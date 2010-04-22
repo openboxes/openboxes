@@ -20,4 +20,10 @@ class StockCardEntry {
 	quantityIncoming(blank:true);
 	quantityOutgoing(blank:true);
     }
+
+    int compareTo(obj) {
+	entryDate.compareTo(obj.entryDate)
+    }
+
+
 }

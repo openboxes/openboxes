@@ -58,16 +58,17 @@ class StockCardController {
 	println "saving stock card entry ${stockCardEntry.id} for stock card ${stockCardEntry.stockCard.id}"
         if (stockCardEntry.save(flush: true)) {
             println "saved stock card entry ${stockCardEntry.id}"
-	    flash.message = '''${message(code: 'default.created.message',
-		    args: [message(code: 'stockCardEntry.label', default: 'Stock Card Entry'), stockCardEntry.id])}'''
+	    flash.message = "${message(code: 'default.created.message', args: [message(code: 'stockCardEntry.label', default: 'Stock Card Entry'), stockCardEntry.id])}"
             redirect(action: "manage", id: stockCardEntry.stockCard.id)
 
 	}
 	else {
 	    println "render create form"
 
+
 	    println "$stockCardEntry.errors"
 	    //render(controller: "stockCardEntry", view: "create", model: [stockCardEntry: stockCardEntry])
+	    
 	    render(view: "manage", model: [stockCardEntryInstance: stockCardEntry, stockCardInstance: stockCardEntry.stockCard])
 	}
 	

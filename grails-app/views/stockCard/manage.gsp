@@ -39,7 +39,7 @@
 		      <th>IN</th>
 		      <th>OUT</th>
 		      <th>Ending balance</th>
-		      <th>Save</th>
+		      <th>Action</th>
 		    </tr>
 		  </thead>
                     <tbody>
@@ -51,7 +51,8 @@
                           <td>${fieldValue(bean: stockCardEntry, field: "quantityIncoming")}</td>
                           <td>${fieldValue(bean: stockCardEntry, field: "quantityOutgoing")}</td>
                           <td>${fieldValue(bean: stockCardEntry, field: "remainingBalance")}</td>
-                          <td>			    
+                          <td>
+			    <a href="">change</a>
 			  </td>
                         </tr>
 		      </g:each>
@@ -75,7 +76,7 @@
 			    ${stockCardEntryInstance?.id}
 			  </td>
 			    <td class="value ${hasErrors(bean: stockCardEntryInstance, field: 'entryDate', 'errors')}">
-			      <g:datePicker name="entryDate" value="${stockCardEntryInstance?.entryDate}" precision="day" noSelection="['':'-Choose-']"/>
+			      <g:datePicker name="entryDate" value="${stockCardEntryInstance?.entryDate}" precision="minute" noSelection="['':'-Choose-']"/>
 			    </td>
 			    <td class="value ${hasErrors(bean: stockCardEntryInstance, field: 'startingBalance', 'errors')}">
 			      <g:textField name="startingBalance" value="${stockCardEntryInstance?.startingBalance}" size="5" />
@@ -105,11 +106,11 @@
 			<g:each var="i" in="${ (0..<10) }">
 			    <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 			      <td></td>
-			      <td>__________________________</td>
-			      <td>_______</td>
-			      <td>_______</td>
-			      <td>_______</td>
-			      <td>_______</td>
+			      <td><g:datePicker name="entryDate" value="${stockCardEntryInstance?.entryDate}" precision="minute" noSelection="['':'-Choose-']"/></td>
+			      <td><g:textField name="startingBalance" value="${stockCardEntryInstance?.remainingBalance}" size="5" /></td>
+			      <td><g:textField name="quantityIncoming" value="${stockCardEntryInstance?.remainingBalance}" size="5" /></td>
+			      <td><g:textField name="quantityOutgoing" value="${stockCardEntryInstance?.remainingBalance}" size="5" /></td>
+			      <td><g:textField name="remainingBalance" value="${stockCardEntryInstance?.remainingBalance}" size="5" /></td>
 			      <td></td>
 			    </tr>
 			</g:each>
