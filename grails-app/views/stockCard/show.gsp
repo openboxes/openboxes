@@ -23,30 +23,25 @@
                     <tbody>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="stockCard.id.label" default="Id" /></td>
-                            
+                            <td valign="top" class="name"><g:message code="stockCard.id.label" default="Id" /></td>                            
                             <td valign="top" class="value">${fieldValue(bean: stockCardInstance, field: "id")}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="stockCard.product.label" default="Product" /></td>
-                            
-                            <td valign="top" class="value"><g:link controller="product" action="show" id="${stockCardInstance?.product?.id}">${stockCardInstance?.product?.encodeAsHTML()}</g:link></td>
-                            
+                            <td valign="top" class="name"><g:message code="stockCard.product.label" default="Product" /></td>                            
+                            <td valign="top" class="value"><g:link controller="product" action="show" id="${stockCardInstance?.product?.id}">${stockCardInstance?.product?.encodeAsHTML()}</g:link></td>                            
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="stockCard.entries.label" default="Entries" /></td>
-                            
+                            <td valign="top" class="name"><g:message code="stockCard.entries.label" default="Entries" /></td>                            
                             <td valign="top" style="text-align: left;" class="value">
                                 <ul>
                                 <g:each in="${stockCardInstance.entries}" var="e">
                                     <li><g:link controller="stockCardEntry" action="show" id="${e.id}">${e?.encodeAsHTML()}</g:link></li>
                                 </g:each>
                                 </ul>
-                            </td>
-                            
+                            </td>                            
                         </tr>
                     
                     </tbody>

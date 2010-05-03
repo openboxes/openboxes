@@ -20,34 +20,24 @@
             <div class="list">
                 <table>
                     <thead>
-                        <tr>
-                        
-                            <g:sortableColumn property="id" title="${message(code: 'warehouse.id.label', default: 'Id')}" />
-                        
-                            <th><g:message code="warehouse.manager.label" default="Manager" /></th>
-                   	    
+                        <tr>                        
                             <g:sortableColumn property="name" title="${message(code: 'warehouse.name.label', default: 'Name')}" />
-                        
-                            <g:sortableColumn property="country" title="${message(code: 'warehouse.country.label', default: 'Country')}" />
-                        
                             <g:sortableColumn property="city" title="${message(code: 'warehouse.city.label', default: 'City')}" />
-                        
+                            <g:sortableColumn property="country" title="${message(code: 'warehouse.country.label', default: 'Country')}" />
+                            <th><g:message code="warehouse.manager.label" default="Manager" /></th>
+                            <g:sortableColumn property="id" title="${message(code: 'warehouse.id.label', default: 'Show Details')}" />
                         </tr>
                     </thead>
                     <tbody>
                     <g:each in="${warehouseInstanceList}" status="i" var="warehouseInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                        
-                            <td><g:link action="show" id="${warehouseInstance.id}">${fieldValue(bean: warehouseInstance, field: "id")}</g:link></td>
-                        
-                            <td>${fieldValue(bean: warehouseInstance, field: "manager")}</td>
-                        
-                            <td>${fieldValue(bean: warehouseInstance, field: "name")}</td>
-                        
-                            <td>${fieldValue(bean: warehouseInstance, field: "country")}</td>
-                        
+                            <td>${fieldValue(bean: warehouseInstance, field: "name")}</td>                        
                             <td>${fieldValue(bean: warehouseInstance, field: "city")}</td>
-                        
+                            <td>${fieldValue(bean: warehouseInstance, field: "country")}</td>                        
+                            <td>${fieldValue(bean: warehouseInstance, field: "manager")}</td>
+                            <td>
+			      <g:link action="show" id="${warehouseInstance.id}">Show Details</g:link>
+			    </td>
                         </tr>
                     </g:each>
                     </tbody>

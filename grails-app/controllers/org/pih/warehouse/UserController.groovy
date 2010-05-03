@@ -22,7 +22,7 @@ class UserController {
 	session.user = userInstance
 	if (userInstance) {
 	    println "user exists $userInstance";
-	    redirect(controller:'product',action:'list')
+	    redirect(controller:'warehouse',action:'index')
 	}
 	else {
 	    println "user does not exist";

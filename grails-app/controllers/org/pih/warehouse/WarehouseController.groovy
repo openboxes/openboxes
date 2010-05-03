@@ -1,9 +1,46 @@
 package org.pih.warehouse
 
-class WarehouseController {
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
+class WarehouseController {
+
+    def inventoryService;
+
+    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
     def beforeInterceptor = [action:this.&auth,except:'login']
+
+    // defined as a regular method so its private
+    def auth() {
+	println "checking if user is authenticated $session.user";
+	if(!session.user) {
+	    println "user in not authenticated";
+	    redirect(controller: "user", action: "login");
+	    return false
+	} else {
+	    println "user is authenticated";
+	}
+    }
+
+    /*
+    	    stockCard: stockCardService.getStockCard(Warehouse.get(params.warehouse),
+						 		Product.get(params.product), fromDate, toDate)
+    */
+    def showInventory = {
+	//Date fromDate = params.fromDate ?: new Date()
+	//Date toDate = params.toDate ?: new Date()
+	def warehouseInstance = Warehouse.get(params.id)
+	println "warehouse $params.id";
+	println "$warehouseInstance.id";
+	def transactionList = inventoryService.getAllTransactions(warehouseInstance);
+	def inventory = inventoryService.getInventory(warehouseInstance)
+
+
+	return [
+	    warehouseInstance : warehouseInstance,
+	    transactions : Transaction.getAll(),
+	    inventory : inventory
+	]
+    }
+
 
     def index = {
         redirect(action: "list", params: params)

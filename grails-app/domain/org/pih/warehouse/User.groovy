@@ -16,8 +16,12 @@ class User {
     String username;
     String password;
 
-    String toString() { return "$email"; }
+    String toString() { return "$firstName $lastName"; }
 
+
+    static mapping = {
+	table "`user`"
+    }
 
     static constraints = {
 	email(email:true)

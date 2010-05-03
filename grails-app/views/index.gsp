@@ -62,9 +62,9 @@
 				<div class="panelBody">
 					<h1>Actions</h1>
 					<ul>
-					  <li><a href="product/list">Manage Products</a></li>
-					  <li><a href="warehouse/list">Manage Warehouses</a></li>
-					  <li><a href="user/list">Manage Users</a></li>
+					  <li><a href="warehouse/list">Show All Warehouses</a></li>
+					  <li><a href="product/list">Show All Products</a></li>
+					  <li><a href="user/list">Show All Users</a></li>
 					</ul>
 					<h1>Controllers</h1>
 					<ul>

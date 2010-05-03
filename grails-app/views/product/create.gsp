@@ -29,10 +29,10 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="upc"><g:message code="product.upc.label" default="Universal Product Code" /></label>
+                                    <label for="ean"><g:message code="product.ean.label" default="Universal Product Code" /></label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'upc', 'errors')}">
-                                    <g:textField name="upc" value="${productInstance?.upc}" />
+                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'ean', 'errors')}">
+                                    <g:textField name="ean" value="${productInstance?.ean}" />
                                 </td>
                             </tr>
                         

@@ -29,19 +29,19 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="manager"><g:message code="warehouse.manager.label" default="Manager" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'manager', 'errors')}">
-                                    <g:select name="manager.id" from="${org.pih.warehouse.User.list()}" optionKey="id" value="${warehouseInstance?.manager?.id}"  />
-                                </td>
-                            </tr>
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
                                     <label for="name"><g:message code="warehouse.name.label" default="Name" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'name', 'errors')}">
                                     <g:textField name="name" value="${warehouseInstance?.name}" />
+                                </td>
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="city"><g:message code="warehouse.city.label" default="City" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'city', 'errors')}">
+                                    <g:textField name="city" value="${warehouseInstance?.city}" />
                                 </td>
                             </tr>
                         
@@ -56,12 +56,13 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="city"><g:message code="warehouse.city.label" default="City" /></label>
+                                    <label for="manager"><g:message code="warehouse.manager.label" default="Manager" /></label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'city', 'errors')}">
-                                    <g:textField name="city" value="${warehouseInstance?.city}" />
+                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'manager', 'errors')}">
+                                    <g:select name="manager.id" from="${org.pih.warehouse.User.list()}" optionKey="id" value="${warehouseInstance?.manager?.id}"  />
                                 </td>
                             </tr>
+
                         
                         </tbody>
                     </table>

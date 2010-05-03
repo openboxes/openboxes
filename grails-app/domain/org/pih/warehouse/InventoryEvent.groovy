@@ -12,7 +12,10 @@ package org.pih.warehouse
  *  database -- they are strictly for convenience as well as to
  *  make the API a little easier to understand.
  */
-class WarehouseEvent {
+class InventoryEvent {
+
+    String name		    // shipment, receipt, delivery, donation, correction
+    String description
 
     static constraints = {
     }

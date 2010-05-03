@@ -20,43 +20,35 @@
             </g:if>
             <div class="dialog">
                 <table>
-                    <tbody>
-                    
+                    <tbody>                    
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="warehouse.id.label" default="Id" /></td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean: warehouseInstance, field: "id")}</td>
-                            
-                        </tr>
-                    
+                            <td valign="top" class="name"><g:message code="warehouse.id.label" default="Id" /></td>                            
+                            <td valign="top" class="value">${fieldValue(bean: warehouseInstance, field: "id")}</td>                            
+                        </tr>                    
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="warehouse.manager.label" default="Manager" /></td>
-                            
-                            <td valign="top" class="value"><g:link controller="user" action="show" id="${warehouseInstance?.manager?.id}">${warehouseInstance?.manager?.encodeAsHTML()}</g:link></td>
-                            
+                            <td valign="top" class="name"><g:message code="warehouse.name.label" default="Name" /></td>                            
+                            <td valign="top" class="value">${fieldValue(bean: warehouseInstance, field: "name")}</td>                            
                         </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name"><g:message code="warehouse.name.label" default="Name" /></td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean: warehouseInstance, field: "name")}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name"><g:message code="warehouse.country.label" default="Country" /></td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean: warehouseInstance, field: "country")}</td>
-                            
-                        </tr>
-                    
                         <tr class="prop">
                             <td valign="top" class="name"><g:message code="warehouse.city.label" default="City" /></td>
-                            
                             <td valign="top" class="value">${fieldValue(bean: warehouseInstance, field: "city")}</td>
-                            
                         </tr>
-                    
+                        <tr class="prop">
+                            <td valign="top" class="name"><g:message code="warehouse.country.label" default="Country" /></td>
+                            <td valign="top" class="value">${fieldValue(bean: warehouseInstance, field: "country")}</td>
+                        </tr>
+                        <tr class="prop">
+                            <td valign="top" class="name"><g:message code="warehouse.manager.label" default="Manager" /></td>
+                            <td valign="top" class="value"><g:link controller="user" action="show" id="${warehouseInstance?.manager?.id}">${warehouseInstance?.manager?.encodeAsHTML()}</g:link></td>
+                        </tr>
+                        <tr class="prop">
+                            <td valign="top" class="name"><g:message code="warehouse.inventory.label" default="Inventory" /></td>
+                            <td valign="top" class="value">
+			      <g:link controller="warehouse" action="showInventory" id="${warehouseInstance?.id}">${warehouseInstance?.inventory?.encodeAsHTML()}</g:link>
+			    </td>
+                        </tr>
+
+
                     </tbody>
                 </table>
             </div>

@@ -37,6 +37,18 @@
 		  <input id="password" type='password' name='password' value='${user?.password}' />
 		</td>
 	      </tr>
+	      <tr class='prop'>
+		<td valign='top' style='text-align:left;' width='20%'>
+		  <label for='warehouse'>Select local warehouse:</label>
+		</td>
+		<td valign='top' style='text-align:left;' width='80%'>
+		  <g:select name="warehouse.id" from="${org.pih.warehouse.Warehouse.list()}" optionKey="id" value=""/>
+		</td>
+	      </tr>
+
+
+
+
 	    </table>
 	  </div>
 	  <div class="buttons">
