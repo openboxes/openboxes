@@ -138,8 +138,7 @@ class BootStrap {
 	    targetWarehouse:warehouse1,
 	    transactionType:transactionType1
 	);
-	warehouse2.addToTransactions(transaction1).save(flush:true, validate:true);
-	transaction1.save(flush:true);
+	
 
 	TransactionEntry transactionEntry1 = new TransactionEntry(
 	    id:1,
@@ -150,6 +149,8 @@ class BootStrap {
 	);
 	transaction1.addToTransactionEntries(transactionEntry1).save(flush:true, validate:true);
 	transactionEntry1.save(flush:true);
+	warehouse2.addToTransactions(transaction1).save(flush:true, validate:true);
+	transaction1.save(flush:true);
 	//transaction1.save(flush:true);
     }
 
