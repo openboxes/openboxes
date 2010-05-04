@@ -1,0 +1,5 @@
+<?php
+$result = array("_MESSAGE" => 'Message',
+				"_YES" => 'Yes',
+				"_NO" => 'No');	
+?>
