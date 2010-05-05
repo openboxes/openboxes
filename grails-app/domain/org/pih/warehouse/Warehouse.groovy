@@ -3,7 +3,7 @@ package org.pih.warehouse
 class Warehouse {
 
     // Core elements
-    Integer id
+    //Integer id
     String name
     String city
     String country
@@ -11,7 +11,7 @@ class Warehouse {
 
     // Core associations
     Inventory inventory
-    List<Transaction> transactions   // might be better at inventory level
+    //List<Transaction> transactions   // might be better at inventory level
 
     
     // Association mapping
@@ -24,15 +24,15 @@ class Warehouse {
     //Country country
     //City city
     //State stateOrProvince
-    // Address address
+    //Address address
 
     String toString() { return "$name"; }
 
 
     // Constraints
     static constraints = {
-	manager(nullable:true)
-	inventory(nullable:true)
-	transactions(nullable:true)
+	    manager(nullable:true)
+	    inventory(nullable:true)
+	    transactions(nullable:true)
     }
 }

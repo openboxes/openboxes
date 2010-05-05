@@ -3,17 +3,20 @@ package org.pih.warehouse
 class TransactionEntry {
 
     // Core data elements
-    Integer id
+    //Integer id
     //String lotNumber		// Should be a real entity
     Product product		// Should actually be a batch or lot
     Integer quantityChange	// Convention: negative number means OUT, positive number means IN
     Date confirmDate		// Confirmation date (of what receiving?)
 
     // Core associations
-    Transaction transaction	// Reference to the parent tranaction.
+    //Transaction transaction	// Reference to the parent tranaction.
 
 
-    static belongsTo = [ Transaction ]
+    String toString() { return "$quantityChange units of $product on $confirmDate"; }
+
+
+    static belongsTo = [ transaction : Transaction ]
 
     static constraints = {
 	

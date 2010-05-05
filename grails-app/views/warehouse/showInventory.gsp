@@ -23,16 +23,32 @@
             <div class="message">${flash.message}</div>
             </g:if>
             <div class="dialog">
+
+	      <h2>Current Inventory</h2>
                 <table>
 		  <thead>
 		    <tr>
-		      <th>ID</th>
 		      <th>Product</th>
 		      <th>Quantity</th>
 		      <th>Reorder Level</th>
 		    </tr>
 		  </thead>
                   <tbody>
+
+		    <g:each var="inventoryLineItem" in="${inventory}" status="i">
+		      <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+			  <td>${inventoryLineItem.key}</td>
+			  <td>${inventoryLineItem.value}</td>
+		      </tr>
+		    </g:each>
+
+
+		   <%--
+
+			<td>${fieldValue(bean: inventoryLineItem, field: "product.name")}</td>
+			<td>${fieldValue(bean: inventoryLineItem, field: "quantity")}</td>
+
+
 		      <g:each in="${warehouseInstance.inventory.inventoryLineItems}" var="inventoryLineItem" status="i">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 			  <td>${fieldValue(bean: inventoryLineItem, field: "id")}</td>
@@ -41,29 +57,40 @@
                           <td>${fieldValue(bean: inventoryLineItem, field: "reorderQuantity")}</td>
                         </tr>
 		      </g:each>
+
+			--%>
 		  </tbody>
 		</table>
 
-
+	      <h2>Show all Transactions</h2>
                 <table>
 		  <thead>
 		    <tr>
-		      <th>ID</th>
 		      <th>Product</th>
-		      <th>Quantity</th>
-		      <th>Reorder Level</th>
+		      <th>Quantity Change</th>
 		    </tr>
 		  </thead>
                   <tbody>
+
+
 		      <g:each in="${warehouseInstance.transactions}" var="transaction" status="i">
-                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-			  <td>${fieldValue(bean: transaction, field: "id")}</td>
-                          <td>${fieldValue(bean: inventoryLineItem, field: "product.name")}</td>
-                          <td>${fieldValue(bean: inventoryLineItem, field: "quantity")}</td>
-                          <td>${fieldValue(bean: inventoryLineItem, field: "reorderQuantity")}</td>
-                        </tr>
+
+			<tr>
+			  <td colspan="2" align="right" valign="middle">
+			    <g:link controller="transactionEntry" action="create" id="${transaction.id}">Add Entry on ${fieldValue(bean: transaction, field: "transactionDate")}</g:link>
+			  </td>
+			</tr>
+
+			<g:each in="${transaction.transactionEntries}" var="transactionEntry" status="j">
+			  <tr class="${(j % 2) == 0 ? 'odd' : 'even'}">			    
+			    <td>${fieldValue(bean: transactionEntry, field: "product.name")}</td>
+			    <td>${fieldValue(bean: transactionEntry, field: "quantityChange")}</td>
+			  </tr>
+			</g:each>
 		      </g:each>
-		  </tbody>
+
+
+		</tbody>
 		</table>
 
 

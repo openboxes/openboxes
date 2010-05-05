@@ -31,7 +31,7 @@ class Transaction {
     // Core associations
     Warehouse localWarehouse	    // local warehouse
     Warehouse targetWarehouse	    // where the transaction is going to / coming from
-    List<TransactionEntry> transactionEntries	    // product-specific entries
+    //List<TransactionEntry> transactionEntries	    // product-specific entries
 
     // Association mapping
     static hasMany = [ transactionEntries : TransactionEntry ]
@@ -39,13 +39,13 @@ class Transaction {
 
     // Constraints 
     static constraints = {
-	transactionDate(min:new Date(),nullable:false)
-	direction(nullable:true)
-	transactionType(nullable:true)
-	inventory(nullable:true)
-	inventoryEvent(nullable:true)
-	localWarehouse(nullable:false)
-	targetWarehouse(nullable:false)
-	transactionEntries(nullable:true)
+	    transactionDate(min:new Date(),nullable:false)
+	    direction(nullable:true)
+	    transactionType(nullable:true)
+	    inventory(nullable:true)
+	    inventoryEvent(nullable:true)
+	    localWarehouse(nullable:false)
+	    targetWarehouse(nullable:false)
+	    transactionEntries(nullable:true)
     }
 }

@@ -26,6 +26,8 @@
                             <g:sortableColumn property="country" title="${message(code: 'warehouse.country.label', default: 'Country')}" />
                             <th><g:message code="warehouse.manager.label" default="Manager" /></th>
                             <g:sortableColumn property="id" title="${message(code: 'warehouse.id.label', default: 'Show Details')}" />
+                            <th><g:message code="warehouse.inventory.label" default="Inventory" /></th>
+                            <th><g:message code="warehouse.transactions.label" default="Transactions" /></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -37,6 +39,12 @@
                             <td>${fieldValue(bean: warehouseInstance, field: "manager")}</td>
                             <td>
 			      <g:link action="show" id="${warehouseInstance.id}">Show Details</g:link>
+			    </td>
+                            <td>
+			      <g:link action="showInventory" id="${warehouseInstance.id}">Show Inventory</g:link>
+			    </td>
+                            <td>
+			      <g:link action="showTransactions" id="${warehouseInstance.id}">Show Transactions</g:link>
 			    </td>
                         </tr>
                     </g:each>

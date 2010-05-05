@@ -47,6 +47,23 @@
 			      <g:link controller="warehouse" action="showInventory" id="${warehouseInstance?.id}">${warehouseInstance?.inventory?.encodeAsHTML()}</g:link>
 			    </td>
                         </tr>
+                        <tr class="prop">
+                            <td valign="top" class="name"><g:message code="warehouse.transactions.label" default="Transactions" /></td>
+                            <td valign="top" class="value">
+			      <table>
+				<g:each in="${warehouseInstance.transactions}" var="transaction" status="i">
+				  <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+				    <td>${fieldValue(bean: transaction, field: "id")}</td>
+				    <td>${fieldValue(bean: transaction, field: "transactionDate")}</td>
+				    <td>${fieldValue(bean: transaction, field: "inventory.id")}</td>
+				    <td>${fieldValue(bean: transaction, field: "localWarehouse")}</td>
+
+				  </tr>
+				</g:each>				
+			      </table>
+
+			    </td>
+                        </tr>
 
 
                     </tbody>

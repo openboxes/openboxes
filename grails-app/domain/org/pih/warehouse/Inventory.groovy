@@ -3,7 +3,6 @@ package org.pih.warehouse
 class Inventory {
 
     // Core data elements
-    Integer id
     Date lastInventoryDate	// last time an inventory was completed
     Warehouse warehouse		// we could assume that a warehouse has an inventory
 
@@ -15,13 +14,12 @@ class Inventory {
     static belongsTo = [ Warehouse ]
 
     // Show use warehouse name
-    String toString() { return "Show Inventory"; }
+    String toString() { return "Inventory $id"; }
 
     // Constraints
     static constraints = {
 	lastInventoryDate(nullable:true)
 	inventoryLineItems(nullable:true)
 	warehouse(nullable:false)
-
     }
 }

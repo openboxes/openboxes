@@ -1,5 +1,3 @@
-
-
 import java.util.ArrayList;
 import org.pih.warehouse.Product;
 import org.pih.warehouse.User;
@@ -115,7 +113,6 @@ class BootStrap {
 	    binLocation: "Warehouse Bin A1"
 	);
 
-
 	// TRYING THIS APPROACH
 	inventory2.addToInventoryLineItems(inventoryLineItem1).save(flush:true, validate:false);
 	inventory2.save(flush:true);
@@ -127,30 +124,31 @@ class BootStrap {
 	/**
 	 * warehouse > transactions > transaction entries
 	 */
-	TransactionType transactionType1 = new TransactionType(name:"Shipment");
-	transactionType1.save(flush:true);
-
+	TransactionType transactionType1 = new TransactionType(name:"Incoming Shipment");
+	transactionType1.save(flush:true, validate:true);
 
 	Transaction transaction1 = new Transaction(
 	    id:1,
 	    transactionDate:new Date(),
-	    localWarehouse:warehouse2,
+	    //localWarehouse:warehouse2,
 	    targetWarehouse:warehouse1,
 	    transactionType:transactionType1
 	);
-	
+	//transaction1.save();
+	//transaction1.addToTransactionEntries(transactionEntry1).save();
+	warehouse2.addToTransactions(transaction1).save(validate:true);
 
+	/*
 	TransactionEntry transactionEntry1 = new TransactionEntry(
-	    id:1,
 	    product:product1,
-	    transaction:transaction1,
 	    quanityChange:new Integer(50),
 	    confirmDate:new Date()
 	);
-	transaction1.addToTransactionEntries(transactionEntry1).save(flush:true, validate:true);
-	transactionEntry1.save(flush:true);
-	warehouse2.addToTransactions(transaction1).save(flush:true, validate:true);
-	transaction1.save(flush:true);
+	transaction1.addToTransactionEntries(transactionEntry1).save(validate:true);
+	*/
+	//transactionEntry1.save(flush:true);
+	//warehouse2.addToTransactions(transaction1).save(flush:true, validate:true);
+	//
 	//transaction1.save(flush:true);
     }
 
