@@ -1,114 +1,58 @@
 <html>
     <head>
-        <title>Welcome to Grails</title>
-		<meta name="layout" content="main" />
-		<style type="text/css" media="screen">
-
-			#nav {
-				margin-top:20px;
-				margin-left:30px;
-				width:228px;
-				float:left;
-
-			}
-			.homePagePanel * {
-				margin:0px;
-			}
-			.homePagePanel .panelBody ul {
-				list-style-type:none;
-				margin-bottom:10px;
-			}
-			.homePagePanel .panelBody h1 {
-				text-transform:uppercase;
-				font-size:1.1em;
-				margin-bottom:10px;
-			}
-			.homePagePanel .panelBody {
-			    background: url(images/leftnav_midstretch.png) repeat-y top;
-				margin:0px;
-				padding:15px;
-			}
-			.homePagePanel .panelBtm {
-			    background: url(images/leftnav_btm.png) no-repeat top;
-				height:20px;
-				margin:0px;
-			}
-
-			.homePagePanel .panelTop {
-			    background: url(images/leftnav_top.png) no-repeat top;
-				height:11px;
-				margin:0px;
-			}
-			h2 {
-				margin-top:15px;
-				margin-bottom:15px;
-				font-size:1.2em;
-			}
-			#pageBody {
-				margin-left:280px;
-				margin-right:20px;
-			}
-		</style>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="layout" content="custom" />
+        <g:set var="entityName" value="${message(code: 'warehouse.label', default: 'Warehouse')}" />
+        <title><g:message code="default.list.label" args="[entityName]" /></title>
+	<!--
+	    Specify content to overload like global navigation links,
+	    page titles, etc.
+	-->
+	<content tag="globalLinks"></content>
+	<content tag="pageTitle">Welcome to the <strong>PIH&copy;</strong> Warehouse</content>
     </head>
-    <body>
-
-        <div class="nav">
-            <span class="menuButton"><a class="home" href="${createLink(uri: '/')}">Home</a></span>
-        </div>
-
-		<div id="nav">
-			<div class="homePagePanel">
-				<div class="panelTop"></div>
-				<div class="panelBody">
-					<h1>Actions</h1>
-					<ul>
-					  <li><a href="warehouse/list">Show All Warehouses</a></li>
-					  <li><a href="product/list">Show All Products</a></li>
-					  <li><a href="user/list">Show All Users</a></li>
-					</ul>
-					<h1>Controllers</h1>
-					<ul>
-					  <g:each var="c" in="${grailsApplication.controllerClasses}">
-						<li class="controller"><g:link controller="${c.logicalPropertyName}">${c.name}</g:link></li>
-					  </g:each>
-					</ul>
-
-					<!--
-					<h1>Application Status</h1>
-					<ul>
-						<li>App version: <g:meta name="app.version"></g:meta></li>
-						<li>Grails version: <g:meta name="app.grails.version"></g:meta></li>
-						<li>JVM version: ${System.getProperty('java.version')}</li>
-						<li>Controllers: ${grailsApplication.controllerClasses.size()}</li>
-						<li>Domains: ${grailsApplication.domainClasses.size()}</li>
-						<li>Services: ${grailsApplication.serviceClasses.size()}</li>
-						<li>Tag Libraries: ${grailsApplication.tagLibClasses.size()}</li>
-					</ul>
-					<h1>Installed Plugins</h1>
-					<ul>
-						<g:set var="pluginManager"
-						       value="${applicationContext.getBean('pluginManager')}"></g:set>
-
-						<g:each var="plugin" in="${pluginManager.allPlugins}">
-							<li>${plugin.name} - ${plugin.version}</li>
-						</g:each>
-
-					</ul>
-					-->
-				</div>
-				<div class="panelBtm">
-					
-				</div>
-			</div>
-
-
-		</div>
-		<div id="pageBody">
-		  <h1>Welcome to the <strong>PIH&copy;</strong> Warehouse Inventory Tracking System</h1>
-		  <p>Some blurb about the system ...</p>
-		  
-		  
-		  
-		</div>
+    <body>        
+	<div class="body">
+	    <div>
+		<g:form controller="user" action="doLogin" method="post">		  
+		    <div class="dialog">
+			<g:if test="${flash.message}">
+			    <div class="message">${flash.message}</div>
+			</g:if>
+			<table class="userForm">
+			    <tr class='prop'>
+				<td valign='top' style='text-align:left;' width='20%'>
+				    <label for='email'>Username:</label>
+				</td>
+				<td valign='top' style='text-align:left;' width='80%'>
+				    <input id="username" type='text' name='username' value='${user?.username}' />
+				</td>
+			    </tr>
+			    <tr class='prop'>
+				<td valign='top' style='text-align:left;' width='20%'>
+				    <label for='password'>Password:</label>
+				</td>
+				<td valign='top' style='text-align:left;' width='80%'>
+				    <input id="password" type='password' name='password' value='${user?.password}' />
+				</td>
+			    </tr>
+			    <tr class='prop'>
+				<td valign='top' style='text-align:left;' width='20%'>
+				    <label for='warehouse'>Select your warehouse:</label>
+				</td>
+				<td valign='top' style='text-align:left;' width='80%'>
+				    <g:select name="warehouse.id" from="${org.pih.warehouse.Warehouse.list()}" optionKey="id" value=""/>
+				</td>
+			    </tr>
+			</table>
+		    </div>
+		    <div class="buttons">
+			<span class="button">
+			    <g:submitButton name="login" class="save" value="${message(code: 'default.button.login.label', default: 'Login')}" />
+			</span>
+		    </div>
+		</g:form>
+	    </div>
+	</div>
     </body>
 </html>

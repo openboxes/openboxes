@@ -5,6 +5,8 @@ package org.pih.warehouse
  */
 class Attachment {
 
+    byte [] contents
+
     static constraints = {
     }
 }

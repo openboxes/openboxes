@@ -3,18 +3,18 @@ package org.pih.warehouse
 class Inventory {
 
     // Core data elements
-    Date lastInventoryDate	// last time an inventory was completed
     Warehouse warehouse		// we could assume that a warehouse has an inventory
+    Date lastInventoryDate	// last time an inventory was completed
 
     // Core associations
-    List<InventoryLineItem> inventoryLineItems	// products in inventory
+    //List<InventoryLineItem> inventoryLineItems	// products in inventory
 
     // Association mapping
     static hasMany = [ inventoryLineItems : InventoryLineItem ]
-    static belongsTo = [ Warehouse ]
+    static belongsTo = [ warehouse : Warehouse ]
 
     // Show use warehouse name
-    String toString() { return "Inventory $id"; }
+    String toString() { return "Inventory @ $warehouse.name"; }
 
     // Constraints
     static constraints = {

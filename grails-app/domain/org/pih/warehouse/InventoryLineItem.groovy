@@ -3,8 +3,7 @@ package org.pih.warehouse
 class InventoryLineItem {
 
     Product product		    // Specific product that we're tracking
-    String binLocation		    // Location within warehouse ("bin" needs its own entity)
-    Inventory inventory		    // Provides a reference back to the parent inventory
+    //Inventory inventory	    // Provides a link back to the parent inventory
 
     Integer quantity		    // Quantity could be a class on its own
     Integer reorderQuantity;	    // Should reorder product when quanity falls below this value
@@ -13,6 +12,8 @@ class InventoryLineItem {
     // TODO Cannot have a reference to product for some reason
     //static hasOne = [ product : Product ]
     static belongsTo = [ inventory : Inventory ]
+
+    String binLocation		    // Location within warehouse ("bin" needs its own entity)
 
     
     // Other important information to be added soon

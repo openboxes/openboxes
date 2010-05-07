@@ -22,7 +22,7 @@ body {
     font: 11px verdana, arial, helvetica, sans-serif;
 }
 #grailsLogo {
-    padding-left: 10px;
+    padding-left: 0px;
     margin:0;
 }
 #grailsAppName {
@@ -305,7 +305,7 @@ th.desc a {
    padding-bottom: 0px;
    width:100%;
    background:#fff;
-   height: 50px;
+   height: 62px;
 }
 
 #banner {
@@ -315,12 +315,34 @@ th.desc a {
 /**
  *  cannot get this to move down so using absolute positioning for now
  */
+
+/* the following selectors are used by layout.gsp layout */
+#logo-info {
+    width: 40%;
+    text-align: left;
+}
+#login-info {
+    width:40%;
+    text-align: right;
+    margin: 10px;
+}
+#login-info ul {
+    list-style:none;
+    margin: 0;
+    padding: 0;
+}
+#login-info ul li  {
+    display: inline;
+    margin: 0 5px;
+}
+
+/* the following selectors are used by main.gsp layout */
 #globalNav {
-    float: right;
+   float: right;
     position: absolute;
     right: 15px;
     top: 30px;
- }
+}
 
 #globalNav ul {
     list-style:none;
@@ -331,3 +353,5 @@ th.desc a {
     display: inline;
     margin: 0 5px;
 }
+
+
