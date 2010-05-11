@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Date;
 import org.pih.warehouse.Country;
 import org.pih.warehouse.Inventory;
 import org.pih.warehouse.InventoryLineItem;
@@ -22,13 +23,16 @@ class BootStrap {
 	new Country(country: "Mexico", population: 103593973, gdp: 24251210, date: new Date()).save();
 	new Country(country: "United States", population: 300000000, gdp: 24251210, date: new Date()).save();
 
-
 	/**
 	 * Users
 	 */
 	User user1 = new User(
-	    email:"jmiranda@pih.org", firstName:"Justin", lastName:"Miranda",
-	    role:"Stock Manager", username:"jmiranda", password: "password"
+	    email:"jmiranda@pih.org", 
+	    firstName:"Justin", 
+	    lastName:"Miranda",
+	    role:"Stock Manager", 
+	    username:"jmiranda", 
+	    password: "password"
 	).save();
 
 	/**
@@ -107,8 +111,6 @@ class BootStrap {
 	).save(flush:true);
 	inventory1.addToInventoryLineItems(inventoryItem1).save(flush:true, validate:false);
 
-
-
 	/**
 	 * warehouse > transactions > transaction entries
 	 */
@@ -126,28 +128,15 @@ class BootStrap {
 
 	TransactionEntry transactionEntry1 = new TransactionEntry(
 	    product:product1,
-	    quantityChange:new Integer(50),
+	    quantityChange:50,
 	    confirmDate:new Date()
 	);
 	transaction1.addToTransactionEntries(transactionEntry1).save(flush:true, validate:false);
 	
-	 
-
-
-	/*
-	TransactionEntry transactionEntry1 = new TransactionEntry(
-	    product:product1,
-	    quanityChange:new Integer(50),
-	    confirmDate:new Date()
-	);
-	transaction1.addToTransactionEntries(transactionEntry1).save(validate:true);
-	*/
-	//transactionEntry1.save(flush:true);
-	//warehouse2.addToTransactions(transaction1).save(flush:true, validate:true);
-	//
-	//transaction1.save(flush:true);
-    }
 
      def destroy = {
      }
-} 
+     
+    }
+    
+}
