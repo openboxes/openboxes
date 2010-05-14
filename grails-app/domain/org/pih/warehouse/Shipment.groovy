@@ -17,12 +17,13 @@ class Shipment {
 
     // Constraints
     static constraints = {
-	status(inList:["Order Received", "Shipmment Packed", "Shipment Sent"])
-	trackingNumber(nullable:true)
-	expectedShippingDate(nullable:true)
-	actualShippingDate(nullable:true)
-	source(nullable:false)
-	target(nullable:false)
-	products(nullable:true)
+		status(inList:["Order Received", "Shipmment Packed", "Shipment Sent"])
+		trackingNumber(nullable:true)
+		expectedShippingDate(nullable:true)
+		actualShippingDate(nullable:true)
+		source(nullable:false)
+		target(nullable:false)
+		products(nullable:true)
+		shipmentLineItems(nullable:true)
     }
 }

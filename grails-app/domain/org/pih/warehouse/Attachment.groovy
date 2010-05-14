@@ -5,8 +5,12 @@ package org.pih.warehouse
  */
 class Attachment {
 
+	long size
+	String type
+	String filename
     byte [] contents
 
     static constraints = {
+		type(inList:["Invoice", "Packing List", "Shipping Manifest", "Other"])
     }
 }

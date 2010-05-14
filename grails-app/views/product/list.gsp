@@ -6,18 +6,18 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'product.label', default: 'Product')}" />
         <title><g:message code="default.list.label" args="[entityName]" /></title>
-	<!--
-	    Specify content to overload like global navigation links,
-	    page titles, etc.
-	-->
-	<content tag="globalLinks">
-	    <span class="menuButton">
-		<g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link>
-	    </span>
-	</content>
-	<content tag="pageTitle">
-	    <g:message code="default.list.label" args="[entityName]" />
-	</content>
+		<!--
+		    Specify content to overload like global navigation links,
+		    page titles, etc.
+		-->
+		<content tag="globalLinks">
+		    <span class="menuButton">
+			<g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link>
+		    </span>
+		</content>
+		<content tag="pageTitle">
+		    <g:message code="default.list.label" args="[entityName]" />
+		</content>
     </head>
     <body>
         <div class="body">

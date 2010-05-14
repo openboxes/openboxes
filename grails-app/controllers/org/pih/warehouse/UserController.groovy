@@ -4,69 +4,99 @@ class UserController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST", login: "GET", doLogin: "POST"]
 
-
+    /**
+     * Allows user to log into the system.
+     */
     def login = {
-	println "show login page";
-	String instructions = "To log on as a manager, please use <strong>jmiranda</strong>:<strong>password</strong>";
-	if (!flash.message)
-	    flash.message = instructions;
-
-	//"${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+		log.info "show login page";
+		String instructions = "To log on as a manager, please use <strong>jmiranda</strong>:<strong>password</strong>";
+		if (!flash.message)
+		    flash.message = instructions;
+	
+		//"${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
     }
 
+    /** 
+     * Performs the authentication logic.
+     */
     def doLogin = {
-
-	println "do login"
-	def userInstance = User.findWhere(username:params['username'], password:params['password'])
-	println "found user";
-	session.user = userInstance
-	if (userInstance) {
-	    println "user exists $userInstance";
-	    redirect(controller:'warehouse',action:'index')
-	}
-	else {
-	    println "user does not exist";
-	    flash.message = "Unable to authenticate user with the provided credentials."
-
-	    //userInstance = new User();
-	    //userInstance.errors.rejectValue("version", "default.authentication.failure",
-	    //	[message(code: 'user.label', default: 'User')] as Object[], "Unable to authenticate user with the provided credentials.")
-
-	    redirect(controller:'user',action:'login')
-	}
+		log.info "doLogin"
+		
+    	def userInstance = User.findWhere(username:params['username'], password:params['password'])
+    	//log.info "$params.warehouse.id"
+    	//def warehouse = Warehouse.get(params);
+    	//if (warehouse)
+    	//	log.info "$warehouse.name"
+    	//userInstance.warehouse = warehouse		
+		session.user = userInstance
+		
+		
+		if (userInstance) {
+		    println "user exists $userInstance";
+		    redirect(controller:'home',action:'dashboard')
+		}
+		else {
+		    println "user does not exist";
+		    flash.message = "Unable to authenticate user with the provided credentials."
+	
+		    //userInstance = new User();
+		    //userInstance.errors.rejectValue("version", "default.authentication.failure",
+		    //	[message(code: 'user.label', default: 'User')] as Object[], "Unable to authenticate user with the provided credentials.")
+	
+		    redirect(controller:'user',action:'login')
+		}
     }
+    
+    /**
+     * Allows user to log out of the system
+     */
+    def logout = { 
+    	log.info "logout"
+    	session.user = null
+    	flash.message = "User was successfully logged out."
+    	redirect(action:'login')
+    }    
 
-     /*
-    def doLogin = {
-        println "locating user $params";
-	def userList = User.list(params)
-	println "found users $userList";
-        //def userInstance = User.get(params.username);
-	if (!userList.isEmpty()) {
-	    println "found user $userList";
-            //flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
-            //redirect(action: "list")
-	    redirect(action: "list");
-        }
-
-    }*/
-
-    def index = {
+    /**
+     * Show user preferences.
+     */
+    def preferences = {
+    	log.info "show preferences"
+    }
+    
+    /**
+     * Show index page - just a redirect to the list page.
+     */
+    def index = {    	
+    	log.info "doLogin"
         redirect(action: "list", params: params)
     }
 
+    /**
+     * Show list of users
+     */
     def list = {
+    	log.info "show a list of users"
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [userInstanceList: User.list(params), userInstanceTotal: User.count()]
     }
 
+    
+    /**
+     * Create a user
+     */
     def create = {
+    	log.info "create a new user based on request parameters"
         def userInstance = new User()
         userInstance.properties = params
         return [userInstance: userInstance]
     }
 
+    /**
+     * Save a user
+     */
     def save = {
+    	log.info "attempt to save the user; show form with validation errors on failure"
         def userInstance = new User(params)
         if (userInstance.save(flush: true)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'user.label', default: 'User'), userInstance.id])}"
@@ -77,6 +107,10 @@ class UserController {
         }
     }
 
+    
+    /**
+     * Show a user
+     */
     def show = {
         def userInstance = User.get(params.id)
         if (!userInstance) {
@@ -88,6 +122,9 @@ class UserController {
         }
     }
 
+    /**
+     * Show the edit form for a user
+     */
     def edit = {
         def userInstance = User.get(params.id)
         if (!userInstance) {
@@ -99,6 +136,9 @@ class UserController {
         }
     }
 
+    /**
+     * Update a user 
+     */
     def update = {
         def userInstance = User.get(params.id)
         if (userInstance) {
@@ -125,7 +165,10 @@ class UserController {
             redirect(action: "list")
         }
     }
-
+    
+    /**
+     * Delete a user
+     */
     def delete = {
         def userInstance = User.get(params.id)
         if (userInstance) {
@@ -144,4 +187,5 @@ class UserController {
             redirect(action: "list")
         }
     }
+    
 }

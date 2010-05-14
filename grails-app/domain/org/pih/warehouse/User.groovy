@@ -8,6 +8,9 @@ class User {
     String firstName;
     String lastName;
     String email;
+    
+    // User's current warehouse
+    Warehouse warehouse;
 
     // Authorization
     String role;
@@ -20,12 +23,13 @@ class User {
 
 
     static mapping = {
-	table "`user`"
+    	table "`user`"
     }
 
     static constraints = {
-	email(email:true)
-	password(blank:false, password: true)
-	role(inList:["Stock Manager", "Stock Person", "Other"]);
+		email(email:true)
+		password(blank:false, password: true)
+		role(inList:["Stock Manager", "Stock Person", "Other"])
+		warehouse(nullable:true)
     }
 }

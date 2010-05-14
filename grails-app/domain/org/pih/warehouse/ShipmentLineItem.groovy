@@ -8,9 +8,8 @@ class ShipmentLineItem {
     static belongsTo = [ shipment : Shipment ]
 
     static constraints = {
-	quantity(min:0, nullable:false)
-	product(nullable:false)
-	shipment(nullable:false)
-
+		quantity(min:0, nullable:false)
+		product(nullable:false)
+		shipment(nullable:false)
     }
 }

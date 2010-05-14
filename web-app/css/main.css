@@ -48,7 +48,7 @@ h1 {
 }
 
 ul {
-    padding-left: 15px;
+    padding-left: 5px;
 }
 
 input, select, textarea {
@@ -109,6 +109,7 @@ input:focus, select:focus, textarea:focus {
     color: #333;
     padding-left: 25px;
 }
+
 
 /* MESSAGES AND ERRORS */
 
@@ -354,4 +355,136 @@ th.desc a {
     margin: 0 5px;
 }
 
+/* breadcrumb */
+.breadcrumb { 
+	margin: 10px;	
+}
+
+/* more menu button icons */
+
+.menuButton a.settings {
+    background: url(../images/icons/settings.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.shipment {
+    background: url(../images/icons/truck.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.warehouse {
+    background: url(../images/icons/handtruck.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.inventory {
+    background: url(../images/icons/inventory.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.menu {
+    background: url(../images/icons/document.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.account {
+    background: url(../images/icons/document.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.main {
+    background: url(../images/icons/document.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.auth {
+    background: url(../images/icons/document.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.user {
+    background: url(../images/icons/user.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.role {
+    background: url(../images/icons/profile.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.admins {
+    background: url(../images/icons/users.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.group {
+    background: url(../images/icons/users.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.admin {
+    background: url(../images/icons/profile.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.transaction {
+    background: url(../images/icons/document.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.stockcard {
+    background: url(../images/icons/document.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.stockcardentry {
+    background: url(../images/icons/document.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.country {
+    background: url(../images/icons/map.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.inventorylineitem {
+    background: url(../images/icons/package.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.product {
+    background: url(../images/icons/product.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.transactionentry {
+    background: url(../images/icons/document.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.documentupload {
+    background: url(../images/icons/document.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
 

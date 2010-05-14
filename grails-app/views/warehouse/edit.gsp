@@ -3,25 +3,27 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="layout" content="main" />
+        <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'warehouse.label', default: 'Warehouse')}" />
         <title><g:message code="default.edit.label" args="[entityName]" /></title>
+        <!-- Specify content to overload like global navigation links, page titles, etc. -->
+		<content tag="pageTitle"><g:message code="default.edit.label" args="[entityName]" /></content>
+		<content tag="menuTitle">${entityName}</content>		
+		<content tag="globalLinksMode">append</content>
+		<content tag="localLinksMode">override</content>
+		<content tag="globalLinks"><g:render template="global" model="[entityName:entityName]"/></content>
+		<content tag="localLinks"><g:render template="local" model="[entityName:entityName]"/></content>               
+		<content tag="breadcrumb"><g:render template="breadcrumb" model="[warehouse:warehouseInstance,pageTitle:pageTitle]"/></content>
     </head>
     <body>
-        <div class="nav">
-            <span class="menuButton"><a class="home" href="${createLink(uri: '/')}">Home</a></span>
-            <span class="menuButton"><g:link class="list" action="list"><g:message code="default.list.label" args="[entityName]" /></g:link></span>
-            <span class="menuButton"><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></span>
-        </div>
         <div class="body">
-            <h1><g:message code="default.edit.label" args="[entityName]" /></h1>
             <g:if test="${flash.message}">
-            <div class="message">${flash.message}</div>
+	            <div class="message">${flash.message}</div>
             </g:if>
             <g:hasErrors bean="${warehouseInstance}">
-            <div class="errors">
-                <g:renderErrors bean="${warehouseInstance}" as="list" />
-            </div>
+	            <div class="errors">
+	                <g:renderErrors bean="${warehouseInstance}" as="list" />
+	            </div>
             </g:hasErrors>
             <g:form method="post" >
                 <g:hiddenField name="id" value="${warehouseInstance?.id}" />
@@ -29,7 +31,6 @@
                 <div class="dialog">
                     <table>
                         <tbody>
-                        
                             <tr class="prop">
                                 <td valign="top" class="name">
                                   <label for="name"><g:message code="warehouse.name.label" default="Name" /></label>
@@ -38,7 +39,6 @@
                                     <g:textField name="name" value="${warehouseInstance?.name}" />
                                 </td>
                             </tr>
-
                             <tr class="prop">
                                 <td valign="top" class="name">
                                   <label for="city"><g:message code="warehouse.city.label" default="City" /></label>
@@ -47,7 +47,6 @@
                                     <g:textField name="city" value="${warehouseInstance?.city}" />
                                 </td>
                             </tr>
-
                             <tr class="prop">
                                 <td valign="top" class="name">
                                   <label for="country"><g:message code="warehouse.country.label" default="Country" /></label>
@@ -56,8 +55,6 @@
                                     <g:textField name="country" value="${warehouseInstance?.country}" />
                                 </td>
                             </tr>
-                        
-
                             <tr class="prop">
                                 <td valign="top" class="name">
                                   <label for="manager"><g:message code="warehouse.manager.label" default="Manager" /></label>
@@ -66,9 +63,6 @@
                                     <g:select name="manager.id" from="${org.pih.warehouse.User.list()}" optionKey="id" value="${warehouseInstance?.manager?.id}"  />
                                 </td>
                             </tr>
-
-
-
                         </tbody>
                     </table>
                 </div>
