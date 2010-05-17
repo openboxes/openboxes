@@ -1,74 +1,16 @@
 package org.pih.warehouse
 
+import org.pih.warehouse.User;
+
 class UserController {
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST", login: "GET", doLogin: "POST"]
-
-    /**
-     * Allows user to log into the system.
-     */
-    def login = {
-		log.info "show login page";
-		String instructions = "To log on as a manager, please use <strong>jmiranda</strong>:<strong>password</strong>";
-		if (!flash.message)
-		    flash.message = instructions;
-	
-		//"${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
-    }
-
-    /** 
-     * Performs the authentication logic.
-     */
-    def doLogin = {
-		log.info "doLogin"
-		
-    	def userInstance = User.findWhere(username:params['username'], password:params['password'])
-    	//log.info "$params.warehouse.id"
-    	//def warehouse = Warehouse.get(params);
-    	//if (warehouse)
-    	//	log.info "$warehouse.name"
-    	//userInstance.warehouse = warehouse		
-		session.user = userInstance
-		
-		
-		if (userInstance) {
-		    println "user exists $userInstance";
-		    redirect(controller:'home',action:'dashboard')
-		}
-		else {
-		    println "user does not exist";
-		    flash.message = "Unable to authenticate user with the provided credentials."
-	
-		    //userInstance = new User();
-		    //userInstance.errors.rejectValue("version", "default.authentication.failure",
-		    //	[message(code: 'user.label', default: 'User')] as Object[], "Unable to authenticate user with the provided credentials.")
-	
-		    redirect(controller:'user',action:'login')
-		}
-    }
-    
-    /**
-     * Allows user to log out of the system
-     */
-    def logout = { 
-    	log.info "logout"
-    	session.user = null
-    	flash.message = "User was successfully logged out."
-    	redirect(action:'login')
-    }    
-
-    /**
-     * Show user preferences.
-     */
-    def preferences = {
-    	log.info "show preferences"
-    }
+    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
     
     /**
      * Show index page - just a redirect to the list page.
      */
     def index = {    	
-    	log.info "doLogin"
+    	log.info "user controller index"
         redirect(action: "list", params: params)
     }
 
@@ -112,6 +54,7 @@ class UserController {
      * Show a user
      */
     def show = {
+    	log.info "show user"
         def userInstance = User.get(params.id)
         if (!userInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
@@ -121,11 +64,21 @@ class UserController {
             [userInstance: userInstance]
         }
     }
+    
+    /**
+     * Show user preferences.
+     */
+    def preferences = {
+    	log.info "show user preferences"
+    }
+    
+    
 
     /**
      * Show the edit form for a user
      */
     def edit = {
+    	log.info "edit user"
         def userInstance = User.get(params.id)
         if (!userInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
@@ -140,6 +93,7 @@ class UserController {
      * Update a user 
      */
     def update = {
+    	log.info "update user"
         def userInstance = User.get(params.id)
         if (userInstance) {
             if (params.version) {
@@ -169,7 +123,8 @@ class UserController {
     /**
      * Delete a user
      */
-    def delete = {
+    def delete = {    	
+    	log.info "delete user"
         def userInstance = User.get(params.id)
         if (userInstance) {
             try {

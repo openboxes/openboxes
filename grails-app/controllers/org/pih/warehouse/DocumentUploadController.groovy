@@ -1,10 +1,10 @@
 package org.pih.warehouse
 
-/*
+
 class DocumentUploadCommand {
    String shipmentId
    Attachment document   
-}*/
+}
 
 class DocumentUploadController {
    def upload = { DocumentUploadCommand command ->

@@ -3,4 +3,4 @@
 &nbsp; &gt; &nbsp;
 <a href="">(selected warehouse goes here)</a>
 &nbsp; &gt; &nbsp;
-<strong>${pageTitle}</strong>
+<strong>(select page title goes here)</strong>

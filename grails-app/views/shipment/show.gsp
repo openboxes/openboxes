@@ -126,7 +126,7 @@
 													<tr>
 														<td><img src="${createLinkTo(dir:'images',file:'document.png')}" alt="Document" /></td>
 														<td>								    
-															<g:uploadForm action="upload">
+															<g:uploadForm controller="document" action="upload">
 			                                    				<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
 			                                    				<g:select name="type" from="${Attachment.constraints.type.inList}" valueMessagePrefix="document.type"  />													
 																<input name="contents" type="file" />

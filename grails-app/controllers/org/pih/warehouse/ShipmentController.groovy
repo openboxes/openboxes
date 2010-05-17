@@ -2,8 +2,6 @@ package org.pih.warehouse
 
 import java.io.File;
 
-
-
 class ShipmentController {
    
     def scaffold = Shipment
@@ -14,8 +12,7 @@ class ShipmentController {
 		    //def recentShipments = Shipment.findAllBy(session.user, [sort: 'id', order: 'desc', max: 20])
 		    //render(template:"list", collection: recentShipments, var: 'shipment')
 		    render { div(class:"errors", "success message") }
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 		    render { div(class:"errors", e.message) }
 		}
     }
@@ -32,47 +29,13 @@ class ShipmentController {
     	
     }
     
-    def upload = { DocumentUploadCommand command ->
-		println "shipmentId: $command.shipmentId"
-		println "contents: $command.contents"
-
-		def file = request.getFile('contents');
-		def filename = file.originalFilename;
-		def shipment = Shipment.get(command.shipmentId);
-		def size = file.size;
-		def type = command.type;
-		
-		Attachment document = new Attachment(type: type, size: size, filename: filename, contents: command.contents);
-		shipment.addToDocuments(document).save(flush:true);
-		
-		flash.message= "Successfully saved file to Shipment"
-		
-		File newFile = new File("/tmp/warehouse/shipment/" + command.shipmentId + "/" + filename);
-		if (newFile.mkdirs())
-			file.transferTo(newFile);
-		
-		flash.message += " and stored the file $newFile.absolutePath to the local file system";
-		
-		
-		
-		redirect(action: 'show', id: command.shipmentId)
-    }
     
     def form = {
         [ shipments : Shipment.list() ]
     }
+    
     def view = {
     	// pass through to "view shipment" page
     }
 }
-
-
-/**
- * Dependent object 
- */
-class DocumentUploadCommand {
-	   String shipmentId
-	   String type
-	   byte [] contents
-	}
 

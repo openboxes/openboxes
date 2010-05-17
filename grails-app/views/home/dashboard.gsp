@@ -2,15 +2,15 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'warehouse.label', default: 'Warehouse')}" />
-        <title><g:message code="default.list.label" args="[entityName]" /></title>
+        <g:set var="entityName" value="${message(code: 'dashboard.label', default: 'Dashboard')}" />
+        <title><g:message code="dashboard.label" default="Dashboard" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="menuTitle">Dashboard</content>		
 		<content tag="pageTitle">Dashboard</content>
 		<content tag="globalLinksMode">append</content>
 		<content tag="localLinksMode">override</content>
-		<content tag="globalLinks"><g:render template="global"/></content>
-		<content tag="localLinks"><g:render template="local"/></content>		
+		<content tag="globalLinks"><g:render template="global" model="[entityName:entityName]"/></content>
+		<content tag="localLinks"><g:render template="local" model="[entityName:entityName]"/></content>		
     </head>
     <body>        
 		<div class="body">
