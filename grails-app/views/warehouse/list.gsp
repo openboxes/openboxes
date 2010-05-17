@@ -4,6 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'warehouse.label', default: 'Warehouse')}" />
+        <g:set var="pageTitle" value="${message(code: 'default.list.label' args="[entityName]")}" />
         <title><g:message code="default.list.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><g:message code="default.list.label" args="[entityName]" /></content>

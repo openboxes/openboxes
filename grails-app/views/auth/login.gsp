@@ -10,7 +10,7 @@
 	<content tag="localLinksMode">override</content>
 	<content tag="globalLinks"><g:render template="global" model="[entityName:entityName]"/></content>
 	<content tag="localLinks"><g:render template="local" model="[entityName:entityName]"/></content>       
-	<content tag="breadcrumb"><g:render template="breadcrumb" model=""/></content>
+	<content tag="breadcrumb"><g:render template="breadcrumb" model="[pageTitle:pageTitle]"/></content>
 </head>
 <body>
 	<div class="body">

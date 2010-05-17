@@ -5,7 +5,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'warehouse.label', default: 'Warehouse')}" />
-        <g:set var="pageTitle" value="<g:message code="default.show.label" args="[entityName]" /> Inventory" />
+        <g:set var="pageTitle" value="${message(code: 'default.show.label' args="[entityName]")}" />
         <title><g:message code="default.show.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><g:message code="default.show.label" args="[entityName]" /> Inventory</content>
@@ -14,15 +14,13 @@
 		<content tag="localLinksMode">override</content>
 		<content tag="globalLinks"><g:render template="global" model="[entityName:entityName]"/></content>
 		<content tag="localLinks"><g:render template="local" model="[entityName:entityName]"/></content>       
-		<content tag="breadcrumb"><g:render template="breadcrumb" model="[warehouse:warehouseInstance,pageTitle:pageTitle]"/></content>
     </head>
     <body>
         <div class="body">
             <g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>
             </g:if>
-            <div class="dialog">
-            
+            <div class="dialog">            
 	            <h2>Show current inventory</h2>
                 <table>
 					<thead>
@@ -37,10 +35,9 @@
 							<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 								<td>${inventoryLineItem.key}</td>
 								<td>${inventoryLineItem.value}</td>
+								<td></td>
 							</tr>
 						</g:each>
-
-
 		   <%--
 
 			<td>${fieldValue(bean: inventoryLineItem, field: "product.name")}</td>

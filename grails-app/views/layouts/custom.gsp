@@ -65,7 +65,7 @@
 				    <div id="login-info" class="yui-u">
 						<ul>
 						    <g:if test="${session.user}">
-								<li>Welcome, ${session.user.username}!</li>
+								<li>Welcome, ${session.user.username}!</li>  | 
 								<li><g:link class="list" controller="user" action="preferences"><g:message code="default.preferences.label"  default="Preferences"/></g:link></li> | 
 								<li><g:link class="list" controller="auth" action="logout"><g:message code="default.logout.label"  default="Logout"/></g:link></li>
 						    </g:if>
@@ -81,11 +81,12 @@
 		    <div class="yui-b">
 				<!-- Global Navigation menu -->
 				<div class="nav">
-				    <span class="menuButton"><a class="home" href="${createLink(uri: '/home/index')}">Home</a></span>				    
+				    				    
+					<g:render template="../common/breadcrumb" />
+
 				    <g:if test="${session.user}">
 					    <span class="menuButton"><a class="shipment" href="${createLink(uri: '/shipment/index')}">Shipments</a></span>
-					    <span class="menuButton"><a class="warehouse" href="${createLink(uri: '/warehouse/index')}">Warehouses</a></span>
-					    <span class="menuButton"><a class="inventory" href="${createLink(uri: '/warehouse/showInventory/1')}">Inventory</a></span>
+					    <span class="menuButton"><a class="inventory" href="${createLink(uri: '/warehouse/showInventory/' + session.warehouse.id)}">Inventory</a></span>
 					    <span class="menuButton"><a class="settings" href="${createLink(uri: '/admin/index')}">Settings</a></span>
 				    	<g:pageProperty name="page.globalLinks" /><!-- Populated using the 'globalLinks' property defined in the GSP file -->
 				    </g:if>
@@ -95,7 +96,7 @@
     </div>
     <div id="doc3" class="yui-t3">
 	    <div class="breadcrumb">
-			<g:render template="../common/breadcrumb" />	
+			
 		</div>
 		<!-- Body includes the divs for the main body content and left navigation menu -->
 		<div id="bd" role="main">
@@ -103,7 +104,7 @@
 	      	<div id="yui-main">
 		    	<div id="mainBlock" class="yui-b">
 					<!-- Populated using the 'pageTitle' property defined in the GSP file -->
-					<%-- 
+					<%--
 					<g:if test="${pageProperty(name:'page.pageTitle')}">
 					    <div id="pageTitle">
 							<!-- Include page title (use content tag in child GSP) -->
@@ -113,8 +114,7 @@
 					    </div>
 					</g:if>
 					--%>
-					<%--<nav:render group="tabs"/>--%>
-					<!-- Include body defined in the GSP file -->
+					
 					<g:layoutBody />
 				</div>
 	      	</div>
