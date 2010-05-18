@@ -117,14 +117,14 @@
 			                                	</thead>
 											    <g:each in="${shipmentInstance.documents}" var="document" status="i">
 													<tr id="document-${document.id}" class="${(i % 2) == 0 ? 'odd' : 'even'}">
-														<td><img src="${createLinkTo(dir:'images',file:'document.png')}" alt="Document" /></td>
-														<td><g:link controller="shipment" action="download" id="${document.id}">${document?.filename}</g:link></td>
+														<td><img src="${createLinkTo(dir:'images/icons',file:'document.png')}" alt="Document" /></td>
+														<td><g:link controller="document" action="download" id="${document.id}">${document?.filename}</g:link></td>
 														<td>${document?.type}</td>
 														<td>${document?.size} bytes</td>
 													</tr>
 											    </g:each>
 													<tr>
-														<td><img src="${createLinkTo(dir:'images',file:'document.png')}" alt="Document" /></td>
+														<td><img src="${createLinkTo(dir:'images/icons',file:'document.png')}" alt="Document" /></td>
 														<td>								    
 															<g:uploadForm controller="document" action="upload">
 			                                    				<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />

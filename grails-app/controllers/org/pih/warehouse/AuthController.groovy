@@ -20,10 +20,12 @@ class AuthController {
 		log.debug "debug logger enabled"
 		log.error "error logger enabled"
 		log.info "show login page";
-		String instructions = "To log on as a manager, please use <strong>jmiranda</strong>:<strong>password</strong>";
+		String instructions = "To log on as a manager, please use <strong>jmiranda</strong>:<strong>password</strong>.";
 		if (!flash.message)
 		    flash.message = instructions;
-	
+		else 
+			flash.message += instructions;
+		
 		//"${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
 	}
 	

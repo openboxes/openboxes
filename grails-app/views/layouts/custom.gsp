@@ -9,10 +9,10 @@
 
 	<!-- Include Blueprint CSS -->
 	<%--<bp:blueprintCss/>--%><!-- TODO Would like to use the bp:blueprintCss -->
-	<!-- 	
+	<!-- -->
+	
 	<link rel="stylesheet" href="${createLinkTo(dir:'css/blueprint', file:'screen.css')}" type="text/css" media="screen, projection">
 	<link rel="stylesheet" href="${createLinkTo(dir:'css/blueprint', file:'print.css')}" type="text/css" media="print">
-	 -->
 	<!--[if IE]><link rel="stylesheet" href="${createLinkTo(dir:'css/blueprint', file:'ie.css')}" type="text/css" media="screen, projection"><![endif]-->
 	
 	<!-- Include Favicon -->
@@ -81,23 +81,20 @@
 		    <div class="yui-b">
 				<!-- Global Navigation menu -->
 				<div class="nav">
-				    				    
 					<g:render template="../common/breadcrumb" />
-
 				    <g:if test="${session.user}">
 					    <span class="menuButton"><a class="shipment" href="${createLink(uri: '/shipment/index')}">Shipments</a></span>
 					    <span class="menuButton"><a class="inventory" href="${createLink(uri: '/warehouse/showInventory/' + session.warehouse.id)}">Inventory</a></span>
 					    <span class="menuButton"><a class="settings" href="${createLink(uri: '/admin/index')}">Settings</a></span>
 				    	<g:pageProperty name="page.globalLinks" /><!-- Populated using the 'globalLinks' property defined in the GSP file -->
 				    </g:if>
+				    
 				</div>
 		    </div>
 		</div>
     </div>
     <div id="doc3" class="yui-t3">
-	    <div class="breadcrumb">
-			
-		</div>
+		<br/>
 		<!-- Body includes the divs for the main body content and left navigation menu -->
 		<div id="bd" role="main">
 	    	<!-- Main Content Block -->

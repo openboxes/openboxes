@@ -12,9 +12,9 @@ class DocumentCommand {
 
 class DocumentController {
 
-    static allowedMethods = [index: "GET", upload: "POST"];
+    static allowedMethods = [index: "GET", upload: "POST", download: "GET"];
 
-    def scaffold = Attachment;
+    //def scaffold = Attachment;
     
  
 
@@ -25,7 +25,37 @@ class DocumentController {
 		log.info "document controller index";
 		redirect(action: "list", params:params)
 	}
-                             
+           
+	
+	
+	/**
+	 * 
+	 */
+	def download = { 
+		log.error "download file";
+
+		def document = Attachment.get(params.id)
+        if (!document) {
+            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
+            redirect(action: "list")
+        }
+        else {
+            [document:document]
+        }		
+		
+		/*
+		def document = Attachment.get(params.id);
+		log.error "document = ${document}";
+		def path = "/tmp/warehouse/shipment/" + params["shipmentId"] + "/" + document.getFilename()
+		log.error "path = ${path}";
+			
+		def file = new File(path);    
+		response.setContentType("application/octet-stream")
+		response.setHeader("Content-disposition", "attachment;filename=${file.getName()}")
+		response.outputStream << file.newInputStream() // Performing a binary stream copy		
+		return;*/
+	}
+	
 	/**
 	 * Upload a document to the server
 	 */
@@ -58,7 +88,7 @@ class DocumentController {
         	flash.message = "File $filename is too large (must be less than 1MB)";
         }
         
-		redirect(action: 'show', id: command.shipmentId)
+		redirect(controller: 'shipment', action: 'show', id: command.shipmentId)
     }    
 
 }

@@ -14,19 +14,11 @@
     </head>
     <body>        
 		<div class="body">		
-	    	<div id="home" class="dialog" style="width:50%">
-	    	
-	    		
-	    			    		
-				<g:if test="${flash.message}">
-				    <div class="message">${flash.message}</div>
-				</g:if>
-	    	
+	    	<div id="home" class="dialog">				
 				<g:if test="${!session.user}">
 		    		<h1>You are not authorized to access this page.</h1>
 					<p>
-						<%-- <g:render template="../common/login"/>--%>
-						Please <a class="home" href="${createLink(uri: '/home/index')}">login</a> to gain access
+						Please <a class="home" href="${createLink(uri: '/auth/login')}">login</a> to gain access
 					</p>
 				</g:if>
 				<g:else>
