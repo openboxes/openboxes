@@ -22,7 +22,10 @@
                         </tr>                    
                         <tr class="prop">
                             <td valign="top" class="name"><g:message code="product.ean.label" default="EAN/UPC" /></td>                            
-                            <td valign="top" class="value">${fieldValue(bean: productInstance, field: "ean")}</td>                            
+                            <td valign="top" class="value">
+                            	${fieldValue(bean: productInstance, field: "ean")}                            
+                            	<a href="http://www.upcdatabase.com/item/${fieldValue(bean: productInstance, field: "ean")}">UPC Lookup</a>
+                            </td>                            
                         </tr>                    
                         <tr class="prop">
                             <td valign="top" class="name"><g:message code="product.description.label" default="Description" /></td>                            

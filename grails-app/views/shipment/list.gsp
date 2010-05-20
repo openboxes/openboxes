@@ -12,8 +12,7 @@
 		<content tag="globalLinksMode">append</content>
 		<content tag="localLinksMode">override</content>
 		<content tag="globalLinks"><g:render template="global" model="[entityName:entityName]"/></content>
-		<content tag="localLinks"><g:render template="local" model="[entityName:entityName]"/></content>       
-		
+		<content tag="localLinks"><g:render template="local" model="[entityName:entityName]"/></content>		
 		<g:javascript library="prototype" />
 		<g:javascript>
 			function clearShipment(e) { $('shipmentContent').value=''; }	
@@ -32,7 +31,7 @@
                             <g:sortableColumn property="id" title="${message(code: 'shipment.id.label', default: 'View')}" />                        
                             <g:sortableColumn property="trackingNumber" title="${message(code: 'shipment.trackingNumber.label', default: 'Tracking Number')}" />                        
                             <g:sortableColumn property="expectedShippingDate" title="${message(code: 'shipment.expectedShippingDate.label', default: 'Expected Shipping Date')}" />                        
-                            <g:sortableColumn property="actualShippingDate" title="${message(code: 'shipment.actualShippingDate.label', default: 'Actual Shipping Date')}" />                        
+                            <g:sortableColumn property="expectedDeliveryDate" title="${message(code: 'shipment.expectedDeliveryDate.label', default: 'Actual Shipping Date')}" />                        
                             <th><g:message code="shipment.source.label" default="Source" /></th>                   	    
                             <th><g:message code="shipment.target.label" default="Target" /></th>                   	    
                         </tr>
@@ -43,7 +42,7 @@
                             <td><g:link action="show" id="${shipmentInstance.id}">view</g:link></td>                        
                             <td>${fieldValue(bean: shipmentInstance, field: "trackingNumber")}</td>
                             <td><g:formatDate date="${shipmentInstance.expectedShippingDate}" /></td>
-                            <td><g:formatDate date="${shipmentInstance.actualShippingDate}" /></td>
+                            <td><g:formatDate date="${shipmentInstance.expectedDeliveryDate}" /></td>
                             <td>${fieldValue(bean: shipmentInstance, field: "source")}</td>
                             <td>${fieldValue(bean: shipmentInstance, field: "target")}</td>
                         </tr>

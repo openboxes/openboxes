@@ -5,9 +5,10 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
-        <title><g:message code="default.create.label" args="[entityName]" /></title>        
+        <g:set var="pageTitle"><g:message code="default.create.label" args="[entityName]" /></g:set>
+        <title>${pageTitle}</title>        
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle">${entityName}</content>
+		<content tag="pageTitle">${pageTitle}</content>
 		<content tag="menuTitle">${entityName}</content>		
 		<content tag="globalLinksMode">append</content>
 		<content tag="localLinksMode">override</content>
@@ -24,69 +25,86 @@
 	                <g:renderErrors bean="${shipmentInstance}" as="list" />
 	            </div>
             </g:hasErrors>
-            <g:form action="save" method="post" >
-                <div class="dialog">
-                    <table>
-                        <tbody>
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="status"><g:message code="shipment.status.label" default="Status" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'status', 'errors')}">
-                                    <g:select name="status" from="${shipmentInstance.constraints.status.inList}" value="${shipmentInstance?.status}" valueMessagePrefix="shipment.status"  />
-                                </td>
-                            </tr>
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="trackingNumber"><g:message code="shipment.trackingNumber.label" default="Tracking Number" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'trackingNumber', 'errors')}">
-                                    <g:textField name="trackingNumber" value="${shipmentInstance?.trackingNumber}" />
-                                </td>
-                            </tr>
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="expectedShippingDate"><g:message code="shipment.expectedShippingDate.label" default="Expected Shipping Date" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}">
-                                    <g:datePicker name="expectedShippingDate" precision="day" value="${shipmentInstance?.expectedShippingDate}" noSelection="['': '']" />
-                                </td>
-                            </tr>
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="actualShippingDate"><g:message code="shipment.actualShippingDate.label" default="Actual Shipping Date" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'actualShippingDate', 'errors')}">
-                                    <g:datePicker name="actualShippingDate" precision="day" value="${shipmentInstance?.actualShippingDate}" noSelection="['': '']" />
-                                </td>
-                            </tr>
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="source"><g:message code="shipment.source.label" default="Source" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'source', 'errors')}">
-                                    <g:select name="source.id" from="${org.pih.warehouse.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.source?.id}"  />
-                                </td>
-                            </tr>
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="target"><g:message code="shipment.target.label" default="Target" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'target', 'errors')}">
-                                    <g:select name="target.id" from="${org.pih.warehouse.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.target?.id}"  />
-                                </td>
-                            </tr>
-                        
-                        </tbody>
-                    </table>
-                </div>
+            <g:form action="save" method="post">
+			    <div class="dialog" >					
+
+					<fieldset> 
+						<legend>Overview</legend>
+						<div class="value ${hasErrors(bean: shipmentInstance, field: 'source', 'errors')}">
+
+							
+							<label for="source"><g:message code="shipment.source.label" default="Supplier" /></label> 
+							<input type="hidden" id="source.id" name="source.id" value="${session?.warehouse?.id}"/>
+							<span class="large">${session?.warehouse.name}</span>
+						</div>						
+						<div class="value ${hasErrors(bean: shipmentInstance, field: 'target', 'errors')}">
+                              <div>
+  	                            <label for="target"><g:message code="shipment.target.label" default="Destination" /></label>
+                               <g:select name="target.id" from="${org.pih.warehouse.Warehouse.list()}" 
+                               	optionKey="id" value="${shipmentInstance?.target?.id}" 
+                               	 />
+                              </div>
+						</div>
+					</fieldset>				
+
+
+
+					<fieldset>
+						<legend>Shipping Details</legend>
+						<div align="left">
+							<div valign="top">
+								<div class="value ${hasErrors(bean: shipmentInstance, field: 'shippingMethod', 'errors')}">
+									<label for="trackingNumber"><g:message
+										code="shipment.shippingMethod.label" default="Shipping Method" /></label> 
+									<g:select
+										name="shippingMethod.id"
+										from="${org.pih.warehouse.ShipmentMethod.list()}" optionKey="id"
+										value="${shipmentInstance?.shippingMethod?.id}" />
+								</div>
+								<div class="value ${hasErrors(bean: shipmentInstance, field: 'trackingNumber', 'errors')}">
+									<label for="trackingNumber"><g:message code="shipment.trackingNumber.label" default="Tracking Number" /></label>
+	                                <g:textField name="trackingNumber" value="${shipmentInstance?.trackingNumber}" />
+	                            </div>
+                            	<div>
+									<div class="value ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}">
+										<label for="expectedShippingDate"><g:message code="shipment.expectedShippingDate.label" default="Expected Ship Date" /></label>
+										<g:datePicker name="expectedShippingDate" precision="day" 
+											value="${shipmentInstance?.expectedShippingDate}" />
+		                            </div>
+		                        </div>
+                            	<div>
+									<div class="value ${hasErrors(bean: shipmentInstance, field: 'expectedDeliveryDate', 'errors')}">
+										<label for="expectedDeliveryDate"><g:message code="shipment.expectedDeliveryDate.label" default="Expected Delivery Date" /></label>
+										<g:datePicker name="expectedDeliveryDate" precision="day" value="${shipmentInstance?.expectedDeliveryDate}" />
+		                            </div>
+		                        </div>
+							</div>	  
+							<div valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'status', 'errors')}">
+                                <label for="status"><g:message code="shipment.status.label" default="Current Status" /></label>
+								<g:select name="status" 
+                                	from="${shipmentInstance.constraints.status.inList}" 
+                                	value="${shipmentInstance?.status}" valueMessagePrefix="shipment.status" 
+                                	 />
+							</div>                        	
+						</div>
+					</fieldset> 
+					
+					<%-- 
+					<fieldset> 
+						<legend>Shipping Items</legend> 			
+					
+						<div class="notice">
+							You must save the shipment before adding items.
+						</div>
+					
+					</fieldset>									
+					--%>	
+				</div>
+
                 <div class="buttons">
-                    <span class="button"><g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" /></span>
+                    <span class="button">
+                    	<g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" />                    	
+                    </span>
                 </div>
             </g:form>
         </div>

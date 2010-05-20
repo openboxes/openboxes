@@ -2,7 +2,7 @@ package org.pih.warehouse
 
 
 /**
- * Dependent object 
+ * Command object 
  */
 class DocumentCommand {
    String shipmentId
@@ -29,31 +29,35 @@ class DocumentController {
 	
 	
 	/**
-	 * 
+	 * Allow user to download the file associated with the given id.
 	 */
 	def download = { 
-		log.error "download file";
+		log.error "download file id = ${params.id}";
 
 		def document = Attachment.get(params.id)
         if (!document) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
-            redirect(action: "list")
+            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}";
+			redirect(controller: "shipment", action: "show", id:document.getShipment().getId());    			
         }
         else {
-            [document:document]
-        }		
-		
-		/*
-		def document = Attachment.get(params.id);
-		log.error "document = ${document}";
-		def path = "/tmp/warehouse/shipment/" + params["shipmentId"] + "/" + document.getFilename()
-		log.error "path = ${path}";
-			
-		def file = new File(path);    
-		response.setContentType("application/octet-stream")
-		response.setHeader("Content-disposition", "attachment;filename=${file.getName()}")
-		response.outputStream << file.newInputStream() // Performing a binary stream copy		
-		return;*/
+            //redirect(action: "show", [document:document]);        	
+    		log.error "document = ${document}";
+    		
+    		def path = "/tmp/warehouse/shipment/" + document.getShipment().getId() + "/" + document.getFilename();
+    		log.error "path = ${path}";
+    			
+    		def file = new File(path);    
+    		
+    		if (file.exists()) { 
+	    		response.setContentType("application/octet-stream")
+	    		response.setHeader("Content-disposition", "attachment;filename=${file.getName()}")
+	    		response.outputStream << file.newInputStream() 
+    		}
+    		else { 
+                flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'file.label', default: 'Document File'), params.id])}";
+    			redirect(controller: "shipment", action: "show", id:document.getShipment().getId());    			
+    		}
+        }
 	}
 	
 	/**

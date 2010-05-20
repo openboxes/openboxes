@@ -28,24 +28,21 @@
                 <table>
                     <thead>
                         <tr>                        
+						    <th><g:message code="product.details.label" default="Details" /></th>
                             <g:sortableColumn property="ean" title="${message(code: 'product.ean.label', default: 'EAN/UPC')}" />
                             <g:sortableColumn property="category" title="${message(code: 'product.category.label', default: 'Category')}" />
                             <g:sortableColumn property="name" title="${message(code: 'product.name.label', default: 'Name')}" />
                             <th><g:message code="product.user.label" default="User" /></th>
-			    <th><g:message code="product.details.label" default="Show Details" /></th>
                         </tr>
                     </thead>
                     <tbody>
                     <g:each in="${productInstanceList}" status="i" var="productInstance">
-                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                        
+                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
+							<td align="center"><g:link action="show" id="${productInstance.id}">view</g:link></td>
                             <td>${fieldValue(bean: productInstance, field: "ean")}</td>
                             <td>${fieldValue(bean: productInstance, field: "category")}</td>
                             <td>${fieldValue(bean: productInstance, field: "name")}</td>
                             <td>${fieldValue(bean: productInstance, field: "user")}</td>
-                            <td>
-			      <g:link action="show" id="${productInstance.id}">Show Details</g:link>
-			    </td>
 <!--
 			    <td>
 			      <g:if test="${productInstance.stockCard}">

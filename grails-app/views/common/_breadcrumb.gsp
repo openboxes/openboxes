@@ -2,9 +2,9 @@
 <span class="menuButton">
 	<a class="home" href="${createLink(uri: '/home/index')}">Home</a>
 	&raquo;
-	<g:if test="${session.warehouse != null}">
-		<a class="none" href="${createLink(uri: '/warehouse/show/' + session.warehouse?.id)}">${session.warehouse?.name}</a>
+	<g:if test="${session?.warehouse}">
+		<a class="building" href="${createLink(uri: '/warehouse/show/' + session.warehouse?.id)}">${session.warehouse?.name}</a>
+		&raquo;
 	</g:if>
-	<g:else>(warehouse not selected)</g:else>
-	&raquo;
+	<g:else>(unknown warehouse)</g:else>
 </span>

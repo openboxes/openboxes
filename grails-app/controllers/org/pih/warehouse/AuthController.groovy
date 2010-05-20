@@ -11,21 +11,21 @@ class AuthController {
 		log.info "auth controller index";
 		redirect(action: "login", params:params)
 	}
-                             
+
+	/**
+	 * Checks whether there is an authenticated user in the session.
+	 */
+	def authorized = { 
+		if (session.user == null) { 
+        	flash.message = 'You are not authorized to access this page.  '
+    		redirect(controller: 'auth', action: 'login');
+    	}		
+	}
                              
     /**
      * Allows user to log into the system.
      */
-    def login = {
-		log.debug "debug logger enabled"
-		log.error "error logger enabled"
-		log.info "show login page";
-		String instructions = "To log on as a manager, please use <strong>jmiranda</strong>:<strong>password</strong>.";
-		if (!flash.message)
-		    flash.message = instructions;
-		else 
-			flash.message += instructions;
-		
+    def login = {			
 		//"${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
 	}
 	
@@ -38,48 +38,72 @@ class AuthController {
      * Performs the authentication logic.
      */
     def doLogin = {
-		log.info "doLogin"
-		
+		log.error "doLogin"		
     	def userInstance = User.findWhere(username:params['username'], password:params['password'])
-    	log.info "WAREHOUSE $params.warehouse.id"
-    	def warehouse = Warehouse.get(params.warehouse.id);
-
-    	if (warehouse != null) { 
-    		// Save the current warehouse in the session
-    		session.warehouse = warehouse;
-    		    		
-    		// Save the preferred warehouse (first time only)
-    		if (userInstance.warehouse == null) { 
-	    		userInstance.warehouse = warehouse;
-	    		userInstance.save(flush:true);
-    		}
-    	}		
-    			
-		
-		session.user = userInstance
+    					
 		if (userInstance) {
-		    log.info "user exists $userInstance";
-		    redirect(controller:'home',action:'index')
+        	log.error "warehouse id = ${params.warehouse.id}"	
+        	def warehouse = null;
+        	if (params.warehouse.id!='null') { 
+            	log.error "looking up warehouse by id = ${params.warehouse.id}";
+            	warehouse = Warehouse.get(params.warehouse.id);        		
+        	}
+    		log.error "warehouse = ${warehouse}"
+        	if (warehouse) {     	    	
+	    		log.error "saving warehouse ${warehouse?.name} to ${userInstance?.username}"
+	    		// Save the current warehouse in the session
+	    		session.warehouse = warehouse;
+	    		    		
+	    		// Save the user's preferred warehouse (if it's not set already)
+	    		log.error "user.warehouse = ${userInstance?.warehouse?.name}"
+	    		if (userInstance.warehouse) { 
+	    			log.error "user does not have a preferred warehouse; setting preferred warehouse to ${warehouse?.name}"
+		    		userInstance.warehouse = warehouse;
+		    		userInstance.save(flush:true);
+	    		}
+	    		
+	    		// Successfully logged in and select a warehouse
+	    		log.error "user exists $userInstance";
+	    		log.error "user chose a valid warehouse $warehouse";
+	    		session.user = userInstance;    		
+	    	    redirect(controller:'home',action:'index')
+	    	}	
+        	else { 
+        		log.error "ask user to choose a warehouse"
+        		//flash.message = "Please choose a valid warehouse.";
+
+        		userInstance = new User(username:params['username'], password:params['password'])
+    		    userInstance.errors.rejectValue("version", "default.authentication.failure",
+    			    	[message(code: 'user.label', default: 'User')] as Object[], "Unable to authenticate user with no warehouse.")
+
+        		render(view: "login", model: [userInstance: userInstance])
+        	}    		    		
 		}
 		else {
-		    log.info "user does not exist";
-		    flash.message = "Unable to authenticate user with the provided credentials."
+			
+		    log.error "user does not exist or password is incorrect";
+		    //flash.message = "Unable to authenticate user with the provided credentials."
 	
+			userInstance = new User(username:params['username'], password:params['password'])
+
 		    //userInstance = new User();
-		    //userInstance.errors.rejectValue("version", "default.authentication.failure",
-		    //	[message(code: 'user.label', default: 'User')] as Object[], "Unable to authenticate user with the provided credentials.")
+		    userInstance.errors.rejectValue("version", "default.authentication.failure",
+		    	[message(code: 'user.label', default: 'User')] as Object[], "Unable to authenticate user with the provided credentials.");
 	
-		    redirect(controller:'user',action:'login')
+		    render(view: "login", model: [userInstance: userInstance])
 		}
+		
+	
     }
     
     /**
      * Allows user to log out of the system
      */
     def logout = { 
-    	log.info "logout"
-    	session.user = null
-    	flash.message = "User was successfully logged out."
+    	def username = session.user.username;    	
+    	session.user = null;
+    	session.warehouse = null;
+    	flash.message = "User ${username} was successfully logged out."
     	redirect(action:'login')
     }    
     

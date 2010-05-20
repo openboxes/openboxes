@@ -22,127 +22,133 @@
            		<div class="message">${flash.message}</div>
             </g:if>            
             <div class="dialog">
-            	<h3><g:message code="shipment.shipment.label" default="Shipment Details" /></h3>
-                <table>
-                    <tbody>                    
-                        <tr class="prop">
-                            <td valign="top" class="name"><g:message code="shipment.status.label" default="Status" /></td>                            
-                            <td valign="top" class="value">${fieldValue(bean: shipmentInstance, field: "status")}</td>                            
-                        </tr>                    
-                        <tr class="prop">
-                            <td valign="top" class="name"><g:message code="shipment.trackingNumber.label" default="Tracking Number" /></td>                            
-                            <td valign="top" class="value">${fieldValue(bean: shipmentInstance, field: "trackingNumber")}</td>                            
-                        </tr>                    
-                        <tr class="prop">
-                            <td valign="top" class="name"><g:message code="shipment.expectedShippingDate.label" default="Expected Shipping Date" /></td>                            
-                            <td valign="top" class="value"><g:formatDate date="${shipmentInstance?.expectedShippingDate}" /></td>                            
-                        </tr>                    
-                        <tr class="prop">
-                            <td valign="top" class="name"><g:message code="shipment.actualShippingDate.label" default="Actual Shipping Date" /></td>                            
-                            <td valign="top" class="value"><g:formatDate date="${shipmentInstance?.actualShippingDate}" /></td>                            
-                        </tr>                    
-                        <tr class="prop">
-                            <td valign="top" class="name"><g:message code="shipment.source.label" default="Source" /></td>                            
-                            <td valign="top" class="value"><g:link controller="warehouse" action="show" id="${shipmentInstance?.source?.id}">${shipmentInstance?.source?.encodeAsHTML()}</g:link></td>                            
-                        </tr>                    
-                        <tr class="prop">
-                            <td valign="top" class="name"><g:message code="shipment.target.label" default="Target" /></td>
-                            <td valign="top" class="value"><g:link controller="warehouse" action="show" id="${shipmentInstance?.target?.id}">${shipmentInstance?.target?.encodeAsHTML()}</g:link></td>                            
-                        </tr>
-					</tbody>
-				</table>
-				<br/>
-				<table>
-					<tr>
-						<td>						
-							<h2><g:message code="shipment.products.label" default="Products" /></h2>
-							<table>
-								<tbody> 
-			                        <tr class="prop">
-			                            <td valign="top" style="text-align: left;" class="value">
-			                            	<table>
-			                                	<thead>
-			                                		<tr>
-			                                			<th>Quantity</th>
-			                                			<th>Product</th>
-			                                		</tr>
-			                                	</thead>
-			                            		<tbody>
-												    <g:each in="${shipmentInstance.shipmentLineItems}" var="item" status="i">
-														<tr id="item-${item.id}" class="${(i % 2) == 0 ? 'odd' : 'even'}">
-															<td>
-																${item?.quantity} units
-															</td>
-															<td>
-																<g:link controller="shipmentLineItem" action="show" id="${item.id}">${item?.product.name}</g:link>
-															</td>
-														</tr>
-												    </g:each>									    
-													<tr>  
-														<td>
-														    <g:form action="addProduct">
-																<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
-																<g:textField name="quantity" size="5" /> x 
-																<g:select 
-																	id="productId" 
-																	name='productId'
-																    noSelection="${['null':'Select One...']}"
-																    from='${Product.list()}' optionKey="id" optionValue="name">
-																</g:select>
-																<g:submitButton name="add" value="Add"/>
-														    </g:form>
-													    </td>
-												    </tr>
-			                            		</tbody>
-											</table>                            							                                
-			                            </td>                            
-			                        </tr>                        
-								</tbody>
-							</table>						
-						</td>					
-						<td>
-							<h2><g:message code="shipment.documents.label" default="Documents" /></h2>
-							<table>
-								<tbody>                                                 
-			                        <tr class="prop">
-			                            <td valign="top" style="text-align: left;" class="value">
-			                                <table>
-			                                	<thead>
-			                                		<tr>
-			                                			<th></th>
-			                                			<th>Document</th>
-			                                			<th>Type</th>
-			                                			<th>Size</th>
-			                                		</tr>
-			                                	</thead>
-											    <g:each in="${shipmentInstance.documents}" var="document" status="i">
-													<tr id="document-${document.id}" class="${(i % 2) == 0 ? 'odd' : 'even'}">
-														<td><img src="${createLinkTo(dir:'images/icons',file:'document.png')}" alt="Document" /></td>
-														<td><g:link controller="document" action="download" id="${document.id}">${document?.filename}</g:link></td>
-														<td>${document?.type}</td>
-														<td>${document?.size} bytes</td>
-													</tr>
-											    </g:each>
-													<tr>
-														<td><img src="${createLinkTo(dir:'images/icons',file:'document.png')}" alt="Document" /></td>
-														<td>								    
-															<g:uploadForm controller="document" action="upload">
-			                                    				<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
-			                                    				<g:select name="type" from="${Attachment.constraints.type.inList}" valueMessagePrefix="document.type"  />													
-																<input name="contents" type="file" />
-																<g:submitButton name="upload" value="Upload"/>
-														    </g:uploadForm>											
-														</td>
-													</tr>
-			                                </table>
-			                            </td>
-			                        </tr>
-			                    </tbody>
-			                </table>						
-						</td>						
-					</tr>
-				</table>
-
+            	<fieldset>
+	            	<legend><g:message code="shipment.shipment.label" default="Shipment Details" /></legend>
+	                <table class="withBorder">
+	                    <tbody>                    
+	                        <tr class="prop">
+	                            <td valign="top" class="name"><label><g:message code="shipment.source.label" default="Supplier" /></label></td>                            
+	                            <td valign="top" class="value"><g:link controller="warehouse" action="show" id="${shipmentInstance?.source?.id}">${shipmentInstance?.source?.encodeAsHTML()}</g:link></td>                            
+	                        </tr>                    
+	                        <tr class="prop">
+	                            <td valign="top" class="name"><label><g:message code="shipment.target.label" default="Destination" /></label></td>
+	                            <td valign="top" class="value"><g:link controller="warehouse" action="show" id="${shipmentInstance?.target?.id}">${shipmentInstance?.target?.encodeAsHTML()}</g:link></td>                            
+	                        </tr>
+	                        <tr class="prop">
+	                            <td valign="top" class="name"><label><g:message code="shipment.status.label" default="Shipping Status" /></label></td>                            
+	                            <td valign="top" class="value">${fieldValue(bean: shipmentInstance, field: "status")}</td>                            
+	                        </tr>                    
+	                        <tr class="prop">
+	                            <td valign="top" class="name"><label><g:message code="shipment.shippingMethod.label" default="Shipping Method" /></label></td>        
+	                            <td valign="top" class="value">
+	                            	<span class="menuButton">
+	                            		<a class="${fieldValue(bean: shipmentInstance, field: "shippingMethod.methodName")}" href="">
+	                            			${fieldValue(bean: shipmentInstance, field: "shippingMethod.methodName")}</a>
+	                            	</span>
+	                            </td>
+	                        </tr>                    
+	                        <tr class="prop">
+	                            <td valign="top" class="name"><label><g:message code="shipment.trackingNumber.label" default="Tracking Number" /></label></td>                            
+	                            <td valign="top" class="value">
+	                            	${fieldValue(bean: shipmentInstance, field: "trackingNumber")}
+	                            	<a href="${fieldValue(bean: shipmentInstance, field: "shippingMethod.trackingUrl")}${fieldValue(bean: shipmentInstance, field: "trackingNumber")}" target="_blank">Track Shipment</a>
+	                            </td>                            
+	                        </tr>                    
+	                        <tr class="prop">
+	                            <td valign="top" class="name"><label><g:message code="shipment.expectedShippingDate.label" default="Expected Shipping Date" /></label></td>                            
+	                            <td valign="top" class="value"><g:formatDate date="${shipmentInstance?.expectedShippingDate}" /></td>                            
+	                        </tr>                    
+	                        <tr class="prop">
+	                            <td valign="top" class="name"><label><g:message code="shipment.expectedDeliveryDate.label" default="Expected Delivery Date" /></label></td>                            
+	                            <td valign="top" class="value"><g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" /></td>                            
+	                        </tr>                    
+						</tbody>
+					</table>
+				</fieldset>
+					
+				<fieldset>
+					<legend><g:message code="shipment.document.label" default="Shipment Documents" /></legend>
+					<table>
+						<thead>
+                       		<tr>
+                       			<th width="20px"></th>
+                       			<th>Document</th>
+                       			<th>Type</th>
+                       			<th>Size</th>
+                       		</tr>
+                       	</thead>
+                       	<tbody>
+						    <g:each in="${shipmentInstance.documents}" var="document" status="i">
+								<tr id="document-${document.id}" class="${(i % 2) == 0 ? 'odd' : 'even'}">
+									<td><img src="${createLinkTo(dir:'images/icons',file:'document.png')}" alt="Document" /></td>
+									<td><g:link controller="document" action="download" id="${document.id}">${document?.filename}</g:link></td>
+									<td>${document?.type}</td>
+									<td>${document?.size} bytes</td>
+								</tr>
+						    </g:each>
+							<tr>
+								<td></td>
+								<td>								    
+									<g:uploadForm controller="document" action="upload">
+										<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
+										<g:select name="type" from="${Attachment.constraints.type.inList}" valueMessagePrefix="document.type"  />													
+										<input name="contents" type="file" />
+										<g:submitButton name="upload" value="Upload"/>
+								    </g:uploadForm>											
+								</td>
+								<td><!-- emtpy cell --></td>
+								<td><!-- emtpy cell --></td>
+							</tr>
+						</tbody>
+	                </table>
+				</fieldset>
+				<fieldset>
+					<legend><g:message code="shipment.shipmentitem.label" default="Shipment Items" /></legend>
+                    <table class="withBorder">
+                       	<thead>
+                       		<tr>
+                       			<th width="20px"></th>
+                       			<th>Shipment Item</th>
+                       			<th>Quantity</th>
+                       			<th></th>
+                       		</tr>
+                       	</thead>
+						<tbody>
+						    <g:each in="${shipmentInstance.shipmentLineItems}" var="item" status="i">
+								<tr id="item-${item.id}" class="${(i % 2) == 0 ? 'odd' : 'even'}">
+									<td><img src="${createLinkTo(dir:'images/icons',file:'product.png')}" alt="Product" /></td>
+									<td>
+										<g:link controller="shipmentLineItem" action="show" id="${item.id}">${item?.product.name}</g:link>
+										
+									</td>
+									<td>
+										${item?.quantity} units									
+									</td>
+									<td><!-- empty --></td>
+								</tr>
+						    </g:each>									    
+							<tr>  
+								<td></td>
+								<td>
+								    <g:form action="addProduct">
+										<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
+										<g:textField name="quantity" size="5" /> x 
+										<g:select 
+											id="productId" 
+											name='productId'
+										    noSelection="${['null':'Select One...']}"
+										    from='${Product.list()}' optionKey="id" optionValue="name">
+										</g:select>
+										<g:submitButton name="add" value="Add"/>
+								    </g:form>
+							    </td>
+							    <td><!-- empty --></td>
+							    <td><!-- empty --></td>
+						    </tr>
+                        </tbody>
+					</table>                            							                                
+				</fieldset>
+				
             </div>            
 			<div class="buttons">
 				<g:form>
@@ -195,6 +201,9 @@
 			    </g:form>
             </div>
 		--%>
+		
+
+				
         </div>
     </body>
 </html>

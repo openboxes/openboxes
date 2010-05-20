@@ -1,0 +1,20 @@
+/* Fix for footer creep 
+----------------------------------------------------------*/
+
+#bd { 
+	margin-bottom: 50px;	/* add a little room between footer and end of content */
+}
+
+#ft {
+	/*background: #555;
+	color:#ddd;*/
+	font-size:0.8em;
+	height:30px;
+	left:0;
+	bottom:0;
+	padding:0;
+	position:fixed;
+	white-space:nowrap;
+	width:100%;
+	z-index:99;
+}

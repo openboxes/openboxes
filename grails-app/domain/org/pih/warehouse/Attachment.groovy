@@ -9,7 +9,9 @@ class Attachment {
 	String type
 	String filename
     byte [] contents
-
+    
+    static belongsTo = [ shipment : Shipment ];
+	
     static constraints = {
 		type(inList:["Invoice", "Packing List", "Shipping Manifest", "Other"])
     }

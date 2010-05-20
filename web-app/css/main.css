@@ -11,10 +11,6 @@ html * {
     right: 0;
 }
 
-.globalNav {
-    position: absolute;
-    right: 0;
-}
 
 body {
     background: #fff;
@@ -37,7 +33,7 @@ body {
 a:link, a:visited, a:hover {
     color: #666;
     font-weight: bold;
-    text-decoration: none;
+    /*text-decoration: none;*/	/* removed because we want to see underline */
 }
 
 h1 {
@@ -73,7 +69,7 @@ input:focus, select:focus, textarea:focus {
 
 .body {
     float: left;
-    margin: 0 15px 10px 15px;
+    margin: 10px 15px 10px 15px;
 }
 
 /* NAVIGATION MENU */
@@ -117,7 +113,7 @@ input:focus, select:focus, textarea:focus {
     background: #f3f8fc url(../images/skin/information.png) 8px 50% no-repeat;
     border: 1px solid #b2d1ff;
     color: #006dba;
-    margin: 10px 0 5px 0;
+    margin: 5px 0 5px 0;
     padding: 5px 5px 5px 30px
 }
 
@@ -284,81 +280,6 @@ th.desc a {
     padding-left: 28px;
 }
 
-#container {
-   height:100%;
-}
-
-#footer {
-   position:absolute;
-   vertical-align: middle;
-   border-top: 1px solid black;
-   bottom: 0px;
-   padding-top: 5px;
-   width:100%;
-   text-align: center;
-   height: 20px;   /* Height of the footer */
-   background:#ccc;
-}
-
-#header {
-   vertical-align: middle;
-   border-bottom: 0px solid black;
-   padding-bottom: 0px;
-   width:100%;
-   background:#fff;
-   height: 62px;
-}
-
-#banner {
-    float: left;
-}
-
-/**
- *  cannot get this to move down so using absolute positioning for now
- */
-
-/* the following selectors are used by layout.gsp layout */
-#logo-info {
-    width: 40%;
-    text-align: left;
-}
-#login-info {
-    width:40%;
-    text-align: right;
-    margin: 10px;
-}
-#login-info ul {
-    list-style:none;
-    margin: 0;
-    padding: 0;
-}
-#login-info ul li  {
-    display: inline;
-    margin: 0 5px;
-}
-
-/* the following selectors are used by main.gsp layout */
-#globalNav {
-   float: right;
-    position: absolute;
-    right: 15px;
-    top: 30px;
-}
-
-#globalNav ul {
-    list-style:none;
-    margin: 0;
-    padding: 0;
-}
-#globalNav ul li  {
-    display: inline;
-    margin: 0 5px;
-}
-
-/* breadcrumb */
-.breadcrumb { 
-	margin: 10px;	
-}
 
 /* more menu button icons */
 
@@ -488,3 +409,26 @@ th.desc a {
     padding-left: 25px;
 }
 
+.menuButton a.building {
+    background: url(../images/icons/building.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.ups {
+    background: url(../images/icons/ups.jpg) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.usps {
+    background: url(../images/icons/usps.jpg) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.fedex {
+    background: url(../images/icons/fedex.jpg) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
