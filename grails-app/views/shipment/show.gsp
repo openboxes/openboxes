@@ -27,7 +27,7 @@
 	                <table class="withBorder">
 	                    <tbody>                    
 	                        <tr>
-	                        	<td rowspan="3"><img src="${createLinkTo(dir:'images/icons',file: shipmentInstance.shippingMethod.methodName + '.jpg')}"/></td>
+	                        	<td rowspan="4"><img src="${createLinkTo(dir:'images/icons',file: shipmentInstance.shippingMethod.methodName + '.jpg')}"/></td>
 	                        	<td></td>
 	                        	<td></td>
 	                        </tr>
@@ -43,7 +43,6 @@
 	                            </td>                            
 	                        </tr>                    
 	                        <tr class="prop">
-	                        	<td></td>
 	                            <td valign="top" class="name"><label><g:message code="shipment.status.label" default="Shipping Status" /></label></td>                            
 	                            <td valign="top" class="value">${fieldValue(bean: shipmentInstance, field: "status")}</td>                            
 	                        </tr>                    
