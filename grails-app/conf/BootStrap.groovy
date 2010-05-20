@@ -24,7 +24,7 @@ class BootStrap {
 	
 	 	ShipmentMethod fedex = new ShipmentMethod(
 	 		
- 			name:"FedEx",
+ 			name:"FedEx Air",
  			methodName:"fedex",
  			trackingNumberFormat:"999999999999", 
  			//trackingUrl:"http://www.google.com/search?hl=en&site=&q=",
@@ -32,7 +32,7 @@ class BootStrap {
  			trackingUrlParameterName:""
 	 	).save();
 	 	ShipmentMethod ups = new ShipmentMethod(
-	 		name:"UPS", 
+	 		name:"UPS Ground", 
  			methodName:"ups",
  			trackingNumberFormat:"1Z9999W99999999999", 
  			//trackingUrl:"http://www.google.com/search?hl=en&site=&q=",
@@ -40,7 +40,7 @@ class BootStrap {
  			trackingUrlParameterName:""
 	 	).save();
 	 	ShipmentMethod usps = new ShipmentMethod(
-	 		name:"US Postal Service", 
+	 		name:"US Postal Service Ground Service", 
  			methodName:"usps",
  			trackingNumberFormat:"", 
 	 		trackingUrl:"", 

@@ -26,42 +26,52 @@
 	            	<legend><g:message code="shipment.shipment.label" default="Shipment Details" /></legend>
 	                <table class="withBorder">
 	                    <tbody>                    
-	                        <tr class="prop">
-	                            <td valign="top" class="name"><label><g:message code="shipment.source.label" default="Supplier" /></label></td>                            
-	                            <td valign="top" class="value"><g:link controller="warehouse" action="show" id="${shipmentInstance?.source?.id}">${shipmentInstance?.source?.encodeAsHTML()}</g:link></td>                            
-	                        </tr>                    
-	                        <tr class="prop">
-	                            <td valign="top" class="name"><label><g:message code="shipment.target.label" default="Destination" /></label></td>
-	                            <td valign="top" class="value"><g:link controller="warehouse" action="show" id="${shipmentInstance?.target?.id}">${shipmentInstance?.target?.encodeAsHTML()}</g:link></td>                            
+	                        <tr>
+	                        	<td rowspan="3"><img src="${createLinkTo(dir:'images/icons',file: shipmentInstance.shippingMethod.methodName + '.jpg')}"/></td>
+	                        	<td></td>
+	                        	<td></td>
 	                        </tr>
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><label><g:message code="shipment.status.label" default="Shipping Status" /></label></td>                            
-	                            <td valign="top" class="value">${fieldValue(bean: shipmentInstance, field: "status")}</td>                            
-	                        </tr>                    
-	                        <tr class="prop">
 	                            <td valign="top" class="name"><label><g:message code="shipment.shippingMethod.label" default="Shipping Method" /></label></td>        
-	                            <td valign="top" class="value">
-	                            	<span class="menuButton">
-	                            		<a class="${fieldValue(bean: shipmentInstance, field: "shippingMethod.methodName")}" href="">
-	                            			${fieldValue(bean: shipmentInstance, field: "shippingMethod.methodName")}</a>
-	                            	</span>
-	                            </td>
+	                            <td valign="top" class="value">${fieldValue(bean: shipmentInstance, field: "shippingMethod.name")}</td>                
 	                        </tr>                    
 	                        <tr class="prop">
 	                            <td valign="top" class="name"><label><g:message code="shipment.trackingNumber.label" default="Tracking Number" /></label></td>                            
 	                            <td valign="top" class="value">
-	                            	${fieldValue(bean: shipmentInstance, field: "trackingNumber")}
-	                            	<a href="${fieldValue(bean: shipmentInstance, field: "shippingMethod.trackingUrl")}${fieldValue(bean: shipmentInstance, field: "trackingNumber")}" target="_blank">Track Shipment</a>
+	                            	${fieldValue(bean: shipmentInstance, field: "trackingNumber")} &nbsp; &nbsp; 
+	                            	(<a href="${fieldValue(bean: shipmentInstance, field: "shippingMethod.trackingUrl")}${fieldValue(bean: shipmentInstance, field: "trackingNumber")}" target="_blank">Track Shipment</a>)
 	                            </td>                            
 	                        </tr>                    
 	                        <tr class="prop">
+	                        	<td></td>
+	                            <td valign="top" class="name"><label><g:message code="shipment.status.label" default="Shipping Status" /></label></td>                            
+	                            <td valign="top" class="value">${fieldValue(bean: shipmentInstance, field: "status")}</td>                            
+	                        </tr>                    
+	                        <tr class="prop">
+	                        	<td></td>
 	                            <td valign="top" class="name"><label><g:message code="shipment.expectedShippingDate.label" default="Expected Shipping Date" /></label></td>                            
 	                            <td valign="top" class="value"><g:formatDate date="${shipmentInstance?.expectedShippingDate}" /></td>                            
 	                        </tr>                    
 	                        <tr class="prop">
+	                        	<td></td>
 	                            <td valign="top" class="name"><label><g:message code="shipment.expectedDeliveryDate.label" default="Expected Delivery Date" /></label></td>                            
 	                            <td valign="top" class="value"><g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" /></td>                            
 	                        </tr>                    
+	                        <tr>
+	                        	<td colspan="3">
+	                        		<hr/>
+	                        	</td>
+	                        </tr>
+	                        <tr class="prop">
+	                        	<td></td>
+	                            <td valign="top" class="name"><label><g:message code="shipment.source.label" default="Supplier" /></label></td>                            
+	                            <td valign="top" class="value"><g:link controller="warehouse" action="show" id="${shipmentInstance?.source?.id}">${shipmentInstance?.source?.encodeAsHTML()}</g:link></td>                            
+	                        </tr>                    
+	                        <tr class="prop">
+	                        	<td></td>
+	                            <td valign="top" class="name"><label><g:message code="shipment.target.label" default="Destination" /></label></td>
+	                            <td valign="top" class="value"><g:link controller="warehouse" action="show" id="${shipmentInstance?.target?.id}">${shipmentInstance?.target?.encodeAsHTML()}</g:link></td>                            
+	                        </tr>
 						</tbody>
 					</table>
 				</fieldset>
