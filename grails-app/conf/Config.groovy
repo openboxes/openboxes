@@ -54,6 +54,11 @@ environments {
     test {
         grails.serverURL = "http://localhost:8080/${appName}"
     }
+    demo {     	
+    	tomcat.deploy.username="tomcat";
+    	tomcat.deploy.password="brux6spa";
+    	tomcat.deploy.url="http://demo.pih-emr.org:8080/manager";    	
+    }
 
 }
 
