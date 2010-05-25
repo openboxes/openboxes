@@ -21,7 +21,6 @@
 						Please <a class="home" href="${createLink(uri: '/auth/login')}">login</a> to gain access
 					</p>
 				</g:if>
-				This will appear if hudson worked<br/>
 				<g:else>
 					<h2>Welcome, <b>${session.user.firstName} ${session.user.lastName}</b>!</h2>
 					<br/>
