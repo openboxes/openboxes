@@ -15,7 +15,7 @@
 		<div class="body">		
 	    	<div id="home" class="dialog">				
 				<g:if test="${!session.user}">
-		    		<h2>You are not authorized to access this page.</h2>
+		    		<h2>Welcome to MIMIC</h2>
 		    		<br/>
 					<p>
 						Please <a class="home" href="${createLink(uri: '/auth/login')}">login</a> to gain access
