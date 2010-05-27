@@ -1,6 +1,6 @@
 package org.pih.warehouse
 
-class InventoryLineItem {
+class InventoryItem {
 
     Product product		    // Specific product that we're tracking
     //Inventory inventory	    // Provides a link back to the parent inventory
@@ -22,9 +22,9 @@ class InventoryLineItem {
    
 
     static constraints = {
-	quantity(min:0, nullable:false)
-	reorderQuantity(min:0, nullable:false)
-	idealQuantity(min:0, nullable:false)
-	inventory(nullable:true)
+		quantity(min:0, nullable:false)
+		reorderQuantity(min:0, nullable:false)
+		idealQuantity(min:0, nullable:false)
+		inventory(nullable:true)
     }
 }

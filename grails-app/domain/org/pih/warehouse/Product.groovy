@@ -35,13 +35,13 @@ class Product {
 
     static constraints = {
         name(blank:false);
-	stockCard(nullable:true)
-	productCode(nullable:true)
-	category(nullable:true)
-	subCategory(nullable:true)
-	user(nullable:true)
-	//size(inList:["Small", "Medium", "Large", "X-Large"]);
-	//category(inList:["Clothing", "Equipment", "Other"]);
+		stockCard(nullable:true)
+		productCode(nullable:true)
+		category(nullable:true)
+		subCategory(nullable:true)
+		user(nullable:true)
+		//size(inList:["Small", "Medium", "Large", "X-Large"]);
+		//category(inList:["Clothing", "Equipment", "Other"]);
     }
 
     String toString() { return "$name"; }

@@ -14,6 +14,7 @@ class User {
 
     // Authorization
     String role;
+    User manager;
 
     // Authentication
     String username;
@@ -27,9 +28,10 @@ class User {
     }
 
     static constraints = {
-		email(email:true)
+    	manager(nullable:true)
+    	email(email:true)
 		password(blank:false, password: true)
-		role(inList:["Stock Manager", "Stock Person", "Other"])
+		role(inList:["Supervisor", "Manager", "Stocker", "Other"])
 		warehouse(nullable:true)
     }
 }

@@ -3,7 +3,7 @@ package org.pih.warehouse
 class Order {
 
     static mapping = {
-	table "`order`"
+    	table "`order`"
     }
 
     static constraints = {

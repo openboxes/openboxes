@@ -34,7 +34,7 @@ class DocumentController {
 	def download = { 
 		log.error "download file id = ${params.id}";
 
-		def document = Attachment.get(params.id)
+		def document = Document.get(params.id)
         if (!document) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}";
 			redirect(controller: "shipment", action: "show", id:document.getShipment().getId());    			
@@ -76,7 +76,7 @@ class DocumentController {
 			def size = file.size;
 			def type = command.type;
 			
-			Attachment document = new Attachment(type: type, size: size, filename: filename, contents: command.contents);
+			Document document = new Document(type: type, size: size, filename: filename, contents: command.contents);
 			shipment.addToDocuments(document).save(flush:true);
 			
 			flash.message= "Successfully saved file to Shipment"
@@ -92,7 +92,7 @@ class DocumentController {
         	flash.message = "File $filename is too large (must be less than 1MB)";
         }
         
-		redirect(controller: 'shipment', action: 'show', id: command.shipmentId)
+		redirect(controller: 'shipment', action: 'edit', id: command.shipmentId)
     }    
 
 }

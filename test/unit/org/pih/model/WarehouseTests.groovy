@@ -7,7 +7,7 @@ import org.pih.warehouse.User;
 import org.pih.warehouse.Warehouse;
 import org.pih.warehouse.StockCard;
 import org.pih.warehouse.Inventory;
-import org.pih.warehouse.InventoryLineItem;
+import org.pih.warehouse.InventoryItem;
 import org.pih.warehouse.Transaction;
 import org.pih.warehouse.TransactionEntry;
 import org.pih.warehouse.TransactionType;
@@ -116,7 +116,7 @@ class WarehouseTests extends GrailsUnitTestCase {
 
 
 	// Create new inventory item
-	InventoryLineItem inventoryLineItem1 = new InventoryLineItem(
+	InventoryItem inventoryLineItem1 = new InventoryItem(
 	    product: product1,
 	    quantity: 100,
 	    reorderQuantity: 50,

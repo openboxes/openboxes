@@ -49,15 +49,22 @@ environments {
         grails.serverURL = "http://www.changeme.com"
     }
     development {
-        grails.serverURL = "http://localhost:8080/${appName}"        
+        grails.serverURL = "http://localhost:8080/${appName}";        
     }
     test {
         grails.serverURL = "http://localhost:8080/${appName}"
     }
     demo {     	
+    	grails.serverURL = "http://demo.pih-emr.org:8080/${appName}"
     	tomcat.deploy.username="tomcat";
     	tomcat.deploy.password="brux6spa";
     	tomcat.deploy.url="http://demo.pih-emr.org:8080/manager";    	
+    }
+    justin { 
+    	grails.serverURL = "http://localhost:8180/${appName}"
+        tomcat.deploy.username="tomcat";
+    	tomcat.deploy.password="tomcat";
+    	tomcat.deploy.url="http://localhost:8180/manager";    	
     }
 
 }

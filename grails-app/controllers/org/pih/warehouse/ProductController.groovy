@@ -17,14 +17,14 @@ class ProductController {
     
     // defined as a regular method so its private
     def auth() {
-	println "checking if user is authenticated $session.user";
-	if(!session.user) {
-	    println "user in not authenticated";
-	    redirect(controller: "user", action: "login");
-	    return false
-	} else {
-	    println "user is authenticated";
-	}
+		println "checking if user is authenticated $session.user";
+		if(!session.user) {
+		    println "user in not authenticated";
+		    redirect(controller: "user", action: "login");
+		    return false
+		} else {
+		    println "user is authenticated";
+		}
     }
 
     def login = {

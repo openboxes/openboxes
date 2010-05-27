@@ -1,12 +1,10 @@
 package org.pih.warehouse
 
-class Warehouse {
+class Warehouse extends Location {
 
     // Core elements
     //Integer id
-    String name
-    String city
-    String country
+    
     User manager
 
     // Core associations
@@ -18,13 +16,7 @@ class Warehouse {
     static hasMany = [transactions:Transaction];
     static mappedBy = [transactions:"localWarehouse"]
 
-    // Other elements to be supported soon
-    //Organization organization
-    //Location location
-    //Country country
-    //City city
-    //State stateOrProvince
-    //Address address
+
 
     String toString() { return "$name"; }
 

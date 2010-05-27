@@ -29,6 +29,19 @@ environments {
 			url = "jdbc:hsqldb:file:prodDb;shutdown=true"
 		}
 	}
+	demo {
+		dataSource {
+			dbCreate = "create-drop" // one of 'create', 'create-drop','update'
+			url = "jdbc:hsqldb:mem:demoDB"
+		}
+	}
+	justin {
+		dataSource {
+			dbCreate = "create-drop" // one of 'create', 'create-drop','update'
+			url = "jdbc:hsqldb:mem:justinDB"
+		}
+	}	
+	
 
 
 }

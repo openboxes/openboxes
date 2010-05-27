@@ -3,7 +3,7 @@ package org.pih.warehouse
 
 class DocumentUploadCommand {
    String shipmentId
-   Attachment document   
+   Document document   
 }
 
 class DocumentUploadController {

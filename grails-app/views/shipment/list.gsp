@@ -28,23 +28,25 @@
                 <table>
                     <thead>
                         <tr>                        
-                            <g:sortableColumn property="id" title="${message(code: 'shipment.id.label', default: 'View')}" />                        
+                            <g:sortableColumn property="id" title="${message(code: 'shipment.id.label', default: 'View')}" />    
+                            <g:sortableColumn property="shipmentStatus" title="${message(code: 'shipment.status.label', default: 'Status')}" />                            
                             <g:sortableColumn property="trackingNumber" title="${message(code: 'shipment.trackingNumber.label', default: 'Tracking Number')}" />                        
+                            <th><g:message code="shipment.origin.label" default="Origin" /></th>                   	    
                             <g:sortableColumn property="expectedShippingDate" title="${message(code: 'shipment.expectedShippingDate.label', default: 'Expected Shipping Date')}" />                        
+                            <th><g:message code="shipment.destination.label" default="Destination" /></th>                   	    
                             <g:sortableColumn property="expectedDeliveryDate" title="${message(code: 'shipment.expectedDeliveryDate.label', default: 'Actual Shipping Date')}" />                        
-                            <th><g:message code="shipment.source.label" default="Source" /></th>                   	    
-                            <th><g:message code="shipment.target.label" default="Target" /></th>                   	    
                         </tr>
                     </thead>
                     <tbody>
                     <g:each in="${shipmentInstanceList}" status="i" var="shipmentInstance">
-                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'} higher">
                             <td><g:link action="show" id="${shipmentInstance.id}">view</g:link></td>                        
+                            <td><span class="rounded">${fieldValue(bean: shipmentInstance, field: "shipmentStatus.name")}</span></td>
                             <td>${fieldValue(bean: shipmentInstance, field: "trackingNumber")}</td>
+                            <td>${fieldValue(bean: shipmentInstance, field: "origin")}</td>
                             <td><g:formatDate date="${shipmentInstance.expectedShippingDate}" /></td>
+                            <td>${fieldValue(bean: shipmentInstance, field: "destination")}</td>
                             <td><g:formatDate date="${shipmentInstance.expectedDeliveryDate}" /></td>
-                            <td>${fieldValue(bean: shipmentInstance, field: "source")}</td>
-                            <td>${fieldValue(bean: shipmentInstance, field: "target")}</td>
                         </tr>
                     </g:each>
                     </tbody>
