@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Date;
+import org.pih.warehouse.Address;
 import org.pih.warehouse.Document;
 import org.pih.warehouse.Category;
 import org.pih.warehouse.Country;
@@ -11,6 +12,7 @@ import org.pih.warehouse.InventoryItem;
 import org.pih.warehouse.Organization;
 import org.pih.warehouse.Product;
 import org.pih.warehouse.ReferenceType;
+import org.pih.warehouse.ReferenceNumber;
 import org.pih.warehouse.StockCard;
 import org.pih.warehouse.Shipment;
 import org.pih.warehouse.ShipmentEvent;
@@ -26,7 +28,13 @@ import org.pih.warehouse.Warehouse;
 class BootStrap {
 	
 	def init = { servletContext ->
-		
+
+	 	/* Categories */
+	 	Category ROOT_CATEGORY = new Category(parent: null, name: "Root category").save();
+		Category SUBCATEGORY1 = new Category(parent: ROOT_CATEGORY, name: "Sub category 1").save();
+		Category SUBCATEGORY2 = new Category(parent: ROOT_CATEGORY, name: "Sub category 2").save();
+		Category SUBCATEGORY3 = new Category(parent: ROOT_CATEGORY, name: "Sub category 3").save();
+	
 		/* Countries */	 	
 		Country CANADA = new Country(country: "Canada", population: 24251210, gdp: 24251210, date: new Date()).save();
 		Country HAITI = new Country(country: "Haiti", population: 29824821, gdp: 24251210, date: new Date()).save();
@@ -77,16 +85,11 @@ class BootStrap {
      	EventType SHIPMENT_STORED = new EventType(name:"SHIPMENT_STORED", description:"Shipment has been stored in warehouse").save();
      	
      	// Unique internal identifier, PO Number, Bill of Lading Number, or customer name,      	
-     	ReferenceType INTERNAL_IDENTIFIER = new ReferenceType(name: "INTERNAL_IDENTIFIER", description: "Internal Identifier").save();
      	ReferenceType PO_NUMBER = new ReferenceType(name: "PO_NUMBER", description: "Purchase Order Number").save();
      	ReferenceType CUSTOMER_NAME = new ReferenceType(name: "CUSTOMER_NAME", description: "Customer name").save();
+     	ReferenceType INTERNAL_IDENTIFIER = new ReferenceType(name: "INTERNAL_IDENTIFIER", description: "Internal Identifier").save();
      	ReferenceType BILL_OF_LADING_NUMBER = new ReferenceType(name: "BILL_OF_LADING", description: "Bill of Lading Number").save();
      	     	
-     	/* Categories */
-     	Category ROOT_CATEGORY = new Category(parent: null, name: "Root category").save();
-		Category SUBCATEGORY1 = new Category(parent: ROOT_CATEGORY, name: "Sub category 1").save();
-		Category SUBCATEGORY2 = new Category(parent: ROOT_CATEGORY, name: "Sub category 2").save();
-		Category SUBCATEGORY3 = new Category(parent: ROOT_CATEGORY, name: "Sub category 3").save();
      			
 		/* Shipment methods */	
 	 	ShipmentMethod FEDEX_AIR = new ShipmentMethod(	 		
@@ -132,8 +135,14 @@ class BootStrap {
 	 		methodName:"UPC Lookup",
 	 		trackingUrl:"http://www.upcdatabase.com/item/${product.ean}"	 		
 	 	)*/
-		
-		
+
+	 	/* Transaction types */
+		TransactionType INCOMING = new TransactionType(name:"Incoming Shipment").save(flush:true, validate:true);
+		TransactionType OUTGOING = new TransactionType(name:"Outgoing Shipment").save(flush:true, validate:true);
+		TransactionType DONATION = new TransactionType(name:"Donation").save(flush:true, validate:true);
+          	
+
+	 	
 		
 		/* Users */		
 		User supervisor = new User(
@@ -211,62 +220,25 @@ class BootStrap {
 		).save(flush:true)
 		
 		
-		
+
+		/* Addresses */
+		Address address1 = new Address(address: "888 Commonwealth Avenue",address2: "Third Floor",city:"Boston",stateOrProvince:"Massachusetts",postalCode: "02215",country: "United States").save(flush:true)
+		Address address2 = new Address(address: "1000 State Street",address2: "Building A",city: "Miami",stateOrProvince: "Florida",postalCode: "33126",country: "United States").save(flush:true);
+		Address address3 = new Address(address: "12345 Main Street", address2: "Suite 401", city: "Tabarre", stateOrProvince: "", postalCode: "", country: "Haiti").save(flush:true);
 		
 		/* Warehouses */
-		Warehouse boston = new Warehouse(
-			name: "Boston Headquarters",
-			city: "Boston",
-			state: "Massachusetts",
-			postalCode: "02115",
-			country: "United States",
-			manager: manager
-		).save(flush:true);
-		
-		Warehouse miami = new Warehouse(
-			name: "Miami Warehouse",
-			city: "Miami",
-			state: "Florida",
-			postalCode: "33126",
-			country: "United States",
-			manager: manager
-		).save(flush:true);
-		
-		Warehouse tabarre = new Warehouse(
-			name: "Tabarre Depot",
-			city: "Tabarre",
-			state: "",
-			postalCode: "",
-			country: "Haiti",			
-			manager: manager
-		).save(flush:true);
-		
-		
-		
+		Warehouse boston = new Warehouse(name: "Boston Headquarters", address: address1, manager: manager).save(flush:true);		
+		Warehouse miami = new Warehouse(name: "Miami Warehouse", address: address2, manager: manager).save(flush:true);
+		Warehouse tabarre = new Warehouse(name: "Tabarre Depot", address: address3, manager: manager).save(flush:true);
 		
 		/* Warehouse > Inventory > Inventory items */
 		
 		// Create new inventory
-		Inventory tabarreInventory = new Inventory(
-			warehouse:tabarre,
-			lastInventoryDate: new Date()
-		).save(flush:true);
+		Inventory tabarreInventory = new Inventory(warehouse:tabarre, lastInventoryDate: new Date()).save(flush:true);
 		
 		// Create new inventory item
-		InventoryItem inventoryItem1 = new InventoryItem(
-			product: advil,	    
-			quantity: 100,
-			reorderQuantity: 50,
-			idealQuantity: 100,
-			binLocation: "Warehouse Bin A1"
-		).save(flush:true);
-		InventoryItem inventoryItem2 = new InventoryItem(
-			product: tylenol,	    
-			quantity: 200,
-			reorderQuantity: 50,
-			idealQuantity: 100,
-			binLocation: "Warehouse Bin A1"
-		).save(flush:true);
+		InventoryItem inventoryItem1 = new InventoryItem(product: advil, quantity: 100, reorderQuantity: 50, idealQuantity: 100, binLocation: "Warehouse Bin A1").save(flush:true);
+		InventoryItem inventoryItem2 = new InventoryItem(product: tylenol, quantity: 200, reorderQuantity: 50, idealQuantity: 100, binLocation: "Warehouse Bin A1").save(flush:true);
 
 		// Add to inventory
 		tabarreInventory.addToInventoryItems(inventoryItem1).save(flush:true, validate:false);
@@ -274,23 +246,11 @@ class BootStrap {
 		
 		/* Warehouse > Transactions > Transaction Entries */
 		
-		TransactionType INCOMING = new TransactionType(name:"Incoming Shipment").save(flush:true, validate:true);
-		TransactionType OUTGOING = new TransactionType(name:"Outgoing Shipment").save(flush:true, validate:true);
-		TransactionType DONATION = new TransactionType(name:"Donation").save(flush:true, validate:true);
 		
-		Transaction transaction1 = new Transaction(
-			transactionDate:new Date(),
-			//localWarehouse:warehouse2,
-			targetWarehouse:tabarre,
-			transactionType:INCOMING
-		); // removed .save(flush:true);
+		Transaction transaction1 = new Transaction(transactionDate:new Date(), targetWarehouse:tabarre, transactionType:INCOMING); // removed .save(flush:true);
 		tabarre.addToTransactions(transaction1).save();
 		
-		TransactionEntry transactionEntry1 = new TransactionEntry(
-			product: advil,
-			quantityChange:50,
-			confirmDate:new Date()
-		);
+		TransactionEntry transactionEntry1 = new TransactionEntry(product: advil, quantityChange:50, confirmDate:new Date());
 		transaction1.addToTransactionEntries(transactionEntry1).save(flush:true, validate:false);
 		
 		
@@ -320,6 +280,9 @@ class BootStrap {
 		shipment1.addToEvents(event4).save(flush:true);
 		shipment1.addToEvents(event5).save(flush:true);
 		
+		shipment1.addToReferenceNumbers(new ReferenceNumber(identifier:"0002492910", referenceType: PO_NUMBER)).save(flush:true)
+		shipment1.addToReferenceNumbers(new ReferenceNumber(identifier:"00001", referenceType: INTERNAL_IDENTIFIER)).save(flush:true)
+		
 		Document document1 = new Document(filename: "shipment-packing-list.pdf", type: "Packing List", size: 1020L, contents: "empty")
 		shipment1.addToDocuments(document1).save(flush:true);		
 		
@@ -327,7 +290,7 @@ class BootStrap {
 		shipment1.addToDocuments(document2).save(flush:true);
 		
 		Container pallet1 = new Container(
-			name: "My first container",
+			name: "My container",
 			containerType: PALLET,
 			weight: 1000,
 			units: "kgs"
@@ -335,13 +298,13 @@ class BootStrap {
 		shipment1.addToContainers(pallet1).save(flush:true);
 
 		
-		ShipmentItem shipmentItem1 = new ShipmentItem(product : advil, quantity : 100);
+		ShipmentItem shipmentItem1 = new ShipmentItem(product : advil, quantity : 100, packageType: LARGE_BOX);
 		pallet1.addToShipmentItems(shipmentItem1).save(flush:true);
 		
-		ShipmentItem shipmentItem2 = new ShipmentItem(product : tylenol, quantity : 200);
+		ShipmentItem shipmentItem2 = new ShipmentItem(product : tylenol, quantity : 200, packageType: LARGE_BOX);
 		pallet1.addToShipmentItems(shipmentItem2).save(flush:true);
 
-		ShipmentItem shipmentItem3 = new ShipmentItem(product : aspirin, quantity : 300);
+		ShipmentItem shipmentItem3 = new ShipmentItem(product : aspirin, quantity : 300, packageType: LARGE_BOX);
 		pallet1.addToShipmentItems(shipmentItem3).save(flush:true);
 		
 		

@@ -7,11 +7,7 @@ class Location {
 
     String name
     
-    //Address address
-    String city
-    String state 
-    String postalCode
-    String country
+    Address address
     
     // Other elements to be supported soon
     //Organization organization
@@ -25,7 +21,5 @@ class Location {
     
 
     static constraints = {
-    	state(nullable:true)
-    	postalCode(nullable:true)
     }
 }

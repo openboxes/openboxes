@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.pih.warehouse.Event;
 import org.pih.warehouse.ShipmentEvent;
+import grails.converters.JSON;
 
 class ShipmentController {
    
@@ -19,6 +20,28 @@ class ShipmentController {
 		    render { div(class:"errors", e.message) }
 		}
     }
+    
+    def availableItems = {     		
+    	println params;
+    	def items = Product.findAllByNameLike("%${params.query}%");
+    	items = items.collect() {
+    		[id:it.id, name:it.name]
+    	}
+    	def jsonItems = [result: items]    	
+    	render jsonItems as JSON;    		
+    }
+    
+    def addItemAutoComplete = {     		
+    	println params;
+    	def product = Product.get(params.selectedItem_id)
+    	def shipment = Shipment.get(params.id);
+    	def container = shipment.getContainers().get(0);
+    	def shipmentItem = new ShipmentItem(product: product, quantity: 1);
+    	container.addToShipmentItems(shipmentItem).save(flush:true);
+    	
+    	redirect action: "show", id: shipment.id;
+    }    
+    
     
     def addContainer = { 
     	def shipment = Shipment.get(params.shipmentId);   	

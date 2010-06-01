@@ -14,6 +14,9 @@ table.withoutBorder {
     border: 0px solid #ccc;
     width: 100%
 }
+td { 
+	padding: 10px;
+}
 #content .small {font-size:.9em;}
 #content .large {font-size:1.4em;}
 /* nothing to do right now */
@@ -31,17 +34,18 @@ label {
 }
 /* TODO figure out what this was meant for */
 h2 {
-	margin-top: 0px;
-	margin-bottom: 0px;
+	margin-top: 10px;
+	margin-bottom: 5px;
 	font-size: 1.2em;
+	border-bottom: 1px solid #ddd;
 }
 .title { 
-font-size: 1.2em;	
-font-weight: bold;
+	font-size: 1.2em;	
+	font-weight: bold;
 }
 
 .body { 
-	width: 95%; 
+	width: 75%;
 } 
 
 /* TODO figure out if we need to keep this */
@@ -213,17 +217,14 @@ padding: 0 .5em 0 .5em;
 font-weight: bold;	
 }
 
+.prop .value { 
+	text-align:left;
+}
+
 .prop .name { 
 	text-align: right; 
 }
 
-tr.higher { 
-	height: 50px;	
-}
-tr.higher td { 
-	vertical-align: middle;
-	text-align: center;
-}
 
 .rounded { 	
 	text-align: left;

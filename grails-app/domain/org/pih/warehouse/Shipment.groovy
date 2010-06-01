@@ -2,9 +2,7 @@ package org.pih.warehouse
 
 class Shipment {
 	
- 	// Core data elements
-	String reference
-	ReferenceType referenceType
+	// Core data elements
 	String comments	
 	
 	// Status 
@@ -26,7 +24,7 @@ class Shipment {
 	
 	//SortedSet containers
 	//SortedSet documents
-	SortedSet events
+	SortedSet<ShipmentEvent> events
 	
 	//Shipper shipper 		// the person or organization shipping the goods
 	//Carrier carrier 		// the person or organization that actually carries the goods from A to B
@@ -35,34 +33,29 @@ class Shipment {
 	
 	
 	// Core association mappings
-	static hasMany = [ 
-		containers : Container,
-		documents : Document, 
-		events : ShipmentEvent
-		//products : Product,
-		//shipmentLineItems : ShipmentItem, 
-	]
+	static hasMany = [events : ShipmentEvent,
+	                  containers : Container,
+	                  documents : Document, 	                  
+	                  //products : Product,
+	                  //shipmentLineItems : ShipmentItem, 
+	                  referenceNumbers : ReferenceNumber]
 	
 	// Constraints
 	static constraints = {
 		
-		reference(nullable:true)
-		referenceType(nullable:true)
-		
+		shipped(nullable:true)
 		origin(nullable:false)
 		destination(nullable:false)
 		comments(nullable:true)
 		
-		shipped(nullable:true)
 		expectedShippingDate(nullable:true)
 		actualShippingDate(nullable:true)
-
+		
 		// date validation looks something like this
 		//expectedShippingDate(validator:{value, obj->
-		//return value.after(obj.checkIn)
+		//	return value.after(obj.checkIn)
 		//})
-
-		
+				
 		delivered(nullable:true)
 		expectedDeliveryDate(nullable:true)
 		actualDeliveryDate(nullable:true)
@@ -72,6 +65,7 @@ class Shipment {
 		shipmentStatus(nullable:true)
 		
 		events(nullable:true)
+		referenceNumbers(nullable:true)
 		documents(nullable:true)
 		containers(nullable:true)
 		

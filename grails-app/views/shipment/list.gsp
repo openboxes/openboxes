@@ -32,9 +32,9 @@
                             <g:sortableColumn property="shipmentStatus" title="${message(code: 'shipment.status.label', default: 'Status')}" />                            
                             <g:sortableColumn property="trackingNumber" title="${message(code: 'shipment.trackingNumber.label', default: 'Tracking Number')}" />                        
                             <th><g:message code="shipment.origin.label" default="Origin" /></th>                   	    
-                            <g:sortableColumn property="expectedShippingDate" title="${message(code: 'shipment.expectedShippingDate.label', default: 'Expected Shipping Date')}" />                        
                             <th><g:message code="shipment.destination.label" default="Destination" /></th>                   	    
-                            <g:sortableColumn property="expectedDeliveryDate" title="${message(code: 'shipment.expectedDeliveryDate.label', default: 'Actual Shipping Date')}" />                        
+                            <g:sortableColumn property="expectedShippingDate" title="${message(code: 'shipment.expectedShippingDate.label', default: 'Expected Shipping Date')}" />                        
+                            <g:sortableColumn property="expectedDeliveryDate" title="${message(code: 'shipment.expectedDeliveryDate.label', default: 'Expected Delivery Date')}" />                        
                         </tr>
                     </thead>
                     <tbody>
@@ -44,8 +44,8 @@
                             <td><span class="rounded">${fieldValue(bean: shipmentInstance, field: "shipmentStatus.name")}</span></td>
                             <td>${fieldValue(bean: shipmentInstance, field: "trackingNumber")}</td>
                             <td>${fieldValue(bean: shipmentInstance, field: "origin")}</td>
-                            <td><g:formatDate date="${shipmentInstance.expectedShippingDate}" /></td>
                             <td>${fieldValue(bean: shipmentInstance, field: "destination")}</td>
+                            <td><g:formatDate date="${shipmentInstance.expectedShippingDate}" /></td>
                             <td><g:formatDate date="${shipmentInstance.expectedDeliveryDate}" /></td>
                         </tr>
                     </g:each>

@@ -3,8 +3,12 @@ package org.pih.warehouse
 class Container implements Comparable {
 
 	String name
-	Float weight 		
+	String containerNumber
+	String dimensions			// could be its own class, but we don't care right now
+
+	Float weight
 	String units		// should probably be a class on its own
+	
 	ContainerType containerType
 	SortedSet shipmentItems
 	
@@ -14,10 +18,12 @@ class Container implements Comparable {
 	// Constraints
 	static constraints = {	 
 		name(nullable:true)
+		containerNumber(nullable:true)
+		dimensions(nullable:true)
 		weight(nullable:true)
 		units(nullable:true)
 		containerType(nullable:true)
-		shipment(nullable:true)
+		//shipment(nullable:true)
 		shipmentItems(nullable:true)		
 	}
 	

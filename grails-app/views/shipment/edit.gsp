@@ -53,10 +53,9 @@
 		            	<div style="text-align:center" class="errors">                            
 	                    	<g:select name="shipmentStatus.id" from="${org.pih.warehouse.ShipmentStatus.list()}" optionKey="id" value="${shipmentInstance?.shipmentStatus?.id}"  />                          	
 	                    </div>
-						<br/>
+
 		            	<h2><g:message code="shipment.shipment.label" default="Shipment Details" /></h2>
-		            	<hr/>
-		            	<br/>
+
 		                <table class="withoutBorder" border="0">
 		                    <tbody>	                        
 		                        <tr class="prop">
@@ -82,11 +81,7 @@
 		  					</tbody>
 						</table>
 							            	        
-						<br/>
-		  				<br/>
 		  				<h2><g:message code="shipment.shipment.label" default="Shipper" /></h2>
-		  				<hr/>
-		  				<br/>
 		  				
 		  				<table class="withoutBorder">
 		  					<tbody>
@@ -112,10 +107,7 @@
 	                    <span class="button"><g:actionSubmit class="delete" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /></span>
 	                </div>
 	 			</g:form>	
-	 			
-	 			
-	 			<br/><br/>
-	 			
+	 				 			
 				<div id="dialogBanner">
 					<a name="history"></a>
 					<span class="title">Edit Event History, Documents & Contents</span>					
@@ -131,10 +123,8 @@
 				</div>				
 	 			<div class="dialog" style="clear:both"></div>
 		 			<fieldset>
-						<br/>					
+				
 						<h2><g:message code="shipment.events.label" default="Event History" /></h2>
-						<hr/>
-						<br/>
 						
 						<div id="eventMessage"></div>
 						<table>
