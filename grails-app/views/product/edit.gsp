@@ -17,7 +17,6 @@
     </head>    
     <body>
         <div class="body">
-            <h1><g:message code="default.edit.label" args="[entityName]" /></h1>
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
@@ -32,22 +31,12 @@
                 <div class="dialog">
                     <table>
                         <tbody>
-                        
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                  <label for="ean"><g:message code="product.ean.label" default="EAN" /></label>
+                                  <label for="ean"><g:message code="product.ean.label" default="UPC" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'ean', 'errors')}">
                                     <g:textField name="ean" value="${productInstance?.ean}" />
-                                </td>
-                            </tr>
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                  <label for="description"><g:message code="product.description.label" default="Description" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'description', 'errors')}">
-                                    <g:textField name="description" value="${productInstance?.description}" />
                                 </td>
                             </tr>
                         
@@ -62,13 +51,24 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
+                                  <label for="description"><g:message code="product.description.label" default="Description" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'description', 'errors')}">
+                                    <g:textField name="description" value="${productInstance?.description}" />
+                                </td>
+                            </tr>
+                        
+                        
+                        	<%-- 
+                            <tr class="prop">
+                                <td valign="top" class="name">
                                   <label for="user"><g:message code="product.user.label" default="User" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'user', 'errors')}">
                                     <g:select name="user.id" from="${org.pih.warehouse.User.list()}" optionKey="id" value="${productInstance?.user?.id}"  />
                                 </td>
                             </tr>
-                        
+                        	--%>
                         </tbody>
                     </table>
                 </div>
