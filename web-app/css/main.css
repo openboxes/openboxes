@@ -433,3 +433,9 @@ th.desc a {
     color: #333;
     padding-left: 25px;
 }
+
+.menuButton a.browse {
+    background: url(../images/icons/browse.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}

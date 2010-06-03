@@ -1,6 +1,7 @@
 package org.pih.warehouse
 
 import org.pih.warehouse.api.AuthService;
+import org.pih.warehouse.ProductType;
 
 class ProductController {
 
@@ -8,23 +9,18 @@ class ProductController {
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"];
     
     def beforeInterceptor = [action:this.&auth,except:'login']
-
-    def afterInterceptor = { model, modelAndView ->
-       //println "Current view is ${modelAndView.viewName}"
-       //if(model.someVar) modelAndView.viewName = "/mycontroller/someotherview"
-       //println "View is now ${modelAndView.viewName}"
-    }
     
     // defined as a regular method so its private
     def auth() {
+    	/*
 		println "checking if user is authenticated $session.user";
 		if(!session.user) {
 		    println "user in not authenticated";
-		    redirect(controller: "user", action: "login");
+		    redirect(controller: "auth", action: "login");
 		    return false
 		} else {
 		    println "user is authenticated";
-		}
+		}*/
     }
 
     def login = {
@@ -35,6 +31,74 @@ class ProductController {
         redirect(action: "list", params: params)
     }
 
+    def browse = { 
+
+    	// Condition types	
+    	def allConditionTypes = ConditionType.getAll();
+    	
+    	// Product types
+		def typeCriteria = ProductType.createCriteria();
+		def allProductTypes = typeCriteria.list {
+			isNull("parent")
+		}    		
+			
+		// Product subtypes
+		def productSubtypes = null;
+		if (params.productTypeId) {
+			def subtypeCriteria = ProductType.createCriteria();
+			productSubtypes = subtypeCriteria.list { 
+				and { 
+					isNotNull("parent")
+					eq("parent.id", Long.parseLong(params.productTypeId))
+				}
+			}		
+		}
+		
+		def selectedCategory = Category.get(params.categoryId);		
+		def selectedConditionType = ConditionType.get(params.conditionTypeId);
+		def selectedProductType = ProductType.get(params.productTypeId);
+		def selectedProductSubType = ProductType.get(params.productSubTypeId);
+
+		
+		// Search for Products matching criteria 
+		def results = null;		
+		def productCriteria = Product.createCriteria();
+		results = productCriteria.list {
+            and{
+                if(params.productTypeId && params.productTypeId != ''){
+                    eq("type.id", Long.parseLong(params.productTypeId))
+                }
+                if(params.productSubTypeId && params.productSubTypeId != ''){
+                    eq("subType.id", Long.parseLong(params.productSubTypeId))
+                }                
+          		if(params.conditionTypeId && params.conditionTypeId != ''){
+          			conditionTypes { 
+          				eq("id", Long.parseLong(params.conditionTypeId))
+          			}
+                }
+          		if(params.categoryId && params.categoryId != ''){
+          			categories { 
+          				eq("id", Long.parseLong(params.categoryId))
+          			}
+                }
+               
+            }
+		
+		}		
+		
+        //params.max = Math.min(params.max ? params.int('max') : 10, 100)		
+		render(view:'browse', model:[productInstanceList : results, 
+    	                             productInstanceTotal: Product.count(), 
+    	                             conditionTypes : allConditionTypes,
+    	                             productTypes : allProductTypes, 
+    	                             productSubTypes : productSubtypes,
+    	                             
+    	                             selectedCategory : selectedCategory,
+    	                             selectedConditionType : selectedConditionType,
+    	                             selectedProductType : selectedProductType,
+    	                             selectedProductSubType : selectedProductSubType])
+    }
+        
     def list = {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [productInstanceList: Product.list(params), productInstanceTotal: Product.count()]

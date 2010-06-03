@@ -5,12 +5,15 @@ import org.pih.warehouse.Document;
 import org.pih.warehouse.Category;
 import org.pih.warehouse.Country;
 import org.pih.warehouse.Container;
+import org.pih.warehouse.ConditionType;
 import org.pih.warehouse.ContainerType;
 import org.pih.warehouse.EventType;
 import org.pih.warehouse.Inventory;
 import org.pih.warehouse.InventoryItem;
 import org.pih.warehouse.Organization;
+import org.pih.warehouse.DrugProduct;
 import org.pih.warehouse.Product;
+import org.pih.warehouse.ProductType;
 import org.pih.warehouse.ReferenceType;
 import org.pih.warehouse.ReferenceNumber;
 import org.pih.warehouse.StockCard;
@@ -45,6 +48,50 @@ class BootStrap {
 		Organization ZL = new Organization(name:  "Zanmi Lasante", description: "").save();
 		Organization PIH = new Organization(name: "Partners In Health", description: "").save();
 	
+		/* Condition Type */
+		ConditionType AIDS_HIV = new ConditionType(name: "HIV/AIDS").save();
+		ConditionType CANCER = new ConditionType(name: "Cancer").save();
+		ConditionType DIARRHEA = new ConditionType(name: "Diarrhea").save();
+		ConditionType PAIN = new ConditionType(name: "Pain").save();
+		ConditionType TUBERCULOSIS = new ConditionType(name: "Tuberculosis").save();
+		
+		/* Product Type */
+		ProductType MEDICINES = new ProductType(parent: null, name: "Medicines").save();
+		ProductType SUPPLIES = new ProductType(parent: null, name: "Supplies").save();
+		ProductType EQUIPMENT = new ProductType(parent: null, name: "Equipment").save();
+		ProductType PERISHABLES = new ProductType(parent: null, name: "Perishables").save();
+		ProductType OTHER = new ProductType(parent: null, name: "Other").save();
+		
+		/* Product Type > Supplies */
+		ProductType MEDICAL_SUPPLIES = new ProductType(parent: SUPPLIES, name: "Medical Supplies").save();
+		ProductType HOSPITAL_SUPPLIES = new ProductType(parent: SUPPLIES, name: "Hospital and Clinic Supplies").save();
+		ProductType OFFICE_SUPPLIES = new ProductType(parent: SUPPLIES, name: "Office Supplies").save();
+
+		/* Product Type > Equipment */
+		ProductType MEDICAL_EQUIPMENT = new ProductType(parent: EQUIPMENT, name: "Medical Equipment").save();
+		ProductType SURGICAL_EQUIPMENT = new ProductType(parent: EQUIPMENT, name: "Surgical Equipment").save();
+		ProductType TECH_EQUIPMENT = new ProductType(parent: EQUIPMENT, name: "IT Equipment").save();
+		ProductType FURNITURE = new ProductType(parent: EQUIPMENT, name: "Furniture and Equipment").save();
+
+		/* Product Type > Food */
+		ProductType FOOD = new ProductType(parent: PERISHABLES, name: "Food").save();
+		
+		/* Product Type > Medicines */
+		ProductType MEDICINES_ARV = new ProductType(parent: MEDICINES, name: "ARVS").save();
+		ProductType MEDICINES_ANESTHESIA = new ProductType(parent: MEDICINES, name: "Anesteshia").save();
+		ProductType MEDICINES_CANCER = new ProductType(parent: MEDICINES, name: "Cancer").save();
+		ProductType MEDICINES_CHRONIC_CARE = new ProductType(parent: MEDICINES, name: "Chronic Care").save();
+		ProductType MEDICINES_PAIN = new ProductType(parent: MEDICINES, name: "Pain").save();
+		ProductType MEDICINES_TB = new ProductType(parent: MEDICINES, name: "TB").save();
+		ProductType MEDICINES_OTHER = new ProductType(parent: MEDICINES, name: "Other").save();
+		
+		/* Product Type > Medical Supplies */
+		ProductType MED_SUPPLIES_LAB = new ProductType(parent: MEDICAL_SUPPLIES, name: "Lab").save();
+		ProductType MED_SUPPLIES_SURGICAL = new ProductType(parent: MEDICAL_SUPPLIES, name: "Surgical").save();
+		ProductType MED_SUPPLIES_XRAY = new ProductType(parent: MEDICAL_SUPPLIES, name: "X-Ray").save();
+		ProductType MED_SUPPLIES_DENTAL = new ProductType(parent: MEDICAL_SUPPLIES, name: "Dental").save();
+		ProductType MED_SUPPLIES_OTHER = new ProductType(parent: MEDICAL_SUPPLIES, name: "Other").save();
+		
      	/* Shipment Container Type */
      	ContainerType CONTAINER = new ContainerType(name:"Container").save();
      	ContainerType PALLET = new ContainerType(name:"Pallet").save();
@@ -84,6 +131,7 @@ class BootStrap {
      	EventType SHIPMENT_UNPACKED = new EventType(name:"SHIPMENT_UNPACKED", description:"Shipment has arrived").save();
      	EventType SHIPMENT_STORED = new EventType(name:"SHIPMENT_STORED", description:"Shipment has been stored in warehouse").save();
      	
+     	/* Reference Number Type */
      	// Unique internal identifier, PO Number, Bill of Lading Number, or customer name,      	
      	ReferenceType PO_NUMBER = new ReferenceType(name: "PO_NUMBER", description: "Purchase Order Number").save();
      	ReferenceType CUSTOMER_NAME = new ReferenceType(name: "CUSTOMER_NAME", description: "Customer name").save();
@@ -130,18 +178,25 @@ class BootStrap {
 	 		//trackingUrl:"http://www.google.com/search?hl=en&site=&q=",
 	 	).save();
 	 	
+	 	/* Transaction types */
+		TransactionType INCOMING = new TransactionType(
+				name:"Incoming Shipment").save(flush:true, validate:true);
+		
+		TransactionType OUTGOING = new TransactionType(
+				name:"Outgoing Shipment").save(flush:true, validate:true);
+		
+		TransactionType DONATION = new TransactionType(
+				name:"Donation").save(flush:true, validate:true);
+          	
+
+	 	
+	 	
+	 	
 	 	/*
 	 	ProductLookup product = new ProductLookup(
 	 		methodName:"UPC Lookup",
 	 		trackingUrl:"http://www.upcdatabase.com/item/${product.ean}"	 		
 	 	)*/
-
-	 	/* Transaction types */
-		TransactionType INCOMING = new TransactionType(name:"Incoming Shipment").save(flush:true, validate:true);
-		TransactionType OUTGOING = new TransactionType(name:"Outgoing Shipment").save(flush:true, validate:true);
-		TransactionType DONATION = new TransactionType(name:"Donation").save(flush:true, validate:true);
-          	
-
 	 	
 		
 		/* Users */		
@@ -173,54 +228,22 @@ class BootStrap {
 		).save();
 
 
-
-		
-		
-		
 		
 		/* Products */
-		Product advil = new Product(
-			ean:"073333531084",
-			productCode:"1",
-			name: "Advil 200mg",
-			description: "Ibuprofen 200 mg",
-			category: "Pain Reliever",
-			user: manager,
-			stockCard: new StockCard()
-		).save();
+		Product advil = new DrugProduct(ean:"ADVIL", productCode:"1", name:"Advil 200mg", type: MEDICINES, subType: MEDICINES_PAIN).save(flush:true);
+		Product tylenol = new DrugProduct(ean:"TYLENOL",productCode:"2", name: "Tylenol 325mg", type: MEDICINES, subType: MEDICINES_PAIN).save(flush:true);		
+		Product aspirin = new DrugProduct(ean:"ASPIRIN",productCode:"3", name: "Aspirin 20mg", type: MEDICINES, subType: MEDICINES_PAIN).save(flush:true);
+		Product generic = new DrugProduct(ean:"GENERIC PAIN", productCode:"4", name: "Generic Pain Reliever",type: MEDICINES, subType: MEDICINES_PAIN).save(flush:true)
+		Product didanosine = new DrugProduct(ean: "DIDANOSINE", productCode:"5", name:"Didanosine 200mg", type: MEDICINES, subType: MEDICINES_ARV).save(flush:true);
 		
-		Product tylenol = new Product(
-			ean:"073333531084",
-			productCode:"2",
-			name: "Tylenol 325mg",
-			description: "Acetominophen 325 mg",
-			category: "Pain Reliever",
-			user: manager,
-			stockCard: new StockCard()
-		).save();
-		
-		Product aspirin = new Product(
-			ean:"073333531084",
-			productCode:"3",
-			name: "Aspirin 20mg",
-			description: "Aspirin 20mg",
-			category: "Pain Reliever",
-			user: manager,
-			stockCard: new StockCard()
-		).save(flush:true);
-		
-		Product test = new Product(
-			ean:"073333531084",
-			productCode:"4",
-			name: "Test Product",
-			description: "",
-			category: "Unknown",
-			user: manager,
-			stockCard: new StockCard()				
-		).save(flush:true)
+		advil.addToConditionTypes(PAIN).save(flush:true);
+		tylenol.addToConditionTypes(PAIN).save(flush:true);
+		aspirin.addToConditionTypes(PAIN).save(flush:true);
+		generic.addToConditionTypes(PAIN).save(flush:true);
+		didanosine.addToConditionTypes(AIDS_HIV).save(flush:true);
+		didanosine.addToCategories(ROOT_CATEGORY).save(flush:true);
 		
 		
-
 		/* Addresses */
 		Address address1 = new Address(address: "888 Commonwealth Avenue",address2: "Third Floor",city:"Boston",stateOrProvince:"Massachusetts",postalCode: "02215",country: "United States").save(flush:true)
 		Address address2 = new Address(address: "1000 State Street",address2: "Building A",city: "Miami",stateOrProvince: "Florida",postalCode: "33126",country: "United States").save(flush:true);
@@ -231,7 +254,9 @@ class BootStrap {
 		Warehouse miami = new Warehouse(name: "Miami Warehouse", address: address2, manager: manager).save(flush:true);
 		Warehouse tabarre = new Warehouse(name: "Tabarre Depot", address: address3, manager: manager).save(flush:true);
 		
-		/* Warehouse > Inventory > Inventory items */
+		/** 
+		 * Warehouse > Inventory > Inventory items 
+		 */
 		
 		// Create new inventory
 		Inventory tabarreInventory = new Inventory(warehouse:tabarre, lastInventoryDate: new Date()).save(flush:true);
@@ -244,8 +269,9 @@ class BootStrap {
 		tabarreInventory.addToInventoryItems(inventoryItem1).save(flush:true, validate:false);
 		tabarreInventory.addToInventoryItems(inventoryItem2).save(flush:true, validate:false);
 		
-		/* Warehouse > Transactions > Transaction Entries */
-		
+		/** 
+		 * Warehouse > Transactions > Transaction Entries 
+		 */
 		
 		Transaction transaction1 = new Transaction(transactionDate:new Date(), targetWarehouse:tabarre, transactionType:INCOMING); // removed .save(flush:true);
 		tabarre.addToTransactions(transaction1).save();

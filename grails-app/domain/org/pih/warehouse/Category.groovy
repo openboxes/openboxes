@@ -13,7 +13,8 @@ class Category {
 	static belongsTo = [ parent : Category ];
 
 	               	                     
-	               	                     
+	String toString() { return "$name"; }
+	
 	static constraints = {
 		code(nullable:true)
 		description(nullable:true)

@@ -10,38 +10,25 @@ package org.pih.warehouse
  */
 class Product {
 
-    Integer id;
+    // Product codes
+    String ean;				// A universal product code (http://en.wikipedia.org/wiki/European_Article_Number)
     String name;
     String description;
+    String productCode;		// An internal product code
 
-    // Product codes
-    String ean;			// A universal product code (http://en.wikipedia.org/wiki/European_Article_Number)
-    String productCode		// An internal product code
-
-
-    // Needs to be fleshed out a bit more
-    String category;
-    String subCategory;
-
-
-    // Needs to be removed
-    User user;
-    StockCard stockCard;	// should not have a reference to a stock card
-
-    //static belongsTo = Category
-    //Category category
-
-    static hasOne = [ StockCard ]
-
+    ProductType type;		// should be the same as the class (e.g. Product or DrugProduct)
+    ProductType subType;	// should be a cascading relationship defined by subclass
+        
+    // Core association mappings
+	static hasMany = [categories : Category, conditionTypes : ConditionType]
+    
     static constraints = {
-        name(blank:false);
-		stockCard(nullable:true)
+        ean(nullable:true)
+        name(blank:false)
+        description(nullable:true)
 		productCode(nullable:true)
-		category(nullable:true)
-		subCategory(nullable:true)
-		user(nullable:true)
-		//size(inList:["Small", "Medium", "Large", "X-Large"]);
-		//category(inList:["Clothing", "Equipment", "Other"]);
+		type(nullable:true)
+		subType(nullable:true)	
     }
 
     String toString() { return "$name"; }

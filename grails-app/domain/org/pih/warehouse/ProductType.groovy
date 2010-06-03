@@ -2,10 +2,10 @@ package org.pih.warehouse
 
 class ProductType {
 
-    Integer id 
     String name
-    String description
-
+    ProductType parent // if this is a subtype, then parent will not be null
+    
     static constraints = {
+    	parent(nullable:true)    
     }
 }

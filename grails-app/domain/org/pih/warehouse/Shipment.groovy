@@ -65,9 +65,9 @@ class Shipment {
 		shipmentStatus(nullable:true)
 		
 		events(nullable:true)
-		referenceNumbers(nullable:true)
-		documents(nullable:true)
-		containers(nullable:true)
+		//referenceNumbers(nullable:true)
+		//documents(nullable:true)
+		//containers(nullable:true)
 		
 	}
 }
