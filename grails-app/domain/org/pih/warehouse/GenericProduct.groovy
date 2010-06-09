@@ -12,8 +12,8 @@ package org.pih.warehouse
 class GenericProduct {
 
 
-    String name			// the name of generic products needs to be i18n'd'
-    ProductType	    productType;
+    String name		// the name of generic products needs to be i18n'd'
+    GenericType	genericType
 
 
 

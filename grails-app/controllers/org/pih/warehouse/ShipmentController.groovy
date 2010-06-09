@@ -33,12 +33,17 @@ class ShipmentController {
     
     def addItemAutoComplete = {     		
     	println params;
+    	
     	def product = Product.get(params.selectedItem_id)
     	def shipment = Shipment.get(params.id);
-    	def container = shipment.getContainers().get(0);
-    	def shipmentItem = new ShipmentItem(product: product, quantity: 1);
-    	container.addToShipmentItems(shipmentItem).save(flush:true);
-    	
+
+    	println "containers: " + shipment.getContainers()
+    	    	
+    	def container = shipment.containers[0];
+    	if (container) { 
+ 	    	def shipmentItem = new ShipmentItem(product: product, quantity: 1);
+	    	container.addToShipmentItems(shipmentItem).save(flush:true);
+    	}
     	redirect action: "show", id: shipment.id;
     }    
     

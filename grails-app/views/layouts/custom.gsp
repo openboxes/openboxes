@@ -138,25 +138,23 @@
 	      	</div>
 	      		      	
 	      	<!-- YUI nav block that includes the local navigation menu -->
+	      	
 	      	<div id="menu" role="navigation" class="yui-b">
-		  		<!-- Navigation Menu -->
-		  		<div id="navMenu" class="homePagePanel">
-		      		<div class="panelTop"><!-- used to dislay the bottom border of the navigation menu --></div>
-					<div class="panelBody">							
-						<h1><g:pageProperty name="page.menuTitle" /> Menu</h1>
-						<ul>
-							<!--  Only display the local navigation menu if the user is logged in -->
-      						<g:if test="${session.user}">
+		  		<g:if test="${session.user}">
+			  		<!-- Navigation Menu -->
+			  		<div id="navMenu" class="homePagePanel">
+			      		<div class="panelTop"><!-- used to dislay the bottom border of the navigation menu --></div>
+						<div class="panelBody">							
+							<h1><g:pageProperty name="page.menuTitle" /> Menu</h1>
+							<ul>
+								<li><span class="menuButton"><a class="dashboard" href="${createLink(uri: '/home/index')}">Dashboard</a></span></li>
 								<g:pageProperty name="page.localLinks" />
-							</g:if>
-							<g:else>
-								<li><span class="menuButton"><g:link class="create" controller="auth" action="login">Login</g:link></span></li>
-							</g:else>
-						</ul>							
-						<br/><!-- this is added in order to get rid of whitespace in menu -->
+							</ul>							
+							<br/><!-- this is added in order to get rid of whitespace in menu -->
+						</div>
+						<div class="panelBtm"><!-- used to dislay the bottom border of the navigation menu --></div>
 					</div>
-					<div class="panelBtm"><!-- used to dislay the bottom border of the navigation menu --></div>
-				</div>
+				</g:if>
 			</div>
 		</div>
 		

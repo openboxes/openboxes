@@ -16,6 +16,9 @@
 		<g:javascript library="prototype" />
     </head>    
     <body>
+    
+    	<h1>Create a new product</h1>
+    
         <div class="body">
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
@@ -25,7 +28,7 @@
 	                <g:renderErrors bean="${productInstance}" as="list" />
 	            </div>
             </g:hasErrors>
-            <g:form action="save" method="post" >
+            <g:form action="save" method="post">
                 <div class="dialog">
                     <table>
                         <tbody>                        
@@ -39,7 +42,7 @@
                             </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="ean"><g:message code="product.ean.label" default="Universal Product Code" /></label>
+                                    <label for="ean"><g:message code="product.ean.label" default="UPC" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'ean', 'errors')}">
                                     <g:textField name="ean" value="${productInstance?.ean}" />
@@ -53,6 +56,23 @@
                                     <g:textField name="description" value="${productInstance?.description}" />
                                 </td>
                             </tr>
+		 					<tr class="prop">
+                                <td valign="top" class="name">
+                                  <label for="type.id"><g:message code="product.productType.label" default="Type" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'type', 'errors')}">
+                                    <g:select name="type.id" from="${org.pih.warehouse.ProductType.list()}" optionKey="id" value="${productInstance?.type?.id}"  />
+                                </td>
+                            </tr>                            
+		 					<tr class="prop">
+                                <td valign="top" class="name">
+                                  <label for="subType.id"><g:message code="product.productType.label" default="Subtype" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'subtype', 'errors')}">
+                                    <g:select name="subType.id" from="${org.pih.warehouse.ProductType.list()}" optionKey="id" value="${productInstance?.subType?.id}"  />
+                                </td>
+                            </tr>                            
+                            
                             
 <%--                             
                             <tr class="prop">

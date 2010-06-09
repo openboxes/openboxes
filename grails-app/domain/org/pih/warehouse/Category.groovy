@@ -1,12 +1,8 @@
 package org.pih.warehouse
 
-class Category {
+class Category extends Type {
 
 	Category parent
-
-	String code			// i18n code
-	String name			
-	String description	
 	
 	static hasMany = [ categories : Category ];
 	static mappedBy = [ categories : "parent" ];
@@ -16,8 +12,6 @@ class Category {
 	String toString() { return "$name"; }
 	
 	static constraints = {
-		code(nullable:true)
-		description(nullable:true)
 		parent(nullable:true)
 	}  
 	

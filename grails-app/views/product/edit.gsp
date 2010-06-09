@@ -16,6 +16,8 @@
 		<g:javascript library="prototype" />
     </head>    
     <body>
+    	<h1>Edit Product</h1>
+    
         <div class="body">
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
@@ -30,16 +32,7 @@
                 <g:hiddenField name="version" value="${productInstance?.version}" />
                 <div class="dialog">
                     <table>
-                        <tbody>
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                  <label for="ean"><g:message code="product.ean.label" default="UPC" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'ean', 'errors')}">
-                                    <g:textField name="ean" value="${productInstance?.ean}" />
-                                </td>
-                            </tr>
-                        
+                        <tbody>                        
                             <tr class="prop">
                                 <td valign="top" class="name">
                                   <label for="name"><g:message code="product.name.label" default="Name" /></label>
@@ -48,7 +41,14 @@
                                     <g:textField name="name" value="${productInstance?.name}" />
                                 </td>
                             </tr>
-                        
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                  <label for="ean"><g:message code="product.ean.label" default="UPC" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'ean', 'errors')}">
+                                    <g:textField name="ean" value="${productInstance?.ean}" />
+                                </td>
+                            </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
                                   <label for="description"><g:message code="product.description.label" default="Description" /></label>
@@ -57,8 +57,22 @@
                                     <g:textField name="description" value="${productInstance?.description}" />
                                 </td>
                             </tr>
-                        
-                        
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                  <label for="type.id"><g:message code="product.productType.label" default="Type" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'type', 'errors')}">
+                                    <g:select name="type.id" from="${org.pih.warehouse.ProductType.list()}" optionKey="id" value="${productInstance?.type?.id}"  />
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                  <label for="subType.id"><g:message code="product.productType.label" default="Sub Type" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'type', 'errors')}">
+                                    <g:select name="subType.id" from="${org.pih.warehouse.ProductType.list()}" optionKey="id" value="${productInstance?.type?.id}"  />
+                                </td>
+                            </tr>
                         	<%-- 
                             <tr class="prop">
                                 <td valign="top" class="name">
@@ -73,7 +87,7 @@
                     </table>
                 </div>
                 <div class="buttons">
-                    <span class="button"><g:actionSubmit class="save" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" /></span>
+                    <span class="button"><g:actionSubmit class="save" action="update" value="${message(code: 'default.button.save.label', default: 'Save')}" /></span>
                     <span class="button"><g:actionSubmit class="delete" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /></span>
                 </div>
             </g:form>

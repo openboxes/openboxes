@@ -12,9 +12,11 @@ class ProductLot {
 	Product product
 	
     static constraints = {
-	
+		lotNumber(nullable:false)
+		expirationDate(nullable:true)
+		product(nullable:false)		
 	}
 
-    String toString() { return "$product?.name"; }
+    String toString() { return "$lotNumber for $product?.name expires on $expirationDate"; }
     
 }

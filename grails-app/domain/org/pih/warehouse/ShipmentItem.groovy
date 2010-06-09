@@ -14,7 +14,7 @@ class ShipmentItem implements Comparable {
     Float grossWeight				// Weight of entire package
     Float unitWeight				// Weight per unit 
     
-    static belongsTo = [ container : Container ]
+    static belongsTo = [ container : Container ] // + shipment : Shipment
 
     static constraints = {
 		quantity(min:0, nullable:false)

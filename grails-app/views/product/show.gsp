@@ -17,7 +17,10 @@
     </head>    
 
     <body>
+       	<h1>Show Product</h1>
         <div class="body">
+        
+        
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
@@ -29,19 +32,27 @@
                             <td valign="top" class="value">${fieldValue(bean: productInstance, field: "id")}</td>                            
                         </tr>                    
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="product.ean.label" default="UPC" /></td>                            
-                            <td valign="top" class="value">
-                            	${fieldValue(bean: productInstance, field: "ean")}                            
-                            	<a href="http://www.upcdatabase.com/item/${fieldValue(bean: productInstance, field: "ean")}">UPC Lookup</a>
-                            </td>                            
-                        </tr>                    
-
-                        <tr class="prop">
                             <td valign="top" class="name"><g:message code="product.name.label" default="Name" /></td>                            
                             <td valign="top" class="value">${fieldValue(bean: productInstance, field: "name")}</td>                            
                         </tr>                    
-
-
+                        <tr class="prop">
+                            <td valign="top" class="name"><g:message code="product.ean.label" default="UPC" /></td>                            
+                            <td valign="top" class="value">
+                            	${fieldValue(bean: productInstance, field: "ean")}
+                            	
+                            	<span class="menuButton" style="padding-left: 25px;">                            
+                            		<a class="browse" target="_new" href="http://www.upcdatabase.com/item/${fieldValue(bean: productInstance, field: "ean")}"><b>Lookup this UPC</b></a>
+                            	</span>
+                            </td>                            
+                        </tr>                    
+                        <tr class="prop">
+                            <td valign="top" class="name"><g:message code="product.type.label" default="Type" /></td>                            
+                            <td valign="top" class="value">${fieldValue(bean: productInstance, field: "type.name")}</td>                            
+                        </tr>                    
+                        <tr class="prop">
+                            <td valign="top" class="name"><g:message code="product.subtype.label" default="Subtype" /></td>                            
+                            <td valign="top" class="value">${fieldValue(bean: productInstance, field: "subType.name")}</td>                            
+                        </tr>                    
                         <tr class="prop">
                             <td valign="top" class="name"><g:message code="product.description.label" default="Description" /></td>                            
                             <td valign="top" class="value">${fieldValue(bean: productInstance, field: "description")}</td>                            

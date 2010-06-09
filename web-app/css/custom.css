@@ -14,11 +14,15 @@ table.withoutBorder {
     border: 0px solid #ccc;
     width: 100%
 }
-td { 
+.dialog td { 
 	padding: 10px;
 }
 #content .small {font-size:.9em;}
 #content .large {font-size:1.4em;}
+
+.menu td { padding: 10px; }  
+.menu .heading { font-size: 1.2em; line-height: 1.2em; vertical-align: middle; border-top: 1px solid #aaa; padding: 5px 10px 5px 10px; display: block; background-color: #eee; }
+
 /* nothing to do right now */
 #menu { }
 /* TODO figure out if this is needed */
@@ -46,7 +50,11 @@ h2 {
 
 .body { 
 	width: 75%;
-} 
+}
+
+.buttons { 
+	margin-top: 1px;	
+}
 
 /* TODO figure out if we need to keep this */
 #pageBody {
@@ -186,27 +194,26 @@ hr.space {background:#fff;color:#fff;}
 /*
 -------------------------------------------------------------*/
 
-.listcontainer
-{
-margin-bottom: 1em;
-overflow: hidden;
+li { 
+	margin-top: 10px; 	
 }
 
-.list
-{
-list-style-type: none;
-margin: 0;
-padding: 0;
+.listcontainer { 
+	margin-bottom: 1em;
+	overflow: hidden;
 }
 
+.list {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
 
-.list li
-{
-border-left: 1px solid #000;
-float: left;
-line-height: 1.1em;
-margin: 0 .5em 0 -.5em;
-padding: 0 .5em 0 .5em;
+.list li {
+	border-left: 1px solid #000;
+	float: left;
+	margin: 0 .5em 0 -.5em;
+	padding: 0 .5em 0 .5em;
 }
 
 .list li.first { 
@@ -224,6 +231,8 @@ font-weight: bold;
 .prop .name { 
 	text-align: right; 
 }
+
+
 
 
 .rounded { 	

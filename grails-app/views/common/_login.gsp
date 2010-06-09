@@ -13,8 +13,8 @@
 		<fieldset> 
 			<legend>Login</legend> 			
 			<div id="loginFormFields">
-				<div>
-				    <label for="password">Log into:</label>
+				<div style="padding-left: 75px;">
+				    <label for="password">Log into:</label><br/>
 				    <g:select class="large" name="warehouse.id" from="${org.pih.warehouse.Warehouse.list()}" 
 				    	optionKey="id" value=""
 				    	noSelection="[null: 'Choose warehouse to manage']"/>

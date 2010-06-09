@@ -3,13 +3,13 @@ package org.pih.warehouse
 class ReferenceNumber {
 
 	String identifier
-	ReferenceType referenceType
+	ReferenceNumberType referenceNumberType
 	
 	
 	// Constraints
 	static constraints = {
 		identifier(nullable:true)
-		referenceType(nullable:true)
+		referenceNumberType(nullable:true)
 	}
 	
 	

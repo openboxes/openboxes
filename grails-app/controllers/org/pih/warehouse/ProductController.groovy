@@ -1,47 +1,40 @@
 package org.pih.warehouse
 
-import org.pih.warehouse.api.AuthService;
 import org.pih.warehouse.ProductType;
 
 class ProductController {
 
-    AuthService authService;
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"];
-    
-    def beforeInterceptor = [action:this.&auth,except:'login']
-    
-    // defined as a regular method so its private
-    def auth() {
-    	/*
-		println "checking if user is authenticated $session.user";
-		if(!session.user) {
-		    println "user in not authenticated";
-		    redirect(controller: "auth", action: "login");
-		    return false
-		} else {
-		    println "user is authenticated";
-		}*/
-    }
-
-    def login = {
-	
-    }
+    static allowedMethods = [save: "POST", update: "POST", delete: "POST"];    
 
     def index = {
         redirect(action: "list", params: params)
     }
 
     def browse = { 
-
+    		
+    	// Get selected 
+		def selectedCategory = Category.get(params.categoryId);		
+		def selectedConditionType = ConditionType.get(params.conditionTypeId);
+		def selectedProductType = ProductType.get(params.productTypeId);
+		def selectedProductSubType = ProductType.get(params.productSubTypeId);
+    		
+		
+		
     	// Condition types	
     	def allConditionTypes = ConditionType.getAll();
     	
-    	// Product types
+    	// Root level product types
 		def typeCriteria = ProductType.createCriteria();
 		def allProductTypes = typeCriteria.list {
 			isNull("parent")
 		}    		
-			
+
+		// Root categories
+		def categoryCriteria = Category.createCriteria();		
+		def allCategories = categoryCriteria.list { 
+			isNull("parent")
+		}
+				
 		// Product subtypes
 		def productSubtypes = null;
 		if (params.productTypeId) {
@@ -53,13 +46,7 @@ class ProductController {
 				}
 			}		
 		}
-		
-		def selectedCategory = Category.get(params.categoryId);		
-		def selectedConditionType = ConditionType.get(params.conditionTypeId);
-		def selectedProductType = ProductType.get(params.productTypeId);
-		def selectedProductSubType = ProductType.get(params.productSubTypeId);
-
-		
+				
 		// Search for Products matching criteria 
 		def results = null;		
 		def productCriteria = Product.createCriteria();
@@ -82,13 +69,14 @@ class ProductController {
           			}
                 }
                
-            }
-		
+            }		
 		}		
 		
         //params.max = Math.min(params.max ? params.int('max') : 10, 100)		
 		render(view:'browse', model:[productInstanceList : results, 
     	                             productInstanceTotal: Product.count(), 
+
+    	                             categories : allCategories,
     	                             conditionTypes : allConditionTypes,
     	                             productTypes : allProductTypes, 
     	                             productSubTypes : productSubtypes,
@@ -97,8 +85,9 @@ class ProductController {
     	                             selectedConditionType : selectedConditionType,
     	                             selectedProductType : selectedProductType,
     	                             selectedProductSubType : selectedProductSubType])
-    }
-        
+	}
+    
+    
     def list = {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [productInstanceList: Product.list(params), productInstanceTotal: Product.count()]
