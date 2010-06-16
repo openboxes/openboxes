@@ -35,7 +35,7 @@
             
 			<div id="dialogBanner">
 				<a name="shipment"></a>
-				<h2><g:message code="shipment.shipment.label" default="Shipment Details" /></h2>
+				<span class="title"><g:message code="shipment.shipment.label" default="Shipment Details" /></span>
 			</div>	
 
             <div class="dialog" style="clear: both;">             	
@@ -45,35 +45,36 @@
 	            	<fieldset>
 		                <table class="withoutBorder" border="1">
 		                    <tbody>	                        
+		                                   
 		                        <tr class="prop">
-		                            <td valign="top" class="name"><label><g:message code="shipment.origin.label" default="Status" /></label></td>                            
-		                            <td valign="top" class=" ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">
-										<g:select name="shipmentStatus.id" from="${org.pih.warehouse.ShipmentStatus.list()}" optionKey="id" value="${shipmentInstance?.shipmentStatus?.id}"  />
-		                            </td>                            
-		                        </tr>                    
-		                        <tr class="prop">
-		                            <td valign="top" class="name"><label><g:message code="shipment.origin.label" default="From" /></label></td>                            
+		                            <td valign="top" class="name"><label><g:message code="shipment.origin.label" default="Ship From" /></label></td>                            
 		                            <td valign="top" class=" ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">
 					                	<g:select name="origin.id" from="${org.pih.warehouse.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.origin?.id}"  />
 		                            </td>                            
-		                        </tr>                    
-		                        <tr class="prop">
-		                            <td valign="top" class="name"><label><g:message code="shipment.destination.label" default="To" /></label></td>
+		                            <td valign="top" class="name"><label><g:message code="shipment.destination.label" default="Ship To" /></label></td>
 		                            <td valign="top" class=" ${hasErrors(bean: shipmentInstance, field: 'destination', 'errors')}">
 					                	<g:select name="destination.id" from="${org.pih.warehouse.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.destination?.id}"  />
 		                            </td>                            
-		                        </tr>	                       
+		                        </tr>                    
+
 		                        <tr class="prop">
 		                            <td valign="top" class="name"><label><g:message code="shipment.expectedShippingDate.label" default="Ship date" /></label></td>                            
 	                                <td valign="top" class=" ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}" nowrap="nowrap">
 		           						<g:datePicker name="expectedShippingDate" precision="day" value="${shipmentInstance?.expectedShippingDate}" />
 	                                </td>
-		                        </tr>                    
-		                        <tr class="prop">
 		                            <td valign="top" class="name"><label><g:message code="shipment.expectedDeliveryDate.label" default="Delivery date" /></label></td>   
 	                                <td valign="top" class=" ${hasErrors(bean: shipmentInstance, field: 'expectedDeliveryDate', 'errors')}" nowrap="nowrap">
 		           						<g:datePicker name="expectedDeliveryDate" precision="day" value="${shipmentInstance?.expectedDeliveryDate}" />
 	                                </td>
+		                        </tr>                    
+		                        <%-- 
+								<tr class="prop">
+		                            <td valign="top" class="name"><label><g:message code="shipment.origin.label" default="Status" /></label></td>                            
+		                            <td valign="top" class=" ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">
+										<g:select name="shipmentStatus.id" from="${org.pih.warehouse.ShipmentStatus.list()}" optionKey="id" value="${shipmentInstance?.shipmentStatus?.id}"  />
+		                            </td>                            
+		                        </tr>         
+		                        <tr class="prop">
 		                        </tr>	                       
 		                        <tr class="prop">
 		                            <td valign="top" class="name"><label><g:message code="shipment.shipmentMethod.label" default="Shipment Method" /></label></td>        
@@ -86,7 +87,8 @@
 		                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'trackingNumber', 'errors')}">
 	                                    <g:textField name="trackingNumber" value="${shipmentInstance?.trackingNumber}" />
 	                                </td>
-		                        </tr>  	          
+		                        </tr>
+		                        --%>  	          
 							</tbody>
 						</table>	            	        				            	        
 		                			

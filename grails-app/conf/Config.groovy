@@ -31,6 +31,8 @@ grails.views.gsp.encoding="UTF-8"
 grails.converters.encoding="UTF-8"
 // enable Sitemesh preprocessing of GSP pages
 grails.views.gsp.sitemesh.preprocess = true
+// not sure what this does
+grails.views.javascript.library="jquery"
 // scaffolding templates configuration
 grails.scaffolding.templates.domainSuffix = 'Instance'
 
@@ -54,19 +56,6 @@ environments {
     test {
         grails.serverURL = "http://localhost:8080/${appName}"
     }
-    demo {     	
-    	grails.serverURL = "http://demo.pih-emr.org:8080/${appName}"
-    	tomcat.deploy.username="tomcat";
-    	tomcat.deploy.password="brux6spa";
-    	tomcat.deploy.url="http://demo.pih-emr.org:8080/manager";    	
-    }
-    justin { 
-    	grails.serverURL = "http://localhost:8180/${appName}"
-        tomcat.deploy.username="tomcat";
-    	tomcat.deploy.password="tomcat";
-    	tomcat.deploy.url="http://localhost:8180/manager";    	
-    }
-
 }
 
 // log4j configuration
@@ -92,6 +81,3 @@ log4j = {
 
     warn   'org.mortbay.log'
 }
-
-
-     

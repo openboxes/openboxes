@@ -4,6 +4,7 @@ class CategoryTagLib {
    
 	static Integer counter = 0;
 	
+	
 	 def displayCategories = { attrs, body ->	 
 	 	out << "<h1>Display Tree</h1>";	 	
 	 	def categories = attrs['categories'];
@@ -20,9 +21,6 @@ class CategoryTagLib {
 	 		println "display children: " + it.categories;
 	 		displayTree it.categories, "<h3>", "</h3>";	 		
 	 	}
-			 
-			 
 	 }
-	
-	
+	 
 }

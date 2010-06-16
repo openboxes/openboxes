@@ -17,8 +17,9 @@ class ProductController {
 		def selectedConditionType = ConditionType.get(params.conditionTypeId);
 		def selectedProductType = ProductType.get(params.productTypeId);
 		def selectedProductSubType = ProductType.get(params.productSubTypeId);
-    		
+    	def selectedAttribute = Attribute.get(params.attributeId)	
 		
+    	def allAttributes = Attribute.getAll();
 		
     	// Condition types	
     	def allConditionTypes = ConditionType.getAll();
@@ -53,34 +54,40 @@ class ProductController {
 		results = productCriteria.list {
             and{
                 if(params.productTypeId && params.productTypeId != ''){
-                    eq("type.id", Long.parseLong(params.productTypeId))
-                }
-                if(params.productSubTypeId && params.productSubTypeId != ''){
-                    eq("subType.id", Long.parseLong(params.productSubTypeId))
-                }                
-          		if(params.conditionTypeId && params.conditionTypeId != ''){
-          			conditionTypes { 
-          				eq("id", Long.parseLong(params.conditionTypeId))
-          			}
+                    eq("productType.id", Long.parseLong(params.productTypeId))
                 }
           		if(params.categoryId && params.categoryId != ''){
           			categories { 
           				eq("id", Long.parseLong(params.categoryId))
           			}
-                }
-               
+                }               
             }		
 		}		
+		
+		// Search drug products matching condition type id
+  		if(params.conditionTypeId && params.conditionTypeId != ''){
+  			def drugProductCriteria = DrugProduct.createCriteria();
+  			results = drugProductCriteria.list {  			
+	  			conditionTypes { 
+	  				eq("id", Long.parseLong(params.conditionTypeId))
+	  			}
+  			}  			
+        }
+		
+		
+		def rootCategory = new Category(name: "/", categories: allCategories);
 		
         //params.max = Math.min(params.max ? params.int('max') : 10, 100)		
 		render(view:'browse', model:[productInstanceList : results, 
     	                             productInstanceTotal: Product.count(), 
-
+    	                             rootCategory : rootCategory,
     	                             categories : allCategories,
     	                             conditionTypes : allConditionTypes,
     	                             productTypes : allProductTypes, 
     	                             productSubTypes : productSubtypes,
-    	                             
+    	                             attributes : allAttributes,
+    	                             selectedAttribute : selectedAttribute,
+    	                            
     	                             selectedCategory : selectedCategory,
     	                             selectedConditionType : selectedConditionType,
     	                             selectedProductType : selectedProductType,

@@ -2,6 +2,7 @@ package org.pih.warehouse
 
 import java.io.File;
 
+import org.pih.warehouse.Comment;
 import org.pih.warehouse.Event;
 import org.pih.warehouse.ShipmentEvent;
 import grails.converters.JSON;
@@ -23,9 +24,12 @@ class ShipmentController {
     
     def availableItems = {     		
     	println params;
-    	def items = Product.findAllByNameLike("%${params.query}%");
-    	items = items.collect() {
-    		[id:it.id, name:it.name]
+    	def items = null;
+    	if (params.query) { 
+	    	items = Product.findAllByNameLike("%${params.query}%");
+	    	items = items.collect() {
+	    		[id:it.id, name:it.name]
+	    	}
     	}
     	def jsonItems = [result: items]    	
     	render jsonItems as JSON;    		
@@ -55,11 +59,11 @@ class ShipmentController {
         def container = new Container(
         	name: name, 
         	weight: 0, 
-        	units: "kgs", 
+        	units: "kg", 
         	containerType: containerType);
         shipment.addToContainers(container);
         flash.message = "Added a new container to the shipment";		
-		redirect(action: 'edit', id: params.shipmentId)    
+		redirect(action: 'show', id: params.shipmentId)    
     }
     
     def deleteContainer = { 
@@ -69,25 +73,57 @@ class ShipmentController {
     	
     	if (container.getShipmentItems().size() > 0) {
     		flash.message = "Cannot delete a container that is not empty";
-    		redirect(action: 'edit', id: shipmentId);    		
+    		redirect(action: 'show', id: shipmentId);    		
     	}
     	else { 
     		container.delete();	    	    	
-    		redirect(action: 'edit', id: shipmentId)     		
+    		redirect(action: 'show', id: shipmentId)     		
     	}    		
     }
     
+    
+    def addComment = { 
+    	println params;
+    	def shipment = (params.shipmentId) ? Shipment.get(params.shipmentId) : null;    	
+    	def recipient = (params.recipientId) ? User.get(params.recipientId) : null;
+    	def comment = new Comment(comment: params.comment, commenter: session.user, recipient: recipient)
+    	if (shipment) { 
+	    	shipment.addToComments(comment).save();
+	    	flash.message = "Added comment '${params.comment}'to shipment $shipment.id";		
+    	}
+		redirect(action: 'show', id: params.shipmentId)    	    		
+    }
+    
+    def deleteComment = { 
+        	def comment = Comment.get(params.id);
+       		def shipmentId = comment.getShipment().getId();    	
+        	if (comment) { 	    	
+           	    comment.delete();	    	    	
+            	flash.message = "Deleted comment $comment from shipment $shipment.id";		
+    	    	redirect(action: 'show', id: shipmentId) 
+        	}
+        	else { 
+            	flash.message = "Could not remove comment $params.id from shipment";		
+        		redirect(action: 'show', id: shipmentId)    	
+        		
+        	}
+        }
+    
+    
 
     def addItem = {     		
+    	println params;
+    		
     	def container = Container.get(params.containerId);
     	def product = Product.get(params.productId);
     	def quantity = params.quantity;
     	def shipmentItem = new ShipmentItem(product: product, quantity: quantity);    	
     	container.addToShipmentItems(shipmentItem).save(flush:true);
     	flash.message = "Added $params.quantity units of $product.name";		
-		redirect(action: 'edit', id: params.shipmentId)    	
+		redirect(action: 'show', id: params.shipmentId)    	
     	
     }
+    
 
     def deleteItem = { 
     	def item = ShipmentItem.get(params.id);
@@ -140,7 +176,7 @@ class ShipmentController {
     	shipment.addToEvents(event).save(flush:true);    
 
     	flash.message = "Added event";		
-		redirect(action: 'edit', id: params.shipmentId)    	
+		redirect(action: 'show', id: params.shipmentId)    	
 	}    
 
     def deleteEvent = { 

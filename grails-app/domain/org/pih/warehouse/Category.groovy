@@ -7,6 +7,12 @@ class Category extends Type {
 	static hasMany = [ categories : Category ];
 	static mappedBy = [ categories : "parent" ];
 	static belongsTo = [ parent : Category ];
+	
+	static mapping = {
+		sort name:"desc"
+		categories sort:"name"
+	}
+	
 
 	               	                     
 	String toString() { return "$name"; }

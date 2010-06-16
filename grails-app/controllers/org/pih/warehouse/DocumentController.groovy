@@ -92,7 +92,7 @@ class DocumentController {
         	flash.message = "File $filename is too large (must be less than 1MB)";
         }
         
-		redirect(controller: 'shipment', action: 'edit', id: command.shipmentId)
+		redirect(controller: 'shipment', action: 'show', id: command.shipmentId)
     }    
 
 }

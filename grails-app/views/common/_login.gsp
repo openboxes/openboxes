@@ -10,21 +10,23 @@
                <g:renderErrors bean="${userInstance}" as="list" />
            </div>
         </g:hasErrors>		
-		<fieldset> 
-			<legend>Login</legend> 			
-			<div id="loginFormFields">
-				<div style="padding-left: 75px;">
+	<div class="notice">
+		Login as <b>manager</b> : <b>password</b> to use the system as a <b>Warehouse Manager</b>. 
+	</div>			
+		<fieldset> 			
+			<div id="loginFormFields" style="padding:25px;">
+				<div>
 				    <label for="password">Log into:</label><br/>
 				    <g:select class="large" name="warehouse.id" from="${org.pih.warehouse.Warehouse.list()}" 
 				    	optionKey="id" value=""
 				    	noSelection="[null: 'Choose warehouse to manage']"/>
 				</div>  	    
-				<div style="padding-left: 75px">
+				<div>
 					<br/>
 					<hr/>
 					<br/>
 					<div>
-						<label for="username">User name:</label><br/>
+						<label for="username">Username or email:</label><br/>
 						<input type="text" class="title" name="username" id="username" value="${userInstance?.username}">
 					</div> 
 					<div>
@@ -42,10 +44,6 @@
 		</span>	
     </div>	
 	<br/>
-	<div class="notice">
-		NOTE: To log onto the system as a <b>Warehouse Manager</b>, 
-		please use the username and password <br/> combination <b>manager</b> : <b>password</b>.						    	
-	</div>			
 
 
 </g:form>

@@ -10,6 +10,23 @@
 	margin-right: 30px;
 	width: 75%;		/* stretch the main content */
 }
+.menuButton, label, input, td, th { 	
+	font-size: 11pt;
+}
+
+/* Shipment summary add padding around To/From addresses */
+#summary td { 
+	padding: 15px;	
+}
+
+.tab { 
+	padding: 25px;	
+}
+/* IMPORTANT: not sure why this works, but mis-aligns the menu */
+.yui-skin-sam { 
+	font: 11px/1.231 arial,helvetica,clean,sans-serif;
+}
+
 table.withoutBorder {
     border: 0px solid #ccc;
     width: 100%
@@ -32,6 +49,9 @@ table.withoutBorder {
 	width: 228px;
 	float: left;
 	border: 0px solid black;
+}
+#resultSummary { 
+	font-size: 9pt;	
 }
 label { 
 	padding-right: 15px; 
@@ -80,7 +100,7 @@ hr.space {background:#fff;color:#fff;}
 }
  	
 #bannerLeft {
-    width: 30%;
+
     text-align: left;
 }
 #bannerRight {
@@ -200,20 +220,23 @@ li {
 
 .listcontainer { 
 	margin-bottom: 1em;
-	overflow: hidden;
+	/*overflow: hidden;*/
+	
 }
 
 .list {
 	list-style-type: none;
-	margin: 0;
-	padding: 0;
+	/*
+	margin: 10px;
+	padding: 10px;*/
 }
 
 .list li {
 	border-left: 1px solid #000;
 	float: left;
-	margin: 0 .5em 0 -.5em;
-	padding: 0 .5em 0 .5em;
+	padding: 5px 10px 5px 10px;
+	/*margin: 0 .5em 0 -.5em;*/
+	/*padding: 0 .75em 0 .75em;*/
 }
 
 .list li.first { 
@@ -221,7 +244,11 @@ li {
 }
 
 .list .active { 
-font-weight: bold;	
+	font-weight: bold;	
+	background-color: #ccc;
+}
+.list li { 
+	background-color: #eee;
 }
 
 .prop .value { 

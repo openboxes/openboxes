@@ -24,17 +24,13 @@
                 <table>
                     <thead>
                         <tr>                        
-						    <th><g:message code="product.details.label" default="Details" /></th>
-                            <g:sortableColumn property="ean" title="${message(code: 'product.ean.label', default: 'EAN/UPC')}" />
                             <g:sortableColumn property="name" title="${message(code: 'product.name.label', default: 'Name')}" />
                         </tr>
                     </thead>
                     <tbody>
                     <g:each in="${productInstanceList}" status="i" var="productInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
-							<td align="center"><g:link action="show" id="${productInstance.id}">view</g:link></td>
-                            <td>${fieldValue(bean: productInstance, field: "ean")}</td>
-                            <td>${fieldValue(bean: productInstance, field: "name")}</td>
+							<td align="center"><g:link action="show" id="${productInstance.id}">${fieldValue(bean: productInstance, field: "name")}</g:link></td>
                         </tr>
                     </g:each>
                     </tbody>

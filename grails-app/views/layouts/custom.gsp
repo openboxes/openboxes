@@ -6,7 +6,6 @@
 	<title><g:layoutTitle default="Your Warehouse App" /></title>
 	<%--<link rel="stylesheet" href="http://yui.yahooapis.com/2.7.0/build/reset-fonts-grids/reset-fonts-grids.css" type="text/css"> --%>
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/yui/2.7.0/reset-fonts-grids',file:'reset-fonts-grids.css')}" type="text/css">
-
 	
 	<!-- Include Favicon -->
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
@@ -37,7 +36,9 @@
 	
 	<!-- Include javascript files -->
 	<g:javascript library="application" />
-	<g:javascript library="prototype"/>
+	<%-- <g:javascript library="prototype"/>
+	<g:javascript library="jquery"/>--%>
+	<gui:resources components="richEditor, dialog, tabView, autoComplete"/>
 	
 	<!-- Include navigation resources -->
 	<%--<nav:resources/>--%>
@@ -61,12 +62,17 @@
 		    <!-- Block which includes the logo and login banner -->
 		    <div class="yui-b">
 				<div class="yui-gf">
-				    <div id="bannerLeft" class="yui-u first">
-						<div class="logo">
-						    <a class="home" href="${createLink(uri: '/home/index')}">
-						    	<img src="${createLinkTo(dir:'images',file:'logo.png')}" width="200" height="61.5" alt="Your Warehouse. You're Welcome." />
+				    <div id="bannerLeft" class="yui-u first" >
+						<span class="logo">
+						    <a class="home" href="${createLink(uri: '/home/index')}" style="text-decoration: none">
+						    	<!-- openBoxes_logo.jpg width="96" height="57" -->
+						    	<img src="${createLinkTo(dir:'images',file:'openboxes.png')}" width="68" height="68" alt="Your Boxes. You're Welcome." 
+						    		style="vertical-align: absmiddle"/><span style="font-size: 1em;"></span>						    		
+						    		<span style="float: right; padding-top: 0px; color: black; text-shadow: #AAA 0px 5px 5px; font-size: 4em;">OpenBoxes</span>
 						    </a>
-						</div>
+						</span>
+						
+						
 				    </div>
 				    <div id="bannerRight" class="yui-u" >
 				    	<div id="loggedIn">
@@ -104,11 +110,13 @@
 				<div class="nav">
 					<g:render template="../common/breadcrumb" />
 				    <g:if test="${session.user}">				    
+						<%-- 
 				    	<g:render template="../common/global"/>
 				    	<g:pageProperty name="page.globalLinks" /><!-- Populated using the 'globalLinks' property defined in the GSP file -->
+					    --%>				    
 						<!-- TODO Implemented hack to move the settings menu over to the right -->
 						<span class="menuButton" style="position:absolute; right: 15px;"><a class="settings" href="${createLink(uri: '/admin/index')}">Settings</a></span>
-				    </g:if>				    
+				    </g:if>
 				</div>
 		    </div>
 		    
@@ -116,6 +124,8 @@
     </div>
     
     <div id="doc3" class="yui-t3">
+    
+	    
 		<br/>
 		<!-- 
 			Body includes the divs for the main body content and left navigation menu 
@@ -161,7 +171,7 @@
 		<!-- YUI "footer" block that includes footer information -->
 		<div id="ft" role="contentinfo">
 			<div id="footer">
-				&copy; 2010 <a href="http://www.pih.org">PIH&trade;</a> Warehouse &nbsp;&nbsp; | &nbsp;&nbsp;
+				&copy; 2010 <a href="http://www.pih.org">PIH</a>&trade; Warehouse &nbsp;&nbsp; | &nbsp;&nbsp;
 				Application Version: <g:meta name="app.version"/>&nbsp;&nbsp; | &nbsp;&nbsp;
 				Grails Version: <g:meta name="app.grails.version"></g:meta>
 			</div>

@@ -3,7 +3,7 @@ package org.pih.warehouse
 class Shipment {
 	
 	// Core data elements
-	String comments	
+	//String comments	
 	
 	// Status 
 	Boolean shipped
@@ -36,6 +36,7 @@ class Shipment {
 	static hasMany = [events : ShipmentEvent,
 	                  containers : Container,
 	                  documents : Document, 	                  
+	                  comments : Comment,
 	                  //products : Product,
 	                  //shipmentLineItems : ShipmentItem, 
 	                  referenceNumbers : ReferenceNumber]
@@ -46,7 +47,7 @@ class Shipment {
 		shipped(nullable:true)
 		origin(nullable:false)
 		destination(nullable:false)
-		comments(nullable:true)
+		//comments(nullable:true)
 		
 		expectedShippingDate(nullable:true)
 		actualShippingDate(nullable:true)

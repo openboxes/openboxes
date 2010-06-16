@@ -28,12 +28,9 @@
             
             
             <div class="list">
-
-				<div>
-					
+				<div>	
 	            	<ul>
-	            		<li class="first"><span class="large">Showing:</span></li>
-	            		<li class="first"><b>All Shipments</b> </li>
+	            		<li class="first active">Show All</li>
 	            		<li><a href="">Incoming (0)</a></li>
 	            		<li><a href="">Outgoing (0)</a></li>
 	            	</ul>
@@ -54,13 +51,13 @@
                     </thead>
                     <tbody>
 	                    <g:each in="${shipmentInstanceList}" status="i" var="shipmentInstance">
-	                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'} higher">
-	                            <td><span class="menuButton"><g:link class="list" action="show" id="${shipmentInstance.id}" alt="show"></g:link></span></td>                        
-	                            <td nowrap="true"><span class="rounded">${fieldValue(bean: shipmentInstance, field: "shipmentStatus.name")}</span></td>
-	                            <td nowrap="true"><g:formatDate date="${shipmentInstance.expectedShippingDate}" /></td>
-	                            <td>${fieldValue(bean: shipmentInstance, field: "trackingNumber")}</td>
-	                            <td>${fieldValue(bean: shipmentInstance, field: "origin")}</td>
-	                            <td>${fieldValue(bean: shipmentInstance, field: "destination")}</td>
+	                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}" style="height: 50px;">
+	                            <td style="vertical-align: middle"><span class="menuButton"><g:link class="list" action="show" id="${shipmentInstance.id}" alt="show"></g:link></span></td>                        
+	                            <td style="vertical-align: middle" nowrap="true"><span class="rounded">${fieldValue(bean: shipmentInstance, field: "shipmentStatus.name")}</span></td>
+	                            <td style="vertical-align: middle" nowrap="true"><g:formatDate date="${shipmentInstance.expectedShippingDate}" format="dd MMM yyyy" /></td>
+	                            <td style="vertical-align: middle">${fieldValue(bean: shipmentInstance, field: "trackingNumber")}</td>
+	                            <td style="vertical-align: middle">${fieldValue(bean: shipmentInstance, field: "origin")}</td>
+	                            <td style="vertical-align: middle">${fieldValue(bean: shipmentInstance, field: "destination")}</td>
 	                        </tr>
 	                    </g:each>
                     </tbody>

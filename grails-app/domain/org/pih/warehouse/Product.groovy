@@ -12,7 +12,9 @@ class Product {
 
 	// Basic attributes
     String name				// brand name and dosage strength: (e.g. Advil 200mg)
-    GenericType genericType // the generic type of product (e.g. pain killer, Ibuprofen)
+    GenericType genericType // the generic type of product (e.g. Pain Reliever)
+    ProductType productType	// the specific type of product (e.g. Ibuprofen)
+    //ProductType subType;	// should be a cascading relationship defined by subclass
     
     String tags				// Comma separated list of tags
     String description
@@ -22,8 +24,6 @@ class Product {
     String unit				// values: tablet, capsule, vial, pill, bottle, injection, box, each, grams, carton, case
     String quantityPerUnit	// quantity per unit
     
-    ProductType type;		// should be the same as the class (e.g. Product or DrugProduct)
-    ProductType subType;	// should be a cascading relationship defined by subclass
     
     // Product codes
     String ean;				// A universal product code (http://en.wikipedia.org/wiki/European_Article_Number)
@@ -35,17 +35,16 @@ class Product {
 	                  productAttributeValues : ProductAttributeValue ]
 	                  
     static constraints = {
-		markAsImportant(nullable:true)
 		name(blank:false)        		
-        description(nullable:true)
 		genericType(nullable:true)
+		productType(nullable:true)		
 		tags(nullable:true)		
+        description(nullable:true)
+		markAsImportant(nullable:true)
         unit(nullable:true)
         quantityPerUnit(nullable:true)        
         ean(nullable:true)
 		productCode(nullable:true)		
-		type(nullable:true)
-		subType(nullable:true)	
     }
 
     String toString() { return "$name"; }

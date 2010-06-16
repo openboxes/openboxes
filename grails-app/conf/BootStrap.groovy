@@ -28,6 +28,7 @@ import org.pih.warehouse.ShipmentEvent;
 import org.pih.warehouse.ShipmentItem;
 import org.pih.warehouse.ShipmentMethod;
 import org.pih.warehouse.ShipmentStatus;
+import org.pih.warehouse.SupplierType;
 import org.pih.warehouse.Transaction;
 import org.pih.warehouse.TransactionEntry;
 import org.pih.warehouse.TransactionType;
@@ -42,17 +43,6 @@ class BootStrap {
 	 */
 	def init = { servletContext ->
 		
-		/* Categories */
-		Category ROOTCATEGORY = new Category(parent: null, name: "Root").save();
-		Category SUBCATEGORYA = new Category(parent: ROOTCATEGORY, name: "Sub A").save();
-		Category SUBCATEGORYB = new Category(parent: ROOTCATEGORY, name: "Sub B").save();
-		Category SUBCATEGORYC = new Category(parent: ROOTCATEGORY, name: "Sub C").save();
-		Category SUBCATEGORYA1 = new Category(parent: SUBCATEGORYA, name: "Sub A1").save();
-		Category SUBCATEGORYA2 = new Category(parent: SUBCATEGORYA, name: "Sub A2").save();
-		Category SUBCATEGORYA3 = new Category(parent: SUBCATEGORYA, name: "Sub A3").save();
-		Category SUBCATEGORYC1 = new Category(parent: SUBCATEGORYC, name: "Sub C1").save();
-		Category SUBCATEGORYC3 = new Category(parent: SUBCATEGORYC, name: "Sub C3").save();
-		
 		/* Countries */	 	
 		Country CANADA = new Country(country: "Canada", population: 24251210, gdp: 24251210, date: new Date()).save();
 		Country HAITI = new Country(country: "Haiti", population: 29824821, gdp: 24251210, date: new Date()).save();
@@ -62,56 +52,123 @@ class BootStrap {
 		/* Organizations */
 		Organization ZL = new Organization(name:  "Zanmi Lasante", description: "").save();
 		Organization PIH = new Organization(name: "Partners In Health", description: "").save();
+			
+		/* Category > Top Level */
+		Category CATEGORY_MEDICINES = new Category(parent: null, name: "Medicines").save();
+		Category CATEGORY_SUPPLIES = new Category(parent: null, name: "Supplies").save();
+		Category CATEGORY_EQUIPMENT = new Category(parent: null, name: "Equipment").save();
+		Category CATEGORY_PERISHABLES = new Category(parent: null, name: "Perishables").save();
+		Category CATEGORY_OTHER = new Category(parent: null, name: "Other").save();
+		
+		/* Category > Supplies */
+		Category CATEGORY_MEDICAL_SUPPLIES = new Category(parent: CATEGORY_SUPPLIES, name: "Medical Supplies").save();
+		Category CATEGORY_HOSPITAL_SUPPLIES = new Category(parent: CATEGORY_SUPPLIES, name: "Hospital and Clinic Supplies").save();
+		Category CATEGORY_OFFICE_SUPPLIES = new Category(parent: CATEGORY_SUPPLIES, name: "Office Supplies").save();
+		
+		/* Category > Equipment */
+		Category CATEGORY_MEDICAL_EQUIPMENT = new Category(parent: CATEGORY_EQUIPMENT, name: "Medical Equipment").save();
+		Category CATEGORY_SURGICAL_EQUIPMENT = new Category(parent: CATEGORY_EQUIPMENT, name: "Surgical Equipment").save();
+		Category CATEGORY_TECH_EQUIPMENT = new Category(parent: CATEGORY_EQUIPMENT, name: "IT Equipment").save();
+		Category CATEGORY_FURNITURE = new Category(parent: CATEGORY_EQUIPMENT, name: "Furniture and Equipment").save();
+		
+		/* Category > Food */
+		Category CATEGORY_FOOD = new Category(parent: CATEGORY_PERISHABLES, name: "Food").save();
+		
+		/* Category > Medicines */ 
+		Category CATEGORY_MEDICINES_ARV = new Category(parent: CATEGORY_MEDICINES, name: "ARVS").save();
+		Category CATEGORY_MEDICINES_ANESTHESIA = new Category(parent: CATEGORY_MEDICINES, name: "Anesteshia").save();
+		Category CATEGORY_MEDICINES_CANCER = new Category(parent: CATEGORY_MEDICINES, name: "Cancer").save();
+		Category CATEGORY_MEDICINES_CHRONIC_CARE = new Category(parent: CATEGORY_MEDICINES, name: "Chronic Care").save();
+		Category CATEGORY_MEDICINES_PAIN = new Category(parent: CATEGORY_MEDICINES, name: "Pain").save();
+		Category CATEGORY_MEDICINES_TB = new Category(parent: CATEGORY_MEDICINES, name: "TB").save();
+		Category CATEGORY_MEDICINES_OTHER = new Category(parent: CATEGORY_MEDICINES, name: "Other").save();
+		
+		/* Category > Medical Supplies */ 
+		Category CATEGORY_MED_SUPPLIES_LAB = new Category(parent: CATEGORY_MEDICAL_SUPPLIES, name: "Lab").save();
+		Category CATEGORY_MED_SUPPLIES_SURGICAL = new Category(parent: CATEGORY_MEDICAL_SUPPLIES, name: "Surgical").save();
+		Category CATEGORY_MED_SUPPLIES_XRAY = new Category(parent: CATEGORY_MEDICAL_SUPPLIES, name: "X-Ray").save();
+		Category CATEGORY_MED_SUPPLIES_DENTAL = new Category(parent: CATEGORY_MEDICAL_SUPPLIES, name: "Dental").save();
+		Category CATEGORY_MED_SUPPLIES_OTHER = new Category(parent: CATEGORY_MEDICAL_SUPPLIES, name: "Other").save();		
 		
 		/* Condition Type */
-		ConditionType AIDS_HIV = new ConditionType(name: "HIV/AIDS").save();
-		ConditionType CANCER = new ConditionType(name: "Cancer").save();
-		ConditionType DIARRHEA = new ConditionType(name: "Diarrhea").save();
-		ConditionType PAIN = new ConditionType(name: "Pain").save();
-		ConditionType TUBERCULOSIS = new ConditionType(name: "Tuberculosis").save();
+		ConditionType CONDITION_AIDS_HIV = new ConditionType(name: "HIV/AIDS").save();
+		ConditionType CONDITION_CANCER = new ConditionType(name: "Cancer").save();
+		ConditionType CONDITION_DIARRHEA = new ConditionType(name: "Diarrhea").save();
+		ConditionType CONDITION_PAIN = new ConditionType(name: "Pain").save();
+		ConditionType CONDITION_TUBERCULOSIS = new ConditionType(name: "Tuberculosis").save();
 		
 		/* Generic Type */
-		GenericType LAPTOP = new GenericType(name: "Laptop").save();
-		GenericType GLOVE = new GenericType(name: "Glove").save();
-		GenericType GUAZE = new GenericType(name: "Guaze").save();
-		GenericType TISSUE = new GenericType(name: "Tissue").save();
-		GenericType FOOTWEAR = new GenericType(name: "Shoe").save();
-		GenericType ARV_MEDICATION = new GenericType(name: "ARV Medication").save();
-		GenericType PAIN_MEDICATION = new GenericType(name: "Pain Medication").save();
-		GenericType VEGETABLE = new GenericType(name: "Vegetable").save();
-		GenericType ELECTRONICS = new GenericType(name: "Electronics").save();
+		GenericType GENERIC_LAPTOP = new GenericType(name: "Laptop").save();
+		GenericType GENERIC_GLOVE = new GenericType(name: "Glove").save();
+		GenericType GENERIC_GUAZE = new GenericType(name: "Guaze").save();
+		GenericType GENERIC_TISSUE = new GenericType(name: "Tissue").save();
+		GenericType GENERIC_FOOTWEAR = new GenericType(name: "Shoe").save();
+		GenericType GENERIC_ARV_MEDICATION = new GenericType(name: "ARV Medication").save();
+		GenericType GENERIC_PAIN_MEDICATION = new GenericType(name: "Pain Medication").save();
+		GenericType GENERIC_VEGETABLE = new GenericType(name: "Vegetable").save();
+		GenericType GENERIC_ELECTRONICS = new GenericType(name: "Electronics").save();
 		
 		/* Attributes */
-		Attribute vitality = new Attribute(name:"Vitality", dataType: "String").save(flush:true);
-		Value vital = new Value(stringValue:"vital")
-		Value essential = new Value(stringValue:"essential")
-		Value nonEssential = new Value(stringValue:"non-essential")
-		vitality.addToValues(vital).save(flush:true);
-		vitality.addToValues(essential).save(flush:true);
-		vitality.addToValues(nonEssential).save(flush:true);
-						
-		/* Product Type */
+		Attribute ATTRIBUTE_VITALITY = new Attribute(name:"Vitality", dataType: "String").save(flush:true);
+		Value VALUE_VITAL = new Value(stringValue:"vital").save();
+		Value VALUE_ESSENTIAL = new Value(stringValue:"essential").save();
+		Value VALUE_NON_ESSENTIAL = new Value(stringValue:"non-essential").save();
+		ATTRIBUTE_VITALITY.addToValues(VALUE_VITAL).save(flush:true);
+		ATTRIBUTE_VITALITY.addToValues(VALUE_ESSENTIAL).save(flush:true);
+		ATTRIBUTE_VITALITY.addToValues(VALUE_NON_ESSENTIAL).save(flush:true);
+		
+		
+		Attribute ATTRIBUTE_SIZE = new Attribute(name: "Size", dataType: "String").save();
+		Attribute ATTRIBUTE_SHAPE = new Attribute(name: "Shape", dataType: "String").save();
+		
+		
+		/* Product Types */
+		ProductType PRODUCT_MEDS_ARV = new ProductType(parent: null, name: "Meds-ARV").save();
+		ProductType PRODUCT_MEDS_TB = new ProductType(parent: null, name: "Meds-TB").save();
+		ProductType PRODUCT_MEDS_CANCER = new ProductType(parent: null, name: "Meds-Cancer").save();
+		ProductType PRODUCT_MEDS_CHRONIC_CARE = new ProductType(parent: null, name: "Meds-Chronic Care").save();
+		ProductType PRODUCT_MEDS_ANESTHESIA = new ProductType(parent: null, name: "Meds-Anesthesia").save();
+		ProductType PRODUCT_MEDS_NARCOTICS = new ProductType(parent: null, name: "Meds-Narcotics").save();
+		ProductType PRODUCT_MEDS_OTHER = new ProductType(parent: null, name: "Meds-Other").save();
+		ProductType PRODUCT_MED_SUPPLIES_LAB = new ProductType(parent: null, name: "Med Supplies-Lab").save();
+		ProductType PRODUCT_MED_SUPPLIES_SURGICAL = new ProductType(parent: null, name: "Med Supplies-Surgical").save();
+		ProductType PRODUCT_MED_SUPPLIES_XRAY = new ProductType(parent: null, name: "Med Supplies-X-ray").save();
+		ProductType PRODUCT_MED_SUPPLIES_DENTAL = new ProductType(parent: null, name: "Med Supplies-Dental").save();
+		ProductType PRODUCT_MED_SUPPLIES_OTHER = new ProductType(parent: null, name: "Med Supplies-Other").save();
+		ProductType PRODUCT_MEDICAL_EQUIPMENT = new ProductType(parent: null, name: "Medical Equipment").save();
+		ProductType PRODUCT_SURGICAL_EQUIPMENT = new ProductType(parent: null, name: "Surgical Equipment").save();
+		ProductType PRODUCT_HOSPITAL_SUPPLIES = new ProductType(parent: null, name: "Hospital and Clinic Supplies").save();
+		ProductType PRODUCT_FURNITURE_AND_EQUIPMENT = new ProductType(parent: null, name: "Furniture and Equipment").save();
+		ProductType PRODUCT_IT_AND_OFFICE = new ProductType(parent: null, name: "IT and Office").save();
+		ProductType PRODUCT_FOOD = new ProductType(parent: null, name: "Food").save();
+		ProductType PRODUCT_OTHER = new ProductType(parent: null, name: "Other").save();
+		
+		/* Product Type 
 		ProductType MEDICINES = new ProductType(parent: null, name: "Medicines").save();
 		ProductType SUPPLIES = new ProductType(parent: null, name: "Supplies").save();
 		ProductType EQUIPMENT = new ProductType(parent: null, name: "Equipment").save();
 		ProductType PERISHABLES = new ProductType(parent: null, name: "Perishables").save();
 		ProductType OTHER = new ProductType(parent: null, name: "Other").save();
+		*/
 		
-		/* Product Type > Supplies */
+		/* Product Type > Supplies 
 		ProductType MEDICAL_SUPPLIES = new ProductType(parent: SUPPLIES, name: "Medical Supplies").save();
 		ProductType HOSPITAL_SUPPLIES = new ProductType(parent: SUPPLIES, name: "Hospital and Clinic Supplies").save();
 		ProductType OFFICE_SUPPLIES = new ProductType(parent: SUPPLIES, name: "Office Supplies").save();
+		*/		
 		
-		/* Product Type > Equipment */
+		/* Product Type > Equipment 
 		ProductType MEDICAL_EQUIPMENT = new ProductType(parent: EQUIPMENT, name: "Medical Equipment").save();
 		ProductType SURGICAL_EQUIPMENT = new ProductType(parent: EQUIPMENT, name: "Surgical Equipment").save();
 		ProductType TECH_EQUIPMENT = new ProductType(parent: EQUIPMENT, name: "IT Equipment").save();
 		ProductType FURNITURE = new ProductType(parent: EQUIPMENT, name: "Furniture and Equipment").save();
+		*/
 		
-		/* Product Type > Food */
+		/* Product Type > Food 
 		ProductType FOOD = new ProductType(parent: PERISHABLES, name: "Food").save();
+		*/
 		
-		/* Product Type > Medicines */
+		/* Product Type > Medicines 
 		ProductType MEDICINES_ARV = new ProductType(parent: MEDICINES, name: "ARVS").save();
 		ProductType MEDICINES_ANESTHESIA = new ProductType(parent: MEDICINES, name: "Anesteshia").save();
 		ProductType MEDICINES_CANCER = new ProductType(parent: MEDICINES, name: "Cancer").save();
@@ -119,13 +176,15 @@ class BootStrap {
 		ProductType MEDICINES_PAIN = new ProductType(parent: MEDICINES, name: "Pain").save();
 		ProductType MEDICINES_TB = new ProductType(parent: MEDICINES, name: "TB").save();
 		ProductType MEDICINES_OTHER = new ProductType(parent: MEDICINES, name: "Other").save();
+		*/
 		
-		/* Product Type > Medical Supplies */
+		/* Product Type > Medical Supplies 
 		ProductType MED_SUPPLIES_LAB = new ProductType(parent: MEDICAL_SUPPLIES, name: "Lab").save();
 		ProductType MED_SUPPLIES_SURGICAL = new ProductType(parent: MEDICAL_SUPPLIES, name: "Surgical").save();
 		ProductType MED_SUPPLIES_XRAY = new ProductType(parent: MEDICAL_SUPPLIES, name: "X-Ray").save();
 		ProductType MED_SUPPLIES_DENTAL = new ProductType(parent: MEDICAL_SUPPLIES, name: "Dental").save();
 		ProductType MED_SUPPLIES_OTHER = new ProductType(parent: MEDICAL_SUPPLIES, name: "Other").save();
+		*/
 		
 		/* Routes of Administration */
 		/*
@@ -136,12 +195,12 @@ class BootStrap {
 		 * SC      Subcutaneous
 		 * SL      Sublingual
 		 */		
-		DrugRouteType ORAL = new DrugRouteType(name: "Oral").save();
-		DrugRouteType RECTAL = new DrugRouteType(name: "Rectal").save();
-		DrugRouteType INTRAMUSCULAR = new DrugRouteType(name: "Intramuscular").save();
-		DrugRouteType INTRAVENOUS = new DrugRouteType(name: "Intravenous").save();
-		DrugRouteType SUBCUTANEOUS = new DrugRouteType(name: "Subcutaneous").save();
-		DrugRouteType SUBLINGUAL = new DrugRouteType(name: "Sublingual").save();
+		DrugRouteType DRUG_ROUTE_ORAL = new DrugRouteType(name: "Oral").save();
+		DrugRouteType DRUG_ROUTE_RECTAL = new DrugRouteType(name: "Rectal").save();
+		DrugRouteType DRUG_ROUTE_INTRAMUSCULAR = new DrugRouteType(name: "Intramuscular").save();
+		DrugRouteType DRUG_ROUTE_INTRAVENOUS = new DrugRouteType(name: "Intravenous").save();
+		DrugRouteType DRUG_ROUTE_SUBCUTANEOUS = new DrugRouteType(name: "Subcutaneous").save();
+		DrugRouteType DRUG_ROUTE_SUBLINGUAL = new DrugRouteType(name: "Sublingual").save();
 			
 		/* Shipment Container Type */
 		ContainerType CONTAINER = new ContainerType(name:"Container").save();
@@ -154,11 +213,11 @@ class BootStrap {
 		ContainerType ITEM = new ContainerType(name:"Item").save();
 		
 		/* Shipment Status */	 	
-		ShipmentStatus NOT_SHIPPED = new ShipmentStatus(name:"Not shipped", description: "Has not shipped yet", finalStatus:false).save();
-		ShipmentStatus IN_TRANSIT = new ShipmentStatus(name:"In transit", description: "In transit to destination", finalStatus:false).save();
-		ShipmentStatus IN_CUSTOMS = new ShipmentStatus(name:"In customs", description: "Being inspected by customer", finalStatus:false).save();
-		ShipmentStatus DELIVERED = new ShipmentStatus(name:"Delivered", description: "Delivered to destination", finalStatus:true).save();	
-		ShipmentStatus CONFIRMED = new ShipmentStatus(name:"Confirmed", description: "Delivered to destination", finalStatus:true).save();	
+		ShipmentStatus SHIPMENT_NOT_SHIPPED = new ShipmentStatus(name:"Not shipped", description: "Has not shipped yet", finalStatus:false).save();
+		ShipmentStatus SHIPMENT_IN_TRANSIT = new ShipmentStatus(name:"In transit", description: "In transit to destination", finalStatus:false).save();
+		ShipmentStatus SHIPMENT_IN_CUSTOMS = new ShipmentStatus(name:"In customs", description: "Being inspected by customer", finalStatus:false).save();
+		ShipmentStatus SHIPMENT_DELIVERED = new ShipmentStatus(name:"Delivered", description: "Delivered to destination", finalStatus:true).save();	
+		ShipmentStatus SHIPMENT_CONFIRMED = new ShipmentStatus(name:"Confirmed", description: "Delivered to destination", finalStatus:true).save();	
 		
 		/* Inventory Status */
 		//InventoryStatus IN_STOCK = new InventoryStatus()
@@ -168,29 +227,41 @@ class BootStrap {
 		//InventoryStatus STOCK_AVAILABLE = new InventoryStatus();
 		//InventoryStatus UNAVAILABLE = new InventoryStatus();
 		
-		/* Shipment Event Type */     	
-		EventType ORDER_RECEIVED = new EventType(name:"ORDER_RECEIVED", description:"Order has been received").save();
-		EventType ORDER_PICKED = new EventType(name:"ORDER_PICKED", description:"Order is being packed").save();
-		EventType SHIPMENT_PACKED = new EventType(name:"SHIPMENT_PACKED", description:"Shipment is packed").save();     	
-		EventType SHIPMENT_LOADED = new EventType(name:"SHIPMENT_LOADED", description:"Shipment has been loaded into truck").save();
-		EventType SHIPMENT_SENT = new EventType(name:"SHIPMENT_SENT", description:"Shipment has been sent by shipper").save();
-		EventType SHIPMENT_IN_TRANSIT = new EventType(name:"SHIPMENT_IN_TRANSIT", description:"Shipment has departed").save();
-		EventType SHIPMENT_DELIVERED = new EventType(name:"SHIPMENT_DELIVERED", description:"Shipment has been delivered by the carrier").save();
-		EventType SHIPMENT_RECEIVED = new EventType(name:"SHIPMENT_RECEIVED", description:"Shipment has been received by the recipient").save();
-		EventType SHIPMENT_UNLOADED = new EventType(name:"SHIPMENT_UNLOADED", description:"Shipment has arrived").save();
-		EventType SHIPMENT_STAGED = new EventType(name:"SHIPMENT_STAGED", description:"Shipment has arrived").save();
-		EventType SHIPMENT_UNPACKED = new EventType(name:"SHIPMENT_UNPACKED", description:"Shipment has arrived").save();
-		EventType SHIPMENT_STORED = new EventType(name:"SHIPMENT_STORED", description:"Shipment has been stored in warehouse").save();
+		/** 
+		 * Shipment Event Type 
+		 */     	
+		EventType EVENT_ORDER_RECEIVED = new EventType(name:"Order has been received", description:"Order has been received").save();
+		EventType EVENT_ORDER_PICKED = new EventType(name:"Order is being picked", description:"Order is being picked").save();
+		EventType EVENT_SHIPMENT_PACKED = new EventType(name:"Shipment is being packed", description:"Shipment is packed").save();     	
+		EventType EVENT_SHIPMENT_LOADED = new EventType(name:"Shipment is being packed onto truck", description:"Shipment has been loaded into truck").save();
+		EventType EVENT_SHIPMENT_SENT = new EventType(name:"Shipment has been sent via shipper", description:"Shipment has been sent by shipper").save();
+		EventType EVENT_SHIPMENT_IN_TRANSIT = new EventType(name:"Shipment is in transit", description:"Shipment has departed").save();
+		EventType EVENT_SHIPMENT_DELIVERED = new EventType(name:"Shipment has been delivered by shipper", description:"Shipment has been delivered by the carrier").save();
+		EventType EVENT_SHIPMENT_RECEIVED = new EventType(name:"Shipment has been received", description:"Shipment has been received by the recipient").save();
+		EventType EVENT_SHIPMENT_UNLOADED = new EventType(name:"Shipment has been unloaded", description:"Shipment has arrived").save();
+		EventType EVENT_SHIPMENT_STAGED = new EventType(name:"Shipment has been staged", description:"Shipment has arrived").save();
+		EventType EVENT_SHIPMENT_UNPACKED = new EventType(name:"Shipment has been unpacked", description:"Shipment has arrived").save();
+		EventType EVENT_SHIPMENT_STORED = new EventType(name:"Shipment has been stored", description:"Shipment has been stored in warehouse").save();
 		
-		/* Reference Number Type */
+		/** 
+		 * Reference Number Type 
+		 */
 		// Unique internal identifier, PO Number, Bill of Lading Number, or customer name,      	
-		ReferenceNumberType PO_NUMBER = new ReferenceNumberType(name: "PO_NUMBER", description: "Purchase Order Number").save();
-		ReferenceNumberType CUSTOMER_NAME = new ReferenceNumberType(name: "CUSTOMER_NAME", description: "Customer name").save();
-		ReferenceNumberType INTERNAL_IDENTIFIER = new ReferenceNumberType(name: "INTERNAL_IDENTIFIER", description: "Internal Identifier").save();
-		ReferenceNumberType BILL_OF_LADING_NUMBER = new ReferenceNumberType(name: "BILL_OF_LADING", description: "Bill of Lading Number").save();
+		ReferenceNumberType REFERENCE_PO_NUMBER = new ReferenceNumberType(name: "Purchase Order Number", description: "Purchase Order Number").save();
+		ReferenceNumberType REFERENCE_CUSTOMER_NAME = new ReferenceNumberType(name: "Customer Name", description: "Customer name").save();
+		ReferenceNumberType REFERENCE_INTERNAL_IDENTIFIER = new ReferenceNumberType(name: "Internal Identifier", description: "Internal Identifier").save();
+		ReferenceNumberType REFERENCE_BILL_OF_LADING_NUMBER = new ReferenceNumberType(name: "Bill of Lading Number", description: "Bill of Lading Number").save();
 		
+
+		SupplierType LOCAL = new SupplierType(name: "LOCAL", description: "Local supplier").save();
+		SupplierType INTERNATIONAL = new SupplierType(name: "INTERNATIONAL", description: "International supplier").save();
+		SupplierType NATIONAL = new SupplierType(name: "NATIONAL", description: "National supplier").save();
+		SupplierType OEM = new SupplierType(name: "OEM", description: "Original equipment manufacturer").save();
+		SupplierType OTHER = new SupplierType(name: "OTHER", description: "Other").save();
 		
-		/* Shipment methods */	
+		/** 
+		 * Shipment methods 
+		 */	
 		ShipmentMethod FEDEX_AIR = new ShipmentMethod(	 		
 			name:"FedEx Air",
 			methodName:"fedex", 			
@@ -223,12 +294,16 @@ class BootStrap {
 			//trackingUrl:"http://www.google.com/search?hl=en&site=&q=",
 			).save();
 		
-		/* Transaction types */
-		TransactionType INCOMING = new TransactionType(name:"Incoming Shipment").save(flush:true, validate:true);		
-		TransactionType OUTGOING = new TransactionType(name:"Outgoing Shipment").save(flush:true, validate:true);		
-		TransactionType DONATION = new TransactionType(name:"Donation").save(flush:true, validate:true);
+		/** 
+		 * Transaction types 
+		 */
+		TransactionType TRANSACTION_INCOMING = new TransactionType(name:"Incoming").save(flush:true, validate:true);		
+		TransactionType TRANSACTION_OUTGOING = new TransactionType(name:"Outgoing").save(flush:true, validate:true);		
+		TransactionType TRANSACTION_DONATION = new TransactionType(name:"Donation").save(flush:true, validate:true);
 		
-		/* Users */		
+		/** 
+		 * Users 
+		 */		
 		User supervisor = new User(
 			email:"supervisor@pih.org", 
 			firstName:"Miss", 
@@ -253,56 +328,78 @@ class BootStrap {
 			password: "password",
 			manager: manager).save();
 		
-		
-		
-		/* Products */
+		/**
+		 * Products > Attributes
+		 */
+		ProductAttributeValue productVitality = new ProductAttributeValue(attribute: ATTRIBUTE_VITALITY, allowMultiple: Boolean.FALSE)
+		productVitality.addToValues(VALUE_ESSENTIAL);		
 		
 		/**
-		 * Pain Medications
+		 * Products > Pain Medications
 		 */
-		Product advil = new DrugProduct(ean:"ADVIL-00001", productCode:"00001", name:"Advil 200mg", genericName: "Ibuprofen", type: MEDICINES, subType: MEDICINES_PAIN).save(flush:true);
-		assert advil != null;
-		advil.addToConditionTypes(PAIN).save(flush:true);
-		
-		ProductAttributeValue advilVitality = new ProductAttributeValue(attribute: vitality, allowMultiple: Boolean.FALSE)
-		advilVitality.addToValues(essential);
-		advil.addToProductAttributeValues(advilVitality).save(flush:true);
-		
-		Product genpril = new DrugProduct(ean:"GEN00002PRIL", productCode:"00002", name:"Genpril", genericName: "Ibuprofen", type: MEDICINES, subType: MEDICINES_PAIN).save(flush:true);
-		genpril.addToConditionTypes(PAIN).save(flush:true);
+		Product advil = new DrugProduct(ean:"AD00001VIL", productCode:"00001", name:"Advil 200mg", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER).save(flush:true);
+		advil.addToConditionTypes(CONDITION_PAIN).save(flush:true);		
+		advil.addToProductAttributeValues(productVitality).save(flush:true);
+		advil.addToCategories(CATEGORY_MEDICINES).save(flush:true);
+		advil.addToCategories(CATEGORY_MEDICINES_PAIN).save(flush:true);
 
-		Product midol = new DrugProduct(ean:"MI00003DOL", productCode:"00003", name:"Midol", genericName: "Ibuprofen", type: MEDICINES, subType: MEDICINES_PAIN).save(flush:true);
-		midol.addToConditionTypes(PAIN).save(flush:true);
+		Product tylenol = new DrugProduct(ean:"TY00006LENOL",productCode:"00006", name: "Tylenol 325mg", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER).save(flush:true);		
+		tylenol.addToConditionTypes(CONDITION_PAIN).save(flush:true);
+		tylenol.addToCategories(CATEGORY_MEDICINES).save(flush:true);
+		tylenol.addToCategories(CATEGORY_MEDICINES_PAIN).save(flush:true);
 		
-		Product motrin = new DrugProduct(ean:"MOT00004RIN", productCode:"00004", name:"Motrin", genericName: "Ibuprofen", type: MEDICINES, subType: MEDICINES_PAIN).save(flush:true);
-		motrin.addToConditionTypes(PAIN).save(flush:true);
+		Product aspirin = new DrugProduct(ean:"AS00007PIRIN",productCode:"00007", name: "Aspirin 20mg", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER).save(flush:true);
+		aspirin.addToConditionTypes(CONDITION_PAIN).save(flush:true);
+		aspirin.addToCategories(CATEGORY_MEDICINES);
+		aspirin.addToCategories(CATEGORY_MEDICINES_PAIN);
 		
-		Product nuprin = new DrugProduct(ean:"NUP00005RIN", productCode:"00005", name:"Nuprin", genericName: "Ibuprofen", type: MEDICINES, subType: MEDICINES_PAIN).save(flush:true);
-		nuprin.addToConditionTypes(PAIN).save(flush:true);
+		Product generic = new DrugProduct(ean:"GENERAL00008PAIN", productCode:"00008", name: "General Pain Reliever", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER).save(flush:true)
+		generic.addToConditionTypes(CONDITION_PAIN).save(flush:true);
+		generic.addToCategories(CATEGORY_MEDICINES);
+		generic.addToCategories(CATEGORY_MEDICINES_PAIN);
 		
-		Product tylenol = new DrugProduct(ean:"TY00006LENOL",productCode:"00006", name: "Tylenol 325mg", genericName: "Ibuprofen", type: MEDICINES, subType: MEDICINES_PAIN).save(flush:true);		
-		tylenol.addToConditionTypes(PAIN).save(flush:true);
+		/*
+		Product genpril = new DrugProduct(ean:"GEN00002PRIL", productCode:"00002", name:"Genpril", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER).save(flush:true);
+		genpril.addToConditionTypes(CONDITION_PAIN).save(flush:true);
+		genpril.addToCategories(CATEGORY_MEDICINES).save(flush:true);
+		genpril.addToCategories(CATEGORY_MEDICINES_PAIN).save(flush:true);
 		
-		Product aspirin = new DrugProduct(ean:"AS00007PIRIN",productCode:"00007", name: "Aspirin 20mg", genericName: "Ibuprofen", type: MEDICINES, subType: MEDICINES_PAIN).save(flush:true);
-		aspirin.addToConditionTypes(PAIN).save(flush:true);
+		Product midol = new DrugProduct(ean:"MI00003DOL", productCode:"00003", name:"Midol", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER).save(flush:true);
+		midol.addToConditionTypes(CONDITION_PAIN).save(flush:true);
+		midol.addToCategories(CATEGORY_MEDICINES).save(flush:true);
+		midol.addToCategories(CATEGORY_MEDICINES_PAIN).save(flush:true);
 		
-		Product generic = new DrugProduct(ean:"GENERAL00008PAIN", productCode:"00008", name: "General Pain Reliever", genericName: "Ibuprofen", type: MEDICINES, subType: MEDICINES_PAIN).save(flush:true)
-		generic.addToConditionTypes(PAIN).save(flush:true);
+		Product motrin = new DrugProduct(ean:"MOT00004RIN", productCode:"00004", name:"Motrin", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER).save(flush:true);
+		motrin.addToConditionTypes(CONDITION_PAIN).save(flush:true);
+		motrin.addToCategories(CATEGORY_MEDICINES).save(flush:true);
+		motrin.addToCategories(CATEGORY_MEDICINES_PAIN).save(flush:true);
 		
+		Product nuprin = new DrugProduct(ean:"NUP00005RIN", productCode:"00005", name:"Nuprin", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER).save(flush:true);
+		nuprin.addToConditionTypes(CONDITION_PAIN).save(flush:true);
+		nuprin.addToCategories(CATEGORY_MEDICINES).save(flush:true);
+		nuprin.addToCategories(CATEGORY_MEDICINES_PAIN).save(flush:true);
+		
+		*/
 		
 		
 		/**
-		 * HIV Medications
+		 * Products > HIV Medications
+		Product didanosine = new DrugProduct(ean: "DIDAN00009OSINE", productCode:"00009", name:"Didanosine 200mg", productType: PRODUCT_MEDS_OTHER).save(flush:true);		
+		didanosine.addToConditionTypes(CONDITION_AIDS_HIV).save(flush:true);
+		didanosine.addToCategories(CATEGORY_MEDICINES).save(flush:true);
+		didanosine.addToCategories(CATEGORY_MEDICINES_ARV).save(flush:true);
+		*/
+		
+		/**
+		 * Products > Durable goods 
+		Product reflotron = new DurableProduct(ean: "RE00010FLOTRON", productCode: "00010", name: "Reflotron", productType: CATEGORY_SURGICAL_EQUIPMENT, make: "Roche", model: "", serialNumber: "4004388").save(flush:true); 
+		reflotron.addToCategories(CATEGORY_EQUIPMENT).save(flush:true);
+		reflotron.addToCategories(CATEGORY_SURGICAL_EQUIPMENT).save(flush:true);
 		 */
-		Product didanosine = new DrugProduct(ean: "DIDAN00009OSINE", productCode:"00009", name:"Didanosine 200mg", type: MEDICINES, subType: MEDICINES_ARV).save(flush:true);		
-		assert didanosine
-
-		didanosine.addToConditionTypes(AIDS_HIV).save(flush:true);
-		didanosine.addToCategories(ROOTCATEGORY).save(flush:true);
 		
-		
-		
-		/* 
+		/**
+		 * Products to add ...
+		 *  
 		 * -- HIV-Meds
 		 * Didanosine 200mg
 		 * Lamivudine 150mg
@@ -320,8 +417,6 @@ class BootStrap {
 		 * Rifampicin 150mg + isoniazide 75mg
 		 * Rifampicin 300mg + Isoniazide 150mg
 		 * 
-		 * 
-		 * 
 		 * -- Meds-Narcotic ---------------------------------
 		 * Fentanyl 0.1 mg/ 2 ml, for injection
 		 * Morphine sulphate 30 mg, controlled release 
@@ -330,33 +425,36 @@ class BootStrap {
 		 * Phenobarbital sodium 200 mg/ 2 ml, for injection
 		 */
 		
-		/* Food products */
-		Product similacAdvanceLowIron = new ConsumableProduct(name: "Similac Advance low iron 400g");
-		Product similacAdvancePlusIron = new ConsumableProduct(name: "Similac Advance + iron 365g");		
+		/** 
+		 * Food products 
+		 */
+		Product similacAdvanceLowIron = new ConsumableProduct(name: "Similac Advance low iron 400g").save(flush:true);
+		similacAdvanceLowIron.addToCategories(CATEGORY_FOOD).save(flush:true);
+				
+		Product similacAdvancePlusIron = new ConsumableProduct(name: "Similac Advance + iron 365g").save(flush:true);		
+		similacAdvancePlusIron.addToCategories(CATEGORY_FOOD).save(flush:true);
 		
-		
-		/* Addresses */
+		/** 
+		 * Addresses 
+		 */
 		Address address1 = new Address(address: "888 Commonwealth Avenue",address2: "Third Floor",city:"Boston",stateOrProvince:"Massachusetts",postalCode: "02215",country: "United States").save(flush:true)
 		Address address2 = new Address(address: "1000 State Street",address2: "Building A",city: "Miami",stateOrProvince: "Florida",postalCode: "33126",country: "United States").save(flush:true);
 		Address address3 = new Address(address: "12345 Main Street", address2: "Suite 401", city: "Tabarre", stateOrProvince: "", postalCode: "", country: "Haiti").save(flush:true);
 		
-		/* Warehouses */
+		/** 
+		 * Warehouses 
+		 */
 		Warehouse boston = new Warehouse(name: "Boston Headquarters", address: address1, manager: manager).save(flush:true);		
 		Warehouse miami = new Warehouse(name: "Miami Warehouse", address: address2, manager: manager).save(flush:true);
 		Warehouse tabarre = new Warehouse(name: "Tabarre Depot", address: address3, manager: manager).save(flush:true);
 		
 		/** 
 		 * Warehouse > Inventory > Inventory items 
-		 */
-		
-		// Create new inventory
-		Inventory tabarreInventory = new Inventory(warehouse:tabarre, lastInventoryDate: new Date()).save(flush:true);
-		
-		// Create new inventory item
+		 */		
 		InventoryItem inventoryItem1 = new InventoryItem(product: advil, quantity: 100, reorderQuantity: 50, idealQuantity: 100, binLocation: "Warehouse Bin A1").save(flush:true);
-		InventoryItem inventoryItem2 = new InventoryItem(product: tylenol, quantity: 200, reorderQuantity: 50, idealQuantity: 100, binLocation: "Warehouse Bin A1").save(flush:true);
-		
-		// Add to inventory
+		InventoryItem inventoryItem2 = new InventoryItem(product: tylenol, quantity: 200, reorderQuantity: 50, idealQuantity: 100, binLocation: "Warehouse Bin A1").save(flush:true);		
+
+		Inventory tabarreInventory = new Inventory(warehouse:tabarre, lastInventoryDate: new Date()).save(flush:true);		
 		tabarreInventory.addToInventoryItems(inventoryItem1).save(flush:true, validate:false);
 		tabarreInventory.addToInventoryItems(inventoryItem2).save(flush:true, validate:false);
 		
@@ -364,19 +462,18 @@ class BootStrap {
 		 * Warehouse > Transactions > Transaction Entries 
 		 */
 		
-		Transaction transaction1 = new Transaction(transactionDate:new Date(), targetWarehouse:tabarre, transactionType:INCOMING); // removed .save(flush:true);
+		Transaction transaction1 = new Transaction(transactionDate:new Date(), targetWarehouse:tabarre, transactionType:TRANSACTION_INCOMING); // removed .save(flush:true);
 		tabarre.addToTransactions(transaction1).save();
 		
 		TransactionEntry transactionEntry1 = new TransactionEntry(product: advil, quantityChange:50, confirmDate:new Date());
 		transaction1.addToTransactionEntries(transactionEntry1).save(flush:true, validate:false);
 		
-		
 		/* Create a new shipment */		
 		Shipment shipment1 = new Shipment(
 			reference: "000000232",
-			referenceType:	INTERNAL_IDENTIFIER,
+			referenceType:	REFERENCE_INTERNAL_IDENTIFIER,
 			comment: "ship me as soon as possible",
-			shipmentStatus: NOT_SHIPPED,
+			shipmentStatus: SHIPMENT_NOT_SHIPPED,
 			shipmentMethod: UPS_GROUND,
 			trackingNumber: "1Z9999W99999999999",
 			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-01"),
@@ -384,11 +481,11 @@ class BootStrap {
 			origin : boston,
 			destination : miami).save(flush:true);	
 	
-		ShipmentEvent event1 = new ShipmentEvent(eventType:ORDER_RECEIVED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-25 14:00:00"), eventLocation: boston)
-		ShipmentEvent event2 = new ShipmentEvent(eventType:ORDER_PICKED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-25 15:30:00"), eventLocation: boston)
-		ShipmentEvent event3 = new ShipmentEvent(eventType:SHIPMENT_PACKED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-25 17:45:00"), eventLocation: boston)
-		ShipmentEvent event4 = new ShipmentEvent(eventType:SHIPMENT_LOADED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-26 09:00:00"), eventLocation: boston)
-		ShipmentEvent event5 = new ShipmentEvent(eventType:SHIPMENT_SENT, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-26 11:00:00"), eventLocation: boston, targetLocation: miami)
+		ShipmentEvent event1 = new ShipmentEvent(eventType:EVENT_ORDER_RECEIVED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-25 14:00:00"), eventLocation: boston)
+		ShipmentEvent event2 = new ShipmentEvent(eventType:EVENT_ORDER_PICKED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-25 15:30:00"), eventLocation: boston)
+		ShipmentEvent event3 = new ShipmentEvent(eventType:EVENT_SHIPMENT_PACKED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-25 17:45:00"), eventLocation: boston)
+		ShipmentEvent event4 = new ShipmentEvent(eventType:EVENT_SHIPMENT_LOADED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-26 09:00:00"), eventLocation: boston)
+		ShipmentEvent event5 = new ShipmentEvent(eventType:EVENT_SHIPMENT_SENT, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-26 11:00:00"), eventLocation: boston, targetLocation: miami)
 		
 		shipment1.addToEvents(event1).save(flush:true);
 		shipment1.addToEvents(event2).save(flush:true);
@@ -396,8 +493,8 @@ class BootStrap {
 		shipment1.addToEvents(event4).save(flush:true);
 		shipment1.addToEvents(event5).save(flush:true);
 		
-		shipment1.addToReferenceNumbers(new ReferenceNumber(identifier:"0002492910", referenceType: PO_NUMBER)).save(flush:true)
-		shipment1.addToReferenceNumbers(new ReferenceNumber(identifier:"00001", referenceType: INTERNAL_IDENTIFIER)).save(flush:true)
+		shipment1.addToReferenceNumbers(new ReferenceNumber(identifier:"0002492910", referenceNumberType:REFERENCE_PO_NUMBER)).save(flush:true)
+		shipment1.addToReferenceNumbers(new ReferenceNumber(identifier:"00001", referenceNumberType:REFERENCE_INTERNAL_IDENTIFIER)).save(flush:true)
 		
 		Document document1 = new Document(filename: "shipment-packing-list.pdf", type: "Packing List", size: 1020L, contents: "empty")
 		shipment1.addToDocuments(document1).save(flush:true);		
