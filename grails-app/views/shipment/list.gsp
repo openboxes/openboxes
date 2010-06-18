@@ -13,11 +13,14 @@
 		<content tag="localLinksMode">override</content>
 		<content tag="globalLinks"><g:render template="global" model="[entityName:entityName]"/></content>
 		<content tag="localLinks"><g:render template="local" model="[entityName:entityName]"/></content>		
+<%-- 
 		<g:javascript library="prototype" />
 		<g:javascript>
 			function clearShipment(e) { $('shipmentContent').value=''; }	
 			function showSpinner(visible) { $('spinner').style.display = visible ? "inline" : "none"; }
 		</g:javascript>
+--%>
+
     </head>
     <body>
         <div class="body">

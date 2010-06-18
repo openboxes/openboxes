@@ -25,13 +25,13 @@
 		<script type="text/javascript" src="${createLinkTo(dir:'js/yui/2.7.0/element',file:'element-min.js')}"></script>
 		<script type="text/javascript" src="${createLinkTo(dir:'js/yui/2.7.0/tabview',file:'tabview-min.js')}"></script>
 		<script type="text/javascript" src="${createLinkTo(dir:'js/yui/2.7.0/history',file:'history-min.js')}"></script>
-
+		
+		<%-- 
 		<link type="text/css" href="${createLinkTo(dir:'js/jquery.ui/css/cupertino',file:'jquery-ui-1.8.2.custom.css')}" rel="stylesheet" />
 		<script type="text/javascript" src="${createLinkTo(dir:'js/jquery.ui',file:'jquery-1.4.2.min.js')}"></script>
 		<script type="text/javascript" src="${createLinkTo(dir:'js/jquery.ui',file:'jquery-ui-1.8.2.custom.min.js')}"></script>
-
-
-		
+		--%>
+	
 	    <style type="text/css" media="screen">
 	    	table {
 	    		background-color: white; 	    	
@@ -70,25 +70,8 @@
 			}            
             
 	    </style>
-	    <script type="text/javascript" charset="utf-8">
-		    YAHOO.namespace("cats.container");
+	    
 		
-		    function init() {
-		        YAHOO.cats.container.module = new YAHOO.widget.Module("module");
-		        YAHOO.cats.container.show = new YAHOO.widget.Module("show");
-		        YAHOO.cats.container.hide = new YAHOO.widget.Module("hide");
-		        YAHOO.cats.container.module.render();
-		
-		        YAHOO.util.Event.addListener("show", "click", YAHOO.cats.container.module.show, YAHOO.cats.container.module, true);
-		        YAHOO.util.Event.addListener("show", "click", YAHOO.cats.container.hide.show, YAHOO.cats.container.hide, true);
-		        YAHOO.util.Event.addListener("show", "click", YAHOO.cats.container.show.hide, YAHOO.cats.container.show, true);   
-		        YAHOO.util.Event.addListener("hide", "click", YAHOO.cats.container.module.hide, YAHOO.cats.container.module, true);
-		        YAHOO.util.Event.addListener("hide", "click", YAHOO.cats.container.show.show, YAHOO.cats.container.show, true);
-		        YAHOO.util.Event.addListener("hide", "click", YAHOO.cats.container.hide.hide, YAHOO.cats.container.hide, true);
-		    }
-		
-		    YAHOO.util.Event.addListener(window, "load", init);
-	    </script>
 	    
 	    
     </head>
@@ -96,8 +79,6 @@
         <div class="body" style="width:100%;">
           	<iframe id="yui-history-iframe" src="assets/blank.html"></iframe>
 			<input id="yui-history-field" type="hidden">
-
-          	
           
             <g:if test="${flash.message}">
            		<div class="message">${flash.message}</div>
@@ -786,73 +767,9 @@
 						        --%>
 							</div>
 					    </gui:tab>					    				    
-					    <gui:tab id="shipmentTestTab" label="Test">				    
-							<h2><g:message code="shipment.method.label" default="Test" /></h2>
-					    	<div class="switcher">
-						    	<a href="#" id="add-event-link">Add a new event</a>
-						    	<a href="#" id="edit-details-link">Change</a>
-					        </div>
+					    <gui:tab id="shipmentTestTab" label="Test">
 				            <div id="testTab" class="tab">
-								<script type="text/javascript">
-									jQuery(document).ready(function($){
-										$('a#edit-details-link').click(function() { 
-											$('#view-details').toggle(100);
-											$('#edit-details').toggle(100);
-										});
-										$('a#edit-origin-link').click(function() { 
-											$('#view-origin').toggle(100);
-											$('#edit-origin').toggle(100);
-										});
-										$('a#edit-destination-link').click(function() { 
-											$('#view-destination').toggle(100);
-											$('#edit-destination').toggle(100);
-										});								
-
-										/* add an event to a shipment */
-										$('#add-event-dialog').dialog({
-											autoOpen: false,
-											width: 500
-										});				
-										$('#add-event-link').click(function(){
-											$('#add-event-dialog').dialog('open');
-											return false;
-										});				
-
-										/* add a container to a shipment */
-										$('#add-container-dialog').dialog({
-											autoOpen: false,
-											width: 500
-										});										
-										$('#add-container-link').click(function(){
-											$('#add-container-dialog').dialog('open');
-											return false;
-										});						
-
-										/* add a document to a shipment */
-										$('#add-document-dialog').dialog({
-											autoOpen: false,
-											width: 500
-										});										
-										$('#add-document-link').click(function(){
-											$('#add-document-dialog').dialog('open');
-											return false;
-										});						
-
-										/* add an event to a shipment */
-										$('#add-comment-dialog').dialog({
-											autoOpen: false,
-											width: 800
-										});				
-										$('#add-comment-link').click(function(){
-											$('#add-comment-dialog').dialog('open');
-											return false;
-										});				
-
-										
-									});
-									
-								</script>
-																
+				            	<!-- All hidden DIVs have been temporarily place into the 'test' tab in case the jquery-ui libraries fail to load  -->
 								<div id="add-container-dialog" title="Add a new Container">
 									<g:form action="addContainer">
 										<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
@@ -1027,6 +944,53 @@
 			</div>	
 			--%>
         </div>
+        
+		<script type="text/javascript">
+			jQuery(document).ready(function($){
+				$('a#edit-details-link').click(function() { 
+					$('#view-details').toggle(0);
+					$('#edit-details').toggle(0);
+				});
+				$('a#edit-origin-link').click(function() { 
+					$('#view-origin').toggle(0);
+					$('#edit-origin').toggle(0);
+				});
+				$('a#edit-destination-link').click(function() { 
+					$('#view-destination').toggle(0);
+					$('#edit-destination').toggle(0);
+				});								
+		
+				/* add an event to a shipment */
+				$('#add-event-dialog').dialog({ autoOpen: false, width: 500 });				
+				$('#add-event-link').click(function(){
+					$('#add-event-dialog').dialog('open');
+					return false;
+				});				
+		
+				/* add a container to a shipment */
+				$('#add-container-dialog').dialog({ autoOpen: false, width: 500 });										
+				$('#add-container-link').click(function(){
+					$('#add-container-dialog').dialog('open');
+					return false;
+				});						
+		
+				/* add a document to a shipment */
+				$('#add-document-dialog').dialog({ autoOpen: false, width: 500 });										
+				$('#add-document-link').click(function(){
+					$('#add-document-dialog').dialog('open');
+					return false;
+				});						
+		
+				/* add an event to a shipment */
+				$('#add-comment-dialog').dialog({ autoOpen: false, width: 800 });				
+				$('#add-comment-link').click(function(){
+					$('#add-comment-dialog').dialog('open');
+					return false;
+				});				
+			});
+		</script>				            
+        
+        
     </body>
 </html>
 

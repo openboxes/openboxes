@@ -4,7 +4,7 @@ class SecurityFilters {
 	def filters = {
 		loginCheck(controller:'*', action:'*') {
 			before = {					
-				if(!session.user && !("login".equals(actionName) || "doLogin".equals(actionName))) {
+				if(!session.user && !("test".equals(controllerName) || "login".equals(actionName) || "doLogin".equals(actionName))) {
 					redirect(controller: 'auth', action:'login')
 					return false;
 				}

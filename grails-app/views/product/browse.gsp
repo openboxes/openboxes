@@ -13,8 +13,7 @@
 		<content tag="globalLinksMode">append</content>
 		<content tag="localLinksMode">override</content>
 		<content tag="globalLinks"><g:render template="global" model="[entityName:entityName]"/></content>
-		<content tag="localLinks"><g:render template="local" model="[entityName:entityName]"/></content>		
-		<g:javascript library="prototype" />
+		<content tag="localLinks"><g:render template="local" model="[entityName:entityName]"/></content>
     </head>    
     <body>
         <div class="body" style="width: 95%">

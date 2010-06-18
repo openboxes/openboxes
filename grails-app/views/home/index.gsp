@@ -2,7 +2,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <title>${message(code: 'default.home.label', default: 'Home')}</title>
+        <title>${message(code: 'default.home.label', default: 'Dashboard')}</title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="menuTitle">${message(code: 'default.home.label', default: 'Home')}</content>		
 		<content tag="pageTitle">${message(code: 'default.home.label', default: 'Home')}</content>

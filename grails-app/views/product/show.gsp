@@ -13,14 +13,10 @@
 		<content tag="localLinksMode">override</content>
 		<content tag="globalLinks"><g:render template="global" model="[entityName:entityName]"/></content>
 		<content tag="localLinks"><g:render template="local" model="[entityName:entityName]"/></content>		
-		<g:javascript library="prototype" />
     </head>    
 
     <body>
-       	<h1>Show Product</h1>
         <div class="body">
-        
-        
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>

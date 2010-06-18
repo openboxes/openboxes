@@ -35,18 +35,27 @@
 	<g:layoutHead />
 	
 	<!-- Include javascript files -->
-	<g:javascript library="application" />
-	<%-- <g:javascript library="prototype"/>
-	<g:javascript library="jquery"/>--%>
+	<g:javascript library="application"/>
+	<g:javascript library="jquery"/>
+	<script type="text/javascript">
+		$.noConflict();
+		// Code that uses other library's $ can follow here.
+	</script>
+
+	<!-- Manually include jquery-ui resources -->
+	<link href="${createLinkTo(dir:'js/jquery.ui/css/cupertino', file:'jquery-ui-1.8.2.custom.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
+	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-ui-1.8.2.custom.min.js')}" type="text/javascript" ></script>
+
+	
+	<!-- Dynamically include jquery-ui resources :  NOT WORKING CORRECTLY -->
+	<!-- <jqui:resources components="dialog, datepicker"/> -->	
+	<!-- <jqui:resources components="datepicker" mode="normal" theme="cupertino" /> -->
+
+	<!-- Dynamically include Grails UI components -->
 	<gui:resources components="richEditor, dialog, tabView, autoComplete"/>
-	
-	<!-- Include navigation resources -->
-	<%--<nav:resources/>--%>
 
-	<style type="text/css" media="screen">
-	
-
-	</style>
+	<!-- Custom styles to be applied to all pages -->
+	<style type="text/css" media="screen"></style>
 </head>
 <body class="yui-skin-sam">
     <div id="doc3" class="yui-t7">
@@ -63,16 +72,12 @@
 		    <div class="yui-b">
 				<div class="yui-gf">
 				    <div id="bannerLeft" class="yui-u first" >
-						<span class="logo">
-						    <a class="home" href="${createLink(uri: '/home/index')}" style="text-decoration: none">
-						    	<!-- openBoxes_logo.jpg width="96" height="57" -->
-						    	<img src="${createLinkTo(dir:'images',file:'openboxes.png')}" width="68" height="68" alt="Your Boxes. You're Welcome." 
-						    		style="vertical-align: absmiddle"/><span style="font-size: 1em;"></span>						    		
-						    		<span style="float: right; padding-top: 0px; color: black; text-shadow: #AAA 0px 5px 5px; font-size: 4em;">OpenBoxes</span>
+						<div class="logo">
+						    <a class="home" href="${createLink(uri: '/home/index')}" style="text-decoration: none">						    	
+					    		<img src="${createLinkTo(dir:'images',file:'openboxes_logo3.png')}" alt="Your Boxes. You're Welcome." 
+					    			style="vertical-align: absmiddle"/>
 						    </a>
-						</span>
-						
-						
+						</div>
 				    </div>
 				    <div id="bannerRight" class="yui-u" >
 				    	<div id="loggedIn">
@@ -108,7 +113,10 @@
 		    <div class="yui-b">
 				<!-- Global Navigation menu -->
 				<div class="nav">
-					<g:render template="../common/breadcrumb" />
+					<%-- <g:render template="../common/breadcrumb" />--%>
+					<g:breadcrumb />
+					
+					
 				    <g:if test="${session.user}">				    
 						<%-- 
 				    	<g:render template="../common/global"/>
