@@ -1,0 +1,1 @@
+The Translator plugin has a default PHP script (translator.php), to load the JSON language packages, you can add security check to this script. By Default this script is in the same DIR of the current page, be aware and use a correct path in case you use it in a multi-level website.

@@ -1,0 +1,70 @@
+/*
+Copyright (c) 2007, Caridy Patiño. All rights reserved.
+Portions Copyright (c) 2007, Yahoo!, Inc. All rights reserved.
+Code licensed under the BSD License:
+http://www.bubbling-library.com/eng/licence
+version: 1.3.3
+*/
+.yui-skin-sam .yui-cms-accordion .yui-cms-item .bd {
+    height: 0;
+    padding: 0;
+    overflow: hidden;
+}
+.yui-skin-sam .yui-cms-accordion.vertical .yui-cms-item .bd {
+    height: auto;
+    width: 1px;
+}
+    .yui-skin-sam .yui-cms-accordion .yui-cms-item .bd .fixed {
+        padding: 5px;
+    }
+
+.yui-skin-sam .yui-cms-accordion .yui-cms-item .actions {
+    position: absolute;
+    top: 5px;
+    right: 2px;
+    text-align: right;
+}
+    .yui-skin-sam .yui-cms-accordion .yui-cms-item .actions a {
+        margin-right: 4px;
+        text-decoration: none;
+        font-size: 50%;
+        float: left;
+    }
+    .yui-skin-sam .yui-cms-accordion .yui-cms-item .actions .accordionToggleItem {
+        width: 14px;
+        height: 14px;
+        background: url(http://yui.yahooapis.com/2.3.1/build/assets/skins/sam/sprite.png) no-repeat 0 -350px;
+        cursor:pointer;
+    }
+        .yui-skin-sam .yui-cms-accordion .yui-cms-item.selected .actions .accordionToggleItem {
+            background: url(http://yui.yahooapis.com/2.3.1/build/assets/skins/sam/sprite.png) no-repeat 0 -400px;
+        }
+        .yui-skin-sam .yui-cms-accordion.persistent .yui-cms-item.selected .actions .accordionToggleItem {
+            display: none;
+        }
+    .yui-skin-sam .yui-cms-accordion.vertical .yui-cms-item .actions .accordionToggleItem {
+        width: 25px;
+        height: 15px;
+        background: url(http://yui.yahooapis.com/2.3.1/build/assets/skins/sam/sprite.png) no-repeat 0 -450px;
+    }
+        .yui-skin-sam .yui-cms-accordion.vertical .yui-cms-item.selected .actions .accordionToggleItem {
+            background: url(http://yui.yahooapis.com/2.3.1/build/assets/skins/sam/sprite.png) no-repeat 0 -500px;
+        }
+    .yui-skin-sam .yui-cms-accordion .yui-cms-item .actions .accordionRemoveItem {
+        width: 25px;
+        height: 15px;
+        background: url(http://yui.yahooapis.com/2.3.1/build/assets/skins/sam/sprite.png) no-repeat 0 -300px;
+    }
+.yui-skin-sam .yui-cms-accordion .yui-cms-item .ajax .fixed {
+    background: url(loading.gif) no-repeat 50% 50%;
+}
+
+.yui-skin-sam .yui-cms-accordion .yui-cms-item .bd {
+	height: 0px;
+}
+.yui-skin-sam .yui-cms-accordion.fixIE .yui-cms-item .bd {
+	*height: 1px; /* IE Hack */
+}
+.yui-skin-sam .yui-cms-accordion .yui-cms-item.selected .bd {
+	height: auto;
+}
