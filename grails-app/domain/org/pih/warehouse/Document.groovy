@@ -6,13 +6,13 @@ package org.pih.warehouse
 class Document {
 
 	long size
-	String type
 	String filename
     byte [] contents
+	DocumentType documentType;
     
     static belongsTo = [ shipment : Shipment ];
 	
     static constraints = {
-		type(inList:["Invoice", "Packing List", "Shipping Manifest", "Other"])
+		//type(inList:["Invoice", "Packing List", "Shipping Manifest", "Other"])
     }
 }

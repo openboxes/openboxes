@@ -2,6 +2,9 @@ package org.pih.warehouse
 
 class Shipment {
 	
+	String name 
+	String description
+	
 	// Core data elements
 	//String comments	
 	
@@ -43,6 +46,8 @@ class Shipment {
 	
 	// Constraints
 	static constraints = {
+		name(nullable:false)
+		description(nullable:true)
 		
 		shipped(nullable:true)
 		origin(nullable:false)

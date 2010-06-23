@@ -59,8 +59,9 @@ select {
    padding: 2px 2px 2px 0;
 }
 textarea {
+	/*
 	width: 250px;
-	height: 150px;
+	height: 150px;*/
 	vertical-align: top;
 }
 
@@ -245,7 +246,7 @@ th.desc a {
     width: 85%;
 }
 
-/* ACTION BUTTONS */
+/* ACTION BUTTONS 
 
 .buttons {
     background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
@@ -280,7 +281,7 @@ th.desc a {
     background: transparent url(../images/skin/database_save.png) 5px 50% no-repeat;
     padding-left: 28px;
 }
-
+*/
 
 /* more menu button icons */
 

@@ -20,8 +20,6 @@
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>
-
-
 			<div class="listcontainer">
 				<ul class="list">
 					<g:set var="activeClass"><g:if test="${params.browseBy == 'all' || params.browseBy == ''}">active</g:if></g:set>
@@ -51,8 +49,9 @@
 										<li class="${i==0?'first':''}">
 											<g:link class="browse" action="browse" params="[browseBy:'type', productTypeId:productType.id]">
 												<g:if test="${productType?.id==selectedProductType?.id}"><span class="large"><b>${productType.name}</b></span></g:if>	
-												<g:else>${productType.name}</g:else></g:link>
-											( ? )								
+												<g:else>${productType.name}</g:else>
+											</g:link>
+																
 										</li>				
 									</g:each>
 								</ul>
@@ -65,8 +64,9 @@
 										<li class="${i==0?'first':''}">
 											<g:link class="browse" action="browse" params="[browseBy:'attribute', attributeId:attribute.id]">
 												<g:if test="${attribute?.id==selectedAttribute?.id}"><span class="large"><b>${attribute.name}</b></span></g:if>	
-												<g:else>${attribute.name}</g:else></g:link>
-											( ? )								
+												<g:else>${attribute.name}</g:else>
+											</g:link>
+																		
 										</li>				
 									</g:each>
 								</ul>

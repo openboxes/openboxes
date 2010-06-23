@@ -13,7 +13,7 @@
     </head>
     <body>        
 		<div class="body">		
-	    	<div id="home" class="dialog">				
+	    	<div id="dashboard">				
 				<g:if test="${!session.user}">
 					<p>Welcome! Please <a class="home" href="${createLink(uri: '/auth/login')}">login</a> to gain access</p>
 				</g:if>

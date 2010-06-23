@@ -13,12 +13,13 @@
 	<!-- Include Main CSS -->
 	<!-- TODO Apparently there's a slight distinction between these two ... need to figure out what that distinction is -->
 	<%--<link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" />--%>
+	
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'menu.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'form.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footer.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'custom.css')}" type="text/css" media="screen, projection" />
-
+	
 	<%--
 	<!-- Include Blueprint CSS --> 
 	<link rel="stylesheet" href="${createLinkTo(dir:'css/blueprint', file:'reset.css')}" type="text/css" media="screen, projection">

@@ -5,23 +5,25 @@ import org.pih.warehouse.Attribute;
 import org.pih.warehouse.Document;
 import org.pih.warehouse.Category;
 import org.pih.warehouse.Country;
+import org.pih.warehouse.Comment;
 import org.pih.warehouse.Container;
 import org.pih.warehouse.ConditionType;
 import org.pih.warehouse.ContainerType;
 import org.pih.warehouse.ConsumableProduct;
+import org.pih.warehouse.DocumentType;
+import org.pih.warehouse.DrugProduct;
+import org.pih.warehouse.DrugRouteType;
+import org.pih.warehouse.DurableProduct;
 import org.pih.warehouse.EventType;
 import org.pih.warehouse.GenericType;
 import org.pih.warehouse.Inventory;
 import org.pih.warehouse.InventoryItem;
 import org.pih.warehouse.Organization;
-import org.pih.warehouse.DrugProduct;
-import org.pih.warehouse.DurableProduct;
 import org.pih.warehouse.Product;
 import org.pih.warehouse.ProductAttributeValue;
 import org.pih.warehouse.ProductType;
 import org.pih.warehouse.ReferenceNumberType;
 import org.pih.warehouse.ReferenceNumber;
-import org.pih.warehouse.DrugRouteType;
 import org.pih.warehouse.StockCard;
 import org.pih.warehouse.Shipment;
 import org.pih.warehouse.ShipmentEvent;
@@ -97,6 +99,30 @@ class BootStrap {
 		ConditionType CONDITION_PAIN = new ConditionType(name: "Pain").save();
 		ConditionType CONDITION_TUBERCULOSIS = new ConditionType(name: "Tuberculosis").save();
 		
+		
+		/**
+		 * Airway Bill
+		 * Bill of Lading
+		 * Packing List
+		 * Certificate of Donation
+		 * Commercial Invoice
+		 * Material Safety Data Sheet
+		 * Certificate of Analysis
+		 * Manifest
+		 * Other
+		 */
+		DocumentType DOCUMENT_AIRWAY_BILL = new DocumentType(name: "Airway Bill").save();
+		DocumentType DOCUMENT_BILL_OF_LADING = new DocumentType(name: "Bill of Lading").save();
+		DocumentType DOCUMENT_PACKING_LIST = new DocumentType(name: "Packing List").save();
+		DocumentType DOCUMENT_CERTIFICATE_OF_DONATION = new DocumentType(name: "Certificate of Donation").save();
+		DocumentType DOCUMENT_COMMERCIAL_INVOICE = new DocumentType(name: "Commercial Invoice").save();
+		DocumentType DOCUMENT_MATERIAL_SAFETY_DATA_SHEET = new DocumentType(name: "Material Safety Data Sheet").save();
+		DocumentType DOCUMENT_CERTICATE_OF_ANALYSIS = new DocumentType(name: "Certificate of Analysis").save();
+		DocumentType DOCUMENT_MANIFEST = new DocumentType(name: "Manifest").save();
+		DocumentType DOCUMENT_OTHER = new DocumentType(name: "Other").save();
+		
+		
+		
 		/* Generic Type */
 		GenericType GENERIC_LAPTOP = new GenericType(name: "Laptop").save();
 		GenericType GENERIC_GLOVE = new GenericType(name: "Glove").save();
@@ -108,7 +134,7 @@ class BootStrap {
 		GenericType GENERIC_VEGETABLE = new GenericType(name: "Vegetable").save();
 		GenericType GENERIC_ELECTRONICS = new GenericType(name: "Electronics").save();
 		
-		/* Attributes */
+		/* Attribute Vitality */
 		Attribute ATTRIBUTE_VITALITY = new Attribute(name:"Vitality", dataType: "String").save(flush:true);
 		Value VALUE_VITAL = new Value(stringValue:"vital").save();
 		Value VALUE_ESSENTIAL = new Value(stringValue:"essential").save();
@@ -116,11 +142,17 @@ class BootStrap {
 		ATTRIBUTE_VITALITY.addToValues(VALUE_VITAL).save(flush:true);
 		ATTRIBUTE_VITALITY.addToValues(VALUE_ESSENTIAL).save(flush:true);
 		ATTRIBUTE_VITALITY.addToValues(VALUE_NON_ESSENTIAL).save(flush:true);
-		
-		
+
+		/* Attribute Size */
 		Attribute ATTRIBUTE_SIZE = new Attribute(name: "Size", dataType: "String").save();
-		Attribute ATTRIBUTE_SHAPE = new Attribute(name: "Shape", dataType: "String").save();
-		
+		Value VALUE_SMALL = new Value(stringValue:"small").save();
+		Value VALUE_MEDIUM = new Value(stringValue:"medium").save();
+		Value VALUE_LARGE = new Value(stringValue:"large").save();
+		Value VALUE_EXTRA_LARGE = new Value(stringValue:"x-large").save();			
+		ATTRIBUTE_SIZE.addToValues(VALUE_SMALL).save(flush:true);
+		ATTRIBUTE_SIZE.addToValues(VALUE_MEDIUM).save(flush:true);
+		ATTRIBUTE_SIZE.addToValues(VALUE_LARGE).save(flush:true);
+		ATTRIBUTE_SIZE.addToValues(VALUE_EXTRA_LARGE).save(flush:true);
 		
 		/* Product Types */
 		ProductType PRODUCT_MEDS_ARV = new ProductType(parent: null, name: "Meds-ARV").save();
@@ -143,32 +175,8 @@ class BootStrap {
 		ProductType PRODUCT_FOOD = new ProductType(parent: null, name: "Food").save();
 		ProductType PRODUCT_OTHER = new ProductType(parent: null, name: "Other").save();
 		
-		/* Product Type 
+		/* Product Type: Root, Supplies, Equipment, Food
 		ProductType MEDICINES = new ProductType(parent: null, name: "Medicines").save();
-		ProductType SUPPLIES = new ProductType(parent: null, name: "Supplies").save();
-		ProductType EQUIPMENT = new ProductType(parent: null, name: "Equipment").save();
-		ProductType PERISHABLES = new ProductType(parent: null, name: "Perishables").save();
-		ProductType OTHER = new ProductType(parent: null, name: "Other").save();
-		*/
-		
-		/* Product Type > Supplies 
-		ProductType MEDICAL_SUPPLIES = new ProductType(parent: SUPPLIES, name: "Medical Supplies").save();
-		ProductType HOSPITAL_SUPPLIES = new ProductType(parent: SUPPLIES, name: "Hospital and Clinic Supplies").save();
-		ProductType OFFICE_SUPPLIES = new ProductType(parent: SUPPLIES, name: "Office Supplies").save();
-		*/		
-		
-		/* Product Type > Equipment 
-		ProductType MEDICAL_EQUIPMENT = new ProductType(parent: EQUIPMENT, name: "Medical Equipment").save();
-		ProductType SURGICAL_EQUIPMENT = new ProductType(parent: EQUIPMENT, name: "Surgical Equipment").save();
-		ProductType TECH_EQUIPMENT = new ProductType(parent: EQUIPMENT, name: "IT Equipment").save();
-		ProductType FURNITURE = new ProductType(parent: EQUIPMENT, name: "Furniture and Equipment").save();
-		*/
-		
-		/* Product Type > Food 
-		ProductType FOOD = new ProductType(parent: PERISHABLES, name: "Food").save();
-		*/
-		
-		/* Product Type > Medicines 
 		ProductType MEDICINES_ARV = new ProductType(parent: MEDICINES, name: "ARVS").save();
 		ProductType MEDICINES_ANESTHESIA = new ProductType(parent: MEDICINES, name: "Anesteshia").save();
 		ProductType MEDICINES_CANCER = new ProductType(parent: MEDICINES, name: "Cancer").save();
@@ -176,18 +184,26 @@ class BootStrap {
 		ProductType MEDICINES_PAIN = new ProductType(parent: MEDICINES, name: "Pain").save();
 		ProductType MEDICINES_TB = new ProductType(parent: MEDICINES, name: "TB").save();
 		ProductType MEDICINES_OTHER = new ProductType(parent: MEDICINES, name: "Other").save();
-		*/
-		
-		/* Product Type > Medical Supplies 
+		ProductType SUPPLIES = new ProductType(parent: null, name: "Supplies").save();
+		ProductType MEDICAL_SUPPLIES = new ProductType(parent: SUPPLIES, name: "Medical Supplies").save();
 		ProductType MED_SUPPLIES_LAB = new ProductType(parent: MEDICAL_SUPPLIES, name: "Lab").save();
 		ProductType MED_SUPPLIES_SURGICAL = new ProductType(parent: MEDICAL_SUPPLIES, name: "Surgical").save();
 		ProductType MED_SUPPLIES_XRAY = new ProductType(parent: MEDICAL_SUPPLIES, name: "X-Ray").save();
 		ProductType MED_SUPPLIES_DENTAL = new ProductType(parent: MEDICAL_SUPPLIES, name: "Dental").save();
 		ProductType MED_SUPPLIES_OTHER = new ProductType(parent: MEDICAL_SUPPLIES, name: "Other").save();
+		ProductType HOSPITAL_SUPPLIES = new ProductType(parent: SUPPLIES, name: "Hospital and Clinic Supplies").save();
+		ProductType OFFICE_SUPPLIES = new ProductType(parent: SUPPLIES, name: "Office Supplies").save();
+		ProductType EQUIPMENT = new ProductType(parent: null, name: "Equipment").save();
+		ProductType MEDICAL_EQUIPMENT = new ProductType(parent: EQUIPMENT, name: "Medical Equipment").save();
+		ProductType SURGICAL_EQUIPMENT = new ProductType(parent: EQUIPMENT, name: "Surgical Equipment").save();
+		ProductType TECH_EQUIPMENT = new ProductType(parent: EQUIPMENT, name: "IT Equipment").save();
+		ProductType FURNITURE = new ProductType(parent: EQUIPMENT, name: "Furniture and Equipment").save();
+		ProductType PERISHABLES = new ProductType(parent: null, name: "Perishables").save();
+		ProductType FOOD = new ProductType(parent: PERISHABLES, name: "Food").save();
+		ProductType OTHER = new ProductType(parent: null, name: "Other").save();
 		*/
 		
-		/* Routes of Administration */
-		/*
+		/* Routes of Administration 
 		 * PO      Oral (per os, by mouth)
 		 * PR      Rectal (per rectum, by the rectum)
 		 * IM      Intramuscular
@@ -203,15 +219,16 @@ class BootStrap {
 		DrugRouteType DRUG_ROUTE_SUBLINGUAL = new DrugRouteType(name: "Sublingual").save();
 			
 		/* Shipment Container Type */
-		ContainerType CONTAINER = new ContainerType(name:"Container").save();
 		ContainerType PALLET = new ContainerType(name:"Pallet").save();
+		ContainerType SUITCASE = new ContainerType(name:"Suitcase").save();
 		ContainerType LARGE_BOX = new ContainerType(name:"Large Box").save();
 		ContainerType MEDIUM_BOX = new ContainerType(name:"Medium Box").save();
 		ContainerType SMALL_BOX = new ContainerType(name:"Small Box").save();
 		ContainerType TRUNK = new ContainerType(name:"Trunk").save();
-		ContainerType SUITCASE = new ContainerType(name:"Suitcase").save();
-		ContainerType ITEM = new ContainerType(name:"Item").save();
-		
+		ContainerType ITEM = new ContainerType(name:"Single Item").save();
+		ContainerType CONTAINER = new ContainerType(name:"Container").save();
+		ContainerType CONTAINER_OTHER = new ContainerType(name:"Other").save();
+				
 		/* Shipment Status */	 	
 		ShipmentStatus SHIPMENT_NOT_SHIPPED = new ShipmentStatus(name:"Not shipped", description: "Has not shipped yet", finalStatus:false).save();
 		ShipmentStatus SHIPMENT_IN_TRANSIT = new ShipmentStatus(name:"In transit", description: "In transit to destination", finalStatus:false).save();
@@ -253,11 +270,11 @@ class BootStrap {
 		ReferenceNumberType REFERENCE_BILL_OF_LADING_NUMBER = new ReferenceNumberType(name: "Bill of Lading Number", description: "Bill of Lading Number").save();
 		
 
-		SupplierType LOCAL = new SupplierType(name: "LOCAL", description: "Local supplier").save();
-		SupplierType INTERNATIONAL = new SupplierType(name: "INTERNATIONAL", description: "International supplier").save();
-		SupplierType NATIONAL = new SupplierType(name: "NATIONAL", description: "National supplier").save();
-		SupplierType OEM = new SupplierType(name: "OEM", description: "Original equipment manufacturer").save();
-		SupplierType OTHER = new SupplierType(name: "OTHER", description: "Other").save();
+		SupplierType SUPPLIER_LOCAL = new SupplierType(name: "LOCAL", description: "Local supplier").save();
+		SupplierType SUPPLIER_INTERNATIONAL = new SupplierType(name: "INTERNATIONAL", description: "International supplier").save();
+		SupplierType SUPPLIER_NATIONAL = new SupplierType(name: "NATIONAL", description: "National supplier").save();
+		SupplierType SUPPLIER_OEM = new SupplierType(name: "OEM", description: "Original equipment manufacturer").save();
+		SupplierType SUPPLIER_OTHER = new SupplierType(name: "OTHER", description: "Other").save();
 		
 		/** 
 		 * Shipment methods 
@@ -284,7 +301,7 @@ class BootStrap {
 			trackingUrlParameterName:"").save();
 		
 		ShipmentMethod USPS_GROUND = new ShipmentMethod(
-			name:"US Postal Service Ground Service", 
+			name:"USPS Ground", 
 			methodName:"usps",
 			trackingNumberFormat:"", 
 			trackingUrl:"", 
@@ -469,18 +486,31 @@ class BootStrap {
 		transaction1.addToTransactionEntries(transactionEntry1).save(flush:true, validate:false);
 		
 		/* Create a new shipment */		
-		Shipment shipment1 = new Shipment(
-			reference: "000000232",
-			referenceType:	REFERENCE_INTERNAL_IDENTIFIER,
-			comment: "ship me as soon as possible",
-			shipmentStatus: SHIPMENT_NOT_SHIPPED,
-			shipmentMethod: UPS_GROUND,
-			trackingNumber: "1Z9999W99999999999",
-			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-01"),
-			expectedDeliveryDate : Date.parse("yyyy-MM-dd", "2010-06-06"),
-			origin : boston,
-			destination : miami).save(flush:true);	
-	
+		Shipment shipment1 = new Shipment(name: "New Shipment 1", description: "Contains boxes of stuff",				
+			shipmentStatus: SHIPMENT_NOT_SHIPPED, shipmentMethod: UPS_GROUND, trackingNumber: "1Z9999W99999999999",
+			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-01"), origin : boston,
+			expectedDeliveryDate : Date.parse("yyyy-MM-dd", "2010-06-05"), destination : miami).save(flush:true);	
+
+		Shipment shipment2 = new Shipment(name: "New Shipment 2", description: "Contains boxes of stuff",				
+			shipmentStatus: SHIPMENT_NOT_SHIPPED, shipmentMethod: UPS_GROUND, trackingNumber: "1Z9999W99999999999",
+			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-05"), origin : miami,
+			expectedDeliveryDate : null, destination : tabarre).save(flush:true);	
+		
+		Shipment shipment3 = new Shipment(name: "New Shipment 3", description: "Contains boxes of stuff",				
+			shipmentStatus: SHIPMENT_NOT_SHIPPED, shipmentMethod: UPS_GROUND, trackingNumber: "1Z9999W99999999999", 
+			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-05"), origin : miami, 
+			expectedDeliveryDate : null, destination : boston).save(flush:true);	
+		
+		Comment comment1 = new Comment(comment: "We need to ship this as soon as possible!", commenter: jmiranda, recipient: jmiranda, sendDate: new Date()).save(flush:true);
+		shipment1.addToComments(comment1).save(flush:true);
+
+		Comment comment2 = new Comment(comment: "Did you ship this yet?!?!?!?", commenter: manager, recipient: jmiranda, sendDate: new Date()).save(flush:true);
+		shipment2.addToComments(comment1).save(flush:true);
+
+		Comment comment3 = new Comment(comment: "What is taking so long?", commenter: supervisor, recipient: jmiranda, sendDate: new Date()).save(flush:true);
+		shipment3.addToComments(comment1).save(flush:true);
+
+		
 		ShipmentEvent event1 = new ShipmentEvent(eventType:EVENT_ORDER_RECEIVED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-25 14:00:00"), eventLocation: boston)
 		ShipmentEvent event2 = new ShipmentEvent(eventType:EVENT_ORDER_PICKED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-25 15:30:00"), eventLocation: boston)
 		ShipmentEvent event3 = new ShipmentEvent(eventType:EVENT_SHIPMENT_PACKED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-25 17:45:00"), eventLocation: boston)
@@ -494,23 +524,17 @@ class BootStrap {
 		shipment1.addToEvents(event5).save(flush:true);
 		
 		shipment1.addToReferenceNumbers(new ReferenceNumber(identifier:"0002492910", referenceNumberType:REFERENCE_PO_NUMBER)).save(flush:true)
-		shipment1.addToReferenceNumbers(new ReferenceNumber(identifier:"00001", referenceNumberType:REFERENCE_INTERNAL_IDENTIFIER)).save(flush:true)
+		shipment1.addToReferenceNumbers(new ReferenceNumber(identifier:"0000000001", referenceNumberType:REFERENCE_INTERNAL_IDENTIFIER)).save(flush:true)
 		
-		Document document1 = new Document(filename: "shipment-packing-list.pdf", type: "Packing List", size: 1020L, contents: "empty")
+		Document document1 = new Document(filename: "shipment-packing-list.pdf", documentType: DOCUMENT_PACKING_LIST, size: 1020L, contents: "empty")
 		shipment1.addToDocuments(document1).save(flush:true);		
 		
-		Document document2 = new Document(filename: "shipment-invoice.pdf", type: "Invoice", size: 990L, contents: "empty") 
+		Document document2 = new Document(filename: "shipment-invoice.pdf", documentType: DOCUMENT_COMMERCIAL_INVOICE, size: 990L, contents: "empty") 
 		shipment1.addToDocuments(document2).save(flush:true);
 		
-		Container pallet1 = new Container(
-		name: "My container",
-		containerType: PALLET,
-		weight: 1000,
-		units: "kgs"
-		);
+		Container pallet1 = new Container(name: "Pallet #1", containerType: PALLET, weight: 1000, units: "kgs");
 		shipment1.addToContainers(pallet1).save(flush:true);
-		
-		
+				
 		ShipmentItem shipmentItem1 = new ShipmentItem(product : advil, quantity : 100, packageType: LARGE_BOX);
 		pallet1.addToShipmentItems(shipmentItem1).save(flush:true);
 		

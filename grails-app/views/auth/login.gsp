@@ -14,9 +14,11 @@
 </head>
 <body>
 	<div class="body">
-		<div width="50%">
-			<g:render template="../common/login"/>
-		</div>			
+
+
+		<g:render template="../common/login"/>
+
+
 	</div>
 </body>
 </html>

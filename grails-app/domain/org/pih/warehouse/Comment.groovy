@@ -11,8 +11,8 @@ class Comment {
 	
 	static constraints = {
 		comment(nullable:false)
+		sendDate(nullable:false)		
 		commenter(nullable:true)
 		recipient(nullable:true)
-		sendDate(nullable:true)		
 	}
 }

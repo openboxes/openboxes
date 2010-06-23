@@ -10,6 +10,32 @@ import grails.converters.JSON;
 class ShipmentController {
    
     def scaffold = Shipment
+    def shipmentService
+    
+    
+    // Wed Jun 23 00:00:00 CDT 2010
+    // yyyy-MM-dd HH:mm:ss z
+    
+    def list = { 
+    	def browseBy = params.id;
+    	def currentLocation = Location.get(session.warehouse.id);
+    	
+    	println ("current location" + currentLocation.name)
+    	
+    	def allShipments = shipmentService.getShipmentsWithAnyLocation(currentLocation);
+		def incomingShipments = shipmentService.getShipmentsWithDestination(currentLocation);	
+		def outgoingShipments = shipmentService.getShipmentsWithOrigin(currentLocation);	
+		
+		def shipmentInstanceList = ("incoming".equals(browseBy)) ? incomingShipments : 
+			("outgoing".equals(browseBy)) ? outgoingShipments : allShipments;
+		
+		[shipmentInstanceList: shipmentInstanceList,
+		 shipmentInstanceTotal: allShipments.size(),
+		 incomingShipmentCount: incomingShipments.size(),
+		 outgoingShipmentCount: outgoingShipments.size()]
+    }
+    
+        
     
     def addShipmentAjax = {
 		try {
@@ -56,15 +82,41 @@ class ShipmentController {
     	def shipment = Shipment.get(params.shipmentId);   	
     	def containerType = ContainerType.get(params.containerTypeId);    	
     	def name = (params.name) ? params.name : containerType.name + " " + shipment.getContainers().size()
-        def container = new Container(
-        	name: name, 
-        	weight: 0, 
-        	units: "kg", 
-        	containerType: containerType);
+        def container = new Container(name: name, weight: params.weight, units: params.units, containerType: containerType);
         shipment.addToContainers(container);
-        flash.message = "Added a new container to the shipment";		
+        flash.message = "Added a new piece to the shipment";		
 		redirect(action: 'show', id: params.shipmentId)    
     }
+    
+    def copyContainer = { 
+        	def shipment = Shipment.get(params.shipmentId);   	
+        	def container = Container.get(params.containerId);  
+        	def name = (params.name) ? params.name : "New Package";
+        	def copies = params.copies
+        	def x = Integer.parseInt(copies)
+        	int index = 1;
+        	while ( x-- > 0 ) {
+        		def containerCopy = new Container(container.properties);
+        		containerCopy.id = null;
+        		containerCopy.name = name + " " + (index++);
+        		containerCopy.containerType = container.containerType;
+        		containerCopy.weight = container.weight;
+        		containerCopy.shipmentItems = null;
+        		containerCopy.save(flush:true);
+        		
+        		container.shipmentItems.each { 
+        			def shipmentItemCopy = new ShipmentItem();
+        			shipmentItemCopy.product = it.product
+        			shipmentItemCopy.quantity = it.quantity;
+        			containerCopy.addToShipmentItems(shipmentItemCopy).save(flush:true);
+        		}
+        		
+        		shipment.addToContainers(containerCopy).save(flush:true);
+        	}
+    		flash.message = "Copied package multiple times within the shipment";		
+    		redirect(action: 'show', id: params.shipmentId)        		
+        }    
+    
     
     def deleteContainer = { 
     		
@@ -117,6 +169,9 @@ class ShipmentController {
     	def container = Container.get(params.containerId);
     	def product = Product.get(params.productId);
     	def quantity = params.quantity;
+    	// if container already includes a shipment item with this product, 
+    	// we just need to add to the total quantity
+    	
     	def shipmentItem = new ShipmentItem(product: product, quantity: quantity);    	
     	container.addToShipmentItems(shipmentItem).save(flush:true);
     	flash.message = "Added $params.quantity units of $product.name";		

@@ -10,6 +10,18 @@
 	margin-right: 30px;
 	width: 75%;		/* stretch the main content */
 }
+
+
+/* controls width of the page */
+.body { 
+	width: 100%;
+}
+
+#loginForm { 
+	
+	width: 1000px;
+}
+
 .menuButton, label, input, td, th { 	
 	font-size: 11pt;
 }
@@ -66,10 +78,6 @@ h2 {
 .title { 
 	font-size: 1.2em;	
 	font-weight: bold;
-}
-
-.body { 
-	width: 75%;
 }
 
 .buttons { 
@@ -214,9 +222,15 @@ hr.space {background:#fff;color:#fff;}
 /*
 -------------------------------------------------------------*/
 
-li { 
-	margin-top: 10px; 	
+/* changed to 5px because div.errors looks weird at 10px */
+div.errors li { 
+	margin-top: 5px; 	
 }
+
+div#dashboard li { 
+	margin-top: 10px;
+}
+	
 
 .listcontainer { 
 	margin-bottom: 1em;

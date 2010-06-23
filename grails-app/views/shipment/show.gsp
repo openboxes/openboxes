@@ -1,6 +1,7 @@
 
 <%@ page import="org.pih.warehouse.ContainerType" %>
 <%@ page import="org.pih.warehouse.Document" %>
+<%@ page import="org.pih.warehouse.DocumentType" %>
 <%@ page import="org.pih.warehouse.EventType" %>
 <%@ page import="org.pih.warehouse.Product" %>
 <%@ page import="org.pih.warehouse.Location" %>
@@ -13,7 +14,10 @@
         <g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
         <title><g:message code="default.show.label" args="[entityName]" /></title>        
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.show.label" args="[entityName]" /></content>
+		<content tag="pageTitle">
+			<g:if test="${shipmentInstance?.name}">${shipmentInstance?.name}</g:if>
+			<g:else><g:message code="default.show.label" args="[entityName]" /></g:else>
+		</content>
 		<content tag="menuTitle">${entityName}</content>		
 		<content tag="globalLinksMode">append</content>
 		<content tag="localLinksMode">override</content>
@@ -105,13 +109,13 @@
 									<table>
 					                	<tbody>     	
 					                        <tr class="prop">
-					                            <td valign="top" class="name"><label><g:message code="shipment.origin.label" default="Shipping from" /></label></td>
+					                            <td valign="top" class="name"><label><g:message code="shipment.origin.label" default="Origin" /></label></td>
 					                            <td valign="top" class="value" nowrap="nowrap">
 					                            	<div class="switcher">
 					                            		<!-- removed span because of rendering issue <span class="ui-icon ui-icon-newwin"></span> 
 					                            				<a ... class="ui-state-default ui-corner-all">
 					                            		-->
-						                            	<a href="#" id="edit-origin-link"><img src="${createLinkTo(dir:'images/icons',file:'edit_32.png')}" alt="Edit Origin"/></a>
+						                            	<a href="#" id="edit-origin-link"><img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit Origin"/></a>
 					                            	</div>					             
 					                            	<div id="view-origin">
 						                            	<h3>${shipmentInstance?.origin?.encodeAsHTML()}</h3>	                            
@@ -140,11 +144,11 @@
 									<table>
 					                	<tbody>     	
 					                        <tr class="prop">
-					                            <td valign="top" class="name"><label><g:message code="shipment.destination.label" default="Delivering to" /></label></td>
+					                            <td valign="top" class="name"><label><g:message code="shipment.destination.label" default="Destination" /></label></td>
 					                            
 					                            <td valign="top" class="value" nowrap="nowrap">
 					                            	<div class="switcher"><!-- class="ui-state-default ui-corner-all" -->
-						                            	<a href="#" id="edit-destination-link"><img src="${createLinkTo(dir:'images/icons',file:'edit_32.png')}" alt="Edit Destination"/></a>
+						                            	<a href="#" id="edit-destination-link"><img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit Destination"/></a>
 					                            	</div>
 					                            
 					                            
@@ -182,22 +186,46 @@
 	            
 	            <div id="details">
 					<gui:tabView id="shipmentTabs">
+					
+					
+					
+					
+					
+					
+					
 					    <gui:tab id="shipmentDetailsTab" label="Details" active="true">				    
 							<h2><g:message code="shipment.method.label" default="Shipping Method" /></h2>
 				            <div id="detailsTab" class="tab" >
 				            	<div class="switcher"><!-- class="ui-state-default ui-corner-all" -->
-					            	<a href="#" id="edit-details-link" ><img src="${createLinkTo(dir:'images/icons',file:'edit_32.png')}" alt="Edit Details"/></a>
+					            	<a href="#" id="edit-details-link" ><img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit Details"/></a>
 				                </div>			                
 				            	<div id="view-details" style="background-color: white;">				            		
 									<table class="withoutBorder" border="0">
 					                    <tbody>       
-					                    
 					                        <tr class="prop">
-					                            <td valign="middle" class="name"><label><g:message code="shipment.shipmentStatus.label" default="Current status" /></label></td>                            
+					                            <td valign="middle" class="name"><label><g:message code="shipment.shipmentStatus.label" default="Status" /></label></td>                            
 					                            <td valign="top" class="value" nowrap="nowrap">
 					                            	${fieldValue(bean: shipmentInstance, field: "shipmentStatus.name")}
 					                            </td>                            
 					                        </tr>                    
+
+					                        <tr class="prop">
+					                            <td valign="middle" class="name">
+					                            	<label><g:message code="shipment.name.label" default="Nickname" /></label>
+					                            </td>                            
+					                            <td valign="top" class="value" nowrap="nowrap">
+					                            	${fieldValue(bean: shipmentInstance, field: "name")}
+					                            </td>                            
+					                        </tr>                    
+					                        <tr class="prop">
+					                            <td valign="middle" class="name">
+					                            	<label><g:message code="shipment.description.label" default="Description" /></label>
+					                            </td>                            
+					                            <td valign="top" class="value" nowrap="nowrap">
+					                            	${fieldValue(bean: shipmentInstance, field: "description")}
+					                            </td>                            
+					                        </tr>                    
+					                    
 					                    
 											<tr class="prop">
 												<td valign="top" class="name"><label><g:message code="shipment.expectedShippingDate.label" default="Ship date" /></label></td>                            
@@ -238,8 +266,6 @@
 													</td>                          
 												</tr>												 													
 											</g:each>
-								
-											
 											<%-- 
 											<tr class="prop">
 											    <td valign="top" class="name"><label><g:message code="shipment.comments.label" default="Comments" /></label></td>   
@@ -264,6 +290,23 @@
 						                <g:hiddenField name="version" value="${shipmentInstance?.version}" />
 						                <table class="withoutBorder" border="0">
 						                    <tbody>	            
+						                    
+						                        <tr class="prop">
+						                            <td valign="top" class="name">
+						                            	<label><g:message code="shipment.name.label" default="Nickname" /></label>
+						                           	</td>           
+						                            <td colspan="3" valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">
+					                                    <g:textField name="name" size="60" value="${shipmentInstance?.name}" />
+						                            </td>                            
+						                        </tr>                    
+						                        <tr class="prop">
+						                            <td valign="top" class="name">
+						                            	<label><g:message code="shipment.name.label" default="Describe what you are shipping" /></label>
+						                            </td>                            
+						                            <td colspan="3" valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'description', 'errors')}">
+														<g:textArea name="description" value="${shipmentInstance?.description}" rows="3" cols="60"/>
+						                            </td>                            
+						                        </tr>                    
 						                        <tr class="prop">
 						                            <td valign="middle" class="name"><label><g:message code="shipment.shipmentStatus.label" default="Current status" /></label></td>                            
 						                            <td valign="middle" class="value" nowrap="nowrap">
@@ -309,19 +352,26 @@
 												    </td>                          
 												</tr>
 												--%>
-																				                    
+													
+												<tr class="prop">		                        
+						                        	<td></td>
+						                        	<td>
+														<div class="buttons">
+															<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> Save</button>
+															<a href="#" class="negative"> <img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="" /> Cancel </a>
+														</div>
+													</td>		                        
+						                        </tr>													
 											</tbody>
-										</table>	
-										<div class="buttons">	
-						                    <span class="button"><g:actionSubmit class="save" action="update" value="${message(code: 'default.button.save.label', default: 'Save')}" /></span>
-										</div>	
-						 			</g:form>						        		
-					        		
+										</table>											
+						 			</g:form>						        							        		
 					        	</div>							
 							</div>												
-					    </gui:tab>						
+					    </gui:tab>		
+					    
+
 						<gui:tab id="shipmentEventsTab" label="Events">
-							<h2><g:message code="shipment.events.label" default="Event History" /></h2>
+							<h2><g:message code="shipment.events.label" default="Tracking" /></h2>
 							<div id="eventsTab" class="tab">
 								<g:if test="${!shipmentInstance.events}">	
 									<div class="notice">
@@ -377,8 +427,14 @@
 												    </td>
 												    --%>
 												    <td>
-														<g:submitButton name="add" value="Add"/>
+														<div class="buttons">
+															<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> Save</button>
+															<a href="#" class="negative"> <img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="" /> Cancel </a>
+															
+														</div>
 													</td>
+													
+													
 												</tr>
 										    </g:form>										    
 										    
@@ -388,8 +444,9 @@
 					    	</div>
 					    </gui:tab>
 						
+											
 						<gui:tab id="shipmentPiecesTab" label="Pieces">
-							<h2><g:message code="shipment.pieces.label" default="Shipment Items" /></h2>
+							<h2><g:message code="shipment.pieces.label" default="Shipment Pieces" /></h2>
 							<div id="itemsTab" class="tab">
 								<g:if test="${shipment?.description}">
 									<table class="withoutBorder">
@@ -405,135 +462,203 @@
 								</g:if>
 								<g:if test="${!shipmentInstance.containers}">	
 									<div class="notice">
-										There are no containers or items in this shipment.
-										<a href="#" id="add-container-link">Add a new container</a>						    	
-									
+										There are no pieces in this shipment.
+										<a href="#" id="add-container-link">Add a new piece</a>						    										
 									</div>								
 								</g:if>
 								<g:else>
 								    <g:each in="${shipmentInstance.containers}" var="container" status="c">
-									    <table style="background-color: white;">
+									    <table style="background-color: white;" border="0">
 											<tbody>
 												<tr>
 													<td valign="top">
 														<div style="margin-top: 10px; margin-bottom: 10px;">
 															<span style="font-size: 1.2em">
-																 (#${c+1}) <g:if test='${container.name}'><b>${container?.name}</b></g:if>
+																<img src="${createLinkTo(dir:'images/icons',file:'box_24.gif')}" alt="box" />
+																 #${c+1} <g:if test='${container.name}'><b>${container?.name}</b></g:if>
 															</span>
 															<span>
 																&nbsp;|&nbsp;
 																Type: ${container?.containerType?.name } &nbsp;|&nbsp;  
 																Weighs: ${container?.weight} ${container?.units} &nbsp;|&nbsp;  
-																Contains: <%= container.getShipmentItems().size() %> items
+																Contains: <%= container.getShipmentItems().size() %> items &nbsp;|&nbsp;
+																<a href="#" id="show-container-contents-link-${container?.id}">Show Contents</a>										
+																
 															</span> 
 														</div>
 													</td>		
-													<td width="5%" valign="top" align="right">
-														<g:link action="deleteContainer" id="${container?.id}">
-															<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete Container"/>
-														</g:link>
+													<td width="10%" valign="top" >
+														<div style="margin-top: 10px; margin-bottom: 10px; text-align: right">
+															<a href="#" id="copy-container-link-${container?.id}">
+																<img src="${createLinkTo(dir:'images/icons/silk',file:'page_copy.png')}" alt="Copy Container"/>
+															</a>															
+															<g:link action="deleteContainer" id="${container?.id}">
+																<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete Container"/>
+															</g:link>
+														</div>
 													</td>						
 												</tr>
-												<tr>
-													<td align="center" colspan="2">
-									                    <table class="withBorder">
-									                       	<thead>
-									                       		<tr>
-									                       			<th width="5%"></th>
-									                       			<th width="40%">Cargo</th>
-									                       			<th width="20%">Quantity</th>
-									                       			<th width="20%">Weight</th>
-									                       			<th width="5%"></th>
-									                       		</tr>
-									                       	</thead>
-															<tbody>
-																<g:if test="${!container.shipmentItems}">	
-																 	<%--
-																 	<tr class="odd">
-																 		<td colspan="5">
-																	 		There are no shipping items in this ${container.containerType.name}.	
-																	 	</td>
-																	</tr>
-																	 --%>
-																	<tr class="odd">
-																		<td width="1%"><img src="${createLinkTo(dir:'images/icons',file:'product.png')}" alt="Product" /></td>																	
-																		<td colspan="5"> 
-																	 		<a href="#" id="add-item-link-${container?.id}">Add a new Item</a>																	
-																 		</td>
-																 	</tr>
-																</g:if>
-																<g:else>					
-																    <g:each in="${container.shipmentItems}" var="item" status="i">
-																		<tr id="item-${item.id}" class="${(i % 2) == 0 ? 'odd' : 'even'}">
-																			<td width="1%"><img src="${createLinkTo(dir:'images/icons',file:'product.png')}" alt="Product" /></td>
-																			<td>
-																				${item?.product.name} 			
-																			</td>
-																			<td>
-																				${item?.quantity} units									
-																			</td>
-																			<td>
-																				${item?.grossWeight}									
-																			</td>
-																			<td>
-																				<g:link class="remove" action="deleteItem" id="${item?.id}">
-																					<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete Shipment Item"/>
-																				</g:link>
-																			</td>
-																		</tr>																	
-																    </g:each>
-																    <tr class="odd">
-																		<td width="1%"><img src="${createLinkTo(dir:'images/icons',file:'product.png')}" alt="Product" /></td>
-																		<td colspan="4" align="center">																		
-																			<a href="#" id="add-item-link-${container?.id}">Add a new Item</a>	
-																		</td>
-																	</tr>
-																    
-																    <!--  Temporarily removed the two forms until I can figure out a better way to integrate them -->
-																    <%-- 
-																	<tr class="prop">
-																		<td colspan="4">
-																			<label><g:message code="shipment.contents.quickAdd.label" default="Quick Add" /></label></td>   
-																			<div style="width:50%">
-																				<g:form action="addItemAutoComplete" id="${shipmentInstance.id}">	
-																					<gui:autoComplete size="20" width="100" id="selectedItem" name="selectedItem" controller="shipment" action="availableItems"/>											
-																					<g:submitButton name="addItem" value="Add to shipment"/>
-																				</g:form>			
-																			</div>						
-																		</td>
-																	</tr>
-																	<g:form action="addItem">
-																		<g:hiddenField name="containerId" value="${container?.id}" />
-																		<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
-																		<tr>  
-																			<td></td>
-																			<td>
-																				<g:textField name="quantity" size="5" /> units of 
-																				<g:select 
-																					id="productId" 
-																					name='productId'
-																				    noSelection="${['null':'Select One...']}"
-																				    from='${Product.list()}' optionKey="id" optionValue="name">
-																				</g:select>
-																		    	<g:submitButton name="add" value="Add"/>
-																		    </td>
-																		    <td></td>
-																		    <td></td>
-																	    </tr>
-																	</g:form>																    	
-																	--%>					
-																	
-															    </g:else>
-									                        </tbody>
-														</table>   
-													</td>
-												</tr>											
 											</tbody>
-										</table>	
-										<br/>						
+										</table>										
+										<div id="container-contents-${container?.id}" style="display: none">
+											<table>
+												<tbody>
+													<tr>
+														<td align="center" colspan="2">
+										                    <table class="withBorder">
+										                       	<thead>
+										                       		<tr>
+										                       			<th width="5%"></th>
+										                       			<th width="40%">Cargo</th>
+										                       			<th width="20%">Quantity</th>
+										                       			<th width="20%">Weight</th>
+										                       			<th width="5%"></th>
+										                       		</tr>
+										                       	</thead>
+																<tbody>
+																	<g:if test="${!container.shipmentItems}">	
+																	 	<%--
+																	 	<tr class="odd">
+																	 		<td colspan="5">
+																		 		There are no shipping items in this ${container.containerType.name}.	
+																		 	</td>
+																		</tr>
+																		 --%>
+																		<tr class="odd">
+																			<td width="1%"><img src="${createLinkTo(dir:'images/icons',file:'pill.png')}" alt="Product" /></td>																	
+																			<td colspan="5"> 
+																		 		<a href="#" id="add-item-link-${container?.id}">Add a new item</a>																	
+																	 		</td>
+																	 	</tr>
+																	</g:if>
+																	<g:else>					
+																	    <g:each in="${container.shipmentItems}" var="item" status="i">
+																			<tr id="item-${item.id}" class="${(i % 2) == 0 ? 'odd' : 'even'}">
+																				<td width="1%"><img src="${createLinkTo(dir:'images/icons',file:'pill.png')}" alt="Item" /></td>
+																				<td>
+																					${item?.product.name} 			
+																				</td>
+																				<td>
+																					${item?.quantity} units									
+																				</td>
+																				<td>
+																					${item?.grossWeight}									
+																				</td>
+																				<td>
+																					<g:link class="remove" action="deleteItem" id="${item?.id}">
+																						<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete Shipment Item"/>
+																					</g:link>
+																				</td>
+																			</tr>																	
+																	    </g:each>
+																	    <tr class="odd">
+																			<td width="1%"><img src="${createLinkTo(dir:'images/icons',file:'product.png')}" alt="Item" /></td>
+																			<td colspan="4" align="center">																		
+																				<a href="#" id="add-item-link-${container?.id}">Add a new item</a>	
+																			</td>
+																		</tr>
+																	    
+																	    <!--  Temporarily removed the two forms until I can figure out a better way to integrate them -->
+																	    <%-- 
+																		<tr class="prop">
+																			<td colspan="4">
+																				<label><g:message code="shipment.contents.quickAdd.label" default="Quick Add" /></label></td>   
+																				<div style="width:50%">
+																					<g:form action="addItemAutoComplete" id="${shipmentInstance.id}">	
+																						<gui:autoComplete size="20" width="100" id="selectedItem" name="selectedItem" controller="shipment" action="availableItems"/>											
+																						<g:submitButton name="addItem" value="Add to shipment"/>
+																					</g:form>			
+																				</div>						
+																			</td>
+																		</tr>
+																		<g:form action="addItem">
+																			<g:hiddenField name="containerId" value="${container?.id}" />
+																			<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
+																			<tr>  
+																				<td></td>
+																				<td>
+																					<g:textField name="quantity" size="5" /> units of 
+																					<g:select 
+																						id="productId" 
+																						name='productId'
+																					    noSelection="${['null':'Select One...']}"
+																					    from='${Product.list()}' optionKey="id" optionValue="name">
+																					</g:select>
+																			    	<g:submitButton name="add" value="Add"/>
+																			    </td>
+																			    <td></td>
+																			    <td></td>
+																		    </tr>
+																		</g:form>																    	
+																		--%>					
+																		
+																    </g:else>
+										                        </tbody>
+															</table>   
+														</td>
+													</tr>											
+												</tbody>
+											</table>	
+										</div>
 										
-																			
-										<div id="add-item-dialog-${container?.id}" style="display: none;" title="Add a new Item">
+										<script type="text/javascript">
+											jQuery(document).ready(function($){
+												$("a#show-container-contents-link-${container?.id}").click(function() {
+													$("#container-contents-${container?.id}").toggle(0);													
+												});										
+												$('#copy-container-dialog-${container?.id}').dialog({
+													autoOpen: false,
+													width: 500
+												});										
+												$('#copy-container-link-${container?.id}').click(function(){
+													$('#copy-container-dialog-${container?.id}').dialog('open');
+													return false;
+												});				
+											});
+											
+										</script>													
+										<br/>						
+																
+																
+										<div id="copy-container-dialog-${container?.id}" title="Copy container" style="display: none;" >
+											<g:form action="copyContainer">
+												<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
+												<g:hiddenField name="containerId" value="${container?.id}" />
+												<table>
+													<tbody>
+														<tr class="prop">
+								                            <td valign="top" class="name"><label><g:message code="container.name.label" default="Nickname" /></label></td>                            
+								                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'name', 'errors')}">
+																${container?.name}
+							                                </td>
+								                        </tr>  	          
+														<tr class="prop">
+								                            <td valign="top" class="name"><label><g:message code="container.name.label" default="Nickname" /></label></td>                            
+								                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'name', 'errors')}">
+																<g:textField name="name" value="${container?.name}" />
+							                                </td>
+								                        </tr>  	          
+														<tr class="prop">
+								                            <td valign="top" class="name"><label><g:message code="container.copies.label" default="# of Copies" /></label></td>                            
+								                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'name', 'errors')}">
+																<g:textField name="copies" value="1" />
+							                                </td>
+								                        </tr>  	          
+								                        <tr>
+														    <td colspan="2">
+																<div class="buttons" style="text-align: right;">
+																	<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> Add Piece</button>
+																</div>
+		
+														    </td>					                        
+								                        </tr>         
+								                    </tbody>
+								                </table>
+										    </g:form>
+										</div>								
+
+										<%-- TODO:  SHOULD BE HIDDEN UNTIL USER REQUESTS TO ADD A NEW ITEM --%>														
+										<div id="add-item-dialog-${container?.id}" style="display: none;" title="Add a new item">
 											<g:form action="addItem">
 												<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
 												<g:hiddenField name="containerId" value="${container?.id}" />
@@ -569,7 +694,9 @@
 														</tr>
 														<tr>
 															<td>
-																<g:submitButton name="add" value="Add"/>											
+																<div class="buttons">
+																	<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> Save</button>
+																</div>
 															</td>										
 													    </tr>
 												    </tbody>
@@ -587,14 +714,19 @@
 													return false;
 												});				
 											});
-										</script>									
-										
+										</script>																			
 									</g:each><!-- iterate over each container -->
 									
+									
+									<%-- --%>
 									<table style="background-color: white;">
 										<tbody>
 											<tr>
 												<td valign="top">
+													<div style="margin-top: 10px; margin-bottom: 10px;">
+														<img src="${createLinkTo(dir:'images/icons',file:'box_24.gif')}" alt="box" /> <a href="#" id="add-container-link">Add a new piece</a>		
+													</div>								
+													<%-- 
 													<div style="margin-top: 10px; margin-bottom: 10px;">
 															<g:form action="addContainer">															
 																<span style="font-size: 1.2em">
@@ -605,20 +737,22 @@
 																	name='containerTypeId'
 																    noSelection="${['null':'Select One...']}"
 																    from='${ContainerType?.list()}' optionKey="id" optionValue="name">
-																</g:select> with name										
+																</g:select> 
+																with name										
 																<g:textField name="name" />
 																and weighs
 																<g:textField name="weight" /> kg
 																<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
-																<g:submitButton name="add" value="Add"/>
+																
+																
+																
+																<div class="buttons">
+																	<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> Save</button>
+																</div>
 															</g:form>														
 													</div>
+													--%>
 												</td>		
-												<td width="5%" valign="top" align="right">
-													<g:link action="deleteContainer" id="${container?.id}">
-														<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete Container"/>
-													</g:link>
-												</td>						
 											</tr>
 										</tbody>
 									</table>
@@ -633,7 +767,7 @@
 								<g:if test="${!shipmentInstance.documents}">	
 									<div class="notice">
 										There are no documents for this shipment. &nbsp; &nbsp;
-										<a href="#" id="add-document-link">Add a new Document</a>									
+										<a href="#" id="add-document-link">Add a new document</a>									
 									</div>
 								</g:if>
 								<g:else>
@@ -651,7 +785,7 @@
 										    <g:each in="${shipmentInstance.documents}" var="document" status="i">
 												<tr id="document-${document.id}" class="${(i % 2) == 0 ? 'odd' : 'even'}">
 													<td><img src="${createLinkTo(dir:'images/icons',file:'document.png')}" alt="Document" /></td>
-													<td>${document?.type}</td>
+													<td>${document?.documentType?.name}</td>
 													<td>${document?.filename} (<g:link controller="document" action="download" id="${document.id}">download</g:link>)</td>
 													<td>${document?.size} bytes</td>
 													<td>
@@ -664,7 +798,7 @@
 										    <tr>
 										    	<td><img src="${createLinkTo(dir:'images/icons',file:'document.png')}" alt="Document" /></td>
 										    	<td colspan="4">
-										    		<a href="#" id="add-document-link">Add a new Document</a>
+										    		<a href="#" id="add-document-link">Add a new document</a>
 										    	
 										    	</td>
 										    
@@ -697,7 +831,7 @@
 						    	<g:if test="${!shipmentInstance?.comments}">
 									<div class="notice">
 										There are no comments for this shipment. &nbsp; &nbsp;
-										<a href="#" id="add-comment-link">Add a new Comment</a>									
+										<a href="#" id="add-comment-link">Add a new comment</a>									
 									</div>
 						    	</g:if>
 						    	<g:else>
@@ -732,7 +866,7 @@
 										    <tr>
 										    	<td><img src="${createLinkTo(dir:'images/icons',file:'tag.png')}" alt="Comment" /></td>
 										    	<td colspan="4">
-										    		<a href="#" id="add-comment-link">Add a new Comment</a>
+										    		<a href="#" id="add-comment-link">Add a new comment</a>
 										    	</td>
 										    
 										    </tr>
@@ -769,8 +903,10 @@
 					    </gui:tab>					    				    
 					    <gui:tab id="shipmentTestTab" label="Test">
 				            <div id="testTab" class="tab">
+
+
 				            	<!-- All hidden DIVs have been temporarily place into the 'test' tab in case the jquery-ui libraries fail to load  -->
-								<div id="add-container-dialog" title="Add a new Container">
+								<div id="add-container-dialog" title="Add a new piece">
 									<g:form action="addContainer">
 										<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
 										<table>
@@ -787,14 +923,17 @@
 					                                </td>
 						                        </tr>  	          
 												<tr class="prop">
-						                            <td valign="top" class="name"><label><g:message code="container.name.label" default="Nickname/Identifier" /></label></td>                            
+						                            <td valign="top" class="name"><label><g:message code="container.name.label" default="Nickname" /></label></td>                            
 						                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'name', 'errors')}">
 														<g:textField name="name" />
 					                                </td>
 						                        </tr>  	          
 						                        <tr>
-												    <td>
-												    	<g:submitButton name="add" value="Add Container"/>
+												    <td colspan="2">
+														<div class="buttons" style="text-align: right;">
+															<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> Add Piece</button>
+														</div>
+
 												    </td>					                        
 						                        </tr>         
 						                    </tbody>
@@ -803,7 +942,7 @@
 								</div>								
 								
 								
-								<div id="add-event-dialog" title="Add a new Event">
+								<div id="add-event-dialog" title="Add a new event">
 									<g:form action="addEvent">
 										<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
 										<table>
@@ -845,14 +984,18 @@
 						                        </tr>  	 
 										    --%>
 						                        <tr>
-												    <td><g:submitButton name="add" value="Add Event"/></td>					                        
+												    <td colspan="2">
+														<div class="buttons" style="text-align: right;">
+															<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> Add Event</button>
+														</div>
+												    </td>					                        
 						                        </tr>         
 						                    </tbody>
 						                </table>
 								    </g:form>
 								</div>
 										
-								<div id="add-document-dialog" title="Add a new Document">
+								<div id="add-document-dialog" title="Add a new document">
 									<g:uploadForm controller="document" action="upload">
 										<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
 										<table>
@@ -860,7 +1003,7 @@
 												<tr class="prop">
 						                            <td valign="top" class="name"><label><g:message code="document.documentType.label" default="Document Type" /></label></td>                            
 						                            <td valign="top" class="value ${hasErrors(bean: documentInstance, field: 'documentType', 'errors')}">																
-														<g:select name="type" from="${Document.constraints.type.inList}" valueMessagePrefix="document.type"  />							    												
+														<g:select name="type" from="${DocumentType.list()}" valueMessagePrefix="document.type"  />							    												
 													</td>
 												</tr>
 												<tr>
@@ -870,8 +1013,10 @@
 													</td>
 												</tr>
 												<tr>
-													<td valign="top" colspan="2" style="text-align: right">
-														<g:submitButton name="upload" value="Upload Document"/>
+													<td valign="top" colspan="2">														
+														<div class="buttons" style="text-align: right;">
+															<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> Upload Document</button>
+														</div>														
 													</td>
 												</tr>
 											</tbody>
@@ -879,7 +1024,7 @@
 								    </g:uploadForm>													
 								</div>										
 												
-								<div id="add-comment-dialog" title="Add a new Comment">
+								<div id="add-comment-dialog" title="Add a new comment">
 									<g:form action="addComment">
 										<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
 										<table>
@@ -916,15 +1061,6 @@
 										</table>
 									</g:form>												
 								</div>										
-																							
-												
-												
-												
-														
-								<div id="editbox" style="border: 1px solid black; disply: none">
-						            <h2><a href="#">Image Name</a></h2>
-						            <p>Description goes here</p>
-						        </div>
 							</div>
 						</gui:tab>
 					    
