@@ -18,6 +18,13 @@
 			</div>			
 
 			<fieldset> 			
+		
+				<script>	
+					jQuery(document).ready(function() {
+						// focus on the first text input field in the first field on the page
+						jQuery("select:first", document.forms[0]).focus();
+					});	
+				</script>		
 			
 				<div  style="padding: 15px;">
 					<div class="prop">
@@ -30,11 +37,11 @@
 					    
 					<div class="prop">
 						<label for="username">Username or email:</label><br/>
-						<input type="text" class="title" name="username" id="username" value="${userInstance?.username}">
+						<input type="text" class="large" name="username" id="username" value="${userInstance?.username}">
 					</div> 
 					<div  class="prop">
 						<label for="password">Password:</label><br/>
-						<input type="password" class="title" name="password" id="password" value="${userInstance?.password}">
+						<input type="password" class="large" name="password" id="password" value="${userInstance?.password}">
 						
 						<span class="buttons" >
 							<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt=""/> Login</button>					   

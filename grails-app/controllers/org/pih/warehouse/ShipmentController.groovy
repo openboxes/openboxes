@@ -1,17 +1,33 @@
 package org.pih.warehouse
 
-import java.io.File;
-
-import org.pih.warehouse.Comment;
-import org.pih.warehouse.Event;
-import org.pih.warehouse.ShipmentEvent;
-import grails.converters.JSON;
+import grails.converters.JSON
 
 class ShipmentController {
    
     def scaffold = Shipment
     def shipmentService
-    
+
+	
+	def create = {
+		def shipmentInstance = new Shipment()
+		shipmentInstance.properties = params
+		if (!shipmentInstance?.shipmentStatus)
+			shipmentInstance.shipmentStatus = ShipmentStatus.findByName("New");
+		return [shipmentInstance: shipmentInstance]
+	}
+
+	def save = {
+		def shipmentInstance = new Shipment(params)
+		if (shipmentInstance.save(flush: true)) {
+			flash.message = "${message(code: 'default.created.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
+			redirect(action: "show", id: shipmentInstance.id)
+		}
+		else {
+			render(view: "create", model: [shipmentInstance: shipmentInstance])
+		}
+	}
+
+	    
     
     // Wed Jun 23 00:00:00 CDT 2010
     // yyyy-MM-dd HH:mm:ss z
@@ -22,17 +38,42 @@ class ShipmentController {
     	
     	println ("current location" + currentLocation.name)
     	
-    	def allShipments = shipmentService.getShipmentsWithAnyLocation(currentLocation);
+    	def allShipments = shipmentService.getShipmentsWithLocation(currentLocation);
 		def incomingShipments = shipmentService.getShipmentsWithDestination(currentLocation);	
 		def outgoingShipments = shipmentService.getShipmentsWithOrigin(currentLocation);	
 		
 		def shipmentInstanceList = ("incoming".equals(browseBy)) ? incomingShipments : 
 			("outgoing".equals(browseBy)) ? outgoingShipments : allShipments;
 		
-		[shipmentInstanceList: shipmentInstanceList,
-		 shipmentInstanceTotal: allShipments.size(),
-		 incomingShipmentCount: incomingShipments.size(),
-		 outgoingShipmentCount: outgoingShipments.size()]
+		def shipmentListByStatus = new HashMap<String, ListCommand>();
+		allShipments.each {
+			def shipmentList = shipmentListByStatus[it.shipmentStatus];
+			if (!shipmentList) {
+				shipmentList = new ListCommand(category: it.shipmentStatus.name, color: it.shipmentStatus.color, 
+					sortOrder: it.shipmentStatus.sortOrder, objectList: new ArrayList());		
+			}
+			shipmentList.objectList.add(it);	
+			shipmentListByStatus.put(it.shipmentStatus, shipmentList)		
+		}
+		
+		/* select shipment_status.id, count(*) from shipment group by shipment_status.id */	
+		def criteria = Shipment.createCriteria()
+		def results = criteria {			
+			projections {
+				groupProperty("shipmentStatus")
+				count("shipmentStatus", "shipmentCount") //Implicit alias is created here !
+			}
+			//order 'myCount'
+		}			
+			
+		[	
+			results : results,
+			shipmentInstanceList : shipmentInstanceList,
+			shipmentInstanceTotal : allShipments.size(),
+			shipmentListByStatus : shipmentListByStatus,
+			incomingShipmentCount : incomingShipments.size(),
+			outgoingShipmentCount : outgoingShipments.size()
+		]
     }
     
         
@@ -79,15 +120,64 @@ class ShipmentController {
     
     
     def addContainer = { 
+		
+		println params 
+		
     	def shipment = Shipment.get(params.shipmentId);   	
     	def containerType = ContainerType.get(params.containerTypeId);    	
-    	def name = (params.name) ? params.name : containerType.name + " " + shipment.getContainers().size()
-        def container = new Container(name: name, weight: params.weight, units: params.units, containerType: containerType);
+    	def containerName = (params.name) ? params.name : containerType.name + " " + (shipment.getContainers().size() + 1);
+        def container = new Container(name: containerName, weight: params.weight, dimensions: params.dimensions, units: params.units, containerType: containerType);
         shipment.addToContainers(container);
         flash.message = "Added a new piece to the shipment";		
 		redirect(action: 'show', id: params.shipmentId)    
     }
-    
+
+	/*
+	def editContainer = {
+		def container = Shipment.get(params.containerId);
+		def containerType = ContainerType.get(params.containerTypeId);
+		def containerName = (params.name) ? params.name : containerType.name + " " + shipment.getContainers().size()
+		def container = new Container(name: containerName, weight: params.weight, units: params.units, dimensions: params.dimensions, containerType: containerType);
+		container.save(flush:true);
+		flash.message = "Added a new piece to the shipment";
+		redirect(action: 'show', id: params.shipmentId)
+	}*/
+
+	
+	def editContainer = {		
+		def shipmentInstance = Shipment.get(params.shipmentId)		
+		def containerInstance = Container.get(params.containerId)
+		if (containerInstance) {
+			/*
+			if (params.version) {
+				def version = params.version.toLong()
+				if (containerInstance.version > version) {					
+					containerInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'container.label', default: 'Container')] as Object[], "Another user has updated this Product while you were editing")
+					render(view: "edit", model: [containerInstance: containerInstance])
+					return
+				}
+			}
+			*/
+			containerInstance.properties = params
+			if (!containerInstance.hasErrors() && containerInstance.save(flush: true)) {
+				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'container.label', default: 'Container'), containerInstance.id])}"
+				redirect(action: "show", id: shipmentInstance.id)
+			}
+			else {
+				flash.message = "Could not edit container"
+				redirect(action: "show", id: shipmentInstance.id)
+				//render(view: "edit", model: [containerInstance: containerInstance])
+			}
+		}
+		else {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'container.label', default: 'Container'), params.containerId])}"
+			redirect(action: "show", id: shipmentInstance.id)
+			//redirect(action: "list")
+		}
+	}
+	
+	
+	    
     def copyContainer = { 
         	def shipment = Shipment.get(params.shipmentId);   	
         	def container = Container.get(params.containerId);  
@@ -101,6 +191,7 @@ class ShipmentController {
         		containerCopy.name = name + " " + (index++);
         		containerCopy.containerType = container.containerType;
         		containerCopy.weight = container.weight;
+        		containerCopy.dimensions = container.dimensions;
         		containerCopy.shipmentItems = null;
         		containerCopy.save(flush:true);
         		
@@ -164,15 +255,19 @@ class ShipmentController {
     
 
     def addItem = {     		
-    	println params;
-    		
-    	def container = Container.get(params.containerId);
+    	println params;		
+		def container = Container.get(params.containerId);
     	def product = Product.get(params.productId);
     	def quantity = params.quantity;
     	// if container already includes a shipment item with this product, 
     	// we just need to add to the total quantity
+    	def weight = product.weight * Integer.valueOf(quantity);
     	
-    	def shipmentItem = new ShipmentItem(product: product, quantity: quantity);    	
+		//def donor = null;
+		//if (params.donorId)
+		def donor = Organization.get(params.donorId);
+					
+		def shipmentItem = new ShipmentItem(product: product, quantity: quantity, weight: weight, donor: donor);
     	container.addToShipmentItems(shipmentItem).save(flush:true);
     	flash.message = "Added $params.quantity units of $product.name";		
 		redirect(action: 'show', id: params.shipmentId)    	
@@ -249,5 +344,27 @@ class ShipmentController {
     def view = {
     	// pass through to "view shipment" page
     }
+}
+
+
+class ListCommand { 	
+	String category;
+	String color;
+	List objectList;
+	Integer sortOrder;
+
+    static constraints = {
+
+    }
+	
+	
+	public int compareTo(def other) {
+		return id <=> other?.id
+		
+		//return sortOrder <=> other?.sortOrder // <=> is the compareTo operator in groovy
+	}
+	
+
+	
 }
 

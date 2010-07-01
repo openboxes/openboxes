@@ -14,6 +14,12 @@ class ShipmentItem implements Comparable {
     Float grossWeight				// Weight of entire package
     Float unitWeight				// Weight per unit 
     
+	
+	Boolean donation = false		// Donation information
+	Organization donor
+
+	
+	
     static belongsTo = [ container : Container ] // + shipment : Shipment
 
     static constraints = {
@@ -23,6 +29,8 @@ class ShipmentItem implements Comparable {
 		grossWeight(nullable:true)
 		unitWeight(nullable:true)
 		//container(nullable:false)
+		donation(nullable:true)
+		donor(nullable:true)
 		
     }
     

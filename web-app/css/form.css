@@ -5,7 +5,7 @@
    * Gives you classes to enhance your forms
    
    Usage:
-   * For text fields, use class .title or .text
+   * For text fields, use class .large or .text
    
 -------------------------------------------------------------- */
 
@@ -19,19 +19,19 @@ legend      { font-weight: bold; font-size:1.2em; }
 -------------------------------------------------------------- */
 
 input[type=text],
-input.text, input.title, 
+input.text, input.large, 
 textarea, select { 
   background-color:#fff; 
   border:1px solid #bbb; 
 }
 input[type=text]:focus, 
-input.text:focus, input.title:focus, 
+input.text:focus, input.large:focus, 
 textarea:focus, select:focus { 
   border-color:#666; 
 }
 
 input[type=text], 
-input.text, input.title,
+input.text, input.large,
 textarea, select {
   margin:0;
 }
@@ -41,9 +41,8 @@ input[type=submit] {
 	height: 200px;	
 }
 
-input.text, 
-input.title   { width: 300px; padding:5px; }
-input.title   { font-size:1.5em; }
+input.text, input.large   { padding:5px; }
+input.large, input.date   { font-size:1.5em; }
 textarea      { padding:5px; }
 
 input[type=checkbox], input[type=radio], 

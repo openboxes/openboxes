@@ -58,8 +58,18 @@
 
 		                <table class="withoutBorder" border="0">
 		                    <tbody>	                        
+								<tr class="prop">
+		                            <td valign="top" class="name">
+		                            	<label><g:message code="shipment.shipmentType.label" default="Type" /></label>
+		                            </td>                            
+		                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">
+										<g:select name="shipmentType.id" from="${org.pih.warehouse.ShipmentType.list()}" optionKey="id" value="${shipmentInstance?.shipmentType?.id}" noSelection="['0':'']" />
+		                            </td> 
+		                        </tr> 
 		                        <tr class="prop">
-		                            <td valign="top" class="name"><label><g:message code="shipment.origin.label" default="From" /></label></td>                            
+		                            <td valign="top" class="name">
+		                            	<label><g:message code="shipment.origin.label" default="From" /></label>
+		                            </td>                            
 		                            <td valign="top" class=" ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">
 					                	<g:select name="origin.id" from="${org.pih.warehouse.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.origin?.id}"  />
 		                            </td>                            

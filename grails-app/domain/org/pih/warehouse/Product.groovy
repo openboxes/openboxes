@@ -23,7 +23,7 @@ class Product {
     // Other attributes
     String unit				// values: tablet, capsule, vial, pill, bottle, injection, box, each, grams, carton, case
     String quantityPerUnit	// quantity per unit
-    
+	Float weight
     
     // Product codes
     String ean;				// A universal product code (http://en.wikipedia.org/wiki/European_Article_Number)
@@ -39,6 +39,7 @@ class Product {
 		genericType(nullable:true)
 		productType(nullable:true)		
 		tags(nullable:true)		
+		weight(nullable:true)
         description(nullable:true)
 		markAsImportant(nullable:true)
         unit(nullable:true)

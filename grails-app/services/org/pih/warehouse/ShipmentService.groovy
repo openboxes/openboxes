@@ -8,7 +8,7 @@ class ShipmentService {
     	return Shipment.list()
     }
     
-    List<Shipment> getShipmentsWithAnyLocation(Location location) {
+    List<Shipment> getShipmentsWithLocation(Location location) {
     	return Shipment.withCriteria { 
     		or {	
 	    		eq("destination", location)

@@ -3,11 +3,11 @@ package org.pih.warehouse
 class Container implements Comparable {
 
 	String name
+	Boolean status = true		// open (true) or closed (false)	
 	String containerNumber
 	String dimensions			// could be its own class, but we don't care right now
-
-	Float weight
-	String units		// should probably be a class on its own
+	Float weight	
+	String units				// should probably be a class on its own
 	
 	ContainerType containerType
 	SortedSet shipmentItems

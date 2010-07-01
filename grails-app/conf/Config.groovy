@@ -9,7 +9,6 @@
 // if(System.properties["${appName}.config.location"]) {
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
 // }
-grails.views.javascript.library="jquery"
 grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
 grails.mime.use.accept.header = false
 grails.mime.types = [ html: ['text/html','application/xhtml+xml'],
@@ -36,8 +35,11 @@ grails.views.javascript.library="jquery"
 // scaffolding templates configuration
 grails.scaffolding.templates.domainSuffix = 'Instance'
 
+// Set to true if BootStrap.groovy is failing to add all sample data 
+grails.gorm.failOnError = false
+
 // Set to false to use the new Grails 1.2 JSONBuilder in the render method
-grails.json.legacy.builder=false
+grails.json.legacy.builder = false
 // enabled native2ascii conversion of i18n properties files
 grails.enable.native2ascii = true
 // whether to install the java.util.logging bridge for sl4j. Disable fo AppEngine!

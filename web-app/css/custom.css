@@ -32,7 +32,7 @@
 }
 
 .tab { 
-	padding: 25px;	
+	padding: 15px;	
 }
 /* IMPORTANT: not sure why this works, but mis-aligns the menu */
 .yui-skin-sam { 
@@ -42,6 +42,9 @@
 table.withoutBorder {
     border: 0px solid #ccc;
     width: 100%
+}
+table.container { 
+	width: 60%;	
 }
 .dialog td { 
 	padding: 10px;
@@ -67,6 +70,7 @@ table.withoutBorder {
 }
 label { 
 	padding-right: 15px; 
+	font-weight: bold;
 }
 /* TODO figure out what this was meant for */
 h2 {

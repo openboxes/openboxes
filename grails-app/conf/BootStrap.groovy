@@ -28,6 +28,7 @@ import org.pih.warehouse.StockCard;
 import org.pih.warehouse.Shipment;
 import org.pih.warehouse.ShipmentEvent;
 import org.pih.warehouse.ShipmentItem;
+import org.pih.warehouse.ShipmentType;
 import org.pih.warehouse.ShipmentMethod;
 import org.pih.warehouse.ShipmentStatus;
 import org.pih.warehouse.SupplierType;
@@ -45,38 +46,52 @@ class BootStrap {
 	 */
 	def init = { servletContext ->
 		
-		/* Countries */	 	
+		/** 
+		 * Countries 
+		 */	 	
 		Country CANADA = new Country(country: "Canada", population: 24251210, gdp: 24251210, date: new Date()).save();
 		Country HAITI = new Country(country: "Haiti", population: 29824821, gdp: 24251210, date: new Date()).save();
 		Country MEXICO = new Country(country: "Mexico", population: 103593973, gdp: 24251210, date: new Date()).save();
 		Country USA = new Country(country: "United States", population: 300000000, gdp: 24251210, date: new Date()).save();
 		
-		/* Organizations */
+		/**
+		 * Organizations 
+		 */
 		Organization ZL = new Organization(name:  "Zanmi Lasante", description: "").save();
 		Organization PIH = new Organization(name: "Partners In Health", description: "").save();
 			
-		/* Category > Top Level */
+		/** 
+		 * Category > Top Level 
+		 */ 		
 		Category CATEGORY_MEDICINES = new Category(parent: null, name: "Medicines").save();
 		Category CATEGORY_SUPPLIES = new Category(parent: null, name: "Supplies").save();
 		Category CATEGORY_EQUIPMENT = new Category(parent: null, name: "Equipment").save();
 		Category CATEGORY_PERISHABLES = new Category(parent: null, name: "Perishables").save();
 		Category CATEGORY_OTHER = new Category(parent: null, name: "Other").save();
 		
-		/* Category > Supplies */
+		/** 
+		 * Category > Supplies 
+		 */ 
 		Category CATEGORY_MEDICAL_SUPPLIES = new Category(parent: CATEGORY_SUPPLIES, name: "Medical Supplies").save();
 		Category CATEGORY_HOSPITAL_SUPPLIES = new Category(parent: CATEGORY_SUPPLIES, name: "Hospital and Clinic Supplies").save();
 		Category CATEGORY_OFFICE_SUPPLIES = new Category(parent: CATEGORY_SUPPLIES, name: "Office Supplies").save();
 		
-		/* Category > Equipment */
+		/** 
+		 * Category > Equipment 
+		 */ 
 		Category CATEGORY_MEDICAL_EQUIPMENT = new Category(parent: CATEGORY_EQUIPMENT, name: "Medical Equipment").save();
 		Category CATEGORY_SURGICAL_EQUIPMENT = new Category(parent: CATEGORY_EQUIPMENT, name: "Surgical Equipment").save();
 		Category CATEGORY_TECH_EQUIPMENT = new Category(parent: CATEGORY_EQUIPMENT, name: "IT Equipment").save();
 		Category CATEGORY_FURNITURE = new Category(parent: CATEGORY_EQUIPMENT, name: "Furniture and Equipment").save();
 		
-		/* Category > Food */
+		/** 
+		 * Category > Food 
+		 */ 
 		Category CATEGORY_FOOD = new Category(parent: CATEGORY_PERISHABLES, name: "Food").save();
 		
-		/* Category > Medicines */ 
+		/** 
+		 * Category > Medicines 
+		 */ 
 		Category CATEGORY_MEDICINES_ARV = new Category(parent: CATEGORY_MEDICINES, name: "ARVS").save();
 		Category CATEGORY_MEDICINES_ANESTHESIA = new Category(parent: CATEGORY_MEDICINES, name: "Anesteshia").save();
 		Category CATEGORY_MEDICINES_CANCER = new Category(parent: CATEGORY_MEDICINES, name: "Cancer").save();
@@ -85,14 +100,18 @@ class BootStrap {
 		Category CATEGORY_MEDICINES_TB = new Category(parent: CATEGORY_MEDICINES, name: "TB").save();
 		Category CATEGORY_MEDICINES_OTHER = new Category(parent: CATEGORY_MEDICINES, name: "Other").save();
 		
-		/* Category > Medical Supplies */ 
+		/** 
+		 * Category > Medical Supplies 
+		 */ 
 		Category CATEGORY_MED_SUPPLIES_LAB = new Category(parent: CATEGORY_MEDICAL_SUPPLIES, name: "Lab").save();
 		Category CATEGORY_MED_SUPPLIES_SURGICAL = new Category(parent: CATEGORY_MEDICAL_SUPPLIES, name: "Surgical").save();
 		Category CATEGORY_MED_SUPPLIES_XRAY = new Category(parent: CATEGORY_MEDICAL_SUPPLIES, name: "X-Ray").save();
 		Category CATEGORY_MED_SUPPLIES_DENTAL = new Category(parent: CATEGORY_MEDICAL_SUPPLIES, name: "Dental").save();
 		Category CATEGORY_MED_SUPPLIES_OTHER = new Category(parent: CATEGORY_MEDICAL_SUPPLIES, name: "Other").save();		
 		
-		/* Condition Type */
+		/** 
+		 * Condition Type 
+		 */
 		ConditionType CONDITION_AIDS_HIV = new ConditionType(name: "HIV/AIDS").save();
 		ConditionType CONDITION_CANCER = new ConditionType(name: "Cancer").save();
 		ConditionType CONDITION_DIARRHEA = new ConditionType(name: "Diarrhea").save();
@@ -123,7 +142,9 @@ class BootStrap {
 		
 		
 		
-		/* Generic Type */
+		/**
+		 * Generic Type 
+		 */
 		GenericType GENERIC_LAPTOP = new GenericType(name: "Laptop").save();
 		GenericType GENERIC_GLOVE = new GenericType(name: "Glove").save();
 		GenericType GENERIC_GUAZE = new GenericType(name: "Guaze").save();
@@ -219,22 +240,28 @@ class BootStrap {
 		DrugRouteType DRUG_ROUTE_SUBLINGUAL = new DrugRouteType(name: "Sublingual").save();
 			
 		/* Shipment Container Type */
-		ContainerType PALLET = new ContainerType(name:"Pallet").save();
-		ContainerType SUITCASE = new ContainerType(name:"Suitcase").save();
-		ContainerType LARGE_BOX = new ContainerType(name:"Large Box").save();
-		ContainerType MEDIUM_BOX = new ContainerType(name:"Medium Box").save();
-		ContainerType SMALL_BOX = new ContainerType(name:"Small Box").save();
-		ContainerType TRUNK = new ContainerType(name:"Trunk").save();
-		ContainerType ITEM = new ContainerType(name:"Single Item").save();
-		ContainerType CONTAINER = new ContainerType(name:"Container").save();
+		ContainerType CONTAINER_CONTAINER = new ContainerType(name:"Container").save();
+		ContainerType CONTAINER_PALLET = new ContainerType(name:"Pallet").save();
+		ContainerType CONTAINER_SUITCASE = new ContainerType(name:"Suitcase").save();
+		ContainerType CONTAINER_BOX = new ContainerType(name:"Box").save();
+		ContainerType CONTAINER_TRUNK = new ContainerType(name:"Trunk").save();
+		ContainerType CONTAINER_ITEM = new ContainerType(name:"Item").save();
 		ContainerType CONTAINER_OTHER = new ContainerType(name:"Other").save();
 				
 		/* Shipment Status */	 	
-		ShipmentStatus SHIPMENT_NOT_SHIPPED = new ShipmentStatus(name:"Not shipped", description: "Has not shipped yet", finalStatus:false).save();
-		ShipmentStatus SHIPMENT_IN_TRANSIT = new ShipmentStatus(name:"In transit", description: "In transit to destination", finalStatus:false).save();
-		ShipmentStatus SHIPMENT_IN_CUSTOMS = new ShipmentStatus(name:"In customs", description: "Being inspected by customer", finalStatus:false).save();
-		ShipmentStatus SHIPMENT_DELIVERED = new ShipmentStatus(name:"Delivered", description: "Delivered to destination", finalStatus:true).save();	
-		ShipmentStatus SHIPMENT_CONFIRMED = new ShipmentStatus(name:"Confirmed", description: "Delivered to destination", finalStatus:true).save();	
+		ShipmentStatus SHIPMENT_STATUS_OPEN = new ShipmentStatus(name:"New", color: "red", description: "Order is being processed", finalStatus:false, sortOrder: 1).save();
+		//ShipmentStatus SHIPMENT_STATUS_PICKED = new ShipmentStatus(name:"Picked", description: "Items have been picked from warehouse.  Items have not not shipped yet", finalStatus:false, sortOrder: 2).save();
+		//ShipmentStatus SHIPMENT_STATUS_PACKED = new ShipmentStatus(name:"Packed", description: "Items have been packed and staged.  Items have not shipped yet", finalStatus:false, sortOrder: 3).save();
+		//ShipmentStatus SHIPMENT_STATUS_LOADED = new ShipmentStatus(name:"Loaded", description: "Items have been loaded onto truck.  Items have not shipped yet.", finalStatus:false, sortOrder: 4).save();
+		ShipmentStatus SHIPMENT_STATUS_READY = new ShipmentStatus(name:"Ready", color: "green", description: "Items are ready to be shipped.", finalStatus:false, sortOrder: 5).save();
+		ShipmentStatus SHIPMENT_STATUS_SHIPPED = new ShipmentStatus(name:"Shipped", color: "green", description: "Items have been shipped from the warehouse.", finalStatus:false, sortOrder: 6).save();
+		ShipmentStatus SHIPMENT_STATUS_IN_TRANSIT = new ShipmentStatus(name:"In transit", color: "green", description: "In transit to destination.", finalStatus:false, sortOrder: 7).save();
+		//ShipmentStatus SHIPMENT_STATUS_IN_CUSTOMS = new ShipmentStatus(name:"In customs", description: "Going through customs inspection", finalStatus:false, sortOrder: 8).save();
+		ShipmentStatus SHIPMENT_STATUS_RETURNED = new ShipmentStatus(name:"Returned", color: "red", description: "Items returned by recipient.", finalStatus:false, sortOrder: 9).save();
+		ShipmentStatus SHIPMENT_STATUS_ARRIVED = new ShipmentStatus(name:"Arrived", color: "green", description: "Awaiting confirmation from recipient.", finalStatus:true, sortOrder: 10).save();	
+		ShipmentStatus SHIPMENT_STATUS_DELIVERED = new ShipmentStatus(name:"Delivered", color: "#AAA", description: "Received confirmation from recipient.", finalStatus:true, sortOrder: 11).save();	
+		//ShipmentStatus SHIPMENT_STATUS_COMPLETED = new ShipmentStatus(name:"Completed", description: "Received confirmation from recipient.  Items safely delivered to destination", finalStatus:true, sortOrder: 12).save();
+		
 		
 		/* Inventory Status */
 		//InventoryStatus IN_STOCK = new InventoryStatus()
@@ -270,46 +297,50 @@ class BootStrap {
 		ReferenceNumberType REFERENCE_BILL_OF_LADING_NUMBER = new ReferenceNumberType(name: "Bill of Lading Number", description: "Bill of Lading Number").save();
 		
 
-		SupplierType SUPPLIER_LOCAL = new SupplierType(name: "LOCAL", description: "Local supplier").save();
-		SupplierType SUPPLIER_INTERNATIONAL = new SupplierType(name: "INTERNATIONAL", description: "International supplier").save();
-		SupplierType SUPPLIER_NATIONAL = new SupplierType(name: "NATIONAL", description: "National supplier").save();
+		/**
+		 * Supplier type 
+		 */
+		SupplierType SUPPLIER_LOCAL = new SupplierType(name: "Local", description: "Local supplier").save();
+		SupplierType SUPPLIER_INTERNATIONAL = new SupplierType(name: "International", description: "International supplier").save();
+		SupplierType SUPPLIER_NATIONAL = new SupplierType(name: "National", description: "National supplier").save();
 		SupplierType SUPPLIER_OEM = new SupplierType(name: "OEM", description: "Original equipment manufacturer").save();
-		SupplierType SUPPLIER_OTHER = new SupplierType(name: "OTHER", description: "Other").save();
+		SupplierType SUPPLIER_OTHER = new SupplierType(name: "Other", description: "Other").save();
 		
 		/** 
 		 * Shipment methods 
 		 */	
-		ShipmentMethod FEDEX_AIR = new ShipmentMethod(	 		
-			name:"FedEx Air",
-			methodName:"fedex", 			
-			trackingNumberFormat:"999999999999", 
-			trackingUrl:"http://www.fedex.com/Tracking?ascend_header=1&clienttype=dotcom&cntry_code=us&language=english&tracknumbers=%s",
-			trackingUrlParameterName:"").save();
+		//trackingUrl:"",
 		
-		ShipmentMethod FEDEX_GROUND = new ShipmentMethod(	 		
-			name:"FedEx Ground",
-			methodName:"fedex", 			
-			trackingNumberFormat:"999999999999", 
-			trackingUrl:"http://www.fedex.com/Tracking?ascend_header=1&clienttype=dotcom&cntry_code=us&language=english&tracknumbers=%s",
-			trackingUrlParameterName:"").save();
+		ShipmentMethod SHIPMENT_METHOD_FEDEX_AIR = new ShipmentMethod(name:"FedEx Air", methodName:"fedex", trackingFormat:"999999999999", trackingUrl:"http://www.fedex.com/Tracking?ascend_header=1&clienttype=dotcom&cntry_code=us&language=english&tracknumbers=%s", parameterName:"").save();		
+		ShipmentMethod SHIPMENT_METHOD_FEDEX_GROUND = new ShipmentMethod(name:"FedEx Ground", methodName:"fedex", trackingFormat:"999999999999", trackingUrl:"http://www.fedex.com/Tracking?ascend_header=1&clienttype=dotcom&cntry_code=us&language=english&tracknumbers=%s", parameterName:"").save();		
+		ShipmentMethod SHIPMENT_METHOD_UPS_GROUND = new ShipmentMethod(name:"UPS Ground", methodName:"ups", trackingFormat:"1Z9999W99999999999", trackingUrl:"http://wwwapps.ups.com/WebTracking/processInputRequest?sort_by=status&tracknums_displayed=1&TypeOfInquiryNumber=T&loc=en_US&InquiryNumber1=%s&track.x=0&track.y=0", parameterName:"").save();		
+		ShipmentMethod SHIPMENT_METHOD_USPS_GROUND = new ShipmentMethod(name:"USPS Ground", methodName:"usps", trackingFormat:"", trackingUrl:"http://www.google.com/search?hl=en&site=&q=", parameterName:"q").save();
+		ShipmentMethod SHIPMENT_METHOD_COURIER = new ShipmentMethod(name:"Courier", methodName:"courier", format:"").save();
+				
+		/** 
+		 * Shipment type
+		 */
+		ShipmentType SHIPMENT_AIR = new ShipmentType(name: "Air", sortOrder: 1).save(flush:true);
+		ShipmentType SHIPMENT_SEA = new ShipmentType(name: "Sea", sortOrder: 2).save(flush:true);
+		ShipmentType SHIPMENT_DOMESTIC = new ShipmentType(name: "Domestic", sortOrder: 3).save(flush:true);
+		ShipmentType SHIPMENT_SUITCASE = new ShipmentType(name: "Suitcase", sortOrder: 4).save(flush:true);
+		ShipmentType SHIPMENT_OTHER = new ShipmentType(name: "Other", sortOrder: 5).save(flush:true);
 		
-		ShipmentMethod UPS_GROUND = new ShipmentMethod(
-			name:"UPS Ground", 
-			methodName:"ups",
-			trackingNumberFormat:"1Z9999W99999999999", 
-			trackingUrl:"http://wwwapps.ups.com/WebTracking/processInputRequest?sort_by=status&tracknums_displayed=1&TypeOfInquiryNumber=T&loc=en_US&InquiryNumber1=%s&track.x=0&track.y=0",
-			trackingUrlParameterName:"").save();
+		SHIPMENT_AIR.addToContainerTypes(CONTAINER_BOX).save();
+		SHIPMENT_AIR.addToContainerTypes(CONTAINER_PALLET).save();
+		SHIPMENT_AIR.addToContainerTypes(CONTAINER_SUITCASE).save();
+		SHIPMENT_AIR.addToContainerTypes(CONTAINER_OTHER).save();
 		
-		ShipmentMethod USPS_GROUND = new ShipmentMethod(
-			name:"USPS Ground", 
-			methodName:"usps",
-			trackingNumberFormat:"", 
-			trackingUrl:"", 
-			trackingUrlParameterName:"").save();
+		SHIPMENT_DOMESTIC.addToContainerTypes(CONTAINER_BOX).save();
+		SHIPMENT_DOMESTIC.addToContainerTypes(CONTAINER_PALLET).save();
+		SHIPMENT_DOMESTIC.addToContainerTypes(CONTAINER_SUITCASE).save();
+		SHIPMENT_DOMESTIC.addToContainerTypes(CONTAINER_TRUNK).save();
+		SHIPMENT_DOMESTIC.addToContainerTypes(CONTAINER_OTHER).save();
 		
-		ShipmentMethod COURIER = new ShipmentMethod(name:"Courier", methodName:"courier"
-			//trackingUrl:"http://www.google.com/search?hl=en&site=&q=",
-			).save();
+		SHIPMENT_SEA.addToContainerTypes(CONTAINER_BOX).save();
+		SHIPMENT_SEA.addToContainerTypes(CONTAINER_CONTAINER).save();
+		
+		SHIPMENT_SUITCASE.addToContainerTypes(CONTAINER_ITEM).save();
 		
 		/** 
 		 * Transaction types 
@@ -321,29 +352,9 @@ class BootStrap {
 		/** 
 		 * Users 
 		 */		
-		User supervisor = new User(
-			email:"supervisor@pih.org", 
-			firstName:"Miss", 
-			lastName:"Supervisor",
-			role:"Supervisor", 
-			username:"super", 
-			password: "password").save();
-		User manager = new User(
-			email:"manager@pih.org", 
-			firstName:"Mister", 
-			lastName:"Manager",
-			role:"Manager", 
-			username:"manager", 
-			password: "password",
-			manager: supervisor).save();
-		User jmiranda = new User(
-			email:"jmiranda@pih.org", 
-			firstName:"Justin", 
-			lastName:"Miranda",
-			role:"Stocker", 
-			username:"jmiranda", 
-			password: "password",
-			manager: manager).save();
+		User supervisor = new User(email:"supervisor@pih.org", firstName:"Miss", lastName:"Supervisor", role:"Supervisor", username:"super", password: "password").save();
+		User manager = new User(email:"manager@pih.org", firstName:"Mister", lastName:"Manager", role:"Manager", username:"manager", password: "password", manager: supervisor).save();		
+		User jmiranda = new User(email:"jmiranda@pih.org", firstName:"Justin", lastName:"Miranda", role:"Stocker", username:"jmiranda", password: "password", manager: manager).save();
 		
 		/**
 		 * Products > Attributes
@@ -354,23 +365,23 @@ class BootStrap {
 		/**
 		 * Products > Pain Medications
 		 */
-		Product advil = new DrugProduct(ean:"AD00001VIL", productCode:"00001", name:"Advil 200mg", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER).save(flush:true);
+		Product advil = new DrugProduct(ean:"AD00001VIL", productCode:"00001", name:"Advil 200mg", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER, weight: 1.6).save(flush:true);
 		advil.addToConditionTypes(CONDITION_PAIN).save(flush:true);		
 		advil.addToProductAttributeValues(productVitality).save(flush:true);
 		advil.addToCategories(CATEGORY_MEDICINES).save(flush:true);
 		advil.addToCategories(CATEGORY_MEDICINES_PAIN).save(flush:true);
 
-		Product tylenol = new DrugProduct(ean:"TY00006LENOL",productCode:"00006", name: "Tylenol 325mg", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER).save(flush:true);		
+		Product tylenol = new DrugProduct(ean:"TY00006LENOL",productCode:"00006", name: "Tylenol 325mg", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER, weight: 1.1).save(flush:true);		
 		tylenol.addToConditionTypes(CONDITION_PAIN).save(flush:true);
 		tylenol.addToCategories(CATEGORY_MEDICINES).save(flush:true);
 		tylenol.addToCategories(CATEGORY_MEDICINES_PAIN).save(flush:true);
 		
-		Product aspirin = new DrugProduct(ean:"AS00007PIRIN",productCode:"00007", name: "Aspirin 20mg", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER).save(flush:true);
+		Product aspirin = new DrugProduct(ean:"AS00007PIRIN",productCode:"00007", name: "Aspirin 20mg", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER, weight: 1.2).save(flush:true);
 		aspirin.addToConditionTypes(CONDITION_PAIN).save(flush:true);
 		aspirin.addToCategories(CATEGORY_MEDICINES);
 		aspirin.addToCategories(CATEGORY_MEDICINES_PAIN);
 		
-		Product generic = new DrugProduct(ean:"GENERAL00008PAIN", productCode:"00008", name: "General Pain Reliever", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER).save(flush:true)
+		Product generic = new DrugProduct(ean:"GENERAL00008PAIN", productCode:"00008", name: "General Pain Reliever", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER, weight: 1.3).save(flush:true)
 		generic.addToConditionTypes(CONDITION_PAIN).save(flush:true);
 		generic.addToCategories(CATEGORY_MEDICINES);
 		generic.addToCategories(CATEGORY_MEDICINES_PAIN);
@@ -445,18 +456,19 @@ class BootStrap {
 		/** 
 		 * Food products 
 		 */
-		Product similacAdvanceLowIron = new ConsumableProduct(name: "Similac Advance low iron 400g").save(flush:true);
+		Product similacAdvanceLowIron = new ConsumableProduct(name: "Similac Advance low iron 400g", weight: 12.0).save(flush:true);
 		similacAdvanceLowIron.addToCategories(CATEGORY_FOOD).save(flush:true);
 				
-		Product similacAdvancePlusIron = new ConsumableProduct(name: "Similac Advance + iron 365g").save(flush:true);		
+		Product similacAdvancePlusIron = new ConsumableProduct(name: "Similac Advance + iron 365g", weight: 10.0).save(flush:true);		
 		similacAdvancePlusIron.addToCategories(CATEGORY_FOOD).save(flush:true);
 		
 		/** 
 		 * Addresses 
 		 */
-		Address address1 = new Address(address: "888 Commonwealth Avenue",address2: "Third Floor",city:"Boston",stateOrProvince:"Massachusetts",postalCode: "02215",country: "United States").save(flush:true)
-		Address address2 = new Address(address: "1000 State Street",address2: "Building A",city: "Miami",stateOrProvince: "Florida",postalCode: "33126",country: "United States").save(flush:true);
+		Address address1 = new Address(address: "888 Commonwealth Avenue",address2: "Third Floor",city:"Boston",stateOrProvince:"MA",postalCode: "02215",country: "United States").save(flush:true)
+		Address address2 = new Address(address: "1000 State Street",address2: "Building A",city: "Miami",stateOrProvince: "FL",postalCode: "33126",country: "United States").save(flush:true);
 		Address address3 = new Address(address: "12345 Main Street", address2: "Suite 401", city: "Tabarre", stateOrProvince: "", postalCode: "", country: "Haiti").save(flush:true);
+		Address address4 = new Address(address: "2482 Massachusetts Ave", address2: "", city: "Boston", stateOrProvince: "MA", postalCode: "02215", country: "United Status").save(flush:true);
 		
 		/** 
 		 * Warehouses 
@@ -464,87 +476,116 @@ class BootStrap {
 		Warehouse boston = new Warehouse(name: "Boston Headquarters", address: address1, manager: manager).save(flush:true);		
 		Warehouse miami = new Warehouse(name: "Miami Warehouse", address: address2, manager: manager).save(flush:true);
 		Warehouse tabarre = new Warehouse(name: "Tabarre Depot", address: address3, manager: manager).save(flush:true);
+		Warehouse acme = new Warehouse(name: "ACME Supply Company", address: address4, manager: manager).save(flush:true);
 		
 		/** 
-		 * Warehouse > Inventory > Inventory items 
+		 * Inventories
 		 */		
-		InventoryItem inventoryItem1 = new InventoryItem(product: advil, quantity: 100, reorderQuantity: 50, idealQuantity: 100, binLocation: "Warehouse Bin A1").save(flush:true);
-		InventoryItem inventoryItem2 = new InventoryItem(product: tylenol, quantity: 200, reorderQuantity: 50, idealQuantity: 100, binLocation: "Warehouse Bin A1").save(flush:true);		
-
 		Inventory tabarreInventory = new Inventory(warehouse:tabarre, lastInventoryDate: new Date()).save(flush:true);		
+		InventoryItem inventoryItem1 = new InventoryItem(product: advil, quantity: 100, reorderQuantity: 50, idealQuantity: 100, binLocation: "Warehouse Bin A1").save(flush:true);
+		InventoryItem inventoryItem2 = new InventoryItem(product: tylenol, quantity: 200, reorderQuantity: 50, idealQuantity: 100, binLocation: "Warehouse Bin A1").save(flush:true);
 		tabarreInventory.addToInventoryItems(inventoryItem1).save(flush:true, validate:false);
 		tabarreInventory.addToInventoryItems(inventoryItem2).save(flush:true, validate:false);
 		
 		/** 
-		 * Warehouse > Transactions > Transaction Entries 
-		 */
-		
+		 * Transactions
+		 */		
 		Transaction transaction1 = new Transaction(transactionDate:new Date(), targetWarehouse:tabarre, transactionType:TRANSACTION_INCOMING); // removed .save(flush:true);
-		tabarre.addToTransactions(transaction1).save();
-		
 		TransactionEntry transactionEntry1 = new TransactionEntry(product: advil, quantityChange:50, confirmDate:new Date());
+		tabarre.addToTransactions(transaction1).save();
 		transaction1.addToTransactionEntries(transactionEntry1).save(flush:true, validate:false);
 		
-		/* Create a new shipment */		
-		Shipment shipment1 = new Shipment(name: "New Shipment 1", description: "Contains boxes of stuff",				
-			shipmentStatus: SHIPMENT_NOT_SHIPPED, shipmentMethod: UPS_GROUND, trackingNumber: "1Z9999W99999999999",
+		/** 
+		 * Shipments 
+		 */		
+		Shipment shipment1 = new Shipment(name: "Sample Shipment 1", 				
+			shipmentStatus: SHIPMENT_STATUS_DELIVERED, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999",
 			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-01"), origin : boston,
-			expectedDeliveryDate : Date.parse("yyyy-MM-dd", "2010-06-05"), destination : miami).save(flush:true);	
+			expectedDeliveryDate : Date.parse("yyyy-MM-dd", "2010-06-05"), destination : tabarre).save(flush:true);	
 
-		Shipment shipment2 = new Shipment(name: "New Shipment 2", description: "Contains boxes of stuff",				
-			shipmentStatus: SHIPMENT_NOT_SHIPPED, shipmentMethod: UPS_GROUND, trackingNumber: "1Z9999W99999999999",
+		Shipment shipment2 = new Shipment(name: "Sample Shipment 2",
+			shipmentStatus: SHIPMENT_STATUS_DELIVERED, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999",
+			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-02"), origin : boston,
+			expectedDeliveryDate : Date.parse("yyyy-MM-dd", "2010-06-03"), destination : miami).save(flush:true);
+
+		Shipment shipment3 = new Shipment(name: "Sample Shipment 3",
+			shipmentStatus: SHIPMENT_STATUS_DELIVERED, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999",
+			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-01"), origin : boston,
+			expectedDeliveryDate : Date.parse("yyyy-MM-dd", "2010-06-05"), destination : tabarre).save(flush:true);
+
+		Shipment shipment4 = new Shipment(name: "Sample Shipment 4",
+			shipmentStatus: SHIPMENT_STATUS_RETURNED, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999",
+			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-01"), origin : miami,
+			expectedDeliveryDate : Date.parse("yyyy-MM-dd", "2010-06-05"), destination : tabarre).save(flush:true);
+
+		Shipment shipment5 = new Shipment(name: "Sample Shipment 5", 				
+			shipmentStatus: SHIPMENT_STATUS_DELIVERED, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999",
 			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-05"), origin : miami,
-			expectedDeliveryDate : null, destination : tabarre).save(flush:true);	
+			expectedDeliveryDate : Date.parse("yyyy-MM-dd", "2010-06-07"), destination : tabarre).save(flush:true);	
 		
-		Shipment shipment3 = new Shipment(name: "New Shipment 3", description: "Contains boxes of stuff",				
-			shipmentStatus: SHIPMENT_NOT_SHIPPED, shipmentMethod: UPS_GROUND, trackingNumber: "1Z9999W99999999999", 
-			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-05"), origin : miami, 
+		Shipment shipment6 = new Shipment(name: "Sample Shipment 6", 				
+			shipmentStatus: SHIPMENT_STATUS_READY, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999", 
+			expectedShippingDate : new Date(), origin : miami, 
 			expectedDeliveryDate : null, destination : boston).save(flush:true);	
+
+		Shipment shipment7 = new Shipment(name: "Sample Shipment 7",
+			shipmentStatus: SHIPMENT_STATUS_READY, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999",
+			expectedShippingDate : new Date(), origin : boston,
+			expectedDeliveryDate : null, destination : tabarre).save(flush:true);
+
+		Shipment shipment8 = new Shipment(name: "Sample Shipment 8", 
+			shipmentStatus: SHIPMENT_STATUS_OPEN, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999",
+			expectedShippingDate : new Date(), origin : miami,
+			expectedDeliveryDate : null, destination : boston).save(flush:true);
+
+		Shipment shipment9 = new Shipment(name: "Sample Shipment 9",
+			shipmentStatus: SHIPMENT_STATUS_OPEN, shipmentMethod: SHIPMENT_METHOD_FEDEX_GROUND, trackingNumber: "1Z9999W99999999999",
+			expectedShippingDate : new Date(), origin : miami,
+			expectedDeliveryDate : null, destination : boston).save(flush:true);
+
+		Shipment shipment10 = new Shipment(name: "Sample Shipment 10",
+			shipmentStatus: SHIPMENT_STATUS_OPEN, shipmentMethod: SHIPMENT_METHOD_USPS_GROUND, trackingNumber: "1Z9999W99999999999",
+			expectedShippingDate : new Date(), origin : miami,
+			expectedDeliveryDate : null, destination : boston).save(flush:true);
+
 		
+						
+		/**
+		 * Shipment dependencies 
+		 */		
 		Comment comment1 = new Comment(comment: "We need to ship this as soon as possible!", commenter: jmiranda, recipient: jmiranda, sendDate: new Date()).save(flush:true);
-		shipment1.addToComments(comment1).save(flush:true);
-
 		Comment comment2 = new Comment(comment: "Did you ship this yet?!?!?!?", commenter: manager, recipient: jmiranda, sendDate: new Date()).save(flush:true);
-		shipment2.addToComments(comment1).save(flush:true);
-
 		Comment comment3 = new Comment(comment: "What is taking so long?", commenter: supervisor, recipient: jmiranda, sendDate: new Date()).save(flush:true);
-		shipment3.addToComments(comment1).save(flush:true);
-
-		
 		ShipmentEvent event1 = new ShipmentEvent(eventType:EVENT_ORDER_RECEIVED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-25 14:00:00"), eventLocation: boston)
 		ShipmentEvent event2 = new ShipmentEvent(eventType:EVENT_ORDER_PICKED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-25 15:30:00"), eventLocation: boston)
 		ShipmentEvent event3 = new ShipmentEvent(eventType:EVENT_SHIPMENT_PACKED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-25 17:45:00"), eventLocation: boston)
 		ShipmentEvent event4 = new ShipmentEvent(eventType:EVENT_SHIPMENT_LOADED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-26 09:00:00"), eventLocation: boston)
-		ShipmentEvent event5 = new ShipmentEvent(eventType:EVENT_SHIPMENT_SENT, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-26 11:00:00"), eventLocation: boston, targetLocation: miami)
+		ShipmentEvent event5 = new ShipmentEvent(eventType:EVENT_SHIPMENT_SENT, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-26 11:00:00"), eventLocation: boston, targetLocation: miami)		
+		Document document1 = new Document(filename: "packing-list.pdf", documentType: DOCUMENT_PACKING_LIST, size: 1020L, contents: "empty")		
+		Document document2 = new Document(filename: "invoice.pdf", documentType: DOCUMENT_COMMERCIAL_INVOICE, size: 990L, contents: "empty") 
+		Container pallet1 = new Container(name: "Pallet #1", containerType: CONTAINER_PALLET, weight: 1000, units: "kgs");
+		ShipmentItem shipmentItem1 = new ShipmentItem(product : advil, quantity : 100, packageType: CONTAINER_BOX);
+		ShipmentItem shipmentItem2 = new ShipmentItem(product : tylenol, quantity : 200, packageType: CONTAINER_BOX);
+		ShipmentItem shipmentItem3 = new ShipmentItem(product : aspirin, quantity : 300, packageType: CONTAINER_BOX);
+
+		shipment1.addToComments(comment1).save(flush:true);
+		shipment2.addToComments(comment1).save(flush:true);
+		shipment3.addToComments(comment1).save(flush:true);
 		
+		shipment1.addToDocuments(document1).save(flush:true);		
+		shipment1.addToDocuments(document2).save(flush:true);
+		shipment1.addToContainers(pallet1).save(flush:true);
 		shipment1.addToEvents(event1).save(flush:true);
 		shipment1.addToEvents(event2).save(flush:true);
 		shipment1.addToEvents(event3).save(flush:true);
 		shipment1.addToEvents(event4).save(flush:true);
-		shipment1.addToEvents(event5).save(flush:true);
-		
+		shipment1.addToEvents(event5).save(flush:true);		
 		shipment1.addToReferenceNumbers(new ReferenceNumber(identifier:"0002492910", referenceNumberType:REFERENCE_PO_NUMBER)).save(flush:true)
 		shipment1.addToReferenceNumbers(new ReferenceNumber(identifier:"0000000001", referenceNumberType:REFERENCE_INTERNAL_IDENTIFIER)).save(flush:true)
-		
-		Document document1 = new Document(filename: "shipment-packing-list.pdf", documentType: DOCUMENT_PACKING_LIST, size: 1020L, contents: "empty")
-		shipment1.addToDocuments(document1).save(flush:true);		
-		
-		Document document2 = new Document(filename: "shipment-invoice.pdf", documentType: DOCUMENT_COMMERCIAL_INVOICE, size: 990L, contents: "empty") 
-		shipment1.addToDocuments(document2).save(flush:true);
-		
-		Container pallet1 = new Container(name: "Pallet #1", containerType: PALLET, weight: 1000, units: "kgs");
-		shipment1.addToContainers(pallet1).save(flush:true);
-				
-		ShipmentItem shipmentItem1 = new ShipmentItem(product : advil, quantity : 100, packageType: LARGE_BOX);
 		pallet1.addToShipmentItems(shipmentItem1).save(flush:true);
-		
-		ShipmentItem shipmentItem2 = new ShipmentItem(product : tylenol, quantity : 200, packageType: LARGE_BOX);
 		pallet1.addToShipmentItems(shipmentItem2).save(flush:true);
-		
-		ShipmentItem shipmentItem3 = new ShipmentItem(product : aspirin, quantity : 300, packageType: LARGE_BOX);
 		pallet1.addToShipmentItems(shipmentItem3).save(flush:true);
-		
-		
+				
 		def destroy = {
 			
 		}
