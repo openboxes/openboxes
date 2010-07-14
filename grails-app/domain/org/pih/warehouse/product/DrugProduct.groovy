@@ -28,7 +28,7 @@ class DrugProduct extends ConsumableProduct {
     String dosageRegimen	// e.g. "Take two capsules by mouth daily"
     String drugClass 		// should be a separate object (and needs to be very expressive)
 
-    PackageType packageType			// e.g. bottle, vial
+    //PackageType packageType			// e.g. bottle, vial
     DrugRouteType drugRouteType		// route of administration (oral, rectal, etc)
     DrugClass majorDrugClass 		// replaces drug class string above
     
@@ -41,7 +41,7 @@ class DrugProduct extends ConsumableProduct {
     	dosageForm(nullable:true)
     	dosageRegimen(nullable:true)
     	drugClass(nullable:true)
-    	packageType(nullable:true)
+    	//packageType(nullable:true)
     	drugRouteType(nullable:true)
     	majorDrugClass(nullable:true)
     }

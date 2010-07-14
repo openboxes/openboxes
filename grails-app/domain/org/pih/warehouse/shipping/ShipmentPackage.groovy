@@ -8,12 +8,11 @@ class ShipmentPackage implements Comparable {
 
 	String name
 	Boolean status = true		// open (true) or closed (false)	
-	String unitNumber
 	String dimensions			// could be its own class, but we don't care right now
 	Float weight	
 	String units				// should probably be a class on its own
 	
-	ContainerType containerType
+	ContainerType packageType
 	SortedSet shipmentItems
 	
 	static hasMany = [ shipmentItems : ShipmentItem ];
@@ -22,12 +21,10 @@ class ShipmentPackage implements Comparable {
 	// Constraints
 	static constraints = {	 
 		name(nullable:true)
-		unitNumber(nullable:true)
 		dimensions(nullable:true)
 		weight(nullable:true)
 		units(nullable:true)
-		containerType(nullable:true)
-		//shipment(nullable:true)
+		packageType(nullable:true)
 		shipmentItems(nullable:true)		
 	}
 	

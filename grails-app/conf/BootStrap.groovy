@@ -1,43 +1,43 @@
 import java.util.Date;
 import org.pih.warehouse.core.Address;
-import org.pih.warehouse.product.Attribute;
-import org.pih.warehouse.shipping.Document;
-import org.pih.warehouse.product.Category;
 import org.pih.warehouse.core.Country;
-import org.pih.warehouse.shipping.Comment;
-import org.pih.warehouse.shipping.Container;
-import org.pih.warehouse.shipping.ContainerType;
+import org.pih.warehouse.core.Organization;
+import org.pih.warehouse.inventory.Inventory;
+import org.pih.warehouse.inventory.InventoryItem;
+import org.pih.warehouse.inventory.Transaction;
+import org.pih.warehouse.inventory.TransactionEntry;
+import org.pih.warehouse.inventory.TransactionType;
+import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.product.Attribute;
+import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.ConditionType;
 import org.pih.warehouse.product.ConsumableProduct;
 import org.pih.warehouse.product.DrugProduct;
 import org.pih.warehouse.product.DrugRouteType;
 import org.pih.warehouse.product.DrugProduct;
 import org.pih.warehouse.product.DrugRouteType;
-import org.pih.warehouse.shipping.DocumentType;
-import org.pih.warehouse.shipping.EventType;
 import org.pih.warehouse.product.GenericType;
-import org.pih.warehouse.core.Organization;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.ProductAttributeValue;
 import org.pih.warehouse.product.ProductType;
+import org.pih.warehouse.shipping.Comment;
+import org.pih.warehouse.shipping.Container;
+import org.pih.warehouse.shipping.ContainerType;
+import org.pih.warehouse.shipping.Document;
+import org.pih.warehouse.shipping.DocumentType;
+import org.pih.warehouse.shipping.EventType;
 import org.pih.warehouse.shipping.ReferenceNumberType;
 import org.pih.warehouse.shipping.ReferenceNumber;
 import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.shipping.ShipmentEvent;
 import org.pih.warehouse.shipping.ShipmentItem;
+import org.pih.warehouse.shipping.ShipmentPackage;
 import org.pih.warehouse.shipping.ShipmentType;
 import org.pih.warehouse.shipping.ShipmentMethod;
 import org.pih.warehouse.shipping.ShipmentStatus;
 import org.pih.warehouse.supplier.SupplierType;
-import org.pih.warehouse.inventory.Transaction;
-import org.pih.warehouse.inventory.TransactionEntry;
-import org.pih.warehouse.inventory.TransactionType;
 import org.pih.warehouse.user.User;
 import org.pih.warehouse.product.Value;
-import org.pih.warehouse.inventory.Warehouse;
-
-import org.pih.warehouse.inventory.Inventory;
-import org.pih.warehouse.inventory.InventoryItem;
 
 class BootStrap {
 	
@@ -563,7 +563,7 @@ class BootStrap {
 		ShipmentEvent event5 = new ShipmentEvent(eventType:EVENT_SHIPMENT_SENT, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-26 11:00:00"), eventLocation: boston, targetLocation: miami)		
 		Document document1 = new Document(filename: "packing-list.pdf", documentType: DOCUMENT_PACKING_LIST, size: 1020L, contents: "empty")		
 		Document document2 = new Document(filename: "invoice.pdf", documentType: DOCUMENT_COMMERCIAL_INVOICE, size: 990L, contents: "empty") 
-		Container pallet1 = new Container(name: "Pallet #1", containerType: CONTAINER_PALLET, weight: 1000, units: "kgs");
+		ShipmentPackage pallet1 = new ShipmentPackage(name: "Pallet #1", packageType: CONTAINER_PALLET, weight: 1000, units: "kgs");
 		ShipmentItem shipmentItem1 = new ShipmentItem(product : advil, quantity : 100, packageType: CONTAINER_BOX);
 		ShipmentItem shipmentItem2 = new ShipmentItem(product : tylenol, quantity : 200, packageType: CONTAINER_BOX);
 		ShipmentItem shipmentItem3 = new ShipmentItem(product : aspirin, quantity : 300, packageType: CONTAINER_BOX);
@@ -574,7 +574,7 @@ class BootStrap {
 		
 		shipment1.addToDocuments(document1).save(flush:true);		
 		shipment1.addToDocuments(document2).save(flush:true);
-		shipment1.addToContainers(pallet1).save(flush:true);
+		shipment1.addToPackages(pallet1).save(flush:true);
 		shipment1.addToEvents(event1).save(flush:true);
 		shipment1.addToEvents(event2).save(flush:true);
 		shipment1.addToEvents(event3).save(flush:true);
