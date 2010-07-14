@@ -1,5 +1,5 @@
 
-<%@ page import="org.pih.warehouse.Warehouse" %>
+<%@ page import="org.pih.warehouse.inventory.Warehouse" %>
 <g:form controller="auth" action="doLogin" method="post">		  
     <div class="dialog">
 		<g:if test="${flash.message}">

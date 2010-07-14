@@ -1,5 +1,5 @@
 
-<%@ page import="org.pih.warehouse.StockCard" %>
+<%@ page import="org.pih.warehouse.inventory.StockCard" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />

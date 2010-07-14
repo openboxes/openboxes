@@ -1,6 +1,6 @@
 
-<%@ page import="org.pih.warehouse.Product" %>
-<%@ page import="org.pih.warehouse.ConditionType" %>
+<%@ page import="org.pih.warehouse.product.Product" %>
+<%@ page import="org.pih.warehouse.product.ConditionType" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />

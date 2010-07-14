@@ -1,5 +1,5 @@
-<%@ page import="org.pih.warehouse.Category" %>
-<%@ page import="org.pih.warehouse.Tag" %>
+<%@ page import="org.pih.warehouse.product.Category" %>
+<%@ page import="org.pih.warehouse.product.Tag" %>
 <%@ page import="org.pih.warehouse.order.catalog.CatalogItem" %>
 <html>
 <head>

@@ -1,14 +1,14 @@
 
-<%@ page import="org.pih.warehouse.ContainerType" %>
-<%@ page import="org.pih.warehouse.Document" %>
-<%@ page import="org.pih.warehouse.DocumentType" %>
-<%@ page import="org.pih.warehouse.EventType" %>
-<%@ page import="org.pih.warehouse.Location" %>
-<%@ page import="org.pih.warehouse.Organization" %>
-<%@ page import="org.pih.warehouse.Product" %>
-<%@ page import="org.pih.warehouse.ReferenceNumberType" %>
-<%@ page import="org.pih.warehouse.Shipment" %>
-<%@ page import="org.pih.warehouse.User" %>
+<%@ page import="org.pih.warehouse.shipping.ContainerType" %>
+<%@ page import="org.pih.warehouse.shipping.Document" %>
+<%@ page import="org.pih.warehouse.shipping.DocumentType" %>
+<%@ page import="org.pih.warehouse.shipping.EventType" %>
+<%@ page import="org.pih.warehouse.core.Location" %>
+<%@ page import="org.pih.warehouse.core.Organization" %>
+<%@ page import="org.pih.warehouse.product.Product" %>
+<%@ page import="org.pih.warehouse.shipping.ReferenceNumberType" %>
+<%@ page import="org.pih.warehouse.shipping.Shipment" %>
+<%@ page import="org.pih.warehouse.user.User" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
