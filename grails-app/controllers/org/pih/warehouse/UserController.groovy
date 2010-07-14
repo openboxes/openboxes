@@ -1,6 +1,6 @@
 package org.pih.warehouse
 
-import org.pih.warehouse.User;
+import org.pih.warehouse.user.User;
 
 class UserController {
 

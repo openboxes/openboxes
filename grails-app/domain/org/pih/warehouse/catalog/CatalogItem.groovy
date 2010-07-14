@@ -1,9 +1,10 @@
 package org.pih.warehouse.catalog
 
-import org.pih.warehouse.Product;
-import org.pih.warehouse.Location;
-import org.pih.warehouse.Tag;
-import org.pih.warehouse.Category;
+import org.pih.warehouse.catalog.Catalog;
+import org.pih.warehouse.core.Location;
+import org.pih.warehouse.product.Product;
+import org.pih.warehouse.product.Tag;
+import org.pih.warehouse.product.Category;
 
 class CatalogItem implements Serializable {
 

@@ -1,8 +1,8 @@
 package org.pih.warehouse.shipping;
 
-import org.pih.warehouse.Location;
-import org.pih.warehouse.Shipment;
-import org.pih.warehouse.Transaction;
+import org.pih.warehouse.core.Location;
+import org.pih.warehouse.shipping.Shipment;
+import org.pih.warehouse.inventory.Transaction;
 
 class ShipmentService {
 	

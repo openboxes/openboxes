@@ -1,6 +1,8 @@
 package org.pih.warehouse
 
-import org.pih.warehouse.ProductType;
+import org.pih.warehouse.product.Category;
+import org.pih.warehouse.product.Product;
+import org.pih.warehouse.product.ProductType;
 
 class ProductController {
 

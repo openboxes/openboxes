@@ -1,7 +1,7 @@
 package org.pih.warehouse.inventory;
 
-import org.pih.warehouse.Transaction;
-import org.pih.warehouse.Warehouse;
+import org.pih.warehouse.inventory.Transaction;
+import org.pih.warehouse.inventory.Warehouse;
 
 class InventoryService {
 	

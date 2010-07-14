@@ -1,7 +1,5 @@
 package org.pih.warehouse.inventory;
 
-import org.pih.warehouse.Warehouse;
-
 class Inventory {
 
     // Core data elements

@@ -1,6 +1,6 @@
 package org.pih.warehouse.catalog
 
-import org.pih.warehouse.Location;
+import org.pih.warehouse.core.Location;
 
 class Catalog {
 

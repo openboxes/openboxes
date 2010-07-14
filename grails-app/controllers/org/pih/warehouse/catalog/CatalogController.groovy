@@ -1,6 +1,6 @@
 package org.pih.warehouse.catalog
 
-import org.pih.warehouse.Product;
+import org.pih.warehouse.product.Product;
 
 class CatalogController {
 
