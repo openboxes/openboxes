@@ -13,5 +13,6 @@
 	<classpathentry kind="con" path="com.springsource.sts.grails.core.CLASSPATH_CONTAINER"/>
 	<classpathentry kind="con" path="GROOVY_SUPPORT"/>
 	<classpathentry kind="lib" path="lib/http-builder-0.5.0-20100405.192442-18.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/grails-jaxrs"/>
 	<classpathentry kind="output" path="web-app/WEB-INF/classes"/>
 </classpath>

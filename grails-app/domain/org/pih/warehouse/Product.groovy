@@ -14,7 +14,9 @@ class Product {
     String name				// brand name and dosage strength: (e.g. Advil 200mg)
     GenericType genericType // the generic type of product (e.g. Pain Reliever)
     ProductType productType	// the specific type of product (e.g. Ibuprofen)
-    //ProductType subType;	// should be a cascading relationship defined by subclass
+    Category category
+	
+	//ProductType subType;	// should be a cascading relationship defined by subclass
     
     String tags				// Comma separated list of tags
     String description
@@ -35,7 +37,8 @@ class Product {
 	                  productAttributeValues : ProductAttributeValue ]
 	                  
     static constraints = {
-		name(blank:false)        		
+		name(blank:false) 
+		category(nullable:true)       		
 		genericType(nullable:true)
 		productType(nullable:true)		
 		tags(nullable:true)		

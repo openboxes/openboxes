@@ -132,7 +132,7 @@
 		</div>
     </div>
     
-    <div id="doc3" class="yui-t3">
+    <div id="doc3" class="yui-t0">
     
 	    
 		<br/>
@@ -146,18 +146,20 @@
 	      	<div id="yui-main">
 		    	<div id="content" class="yui-b">
 					<!-- Populated using the 'pageTitle' property defined in the GSP file -->
+					<%-- 
 					<g:if test="${pageProperty(name:'page.pageTitle')}">
 					    <div id="pageTitle">
 							<h1><g:pageProperty name="page.pageTitle" /></h1>
 							<hr/>
 					    </div>
 					</g:if>
+					--%>
 					<g:layoutBody />
 				</div>
 	      	</div>
 	      		      	
 	      	<!-- YUI nav block that includes the local navigation menu -->
-	      	
+	      	<%--	      	
 	      	<div id="menu" role="navigation" class="yui-b">
 		  		<g:if test="${session.user}">
 			  		<!-- Navigation Menu -->
@@ -175,6 +177,7 @@
 					</div>
 				</g:if>
 			</div>
+			 --%>
 		</div>
 		
 		<!-- YUI "footer" block that includes footer information -->

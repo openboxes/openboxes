@@ -27,27 +27,27 @@
 				</script>		
 			
 				<div  style="padding: 15px;">
+					    
+					<div class="prop">
+						<label for="username">Username or email:</label><br/>
+						<input type="text" class="large" name="username" id="username" size="40" value="${userInstance?.username}">
+					</div> 
+					<div  class="prop">
+						<label for="password">Password:</label><br/>
+						<input type="password" class="large" name="password" id="password" size="40" value="${userInstance?.password}">
+						
+											
+					</div>	
+					<hr style="margin-bottom: 1.4em; margin-top: 1.4em"/>
 					<div class="prop">
 						<!-- <label for="warehouse.id">Log into:</label><br/> -->
 					    <g:select class="large" name="warehouse.id" from="${org.pih.warehouse.Warehouse.list()}" 
 					    	optionKey="id" value=""
 					    	noSelection="[null: 'Choose warehouse to manage']"/>
-					</div>  					
-					<hr style="margin-bottom: 1.4em; margin-top: 1.4em"/>
-					    
-					<div class="prop">
-						<label for="username">Username or email:</label><br/>
-						<input type="text" class="large" name="username" id="username" value="${userInstance?.username}">
-					</div> 
-					<div  class="prop">
-						<label for="password">Password:</label><br/>
-						<input type="password" class="large" name="password" id="password" value="${userInstance?.password}">
-						
 						<span class="buttons" >
 							<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt=""/> Login</button>					   
 						</span>
-											
-					</div>	
+					</div>  					
 				</div>
 			</div>
 		</fieldset> 

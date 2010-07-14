@@ -1,5 +1,8 @@
 package org.pih.warehouse
 
+import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.InventoryEvent
+
 /**
  *  Represents a unit of work completed within a single warehouse.  A
  *  transaction can be incoming/outgoing and must have a source and
@@ -46,6 +49,6 @@ class Transaction {
 	    inventoryEvent(nullable:true)
 	    localWarehouse(nullable:false)
 	    targetWarehouse(nullable:false)
-	    transactionEntries(nullable:true)
+	    //transactionEntries(nullable:true)
     }
 }

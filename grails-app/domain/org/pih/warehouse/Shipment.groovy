@@ -2,9 +2,11 @@ package org.pih.warehouse
 
 class Shipment {
 		
+	def searchable = true
+	
 	// Core data elements
 	String name 
-	String identifier
+	String shipmentNumber
 	
 	// Status 
 	//Boolean shipped
@@ -44,10 +46,11 @@ class Shipment {
 		return (id) ? expectedShippingDate.format('MMddyyyy') + "-" + String.valueOf(id).padLeft(6, "0")  : "(new shipment)";		
 	}
 	
+	static transients = [ "allShipmentItems" ]
 	
 	// Core association mappings
 	static hasMany = [events : ShipmentEvent,
-	                  containers : Container,
+	                  groups : ShipmentItemGroup,
 	                  documents : Document, 	                  
 	                  comments : Comment,
 	                  //products : Product,
@@ -57,7 +60,7 @@ class Shipment {
 	// Constraints
 	static constraints = {
 		name(nullable:false, blank: false)
-		identifier(nullable:true)
+		shipmentNumber(nullable:true)
 		
 		origin(nullable:false, blank: false, validator: { value, obj -> return !value.equals(obj.destination)})
 		destination(nullable:false, blank: false)
@@ -93,4 +96,11 @@ class Shipment {
 		//containers(nullable:true)
 		
 	}
+	
+	
+	List<ShipmentItem> getAllShipmentItems() { 
+		
+		
+	}
+	
 }

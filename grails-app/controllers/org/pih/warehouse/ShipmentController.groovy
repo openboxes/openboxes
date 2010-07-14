@@ -18,6 +18,9 @@ class ShipmentController {
 
 	def save = {
 		def shipmentInstance = new Shipment(params)
+		if (!shipmentInstance?.shipmentStatus)
+			shipmentInstance.shipmentStatus = ShipmentStatus.findByName("New");
+		
 		if (shipmentInstance.save(flush: true)) {
 			flash.message = "${message(code: 'default.created.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 			redirect(action: "show", id: shipmentInstance.id)
@@ -75,7 +78,28 @@ class ShipmentController {
 			outgoingShipmentCount : outgoingShipments.size()
 		]
     }
-    
+	
+	def incomingShipments = { 
+		
+		
+		
+	}
+	
+	def outgoingShipments = { 
+		
+	}
+	
+	
+	
+	
+	def sendShipment = { 
+		redirect action: "show", id: shipment.id;
+	}
+
+	
+	def deliverShipment = {
+		redirect action: "show", id: shipment.id;
+	}    
         
     
     def addShipmentAjax = {
@@ -311,9 +335,8 @@ class ShipmentController {
     def addEvent = { 
     		
     	def targetLocation = null    	
-    	if (params.targetLocationId) { 
+    	if (params.targetLocationId)
         	Location.get(params.targetLocationId)
-    	}
     	
     	ShipmentEvent event = new ShipmentEvent(
     		eventType:EventType.get(params.eventTypeId), 
@@ -336,6 +359,14 @@ class ShipmentController {
     	redirect(action: 'show', id: shipmentId) 
     }
     
+	
+	def addReferenceNumber = { 		
+		def referenceNumber = new ReferenceNumber(params);
+		def shipment = Shipment.get(params.shipmentId);
+		shipment.addToReferenceNumbers(referenceNumber);
+		flash.message = "Added reference number";
+		redirect(action: 'show', id: params.shipmentId)
+	}
     
     def form = {
         [ shipments : Shipment.list() ]

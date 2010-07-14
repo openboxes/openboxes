@@ -1,5 +1,7 @@
 package org.pih.warehouse
 
+import org.pih.warehouse.inventory.Inventory;
+
 class Warehouse extends Location {
 
     // Core elements

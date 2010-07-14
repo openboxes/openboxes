@@ -16,15 +16,12 @@ import org.pih.warehouse.DrugRouteType;
 import org.pih.warehouse.DurableProduct;
 import org.pih.warehouse.EventType;
 import org.pih.warehouse.GenericType;
-import org.pih.warehouse.Inventory;
-import org.pih.warehouse.InventoryItem;
 import org.pih.warehouse.Organization;
 import org.pih.warehouse.Product;
 import org.pih.warehouse.ProductAttributeValue;
 import org.pih.warehouse.ProductType;
 import org.pih.warehouse.ReferenceNumberType;
 import org.pih.warehouse.ReferenceNumber;
-import org.pih.warehouse.StockCard;
 import org.pih.warehouse.Shipment;
 import org.pih.warehouse.ShipmentEvent;
 import org.pih.warehouse.ShipmentItem;
@@ -38,6 +35,10 @@ import org.pih.warehouse.TransactionType;
 import org.pih.warehouse.User;
 import org.pih.warehouse.Value;
 import org.pih.warehouse.Warehouse;
+
+import org.pih.warehouse.inventory.Inventory;
+import org.pih.warehouse.inventory.InventoryItem;
+import org.pih.warehouse.inventory.StockCard;
 
 class BootStrap {
 	

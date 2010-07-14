@@ -2,7 +2,10 @@ package org.pih.warehouse
 
 class HomeController {
 
-    def index = { }
+    def index = {
+		
+		log.warn "something"	
+	}
     
     def dashboard = { } 
     

@@ -3,19 +3,13 @@ package org.pih.warehouse
 class TestController {
 
 	
-	def jQuery = { 
-			
-	}
+	def jQuery = { }
 
-	def jQueryDatepicker = { 
+	def jQueryTabs = { } 	
+	
+	def jQueryDatepicker = { }
 		
-	}
-	
-	
-	def yui = { 
-			
-			
-	}
+	def yui = { }
 		
 		
 	

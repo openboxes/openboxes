@@ -8,7 +8,11 @@
 #content { 
 	margin-left: 0px;	/* hack to move content over */
 	margin-right: 30px;
-	width: 75%;		/* stretch the main content */
+	width: 95%;		/* stretch the main content */
+}
+
+body { 
+	font-family: "lucida grande", arial, verdana;
 }
 
 
@@ -18,8 +22,7 @@
 }
 
 #loginForm { 
-	
-	width: 1000px;
+	width: 600px;
 }
 
 .menuButton, label, input, td, th { 	
@@ -34,6 +37,11 @@
 .tab { 
 	padding: 15px;	
 }
+.tabOuter { 
+	
+	background-color: #eee;
+}
+
 /* IMPORTANT: not sure why this works, but mis-aligns the menu */
 .yui-skin-sam { 
 	font: 11px/1.231 arial,helvetica,clean,sans-serif;
@@ -44,16 +52,18 @@ table.withoutBorder {
     width: 100%
 }
 table.container { 
-	width: 60%;	
+	width: 100%;	
 }
 .dialog td { 
 	padding: 10px;
 }
 #content .small {font-size:.9em;}
-#content .large {font-size:1.4em;}
+#content .large {font-size:1.1em;}
 
 .menu td { padding: 10px; }  
-.menu .heading { font-size: 1.2em; line-height: 1.2em; vertical-align: middle; border-top: 1px solid #aaa; padding: 5px 10px 5px 10px; display: block; background-color: #eee; }
+.menu .heading { font-size: 1.2em; line-height: 1.2em; vertical-align: middle; padding: 5px 10px 5px 10px; display: block; background-color: #eee; }
+.menu .menuSection { border: 1px solid #aaa; padding: 10px; padding-bottom: 25px; }
+
 
 /* nothing to do right now */
 #menu { }

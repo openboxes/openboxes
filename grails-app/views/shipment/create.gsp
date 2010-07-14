@@ -54,6 +54,7 @@
 						showOtherMonths: true, 
 						selectOtherMonths: true
 					});
+					
 					jQuery("#expectedDeliveryDatePicker").datepicker({ 
 						showOn: 'both',
 						buttonImage: '../images/icons/silk/calendar.png',
@@ -74,16 +75,6 @@
 						buttonImage: '../images/icons/silk/calendar.png',
 						buttonImageOnly: true
 					});
-		
-		
-						/*			  
-				        buttonImage: 'http://localhost:8080/warehouse/images/icons/barcode.png',
-				        buttonImageOnly: true,
-				        changeMonth: true,
-				        changeYear: true,
-				        closeText: 'x',
-				        showOn: 'both'
-						*/
 					
 				});
 			</script>
@@ -112,13 +103,8 @@
 	                                    <g:textField class="large" name="name" size="30" value="${shipmentInstance?.name}" />
 		                            </td>                            
 		                        </tr>
-							</tbody>
-						</table>
-					</fieldset>        
-	            	<fieldset>	            	
-	            		<legend>Shipper Information</legend>
-		                <table class="withoutBorder" border="0">
-		                    <tbody>	            
+		                    
+<!--  		                    
 								<tr class="prop">
 		                            <td valign="top" class="name">
 		                            	<label><g:message code="shipment.status.label" default="Current Status" /></label>
@@ -135,6 +121,7 @@
 										<g:select name="shipmentMethod.id" from="${org.pih.warehouse.ShipmentMethod.list()}" optionKey="id" optionValue="name" value="${shipmentInstance?.shipmentMethod?.id}" noSelection="['0':'']" />
 		                            </td>
 		                        </tr>                    
+-->
 		                        <tr class="prop">
 		                            <td valign="top" class="name">
 		                            	<label><g:message code="shipment.destination.label" default="Ship on" /></label>
@@ -172,25 +159,24 @@
 		                            </td>                            
 		                        </tr>
 		                        --%>
+
+		                        <tr class="prop">		                        
+		                        	<td></td>
+		                        	<td>
+										<div class="buttons" style="text-align: left;">
+											<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> Save</button>
+											
+											<g:link controller="home" action="index" class="negative">
+												<img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="" /> Cancel
+											</g:link>
+										</div>
+									</td>		                        
+		                        </tr>
+
 		                                  
 							</tbody>
 						</table>	            	        				            	        		                			
 			 		</fieldset>
-	                <table class="withoutBorder">
-		                <tbody>        
-	                        <tr class="prop">		                        
-	                        	<td>
-									<div class="buttons" style="text-align: left;">
-										<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> Save</button>
-										
-										<g:link controller="home" action="index" class="negative">
-											<img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="" /> Cancel
-										</g:link>
-									</div>
-								</td>		                        
-	                        </tr>
-						</tbody>
-					</table>	            	        				            	        		                			
 	 			</g:form>	
 
             </div>

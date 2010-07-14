@@ -61,6 +61,7 @@
 						<table>
 		                    <thead>
 		                        <tr style="height:20px">                        
+		                            <g:sortableColumn property="identifier" title="${message(code: 'shipment.identifier.label', default: 'Identifier')}" />                            
 		                            <g:sortableColumn property="shipmentStatus" title="${message(code: 'shipment.status.label', default: 'Status')}" />                            
 		                            <g:sortableColumn property="shippingDate" title="${message(code: 'shipment.shippingDate.label', default: 'Date')}" />
 		                            <g:sortableColumn property="name" title="${message(code: 'shipment.name.label', default: 'Name')}" />
@@ -76,6 +77,9 @@
 		                    <tbody>				
 								<g:each in="${shipmentList.value.objectList}" var="shipmentInstance" status="i">							
 									<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+			                            <td style="vertical-align: top; text-align: center">											
+			                            	<g:link action="show" id="${shipmentInstance.id}" alt="show"><span style="color:#aaa">${fieldValue(bean: shipmentInstance, field: "identifier")}</span></g:link>
+										</td>
 			                            <td style="vertical-align: top; text-align: center;" nowrap="true" width="5%">
 		                            		<g:if test="${shipmentInstance?.shipmentStatus}">${fieldValue(bean: shipmentInstance, field: "shipmentStatus.name")}</g:if>
 		                            		<g:else>No status</g:else>
@@ -85,8 +89,7 @@
 			                            	<i><g:formatDate date="${shipmentInstance.expectedShippingDate}" format="dd MMM yyyy" /></i>
 			                            </td>
 			                            <td style="vertical-align: top; text-align: left">
-			                            	<g:link action="show" id="${shipmentInstance.id}" alt="show">${fieldValue(bean: shipmentInstance, field: "name")}</g:link>
-											<span style="color:#aaa">(${fieldValue(bean: shipmentInstance, field: "identifier")})</span>
+			                            	${fieldValue(bean: shipmentInstance, field: "name")}
 										</td>
 			                            <td style="vertical-align: top; text-align: center;" nowrap="true" width="10%">
 			                            	<g:if test="${session?.warehouse?.id != shipmentInstance?.origin?.id}">
@@ -114,7 +117,7 @@
 											</g:if>
 											<script type="text/javascript">
 												jQuery(document).ready(function($){		
-													$('#preview-documents-dialog-${shipmentInstance.id}').dialog({ autoOpen: false, width: 500 });										
+													$('#preview-documents-dialog-${shipmentInstance.id}').dialog({ autoOpen: false, width: 600, modal: true });										
 													$('#preview-documents-link-${shipmentInstance.id}').click(function(){
 														$('#preview-documents-dialog-${shipmentInstance.id}').dialog('open');
 														return false;

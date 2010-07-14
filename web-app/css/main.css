@@ -15,7 +15,7 @@ html * {
 body {
     background: #fff;
     color: #333;
-    font: 11px verdana, arial, helvetica, sans-serif;
+    font: 11px "lucida grande", verdana, arial, helvetica, sans-serif;
 }
 #grailsLogo {
     padding-left: 0px;
@@ -51,7 +51,7 @@ ul {
 input, select, textarea {
     background-color: #fcfcfc;
     border: 1px solid #ccc;
-    font: 11px verdana, arial, helvetica, sans-serif;
+    font: 11px "lucida grande", verdana, arial, helvetica, sans-serif;
     margin: 2px 0;
     padding: 2px 4px;
 }
@@ -77,7 +77,8 @@ input:focus, select:focus, textarea:focus {
 /* NAVIGATION MENU */
 
 .nav {
-    background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
+    /*background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;*/
+    background-color: #eee;
     border: 1px solid #ccc;
     border-style: solid none solid none;
     margin-top: 5px;
@@ -147,13 +148,13 @@ td.errors input {
 
 table {
     border: 1px solid #ccc;
-    width: 100%
+    /*width: 100%*/
 }
 tr {
     border: 0;
 }
 td, th {
-    font: 11px verdana, arial, helvetica, sans-serif;
+    font: 11px "lucida grande", verdana, arial, helvetica, sans-serif;
     line-height: 12px;
     padding: 5px 6px;
     text-align: left;

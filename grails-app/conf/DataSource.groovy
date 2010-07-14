@@ -12,9 +12,18 @@ hibernate {
 // environment specific settings
 environments {
 	development {
-		dataSource {
-			dbCreate = "create-drop" // one of 'create', 'create-drop','update'
-			url = "jdbc:hsqldb:mem:devDB"
+		dataSource {			
+			//dbCreate = "create-drop" // one of 'create', 'create-drop','update'
+			//url = "jdbc:hsqldb:mem:devDB"
+			
+			pooled = true
+			driverClassName = "com.mysql.jdbc.Driver"
+			username = "root"
+			password = "root"
+			dbCreate = "create-drop"
+			url = "jdbc:mysql://localhost:3306/warehouse"
+		
+			
 		}
 	}
 	test {
@@ -29,18 +38,6 @@ environments {
 			url = "jdbc:hsqldb:file:prodDb;shutdown=true"
 		}
 	}
-	demo {
-		dataSource {
-			dbCreate = "create-drop" // one of 'create', 'create-drop','update'
-			url = "jdbc:hsqldb:mem:demoDB"
-		}
-	}
-	justin {
-		dataSource {
-			dbCreate = "create-drop" // one of 'create', 'create-drop','update'
-			url = "jdbc:hsqldb:mem:justinDB"
-		}
-	}	
 	
 
 

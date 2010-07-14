@@ -2,5 +2,5 @@ package org.pih.warehouse
 
 class ReferenceNumberTypeController {
 
-    def scaffold = ReferenceNumberType;
+    //def scaffold = ReferenceNumberType;
 }
