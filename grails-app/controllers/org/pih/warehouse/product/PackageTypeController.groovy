@@ -1,5 +1,4 @@
-package org.pih.warehouse
-
+package org.pih.warehouse.product;
 
 class PackageTypeController {
 

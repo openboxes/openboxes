@@ -11,8 +11,8 @@ class Warehouse extends Location {
     User manager
 
     // Core associations
-    //Inventory inventory
-    //List<Transaction> transactions   // might be better at inventory level
+    Inventory inventory
+    List<Transaction> transactions   // might be better at inventory level
 
     
     // Association mapping

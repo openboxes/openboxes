@@ -4,11 +4,11 @@ package org.pih.warehouse.shipping
  * Replaces the Container class.
  *
  */
-class ShipmentItemGroup implements Comparable {
+class ShipmentPackage implements Comparable {
 
 	String name
 	Boolean status = true		// open (true) or closed (false)	
-	String containerNumber
+	String unitNumber
 	String dimensions			// could be its own class, but we don't care right now
 	Float weight	
 	String units				// should probably be a class on its own
@@ -22,7 +22,7 @@ class ShipmentItemGroup implements Comparable {
 	// Constraints
 	static constraints = {	 
 		name(nullable:true)
-		containerNumber(nullable:true)
+		unitNumber(nullable:true)
 		dimensions(nullable:true)
 		weight(nullable:true)
 		units(nullable:true)

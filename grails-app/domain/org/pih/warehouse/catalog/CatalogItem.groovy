@@ -6,7 +6,7 @@ import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.Tag;
 import org.pih.warehouse.product.Category;
 
-class CatalogItem implements Serializable {
+class CatalogItem {
 
 	String name
 	String description
@@ -24,8 +24,8 @@ class CatalogItem implements Serializable {
 	}
 
 	static mapping = {
-		cache usage:"transactional"
-		tags cache:"transactional", cascade: "all,delete-orphan" // sort: "tag"
+		//cache usage:"transactional"
+		//tags cache:"transactional", cascade: "all,delete-orphan" // sort: "tag"
 	}
 
 	static hasMany = [tags : Tag]

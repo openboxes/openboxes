@@ -1,4 +1,4 @@
-package org.pih.warehouse
+package org.pih.warehouse.product;
 
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;

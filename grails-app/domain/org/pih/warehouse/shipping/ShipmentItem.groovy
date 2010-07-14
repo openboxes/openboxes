@@ -23,7 +23,7 @@ class ShipmentItem implements Comparable {
 
 	
 	
-    static belongsTo = [ group : ShipmentItemGroup ] // + shipment : Shipment
+    static belongsTo = [ shipmentPackage : ShipmentPackage ] // + shipment : Shipment
 
     static constraints = {
 		quantity(min:0, nullable:false)

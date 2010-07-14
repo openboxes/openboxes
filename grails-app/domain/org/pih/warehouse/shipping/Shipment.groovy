@@ -45,15 +45,12 @@ class Shipment {
 	Date dateCreated;
 	Date lastUpdated;
 	
-	String getIdentifier() { 
-		return (id) ? expectedShippingDate.format('MMddyyyy') + "-" + String.valueOf(id).padLeft(6, "0")  : "(new shipment)";		
-	}
 	
 	static transients = [ "allShipmentItems" ]
 	
 	// Core association mappings
 	static hasMany = [events : ShipmentEvent,
-	                  groups : ShipmentItemGroup,
+	                  packages : ShipmentPackage,
 	                  documents : Document, 	                  
 	                  comments : Comment,
 	                  //products : Product,
@@ -101,9 +98,14 @@ class Shipment {
 	}
 	
 	
-	List<ShipmentItem> getAllShipmentItems() { 
-		
+	List<ShipmentItem> getAllShipmentItems() { 		
 		
 	}
-	
+
+	String getShipmentNumber() {
+		return (id) ? String.valueOf(id).padLeft(6, "0")  : "(new shipment)";
+	}
+
+		
 }
+

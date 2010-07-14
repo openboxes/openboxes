@@ -1,21 +1,23 @@
 package org.pih.warehouse.order;
 
 import org.pih.warehouse.catalog.CatalogItem;
+import org.pih.warehouse.product.Product;
 
 class OrderLineItem {
 
-	CatalogItem item	
-	int quantity;
 	int price;
+	int quantity;
+	Product product;
 	
 	static transients = ["totalPrice"]
 	
     static constraints = {
 		quantity(min:0)
+		product(nullable:true)
     }
 	
 	int getTotalPrice() {
-		item ? item.price * quantity : 0
+		price * quantity
 	}
 	
 }
