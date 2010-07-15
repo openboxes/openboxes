@@ -1,6 +1,6 @@
+<%@ page import="org.pih.warehouse.catalog.CatalogItem" %>
 <%@ page import="org.pih.warehouse.product.Category" %>
 <%@ page import="org.pih.warehouse.product.Tag" %>
-<%@ page import="org.pih.warehouse.order.catalog.CatalogItem" %>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
