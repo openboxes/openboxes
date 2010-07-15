@@ -1,11 +1,12 @@
 package org.pih.warehouse
 
 import grails.converters.JSON
-
+import org.pih.warehouse.core.Country;
 
 class CountryController {
 	def scaffold = Country
-	def index = { redirect(action: list, params: params)
+	def index = { 
+		redirect(action: list, params: params)
 	}
 	
 	def list = {
@@ -27,10 +28,7 @@ class CountryController {
 		//[ courseInstanceList: Course.list( params ) , courseInstanceTotal: Course.count() ]
 		def countries = Country.list( params )
 		// return a bunch of json data with metadata.
-		def json = [
-		totalCount: countries.size,
-		results: countries
-		]
+		def json = [ totalCount: countries.size, results: countries ]
 		render json as JSON
 	}
 }
