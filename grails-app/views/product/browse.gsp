@@ -77,7 +77,7 @@
 	           					<g:displayMenu rootNode="${rootCategory}" />		           					
 								<%--            					
 								<ul>							
-									<g:each in="${org.pih.warehouse.Category.list()}" status="i" var="category">
+									<g:each in="${org.pih.warehouse.product.Category.list()}" status="i" var="category">
 										<li class="${i==0?'first':''}">
 											<g:link class="browse" action="browse"  params="[browseBy:'category', categoryId:category.id]">
 												<g:if test="${category?.id==selectedCategory?.id}"><span class="large"><b>${category.name}</b></span></g:if>	

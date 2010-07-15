@@ -1,4 +1,5 @@
 <%@ page import="org.pih.warehouse.core.Location" %>
+<%@ page import="org.pih.warehouse.inventory.Warehouse" %>
 <%@ page import="org.pih.warehouse.product.Product" %>
 <%@ page import="org.pih.warehouse.shipping.Document" %>
 <%@ page import="org.pih.warehouse.shipping.ContainerType" %>
@@ -90,7 +91,7 @@
 		                            	<label><g:message code="shipment.shipmentType.label" default="Shipment Type" /></label>
 		                            </td>                            
 		                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'shipmentType', 'errors')}">
-										<g:select name="shipmentType.id" from="${org.pih.warehouse.ShipmentType.list()}" optionKey="id" value="${shipmentInstance?.shipmentType?.id}" noSelection="['0':'']" />
+										<g:select name="shipmentType.id" from="${org.pih.warehouse.shipping.ShipmentType.list()}" optionKey="id" value="${shipmentInstance?.shipmentType?.id}" noSelection="['0':'']" />
 		                            </td>                            
 		                        </tr>         
 		                                
@@ -109,7 +110,7 @@
 		                            	<label><g:message code="shipment.status.label" default="Current Status" /></label>
 		                            </td>                            
 		                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'status', 'errors')}">
-										<g:select name="shipmentStatus.id" from="${org.pih.warehouse.ShipmentStatus.list()}" optionKey="id" value="${shipmentInstance?.shipmentStatus?.id}" noSelection="['0':'']" />
+										<g:select name="shipmentStatus.id" from="${org.pih.warehouse.shipping.ShipmentStatus.list()}" optionKey="id" value="${shipmentInstance?.shipmentStatus?.id}" noSelection="['0':'']" />
 		                            </td>                            
 		                        </tr>         
 		                        <tr class="prop">
@@ -117,7 +118,7 @@
 		                            	<label><g:message code="shipment.shipmentMethod.label" default="Shipment Method" /></label>
 		                            </td>        
 		                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'shipmentMethod', 'errors')}">
-										<g:select name="shipmentMethod.id" from="${org.pih.warehouse.ShipmentMethod.list()}" optionKey="id" optionValue="name" value="${shipmentInstance?.shipmentMethod?.id}" noSelection="['0':'']" />
+										<g:select name="shipmentMethod.id" from="${org.pih.warehouse.shipping.ShipmentMethod.list()}" optionKey="id" optionValue="name" value="${shipmentInstance?.shipmentMethod?.id}" noSelection="['0':'']" />
 		                            </td>
 		                        </tr>                    
 -->
@@ -135,7 +136,7 @@
 		                            	<label><g:message code="shipment.origin.label" default="Ship from" /></label>
 		                            </td>                            
 		                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">
-					                	<g:select name="origin.id" from="${org.pih.warehouse.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.origin?.id}" noSelection="['0':'']" />
+					                	<g:select name="origin.id" from="${org.pih.warehouse.inventory.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.origin?.id}" noSelection="['0':'']" />
 		                            </td>                            
 		                        </tr>		                        
 		                        <tr class="prop">
@@ -143,7 +144,7 @@
 		                            	<label><g:message code="shipment.destination.label" default="Ship to" /></label>
 		                            </td>                            
 		                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">
-		                            	<g:select name="destination.id" from="${org.pih.warehouse.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.destination?.id}" noSelection="['0':'']" />
+		                            	<g:select name="destination.id" from="${org.pih.warehouse.inventory.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.destination?.id}" noSelection="['0':'']" />
 		                            </td>                            
 		                        </tr>		                        
 		                        

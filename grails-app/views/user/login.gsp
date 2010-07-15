@@ -41,7 +41,7 @@
 								<label for='warehouse'>Select local warehouse:</label>
 							</td>
 							<td valign='top' style='text-align: left;' width='80%'>
-								<g:select name="warehouse.id" from="${org.pih.warehouse.Warehouse.list()}" optionKey="id" value="" />
+								<g:select name="warehouse.id" from="${org.pih.warehouse.inventory.Warehouse.list()}" optionKey="id" value="" />
 							</td>
 						</tr>
 					</table>

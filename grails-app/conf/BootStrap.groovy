@@ -473,10 +473,10 @@ class BootStrap {
 		/** 
 		 * Warehouses 
 		 */
-		Warehouse boston = new Warehouse(name: "Boston Headquarters", address: address1, manager: manager).save(flush:true);		
-		Warehouse miami = new Warehouse(name: "Miami Warehouse", address: address2, manager: manager).save(flush:true);
-		Warehouse tabarre = new Warehouse(name: "Tabarre Depot", address: address3, manager: manager).save(flush:true);
-		Warehouse acme = new Warehouse(name: "ACME Supply Company", address: address4, manager: manager).save(flush:true);
+		Warehouse boston = new Warehouse(name: "Boston Headquarters", address: address1, manager: manager, logoUrl: "http://a3.twimg.com/profile_images/134665083/BOS_Red_Sox_normal.PNG").save(flush:true);		
+		Warehouse miami = new Warehouse(name: "Miami Warehouse", address: address2, manager: manager, logoUrl: "http://pihemr.files.wordpress.com/2008/01/pih-hands.jpg").save(flush:true);
+		Warehouse tabarre = new Warehouse(name: "Tabarre Depot", address: address3, manager: manager, logoUrl: "http://pihemr.files.wordpress.com/2008/01/pih-hands.jpg").save(flush:true);
+		Warehouse acme = new Warehouse(name: "ACME Supply Company", address: address4, manager: manager, logoUrl: "http://pihemr.files.wordpress.com/2008/01/pih-hands.jpg").save(flush:true);
 		
 		/** 
 		 * Inventories

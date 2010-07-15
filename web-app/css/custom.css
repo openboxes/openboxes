@@ -11,6 +11,24 @@
 	width: 95%;		/* stretch the main content */
 }
 
+#notify-container {
+	color:#735005;
+	font-size:130%;
+	font-weight:bold;
+	left:0;
+	position:fixed;
+	text-align:center;
+	top:0;
+	width:100%;
+	z-index:100;
+}
+#notify-container div {
+	background-color:#F4A83D;
+	border-bottom:1px solid #D6800C;
+	padding:7px 0;
+}
+
+
 body { 
 	font-family: "lucida grande", arial, verdana;
 }
@@ -60,10 +78,34 @@ table.container {
 #content .small {font-size:.9em;}
 #content .large {font-size:1.1em;}
 
-.menu td { padding: 10px; }  
-.menu .heading { font-size: 1.2em; line-height: 1.2em; vertical-align: middle; padding: 5px 10px 5px 10px; display: block; background-color: #eee; }
-.menu .menuSection { border: 1px solid #aaa; padding: 10px; padding-bottom: 25px; }
-
+.menu { padding: 5px; }  
+.menu .heading { 
+	font-size: 1.2em;
+	line-height: 1.2em; 
+	vertical-align: middle;
+	padding: 5px 0px 5px 0px; 
+	display: block; 
+	background-color: #F8F7EF; }
+.menu .menuSection { 
+	border-right: 1px solid #aaa;
+	padding-right: 5px; 
+	padding-bottom: 10px;
+}
+.menu .menuSection ul { 
+	padding: 5px; 
+}
+.menu .menuSection ul li { 
+    display: block;
+    overflow: hidden;
+    padding: 0;
+    cursor: pointer;
+}
+.menu .menuSection a { 
+	text-decoration: none;
+}
+.menu .menuSection a:hover { 
+	text-decoartion: underline;
+}
 
 /* nothing to do right now */
 #menu { }

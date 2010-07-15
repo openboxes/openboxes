@@ -29,10 +29,6 @@ class AuthController {
 		//"${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
 	}
 	
-		
-	def switchWarehouse = { 
-		log.info "switch warehouse"
-	}
 	
     /** 
      * Performs the authentication logic.
@@ -42,42 +38,10 @@ class AuthController {
     	def userInstance = User.findWhere(username:params['username'], password:params['password'])
     					
 		if (userInstance) {
-        	log.error "warehouse id = ${params.warehouse.id}"	
-        	def warehouse = null;
-        	if (params.warehouse.id!='null') { 
-            	log.error "looking up warehouse by id = ${params.warehouse.id}";
-            	warehouse = Warehouse.get(params.warehouse.id);        		
-        	}
-    		log.error "warehouse = ${warehouse}"
-        	if (warehouse) {     	    	
-	    		log.error "saving warehouse ${warehouse?.name} to ${userInstance?.username}"
-	    		// Save the current warehouse in the session
-	    		session.warehouse = warehouse;
-	    		    		
-	    		// Save the user's preferred warehouse (if it's not set already)
-	    		log.error "user.warehouse = ${userInstance?.warehouse?.name}"
-	    		if (userInstance.warehouse) { 
-	    			log.error "user does not have a preferred warehouse; setting preferred warehouse to ${warehouse?.name}"
-		    		userInstance.warehouse = warehouse;
-		    		userInstance.save(flush:true);
-	    		}
-	    		
-	    		// Successfully logged in and select a warehouse
-	    		log.error "user exists $userInstance";
-	    		log.error "user chose a valid warehouse $warehouse";
-	    		session.user = userInstance;    		
-	    	    redirect(controller:'home',action:'index')
-	    	}	
-        	else { 
-        		log.error "ask user to choose a warehouse"
-        		//flash.message = "Please choose a valid warehouse.";
-
-        		userInstance = new User(username:params['username'], password:params['password'])
-    		    userInstance.errors.rejectValue("version", "default.authentication.failure",
-    			    	[message(code: 'user.label', default: 'User')] as Object[], "Unable to authenticate user with no warehouse.")
-
-        		render(view: "login", model: [userInstance: userInstance])
-        	}    		    		
+			// Successfully logged in and select a warehouse
+			session.user = userInstance;
+			redirect(controller:'dashboard',action:'index')
+    		
 		}
 		else {
 			

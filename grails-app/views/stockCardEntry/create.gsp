@@ -41,7 +41,7 @@
                                     <label for="stockCard"><g:message code="stockCardEntry.stockCard.label" default="Stock Card" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: stockCardEntryInstance, field: 'stockCard', 'errors')}">
-                                    <g:select name="stockCard.id" from="${org.pih.warehouse.StockCard.list()}" optionKey="id" value="${stockCardEntryInstance?.stockCard?.id}"  />
+                                    <g:select name="stockCard.id" from="${org.pih.warehouse.inventory.StockCard.list()}" optionKey="id" value="${stockCardEntryInstance?.stockCard?.id}"  />
                                 </td>
                             </tr>
                         

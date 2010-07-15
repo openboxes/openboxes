@@ -6,20 +6,10 @@ package org.pih.warehouse.core
 class Location {
 
     String name
-    
+    String logoUrl 
     Address address
-    
-    // Other elements to be supported soon
-    //Organization organization
-    //Country country
-    //City city
-    //State stateOrProvince
-    //Address address
-    
-    //employees : Employee
-    
-    
 
     static constraints = {
+		logoUrl(nullable:true)
     }
 }

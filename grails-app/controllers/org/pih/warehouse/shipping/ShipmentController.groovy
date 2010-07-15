@@ -1,6 +1,7 @@
 package org.pih.warehouse.shipping;
 
 import grails.converters.JSON
+import org.pih.warehouse.core.Location;
 
 class ShipmentController {
    

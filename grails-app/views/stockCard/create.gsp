@@ -32,7 +32,7 @@
                                     <label for="product"><g:message code="stockCard.product.label" default="Product" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: stockCardInstance, field: 'product', 'errors')}">
-                                    <g:select name="product.id" from="${org.pih.warehouse.Product.list()}" optionKey="id" value="${stockCardInstance?.product?.id}"  />
+                                    <g:select name="product.id" from="${org.pih.warehouse.product.Product.list()}" optionKey="id" value="${stockCardInstance?.product?.id}"  />
                                 </td>
                             </tr>
                         

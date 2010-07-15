@@ -157,7 +157,7 @@
 														                <g:hiddenField name="id" value="${shipmentInstance?.id}" />
 														                <g:hiddenField name="version" value="${shipmentInstance?.version}" />
 										                            	<span class=" ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">
-										                					<g:select name="origin.id" from="${org.pih.warehouse.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.origin?.id}"  />						                					
+										                					<g:select name="origin.id" from="${org.pih.warehouse.inventory.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.origin?.id}"  />						                					
 																		</span>
 																		<br/><br/>
 
@@ -202,7 +202,7 @@
 														                <g:hiddenField name="id" value="${shipmentInstance?.id}" />
 														                <g:hiddenField name="version" value="${shipmentInstance?.version}" />
 										                            	<span class=" ${hasErrors(bean: shipmentInstance, field: 'destination', 'errors')}">
-										                					<g:select name="destination.id" from="${org.pih.warehouse.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.destination?.id}"  />								                					
+										                					<g:select name="destination.id" from="${org.pih.warehouse.inventory.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.destination?.id}"  />								                					
 																		</span>
 																		<br/><br/>
 																		<span class="buttons">
@@ -376,13 +376,13 @@
 														                        <tr class="prop">
 														                            <td valign="middle" class="name"><label><g:message code="shipment.shipmentType.label" default="Type" /></label></td>                            
 														                            <td valign="middle" class="value" nowrap="nowrap">
-																                    	<g:select name="shipmentType" from="${org.pih.warehouse.ShipmentType.list()}" optionKey="id" value="${shipmentInstance?.shipmentType?.id}"  /> 
+																                    	<g:select name="shipmentType" from="${org.pih.warehouse.shipping.ShipmentType.list()}" optionKey="id" value="${shipmentInstance?.shipmentType?.id}"  /> 
 														                            </td>                            
 														                        </tr>                    						                                
 														                        <tr class="prop">
 														                            <td valign="middle" class="name"><label><g:message code="shipment.shipmentStatus.label" default="Status" /></label></td>                            
 														                            <td valign="middle" class="value" nowrap="nowrap">
-																                    	<g:select name="shipmentStatus.id" from="${org.pih.warehouse.ShipmentStatus.list()}" optionKey="id" value="${shipmentInstance?.shipmentStatus?.id}"  /> 
+																                    	<g:select name="shipmentStatus.id" from="${org.pih.warehouse.shipping.ShipmentStatus.list()}" optionKey="id" value="${shipmentInstance?.shipmentStatus?.id}"  /> 
 														                            </td>                            
 														                        </tr>                    						                                
 																				<tr class="prop">
@@ -405,7 +405,7 @@
 													           					<tr class="prop">	                        	
 														                            <td valign="top" class="name"><label><g:message code="shipment.method.label" default="Shipment method" /></label></td>        
 														                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'shipmentMethod', 'errors')}">
-																						<g:select name="shipmentMethod.id" from="${org.pih.warehouse.ShipmentMethod.list()}" optionKey="id" optionValue="name" value="${shipmentInstance?.shipmentMethod?.id}"  />
+																						<g:select name="shipmentMethod.id" from="${org.pih.warehouse.shipping.ShipmentMethod.list()}" optionKey="id" optionValue="name" value="${shipmentInstance?.shipmentMethod?.id}"  />
 														                            </td>
 														                        </tr>                    
 														                        <tr class="prop">

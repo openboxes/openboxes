@@ -83,6 +83,8 @@ log4j = {
 	//		'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
 	//		'org.springframework'
 	
+	warn	'org.mortbay.log'
+	
 	info	'org.codehaus.groovy.grails.web.servlet',  //  controllers
 			'org.codehaus.groovy.grails.web.pages', //  GSP
 			'org.codehaus.groovy.grails.web.sitemesh', //  layouts
@@ -94,13 +96,15 @@ log4j = {
 			'org.springframework',
 			'org.hibernate',
 			'org.pih.warehouse',
-			'net.sf.ehcache.hibernate'
+			'net.sf.ehcache.hibernate',
+			'grails.app',
+			'grails.app.controller',
+			'grails.app.bootstrap',
+			'grails.app.service',
+			'grails.app.task',
+			'BootStrap'
+				
+	debug	'org.apache.ddlutils'
 	
-	warn	'org.mortbay.log'
-	
-	
-	
-	debug 	'grails.app',
-			'BootStrap',
-			'org.apache.ddlutils'	
+
 }

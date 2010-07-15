@@ -61,7 +61,7 @@
                                   <label for="type.id"><g:message code="product.productType.label" default="Type" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'type', 'errors')}">
-                                    <g:select name="type.id" from="${org.pih.warehouse.ProductType.list()}" optionKey="id" value="${productInstance?.type?.id}"  />
+                                    <g:select name="type.id" from="${org.pih.warehouse.product.ProductType.list()}" optionKey="id" value="${productInstance?.type?.id}"  />
                                 </td>
                             </tr>
                             <tr class="prop">
@@ -69,7 +69,7 @@
                                   <label for="subType.id"><g:message code="product.productType.label" default="Sub Type" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'type', 'errors')}">
-                                    <g:select name="subType.id" from="${org.pih.warehouse.ProductType.list()}" optionKey="id" value="${productInstance?.type?.id}"  />
+                                    <g:select name="subType.id" from="${org.pih.warehouse.product.ProductType.list()}" optionKey="id" value="${productInstance?.type?.id}"  />
                                 </td>
                             </tr>
                         	<%-- 
@@ -78,7 +78,7 @@
                                   <label for="user"><g:message code="product.user.label" default="User" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'user', 'errors')}">
-                                    <g:select name="user.id" from="${org.pih.warehouse.User.list()}" optionKey="id" value="${productInstance?.user?.id}"  />
+                                    <g:select name="user.id" from="${org.pih.warehouse.user.User.list()}" optionKey="id" value="${productInstance?.user?.id}"  />
                                 </td>
                             </tr>
                         	--%>

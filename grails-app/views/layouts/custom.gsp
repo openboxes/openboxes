@@ -59,6 +59,12 @@
 	<style type="text/css" media="screen"></style>
 </head>
 <body class="yui-skin-sam">
+	
+	<%--
+	<div id="notify-container" style="display: hidden;">
+		<div id="notify-message">test</div>	
+	</div>
+ 	--%>
     <div id="doc3" class="yui-t7">
 		<!-- Spinner gets displayed when AJAX is invoked -->
 		<div id="spinner" class="spinner" style="display:none;">
@@ -115,16 +121,29 @@
 				<!-- Global Navigation menu -->
 				<div class="nav">
 					<%-- <g:render template="../common/breadcrumb" />--%>
-					<g:breadcrumb />
+					<%--<g:breadcrumb />--%>
+					&nbsp;
 					
-					
-				    <g:if test="${session.user}">				    
+				    <g:if test="${session?.user}">			
+				    
+				    	<g:if test="${session?.warehouse}">
+							<g:if test="${session?.warehouse?.logoUrl}"><img src="${session?.warehouse?.logoUrl}" width="24" height="24" border="1" style="vertical-align: bottom"></img></g:if>
+							&nbsp;
+							<span style="font-size:200%; font-weight: bold;">
+								${session?.warehouse?.name}
+							</span>
+							<a styte="vertical-align: middle" class="home" href='${createLink(controller: "dashboard", action:"chooseWarehouse")}'>change</a>	
+						</g:if>
 						<%-- 
 				    	<g:render template="../common/global"/>
 				    	<g:pageProperty name="page.globalLinks" /><!-- Populated using the 'globalLinks' property defined in the GSP file -->
 					    --%>				    
 						<!-- TODO Implemented hack to move the settings menu over to the right -->
-						<span class="menuButton" style="position:absolute; right: 15px;"><a class="settings" href="${createLink(uri: '/admin/index')}">Settings</a></span>
+						<%-- 
+							<span class="menuButton" style="position:absolute; right: 15px;">
+								<a class="settings" href="${createLink(uri: '/admin/index')}">Settings</a>
+							</span>
+						--%>
 				    </g:if>
 				</div>
 		    </div>
@@ -132,7 +151,7 @@
 		</div>
     </div>
     
-    <div id="doc3" class="yui-t0">
+    <div id="doc3" class="yui-t3">
     
 	    
 		<br/>
@@ -146,23 +165,20 @@
 	      	<div id="yui-main">
 		    	<div id="content" class="yui-b">
 					<!-- Populated using the 'pageTitle' property defined in the GSP file -->
-					<%-- 
 					<g:if test="${pageProperty(name:'page.pageTitle')}">
-					    <div id="pageTitle">
-							<h1><g:pageProperty name="page.pageTitle" /></h1>
-							<hr/>
-					    </div>
+					    <div id="pageTitle"><h1><g:pageProperty name="page.pageTitle" /></h1><hr/></div>
 					</g:if>
-					--%>
 					<g:layoutBody />
 				</div>
 	      	</div>
 	      		      	
 	      	<!-- YUI nav block that includes the local navigation menu -->
-	      	<%--	      	
+	         	
 	      	<div id="menu" role="navigation" class="yui-b">
-		  		<g:if test="${session.user}">
-			  		<!-- Navigation Menu -->
+		  		<g:if test="${session?.user}">
+					<!-- Navigation Menu -->
+					<g:render template="../common/menu"/>
+					<%-- 			  		
 			  		<div id="navMenu" class="homePagePanel">
 			      		<div class="panelTop"><!-- used to dislay the bottom border of the navigation menu --></div>
 						<div class="panelBody">							
@@ -175,9 +191,10 @@
 						</div>
 						<div class="panelBtm"><!-- used to dislay the bottom border of the navigation menu --></div>
 					</div>
+					--%>
 				</g:if>
 			</div>
-			 --%>
+			 
 		</div>
 		
 		<!-- YUI "footer" block that includes footer information -->

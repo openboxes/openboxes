@@ -305,7 +305,7 @@ th.desc a {
 }
 
 .menuButton a.inventory {
-    background: url(../images/icons/inventory.png) center left no-repeat;
+    background: url(../images/icons/stockbook.png) center left no-repeat;
     color: #333;
     padding-left: 25px;
 }
@@ -400,6 +400,13 @@ th.desc a {
     padding-left: 25px;
 }
 
+.menuButton a.order {
+    background: url(../images/icons/order.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+
 .menuButton a.transactionentry {
     background: url(../images/icons/document.png) center left no-repeat;
     color: #333;
@@ -447,3 +454,16 @@ th.desc a {
     color: #333;
     padding-left: 25px;
 }
+
+.menuButton a.metadata {
+    background: url(../images/icons/wrench.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.bullet {
+    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+

@@ -37,11 +37,12 @@
 		            		<li><g:link class="browse" action="list" id="outgoing">Show all shipments TO ${session.warehouse.name} (${outgoingShipmentCount})</g:link></li>
 		            	</ul>
 		            </div>
-				--%>				
+				--%>
+				Filter by:				
 				<ul>
 					<g:each in="${shipmentListByStatus}" var="shipmentList">      
 						<li>
-							<g:link class="browse" action="list" id="${shipmentList.key}">${shipmentList.key} Shipments</g:link> 
+							<g:link class="browse" action="list" id="${shipmentList.key}">${shipmentList.key}</g:link> 
 							<g:if test="${shipmentList.value.objectList}">(${shipmentList.value.objectList.size})</g:if>
 						</li>
 					</g:each>
@@ -61,57 +62,49 @@
 						<table>
 		                    <thead>
 		                        <tr style="height:20px">                        
-		                            <g:sortableColumn property="identifier" title="${message(code: 'shipment.identifier.label', default: 'Identifier')}" />                            
-		                            <g:sortableColumn property="shipmentStatus" title="${message(code: 'shipment.status.label', default: 'Status')}" />                            
-		                            <g:sortableColumn property="shippingDate" title="${message(code: 'shipment.shippingDate.label', default: 'Date')}" />
+		                            <g:sortableColumn property="shipmentNumber" title="${message(code: 'shipment.shipmentNumber.label', default: 'Identifier')}" />                            
 		                            <g:sortableColumn property="name" title="${message(code: 'shipment.name.label', default: 'Name')}" />
-		                            <g:sortableColumn property="origin" title="${message(code: 'shipment.origin.label', default: 'From')}" />
-		                            <g:sortableColumn property="destination" title="${message(code: 'shipment.destination.label', default: 'To')}" />
+		                            <g:sortableColumn property="origin" title="${message(code: 'shipment.origin.label', default: 'Departing')}" />
+		                            <g:sortableColumn property="destination" title="${message(code: 'shipment.destination.label', default: 'Arriving')}" />
 		                            <th><g:message code="shipment.document.label" default="Documents" /></th>		                            
-<%-- 		                            		                            
-		                            <g:sortableColumn property="identifier" title="${message(code: 'shipment.identifier.label', default: 'Identifier')}" />                        
-		                            <g:sortableColumn property="trackingNumber" title="${message(code: 'shipment.trackingNumber.label', default: 'Tracking Number')}" />                        
---%>	                            
 		                        </tr>
 		                    </thead>
 		                    <tbody>				
 								<g:each in="${shipmentList.value.objectList}" var="shipmentInstance" status="i">							
 									<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-			                            <td style="vertical-align: top; text-align: center">											
-			                            	<g:link action="show" id="${shipmentInstance.id}" alt="show"><span style="color:#aaa">${fieldValue(bean: shipmentInstance, field: "identifier")}</span></g:link>
+			                            <td style="vertical-align: top; text-align: center" width="5%">											
+			                            	<g:link action="show" id="${shipmentInstance.id}" alt="show"><span style="color:#aaa">${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}</span></g:link>
 										</td>
-			                            <td style="vertical-align: top; text-align: center;" nowrap="true" width="5%">
-		                            		<g:if test="${shipmentInstance?.shipmentStatus}">${fieldValue(bean: shipmentInstance, field: "shipmentStatus.name")}</g:if>
-		                            		<g:else>No status</g:else>
-			                            </td>
-			                            <td style="vertical-align: top; text-align: center;" nowrap="true" width="5%">
-			                            	<g:if test="${shipmentInstance.actualShippingDate}"><g:formatDate date="${shipmentInstance.actualShippingDate}" format="dd MMM yyyy" /><br/></g:if>
-			                            	<i><g:formatDate date="${shipmentInstance.expectedShippingDate}" format="dd MMM yyyy" /></i>
-			                            </td>
-			                            <td style="vertical-align: top; text-align: left">
+			                            <td style="vertical-align: top; text-align: left" width="10%">
 			                            	${fieldValue(bean: shipmentInstance, field: "name")}
 										</td>
-			                            <td style="vertical-align: top; text-align: center;" nowrap="true" width="10%">
+			                            <td style="vertical-align: top; text-align: left" nowrap="true" width="10%">
 			                            	<g:if test="${session?.warehouse?.id != shipmentInstance?.origin?.id}">
 				                            	<g:set var="cssClass" >font-weight: bold;</g:set>	
 			                            	</g:if>
 			                            	<g:else>
-			                            		<g:set var="cssClass" >color: #ddd;</g:set>	
+			                            		<g:set var="cssClass" >color: #aaa;</g:set>	
 			                            	</g:else>
-			                            	<span style="${cssClass}">
-				                            	${fieldValue(bean: shipmentInstance, field: "origin")}
-			                            	</span>
+			                            	<span style="${cssClass}">${fieldValue(bean: shipmentInstance, field: "origin")}</span>
+			                            	<span>
+				                            	<g:if test="${shipmentInstance.actualShippingDate}"><g:formatDate date="${shipmentInstance.actualShippingDate}" format="dd MMM yyyy" /><br/></g:if>
+				                            	<g:formatDate date="${shipmentInstance.expectedShippingDate}" format="dd MMM yyyy" />			                            	
+				                            </span>
 			                            </td>
-			                            <td style="vertical-align: top; text-align: center;" nowrap="true" width="10%">
+			                            <td style="vertical-align: top; text-align: left" nowrap="true" width="10%">
 			                            	<g:if test="${session?.warehouse?.id != shipmentInstance?.destination?.id}">
 				                            	<g:set var="cssClass" >font-weight: bold;</g:set>	
 			                            	</g:if>
 			                            	<g:else>
-			                            		<g:set var="cssClass" >color: #ddd;</g:set>	
+			                            		<g:set var="cssClass" >color: #aaa;</g:set>	
 			                            	</g:else>
-			                            	<span style="${cssClass}">${fieldValue(bean: shipmentInstance, field: "destination")}</span>
+			                            	<span style="${cssClass}">${fieldValue(bean: shipmentInstance, field: "destination")}</span> 
+			                            	<span>
+				                            	<g:if test="${shipmentInstance.actualDeliveryDate}"><g:formatDate date="${shipmentInstance.actualShippingDate}" format="dd MMM yyyy" /><br/></g:if>
+				                            	<g:formatDate date="${shipmentInstance.expectedDeliveryDate}" format="dd MMM yyyy" />
+			                            	</span>
 			                            </td>
-			                            <td style="vertical-align: top; text-align: center;" width="2%">
+			                            <td style="vertical-align: top; text-align: center;" width="10%">
 			                            	<g:if test="${shipmentInstance.documents}">			                            					                            	
 			                            		<a href="#" id="preview-documents-link-${shipmentInstance.id}"><img src="${createLinkTo(dir:'images/icons',file:'document.png')}" alt="" valign="middle"/></a>	
 											</g:if>
@@ -125,7 +118,7 @@
 												});
 											</script>	
 											<div id="preview-documents-dialog-${shipmentInstance.id}" title="Preview Documents" style="display:none; text-align: left;">
-												<h1>${shipmentInstance.name} ${shipmentInstance.identifier}</h1>												
+												<h1>${shipmentInstance.name} ${shipmentInstance.shipmentNumber}</h1>												
 				                            	
 			                            		<div>
 			                            			<ul>
