@@ -40,7 +40,7 @@ class ShipmentController {
     	def browseBy = params.id;
     	def currentLocation = Location.get(session.warehouse.id);
     	
-    	println ("current location" + currentLocation.name)
+    	log.debug ("current location" + currentLocation.name)
     	
     	def allShipments = shipmentService.getShipmentsWithLocation(currentLocation);
 		def incomingShipments = shipmentService.getShipmentsWithDestination(currentLocation);	
@@ -115,7 +115,7 @@ class ShipmentController {
     }
     
     def availableItems = {     		
-    	println params;
+    	log.debug params;
     	def items = null;
     	if (params.query) { 
 	    	items = Product.findAllByNameLike("%${params.query}%");
@@ -128,14 +128,14 @@ class ShipmentController {
     }
     
     def addItemAutoComplete = {     		
-    	println params;
+    	log.debug params;
     	
     	def product = Product.get(params.selectedItem_id)
     	def shipment = Shipment.get(params.id);
 
-    	println "containers: " + shipment.getContainers()
+    	log.debug "packages: " + shipment.getPackages()
     	    	
-    	def container = shipment.containers[0];
+    	def container = shipment.packages[0];
     	if (container) { 
  	    	def shipmentItem = new ShipmentItem(product: product, quantity: 1);
 	    	container.addToShipmentItems(shipmentItem).save(flush:true);
@@ -146,7 +146,7 @@ class ShipmentController {
     
     def addContainer = { 
 		
-		println params 
+		log.debug params 
 		
     	def shipment = Shipment.get(params.shipmentId);   	
     	def containerType = ContainerType.get(params.containerTypeId);    	
@@ -251,7 +251,7 @@ class ShipmentController {
     
     
     def addComment = { 
-    	println params;
+    	log.debug params;
     	def shipment = (params.shipmentId) ? Shipment.get(params.shipmentId) : null;    	
     	def recipient = (params.recipientId) ? User.get(params.recipientId) : null;
     	def comment = new Comment(comment: params.comment, commenter: session.user, recipient: recipient)
@@ -280,7 +280,7 @@ class ShipmentController {
     
 
     def addItem = {     		
-    	println params;		
+    	log.debug params;		
 		def container = Container.get(params.containerId);
     	def product = Product.get(params.productId);
     	def quantity = params.quantity;

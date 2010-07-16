@@ -563,7 +563,7 @@ class BootStrap {
 		ShipmentEvent event5 = new ShipmentEvent(eventType:EVENT_SHIPMENT_SENT, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-26 11:00:00"), eventLocation: boston, targetLocation: miami)		
 		Document document1 = new Document(filename: "packing-list.pdf", documentType: DOCUMENT_PACKING_LIST, size: 1020L, contents: "empty")		
 		Document document2 = new Document(filename: "invoice.pdf", documentType: DOCUMENT_COMMERCIAL_INVOICE, size: 990L, contents: "empty") 
-		ShipmentPackage pallet1 = new ShipmentPackage(name: "Pallet #1", packageType: CONTAINER_PALLET, weight: 1000, units: "kgs");
+		Container pallet1 = new Container(name: "Pallet #1", containerType: CONTAINER_PALLET, weight: 1000, units: "kgs");
 		ShipmentItem shipmentItem1 = new ShipmentItem(product : advil, quantity : 100, packageType: CONTAINER_BOX);
 		ShipmentItem shipmentItem2 = new ShipmentItem(product : tylenol, quantity : 200, packageType: CONTAINER_BOX);
 		ShipmentItem shipmentItem3 = new ShipmentItem(product : aspirin, quantity : 300, packageType: CONTAINER_BOX);
@@ -574,7 +574,7 @@ class BootStrap {
 		
 		shipment1.addToDocuments(document1).save(flush:true);		
 		shipment1.addToDocuments(document2).save(flush:true);
-		shipment1.addToPackages(pallet1).save(flush:true);
+		shipment1.addToContainers(pallet1).save(flush:true);
 		shipment1.addToEvents(event1).save(flush:true);
 		shipment1.addToEvents(event2).save(flush:true);
 		shipment1.addToEvents(event3).save(flush:true);

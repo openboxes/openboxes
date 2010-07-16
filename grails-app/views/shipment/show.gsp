@@ -87,8 +87,8 @@
 									
 							<span style="">
 								<g:if test="${shipmentInstance?.name}">					
+									<span style="padding-left: 5px; color:#aaa"><g:if test="${shipmentInstance?.shipmentNumber}">${shipmentInstance?.shipmentNumber}</g:if></span>		
 									<span style="font-weight: bold;">${shipmentInstance?.name}</span>
-									<span style="padding-left: 5px; color:#aaa"><g:if test="${shipmentInstance?.identifier}">${shipmentInstance?.identifier}</g:if></span>		
 								</g:if>
 							</span>
 						</td>
@@ -329,7 +329,7 @@
 																			
 								        									<tr class="prop">
 													                            <td valign="middle" class="name">
-													                            	<label><g:message code="shipment.identifier.label" default="Last Modified on" /></label>
+													                            	<label><g:message code="shipment.shipmentNumber.label" default="Last Modified on" /></label>
 													                            </td>                            
 													                            <td valign="top" class="value" nowrap="nowrap">
 													                            	<span style="color: #aaa"><g:formatDate date="${shipmentInstance?.lastUpdated}" format="dd MMM yyyy hh:mm:ss"/></span>
@@ -337,7 +337,7 @@
 													                        </tr>                    
 													                        <tr class="prop">
 													                            <td valign="middle" class="name">
-													                            	<label><g:message code="shipment.identifier.label" default="Created on" /></label>
+													                            	<label><g:message code="shipment.shipmentNumber.label" default="Created on" /></label>
 													                            </td>                            
 													                            <td valign="top" class="value" nowrap="nowrap">
 													                            	<span style="color: #aaa"><g:formatDate date="${shipmentInstance?.dateCreated}" format="dd MMM yyyy hh:mm:ss"/></span>
@@ -424,7 +424,7 @@
 																				</tr>											                        
 									        									<tr class="prop">
 														                            <td valign="middle" class="name">
-														                            	<label><g:message code="shipment.identifier.label" default="Last Modified on" /></label>
+														                            	<label><g:message code="shipment.shipmentNumber.label" default="Last Modified on" /></label>
 														                            </td>                            
 														                            <td valign="top" class="value" nowrap="nowrap">
 														                            	<span style="color: #aaa"><g:formatDate date="${shipmentInstance?.lastUpdated}" format="dd MMM yyyy hh:mm:ss"/></span>											                            	
@@ -432,7 +432,7 @@
 														                        </tr>                    
 									        									<tr class="prop">
 														                            <td valign="middle" class="name">
-														                            	<label><g:message code="shipment.identifier.label" default="Created on" /></label>
+														                            	<label><g:message code="shipment.shipmentNumber.label" default="Created on" /></label>
 														                            </td>                            
 														                            <td valign="top" class="value" nowrap="nowrap">
 														                            	<span style="color: #aaa"><g:formatDate date="${shipmentInstance?.dateCreated}" format="dd MMM yyyy hh:mm:ss"/></span>											                            	
@@ -486,7 +486,7 @@
 							</g:if>
 							<g:if test="${!shipmentInstance.containers}">	
 								<div class="notice">
-									There are currently no pieces in this shipment.																    										
+									There are currently no shipping units in this shipment.																    										
 								</div>								
 							</g:if>
 							<g:else>

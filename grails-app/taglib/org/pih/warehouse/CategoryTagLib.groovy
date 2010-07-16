@@ -15,10 +15,9 @@ class CategoryTagLib {
 	 def displayTree = { categories, beginTag, endTag -> 			 
 		counter++;
 	 	categories.each { 	 		
-	 		println beginTag + it + endTag 
-	 		println counter.toString();
-	 		
-	 		println "display children: " + it.categories;
+	 		log.debug beginTag + it + endTag 
+	 		log.debug counter.toString();	 		
+	 		log.debug "display children: " + it.categories;
 	 		displayTree it.categories, "<h3>", "</h3>";	 		
 	 	}
 	 }

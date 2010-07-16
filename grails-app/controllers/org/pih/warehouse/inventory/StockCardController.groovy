@@ -11,7 +11,7 @@ class StockCardController {
 	}
 	
 	def manage = {
-		println "manage stock card $params.id"
+		log.debug "manage stock card $params.id"
 		//def product = Product.get(params.id)
 		//if (!product)
 		//    redirect(controller: "product", action: "list");
@@ -20,13 +20,13 @@ class StockCardController {
 		
 		def stockCardInstance = StockCard.get(params.id);
 		
-		println "stock card instance $stockCardInstance"
+		log.debug "stock card instance $stockCardInstance"
 		/*
 		 if (!stockCardInstance) {
-		 println "creating new stock card ";	    
+		 log.debug "creating new stock card ";	    
 		 stockCardInstance = new StockCard(product:product);
 		 stockCardInstance.save();
-		 println "creating new stock card $stockCardInstance.id";
+		 log.debug "creating new stock card $stockCardInstance.id";
 		 }*/
 		
 		//def stockCardInstance = StockCard.get(params.id)
@@ -54,19 +54,19 @@ class StockCardController {
 	
 	def saveEntry = {
 		
-		println "\n\nsaving stock card entry $params";
+		log.debug "\n\nsaving stock card entry $params";
 		def stockCardEntry = new StockCardItem(params)
-		println "saving stock card entry ${stockCardEntry.id} for stock card ${stockCardEntry.stockCard.id}"
+		log.debug "saving stock card entry ${stockCardEntry.id} for stock card ${stockCardEntry.stockCard.id}"
 		if (stockCardEntry.save(flush: true)) {
-			println "saved stock card entry ${stockCardEntry.id}"
+			log.debug "saved stock card entry ${stockCardEntry.id}"
 			flash.message = "${message(code: 'default.created.message', args: [message(code: 'stockCardEntry.label', default: 'Stock Card Entry'), stockCardEntry.id])}"
 			redirect(action: "manage", id: stockCardEntry.stockCard.id)
 		}
 		else {
-			println "render create form"
+			log.debug "render create form"
 			
 			
-			println "$stockCardEntry.errors"
+			log.debug "$stockCardEntry.errors"
 			//render(controller: "stockCardEntry", view: "create", model: [stockCardEntry: stockCardEntry])
 			
 			render(view: "manage", model: [stockCardEntryInstance: stockCardEntry, stockCardInstance: stockCardEntry.stockCard])
@@ -76,16 +76,16 @@ class StockCardController {
 		/*
 		 def stockCardEntry = new StockCardEntry(params);
 		 def saved = stockCardEntry.save(flush: true);
-		 println "saved stock card entry $stockCardEntry ";
+		 log.debug "saved stock card entry $stockCardEntry ";
 		 if (saved) {
-		 println "saved stock card entry $stockCardEntry";
+		 log.debug "saved stock card entry $stockCardEntry";
 		 flash.message = '''${message(code: 'default.created.message',
 		 args: [message(code: 'stockCardEntry.label', default: 'Stock Card Entry'), stockCardEntry.id])}'''
 		 //redirect(action: "show", id: stockCardEntry.id)
 		 redirect(action: "manage", id: stockCardEntry.stockCard.id);
 		 }
 		 else {
-		 println "need to create new stock card entry $params.stockCard.id";
+		 log.debug "need to create new stock card entry $params.stockCard.id";
 		 redirect(action: "manage", id: params.stockCard.id)
 		 //render(view: "create", model: [stockCardEntry: stockCardEntry])
 		 }

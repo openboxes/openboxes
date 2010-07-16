@@ -11,13 +11,13 @@ class WarehouseController {
 	
 	// defined as a regular method so its private
 	def auth() {
-		println "checking if user is authenticated $session.user";
+		log.debug "checking if user is authenticated $session.user";
 		if(!session.user) {
-			println "user in not authenticated";
+			log.debug "user in not authenticated";
 			redirect(controller: "user", action: "login");
 			return false
 		} else {
-			println "user is authenticated";
+			log.debug "user is authenticated";
 		}
 	}
 	
@@ -43,14 +43,14 @@ class WarehouseController {
 			eq("t.localWarehouse", warehouse)
 		}
 		
-		println "transaction entries $entries"
+		log.debug "transaction entries $entries"
 		for (TransactionEntry entry in entries) {
 			def quantityNow = inventory.get(entry.product);
 			
-			println "$quantityNow + $entry?.quantityChange"	    
+			log.debug "$quantityNow + $entry?.quantityChange"	    
 			quantityNow += entry.quantityChange
 			
-			println "quantity = $quantityNow"
+			log.debug "quantity = $quantityNow"
 			inventory.put(entry.product, quantityNow)
 		}
 		

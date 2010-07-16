@@ -95,7 +95,7 @@ table.container {
 	padding: 5px; 
 }
 .menu .menuSection ul li { 
-    display: block;
+    /*display: block;*/
     overflow: hidden;
     padding: 0;
     cursor: pointer;
@@ -104,7 +104,7 @@ table.container {
 	text-decoration: none;
 }
 .menu .menuSection a:hover { 
-	text-decoartion: underline;
+	text-decoration: underline;
 }
 
 /* nothing to do right now */

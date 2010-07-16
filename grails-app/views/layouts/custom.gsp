@@ -39,7 +39,20 @@
 	<g:javascript library="application"/>
 	<g:javascript library="jquery"/>
 	<script type="text/javascript">
-		$.noConflict();
+		//$.noConflict();
+		/*
+		$(function () {
+			$.notifyBar({
+				html: "Thank you, your settings were updated!",
+				delay: 100000,
+				animationSpeed: "normal",
+				close:true
+			});  
+		});
+		*/
+
+
+		
 		// Code that uses other library's $ can follow here.
 	</script>
 
@@ -47,6 +60,8 @@
 	<link href="${createLinkTo(dir:'js/jquery.ui/css/cupertino', file:'jquery-ui-1.8.2.custom.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
 	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-ui-1.8.2.custom.min.js')}" type="text/javascript" ></script>
 
+	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.notifyBar',file:'jquery.notifyBar.css')}" type="text/css" media="screen"  />
+	<script type="text/javascript" src="${createLinkTo(dir:'js/jquery.notifyBar',file:'jquery.notifyBar.js')}"></script>
 	
 	<!-- Dynamically include jquery-ui resources :  NOT WORKING CORRECTLY -->
 	<!-- <jqui:resources components="dialog, datepicker"/> -->	
@@ -59,12 +74,16 @@
 	<style type="text/css" media="screen"></style>
 </head>
 <body class="yui-skin-sam">
-	
-	<%--
-	<div id="notify-container" style="display: hidden;">
-		<div id="notify-message">test</div>	
-	</div>
+
+	<div class="notification-container"></div>
+	<%-- 
+	<g:if test="${flash.message}">	
+		<div id="notify-container" style="display: hidden;">
+			<div id="notify-message" class="message">${flash.message}</div>	
+		</div>
+	</g:if>
  	--%>
+
     <div id="doc3" class="yui-t7">
 		<!-- Spinner gets displayed when AJAX is invoked -->
 		<div id="spinner" class="spinner" style="display:none;">
@@ -97,8 +116,9 @@
 									| <li><g:link class="list" controller="user" action="preferences"><g:message code="default.preferences.label"  default="Preferences"/></g:link></li>
 									 -->
 									| <li><g:link class="list" controller="auth" action="logout"><g:message code="default.logout.label"  default="Logout"/></g:link></li>
+									<!-- 
 									| <li><input type="text" value="search" name="q" style="color: #aaa; font-weight: bold;" disabled=disabled /></li>
-									
+									 -->
 							    </g:if>
 							    <g:else test="${!session.user}">
 									<li>Not logged in</li>  | <li><g:link class="list" controller="auth" action="login"><g:message code="default.login.label" default="Login"/></g:link></li>
@@ -109,9 +129,7 @@
 									 
 							    </g:else>
 							</ul>
-						</div>
-						<div>
-						</div>
+						</div>					
 				    </div>
 				</div>
 		    </div>
@@ -173,7 +191,6 @@
 	      	</div>
 	      		      	
 	      	<!-- YUI nav block that includes the local navigation menu -->
-	         	
 	      	<div id="menu" role="navigation" class="yui-b">
 		  		<g:if test="${session?.user}">
 					<!-- Navigation Menu -->
@@ -193,10 +210,19 @@
 					</div>
 					--%>
 				</g:if>
-			</div>
-			 
+			</div>			 
 		</div>
-		
+
+		<!-- 
+		<div>
+			<button id="common">Default style bar</button>
+		    <button id="error">Error style bar</button>
+		    <button id="success">Success style bar</button>
+		    <button id="custom">Custom styling</button>
+		    <button id="close">With close button</button>	
+		</div>	
+		 -->
+		 
 		<!-- YUI "footer" block that includes footer information -->
 		<div id="ft" role="contentinfo">
 			<div id="footer">
@@ -206,5 +232,36 @@
 			</div>
 		</div>
 	</div>
+	
+	
+    <script type="text/javascript">
+		$(function() {
+	  		/*
+			$.notifyBar({ html: "This is 'Notify bar'!" });		  
+			$("#callGreen").click(function(){
+				$.notifyBar({ html: "Thank you, your settings were updated!", jqObject: $("#greenDiv") });
+			});		  
+			$("#callError").click(function(){
+				$.notifyBar({ jqObject: $("#errorDiv") });
+			});
+			$("#common").click(function(){
+				$.notifyBar({});
+			});
+			$("#error").click(function(){
+				$.notifyBar({ cls: "error", html: "Error occurred!" });
+			});
+			$("#success").click(function(){
+				$.notifyBar({ cls: "success", html: "Your data has been changed!" });
+			});
+			$("#custom").click(function(){
+				$.notifyBar({ cls: "custom", html: "This is a custom styling!" });
+			});
+			$("#close").click(function(){
+				$.notifyBar({ html: "Click 'close' to hide notify bar", close: true, delay: 1000000 });
+			});
+			*/
+		});    
+	</script>
+	
 </body>
 </html>

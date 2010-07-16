@@ -15,33 +15,27 @@ class DashboardController {
 		
 		def warehouse = null;
 		if (params.id!='null') {
-			log.error "looking up warehouse by id = ${params.id}";
+			log.info "looking up warehouse by id = ${params.id}";
 			warehouse = Location.get(params.id);
 		}
 
 		if (warehouse) {
 			
-			// Save the current warehouse in the session
+			// Save the warehouse selection to the session
 			session.warehouse = warehouse;
 						
-			// Save the user's preferred warehouse (if it's not set already)
-			//if (userInstance.warehouse) {
-			//	userInstance.warehouse = warehouse;
-			//	userInstance.save(flush:true);
-			//}
-			
+			// Save the warehouse selection for "last logged into" information
+			if (session.user) { 
+				def userInstance = User.get(session.user.id);
+				userInstance.warehouse = warehouse;
+				userInstance.lastLoginDate = new Date();
+				userInstance.save(flush:true);
+			}			
 			// Successfully logged in and select a warehouse
 			//session.user = userInstance;
-			redirect(controller:'dashboard',action:'index')
+			redirect(controller:'dashboard', action:'index')
 		}
-		else {
-			log.error "ask user to choose a warehouse"
-			//flash.message = "Please choose a valid warehouse.";
-			
-			//userInstance = new User(username:params['username'], password:params['password'])
-			//userInstance.errors.rejectValue("version", "default.authentication.failure",
-			//		[message(code: 'user.label', default: 'User')] as Object[], "Unable to authenticate user with no warehouse.")
-
+		else {	
 			render(view: "chooseWarehouse")
 		}
 		

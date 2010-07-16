@@ -24,7 +24,7 @@ class DataImportService {
 		def people = sql.dataSet("PERSON")
 		
 		people.each { 
-			println it;
+			log.info it;
 		}
 		
 	}

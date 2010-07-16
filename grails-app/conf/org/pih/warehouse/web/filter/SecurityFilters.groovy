@@ -12,8 +12,15 @@ class SecurityFilters {
 					redirect(controller: 'auth', action:'login')
 					return false;
 				}
-				else if (!session.warehouse && !("chooseWarehouse".equals(actionName) || "login".equals(actionName) || "doLogin".equals(actionName))) {
+				else if (!session.warehouse && !("chooseWarehouse".equals(actionName) || "logout".equals(actionName) 
+							|| "login".equals(actionName) || "doLogin".equals(actionName))) {
+						
+					if (session?.warehouseStillNotSelected) { 
+						flash.message = "You must choose a warehouse before selecting a menu option.";
+					}
+					session.warehouseStillNotSelected = true;
 					redirect(controller: 'dashboard', action: 'chooseWarehouse')
+					//render(view: "/dashboard/chooseWarehouse")					
 					return false;
 				}
 				

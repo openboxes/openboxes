@@ -34,18 +34,21 @@ class AuthController {
      * Performs the authentication logic.
      */
     def doLogin = {
-		log.error "doLogin"		
+		log.debug "doLogin"		
     	def userInstance = User.findWhere(username:params['username'], password:params['password'])
-    					
+    		
+		// Successfully logged in
 		if (userInstance) {
-			// Successfully logged in and select a warehouse
 			session.user = userInstance;
+			
+			log.info "preferred warehouse" + userInstance.warehouse
 			redirect(controller:'dashboard',action:'index')
     		
 		}
+		// Invalid username or password
 		else {
 			
-		    log.error "user does not exist or password is incorrect";
+		    log.info "user does not exist or password is incorrect";
 		    //flash.message = "Unable to authenticate user with the provided credentials."
 	
 			userInstance = new User(username:params['username'], password:params['password'])

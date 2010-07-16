@@ -32,7 +32,7 @@ class DocumentController {
 	 * Allow user to download the file associated with the given id.
 	 */
 	def download = { 
-		log.error "download file id = ${params.id}";
+		log.debug "download file id = ${params.id}";
 
 		def document = Document.get(params.id)
         if (!document) {
@@ -41,10 +41,10 @@ class DocumentController {
         }
         else {
             //redirect(action: "show", [document:document]);        	
-    		log.error "document = ${document}";
+    		log.debug "document = ${document}";
     		
     		def path = "/tmp/warehouse/shipment/" + document.getShipment().getId() + "/" + document.getFilename();
-    		log.error "path = ${path}";
+    		log.info "uploaded file path = ${path}";
     			
     		def file = new File(path);    
     		

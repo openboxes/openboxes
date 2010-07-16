@@ -50,7 +50,7 @@ class Shipment {
 	
 	// Core association mappings
 	static hasMany = [events : ShipmentEvent,
-	                  packages : ShipmentPackage,
+	                  containers : Container,
 	                  documents : Document, 	                  
 	                  comments : Comment,
 	                  //products : Product,
