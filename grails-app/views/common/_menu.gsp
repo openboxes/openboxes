@@ -6,8 +6,8 @@
 			</span>
 		</span>
 		<ul>
-			<li><span class="menuButton"><g:link class="bullet" controller="shipment" action="list"><g:message code="shipment.list.incoming.label"  default="Incoming Shipments"/></g:link></span></li>										
-			<li><span class="menuButton"><g:link class="bullet" controller="shipment" action="list"><g:message code="shipment.list.outgoing.label"  default="Outgoing Shipments"/></g:link></span></li>										
+			<li><span class="menuButton"><g:link class="bullet" controller="shipment" action="listIncoming"><g:message code="shipment.list.incoming.label"  default="Incoming Shipments"/></g:link></span></li>										
+			<li><span class="menuButton"><g:link class="bullet" controller="shipment" action="listOutgoing"><g:message code="shipment.list.outgoing.label"  default="Outgoing Shipments"/></g:link></span></li>										
 			<li><span class="menuButton"><g:link class="bullet" controller="shipment" action="create"><g:message code="shipment.create.incoming.label" default="New Incoming Shipment" /></g:link></span></li>						
 			<li><span class="menuButton"><g:link class="bullet" controller="shipment" action="create"><g:message code="shipment.create.outgoing.label" default="New Outgoing Shipment" /></g:link></span></li>						
 		</ul>										

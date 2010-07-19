@@ -26,7 +26,42 @@ class DocumentController {
 		redirect(action: "list", params:params)
 	}
            
-	
+
+	/**
+	* Upload a document to the server
+	*/
+   def upload = { DocumentCommand command ->
+	   log.info "shipmentId: $command.shipmentId"
+	   log.info "contents: $command.contents"
+
+	   def file = request.getFile('contents');
+	   def filename = file.originalFilename;
+	   
+	   // file must be less than 1MB
+	   if (!file?.empty && file.size < 1024*1000) {
+		   def shipment = Shipment.get(command.shipmentId);
+		   def size = file.size;
+		   def type = command.type;
+		   
+		   Document document = new Document(type: type, size: size, filename: filename, contents: command.contents);
+		   shipment.addToDocuments(document).save(flush:true);
+		   
+		   flash.message= "Successfully saved file to Shipment"
+		   
+		   File newFile = new File("/tmp/warehouse/shipment/" + command.shipmentId + "/" + filename);
+		   newFile.mkdirs();
+		   file.transferTo(newFile);
+		   
+		   flash.message += " and stored the file $newFile.absolutePath to the local file system";
+	   }
+	   else {
+		   
+		   flash.message = "File $filename is too large (must be less than 1MB)";
+	   }
+	   
+	   redirect(controller: 'shipment', action: 'show', id: command.shipmentId)
+   }
+		
 	
 	/**
 	 * Allow user to download the file associated with the given id.
@@ -60,39 +95,6 @@ class DocumentController {
         }
 	}
 	
-	/**
-	 * Upload a document to the server
-	 */
-    def upload = { DocumentCommand command ->
-		log.info "shipmentId: $command.shipmentId"
-		log.info "contents: $command.contents"
 
-		def file = request.getFile('contents');
-		def filename = file.originalFilename;
-        
-		// file must be less than 1MB
-        if (!file?.empty && file.size < 1024*1000) {
-			def shipment = Shipment.get(command.shipmentId);
-			def size = file.size;
-			def type = command.type;
-			
-			Document document = new Document(type: type, size: size, filename: filename, contents: command.contents);
-			shipment.addToDocuments(document).save(flush:true);
-			
-			flash.message= "Successfully saved file to Shipment"
-			
-			File newFile = new File("/tmp/warehouse/shipment/" + command.shipmentId + "/" + filename);
-			if (newFile.mkdirs())
-				file.transferTo(newFile);
-			
-			flash.message += " and stored the file $newFile.absolutePath to the local file system";
-        }
-        else { 
-        	
-        	flash.message = "File $filename is too large (must be less than 1MB)";
-        }
-        
-		redirect(controller: 'shipment', action: 'show', id: command.shipmentId)
-    }    
 
 }

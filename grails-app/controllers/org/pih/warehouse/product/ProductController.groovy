@@ -22,8 +22,7 @@ class ProductController {
 	def importProducts = { 
 		
 		if ("GET".equals(request.getMethod())) { 			
-			log.info "GET request"
-				render(view: "uploadProducts");
+			render(view: "uploadProducts");
 		}
 		else if ("POST".equals(request.getMethod())) { 			
 			log.info "POST request"
@@ -46,11 +45,10 @@ class ProductController {
 				redirect(controller: "product", action: "browse")
 			}
 		}
+	}
+
 
 		
-		
-	}
-	
 	/**
 	 * Upload and process CSV file
 	 */
@@ -285,6 +283,8 @@ class ProductController {
             redirect(action: "list")
         }
     }
+	
+	
 }
 
 

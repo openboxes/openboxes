@@ -31,10 +31,27 @@ class ShipmentController {
 		}
 	}
 
-	    
+	def listIncoming = { 
+		def currentLocation = Location.get(session.warehouse.id);
+		def incomingShipments = shipmentService.getShipmentsWithDestination(currentLocation);		
+		[
+			shipmentInstanceList : incomingShipments,
+			shipmentInstanceTotal : incomingShipments.size(),
+		];
+	}
+	
+	
+	def listOutgoing = { 
+		def currentLocation = Location.get(session.warehouse.id);		
+		def outgoingShipments = shipmentService.getShipmentsWithOrigin(currentLocation);		
+		[
+			shipmentInstanceList : outgoingShipments,
+			shipmentInstanceTotal : outgoingShipments.size(),
+		];
+		
+		
+	}
     
-    // Wed Jun 23 00:00:00 CDT 2010
-    // yyyy-MM-dd HH:mm:ss z
     
     def list = { 
     	def browseBy = params.id;
@@ -49,6 +66,7 @@ class ShipmentController {
 		def shipmentInstanceList = ("incoming".equals(browseBy)) ? incomingShipments : 
 			("outgoing".equals(browseBy)) ? outgoingShipments : allShipments;
 		
+		// Arrange shipments by status 
 		def shipmentListByStatus = new HashMap<String, ListCommand>();
 		allShipments.each {
 			def shipmentList = shipmentListByStatus[it.shipmentStatus];
@@ -60,6 +78,7 @@ class ShipmentController {
 			shipmentListByStatus.put(it.shipmentStatus, shipmentList)		
 		}
 		
+		// Get a count of shipments by status
 		/* select shipment_status.id, count(*) from shipment group by shipment_status.id */	
 		def criteria = Shipment.createCriteria()
 		def results = criteria {			
@@ -79,19 +98,6 @@ class ShipmentController {
 			outgoingShipmentCount : outgoingShipments.size()
 		]
     }
-	
-	def incomingShipments = { 
-		
-		
-		
-	}
-	
-	def outgoingShipments = { 
-		
-	}
-	
-	
-	
 	
 	def sendShipment = { 
 		redirect action: "show", id: shipment.id;

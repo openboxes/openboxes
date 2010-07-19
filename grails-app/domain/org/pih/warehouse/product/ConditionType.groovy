@@ -8,6 +8,7 @@ import org.pih.warehouse.core.Type;
 class ConditionType extends Type {
 
 	static constraints = { 
+		
 	}
 
 	String toString() { return "$name"; }	

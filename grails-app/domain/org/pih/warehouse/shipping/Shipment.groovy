@@ -105,6 +105,12 @@ class Shipment {
 	String getShipmentNumber() {
 		return (id) ? String.valueOf(id).padLeft(6, "0")  : "(new shipment)";
 	}
+	
+	/*
+	int compareTo(obj) {
+		dateCreated.compareTo(obj.dateCreated)
+	}*/
+ 
 
 		
 }
