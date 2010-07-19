@@ -147,7 +147,7 @@ td.errors input {
 /* TABLES */
 
 table {
-    border: 1px solid #ccc;
+    /*border: 1px solid #ccc;*/		/* jmiranda: removed because it's annoying to have to disabled the border */
     /*width: 100%*/
 }
 tr {
@@ -161,7 +161,7 @@ td, th {
     vertical-align: top;
 }
 th {
-    background: #fff url(../images/skin/shadow.jpg);
+    /*background: #fff url(../images/skin/shadow.jpg);*/
     color: #666;
     font-size: 11px;
     font-weight: bold;

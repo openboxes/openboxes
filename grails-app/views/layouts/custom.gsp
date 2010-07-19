@@ -193,8 +193,10 @@
 	      	<!-- YUI nav block that includes the local navigation menu -->
 	      	<div id="menu" role="navigation" class="yui-b">
 		  		<g:if test="${session?.user}">
-					<!-- Navigation Menu -->
-					<g:render template="../common/menu"/>
+					<!-- Navigation Menu -->				
+					<g:if test="${session?.warehouse}">
+						<g:render template="../common/menu"/>
+					</g:if>
 					<%-- 			  		
 			  		<div id="navMenu" class="homePagePanel">
 			      		<div class="panelTop"><!-- used to dislay the bottom border of the navigation menu --></div>

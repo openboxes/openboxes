@@ -21,7 +21,7 @@
 		<ul>
 			<li><span class="menuButton"><g:link class="bullet" controller="product" action="browse"><g:message code="product.browse.label"  default="Browse Products"/></g:link></span></li>		
 			<li><span class="menuButton"><g:link class="bullet" controller="product" action="create"><g:message code="product.create.label" default="Create Product" /></g:link></span></li>						
-			<li><span class="menuButton"><g:link class="bullet" controller="product" action="create"><g:message code="product.import.label" default="Import Products" /></g:link></span></li>						
+			<li><span class="menuButton"><g:link class="bullet" controller="product" action="importProducts"><g:message code="product.import.label" default="Import Products" /></g:link></span></li>						
 
 			<%-- 
 			<li><span class="menuButton"><g:link class="list" controller="product" action="list"><g:message code="default.list.label"  args="['Product']"/></g:link></span></li>		

@@ -1,8 +1,11 @@
 package org.pih.warehouse.product;
 
+import org.junit.runner.Request;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.ProductType;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 class ProductController {
 
@@ -12,6 +15,108 @@ class ProductController {
         redirect(action: "list", params: params)
     }
 
+	
+	/**
+	 * Import contents of CSV file
+	 */
+	def importProducts = { 
+		
+		if ("GET".equals(request.getMethod())) { 			
+			log.info "GET request"
+				render(view: "uploadProducts");
+		}
+		else if ("POST".equals(request.getMethod())) { 			
+			log.info "POST request"
+			if (!session.products) { 				
+				log.info "GET request"
+				
+				flash.message = "Please upload a CSV file with valid products";
+			}
+			else { 			
+				session.products.each() {
+					
+					
+					
+					new Product(name: it.name, description: it.description, productType: it.productType).save(failOnError:true);
+				};
+				
+					
+				// import 
+				flash.message = "Products imported successfully"	
+				redirect(controller: "product", action: "browse")
+			}
+		}
+
+		
+		
+	}
+	
+	/**
+	 * Upload and process CSV file
+	 */
+	def uploadProducts = {
+		
+		if ("POST".equals(request.getMethod())) {
+			
+			
+			def uploadFile = request.getFile('csvFile');
+			
+			// file must be less than 1MB
+			if (!uploadFile?.empty) {
+				File csvFile = new File("/tmp/warehouse/products/import/" + uploadFile.originalFilename);
+				csvFile.mkdirs()
+				
+				uploadFile.transferTo(csvFile);
+				
+				
+				//def sql = Sql.newInstance("jdbc:mysql://localhost:3306/mydb", "user", "pswd", "com.mysql.jdbc.Driver")
+				//def people = sql.dataSet("PERSON")
+				List<Product> products = new ArrayList<Product>();
+				
+				/*
+				csvFile.splitEachLine(",") { fields ->
+					log.info("field0: " + fields[0])
+					log.info("field1: " + fields[1])
+					log.info("field2: " + fields[2])
+					
+					products.add(
+						new ProductCommand(
+							id: fields[0], 
+							ean: fields[1], 
+							name: fields[2], 
+							description: fields[3], 
+							productType: fields[4]));
+				}*/
+
+				
+				// Process CSV file 
+				def columns;
+				CSVReader csvReader = new CSVReader(new FileReader(csvFile.getAbsolutePath()), (char) ',', (char) '\"', 1);
+				while ((columns = csvReader.readNext()) != null) {
+					log.info "product type: " + columns[4]
+					def productType = ProductType.findByName(columns[4]);
+					if (!productType) { 
+						throw new Exception("Could not find Product Type with name '" + columns[4] + "'")
+					}
+					
+					products.add(
+						new Product(
+							//id: columns[0],
+							ean: columns[1],
+							name: columns[2],
+							description: columns[3],
+							productType: productType));
+				}
+				
+				session.products = products;						
+				render(view: "importProducts", model: [products:products]);
+			}
+			else { 			
+				flash.message = "Please upload a non-empty CSV file";				
+			}
+    	}
+    }
+	
     def browse = { 
     		
     	// Get selected 
@@ -82,18 +187,12 @@ class ProductController {
         //params.max = Math.min(params.max ? params.int('max') : 10, 100)		
 		render(view:'browse', model:[productInstanceList : results, 
     	                             productInstanceTotal: Product.count(), 
-    	                             rootCategory : rootCategory,
-    	                             categories : allCategories,
-    	                             conditionTypes : allConditionTypes,
-    	                             productTypes : allProductTypes, 
-    	                             productSubTypes : productSubtypes,
-    	                             attributes : allAttributes,
-    	                             selectedAttribute : selectedAttribute,
-    	                            
-    	                             selectedCategory : selectedCategory,
-    	                             selectedConditionType : selectedConditionType,
-    	                             selectedProductType : selectedProductType,
-    	                             selectedProductSubType : selectedProductSubType])
+									 rootCategory : rootCategory,
+    	                             categories : allCategories, selectedCategory : selectedCategory,
+    	                             conditionTypes : allConditionTypes, selectedConditionType : selectedConditionType,
+    	                             productTypes : allProductTypes, selectedProductType : selectedProductType,
+    	                             productSubTypes : productSubtypes, selectedProductSubType : selectedProductSubType,
+    	                             attributes : allAttributes, selectedAttribute : selectedAttribute ])
 	}
     
     
@@ -187,3 +286,20 @@ class ProductController {
         }
     }
 }
+
+
+
+class ProductCommand {
+	String id
+	String ean
+	String name
+	String description
+	String productType
+	
+	static constraints = {
+	   ean(nullable: true, blank: false)
+	   name(nullable: true, blank: false)
+	   description(nullable:true, blank:false)
+	   productType(nullable:true, blank:false)
+	}
+ }

@@ -127,8 +127,15 @@
 		                            	<label><g:message code="shipment.destination.label" default="Ship on" /></label>
 		                            </td>
 		                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}">
+										
+										<g:jquery_datepicker name="expectedShippingDate" />
+										
+										<!-- 
+										
 										<input id="expectedShippingDate" name="expectedShippingDate" type="hidden"/>
 										<input id="expectedShippingDatePicker" name="expectedShippingDatePicker" type="text" class="date" width="8" />
+										 -->
+										
 		                            </td>                            
 		                        </tr>          
 		                        <tr class="prop">
