@@ -117,11 +117,11 @@
 										</td>				
 									
 									</tr>									
-									
-									<tr>
-										<td colspan="2">&nbsp;</td>									
-									</tr>
-									
+									<tr class="prop">
+										<td colspan="2">
+											
+										</td>
+									</tr>									
 									<tr class="prop">
 										<td class="name"><label>Documents</label></td>
 										<td class="value">
@@ -137,7 +137,10 @@
 																<tr id="document-${document.id}"
 																	class="${(i % 2) == 0 ? 'odd' : 'even'}">
 																	<td nowrap="nowrap">
-																		<g:formatDate format="dd MMM yyyy" date="${document?.dateCreated}"/>					
+																		<g:formatDate format="dd MMM yyyy" date="${document?.dateCreated}"/><br/>
+																		<span style="font-size: 0.8em; color: #aaa;">
+																			<g:formatDate type="time" date="${document.dateCreated}"/>
+																		</span>																							
 																	</td>					
 																	<td>
 																		${document?.documentType?.name}
@@ -159,8 +162,10 @@
 											</div>										
 										</td>
 									</tr>
-									<tr>
-										<td colspan="2">&nbsp;</td>									
+									<tr class="prop">
+										<td colspan="2">
+											
+										</td>
 									</tr>
 									<tr class="prop">
 										<td class="name"><label>Events</label></td>
@@ -300,7 +305,7 @@
 								</g:each>									
 							</g:else>
 						</div>
-						<div style="padding: 5px; border-bottom: 1px solid #ccc;"> 
+						<div style="padding: 5px; text-align: right;"> 
 							<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}"><img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit Contents" style="vertical-align: middle"/> edit contents</g:link>
 							&nbsp; 
 							<g:link controller="shipment" action="showPackingList" id="${shipmentInstance.id}" ><img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="View Packing List" style="vertical-align: middle"/> packing list</g:link> 
