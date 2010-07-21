@@ -100,12 +100,9 @@
 									<tr class="prop">
 										<td valign="top" class="name"><label><g:message
 											code="shipment.trackingNumber.label" default="Tracking" /></label></td>
-										<td valign="top" class="value"><span style="color: #aaa">
-												<g:if test="${shipmentInstance?.trackingNumber}">
-													${fieldValue(bean: shipmentInstance, field: "trackingNumber")}											                            	
-												</g:if> 
-												<g:else>(none)</g:else> 
-											</span></td>
+										<td valign="top" class="value">										
+											${fieldValue(bean: shipmentInstance, field: "trackingNumber")}											                            	
+										</td>
 									</tr>
 									<tr class="prop">
 										<td class="name">
@@ -196,7 +193,10 @@
 									<g:each in="${shipmentInstance.events}" var="event" status="i">
 										<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 											<td nowrap="nowrap">
-												<g:formatDate format="dd MMM yy" date="${event.eventDate}"/>
+												<g:formatDate format="dd MMM yy" date="${event.eventDate}"/><br/>
+												<span style="font-size: 0.8em; color: #aaa;">
+													<g:formatDate type="time" date="${event.eventDate}"/>
+												</span>
 											</td>
 											<td nowrap="nowrap">
 												${event.eventType.name}<br/>

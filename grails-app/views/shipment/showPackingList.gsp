@@ -39,24 +39,33 @@
 			</div>
 		</g:hasErrors>	
 	
-	
-		<div class="list">	
+		<table>
+			<tr>
+				<td>
+		<div id="containers" class="section">
+			<h2>Packing List</h2>
 			<table>
 				<tbody>
-					<g:each var="item" in="${shipmentInstance.allShipmentItems}" status="i">
+					<tr>
+						<th>Item</th>
+						<th>Quantity</th>
+					</tr>
 				
-						<tr>
-							<td>
-								${i}
-							
-							</td>
+					<g:each var="item" in="${shipmentInstance.allShipmentItems}" status="i">					
+						<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+							<td>${item.product.name}</td>
+							<td>${item.quantity}</td>
 						</tr>
 					</g:each>
 		
 				</tbody>
 			</table>
-			
 		</div>
+				
+				</td>
+			</tr>
+		</table>
+
 	</div>
 </body>
 </html>
