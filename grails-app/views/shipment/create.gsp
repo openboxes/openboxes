@@ -50,27 +50,25 @@
 	                        		<label><g:message code="shipment.name.label" default="Nickname" /></label>
 	                        	</td>
 	                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">
-                                    <g:textField class="large" name="name" size="30" value="${shipmentInstance?.name}" />
+                                    <g:textField name="name" size="30" value="${shipmentInstance?.name}" />
 	                            </td>                            
 	                        </tr>
 	                    
-<!--  		                    
-		                        <tr class="prop">
-		                            <td valign="top" class="name">
-		                            	<label><g:message code="shipment.destination.label" default="Ship on" /></label>
-		                            </td>
-		                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}">										
-									<g:jquery_datepicker name="expectedShippingDate" />																			
+	                        <tr class="prop">
+								<td valign="top" class="name">
+	                            	<label><g:message code="shipment.destination.label" default="Expected shipping date" /></label>
+	                            </td>
+	                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}">										
+									<g:jqueryDatePicker name="expectedShippingDate" />																			
 	                            </td>                            
 	                        </tr>          
--->
-		                        <g:if test="${params.type=='incoming'}">                   
+	                        <g:if test="${params.type=='incoming'}">                   
 		                        <tr class="prop">
 		                            <td valign="top" class="name">
 		                            	<label><g:message code="shipment.origin.label" default="Where is it coming from?" /></label>
 		                            </td>                            
 		                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">
-		                            	<g:select name="origin.id" from="${org.pih.warehouse.inventory.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.origin?.id}" noSelection="['0':'']" />
+		                            	<g:select name="origin.id" from="${warehouses}" optionKey="id" value="${shipmentInstance?.origin?.id}" noSelection="['0':'']" />
 		                            	<g:hiddenField name="destination.id" value="${session.warehouse.id}" />
 		                            </td>                            
 		                        </tr>		     
@@ -82,8 +80,8 @@
 		                            	<label><g:message code="shipment.destination.label" default="Where is it going?" /></label>
 		                            </td>                            
 		                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">
-		                            	<g:select name="destination.id" from="${org.pih.warehouse.inventory.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.destination?.id}" noSelection="['0':'']" />
-		                            	<g:hiddenField name="origin" value="${session.warehouse.id}" />
+		                            	<g:select name="destination.id" from="${warehouses}" optionKey="id" value="${shipmentInstance?.destination?.id}" noSelection="['0':'']" />
+		                            	<g:hiddenField name="origin.id" value="${session.warehouse.id}" />
 		                            </td>                            
 		                        </tr>	
 	                        </g:elseif>
@@ -93,7 +91,7 @@
 		                            	<label><g:message code="shipment.destination.label" default="Where is it coming from?" /></label>
 		                            </td>                            
 		                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">
-		                            	<g:select name="origin.id" from="${org.pih.warehouse.inventory.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.destination?.id}" noSelection="['0':'']" />
+		                            	<g:select name="origin.id" from="${warehouses}" optionKey="id" value="${shipmentInstance?.origin?.id}" noSelection="['0':'']" />
 		                            </td>                            
 		                        </tr>	
 		                        <tr class="prop">
@@ -101,10 +99,18 @@
 		                            	<label><g:message code="shipment.destination.label" default="Where is it going?" /></label>
 		                            </td>                            
 		                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">
-		                            	<g:select name="destination.id" from="${org.pih.warehouse.inventory.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.destination?.id}" noSelection="['0':'']" />
+		                            	<g:select name="destination.id" from="${warehouses}" optionKey="id" value="${shipmentInstance?.destination?.id}" noSelection="['0':'']" />
 		                            </td>                            
 		                        </tr>	
 	                        </g:else>
+							<tr class="prop">
+	                        	<td valign="top" class="name">
+	                        		<label><g:message code="shipment.initialStatus.label" default="What is the current status?" /></label>
+	                        	</td>
+	                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: '', 'errors')}">
+                                    <g:select name="eventType.id" from="${eventTypes}" optionKey="id" value="${shipmentInstance?.origin?.id}" noSelection="['0':'']" />
+	                            </td>                            
+	                        </tr>	                        	      
 	                        	                        
 	                        <tr class="prop">		                        
 	                        	<td></td>

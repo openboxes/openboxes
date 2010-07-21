@@ -59,7 +59,7 @@ class DocumentController {
 		   flash.message = "File $filename is too large (must be less than 1MB)";
 	   }
 	   
-	   redirect(controller: 'shipment', action: 'show', id: command.shipmentId)
+	   redirect(controller: 'shipment', action: 'showDetails', id: command.shipmentId)
    }
 		
 	
@@ -72,12 +72,10 @@ class DocumentController {
 		def document = Document.get(params.id)
         if (!document) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}";
-			redirect(controller: "shipment", action: "show", id:document.getShipment().getId());    			
+			redirect(controller: "shipment", action: "showDetails", id:document.getShipment().getId());    			
         }
-        else {
-            //redirect(action: "show", [document:document]);        	
-    		log.debug "document = ${document}";
-    		
+        else {            
+    		log.debug "document = ${document}";    		
     		def path = "/tmp/warehouse/shipment/" + document.getShipment().getId() + "/" + document.getFilename();
     		log.info "uploaded file path = ${path}";
     			
@@ -90,7 +88,7 @@ class DocumentController {
     		}
     		else { 
                 flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'file.label', default: 'Document File'), params.id])}";
-    			redirect(controller: "shipment", action: "show", id:document.getShipment().getId());    			
+    			redirect(controller: "shipment", action: "showDetails", id:document.getShipment().getId());    			
     		}
         }
 	}

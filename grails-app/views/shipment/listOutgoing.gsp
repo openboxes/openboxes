@@ -5,7 +5,11 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'shipment.label', default: 'Outgoing Shipments')}" />
         <title><g:message code="default.list.label" args="[entityName]" /></title>
-		<content tag="pageTitle"><g:message code="default.list.label" args="[entityName]" /></content>
+		<content tag="pageTitle">
+			<img src="${createLinkTo(dir:'images/icons/silk/',file: 'lorry.png')}"
+				valign="top" style="vertical-align: middle;" />
+			<g:message code="default.list.label" args="[entityName]" />
+		</content>
     </head>    
     <body>
         <div class="body">
@@ -43,8 +47,7 @@
 										</div>									
 									</g:else>
 								</td>
-								<td>
-								
+								<td nowrap="nowrap">								
 									<g:if test="${!shipmentInstance.events}"></g:if>
 									<g:else>
 										<g:each in="${shipmentInstance.documents}" var="document" status="j">

@@ -20,8 +20,7 @@ class Event implements Comparable {
 	                     
 	static constraints = {
 		targetLocation(nullable:true)
-		description(nullable:true)
-		
+		description(nullable:true)		
 	}
 
 	String toString() { return "$eventType $eventLocation on $eventDate"; }

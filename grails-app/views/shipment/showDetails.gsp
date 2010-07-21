@@ -10,14 +10,23 @@
 <%@ page import="org.pih.warehouse.shipping.Shipment" %>
 <%@ page import="org.pih.warehouse.user.User" %>
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
-        <title><g:message code="default.show.label" args="[entityName]" /></title>        
-        <!-- Specify content to overload like global navigation links, page titles, etc. -->
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="layout" content="custom" />
+	<g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
+	<title><g:message code="default.show.label" args="[entityName]" /></title>        
+	<!-- Specify content to overload like global navigation links, page titles, etc. -->
+	<content tag="pageTitle">
+		<img src="${createLinkTo(dir:'images/icons/silk/',file: 'lorry.png')}"
+			valign="top" style="vertical-align: middle;" /> 
+			${shipmentInstance.name}<br/>
+			<span style="color: #aaa; font-size: 0.8em;">
+				Created: <g:formatDate date="${shipmentInstance?.dateCreated}" format="dd MMM yyyy hh:mm" /> |
+				Updated: <g:formatDate date="${shipmentInstance?.lastUpdated}" format="dd MMM yyyy hh:mm" />				
+			</span>
+	</content>
 </head>
-	
+
 <body>
     
 	<div class="body">
@@ -25,11 +34,12 @@
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
 		</g:if>
-			<table>
-				<tr>
-					<td>
-						<div id="details" class="section">
-							<h2>Shipment Details</h2>
+		<table>
+			<tr>
+				<td>
+					<div id="details" class="section">
+						<h2>Shipment Details</h2>
+						<div style="padding: 10px">
 							<table cellspacing="5" cellpadding="5">
 								<tbody>
 									<tr class="prop">
@@ -63,7 +73,7 @@
 										</td>
 									</tr>
 																
-
+	
 									<tr class="prop">
 										<td valign="top" class="name"><label><g:message
 											code="shipment.method.label" default="Ship By" /></label></td>
@@ -100,16 +110,25 @@
 											date="${shipmentInstance?.dateCreated}"
 											format="dd MMM yyyy hh:mm:ss" /></span></td>
 									</tr>
-									--%>
-									
+									--%>									
 								</tbody>
 							</table>
 						</div>
-						<div id="documents" class="section">
-							<h2>Documents</h2>
+						<div style="border-bottom: 1px solid #ccc; border-top: 1px dotted #ccc; padding: 5px;"> 
+							<span class="button">
+								<g:link controller="shipment" action="editDetails" id="${shipmentInstance.id}"><img
+								src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}"
+								alt="Edit Shipment" /> edit</g:link></span> 
+						</div>		
+				
+						
+					</div>
+					<div id="documents" class="section">
+						<h2>Documents</h2>
+						<div style="padding: 5px;">
 							<g:if test="${!shipmentInstance.containers}">
-								<div>There are currently no documents for this
-								shipment.</div>
+								There are currently no documents for this
+								shipment.
 							</g:if> 
 							<g:else>
 								<table>
@@ -129,25 +148,29 @@
 											</tr>
 										</g:each>
 										<tr>
-											<td colspan="3" style="text-align: left; border-top: 1px solid #ccc;">
-												<span style="vertical-align: absmiddle">
-													<a href="${createLink(controller: "shipment", action="addDocument")}"><img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add Document"/> add document</a>
-												</span>
-											</td>										
-										</tr>
+											<td>											
+											</td>
 										
+										</tr>
 									</tbody>
 								</table>
 							</g:else>
 						</div>
-						<div id="events" class="section">
-							<h2>Events</h2>
+						<div style="vertical-align: middle; border-top: 1px dotted #ccc; padding: 5px; border-bottom: 1px solid #ccc">
+							<a href="${createLink(controller: "shipment", action: "addDocument", id: shipmentInstance.id)}"><img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add Document"/> add document</a>
+						</div>
+						
+						
+					</div>
+					<div id="events" class="section">
+						<h2>Events</h2>
+						<div style="padding: 5px;">
 							<g:if test="${!shipmentInstance.events}">
-								<div>There are currently no events for this
-								shipment.</div>
+								There are currently no events for this
+								shipment.
 							</g:if> 
 							<g:else>
-								<table>	
+								<table >	
 									<g:each in="${shipmentInstance.events}" var="event" status="i">
 										<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 											<td nowrap="nowrap">
@@ -159,30 +182,24 @@
 													${event.eventLocation.name}</span>
 											</td> 
 										</tr>										
-									</g:each>
-									<tr>
-										<td colspan="2" style="text-align: left; border-top: 1px solid #ccc;">
-											<span style="vertical-align: absmiddle">
-												<a href="${createLink(controller: "shipment", action="addEvent")}"><img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add Event"/> add event</a>
-											</span>
-										</td>										
-									</tr>
-									
-									
+									</g:each>									
 								</table>
-								
-								
 							</g:else>
-						</div>					
-					</td>					
-					</td>
-				
-					<td width="60%">
-						<div id="containers" class="section">
-							<h2>Shipment Units</h2>
+						</div>
+						<div style="vertical-align: absmiddle; border-top: 1px dotted #ccc; border-bottom: 1px solid #ccc; padding: 5px;">
+							<a href="${createLink(controller: "shipment", action: "addEvent", id: shipmentInstance.id)}"><img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add Event"/> add event</a>
+						</div>
+					</div>					
+				</td>					
+			
+				<td width="60%">
+					<div id="containers" class="section">
+						<h2>Shipment Units</h2>
+						
+						<div style="padding: 5px;">
 							<g:if test="${!shipmentInstance.containers}">
-								<div>There are currently no shipping units in this
-								shipment.</div>
+								There are currently no shipping units in this
+								shipment.
 							</g:if> 
 							<g:else>
 								<g:each in="${shipmentInstance.containersByType}" var="entry" status="i">									 
@@ -236,10 +253,8 @@
 																</span> 
 																<span style="color: #aaa; font-size: .75em; padding-left: 10px;">
 																	Contains: 
-																	<b><%= container.getShipmentItems().size() %> items</b> </span>
-																<span style="padding-left: 10px;"> 
-																	<g:link controller="container" action="show" id="${container.id}">edit</g:link> 
-																 </span> 
+																	<b><%= container.getShipmentItems().size() %> items</b> 
+																</span>												 
 															</div>	
 														</td>
 													</tr>
@@ -247,27 +262,16 @@
 											</table>										
 										</g:each>										
 									</fieldset>
-								</g:each>
-								<!-- iterate over each container -->
+								</g:each>									
 							</g:else>
-						</div>						
-					</td>
-				</tr>
-				<tr>
-					<td>&nbsp;</td>
-				</tr>				
-				<tr style="border-top: 1px solid #aaa;">
-					<td colspan="2">
-						<div id="buttons" class="buttons"><span class="button"><a
-							href="${createLink(controller: "shipment", action="editDetails")}"><img
-							src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}"
-							alt="Edit Shipment" /> Edit Shipment</a></span> 
 						</div>
-							
-					</td>
-				</tr>
-			</table>
-		</div>
-
-    </body>
+						<div style="padding: 5px; border-bottom: 1px solid #ccc; border-top: 1px dotted #ccc;"> 
+							<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}"><img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit Contents"/> edit</g:link> 
+						</div>								
+					</div>						
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
 </html>

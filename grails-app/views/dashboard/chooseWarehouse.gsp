@@ -19,7 +19,7 @@
 
 
 					<fieldset> 		
-						<label>Choose a warehouse:</label>
+						<legend>Choose a warehouse</legend>
 						<table>
 							<tbody>
 								<tr>
@@ -32,18 +32,18 @@
 										</g:if>
 									</td>
 								</tr>
-								<tr>
-									<g:each var="warehouse" in="${org.pih.warehouse.inventory.Warehouse.list()}">								
-										<td>
-											<div style="width: 100px; padding: 5px; background-color: #F8F7EF; display: block;">
-												
-												
-												<a style="display: block;" class="home" href='${createLink(action:"chooseWarehouse", id: warehouse.id)}'>
-												<g:if test="${warehouse.logoUrl}"><img src="${warehouse.logoUrl}" width="24" height="24" style="vertical-align: middle"></img></g:if>${warehouse.name}</a> 
-											</div>
-										</td>
+									<g:each var="warehouse" in="${warehouses}" status="i">								
+										<tr>
+											<td nowrap="nowrap">
+												<div style="padding: 5px; background-color: #F8F7EF; display: block;">												
+													<a style="display: block;" class="home" href='${createLink(action:"chooseWarehouse", id: warehouse.id)}'>
+														<g:if test="${warehouse.logoUrl}"><img src="${warehouse.logoUrl}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img></g:if>
+														${warehouse.name}
+													</a> 
+												</div>												
+											</td>											
+										</tr>																		
 									</g:each>							
-								</tr>
 							</tbody>					
 						</table>
 					</fieldset>					

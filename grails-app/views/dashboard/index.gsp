@@ -4,12 +4,7 @@
         <meta name="layout" content="custom" />
         <title>${message(code: 'default.dashboard.label', default: 'Dashboard')}</title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="menuTitle">${message(code: 'default.dashboard.label', default: 'Dashboard')}</content>		
-		<content tag="pageTitle">${message(code: 'default.dashboard.label', default: 'Dashboard')}</content>
-		<content tag="globalLinksMode">append</content>
-		<content tag="localLinksMode">override</content>
-		<content tag="globalLinks"><g:render template="global"/></content>
-		<content tag="localLinks"><g:render template="local"/></content>
+		<content tag="pageTitle">${message(code: 'default.dashboard.label', default: 'My Dashboard')}</content>
     </head>
     <body>        
 		<div class="body">		

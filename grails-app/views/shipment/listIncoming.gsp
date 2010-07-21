@@ -6,7 +6,10 @@
         <g:set var="entityName" value="${message(code: 'shipment.label', default: 'Incoming Shipments')}" />
         <title><g:message code="default.list.label" args="[entityName]" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.list.label" args="[entityName]" /></content>
+		<content tag="pageTitle">
+			<img src="${createLinkTo(dir:'images/icons/silk/',file: 'lorry.png')}"
+			valign="top" style="vertical-align: middle;" /> 
+			<g:message code="default.list.label" args="[entityName]" /></content>
     </head>    
     <body>
         <div class="body">
@@ -42,15 +45,26 @@
 									${fieldValue(bean: shipmentInstance, field: "origin.name")}
 								</td>
 								<td>
-									<g:if test="${!shipmentInstance.events}">No events</g:if>									
+									<g:if test="${!shipmentInstance.events}"></g:if>									
 									<g:else>
-							
-					
-									</g:else>																		
-
+										<div>
+											<b>${shipmentInstance.mostRecentEvent.eventType.name}</b><br/>
+											<span style="font-size: 0.8em; color: #aaa;">
+												<g:formatDate format="dd MMM yyyy" date="${shipmentInstance.mostRecentEvent.eventDate}"/> |  
+												${shipmentInstance.mostRecentEvent.eventLocation.name}</span>
+										</div>									
+									</g:else>
 								</td>
-								<td>
-								
+								<td nowrap="nowrap">								
+									<g:if test="${!shipmentInstance.events}"></g:if>
+									<g:else>
+										<g:each in="${shipmentInstance.documents}" var="document" status="j">
+											<div id="document-${document.id}">
+												<img src="${createLinkTo(dir:'images/icons/',file:'document.png')}" alt="Document" style="vertical-align: absmiddle"/>
+												<g:link controller="document" action="download" id="${document.id}">${document?.filename}</g:link>
+											</div>
+										</g:each>							
+									</g:else>
 								</td>
 	                        </tr>
 	                    </g:each>

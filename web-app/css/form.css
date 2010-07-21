@@ -42,7 +42,6 @@ input[type=submit] {
 }
 
 input.text, input.large   { padding:5px; }
-input.large, input.date   { font-size:1.5em; }
 textarea      { padding:5px; }
 
 input[type=checkbox], input[type=radio], 

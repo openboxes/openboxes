@@ -97,55 +97,58 @@
 		    <!-- Block which includes the logo and login banner -->
 		    <div class="yui-b">
 				<div class="yui-gf">
-				    <div id="bannerLeft" class="yui-u first" >
-						<div class="logo">
-						    <a class="home" href="${createLink(uri: '/dashboard/index')}" style="text-decoration: none">						    	
-					    		<img src="${createLinkTo(dir:'images',file:'openboxes_logo3.png')}" alt="Your Boxes. You're Welcome." 
-					    			style="vertical-align: absmiddle"/>
-						    </a>
-						</div>
-				    </div>
-				    <div id="bannerRight" class="yui-u" >
-				    	<div id="loggedIn">
-							<ul>
-							    <g:if test="${session.user}">
-									<g:if test="${session?.warehouse}">
+				
+					<div id="banner">
+					    <div id="bannerLeft" class="yui-u first" >
+							<div class="logo" >
+							    <a class="home" href="${createLink(uri: '/dashboard/index')}" style="text-decoration: none">						    	
+						    		<img src="${createLinkTo(dir:'images/icons/',file:'logo.gif')}" alt="Your Boxes. You're Welcome." 
+						    			style="vertical-align: absmiddle"/>
+						    			<span style="font-size: 2em; vertical-align: top;">openBoxes</span>
+							    </a>
+							</div>
+					    </div>
+					    <div id="bannerRight" class="yui-u" >
+					    	<div id="loggedIn">
+								<ul>
+								    <g:if test="${session.user}">
+										<g:if test="${session?.warehouse}">
+											<li>
+												<%-- <g:if test="${session?.warehouse?.logoUrl}"><img src="${session?.warehouse?.logoUrl}" width="24" height="24" border="1" style="vertical-align: bottom"></img></g:if>
+												&nbsp;--%>
+												<span style="font-weight: bold;">
+													${session?.warehouse?.name}
+												</span>
+												<a styte="vertical-align: middle" class="home" href='${createLink(controller: "dashboard", action:"chooseWarehouse")}'>change</a>	
+											</li>
+										</g:if>
+										|								
 										<li>
-											<%-- <g:if test="${session?.warehouse?.logoUrl}"><img src="${session?.warehouse?.logoUrl}" width="24" height="24" border="1" style="vertical-align: bottom"></img></g:if>
-											&nbsp;--%>
-											<span style="font-weight: bold;">
-												${session?.warehouse?.name}
-											</span>
-											<a styte="vertical-align: middle" class="home" href='${createLink(controller: "dashboard", action:"chooseWarehouse")}'>change</a>	
+											logged in as <b>${session.user.username}</b>
 										</li>
-									</g:if>
-									|								
-									<li>
-										Logged in as <b>${session.user.username}</b>
-									</li>
-									<!-- 
-									| <li><g:link class="list" controller="user" action="preferences"><g:message code="default.preferences.label"  default="Preferences"/></g:link></li>
-									 -->
-									| 
-									<li>
-										<g:message code="default.notuser.label"  default="not you?"/> &nbsp; 
-										<g:link class="list" controller="auth" action="logout"><g:message code="default.logout.label"  default="Logout"/></g:link>
-									</li>
-									<!-- 
-									| <li><input type="text" value="search" name="q" style="color: #aaa; font-weight: bold;" disabled=disabled /></li>
-									 -->
-							    </g:if>
-							    <g:else test="${!session.user}">
-									<li>Not logged in</li>  | <li><g:link class="list" controller="auth" action="login"><g:message code="default.login.label" default="Login"/></g:link></li>
-									<!-- 
-									 | <li><g:link class="list" controller="user" action="register"><g:message code="default.register.label" default="Register"/></g:link></li>
-									 | <li><g:link class="list" controller="user" action="help"><g:message code="default.help.label" default="Help"/></g:link></li>
-									 -->
-									 
-							    </g:else>
-							</ul>
-						</div>					
-				    </div>
+										<!-- 
+										| <li><g:link class="list" controller="user" action="preferences"><g:message code="default.preferences.label"  default="Preferences"/></g:link></li>
+										 -->
+										| 
+										<li>
+											<g:link class="list" controller="auth" action="logout"><g:message code="default.logout.label"  default="Logout"/></g:link>
+										</li>
+										<!-- 
+										| <li><input type="text" value="search" name="q" style="color: #aaa; font-weight: bold;" disabled=disabled /></li>
+										 -->
+								    </g:if>
+								    <g:else test="${!session.user}">
+										<li>Not logged in</li>  | <li><g:link class="list" controller="auth" action="login"><g:message code="default.login.label" default="Login"/></g:link></li>
+										<!-- 
+										 | <li><g:link class="list" controller="user" action="register"><g:message code="default.register.label" default="Register"/></g:link></li>
+										 | <li><g:link class="list" controller="user" action="help"><g:message code="default.help.label" default="Help"/></g:link></li>
+										 -->
+										 
+								    </g:else>
+								</ul>
+							</div>					
+					    </div>
+					</div>
 				</div>
 		    </div>
 		    

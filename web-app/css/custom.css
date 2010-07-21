@@ -36,7 +36,7 @@ body {
 
 /* controls width of the page */
 .body { 
-	width: 100%;
+	padding: 20px;
 }
 
 #loginForm { 
@@ -56,7 +56,7 @@ body {
 	top: 50%;
 	left: 50%;
 	margin-left: -250px;
-	margin-top: -200px;
+	margin-top: -175px;
 }
 
 .menuButton, label, input, td, th { 	
@@ -99,7 +99,7 @@ table.container {
 }
 
 .menu { 
-	padding: 1px; 
+	padding: 0px; 
 	border-right: 1px solid #eee;
 	border-bottom: 1px solid #eee;
 	border-top: 1px solid #eee;
@@ -172,12 +172,13 @@ h2 {
 #pageBody {
 	margin-left: 280px;
 	margin-right: 20px;
+	padding: 1px;
 }
 
 #pageTitle { 
-	/*ackground-color: #F8F7EF;*/	
-	padding: 5px 5px 5px 0px;
-	margin: 0px;
+	border-top: 1px solid #EEE;
+	background-color: #F8F7EF;
+	padding: 5px 5px 5px 5px;	
 }
 
 .section { 	
@@ -206,60 +207,32 @@ hr.space {background:#fff;color:#fff;}
 	border: 0px solid black;
 	padding: 0px;
 	margin: 0px;
+	height: 24px;
 }
- 	
+
+#banner { 
+	background-color: #eee; 
+	padding-right: 25px;
+}
+
+	
+
 #bannerLeft {
 
     text-align: left;
 }
 #bannerRight {
-    width: 45%;
 	text-align: right;
 }
-#dialogBanner { 	
-	text-align: left;
-	margin: 0px;
-	background-color: #eee; 	
-	border: 0px solid #000; 
-	padding: 10px 10px 5px 15px;  	
-	
-	border-radius-topleft: 10px; 
-	-o-border-radius-topleft: 10px; 
-	-icab-border-radius-topleft: 10px; 
-	-khtml-border-radius-topleft: 10px; 
-	-moz-border-radius-topleft: 10px; 
-	-webkit-border-radius-topleft: 10px;
 
-	border-top-left-radius: 10px; 
-	-o-border-top-left-radius: 10px; 
-	-icab-border-top-left-radius: 10px; 
-	-khtml-border-top-left-radius: 10px; 
-	-moz-border-top-left-radius: 10px; 
-	-webkit-border-top-left-radius: 10px; 
-
-	border-radius-topright: 10px; 
-	-o-border-radius-topright: 10px; 
-	-icab-border-radius-topright: 10px; 
-	-khtml-border-radius-topright: 10px; 
-	-moz-border-radius-topright: 10px; 
-	-webkit-border-radius-topright: 10px;
-
-	border-top-right-radius: 10px; 
-	-o-border-top-right-radius: 10px; 
-	-icab-border-top-right-radius: 10px; 
-	-khtml-border-top-right-radius: 10px; 
-	-moz-border-top-right-radius: 10px; 
-	-webkit-border-top-right-radius: 10px; 
-
-}
 #loggedIn { 	
 	text-align: right;
 	margin: 0px;
 	font-size: 1.2em;
-	background-color: #eee; 	
 	border: 0px solid #000; 
 	padding: 5px 10px 10px 15px;  	
 	
+/*
 	border-radius-bottomleft: 10px; 
 	-o-border-radius-bottomleft: 10px; 
 	-icab-border-radius-bottomleft: 10px; 
@@ -273,6 +246,7 @@ hr.space {background:#fff;color:#fff;}
 	-khtml-border-bottom-left-radius: 10px; 
 	-moz-border-bottom-left-radius: 10px; 
 	-webkit-border-bottom-left-radius: 10px; 
+*/
 }
 
 #loggedIn ul {
@@ -315,9 +289,7 @@ hr.space {background:#fff;color:#fff;}
    height: 62px;
 }
 
-#banner {
-    float: left;
-}
+
 
 
 /*

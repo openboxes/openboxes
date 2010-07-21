@@ -3,6 +3,7 @@ package org.pih.warehouse.shipping
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Organization;
 
+
 class Shipment {
 		
 	def searchable = true
@@ -10,10 +11,6 @@ class Shipment {
 	// Core data elements
 	String name 
 	String shipmentNumber
-	
-	// Status 
-	//Boolean shipped
-	//Boolean delivered
 	
 	// Status dates
 	Date expectedShippingDate
@@ -28,6 +25,7 @@ class Shipment {
 	ShipmentType shipmentType
 	ShipmentMethod shipmentMethod
 	ShipmentStatus shipmentStatus
+	ShipmentEvent currentEvent 
 	
 	// Donation information
 	Boolean donation 
@@ -64,46 +62,38 @@ class Shipment {
 	// Constraints
 	static constraints = {
 		name(nullable:false, blank: false)
-		shipmentNumber(nullable:true)
-		
+		shipmentNumber(nullable:true)	
 		origin(nullable:false, blank: false, validator: { value, obj -> return !value.equals(obj.destination)})
-		destination(nullable:false, blank: false)
-		
+		destination(nullable:false, blank: false)		
 		expectedShippingDate(nullable:true)
 		actualShippingDate(nullable:true)
 		expectedDeliveryDate(nullable:true)
 		actualDeliveryDate(nullable:true)
-
 		// date validation looks something like this
-		//expectedShippingDate(validator:{value, obj->
-		//	return value.after(obj.checkIn)
-		//})
-				
-		
-		
+		//expectedShippingDate(validator:{value, obj-> return value.after(obj.checkIn)})		
 		trackingNumber(nullable:true)
 		shipmentType(nullable:true)
 		shipmentMethod(nullable:true)
 		shipmentStatus(nullable:true)
-		
+		currentEvent(nullable:true)		
 		donation(nullable:true)
 		donor(nullable:true)
-		
 		events(nullable:true)
-
 		dateCreated(nullable:true);
 		lastUpdated(nullable:true);
-		
-
 		//referenceNumbers(nullable:true)
 		//documents(nullable:true)
-		//containers(nullable:true)
-		
+		//containers(nullable:true)		
 	}
 	
-	
 	List<ShipmentItem> getAllShipmentItems() { 		
-		
+		List<ShipmentItem> allShipmentItems = new ArrayList<ShipmentItem>();		
+		for (container in containers) {
+			for (item in container.getShipmentItems()) { 
+				allShipmentItems.add(item);				
+			}
+		}
+		return allShipmentItems;		
 	}
 
 	String getShipmentNumber() {

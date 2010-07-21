@@ -3,6 +3,9 @@ package org.pih.warehouse.shipping;
 import grails.converters.JSON
 import org.pih.warehouse.core.Location;
 
+import org.pih.warehouse.inventory.Warehouse;
+
+
 class ShipmentController {
    
     def scaffold = Shipment
@@ -20,11 +23,83 @@ class ShipmentController {
 			shipmentInstance.origin = session.warehouse;			
 		}		
 		//return [shipmentInstance: shipmentInstance]
-		render(view: "create", model: [shipmentInstance: shipmentInstance])
-		
+		render(view: "create", model: [ shipmentInstance : shipmentInstance,
+				warehouses : Warehouse.list(), eventTypes : EventType.list()]);
 	}
+
+	def save = {
+		def shipmentInstance = new Shipment(params)
+				
+		if (shipmentInstance.save(flush: true)) {
+		
+			// Try to add the current event
+			def eventType = EventType.get(params.eventType.id);
+			if (eventType) {
+				def shipmentEvent = new ShipmentEvent(eventType: eventType, eventLocation: session.warehouse, eventDate: new Date())
+				shipmentInstance.addToEvents(shipmentEvent).save(flush:true);
+			}
+			flash.message = "${message(code: 'default.created.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
+			redirect(action: "showDetails", id: shipmentInstance.id)
+		}
+		else {
+			//redirect(action: "create", model: [shipmentInstance: shipmentInstance], params: [type:params.type])
+			render(view: "create", model: [shipmentInstance : shipmentInstance,
+				warehouses : Warehouse.list(), eventTypes : EventType.list()]);
+		}
+	}
+
+	def update = {
+		def shipmentInstance = Shipment.get(params.id)
+		if (shipmentInstance) {
+			if (params.version) {
+				def version = params.version.toLong()
+				if (shipmentInstance.version > version) {					
+					shipmentInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'shipment.label', default: 'Shipment')] as Object[], "Another user has updated this Shipment while you were editing")
+					render(view: "editDetails", model: [shipmentInstance: shipmentInstance])
+					return
+				}
+			}
+			shipmentInstance.properties = params
+			if (!shipmentInstance.hasErrors() && shipmentInstance.save(flush: true)) {
+				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
+				redirect(action: "showDetails", id: shipmentInstance.id)
+			}
+			else {
+				render(view: "editDetails", model: [shipmentInstance: shipmentInstance])
+			}
+		}
+		else {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+			redirect(action: "list")
+		}
+	}
+
 	
+		
 	def showDetails = {
+		def shipmentInstance = Shipment.get(params.id)
+		if (!shipmentInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+			redirect(action: (params.type == "incoming") ? "listIncoming" : "listOutgoing")
+		}
+		else {
+			[shipmentInstance: shipmentInstance]
+		}
+	}
+
+	def editDetails = {
+		def shipmentInstance = Shipment.get(params.id)
+		if (!shipmentInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+			redirect(action: (params.type == "incoming") ? "listIncoming" : "listOutgoing")
+		}
+		else {
+			[shipmentInstance: shipmentInstance]
+		}
+	}
+
+	
+	def showPackingList = { 
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
@@ -38,18 +113,9 @@ class ShipmentController {
 	
 	
 	
-	def save = {
-		def shipmentInstance = new Shipment(params)
-		if (shipmentInstance.save(flush: true)) {
-			flash.message = "${message(code: 'default.created.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
-			redirect(action: "showDetails", id: shipmentInstance.id)
-		}
-		else {
-			//redirect(action: "create", model: [shipmentInstance: shipmentInstance], params: [type:params.type])
-			render(view: "create", model: [shipmentInstance:shipmentInstance])
-		}
-	}
 
+	
+	
 	def listIncoming = { 
 		def currentLocation = Location.get(session.warehouse.id);
 		def incomingShipments = shipmentService.getShipmentsWithDestination(currentLocation);		
@@ -74,17 +140,13 @@ class ShipmentController {
     
     def list = { 
     	def browseBy = params.id;
-    	def currentLocation = Location.get(session.warehouse.id);
-    	
-    	log.debug ("current location" + currentLocation.name)
-    	
+    	def currentLocation = Location.get(session.warehouse.id);    	
+    	log.debug ("current location" + currentLocation.name)    	
     	def allShipments = shipmentService.getShipmentsWithLocation(currentLocation);
 		def incomingShipments = shipmentService.getShipmentsWithDestination(currentLocation);	
-		def outgoingShipments = shipmentService.getShipmentsWithOrigin(currentLocation);	
-		
+		def outgoingShipments = shipmentService.getShipmentsWithOrigin(currentLocation);			
 		def shipmentInstanceList = ("incoming".equals(browseBy)) ? incomingShipments : 
-			("outgoing".equals(browseBy)) ? outgoingShipments : allShipments;
-		
+			("outgoing".equals(browseBy)) ? outgoingShipments : allShipments;		
 		// Arrange shipments by status 
 		def shipmentListByStatus = new HashMap<String, ListCommand>();
 		allShipments.each {
@@ -97,8 +159,9 @@ class ShipmentController {
 			shipmentListByStatus.put(it.shipmentStatus, shipmentList)		
 		}
 		
-		// Get a count of shipments by status
-		/* select shipment_status.id, count(*) from shipment group by shipment_status.id */	
+		// Get a count of shipments by status		 
+		// QUERY: select shipment_status.id, count(*) from shipment group by shipment_status.id 
+			
 		def criteria = Shipment.createCriteria()
 		def results = criteria {			
 			projections {
@@ -108,13 +171,9 @@ class ShipmentController {
 			//order 'myCount'
 		}			
 			
-		[	
-			results : results,
-			shipmentInstanceList : shipmentInstanceList,
-			shipmentInstanceTotal : allShipments.size(),
-			shipmentListByStatus : shipmentListByStatus,
-			incomingShipmentCount : incomingShipments.size(),
-			outgoingShipmentCount : outgoingShipments.size()
+		[ 	results : results, shipmentInstanceList : shipmentInstanceList,
+			shipmentInstanceTotal : allShipments.size(), shipmentListByStatus : shipmentListByStatus,
+			incomingShipmentCount : incomingShipments.size(), outgoingShipmentCount : outgoingShipments.size()
 		]
     }
 	
@@ -122,7 +181,6 @@ class ShipmentController {
 		redirect action: "showDetails", id: shipment.id;
 	}
 
-	
 	def deliverShipment = {
 		redirect action: "showDetails", id: shipment.id;
 	}    
@@ -153,13 +211,10 @@ class ShipmentController {
     }
     
     def addItemAutoComplete = {     		
-    	log.debug params;
-    	
+    	log.debug params;    	
     	def product = Product.get(params.selectedItem_id)
     	def shipment = Shipment.get(params.id);
-
     	log.debug "packages: " + shipment.getPackages()
-    	    	
     	def container = shipment.packages[0];
     	if (container) { 
  	    	def shipmentItem = new ShipmentItem(product: product, quantity: 1);
@@ -169,10 +224,8 @@ class ShipmentController {
     }    
     
     
-    def addContainer = { 
-		
-		log.debug params 
-		
+    def addContainer = { 		
+		log.debug params 		
     	def shipment = Shipment.get(params.shipmentId);   	
     	def containerType = ContainerType.get(params.containerTypeId);    	
     	def containerName = (params.name) ? params.name : containerType.name + " " + (shipment.getContainers().size() + 1);

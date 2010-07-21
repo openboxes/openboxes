@@ -1,6 +1,7 @@
 package org.pih.warehouse.user;
 
 import org.pih.warehouse.core.Location;
+import org.pih.warehouse.inventory.Warehouse;
 
 class DashboardController {
 
@@ -36,7 +37,7 @@ class DashboardController {
 			redirect(controller:'dashboard', action:'index')
 		}
 		else {	
-			render(view: "chooseWarehouse")
+			render(view: "chooseWarehouse", model: [warehouses: Warehouse.list()])
 		}
 		
 	}

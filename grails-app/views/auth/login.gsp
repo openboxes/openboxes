@@ -27,7 +27,7 @@
 					</div>			
 		
 					<fieldset> 			
-				
+						<legend>Login</legend>		
 						<script>	
 							jQuery(document).ready(function() {
 								// focus on the first text input field in the first field on the page
