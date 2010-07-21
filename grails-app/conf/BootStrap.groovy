@@ -585,8 +585,6 @@ class BootStrap {
 		shipment2.addToComments(comment1).save(flush:true);
 		shipment3.addToComments(comment1).save(flush:true);
 		
-		shipment1.addToDocuments(document1).save(flush:true);		
-		shipment1.addToDocuments(document2).save(flush:true);
 		shipment1.addToContainers(pallet1).save(flush:true);
 		shipment1.addToContainers(pallet2).save(flush:true);
 		shipment1.addToContainers(box1).save(flush:true);

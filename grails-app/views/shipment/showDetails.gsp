@@ -44,7 +44,7 @@
 								<tbody>
 									<tr class="prop">
 										<td valign="top" class="name"><label><g:message
-											code="shipment.shipmentNumber.label" default="Number" /></label></td>
+											code="shipment.shipmentNumber.label" default="Shipment #" /></label></td>
 										<td valign="top" class="value">
 											${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}
 										</td>
@@ -100,7 +100,7 @@
 									</tr>
 									<tr class="prop">
 										<td valign="top" class="name"><label><g:message
-											code="shipment.trackingNumber.label" default="Tracking" /></label></td>
+											code="shipment.trackingNumber.label" default="Tracking #" /></label></td>
 										<td valign="top" class="value">										
 											${fieldValue(bean: shipmentInstance, field: "trackingNumber")}											                            	
 										</td>
@@ -168,7 +168,7 @@
 										</td>
 									</tr>
 									<tr class="prop">
-										<td class="name"><label>Events</label></td>
+										<td class="name"><label>Tracking</label></td>
 										<td class="value">
 
 											<div style="padding: 5px;">
