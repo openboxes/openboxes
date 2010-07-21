@@ -36,7 +36,11 @@ body {
 
 /* controls width of the page */
 .body { 
-	padding: 20px;
+	padding: 10px 0 10px 0;
+}
+
+.fade { 
+	color: #aaa;	
 }
 
 #loginForm { 
@@ -108,7 +112,7 @@ table.container {
 	font-size: 1.2em;
 	line-height: 1.2em; 
 	vertical-align: middle;
-	padding: 5px 0px 5px 0px; 
+	padding: 5px 0px 5px 5px; 
 	display: block; 
 	background-color: #F8F7EF; 
 }
@@ -121,11 +125,12 @@ table.container {
 }
 .menu .menuSection ul li { 
     /*display: block;*/
-    overflow: hidden;
-    padding: 0;
+    
+    padding: 2px 0 2px 15px;
     cursor: pointer;
 }
-.menu .menuSection a { 
+.menu .menuSection a:link { 
+	font-weight: none;
 	text-decoration: none;
 }
 .menu .menuSection a:hover { 
@@ -338,11 +343,16 @@ div#dashboard li {
 	background-color: #eee;
 }
 
+
+.prop { 
+	border-top: 1px dotted #ccc;	
+}
 .prop .value { 
 	text-align:left;
 }
 
 .prop .name { 
+	background-color: #F7F7F7;
 	text-align: right; 
 }
 

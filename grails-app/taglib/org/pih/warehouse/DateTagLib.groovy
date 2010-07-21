@@ -1,11 +1,15 @@
 package org.pih.warehouse
 
+import java.text.SimpleDateFormat;
+
 class DateTagLib {
    	
 	def jqueryDatePicker = {attrs, body ->
 		
 		def name = attrs.name;
 		
+		def value = (attrs.format && attrs.value) ? new SimpleDateFormat(attrs.format).format(attrs.value) : ""
+
 		if (name == null) { 
 			throw new IllegalArgumentException("name parameter must be specified")			
 		}
@@ -26,8 +30,8 @@ class DateTagLib {
 		out << "}); "
 		out << "</script> "
 
-		out << "<input id='" + name + "' name='" + name + "' type='hidden'/> "
-		out << "<input id='" + name + "Widget' name='" + name + "Widget' type='text' class='date' width='8' /> "
+		out << "<input id='" + name + "' name='" + name + "' value='" + value + "' type='hidden'/> "
+		out << "<input id='" + name + "Widget' name='" + name + "Widget' value='" + value + "' type='text' class='date' width='8' /> "
 
 	}
 }

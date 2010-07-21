@@ -40,7 +40,7 @@
 									<g:if test="${!shipmentInstance.events}"></g:if>									
 									<g:else>
 										<div>
-											<b>${shipmentInstance.mostRecentEvent.eventType.name}</b><br/>
+											${shipmentInstance.mostRecentEvent.eventType.name}<br/>
 											<span style="font-size: 0.8em; color: #aaa;">
 												<g:formatDate format="dd MMM yyyy" date="${shipmentInstance.mostRecentEvent.eventDate}"/> |  
 												${shipmentInstance.mostRecentEvent.eventLocation.name}</span>
@@ -52,8 +52,8 @@
 									<g:else>
 										<g:each in="${shipmentInstance.documents}" var="document" status="j">
 											<div id="document-${document.id}">
-												<img src="${createLinkTo(dir:'images/icons/',file:'document.png')}" alt="Document" style="vertical-align: absmiddle"/>
-												<g:link controller="document" action="download" id="${document.id}">${document?.filename}</g:link>
+												<img src="${createLinkTo(dir:'images/icons/',file:'document.png')}" alt="Document" style="vertical-align: middle"/>
+												<g:link controller="document" action="download" id="${document.id}">${document?.documentType?.name}</g:link>
 											</div>
 										</g:each>							
 									</g:else>

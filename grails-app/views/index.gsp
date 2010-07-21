@@ -1,1 +1,1 @@
-${response.sendRedirect("home/index")}
+${response.sendRedirect("dashboard/index")}

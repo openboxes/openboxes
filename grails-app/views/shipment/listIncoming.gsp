@@ -48,7 +48,7 @@
 									<g:if test="${!shipmentInstance.events}"></g:if>									
 									<g:else>
 										<div>
-											<b>${shipmentInstance.mostRecentEvent.eventType.name}</b><br/>
+											${shipmentInstance.mostRecentEvent.eventType.name}<br/>
 											<span style="font-size: 0.8em; color: #aaa;">
 												<g:formatDate format="dd MMM yyyy" date="${shipmentInstance.mostRecentEvent.eventDate}"/> |  
 												${shipmentInstance.mostRecentEvent.eventLocation.name}</span>

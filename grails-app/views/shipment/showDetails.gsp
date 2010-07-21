@@ -19,7 +19,7 @@
 	<content tag="pageTitle">
 		<img src="${createLinkTo(dir:'images/icons/silk/',file: 'lorry.png')}"
 			valign="top" style="vertical-align: middle;" /> 
-			${shipmentInstance.name}<br/>
+			${shipmentInstance.name}
 			<span style="color: #aaa; font-size: 0.8em;">
 				Created: <g:formatDate date="${shipmentInstance?.dateCreated}" format="dd MMM yyyy hh:mm" /> |
 				Updated: <g:formatDate date="${shipmentInstance?.lastUpdated}" format="dd MMM yyyy hh:mm" />				
@@ -39,21 +39,43 @@
 				<td>
 					<div id="details" class="section">
 						<h2>Shipment Details</h2>
-						<div style="padding: 10px">
+						<div style="">
 							<table cellspacing="5" cellpadding="5">
 								<tbody>
 									<tr class="prop">
 										<td valign="top" class="name"><label><g:message
+											code="shipment.shipmentNumber.label" default="Number" /></label></td>
+										<td valign="top" class="value">
+											${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}
+										</td>
+									</tr>
+									<tr class="prop">
+										<td valign="top" class="name"><label><g:message
 											code="shipment.shipmentType.label" default="Type" /></label></td>
 										<td valign="top" class="value">
-										${fieldValue(bean: shipmentInstance, field: "shipmentType.name")}
+											${fieldValue(bean: shipmentInstance, field: "shipmentType.name")}
 										</td>
 									</tr>
 									<tr class="prop">
 										<td valign="top" class="name"><label><g:message
 											code="shipment.shipmentStatus.label" default="Name" /></label></td>
 										<td valign="top" class="value">
-										${fieldValue(bean: shipmentInstance, field: "name")}
+											${fieldValue(bean: shipmentInstance, field: "name")}
+										</td>
+									</tr>
+									<tr class="prop">
+										<td valign="top" class="name"><label><g:message
+											code="shipment.origin.label" default="From" /></label></td>
+										<td valign="top" class="value">
+											${fieldValue(bean: shipmentInstance, field: "origin.name")}<br/>
+										
+											<g:if test="${shipmentInstance.expectedShippingDate}">
+												<span style="font-size: 0.8em; color: #aaa">
+													Expected to ship on <g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="dd MMM yyyy" />
+												</span>
+											
+											</g:if>
+										
 										</td>
 									</tr>
 									
@@ -65,18 +87,11 @@
 										${fieldValue(bean: shipmentInstance, field: "destination.name")}
 										</td>
 									</tr>
-									<tr class="prop">
-										<td valign="top" class="name"><label><g:message
-											code="shipment.origin.label" default="From" /></label></td>
-										<td valign="top" class="value">
-										${fieldValue(bean: shipmentInstance, field: "origin.name")}
-										</td>
-									</tr>
 																
 	
 									<tr class="prop">
 										<td valign="top" class="name"><label><g:message
-											code="shipment.method.label" default="Ship By" /></label></td>
+											code="shipment.method.label" default="Shipper" /></label></td>
 										<td valign="top" class="value">
 										${fieldValue(bean: shipmentInstance, field: "shipmentMethod.name")} <img
 											src="${createLinkTo(dir:'images/icons',file: shipmentInstance?.shipmentMethod?.methodName + '.png')}"
@@ -92,6 +107,19 @@
 												<g:else>(none)</g:else> 
 											</span></td>
 									</tr>
+									<tr class="prop">
+										<td class="name">
+											&nbsp
+										</td>
+										<td class="value">
+											<span class="button">
+												<g:link controller="shipment" action="editDetails" id="${shipmentInstance.id}"><img
+												src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}"
+												alt="Edit Shipment" style="vertical-align: middle" /> edit details</g:link></span> 
+										
+										</td>
+									</tr>
+									
 									<%-- 
 									<tr class="prop">
 										<td valign="middle" class="name"><label><g:message
@@ -114,21 +142,18 @@
 								</tbody>
 							</table>
 						</div>
-						<div style="border-bottom: 1px solid #ccc; border-top: 1px dotted #ccc; padding: 5px;"> 
-							<span class="button">
-								<g:link controller="shipment" action="editDetails" id="${shipmentInstance.id}"><img
-								src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}"
-								alt="Edit Shipment" /> edit</g:link></span> 
-						</div>		
+						<div style="vertical-align: middle; padding: 5px; border-bottom: 1px solid #ccc">
+
+						</div>
 				
 						
 					</div>
 					<div id="documents" class="section">
 						<h2>Documents</h2>
 						<div style="padding: 5px;">
-							<g:if test="${!shipmentInstance.containers}">
-								There are currently no documents for this
-								shipment.
+							<g:if test="${!shipmentInstance.documents}">
+								<span class="fade">There are no documents for this
+								shipment.</span>
 							</g:if> 
 							<g:else>
 								<table>
@@ -142,22 +167,19 @@
 												<td>
 													${document?.documentType?.name}
 												</td>
-												<td>
-													<g:link controller="document" action="download" id="${document.id}">download</g:link>
+												<td nowrap="nowrap">
+													<g:link controller="document" action="download" id="${document.id}">
+														<img src="${createLinkTo(dir:'images/icons/silk',file:'disk.png')}" alt="Download" style="vertical-align: middle"/>													
+													</g:link>
 												</td>
 											</tr>
-										</g:each>
-										<tr>
-											<td>											
-											</td>
-										
-										</tr>
+										</g:each>										
 									</tbody>
 								</table>
 							</g:else>
 						</div>
-						<div style="vertical-align: middle; border-top: 1px dotted #ccc; padding: 5px; border-bottom: 1px solid #ccc">
-							<a href="${createLink(controller: "shipment", action: "addDocument", id: shipmentInstance.id)}"><img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add Document"/> add document</a>
+						<div style="vertical-align: middle; padding: 5px; border-bottom: 1px solid #ccc">
+							<a href="${createLink(controller: "shipment", action: "addDocument", id: shipmentInstance.id)}"><img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add Document" style="vertical-align: middle"/> add document</a>
 						</div>
 						
 						
@@ -166,8 +188,8 @@
 						<h2>Events</h2>
 						<div style="padding: 5px;">
 							<g:if test="${!shipmentInstance.events}">
-								There are currently no events for this
-								shipment.
+								<span class="fade">There are no events for this
+								shipment.</span>
 							</g:if> 
 							<g:else>
 								<table >	
@@ -186,8 +208,8 @@
 								</table>
 							</g:else>
 						</div>
-						<div style="vertical-align: absmiddle; border-top: 1px dotted #ccc; border-bottom: 1px solid #ccc; padding: 5px;">
-							<a href="${createLink(controller: "shipment", action: "addEvent", id: shipmentInstance.id)}"><img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add Event"/> add event</a>
+						<div style="border-bottom: 1px solid #ccc; padding: 5px;">
+							<a href="${createLink(controller: "shipment", action: "addEvent", id: shipmentInstance.id)}"><img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add Event" style="vertical-align: middle"/> add event</a>
 						</div>
 					</div>					
 				</td>					
@@ -198,8 +220,8 @@
 						
 						<div style="padding: 5px;">
 							<g:if test="${!shipmentInstance.containers}">
-								There are currently no shipping units in this
-								shipment.
+								<span class="fade" style="text-align: center">There are no shipping units in this
+								shipment.</span>
 							</g:if> 
 							<g:else>
 								<g:each in="${shipmentInstance.containersByType}" var="entry" status="i">									 
@@ -265,8 +287,10 @@
 								</g:each>									
 							</g:else>
 						</div>
-						<div style="padding: 5px; border-bottom: 1px solid #ccc; border-top: 1px dotted #ccc;"> 
-							<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}"><img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit Contents"/> edit</g:link> 
+						<div style="padding: 5px; border-bottom: 1px solid #ccc;"> 
+							<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}"><img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit Contents" style="vertical-align: middle"/> edit contents</g:link>
+							&nbsp; 
+							<g:link controller="shipment" action="showPackingList" id="${shipmentInstance.id}" ><img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="View Packing List" style="vertical-align: middle"/> packing list</g:link> 
 						</div>								
 					</div>						
 				</td>

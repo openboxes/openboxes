@@ -49,6 +49,9 @@ class ShipmentController {
 	}
 
 	def update = {
+		
+		log.info params
+		
 		def shipmentInstance = Shipment.get(params.id)
 		if (shipmentInstance) {
 			if (params.version) {
@@ -282,34 +285,34 @@ class ShipmentController {
 	
 	    
     def copyContainer = { 
-        	def shipment = Shipment.get(params.shipmentId);   	
-        	def container = Container.get(params.containerId);  
-        	def name = (params.name) ? params.name : "New Package";
-        	def copies = params.copies
-        	def x = Integer.parseInt(copies)
-        	int index = 1;
-        	while ( x-- > 0 ) {
-        		def containerCopy = new Container(container.properties);
-        		containerCopy.id = null;
-        		containerCopy.name = name + " " + (index++);
-        		containerCopy.containerType = container.containerType;
-        		containerCopy.weight = container.weight;
-        		containerCopy.dimensions = container.dimensions;
-        		containerCopy.shipmentItems = null;
-        		containerCopy.save(flush:true);
-        		
-        		container.shipmentItems.each { 
-        			def shipmentItemCopy = new ShipmentItem();
-        			shipmentItemCopy.product = it.product
-        			shipmentItemCopy.quantity = it.quantity;
-        			containerCopy.addToShipmentItems(shipmentItemCopy).save(flush:true);
-        		}
-        		
-        		shipment.addToContainers(containerCopy).save(flush:true);
-        	}
-    		flash.message = "Copied package multiple times within the shipment";		
-    		redirect(action: 'show', id: params.shipmentId)        		
-        }    
+    	def shipment = Shipment.get(params.shipmentId);   	
+    	def container = Container.get(params.containerId);  
+    	def name = (params.name) ? params.name : "New Package";
+    	def copies = params.copies
+    	def x = Integer.parseInt(copies)
+    	int index = 1;
+    	while ( x-- > 0 ) {
+    		def containerCopy = new Container(container.properties);
+    		containerCopy.id = null;
+    		containerCopy.name = name + " " + (index++);
+    		containerCopy.containerType = container.containerType;
+    		containerCopy.weight = container.weight;
+    		containerCopy.dimensions = container.dimensions;
+    		containerCopy.shipmentItems = null;
+    		containerCopy.save(flush:true);
+    		
+    		container.shipmentItems.each { 
+    			def shipmentItemCopy = new ShipmentItem();
+    			shipmentItemCopy.product = it.product
+    			shipmentItemCopy.quantity = it.quantity;
+    			containerCopy.addToShipmentItems(shipmentItemCopy).save(flush:true);
+    		}
+    		
+    		shipment.addToContainers(containerCopy).save(flush:true);
+    	}
+		flash.message = "Copied package multiple times within the shipment";		
+		redirect(action: 'show', id: params.shipmentId)        		
+    }    
     
     
     def deleteContainer = { 
@@ -341,19 +344,19 @@ class ShipmentController {
     }
     
     def deleteComment = { 
-        	def comment = Comment.get(params.id);
-       		def shipmentId = comment.getShipment().getId();    	
-        	if (comment) { 	    	
-           	    comment.delete();	    	    	
-            	flash.message = "Deleted comment $comment from shipment $shipment.id";		
-    	    	redirect(action: 'show', id: shipmentId) 
-        	}
-        	else { 
-            	flash.message = "Could not remove comment $params.id from shipment";		
-        		redirect(action: 'show', id: shipmentId)    	
-        		
-        	}
-        }
+    	def comment = Comment.get(params.id);
+   		def shipmentId = comment.getShipment().getId();    	
+    	if (comment) { 	    	
+       	    comment.delete();	    	    	
+        	flash.message = "Deleted comment $comment from shipment $shipment.id";		
+	    	redirect(action: 'show', id: shipmentId) 
+    	}
+    	else { 
+        	flash.message = "Could not remove comment $params.id from shipment";		
+    		redirect(action: 'show', id: shipmentId)    	
+    		
+    	}
+    }
     
     
 
@@ -376,6 +379,17 @@ class ShipmentController {
 		redirect(action: 'show', id: params.shipmentId)    	
     	
     }
+	
+	
+	def addDocument = { 
+		log.info params
+		def shipmentInstance = Shipment.get(params.id);
+		if (!shipmentInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
+			redirect(action: "list")
+		}
+		render(view: "addDocument", model: [shipmentInstance : shipmentInstance, document : new Document()]);
+	}
     
 
     def deleteItem = { 
@@ -412,23 +426,39 @@ class ShipmentController {
     
     
     def addEvent = { 
-    		
-    	def targetLocation = null    	
-    	if (params.targetLocationId)
-        	Location.get(params.targetLocationId)
-    	
-    	ShipmentEvent event = new ShipmentEvent(
-    		eventType:EventType.get(params.eventTypeId), 
-    		eventDate: params.eventDate, 
-    		eventLocation: Location.get(params.eventLocationId),
-    		targetLocation: targetLocation
-    	);
-    	
-    	def shipment = Shipment.get(params.shipmentId);     	
-    	shipment.addToEvents(event).save(flush:true);    
-
-    	flash.message = "Added event";		
-		redirect(action: 'show', id: params.shipmentId)    	
+		
+		
+    	if ("GET".equals(request.getMethod())) { 
+			
+			def shipmentInstance = Shipment.get(params.id);
+			if (!shipmentInstance) {
+				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
+				redirect(action: "list")
+			}
+			render(view: "addEvent", model: [shipmentInstance : shipmentInstance, shipmentEvent : new ShipmentEvent()]);
+		
+			
+		}
+		else { 
+			
+	    	def targetLocation = null    	
+	    	if (params.targetLocationId) { 
+	        	Location.get(params.targetLocationId)
+	    	}
+			
+	    	ShipmentEvent event = new ShipmentEvent(
+	    		eventType:EventType.get(params.eventTypeId), 
+	    		eventDate: params.eventDate, 
+	    		eventLocation: Location.get(params.eventLocationId),
+	    		targetLocation: targetLocation
+	    	);
+	    	
+	    	def shipment = Shipment.get(params.shipmentId);     	
+	    	shipment.addToEvents(event).save(flush:true);    
+	
+	    	flash.message = "Added event";		
+			redirect(action: 'showDetails', id: params.shipmentId)    	
+		}
 	}    
 
     def deleteEvent = { 
