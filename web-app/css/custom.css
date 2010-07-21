@@ -40,12 +40,12 @@ body {
 }
 
 #loginForm { 
-	width:600px;
+	width:400px;
 	height:  200px;
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	margin-left: -250px;
+	margin-left: -200px;
 	margin-top: -100px;
 }
 
@@ -91,8 +91,12 @@ table.container {
 .dialog td { 
 	padding: 10px;
 }
-#content .small {font-size:.9em;}
-#content .large {font-size:1.1em;}
+#content .small {
+	font-size:.9em;
+}
+#content .large {
+	font-size:1.1em;
+}
 
 .menu { 
 	padding: 1px; 
@@ -106,7 +110,8 @@ table.container {
 	vertical-align: middle;
 	padding: 5px 0px 5px 0px; 
 	display: block; 
-	background-color: #F8F7EF; }
+	background-color: #F8F7EF; 
+}
 .menu .menuSection { 
 	padding-right: 1px; 
 	padding-bottom: 10px;
@@ -128,7 +133,9 @@ table.container {
 }
 
 /* nothing to do right now */
-#menu { }
+#menu { 
+
+}
 /* TODO figure out if this is needed */
 #nav {
 	margin-top: 20px;
@@ -169,7 +176,7 @@ h2 {
 
 #pageTitle { 
 	/*ackground-color: #F8F7EF;*/	
-	padding: 5px 5px 0 15px;
+	padding: 5px 5px 5px 0px;
 	margin: 0px;
 }
 

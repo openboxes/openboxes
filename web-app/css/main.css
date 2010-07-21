@@ -32,9 +32,10 @@ body {
 
 a:link, a:visited, a:hover {
     color: #666;
-    /*font-weight: bold;*/
-    text-decoration: underline;
-    /*text-decoration: none;*/	/* removed because we want to see underline */
+    font-weight: bold;
+    font-size: 0.9em;
+    /*text-decoration: underline;*/
+   	text-decoration: none;	/* removed because we want to see underline */
 }
 
 h1 {

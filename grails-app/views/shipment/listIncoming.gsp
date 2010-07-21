@@ -7,11 +7,6 @@
         <title><g:message code="default.list.label" args="[entityName]" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><g:message code="default.list.label" args="[entityName]" /></content>
-		<content tag="menuTitle">${entityName}</content>		
-		<content tag="globalLinksMode">append</content>
-		<content tag="localLinksMode">override</content>
-		<content tag="globalLinks"><g:render template="global" model="[entityName:entityName]"/></content>
-		<content tag="localLinks"><g:render template="local" model="[entityName:entityName]"/></content>		
     </head>    
     <body>
         <div class="body">
@@ -34,8 +29,8 @@
                             <g:sortableColumn property="shipmentNumber" title="${message(code: 'shipment.shipmentNumber.label', default: 'Shipment Number')}" />
                             <g:sortableColumn property="name" title="${message(code: 'shipment.name.label', default: 'Name')}" />
                             <g:sortableColumn property="origin.name" title="${message(code: 'shipment.origin.label', default: 'From')}" />
-                            <g:sortableColumn property="events" title="${message(code: 'shipment.events.label', default: 'Latest Event (date, location, description)')}" />
-                            
+                            <g:sortableColumn property="events" title="${message(code: 'shipment.events.label', default: 'Most Recent Event')}" />
+							<g:sortableColumn property="documents" title="${message(code: 'shipment.documents.label', default: 'Documents')}" />                            
                         </tr>
                     </thead>
                     <tbody>
@@ -49,17 +44,13 @@
 								<td>
 									<g:if test="${!shipmentInstance.events}">No events</g:if>									
 									<g:else>
-										<table>		
-											<g:each in="${shipmentInstance.events}" var="event">									
-												<tr>
-													<td>${event.eventDate}</td>
-													<td>${event.eventLocation.name}</td>
-													<td>${event.eventType.name}</td> 
-												</tr>										
-											</g:each>
-										</table>
+							
+					
 									</g:else>																		
 
+								</td>
+								<td>
+								
 								</td>
 	                        </tr>
 	                    </g:each>

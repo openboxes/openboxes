@@ -17,11 +17,6 @@
         <title><g:message code="default.show.label" args="[entityName]" /></title>        
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle">Shipment Details</content>
-		<content tag="menuTitle">${entityName}</content>		
-		<content tag="globalLinksMode">append</content>
-		<content tag="localLinksMode">override</content>
-		<content tag="globalLinks"><g:render template="global" model="[entityName:entityName]"/></content>
-		<content tag="localLinks"><g:render template="local" model="[entityName:entityName]"/></content>    
 				
 		<%-- 				
     	<script type="text/javascript" src="${createLinkTo(dir:'js/yui/2.7.0/yahoo-dom-event',file:'yahoo-dom-event.js')}" charset="utf-8"></script>
@@ -217,8 +212,7 @@
 												</table>
 											</div>
 			                    		</td>
-			                    		<td >
-			                    			
+			                    		<td>
 											<div id="detailsTab" class="tab">
 												<table class="withoutBorder" style="background-color: white;">
 													<tbody>

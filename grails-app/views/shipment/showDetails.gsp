@@ -121,13 +121,21 @@
 													<g:formatDate format="dd MMM yyyy" date="${document?.dateCreated}"/>					
 												</td>					
 												<td>
-													<label>${document?.documentType?.name}</label>
+													${document?.documentType?.name}
 												</td>
 												<td>
 													<g:link controller="document" action="download" id="${document.id}">download</g:link>
 												</td>
 											</tr>
 										</g:each>
+										<tr>
+											<td colspan="3" style="text-align: left; border-top: 1px solid #ccc;">
+												<span style="vertical-align: absmiddle">
+													<a href="${createLink(controller: "shipment", action="addDocument")}"><img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add Document"/> add document</a>
+												</span>
+											</td>										
+										</tr>
+										
 									</tbody>
 								</table>
 							</g:else>
@@ -145,11 +153,25 @@
 											<td nowrap="nowrap">
 												<g:formatDate format="dd MMM yy" date="${event.eventDate}"/>
 											</td>
-											<td nowrap="nowrap">${event.eventLocation.name}</td> 
-											<td>${event.eventType.name}</td> 
+											<td nowrap="nowrap">
+												${event.eventType.name}<br/>
+												<span style="font-size: 0.8em; color: #aaa;">
+													${event.eventLocation.name}</span>
+											</td> 
 										</tr>										
 									</g:each>
+									<tr>
+										<td colspan="2" style="text-align: left; border-top: 1px solid #ccc;">
+											<span style="vertical-align: absmiddle">
+												<a href="${createLink(controller: "shipment", action="addEvent")}"><img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add Event"/> add event</a>
+											</span>
+										</td>										
+									</tr>
+									
+									
 								</table>
+								
+								
 							</g:else>
 						</div>					
 					</td>					
@@ -195,15 +217,15 @@
 													<tr id="container-${container.id}"
 														class="${(j % 2) == 0 ? 'odd' : 'even'}">
 														<td>&nbsp;</td>
-														<td valign="top">
+														<td valign="top" nowrap="nowrap">
 															<div>
-																<span> <g:link controller="container" action="show" id="${container.id}">${container?.name}</g:link></span> 
-																<span style="color: #aaa; font-size: .75em; padding-left: 15px;">
+																<span style="color: #aaa;">${container?.name}</span>
+																<span style="color: #aaa; font-size: .75em; padding-left: 10px;">
 																	Weight: 
 																	<g:if test="${container.weight}"><b>${container?.weight} ${container?.units}</b></g:if> 
 																	<g:else><b>unknown</b></g:else> 
 																</span> 
-																<span style="color: #aaa; font-size: .75em; padding-left: 15px;">
+																<span style="color: #aaa; font-size: .75em; padding-left: 10px;">
 																	Dimensions: 
 																	<g:if test="${container.dimensions}">
 																		<b>${container.dimensions}</b>
@@ -212,19 +234,19 @@
 																		<b>unknown</b>
 																	</g:else> 
 																</span> 
-																<span style="color: #aaa; font-size: .75em; padding-left: 15px;">
+																<span style="color: #aaa; font-size: .75em; padding-left: 10px;">
 																	Contains: 
 																	<b><%= container.getShipmentItems().size() %> items</b> </span>
+																<span style="padding-left: 10px;"> 
+																	<g:link controller="container" action="show" id="${container.id}">edit</g:link> 
+																 </span> 
 															</div>	
 														</td>
 													</tr>
 												</tbody>
 											</table>										
-										</g:each>
-										
+										</g:each>										
 									</fieldset>
-																	
-
 								</g:each>
 								<!-- iterate over each container -->
 							</g:else>
@@ -235,18 +257,11 @@
 					<td>&nbsp;</td>
 				</tr>				
 				<tr style="border-top: 1px solid #aaa;">
-					<td>
+					<td colspan="2">
 						<div id="buttons" class="buttons"><span class="button"><a
 							href="${createLink(controller: "shipment", action="editDetails")}"><img
 							src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}"
-							alt="Edit Shipment" /> Edit Shipment</a></span> <span class="button"><a
-							href="${createLink(controller: "shipment", action="changeState")}"><img
-							src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}"
-							alt="Send Shipment" /> Send Shipment</a></span> 
-							<span class="button"><a
-							href="${createLink(controller: "shipment", action="addDocument")}"><img
-							src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}"
-							alt="Add Reference Number" /> Add Document</a></span>
+							alt="Edit Shipment" /> Edit Shipment</a></span> 
 						</div>
 							
 					</td>

@@ -44,8 +44,6 @@
 							<div  class="prop">
 								<label for="password">Password:</label><br/>
 								<input type="password" class="large" name="password" id="password" size="40" value="${userInstance?.password}">
-								
-													
 							</div>	
 							
 		<%-- 					
@@ -66,11 +64,11 @@
 			</div>
 			
 			<%-- 
-		    <div class="buttons">
-				<span class="button">
-					<g:submitButton name="login" class="save" value="${message(code: 'default.button.login.label', default: 'Login')}" />
-				</span>	
-		    </div>
+			    <div class="buttons">
+					<span class="button">
+						<g:submitButton name="login" class="save" value="${message(code: 'default.button.login.label', default: 'Login')}" />
+					</span>	
+			    </div>
 		    --%>	
 			<br/>
 		</g:form>

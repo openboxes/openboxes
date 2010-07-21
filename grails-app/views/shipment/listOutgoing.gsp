@@ -5,13 +5,7 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'shipment.label', default: 'Outgoing Shipments')}" />
         <title><g:message code="default.list.label" args="[entityName]" /></title>
-		<!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><g:message code="default.list.label" args="[entityName]" /></content>
-		<content tag="menuTitle">${entityName}</content>		
-		<content tag="globalLinksMode">append</content>
-		<content tag="localLinksMode">override</content>
-		<content tag="globalLinks"><g:render template="global" model="[entityName:entityName]"/></content>
-		<content tag="localLinks"><g:render template="local" model="[entityName:entityName]"/></content>		
     </head>    
     <body>
         <div class="body">
@@ -39,33 +33,26 @@
 									${fieldValue(bean: shipmentInstance, field: "destination.name")}
 								</td>
 								<td>
-									<g:if test="${!shipmentInstance.events}">None</g:if>									
+									<g:if test="${!shipmentInstance.events}"></g:if>									
 									<g:else>
-										<table>
-											<tr>
-												<td><g:formatDate format="dd MMM yyyy" date="${shipmentInstance.mostRecentEvent.eventDate}"/></td>
-												<td><b>${shipmentInstance.mostRecentEvent.eventLocation.name}<b></td>
-											</tr>
-											<tr>
-												<td></td>
-												<td>${shipmentInstance.mostRecentEvent.eventType.name}</td>
-											</tr>
-										</table>									
+										<div>
+											<b>${shipmentInstance.mostRecentEvent.eventType.name}</b><br/>
+											<span style="font-size: 0.8em; color: #aaa;">
+												<g:formatDate format="dd MMM yyyy" date="${shipmentInstance.mostRecentEvent.eventDate}"/> |  
+												${shipmentInstance.mostRecentEvent.eventLocation.name}</span>
+										</div>									
 									</g:else>
 								</td>
 								<td>
 								
-									<g:if test="${!shipmentInstance.events}">None</g:if>
+									<g:if test="${!shipmentInstance.events}"></g:if>
 									<g:else>
-										<table>
-											<g:each in="${shipmentInstance.documents}" var="document" status="j">
-												<tr id="document-${document.id}">
-													<td>
-														<g:link controller="document" action="download" id="${document.id}">${document?.filename}</g:link>					
-													</td>					
-												</tr>
-											</g:each>							
-										</table>	
+										<g:each in="${shipmentInstance.documents}" var="document" status="j">
+											<div id="document-${document.id}">
+												<img src="${createLinkTo(dir:'images/icons/',file:'document.png')}" alt="Document" style="vertical-align: absmiddle"/>
+												<g:link controller="document" action="download" id="${document.id}">${document?.filename}</g:link>
+											</div>
+										</g:each>							
 									</g:else>
 								</td>
 	                        </tr>

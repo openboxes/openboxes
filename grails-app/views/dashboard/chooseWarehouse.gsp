@@ -32,18 +32,18 @@
 										</g:if>
 									</td>
 								</tr>
-								<g:each var="warehouse" in="${org.pih.warehouse.inventory.Warehouse.list()}">								
-									<tr>
+								<tr>
+									<g:each var="warehouse" in="${org.pih.warehouse.inventory.Warehouse.list()}">								
 										<td>
-											<a class="home" href='${createLink(action:"chooseWarehouse", id: warehouse.id)}'>
-												<div style="padding: 15px; background-color: #F8F7EF; display: block;">
-													<g:if test="${warehouse.logoUrl}"><img src="${warehouse.logoUrl}" width="24" height="24" style="vertical-align: middle"></img></g:if>
-													${warehouse.name} 												
-												</div>
-											</a> &nbsp;
+											<div style="width: 100px; padding: 5px; background-color: #F8F7EF; display: block;">
+												
+												
+												<a style="display: block;" class="home" href='${createLink(action:"chooseWarehouse", id: warehouse.id)}'>
+												<g:if test="${warehouse.logoUrl}"><img src="${warehouse.logoUrl}" width="24" height="24" style="vertical-align: middle"></img></g:if>${warehouse.name}</a> 
+											</div>
 										</td>
-									</tr>
-								</g:each>							
+									</g:each>							
+								</tr>
 							</tbody>					
 						</table>
 					</fieldset>					
