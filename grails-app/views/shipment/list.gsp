@@ -73,7 +73,7 @@
 								<g:each in="${shipmentList.value.objectList}" var="shipmentInstance" status="i">							
 									<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 			                            <td style="vertical-align: top; text-align: center" width="5%">											
-			                            	<g:link action="show" id="${shipmentInstance.id}" alt="show"><span style="color:#aaa">${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}</span></g:link>
+			                            	<g:link action="show" id="${shipmentInstance.id}" alt="showDetails"><span style="color:#aaa">${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}</span></g:link>
 										</td>
 			                            <td style="vertical-align: top; text-align: left" width="10%">
 			                            	${fieldValue(bean: shipmentInstance, field: "name")}

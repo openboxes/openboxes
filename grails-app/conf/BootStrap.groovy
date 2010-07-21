@@ -248,8 +248,8 @@ class BootStrap {
 		ContainerType CONTAINER_ITEM = new ContainerType(name:"Item").save();
 		ContainerType CONTAINER_OTHER = new ContainerType(name:"Other").save();
 				
-		/* Shipment Status */	 	
-		ShipmentStatus SHIPMENT_STATUS_OPEN = new ShipmentStatus(name:"New", color: "red", description: "Order is being processed", finalStatus:false, sortOrder: 1).save();
+		/* Shipment Status */
+		ShipmentStatus SHIPMENT_STATUS_NEW = new ShipmentStatus(name:"New", color: "red", description: "Order is being processed", finalStatus:false, sortOrder: 1).save();
 		//ShipmentStatus SHIPMENT_STATUS_PICKED = new ShipmentStatus(name:"Picked", description: "Items have been picked from warehouse.  Items have not not shipped yet", finalStatus:false, sortOrder: 2).save();
 		//ShipmentStatus SHIPMENT_STATUS_PACKED = new ShipmentStatus(name:"Packed", description: "Items have been packed and staged.  Items have not shipped yet", finalStatus:false, sortOrder: 3).save();
 		//ShipmentStatus SHIPMENT_STATUS_LOADED = new ShipmentStatus(name:"Loaded", description: "Items have been loaded onto truck.  Items have not shipped yet.", finalStatus:false, sortOrder: 4).save();
@@ -320,27 +320,27 @@ class BootStrap {
 		/** 
 		 * Shipment type
 		 */
-		ShipmentType SHIPMENT_AIR = new ShipmentType(name: "Air", sortOrder: 1).save(flush:true);
-		ShipmentType SHIPMENT_SEA = new ShipmentType(name: "Sea", sortOrder: 2).save(flush:true);
-		ShipmentType SHIPMENT_DOMESTIC = new ShipmentType(name: "Domestic", sortOrder: 3).save(flush:true);
-		ShipmentType SHIPMENT_SUITCASE = new ShipmentType(name: "Suitcase", sortOrder: 4).save(flush:true);
-		ShipmentType SHIPMENT_OTHER = new ShipmentType(name: "Other", sortOrder: 5).save(flush:true);
+		ShipmentType SHIPMENT_TYPE_AIR = new ShipmentType(name: "Air", sortOrder: 1).save(flush:true);
+		ShipmentType SHIPMENT_TYPE_SEA = new ShipmentType(name: "Sea", sortOrder: 2).save(flush:true);
+		ShipmentType SHIPMENT_TYPE_DOMESTIC = new ShipmentType(name: "Domestic", sortOrder: 3).save(flush:true);
+		ShipmentType SHIPMENT_TYPE_SUITCASE = new ShipmentType(name: "Suitcase", sortOrder: 4).save(flush:true);
+		ShipmentType SHIPMENT_TYPE_OTHER = new ShipmentType(name: "Other", sortOrder: 5).save(flush:true);
 		
-		SHIPMENT_AIR.addToContainerTypes(CONTAINER_BOX).save();
-		SHIPMENT_AIR.addToContainerTypes(CONTAINER_PALLET).save();
-		SHIPMENT_AIR.addToContainerTypes(CONTAINER_SUITCASE).save();
-		SHIPMENT_AIR.addToContainerTypes(CONTAINER_OTHER).save();
+		SHIPMENT_TYPE_AIR.addToContainerTypes(CONTAINER_BOX).save();
+		SHIPMENT_TYPE_AIR.addToContainerTypes(CONTAINER_PALLET).save();
+		SHIPMENT_TYPE_AIR.addToContainerTypes(CONTAINER_SUITCASE).save();
+		SHIPMENT_TYPE_AIR.addToContainerTypes(CONTAINER_OTHER).save();
 		
-		SHIPMENT_DOMESTIC.addToContainerTypes(CONTAINER_BOX).save();
-		SHIPMENT_DOMESTIC.addToContainerTypes(CONTAINER_PALLET).save();
-		SHIPMENT_DOMESTIC.addToContainerTypes(CONTAINER_SUITCASE).save();
-		SHIPMENT_DOMESTIC.addToContainerTypes(CONTAINER_TRUNK).save();
-		SHIPMENT_DOMESTIC.addToContainerTypes(CONTAINER_OTHER).save();
+		SHIPMENT_TYPE_DOMESTIC.addToContainerTypes(CONTAINER_BOX).save();
+		SHIPMENT_TYPE_DOMESTIC.addToContainerTypes(CONTAINER_PALLET).save();
+		SHIPMENT_TYPE_DOMESTIC.addToContainerTypes(CONTAINER_SUITCASE).save();
+		SHIPMENT_TYPE_DOMESTIC.addToContainerTypes(CONTAINER_TRUNK).save();
+		SHIPMENT_TYPE_DOMESTIC.addToContainerTypes(CONTAINER_OTHER).save();
 		
-		SHIPMENT_SEA.addToContainerTypes(CONTAINER_BOX).save();
-		SHIPMENT_SEA.addToContainerTypes(CONTAINER_CONTAINER).save();
+		SHIPMENT_TYPE_SEA.addToContainerTypes(CONTAINER_BOX).save();
+		SHIPMENT_TYPE_SEA.addToContainerTypes(CONTAINER_CONTAINER).save();
 		
-		SHIPMENT_SUITCASE.addToContainerTypes(CONTAINER_ITEM).save();
+		SHIPMENT_TYPE_SUITCASE.addToContainerTypes(CONTAINER_ITEM).save();
 		
 		/** 
 		 * Transaction types 
@@ -498,53 +498,63 @@ class BootStrap {
 		/** 
 		 * Shipments 
 		 */		
-		Shipment shipment1 = new Shipment(name: "Sample Shipment 1", 				
+		Shipment shipment1 = new Shipment(name: "Sample Shipment 1", 		
+			shipmentType: SHIPMENT_TYPE_AIR,
 			shipmentStatus: SHIPMENT_STATUS_DELIVERED, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999",
 			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-01"), origin : boston,
 			expectedDeliveryDate : Date.parse("yyyy-MM-dd", "2010-06-05"), destination : tabarre).save(flush:true);	
 
 		Shipment shipment2 = new Shipment(name: "Sample Shipment 2",
+			shipmentType: SHIPMENT_TYPE_AIR,
 			shipmentStatus: SHIPMENT_STATUS_DELIVERED, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999",
 			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-02"), origin : boston,
 			expectedDeliveryDate : Date.parse("yyyy-MM-dd", "2010-06-03"), destination : miami).save(flush:true);
 
 		Shipment shipment3 = new Shipment(name: "Sample Shipment 3",
+			shipmentType: SHIPMENT_TYPE_AIR,
 			shipmentStatus: SHIPMENT_STATUS_DELIVERED, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999",
 			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-01"), origin : boston,
 			expectedDeliveryDate : Date.parse("yyyy-MM-dd", "2010-06-05"), destination : tabarre).save(flush:true);
 
 		Shipment shipment4 = new Shipment(name: "Sample Shipment 4",
+			shipmentType: SHIPMENT_TYPE_AIR,
 			shipmentStatus: SHIPMENT_STATUS_RETURNED, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999",
 			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-01"), origin : miami,
 			expectedDeliveryDate : Date.parse("yyyy-MM-dd", "2010-06-05"), destination : tabarre).save(flush:true);
 
 		Shipment shipment5 = new Shipment(name: "Sample Shipment 5", 				
+			shipmentType: SHIPMENT_TYPE_AIR,
 			shipmentStatus: SHIPMENT_STATUS_DELIVERED, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999",
 			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-05"), origin : miami,
 			expectedDeliveryDate : Date.parse("yyyy-MM-dd", "2010-06-07"), destination : tabarre).save(flush:true);	
 		
 		Shipment shipment6 = new Shipment(name: "Sample Shipment 6", 				
+			shipmentType: SHIPMENT_TYPE_AIR,
 			shipmentStatus: SHIPMENT_STATUS_READY, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999", 
 			expectedShippingDate : new Date(), origin : miami, 
 			expectedDeliveryDate : null, destination : boston).save(flush:true);	
 
 		Shipment shipment7 = new Shipment(name: "Sample Shipment 7",
+			shipmentType: SHIPMENT_TYPE_AIR,
 			shipmentStatus: SHIPMENT_STATUS_READY, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999",
 			expectedShippingDate : new Date(), origin : boston,
 			expectedDeliveryDate : null, destination : tabarre).save(flush:true);
 
 		Shipment shipment8 = new Shipment(name: "Sample Shipment 8", 
-			shipmentStatus: SHIPMENT_STATUS_OPEN, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999",
+			shipmentType: SHIPMENT_TYPE_AIR,
+			shipmentStatus: SHIPMENT_STATUS_NEW, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999",
 			expectedShippingDate : new Date(), origin : miami,
 			expectedDeliveryDate : null, destination : boston).save(flush:true);
 
 		Shipment shipment9 = new Shipment(name: "Sample Shipment 9",
-			shipmentStatus: SHIPMENT_STATUS_OPEN, shipmentMethod: SHIPMENT_METHOD_FEDEX_GROUND, trackingNumber: "1Z9999W99999999999",
+			shipmentType: SHIPMENT_TYPE_AIR,
+			shipmentStatus: SHIPMENT_STATUS_NEW, shipmentMethod: SHIPMENT_METHOD_FEDEX_GROUND, trackingNumber: "1Z9999W99999999999",
 			expectedShippingDate : new Date(), origin : miami,
 			expectedDeliveryDate : null, destination : boston).save(flush:true);
 
 		Shipment shipment10 = new Shipment(name: "Sample Shipment 10",
-			shipmentStatus: SHIPMENT_STATUS_OPEN, shipmentMethod: SHIPMENT_METHOD_USPS_GROUND, trackingNumber: "1Z9999W99999999999",
+			shipmentType: SHIPMENT_TYPE_AIR,
+			shipmentStatus: SHIPMENT_STATUS_NEW, shipmentMethod: SHIPMENT_METHOD_USPS_GROUND, trackingNumber: "1Z9999W99999999999",
 			expectedShippingDate : new Date(), origin : miami,
 			expectedDeliveryDate : null, destination : boston).save(flush:true);
 
@@ -564,6 +574,9 @@ class BootStrap {
 		Document document1 = new Document(filename: "packing-list.pdf", documentType: DOCUMENT_PACKING_LIST, size: 1020L, contents: "empty")		
 		Document document2 = new Document(filename: "invoice.pdf", documentType: DOCUMENT_COMMERCIAL_INVOICE, size: 990L, contents: "empty") 
 		Container pallet1 = new Container(name: "Pallet #1", containerType: CONTAINER_PALLET, weight: 1000, units: "kgs");
+		Container pallet2 = new Container(name: "Pallet #2", containerType: CONTAINER_PALLET, weight: 2000, units: "kgs");
+		Container box1 = new Container(name: "Box #1", containerType: CONTAINER_BOX, weight: 100, units: "kgs");
+		Container box2 = new Container(name: "Box #2", containerType: CONTAINER_BOX, weight: 200, units: "kgs");
 		ShipmentItem shipmentItem1 = new ShipmentItem(product : advil, quantity : 100, packageType: CONTAINER_BOX);
 		ShipmentItem shipmentItem2 = new ShipmentItem(product : tylenol, quantity : 200, packageType: CONTAINER_BOX);
 		ShipmentItem shipmentItem3 = new ShipmentItem(product : aspirin, quantity : 300, packageType: CONTAINER_BOX);
@@ -575,13 +588,16 @@ class BootStrap {
 		shipment1.addToDocuments(document1).save(flush:true);		
 		shipment1.addToDocuments(document2).save(flush:true);
 		shipment1.addToContainers(pallet1).save(flush:true);
+		shipment1.addToContainers(pallet2).save(flush:true);
+		shipment1.addToContainers(box1).save(flush:true);
+		shipment1.addToContainers(box2).save(flush:true);
 		shipment1.addToEvents(event1).save(flush:true);
 		shipment1.addToEvents(event2).save(flush:true);
 		shipment1.addToEvents(event3).save(flush:true);
 		shipment1.addToEvents(event4).save(flush:true);
 		shipment1.addToEvents(event5).save(flush:true);		
-		shipment1.addToReferenceNumbers(new ReferenceNumber(identifier:"0002492910", referenceNumberType:REFERENCE_PO_NUMBER)).save(flush:true)
 		shipment1.addToReferenceNumbers(new ReferenceNumber(identifier:"0000000001", referenceNumberType:REFERENCE_INTERNAL_IDENTIFIER)).save(flush:true)
+		shipment1.addToReferenceNumbers(new ReferenceNumber(identifier:"0002492910", referenceNumberType:REFERENCE_PO_NUMBER)).save(flush:true)
 		pallet1.addToShipmentItems(shipmentItem1).save(flush:true);
 		pallet1.addToShipmentItems(shipmentItem2).save(flush:true);
 		pallet1.addToShipmentItems(shipmentItem3).save(flush:true);

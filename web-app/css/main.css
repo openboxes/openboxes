@@ -41,7 +41,7 @@ h1 {
     color: #48802c;
     font-weight: normal;
     font-size: 16px;
-    margin: .8em 0 .3em 0;
+    /*margin: .8em 0 .3em 0;*/
 }
 
 ul {
@@ -70,8 +70,8 @@ input:focus, select:focus, textarea:focus {
 }
 
 .body {
-    float: left;
-    margin: 10px 15px 10px 15px;
+    /*float: left;*/
+    /*margin: 10px 15px 10px 15px;*/
 }
 
 /* NAVIGATION MENU */
@@ -156,7 +156,7 @@ tr {
 td, th {
     font: 11px "lucida grande", verdana, arial, helvetica, sans-serif;
     line-height: 12px;
-    padding: 5px 6px;
+    padding: 6px 6px;
     text-align: left;
     vertical-align: top;
 }
@@ -240,12 +240,12 @@ th.desc a {
 }
 .prop .name {
     text-align: left;
-    width: 15%;
+    width: 10%;
     white-space: nowrap;
 }
 .prop .value {
     text-align: left;
-    width: 85%;
+    width: 90%;
 }
 
 /* ACTION BUTTONS 

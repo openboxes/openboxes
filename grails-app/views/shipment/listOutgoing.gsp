@@ -23,34 +23,50 @@
                 <table>
                     <thead>
                         <tr>   
-                            <g:sortableColumn property="name" title="${message(code: 'shipment.name.label', default: 'Name')}" />
                             <g:sortableColumn property="shipmentNumber" title="${message(code: 'shipment.shipmentNumber.label', default: 'Shipment Number')}" />
-                            <g:sortableColumn property="destination.name" title="${message(code: 'shipment.origin.label', default: 'Destination')}" />
-                            <g:sortableColumn property="events" title="${message(code: 'shipment.events.label', default: 'Latest Event (date, location, description)')}" />
-                            
+                            <g:sortableColumn property="name" title="${message(code: 'shipment.name.label', default: 'Name')}" />
+                            <g:sortableColumn property="destination.name" title="${message(code: 'shipment.origin.label', default: 'To')}" />
+                            <g:sortableColumn property="events" title="${message(code: 'shipment.events.label', default: 'Most Recent Event')}" />
+							<g:sortableColumn property="documents" title="${message(code: 'shipment.documents.label', default: 'Documents')}" />
                         </tr>
                     </thead>
                     <tbody>
 	                    <g:each in="${shipmentInstanceList}" status="i" var="shipmentInstance">
 	                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
+								<td align="center"><g:link action="showDetails" id="${shipmentInstance.id}">${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}</g:link></td>
 								<td align="center">${fieldValue(bean: shipmentInstance, field: "name")}</td>
-								<td align="center"><g:link action="show" id="${shipmentInstance.id}">${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}</g:link></td>
 								<td align="center">
 									${fieldValue(bean: shipmentInstance, field: "destination.name")}
 								</td>
 								<td>
-									<g:if test="${!shipmentInstance.events}">No events</g:if>									
+									<g:if test="${!shipmentInstance.events}">None</g:if>									
 									<g:else>
-										<table>		
-											<g:each in="${shipmentInstance.events}" var="event">									
-												<tr>
-													<td>${event.eventDate}</td>
-													<td>${event.eventLocation.name}</td>
-													<td>${event.eventType.name}</td> 
-												</tr>										
-											</g:each>
-										</table>
-									</g:else>																		
+										<table>
+											<tr>
+												<td><g:formatDate format="dd MMM yyyy" date="${shipmentInstance.mostRecentEvent.eventDate}"/></td>
+												<td><b>${shipmentInstance.mostRecentEvent.eventLocation.name}<b></td>
+											</tr>
+											<tr>
+												<td></td>
+												<td>${shipmentInstance.mostRecentEvent.eventType.name}</td>
+											</tr>
+										</table>									
+									</g:else>
+								</td>
+								<td>
+								
+									<g:if test="${!shipmentInstance.events}">None</g:if>
+									<g:else>
+										<table>
+											<g:each in="${shipmentInstance.documents}" var="document" status="j">
+												<tr id="document-${document.id}">
+													<td>
+														<g:link controller="document" action="download" id="${document.id}">${document?.filename}</g:link>					
+													</td>					
+												</tr>
+											</g:each>							
+										</table>	
+									</g:else>
 								</td>
 	                        </tr>
 	                    </g:each>

@@ -40,7 +40,23 @@ body {
 }
 
 #loginForm { 
-	width: 600px;
+	width:600px;
+	height:  200px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-left: -250px;
+	margin-top: -100px;
+}
+
+#chooseWarehouse { 
+	width: 500px;
+	height:  400px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-left: -250px;
+	margin-top: -200px;
 }
 
 .menuButton, label, input, td, th { 	
@@ -78,7 +94,12 @@ table.container {
 #content .small {font-size:.9em;}
 #content .large {font-size:1.1em;}
 
-.menu { padding: 5px; }  
+.menu { 
+	padding: 1px; 
+	border-right: 1px solid #eee;
+	border-bottom: 1px solid #eee;
+	border-top: 1px solid #eee;
+}  
 .menu .heading { 
 	font-size: 1.2em;
 	line-height: 1.2em; 
@@ -87,12 +108,11 @@ table.container {
 	display: block; 
 	background-color: #F8F7EF; }
 .menu .menuSection { 
-	border-right: 1px solid #aaa;
-	padding-right: 5px; 
+	padding-right: 1px; 
 	padding-bottom: 10px;
 }
 .menu .menuSection ul { 
-	padding: 5px; 
+	padding: 1px; 
 }
 .menu .menuSection ul li { 
     /*display: block;*/
@@ -124,6 +144,7 @@ label {
 	padding-right: 15px; 
 	font-weight: bold;
 }
+
 /* TODO figure out what this was meant for */
 h2 {
 	margin-top: 10px;
@@ -145,6 +166,23 @@ h2 {
 	margin-left: 280px;
 	margin-right: 20px;
 }
+
+#pageTitle { 
+	/*ackground-color: #F8F7EF;*/	
+	padding: 5px 5px 0 15px;
+	margin: 0px;
+}
+
+.section { 	
+	padding-left: 10px; 
+	padding-bottom: 10px; 
+}
+.buttons { 
+	padding: 10px; 
+}
+	
+
+
 /* stole from blueprint screen.css */
 hr {background:#ddd;color:#ddd;clear:both;float:none;width:100%;height:.1em;margin:0 0 0em 0em;border:none;}
 hr.space {background:#fff;color:#fff;}

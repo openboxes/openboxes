@@ -10,8 +10,14 @@ package org.pih.warehouse.shipping
  */
 class ShipmentEvent extends Event  {
 	
+	ShipmentStatus shipmentStatus;
+	
 	static belongsTo = { shipment:Shipment }
-		
+			
+	static constraints = {
+		shipmentStatus(nullable:true);
+	}
+	
 
 	
 	

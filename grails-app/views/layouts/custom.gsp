@@ -99,7 +99,7 @@
 				<div class="yui-gf">
 				    <div id="bannerLeft" class="yui-u first" >
 						<div class="logo">
-						    <a class="home" href="${createLink(uri: '/home/index')}" style="text-decoration: none">						    	
+						    <a class="home" href="${createLink(uri: '/dashboard/index')}" style="text-decoration: none">						    	
 					    		<img src="${createLinkTo(dir:'images',file:'openboxes_logo3.png')}" alt="Your Boxes. You're Welcome." 
 					    			style="vertical-align: absmiddle"/>
 						    </a>
@@ -109,13 +109,28 @@
 				    	<div id="loggedIn">
 							<ul>
 							    <g:if test="${session.user}">
-									<li>Logged in as <b>${session.user.username}</b>
-										(<g:link class="list" controller="auth" action="logout"><g:message code="default.notuser.label"  default="not you?"/></g:link>)
+									<g:if test="${session?.warehouse}">
+										<li>
+											<%-- <g:if test="${session?.warehouse?.logoUrl}"><img src="${session?.warehouse?.logoUrl}" width="24" height="24" border="1" style="vertical-align: bottom"></img></g:if>
+											&nbsp;--%>
+											<span style="font-weight: bold;">
+												${session?.warehouse?.name}
+											</span>
+											<a styte="vertical-align: middle" class="home" href='${createLink(controller: "dashboard", action:"chooseWarehouse")}'>change</a>	
+										</li>
+									</g:if>
+									|								
+									<li>
+										Logged in as <b>${session.user.username}</b>
 									</li>
 									<!-- 
 									| <li><g:link class="list" controller="user" action="preferences"><g:message code="default.preferences.label"  default="Preferences"/></g:link></li>
 									 -->
-									| <li><g:link class="list" controller="auth" action="logout"><g:message code="default.logout.label"  default="Logout"/></g:link></li>
+									| 
+									<li>
+										<g:message code="default.notuser.label"  default="not you?"/> &nbsp; 
+										<g:link class="list" controller="auth" action="logout"><g:message code="default.logout.label"  default="Logout"/></g:link>
+									</li>
 									<!-- 
 									| <li><input type="text" value="search" name="q" style="color: #aaa; font-weight: bold;" disabled=disabled /></li>
 									 -->
@@ -134,48 +149,13 @@
 				</div>
 		    </div>
 		    
-		    <!-- Block which includes global navigation and breadcrumb -->
-		    <div class="yui-b">
-				<!-- Global Navigation menu -->
-				<div class="nav">
-					<%-- <g:render template="../common/breadcrumb" />--%>
-					<%--<g:breadcrumb />--%>
-					&nbsp;
-					
-				    <g:if test="${session?.user}">			
-				    
-				    	<g:if test="${session?.warehouse}">
-							<g:if test="${session?.warehouse?.logoUrl}"><img src="${session?.warehouse?.logoUrl}" width="24" height="24" border="1" style="vertical-align: bottom"></img></g:if>
-							&nbsp;
-							<span style="font-size:200%; font-weight: bold;">
-								${session?.warehouse?.name}
-							</span>
-							<a styte="vertical-align: middle" class="home" href='${createLink(controller: "dashboard", action:"chooseWarehouse")}'>change</a>	
-						</g:if>
-						<%-- 
-				    	<g:render template="../common/global"/>
-				    	<g:pageProperty name="page.globalLinks" /><!-- Populated using the 'globalLinks' property defined in the GSP file -->
-					    --%>				    
-						<!-- TODO Implemented hack to move the settings menu over to the right -->
-						<%-- 
-							<span class="menuButton" style="position:absolute; right: 15px;">
-								<a class="settings" href="${createLink(uri: '/admin/index')}">Settings</a>
-							</span>
-						--%>
-				    </g:if>
-				</div>
-		    </div>
-		    
 		</div>
     </div>
     
-    <div id="doc3" class="yui-t3">
-    
-	    
-		<br/>
+    <div id="doc3" class="yui-t3">	    
 		<!-- 
-			Body includes the divs for the main body content and left navigation menu 
-		----------------------------------------------------------------------------------->
+				Body includes the divs for the main body content and left navigation menu 
+			----------------------------------------------------------------------------------->
 		<!-- YUI "body" block that includes the main content for the page -->
 		<div id="bd" role="main">
 
@@ -184,7 +164,7 @@
 		    	<div id="content" class="yui-b">
 					<!-- Populated using the 'pageTitle' property defined in the GSP file -->
 					<g:if test="${pageProperty(name:'page.pageTitle')}">
-					    <div id="pageTitle"><h1><g:pageProperty name="page.pageTitle" /></h1><hr/></div>
+					    <div id="pageTitle"><h1><g:pageProperty name="page.pageTitle" /></h1></div>
 					</g:if>
 					<g:layoutBody />
 				</div>

@@ -8,11 +8,6 @@
         <title><g:message code="default.show.label" args="[entityName]" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><g:message code="default.list.label" args="[entityName]" /></content>
-		<content tag="menuTitle">${entityName}</content>		
-		<content tag="globalLinksMode">append</content>
-		<content tag="localLinksMode">override</content>
-		<content tag="globalLinks"><g:render template="global" model="[entityName:entityName]"/></content>
-		<content tag="localLinks"><g:render template="local" model="[entityName:entityName]"/></content>		
     </head>    
 
     <body>
@@ -35,7 +30,6 @@
                             <td valign="top" class="name"><g:message code="product.ean.label" default="UPC" /></td>                            
                             <td valign="top" class="value">
                             	${fieldValue(bean: productInstance, field: "ean")}
-                            	
                             	<span class="menuButton" style="padding-left: 25px;">                            
                             		<a class="browse" target="_new" href="http://www.upcdatabase.com/item/${fieldValue(bean: productInstance, field: "ean")}"><b>Lookup this UPC</b></a>
                             	</span>

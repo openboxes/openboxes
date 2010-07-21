@@ -9,8 +9,11 @@ class Event implements Comparable {
 	EventType eventType			// The type of the Event
 	Location eventLocation		// The Location at which the Event occurred	
 	Location targetLocation		// Optionally, the Location at which the Event is targeted
-	
 	String description			// an optional description of the event
+	
+	// Audit fields
+	Date dateCreated;
+	Date lastUpdated;
 	
 	
 	static belongsTo = [ shipment : Shipment ]

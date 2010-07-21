@@ -12,22 +12,41 @@ class ShipmentController {
 	def create = {
 		def shipmentInstance = new Shipment()
 		shipmentInstance.properties = params
-		if (!shipmentInstance?.shipmentStatus)
-			shipmentInstance.shipmentStatus = ShipmentStatus.findByName("New");
-		return [shipmentInstance: shipmentInstance]
-	}
-
-	def save = {
-		def shipmentInstance = new Shipment(params)
-		if (!shipmentInstance?.shipmentStatus)
-			shipmentInstance.shipmentStatus = ShipmentStatus.findByName("New");
 		
-		if (shipmentInstance.save(flush: true)) {
-			flash.message = "${message(code: 'default.created.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
-			redirect(action: "show", id: shipmentInstance.id)
+		if (params.type == "incoming") { 
+			shipmentInstance.destination = session.warehouse;			
+		}
+		else if (params.type == "outgoing") { 
+			shipmentInstance.origin = session.warehouse;			
+		}		
+		//return [shipmentInstance: shipmentInstance]
+		render(view: "create", model: [shipmentInstance: shipmentInstance])
+		
+	}
+	
+	def showDetails = {
+		def shipmentInstance = Shipment.get(params.id)
+		if (!shipmentInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+			redirect(action: (params.type == "incoming") ? "listIncoming" : "listOutgoing")
 		}
 		else {
-			render(view: "create", model: [shipmentInstance: shipmentInstance])
+			[shipmentInstance: shipmentInstance]
+		}
+	}
+	
+	
+	
+	
+	def save = {
+		def shipmentInstance = new Shipment(params)
+		if (shipmentInstance.save(flush: true)) {
+			flash.message = "${message(code: 'default.created.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
+			redirect(action: "showDetails", id: shipmentInstance.id)
+		}
+		else {
+			//redirect(action: "create", model: [shipmentInstance: shipmentInstance], params: [type:params.type])
+			render(view: "create", model: [shipmentInstance:shipmentInstance])
 		}
 	}
 
@@ -100,12 +119,12 @@ class ShipmentController {
     }
 	
 	def sendShipment = { 
-		redirect action: "show", id: shipment.id;
+		redirect action: "showDetails", id: shipment.id;
 	}
 
 	
 	def deliverShipment = {
-		redirect action: "show", id: shipment.id;
+		redirect action: "showDetails", id: shipment.id;
 	}    
         
     
@@ -146,7 +165,7 @@ class ShipmentController {
  	    	def shipmentItem = new ShipmentItem(product: product, quantity: 1);
 	    	container.addToShipmentItems(shipmentItem).save(flush:true);
     	}
-    	redirect action: "show", id: shipment.id;
+    	redirect action: "showDetails", id: shipment.id;
     }    
     
     
@@ -160,7 +179,7 @@ class ShipmentController {
         def container = new Container(name: containerName, weight: params.weight, dimensions: params.dimensions, units: params.units, containerType: containerType);
         shipment.addToContainers(container);
         flash.message = "Added a new piece to the shipment";		
-		redirect(action: 'show', id: params.shipmentId)    
+		redirect(action: 'showDetails', id: params.shipmentId)    
     }
 
 	/*
@@ -192,17 +211,17 @@ class ShipmentController {
 			containerInstance.properties = params
 			if (!containerInstance.hasErrors() && containerInstance.save(flush: true)) {
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'container.label', default: 'Container'), containerInstance.id])}"
-				redirect(action: "show", id: shipmentInstance.id)
+				redirect(action: "showDetails", id: shipmentInstance.id)
 			}
 			else {
 				flash.message = "Could not edit container"
-				redirect(action: "show", id: shipmentInstance.id)
+				redirect(action: "showDetails", id: shipmentInstance.id)
 				//render(view: "edit", model: [containerInstance: containerInstance])
 			}
 		}
 		else {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'container.label', default: 'Container'), params.containerId])}"
-			redirect(action: "show", id: shipmentInstance.id)
+			redirect(action: "showDetails", id: shipmentInstance.id)
 			//redirect(action: "list")
 		}
 	}

@@ -33,7 +33,7 @@
                         <tr>   
                             <g:sortableColumn property="shipmentNumber" title="${message(code: 'shipment.shipmentNumber.label', default: 'Shipment Number')}" />
                             <g:sortableColumn property="name" title="${message(code: 'shipment.name.label', default: 'Name')}" />
-                            <g:sortableColumn property="origin.name" title="${message(code: 'shipment.origin.label', default: 'Origin')}" />
+                            <g:sortableColumn property="origin.name" title="${message(code: 'shipment.origin.label', default: 'From')}" />
                             <g:sortableColumn property="events" title="${message(code: 'shipment.events.label', default: 'Latest Event (date, location, description)')}" />
                             
                         </tr>
@@ -41,7 +41,7 @@
                     <tbody>
 	                    <g:each in="${shipmentInstanceList}" status="i" var="shipmentInstance">
 	                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
-								<td align="center" width="5%"><g:link action="show" id="${shipmentInstance.id}">${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}</g:link></td>
+								<td align="center" width="5%"><g:link action="showDetails" id="${shipmentInstance.id}">${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}</g:link></td>
 								<td align="center">${fieldValue(bean: shipmentInstance, field: "name")}</td>
 								<td align="center">
 									${fieldValue(bean: shipmentInstance, field: "origin.name")}
@@ -69,6 +69,6 @@
             <div class="paginateButtons">
                 <g:paginate total="${shipmentInstanceTotal}" />
             </div>
-        </div>
+        </div>		
     </body>
 </html>
