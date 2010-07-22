@@ -100,16 +100,16 @@
 						</td>
 					</tr>		
 					<tr class="prop">
-						<td></td>
+						<td class="name"></td>
 						<td>
-						<div class="buttons">
-							<button type="submit" class="positive"><img
-							src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
-							alt="Save" /> Save</button>
-							<g:link controller="dashboard" action="index" class="negative"> <img
-							src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}"
-							alt="Cancel" /> Cancel </g:link>
-						</div>
+							<div class="buttons">
+								<button type="submit" class="positive"><img
+								src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
+								alt="Save" /> Save</button>
+								<g:link controller="dashboard" action="index" class="negative"> <img
+								src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}"
+								alt="Cancel" /> Cancel </g:link>
+							</div>
 						</td>
 					</tr>
 				</tbody>

@@ -155,7 +155,7 @@
 		</div>
     </div>
     
-    <div id="doc3" class="yui-t3">	    
+    <div id="doc3" class="yui-t2">	    
 		<!-- 
 				Body includes the divs for the main body content and left navigation menu 
 			----------------------------------------------------------------------------------->
@@ -178,7 +178,7 @@
 		  		<g:if test="${session?.user}">
 					<!-- Navigation Menu -->				
 					<g:if test="${session?.warehouse}">
-						<g:render template="../common/menu"/>
+						<g:render template="/common/menu"/>
 					</g:if>
 					<%-- 			  		
 			  		<div id="navMenu" class="homePagePanel">

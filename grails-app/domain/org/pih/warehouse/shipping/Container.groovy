@@ -1,5 +1,7 @@
 package org.pih.warehouse.shipping;
 
+import java.util.Date;
+
 class Container implements Comparable {
 
 	String name
@@ -11,6 +13,10 @@ class Container implements Comparable {
 	
 	ContainerType containerType
 	SortedSet shipmentItems
+	
+	// Audit fields
+	Date dateCreated;
+	Date lastUpdated;
 	
 	static hasMany = [ shipmentItems : ShipmentItem ];
 	static belongsTo = [ shipment : Shipment ];

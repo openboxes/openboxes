@@ -57,6 +57,8 @@ class Shipment {
 
 	static mapping = {
 		events sort: 'eventDate', order: 'desc'
+		containers sort: 'dateCreated', order: 'asc'
+		documents sort: 'dateCreated', order: 'asc'
 	}
 
 	// Constraints

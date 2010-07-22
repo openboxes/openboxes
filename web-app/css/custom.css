@@ -4,6 +4,7 @@
 #doc3 {
 	margin:auto;
 }
+
 /* used to give the main content some protection against hitting the right edge of the browser */
 #content { 
 	margin-left: 0px;	/* hack to move content over */

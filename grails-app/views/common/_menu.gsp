@@ -4,16 +4,16 @@
 			<img src="${createLinkTo(dir:'images/icons/',file:'truck.png')}" alt="Edit Contents" style="vertical-align: middle"/> <g:message code="shipment.manage.label"  default="Manage Shipments"/>
 		</span>
 		<ul>
-			<li><span class="menuButton"><g:link class="nobullet" controller="shipment" action="listOutgoing"><g:message code="shipment.list.outgoing.label"  default="Outgoing Shipments"/></g:link></span></li>										
-			<li><span class="menuButton"><g:link class="nobullet" controller="shipment" action="listIncoming"><g:message code="shipment.list.incoming.label"  default="Incoming Shipments"/></g:link></span></li>										
+			<li><span class="menuButton"><g:link class="nobullet" controller="shipment" action="listOutgoing"><g:message code="shipment.list.outgoing.label"  default="Browse Outgoing"/></g:link></span></li>										
+			<li><span class="menuButton"><g:link class="nobullet" controller="shipment" action="listIncoming"><g:message code="shipment.list.incoming.label"  default="Browse Incoming"/></g:link></span></li>										
 			<li>
 				<span class="menuButton">
-					<g:link class="nobullet" controller="shipment" action="create" params="['type':'outgoing']"><g:message code="shipment.create.outgoing.label" default="New Outgoing Shipment" /></g:link>
+					<g:link class="nobullet" controller="shipment" action="create" params="['type':'outgoing']"><g:message code="shipment.create.outgoing.label" default="New Outgoing" /></g:link>
 				</span>
 			</li>			
 			<li>
 				<span class="menuButton">
-					<g:link class="nobullet" controller="shipment" action="create" params="['type':'incoming']"><g:message code="shipment.create.incoming.label" default="New Incoming Shipment" /></g:link>
+					<g:link class="nobullet" controller="shipment" action="create" params="['type':'incoming']"><g:message code="shipment.create.incoming.label" default="New Incoming" /></g:link>
 				</span>
 			</li>						
 		</ul>										
@@ -24,8 +24,8 @@
 		</span>
 		<ul>
 			<li><span class="menuButton"><g:link class="nobullet" controller="product" action="browse"><g:message code="product.browse.label"  default="Browse Products"/></g:link></span></li>		
-			<li><span class="menuButton"><g:link class="nobullet" controller="product" action="create"><g:message code="product.create.label" default="Create Product" /></g:link></span></li>						
 			<li><span class="menuButton"><g:link class="nobullet" controller="product" action="importProducts"><g:message code="product.import.label" default="Import Products" /></g:link></span></li>						
+			<li><span class="menuButton"><g:link class="nobullet" controller="product" action="create"><g:message code="product.create.label" default="New Product" /></g:link></span></li>						
 
 			<%-- 
 			<li><span class="menuButton"><g:link class="list" controller="product" action="list"><g:message code="default.list.label"  args="['Product']"/></g:link></span></li>		
@@ -58,8 +58,8 @@
 
 		</span>
 		<ul>
-			<li><span class="menuButton"><g:link class="nobullet" controller="order" action="search"><g:message code="order.search.label" default="Search orders" /></g:link></span></li>						
-			<li><span class="menuButton"><g:link class="nobullet" controller="order" action="create"><g:message code="order.create.label" default="Create an order" /></g:link></span></li>						
+			<li><span class="menuButton"><g:link class="nobullet" controller="order" action="search"><g:message code="order.search.label" default="Search Orders" /></g:link></span></li>						
+			<li><span class="menuButton"><g:link class="nobullet" controller="order" action="create"><g:message code="order.create.label" default="New Order" /></g:link></span></li>						
 			<!--  
 			<li><span class="menuButton"><g:link class="list" controller="order" action="search"><g:message code="order.search.label"  default="Search orders"/></g:link></span></li>		
 			<li><span class="menuButton"><g:link class="list" controller="order" action="listPending"><g:message code="default.list.label"  args="['Pending Order']"/></g:link></span></li>		

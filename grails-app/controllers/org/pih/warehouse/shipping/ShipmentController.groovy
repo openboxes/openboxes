@@ -4,7 +4,7 @@ import grails.converters.JSON
 import org.pih.warehouse.core.Location;
 
 import org.pih.warehouse.inventory.Warehouse;
-
+import org.pih.warehouse.product.Product;
 
 class ShipmentController {
    
@@ -113,6 +113,16 @@ class ShipmentController {
 		}
 	}
 	
+	def editContents = {
+		def shipmentInstance = Shipment.get(params.id)
+		if (!shipmentInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+			redirect(action: (params.type == "incoming") ? "listIncoming" : "listOutgoing")
+		}
+		else {
+			[shipmentInstance: shipmentInstance]
+		}
+	}
 	
 	
 	
@@ -214,16 +224,21 @@ class ShipmentController {
     }
     
     def addItemAutoComplete = {     		
-    	log.debug params;    	
+    	log.info params;    	
+		def container = Container.get(params.container.id);
     	def product = Product.get(params.selectedItem_id)
     	def shipment = Shipment.get(params.id);
-    	log.debug "packages: " + shipment.getPackages()
-    	def container = shipment.packages[0];
+    	log.debug "containers: " + shipment.getContainers()
+    	//def container = shipment.containers[0];
     	if (container) { 
  	    	def shipmentItem = new ShipmentItem(product: product, quantity: 1);
 	    	container.addToShipmentItems(shipmentItem).save(flush:true);
     	}
-    	redirect action: "showDetails", id: shipment.id;
+		else { 
+			flash.message = "could not add item to container";
+		}
+		
+    	redirect action: "editContents", id: shipment.id;
     }    
     
     

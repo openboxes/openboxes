@@ -27,10 +27,8 @@
 	</content>
 </head>
 
-<body>
-    
-	<div class="body">
-	     	
+<body>    
+	<div class="body">	
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
 		</g:if>
@@ -38,7 +36,6 @@
 			<tr>
 				<td>
 					<div id="details" class="section">
-						<h2>Shipment Details</h2>
 						<div style="">
 							<table cellspacing="5" cellpadding="5">
 								<tbody>
@@ -133,6 +130,12 @@
 												<g:else>
 													<table>
 														<tbody>
+															<tr>
+																<th>Date</th>
+																<th>Document</th>
+																<th style="text-align: center">Download</th>
+															</tr>
+														
 															<g:each in="${shipmentInstance.documents}" var="document" status="i">
 																<tr id="document-${document.id}"
 																	class="${(i % 2) == 0 ? 'odd' : 'even'}">
@@ -145,7 +148,7 @@
 																	<td>
 																		${document?.documentType?.name}
 																	</td>
-																	<td nowrap="nowrap">
+																	<td nowrap="nowrap" style="text-align: center">
 																		<g:link controller="document" action="download" id="${document.id}">
 																			<img src="${createLinkTo(dir:'images/icons/silk',file:'disk.png')}" alt="Download" style="vertical-align: middle"/>													
 																		</g:link>
@@ -178,21 +181,27 @@
 												</g:if> 
 												<g:else>
 													<table >	
-														<g:each in="${shipmentInstance.events}" var="event" status="i">
-															<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-																<td nowrap="nowrap">
-																	<g:formatDate format="dd MMM yy" date="${event.eventDate}"/><br/>
-																	<span style="font-size: 0.8em; color: #aaa;">
-																		<g:formatDate type="time" date="${event.eventDate}"/>
-																	</span>
-																</td>
-																<td nowrap="nowrap">
-																	${event.eventType.name}<br/>
-																	<span style="font-size: 0.8em; color: #aaa;">
-																		${event.eventLocation.name}</span>
-																</td> 
-															</tr>										
-														</g:each>									
+														<tbody>
+															<tr>
+																<th>Date</th>
+																<th>Description</th>
+															</tr>
+															<g:each in="${shipmentInstance.events}" var="event" status="i">
+																<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+																	<td nowrap="nowrap">
+																		<g:formatDate format="dd MMM yy" date="${event.eventDate}"/><br/>
+																		<span style="font-size: 0.8em; color: #aaa;">
+																			<g:formatDate type="time" date="${event.eventDate}"/>
+																		</span>
+																	</td>
+																	<td nowrap="nowrap">
+																		${event.eventType.name}<br/>
+																		<span style="font-size: 0.8em; color: #aaa;">
+																			${event.eventLocation.name}</span>
+																	</td> 
+																</tr>										
+															</g:each>	
+														</tbody>								
 													</table>
 												</g:else>
 											</div>
@@ -208,66 +217,45 @@
 									</tr>
 								</tbody>
 							</table>
-									
-									<%-- 
-									<tr class="prop">
-										<td valign="middle" class="name"><label><g:message
-											code="shipment.shipmentNumber.label" default="Last Modified on" /></label>
-										</td>
-										<td valign="top" class="value" nowrap="nowrap"><span
-											style="color: #aaa"><g:formatDate
-											date="${shipmentInstance?.lastUpdated}"
-											format="dd MMM yyyy hh:mm:ss" /></span></td>
-									</tr>
-									<tr class="prop">
-										<td valign="middle" class="name"><label><g:message
-											code="shipment.shipmentNumber.label" default="Created on" /></label></td>
-										<td valign="top" class="value" nowrap="nowrap"><span
-											style="color: #aaa"><g:formatDate
-											date="${shipmentInstance?.dateCreated}"
-											format="dd MMM yyyy hh:mm:ss" /></span></td>
-									</tr>
-									--%>									
 						</div>
 					</div>
 				</td>					
 			
 				<td width="60%">
 					<div id="containers" class="section">
-						<h2>Shipment Units</h2>
-						
-						<div style="padding: 5px;">
-							<g:if test="${!shipmentInstance.containers}">
-								<span class="fade" style="text-align: center">There are no shipping units in this
-								shipment.</span>
-							</g:if> 
-							<g:else>
-								<g:each in="${shipmentInstance.containersByType}" var="entry" status="i">									 
-									
-									<fieldset>
-										<legend>
-											<g:if test="${entry?.key=='Box'}">
-												<img src="${createLinkTo(dir:'images/icons',file:'box_24.gif')}"
-													alt="box" style="vertical-align: middle; width: 24px; height: 24px;" />
-											</g:if>
-											<g:elseif test="${entry?.key=='Pallet'}">
-												<img src="${createLinkTo(dir:'images/icons',file:'pallet.jpg')}"
-													alt="pallet"
-													style="vertical-align: middle; width: 24px; height: 24px;" />
-											</g:elseif>
-											<g:elseif test="${entry?.key=='Suitcase'}">
-												<img src="${createLinkTo(dir:'images/icons',file:'suitcase.jpg')}"
-													alt="suitcase"
-													style="vertical-align: middle; width: 24px; height: 24px;" />
-											</g:elseif>
-											<g:elseif test="${entry?.key=='Container'}">
-												<img src="${createLinkTo(dir:'images/icons',file:'container.jpg')}"
-													alt="container"
-													style="vertical-align: middle; width: 24px; height: 24px;" />
-											</g:elseif>
-											${entry?.key}								
-										</legend>
-									
+											
+						<fieldset>
+							<legend>Shipment Units</legend>
+											
+							<div style="padding: 5px;">
+								<g:if test="${!shipmentInstance.containers}">
+									<span class="fade" style="text-align: center">There are no shipping units in this
+									shipment.</span>
+								</g:if> 
+								<g:else>
+									<g:each in="${shipmentInstance.containersByType}" var="entry" status="i">									 
+								
+										<g:if test="${entry?.key=='Box'}">
+											<img src="${createLinkTo(dir:'images/icons',file:'box_24.gif')}"
+												alt="box" style="vertical-align: middle; width: 24px; height: 24px;" />
+										</g:if>
+										<g:elseif test="${entry?.key=='Pallet'}">
+											<img src="${createLinkTo(dir:'images/icons',file:'pallet.jpg')}"
+												alt="pallet"
+												style="vertical-align: middle; width: 24px; height: 24px;" />
+										</g:elseif>
+										<g:elseif test="${entry?.key=='Suitcase'}">
+											<img src="${createLinkTo(dir:'images/icons',file:'suitcase.jpg')}"
+												alt="suitcase"
+												style="vertical-align: middle; width: 24px; height: 24px;" />
+										</g:elseif>
+										<g:elseif test="${entry?.key=='Container'}">
+											<img src="${createLinkTo(dir:'images/icons',file:'container.jpg')}"
+												alt="container"
+												style="vertical-align: middle; width: 24px; height: 24px;" />
+										</g:elseif>
+										${entry?.key} Units						
+								
 										<g:each in="${entry.value}" var="container" status="j">
 											<table class="container">
 												<tbody>											
@@ -300,17 +288,17 @@
 													</tr>
 												</tbody>
 											</table>										
-										</g:each>										
-									</fieldset>
-								</g:each>									
-							</g:else>
-						</div>
-						<div style="padding: 5px; text-align: right;"> 
-							<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}"><img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit Contents" style="vertical-align: middle"/> edit contents</g:link>
-							&nbsp; 
-							<g:link controller="shipment" action="showPackingList" id="${shipmentInstance.id}" ><img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="View Packing List" style="vertical-align: middle"/> packing list</g:link> 
-						</div>								
-					</div>						
+										</g:each>
+										<br/>										
+									</g:each>									
+								</g:else>
+							</div>
+							<div style="padding: 5px; text-align: left"> 								
+								<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}"><img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit Contents" style="vertical-align: middle"/> edit contents</g:link> &nbsp;
+								<g:link controller="shipment" action="showPackingList" id="${shipmentInstance.id}" ><img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="View Packing List" style="vertical-align: middle"/> packing list</g:link>
+							</div>								
+						</fieldset>											
+					</div>
 				</td>
 			</tr>
 		</table>
