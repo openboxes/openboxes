@@ -121,8 +121,8 @@
 												</span>
 												<a styte="vertical-align: middle" class="home" href='${createLink(controller: "dashboard", action:"chooseWarehouse")}'>change</a>	
 											</li>
-										</g:if>
 										|								
+										</g:if>
 										<li>
 											logged in as <b>${session.user.username}</b>
 										</li>

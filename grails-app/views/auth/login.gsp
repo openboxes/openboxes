@@ -11,10 +11,10 @@
 
 		<g:form controller="auth" action="doLogin" method="post">		  
 		    <div class="dialog">
-				<g:if test="${flash.message}">
-				    <div class="message">${flash.message}</div>
-				</g:if>		
 				<div id="loginForm">
+					<g:if test="${flash.message}">
+					    <div class="message">${flash.message}</div>
+					</g:if>		
 		
 					<g:hasErrors bean="${userInstance}">
 			           <div class="errors">
@@ -22,12 +22,11 @@
 			           </div>
 			        </g:hasErrors>		
 		
-					<div class="notice">
-						Login as <b>manager</b> : <b>password</b> to use the system as a <b>Warehouse Manager</b>. 
-					</div>			
 		
 					<fieldset> 			
 						<legend>Login</legend>		
+						
+						
 						<script>	
 							jQuery(document).ready(function() {
 								// focus on the first text input field in the first field on the page
@@ -35,33 +34,30 @@
 							});	
 						</script>		
 					
-						<div  style="padding: 15px;">
+						<div style="padding: 15px;">
 							    
-							<div class="prop">
-								<label for="username">Username or email:</label><br/>
-								<input type="text" class="large" name="username" id="username" size="40" value="${userInstance?.username}">
+							<div>
+								<label for="username">Username or email:</label>
+							</div>
+							<div>
+								<input type="text" class="large" name="username" id="username" size="42" value="${userInstance?.username}">
+								<br/><span class="fade">e.g. <b>manager</b></span>															
 							</div> 
-							<div  class="prop">
-								<label for="password">Password:</label><br/>
-								<input type="password" class="large" name="password" id="password" size="40" value="${userInstance?.password}">
+							<div>
+								<label for="password">Password:</label>
+							</div>
+							<div>
+								<input type="password" class="large" name="password" id="password" size="42" value="${userInstance?.password}">
+								<br/><span class="fade">e.g. <b>password</b></span>															
 							</div>	
-							
-		<%-- 					
-							<hr style="margin-bottom: 1.4em; margin-top: 1.4em"/>
-							<div class="prop">
-								<!-- <label for="warehouse.id">Log into:</label><br/> -->
-							    <g:select class="large" name="warehouse.id" from="${org.pih.warehouse.inventory.Warehouse.list()}" 
-							    	optionKey="id" value=""
-							    	noSelection="[null: 'Choose warehouse to manage']"/>				    	
-		--%>					    	
+							<div style="text-align: right;">
 								<span class="buttons" >
 									<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt=""/> Login</button>					   
 								</span>
 							</div>  					
 						</div>
-					</div>
-				</fieldset> 
-			</div>
+					</fieldset> 
+				</div>
 			
 			<%-- 
 			    <div class="buttons">

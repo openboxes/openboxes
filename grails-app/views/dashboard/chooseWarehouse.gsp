@@ -26,9 +26,9 @@
 									<td>
 										<g:if test="${session?.user?.warehouse}">
 											<span style="width: 100%; text-align: right; color: #aaa">
-												Your last login: 
-												<b>${session?.user?.lastLoginDate}</b> 
-												<b>${session?.user?.warehouse}</b></span>
+												Last login: <b>${session?.user?.warehouse}</b> on
+												<b><g:formatDate format="dd MMM yyyy hh:mm" date="${session?.user?.lastLoginDate}"/></b> 
+											</span>
 										</g:if>
 									</td>
 								</tr>
