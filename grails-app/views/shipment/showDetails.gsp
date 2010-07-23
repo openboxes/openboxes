@@ -124,8 +124,7 @@
 										<td class="value">
 											<div style="padding: 5px;">
 												<g:if test="${!shipmentInstance.documents}">
-													<span class="fade">There are no documents for this
-													shipment.</span>
+													<div class="fade">(empty)</div>													
 												</g:if> 
 												<g:else>
 													<table>
@@ -135,7 +134,7 @@
 																<th>Document</th>
 																<th style="text-align: center">Download</th>
 															</tr>
-														
+															
 															<g:each in="${shipmentInstance.documents}" var="document" status="i">
 																<tr id="document-${document.id}"
 																	class="${(i % 2) == 0 ? 'odd' : 'even'}">
@@ -154,17 +153,25 @@
 																		</g:link>
 																	</td>
 																</tr>
-															</g:each>										
+															</g:each>	
 														</tbody>
 													</table>
-												</g:else>
+												</g:else>									
+												
 											</div>
-											<div>
-												<a href="${createLink(controller: "shipment", action: "addDocument", id: shipmentInstance.id)}">
-													<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add Document" style="vertical-align: middle"/> add document</a>
-											</div>										
 										</td>
 									</tr>
+									<tr class="prop">
+										<td class="name">
+										
+										</td>										
+										<td class="value">
+											<a href="${createLink(controller: "shipment", action: "addDocument", id: shipmentInstance.id)}">
+												<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add Document" style="vertical-align: middle"/> add document</a>										
+										</td>
+									
+									</tr>
+									
 									<tr class="prop">
 										<td colspan="2">
 											
@@ -180,7 +187,7 @@
 													shipment.</span>
 												</g:if> 
 												<g:else>
-													<table >	
+													<table>	
 														<tbody>
 															<tr>
 																<th>Date</th>
@@ -188,13 +195,13 @@
 															</tr>
 															<g:each in="${shipmentInstance.events}" var="event" status="i">
 																<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-																	<td nowrap="nowrap">
+																	<td>
 																		<g:formatDate format="dd MMM yy" date="${event.eventDate}"/><br/>
 																		<span style="font-size: 0.8em; color: #aaa;">
 																			<g:formatDate type="time" date="${event.eventDate}"/>
 																		</span>
 																	</td>
-																	<td nowrap="nowrap">
+																	<td>
 																		${event.eventType.name}<br/>
 																		<span style="font-size: 0.8em; color: #aaa;">
 																			${event.eventLocation.name}</span>
@@ -205,11 +212,18 @@
 													</table>
 												</g:else>
 											</div>
+										</td>
+									</tr>	
+									<tr class="prop">
+										<td class="name">
+										</td>
+										<td class="value">
 											<div>
 												<a href="${createLink(controller: "shipment", action: "addEvent", id: shipmentInstance.id)}"><img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add Event" style="vertical-align: middle"/> add event</a>
 											</div>										
 										</td>
-									</tr>									
+									</tr>
+																	
 									<tr class="prop">
 										<td colspan="2">
 											
@@ -233,36 +247,43 @@
 									shipment.</span>
 								</g:if> 
 								<g:else>
+									<div>
+										Includes ${shipmentInstance.allShipmentItems.size} items
+								
+									</div>
+									
 									<g:each in="${shipmentInstance.containersByType}" var="entry" status="i">									 
-								
-										<g:if test="${entry?.key=='Box'}">
-											<img src="${createLinkTo(dir:'images/icons',file:'box_24.gif')}"
-												alt="box" style="vertical-align: middle; width: 24px; height: 24px;" />
-										</g:if>
-										<g:elseif test="${entry?.key=='Pallet'}">
-											<img src="${createLinkTo(dir:'images/icons',file:'pallet.jpg')}"
-												alt="pallet"
-												style="vertical-align: middle; width: 24px; height: 24px;" />
-										</g:elseif>
-										<g:elseif test="${entry?.key=='Suitcase'}">
-											<img src="${createLinkTo(dir:'images/icons',file:'suitcase.jpg')}"
-												alt="suitcase"
-												style="vertical-align: middle; width: 24px; height: 24px;" />
-										</g:elseif>
-										<g:elseif test="${entry?.key=='Container'}">
-											<img src="${createLinkTo(dir:'images/icons',file:'container.jpg')}"
-												alt="container"
-												style="vertical-align: middle; width: 24px; height: 24px;" />
-										</g:elseif>
-										${entry?.key} Units						
-								
+																
 										<g:each in="${entry.value}" var="container" status="j">
 											<table class="container">
 												<tbody>											
 													<tr id="container-${container.id}"
 														class="${(j % 2) == 0 ? 'odd' : 'even'}">
-														<td>&nbsp;</td>
-														<td valign="top" nowrap="nowrap">
+														<td>
+															<g:if test="${entry?.key=='Box'}">
+																<img src="${createLinkTo(dir:'images/icons',file:'box_24.gif')}"
+																	alt="box" style="vertical-align: middle; width: 24px; height: 24px;" />
+															</g:if>
+															<g:elseif test="${entry?.key=='Pallet'}">
+																<img src="${createLinkTo(dir:'images/icons',file:'pallet.jpg')}"
+																	alt="pallet"
+																	style="vertical-align: middle; width: 24px; height: 24px;" />
+															</g:elseif>
+															<g:elseif test="${entry?.key=='Suitcase'}">
+																<img src="${createLinkTo(dir:'images/icons',file:'suitcase.jpg')}"
+																	alt="suitcase"
+																	style="vertical-align: middle; width: 24px; height: 24px;" />
+															</g:elseif>
+															<g:elseif test="${entry?.key=='Container'}">
+																<img src="${createLinkTo(dir:'images/icons',file:'container.jpg')}"
+																	alt="container"
+																	style="vertical-align: middle; width: 24px; height: 24px;" />
+															</g:elseif>
+														
+														
+														
+														</td>
+														<td valign="top">
 															<div>
 																<span style="color: #aaa;">${container?.name}</span>
 																<span style="color: #aaa; font-size: .75em; padding-left: 10px;">
@@ -289,7 +310,6 @@
 												</tbody>
 											</table>										
 										</g:each>
-										<br/>										
 									</g:each>									
 								</g:else>
 							</div>

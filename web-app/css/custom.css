@@ -8,9 +8,14 @@
 /* used to give the main content some protection against hitting the right edge of the browser */
 #content { 
 	margin-left: 0px;	/* hack to move content over */
-	margin-right: 30px;
+	/*margin-right: 30px;*/	/* moved to .body */
 	width: 95%;		/* stretch the main content */
 }
+
+.body { 
+	margin-right: 5px;
+}
+
 
 #notify-container {
 	color:#735005;

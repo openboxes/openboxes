@@ -115,12 +115,14 @@ class ShipmentController {
 	
 	def editContents = {
 		def shipmentInstance = Shipment.get(params.id)
+		def containerInstance = Container.get(params?.container?.id);
+		
 		if (!shipmentInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
 			redirect(action: (params.type == "incoming") ? "listIncoming" : "listOutgoing")
 		}
 		else {
-			[shipmentInstance: shipmentInstance]
+			[shipmentInstance: shipmentInstance, containerInstance: containerInstance]
 		}
 	}
 	
@@ -238,7 +240,7 @@ class ShipmentController {
 			flash.message = "could not add item to container";
 		}
 		
-    	redirect action: "editContents", id: shipment.id;
+    	redirect action: "editContents", id: shipment.id, params: ["container.id": container.id];
     }    
     
     
@@ -250,7 +252,7 @@ class ShipmentController {
         def container = new Container(name: containerName, weight: params.weight, dimensions: params.dimensions, units: params.units, containerType: containerType);
         shipment.addToContainers(container);
         flash.message = "Added a new piece to the shipment";		
-		redirect(action: 'showDetails', id: params.shipmentId)    
+		redirect(action: 'editContents', id: params.shipmentId)    
     }
 
 	/*
