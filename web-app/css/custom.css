@@ -191,8 +191,9 @@ h2 {
 }
 
 .section { 	
+	/*
 	padding-left: 10px; 
-	padding-bottom: 10px; 
+	padding-bottom: 10px; */
 }
 .buttons { 
 	padding: 10px; 
@@ -213,8 +214,8 @@ hr.space {background:#fff;color:#fff;}
 #hd { 
     vertical-align: bottom;		
 	/* debugging */
-	border: 0px solid black;
-	padding: 0px;
+	border-bottom: 1px solid #eee;
+	padding-bottom: 5px;
 	margin: 0px;
 	height: 24px;
 }
@@ -280,7 +281,7 @@ hr.space {background:#fff;color:#fff;}
 #footer {
    position:absolute;
    vertical-align: middle;
-   border-top: 1px solid black;
+   border-top: 1px solid #aaa;
    bottom: 0px;
    padding-top: 5px;
    width:100%;

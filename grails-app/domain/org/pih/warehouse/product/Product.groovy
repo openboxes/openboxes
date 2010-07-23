@@ -11,20 +11,22 @@ package org.pih.warehouse.product
 class Product {
 
 	// Basic attributes
-    String name				// brand name and dosage strength: (e.g. Advil 200mg)
-    GenericType genericType // the generic type of product (e.g. Pain Reliever)
-    ProductType productType	// the specific type of product (e.g. Ibuprofen)
+	
+    String name					// brand name and dosage strength: (e.g. Advil 200mg)
+    GenericType genericType 	// the generic type of product (e.g. Pain Reliever)
+    ProductType productType		// the specific type of product (e.g. Ibuprofen)
     Category category
 	
-	//ProductType subType;	// should be a cascading relationship defined by subclass
+	//ProductType subType;		// should be a cascading relationship defined by subclass
     
-    String tags				// Comma separated list of tags
+    String tags					// Comma separated list of tags
     String description
-    Boolean markAsImportant		// Mark with the given product is important or not
+    Boolean unverified			// Mark as unverified -- used for products that are added on the fly
+	Boolean markAsImportant		// Mark with the given product is important or not
 
     // Other attributes
-    String unit				// values: tablet, capsule, vial, pill, bottle, injection, box, each, grams, carton, case
-    String quantityPerUnit	// quantity per unit
+    String unit					// values: tablet, capsule, vial, pill, bottle, injection, box, each, grams, carton, case
+    String quantityPerUnit		// quantity per unit
 	Float weight
     
     // Product codes
@@ -44,6 +46,7 @@ class Product {
 		tags(nullable:true)		
 		weight(nullable:true)
         description(nullable:true)
+		unverified(nullable:true)
 		markAsImportant(nullable:true)
         unit(nullable:true)
         quantityPerUnit(nullable:true)        
@@ -55,16 +58,3 @@ class Product {
     
 }
 
-/*
-boolean equals(other) {
-if (other?.is(this)) return true;
-if (!(other instanceof Product)) return false;
-if (!id || !other?.id || id != other?.id) return false;
-return true;
-}*/
-
-/*
-int hashCode() {
-int hashCode = 0;
-hashCode = 29 * (hashCode +  (!id ? 0 : id ^ (id >>> 32)));
-}*/

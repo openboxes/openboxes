@@ -34,6 +34,7 @@
                             <g:sortableColumn property="origin.name" title="${message(code: 'shipment.origin.label', default: 'From')}" />
                             <g:sortableColumn property="events" title="${message(code: 'shipment.events.label', default: 'Most Recent Event')}" />
 							<g:sortableColumn property="documents" title="${message(code: 'shipment.documents.label', default: 'Documents')}" />                            
+                            <g:sortableColumn property="mostRecentStatus" title="${message(code: 'shipment.status.label', default: 'Most Recent Status')}" />
                         </tr>
                     </thead>
                     <tbody>
@@ -65,6 +66,9 @@
 											</div>
 										</g:each>							
 									</g:else>
+								</td>
+								<td>
+									${shipmentInstance.mostRecentStatus}
 								</td>
 	                        </tr>
 	                    </g:each>

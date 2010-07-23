@@ -1,5 +1,7 @@
 package org.pih.warehouse.shipping;
 
+import java.util.Date;
+
 import org.pih.warehouse.user.User
 
 class Comment {
@@ -8,6 +10,11 @@ class Comment {
 	String comment
 	User commenter
 	User recipient
+	
+	// Audit fields
+	Date dateCreated;
+	Date lastUpdated;
+	
 	
 	String toString() { return "$comment"; }
 	

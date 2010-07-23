@@ -90,6 +90,17 @@ class ShipmentController {
 		}
 	}
 
+	def showDetailsAlt = {
+		def shipmentInstance = Shipment.get(params.id)
+		if (!shipmentInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+			redirect(action: (params.type == "incoming") ? "listIncoming" : "listOutgoing")
+		}
+		else {
+			[shipmentInstance: shipmentInstance]
+		}
+	}
+	
 	def editDetails = {
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
@@ -128,13 +139,33 @@ class ShipmentController {
 	
 	
 	
-
+	HashMap getShipmentsByStatus(List shipments) { 
+		def shipmentListByStatus = new HashMap<String, ListCommand>();
+		shipments.each {
+			
+			Shipment shipment = (Shipment) it;			
+			def status = shipment.getMostRecentStatus();
+			def shipmentList = shipmentListByStatus[status];			
+			// Shipment list does not exist for this status, create a new one
+			if (!shipmentList) {
+				shipmentList = new ListCommand(category: status, objectList: new ArrayList());
+			}			
+			// Populate shipment list and map
+			shipmentList.objectList.add(shipment);
+			shipmentListByStatus.put(status, shipmentList)
+		}
+		
+		return shipmentListByStatus;
+				
+		
+	}
 	
 	
 	def listIncoming = { 
 		def currentLocation = Location.get(session.warehouse.id);
 		def incomingShipments = shipmentService.getShipmentsWithDestination(currentLocation);		
 		[
+			shipmentInstanceMap : getShipmentsByStatus(incomingShipments),
 			shipmentInstanceList : incomingShipments,
 			shipmentInstanceTotal : incomingShipments.size(),
 		];
@@ -145,14 +176,15 @@ class ShipmentController {
 		def currentLocation = Location.get(session.warehouse.id);		
 		def outgoingShipments = shipmentService.getShipmentsWithOrigin(currentLocation);		
 		[
+			shipmentInstanceMap : getShipmentsByStatus(outgoingShipments),
 			shipmentInstanceList : outgoingShipments,
 			shipmentInstanceTotal : outgoingShipments.size(),
 		];
 		
 		
 	}
-    
-    
+	
+	
     def list = { 
     	def browseBy = params.id;
     	def currentLocation = Location.get(session.warehouse.id);    	
@@ -227,11 +259,15 @@ class ShipmentController {
     
     def addItemAutoComplete = {     		
     	log.info params;    	
+		def shipment = Shipment.get(params.id);
 		def container = Container.get(params.container.id);
     	def product = Product.get(params.selectedItem_id)
-    	def shipment = Shipment.get(params.id);
-    	log.debug "containers: " + shipment.getContainers()
-    	//def container = shipment.containers[0];
+
+		// Create a new unverified product
+		if (!product) { 
+			product = new Product(name: params.selectedItem, unverified: true).save(failOnError:true)
+		}
+		
     	if (container) { 
  	    	def shipmentItem = new ShipmentItem(product: product, quantity: 1);
 	    	container.addToShipmentItems(shipmentItem).save(flush:true);
@@ -251,7 +287,6 @@ class ShipmentController {
     	def containerName = (params.name) ? params.name : containerType.name + " " + (shipment.getContainers().size() + 1);
         def container = new Container(name: containerName, weight: params.weight, dimensions: params.dimensions, units: params.units, containerType: containerType);
         shipment.addToContainers(container);
-        flash.message = "Added a new piece to the shipment";		
 		redirect(action: 'editContents', id: params.shipmentId)    
     }
 

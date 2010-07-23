@@ -272,20 +272,29 @@ class BootStrap {
 		//InventoryStatus UNAVAILABLE = new InventoryStatus();
 		
 		/** 
-		 * Shipment Event Type 
+		 * Order Event Type 
 		 */     	
-		EventType EVENT_ORDER_RECEIVED = new EventType(name:"Order has been received", description:"Order has been received").save();
-		EventType EVENT_ORDER_PICKED = new EventType(name:"Order is being picked", description:"Order is being picked").save();
-		EventType EVENT_SHIPMENT_PACKED = new EventType(name:"Shipment is being packed", description:"Shipment is packed").save();     	
-		EventType EVENT_SHIPMENT_LOADED = new EventType(name:"Shipment is being packed onto truck", description:"Shipment has been loaded into truck").save();
-		EventType EVENT_SHIPMENT_SENT = new EventType(name:"Shipment has been sent via shipper", description:"Shipment has been sent by shipper").save();
-		EventType EVENT_SHIPMENT_IN_TRANSIT = new EventType(name:"Shipment is in transit", description:"Shipment has departed").save();
-		EventType EVENT_SHIPMENT_DELIVERED = new EventType(name:"Shipment has been delivered by shipper", description:"Shipment has been delivered by the carrier").save();
-		EventType EVENT_SHIPMENT_RECEIVED = new EventType(name:"Shipment has been received", description:"Shipment has been received by the recipient").save();
-		EventType EVENT_SHIPMENT_UNLOADED = new EventType(name:"Shipment has been unloaded", description:"Shipment has arrived").save();
-		EventType EVENT_SHIPMENT_STAGED = new EventType(name:"Shipment has been staged", description:"Shipment has arrived").save();
-		EventType EVENT_SHIPMENT_UNPACKED = new EventType(name:"Shipment has been unpacked", description:"Shipment has arrived").save();
-		EventType EVENT_SHIPMENT_STORED = new EventType(name:"Shipment has been stored", description:"Shipment has been stored in warehouse").save();
+		//EventType EVENT_ORDER_RECEIVED = new EventType(name:"Order has been received", initial: true).save();
+		//EventType EVENT_ORDER_PICKED = new EventType(name:"Order is being picked", pending: true).save();
+		//EventType EVENT_ORDER_FULFILLED = new EventType(name:"Order has been fulfilled", completed: true).save();
+		
+		/**
+		 * Shipment Event Type
+		 */
+		EventType EVENT_SHIPMENT_REQUESTED = new EventType(name: "Shipment has been requested", description: "Shipment has been requested", initial: true).save();
+		EventType EVENT_SHIPMENT_PACKED = new EventType(name:"Shipment is being packed", description:"Shipment is packed", pending: true).save();     	
+		EventType EVENT_SHIPMENT_LOADED = new EventType(name:"Shipment is being loaded", description:"Shipment has been loaded into truck", pending: true).save();
+		EventType EVENT_SHIPMENT_DEPARTED = new EventType(name:"Shipment has departed", description:"Shipment has been sent by shipper", pending: true).save();
+		EventType EVENT_SHIPMENT_ARRIVED = new EventType(name:"Shipment has arrived", description:"Shipment has been received and signed for by the recipient", pending: true).save();
+		EventType EVENT_SHIPMENT_DELIVERED = new EventType(name:"Shipment has been delivered", description:"Shipment has been delivered and needs confirmation", complete: true).save();
+		
+		/**
+		 * Warehouse Event Type
+		 */
+		//EventType EVENT_GOODS_UNLOADED = new EventType(name:"Shipment has been unloaded", description:"Shipment has arrived", ).save();
+		//EventType EVENT_GOODS_STAGED = new EventType(name:"Shipment has been staged", description:"Shipment has arrived").save();
+		//EventType EVENT_GOODS_UNPACKED = new EventType(name:"Shipment has been unpacked", description:"Shipment has arrived").save();
+		//EventType EVENT_GOODS_STORED = new EventType(name:"Shipment has been stored", description:"Shipment has been stored in warehouse").save();
 		
 		/** 
 		 * Reference Number Type 
@@ -563,14 +572,17 @@ class BootStrap {
 		/**
 		 * Shipment dependencies 
 		 */		
-		Comment comment1 = new Comment(comment: "We need to ship this as soon as possible!", commenter: jmiranda, recipient: jmiranda, sendDate: new Date()).save(flush:true);
-		Comment comment2 = new Comment(comment: "Did you ship this yet?!?!?!?", commenter: manager, recipient: jmiranda, sendDate: new Date()).save(flush:true);
-		Comment comment3 = new Comment(comment: "What is taking so long?", commenter: supervisor, recipient: jmiranda, sendDate: new Date()).save(flush:true);
-		ShipmentEvent event1 = new ShipmentEvent(eventType:EVENT_ORDER_RECEIVED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-25 14:00:00"), eventLocation: boston)
-		ShipmentEvent event2 = new ShipmentEvent(eventType:EVENT_ORDER_PICKED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-25 15:30:00"), eventLocation: boston)
-		ShipmentEvent event3 = new ShipmentEvent(eventType:EVENT_SHIPMENT_PACKED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-25 17:45:00"), eventLocation: boston)
-		ShipmentEvent event4 = new ShipmentEvent(eventType:EVENT_SHIPMENT_LOADED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-26 09:00:00"), eventLocation: boston)
-		ShipmentEvent event5 = new ShipmentEvent(eventType:EVENT_SHIPMENT_SENT, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-26 11:00:00"), eventLocation: boston, targetLocation: miami)		
+		Comment comment1 = new Comment(comment: "We need to ship this as soon as possible!", commenter: jmiranda, recipient: jmiranda, sendDate: new Date())
+		Comment comment2 = new Comment(comment: "Did you ship this yet?!?!?!?", commenter: manager, recipient: jmiranda, sendDate: new Date())
+		Comment comment3 = new Comment(comment: "What is taking so long?", commenter: supervisor, recipient: jmiranda, sendDate: new Date())
+		ShipmentEvent event1 = new ShipmentEvent(eventType:EVENT_SHIPMENT_REQUESTED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-25 15:30:00"), eventLocation: boston)
+		ShipmentEvent event2 = new ShipmentEvent(eventType:EVENT_SHIPMENT_PACKED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-25 17:45:00"), eventLocation: boston)
+		ShipmentEvent event3 = new ShipmentEvent(eventType:EVENT_SHIPMENT_LOADED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-26 09:00:00"), eventLocation: boston)
+		ShipmentEvent event4 = new ShipmentEvent(eventType:EVENT_SHIPMENT_DEPARTED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-26 11:00:00"), eventLocation: boston)
+		ShipmentEvent event5 = new ShipmentEvent(eventType:EVENT_SHIPMENT_ARRIVED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-27 12:30:00"), eventLocation: miami)
+		ShipmentEvent event6 = new ShipmentEvent(eventType:EVENT_SHIPMENT_DEPARTED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-27 13:30:00"), eventLocation: miami)
+		ShipmentEvent event7 = new ShipmentEvent(eventType:EVENT_SHIPMENT_ARRIVED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-28 09:30:00"), eventLocation: tabarre)
+		ShipmentEvent event8 = new ShipmentEvent(eventType:EVENT_SHIPMENT_DELIVERED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-28 10:30:00"), eventLocation: tabarre)
 		Document document1 = new Document(filename: "packing-list.pdf", documentType: DOCUMENT_PACKING_LIST, size: 1020L, contents: "empty")		
 		Document document2 = new Document(filename: "invoice.pdf", documentType: DOCUMENT_COMMERCIAL_INVOICE, size: 990L, contents: "empty") 
 		Container pallet1 = new Container(name: "Pallet #1", containerType: CONTAINER_PALLET, weight: 1000, units: "kgs");
@@ -594,6 +606,9 @@ class BootStrap {
 		shipment1.addToEvents(event3).save(flush:true);
 		shipment1.addToEvents(event4).save(flush:true);
 		shipment1.addToEvents(event5).save(flush:true);		
+		shipment1.addToEvents(event6).save(flush:true);		
+		shipment1.addToEvents(event7).save(flush:true);		
+		shipment1.addToEvents(event8).save(flush:true);		
 		shipment1.addToReferenceNumbers(new ReferenceNumber(identifier:"0000000001", referenceNumberType:REFERENCE_INTERNAL_IDENTIFIER)).save(flush:true)
 		shipment1.addToReferenceNumbers(new ReferenceNumber(identifier:"0002492910", referenceNumberType:REFERENCE_PO_NUMBER)).save(flush:true)
 		pallet1.addToShipmentItems(shipmentItem1).save(flush:true);

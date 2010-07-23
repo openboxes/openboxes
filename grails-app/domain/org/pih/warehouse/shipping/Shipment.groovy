@@ -44,7 +44,7 @@ class Shipment {
 	Date lastUpdated;
 	
 	
-	static transients = [ "allShipmentItems", "containersByType", "mostRecentEvent"]
+	static transients = [ "allShipmentItems", "containersByType", "mostRecentEvent", "mostRecentStatus"]
 	
 	// Core association mappings
 	static hasMany = [events : ShipmentEvent,
@@ -124,6 +124,16 @@ class Shipment {
 		}
 		return null;
 	}
+	
+	String getMostRecentStatus() { 
+		if(mostRecentEvent) { 
+			if (mostRecentEvent.getEventType()) { 
+				return mostRecentEvent.getEventType().getStatus();
+			}			
+		}
+		return "Pending";
+	}
+	
 		
 	/*
 	int compareTo(obj) {

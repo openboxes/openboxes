@@ -8,12 +8,14 @@ import org.pih.warehouse.core.Type;
 class ShipmentStatus extends Type {
 	
 	// Indicates whether this status is an initial or completed state
-	Boolean initialStatus = false; 
-	Boolean finalStatus = false;		
+	Boolean initial = false; 
+	Boolean pending = false;
+	Boolean complete = false;		
 	
     static constraints = {
-		initialStatus(nullable:true)
-		finalStatus(nullable:true)
+		initial(nullable:true)
+		pending(nullable:true)
+		complete(nullable:true)
 	}
 	
 	String toString() { return "$name"; }
