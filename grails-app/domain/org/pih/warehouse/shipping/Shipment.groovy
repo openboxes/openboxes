@@ -30,6 +30,7 @@ class Shipment {
 	// Donation information
 	Boolean donation 
 	Organization donor
+	Float totalValue
 	
 	//SortedSet containers
 	//SortedSet documents
@@ -80,6 +81,7 @@ class Shipment {
 		currentEvent(nullable:true)		
 		donation(nullable:true)
 		donor(nullable:true)
+		totalValue(nullable:true)
 		events(nullable:true)
 		dateCreated(nullable:true);
 		lastUpdated(nullable:true);

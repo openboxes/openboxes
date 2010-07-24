@@ -15,7 +15,10 @@
 .body { 
 	margin-right: 5px;
 }
-
+#dashboard { 
+	margin: 20px; 	
+}
+	
 
 #notify-container {
 	color:#735005;
@@ -113,10 +116,10 @@ table.container {
 	border-top: 1px solid #eee;
 }  
 .menu .heading { 
-	font-size: 1.2em;
-	line-height: 1.2em; 
+	font-size: 1.5em;
+	line-height: 1.5em; 
 	vertical-align: middle;
-	padding: 5px 0px 5px 5px; 
+	padding: 2px 0px 2px 15px; 
 	display: block; 
 	background-color: #F8F7EF; 
 }
@@ -125,12 +128,12 @@ table.container {
 	padding-bottom: 10px;
 }
 .menu .menuSection ul { 
-	padding: 1px; 
+	padding: 5px; 
 }
 .menu .menuSection ul li { 
     /*display: block;*/
     
-    padding: 2px 0 2px 15px;
+    padding: 0px 0px 2px 5px;
     cursor: pointer;
 }
 .menu .menuSection a:link { 
@@ -357,6 +360,7 @@ div#dashboard li {
 }
 
 .prop .name { 
+	width: 20%;
 	background-color: #F7F7F7;
 	text-align: right; 
 }

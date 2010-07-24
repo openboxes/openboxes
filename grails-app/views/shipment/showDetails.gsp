@@ -28,12 +28,9 @@
 		</g:if>
 		<table>
 			<tr>
-				<td>
-				
-				<fieldset>
-				
-				
-					<div>
+				<td width="75%">				
+					<fieldset>
+						<div>
 							<table>
 								<tbody>
 									<tr>
@@ -154,7 +151,13 @@
 											</table>
 										</td>
 									</tr>
-
+									<tr class="prop">
+										<td valign="top" class="name"><label><g:message
+											code="shipment.totalValue.label" default="Total Value" /></label></td>
+										<td valign="top" class="">
+											$<g:formatNumber format="#,###.##" number="${shipmentInstance.totalValue}" /><br/>
+										</td>
+									</tr>
 									<tr class="prop">
 										<td>&nbsp;</td>
 									</tr>
@@ -410,10 +413,10 @@
 						</div>
 					</div>
 				</fieldset>
-				</td>		
+			</td>		
 				<td width="25%">
+				
 					<fieldset>
-						<legend>options</legend>
 						<table>
 							<tr class="">
 								<td>
@@ -454,7 +457,7 @@
 							</tr>					
 						</table>
 					</fieldset>
-				</td>			
+				</td>	
 			</tr>
 		</table>
 	</div>

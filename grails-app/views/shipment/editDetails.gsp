@@ -100,6 +100,15 @@
 						</td>
 					</tr>		
 					<tr class="prop">
+						<td valign="top" class="name"><label><g:message
+							code="shipment.totalValue.label" default="Total value" /></label></td>
+						<td valign="top"
+							class=" ${hasErrors(bean: shipmentInstance, field: 'totalValue', 'errors')}"
+							nowrap="nowrap">
+								<g:textField name="totalValue" value="${shipmentInstance?.totalValue}" />
+						</td>
+					</tr>		
+					<tr class="prop">
 						<td class="name"></td>
 						<td>
 							<div class="buttons">
