@@ -31,8 +31,8 @@ body {
 }
 
 a:link, a:visited, a:hover {
-    color: #666;
-    font-weight: bold;
+    color: blue;
+    /*font-weight: bold;*/
     font-size: 0.9em;
     /*text-decoration: underline;*/
    	text-decoration: none;	/* removed because we want to see underline */
@@ -91,22 +91,22 @@ input:focus, select:focus, textarea:focus {
     padding: 0 5px;
 }
 .menuButton a {
-    color: #333;
+    /*color: #333;*/
     padding: 4px 6px;
 }
 .menuButton a.home {
     background: url(../images/skin/house.png) center left no-repeat;
-    color: #333;
+    /*color: #333;*/
     padding-left: 25px;
 }
 .menuButton a.list {
     background: url(../images/skin/database_table.png) center left no-repeat;
-    color: #333;
+    /*color: #333;*/
     padding-left: 25px;
 }
 .menuButton a.create {
     background: url(../images/skin/database_add.png) center left no-repeat;
-    color: #333;
+    /*color: #333;*/
     padding-left: 25px;
 }
 

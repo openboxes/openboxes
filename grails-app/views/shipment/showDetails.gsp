@@ -23,10 +23,21 @@
 
 <body>    
 	<div class="body">	
+	
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
 		</g:if>
+		
+		
 		<table>
+			<tr>
+				<td colspan="2">
+					<div style="padding-bottom: 10px;">
+						<g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}">${shipmentInstance?.name}</g:link> 
+						&raquo; <span style="font-size: 90%">Show Details</span>
+					</div>										
+				</td>			
+			</tr>
 			<tr>
 				<td width="75%">				
 					<fieldset>
@@ -55,10 +66,9 @@
 											<span class="fade">[Shipment No. ${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}]</span>
 										</td>
 									</tr>
-								</tbody>
-							
+								</tbody>							
 							</table>
-					</div>				
+						</div>				
 				
 					<div id="details" class="section">
 						<div style="">
@@ -201,8 +211,14 @@
 																		</g:else>
 																	</td>
 																	 --%>
-																	<td>			
-																		<span>${container?.name}</span> &nbsp;
+																	<td>	
+																																																				<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}" 
+																		<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}" 
+																		params="['container.id':container.id]">
+																			<span>${container?.name}</span> 
+																		</g:link>																	
+																		&nbsp;
+																		
 																		<span style="color: #666">(contains ${container.shipmentItems.size()} items)</span>
 																		
 																		<%-- 
@@ -250,7 +266,7 @@
 																		<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}" 
 																		params="['container.id':container.id]"><img 
 																		src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" 
-																		alt="Add Document" style="vertical-align: middle"/></g:link>																	
+																		alt="Add" style="vertical-align: middle"/></g:link>																	
 																	
 																	</td>
 																	
@@ -415,48 +431,50 @@
 				</fieldset>
 			</td>		
 				<td width="25%">
-				
-					<fieldset>
-						<table>
-							<tr class="">
-								<td>
-									<g:link controller="shipment" action="editDetails" id="${shipmentInstance.id}"><img
-									src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}"
-									alt="Edit Shipment" style="vertical-align: middle" /> edit details</g:link>
-								
-								</td>
-							</tr>
-							<tr class="">
-								<td>
-									<a href="${createLink(controller: "shipment", action: "addEvent", id: shipmentInstance.id)}"><img 
-									src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" 
-									alt="Add Event" style="vertical-align: middle"/> add event</a>
-								</td>
-							</tr>
-							<tr class="">
-								<td>
-									<a href="${createLink(controller: "shipment", action: "addDocument", id: shipmentInstance.id)}"><img 
-									src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" 
-									alt="Add Document" style="vertical-align: middle"/> add document</a>										
-								
-								</td>
-							</tr>
-							<tr class="">
-								<td>
-									<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}"><img 
-									src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" 
-									alt="Add Document" style="vertical-align: middle"/> add boxes</a></g:link>
-								</td>
-							</tr>
-							<tr class="">
-								<td>
-									<g:link controller="shipment" action="showPackingList" id="${shipmentInstance.id}" ><img 
-									src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" 
-									alt="View Packing List" style="vertical-align: middle"/> packing list</g:link>		
-								</td>
-							</tr>					
-						</table>
-					</fieldset>
+					<div style="width: 200px">
+						<fieldset>
+							<h2>Actions</h2>
+							<table>
+								<tr class="">
+									<td>
+										<g:link controller="shipment" action="editDetails" id="${shipmentInstance.id}"><img
+										src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}"
+										alt="Edit Shipment" style="vertical-align: middle" /> &nbsp; edit details</g:link>
+									
+									</td>
+								</tr>
+								<tr class="">
+									<td>
+										<a href="${createLink(controller: "shipment", action: "addEvent", id: shipmentInstance.id)}"><img 
+										src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" 
+										alt="Add Event" style="vertical-align: middle"/> &nbsp; add event</a>
+									</td>
+								</tr>
+								<tr class="">
+									<td>
+										<a href="${createLink(controller: "shipment", action: "addDocument", id: shipmentInstance.id)}"><img 
+										src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" 
+										alt="Add Document" style="vertical-align: middle"/> &nbsp; add document</a>										
+									
+									</td>
+								</tr>
+								<tr class="">
+									<td>
+										<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}"><img 
+										src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" 
+										alt="Add Document" style="vertical-align: middle"/> &nbsp; add boxes</a></g:link>
+									</td>
+								</tr>
+								<tr class="">
+									<td>
+										<g:link controller="shipment" action="showPackingList" id="${shipmentInstance.id}" ><img 
+										src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" 
+										alt="View Packing List" style="vertical-align: middle"/> &nbsp; view packing list</g:link>		
+									</td>
+								</tr>					
+							</table>
+						</fieldset>
+					</div>
 				</td>	
 			</tr>
 		</table>

@@ -136,14 +136,25 @@ table.container {
     padding: 0px 0px 2px 5px;
     cursor: pointer;
 }
-.menu .menuSection a:link { 
+/*
+.menu .menuSection a { 
 	font-weight: none;
 	text-decoration: none;
 }
+.menu .menuSection a:hover { 	
+	text-decoration: none;
+	font-weight: none;
+}
 .menu .menuSection a:hover { 
 	text-decoration: underline;
+	font-weight: none;
 }
-
+.menu .menuSection a:visited { 
+	text-decoration: none;
+	font-weight: none;
+}
+*/
+	
 /* nothing to do right now */
 #menu { 
 
