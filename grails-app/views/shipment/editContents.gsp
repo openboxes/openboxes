@@ -53,6 +53,10 @@
 									 &nbsp; &raquo; &nbsp; 
 									<span style="font-size: 90%">${containerInstance?.name}</span>
 								</div>
+								
+								<fieldset>
+								
+								<h2>Items in ${containerInstance?.name}</h2>
 								<table>
 									<tbody>
 										<g:if test="${containerInstance?.shipmentItems}">
@@ -76,7 +80,12 @@
 										</g:else>
 									</tbody>
 								</table>			
-								
+								<div class="buttons">
+									<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_left.png')}" alt="Done" /> Done</button></span>
+								</div>
+
+
+								</fieldset>
 																	
 	
 							</g:if>
@@ -199,9 +208,6 @@
 						<td width="1%"></td>
 						<td valign="top">						
 							<fieldset>
-									
-									
-								
 								<g:if test="${containerInstance}">
 									<div>
 										<h2>Add a product</h2>										

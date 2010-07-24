@@ -23,13 +23,18 @@ class EventType extends Type{
 		complete(nullable:true)
 	}
 	
-	static transients = [ "status" ]
+	static transients = [ "status", "optionValue" ]
 	
 	String getStatus() { 
 		if (initial) return "Initiated"
 		else if (complete) return "Completed"
 		return "Pending"
 	}
+	
+	String getOptionValue() { 
+		return name + " [" + this.getStatus() + "]" 
+	}
+	
 	
 	String toString() { return "$name"; }	
 	

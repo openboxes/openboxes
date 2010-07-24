@@ -52,9 +52,9 @@
                        </tr>  	          
 					<tr class="prop">
                            <td valign="top" class="name"><label><g:message code="event.eventType.label" default="Event Type" /></label></td>                            
-                           <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'eventDate', 'errors')}">
+                           <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'eventType', 'errors')}">
                                   <g:select id="eventTypeId" name='eventTypeId' noSelection="${['':'Select one ...']}" 
-                                  	from='${EventType.list()}' optionKey="id" optionValue="name"></g:select>
+                                  	from='${EventType.list()}' optionKey="id" optionValue="optionValue"></g:select>
                               </td>
                        </tr>  	          
 						<tr class="prop">
