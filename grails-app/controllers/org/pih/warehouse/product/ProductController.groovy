@@ -124,9 +124,9 @@ class ProductController {
 		def selectedProductSubType = ProductType.get(params.productSubTypeId);
     	def selectedAttribute = Attribute.get(params.attributeId)	
 		
-    	def allAttributes = Attribute.getAll();
 		
     	// Condition types	
+    	def allAttributes = Attribute.getAll();
     	def allConditionTypes = ConditionType.getAll();
     	
     	// Root level product types
@@ -156,17 +156,25 @@ class ProductController {
 		// Search for Products matching criteria 
 		def results = null;		
 		def productCriteria = Product.createCriteria();
+		log.info "product filter " + params;
 		results = productCriteria.list {
             and{
-                if(params.productTypeId && params.productTypeId != ''){
+                if(params.productTypeId){
                     eq("productType.id", Long.parseLong(params.productTypeId))
                 }
-          		if(params.categoryId && params.categoryId != ''){
+          		if(params.categoryId){
           			categories { 
           				eq("id", Long.parseLong(params.categoryId))
           			}
-                }               
-            }		
+                } 
+				if (params.nameContains) {  
+					like("name", "%" + params.nameContains + "%")
+					//eq("name", params.nameContains)
+				}
+				if (params.unverified) { 
+					eq("unverified", true)
+				}
+            }				
 		}		
 		
 		// Search drug products matching condition type id
@@ -199,15 +207,45 @@ class ProductController {
         [productInstanceList: Product.list(params), productInstanceTotal: Product.count()]
     }
 
-    def create = {
-        def productInstance = new Product()
-        productInstance.properties = params
-        return [productInstance: productInstance]
-    }
+	
+	
+	
+	def create = { 
 
+		if (!params.type) {
+			render(view: "selectType")
+		}
+		else { 			
+			def productInstance = null;
+			if (params.type == 'drug') {			
+				productInstance = new DrugProduct();			
+			} 	
+			else if (params.type == 'durable') { 
+				productInstance = new DurableProduct();
+			}	
+			else { 
+				productInstance = new Product();
+			}			
+			productInstance.properties = params
+			render(view: "edit", model: [productInstance : productInstance])
+		}
+	}
+
+	
     def save = {
-        def productInstance = new Product(params)
-        if (productInstance.save(flush: true)) {
+        //def productInstance = new Product(params)
+        
+		def productInstance = null;
+		if (params.type == 'drug') {
+			productInstance = new DrugProduct(params);
+		} else if (params.type == 'durable') {
+			productInstance = new DurableProduct(params);
+		} else {
+			productInstance = new Product(params);
+		}
+
+		
+		if (productInstance.save(flush: true)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'product.label', default: 'Product'), productInstance.id])}"
             redirect(action: "show", id: productInstance.id)
         }
@@ -220,7 +258,7 @@ class ProductController {
         def productInstance = Product.get(params.id)
         if (!productInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
-            redirect(action: "list")
+            redirect(action: "browse")
         }
         else {
             [productInstance: productInstance]
@@ -231,7 +269,7 @@ class ProductController {
         def productInstance = Product.get(params.id)
         if (!productInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
-            redirect(action: "list")
+            redirect(action: "browse")
         }
         else {
             return [productInstance: productInstance]
@@ -261,7 +299,7 @@ class ProductController {
         }
         else {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
-            redirect(action: "list")
+            redirect(action: "browse")
         }
     }
 
@@ -280,7 +318,7 @@ class ProductController {
         }
         else {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
-            redirect(action: "list")
+            redirect(action: "browse")
         }
     }
 	

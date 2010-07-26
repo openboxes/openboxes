@@ -21,18 +21,30 @@
 			</div>
 		</g:hasErrors> 
 		
-		<div>	
+		<div clss="dialog">
 			<g:uploadForm controller="product" action="uploadProducts">
-				<label>File</label>
-				<input name="csvFile" type="file" />				
-				
-				<span class="buttons">
-					<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="upload" /> 
-						${message(code: 'default.button.upload.label', default: 'Upload')}</button>
-					<a href="${createLink(controller: "product", action: "browse")}" id="edit-origin-link" class="negative"> 
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="" /> Cancel </a>															
-				</span>				
-				
+				<fieldset>		
+					<legend>Select file with products to import</legend>	
+					<table>
+						<tbody>
+							<tr class="prop">
+								<td class="name"><label>File</label></td>
+								<td class="value"><input name="csvFile" type="file" /></td>
+							</tr>
+							<tr class="prop">
+								<td class="name"></td>
+								<td class="value">
+									<span class="buttons">
+										<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="upload" /> 
+											${message(code: 'default.button.upload.label', default: 'Upload')}</button>
+										<a href="${createLink(controller: "product", action: "browse")}" id="edit-origin-link" class="negative"> 
+											<img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="" /> Cancel </a>															
+									</span>						
+								</td>					
+							</tr>
+						</tbody>						
+					</table>
+				</fieldset>
 			</g:uploadForm>	
 		</div>
 

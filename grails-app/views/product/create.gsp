@@ -8,15 +8,8 @@
         <title><g:message code="default.create.label" args="[entityName]" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><g:message code="default.create.label" args="[entityName]" /></content>
-		<content tag="menuTitle">${entityName}</content>		
-		<content tag="globalLinksMode">append</content>
-		<content tag="localLinksMode">override</content>
-		<content tag="globalLinks"><g:render template="global" model="[entityName:entityName]"/></content>
-		<content tag="localLinks"><g:render template="local" model="[entityName:entityName]"/></content>		
     </head>    
     <body>
-    
-    	<h1>Create a new product</h1>
     
         <div class="body">
             <g:if test="${flash.message}">
@@ -39,6 +32,14 @@
                                     <g:textField name="name" value="${productInstance?.name}" />
                                 </td>
                             </tr>
+		 					<tr class="prop">
+                                <td valign="top" class="name">
+                                  <label for="productType.id"><g:message code="product.productType.label" default="Product Type" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'type', 'errors')}">
+                                    <g:select name="productType.id" from="${org.pih.warehouse.product.ProductType.list()}" optionKey="id" value="${productInstance?.productType?.id}"  />
+                                </td>
+                            </tr>                            
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="ean"><g:message code="product.ean.label" default="UPC" /></label>
@@ -55,39 +56,18 @@
                                     <g:textField name="description" value="${productInstance?.description}" />
                                 </td>
                             </tr>
-		 					<tr class="prop">
-                                <td valign="top" class="name">
-                                  <label for="type.id"><g:message code="product.productType.label" default="Type" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'type', 'errors')}">
-                                    <g:select name="type.id" from="${org.pih.warehouse.product.ProductType.list()}" optionKey="id" value="${productInstance?.type?.id}"  />
-                                </td>
-                            </tr>                            
-		 					<tr class="prop">
-                                <td valign="top" class="name">
-                                  <label for="subType.id"><g:message code="product.productType.label" default="Subtype" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'subtype', 'errors')}">
-                                    <g:select name="subType.id" from="${org.pih.warehouse.product.ProductType.list()}" optionKey="id" value="${productInstance?.subType?.id}"  />
-                                </td>
-                            </tr>                            
-                            
-                            
-<%--                             
                             <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="user"><g:message code="product.user.label" default="User" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'user', 'errors')}">
-                                    <g:select name="user.id" from="${org.pih.warehouse.user.User.list()}" optionKey="id" value="${productInstance?.user?.id}"  />
-                                </td>
+                            	<td valign="top" class="name"></td>
+                            	<td>
+					                <div class="buttons">
+										<button type="submit" class="positive">
+											<img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Save" /> 
+											${message(code: 'default.button.save.label', default: 'Save')}</button>
+									</div>	                         
+                            	</td>
                             </tr>
---%>                        
                         </tbody>
                     </table>
-                </div>
-                <div class="buttons">
-                    <span class="button"><g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" /></span>
                 </div>
             </g:form>
         </div>

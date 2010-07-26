@@ -48,7 +48,7 @@
 									 &nbsp; &raquo; &nbsp; 
 									<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}" params="['container.id':containerInstance.id]">${containerInstance?.name}</g:link>
 									&nbsp; &raquo; &nbsp;
-									<span style="font-size: 90%">Included Items</span>
+									<span style="font-size: 90%">Items</span>
 								</div>					
 							</g:if>
 							<g:else>
@@ -61,8 +61,9 @@
 					</tr>					
 					<tr>
 						<td style="width: 60%" valign="top">
-							
-							<fieldset>
+
+
+							<fieldset>							
 								<table>
 									<tbody>
 										<tr>
@@ -89,187 +90,259 @@
 										</tr>
 									</tbody>
 								</table>			
-								
-								<h2>Shipping Packages</h2>									
-								<table>		
+									
+									
+								<table>
 									<tr>
-										<th width="5%"></th>
-										<th>Name</th>
-										<th width="70%">Contents</th>
+										<td colspan="2">
+											<h3>Shipment Units & Items</h3>									
+										</td>
 									</tr>
-									<g:each in="${shipmentInstance.containers}" var="container" status="i">	
-									
-									
-										<g:set var="cssStyle"></g:set>
-										<g:if test="${containerInstance?.id == container?.id}">
-											<g:set var="cssStyle">background-color: white</g:set>											
-										</g:if>
-										<tr style="${cssStyle}" class="${(i % 2) == 0 ? 'odd' : 'even'}">										
-											<td>${i+1}.</td>
-											<%--
-											<td>
-												<g:if test="${container?.containerType?.name=='Pallet'}">
-													<img src="${createLinkTo(dir:'images/icons',file:'pallet.jpg')}"
-														alt="pallet"
-														style="vertical-align: middle; width: 24px; height: 24px;" />
-												</g:if>
-												<g:elseif test="${container?.containerType?.name=='Suitcase'}">
-													<img src="${createLinkTo(dir:'images/icons',file:'suitcase.jpg')}"
-														alt="suitcase"
-														style="vertical-align: middle; width: 24px; height: 24px;" />
-												</g:elseif>
-												<g:elseif test="${container?.containerType?.name=='Container'}">
-													<img src="${createLinkTo(dir:'images/icons',file:'container.jpg')}"
-														alt="container" style="vertical-align: middle; width: 24px; height: 24px;" />
-												</g:elseif>								
-												<g:else>														
-													<img src="${createLinkTo(dir:'images/icons',file:'box_24.gif')}"
-														alt="box" style="vertical-align: middle; width: 24px; height: 24px;" />														
-												</g:else>
-											</td>
-											 --%>
-											<td>			
-												
-												<div>													
+									<tr>
+										<td width="30%">
+											<table>		
+												<g:each in="${shipmentInstance.containers}" var="container" status="i">	
+													<g:set var="cssStyle"></g:set>
 													<g:if test="${containerInstance?.id == container?.id}">
-														<span style="font-size:1.25em">${container?.name}</span>
+														<g:set var="cssStyle">background-color: lightblue</g:set>											
 													</g:if>
-													<g:else>
-														<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}" params="['container.id':container.id]">
-															<span style="font-size:1.25em">${container?.name}</span>
-														</g:link>
-													</g:else>
-													&nbsp; 
-													<span class="fade">
-														<g:if test="${container.shipmentItems}">
-															(${container.shipmentItems.size()} items)
-														</g:if>
-														<g:else>
-															(empty)
-														</g:else>
-													</span>
-												</div>												
-												
-												<%-- 
-												<div style="color: #666; font-size: .75em;">
-													Weight: &nbsp;
-														<g:if test="${container.weight}">
-															${container?.weight} ${container?.units}
-														</g:if> 
-														<g:else><b>unknown</b></g:else> 
-													
-													<div>
-													Dimensions: &nbsp;
-														<g:if test="${container.dimensions}">
-															${container.dimensions}
-														</g:if> 
-														<g:else>
-															<b>unknown</b>
-														</g:else> 													
-													</div>
-													<div>
-														# Items: &nbsp;<%= container.getShipmentItems().size() %></span>
-													</div>
-												</div>
-												--%>
-											</td>
-											<%-- 
-											<td>
-												<div style="color: #666; font-size: .75em; padding-left: 10px;">
-													<g:if test="${container.shipmentItems}">
-														<ul>
-															<g:each var="item" in="${container.shipmentItems}" 
-																status="k">
-																<li>
-																	<span><g:if test="${!(k-1 == container.shipmentItems.size())}">&nbsp;&bull;&nbsp;</g:if></span>
-																	<span>${item.quantity} ${item?.product?.name}</span>
-																</li>
-															</g:each>
-														</ul>															
-													</g:if>
-												</div>														
-											</td>
-											--%>
-											
-											<%-- 
-											<td width="20%">
-												<div style="text-align: left">
-													<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}" params="['container.id':container.id]">
-					 									<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add Items" style="vertical-align: middle"/> add items
-					 								</g:link>												
-													<!--
-													<ul>
-						 								<li> 						
-						 									<g:link controller="shipment" action="editContainer" id="${container.id}"><img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="" style="vertical-align: middle"/> edit box</a></g:link> &nbsp;
-						 								</li>
-						 								<li>
-						 									<g:link controller="shipment" action="copyContainer" id="${container.id}"><img src="${createLinkTo(dir:'images/icons/silk',file:'page_copy.png')}" alt="" style="vertical-align: middle"/> copy box</a></g:link> &nbsp;
-						 								</li>
-						 								<li>
-						 									<g:link controller="shipment" action="deleteContainer" id="${container.id}"><img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="" style="vertical-align: middle"/> delete box</a></g:link> &nbsp;
-						 								</li>
-					 								</ul>
-					 								-->
-												</div>								
-											</td>
-											
-											--%>
-											
-											<td width="70%">
-												<fieldset>
-												<g:if test="${containerInstance.id == container.id}">
-													<g:if test="${containerInstance}">																
-													
-														<table>
-															<tbody>
-																<g:if test="${containerInstance?.shipmentItems}">
-																	<tr>
-																		<th></th>
-																		<th>Item</th>
-																		<th style="text-align: center;" width="20%">Qty</th>
-																	</tr>
-																	<g:each var="item" in="${containerInstance.shipmentItems}" status="k">
-																		<tr class="${(k % 2) == 0 ? 'odd' : 'even'}">
-																			<td width="5%">${k+1}.</td>
-																			<td>
-																				${item?.product?.name} 
-																				<g:if test="${item?.product?.unverified}">
-																					<span class="fade">(unverified)</span>
-																				</g:if> 
-																			
-																			</td>
-																			<td style="text-align: center;" width="20%;">${item.quantity}</td>
-																		</tr>							
-																	</g:each>
+													<tr style="${cssStyle}" class="${(i % 2) == 0 ? 'odd' : 'even'}">										
+														<td>${i+1}.</td>
+														<%--
+														<td>
+															<g:if test="${container?.containerType?.name=='Pallet'}">
+																<img src="${createLinkTo(dir:'images/icons',file:'pallet.jpg')}"
+																	alt="pallet"
+																	style="vertical-align: middle; width: 24px; height: 24px;" />
+															</g:if>
+															<g:elseif test="${container?.containerType?.name=='Suitcase'}">
+																<img src="${createLinkTo(dir:'images/icons',file:'suitcase.jpg')}"
+																	alt="suitcase"
+																	style="vertical-align: middle; width: 24px; height: 24px;" />
+															</g:elseif>
+															<g:elseif test="${container?.containerType?.name=='Container'}">
+																<img src="${createLinkTo(dir:'images/icons',file:'container.jpg')}"
+																	alt="container" style="vertical-align: middle; width: 24px; height: 24px;" />
+															</g:elseif>								
+															<g:else>														
+																<img src="${createLinkTo(dir:'images/icons',file:'box_24.gif')}"
+																	alt="box" style="vertical-align: middle; width: 24px; height: 24px;" />														
+															</g:else>
+														</td>
+														 --%>
+														<td>			
+															
+															<div>													
+																<g:if test="${containerInstance?.id == container?.id}">
+																	<span style="font-size:1.25em">${container?.name}</span>
 																</g:if>
 																<g:else>
-																	<tr>
-																		<td style="text-align: center">
-																			<span class="fade">(empty)</span>
-																		</td>
-																	</tr>													
+																	<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}" params="['container.id':container.id]">
+																		<span style="font-size:1.25em">${container?.name}</span>
+																	</g:link>
 																</g:else>
-															</tbody>
-														</table>			
-													</g:if>												
-												</g:if>
-											</fieldset>
-											</td>
-											
-											
-											
-										</tr>
-									</g:each>		
-								</table>
-
-							</fieldset>							
-						</td>
-						
-						
-						
+																&nbsp; 
+																<span class="fade">
+																	<g:if test="${container.shipmentItems}">
+																		(${container.shipmentItems.size()} items)
+																	</g:if>
+																	<g:else>
+																		(empty)
+																	</g:else>
+																</span>
+															</div>												
+															
+															<%-- 
+															<div style="color: #666; font-size: .75em;">
+																Weight: &nbsp;
+																	<g:if test="${container.weight}">
+																		${container?.weight} ${container?.units}
+																	</g:if> 
+																	<g:else><b>unknown</b></g:else> 
+																
+																<div>
+																Dimensions: &nbsp;
+																	<g:if test="${container.dimensions}">
+																		${container.dimensions}
+																	</g:if> 
+																	<g:else>
+																		<b>unknown</b>
+																	</g:else> 													
+																</div>
+																<div>
+																	# Items: &nbsp;<%= container.getShipmentItems().size() %></span>
+																</div>
+															</div>
+															--%>
+														</td>
+														<%-- 
+														<td>
+															<div style="color: #666; font-size: .75em; padding-left: 10px;">
+																<g:if test="${container.shipmentItems}">
+																	<ul>
+																		<g:each var="item" in="${container.shipmentItems}" 
+																			status="k">
+																			<li>
+																				<span><g:if test="${!(k-1 == container.shipmentItems.size())}">&nbsp;&bull;&nbsp;</g:if></span>
+																				<span>${item.quantity} ${item?.product?.name}</span>
+																			</li>
+																		</g:each>
+																	</ul>															
+																</g:if>
+															</div>														
+														</td>
+														--%>
+														
+														<%-- 
+														<td width="20%">
+															<div style="text-align: left">
+																<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}" params="['container.id':container.id]">
+								 									<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add Items" style="vertical-align: middle"/> add items
+								 								</g:link>												
+																<!--
+																<ul>
+									 								<li> 						
+									 									<g:link controller="shipment" action="editContainer" id="${container.id}"><img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="" style="vertical-align: middle"/> edit box</a></g:link> &nbsp;
+									 								</li>
+									 								<li>
+									 									<g:link controller="shipment" action="copyContainer" id="${container.id}"><img src="${createLinkTo(dir:'images/icons/silk',file:'page_copy.png')}" alt="" style="vertical-align: middle"/> copy box</a></g:link> &nbsp;
+									 								</li>
+									 								<li>
+									 									<g:link controller="shipment" action="deleteContainer" id="${container.id}"><img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="" style="vertical-align: middle"/> delete box</a></g:link> &nbsp;
+									 								</li>
+								 								</ul>
+								 								-->
+															</div>								
+														</td>
+														
+														--%>
+														
+													</tr>
+												</g:each>		
+											</table>
+	
+										
+										</td>
+									
+										<td>
+											<g:each in="${shipmentInstance.containers}" var="container" status="i">	
+												<g:if test="${containerInstance?.id == container?.id}">
+												
+													<div style="padding: 5px; background-color: lightblue;">
+														<span style="font-size:1.25em">${container?.name}</span>													
+													</div>
+													<fieldset>
+														<g:if test="${containerInstance}">																
+															<table>
+																<tbody>
+																	<g:if test="${containerInstance?.shipmentItems}">
+																		
+																		<g:each var="item" in="${containerInstance.shipmentItems}" status="k">
+																			<tr class="${(k % 2) == 0 ? 'odd' : 'even'}">
+																				<td width="5%">${k+1}.</td>
+																				<td>
+																					${item?.product?.name} 
+																					<g:if test="${item?.product?.unverified}">
+																						<span class="fade">(unverified)</span>
+																					</g:if> 
+																				
+																				</td>
+																				<td style="text-align: center;" width="20%;">${item.quantity}</td>
+																			</tr>							
+																		</g:each>
+																	</g:if>
+																	<g:else>
+																		<tr>
+																			<td style="text-align: center">
+																				<span class="fade">(empty)</span>
+																			</td>
+																		</tr>													
+																	</g:else>
+																</tbody>
+															</table>			
+														</g:if>												
+													</fieldset>
+												</g:if>							
+											</g:each>									
+										</td>
+									</tr>
+								</table>	
+							</fieldset>
+						</td>						
 						<td width="1%"></td>
 						<td valign="top" width="25%">						
 							<fieldset>
+
+
+								<g:if test="${containerInstance}">
+									<div>
+										<h2>Add a product</h2>										
+										<g:form action="addItemAutoComplete" id="${shipmentInstance.id}">	
+											<table>
+												<tr class="prop">
+													<td class="name"><label>Add To</label></td>
+													<td class="value">
+														${containerInstance?.name}
+														<%-- 														
+														<g:select name="container.id" from="${shipmentInstance?.containers}" 
+															optionKey="id" optionValue="name" value="" noSelection="['0':'']" />															
+														--%>										
+														<g:hiddenField name="container.id" value="${containerInstance?.id}"></g:hiddenField>
+													</td>												
+												</tr>								
+												<tr class="prop">
+													<td class="name"><label>Item</label></td>
+													<td class="value">
+														<gui:autoComplete size="20" 
+															id="selectedItem" name="selectedItem" 
+															controller="shipment" action="availableItems"/>												
+													</td>												
+												</tr>								
+												<tr class="prop">
+													<td class="name"></td>
+													<td class="value">
+													
+														<div class="buttons">
+															<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add" /> Add</button></span>
+														</div>
+						
+														
+														
+													</td>												
+												</tr>									
+											</table>									
+										</g:form>			
+									</div>				
+									
+									<%-- 		
+									<div>
+										<h2>All shipment units</h2>
+										<table>
+											<tbody>
+												<tr>
+													<th>Shipment unit</th>
+												</tr>
+												<g:each in="${shipmentInstance.containers}" var="container" status="i">											
+													<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+														<td >
+															<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}" params="['container.id':container.id]">															
+																<img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" alt="Add" style="vertical-align: middle"/>
+																${container.name}
+															</g:link>																												
+															&nbsp;
+															(<%= container.getShipmentItems().size() %> items) 																												
+														</td>
+													</tr>
+												</g:each>											
+											</tbody>																		
+										</table>										
+									</div>
+									--%>
+										
+								</g:if>
+
+
+
 									<div>
 										<g:form action="addContainer">															
 											<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />										
@@ -309,7 +382,7 @@
 														<td class="name"></td>
 														<td class="value">	
 															<div class="buttons">
-																<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> Save</button>
+																<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="add" /> Add</button>
 															</div>													
 														</td>
 													</tr>	
@@ -318,75 +391,8 @@
 											</table>
 										</g:form>														
 									</div>								
-									<br/><br/>							
 							
-								<g:if test="${containerInstance}">
-									<div>
-										<h2>Add a product</h2>										
-										<g:form action="addItemAutoComplete" id="${shipmentInstance.id}">	
-											<table>
-												<tr class="prop">
-													<td class="name"><label>Add To</label></td>
-													<td class="value">
-														${containerInstance?.name}
-														<%-- 														
-														<g:select name="container.id" from="${shipmentInstance?.containers}" 
-															optionKey="id" optionValue="name" value="" noSelection="['0':'']" />															
-														--%>										
-														<g:hiddenField name="container.id" value="${containerInstance?.id}"></g:hiddenField>
-													</td>												
-												</tr>								
-												<tr class="prop">
-													<td class="name"><label>Item</label></td>
-													<td class="value">
-														<gui:autoComplete size="20" 
-															id="selectedItem" name="selectedItem" 
-															controller="shipment" action="availableItems"/>												
-													</td>												
-												</tr>								
-												<tr class="prop">
-													<td class="name"></td>
-													<td class="value">
-													
-														<div class="buttons">
-															<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add" /> Add</button></span>
-															<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_left.png')}" alt="Done" /> Done</button></span>
-														</div>
-						
-														
-														
-													</td>												
-												</tr>									
-											</table>									
-										</g:form>			
-									</div>				
-									
-									<%-- 		
-									<div>
-										<h2>All shipment units</h2>
-										<table>
-											<tbody>
-												<tr>
-													<th>Shipment unit</th>
-												</tr>
-												<g:each in="${shipmentInstance.containers}" var="container" status="i">											
-													<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-														<td >
-															<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}" params="['container.id':container.id]">															
-																<img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" alt="Add" style="vertical-align: middle"/>
-																${container.name}
-															</g:link>																												
-															&nbsp;
-															(<%= container.getShipmentItems().size() %> items) 																												
-														</td>
-													</tr>
-												</g:each>											
-											</tbody>																		
-										</table>										
-									</div>
-									--%>
-										
-								</g:if>
+								
 								
 						
 							</fieldset>

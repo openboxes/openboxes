@@ -21,66 +21,61 @@
 			</div>
 		</g:hasErrors> 
 		
-<!--  
-		<div>	
-			<g:uploadForm controller="product" action="importProducts">
-				<label>File</label>
-				<input name="csvFile" type="file" />				
-				
-				<span class="buttons">
-					<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="upload" /> 
-						${message(code: 'default.button.upload.label', default: 'Upload')}</button>
-					<a href="#" id="edit-origin-link" class="negative"> 
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="" /> Cancel </a>															
-				</span>				
-				
-			</g:uploadForm>	
-		</div>
--->
 
 		
-		<div>
-			<fieldset>
-				<legend>Products to be imported</legend>
-				<table width="100%">
-					<thead>
-						<tr>         
-							<th width="5%"></th>               
-							<g:sortableColumn property="id" title="${message(code: 'product.id.label', default: 'ID')}"  width="5%" />
-							<g:sortableColumn property="name" title="${message(code: 'product.name.label', default: 'Name')}" width="10%" />
-							<g:sortableColumn property="description" title="${message(code: 'product.description.label', default: 'Description')}" />
-							<g:sortableColumn property="productType" title="${message(code: 'product.productType.label', default: 'Product Type')}" />
-						</tr>
-					</thead>
+		<div class="dialog">
+			<fieldset>		
+				<legend>Review products to import</legend>	
+				<table>
 					<tbody>
-						<g:each var="productInstance" in="${products}" status="i">
-							<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">         
-								<td><input type="checkbox" checked="checked" disabled="disabled"/></td>   
-								<td align="center"><g:link action="show" id="${productInstance.id}">${fieldValue(bean: productInstance, field: "id")}</g:link></td>
-								<td align="center">${fieldValue(bean: productInstance, field: "name")}</td>
-								<td align="center">${fieldValue(bean: productInstance, field: "description")}</td>
-								<td>${fieldValue(bean: productInstance, field: "productType.name")}</td>
-							</tr>
-						</g:each>		                    
-					</tbody>
-				</table>
+						<tr class="prop">
+							<td class="name"><label>Products</label></td>
+							<td class="value">
+								<table width="100%">
+									<thead>
+										<tr>         
+											<th width="5%"></th>               
+											<g:sortableColumn property="id" title="${message(code: 'product.id.label', default: 'ID')}"  width="5%" />
+											<g:sortableColumn property="name" title="${message(code: 'product.name.label', default: 'Name')}" width="10%" />
+											<g:sortableColumn property="description" title="${message(code: 'product.description.label', default: 'Description')}" />
+											<g:sortableColumn property="productType" title="${message(code: 'product.productType.label', default: 'Product Type')}" />
+										</tr>
+									</thead>
+									<tbody>
+										<g:each var="productInstance" in="${products}" status="i">
+											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">         
+												<td><input type="checkbox" checked="checked" disabled="disabled"/></td>   
+												<td align="center"><g:link action="show" id="${productInstance.id}">${fieldValue(bean: productInstance, field: "id")}</g:link></td>
+												<td align="center">${fieldValue(bean: productInstance, field: "name")}</td>
+												<td align="center">${fieldValue(bean: productInstance, field: "description")}</td>
+												<td>${fieldValue(bean: productInstance, field: "productType.name")}</td>
+											</tr>
+										</g:each>		                    
+									</tbody>
+								</table>						
+							</td>
+						</tr>
+						<tr class="prop">
+							<td class="name">&nbsp;</td>
+							<td class="value">
+								<div class="buttonBar">
+									<g:form action="importProducts" method="post">
+										<span class="buttons">
+											<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="upload" /> 
+												${message(code: 'default.button.import.label', default: 'Import')}</button>
+											<a href="${createLink(controller: "product", action: "importProducts")}" id="" class="negative"> 
+												<img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="" /> Cancel </a>															
+										</span>						
+									
+									</g:form>			
+								</div>							
+							</td>
+						</tr>
 				
-				<div class="buttonBar">
-					<g:form action="importProducts" method="post">
-						<span class="buttons">
-							<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="upload" /> 
-								${message(code: 'default.button.import.label', default: 'Import')}</button>
-							<a href="${createLink(controller: "product", action: "importProducts")}" id="" class="negative"> 
-								<img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="" /> Cancel </a>															
-						</span>						
-					
-					</g:form>			
-				</div>
-								    
+					</tbody>
+				</table>						    
 			</fieldset>
 		</div>
-
-
 	</div>
 </body>
 </html>

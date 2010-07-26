@@ -24,8 +24,9 @@
 		</span>
 		<ul>
 			<li><span class="menuButton"><g:link class="nobullet" controller="product" action="browse"><g:message code="product.browse.label"  default="Browse Products"/></g:link></span></li>		
-			<li><span class="menuButton"><g:link class="nobullet" controller="product" action="importProducts"><g:message code="product.import.label" default="Import Products" /></g:link></span></li>						
 			<li><span class="menuButton"><g:link class="nobullet" controller="product" action="create"><g:message code="product.create.label" default="New Product" /></g:link></span></li>						
+			<li></li>
+			<li><span class="menuButton"><g:link class="nobullet" controller="product" action="importProducts"><g:message code="product.import.label" default="Import Products" /></g:link></span></li>						
 
 			<%-- 
 			<li><span class="menuButton"><g:link class="list" controller="product" action="list"><g:message code="default.list.label"  args="['Product']"/></g:link></span></li>		
@@ -41,8 +42,9 @@
 			<g:message code="inventory.manage.label"  default="Manage Inventory"/>
 		</span>
 		<ul>
+			<!-- 
 			<li><span class="menuButton"><g:link class="nobullet" controller="inventory" action="browse"><g:message code="inventory.browse.label"  default="Browse Inventory"/></g:link></span></li>		
-		
+		 	-->
 			<!--  
 			<li><span class="menuButton"><g:link class="browse" controller="product" action="browse"><g:message code="default.browse.label"  args="['Product']"/></g:link></span></li>		
 			<li><span class="menuButton"><g:link class="list" controller="product" action="list"><g:message code="default.list.label"  args="['Product']"/></g:link></span></li>		
@@ -58,8 +60,10 @@
 
 		</span>
 		<ul>
+			<!-- 
 			<li><span class="menuButton"><g:link class="nobullet" controller="order" action="search"><g:message code="order.search.label" default="Search Orders" /></g:link></span></li>						
 			<li><span class="menuButton"><g:link class="nobullet" controller="order" action="create"><g:message code="order.create.label" default="New Order" /></g:link></span></li>						
+			 -->
 			<!--  
 			<li><span class="menuButton"><g:link class="list" controller="order" action="search"><g:message code="order.search.label"  default="Search orders"/></g:link></span></li>		
 			<li><span class="menuButton"><g:link class="list" controller="order" action="listPending"><g:message code="default.list.label"  args="['Pending Order']"/></g:link></span></li>		
@@ -75,8 +79,9 @@
 			<g:message code="settings.manage.label" args="['Settings']" default="Manage Settings"/>
 		</span>
 		<ul>
+			<!-- 
 			<li><span class="menuButton"><g:link class="nobullet" controller="admin" action="index"><g:message code="default.manage.label" args="['Settings']" default="Manage Settings" /></g:link></span></li>
-
+			-->
 		</ul>
 	</div>								
 	<div class="menuSection">
@@ -85,8 +90,10 @@
 			<g:message code="metadata.manage.label"  default="Manage Metadata"/>
 		</span>
 		<ul>
+			<!-- 
 			<li><span class="menuButton"><g:link class="nobullet" controller="containerType" action="list"><g:message code="default.manage.label" args="['Metadata']"/></g:link></span></li>		
-<!-- 
+			-->
+			<!-- 
 			<li><span class="menuButton"><g:link class="nobullet" controller="referenceNumberType" action="list"><g:message code="default.manage.label" args="['Reference # Types']"/></g:link></span></li>		
 			<li><span class="menuButton"><g:link class="nobullet" controller="genericType" action="list"><g:message code="default.manage.label" args="['Generic Types']"/></g:link></span></li>		
 			<li><span class="menuButton"><g:link class="nobullet" controller="productType" action="list"><g:message code="default.manage.label" args="['Product Types']"/></g:link></span></li>		
@@ -95,7 +102,7 @@
 			<li><span class="menuButton"><g:link class="nobullet" controller="drugRouteType" action="list"><g:message code="default.manage.label" args="['Admin Routes']"/></g:link></span></li>		
 			<li><span class="menuButton"><g:link class="nobullet" controller="packageType" action="list"><g:message code="default.manage.label" args="['Drug Package']"/></g:link></span></li>		
 			<li><span class="menuButton"><g:link class="nobullet" controller="drugClass" action="list"><g:message code="default.manage.label" args="['Drug Classes']"/></g:link></span></li>
- -->
+ 			-->
 		</ul>
 	</div>
 </div>
