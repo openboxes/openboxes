@@ -91,7 +91,7 @@
 									</tbody>
 								</table>			
 									
-									
+								<br/>
 								<table>
 									<tr>
 										<td colspan="2">
@@ -236,18 +236,31 @@
 															<table>
 																<tbody>
 																	<g:if test="${containerInstance?.shipmentItems}">
-																		
+																		<tr>
+																			<th></th>
+																			<th>Item</th>
+																			<th>Qty</th>
+																			<th></th>
+																		</tr>
 																		<g:each var="item" in="${containerInstance.shipmentItems}" status="k">
 																			<tr class="${(k % 2) == 0 ? 'odd' : 'even'}">
 																				<td width="5%">${k+1}.</td>
 																				<td>
-																					${item?.product?.name} 
+																					${item?.product?.name} ${item?.id}
 																					<g:if test="${item?.product?.unverified}">
 																						<span class="fade">(unverified)</span>
 																					</g:if> 
 																				
 																				</td>
-																				<td style="text-align: center;" width="20%;">${item.quantity}</td>
+																				<td style="text-align: center;">
+																					<g:form action="editItem">																					
+																						<g:hiddenField name="id" value="${item?.id}"></g:hiddenField>
+																						<g:textField name="quantity" value="${item.quantity}" size="3" />																				
+																						<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Save" /> Save</button></span>
+																					</g:form>
+																				</td>
+																				<td valign="top">
+																				</td>
 																			</tr>							
 																		</g:each>
 																	</g:if>
@@ -271,12 +284,11 @@
 						</td>						
 						<td width="1%"></td>
 						<td valign="top" width="25%">						
-							<fieldset>
-
-
-								<g:if test="${containerInstance}">
+							
+							<g:if test="${containerInstance}">
+								<fieldset>
+									<legend>Add a Product</legend>
 									<div>
-										<h2>Add a product</h2>										
 										<g:form action="addItemAutoComplete" id="${shipmentInstance.id}">	
 											<table>
 												<tr class="prop">
@@ -313,6 +325,54 @@
 											</table>									
 										</g:form>			
 									</div>				
+								</fieldset>
+								<br/>
+								<fieldset>
+									<legend>Edit Shipment Unit</legend>
+									<div>
+										<g:form action="editContainer">
+											<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
+											<g:hiddenField name="containerId" value="${containerInstance?.id}" />
+											<table>
+												<tbody>
+													<tr class="prop">
+							                            <td valign="top" class="name">
+							                            	<label><g:message code="container.name.label" default="Nickname" /></label>
+							                            </td>                            
+							                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'name', 'errors')}">
+															<g:textField name="name" value="${containerInstance?.name}" />
+						                                </td>
+							                        </tr>  	          
+													<tr class="prop">
+							                            <td valign="top" class="name">
+							                            	<label><g:message code="container.name.label" default="Dimensions" /></label>
+							                            </td>                            
+							                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'dimensions', 'errors')}">
+															<g:textField name="dimensions" value="${containerInstance?.dimensions}" />
+						                                </td>
+							                        </tr>  	          
+													<tr class="prop">
+							                            <td valign="top" class="name">
+							                            	<label><g:message code="container.name.label" default="Weight" /></label>
+							                            </td>                            
+							                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'weight', 'errors')}">
+															<g:textField name="weight" value="${containerInstance?.weight}" />
+						                                </td>
+							                        </tr>  	          
+							                        <tr class="prop">
+													    <td valign="top" class="name"></td>													    
+													    <td class="value">
+															<div class="buttons">
+																<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> Save</button>
+															</div>
+													    </td>					                        
+							                        </tr>         
+							                    </tbody>
+							                </table>
+									    </g:form>									
+									</div>
+								</fieldset>
+								<br/>
 									
 									<%-- 		
 									<div>
@@ -342,11 +402,11 @@
 								</g:if>
 
 
-
+								<fieldset>
+									<legend>Add a Shipment Unit</legend>
 									<div>
 										<g:form action="addContainer">															
 											<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />										
-											<h2>Add a shipment unit</h2>
 											<table>
 												<tbody>
 													<tr class="prop">
@@ -391,12 +451,46 @@
 											</table>
 										</g:form>														
 									</div>								
-							
+								</fieldset>		
 								
+								<br/>
 								
-						
-							</fieldset>
-						
+								<div>
+									<g:form action="copyContainer">
+										<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
+										<g:hiddenField name="containerId" value="${containerInstance?.id}" />
+									
+										<fieldset>
+											<legend>Clone Shipment Unit</legend>
+											<table>
+												<tbody>
+													<tr class="prop">
+							                            <td valign="top" class="name"><label><g:message code="container.name.label" default="Copy ..." /></label></td>                            
+							                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'name', 'errors')}">
+															${containerInstance?.name}
+						                                </td>
+							                        </tr>  	          
+													<tr class="prop">
+							                            <td valign="top" class="name"><label><g:message code="container.copies.label" default="# of Copies" /></label></td>                            
+							                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'name', 'errors')}">
+															<g:textField name="copies" value="1" />
+						                                </td>
+							                        </tr>  	          
+							                        <tr>
+													    <td colspan="2">
+															<div class="buttons" style="text-align: right;">
+																<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> Copy</button>
+															</div>
+	
+													    </td>					                        
+							                        </tr>         
+							                    </tbody>
+							                </table>
+						                
+						                </fieldset>
+								    </g:form>
+								</div>																
+												
 						</td>
 					</tr>
 				</tbody>

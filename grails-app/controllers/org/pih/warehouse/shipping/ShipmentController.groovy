@@ -319,7 +319,7 @@ class ShipmentController {
 			containerInstance.properties = params
 			if (!containerInstance.hasErrors() && containerInstance.save(flush: true)) {
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'container.label', default: 'Container'), containerInstance.id])}"
-				redirect(action: "showDetails", id: shipmentInstance.id)
+				redirect(action: "editContents", id: shipmentInstance.id)
 			}
 			else {
 				flash.message = "Could not edit container"
@@ -363,7 +363,7 @@ class ShipmentController {
     		shipment.addToContainers(containerCopy).save(flush:true);
     	}
 		flash.message = "Copied package multiple times within the shipment";		
-		redirect(action: 'show', id: params.shipmentId)        		
+		redirect(action: 'editContents', id: params.shipmentId)        		
     }    
     
     
@@ -378,7 +378,7 @@ class ShipmentController {
     	}
     	else { 
     		container.delete();	    	    	
-    		redirect(action: 'show', id: shipmentId)     		
+    		redirect(action: 'showDetails', id: shipmentId)     		
     	}    		
     }
     
@@ -459,6 +459,25 @@ class ShipmentController {
     		
     	}
     }
+	
+	def editItem = { 
+		def item = ShipmentItem.get(params.id);
+		def container = item.getContainer();
+		def shipmentId = container.getShipment().getId();
+		if (item) {
+			item.quantity = Integer.parseInt(params.quantity);
+			item.save();
+			flash.message = "Deleted shipment item $params.id from container $container.name";
+			redirect(action: 'editContents', id: shipmentId)
+		}
+		else {
+			flash.message = "Could not edit item $params.id from container";
+			redirect(action: 'showDetails', id: shipmentId, params: [container.id, container.id])
+			
+		}
+
+		
+	}
 
     
     def deleteDocument = { 
@@ -467,11 +486,11 @@ class ShipmentController {
     	if (document) { 	    	
        	    document.delete();	    	    	
         	flash.message = "Deleted document $params.id from shipment";		
-	    	redirect(action: 'show', id: shipmentId) 
+	    	redirect(action: 'showDetails', id: shipmentId) 
     	}
     	else { 
         	flash.message = "Could not remove document $params.id from shipment";		
-    		redirect(action: 'show', id: shipmentId)    	
+    		redirect(action: 'showDetails', id: shipmentId)    	
     		
     	}
     }
