@@ -12,7 +12,7 @@ class ShipmentService {
 		return Shipment.list()
 	}
 	
-	List<Shipment> getShipmentsWithLocation(Location location) {
+	List<Shipment> getShipmentsByLocation(Location location) {
 		return Shipment.withCriteria { 
 			or {	
 				eq("destination", location)
@@ -20,12 +20,41 @@ class ShipmentService {
 			}
 		}
 	}    
-	
-	List<Shipment> getShipmentsWithDestination(Location location) {
-		return Shipment.withCriteria { eq("destination", location) }
+
+	List<Shipment> getShipmentsByName(String name) {
+		return Shipment.withCriteria { 
+			ilike("name", "%" +name + "%")
+		}
 	}
 	
-	List<Transaction> getShipmentsWithOrigin(Location location) {
-		return Shipment.withCriteria { eq("origin", location) }
+	List<Shipment> getShipmentsByNameAndDestination(String name, Location location) {
+		return Shipment.withCriteria {
+			and { 
+				ilike("name", "%" +name + "%")
+				eq("destination", location)
+			}
+		}
+	}
+
+	List<Shipment> getShipmentsByNameAndOrigin(String name, Location location) {
+		return Shipment.withCriteria {
+			and {
+				ilike("name", "%" +name + "%")
+				eq("origin", location)
+			}
+		}
+	}
+
+
+	List<Shipment> getShipmentsByDestination(Location location) {
+		return Shipment.withCriteria { 
+			eq("destination", location) 
+		}
+	}
+	
+	List<Transaction> getShipmentsByOrigin(Location location) {
+		return Shipment.withCriteria { 
+			eq("origin", location);
+		}
 	}
 }

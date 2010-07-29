@@ -31,15 +31,11 @@ class ProductController {
 				
 				flash.message = "Please upload a CSV file with valid products";
 			}
-			else { 			
-				session.products.each() {
-					
-					
-					
+			else { 	
+				session.products.each() {					
 					new Product(name: it.name, description: it.description, productType: it.productType).save(failOnError:true);
 				};
-				
-					
+									
 				// import 
 				flash.message = "Products imported successfully"	
 				redirect(controller: "product", action: "browse")
@@ -104,8 +100,7 @@ class ProductController {
 							name: columns[2],
 							description: columns[3],
 							productType: productType));
-				}
-				
+				}				
 				session.products = products;						
 				render(view: "importProducts", model: [products:products]);
 			}

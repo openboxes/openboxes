@@ -40,14 +40,14 @@
 								<label for="username">Username or email:</label>
 							</div>
 							<div>
-								<input type="text" class="large" name="username" id="username" size="42" value="${userInstance?.username}">
+								<input type="text" class="large" name="username" id="username" size="30" value="${userInstance?.username}">
 								<br/><span class="fade">e.g. <b>manager</b></span>															
 							</div> 
 							<div>
 								<label for="password">Password:</label>
 							</div>
 							<div>
-								<input type="password" class="large" name="password" id="password" size="42" value="${userInstance?.password}">
+								<input type="password" class="large" name="password" id="password" size="30" value="${userInstance?.password}">
 								<br/><span class="fade">e.g. <b>password</b></span>															
 							</div>	
 							<div style="text-align: right;">

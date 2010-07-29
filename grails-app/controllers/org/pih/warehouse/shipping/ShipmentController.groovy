@@ -1,8 +1,11 @@
 package org.pih.warehouse.shipping;
 
-import grails.converters.JSON
-import org.pih.warehouse.core.Location;
+import java.sql.ResultSet;
 
+import grails.converters.JSON
+import groovy.sql.Sql;
+import au.com.bytecode.opencsv.CSVWriter;
+import org.pih.warehouse.core.Location;
 import org.pih.warehouse.inventory.Warehouse;
 import org.pih.warehouse.product.Product;
 
@@ -10,7 +13,8 @@ class ShipmentController {
    
     def scaffold = Shipment
     def shipmentService
-
+	def dataSource
+	def sessionFactory
 	
 	def create = {
 		def shipmentInstance = new Shipment()
@@ -124,6 +128,41 @@ class ShipmentController {
 		}
 	}
 	
+	def downloadPackingList = { 
+		def shipmentInstance = Shipment.get(params.id)
+		if (!shipmentInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+			redirect(action: (params.type == "incoming") ? "listIncoming" : "listOutgoing")
+		}
+		else {
+			//List<String[]> allElements = new ArrayList<String[]>();
+			//shipmentInstance.getAllShipmentItems().each { 
+			//	def row = it.name
+			//}
+
+			StringWriter sw = new StringWriter();
+			CSVWriter writer = new CSVWriter(sw);
+			Sql sql = new Sql(sessionFactory.currentSession.connection())			
+			sql.eachRow('select * from shipment') { row -> 
+				
+				def rowArray = new String[2];
+				rowArray.putAt(0, row.id);
+				rowArray.putAt(1, row.name);
+				writer.writeNext(rowArray);
+			}
+			
+			//writer.writeAll(resultSet, false);
+			log.info "results: " + sw.toString();
+			response.setHeader("Content-disposition", "attachment; filename=shipments.csv");
+			render(contentType: "text/csv", text: sw.toString());			
+			sql.close();
+			//resultSet.close();
+			
+			
+		}
+	}
+	
+	
 	def editContents = {
 		def shipmentInstance = Shipment.get(params.id)
 		def containerInstance = Container.get(params?.container?.id);
@@ -162,8 +201,15 @@ class ShipmentController {
 	
 	
 	def listIncoming = { 
-		def currentLocation = Location.get(session.warehouse.id);
-		def incomingShipments = shipmentService.getShipmentsWithDestination(currentLocation);		
+		def incomingShipments = null;
+
+		def currentLocation = Location.get(session.warehouse.id);		
+		if (params.searchQuery) { 
+			incomingShipments = shipmentService.getShipmentsByNameAndDestination(params.searchQuery, currentLocation);			
+		} else {  
+			incomingShipments = shipmentService.getShipmentsByDestination(currentLocation);		
+		}
+		
 		[
 			shipmentInstanceMap : getShipmentsByStatus(incomingShipments),
 			shipmentInstanceList : incomingShipments,
@@ -174,7 +220,7 @@ class ShipmentController {
 	
 	def listOutgoing = { 
 		def currentLocation = Location.get(session.warehouse.id);		
-		def outgoingShipments = shipmentService.getShipmentsWithOrigin(currentLocation);		
+		def outgoingShipments = shipmentService.getShipmentsByOrigin(currentLocation);		
 		[
 			shipmentInstanceMap : getShipmentsByStatus(outgoingShipments),
 			shipmentInstanceList : outgoingShipments,
@@ -189,9 +235,9 @@ class ShipmentController {
     	def browseBy = params.id;
     	def currentLocation = Location.get(session.warehouse.id);    	
     	log.debug ("current location" + currentLocation.name)    	
-    	def allShipments = shipmentService.getShipmentsWithLocation(currentLocation);
-		def incomingShipments = shipmentService.getShipmentsWithDestination(currentLocation);	
-		def outgoingShipments = shipmentService.getShipmentsWithOrigin(currentLocation);			
+    	def allShipments = shipmentService.getShipmentsByLocation(currentLocation);
+		def incomingShipments = shipmentService.getShipmentsByDestination(currentLocation);	
+		def outgoingShipments = shipmentService.getShipmentsByOrigin(currentLocation);			
 		def shipmentInstanceList = ("incoming".equals(browseBy)) ? incomingShipments : 
 			("outgoing".equals(browseBy)) ? outgoingShipments : allShipments;		
 		// Arrange shipments by status 
@@ -243,13 +289,61 @@ class ShipmentController {
 		    render { div(class:"errors", e.message) }
 		}
     }
+
+	
+	def availableContacts = { 
+		def contacts = null;
+		if (params.query) {
+			contacts = Contact.withCriteria { 
+				or { 
+					ilike("name", "%${params.query}%")
+					ilike("email", "%${params.query}%")
+					ilike("phone", "%${params.query}%")
+					ilike("firstName", "%${params.query}%")
+					ilike("lastName", "%${params.query}%")
+				}
+			}
+			
+			contacts = contacts.collect() {
+				[id : it.id, name : it.name]
+			}
+		}
+		def jsonItems = [result: contacts]
+		render jsonItems as JSON;
+	}
+		
+	
+	def availableShipments = { 
+		log.debug params;
+		def items = null;
+		if (params.query) {
+			items = Shipment.findAllByNameLike("%${params.query}%", [max:10, offset:0, "ignore-case":true]);
+			items = items.collect() {
+				[id:it.id, name:it.name]
+			}
+		}
+		def jsonItems = [result: items]
+		render jsonItems as JSON;
+	}
+
+	
     
     def availableItems = {     		
     	log.debug params;
     	def items = null;
     	if (params.query) { 
-	    	items = Product.findAllByNameLike("%${params.query}%");
-	    	items = items.collect() {
+			
+			//String [] parts = params.query.split(" ");
+			
+	    	//items = Product.findAllByNameLike("%${params.query}%", [max:10, offset:0, "ignore-case":true]);
+	    	items = Product.withCriteria { 
+				or { 
+					ilike("name", "%${params.query}%")
+					ilike("description", "%${params.query}%")
+				}
+			}
+			
+			items = items.collect() {
 	    		[id:it.id, name:it.name]
 	    	}
     	}
@@ -259,25 +353,42 @@ class ShipmentController {
     
     def addItemAutoComplete = {     		
     	log.info params;    	
-		def shipment = Shipment.get(params.id);
+		def shipment = Shipment.get(params.id);		
 		def container = Container.get(params.container.id);
     	def product = Product.get(params.selectedItem_id)
-
+		def quantity = (params.quantity) ? Integer.parseInt(params.quantity) : 1;
+		
 		// Create a new unverified product
 		if (!product) { 
 			product = new Product(name: params.selectedItem, unverified: true).save(failOnError:true)
 		}
 		
+		// Add item to container if product doesn't already exist
     	if (container) { 
- 	    	def shipmentItem = new ShipmentItem(product: product, quantity: 1);
-	    	container.addToShipmentItems(shipmentItem).save(flush:true);
+			boolean found = false;
+			container.shipmentItems.each { 
+				if (it.product == product) { 					
+					it.quantity += quantity;
+					it.save();
+					found = true;
+				}
+			}			
+			if (!found) { 			
+				shipmentItem = new ShipmentItem(product: product, quantity: quantity);
+				container.addToShipmentItems(shipmentItem).save(flush:true);
+			}			
     	}
+		// Add to all shipment containers 
+		/*
 		else { 
-			flash.message = "could not add item to container";
-		}
+			shipment.getContainers().each { 
+				it.addToShipmentItems(shipmentItem).save(flush:true);				
+			}
+		}*/
 		
-    	redirect action: "editContents", id: shipment.id, params: ["container.id": container.id];
+    	redirect action: "editContents", id: shipment?.id, params: ["container.id": container?.id];
     }    
+	
     
     
     def addContainer = { 		
@@ -303,6 +414,9 @@ class ShipmentController {
 
 	
 	def editContainer = {		
+		
+		log.info params
+		
 		def shipmentInstance = Shipment.get(params.shipmentId)		
 		def containerInstance = Container.get(params.containerId)
 		if (containerInstance) {
@@ -317,6 +431,19 @@ class ShipmentController {
 			}
 			*/
 			containerInstance.properties = params
+			
+			Iterator iter = containerInstance.shipmentItems.iterator()
+			while (iter.hasNext()) {
+				def item = iter.next()
+				log.info item.product.name + " " + item.quantity;
+				
+				if (item.quantity == 0) {
+					item.delete();
+					//containerInstance.removeFromShipmentItems(item);
+					iter.remove();					
+				}				
+			}
+			
 			if (!containerInstance.hasErrors() && containerInstance.save(flush: true)) {
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'container.label', default: 'Container'), containerInstance.id])}"
 				redirect(action: "editContents", id: shipmentInstance.id)
@@ -339,27 +466,31 @@ class ShipmentController {
     def copyContainer = { 
     	def shipment = Shipment.get(params.shipmentId);   	
     	def container = Container.get(params.containerId);  
-    	def name = (params.name) ? params.name : "New Package";
-    	def copies = params.copies
-    	def x = Integer.parseInt(copies)
-    	int index = 1;
-    	while ( x-- > 0 ) {
+    	
+
+		def numCopies = Integer.parseInt(params.copies)
+    	int index = (shipment?.containers)?(shipment.containers.size()):1;
+    	try { 
+			index = Integer.parseInt(container.name);
+		} catch (NumberFormatException e) {
+			log.warn("The given value " + params.name + " is not an integer");
+		}
+		
+		
+		while ( numCopies-- > 0 ) {
     		def containerCopy = new Container(container.properties);
     		containerCopy.id = null;
-    		containerCopy.name = name + " " + (index++);
+    		containerCopy.name = "" + (++index);
     		containerCopy.containerType = container.containerType;
     		containerCopy.weight = container.weight;
     		containerCopy.dimensions = container.dimensions;
     		containerCopy.shipmentItems = null;
     		containerCopy.save(flush:true);
-    		
+			    		
     		container.shipmentItems.each { 
-    			def shipmentItemCopy = new ShipmentItem();
-    			shipmentItemCopy.product = it.product
-    			shipmentItemCopy.quantity = it.quantity;
+    			def shipmentItemCopy = new ShipmentItem(product: it.product, quantity: it.quantity, serialNumber: it.serialNumber, recipient: it.recipient);
     			containerCopy.addToShipmentItems(shipmentItemCopy).save(flush:true);
-    		}
-    		
+    		}    		
     		shipment.addToContainers(containerCopy).save(flush:true);
     	}
 		flash.message = "Copied package multiple times within the shipment";		
@@ -371,15 +502,16 @@ class ShipmentController {
     		
 		def container = Container.get(params.id);
     	def shipmentId = container.getShipment().getId();
-    	
+		/*
     	if (container.getShipmentItems().size() > 0) {
-    		flash.message = "Cannot delete a container that is not empty";
-    		redirect(action: 'show', id: shipmentId);    		
+    		flash.message = "Cannot delete a shipment unit that is not empty";
     	}
     	else { 
-    		container.delete();	    	    	
-    		redirect(action: 'showDetails', id: shipmentId)     		
-    	}    		
+			container.delete();
+    	} */
+		
+		container.delete();   		
+		redirect(action: 'editContents', id: shipmentId)     		
     }
     
     
@@ -413,11 +545,12 @@ class ShipmentController {
     
 
     def addItem = {     		
-    	log.debug params;		
+    	log.debug params;
 		def container = Container.get(params.containerId);
     	def product = Product.get(params.productId);
     	def quantity = params.quantity;
-    	// if container already includes a shipment item with this product, 
+
+		// if container already includes a shipment item with this product, 
     	// we just need to add to the total quantity
     	def weight = product.weight * Integer.valueOf(quantity);
     	

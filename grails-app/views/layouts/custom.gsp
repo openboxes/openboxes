@@ -57,11 +57,12 @@
 	</script>
 
 	<!-- Manually include jquery-ui resources -->
-	<link href="${createLinkTo(dir:'js/jquery.ui/css/cupertino', file:'jquery-ui-1.8.2.custom.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
+	<link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui-1.8.2.custom.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
 	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-ui-1.8.2.custom.min.js')}" type="text/javascript" ></script>
 
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.notifyBar',file:'jquery.notifyBar.css')}" type="text/css" media="screen"  />
 	<script type="text/javascript" src="${createLinkTo(dir:'js/jquery.notifyBar',file:'jquery.notifyBar.js')}"></script>
+	<script type="text/javascript" src="${createLinkTo(dir:'js/jquery',file:'jquery.ezCookie_0.7.01.js')}"></script>
 	
 	<!-- Dynamically include jquery-ui resources :  NOT WORKING CORRECTLY -->
 	<!-- <jqui:resources components="dialog, datepicker"/> -->	
@@ -104,7 +105,7 @@
 							    <a class="home" href="${createLink(uri: '/dashboard/index')}" style="text-decoration: none">						    	
 						    		<img src="${createLinkTo(dir:'images/icons/',file:'logo.gif')}" alt="Your Boxes. You're Welcome." 
 						    			style="vertical-align: absmiddle"/>
-						    			<span style="font-size: 2em; vertical-align: top;">openBoxes</span>
+						    			<span style="font-size: 2em; vertical-align: top;">openboxes</span>
 							    </a>
 							</div>
 					    </div>
@@ -131,7 +132,7 @@
 										 -->
 										| 
 										<li>
-											<g:link class="list" controller="auth" action="logout"><g:message code="default.logout.label"  default="Logout"/></g:link>
+											<g:link class="list" controller="auth" action="logout"><g:message code="default.logout.label"  default="logout"/></g:link>
 										</li>
 										<!-- 
 										| <li><input type="text" value="search" name="q" style="color: #aaa; font-weight: bold;" disabled=disabled /></li>
@@ -155,7 +156,7 @@
 		</div>
     </div>
     
-    <div id="doc3" class="yui-t3">	    
+    <div id="doc3" class="yui-t2">	    
 		<!-- 
 				Body includes the divs for the main body content and left navigation menu 
 			----------------------------------------------------------------------------------->

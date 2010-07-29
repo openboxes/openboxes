@@ -16,11 +16,11 @@ class SecurityFilters {
 							|| "login".equals(actionName) || "doLogin".equals(actionName))) {
 						
 					if (session?.warehouseStillNotSelected) { 
-						flash.message = "You must choose a warehouse before selecting a menu option.";
+						flash.message = "Please choose a warehouse to begin.";
 					}
 					session.warehouseStillNotSelected = true;
 					redirect(controller: 'dashboard', action: 'chooseWarehouse')
-					//render(view: "/dashboard/chooseWarehouse")					
+					//render(view: '/dashboard/chooseWarehouse')					
 					return false;
 				}
 				

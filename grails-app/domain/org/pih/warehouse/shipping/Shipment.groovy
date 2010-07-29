@@ -11,6 +11,7 @@ class Shipment {
 	// Core data elements
 	String name 
 	String shipmentNumber
+	String recipient 
 	
 	// Status dates
 	Date expectedShippingDate
@@ -40,6 +41,7 @@ class Shipment {
 	//Carrier carrier 		// the person or organization that actually carries the goods from A to B
 	//Recipient recipient	// the person or organization that is receiving the goods
 	
+	
 	// Audit fields 
 	Date dateCreated;
 	Date lastUpdated;
@@ -66,6 +68,7 @@ class Shipment {
 	static constraints = {
 		name(nullable:false, blank: false)
 		shipmentNumber(nullable:true)	
+		recipient(nullable:true)
 		origin(nullable:false, blank: false, validator: { value, obj -> return !value.equals(obj.destination)})
 		destination(nullable:false, blank: false)		
 		expectedShippingDate(nullable:true)

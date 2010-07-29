@@ -15,8 +15,7 @@ class DashboardController {
 		log.info "Choose warehouse"
 		
 		def warehouse = null;
-		if (params.id!='null') {
-			log.info "looking up warehouse by id = ${params.id}";
+		if (params.id!='null') {			
 			warehouse = Location.get(params.id);
 		}
 

@@ -281,12 +281,12 @@ class BootStrap {
 		/**
 		 * Shipment Event Type
 		 */
-		EventType EVENT_SHIPMENT_REQUESTED = new EventType(name: "Shipment has been requested", description: "Shipment has been requested", initial: true).save();
-		EventType EVENT_SHIPMENT_PACKED = new EventType(name:"Shipment is being packed", description:"Shipment is packed", pending: true).save();     	
-		EventType EVENT_SHIPMENT_LOADED = new EventType(name:"Shipment is being loaded", description:"Shipment has been loaded into truck", pending: true).save();
-		EventType EVENT_SHIPMENT_DEPARTED = new EventType(name:"Shipment has departed", description:"Shipment has been sent by shipper", pending: true).save();
-		EventType EVENT_SHIPMENT_ARRIVED = new EventType(name:"Shipment has arrived", description:"Shipment has been received and signed for by the recipient", pending: true).save();
-		EventType EVENT_SHIPMENT_DELIVERED = new EventType(name:"Shipment has been delivered", description:"Shipment has been delivered and needs confirmation", complete: true).save();
+		EventType EVENT_SHIPMENT_REQUESTED = new EventType(name: "Requested", description: "Shipment has been requested", initial: true).save();
+		EventType EVENT_SHIPMENT_PACKED = new EventType(name:"Packed", description:"Shipment has been packed", pending: true).save();     	
+		EventType EVENT_SHIPMENT_LOADED = new EventType(name:"Loaded", description:"Shipment has been loaded onto truck", pending: true).save();
+		EventType EVENT_SHIPMENT_DEPARTED = new EventType(name:"Departed", description:"Shipment has departed origin", pending: true).save();
+		EventType EVENT_SHIPMENT_ARRIVED = new EventType(name:"Arrived", description:"Shipment has arrived and is awaiting signature", pending: true).save();
+		EventType EVENT_SHIPMENT_DELIVERED = new EventType(name:"Received", description:"Shipment has been received", complete: true).save();
 		
 		/**
 		 * Warehouse Event Type
@@ -585,10 +585,10 @@ class BootStrap {
 		ShipmentEvent event8 = new ShipmentEvent(eventType:EVENT_SHIPMENT_DELIVERED, eventDate: Date.parse("yyyy-MM-dd hh:mm:ss", "2010-05-28 10:30:00"), eventLocation: tabarre)
 		Document document1 = new Document(filename: "packing-list.pdf", documentType: DOCUMENT_PACKING_LIST, size: 1020L, contents: "empty")		
 		Document document2 = new Document(filename: "invoice.pdf", documentType: DOCUMENT_COMMERCIAL_INVOICE, size: 990L, contents: "empty") 
-		Container pallet1 = new Container(name: "Pallet #1", containerType: CONTAINER_PALLET, weight: 1000, units: "kgs");
-		Container pallet2 = new Container(name: "Pallet #2", containerType: CONTAINER_PALLET, weight: 2000, units: "kgs");
-		Container box1 = new Container(name: "Box #1", containerType: CONTAINER_BOX, weight: 100, units: "kgs");
-		Container box2 = new Container(name: "Box #2", containerType: CONTAINER_BOX, weight: 200, units: "kgs");
+		Container pallet1 = new Container(name: "1", containerType: CONTAINER_PALLET, weight: 1000, units: "kgs");
+		Container pallet2 = new Container(name: "2", containerType: CONTAINER_PALLET, weight: 2000, units: "kgs");
+		Container box1 = new Container(name: "3", containerType: CONTAINER_BOX, weight: 100, units: "kgs");
+		Container box2 = new Container(name: "4", containerType: CONTAINER_BOX, weight: 200, units: "kgs");
 		ShipmentItem shipmentItem1 = new ShipmentItem(product : advil, quantity : 100, packageType: CONTAINER_BOX);
 		ShipmentItem shipmentItem2 = new ShipmentItem(product : tylenol, quantity : 200, packageType: CONTAINER_BOX);
 		ShipmentItem shipmentItem3 = new ShipmentItem(product : aspirin, quantity : 300, packageType: CONTAINER_BOX);
