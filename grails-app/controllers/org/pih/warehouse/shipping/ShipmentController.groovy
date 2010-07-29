@@ -139,15 +139,42 @@ class ShipmentController {
 			//shipmentInstance.getAllShipmentItems().each { 
 			//	def row = it.name
 			//}
-
+			String query = """\
+				select  
+					container.name,  
+					container.dimensions, 
+					container.weight, 
+					shipment_item.quantity,
+					product.name,
+					shipment_item.serial_number
+				from shipment, container, shipment_item, product
+				where shipment.id = container.shipment_id
+				and shipment_item.container_id = container.id
+				and shipment_item.product_id = product.id """
+				
 			StringWriter sw = new StringWriter();
 			CSVWriter writer = new CSVWriter(sw);
-			Sql sql = new Sql(sessionFactory.currentSession.connection())			
-			sql.eachRow('select * from shipment') { row -> 
+			Sql sql = new Sql(sessionFactory.currentSession.connection())	
+			
+			String [] colArray = new String[7];
+			colArray.putAt(0, "unit");
+			colArray.putAt(1, "dimensions");
+			colArray.putAt(2, "weight");
+			colArray.putAt(3, "qty");
+			colArray.putAt(4, "item");
+			colArray.putAt(5, "serial number");
+			colArray.putAt(6, "end");
+			writer.writeNext(colArray);
+			sql.eachRow(query) { row -> 
 				
-				def rowArray = new String[2];
-				rowArray.putAt(0, row.id);
-				rowArray.putAt(1, row.name);
+				def rowArray = new String[7];
+				rowArray.putAt(0, row[0]);
+				rowArray.putAt(1, row[1]);
+				rowArray.putAt(2, row[2]);
+				rowArray.putAt(3, row[3]);
+				rowArray.putAt(4, row[4]);
+				rowArray.putAt(5, row[5]);
+				rowArray.putAt(6, "end");
 				writer.writeNext(rowArray);
 			}
 			
@@ -357,6 +384,7 @@ class ShipmentController {
 		def container = Container.get(params.container.id);
     	def product = Product.get(params.selectedItem_id)
 		def quantity = (params.quantity) ? Integer.parseInt(params.quantity) : 1;
+		def shipmentItem = null;
 		
 		// Create a new unverified product
 		if (!product) { 
@@ -374,12 +402,12 @@ class ShipmentController {
 				}
 			}			
 			if (!found) { 			
-				shipmentItem = new ShipmentItem(product: product, quantity: quantity);
-				container.addToShipmentItems(shipmentItem).save(flush:true);
+				shipmentItem = new ShipmentItem(product: product, quantity: quantity, serialNumber: params.serialNumber, recipient: params.recipient);
+				container.addToShipmentItems(shipmentItem).save(flush:true);				
 			}			
     	}
-		// Add to all shipment containers 
 		/*
+		// Add to all shipment containers 
 		else { 
 			shipment.getContainers().each { 
 				it.addToShipmentItems(shipmentItem).save(flush:true);				

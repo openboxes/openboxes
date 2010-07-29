@@ -74,6 +74,13 @@ body {
 	font-size: 11pt;
 }
 
+.toggle-button { 
+	cursor: hand;
+}
+.toggleable { 
+	display: none;
+}
+
 /* Shipment summary add padding around To/From addresses */
 #summary td { 
 	padding: 15px;	
@@ -99,6 +106,18 @@ table.withoutBorder {
 table.container { 
 	width: 100%;	
 }
+
+table#listOutgoing { 
+	border: 0px;
+}
+
+table#listOutgoing td { 
+	border: 0px;	
+}
+
+table#listOutgoing th { 
+}
+	
 .dialog td { 
 	padding: 10px;
 }
@@ -173,6 +192,12 @@ table.container {
 label { 
 	padding-right: 15px; 
 	font-weight: bold;
+}
+label.required { 
+	color: red;
+}
+label.optional { 
+	color: #AAA;
 }
 
 /* TODO figure out what this was meant for */

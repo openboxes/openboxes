@@ -44,7 +44,7 @@
 									<g:select name="shipmentType.id" from="${org.pih.warehouse.shipping.ShipmentType.list()}" optionKey="id" value="${shipmentInstance?.shipmentType?.id}" noSelection="['0':'']" />
 	                            </td>                            
 	                        </tr>         
-	                                
+
 	                        <tr class="prop">
 	                        	<td valign="top" class="name">
 	                        		<label><g:message code="shipment.name.label" default="Nickname" /></label>
@@ -53,6 +53,22 @@
                                     <g:textField name="name" size="30" value="${shipmentInstance?.name}" />
 	                            </td>                            
 	                        </tr>
+
+	                        <tr class="prop">
+	                        	<td valign="top" class="name">
+	                        		<label><g:message code="shipment.recipient.label" default="Recipient" /></label>
+	                        	</td>
+	                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'recipient', 'errors')}">
+                                    <g:textField name="recipient" size="30" value="${shipmentInstance?.recipient}" />
+	                            </td>                            
+	                        	<td valign="top" class="name">
+	                        		<label><g:message code="shipment.carrier.label" default="Carrier" /></label>
+	                        	</td>
+	                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'carrier', 'errors')}">
+                                    <g:textField name="carrier" size="30" value="${shipmentInstance?.carrier}" />
+	                            </td>                            
+	                        </tr>
+	                                
 	                    
 	                        <tr class="prop">
 								<td valign="top" class="name">

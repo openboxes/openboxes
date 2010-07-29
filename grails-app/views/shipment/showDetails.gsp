@@ -75,60 +75,10 @@
 							<table cellspacing="5" cellpadding="5">
 								<tbody>
 
-									<tr >
+									<tr>
 										<td>&nbsp;</td>
 									</tr>
 								
-<%-- 								
-									<tr class="prop">
-										<td valign="top" class="name"><label><g:message
-											code="shipment.shipmentNumber.label" default="Shipment #" /></label></td>
-										<td valign="top" class="value" colspan="3">
-											${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}
-										</td>
-									</tr>
-									<tr class="prop">
-										<td valign="top" class="name"><label><g:message
-											code="shipment.shipmentType.label" default="Type" /></label></td>
-										<td valign="top" class="value" colspan="3">
-											${fieldValue(bean: shipmentInstance, field: "shipmentType.name")}
-										</td>
-									</tr>
-									<tr class="prop">
-										<td valign="top" class="name"><label><g:message
-											code="shipment.shipmentStatus.label" default="Name" /></label></td>
-										<td valign="top" class="value" colspan="3">
-											${fieldValue(bean: shipmentInstance, field: "name")}
-										</td>
-									</tr>
---%>									
-									<tr class="prop">
-										<td valign="top" class="name" style="width: 10%;"><label><g:message
-											code="shipment.origin.label" default="From" /></label></td>
-										<td valign="top" style="width: 40%;">
-											<span>
-												${fieldValue(bean: shipmentInstance, field: "origin.name")}<br/>										
-												<g:if test="${shipmentInstance.expectedShippingDate}">
-													<span style="font-size: 0.8em; color: #aaa">
-														Expected to ship on <g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="dd MMM yyyy" />
-													</span>											
-												</g:if>
-											</span>
-										</td>
-										<td class="name"  style="width: 10%;">
-											<label><g:message code="shipment.destination.label" default="To" /></label>
-										</td>
-										<td class="value" style="width: 40%;">
-											<span>
-												${fieldValue(bean: shipmentInstance, field: "destination.name")}<br/>
-												<g:if test="${shipmentInstance.expectedDeliveryDate}">
-													<span style="font-size: 0.8em; color: #aaa">
-														Expected to arrive on <g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="dd MMM yyyy" />
-													</span>											
-												</g:if>
-											</span>											
-										</td>
-									</tr>
 									<tr class="prop">
 										<td valign="top" class="name"><label><g:message
 											code="shipment.currentStatus.label" default="Status" /></label></td>
@@ -162,12 +112,65 @@
 										</td>
 									</tr>
 									<tr class="prop">
-										<td valign="top" class="name"><label><g:message
-											code="shipment.totalValue.label" default="Total Value" /></label></td>
+										<td valign="top" class="name" style="width: 10%;"><label><g:message
+											code="shipment.origin.label" default="From" /></label></td>
+										<td valign="top" style="width: 30%;">
+											<span>
+												${fieldValue(bean: shipmentInstance, field: "origin.name")}<br/>										
+												<g:if test="${shipmentInstance.expectedShippingDate}">
+													<span style="font-size: 0.8em; color: #aaa">
+														Expected to ship on <g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="dd MMM yyyy" />
+													</span>											
+												</g:if>
+											</span>
+										</td>
+										<td class="name"  style="width: 10%;">
+											<label><g:message code="shipment.destination.label" default="To" /></label>
+										</td>
+										<td class="value" style="width: 30%;">
+											<span>
+												${fieldValue(bean: shipmentInstance, field: "destination.name")}<br/>
+												<g:if test="${shipmentInstance.expectedDeliveryDate}">
+													<span style="font-size: 0.8em; color: #aaa">
+														Expected to arrive on <g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="dd MMM yyyy" />
+													</span>											
+												</g:if>
+											</span>											
+										</td>
+									</tr>
+									
+									<tr class="prop">
+										<td valign="top" class="name" style="width: 10%;"><label><g:message
+											code="shipment.carrier.label" default="Carrier" /></label></td>
+										<td valign="top" style="width: 30%;">
+											<span>${fieldValue(bean: shipmentInstance, field: "carrier")}</span>
+										</td>
+										<td class="name"  style="width: 10%;">
+											<label><g:message code="shipment.destination.label" default="Recipient" /></label>
+										</td>
+										<td class="value" style="width: 30%;">
+											<span>${fieldValue(bean: shipmentInstance, field: "recipient")}</span>
+										</td>
+									</tr>
+
+
+
+									<tr class="prop">
+										<td>&nbsp;</td>
+									</tr>
+									
+									<tr class="prop">
+										<td valign="top" class="name">
+										<img src="${createLinkTo(dir:'images/icons/silk',file:'money.png')}" alt="money" style="vertical-align: middle"/>
+										<label><g:message
+											code="shipment.totalValue.label" default="Total Value" /></label><br/></td>
 										<td valign="top" class="">
 											<g:if test="${shipmentInstance.totalValue}">
 												$<g:formatNumber format="#,###.##" number="${shipmentInstance.totalValue}" /><br/>
 											</g:if>
+											<g:else>
+												<span class="fade">(empty)</span>
+											</g:else>
 										</td>
 									</tr>
 									<tr class="prop">
@@ -182,13 +185,16 @@
 										</td>										
 										<td class="value" colspan="3">
 											<div>
-												
+												<g:if test="${!shipmentInstance.containers}">
+													<div class="fade">(empty)</div>											
+												</g:if> 
+												<g:else>
 													<div id="containers" class="section">											
 														<table>		
 															<tr>
 																<th width="5%"></th>
-																<th width="40%">Contents</th>
-																<th width="15%"></th>
+																<th width="15%">Shipment Units</th>
+																<th width="15%" style="text-align: center"># Items</th>
 																<th width="10%" style="text-align: center"></th>															
 															</tr>
 															<g:each in="${shipmentInstance.containers}" var="container" status="i">		
@@ -221,9 +227,9 @@
 																			<span>${container?.containerType?.name} #${container?.name}</span> 
 																		</g:link>
 																		&nbsp;
-																		
-																		<span style="color: #666">(contains ${container.shipmentItems.size()} items)</span>
-																		
+																	</td>
+																	<td style="text-align: center;">
+																		<span class="fade">${container.shipmentItems.size()} items</span>
 																		<%-- 
 																		<div style="color: #666; font-size: .75em;">
 																			Weight: &nbsp;
@@ -278,7 +284,7 @@
 															</g:each>		
 														</table>							
 													</div>
-												
+												</g:else>
 											</div>
 										</td>
 									</tr>
@@ -293,7 +299,7 @@
 										<td class="value"  colspan="3">										
 											<div>
 												<g:if test="${!shipmentInstance.documents}">
-													<div class="fade" style="text-align:center">(empty)</div>											
+													<div class="fade">(empty)</div>											
 												</g:if> 
 												<g:else>													
 													<table>
@@ -348,7 +354,7 @@
 													<table>
 														<tbody>
 															<g:if test="${!shipmentInstance.comments}">
-																<div class="fade" style="text-align:center">(empty)</div>
+																<div class="fade">(empty)</div>
 															</g:if> 
 															<g:else>
 																<tr>
@@ -454,14 +460,23 @@
 						<fieldset>
 							<legend>Actions</legend>
 							<table>
-								<tr class="">
+								<tr class="prop">
+									<td>
+										<g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}"><img
+										src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}"
+										alt="Show Shipment" style="vertical-align: middle" /> &nbsp; <b>show details</b></g:link>
+									
+									</td>
+								</tr>
+								<tr class="prop">
 									<td>
 										<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}"><img 
 										src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" 
 										alt="Add Document" style="vertical-align: middle"/> &nbsp; edit contents</a></g:link>
 									</td>
 								</tr>
-								<tr class="">
+								
+								<tr class="prop">
 									<td>
 										<g:link controller="shipment" action="editDetails" id="${shipmentInstance.id}"><img
 										src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}"
@@ -469,7 +484,7 @@
 									
 									</td>
 								</tr>
-								<tr class="">
+								<tr class="prop">
 									<td>
 										<a href="${createLink(controller: "shipment", action: "addDocument", id: shipmentInstance.id)}"><img 
 										src="${createLinkTo(dir:'images/icons/silk',file:'page_word.png')}" 
@@ -477,25 +492,14 @@
 									
 									</td>
 								</tr>
-								<tr class="">
+								<tr class="prop">
 									<td>
 										<g:link controller="shipment" action="showPackingList" id="${shipmentInstance.id}" ><img 
 										src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" 
 										alt="View Packing List" style="vertical-align: middle"/> &nbsp; view packing list</g:link>		
 									</td>
 								</tr>					
-								<tr class="">
-									<td>
-										<g:link controller="shipment" action="downloadPackingList" id="${shipmentInstance.id}" ><img 
-										src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" 
-										alt="View Packing List" style="vertical-align: middle"/> &nbsp; download packing list</g:link>		
-									</td>
-								</tr>					
 							</table>
-							
-							
-							
-							
 						</fieldset>
 					</div>
 					<br/>

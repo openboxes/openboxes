@@ -7,6 +7,7 @@ class Container implements Comparable {
 	String name
 	Boolean status = true		// open (true) or closed (false)	
 	String containerNumber
+	String description
 	String recipient
 	String dimensions			// could be its own class, but we don't care right now
 	Float weight	
@@ -26,6 +27,7 @@ class Container implements Comparable {
 	// Constraints
 	static constraints = {	 
 		name(nullable:true)
+		description(nullable:true)
 		containerNumber(nullable:true)
 		recipient(nullable:true)
 		dimensions(nullable:true)

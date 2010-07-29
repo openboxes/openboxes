@@ -11,6 +11,7 @@ class Shipment {
 	// Core data elements
 	String name 
 	String shipmentNumber
+	String carrier
 	String recipient 
 	
 	// Status dates
@@ -69,6 +70,7 @@ class Shipment {
 		name(nullable:false, blank: false)
 		shipmentNumber(nullable:true)	
 		recipient(nullable:true)
+		carrier(nullable:true)
 		origin(nullable:false, blank: false, validator: { value, obj -> return !value.equals(obj.destination)})
 		destination(nullable:false, blank: false)		
 		expectedShippingDate(nullable:true)
