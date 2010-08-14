@@ -46,20 +46,14 @@ class BootStrap {
 	 */
 	def init = { servletContext ->
 		
-		/** 
-		 * Countries 
-		 */	 	
-		Country CANADA = new Country(country: "Canada", population: 24251210, gdp: 24251210, date: new Date()).save();
-		Country HAITI = new Country(country: "Haiti", population: 29824821, gdp: 24251210, date: new Date()).save();
-		Country MEXICO = new Country(country: "Mexico", population: 103593973, gdp: 24251210, date: new Date()).save();
-		Country USA = new Country(country: "United States", population: 300000000, gdp: 24251210, date: new Date()).save();
-		
 		/**
 		 * Organizations 
 		 */
 		Organization ZL = new Organization(name:  "Zanmi Lasante", description: "").save();
 		Organization PIH = new Organization(name: "Partners In Health", description: "").save();
-			
+		//Donor DONOR = new Donor(name: "Donor Organization ABC", description: "").save();
+		//Shipper SHIPPER = new Shipper(name: "Shipper", description:"").save();
+					
 		/** 
 		 * Category > Top Level 
 		 */ 		
@@ -508,64 +502,94 @@ class BootStrap {
 		 * Shipments 
 		 */		
 		Shipment shipment1 = new Shipment(name: "Sample Shipment 1", 		
+			origin : boston,
+			destination : tabarre,
 			shipmentType: SHIPMENT_TYPE_AIR,
-			shipmentStatus: SHIPMENT_STATUS_DELIVERED, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999",
-			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-01"), origin : boston,
-			expectedDeliveryDate : Date.parse("yyyy-MM-dd", "2010-06-05"), destination : tabarre).save(flush:true);	
+			shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, 
+			trackingNumber: "1Z9999W99999999999",
+			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-01"), 
+			expectedDeliveryDate : Date.parse("yyyy-MM-dd", "2010-06-05")).save(flush:true);	
 
 		Shipment shipment2 = new Shipment(name: "Sample Shipment 2",
+			origin : boston,
+			destination : miami,
 			shipmentType: SHIPMENT_TYPE_AIR,
-			shipmentStatus: SHIPMENT_STATUS_DELIVERED, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999",
-			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-02"), origin : boston,
-			expectedDeliveryDate : Date.parse("yyyy-MM-dd", "2010-06-03"), destination : miami).save(flush:true);
+			shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, 
+			trackingNumber: "1Z9999W99999999999",
+			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-02"), 
+			expectedDeliveryDate : Date.parse("yyyy-MM-dd", "2010-06-03")).save(flush:true);
 
 		Shipment shipment3 = new Shipment(name: "Sample Shipment 3",
+			origin : boston,
+			destination : tabarre,
 			shipmentType: SHIPMENT_TYPE_AIR,
-			shipmentStatus: SHIPMENT_STATUS_DELIVERED, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999",
-			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-01"), origin : boston,
-			expectedDeliveryDate : Date.parse("yyyy-MM-dd", "2010-06-05"), destination : tabarre).save(flush:true);
+			shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, 
+			trackingNumber: "1Z9999W99999999999",
+			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-01"), 
+			expectedDeliveryDate : Date.parse("yyyy-MM-dd", "2010-06-05")).save(flush:true);
 
 		Shipment shipment4 = new Shipment(name: "Sample Shipment 4",
+			origin : miami,
+			destination : tabarre,
 			shipmentType: SHIPMENT_TYPE_AIR,
-			shipmentStatus: SHIPMENT_STATUS_RETURNED, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999",
-			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-01"), origin : miami,
-			expectedDeliveryDate : Date.parse("yyyy-MM-dd", "2010-06-05"), destination : tabarre).save(flush:true);
+			shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, 
+			trackingNumber: "1Z9999W99999999999",
+			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-01"), 
+			expectedDeliveryDate : Date.parse("yyyy-MM-dd", "2010-06-05")).save(flush:true);
 
 		Shipment shipment5 = new Shipment(name: "Sample Shipment 5", 				
+			origin : miami,
+			destination : tabarre,
 			shipmentType: SHIPMENT_TYPE_AIR,
-			shipmentStatus: SHIPMENT_STATUS_DELIVERED, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999",
-			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-05"), origin : miami,
-			expectedDeliveryDate : Date.parse("yyyy-MM-dd", "2010-06-07"), destination : tabarre).save(flush:true);	
+			shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, 
+			trackingNumber: "1Z9999W99999999999",
+			expectedShippingDate : Date.parse("yyyy-MM-dd", "2010-06-05"), 
+			expectedDeliveryDate : Date.parse("yyyy-MM-dd", "2010-06-07")).save(flush:true);	
 		
 		Shipment shipment6 = new Shipment(name: "Sample Shipment 6", 				
+			origin : miami, 
+			destination : boston,
 			shipmentType: SHIPMENT_TYPE_AIR,
-			shipmentStatus: SHIPMENT_STATUS_READY, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999", 
-			expectedShippingDate : new Date(), origin : miami, 
-			expectedDeliveryDate : null, destination : boston).save(flush:true);	
+			shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, 
+			trackingNumber: "1Z9999W99999999999", 
+			expectedShippingDate : new Date(), 
+			expectedDeliveryDate : null).save(flush:true);	
 
 		Shipment shipment7 = new Shipment(name: "Sample Shipment 7",
+			origin : boston,
+			destination : tabarre,
 			shipmentType: SHIPMENT_TYPE_AIR,
-			shipmentStatus: SHIPMENT_STATUS_READY, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999",
-			expectedShippingDate : new Date(), origin : boston,
-			expectedDeliveryDate : null, destination : tabarre).save(flush:true);
+			shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, 
+			trackingNumber: "1Z9999W99999999999",
+			expectedShippingDate : new Date(), 
+			expectedDeliveryDate : null).save(flush:true);
 
 		Shipment shipment8 = new Shipment(name: "Sample Shipment 8", 
+			origin : miami,
+			destination : boston,
 			shipmentType: SHIPMENT_TYPE_AIR,
-			shipmentStatus: SHIPMENT_STATUS_NEW, shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, trackingNumber: "1Z9999W99999999999",
-			expectedShippingDate : new Date(), origin : miami,
-			expectedDeliveryDate : null, destination : boston).save(flush:true);
+			shipmentMethod: SHIPMENT_METHOD_UPS_GROUND, 
+			trackingNumber: "1Z9999W99999999999",
+			expectedShippingDate : new Date(), 
+			expectedDeliveryDate : null).save(flush:true);
 
 		Shipment shipment9 = new Shipment(name: "Sample Shipment 9",
+			origin : miami,
+			destination : boston,
 			shipmentType: SHIPMENT_TYPE_AIR,
-			shipmentStatus: SHIPMENT_STATUS_NEW, shipmentMethod: SHIPMENT_METHOD_FEDEX_GROUND, trackingNumber: "1Z9999W99999999999",
-			expectedShippingDate : new Date(), origin : miami,
-			expectedDeliveryDate : null, destination : boston).save(flush:true);
+			shipmentMethod: SHIPMENT_METHOD_FEDEX_GROUND, 
+			trackingNumber: "1Z9999W99999999999",
+			expectedShippingDate : new Date(), 
+			expectedDeliveryDate : null).save(flush:true);
 
 		Shipment shipment10 = new Shipment(name: "Sample Shipment 10",
+			origin : miami,
+			destination : boston,
 			shipmentType: SHIPMENT_TYPE_AIR,
-			shipmentStatus: SHIPMENT_STATUS_NEW, shipmentMethod: SHIPMENT_METHOD_USPS_GROUND, trackingNumber: "1Z9999W99999999999",
-			expectedShippingDate : new Date(), origin : miami,
-			expectedDeliveryDate : null, destination : boston).save(flush:true);
+			shipmentMethod: SHIPMENT_METHOD_USPS_GROUND, 
+			trackingNumber: "1Z9999W99999999999",
+			expectedShippingDate : new Date(), 
+			expectedDeliveryDate : null).save(flush:true);
 
 		
 						
@@ -594,9 +618,8 @@ class BootStrap {
 		ShipmentItem shipmentItem3 = new ShipmentItem(product : aspirin, quantity : 300, packageType: CONTAINER_BOX);
 
 		shipment1.addToComments(comment1).save(flush:true);
-		shipment2.addToComments(comment1).save(flush:true);
-		shipment3.addToComments(comment1).save(flush:true);
-		
+		shipment1.addToComments(comment2).save(flush:true);
+		shipment1.addToComments(comment3).save(flush:true);		
 		shipment1.addToContainers(pallet1).save(flush:true);
 		shipment1.addToContainers(pallet2).save(flush:true);
 		shipment1.addToContainers(box1).save(flush:true);

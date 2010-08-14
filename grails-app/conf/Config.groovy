@@ -1,10 +1,12 @@
-// locations to search for config files that get merged into the main config
+// Locations to search for config files that get merged into the main config
 // config files can either be Java properties files or ConfigSlurper scripts
 
-// grails.config.locations = [ "classpath:${appName}-config.properties",
-//                             "classpath:${appName}-config.groovy",
-//                             "file:${userHome}/.grails/${appName}-config.properties",
-//                             "file:${userHome}/.grails/${appName}-config.groovy"]
+grails.config.locations = [ 
+	//"classpath:${appName}-config.groovy",
+	//"classpath:${appName}-config.properties",
+	//"file:${userHome}/.grails/${appName}-config.groovy",
+	"file:${userHome}/.grails/${appName}-config.properties"
+]
 
 // if(System.properties["${appName}.config.location"]) {
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
@@ -22,8 +24,8 @@ grails.mime.types = [ html: ['text/html','application/xhtml+xml'],
 		all: '*/*',
 		json: ['application/json','text/json'],
 		form: 'application/x-www-form-urlencoded',
-		multipartForm: 'multipart/form-data'
-		]
+		multipartForm: 'multipart/form-data']
+
 // The default codec used to encode data with ${}
 grails.views.default.codec="none" // none, html, base64
 grails.views.gsp.encoding="UTF-8"
@@ -49,22 +51,22 @@ grails.spring.bean.packages = []
 
 // set per-environment serverURL stem for creating absolute links
 environments {
-	production { grails.serverURL = "http://www.changeme.com" }
+	production {  grails.serverURL = "http://www.changeme.com"  }
 	development {
 		grails.serverURL = "http://localhost:8080/${appName}";
 	}
-	test { grails.serverURL = "http://localhost:8080/${appName}" }
+	test {  grails.serverURL = "http://localhost:8080/${appName}"  }
 }
 
 // log4j configuration
 /*
-log4j = {
-	root {
-		error()
-		additivity = true
-	}
-	debug 'grails.app'
-}*/
+ log4j = {
+ root {
+ error()
+ additivity = true
+ }
+ debug 'grails.app'
+ }*/
 
 log4j = {
 	// Example of changing the log pattern for the default console    
@@ -83,9 +85,8 @@ log4j = {
 	//		'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
 	//		'org.springframework'
 	
-	warn	'org.mortbay.log'
-	
-	info	'org.codehaus.groovy.grails.web.servlet',  //  controllers
+	warn	'org.mortbay.log',
+			'org.codehaus.groovy.grails.web.servlet',  //  controllers
 			'org.codehaus.groovy.grails.web.pages', //  GSP
 			'org.codehaus.groovy.grails.web.sitemesh', //  layouts
 			'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
@@ -103,8 +104,8 @@ log4j = {
 			'grails.app.service',
 			'grails.app.task',
 			'BootStrap'
-				
+	
 	debug	'org.apache.ddlutils'
 	
-
+	
 }

@@ -14,24 +14,27 @@ class DateTagLib {
 			throw new IllegalArgumentException("name parameter must be specified")			
 		}
 		
-		out << "<script type=\'text/javascript\'> "
-		out << "jQuery(function() { "
-		out << "	jQuery('#" + name + "Widget').datepicker({ "
-		out << "		showOn: 'both', "
-		out << "		altField: '#" + name + "', "
-		out << "		altFormat: 'mm/dd/yy', "
-		out << "		dateFormat: 'dd M yy', "
-		out << "		autoSize: true, "
-		out << "		closeText: 'Done', "
-		out << "		showButtonPanel: true, "
-		out << "		showOtherMonths: true, "
-		out << "		selectOtherMonths: true "
-		out << "	}); "			
-		out << "}); "
-		out << "</script> "
+		out << "<input id='" + name + "' name='" + name + "' type='hidden'/> \n"
+		out << "<input id='" + name + "Widget' name='" + name + "Widget' type='text' class='date' width='8' /> \n"
 
-		out << "<input id='" + name + "' name='" + name + "' value='" + value + "' type='hidden'/> "
-		out << "<input id='" + name + "Widget' name='" + name + "Widget' value='" + value + "' type='text' class='date' width='8' /> "
-
+		out << "<script type=\'text/javascript\'> \n"
+		out << "jQuery(function() { \n"
+		out << "	// expects MM/dd/yyyy \n"
+		out << "	var dateValue = new Date('" + value + "'); "		
+		out << "	jQuery('#" + name + "Widget').datepicker({ \n"
+		out << "		showOn: 'both', \n"
+		out << "		altField: '#" + name + "', \n"
+		out << "		altFormat: 'mm/dd/yy', \n"
+		out << "		dateFormat: 'dd M yy', \n"
+		out << "		autoSize: true, \n"
+		out << "		closeText: 'Done', \n"
+		out << "		showButtonPanel: true, \n"
+		out << "		showOtherMonths: true, \n"
+		out << "		selectOtherMonths: true \n"
+		out << "	}); \n"
+		out << "	jQuery('#" + name + "Widget').datepicker('setDate', dateValue);\n"
+		out << "}); \n"
+		out << "</script> \n"
+		
 	}
 }
