@@ -1,16 +1,22 @@
 package org.pih.warehouse.core
 
+import java.util.Date;
+
 class Address {
 	
 	String address
-    String address2
-    String city
-    String stateOrProvince
-    String postalCode
-    String country
+	String address2
+	String city
+	String stateOrProvince
+	String postalCode
+	String country
 
-    static constraints = {
+	// Audit fields
+	Date dateCreated;
+	Date lastUpdated;
+	
+	static constraints = {
 		postalCode(nullable:true)
 		stateOrProvince(nullable:true)
-    }
+	}
 }

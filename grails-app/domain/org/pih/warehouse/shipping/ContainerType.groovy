@@ -7,5 +7,5 @@ import org.pih.warehouse.core.Type;
  * Examples of this would be Pallet, Box, Piece, Suitcase, etc
  */
 class ContainerType extends Type {
-	
+
 }

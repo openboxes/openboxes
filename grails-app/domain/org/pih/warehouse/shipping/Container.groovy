@@ -1,20 +1,32 @@
 package org.pih.warehouse.shipping;
 
 import java.util.Date;
+import org.pih.warehouse.core.Person;
 
 class Container implements Comparable {
 
-	String name
-	Boolean status = true		// open (true) or closed (false)	
+	String name	
 	String containerNumber
 	String description
-	String recipient
-	String dimensions			// could be its own class, but we don't care right now
-	Float weight	
-	String units				// should probably be a class on its own
+	Person recipient
+
+	Container parentContainer
 	
-	ContainerType containerType
+	// Dimensions
+	Float height;				// height of container
+	Float width;				// width of container
+	Float length;				// length of container 
+	String volume_units			// standard dimensional unit: cm, in, ft, 
+	
+	// Weight
+	Float weight				// weight of container
+	String weight_units			// standard weight unit: kg, lb
+	
+	// Items in container 
 	List shipmentItems
+	
+	// Type of container 
+	ContainerType containerType
 	
 	// Audit fields
 	Date dateCreated;
@@ -30,12 +42,15 @@ class Container implements Comparable {
 		description(nullable:true)
 		containerNumber(nullable:true)
 		recipient(nullable:true)
-		dimensions(nullable:true)
+		height(nullable:true)
+		width(nullable:true)
+		length(nullable:true)
+		volume_units(nullable:true)
 		weight(nullable:true)
-		units(nullable:true)
+		weight_units(nullable:true)
 		containerType(nullable:true)
-		//shipment(nullable:true)
 		shipmentItems(nullable:true)		
+		parentContainer(nullable:true)
 	}
 	
 	int compareTo(obj) { name.compareTo(obj.name) }

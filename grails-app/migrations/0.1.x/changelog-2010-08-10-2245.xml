@@ -1,0 +1,36 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda (generated)" id="1281278561615-1">
+        <validCheckSum>36ea28f213dce68259e3e41cf06d1fde</validCheckSum>    
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="person_attribute_type" columnName="edit_privilege"/></not>
+		</preConditions>    
+        <dropIndex indexName="FKE139719A6520205B" tableName="shipment"/>        
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281278561615-2">
+        <dropColumn columnName="actual_delivery_date" tableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281278561615-3">
+        <dropColumn columnName="actual_shipping_date" tableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281278561615-4">
+        <dropColumn columnName="carrier" tableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281278561615-5">
+        <dropColumn columnName="donation" tableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281278561615-6">
+        <dropColumn columnName="expected_delivery_date" tableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281278561615-7">
+        <dropColumn columnName="expected_shipping_date" tableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281278561615-8">
+        <dropColumn columnName="recipient" tableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281278561615-9">
+        <dropColumn columnName="shipment_status_id" tableName="shipment"/>
+    </changeSet>
+
+</databaseChangeLog>

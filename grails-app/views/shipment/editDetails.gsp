@@ -165,7 +165,7 @@
 							</tr>		
 							<tr class="prop">
 								<td valign="top" class="name"><label><g:message
-									code="shipment.totalValue.label" default="Total value" /></label></td>
+									code="shipment.totalValue.label" default="Total Value (USD)" /></label></td>
 								<td valign="top"
 									class=" ${hasErrors(bean: shipmentInstance, field: 'totalValue', 'errors')}"
 									nowrap="nowrap">

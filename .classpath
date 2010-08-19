@@ -24,5 +24,6 @@
 	<classpathentry kind="lib" path="lib/poi-ooxml-3.6-20091214.jar"/>
 	<classpathentry kind="lib" path="lib/poi-ooxml-schemas-3.6-20091214.jar"/>
 	<classpathentry kind="lib" path="lib/poi-scratchpad-3.6-20091214.jar"/>
+	<classpathentry kind="lib" path="lib/liquibase-1.9.5.jar"/>
 	<classpathentry kind="output" path="web-app/WEB-INF/classes"/>
 </classpath>

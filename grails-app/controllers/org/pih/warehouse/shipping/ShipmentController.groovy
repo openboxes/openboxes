@@ -52,10 +52,7 @@ class ShipmentController {
 		}
 	}
 
-	def update = {
-		
-		log.info params
-		
+	def update = {		
 		def shipmentInstance = Shipment.get(params.id)
 		if (shipmentInstance) {
 			if (params.version) {
@@ -116,7 +113,38 @@ class ShipmentController {
 		}
 	}
 
-	
+	def sendShipment = {
+		def shipmentInstance = Shipment.get(params.id)
+		if (!shipmentInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+			redirect(action: (params.type == "incoming") ? "listIncoming" : "listOutgoing")
+		}
+		else {
+			if ("POST".equalsIgnoreCase(request.getMethod())) { 
+			
+				shipmentInstance.properties = params
+				if (!shipmentInstance.hasErrors() && shipmentInstance.save(flush: true)) {
+					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
+					redirect(action: "showDetails", id: shipmentInstance.id)
+				}
+			}
+			
+			
+			render(view: "sendShipment", model: [shipmentInstance: shipmentInstance])
+		}		
+	}
+
+	def receiveShipment = {
+		def shipmentInstance = Shipment.get(params.id)
+		if (!shipmentInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+			redirect(action: (params.type == "incoming") ? "listIncoming" : "listOutgoing")
+		}
+		else {
+			[shipmentInstance: shipmentInstance]
+		}
+	}
+
 	def showPackingList = { 
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
@@ -156,25 +184,23 @@ class ShipmentController {
 			CSVWriter writer = new CSVWriter(sw);
 			Sql sql = new Sql(sessionFactory.currentSession.connection())	
 			
-			String [] colArray = new String[7];
+			String [] colArray = new String[6];
 			colArray.putAt(0, "unit");
 			colArray.putAt(1, "dimensions");
 			colArray.putAt(2, "weight");
 			colArray.putAt(3, "qty");
 			colArray.putAt(4, "item");
 			colArray.putAt(5, "serial number");
-			colArray.putAt(6, "end");
 			writer.writeNext(colArray);
 			sql.eachRow(query) { row -> 
 				
-				def rowArray = new String[7];
+				def rowArray = new String[6];
 				rowArray.putAt(0, row[0]);
 				rowArray.putAt(1, row[1]);
 				rowArray.putAt(2, row[2]);
 				rowArray.putAt(3, row[3]);
 				rowArray.putAt(4, row[4]);
 				rowArray.putAt(5, row[5]);
-				rowArray.putAt(6, "end");
 				writer.writeNext(rowArray);
 			}
 			
@@ -296,15 +322,7 @@ class ShipmentController {
 			incomingShipmentCount : incomingShipments.size(), outgoingShipmentCount : outgoingShipments.size()
 		]
     }
-	
-	def sendShipment = { 
-		redirect action: "showDetails", id: shipment.id;
-	}
-
-	def deliverShipment = {
-		redirect action: "showDetails", id: shipment.id;
-	}    
-        
+	        
     
     def addShipmentAjax = {
 		try {
@@ -671,18 +689,11 @@ class ShipmentController {
 		
 			
 		}
-		else { 
-			
-	    	def targetLocation = null    	
-	    	if (params.targetLocationId) { 
-	        	Location.get(params.targetLocationId)
-	    	}
-			
+		else { 						
 	    	ShipmentEvent event = new ShipmentEvent(
 	    		eventType:EventType.get(params.eventTypeId), 
 	    		eventDate: params.eventDate, 
-	    		eventLocation: Location.get(params.eventLocationId),
-	    		targetLocation: targetLocation
+	    		eventLocation: Location.get(params.eventLocationId)
 	    	);
 	    	
 	    	def shipment = Shipment.get(params.shipmentId);     	

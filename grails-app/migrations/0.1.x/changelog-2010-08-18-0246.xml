@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda (generated)" id="1282113934502-1">
+        <createTable tableName="shipment_event">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="event_date" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="event_location_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="event_type_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282113934502-2">
+        <addColumn tableName="container">
+            <column name="parent_container_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282113934502-3">
+        <addColumn tableName="container">
+            <column name="recipient_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282113934502-4">
+        <dropNotNullConstraint columnDataType="BIGINT" columnName="product_id" tableName="transaction_entry"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282113934502-5">
+        <dropNotNullConstraint columnDataType="INT" columnName="quantity_change" tableName="transaction_entry"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282113934502-6">
+        <createIndex indexName="FKE7814C8144979D51" tableName="container" unique="false">
+            <column name="recipient_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282113934502-7">
+        <createIndex indexName="FKE7814C814B6A2E03" tableName="container" unique="false">
+            <column name="parent_container_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282113934502-8">
+        <createIndex indexName="FK6D032BB53B5F6286" tableName="shipment_event" unique="false">
+            <column name="shipment_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282113934502-9">
+        <createIndex indexName="FK6D032BB54415A5B0" tableName="shipment_event" unique="false">
+            <column name="event_location_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282113934502-10">
+        <createIndex indexName="FK6D032BB5F2CDAB03" tableName="shipment_event" unique="false">
+            <column name="event_type_id"/>
+        </createIndex>
+    </changeSet>
+    
+    <!-- Drop columns -->
+    <changeSet author="jmiranda (generated)" id="1282113934502-26">
+        <dropColumn columnName="recipient" tableName="container"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282113934502-27">
+        <dropColumn columnName="status" tableName="container"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282113934502-28">
+        <dropColumn columnName="new_field" tableName="document"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282113934502-29">
+        <dropColumn columnName="class" tableName="event"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282113934502-30">
+        <dropColumn columnName="generic_type_id" tableName="generic_product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282113934502-31">
+        <dropColumn columnName="name" tableName="generic_product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282113934502-32">
+        <dropColumn columnName="drug_class" tableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282113934502-33">
+        <dropColumn columnName="confirm_date" tableName="transaction_entry"/>
+    </changeSet>
+    
+    <!-- Drop tables -->
+    <changeSet author="jmiranda (generated)" id="1282113934502-34">
+        <dropTable tableName="country"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282113934502-35">
+        <dropTable tableName="drug_product_condition_type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282113934502-36">
+        <dropTable tableName="invoice"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282113934502-37">
+        <dropTable tableName="shipment_package"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282113934502-38">
+        <dropTable tableName="shipment_package_shipment_item"/>
+    </changeSet>
+</databaseChangeLog>

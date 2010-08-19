@@ -3,12 +3,46 @@
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-	<!--     
-    <include file="changelog-initial-schema.xml"/>
+	<!-- 
+		The data files should be executed right after the core-shema changelog, but 
+		the data is based on INSERT statements that are in sync with the data model
+		after the first four 0.1.x changelogs.		
+	-->
+    <include file="changelog-create-core-schema.xml"/>
+    <!--  -->
     <include file="0.1.x/changelog-2010-08-10-2245.xml"/>
+    
+    <!--  -->
     <include file="0.1.x/changelog-2010-08-13-1213.xml"/>
+    
+    <!--  -->
     <include file="0.1.x/changelog-2010-08-13-1613.xml"/>
-	 -->
+    
+    <!--  -->
+    <include file="0.1.x/changelog-2010-08-13-2334.xml"/>
+	
+	<!-- Insert core data -->
+    <include file="changelog-insert-core-data.xml"/>
+	
+	<!-- Insert demo data -->
+    <include file="changelog-insert-demo-data.xml"/>
+    
+    <!-- Change to document.file_contents column -->
+    <include file="0.1.x/changelog-2010-08-16-2331.xml"/>    
+	
+	<!-- Changes to 'container' table -->
+    <include file="0.1.x/changelog-2010-08-17-0007.xml"/>
+    
+    <!--  Changes to 'container', 'comment', 'shipment_item', and 'inventory' -->
+    <include file="0.1.x/changelog-2010-08-18-0055.xml"/>
+    
+    <!--  -->
+    <include file="0.1.x/changelog-2010-08-18-0204.xml"/>
+    
+    <!--  -->
+    <include file="0.1.x/changelog-2010-08-18-0246.xml"/>
 	 
-	 
+    <!-- Changes to many tables, columns -->
+    <include file="0.1.x/changelog-2010-08-18-1955.xml"/>
+
 </databaseChangeLog>

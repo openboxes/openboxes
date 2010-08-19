@@ -1,20 +1,20 @@
 package org.pih.warehouse.shipping
 
+import java.util.Date;
+
 class ShipmentMethod {
 	
-	String name
-	String methodName
-	String trackingUrl
-	String trackingFormat
-	String parameterName
+	Shipper carrier						// the shipping organization that will transport the goods
+	ShipperService shipmentService		// the selected shipping service selected
+	String trackingNumber				// should be part of a shipment mode: tracking number, carrier, service
 
-    static constraints = {
-		name(nullable:false)
-		methodName(nullable:false)
-		trackingUrl(nullable:true, blank:true)
-		trackingFormat(nullable:true)
-		parameterName(nullable:true, blank:true)
-    }
+	// Audit fields
+	Date dateCreated;
+	Date lastUpdated;
 	
-	String toString() { return "$methodName"; }
+	static constraints = {
+		carrier(nullable:true)
+		shipmentService(nullable:true)
+		trackingNumber(nullable:true)
+	}
 }

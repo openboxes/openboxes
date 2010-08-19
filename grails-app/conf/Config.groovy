@@ -86,26 +86,29 @@ log4j = {
 	//		'org.springframework'
 	
 	warn	'org.mortbay.log',
-			'org.codehaus.groovy.grails.web.servlet',  //  controllers
-			'org.codehaus.groovy.grails.web.pages', //  GSP
-			'org.codehaus.groovy.grails.web.sitemesh', //  layouts
-			'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-			'org.codehaus.groovy.grails.web.mapping', // URL mapping
-			'org.codehaus.groovy.grails.commons', // core / classloading
-			'org.codehaus.groovy.grails.plugins', // plugins
-			'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
-			'org.springframework',
-			'org.hibernate',
-			'org.pih.warehouse',
-			'net.sf.ehcache.hibernate',
-			'grails.app',
-			'grails.app.controller',
-			'grails.app.bootstrap',
-			'grails.app.service',
-			'grails.app.task',
-			'BootStrap'
+		'org.codehaus.groovy.grails.web.servlet',		// controllers
+		'org.codehaus.groovy.grails.web.pages',			// GSP
+		'org.codehaus.groovy.grails.web.sitemesh',		// layouts
+		'org.codehaus.groovy.grails.web.mapping.filter',	// URL mapping
+		'org.codehaus.groovy.grails.web.mapping', 		// URL mapping
+		'org.codehaus.groovy.grails.commons', 			// core / classloading
+		'org.codehaus.groovy.grails.plugins',			// plugins
+		'org.codehaus.groovy.grails.orm.hibernate', 		// hibernate integration
+		'net.sf.ehcache.hibernate'		
 	
-	debug	'org.apache.ddlutils'
+	info	'org.liquibase', 	
+		'org.springframework',
+		'org.hibernate',
+		'org.pih.warehouse',
+		'grails.app',
+		'grails.app.controller',
+		'grails.app.bootstrap',
+		'grails.app.service',
+		'grails.app.task'
+		'BootStrap'
+
+	debug	'liquibase',
+		'org.apache.ddlutils'
 	
 	
 }

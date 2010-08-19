@@ -1,5 +1,7 @@
 package org.pih.warehouse.user;
 
+import org.pih.warehouse.core.User;
+
 class UserController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]

@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+<!-- 
+	<changeSet author="jmiranda" id="disable-foreign-key-checks" runAlways="true" dbms="mysql">
+		<sql>SET FOREIGN_KEY_CHECKS=0</sql>
+	</changeSet>
+ -->
+	<changeSet author="jmiranda" id="201008162047-1">
+		<!-- 
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT COUNT(*) FROM address</sqlCheck>
+		</preConditions>	
+		 -->
+		<sql>
+			INSERT INTO `address` (`id`, `version`, `address`, `address2`, `city`, `country`, `postal_code`, `state_or_province`) VALUES
+			(1,0,'888 Commonwealth Avenue','Third Floor','Boston','United States','02215','MA'),
+			(2,0,'1000 State Street','Building A','Miami','United States','33126','FL'),
+			(3,0,'12345 Main Street','Suite 401','Tabarre','Haiti',NULL,NULL),
+			(4,0,'2482 Massachusetts Ave','','Boston','United Status','02215','MA');
+		
+		</sql>
+	</changeSet>	
+	<changeSet author="jmiranda" id="201008162047-2">
+		<!-- 
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT COUNT(*) FROM address</sqlCheck>
+		</preConditions>	
+		 -->
+		<sql>
+			INSERT INTO `attribute` (`id`, `version`, `data_type`, `name`) VALUES
+			(1,3,'String','Vitality'),
+			(2,4,'String','Size');
+						
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-3">
+		<sql>
+		
+			INSERT INTO `attribute_value` (`attribute_values_id`, `value_id`) VALUES 
+			(1,1),
+			(1,2),
+			(1,3),
+			(2,4),
+			(2,5),
+			(2,6),
+			(2,7);
+		
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-4">
+		<sql>
+		
+			INSERT INTO `comment` (`id`, `version`, `comment`, `commenter_id`, `date_created`, `last_updated`, `recipient_id`, `send_date`) VALUES
+			(1,0,'We need to ship this as soon as possible!',3,'2010-08-16 20:10:26','2010-08-16 20:10:26',3,'2010-08-16 20:10:25'),
+			(2,0,'Did you ship this yet?!?!?!?',2,'2010-08-16 20:10:26','2010-08-16 20:10:26',3,'2010-08-16 20:10:26'),
+			(3,0,'What is taking so long?',1,'2010-08-16 20:10:26','2010-08-16 20:10:26',3,'2010-08-16 20:10:26');
+		
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-5">
+		<sql>
+			INSERT INTO `container` (`id`, `version`, `container_number`, `container_type_id`, `date_created`, `description`, `dimensions`, `last_updated`, `name`, `recipient`, `shipment_id`, `status`, `units`, `weight`) VALUES
+			(1,3,NULL,75,'2010-08-16 20:10:26',NULL,NULL,'2010-08-16 20:10:28','1',NULL,1,'','kg',1000),
+			(2,0,NULL,75,'2010-08-16 20:10:26',NULL,NULL,'2010-08-16 20:10:26','2',NULL,1,'','kg',2000),
+			(3,0,NULL,77,'2010-08-16 20:10:26',NULL,NULL,'2010-08-16 20:10:26','3',NULL,1,'','kg',100),
+			(4,0,NULL,77,'2010-08-16 20:10:26',NULL,NULL,'2010-08-16 20:10:26','4',NULL,1,'','kg',200);			
+		
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-6">
+		<sql>
+			INSERT INTO `drug_product_condition_type` (`drug_product_condition_types_id`, `condition_type_id`) VALUES
+			(1,29),
+			(2,29),
+			(3,29),
+			(4,29);
+			
+		
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-7">
+		<sql>
+			INSERT INTO `event` (`id`, `version`, `date_created`, `description`, `event_date`, `event_location_id`, `event_type_id`, `last_updated`, `shipment_id`, `target_location_id`, `class`) VALUES
+			(1,0,'2010-08-16 20:10:27',NULL,'2010-05-25 15:30:00',1,88,'2010-08-16 20:10:27',1,NULL,'org.pih.warehouse.shipping.ShipmentEvent'),
+			(2,0,'2010-08-16 20:10:27',NULL,'2010-05-25 17:45:00',1,89,'2010-08-16 20:10:27',1,NULL,'org.pih.warehouse.shipping.ShipmentEvent'),
+			(3,0,'2010-08-16 20:10:27',NULL,'2010-05-26 09:00:00',1,90,'2010-08-16 20:10:27',1,NULL,'org.pih.warehouse.shipping.ShipmentEvent'),
+			(4,0,'2010-08-16 20:10:27',NULL,'2010-05-26 11:00:00',1,91,'2010-08-16 20:10:27',1,NULL,'org.pih.warehouse.shipping.ShipmentEvent'),
+			(5,0,'2010-08-16 20:10:27',NULL,'2010-05-27 00:30:00',2,92,'2010-08-16 20:10:27',1,NULL,'org.pih.warehouse.shipping.ShipmentEvent'),
+			(6,0,'2010-08-16 20:10:27',NULL,'2010-05-27 13:30:00',2,91,'2010-08-16 20:10:27',1,NULL,'org.pih.warehouse.shipping.ShipmentEvent'),
+			(7,0,'2010-08-16 20:10:27',NULL,'2010-05-28 09:30:00',3,92,'2010-08-16 20:10:27',1,NULL,'org.pih.warehouse.shipping.ShipmentEvent'),
+			(8,0,'2010-08-16 20:10:27',NULL,'2010-05-28 10:30:00',3,93,'2010-08-16 20:10:27',1,NULL,'org.pih.warehouse.shipping.ShipmentEvent');						
+		
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-8">
+		<sql>
+			INSERT INTO `inventory` (`id`, `version`, `last_inventory_date`) VALUES
+			(1,2,'2010-08-16 20:10:23');
+		
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-9">
+		<sql>
+			INSERT INTO `inventory_item` (`id`, `version`, `bin_location`, `ideal_quantity`, `inventory_id`, `product_id`, `quantity`, `reorder_quantity`) VALUES 
+			(1,1,'Warehouse Bin A1',100,1,1,100,50),
+			(2,1,'Warehouse Bin A1',100,1,2,200,50);
+		
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-10">
+		<sql>
+			INSERT INTO `location` (`id`, `version`, `address_id`, `logo_url`, `name`, `class`, `inventory_id`, `manager_id`) VALUES
+			(1,0,1,'http://a3.twimg.com/profile_images/134665083/BOS_Red_Sox_normal.PNG','Boston Headquarters','org.pih.warehouse.inventory.Warehouse',NULL,2),
+			(2,0,2,'http://pihemr.files.wordpress.com/2008/01/pih-hands.jpg','Miami Warehouse','org.pih.warehouse.inventory.Warehouse',NULL,2),
+			(3,2,3,'http://pihemr.files.wordpress.com/2008/01/pih-hands.jpg','Tabarre Depot','org.pih.warehouse.inventory.Warehouse',1,2),
+			(4,0,4,'http://pihemr.files.wordpress.com/2008/01/pih-hands.jpg','ACME Supply Company','org.pih.warehouse.inventory.Warehouse',NULL,2);
+		
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-11">
+		<sql>
+			INSERT INTO `organization` (`id`, `version`, `description`, `name`) VALUES
+			(1,0,NULL,'Zanmi Lasante'),
+			(2,0,NULL,'Partners In Health');
+
+
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-12">
+		<sql>
+		
+			INSERT INTO `person` (`id`, `version`, `first_name`, `last_name`, `name`, `class`, `email`, `phone_no`, `last_login_date`, `manager_id`, `password`, `role`, `username`, `warehouse_id`) VALUES
+			(1,0,'Miss','Supervisor',NULL,'org.pih.warehouse.user.User','supervisor@pih.org',NULL,NULL,NULL,'password','Supervisor','super',NULL),
+			(2,4,'Mister','Manager',NULL,'org.pih.warehouse.user.User','manager@pih.org',NULL,NULL,1,'password','Manager','manager',4),
+			(3,0,'Justin','Miranda',NULL,'org.pih.warehouse.user.User','jmiranda@pih.org',NULL,NULL,2,'password','Stocker','jmiranda',NULL);
+		
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-13">
+		<sql>
+
+			INSERT INTO `product` (`id`, `version`, `category_id`, `description`, `ean`, `generic_type_id`, `mark_as_important`, `name`, `product_code`, `product_type_id`, `quantity_per_unit`, `tags`, `unit`, `unverified`, `weight`, `class`, `dosage_form`, `dosage_regimen`, `dosage_strength`, `drug_class`, `drug_route_type_id`, `generic_name`, `major_drug_class_id`, `make`, `model`) VALUES			
+			(1,4,NULL,NULL,'AD00001VIL',NULL,NULL,'Advil 200mg','00001',55,NULL,NULL,NULL,NULL,1.6,'org.pih.warehouse.product.DrugProduct',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Ibuprofen',NULL),
+			(2,3,NULL,NULL,'TY00006LENOL',NULL,NULL,'Tylenol 325mg','00006',55,NULL,NULL,NULL,NULL,1.1,'org.pih.warehouse.product.DrugProduct',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Ibuprofen',NULL),
+			(3,2,NULL,NULL,'AS00007PIRIN',NULL,NULL,'Aspirin 20mg','00007',55,NULL,NULL,NULL,NULL,1.2,'org.pih.warehouse.product.DrugProduct',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Ibuprofen',NULL),
+			(4,2,NULL,NULL,'GENERAL00008PAIN',NULL,NULL,'General Pain Reliever','00008',55,NULL,NULL,NULL,NULL,1.3,'org.pih.warehouse.product.DrugProduct',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Ibuprofen',NULL),
+			(5,1,NULL,NULL,NULL,NULL,NULL,'Similac Advance low iron 400g',NULL,NULL,NULL,NULL,NULL,NULL,12,'org.pih.warehouse.product.ConsumableProduct',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+			(6,1,NULL,NULL,NULL,NULL,NULL,'Similac Advance + iron 365g',NULL,NULL,NULL,NULL,NULL,NULL,10,'org.pih.warehouse.product.ConsumableProduct',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+		
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-14">
+		<sql>
+			INSERT INTO `product_attribute_value` (`id`, `version`, `allow_multiple`, `attribute_id`, `product_id`) VALUES 
+			(1,0,'\0',1,1);
+		
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-15">
+		<sql>
+			INSERT INTO `product_attribute_value_value` (`product_attribute_value_values_id`, `value_id`) VALUES
+			(1,2);
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-16">
+		<sql>
+			INSERT INTO `product_category` (`product_categories_id`, `category_id`) VALUES 
+			(1,1),
+			(1,18),
+			(2,1),
+			(2,18),
+			(3,1),
+			(3,18),
+			(4,1),
+			(4,18),
+			(5,13),
+			(6,13);
+
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-17">
+		<sql>
+			INSERT INTO `reference_number` (`id`, `version`, `identifier`, `reference_number_type_id`) VALUES 
+			(1,0,'0000000001',96),
+			(2,0,'0002492910',94);
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-18">
+		<sql>
+			INSERT INTO `shipment` (`id`, `version`, `carrier_id`, `current_event_id`, `date_created`, `destination_id`, `donor_id`, `expected_delivery_date`, `expected_shipping_date`, `last_updated`, `name`, `origin_id`, `recipient_id`, `shipment_method_id`, `shipment_number`, `shipment_type_id`, `total_value`, `tracking_number`) VALUES 
+			(1,18,NULL,NULL,'2010-08-16 20:10:24',3,NULL,'2010-06-05 00:00:00','2010-06-01 00:00:00','2010-08-16 20:10:28','Sample Shipment 1',1,NULL,3,'000001',103,NULL,'1Z9999W99999999999'),
+			(2,1,NULL,NULL,'2010-08-16 20:10:24',2,NULL,'2010-06-03 00:00:00','2010-06-02 00:00:00','2010-08-16 20:10:24','Sample Shipment 2',1,NULL,3,'000002',103,NULL,'1Z9999W99999999999'),
+			(3,1,NULL,NULL,'2010-08-16 20:10:24',3,NULL,'2010-06-05 00:00:00','2010-06-01 00:00:00','2010-08-16 20:10:25','Sample Shipment 3',1,NULL,3,'000003',103,NULL,'1Z9999W99999999999'),
+			(4,1,NULL,NULL,'2010-08-16 20:10:25',3,NULL,'2010-06-05 00:00:00','2010-06-01 00:00:00','2010-08-16 20:10:25','Sample Shipment 4',2,NULL,3,'000004',103,NULL,'1Z9999W99999999999'),
+			(5,1,NULL,NULL,'2010-08-16 20:10:25',3,NULL,'2010-06-07 00:00:00','2010-06-05 00:00:00','2010-08-16 20:10:25','Sample Shipment 5',2,NULL,3,'000005',103,NULL,'1Z9999W99999999999'),
+			(6,1,NULL,NULL,'2010-08-16 20:10:25',1,NULL,NULL,'2010-08-16 20:10:25','2010-08-16 20:10:25','Sample Shipment 6',2,NULL,3,'000006',103,NULL,'1Z9999W99999999999'),
+			(7,1,NULL,NULL,'2010-08-16 20:10:25',3,NULL,NULL,'2010-08-16 20:10:25','2010-08-16 20:10:25','Sample Shipment 7',1,NULL,3,'000007',103,NULL,'1Z9999W99999999999'),
+			(8,1,NULL,NULL,'2010-08-16 20:10:25',1,NULL,NULL,'2010-08-16 20:10:25','2010-08-16 20:10:25','Sample Shipment 8',2,NULL,3,'000008',103,NULL,'1Z9999W99999999999'),
+			(9,1,NULL,NULL,'2010-08-16 20:10:25',1,NULL,NULL,'2010-08-16 20:10:25','2010-08-16 20:10:25','Sample Shipment 9',2,NULL,2,'000009',103,NULL,'1Z9999W99999999999'),
+			(10,1,NULL,NULL,'2010-08-16 20:10:25',1,NULL,NULL,'2010-08-16 20:10:25','2010-08-16 20:10:25','Sample Shipment 10',2,NULL,4,'000010',103,NULL,'1Z9999W99999999999');			
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-19">
+		<sql>
+			INSERT INTO `shipment_comment` (`shipment_comments_id`, `comment_id`) VALUES 
+			(1,1),
+			(1,2),
+			(1,3);
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-20">
+		<sql>
+
+			INSERT INTO `shipment_item` (`id`, `version`, `container_id`, `donation`, `donor_id`, `gross_weight`, `product_id`, `quantity`, `recipient`, `serial_number`, `unit_weight`, `shipment_items_idx`) VALUES 
+			(1,0,1,'\0',NULL,NULL,1,100,NULL,NULL,NULL,0),
+			(2,0,1,'\0',NULL,NULL,2,200,NULL,NULL,NULL,1),
+			(3,0,1,'\0',NULL,NULL,3,300,NULL,NULL,NULL,2);			
+
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-21">
+		<sql>
+			<![CDATA[
+				INSERT INTO `shipment_method` (`id`, `version`, `method_name`, `name`, `parameter_name`, `tracking_format`, `tracking_url`) VALUES 
+				(1,0,'fedex','FedEx Air',NULL,'999999999999','http://www.fedex.com/Tracking?ascend_header=1&clienttype=dotcom&cntry_code=us&language=english&tracknumbers=%s'),
+				(2,0,'fedex','FedEx Ground',NULL,'999999999999','http://www.fedex.com/Tracking?ascend_header=1&clienttype=dotcom&cntry_code=us&language=english&tracknumbers=%s'),
+				(3,0,'ups','UPS Ground',NULL,'1Z9999W99999999999','http://wwwapps.ups.com/WebTracking/processInputRequest?sort_by=status&tracknums_displayed=1&TypeOfInquiryNumber=T&loc=en_US&InquiryNumber1=%s&track.x=0&track.y=0'),
+				(4,0,'usps','USPS Ground','q',NULL,'http://www.google.com/search?hl=en&site=&q='),
+				(5,0,'courier','Courier',NULL,NULL,NULL);
+			]]>		
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-22">
+		<sql>
+			INSERT INTO `shipment_reference_number` (`shipment_reference_numbers_id`, `reference_number_id`) VALUES 
+			(1,1),
+			(1,2);
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-23">
+		<sql>
+			INSERT INTO `shipment_type_container_type` (`shipment_type_container_types_id`, `container_type_id`) VALUES 
+			(103,75),
+			(103,80),
+			(103,76),
+			(103,77),
+			(104,74),
+			(104,77),
+			(105,75),
+			(105,78),
+			(105,80),
+			(105,76),
+			(105,77),
+			(106,79);
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-24">
+		<sql>
+			INSERT INTO `transaction` (`id`, `version`, `direction`, `inventory_id`, `inventory_event_id`, `local_warehouse_id`, `target_warehouse_id`, `transaction_date`, `transaction_type_id`, `transactions_idx`) VALUES 
+			(1,0,NULL,NULL,NULL,3,3,'2010-08-16 20:10:24',1,0);
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-25">
+		<sql>
+			INSERT INTO `transaction_entry` (`id`, `version`, `confirm_date`, `product_id`, `quantity_change`, `transaction_id`) VALUES 
+			(1,0,'2010-08-16 20:10:24',1,50,1);
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-26">
+		<sql>
+			INSERT INTO `transaction_type` (`id`, `version`, `description`, `name`) VALUES 
+			(1,0,NULL,'Incoming'),
+			(2,0,NULL,'Outgoing'),
+			(3,0,NULL,'Donation');
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-27">
+		<sql>
+			INSERT INTO `type` (`id`, `version`, `color`, `description`, `name`, `sort_order`, `class`, `parent_id`, `complete`, `initial`, `pending`) VALUES 
+			(1,0,NULL,NULL,'Medicines',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,NULL),
+			(2,0,NULL,NULL,'Supplies',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,NULL),
+			(3,0,NULL,NULL,'Equipment',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,NULL),
+			(4,0,NULL,NULL,'Perishables',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,NULL),
+			(5,0,NULL,NULL,'Other',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,NULL),
+			(6,0,NULL,NULL,'Medical Supplies',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,2),
+			(7,0,NULL,NULL,'Hospital and Clinic Supplies',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,2),
+			(8,0,NULL,NULL,'Office Supplies',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,2),
+			(9,0,NULL,NULL,'Medical Equipment',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,3),
+			(10,0,NULL,NULL,'Surgical Equipment',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,3),
+			(11,0,NULL,NULL,'IT Equipment',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,3),
+			(12,0,NULL,NULL,'Furniture and Equipment',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,3),
+			(13,0,NULL,NULL,'Food',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,4),
+			(14,0,NULL,NULL,'ARVS',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,1),
+			(15,0,NULL,NULL,'Anesteshia',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,1),
+			(16,0,NULL,NULL,'Cancer',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,1),
+			(17,0,NULL,NULL,'Chronic Care',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,1),
+			(18,0,NULL,NULL,'Pain',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,1),
+			(19,0,NULL,NULL,'TB',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,1),
+			(20,0,NULL,NULL,'Other',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,1),
+			(21,0,NULL,NULL,'Lab',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,6),
+			(22,0,NULL,NULL,'Surgical',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,6),
+			(23,0,NULL,NULL,'X-Ray',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,6),
+			(24,0,NULL,NULL,'Dental',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,6),
+			(25,0,NULL,NULL,'Other',0,'org.pih.warehouse.product.Category',NULL,NULL,NULL,6),
+			(26,0,NULL,NULL,'HIV/AIDS',0,'org.pih.warehouse.product.ConditionType',NULL,NULL,NULL,NULL),
+			(27,0,NULL,NULL,'Cancer',0,'org.pih.warehouse.product.ConditionType',NULL,NULL,NULL,NULL),
+			(28,0,NULL,NULL,'Diarrhea',0,'org.pih.warehouse.product.ConditionType',NULL,NULL,NULL,NULL),
+			(29,0,NULL,NULL,'Pain',0,'org.pih.warehouse.product.ConditionType',NULL,NULL,NULL,NULL),
+			(30,0,NULL,NULL,'Tuberculosis',0,'org.pih.warehouse.product.ConditionType',NULL,NULL,NULL,NULL),
+			(31,0,NULL,NULL,'Airway Bill',0,'org.pih.warehouse.shipping.DocumentType',NULL,NULL,NULL,NULL),
+			(32,0,NULL,NULL,'Bill of Lading',0,'org.pih.warehouse.shipping.DocumentType',NULL,NULL,NULL,NULL),
+			(33,0,NULL,NULL,'Packing List',0,'org.pih.warehouse.shipping.DocumentType',NULL,NULL,NULL,NULL),
+			(34,0,NULL,NULL,'Certificate of Donation',0,'org.pih.warehouse.shipping.DocumentType',NULL,NULL,NULL,NULL),
+			(35,0,NULL,NULL,'Commercial Invoice',0,'org.pih.warehouse.shipping.DocumentType',NULL,NULL,NULL,NULL),
+			(36,0,NULL,NULL,'Material Safety Data Sheet',0,'org.pih.warehouse.shipping.DocumentType',NULL,NULL,NULL,NULL),
+			(37,0,NULL,NULL,'Certificate of Analysis',0,'org.pih.warehouse.shipping.DocumentType',NULL,NULL,NULL,NULL),
+			(38,0,NULL,NULL,'Manifest',0,'org.pih.warehouse.shipping.DocumentType',NULL,NULL,NULL,NULL),
+			(39,0,NULL,NULL,'Other',0,'org.pih.warehouse.shipping.DocumentType',NULL,NULL,NULL,NULL),
+			(40,0,NULL,NULL,'Laptop',0,'org.pih.warehouse.product.GenericType',NULL,NULL,NULL,NULL),
+			(41,0,NULL,NULL,'Glove',0,'org.pih.warehouse.product.GenericType',NULL,NULL,NULL,NULL),
+			(42,0,NULL,NULL,'Guaze',0,'org.pih.warehouse.product.GenericType',NULL,NULL,NULL,NULL),
+			(43,0,NULL,NULL,'Tissue',0,'org.pih.warehouse.product.GenericType',NULL,NULL,NULL,NULL),
+			(44,0,NULL,NULL,'Shoe',0,'org.pih.warehouse.product.GenericType',NULL,NULL,NULL,NULL),
+			(45,0,NULL,NULL,'ARV Medication',0,'org.pih.warehouse.product.GenericType',NULL,NULL,NULL,NULL),
+			(46,0,NULL,NULL,'Pain Medication',0,'org.pih.warehouse.product.GenericType',NULL,NULL,NULL,NULL),
+			(47,0,NULL,NULL,'Vegetable',0,'org.pih.warehouse.product.GenericType',NULL,NULL,NULL,NULL),
+			(48,0,NULL,NULL,'Electronics',0,'org.pih.warehouse.product.GenericType',NULL,NULL,NULL,NULL),
+			(49,0,NULL,NULL,'Meds-ARV',0,'org.pih.warehouse.product.ProductType',NULL,NULL,NULL,NULL),
+			(50,0,NULL,NULL,'Meds-TB',0,'org.pih.warehouse.product.ProductType',NULL,NULL,NULL,NULL),
+			(51,0,NULL,NULL,'Meds-Cancer',0,'org.pih.warehouse.product.ProductType',NULL,NULL,NULL,NULL),
+			(52,0,NULL,NULL,'Meds-Chronic Care',0,'org.pih.warehouse.product.ProductType',NULL,NULL,NULL,NULL),
+			(53,0,NULL,NULL,'Meds-Anesthesia',0,'org.pih.warehouse.product.ProductType',NULL,NULL,NULL,NULL),
+			(54,0,NULL,NULL,'Meds-Narcotics',0,'org.pih.warehouse.product.ProductType',NULL,NULL,NULL,NULL),
+			(55,0,NULL,NULL,'Meds-Other',0,'org.pih.warehouse.product.ProductType',NULL,NULL,NULL,NULL),
+			(56,0,NULL,NULL,'Med Supplies-Lab',0,'org.pih.warehouse.product.ProductType',NULL,NULL,NULL,NULL),
+			(57,0,NULL,NULL,'Med Supplies-Surgical',0,'org.pih.warehouse.product.ProductType',NULL,NULL,NULL,NULL),
+			(58,0,NULL,NULL,'Med Supplies-X-ray',0,'org.pih.warehouse.product.ProductType',NULL,NULL,NULL,NULL),
+			(59,0,NULL,NULL,'Med Supplies-Dental',0,'org.pih.warehouse.product.ProductType',NULL,NULL,NULL,NULL),
+			(60,0,NULL,NULL,'Med Supplies-Other',0,'org.pih.warehouse.product.ProductType',NULL,NULL,NULL,NULL),
+			(61,0,NULL,NULL,'Medical Equipment',0,'org.pih.warehouse.product.ProductType',NULL,NULL,NULL,NULL),
+			(62,0,NULL,NULL,'Surgical Equipment',0,'org.pih.warehouse.product.ProductType',NULL,NULL,NULL,NULL),
+			(63,0,NULL,NULL,'Hospital and Clinic Supplies',0,'org.pih.warehouse.product.ProductType',NULL,NULL,NULL,NULL),
+			(64,0,NULL,NULL,'Furniture and Equipment',0,'org.pih.warehouse.product.ProductType',NULL,NULL,NULL,NULL),
+			(65,0,NULL,NULL,'IT and Office',0,'org.pih.warehouse.product.ProductType',NULL,NULL,NULL,NULL),
+			(66,0,NULL,NULL,'Food',0,'org.pih.warehouse.product.ProductType',NULL,NULL,NULL,NULL),
+			(67,0,NULL,NULL,'Other',0,'org.pih.warehouse.product.ProductType',NULL,NULL,NULL,NULL),
+			(68,0,NULL,NULL,'Oral',0,'org.pih.warehouse.product.DrugRouteType',NULL,NULL,NULL,NULL),
+			(69,0,NULL,NULL,'Rectal',0,'org.pih.warehouse.product.DrugRouteType',NULL,NULL,NULL,NULL),
+			(70,0,NULL,NULL,'Intramuscular',0,'org.pih.warehouse.product.DrugRouteType',NULL,NULL,NULL,NULL),
+			(71,0,NULL,NULL,'Intravenous',0,'org.pih.warehouse.product.DrugRouteType',NULL,NULL,NULL,NULL),
+			(72,0,NULL,NULL,'Subcutaneous',0,'org.pih.warehouse.product.DrugRouteType',NULL,NULL,NULL,NULL),
+			(73,0,NULL,NULL,'Sublingual',0,'org.pih.warehouse.product.DrugRouteType',NULL,NULL,NULL,NULL),
+			(74,0,NULL,NULL,'Container',0,'org.pih.warehouse.shipping.ContainerType',NULL,NULL,NULL,NULL),
+			(75,0,NULL,NULL,'Pallet',0,'org.pih.warehouse.shipping.ContainerType',NULL,NULL,NULL,NULL),
+			(76,0,NULL,NULL,'Suitcase',0,'org.pih.warehouse.shipping.ContainerType',NULL,NULL,NULL,NULL),
+			(77,0,NULL,NULL,'Box',0,'org.pih.warehouse.shipping.ContainerType',NULL,NULL,NULL,NULL),
+			(78,0,NULL,NULL,'Trunk',0,'org.pih.warehouse.shipping.ContainerType',NULL,NULL,NULL,NULL),
+			(79,0,NULL,NULL,'Item',0,'org.pih.warehouse.shipping.ContainerType',NULL,NULL,NULL,NULL),
+			(80,0,NULL,NULL,'Other',0,'org.pih.warehouse.shipping.ContainerType',NULL,NULL,NULL,NULL),
+			(81,0,'red','Order is being processed','New',1,'org.pih.warehouse.shipping.ShipmentStatus','\0','\0','\0',NULL),
+			(82,0,'green','Items are ready to be shipped.','Ready',5,'org.pih.warehouse.shipping.ShipmentStatus','\0','\0','\0',NULL),
+			(83,0,'green','Items have been shipped from the warehouse.','Shipped',6,'org.pih.warehouse.shipping.ShipmentStatus','\0','\0','\0',NULL),
+			(84,0,'green','In transit to destination.','In transit',7,'org.pih.warehouse.shipping.ShipmentStatus','\0','\0','\0',NULL),
+			(85,0,'red','Items returned by recipient.','Returned',9,'org.pih.warehouse.shipping.ShipmentStatus','\0','\0','\0',NULL),
+			(86,0,'green','Awaiting confirmation from recipient.','Arrived',10,'org.pih.warehouse.shipping.ShipmentStatus','\0','\0','\0',NULL),
+			(87,0,'#AAA','Received confirmation from recipient.','Delivered',11,'org.pih.warehouse.shipping.ShipmentStatus','\0','\0','\0',NULL),
+			(88,0,NULL,'Shipment has been requested','Requested',0,'org.pih.warehouse.shipping.EventType','\0','','\0',NULL),
+			(89,0,NULL,'Shipment has been packed','Packed',0,'org.pih.warehouse.shipping.EventType','\0','\0','',NULL),
+			(90,0,NULL,'Shipment has been loaded onto truck','Loaded',0,'org.pih.warehouse.shipping.EventType','\0','\0','',NULL),
+			(91,0,NULL,'Shipment has departed origin','Departed',0,'org.pih.warehouse.shipping.EventType','\0','\0','',NULL),
+			(92,0,NULL,'Shipment has arrived and is awaiting signature','Arrived',0,'org.pih.warehouse.shipping.EventType','\0','\0','',NULL),
+			(93,0,NULL,'Shipment has been received','Received',0,'org.pih.warehouse.shipping.EventType','','\0','\0',NULL),
+			(94,0,NULL,'Purchase Order Number','Purchase Order Number',0,'org.pih.warehouse.shipping.ReferenceNumberType',NULL,NULL,NULL,NULL),
+			(95,0,NULL,'Customer name','Customer Name',0,'org.pih.warehouse.shipping.ReferenceNumberType',NULL,NULL,NULL,NULL),
+			(96,0,NULL,'Internal Identifier','Internal Identifier',0,'org.pih.warehouse.shipping.ReferenceNumberType',NULL,NULL,NULL,NULL),
+			(97,0,NULL,'Bill of Lading Number','Bill of Lading Number',0,'org.pih.warehouse.shipping.ReferenceNumberType',NULL,NULL,NULL,NULL),
+			(98,0,NULL,'Local supplier','Local',0,'org.pih.warehouse.supplier.SupplierType',NULL,NULL,NULL,NULL),
+			(99,0,NULL,'International supplier','International',0,'org.pih.warehouse.supplier.SupplierType',NULL,NULL,NULL,NULL),
+			(100,0,NULL,'National supplier','National',0,'org.pih.warehouse.supplier.SupplierType',NULL,NULL,NULL,NULL),
+			(101,0,NULL,'Original equipment manufacturer','OEM',0,'org.pih.warehouse.supplier.SupplierType',NULL,NULL,NULL,NULL),
+			(102,0,NULL,'Other','Other',0,'org.pih.warehouse.supplier.SupplierType',NULL,NULL,NULL,NULL),
+			(103,1,NULL,NULL,'Air',1,'org.pih.warehouse.shipping.ShipmentType',NULL,NULL,NULL,NULL),
+			(104,1,NULL,NULL,'Sea',2,'org.pih.warehouse.shipping.ShipmentType',NULL,NULL,NULL,NULL),
+			(105,1,NULL,NULL,'Domestic',3,'org.pih.warehouse.shipping.ShipmentType',NULL,NULL,NULL,NULL),
+			(106,1,NULL,NULL,'Suitcase',4,'org.pih.warehouse.shipping.ShipmentType',NULL,NULL,NULL,NULL),
+			(107,0,NULL,NULL,'Other',5,'org.pih.warehouse.shipping.ShipmentType',NULL,NULL,NULL,NULL);
+		</sql>
+	</changeSet>
+	<changeSet author="jmiranda" id="201008162047-28">
+		<sql>
+			INSERT INTO `value` (`id`, `version`, `byte_value`, `float_value`, `integer_value`, `string_value`) VALUES 
+			(1,0,NULL,NULL,NULL,'vital'),
+			(2,0,NULL,NULL,NULL,'essential'),
+			(3,0,NULL,NULL,NULL,'non-essential'),
+			(4,0,NULL,NULL,NULL,'small'),
+			(5,0,NULL,NULL,NULL,'medium'),
+			(6,0,NULL,NULL,NULL,'large'),
+			(7,0,NULL,NULL,NULL,'x-large');
+		</sql>
+	</changeSet>
+	
+
+<!-- 
+	<changeSet author="jmiranda" id="enable-foreign-key-checks"
+		runAlways="true" dbms="mysql">
+		<sql>SET FOREIGN_KEY_CHECKS=1</sql>
+	</changeSet>
+ -->
+
+</databaseChangeLog>    

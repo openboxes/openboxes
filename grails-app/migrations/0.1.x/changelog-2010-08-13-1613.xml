@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda (generated)" id="1281730430580-1">
+        <addColumn tableName="shipment">
+            <column name="carrier_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281730430580-2">
+        <addColumn tableName="shipment">
+            <column name="expected_delivery_date" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281730430580-3">
+        <addColumn tableName="shipment">
+            <column name="expected_shipping_date" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281730430580-4">
+        <addColumn tableName="shipment">
+            <column name="recipient_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281730430580-5">
+        <createIndex indexName="FKE139719A317C0A66" tableName="shipment" unique="false">
+            <column name="carrier_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281730430580-6">
+        <createIndex indexName="FKE139719A4CC797A5" tableName="shipment" unique="false">
+            <column name="recipient_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

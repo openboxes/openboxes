@@ -1,14 +1,20 @@
 package org.pih.warehouse.product;
 
+import java.util.Date;
+
 import org.pih.warehouse.core.Type;
 
 class Category extends Type {
 
-	Category parent
+	Category parentCategory
+	
+	// Audit fields
+	Date dateCreated;
+	Date lastUpdated;
 	
 	static hasMany = [ categories : Category ];
-	static mappedBy = [ categories : "parent" ];
-	static belongsTo = [ parent : Category ];
+	static mappedBy = [ categories : "parentCategory" ];
+	static belongsTo = [ parentCategory : Category ];
 	
 	static mapping = {
 		sort name:"desc"
@@ -20,7 +26,7 @@ class Category extends Type {
 	String toString() { return "$name"; }
 	
 	static constraints = {
-		parent(nullable:true)
+		parentCategory(nullable:true)
 	}  
 	
 	                     

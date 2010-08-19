@@ -2,8 +2,8 @@ package org.pih.warehouse.product;
 
 class ProductAttributeValue {
 	
-	Boolean allowMultiple
 	Attribute attribute;
+	Boolean allowMultiple
 	
 	static belongsTo = [ product : Product ]
 	static hasMany = [values : Value]

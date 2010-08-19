@@ -31,7 +31,12 @@ target('dbDiff': '''Generates change log required to make Test DB match Developm
 private ConfigObject loadTestConfig(classLoader, servletVersion, basedir, userHome, grailsAppVersion, grailsAppName, grailsHome) {
 	try {
 		def testConfigSlurper = new ConfigSlurper('test')
-		testConfigSlurper.setBinding(grailsHome: grailsHome, appName: grailsAppName, appVersion: grailsAppVersion, userHome: userHome, basedir: basedir, servletVersion: servletVersion)
+		testConfigSlurper.setBinding(grailsHome: grailsHome, 
+			appName: grailsAppName, 
+			appVersion: grailsAppVersion, 
+			userHome: userHome, 
+			basedir: basedir, 
+			servletVersion: servletVersion)
 		
 		def myClassLoader = new URLClassLoader([ classesDir.toURI().toURL()] as URL[], rootLoader)
 		def testConfig = testConfigSlurper.parse(myClassLoader.loadClass("DataSource"))

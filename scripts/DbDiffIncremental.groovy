@@ -23,6 +23,8 @@ target('dbDiffIncremental': '''Generates change log required to make Test DB mat
 		
 		def targetDatabase = getDatabase(testConfig)
 		Diff diff = new Diff(baseDatabase, targetDatabase);
+		//diff.setDiffTypes("tables, columns, primaryKeys, indexes, foreignKeys, sequences")
+		diff.setDiffTypes("tables, columns, primaryKeys, indexes");
 		DiffResult diffResult = diff.compare();
 		diffResult.printChangeLog(System.out, targetDatabase);
 	}

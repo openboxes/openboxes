@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda (generated)" id="1282017982822-1">
+        <addColumn tableName="container">
+            <column name="height" type="FLOAT(12,0)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282017982822-2">
+        <addColumn tableName="container">
+            <column name="length" type="FLOAT(12,0)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282017982822-3">
+        <addColumn tableName="container">
+            <column name="volume_units" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282017982822-4">
+        <addColumn tableName="container">
+            <column name="weight_units" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282017982822-5">
+        <addColumn tableName="container">
+            <column name="width" type="FLOAT(12,0)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282017982822-6">
+    	<sql>
+    		UPDATE container SET `weight_units` = units;
+    	</sql>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282017982822-7">
+    	<preConditions onFail="MARK_RAN">
+    		<sqlCheck expectedResult="0">
+    			SELECT COUNT(*) FROM container WHERE dimensions IS NOT NULL OR dimensions != '';
+    		</sqlCheck>
+    	</preConditions>
+    	<comment>User should manually convert dimensions into height, width, length.</comment>    
+		<dropColumn tableName="container" columnName="dimensions"/>			
+	</changeSet>
+    <changeSet author="jmiranda (generated)" id="1282017982822-8">
+		<dropColumn tableName="container" columnName="units"/>			
+	</changeSet>
+</databaseChangeLog>

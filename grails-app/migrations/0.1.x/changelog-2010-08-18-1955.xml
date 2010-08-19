@@ -1,0 +1,624 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda (generated)" id="1282175660720-1">
+        <createTable tableName="donor">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-2">
+        <createTable tableName="inventory_lot">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expiration_date" type="DATETIME"/>
+            <column name="lot_number" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-3">
+        <createTable tableName="party">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-4">
+        <createTable tableName="party_type">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-5">
+        <createTable tableName="product_name">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_brand_name" type="BIT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_generic_name" type="BIT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-6">
+        <createTable tableName="role">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="role_type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-7">
+        <createTable tableName="shipper">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="parameter_name" type="VARCHAR(255)"/>
+            <column name="tracking_format" type="VARCHAR(255)"/>
+            <column name="tracking_url" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-8">
+        <createTable tableName="shipper_service">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-9">
+        <createTable tableName="shipper_shipper_service">
+            <column name="shipper_shipper_services_id" type="BIGINT"/>
+            <column name="shipper_service_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-10">
+        <createTable tableName="user">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="active" type="BIT"/>
+            <column name="last_login_date" type="DATETIME"/>
+            <column name="manager_id" type="BIGINT"/>
+            <column name="password" type="VARCHAR(255)"/>
+            <column name="username" type="VARCHAR(255)"/>
+            <column name="warehouse_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-11">
+        <createTable tableName="user_role">
+            <column name="user_roles_id" type="BIGINT"/>
+            <column name="role_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-12">
+        <addColumn tableName="address">
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-13">
+        <addColumn tableName="address">
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-14">
+        <addColumn tableName="attribute">
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-15">
+        <addColumn tableName="attribute">
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-16">
+        <addColumn tableName="comment">
+            <column name="shipment_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-17">
+        <addColumn tableName="generic_product">
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-18">
+        <addColumn tableName="generic_product">
+            <column name="generic_type_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-19">
+        <addColumn tableName="generic_product">
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-20">
+        <addColumn tableName="generic_product">
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-21">
+        <addColumn tableName="inventory_item">
+            <column name="inventory_lot_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-22">
+        <addColumn tableName="inventory_item">
+            <column name="quantity_on_hand" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-23">
+        <addColumn tableName="inventory_item">
+            <column name="serial_number" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-24">
+        <addColumn tableName="location">
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-25">
+        <addColumn tableName="location">
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-26">
+        <addColumn tableName="organization">
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-27">
+        <addColumn tableName="organization">
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-28">
+        <addColumn tableName="person">
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-29">
+        <addColumn tableName="person">
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-30">
+        <addColumn tableName="person">
+            <column name="phone_number" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-31">
+        <addColumn tableName="product">
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-32">
+        <addColumn tableName="product">
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-33">
+        <addColumn tableName="shipment">
+            <column name="courier_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-34">
+        <addColumn tableName="shipment_item">
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-35">
+        <addColumn tableName="shipment_item">
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-36">
+        <addColumn tableName="shipment_item">
+            <column name="lot_number" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-37">
+        <addColumn tableName="shipment_method">
+            <column name="carrier_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-38">
+        <addColumn tableName="shipment_method">
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-39">
+        <addColumn tableName="shipment_method">
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-40">
+        <addColumn tableName="shipment_method">
+            <column name="shipment_service_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-41">
+        <addColumn tableName="shipment_method">
+            <column name="tracking_number" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-42">
+        <addColumn tableName="tag">
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-43">
+        <addColumn tableName="tag">
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-44">
+        <addColumn tableName="type">
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-45">
+        <addColumn tableName="type">
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-46">
+        <addColumn tableName="type">
+            <column name="parent_category_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-47">
+        <addColumn tableName="type">
+            <column name="parent_drug_class_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-48">
+        <addColumn tableName="value">
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-49">
+        <addColumn tableName="value">
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-50">
+        <addNotNullConstraint columnDataType="BIGINT" columnName="inventory_id" defaultNullValue="" tableName="inventory_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-51">
+        <dropNotNullConstraint columnDataType="BIGINT" columnName="product_id" tableName="inventory_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-52">
+        <createIndex indexName="FK38A5EE5F3B5F6286" tableName="comment" unique="false">
+            <column name="shipment_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-53">
+        <createIndex indexName="FK19B6B687E0FEE896" tableName="generic_product" unique="false">
+            <column name="generic_type_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-54">
+        <createIndex indexName="FKA518DDEEDED5FAE7" tableName="inventory_lot" unique="false">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-55">
+        <createIndex indexName="FKE139719A7CADA8BD" tableName="shipment" unique="false">
+            <column name="courier_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-56">
+        <createIndex indexName="FK40203B26463BEACA" tableName="shipment_method" unique="false">
+            <column name="shipment_service_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-57">
+        <createIndex indexName="FK40203B26EAE5CC97" tableName="shipment_method" unique="false">
+            <column name="carrier_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-58">
+        <createIndex indexName="FK847AAAF9296B2CA3" tableName="shipper_shipper_service" unique="false">
+            <column name="shipper_service_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-59">
+        <createIndex indexName="FK847AAAF9DBD37BB5" tableName="shipper_shipper_service" unique="false">
+            <column name="shipper_shipper_services_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-60">
+        <createIndex indexName="FK368F3A619A2EF8" tableName="type" unique="false">
+            <column name="parent_category_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-61">
+        <createIndex indexName="FK368F3AC427B631" tableName="type" unique="false">
+            <column name="parent_drug_class_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-62">
+        <createIndex indexName="FK36EBCB1171F854" tableName="user" unique="false">
+            <column name="warehouse_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-63">
+        <createIndex indexName="FK36EBCB41E07A73" tableName="user" unique="false">
+            <column name="manager_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-64">
+        <createIndex indexName="FK143BF46AA0553B57" tableName="user_role" unique="false">
+            <column name="user_roles_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-65">
+        <dropIndex indexName="FK5C6729A3B5F6286" tableName="event"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-66">
+        <dropIndex indexName="FK5C6729A4415A5B0" tableName="event"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-67">
+        <dropIndex indexName="FK5C6729A502BEA27" tableName="event"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-68">
+        <dropIndex indexName="FK5C6729AF2CDAB03" tableName="event"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-69">
+        <dropIndex indexName="FK714F9FB561ED379F" tableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-70">
+        <dropIndex indexName="FKC4E39B551171F854" tableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-71">
+        <dropIndex indexName="FKC4E39B55B4B2F9C7" tableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-72">
+        <dropIndex indexName="FKED8DCCEFC4D2DD00" tableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-73">
+        <dropIndex indexName="FK4EDD0CB02B0098E8" tableName="product_attribute_value_value"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-74">
+        <dropIndex indexName="FKA71C9001DED5FAE7" tableName="product_lot"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-75">
+        <dropIndex indexName="FKE139719A25FD467A" tableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-76">
+        <dropIndex indexName="FKE139719A317C0A66" tableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-77">
+        <dropIndex indexName="FKE139719A572BAB82" tableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-78">
+        <dropIndex indexName="FKE139719AA28CC5FB" tableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-79">
+        <dropIndex indexName="FKC398CCBA1C5898C7" tableName="shipment_comment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-80">
+        <dropIndex indexName="FKC398CCBAAE3040CE" tableName="shipment_comment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-81">
+        <dropIndex indexName="FKDA3BB298572BAB82" tableName="shipment_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-82">
+        <dropIndex indexName="FK312F6C292388BC5" tableName="shipment_reference_number"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-83">
+        <dropIndex indexName="FK7FA0D2DEB3FB7111" tableName="transaction"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-84">
+        <dropIndex indexName="FKABC21FD12EF4C7F4" tableName="transaction_entry"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-85">
+        <dropColumn columnName="bin_location" tableName="inventory_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-86">
+        <dropColumn columnName="ideal_quantity" tableName="inventory_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-87">
+        <dropColumn columnName="quantity" tableName="inventory_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-88">
+        <dropColumn columnName="reorder_quantity" tableName="inventory_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-89">
+        <dropColumn columnName="version" tableName="organization"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-90">
+        <dropColumn columnName="class" tableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-91">
+        <dropColumn columnName="last_login_date" tableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-92">
+        <dropColumn columnName="manager_id" tableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-93">
+        <dropColumn columnName="password" tableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-94">
+        <dropColumn columnName="phone_no" tableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-95">
+        <dropColumn columnName="role" tableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-96">
+        <dropColumn columnName="username" tableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-97">
+        <dropColumn columnName="version" tableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-98">
+        <dropColumn columnName="warehouse_id" tableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-99">
+        <dropColumn columnName="dosage_regimen" tableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-100">
+        <dropColumn columnName="major_drug_class_id" tableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-101">
+        <dropColumn columnName="carrier_id" tableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-102">
+        <dropColumn columnName="tracking_number" tableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-103">
+        <dropColumn columnName="donation" tableName="shipment_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-104">
+        <dropColumn columnName="gross_weight" tableName="shipment_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-105">
+        <dropColumn columnName="unit_weight" tableName="shipment_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-106">
+        <dropColumn columnName="method_name" tableName="shipment_method"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-107">
+        <dropColumn columnName="name" tableName="shipment_method"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-108">
+        <dropColumn columnName="parameter_name" tableName="shipment_method"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-109">
+        <dropColumn columnName="tracking_format" tableName="shipment_method"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-110">
+        <dropColumn columnName="tracking_url" tableName="shipment_method"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-111">
+        <dropColumn columnName="color" tableName="type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-112">
+        <dropTable tableName="event"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-113">
+        <dropTable tableName="product_lot"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282175660720-114">
+        <dropTable tableName="shipment_comment"/>
+    </changeSet>
+    <changeSet author="jmiranda" id="1282175660720-115">
+        <sql>
+		INSERT INTO `user` (`id`, `username`, `password`) VALUES
+		(1,'super','password'),
+		(2,'manager','password'),
+		(3,'jmiranda','password');		
+	</sql>
+    </changeSet>
+    <changeSet author="jmiranda" id="1282175660720-116">
+        <sql>
+		INSERT INTO `party` (`id`, `version`) VALUES
+		(1, 0),
+		(2, 0),
+		(3, 0);		
+	</sql>
+    </changeSet>
+</databaseChangeLog>
+

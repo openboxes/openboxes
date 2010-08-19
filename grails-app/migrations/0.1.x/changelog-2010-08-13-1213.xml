@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda (generated)" id="1281715647499-1">
+        <modifyColumn tableName="catalog_item">
+            <column name="description" type="VARCHAR(2000)"/>
+        </modifyColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-2">
+        <dropNotNullConstraint columnDataType="DATETIME" columnName="date_created" tableName="comment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-3">
+        <dropNotNullConstraint columnDataType="DATETIME" columnName="last_updated" tableName="comment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-4">
+        <dropIndex indexName="FK5CA405502C9564B0" tableName="application"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-5">
+        <dropIndex indexName="FK5CA4055032144692" tableName="application"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-6">
+        <dropIndex indexName="FKD7F53A0E361812E7" tableName="attribute_value"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-7">
+        <dropIndex indexName="FKD7F53A0E8C0B9A5E" tableName="attribute_value"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-8">
+        <dropIndex indexName="FK211F60194E19F329" tableName="catalog"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-9">
+        <dropIndex indexName="FKBB91FB79DDA4FBD1" tableName="catalog_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-10">
+        <dropIndex indexName="FKBB91FB79DED5FAE7" tableName="catalog_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-11">
+        <dropIndex indexName="FK62F285D4226CC83E" tableName="catalog_item_tag"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-12">
+        <dropIndex indexName="FK62F285D4D9784587" tableName="catalog_item_tag"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-13">
+        <dropIndex indexName="FK38A5EE5F4FBA11C8" tableName="comment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-14">
+        <dropIndex indexName="FK38A5EE5F6B586FDB" tableName="comment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-15">
+        <dropIndex indexName="FKE7814C8117A6E251" tableName="container"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-16">
+        <dropIndex indexName="FKE7814C813B5F6286" tableName="container"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-17">
+        <dropIndex indexName="FK335CD11B3B5F6286" tableName="document"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-18">
+        <dropIndex indexName="FK335CD11B64BE051D" tableName="document"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-19">
+        <dropIndex indexName="FK497F34AD35EDD9DE" tableName="drug_product_condition_type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-20">
+        <dropIndex indexName="FK497F34ADD05604D0" tableName="drug_product_condition_type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-21">
+        <dropIndex indexName="FK5C6729A3B5F6286" tableName="event"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-22">
+        <dropIndex indexName="FK5C6729A4415A5B0" tableName="event"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-23">
+        <dropIndex indexName="FK5C6729A502BEA27" tableName="event"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-24">
+        <dropIndex indexName="FK5C6729AF2CDAB03" tableName="event"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-25">
+        <dropIndex indexName="FK19B6B687E0FEE896" tableName="generic_product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-26">
+        <dropIndex indexName="FKFE01941672A2C5B4" tableName="inventory_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-27">
+        <dropIndex indexName="FKFE019416DED5FAE7" tableName="inventory_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-28">
+        <dropIndex indexName="FK714F9FB561ED379F" tableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-29">
+        <dropIndex indexName="FK714F9FB572A2C5B4" tableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-30">
+        <dropIndex indexName="FK714F9FB5B4B2F9C7" tableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-31">
+        <dropIndex indexName="FK651874E7E20AF0C" tableName="order"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-32">
+        <dropIndex indexName="FK493194CDDED5FAE7" tableName="order_line_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-33">
+        <dropIndex indexName="FK6A7815DC1D65794E" tableName="order_order_line_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-34">
+        <dropIndex indexName="FK6A7815DCC2FAEE" tableName="order_order_line_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-35">
+        <dropIndex indexName="FKC4E39B551171F854" tableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-36">
+        <dropIndex indexName="FKC4E39B55B4B2F9C7" tableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-37">
+        <dropIndex indexName="FKED8DCCEF7D4BD1B" tableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-38">
+        <dropIndex indexName="FKED8DCCEFABD88AC6" tableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-39">
+        <dropIndex indexName="FKED8DCCEFC4D2DD00" tableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-40">
+        <dropIndex indexName="FKED8DCCEFE0FEE896" tableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-41">
+        <dropIndex indexName="FKED8DCCEFEF4C770D" tableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-42">
+        <dropIndex indexName="FK6C229EBE47B0D087" tableName="product_attribute_value"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-43">
+        <dropIndex indexName="FK6C229EBEDED5FAE7" tableName="product_attribute_value"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-44">
+        <dropIndex indexName="FK4EDD0CB02B0098E8" tableName="product_attribute_value_value"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-45">
+        <dropIndex indexName="FK4EDD0CB0361812E7" tableName="product_attribute_value_value"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-46">
+        <dropIndex indexName="FKDDB2C140DED5FAE7" tableName="product_brand_names"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-47">
+        <dropIndex indexName="FKA0303E4EB031274A" tableName="product_category"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-48">
+        <dropIndex indexName="FKA0303E4EEF4C770D" tableName="product_category"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-49">
+        <dropIndex indexName="FKA71C9001DED5FAE7" tableName="product_lot"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-50">
+        <dropIndex indexName="FKD790DEBD154F600" tableName="reference_number"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-51">
+        <dropIndex indexName="FKE139719A1E2B3CDC" tableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-52">
+        <dropIndex indexName="FKE139719A25FD467A" tableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-53">
+        <dropIndex indexName="FKE139719A572BAB82" tableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-54">
+        <dropIndex indexName="FKE139719AA28CC5FB" tableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-55">
+        <dropIndex indexName="FKE139719ADBDEDAC4" tableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-56">
+        <dropIndex indexName="FKE139719AFF77FF9B" tableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-57">
+        <dropIndex indexName="FKC398CCBA1C5898C7" tableName="shipment_comment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-58">
+        <dropIndex indexName="FKC398CCBAAE3040CE" tableName="shipment_comment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-59">
+        <dropIndex indexName="FKDA3BB298572BAB82" tableName="shipment_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-60">
+        <dropIndex indexName="FKDA3BB2987400E88E" tableName="shipment_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-61">
+        <dropIndex indexName="FKDA3BB298DED5FAE7" tableName="shipment_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-62">
+        <dropIndex indexName="FK5AD812A13B5F6286" tableName="shipment_package"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-63">
+        <dropIndex indexName="FK5AD812A1C5DD3516" tableName="shipment_package"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-64">
+        <dropIndex indexName="FK1CD7E97A87D639A1" tableName="shipment_package_shipment_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-65">
+        <dropIndex indexName="FK1CD7E97AB06EC4FB" tableName="shipment_package_shipment_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-66">
+        <dropIndex indexName="FK312F6C25F1E7ECF" tableName="shipment_reference_number"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-67">
+        <dropIndex indexName="FK312F6C292388BC5" tableName="shipment_reference_number"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-68">
+        <dropIndex indexName="FK69C15B817A6E251" tableName="shipment_type_container_type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-69">
+        <dropIndex indexName="FK69C15B8323E731F" tableName="shipment_type_container_type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-70">
+        <dropIndex indexName="FK7FA0D2DE72A2C5B4" tableName="transaction"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-71">
+        <dropIndex indexName="FK7FA0D2DE72B43DC7" tableName="transaction"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-72">
+        <dropIndex indexName="FK7FA0D2DEB3FB7111" tableName="transaction"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-73">
+        <dropIndex indexName="FK7FA0D2DEB9F1C442" tableName="transaction"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-74">
+        <dropIndex indexName="FK7FA0D2DEC6128A8" tableName="transaction"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-75">
+        <dropIndex indexName="FKABC21FD12EF4C7F4" tableName="transaction_entry"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-76">
+        <dropIndex indexName="FKABC21FD1DED5FAE7" tableName="transaction_entry"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-77">
+        <dropIndex indexName="FK368F3AF0A7BE1" tableName="type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-78">
+        <addForeignKeyConstraint baseColumnNames="parent_id" baseTableName="application" constraintName="FK5CA4055032144692" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="server"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-79">
+        <addForeignKeyConstraint baseColumnNames="self_id" baseTableName="application" constraintName="FK5CA405502C9564B0" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="server"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-80">
+        <addForeignKeyConstraint baseColumnNames="attribute_values_id" baseTableName="attribute_value" constraintName="FKD7F53A0E8C0B9A5E" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="attribute"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-81">
+        <addForeignKeyConstraint baseColumnNames="value_id" baseTableName="attribute_value" constraintName="FKD7F53A0E361812E7" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="value"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-82">
+        <addForeignKeyConstraint baseColumnNames="store_id" baseTableName="catalog" constraintName="FK211F60194E19F329" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-83">
+        <addForeignKeyConstraint baseColumnNames="catalog_id" baseTableName="catalog_item" constraintName="FKBB91FB79DDA4FBD1" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="catalog"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-84">
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="catalog_item" constraintName="FKBB91FB79DED5FAE7" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-85">
+        <addForeignKeyConstraint baseColumnNames="catalog_item_tags_id" baseTableName="catalog_item_tag" constraintName="FK62F285D4226CC83E" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="catalog_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-86">
+        <addForeignKeyConstraint baseColumnNames="tag_id" baseTableName="catalog_item_tag" constraintName="FK62F285D4D9784587" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="tag"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-87">
+        <addForeignKeyConstraint baseColumnNames="commenter_id" baseTableName="comment" constraintName="FK38A5EE5F4FBA11C8" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-88">
+        <addForeignKeyConstraint baseColumnNames="recipient_id" baseTableName="comment" constraintName="FK38A5EE5F6B586FDB" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-89">
+        <addForeignKeyConstraint baseColumnNames="container_type_id" baseTableName="container" constraintName="FKE7814C8117A6E251" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-90">
+        <addForeignKeyConstraint baseColumnNames="shipment_id" baseTableName="container" constraintName="FKE7814C813B5F6286" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-91">
+        <addForeignKeyConstraint baseColumnNames="document_type_id" baseTableName="document" constraintName="FK335CD11B64BE051D" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-92">
+        <addForeignKeyConstraint baseColumnNames="shipment_id" baseTableName="document" constraintName="FK335CD11B3B5F6286" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-93">
+        <addForeignKeyConstraint baseColumnNames="condition_type_id" baseTableName="drug_product_condition_type" constraintName="FK497F34AD35EDD9DE" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-94">
+        <addForeignKeyConstraint baseColumnNames="drug_product_condition_types_id" baseTableName="drug_product_condition_type" constraintName="FK497F34ADD05604D0" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-95">
+        <addForeignKeyConstraint baseColumnNames="event_location_id" baseTableName="event" constraintName="FK5C6729A4415A5B0" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-96">
+        <addForeignKeyConstraint baseColumnNames="event_type_id" baseTableName="event" constraintName="FK5C6729AF2CDAB03" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-97">
+        <addForeignKeyConstraint baseColumnNames="shipment_id" baseTableName="event" constraintName="FK5C6729A3B5F6286" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-98">
+        <addForeignKeyConstraint baseColumnNames="target_location_id" baseTableName="event" constraintName="FK5C6729A502BEA27" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-99">
+        <addForeignKeyConstraint baseColumnNames="generic_type_id" baseTableName="generic_product" constraintName="FK19B6B687E0FEE896" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-100">
+        <addForeignKeyConstraint baseColumnNames="inventory_id" baseTableName="inventory_item" constraintName="FKFE01941672A2C5B4" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="inventory"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-101">
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="inventory_item" constraintName="FKFE019416DED5FAE7" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-102">
+        <addForeignKeyConstraint baseColumnNames="address_id" baseTableName="location" constraintName="FK714F9FB561ED379F" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="address"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-103">
+        <addForeignKeyConstraint baseColumnNames="inventory_id" baseTableName="location" constraintName="FK714F9FB572A2C5B4" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="inventory"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-104">
+        <addForeignKeyConstraint baseColumnNames="manager_id" baseTableName="location" constraintName="FK714F9FB5B4B2F9C7" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-105">
+        <addForeignKeyConstraint baseColumnNames="customer_id" baseTableName="order" constraintName="FK651874E7E20AF0C" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-106">
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="order_line_item" constraintName="FK493194CDDED5FAE7" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-107">
+        <addForeignKeyConstraint baseColumnNames="order_line_item_id" baseTableName="order_order_line_item" constraintName="FK6A7815DC1D65794E" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="order_line_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-108">
+        <addForeignKeyConstraint baseColumnNames="order_line_items_id" baseTableName="order_order_line_item" constraintName="FK6A7815DCC2FAEE" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="order"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-109">
+        <addForeignKeyConstraint baseColumnNames="manager_id" baseTableName="person" constraintName="FKC4E39B55B4B2F9C7" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-110">
+        <addForeignKeyConstraint baseColumnNames="warehouse_id" baseTableName="person" constraintName="FKC4E39B551171F854" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-111">
+        <addForeignKeyConstraint baseColumnNames="category_id" baseTableName="product" constraintName="FKED8DCCEFEF4C770D" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-112">
+        <addForeignKeyConstraint baseColumnNames="drug_route_type_id" baseTableName="product" constraintName="FKED8DCCEF7D4BD1B" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-113">
+        <addForeignKeyConstraint baseColumnNames="generic_type_id" baseTableName="product" constraintName="FKED8DCCEFE0FEE896" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-114">
+        <addForeignKeyConstraint baseColumnNames="major_drug_class_id" baseTableName="product" constraintName="FKED8DCCEFC4D2DD00" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-115">
+        <addForeignKeyConstraint baseColumnNames="product_type_id" baseTableName="product" constraintName="FKED8DCCEFABD88AC6" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-116">
+        <addForeignKeyConstraint baseColumnNames="attribute_id" baseTableName="product_attribute_value" constraintName="FK6C229EBE47B0D087" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="attribute"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-117">
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="product_attribute_value" constraintName="FK6C229EBEDED5FAE7" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-118">
+        <addForeignKeyConstraint baseColumnNames="product_attribute_value_values_id" baseTableName="product_attribute_value_value" constraintName="FK4EDD0CB02B0098E8" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product_attribute_value"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-119">
+        <addForeignKeyConstraint baseColumnNames="value_id" baseTableName="product_attribute_value_value" constraintName="FK4EDD0CB0361812E7" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="value"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-120">
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="product_brand_names" constraintName="FKDDB2C140DED5FAE7" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-121">
+        <addForeignKeyConstraint baseColumnNames="category_id" baseTableName="product_category" constraintName="FKA0303E4EEF4C770D" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-122">
+        <addForeignKeyConstraint baseColumnNames="product_categories_id" baseTableName="product_category" constraintName="FKA0303E4EB031274A" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-123">
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="product_lot" constraintName="FKA71C9001DED5FAE7" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-124">
+        <addForeignKeyConstraint baseColumnNames="reference_number_type_id" baseTableName="reference_number" constraintName="FKD790DEBD154F600" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-125">
+        <addForeignKeyConstraint baseColumnNames="current_event_id" baseTableName="shipment" constraintName="FKE139719A25FD467A" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="event"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-126">
+        <addForeignKeyConstraint baseColumnNames="destination_id" baseTableName="shipment" constraintName="FKE139719A1E2B3CDC" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-127">
+        <addForeignKeyConstraint baseColumnNames="donor_id" baseTableName="shipment" constraintName="FKE139719A572BAB82" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="organization"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-128">
+        <addForeignKeyConstraint baseColumnNames="origin_id" baseTableName="shipment" constraintName="FKE139719ADBDEDAC4" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-129">
+        <addForeignKeyConstraint baseColumnNames="shipment_method_id" baseTableName="shipment" constraintName="FKE139719AA28CC5FB" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="shipment_method"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-130">
+        <addForeignKeyConstraint baseColumnNames="shipment_type_id" baseTableName="shipment" constraintName="FKE139719AFF77FF9B" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-131">
+        <addForeignKeyConstraint baseColumnNames="comment_id" baseTableName="shipment_comment" constraintName="FKC398CCBAAE3040CE" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="comment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-132">
+        <addForeignKeyConstraint baseColumnNames="shipment_comments_id" baseTableName="shipment_comment" constraintName="FKC398CCBA1C5898C7" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-133">
+        <addForeignKeyConstraint baseColumnNames="container_id" baseTableName="shipment_item" constraintName="FKDA3BB2987400E88E" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="container"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-134">
+        <addForeignKeyConstraint baseColumnNames="donor_id" baseTableName="shipment_item" constraintName="FKDA3BB298572BAB82" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="organization"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-135">
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="shipment_item" constraintName="FKDA3BB298DED5FAE7" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-136">
+        <addForeignKeyConstraint baseColumnNames="package_type_id" baseTableName="shipment_package" constraintName="FK5AD812A1C5DD3516" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-137">
+        <addForeignKeyConstraint baseColumnNames="shipment_id" baseTableName="shipment_package" constraintName="FK5AD812A13B5F6286" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-138">
+        <addForeignKeyConstraint baseColumnNames="shipment_item_id" baseTableName="shipment_package_shipment_item" constraintName="FK1CD7E97AB06EC4FB" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="shipment_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-139">
+        <addForeignKeyConstraint baseColumnNames="shipment_package_shipment_items_id" baseTableName="shipment_package_shipment_item" constraintName="FK1CD7E97A87D639A1" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="shipment_package"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-140">
+        <addForeignKeyConstraint baseColumnNames="reference_number_id" baseTableName="shipment_reference_number" constraintName="FK312F6C292388BC5" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="reference_number"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-141">
+        <addForeignKeyConstraint baseColumnNames="shipment_reference_numbers_id" baseTableName="shipment_reference_number" constraintName="FK312F6C25F1E7ECF" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-142">
+        <addForeignKeyConstraint baseColumnNames="container_type_id" baseTableName="shipment_type_container_type" constraintName="FK69C15B817A6E251" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-143">
+        <addForeignKeyConstraint baseColumnNames="shipment_type_container_types_id" baseTableName="shipment_type_container_type" constraintName="FK69C15B8323E731F" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-144">
+        <addForeignKeyConstraint baseColumnNames="inventory_event_id" baseTableName="transaction" constraintName="FK7FA0D2DE72B43DC7" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="inventory_event"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-145">
+        <addForeignKeyConstraint baseColumnNames="inventory_id" baseTableName="transaction" constraintName="FK7FA0D2DE72A2C5B4" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="inventory"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-146">
+        <addForeignKeyConstraint baseColumnNames="local_warehouse_id" baseTableName="transaction" constraintName="FK7FA0D2DEC6128A8" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-147">
+        <addForeignKeyConstraint baseColumnNames="target_warehouse_id" baseTableName="transaction" constraintName="FK7FA0D2DEB9F1C442" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-148">
+        <addForeignKeyConstraint baseColumnNames="transaction_type_id" baseTableName="transaction" constraintName="FK7FA0D2DEB3FB7111" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="transaction_type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-149">
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="transaction_entry" constraintName="FKABC21FD1DED5FAE7" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-150">
+        <addForeignKeyConstraint baseColumnNames="transaction_id" baseTableName="transaction_entry" constraintName="FKABC21FD12EF4C7F4" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="transaction"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1281715647499-151">
+        <addForeignKeyConstraint baseColumnNames="parent_id" baseTableName="type" constraintName="FK368F3AF0A7BE1" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="type"/>
+    </changeSet>
+</databaseChangeLog>

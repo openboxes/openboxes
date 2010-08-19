@@ -1,8 +1,6 @@
 package org.pih.warehouse.data
 
-
-
-class DataImportService {
+class DataService {
 	
 	static transactional = true
 	

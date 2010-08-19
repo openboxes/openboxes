@@ -22,13 +22,11 @@
 </head>
 
 <body>    
-	<div class="body">	
-	
+	<div class="body">
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
 		</g:if>
-		
-		
+				
 		<table>
 			<tr>
 				<td colspan="2">
@@ -70,8 +68,7 @@
 							</table>
 						</div>				
 				
-					<div id="details" class="section">
-						<div style="">
+						<div id="details" class="section">
 							<table cellspacing="5" cellpadding="5">
 								<tbody>
 
@@ -452,18 +449,19 @@
 								</tbody>
 							</table>
 						</div>
-					</div>
-				</fieldset>
-			</td>		
+					</fieldset>
+				</td>		
 				<td width="30%">
 					<div style="width: 300px">
 						<fieldset>
 							<legend>Actions</legend>
+							
+							<h3>Prepare Shipment</h3>
 							<table>
 								<tr class="prop">
 									<td>
 										<g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}"><img
-										src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}"
+										src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}"
 										alt="Show Shipment" style="vertical-align: middle" /> &nbsp; <b>show details</b></g:link>
 									
 									</td>
@@ -500,6 +498,31 @@
 									</td>
 								</tr>					
 							</table>
+							<br/>
+							<h3>Send Shipment</h3>
+							<table>
+								<tr class="prop">
+									<td>
+										<g:link controller="shipment" action="sendShipment" id="${shipmentInstance.id}"><img
+										src="${createLinkTo(dir:'images/icons',file:'truck.png')}"
+										alt="Send Shipment" style="vertical-align: middle" /> &nbsp; send shipment</g:link>
+									
+									</td>
+								</tr>
+							</table>							
+							<br/>
+							<h3>Receive Shipment</h3>
+							<table>
+								<tr class="prop">
+									<td>
+										<g:link controller="shipment" action="receiveShipment" id="${shipmentInstance.id}"><img
+										src="${createLinkTo(dir:'images/icons',file:'handtruck.png')}"
+										alt="Send Shipment" style="vertical-align: middle" /> &nbsp; receive shipment</g:link>
+									
+									</td>
+								</tr>
+							</table>							
+							
 						</fieldset>
 					</div>
 					<br/>

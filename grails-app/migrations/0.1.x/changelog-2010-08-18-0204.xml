@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+	<changeSet author="jmiranda (generated)" id="1282111194470-1">
+        <addNotNullConstraint columnDataType="BIGINT" columnName="transaction_id" defaultNullValue="" tableName="transaction_entry"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282111194470-14">
+        <dropColumn columnName="mark_as_important" tableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282111194470-15">
+        <dropColumn columnName="quantity_per_unit" tableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282111194470-16">
+        <dropColumn columnName="unit" tableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282111194470-17">
+        <dropColumn columnName="weight" tableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282111194470-18">
+        <dropTable tableName="product_brand_names"/>
+    </changeSet>
+   
+
+</databaseChangeLog>

@@ -1,5 +1,7 @@
 package org.pih.warehouse.product;
 
+import java.util.Date;
+
 import org.pih.warehouse.core.Type;
 
 /**
@@ -12,6 +14,10 @@ import org.pih.warehouse.core.Type;
  */
 class DrugClass extends Type {
 
-	static belongsTo = [ parent : DrugClass ]
+	static belongsTo = [ parentDrugClass : DrugClass ]
+	
+	// Audit fields
+	Date dateCreated;
+	Date lastUpdated;
 	
 }

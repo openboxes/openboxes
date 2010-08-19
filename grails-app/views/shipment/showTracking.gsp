@@ -920,10 +920,6 @@
 												</td>
 												<%-- 
 												<td>
-													<g:select id="targetLocationId" name='targetLocationId' noSelection="${['':'Select one ...']}" from='${Location.list()}' optionKey="id" optionValue="name">
-													</g:select>									
-												</td>									
-												<td>
 													<g:textField name="description" size="15" /> 
 											    </td>
 											    --%>
@@ -1189,13 +1185,7 @@
 				                                </td>
 					                        </tr>  	          
 										<%-- 
-											<tr class="prop">
-					                            <td valign="top" class="name"><label><g:message code="event.eventDate.label" default="Event Date" /></label></td>                            
-					                            <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'eventDate', 'errors')}">
-													<g:select id="targetLocationId" name='targetLocationId' noSelection="${['':'Select one ...']}" 
-														from='${Location.list()}' optionKey="id" optionValue="name"></g:select>									
-				                                </td>
-					                        </tr>  	          
+											          
 											<tr class="prop">
 					                            <td valign="top" class="name"><label><g:message code="event.description.label" default="Comment" /></label></td>                            
 					                            <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'description', 'errors')}">

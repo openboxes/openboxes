@@ -1,5 +1,7 @@
 package org.pih.warehouse.user
 
+import org.pih.warehouse.core.User;
+
 class AuthController {
 
     static allowedMethods = [login: "GET", doLogin: "POST", logout: "GET"];
@@ -35,8 +37,9 @@ class AuthController {
      */
     def doLogin = {
 		log.debug "doLogin"		
-    	def userInstance = User.findWhere(username:params['username'], password:params['password'])
-    		
+    		def userInstance = User.findWhere(username:params['username'], password:params['password'])
+    		def userList = User.getAll();
+		log.info "user list: " + userList;
 		// Successfully logged in
 		if (userInstance) {
 			session.user = userInstance;
@@ -48,7 +51,7 @@ class AuthController {
 		// Invalid username or password
 		else {
 			
-		    log.info "user does not exist or password is incorrect";
+		    log.info "user does $params.username not exist or password $params.password is incorrect";
 		    //flash.message = "Unable to authenticate user with the provided credentials."
 	
 			userInstance = new User(username:params['username'], password:params['password'])

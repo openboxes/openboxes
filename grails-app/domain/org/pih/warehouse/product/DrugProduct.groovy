@@ -22,27 +22,24 @@ import org.pih.warehouse.core.Type;
  */
 class DrugProduct extends ConsumableProduct {
 	
-    String genericName		// generic name: Ibuprofen 
-	String dosageStrength	// e.g. "200 mg"	
-    String dosageForm		// e.g. "tablet" 
-    String dosageRegimen	// e.g. "Take two capsules by mouth daily"
-    String drugClass 		// should be a separate object (and needs to be very expressive)
-
-    //PackageType packageType			// e.g. bottle, vial
+    String genericName				// generic name: Ibuprofen 
+	String dosageStrength			// e.g. "200 mg"	
+    String dosageForm				// e.g. "tablet" 
+    //String dosageRegimen			// e.g. "Take two capsules by mouth daily"
+    //PackageType packageType		// e.g. bottle, vial
     DrugRouteType drugRouteType		// route of administration (oral, rectal, etc)
-    DrugClass majorDrugClass 		// replaces drug class string above
+    //DrugClass drugClass 			// replaces drug class string above
     
 	
-	static hasMany = [ conditionTypes : ConditionType ]
+	//static hasMany = [ conditionTypes : ConditionType ]
     
     static constraints = {
     	genericName(nullable:true)
 		dosageStrength(nullable:true)
     	dosageForm(nullable:true)
-    	dosageRegimen(nullable:true)
-    	drugClass(nullable:true)
-    	//packageType(nullable:true)
+    	//dosageRegimen(nullable:true)
     	drugRouteType(nullable:true)
-    	majorDrugClass(nullable:true)
+		//drugClass(nullable:true)
+		
     }
 }

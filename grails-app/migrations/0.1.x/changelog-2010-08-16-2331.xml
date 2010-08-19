@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda (generated)" id="1282015806393-1">
+        <addNotNullConstraint columnDataType="VARCHAR(2000)" columnName="description" defaultNullValue="" tableName="catalog_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282015806393-2">
+        <dropNotNullConstraint columnDataType="BIGINT" columnName="document_type_id" tableName="document"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282015806393-3">
+        <modifyColumn tableName="document">
+            <column name="file_contents" type="MEDIUMBLOB"/>
+        </modifyColumn>
+    </changeSet>    
+    <changeSet author="jmiranda (generated)" id="1282015806393-4">
+        <dropNotNullConstraint columnDataType="MEDIUMBLOB" columnName="file_contents" tableName="document"/>
+    </changeSet>
+
+</databaseChangeLog>

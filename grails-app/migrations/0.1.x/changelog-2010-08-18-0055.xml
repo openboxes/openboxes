@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda (generated)" id="1282107522049-1">
+        <addColumn tableName="comment">
+            <column name="date_read" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282107522049-2">
+        <addColumn tableName="comment">
+            <column name="date_sent" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282107522049-3">
+        <addColumn tableName="comment">
+            <column name="sender_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282107522049-4">
+        <addColumn tableName="shipment_item">
+            <column name="recipient_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282107522049-6">
+        <modifyColumn tableName="transaction">
+            <column name="id" type="BIGINT"/>
+        </modifyColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282107522049-7">
+        <modifyColumn tableName="transaction_entry">
+            <column name="transaction_id" type="BIGINT"/>
+        </modifyColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282107522049-8">
+        <dropColumn columnName="commenter_id" tableName="comment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282107522049-9">
+        <dropColumn columnName="send_date" tableName="comment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282107522049-10">
+        <dropColumn columnName="recipient" tableName="shipment_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282107522049-11">
+        <dropColumn columnName="inventory_event_id" tableName="transaction"/>
+    </changeSet>
+    
+    <!--  Drop a bunch of tables -->
+    <changeSet author="jmiranda (generated)" id="1282107522049-12">
+        <dropTable tableName="application"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282107522049-13">
+        <dropTable tableName="catalog"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282107522049-14">
+        <dropTable tableName="catalog_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282107522049-15">
+        <dropTable tableName="catalog_item_tag"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282107522049-16">
+        <dropTable tableName="inventory_event"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282107522049-17">
+        <dropTable tableName="order"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282107522049-18">
+        <dropTable tableName="order_line_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282107522049-19">
+        <dropTable tableName="order_order_line_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282107522049-20">
+        <dropTable tableName="product_list"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282107522049-21">
+        <dropTable tableName="product_list_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282107522049-22">
+        <dropTable tableName="server"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282107522049-23">
+        <dropTable tableName="supplier"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282107522049-24">
+        <dropTable tableName="warehouse_bin"/>
+    </changeSet>
+    
+    <!--  Create indices for comment.sender_id and shipment_item.recipient -->
+    <changeSet author="jmiranda (generated)" id="1282107522049-25">
+        <createIndex indexName="FK38A5EE5FAF1302EB" tableName="comment" unique="false">
+            <column name="sender_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282107522049-26">
+        <createIndex indexName="FKDA3BB29844979D51" tableName="shipment_item" unique="false">
+            <column name="recipient_id"/>
+        </createIndex>
+    </changeSet>    
+
+</databaseChangeLog>

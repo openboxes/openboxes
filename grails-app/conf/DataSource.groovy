@@ -20,7 +20,7 @@ environments {
 	development {
 		dataSource {	
 			// disable dbCreate when you create the initial database using '$ grails dev migrate'
-			dbCreate = "create" 	
+			//dbCreate = "update" 	
 			url = "jdbc:mysql://localhost:3306/warehouse_dev?autoreconnect=true"
 		}
 	}
@@ -41,6 +41,12 @@ environments {
 			url = "jdbc:mysql://localhost:3306/warehouse_diff?autoreconnect=true"
 		}
 	}
-	
+	demo {
+		dataSource {
+			dbCreate = "create-drop"
+			url = "jdbc:mysql://localhost:3306/warehouse_demo?autoreconnect=true"
+		}
+	}
+
 	
 }

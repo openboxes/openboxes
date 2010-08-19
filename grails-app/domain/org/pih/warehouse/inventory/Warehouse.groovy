@@ -1,28 +1,25 @@
 package org.pih.warehouse.inventory;
 
+import java.util.Date;
+
 import org.pih.warehouse.core.Location;
-import org.pih.warehouse.user.User;
+import org.pih.warehouse.core.User;
 
 class Warehouse extends Location {
 
-    // Core elements
-    //Integer id
-    
-    User manager
+    User manager						// the person in charge of the warehouse
+    Inventory inventory					// each warehouse has a single inventory
+    List<Transaction> transactions   	// might be better at inventory level
 
-    // Core associations
-    Inventory inventory
-    List<Transaction> transactions   // might be better at inventory level
-
-    
     // Association mapping
-    static hasMany = [transactions:Transaction];
+    static hasMany = [transactions:Transaction, users:User];
     static mappedBy = [transactions:"localWarehouse"]
 
-
-
+	// Audit fields
+	Date dateCreated;
+	Date lastUpdated;
+	
     String toString() { return "$name"; }
-
 
     // Constraints
     static constraints = {

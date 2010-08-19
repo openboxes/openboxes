@@ -9,16 +9,21 @@ class Document {
 
 	long size
 	String filename
-    byte [] contents
+	String extension 
+	byte [] fileContents
+	String documentNumber;
 	DocumentType documentType;
-
+	
 	// Audit fields
 	Date dateCreated;
 	Date lastUpdated;
 	    
-    static belongsTo = [ shipment : Shipment ];
+	static belongsTo = [ shipment : Shipment ];
 	
-    static constraints = {
-		//type(inList:["Invoice", "Packing List", "Shipping Manifest", "Other"])
-    }
+	static constraints = {
+		extension(nullable:true)
+		fileContents(nullable:true, maxSize:10485760) // 10 MBs
+		documentNumber(nullable:true)
+		documentType(nullable:true)		
+	}
 }

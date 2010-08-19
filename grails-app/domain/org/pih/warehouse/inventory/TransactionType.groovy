@@ -9,8 +9,8 @@ class TransactionType {
     String toString() { return "$name"; }
 
     static constraints = {
-	name(nullable:false)
-	description(nullable:true)
+		name(nullable:false)
+		description(nullable:true)
     }
 
 

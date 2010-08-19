@@ -1,27 +1,34 @@
 package org.pih.warehouse.shipping;
 
 import java.util.Date;
+import org.pih.warehouse.core.User
 
-import org.pih.warehouse.user.User
+
 
 class Comment {
 
-	Date sendDate 
 	String comment
-	User commenter
+	User sender
 	User recipient
+	Date dateSent
+	Date dateRead
 	
 	// Audit fields
 	Date dateCreated;
 	Date lastUpdated;
+
+	static belongsTo = [ shipment : Shipment ];
 	
-	
-	String toString() { return "$comment"; }
 	
 	static constraints = {
 		comment(nullable:false)
-		sendDate(nullable:false)		
-		commenter(nullable:true)
+		dateSent(nullable:false)		
+		dateRead(nullable:false)		
+		sender(nullable:true)
 		recipient(nullable:true)
+		dateCreated(nullable:true)
+		lastUpdated(nullable:true)
 	}
+
+	String toString() { return "$comment"; }
 }

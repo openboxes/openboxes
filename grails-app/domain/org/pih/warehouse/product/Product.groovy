@@ -1,5 +1,7 @@
 package org.pih.warehouse.product
 
+import java.util.Date;
+
 /**
  * An product is an instance of a generic.  For instance,
  * the product might be Ibuprofen, but the product is Advil 200mg
@@ -10,46 +12,33 @@ package org.pih.warehouse.product
  */
 class Product {
 
-	// Basic attributes
+	// Basic attributes	
+    String name					// A product name (e.g. a brand name, dosage strength like Advil 200mg)
+    String tags					// Comma separated list of tags
+	String ean;					// A universal product code (http://en.wikipedia.org/wiki/European_Article_Number)
+	String productCode;			// An internal product code
+	String description
+	Boolean unverified			// A product is mark as unverified if it was added on the fly
 	
-    String name					// brand name and dosage strength: (e.g. Advil 200mg)
+	// Classification
+	Category category			// the product's primary category
     GenericType genericType 	// the generic type of product (e.g. Pain Reliever)
     ProductType productType		// the specific type of product (e.g. Ibuprofen)
-    Category category
 	
-	//ProductType subType;		// should be a cascading relationship defined by subclass
-    
-    String tags					// Comma separated list of tags
-    String description
-    Boolean unverified			// Mark as unverified -- used for products that are added on the fly
-	Boolean markAsImportant		// Mark with the given product is important or not
-
-    // Other attributes
-    String unit					// values: tablet, capsule, vial, pill, bottle, injection, box, each, grams, carton, case
-    String quantityPerUnit		// quantity per unit
-	Float weight
-    
-    // Product codes
-    String ean;				// A universal product code (http://en.wikipedia.org/wiki/European_Article_Number)
-    String productCode;		// An internal product code
-
-    // Core association mappings
-	static hasMany = [brandNames : String, 
-					  categories : Category, 
-	                  productAttributeValues : ProductAttributeValue ]
+	// Audit fields
+	Date dateCreated;
+	Date lastUpdated;
+	
+	static hasMany = [ categories : Category ]
 	                  
     static constraints = {
 		name(blank:false) 
+		unverified(nullable:true)
 		category(nullable:true)       		
 		genericType(nullable:true)
 		productType(nullable:true)		
-		tags(nullable:true)		
-		weight(nullable:true)
+		tags(nullable:true)				
         description(nullable:true)
-		unverified(nullable:true)
-		markAsImportant(nullable:true)
-        unit(nullable:true)
-        quantityPerUnit(nullable:true)        
         ean(nullable:true)
 		productCode(nullable:true)		
     }

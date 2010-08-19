@@ -7,7 +7,8 @@ package org.pih.warehouse.shipping;
 class DocumentCommand {
    String typeId
    String shipmentId
-   byte [] contents
+   String documentNumber
+   byte [] fileContents
 }
 
 class DocumentController {
@@ -32,10 +33,11 @@ class DocumentController {
 	*/
    def upload = { DocumentCommand command ->
 	   log.info "upload document: " + params
-	   def file = request.getFile('contents');
+	   def file = request.getFile('fileContents');
 	   def filename = file.originalFilename;
 	   def shipmentInstance = Shipment.get(command.shipmentId);
-
+	   def documentNumber = params.documentNumber;
+	   
 	   log.info "file: " + file
 	   
 	   // file must be less than 1MB
@@ -44,7 +46,7 @@ class DocumentController {
 		   def documentType = DocumentType.get(Long.parseLong(command.typeId));
 		   
 		   Document document = new Document(documentType: documentType, size: fileSize, 
-			   filename: filename, contents: command.contents);
+			   filename: filename, contents: command.fileContents, documentNumber: command.documentNumber);
 		   
 		   if (!document.hasErrors()) {			   
 			   shipmentInstance.addToDocuments(document).save(flush:true)
