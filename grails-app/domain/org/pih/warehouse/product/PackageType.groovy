@@ -2,26 +2,27 @@ package org.pih.warehouse.product;
 
 import java.util.Date;
 
-class ProductType {
 
-    String name
+/**
+ * Represents a means of packaging a single unit of product (e.g. bottle, vial, box etc)
+ */
+class PackageType  {
+	
+	String name
 	String description
 	Integer sortOrder = 0;
 	Date dateCreated;
-	Date lastUpdated;
-	ProductType parentProductType // if this is a subtype, then parent will not be null
+	Date lastUpdated;	
 	
-	static constraints = {
+	static constraints = { 
 		name(nullable:false)
 		description(nullable:true)
 		sortOrder(nullable:true)
-		parentProductType(nullable:true)    
-	}
+	}	
 
 	static mapping = {
 		sort "sortOrder"
 	}
 
 	
-		
 }

@@ -12,7 +12,9 @@ class InventoryLot {
 	Date expirationDate				// expiration date	
 	Product product					// Reference to the product
 		
-	static belongsTo = [ inventoryItem : InventoryItem ];
+	// InventoryLot(s) should probably live on their own.  InventoryItem can reference InventoryLot, but should not
+	// own an InventoryLot.
+	//static belongsTo = [ inventoryItem : InventoryItem ];
 	
     static constraints = {
 		lotNumber(nullable:false)

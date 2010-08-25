@@ -40,7 +40,7 @@ class WarehouseController {
 		// Get all transaction entries
 		def entries = TransactionEntry.withCriteria {
 			createAlias("transaction", "t")
-			eq("t.localWarehouse", warehouse)
+			eq("t.thisWarehouse", warehouse)
 		}
 		
 		log.debug "transaction entries $entries"

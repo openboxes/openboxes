@@ -120,7 +120,7 @@
 					                            --%>
 					                            <th width="5%" style="text-align: center">${message(code: 'product.type.label', default: 'Type')}</th>
 					                            <g:sortableColumn property="name" title="${message(code: 'product.name.label', default: 'Name')}" />
-					                            <g:sortableColumn property="ean" title="${message(code: 'product.ean.label', default: 'UPC')}" />
+					                            <g:sortableColumn property="upc" title="${message(code: 'product.upc.label', default: 'UPC')}" />
 					                            <g:sortableColumn property="productType" title="${message(code: 'product.productType.label', default: 'Product Type')}" />
 					                            <g:sortableColumn property="complete" title="${message(code: 'product.unverified.label', default: 'Complete')}" />
 					                        </tr>

@@ -1,5 +1,5 @@
 
-<%@ page import="org.pih.warehouse.user.User" %>
+<%@ page import="org.pih.warehouse.core.User" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -49,12 +49,7 @@
                             <td valign="top" class="value">${fieldValue(bean: userInstance, field: "email")}</td>
                         </tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name"><g:message code="user.role.label" default="Role" /></td>
-                            <td valign="top" class="value">${fieldValue(bean: userInstance, field: "role")}</td>
-                        </tr>
-
-
+ 
                     </tbody>
                 </table>
             </div>

@@ -15,7 +15,7 @@
 				<g:else>
 					<p class="large" align="justify">				
 						<span class="greeting">Welcome, <b>${session.user.firstName} ${session.user.lastName}</b>!</span>
-						You are logged into the <b>${session.warehouse?.name}</b> warehouse as a <b>${session.user.role}</b>. 
+						You are logged into the <b>${session.warehouse?.name}</b> warehouse. 
 					</p>
 				</g:else>
 	    	</div>

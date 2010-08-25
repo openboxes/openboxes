@@ -1,5 +1,6 @@
 package org.pih.warehouse.shipping;
 
+import org.pih.warehouse.core.Document;
 
 /**
  * Command object 
@@ -96,7 +97,7 @@ class DocumentController {
     		
     		if (file.exists()) { 
 	    		response.setContentType("application/octet-stream")
-	    		response.setHeader("Content-disposition", "attachment;filename=${file.getName()}")
+	    		response.setHeader("Content-Disposition", "attachment;filename=${file.getName()}")
 	    		response.outputStream << file.newInputStream() 
     		}
     		else { 

@@ -32,9 +32,9 @@
 	                            <td valign="top" class="value">${fieldValue(bean: productInstance, field: "productType.name")}</td>                            
 	                        </tr>                    
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="product.ean.label" default="UPC" /></td>                            
+	                            <td valign="top" class="name"><g:message code="product.upc.label" default="UPC" /></td>                            
 	                            <td valign="top" class="value">
-	                            	${fieldValue(bean: productInstance, field: "ean")}
+	                            	${fieldValue(bean: productInstance, field: "upc")}
 	                            	<span class="menuButton" style="padding-left: 25px;">                            
 	                            		<a class="browse" target="_new" href="http://www.upcdatabase.com/item/${fieldValue(bean: productInstance, field: "ean")}"><b>Lookup this UPC</b></a>
 	                            	</span>

@@ -108,9 +108,9 @@
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="drugProduct.ean.label" default="Ean" /></td>
+                            <td valign="top" class="name"><g:message code="drugProduct.upc.label" default="UPC" /></td>
                             
-                            <td valign="top" class="value">${fieldValue(bean: drugProductInstance, field: "ean")}</td>
+                            <td valign="top" class="value">${fieldValue(bean: drugProductInstance, field: "upc")}</td>
                             
                         </tr>
                     

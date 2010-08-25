@@ -1,8 +1,11 @@
 package org.pih.warehouse.shipping
 
-import org.pih.warehouse.core.Person;
+import org.pih.warehouse.core.Comment;
+import org.pih.warehouse.core.Document;
+import org.pih.warehouse.core.Event;
 import org.pih.warehouse.core.Location;
-import org.pih.warehouse.core.Organization;
+import org.pih.warehouse.core.Person;
+import org.pih.warehouse.shipping.ReferenceNumber;
 import org.pih.warehouse.donation.Donor;
 
 
@@ -19,9 +22,8 @@ class Shipment {
 
 	ShipmentType shipmentType		// the shipment type: Air, Sea Freight, Suitcase
 	ShipmentMethod shipmentMethod	// the shipping carrier and shipping service used	
-	ShipmentEvent currentEvent		// the current event (REMOVE)
 
-	Person courier 					// the person or organization that actually carries the goods from A to B
+	Person carrier 					// the person or organization that actually carries the goods from A to B
 	Person recipient				// the person or organization that is receiving the goods
 	Donor donor						// the information about the donor (OPTIONAL)
 	Float totalValue				// the total value of all items in the shipment
@@ -30,6 +32,11 @@ class Shipment {
 	Date dateCreated;
 	Date lastUpdated;
 	
+	// Associations
+	SortedSet events;
+	List documents;
+	List comments;
+	List referenceNumbers;
 	
 	static transients = [ 
 		"allShipmentItems",
@@ -38,19 +45,35 @@ class Shipment {
 		"mostRecentStatus"]
 	
 	// Core association mappings
-	static hasMany = [events : ShipmentEvent,
+	static hasMany = [events : Event,
 	                  containers : Container,
 	                  documents : Document, 	                  
 	                  comments : Comment,
 	                  referenceNumbers : ReferenceNumber ]
 
+	// 
+	// Ran into Hibernate bug HHH-4394 and GRAILS-4089 when trying to order the associations.  This is due to the 
+	// fact that the many side of the association (e.g. 'events') does not have a belongsTo 'shipment'.  So instead
+	// of adding a foreign key reference to the 'event' table, GORM creates a new join table 'shipment_event' to 
+	// map 'events' to 'shipments' (which is exactly what I want).  However, the events are not 'eagerly' fetched
+	// so the query to pull the data (and sort) only uses the 'shipment_event' table.  So for now, I'm going to 
+	// use a SortedSet for events and have the Event class implement Comparable. 
+
 	static mapping = {
-		events sort: 'eventDate', order: 'desc'
 		containers sort: 'dateCreated', order: 'asc'
-		documents sort: 'dateCreated', order: 'asc'	
-		comments joinTable:[name:'shipment_comment', key:'shipment_id', column:'comment_id'],
-			sort: 'dateCreated', order: 'desc'		
+	}	
+	/*	
+	static mapping = {
+		containers sort: 'dateCreated', order: 'asc'
+		events sort: 'eventDate', order: 'desc'
+		documents sort: 'dateCreated', order: 'desc'
+		comments sort: 'dateCreated', order: 'desc'
+		
+		//events joinTable:[name:'shipment_event', key:'shipment_id', column:'event_id'], sort: 'eventDate', order: 'desc'
+		//documents joinTable:[name:'shipment_document', key:'shipment_id', column:'document_id'], sort: 'dateCreated', order: 'asc'	
+		//comments joinTable:[name:'shipment_comment', key:'shipment_id', column:'comment_id'], sort: 'dateCreated', order: 'desc'		
 	}
+	*/
 
 	// Constraints
 	static constraints = {
@@ -65,17 +88,19 @@ class Shipment {
 		//expectedDeliveryDate(validator:{value, obj-> return value.after(obj.checkIn)})		
 		shipmentType(nullable:true)
 		shipmentMethod(nullable:true)
-		currentEvent(nullable:true)		
 
-		courier(nullable:true)
+		carrier(nullable:true)
 		recipient(nullable:true)
 		donor(nullable:true)
 		totalValue(nullable:true)
 		
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)
-	
+
+		comments(nullable:true)
+		containers(nullable:true)
 		events(nullable:true)
+		documents(nullable:true)
 	}
 	
 	List<ShipmentItem> getAllShipmentItems() { 		
@@ -108,7 +133,7 @@ class Shipment {
 		
 	}
 	
-	ShipmentEvent getMostRecentEvent() { 		
+	Event getMostRecentEvent() { 		
 		if (events && events.size() > 0) {
 			return events.iterator().next();
 		}

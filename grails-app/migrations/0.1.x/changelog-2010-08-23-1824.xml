@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+	<!-- Add new column, move data, drop old column -->
+	<changeSet author="jmiranda (generated)" id="1282602202381-1">
+		<addColumn tableName="shipment_method">
+			<column name="shipper_service_id" type="BIGINT"/>
+		</addColumn>
+	</changeSet>
+    <changeSet author="jmiranda" id="1282602202381-2">
+		<sql>
+			UPDATE shipment_method SET shipper_service_id = shipment_service_id;
+		</sql>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282602202381-3">
+        <dropColumn columnName="shipment_service_id" tableName="shipment_method"/>
+    </changeSet>
+	
+	<!-- Add new column, move data, drop old column -->
+    <changeSet author="jmiranda (generated)" id="1282602202381-4">
+        <addColumn tableName="shipment_method">
+            <column name="shipper_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda" id="1282602202381-5">
+		<sql>
+			UPDATE shipment_method SET shipper_id = carrier_id;
+		</sql>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282602202381-6">
+        <dropColumn columnName="carrier_id" tableName="shipment_method"/>
+    </changeSet>
+	<changeSet author="jmiranda" id="1282602202381-7">
+		<sql>
+			<![CDATA[
+				INSERT INTO `shipper_service` (`id`, `version`, `method_name`, `name`, `parameter_name`, `tracking_format`, `tracking_url`) VALUES 
+				(1,0,'fedex','FedEx Air',NULL,'999999999999','http://www.fedex.com/Tracking?ascend_header=1&clienttype=dotcom&cntry_code=us&language=english&tracknumbers=%s'),
+				(2,0,'fedex','FedEx Ground',NULL,'999999999999','http://www.fedex.com/Tracking?ascend_header=1&clienttype=dotcom&cntry_code=us&language=english&tracknumbers=%s'),
+				(3,0,'ups','UPS Ground',NULL,'1Z9999W99999999999','http://wwwapps.ups.com/WebTracking/processInputRequest?sort_by=status&tracknums_displayed=1&TypeOfInquiryNumber=T&loc=en_US&InquiryNumber1=%s&track.x=0&track.y=0'),
+				(4,0,'usps','USPS Ground','q',NULL,'http://www.google.com/search?hl=en&site=&q='),
+				(5,0,'courier','Courier',NULL,NULL,NULL);
+			]]>		
+			
+		</sql>
+	</changeSet>
+
+	
+</databaseChangeLog>
+

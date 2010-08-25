@@ -57,7 +57,7 @@
 				    <td>${fieldValue(bean: transaction, field: "id")}</td>
 				    <td>${fieldValue(bean: transaction, field: "transactionDate")}</td>
 				    <td>${fieldValue(bean: transaction, field: "inventory.id")}</td>
-				    <td>${fieldValue(bean: transaction, field: "localWarehouse")}</td>
+				    <td>${fieldValue(bean: transaction, field: "thisWarehouse")}</td>
 
 				  </tr>
 				</g:each>				

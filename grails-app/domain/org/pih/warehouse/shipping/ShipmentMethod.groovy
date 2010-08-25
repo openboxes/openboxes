@@ -4,17 +4,16 @@ import java.util.Date;
 
 class ShipmentMethod {
 	
-	Shipper carrier						// the shipping organization that will transport the goods
-	ShipperService shipmentService		// the selected shipping service selected
-	String trackingNumber				// should be part of a shipment mode: tracking number, carrier, service
-
-	// Audit fields
+	ShipperService shipperService		// the selected shipping service
+	String trackingNumber			// should be part of a shipment mode: tracking number, carrier, service
 	Date dateCreated;
 	Date lastUpdated;
 	
+	static belongsTo = [ shipment : Shipment ]
+	
 	static constraints = {
-		carrier(nullable:true)
-		shipmentService(nullable:true)
+		shipperService(nullable:true)
 		trackingNumber(nullable:true)
+		shipment(nullable:true)
 	}
 }

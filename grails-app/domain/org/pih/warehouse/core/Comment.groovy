@@ -1,9 +1,7 @@
-package org.pih.warehouse.shipping;
+package org.pih.warehouse.core;
 
 import java.util.Date;
 import org.pih.warehouse.core.User
-
-
 
 class Comment {
 
@@ -12,22 +10,20 @@ class Comment {
 	User recipient
 	Date dateSent
 	Date dateRead
-	
-	// Audit fields
 	Date dateCreated;
 	Date lastUpdated;
 
-	static belongsTo = [ shipment : Shipment ];
+	// Comments should exist on their own in case we want to tie them to other objects. 
+	// Shipment (and other entities) should create a join table for comments.
+	//static belongsTo = [ shipment : Shipment ];
 	
 	
 	static constraints = {
 		comment(nullable:false)
-		dateSent(nullable:false)		
-		dateRead(nullable:false)		
 		sender(nullable:true)
 		recipient(nullable:true)
-		dateCreated(nullable:true)
-		lastUpdated(nullable:true)
+		dateSent(nullable:true, min: new Date())		
+		dateRead(nullable:true)		
 	}
 
 	String toString() { return "$comment"; }

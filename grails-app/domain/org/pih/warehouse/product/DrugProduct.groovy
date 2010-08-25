@@ -1,8 +1,5 @@
 package org.pih.warehouse.product;
 
-import org.pih.warehouse.core.Type;
-
-
 /**
  * Drug information that should be included:
  * - Product Trade Name or Catalog Name
@@ -20,26 +17,31 @@ import org.pih.warehouse.core.Type;
  * 	- http://www.fda.gov/Drugs/DevelopmentApprovalProcess/UCM070829
  * 	- http://en.wikipedia.org/wiki/National_Drug_Code
  */
-class DrugProduct extends ConsumableProduct {
+class DrugProduct extends Product {
 	
-    String genericName				// generic name: Ibuprofen 
-	String dosageStrength			// e.g. "200 mg"	
-    String dosageForm				// e.g. "tablet" 
-    //String dosageRegimen			// e.g. "Take two capsules by mouth daily"
-    //PackageType packageType		// e.g. bottle, vial
-    DrugRouteType drugRouteType		// route of administration (oral, rectal, etc)
-    //DrugClass drugClass 			// replaces drug class string above
-    
+	String name				// generic name: Ibuprofen 
+	String dosageStrength			// e.g. "200"	
+	String dosageUnit			// e.g. "MG"	
+	DosageForm dosageForm			// e.g. "tablet" 
+	String packageSize			// e.g. 100 
+	PackageType packageType			// e.g. bottle, vial
+	DrugClass drugClass 			// e.g. antiviral agents
+	DrugRouteType drugRouteType		// route of administration (oral, rectal, etc)
+    	
+	static mapping = {
+		table "drug_product"
+	}
 	
 	//static hasMany = [ conditionTypes : ConditionType ]
     
-    static constraints = {
-    	genericName(nullable:true)
+	static constraints = {
+		name(nullable:true)
 		dosageStrength(nullable:true)
-    	dosageForm(nullable:true)
-    	//dosageRegimen(nullable:true)
-    	drugRouteType(nullable:true)
-		//drugClass(nullable:true)
-		
-    }
+		dosageUnit(nullable:true)
+		dosageForm(nullable:true)
+		packageSize(nullable:true)
+		packageType(nullable:true)
+		drugClass(nullable:true)
+		drugRouteType(nullable:true)
+	}
 }

@@ -1,5 +1,8 @@
 package org.pih.warehouse.shipping
 
+import org.pih.warehouse.core.Event;
+
+
 class ShipmentEventController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -14,13 +17,13 @@ class ShipmentEventController {
     }
 
     def create = {
-        def shipmentEventInstance = new ShipmentEvent()
+        def shipmentEventInstance = new Event()
         shipmentEventInstance.properties = params
         return [shipmentEventInstance: shipmentEventInstance]
     }
 
     def save = {
-        def shipmentEventInstance = new ShipmentEvent(params)
+        def shipmentEventInstance = new Event(params)
         if (shipmentEventInstance.save(flush: true)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), shipmentEventInstance.id])}"
             redirect(action: "show", id: shipmentEventInstance.id)
@@ -31,7 +34,7 @@ class ShipmentEventController {
     }
 
     def show = {
-        def shipmentEventInstance = ShipmentEvent.get(params.id)
+        def shipmentEventInstance = Event.get(params.id)
         if (!shipmentEventInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
             redirect(action: "list")
@@ -42,7 +45,7 @@ class ShipmentEventController {
     }
 
     def edit = {
-        def shipmentEventInstance = ShipmentEvent.get(params.id)
+        def shipmentEventInstance = Event.get(params.id)
         if (!shipmentEventInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
             redirect(action: "list")
@@ -53,7 +56,7 @@ class ShipmentEventController {
     }
 
     def update = {
-        def shipmentEventInstance = ShipmentEvent.get(params.id)
+        def shipmentEventInstance = Event.get(params.id)
         if (shipmentEventInstance) {
             if (params.version) {
                 def version = params.version.toLong()

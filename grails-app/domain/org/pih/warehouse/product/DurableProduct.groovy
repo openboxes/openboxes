@@ -4,11 +4,13 @@ class DurableProduct extends Product {
 
 	String make 
 	String model
-	//String serialNumber
+	
+	static mapping = {
+		table "durable_product"
+	}
 	
 	static constraints = {	
 		make(nullable:true)
 		model(nullable:true)
-		//serialNumber(nullable:true)
 	}
 }

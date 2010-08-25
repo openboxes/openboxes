@@ -12,7 +12,7 @@ class InventoryService {
 	}
 	
 	List<Transaction> getAllTransactions(Warehouse warehouse) {
-		return Transaction.withCriteria { eq("localWarehouse", warehouse) }
+		return Transaction.withCriteria { eq("thisWarehouse", warehouse) }
 	}
 	
 	Inventory getInventory(Warehouse warehouse) {

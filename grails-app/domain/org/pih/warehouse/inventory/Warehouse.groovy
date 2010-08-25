@@ -13,7 +13,7 @@ class Warehouse extends Location {
 
     // Association mapping
     static hasMany = [transactions:Transaction, users:User];
-    static mappedBy = [transactions:"localWarehouse"]
+    static mappedBy = [transactions:"thisWarehouse"]
 
 	// Audit fields
 	Date dateCreated;

@@ -1,5 +1,5 @@
 
-<%@ page import="org.pih.warehouse.user.User" %>
+<%@ page import="org.pih.warehouse.core.User" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -75,16 +75,6 @@
                                     <g:textField name="email" value="${userInstance?.email}" />
                                 </td>
                             </tr>
-
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                  <label for="role"><g:message code="user.role.label" default="Role" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'role', 'errors')}">
-                                    <g:textField name="role" value="${userInstance?.role}" />
-                                </td>
-                            </tr>
-
 
                         </tbody>
                     </table>

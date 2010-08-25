@@ -62,7 +62,7 @@
                                     <label for="manager"><g:message code="warehouse.manager.label" default="Manager" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'manager', 'errors')}">
-                                    <g:select name="manager.id" from="${org.pih.warehouse.user.User.list()}" optionKey="id" value="${warehouseInstance?.manager?.id}"  />
+                                    <g:select name="manager.id" from="${org.pih.warehouse.core.User.list()}" optionKey="id" value="${warehouseInstance?.manager?.id}"  />
                                 </td>
                             </tr>
 

@@ -1,6 +1,7 @@
 package org.pih.warehouse.user;
 
 import org.pih.warehouse.core.Location;
+import org.pih.warehouse.core.User;
 import org.pih.warehouse.inventory.Warehouse;
 
 class DashboardController {

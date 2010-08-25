@@ -45,4 +45,5 @@
     <!-- Changes to many tables, columns -->
     <include file="0.1.x/changelog-2010-08-18-1955.xml"/>
 
+
 </databaseChangeLog>

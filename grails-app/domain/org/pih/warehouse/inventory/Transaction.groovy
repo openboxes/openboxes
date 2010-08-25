@@ -20,26 +20,22 @@ import org.pih.warehouse.inventory.Inventory
  */
 class Transaction {
 
-    String direction		    		// DEBIT, CREDIT
-    Date transactionDate	    		// date entered into the system
-    TransactionType transactionType 	// detailed transaction type (similar to event)
-    Inventory inventory		    		// the inventory to which this is connected
-
-	// Needs some more thought (origin, destination)    
-    Warehouse localWarehouse	    	// where the transaction is 
+    Date transactionDate	    		// Date entered into the warehouse
+    TransactionType transactionType 	// Detailed transaction type (e.g. Order, Transfer, Stock Count) 
+    Inventory inventory		    		// The inventory to which this is connected
+    Warehouse thisWarehouse	    		// The local warehouse that the transaction is 
     Warehouse targetWarehouse	    	// where the transaction is going to / coming from
 
     // Association mapping
     static hasMany = [ transactionEntries : TransactionEntry ]
-    static belongsTo = [ localWarehouse : Warehouse ]
+    static belongsTo = [ thisWarehouse : Warehouse ]
 
     // Constraints 
     static constraints = {
 	    transactionDate(min:new Date(),nullable:false)
-	    direction(nullable:true)
 	    transactionType(nullable:true)
 	    inventory(nullable:true)	    
-	    localWarehouse(nullable:false)
+	    thisWarehouse(nullable:false)
 	    targetWarehouse(nullable:false)
     }
 }

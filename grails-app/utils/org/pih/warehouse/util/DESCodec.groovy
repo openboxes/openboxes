@@ -6,7 +6,6 @@ import javax.crypto.spec.*;
 
 class DESCodec {
 	
-	
 	static encode = { String target ->
 		def cipher = getCipher(Cipher.ENCRYPT_MODE)
 		return cipher.doFinal(target.bytes).encodeBase64()

@@ -5,18 +5,14 @@ import java.util.Date;
 import org.pih.warehouse.inventory.Warehouse;
 
 
-class Person extends Party {
+class Person {
     
-	String name;
 	String firstName;
 	String lastName;
 	String email;
 	String phoneNumber;
-
-	// Audit fields
 	Date dateCreated;
 	Date lastUpdated;
-	
 	
 	static mapping = { 
 		tablePerHierarchy false
@@ -24,10 +20,9 @@ class Person extends Party {
 	}
 
 
-	String toString() { return "Name: $firstName $lastName, Email: $email, Phone: $phoneNo"; }
+	String toString() { return "Name: $firstName $lastName, Email: $email, Phone: $phoneNumber"; }
 
 	static constraints = { 
-		name(nullable:true)	
 		firstName(nullable:true)	
 		lastName(nullable:true)	
 		email(nullable:true, email:true)

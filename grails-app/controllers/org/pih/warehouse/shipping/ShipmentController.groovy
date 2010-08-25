@@ -5,6 +5,9 @@ import java.sql.ResultSet;
 import grails.converters.JSON
 import groovy.sql.Sql;
 import au.com.bytecode.opencsv.CSVWriter;
+import org.pih.warehouse.core.Comment;
+import org.pih.warehouse.core.Document;
+import org.pih.warehouse.core.Event;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.inventory.Warehouse;
 import org.pih.warehouse.product.Product;
@@ -39,7 +42,7 @@ class ShipmentController {
 			// Try to add the current event
 			def eventType = EventType.get(params.eventType.id);
 			if (eventType) {
-				def shipmentEvent = new ShipmentEvent(eventType: eventType, eventLocation: session.warehouse, eventDate: new Date())
+				def shipmentEvent = new Event(eventType: eventType, eventLocation: session.warehouse, eventDate: new Date())
 				shipmentInstance.addToEvents(shipmentEvent).save(flush:true);
 			}
 			flash.message = "${message(code: 'default.created.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
@@ -685,14 +688,13 @@ class ShipmentController {
 				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
 				redirect(action: "list")
 			}
-			render(view: "addEvent", model: [shipmentInstance : shipmentInstance, shipmentEvent : new ShipmentEvent()]);
+			render(view: "addEvent", model: [shipmentInstance : shipmentInstance, shipmentEvent : new Event()]);
 		
 			
 		}
 		else { 						
-	    	ShipmentEvent event = new ShipmentEvent(
-	    		eventType:EventType.get(params.eventTypeId), 
-	    		eventDate: params.eventDate, 
+	    	Event event = new Event(
+	    		eventType:EventType.get(params.eventTypeId), eventDate: params.eventDate, 
 	    		eventLocation: Location.get(params.eventLocationId)
 	    	);
 	    	

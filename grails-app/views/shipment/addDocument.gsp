@@ -8,7 +8,7 @@
 <%@ page import="org.pih.warehouse.product.Product"%>
 <%@ page import="org.pih.warehouse.shipping.ReferenceNumberType"%>
 <%@ page import="org.pih.warehouse.shipping.Shipment"%>
-<%@ page import="org.pih.warehouse.user.User"%>
+<%@ page import="org.pih.warehouse.core.User"%>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />

@@ -13,9 +13,9 @@ class WarehouseTests extends GrailsUnitTestCase {
     }
 
     void testSomething() {
-		Warehouse localWarehouse = new Warehouse();
-		localWarehouse.save()
-		assertNotNull(localWarehouse.id)
+		Warehouse thisWarehouse = new Warehouse();
+		thisWarehouse.save()
+		assertNotNull(thisWarehouse.id)
 	
 		Warehouse remoteWarehouse = new Warehouse();
 		remoteWarehouse.save()

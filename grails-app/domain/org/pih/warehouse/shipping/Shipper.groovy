@@ -1,25 +1,30 @@
 package org.pih.warehouse.shipping
 
 import java.util.Date;
-import org.pih.warehouse.core.Organization;
 
-class Shipper extends Organization {
+class Shipper {
 	
+	String name
+	String description	
 	String trackingUrl
 	String trackingFormat
 	String parameterName
+	Date dateCreated;
+	Date lastUpdated;
 
+	static hasMany = [ shipperServices : ShipperService ];
 	static mapping = {
-		tablePerHierarchy false
-		table 'shipper'
+		shipperServices joinTable: [name:'shipper_service', column: 'shipper_service_id', key: 'shipper_id']
 	}
-	
-	static hasMany = [ shipperServices: ShipperService ]
 
-    	static constraints = {
+    static constraints = {
+		name(nullable:false)
+		description(nullable:true)		
 		trackingUrl(nullable:true, blank:true)
 		trackingFormat(nullable:true)
 		parameterName(nullable:true, blank:true)
+		dateCreated(nullable:true)
+		lastUpdated(nullable:true)
    	}
 
 }

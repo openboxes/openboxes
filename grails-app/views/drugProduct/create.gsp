@@ -130,10 +130,10 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="ean"><g:message code="drugProduct.ean.label" default="Ean" /></label>
+                                    <label for="upc"><g:message code="drugProduct.upc.label" default="UPC" /></label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean: drugProductInstance, field: 'ean', 'errors')}">
-                                    <g:textField name="ean" value="${drugProductInstance?.ean}" />
+                                <td valign="top" class="value ${hasErrors(bean: drugProductInstance, field: 'upc', 'errors')}">
+                                    <g:textField name="upc" value="${drugProductInstance?.upc}" />
                                 </td>
                             </tr>
                         

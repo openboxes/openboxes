@@ -1,5 +1,6 @@
 package org.pih.warehouse.shipping;
 
+import org.pih.warehouse.core.Document;
 
 class DocumentUploadCommand {
    String shipmentId

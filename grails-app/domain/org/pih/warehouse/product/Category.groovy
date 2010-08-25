@@ -2,13 +2,12 @@ package org.pih.warehouse.product;
 
 import java.util.Date;
 
-import org.pih.warehouse.core.Type;
+class Category {
 
-class Category extends Type {
-
+	String name
+	String description
+	Integer sortOrder = 0;
 	Category parentCategory
-	
-	// Audit fields
 	Date dateCreated;
 	Date lastUpdated;
 	
@@ -21,15 +20,16 @@ class Category extends Type {
 		categories sort:"name"
 	}
 	
-
-	               	                     
-	String toString() { return "$name"; }
-	
 	static constraints = {
+		name(nullable:false)
+		description(nullable:true)
+		sortOrder(nullable:true)
 		parentCategory(nullable:true)
 	}  
 	
-	                     
+	String toString() { return "$name"; }
+	
+
 	
 	                     
 	

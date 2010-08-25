@@ -3,7 +3,7 @@ package org.pih.warehouse.product;
 
 class ProductAttributeValueController {
 
-	def scaffold = ProductAttributeValue;
+	def scaffold = ProductAttribute;
 	
 	
 	
