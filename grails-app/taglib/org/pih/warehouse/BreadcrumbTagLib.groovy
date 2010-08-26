@@ -1,7 +1,5 @@
 package org.pih.warehouse
 
-import org.junit.runner.Request;
-
 class BreadcrumbTagLib {
 	
 	def breadcrumb = { attrs, body -> 

@@ -1,14 +1,3 @@
-
-<%@ page import="org.pih.warehouse.shipping.ContainerType" %>
-<%@ page import="org.pih.warehouse.shipping.Document" %>
-<%@ page import="org.pih.warehouse.shipping.DocumentType" %>
-<%@ page import="org.pih.warehouse.shipping.EventType" %>
-<%@ page import="org.pih.warehouse.core.Location" %>
-<%@ page import="org.pih.warehouse.core.Organization" %>
-<%@ page import="org.pih.warehouse.product.Product" %>
-<%@ page import="org.pih.warehouse.shipping.ReferenceNumberType" %>
-<%@ page import="org.pih.warehouse.shipping.Shipment" %>
-<%@ page import="org.pih.warehouse.core.User" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -373,12 +362,6 @@
 																                    	<g:select name="shipmentType" from="${org.pih.warehouse.shipping.ShipmentType.list()}" optionKey="id" value="${shipmentInstance?.shipmentType?.id}"  /> 
 														                            </td>                            
 														                        </tr>                    						                                
-														                        <tr class="prop">
-														                            <td valign="middle" class="name"><label><g:message code="shipment.shipmentStatus.label" default="Status" /></label></td>                            
-														                            <td valign="middle" class="value" nowrap="nowrap">
-																                    	<g:select name="shipmentStatus.id" from="${org.pih.warehouse.shipping.ShipmentStatus.list()}" optionKey="id" value="${shipmentInstance?.shipmentStatus?.id}"  /> 
-														                            </td>                            
-														                        </tr>                    						                                
 																				<tr class="prop">
 																					<td valign="top" class="name"><label><g:message code="shipment.expectedShippingDate.label" default="Ship date" /></label></td>                            
 													                                <td valign="top" class=" ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}" nowrap="nowrap">
@@ -396,12 +379,7 @@
 																						&nbsp;
 																					</td>																	
 																				</tr>
-													           					<tr class="prop">	                        	
-														                            <td valign="top" class="name"><label><g:message code="shipment.method.label" default="Shipment method" /></label></td>        
-														                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'shipmentMethod', 'errors')}">
-																						<g:select name="shipmentMethod.id" from="${org.pih.warehouse.shipping.ShipmentMethod.list()}" optionKey="id" optionValue="name" value="${shipmentInstance?.shipmentMethod?.id}"  />
-														                            </td>
-														                        </tr>                    
+													           					                 
 														                        <tr class="prop">
 														                            <td valign="top" class="name"><label><g:message code="shipment.trackingNumber.label" default="Tracking number" /></label></td>                            
 														                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'trackingNumber', 'errors')}">
@@ -647,7 +625,7 @@
 																				id="productId" 
 																				name='productId'
 																			    noSelection="${['null':'']}"
-																			    from='${Product.list()}' optionKey="id" optionValue="name">
+																			    from='${org.pih.warehouse.product.Product.list()}' optionKey="id" optionValue="name">
 																			</g:select>
 																	    	<span class="buttons">
 																	    		<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> Add item</button>
@@ -788,7 +766,7 @@
 																id="productId" 
 																name='productId'
 															    noSelection="${['null':'Select One...']}"
-															    from='${Product.list()}' optionKey="id" optionValue="name">
+															    from='${org.pih.warehouse.product.Product.list()}' optionKey="id" optionValue="name">
 															</g:select>
 													    </td>
 													</tr>
@@ -801,7 +779,7 @@
 																id="donorId" 
 																name='donorId'
 															    noSelection="${['null':'']}"
-															    from='${Organization.list()}' optionKey="id" optionValue="name">
+															    from='${org.pih.warehouse.donation.Donor.list()}' optionKey="id" optionValue="name">
 															</g:select>
 														</td>
 													</tr>
@@ -907,10 +885,10 @@
 													<g:datePicker id="eventDate" name="eventDate" value="" />
 												</td>
 												<td>
-													<g:select id="eventTypeId" name='eventTypeId' noSelection="${['':'Select one ...']}" from='${EventType.list()}' optionKey="id" optionValue="name"></g:select>
+													<g:select id="eventTypeId" name='eventTypeId' noSelection="${['':'Select one ...']}" from='${org.pih.warehouse.core.EventType.list()}' optionKey="id" optionValue="name"></g:select>
 												</td>
 												<td>
-													<g:select id="eventLocationId" name='eventLocationId' noSelection="${['':'Select one ...']}" from='${Location.list()}' optionKey="id" optionValue="name"></g:select>									
+													<g:select id="eventLocationId" name='eventLocationId' noSelection="${['':'Select one ...']}" from='${org.pih.warehouse.core.Location.list()}' optionKey="id" optionValue="name"></g:select>									
 												</td>
 												<%-- 
 												<td>
@@ -1109,7 +1087,7 @@
 															id="containerTypeId" 
 															name='containerTypeId'
 														    noSelection="${['null':'Select One...']}"
-														    from='${ContainerType?.list()}' optionKey="id" optionValue="name">
+														    from='${org.pih.warehouse.shipping.ContainerType?.list()}' optionKey="id" optionValue="name">
 														</g:select>					                                    
 				                                    </g:else>
 				                                    
@@ -1171,14 +1149,14 @@
 					                            <td valign="top" class="name"><label><g:message code="event.eventType.label" default="Event Type" /></label></td>                            
 					                            <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'eventDate', 'errors')}">
 				                                    <g:select id="eventTypeId" name='eventTypeId' noSelection="${['':'Select one ...']}" 
-				                                    	from='${EventType.list()}' optionKey="id" optionValue="name"></g:select>
+				                                    	from='${org.pih.warehouse.core.EventType.list()}' optionKey="id" optionValue="name"></g:select>
 				                                </td>
 					                        </tr>  	          
 											<tr class="prop">
 					                            <td valign="top" class="name"><label><g:message code="event.eventDate.label" default="Location" /></label></td>                            
 					                            <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'location', 'errors')}">
 													<g:select id="eventLocationId" name='eventLocationId' noSelection="${['':'Select one ...']}" 
-														from='${Location.list()}' optionKey="id" optionValue="name">
+														from='${org.pih.warehouse.core.Location.list()}' optionKey="id" optionValue="name">
 														</g:select>									
 				                                </td>
 					                        </tr>  	          
@@ -1217,7 +1195,7 @@
 											<tr class="prop">
 					                            <td valign="top" class="name"><label><g:message code="document.documentType.label" default="Document Type" /></label></td>                            
 					                            <td valign="top" class="value ${hasErrors(bean: documentInstance, field: 'documentType', 'errors')}">																
-													<g:select name="type" from="${DocumentType.list()}" valueMessagePrefix="document.type"  />							    												
+													<g:select name="type" from="${org.pih.warehouse.core.DocumentType.list()}" valueMessagePrefix="document.type"  />							    												
 												</td>
 											</tr>
 											<tr>
@@ -1253,7 +1231,7 @@
 					                            <td valign="top" class="name"><label><g:message code="comment.recipient.label" default="To" /></label></td>                            
 					                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'recipient', 'errors')}">
 													<g:select id="recipientId" name='recipientId' noSelection="${['':'Select one ...']}" 
-				                                    	from='${User.list()}' optionKey="id" optionValue="username"></g:select>
+				                                    	from='${org.pih.warehouse.core.User.list()}' optionKey="id" optionValue="username"></g:select>
 				                                </td>
 					                        </tr>  	          
 											<tr class="prop">
@@ -1281,7 +1259,7 @@
 					                            <td valign="top" class="name"><label><g:message code="shipment.referenceNumberType.label" default="Type" /></label></td>                            
 					                            <td valign="top" class="value ${hasErrors(bean: referenceNumber, field: 'referenceNumber', 'errors')}">
 													<g:select id="recipientId" name='recipientId' noSelection="${['':'Select one ...']}" 
-				                                    	from='${ReferenceNumberType.list()}' optionKey="id" optionValue="name"></g:select>
+				                                    	from='${org.pih.warehouse.shipping.ReferenceNumberType.list()}' optionKey="id" optionValue="name"></g:select>
 				                                </td>
 					                        </tr>  	          
 											<tr class="prop">

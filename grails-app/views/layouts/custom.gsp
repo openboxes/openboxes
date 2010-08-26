@@ -60,17 +60,19 @@
 	<link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui-1.8.2.custom.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
 	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-ui-1.8.2.custom.min.js')}" type="text/javascript" ></script>
 
+	<!--  
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.notifyBar',file:'jquery.notifyBar.css')}" type="text/css" media="screen"  />
 	<script type="text/javascript" src="${createLinkTo(dir:'js/jquery.notifyBar',file:'jquery.notifyBar.js')}"></script>
 	<script type="text/javascript" src="${createLinkTo(dir:'js/jquery',file:'jquery.ezCookie_0.7.01.js')}"></script>
+	-->
 	
 	<!-- Dynamically include jquery-ui resources :  NOT WORKING CORRECTLY -->
 	<!-- <jqui:resources components="dialog, datepicker"/> -->	
 	<!-- <jqui:resources components="datepicker" mode="normal" theme="cupertino" /> -->
 
-	<!-- Dynamically include Grails UI components -->
+	<!-- Dynamically include Grails UI components 
 	<gui:resources components="richEditor, dialog, tabView, autoComplete"/>
-
+	-->
 	<!-- Custom styles to be applied to all pages -->
 	<style type="text/css" media="screen"></style>
 </head>

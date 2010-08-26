@@ -46,16 +46,15 @@
 				
             <div class="list">
 				<g:each var="entry" in="${shipmentInstanceMap}">	                    
-					<div style="padding: 10px; font-weight: bold;" >${entry.key}</div>	                    	
+					<div style="padding: 10px; font-weight: bold;" ><h1>${entry.key}</h1></div>	                    	
 					<table>
 	                    <thead>
 	                        <tr>   
-	                            <g:sortableColumn property="shipmentNumber" title="${message(code: 'shipment.shipmentNumber.label', default: 'Shipment Number')}" />
-	                            <g:sortableColumn property="name" title="${message(code: 'shipment.name.label', default: 'Name')}" />
-	                            <g:sortableColumn property="origin.name" title="${message(code: 'shipment.origin.label', default: 'From')}" />
-	                            <g:sortableColumn property="events" title="${message(code: 'shipment.events.label', default: 'Most Recent Event')}" />
-								<g:sortableColumn property="documents" title="${message(code: 'shipment.documents.label', default: 'Documents')}" />                            
-	                            <g:sortableColumn property="mostRecentStatus" title="${message(code: 'shipment.status.label', default: 'Most Recent Status')}" />
+	                            <g:sortableColumn property="events" title="${message(code: 'shipment.events.label', default: 'Status')}" />
+								<g:sortableColumn property="shipmentNumber" title="${message(code: 'shipment.shipmentNumber.label', default: 'Shipment Number')}" />
+	                            <g:sortableColumn property="destination" title="${message(code: 'shipment.origin.label', default: 'Origin')}" />
+	                            <g:sortableColumn property="documents" title="${message(code: 'shipment.documents.label', default: 'Documents')}" />                            
+								<g:sortableColumn property="lastModified" title="${message(code: 'shipment.lastModified.label', default: 'Last Modified')}" />
 	                        </tr>
 	                    </thead>
 	                   
@@ -63,36 +62,37 @@
 		                    <g:each var="shipmentList" in="${entry.value}">
 								<g:each var="shipmentInstance" in="${shipmentList.objectList}" status="i">
 									<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
-										<td align="center" width="15%"><g:link action="showDetails" id="${shipmentInstance.id}">${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}</g:link></td>
-										<td align="center">${fieldValue(bean: shipmentInstance, field: "name")}</td>
-										<td align="center">
-											${fieldValue(bean: shipmentInstance, field: "origin.name")}
-										</td>
-										<td>
+										<td width="10%">
 											<g:if test="${!shipmentInstance.events}"></g:if>									
 											<g:else>
 												<div>
-													${shipmentInstance.mostRecentEvent.eventType.name}<br/>
+													<b>${shipmentInstance.mostRecentEvent.eventType.name}</b> &nbsp;
 													<span style="font-size: 0.8em; color: #aaa;">
-														<g:formatDate format="dd MMM yyyy" date="${shipmentInstance.mostRecentEvent.eventDate}"/> |  
-														${shipmentInstance.mostRecentEvent.eventLocation.name}</span>
+														<g:formatDate format="dd MMM yyyy" date="${shipmentInstance.mostRecentEvent.eventDate}"/></span>
 												</div>									
 											</g:else>
 										</td>
-										<td nowrap="nowrap">								
-											<g:if test="${!shipmentInstance.events}"></g:if>
+										<td width="10%" align="center">
+											<g:link action="showDetails" id="${shipmentInstance.id}">${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}</g:link>
+											${fieldValue(bean: shipmentInstance, field: "name")}
+										</td>
+										<td width="10%" align="center">
+											${fieldValue(bean: shipmentInstance, field: "origin.name")}
+										</td>
+										<td width="15%">
+											<g:if test="${!shipmentInstance.documents}"><span class="fade">(empty)</span></g:if>
 											<g:else>
 												<g:each in="${shipmentInstance.documents}" var="document" status="j">
 													<div id="document-${document.id}">
-														<img src="${createLinkTo(dir:'images/icons/',file:'document.png')}" alt="Document" style="vertical-align: absmiddle"/>
-														<g:link controller="document" action="download" id="${document.id}">${document?.filename}</g:link>
+														<img src="${createLinkTo(dir:'images/icons/',file:'document.png')}" alt="Document" style="vertical-align: middle"/>
+														<g:link controller="document" action="download" id="${document.id}">${document?.documentType?.name} (${document?.filename})</g:link>
 													</div>
 												</g:each>							
 											</g:else>
 										</td>
-										<td>
-											${shipmentInstance.mostRecentStatus}
-										</td>
+										<td width="10%">
+											<span class="fade"><g:formatDate format="dd MMM yyyy hh:mm a" date="${shipmentInstance.lastUpdated}"/></span>
+										</td>									
 			                        </tr>
 								</g:each>                    		
 	                    	</g:each>	                    	         
@@ -100,11 +100,9 @@
 					</table>
 				</g:each>
             </div>
-<!--              
             <div class="paginateButtons">
                 <g:paginate total="${shipmentInstanceTotal}" />
             </div>
--->            
         </div>		
     </body>
 </html>

@@ -1,12 +1,3 @@
-
-<%@ page import="org.pih.warehouse.core.Location" %>
-<%@ page import="org.pih.warehouse.product.Product" %>
-<%@ page import="org.pih.warehouse.shipping.ContainerType" %>
-<%@ page import="org.pih.warehouse.shipping.Document" %>
-<%@ page import="org.pih.warehouse.shipping.EventType" %>
-<%@ page import="org.pih.warehouse.shipping.Shipment" %>
-<%@ page import="org.pih.warehouse.shipping.ShipmentMethod" %>
-<%@ page import="org.pih.warehouse.shipping.ShipmentStatus" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />

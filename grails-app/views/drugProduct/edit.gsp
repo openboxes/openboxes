@@ -228,7 +228,7 @@
                                     <g:select name="categories" from="${org.pih.warehouse.product.Category.list()}" multiple="yes" optionKey="id" size="5" value="${drugProductInstance?.categories}" />
                                 </td>
                             </tr>
-                        
+<%-- 
                             <tr class="prop">
                                 <td valign="top" class="name">
                                   <label for="conditionTypes"><g:message code="drugProduct.conditionTypes.label" default="Condition Types" /></label>
@@ -237,22 +237,22 @@
                                     <g:select name="conditionTypes" from="${org.pih.warehouse.product.ConditionType.list()}" multiple="yes" optionKey="id" size="5" value="${drugProductInstance?.conditionTypes}" />
                                 </td>
                             </tr>
-                        
                             <tr class="prop">
                                 <td valign="top" class="name">
                                   <label for="productAttributeValues"><g:message code="drugProduct.productAttributeValues.label" default="Product Attribute Values" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: drugProductInstance, field: 'productAttributeValues', 'errors')}">
                                     
-<ul>
-<g:each in="${drugProductInstance?.productAttributeValues?}" var="p">
-    <li><g:link controller="productAttributeValue" action="show" id="${p.id}">${p?.encodeAsHTML()}</g:link></li>
-</g:each>
-</ul>
-<g:link controller="productAttributeValue" action="create" params="['drugProduct.id': drugProductInstance?.id]">${message(code: 'default.add.label', args: [message(code: 'productAttributeValue.label', default: 'ProductAttributeValue')])}</g:link>
+									<ul>
+										<g:each in="${drugProductInstance?.productAttributeValues?}" var="p">
+										    <li><g:link controller="productAttributeValue" action="show" id="${p.id}">${p?.encodeAsHTML()}</g:link></li>
+										</g:each>
+									</ul>
+									<g:link controller="productAttributeValue" action="create" params="['drugProduct.id': drugProductInstance?.id]">${message(code: 'default.add.label', args: [message(code: 'productAttributeValue.label', default: 'ProductAttributeValue')])}</g:link>
 
                                 </td>
                             </tr>
+--%>                        
                         
                         </tbody>
                     </table>

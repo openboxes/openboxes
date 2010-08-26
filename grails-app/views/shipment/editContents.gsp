@@ -1,14 +1,3 @@
-
-<%@ page import="org.pih.warehouse.shipping.ContainerType"%>
-<%@ page import="org.pih.warehouse.shipping.Document"%>
-<%@ page import="org.pih.warehouse.shipping.DocumentType"%>
-<%@ page import="org.pih.warehouse.shipping.EventType"%>
-<%@ page import="org.pih.warehouse.core.Location"%>
-<%@ page import="org.pih.warehouse.core.Organization"%>
-<%@ page import="org.pih.warehouse.product.Product"%>
-<%@ page import="org.pih.warehouse.shipping.ReferenceNumberType"%>
-<%@ page import="org.pih.warehouse.shipping.Shipment"%>
-<%@ page import="org.pih.warehouse.core.User"%>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -111,34 +100,11 @@
 						<td style="width: 60%" valign="top">
 							<div>
 								<fieldset>							
-									<table>
-										<tbody>
-											<tr>
-												<td width="24px;">
-													<%-- 
-													<img src="${createLinkTo(dir:'images/icons/silk/',file: 'lorry.png')}"
-														valign="top" style="vertical-align: middle;" /> 
-													--%>
-													<img src="${createLinkTo(dir:'images/icons',file: 'ShipmentType' + shipmentInstance?.shipmentType?.name + '.png')}"
-														alt="${shipmentInstance?.shipmentType?.name}" style="vertical-align: middle; width: 24px; height: 24px;" />						
-												</td>
-												<td>
-													<span style="font-size: 1.2em;">${shipmentInstance.name}</span> 
-													&nbsp; 
-													<br/>
-													<span style="color: #aaa; font-size: 0.8em;">
-														last modified: <g:formatDate date="${shipmentInstance?.lastUpdated}" format="dd MMM yyyy hh:mm" />	&nbsp;							
-														created: <g:formatDate date="${shipmentInstance?.dateCreated}" format="dd MMM yyyy hh:mm" />			
-													</span>	
-												</td>		
-												<td style="text-align: right;">
-													<span class="fade">[Shipment No. ${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}]</span>
-												</td>
-											</tr>
-										</tbody>
-									</table>			
-										
-									<br/>
+								
+									<g:render template="summary"/>
+								
+								
+								<br/>
 								
 							<div class="accordion">									
 								<table>
@@ -211,15 +177,18 @@
 																	<td class="name"><label class="optional">Weight</label></td>
 																	<td class="value">
 																		<g:textField name="weight" value="${container?.weight}" size="7"/> 
-																		<g:textField name="units" value="${container?.units}" size="5"/> &nbsp;
-																		<span class="fade">e.g. '100 lbs' or '120 kgs' </span>
+																		<g:textField name="weightUnits" value="${container?.weightUnits}" size="2"/> &nbsp;
+																		<span class="fade">e.g. '100 lb' or '120 kg' </span>
 																	</td>
 																</tr>
 																<tr class="prop">
 																	<td class="name"><label class="optional">Dimensions</label></td>
 																	<td class="value">
-																		<g:textField name="dimensions" value="${container?.dimensions}" size="15"/> &nbsp;
-																		 <span class="fade">e.g. '10.1" x 4.2" x 2.8"' or '4 sq in'</span>
+																		<g:textField name="height" value="${container?.height}" size="2"/> &nbsp;
+																		<g:textField name="width" value="${container?.width}" size="2"/> &nbsp;
+																		<g:textField name="length" value="${container?.length}" size="2"/> &nbsp;
+																		<g:textField name="volumeUnits" value="${container?.volumeUnits}" size="2"/> &nbsp;																		
+																		 <span class="fade">e.g. '10.1" x 4.2" x 2.8"'</span>
 																	</td>		
 																</tr>
 																<tr class="prop">
@@ -498,117 +467,8 @@
 								</tr>
 							</table>
 						</td>						
-						<td valign="top" width="25%">							
-							<div style="width: 300px">
-								<fieldset>
-									<legend>Actions</legend>
-									<table>
-										<tr class="prop">
-											<td>
-												<g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}"><img
-												src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}"
-												alt="Show Shipment" style="vertical-align: middle" /> &nbsp; show details</g:link>
-											
-											</td>
-										</tr>
-										<tr class="prop">
-											<td>
-												<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}"><img 
-												src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" 
-												alt="Add Document" style="vertical-align: middle"/> &nbsp; <b>edit contents</b></a></g:link>
-											</td>
-										</tr>										
-										<tr class="prop">
-											<td>
-												<g:link controller="shipment" action="editDetails" id="${shipmentInstance.id}"><img
-												src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}"
-												alt="Edit Shipment" style="vertical-align: middle" /> &nbsp; edit details</g:link>
-											
-											</td>
-										</tr>
-										<tr class="prop">
-											<td>
-												<a href="${createLink(controller: "shipment", action: "addDocument", id: shipmentInstance.id)}"><img 
-												src="${createLinkTo(dir:'images/icons/silk',file:'page_word.png')}" 
-												alt="Add Document" style="vertical-align: middle"/> &nbsp; attach document</a>										
-											
-											</td>
-										</tr>
-										<tr class="prop">
-											<td>
-												<g:link controller="shipment" action="showPackingList" id="${shipmentInstance.id}" ><img 
-												src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" 
-												alt="View Packing List" style="vertical-align: middle"/> &nbsp; view packing list</g:link>		
-											</td>
-										</tr>					
-									</table>
-								</fieldset>
-							</div>				
-							
-							<br/>
-							<div>
-								<fieldset>								
-									<legend class="toggle-button">
-										&nbsp;<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}"
-											alt="box" style="vertical-align: middle;" /> &nbsp;Add a Shipment Item&nbsp;
-									</legend>
-									<div class="toggleable">																
-										<g:form action="addItemAutoComplete" id="${shipmentInstance.id}">	
-											<table>
-												<tr class="prop">
-													<td class="name"><label>Quantity</label></td>
-													<td class="value">
-														<g:textField name="quantity" value="1" size="3" />
-													</td>													
-												</tr>
-												<tr class="prop">
-													<td class="name"><label>Add item</label></td>
-													<td class="value">
-														<gui:autoComplete size="20" 
-															id="selectedItem" name="selectedItem" 
-															controller="shipment" action="availableItems" />
-													</td>												
-												</tr>											
-												<tr class="prop">												
-													<td class="name"><label>to ...</label></td>
-													<td class="value">
-														<g:select name="container.id" from="${shipmentInstance?.containers}" 
-															optionKey="id" optionValue="optionValue" value="" noSelection="['0':'']" />					
-														<%-- 										
-														<g:hiddenField name="container.id" value="${containerInstance?.id}"></g:hiddenField>
-														--%>
-													</td>												
-												</tr>			
-												<tr class="prop">
-													<td class="name"><label class="optional">Serial Number</label></td>
-													<td class="value">
-														<g:textField name="serialNumber" value="" size="20" style="" /><br/>
-														<span class="fade">(e.g. serial number, lot number)</span>
-													</td>													
-												</tr>
-												<tr class="prop">
-													<td class="name"><label class="optional">Recipient</label></td>
-													<td class="value">
-														<g:textField name="recipient" value="" size="20" style="" /><br/>
-														<span class="fade">(e.g. contact name, email)</span>
-													</td>													
-												</tr>
-												<tr class="prop">
-													<td class="name"></td>
-													<td class="value">
-														<div class="buttons">
-															<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add" /> Add</button></span>
-														</div>
-													</td>												
-												</tr>									
-											</table>									
-										</g:form>			
-									</div>				
-								</fieldset>
-							</div>									
-							
-							
-											
+						<td valign="top" width="20%">							
+							<g:render template="sidebar" />
 						</td>
 					</tr>
 				</tbody>
