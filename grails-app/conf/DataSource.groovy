@@ -3,7 +3,7 @@ dataSource {
 	pooled = true
 	driverClassName = "com.mysql.jdbc.Driver"
 	dialect = org.hibernate.dialect.MySQL5InnoDBDialect
-	loggingSql = true
+	loggingSql = false
 	username = "root"
 	password = "root"
 }
@@ -20,8 +20,8 @@ environments {
 	development {
 		dataSource {	
 			// disable dbCreate when you create the initial database using '$ grails dev migrate'
-			//dbCreate = "update" 	
-			dbCreate = "create-drop"
+			dbCreate = "update" 	
+			//dbCreate = "create-drop"			
 			url = "jdbc:mysql://localhost:3306/warehouse_dev?zeroDateTimeBehavior=convertToNull"
 		}
 	}
@@ -44,6 +44,7 @@ environments {
 	}
 	demo {
 		dataSource {
+			// Used when starting a new version of the migrations changelog 
 			dbCreate = "create-drop"
 			url = "jdbc:mysql://localhost:3306/warehouse_demo?zeroDateTimeBehavior=convertToNull"
 		}

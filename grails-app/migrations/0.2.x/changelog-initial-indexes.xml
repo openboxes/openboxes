@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda (generated)" id="1282769506828-1">
+        <createIndex indexName="FKC7AA9C2FFFE725" tableName="attribute" unique="false">
+            <column name="default_value_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-2">
+        <createIndex indexName="FKD7F53A0E361812E7" tableName="attribute_value" unique="false">
+            <column name="value_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-3">
+        <createIndex indexName="FKD7F53A0E4BFE8EC8" tableName="attribute_value" unique="false">
+            <column name="attribute_options_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-4">
+        <createIndex indexName="FK302BCFE619A2EF8" tableName="category" unique="false">
+            <column name="parent_category_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-5">
+        <createIndex indexName="FK38A5EE5FAF1302EB" tableName="comment" unique="false">
+            <column name="sender_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-6">
+        <createIndex indexName="FK38A5EE5FF885F087" tableName="comment" unique="false">
+            <column name="recipient_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-7">
+        <createIndex indexName="FKE7814C8117A6E251" tableName="container" unique="false">
+            <column name="container_type_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-8">
+        <createIndex indexName="FKE7814C813B5F6286" tableName="container" unique="false">
+            <column name="shipment_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-9">
+        <createIndex indexName="FKE7814C8144979D51" tableName="container" unique="false">
+            <column name="recipient_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-10">
+        <createIndex indexName="FKE7814C814B6A2E03" tableName="container" unique="false">
+            <column name="parent_container_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-11">
+        <createIndex indexName="FKDD770419C427B631" tableName="drug_class" unique="false">
+            <column name="parent_drug_class_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-12">
+        <createIndex indexName="FK16730350AE684D06" tableName="drug_product" unique="false">
+            <column name="drug_class_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-13">
+        <createIndex indexName="FK5C6729A4415A5B0" tableName="event" unique="false">
+            <column name="event_location_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-14">
+        <createIndex indexName="FKFE01941672A2C5B4" tableName="inventory_item" unique="false">
+            <column name="inventory_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-15">
+        <createIndex indexName="FKFE019416DED5FAE7" tableName="inventory_item" unique="false">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-16">
+        <createIndex indexName="FKA518DDEEDED5FAE7" tableName="inventory_lot" unique="false">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-17">
+        <createIndex indexName="FK714F9FB541E07A73" tableName="location" unique="false">
+            <column name="manager_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-18">
+        <createIndex indexName="FK714F9FB572A2C5B4" tableName="location" unique="false">
+            <column name="inventory_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-19">
+        <createIndex indexName="FKED8DCCEFABD88AC6" tableName="product" unique="false">
+            <column name="product_type_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-20">
+        <createIndex indexName="FKED8DCCEFEF4C770D" tableName="product" unique="false">
+            <column name="category_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-21">
+        <createIndex indexName="FK94A534C47B0D087" tableName="product_attribute" unique="false">
+            <column name="attribute_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-22">
+        <createIndex indexName="FK94A534CDED5FAE7" tableName="product_attribute" unique="false">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-23">
+        <createIndex indexName="FK6C229EBE361812E7" tableName="product_attribute_value" unique="false">
+            <column name="value_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-24">
+        <createIndex indexName="FKA0303E4EDED5FAE7" tableName="product_category" unique="false">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-25">
+        <createIndex indexName="FKA0303E4EEF4C770D" tableName="product_category" unique="false">
+            <column name="category_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-26">
+        <createIndex indexName="FK3C7623DBDED5FAE7" tableName="product_name" unique="false">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-27">
+        <createIndex indexName="FK3C78DD69DED5FAE7" tableName="product_tags" unique="false">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-28">
+        <createIndex indexName="FK3C79388A4F625531" tableName="product_type" unique="false">
+            <column name="parent_product_type_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-29">
+        <createIndex indexName="FKE139719A1E2B3CDC" tableName="shipment" unique="false">
+            <column name="destination_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-30">
+        <createIndex indexName="FKE139719A294C1012" tableName="shipment" unique="false">
+            <column name="carrier_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-31">
+        <createIndex indexName="FKE139719A44979D51" tableName="shipment" unique="false">
+            <column name="recipient_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-32">
+        <createIndex indexName="FKE139719A49AB6B52" tableName="shipment" unique="false">
+            <column name="donor_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-33">
+        <createIndex indexName="FKE139719ADBDEDAC4" tableName="shipment" unique="false">
+            <column name="origin_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-34">
+        <createIndex indexName="FKE139719AFF77FF9B" tableName="shipment" unique="false">
+            <column name="shipment_type_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-35">
+        <createIndex indexName="FK6D032BB53B350242" tableName="shipment_event" unique="false">
+            <column name="shipment_events_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-36">
+        <createIndex indexName="FKDA3BB29844979D51" tableName="shipment_item" unique="false">
+            <column name="recipient_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-37">
+        <createIndex indexName="FKDA3BB29849AB6B52" tableName="shipment_item" unique="false">
+            <column name="donor_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-38">
+        <createIndex indexName="FKDA3BB2987400E88E" tableName="shipment_item" unique="false">
+            <column name="container_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-39">
+        <createIndex indexName="FKDA3BB298DED5FAE7" tableName="shipment_item" unique="false">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-40">
+        <createIndex indexName="FK69C15B817A6E251" tableName="shipment_type_container_type" unique="false">
+            <column name="container_type_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-41">
+        <createIndex indexName="FK69C15B8323E731F" tableName="shipment_type_container_type" unique="false">
+            <column name="shipment_type_container_types_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-42">
+        <createIndex indexName="FK7FA0D2DE15EC4455" tableName="transaction" unique="false">
+            <column name="this_warehouse_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-43">
+        <createIndex indexName="FK7FA0D2DE72A2C5B4" tableName="transaction" unique="false">
+            <column name="inventory_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-44">
+        <createIndex indexName="FK7FA0D2DEB9F1C442" tableName="transaction" unique="false">
+            <column name="target_warehouse_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-45">
+        <createIndex indexName="FKABC21FD1DED5FAE7" tableName="transaction_entry" unique="false">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-46">
+        <createIndex indexName="FK36EBCB1171F854" tableName="user" unique="false">
+            <column name="warehouse_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-47">
+        <createIndex indexName="FK36EBCB41E07A73" tableName="user" unique="false">
+            <column name="manager_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282769506828-48">
+        <createIndex indexName="FK143BF46AA462C195" tableName="user_role" unique="false">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

@@ -6,8 +6,6 @@ class Donor {
 	
 	String name
 	String description
-
-	// Audit fields
 	Date dateCreated;
 	Date lastUpdated;
 

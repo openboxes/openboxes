@@ -1,0 +1,522 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda (generated)" id="1282763266083-1">
+        <createTable tableName="category">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_category_id" type="BIGINT"/>
+            <column name="sort_order" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-2">
+        <createTable tableName="container_type">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-3">
+        <createTable tableName="document_type">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-4">
+        <createTable tableName="dosage_form">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-5">
+        <createTable tableName="drug_class">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_drug_class_id" type="BIGINT"/>
+            <column name="sort_order" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-6">
+        <createTable tableName="drug_product">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="dosage_form_id" type="BIGINT"/>
+            <column name="dosage_strength" type="VARCHAR(255)"/>
+            <column name="dosage_unit" type="VARCHAR(255)"/>
+            <column name="drug_class_id" type="BIGINT"/>
+            <column name="drug_route_type_id" type="BIGINT"/>
+            <column name="package_size" type="VARCHAR(255)"/>
+            <column name="package_type_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-7">
+        <createTable tableName="drug_route_type">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-8">
+        <createTable tableName="durable_product">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="make" type="VARCHAR(255)"/>
+            <column name="model" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-9">
+        <createTable tableName="event">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="event_date" type="DATETIME"/>
+            <column name="event_location_id" type="BIGINT"/>
+            <column name="event_type_id" type="BIGINT"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-10">
+        <createTable tableName="event_type">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="event_status" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-11">
+        <createTable tableName="generic_type">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-12">
+        <createTable tableName="package_type">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-13">
+        <createTable tableName="product_attribute">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attribute_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-14">
+        <createTable tableName="product_tags">
+            <column name="product_id" type="BIGINT"/>
+            <column name="tags_string" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-15">
+        <createTable tableName="product_type">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_product_type_id" type="BIGINT"/>
+            <column name="sort_order" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-16">
+        <createTable tableName="reference_number_type">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-17">
+        <createTable tableName="shipment_comment">
+            <column name="shipment_comments_id" type="BIGINT"/>
+            <column name="comment_id" type="BIGINT"/>
+            <column name="comments_idx" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-18">
+        <createTable tableName="shipment_document">
+            <column name="shipment_documents_id" type="BIGINT"/>
+            <column name="document_id" type="BIGINT"/>
+            <column name="documents_idx" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-19">
+        <createTable tableName="shipment_type">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-20">
+        <addColumn tableName="attribute">
+            <column name="allow_multiple" type="BIT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-21">
+        <addColumn tableName="attribute">
+            <column name="default_value_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-22">
+        <addColumn tableName="attribute">
+            <column name="label" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-23">
+        <addColumn tableName="attribute_value">
+            <column name="attribute_options_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-24">
+        <addColumn tableName="document">
+            <column name="content_type" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-25">
+        <addColumn tableName="document">
+            <column name="file_uri" type="TINYBLOB"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-26">
+        <addColumn tableName="document">
+            <column name="name" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-27">
+        <addColumn tableName="donor">
+            <column name="date_created" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-28">
+        <addColumn tableName="donor">
+            <column name="description" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-29">
+        <addColumn tableName="donor">
+            <column name="last_updated" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-30">
+        <addColumn tableName="donor">
+            <column name="name" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-31">
+        <addColumn tableName="donor">
+            <column name="version" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-32">
+        <addColumn tableName="person">
+            <column name="version" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-33">
+        <addColumn tableName="product">
+            <column name="image_src" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-34">
+        <addColumn tableName="product">
+            <column name="upc" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-35">
+        <addColumn tableName="product_attribute_value">
+            <column name="product_attribute_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-36">
+        <addColumn tableName="product_attribute_value">
+            <column name="value_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-37">
+        <addColumn tableName="product_category">
+            <column name="product_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-38">
+        <addColumn tableName="product_name">
+            <column name="product_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-39">
+        <addColumn tableName="product_name">
+            <column name="product_name_type" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-40">
+        <addColumn tableName="shipment">
+            <column name="carrier_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-41">
+        <addColumn tableName="shipment_event">
+            <column name="event_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-42">
+        <addColumn tableName="shipment_event">
+            <column name="shipment_events_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-43">
+        <addColumn tableName="shipment_reference_number">
+            <column name="reference_numbers_idx" type="INT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-44">
+        <addColumn tableName="shipper">
+            <column name="date_created" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-45">
+        <addColumn tableName="shipper">
+            <column name="description" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-46">
+        <addColumn tableName="shipper">
+            <column name="last_updated" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-47">
+        <addColumn tableName="shipper">
+            <column name="name" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-48">
+        <addColumn tableName="shipper">
+            <column name="version" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-49">
+        <addColumn tableName="shipper_service">
+            <column name="description" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-50">
+        <addColumn tableName="shipper_service">
+            <column name="shipper_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-51">
+        <addColumn tableName="transaction">
+            <column name="this_warehouse_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-52">
+        <addColumn tableName="transaction_type">
+            <column name="date_created" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-53">
+        <addColumn tableName="transaction_type">
+            <column name="last_updated" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-54">
+        <addColumn tableName="transaction_type">
+            <column name="sort_order" type="INT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-55">
+        <addColumn tableName="user_role">
+            <column name="user_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-56">
+        <addColumn tableName="value">
+            <column name="date_value" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

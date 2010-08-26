@@ -20,8 +20,8 @@ class Document {
 	Date lastUpdated;		// The date the document was last updated
 
 	URI fileUri			// Universal Resource Identifier
-	DocumentType documentType;	// Type of document
 	String documentNumber;		// Document reference number
+	DocumentType documentType;	// Type of document
 	
 	// Documents should exist on their own in case we want to tie them to other objects. 
 	// Shipment (and other entities) should create a join table for documents.	
@@ -34,6 +34,7 @@ class Document {
 		filename(nullable:true)
 		fileContents(nullable:true)
 		extension(nullable:true)
+		contentType(nullable:true)
 		fileUri(nullable:true)
 		fileContents(nullable:true, maxSize:10485760) // 10 MBs
 		documentNumber(nullable:true)

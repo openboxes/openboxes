@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda (generated)" id="1282763266083-747">
+    	<dropTable tableName="product_attribute_value"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282763266083-748">
+    	<dropTable tableName="shipment_event"/>
+    </changeSet>
+
+   <!--  
+   		Oops.  It seems I accidentally dropped two tables that we were planning to keep.  
+   		This is just a 'practice' run, but if this was the real thing, we would have had 
+   		to reconstruct the tables from backups.  So please be careful!
+   -->
+   <changeSet author="jmiranda (generated)" id="1282767513665-1">
+        <createTable tableName="product_attribute_value">
+            <column name="product_attribute_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282767513665-2">
+        <createTable tableName="shipment_event">
+            <column name="shipment_events_id" type="BIGINT"/>
+            <column name="event_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+
+    
+    
+</databaseChangeLog>
+
+ 

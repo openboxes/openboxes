@@ -173,8 +173,12 @@ class ShipmentController {
 			String query = """\
 				select  
 					container.name,  
-					container.dimensions, 
+					container.height, 
+					container.width, 
+					container.length, 
+					container.volume_units, 
 					container.weight, 
+					container.weight_units,
 					shipment_item.quantity,
 					product.name,
 					shipment_item.serial_number
@@ -199,11 +203,11 @@ class ShipmentController {
 				
 				def rowArray = new String[6];
 				rowArray.putAt(0, row[0]);
-				rowArray.putAt(1, row[1]);
-				rowArray.putAt(2, row[2]);
-				rowArray.putAt(3, row[3]);
-				rowArray.putAt(4, row[4]);
-				rowArray.putAt(5, row[5]);
+				rowArray.putAt(1, row[1] + "x" + row[2] + "x" + row[3] + " " + row[4]);
+				rowArray.putAt(2, row[5] + " " + row[6] );
+				rowArray.putAt(3, row[7]);
+				rowArray.putAt(4, row[8]);
+				rowArray.putAt(5, row[9]);
 				writer.writeNext(rowArray);
 			}
 			
@@ -445,7 +449,7 @@ class ShipmentController {
     	def shipment = Shipment.get(params.shipmentId);   	
     	def containerType = ContainerType.get(params.containerTypeId);    	
     	def containerName = (params.name) ? params.name : containerType.name + " " + (shipment.getContainers().size() + 1);
-        def container = new Container(name: containerName, weight: params.weight, dimensions: params.dimensions, units: params.units, containerType: containerType);
+        def container = new Container(name: containerName, weight: params.weight, weightUnits: params.weightUnits, containerType: containerType);
         shipment.addToContainers(container);
 		redirect(action: 'editContents', id: params.shipmentId)    
     }
@@ -455,7 +459,7 @@ class ShipmentController {
 		def container = Shipment.get(params.containerId);
 		def containerType = ContainerType.get(params.containerTypeId);
 		def containerName = (params.name) ? params.name : containerType.name + " " + shipment.getContainers().size()
-		def container = new Container(name: containerName, weight: params.weight, units: params.units, dimensions: params.dimensions, containerType: containerType);
+		def container = new Container(name: containerName, weight: params.weight, units: params.weightUnits, containerType: containerType);
 		container.save(flush:true);
 		flash.message = "Added a new piece to the shipment";
 		redirect(action: 'show', id: params.shipmentId)

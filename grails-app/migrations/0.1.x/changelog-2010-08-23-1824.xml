@@ -29,20 +29,19 @@
     <changeSet author="jmiranda (generated)" id="1282602202381-6">
         <dropColumn columnName="carrier_id" tableName="shipment_method"/>
     </changeSet>
-	<changeSet author="jmiranda" id="1282602202381-7">
-		<sql>
-			<![CDATA[
-				INSERT INTO `shipper_service` (`id`, `version`, `method_name`, `name`, `parameter_name`, `tracking_format`, `tracking_url`) VALUES 
-				(1,0,'fedex','FedEx Air',NULL,'999999999999','http://www.fedex.com/Tracking?ascend_header=1&clienttype=dotcom&cntry_code=us&language=english&tracknumbers=%s'),
-				(2,0,'fedex','FedEx Ground',NULL,'999999999999','http://www.fedex.com/Tracking?ascend_header=1&clienttype=dotcom&cntry_code=us&language=english&tracknumbers=%s'),
-				(3,0,'ups','UPS Ground',NULL,'1Z9999W99999999999','http://wwwapps.ups.com/WebTracking/processInputRequest?sort_by=status&tracknums_displayed=1&TypeOfInquiryNumber=T&loc=en_US&InquiryNumber1=%s&track.x=0&track.y=0'),
-				(4,0,'usps','USPS Ground','q',NULL,'http://www.google.com/search?hl=en&site=&q='),
-				(5,0,'courier','Courier',NULL,NULL,NULL);
-			]]>		
-			
-		</sql>
-	</changeSet>
-
+    
+    <!--  Needed to converted these into autocrement columns because they used to extend the Organization class (which is now gone) -->
+   <changeSet author="jmiranda (generated)" id="1282602202381-7">
+        <modifyColumn tableName="donor">
+            <column name="id" autoIncrement="true" type="BIGINT"/>
+        </modifyColumn>
+    </changeSet>    
+   <changeSet author="jmiranda (generated)" id="1282602202381-8">
+        <modifyColumn tableName="shipper">
+            <column name="id" autoIncrement="true" type="BIGINT"/>
+        </modifyColumn>
+    </changeSet>    
+    
 	
 </databaseChangeLog>
 

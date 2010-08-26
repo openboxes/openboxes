@@ -16,11 +16,11 @@ class Container implements Comparable {
 	Float height;				// height of container
 	Float width;				// width of container
 	Float length;				// length of container 
-	String volume_units			// standard dimensional unit: cm, in, ft, 
+	String volumeUnits			// standard dimensional unit: cm, in, ft, 
 	
 	// Weight
 	Float weight				// weight of container
-	String weight_units			// standard weight unit: kg, lb
+	String weightUnits			// standard weight unit: kg, lb
 	
 	// Items in container 
 	List shipmentItems
@@ -45,9 +45,9 @@ class Container implements Comparable {
 		height(nullable:true)
 		width(nullable:true)
 		length(nullable:true)
-		volume_units(nullable:true)
+		volumeUnits(nullable:true)
 		weight(nullable:true)
-		weight_units(nullable:true)
+		weightUnits(nullable:true)
 		containerType(nullable:true)
 		shipmentItems(nullable:true)		
 		parentContainer(nullable:true)

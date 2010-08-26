@@ -30,7 +30,7 @@ class Event implements Comparable {
 	}
 
 	String toString() { return "$eventType $eventLocation on $eventDate"; }
-	int compareTo(obj) { eventDate.compareTo(obj.eventDate) }
+	int compareTo(obj) { obj.eventDate <=> eventDate }
 	
 	
 }

@@ -25,6 +25,7 @@ class Shipment {
 
 	Person carrier 					// the person or organization that actually carries the goods from A to B
 	Person recipient				// the person or organization that is receiving the goods
+	
 	Donor donor						// the information about the donor (OPTIONAL)
 	Float totalValue				// the total value of all items in the shipment
 		

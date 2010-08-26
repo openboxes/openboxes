@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<!-- 
+		The data files should be executed right after the core-shema changelog, but 
+		the data is based on INSERT statements that are in sync with the data model
+		after the first four 0.1.x changelogs.		
+	-->
+    <include file="0.1.x/changelog-create-core-schema.xml"/>
+
+    <!--  -->
+    <include file="0.1.x/changelog-2010-08-10-2245.xml"/>
+    
+    <!--  -->
+    <include file="0.1.x/changelog-2010-08-13-1213.xml"/>
+    
+    <!--  -->
+    <include file="0.1.x/changelog-2010-08-13-1613.xml"/>
+    
+    <!--  -->
+    <include file="0.1.x/changelog-2010-08-13-2334.xml"/>
+	
+	<!-- Insert core data 
+    <include file="0.1.x/changelog-insert-core-data.xml"/>
+	-->
+	
+	<!-- Insert demo data 
+    <include file="0.1.x/changelog-insert-demo-data.xml"/>
+    -->
+    
+    <!-- Change to document.file_contents column -->
+    <include file="0.1.x/changelog-2010-08-16-2331.xml"/>    
+	
+	<!-- Changes to 'container' table -->
+    <include file="0.1.x/changelog-2010-08-17-0007.xml"/>
+    
+    <!--  Changes to 'container', 'comment', 'shipment_item', and 'inventory' -->
+    <include file="0.1.x/changelog-2010-08-18-0055.xml"/>
+    
+    <!--  -->
+    <include file="0.1.x/changelog-2010-08-18-0204.xml"/>
+    
+    <!--  -->
+    <include file="0.1.x/changelog-2010-08-18-0246.xml"/>
+	 
+    <!-- Changes to many tables, columns -->
+    <include file="0.1.x/changelog-2010-08-18-1955.xml"/>
+
+    <!-- Changes to many tables, columns -->
+    <include file="0.1.x/changelog-2010-08-23-1824.xml"/>
+
+    <!-- A bunch of 'drop column' changes -->
+    <include file="0.1.x/changelog-2010-08-25-1200.xml"/>
+    
+    <!-- Major data model changes and data import -->
+    <include file="0.1.x/changelog-2010-08-25-1509.xml"/>
+    <include file="0.1.x/changelog-2010-08-25-1510-data.xml"/>
+    <include file="0.1.x/changelog-2010-08-25-1511.xml"/>
+
+</databaseChangeLog>

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda (generated)" id="1282753764894-329">
+        <dropColumn columnName="attribute_values_id" tableName="attribute_value"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-330">
+        <dropColumn columnName="shipment_id" tableName="comment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-331">
+        <dropColumn columnName="shipment_id" tableName="document"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-332">
+        <dropColumn columnName="size" tableName="document"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-333">
+        <dropColumn columnName="name" tableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-334">
+        <dropColumn columnName="class" tableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-335">
+        <dropColumn columnName="dosage_form" tableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-336">
+        <dropColumn columnName="dosage_strength" tableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-337">
+        <dropColumn columnName="drug_route_type_id" tableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-338">
+        <dropColumn columnName="ean" tableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-339">
+        <dropColumn columnName="generic_name" tableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-340">
+        <dropColumn columnName="make" tableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-341">
+        <dropColumn columnName="model" tableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-342">
+        <dropColumn columnName="tags" tableName="product"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1282753764894-343">
+        <dropColumn columnName="allow_multiple" tableName="product_attribute_value"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-344">
+        <dropColumn columnName="attribute_id" tableName="product_attribute_value"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-345">
+        <dropColumn columnName="id" tableName="product_attribute_value"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-346">
+        <dropColumn columnName="product_id" tableName="product_attribute_value"/>
+    </changeSet>
+	<!-- 
+		Commenting out a changeset.
+		    		
+    	These changesets are causing the error below.  We really don't care about this
+    	column because the table gets dropped in changeset 1282753764894-370. 	
+    	
+    	Error executing SQL ALTER TABLE `product_attribute_value` DROP COLUMN `version`:
+    	You can't delete all columns with ALTER TABLE; use DROP TABLE instead
+	 -->
+    <!-- 
+    <changeSet author="jmiranda (generated)" id="1282753764894-347" failOnError="false">
+        <dropColumn columnName="version" tableName="product_attribute_value"/>
+    </changeSet>
+    -->
+    <changeSet author="jmiranda (generated)" id="1282753764894-348">
+        <dropColumn columnName="product_categories_id" tableName="product_category"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-349">
+        <dropColumn columnName="is_brand_name" tableName="product_name"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-350">
+        <dropColumn columnName="is_generic_name" tableName="product_name"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-351">
+        <dropColumn columnName="courier_id" tableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-352">
+        <dropColumn columnName="current_event_id" tableName="shipment"/>
+    </changeSet>
+    
+    <changeSet author="jmiranda (generated)" id="1282753764894-353">
+        <dropColumn columnName="date_created" tableName="shipment_event"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-354">
+        <dropColumn columnName="event_date" tableName="shipment_event"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-355">
+        <dropColumn columnName="event_location_id" tableName="shipment_event"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-356">
+        <dropColumn columnName="event_type_id" tableName="shipment_event"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-357">
+        <dropColumn columnName="id" tableName="shipment_event"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-358">
+        <dropColumn columnName="last_updated" tableName="shipment_event"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-359">
+        <dropColumn columnName="shipment_id" tableName="shipment_event"/>
+    </changeSet>
+
+	<!-- 
+		Commenting out a changeset.
+		    		
+	-->
+    <!-- 
+    <changeSet author="jmiranda (generated)" id="1282753764894-360">
+        <dropColumn columnName="version" tableName="shipment_event"/>
+    </changeSet>
+	-->
+    <changeSet author="jmiranda (generated)" id="1282753764894-361">
+	     <preConditions onFail="MARK_RAN">
+			<columnExists tableName="shipment_method" columnName="carrier_id"/>
+		 </preConditions>
+        <dropColumn columnName="carrier_id" tableName="shipment_method"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-362">
+	     <preConditions onFail="MARK_RAN">
+			<columnExists tableName="shipment_method" columnName="shipment_service_id"/>
+		 </preConditions>        
+        <dropColumn columnName="shipment_service_id" tableName="shipment_method"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-363">
+        <dropColumn columnName="direction" tableName="transaction"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-364">
+        <dropColumn columnName="local_warehouse_id" tableName="transaction"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-365">
+        <dropColumn columnName="user_roles_id" tableName="user_role"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-366">
+        <dropTable tableName="generic_product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-367">
+        <dropTable tableName="organization"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-368">
+        <dropTable tableName="party"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-369">
+        <dropTable tableName="party_type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-370">
+        <dropTable tableName="product_attribute_value_value"/>
+    </changeSet>    
+    <changeSet author="jmiranda (generated)" id="1282753764894-371">
+        <dropTable tableName="shipper_shipper_service"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282753764894-372">
+        <dropTable tableName="type"/>
+    </changeSet>
+    <changeSet author="jmiranda" id="1282753764894-373">
+	     <preConditions onFail="MARK_RAN">
+			<columnExists tableName="shipment_method" columnName="shipper_id"/>
+		 </preConditions>
+        <dropColumn columnName="shipper_id" tableName="shipment_method"/>
+    </changeSet>
+</databaseChangeLog>

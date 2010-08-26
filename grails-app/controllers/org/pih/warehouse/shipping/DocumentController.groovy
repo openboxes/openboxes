@@ -1,15 +1,18 @@
 package org.pih.warehouse.shipping;
 
 import org.pih.warehouse.core.Document;
+import org.pih.warehouse.core.DocumentType;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Command object 
  */
 class DocumentCommand {
    String typeId
+   String name
    String shipmentId
    String documentNumber
-   byte [] fileContents
+   MultipartFile fileContents
 }
 
 class DocumentController {
@@ -33,42 +36,36 @@ class DocumentController {
 	* Upload a document to the server
 	*/
    def upload = { DocumentCommand command ->
-	   log.info "upload document: " + params
-	   def file = request.getFile('fileContents');
-	   def filename = file.originalFilename;
-	   def shipmentInstance = Shipment.get(command.shipmentId);
-	   def documentNumber = params.documentNumber;
+	   log.info "upload document: " + params	  	   
+	   def file = command.fileContents;	   
+	   def shipmentInstance = Shipment.get(command.shipmentId);	   
+	   log.info "multipart file: " + file.originalFilename + " " + file.contentType + " " + file.size + " " 
 	   
-	   log.info "file: " + file
-	   
-	   // file must be less than 1MB
+	   // file must not be empty and must be less than 1MB
 	   if (!file?.empty && file.size < 1024*1000) {		   
-		   def fileSize = file.size;
-		   def documentType = DocumentType.get(Long.parseLong(command.typeId));
-		   
-		   Document document = new Document(documentType: documentType, size: fileSize, 
-			   filename: filename, contents: command.fileContents, documentNumber: command.documentNumber);
+		   Document document = new Document( 
+			   size: file.size, 
+			   name: command.name,
+			   filename: file.originalFilename,
+			   fileContents: command.fileContents.bytes,
+			   contentType: file.contentType, 
+			   documentNumber: command.documentNumber,
+			   documentType:  DocumentType.get(Long.parseLong(command.typeId)));
 		   
 		   if (!document.hasErrors()) {			   
 			   shipmentInstance.addToDocuments(document).save(flush:true)
 			   log.info "saved document to shipment"
 			   flash.message= "Successfully saved file to Shipment"			   
-			   File newFile = new File("/tmp/warehouse/shipment/" + command.shipmentId + "/" + filename);
-			   newFile.mkdirs();
-			   file.transferTo(newFile);			   
-			   flash.message += " and stored the file $newFile.absolutePath to the local file system";			   
-			   //redirect(action: "showDetails", id: shipmentInstance.id)
 		   }
 		   else {
-			   log.info "did not save document " + document.errors;
-			   log.info "not sure why what the fuck"
+			   log.info "Document did not save " + document.errors;
 			   flash.message = "Cannot save document " + document.errors;
 			   redirect(controller: "shipment", action: "addDocument", id: shipmentInstance.id,
 				   model: [shipmentInstance: shipmentInstance, document : document])
 		   }
 	   }
 	   else {
-		   log.info "document is empty or too large"		   
+		   log.info "Document is empty or too large"		   
 		   flash.message = "File $filename is too large (must be less than 1MB)";
 		   redirect(controller: 'shipment', action: 'showDetails', id: command.shipmentId)
 	   }
@@ -81,7 +78,7 @@ class DocumentController {
 	 * Allow user to download the file associated with the given id.
 	 */
 	def download = { 
-		log.debug "download file id = ${params.id}";
+		log.debug "Download file with id = ${params.id}";
 
 		def document = Document.get(params.id)
         if (!document) {
@@ -89,21 +86,10 @@ class DocumentController {
 			redirect(controller: "shipment", action: "showDetails", id:document.getShipment().getId());    			
         }
         else {            
-    		log.debug "document = ${document}";    		
-    		def path = "/tmp/warehouse/shipment/" + document.getShipment().getId() + "/" + document.getFilename();
-    		log.info "uploaded file path = ${path}";
-    			
-    		def file = new File(path);    
-    		
-    		if (file.exists()) { 
-	    		response.setContentType("application/octet-stream")
-	    		response.setHeader("Content-Disposition", "attachment;filename=${file.getName()}")
-	    		response.outputStream << file.newInputStream() 
-    		}
-    		else { 
-                flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'file.label', default: 'Document File'), params.id])}";
-    			redirect(controller: "shipment", action: "showDetails", id:document.getShipment().getId());    			
-    		}
+    		log.info "document = ${document} ${document.contentType}";    		    					
+    		response.setContentType(document.contentType)
+    		response.setHeader("Content-Disposition", "attachment;filename=${document.filename}")
+			response.outputStream << document.fileContents;
         }
 	}
 	
