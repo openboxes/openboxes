@@ -1,9 +1,10 @@
 
-import liquibase.Liquibase;
-import liquibase.database.DatabaseFactory;
 
 import grails.util.GrailsUtil;
+import liquibase.Liquibase;
+import liquibase.database.DatabaseFactory;
 import java.util.Date;
+import javax.sql.DataSource;
 import org.pih.warehouse.core.Address;
 import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.DataType;
@@ -48,9 +49,9 @@ import org.pih.warehouse.shipping.ShipperService;
 
 class BootStrap {
 	
-	/**
-	 * 
-	 */
+	
+	DataSource dataSource;
+	
 	def init = { servletContext ->
 		
 		// ================================    Static Data    ============================================
