@@ -105,8 +105,66 @@
 										<td valign="top" class="name" style="width: 10%;"><label><g:message
 											code="shipment.carrier.label" default="Carrier" /></label></td>
 										<td valign="top" style="width: 30%;">
+											
+											<%-- 
 											<g:textField name="carrier"
 												value="${shipmentInstance?.carrier}" /> 	
+												--%>
+												
+											<div>
+												<input id="carrier-suggest" type="text" value="${shipmentInstance.carrier.firstName} ${shipmentInstance.carrier.lastName}"> 	
+												<img id="carrier-icon" src="/warehouse/images/icons/search.png" style="vertical-align: middle;"/>
+												<input id="carrier-id" name="carrier.id" type="hidden" value="${shipmentInstance.carrier.id}"/>
+												<span id="carrier-name"></span>		
+											</div>		
+											<script>
+												$(document).ready(function() {
+													$('#carrier-suggest').focus();
+													$("#carrier-name").click(function() {
+														$('#carrier-suggest').val("");
+														$('#carrier-name').hide();
+														$('#carrier-suggest').show();				
+														$('#carrier-suggest').focus();
+														$('#carrier-suggest').select();
+													});
+											      	$("#carrier-suggest").autocomplete({
+											            width: 400,
+											            minLength: 2,
+											            dataType: 'json',
+											            highlight: true,
+											            selectFirst: true,
+											            scroll: true,
+											            autoFill: true,
+											            //scrollHeight: 300,
+														//define callback to format results
+														source: function(req, add){
+															//pass request to server
+															$.getJSON("/warehouse/test/searchByName", req, function(data) {
+																var people = [];
+																$.each(data, function(i, item){
+																	people.push(item);
+																});
+																add(people);
+															});
+												      	},
+												        focus: function(event, ui) {			        
+												      		$('#carrier-suggest').val(ui.item.label);					
+												      		return false;
+												        },	
+														select: function(event, ui) {	
+															$('#carrier-suggest').val(ui.item.label);
+															$('#carrier-name').html(ui.item.label);
+															$('#carrier-id').val(ui.item.value);
+															$('#carrier-icon').attr('src', '/warehouse/images/icons/silk/user.png');
+															$('#carrier-suggest').hide();
+															$('#carrier-name').show();
+															return false;
+														}
+													});
+												});
+											</script>													
+												
+												
 										</td>
 									</tr>
 									<tr class="prop">
@@ -114,9 +172,64 @@
 											<label><g:message code="shipment.destination.label" default="Recipient" /></label>
 										</td>
 										<td class="value" style="width: 30%;">								
-											<g:textField name="recipient"
-												value="${shipmentInstance?.recipient}" /> 								
-										</td>
+
+											
+											<div>
+												
+												<input id="recipient-suggest" type="text" value="${shipmentInstance.recipient.firstName} ${shipmentInstance.recipient.lastName}"> 												
+												<img id="recipient-icon" src="/warehouse/images/icons/search.png" style="vertical-align: middle;"/>
+												<input id="recipient-id" name="recipient.id" type="hidden" value="${shipmentInstance.recipient.id }"/>												
+												<span id="recipient-name"></span>		
+											</div>		
+											<script>
+												$(document).ready(function() {
+													//$('#recipient-suggest').focus();
+													$("#recipient-name").click(function() {
+														$('#recipient-suggest').val("");
+														$('#recipient-name').hide();
+														$('#recipient-suggest').show();				
+														$('#recipient-suggest').focus();
+														$('#recipient-suggest').select();
+													});
+											      	$("#recipient-suggest").autocomplete({
+											            width: 400,
+											            minLength: 2,
+											            dataType: 'json',
+											            highlight: true,
+											            selectFirst: true,
+											            scroll: true,
+											            autoFill: true,
+											            //scrollHeight: 300,
+														//define callback to format results
+														source: function(req, add){
+															//pass request to server
+															$.getJSON("/warehouse/test/searchByName", req, function(data) {
+																var people = [];
+																$.each(data, function(i, item){
+																	people.push(item);
+																});
+																add(people);
+															});
+												      	},
+												        focus: function(event, ui) {			        
+												      		$('#recipient-suggest').val(ui.item.label);					
+												      		return false;
+												        },	
+														select: function(event, ui) {	
+															$('#recipient-suggest').val(ui.item.label);
+															$('#recipient-name').html(ui.item.label);
+															$('#recipient-id').val(ui.item.value);
+															$('#recipient-icon').attr('src', '/warehouse/images/icons/silk/user.png');
+															$('#recipient-suggest').hide();
+															$('#recipient-name').show();
+															return false;
+														}
+													});
+												});
+											</script>		
+	
+
+									</td>
 									</tr>						
 									
 									<tr class="prop">

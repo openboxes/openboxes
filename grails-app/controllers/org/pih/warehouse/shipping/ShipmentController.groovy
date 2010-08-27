@@ -39,7 +39,7 @@ class ShipmentController {
 				
 		if (shipmentInstance.save(flush: true)) {
 		
-			// Try to add the current event
+			// Try to add the initial event
 			def eventType = EventType.get(params.eventType.id);
 			if (eventType) {
 				def shipmentEvent = new Event(eventType: eventType, eventLocation: session.warehouse, eventDate: new Date())
@@ -56,6 +56,8 @@ class ShipmentController {
 	}
 
 	def update = {		
+		
+		log.info params
 		def shipmentInstance = Shipment.get(params.id)
 		if (shipmentInstance) {
 			if (params.version) {

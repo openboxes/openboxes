@@ -5,7 +5,7 @@ import java.util.Date;
 import org.pih.warehouse.inventory.Warehouse;
 
 
-class Person {
+class Person implements Comparable {
     
 	String firstName;
 	String lastName;
@@ -28,6 +28,8 @@ class Person {
 		email(nullable:true, email:true)
 		phoneNumber(nullable:true)
 	}
+	
+	int compareTo(obj) { obj.id <=> id }
 	
 	
 }

@@ -1,7 +1,6 @@
-<div id="shipmentMenu" class="menu" style="width: 200px">
+<div id="shipmentMenu" class="menu" style="width: 250px">
 	<fieldset>
-		<legend>Actions</legend>			
-		<h3>Edit Shipment</h3>
+		<legend>Workflow</legend>			
 		<table>
 			<tr class="prop">
 				<td>
@@ -39,6 +38,16 @@
 			</tr>
 			<tr class="prop">
 				<td>
+					<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}"><img 
+					src="${createLinkTo(dir:'images/icons',file:'pack-shipment.png')}" 
+					alt="Add Document" style="vertical-align: middle"/> &nbsp; 
+						<g:if test="${request.request.requestURL.toString().contains('editContents')}"><b>pack shipment</b></g:if>
+						<g:else>pack shipment</g:else>
+					</g:link>
+				</td>
+			</tr>
+			<tr class="prop">
+				<td>
 					<g:link controller="shipment" action="showPackingList" id="${shipmentInstance.id}" ><img 
 					src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" 
 					alt="View Packing List" style="vertical-align: middle"/> &nbsp; 
@@ -47,20 +56,6 @@
 					</g:link>		
 				</td>
 			</tr>					
-		</table>
-		<br/><br/>
-		<h3>Pack Shipment</h3>
-		<table>
-			<tr class="prop">
-				<td>
-					<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}"><img 
-					src="${createLinkTo(dir:'images/icons',file:'pack-shipment.png')}" 
-					alt="Add Document" style="vertical-align: middle"/> &nbsp; 
-						<g:if test="${request.request.requestURL.toString().contains('editContents')}"><b>edit contents</b></g:if>
-						<g:else>edit contents</g:else>
-					</g:link>
-				</td>
-			</tr>
 			<tr class="prop">
 				<td>
 					<g:link controller="shipment" action="markAsReady" id="${shipmentInstance.id}"><img 
@@ -71,10 +66,6 @@
 					</g:link>
 				</td>
 			</tr>		
-		</table>							
-		<br/><br/>
-		<h3>Send Shipment</h3>
-		<table>
 			<tr class="prop">
 				<td>
 					<g:link controller="shipment" action="sendShipment" id="${shipmentInstance.id}"><img
@@ -86,10 +77,6 @@
 				
 				</td>
 			</tr>
-		</table>							
-		<br/><br/>
-		<h3>Receive Shipment</h3>
-		<table>
 			<tr class="prop">
 				<td>
 					<g:link controller="shipment" action="receiveShipment" id="${shipmentInstance.id}"><img
@@ -104,34 +91,25 @@
 	</fieldset>
 </div>
 <br/>
-<div style="width: 200px">
+<div style="width: 250px" class="menu" >
 	<fieldset>
-		<legend>Tracking</legend>
+		<legend>Summary</legend>
 		<table>
 			<g:each in="${shipmentInstance.events}" var="event" status="i">
 				
-				<tr class="">
+				<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 					<td>
-						<g:if test="${i == 0}"><b>${event?.eventType?.name}</b></g:if>
-						<g:else><span style="font-size: 0.8em; color: #aaa;">${event?.eventType?.name}</span></g:else>
+						
+							<span style="font-size: 0.8em; color: #aaa;"><g:formatDate format="MMM dd" date="${event.eventDate}"/></span>
+						
 					</td>
 					<td>
 						
-						<g:if test="${i == 0}">
-							<b>
-								${event.eventLocation.name}
-								&nbsp; <g:formatDate format="dd/MM/yy" date="${event.eventDate}"/>
-								&nbsp; <g:formatDate type="time" date="${event.eventDate}"/>
-							</b>						
-						</g:if>
-						<g:else>
+						
 							<span style="font-size: 0.8em; color: #aaa;">
-								${event.eventLocation.name}
-								&nbsp; <g:formatDate format="dd/MM/yy" date="${event.eventDate}"/> 
-								&nbsp; <g:formatDate type="time" date="${event.eventDate}"/>
-								
+								${event?.eventType?.name} ${event.eventLocation.name}
 							</span>
-						</g:else>
+						
 					</td>
 				</tr>
 			</g:each>

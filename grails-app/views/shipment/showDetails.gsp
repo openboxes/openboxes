@@ -44,9 +44,8 @@
 										<td valign="top" class="name"><label><g:message
 											code="shipment.currentStatus.label" default="Status" /></label></td>
 										<td valign="top" class="">
-											${fieldValue(bean: shipmentInstance, field: "mostRecentStatus")}<br/> 
+											${fieldValue(bean: shipmentInstance, field: "mostRecentEvent.eventType.name")}
 											<span style="font-size: 0.8em; color: #aaa">
-												${fieldValue(bean: shipmentInstance, field: "mostRecentEvent.eventType.name")} <br/>
 												${fieldValue(bean: shipmentInstance, field: "mostRecentEvent.eventLocation.name")} &nbsp;
 												<g:formatDate format="dd MMM yyyy" date="${shipmentInstance?.mostRecentEvent?.eventDate}"/>
 											</span>
@@ -63,10 +62,12 @@
 																${fieldValue(bean: shipmentInstance, field: "shipmentMethod.shipper.name")} <br/> 
 																<span class="fade" style="font-size: 0.8em;">${fieldValue(bean: shipmentInstance, field: "shipmentMethod.trackingNumber")}</span>														
 															</td>
+															<%-- 
 															<td style="width:16px;">
 																<img src="${createLinkTo(dir:'images/icons',file: shipmentInstance?.shipmentMethod?.shipperService?.name + '.png')}"
 																valign="top" style="vertical-align: middle;" />
 															</td>
+															--%>
 														</tr>
 													</tbody>											
 												</table>
@@ -108,13 +109,21 @@
 										<td valign="top" class="name" style="width: 10%;"><label><g:message
 											code="shipment.carrier.label" default="Carrier" /></label></td>
 										<td valign="top" style="width: 30%;">
-											<span>${fieldValue(bean: shipmentInstance, field: "carrier")}</span>
+											<span>
+												${fieldValue(bean: shipmentInstance, field: "carrier.firstName")}
+												${fieldValue(bean: shipmentInstance, field: "carrier.lastName")}
+											</span>
+											<span class="fade" style="font-size: 0.8em;">${fieldValue(bean: shipmentInstance, field: "carrier.email")}</span>
 										</td>
 										<td class="name"  style="width: 10%;">
 											<label><g:message code="shipment.destination.label" default="Recipient" /></label>
 										</td>
 										<td class="value" style="width: 30%;">
-											<span>${fieldValue(bean: shipmentInstance, field: "recipient")}</span>
+											<span>
+												${fieldValue(bean: shipmentInstance, field: "recipient.firstName")}
+												${fieldValue(bean: shipmentInstance, field: "recipient.lastName")}
+											</span>
+											<span class="fade" style="font-size: 0.8em;">${fieldValue(bean: shipmentInstance, field: "recipient.email")}</span>
 										</td>
 									</tr>
 
