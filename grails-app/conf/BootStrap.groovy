@@ -600,7 +600,7 @@ class BootStrap {
 				}
 				//LiquibaseUtil.class.getClassLoader();
 				def classLoader = getClass().classLoader;
-						def fileOpener = classLoader.loadClass("org.liquibase.grails.GrailsFileOpener").getConstructor().newInstance()
+				def fileOpener = classLoader.loadClass("org.liquibase.grails.GrailsFileOpener").getConstructor().newInstance()
 
 				//def fileOpener = new ClassLoaderFileOpener()
 				def database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(c)
