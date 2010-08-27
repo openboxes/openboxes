@@ -5,6 +5,11 @@
             <column name="shipper_id" type="BIGINT"/>
         </addColumn>
     </changeSet>
+    <changeSet author="jmiranda (generated)" id="1282772321026-16">
+        <createIndex indexName="FK40203B263896C98E" tableName="shipment_method" unique="false">
+            <column name="shipper_id"/>
+        </createIndex>
+    </changeSet>    
     <changeSet author="jmiranda (generated)" id="1282861095818-1">
         <createIndex indexName="FK335CD11B6631D8CC" tableName="document" unique="false">
             <column name="document_type_id"/>
@@ -78,11 +83,6 @@
     <changeSet author="jmiranda (generated)" id="1282861095818-15">
         <createIndex indexName="FK40203B26296B2CA3" tableName="shipment_method" unique="false">
             <column name="shipper_service_id"/>
-        </createIndex>
-    </changeSet>
-    <changeSet author="jmiranda (generated)" id="1282861095818-16">
-        <createIndex indexName="FK40203B263896C98E" tableName="shipment_method" unique="false">
-            <column name="shipper_id"/>
         </createIndex>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1282861095818-17">
