@@ -112,9 +112,9 @@
 												--%>
 												
 											<div>
-												<input id="carrier-suggest" type="text" value="${shipmentInstance.carrier.firstName} ${shipmentInstance.carrier.lastName}"> 	
+												<input id="carrier-suggest" type="text" value="${shipmentInstance?.carrier?.firstName} ${shipmentInstance?.carrier?.lastName}"> 	
 												<img id="carrier-icon" src="/warehouse/images/icons/search.png" style="vertical-align: middle;"/>
-												<input id="carrier-id" name="carrier.id" type="hidden" value="${shipmentInstance.carrier.id}"/>
+												<input id="carrier-id" name="carrier.id" type="hidden" value="${shipmentInstance?.carrier?.id}"/>
 												<span id="carrier-name"></span>		
 											</div>		
 											<script>
@@ -176,9 +176,9 @@
 											
 											<div>
 												
-												<input id="recipient-suggest" type="text" value="${shipmentInstance.recipient.firstName} ${shipmentInstance.recipient.lastName}"> 												
+												<input id="recipient-suggest" type="text" value="${shipmentInstance?.recipient?.firstName} ${shipmentInstance?.recipient?.lastName}"> 												
 												<img id="recipient-icon" src="/warehouse/images/icons/search.png" style="vertical-align: middle;"/>
-												<input id="recipient-id" name="recipient.id" type="hidden" value="${shipmentInstance.recipient.id }"/>												
+												<input id="recipient-id" name="recipient.id" type="hidden" value="${shipmentInstance?.recipient?.id }"/>												
 												<span id="recipient-name"></span>		
 											</div>		
 											<script>
