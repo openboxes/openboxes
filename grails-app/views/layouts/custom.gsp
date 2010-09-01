@@ -124,27 +124,29 @@
 												</span>
 												<a styte="vertical-align: middle" class="home" href='${createLink(controller: "dashboard", action:"chooseWarehouse")}'>change</a>	
 											</li>
-										|								
+																		
 										</g:if>
 										<li>
 											logged in as <b>${session.user.username}</b>
 										</li>
 										<!-- 
-										| <li><g:link class="list" controller="user" action="preferences"><g:message code="default.preferences.label"  default="Preferences"/></g:link></li>
+										 <li><g:link class="list" controller="user" action="preferences"><g:message code="default.preferences.label"  default="Preferences"/></g:link></li>
 										 -->
-										| 
+										 
 										<li>
 											<g:link class="list" controller="auth" action="logout"><g:message code="default.logout.label"  default="logout"/></g:link>
 										</li>
 										<!-- 
-										| <li><input type="text" value="search" name="q" style="color: #aaa; font-weight: bold;" disabled=disabled /></li>
+										 <li><input type="text" value="search" name="q" style="color: #aaa; font-weight: bold;" disabled=disabled /></li>
 										 -->
 								    </g:if>
 								    <g:else test="${!session.user}">
-										<li>Not logged in</li>  | <li><g:link class="list" controller="auth" action="login"><g:message code="default.login.label" default="Login"/></g:link></li>
+										<li>Not logged in</li>
+										<li><g:link class="list" controller="auth" action="signup"><g:message code="default.signup.label" default="Signup"/></g:link></li>
+										<li><g:link class="list" controller="auth" action="login"><g:message code="default.login.label" default="Login"/></g:link></li>
 										<!-- 
-										 | <li><g:link class="list" controller="user" action="register"><g:message code="default.register.label" default="Register"/></g:link></li>
-										 | <li><g:link class="list" controller="user" action="help"><g:message code="default.help.label" default="Help"/></g:link></li>
+										  <li><g:link class="list" controller="user" action="register"><g:message code="default.register.label" default="Register"/></g:link></li>
+										  <li><g:link class="list" controller="user" action="help"><g:message code="default.help.label" default="Help"/></g:link></li>
 										 -->
 										 
 								    </g:else>

@@ -11,6 +11,23 @@ grails.config.locations = [
 // if(System.properties["${appName}.config.location"]) {
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
 // }
+
+grails { 
+	mail { 
+		from = "warehouse@pih.org"
+		host = "localhost"
+		port = "25"
+		//host = "smtp.gmail.com"
+		//port = 465
+		//username = "justin.miranda@gmail.com"
+		//password = "test"
+		//props = ["mail.smtp.auth":"true",
+		//  "mail.smtp.socketFactory.port":"465",
+		//  "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
+		//  "mail.smtp.socketFactory.fallback":"false"]
+	}
+}
+
 grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
 grails.mime.use.accept.header = false
 grails.mime.types = [ html: ['text/html','application/xhtml+xml'],

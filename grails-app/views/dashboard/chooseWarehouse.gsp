@@ -21,29 +21,37 @@
 					<fieldset> 		
 						<legend>Choose a warehouse</legend>
 						<table>
-							<tbody>
+							<tbody>							
 								<tr>
 									<td>
 										<g:if test="${session?.user?.warehouse}">
-											<span style="width: 100%; text-align: right; color: #aaa">
-												Last login: <b>${session?.user?.warehouse}</b> on
-												<b><g:formatDate format="dd MMM yyyy hh:mm" date="${session?.user?.lastLoginDate}"/></b> 
+											<span style="font-size: 80%; width: 100%; text-align: right; color: #aaa">
+												You last logged into <b>${session?.user?.warehouse}</b> on
+												<b><g:formatDate format="MMM dd, yyyy hh:mm a" date="${session?.user?.lastLoginDate}"/></b> 
 											</span>
 										</g:if>
 									</td>
-								</tr>
-									<g:each var="warehouse" in="${warehouses}" status="i">								
-										<tr>
-											<td nowrap="nowrap">
-												<div style="padding: 5px; background-color: #F8F7EF; display: block;">												
-													<a style="display: block;" class="home" href='${createLink(action:"chooseWarehouse", id: warehouse.id)}'>
-														<g:if test="${warehouse.logoUrl}"><img src="${warehouse.logoUrl}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img></g:if>
-														${warehouse.name}
-													</a> 
-												</div>												
-											</td>											
-										</tr>																		
-									</g:each>							
+								</tr>							
+								<g:each var="warehouse" in="${warehouses}" status="i">								
+									<tr>
+										<td nowrap="nowrap">
+											<div style="padding: 5px; background-color: #F8F7EF; display: block;">												
+												<a style="display: block;" class="home" href='${createLink(action:"chooseWarehouse", id: warehouse.id)}'>
+													<g:if test="${warehouse.logo}">	
+														<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'warehouse', action:'viewLogo', id: warehouse.id)}" />															
+														<%--<img src="${warehouse.logo}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img>--%>
+													</g:if>
+													<g:else>
+														<img src="${createLinkTo(dir:'images',file:'icons/building.png')}" style="vertical-align: middle"/>
+													</g:else>
+													&nbsp;
+													${warehouse.name} 
+												</a> 
+											</div>												
+										</td>											
+									</tr>																		
+								</g:each>							
+								
 							</tbody>					
 						</table>
 					</fieldset>					

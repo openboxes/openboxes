@@ -114,38 +114,23 @@ class ProductController {
     		
     	// Get selected 
 		def selectedCategory = Category.get(params.categoryId);		
-		def selectedConditionType = ConditionType.get(params.conditionTypeId);
 		def selectedProductType = ProductType.get(params.productTypeId);
-		def selectedProductSubType = ProductType.get(params.productSubTypeId);
     	def selectedAttribute = Attribute.get(params.attributeId)	
 		
 		
     	// Condition types	
     	def allAttributes = Attribute.getAll();
-    	def allConditionTypes = ConditionType.getAll();
     	
     	// Root level product types
 		def typeCriteria = ProductType.createCriteria();
 		def allProductTypes = typeCriteria.list {
-			isNull("parent")
+			isNull("parentProductType")
 		}    		
 
 		// Root categories
 		def categoryCriteria = Category.createCriteria();		
 		def allCategories = categoryCriteria.list { 
-			isNull("parent")
-		}
-				
-		// Product subtypes
-		def productSubtypes = null;
-		if (params.productTypeId) {
-			def subtypeCriteria = ProductType.createCriteria();
-			productSubtypes = subtypeCriteria.list { 
-				and { 
-					isNotNull("parent")
-					eq("parent.id", Long.parseLong(params.productTypeId))
-				}
-			}		
+			isNull("parentCategory")
 		}
 				
 		// Search for Products matching criteria 
@@ -164,25 +149,13 @@ class ProductController {
                 } 
 				if (params.nameContains) {  
 					like("name", "%" + params.nameContains + "%")
-					//eq("name", params.nameContains)
 				}
 				if (params.unverified) { 
 					eq("unverified", true)
 				}
             }				
 		}		
-		
-		// Search drug products matching condition type id
-  		if(params.conditionTypeId && params.conditionTypeId != ''){
-  			def drugProductCriteria = DrugProduct.createCriteria();
-  			results = drugProductCriteria.list {  			
-	  			conditionTypes { 
-	  				eq("id", Long.parseLong(params.conditionTypeId))
-	  			}
-  			}  			
-        }
-		
-		
+				
 		def rootCategory = new Category(name: "/", categories: allCategories);
 		
         //params.max = Math.min(params.max ? params.int('max') : 10, 100)		
@@ -190,9 +163,7 @@ class ProductController {
     	                             productInstanceTotal: Product.count(), 
 									 rootCategory : rootCategory,
     	                             categories : allCategories, selectedCategory : selectedCategory,
-    	                             conditionTypes : allConditionTypes, selectedConditionType : selectedConditionType,
     	                             productTypes : allProductTypes, selectedProductType : selectedProductType,
-    	                             productSubTypes : productSubtypes, selectedProductSubType : selectedProductSubType,
     	                             attributes : allAttributes, selectedAttribute : selectedAttribute ])
 	}
     

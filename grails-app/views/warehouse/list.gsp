@@ -38,8 +38,8 @@
 							<td>
 								<g:link action="show" id="${warehouseInstance.id}">${fieldValue(bean: warehouseInstance, field: "name")}</g:link>
 							</td>
-                            <td>${fieldValue(bean: warehouseInstance, field: "city")}</td>
-                            <td>${fieldValue(bean: warehouseInstance, field: "country")}</td>                        
+                            <td>${fieldValue(bean: warehouseInstance, field: "address.city")}</td>
+                            <td>${fieldValue(bean: warehouseInstance, field: "address.country")}</td>                        
                             <td>${fieldValue(bean: warehouseInstance, field: "manager")}</td>                            
                             <td>
 								<g:link action="showInventory" id="${warehouseInstance.id}">Show Inventory</g:link>

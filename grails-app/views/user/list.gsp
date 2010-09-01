@@ -6,20 +6,13 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'user.label', default: 'User')}" />
         <title><g:message code="default.list.label" args="[entityName]" /></title>
-	<content tag="globalLinks"><!-- Specify global navigation links -->
-	    <span class="menuButton">
-		<g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link>
-	    </span>
-	</content>
-	<content tag="pageTitle"><!-- Specify page title -->
-	    <g:message code="default.list.label" args="[entityName]" />
-	</content>
+	<content tag="pageTitle"><g:message code="default.list.label" args="[entityName]" /></content>
 
     </head>
     <body>
         <div class="body">
 	    <g:if test="${flash.message}">
-	      <div class="message">${flash.message}</div>
+	    	<div class="message">${flash.message}</div>
             </g:if>
             <div class="list">
                 <table>

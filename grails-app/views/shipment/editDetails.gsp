@@ -5,9 +5,7 @@
 	<g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
 	<title><g:message code="default.edit.label" args="[entityName]" /></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
-	<content tag="pageTitle">
-		Edit Shipment
-	</content>
+	<content tag="pageTitle">Edit Shipment</content>
 </head>
 
 <body>

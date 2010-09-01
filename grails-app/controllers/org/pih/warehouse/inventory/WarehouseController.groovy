@@ -186,4 +186,42 @@ class WarehouseController {
 			redirect(action: "list")
 		}
 	}
+
+
+	/**
+	 * View warehouse logo 
+	 */
+	def viewLogo = { 
+		def warehouseInstance = Warehouse.get(params.id);		
+		if (warehouseInstance) { 
+			byte[] logo = warehouseInstance.logo 
+			response.outputStream << logo
+		} 
+		else { 
+			"${message(code: 'default.not.found.message', args: [message(code: 'warehouse.label', default: 'Warehouse'), params.id])}"
+		}
+	} 
+
+
+	def uploadLogo = { 
+		
+		def warehouseInstance = Warehouse.get(params.id);		
+		if (warehouseInstance) { 
+			def logo = request.getFile("logo");
+			if (!logo?.empty && logo.size < 1024*1000) { // not empty AND less than 1MB
+				warehouseInstance.logo = logo.bytes;			
+		        if (!warehouseInstance.hasErrors() && warehouseInstance.save(flush: true)) {
+		            flash.message = "${message(code: 'default.updated.message', args: [message(code: 'warehouse.label', default: 'Warehouse'), warehouseInstance.id])}"
+		        }
+		        else {
+					// there were errors, the photo was not saved
+		        }
+			}
+            redirect(action: "show", id: warehouseInstance.id)
+		} 
+		else { 
+			"${message(code: 'default.not.found.message', args: [message(code: 'warehouse.label', default: 'Warehouse'), params.id])}"
+		}
+	}
+
 }

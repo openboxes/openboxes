@@ -28,28 +28,15 @@
 								<table>
 									<tr class="prop">
 										<td class="name">
-											<label>Match</label>
-										</td>
-										<td colspan="3">
-											<g:radio name="match" value="matchAll" checked="true" disabled="true" /> Match all of the following &nbsp;&nbsp;&nbsp;<br/>
-											<g:radio name="match" value="matchAll" disabled="true"/> Match any of the following <i>(not supported)</i>
-											 
-										</td>
-										
-									</tr>
-									<tr class="prop">
-										<td class="name">
 											<label>Name contains</label>
 										</td>
 										<td>
-											<g:textField name="nameContains" value="${params.nameContains}"/>										
+											<g:textField name="nameContains" value="${params.nameContains}" size="30"/>		
+										</td>
+										<td colspan="2" valign="top">
+											<g:checkBox name="unverified" value="${params.unverified}" /> Show  only invalid products <br/>											 
 										</td>										
-										<td class="name">
-											<label>Show only incomplete products</label>
-										</td>
-										<td>
-											<g:checkBox name="unverified" value="${params.unverified}" />
-										</td>
+										
 									</tr>
 									<tr class="prop">
 										<td class="name">
@@ -88,13 +75,20 @@
 									</tr>
 -->									
 									<tr class="prop">
-										<td class="name"></td>
+										<td class="name">
+											<label>Match</label>
+										</td>
+										<td>
+											<g:radio name="match" value="matchAll" checked="true" disabled="true" /> Match all  &nbsp;&nbsp;&nbsp;<br/>
+											<g:radio name="match" value="matchAll" disabled="true"/> Match any <i>(not supported)</i>											 
+										</td>
 										<td>
 											<span class="buttons">
 												<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Filter" /> 
 													${message(code: 'default.button.filter.label', default: 'Filter')}</button>
-											</span>										
+											</span>											
 										</td>
+										
 									</tr>
 								</table>				
 							</fieldset>
@@ -118,10 +112,12 @@
 					                            <g:sortableColumn property="id" title="${message(code: 'product.id.label', default: 'ID')}" />
 					                            --%>
 					                            <th width="5%" style="text-align: center">${message(code: 'product.type.label', default: 'Type')}</th>
-					                            <g:sortableColumn property="name" title="${message(code: 'product.name.label', default: 'Name')}" />
 					                            <g:sortableColumn property="upc" title="${message(code: 'product.upc.label', default: 'UPC')}" />
+					                            <g:sortableColumn property="name" title="${message(code: 'product.name.label', default: 'Name')}" />
 					                            <g:sortableColumn property="productType" title="${message(code: 'product.productType.label', default: 'Product Type')}" />
-					                            <g:sortableColumn property="complete" title="${message(code: 'product.unverified.label', default: 'Complete')}" />
+					                            <g:sortableColumn property="categories" title="${message(code: 'product.categories.label', default: 'Categories')}" />
+					                            <g:sortableColumn property="tags" title="${message(code: 'product.tags.label', default: 'Tags')}" />
+					                            <g:sortableColumn property="complete" title="${message(code: 'product.unverified.label', default: 'Valid')}" />
 					                        </tr>
 					                    </thead>
 					                    <tbody>
@@ -140,23 +136,29 @@
 															<img src="${createLinkTo(dir:'images/icons/silk',file: 'page_white.png')}"/>
 														</g:else>
 													</td>
-													<td align="center" width="40%">
+													<td align="center" width="10%">
+														${fieldValue(bean: productInstance, field: "upc")}
+													</td>
+													<td align="center">
 														<g:link action="show" id="${productInstance.id}">
 															${fieldValue(bean: productInstance, field: "name")}
 														</g:link>
 													</td>
-													<td align="center" width="10%">
-														${fieldValue(bean: productInstance, field: "ean")}
-													</td>
 													<td width="10%">
 														${fieldValue(bean: productInstance, field: "productType.name")}
 													</td>					                            
-													<td valign="top" align="center" width="5%">
+													<td width="10%">
+														${fieldValue(bean: productInstance, field: "categories")}
+													</td>					                            
+													<td width="10%">
+														${fieldValue(bean: productInstance, field: "tags")}
+													</td>					                            
+													<td valign="top" style="text-align: center" width="5%">
 														<g:if test="${productInstance.unverified}">
-															<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="Complete" />														
+															<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="Invalid" />														
 														</g:if>
 														<g:else>
-															<img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Complete" />														
+															<img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Valid" />														
 														</g:else>
 													</td>
 						                        </tr>
@@ -164,6 +166,9 @@
 					                    </tbody>
 					                </table>       
 					        	</g:if>         
+					        	
+					        	
+					        	
 							</fieldset>
 			            </div>
 					</td>

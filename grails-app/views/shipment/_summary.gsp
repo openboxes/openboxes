@@ -1,4 +1,4 @@
-<div>
+<div style="padding: 10px;">
 	<table>
 		<tbody>
 			<tr>
@@ -12,15 +12,12 @@
 				</td>
 				<td>
 					<span style="font-size: 1.2em;">${shipmentInstance.name}</span> 
-					&nbsp; 
-					<br/>
-					<span style="color: #aaa; font-size: 0.8em;">
-						last modified: <g:formatDate date="${shipmentInstance?.lastUpdated}" format="dd MMM yyyy hh:mm" />	&nbsp;							
-						created: <g:formatDate date="${shipmentInstance?.dateCreated}" format="dd MMM yyyy hh:mm" />			
-					</span>	
+					<div style="color: #aaa; font-size: 0.9em;">
+						Shipment Number: &nbsp; ${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}
+					</div>	
 				</td>		
 				<td style="text-align: right;">
-					<span class="fade">[Shipment No. ${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}]</span>
+					<span style="font-weight: bold;">${fieldValue(bean: shipmentInstance, field: "mostRecentEvent.eventType.name")}</span>
 				</td>
 			</tr>
 		</tbody>

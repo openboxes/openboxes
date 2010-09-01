@@ -6,31 +6,22 @@ import org.pih.warehouse.core.Person;
 class Container implements Comparable {
 
 	String name	
-	String containerNumber
-	String description
-	Person recipient
-
-	Container parentContainer
-	
-	// Dimensions
-	Float height;				// height of container
-	Float width;				// width of container
-	Float length;				// length of container 
-	String volumeUnits			// standard dimensional unit: cm, in, ft, 
-	
-	// Weight
-	Float weight				// weight of container
-	String weightUnits			// standard weight unit: kg, lb
-	
-	// Items in container 
-	List shipmentItems
-	
-	// Type of container 
-	ContainerType containerType
-	
-	// Audit fields
+	String containerNumber				// An official container number (if it exists)
+	String description					// Description of contents
+	Person recipient					// Person who is assigned to receive the container
+	Container parentContainer			// the "containing" container
+	Float height;						// height of container
+	Float width;						// width of container
+	Float length;						// length of container 
+	String volumeUnits					// standard dimensional unit: cm, in, ft, 	
+	Float weight						// weight of container
+	String weightUnits					// standard weight unit: kg, lb
 	Date dateCreated;
 	Date lastUpdated;
+	 
+	List shipmentItems					// Items in container
+	ContainerType containerType			// Type of container
+	ContainerStatus containerStatus		// Status of the container (open, closed)
 	
 	static transients = [ "optionValue" ]
 	static hasMany = [ shipmentItems : ShipmentItem ];
@@ -51,12 +42,13 @@ class Container implements Comparable {
 		containerType(nullable:true)
 		shipmentItems(nullable:true)		
 		parentContainer(nullable:true)
+		containerStatus(nullable:true)
 	}
 	
 	int compareTo(obj) { name.compareTo(obj.name) }
 	
 	String getOptionValue() {
-		return containerType.name + " #" + name
+		return containerType.name + "-" + name
 	}
 	
 }

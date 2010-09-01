@@ -7,8 +7,6 @@
 </head>
 <body>
 	<div class="body">
-
-
 		<g:form controller="auth" action="doLogin" method="post">		  
 		    <div class="dialog">
 				<div id="loginForm">
@@ -17,15 +15,15 @@
 					</g:if>		
 		
 					<g:hasErrors bean="${userInstance}">
-			           <div class="errors">
-			               <g:renderErrors bean="${userInstance}" as="list" />
-			           </div>
-			        </g:hasErrors>		
+					   <div class="errors">
+					       <g:renderErrors bean="${userInstance}" as="list" />
+					   </div>
+					</g:hasErrors>		
 		
 		
 					<fieldset> 			
 						<legend>Login</legend>		
-						
+					
 						
 						<script>	
 							jQuery(document).ready(function() {
@@ -34,39 +32,45 @@
 							});	
 						</script>		
 					
-						<div style="padding: 15px;">
-							    
-							<div>
-								<label for="username">Username or email:</label>
-							</div>
-							<div>
-								<input type="text" class="large" name="username" id="username" size="43" value="${userInstance?.username}">
-								<br/><span class="fade">e.g. <b>manager</b></span>															
-							</div> 
-							<div>
-								<label for="password">Password:</label>
-							</div>
-							<div>
-								<input type="password" class="large" name="password" id="password" size="43" value="${userInstance?.password}">
-								<br/><span class="fade">e.g. <b>password</b></span>															
-							</div>	
-							<div style="text-align: right;">
-								<span class="buttons" >
-									<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt=""/> Login</button>					   
-								</span>
-							</div>  					
-						</div>
+
+						<table>
+							<tbody>
+
+								<tr class="prop">
+									<td valign="top" class="name">
+										<label for="email"><g:message code="user.email.label" default="Email" /></label>
+									</td>
+									<td valign="top" class="value ${hasErrors(bean: userInstance, field: 'email', 'errors')}">
+										<g:textField name="email" value="${userInstance?.email}"  />
+									</td>
+								</tr>
+								<tr class="prop">
+									<td valign="top" class="name">
+										<label for="password"><g:message code="user.password.label" default="Password" /></label>
+									</td>
+									<td valign="top" class="value ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
+										<g:passwordField name="password" value="${userInstance?.password}" />
+									</td>
+								</tr>
+								<tr class="prop">
+									<td valign="top" class="name">
+
+									</td>
+									<td valign="top">
+										<div style="text-align: right;">
+											<div class="buttons" >
+												<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt=""/> Login</button>					   
+											</div>
+										</div>  					
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+						
 					</fieldset> 
 				</div>
-			
-			<%-- 
-			    <div class="buttons">
-					<span class="button">
-						<g:submitButton name="login" class="save" value="${message(code: 'default.button.login.label', default: 'Login')}" />
-					</span>	
-			    </div>
-		    --%>	
-			<br/>
+			</div>
 		</g:form>
 		
 

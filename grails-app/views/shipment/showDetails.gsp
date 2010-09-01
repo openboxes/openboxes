@@ -44,17 +44,21 @@
 										<td valign="top" class="name"><label><g:message
 											code="shipment.currentStatus.label" default="Status" /></label></td>
 										<td valign="top" class="">
-											${fieldValue(bean: shipmentInstance, field: "mostRecentEvent.eventType.name")}
+											${fieldValue(bean: shipmentInstance, field: "mostRecentEvent.eventType.name")}<br/>
+										</td>
+										<td>
 											<span style="font-size: 0.8em; color: #aaa">
-												${fieldValue(bean: shipmentInstance, field: "mostRecentEvent.eventLocation.name")} &nbsp;
-												<g:formatDate format="dd MMM yyyy" date="${shipmentInstance?.mostRecentEvent?.eventDate}"/>
+												@ ${fieldValue(bean: shipmentInstance, field: "mostRecentEvent.eventLocation.name")}
+												on <g:formatDate format="dd MMM yyyy" date="${shipmentInstance?.mostRecentEvent?.eventDate}"/>
 											</span>
 										</td>
+									</tr>
+									<tr class="prop">
 										<td valign="top" class="name"><label><g:message
 											code="shipment.method.label" default="Shipper" /></label>
 										</td>
 										<td valign="top" class="">
-											<g:if test="${shipmentInstance.shipmentMethod}">
+											<g:if test="${shipmentInstance.shipmentMethod.shipper}">
 												<table>
 													<tbody>
 														<tr>
@@ -73,7 +77,7 @@
 												</table>
 											</g:if>
 											<g:else>
-												<span class="fade">(none)</span>
+												<span class="fade">(empty)</span>
 											</g:else>										
 										</td>
 									</tr>
@@ -83,25 +87,31 @@
 										<td valign="top" style="width: 30%;">
 											<span>
 												${fieldValue(bean: shipmentInstance, field: "origin.name")}<br/>										
-												<g:if test="${shipmentInstance.expectedShippingDate}">
-													<span style="font-size: 0.8em; color: #aaa">
-														Expected to ship on <g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="dd MMM yyyy" />
-													</span>											
-												</g:if>
 											</span>
 										</td>
+										<td>
+											<g:if test="${shipmentInstance.expectedShippingDate}">
+												<span class="fade">
+													expected to ship on <g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="MMM dd yyyy" />
+												</span>											
+											</g:if>
+										</td>
+									</tr>
+									<tr class="prop">
 										<td class="name"  style="width: 10%;">
 											<label><g:message code="shipment.destination.label" default="To" /></label>
 										</td>
-										<td class="value" style="width: 30%;">
+										<td class="" style="width: 30%;">
 											<span>
 												${fieldValue(bean: shipmentInstance, field: "destination.name")}<br/>
-												<g:if test="${shipmentInstance.expectedDeliveryDate}">
-													<span style="font-size: 0.8em; color: #aaa">
-														Expected to arrive on <g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="dd MMM yyyy" />
-													</span>											
-												</g:if>
 											</span>											
+										</td>
+										<td>
+											<g:if test="${shipmentInstance.expectedDeliveryDate}">
+												<span class="fade">
+													expected to arrive on <g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="MMM dd yyyy" />
+												</span>											
+											</g:if>
 										</td>
 									</tr>
 									
@@ -113,8 +123,12 @@
 												${fieldValue(bean: shipmentInstance, field: "carrier.firstName")}
 												${fieldValue(bean: shipmentInstance, field: "carrier.lastName")}
 											</span>
-											<span class="fade" style="font-size: 0.8em;">${fieldValue(bean: shipmentInstance, field: "carrier.email")}</span>
 										</td>
+										<td>
+											<span class="fade">${fieldValue(bean: shipmentInstance, field: "carrier.email")}</span>
+										</td>
+									</tr>
+									<tr class="prop">
 										<td class="name"  style="width: 10%;">
 											<label><g:message code="shipment.destination.label" default="Recipient" /></label>
 										</td>
@@ -122,22 +136,35 @@
 											<span>
 												${fieldValue(bean: shipmentInstance, field: "recipient.firstName")}
 												${fieldValue(bean: shipmentInstance, field: "recipient.lastName")}
-											</span>
-											<span class="fade" style="font-size: 0.8em;">${fieldValue(bean: shipmentInstance, field: "recipient.email")}</span>
+											</span>											
+										</td>
+										<td>
+											<span class="fade">${fieldValue(bean: shipmentInstance, field: "recipient.email")}</span>
 										</td>
 									</tr>
-
-
-
-									<tr class="prop">
-										<td>&nbsp;</td>
-									</tr>
-									
 									<tr class="prop">
 										<td valign="top" class="name">
-										<img src="${createLinkTo(dir:'images/icons/silk',file:'money.png')}" alt="money" style="vertical-align: middle"/>
-										<label><g:message
-											code="shipment.totalValue.label" default="Total Value" /></label><br/></td>
+											<label><g:message code="shipment.donor.label" default="Donated by" /></label><br/>
+										</td>
+										<td valign="top" class="">
+											<g:if test="${shipmentInstance.donor}">
+												${shipmentInstance.donor.name}
+											</g:if>
+											<g:else>
+												<span class="fade">(empty)</span>
+											</g:else>										
+										
+										</td>
+										<td>
+											&nbsp;
+										</td>
+									
+									</tr>
+									<tr class="prop">
+										<td valign="top" class="name">
+											<img src="${createLinkTo(dir:'images/icons/silk',file:'money.png')}" alt="money" style="vertical-align: middle"/>
+											<label><g:message code="shipment.totalValue.label" default="Total Value" /></label><br/>
+										</td>
 										<td valign="top" class="">
 											<g:if test="${shipmentInstance.totalValue}">
 												$<g:formatNumber format="#,###.##" number="${shipmentInstance.totalValue}" /><br/>
@@ -145,6 +172,9 @@
 											<g:else>
 												<span class="fade">(empty)</span>
 											</g:else>
+										</td>
+										<td>
+											&nbsp;
 										</td>
 									</tr>
 									<tr class="prop">
@@ -165,58 +195,59 @@
 														<table>		
 															<tr>
 																<th width="5%"></th>
-																<th width="15%">Created</th>
-																<th width="40%">Package</th>
+																<th>Package</th>
+																<th>Description</th>
+																<th>Items</th>
+																<th>Status</th>
 																<th width="10%"></th>
 															</tr>
 															<g:each in="${shipmentInstance.containers}" var="container" status="i">		
 																<tr id="container-${container.id}" class="${(i % 2) == 0 ? 'odd' : 'even'}">
 																	<td>${i+1}.</td>
-																	<td>
-																		<g:formatDate format="dd MMM yyyy" date="${container?.dateCreated}"/> <br/>
-																		<span style="font-size: 0.8em; color: #aaa;">
-																			<g:formatDate type="time" date="${container.dateCreated}"/>
-																		</span>																		
+																	<td>	
+																		<span>${container?.containerType?.name}-${container?.name}</span> &nbsp;
 																	</td>
-																	<%--
+																	<td>	
+																		${container?.description}
+																	</td>
 																	<td>
-																		<g:if test="${container?.containerType?.name=='Pallet'}">
-																			<img src="${createLinkTo(dir:'images/icons',file:'pallet.jpg')}"
-																				alt="pallet"
-																				style="vertical-align: middle; width: 24px; height: 24px;" />
+																		<span class="fade">${container.shipmentItems.size()}</span>
+																	</td>
+																	<td>	
+																		<g:if test="${container?.containerStatus}">
+																			<span>${container?.containerStatus?.name}</span>
 																		</g:if>
-																		<g:elseif test="${container?.containerType?.name=='Suitcase'}">
-																			<img src="${createLinkTo(dir:'images/icons',file:'suitcase.jpg')}"
-																				alt="suitcase"
-																				style="vertical-align: middle; width: 24px; height: 24px;" />
-																		</g:elseif>
-																		<g:elseif test="${container?.containerType?.name=='Container'}">
-																			<img src="${createLinkTo(dir:'images/icons',file:'container.jpg')}"
-																				alt="container" style="vertical-align: middle; width: 24px; height: 24px;" />
-																		</g:elseif>								
-																		<g:else>														
-																			<img src="${createLinkTo(dir:'images/icons',file:'box_24.gif')}"
-																				alt="box" style="vertical-align: middle; width: 24px; height: 24px;" />														
+																		<g:else>
+																			<span class="fade">(none)</span>
 																		</g:else>
 																	</td>
-																	 --%>
-																	<td>	
-																		<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}" params="['container.id':container.id]">
-																			<span>${container?.containerType?.name} #${container?.name}</span> &nbsp;
-																			<span class="fade">${container.shipmentItems.size()} items</span>
-																		</g:link>
-																	</td>
-																	<td style="text-align: center">
-																		<!-- 
-																			<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}" 
+																	<td style="text-align: right" nowrap="true">																		 
+																		<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}" 
 																			params="['container.id':container.id]"><img 
 																			src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" 
 																			alt="Add" style="vertical-align: middle"/></g:link>
-																		-->																	
-																	</td>
-																	
+																		&nbsp;
+																		<%-- 
+																		<g:if test="${container}">
+																			<g:link controller="shipment" action="openContainer" id="${shipmentInstance.id}" params="['container.id':container.id]">
+																				<img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" alt="Pack" style="vertical-align: middle"/>														
+																			</g:link>
+																		</g:if>
+																		<g:else>
+																			<g:link controller="shipment" action="closeContainer" id="${shipmentInstance.id}" params="['container.id':container.id]">
+																				<img src="${createLinkTo(dir:'images/icons/',file:'pack-shipment.png')}" alt="Pack" style="vertical-align: middle"/>														
+																			</g:link>
+																		</g:else>
+																		&nbsp;
+																		--%>
+																		<g:link class="remove" action="deleteContainer" id="${container?.id}" params="[shipmentId:shipmentInstance.id]">
+																			<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" style="vertical-align: middle"/>
+																		</g:link>																		
+																	</td>																	
 																</tr>
 															</g:each>		
+															
+															
 														</table>							
 													</div>
 												</g:else>
@@ -241,30 +272,37 @@
 														<tbody>
 															<tr>
 																<th width="5%"></th>
-																<th width="15%">Uploaded</th>
 																<th width="40%">Document</th>
-																<th width="10%" style="text-align: center">Download</th>																
+																<th width="15%">Uploaded</th>
+																<th width="10%" style="text-align: center"></th>																
 															</tr>															
 															<g:each in="${shipmentInstance.documents}" var="document" status="i">
 																<tr id="document-${document.id}"
 																	class="${(i % 2) == 0 ? 'odd' : 'even'}">
 																	<td>${i+1}.</td>
 																	<td>
-																		<g:formatDate format="dd MMM yyyy" date="${document?.dateCreated}"/> &nbsp; 
-																		<span style="font-size: 0.8em; color: #aaa;">
-																			<g:formatDate type="time" date="${document.dateCreated}"/>
-																		</span>																		
-																	</td>
-																	<td>
 																		${document?.documentType?.name} <br/>
 																		<span class="fade">
 																		${document?.name} 
 																		</span>
 																	</td>
-																	<td style="text-align: center">
+																	<td>
+																		<g:formatDate format="MMM dd yyyy" date="${document?.dateCreated}"/> &nbsp; 
+																		<%--
+																		<span style="font-size: 0.8em; color: #aaa;">
+																			<g:formatDate type="time" date="${document.dateCreated}"/>
+																		</span>
+																		 --%>																		
+																	</td>
+																	<td style="text-align: right">
 																		<g:link controller="document" action="download" id="${document.id}">
 																			<img src="${createLinkTo(dir:'images/icons/silk',file:'disk.png')}" alt="Download" style="vertical-align: middle"/>													
 																		</g:link>
+																		&nbsp;
+																		<g:link class="remove" action="deleteDocument" id="${document?.id}" params="[shipmentId:shipmentInstance.id]">
+																			<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" style="vertical-align: middle"/>
+																		</g:link>																		
+																		
 																	</td>
 																</tr>
 															</g:each>	
@@ -295,23 +333,29 @@
 														<g:else>
 															<tr>
 																<th width="5%"></th>
-																<th width="15%">Date</th>																	
 																<th width="40%">Comment</th>
+																<th width="15%">Date</th>																	
 																<th width="10%"></th>
 															</tr>
 														
 															<g:each in="${shipmentInstance.comments}" var="comment" status="i">
 																<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 																	<td>${i+1}</td>
+																	<td><i>"${comment?.comment}"</i> --<b>${comment.sender.username}</b></td>																	
 																	<td>
-																		<g:formatDate format="dd MMM yy" date="${comment.dateCreated}"/> &nbsp; 
+																		<g:formatDate format="MMM dd yyyy" date="${comment.dateCreated}"/> &nbsp; 
+																		<%-- 
 																		<span style="font-size: 0.8em; color: #aaa;">
 																			<g:formatDate type="time" date="${comment?.dateCreated}"/>
-																		</span>	
+																		</span>
+																		--%>	
 																	
 																	</td>																		
-																	<td>${comment?.comment}	</td>																	
-																	<td>${comment.sender.username}</td> 
+																	<td style="text-align: right">
+																		<g:link class="remove" action="deleteComment" id="${comment?.id}" params="[shipmentId:shipmentInstance.id]">
+																			<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" style="vertical-align: middle"/>
+																		</g:link>	
+																	</td>
 																</tr>
 															</g:each>	
 														</g:else>									
@@ -338,25 +382,35 @@
 														<tbody>
 															<tr>
 																<th width="5%"></th>
-																<th width="15%">Date</th>
-																<th width="40%">Location</th>
+																<th width="20%">Location</th>
 																<th width="10%">Status</th>
+																<th width="15%">Date</th>
+																<th width="10%"></th>
 															</tr>
 															<g:each in="${shipmentInstance.events}" var="event" status="i">
 																<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 																	<td>${i+1}.</td>
-																	<td>																			
-																		<g:formatDate format="dd MMM yy" date="${event.eventDate}"/> &nbsp; 
-																		<span style="font-size: 0.8em; color: #aaa;">
-																			<g:formatDate type="time" date="${event.eventDate}"/>
-																		</span>																			
-																	</td>
 																	<td>
 																		${event.eventLocation.name}
 																	</td>
 																	<td>																
 																		${event.eventType.name}
 																	</td>
+																	<td>																			
+																		<g:formatDate format="MMM dd yyyy" date="${event.eventDate}"/> &nbsp; 
+																		<%-- 
+																		<span style="font-size: 0.8em; color: #aaa;">
+																			<g:formatDate type="time" date="${event.eventDate}"/>
+																		</span>
+																		--%>																			
+																	</td>
+																	<td style="text-align: right">
+																		<g:link class="remove" action="deleteEvent" id="${event?.id}" params="[shipmentId:shipmentInstance.id]">
+																			<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" style="vertical-align: middle"/>
+																		</g:link>	
+																	</td>
+																	
+																	
 																</tr>
 															</g:each>
 															<!-- 

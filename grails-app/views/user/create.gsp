@@ -3,24 +3,22 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="layout" content="main" />
+        <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'user.label', default: 'User')}" />
         <title><g:message code="default.create.label" args="[entityName]" /></title>
+	<content tag="pageTitle"><g:message code="default.create.label" args="[entityName]" /></content>
+
     </head>
     <body>
-        <div class="nav">
-            <span class="menuButton"><a class="home" href="${createLink(uri: '/')}">Home</a></span>
-            <span class="menuButton"><g:link class="list" action="list"><g:message code="default.list.label" args="[entityName]" /></g:link></span>
-        </div>
+      
         <div class="body">
-            <h1><g:message code="default.create.label" args="[entityName]" /></h1>
             <g:if test="${flash.message}">
-            <div class="message">${flash.message}</div>
+            	<div class="message">${flash.message}</div>
             </g:if>
             <g:hasErrors bean="${userInstance}">
-            <div class="errors">
-                <g:renderErrors bean="${userInstance}" as="list" />
-            </div>
+		    <div class="errors">
+		        <g:renderErrors bean="${userInstance}" as="list" />
+		    </div>
             </g:hasErrors>
             <g:form action="save" method="post" >
                 <div class="dialog">

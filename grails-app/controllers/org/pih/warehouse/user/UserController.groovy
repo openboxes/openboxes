@@ -142,5 +142,42 @@ class UserController {
             redirect(action: "list")
         }
     }
+
+	/**
+	 * View user's profile photo 
+	 */
+	def viewPhoto = { 
+		def userInstance = User.get(params.id);		
+		if (userInstance) { 
+			byte[] image = userInstance.photo 
+			response.outputStream << image
+		} 
+		else { 
+			"${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+		}
+	} 
+
+
+	def uploadPhoto = { 
+		
+		def userInstance = User.get(params.id);		
+		if (userInstance) { 
+			def photo = request.getFile("photo");
+			if (!photo?.empty && photo.size < 1024*1000) { // not empty AND less than 1MB
+				userInstance.photo = photo.bytes;			
+		        if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
+		            flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), userInstance.id])}"
+		        }
+		        else {
+					// there were errors, the photo was not saved
+		        }
+			}
+            redirect(action: "show", id: userInstance.id)
+		} 
+		else { 
+			"${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+		}
+	}
+
     
 }
