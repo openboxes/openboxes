@@ -110,4 +110,21 @@
             <column name="role_id"/>
         </createIndex>
     </changeSet>
+    
+    <changeSet author="jmiranda (generated)" id="1283380563115-1">
+        <addColumn tableName="container">
+            <column name="container_status" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1283380563115-2">
+        <addColumn tableName="location">
+            <column name="logo" type="MEDIUMBLOB"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1283380563115-3">
+        <addColumn tableName="user">
+            <column name="photo" type="MEDIUMBLOB"/>
+        </addColumn>
+    </changeSet>
+        
 </databaseChangeLog>
