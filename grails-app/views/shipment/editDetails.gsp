@@ -27,48 +27,29 @@
 		<table>
 			<tr>
 				<td colspan="2">		
-					<table>
-						<tr>
-							<td>
-								<div style="padding-bottom: 10px;">
-									<g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}">${shipmentInstance?.name}</g:link> 
-									&raquo; <span style="font-size: 90%">Edit Details</span>
-								</div>										
-							</td>
-						</tr>
-					</table>		
+					<div style="padding-bottom: 10px;">
+						<g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}">${shipmentInstance?.name}</g:link> 
+						&raquo; <span style="font-size: 90%">Edit Details</span>
+					</div>										
 				</td>	
 			</tr>
 			<tr>
-				<td>
+				<td width="75%">
 					<g:form action="update" method="post">
 						<fieldset>			
 							
 							<g:render template="summary"/>
-							
-						
 						
 							<g:hiddenField name="id" value="${shipmentInstance?.id}" />
 							<g:hiddenField name="version" value="${shipmentInstance?.version}" />
 							<table>
 								<tbody>
-									<tr >
-										<td>&nbsp;</td>
-									</tr>
-								
 									<tr class="prop">
 										<td valign="top" class="name"><label><g:message
 											code="shipment.name.label" default="Shipment Number" /></label></td>
 										<td colspan="3" valign="top"
 											class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">
 										<span style="line-height: 1.5em">${shipmentInstance?.shipmentNumber}</span></td>
-									</tr>
-									<tr class="prop">
-										<td valign="top" class="name"><label><g:message
-											code="shipment.name.label" default="Nickname" /></label></td>
-										<td colspan="3" valign="top"
-											class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">
-										<g:textField name="name" value="${shipmentInstance?.name}" /></td>
 									</tr>
 									<tr class="prop">
 										<td valign="middle" class="name"><label><g:message
@@ -79,6 +60,13 @@
 											optionKey="id" optionValue="name" value="${shipmentInstance?.shipmentType?.id}" />
 										</td>
 									</tr>							
+									<tr class="prop">
+										<td valign="top" class="name"><label><g:message
+											code="shipment.name.label" default="Nickname" /></label></td>
+										<td colspan="3" valign="top"
+											class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">
+										<g:textField name="name" value="${shipmentInstance?.name}" /></td>
+									</tr>
 									<%-- 
 									<tr class="prop">
 										<td valign="top" class="name"><label><g:message
@@ -99,18 +87,20 @@
 												value="${shipmentInstance?.trackingNumber}" /> </td>
 									</tr>
 									--%>
+									
+									
 									<tr class="prop">
 										<td valign="top" class="name" style="width: 10%;"><label><g:message
 											code="shipment.carrier.label" default="Carrier" /></label></td>
-										<td valign="top" style="width: 30%;">
-											
-											<%-- 
-											<g:textField name="carrier"
-												value="${shipmentInstance?.carrier}" /> 	
-												--%>
-												
+										<td valign="top" style="width: 30%;">											
+
 											<div>
-												<input id="carrier-suggest" type="text" value="${shipmentInstance?.carrier?.firstName} ${shipmentInstance?.carrier?.lastName}"> 	
+												<g:if test="${shipmentInstance?.carrier}">
+													<input id="carrier-suggest" type="text" value="${shipmentInstance?.carrier?.firstName} ${shipmentInstance?.carrier?.lastName}">
+												</g:if>
+												<g:else>
+													<input id="carrier-suggest" type="text" value="">
+												</g:else>										
 												<img id="carrier-icon" src="/warehouse/images/icons/search.png" style="vertical-align: middle;"/>
 												<input id="carrier-id" name="carrier.id" type="hidden" value="${shipmentInstance?.carrier?.id}"/>
 												<span id="carrier-name"></span>		
@@ -169,12 +159,16 @@
 										<td class="name"  style="width: 10%;">
 											<label><g:message code="shipment.destination.label" default="Recipient" /></label>
 										</td>
-										<td class="value" style="width: 30%;">								
-
-											
+										<td class="value" style="width: 30%;">		
 											<div>
-												
-												<input id="recipient-suggest" type="text" value="${shipmentInstance?.recipient?.firstName} ${shipmentInstance?.recipient?.lastName}"> 												
+											
+												<g:if test="${shipmentInstance?.recipient}">
+													<input id="recipient-suggest" type="text" value="${shipmentInstance?.recipient?.firstName} ${shipmentInstance?.recipient?.lastName}">
+												</g:if>
+												<g:else>
+													<input id="recipient-suggest" type="text" value="">
+												</g:else>										
+											
 												<img id="recipient-icon" src="/warehouse/images/icons/search.png" style="vertical-align: middle;"/>
 												<input id="recipient-id" name="recipient.id" type="hidden" value="${shipmentInstance?.recipient?.id }"/>												
 												<span id="recipient-name"></span>		
@@ -227,9 +221,8 @@
 											</script>		
 	
 
-									</td>
+										</td>
 									</tr>						
-									
 									<tr class="prop">
 										<td valign="top" class="name"><label><g:message
 											code="shipment.expectedShippingDate.label" default="Expected shipping date" /></label></td>
@@ -240,6 +233,7 @@
 											value="${shipmentInstance?.expectedShippingDate}" format="MM/dd/yyyy"/>
 										</td>
 									</tr>		
+									
 									<tr class="prop">
 										<td valign="top" class="name"><label><g:message
 											code="shipment.totalValue.label" default="Total Value (USD)" /></label></td>
@@ -265,8 +259,7 @@
 								</tbody>
 							</table>
 						</fieldset>
-					</g:form>
-					
+					</g:form>					
 				</td>		
 				<td width="20%">
 					<g:render template="sidebar" />				

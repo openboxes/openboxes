@@ -35,75 +35,75 @@
 			</tr>
 	
 			<tr>
-				<td>
-					<fieldset>	
-					
+				<td width="70%">
+					<fieldset>						
 						<g:render template="summary"/>
 											
-						<br/>
-						<table>
-							<tr>
-								<td>
-									<div id="containers" class="section">			
-															
-										<table border="1" style="padding: 0px; margin: 0px">
-											<tbody>
-												<tr>
-													<th>Shipment Unit</th>
-													<th>Dimensions</th>
-													<th>Weight</th>
-													<th>Item</th>
-													<th>Serial No.</th>										
-												</tr>				
-												<g:each var="container" in="${shipmentInstance.containers}" status="i">
-													<g:each var="item" in="${container.shipmentItems}" status="j">
-														<tr>
-															<td width="10%">
-																<g:if test="${j==0}">
-																	${container?.containerType?.name} #${container?.name}
-																</g:if>
-															</td>																
-															<td width="5%">
-																<g:if test="${j==0}">
-																	<g:if test="${container?.height && container?.width && container?.length}">	
-																		${container?.height} x ${container?.width} x ${container?.length}
-																	</g:if>
-																	<g:else>
-																		(empty)
-																	</g:else>
-																</g:if>
-															</td>
-															<td width="5%">
-																<g:if test="${j==0}">
-																	${container?.weight} ${container?.weightUnits}
-																</g:if>
-															</td>
-															<td width="20%" style="border:1px solid black">${item?.quantity} x ${item?.product.name}</td>
-															<td width="15%" style="border:1px solid black">${item?.serialNumber}</td>
-														</tr>																			
-													</g:each>										
-												</g:each>		
-											</tbody>
-										</table>
-									</div>
-									<div style="text-align: right; padding: 10px;">
-										<g:link controller="shipment" action="downloadPackingList" id="${shipmentInstance.id}" ><img 
-										src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}" 
-										alt="Export Packing List" style="vertical-align: middle"/> Download</g:link>		
-									</div>						
-											
-								</td>
-							</tr>
+						<table style="padding: 0px; margin: 0px;">
+							<tbody>
+								<tr style="height: 30px;">
+									<th>Package</th>
+									<th>Dimensions</th>
+									<th>Weight</th>
+									<th>Item</th>
+									<th>Serial No.</th>										
+								</tr>				
+								<g:each var="container" in="${shipmentInstance.containers}" status="i">
+									<g:if test="${!container.shipmentItems}">
+										<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+											<td width="10%">
+												<b>${container?.containerType?.name}-${container?.name}</b>
+											</td>																
+											<td width="10%">
+												<g:if test="${container?.height && container?.width && container?.length}">	
+													${container?.height} x ${container?.width} x ${container?.length}
+												</g:if>
+												<g:else>
+													&nbsp;
+												</g:else>
+											</td>
+											<td width="10%">
+												${container?.weight} ${container?.weightUnits}
+											</td>
+											<td width="20%">(empty)</td>
+											<td width="10%">&nbsp;</td>
+										</tr>																	
+									</g:if>
+									<g:each var="item" in="${container.shipmentItems}" status="j">
+										<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+											<td width="10%">
+												<g:if test="${j==0}">
+													<b>${container?.containerType?.name}-${container?.name}</b>
+												</g:if>
+												<g:else>&nbsp;</g:else>
+											</td>																
+											<td width="10%">
+												<g:if test="${j==0}">
+													<g:if test="${container?.height && container?.width && container?.length}">	
+														${container?.height} x ${container?.width} x ${container?.length}
+													</g:if>
+													<g:else>&nbsp;</g:else>
+												</g:if>
+											</td>
+											<td width="10%">
+												<g:if test="${j==0}">
+													${container?.weight} ${container?.weightUnits}
+												</g:if>
+											</td>
+											<td width="20%">${item?.product.name} (${item?.quantity})</td>
+											<td width="10%">${item?.serialNumber}</td>
+										</tr>																			
+									</g:each>										
+								</g:each>		
+							</tbody>
 						</table>
+						<div style="text-align: right; padding: 10px;">
+							<g:link controller="shipment" action="downloadPackingList" id="${shipmentInstance.id}" ><img 
+							src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}" 
+							alt="Export Packing List" style="vertical-align: middle"/> Download</g:link>		
+						</div>														
 					</fieldset>		
-		
-
-
-
-				
 				</td>
-		
-		
 				<td width="20%">
 					<g:render template="sidebar"/>
 				</td>

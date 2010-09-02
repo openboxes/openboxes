@@ -87,8 +87,7 @@
 			                            	</g:else>
 			                            	<span style="${cssClass}">${fieldValue(bean: shipmentInstance, field: "origin")}</span>
 			                            	<span>
-				                            	<g:if test="${shipmentInstance.actualShippingDate}"><g:formatDate date="${shipmentInstance.actualShippingDate}" format="dd MMM yyyy" /><br/></g:if>
-				                            	<g:formatDate date="${shipmentInstance.expectedShippingDate}" format="dd MMM yyyy" />			                            	
+				                            	<g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="MMM dd yyyy" />			                            	
 				                            </span>
 			                            </td>
 			                            <td style="vertical-align: top; text-align: left" nowrap="true" width="10%">
@@ -100,8 +99,7 @@
 			                            	</g:else>
 			                            	<span style="${cssClass}">${fieldValue(bean: shipmentInstance, field: "destination")}</span> 
 			                            	<span>
-				                            	<g:if test="${shipmentInstance.actualDeliveryDate}"><g:formatDate date="${shipmentInstance.actualShippingDate}" format="dd MMM yyyy" /><br/></g:if>
-				                            	<g:formatDate date="${shipmentInstance.expectedDeliveryDate}" format="dd MMM yyyy" />
+				                            	<g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="MMM dd yyyy" />
 			                            	</span>
 			                            </td>
 			                            <td style="vertical-align: top; text-align: center;" width="10%">
@@ -134,14 +132,7 @@
 					                            	</ul>
 												</div>										
 											</div>
-			                            </td>
-<%-- 
-			                            <td style="vertical-align: middle; text-align: center;">${fieldValue(bean: shipmentInstance, field: "trackingNumber")}</td>
-			                            
---%>		                            
-
-
-
+			                            </td>	                            
 			                        </tr>							
 	    						</g:each>
 							</tbody>            

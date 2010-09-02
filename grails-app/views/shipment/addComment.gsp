@@ -5,7 +5,7 @@
 	<g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
 	<title><g:message code="default.edit.label" args="[entityName]" /></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
-	<content tag="pageTitle">Attach Document</content>
+	<content tag="pageTitle">Add Comment</content>
 </head>
 
 <body>
@@ -28,7 +28,7 @@
 					<div style="padding-bottom: 10px;">
 						<g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}">${shipmentInstance?.name}</g:link> 
 						 &nbsp; &raquo; &nbsp; 
-						<span style="font-size: 90%">Attach Document</span>
+						<span style="font-size: 90%">Add Comment</span>
 					</div>					
 				</td>
 			</tr>		
@@ -37,54 +37,38 @@
 					<fieldset>
 						<g:render template="summary" />
 
-
-						<div>
-							<g:uploadForm controller="document" action="upload">
+						
+							<g:form action="saveComment">
 								<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
 								<table>
 									<tbody>
 										<tr class="prop">
-											<td valign="top" class="name"><label><g:message
-												code="document.documentType.label" default="Document Type" /></label></td>
-											<td valign="top"
-												class="value ${hasErrors(bean: documentInstance, field: 'documentType', 'errors')}">
-												<g:select name="typeId" from="${org.pih.warehouse.core.DocumentType.list()}" optionKey="id" optionValue="name"/>
-											</td>
-										</tr>
+				                            <td valign="top" class="name"><label><g:message code="comment.recipient.label" default="To" /></label></td>                            
+				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'recipient', 'errors')}">
+												<g:select id="recipientId" name='recipientId' noSelection="${['':'Select one ...']}" 
+			                                    	from='${org.pih.warehouse.core.User.list()}' optionKey="id" optionValue="username"></g:select>
+			                                </td>
+				                        </tr>  	          
 										<tr class="prop">
-											<td valign="top" class="name"><label class="optional"><g:message
-												code="document.name.label" default="Description" /></label>
-											</td>
-											<td valign="top"
-												class="value ${hasErrors(bean: documentInstance, field: 'name', 'errors')}">
-												<g:textField name="name" value="${documentInstance?.name}" />
-											</td>
-										</tr>
+				                            <td valign="top" class="name"><label><g:message code="comment.sender.label" default="From" /></label></td>                            
+				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'sender', 'errors')}">
+			                                    ${session.user.username}
+			                                </td>
+				                        </tr>  	          
 										<tr class="prop">
-											<td valign="top" class="name"><label class="optional"><g:message
-												code="document.number.label" default="Document Number" /></label>
-											</td>
-											<td valign="top"
-												class="value ${hasErrors(bean: documentInstance, field: 'documentNumber', 'errors')}">
-												<g:textField name="documentNumber" value="${documentInstance?.documentNumber}" />
-											</td>
-										</tr>
-										<tr class="prop">
-											<td valign="top" class="name"><label><g:message
-												code="document.file.label" default="Select a file" /></label>
-											</td>
-											<td valign="top"
-												class="value ${hasErrors(bean: documentInstance, field: 'fileContents', 'errors')}">
-												<input name="fileContents" type="file" />
-											</td>
-										</tr>
+				                            <td valign="top" class="name"><label><g:message code="comment.comment.label" default="Comment" /></label></td>                            
+				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'comment', 'errors')}">
+			                                    <g:textArea name="comment" cols="60" rows="10"/>
+			                                </td>
+				                        </tr>  	        
+											
 										<tr class="prop">
 											<td valign="top" class="name"></td>
 											<td valign="top" class="value">
 												<div class="buttons">
 													<button type="submit" class="positive"><img
 														src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
-														alt="save" /> Upload</button>
+														alt="save" /> Add</button>
 													<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id}" class="negative">
 														<img
 															src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}"
@@ -92,10 +76,9 @@
 												</div>				
 											</td>
 										</tr>
-									</tbody>
-								</table>
-							</g:uploadForm>
-						</div>
+								</tbody>
+							</table>
+						</g:form>
 					</fieldset>
 				</td>
 				<td width="20%">

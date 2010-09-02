@@ -8,6 +8,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Document;
 import org.pih.warehouse.core.Event;
+import org.pih.warehouse.core.EventType;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.User;
@@ -58,8 +59,6 @@ class ShipmentController {
 	}
 	
 	def update = {		
-		
-		log.info params
 		def shipmentInstance = Shipment.get(params.id)
 		if (shipmentInstance) {
 			if (params.version) {
@@ -127,16 +126,21 @@ class ShipmentController {
 			redirect(action: (params.type == "incoming") ? "listIncoming" : "listOutgoing")
 		}
 		else {
-			if ("POST".equalsIgnoreCase(request.getMethod())) { 
-				
+			if ("POST".equalsIgnoreCase(request.getMethod())) { 				
 				shipmentInstance.properties = params
 				if (!shipmentInstance.hasErrors() && shipmentInstance.save(flush: true)) {
+										
+					Event event = new Event(
+						eventType:EventType.findByName("Departed"), 
+						eventDate: new Date(),
+						eventLocation: Location.get(session.warehouse.id)).save(flush:true);						
+
+					shipmentInstance.addToEvents(event).save(flush:true);
+					
 					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
-					redirect(action: "showDetails", id: shipmentInstance.id)
+					redirect(action: "listOutgoing")
 				}
 			}
-			
-			
 			render(view: "sendShipment", model: [shipmentInstance: shipmentInstance])
 		}
 	}
@@ -303,13 +307,13 @@ class ShipmentController {
 		// Arrange shipments by status 
 		def shipmentListByStatus = new HashMap<String, ListCommand>();
 		allShipments.each {
-			def shipmentList = shipmentListByStatus[it.shipmentStatus];
+			def shipmentList = shipmentListByStatus[it.mostRecentStatus];
 			if (!shipmentList) {
-				shipmentList = new ListCommand(category: it.shipmentStatus.name, color: it.shipmentStatus.color, 
-				sortOrder: it.shipmentStatus.sortOrder, objectList: new ArrayList());
+				shipmentList = new ListCommand(category: it.mostRecentStatus, color: "#ddd", 
+				sortOrder: 0, objectList: new ArrayList());
 			}
 			shipmentList.objectList.add(it);	
-			shipmentListByStatus.put(it.shipmentStatus, shipmentList)
+			shipmentListByStatus.put(it.mostRecentStatus, shipmentList)
 		}
 		
 		// Get a count of shipments by status		 
@@ -318,8 +322,8 @@ class ShipmentController {
 		def criteria = Shipment.createCriteria()
 		def results = criteria {			
 			projections {
-				groupProperty("shipmentStatus")
-				count("shipmentStatus", "shipmentCount") //Implicit alias is created here !
+				groupProperty("shipmentType")
+				count("shipmentType", "shipmentCount") //Implicit alias is created here !
 			}
 			//order 'myCount'
 		}			
@@ -503,55 +507,48 @@ class ShipmentController {
 	
 	
 	def copyContainer = { 
+		def container = Container.get(params.id);  
 		def shipment = Shipment.get(params.shipmentId);   	
-		def container = Container.get(params.containerId);  
-		
-		
-		def numCopies = Integer.parseInt(params.copies)
-		int index = (shipment?.containers)?(shipment.containers.size()):1;
-		try { 
-			index = Integer.parseInt(container.name);
-		} catch (NumberFormatException e) {
-			log.warn("The given value " + params.name + " is not an integer");
-		}
-		
-		
-		while ( numCopies-- > 0 ) {
-			def containerCopy = new Container(container.properties);
-			containerCopy.id = null;
-			containerCopy.name = "" + (++index);
-			containerCopy.containerType = container.containerType;
-			containerCopy.weight = container.weight;
-			//containerCopy.dimensions = container.dimensions;
-			containerCopy.shipmentItems = null;
-			containerCopy.save(flush:true);
+
+		if (container && shipment) { 		
+			def numCopies = (params.copies) ? Integer.parseInt( params.copies ) : 1
+			int index = (shipment?.containers)?(shipment.containers.size()):1;
+			/*try { 
+				index = Integer.parseInt(container.name);
+			} catch (NumberFormatException e) {
+				log.warn("The given value " + params.name + " is not an integer");
+			}*/
 			
-			container.shipmentItems.each { 
-				def shipmentItemCopy = new ShipmentItem(product: it.product, quantity: it.quantity, serialNumber: it.serialNumber, recipient: it.recipient);
-				containerCopy.addToShipmentItems(shipmentItemCopy).save(flush:true);
-			}    		
-			shipment.addToContainers(containerCopy).save(flush:true);
+			
+			while ( numCopies-- > 0 ) {
+				def containerCopy = new Container(container.properties);
+				containerCopy.id = null;
+				containerCopy.name = "" + (++index);
+				containerCopy.containerType = container.containerType;
+				containerCopy.weight = container.weight;
+				//containerCopy.dimensions = container.dimensions;
+				containerCopy.shipmentItems = null;
+				containerCopy.save(flush:true);
+				
+				container.shipmentItems.each { 
+					def shipmentItemCopy = new ShipmentItem(product: it.product, quantity: it.quantity, serialNumber: it.serialNumber, recipient: it.recipient);
+					containerCopy.addToShipmentItems(shipmentItemCopy).save(flush:true);
+				}    		
+				shipment.addToContainers(containerCopy).save(flush:true);
+			}
+			flash.message = "Copied package successfully";		
+		} else { 
+			flash.message = "Unable to copy package";		
 		}
-		flash.message = "Copied package multiple times within the shipment";		
-		redirect(action: 'editContents', id: params.shipmentId)
+		
+		redirect(action: 'showDetails', id: params.shipmentId)
 	}    
 	
 	
 
 	
 	
-	def addComment = { 
-		log.debug params;
-		def shipment = (params.shipmentId) ? Shipment.get(params.shipmentId) : null;    	
-		def recipient = (params.recipientId) ? User.get(params.recipientId) : null;
-		def comment = new Comment(comment: params.comment, commenter: session.user, recipient: recipient)
-		if (shipment) { 
-			shipment.addToComments(comment).save();
-			flash.message = "Added comment '${params.comment}'to shipment $shipment.id";
-		}
-		redirect(action: 'show', id: params.shipmentId)
-	}
-	
+
 
 	
 	
@@ -581,13 +578,50 @@ class ShipmentController {
 	def addDocument = { 
 		log.info params
 		def shipmentInstance = Shipment.get(params.id);
-		if (!shipmentInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
-			redirect(action: "list")
-		}
 		render(view: "addDocument", model: [shipmentInstance : shipmentInstance, document : new Document()]);
 	}
 	
+	def addComment = {
+		log.debug params;
+		def shipmentInstance = Shipment.get(params.id)
+		render(view: "addComment", model: [shipmentInstance : shipmentInstance, comment : new Comment()]);
+		
+		//def recipient = (params.recipientId) ? User.get(params.recipientId) : null;
+		//def comment = new Comment(comment: params.comment, commenter: session.user, recipient: recipient)
+		//if (shipment) {
+		//	shipment.addToComments(comment).save();
+		//	flash.message = "Added comment '${params.comment}'to shipment $shipment.id";
+		//}
+		//redirect(action: 'addComment', id: params.shipmentId)
+	}
+
+	def addPackage = {
+		def shipmentInstance = Shipment.get(params.id)
+		def containerType = ContainerType.findByName(params.containerType)
+		if (!containerType) { 
+			flash.message = "Unable to add container type ${containerType} to the shipment";
+		}
+		else { 
+			flash.message = "Added a new ${params.containerType} to the shipment";
+			def containerName = (shipmentInstance?.containers) ? String.valueOf(shipmentInstance.containers.size() + 1) : "1";
+			def container = new Container(containerType:containerType, name:containerName)
+			shipmentInstance.addToContainers(container).save(flush:true);
+		}
+		redirect(action: 'showDetails', id: params.id);		
+	}
+
+		
+	def saveComment = { 
+		def shipmentInstance = Shipment.get(params.shipmentId);
+		def recipient = (params.recipientId) ? User.get(params.recipientId) : null;
+		def comment = new Comment(comment: params.comment, sender: session.user, recipient: recipient)
+		if (shipmentInstance) { 
+			shipmentInstance.addToComments(comment).save(flush:true);
+			flash.message = "Added comment '${params.comment}'to shipment ${shipmentInstance.name}";			
+		}
+		redirect(action: 'showDetails', id: params.shipmentId);
+		
+	}
 	
 
 	

@@ -15,7 +15,7 @@ html * {
 body {
     background: #fff;
     color: #333;
-    font: 11px "lucida grande", verdana, arial, helvetica, sans-serif;
+    /*font: 11px "lucida grande", verdana, arial, helvetica, sans-serif;*/
 }
 #grailsLogo {
     padding-left: 0px;
@@ -52,7 +52,7 @@ ul {
 input, select, textarea {
     background-color: #fcfcfc;
     border: 1px solid #ccc;
-    font: 11px "lucida grande", verdana, arial, helvetica, sans-serif;
+    /*font: 11px "lucida grande", verdana, arial, helvetica, sans-serif;*/
     margin: 2px 0;
     padding: 2px 4px;
 }

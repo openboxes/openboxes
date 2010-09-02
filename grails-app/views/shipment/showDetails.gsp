@@ -6,9 +6,7 @@
 	<g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
 	<title><g:message code="default.show.label" args="[entityName]" /></title>        
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
-	<content tag="pageTitle">
-		Show Shipment
-	</content>
+	<content tag="pageTitle">Show Shipment</content>
 </head>
 
 <body>    
@@ -36,10 +34,6 @@
 							<table cellspacing="5" cellpadding="5">
 								<tbody>
 
-									<tr>
-										<td>&nbsp;</td>
-									</tr>
-								
 									<tr class="prop">
 										<td valign="top" class="name"><label><g:message
 											code="shipment.currentStatus.label" default="Status" /></label></td>
@@ -47,38 +41,10 @@
 											${fieldValue(bean: shipmentInstance, field: "mostRecentEvent.eventType.name")}<br/>
 										</td>
 										<td>
-											<span style="font-size: 0.8em; color: #aaa">
-												@ ${fieldValue(bean: shipmentInstance, field: "mostRecentEvent.eventLocation.name")}
+											<span class="fade">
+												${fieldValue(bean: shipmentInstance, field: "mostRecentEvent.eventLocation.name")}
 												on <g:formatDate format="dd MMM yyyy" date="${shipmentInstance?.mostRecentEvent?.eventDate}"/>
 											</span>
-										</td>
-									</tr>
-									<tr class="prop">
-										<td valign="top" class="name"><label><g:message
-											code="shipment.method.label" default="Shipper" /></label>
-										</td>
-										<td valign="top" class="">
-											<g:if test="${shipmentInstance.shipmentMethod.shipper}">
-												<table>
-													<tbody>
-														<tr>
-															<td>
-																${fieldValue(bean: shipmentInstance, field: "shipmentMethod.shipper.name")} <br/> 
-																<span class="fade" style="font-size: 0.8em;">${fieldValue(bean: shipmentInstance, field: "shipmentMethod.trackingNumber")}</span>														
-															</td>
-															<%-- 
-															<td style="width:16px;">
-																<img src="${createLinkTo(dir:'images/icons',file: shipmentInstance?.shipmentMethod?.shipperService?.name + '.png')}"
-																valign="top" style="vertical-align: middle;" />
-															</td>
-															--%>
-														</tr>
-													</tbody>											
-												</table>
-											</g:if>
-											<g:else>
-												<span class="fade">(empty)</span>
-											</g:else>										
 										</td>
 									</tr>
 									<tr class="prop">
@@ -114,15 +80,47 @@
 											</g:if>
 										</td>
 									</tr>
-									
+									<tr class="prop">
+										<td valign="top" class="name"><label><g:message
+											code="shipment.method.label" default="Shipper" /></label>
+										</td>
+										<td valign="top" class="">
+											<g:if test="${shipmentInstance?.shipmentMethod?.shipper}">
+												<table>
+													<tbody>
+														<tr>
+															<td>
+																${fieldValue(bean: shipmentInstance, field: "shipmentMethod.shipper.name")} <br/> 
+																<span class="fade" style="font-size: 0.8em;">${fieldValue(bean: shipmentInstance, field: "shipmentMethod.trackingNumber")}</span>														
+															</td>
+															<%-- 
+															<td style="width:16px;">
+																<img src="${createLinkTo(dir:'images/icons',file: shipmentInstance?.shipmentMethod?.shipperService?.name + '.png')}"
+																valign="top" style="vertical-align: middle;" />
+															</td>
+															--%>
+														</tr>
+													</tbody>											
+												</table>
+											</g:if>
+											<g:else>
+												<span class="fade">(empty)</span>
+											</g:else>										
+										</td>
+									</tr>
 									<tr class="prop">
 										<td valign="top" class="name" style="width: 10%;"><label><g:message
 											code="shipment.carrier.label" default="Carrier" /></label></td>
 										<td valign="top" style="width: 30%;">
-											<span>
-												${fieldValue(bean: shipmentInstance, field: "carrier.firstName")}
-												${fieldValue(bean: shipmentInstance, field: "carrier.lastName")}
-											</span>
+											<g:if test="${shipmentInstance?.carrier}">
+												<span>
+													${fieldValue(bean: shipmentInstance, field: "carrier.firstName")}
+													${fieldValue(bean: shipmentInstance, field: "carrier.lastName")}
+												</span>
+											</g:if>
+											<g:else>
+												<span class="fade">(empty)</span>
+											</g:else>												
 										</td>
 										<td>
 											<span class="fade">${fieldValue(bean: shipmentInstance, field: "carrier.email")}</span>
@@ -130,18 +128,25 @@
 									</tr>
 									<tr class="prop">
 										<td class="name"  style="width: 10%;">
-											<label><g:message code="shipment.destination.label" default="Recipient" /></label>
+											<label><g:message code="shipment.recipient.label" default="Recipient" /></label>
 										</td>
 										<td class="value" style="width: 30%;">
-											<span>
-												${fieldValue(bean: shipmentInstance, field: "recipient.firstName")}
-												${fieldValue(bean: shipmentInstance, field: "recipient.lastName")}
-											</span>											
+											<g:if test="${shipmentInstance?.recipient}">
+												<span>
+													${fieldValue(bean: shipmentInstance, field: "recipient.firstName")}
+													${fieldValue(bean: shipmentInstance, field: "recipient.lastName")}
+												</span>
+											</g:if>
+											<g:else>
+												<span class="fade">(empty)</span>
+											</g:else>												
+											
 										</td>
 										<td>
 											<span class="fade">${fieldValue(bean: shipmentInstance, field: "recipient.email")}</span>
 										</td>
 									</tr>
+									<%-- 
 									<tr class="prop">
 										<td valign="top" class="name">
 											<label><g:message code="shipment.donor.label" default="Donated by" /></label><br/>
@@ -158,8 +163,8 @@
 										<td>
 											&nbsp;
 										</td>
-									
 									</tr>
+									--%>
 									<tr class="prop">
 										<td valign="top" class="name">
 											<img src="${createLinkTo(dir:'images/icons/silk',file:'money.png')}" alt="money" style="vertical-align: middle"/>
@@ -177,9 +182,11 @@
 											&nbsp;
 										</td>
 									</tr>
+<!-- 									
 									<tr class="prop">
 										<td>&nbsp;</td>
-									</tr>
+									</tr>																		
+ -->									
 									<tr class="prop">																									
 										<td class="name">
 											<img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" alt="package" style="vertical-align: middle"/>
@@ -224,8 +231,15 @@
 																	<td style="text-align: right" nowrap="true">																		 
 																		<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}" 
 																			params="['container.id':container.id]"><img 
-																			src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" 
+																			src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" 
 																			alt="Add" style="vertical-align: middle"/></g:link>
+
+																		&nbsp;
+																		
+																		<g:link class="copy" action="copyContainer" id="${container?.id}" params="[shipmentId:shipmentInstance.id]">
+																			<img src="${createLinkTo(dir:'images/icons/silk',file:'page_copy.png')}" alt="Copy" style="vertical-align: middle"/>
+																		</g:link>																		
+
 																		&nbsp;
 																		<%-- 
 																		<g:if test="${container}">
@@ -254,9 +268,11 @@
 											</div>
 										</td>
 									</tr>
+<!-- 									
 									<tr class="prop">
 										<td>&nbsp;</td>
-									</tr>
+									</tr>																		
+ -->									
 									<tr class="prop">
 										<td class="name">
 											<img src="${createLinkTo(dir:'images/icons',file:'document.png')}" alt="document" style="vertical-align: middle"/>
@@ -312,10 +328,11 @@
 											</div>
 										</td>					
 									</tr>
+<!-- 									
 									<tr class="prop">
 										<td>&nbsp;</td>
-									</tr>
-									
+									</tr>																		
+ -->									
 									<tr class="prop">
 																							
 										<td class="name">
@@ -341,9 +358,9 @@
 															<g:each in="${shipmentInstance.comments}" var="comment" status="i">
 																<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 																	<td>${i+1}</td>
-																	<td><i>"${comment?.comment}"</i> --<b>${comment.sender.username}</b></td>																	
+																	<td><i>"${comment?.comment}"</i> --<b>${comment?.sender?.username}</b></td>																	
 																	<td>
-																		<g:formatDate format="MMM dd yyyy" date="${comment.dateCreated}"/> &nbsp; 
+																		<g:formatDate format="MMM dd yyyy" date="${comment?.dateCreated}"/> &nbsp; 
 																		<%-- 
 																		<span style="font-size: 0.8em; color: #aaa;">
 																			<g:formatDate type="time" date="${comment?.dateCreated}"/>
@@ -364,13 +381,15 @@
 											</div>
 										</td>
 									</tr>			
+<!-- 									
 									<tr class="prop">
 										<td>&nbsp;</td>
 									</tr>																		
+ -->									
 									<tr class="prop">
 										<td class="name">
-											<img src="${createLinkTo(dir:'images/icons/silk',file:'calendar.png')}" alt="activity" style="vertical-align: middle"/>
-											<label>Activity</label>
+											<img src="${createLinkTo(dir:'images/icons/silk',file:'calendar.png')}" alt="events" style="vertical-align: middle"/>
+											<label>Events</label>
 										</td>
 										<td class="" colspan="3">
 											<div>

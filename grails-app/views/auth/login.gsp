@@ -52,8 +52,8 @@
 										<g:passwordField name="password" value="${userInstance?.password}" />
 									</td>
 								</tr>
-								<tr class="prop">
-									<td valign="top" class="name">
+								<tr >
+									<td valign="top">
 
 									</td>
 									<td valign="top">

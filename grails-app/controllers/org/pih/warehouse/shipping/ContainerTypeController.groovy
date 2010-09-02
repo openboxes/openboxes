@@ -3,6 +3,6 @@ package org.pih.warehouse.shipping;
 
 class ContainerTypeController {
 
-	//def scaffold = ContainerType;
+	def scaffold = ContainerType;
 	
 }

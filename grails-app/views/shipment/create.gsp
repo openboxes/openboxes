@@ -18,125 +18,136 @@
 	                <g:renderErrors bean="${shipmentInstance}" as="list" />
 	            </div>
             </g:hasErrors>			
-            <div class="dialog" style="clear: both;">             	
-	  			<g:form action="save" method="post">
-	                <g:hiddenField name="id" value="${shipmentInstance?.id}" />
-	                <g:hiddenField name="version" value="${shipmentInstance?.version}" />
-	                <g:hiddenField name="type" value="${params.type}" />
-            	
-	                <table>
-	                    <tbody>	
-							<tr class="prop">
-	                            <td valign="top" class="name">
-	                            	<label><g:message code="shipment.shipmentType.label" default="Shipment Type" /></label>
-	                            </td>                            
-	                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'shipmentType', 'errors')}">
-									<g:select name="shipmentType.id" from="${org.pih.warehouse.shipping.ShipmentType.list()}" optionKey="id" value="${shipmentInstance?.shipmentType?.id}" noSelection="['0':'']" />
-	                            </td>                            
-	                        </tr>         
-
-	                        <tr class="prop">
-	                        	<td valign="top" class="name">
-	                        		<label><g:message code="shipment.name.label" default="Nickname" /></label>
-	                        	</td>
-	                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">
-                                    <g:textField name="name" size="30" value="${shipmentInstance?.name}" />
-	                            </td>                            
-	                        </tr>
-
-	                        <tr class="prop">
-	                        	<td valign="top" class="name">
-	                        		<label><g:message code="shipment.recipient.label" default="Recipient" /></label>
-	                        	</td>
-	                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'recipient', 'errors')}">
-                                    <g:textField name="recipient" size="30" value="${shipmentInstance?.recipient}" />
-	                            </td>                            
-	                        	<td valign="top" class="name">
-	                        		<label><g:message code="shipment.carrier.label" default="Carrier" /></label>
-	                        	</td>
-	                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'carrier', 'errors')}">
-                                    <g:textField name="carrier" size="30" value="${shipmentInstance?.carrier}" />
-	                            </td>                            
-	                        </tr>
-	                                
-	                    
-	                        <tr class="prop">
-								<td valign="top" class="name">
-	                            	<label><g:message code="shipment.destination.label" default="Expected shipping date" /></label>
-	                            </td>
-	                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}">										
-									<g:jqueryDatePicker name="expectedShippingDate" />																			
-	                            </td>                            
-	                        </tr>          
-	                        <g:if test="${params.type=='incoming'}">                   
-		                        <tr class="prop">
-		                            <td valign="top" class="name">
-		                            	<label><g:message code="shipment.origin.label" default="Where is it coming from?" /></label>
-		                            </td>                            
-		                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">
-		                            	<g:select name="origin.id" from="${warehouses}" optionKey="id" value="${shipmentInstance?.origin?.id}" noSelection="['0':'']" />
-		                            	<g:hiddenField name="destination.id" value="${session.warehouse.id}" />
-		                            </td>                            
-		                        </tr>		     
-							</g:if>		                        
-	                        
-	                        <g:elseif test="${params.type=='outgoing'}">                   
-		                        <tr class="prop">
-		                            <td valign="top" class="name">
-		                            	<label><g:message code="shipment.destination.label" default="Where is it going?" /></label>
-		                            </td>                            
-		                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">
-		                            	<g:select name="destination.id" from="${warehouses}" optionKey="id" value="${shipmentInstance?.destination?.id}" noSelection="['0':'']" />
-		                            	<g:hiddenField name="origin.id" value="${session.warehouse.id}" />
-		                            </td>                            
-		                        </tr>	
-	                        </g:elseif>
-	                        <g:else>
-		                        <tr class="prop">
-		                            <td valign="top" class="name">
-		                            	<label><g:message code="shipment.destination.label" default="Where is it coming from?" /></label>
-		                            </td>                            
-		                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">
-		                            	<g:select name="origin.id" from="${warehouses}" optionKey="id" value="${shipmentInstance?.origin?.id}" noSelection="['0':'']" />
-		                            </td>                            
-		                        </tr>	
-		                        <tr class="prop">
-		                            <td valign="top" class="name">
-		                            	<label><g:message code="shipment.destination.label" default="Where is it going?" /></label>
-		                            </td>                            
-		                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">
-		                            	<g:select name="destination.id" from="${warehouses}" optionKey="id" value="${shipmentInstance?.destination?.id}" noSelection="['0':'']" />
-		                            </td>                            
-		                        </tr>	
-	                        </g:else>
-							<tr class="prop">
-	                        	<td valign="top" class="name">
-	                        		<label><g:message code="shipment.initialStatus.label" default="What is the current status?" /></label>
-	                        	</td>
-	                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: '', 'errors')}">
-                                    <g:select name="eventType.id" from="${eventTypes}" optionKey="id" value="${shipmentInstance?.origin?.id}" noSelection="['0':'']" />
-	                            </td>                            
-	                        </tr>	                        	      
-	                        	                        
-	                        <tr class="prop">		                        
-	                        	<td></td>
-	                        	<td>
-									<div class="buttons" style="text-align: left;">
-										<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> Save</button>											
-										<g:link controller="dashboard" action="index" class="negative">
-											<img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="cancel" /> Cancel
-										</g:link>
+            
+            
+            
+			<table>
+				<tr>
+					<td width="70%">
+			  			<g:form action="save" method="post">
+			                <g:hiddenField name="id" value="${shipmentInstance?.id}" />
+			                <g:hiddenField name="version" value="${shipmentInstance?.version}" />
+			                <g:hiddenField name="type" value="${params.type}" />
+								<fieldset>											
+									<g:render template="summary"/>            
+		            
+				    	        	<div class="dialog" style="clear: both;">             	
+						                <table>
+						                    <tbody>	
+						                    
+												<tr class="prop">
+													<td valign="top" class="name"><label><g:message
+														code="shipment.name.label" default="Shipment Number" /></label></td>
+													<td colspan="3" valign="top"
+														class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">
+													<span style="line-height: 1.5em">${shipmentInstance?.shipmentNumber}</span></td>
+												</tr>
+						                    
+						                    
+												<tr class="prop">
+						                            <td valign="top" class="name">
+						                            	<label><g:message code="shipment.shipmentType.label" default="Shipment Type" /></label>
+						                            </td>                            
+						                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'shipmentType', 'errors')}">
+														<g:select name="shipmentType.id" from="${org.pih.warehouse.shipping.ShipmentType.list()}" 
+															optionKey="id" 
+															optionValue="name"
+															value="${shipmentInstance?.shipmentType?.id}" 
+															noSelection="['0':'']" />
+						                            </td>                            
+						                        </tr>         
+					
+						                        <tr class="prop">
+						                        	<td valign="top" class="name">
+						                        		<label><g:message code="shipment.name.label" default="Nickname" /></label>
+						                        	</td>
+						                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">
+					                                    <g:textField name="name" size="30" value="${shipmentInstance?.name}" />
+						                            </td>                            
+						                        </tr>
+						                        <tr class="prop">
+													<td valign="top" class="name">
+						                            	<label><g:message code="shipment.expectedShippingDate.label" default="Expected shipping date" /></label>
+						                            </td>
+						                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}">										
+														<g:jqueryDatePicker name="expectedShippingDate" />																			
+						                            </td>                            
+						                        </tr>          
+						                        <g:if test="${params.type=='incoming'}">                   
+							                        <tr class="prop">
+							                            <td valign="top" class="name">
+							                            	<label><g:message code="shipment.origin.label" default="Where is it coming from?" /></label>
+							                            </td>                            
+							                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">
+							                            	<g:select name="origin.id" from="${warehouses}" optionKey="id" value="${shipmentInstance?.origin?.id}" noSelection="['0':'']" />
+							                            	<g:hiddenField name="destination.id" value="${session.warehouse.id}" />
+							                            </td>                            
+							                        </tr>		     
+												</g:if>		                        
+						                        
+						                        <g:elseif test="${params.type=='outgoing'}">                   
+							                        <tr class="prop">
+							                            <td valign="top" class="name">
+							                            	<label><g:message code="shipment.destination.label" default="Where is it going?" /></label>
+							                            </td>                            
+							                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'destination', 'errors')}">
+							                            	<g:select name="destination.id" from="${warehouses}" optionKey="id" value="${shipmentInstance?.destination?.id}" noSelection="['0':'']" />
+							                            	<g:hiddenField name="origin.id" value="${session.warehouse.id}" />
+							                            </td>                            
+							                        </tr>	
+						                        </g:elseif>
+						                        <g:else>
+							                        <tr class="prop">
+							                            <td valign="top" class="name">
+							                            	<label><g:message code="shipment.destination.label" default="Where is it coming from?" /></label>
+							                            </td>                            
+							                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">
+							                            	<g:select name="origin.id" from="${warehouses}" optionKey="id" value="${shipmentInstance?.origin?.id}" noSelection="['0':'']" />
+							                            </td>                            
+							                        </tr>	
+							                        <tr class="prop">
+							                            <td valign="top" class="name">
+							                            	<label><g:message code="shipment.destination.label" default="Where is it going?" /></label>
+							                            </td>                            
+							                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'destination', 'errors')}">
+							                            	<g:select name="destination.id" from="${warehouses}" optionKey="id" value="${shipmentInstance?.destination?.id}" noSelection="['0':'']" />
+							                            </td>                            
+							                        </tr>	
+						                        </g:else>
+												<tr class="prop">
+						                        	<td valign="top" class="name">
+						                        		<label><g:message code="shipment.initialStatus.label" default="What is the current status?" /></label>
+						                        	</td>
+						                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'shipmentStatus', 'errors')}">
+					                                    <g:select name="eventType.id" from="${eventTypes}" optionKey="id" value="" noSelection="['0':'']" />
+						                            </td>                            
+						                        </tr>	                        	      
+					
+						                                    
+						                        <tr class="prop">		                        
+						                        	<td></td>
+						                        	<td>
+														<div class="buttons" style="text-align: left;">
+															<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> Save</button>											
+															<g:link controller="dashboard" action="index" class="negative">
+																<img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="cancel" /> Cancel
+															</g:link>
+														</div>
+													</td>		                        
+						                        </tr>
+											</tbody>
+										</table>	            	        				            	        		                				 		
 									</div>
-								</td>		                        
-	                        </tr>
-						</tbody>
-					</table>	            	        				            	        		                			
-		 		
-	 			</g:form>	
-
-            </div>
-            
-            
+		            		</fieldset>
+	          			</g:form>
+          			</td>
+          			<td width="20%">
+          				
+          			
+          			</td>
+          			
+          		</tr>
+        	</table>
         </div>
     </body>
 </html>

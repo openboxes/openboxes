@@ -4,10 +4,10 @@
 			<img src="${createLinkTo(dir:'images/icons/',file:'truck.png')}"  alt="Shipping" style="vertical-align: middle"/> <g:message code="shipment.manage.label"  default="Shipping"/>
 		</span>
 		<ul>
-			<li><span class="menuButton"><g:link class="nobullet" controller="shipment" action="listOutgoing"><g:message code="shipment.list.outgoing.label"  default="browse outgoing"/></g:link></span></li>										
+			<li><span class="menuButton"><g:link class="nobullet" controller="shipment" action="listOutgoing"><g:message code="shipment.list.outgoing.label"  default="browse shipping"/></g:link></span></li>										
 			<li>
 				<span class="menuButton">
-					<g:link class="nobullet" controller="shipment" action="create" params="['type':'outgoing']"><g:message code="shipment.create.outgoing.label" default="add new outgoing" /></g:link>
+					<g:link class="nobullet" controller="shipment" action="create" params="['type':'outgoing']"><g:message code="shipment.create.outgoing.label" default="add new shipping" /></g:link>
 				</span>
 			</li>			
 		</ul>										
@@ -19,13 +19,13 @@
 		<ul>
 			<li>
 				<span class="menuButton">
-					<g:link class="nobullet" controller="shipment" action="listIncoming"><g:message code="shipment.list.incoming.label"  default="browse incoming"/>
+					<g:link class="nobullet" controller="shipment" action="listIncoming"><g:message code="shipment.list.incoming.label"  default="browse receiving"/>
 					</g:link>
 				</span>		
 			</li>										
 			<li>
 				<span class="menuButton">
-					<g:link class="nobullet" controller="shipment" action="create" params="['type':'incoming']"><g:message code="shipment.create.incoming.label" default="add new incoming" /></g:link>
+					<g:link class="nobullet" controller="shipment" action="create" params="['type':'incoming']"><g:message code="shipment.create.incoming.label" default="add new receiving" /></g:link>
 				</span>
 			</li>						
 		</ul>										
@@ -143,6 +143,7 @@
 			<g:message code="metadata.manage.label"  default="Metadata"/>
 		</span>
 		<ul>
+			<li><span class="menuButton"><g:link class="nobullet" controller="eventType" action="list"><g:message code="eventType.browse.label"  default="browse event types"/></g:link></span></li>		
 
 			<!-- 
 			<li><span class="menuButton"><g:link class="nobullet" controller="containerType" action="list"><g:message code="default.manage.label" args="['Metadata']"/></g:link></span></li>		

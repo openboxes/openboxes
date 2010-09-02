@@ -35,7 +35,7 @@ class EventType {
 
 	
 	String getStatus() { 
-		return "$eventStatus?.name";
+		return (eventStatus) ? eventStatus.name : "None";
 
 	}
 	
