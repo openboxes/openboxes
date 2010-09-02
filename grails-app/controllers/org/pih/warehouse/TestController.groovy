@@ -6,6 +6,8 @@ import org.pih.warehouse.core.Person;
 
 class TestController {
 	
+	def mailService;
+	
 	
 	def jQuery = {
 	}
@@ -23,7 +25,26 @@ class TestController {
 		
 		
 	}
-
+	
+	
+	def sendEmail = {
+		if(request.method == 'POST') {
+			log.info "send email test"
+			if (params.to && params.msg && params.subject) { 
+				log.info "send email";
+				mailService.sendMail(params.subject, params.msg, params.to);
+				flash.message = "Sent simple email successfully!"
+			} else if (params.to && params.htmlMsg && params.subject) { 
+				log.info "send html email";
+				mailService.sendHtmlMail(params.subject, params.htmlMsg, "text alternative message", params.to)
+				flash.message = "Sent HTML email successfully!"
+			} else { 			
+				flash.message = "Unable to send email";
+			}
+		}
+	}
+	
+	
 	/*	
 	def searchByFirstName = {
 		def person = Person.findAllByFirstNameIlike(params.q + "%")

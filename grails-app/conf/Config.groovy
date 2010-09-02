@@ -14,7 +14,7 @@ grails.config.locations = [
 
 grails { 
 	mail { 
-		from = "warehouse@pih.org"
+		from = "info@localhost"
 		host = "localhost"
 		port = "25"
 		//host = "smtp.gmail.com"

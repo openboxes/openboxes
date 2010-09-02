@@ -27,7 +27,7 @@ class MailService {
 	}
 	
 	
-	def sendHtmlMail(String subject, String htmlMessage, String testMessage, String to) { 		
+	def sendHtmlMail(String subject, String htmlMessage, String textMessage, String to) { 		
 		// Create the email message
 		HtmlEmail email = new HtmlEmail();
 		email.setHostName(host)
@@ -38,7 +38,7 @@ class MailService {
 		//URL url = new URL("http://www.apache.org/images/asf_logo_wide.gif");
 		//String cid = email.embed(url, "Apache logo");
 		email.setHtmlMsg(htmlMessage);
-		email.setTextMsg(testMessage);
+		email.setTextMsg(textMessage);
 		email.send();	  
 	}
 	
