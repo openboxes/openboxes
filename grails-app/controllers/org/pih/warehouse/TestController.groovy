@@ -3,6 +3,7 @@ package org.pih.warehouse
 import java.util.SortedSet;
 import grails.converters.JSON;
 import org.pih.warehouse.core.Person;
+import org.pih.warehouse.product.Product;
 
 class TestController {
 	
@@ -26,6 +27,14 @@ class TestController {
 		
 	}
 	
+	def jQueryAutoSuggestTag = { 
+		
+		
+	}
+	
+	def jQueryAutocomplete = { 
+		
+	}
 	
 	def sendEmail = {
 		if(request.method == 'POST') {
@@ -45,58 +54,82 @@ class TestController {
 	}
 	
 	
-	/*	
-	def searchByFirstName = {
-		def person = Person.findAllByFirstNameIlike(params.q + "%")
-		if ( person ) {
-			render person as JSON
-		} else {
-			response.sendError(400, "Person does not exist");
-		}
-	}*/
-	
-	def searchByName = {
+	def findProducts = {
 		log.info params
-		def people = new TreeSet();
+		def items = new TreeSet();			
+		if (params.term) {							
+			items = Product.withCriteria {
+				or {
+					ilike("name", "%" +  params.term + "%")
+					ilike("upc", "%" +  params.term + "%")
+				}
+			}
+			if (items) { 
+				items = items.collect() {
+					[	value: it.id,
+						valueText: it.name,
+						label: it.name,
+						desc: it.description,
+						icon: "none"]
+				}
+			}
+			else { 				
+				def item =  [ 
+					value: 0, 
+					valueText : params.term,
+					label: "Add a new item for '" + params.term + "'?",
+					desc: params.term,
+					icon: "none"
+				];
+				items.add(item)
+			}
+		}
+		render items as JSON;
+	}
+	
+	
+	def findPersonByName = {
+		log.info params
+		def items = new TreeSet();
 		try {  
 			
 			if (params.term) {
 								
-				people = Person.withCriteria {
+				items = Person.withCriteria {
 					or {
 						ilike("firstName", "%" +  params.term + "%")
 						ilike("lastName", "%" +  params.term + "%")
 						ilike("email", "%" + params.term + "%")
 					}
 				}
+			
+				if (items) { 		
+					items = items.collect() {
+						[	value: it.id,
+							valueText: it.firstName + " " + it.lastName,
+							label: "<img src=\"/warehouse/user/viewPhoto/" + it.id + "\" width=\"24\" height=\"24\" style=\"vertical-align: bottom;\"\"/>&nbsp;" + it.firstName + " " + it.lastName,						
+							desc: it.email, 
+							icon: it.photo]
+					}
+				}	
+				else { 
+					def item =  [
+						value: 0,
+						valueText : params.term,
+						label: "Add new item for '" + params.term + "'?",
+						desc: params.term,
+						icon: "none"
+					];
+					items.add(item)
+				}			
 				
-				/*
-				def searchTerms = params.term.split(" ");			
-				searchTerms.each {
-					log.info "searchTerm: '${it}' " + it.class.name	
-					def peopleWithSimilarFirstName = Person.findAllByFirstNameIlike("%" + it + "%")
-					def peopleWithSimilarLastName = Person.findAllByLastNameIlike("%" + it + "%")
-					log.info "peopleWithSimilarFirstName: " + peopleWithSimilarFirstName;
-					log.info "peopleWithSimilarLastName: " + peopleWithSimilarLastName;
-					people.addAll(peopleWithSimilarFirstName)
-					people.addAll(peopleWithSimilarLastName)
-					log.info "people: " + people
-				}*/
 				
-				people = people.collect() {
-					[	value: it.id,
-						label: it.firstName + " " + it.lastName,
-						desc: "description", 
-						icon: "some image"]
-				}
 			}
-			//def jsonItems = [result: people]
-			//render jsonItems as JSON;
 		} catch (Exception e) { 
 			e.printStackTrace();
 		
 		}
-		render people as JSON;
+		render items as JSON;
 	}
 	
 	

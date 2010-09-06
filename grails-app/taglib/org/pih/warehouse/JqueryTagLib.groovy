@@ -4,33 +4,25 @@ import java.text.SimpleDateFormat;
 import org.pih.warehouse.core.Person;
 
 class JqueryTagLib {
-	
-	
-	
-	def personAutoSuggest = { attrs, body ->
-		def name = attrs.name	
-		def person = Person.get(attrs.id);
 		
-		def personAutoSuggestHtml = """
+	def autoSuggest = { attrs, body ->
+		def name = attrs.name	
+		def valueId = (attrs.valueId)?attrs.valueId:"";
+		def valueName = (attrs.valueName)?attrs.valueName:"";
+		def width = (attrs.width) ? attrs.width : 300;
+		def minLength = (attrs.minLength) ? attrs.minLength : 2;
+		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "findPersonByName";
+		
+		def html = """
 			<div>
-				<input id="carrier-suggest" type="text" value=""/> 	
-				<img id="carrier-icon" src="/warehouse/images/icons/search.png" style="vertical-align: middle;"/>
-				<input id="carrier-id" name="carrier.id" type="hidden" value=""/>
-				<span id="carrier-name"></span>		
+				<input id="${name}-id" type="hidden" name="${name}.id" value="${valueId}"/>
+				<input id="${name}-suggest" type="text" name="${name}.name" value="${valueName}" style="width: ${width}px;"> 		
 			</div>		
 			<script>
 				\$(document).ready(function() {
-					\$('#carrier-suggest').focus();
-					\$("#carrier-name").click(function() {
-						\$('#carrier-suggest').val("");
-						\$('#carrier-name').hide();
-						\$('#carrier-suggest').show();				
-						\$('#carrier-suggest').focus();
-						\$('#carrier-suggest').select();
-					});
-			      	\$("#carrier-suggest").autocomplete({
-			            width: 400,
-			            minLength: 2,
+			      	\$("#${name}-suggest").autocomplete({
+			            width: ${width*2},
+			            minLength: ${minLength},
 			            dataType: 'json',
 			            highlight: true,
 			            selectFirst: true,
@@ -39,34 +31,32 @@ class JqueryTagLib {
 			            //scrollHeight: 300,
 						//define callback to format results
 						source: function(req, add){
-							//pass request to server
-							\$.getJSON("/warehouse/test/searchByName", req, function(data) {
-								var people = [];
-								\$.each(data, function(i, item){
-									people.push(item);
+							\$.getJSON('${jsonUrl}', req, function(data) {
+								var items = [];
+								\$.each(data, function(i, item) {
+									items.push(item);
 								});
-								add(people);
+								add(items);
 							});
 				      	},
 				        focus: function(event, ui) {			        
-				      		\$('#carrier-suggest').val(ui.item.label);					
+				      		\$('#${name}-suggest').val(ui.item.valueText);					
 				      		return false;
 				        },	
 						select: function(event, ui) {	
-							\$('#carrier-suggest').val(ui.item.label);
-							\$('#carrier-name').html(ui.item.label);
-							\$('#carrier-id').val(ui.item.value);
-							\$('#carrier-icon').attr('src', '/warehouse/images/icons/silk/user.png');
-							\$('#carrier-suggest').hide();
-							\$('#carrier-name').show();
+							search_option = ui.item;		
+							\$('#${name}-suggest').val(ui.item.valueText);
+							\$('#${name}-id').val(ui.item.value);
+							//\$('#${name}-name').html(ui.item.valueText);					
 							return false;
 						}
 					});
 				});
-			</script>""";
+			</script>
+		""";
 			
 		
-		out << personAutoSuggestHtml; 
+		out << html; 
 	}
 	
 	

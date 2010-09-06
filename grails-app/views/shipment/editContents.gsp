@@ -112,64 +112,23 @@
 															<g:render template="containerSummary" />																
 															
 															<div>
-																																		
-																	<g:form action="addItemAutoComplete" id="${shipmentInstance.id}">	
-																		<g:hiddenField name="container.id" value="${containerInstance?.id}"></g:hiddenField>
-																	
-																		<div>																
-																			<table>
-																				<tr class="prop">
-																					<th></th>
-																					<th>Qty</th>
-																					<th>Item</th>
-																					<th>Serial No</th>
-																					<th>Recipient</th>
-																					<th></th>
-																				</tr>
-																				<tr class="prop">
-																					<td width="5%"> &nbsp; &nbsp; &nbsp; </td>
-																					<td width="10%">													
-																						<g:textField name="quantity" value="1" size="2" />
-																					</td>
-																					<td width="20%">											
-																						<%-- 		
-																						<gui:autoComplete size="10" 
-																							id="selectedItem" name="selectedItem" 
-																							controller="shipment" action="availableItems" />--%>
-																						<g:textField name="selectedItem" value="" size="10" style="" />
-																					</td>
-																					<td width="20%">													
-																						<g:textField name="serialNumber" value="" size="10" style="" />
-																					</td>
-																					<td width="20%">													
-																						<g:select name="recipient.id" 
-																							noSelection="${['null':'']}"
-																							from="${org.pih.warehouse.core.Person.list()}"
-																							optionValue="${{it.username}}"
-																							optionKey="id"
-																							value="${shipmentInstance?.recipient?.id}"/>
-																											
-																					</td>
-																					<td  width="25%" valign="top" nowrap="nowrap">
-																						<div class="buttons" style="padding: 0px">
-																							<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add"/> Add</button>
-																						</div>
-																					</td>
-																				</tr>	
-																			</table>									
-																		</div>																												
-																	</g:form>
-																										
-																
 																	<g:form action="editContainer">
 																		<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}"/>
 																		<g:hiddenField name="containerId" value="${containerInstance?.id}"/>
-																			<table>
+																			<table border="1">
 																				<tbody>
+																					<tr class="prop">
+																						<th></th>
+																						<th>Qty</th>
+																						<th>Item</th>
+																						<th>Serial No</th>
+																						<th>Recipient</th>
+																						<th></th>
+																					</tr>																				
 																					<g:if test="${containerInstance?.shipmentItems}">
 																						<g:each var="item" in="${containerInstance.shipmentItems}" status="k">
 																							<tr class="prop ${(k % 2) == 0 ? 'odd' : 'even'}">
-																								<td style="5%">${k+1}.</td>
+																								<td width="7%" style="text-align: center;">${k+1}</td>
 																								<td width="10%">
 																									<g:hiddenField name="shipmentItems[${k}].id" value="${item.id}"></g:hiddenField>												    
 																									<g:textField name="shipmentItems[${k}].quantity" value="${item.quantity}" size="2" />
@@ -180,56 +139,89 @@
 																										<span class="fade">(unverified)</span>
 																									</g:if> 
 																								</td>
-																								<td width="20%">
+																								<td width="15%">
 																									<g:textField name="shipmentItems[${k}].serialNumber" value="${item.serialNumber}" size="10" />																									
 																								</td>
 																								<td width="20%">
-																									<g:select name="shipmentItems[${k}].recipient.id" 
-																										noSelection="${['null':'']}"
-																										from="${org.pih.warehouse.core.Person.list()}"
-																										optionValue="${{it.username}}"
-																										optionKey="id"
-																										value="${item?.recipient?.id}"/>
-																									
-																									
-																									
-																									<%-- 
-																									<g:textField name="shipmentItems[${k}].recipient" value="${item.recipient}" size="10" />
-																									<gui:autoComplete size="20" 
-																										id="shipmentItems[${k}].recipient" name="shipmentItems[${k}].recipient" 
-																										controller="shipment" action="availableContacts"/>																																							
-																									 --%>
-																									 
-																									 
+																									<g:if test="${shipmentInstance?.recipient}">
+																										<g:autoSuggest name="shipmentItems[${k}].recipient" jsonUrl="/warehouse/shipment/findPersonByName" 
+																											width="100" 
+																											valueId="${item?.recipient?.id}" 
+																											valueName="${item?.recipient.email}"/>												
+																									</g:if>
+																									<g:else>
+																										<g:autoSuggest name="recipient" jsonUrl="/warehouse/shipment/findPersonByName" width="100" />	
+																									</g:else>	
 																								</td>
-																								<td width="25%"></td>
+																								<td width="10%" style="vertical-align: bottom; text-align: right">
+																									<span class="buttons" style="padding: 0px">
+																										<button type="submit" class="negative"><img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete"/></button>
+																									</span>
+																								</td>
 																							</tr>							
 																						</g:each>																																														
 																						<tr class="prop">
-																							<td colspan="5" style="text-align: right;">
-																								<span class="fade">(enter '0' in <b>Qty</b> field to remove item)</span>
+																							<td colspan="6">
+																								<div class="fade" style="float: left; ">
+																									<li>After modifying any of the values above, click <b>Save</b>.</li>  
+																									<li>To remove an item, enter '0' in <b>Qty</b> field to remove item)</li>
+																								</div>
+																								<div class="buttons" style="padding: 0px; float: right;">
+																									<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Save"/> Save</button>
+																									<%-- <g:link class="negative" controller="shipment" action="deleteContainer" id="${containerInstance.id}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"><img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="Delete"/> Delete</a></g:link> &nbsp;--%>
+																								</div>
 																							</td>
 																						</tr>
 																					</g:if>
 																					<g:else>
 																						<tr>
-																							<td style="text-align: center" colspan="5">
+																							<td style="text-align: center" colspan="6">
 																								<span class="fade">(empty)</span>
 																							</td>
 																						</tr>													
 																					</g:else>															
-																					<tr>																	
-																						<td colspan="5">
-																							<div class="buttons">
-																								<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Save" /> Save</button>
-																								<%-- <g:link class="negative" controller="shipment" action="deleteContainer" id="${containerInstance.id}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"><img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="Delete"/> Delete</a></g:link> &nbsp;--%>
-																							</div>
-																						</td>
-																					</tr>															
 																					
 																				</tbody>
 																			</table>	
 																		</g:form>																		
+																	<g:form action="addItemAutoComplete" id="${shipmentInstance.id}">	
+																		<g:hiddenField name="container.id" value="${containerInstance?.id}"></g:hiddenField>
+																	
+																		<div>																
+																			<table border="1">
+																				<tbody>
+																					<tr class="prop" style="background-color: #FFF6BF;">
+																						<td width="7%" style="vertical-align: bottom; text-align: center"> (new) </td>
+																						<td width="10%" style="vertical-align: bottom;">													
+																							<g:textField name="quantity" value="" size="2" />
+																						</td>
+																						<td width="20%" style="vertical-align: bottom;">											
+																							<g:autoSuggest name="selectedItem" jsonUrl="/warehouse/shipment/findProducts" width="100"/>	
+																						</td>
+																						<td width="15%" style="vertical-align: bottom;">													
+																							<g:textField name="serialNumber" value="" size="10" style="" />
+																						</td>
+																						<td width="20%" style="vertical-align: bottom;">
+																							<g:if test="${shipmentInstance?.recipient}">
+																								<g:autoSuggest name="recipient" jsonUrl="/warehouse/shipment/findPersonByName" 
+																									width="100" 
+																									valueId="${shipmentInstance?.recipient?.id}" 
+																									valueName="${shipmentInstance?.recipient?.email}"/>												
+																							</g:if>
+																							<g:else>
+																								<g:autoSuggest name="recipient" jsonUrl="/warehouse/shipment/findPersonByName" width="100" />	
+																							</g:else>	
+																						</td>
+																						<td width="10%" style="vertical-align: bottom; text-align: right">
+																							<span class="buttons" style="padding: 0px">
+																								<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add"/></button>
+																							</span>
+																						</td>
+																					</tr>	
+																				</tbody>
+																			</table>									
+																		</div>																												
+																	</g:form>
 															
 
 															</div>
@@ -269,7 +261,7 @@
 																		<td class="value">
 																			<g:textField name="weight" value="${containerInstance?.weight}" size="7"/> 
 																			<g:select name="weightUnits" 
-																				from="${[' ', 'kg', 'lb']}"
+																				from="${[' ', 'lb', 'kg']}"
 																				value="${containerInstance?.weightUnits}">
 																			</g:select>																	
 																			<span class="fade">e.g. '100 lb' or '120 kg' </span>

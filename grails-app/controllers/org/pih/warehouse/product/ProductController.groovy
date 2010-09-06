@@ -4,6 +4,7 @@ import org.junit.runner.Request;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.ProductType;
+import grails.converters.JSON;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -287,7 +288,6 @@ class ProductController {
             redirect(action: "browse")
         }
     }
-	
 	
 }
 

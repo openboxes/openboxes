@@ -12,6 +12,9 @@
 	width: 95%;		/* stretch the main content */
 }
 
+li.ui-menu-item { text-align: left; font-weight: bold; } 
+
+
 .body { 
 	margin-right: 5px;
 }

@@ -109,6 +109,7 @@ class ShipmentController {
 	}
 	
 	def editDetails = {
+		log.info params
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
@@ -384,6 +385,83 @@ class ShipmentController {
 		render jsonItems as JSON;
 	}
 	
+	def findPersonByName = {
+		log.info "findPersonByName: " + params
+		def items = new TreeSet();
+		try {
+			
+			if (params.term) {
+								
+				items = Person.withCriteria {
+					or {
+						ilike("firstName", "%" +  params.term + "%")
+						ilike("lastName", "%" +  params.term + "%")
+						ilike("email", "%" + params.term + "%")
+					}
+				}
+			
+				if (items) {
+					items = items.collect() {
+						[	value: it.id,
+							valueText: it.firstName + " " + it.lastName,
+							label: "<img src=\"/warehouse/user/viewPhoto/" + it.id + "\" width=\"24\" height=\"24\" style=\"vertical-align: bottom;\"\"/>&nbsp;" + it.firstName + " " + it.lastName + "&nbsp;&lt;" +  it.email + "&gt;",
+							desc: it.email,
+							icon: "<img src=\"/warehouse/user/viewPhoto/" + it.id
+						]
+					}
+				}
+				else {
+					def item =  [
+						value: 0,
+						valueText : params.term,
+						label: "Add new item for '" + params.term + "'?",
+						desc: params.term,
+						icon: "none"
+					];
+					items.add(item)
+				}
+				
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		
+		}
+		render items as JSON;
+	}
+	
+	def findProducts = {
+		log.info params
+		def items = new TreeSet();
+		if (params.term) {
+			items = Product.withCriteria {
+				or {
+					ilike("name", "%" +  params.term + "%")
+					ilike("upc", "%" +  params.term + "%")
+				}
+			}
+			if (items) {
+				items = items.collect() {
+					[	value: it.id,
+						valueText: it.name,
+						label: it.name,
+						desc: it.description,
+						icon: "none"]
+				}
+			}
+			else {
+				def item =  [
+					value: 0,
+					valueText : params.term,
+					label: "Add a new item for '" + params.term + "'?",
+					desc: params.term,
+					icon: "none"
+				];
+				items.add(item)
+			}
+		}
+		render items as JSON;
+	}
 	
 	
 	def availableItems = {     		
@@ -413,14 +491,14 @@ class ShipmentController {
 		log.info params;    	
 		def shipment = Shipment.get(params.id);		
 		def container = Container.get(params.container.id);
-		def product = Product.get(params.selectedItem_id)
+		def product = Product.get(params.selectedItem.id)
 		def recipient = User.get(params.recipient.id);		
 		def quantity = (params.quantity) ? Integer.parseInt(params.quantity) : 1;
 		def shipmentItem = null;
 		
 		// Create a new unverified product
 		if (!product) { 
-			product = new Product(name: params.selectedItem, unverified: true).save(failOnError:true)
+			product = new Product(name: params.selectedItem.name, unverified: true).save(failOnError:true)
 		}		
 		// Add item to container if product doesn't already exist
 		if (container) { 
