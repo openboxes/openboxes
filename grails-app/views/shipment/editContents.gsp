@@ -155,16 +155,16 @@
 																								</td>
 																								<td width="10%" style="vertical-align: bottom; text-align: right">
 																									<span class="buttons" style="padding: 0px">
-																										<button type="submit" class="negative"><img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete"/></button>
+																										<%-- <button type="submit" class="negative"><img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete"/></button>--%>
 																									</span>
 																								</td>
 																							</tr>							
 																						</g:each>																																														
 																						<tr class="prop">
 																							<td colspan="6">
-																								<div class="fade" style="float: left; ">
+																								<div class="fade" style="float: left;">
 																									<li>After modifying any of the values above, click <b>Save</b>.</li>  
-																									<li>To remove an item, enter '0' in <b>Qty</b> field to remove item)</li>
+																									<li>To remove an item, enter '0' in <b>Qty</b> field.</li>
 																								</div>
 																								<div class="buttons" style="padding: 0px; float: right;">
 																									<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Save"/> Save</button>
