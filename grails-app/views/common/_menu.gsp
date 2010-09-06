@@ -1,6 +1,6 @@
 <script type="text/javascript">
 $(function() { 
-	$('.menu').accordion({
+	$('#leftnavMenu').accordion({
 		active: false, 
 		navigation: true, 
 		autoheight: true, 
@@ -10,7 +10,7 @@ $(function() {
 </script>
 
 
-<div class="menu">
+<div id="leftnavMenu" class="menu">
 	<h3 class="heading">
 		<img src="${createLinkTo(dir:'images/icons/',file:'truck.png')}"  alt="Shipping" style="vertical-align: middle"/> <g:message code="shipment.manage.label"  default="Shipping"/>
 	</h3>
