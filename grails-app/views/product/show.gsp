@@ -36,7 +36,7 @@
 	                            <td valign="top" class="value">
 	                            	${fieldValue(bean: productInstance, field: "upc")}
 	                            	<span class="menuButton" style="padding-left: 25px;">                            
-	                            		<a class="browse" target="_new" href="http://www.upcdatabase.com/item/${fieldValue(bean: productInstance, field: "ean")}"><b>Lookup this UPC</b></a>
+	                            		<a class="browse" target="_new" href="http://www.upcdatabase.com/item/${fieldValue(bean: productInstance, field: "upc")}"><b>Lookup this UPC</b></a>
 	                            	</span>
 	                            </td>                            
 	                        </tr>                    
