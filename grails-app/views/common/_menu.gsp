@@ -1,8 +1,20 @@
+<script type="text/javascript">
+$(function() { 
+	$('.menu').accordion({
+		active: false, 
+		navigation: true, 
+		autoheight: true, 
+		alwaysOpen: true
+	});
+});
+</script>
+
+
 <div class="menu">
+	<h3 class="heading">
+		<img src="${createLinkTo(dir:'images/icons/',file:'truck.png')}"  alt="Shipping" style="vertical-align: middle"/> <g:message code="shipment.manage.label"  default="Shipping"/>
+	</h3>
 	<div class="menuSection">
-		<span class="heading">
-			<img src="${createLinkTo(dir:'images/icons/',file:'truck.png')}"  alt="Shipping" style="vertical-align: middle"/> <g:message code="shipment.manage.label"  default="Shipping"/>
-		</span>
 		<ul>
 			<li><span class="menuButton"><g:link class="nobullet" controller="shipment" action="listOutgoing"><g:message code="shipment.list.outgoing.label"  default="browse shipping"/></g:link></span></li>										
 			<li>
@@ -12,15 +24,14 @@
 			</li>			
 		</ul>										
 	</div>
+	<h3 class="heading">
+		<img src="${createLinkTo(dir:'images/icons/',file:'handtruck.png')}" width="16" height="16" alt="Receiving" style="vertical-align: middle"/> <g:message code="shipment.manage.label"  default="Receiving"/>
+	</h3>
 	<div class="menuSection">
-		<span class="heading">
-			<img src="${createLinkTo(dir:'images/icons/',file:'handtruck.png')}" width="16" height="16" alt="Receiving" style="vertical-align: middle"/> <g:message code="shipment.manage.label"  default="Receiving"/>
-		</span>
 		<ul>
 			<li>
 				<span class="menuButton">
-					<g:link class="nobullet" controller="shipment" action="listIncoming"><g:message code="shipment.list.incoming.label"  default="browse receiving"/>
-					</g:link>
+					<g:link class="nobullet" controller="shipment" action="listIncoming"><g:message code="shipment.list.incoming.label"  default="browse receiving"/></g:link>
 				</span>		
 			</li>										
 			<li>
@@ -30,11 +41,11 @@
 			</li>						
 		</ul>										
 	</div>
+	<h3 class="heading">
+		<img src="${createLinkTo(dir:'images/icons/',file:'stockbook.png')}" alt="Inventory" style="vertical-align: middle"/>
+		<g:message code="inventory.manage.label"  default="Inventory"/>
+	</h3>
 	<div class="menuSection">									
-		<span class="heading">
-			<img src="${createLinkTo(dir:'images/icons/',file:'stockbook.png')}" alt="Inventory" style="vertical-align: middle"/>
-			<g:message code="inventory.manage.label"  default="Inventory"/>
-		</span>
 		<ul>
 			<!-- 
 			<li><span class="menuButton"><g:link class="nobullet" controller="inventory" action="browse"><g:message code="inventory.browse.label"  default="Browse Inventory"/></g:link></span></li>		
@@ -47,10 +58,10 @@
 		
 		</ul>	
 	</div>							
+	<h3 class="heading">
+		<img src="${createLinkTo(dir:'images/icons/',file:'product.png')}" alt="Products" style="vertical-align: middle"/> <g:message code="product.manage.label"  default="Products"/>
+	</h3>
 	<div class="menuSection">									
-		<span class="heading">
-			<img src="${createLinkTo(dir:'images/icons/',file:'product.png')}" alt="Products" style="vertical-align: middle"/> <g:message code="product.manage.label"  default="Products"/>
-		</span>
 		<ul>
 			<li><span class="menuButton"><g:link class="nobullet" controller="product" action="browse"><g:message code="product.browse.label"  default="browse products"/></g:link></span></li>		
 			<li><span class="menuButton"><g:link class="nobullet" controller="product" action="importProducts"><g:message code="product.import.label" default="import products" /></g:link></span></li>						
@@ -64,12 +75,12 @@
 		</ul>	
 	</div>							
 	
-	<div class="menuSection">									
-		<span class="heading">
-			<img src="${createLinkTo(dir:'images/icons/',file:'order.png')}" alt="Orders" style="vertical-align: middle"/>
-			<g:message code="order.manage.label"  default="Orders"/>
+	<h3 class="heading">
+		<img src="${createLinkTo(dir:'images/icons/',file:'order.png')}" alt="Orders" style="vertical-align: middle"/>
+		<g:message code="order.manage.label"  default="Orders"/>
 
-		</span>
+	</h3>
+	<div class="menuSection">									
 		<ul>
 			<!-- 
 			<li><span class="menuButton"><g:link class="nobullet" controller="order" action="search"><g:message code="order.search.label" default="Search Orders" /></g:link></span></li>						
@@ -84,66 +95,46 @@
 			-->
 		</ul>	
 	</div>
+	<h3 class="heading">
+		<img src="${createLinkTo(dir:'images/icons/',file:'reports.png')}" alt="Reports" style="vertical-align: middle"/>
+		<g:message code="settings.manage.label" args="['Reports']" default="Reports"/>
+	</h3>
 	<div class="menuSection">
-		<span class="heading">
-			<img src="${createLinkTo(dir:'images/icons/',file:'reports.png')}" alt="Reports" style="vertical-align: middle"/>
-			<g:message code="settings.manage.label" args="['Reports']" default="Reports"/>
-		</span>
 		<ul>
 			<!-- 
 			<li><span class="menuButton"><g:link class="nobullet" controller="admin" action="index"><g:message code="default.manage.label" args="['Settings']" default="Manage Settings" /></g:link></span></li>
 			-->
 		</ul>
 	</div>					
+	<h3 class="heading">
+		<img src="${createLinkTo(dir:'images/icons/',file:'settings.png')}" alt="Settings" style="vertical-align: middle"/>
+		<g:message code="settings.manage.label" args="['Settings']" default="Settings"/>
+	</h3>
 	<div class="menuSection">
-		<span class="heading">
-			<img src="${createLinkTo(dir:'images/icons/',file:'settings.png')}" alt="Settings" style="vertical-align: middle"/>
-			<g:message code="settings.manage.label" args="['Settings']" default="Settings"/>
-		</span>
 		<ul>
 			<!-- 
 			<li><span class="menuButton"><g:link class="nobullet" controller="admin" action="index"><g:message code="default.manage.label" args="['Settings']" default="Manage Settings" /></g:link></span></li>
 			-->
 		</ul>
-	</div>								
-	<div class="menuSection">
-		<span class="heading">
-			<img src="${createLinkTo(dir:'images/icons/',file:'users.png')}" alt="User" style="vertical-align: middle"/>
-			<g:message code="user.manage.label"  default="Users"/>
-		</span>
-		<ul>
+	</div>	
 
+	<h3 class="heading">
+		<img src="${createLinkTo(dir:'images/icons/',file:'wrench.png')}" alt="Metadata" style="vertical-align: middle"/>
+		<g:message code="metadata.manage.label"  default="Metadata"/>
+	</h3>
+	<div class="menuSection">
+		<ul>
+			<li><span class="menuButton"><g:link class="nobullet" controller="eventType" action="list"><g:message code="eventType.browse.label"  default="browse event types"/></g:link></span></li>		
+			<li>
+				<span class="menuButton">
+					<g:link class="nobullet" controller="warehouse" action="list"><g:message code="warehouse.list.label"  default="browse warehouses"/></g:link>
+				</span>		
+			</li>										
 			<li>
 				<span class="menuButton">
 					<g:link class="nobullet" controller="user" action="list"><g:message code="user.list.label"  default="browse users"/></g:link>
 				</span>		
 			</li>										
-		</ul>
-	</div>
-	<div class="menuSection">
-		<span class="heading">
-			<img src="${createLinkTo(dir:'images/icons/',file:'building.png')}" alt="Warehouse" style="vertical-align: middle"/>
-			<g:message code="warehouse.manage.label" default="Warehouses"/>
-		</span>
-		<ul>
-
-			<li>
-				<span class="menuButton">
-					<g:link class="nobullet" controller="warehouse" action="list"><g:message code="warehouse.list.label"  default="browse warehouses"/>
-					</g:link>
-				</span>		
-			</li>										
-		</ul>
-	</div>
-
-
-	<div class="menuSection">
-		<span class="heading">
-			<img src="${createLinkTo(dir:'images/icons/',file:'wrench.png')}" alt="Metadata" style="vertical-align: middle"/>
-			<g:message code="metadata.manage.label"  default="Metadata"/>
-		</span>
-		<ul>
-			<li><span class="menuButton"><g:link class="nobullet" controller="eventType" action="list"><g:message code="eventType.browse.label"  default="browse event types"/></g:link></span></li>		
 
 			<!-- 
 			<li><span class="menuButton"><g:link class="nobullet" controller="containerType" action="list"><g:message code="default.manage.label" args="['Metadata']"/></g:link></span></li>		

@@ -160,7 +160,7 @@
 		</div>
     </div>
     
-    <div id="doc3" class="yui-t2">	    
+    <div id="doc3" class="yui-t3">	    
 		<!-- 
 				Body includes the divs for the main body content and left navigation menu 
 			----------------------------------------------------------------------------------->
