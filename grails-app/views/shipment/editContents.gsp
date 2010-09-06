@@ -147,7 +147,7 @@
 																										<g:autoSuggest name="shipmentItems[${k}].recipient" jsonUrl="/warehouse/shipment/findPersonByName" 
 																											width="100" 
 																											valueId="${item?.recipient?.id}" 
-																											valueName="${item?.recipient.email}"/>												
+																											valueName="${item?.recipient?.email}"/>												
 																									</g:if>
 																									<g:else>
 																										<g:autoSuggest name="recipient" jsonUrl="/warehouse/shipment/findPersonByName" width="100" />	
