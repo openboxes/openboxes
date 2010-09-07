@@ -183,5 +183,17 @@
             <column name="comment" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>    
+    <changeSet author="jmiranda (generated)" id="1283827447136-1">
+        <insert tableName="event_type">
+            <column name="id" valueNumeric="7"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description" value="Shipment is in transit"/>
+            <column name="event_status" value="PENDING"/>
+            <column name="last_updated" valueDate="2010-09-02"/>
+            <column name="name" value="In Transit"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
         
 </databaseChangeLog>
