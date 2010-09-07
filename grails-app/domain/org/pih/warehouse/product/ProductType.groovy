@@ -22,6 +22,6 @@ class ProductType {
 		sort "sortOrder"
 	}
 
-	
+	String toString() { return "$name"; }
 		
 }

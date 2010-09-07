@@ -312,6 +312,18 @@ th.desc a {
     padding-left: 25px;
 }
 
+.menuButton a.eventType {
+    background: url(../images/icons/silk/calendar.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.import {
+    background: url(../images/icons/silk/table_add.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
 .menuButton a.menu {
     background: url(../images/icons/document.png) center left no-repeat;
     color: #333;

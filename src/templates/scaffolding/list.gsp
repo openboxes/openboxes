@@ -15,6 +15,12 @@
             	<div class="message">\${flash.message}</div>
             </g:if>
             <div class="list">
+            
+				<div>            	
+	            	<span class="menuButton">
+	            		<g:link class="create" action="create"><g:message code="default.create.label" args="['${domainClass.propertyName}']"/></g:link>
+	            	</span>
+            	</div>
                 <table>
                     <thead>
                         <tr>
@@ -36,7 +42,7 @@
                         <%  props.eachWithIndex { p, i ->
                                 cp = domainClass.constrainedProperties[p.name]
                                 if (i == 0) { %>
-                            <td><g:link action="show" id="\${${propertyName}.id}">\${fieldValue(bean: ${propertyName}, field: "${p.name}")}</g:link></td>
+                            <td><g:link action="edit" id="\${${propertyName}.id}">\${fieldValue(bean: ${propertyName}, field: "${p.name}")}</g:link></td>
                         <%      } else if (i < 6) {
                                     if (p.type == Boolean.class || p.type == boolean.class) { %>
                             <td><g:formatBoolean boolean="\${${propertyName}.${p.name}}" /></td>

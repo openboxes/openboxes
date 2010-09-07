@@ -30,5 +30,6 @@ class DrugClass {
 		sort "sortOrder"
 	}
 
-		
+	String toString() { return "$name"; }
+
 }

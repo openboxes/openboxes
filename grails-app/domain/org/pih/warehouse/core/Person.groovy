@@ -19,9 +19,6 @@ class Person implements Comparable {
 		table 'person' 
 	}
 
-
-	String toString() { return "Name: $firstName $lastName, Email: $email, Phone: $phoneNumber"; }
-
 	static constraints = { 
 		firstName(nullable:true)	
 		lastName(nullable:true)	
@@ -31,5 +28,6 @@ class Person implements Comparable {
 	
 	int compareTo(obj) { obj.id <=> id }
 	
-	
+	String toString() { return "$firstName $lastName"; }
+		
 }

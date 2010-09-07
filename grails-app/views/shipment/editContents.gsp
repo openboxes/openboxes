@@ -19,37 +19,6 @@
 				<g:renderErrors bean="${shipmentInstance}" as="list" />
 			</div>
 		</g:hasErrors>
-		<script type="text/javascript">
-			jQuery(function() {
-				$('.accordion .container').click(function() {
-					$(this).next().toggle();
-					// Save the ID 
-					var id = $(this).attr('id');	
-					var isClicked = $.cookie(id);
-					if (isClicked) $.removeCookie(id);
-					else $.setCookie(id, "clicked");
-					return false;			
-				}).next().hide();		
-			});
-		
-			jQuery(document).ready(function() {
-				//var openContainers = $.cookie("openContainers");
-				//alert("openContainers: " + openContainers);
-		
-				$('.accordion .container').each(function(index, value){  
-					var id = $(this).attr('id')
-					var isClicked = $.cookie(id);
-					if(isClicked) { 
-						$(this).next().show();
-					}
-				});	
-		
-				$('.toggle-button').click(function() {
-					$(this).next(".toggleable").slideToggle('fast');
-				});
-				
-			});
-		</script>
 		<table>
 			<tbody>
 				<tr>
@@ -95,12 +64,10 @@
 										<g:if test="${containerInstance}">			
 											<div id="container-${containerInstance?.id}" class="details">																									
 												<script type="text/javascript">
-												$(function() {
-													$("#tabs").tabs();
-												});
+													$(function() {
+														$("#tabs").tabs();
+													});
 												</script>
-																	
-																				
 												<div class="demo">								
 													<div id="tabs">
 														<ul>
@@ -121,16 +88,17 @@
 																						<th></th>
 																						<th>Qty</th>
 																						<th>Item</th>
-																						<th>Serial No</th>
+																						<th>Lot / Serial No</th>
 																						<th>Recipient</th>
 																						<th></th>
 																					</tr>																				
+																				
 																					<g:if test="${containerInstance?.shipmentItems}">
 																						<g:each var="item" in="${containerInstance.shipmentItems}" status="k">
 																							<tr class="prop ${(k % 2) == 0 ? 'odd' : 'even'}">
 																								<td width="7%" style="text-align: center;">${k+1}</td>
 																								<td width="10%">
-																									<g:hiddenField name="shipmentItems[${k}].id" value="${item.id}"></g:hiddenField>												    
+																									<g:hiddenField name="shipmentItems[${k}].id" value="${item.id}"></g:hiddenField>											    
 																									<g:textField name="shipmentItems[${k}].quantity" value="${item.quantity}" size="2" />
 																								</td>
 																								<td width="20%">
@@ -142,16 +110,12 @@
 																								<td width="15%">
 																									<g:textField name="shipmentItems[${k}].serialNumber" value="${item.serialNumber}" size="10" />																									
 																								</td>
-																								<td width="20%">
-																									<g:if test="${shipmentInstance?.recipient}">
-																										<g:autoSuggest name="shipmentItems[${k}].recipient" jsonUrl="/warehouse/shipment/findPersonByName" 
-																											width="100" 
-																											valueId="${item?.recipient?.id}" 
-																											valueName="${item?.recipient?.email}"/>												
-																									</g:if>
-																									<g:else>
-																										<g:autoSuggest name="recipient" jsonUrl="/warehouse/shipment/findPersonByName" width="100" />	
-																									</g:else>	
+																								<td width="20%">							
+																									${item?.recipient?.firstName} ${item?.recipient?.lastName} <span class="fade">${item?.recipient?.email}</span>
+																									<g:autoSuggest name="shipmentItems[${k}]\\.recipient" jsonUrl="/warehouse/shipment/findPersonByName" 
+																										width="150" 
+																										valueId="${item?.recipient?.id}" 
+																										valueName="${item?.recipient?.email}"/>												
 																								</td>
 																								<td width="10%" style="vertical-align: bottom; text-align: right">
 																									<span class="buttons" style="padding: 0px">
@@ -162,13 +126,13 @@
 																						</g:each>																																														
 																						<tr class="prop">
 																							<td colspan="6">
-																								<div class="fade" style="float: left;">
-																									<li>After modifying any of the values above, click <b>Save</b>.</li>  
-																									<li>To remove an item, enter '0' in <b>Qty</b> field.</li>
-																								</div>
-																								<div class="buttons" style="padding: 0px; float: right;">
+																								<div class="buttons" style="padding: 15px;">
 																									<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Save"/> Save</button>
 																									<%-- <g:link class="negative" controller="shipment" action="deleteContainer" id="${containerInstance.id}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"><img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="Delete"/> Delete</a></g:link> &nbsp;--%>
+																								</div>
+																								<div class="fade" style="padding: 15px;">
+																									<li>After modifying any of the values above, click <b>Save</b>.</li>  
+																									<li>To remove an item, enter '0' in <b>Qty</b> field.</li>
 																								</div>
 																							</td>
 																						</tr>
@@ -180,7 +144,8 @@
 																							</td>
 																						</tr>													
 																					</g:else>															
-																					
+																																							
+																				
 																				</tbody>
 																			</table>	
 																		</g:form>																		
@@ -191,28 +156,23 @@
 																			<table border="1">
 																				<tbody>
 																					<tr class="prop" style="background-color: #FFF6BF;">
-																						<td width="7%" style="vertical-align: bottom; text-align: center"> (new) </td>
-																						<td width="10%" style="vertical-align: bottom;">													
+																						<td width="7%" style="vertical-align: middle; text-align: center"> (new) </td>
+																						<td width="10%" style="vertical-align: middle; text-align: center;">													
 																							<g:textField name="quantity" value="" size="2" />
 																						</td>
-																						<td width="20%" style="vertical-align: bottom;">											
-																							<g:autoSuggest name="selectedItem" jsonUrl="/warehouse/shipment/findProducts" width="100"/>	
+																						<td width="20%" style="vertical-align: middle; text-align: center;">											
+																							<g:autoSuggest name="selectedItem" jsonUrl="/warehouse/shipment/findProductByName" width="200"/>	
 																						</td>
-																						<td width="15%" style="vertical-align: bottom;">													
+																						<td width="15%" style="vertical-align: middle; text-align: center;">													
 																							<g:textField name="serialNumber" value="" size="10" style="" />
 																						</td>
-																						<td width="20%" style="vertical-align: bottom;">
-																							<g:if test="${shipmentInstance?.recipient}">
-																								<g:autoSuggest name="recipient" jsonUrl="/warehouse/shipment/findPersonByName" 
-																									width="100" 
-																									valueId="${shipmentInstance?.recipient?.id}" 
-																									valueName="${shipmentInstance?.recipient?.email}"/>												
-																							</g:if>
-																							<g:else>
-																								<g:autoSuggest name="recipient" jsonUrl="/warehouse/shipment/findPersonByName" width="100" />	
-																							</g:else>	
+																						<td width="20%" style="vertical-align: middle; text-align: center;">
+																							<g:autoSuggest name="recipient" jsonUrl="/warehouse/shipment/findPersonByName" 
+																								width="150" 
+																								valueId="${shipmentInstance?.recipient?.id}" 
+																								valueName="${shipmentInstance?.recipient?.email}"/>												
 																						</td>
-																						<td width="10%" style="vertical-align: bottom; text-align: right">
+																						<td width="10%" style="vertical-align: middle; text-align: right">
 																							<span class="buttons" style="padding: 0px">
 																								<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add"/></button>
 																							</span>

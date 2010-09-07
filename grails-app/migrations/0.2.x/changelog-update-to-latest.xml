@@ -126,5 +126,62 @@
             <column name="photo" type="MEDIUMBLOB"/>
         </addColumn>
     </changeSet>
+    <changeSet author="jmiranda (generated)" id="1283826482822-1">
+        <createTable tableName="receipt">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="actual_delivery_date" type="DATETIME"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expected_delivery_date" type="DATETIME"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_id" type="BIGINT"/>
+            <column name="shipment_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1283826482822-2">
+        <createTable tableName="receipt_item">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="comment_id" type="BIGINT"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expiration_date" type="DATETIME"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lot_number" type="VARCHAR(255)"/>
+            <column name="product_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity_delivered" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity_received" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="receipt_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_id" type="BIGINT"/>
+            <column name="serial_number" type="VARCHAR(255)"/>
+            <column name="accepted" type="BIT"/>
+            <column name="comment" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>    
         
 </databaseChangeLog>

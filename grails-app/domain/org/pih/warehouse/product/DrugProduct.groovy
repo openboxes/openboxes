@@ -19,12 +19,13 @@ package org.pih.warehouse.product;
  */
 class DrugProduct extends Product {
 	
-	String name				// generic name: Ibuprofen 
 	String dosageStrength			// e.g. "200"	
-	String dosageUnit			// e.g. "MG"	
+	String dosageUnit				// e.g. "MG"	
 	DosageForm dosageForm			// e.g. "tablet" 
-	String packageSize			// e.g. 100 
+	
 	PackageType packageType			// e.g. bottle, vial
+	String packageSize				// e.g. 100 
+	
 	DrugClass drugClass 			// e.g. antiviral agents
 	DrugRouteType drugRouteType		// route of administration (oral, rectal, etc)
     	
@@ -35,7 +36,6 @@ class DrugProduct extends Product {
 	//static hasMany = [ conditionTypes : ConditionType ]
     
 	static constraints = {
-		name(nullable:true)
 		dosageStrength(nullable:true)
 		dosageUnit(nullable:true)
 		dosageForm(nullable:true)

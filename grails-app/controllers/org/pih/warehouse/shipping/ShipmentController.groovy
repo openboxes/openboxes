@@ -14,6 +14,8 @@ import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.inventory.Warehouse;
 import org.pih.warehouse.product.Product;
+import org.pih.warehouse.receiving.Receipt;
+import org.pih.warehouse.receiving.ReceiptItem;
 
 class ShipmentController {
 	
@@ -129,15 +131,18 @@ class ShipmentController {
 		else {
 			if ("POST".equalsIgnoreCase(request.getMethod())) { 				
 				shipmentInstance.properties = params
-				if (!shipmentInstance.hasErrors() && shipmentInstance.save(flush: true)) {
-										
-					Event event = new Event(
-						eventType:EventType.findByName("Departed"), 
+				if (!shipmentInstance.hasErrors() && shipmentInstance.save(flush: true)) {					
+					def event = new Event(
 						eventDate: new Date(),
+						eventType:EventType.findByName("Departed"), 
 						eventLocation: Location.get(session.warehouse.id)).save(flush:true);						
 
 					shipmentInstance.addToEvents(event).save(flush:true);
-					
+
+					def comment = new Comment(comment: params.comment, sender: session.user)
+					shipmentInstance.addToComments(comment).save(flush:true);
+
+										
 					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 					redirect(action: "listOutgoing")
 				}
@@ -147,13 +152,45 @@ class ShipmentController {
 	}
 	
 	def receiveShipment = {
-		def shipmentInstance = Shipment.get(params.id)
+		log.info "params: " + params
+		def receiptInstance = new Receipt(params);
+		def shipmentInstance = Shipment.get(params.id)		
 		if (!shipmentInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
-			redirect(action: (params.type == "incoming") ? "listIncoming" : "listOutgoing")
+			redirect(action: "listIncoming")
 		}
-		else {
-			[shipmentInstance: shipmentInstance]
+		else {			
+			if ("POST".equalsIgnoreCase(request.getMethod())) {				
+				
+				//receiptInstance.shipment = shipmentInstance;
+				if (!receiptInstance.hasErrors() && receiptInstance.save(flush: true)) {
+					def event = new Event(
+						eventDate: new Date(),
+						eventType:EventType.findByName("Received"),
+						eventLocation: Location.get(session.warehouse.id)).save(flush:true);
+					shipmentInstance.addToEvents(event).save(flush:true);
+					
+					def comment = new Comment(comment: params.comment, sender: session.user)
+					shipmentInstance.addToComments(comment).save(flush:true);
+					
+					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
+					redirect(action: "listIncoming")
+				}				
+			}
+			else { 
+				// Instantiate the model class to be used 
+				receiptInstance = new Receipt(shipment:shipmentInstance, recipient:shipmentInstance?.recipient);
+				
+				shipmentInstance.allShipmentItems.each {										
+					ReceiptItem receiptItem = new ReceiptItem(it.properties);
+					receiptItem.setQuantityDelivered (it.quantity);
+					receiptItem.setQuantityReceived (it.quantity);				
+					receiptItem.setLotNumber(it.lotNumber);
+					receiptItem.setSerialNumber (it.serialNumber);
+					receiptInstance.addToReceiptItems(receiptItem);
+				} 
+			}
+			[shipmentInstance:shipmentInstance, receiptInstance:receiptInstance]
 		}
 	}
 	
@@ -179,7 +216,7 @@ class ShipmentController {
 			//shipmentInstance.getAllShipmentItems().each { 
 			//	def row = it.name
 			//}
-			String query = """\
+			String query = """
 				select  
 					container.name,  
 					container.height, 
@@ -194,7 +231,8 @@ class ShipmentController {
 				from shipment, container, shipment_item, product
 				where shipment.id = container.shipment_id
 				and shipment_item.container_id = container.id
-				and shipment_item.product_id = product.id """
+				and shipment_item.product_id = product.id 
+				and shipment.id = ${params.id}"""
 			
 			StringWriter sw = new StringWriter();
 			CSVWriter writer = new CSVWriter(sw);
@@ -212,7 +250,7 @@ class ShipmentController {
 				
 				def rowArray = new String[6];
 				rowArray.putAt(0, row[0]);
-				rowArray.putAt(1, row[1] + "x" + row[2] + "x" + row[3] + " " + row[4]);
+				rowArray.putAt(1, (row[1])?row[1]:"0" + "x" + (row[2])?row[2]:"0" + "x" + (row[3])?row[3]:"0" + " " + (row[4])?row[4]:"");
 				rowArray.putAt(2, row[5] + " " + row[6] );
 				rowArray.putAt(3, row[7]);
 				rowArray.putAt(4, row[8]);
@@ -222,7 +260,7 @@ class ShipmentController {
 			
 			//writer.writeAll(resultSet, false);
 			log.info "results: " + sw.toString();
-			response.setHeader("Content-disposition", "attachment; filename=shipments.csv");
+			response.setHeader("Content-disposition", "attachment; filename=PackingList.csv");
 			render(contentType: "text/csv", text: sw.toString());			
 			sql.close();
 			//resultSet.close();
@@ -414,7 +452,7 @@ class ShipmentController {
 					def item =  [
 						value: 0,
 						valueText : params.term,
-						label: "Add new item for '" + params.term + "'?",
+						label: "Add new person '" + params.term + "'?",
 						desc: params.term,
 						icon: "none"
 					];
@@ -430,7 +468,9 @@ class ShipmentController {
 		render items as JSON;
 	}
 	
-	def findProducts = {
+	
+	
+	def findProductByName = {
 		log.info params
 		def items = new TreeSet();
 		if (params.term) {
@@ -453,7 +493,7 @@ class ShipmentController {
 				def item =  [
 					value: 0,
 					valueText : params.term,
-					label: "Add a new item for '" + params.term + "'?",
+					label: "Add a new product '" + params.term + "'?",
 					desc: params.term,
 					icon: "none"
 				];
@@ -463,7 +503,43 @@ class ShipmentController {
 		render items as JSON;
 	}
 	
+
+	def findWarehouseByName = {
+		log.info params
+		def items = new TreeSet();
+		if (params.term) {
+			items = Warehouse.withCriteria {
+				or {
+					ilike("name", "%" +  params.term + "%")
+				}
+			}
+			if (items) {
+				items = items.collect() {
+					[	value: it.id,
+						valueText: it.name,
+						label: "<img src=\"/warehouse/warehouse/viewLogo/" + it.id + "\" width=\"24\" height=\"24\" style=\"vertical-align: bottom;\"\"/>&nbsp;" + it.name,
+						desc: it.name,
+						icon: "<img src=\"/warehouse/warehouse/viewLogo/" + it.id + "\" width=\"24\" height=\"24\" style=\"vertical-align: bottom;\"\"/>"]
+				}
+			}
+			/*
+			else {
+				def item =  [
+					value: 0,
+					valueText : params.term,
+					label: "Add a new warehouse for '" + params.term + "'?",
+					desc: params.term,
+					icon: "none"
+				];
+				items.add(item)
+			}*/
+		}
+		render items as JSON;
+	}
+
 	
+	
+		
 	def availableItems = {     		
 		log.debug params;
 		def items = null;
@@ -492,14 +568,28 @@ class ShipmentController {
 		def shipment = Shipment.get(params.id);		
 		def container = Container.get(params.container.id);
 		def product = Product.get(params.selectedItem.id)
-		def recipient = User.get(params.recipient.id);		
+		def recipient = Person.get(params.recipient.id);		
 		def quantity = (params.quantity) ? Integer.parseInt(params.quantity) : 1;
 		def shipmentItem = null;
 		
 		// Create a new unverified product
 		if (!product) { 
-			product = new Product(name: params.selectedItem.name, unverified: true).save(failOnError:true)
+			product = new Product(name: params.selectedItem.name, unverified: true).save(failOnError:true);
 		}		
+		if (!recipient) { 
+			def name = params.recipient.name;
+			if (name) { 
+				def nameArray = name.split(" ");
+				if (nameArray.length == 3) { 
+					recipient = new Person(firstName : nameArray[0], lastName : nameArray[1], email : nameArray[2]).save(failOnError:true);
+				} else if (nameArray.length == 2) { 
+					recipient = new Person(firstName : nameArray[0], lastName : nameArray[1]).save(failOnError:true);
+				} else { 
+					recipient = new Person(firstName : nameArray[0]).save(failOnError:true);				
+				}
+			}
+		}
+		
 		// Add item to container if product doesn't already exist
 		if (container) { 
 			boolean found = false;

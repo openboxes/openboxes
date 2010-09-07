@@ -52,7 +52,7 @@ class Shipment {
 	                  comments : Comment,
 	                  referenceNumbers : ReferenceNumber ]
 
-	// 
+	
 	// Ran into Hibernate bug HHH-4394 and GRAILS-4089 when trying to order the associations.  This is due to the 
 	// fact that the many side of the association (e.g. 'events') does not have a belongsTo 'shipment'.  So instead
 	// of adding a foreign key reference to the 'event' table, GORM creates a new join table 'shipment_event' to 
@@ -144,10 +144,10 @@ class Shipment {
 	String getMostRecentStatus() { 
 		if(mostRecentEvent) { 
 			if (mostRecentEvent.getEventType()) { 
-				return mostRecentEvent.getEventType().getStatus();
+				return mostRecentEvent.getEventType().getName();
 			}			
 		}
-		return "Pending";
+		return "Unknown";
 	}
 	
 		

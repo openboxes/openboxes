@@ -9,6 +9,11 @@ $(function() {
 });
 </script>
 
+<style>
+
+	.menuButton { font-variant: small-caps; } 
+</style>
+
 
 <div id="leftnavMenu" class="menu">
 	<h3 class="heading">
@@ -16,10 +21,14 @@ $(function() {
 	</h3>
 	<div class="menuSection">
 		<ul>
-			<li><span class="menuButton"><g:link class="nobullet" controller="shipment" action="listOutgoing"><g:message code="shipment.list.outgoing.label"  default="browse shipping"/></g:link></span></li>										
 			<li>
 				<span class="menuButton">
-					<g:link class="nobullet" controller="shipment" action="create" params="['type':'outgoing']"><g:message code="shipment.create.outgoing.label" default="add new shipping" /></g:link>
+					<g:link class="list" controller="shipment" action="listOutgoing"><g:message code="shipment.list.outgoing.label"  default="browse shipping"/></g:link>
+				</span>
+			</li>										
+			<li>
+				<span class="menuButton">
+					<g:link class="create" controller="shipment" action="create" params="['type':'outgoing']"><g:message code="shipment.create.outgoing.label" default="add new shipping" /></g:link>
 				</span>
 			</li>			
 		</ul>										
@@ -31,12 +40,12 @@ $(function() {
 		<ul>
 			<li>
 				<span class="menuButton">
-					<g:link class="nobullet" controller="shipment" action="listIncoming"><g:message code="shipment.list.incoming.label"  default="browse receiving"/></g:link>
+					<g:link class="list" controller="shipment" action="listIncoming"><g:message code="shipment.list.incoming.label"  default="browse receiving"/></g:link>
 				</span>		
 			</li>										
 			<li>
 				<span class="menuButton">
-					<g:link class="nobullet" controller="shipment" action="create" params="['type':'incoming']"><g:message code="shipment.create.incoming.label" default="add new receiving" /></g:link>
+					<g:link class="create" controller="shipment" action="create" params="['type':'incoming']"><g:message code="shipment.create.incoming.label" default="add new receiving" /></g:link>
 				</span>
 			</li>						
 		</ul>										
@@ -63,9 +72,21 @@ $(function() {
 	</h3>
 	<div class="menuSection">									
 		<ul>
-			<li><span class="menuButton"><g:link class="nobullet" controller="product" action="browse"><g:message code="product.browse.label"  default="browse products"/></g:link></span></li>		
-			<li><span class="menuButton"><g:link class="nobullet" controller="product" action="importProducts"><g:message code="product.import.label" default="import products" /></g:link></span></li>						
-			<li><span class="menuButton"><g:link class="nobullet" controller="product" action="create"><g:message code="product.create.label" default="add new product" /></g:link></span></li>
+			<li>
+				<span class="menuButton">
+					<g:link class="list" controller="product" action="browse"><g:message code="product.browse.label"  default="browse products"/></g:link>
+				</span>
+			</li>		
+			<li>
+				<span class="menuButton">
+					<g:link class="import" controller="product" action="importProducts"><g:message code="product.import.label" default="import products" /></g:link>
+				</span>
+			</li>						
+			<li>
+				<span class="menuButton">
+					<g:link class="create" controller="product" action="create"><g:message code="product.create.label" default="add new product" /></g:link>
+				</span>
+			</li>
 			<%-- 
 			<li><span class="menuButton"><g:link class="list" controller="product" action="list"><g:message code="default.list.label"  args="['Product']"/></g:link></span></li>		
 			<li><span class="menuButton"><g:link class="create" controller="drugProduct" action="create"><g:message code="default.create.label" args="['Drug Product']" default="Create a new Drug Product" /></g:link></span></li>						
@@ -124,19 +145,33 @@ $(function() {
 	</h3>
 	<div class="menuSection">
 		<ul>
-			<li><span class="menuButton"><g:link class="nobullet" controller="eventType" action="list"><g:message code="eventType.browse.label"  default="browse event types"/></g:link></span></li>		
 			<li>
 				<span class="menuButton">
-					<g:link class="nobullet" controller="warehouse" action="list"><g:message code="warehouse.list.label"  default="browse warehouses"/></g:link>
+					<g:link class="eventType" controller="eventType" action="list"><g:message code="eventType.browse.label"  default="browse event types"/></g:link>
+				</span>
+			</li>		
+			<li>
+				<span class="menuButton">
+					<g:link class="user" controller="user" action="list"><g:message code="user.list.label"  default="browse users"/></g:link>
 				</span>		
 			</li>										
 			<li>
 				<span class="menuButton">
-					<g:link class="nobullet" controller="user" action="list"><g:message code="user.list.label"  default="browse users"/></g:link>
+					<g:link class="warehouse" controller="warehouse" action="list"><g:message code="warehouse.list.label"  default="browse warehouses"/></g:link>
 				</span>		
-			</li>										
-
-			<!-- 
+			</li>			
+											
+			<li>
+				<span class="menuButton">
+					<g:link class="metadata" controller="drugRouteType" action="list"><g:message code="default.manage.label" args="['Admin Routes']"/></g:link>
+				</span>
+			</li>
+			<li>
+				<span class="menuButton">
+					<g:link class="metadata" controller="drugClass" action="list"><g:message code="default.manage.label" args="['Drug Classes']"/></g:link>
+				</span>
+			</li>
+ 			<!-- 
 			<li><span class="menuButton"><g:link class="nobullet" controller="containerType" action="list"><g:message code="default.manage.label" args="['Metadata']"/></g:link></span></li>		
 			-->
 			<!-- 
@@ -145,10 +180,9 @@ $(function() {
 			<li><span class="menuButton"><g:link class="nobullet" controller="productType" action="list"><g:message code="default.manage.label" args="['Product Types']"/></g:link></span></li>		
 			<li><span class="menuButton"><g:link class="nobullet" controller="category" action="list"><g:message code="default.manage.label" args="['Categories']"/></g:link></span></li>		
 			<li><span class="menuButton"><g:link class="nobullet" controller="conditionType" action="list"><g:message code="default.manage.label" args="['Medical Conditions']"/></g:link></span></li>		
-			<li><span class="menuButton"><g:link class="nobullet" controller="drugRouteType" action="list"><g:message code="default.manage.label" args="['Admin Routes']"/></g:link></span></li>		
+					
 			<li><span class="menuButton"><g:link class="nobullet" controller="packageType" action="list"><g:message code="default.manage.label" args="['Drug Package']"/></g:link></span></li>		
-			<li><span class="menuButton"><g:link class="nobullet" controller="drugClass" action="list"><g:message code="default.manage.label" args="['Drug Classes']"/></g:link></span></li>
- 			-->
+			-->
 		</ul>
 	</div>
 </div>

@@ -24,5 +24,7 @@ class PackageType  {
 		sort "sortOrder"
 	}
 
+	String toString() { return "$name"; }
+	
 	
 }

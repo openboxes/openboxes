@@ -23,5 +23,7 @@ class DosageForm {
 		sort "sortOrder"
 	}
 
+	String toString() { return "$name"; }
+	
 		
 }

@@ -22,5 +22,8 @@ class DrugRouteType {
 	static mapping = {
 		sort "sortOrder"
 	}
+	
+	String toString() { return "$name"; }
+	
 
 }
