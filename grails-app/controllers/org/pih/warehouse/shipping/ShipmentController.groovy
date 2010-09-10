@@ -636,18 +636,24 @@ class ShipmentController {
 		def container = Container.get(params.container.id);
 		def product = Product.get(params.selectedItem.id)
 		def recipient = Person.get(params.recipient.id);		
-		def quantity = (params.quantity) ? Integer.parseInt(params.quantity) : 1;
+		def quantity = (params.quantity) ? Integer.parseInt(params.quantity.trim()) : 1;
 		def shipmentItem = null;
 		
 		// Create a new unverified product
-		if (!product) { 
-			product = new Product(name: params.selectedItem.name, unverified: true).save(failOnError:true);
-		}		
-		if (!recipient) { 
-			def name = params.recipient.name;
+		if (!product) { 			
+			product = new Product(name: params.selectedItem.name, unverified: true);			
+			if (!product.hasErrors() && product.save(flush: true)) {
+				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'container.label', default: 'Product'), product.id])}"
+				//redirect(action: "editContents", id: shipment.id, params: ["container.id": container?.id])
+			}
+			else {
+				// Encountered an error with saving the product
+				redirect(action: "editContents", id: shipment.id, params: ["container.id": container?.id])
+				return;
+				
+			}			
+		}	
 			
-		}
-		
 		// Add item to container if product doesn't already exist
 		if (container) { 
 			boolean found = false;

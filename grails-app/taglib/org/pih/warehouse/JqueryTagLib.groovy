@@ -49,7 +49,7 @@ class JqueryTagLib {
 								});
 					      	},
 					        focus: function(event, ui) {			        
-					      		\$('#${id}-suggest').val(ui.item.valueText);					
+					      		//\$('#${id}-suggest').val(ui.item.valueText);					
 					      		return false;
 					        },	
 							select: function(event, ui) {	
