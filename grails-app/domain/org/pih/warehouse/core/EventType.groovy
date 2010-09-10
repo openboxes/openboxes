@@ -16,6 +16,7 @@ class EventType {
 	String name
 	String description
 	Integer sortOrder = 0;
+	ActivityType activityType;
 	Date dateCreated;
 	Date lastUpdated;
 
@@ -27,6 +28,7 @@ class EventType {
 		description(nullable:true)
 		sortOrder(nullable:true)
 		eventStatus(nullable:true)		
+		activityType(nullable:true)
 	}
 	
 	static mapping = {

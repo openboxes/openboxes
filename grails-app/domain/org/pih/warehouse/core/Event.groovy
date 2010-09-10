@@ -15,9 +15,9 @@ import org.pih.warehouse.core.Location;
 */
 class Event implements Comparable {
 	
-	Date eventDate				// The date and time on which the Event occurred
+	Date eventDate				// The date and time on which the Event occurred	
 	EventType eventType			// The type of the Event
-	Location eventLocation			// The Location at which the Event occurred
+	Location eventLocation		// The Location at which the Event occurred
 	Date dateCreated;
 	Date lastUpdated;
 	

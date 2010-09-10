@@ -147,7 +147,7 @@ class Shipment {
 				return mostRecentEvent.getEventType().getName();
 			}			
 		}
-		return "Unknown";
+		return "Not Shipped";
 	}
 	
 		

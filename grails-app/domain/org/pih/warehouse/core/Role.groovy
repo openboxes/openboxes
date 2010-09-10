@@ -12,7 +12,7 @@ class Role {
 		description(nullable:true)
 	}
 
-	
+	String toString() { return "${roleType.name}"; } 
 	
 }
 

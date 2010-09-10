@@ -195,5 +195,37 @@
             <column name="sort_order" valueNumeric="0"/>
         </insert>
     </changeSet>
+    
+    <changeSet author="jmiranda (generated)" id="1284059441612-1">
+        <addColumn tableName="event_type">
+            <column name="activity_type" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284059441612-2">
+		<sql>
+			UPDATE event_type SET activity_type = 'SHIPPING' where id = 1;		
+			UPDATE event_type SET activity_type = 'SHIPPING' where id = 2;		
+			UPDATE event_type SET activity_type = 'SHIPPING' where id = 3;		
+			UPDATE event_type SET activity_type = 'SHIPPING' where id = 4;		
+			UPDATE event_type SET activity_type = 'RECEIVING' where id = 5;		
+			UPDATE event_type SET activity_type = 'RECEIVING' where id = 6;
+			UPDATE event_type SET activity_type = 'RECEIVING' where id = 7;							
+		</sql>		
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284059441612-3">
+        <addColumn tableName="location">
+            <column name="managed_locally" type="BIT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284059441612-4">
+    	<comment>Allow all locations to be managed by this deployment.</comment>
+		<sql>
+			UPDATE location SET managed_locally = 1;		
+		</sql>		
+    </changeSet>
+    
+    
+
+    
         
 </databaseChangeLog>

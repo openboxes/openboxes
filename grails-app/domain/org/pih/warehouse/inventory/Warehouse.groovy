@@ -7,17 +7,17 @@ import org.pih.warehouse.core.User;
 
 class Warehouse extends Location {
 
-    User manager						// the person in charge of the warehouse
-    Inventory inventory					// each warehouse has a single inventory
-    List<Transaction> transactions   	// might be better at inventory level
+    User manager								// the person in charge of the warehouse
+    Inventory inventory							// each warehouse has a single inventory
+    List<Transaction> transactions   			// might be better at inventory level
+	Boolean managedLocally = Boolean.TRUE		// indicates whether this warehouse is being managed on the locally deployed system
+	Date dateCreated;
+	Date lastUpdated;
 
     // Association mapping
     static hasMany = [transactions:Transaction, users:User];
     static mappedBy = [transactions:"thisWarehouse"]
 
-	// Audit fields
-	Date dateCreated;
-	Date lastUpdated;
 	
     String toString() { return "$name"; }
 

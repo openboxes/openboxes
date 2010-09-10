@@ -26,5 +26,7 @@ class Shipper {
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)
    	}
+	
+	String toString() { return "${name}"; }
 
 }
