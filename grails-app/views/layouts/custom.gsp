@@ -18,7 +18,7 @@
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'menu.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'form.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footer.css')}" type="text/css" media="screen, projection" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'custom.css')}" type="text/css" media="screen, projection" />
+	
 	
 	<%--
 	<!-- Include Blueprint CSS --> 
@@ -73,6 +73,9 @@
 	<!-- Dynamically include Grails UI components 
 	<gui:resources components="richEditor, dialog, tabView, autoComplete"/>
 	-->
+	
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'custom.css')}" type="text/css" media="screen, projection" />
+	
 	<!-- Custom styles to be applied to all pages -->
 	<style type="text/css" media="screen"></style>
 </head>

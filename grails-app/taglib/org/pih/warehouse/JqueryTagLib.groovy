@@ -6,6 +6,7 @@ import org.pih.warehouse.core.Person;
 class JqueryTagLib {
 		
 	def autoSuggest = { attrs, body ->
+		def id = attrs.id
 		def name = attrs.name	
 		def valueId = (attrs.valueId)?attrs.valueId:"";
 		def valueName = (attrs.valueName)?attrs.valueName:"";
@@ -15,13 +16,13 @@ class JqueryTagLib {
 		
 		def html = """
 			<div>
-				<input id="${name}-id" type="hidden" name="${name}.id" value="${valueId}"/>
-				<input id="${name}-suggest" type="text" name="${name}.name" value="${valueName}" style="width: ${width}px;"> 		
+				<input id="${id}-id" type="hidden" name="${name}.id" value="${valueId}"/>
+				<input id="${id}-suggest" type="text" name="${name}.name" value="${valueName}" style="width: ${width}px;"> 		
 			</div>		
 			<script>
 				\$(document).ready(function() {
-			      	\$("#${name}-suggest").autocomplete({
-			            width: ${width*2},
+			      	\$("#${id}-suggest").autocomplete({
+			            width: ${width},
 			            minLength: ${minLength},
 			            dataType: 'json',
 			            highlight: true,
@@ -40,14 +41,14 @@ class JqueryTagLib {
 							});
 				      	},
 				        focus: function(event, ui) {			        
-				      		\$('#${name}-suggest').val(ui.item.valueText);					
+				      		\$('#${id}-suggest').val(ui.item.valueText);					
 				      		return false;
 				        },	
 						select: function(event, ui) {	
+							//alert("selected: " + ui.item.value + " " + ui.item.valueText)
 							search_option = ui.item;		
-							\$('#${name}-suggest').val(ui.item.valueText);
-							\$('#${name}-id').val(ui.item.value);
-							//\$('#${name}-name').html(ui.item.valueText);					
+							\$('#${id}-id').val(ui.item.value);
+							\$('#${id}-suggest').val(ui.item.valueText);
 							return false;
 						}
 					});

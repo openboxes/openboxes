@@ -35,8 +35,21 @@
 								<g:each var="warehouse" in="${warehouses}" status="i">								
 									<tr>
 										<td nowrap="nowrap">
-											<div style="padding: 5px; background-color: #F8F7EF; display: block;">												
-												<a style="display: block;" class="home" href='${createLink(action:"chooseWarehouse", id: warehouse.id)}'>
+											<div style="padding: 10px; background-color: #F8F7EF; display: block;">												
+												<g:if test="${warehouse.managedLocally}">
+													<a style="display: block;" class="home" href='${createLink(action:"chooseWarehouse", id: warehouse.id)}'>
+														<g:if test="${warehouse.logo}">	
+															<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'warehouse', action:'viewLogo', id: warehouse.id)}" />															
+															<%--<img src="${warehouse.logo}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img>--%>
+														</g:if>
+														<g:else>
+															<img src="${createLinkTo(dir:'images',file:'icons/building.png')}" style="vertical-align: middle"/>
+														</g:else>
+														&nbsp;
+														${warehouse.name} 
+													</a> 
+												</g:if>
+												<g:else>
 													<g:if test="${warehouse.logo}">	
 														<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'warehouse', action:'viewLogo', id: warehouse.id)}" />															
 														<%--<img src="${warehouse.logo}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img>--%>
@@ -45,8 +58,8 @@
 														<img src="${createLinkTo(dir:'images',file:'icons/building.png')}" style="vertical-align: middle"/>
 													</g:else>
 													&nbsp;
-													${warehouse.name} 
-												</a> 
+													${warehouse.name} <span class="fade">managed remotely</span>
+												</g:else>
 											</div>												
 										</td>											
 									</tr>																		

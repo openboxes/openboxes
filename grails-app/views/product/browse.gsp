@@ -8,91 +8,162 @@
         <title><g:message code="default.browse.label" args="[entityName]" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><g:message code="default.browse.label" args="[entityName]" /></content>
-		<content tag="menuTitle">${entityName}</content>		
-		<content tag="globalLinksMode">append</content>
-		<content tag="localLinksMode">override</content>
-		<content tag="globalLinks"><g:render template="global" model="[entityName:entityName]"/></content>
-		<content tag="localLinks"><g:render template="local" model="[entityName:entityName]"/></content>
+    
+    	<style>
+    		.selected { font-weight: bold; } 
+    	
+    	</style>
     </head>    
+
+
     <body>
+    
+    
+<script type="text/javascript">
+	$(function() { 
+		$('#productSearch').accordion({active: true, navigation: true, autoheight: false, alwaysOpen: true, clearStyle: true });
+	});
+</script>
+    
         <div class="body" style="width: 95%">
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>						
 			<table>
 				<tr>
-					<td>					
-						<g:form method="get" action="browse">
-			            	<fieldset>
-			            		<legend>Filter by</legend>				            
+					<td>			
+						<script type="text/javascript">
+							$(function() { $("#productSearchTabs").tabs(); });
+						</script>
+						<div id="productSearchTabs">
+							<ul>
+								<li><a href="#tabs-1">Product Type</a></li>
+								<li><a href="#tabs-2">Categories</a></li>
+								<li><a href="#tabs-3">Search</a></li>
+							</ul>
+							<div id="tabs-1">
+							
+								<h3>Filter by Product Type</h3><br/>
 								<table>
-									<tr class="prop">
-										<td class="name">
-											<label>Name contains</label>
-										</td>
-										<td>
-											<g:textField name="nameContains" value="${params.nameContains}" size="30"/>		
-										</td>
-										<td colspan="2" valign="top">
-											<g:checkBox name="unverified" value="${params.unverified}" /> Show  only invalid products <br/>											 
-										</td>										
-										
+									<tr>
+										<g:each in="${productTypes}" status="i" var="productType">
+											<td>
+												<span class="${(productType?.name==selectedProductType?.name)?'selected':''}">
+													<a href="${createLink(action:'browse',params:["productTypeId":productType.id])}">${productType.name}</a>
+												</span>
+											</td>
+											<g:if test="${(i+1)%6==0}"></tr><tr></g:if>
+										</g:each>
 									</tr>
-									<tr class="prop">
-										<td class="name">
-											<label>Has product type</label>
-										</td>
-										<td>
-											<g:select multiple="true" size="5" 
-												name="productTypeId" 
-												from="${productTypes}" 
-												value="${selectedProductType}"
-												optionKey="id" 
-												optionValue="name">
-											</g:select>										
-										</td>
-										<td class="name">
-											<label>Has category</label>
-										</td>
-										<td>
-											<g:selectCategory name="categoryId" rootNode="${rootCategory}" />
-										</td>
+								</table>							
+							</div>
+							<div id="tabs-2">							
+								<h3>Filter by Category</h3><br/>
+								<table>
+									<tr>
+										<g:each in="${categories}" status="i" var="category">
+											<td>
+												<span class="${(category?.name==selectedCategory?.name)?'selected':''}" style="text-variant: small-caps;">
+													<a href="${createLink(action:'browse',params:["categoryId":category.id])}">${category.name}</a>
+												</span>
+												<div style="padding: 10px;">
+												<ul>
+													<g:each in="${category.categories}" status="j" var="childCategory">
+														<li>
+															<span class="${(childCategory?.name==selectedCategory?.name)?'selected':''}">
+																<a href="${createLink(action:'browse',params:["categoryId":childCategory.id])}">${childCategory.name}</a>
+															</span>
+														</li>
+													</g:each>
+												</ul>
+												</div>
+											</td>
+											<g:if test="${(i+1)%6==0}"></tr><tr></g:if>
+											
+										</g:each>
 									</tr>
-<!--  
+								</table>														
+							</div>
+							<div id="tabs-3">
+								<h3>Filter by Name</h3><br/>
+								<g:form method="get" action="browse">
+									<table>
+										<tr class="prop">
+											<td class="name">
+												<label>Name contains</label>
+											</td>
+											<td>
+												<g:textField name="nameContains" value="${params.nameContains}" size="30"/>		
+											</td>
+											<td colspan="2" valign="top">
+												<g:checkBox name="unverified" value="${params.unverified}" /> Show  only invalid products <br/>											 
+											</td>										
+											<td>
+												<span class="buttons">
+													<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Filter" /> 
+														${message(code: 'default.button.filter.label', default: 'Filter')}</button>
+												</span>											
+											</td>
+											
+										</tr>
+<%-- 	
 									<tr class="prop">
-										<td class="name">
-											<label>Has attribute(s)</label>
-										</td>
-										<td>
-											<g:select multiple="true" 
-												name="attributeId" 
-												from="${org.pih.warehouse.product.Attribute.list()}" 
-												value="${selectedAttribute}"
-												optionKey="id" 
-												optionValue="name">
-											</g:select>
-										</td>
-									</tr>
--->									
-									<tr class="prop">
-										<td class="name">
-											<label>Match</label>
-										</td>
-										<td>
-											<g:radio name="match" value="matchAll" checked="true" disabled="true" /> Match all  &nbsp;&nbsp;&nbsp;<br/>
-											<g:radio name="match" value="matchAll" disabled="true"/> Match any <i>(not supported)</i>											 
-										</td>
-										<td>
-											<span class="buttons">
-												<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Filter" /> 
-													${message(code: 'default.button.filter.label', default: 'Filter')}</button>
-											</span>											
-										</td>
-										
-									</tr>
-								</table>				
-							</fieldset>
-						</g:form>
+											<td class="name">
+												<label>Has product type</label>
+											</td>
+											<td>
+												<g:select multiple="true" size="5" 
+													name="productTypeId" 
+													from="${productTypes}" 
+													value="${selectedProductType}"
+													optionKey="id" 
+													optionValue="name">
+												</g:select>										
+											</td>
+											<td class="name">
+												<label>Has category</label>
+											</td>
+											<td>
+												<g:selectCategory name="categoryId" rootNode="${rootCategory}" />
+											</td>
+										</tr>
+										<tr class="prop">
+											<td class="name">
+												<label>Has attribute(s)</label>
+											</td>
+											<td>
+												<g:select multiple="true" 
+													name="attributeId" 
+													from="${org.pih.warehouse.product.Attribute.list()}" 
+													value="${selectedAttribute}"
+													optionKey="id" 
+													optionValue="name">
+												</g:select>
+											</td>
+										</tr>
+										<tr class="prop">
+											<td class="name">
+												<label>Match</label>
+											</td>
+											<td>
+												<g:radio name="match" value="matchAll" checked="true" disabled="true" /> Match all  &nbsp;&nbsp;&nbsp;<br/>
+												<g:radio name="match" value="matchAll" disabled="true"/> Match any <i>(not supported)</i>											 
+											</td>
+											<td>
+												<span class="buttons">
+													<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Filter" /> 
+														${message(code: 'default.button.filter.label', default: 'Filter')}</button>
+												</span>											
+											</td>
+											
+										</tr>
+--%>
+									</table>	
+								</g:form>			
+							</div>
+							
+							
+						</div>
 					</td>					
 				</tr>
 				
@@ -102,7 +173,7 @@
 							<fieldset>
 			            		<legend>Search results</legend>						
 								<div>
-									Returned ${productInstanceList.size} products				            		         				            	
+									Your search returned ${productInstanceList.size} products.  
 					            </div>					            
 					            <g:if test="${productInstanceList.size > 0}">
 					                <table width="100%">
@@ -166,9 +237,6 @@
 					                    </tbody>
 					                </table>       
 					        	</g:if>         
-					        	
-					        	
-					        	
 							</fieldset>
 			            </div>
 					</td>

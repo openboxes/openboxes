@@ -1,10 +1,11 @@
 <script type="text/javascript">
 $(function() { 
 	$('#leftnavMenu').accordion({
-		active: false, 
+		active: true, 
 		navigation: true, 
-		autoheight: true, 
-		alwaysOpen: true
+		autoheight: false, 
+		alwaysOpen: true,
+		clearStyle: true 
 	});
 });
 </script>
@@ -21,14 +22,14 @@ $(function() {
 	</h3>
 	<div class="menuSection">
 		<ul>
-			<li>
+			<li class="prop">
 				<span class="menuButton">
 					<g:link class="list" controller="shipment" action="listOutgoing"><g:message code="shipment.list.outgoing.label"  default="browse shipping"/></g:link>
 				</span>
 			</li>										
-			<li>
+			<li class="prop">
 				<span class="menuButton">
-					<g:link class="create" controller="shipment" action="create" params="['type':'outgoing']"><g:message code="shipment.create.outgoing.label" default="add new shipping" /></g:link>
+					<g:link class="create" controller="shipment" action="create" params="['type':'outgoing']"><g:message code="shipment.create.outgoing.label" default="new shipping request" /></g:link>
 				</span>
 			</li>			
 		</ul>										
@@ -38,14 +39,14 @@ $(function() {
 	</h3>
 	<div class="menuSection">
 		<ul>
-			<li>
+			<li class="prop">
 				<span class="menuButton">
 					<g:link class="list" controller="shipment" action="listIncoming"><g:message code="shipment.list.incoming.label"  default="browse receiving"/></g:link>
 				</span>		
 			</li>										
-			<li>
+			<li class="prop">
 				<span class="menuButton">
-					<g:link class="create" controller="shipment" action="create" params="['type':'incoming']"><g:message code="shipment.create.incoming.label" default="add new receiving" /></g:link>
+					<g:link class="create" controller="shipment" action="create" params="['type':'incoming']"><g:message code="shipment.create.incoming.label" default="new receipt" /></g:link>
 				</span>
 			</li>						
 		</ul>										
@@ -72,17 +73,17 @@ $(function() {
 	</h3>
 	<div class="menuSection">									
 		<ul>
-			<li>
+			<li class="prop">
 				<span class="menuButton">
 					<g:link class="list" controller="product" action="browse"><g:message code="product.browse.label"  default="browse products"/></g:link>
 				</span>
 			</li>		
-			<li>
+			<li class="prop">
 				<span class="menuButton">
 					<g:link class="import" controller="product" action="importProducts"><g:message code="product.import.label" default="import products" /></g:link>
 				</span>
 			</li>						
-			<li>
+			<li class="prop">
 				<span class="menuButton">
 					<g:link class="create" controller="product" action="create"><g:message code="product.create.label" default="add new product" /></g:link>
 				</span>
@@ -94,12 +95,10 @@ $(function() {
 			<li><span class="menuButton"><g:link class="create" controller="durableProduct" action="create"><g:message code="default.create.label" args="['Durable Product']" default="Create a new Durable Product" /></g:link></span></li>
 			--%>
 		</ul>	
-	</div>							
-	
+	</div>								
 	<h3 class="heading">
 		<img src="${createLinkTo(dir:'images/icons/',file:'order.png')}" alt="Orders" style="vertical-align: middle"/>
 		<g:message code="order.manage.label"  default="Orders"/>
-
 	</h3>
 	<div class="menuSection">									
 		<ul>
@@ -128,49 +127,58 @@ $(function() {
 		</ul>
 	</div>					
 	<h3 class="heading">
-		<img src="${createLinkTo(dir:'images/icons/',file:'settings.png')}" alt="Settings" style="vertical-align: middle"/>
-		<g:message code="settings.manage.label" args="['Settings']" default="Settings"/>
+		<img src="${createLinkTo(dir:'images/icons/',file:'wrench.png')}" alt="Administration" style="vertical-align: middle"/>
+		<g:message code="metadata.manage.label"  default="Administration"/>
 	</h3>
 	<div class="menuSection">
 		<ul>
-			<!-- 
-			<li><span class="menuButton"><g:link class="nobullet" controller="admin" action="index"><g:message code="default.manage.label" args="['Settings']" default="Manage Settings" /></g:link></span></li>
-			-->
-		</ul>
-	</div>	
-
-	<h3 class="heading">
-		<img src="${createLinkTo(dir:'images/icons/',file:'wrench.png')}" alt="Metadata" style="vertical-align: middle"/>
-		<g:message code="metadata.manage.label"  default="Metadata"/>
-	</h3>
-	<div class="menuSection">
-		<ul>
-			<li>
+			<li class="prop">
 				<span class="menuButton">
-					<g:link class="eventType" controller="eventType" action="list"><g:message code="eventType.browse.label"  default="browse event types"/></g:link>
+					<g:link class="eventType" controller="eventType" action="list"><g:message code="default.manage.label"  args="['event types']"/></g:link>
 				</span>
 			</li>		
-			<li>
+			<li class="prop">
 				<span class="menuButton">
-					<g:link class="user" controller="user" action="list"><g:message code="user.list.label"  default="browse users"/></g:link>
+					<g:link class="drugRoute" controller="drugRouteType" action="list"><g:message code="default.manage.label" args="['drug routes']"/></g:link>
+				</span>
+			</li>
+			<li class="prop">
+				<span class="menuButton">
+					<g:link class="drugClass" controller="drugClass" action="list"><g:message code="default.manage.label" args="['drug classes']"/></g:link>
+				</span>
+			</li>
+			<li class="prop">
+				<span class="menuButton">
+					<g:link class="group" controller="person" action="list"><g:message code="default.manage.label" args="['people']"/></g:link>
 				</span>		
 			</li>										
-			<li>
+			<li class="prop">
 				<span class="menuButton">
-					<g:link class="warehouse" controller="warehouse" action="list"><g:message code="warehouse.list.label"  default="browse warehouses"/></g:link>
+					<g:link class="role" controller="role" action="list"><g:message code="default.manage.label" args="['roles']"/></g:link>
 				</span>		
-			</li>			
-											
-			<li>
+			</li>										
+			<li class="prop">
 				<span class="menuButton">
-					<g:link class="metadata" controller="drugRouteType" action="list"><g:message code="default.manage.label" args="['Admin Routes']"/></g:link>
+					<g:link class="shipper" controller="shipper" action="list"><g:message code="default.manage.label" args="['Shippers']"/></g:link>
 				</span>
 			</li>
-			<li>
+			<li class="prop">
 				<span class="menuButton">
-					<g:link class="metadata" controller="drugClass" action="list"><g:message code="default.manage.label" args="['Drug Classes']"/></g:link>
+					<g:link class="shipperService" controller="shipperService" action="list"><g:message code="default.manage.label" args="['Shipper Services']"/></g:link>
 				</span>
 			</li>
+			<li class="prop">
+				<span class="menuButton">
+					<g:link class="user" controller="user" action="list"><g:message code="default.manage.label" args="['users']"/></g:link>
+				</span>		
+			</li>										
+			<li class="prop">
+				<span class="menuButton">
+					<g:link class="warehouse" controller="warehouse" action="list"><g:message code="default.manage.label" args="['warehouses']"/></g:link>
+				</span>		
+			</li>														
+
+
  			<!-- 
 			<li><span class="menuButton"><g:link class="nobullet" controller="containerType" action="list"><g:message code="default.manage.label" args="['Metadata']"/></g:link></span></li>		
 			-->

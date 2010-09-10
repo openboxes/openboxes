@@ -52,6 +52,10 @@
                             <td valign="top" class="value">${fieldValue(bean: userInstance, field: "email")}</td>
                         </tr>
                         <tr class="prop">
+                            <td valign="top" class="name"><g:message code="user.roles.label" default="Roles" /></td>
+                            <td valign="top" class="value">${fieldValue(bean: userInstance, field: "roles")}</td>
+                        </tr>
+                        <tr class="prop">
                             <td valign="top" class="name"><g:message code="user.photo.label" default="Profile Photo" /></td>                            
                             <td valign="top" class="value">
 							

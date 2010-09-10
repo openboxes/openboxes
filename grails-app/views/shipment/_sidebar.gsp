@@ -1,92 +1,87 @@
-<div id="shipmentMenu" class="menu" style="width: 250px">
-	<fieldset>
-		<legend>Edit Actions</legend>			
-		<table>
-			<tr>
-				<td>
-					<g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}"><img
-					src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}"
-					alt="Show Shipment" style="vertical-align: middle" /> &nbsp; 						
-						<g:if test="${request.request.requestURL.toString().contains('showDetails')}"><b>show details</b></g:if>
-						<g:else>show details</g:else>
-					</g:link>
+<!-- Only allow the originating warehouse to edit the shipment -->
+
+	<div id="shipmentMenu" class="menu" style="width: 250px">
+		<fieldset>
+			<legend>Edit Actions</legend>			
+			<table>
+				<g:if test="${session?.warehouse?.id == shipmentInstance?.origin?.id}">			
+					<tr>
+						<td>
+							<g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}"><img
+							src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}"
+							alt="Show Shipment" style="vertical-align: middle" /> &nbsp; 						
+								<g:if test="${request.request.requestURL.toString().contains('showDetails')}"><b>show details</b></g:if>
+								<g:else>show details</g:else>
+							</g:link>
+							
+						</td>
+					</tr>
 					
-				</td>
-			</tr>
-			
+					<tr class="prop">
+						<td>
+							<g:link controller="shipment" action="editDetails" id="${shipmentInstance.id}"><img
+							src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}"
+							alt="Edit Shipment" style="vertical-align: middle" /> &nbsp; 
+								<g:if test="${request.request.requestURL.toString().contains('editDetails')}"><b>edit details</b></g:if>
+								<g:else>edit details</g:else>
+							</g:link>
+						
+						</td>
+					</tr>
+					<tr class="prop">
+						<td>
+							<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}"><img 
+							src="${createLinkTo(dir:'images/icons',file:'pack-shipment.png')}" 
+							alt="Edit Contents" style="vertical-align: middle"/> &nbsp; 
+								<g:if test="${request.request.requestURL.toString().contains('editContents')}"><b>edit contents</b></g:if>
+								<g:else>edit contents</g:else>
+							</g:link>
+						</td>
+					</tr>
+					<tr class="prop">
+						<td>
+							<a href="${createLink(controller: "shipment", action: "addPackage", id: shipmentInstance.id)}?containerType=Box"><img 
+							src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" 
+							alt="Add Box" style="vertical-align: middle"/> &nbsp; 
+								<g:if test="${request.request.requestURL.toString().contains('addPackage')}"><b>add package</b></g:if>
+								<g:else>add package</g:else>
+							</a>				
+						</td>
+					</tr>
+					<tr class="prop">
+						<td>
+							<a href="${createLink(controller: "shipment", action: "addDocument", id: shipmentInstance.id)}"><img 
+							src="${createLinkTo(dir:'images/icons',file:'document.png')}" 
+							alt="Add Document" style="vertical-align: middle"/> &nbsp; 
+								<g:if test="${request.request.requestURL.toString().contains('addDocument')}"><b>add document</b></g:if>
+								<g:else>add document</g:else>
+							</a>										
+						
+						</td>
+					</tr>
+					<tr class="prop">
+						<td>
+							<a href="${createLink(controller: "shipment", action: "addComment", id: shipmentInstance.id)}"><img 
+							src="${createLinkTo(dir:'images/icons/silk',file:'comment.png')}" 
+							alt="Add Document" style="vertical-align: middle"/> &nbsp; 
+								<g:if test="${request.request.requestURL.toString().contains('addComment')}"><b>add comment</b></g:if>
+								<g:else>add comment</g:else>
+							</a>				
+						</td>
+					</tr>
+					<tr class="prop">
+						<td>
+							<a href="${createLink(controller: "shipment", action: "addEvent", id: shipmentInstance.id)}"><img 
+							src="${createLinkTo(dir:'images/icons/silk',file:'calendar.png')}" 
+							alt="Add Document" style="vertical-align: middle"/> &nbsp; 
+								<g:if test="${request.request.requestURL.toString().contains('addEvent')}"><b>add event</b></g:if>
+								<g:else>add event</g:else>
+							</a>										
+						
+						</td>
+					</tr>
+				</g:if>
 			<tr class="prop">
-				<td>
-					<g:link controller="shipment" action="editDetails" id="${shipmentInstance.id}"><img
-					src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}"
-					alt="Edit Shipment" style="vertical-align: middle" /> &nbsp; 
-						<g:if test="${request.request.requestURL.toString().contains('editDetails')}"><b>edit details</b></g:if>
-						<g:else>edit details</g:else>
-					</g:link>
-				
-				</td>
-			</tr>
-			<tr class="prop">
-				<td>
-					<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}"><img 
-					src="${createLinkTo(dir:'images/icons',file:'pack-shipment.png')}" 
-					alt="Edit Contents" style="vertical-align: middle"/> &nbsp; 
-						<g:if test="${request.request.requestURL.toString().contains('editContents')}"><b>edit contents</b></g:if>
-						<g:else>edit contents</g:else>
-					</g:link>
-				</td>
-			</tr>
-			<tr class="prop">
-				<td>
-					<a href="${createLink(controller: "shipment", action: "addPackage", id: shipmentInstance.id)}?containerType=Box"><img 
-					src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" 
-					alt="Add Box" style="vertical-align: middle"/> &nbsp; 
-						<g:if test="${request.request.requestURL.toString().contains('addPackage')}"><b>add package</b></g:if>
-						<g:else>add package</g:else>
-					</a>				
-				</td>
-			</tr>
-			<tr class="prop">
-				<td>
-					<a href="${createLink(controller: "shipment", action: "addDocument", id: shipmentInstance.id)}"><img 
-					src="${createLinkTo(dir:'images/icons',file:'document.png')}" 
-					alt="Add Document" style="vertical-align: middle"/> &nbsp; 
-						<g:if test="${request.request.requestURL.toString().contains('addDocument')}"><b>add document</b></g:if>
-						<g:else>add document</g:else>
-					</a>										
-				
-				</td>
-			</tr>
-			<tr class="prop">
-				<td>
-					<a href="${createLink(controller: "shipment", action: "addComment", id: shipmentInstance.id)}"><img 
-					src="${createLinkTo(dir:'images/icons/silk',file:'comment.png')}" 
-					alt="Add Document" style="vertical-align: middle"/> &nbsp; 
-						<g:if test="${request.request.requestURL.toString().contains('addComment')}"><b>add comment</b></g:if>
-						<g:else>add comment</g:else>
-					</a>				
-				</td>
-			</tr>
-			<tr class="prop">
-				<td>
-					<a href="${createLink(controller: "shipment", action: "addEvent", id: shipmentInstance.id)}"><img 
-					src="${createLinkTo(dir:'images/icons/silk',file:'calendar.png')}" 
-					alt="Add Document" style="vertical-align: middle"/> &nbsp; 
-						<g:if test="${request.request.requestURL.toString().contains('addEvent')}"><b>add event</b></g:if>
-						<g:else>add event</g:else>
-					</a>										
-				
-				</td>
-			</tr>
-		</table>
-	</fieldset>	
-</div>
-<br/>
-<div style="width: 250px" class="menu" >
-	
-	<fieldset>
-		<legend>Workflow Actions</legend>			
-		<table>
-			<tr >
 				<td>
 					<g:link controller="shipment" action="showPackingList" id="${shipmentInstance.id}" ><img 
 					src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" 

@@ -17,19 +17,9 @@
 				
 		<table>
 			<tr>
-				<td colspan="2">
-					<div style="padding-bottom: 10px;">
-						<g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}">${shipmentInstance?.name}</g:link> 
-						&raquo; <span style="font-size: 90%">Show Details</span>
-					</div>										
-				</td>			
-			</tr>
-			<tr>
 				<td width="75%">				
 					<fieldset>
-
-						<g:render template="summary"/>
-						
+						<g:render template="summary"/>						
 						<div id="details" class="section">
 							<table cellspacing="5" cellpadding="5">
 								<tbody>
@@ -56,11 +46,14 @@
 											</span>
 										</td>
 										<td>
-											<g:if test="${shipmentInstance.expectedShippingDate}">
-												<span class="fade">
-													expected to ship on <g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="MMM dd yyyy" />
-												</span>											
-											</g:if>
+											<span class="fade">
+												<g:if test="${shipmentInstance.expectedShippingDate}">
+													Expected to ship on <g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="MMM dd yyyy" />
+												</g:if>
+												<g:else>
+													No expected shipping date yet.
+												</g:else>
+											</span>											
 										</td>
 									</tr>
 									<tr class="prop">
@@ -73,11 +66,14 @@
 											</span>											
 										</td>
 										<td>
-											<g:if test="${shipmentInstance.expectedDeliveryDate}">
-												<span class="fade">
-													expected to arrive on <g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="MMM dd yyyy" />
-												</span>											
-											</g:if>
+											<span class="fade">
+												<g:if test="${shipmentInstance.expectedDeliveryDate}">
+													Expected to arrive on <g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="MMM dd yyyy" />
+												</g:if>
+												<g:else>
+													No expected delivery date yet.
+												</g:else>
+											</span>											
 										</td>
 									</tr>
 									<tr class="prop">
@@ -85,28 +81,19 @@
 											code="shipment.method.label" default="Shipper" /></label>
 										</td>
 										<td valign="top" class="">
-											<g:if test="${shipmentInstance?.shipmentMethod?.shipper}">
-												<table>
-													<tbody>
-														<tr>
-															<td>
-																${fieldValue(bean: shipmentInstance, field: "shipmentMethod.shipper.name")} <br/> 
-																<span class="fade" style="font-size: 0.8em;">${fieldValue(bean: shipmentInstance, field: "shipmentMethod.trackingNumber")}</span>														
-															</td>
-															<%-- 
-															<td style="width:16px;">
-																<img src="${createLinkTo(dir:'images/icons',file: shipmentInstance?.shipmentMethod?.shipperService?.name + '.png')}"
-																valign="top" style="vertical-align: middle;" />
-															</td>
-															--%>
-														</tr>
-													</tbody>											
-												</table>
-											</g:if>
-											<g:else>
-												<span class="fade">(empty)</span>
-											</g:else>										
+											${fieldValue(bean: shipmentInstance, field: "shipmentMethod.shipper.name")} 
+											${fieldValue(bean: shipmentInstance, field: "shipmentMethod.shipperService.name")} 
+																														
 										</td>
+										<%-- 
+										<td style="width:16px;">
+											<img src="${createLinkTo(dir:'images/icons',file: shipmentInstance?.shipmentMethod?.shipperService?.name + '.png')}"
+											valign="top" style="vertical-align: middle;" />
+										</td>
+										--%>
+										<td>
+											<span class="fade">Tracking Number <b>${fieldValue(bean: shipmentInstance, field: "shipmentMethod.trackingNumber")}</b></span>										
+										</td>										
 									</tr>
 									<tr class="prop">
 										<td valign="top" class="name" style="width: 10%;"><label><g:message
@@ -126,6 +113,7 @@
 											<span class="fade">${fieldValue(bean: shipmentInstance, field: "carrier.email")}</span>
 										</td>
 									</tr>
+									<%-- 
 									<tr class="prop">
 										<td class="name"  style="width: 10%;">
 											<label><g:message code="shipment.recipient.label" default="Recipient" /></label>
@@ -146,6 +134,7 @@
 											<span class="fade">${fieldValue(bean: shipmentInstance, field: "recipient.email")}</span>
 										</td>
 									</tr>
+									--%>
 									<%-- 
 									<tr class="prop">
 										<td valign="top" class="name">

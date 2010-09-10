@@ -41,13 +41,18 @@
 	                                    ${renderEditor(p)}
 	                                </td>
 	                            </tr>
-	                        <%  }   } %>
+	                        <%  }   } %>	                        
+                            	<tr class="prop">
+		                        	<td valign="top"></td>
+		                        	<td valign="top">                        	
+						                <div class="buttons">
+						                    <g:actionSubmit class="save" action="update" value="\${message(code: 'default.button.update.label', default: 'Update')}" />
+						                    <g:actionSubmit class="delete" action="delete" value="\${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('\${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+						                </div>
+		    						</td>                    	
+	                        	</tr>	                        
 	                        </tbody>
 	                    </table>
-	                </div>
-	                <div class="buttons">
-	                    <g:actionSubmit class="save" action="update" value="\${message(code: 'default.button.update.label', default: 'Update')}" />
-	                    <g:actionSubmit class="delete" action="delete" value="\${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('\${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
 	                </div>
                 </fieldset>
             </g:form>

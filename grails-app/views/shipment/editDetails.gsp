@@ -21,18 +21,7 @@
 				<g:renderErrors bean="${shipmentInstance}" as="list" />
 			</div>
 		</g:hasErrors>	
-
-
-
 		<table>
-			<tr>
-				<td colspan="2">		
-					<div style="padding-bottom: 10px;">
-						<g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}">${shipmentInstance?.name}</g:link> 
-						&raquo; <span style="font-size: 90%">Edit Details</span>
-					</div>										
-				</td>	
-			</tr>
 			<tr>
 				<td width="75%">
 					<g:form action="update" method="post">
@@ -66,60 +55,80 @@
 										<td colspan="3" valign="top"
 											class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">
 										<g:textField name="name" value="${shipmentInstance?.name}" /></td>
-									</tr>
-									<%-- 
+									</tr>									
 									<tr class="prop">
-										<td valign="top" class="name"><label><g:message
-											code="shipment.method.label" default="Shipment method" /></label></td>
-										<td valign="top"
-											class="value ${hasErrors(bean: shipmentInstance, field: 'shipmentMethod', 'errors')}">
-										<g:select name="shipmentMethod.id"
-											from="${org.pih.warehouse.shipping.ShipmentMethod.list()}"
-											optionKey="id" optionValue="name"
-											value="${shipmentInstance?.shipmentMethod?.id}" /></td>
+										<td valign="top" class="name" style="width: 10%;"><label><g:message
+											code="shipment.shipper.label" default="Origin" /></label></td>
+										<td valign="top" style="width: 30%;">											
+											<%-- <g:autoSuggest id="origin" name="origin" 
+												jsonUrl="/warehouse/shipment/findWarehouseByName" 
+												valueId="${shipmentInstance?.origin?.id}" 
+												valueName="${shipmentInstance?.origin?.name}"/>												
+												--%>
+												<span style="line-height: 1.5em">${shipmentInstance?.origin?.name}</span>
+										</td>
 									</tr>
 									<tr class="prop">
-										<td valign="top" class="name"><label><g:message
-											code="shipment.trackingNumber.label" default="Tracking number" /></label></td>
-										<td valign="top"
-											class="value ${hasErrors(bean: shipmentInstance, field: 'trackingNumber', 'errors')}">
-											<g:textField name="trackingNumber"
-												value="${shipmentInstance?.trackingNumber}" /> </td>
+										<td valign="top" class="name" style="width: 10%;"><label><g:message
+											code="shipment.shipper.label" default="Destination" /></label></td>
+										<td valign="top" style="width: 30%;">											
+											<g:autoSuggest id="destination" name="destination" 
+												jsonUrl="/warehouse/shipment/findWarehouseByName" 
+												valueId="${shipmentInstance?.destination?.id}" 
+												valueName="${shipmentInstance?.destination?.name}"/>												
+										</td>
 									</tr>
-									--%>
+									<tr class="prop">
+										<td valign="top" class="name" style="width: 10%;"><label><g:message
+											code="shipment.shipper.label" default="Shipping Method" /></label></td>
+										<td valign="top" style="width: 30%;">											
+											<g:autoSuggest id="shipperService" name="shipperService" 
+												jsonUrl="/warehouse/json/findShipperServiceByName" 
+												valueId="${shipmentInstance?.shipmentMethod?.shipperService?.id}" 
+												valueName="${shipmentInstance?.shipmentMethod?.shipper?.name} ${shipmentInstance?.shipmentMethod?.shipperService?.name}"/>												
+										</td>
+									</tr>
+									<tr class="prop">
+										<td valign="top" class="name" style="width: 10%;"><label><g:message
+											code="shipment.shipper.label" default="Tracking Number" /></label></td>
+										<td valign="top" style="width: 30%;">											
+											<g:textField name="shipmentMethod.trackingNumber" value="${shipmentInstance?.shipmentMethod?.trackingNumber}" />										
+										</td>
+									</tr>
 									
-									
+									 
 									<tr class="prop">
 										<td valign="top" class="name" style="width: 10%;"><label><g:message
 											code="shipment.carrier.label" default="Carrier" /></label></td>
 										<td valign="top" style="width: 30%;">											
 											<g:if test="${shipmentInstance?.carrier}">
-												<g:autoSuggest name="carrier" jsonUrl="/warehouse/shipment/findPersonByName" 
-													width="300" 
+												<g:autoSuggest id="carrier" name="safeCarrier" jsonUrl="/warehouse/shipment/findPersonByName" 
 													valueId="${shipmentInstance?.carrier?.id}" 
 													valueName="${shipmentInstance?.carrier?.firstName} ${shipmentInstance?.carrier?.lastName}"/>												
 											</g:if>
 											<g:else>
-												<g:autoSuggest name="carrier" jsonUrl="/warehouse/shipment/findPersonByName" width="200" />	
+												<g:autoSuggest id="carrier" name="safeCarrier" jsonUrl="/warehouse/shipment/findPersonByName" width="200" />	
 											</g:else>												
 										</td>
 									</tr>
+									
+									<%--
 									<tr class="prop">
 										<td class="name"  style="width: 10%;">
-											<label><g:message code="shipment.destination.label" default="Recipient" /></label>
+											<label><g:message code="shipment.recipient.label" default="Recipient" /></label>
 										</td>
 										<td class="value" style="width: 30%;">		
 											<g:if test="${shipmentInstance?.recipient}">
-												<g:autoSuggest name="recipient" jsonUrl="/warehouse/shipment/findPersonByName" 
-													width="300" 
+												<g:autoSuggest id="recipient" name="recipient" jsonUrl="/warehouse/shipment/findPersonByName" 
 													valueId="${shipmentInstance?.recipient?.id}" 
-													valueName="${shipmentInstance?.recipient?.firstName} ${shipmentInstance?.carrier?.lastName}"/>												
+													valueName="${shipmentInstance?.recipient?.firstName} ${shipmentInstance?.recipient?.lastName}"/>												
 											</g:if>
 											<g:else>
 												<g:autoSuggest name="recipient" jsonUrl="/warehouse/shipment/findPersonByName" width="200" />	
 											</g:else>	
 										</td>
-									</tr>						
+									</tr>
+									--%>						
 									<tr class="prop">
 										<td valign="top" class="name"><label><g:message
 											code="shipment.expectedShippingDate.label" default="Expected shipping date" /></label></td>

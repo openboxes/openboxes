@@ -300,8 +300,20 @@ th.desc a {
     padding-left: 25px;
 }
 
+.menuButton a.drugRoute {
+    background: url(../images/icons/silk/pill_go.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.drugClass {
+    background: url(../images/icons/silk/pill.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
 .menuButton a.warehouse {
-    background: url(../images/icons/handtruck.png) center left no-repeat;
+    background: url(../images/icons/silk/building.png) center left no-repeat;
     color: #333;
     padding-left: 25px;
 }
@@ -355,7 +367,7 @@ th.desc a {
 }
 
 .menuButton a.role {
-    background: url(../images/icons/profile.png) center left no-repeat;
+    background: url(../images/icons/silk/shield.png) center left no-repeat;
     color: #333;
     padding-left: 25px;
 }
@@ -438,6 +450,19 @@ th.desc a {
     color: #333;
     padding-left: 25px;
 }
+
+.menuButton a.shipper {
+    background: url(../images/icons/silk/lorry.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.shipperService {
+    background: url(../images/icons/silk/map.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
 
 .menuButton a.ups {
     background: url(../images/icons/ups.jpg) center left no-repeat;

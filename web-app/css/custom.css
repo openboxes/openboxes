@@ -14,7 +14,7 @@
 
 li.ui-menu-item { text-align: left; font-weight: bold; } 
 h3.ui-state-active { background-color: #F8F7EF; }
-
+.ui-accordion .ui-accordion-content { padding: 0px; } 
 .body { 
 	margin-right: 5px;
 }

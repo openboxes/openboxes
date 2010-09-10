@@ -40,11 +40,18 @@
                                 </td>
                             </tr>
                         <%  }   }   } %>
+                        
+	                        <tr class="prop">
+	                        	<td valign="top"></td>
+	                        	<td valign="top">
+					                <div class="buttons">
+					                   <g:submitButton name="create" class="save" value="\${message(code: 'default.button.create.label', default: 'Create')}" />
+					                </div>                        	
+	                        	</td>
+	                        </tr>
+	                        
                         </tbody>
                     </table>
-                </div>
-                <div class="buttons">
-                   <g:submitButton name="create" class="save" value="\${message(code: 'default.button.create.label', default: 'Create')}" />
                 </div>
             </g:form>
         </div>

@@ -41,34 +41,31 @@
                             </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                  <label for="city"><g:message code="warehouse.city.label" default="City" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'city', 'errors')}">
-                                    <g:textField name="city" value="${warehouseInstance?.city}" />
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                  <label for="country"><g:message code="warehouse.country.label" default="Country" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'country', 'errors')}">
-                                    <g:textField name="country" value="${warehouseInstance?.country}" />
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td valign="top" class="name">
                                   <label for="manager"><g:message code="warehouse.manager.label" default="Manager" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'manager', 'errors')}">
                                     <g:select name="manager.id" from="${org.pih.warehouse.core.User.list()}" optionKey="id" value="${warehouseInstance?.manager?.id}"  />
                                 </td>
                             </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                  <label for="manager"><g:message code="warehouse.manager.label" default="Managed Locally" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'managedLocally', 'errors')}">
+                                    <g:textField name="managedLocally" value="${warehouseInstance?.managedLocally}" />
+                                </td>
+                            </tr>
+                            <tr>
+                            	<td valign="top"></td>
+                            	<td valign="top">
+					                <div class="buttons">
+					                    <g:actionSubmit class="save" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" /></span>
+					                    <g:actionSubmit class="delete" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /></span>
+					                </div>                            	
+                            	</td>
+                            </tr>
                         </tbody>
                     </table>
-                </div>
-                <div class="buttons">
-                    <span class="button"><g:actionSubmit class="save" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" /></span>
-                    <span class="button"><g:actionSubmit class="delete" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /></span>
                 </div>
             </g:form>
         </div>

@@ -21,7 +21,7 @@
         def ${propertyName} = new ${className}(params)
         if (${propertyName}.save(flush: true)) {
             flash.message = "\${message(code: 'default.created.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), ${propertyName}.id])}"
-            redirect(action: "show", id: ${propertyName}.id)
+            redirect(action: "list", id: ${propertyName}.id)
         }
         else {
             render(view: "create", model: [${propertyName}: ${propertyName}])
@@ -65,7 +65,7 @@
             ${propertyName}.properties = params
             if (!${propertyName}.hasErrors() && ${propertyName}.save(flush: true)) {
                 flash.message = "\${message(code: 'default.updated.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), ${propertyName}.id])}"
-                redirect(action: "show", id: ${propertyName}.id)
+                redirect(action: "list", id: ${propertyName}.id)
             }
             else {
                 render(view: "edit", model: [${propertyName}: ${propertyName}])
@@ -87,7 +87,7 @@
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
                 flash.message = "\${message(code: 'default.not.deleted.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])}"
-                redirect(action: "show", id: params.id)
+                redirect(action: "list", id: params.id)
             }
         }
         else {

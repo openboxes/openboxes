@@ -3,7 +3,7 @@
    <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'shipment.label', default: 'Incoming Shipments')}" />
+        <g:set var="entityName" value="${message(code: 'shipment.label', default: 'Receiving')}" />
         <title><g:message code="default.list.label" args="[entityName]" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle">
@@ -16,7 +16,8 @@
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>
-            
+
+<%--             
             <div class="dialog">
 				<g:form method="get" action="listIncoming">
 	            	<fieldset>
@@ -34,27 +35,26 @@
 					</fieldset>
 				</g:form>
 			</div>
-            
-            	<!-- 
-						Shipment name
-						Shipment ID (six digits)
-						To
-						Last event
-						Date of last event
-						Location of last event            	
-            	 -->
-				
+--%>			
             <div class="list">
 				<g:each var="entry" in="${shipmentInstanceMap}">	                    
-					<div style="padding: 10px; font-weight: bold;" ><h1>${entry.key}</h1></div>	                    	
+					<div style="padding: 10px; font-weight: bold;" >
+						<%-- <g:if test="${entry.key=='Unknown'}"><img src="${createLinkTo(dir:'images/icons/silk',file: 'flag_red.png')}" /></g:if>
+						<g:elseif test="${entry.key=='Delivered'}"><img src="${createLinkTo(dir:'images/icons/silk',file: 'tick.png')}" /></g:elseif>
+						<g:else><img src="${createLinkTo(dir:'images/icons/silk',file: 'clock.png')}" /></g:else>
+						 &nbsp
+						 --%>
+						<h1 style="display: inline;">${entry.key}</h1>
+					</div>	                    	
 					<table>
 	                    <thead>
 	                        <tr>   
-	                            <g:sortableColumn property="events" title="${message(code: 'shipment.events.label', default: 'Status')}" />
-								<g:sortableColumn property="shipmentNumber" title="${message(code: 'shipment.shipmentNumber.label', default: 'Shipment Number')}" />
+								<g:sortableColumn property="shipmentType" title="${message(code: 'shipment.shipmentType.label', default: 'Type')}" />
+	                            <g:sortableColumn property="shipmentNumber" title="${message(code: 'shipment.shipmentNumber.label', default: 'Shipment')}" />								
+	                            <g:sortableColumn property="status" title="${message(code: 'shipment.status.label', default: 'Status')}" />                            
+	                            <g:sortableColumn property="eventDate" title="${message(code: 'shipment.eventDate.label', default: 'Event Date')}" />                            
 	                            <g:sortableColumn property="destination" title="${message(code: 'shipment.origin.label', default: 'Origin')}" />
-	                            <g:sortableColumn property="documents" title="${message(code: 'shipment.documents.label', default: 'Documents')}" />                            
-								<g:sortableColumn property="lastModified" title="${message(code: 'shipment.lastModified.label', default: 'Last Modified')}" />
+	                            <g:sortableColumn property="documents" title="${message(code: 'shipment.documents.label', default: 'Documents')}" />                              
 	                        </tr>
 	                    </thead>
 	                   
@@ -62,20 +62,34 @@
 		                    <g:each var="shipmentList" in="${entry.value}">
 								<g:each var="shipmentInstance" in="${shipmentList.objectList}" status="i">
 									<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
+
+										<td width="5%" style="text-align: center">
+											<img src="${createLinkTo(dir:'images/icons',file: 'ShipmentType' + shipmentInstance?.shipmentType?.name + '.png')}"
+											alt="${shipmentInstance?.shipmentType?.name}" style="vertical-align: middle; width: 24px; height: 24px;" />		
+										</td>										
+										<td width="20%">
+											<g:link action="showDetails" id="${shipmentInstance.id}">
+												${fieldValue(bean: shipmentInstance, field: "name")}
+											</g:link>																														
+										</td>
 										<td width="10%">
-											<g:if test="${!shipmentInstance.events}"></g:if>									
+											<g:if test="${!shipmentInstance.events}"></g:if>
 											<g:else>
 												<div>
-													<b>${shipmentInstance.mostRecentEvent.eventType.name}</b> &nbsp;
-													<span style="font-size: 0.8em; color: #aaa;">
-														<g:formatDate format="dd MMM yyyy" date="${shipmentInstance.mostRecentEvent.eventDate}"/></span>
+													${shipmentInstance.mostRecentEvent.eventType.name}
+													
 												</div>									
-											</g:else>
+											</g:else>											
 										</td>
-										<td width="10%" align="center">
-											<g:link action="showDetails" id="${shipmentInstance.id}">${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}</g:link>
-											${fieldValue(bean: shipmentInstance, field: "name")}
+										<td width="10%">
+											<g:if test="${!shipmentInstance.events}"></g:if>
+											<g:else>										
+												<g:formatDate format="MMM dd yyyy" date="${shipmentInstance.mostRecentEvent.eventDate}"/>
+											</g:else>											
 										</td>
+
+
+
 										<td width="10%" align="center">
 											${fieldValue(bean: shipmentInstance, field: "origin.name")}
 										</td>
@@ -90,18 +104,14 @@
 												</g:each>							
 											</g:else>
 										</td>
-										<td width="10%">
-											<span class="fade"><g:formatDate format="dd MMM yyyy hh:mm a" date="${shipmentInstance.lastUpdated}"/></span>
-										</td>									
 			                        </tr>
 								</g:each>                    		
 	                    	</g:each>	                    	         
 	                    </tbody>
 					</table>
+					<br/>
+					<br/>
 				</g:each>
-            </div>
-            <div class="paginateButtons">
-                <g:paginate total="${shipmentInstanceTotal}" />
             </div>
         </div>		
     </body>

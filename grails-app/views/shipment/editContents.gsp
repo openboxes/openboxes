@@ -20,18 +20,7 @@
 			</div>
 		</g:hasErrors>
 		<table>
-			<tbody>
-				<tr>
-					<td colspan="2">
-						<div style="padding-bottom: 10px;">
-							<g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}">${shipmentInstance?.name}</g:link> 
-							 &nbsp; &raquo; &nbsp;
-							<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}">Packages</g:link>
-							 &nbsp; &raquo; &nbsp; 
-							<span style="font-size: 90%">Edit Contents</span>
-						</div>					
-					</td>
-				</tr>					
+			<tbody>		
 				<tr>
 					<td style="width: 75%" valign="top">
 						<fieldset>
@@ -208,13 +197,6 @@
 																			<g:textField name="containerNumber" value="${containerInstance.containerNumber}" size="15"/> &nbsp;		
 																			<span class="fade"></span>																
 																		</td>													
-																	</tr>
-																	<tr class="prop">
-																		<td class="name"><label class="optional">Recipient</label></td>
-																		<td class="value">
-																			<g:textField name="recipient" value="${containerInstance?.recipient}" size="15"/> &nbsp;
-																			<span class="fade">enter contact's name or email</span>
-																		</td>		
 																	</tr>
 																	<tr class="prop">										
 																		<td class="name"><label class="optional">Weight</label></td>

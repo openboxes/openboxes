@@ -60,7 +60,9 @@ class ShipmentController {
 		}
 	}
 	
-	def update = {		
+	def update = {	
+		log.info params
+			
 		def shipmentInstance = Shipment.get(params.id)
 		if (shipmentInstance) {
 			if (params.version) {
@@ -70,8 +72,44 @@ class ShipmentController {
 					render(view: "editDetails", model: [shipmentInstance: shipmentInstance])
 					return
 				}
-			}
+			}			
 			shipmentInstance.properties = params
+
+			
+			def shipperService = ShipperService.get(params.shipperService.id);
+			if (!shipmentInstance.shipmentMethod) { 
+				shipmentInstance.shipmentMethod = new ShipmentMethod();
+			}
+			shipmentInstance.shipmentMethod.shipperService = shipperService;
+			shipmentInstance.shipmentMethod.shipper = shipperService.shipper;
+
+						
+			// This is necessary because Grails seems to be binding things incorrectly.  If we just let 
+			// Grails do the binding by itself, it tries to change the ID of the 'carrier' that is already
+			// associated with the shipment, rather than changing the 'carrier' object associated with 
+			// the shipment.
+			
+			// Get the carrier object
+			def safeCarrier = Person.get(params?.safeCarrier?.id)
+			
+			// 
+			if (safeCarrier && params?.safeCarrier?.name == safeCarrier?.name) {
+				log.info "found safe carrier by id " + safeCarrier;
+				if (safeCarrier?.id != shipmentInstance?.carrier?.id) { 
+					shipmentInstance?.carrier = safeCarrier;
+				}
+			} 
+			else { 
+				if (params?.safeCarrier?.name) {
+					safeCarrier = convertStringToPerson(params.safeCarrier.name).save(flush:true);
+					shipmentInstance.carrier = safeCarrier;
+				} 
+				else { 
+					shipmentInstance.carrier = null;
+				}
+			}				
+		
+			
 			if (!shipmentInstance.hasErrors() && shipmentInstance.save(flush: true)) {
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 				redirect(action: "showDetails", id: shipmentInstance.id)
@@ -443,14 +481,13 @@ class ShipmentController {
 						[	value: it.id,
 							valueText: it.firstName + " " + it.lastName,
 							label: "<img src=\"/warehouse/user/viewPhoto/" + it.id + "\" width=\"24\" height=\"24\" style=\"vertical-align: bottom;\"\"/>&nbsp;" + it.firstName + " " + it.lastName + "&nbsp;&lt;" +  it.email + "&gt;",
-							desc: it.email,
-							icon: "<img src=\"/warehouse/user/viewPhoto/" + it.id
+							desc: (it?.email)?it.email:"no email",
 						]
 					}
 				}
 				else {
 					def item =  [
-						value: 0,
+						value: null,
 						valueText : params.term,
 						label: "Add new person '" + params.term + "'?",
 						desc: params.term,
@@ -491,7 +528,7 @@ class ShipmentController {
 			}
 			else {
 				def item =  [
-					value: 0,
+					value: null,
 					valueText : params.term,
 					label: "Add a new product '" + params.term + "'?",
 					desc: params.term,
@@ -578,16 +615,7 @@ class ShipmentController {
 		}		
 		if (!recipient) { 
 			def name = params.recipient.name;
-			if (name) { 
-				def nameArray = name.split(" ");
-				if (nameArray.length == 3) { 
-					recipient = new Person(firstName : nameArray[0], lastName : nameArray[1], email : nameArray[2]).save(failOnError:true);
-				} else if (nameArray.length == 2) { 
-					recipient = new Person(firstName : nameArray[0], lastName : nameArray[1]).save(failOnError:true);
-				} else { 
-					recipient = new Person(firstName : nameArray[0]).save(failOnError:true);				
-				}
-			}
+			
 		}
 		
 		// Add item to container if product doesn't already exist
@@ -763,21 +791,28 @@ class ShipmentController {
 		//redirect(action: 'addComment', id: params.shipmentId)
 	}
 
-	def addPackage = {
-		def shipmentInstance = Shipment.get(params.id)
-		def containerType = ContainerType.findByName(params.containerType)
-		if (!containerType) { 
-			flash.message = "Unable to add container type ${containerType} to the shipment";
-		}
-		else { 
+	def addPackage = {		
+		def shipmentInstance = Shipment.get(params.id);
+		def container = new Container(
+			containerType : ContainerType.findByName(params.containerType));
+			
+		render(view: "addPackage", model: [shipmentInstance : shipmentInstance, container : container]);
+
+	}
+	
+	def savePackage = {
+		def shipmentInstance = Shipment.get(params.shipmentId);
+		def container = new Container(params);
+		if (shipmentInstance) {
 			flash.message = "Added a new ${params.containerType} to the shipment";
-			def containerName = (shipmentInstance?.containers) ? String.valueOf(shipmentInstance.containers.size() + 1) : "1";
-			def container = new Container(containerType:containerType, name:containerName)
+			//container.containerType = ContainerType.get(params.containerType.id);
+			//container.name = (shipmentInstance?.containers) ? String.valueOf(shipmentInstance.containers.size() + 1) : "1";
 			shipmentInstance.addToContainers(container).save(flush:true);
 		}
-		redirect(action: 'showDetails', id: params.id);		
+		redirect(action: 'showDetails', id: params.shipmentId);
+		
 	}
-
+	
 		
 	def saveComment = { 
 		def shipmentInstance = Shipment.get(params.shipmentId);
@@ -927,6 +962,38 @@ class ShipmentController {
 	def view = {
 		// pass through to "view shipment" page
 	}
+
+	Person convertStringToPerson(String name) { 
+		def person = new Person();
+		if (name) {
+			def nameArray = name.split(" ");
+			nameArray.each { 
+				if (it.contains("@")) { 
+					person.email = it;
+				}
+				else if (!person.firstName) { 
+					person.firstName = it;
+				}
+				else if (!person.lastName) { 
+					person.lastName = it;
+				}
+				else { 
+					person.lastName += " " + it;
+				}
+			}
+			/*
+			if (nameArray.length == 3) {
+				recipient = new Person(firstName : nameArray[0], lastName : nameArray[1], email : nameArray[2]);
+			} else if (nameArray.length == 2) {
+				recipient = new Person(firstName : nameArray[0], lastName : nameArray[1]);
+			} else if (nameArray.length == 1) {
+				recipient = new Person(firstName : nameArray[0]);
+			}*/			
+		}
+		return person;
+	}	
+	
+	
 }
 
 

@@ -22,22 +22,11 @@
 			</div>
 		</g:hasErrors>
 			
-		<table>		
-			<tr>
-				<td colspan="2">
-					<div style="padding-bottom: 10px;">
-						<g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}">${shipmentInstance?.name}</g:link> 
-						 &nbsp; &raquo; &nbsp; 
-						<span style="font-size: 90%">Attach Document</span>
-					</div>					
-				</td>
-			</tr>		
+		<table>					
 			<tr>
 				<td width="75%">
 					<fieldset>
 						<g:render template="summary" />
-
-
 						<div>
 							<g:uploadForm controller="document" action="upload">
 								<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />

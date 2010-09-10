@@ -25,14 +25,6 @@
 
 		<table>
 			<tr>
-				<td colspan="2">		
-					<div style="padding-bottom: 10px;">
-						<g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}">${shipmentInstance?.name}</g:link> 
-						&raquo; <span style="font-size: 90%">Edit Details</span>
-					</div>										
-				</td>	
-			</tr>
-			<tr>
 				<td width="75%">
 					<g:form action="addEvent" method="POST">
 						<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
