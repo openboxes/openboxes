@@ -77,48 +77,68 @@ class ShipmentController {
 			// Bind request parameters 
 			shipmentInstance.properties = params
 			
+			// -- Processing shipment method  -------------------------
 			log.info "autocomplete shipment method: " + params
 			// Create a new shipment method if one does not exist
-			if (!shipmentInstance.shipmentMethod) {
-				shipmentInstance.shipmentMethod = new ShipmentMethod();
+			def shipmentMethod = shipmentInstance.shipmentMethod;
+			if (!shipmentMethod) {
+				shipmentMethod = new ShipmentMethod();
 			}
 
 			// If there's an ID but no name, it means we want to remove the shipper and shipper service
 			if (!params.shipperService.name) { 			
-				shipmentInstance.shipmentMethod.shipper = null
-				shipmentInstance.shipmentMethod.shipperService = null
+				shipmentMethod.shipper = null
+				shipmentMethod.shipperService = null
 			}
 			// Otherwise we set the selected accordingly
-			else if (params.shipperService.id) { 
+			else if (params.shipperService.id && params.shipperService.name) { 
 				def shipperService = ShipperService.get(params.shipperService.id);
-				shipmentInstance.shipmentMethod.shipperService = shipperService;
-				shipmentInstance.shipmentMethod.shipper = shipperService.shipper;
-				shipmentInstance.shipmentMethod.save(flush:true);
+				if (shipperService) { 
+					shipmentMethod.shipperService = shipperService;
+					shipmentMethod.shipper = shipperService.shipper;
+				}
 			}
-									
+			// We work with and save the shipmentMethod instance in order to avoid a transient object exception
+			// that occurs when setting the destination above and saving the shipment method within the shipment
+			shipmentInstance.shipmentMethod = shipmentMethod;
+			shipmentInstance.shipmentMethod.save(flush:true);
+			
+			// -- Processing destination  -------------------------
+			// Reset the destination to null
+			if (!params.safeDestination.name) {
+				shipmentInstance.destination = null;
+			}
+			// Assign a destination if one was selected
+			else if (params.safeDestination.id && params.safeDestination.name) {
+				def destination = Location.get(params.safeDestination.id);
+				if (destination && params.safeDestination.name == destination.name) // if it exists
+					shipmentInstance.destination = destination;
+			}
+												
+			// -- Processing carrier  -------------------------
 			// This is necessary because Grails seems to be binding things incorrectly.  If we just let 
 			// Grails do the binding by itself, it tries to change the ID of the 'carrier' that is already
 			// associated with the shipment, rather than changing the 'carrier' object associated with 
 			// the shipment.
-			
-			// Get the carrier object
-			def safeCarrier = Person.get(params?.safeCarrier?.id)
-			if (safeCarrier && params?.safeCarrier?.name == safeCarrier?.name) {
-				log.info "found safe carrier by id " + safeCarrier;
-				if (safeCarrier?.id != shipmentInstance?.carrier?.id) { 
-					shipmentInstance?.carrier = safeCarrier;
-				}
-			} 
-			else { 
-				if (params?.safeCarrier?.name) {
-					safeCarrier = convertStringToPerson(params.safeCarrier.name).save(flush:true);
+						
+			// Reset the carrier
+			if (!params.safeCarrier.name) {
+				shipmentInstance.carrier = null;
+			}
+			// else if the person is found and different from the current one, then we use that person
+			else if (params.safeCarrier.id && params.safeCarrier.name) {
+				def safeCarrier = Person.get(params.safeCarrier.id);				
+				if (safeCarrier && safeCarrier?.name != shipmentInstance?.carrier?.name)
 					shipmentInstance.carrier = safeCarrier;
-				} 
-				else { 
-					shipmentInstance.carrier = null;
+			}
+			// else if only the name is provided, we need to create a new person
+			else { 
+				def safeCarrier = convertStringToPerson(params.safeCarrier.name);
+				if (safeCarrier) { 
+					safeCarrier.save(flush:true)
+					shipmentInstance.carrier = safeCarrier;
 				}
-			}				
-		
+			}
 			
 			if (!shipmentInstance.hasErrors() && shipmentInstance.save(flush: true)) {
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"

@@ -35,10 +35,12 @@
 								<tbody>
 									<tr class="prop">
 										<td valign="top" class="name"><label><g:message
-											code="shipment.name.label" default="Shipment Number" /></label></td>
+											code="shipment.name.label" default="Shipment Number" /></label>
+										</td>
 										<td colspan="3" valign="top"
 											class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">
-										<span style="line-height: 1.5em">${shipmentInstance?.shipmentNumber}</span></td>
+											<span style="line-height: 1.5em">${shipmentInstance?.shipmentNumber}</span>
+										</td>
 									</tr>
 									<tr class="prop">
 										<td valign="middle" class="name"><label><g:message
@@ -60,7 +62,8 @@
 									</tr>									
 									<tr class="prop">
 										<td valign="top" class="name" style="width: 10%;"><label><g:message
-											code="shipment.shipper.label" default="Origin" /></label></td>
+											code="shipment.shipper.label" default="Origin" /></label>
+										</td>
 										<td valign="top" style="width: 30%;">											
 											<%-- <g:autoSuggest id="origin" name="origin" 
 												jsonUrl="/warehouse/shipment/findWarehouseByName" 
@@ -68,13 +71,14 @@
 												valueName="${shipmentInstance?.origin?.name}"/>												
 												--%>
 												<span style="line-height: 1.5em">${shipmentInstance?.origin?.name}</span>
+												<g:hiddenField name="origin.id" value="${shipmentInstance?.origin?.id}" />
 										</td>
 									</tr>
 									<tr class="prop">
 										<td valign="top" class="name" style="width: 10%;"><label><g:message
 											code="shipment.shipper.label" default="Destination" /></label></td>
 										<td valign="top" style="width: 30%;">											
-											<g:autoSuggest id="destination" name="destination" 
+											<g:autoSuggest id="destination" name="safeDestination" 
 												jsonUrl="/warehouse/shipment/findWarehouseByName" 
 												valueId="${shipmentInstance?.destination?.id}" 
 												valueName="${shipmentInstance?.destination?.name}"/>												

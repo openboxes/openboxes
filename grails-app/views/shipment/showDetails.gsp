@@ -81,18 +81,23 @@
 											code="shipment.method.label" default="Shipper" /></label>
 										</td>
 										<td valign="top" class="">
-											${fieldValue(bean: shipmentInstance, field: "shipmentMethod.shipper.name")} 
-											${fieldValue(bean: shipmentInstance, field: "shipmentMethod.shipperService.name")} 
-																														
+											<g:if test="${shipmentInstance?.shipmentMethod?.shipperService}">
+												${fieldValue(bean: shipmentInstance, field: "shipmentMethod.shipper.name")} 
+												${fieldValue(bean: shipmentInstance, field: "shipmentMethod.shipperService.name")}																														
+											</g:if>
+											<g:else>
+												<span class="fade">
+													(empty)												
+												</span>
+											</g:else>										
 										</td>
-										<%-- 
-										<td style="width:16px;">
-											<img src="${createLinkTo(dir:'images/icons',file: shipmentInstance?.shipmentMethod?.shipperService?.name + '.png')}"
-											valign="top" style="vertical-align: middle;" />
-										</td>
-										--%>
+									
 										<td>
-											<span class="fade">Tracking Number <b>${fieldValue(bean: shipmentInstance, field: "shipmentMethod.trackingNumber")}</b></span>										
+											<g:if test="${shipmentInstance?.shipmentMethod?.trackingNumber}">
+												<span class="fade">
+													Tracking # <b>${fieldValue(bean: shipmentInstance, field: "shipmentMethod.trackingNumber")}</b>
+												</span>
+											</g:if>
 										</td>										
 									</tr>
 									<tr class="prop">
