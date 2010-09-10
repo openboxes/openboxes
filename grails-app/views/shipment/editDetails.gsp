@@ -51,10 +51,12 @@
 									</tr>							
 									<tr class="prop">
 										<td valign="top" class="name"><label><g:message
-											code="shipment.name.label" default="Nickname" /></label></td>
+											code="shipment.name.label" default="Nickname" /></label>
+										</td>
 										<td colspan="3" valign="top"
 											class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">
-										<g:textField name="name" value="${shipmentInstance?.name}" /></td>
+											<g:textField name="name" value="${shipmentInstance?.name}" style="width: 200px" />
+										</td>
 									</tr>									
 									<tr class="prop">
 										<td valign="top" class="name" style="width: 10%;"><label><g:message
@@ -81,18 +83,26 @@
 									<tr class="prop">
 										<td valign="top" class="name" style="width: 10%;"><label><g:message
 											code="shipment.shipper.label" default="Shipping Method" /></label></td>
-										<td valign="top" style="width: 30%;">											
-											<g:autoSuggest id="shipperService" name="shipperService" 
-												jsonUrl="/warehouse/json/findShipperServiceByName" 
-												valueId="${shipmentInstance?.shipmentMethod?.shipperService?.id}" 
-												valueName="${shipmentInstance?.shipmentMethod?.shipper?.name} ${shipmentInstance?.shipmentMethod?.shipperService?.name}"/>												
+										<td valign="top" style="width: 30%;">			
+										
+											<g:if test="${shipmentInstance?.shipmentMethod?.shipperService}">								
+												<g:autoSuggest id="shipperService" name="shipperService" 
+													jsonUrl="/warehouse/json/findShipperServiceByName" 
+													valueId="${shipmentInstance?.shipmentMethod?.shipperService?.id}" 
+													valueName="${shipmentInstance?.shipmentMethod?.shipper?.name} ${shipmentInstance?.shipmentMethod?.shipperService?.name}"/>												
+											</g:if>
+											<g:else>
+												<g:autoSuggest id="shipperService" name="shipperService" 
+													jsonUrl="/warehouse/json/findShipperServiceByName"/>																							
+											</g:else>
 										</td>
 									</tr>
 									<tr class="prop">
 										<td valign="top" class="name" style="width: 10%;"><label><g:message
-											code="shipment.shipper.label" default="Tracking Number" /></label></td>
+											code="shipment.shipper.label" default="Tracking Number" /></label>
+										</td>
 										<td valign="top" style="width: 30%;">											
-											<g:textField name="shipmentMethod.trackingNumber" value="${shipmentInstance?.shipmentMethod?.trackingNumber}" />										
+											<g:textField name="shipmentMethod.trackingNumber" value="${shipmentInstance?.shipmentMethod?.trackingNumber}" style="width: 200px" />										
 										</td>
 									</tr>
 									
@@ -135,7 +145,7 @@
 										<td valign="top"
 											class=" ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}"
 											nowrap="nowrap">
-												<g:jqueryDatePicker name="expectedShippingDate"
+												<g:jqueryDatePicker id="expectedShippingDate" name="expectedShippingDate"
 											value="${shipmentInstance?.expectedShippingDate}" format="MM/dd/yyyy"/>
 										</td>
 									</tr>		

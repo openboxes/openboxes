@@ -73,17 +73,29 @@ class ShipmentController {
 					return
 				}
 			}			
-			shipmentInstance.properties = params
 
+			// Bind request parameters 
+			shipmentInstance.properties = params
 			
-			def shipperService = ShipperService.get(params.shipperService.id);
-			if (!shipmentInstance.shipmentMethod) { 
+			log.info "autocomplete shipment method: " + params
+			// Create a new shipment method if one does not exist
+			if (!shipmentInstance.shipmentMethod) {
 				shipmentInstance.shipmentMethod = new ShipmentMethod();
 			}
-			shipmentInstance.shipmentMethod.shipperService = shipperService;
-			shipmentInstance.shipmentMethod.shipper = shipperService.shipper;
 
-						
+			// If there's an ID but no name, it means we want to remove the shipper and shipper service
+			if (!params.shipperService.name) { 			
+				shipmentInstance.shipmentMethod.shipper = null
+				shipmentInstance.shipmentMethod.shipperService = null
+			}
+			// Otherwise we set the selected accordingly
+			else if (params.shipperService.id) { 
+				def shipperService = ShipperService.get(params.shipperService.id);
+				shipmentInstance.shipmentMethod.shipperService = shipperService;
+				shipmentInstance.shipmentMethod.shipper = shipperService.shipper;
+				shipmentInstance.shipmentMethod.save(flush:true);
+			}
+									
 			// This is necessary because Grails seems to be binding things incorrectly.  If we just let 
 			// Grails do the binding by itself, it tries to change the ID of the 'carrier' that is already
 			// associated with the shipment, rather than changing the 'carrier' object associated with 
@@ -91,8 +103,6 @@ class ShipmentController {
 			
 			// Get the carrier object
 			def safeCarrier = Person.get(params?.safeCarrier?.id)
-			
-			// 
 			if (safeCarrier && params?.safeCarrier?.name == safeCarrier?.name) {
 				log.info "found safe carrier by id " + safeCarrier;
 				if (safeCarrier?.id != shipmentInstance?.carrier?.id) { 
