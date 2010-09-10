@@ -287,222 +287,118 @@ th.desc a {
 */
 
 /* more menu button icons */
-
+.menuButton { 
+	padding-left: 10px;
+}
+.menuButton a { 
+	padding-left: 25px;
+}
 .menuButton a.settings {
     background: url(../images/icons/settings.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.shipment {
     background: url(../images/icons/truck.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.drugRoute {
     background: url(../images/icons/silk/pill_go.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.drugClass {
     background: url(../images/icons/silk/pill.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.warehouse {
     background: url(../images/icons/silk/building.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.inventory {
     background: url(../images/icons/stockbook.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.eventType {
     background: url(../images/icons/silk/calendar.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.import {
     background: url(../images/icons/silk/table_add.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.menu {
     background: url(../images/icons/document.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.account {
     background: url(../images/icons/document.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.main {
     background: url(../images/icons/document.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.auth {
     background: url(../images/icons/document.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.user {
     background: url(../images/icons/user.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.role {
     background: url(../images/icons/silk/shield.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.admins {
     background: url(../images/icons/users.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.group {
     background: url(../images/icons/users.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.admin {
     background: url(../images/icons/profile.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.transaction {
     background: url(../images/icons/document.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.stockcard {
     background: url(../images/icons/document.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.stockcardentry {
     background: url(../images/icons/document.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.country {
     background: url(../images/icons/map.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.inventorylineitem {
     background: url(../images/icons/package.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.product {
     background: url(../images/icons/product.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.order {
     background: url(../images/icons/order.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
-
 .menuButton a.transactionentry {
     background: url(../images/icons/document.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.documentupload {
     background: url(../images/icons/document.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.building {
     background: url(../images/icons/building.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.shipper {
     background: url(../images/icons/silk/lorry.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.shipperService {
     background: url(../images/icons/silk/map.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
-
 .menuButton a.ups {
     background: url(../images/icons/ups.jpg) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.usps {
     background: url(../images/icons/usps.jpg) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.fedex {
     background: url(../images/icons/fedex.jpg) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.browse {
     background: url(../images/icons/browse.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.dashboard {
     background: url(../images/icons/browse3.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.metadata {
     background: url(../images/icons/wrench.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
-
 .menuButton a.bullet {
     background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
-    color: #333;
-    padding-left: 25px;
 }
 

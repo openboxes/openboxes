@@ -1,12 +1,12 @@
 <script type="text/javascript">
 $(function() { 
-	$('#leftnavMenu').accordion({
-		active: true, 
-		navigation: true, 
-		autoheight: false, 
-		alwaysOpen: true,
-		clearStyle: true 
-	});
+	//$('#leftnavMenu').accordion({
+	//	active: true, 
+	//	navigation: true, 
+	//	autoheight: false, 
+	//	alwaysOpen: true,
+	//	clearStyle: true 
+	//});
 });
 </script>
 
