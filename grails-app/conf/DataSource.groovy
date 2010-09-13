@@ -22,24 +22,24 @@ environments {
 			// disable dbCreate when you create the initial database using '$ grails dev migrate'
 			dbCreate = "update" 	
 			//dbCreate = "create-drop"			
-			url = "jdbc:mysql://localhost:3306/warehouse_dev?autoreconnect=true&amp;zeroDateTimeBehavior=convertToNull"
+			url = "jdbc:mysql://localhost:3306/warehouse_dev?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull"
 		}
 	}
 	test {
 		dataSource {			
-			url = "jdbc:mysql://localhost:3306/warehouse_test?autoreconnect=true&amp;zeroDateTimeBehavior=convertToNull"
+			url = "jdbc:mysql://localhost:3306/warehouse_test?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull"
 		}
 	}
 	production {
 		dataSource {
-			url = "jdbc:mysql://localhost:3306/warehouse_prod?autoreconnect=true&amp;zeroDateTimeBehavior=convertToNull"
+			url = "jdbc:mysql://localhost:3306/warehouse_prod?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull"
 		}
 	}
 	diff {
 		dataSource {
 			// Used with the 'db-diff-incremental' script
 			dbCreate = "create-drop"
-			url = "jdbc:mysql://localhost:3306/warehouse_diff?autoreconnect=true"
+			url = "jdbc:mysql://localhost:3306/warehouse_diff?autoReconnect=true"
 		}
 	}
 	demo {
