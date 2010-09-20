@@ -604,7 +604,7 @@ class BootStrap {
 
 				//def fileOpener = new ClassLoaderFileOpener()
 				def database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(c)
-				log.info("\t\tSeting default schema to " + c.catalog)
+				log.info("\t\tSetting default schema to " + c.catalog)
 				database.setDefaultSchemaName(c.catalog)
 				liquibase = new Liquibase("changelog.xml", fileOpener, database);
 				liquibase.update(null)

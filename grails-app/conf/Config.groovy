@@ -114,6 +114,7 @@ log4j = {
 		'net.sf.ehcache.hibernate'		
 	
 	info	'org.liquibase', 	
+		'com.mchange',
 		'org.springframework',
 		'org.hibernate',
 		'org.pih.warehouse',
