@@ -134,10 +134,10 @@
 						<span style="font-size: 0.8em; color: #aaa;">${container?.containerType?.name} ${container?.name}</span>
 					</td>
 					<td style="text-align: center;">
-						<span style="font-size: 0.8em; color: #aaa;">${container.shipmentItems.size()}</span>
+						<span style="font-size: 0.8em; color: #aaa;">${container?.shipmentItems?.size()}</span>
 					</td>
 					<td style="text-align: center;">
-						<span style="font-size: 0.8em; color: #aaa;">${container.weight} ${container.weightUnits}</span>
+						<span style="font-size: 0.8em; color: #aaa;">${container?.weight} ${container?.weightUnits}</span>
 					</td>
 				</tr>
 			</g:each>
@@ -159,7 +159,7 @@
 <br/>
 <div style="width: 250px" class="menu" >
 	<fieldset>
-		<legend>Summary</legend>
+		<legend>Shipping</legend>
 		<table>
 			<tr>
 				<th>Date</th>
@@ -168,11 +168,11 @@
 			<g:each in="${shipmentInstance.events}" var="event" status="i">				
 				<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 					<td nowrap="nowrap">						
-						<span style="font-size: 0.8em; color: #aaa;"><g:formatDate format="MMM dd" date="${event.eventDate}"/></span>						
+						<span style="font-size: 0.9em; color: #aaa;"><g:formatDate format="MMM dd" date="${event.eventDate}"/></span>						
 					</td>
 					<td>
-						<span style="font-size: 0.8em; color: #aaa;">
-							${event?.eventType?.name} ${event.eventLocation.name}
+						<span style="font-size: 0.9em; color: #aaa;">
+							<b>${event?.eventType?.name}</b> at ${event.eventLocation.name}
 						</span>
 					</td>
 				</tr>

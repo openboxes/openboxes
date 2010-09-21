@@ -8,7 +8,8 @@
 	<content tag="pageTitle">Edit Shipment Contents</content>
 </head>
 <body>
-	<div class="body">
+										
+<div class="body">
 		<g:if test="${flash.message}">
 			<div class="message">
 				${flash.message}
@@ -28,13 +29,13 @@
 							<table>
 								<tr>
 									<td>	
+										<h2>Packages</h2>				
 										<div style="padding: 10px;">																	
-											<span>Packages:</span>				
 											<g:each in="${shipmentInstance?.containers}" var="container" status="i">															
 												<g:if test="${container?.id == containerInstance?.id}">
-													<span style="border: 1px solid black; padding: 5px;">
-														&nbsp;${container.name}
-													</span>													
+													<span style="border: 2px solid black; padding: 5px; background-color: whitesmoke;">
+														<g:render template="containerSummary" />	
+													</span>
 												</g:if>
 												<g:else>
 													<span style="padding: 5px;">
@@ -46,12 +47,13 @@
 									</td>
 								</tr>
 							</table>
-																		
+																	
 							<table>
 								<tr>
 									<td>
 										<g:if test="${containerInstance}">			
-											<div id="container-${containerInstance?.id}" class="details">																									
+												
+											<div id="container-${containerInstance?.id}" class="details">																							
 												<script type="text/javascript">
 													$(function() {
 														$("#tabs").tabs();
@@ -60,146 +62,238 @@
 												<div class="demo">								
 													<div id="tabs">
 														<ul>
+															
 															<li><a href="#tabs-1">Contents</a></li>
 															<li><a href="#tabs-2">Details</a></li>
 															<li><a href="#tabs-3">Clone</a></li>
 														</ul>
 														<div id="tabs-1">
-															<g:render template="containerSummary" />																
-															
+																			
+															<g:render template="containerSummary" />				
+																		
+																	<div style="text-align: right;">						
+																		<a id="add-person-link" href="#">
+																			<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add" style="vertical-align: absmiddle;" /> Add a new person
+																		</a>
+																		<script type="text/javascript">
+																			$(document).ready(function(){
+																												
+																				$('#add-person-dialog').dialog({
+																					autoOpen: false, modal: true, 
+																					buttons: {
+																			           'Add a Person': function() {
+																							var firstName = $("#firstName").val();
+																							var lastName = $("#lastName").val();
+																							var email = $("#email").val();
+
+																			                $.post('/warehouse/json/savePerson', 
+																					                {firstName: firstName, lastName: lastName, email: email}, 
+																					                function(data) {
+																						                alert("wtf");
+																			                    		var item = $("<li>");
+																			                    		var link = $("<a>").attr("href", "/warehouse/person/show/" + data.id).html(data.firstName + " " + data.lastName);
+																			                    		item.append(link);
+																			                    		$('#peopleAdded').append(item);
+																			                		}, 'json');
+																			                $(this).dialog('close');
+																			            },	
+																			            Cancel: function() {
+																			                $(this).dialog('close');
+																			            }																	            																		            
+																		    		}, 
+																		    		close: function() { 
+																		                //window.location.reload(true);
+																						// does nothing 
+																			    	}
+																				});
+																				$("#add-person-link").click(function() {
+																					$('#add-person-dialog').dialog('open');																																		
+																				});																			
+																			});
+																		</script>																										
+																	</div>
+																			
+																															
 															<div>
-															
-																		
-																		
-																	<h2>Add an item</h2>																	
-																	<g:form action="addItemAutoComplete" id="${shipmentInstance.id}">	
-																		<g:hiddenField name="container.id" value="${containerInstance?.id}"></g:hiddenField>
+																<h2>Add an item</h2>																	
+																<g:form action="saveItem" id="${shipmentInstance.id}">	
+																	<g:hiddenField name="container.id" value="${containerInstance?.id}"></g:hiddenField>
+																
+																															
+																	<table>
+																		<thead>
+																			<tr class="prop">
+																				<th></th>
+																				<th>Qty</th>
+																				<th>Item</th>
+																				<th>Lot / Serial No</th>
+																				<th>Recipient</th>
+																				<th></th>
+																			</tr>
+																		</thead>
 																	
-																		<div class="list">																
-																			<table>
+																		<tbody>
+																			<tr class="prop" style="background-color: #FFF6BF;">
+																				<td width="7%" style="vertical-align: middle; text-align: center"> (new) </td>
+																				<td width="10%" style="vertical-align: middle; text-align: center;">													
+																					<g:textField name="quantity" value="" size="2" />
+																				</td>
+																				<td width="20%" style="vertical-align: middle; text-align: left;">											
+																					<g:autoSuggest id="selectedItem" name="selectedItem" jsonUrl="/warehouse/json/findProductByName" width="200"/>	
+																				</td>
+																				<td width="15%" style="vertical-align: middle; text-align: left;">													
+																					<g:textField name="serialNumber" value="" size="10" style="" />
+																				</td>
+																				<td width="20%" style="vertical-align: middle; text-align: left;">
+																					<g:autoSuggest id="recipient" name="recipient" jsonUrl="/warehouse/json/findPersonByName" 
+																						width="150" 
+																						valueId="${shipmentInstance?.recipient?.id}" 
+																						valueName="${shipmentInstance?.recipient?.email}"/>	
+																						
+																				</td>
+																				<td width="10%" style="vertical-align: middle; text-align: right">
+																					<span class="buttons" style="padding: 0px">
+																						<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add"/> Add</button>
+																					</span>
+																				</td>
+																			</tr>	
+																		</tbody>
+																	</table>									
+																
+																</g:form>
+
+																<br/>
+																<br/>
+																<h2>Included items</h2>																																
+																<g:form action="editContainer">
+																	<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}"/>
+																	<g:hiddenField name="containerId" value="${containerInstance?.id}"/>
+																	
+																	
+																		<table border="0">
+																			<g:if test="${containerInstance?.shipmentItems}">
 																				<thead>
+																					<tr>
+																						<td colspan="6"
+																							<div class="fade">
+																								To remove an item, enter '0' in <b>Qty</b> field. After modifying any of the values below, click <b>Save</b>.  
+																							</div>
+																						</td>
+																					</tr>
 																					<tr class="prop">
 																						<th></th>
 																						<th>Qty</th>
 																						<th>Item</th>
 																						<th>Lot / Serial No</th>
-																						<th>Recipient</th>
+																						<th>Recipient </th>
 																						<th></th>
-																					</tr>
+																					</tr>																							
 																				</thead>
-																			
 																				<tbody>
-																					<tr class="prop" style="background-color: #FFF6BF;">
-																						<td width="7%" style="vertical-align: middle; text-align: center"> (new) </td>
-																						<td width="10%" style="vertical-align: middle; text-align: center;">													
-																							<g:textField name="quantity" value="" size="2" />
+																				
+																					<g:each var="item" in="${containerInstance.shipmentItems}" status="k">
+																						<tr class="prop ${(k % 2) == 0 ? 'odd' : 'even'}">
+																							<td width="7%" style="text-align: center;">${k+1}</td>
+																							<td width="10%">
+																								<g:hiddenField name="shipmentItems[${k}].id" value="${item.id}"></g:hiddenField>											    
+																								<g:textField name="shipmentItems[${k}].quantity" value="${item.quantity}" size="2" />
+																							</td>
+																							<td width="20%">
+																								<g:autoSuggest id="shipmentItems${k}-product" name="shipmentItems[${k}].product" jsonUrl="/warehouse/json/findProductByName" 
+																									width="150" 
+																									valueId="${item?.product?.id}" 
+																									valueName="${item?.product?.name}"/>																								
+																								<g:if test="${item?.product?.unverified}">
+																									<span class="fade">(unverified)</span>
+																								</g:if> 
+																							</td>
+																							<td width="15%">
+																								<g:textField name="shipmentItems[${k}].serialNumber" value="${item.serialNumber}" size="10" />																									
+																							</td>
+																							<td width="20%">							
+																								<g:autoSuggest id="shipmentItems${k}-recipient" name="shipmentItems[${k}].recipient" jsonUrl="/warehouse/json/findPersonByName" 
+																									width="150" 
+																									valueId="${item?.recipient?.id}" 
+																									valueName="${item?.recipient?.email}"/>												
+																									
+																								
+																							</td>
+																							<td width="10%" style="vertical-align: bottom; text-align: right">
+																								<span class="buttons" style="padding: 0px">
+																								
+																									<%-- <button type="submit" class="negative"><img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete"/></button>--%>
+																								</span>
+																							</td>
+																						</tr>							
+																					</g:each>	
+																				</tbody>
+																				<tfoot>																																													
+																					<tr >
+																						<td colspan="6">
+																							<div class="buttons" style="padding: 15px; float: right;">
+																								<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Save"/> Save</button>
+																								<%-- <g:link class="negative" controller="shipment" action="deleteContainer" id="${containerInstance.id}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"><img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="Delete"/> Delete</a></g:link> &nbsp;--%>
+																							</div>
 																						</td>
-																						<td width="20%" style="vertical-align: middle; text-align: center;">											
-																							<g:autoSuggest id="selectedItem" name="selectedItem" jsonUrl="/warehouse/shipment/findProductByName" width="200"/>	
-																						</td>
-																						<td width="15%" style="vertical-align: middle; text-align: center;">													
-																							<g:textField name="serialNumber" value="" size="10" style="" />
-																						</td>
-																						<td width="20%" style="vertical-align: middle; text-align: center;">
-																							<g:autoSuggest name="recipient" jsonUrl="/warehouse/shipment/findPersonByName" 
-																								width="150" 
-																								valueId="${shipmentInstance?.recipient?.id}" 
-																								valueName="${shipmentInstance?.recipient?.email}"/>												
-																						</td>
-																						<td width="10%" style="vertical-align: middle; text-align: right">
-																							<span class="buttons" style="padding: 0px">
-																								<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add"/> Add</button>
-																							</span>
+																					</tr>
+																				</tfoot>
+																			</g:if>
+																			<g:else>
+																				<tbody>
+																					<tr>
+																						<td style="text-align: center" colspan="6" >
+																							<div class="fade" style="padding: 20px;">(empty)</div>
 																						</td>
 																					</tr>	
-																				</tbody>
-																			</table>									
-																		</div>																												
-																	</g:form>
-
-																	<br/>
-																	<br/>
-																	<h2>Included items</h2>																																
-																	<g:form action="editContainer">
-																		<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}"/>
-																		<g:hiddenField name="containerId" value="${containerInstance?.id}"/>
-																			<table border="0">
-																				<g:if test="${containerInstance?.shipmentItems}">
-																					<thead>
-																						<tr class="prop">
-																							<th></th>
-																							<th>Qty</th>
-																							<th>Item</th>
-																							<th>Lot / Serial No</th>
-																							<th>Recipient</th>
-																							<th></th>
-																						</tr>																							
-																					</thead>
-																					<tbody>
-																					
-																						<g:each var="item" in="${containerInstance.shipmentItems}" status="k">
-																							<tr class="prop ${(k % 2) == 0 ? 'odd' : 'even'}">
-																								<td width="7%" style="text-align: center;">${k+1}</td>
-																								<td width="10%">
-																									<g:hiddenField name="shipmentItems[${k}].id" value="${item.id}"></g:hiddenField>											    
-																									<g:textField name="shipmentItems[${k}].quantity" value="${item.quantity}" size="2" />
-																								</td>
-																								<td width="20%">
-																									${item?.product?.name} 
-																									<g:if test="${item?.product?.unverified}">
-																										<span class="fade">(unverified)</span>
-																									</g:if> 
-																								</td>
-																								<td width="15%">
-																									<g:textField name="shipmentItems[${k}].serialNumber" value="${item.serialNumber}" size="10" />																									
-																								</td>
-																								<td width="20%">							
-																									
-																									<span class="fade">${item?.recipient?.email}</span>
-																									<%-- 
-																									<g:autoSuggest name="shipmentItems[${k}]\\.recipient" jsonUrl="/warehouse/shipment/findPersonByName" 
-																										width="150" 
-																										valueId="${item?.recipient?.id}" 
-																										valueName="${item?.recipient?.email}"/>												
-																									--%>
-																								</td>
-																								<td width="10%" style="vertical-align: bottom; text-align: right">
-																									<span class="buttons" style="padding: 0px">
-																										<%-- <button type="submit" class="negative"><img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete"/></button>--%>
-																									</span>
-																								</td>
-																							</tr>							
-																						</g:each>																																														
-																						<tr class="prop">
-																							<td colspan="6">
-																								<div class="buttons" style="padding: 15px; float: right;">
-																									<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Save"/> Save</button>
-																									<%-- <g:link class="negative" controller="shipment" action="deleteContainer" id="${containerInstance.id}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"><img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="Delete"/> Delete</a></g:link> &nbsp;--%>
-																								</div>
-																								<div class="fade" style="padding: 15px; float: right;">
-																									<li>To remove an item, enter '0' in <b>Qty</b> field.</li>
-																									<li>After modifying any of the values above, click <b>Save</b>.</li>  
-																									
-																								</div>
-																							</td>
-																						</tr>
-																					</tbody>
-																				</g:if>
-																				<g:else>
-																					<tbody>
-																						<tr>
-																							<td style="text-align: center" colspan="6" >
-																								<div class="fade" style="padding: 20px;">(empty)</div>
-																							</td>
-																						</tr>	
-																					</tbody>												
-																				</g:else>	
-																			</table>	
-																		</g:form>	
-
+																				</tbody>												
+																			</g:else>	
+																		</table>	
+																</g:form>	
+															</div>																		
 															
-
-															</div>
+															<%-- 
+																Add a New Person dialog box															
+															--%>
+															<div id="add-person-dialog" title="Add a new recipient" style="display: none;" >
+																<ul id="people"></ul>
+																
+																<g:form name="addPersonForm" url="${[controller: 'shipment', action:'savePerson']}" >
+																	<g:hiddenField name="id" value="0" />
+																	<table>
+																		<tbody>
+																			<tr class="prop">
+													                            <td valign="top" class="name"><label><g:message code="person.firstName.label" default="First Name" /></label></td>                            
+													                            <td valign="top" class="value ${hasErrors(bean: personInstance, field: 'firstName', 'errors')}">
+																					<g:textField id="firstName" name="firstName" size="15" />
+												                                </td>
+													                        </tr>  	          
+																			<tr class="prop">
+													                            <td valign="top" class="name"><label><g:message code="person.lastName.label" default="Last Name" /></label></td>                            
+													                            <td valign="top" class="value ${hasErrors(bean: personInstance, field: 'lastName', 'errors')}">
+												                                    <g:textField id="lastName" name="lastName" size="15" /> 
+												                                </td>
+													                        </tr>  	        
+																			<tr class="prop">
+													                            <td valign="top" class="name"><label><g:message code="person.email.label" default="Email" /></label></td>                            
+													                            <td valign="top" class="value ${hasErrors(bean: personInstance, field: 'email', 'errors')}">
+												                                    <g:textField id="email" name="email" size="15" /> 
+												                                </td>
+													                        </tr>											                        
+													                        <%--   	        
+													                        <tr>
+													                        	<td></td>
+																				<td valign="top" style="text-align: left">
+																					<div class="buttons">		
+																						<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="save" /> Save</button>
+																						<button type="submit" class="negative"><img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="close" /> Done</button>
+																					</div>
+																				</td>
+																			</tr>
+																			--%>				                          
+																		</tbody>
+																	</table>
+																</g:form>																	
+															</div>								
 														</div><!-- tabs-1 -->	 
 														
 															
@@ -210,61 +304,65 @@
 																<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}"></g:hiddenField>												    
 																<g:hiddenField name="containerId" value="${containerInstance?.id}"></g:hiddenField>										
 																			
-														    	<table>
-																	<tr class="prop">										
-																		<td class="name"><label>${containerInstance?.containerType?.name} #</label></td>
-																		<td class="value">
-																			<g:textField name="name" value="${containerInstance?.name}" size="2" />
-																		</td>
-																	</tr>
-																	<tr class="prop">
-																		<td class="name"><label class="optional">Identifier #</label></td>
-																		<td class="value">
-																			<g:textField name="containerNumber" value="${containerInstance.containerNumber}" size="15"/> &nbsp;		
-																			<span class="fade"></span>																
-																		</td>													
-																	</tr>
-																	<tr class="prop">										
-																		<td class="name"><label class="optional">Weight</label></td>
-																		<td class="value">
-																			<g:textField name="weight" value="${containerInstance?.weight}" size="7"/> 
-																			<g:select name="weightUnits" 
-																				from="${[' ', 'lb', 'kg']}"
-																				value="${containerInstance?.weightUnits}">
-																			</g:select>																	
-																			<span class="fade">e.g. '100 lb' or '120 kg' </span>
-																		</td>
-																	</tr>
-																	<tr class="prop">
-																		<td class="name"><label class="optional">Dimensions</label></td>
-																		<td class="value">
-																			<g:textField name="height" value="${containerInstance?.height}" size="2"/> x
-																			<g:textField name="width" value="${containerInstance?.width}" size="2"/> x
-																			<g:textField name="length" value="${containerInstance?.length}" size="2"/> 																																								
-																			<g:select name="volumeUnits" 
-																				from="${['', 'in', 'ft', 'cm']}"
-																				value="${containerInstance?.volumeUnits}">																							
-																			</g:select>
-																			
-																			 <span class="fade">e.g. '10.1" x 4.2" x 2.8"'</span>
-																		</td>		
-																	</tr>
-																	<tr class="prop">
-																		<td class="name"><label class="optional">Description</label></td>
-																		<td class="value">
-																			<g:textField name="description" value="${containerInstance?.description}" size="40"/> &nbsp;
-																		</td>
-																	</tr>
-																	<tr class="prop">																	
-																		<td class=""></td>
-																		<td class="value" colspan="2">
-																			<div class="buttons">
-																				<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Save" /> Save</button>
-																				<g:link class="negative" controller="shipment" action="deleteContainer" id="${containerInstance.id}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"><img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="Delete"/> Delete</a></g:link> &nbsp;
-																			</div>
-																		</td>
-																	</tr>
-																</table>					
+															    	<table>
+																		<tr class="prop">										
+																			<td class="name"><label>${containerInstance?.containerType?.name} #</label></td>
+																			<td class="value">
+																				<g:textField name="name" value="${containerInstance?.name}" size="2" />
+																			</td>
+																		</tr>
+																		<tr class="prop">
+																			<td class="name"><label class="optional">Contents</label></td>
+																			<td class="value">
+																				<g:textArea name="description" value="${containerInstance?.description}" cols="40" rows="3"/> &nbsp;
+																			</td>
+																		</tr>
+																		<%-- 
+																		<tr class="prop">
+																			<td class="name"><label class="optional">Identifier #</label></td>
+																			<td class="value">
+																				<g:textField name="containerNumber" value="${containerInstance.containerNumber}" size="15"/> &nbsp;		
+																				<span class="fade"></span>																
+																			</td>													
+																		</tr>
+																		--%>
+																		<tr class="prop">										
+																			<td class="name"><label class="optional">Weight</label></td>
+																			<td class="value">
+																				<g:textField name="weight" value="${containerInstance?.weight}" size="7"/> 
+																				<g:select name="weightUnits" 
+																					from="${[' ', 'lb', 'kg']}"
+																					value="${containerInstance?.weightUnits}">
+																				</g:select>																	
+																				<span class="fade">e.g. '100 lb' or '120 kg' </span>
+																			</td>
+																		</tr>
+																		<tr class="prop">
+																			<td class="name"><label class="optional">Dimensions</label></td>
+																			<td class="value">
+																				<g:textField name="height" value="${containerInstance?.height}" size="2"/> x
+																				<g:textField name="width" value="${containerInstance?.width}" size="2"/> x
+																				<g:textField name="length" value="${containerInstance?.length}" size="2"/> 																																								
+																				<g:select name="volumeUnits" 
+																					from="${['', 'in', 'ft', 'cm']}"
+																					value="${containerInstance?.volumeUnits}">																							
+																				</g:select>
+																				
+																				 <span class="fade">e.g. '10.1" x 4.2" x 2.8"'</span>
+																			</td>		
+																		</tr>
+																		<tr class="prop">																	
+																			<td class=""></td>
+																			<td class="value" colspan="2">
+																				<div class="buttons">
+																					<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Save" /> Save</button>
+																					<g:link class="negative" controller="shipment" action="deleteContainer" id="${containerInstance.id}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"><img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="Delete"/> Delete</a></g:link> &nbsp;
+																				</div>
+																			</td>
+																		</tr>
+																
+																	</table>
+																
 															</g:form>		
 														</div><!-- tabs-2 -->
 												

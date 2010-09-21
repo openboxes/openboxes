@@ -1,4 +1,5 @@
 
+<%@page import="javax.swing.event.DocumentEvent.EventType"%>
 <html>
    <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -16,8 +17,8 @@
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>
-            <%-- 
             <div class="dialog">
+            	<%-- 
 				<g:form method="get" action="listOutgoing">
 	            	<fieldset>
 	            		<legend>Filter by</legend>				            
@@ -32,12 +33,25 @@
 							</tr>
 						</table>				
 					</fieldset>
-				</g:form>            
+				</g:form>
+				--%>
+				
             </div>
-            --%>
             <div class="list">
+            
+            	<g:if test="${shipmentInstanceMap.size()==0}">
+            		<div class="notice">
+            			<g:if test="${eventType?.name}">
+            				There are no recent shipments with event type <b>${eventType.name}</b>.
+            			</g:if>
+            			<g:else>
+    		        		There are no recent shipments matching your conditions.
+	            		</g:else>
+            		</div>
+            	</g:if>
+            
 				<g:each var="entry" in="${shipmentInstanceMap}">	        
-					<div style="padding: 10px; font-weight: bold;" ><h1>${entry.key}</h1></div>	                    	
+					<h2><b>${entry.key}</b> Shipments (${entry.value.objectList.size})</h2>	                    	
 					<table>
 	                    <thead>
 	                        <tr>   
@@ -54,7 +68,7 @@
 		                    <g:each var="shipmentList" in="${entry.value}">
 								<g:each var="shipmentInstance" in="${shipmentList.objectList}" status="i">
 									<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
-										<td width="5%" align="center">
+										<td width="3%" style="text-align: center">
 											<img src="${createLinkTo(dir:'images/icons',file: 'ShipmentType' + shipmentInstance?.shipmentType?.name + '.png')}"
 											alt="${shipmentInstance?.shipmentType?.name}" style="vertical-align: middle; width: 24px; height: 24px;" />		
 										</td>										

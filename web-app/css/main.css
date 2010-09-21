@@ -33,7 +33,7 @@ body {
 a:link, a:visited, a:hover {
     color: blue;
     /*font-weight: bold;*/
-    font-size: 0.9em;
+    /*font-size: 0.9em;*/ /* removed because it's distracting */
     /*text-decoration: underline;*/
    	text-decoration: none;	/* removed because we want to see underline */
 }
@@ -400,5 +400,11 @@ th.desc a {
 }
 .menuButton a.bullet {
     background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
+}
+.menuButton a.invalid {
+    background: url(../images/icons/silk/cross.png) center left no-repeat;
+}
+.menuButton a.new {
+    background: url(../images/icons/silk/add.png) center left no-repeat;
 }
 

@@ -55,15 +55,21 @@ body {
 	color: #aaa;	
 }
 
-#loginForm { 
-	width:400px;
-	height:  300px;
-	position: absolute;
-	top: 100px;
-	left: 50%;
-	margin-left: -150px;
+#logo { 
+	padding: 5px;	
 }
 
+#loginForm { 
+	width:400px;
+	position: absolute;
+	top: 125px;
+	left: 50%;
+	margin-left: -200px;
+}
+#loginFormBox { 
+	border: 1px solid lightgrey;	
+}
+	
 #signupForm { 
 	width:400px;
 	height:  300px;

@@ -11,7 +11,7 @@ import org.pih.warehouse.core.EventStatus;
  * status of a Shipment from Supplier to final destination, whereas ShipmentEvent is
  * meant to represent a particular Event which occurs during the course of Shipment.
  */
-class EventType {
+class EventType implements Comparable {
 
 	String name
 	String description
@@ -29,6 +29,11 @@ class EventType {
 		sortOrder(nullable:true)
 		eventStatus(nullable:true)		
 		activityType(nullable:true)
+		
+		dateCreated(display:false)
+		lastUpdated(display:false)
+		status(display:false)
+		optionValue(display:false)		
 	}
 	
 	static mapping = {
@@ -37,15 +42,20 @@ class EventType {
 
 	
 	String getStatus() { 
-		return (eventStatus) ? eventStatus.name : "None";
-
+		return (eventStatus) ? eventStatus.name : "Invalid";
 	}
 	
 	String getOptionValue() { 
-		return name + " [" + this.getStatus() + "]" 
+		return (activityType ? activityType.name + " - " : "") + (description) ? description : name; 
 	}
 	
 	
 	String toString() { return "$name"; }	
 	
+	int compareTo(obj) {
+		if (obj?.sortOrder && sortOrder) {
+			return obj.sortOrder <=> sortOrder 
+		}		
+		return obj.id <=> id;
+	}	
 }

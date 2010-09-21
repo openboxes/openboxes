@@ -50,8 +50,6 @@
 			});  
 		});
 		*/
-
-
 		
 		// Code that uses other library's $ can follow here.
 	</script>
@@ -59,6 +57,7 @@
 	<!-- Manually include jquery-ui resources -->
 	<link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui-1.8.2.custom.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
 	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-ui-1.8.2.custom.min.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>
 
 	<!--  
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.notifyBar',file:'jquery.notifyBar.css')}" type="text/css" media="screen"  />
@@ -95,15 +94,12 @@
 		<div id="spinner" class="spinner" style="display:none;">
 		    <img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 		</div>
-		<!-- 
-			Header "hd" includes includes logo, global navigation 
-		------------------------------------------------------------------->
+		<!-- Header "hd" includes includes logo, global navigation -->
 		<div id="hd" role="banner">
 		    
 		    <!-- Block which includes the logo and login banner -->
 		    <div class="yui-b">
-				<div class="yui-gf">
-				
+				<div class="yui-gf">				
 					<div id="banner">
 					    <div id="bannerLeft" class="yui-u first" >
 							<div class="logo" >

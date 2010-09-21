@@ -1,6 +1,7 @@
 package org.pih.warehouse.shipping;
 
 import java.sql.ResultSet;
+import java.util.List;
 
 import grails.converters.JSON
 import groovy.sql.Sql;
@@ -16,6 +17,8 @@ import org.pih.warehouse.inventory.Warehouse;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.receiving.Receipt;
 import org.pih.warehouse.receiving.ReceiptItem;
+import org.pih.warehouse.core.ListCommand;
+
 
 class ShipmentController {
 	
@@ -347,44 +350,48 @@ class ShipmentController {
 			redirect(action: (params.type == "incoming") ? "listIncoming" : "listOutgoing")
 		}
 		else {
+			
+			if (!containerInstance && shipmentInstance?.containers) { 
+				containerInstance = shipmentInstance.containers.iterator().next();
+				
+			}
 			[shipmentInstance: shipmentInstance, containerInstance: containerInstance]
 		}
 	}
 	
-	
-	
-	HashMap getShipmentsByStatus(List shipments) { 
-		def shipmentListByStatus = new HashMap<String, ListCommand>();
-		shipments.each {
-			
-			Shipment shipment = (Shipment) it;			
-			def status = shipment.getMostRecentStatus();
-			def shipmentList = shipmentListByStatus[status];			
-			// Shipment list does not exist for this status, create a new one
-			if (!shipmentList) {
-				shipmentList = new ListCommand(category: status, objectList: new ArrayList());
-			}			
-			// Populate shipment list and map
-			shipmentList.objectList.add(shipment);
-			shipmentListByStatus.put(status, shipmentList)
-		}
+	def listShipments = { 		
+		[ shipments : shipmentService.getShipments() ]
 		
-		return shipmentListByStatus;
 	}
 	
-	
 	def listIncoming = { 
-		def incomingShipments = null;
-		
+		def incomingShipments = null;		
 		def currentLocation = Location.get(session.warehouse.id);		
 		if (params.searchQuery) { 
-			incomingShipments = shipmentService.getShipmentsByNameAndDestination(params.searchQuery, currentLocation);
-		} else {  
+			incomingShipments = shipmentService.getShipments(params.searchQuery, currentLocation);
+		} 
+		else {  
 			incomingShipments = shipmentService.getShipmentsByDestination(currentLocation);
+		}
+		def eventType = null;
+		// If there's no event type filter, return all outgoing shipments
+		// otherwise, we try to filter down the shipments
+		if (params?.eventType?.id) {
+			eventType = (params.eventType?.id) ? EventType.get(params.eventType.id) : null;
+			log.info "eventType: " + eventType?.name
+			
+			// Match the shipment's most recent event type against the selected event type
+			if (eventType) {
+				incomingShipments = incomingShipments.findAll() { s -> s?.mostRecentEvent?.eventType == eventType }
+			}
+			// Yes, there could actually be shipments with no most recent event
+			else
+				incomingShipments = incomingShipments.findAll() { s -> s?.mostRecentEvent?.eventType == null }
 		}
 		
 		[
-			shipmentInstanceMap : getShipmentsByStatus(incomingShipments),
+			eventType : eventType,
+			shipmentInstanceMap : shipmentService.getShipmentsByStatus(incomingShipments),
 			shipmentInstanceList : incomingShipments,
 			shipmentInstanceTotal : incomingShipments.size(),
 		];
@@ -393,9 +400,27 @@ class ShipmentController {
 	
 	def listOutgoing = { 
 		def currentLocation = Location.get(session.warehouse.id);		
-		def outgoingShipments = shipmentService.getShipmentsByOrigin(currentLocation);		
+		def outgoingShipments = shipmentService.getShipmentsByOrigin(currentLocation);	
+		
+		// If there's no event type filter, return all outgoing shipments
+		// otherwise, we try to filter down the shipments
+		def eventType = null;
+		if (params?.eventType?.id) { 
+			eventType = (params.eventType?.id) ? EventType.get(params.eventType.id) : null;		
+			log.info "eventType: " + eventType?.name
+			
+			// Match the shipment's most recent event type against the selected event type
+			if (eventType) {  
+				outgoingShipments = outgoingShipments.findAll() { s -> s?.mostRecentEvent?.eventType == eventType } 
+			}
+			// Yes, there could actually be shipments with no most recent event	
+			else 
+				outgoingShipments = outgoingShipments.findAll() { s -> s?.mostRecentEvent?.eventType == null }			
+		} 
+					
 		[
-			shipmentInstanceMap : getShipmentsByStatus(outgoingShipments),
+			eventType : eventType,			
+			shipmentInstanceMap : shipmentService.getShipmentsByStatus(outgoingShipments),
 			shipmentInstanceList : outgoingShipments,
 			shipmentInstanceTotal : outgoingShipments.size(),
 		];
@@ -441,196 +466,7 @@ class ShipmentController {
 		]
 	}
 	
-	
-	def addShipmentAjax = {
-		try {
-			//def newPost = postService.createPost(session.user.userId, params.content);
-			//def recentShipments = Shipment.findAllBy(session.user, [sort: 'id', order: 'desc', max: 20])
-			//render(template:"list", collection: recentShipments, var: 'shipment')
-			render { div(class:"errors", "success message")
-			}
-		} catch (Exception e) {
-			render { div(class:"errors", e.message)
-			}
-		}
-	}
-	
-	
-	def availableContacts = { 
-		def contacts = null;
-		if (params.query) {
-			contacts = Contact.withCriteria { 
-				or { 
-					ilike("name", "%${params.query}%")
-					ilike("email", "%${params.query}%")
-					ilike("phone", "%${params.query}%")
-					ilike("firstName", "%${params.query}%")
-					ilike("lastName", "%${params.query}%")
-				}
-			}
-			
-			contacts = contacts.collect() {
-				[id : it.id, name : it.name]
-			}
-		}
-		def jsonItems = [result: contacts]
-		render jsonItems as JSON;
-	}
-	
-	
-	def availableShipments = { 
-		log.debug params;
-		def items = null;
-		if (params.query) {
-			items = Shipment.findAllByNameLike("%${params.query}%", [max:10, offset:0, "ignore-case":true]);
-			items = items.collect() {
-				[id:it.id, name:it.name]
-			}
-		}
-		def jsonItems = [result: items]
-		render jsonItems as JSON;
-	}
-	
-	def findPersonByName = {
-		log.info "findPersonByName: " + params
-		def items = new TreeSet();
-		try {
-			
-			if (params.term) {
-								
-				items = Person.withCriteria {
-					or {
-						ilike("firstName", "%" +  params.term + "%")
-						ilike("lastName", "%" +  params.term + "%")
-						ilike("email", "%" + params.term + "%")
-					}
-				}
-			
-				if (items) {
-					items = items.collect() {
-						[	value: it.id,
-							valueText: it.firstName + " " + it.lastName,
-							label: "<img src=\"/warehouse/user/viewPhoto/" + it.id + "\" width=\"24\" height=\"24\" style=\"vertical-align: bottom;\"\"/>&nbsp;" + it.firstName + " " + it.lastName + "&nbsp;&lt;" +  it.email + "&gt;",
-							desc: (it?.email)?it.email:"no email",
-						]
-					}
-				}
-				else {
-					def item =  [
-						value: null,
-						valueText : params.term,
-						label: "Add new person '" + params.term + "'?",
-						desc: params.term,
-						icon: "none"
-					];
-					items.add(item)
-				}
-				
-				
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		
-		}
-		render items as JSON;
-	}
-	
-	
-	
-	def findProductByName = {
-		log.info params
-		def items = new TreeSet();
-		if (params.term) {
-			items = Product.withCriteria {
-				or {
-					ilike("name", "%" +  params.term + "%")
-					ilike("upc", "%" +  params.term + "%")
-				}
-			}
-			if (items) {
-				items = items.collect() {
-					[	value: it.id,
-						valueText: it.name,
-						label: it.name,
-						desc: it.description,
-						icon: "none"]
-				}
-			}
-			else {
-				def item =  [
-					value: null,
-					valueText : params.term,
-					label: "Add a new product '" + params.term + "'?",
-					desc: params.term,
-					icon: "none"
-				];
-				items.add(item)
-			}
-		}
-		render items as JSON;
-	}
-	
-
-	def findWarehouseByName = {
-		log.info params
-		def items = new TreeSet();
-		if (params.term) {
-			items = Warehouse.withCriteria {
-				or {
-					ilike("name", "%" +  params.term + "%")
-				}
-			}
-			if (items) {
-				items = items.collect() {
-					[	value: it.id,
-						valueText: it.name,
-						label: "<img src=\"/warehouse/warehouse/viewLogo/" + it.id + "\" width=\"24\" height=\"24\" style=\"vertical-align: bottom;\"\"/>&nbsp;" + it.name,
-						desc: it.name,
-						icon: "<img src=\"/warehouse/warehouse/viewLogo/" + it.id + "\" width=\"24\" height=\"24\" style=\"vertical-align: bottom;\"\"/>"]
-				}
-			}
-			/*
-			else {
-				def item =  [
-					value: 0,
-					valueText : params.term,
-					label: "Add a new warehouse for '" + params.term + "'?",
-					desc: params.term,
-					icon: "none"
-				];
-				items.add(item)
-			}*/
-		}
-		render items as JSON;
-	}
-
-	
-	
-		
-	def availableItems = {     		
-		log.debug params;
-		def items = null;
-		if (params.query) { 
-			
-			//String [] parts = params.query.split(" ");
-			
-			//items = Product.findAllByNameLike("%${params.query}%", [max:10, offset:0, "ignore-case":true]);
-			items = Product.withCriteria { 
-				or { 
-					ilike("name", "%${params.query}%")
-					ilike("description", "%${params.query}%")
-				}
-			}
-			
-			items = items.collect() {
-				[id:it.id, name:it.name]
-			}
-		}
-		def jsonItems = [result: items]    	
-		render jsonItems as JSON;
-	}
-	
-	def addItemAutoComplete = {     		
+	def saveItem = {     		
 		log.info params;    	
 		def shipment = Shipment.get(params.id);		
 		def container = Container.get(params.container.id);
@@ -656,17 +492,26 @@ class ShipmentController {
 			
 		// Add item to container if product doesn't already exist
 		if (container) { 
+			def oldQuantity = 0;
+			def newQuantity = 0;
 			boolean found = false;
 			container.shipmentItems.each { 
-				if (it.product == product) { 					
+				if (it.product == product) { 
+					oldQuantity = it.quantity;					
 					it.quantity += quantity;
+					newQuantity = it.quantity;
 					it.save();
 					found = true;
+					
 				}
 			}			
 			if (!found) { 			
 				shipmentItem = new ShipmentItem(product: product, quantity: quantity, serialNumber: params.serialNumber, recipient: recipient);
 				container.addToShipmentItems(shipmentItem).save(flush:true);
+			}
+			else { 
+				flash.message = "Modified quantity of existing shipment item ${product.name} from ${oldQuantity} to ${newQuantity}"
+				
 			}
 		}
 		
@@ -716,6 +561,14 @@ class ShipmentController {
 					item.delete();
 					//containerInstance.removeFromShipmentItems(item);
 					iter.remove();					
+				}
+			}
+			
+			// If the user removed the recipient, we need to make sure that the whole object is removed (not just the ID)
+			for (def shipmentItem : containerInstance?.shipmentItems) { 
+				if (!shipmentItem?.recipient?.id) { 
+					log.info("item recipient: " + shipmentItem.recipient.id)
+					shipmentItem.recipient = null;
 				}
 			}
 			
@@ -777,14 +630,7 @@ class ShipmentController {
 	}    
 	
 	
-
-	
-	
-
-
-	
-	
-	
+	/*
 	def addItem = {     		
 		log.debug params;
 		def container = Container.get(params.containerId);
@@ -803,9 +649,8 @@ class ShipmentController {
 		container.addToShipmentItems(shipmentItem).save(flush:true);
 		flash.message = "Added $params.quantity units of $product.name";		
 		redirect(action: 'show', id: params.shipmentId)    	
-		
 	}
-	
+	*/	
 	
 	def addDocument = { 
 		log.info params
@@ -827,26 +672,48 @@ class ShipmentController {
 		//redirect(action: 'addComment', id: params.shipmentId)
 	}
 
+	/**
+	 * This action is used to render the form page used to add a 
+	 * new package/container to a shipment.
+	 */
 	def addPackage = {		
 		def shipmentInstance = Shipment.get(params.id);
-		def container = new Container(
-			containerType : ContainerType.findByName(params.containerType));
+		//def containerType = ContainerType.findByName(params?.containerType?.name); 
+		
+		def containerName = (shipmentInstance?.containers) ? String.valueOf(shipmentInstance?.containers?.size() + 1) : "1";
+		def containerInstance = new Container(name : containerName);
 			
-		render(view: "addPackage", model: [shipmentInstance : shipmentInstance, container : container]);
+		render(view: "addPackage", model: [shipmentInstance : shipmentInstance, containerInstance : containerInstance]);
 
 	}
 	
+	
+	/**
+	 * This closure is used to process the 'add package' form.
+	 */
 	def savePackage = {
-		def shipmentInstance = Shipment.get(params.shipmentId);
-		def container = new Container(params);
-		if (shipmentInstance) {
-			flash.message = "Added a new ${params.containerType} to the shipment";
-			//container.containerType = ContainerType.get(params.containerType.id);
-			//container.name = (shipmentInstance?.containers) ? String.valueOf(shipmentInstance.containers.size() + 1) : "1";
-			shipmentInstance.addToContainers(container).save(flush:true);
-		}
-		redirect(action: 'showDetails', id: params.shipmentId);
 		
+		log.info "params " + params;
+		
+		def shipmentInstance = Shipment.get(params.shipmentId);
+		def containerInstance = new Container(params);
+		if (containerInstance && shipmentInstance) {	
+			shipmentInstance.addToContainers(containerInstance);
+			if (!shipmentInstance.hasErrors() && shipmentInstance.save(flush: true)) {
+				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'container.label', default: 'Container'), containerInstance.id])}"
+				//container.containerType = ContainerType.get(params.containerType.id);
+				//container.name = (shipmentInstance?.containers) ? String.valueOf(shipmentInstance.containers.size() + 1) : "1";			
+				redirect(action: "editContents", id: shipmentInstance.id, params: ["container.id" : containerInstance.id])
+			}
+			else {
+				//flash.message = "Could not save container"				
+				render(view: "addPackage", model: [shipmentInstance:shipmentInstance, containerInstance:containerInstance])
+			}
+			
+			
+		} else { 		
+			redirect(action: 'showDetails', id: params.shipmentId);
+		}		
 	}
 	
 		
@@ -858,9 +725,9 @@ class ShipmentController {
 			shipmentInstance.addToComments(comment).save(flush:true);
 			flash.message = "Added comment '${params.comment}'to shipment ${shipmentInstance.name}";			
 		}
-		redirect(action: 'showDetails', id: params.shipmentId);
-		
+		redirect(action: 'showDetails', id: params.shipmentId);		
 	}
+	
 	
 
 	
@@ -1033,20 +900,5 @@ class ShipmentController {
 }
 
 
-class ListCommand { 	
-	String category;
-	String color;
-	List objectList;
-	Integer sortOrder;
-	
-	static constraints = {
-	}
-	
-	
-	public int compareTo(def other) {
-		return id <=> other?.id
-		
-		//return sortOrder <=> other?.sortOrder // <=> is the compareTo operator in groovy
-	}
-}
+
 

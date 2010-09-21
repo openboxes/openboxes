@@ -11,8 +11,12 @@ class JqueryTagLib {
 		def valueId = (attrs.valueId)?attrs.valueId:"";
 		def valueName = (attrs.valueName)?attrs.valueName:"";
 		def width = (attrs.width) ? attrs.width : 200;
-		def minLength = (attrs.minLength) ? attrs.minLength : 2;
-		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "findPersonByName";
+		def minLength = (attrs.minLength) ? attrs.minLength : 0;
+		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "/warehouse/json/findPersonByName";
+
+		def showValue = (valueName && valueId) ? true : false;
+		def spanDisplay = (showValue) ? "inline" : "none";
+		def suggestDisplay = (showValue) ? "none" : "inline";
 		
 		def html = """
 			<div>
@@ -20,15 +24,43 @@ class JqueryTagLib {
 					#${id}-suggest {
 						background-image: url('/warehouse/images/icons/silk/magnifier.png');
 						background-repeat: no-repeat;
-						background-position: center right;
-						padding-right: 20px;						
+						background-position: center left;
+						padding-left: 20px;						
 					}				
 				</style>
-			
+				
 				<input id="${id}-id" type="hidden" name="${name}.id" value="${valueId}"/>
-				<input id="${id}-suggest" type="text" name="${name}.name" value="${valueName}" style="width: ${width}px;"> 	
+				<input id="${id}-suggest" type="text" name="${name}.name" value="${valueName}" style="width: ${width}px; display: ${suggestDisplay};"> 	
+				<span id="${id}-span" style="text-align: left; display: ${spanDisplay};">${valueName}</span>
 				<script>
+				
+				
 					\$(document).ready(function() {
+						// Captures 'Enter' key presses
+						//\$(window).keydown(function(event){
+						//	if(event.keyCode == 13) {
+						//		event.preventDefault();
+						//		return false;
+						//	}
+						//});
+						
+						\$("#${id}-suggest").click(function() {
+						    \$("#${id}-suggest").trigger("focus"); 
+                        });
+                        
+						\$("#${id}-suggest").blur(function() { 							
+							var text = \$('#${id}-suggest').val();
+							\$('#${id}-suggest').hide();					
+							\$('#${id}-span').html(text?text:'<b>empty</b> &nbsp; click to change');
+							\$('#${id}-span').show();						
+						});                        
+						\$("#${id}-span").click(function() {
+							\$('#${id}-span').hide();							
+							\$('#${id}-suggest').show();
+							\$('#${id}-suggest').val('');
+							\$('#${id}-span').html('');
+							\$('#${id}-id').val('');
+						});
 				      	\$("#${id}-suggest").autocomplete({
 				            width: ${width},
 				            minLength: ${minLength},
@@ -48,18 +80,21 @@ class JqueryTagLib {
 									add(items);
 								});
 					      	},
-					        focus: function(event, ui) {			        
-					      		//\$('#${id}-suggest').val(ui.item.valueText);					
-					      		return false;
+					        focus: function(event, ui) {			
+					      		\$('#${id}-suggest').val(ui.item.valueText);					
+					      	//	return false;
 					        },	
-							select: function(event, ui) {	
+							select: function(event, ui) {
 								\$('#${id}-id').val(ui.item.value);
 								\$('#${id}-suggest').val(ui.item.valueText);
+								\$('#${id}-span').html(ui.item.valueText);
+								\$('#${id}-suggest').hide();
+								\$('#${id}-span').show();
 								return false;
-	
 							}
 						});
 					});
+					
 				</script>
 			</div>		
 		""";

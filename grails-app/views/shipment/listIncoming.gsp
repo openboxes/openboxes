@@ -37,15 +37,21 @@
 			</div>
 --%>			
             <div class="list">
+            
+
+				<g:if test="${shipmentInstanceMap.size()==0}">
+            		<div class="notice">
+            			<g:if test="${eventType?.name}">
+            				There are no recent shipments with event type <b>${eventType.name}</b>.
+            			</g:if>
+            			<g:else>
+    		        		There are no recent shipments matching your conditions.
+	            		</g:else>
+            		</div>
+            	</g:if>
+            
 				<g:each var="entry" in="${shipmentInstanceMap}">	                    
-					<div style="padding: 10px; font-weight: bold;" >
-						<%-- <g:if test="${entry.key=='Unknown'}"><img src="${createLinkTo(dir:'images/icons/silk',file: 'flag_red.png')}" /></g:if>
-						<g:elseif test="${entry.key=='Delivered'}"><img src="${createLinkTo(dir:'images/icons/silk',file: 'tick.png')}" /></g:elseif>
-						<g:else><img src="${createLinkTo(dir:'images/icons/silk',file: 'clock.png')}" /></g:else>
-						 &nbsp
-						 --%>
-						<h1 style="display: inline;">${entry.key}</h1>
-					</div>	                    	
+					<h2><b>${entry.key}</b> Shipments (${entry.value.objectList.size})</h2>	      
 					<table>
 	                    <thead>
 	                        <tr>   
@@ -63,7 +69,7 @@
 								<g:each var="shipmentInstance" in="${shipmentList.objectList}" status="i">
 									<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
 
-										<td width="5%" style="text-align: center">
+										<td width="3%" style="text-align: center">
 											<img src="${createLinkTo(dir:'images/icons',file: 'ShipmentType' + shipmentInstance?.shipmentType?.name + '.png')}"
 											alt="${shipmentInstance?.shipmentType?.name}" style="vertical-align: middle; width: 24px; height: 24px;" />		
 										</td>										

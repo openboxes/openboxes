@@ -97,7 +97,7 @@
 							                            </td>                            
 							                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">
 							                            	<%-- <g:select name="destination.id" from="${warehouses}" optionKey="id" value="${shipmentInstance?.destination?.id}" noSelection="['0':'']" />--%>
-							                            	<g:autoSuggest name="destination" jsonUrl="/warehouse/shipment/findWarehouseByName" width="300" />
+							                            	<g:autoSuggest id="destination" name="destination" jsonUrl="/warehouse/json/findWarehouseByName" width="300" />
 							                            	<g:hiddenField name="origin.id" value="${session.warehouse.id}" />
 							                            	
 							                            </td>                            

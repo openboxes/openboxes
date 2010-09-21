@@ -66,7 +66,7 @@
 										</td>
 										<td valign="top" style="width: 30%;">											
 											<%-- <g:autoSuggest id="origin" name="origin" 
-												jsonUrl="/warehouse/shipment/findWarehouseByName" 
+												jsonUrl="/warehouse/json/findWarehouseByName" 
 												valueId="${shipmentInstance?.origin?.id}" 
 												valueName="${shipmentInstance?.origin?.name}"/>												
 												--%>
@@ -79,7 +79,7 @@
 											code="shipment.shipper.label" default="Destination" /></label></td>
 										<td valign="top" style="width: 30%;">											
 											<g:autoSuggest id="destination" name="safeDestination" 
-												jsonUrl="/warehouse/shipment/findWarehouseByName" 
+												jsonUrl="/warehouse/json/findWarehouseByName" 
 												valueId="${shipmentInstance?.destination?.id}" 
 												valueName="${shipmentInstance?.destination?.name}"/>												
 										</td>
@@ -116,12 +116,12 @@
 											code="shipment.carrier.label" default="Carrier" /></label></td>
 										<td valign="top" style="width: 30%;">											
 											<g:if test="${shipmentInstance?.carrier}">
-												<g:autoSuggest id="carrier" name="safeCarrier" jsonUrl="/warehouse/shipment/findPersonByName" 
+												<g:autoSuggest id="carrier" name="safeCarrier" jsonUrl="/warehouse/json/findPersonByName" 
 													valueId="${shipmentInstance?.carrier?.id}" 
 													valueName="${shipmentInstance?.carrier?.firstName} ${shipmentInstance?.carrier?.lastName}"/>												
 											</g:if>
 											<g:else>
-												<g:autoSuggest id="carrier" name="safeCarrier" jsonUrl="/warehouse/shipment/findPersonByName" width="200" />	
+												<g:autoSuggest id="carrier" name="safeCarrier" jsonUrl="/warehouse/json/findPersonByName" width="200" />	
 											</g:else>												
 										</td>
 									</tr>
@@ -133,12 +133,12 @@
 										</td>
 										<td class="value" style="width: 30%;">		
 											<g:if test="${shipmentInstance?.recipient}">
-												<g:autoSuggest id="recipient" name="recipient" jsonUrl="/warehouse/shipment/findPersonByName" 
+												<g:autoSuggest id="recipient" name="recipient" jsonUrl="/warehouse/json/findPersonByName" 
 													valueId="${shipmentInstance?.recipient?.id}" 
 													valueName="${shipmentInstance?.recipient?.firstName} ${shipmentInstance?.recipient?.lastName}"/>												
 											</g:if>
 											<g:else>
-												<g:autoSuggest name="recipient" jsonUrl="/warehouse/shipment/findPersonByName" width="200" />	
+												<g:autoSuggest id="recipient" name="recipient" jsonUrl="/warehouse/json/findPersonByName" width="200" />	
 											</g:else>	
 										</td>
 									</tr>

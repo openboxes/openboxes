@@ -26,15 +26,25 @@
 
 									<tr class="prop">
 										<td valign="top" class="name"><label><g:message
-											code="shipment.currentStatus.label" default="Status" /></label></td>
+											code="shipment.currentStatus.label" default="Status" /></label>
+										</td>
 										<td valign="top" class="">
-											${fieldValue(bean: shipmentInstance, field: "mostRecentEvent.eventType.name")}<br/>
+											<g:if test="${shipmentInstance?.mostRecentEvent}">
+												${fieldValue(bean: shipmentInstance, field: "mostRecentEvent.eventType.name")}<br/>
+											</g:if>
+											<g:else>
+												<span class="fade">(empty)</span>
+											</g:else>
+											
+											
 										</td>
 										<td>
-											<span class="fade">
-												${fieldValue(bean: shipmentInstance, field: "mostRecentEvent.eventLocation.name")}
-												on <g:formatDate format="dd MMM yyyy" date="${shipmentInstance?.mostRecentEvent?.eventDate}"/>
-											</span>
+											<g:if test="${shipmentInstance?.mostRecentEvent}">
+												<span class="fade">
+													${fieldValue(bean: shipmentInstance, field: "mostRecentEvent.eventLocation.name")}
+													on <g:formatDate format="dd MMM yyyy" date="${shipmentInstance?.mostRecentEvent?.eventDate}"/>
+												</span>
+											</g:if>
 										</td>
 									</tr>
 									<tr class="prop">

@@ -41,7 +41,7 @@
 												<label><g:message code="receipt.recipient.label" default="Recipient" /></label>
 											</td>
 											<td class="value" style="width: 30%;">
-												<g:autoSuggest name="recipient" jsonUrl="/warehouse/shipment/findPersonByName"
+												<g:autoSuggest id="recipient" name="recipient" jsonUrl="/warehouse/json/findPersonByName"
 													width="150"
 													valueId="${receiptInstance?.recipient?.id}"
 													valueName="${receiptInstance?.recipient?.email}"/>	

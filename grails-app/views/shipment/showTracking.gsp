@@ -620,7 +620,7 @@
 																							<label><g:message code="shipment.contents.quickAdd.label" default="Quick Add" /></label></td>   
 																							<div style="width:50%">
 																								<g:form action="addItemAutoComplete" id="${shipmentInstance.id}">	
-																									<gui:autoComplete size="20" width="100" id="selectedItem" name="selectedItem" controller="shipment" action="availableItems"/>											
+																									<gui:autoComplete size="20" width="100" id="selectedItem" name="selectedItem" controller="json" action="availableItems"/>											
 																									<g:submitButton name="addItem" value="Add to shipment"/>
 																								</g:form>			
 																							</div>						

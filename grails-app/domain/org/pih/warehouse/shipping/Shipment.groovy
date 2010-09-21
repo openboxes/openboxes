@@ -3,6 +3,7 @@ package org.pih.warehouse.shipping
 import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Document;
 import org.pih.warehouse.core.Event;
+import org.pih.warehouse.core.EventType;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.shipping.ReferenceNumber;
@@ -13,27 +14,28 @@ class Shipment {
 		
 	String name 					// user-defined name of the shipment 
 	String shipmentNumber			// an auto-generated shipment number
+	Date expectedShippingDate		// the date the origin expects to ship the goods
+	Date expectedDeliveryDate		// the date the destination should expect to receive the goods
+	Float totalValue				// the total value of all items in the shipment		
 
+	// Audit fields
+	Date dateCreated
+	Date lastUpdated
+	String createdBy
+	String lastModifiedBy
+
+	
+	// One-to-one associations
 	Location origin					// the location from which the shipment will depart
 	Location destination			// the location to which the shipment will arrive
-
-	Date expectedDeliveryDate
-	Date expectedShippingDate
-
 	ShipmentType shipmentType		// the shipment type: Air, Sea Freight, Suitcase
 	ShipmentMethod shipmentMethod	// the shipping carrier and shipping service used	
-
 	Person carrier 					// the person or organization that actually carries the goods from A to B
-	Person recipient				// the person or organization that is receiving the goods
-	
+	Person recipient				// the person or organization that is receiving the goods	
 	Donor donor						// the information about the donor (OPTIONAL)
-	Float totalValue				// the total value of all items in the shipment
-		
-	// Audit fields 
-	Date dateCreated;
-	Date lastUpdated;
+	//Event mostRecentEvent			// a reference to the most recent event (needed for querying)
 	
-	// Associations
+	// One-to-many associations
 	SortedSet events;
 	List documents;
 	List comments;
@@ -97,6 +99,8 @@ class Shipment {
 		
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)
+		createdBy(nullable:true)
+		lastModifiedBy(nullable:true)
 
 		comments(nullable:true)
 		containers(nullable:true)
@@ -141,22 +145,14 @@ class Shipment {
 		return null;
 	}
 	
-	String getMostRecentStatus() { 
+	EventType getMostRecentStatus() { 
 		if(mostRecentEvent) { 
 			if (mostRecentEvent.getEventType()) { 
-				return mostRecentEvent.getEventType().getName();
+				return mostRecentEvent.getEventType();
 			}			
 		}
-		return "Not Shipped";
+		return new EventType(sortOrder: 0, name: "Invalid", description: "Shipment has no current status and should be fixed");
 	}
-	
-		
-	/*
-	int compareTo(obj) {
-		dateCreated.compareTo(obj.dateCreated)
-	}*/
- 
-
 		
 }
 

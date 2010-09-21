@@ -6,41 +6,50 @@
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 </head>
 <body>
+	<style>
+		#hd { display: none; }  
+		
+	</style>
+
 	<div class="body">
 		<g:form controller="auth" action="doLogin" method="post">		  
 		    <div class="dialog">
+
 				<div id="loginForm">
-					<g:if test="${flash.message}">
-					    <div class="message">${flash.message}</div>
-					</g:if>		
-		
 					<g:hasErrors bean="${userInstance}">
 					   <div class="errors">
 					       <g:renderErrors bean="${userInstance}" as="list" />
 					   </div>
 					</g:hasErrors>		
-		
-		
-					<fieldset> 			
-						<legend>Login</legend>		
 					
-						
+					<g:if test="${flash.message}">
+					    <div class="message">${flash.message}</div>
+					</g:if>				
+					
+					
+					<div id="loginFormBox">
+						<div id="logo">
+							<a class="home" href="${createLink(uri: '/dashboard/index')}" style="text-decoration: none">						    	
+					    		<img src="${createLinkTo(dir:'images/icons/',file:'logo.gif')}" alt="Your Boxes. You're Welcome." 
+					    			style="vertical-align: absmiddle"/>
+					    			<span style="font-size: 2em; vertical-align: top;">openboxes</span>
+						    </a>					
+						</div>					
 						<script>	
 							jQuery(document).ready(function() {
 								// focus on the first text input field in the first field on the page
 								jQuery("select:first", document.forms[0]).focus();
 							});	
 						</script>		
-					
 
 						<table>
 							<tbody>
-
+	
 								<tr class="prop">
 									<td valign="top" class="name">
 										<label for="email"><g:message code="user.email.label" default="Email" /></label>
 									</td>
-									<td valign="top" class="value ${hasErrors(bean: userInstance, field: 'email', 'errors')}">
+									<td valign="top" class="value ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
 										<g:textField name="email" value="${userInstance?.email}"  />
 									</td>
 								</tr>
@@ -52,23 +61,21 @@
 										<g:passwordField name="password" value="${userInstance?.password}" />
 									</td>
 								</tr>
-								<tr >
-									<td valign="top">
-
+								<tr class="prop">
+									<td valign="top" class="">
 									</td>
 									<td valign="top">
 										<div style="text-align: right;">
-											<div class="buttons" >
+											<span class="buttons" >
 												<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt=""/> Login</button>					   
-											</div>
+											</span>
 										</div>  					
 									</td>
 								</tr>
 							</tbody>
 						</table>
-
 						
-					</fieldset> 
+					</div>						
 				</div>
 			</div>
 		</g:form>

@@ -223,9 +223,240 @@
 			UPDATE location SET managed_locally = 1;		
 		</sql>		
     </changeSet>
-    
-    
 
+    <changeSet author="jmiranda (generated)" id="1284743822481-1">
+		<preConditions onFail="MARK_RAN"><not><indexExists indexName="FK408272383B5F6286"/></not></preConditions>    
+        <createIndex indexName="FK408272383B5F6286" tableName="receipt" unique="false">
+            <column name="shipment_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284743822481-2">
+		<preConditions onFail="MARK_RAN"><not><indexExists indexName="FK4082723844979D51"/></not></preConditions>    
+        <createIndex indexName="FK4082723844979D51" tableName="receipt" unique="false">
+            <column name="recipient_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284743822481-3">
+		<preConditions onFail="MARK_RAN"><not><indexExists indexName="FKAE3064BA44979D51"/></not></preConditions>    
+        <createIndex indexName="FKAE3064BA44979D51" tableName="receipt_item" unique="false">
+            <column name="recipient_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284743822481-4">
+		<preConditions onFail="MARK_RAN"><not><indexExists indexName="FKAE3064BADED5FAE7"/></not></preConditions>    
+        <createIndex indexName="FKAE3064BADED5FAE7" tableName="receipt_item" unique="false">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284743822481-5">
+		<preConditions onFail="MARK_RAN"><not><indexExists indexName="FKAE3064BAF7076438"/></not></preConditions>    
+        <createIndex indexName="FKAE3064BAF7076438" tableName="receipt_item" unique="false">
+            <column name="receipt_id"/>
+        </createIndex>
+    </changeSet>
+	<changeSet author="jmiranda" id="1284743822481-6">
+		<sql>
+			ALTER TABLE address ENGINE = InnoDB;
+			ALTER TABLE address ENGINE = InnoDB;
+			ALTER TABLE attribute ENGINE = InnoDB;
+			ALTER TABLE attribute_value ENGINE = InnoDB;
+			ALTER TABLE category ENGINE = InnoDB;
+			ALTER TABLE comment ENGINE = InnoDB;
+			ALTER TABLE container ENGINE = InnoDB;
+			ALTER TABLE container_type ENGINE = InnoDB;
+			ALTER TABLE document ENGINE = InnoDB;
+			ALTER TABLE document_type ENGINE = InnoDB;
+			ALTER TABLE donor ENGINE = InnoDB;
+			ALTER TABLE dosage_form ENGINE = InnoDB;
+			ALTER TABLE drug_class ENGINE = InnoDB;
+			ALTER TABLE drug_product ENGINE = InnoDB;
+			ALTER TABLE drug_route_type ENGINE = InnoDB;
+			ALTER TABLE durable_product ENGINE = InnoDB;
+			ALTER TABLE event ENGINE = InnoDB;
+			ALTER TABLE event_type ENGINE = InnoDB;
+			ALTER TABLE generic_type ENGINE = InnoDB;
+			ALTER TABLE inventory ENGINE = InnoDB;
+			ALTER TABLE inventory_item ENGINE = InnoDB;
+			ALTER TABLE inventory_lot ENGINE = InnoDB;
+			ALTER TABLE location ENGINE = InnoDB;
+			ALTER TABLE package_type ENGINE = InnoDB;
+			ALTER TABLE person ENGINE = InnoDB;
+			ALTER TABLE product ENGINE = InnoDB;
+			ALTER TABLE product_attribute ENGINE = InnoDB;
+			ALTER TABLE product_attribute_value ENGINE = InnoDB;
+			ALTER TABLE product_category ENGINE = InnoDB;
+			ALTER TABLE product_name ENGINE = InnoDB;
+			ALTER TABLE product_tags ENGINE = InnoDB;
+			ALTER TABLE product_type ENGINE = InnoDB;
+			ALTER TABLE receipt ENGINE = InnoDB;
+			ALTER TABLE receipt_item ENGINE = InnoDB;
+			ALTER TABLE reference_number ENGINE = InnoDB;
+			ALTER TABLE reference_number_type ENGINE = InnoDB;
+			ALTER TABLE role ENGINE = InnoDB;
+			ALTER TABLE shipment ENGINE = InnoDB;
+			ALTER TABLE shipment_comment ENGINE = InnoDB;
+			ALTER TABLE shipment_document ENGINE = InnoDB;
+			ALTER TABLE shipment_event ENGINE = InnoDB;
+			ALTER TABLE shipment_item ENGINE = InnoDB;
+			ALTER TABLE shipment_method ENGINE = InnoDB;
+			ALTER TABLE shipment_reference_number ENGINE = InnoDB;
+			ALTER TABLE shipment_type ENGINE = InnoDB;
+			ALTER TABLE shipment_type_container_type ENGINE = InnoDB;
+			ALTER TABLE shipper ENGINE = InnoDB;
+			ALTER TABLE shipper_service ENGINE = InnoDB;
+			ALTER TABLE transaction ENGINE = InnoDB;
+			ALTER TABLE transaction_entry ENGINE = InnoDB;
+			ALTER TABLE transaction_type ENGINE = InnoDB;
+			ALTER TABLE user ENGINE = InnoDB;
+			ALTER TABLE user_role ENGINE = InnoDB;
+			ALTER TABLE value ENGINE = InnoDB;			
+		</sql>
+	</changeSet>
+	
+	
+    <changeSet author="jmiranda (generated)" id="1284743822481-7">
+		<validCheckSum>52fee9405a1c7a89bb4779b1d17af6ba</validCheckSum>		
+    	<comment>The sort order is used to sort the different event types chronologically.</comment>
+		<sql>
+			UPDATE event_type SET sort_order = 1 where id = 1;		
+			UPDATE event_type SET sort_order = 2 where id = 2;		
+			UPDATE event_type SET sort_order = 3 where id = 3;		
+			UPDATE event_type SET sort_order = 4 where id = 4;		
+			UPDATE event_type SET sort_order = 6 where id = 5;		
+			UPDATE event_type SET sort_order = 7 where id = 6;
+			UPDATE event_type SET sort_order = 5 where id = 7;							
+		</sql>		
+    </changeSet>
     
+    <changeSet author="jmiranda (generated)" id="1284743822481-8">
+    	<comment>The event status field is used to distinguish between INITAL, PENDING, COMPLETE states.</comment>
+		<sql>
+			UPDATE event_type SET event_status = 'INITIAL' where id = 1;		
+			UPDATE event_type SET event_status = 'PENDING' where id = 2;		
+			UPDATE event_type SET event_status = 'PENDING' where id = 3;		
+			UPDATE event_type SET event_status = 'COMPLETE' where id = 4;		
+			UPDATE event_type SET event_status = 'INITIAL' where id = 5;		
+			UPDATE event_type SET event_status = 'COMPLETE' where id = 6;
+			UPDATE event_type SET event_status = 'PENDING' where id = 7;							
+		</sql>		
+    </changeSet>    
+	
+
+	<changeSet author="jmiranda (generated)" id="1284790199445-1">	
+	    <preConditions onFail="MARK_RAN"><not><indexExists indexName="fk_shipment_item_recipient"/></not></preConditions>
+	    <addForeignKeyConstraint constraintName="fk_shipment_item_recipient"
+	    	baseTableName="shipment_item" baseColumnNames="recipient_id" referencedTableName="person" referencedColumnNames="id" />
+	</changeSet>
+	
+	<!-- 
+	<changeSet author="jmiranda (generated)" id="1284790199445-2">	
+	    <preConditions onFail="MARK_RAN"><not><indexExists indexName="fk_attribute_default_value"/></not></preConditions>
+	    <addForeignKeyConstraint constraintName="fk_attribute_default_value"
+	    	baseTableName="attribute" baseColumnNames="default_value_id" referencedTableName="value" referencedColumnNames="id" />
+	</changeSet>
+	 -->
+	 
+	 
+	<!--  
+    <changeSet author="jmiranda (generated)" id="1284790199445-5">
+        <dropIndex indexName="FK335CD11B6631D8CC" tableName="document"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284790199445-6">
+        <dropIndex indexName="FK167303507D4BD1B" tableName="drug_product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284790199445-7">
+        <dropIndex indexName="FK16730350BF6C3E5C" tableName="drug_product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284790199445-8">
+        <dropIndex indexName="FK16730350C2308EF4" tableName="drug_product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284790199445-9">
+        <dropIndex indexName="FK5C6729A3D970DB4" tableName="event"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284790199445-10">
+        <dropIndex indexName="FKFE01941612A19DA7" tableName="inventory_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284790199445-11">
+        <dropIndex indexName="FK714F9FB561ED379F" tableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284790199445-12">
+        <dropIndex indexName="FKED8DCCEFE0FEE896" tableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284790199445-13">
+        <dropIndex indexName="FK6C229EBE4F1E306E" tableName="product_attribute_value"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284790199445-14">
+        <dropIndex indexName="FKAE3064BAF7076438" tableName="receipt_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284790199445-15">
+        <dropIndex indexName="FKD790DEBD154F600" tableName="reference_number"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284790199445-16">
+        <dropIndex indexName="FKE139719AA28CC5FB" tableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284790199445-17">
+        <dropIndex indexName="FKC398CCBAC4A49BBF" tableName="shipment_comment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284790199445-18">
+        <dropIndex indexName="FK6C5BE20C800AA15" tableName="shipment_document"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284790199445-19">
+        <dropIndex indexName="FK6D032BB5786431F" tableName="shipment_event"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284790199445-20">
+        <dropIndex indexName="FK40203B26296B2CA3" tableName="shipment_method"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284790199445-21">
+        <dropIndex indexName="FK312F6C292388BC5" tableName="shipment_reference_number"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284790199445-22">
+        <dropIndex indexName="FK7FA0D2DEB3FB7111" tableName="transaction"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284790199445-23">
+        <dropIndex indexName="FKABC21FD12EF4C7F4" tableName="transaction_entry"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1284790199445-24">
+        <dropIndex indexName="FK143BF46AFF37FDB5" tableName="user_role"/>
+    </changeSet>
+	<changeSet author="jmiranda (generated)" id="1284790199445-25">	
+	    <preConditions onFail="MARK_RAN"><not><indexExists indexName="fk_attribute_default_value"/></not></preConditions>
+	    <addForeignKeyConstraint constraintName="fk_attribute_default_value"
+	    	baseTableName="attribute" baseColumnNames="default_value_id" referencedTableName="value" referencedColumnNames="id" />
+	</changeSet>
+	-->		
+	<!--
+   <changeSet author="jmiranda (generated)" id="1">
+
+        <createIndex indexName="FKDA3BB29844979D51" tableName="shipment_item" unique="false">
+            <column name="recipient_id"/>
+        </createIndex>
+    </changeSet>    	
+	<changeSet author="jmiranda (generated)" id="2">
+        <dropIndex indexName="FKDA3BB29844979D51" tableName="shipment_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="3">
+        <addForeignKeyConstraint baseColumnNames="recipient_id" baseTableName="shipment_item" constraintName="fk_shipment_item_recipient" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+
+
+	<changeSet author="jmiranda (generated)" id="1">
+        <dropIndex indexName="FKDA3BB29844979D51" tableName="shipment_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="2">
+        <addForeignKeyConstraint baseColumnNames="recipient_id" baseTableName="shipment_item" constraintName="FKDA3BB29844979D51" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+
+ALTER TABLE shipment_item DROP FOREIGN KEY `FKDA3BB29844979D51`;
+ALTER TABLE shipment_item DROP KEY `FKDA3BB29844979D51`;
+
+
+ALTER TABLE shipment_item ADD CONSTRAINT `FKDA3BB29844979D51` FOREIGN KEY `FKDA3BB29844979D51` (`recipient_id`) REFERENCES `person` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+	    
+	    alter table department_leader add index FK608FE96E2ADB49A (department_id),
+add constraint FK608FE96E2ADB49A foreign key (department_id) references
+department (id)
+-->
+      
+      
         
 </databaseChangeLog>

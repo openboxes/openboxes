@@ -42,7 +42,7 @@
 										<td valign="top" class="name" style="width: 10%;"><label><g:message
 											code="shipment.carrier.label" default="Carrier" /></label></td>
 										<td valign="top" style="width: 30%;">
-											<g:autoSuggest name="carrier" jsonUrl="/warehouse/shipment/findPersonByName" 
+											<g:autoSuggest id="carrier" name="carrier" jsonUrl="/warehouse/json/findPersonByName" 
 												width="150" 
 												valueId="${shipmentInstance?.carrier?.id}" 
 												valueName="${shipmentInstance?.carrier?.email}"/>		
@@ -54,7 +54,7 @@
 											<label><g:message code="shipment.destination.label" default="Recipient" /></label>
 										</td>
 										<td class="value" style="width: 30%;">		
-											<g:autoSuggest name="recipient" jsonUrl="/warehouse/shipment/findPersonByName"
+											<g:autoSuggest id="recipient" name="recipient" jsonUrl="/warehouse/json/findPersonByName"
 												width="150"
 												valueId="${shipmentInstance?.recipient?.id}"
 												valueName="${shipmentInstance?.recipient?.email}"/>

@@ -14,13 +14,13 @@
 		<tr>
 			<td valign="top">Person</td>
 			<td>
-				<g:autoSuggest name="carrier" jsonUrl="findPersonByName"/>				
+				<g:autoSuggest name="carrier" jsonUrl="/warehouse/json/findPersonByName"/>				
 			</td>
 		</tr>
 		<tr>
 			<td valign="top">Product</td>
 			<td>
-				<g:autoSuggest name="product" jsonUrl="findProducts"/>	
+				<g:autoSuggest name="product" jsonUrl="/warehouse/json/findProductsByName"/>	
 			</td>
 		</tr>
 	

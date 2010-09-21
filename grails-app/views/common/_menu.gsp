@@ -17,48 +17,91 @@ $(function() {
 
 
 <div id="leftnavMenu" class="menu">
-	<h3 class="heading">
-		<img src="${createLinkTo(dir:'images/icons/',file:'truck.png')}"  alt="Shipping" style="vertical-align: middle"/> <g:message code="shipment.manage.label"  default="Shipping"/>
+	<h3 class="heading selected" >
+		<img src="${createLinkTo(dir:'images/icons/',file:'dashboard.png')}"  alt="Dashboard" style="vertical-align: middle"/> &nbsp; <g:message code="dashboard.manage.label"  default="Dashboard"/>
 	</h3>
 	<div class="menuSection">
 		<ul>
-			<li class="prop">
+			<li class="">
 				<span class="menuButton">
-					<g:link class="list" controller="shipment" action="listOutgoing"><g:message code="shipment.list.outgoing.label"  default="browse shipping"/></g:link>
+					<g:link class="bullet" controller="dashboard" action="index"><g:message code="dashboard.list.label"  default="dashboard"/></g:link>
 				</span>
-			</li>										
+			</li>				
+		</ul>
+	</div>
+	<h3 class="heading selected" >
+		<img src="${createLinkTo(dir:'images/icons/',file:'truck.png')}"  alt="Shipping" style="vertical-align: middle"/> &nbsp; <g:message code="shipment.manage.label"  default="Shipping"/>
+	</h3>
+	<div class="menuSection">
+		<ul>
+			<li class="">
+				<span class="menuButton">
+					<g:link class="bullet" controller="shipment" action="listOutgoing"><g:message code="shipment.list.outgoing.label"  default="view all shipping"/></g:link>
+				</span>
+			</li>				
+			<g:each in="${org.pih.warehouse.core.EventType.list()}" var="eventType">
+				<g:if test="${eventType?.activityType?.name == 'Shipping'}">
+					<li class="prop">
+						<span class="menuButton">
+							<g:link class="bullet" action="listOutgoing" params="['eventType.id':eventType.id]"><g:message code="shipment.list.outgoing.label"  default="view ${eventType?.name?.toLowerCase()}"/></g:link>
+						</span>
+					</li>
+				</g:if>
+			</g:each>
 			<li class="prop">
 				<span class="menuButton">
-					<g:link class="create" controller="shipment" action="create" params="['type':'outgoing']"><g:message code="shipment.create.outgoing.label" default="new shipping request" /></g:link>
+					<g:link class="invalid" controller="shipment" action="listOutgoing" params="['eventType.id':0]"><g:message code="shipment.list.outgoing.label"  default="view invalid shipments"/></g:link>
 				</span>
 			</li>			
+			<li class="prop">
+				<span class="menuButton">
+					<g:link class="new" controller="shipment" action="create" params="['type':'outgoing']"><g:message code="shipment.create.outgoing.label" default="new shipping request" /></g:link>
+				</span>
+			</li>					
+									
 		</ul>										
 	</div>
 	<h3 class="heading">
-		<img src="${createLinkTo(dir:'images/icons/',file:'handtruck.png')}" width="16" height="16" alt="Receiving" style="vertical-align: middle"/> <g:message code="shipment.manage.label"  default="Receiving"/>
+		<img src="${createLinkTo(dir:'images/icons/',file:'handtruck.png')}" width="16" height="16" alt="Receiving" style="vertical-align: middle"/> &nbsp; <g:message code="shipment.manage.label"  default="Receiving"/>
 	</h3>
 	<div class="menuSection">
 		<ul>
-			<li class="prop">
+			<li class="">
 				<span class="menuButton">
-					<g:link class="list" controller="shipment" action="listIncoming"><g:message code="shipment.list.incoming.label"  default="browse receiving"/></g:link>
+					<g:link class="bullet" controller="shipment" action="listIncoming"><g:message code="shipment.list.incoming.label"  default="view all receiving"/></g:link>
 				</span>		
 			</li>										
+			<g:each in="${org.pih.warehouse.core.EventType.list()}" var="eventType">
+				<g:if test="${eventType?.activityType?.name == 'Receiving'}">
+					<li class="prop">
+						<span class="menuButton">
+							<g:link class="bullet" controller="shipment" action="listIncoming" params="['eventType.id':eventType.id]"><g:message code="shipment.list.outgoing.label"  default="view ${eventType?.name?.toLowerCase()}"/></g:link>
+						</span>
+					</li>
+				</g:if>
+			</g:each>
+			<li class="prop">
+				<span class="menuButton">
+					<g:link class="invalid" controller="shipment" action="listIncoming" params="['eventType.id':0]"><g:message code="shipment.list.incoming.label"  default="view invalid shipments"/></g:link>
+				</span>
+			</li>			
+			<!-- 
 			<li class="prop">
 				<span class="menuButton">
 					<g:link class="create" controller="shipment" action="create" params="['type':'incoming']"><g:message code="shipment.create.incoming.label" default="new receipt" /></g:link>
 				</span>
-			</li>						
+			</li>
+			 -->						
 		</ul>										
 	</div>
 	<h3 class="heading">
-		<img src="${createLinkTo(dir:'images/icons/',file:'stockbook.png')}" alt="Inventory" style="vertical-align: middle"/>
+		<img src="${createLinkTo(dir:'images/icons/',file:'stockbook.png')}" alt="Inventory" style="vertical-align: middle"/> &nbsp; 
 		<g:message code="inventory.manage.label"  default="Inventory"/>
 	</h3>
 	<div class="menuSection">									
 		<ul>
 			<!-- 
-			<li><span class="menuButton"><g:link class="nobullet" controller="inventory" action="browse"><g:message code="inventory.browse.label"  default="Browse Inventory"/></g:link></span></li>		
+			<li><span class="menuButton"><g:link class="nobullet" controller="inventory" action="browse"><g:message code="inventory.browse.label"  default="View Inventory"/></g:link></span></li>		
 		 	-->
 			<!--  
 			<li><span class="menuButton"><g:link class="browse" controller="product" action="browse"><g:message code="default.browse.label"  args="['Product']"/></g:link></span></li>		
@@ -69,23 +112,23 @@ $(function() {
 		</ul>	
 	</div>							
 	<h3 class="heading">
-		<img src="${createLinkTo(dir:'images/icons/',file:'product.png')}" alt="Products" style="vertical-align: middle"/> <g:message code="product.manage.label"  default="Products"/>
+		<img src="${createLinkTo(dir:'images/icons/',file:'product.png')}" alt="Products" style="vertical-align: middle"/> &nbsp; <g:message code="product.manage.label"  default="Products"/>
 	</h3>
 	<div class="menuSection">									
 		<ul>
-			<li class="prop">
+			<li class="">
 				<span class="menuButton">
-					<g:link class="list" controller="product" action="browse"><g:message code="product.browse.label"  default="browse products"/></g:link>
+					<g:link class="bullet" controller="product" action="browse"><g:message code="product.browse.label"  default="view all products"/></g:link>
 				</span>
 			</li>		
 			<li class="prop">
 				<span class="menuButton">
-					<g:link class="import" controller="product" action="importProducts"><g:message code="product.import.label" default="import products" /></g:link>
+					<g:link class="bullet" controller="product" action="importProducts"><g:message code="product.import.label" default="import products" /></g:link>
 				</span>
 			</li>						
 			<li class="prop">
 				<span class="menuButton">
-					<g:link class="create" controller="product" action="create"><g:message code="product.create.label" default="add new product" /></g:link>
+					<g:link class="new" controller="product" action="create"><g:message code="product.create.label" default="add new product" /></g:link>
 				</span>
 			</li>
 			<%-- 
@@ -97,7 +140,7 @@ $(function() {
 		</ul>	
 	</div>								
 	<h3 class="heading">
-		<img src="${createLinkTo(dir:'images/icons/',file:'order.png')}" alt="Orders" style="vertical-align: middle"/>
+		<img src="${createLinkTo(dir:'images/icons/',file:'order.png')}" alt="Orders" style="vertical-align: middle"/> &nbsp; 
 		<g:message code="order.manage.label"  default="Orders"/>
 	</h3>
 	<div class="menuSection">									
@@ -116,7 +159,7 @@ $(function() {
 		</ul>	
 	</div>
 	<h3 class="heading">
-		<img src="${createLinkTo(dir:'images/icons/',file:'reports.png')}" alt="Reports" style="vertical-align: middle"/>
+		<img src="${createLinkTo(dir:'images/icons/',file:'reports.png')}" alt="Reports" style="vertical-align: middle"/> &nbsp; 
 		<g:message code="settings.manage.label" args="['Reports']" default="Reports"/>
 	</h3>
 	<div class="menuSection">
@@ -127,12 +170,12 @@ $(function() {
 		</ul>
 	</div>					
 	<h3 class="heading">
-		<img src="${createLinkTo(dir:'images/icons/',file:'wrench.png')}" alt="Administration" style="vertical-align: middle"/>
+		<img src="${createLinkTo(dir:'images/icons/',file:'wrench.png')}" alt="Administration" style="vertical-align: middle"/> &nbsp; 
 		<g:message code="metadata.manage.label"  default="Administration"/>
 	</h3>
 	<div class="menuSection">
 		<ul>
-			<li class="prop">
+			<li class="">
 				<span class="menuButton">
 					<g:link class="eventType" controller="eventType" action="list"><g:message code="default.manage.label"  args="['event types']"/></g:link>
 				</span>
@@ -159,12 +202,12 @@ $(function() {
 			</li>										
 			<li class="prop">
 				<span class="menuButton">
-					<g:link class="shipper" controller="shipper" action="list"><g:message code="default.manage.label" args="['Shippers']"/></g:link>
+					<g:link class="shipper" controller="shipper" action="list"><g:message code="default.manage.label" args="['shippers']"/></g:link>
 				</span>
 			</li>
 			<li class="prop">
 				<span class="menuButton">
-					<g:link class="shipperService" controller="shipperService" action="list"><g:message code="default.manage.label" args="['Shipper Services']"/></g:link>
+					<g:link class="shipperService" controller="shipperService" action="list"><g:message code="default.manage.label" args="['shipper services']"/></g:link>
 				</span>
 			</li>
 			<li class="prop">
