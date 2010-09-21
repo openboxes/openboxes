@@ -21,8 +21,8 @@ class Shipment {
 	// Audit fields
 	Date dateCreated
 	Date lastUpdated
-	String createdBy
-	String lastModifiedBy
+	//String createdBy
+	//String lastModifiedBy
 
 	
 	// One-to-one associations
@@ -99,8 +99,8 @@ class Shipment {
 		
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)
-		createdBy(nullable:true)
-		lastModifiedBy(nullable:true)
+		//createdBy(nullable:true)
+		//lastModifiedBy(nullable:true)
 
 		comments(nullable:true)
 		containers(nullable:true)
