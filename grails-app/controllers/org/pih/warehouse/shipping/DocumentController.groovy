@@ -66,7 +66,7 @@ class DocumentController {
 	   }
 	   else {
 		   log.info "Document is empty or too large"		   
-		   flash.message = "File $filename is too large (must be less than 1MB)";
+		   flash.message = "File is too large (must be less than 1MB)";
 		   redirect(controller: 'shipment', action: 'showDetails', id: command.shipmentId)
 	   }
 	   log.info "something happened, just not sure what"

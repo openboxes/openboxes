@@ -82,7 +82,7 @@ class JqueryTagLib {
 					      	},
 					        focus: function(event, ui) {			
 					      		\$('#${id}-suggest').val(ui.item.valueText);					
-					      	//	return false;
+					      		return false;
 					        },	
 							select: function(event, ui) {
 								\$('#${id}-id').val(ui.item.value);
