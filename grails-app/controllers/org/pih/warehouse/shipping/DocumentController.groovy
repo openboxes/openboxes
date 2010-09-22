@@ -41,8 +41,9 @@ class DocumentController {
 	   def shipmentInstance = Shipment.get(command.shipmentId);	   
 	   log.info "multipart file: " + file.originalFilename + " " + file.contentType + " " + file.size + " " 
 	   
-	   // file must not be empty and must be less than 1MB
-	   if (!file?.empty && file.size < 1024*1000) {		   
+	   // file must not be empty and must be less than 10MB
+	   // FIXME The size limit needs to go somewhere
+	   if (!file?.empty && file.size < 10*1024*1000) {		   
 		   Document document = new Document( 
 			   size: file.size, 
 			   name: command.name,

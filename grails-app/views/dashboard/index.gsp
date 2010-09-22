@@ -144,17 +144,17 @@
 				<div class="widgetSmall">
 					<div class="widgetHeader">Shipments: Incoming Summary </div>
 	    			<div class="widgetContent">
-	    				<div><b>From:</b> ${session.warehouse.name}</div>	    			
+	    				<div><b>To:</b> ${session.warehouse.name}</div>	    			
 	    				<hr/>
 	    				<div id="incomingShipmentBreakdown">	
 				    		<table>				    			
 				    			<tbody>
 									<g:each var="entry" in="${incomingShipmentsByStatus}" status="i">	 
-											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-												<td><g:link controller="shipment" action="listIncoming" params="['eventType.id':entry.key.id]">${entry.key.name}</g:link></td>
-												<td><span class="fade">${entry.key.description}</span></td>
-												<td>${entry.value.objectList.size}</td>
-											</tr>	
+										<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+											<td><g:link controller="shipment" action="listIncoming" params="['eventType.id':entry.key.id]">${entry.key.name}</g:link></td>
+											<td><span class="fade">${entry.key.description}</span></td>
+											<td>${entry.value.objectList.size}</td>
+										</tr>	
 										
 							    	</g:each>
 						    	</tbody>

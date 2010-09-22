@@ -10,7 +10,7 @@
 		<content tag="pageTitle"><g:message code="default.browse.label" args="[entityName]" /></content>
     
     	<style>
-    		.selected { font-weight: bold; } 
+    		.selected { font-weight: bold; border: 2px solid black; background-color: whitesmoke; padding: 5px; } 
     	
     	</style>
     </head>    

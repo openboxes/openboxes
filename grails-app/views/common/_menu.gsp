@@ -17,7 +17,7 @@ $(function() {
 
 
 <div id="leftnavMenu" class="menu">
-	<h3 class="heading selected" >
+	<h3 class="heading" >
 		<img src="${createLinkTo(dir:'images/icons/',file:'dashboard.png')}"  alt="Dashboard" style="vertical-align: middle"/> &nbsp; <g:message code="dashboard.manage.label"  default="Dashboard"/>
 	</h3>
 	<div class="menuSection">
@@ -29,7 +29,7 @@ $(function() {
 			</li>				
 		</ul>
 	</div>
-	<h3 class="heading selected" >
+	<h3 class="heading" >
 		<img src="${createLinkTo(dir:'images/icons/',file:'truck.png')}"  alt="Shipping" style="vertical-align: middle"/> &nbsp; <g:message code="shipment.manage.label"  default="Shipping"/>
 	</h3>
 	<div class="menuSection">
@@ -43,7 +43,7 @@ $(function() {
 				<g:if test="${eventType?.activityType?.name == 'Shipping'}">
 					<li class="prop">
 						<span class="menuButton">
-							<g:link class="bullet" action="listOutgoing" params="['eventType.id':eventType.id]"><g:message code="shipment.list.outgoing.label"  default="view ${eventType?.name?.toLowerCase()}"/></g:link>
+							<g:link class="bullet" controller="shipment" action="listOutgoing" params="['eventType.id':eventType.id]"><g:message code="shipment.list.outgoing.label"  default="view ${eventType?.name?.toLowerCase()}"/></g:link>
 						</span>
 					</li>
 				</g:if>

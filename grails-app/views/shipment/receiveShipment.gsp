@@ -73,53 +73,57 @@
 											<td valign="top"
 												class=" ${hasErrors(bean: receiptInstance, field: 'receiptItem', 'errors')}"
 												nowrap="nowrap">
-													<table>
-														<thead>
-															<tr>
-																<th colspan="2"></th>
-																<th colspan="2" style="text-align: center;">Quantity</th>
-																<th colspan="2"></th>
-															</tr>
-															<tr>
-																<th style="text-align: left;">Item</th>
-																<th style="text-align: center;">Lot / Serial No</th>
-																<th style="text-align: center;">Shipped</th>
-																<th style="text-align: center;">Received</th>
-																<th style="text-align: center;">Accepted?</th>
-																<th style="text-align: center;">Comment</th>
-															</tr>
-														</thead>
-														<tbody>
-															<g:each var="receiptItem" in="${receiptInstance.receiptItems}" status="i">															
-																<tr class="prop ${(i % 2) == 0 ? 'odd' : 'even'}">
-																	<td style="text-align: left; vertical-align: middle;">
-																		<g:hiddenField name="receiptItems[${i}].product.id" value="${receiptItem?.product?.id}"/>
-																		${receiptItem?.product?.name}
-																	</td>
-																	<td style="text-align: center; vertical-align: middle;">
-																		<g:hiddenField name="receiptItems[${i}].serialNumer" value="${receiptItem?.serialNumber}"/>
-																		${receiptItem?.serialNumber}
-																	</td>
-																	<td style="text-align: center; vertical-align: middle;">
-																		<g:hiddenField name="receiptItems[${i}].quantityDelivered" value="${receiptItem?.quantityDelivered}"/>																	
-																		${receiptItem?.quantityDelivered}
-																	</td>
-																	<td style="text-align: center; vertical-align: middle;">
-																		<g:textField name="receiptItems[${i}].quantityReceived" value="${receiptItem?.quantityReceived}" size="3"/>
-																	</td>
-																	<td style="text-align: center; vertical-align: middle;">
-																		<g:select name="receiptItems[${i}].accepted" from="['true','false']" value="${receiptItem.accepted?receiptItem.accepted:'true'}" 
-																		 noSelection="['null': '']" />																																			
-																	</td>
-																	<td style="text-align: center; vertical-align: middle;">
-																		<g:textField name="receiptItems[${i}].comment" value="${receiptItem?.comment}" size="10"/>
-																	</td>
-																</tr>												
-															</g:each>														
-														</tbody>													
-													</table>
-												</ul>
-
+												
+													<g:if test="${!receiptInstance.receiptItems}">
+														There are no shipment items to receive.
+													</g:if>			
+													<g:else>										
+														<table>
+															<thead>
+																<tr>
+																	<th colspan="2"></th>
+																	<th colspan="2" style="text-align: center;">Quantity</th>
+																	<th colspan="2"></th>
+																</tr>
+																<tr>
+																	<th style="text-align: left;">Item</th>
+																	<th style="text-align: center;">Lot / Serial No</th>
+																	<th style="text-align: center;">Shipped</th>
+																	<th style="text-align: center;">Received</th>
+																	<th style="text-align: center;">Accepted?</th>
+																	<th style="text-align: center;">Comment</th>
+																</tr>
+															</thead>
+															<tbody>
+																<g:each var="receiptItem" in="${receiptInstance.receiptItems}" status="i">															
+																	<tr class="prop ${(i % 2) == 0 ? 'odd' : 'even'}">
+																		<td style="text-align: left; vertical-align: middle;">
+																			<g:hiddenField name="receiptItems[${i}].product.id" value="${receiptItem?.product?.id}"/>
+																			${receiptItem?.product?.name}
+																		</td>
+																		<td style="text-align: center; vertical-align: middle;">
+																			<g:hiddenField name="receiptItems[${i}].serialNumer" value="${receiptItem?.serialNumber}"/>
+																			${receiptItem?.serialNumber}
+																		</td>
+																		<td style="text-align: center; vertical-align: middle;">
+																			<g:hiddenField name="receiptItems[${i}].quantityDelivered" value="${receiptItem?.quantityDelivered}"/>																	
+																			${receiptItem?.quantityDelivered}
+																		</td>
+																		<td style="text-align: center; vertical-align: middle;">
+																			<g:textField name="receiptItems[${i}].quantityReceived" value="${receiptItem?.quantityReceived}" size="3"/>
+																		</td>
+																		<td style="text-align: center; vertical-align: middle;">
+																			<g:select name="receiptItems[${i}].accepted" from="['true','false']" value="${receiptItem.accepted?receiptItem.accepted:'true'}" 
+																			 noSelection="['null': '']" />																																			
+																		</td>
+																		<td style="text-align: center; vertical-align: middle;">
+																			<g:textField name="receiptItems[${i}].comment" value="${receiptItem?.comment}" size="10"/>
+																		</td>
+																	</tr>												
+																</g:each>														
+															</tbody>													
+														</table>
+													</g:else>
 											</td>
 										</tr>											
 										

@@ -79,7 +79,9 @@
 																			$(document).ready(function(){
 																												
 																				$('#add-person-dialog').dialog({
-																					autoOpen: false, modal: true, 
+																					autoOpen: false, 
+																					modal: true, 
+																					width: '400px',
 																					buttons: {
 																			           'Add a Person': function() {
 																							var firstName = $("#firstName").val();
@@ -89,7 +91,6 @@
 																			                $.post('/warehouse/json/savePerson', 
 																					                {firstName: firstName, lastName: lastName, email: email}, 
 																					                function(data) {
-																						                alert("wtf");
 																			                    		var item = $("<li>");
 																			                    		var link = $("<a>").attr("href", "/warehouse/person/show/" + data.id).html(data.firstName + " " + data.lastName);
 																			                    		item.append(link);
@@ -136,7 +137,7 @@
 																			<tr class="prop" style="background-color: #FFF6BF;">
 																				<td width="7%" style="vertical-align: middle; text-align: center"> (new) </td>
 																				<td width="10%" style="vertical-align: middle; text-align: center;">													
-																					<g:textField name="quantity" value="" size="2" />
+																					<g:textField name="quantity" value="1" size="2" />
 																				</td>
 																				<td width="20%" style="vertical-align: middle; text-align: left;">											
 																					<g:autoSuggest id="selectedItem" name="selectedItem" jsonUrl="/warehouse/json/findProductByName" width="200"/>	
@@ -254,8 +255,8 @@
 															<%-- 
 																Add a New Person dialog box															
 															--%>
-															<div id="add-person-dialog" title="Add a new recipient" style="display: none;" >
-																<ul id="people"></ul>
+															<div id="add-person-dialog" title="Add a new recipient" style="display: none; padding: 50px;" >
+																
 																
 																<g:form name="addPersonForm" url="${[controller: 'shipment', action:'savePerson']}" >
 																	<g:hiddenField name="id" value="0" />
@@ -317,15 +318,7 @@
 																				<g:textArea name="description" value="${containerInstance?.description}" cols="40" rows="3"/> &nbsp;
 																			</td>
 																		</tr>
-																		<%-- 
-																		<tr class="prop">
-																			<td class="name"><label class="optional">Identifier #</label></td>
-																			<td class="value">
-																				<g:textField name="containerNumber" value="${containerInstance.containerNumber}" size="15"/> &nbsp;		
-																				<span class="fade"></span>																
-																			</td>													
-																		</tr>
-																		--%>
+																	
 																		<tr class="prop">										
 																			<td class="name"><label class="optional">Weight</label></td>
 																			<td class="value">
