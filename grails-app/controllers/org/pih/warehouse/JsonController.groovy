@@ -4,6 +4,8 @@ import grails.converters.*;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.inventory.Warehouse;
 import org.pih.warehouse.product.Product;
+import org.pih.warehouse.shipping.Shipper;
+import org.pih.warehouse.shipping.ShipperService;
 import org.pih.warehouse.shipping.Shipment;
 
 
