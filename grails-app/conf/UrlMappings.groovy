@@ -6,6 +6,9 @@ class UrlMappings {
 			  }
 		}
 		
+		"/api/$action/$id"(controller:"api", parseRequest:true){
+			//action = [GET:"show", PUT:"update", DELETE:"delete", POST:"save"]
+		}
 		//"/test/searchByFirstName.json?q=$q"(controller:"test") { 
 		//	action = [GET:"searchByFirstName"]
 		//}

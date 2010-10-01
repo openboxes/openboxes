@@ -4,14 +4,24 @@ class SecurityFilters {
 		loginCheck(controller:'*', action:'*') {
 			before = {	
 				
+				log.info params
+				String [] controllersWithAuthUserNotRequired = "api,test".split(",");
 				String [] actionsWithAuthUserNotRequired = "login,doLogin,signup,doSignup".split(",");
 				String [] actionsWithWarehouseNotRequired = "login,doLogin,signup,doSignup,chooseWarehouse,viewLogo".split(",");
 								
 				if (params.controller == null) {
+					log.info "controller is null redirect to auth" 
 					redirect(controller: 'auth', action:'login')   
 					return true
+				}			
+				// FIXME In order to start working on sync use cases, we need to authenticate  	
+				else if (Arrays.asList(controllersWithAuthUserNotRequired).contains(controllerName)) {
+					log.info "api controller" 
+					return true;
 				}
-				else if(!session.user && !(Arrays.asList(actionsWithAuthUserNotRequired).contains(actionName))) {
+				else if(!session.user && !(
+					Arrays.asList(actionsWithAuthUserNotRequired).contains(actionName))) {
+					log.info "redirect to auth" 
 					redirect(controller: 'auth', action:'login')
 					return false;
 				}
