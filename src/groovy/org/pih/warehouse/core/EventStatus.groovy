@@ -2,6 +2,8 @@ package org.pih.warehouse.core;
 
 public enum EventStatus {
 
+	NEW('New'),
+	UNKNOWN('Unknown'),
 	INITIAL('Initial'),
 	PENDING('Pending'),
 	COMPLETE('Complete');
@@ -11,7 +13,7 @@ public enum EventStatus {
 	EventStatus(String name) { this.name = name; }
 
 	static list() {
-		[ INITIAL, PENDING, COMPLETE ]
+		[ NEW, INITIAL, PENDING, COMPLETE, UNKNOWN ]
 	}
 }
 
