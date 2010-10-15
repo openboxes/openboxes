@@ -3,7 +3,7 @@ package org.pih.warehouse.core;
 import java.util.Date;
 import org.pih.warehouse.core.User
 
-class Comment {
+class Comment implements Serializable {
 
 	String comment
 	User sender

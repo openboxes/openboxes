@@ -5,10 +5,23 @@ import grails.converters.JSON;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.product.Product;
 
+//import groovyx.net.http.*
+///import static groovyx.net.http.ContentType.JSON
+
 class TestController {
 	
 	def mailService;
-	
+
+	/*
+	def testHttpBuilder =  {		
+		def http = new HTTPBuilder("http://localhost:8080/amazon")
+		
+		http.request(Method.GET, JSON) { 
+			url.path = '/book/list' 
+			response.success = {resp, json -> json.books.each { book -> println book.title } } 
+		}
+		
+	}*/	
 	
 	def jQuery = {
 	}

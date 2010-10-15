@@ -2,7 +2,7 @@ package org.pih.warehouse.core
 
 import java.util.Date;
 
-class Address {
+class Address implements Serializable {
 	
 	String address
 	String address2

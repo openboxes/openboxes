@@ -4,7 +4,7 @@
         <meta name="layout" content="custom" />
         <title>${message(code: 'default.dashboard.label', default: 'Dashboard')}</title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle">${message(code: 'default.dashboard.label', default: 'My Dashboard')}</content>
+		<content tag="pageTitle">${message(code: 'default.dashboard.label', default: 'Dashboard')}</content>
     </head>
     <body>        
     
@@ -38,12 +38,9 @@
 				</div>
 				
 				<div class="widgetSmall">
-					<div class="widgetHeader">Shipments: Most Recent Outgoing</div>
+					<div class="widgetHeader">Recent Shipments from ${session.warehouse.name}</div>
 	    			<div class="widgetContent">
-	    				<div><b>From:</b> ${session.warehouse.name }</div>	    			
-	    				<hr/>
-	    				<div id="mostRecentOutgoingShipments">	
-	    				
+	    				<div id="mostRecentOutgoingShipments">		    				
    							<g:if test="${!outgoingShipments}">
    								<div style="text-align: center; padding: 10px;" class="fade">
    									(no recent shipments)
@@ -53,17 +50,18 @@
 		    					<table>	    				
 		    						<thead>
 		    							<tr>
-		    								<th>Date</th>
-		    								<th>Name</th>
 		    								<th>Status</th>
+		    								<th>Name</th>
+		    								<th>Ship Date</th>
 		    							</tr>
 		    						</thead>
 		    						<tbody>
 										<g:each in="${outgoingShipments}" var="shipment" status="i">										
 											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-												<td><g:formatDate date="${shipment.expectedShippingDate}" format="MMM dd yyyy"/></td>
+												<td><g:link controller="shipment" action="listOutgoing" params="['eventType.id':shipment?.mostRecentStatus?.id]">
+													</g:link>${shipment?.mostRecentEvent?.eventType?.eventStatus?.name}</td>									
 												<td><g:link controller="shipment" action="showDetails" id="${shipment.id}">${shipment.name }</g:link></td>
-												<td><g:link controller="shipment" action="listOutgoing" params="['eventType.id':shipment?.mostRecentStatus?.id]">${shipment.mostRecentStatus}</g:link></td>									
+												<td><g:formatDate date="${shipment.expectedShippingDate}" format="MMM dd"/></td>
 											</tr>										
 										</g:each>
 									</tbody>
@@ -74,13 +72,9 @@
 				</div>
 				
 				<div class="widgetSmall">
-					<div class="widgetHeader">Shipments: Most Recent Incoming</div>
+					<div class="widgetHeader">Recent Shipments to ${session.warehouse.name}</div>
 	    			<div class="widgetContent">
-	    				<div><b>To:</b> ${session.warehouse.name}</div>
-	    				<hr/>
 	    				<div id="mostRecentIncomingShipments">
-	    				
-	    				
 		    				<g:if test="${!incomingShipments}">
    								<div style="text-align: center; padding: 10px;" class="fade">
    									(no recent shipments)
@@ -90,17 +84,18 @@
 			    				<table>
 		    						<thead>
 		    							<tr>
-		    								<th>Date</th>
-		    								<th>Name</th>
 		    								<th>Status</th>
+		    								<th>Name</th>
+		    								<th>Ship Date</th>
 		    							</tr>
 		    						</thead>
 		    						<tbody>
 										<g:each in="${incomingShipments}" var="shipment" status="i">
 											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-												<td><g:formatDate date="${shipment.expectedShippingDate}" format="MMM dd yyyy"/></td>
+												<td><g:link controller="shipment" action="listIncoming" params="['eventType.id':shipment?.mostRecentStatus?.id]">
+													</g:link>${shipment?.mostRecentEvent?.eventType?.eventStatus?.name}</td>
 												<td><g:link controller="shipment" action="showDetails" id="${shipment.id}">${shipment.name }</g:link></td>
-												<td><g:link controller="shipment" action="listIncoming" params="['eventType.id':shipment?.mostRecentStatus?.id]">${shipment.mostRecentStatus}</g:link></td>
+												<td><g:formatDate date="${shipment.expectedShippingDate}" format="MMM dd"/></td>
 											</tr>
 										</g:each>
 									</tbody>
@@ -113,58 +108,80 @@
 				<br clear="all"/>
 				
 				<div class="widgetSmall">
-					<div class="widgetHeader">Shipments: Outgoing Summary</div>
+					<div class="widgetHeader">Summary: Shipments from ${session.warehouse.name}</div>
 	    			<div class="widgetContent">
-	    				<div><b>From:</b> ${session.warehouse.name }</div>	    			
-	    				<hr/>
-	    				<div id="outgoingShipmentBreakdown">	
-				    		<table>				    			
-				    			<tbody>
-									<g:each var="entry" in="${outgoingShipmentsByStatus}" status="i">	 
-										
-										<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-											<td><g:link controller="shipment" action="listOutgoing" params="['eventType.id':entry.key.id]">${entry.key.name}</g:link></td>
-											<td><span class="fade">${entry.key.description}</span></td>
-											<td>${entry.value.objectList.size}</td>
-										</tr>	
-										
-							    	</g:each>
-						    	</tbody>
-						    	<tfoot>
-							    	<tr>
-							    		<th colspan="2">Total</th>
-							    		<th>${allOutgoingShipments.size()}</td>
-							    	</tr>
-						    	</tfoot>
-					    	</table>
+	    				<div id="outgoingShipmentSummary">
+		    				<g:if test="${!outgoingShipmentsByStatus}">
+   								<div style="text-align: center; padding: 10px;" class="fade">
+   									(no outgoing shipments)
+   								</div>
+   							</g:if>	    		
+   							<g:else>			
+					    		<table>				    			
+					    			<thead>
+					    				<tr>
+					    					<th>Status</th>
+					    					<th>Count</th>
+					    				</tr>
+					    			</thead>	    			
+					    			<tbody>
+										<g:each var="entry" in="${outgoingShipmentsByStatus}" status="i">											
+											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+												<td><g:link controller="shipment" action="listOutgoing" params="['eventStatus':entry.key, 'activityType':'SHIPPING']">${entry.key.name}</g:link></td>
+												<td>${entry.value.objectList.size}</td>
+											</tr>	
+											
+								    	</g:each>
+							    	</tbody>
+							    	<tfoot>
+								    	<tr>
+								    		<th>Total</th>
+								    		<th>${allOutgoingShipments.size()}</td>
+								    	</tr>
+							    	</tfoot>
+						    	</table>
+						    </g:else>
 						</div>
 	    			</div>
 				</div>				
 				
 				<div class="widgetSmall">
-					<div class="widgetHeader">Shipments: Incoming Summary </div>
+					<div class="widgetHeader">Summary: Shipments to ${session.warehouse.name}</div>
 	    			<div class="widgetContent">
-	    				<div><b>To:</b> ${session.warehouse.name}</div>	    			
+	    					    			
 	    				<hr/>
-	    				<div id="incomingShipmentBreakdown">	
-				    		<table>				    			
-				    			<tbody>
-									<g:each var="entry" in="${incomingShipmentsByStatus}" status="i">	 
-										<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-											<td><g:link controller="shipment" action="listIncoming" params="['eventType.id':entry.key.id]">${entry.key.name}</g:link></td>
-											<td><span class="fade">${entry.key.description}</span></td>
-											<td>${entry.value.objectList.size}</td>
-										</tr>	
-										
-							    	</g:each>
-						    	</tbody>
-						    	<tfoot>
-							    	<tr>
-							    		<th colspan="2">Total</th>							    		
-							    		<th>${allIncomingShipments.size()}</td>
-							    	</tr>
-						    	</tfoot>
-					    	</table>
+	    				<div id="incomingShipmentSummary">	
+	    				
+		    				<g:if test="${!incomingShipmentsByStatus}">
+   								<div style="text-align: center; padding: 10px;" class="fade">
+   									(no incoming shipments)
+   								</div>
+   							</g:if>	    		
+   							<g:else>			
+					    		<table>			
+					    			<thead>
+					    				<tr>
+					    					<th>Status</th>
+					    					<th>Count</th>
+					    				</tr>
+					    			</thead>	    			
+					    			<tbody>
+										<g:each var="entry" in="${incomingShipmentsByStatus}" status="i">	 
+											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+												<td><g:link controller="shipment" action="listIncoming" params="['eventStatus':entry.key, 'activityType':'RECEIVING']">${entry.key.name}</g:link></td>
+												<td>${entry.value.objectList.size}</td>
+											</tr>	
+											
+								    	</g:each>
+							    	</tbody>
+							    	<tfoot>
+								    	<tr>
+								    		<th>Total</th>							    		
+								    		<th>${allIncomingShipments.size()}</td>
+								    	</tr>
+							    	</tfoot>
+						    	</table>
+						    </g:else>
 						</div>
 	    			</div>
 				</div>								

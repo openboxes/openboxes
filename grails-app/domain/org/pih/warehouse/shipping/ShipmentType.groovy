@@ -5,7 +5,7 @@ import java.util.Date;
 /**
  * Represents the type of shipment (Sea, Air, Suitcase, Domestic Freight, Other)
  */
-class ShipmentType {
+class ShipmentType implements java.io.Serializable {
 
 	String name
 	String description

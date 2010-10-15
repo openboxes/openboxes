@@ -2,7 +2,7 @@ package org.pih.warehouse.core
 
 import java.util.Date;
 
-class Role {
+class Role implements Serializable {
 	
 	RoleType roleType;
 	String description;

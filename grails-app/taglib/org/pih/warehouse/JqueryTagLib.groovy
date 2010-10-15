@@ -15,8 +15,10 @@ class JqueryTagLib {
 		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "/warehouse/json/findPersonByName";
 
 		def showValue = (valueName && valueId) ? true : false;
-		def spanDisplay = (showValue) ? "inline" : "none";
-		def suggestDisplay = (showValue) ? "none" : "inline";
+		//def spanDisplay = (showValue) ? "inline" : "none";
+		//def suggestDisplay = (showValue) ? "none" : "inline";
+		def spanDisplay = "none";
+		def suggestDisplay = "inline";
 		
 		def html = """
 			<div>
@@ -50,16 +52,16 @@ class JqueryTagLib {
                         
 						\$("#${id}-suggest").blur(function() { 							
 							var text = \$('#${id}-suggest').val();
-							\$('#${id}-suggest').hide();					
-							\$('#${id}-span').html(text?text:'<b>empty</b> &nbsp; click to change');
-							\$('#${id}-span').show();						
+							//\$('#${id}-suggest').hide();					
+							//\$('#${id}-span').html(text?text:'<b>empty</b> &nbsp; click to change');
+							//\$('#${id}-span').show();						
 						});                        
 						\$("#${id}-span").click(function() {
-							\$('#${id}-span').hide();							
-							\$('#${id}-suggest').show();
-							\$('#${id}-suggest').val('');
-							\$('#${id}-span').html('');
-							\$('#${id}-id').val('');
+							//\$('#${id}-span').hide();							
+							//\$('#${id}-suggest').show();
+							//\$('#${id}-suggest').val('');
+							//\$('#${id}-span').html('');
+							//\$('#${id}-id').val('');
 						});
 				      	\$("#${id}-suggest").autocomplete({
 				            width: ${width},
@@ -88,8 +90,8 @@ class JqueryTagLib {
 								\$('#${id}-id').val(ui.item.value);
 								\$('#${id}-suggest').val(ui.item.valueText);
 								\$('#${id}-span').html(ui.item.valueText);
-								\$('#${id}-suggest').hide();
-								\$('#${id}-span').show();
+								//\$('#${id}-suggest').hide();
+								//\$('#${id}-span').show();
 								return false;
 							}
 						});

@@ -2968,4 +2968,164 @@
             <column name="category_id" valueNumeric="13"/>
         </insert>
     </changeSet>
+    
+    
+    
+    <changeSet author="jmiranda (generated)" id="1285794105801-1">
+        <insert tableName="event">
+            <column name="id" valueNumeric="20"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-09-25"/>
+            <column name="event_date" valueDate="2010-09-25"/>
+            <column name="event_location_id" valueNumeric="1"/>
+            <column name="event_type_id" valueNumeric="1"/>
+            <column name="last_updated" valueDate="2010-09-25"/>
+        </insert>
+    </changeSet>    
+    <changeSet author="jmiranda (generated)" id="1285794105801-2">
+        <insert tableName="event">
+            <column name="id" valueNumeric="21"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-09-25"/>
+            <column name="event_date" valueDate="2010-09-25"/>
+            <column name="event_location_id" valueNumeric="1"/>
+            <column name="event_type_id" valueNumeric="1"/>
+            <column name="last_updated" valueDate="2010-09-25"/>
+        </insert>
+    </changeSet>    
+    <changeSet author="jmiranda (generated)" id="1285794105801-3">
+        <insert tableName="event">
+            <column name="id" valueNumeric="22"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-09-25"/>
+            <column name="event_date" valueDate="2010-09-25"/>
+            <column name="event_location_id" valueNumeric="1"/>
+            <column name="event_type_id" valueNumeric="1"/>
+            <column name="last_updated" valueDate="2010-09-25"/>
+        </insert>
+    </changeSet>    
+    <changeSet author="jmiranda (generated)" id="1285794105801-4">
+        <insert tableName="event">
+            <column name="id" valueNumeric="23"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-09-25"/>
+            <column name="event_date" valueDate="2010-09-25"/>
+            <column name="event_location_id" valueNumeric="1"/>
+            <column name="event_type_id" valueNumeric="1"/>
+            <column name="last_updated" valueDate="2010-09-25"/>
+        </insert>
+    </changeSet>    
+    <changeSet author="jmiranda (generated)" id="1285794105801-5">
+        <insert tableName="event">
+            <column name="id" valueNumeric="24"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-09-25"/>
+            <column name="event_date" valueDate="2010-09-25"/>
+            <column name="event_location_id" valueNumeric="1"/>
+            <column name="event_type_id" valueNumeric="1"/>
+            <column name="last_updated" valueDate="2010-09-25"/>
+        </insert>
+    </changeSet>    
+    <changeSet author="jmiranda (generated)" id="1285794105801-6">
+        <insert tableName="event">
+            <column name="id" valueNumeric="25"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-09-25"/>
+            <column name="event_date" valueDate="2010-09-25"/>
+            <column name="event_location_id" valueNumeric="1"/>
+            <column name="event_type_id" valueNumeric="1"/>
+            <column name="last_updated" valueDate="2010-09-25"/>
+        </insert>
+    </changeSet> 
+    <changeSet author="jmiranda (generated)" id="1285794105801-7">
+        <insert tableName="event">
+            <column name="id" valueNumeric="26"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-09-25"/>
+            <column name="event_date" valueDate="2010-09-25"/>
+            <column name="event_location_id" valueNumeric="1"/>
+            <column name="event_type_id" valueNumeric="1"/>
+            <column name="last_updated" valueDate="2010-09-25"/>
+        </insert>
+    </changeSet> 
+    <changeSet author="jmiranda (generated)" id="1285794105801-8">
+        <insert tableName="event">
+            <column name="id" valueNumeric="27"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-09-25"/>
+            <column name="event_date" valueDate="2010-09-25"/>
+            <column name="event_location_id" valueNumeric="1"/>
+            <column name="event_type_id" valueNumeric="1"/>
+            <column name="last_updated" valueDate="2010-09-25"/>
+        </insert>
+    </changeSet> 
+    <changeSet author="jmiranda (generated)" id="1285794105801-9">
+        <insert tableName="event">
+            <column name="id" valueNumeric="28"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-09-25"/>
+            <column name="event_date" valueDate="2010-09-25"/>
+            <column name="event_location_id" valueNumeric="1"/>
+            <column name="event_type_id" valueNumeric="1"/>
+            <column name="last_updated" valueDate="2010-09-25"/>
+        </insert>
+    </changeSet> 
+       
+    <changeSet author="jmiranda (generated)" id="1285794105801-10">
+        <insert tableName="shipment_event">
+            <column name="shipment_events_id" valueNumeric="2"/>
+            <column name="event_id" valueNumeric="20"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1285794105801-11">
+        <insert tableName="shipment_event">
+            <column name="shipment_events_id" valueNumeric="3"/>
+            <column name="event_id" valueNumeric="21"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1285794105801-12">
+        <insert tableName="shipment_event">
+            <column name="shipment_events_id" valueNumeric="4"/>
+            <column name="event_id" valueNumeric="22"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1285794105801-13">
+        <insert tableName="shipment_event">
+            <column name="shipment_events_id" valueNumeric="5"/>
+            <column name="event_id" valueNumeric="23"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1285794105801-14">
+        <insert tableName="shipment_event">
+            <column name="shipment_events_id" valueNumeric="7"/>
+            <column name="event_id" valueNumeric="24"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1285794105801-15">
+        <insert tableName="shipment_event">
+            <column name="shipment_events_id" valueNumeric="8"/>
+            <column name="event_id" valueNumeric="25"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1285794105801-16">
+        <insert tableName="shipment_event">
+            <column name="shipment_events_id" valueNumeric="9"/>
+            <column name="event_id" valueNumeric="26"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1285794105801-17">
+        <insert tableName="shipment_event">
+            <column name="shipment_events_id" valueNumeric="10"/>
+            <column name="event_id" valueNumeric="27"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1285794105801-18">
+        <insert tableName="shipment_event">
+            <column name="shipment_events_id" valueNumeric="11"/>
+            <column name="event_id" valueNumeric="28"/>
+        </insert>
+    </changeSet>
+
+
+    
 </databaseChangeLog>

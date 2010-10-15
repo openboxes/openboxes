@@ -15,12 +15,8 @@ class DashboardController {
 			redirect(action: "chooseWarehouse")			
 		}		
 		Location location = Location.get(session?.warehouse?.id);
-		
-		
 		def recentOutgoingShipments = shipmentService.getRecentOutgoingShipments(location?.id)
 		def recentIncomingShipments = shipmentService.getRecentIncomingShipments(location?.id)
-
-		
 		def allOutgoingShipments = shipmentService.getShipmentsByOrigin(location)
 		def allIncomingShipments = shipmentService.getShipmentsByDestination(location)
 		

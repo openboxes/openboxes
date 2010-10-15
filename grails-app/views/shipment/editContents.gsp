@@ -108,10 +108,10 @@
 																			    	}
 																				});
 																				$("#add-person-link").click(function() {
-																					$('#add-person-dialog').dialog('open');																																		
+																					$('#add-person-dialog').dialog('open');	
 																				});																			
 																			});
-																		</script>																										
+																		</script>
 																	</div>
 																			
 																															
@@ -136,17 +136,19 @@
 																		<tbody>
 																			<tr class="prop" style="background-color: #FFF6BF;">
 																				<td width="7%" style="vertical-align: middle; text-align: center"> (new) </td>
-																				<td width="10%" style="vertical-align: middle; text-align: center;">													
+																				<td width="10%" style="vertical-align: middle; text-align: center;">
 																					<g:textField name="quantity" value="1" size="2" />
 																				</td>
-																				<td width="20%" style="vertical-align: middle; text-align: left;">											
-																					<g:autoSuggest id="selectedItem" name="selectedItem" jsonUrl="/warehouse/json/findProductByName" width="200"/>	
+																				<td width="20%" style="vertical-align: middle; text-align: left;">
+																					<g:autoSuggest id="selectedItem" name="selectedItem" 
+																						jsonUrl="/warehouse/json/findProductByName" width="200"/>
 																				</td>
-																				<td width="15%" style="vertical-align: middle; text-align: left;">													
+																				<td width="15%" style="vertical-align: middle; text-align: left;">	
 																					<g:textField name="serialNumber" value="" size="10" style="" />
 																				</td>
 																				<td width="20%" style="vertical-align: middle; text-align: left;">
-																					<g:autoSuggest id="recipient" name="recipient" jsonUrl="/warehouse/json/findPersonByName" 
+																					<g:autoSuggest id="recipient" name="recipient" 
+																						jsonUrl="/warehouse/json/findPersonByName"
 																						width="150" 
 																						valueId="${shipmentInstance?.recipient?.id}" 
 																						valueName="${shipmentInstance?.recipient?.email}"/>	
@@ -165,7 +167,7 @@
 
 																<br/>
 																<br/>
-																<h2>Included items</h2>																																
+																<h2>Included items</h2>
 																<g:form action="editContainer">
 																	<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}"/>
 																	<g:hiddenField name="containerId" value="${containerInstance?.id}"/>
@@ -177,7 +179,8 @@
 																					<tr>
 																						<td colspan="6"
 																							<div class="fade">
-																								To remove an item, enter '0' in <b>Qty</b> field. After modifying any of the values below, click <b>Save</b>.  
+																								To remove an item, enter '0' in <b>Qty</b> field. After modifying
+																								any of the values below, click <b>Save</b>.
 																							</div>
 																						</td>
 																					</tr>
@@ -188,19 +191,19 @@
 																						<th>Lot / Serial No</th>
 																						<th>Recipient </th>
 																						<th></th>
-																					</tr>																							
+																					</tr>		
 																				</thead>
 																				<tbody>
 																				
-																					<g:each var="item" in="${containerInstance.shipmentItems}" status="k">
-																						<tr class="prop ${(k % 2) == 0 ? 'odd' : 'even'}">
-																							<td width="7%" style="text-align: center;">${k+1}</td>
+																					<g:each var="item" in="${containerInstance.shipmentItems}" status="itemStatus">
+																						<tr class="prop ${(itemStatus % 2) == 0 ? 'odd' : 'even'}">
+																							<td width="7%" style="text-align: center;">${itemStatus+1}</td>
 																							<td width="10%">
-																								<g:hiddenField name="shipmentItems[${k}].id" value="${item.id}"></g:hiddenField>											    
-																								<g:textField name="shipmentItems[${k}].quantity" value="${item.quantity}" size="2" />
+																								<g:hiddenField name="shipmentItems[${itemStatus}].id" value="${item.id}"></g:hiddenField>	
+																								<g:textField name="shipmentItems[${itemStatus}].quantity" value="${item.quantity}" size="2" />
 																							</td>
 																							<td width="20%">
-																								<g:autoSuggest id="shipmentItems${k}-product" name="shipmentItems[${k}].product" jsonUrl="/warehouse/json/findProductByName" 
+																								<g:autoSuggest id="shipmentItems${itemStatus}-product" name="shipmentItems[${itemStatus}].product" jsonUrl="/warehouse/json/findProductByName" 
 																									width="150" 
 																									valueId="${item?.product?.id}" 
 																									valueName="${item?.product?.name}"/>																								
@@ -209,10 +212,10 @@
 																								</g:if> 
 																							</td>
 																							<td width="15%">
-																								<g:textField name="shipmentItems[${k}].serialNumber" value="${item.serialNumber}" size="10" />																									
+																								<g:textField name="shipmentItems[${itemStatus}].serialNumber" value="${item.serialNumber}" size="10" />																									
 																							</td>
 																							<td width="20%">							
-																								<g:autoSuggest id="shipmentItems${k}-recipient" name="shipmentItems[${k}].recipient" jsonUrl="/warehouse/json/findPersonByName" 
+																								<g:autoSuggest id="shipmentItems${itemStatus}-recipient" name="shipmentItems[${itemStatus}].recipient" jsonUrl="/warehouse/json/findPersonByName" 
 																									width="150" 
 																									valueId="${item?.recipient?.id}" 
 																									valueName="${item?.recipient?.email}"/>												

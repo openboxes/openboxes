@@ -5,7 +5,7 @@ import java.util.Date;
 import org.pih.warehouse.inventory.Warehouse;
 
 
-class Person implements Comparable {
+class Person implements Comparable, Serializable {
     
 	String firstName;
 	String lastName;

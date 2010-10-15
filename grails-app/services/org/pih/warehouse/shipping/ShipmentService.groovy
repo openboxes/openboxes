@@ -2,6 +2,8 @@ package org.pih.warehouse.shipping;
 
 import java.util.List;
 import java.util.Map;
+
+import org.pih.warehouse.core.EventStatus;
 import org.pih.warehouse.core.EventType;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.ListCommand;
@@ -19,8 +21,33 @@ class ShipmentService {
 	
 	List<Shipment> getRecentOutgoingShipments(Long locationId) { 		
 		Location location = Location.get(locationId);
-		return Shipment.findAllByOriginAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30, 
-			[max:5, offset:2, sort:"expectedShippingDate", order:"desc"]);
+		//def upcomingShipments = Shipment.findAllByOriginAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30, 
+		//	[max:5, offset:2, sort:"expectedShippingDate", order:"desc"]);
+		
+		def criteria = Shipment.createCriteria()
+		def now = new Date()
+		def upcomingShipments = criteria.list {
+			and { 
+				eq("origin", location)
+				or {
+					between("expectedShippingDate",now-5,now+30)
+					isNull("expectedShippingDate")
+				}
+			}
+		}
+		
+		def shipments = new ArrayList<Shipment>();		
+		for (shipment in upcomingShipments) { 
+			shipments.add(shipment);
+		}
+						
+		/*
+		def unknownShipments = Shipment.findAllByOriginAndExpectedShippingDateIsNull(location);		
+		for (shipment in unknownShipments) { 
+			shipments.add(shipment);
+		}*/
+		
+		return shipments;
 	}
 	
 	
@@ -34,14 +61,15 @@ class ShipmentService {
 	Map<EventType, ListCommand> getShipmentsByStatus(List shipments) {
 		def shipmentMap = new TreeMap<EventType, ListCommand>();
 		shipments.each {
-			def eventType = it.getMostRecentStatus();
-			log.info("eventType: " + eventType.name)
-			def shipmentList = shipmentMap[eventType];
+			
+			def eventType = it.getMostRecentStatus();			
+			def key = (eventType?.eventStatus) ? eventType?.eventStatus : EventStatus.UNKNOWN;
+			def shipmentList = shipmentMap[key];
 			if (!shipmentList) {
-				shipmentList = new ListCommand(category: eventType, objectList: new ArrayList());
+				shipmentList = new ListCommand(category: key, objectList: new ArrayList());
 			}
 			shipmentList.objectList.add(it);
-			shipmentMap.put(eventType, shipmentList)
+			shipmentMap.put(key, shipmentList)
 		}
 		log.info("shipmentMap: " + shipmentMap)
 		

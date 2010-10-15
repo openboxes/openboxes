@@ -11,7 +11,7 @@ import org.pih.warehouse.core.EventStatus;
  * status of a Shipment from Supplier to final destination, whereas ShipmentEvent is
  * meant to represent a particular Event which occurs during the course of Shipment.
  */
-class EventType implements Comparable {
+class EventType implements Comparable, Serializable {
 
 	String name
 	String description

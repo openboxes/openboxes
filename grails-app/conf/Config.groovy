@@ -17,6 +17,7 @@ grails {
 		from = "info@localhost"
 		host = "localhost"
 		port = "25"
+		//from = "justin.miranda@gmail.com"
 		//host = "smtp.gmail.com"
 		//port = 465
 		//username = "justin.miranda@gmail.com"
@@ -68,11 +69,19 @@ grails.spring.bean.packages = []
 
 // set per-environment serverURL stem for creating absolute links
 environments {
-	production {  grails.serverURL = "http://www.changeme.com"  }
+	production {  
+		grails.serverURL = "http://www.changeme.com"  
+	}
 	development {
 		grails.serverURL = "http://localhost:8080/${appName}";
 	}
-	test {  grails.serverURL = "http://localhost:8080/${appName}"  }
+	test {  
+		grails.serverURL = "http://localhost:8080/${appName}"  
+	}
+	child { 
+		grails.serverURL = "http://localhost:8090/${appName}"
+		warehouse.syncServerURL = "http://localhost:8080/${appName}"
+	}
 }
 
 // log4j configuration
@@ -126,7 +135,9 @@ log4j = {
 		'BootStrap'
 
 	debug	'liquibase',
-		'org.apache.ddlutils'
+		'org.apache.ddlutils',
+		'org.apache.http.headers',
+		'org.apache.http.wire'
 	
 	
 }

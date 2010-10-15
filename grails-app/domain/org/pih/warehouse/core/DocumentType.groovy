@@ -2,7 +2,10 @@ package org.pih.warehouse.core
 
 import java.util.Date;
 
-class DocumentType {
+/** 
+ * TODO Use enum 
+ */
+class DocumentType implements Serializable {
 	
 	String name
 	String description

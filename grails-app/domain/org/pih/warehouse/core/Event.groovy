@@ -13,7 +13,7 @@ import org.pih.warehouse.core.Location;
 *  Shipment #2 Arrived at Customs on 5/5/2010:
 *  		{eventDate: 5/5/2010, eventLocation: Customs, eventType: ARRIVED}
 */
-class Event implements Comparable {
+class Event implements Comparable, Serializable {
 	
 	Date eventDate				// The date and time on which the Event occurred	
 	EventType eventType			// The type of the Event

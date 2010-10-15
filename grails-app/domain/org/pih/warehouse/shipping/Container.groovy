@@ -3,7 +3,7 @@ package org.pih.warehouse.shipping;
 import java.util.Date;
 import org.pih.warehouse.core.Person;
 
-class Container implements Comparable {
+class Container implements Comparable, java.io.Serializable {
 
 	String name	
 	String containerNumber				// An official container number (if it exists)

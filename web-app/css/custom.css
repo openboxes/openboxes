@@ -21,28 +21,9 @@ h3.ui-state-active { background-color: #F8F7EF; }
 #dashboard { 
 	margin: 20px; 	
 }
-	
-
-#notify-container {
-	color:#735005;
-	font-size:130%;
-	font-weight:bold;
-	left:0;
-	position:fixed;
-	text-align:center;
-	top:0;
-	width:100%;
-	z-index:100;
-}
-#notify-container div {
-	background-color:#F4A83D;
-	border-bottom:1px solid #D6800C;
-	padding:7px 0;
-}
-
 
 body { 
-	font-family: "lucida grande", arial, verdana;
+	font-family: "Lucida Grande", arial, verdana;
 }
 
 
@@ -68,6 +49,7 @@ body {
 }
 #loginFormBox { 
 	border: 1px solid lightgrey;	
+	padding: 20px;
 }
 	
 #signupForm { 
@@ -153,7 +135,7 @@ table#listOutgoing th {
 	border-top: 1px solid #eee;
 }  
 .menu .heading { 
-	font-size: 1.5em;
+	font-size: 1.25em;
 	line-height: 1.5em; 
 	vertical-align: middle;
 	padding: 2px 0px 2px 15px; 
@@ -392,17 +374,36 @@ div#dashboard li {
 
 .prop { 
 	border-top: 1px dotted #ccc;	
+	
 }
+
+.prop .first { 
+	border-top: 0px;	
+}
+
 .prop .value { 
 	text-align:left;
+	width: 30%;
+	vertical-align: top;
+	line-height: 1.5em;
 }
 
 .prop .name { 
-	width: 20%;
+	width: 10%;
 	background-color: #F7F7F7;
 	text-align: right; 
 }
 
 
+label { display: block; text-decoration: none; } 
+fieldset .prop { margin: 10px; }
+.radio { padding-left: 10px; } 
+.body {  } 
+#progressbar {  padding: 10px; margin: 10px; } 
+#progressbar .step { padding-left: 0; border: 1px solid #aaa; background-color: whitesmoke; padding: 10px;}
+.step.selected { font-weight: bold; text-decoration: underline; background-color: #F8F7EF; } 
+span.right { float: left; } 
+span.left { width: 10%;  float: left; text-align: center; } 
+#wizard { }
 
 

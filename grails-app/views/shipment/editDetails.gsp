@@ -64,20 +64,21 @@
 										<td valign="top" class="name" style="width: 10%;"><label><g:message
 											code="shipment.shipper.label" default="Origin" /></label>
 										</td>
-										<td valign="top" style="width: 30%;">											
+										<td valign="top" style="width: 30%; line-height: 1.5em">											
 											<%-- <g:autoSuggest id="origin" name="origin" 
 												jsonUrl="/warehouse/json/findWarehouseByName" 
 												valueId="${shipmentInstance?.origin?.id}" 
 												valueName="${shipmentInstance?.origin?.name}"/>												
 												--%>
-												<span style="line-height: 1.5em">${shipmentInstance?.origin?.name}</span>
+												${shipmentInstance?.origin?.name}
 												<g:hiddenField name="origin.id" value="${shipmentInstance?.origin?.id}" />
 										</td>
 									</tr>
 									<tr class="prop">
 										<td valign="top" class="name" style="width: 10%;"><label><g:message
-											code="shipment.shipper.label" default="Destination" /></label></td>
-										<td valign="top" style="width: 30%;">											
+											code="shipment.shipper.label" default="Destination" /></label>
+										</td>
+										<td valign="top" style="width: 30%; line-height: 1.5em">											
 											<g:autoSuggest id="destination" name="safeDestination" 
 												jsonUrl="/warehouse/json/findWarehouseByName" 
 												valueId="${shipmentInstance?.destination?.id}" 
@@ -86,9 +87,9 @@
 									</tr>
 									<tr class="prop">
 										<td valign="top" class="name" style="width: 10%;"><label><g:message
-											code="shipment.shipper.label" default="Shipping Method" /></label></td>
-										<td valign="top" style="width: 30%;">			
-										
+											code="shipment.shipper.label" default="Shipping Method" /></label>
+										</td>
+										<td valign="top" style="width: 30%; line-height: 1.5em">			
 											<g:if test="${shipmentInstance?.shipmentMethod?.shipperService}">								
 												<g:autoSuggest id="shipperService" name="shipperService" 
 													jsonUrl="/warehouse/json/findShipperServiceByName" 
@@ -114,7 +115,7 @@
 									<tr class="prop">
 										<td valign="top" class="name" style="width: 10%;"><label><g:message
 											code="shipment.carrier.label" default="Carrier" /></label></td>
-										<td valign="top" style="width: 30%;">											
+										<td valign="top" style="width: 30%; line-height: 1.5em">											
 											<g:if test="${shipmentInstance?.carrier}">
 												<g:autoSuggest id="carrier" name="safeCarrier" jsonUrl="/warehouse/json/findPersonByName" 
 													valueId="${shipmentInstance?.carrier?.id}" 
@@ -165,7 +166,7 @@
 									</tr>		
 									<tr class="prop">
 										<td class="name"></td>
-										<td>
+										<td class="value">
 											<div class="buttons">
 												<button type="submit" class="positive"><img
 												src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"

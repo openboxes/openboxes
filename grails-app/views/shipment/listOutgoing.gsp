@@ -1,5 +1,4 @@
 
-<%@page import="javax.swing.event.DocumentEvent.EventType"%>
 <html>
    <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -37,7 +36,7 @@
 				--%>
 				
             </div>
-            <div class="list">
+            <div style="width: 75%;">
             
             	<g:if test="${shipmentInstanceMap.size()==0}">
             		<div class="notice">
@@ -49,9 +48,30 @@
 	            		</g:else>
             		</div>
             	</g:if>
-            
+
+				<table>            
+					<g:each var="entry" in="${shipmentInstanceMap}">	
+						<thead>
+							<tr> 
+								<th>       
+									<h2>${entry.key.name} (${entry.value.objectList.size})</h2>
+								</th>
+							</tr>
+						</thead>
+	                    <g:each var="shipmentList" in="${entry.value}">
+							<g:each var="shipmentInstance" in="${shipmentList.objectList}" status="i">
+								<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+									<td>
+										<g:render template="shipmentSummary" model="['shipmentInstance':shipmentInstance]"/>
+									</td>
+								</tr>
+							</g:each>                    		
+	                   	</g:each>
+		           	</g:each>
+				</table>
+
+<%--
 				<g:each var="entry" in="${shipmentInstanceMap}">	        
-					<h2><b>${entry.key}</b> Shipments (${entry.value.objectList.size})</h2>	                    	
 					<table>
 	                    <thead>
 	                        <tr>   
@@ -116,7 +136,10 @@
 					</table>
 					<br/>            
 					<br/>            
-				</g:each>
+				</g:each>			
+ --%>					
+					
+				
             </div>
         </div>
     </body>

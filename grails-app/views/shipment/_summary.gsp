@@ -1,5 +1,5 @@
-<div style="padding: 10px;">
-	<g:if test="${shipmentInstance.id}">
+<div style="padding: 20px;">
+	<g:if test="${shipmentInstance?.id}">
 		<table>
 			<tbody>
 				<tr>
@@ -13,9 +13,18 @@
 						<div style="color: #aaa; font-size: 0.9em;">
 							Shipment Number: &nbsp; ${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}
 						</div>	
-					</td>		
+					</td>	
+										
 					<td style="text-align: right;">
-						<span style="font-weight: bold;">${fieldValue(bean: shipmentInstance, field: "mostRecentEvent.eventType.name")}</span>
+						<g:if test="${shipmentInstance?.mostRecentEvent?.eventType?.eventStatus?.name}">
+							<img src="${createLinkTo(dir:'images/icons/eventStatus',file: shipmentInstance?.mostRecentEvent?.eventType?.eventStatus?.name?.toLowerCase() + '.png')}"
+								alt="${shipmentInstance?.mostRecentEvent?.eventType?.eventStatus?.name}" style="vertical-align: middle"/>							
+						</g:if>
+						<g:else>
+							<img src="${createLinkTo(dir:'images/icons/eventStatus',file: 'invalid.png')}"
+								alt="Invalid" style="vertical-align: middle"/>							
+						</g:else>
+						<span class="fade">${shipmentInstance?.mostRecentEvent?.eventType?.eventStatus?.name}</span>
 					</td>
 				</tr>
 			</tbody>

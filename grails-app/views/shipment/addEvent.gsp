@@ -36,23 +36,34 @@
 							<table>
 								<tbody>
 									<tr class="prop">
+			                           <td valign="top" class="name"><label><g:message code="event.eventType.label" default="Event Type" /></label></td>                            
+			                           <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'eventType', 'errors')}">
+											<g:if test="${!eventInstance?.eventType}">												
+												<g:select id="eventType.id" name='eventType.id' noSelection="${['':'Select one ...']}" 
+													from='${org.pih.warehouse.core.EventType.list()}' optionKey="id" 
+													optionValue="optionValue" value="${eventInstance.eventType}" >
+												</g:select>
+											</g:if>
+											<g:else>
+												<g:hiddenField name="eventType.id" value="${eventInstance?.eventType?.id}"/>
+												${eventInstance?.eventType?.name}
+											</g:else>
+			                       		</td>
+									</tr> 								
+								
+									<tr class="prop">
 				                           <td valign="top" class="name"><label><g:message code="event.eventDate.label" default="Event Date" /></label></td>                            
 				                           <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'eventDate', 'errors')}">
-				                                  <g:jqueryDatePicker name="eventDate" value="" format="" />
+				                                  <g:jqueryDatePicker name="eventDate" value="${eventInstance?.eventDate}" format="" />
 				                              </td>
 				                       </tr>  	          
-									<tr class="prop">
-				                           <td valign="top" class="name"><label><g:message code="event.eventType.label" default="Event Type" /></label></td>                            
-				                           <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'eventType', 'errors')}">
-				                                  <g:select id="eventTypeId" name='eventTypeId' noSelection="${['':'Select one ...']}" 
-				                                  	from='${org.pih.warehouse.core.EventType.list()}' optionKey="id" optionValue="optionValue"></g:select>
-				                              </td>
-				                       </tr>  	          
+										 	          
 										<tr class="prop">
 				                           <td valign="top" class="name"><label><g:message code="event.eventDate.label" default="Location" /></label></td>                            
 				                           <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'location', 'errors')}">
-											<g:select id="eventLocationId" name='eventLocationId' noSelection="${['':'Select one ...']}" 
-												from='${org.pih.warehouse.core.Location.list()}' optionKey="id" optionValue="name">
+											<g:select id="eventLocation.id" name='eventLocation.id' noSelection="${['':'Select one ...']}" 
+												from='${org.pih.warehouse.core.Location.list()}' optionKey="id" optionValue="name"
+												value="${eventInstance?.eventLocation?.id}">
 												</g:select>									
 				                              </td>
 				                       </tr>  	          
@@ -65,7 +76,7 @@
 									    <td class="value">
 											<div class="buttons" style="text-align: left;">
 												<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> Add Event</button>
-												<g:link controller="dashboard" action="index" class="negative"> <img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="Cancel" /> Cancel </g:link>
+												<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id}" class="negative"> <img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="Cancel" /> Cancel </g:link>
 											</div>
 									    </td>					                        
 				                       </tr>         

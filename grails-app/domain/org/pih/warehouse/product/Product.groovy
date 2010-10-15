@@ -10,7 +10,7 @@ import java.util.Date;
  * report on product availability across a generic product like Ibuprofen
  * no matter what size or shape it is.
  */
-class Product {
+class Product implements Serializable {
 
     String name					// A product name (e.g. a brand name, dosage strength like Advil 200mg)
     String upc;					// A universal product code (http://en.wikipedia.org/wiki/European_Article_Number)

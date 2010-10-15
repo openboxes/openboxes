@@ -9,7 +9,7 @@ import org.pih.warehouse.core.DocumentType;
  * entity in the system.  Currently, users can only upload and link documents to 
  * shipments.  
  */
-class Document {
+class Document implements Serializable {
 
 	String name			// Document name (optional)
 	String filename			// Document filename

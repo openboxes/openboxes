@@ -2,7 +2,7 @@
 
 	<div id="shipmentMenu" class="menu" style="width: 250px">
 		<fieldset>
-			<legend>Edit Actions</legend>			
+			<legend>Actions</legend>			
 			<table>
 				<g:if test="${session?.warehouse?.id == shipmentInstance?.origin?.id}">			
 					<tr>
@@ -115,6 +115,16 @@
 					</td>
 				</tr>
 			</g:if>
+			<tr class="prop">
+				<td>
+					<g:link controller="shipment" action="deleteShipment" id="${shipmentInstance.id}"><img
+					src="${createLinkTo(dir:'images/icons',file:'trash.png')}"
+					alt="Receive Shipment" style="vertical-align: middle" /> &nbsp; 
+						<g:if test="${request.request.requestURL.toString().contains('deleteShipment')}"><b>delete shipment</b></g:if>
+						<g:else>delete shipment</g:else>
+					</g:link>				
+				</td>
+			</tr>
 		</table>
 	</fieldset>
 </div>

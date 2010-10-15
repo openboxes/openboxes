@@ -8,9 +8,9 @@ import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.shipping.ReferenceNumber;
 import org.pih.warehouse.donation.Donor;
+import java.io.Serializable;
 
-
-class Shipment {
+class Shipment implements Serializable {
 		
 	String name 					// user-defined name of the shipment 
 	String shipmentNumber			// an auto-generated shipment number
@@ -45,7 +45,9 @@ class Shipment {
 		"allShipmentItems",
 		"containersByType", 
 		"mostRecentEvent", 
-		"mostRecentStatus"]
+		"mostRecentStatus",
+		"actualShippingDate",
+		"actualDeliveryDate"]
 	
 	// Core association mappings
 	static hasMany = [events : Event,
@@ -118,6 +120,7 @@ class Shipment {
 		return allShipmentItems;		
 	}
 
+	
 	String getShipmentNumber() {
 		return (id) ? String.valueOf(id).padLeft(6, "0")  : "(new shipment)";
 	}
@@ -137,6 +140,29 @@ class Shipment {
 		return containerMap;
 		
 	}
+	
+	/**
+	 * FIXME The eventType.name value might change, so we need to make this 
+	 * more robust.
+	 */
+	Date getActualShippingDate() { 
+		for (event in events) { 
+			if (event?.eventType?.name == "Shipped") { 
+				return event?.eventDate;
+			}
+		}
+		return null;
+	}
+
+	Date getActualDeliveryDate() { 
+		for (event in events) {
+			if (event?.eventType?.name == "Received") {
+				return event?.eventDate;
+			}
+		}
+		return null;
+	}
+		
 	
 	Event getMostRecentEvent() { 		
 		if (events && events.size() > 0) {

@@ -6,9 +6,12 @@ import java.util.List;
 import grails.converters.JSON
 import groovy.sql.Sql;
 import au.com.bytecode.opencsv.CSVWriter;
+
+import org.pih.warehouse.core.ActivityType;
 import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Document;
 import org.pih.warehouse.core.Event;
+import org.pih.warehouse.core.EventStatus;
 import org.pih.warehouse.core.EventType;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
@@ -65,7 +68,7 @@ class ShipmentController {
 	
 	def update = {	
 		log.info params
-			
+		
 		def shipmentInstance = Shipment.get(params.id)
 		if (shipmentInstance) {
 			if (params.version) {
@@ -76,7 +79,7 @@ class ShipmentController {
 					return
 				}
 			}			
-
+			
 			// Bind request parameters 
 			shipmentInstance.properties = params
 			
@@ -87,7 +90,7 @@ class ShipmentController {
 			if (!shipmentMethod) {
 				shipmentMethod = new ShipmentMethod();
 			}
-
+			
 			// If there's an ID but no name, it means we want to remove the shipper and shipper service
 			if (!params.shipperService.name) { 			
 				shipmentMethod.shipper = null
@@ -115,15 +118,15 @@ class ShipmentController {
 			else if (params.safeDestination.id && params.safeDestination.name) {
 				def destination = Location.get(params.safeDestination.id);
 				if (destination && params.safeDestination.name == destination.name) // if it exists
-					shipmentInstance.destination = destination;
+				shipmentInstance.destination = destination;
 			}
-												
+			
 			// -- Processing carrier  -------------------------
 			// This is necessary because Grails seems to be binding things incorrectly.  If we just let 
 			// Grails do the binding by itself, it tries to change the ID of the 'carrier' that is already
 			// associated with the shipment, rather than changing the 'carrier' object associated with 
 			// the shipment.
-						
+			
 			// Reset the carrier
 			if (!params.safeCarrier.name) {
 				shipmentInstance.carrier = null;
@@ -132,7 +135,7 @@ class ShipmentController {
 			else if (params.safeCarrier.id && params.safeCarrier.name) {
 				def safeCarrier = Person.get(params.safeCarrier.id);				
 				if (safeCarrier && safeCarrier?.name != shipmentInstance?.carrier?.name)
-					shipmentInstance.carrier = safeCarrier;
+				shipmentInstance.carrier = safeCarrier;
 			}
 			// else if only the name is provided, we need to create a new person
 			else { 
@@ -166,7 +169,14 @@ class ShipmentController {
 			redirect(action: (params.type == "incoming") ? "listIncoming" : "listOutgoing")
 		}
 		else {
-			[shipmentInstance: shipmentInstance]
+			def eventTypes =  org.pih.warehouse.core.EventType.list();
+			def shippingEventTypes = eventTypes.findAll() { eventType -> 
+				eventType?.activityType == ActivityType.SHIPPING
+			}
+			def receivingEventTypes = eventTypes.findAll() { eventType ->
+				eventType?.activityType == ActivityType.RECEIVING
+			}
+			[shipmentInstance: shipmentInstance, shippingEventTypes : shippingEventTypes]
 		}
 	}
 	
@@ -204,22 +214,42 @@ class ShipmentController {
 				shipmentInstance.properties = params
 				if (!shipmentInstance.hasErrors() && shipmentInstance.save(flush: true)) {					
 					def event = new Event(
-						eventDate: new Date(),
-						eventType:EventType.findByName("Departed"), 
-						eventLocation: Location.get(session.warehouse.id)).save(flush:true);						
-
+					eventDate: new Date(),
+					eventType:EventType.findByName("Departed"), 
+					eventLocation: Location.get(session.warehouse.id)).save(flush:true);						
+					
 					shipmentInstance.addToEvents(event).save(flush:true);
-
+					
 					def comment = new Comment(comment: params.comment, sender: session.user)
 					shipmentInstance.addToComments(comment).save(flush:true);
-
-										
+					
+					
 					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 					redirect(action: "listOutgoing")
 				}
 			}
 			render(view: "sendShipment", model: [shipmentInstance: shipmentInstance])
 		}
+	}
+	
+	
+	def deleteShipment = {
+		def shipmentInstance = Shipment.get(params.id)
+		if (!shipmentInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+			redirect(controller: "dashboard", action: "index");
+			return;
+		}
+		else {
+			if ("POST".equalsIgnoreCase(request.getMethod())) {				
+
+				shipmentInstance.delete();
+				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
+				redirect(controller: "dashboard", action: "index")
+				return;
+			}
+		}
+		[shipmentInstance:shipmentInstance]
 	}
 	
 	def receiveShipment = {
@@ -236,9 +266,9 @@ class ShipmentController {
 				//receiptInstance.shipment = shipmentInstance;
 				if (!receiptInstance.hasErrors() && receiptInstance.save(flush: true)) {
 					def event = new Event(
-						eventDate: new Date(),
-						eventType:EventType.findByName("Received"),
-						eventLocation: Location.get(session.warehouse.id)).save(flush:true);
+					eventDate: new Date(),
+					eventType:EventType.findByName("Received"),
+					eventLocation: Location.get(session.warehouse.id)).save(flush:true);
 					shipmentInstance.addToEvents(event).save(flush:true);
 					
 					def comment = new Comment(comment: params.comment, sender: session.user)
@@ -246,7 +276,7 @@ class ShipmentController {
 					
 					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 					redirect(action: "listIncoming")
-				}				
+				}
 			}
 			else { 
 				// Instantiate the model class to be used 
@@ -259,7 +289,7 @@ class ShipmentController {
 					receiptItem.setLotNumber(it.lotNumber);
 					receiptItem.setSerialNumber (it.serialNumber);
 					receiptInstance.addToReceiptItems(receiptItem);
-				} 
+				}
 			}
 			[shipmentInstance:shipmentInstance, receiptInstance:receiptInstance]
 		}
@@ -353,7 +383,6 @@ class ShipmentController {
 			
 			if (!containerInstance && shipmentInstance?.containers) { 
 				containerInstance = shipmentInstance.containers.iterator().next();
-				
 			}
 			[shipmentInstance: shipmentInstance, containerInstance: containerInstance]
 		}
@@ -361,7 +390,6 @@ class ShipmentController {
 	
 	def listShipments = { 		
 		[ shipments : shipmentService.getShipments() ]
-		
 	}
 	
 	def listIncoming = { 
@@ -382,11 +410,14 @@ class ShipmentController {
 			
 			// Match the shipment's most recent event type against the selected event type
 			if (eventType) {
-				incomingShipments = incomingShipments.findAll() { s -> s?.mostRecentEvent?.eventType == eventType }
+				incomingShipments = incomingShipments.findAll() { s -> 
+					s?.mostRecentEvent?.eventType == eventType
+				}
 			}
 			// Yes, there could actually be shipments with no most recent event
 			else
-				incomingShipments = incomingShipments.findAll() { s -> s?.mostRecentEvent?.eventType == null }
+			incomingShipments = incomingShipments.findAll() { s -> s?.mostRecentEvent?.eventType == null
+			}
 		}
 		
 		[
@@ -407,17 +438,27 @@ class ShipmentController {
 		def eventType = null;
 		if (params?.eventType?.id) { 
 			eventType = (params.eventType?.id) ? EventType.get(params.eventType.id) : null;		
-			log.info "eventType: " + eventType?.name
 			
 			// Match the shipment's most recent event type against the selected event type
 			if (eventType) {  
-				outgoingShipments = outgoingShipments.findAll() { s -> s?.mostRecentEvent?.eventType == eventType } 
+				outgoingShipments = outgoingShipments.findAll() { shipment -> 
+					shipment?.mostRecentEvent?.eventType == eventType
+				}
 			}
 			// Yes, there could actually be shipments with no most recent event	
-			else 
-				outgoingShipments = outgoingShipments.findAll() { s -> s?.mostRecentEvent?.eventType == null }			
+			else {
+				outgoingShipments = outgoingShipments.findAll() { shipment -> 
+					shipment?.mostRecentEvent?.eventType == null
+				}
+			}
 		} 
-					
+		else if (params?.eventStatus && params?.activityType) { 			
+			outgoingShipments = outgoingShipments.findAll() { shipment ->
+				
+				(shipment?.mostRecentEvent?.eventType?.activityType == ActivityType.valueOf(params.activityType) &&
+				shipment?.mostRecentEvent?.eventType?.eventStatus == EventStatus.valueOf(params.eventStatus))
+			}
+		}
 		[
 			eventType : eventType,			
 			shipmentInstanceMap : shipmentService.getShipmentsByStatus(outgoingShipments),
@@ -487,9 +528,9 @@ class ShipmentController {
 				redirect(action: "editContents", id: shipment.id, params: ["container.id": container?.id])
 				return;
 				
-			}			
+			}
 		}	
-			
+		
 		// Add item to container if product doesn't already exist
 		if (container) { 
 			def oldQuantity = 0;
@@ -502,7 +543,6 @@ class ShipmentController {
 					newQuantity = it.quantity;
 					it.save();
 					found = true;
-					
 				}
 			}			
 			if (!found) { 			
@@ -511,7 +551,6 @@ class ShipmentController {
 			}
 			else { 
 				flash.message = "Modified quantity of existing shipment item ${product.name} from ${oldQuantity} to ${newQuantity}"
-				
 			}
 		}
 		
@@ -567,7 +606,7 @@ class ShipmentController {
 			// If the user removed the recipient, we need to make sure that the whole object is removed (not just the ID)
 			for (def shipmentItem : containerInstance?.shipmentItems) { 
 				if (!shipmentItem?.recipient?.id) { 
-					log.info("item recipient: " + shipmentItem.recipient.id)
+					log.info("item recipient: " + shipmentItem?.recipient?.id)
 					shipmentItem.recipient = null;
 				}
 			}
@@ -594,15 +633,15 @@ class ShipmentController {
 	def copyContainer = { 
 		def container = Container.get(params.id);  
 		def shipment = Shipment.get(params.shipmentId);   	
-
+		
 		if (container && shipment) { 		
 			def numCopies = (params.copies) ? Integer.parseInt( params.copies ) : 1
 			int index = (shipment?.containers)?(shipment.containers.size()):1;
 			/*try { 
-				index = Integer.parseInt(container.name);
-			} catch (NumberFormatException e) {
-				log.warn("The given value " + params.name + " is not an integer");
-			}*/
+			 index = Integer.parseInt(container.name);
+			 } catch (NumberFormatException e) {
+			 log.warn("The given value " + params.name + " is not an integer");
+			 }*/
 			
 			
 			while ( numCopies-- > 0 ) {
@@ -621,9 +660,9 @@ class ShipmentController {
 				}    		
 				shipment.addToContainers(containerCopy).save(flush:true);
 			}
-			flash.message = "Copied package successfully";		
+			flash.message = "Copied package successfully";
 		} else { 
-			flash.message = "Unable to copy package";		
+			flash.message = "Unable to copy package";
 		}
 		
 		redirect(action: 'showDetails', id: params.shipmentId)
@@ -631,26 +670,23 @@ class ShipmentController {
 	
 	
 	/*
-	def addItem = {     		
-		log.debug params;
-		def container = Container.get(params.containerId);
-		def product = Product.get(params.productId);
-		def quantity = params.quantity;
-		
-		// if container already includes a shipment item with this product, 
-		// we just need to add to the total quantity
-		def weight = product.weight * Integer.valueOf(quantity);
-		
-		//def donor = null;
-		//if (params.donorId)
-		def donor = Organization.get(params.donorId);
-		
-		def shipmentItem = new ShipmentItem(product: product, quantity: quantity, weight: weight, donor: donor);
-		container.addToShipmentItems(shipmentItem).save(flush:true);
-		flash.message = "Added $params.quantity units of $product.name";		
-		redirect(action: 'show', id: params.shipmentId)    	
-	}
-	*/	
+	 def addItem = {     		
+	 log.debug params;
+	 def container = Container.get(params.containerId);
+	 def product = Product.get(params.productId);
+	 def quantity = params.quantity;
+	 // if container already includes a shipment item with this product, 
+	 // we just need to add to the total quantity
+	 def weight = product.weight * Integer.valueOf(quantity);
+	 //def donor = null;
+	 //if (params.donorId)
+	 def donor = Organization.get(params.donorId);
+	 def shipmentItem = new ShipmentItem(product: product, quantity: quantity, weight: weight, donor: donor);
+	 container.addToShipmentItems(shipmentItem).save(flush:true);
+	 flash.message = "Added $params.quantity units of $product.name";		
+	 redirect(action: 'show', id: params.shipmentId)    	
+	 }
+	 */	
 	
 	def addDocument = { 
 		log.info params
@@ -671,7 +707,7 @@ class ShipmentController {
 		//}
 		//redirect(action: 'addComment', id: params.shipmentId)
 	}
-
+	
 	/**
 	 * This action is used to render the form page used to add a 
 	 * new package/container to a shipment.
@@ -682,9 +718,9 @@ class ShipmentController {
 		
 		def containerName = (shipmentInstance?.containers) ? String.valueOf(shipmentInstance?.containers?.size() + 1) : "1";
 		def containerInstance = new Container(name : containerName);
-			
+		
 		render(view: "addPackage", model: [shipmentInstance : shipmentInstance, containerInstance : containerInstance]);
-
+		
 	}
 	
 	
@@ -709,27 +745,25 @@ class ShipmentController {
 				//flash.message = "Could not save container"				
 				render(view: "addPackage", model: [shipmentInstance:shipmentInstance, containerInstance:containerInstance])
 			}
-			
-			
 		} else { 		
 			redirect(action: 'showDetails', id: params.shipmentId);
-		}		
+		}
 	}
 	
-		
+	
 	def saveComment = { 
 		def shipmentInstance = Shipment.get(params.shipmentId);
 		def recipient = (params.recipientId) ? User.get(params.recipientId) : null;
 		def comment = new Comment(comment: params.comment, sender: session.user, recipient: recipient)
 		if (shipmentInstance) { 
 			shipmentInstance.addToComments(comment).save(flush:true);
-			flash.message = "Added comment '${params.comment}'to shipment ${shipmentInstance.name}";			
+			flash.message = "Added comment '${params.comment}'to shipment ${shipmentInstance.name}";
 		}
-		redirect(action: 'showDetails', id: params.shipmentId);		
+		redirect(action: 'showDetails', id: params.shipmentId);
 	}
 	
 	
-
+	
 	
 	def editItem = { 
 		def item = ShipmentItem.get(params.id);
@@ -754,7 +788,7 @@ class ShipmentController {
 		if (shipment && document) { 	    	
 			shipment.removeFromDocuments(document).save(flush:true);
 			document.delete();	    	    	
-			flash.message = "Deleted document $params.id from shipment";		
+			flash.message = "Deleted document $params.id from shipment";
 		}
 		else { 
 			flash.message = "Could not remove document $params.id from shipment";
@@ -779,7 +813,7 @@ class ShipmentController {
 	def deleteContainer = {
 		def container = Container.get(params.id);
 		def shipment = Shipment.get(params.shipmentId);
-
+		
 		if (shipment && container) {
 			container.delete();
 			//shipment.removeFromContainers(container).save(flush:true);
@@ -788,7 +822,7 @@ class ShipmentController {
 		else {
 			flash.message = "Could not remove event $params.id from shipment";
 		}
-
+		
 		redirect(action: 'showDetails', id: params.shipmentId)
 	}
 	
@@ -833,19 +867,20 @@ class ShipmentController {
 				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
 				redirect(action: "list")
 			}
-			render(view: "addEvent", model: [shipmentInstance : shipmentInstance, shipmentEvent : new Event()]);
+			//def event = new Event(eventType:EventType.get(params.eventType.id), eventDate:new Date())
+			def eventInstance = new Event(params);			
+			render(view: "addEvent", model: [shipmentInstance : shipmentInstance, eventInstance : eventInstance]);
 		}
 		else { 						
-			Event event = new Event(
-			eventType:EventType.get(params.eventTypeId), eventDate: params.eventDate, 
-			eventLocation: Location.get(params.eventLocationId)
-			);
-			
-			def shipment = Shipment.get(params.shipmentId);     	
-			shipment.addToEvents(event).save(flush:true);    
-			
-			flash.message = "Added event";		
-			redirect(action: 'showDetails', id: params.shipmentId)
+			Event eventInstance = new Event(params);			
+			def shipmentInstance = Shipment.get(params.shipmentId);     	
+			if (!eventInstance.hasErrors() && shipmentInstance.addToEvents(eventInstance).save(flush:true)) { 			
+				flash.message = "Added event ${eventInstance?.eventType?.name} to shipment";		
+			}
+			else { 
+				flash.message = "Unable to add event ${eventInstance?.eventType?.name} to shipment"
+			}
+			redirect(action: 'showDetails', id: shipmentInstance.id)
 		}
 	}    
 	
@@ -865,7 +900,7 @@ class ShipmentController {
 	def view = {
 		// pass through to "view shipment" page
 	}
-
+	
 	Person convertStringToPerson(String name) { 
 		def person = new Person();
 		if (name) {
@@ -885,18 +920,16 @@ class ShipmentController {
 				}
 			}
 			/*
-			if (nameArray.length == 3) {
-				recipient = new Person(firstName : nameArray[0], lastName : nameArray[1], email : nameArray[2]);
-			} else if (nameArray.length == 2) {
-				recipient = new Person(firstName : nameArray[0], lastName : nameArray[1]);
-			} else if (nameArray.length == 1) {
-				recipient = new Person(firstName : nameArray[0]);
-			}*/			
+			 if (nameArray.length == 3) {
+			 recipient = new Person(firstName : nameArray[0], lastName : nameArray[1], email : nameArray[2]);
+			 } else if (nameArray.length == 2) {
+			 recipient = new Person(firstName : nameArray[0], lastName : nameArray[1]);
+			 } else if (nameArray.length == 1) {
+			 recipient = new Person(firstName : nameArray[0]);
+			 }*/
 		}
 		return person;
-	}	
-	
-	
+	}
 }
 
 

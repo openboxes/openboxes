@@ -7,7 +7,7 @@ import org.pih.warehouse.donation.Donor;
 
 
 
-class ShipmentItem implements Comparable {
+class ShipmentItem implements Comparable, java.io.Serializable {
 
 	String lotNumber			// Loose coupling to the inventory lot 
 	Product product		    	// Specific product that we're tracking

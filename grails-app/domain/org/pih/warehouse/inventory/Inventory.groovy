@@ -1,6 +1,6 @@
 package org.pih.warehouse.inventory;
 
-class Inventory {
+class Inventory implements java.io.Serializable {
 
     // Core data elements
     Warehouse warehouse		// we could assume that a warehouse has an inventory
@@ -11,7 +11,7 @@ class Inventory {
     static belongsTo = [ warehouse : Warehouse ]
 
     // Show use warehouse name
-    String toString() { return "Inventory @ $warehouse.name"; }
+    String toString() { return "${warehouse.name}"; }
 
     // Constraints
     static constraints = {
@@ -19,4 +19,5 @@ class Inventory {
 		inventoryItems(nullable:true)
 		warehouse(nullable:false)
     }
+	
 }

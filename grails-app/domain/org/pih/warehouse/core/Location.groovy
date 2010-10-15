@@ -5,7 +5,7 @@ import java.util.Date;
 /**
  * A location can be a customer, warehouse, or supplier.  
  */
-class Location {
+class Location implements java.io.Serializable {
 	String name
 	byte [] logo				// logo
 	String logoUrl 

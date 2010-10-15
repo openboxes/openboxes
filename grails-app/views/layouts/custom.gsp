@@ -170,7 +170,14 @@
 		    	<div id="content" class="yui-b">
 					<!-- Populated using the 'pageTitle' property defined in the GSP file -->
 					<g:if test="${pageProperty(name:'page.pageTitle')}">
-					    <div id="pageTitle"><h1><g:pageProperty name="page.pageTitle" /></h1></div>
+					    <div id="pageTitle">					    
+						    <g:if test="${session?.warehouse}">
+								<b>${session?.warehouse?.name}</b>
+							</g:if>
+					    	<h1>
+							    <g:pageProperty name="page.pageTitle" />
+							</h1>
+					    </div>
 					</g:if>
 					<g:layoutBody />
 				</div>
