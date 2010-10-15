@@ -50,7 +50,7 @@ class SuitcaseController {
 				
 				def event = new Event(
 					eventDate: new Date(),
-					eventType:EventType.findByName("Initiated"),
+					eventType:EventType.findByName("Requested"),
 					eventLocation: Location.get(session.warehouse.id)).save(flush:true);
 					shipmentInstance.addToEvents(event).save(flush:true);
 				
