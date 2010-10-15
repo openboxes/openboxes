@@ -2971,6 +2971,7 @@
     
     
     
+<!--     
     <changeSet author="jmiranda (generated)" id="1285794105801-1">
         <insert tableName="event">
             <column name="id" valueNumeric="20"/>
@@ -3126,6 +3127,6 @@
         </insert>
     </changeSet>
 
-
+ -->
     
 </databaseChangeLog>
