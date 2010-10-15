@@ -51,7 +51,8 @@ class AuthController {
 			def managerUsername = userInstance?.manager?.username;
 			def roles = userInstance?.roles;
 
-			session.user = userInstance;			
+			session.user = userInstance;		
+			session.warehouse = userInstance.warehouse
 			redirect(controller:'dashboard',action:'index')
     		
 		}
