@@ -88,15 +88,8 @@
 														<g:link action="createSuitcase" event="addItem" id="${shipmentInstance?.id}"
 															params="['container.id':containerInstance?.id]">
 															<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add Item" style="vertical-align: middle"/>&nbsp;
-															Add Drug</g:link>		
-															
-														&nbsp; <span class="fade">|</span> &nbsp;  
-	
-														<g:link action="createSuitcase" event="addItem" id="${shipmentInstance?.id}"
-															params="['container.id':containerInstance?.id]">
-															<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add Item" style="vertical-align: middle"/>&nbsp;
-															Add Equipment</g:link>		
-	
+															Add Item</g:link>		
+																
 														&nbsp; <span class="fade">|</span> &nbsp;  
 															
 														<g:if test="${containerInstance?.containerType?.name != 'Suitcase' }">
