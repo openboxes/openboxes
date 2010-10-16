@@ -13,17 +13,17 @@
 
 	<div class="body">
 	
-	<g:form action="createSuitcase">
-		<g:hiddenField name="id" value="${shipmentInstance?.id}" />
-		<g:hiddenField name="version" value="${shipmentInstance?.version}" />
-
-		<div class="">
-			<g:submitButton name="refresh" value="Refresh"></g:submitButton>
-			<g:submitButton name="back" value="Back"></g:submitButton>
-			<g:link action="createSuitcase" event="cancel" id="${shipmentInstance?.id}">Cancel</g:link>
-		</div>	
+		<g:form action="createSuitcase">
+			<g:hiddenField name="id" value="${shipmentInstance?.id}" />
+			<g:hiddenField name="version" value="${shipmentInstance?.version}" />
 	
-		<div style="width: 8in; height: 11in; border: 1px solid #ccc; padding-top: 1in; padding-bottom: 1in; padding-right: .5in; padding-left: .5in; font-family: 'Times New Roman'; font-size: 12pt;">
+			<div class="">
+				<g:submitButton name="refresh" value="Refresh"></g:submitButton>
+				<g:submitButton name="back" value="Back"></g:submitButton>
+				<g:link action="createSuitcase" event="cancel" id="${shipmentInstance?.id}">Cancel</g:link>
+			</div>	
+		
+			<div style="width: 8in; height: 11in; border: 1px solid #ccc; padding-top: 1in; padding-bottom: 1in; padding-right: .5in; padding-left: .5in; font-family: 'Times New Roman'; font-size: 12pt;">
 				<p><g:formatDate date="${new Date()}" format="MMMMM dd, yyyy"/></p>
 				<br/>
 				<p>To Whom It May Concern:</p>
