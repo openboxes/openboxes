@@ -19,9 +19,9 @@ class SuitcaseController {
 	def createSuitcaseFlow = {
 		step0 { 
 			action {
-				log.info("step 1 action")
+				log.info("step 0 action")
 				flow.shipmentInstance = new Shipment(params);
-				ShipmentType shipmentType = ShipmentType.findByName("Suitcase");
+				ShipmentType shipmentType = ShipmentType.findByName("Suitcases");
 				if (!shipmentType)
 					return error();
 				flow.shipmentInstance.shipmentType = shipmentType;
@@ -39,26 +39,35 @@ class SuitcaseController {
 
 				
 				// This is necessary in order for validation to work
-				flow.shipmentInstance = shipmentInstance
+				//flow.shipmentInstance = shipmentInstance
 				
+				
+				// If the shipment does not have any containers, create the default suitcase 
 				if (!shipmentInstance?.containers) { 
 					def number = (shipmentInstance?.containers) ? shipmentInstance?.containers?.size() : 0;
 					def containerType = ContainerType.findByName("Suitcase");
-					def suitcase = new Container(name: number+1, containerType: containerType);
-					shipmentInstance.addToContainers(suitcase);				
+					if (containerType) {
+						def suitcase = new Container(name: number+1, containerType: containerType);
+						shipmentInstance.addToContainers(suitcase);				
+					}
 				}
 				
-				def event = new Event(
-					eventDate: new Date(),
-					eventType:EventType.findByName("Requested"),
-					eventLocation: Location.get(session.warehouse.id)).save(flush:true);
+				EventType eventType = EventType.findByName("Requested")				
+				if (eventType) { 
+					def event = new Event(
+						eventDate: new Date(), 
+						eventType: eventType,
+						eventLocation: Location.get(session.warehouse.id)).save(flush:true);
+					
 					shipmentInstance.addToEvents(event).save(flush:true);
-				
+				}
+								
 				if (shipmentInstance.hasErrors() || !shipmentInstance.save(flush:true)) { 
 					log.info("error saving shipment")
 					return error();
 				}
 				
+				[shipmentInstance: shipmentInstance]
 				
 			}.to "step2"
 		}
@@ -75,7 +84,8 @@ class SuitcaseController {
 				if (shipmentInstance.hasErrors() || !shipmentInstance.save(flush:true)) 
 					return error();
 				
-								
+					
+				[shipmentInstance: shipmentInstance]					
 			}.to "step3"
 
 		}
@@ -96,6 +106,7 @@ class SuitcaseController {
 					log.info "error saving shipment"
 				}
 				
+				[shipmentInstance: shipmentInstance]				
 			}.to "step3"			
 			on("addItem") { 
 				log.info("params " + params);
@@ -107,6 +118,7 @@ class SuitcaseController {
 				if (shipmentInstance.hasErrors() || !shipmentInstance.save(flush:true))
 					return error();
 				
+				[shipmentInstance: shipmentInstance]				
 			}.to "step3"				
 			on("deleteItem") { 
 				Shipment shipmentInstance = Shipment.get(params.id);
@@ -154,11 +166,17 @@ class SuitcaseController {
 			on("back").to "step3"
 			on("next") { 	
 				//def shipmentInstance = Shipment.get(params.id);
-				
-				
-							
 			}.to "step5"
+			on ("reviewLetter") { 				
+				// Pass through to 'reviewLetter' action
+			}.to "reviewLetter"		
 		} 
+		reviewLetter { 
+			render(view: "suitcaseLetter")			
+			on("back").to "step4"
+			on("next").to "step4"
+			on("refresh").to "reviewLetter"
+		}		
 		step5 {
 			on("cancel").to "cancel"
 			on("back").to "step4"
