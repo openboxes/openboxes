@@ -34,7 +34,9 @@
 							<tr class="prop">
 	                            <td valign="top" class="name"></td>                            
 	                            <td valign="top" class="value">
-									Congratulations, your suitcase has been sent!
+									Congratulations, your suitcase has been sent!  <br/><br/>
+									
+									<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id}">Go to shipment</g:link>
                                 </td>
 	                        </tr>  	        
 	                        
