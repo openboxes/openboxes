@@ -72,6 +72,44 @@
 										${shipmentInstance?.destination?.name}
 								</td>
 							</tr>
+							<tr class="prop">
+								<td valign="top" class="name" style="width: 10%;"><label><g:message
+									code="shipment.traveler.label" default="Traveler" /></label></td>
+								<td valign="top" style="width: 30%;">
+									${shipmentInstance?.carrier?.name}
+										
+								</td>
+							</tr>							
+							<tr class="prop">
+								<td valign="top" class="name"><label><g:message
+									code="shipment.expectedShippingDate.label" default="Expected shipping date" /></label></td>
+								<td valign="top"
+									class=" ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}"
+									nowrap="nowrap">
+										<g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="MMM dd, yyyy"/>
+								</td>
+							</tr>		
+							<tr class="prop">
+								<td valign="top" class="name"><label><g:message
+									code="shipment.expectedShippingDate.label" default="Expected arrival date" /></label></td>
+								<td valign="top"
+									class=" ${hasErrors(bean: shipmentInstance, field: 'expectedDeliveryDate', 'errors')}"
+									nowrap="nowrap">
+										<g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="MMM dd, yyyy"/>
+								</td>
+							</tr>		
+							
+							
+							<tr class="prop">
+								<td valign="top" class="name"><label><g:message
+									code="shipment.totalValue.label" default="Total Value (USD)" /></label></td>
+								<td valign="top"
+									class=" ${hasErrors(bean: shipmentInstance, field: 'totalValue', 'errors')}"
+									nowrap="nowrap">
+										USD $<g:formatNumber number="${shipmentInstance?.totalValue}" format="###,##0.00"/>
+								</td>
+							</tr>									
+							
 							<tr>
 								<td colspan="2"><hr/></td>
 							</tr>						
