@@ -37,10 +37,8 @@ class SuitcaseController {
 				log.info("params" + params)
 				def shipmentInstance = new Shipment(params);
 
-				
 				// This is necessary in order for validation to work
-				//flow.shipmentInstance = shipmentInstance
-				
+				flow.shipmentInstance = shipmentInstance
 				
 				// If the shipment does not have any containers, create the default suitcase 
 				if (!shipmentInstance?.containers) { 
@@ -66,8 +64,6 @@ class SuitcaseController {
 					log.info("error saving shipment")
 					return error();
 				}
-				
-				[shipmentInstance: shipmentInstance]
 				
 			}.to "step2"
 		}
@@ -165,7 +161,21 @@ class SuitcaseController {
 			on("cancel").to "cancel"
 			on("back").to "step3"
 			on("next") { 	
-				//def shipmentInstance = Shipment.get(params.id);
+				def shipmentInstance = Shipment.get(params.id);
+				if (shipmentInstance) { 
+					EventType eventType = EventType.findByName("Packed")
+					if (eventType) {
+						def event = new Event(
+							eventDate: new Date(),
+							eventType: eventType,
+							eventLocation: Location.get(session.warehouse.id)).save(flush:true);					
+						shipmentInstance.addToEvents(event).save(flush:true);
+					}
+				} else {
+					log.info("Could not find shipment")
+					return error();
+				}
+									
 			}.to "step5"
 			on ("reviewLetter") { 				
 				// Pass through to 'reviewLetter' action
@@ -187,11 +197,15 @@ class SuitcaseController {
 				//shipmentInstance.properties = params
 				if (!shipmentInstance.hasErrors() && shipmentInstance.save(flush: true)) {
 					
-					//def event = new Event(eventDate: new Date(),
-					//eventType:EventType.findByName("Shipped"),
-					//eventLocation: Location.get(session.warehouse.id)).save(flush:true);					
-					//shipmentInstance.addToEvents(event).save(flush:true);
-					
+					EventType eventType = EventType.findByName("Shipped")
+					if (eventType) {
+						def event = new Event(
+							eventDate: new Date(),
+							eventType: eventType,
+							eventLocation: Location.get(session.warehouse.id)).save(flush:true);
+						shipmentInstance.addToEvents(event).save(flush:true);
+					}
+											
 					def comment = new Comment(comment: params.comment, sender: session?.user)
 					shipmentInstance.addToComments(comment).save(flush:true);
 				
