@@ -381,6 +381,12 @@ div#dashboard li {
 	border-top: 0px;	
 }
 
+.prop .name { 
+	width: 20%;
+	background-color: #F7F7F7;
+	text-align: right; 
+}
+
 .prop .value { 
 	text-align:left;
 	width: 30%;
@@ -388,14 +394,10 @@ div#dashboard li {
 	line-height: 1.5em;
 }
 
-.prop .name { 
-	width: 10%;
-	background-color: #F7F7F7;
-	text-align: right; 
-}
 
 
-label { display: block; text-decoration: none; } 
+label { display: inline; text-decoration: none; }
+label.block { display: block; } 
 fieldset .prop { margin: 10px; }
 .radio { padding-left: 10px; } 
 .body {  } 
