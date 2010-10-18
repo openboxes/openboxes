@@ -84,7 +84,7 @@ class JsonController {
 					items = items.collect() {						
 						
 						[	value: it.id,
-							valueText: (it?.email) ? it.email : it.firstName + " " + it.lastName,
+							valueText: it.name,
 							label:  "" + it.firstName + " " + it.lastName + "&nbsp;&lt;" +  it.email + "&gt;",
 							desc: (it?.email) ? it.email : "no email",
 						]
