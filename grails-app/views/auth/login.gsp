@@ -12,7 +12,10 @@
 	</style>
 
 	<div class="body">
-		<g:form controller="auth" action="doLogin" method="post">		  
+		<g:form controller="auth" action="doLogin" method="post">	
+		
+			<g:hiddenField name="targetUri" value="${params?.targetUri}" />
+			  
 		    <div class="dialog">
 
 				<div id="loginForm">
@@ -27,14 +30,16 @@
 					</g:if>				
 					
 					
-					<div id="loginFormBox">
-						<div id="logo">
-							<a class="home" href="${createLink(uri: '/dashboard/index')}" style="text-decoration: none">						    	
-					    		<img src="${createLinkTo(dir:'images/icons/',file:'logo.gif')}" alt="Your Boxes. You're Welcome." 
-					    			style="vertical-align: absmiddle"/>
-					    			<span style="font-size: 2em; vertical-align: top;">openboxes</span>
-						    </a>					
-						</div>					
+					<fieldset> 			
+						<legend>							
+							<div id="logo">
+								<a class="home" href="${createLink(uri: '/dashboard/index')}" style="text-decoration: none">						    	
+						    		<img src="${createLinkTo(dir:'images/icons/',file:'logo.gif')}" alt="Your Boxes. You're Welcome." 
+						    			style="vertical-align: absmiddle"/>
+						    			<span style="font-size: 2em; vertical-align: top;">openboxes</span>
+							    </a>					
+							</div>	
+						</legend>				
 						<script>	
 							jQuery(document).ready(function() {
 								// focus on the first text input field in the first field on the page
@@ -44,12 +49,17 @@
 
 						<table>
 							<tbody>
-	
+
+								<tr class="">
+									<td colspan="2">
+										
+									</td>	
+								</tr>
 								<tr class="prop">
 									<td valign="top" class="name">
 										<label for="email"><g:message code="user.email.label" default="Email" /></label>
 									</td>
-									<td valign="top" class="value ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
+									<td valign="top" class="value ${hasErrors(bean: userInstance, field: 'email', 'errors')}">
 										<g:textField name="email" value="${userInstance?.email}"  />
 									</td>
 								</tr>
@@ -67,15 +77,21 @@
 									<td valign="top">
 										<div style="text-align: right;">
 											<span class="buttons" >
-												<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt=""/> Login</button>					   
+												<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt=""/> Login</button>												
 											</span>
-										</div>  					
+										</div>  	
+									</td>
+								</tr>
+								<tr class="prop">
+									<td valign="top" class="" colspan="2">
+										<div style="text-align: left">				
+											New user? <g:link class="list" controller="auth" action="signup"><g:message code="default.signup.label" default="Signup"/></g:link>
+										</div>
 									</td>
 								</tr>
 							</tbody>
 						</table>
-						
-					</div>						
+					</fieldset>
 				</div>
 			</div>
 		</g:form>

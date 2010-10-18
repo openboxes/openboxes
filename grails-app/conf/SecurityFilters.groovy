@@ -22,7 +22,7 @@ class SecurityFilters {
 				else if(!session.user && !(
 					Arrays.asList(actionsWithAuthUserNotRequired).contains(actionName))) {
 					log.info "redirect to auth" 
-					redirect(controller: 'auth', action:'login')
+					redirect(controller: 'auth', action:'login', params: ['targetUri': (request.forwardURI - request.contextPath)])
 					return false;
 				}
 				

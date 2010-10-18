@@ -53,6 +53,12 @@ class AuthController {
 
 			session.user = userInstance;		
 			session.warehouse = userInstance.warehouse
+			
+			
+			if (params?.targetUri) { 
+				redirect(uri: params.targetUri);
+				return;
+			}
 			redirect(controller:'dashboard',action:'index')
     		
 		}

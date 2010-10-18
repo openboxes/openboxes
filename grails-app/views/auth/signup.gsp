@@ -9,6 +9,11 @@
 
 </head>
 <body>
+
+	<style>
+		#hd { display: none; }  	
+	</style>
+
 	<div class="body">
 		<g:form controller="auth" action="signup" method="post">		  
 		    <div class="dialog">
@@ -25,14 +30,21 @@
 			
 			
 					<fieldset> 			
-						<legend>Request an Account</legend>		
-							
+						<legend>		
+							<div id="logo">
+								<a class="home" href="${createLink(uri: '/dashboard/index')}" style="text-decoration: none">						    	
+						    		<img src="${createLinkTo(dir:'images/icons/',file:'logo.gif')}" alt="Your Boxes. You're Welcome." 
+						    			style="vertical-align: absmiddle"/>
+						    			<span style="font-size: 2em; vertical-align: top;">openboxes</span>
+							    </a>					
+							</div>			
+						</legend>
 						<table>
 							<tbody>
 
 							<tr>
 								<td colspan="2">
-									Enter account information below.
+									Enter your account details below.
 								</td>	
 							</tr>
 
@@ -88,7 +100,7 @@
 					            </tr>	
 	
 								<tr class="prop">	
-									<td class="name"></td>					
+									<td class=""></td>					
 									<td valign="top" style="text-align: right">
 										<div class="buttons">		
 											<div class="button" >
@@ -97,6 +109,14 @@
 										</div>
 									</td>
 								</tr>
+								<tr class="prop">
+									<td valign="top" class="" colspan="2">
+										<div style="text-align: left">				
+											Already have an account? <g:link class="list" controller="auth" action="login"><g:message code="default.login.label" default="Login"/></g:link>
+										</div>
+									</td>
+								</tr>								
+								
 							</tbody>	
 						</table>						
 					</fieldset> 
