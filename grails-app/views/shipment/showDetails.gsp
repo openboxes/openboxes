@@ -414,10 +414,10 @@
 																<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 																	<td>${i+1}.</td>
 																	<td>
-																		${event.eventLocation.name}
+																		${event?.eventLocation?.name}
 																	</td>
 																	<td>																
-																		${event.eventType.name}
+																		${event?.eventType?.name}
 																	</td>
 																	<td>																			
 																		<g:formatDate format="MMM dd yyyy" date="${event.eventDate}"/> &nbsp; 
