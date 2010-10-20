@@ -364,6 +364,7 @@
     <changeSet author="jmiranda (generated)" id="1287544235753-4">
         <addNotNullConstraint columnDataType="BIT" columnName="accepted" defaultNullValue="" tableName="receipt_item"/>
     </changeSet>
+    <!-- 
     <changeSet author="jmiranda (generated)" id="1287544235753-5">
         <addNotNullConstraint columnDataType="DATETIME" columnName="expected_delivery_date" defaultNullValue="" tableName="shipment"/>
     </changeSet>
@@ -373,7 +374,7 @@
     <changeSet author="jmiranda (generated)" id="1287544235753-7">
         <dropColumn columnName="comment_id" tableName="receipt_item"/>
     </changeSet>
-	
+	 -->
 	
 	<!-- 
 	<changeSet author="jmiranda (generated)" id="1284790199445-2">	
