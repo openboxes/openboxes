@@ -170,10 +170,9 @@
 								<td class=""></td>
 								<td class="">
 									<div class="">
-									    <g:submitButton name="back" value="Back"></g:submitButton>
 									    <g:submitButton name="next" value="Next"></g:submitButton>
+									    <g:submitButton name="back" value="Back"></g:submitButton>
 									    <g:submitButton name="reviewLetter" value="Review Letter"></g:submitButton>
-									    
 										<g:link action="createSuitcase" event="cancel" id="${shipmentInstance?.id}">Cancel</g:link>
 									    
 								    </div>

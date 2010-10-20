@@ -127,14 +127,11 @@
 										</g:if>
 										<li>
 											logged in as <b>${session.user.username}</b>
+											<g:link class="list" controller="auth" action="logout"><g:message code="default.logout.label"  default="logout"/></g:link>
 										</li>
 										<!-- 
 										 <li><g:link class="list" controller="user" action="preferences"><g:message code="default.preferences.label"  default="Preferences"/></g:link></li>
-										 -->
-										 
-										<li>
-											<g:link class="list" controller="auth" action="logout"><g:message code="default.logout.label"  default="logout"/></g:link>
-										</li>
+										 -->										 
 										<!-- 
 										 <li><input type="text" value="search" name="q" style="color: #aaa; font-weight: bold;" disabled=disabled /></li>
 										 -->

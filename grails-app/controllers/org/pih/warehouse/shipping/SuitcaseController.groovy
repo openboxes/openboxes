@@ -21,7 +21,7 @@ class SuitcaseController {
 			action {
 				log.info("step 0 action")
 				flow.shipmentInstance = new Shipment(params);
-				ShipmentType shipmentType = ShipmentType.findByName("Suitcases");
+				ShipmentType shipmentType = ShipmentType.findByName("Suitcase");
 				if (!shipmentType)
 					return error();
 				flow.shipmentInstance.shipmentType = shipmentType;
@@ -59,11 +59,12 @@ class SuitcaseController {
 					
 					shipmentInstance.addToEvents(event).save(flush:true);
 				}
-								
-				if (shipmentInstance.hasErrors() || !shipmentInstance.save(flush:true)) { 
-					log.info("error saving shipment")
+
+				if (!shipmentInstance.validate(['name', 'origin', 'destination'])) { 
 					return error();
-				}
+				}								
+			
+				flow.shipmentInstance = shipmentInstance;
 				
 			}.to "step2"
 		}
@@ -73,15 +74,17 @@ class SuitcaseController {
 			on("next") { 
 				//log.info( "shipment " + flow.shipmentInstance.name)	
 
-				def shipmentInstance = Shipment.get(params.id)
+				//def shipmentInstance = Shipment.get(params.id)
+				
+				def shipmentInstance = flow.shipmentInstance;
 				shipmentInstance.properties = params
 
-				//def shipmentInstance = flow.shipmentInstance;
-				if (shipmentInstance.hasErrors() || !shipmentInstance.save(flush:true)) 
+				if (shipmentInstance.hasErrors() || !shipmentInstance.save(flush:true)) {
 					return error();
+				}
 				
-					
-				[shipmentInstance: shipmentInstance]					
+				flow.shipmentInstance = shipmentInstance;
+				//[shipmentInstance: shipmentInstance]					
 			}.to "step3"
 
 		}
@@ -199,16 +202,15 @@ class SuitcaseController {
 					
 					EventType eventType = EventType.findByName("Shipped")
 					if (eventType) {
-						def event = new Event(
-							eventDate: new Date(),
-							eventType: eventType,
+						def event = new Event(eventDate: new Date(), eventType: eventType,
 							eventLocation: Location.get(session.warehouse.id)).save(flush:true);
 						shipmentInstance.addToEvents(event).save(flush:true);
 					}
-											
-					def comment = new Comment(comment: params.comment, sender: session?.user)
-					shipmentInstance.addToComments(comment).save(flush:true);
-				
+							
+					if (params.comment) { 				
+						def comment = new Comment(comment: params.comment, sender: session?.user)
+						shipmentInstance.addToComments(comment).save(flush:true);
+					}				
 
 					def confirmSubject = "Suitcase " + shipmentInstance?.name + " has been shipped";
 					def confirmMessage = "This message represents the email body"

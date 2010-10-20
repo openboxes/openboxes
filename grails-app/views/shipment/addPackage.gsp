@@ -34,6 +34,13 @@
 								<table>
 									<tbody>
 										<tr class="prop">
+				                            <td valign="top" class="name"><label><g:message code="container.parentContainer.label" default="Parent" /></label></td>                            
+				                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'parentContainer', 'errors')}">
+												<g:select id="parentContainer.id" name='parentContainer.id' noSelection="${['':'']}" 
+			                                    	from='${shipmentInstance?.containers}' optionKey="id" optionValue="${{it?.containerType?.name + ' ' + it?.name}}"></g:select>
+			                                </td>
+				                        </tr>  	          
+										<tr class="prop">
 				                            <td valign="top" class="name"><label><g:message code="container.containerType.label" default="Type" /></label></td>                            
 				                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'containerType', 'errors')}">
 												<g:select id="containerType.id" name='containerType.id' noSelection="${['':'Select one ...']}" 

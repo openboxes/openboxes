@@ -70,6 +70,46 @@
 										${shipmentInstance?.destination?.name}
 								</td>
 							</tr>
+							<tr class="prop">
+								<td valign="top" class="name" style="width: 10%;"><label><g:message
+									code="shipment.traveler.label" default="Traveler" /></label></td>
+								<td valign="top" style="width: 30%;">
+									${shipmentInstance?.carrier?.name}
+								</td>
+							</tr>
+							<tr class="prop">
+								<td valign="top" class="name"><label><g:message
+									code="shipment.expectedShippingDate.label" default="Expected shipping date" /></label></td>
+								<td valign="top"
+									class=" ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}"
+									nowrap="nowrap">
+										${formatDate(date: shipmentInstance?.expectedShippingDate, format: 'MMMMM dd, yyyy')}
+								</td>
+							</tr>		
+							<tr class="prop">
+								<td valign="top" class="name"><label><g:message
+									code="shipment.expectedShippingDate.label" default="Expected arrival date" /></label></td>
+								<td valign="top"
+									class=" ${hasErrors(bean: shipmentInstance, field: 'expectedDeliveryDate', 'errors')}"
+									nowrap="nowrap">									
+										${formatDate(date: shipmentInstance?.expectedDeliveryDate, format: 'MMMMM dd, yyyy')}
+								</td>
+							</tr>		
+							
+							
+							<tr class="prop">
+								<td valign="top" class="name"><label><g:message
+									code="shipment.totalValue.label" default="Total Value (USD)" /></label></td>
+								<td valign="top"
+									class=" ${hasErrors(bean: shipmentInstance, field: 'totalValue', 'errors')}"
+									nowrap="nowrap">
+										$${formatNumber(number: shipmentInstance?.totalValue, format: '###0.00')}
+								</td>
+							</tr>								
+							
+							
+							
+							
 							<tr>
 								<td colspan="2"><hr/></td>
 							</tr>						
@@ -193,19 +233,20 @@
 										</table>	
 										<br/>														
 									</g:each>
-									
-									<span class="fade">Click 'Save' before adding a box or item.</span>
+									<div style="text-align: right">									
+										<span class="fade">
+											Click 'Save' before adding a box or item.
+											<g:submitButton name="save" value="Save"></g:submitButton>
+										</span>
+									</div>
 								</td>
 							</tr>
 							<tr class="prop">
 								<td class=""></td>
 								<td class="">
 									<div class="">									
-										<g:submitButton name="save" value="Save"></g:submitButton>
-										&nbsp;|&nbsp;
-											
-									    <g:submitButton name="back" value="Back"></g:submitButton>
 									    <g:submitButton name="next" value="Next"></g:submitButton>
+										<g:submitButton name="back" value="Back"></g:submitButton>
 										<g:link action="createSuitcase" event="cancel" id="${shipmentInstance?.id}">Cancel</g:link>
 								    </div>
 													

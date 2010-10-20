@@ -16,6 +16,7 @@ class Shipment implements Serializable {
 	String shipmentNumber			// an auto-generated shipment number
 	Date expectedShippingDate		// the date the origin expects to ship the goods
 	Date expectedDeliveryDate		// the date the destination should expect to receive the goods
+	String flightInformation		// the flight number and airline 
 	Float totalValue				// the total value of all items in the shipment		
 
 	// Audit fields
@@ -87,9 +88,10 @@ class Shipment implements Serializable {
 		origin(nullable:false, blank: false, 
 			validator: { value, obj -> return !value.equals(obj.destination)})
 		destination(nullable:false, blank: false)		
-		expectedShippingDate(nullable:true)
+		flightInformation(nullable:true)
+		expectedShippingDate(nullable:false)
 		//expectedShippingDate(validator:{value, obj-> return value.after(obj.checkIn)})		
-		expectedDeliveryDate(nullable:true)
+		expectedDeliveryDate(nullable:false)
 		//expectedDeliveryDate(validator:{value, obj-> return value.after(obj.checkIn)})		
 		shipmentType(nullable:true)
 		shipmentMethod(nullable:true)

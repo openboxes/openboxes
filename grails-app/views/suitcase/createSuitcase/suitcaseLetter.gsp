@@ -40,7 +40,7 @@
 					</g:each>
 				</g:each>
 				<br/>
-				<p>The value of these items is US <b>$${shipmentInstance?.totalValue ? shipmentInstance.totalValue : 0.00 }</b>, and is provided for customs use only.  These products will not be resold, but will be donated and distributed free of charge, under the supervision of Partners In Health.</p>
+				<p>The value of these items is US <b>$ ${shipmentInstance?.totalValue ? formatNumber(number: shipmentInstance.totalValue, format: '#,##0.00') : 0.00 }</b>, and is provided for customs use only.  These products will not be resold, but will be donated and distributed free of charge, under the supervision of Partners In Health.</p>
 				<br/>
 				<p>Thank you in advance for your assistance in ensuring that these materials reach the clinics as quickly as possible.</p>
 				<br/>

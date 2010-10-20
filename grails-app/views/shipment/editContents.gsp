@@ -28,31 +28,26 @@
 							<g:render template="summary"/>
 							<table>
 								<tr>
-									<td>	
-										<h2>Packages</h2>				
-										<div style="padding: 10px;">																	
-											<g:each in="${shipmentInstance?.containers}" var="container" status="i">															
-												<g:if test="${container?.id == containerInstance?.id}">
-													<span style="border: 2px solid black; padding: 5px; background-color: whitesmoke;">
-														<g:render template="containerSummary" />	
-													</span>
-												</g:if>
-												<g:else>
-													<span style="padding: 5px;">
-														&nbsp;<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}" params="['container.id':container.id]">${container.name}</g:link>
-													</span>
-												</g:else>				
+									<td width="30%">	
+										<div style="padding: 1px;">																	
+											<g:each in="${shipmentInstance?.containers}" var="container" status="i">											
+												<g:if test="${!container?.parentContainer}">															
+													<div style="padding: 1px; ">
+														<g:render template="containerSummary" model="['containerInstance':container, 'selected':containerInstance]"/>	
+														<g:each var="childContainer" in="${container.containers}">
+															<div style="padding:1px; padding-left: 5px;">
+																<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}" params="['container.id':childContainer.id]">																	
+																	<g:render template="containerSummary" model="['containerInstance':childContainer, 'selected':containerInstance]"/>	
+																</g:link>
+															</div>
+														</g:each>
+													</div>
+												</g:if>		
 											</g:each>
 										</div>
 									</td>
-								</tr>
-							</table>
-																	
-							<table>
-								<tr>
-									<td>
+									<td width="70%">
 										<g:if test="${containerInstance}">			
-												
 											<div id="container-${containerInstance?.id}" class="details">																							
 												<script type="text/javascript">
 													$(function() {
@@ -68,16 +63,13 @@
 															<li><a href="#tabs-3">Clone</a></li>
 														</ul>
 														<div id="tabs-1">
-																			
 															<g:render template="containerSummary" />				
-																		
 																	<div style="text-align: right;">						
 																		<a id="add-person-link" href="#">
 																			<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add" style="vertical-align: absmiddle;" /> Add a new person
 																		</a>
 																		<script type="text/javascript">
 																			$(document).ready(function(){
-																												
 																				$('#add-person-dialog').dialog({
 																					autoOpen: false, 
 																					modal: true, 
@@ -309,6 +301,15 @@
 																<g:hiddenField name="containerId" value="${containerInstance?.id}"></g:hiddenField>										
 																			
 															    	<table>
+															    	
+																		<tr class="prop">
+												                            <td valign="top" class="name"><label><g:message code="container.parentContainer.label" default="Parent" /></label></td>                            
+												                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'parentContainer', 'errors')}">
+																				<g:select id="parentContainer.id" name='parentContainer.id' noSelection="${['':'']}" 
+											                                    	from='${shipmentInstance?.containers}' optionKey="id" optionValue="name"></g:select>
+											                                </td>
+												                        </tr>  	          
+															    	
 																		<tr class="prop">										
 																			<td class="name"><label>${containerInstance?.containerType?.name} #</label></td>
 																			<td class="value">

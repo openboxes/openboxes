@@ -46,10 +46,16 @@
 							<td valign="top" class="name"><label>Type</label></td>
 							<td valign="top"
 								class="value ${hasErrors(bean: shipmentInstance, field: 'shipmentType', 'errors')}">
-								<g:select
-									name="shipmentType.id"
-									from="${org.pih.warehouse.shipping.ShipmentType.list()}"
-									optionKey="id" optionValue="name" value="${shipmentInstance?.shipmentType?.id}" />								
+								<g:if test="${shipmentInstance?.shipmentType}">
+									<g:hiddenField name="shipmentType.id" value="${shipmentInstance?.shipmentType?.id}" />
+									${shipmentInstance?.shipmentType?.name }																	
+								</g:if>
+								<g:else>
+									<g:select
+										name="shipmentType.id"
+										from="${org.pih.warehouse.shipping.ShipmentType.list()}"
+										optionKey="id" optionValue="name" value="${shipmentInstance?.shipmentType?.id}" />								
+								</g:else>
 							</td>
 						</tr>
 						<tr class="prop">

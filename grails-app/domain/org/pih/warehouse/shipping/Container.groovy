@@ -9,7 +9,7 @@ class Container implements Comparable, java.io.Serializable {
 	String containerNumber				// An official container number (if it exists)
 	String description					// Description of contents
 	Person recipient					// Person who is assigned to receive the container
-	Container parentContainer			// the "containing" container
+	
 	Float height;						// height of container
 	Float width;						// width of container
 	Float length;						// length of container 
@@ -20,12 +20,14 @@ class Container implements Comparable, java.io.Serializable {
 	Date lastUpdated;
 	 
 	List shipmentItems					// Items in container
+	Container parentContainer			// the "containing" container
 	ContainerType containerType			// Type of container
 	ContainerStatus containerStatus		// Status of the container (open, closed)
 	
 	static transients = [ "optionValue" ]
-	static hasMany = [ shipmentItems : ShipmentItem ];
-	static belongsTo = [ shipment : Shipment ];
+	static belongsTo = [ shipment : Shipment];	/* parentContainer : Container */
+	static hasMany = [ shipmentItems : ShipmentItem, containers: Container ];
+	static mappedBy = [containers: 'parentContainer']	
 	
 	// Constraints
 	static constraints = {	 

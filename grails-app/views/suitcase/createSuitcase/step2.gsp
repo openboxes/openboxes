@@ -22,7 +22,6 @@
             </div>
         </g:hasErrors>		
 
-
 		<g:form action="createSuitcase">
 			<g:hiddenField name="id" value="${shipmentInstance?.id}" />
 			<g:hiddenField name="version" value="${shipmentInstance?.version}" />
@@ -184,8 +183,8 @@
 							<td class=""></td>
 							<td>
 								<div class="">
-								    <g:submitButton name="back" value="Back"></g:submitButton>
 								    <g:submitButton name="next" value="Next"></g:submitButton>
+								    <g:submitButton name="back" value="Back"></g:submitButton>
 								    <g:link action="createSuitcase" event="cancel" id="${shipmentInstance?.id}">Cancel</g:link>
 								</div>
 	

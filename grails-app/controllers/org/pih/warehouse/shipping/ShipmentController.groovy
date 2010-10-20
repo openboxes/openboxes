@@ -212,17 +212,22 @@ class ShipmentController {
 		else {
 			if ("POST".equalsIgnoreCase(request.getMethod())) { 				
 				shipmentInstance.properties = params
-				if (!shipmentInstance.hasErrors() && shipmentInstance.save(flush: true)) {					
-					def event = new Event(
-					eventDate: new Date(),
-					eventType:EventType.findByName("Departed"), 
-					eventLocation: Location.get(session.warehouse.id)).save(flush:true);						
+				if (!shipmentInstance.hasErrors() && shipmentInstance.save(flush: true)) {			
+
+					EventType eventType = EventType.findByName("Shipped")
+					if (eventType) {
+						def event = new Event(eventDate: new Date(), eventType: eventType,
+							eventLocation: Location.get(session.warehouse.id)).save(flush:true);
+						shipmentInstance.addToEvents(event).save(flush:true);
+					}
+					else { 
+						throw new Exception("Expected event type 'Shipped'")
+					}
 					
-					shipmentInstance.addToEvents(event).save(flush:true);
-					
-					def comment = new Comment(comment: params.comment, sender: session.user)
-					shipmentInstance.addToComments(comment).save(flush:true);
-					
+					if (params.comment) { 
+						def comment = new Comment(comment: params.comment, sender: session.user)
+						shipmentInstance.addToComments(comment).save(flush:true);
+					}					
 					
 					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 					redirect(action: "listOutgoing")
@@ -241,8 +246,7 @@ class ShipmentController {
 			return;
 		}
 		else {
-			if ("POST".equalsIgnoreCase(request.getMethod())) {				
-
+			if ("POST".equalsIgnoreCase(request.getMethod())) {	
 				shipmentInstance.delete();
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 				redirect(controller: "dashboard", action: "index")
@@ -732,11 +736,16 @@ class ShipmentController {
 		log.info "params " + params;
 		
 		def shipmentInstance = Shipment.get(params.shipmentId);
+		def parentContainerInstance = Container.get(params?.parentContainer?.id);
+		
 		def containerInstance = new Container(params);
 		if (containerInstance && shipmentInstance) {	
 			shipmentInstance.addToContainers(containerInstance);
 			if (!shipmentInstance.hasErrors() && shipmentInstance.save(flush: true)) {
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'container.label', default: 'Container'), containerInstance.id])}"
+				if (parentContainerInstance) { 
+					parentContainerInstance.addToContainers(containerInstance).save(flush: true);
+				}
 				//container.containerType = ContainerType.get(params.containerType.id);
 				//container.name = (shipmentInstance?.containers) ? String.valueOf(shipmentInstance.containers.size() + 1) : "1";			
 				redirect(action: "editContents", id: shipmentInstance.id, params: ["container.id" : containerInstance.id])
