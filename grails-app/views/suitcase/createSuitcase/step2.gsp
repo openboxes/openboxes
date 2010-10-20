@@ -82,6 +82,17 @@
 							</td>
 						</tr>
 						<tr class="prop">
+							<td valign="top" class="name"><label><g:message
+								code="shipment.totalValue.label" default="Total Value (USD)" /></label></td>
+							<td valign="top"
+								class=" ${hasErrors(bean: shipmentInstance, field: 'totalValue', 'errors')}"
+								nowrap="nowrap">
+									<g:textField name="totalValue" value="${shipmentInstance?.totalValue}" />
+							</td>
+						</tr>		
+						
+						
+						<tr class="prop">
 							<td valign="top" class="name" style="width: 10%;"><label><g:message
 								code="shipment.traveler.label" default="Traveler" /></label></td>
 							<td valign="top" style="width: 30%;">
@@ -92,6 +103,16 @@
 									
 							</td>
 						</tr>
+						<tr class="prop">
+							<td valign="top" class="name"><label><g:message
+								code="shipment.totalValue.label" default="Flight Information" /></label></td>
+							<td valign="top"
+								class=" ${hasErrors(bean: shipmentInstance, field: 'flightInformation', 'errors')}"
+								nowrap="nowrap">
+									<g:textField name="flightInformation" value="${shipmentInstance?.flightInformation}" /> 
+									<span class="fade">(e.g. AA 2292)</span>
+							</td>
+						</tr>		
 						
 						
 						<%-- 
@@ -170,15 +191,6 @@
 						</tr>		
 						
 						
-						<tr class="prop">
-							<td valign="top" class="name"><label><g:message
-								code="shipment.totalValue.label" default="Total Value (USD)" /></label></td>
-							<td valign="top"
-								class=" ${hasErrors(bean: shipmentInstance, field: 'totalValue', 'errors')}"
-								nowrap="nowrap">
-									<g:textField name="totalValue" value="${shipmentInstance?.totalValue}" />
-							</td>
-						</tr>		
 						<tr class="prop">
 							<td class=""></td>
 							<td>

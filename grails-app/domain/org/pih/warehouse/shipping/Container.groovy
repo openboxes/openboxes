@@ -9,7 +9,7 @@ class Container implements Comparable, java.io.Serializable {
 	String containerNumber				// An official container number (if it exists)
 	String description					// Description of contents
 	Person recipient					// Person who is assigned to receive the container
-	
+	Integer sortOrder					// 
 	Float height;						// height of container
 	Float width;						// width of container
 	Float length;						// length of container 
@@ -45,6 +45,7 @@ class Container implements Comparable, java.io.Serializable {
 		shipmentItems(nullable:true)		
 		parentContainer(nullable:true)
 		containerStatus(nullable:true)
+		sortOrder(nullable:true)
 	}
 	
 	int compareTo(obj) { name.compareTo(obj.name) }

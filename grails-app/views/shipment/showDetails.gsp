@@ -48,7 +48,7 @@
 										</td>
 									</tr>
 									<tr class="prop">
-										<td valign="top" class="name" style="width: 10%;"><label><g:message
+										<td valign="top" class="name" ><label><g:message
 											code="shipment.origin.label" default="From" /></label></td>
 										<td valign="top" style="width: 30%;">
 											<span>
@@ -67,7 +67,7 @@
 										</td>
 									</tr>
 									<tr class="prop">
-										<td class="name"  style="width: 10%;">
+										<td class="name"  >
 											<label><g:message code="shipment.destination.label" default="To" /></label>
 										</td>
 										<td class="" style="width: 30%;">
@@ -111,7 +111,7 @@
 										</td>										
 									</tr>
 									<tr class="prop">
-										<td valign="top" class="name" style="width: 10%;"><label><g:message
+										<td valign="top" class="name" ><label><g:message
 											code="shipment.carrier.label" default="Carrier" /></label></td>
 										<td valign="top" style="width: 30%;">
 											<g:if test="${shipmentInstance?.carrier}">
@@ -128,9 +128,16 @@
 											<span class="fade">${fieldValue(bean: shipmentInstance, field: "carrier.email")}</span>
 										</td>
 									</tr>
+									<tr class="prop">
+										<td valign="top" class="name"><label><g:message
+											code="shipment.flightInformation.label" default="Flight Information" /></label></td>
+										<td valign="top" style="width: 30%;">
+											${fieldValue(bean: shipmentInstance, field: "flightInformation")}
+										</td>
+									</tr>
 									<%-- 
 									<tr class="prop">
-										<td class="name"  style="width: 10%;">
+										<td class="name"  >
 											<label><g:message code="shipment.recipient.label" default="Recipient" /></label>
 										</td>
 										<td class="value" style="width: 30%;">
@@ -274,7 +281,6 @@
 																			<td></td>																		
 																			<td></td>																		
 																			<td></td>		
-																			<td></td>																
 																			<td style="text-align: right;">																			
 																				<%-- 
 																				<g:link controller="shipment" action="addPackage" id="${shipmentInstance.id}" 

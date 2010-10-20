@@ -347,6 +347,33 @@
 	    <addForeignKeyConstraint constraintName="fk_shipment_item_recipient"
 	    	baseTableName="shipment_item" baseColumnNames="recipient_id" referencedTableName="person" referencedColumnNames="id" />
 	</changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1287544235753-1">
+        <addColumn tableName="container">
+            <column name="sort_order" type="INT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1287544235753-2">
+        <addColumn tableName="shipment">
+            <column name="flight_information" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1287544235753-3">
+        <dropNotNullConstraint columnDataType="VARCHAR(255)" columnName="content_type" tableName="document"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1287544235753-4">
+        <addNotNullConstraint columnDataType="BIT" columnName="accepted" defaultNullValue="" tableName="receipt_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1287544235753-5">
+        <addNotNullConstraint columnDataType="DATETIME" columnName="expected_delivery_date" defaultNullValue="" tableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1287544235753-6">
+        <addNotNullConstraint columnDataType="DATETIME" columnName="expected_shipping_date" defaultNullValue="" tableName="shipment"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1287544235753-7">
+        <dropColumn columnName="comment_id" tableName="receipt_item"/>
+    </changeSet>
+	
 	
 	<!-- 
 	<changeSet author="jmiranda (generated)" id="1284790199445-2">	
