@@ -240,7 +240,7 @@ class CreateShipmentController {
 						boolean exists = Boolean.FALSE;
 						// If 'requested' event type already exists, return
 						log.info("exists " + exists)
-						shipmentInstance?.events {
+						shipmentInstance?.events.each {
 							if (it.eventType == eventType) 
 								exists = Boolean.TRUE;
 						}
