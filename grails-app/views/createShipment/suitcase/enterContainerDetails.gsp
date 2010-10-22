@@ -29,7 +29,7 @@
 									<label>Suitcases / Boxes</label>
 								</td>
 								<td valign="top" class="value">
-									<table style="width: 0%; border: 1px solid black;">
+									<table style="border: 1px solid black;">
 
 					                	<g:set var="count" value="${0 }"/>	
 										<g:each var="suitcaseInstance" in="${shipmentInstance?.containers}">			
