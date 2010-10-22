@@ -531,7 +531,6 @@ class ShipmentController {
 				// Encountered an error with saving the product
 				redirect(action: "editContents", id: shipment.id, params: ["container.id": container?.id])
 				return;
-				
 			}
 		}	
 		

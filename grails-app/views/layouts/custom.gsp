@@ -165,16 +165,25 @@
 	    	<!-- YUI main Block including page title and content -->
 	      	<div id="yui-main">
 		    	<div id="content" class="yui-b">
+
 					<!-- Populated using the 'pageTitle' property defined in the GSP file -->
-					<g:if test="${pageProperty(name:'page.pageTitle')}">
-					    <div id="pageTitle">					    
-						    <g:if test="${session?.warehouse}">
-								<b>${session?.warehouse?.name}</b>
-							</g:if>
-					    	<h1>
-							    <g:pageProperty name="page.pageTitle" />
-							</h1>
-					    </div>
+					<g:if test="${session.user}">
+						<g:if test="${pageProperty(name:'page.pageTitle')}">
+						    <div id="pageTitle">					    
+							    <g:if test="${session?.warehouse}">
+									<b>${session?.warehouse?.name}</b>
+								</g:if>
+						    	<h1><g:layoutTitle /></h1>
+						    </div>
+						</g:if>
+						<g:else>
+				    		<div id="pageTitle">
+							    <g:if test="${session?.warehouse}">
+									<b>${session?.warehouse?.name}</b>
+								</g:if>
+					    		<h1><g:layoutTitle /></h1>
+				    		</div>
+						</g:else>
 					</g:if>
 					<g:layoutBody />
 				</div>

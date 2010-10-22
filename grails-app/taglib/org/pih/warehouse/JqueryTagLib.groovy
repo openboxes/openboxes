@@ -129,7 +129,6 @@ class JqueryTagLib {
 			<input id='${id}-datepicker' name='${name}-datepicker' type='text' class='date' /> 
 			<script type=\'text/javascript\'> 
 				jQuery(function() {
-					var dateValue = new Date('${value}'); 	
 					jQuery('#${id}-datepicker').datepicker({
 						showOn: 'both',
 						altField: '#${name}',
@@ -143,8 +142,11 @@ class JqueryTagLib {
 						//showButtonPanel: true,
 						//showOtherMonths: true,
 						//selectOtherMonths: true
-					});
-					jQuery('#${name}-datepicker').datepicker('setDate', dateValue);
+					});					
+					var dateValue = '${value}';					 
+					if (dateValue) { 
+						jQuery('#${name}-datepicker').datepicker('setDate', new Date('${value}'));
+					}
 				}); 
 			</script> 
 		</div>

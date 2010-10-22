@@ -118,23 +118,19 @@
 												<span>
 													${fieldValue(bean: shipmentInstance, field: "carrier.firstName")}
 													${fieldValue(bean: shipmentInstance, field: "carrier.lastName")}
-												</span>
+												</span>												
 											</g:if>
 											<g:else>
 												<span class="fade">(empty)</span>
 											</g:else>												
 										</td>
 										<td>
-											<span class="fade">${fieldValue(bean: shipmentInstance, field: "carrier.email")}</span>
-										</td>
-									</tr>
-									<tr class="prop">
-										<td valign="top" class="name"><label><g:message
-											code="shipment.flightInformation.label" default="Flight Information" /></label></td>
-										<td valign="top" style="width: 30%;">
+											<span class="fade">
 											${fieldValue(bean: shipmentInstance, field: "flightInformation")}
+											</span>
 										</td>
 									</tr>
+									
 									<%-- 
 									<tr class="prop">
 										<td class="name"  >
@@ -212,33 +208,35 @@
 													<div id="containers" class="section">											
 														<table>		
 															<tr>
-																<th width="5%"></th>
 																<th>Package</th>
-																<th>Description</th>
-																<th>Items</th>
-																<th>Boxes</th>
+																<th>Qty</th>
+																<th>Lot Number</th>
+																<th>Recipient</th>
 																<th width="10%"></th>
 															</tr>
 															<g:set var="count" value="${0}"/>
 															<g:each in="${shipmentInstance.containers}" var="container" status="i">		
 																<g:if test="${!container?.parentContainer}">
 																	<tr id="container-${container.id}" class="${(count++ % 2 == 0)?'odd':'even'}">
-																		<td>
-																			${i+1}.
-																		</td>
 																		<td>	
+																			<img src="${createLinkTo(dir:'images/icons/silk',file:'briefcase.png')}" alt="package" style="vertical-align: middle"/> &nbsp;
 																			<span style="font-weight: bold;">${container?.containerType?.name} ${container?.name}</span> &nbsp;
 																		</td>
 																		<td>	
 																			${container?.description}
 																		</td>
 																		<td>
+																			<%-- 
 																			<span class="fade">${container.shipmentItems.size()}</span>
+																			--%>
 																		</td>
 																		<td>
+																			<%-- 
 																			${container?.containers?.size()}
+																			--%>
 																		</td>
 																		<td style="text-align: right" nowrap="true">																		 
+																			<%-- 
 																			<g:link controller="shipment" action="addPackage" id="${shipmentInstance.id}" 
 																				params="['parentContainer.id':container.id]"><img 
 																				src="${createLinkTo(dir:'images/icons/silk',file:'package_add.png')}" 
@@ -252,43 +250,41 @@
 																			<g:link class="copy" action="copyContainer" id="${container?.id}" params="[shipmentId:shipmentInstance.id]">
 																				<img src="${createLinkTo(dir:'images/icons/silk',file:'page_copy.png')}" alt="Copy" style="vertical-align: middle"/>
 																			</g:link>																		
-																			<%-- 
-																			<g:if test="${container}">
-																				<g:link controller="shipment" action="openContainer" id="${shipmentInstance.id}" params="['container.id':container.id]">
-																					<img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" alt="Pack" style="vertical-align: middle"/>														
-																				</g:link>
-																			</g:if>
-																			<g:else>
-																				<g:link controller="shipment" action="closeContainer" id="${shipmentInstance.id}" params="['container.id':container.id]">
-																					<img src="${createLinkTo(dir:'images/icons/',file:'pack-shipment.png')}" alt="Pack" style="vertical-align: middle"/>														
-																				</g:link>
-																			</g:else>
-																			&nbsp;
-																			--%>
 																			<g:link class="remove" action="deleteContainer" id="${container?.id}" params="[shipmentId:shipmentInstance.id]">
 																				<img src="${createLinkTo(dir:'images/icons/silk',file:'package_delete.png')}" alt="Delete" style="vertical-align: middle"/>
 																			</g:link>																		
+																			--%>
 																		</td>		
 																	</tr>
+																	<g:each in="${container?.shipmentItems}" var="itemInstance">
+																		<tr class="${(count++ % 2 == 0)?'odd':'even'}">
+																			<td>
+																				<span style="padding-left: 30px;">
+																					<img src="${createLinkTo(dir: 'images/icons/silk', file: 'page.png')}" style="vertical-align: middle"/>
+																					&nbsp; ${itemInstance?.product?.name}
+																				</span>
+																			</td>
+																			<td>${itemInstance?.quantity}</td>																		
+																			<td>${itemInstance?.lotNumber}</td>																		
+																			<td>${itemInstance?.recipient?.name}</td>																		
+																			<td></td>																		
+																		</tr>
+																	
+																	</g:each>
 																	
 																	<g:each in="${container?.containers}" var="childContainer">
 																		<tr class="${(count++ % 2 == 0)?'odd':'even'}">
-																			<td></td>
 																			<td>
-																				<img src="${createLinkTo(dir: 'images/icons', file: 'package.png')}" style="vertical-align: middle"/>
-																				&nbsp; ${childContainer?.containerType?.name} ${childContainer?.name}
+																				<span style="padding-left: 30px">
+																					<img src="${createLinkTo(dir: 'images/icons', file: 'box.png')}" style="vertical-align: middle"/>
+																					&nbsp; ${childContainer?.containerType?.name} ${childContainer?.name}
+																				</span>
 																			</td>																		
 																			<td></td>																		
 																			<td></td>																		
 																			<td></td>		
 																			<td style="text-align: right;">																			
 																				<%-- 
-																				<g:link controller="shipment" action="addPackage" id="${shipmentInstance.id}" 
-																					params="['parentContainer.id':container.id]"><img 
-																					src="${createLinkTo(dir:'images/icons/silk',file:'package_add.png')}" 
-																					alt="Add" style="vertical-align: middle"/>
-																				</g:link>
-																				--%>
 																				<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}" 
 																					params="['container.id':container.id]"><img 
 																					src="${createLinkTo(dir:'images/icons/silk',file:'package_go.png')}" 
@@ -301,6 +297,7 @@
 																				<g:link class="remove" action="deleteContainer" id="${container?.id}" params="[shipmentId:shipmentInstance.id]">
 																					<img src="${createLinkTo(dir:'images/icons/silk',file:'package_delete.png')}" alt="Delete" style="vertical-align: middle"/>
 																				</g:link>																		
+																				--%>
 																				
 																			
 																			</td>																		
@@ -308,31 +305,18 @@
 																		</tr>
 																		<g:each var="childItem" in="${childContainer?.shipmentItems}">
 																			<tr class="${(count++ % 2 == 0)?'odd':'even'}">
-																				<td></td>
 																				<td>
-																					&nbsp; &nbsp; <img src="${createLinkTo(dir: 'images/icons/silk', file: 'page.png')}" style="vertical-align: middle"/>
-																					&nbsp; ${childItem?.product?.name }
+																					<span style="padding-left: 60px">
+																						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'page.png')}" style="vertical-align: middle"/>
+																						&nbsp; ${childItem?.product?.name }
+																					</span>
 																				</td>
-																				<td></td>																		
-																				<td></td>																		
-																				<td></td>																		
+																				<td>${childItem?.quantity}</td>																		
+																				<td>${childItem?.lotNumber}</td>																		
+																				<td>${childItem?.recipient?.name}</td>																		
 																				<td></td>																		
 																			</tr>
 																		</g:each>
-																	</g:each>
-																	<g:each in="${container?.shipmentItems}" var="itemInstance">
-																		<tr class="${(count++ % 2 == 0)?'odd':'even'}">
-																			<td></td>
-																			<td>
-																				<img src="${createLinkTo(dir: 'images/icons/silk', file: 'page.png')}" style="vertical-align: middle"/>
-																				&nbsp; ${itemInstance?.product?.name}
-																			</td>
-																			<td></td>																		
-																			<td></td>																		
-																			<td></td>																		
-																			<td></td>																		
-																		</tr>
-																	
 																	</g:each>
 																	
 																</g:if>

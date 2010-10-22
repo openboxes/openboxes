@@ -6,8 +6,8 @@ class SecurityFilters {
 				
 				log.info params
 				String [] controllersWithAuthUserNotRequired = "api,test".split(",");
-				String [] actionsWithAuthUserNotRequired = "login,doLogin,signup,doSignup".split(",");
-				String [] actionsWithWarehouseNotRequired = "login,doLogin,signup,doSignup,chooseWarehouse,viewLogo".split(",");
+				String [] actionsWithAuthUserNotRequired = "login,doLogin,signup,doSignup,json".split(",");
+				String [] actionsWithWarehouseNotRequired = "login,doLogin,signup,doSignup,chooseWarehouse,viewLogo,json".split(",");
 								
 				if (params.controller == null) {
 					log.info "controller is null redirect to auth" 

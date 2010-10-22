@@ -37,7 +37,7 @@
 							</td>
 							<td colspan="3" valign="top"
 								class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">
-								<span style="line-height: 1.5em">${shipmentInstance?.shipmentNumber}</span>
+								${shipmentInstance?.shipmentNumber}
 							</td>
 						</tr>
 						<tr class="prop">
@@ -71,10 +71,36 @@
 						</tr>
 						<tr>
 							<td colspan="2"><hr/></td>
-						</tr>						
+						</tr>					
+						<tr class="prop">
+							<td valign="top" class="name"><label><g:message
+								code="shipment.expectedShippingDate.label" default="Expected shipping date" /></label></td>
+							<td valign="top"
+								class=" ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}"
+								nowrap="nowrap">
+									<g:jqueryDatePicker id="expectedShippingDate" name="expectedShippingDate"
+								value="${shipmentInstance?.expectedShippingDate}" format="MM/dd/yyyy"/>
+							</td>
+						</tr>		
+						<tr class="prop">
+							<td valign="top" class="name"><label><g:message
+								code="shipment.expectedShippingDate.label" default="Expected arrival date" /></label></td>
+							<td valign="top"
+								class=" ${hasErrors(bean: shipmentInstance, field: 'expectedDeliveryDate', 'errors')}"
+								nowrap="nowrap">
+									<g:jqueryDatePicker id="expectedDeliveryDate" name="expectedDeliveryDate"
+								value="${shipmentInstance?.expectedDeliveryDate}" format="MM/dd/yyyy"/>
+							</td>
+						</tr>		
+						<tr>
+							<td colspan="2"><hr/></td>
+						</tr>					
+						
+							
 										
 						<tr class="prop">	
-							<td valign="top" class="name"><label><g:message code="shipment.suitcaseCount.label" default="How many suitcases?" /></label>
+							<td valign="top" class="name">
+								<label><g:message code="shipment.suitcaseCount.label" default="How many suitcases?" /></label>
 							</td>
 							<td valign="top" class="value">							
 								<g:select name="suitcaseCount" from="${1..5}" value="${params?.suitcaseCount ? params.suitcaseCount : 1}" disabled="true"
@@ -83,11 +109,14 @@
 						</tr>
 						<tr class="prop">
 							<td valign="top" class="name"><label><g:message
-								code="shipment.totalValue.label" default="Total Value (USD)" /></label></td>
+								code="shipment.totalValue.label" default="Total value of contents" /></label></td>
 							<td valign="top"
 								class=" ${hasErrors(bean: shipmentInstance, field: 'totalValue', 'errors')}"
 								nowrap="nowrap">
-									<g:textField name="totalValue" value="${shipmentInstance?.totalValue}" />
+									<g:textField 
+										name="totalValue" 
+										value="${formatNumber(number: (shipmentInstance?.totalValue)?shipmentInstance?.totalValue:0.00, format: '#,##0.00')}" 
+										size="7" />  <span class="fade">(USD $#,###.##)</span>
 							</td>
 						</tr>		
 						
@@ -169,26 +198,6 @@
 							</td>
 						</tr>
 						--%>						
-						<tr class="prop">
-							<td valign="top" class="name"><label><g:message
-								code="shipment.expectedShippingDate.label" default="Expected shipping date" /></label></td>
-							<td valign="top"
-								class=" ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}"
-								nowrap="nowrap">
-									<g:jqueryDatePicker id="expectedShippingDate" name="expectedShippingDate"
-								value="${shipmentInstance?.expectedShippingDate}" format="MM/dd/yyyy"/>
-							</td>
-						</tr>		
-						<tr class="prop">
-							<td valign="top" class="name"><label><g:message
-								code="shipment.expectedShippingDate.label" default="Expected arrival date" /></label></td>
-							<td valign="top"
-								class=" ${hasErrors(bean: shipmentInstance, field: 'expectedDeliveryDate', 'errors')}"
-								nowrap="nowrap">
-									<g:jqueryDatePicker id="expectedDeliveryDate" name="expectedDeliveryDate"
-								value="${shipmentInstance?.expectedDeliveryDate}" format="MM/dd/yyyy"/>
-							</td>
-						</tr>		
 						
 						
 						<tr class="prop">

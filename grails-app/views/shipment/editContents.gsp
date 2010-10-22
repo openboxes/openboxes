@@ -251,8 +251,6 @@
 																Add a New Person dialog box															
 															--%>
 															<div id="add-person-dialog" title="Add a new recipient" style="display: none; padding: 50px;" >
-																
-																
 																<g:form name="addPersonForm" url="${[controller: 'shipment', action:'savePerson']}" >
 																	<g:hiddenField name="id" value="0" />
 																	<table>

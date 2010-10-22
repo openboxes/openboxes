@@ -41,12 +41,25 @@ $(function() {
 		<ul>
 			<li class="prop first">
 				<span class="menuButton">
-					<g:link class="new" controller="suitcase" action="index"><g:message code="shipment.create.outgoing.label" default="add new suitcase" /></g:link>
+					<g:link class="new" controller="createShipment" action="suitcase"><g:message code="shipment.create.label" default="suitcase wizard" /></g:link>
 				</span>
 			</li>					
+			<%-- 
 			<li class="prop">
 				<span class="menuButton">
-					<g:link class="new" controller="shipment" action="create" params="['type':'outgoing']"><g:message code="shipment.create.outgoing.label" default="add new shipment" /></g:link>
+					<g:link class="new" controller="createShipment" action="shoppingCart"><g:message code="shipment.create.label" default="shopping cart wizard" /></g:link>
+				</span>
+			</li>					
+			<hr/>
+			<li class="prop">
+				<span class="menuButton">
+					<g:link class="new" controller="suitcase" action="index"><g:message code="shipment.create.suitcase.label" default="add new suitcase" /></g:link>
+				</span>
+			</li>
+			--%>					
+			<li class="prop">
+				<span class="menuButton">
+					<g:link class="new" controller="shipment" action="create" params="['type':'outgoing']"><g:message code="shipment.create.label" default="add new shipment" /></g:link>
 				</span>
 			</li>					
 			<li class="prop">

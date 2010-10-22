@@ -5,6 +5,10 @@ import org.pih.warehouse.core.Person;
 
 class Container implements Comparable, java.io.Serializable {
 
+	def beforeDelete = {
+		shipment.removeFromContainers(this)
+	 }
+	
 	String name	
 	String containerNumber				// An official container number (if it exists)
 	String description					// Description of contents
@@ -28,10 +32,14 @@ class Container implements Comparable, java.io.Serializable {
 	static belongsTo = [ shipment : Shipment];	/* parentContainer : Container */
 	static hasMany = [ shipmentItems : ShipmentItem, containers: Container ];
 	static mappedBy = [containers: 'parentContainer']	
-	
+
+	static mapping = {
+		sort "sortOrder"
+	 }
+		
 	// Constraints
 	static constraints = {	 
-		name(nullable:true)
+		name(nullable:false)
 		description(nullable:true)
 		containerNumber(nullable:true)
 		recipient(nullable:true)
@@ -41,7 +49,7 @@ class Container implements Comparable, java.io.Serializable {
 		volumeUnits(nullable:true)
 		weight(nullable:true)
 		weightUnits(nullable:true)
-		containerType(nullable:true)
+		containerType(nullable:false)
 		shipmentItems(nullable:true)		
 		parentContainer(nullable:true)
 		containerStatus(nullable:true)

@@ -111,12 +111,25 @@ class Shipment implements Serializable {
 		events(nullable:true)
 		documents(nullable:true)
 	}
+
 	
+	/** 
+	 * Transient method that gets all shipment items two-levels deep.
+	 * 
+	 * TODO Need to make this recursive.
+	 * 	
+	 * @return
+	 */
 	List<ShipmentItem> getAllShipmentItems() { 		
 		List<ShipmentItem> allShipmentItems = new ArrayList<ShipmentItem>();		
 		for (container in containers) {
-			for (item in container.getShipmentItems()) { 
+			for (item in container?.shipmentItems) { 
 				allShipmentItems.add(item);				
+			}
+			for (childContainer in container?.containers) { 
+				for (childItem in childContainer?.shipmentItems) { 
+					allShipmentItems.add(childItem);
+				}
 			}
 		}
 		return allShipmentItems;		

@@ -1,5 +1,8 @@
 package org.pih.warehouse.shipping
 
+import grails.converters.JSON;
+
+import org.pih.warehouse.core.DialogForm;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Event;
 import org.pih.warehouse.core.EventType;
@@ -14,16 +17,18 @@ class SuitcaseController {
 	
 	
 	def index = {
-	   redirect(action:'createSuitcase')
+		redirect(action:'createSuitcase')
+		//redirect(action: '')
 	}
+	
+	
 	def createSuitcaseFlow = {
 		step0 { 
 			action {
-				log.info("step 0 action")
 				flow.shipmentInstance = new Shipment(params);
 				ShipmentType shipmentType = ShipmentType.findByName("Suitcase");
 				if (!shipmentType)
-					return error();
+					throw new Exception("Unable to find 'Suitcase' shipment type")
 				flow.shipmentInstance.shipmentType = shipmentType;
 				return success();
 			}
@@ -72,19 +77,17 @@ class SuitcaseController {
 			on("back").to "step1"
 			on("cancel").to "cancel"
 			on("next") { 
-				//log.info( "shipment " + flow.shipmentInstance.name)	
-
-				//def shipmentInstance = Shipment.get(params.id)
-				
-				def shipmentInstance = flow.shipmentInstance;
+				//log.info( "shipment " + flow.shipmentInstance.name)
+				def shipmentInstance = Shipment.get(params.id)
+				if (!shipmentInstance)
+					shipmentInstance = flow.shipmentInstance;
+					
 				shipmentInstance.properties = params
 
 				if (shipmentInstance.hasErrors() || !shipmentInstance.save(flush:true)) {
 					return error();
-				}
-				
-				flow.shipmentInstance = shipmentInstance;
-				//[shipmentInstance: shipmentInstance]					
+				}				
+						
 			}.to "step3"
 
 		}
@@ -96,6 +99,9 @@ class SuitcaseController {
 				def shipmentInstance = Shipment.get(params.id) 				
 				shipmentInstance.properties = params
 				
+				if (!shipmentInstance.validate()) { 
+					return error();
+				}
 				if (!shipmentInstance.hasErrors() && shipmentInstance.save(flush: true)) {
 					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
 					log.info "saved successfully"
@@ -107,16 +113,31 @@ class SuitcaseController {
 				
 				[shipmentInstance: shipmentInstance]				
 			}.to "step3"			
+			on("addPerson") { 
+				log.info("addPerson params" + params);
+				flash.message = "New person ${params} added"
+				return error();
+
+			}.to "step3"				
+			on("addNewItem") { 
+				log.info("params " + params);
+				def productInstance = new Product(); //Product.findByName("");
+				def shipmentItem = new ShipmentItem(product: productInstance, quantity: 1);				
+				Shipment shipmentInstance = Shipment.get(params.id);
+				Container containerInstance = Container.get(params.container.id);
+				containerInstance.addToShipmentItems(shipmentItem).save(flush:true);
+				[shipmentInstance: shipmentInstance]				
+			}.to "step3"				
 			on("addItem") { 
 				log.info("params " + params);
-				def productInstance = Product.findByName("New Product");
+				def productInstance = new Product(); //Product.findByName("");
 				def shipmentItem = new ShipmentItem(product: productInstance, quantity: 1);				
 				Shipment shipmentInstance = Shipment.get(params.id);
 				Container containerInstance = Container.get(params.container.id);
 				containerInstance.addToShipmentItems(shipmentItem);					
-				if (shipmentInstance.hasErrors() || !shipmentInstance.save(flush:true))
+				/*if (shipmentInstance.hasErrors() || !shipmentInstance.save(flush:true))
 					return error();
-				
+				*/
 				[shipmentInstance: shipmentInstance]				
 			}.to "step3"				
 			on("deleteItem") { 
@@ -150,15 +171,24 @@ class SuitcaseController {
 			}.to "step3"
 			on("addBox") { 
 				def shipmentInstance = flow.shipmentInstance;
+				def containerInstance = Container.get(params?.container?.id);				
 				def containerType = ContainerType.findByName("Box");
 				def number = (shipmentInstance?.containers) ? shipmentInstance?.containers?.size() : 0;
 				def box = new Container(name: number, containerType: containerType);
-				shipmentInstance.addToContainers(box);								
-				if (shipmentInstance.hasErrors() || !shipmentInstance.save(flush:true))
+				box.shipment = shipmentInstance;
+				containerInstance?.addToContainers(box);				
+				if (containerInstance.hasErrors() || !containerInstance.save(flush:true))
 					return error();
+
+								//shipmentInstance.addToContainers(box);								
+				//if (shipmentInstance.hasErrors() || !shipmentInstance.save(flush:true))
+				//	return error();
 			}.to "step3"			
 			on("cancel").to "cancel"
-			on("next").to "step4"
+			on("next") { 
+				log.info "fuck you !"
+				
+			}.to "step4"
 		} 
 		step4 { 
 			on("cancel").to "cancel"
