@@ -21,7 +21,7 @@
                 <table>
                     <tbody>
 						<tr class="prop">
-							<td valign="top" class="name"><label>Type</label></td>
+							<td valign="top" class="name"><label><g:message code="shipment.type.label" default="Type" /></label></td>
 							<td valign="top"
 								class="value ${hasErrors(bean: shipmentInstance, field: 'shipmentType', 'errors')}">
 								<g:if test="${shipmentInstance?.shipmentType}">
@@ -38,55 +38,42 @@
 						</tr>
 						<tr class='prop'>
 							<td valign='top' class='name'>
-								<label for='name'>Name:</label>
+								<label for='name'><label><g:message code="shipment.name.label" default="Name" /></label>
 							</td>
 							<td valign='top' class='value ${hasErrors(bean:shipmentInstance,field:'name','errors')}'>
 								<input type="text" name='name' value="${shipmentInstance?.name?.encodeAsHTML()}" size="40"/>
 							</td>
 						</tr>  
 						<tr class="prop">
-							<td valign="top" class="name"><label>Route</label></td>
+							<td valign="top" class="name"><label><label><g:message code="shipment.origin.label" default="Origin" /></label></td>
 							<td valign="top"
-								class="value ">
-								
-								<table border="0" style="border: 1px solid whitesmoke; background-color: #f5f5f5;">
-									<thead>
-										<tr>
-											<th style="text-align: center">Departing</th>
-											<th style="text-align: center">Arriving</th>
-									
-									</thead>
-									<tbody>
-										<tr>
-											<td class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}"
-												style="text-align: center">
-												<g:select name="origin.id" from="${org.pih.warehouse.inventory.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.origin?.id}" style="width: 180px" />							
-											</td>
-											<td class="value ${hasErrors(bean: shipmentInstance, field: 'destination', 'errors')}"
-												style="text-align: center">
-												<g:select name="destination.id" from="${org.pih.warehouse.inventory.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.destination?.id}" style="width: 180px" />							
-											</td>
-										</tr>
-										<tr>
-											<td nowrap class="value" style="text-align: center;"> 
-												<g:jqueryDatePicker id="expectedShippingDate" name="expectedShippingDate"
-													value="${shipmentInstance?.expectedShippingDate}" format="MM/dd/yyyy"/>							
-											
-											</td>
-											<td nowrap class="value" style="text-align: center;"> 
-												<g:jqueryDatePicker id="expectedDeliveryDate" name="expectedDeliveryDate"
-													value="${shipmentInstance?.expectedDeliveryDate}" format="MM/dd/yyyy"/>
-											</td>
-											
-										</tr>
-									</tbody>
-								</table>
+								class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">								
+								<g:select name="origin.id" from="${org.pih.warehouse.inventory.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.origin?.id}" style="width: 180px" />							
 							</td>
-						</tr>						
-						<tr>
-							<td>
+						<tr class="prop"
+							<td valign="top" class="name"><label><g:message code="shipment.destination.label" default="Destination" /></td>
+							<td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'destination', 'errors')}">
+								<g:select name="destination.id" from="${org.pih.warehouse.inventory.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.destination?.id}" style="width: 180px" />							
+							</td>
+						</tr>
+						<tr class="prop">
+							<td valign="top" class="name"><label><g:message code="shipment.expectedShippingDate.label" default="Expected to ship on" /></td>
+							<td class="value ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}"> 
+								<g:jqueryDatePicker id="expectedShippingDate" name="expectedShippingDate"
+									value="${shipmentInstance?.expectedShippingDate}" format="MM/dd/yyyy"/>							
 							
 							</td>
+						</tr>
+						<tr class="prop">
+							<td valign="top" class="name"><label><g:message code="shipment.expectedDeliveryDate.label" default="Expected to arrive on" /></td>
+							<td class="value ${hasErrors(bean: shipmentInstance, field: 'expectedDeliveryDate', 'errors')}"> 
+								<g:jqueryDatePicker id="expectedDeliveryDate" name="expectedDeliveryDate"
+									value="${shipmentInstance?.expectedDeliveryDate}" format="MM/dd/yyyy"/>
+							</td>
+							
+						</tr>
+						<tr>
+							<td></td>
 							<td>
 								<div class="buttons">
 									<span class="formButton"> 
