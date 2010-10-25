@@ -18,10 +18,11 @@
 					<td valign="top">
 						<%-- <g:link action="showDetails" id="${shipmentInstance.id}"></g:link>--%>
 						<div style="display: block;">						
-							<b>${shipmentInstance?.name}</b>
+							<b>${shipmentInstance?.name}</b><br/>
 							<span class="fade">
 								<%--${shipmentInstance?.shipmentType?.name} Shipment <br/> --%>
-								${shipmentInstance?.origin?.name} to ${shipmentInstance?.destination?.name}
+								${shipmentInstance?.origin?.name}
+								<img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_right.png')}" style="vertical-align: middle;"/> ${shipmentInstance?.destination?.name}
 							</span>
 						</div>
 					</td>
@@ -37,22 +38,7 @@
 				</tr>
 				<tr>
 					<td></td>
-					<td style="text-align: left;">
-						<div>
-							<g:if test="${shipmentInstance?.mostRecentEvent?.eventType }">
-								<span class="fade">${shipmentInstance?.mostRecentEvent?.eventType?.description } 
-								 as of <b><g:relativeDate date="${shipmentInstance?.mostRecentEvent?.eventDate}"/></b>
-										(<g:formatDate format="MMM dd" date="${shipmentInstance?.mostRecentEvent?.eventDate}"/>)
-								</span>
-							</g:if>
-							<g:else>
-								<g:link action="addEvent" id="${shipmentInstance.id}">
-									<img src="${createLinkTo(dir:'images/icons/silk', file:'add.png')}" style="vertical-align: middle;"/>
-									This shipment needs an initial event.
-								</g:link>
-							</g:else>
-						</div>
-					
+					<td style="text-align: left;" colspan="2">
 						<div>
 							<g:if test="${shipmentInstance.actualShippingDate}">
 								Shipment was shipped <b><g:relativeDate date="${shipmentInstance?.actualShippingDate }"/></b>
@@ -87,7 +73,21 @@
 				
 				
 				<tr class="prop">
-					<td style="text-align: right;" colspan="3">
+					<td colspan="2">
+						<span style="font-weight: bold;">Status:</span>		
+						<span>${shipmentInstance?.mostRecentEvent?.eventType?.eventStatus?.name}</span>									
+						<br/>
+						<g:if test="${shipmentInstance?.mostRecentEvent?.eventType }">
+							<span class="fade">
+								${shipmentInstance?.mostRecentEvent?.eventType?.name }
+								<b><g:relativeDate date="${shipmentInstance?.mostRecentEvent?.eventDate}"/></b>
+								(<g:formatDate format="MMM dd" date="${shipmentInstance?.mostRecentEvent?.eventDate}"/>)
+							</span>
+						</g:if>
+						
+									
+					</td>
+					<td style="text-align: right;" colspan="1">
 						<div style="color: #aaa; font-size: 0.75em;">
 							Last modified <b><g:formatDate format="MMM dd" date="${shipmentInstance?.lastUpdated}"/></b> at								
 							<b><g:formatDate format="hh:mm:ss a" date="${shipmentInstance?.lastUpdated}"/></b>

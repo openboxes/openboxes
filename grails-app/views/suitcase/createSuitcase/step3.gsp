@@ -406,14 +406,7 @@
 
 			$("#btnAddPerson").click(function() { 
 				$('#dlgAddPerson').dialog('open');
-			});																			
-			$("#btnAddItem").click(function() { 
-				$('#dlgAddItem').dialog('open'); 
-			});									
-			$("#btnAddBox").click(function() { 
-				$('#dlgAddBox').dialog('open'); 
-			});									
-			
+			});																						
 			$('#dlgAddPerson').dialog({
 				autoOpen: false, 
 				modal: true, 
@@ -452,6 +445,9 @@
 		    	}
 			});
 
+			$("#btnAddItem").click(function() { 
+				$('#dlgAddItem').dialog('open'); 
+			});									
 			$('#dlgAddItem').dialog({
 				autoOpen: false, 
 				modal: true, 
@@ -492,7 +488,10 @@
 	                //window.location.reload(true);
 		    	}
 			});
-									
+
+			$("#btnAddBox").click(function() { 
+				$('#dlgAddBox').dialog('open'); 
+			});									
 			$('#dlgAddBox').dialog({
 				autoOpen: false, 
 				modal: true, 

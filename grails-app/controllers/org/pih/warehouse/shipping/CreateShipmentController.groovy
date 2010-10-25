@@ -55,10 +55,10 @@ class CreateShipmentController {
 				// Add a new event to the shipment to mark it as Requested
 				EventType eventType = EventType.findByName("Requested")
 				if (eventType) {
-					boolean exists = false;
+					boolean exists = Boolean.FALSE;
 					// If 'requested' event type already exists, return
 					shipmentInstance?.events.each {
-						(it.eventType == eventType) exists = true;
+						(it.eventType == eventType) exists = Boolean.TRUE;
 					}
 					// Avoid duplicate events 
 					if (!exists) {
@@ -173,16 +173,7 @@ class CreateShipmentController {
 						containerInstance.addToShipmentItems(itemInstance).save(flush:true);
 					}					
 				}
-				flow.itemInstance=null;
-				
-				//flow.container = container
-				//if(container.hasErrors() || !container.validate()) return error()
-				//if(!params.id)return error()
-				//def containers = flow.containers
-				//if(!containers) containers = [] as HashSet
-				//containers << container
-				//flow.containers = containers
-				
+				flow.itemInstance=null;				
 			}.to "addShipmentItems"
 			on("submit").to "reviewShipment"
 			on(Exception).to "handleError"
@@ -202,7 +193,8 @@ class CreateShipmentController {
 						boolean exists = Boolean.FALSE
 						// If 'requested' event type already exists, return
 						shipmentInstance?.events.each {
-							if (it.eventType == eventType) exists = Boolean.TRUE;
+							if (it.eventType == eventType) 
+								exists = Boolean.TRUE;
 						}
 						// Avoid duplicate events
 						if (!exists) {
