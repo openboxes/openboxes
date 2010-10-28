@@ -23,12 +23,12 @@ $(function() {
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="dashboard" action="index"><g:message code="dashboard.list.label"  default="dashboard"/></g:link>
+					<g:link class="bullet" controller="dashboard" action="index"><g:message code="dashboard.list.label"  default="Show dashboard"/></g:link>
 				</span>
 			</li>				
 			<li class="prop">
 				<span class="menuButton">
-					<g:link class="bullet" controller="sync" action="index"><g:message code="sync.list.label"  default="sync dashboard"/></g:link>
+					<g:link class="bullet" controller="sync" action="index"><g:message code="sync.list.label"  default="Show sync dashboard"/></g:link>
 				</span>
 			</li>				
 		</ul>
@@ -40,7 +40,7 @@ $(function() {
 		<ul>
 			<li class="prop first">
 				<span class="menuButton">
-					<g:link class="new" controller="createShipment" action="suitcase"><g:message code="shipment.create.label" default="suitcase wizard" /></g:link>
+					<g:link class="new" controller="createShipment" action="suitcase"><g:message code="shipment.create.label" default="Show suitcase wizard" /></g:link>
 				</span>
 			</li>					
 			<%-- 
@@ -58,22 +58,22 @@ $(function() {
 			--%>					
 			<li class="prop">
 				<span class="menuButton">
-					<g:link class="new" controller="shipment" action="create" params="['type':'outgoing']"><g:message code="shipment.create.label" default="add new shipment" /></g:link>
+					<g:link class="new" controller="shipment" action="create" params="['type':'outgoing']"><g:message code="shipment.create.label" default="Add new shipment" /></g:link>
 				</span>
 			</li>					
 			<li class="prop">
 				<span class="menuButton">
-					<g:link class="bullet" controller="shipment" action="listOutgoing"><g:message code="shipment.listShipping.label"  default="show all shipping"/></g:link>
+					<g:link class="bullet" controller="shipment" action="listOutgoing"><g:message code="shipment.listShipping.label"  default="Show all shipping"/></g:link>
 				</span>
 			</li>				
 			<li class="prop">
 				<span class="menuButton">
-					<g:link class="bullet" controller="shipment" action="listShippingByStatus"><g:message code="shipment.listShippingByStatus.label"  default="show shipping by status"/></g:link>
+					<g:link class="bullet" controller="shipment" action="listShippingByStatus"><g:message code="shipment.listShippingByStatus.label"  default="Show shipping by status"/></g:link>
 				</span>
 			</li>				
 			<li class="prop">
 				<span class="menuButton">
-					<g:link class="bullet" controller="shipment" action="listShippingByType"><g:message code="shipment.listShippingByType.label"  default="show shipping by type"/></g:link>
+					<g:link class="bullet" controller="shipment" action="listShippingByType"><g:message code="shipment.listShippingByType.label"  default="Show shipping by type"/></g:link>
 				</span>
 			</li>				
 			<%-- 			
@@ -112,7 +112,7 @@ $(function() {
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="shipment" action="listIncoming"><g:message code="shipment.list.incoming.label"  default="show all"/></g:link>
+					<g:link class="bullet" controller="shipment" action="listIncoming"><g:message code="shipment.list.incoming.label"  default="Show all receiving"/></g:link>
 				</span>		
 			</li>										
 			<%-- 
@@ -157,12 +157,12 @@ $(function() {
 		<ul>
 			<li>
 				<span class="menuButton">
-					<g:link class="browse" class="bullet" controller="inventory" action="browse"><g:message code="inventory.browse.label" default="browse inventory"/></g:link>
+					<g:link class="browse" class="bullet" controller="inventory" action="browse"><g:message code="inventory.browse.label" default="Browse inventory"/></g:link>
 				</span>
 			</li>		
 			<li>
 				<span class="menuButton">
-					<g:link class="browse" class="bullet" controller="receipt" action="process"><g:message code="inventory.browse.label" default="process receipts"/></g:link>
+					<g:link class="browse" class="bullet" controller="receipt" action="process"><g:message code="receiving.process.label" default="Process receipts"/></g:link>
 				</span>
 			</li>		
 			<!-- 
@@ -180,21 +180,21 @@ $(function() {
 	</h3>
 	<div class="menuSection">									
 		<ul>
-			<li class="">
+			<li class="prop">
 				<span class="menuButton">
-					<g:link class="bullet" controller="product" action="browse"><g:message code="product.browse.label" default="show all"/></g:link>
+					<g:link class="new" controller="product" action="create"><g:message code="product.create.label" default="Add new product" /></g:link>
+				</span>
+			</li>
+			<li class="prop">
+				<span class="menuButton">
+					<g:link class="bullet" controller="product" action="browse"><g:message code="product.browse.label" default="Show all products"/></g:link>
 				</span>
 			</li>		
 			<li class="prop">
 				<span class="menuButton">
-					<g:link class="bullet" controller="product" action="importProducts"><g:message code="product.import.label" default="import products" /></g:link>
+					<g:link class="bullet" controller="product" action="importProducts"><g:message code="product.import.label" default="Import new products" /></g:link>
 				</span>
 			</li>						
-			<li class="prop">
-				<span class="menuButton">
-					<g:link class="new" controller="product" action="create"><g:message code="product.create.label" default="add new product" /></g:link>
-				</span>
-			</li>
 			<%-- 
 			<li><span class="menuButton"><g:link class="list" controller="product" action="list"><g:message code="default.list.label"  args="['Product']"/></g:link></span></li>		
 			<li><span class="menuButton"><g:link class="create" controller="drugProduct" action="create"><g:message code="default.create.label" args="['Drug Product']" default="Create a new Drug Product" /></g:link></span></li>						

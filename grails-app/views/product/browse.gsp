@@ -37,13 +37,13 @@
 						</script>
 						<div id="productSearchTabs">
 							<ul>
-								<li><a href="#tabs-1">Product Type</a></li>
+								<li><a href="#tabs-1">Serenic Code</a></li>
 								<li><a href="#tabs-2">Categories</a></li>
 								<li><a href="#tabs-3">Search</a></li>
 							</ul>
 							<div id="tabs-1">
 							
-								<h3>Filter by Product Type</h3><br/>
+								<h3>Filter by Serenic Code</h3><br/>
 								<table>
 									<tr>
 										<g:each in="${productTypes}" status="i" var="productType">
@@ -183,9 +183,9 @@
 					                            <g:sortableColumn property="id" title="${message(code: 'product.id.label', default: 'ID')}" />
 					                            --%>
 					                            <th width="5%" style="text-align: center">${message(code: 'product.type.label', default: 'Type')}</th>
-					                            <g:sortableColumn property="upc" title="${message(code: 'product.upc.label', default: 'UPC')}" />
 					                            <g:sortableColumn property="name" title="${message(code: 'product.name.label', default: 'Name')}" />
-					                            <g:sortableColumn property="productType" title="${message(code: 'product.productType.label', default: 'Product Type')}" />
+					                            <g:sortableColumn property="upc" title="${message(code: 'product.upc.label', default: 'UPC')}" />
+					                            <g:sortableColumn property="productType" title="${message(code: 'product.productType.label', default: 'Serenic Code')}" />
 					                            <g:sortableColumn property="categories" title="${message(code: 'product.categories.label', default: 'Categories')}" />
 					                            <g:sortableColumn property="tags" title="${message(code: 'product.tags.label', default: 'Tags')}" />
 					                            <g:sortableColumn property="complete" title="${message(code: 'product.unverified.label', default: 'Valid')}" />
@@ -204,16 +204,16 @@
 															<img src="${createLinkTo(dir:'images/icons/silk',file: 'computer.png')}"/>
 														</g:elseif>
 														<g:else>
-															<img src="${createLinkTo(dir:'images/icons/silk',file: 'page_white.png')}"/>
+															<img src="${createLinkTo(dir:'images/icons/silk',file: 'attach.png')}"/>
 														</g:else>
+													</td>
+													<td align="center">
+														<g:link action="edit" id="${productInstance.id}">
+															${fieldValue(bean: productInstance, field: "name")}
+														</g:link>
 													</td>
 													<td align="center" width="10%">
 														${fieldValue(bean: productInstance, field: "upc")}
-													</td>
-													<td align="center">
-														<g:link action="show" id="${productInstance.id}">
-															${fieldValue(bean: productInstance, field: "name")}
-														</g:link>
 													</td>
 													<td width="10%">
 														${fieldValue(bean: productInstance, field: "productType.name")}

@@ -28,7 +28,6 @@
                 <div class="dialog">
                     <table>
                         <tbody>
-                        
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="name"><g:message code="drugProduct.name.label" default="Name" /></label>

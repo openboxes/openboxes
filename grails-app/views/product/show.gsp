@@ -15,10 +15,7 @@
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
-            <div class="dialog">
-            
-            
-            
+            <div class="dialog">            
             	<fieldset>
             		<legend>${fieldValue(bean: productInstance, field: "name")}</legend>
 	                <table>
@@ -28,6 +25,10 @@
 	                            <td valign="top" class="value">${fieldValue(bean: productInstance, field: "id")}</td>                            
 	                        </tr>                    
 	                        <tr class="prop">
+	                            <td valign="top" class="name"><g:message code="product.name.label" default="Name" /></td>                            
+	                            <td valign="top" class="value">${fieldValue(bean: productInstance, field: "name")}</td>                            
+	                        </tr>                    
+	                        <tr class="prop">
 	                            <td valign="top" class="name"><g:message code="product.type.label" default="Type" /></td>                            
 	                            <td valign="top" class="value">${fieldValue(bean: productInstance, field: "productType.name")}</td>                            
 	                        </tr>                    
@@ -35,9 +36,11 @@
 	                            <td valign="top" class="name"><g:message code="product.upc.label" default="UPC" /></td>                            
 	                            <td valign="top" class="value">
 	                            	${fieldValue(bean: productInstance, field: "upc")}
-	                            	<span class="menuButton" style="padding-left: 25px;">                            
-	                            		<a class="browse" target="_new" href="http://www.upcdatabase.com/item/${fieldValue(bean: productInstance, field: "upc")}"><b>Lookup this UPC</b></a>
-	                            	</span>
+	                            	<g:if test="${productInstance?.upc}">
+		                            	<span class="menuButton" style="padding-left: 25px;">                            
+		                            		<a class="browse" target="_new" href="http://www.upcdatabase.com/item/${fieldValue(bean: productInstance, field: "upc")}"><b>Lookup this UPC</b></a>
+		                            	</span>
+	                            	</g:if>
 	                            </td>                            
 	                        </tr>                    
 	                        <tr class="prop">
@@ -48,10 +51,10 @@
 	                            <td valign="top" class="name"><g:message code="product.categories.label" default="Categories" /></td>                            
 	                            <td valign="top" class="value">${fieldValue(bean: productInstance, field: "categories")}</td>                            
 	                        </tr>
-	                        <tr class="prop">
-	                            <td valign="top" class="name"></td>                            
-	                            <td valign="top" class="value">
-						            <div class="buttons">
+							<tr class="prop">
+								<td valign="top" class="">
+
+									<div class="buttons">
 						                <g:form>
 						                    <g:hiddenField name="id" value="${productInstance?.id}" />
 						                    <g:link controller="product" action="edit" id="${productInstance.id}">
@@ -63,14 +66,17 @@
 							                    ${message(code: 'default.button.delete.label', default: 'Delete')}
 						                    </button> 
 						                </g:form>
-						            </div>
-	
-								</td>                            
-	                        </tr>
+						            </div>            
+
+								</td>
+							</tr>
 	                    </tbody>
 	                </table>
                 </fieldset>
             </div>
+            
+								            
+            
         </div>
     </body>
 </html>

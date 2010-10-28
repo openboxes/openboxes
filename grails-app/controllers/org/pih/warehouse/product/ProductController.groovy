@@ -17,99 +17,7 @@ class ProductController {
     }
 
 	
-	/**
-	 * Import contents of CSV file
-	 */
-	def importProducts = { 
-		
-		if ("GET".equals(request.getMethod())) { 			
-			render(view: "uploadProducts");
-		}
-		else if ("POST".equals(request.getMethod())) { 			
-			log.info "POST request"
-			if (!session.products) { 				
-				log.info "GET request"
-				
-				flash.message = "Please upload a CSV file with valid products";
-			}
-			else { 	
-				session.products.each() {					
-					new Product(name: it.name, description: it.description, productType: it.productType).save(failOnError:true);
-				};
-									
-				// import 
-				flash.message = "Products imported successfully"	
-				redirect(controller: "product", action: "browse")
-			}
-		}
-	}
 
-
-		
-	/**
-	 * Upload and process CSV file
-	 */
-	def uploadProducts = {
-		
-		if ("POST".equals(request.getMethod())) {
-			
-			
-			def uploadFile = request.getFile('csvFile');
-			
-			// file must be less than 1MB
-			if (!uploadFile?.empty) {
-				File csvFile = new File("/tmp/warehouse/products/import/" + uploadFile.originalFilename);
-				csvFile.mkdirs()
-				
-				uploadFile.transferTo(csvFile);
-				
-				
-				//def sql = Sql.newInstance("jdbc:mysql://localhost:3306/mydb", "user", "pswd", "com.mysql.jdbc.Driver")
-				//def people = sql.dataSet("PERSON")
-				List<Product> products = new ArrayList<Product>();
-				
-				/*
-				csvFile.splitEachLine(",") { fields ->
-					log.info("field0: " + fields[0])
-					log.info("field1: " + fields[1])
-					log.info("field2: " + fields[2])
-					
-					products.add(
-						new ProductCommand(
-							id: fields[0], 
-							ean: fields[1], 
-							name: fields[2], 
-							description: fields[3], 
-							productType: fields[4]));
-				}*/
-
-				
-				// Process CSV file 
-				def columns;
-				CSVReader csvReader = new CSVReader(new FileReader(csvFile.getAbsolutePath()), (char) ',', (char) '\"', 1);
-				while ((columns = csvReader.readNext()) != null) {
-					log.info "product type: " + columns[4]
-					def productType = ProductType.findByName(columns[4]);
-					if (!productType) { 
-						throw new Exception("Could not find Product Type with name '" + columns[4] + "'")
-					}
-					
-					products.add(
-						new Product(
-							//id: columns[0],
-							ean: columns[1],
-							name: columns[2],
-							description: columns[3],
-							productType: productType));
-				}				
-				session.products = products;						
-				render(view: "importProducts", model: [products:products]);
-			}
-			else { 			
-				flash.message = "Please upload a non-empty CSV file";				
-			}
-    	}
-    }
 	
     def browse = { 
     		
@@ -201,23 +109,28 @@ class ProductController {
 	
     def save = {
         //def productInstance = new Product(params)
-        
+		log.info "save called with params " + params
+		log.info "type = " + params.type;
+		
 		def productInstance = null;
 		if (params.type == 'drug') {
 			productInstance = new DrugProduct(params);
-		} else if (params.type == 'durable') {
+		} 
+		else if (params.type == 'durable') {
 			productInstance = new DurableProduct(params);
-		} else {
+		} 
+		else {
 			productInstance = new Product(params);
 		}
 
+		log.info "class = " + productInstance?.class?.simpleName
 		
 		if (productInstance.save(flush: true)) {
-            flash.message = "${message(code: 'default.created.message', args: [message(code: 'product.label', default: 'Product'), productInstance.id])}"
-            redirect(action: "show", id: productInstance.id)
+            flash.message = "${message(code: 'default.created.message', args: [message(code: 'product.label', default: 'Product'), productInstance.name])}"
+            redirect(action: "browse")
         }
         else {
-            render(view: "create", model: [productInstance: productInstance])
+            render(view: "edit", model: [productInstance: productInstance])
         }
     }
 
@@ -244,12 +157,15 @@ class ProductController {
     }
 
     def update = {
+		
+		log.info "update called with params " + params
         def productInstance = Product.get(params.id)
+		log.info " " + productInstance.class.simpleName
+		
         if (productInstance) {
             if (params.version) {
                 def version = params.version.toLong()
-                if (productInstance.version > version) {
-                    
+                if (productInstance.version > version) {                    
                     productInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'product.label', default: 'Product')] as Object[], "Another user has updated this Product while you were editing")
                     render(view: "edit", model: [productInstance: productInstance])
                     return
@@ -257,8 +173,8 @@ class ProductController {
             }
             productInstance.properties = params
             if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
-                flash.message = "${message(code: 'default.updated.message', args: [message(code: 'product.label', default: 'Product'), productInstance.id])}"
-                redirect(action: "show", id: productInstance.id)
+                flash.message = "${message(code: 'default.updated.message', args: [message(code: 'product.label', default: 'Product'), productInstance.name])}"
+                redirect(action: "browse")
             }
             else {
                 render(view: "edit", model: [productInstance: productInstance])
@@ -288,6 +204,101 @@ class ProductController {
             redirect(action: "browse")
         }
     }
+	
+	/**
+	* Import contents of CSV file
+	*/
+   def importProducts = {
+	   
+	   if ("GET".equals(request.getMethod())) {
+		   render(view: "uploadProducts");
+	   }
+	   else if ("POST".equals(request.getMethod())) {
+		   log.info "POST request"
+		   if (!session.products) {
+			   log.info "GET request"
+			   
+			   flash.message = "Please upload a CSV file with valid products";
+		   }
+		   else {
+			   session.products.each() {
+				   new Product(name: it.name, description: it.description, productType: it.productType).save(failOnError:true);
+			   };
+								   
+			   // import
+			   flash.message = "Products imported successfully"
+			   redirect(controller: "product", action: "browse")
+		   }
+	   }
+   }
+
+
+	   
+   /**
+	* Upload and process CSV file
+	*/
+   def uploadProducts = {
+	   
+	   if ("POST".equals(request.getMethod())) {
+		   
+		   
+		   def uploadFile = request.getFile('csvFile');
+		   
+		   // file must be less than 1MB
+		   if (!uploadFile?.empty) {
+			   File csvFile = new File("/tmp/warehouse/products/import/" + uploadFile.originalFilename);
+			   csvFile.mkdirs()
+			   
+			   uploadFile.transferTo(csvFile);
+			   
+			   
+			   //def sql = Sql.newInstance("jdbc:mysql://localhost:3306/mydb", "user", "pswd", "com.mysql.jdbc.Driver")
+			   //def people = sql.dataSet("PERSON")
+			   List<Product> products = new ArrayList<Product>();
+			   
+			   /*
+			   csvFile.splitEachLine(",") { fields ->
+				   log.info("field0: " + fields[0])
+				   log.info("field1: " + fields[1])
+				   log.info("field2: " + fields[2])
+				   
+				   products.add(
+					   new ProductCommand(
+						   id: fields[0],
+						   ean: fields[1],
+						   name: fields[2],
+						   description: fields[3],
+						   productType: fields[4]));
+			   }*/
+
+			   
+			   // Process CSV file
+			   def columns;
+			   CSVReader csvReader = new CSVReader(new FileReader(csvFile.getAbsolutePath()), (char) ',', (char) '\"', 1);
+			   while ((columns = csvReader.readNext()) != null) {
+				   log.info "product type: " + columns[4]
+				   def productType = ProductType.findByName(columns[4]);
+				   if (!productType) {
+					   throw new Exception("Could not find Product Type with name '" + columns[4] + "'")
+				   }
+				   
+				   products.add(
+					   new Product(
+						   //id: columns[0],
+						   ean: columns[1],
+						   name: columns[2],
+						   description: columns[3],
+						   productType: productType));
+			   }
+			   session.products = products;
+			   render(view: "importProducts", model: [products:products]);
+		   }
+		   else {
+			   flash.message = "Please upload a non-empty CSV file";
+		   }
+	   }
+   }
+	
 	
 }
 
