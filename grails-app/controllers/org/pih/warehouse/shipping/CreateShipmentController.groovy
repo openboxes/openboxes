@@ -73,6 +73,7 @@ class CreateShipmentController {
 				//flash.message = "test";
 				
 			}.to "enterTravelerDetails"
+			on("finish").to "finish"
 			on("return").to "start"			
 			on(Exception).to "handleError"
 		}
@@ -344,26 +345,24 @@ class CreateShipmentController {
 						// Avoid duplicate events
 						if (!exists) {
 							log.info ("Event does not exist")
-							def event = new Event(
-								eventDate: new Date(),
-								eventType: eventType,
+							def event = new Event(eventDate: new Date(), eventType: eventType, 
 								eventLocation: Location.get(session.warehouse.id)).save(flush:true);
 							shipmentInstance.addToEvents(event).save(flush:true);
-
 						}
 					}
-												
 					if (params.comment) {
 						def comment = new Comment(comment: params.comment, sender: session?.user)
 						shipmentInstance.addToComments(comment).save(flush:true);
 					}
-
+					
+					// Send an email message to the shipment owner
 					def confirmSubject = "Suitcase " + shipmentInstance?.name + " has been shipped";
 					def confirmMessage = "This message represents the email body"
 					if (session?.user) {
 						mailService.sendMail(confirmSubject, confirmMessage, session?.user?.email);
 					}
-					
+										
+					// Send emails to each person receiving shipment 
 					shipmentInstance?.allShipmentItems?.each {
 						def subject = "Suitcase " + shipmentInstance?.name + " contains an item for you!";
 						def message = "You should expect to receive " + it.quantity + " units of " + it?.product?.name +
@@ -374,29 +373,35 @@ class CreateShipmentController {
 							mailService.sendMail(subject, message, it?.recipient?.email);
 						}							
 					}
-	
+					log.info ("flow.shipment.ID: " + flow?.shipmentInstance?.id)
+					log.info ("flow.shipment: " + flow?.shipmentInstance)
+					log.info ("shipment.ID: " + shipmentInstance?.id)
+					log.info ("shipment: " + shipmentInstance)
+
 					//flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
-					//redirect(action: "showDetails", id: shipmentInstance.id, params: ["containerId" : params.containerId])
+					//redirect(controller: "shipment", action: "showDetails", id: shipmentInstance.id)
 				}
 			}
 			on("error").to "reviewShipment"
 			on(Exception).to "reviewShipment"
-			on("success").to "redirectToDetails"
+			on("success").to "complete"
 		}
-		redirectToDetails { 
-			redirect(controller:"shipment", action:"showDetails", id: flow.shipmentInstance?.id)
+		complete { 
 			
 		}
 		handleError()
 		cancel {
 			redirect(controller:"dashboard", action:"index")
 		}
-		clear { 
-			action { 
+		clear {
+			action {
 				//flow.clear();
 			}
 			on("success").to "enterShipmentDetails"
 			on(Exception).to "handleError"
+		}
+		redirectToShowDetails { 	
+			redirect(controller:"shipment", action:"showDetails", id: flow.shipmentInstance?.id)			
 		}
 	}
 

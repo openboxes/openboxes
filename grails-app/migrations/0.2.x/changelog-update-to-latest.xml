@@ -371,7 +371,21 @@
             </column>
         </addColumn>
     </changeSet>
-    
+    <changeset author="jmiranda" id="1288203894188-2">
+		<comment>Shipment items are now tied to shipments, rather than containers.</comment>
+		<sql>    	
+			UPDATE shipment_item AS s
+			  INNER JOIN container AS c ON c.id = s.container_id
+			  SET s.shipment_id = c.shipment_id
+			WHERE s.shipment_id is null or s.shipment_id = 0    
+		</sql>
+    </changeset>
+    <changeset author="jmiranda" id="1288203894188-3">
+		<comment>Changed named for the Shipped event type.</comment>
+		<sql>    	
+			UPDATE event_type SET name = 'Shipped' where id = 4 and name = 'Departed';	 
+		</sql>
+    </changeset>
     
     <!-- 
     <changeSet author="jmiranda (generated)" id="1287544235753-5">

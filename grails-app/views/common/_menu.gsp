@@ -40,7 +40,7 @@ $(function() {
 		<ul>
 			<li class="prop first">
 				<span class="menuButton">
-					<g:link class="new" controller="createShipment" action="suitcase"><g:message code="shipment.create.label" default="Show suitcase wizard" /></g:link>
+					<g:link class="new" controller="createShipment" action="suitcase"><g:message code="shipment.create.label" default="Add new suitcase" /></g:link>
 				</span>
 			</li>					
 			<%-- 

@@ -149,10 +149,10 @@
 												</td>									
 												<td><g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}">${shipmentInstance.name }</g:link></td>
 												<td>${shipmentInstance.destination.name }</td>
-												<td>
-													<g:relativeDate date="${shipmentInstance.expectedShippingDate}"/>
+												<td nowrap>
+													<g:formatDate date="${shipmentInstance.expectedShippingDate}" format="MMM dd"/>
 													<span class="fade">
-														<g:formatDate date="${shipmentInstance.expectedShippingDate}" format="MMM dd"/>
+														(<g:relativeDate date="${shipmentInstance.expectedShippingDate}"/>)
 													</span>
 												</td>
 											</tr>										
@@ -202,7 +202,12 @@
 													</g:link>${shipment?.mostRecentEvent?.eventType?.eventStatus?.name}</td>
 												<td><g:link controller="shipment" action="showDetails" id="${shipment.id}">${shipment.name }</g:link></td>
 												<td>${shipment?.origin?.name }</td>
-												<td><g:formatDate date="${shipment.expectedShippingDate}" format="MMM dd"/></td>
+												<td nowrap>
+													<g:formatDate date="${shipmentInstance.expectedShippingDate}" format="MMM dd"/>
+													<span class="fade">
+														(<g:relativeDate date="${shipmentInstance.expectedShippingDate}"/>)
+													</span>												
+												</td>
 											</tr>
 										</g:each>
 									</g:else>
