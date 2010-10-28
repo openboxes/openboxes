@@ -58,17 +58,25 @@
 											width="180" size="30"
 											valueId="${shipmentInstance?.carrier?.id}" 
 											valueName="${shipmentInstance?.carrier?.name}"/>		
-											
 									</td>
 								</tr>
 								<tr class="prop">
 									<td valign="top" class="name"><label><g:message
-										code="shipment.totalValue.label" default="Flight Information" /></label></td>
+										code="shipment.totalValue.label" default="Flight number" /></label></td>
 									<td valign="top"
 										class=" ${hasErrors(bean: shipmentInstance, field: 'flightInformation', 'errors')}"
 										nowrap="nowrap">
-											<g:textField name="flightInformation" value="${shipmentInstance?.flightInformation}" /> 
+											<g:textField name="flightInformation" size="10" value="${shipmentInstance?.flightInformation}" /> 
 											<span class="fade">(e.g. AA 2292)</span>
+									</td>
+								</tr>										
+								<tr class="prop">
+									<td valign="top" class="name"><label><g:message
+										code="shipment.totalValue.label" default="Total value (USD)" /></label></td>
+									<td valign="top"
+										class=" ${hasErrors(bean: shipmentInstance, field: 'totalValue', 'errors')}"
+										nowrap="nowrap">
+											$ <g:textField name="totalValue" value="${formatNumber(format: '##,##0.00', number: shipmentInstance.totalValue)}" size="10"/>
 									</td>
 								</tr>										
 		                    </tbody>

@@ -123,8 +123,7 @@
 													<th>Suitcase/Box</th>
 													<th>Product</th>
 													<th>Quantity</th>
-													<th>Serial Number</th>
-													<th>Lot Number</th>
+													<th>Serial/Lot Number</th>
 													<th>Recipient</th>
 												</tr>
 											</thead>
@@ -150,10 +149,12 @@
 																	${itemInstance?.quantity}
 																</td>
 																<td>
-																	${itemInstance?.serialNumber}
-																</td>
-																<td>
-																	${itemInstance?.lotNumber}
+																	<g:if test="${itemInstance?.lotNumber}">
+																		${itemInstance?.lotNumber}
+																	</g:if>
+																	<g:else>
+																		${itemInstance?.serialNumber}
+																	</g:else>
 																</td>
 																<td>
 																	${itemInstance?.recipient?.name}
