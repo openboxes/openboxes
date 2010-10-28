@@ -37,7 +37,6 @@
 				
             </div>
             <div style="width: 75%;">
-            
             	<g:if test="${shipmentInstanceMap.size()==0}">
             		<div class="notice">
             			<g:if test="${eventType?.name}">
@@ -51,22 +50,23 @@
 
 				<table>            
 					<g:each var="entry" in="${shipmentInstanceMap}">	
-						<thead>
+						<tbody>
 							<tr> 
-								<th>       
+								<td colspan="2" valign="top">       
 									<h2>${entry.key.name} (${entry.value.objectList.size})</h2>
-								</th>
+								</td>
 							</tr>
-						</thead>
-	                    <g:each var="shipmentList" in="${entry.value}">
-							<g:each var="shipmentInstance" in="${shipmentList.objectList}" status="i">
-								<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-									<td>
-										<g:render template="shipmentSummary" model="['shipmentInstance':shipmentInstance]"/>
-									</td>
-								</tr>
-							</g:each>                    		
-	                   	</g:each>
+		                    <g:each var="shipmentList" in="${entry.value}">
+								<g:each var="shipmentInstance" in="${shipmentList.objectList}" status="i">
+									<tr >
+										<td></td>
+										<td class="${i%2==0?'odd':'even' }">
+											<g:render template="shipmentSummary" model="['shipmentInstance':shipmentInstance]"/>
+										</td>
+									</tr>
+								</g:each>                    		
+		                   	</g:each>
+						</tbody>
 		           	</g:each>
 				</table>
 

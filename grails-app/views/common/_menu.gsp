@@ -11,8 +11,7 @@ $(function() {
 </script>
 
 <style>
-
-	.menuButton { font-variant: small-caps; } 
+	/*.menuButton { font-variant: small-caps; }*/ 
 </style>
 
 
@@ -64,30 +63,42 @@ $(function() {
 			</li>					
 			<li class="prop">
 				<span class="menuButton">
-					<g:link class="bullet" controller="shipment" action="listOutgoing"><g:message code="shipment.list.outgoing.label"  default="view all"/></g:link>
+					<g:link class="bullet" controller="shipment" action="listOutgoing"><g:message code="shipment.listShipping.label"  default="show all shipping"/></g:link>
 				</span>
 			</li>				
-			
+			<li class="prop">
+				<span class="menuButton">
+					<g:link class="bullet" controller="shipment" action="listShippingByStatus"><g:message code="shipment.listShippingByStatus.label"  default="show shipping by status"/></g:link>
+				</span>
+			</li>				
+			<li class="prop">
+				<span class="menuButton">
+					<g:link class="bullet" controller="shipment" action="listShippingByType"><g:message code="shipment.listShippingByType.label"  default="show shipping by type"/></g:link>
+				</span>
+			</li>				
+			<%-- 			
 			<g:each in="${org.pih.warehouse.core.EventStatus.list()}" var="eventStatus">
 				<li class="prop">
 					<span class="menuButton">
-						<g:link class="bullet" controller="shipment" action="listOutgoing" params="['activityType':'SHIPPING','eventStatus':eventStatus]"><g:message code="shipment.list.outgoing.label"  default="view ${eventStatus?.name?.toLowerCase()}"/></g:link>
+						<g:link class="bullet" controller="shipment" action="listOutgoing" params="['activityType':'SHIPPING','eventStatus':eventStatus]"><g:message code="shipment.list.outgoing.label"  default="show ${eventStatus?.name?.toLowerCase()}"/></g:link>
 					</span>
 				</li>
 			</g:each>
+			--%>
+			
 			<%-- 
 			<g:each in="${org.pih.warehouse.core.EventType.list()}" var="eventType">
 				<g:if test="${eventType?.activityType?.name == 'Shipping'}">
 					<li class="prop">
 						<span class="menuButton">
-							<g:link class="bullet" controller="shipment" action="listOutgoing" params="['eventType.id':eventType.id]"><g:message code="shipment.list.outgoing.label"  default="view ${eventType?.name?.toLowerCase()}"/></g:link>
+							<g:link class="bullet" controller="shipment" action="listOutgoing" params="['eventType.id':eventType.id]"><g:message code="shipment.list.outgoing.label"  default="show ${eventType?.name?.toLowerCase()}"/></g:link>
 						</span>
 					</li>
 				</g:if>
 			</g:each>
 			<li class="prop">
 				<span class="menuButton">
-					<g:link class="invalid" controller="shipment" action="listOutgoing" params="['eventType.id':0]"><g:message code="shipment.list.outgoing.label"  default="view invalid shipments"/></g:link>
+					<g:link class="invalid" controller="shipment" action="listOutgoing" params="['eventType.id':0]"><g:message code="shipment.list.outgoing.label"  default="show invalid shipments"/></g:link>
 				</span>
 			</li>			
 			--%>
@@ -101,7 +112,7 @@ $(function() {
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="shipment" action="listIncoming"><g:message code="shipment.list.incoming.label"  default="view all"/></g:link>
+					<g:link class="bullet" controller="shipment" action="listIncoming"><g:message code="shipment.list.incoming.label"  default="show all"/></g:link>
 				</span>		
 			</li>										
 			<%-- 
@@ -109,24 +120,25 @@ $(function() {
 				<g:if test="${eventType?.activityType == org.pih.warehouse.core.ActivityType.RECEIVING}">
 					<li class="prop">
 						<span class="menuButton">
-							<g:link class="bullet" controller="shipment" action="listIncoming" params="['eventType.id':eventType.id]"><g:message code="shipment.list.outgoing.label"  default="view ${eventType?.name?.toLowerCase()}"/></g:link>
+							<g:link class="bullet" controller="shipment" action="listIncoming" params="['eventType.id':eventType.id]"><g:message code="shipment.list.outgoing.label"  default="show ${eventType?.name?.toLowerCase()}"/></g:link>
 						</span>
 					</li>
 				</g:if>
 			</g:each>
 			--%>
+			<%-- 
 			<g:each in="${org.pih.warehouse.core.EventStatus.list()}" var="eventStatus">
 				<li class="prop">
 					<span class="menuButton">
-						<g:link class="bullet" controller="shipment" action="listOutgoing" params="['activityType':'RECEIVING','eventStatus':eventStatus]"><g:message code="shipment.list.outgoing.label"  default="view ${eventStatus?.name?.toLowerCase()}"/></g:link>
+						<g:link class="bullet" controller="shipment" action="listOutgoing" params="['activityType':'RECEIVING','eventStatus':eventStatus]"><g:message code="shipment.list.outgoing.label"  default="show ${eventStatus?.name?.toLowerCase()}"/></g:link>
 					</span>
 				</li>
 			</g:each>	
-					
+			--%>	
 			<!-- 
 			<li class="prop">
 				<span class="menuButton">
-					<g:link class="invalid" controller="shipment" action="listIncoming" params="['eventType.id':0]"><g:message code="shipment.list.incoming.label"  default="view invalid shipments"/></g:link>
+					<g:link class="invalid" controller="shipment" action="listIncoming" params="['eventType.id':0]"><g:message code="shipment.list.incoming.label"  default="show invalid shipments"/></g:link>
 				</span>
 			</li>			
 			<li class="prop">
@@ -145,16 +157,16 @@ $(function() {
 		<ul>
 			<li>
 				<span class="menuButton">
-					<g:link class="browse" class="bullet" controller="inventory" action="browse"><g:message code="default.browse.label"  args="['inventory']"/></g:link>
+					<g:link class="browse" class="bullet" controller="inventory" action="browse"><g:message code="inventory.browse.label" default="browse inventory"/></g:link>
 				</span>
 			</li>		
 			<li>
 				<span class="menuButton">
-					<g:link class="browse" class="bullet" controller="receipt" action="process"><g:message code="default.browse.label"  args="['receipt']"/></g:link>
+					<g:link class="browse" class="bullet" controller="receipt" action="process"><g:message code="inventory.browse.label" default="process receipts"/></g:link>
 				</span>
 			</li>		
 			<!-- 
-			<li><span class="menuButton"><g:link class="nobullet" controller="inventory" action="browse"><g:message code="inventory.browse.label"  default="View Inventory"/></g:link></span></li>		
+			<li><span class="menuButton"><g:link class="nobullet" controller="inventory" action="browse"><g:message code="inventory.browse.label"  default="show Inventory"/></g:link></span></li>		
 		 	-->
 			<!--  
 			<li><span class="menuButton"><g:link class="list" controller="product" action="list"><g:message code="default.list.label"  args="['Product']"/></g:link></span></li>		
@@ -170,7 +182,7 @@ $(function() {
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="product" action="browse"><g:message code="product.browse.label"  default="view all"/></g:link>
+					<g:link class="bullet" controller="product" action="browse"><g:message code="product.browse.label" default="show all"/></g:link>
 				</span>
 			</li>		
 			<li class="prop">

@@ -6,92 +6,158 @@
          <title>Enter Container Details</title>         
     </head>
     <body>
-        <div class="body">
-           <g:if test="${flash.message}">
-                 <div class="message">${flash.message}</div>
-           </g:if>
+    
+    
+    
+		<div class="body">
+			
+			<g:if test="${message}">
+				<div class="message">${message}</div>
+			</g:if>
 			<g:hasErrors bean="${containerInstance}">
-	            <div class="errors">
-	                <g:renderErrors bean="${containerInstance}" as="list" />
-	            </div>				
+				<div class="errors">
+					<g:renderErrors bean="${containerInstance}" as="list" />
+				</div>				
 			</g:hasErrors>          
+	
+			<g:render template="flowHeader"/>						
+	
+			<fieldset>
+				<legend>Step 3&nbsp;Add shipment items</legend>	
 			 
-			<g:form action="suitcase" method="post" >
-               <div class="dialog">
-	                <table>
-	                    <tbody>
-							<tr class="prop">
-								<td valign="top" class="name"><label>Shipment</label></td>
-								<td valign="top" class="value">${shipmentInstance?.name}</td>
+					<div class="dialog">
+					<table style="border: 1px solid #CCC;" border="0">
+						<thead>	
+							<tr>
+								<th>Item</th>
+								<th>Qty</th>
+								<th></th>
+								<th>Actions</th>
 							</tr>
-							<tr class="prop">
-								<td valign="top" class="name">
-									<label>Suitcases / Boxes</label>
-								</td>
-								<td valign="top" class="value">
-									<table style="border: 1px solid black;">
-
-					                	<g:set var="count" value="${0 }"/>	
-										<g:each var="suitcaseInstance" in="${shipmentInstance?.containers}">			
-											<tr class="${count++%2==0?'odd':'even' }">
-												<td>
-												
-													<img src="${createLinkTo(dir:'images/icons/silk',file:'briefcase.png')}" alt="Add a box" style="vertical-align: middle"/>&nbsp;
-													<b>${suitcaseInstance?.containerType?.name } ${suitcaseInstance?.name }</b>
-												</td>
-
-											</tr>
-											<g:each in="${suitcaseInstance?.containers}" var="boxInstance">
-												<tr class="${count++%2==0?'odd':'even' }">
-													<td>
-														
-														<span style="padding-left: 32px;"> 
-															<img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" alt="Package" style="vertical-align: middle"/>
-															&nbsp;
-															${boxInstance?.containerType?.name} ${boxInstance?.name}
-															&nbsp; <g:link action="suitcase" event="removeBox" id="${shipmentInstance?.id}" params="['suitcase.id':suitcaseInstance?.id,'box.id':boxInstance?.id]">remove</g:link>													
-															
-														</span>
-													</td>
-												</tr>
-											</g:each>
-											<tr class="${count++%2==0?'odd':'even' }">
-												<td>
-													<span style="padding-left: 32px;"> 
-														<g:link action="suitcase" event="addBox" id="${shipmentInstance?.id}" params="['suitcase.id':suitcaseInstance?.id]">
-															<img src="${createLinkTo(dir:'images/icons/silk',file:'package_add.png')}" alt="Add a box" style="vertical-align: middle"/>&nbsp;
-															Add another box
-														</g:link>
-													</span>
-												</td>
-											</tr>												
-										</g:each>
+						</thead>
+						<g:set var="count" value="${0 }"/>	
+						<g:each var="suitcaseInstance" in="${shipmentInstance?.containers}">
+							<tbody>
+								<tr class="${count++%2==0?'odd':'even' }">
+									<td style="width:30%;">
+										<span>
+											<img src="${createLinkTo(dir:'images/icons/silk',file:'briefcase.png')}" alt="Add a box" style="vertical-align: middle"/>&nbsp;
+											<b>${suitcaseInstance?.containerType?.name } ${suitcaseInstance?.name }</b>
+										</span>
+									</td>
+									<td style="text-align:center;width:5%;">-</td>
+									<td></td>
+									<td style="width:25%; text-align: left;">
+										<span nowrap>
+											<a href="#" id="btnAddItem-${suitcaseInstance?.id}">
+												<img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" alt="Add an item" style="vertical-align: middle"/>
+												&nbsp;add item
+											</a> 													
+											&nbsp;
+											<g:link action="suitcase" event="addBox" id="${shipmentInstance?.id}" params="['suitcase.id':suitcaseInstance?.id]">
+												<img src="${createLinkTo(dir:'images/icons/silk',file:'package_add.png')}" alt="Add a box" style="vertical-align: middle"/>
+												&nbsp;add box
+											</g:link>
+										</span>
+										<g:render template="addShipmentItem" model="['containerInstance':suitcaseInstance]"/>
+									</td>
+								</tr>
+								<g:each var="itemInstance" in="${shipmentInstance?.shipmentItems}">		
+									<g:if test="${itemInstance?.container?.id == suitcaseInstance?.id}">	
 										<tr class="${count++%2==0?'odd':'even' }">
 											<td>
-												<g:link action="suitcase" event="addSuitcase" id="${shipmentInstance?.id}">
-													<img src="${createLinkTo(dir:'images/icons/silk',file:'briefcase.png')}" alt="Add another suitcase" style="vertical-align: middle"/>&nbsp;
-														Add another suitcase</g:link>									
+												<span style="padding-left: 32px;">
+													<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="Item" style="vertical-align: middle"/>
+													&nbsp;${itemInstance?.product?.name } ${itemInstance?.id}	
+												</span>
+											</td>
+											<td style="text-align:center;">
+												${itemInstance?.quantity}
+											</td>
+											<td></td>
+											<td style="text-align: left;">		
+												<g:link action="suitcase" event="removeItem" id="${itemInstance?.id}" params="['shipment.id':shipmentInstance?.id]">
+													<img src="${createLinkTo(dir:'images/icons/silk',file:'page_delete.png')}" alt="remove item" style="vertical-align: middle"/>
+													&nbsp;remove item
+												</g:link>
 											</td>
 										</tr>
-									</table>
+									</g:if>
+								</g:each>
+	
+								<g:each in="${suitcaseInstance?.containers}" var="boxInstance">
+									<tr class="${count++%2==0?'odd':'even' }">
+										<td>
+											<span style="padding-left: 32px;">
+												<img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" alt="Package" style="vertical-align: middle"/>
+												&nbsp;${boxInstance?.containerType?.name} ${boxInstance?.name}
+											</span>
+										</td>
+										<td style="text-align:center;">-</td>
+										<td></td>
+										<td style="text-align: left;">
+											<a href="#" id="btnAddItem-${boxInstance?.id}">
+												<img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" alt="Add an item" style="vertical-align: middle"/>
+												&nbsp;add item
+											</a> 		
+											&nbsp;
+											
+											<g:link action="suitcase" event="removeBox" id="${shipmentInstance?.id}" params="['suitcase.id':suitcaseInstance?.id,'box.id':boxInstance?.id]">
+												<img src="${createLinkTo(dir:'images/icons/silk',file:'package_delete.png')}" alt="Add an item" style="vertical-align: middle"/>
+												&nbsp;remove box
+											</g:link>
+											
+											<g:render template="addShipmentItem" model="['containerInstance':boxInstance]"/>															
+										</td>
+									</tr>
+									<g:each var="itemInstance" in="${shipmentInstance?.shipmentItems}">	
+										<g:if test="${boxInstance?.id == itemInstance?.container?.id }">
+											<tr class="${count++%2==0?'odd':'even' }">
+												<td>
+													<span style="padding-left: 64px;">
+														<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="Item" style="vertical-align: middle"/>
+														&nbsp;${itemInstance?.product?.name }																	
+													</span>
+												</td>
+												<td style="text-align:center;">
+													${itemInstance?.quantity}
+												</td>
+												<td></td>
+												<td style="text-align: left;">		
+													<g:link action="suitcase" event="removeItem" id="${itemInstance?.id}" params="['shipment.id':shipmentInstance?.id]">
+														<img src="${createLinkTo(dir:'images/icons/silk',file:'page_delete.png')}" alt="remove item" style="vertical-align: middle"/>
+														&nbsp;remove item
+													</g:link>
+												</td>
+											</tr>
+										</g:if>
+									</g:each>												
+								</g:each>
+							</tbody>											
+						</g:each>
+						<tfoot>
+							<tr class="${count++%2==0?'odd':'even' }">
+								<td></td>
+								<td></td>
+								<td></td>
+								<td>
+									<g:link action="suitcase" event="addSuitcase" id="${shipmentInstance?.id}">
+										<img src="${createLinkTo(dir:'images/icons/silk',file:'briefcase.png')}" alt="add a suitcase" style="vertical-align: middle"/>
+										&nbsp;add a suitcase
+									</g:link>
 								</td>
-							</tr>	                    
-							<tr>
-								<td valign="top" class="name"></td>
-								<td valign="top" class="value">
-					               <div class="buttons">
-										<span class="formButton">
-											<g:submitButton name="back" value="Back"></g:submitButton>								
-											<g:submitButton name="submit" value="Next"></g:submitButton>
-										</span>
-					               </div>
-								</td>		
-							</tr>							
-							
-	                    </tbody>
-	               </table>
-               </div>
-            </g:form>
+							</tr>
+						</tfoot>
+					</table>
+				</div>		
+				<div class="buttons">
+					<g:form action="suitcase" method="post" >
+						<g:submitButton name="back" value="Back"></g:submitButton>								
+						<g:submitButton name="submit" value="Next"></g:submitButton>
+		            </g:form>
+				</div>
+               
+			</fieldset>
         </div>
     </body>
 </html>

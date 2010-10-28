@@ -329,7 +329,7 @@ class JsonController {
 			
 			if (itemInstance) { 
 				log.info("add item to container");
-				containerInstance.addToShipmentItems(itemInstance).save(flush:true);
+				containerInstance.shipment.addToShipmentItems(itemInstance).save(flush:true);
 				shipmentInstance.save(flush:true);
 				log.info("added item to container");
 			}
@@ -378,7 +378,7 @@ class JsonController {
 			}
 			if (!found) {
 				itemInstance = new ShipmentItem(product: productInstance, quantity: quantity, serialNumber: params.lotNumber, recipient: recipientInstance);
-				containerInstance.addToShipmentItems(itemInstance).save(flush:true);
+				containerInstance.shipment.addToShipmentItems(itemInstance).save(flush:true);
 			}
 			else {
 				flash.message = "Modified quantity of existing shipment item ${productInstance.name} from ${oldQuantity} to ${newQuantity}"

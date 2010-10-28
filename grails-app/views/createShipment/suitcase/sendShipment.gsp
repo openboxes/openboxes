@@ -14,20 +14,28 @@
 <body>    
 	<div class="body">
 		
-		<g:if test="${flash.message}">
-			<div class="message">${flash.message}</div>
+		<g:if test="${message}">
+			<div class="message">${message}</div>
 		</g:if>
 		
 		<g:hasErrors bean="${shipmentInstance}">
 			<div class="errors">
 				<g:renderErrors bean="${shipmentInstance}" as="list" />
 			</div>
-		</g:hasErrors>							
+		</g:hasErrors>	
+		
+		<g:render template="flowHeader"/>						
+								
 				
 		<g:form action="suitcase">
 			<g:hiddenField name="id" value="${shipmentInstance?.id}" />
 			<g:hiddenField name="version" value="${shipmentInstance?.version}" />
 	
+	
+	
+			<fieldset>
+				<legend>Step 5.&nbsp;Send Shipment</legend>
+			
 				<div class="dialog">				
 					<table>
 						<tbody>
@@ -116,31 +124,23 @@
 											</tr>												
 										</g:each>
 									</table>
-								</td>
-							
+								</td>							
 							</tr>
-							
-															
 							<tr class="prop">
 	                            <td valign="top" class="name"><label><g:message code="comment.comment.label" default="Additional Comments" /></label></td>                            
 	                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'comment', 'errors')}">
                                     <g:textArea name="comment" cols="30" rows="2"/>
                                 </td>
 	                        </tr>  	        
-							<tr class="prop">
-								<td class=""></td>
-								<td class="">
-									<div class="buttons">
-									    <g:submitButton name="back" value="Back"></g:submitButton>
-									    <g:submitButton name="finish" value="Finish"></g:submitButton>
-								    </div>
-								</td>
-							</tr>
-						
-
 						</tbody>
 					</table>										
 				</div>
+				<div class="buttons">
+				    <g:submitButton name="back" value="Back"></g:submitButton>
+				    <g:submitButton name="finish" value="Finish"></g:submitButton>
+			    </div>
+
+			</fieldset>
 		</g:form>		
 	</div>
 </body>

@@ -549,7 +549,13 @@ class ShipmentController {
 				}
 			}			
 			if (!found) { 			
-				shipmentItem = new ShipmentItem(product: product, quantity: quantity, serialNumber: params.serialNumber, recipient: recipient);
+				shipmentItem = new ShipmentItem(product: product, 
+					quantity: quantity, 
+					serialNumber: params.serialNumber, 
+					recipient: recipient,
+					container: containerInstance);
+				
+				//container.addToShipmentItems(shipmentItem).save(flush:true);
 				container.addToShipmentItems(shipmentItem).save(flush:true);
 			}
 			else { 
@@ -658,8 +664,14 @@ class ShipmentController {
 				containerCopy.save(flush:true);
 				
 				container.shipmentItems.each { 
-					def shipmentItemCopy = new ShipmentItem(product: it.product, quantity: it.quantity, serialNumber: it.serialNumber, recipient: it.recipient);
-					containerCopy.addToShipmentItems(shipmentItemCopy).save(flush:true);
+					def shipmentItemCopy = new ShipmentItem(
+						product: it.product, 
+						quantity: it.quantity, 
+						serialNumber: it.serialNumber, 
+						recipient: it.recipient,
+						container: containerCopy);
+					//containerCopy.addToShipmentItems(shipmentItemCopy).save(flush:true);
+					containerCopy.shipment.addToShipmentItems(shipmentItem).save(flush:true);
 				}    		
 				shipment.addToContainers(containerCopy).save(flush:true);
 			}
@@ -685,7 +697,7 @@ class ShipmentController {
 	 //if (params.donorId)
 	 def donor = Organization.get(params.donorId);
 	 def shipmentItem = new ShipmentItem(product: product, quantity: quantity, weight: weight, donor: donor);
-	 container.addToShipmentItems(shipmentItem).save(flush:true);
+	 container.shipment.addToShipmentItems(shipmentItem).save(flush:true);
 	 flash.message = "Added $params.quantity units of $product.name";		
 	 redirect(action: 'show', id: params.shipmentId)    	
 	 }
@@ -891,7 +903,13 @@ class ShipmentController {
 			redirect(action: 'showDetails', id: shipmentInstance.id)
 		}
 	}    
-	
+	def addShipmentItem = { 
+		log.info "parameters: " + params
+		
+		[shipmentInstance : Shipment.get(params.id), 
+			containerInstance : Container.get(params?.containerId),
+			itemInstance : new ShipmentItem() ]
+	}
 	
 	def addReferenceNumber = { 		
 		def referenceNumber = new ReferenceNumber(params);

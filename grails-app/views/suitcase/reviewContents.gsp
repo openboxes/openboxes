@@ -6,8 +6,6 @@
 	<g:set var="entityName" value="${message(code: 'shipmentType.label', default: 'Shipment Type')}" />
 	<title><g:message code="shipment.create.label" default="Create Suitcase Shipment" /></title>        
 	<content tag="pageTitle"><g:message code="shipment.create.label" default="Create Suitcase Shipment" /></content>
-	<style>
-	</style>
 </head>
 
 <body>    

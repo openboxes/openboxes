@@ -37,78 +37,9 @@
 					</div>
 				</div>
 				
-				<div class="widgetSmall">
-					<div class="widgetHeader">Recent Shipments from ${session.warehouse.name}</div>
-	    			<div class="widgetContent">
-	    				<div id="mostRecentOutgoingShipments">		    				
-   							<g:if test="${!outgoingShipments}">
-   								<div style="text-align: center; padding: 10px;" class="fade">
-   									(no recent shipments)
-   								</div>
-   							</g:if>
-	    					<g:else>
-		    					<table>	    				
-		    						<thead>
-		    							<tr>
-		    								<th>Status</th>
-		    								<th>Name</th>
-		    								<th>Ship Date</th>
-		    							</tr>
-		    						</thead>
-		    						<tbody>
-										<g:each in="${outgoingShipments}" var="shipment" status="i">										
-											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-												<td><g:link controller="shipment" action="listOutgoing" params="['eventType.id':shipment?.mostRecentStatus?.id]">
-													</g:link>${shipment?.mostRecentEvent?.eventType?.eventStatus?.name}</td>									
-												<td><g:link controller="shipment" action="showDetails" id="${shipment.id}">${shipment.name }</g:link></td>
-												<td><g:formatDate date="${shipment.expectedShippingDate}" format="MMM dd"/></td>
-											</tr>										
-										</g:each>
-									</tbody>
-								</table>
-							</g:else>
-						</div>
-	    			</div>
-				</div>
 				
-				<div class="widgetSmall">
-					<div class="widgetHeader">Recent Shipments to ${session.warehouse.name}</div>
-	    			<div class="widgetContent">
-	    				<div id="mostRecentIncomingShipments">
-		    				<g:if test="${!incomingShipments}">
-   								<div style="text-align: center; padding: 10px;" class="fade">
-   									(no recent shipments)
-   								</div>
-   							</g:if>
-	    					<g:else>
-			    				<table>
-		    						<thead>
-		    							<tr>
-		    								<th>Status</th>
-		    								<th>Name</th>
-		    								<th>Ship Date</th>
-		    							</tr>
-		    						</thead>
-		    						<tbody>
-										<g:each in="${incomingShipments}" var="shipment" status="i">
-											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-												<td><g:link controller="shipment" action="listIncoming" params="['eventType.id':shipment?.mostRecentStatus?.id]">
-													</g:link>${shipment?.mostRecentEvent?.eventType?.eventStatus?.name}</td>
-												<td><g:link controller="shipment" action="showDetails" id="${shipment.id}">${shipment.name }</g:link></td>
-												<td><g:formatDate date="${shipment.expectedShippingDate}" format="MMM dd"/></td>
-											</tr>
-										</g:each>
-									</tbody>
-								</table>	    			
-							</g:else>
-						</div>
-	    			</div>
-				</div>
-				
-				<br clear="all"/>
-				
-				<div class="widgetSmall">
-					<div class="widgetHeader">Summary: Shipments from ${session.warehouse.name}</div>
+				<div class="widgetSmall">					
+					<div class="widgetHeader"><u>SHIPPING</u> from ${session.warehouse.name}</div>
 	    			<div class="widgetContent">
 	    				<div id="outgoingShipmentSummary">
 		    				<g:if test="${!outgoingShipmentsByStatus}">
@@ -146,12 +77,9 @@
 				</div>				
 				
 				<div class="widgetSmall">
-					<div class="widgetHeader">Summary: Shipments to ${session.warehouse.name}</div>
-	    			<div class="widgetContent">
-	    					    			
-	    				<hr/>
+					<div class="widgetHeader"><u>RECEIVING</u> to ${session.warehouse.name}</div>
+	    			<div class="widgetContent">	    					    			
 	    				<div id="incomingShipmentSummary">	
-	    				
 		    				<g:if test="${!incomingShipmentsByStatus}">
    								<div style="text-align: center; padding: 10px;" class="fade">
    									(no incoming shipments)
@@ -185,6 +113,106 @@
 						</div>
 	    			</div>
 				</div>								
+
+				<br clear="all"/>
+
+				
+				<div class="widgetSmall">
+					<div class="widgetHeader">Recent <u>SHIPPING</u> from ${session.warehouse.name}</div>
+	    			<div class="widgetContent">
+	    				<div id="mostRecentOutgoingShipments">		    				
+	    					<table>	    				
+	    						<thead>
+	    							<tr>
+	    								<th>Status</th>
+	    								<th>Name</th>
+	    								<th>Ship To</th>
+	    								<th>Ship On</th>
+	    							</tr>
+	    						</thead>
+								<tbody>	    				
+		   							<g:if test="${!outgoingShipments}">
+		   								<tr>
+											<td colspan="4">
+				   								<div style="text-align: center; padding: 10px;" class="fade">
+				   									(no recent shipments)
+				   								</div>
+											</td>
+		   								</tr>
+		   							</g:if>
+			    					<g:else>
+										<g:each in="${outgoingShipments}" var="shipmentInstance" status="i">										
+											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+												<td>
+													<g:link controller="shipment" action="listOutgoing" params="['eventType.id':shipment?.mostRecentStatus?.id]"></g:link>
+													${shipmentInstance?.mostRecentEvent?.eventType?.eventStatus?.name}
+												</td>									
+												<td><g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}">${shipmentInstance.name }</g:link></td>
+												<td>${shipmentInstance.destination.name }</td>
+												<td>
+													<g:relativeDate date="${shipmentInstance.expectedShippingDate}"/>
+													<span class="fade">
+														<g:formatDate date="${shipmentInstance.expectedShippingDate}" format="MMM dd"/>
+													</span>
+												</td>
+											</tr>										
+										</g:each>
+									</g:else>
+									<tr>
+										<th colspan="4" style="text-align:right">
+											<g:link class="new" controller="createShipment" action="suitcase">
+												<img src="${createLinkTo(dir: 'images/icons/silk/', file: 'add.png') }" style="vertical-align:middle;"/>
+												<g:message code="shipment.create.label" default="new suitcase" />
+											</g:link>
+										</th>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+	    			</div>
+				</div>
+				
+				<div class="widgetSmall">
+					<div class="widgetHeader">Recent <u>RECEIVING</u> to ${session.warehouse.name}</div>
+	    			<div class="widgetContent">
+	    				<div id="mostRecentIncomingShipments">
+		    				<table>
+	    						<thead>
+	    							<tr>
+	    								<th>Status</th>
+	    								<th>Name</th>
+	    								<th>Ship From</th>
+	    								<th>Ship On</th>
+	    							</tr>
+	    						</thead>
+	    						<tbody>
+				    				<g:if test="${!incomingShipments}">
+				    					<tr>
+				    						<td colspan="4">
+				   								<div style="text-align: center;" class="fade">
+				   									(no recent shipments)
+				   								</div>
+				   							</td>
+				   						</tr>
+		   							</g:if>
+			    					<g:else>
+										<g:each in="${incomingShipments}" var="shipment" status="i">
+											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+												<td><g:link controller="shipment" action="listIncoming" params="['eventType.id':shipment?.mostRecentStatus?.id]">
+													</g:link>${shipment?.mostRecentEvent?.eventType?.eventStatus?.name}</td>
+												<td><g:link controller="shipment" action="showDetails" id="${shipment.id}">${shipment.name }</g:link></td>
+												<td>${shipment?.origin?.name }</td>
+												<td><g:formatDate date="${shipment.expectedShippingDate}" format="MMM dd"/></td>
+											</tr>
+										</g:each>
+									</g:else>
+								</tbody>
+							</table>
+						</div>
+	    			</div>
+				</div>
+				
+				
 				
 	    	</div>
 		</div>

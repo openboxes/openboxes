@@ -8,21 +8,24 @@
     <body>
         <div class="body">
 
-           <g:if test="${flash.message}">
-                 <div class="message">${flash.message}</div>
-           </g:if>
+			<g:if test="${message}">
+				<div class="message">
+					${message}
+				</div>
+			</g:if> 
 			<g:hasErrors bean="${itemInstance}">
-                <div class="errors">
-                    <g:renderErrors bean="${itemInstance}" as="list" />
-                </div>
+				<div class="errors"><g:renderErrors bean="${itemInstance}" as="list" /></div>
 			</g:hasErrors>
+
+			<g:render template="flowHeader"/>
+
 			<fieldset>
+				<legend>Step 4 &nbsp; Add shipment items</legend>					
 				<div class="dialog">
-				
 					<div style="padding: 15px; text-align: right;">
-					<a href="#" id="btnAddItem">
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" alt="Add an item" style="vertical-align: middle"/>&nbsp;Add an item</a> 													
-					&nbsp;&nbsp;				
+						<a href="#" id="btnAddItem">
+							<img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" alt="Add an item" style="vertical-align: middle"/>&nbsp;Add an item</a> 													
+						&nbsp;&nbsp;				
 					</div>
 					<table border="0">
 						<thead>
@@ -91,22 +94,18 @@
 								
 							</tr>
 						</g:form>				
-						
-						
 					</table>
-							
 				</div>
-			</div>
-		</fieldset>
+			
+				<g:form action="suitcase" method="post" >
+					<div class="buttons">
+						<g:submitButton name="back" value="Back"></g:submitButton>								
+						<g:submitButton name="submit" value="Next"></g:submitButton>								
+					</div>
+				</g:form>
+			</fieldset>
+		</div>
 	   	   
-		<g:form action="suitcase" method="post" >
-			<div class="buttons">
-				<span class="formButton">
-					<g:submitButton name="back" value="Back"></g:submitButton>								
-					<g:submitButton name="submit" value="Next"></g:submitButton>								
-				</span>
-			</div>
-		</g:form>
 
 
 		<div id="dlgAddItem" title="Add an item" style="display: none; padding: 10px;" >
@@ -160,7 +159,6 @@
 		</div>		
 		<script type="text/javascript">
 			$(document).ready(function(){
-				
 				$("#btnAddItem").click(function() { 
 					$('#dlgAddItem').dialog('open'); 
 				});									

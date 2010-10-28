@@ -122,19 +122,26 @@ class SuitcaseController {
 			on("addNewItem") { 
 				log.info("params " + params);
 				def productInstance = new Product(); //Product.findByName("");
-				def shipmentItem = new ShipmentItem(product: productInstance, quantity: 1);				
 				Shipment shipmentInstance = Shipment.get(params.id);
 				Container containerInstance = Container.get(params.container.id);
-				containerInstance.addToShipmentItems(shipmentItem).save(flush:true);
+				
+				def shipmentItem = new ShipmentItem(product: productInstance, quantity: 1, container: containerInstance);
+				
+				//containerInstance.addToShipmentItems(shipmentItem).save(flush:true);
+				containerInstance.shipment.addToShipmentItems(shipmentItem).save(flush:true);
 				[shipmentInstance: shipmentInstance]				
 			}.to "step3"				
 			on("addItem") { 
 				log.info("params " + params);
 				def productInstance = new Product(); //Product.findByName("");
-				def shipmentItem = new ShipmentItem(product: productInstance, quantity: 1);				
 				Shipment shipmentInstance = Shipment.get(params.id);
 				Container containerInstance = Container.get(params.container.id);
-				containerInstance.addToShipmentItems(shipmentItem);					
+				//containerInstance.addToShipmentItems(shipmentItem);					
+				
+				def shipmentItem = new ShipmentItem(product: productInstance, quantity: 1, container: containerInstance);
+				
+				
+				containerInstance.shipment.addToShipmentItems(shipmentItem)
 				/*if (shipmentInstance.hasErrors() || !shipmentInstance.save(flush:true))
 					return error();
 				*/
@@ -145,8 +152,9 @@ class SuitcaseController {
 				Container containerInstance = Container.get(params.container.id);
 				def itemInstance = ShipmentItem.get(params.item.id);
 				if (itemInstance) {
-					itemInstance.delete()	
-					containerInstance.removeFromShipmentItems(itemInstance);				
+					itemInstance.delete()
+					shipmentInstance.removeFromShipmentItems(itemInstance);	
+					//containerInstance.removeFromShipmentItems(itemInstance);				
 				}
 					
 				if (shipmentInstance.hasErrors() || !shipmentInstance.save(flush:true))

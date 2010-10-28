@@ -38,6 +38,7 @@ class Shipment implements Serializable {
 	
 	// One-to-many associations
 	SortedSet events;
+	SortedSet containers;
 	List documents;
 	List comments;
 	List referenceNumbers;
@@ -48,13 +49,14 @@ class Shipment implements Serializable {
 		"mostRecentEvent", 
 		"mostRecentStatus",
 		"actualShippingDate",
-		"actualDeliveryDate"]
+		"actualDeliveryDate" ]
 	
 	// Core association mappings
 	static hasMany = [events : Event,
 	                  containers : Container,
 	                  documents : Document, 	                  
 	                  comments : Comment,
+					  shipmentItems : ShipmentItem,
 	                  referenceNumbers : ReferenceNumber ]
 
 	
@@ -66,7 +68,7 @@ class Shipment implements Serializable {
 	// use a SortedSet for events and have the Event class implement Comparable. 
 
 	static mapping = {
-		containers sort: 'dateCreated', order: 'asc'
+		//containers sort: 'dateCreated', order: 'asc'
 	}	
 	/*	
 	static mapping = {
@@ -106,10 +108,10 @@ class Shipment implements Serializable {
 		//createdBy(nullable:true)
 		//lastModifiedBy(nullable:true)
 
-		comments(nullable:true)
-		containers(nullable:true)
-		events(nullable:true)
-		documents(nullable:true)
+		//comments(nullable:true)
+		//containers(nullable:true)
+		//events(nullable:true)
+		//documents(nullable:true)
 	}
 
 	

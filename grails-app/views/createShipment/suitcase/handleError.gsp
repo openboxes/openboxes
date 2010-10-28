@@ -7,8 +7,8 @@
     </head>
     <body>
         <div class="body">
-           <g:if test="${flash.message}">
-                 <div class="message">${flash.message}</div>
+           <g:if test="${message}">
+                 <div class="message">${message}</div>
            </g:if>       
 			There was an error, please try again
         </div>

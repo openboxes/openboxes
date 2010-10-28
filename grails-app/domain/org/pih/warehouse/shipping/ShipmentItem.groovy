@@ -17,22 +17,24 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 	Donor donor					// Organization that donated the goods
 	Date dateCreated;
 	Date lastUpdated;
-	
+			
+	Container container				// 
 	//PackageType packageType		// The type of packaging that this item is stored 
 									// within.  This is different from the container type  
 									// (which might be a pallet or shipping container), in  
 									// that this will likely be a box that the item is 
 									// actually contained within.
 	
-	static belongsTo = [ container : Container ] // + shipment : Shipment
+	static belongsTo = [ shipment : Shipment ]
+	//static belongsTo = [ container : Container ] // + shipment : Shipment
 	static constraints = {
+		container(nullable:true)
 		product(nullable:false)
 		lotNumber(nullable:true)
 		quantity(min:0, nullable:false)
 		serialNumber(nullable:true)
 		recipient(nullable:true)
 		donor(nullable:true)
-		
 	}
     
 	int compareTo(obj) { product.name.compareTo(obj.product.name) }

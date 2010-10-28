@@ -36,18 +36,17 @@ class CreateShipmentController {
 			on(Exception).to "handleError"
 		}
 		enterShipmentDetails {
-			on("clear").to "clear"
+			on("cancel").to "cancel"
 			on("submit") {
-				log.info("params = " + params)
 				def shipmentInstance = Shipment.get(params.id)
 				if (!shipmentInstance)
-					shipmentInstance = new Shipment(params)
+					shipmentInstance = new Shipment()
 			
+				shipmentInstance.properties = params
 				flow.shipmentInstance = shipmentInstance
-				def e = yes()
+				
 				if(shipmentInstance.hasErrors() || !shipmentInstance.validate()) 
 					return error()
-
 
 				// Save the current instance
 				shipmentInstance?.save(flush:true);		
@@ -71,12 +70,39 @@ class CreateShipmentController {
 				}
 				flow.shipmentInstance = shipmentInstance		
 				
-			}.to "enterContainerDetails"
-			on("return").to "showCart"
+				//flash.message = "test";
+				
+			}.to "enterTravelerDetails"
+			on("return").to "start"			
 			on(Exception).to "handleError"
 		}
-		enterContainerDetails  {
+		enterTravelerDetails {
+			on("cancel").to "cancel"
 			on("back").to "enterShipmentDetails"
+			on("submit") { 
+				log.info("params = " + params)
+				def shipmentInstance = Shipment.get(params.id)
+				if (!shipmentInstance) 
+					return error();
+					
+				shipmentInstance.properties = params
+				flow.shipmentInstance = shipmentInstance
+
+				
+				if(shipmentInstance.hasErrors() || !shipmentInstance.validate())
+					return error()
+
+
+				// Save the current instance
+				shipmentInstance?.save(flush:true);
+				
+				
+			}.to "enterContainerDetails"
+			
+		}
+		enterContainerDetails  {
+			on("cancel").to "cancel"
+			on("back").to "enterTravelerDetails"
 			on("clear").to "clear"
 			on("removeContents") { 
 				def shipmentInstance = Shipment.get(params.id)
@@ -93,8 +119,11 @@ class CreateShipmentController {
 				def name = String.valueOf(sortOrder)
 				
 				def containerInstance = new Container(
-					name: name, containerType:ContainerType.findByName("Suitcase"), sortOrder: sortOrder)
-				containerInstance.shipment = flow.shipmentInstance
+					name: name, 
+					containerType:ContainerType.findByName("Suitcase"), 
+					shipment: shipmentInstance,
+					sortOrder: sortOrder)
+
 				flow.containerInstance = containerInstance
 				
 				// Errors 
@@ -103,7 +132,12 @@ class CreateShipmentController {
 				}
 				// No errors
 				else { 
-					shipmentInstance?.addToContainers(containerInstance).save(flush:true)		
+					
+					log.info("shipment: " + shipmentInstance)
+					log.info("containers: " + shipmentInstance.containers)
+					shipmentInstance?.addToContainers(containerInstance)	
+					containerInstance.save(flush:true);
+					
 					//if(!params.id)	return error()
 					//def containers = flow.containers
 					//if(!containers) containers = [] as HashSet
@@ -112,16 +146,23 @@ class CreateShipmentController {
 					//flow.containers = containers
 					//flow.containerInstance = null
 					
-					
 				}
 			}.to "enterContainerDetails"		
 			on("removeBox") { 
 				def suitcaseInstance = Container.get(params?.suitcase?.id)
 				def boxInstance = Container.get(params?.box?.id)
 				if (suitcaseInstance && boxInstance) { 
-					suitcaseInstance.removeFromContainers(boxInstance).save(flush:true);
+					if (!boxInstance?.shipmentItems) { 
+						suitcaseInstance.removeFromContainers(boxInstance).save(flush:true);
+						return error();
+					}
+					else { 
+						flash.message = "Sorry, you cannot remove a box that contains items.";
+						return error();
+					}
 				} 
 				else { 
+					flash.message = "Sorry, you cannot locate the selected suitcase or box.";
 					return error();
 				}				
 				
@@ -134,23 +175,80 @@ class CreateShipmentController {
 				log.info("suitcase instance: " + suitcaseInstance);
 				
 				if (suitcaseInstance) { 
-					log.info("suitcaseInstance: " + suitcaseInstance?.containers)
+					log.info("boxes: " + suitcaseInstance?.containers)
 					def sortOrder = (suitcaseInstance?.containers)?suitcaseInstance?.containers?.size()+1:1
 					def name = String.valueOf(sortOrder)
 					
 					//def name = String.valueOf(suitcaseInstance?.containers()?suitcaseInstance?.containers.size():1);
-					def boxInstance = new Container(name: name, sortOrder: sortOrder, 
-						containerType:ContainerType.findByName("Box"))
-					boxInstance.shipment = shipmentInstance;
-					suitcaseInstance.addToContainers(boxInstance).save(flush:true);				
+					def boxInstance = new Container(
+						name: name, 
+						sortOrder: sortOrder, 
+						shipment: shipmentInstance,
+						containerType:ContainerType.findByName("Box"));
+					
+					suitcaseInstance?.addToContainers(boxInstance)
+					if (!suitcaseInstance?.save(flush:true)) { 
+						return error();
+					} 
+									
 				} else { 
 					return error();
 				}				
 			}.to "enterContainerDetails"
+			on("removeItem") {
+				log.info("params" + params)
+				def shipmentInstance = Shipment.get(params?.shipment?.id);
+				def itemInstance = ShipmentItem.get(params?.id);
+				if (shipmentInstance) { 
+					if (itemInstance) {
+						itemInstance.delete();
+						shipmentInstance.removeFromShipmentItems(itemInstance).save(flush:true);
+					}
+				}
+				
+
+				
+			}.to "enterContainerDetails"
+			on("addItem") {
+				def shipmentInstance = Shipment.get(params?.shipment?.id);
+				def containerInstance = Container.get(params?.container?.id);
+				
+				if (containerInstance) {
+					Product productInstance = Product.get(params?.product?.id);
+					if (productInstance) {						
+						def itemInstance = new ShipmentItem(
+							product: productInstance,
+							quantity: params.quantity,
+							recipient: Person.get(params.recipient.id),
+							lotNumber: params.lotNumber,
+							shipment: containerInstance.shipment,
+							container: containerInstance);
+						
+						flow.itemInstance = itemInstance
+						
+						if(itemInstance.hasErrors() || !itemInstance.validate()) {
+							println "Errors: " + itemInstance.errors.each { println it }
+							flash.message = "Sorry, there was an error validating item to be added";
+							return error()
+						}
+						
+						if (!containerInstance.shipment.addToShipmentItems(itemInstance).save(flush:true)) { 
+							log.error("Sorry, unable to add new item to shipment.  Please try again.");
+							flash.message = "Unable to add new item to shipment";
+						}
+					}
+					else { 
+						flash.message = "Sorry, unable to find the given product.  Please try again.";
+					}
+				}
+				
+			}.to "enterContainerDetails"
 		
-			on ("submit").to "addShipmentItems"
-			on(Exception).to "handleError"
+		
+			on ("submit").to "reviewShipment"
+			//on(Exception).to "handleError"
 		}
+		/*
 		addShipmentItems  {
 			on("back").to "enterContainerDetails"
 			on("addItem") {
@@ -158,17 +256,21 @@ class CreateShipmentController {
 				if (containerInstance) { 
 					Product productInstance = Product.get(params.product?.id);
 					if (productInstance) { 
+						
 						def itemInstance = new ShipmentItem(
 							product: productInstance, 
 							quantity: params.quantity, 
 							recipient: Person.get(params.recipient.id),
-							lotNumber: params.lotNumber);
-						itemInstance.container = containerInstance;						
+							lotNumber: params.lotNumber, 
+							container: containerInstance);
+
 						if(itemInstance.hasErrors() || !itemInstance.validate()) {
 							flow.itemInstance = itemInstance
 							return error()
 						}
-						containerInstance.addToShipmentItems(itemInstance).save(flush:true);
+						
+						containerInstance.shipment.addToShipmentItems(itemInstance).save(flush:true);
+						//containerInstance.addToShipmentItems(itemInstance).save(flush:true);
 					}					
 				}
 				flow.itemInstance=null;				
@@ -176,9 +278,11 @@ class CreateShipmentController {
 			on("submit").to "reviewShipment"
 			on(Exception).to "handleError"
 			on("clear").to "clear"
-		}
+		}*/
 		reviewShipment  {
-			on("back").to "addShipmentItems"
+			
+			on("cancel").to "cancel"
+			on("back").to "enterContainerDetails"
 			on("reviewLetter").to "reviewLetter"
 			on("clear").to "clear"
 			on("next") {
@@ -216,6 +320,7 @@ class CreateShipmentController {
 			on("refresh").to "reviewLetter"
 		}
 		sendShipment  {
+			on("cancel").to "cancel"
 			on("back").to "reviewShipment"
 			on("finish").to "finish"			
 		}
@@ -224,9 +329,11 @@ class CreateShipmentController {
 				def shipmentInstance = Shipment.get(params.id);
 				//shipmentInstance.properties = params
 				if (!shipmentInstance.hasErrors() && shipmentInstance.save(flush: true)) {
-					
 					EventType eventType = EventType.findByName("Shipped")
-					if (eventType) {
+					if (!eventType) {
+						log.error("Event type 'Shipped' does not exist")
+					} 
+					else { 
 						boolean exists = Boolean.FALSE;
 						// If 'requested' event type already exists, return
 						log.info("exists " + exists)
@@ -244,7 +351,7 @@ class CreateShipmentController {
 							shipmentInstance.addToEvents(event).save(flush:true);
 
 						}
-					}				
+					}
 												
 					if (params.comment) {
 						def comment = new Comment(comment: params.comment, sender: session?.user)
@@ -271,9 +378,6 @@ class CreateShipmentController {
 					//flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 					//redirect(action: "showDetails", id: shipmentInstance.id, params: ["containerId" : params.containerId])
 				}
-				
-				
-				
 			}
 			on("error").to "reviewShipment"
 			on(Exception).to "reviewShipment"
@@ -284,6 +388,9 @@ class CreateShipmentController {
 			
 		}
 		handleError()
+		cancel {
+			redirect(controller:"dashboard", action:"index")
+		}
 		clear { 
 			action { 
 				//flow.clear();

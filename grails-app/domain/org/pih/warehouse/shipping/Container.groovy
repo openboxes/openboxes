@@ -5,10 +5,6 @@ import org.pih.warehouse.core.Person;
 
 class Container implements Comparable, java.io.Serializable {
 
-	def beforeDelete = {
-		shipment.removeFromContainers(this)
-	 }
-	
 	String name	
 	String containerNumber				// An official container number (if it exists)
 	String description					// Description of contents
@@ -22,20 +18,23 @@ class Container implements Comparable, java.io.Serializable {
 	String weightUnits					// standard weight unit: kg, lb
 	Date dateCreated;
 	Date lastUpdated;
-	 
-	List shipmentItems					// Items in container
-	Container parentContainer			// the "containing" container
+	
 	ContainerType containerType			// Type of container
 	ContainerStatus containerStatus		// Status of the container (open, closed)
 	
-	static transients = [ "optionValue" ]
-	static belongsTo = [ shipment : Shipment];	/* parentContainer : Container */
-	static hasMany = [ shipmentItems : ShipmentItem, containers: Container ];
-	static mappedBy = [containers: 'parentContainer']	
+	Shipment shipment
+	Container parentContainer			// the "containing" container
+	SortedSet containers				// Child containers (in combination with mapping, helps to order containers)
 
-	static mapping = {
-		sort "sortOrder"
-	 }
+	//static belongsTo = [ parentContainer : Container ]
+	//static belongsTo = [ shipment : Shipment ];
+	static hasMany = [ containers : Container ];
+	//static mappedBy = [containers: 'parentContainer']
+
+	static transients = [ "optionValue", "shipmentItems" ]
+	//static mapping = {
+	//	containers sort: 'sortOrder', order: 'asc'
+	//}
 		
 	// Constraints
 	static constraints = {	 
@@ -50,13 +49,25 @@ class Container implements Comparable, java.io.Serializable {
 		weight(nullable:true)
 		weightUnits(nullable:true)
 		containerType(nullable:false)
-		shipmentItems(nullable:true)		
-		parentContainer(nullable:true)
+		//shipmentItems(nullable:true)		
+		//parentContainer(nullable:true)
 		containerStatus(nullable:true)
 		sortOrder(nullable:true)
 	}
 	
-	int compareTo(obj) { name.compareTo(obj.name) }
+	
+	//def beforeDelete = {
+	//	shipment.removeFromContainers(this)
+	//}
+	
+
+	int compareTo(obj) { 
+		return sortOrder.compareTo(obj.sortOrder) 
+	}
+	
+	List<ShipmentItem> getShipmentItems() { 
+		return ShipmentItem.findAllByContainer(this)
+	}
 	
 	String getOptionValue() {
 		return containerType.name + "-" + name

@@ -364,6 +364,15 @@
     <changeSet author="jmiranda (generated)" id="1287544235753-4">
         <addNotNullConstraint columnDataType="BIT" columnName="accepted" defaultNullValue="" tableName="receipt_item"/>
     </changeSet>
+    <changeSet author="jmiranda (generated)" id="1288203894188-1">
+        <addColumn tableName="shipment_item">
+            <column name="shipment_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    
+    
     <!-- 
     <changeSet author="jmiranda (generated)" id="1287544235753-5">
         <addNotNullConstraint columnDataType="DATETIME" columnName="expected_delivery_date" defaultNullValue="" tableName="shipment"/>

@@ -9,7 +9,7 @@ class MailService {
 	boolean transactional = false
 
 	def config = ConfigurationHolder.config
-	String from = "${config.grails.mail.from}" 						// warehouse@pih.org
+	String from = "${config.grails.mail.from}" 						// warehouse@pih-emr.org
 	String host= "${config.grails.mail.host}" 						// localhost
 	Integer port = Integer.parseInt ("${config.grails.mail.port}") 	// 23; 
 	
@@ -19,7 +19,7 @@ class MailService {
 		email.setHostName(host)
 		email.addTo(to)
 		email.setFrom(from)
-		email.setSubject(subject)
+		email.setSubject("[OpenBoxes] " + subject)
 		email.setMsg(msg)		
 		//email.setAuthentication(username,password)		
 		//email.setSmtpPort(port)		
@@ -33,7 +33,7 @@ class MailService {
 		email.setHostName(host)
 		email.addTo(to)
 		email.setFrom(from)
-		email.setSubject(subject)		
+		email.setSubject("[OpenBoxes] " + subject)		
 		// embed the image and get the content id
 		//URL url = new URL("http://www.apache.org/images/asf_logo_wide.gif");
 		//String cid = email.embed(url, "Apache logo");

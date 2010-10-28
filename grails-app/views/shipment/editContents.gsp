@@ -64,47 +64,47 @@
 														</ul>
 														<div id="tabs-1">
 															<g:render template="containerSummary" />				
-																	<div style="text-align: right;">						
-																		<a id="add-person-link" href="#">
-																			<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add" style="vertical-align: absmiddle;" /> Add a new person
-																		</a>
-																		<script type="text/javascript">
-																			$(document).ready(function(){
-																				$('#add-person-dialog').dialog({
-																					autoOpen: false, 
-																					modal: true, 
-																					width: '400px',
-																					buttons: {
-																			           'Add a Person': function() {
-																							var firstName = $("#firstName").val();
-																							var lastName = $("#lastName").val();
-																							var email = $("#email").val();
+															<div style="text-align: right;">						
+																<a id="add-person-link" href="#">
+																	<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add" style="vertical-align: absmiddle;" /> Add a new person
+																</a>
+																<script type="text/javascript">
+																	$(document).ready(function(){
+																		$('#add-person-dialog').dialog({
+																			autoOpen: false, 
+																			modal: true, 
+																			width: '400px',
+																			buttons: {
+																	           'Add a Person': function() {
+																					var firstName = $("#firstName").val();
+																					var lastName = $("#lastName").val();
+																					var email = $("#email").val();
 
-																			                $.post('/warehouse/json/savePerson', 
-																					                {firstName: firstName, lastName: lastName, email: email}, 
-																					                function(data) {
-																			                    		var item = $("<li>");
-																			                    		var link = $("<a>").attr("href", "/warehouse/person/show/" + data.id).html(data.firstName + " " + data.lastName);
-																			                    		item.append(link);
-																			                    		$('#peopleAdded').append(item);
-																			                		}, 'json');
-																			                $(this).dialog('close');
-																			            },	
-																			            Cancel: function() {
-																			                $(this).dialog('close');
-																			            }																	            																		            
-																		    		}, 
-																		    		close: function() { 
-																		                //window.location.reload(true);
-																						// does nothing 
-																			    	}
-																				});
-																				$("#add-person-link").click(function() {
-																					$('#add-person-dialog').dialog('open');	
-																				});																			
-																			});
-																		</script>
-																	</div>
+																	                $.post('/warehouse/json/savePerson', 
+																			                {firstName: firstName, lastName: lastName, email: email}, 
+																			                function(data) {
+																	                    		var item = $("<li>");
+																	                    		var link = $("<a>").attr("href", "/warehouse/person/show/" + data.id).html(data.firstName + " " + data.lastName);
+																	                    		item.append(link);
+																	                    		$('#peopleAdded').append(item);
+																	                		}, 'json');
+																	                $(this).dialog('close');
+																	            },	
+																	            Cancel: function() {
+																	                $(this).dialog('close');
+																	            }																	            																		            
+																    		}, 
+																    		close: function() { 
+																                //window.location.reload(true);
+																				// does nothing 
+																	    	}
+																		});
+																		$("#add-person-link").click(function() {
+																			$('#add-person-dialog').dialog('open');	
+																		});																			
+																	});
+																</script>
+															</div>
 																			
 																															
 															<div>
