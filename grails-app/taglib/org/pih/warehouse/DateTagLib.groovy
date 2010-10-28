@@ -10,16 +10,18 @@ class DateTagLib {
 		Date now = new Date();
 		Date date = attrs.date;
 		
-		def days = date - now;
-		
-		if (days == 0) { 
-			out << "today";
-		}
-		else if (days > 0) { 
-			out << "in ${days} days";
-		} 
-		else if (days < 0) { 
-			out << "${-days} days ago"
+		if (date) { 
+			def days = date - now;
+			
+			if (days == 0) { 
+				out << "today";
+			}
+			else if (days > 0) { 
+				out << "in ${days} days";
+			} 
+			else if (days < 0) { 
+				out << "${-days} days ago"
+			}
 		}
 	}
 		
