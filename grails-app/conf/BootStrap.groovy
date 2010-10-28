@@ -447,6 +447,7 @@ class BootStrap {
 			//tabarre.addToTransactions(transaction1).save();
 			//transaction1.addToTransactionEntries(transactionEntry1).save(flush:true, validate:false);
 		
+			/*
 			ShipmentMethod SHIPMENT_METHOD_UPS_GROUND = new ShipmentMethod(shipperService: SHIPPER_SERVICE_UPS_GROUND, trackingNumber: "").save(flush:true);
 			ShipmentMethod SHIPMENT_METHOD_UPS_AIR = new ShipmentMethod(shipperService: SHIPPER_SERVICE_UPS_AIR, trackingNumber: "").save(flush:true);
 			ShipmentMethod SHIPMENT_METHOD_FEDEX_AIR = new ShipmentMethod(shipperService: SHIPPER_SERVICE_DHL_AIR, trackingNumber: "").save(flush:true);
@@ -588,6 +589,7 @@ class BootStrap {
 			pallet1.addToShipmentItems(shipmentItem1).save(flush:true);
 			pallet1.addToShipmentItems(shipmentItem2).save(flush:true);
 			pallet1.addToShipmentItems(shipmentItem3).save(flush:true);
+			*/
 		}
 		
 		if (GrailsUtil.environment == 'test') {
