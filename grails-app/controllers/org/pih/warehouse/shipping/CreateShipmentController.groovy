@@ -399,37 +399,46 @@ class CreateShipmentController {
 						def comment = new Comment(comment: params.comment, sender: session?.user)
 						shipmentInstance.addToComments(comment).save(flush:true);
 					}
-					
+
 					// Send an email message to the shipment owner
-					def confirmSubject = "Suitcase " + shipmentInstance?.name + " has been shipped";
-					def confirmMessage = "This message represents the email body"
 					if (session?.user) {
-						mailService.sendMail(confirmSubject, confirmMessage, session?.user?.email);
+						def subject = "Your suitcase shipment " + shipmentInstance?.name + " has been successfully created";
+						def message = "You have successfully created a suitcase shipment."
+						mailService.sendMail(subject, message, session?.user?.email);
 					}
-										
+					
+					// Send an email message to the shipment traveler
+					if (shipmentInstance?.carrier) { 					
+						// Send an email message to the shipment owner
+						def subject = "A suitcase shipment " + shipmentInstance?.name + " is ready for pickup";
+						def message = "The suitcase you will be traveling with is ready for pickup."
+						mailService.sendMail(subject, message, shipmentInstance?.carrier?.email);
+					}
+					
+					// Send an email message to the shipment recipient
+					if (shipmentInstance?.recipient) { 
+						def subject = "A suitcase shipment " + shipmentInstance?.name + " is ready to ship to you";
+						def message = "A suitcase that is being sent to you is ready to be shipped."
+						mailService.sendMail(subject, message, shipmentInstance?.recipient?.email);
+					}
+					
 					// Send emails to each person receiving shipment 
 					shipmentInstance?.allShipmentItems?.each {
-						def subject = "Suitcase " + shipmentInstance?.name + " contains an item for you!";
+						def subject = "An item is being shipped to you as part of shipment " + shipmentInstance?.name;
 						def message = "You should expect to receive " + it.quantity + " units of " + it?.product?.name +
 							 " within a few days of " + shipmentInstance?.expectedDeliveryDate;
 
 						if (it?.recipient?.email) {
-							log.info("Sending email to " + it?.recipient?.email)
 							mailService.sendMail(subject, message, it?.recipient?.email);
 						}							
 					}
-					log.info ("flow.shipment.ID: " + flow?.shipmentInstance?.id)
-					log.info ("flow.shipment: " + flow?.shipmentInstance)
-					log.info ("shipment.ID: " + shipmentInstance?.id)
-					log.info ("shipment: " + shipmentInstance)
-
 					//flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 					//redirect(controller: "shipment", action: "showDetails", id: shipmentInstance.id)
 				}
 			}
 			on("error").to "reviewShipment"
 			on(Exception).to "reviewShipment"
-			on("success").to "completeShipment"
+			on("success").to "complete"
 		}
 		complete { 
 			// renders complete.gsp 		

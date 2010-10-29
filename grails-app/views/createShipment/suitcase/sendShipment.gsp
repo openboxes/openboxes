@@ -21,20 +21,19 @@
 				<g:renderErrors bean="${shipmentInstance}" as="list" />
 			</div>
 		</g:hasErrors>	
+
+		<g:render template="flowHeader" model="['currentState':'Ship']"/>	
+
 		
-							
-								
-				
 		<g:form action="suitcase">
 			<g:hiddenField name="id" value="${shipmentInstance?.id}" />
 			<g:hiddenField name="version" value="${shipmentInstance?.version}" />
-	
-	
+
 	
 			<fieldset>
-				<legend>Step 5.&nbsp;Send Shipment</legend>
+				<%-- <legend>Step 5.&nbsp;Send Shipment</legend>--%>
 				
-				<g:render template="flowHeader" model="['currentState':'Ship']"/>	
+				<g:render template="../shipment/summary" />
 			
 				<div class="dialog">				
 					<table>
@@ -93,39 +92,71 @@
 							</tr>
 							--%>			
 							<tr class="prop">
+								<td valign="top" class="name"><label><g:message
+									code="shipment.name.label" default="Shipment Number" /></label>
+								</td>
+								<td colspan="3" valign="top"
+									class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">
+									<span style="line-height: 1.5em">${shipmentInstance?.shipmentNumber}</span>
+								</td>
+							</tr>
+							<tr class="prop">
 								<td valign="top" class="name"><label>Name</label></td>
 								<td valign="top" class="value">
 									${shipmentInstance?.name }
 								</td>
 							</tr>
 							<tr class="prop">
-								<td valign="top" class="name"><label>Notifications</label></td>
+								<td valign="top" class="name"><label>Instructions</label></td>
 								<td valign="top" class="value">
-									By clicking <b>Finish</b>, your suitcase will be marked as <b>Shipped</b> and 
-									a notification email will be sent to the following people:
-									<br/><br/>
+									<p>By clicking <b>Send Shipment</b>, your suitcase will be marked as <b>Shipped</b> and 
+									a notification email will be sent to the following people:</p>
+							
+									<br/>
+
 									<table>	
-										<g:each var="itemInstance" in="${shipmentInstance.allShipmentItems }">
-											<tr>
+										<tr>
+											<th></th>
+											<th>Recipient</th>
+											<th>Notification</th>
+										</tr>
+										<tr class="prop">
+											<td>
+												<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
+											</td>
+											<td>${shipmentInstance?.carrier?.name }  &nbsp;<br/> <span class="fade">${shipmentInstance?.carrier?.email}</span></td>
+											<td>Your suitcase is ready for pickup</td>
+										</tr>
+										<tr class="prop">
+											<td>
+												<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
+											</td>
+											<td>${shipmentInstance?.recipient?.name }  &nbsp;<br/> <span class="fade">${shipmentInstance?.recipient?.email}</span></td>
+											<td>Your suitcase is ready to ship</td>
+										</tr>
+										
+										<g:each var="recipient" in="${shipmentInstance.allShipmentItems.recipient.unique() }">
+											<tr class="prop">
 												<td>
 													<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
-													&nbsp; 
-													<g:if test="${itemInstance?.recipient}">
-														${itemInstance?.recipient?.name } <span class="">(${itemInstance?.recipient?.email})</span>
+												</td>
+												<td>
+													<g:if test="${recipient}">
+														${recipient?.name } &nbsp;<br/><span class="fade">${recipient?.email}</span>
 													</g:if>
 													<g:else>
 														<i>no recipient selected</i>
 													</g:else>
-													<br/>
-													<div style="padding-left: 50px;">
-														<b>${itemInstance?.product?.name }</b> (${itemInstance?.quantity}) 
-													</div>
 												</td>
-											</tr>												
+												<td>
+													Your item(s) are ready to ship
+												</td>
+											</tr>						
 										</g:each>
 									</table>
 								</td>							
 							</tr>
+
 							<tr class="prop">
 	                            <td valign="top" class="name"><label><g:message code="comment.comment.label" default="Additional Comments" /></label></td>                            
 	                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'comment', 'errors')}">

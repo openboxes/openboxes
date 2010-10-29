@@ -19,16 +19,17 @@
 			</g:hasErrors>
            
 									
+			<g:render template="flowHeader" model="['currentState':'Review']"/>
            
 			<g:form action="suitcase" method="post" >
            		<g:hiddenField name="id" value="${shipmentInstance?.id}"/>
            		<fieldset>
-           			<legend>Step 4. Review shipment</legend>
+           			<%--<legend>Step 4. Review shipment</legend> --%>
            		
-           			<g:render template="flowHeader" model="['currentState':'Review']"/>
+           			<g:render template="../shipment/summary" />
+           		
            			
 					<div class="dialog">     
-						<h2>Please review your shipment details:</h2>
 						<table>
 							<tbody>
 								<tr class="prop">
@@ -73,7 +74,7 @@
 								<tr class="prop">
 									<td valign="top" class="name" style="width: 10%;"><label><g:message
 										code="shipment.traveler.label" default="Traveler" /></label></td>
-									<td valign="top" style="width: 30%;">
+									<td valign="top" style="width: 30%;" class="value">
 										${shipmentInstance?.carrier?.name}
 											
 									</td>
@@ -82,7 +83,7 @@
 									<td valign="top" class="name"><label><g:message
 										code="shipment.expectedShippingDate.label" default="Expected shipping date" /></label></td>
 									<td valign="top"
-										class=" ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}"
+										class="value ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}"
 										nowrap="nowrap">
 											<g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="MMM dd, yyyy"/>
 									</td>
@@ -91,7 +92,7 @@
 									<td valign="top" class="name"><label><g:message
 										code="shipment.expectedShippingDate.label" default="Expected arrival date" /></label></td>
 									<td valign="top"
-										class=" ${hasErrors(bean: shipmentInstance, field: 'expectedDeliveryDate', 'errors')}"
+										class="value ${hasErrors(bean: shipmentInstance, field: 'expectedDeliveryDate', 'errors')}"
 										nowrap="nowrap">
 											<g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="MMM dd, yyyy"/>
 									</td>
@@ -102,7 +103,7 @@
 									<td valign="top" class="name"><label><g:message
 										code="shipment.totalValue.label" default="Total Value (USD)" /></label></td>
 									<td valign="top"
-										class=" ${hasErrors(bean: shipmentInstance, field: 'totalValue', 'errors')}"
+										class="value ${hasErrors(bean: shipmentInstance, field: 'totalValue', 'errors')}"
 										nowrap="nowrap">
 										<g:if test="${shipmentInstance?.totalValue}">
 											USD $<g:formatNumber number="${shipmentInstance?.totalValue}" format="###,##0.00"/>

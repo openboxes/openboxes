@@ -34,7 +34,7 @@
 				items <b>${shipmentInstance?.carrier?.name}</b> is carrying constitute a charitable donation 
 				from Partners In Health to Haiti.</p>			
 
-				<p>The contents of <b>${session.user.name}</b>'s luggage include:</p>
+				<p>The contents of <b>${shipmentInstance?.carrier?.name}</b>'s luggage include:</p>
 
 				<div style="padding-left: 50px;">					
 					<g:each var="itemInstance" in="${shipmentInstance?.allShipmentItems}">

@@ -20,13 +20,13 @@
 				</div>				
 			</g:hasErrors>          
 	
-							
+			<g:render template="flowHeader" model="['currentState':'Pack']"/>		
+			 		
 	
 			<fieldset>
-				<legend>Step 3&nbsp;Add shipment items</legend>	
-			 
-			 		<g:render template="flowHeader" model="['currentState':'Pack']"/>		
-			 
+				<%--<legend>Step 3&nbsp;Add shipment items</legend> --%>	
+					<g:render template="../shipment/summary" />	
+			 		
 					<div class="dialog">
 					<table style="border: 1px solid #CCC;" border="0">
 						<thead>	

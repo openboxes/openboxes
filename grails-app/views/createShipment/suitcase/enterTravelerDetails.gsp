@@ -16,19 +16,31 @@
 				<div class="errors"><g:renderErrors bean="${shipmentInstance}" as="list" /></div>
 			</g:hasErrors> 
 			
-			
+			<g:render template="flowHeader" model="['currentState':'Traveler']"/>
 			
 			<g:form action="suitcase" method="post">
 				<g:hiddenField name="id" value="${shipmentInstance?.id}"/>
 				<fieldset>
-					<legend>Step 2&nbsp;Enter traveler's details</legend>					
+					<%-- <legend>Step 2&nbsp;Enter traveler's details</legend>--%>					
 						
-					<g:render template="flowHeader" model="['currentState':'Traveler']"/>
+					<g:render template="../shipment/summary" />	
+					
 								
 					
 					<div class="dialog">
 						<table>
 		                    <tbody>
+		                    
+		                    <%-- 
+								<tr class="prop">
+									<td valign="top" class="name"><label><g:message
+										code="shipment.name.label" default="Shipment Number" /></label>
+									</td>
+									<td colspan="3" valign="top"
+										class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">
+										<span style="line-height: 1.5em">${shipmentInstance?.shipmentNumber}</span>
+									</td>
+								</tr>
 								<tr class="prop">
 									<td valign="top" class="name"><label><g:message code="shipment.type.label" default="Type" /></label></td>
 									<td valign="top"
@@ -52,7 +64,9 @@
 									<td valign='top' class='value ${hasErrors(bean:shipmentInstance,field:'name','errors')}'>
 										${shipmentInstance?.name?.encodeAsHTML()}
 									</td>
-								</tr>  
+								</tr>
+								--%>
+								  
 								<tr class="prop">
 									<td valign="top" class="name" style="width: 10%;"><label><g:message
 										code="shipment.traveler.label" default="Traveler" /></label></td>
@@ -61,6 +75,16 @@
 											width="180" size="30"
 											valueId="${shipmentInstance?.carrier?.id}" 
 											valueName="${shipmentInstance?.carrier?.name}"/>		
+									</td>
+								</tr>
+								<tr class="prop">
+									<td valign="top" class="name" style="width: 10%;"><label><g:message
+										code="shipment.recipient.label" default="Recipient" /></label></td>
+									<td valign="top" style="width: 30%;">
+										<g:autoSuggest id="recipient" name="recipient" jsonUrl="/warehouse/json/findPersonByName" 
+											width="180" size="30"
+											valueId="${shipmentInstance?.recipient?.id}" 
+											valueName="${shipmentInstance?.recipient?.name}"/>		
 									</td>
 								</tr>
 								<tr class="prop">

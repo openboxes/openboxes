@@ -15,15 +15,15 @@
 	                <g:renderErrors bean="${shipmentInstance}" as="list" />
 	            </div>				
 			</g:hasErrors>
-			
-			
+
+			<g:render template="flowHeader" model="['currentState':'Details']"/>
 			
            	<g:form action="suitcase" method="post">
 				<g:hiddenField name="id" value="${shipmentInstance?.id}"/>
 				<fieldset>
 					<legend>Step 1&nbsp; Enter shipment details</legend>
 					
-					<g:render template="flowHeader" model="['currentState':'Details']"/>
+					<g:render template="../shipment/summary" />	
 					
                		<div class="dialog">
 		                <table>
