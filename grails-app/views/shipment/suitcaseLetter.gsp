@@ -29,9 +29,8 @@
 
 				<p>To Whom It May Concern:</p>
 
-				<p>This letter is to certify that the luggage carried by ${shipmentInstance?.carrier?.name} contains humanitarian donations for Haiti. 
-				<b>${shipmentInstance?.carrier?.name}</b> is an employee of Partners In Health. The 
-				items <b>${shipmentInstance?.carrier?.name}</b> is carrying constitute a charitable donation 
+				<p>This letter is to certify that the luggage carried by ${session.user.name} contains humanitarian donations for Haiti. 
+				<b>${session.user.name}</b> is an employee of Partners In Health. The items <b>${session.user.name}</b> is carrying constitute a charitable donation 
 				from Partners In Health to Haiti.</p>			
 
 				<p>The contents of <b>${session.user.name}</b>'s luggage include:</p>
@@ -48,15 +47,13 @@
 
 				<p>Sincerely,</p>
 
-				<img src="${createLinkTo(dir: 'images/signatures/', file: 'joiamukherjee.jpg') }" border="0"/>
+				<img src="${createLinkTo(dir: 'images/', file: 'signature.jpg') }" border="0"/>
 
 				<p>Joia Mukherjee<br/>
 				Medical Director, Partners In Health</p>
 
 				<p>Enclosures<br/>
 				Sworn to and subscribed before me on <g:formatDate date="${new Date()}" format="MMMMM dd, yyyy"/></p>
-
-				<img src="${createLinkTo(dir: 'images/signatures/', file: 'kathrynkempton.jpg') }" border="0"/>
 
 				<p>Kathryn G. Kempton Amaral, Notary Public<br/>
 				My commission expires: 27 February 2015.</p>

@@ -18,13 +18,15 @@
 				</div>
 			</g:hasErrors>
            
-			<g:render template="flowHeader"/>						
+									
            
 			<g:form action="suitcase" method="post" >
            		<g:hiddenField name="id" value="${shipmentInstance?.id}"/>
            		<fieldset>
            			<legend>Step 4. Review shipment</legend>
            		
+           			<g:render template="flowHeader" model="['currentState':'Review']"/>
+           			
 					<div class="dialog">     
 						<h2>Please review your shipment details:</h2>
 						<table>
@@ -169,9 +171,19 @@
 							</tbody>
 						</table>					
 					</div>
+					
 					<div class="buttons">
-						<g:submitButton name="back" value="Back"></g:submitButton>	
-						<g:submitButton name="next" value="Next"></g:submitButton>
+						<table>
+							<tr>
+								<td style="text-align: center;">
+									<g:submitButton name="back" value="Back"></g:submitButton>	
+									<g:submitButton name="submit" value="Next"></g:submitButton> 
+								</td>
+								<td style="text-align: right;">
+									<g:submitButton name="done" value="Exit"></g:submitButton>						
+								</td>
+							</tr>
+						</table>
 					</div>
 					
 				</fieldset>

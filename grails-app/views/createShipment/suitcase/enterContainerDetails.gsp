@@ -20,10 +20,12 @@
 				</div>				
 			</g:hasErrors>          
 	
-			<g:render template="flowHeader"/>						
+							
 	
 			<fieldset>
 				<legend>Step 3&nbsp;Add shipment items</legend>	
+			 
+			 		<g:render template="flowHeader" model="['currentState':'Pack']"/>		
 			 
 					<div class="dialog">
 					<table style="border: 1px solid #CCC;" border="0">
@@ -68,7 +70,7 @@
 											<td>
 												<span style="padding-left: 32px;">
 													<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="Item" style="vertical-align: middle"/>
-													&nbsp;${itemInstance?.product?.name } ${itemInstance?.id}	
+													&nbsp;${itemInstance?.product?.name } 	
 												</span>
 											</td>
 											<td style="text-align:center;">
@@ -152,11 +154,19 @@
 				</div>		
 				<div class="buttons">
 					<g:form action="suitcase" method="post" >
-						<g:submitButton name="back" value="Back"></g:submitButton>								
-						<g:submitButton name="submit" value="Next"></g:submitButton>
+						<table>
+							<tr>
+								<td style="text-align: center;">
+									<g:submitButton name="back" value="Back"></g:submitButton>	
+									<g:submitButton name="submit" value="Next"></g:submitButton> 
+								</td>
+								<td style="text-align: right;">
+									<g:submitButton name="done" value="Exit"></g:submitButton>						
+								</td>
+							</tr>
+						</table>
 		            </g:form>
 				</div>
-               
 			</fieldset>
         </div>
     </body>

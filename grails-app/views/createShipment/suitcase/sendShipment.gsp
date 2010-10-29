@@ -7,8 +7,6 @@
 	<g:set var="entityName" value="${message(code: 'shipmentType.label', default: 'Shipment Type')}" />
 	<title><g:message code="shipment.create.label" default="Create Suitcase Shipment" /></title>        
 	<content tag="pageTitle"><g:message code="shipment.create.label" default="Create Suitcase Shipment" /></content>
-	<style>
-	</style>
 </head>
 
 <body>    
@@ -24,7 +22,7 @@
 			</div>
 		</g:hasErrors>	
 		
-		<g:render template="flowHeader"/>						
+							
 								
 				
 		<g:form action="suitcase">
@@ -35,6 +33,8 @@
 	
 			<fieldset>
 				<legend>Step 5.&nbsp;Send Shipment</legend>
+				
+				<g:render template="flowHeader" model="['currentState':'Ship']"/>	
 			
 				<div class="dialog">				
 					<table>
@@ -136,10 +136,18 @@
 					</table>										
 				</div>
 				<div class="buttons">
-				    <g:submitButton name="back" value="Back"></g:submitButton>
-				    <g:submitButton name="finish" value="Finish"></g:submitButton>
+					<table>
+						<tr>
+							<td style="text-align: center;">
+							    <g:submitButton name="back" value="Back"></g:submitButton>
+							    <g:submitButton name="finish" value="Send Shipment"></g:submitButton>
+							</td>
+							<td style="text-align: right;">
+								<g:submitButton name="done" value="Exit"></g:submitButton>						
+							</td>
+						</tr>
+					</table>
 			    </div>
-
 			</fieldset>
 		</g:form>		
 	</div>

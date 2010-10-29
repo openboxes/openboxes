@@ -21,10 +21,20 @@ class CreateShipmentController {
 	}
 	
 	
+	
 	def suitcaseFlow = {
 		start {
 			action {
-				flow.shipmentInstance = new Shipment();
+				log.info("suitcaseFlow started!!!")
+				if (!flow.shipmentInstance) { 
+					if (params.id) { 
+						flow.shipmentInstance = Shipment.get(params.id);
+					} 
+					else { 
+						flow.shipmentInstance = new Shipment();
+					}
+				}
+								
 				ShipmentType shipmentType = ShipmentType.findByName("Suitcase");
 				if (!shipmentType)
 					throw new Exception("Unable to find 'Suitcase' shipment type")
@@ -74,6 +84,13 @@ class CreateShipmentController {
 				
 			}.to "enterTravelerDetails"
 			on("finish").to "finish"
+			on("enterShipmentDetails").to "enterShipmentDetails"
+			on("enterTravelerDetails").to "enterTravelerDetails"
+			on("enterContainerDetails").to "enterContainerDetails"
+			on("reviewShipment").to "reviewShipment"
+			on("sendShipment").to "sendShipment"
+			on("done").to "redirectToShowDetails"
+			
 			on("return").to "start"			
 			on(Exception).to "handleError"
 		}
@@ -99,7 +116,12 @@ class CreateShipmentController {
 				
 				
 			}.to "enterContainerDetails"
-			
+			on("enterShipmentDetails").to "enterShipmentDetails"
+			on("enterTravelerDetails").to "enterTravelerDetails"
+			on("enterContainerDetails").to "enterContainerDetails"
+			on("reviewShipment").to "reviewShipment"
+			on("sendShipment").to "sendShipment"
+			on("done").to "redirectToShowDetails"
 		}
 		enterContainerDetails  {
 			on("cancel").to "cancel"
@@ -247,6 +269,14 @@ class CreateShipmentController {
 		
 		
 			on ("submit").to "reviewShipment"
+			on ("enterShipmentDetails").to "enterShipmentDetails"
+			on ("enterTravelerDetails").to "enterTravelerDetails"
+			on ("enterContainerDetails").to "enterContainerDetails"
+			on ("reviewShipment").to "reviewShipment"
+			on ("sendShipment").to "sendShipment"
+			on ("done").to "redirectToShowDetails"
+
+			
 			//on(Exception).to "handleError"
 		}
 		/*
@@ -286,7 +316,7 @@ class CreateShipmentController {
 			on("back").to "enterContainerDetails"
 			on("reviewLetter").to "reviewLetter"
 			on("clear").to "clear"
-			on("next") {
+			on("submit") {
 				
 				def shipmentInstance = Shipment.get(params.id);
 				if (shipmentInstance) { 
@@ -314,7 +344,13 @@ class CreateShipmentController {
 				}				
 
 			}.to "sendShipment"
-			
+		
+			on("enterShipmentDetails").to "enterShipmentDetails"
+			on("enterTravelerDetails").to "enterTravelerDetails"
+			on("enterContainerDetails").to "enterContainerDetails"
+			on("reviewShipment").to "reviewShipment"
+			on("sendShipment").to "sendShipment"
+			on("done").to "redirectToShowDetails"
 		}
 		reviewLetter {
 			on("back").to "reviewShipment"
@@ -323,7 +359,16 @@ class CreateShipmentController {
 		sendShipment  {
 			on("cancel").to "cancel"
 			on("back").to "reviewShipment"
-			on("finish").to "finish"			
+			on("finish").to "finish"	
+			on("enterShipmentDetails").to "enterShipmentDetails"
+			on("enterTravelerDetails").to "enterTravelerDetails"
+			on("enterContainerDetails").to "enterContainerDetails"
+			on("reviewShipment").to "reviewShipment"
+			on("sendShipment").to "sendShipment"
+			on("done").to "redirectToShowDetails"
+
+			
+			
 		}
 		finish { 
 			action {
@@ -384,10 +429,10 @@ class CreateShipmentController {
 			}
 			on("error").to "reviewShipment"
 			on(Exception).to "reviewShipment"
-			on("success").to "complete"
+			on("success").to "completeShipment"
 		}
 		complete { 
-			
+			// renders complete.gsp 		
 		}
 		handleError()
 		cancel {
@@ -401,7 +446,8 @@ class CreateShipmentController {
 			on(Exception).to "handleError"
 		}
 		redirectToShowDetails { 	
-			redirect(controller:"shipment", action:"showDetails", id: flow.shipmentInstance?.id)			
+			//redirect(url: '/shipment/showDetails/${flowScope?.shipmentIntance?.id}')
+			redirect(controller:"shipment", action:"showDetails", id: flow?.shipmentInstance?.id)			
 		}
 	}
 

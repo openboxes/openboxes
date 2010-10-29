@@ -45,8 +45,11 @@
 					</td>
 				</tr>
 				<tr>
-					<td>
-						<g:submitButton name="addItem" value="Add Item"></g:submitButton>
+					<td></td>
+					<td style="text-align: left;">
+						<div class="buttons">
+							<g:submitButton name="addItem" value="Add Item"></g:submitButton>
+						</div>
 					</td>
 				</tr>
 			</tbody>
