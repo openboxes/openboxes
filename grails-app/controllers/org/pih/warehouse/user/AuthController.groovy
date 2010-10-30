@@ -45,7 +45,14 @@ class AuthController {
 		//	userInstance = User.findWhere(email:params['email'], password:params['password']);
 		
 		// Successfully logged in
-		if (userInstance) {			
+		if (userInstance) {		
+			
+			if (!userInstance?.active) { 
+				flash.message = "Your account is currently inactive."
+				redirect(controller: 'auth', action: 'login');
+				return;
+			}
+			
 			// Need to fetch the manager and roles
 			def warehouse = userInstance?.warehouse?.name;
 			def managerUsername = userInstance?.manager?.username;
@@ -102,6 +109,7 @@ class AuthController {
 			def userInstance = new User();
 			userInstance.properties = params
 			userInstance.username = params.email;
+			userInstance.active = Boolean.FALSE;
 			// Create account 
 			if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
 				flash.message = "${message(code: 'default.create.message', args: [message(code: 'user.label', default: 'User'), userInstance.id])}"

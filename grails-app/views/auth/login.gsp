@@ -2,7 +2,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
-	<title>Warehouse &gt; Login</title>
+	<title>Login</title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 </head>
 <body>
@@ -59,7 +59,7 @@
 									<td valign="top" class="name">
 										<label for="email"><g:message code="user.email.label" default="Email" /></label>
 									</td>
-									<td valign="top" class="value ${hasErrors(bean: userInstance, field: 'email', 'errors')}">
+									<td valign="top" class="value ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
 										<g:textField name="email" value="${userInstance?.email}"  />
 									</td>
 								</tr>

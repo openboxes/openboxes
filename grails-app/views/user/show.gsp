@@ -17,19 +17,30 @@
             <div class="dialog">
                 <table>
                     <tbody>
-						<tr>
+						<tr style="background-color: #eee;">
 		        			<td valign="top" colspan="2">
 	            				<img class="photo" width="25" height="25" 
 	            					src="${createLink(controller:'user', action:'viewPhoto', id:userInstance.id)}" style="vertical-align: bottom" />
 	            				&nbsp;
-		            			<span style="font-weight: bold; font-size: 200%">${fieldValue(bean: userInstance, field: "firstName")} ${fieldValue(bean: userInstance, field: "lastName")}</span>
+		            			<span style="font-weight: bold; font-size: 100%">${fieldValue(bean: userInstance, field: "firstName")} ${fieldValue(bean: userInstance, field: "lastName")}</span>
+		            			
 							</td>            
+
                     	</tr>                    
                     
                         <tr class="prop">
                             <td valign="top" class="name"><g:message code="user.id.label" default="ID" /></td>                            
                             <td valign="top" class="value">${fieldValue(bean: userInstance, field: "id")}</td>                            
                         </tr>
+                        <tr class="prop">
+                            <td valign="top" class="name">
+                              <label for="active"><g:message code="user.active.label" default="Active" /></label>
+                            </td>
+                            <td valign="top" class="value">
+                            	${fieldValue(bean: userInstance, field: "active")}
+                            </td>
+                        </tr>
+                            
           
                     
                         <tr class="prop">
@@ -78,21 +89,13 @@
 						<tr class="prop">
                             <td valign="top" class="name"></td>
                             <td valign="top" class="value">
-
+								
 								<g:form>
+									<g:hiddenField name="id" value="${userInstance?.id}" />
 									<div class="buttons">
-					
-										<g:hiddenField name="id" value="${userInstance?.id}" />
-
 										<g:actionSubmit class="positive" action="edit" value="${message(code: 'default.button.edit.label', default: 'Edit')}" />
-										<%--
 										<g:actionSubmit class="negative" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
-										--%>										
-												<g:link controller="user" action="list" id="${userInstance.id}">
-													<img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}"
-													alt="Cancel" /> Cancel</g:link>
-
-										</div>
+									</div>						
 								</g:form>
 							</td>
                         </tr>

@@ -11,14 +11,13 @@
     </head>
     <body>
         <div class="body">
-           
             <g:if test="${flash.message}">
-		<div class="message">${flash.message}</div>
+				<div class="message">${flash.message}</div>
             </g:if>
             <g:hasErrors bean="${userInstance}">
-		<div class="errors">
-			<g:renderErrors bean="${userInstance}" as="list" />
-		</div>
+				<div class="errors">
+					<g:renderErrors bean="${userInstance}" as="list" />
+				</div>
             </g:hasErrors>
             <g:form method="post" >
                 <g:hiddenField name="id" value="${userInstance?.id}" />
@@ -73,6 +72,17 @@
                                     <g:textField name="email" value="${userInstance?.email}" />
                                 </td>
                             </tr>
+                            
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                  <label for="active"><g:message code="user.active.label" default="Active" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'active', 'errors')}">
+                                    <g:textField name="active" value="${userInstance?.active}" />
+                                </td>
+                            </tr>
+                            
+                            
 				<tr class="prop">
 					<td valign="top" class="name">
 
