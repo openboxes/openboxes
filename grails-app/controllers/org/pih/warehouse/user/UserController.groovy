@@ -88,6 +88,21 @@ class UserController {
             return [userInstance: userInstance]
         }
     }
+	
+	
+	def toggleActivation = { 
+		def userInstance = User.get(params.id)
+		if (!userInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+		}
+		else {			
+			userInstance.active = !userInstance.active;
+			if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
+				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), userInstance.id])}"
+			}
+		}
+		redirect(action: "show", id: userInstance.id)
+	}
 
     /**
      * Update a user 
