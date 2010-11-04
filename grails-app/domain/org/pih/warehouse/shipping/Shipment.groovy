@@ -53,9 +53,9 @@ class Shipment implements Serializable {
 	
 	// Core association mappings
 	static hasMany = [events : Event,
+	                  comments : Comment,
 	                  containers : Container,
 	                  documents : Document, 	                  
-	                  comments : Comment,
 					  shipmentItems : ShipmentItem,
 	                  referenceNumbers : ReferenceNumber ]
 
@@ -68,8 +68,12 @@ class Shipment implements Serializable {
 	// use a SortedSet for events and have the Event class implement Comparable. 
 
 	static mapping = {
+		events cascade: "all-delete-orphan"
+		comments cascade: "all-delete-orphan"
 		containers cascade: "all-delete-orphan"
+		documents cascade: "all-delete-orphan"
 		shipmentItems cascade: "all-delete-orphan"
+		referenceNumbers cascade: "all-delete-orphan"
 		//containers sort: 'dateCreated', order: 'asc'
 		//events joinTable:[name:'shipment_event', key:'shipment_id', column:'event_id']
 	}	

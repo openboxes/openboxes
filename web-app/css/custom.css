@@ -309,17 +309,17 @@ hr.space {background:#fff;color:#fff;}
    padding-top: 5px;
    width:100%;
    text-align: center;
-   height: 20px;   /* Height of the footer */
-   background:#ccc;
+   height: 40px;   /* Height of the footer */
+   background: #fff;
 }
 
 #header {
-   vertical-align: middle;
-   border-bottom: 0px solid black;
-   padding-bottom: 0px;
-   width:100%;
-   background:#fff;
-   height: 62px;
+	vertical-align: middle;
+	border-bottom: 0px solid black;
+	padding-bottom: 0px;
+	width:100%;
+	background:#fff;
+	height: 62px;
 }
 
 
@@ -394,8 +394,8 @@ div#dashboard li {
 	line-height: 1.5em;
 }
 
-
-
+.active	{ background-color: #6699CC; color: white;} 
+.inactive { background-color: #EEE; } 
 label { display: inline; text-decoration: none; }
 label.block { display: block; } 
 fieldset .prop { margin: 10px; }

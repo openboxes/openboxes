@@ -19,7 +19,7 @@
 
 <%--             
             <div class="dialog">
-				<g:form method="get" action="listIncoming">
+				<g:form method="get" action="listReceiving">
 	            	<fieldset>
 	            		<legend>Filter by</legend>				            
 						<table>
@@ -68,7 +68,6 @@
 		                    <g:each var="shipmentList" in="${entry.value}">
 								<g:each var="shipmentInstance" in="${shipmentList.objectList}" status="i">
 									<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
-
 										<td width="3%" style="text-align: center">
 											<img src="${createLinkTo(dir:'images/icons',file: 'ShipmentType' + shipmentInstance?.shipmentType?.name + '.png')}"
 											alt="${shipmentInstance?.shipmentType?.name}" style="vertical-align: middle; width: 24px; height: 24px;" />		
@@ -83,7 +82,6 @@
 											<g:else>
 												<div>
 													${shipmentInstance.mostRecentEvent.eventType.name}
-													
 												</div>									
 											</g:else>											
 										</td>
@@ -93,9 +91,6 @@
 												<g:formatDate format="MMM dd yyyy" date="${shipmentInstance.mostRecentEvent.eventDate}"/>
 											</g:else>											
 										</td>
-
-
-
 										<td width="10%" align="center">
 											${fieldValue(bean: shipmentInstance, field: "origin.name")}
 										</td>

@@ -104,6 +104,7 @@
 					</g:link>		
 				</td>
 			</tr>					
+			<%-- 
 			<g:if test="${session?.warehouse?.id == shipmentInstance?.origin?.id}">
 				<tr class="prop">
 					<td>
@@ -116,6 +117,7 @@
 					</td>
 				</tr>
 			</g:if>
+			--%>
 			<g:if test="${session?.warehouse?.id == shipmentInstance?.destination?.id}">
 				<tr class="prop">
 					<td>

@@ -18,7 +18,7 @@
             
 				<div>            	
 	            	<span class="menuButton">
-	            		<g:link class="new" action="create"><g:message code="default.create.label" args="['${domainClass.propertyName}']"/></g:link>
+	            		<g:link class="new" action="create"><g:message code="default.add.label" args="['${domainClass.propertyName}']"/></g:link>
 	            	</span>
             	</div>
                 <table>

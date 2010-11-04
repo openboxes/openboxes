@@ -120,11 +120,16 @@
 											<li>
 												<%-- <g:if test="${session?.warehouse?.logoUrl}"><img src="${session?.warehouse?.logoUrl}" width="24" height="24" border="1" style="vertical-align: bottom"></img></g:if>
 												&nbsp;--%>
-												<span style="font-weight: bold;">
-													${session?.warehouse?.name}
-												</span>
-												<a styte="vertical-align: middle" class="home" href='${createLink(controller: "dashboard", action:"chooseWarehouse")}'>change</a>	
+													<g:if test="${session?.warehouse?.logo}">
+														<img class="photo" width="25" height="25" 
+			            									src="${createLink(controller:'warehouse', action:'viewLogo', id:session.warehouse.id)}" style="vertical-align: middle" />
+			            							</g:if>
+													<b>${session?.warehouse?.name}</b>
+													<a style="vertical-align: middle" class="home" href='${createLink(controller: "dashboard", action:"chooseWarehouse")}'>
+														change
+													</a>	
 											</li>
+											<li>|</li>
 																		
 										</g:if>
 										<li>
@@ -167,7 +172,6 @@
 	    	<!-- YUI main Block including page title and content -->
 	      	<div id="yui-main">
 		    	<div id="content" class="yui-b">
-
 					<!-- Populated using the 'pageTitle' property defined in the GSP file -->
 					<g:if test="${session.user}">
 						<g:if test="${pageProperty(name:'page.pageTitle')}">
@@ -216,55 +220,52 @@
 			</div>			 
 		</div>
 
-		<!-- 
-		<div>
-			<button id="common">Default style bar</button>
-		    <button id="error">Error style bar</button>
-		    <button id="success">Success style bar</button>
-		    <button id="custom">Custom styling</button>
-		    <button id="close">With close button</button>	
-		</div>	
-		 -->
-		 
 		<!-- YUI "footer" block that includes footer information -->
 		<div id="ft" role="contentinfo">
 			<div id="footer">
-				&copy; 2010 <a href="http://www.pih.org">PIH</a>&trade; Warehouse &nbsp;&nbsp; | &nbsp;&nbsp;
-				Application Version: <g:meta name="app.version"/>&nbsp;&nbsp; | &nbsp;&nbsp;
-				Grails Version: <g:meta name="app.grails.version"></g:meta>
+				<div style="line-height: 2em;">
+					&copy; 2010 Partners In Health&trade; <b>OpenBoxes</b> &nbsp;&nbsp; | &nbsp;&nbsp;
+					Application Version: &nbsp;<b><g:meta name="app.version"/></b>&nbsp;&nbsp; | &nbsp;&nbsp;
+					Grails Version: &nbsp; <b><g:meta name="app.grails.version"></g:meta></b>&nbsp;&nbsp; | &nbsp;&nbsp;
+					Locale: &nbsp;  	
+					
+					<img src="${createLinkTo(dir: 'images/flags', file: 'us.png') }" style="vertical-align: middle;">
+					<g:if test="${session['org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'].toString() != 'en_US'}">			
+						<a href="${createLink(controller: 'dashboard', action: 'index', params: ['lang':'en_US'])}">English (US)</a> &nbsp;
+					</g:if>
+					<g:else>
+						<span>English (US)</span>					
+					</g:else>
+					&nbsp;					
+					<img src="${createLinkTo(dir: 'images/flags', file: 'fr.png') }" style="vertical-align: middle;">
+					<g:if test="${session['org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'].toString() != 'fr'}">			
+						<a href="${createLink(controller: 'dashboard', action: 'index', params: ['lang':'fr'])}">French</a> &nbsp;
+					</g:if>
+					<g:else>
+						<span>French</span>					
+					</g:else>
+					&nbsp;
+					<img src="${createLinkTo(dir: 'images/flags', file: 'es.png') }" style="vertical-align: middle;">
+					<g:if test="${session['org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'].toString() != 'es'}">			
+						<a href="${createLink(controller: 'dashboard', action: 'index', params: ['lang':'es'])}">Spanish</a> &nbsp;
+					</g:if>
+					<g:else>
+						<span>Spanish</span>					
+					</g:else>
+
+<!--  
+
+					<img src="${createLinkTo(dir: 'images/flags', file: 'do.png') }" style="vertical-align: middle;">
+					<g:if test="${org.springframework.context.i18n.LocaleContextHolder.locale != 'do'}">			
+						<a href="${createLink(controller: 'dashboard', action: 'index', params: ['lang':'do'])}">Spanish (Dominican Republic)</a> &nbsp;
+					</g:if>
+					<g:else>
+						<span>French (Rwanda)</span>					
+					</g:else>
+-->
+				</div>
 			</div>
 		</div>
 	</div>
-	
-	
-    <script type="text/javascript">
-		$(function() {
-	  		/*
-			$.notifyBar({ html: "This is 'Notify bar'!" });		  
-			$("#callGreen").click(function(){
-				$.notifyBar({ html: "Thank you, your settings were updated!", jqObject: $("#greenDiv") });
-			});		  
-			$("#callError").click(function(){
-				$.notifyBar({ jqObject: $("#errorDiv") });
-			});
-			$("#common").click(function(){
-				$.notifyBar({});
-			});
-			$("#error").click(function(){
-				$.notifyBar({ cls: "error", html: "Error occurred!" });
-			});
-			$("#success").click(function(){
-				$.notifyBar({ cls: "success", html: "Your data has been changed!" });
-			});
-			$("#custom").click(function(){
-				$.notifyBar({ cls: "custom", html: "This is a custom styling!" });
-			});
-			$("#close").click(function(){
-				$.notifyBar({ html: "Click 'close' to hide notify bar", close: true, delay: 1000000 });
-			});
-			*/
-		});    
-	</script>
-	
 </body>
 </html>

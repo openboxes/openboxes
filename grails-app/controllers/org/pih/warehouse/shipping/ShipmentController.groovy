@@ -166,7 +166,7 @@ class ShipmentController {
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
-			redirect(action: (params.type == "incoming") ? "listIncoming" : "listOutgoing")
+			redirect(action: (params.type == "incoming") ? "listReceiving" : "listShipping")
 		}
 		else {
 			def eventTypes =  org.pih.warehouse.core.EventType.list();
@@ -184,7 +184,7 @@ class ShipmentController {
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
-			redirect(action: (params.type == "incoming") ? "listIncoming" : "listOutgoing")
+			redirect(action: (params.type == "incoming") ? "listReceiving" : "listShipping")
 		}
 		else {
 			[shipmentInstance: shipmentInstance]
@@ -196,7 +196,7 @@ class ShipmentController {
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
-			redirect(action: (params.type == "incoming") ? "listIncoming" : "listOutgoing")
+			redirect(action: (params.type == "incoming") ? "listReceiving" : "listShipping")
 		}
 		else {
 			[shipmentInstance: shipmentInstance]
@@ -207,7 +207,7 @@ class ShipmentController {
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
-			redirect(action: (params.type == "incoming") ? "listIncoming" : "listOutgoing")
+			redirect(action: (params.type == "incoming") ? "listReceiving" : "listShipping")
 		}
 		else {
 			if ("POST".equalsIgnoreCase(request.getMethod())) { 				
@@ -230,7 +230,7 @@ class ShipmentController {
 					}					
 					
 					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
-					redirect(action: "listOutgoing")
+					redirect(action: "listShipping")
 				}
 			}
 			render(view: "sendShipment", model: [shipmentInstance: shipmentInstance])
@@ -270,7 +270,7 @@ class ShipmentController {
 		def shipmentInstance = Shipment.get(params.id)		
 		if (!shipmentInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
-			redirect(action: "listIncoming")
+			redirect(action: "listReceiving")
 		}
 		else {			
 			if ("POST".equalsIgnoreCase(request.getMethod())) {				
@@ -287,7 +287,7 @@ class ShipmentController {
 					shipmentInstance.addToComments(comment).save(flush:true);
 					
 					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
-					redirect(action: "listIncoming")
+					redirect(action: "listReceiving")
 				}
 			}
 			else { 
@@ -311,7 +311,7 @@ class ShipmentController {
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
-			redirect(action: (params.type == "incoming") ? "listIncoming" : "listOutgoing")
+			redirect(action: (params.type == "incoming") ? "listReceiving" : "listShipping")
 		}
 		else {
 			[shipmentInstance: shipmentInstance]
@@ -322,7 +322,7 @@ class ShipmentController {
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
-			redirect(action: (params.type == "incoming") ? "listIncoming" : "listOutgoing")
+			redirect(action: (params.type == "incoming") ? "listReceiving" : "listShipping")
 		}
 		else {
 			//List<String[]> allElements = new ArrayList<String[]>();
@@ -389,7 +389,7 @@ class ShipmentController {
 		
 		if (!shipmentInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
-			redirect(action: (params.type == "incoming") ? "listIncoming" : "listOutgoing")
+			redirect(action: (params.type == "incoming") ? "listReceiving" : "listShipping")
 		}
 		else {
 			
@@ -404,7 +404,7 @@ class ShipmentController {
 		[ shipments : shipmentService.getShipments() ]
 	}
 	
-	def listIncoming = { 
+	def listReceiving = { 
 		def incomingShipments = null;		
 		def currentLocation = Location.get(session.warehouse.id);		
 		if (params.searchQuery) { 
@@ -441,7 +441,7 @@ class ShipmentController {
 	}
 	
 	
-	def listOutgoing = { 
+	def listShipping = { 
 		def currentLocation = Location.get(session.warehouse.id);		
 		def outgoingShipments = shipmentService.getShipmentsByOrigin(currentLocation);	
 		

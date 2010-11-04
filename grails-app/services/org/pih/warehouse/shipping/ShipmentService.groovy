@@ -30,7 +30,8 @@ class ShipmentService {
 			and { 
 				eq("origin", location)
 				or {
-					between("expectedShippingDate",now-5,now+30)
+					between("expectedShippingDate",null,null)
+					//between("expectedShippingDate",now-5,now+30)
 					isNull("expectedShippingDate")
 				}
 			}
@@ -53,7 +54,8 @@ class ShipmentService {
 	
 	List<Shipment> getRecentIncomingShipments(Long locationId) { 		
 		Location location = Location.get(locationId);
-		return Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30, 
+		//return Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30, 
+		return Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, null, null,
 			[max:5, offset:2, sort:"expectedShippingDate", order:"desc"]);
 	}
 	

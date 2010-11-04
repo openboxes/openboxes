@@ -4,7 +4,7 @@
 			<tbody>
 				<tr>
 					<td width="24px;">
-						<img src="${createLinkTo(dir:'images/icons',file: 'ShipmentType' + shipmentInstance?.shipmentType?.name + '.png')}"
+						<img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + shipmentInstance?.shipmentType?.name + '.png')}"
 							alt="${shipmentInstance?.shipmentType?.name}" style="vertical-align: middle; width: 48px; height: 48px;" />						
 					</td>
 					<td>
