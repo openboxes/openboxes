@@ -5,6 +5,11 @@ import org.pih.warehouse.core.Person;
 
 class Container implements Comparable, java.io.Serializable {
 
+	//def beforeDelete = {
+	//	shipment.removeFromContainers(this)
+	//}
+
+	
 	String name	
 	String containerNumber				// An official container number (if it exists)
 	String description					// Description of contents
@@ -22,25 +27,27 @@ class Container implements Comparable, java.io.Serializable {
 	ContainerType containerType			// Type of container
 	ContainerStatus containerStatus		// Status of the container (open, closed)
 	
-	Shipment shipment
+	//Shipment shipment
 	Container parentContainer			// the "containing" container
 	SortedSet containers				// Child containers (in combination with mapping, helps to order containers)
 
 	//static belongsTo = [ parentContainer : Container ]
-	//static belongsTo = [ shipment : Shipment ];
+	static belongsTo = [ shipment : Shipment ];
 	static hasMany = [ containers : Container ];
 	//static mappedBy = [containers: 'parentContainer']
 
 	static transients = [ "optionValue", "shipmentItems" ]
-	//static mapping = {
-	//	containers sort: 'sortOrder', order: 'asc'
-	//}
+	static mapping = {
+		//containers sort: 'sortOrder', order: 'asc'
+		containers cascade: "all-delete-orphan"
+	}
 		
 	// Constraints
 	static constraints = {	 
 		name(nullable:false)
 		description(nullable:true)
 		containerNumber(nullable:true)
+		parentContainer(nullable:true)
 		recipient(nullable:true)
 		height(nullable:true)
 		width(nullable:true)
@@ -53,13 +60,7 @@ class Container implements Comparable, java.io.Serializable {
 		//parentContainer(nullable:true)
 		containerStatus(nullable:true)
 		sortOrder(nullable:true)
-	}
-	
-	
-	//def beforeDelete = {
-	//	shipment.removeFromContainers(this)
-	//}
-	
+	}	
 
 	int compareTo(obj) { 
 		return sortOrder.compareTo(obj.sortOrder) 

@@ -5,26 +5,27 @@
 				<tr>
 					<td width="24px;">
 						<img src="${createLinkTo(dir:'images/icons',file: 'ShipmentType' + shipmentInstance?.shipmentType?.name + '.png')}"
-							alt="${shipmentInstance?.shipmentType?.name}" style="vertical-align: middle; width: 24px; height: 24px;" />						
+							alt="${shipmentInstance?.shipmentType?.name}" style="vertical-align: middle; width: 48px; height: 48px;" />						
 					</td>
 					<td>
-						
-						<span style="font-size: 1.2em;">${shipmentInstance?.name}</span> 
-						<div style="color: #aaa; font-size: 0.9em;">
-							Shipment Number: &nbsp; ${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}
+						<div style="font-size: 1.5em; font-weight: bold; line-height: 1em;">${shipmentInstance?.name}</div> 
+						<div class="fade" style="font-size: 0.9em; line-height: 20px;">
+							#${fieldValue(bean: shipmentInstance, field: "shipmentNumber")} | ${shipmentInstance?.shipmentType?.name}
 						</div>	
 					</td>	
 										
 					<td style="text-align: right;">
-						<g:if test="${shipmentInstance?.mostRecentEvent?.eventType?.eventStatus?.name}">
-							<img src="${createLinkTo(dir:'images/icons/eventStatus',file: shipmentInstance?.mostRecentEvent?.eventType?.eventStatus?.name?.toLowerCase() + '.png')}"
-								alt="${shipmentInstance?.mostRecentEvent?.eventType?.eventStatus?.name}" style="vertical-align: middle"/>							
-						</g:if>
-						<g:else>
-							<img src="${createLinkTo(dir:'images/icons/eventStatus',file: 'invalid.png')}"
-								alt="Invalid" style="vertical-align: middle"/>							
-						</g:else>
-						<span class="fade">${shipmentInstance?.mostRecentEvent?.eventType?.eventStatus?.name}</span>
+						<div class="fade" style="font-weight: bold; font-size:1.5em;">
+							<g:if test="${shipmentInstance?.mostRecentEvent?.eventType?.eventStatus?.name}">
+								<img src="${createLinkTo(dir:'images/icons/eventStatus',file: shipmentInstance?.mostRecentEvent?.eventType?.eventStatus?.name?.toLowerCase() + '.png')}"
+									alt="${shipmentInstance?.mostRecentEvent?.eventType?.eventStatus?.name}" style="vertical-align: middle"/>							
+							</g:if>
+							<g:else>
+								<img src="${createLinkTo(dir:'images/icons/eventStatus',file: 'invalid.png')}"
+									alt="Invalid" style="vertical-align: middle"/>							
+							</g:else>
+							${shipmentInstance?.mostRecentEvent?.eventType?.name}
+						</div>
 					</td>
 				</tr>
 			</tbody>

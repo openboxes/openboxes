@@ -5,10 +5,13 @@ import org.pih.warehouse.product.Product;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.donation.Donor;
 
-
-
 class ShipmentItem implements Comparable, java.io.Serializable {
 
+	//def beforeDelete = {
+	//	container.removeFromShipmentItems(this)
+	//}
+
+	
 	String lotNumber			// Loose coupling to the inventory lot 
 	Product product		    	// Specific product that we're tracking
 	Integer quantity		    // Quantity could be a class on its own

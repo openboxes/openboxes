@@ -68,8 +68,12 @@ class Shipment implements Serializable {
 	// use a SortedSet for events and have the Event class implement Comparable. 
 
 	static mapping = {
+		containers cascade: "all-delete-orphan"
+		shipmentItems cascade: "all-delete-orphan"
 		//containers sort: 'dateCreated', order: 'asc'
+		//events joinTable:[name:'shipment_event', key:'shipment_id', column:'event_id']
 	}	
+
 	/*	
 	static mapping = {
 		containers sort: 'dateCreated', order: 'asc'

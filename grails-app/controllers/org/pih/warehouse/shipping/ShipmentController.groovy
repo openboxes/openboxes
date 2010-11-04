@@ -247,7 +247,15 @@ class ShipmentController {
 		}
 		else {
 			if ("POST".equalsIgnoreCase(request.getMethod())) {	
-				shipmentInstance.delete();
+				//shipmentInstance.shipmentItems.clear();
+				//shipmentInstance.containers.clear();
+				Shipment.withTransaction { tx -> 
+					shipmentInstance.delete();
+					
+					
+					//tx.setRollbackOnly();
+				}
+				
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 				redirect(controller: "dashboard", action: "index")
 				return;
