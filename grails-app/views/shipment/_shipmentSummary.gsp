@@ -15,7 +15,7 @@
 						<b>${shipmentInstance?.name}</b>		
 					</td>
 					<td width="10%" style="text-align: center;" rowspan="2">
-						<img src="${createLinkTo(dir:'images/icons',file: 'ShipmentType' + shipmentInstance?.shipmentType?.name + '.png')}"
+						<img src="${createLinkTo(dir:'images/icons/shipmentType/',file: 'ShipmentType' + shipmentInstance?.shipmentType?.name + '.png')}"
 							alt="${shipmentInstance?.shipmentType?.name}" style="vertical-align: middle; width: 24px; height: 24px;" />
 						<br/><br/>
 						<g:link action="showDetails" id="${shipmentInstance.id}"><b>details</b>&nbsp;</g:link>							

@@ -17,28 +17,7 @@
 				<div class="message">${flash.message}</div>
             </g:if>
 
-<%--             
-            <div class="dialog">
-				<g:form method="get" action="listReceiving">
-	            	<fieldset>
-	            		<legend>Filter by</legend>				            
-						<table>
-							<tr class="prop">
-								<td class="name">
-									<label>Search</label>
-								</td>
-								<td>
-									<g:textField name="searchQuery" value="${params.searchQuery}"/>										
-								</td>										
-							</tr>
-						</table>				
-					</fieldset>
-				</g:form>
-			</div>
---%>			
             <div class="list">
-            
-
 				<g:if test="${shipmentInstanceMap.size()==0}">
             		<div class="notice">
             			<g:if test="${eventType?.name}">
@@ -69,7 +48,7 @@
 								<g:each var="shipmentInstance" in="${shipmentList.objectList}" status="i">
 									<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
 										<td width="3%" style="text-align: center">
-											<img src="${createLinkTo(dir:'images/icons',file: 'ShipmentType' + shipmentInstance?.shipmentType?.name + '.png')}"
+											<img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + shipmentInstance?.shipmentType?.name + '.png')}"
 											alt="${shipmentInstance?.shipmentType?.name}" style="vertical-align: middle; width: 24px; height: 24px;" />		
 										</td>										
 										<td width="20%">

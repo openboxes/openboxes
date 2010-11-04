@@ -89,7 +89,7 @@
 								<g:each var="shipmentInstance" in="${shipmentList.objectList}" status="i">
 									<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
 										<td width="3%" style="text-align: center">
-											<img src="${createLinkTo(dir:'images/icons',file: 'ShipmentType' + shipmentInstance?.shipmentType?.name + '.png')}"
+											<img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + shipmentInstance?.shipmentType?.name + '.png')}"
 											alt="${shipmentInstance?.shipmentType?.name}" style="vertical-align: middle; width: 24px; height: 24px;" />		
 										</td>										
 										<td width="20%">
