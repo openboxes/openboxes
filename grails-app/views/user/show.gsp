@@ -14,8 +14,11 @@
             <g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>
             </g:if>
+            
+            
+            <g:render template="summary"/>
 			<fieldset>
-				<g:render template="summary"/>
+				
 	            <div class="dialog">
 	                <table>
 	                    <tbody>
@@ -30,7 +33,7 @@
 	                    
 	                        <tr class="prop">
 	                            <td valign="top" class="name"><g:message code="user.name.label" default="Name" /></td>                            
-	                            <td valign="top" class="value">${fieldValue(bean: userInstance, field: "lastName")}, ${fieldValue(bean: userInstance, field: "firstName")}</td>                            
+	                            <td valign="top" class="value">${fieldValue(bean: userInstance, field: "name")}</td>                            
 	                        </tr>
 	                    
 	                        <tr class="prop">
@@ -44,7 +47,10 @@
 	                        </tr>
 	                        <tr class="prop">
 	                            <td valign="top" class="name"><g:message code="user.roles.label" default="Roles" /></td>
-	                            <td valign="top" class="value">${fieldValue(bean: userInstance, field: "roles")}</td>
+	                            <td valign="top" class="value">
+	                            	<g:if test="${userInstance?.roles}">${fieldValue(bean: userInstance, field: "roles")}</g:if>
+	                            	<g:else><span class="fade">empty</span></g:else>
+	                            </td>
 	                        </tr>
 	                        <tr class="prop">
 	                            <td valign="top" class="name"><g:message code="user.photo.label" default="Profile Photo" /></td>                            
@@ -69,8 +75,8 @@
 								</td>
 							</tr>
 							<tr class="prop">
-	                            <td valign="top" class="name"></td>
-	                            <td valign="top" class="value">
+	                            <td valign="top" class="prop name"></td>
+	                            <td valign="top" class="prop value">
 									<g:form>
 										<g:hiddenField name="id" value="${userInstance?.id}" />
 										<div class="buttons">
@@ -85,7 +91,7 @@
 										</div>						
 									</g:form>
 								</td>
-	                        </tr>
+	                        </tr>	                        
 	                    </tbody>
 	                </table>
 	            </div>

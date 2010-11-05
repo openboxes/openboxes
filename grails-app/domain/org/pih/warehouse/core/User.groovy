@@ -28,8 +28,13 @@ class User extends Person {
 		active(nullable:true)
 		manager(nullable:true)
 		photo(nullable:true, maxSize:10485760) // 10 MBs
-		username(nullable: false, blank:false)
-		password(blank:false, password: true)
+		username(nullable: false, blank:false, unique: true)		
+		password(nullable: false, blank: false, minSize: 6, validator: {password, obj ->
+			def passwordConfirm = obj.properties['passwordConfirm']
+			if(passwordConfirm == null) return true // skip matching password validation (only important when setting/resetting pass)
+			println "password: " + passwordConfirm + " " + password
+			passwordConfirm == password ? true : ['invalid.matchingpasswords']
+		})		
 		lastLoginDate(nullable:true)
 		warehouse(nullable:true)
 	}

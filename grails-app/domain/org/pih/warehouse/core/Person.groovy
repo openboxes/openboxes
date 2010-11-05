@@ -22,13 +22,14 @@ class Person implements Comparable, Serializable {
 	static transients = ["name"]
 	
 	static constraints = { 
-		firstName(nullable:true)	
-		lastName(nullable:true)	
-		email(nullable:true, email:true)
+		name(display:false)
+		firstName(nullable:false)	
+		lastName(nullable:false)	
+		email(nullable:false, email:true, unique:true)
 		phoneNumber(nullable:true)
 		dateCreated(display:false)
 		lastUpdated(display:false)
-		name(display:false)
+		
 	}
 	
 	int compareTo(obj) { obj.id <=> id }

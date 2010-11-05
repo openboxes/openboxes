@@ -1,11 +1,14 @@
 package org.pih.warehouse.user;
 
 import org.pih.warehouse.core.User;
+import org.pih.warehouse.core.Role;
+import org.pih.warehouse.core.RoleType;
 
 class UserController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
-    
+    def mailService;
+	
     /**
      * Show index page - just a redirect to the list page.
      */
@@ -99,6 +102,28 @@ class UserController {
 			userInstance.active = !userInstance.active;
 			if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), userInstance.id])}"
+				
+				// FIXME Refactor (place code in service layer)
+				// Send notification emails to all administrators
+				def recipients = [ ];
+				def roleAdmin = Role.findByRoleType(RoleType.ROLE_ADMIN)
+				if (roleAdmin) {
+					def criteria = User.createCriteria()
+					recipients = criteria.list {
+						roles { 
+							eq("id", roleAdmin.id)
+						}
+					}
+				}
+				recipients << userInstance;
+				if (recipients) {
+					recipients.each {
+						println "Sending email to " + it.email;
+						def subject = "User account has been " + (userInstance?.active ? "activated" : "de-activated");
+						def message = "User account " + userInstance?.username + " has been " + (userInstance?.active ? "activated" : "de-activated");
+						mailService.sendMail(subject, message, it.email);
+					}
+				}
 			}
 		}
 		redirect(action: "show", id: userInstance.id)
@@ -114,13 +139,27 @@ class UserController {
             if (params.version) {
                 def version = params.version.toLong()
                 if (userInstance.version > version) {
-                    
                     userInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'user.label', default: 'User')] as Object[], "Another user has updated this User while you were editing")
                     render(view: "edit", model: [userInstance: userInstance])
                     return
                 }
             }
-            userInstance.properties = params
+			
+			// Password in the db is different from the one specified 
+			// so the user must have changed the password.  We need 
+			// to compare the password with confirm password before 
+			// setting the new password in the database
+			if (userInstance.password != params.password) {
+				userInstance.properties = params
+				userInstance.password = params?.password?.encodeAsPassword();
+				userInstance.passwordConfirm = params?.passwordConfirm?.encodeAsPassword();
+			}
+			else { 
+				userInstance.properties = params	
+				userInstance.passwordConfirm = userInstance.password 			
+			}
+			
+			
             if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
                 flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), userInstance.id])}"
                 redirect(action: "show", id: userInstance.id)
@@ -139,18 +178,23 @@ class UserController {
      * Delete a user
      */
     def delete = {    	
-    	log.info "delete user"
         def userInstance = User.get(params.id)
-        if (userInstance) {
-            try {
-                userInstance.delete(flush: true)
-                flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
-                redirect(action: "list")
-            }
-            catch (org.springframework.dao.DataIntegrityViolationException e) {
-                flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
-                redirect(action: "show", id: params.id)
-            }
+        if (userInstance) {			
+			if (userInstance?.id == session?.user?.id) { 
+				flash.message = "${message(code: 'default.cannot.delete.self.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+				redirect(action: "show", id: params.id)
+			}
+			else { 			
+	            try {
+	                userInstance.delete(flush: true)
+	                flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+	                redirect(action: "list")
+	            }
+	            catch (org.springframework.dao.DataIntegrityViolationException e) {
+	                flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+	                redirect(action: "show", id: params.id)
+	            }
+			}
         }
         else {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"

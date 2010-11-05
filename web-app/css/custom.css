@@ -43,7 +43,7 @@ body {
 #loginForm { 
 	width:400px;
 	position: absolute;
-	top: 125px;
+	top: 50px;
 	left: 50%;
 	margin-left: -200px;
 }
@@ -56,19 +56,12 @@ body {
 	width:400px;
 	height:  300px;
 	position: absolute;
-	top: 100px;
+	top: 50px;
 	left: 50%;
 	margin-left: -150px;
 }
 
 
-#chooseWarehouse { 
-	width: 500px;
-	position: absolute;
-	top: 100px;
-	left: 50%;
-	margin-left: -250px;
-}
 
 .menuButton, label, input, td, th { 	
 	font-size: 10pt;
@@ -309,7 +302,7 @@ hr.space {background:#fff;color:#fff;}
    padding-top: 5px;
    width:100%;
    text-align: center;
-   height: 40px;   /* Height of the footer */
+   height: 20px;   /* Height of the footer */
    background: #fff;
 }
 

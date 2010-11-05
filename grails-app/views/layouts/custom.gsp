@@ -199,9 +199,8 @@
 	      	<div id="menu" role="navigation" class="yui-b">
 		  		<g:if test="${session?.user}">
 					<!-- Navigation Menu -->				
-					<g:if test="${session?.warehouse}">
-						<g:render template="/common/menu"/>
-					</g:if>
+					
+					<g:render template="/common/menu"/>
 					<%-- 			  		
 			  		<div id="navMenu" class="homePagePanel">
 			      		<div class="panelTop"><!-- used to dislay the bottom border of the navigation menu --></div>

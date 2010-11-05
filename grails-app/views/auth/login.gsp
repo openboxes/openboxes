@@ -12,7 +12,7 @@
 	</style>
 
 	<div class="body">
-		<g:form controller="auth" action="doLogin" method="post">	
+		<g:form controller="auth" action="handleLogin" method="post">	
 		
 			<g:hiddenField name="targetUri" value="${params?.targetUri}" />
 			  
@@ -57,10 +57,10 @@
 								</tr>
 								<tr class="prop">
 									<td valign="top" class="name">
-										<label for="email"><g:message code="user.email.label" default="Email" /></label>
+										<label for="email"><g:message code="user.usernameOrEmail.label" default="Username or email" /></label>
 									</td>
 									<td valign="top" class="value ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
-										<g:textField name="email" value="${userInstance?.email}"  />
+										<g:textField name="username" value="${userInstance?.username}"  />
 									</td>
 								</tr>
 								<tr class="prop">

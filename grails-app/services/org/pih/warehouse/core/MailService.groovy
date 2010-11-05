@@ -14,32 +14,40 @@ class MailService {
 	Integer port = Integer.parseInt ("${config.grails.mail.port}") 	// 23; 
 	
 	def sendMail(String subject, String msg, String to) {	
-		//SimpleEmail is the class which will do all the hard work for you
-		SimpleEmail email = new SimpleEmail()
-		email.setHostName(host)
-		email.addTo(to)
-		email.setFrom(from)
-		email.setSubject("[OpenBoxes] " + subject)
-		email.setMsg(msg)		
-		//email.setAuthentication(username,password)		
-		//email.setSmtpPort(port)		
-		email.send()
+		try { 
+			//SimpleEmail is the class which will do all the hard work for you
+			SimpleEmail email = new SimpleEmail()
+			email.setHostName(host)
+			email.addTo(to)
+			email.setFrom(from)
+			email.setSubject("[OpenBoxes] " + subject)
+			email.setMsg(msg)		
+			//email.setAuthentication(username,password)		
+			//email.setSmtpPort(port)		
+			email.send()
+		} catch (Exception e) { 
+			log.error("Error sending plaintext email message with subject " + subject + " to " + to, e);
+		}
 	}
 	
 	
 	def sendHtmlMail(String subject, String htmlMessage, String textMessage, String to) { 		
-		// Create the email message
-		HtmlEmail email = new HtmlEmail();
-		email.setHostName(host)
-		email.addTo(to)
-		email.setFrom(from)
-		email.setSubject("[OpenBoxes] " + subject)		
-		// embed the image and get the content id
-		//URL url = new URL("http://www.apache.org/images/asf_logo_wide.gif");
-		//String cid = email.embed(url, "Apache logo");
-		email.setHtmlMsg(htmlMessage);
-		email.setTextMsg(textMessage);
-		email.send();	  
+		try { 			
+			// Create the email message
+			HtmlEmail email = new HtmlEmail();
+			email.setHostName(host)
+			email.addTo(to)
+			email.setFrom(from)
+			email.setSubject("[OpenBoxes] " + subject)		
+			// embed the image and get the content id
+			//URL url = new URL("http://www.apache.org/images/asf_logo_wide.gif");
+			//String cid = email.embed(url, "Apache logo");
+			email.setHtmlMsg(htmlMessage);
+			email.setTextMsg(textMessage);
+			email.send();	  
+		} catch (Exception e) { 
+			log.error("Error sending HTML email message with subject " + subject + " to " + to, e);		
+		}
 	}
 	
 	

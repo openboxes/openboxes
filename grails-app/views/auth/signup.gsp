@@ -15,7 +15,7 @@
 	</style>
 
 	<div class="body">
-		<g:form controller="auth" action="signup" method="post">		  
+		<g:form controller="auth" action="handleSignup" method="post">		  
 		    <div class="dialog">
 				<div id="signupForm">
 					<g:if test="${flash.message}">
@@ -27,7 +27,6 @@
 					       <g:renderErrors bean="${userInstance}" as="list" />
 					   </div>
 					</g:hasErrors>		
-			
 			
 					<fieldset> 			
 						<legend>		
@@ -42,25 +41,14 @@
 						<table>
 							<tbody>
 
-							<tr>
-								<td colspan="2">
-									Enter your account details below.
-								</td>	
-							</tr>
-
+								<tr>
+									<td colspan="2">
+										Enter your account details below.
+									</td>	
+								</tr>
 					            <tr class="prop">
 					                <td valign="top" class="name">
-					                    <label for="email"><g:message code="user.name.label" default="Email" /></label>
-					                </td>
-					                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
-					                    <g:textField name="email" value="${userInstance?.email}" />
-					                </td>
-					            </tr>
-
-					            
-					            <tr class="prop">
-					                <td valign="top" class="name">
-					                    <label for="firstName"><g:message code="user.name.label" default="First Name" /></label>
+					                    <label for="firstName"><g:message code="user.firstName.label" default="First Name" /></label>
 					                </td>
 					                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'firstName', 'errors')}">
 					                    <g:textField name="firstName" value="${userInstance?.firstName}" />
@@ -69,17 +57,35 @@
 	
 					            <tr class="prop">
 					                <td valign="top" class="name">
-					                    <label for="lastName"><g:message code="user.name.label" default="Last Name" /></label>
+					                    <label for="lastName"><g:message code="user.lastName.label" default="Last Name" /></label>
 					                </td>
 					                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'lastName', 'errors')}">
 					                    <g:textField name="lastName" value="${userInstance?.lastName}" />
 					                </td>
 					            </tr>
+
+					            <tr class="prop">
+					                <td valign="top" class="name">
+					                    <label for="email"><g:message code="user.email.label" default="Email" /></label>
+					                </td>
+					                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'email', 'errors')}">
+					                    <g:textField name="email" value="${userInstance?.email}" />
+					                </td>
+					            </tr>
 					        
-							<tr class="prop">
-								<td colspan="2"><hr/></td>
-							</tr>
+								<tr class="prop">
+									<td colspan="2"><hr/></td>
+								</tr>
 						
+					            <tr class="prop">
+					                <td valign="top" class="name">
+					                    <label for="username"><g:message code="user.username.label" default="Username" /></label>
+					                </td>
+					                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
+					                    <g:textField name="username" value="${userInstance?.username}" />
+					                </td>
+					            </tr>
+
 	
 					            <tr class="prop">
 					                <td valign="top" class="name">
