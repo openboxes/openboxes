@@ -19,7 +19,7 @@
 				<g:if test="${shipmentInstanceMap.size()==0}">
             		<div class="message">
             			<g:if test="${eventType?.name}">
-            				There are no shipments with event type <b>${eventType.name}</b>.
+            				There are no shipments with event type <b>${eventType?.name}</b>.
             			</g:if>
             			<g:else>
     		        		There are no shipments matching your conditions.
@@ -58,7 +58,7 @@
 											<g:if test="${!shipmentInstance.events}"></g:if>
 											<g:else>
 												<div>
-													${shipmentInstance.mostRecentEvent.eventType.name}
+													${shipmentInstance?.mostRecentEvent?.eventType?.name}
 												</div>									
 											</g:else>											
 										</td>
