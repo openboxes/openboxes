@@ -14,6 +14,8 @@ class TransactionType {
 		name(nullable:false)
 		description(nullable:true)
 		sortOrder(nullable:true)
+		dateCreated(display:false)
+		lastUpdated(display:false)
 	}
 
 	static mapping = {

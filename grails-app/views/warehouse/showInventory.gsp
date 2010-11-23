@@ -74,7 +74,7 @@
 			<g:each in="${transaction.transactionEntries}" var="transactionEntry" status="j">
 			  <tr class="${(j % 2) == 0 ? 'odd' : 'even'}">			    
 			    <td>${fieldValue(bean: transactionEntry, field: "product.name")}</td>
-			    <td>${fieldValue(bean: transactionEntry, field: "quantityChange")}</td>
+			    <td>${fieldValue(bean: transactionEntry, field: "quantity")}</td>
 			  </tr>
 			</g:each>
 		      </g:each>

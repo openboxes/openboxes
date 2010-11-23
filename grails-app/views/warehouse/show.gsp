@@ -21,9 +21,11 @@
 	                    <tbody>                    
 	                    	<tr>
 			        			<td valign="top" colspan="2">
+			        				<g:if test="${warehouseInstance?.logo }">
 		            				<img class="photo" width="25" height="25" 
-		            					src="${createLink(controller:'warehouse', action:'viewLogo', id:warehouseInstance.id)}" style="vertical-align: bottom" />
+		            					src="${createLink(controller:'warehouse', action:'viewLogo', id:warehouseInstance.id)}" style="vertical-align: bottom" />		            				
 		            				&nbsp;
+		            				</g:if>
 			            			<span style="font-weight: bold; font-size: 200%">${fieldValue(bean: warehouseInstance, field: "name")}</span>
 								</td>            
 	                    	</tr>
@@ -55,35 +57,15 @@
 	                        <tr class="prop">
 	                            <td valign="top" class="name"><g:message code="warehouse.inventory.label" default="Inventory" /></td>
 	                            <td valign="top" class="value">
-				      				<g:link controller="warehouse" action="showInventory" id="${warehouseInstance?.id}">${warehouseInstance?.inventory?.encodeAsHTML()}</g:link>
+				      				<g:link controller="inventory" action="show" id="${warehouseInstance?.inventory?.id}">${warehouseInstance?.inventory?.encodeAsHTML()}</g:link>
 							    </td>
 	                        </tr>
-	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="warehouse.transactions.label" default="Transactions" /></td>
-	                            <td valign="top" class="value">
-									<table>
-										<g:each in="${warehouseInstance.transactions}" var="transaction" status="i">
-											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-												<td>${fieldValue(bean: transaction, field: "id")}</td>
-												<td>${fieldValue(bean: transaction, field: "transactionDate")}</td>
-												<td>${fieldValue(bean: transaction, field: "inventory.id")}</td>
-												<td>${fieldValue(bean: transaction, field: "thisWarehouse")}</td>
-	
-											</tr>
-										</g:each>				
-									</table>
-							    </td>
-	                        </tr>
+	                        
 	                        <tr class="prop">
 	                            <td valign="top" class="name"><g:message code="user.photo.label" default="Profile Photo" /></td>                            
 	                            <td valign="top" class="value">							
 									<img class="photo" src="${createLink(controller:'warehouse', action:'viewLogo', id:warehouseInstance.id)}" />
-								</td>
-							</tr>
-							<tr class="prop">
-								<td class="name">
-								</td>
-								<td>							
+									<br/>
 									<g:form controller="warehouse" method="post" action="uploadLogo" enctype="multipart/form-data">
 										<input type="hidden" name="id" value="${warehouseInstance.id}" />
 										<input type="file" name="logo"/>

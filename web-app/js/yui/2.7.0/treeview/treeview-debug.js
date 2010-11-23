@@ -2,7 +2,7 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.1
+version: 2.8.2r1
 */
 (function () {
     var Dom = YAHOO.util.Dom,
@@ -4055,4 +4055,4 @@ YAHOO.widget.TVFadeOut.prototype = {
     }
 };
 
-YAHOO.register("treeview", YAHOO.widget.TreeView, {version: "2.8.1", build: "19"});
+YAHOO.register("treeview", YAHOO.widget.TreeView, {version: "2.8.2r1", build: "7"});

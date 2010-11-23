@@ -8,13 +8,20 @@ import java.util.Date;
 class Location implements java.io.Serializable {
 	String name
 	byte [] logo				// logo
-	String logoUrl 
 	Address address
+	LocationType locationType	
+	Location parentLocation; 
+	
 	Date dateCreated;
 	Date lastUpdated;
 	
+	static belongsTo = [ parentLocation : Location ]
+	static hasMany = [ locations : Location ]
+	
 	static constraints = {
+		name(nullable:false)
+		address(nullable:true)
+		locationType(nullable:true)
 		logo(nullable:true, maxSize:10485760) // 10 MBs
-		logoUrl(nullable:true)
 	}
 }

@@ -174,22 +174,16 @@
 		    	<div id="content" class="yui-b">
 					<!-- Populated using the 'pageTitle' property defined in the GSP file -->
 					<g:if test="${session.user}">
-						<g:if test="${pageProperty(name:'page.pageTitle')}">
-						    <div id="pageTitle">					    
-							    <g:if test="${session?.warehouse}">
-									<b>${session?.warehouse?.name}</b>
-								</g:if>
-						    	<h1><g:layoutTitle /></h1>
-						    </div>
-						</g:if>
-						<g:else>
-				    		<div id="pageTitle">
-							    <g:if test="${session?.warehouse}">
-									<b>${session?.warehouse?.name}</b>
-								</g:if>
-					    		<h1><g:layoutTitle /></h1>
-				    		</div>
-						</g:else>
+						<h3>
+						    <div id="pageTitle">		
+								<img src="${createLinkTo(dir:'images/icons/silk/',file: 'building.png')}" /> 
+								<g:if test="${session?.warehouse}">${session?.warehouse?.name}&nbsp;&raquo;&nbsp;</g:if>
+							    <g:message code="${params.controller }.label"/>&nbsp;&raquo;&nbsp;			
+								
+								<g:if test="${pageProperty(name:'page.pageTitle')}"><b>${pageProperty(name:'page.pageTitle')}</b></g:if>
+								<g:else><b><g:layoutTitle /></b></g:else>
+							</div>
+						</h3>
 					</g:if>
 					<g:layoutBody />
 				</div>

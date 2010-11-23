@@ -3,18 +3,20 @@ package org.pih.warehouse.inventory;
 import org.pih.warehouse.product.Product;
 
 class TransactionEntry {
-
-    Product product					// Should actually be a batch or lot
-    Integer quantityChange			// Convention: negative number means OUT, positive number means IN
-
-    String toString() { return "$quantityChange $product"; }
-
-
+	
+	Product product					// Optional
+	String lotNumber				// Optional 
+    Integer quantity				// Convention: negative number means OUT, positive number means IN
+	InventoryItem inventoryItem		// The inventory item (or product being tracked)
+	
     static belongsTo = [ transaction : Transaction ]
 
     static constraints = {
-		product(nullable:true)
-		quantityChange(nullable:true)	
-
+		//product(nullable:false)
+		inventoryItem(nullable:false)		
+		quantity(nullable:false)
+		product(nullable:true)	
+		lotNumber(nullable:true)
+		
     }
 }

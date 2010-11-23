@@ -12,7 +12,8 @@
 	width: 95%;		/* stretch the main content */
 }
 
-li.ui-menu-item { text-align: left; font-weight: bold; } 
+li.ui-menu-item { text-align: left; font-weight: bold; }
+h3 { font-size: 1.25em; } 
 h3.ui-state-active { background-color: #F8F7EF; }
 .ui-accordion .ui-accordion-content { padding: 0px; } 
 .body { 
@@ -20,6 +21,10 @@ h3.ui-state-active { background-color: #F8F7EF; }
 }
 #dashboard { 
 	margin: 20px; 	
+}
+
+img { 
+	vertical-align: middle;
 }
 
 body { 
@@ -137,7 +142,7 @@ table#listOutgoing th {
 }
 .menu .menuSection { 
 	padding-right: 0px; 
-	padding-bottom: 10px;
+	padding-bottom: 0px;
 }
 .menu .menuSection ul { 
 	padding-top: 5px; 

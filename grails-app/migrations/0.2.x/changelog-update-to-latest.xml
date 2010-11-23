@@ -146,7 +146,7 @@
             <column name="shipment_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
-        </createTable>
+        </createTable>        
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1283826482822-2">
         <createTable tableName="receipt_item">
@@ -554,5 +554,808 @@
 		<sql>
 			ALTER TABLE shipment_item MODIFY COLUMN container_id BIGINT(20) DEFAULT NULL;
 		</sql>
+	</changeSet>		
+    <changeSet author="jmiranda" id="1289252228964-1">
+	    <validCheckSum>ee23dff97958f73c667be43f1aeba9f</validCheckSum>
+    	<comment>Delete all transaction types.</comment>
+    	<sql>	
+    		DELETE FROM transaction_type;    	
+    	</sql>
 	</changeSet>
+    <changeSet author="jmiranda" id="1289252228964-2">
+    	<validCheckSum>80e35da905d0bbf2c59bfca218834f</validCheckSum>
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="1"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-11-08"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-11-08"/>
+            <column name="name" value="Transfer"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="2"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-11-08"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-11-08"/>
+            <column name="name" value="Consumption"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="3"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-11-08"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-11-08"/>
+            <column name="name" value="Adjustment"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="4"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-11-08"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-11-08"/>
+            <column name="name" value="Expired"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="5"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-11-08"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-11-08"/>
+            <column name="name" value="Damaged"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="6"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-11-08"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-11-08"/>
+            <column name="name" value="Borrowed"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    
+	<changeSet author="jmiranda" id="1290012682448-0">
+    	<comment>Delete all product types.</comment>
+    	<sql>	
+		    update product set product_type_id = null;
+    	</sql>
+	</changeSet>    
+
+	<changeSet author="jmiranda" id="1290012682448-1">
+    	<comment>Delete all product types.</comment>
+    	<sql>	
+		    delete from product_type;
+    	</sql>
+	</changeSet>    
+
+    <changeSet author="jmiranda (generated)" id="1290012682448-2">
+        <insert tableName="product_type">
+            <column name="id" valueNumeric="1"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="HIV"/>
+            <column name="parent_product_type_id"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290012682448-3">
+        <insert tableName="product_type">
+            <column name="id" valueNumeric="2"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="TB"/>
+            <column name="parent_product_type_id"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290012682448-4">
+        <insert tableName="product_type">
+            <column name="id" valueNumeric="3"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Injectable"/>
+            <column name="parent_product_type_id"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290012682448-5">
+        <insert tableName="product_type">
+            <column name="id" valueNumeric="4"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Lab Supply"/>
+            <column name="parent_product_type_id"/>
+            <column name="sort_order" valueNumeric="4"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290012682448-6">
+        <insert tableName="product_type">
+            <column name="id" valueNumeric="5"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Med Supply"/>
+            <column name="parent_product_type_id"/>
+            <column name="sort_order" valueNumeric="5"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290012682448-7">
+        <insert tableName="product_type">
+            <column name="id" valueNumeric="6"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Radiology"/>
+            <column name="parent_product_type_id"/>
+            <column name="sort_order" valueNumeric="6"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290012682448-8">
+        <insert tableName="product_type">
+            <column name="id" valueNumeric="7"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="SOP"/>
+            <column name="parent_product_type_id"/>
+            <column name="sort_order" valueNumeric="7"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290012682448-9">
+        <insert tableName="product_type">
+            <column name="id" valueNumeric="8"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Topical"/>
+            <column name="parent_product_type_id"/>
+            <column name="sort_order" valueNumeric="8"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290012682448-10">
+        <insert tableName="product_type">
+            <column name="id" valueNumeric="9"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Narcotic"/>
+            <column name="parent_product_type_id"/>
+            <column name="sort_order" valueNumeric="9"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290012682448-11">
+        <insert tableName="product_type">
+            <column name="id" valueNumeric="10"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Oral Med"/>
+            <column name="parent_product_type_id"/>
+            <column name="sort_order" valueNumeric="10"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290012682448-12">
+        <insert tableName="product_type">
+            <column name="id" valueNumeric="11"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Eye Care"/>
+            <column name="parent_product_type_id"/>
+            <column name="sort_order" valueNumeric="11"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290012682448-13">
+        <insert tableName="product_type">
+            <column name="id" valueNumeric="12"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Nutrition"/>
+            <column name="parent_product_type_id"/>
+            <column name="sort_order" valueNumeric="12"/>
+        </insert>
+    </changeSet> 
+	
+    <changeSet author="jmiranda (generated)" id="1290446254184-01">
+    	<preConditions onFail="MARK_RAN">
+    		<tableExists tableName="transaction_entry"/>
+    	</preConditions>
+		<dropTable tableName="transaction_entry"/>
+	</changeSet>
+    <changeSet author="jmiranda (generated)" id="1290446254184-02">
+    	<preConditions onFail="MARK_RAN">
+    		<tableExists tableName="transaction"/>
+    	</preConditions>
+		<dropTable tableName="transaction"/>
+	</changeSet>
+    <changeSet author="jmiranda (generated)" id="1290446254184-03">
+    	<preConditions onFail="MARK_RAN">
+    		<tableExists tableName="inventory_inventory_lot"/>
+    	</preConditions>
+		<dropTable tableName="inventory_inventory_lot"/>
+	</changeSet>
+    <changeSet author="jmiranda (generated)" id="1290446254184-04">
+    	<preConditions onFail="MARK_RAN">
+    		<tableExists tableName="inventory_item"/>
+    	</preConditions>
+		<dropTable tableName="inventory_item"/>
+	</changeSet>
+    <changeSet author="jmiranda (generated)" id="1290446254184-05">
+    	<preConditions onFail="MARK_RAN">
+    		<tableExists tableName="inventory_lot"/>
+    	</preConditions>
+		<dropTable tableName="inventory_lot"/>		
+	</changeSet>
+	
+    <changeSet author="jmiranda (generated)" id="1290449480096-1">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="inventory_item" /></not>
+		</preConditions>   
+        <createTable tableName="inventory_item">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="active" type="BIT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ideal_quantity" type="INT"/>
+            <column name="inventory_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="inventory_item_type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lot_number" type="VARCHAR(255)"/>
+            <column name="low_quantity" type="INT"/>
+            <column name="max_quantity" type="INT"/>
+            <column name="min_quantity" type="INT"/>
+            <column name="product_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reorder_quantity" type="INT"/>
+            <column name="serial_number" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290449480096-2">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="inventory_lot" /></not>
+		</preConditions>   
+        <createTable tableName="inventory_lot">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expiration_date" type="DATETIME"/>
+            <column name="initial_quantity" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="inventory_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lot_number" type="VARCHAR(255)"/>
+            <column name="manufacture_date" type="DATETIME"/>
+            <column name="product_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>        
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290449480096-3">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="location_type" /></not>
+		</preConditions>   
+        <createTable tableName="location_type">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290449480096-4">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="lookup" /></not>
+		</preConditions>   
+        <createTable tableName="lookup">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT"/>
+            <column name="class" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290449480096-5">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="product_code" /></not>
+		</preConditions>   
+        <createTable tableName="product_code">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290449480096-6">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="product_group" /></not>
+		</preConditions>   
+        <createTable tableName="product_group">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290449480096-7">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="setting" /></not>
+		</preConditions>   
+        <createTable tableName="setting">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(7)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290449480096-8">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="transaction" /></not>
+		</preConditions>   
+        <createTable tableName="transaction">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by_id" type="BIGINT"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="destination_id" type="BIGINT"/>
+            <column name="inventory_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_date" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_type_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290449480096-9">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="transaction_entry" /></not>
+		</preConditions>   
+		<createTable tableName="transaction_entry">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="inventory_item_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lot_number" type="VARCHAR(255)"/>
+            <column name="product_id" type="BIGINT"/>
+            <column name="quantity" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290449480096-10">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="unit_of_measure" /></not>
+		</preConditions>    
+        <createTable tableName="unit_of_measure">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290449480096-11">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="inventory" columnName="date_created"/></not>
+		</preConditions>    
+        <addColumn tableName="inventory">
+            <column name="date_created" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290449480096-12">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="inventory" columnName="last_updated"/></not>
+		</preConditions>    
+        <addColumn tableName="inventory">
+            <column name="last_updated" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290449480096-13">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="location" columnName="active"/></not>
+		</preConditions>    
+        <addColumn tableName="location">
+            <column name="active" type="BIT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290449480096-14">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="location" columnName="location_type_id"/></not>
+		</preConditions>    
+        <addColumn tableName="location">
+            <column name="location_type_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290449480096-15">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="location" columnName="parent_location_id"/></not>
+		</preConditions>    
+        <addColumn tableName="location">
+            <column name="parent_location_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290449480096-16">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="product" columnName="budget_code_id"/></not>
+		</preConditions>    
+        <addColumn tableName="product">
+            <column name="budget_code_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290449480096-17">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="product" columnName="code"/></not>
+		</preConditions>    
+        <addColumn tableName="product">
+            <column name="code" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290449480096-18">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="product" columnName="ean"/></not>
+		</preConditions>    
+        <addColumn tableName="product">
+            <column name="ean" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290449480096-19">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="product" columnName="french_name"/></not>
+		</preConditions>    
+        <addColumn tableName="product">
+            <column name="french_name" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290449480096-20">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="product" columnName="product_group_id"/></not>
+		</preConditions>    
+        <addColumn tableName="product">
+            <column name="product_group_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290449480096-21">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="product" columnName="quantity_per_unit"/></not>
+		</preConditions>    
+        <addColumn tableName="product">
+            <column name="quantity_per_unit" type="INT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290449480096-22">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="product" columnName="sku"/></not>
+		</preConditions>    
+        <addColumn tableName="product">
+            <column name="sku" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290449480096-23">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="product" columnName="unit_of_measure_id"/></not>
+		</preConditions>
+		<addColumn tableName="product">
+            <column name="unit_of_measure_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290449480096-24">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="product_type" columnName="code"/></not>
+		</preConditions>    
+        <addColumn tableName="product_type">
+            <column name="code" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+	
+	
+	<!--  Made a mistake in associating the inventory levels with inventory items  -->
+	<changeSet author="jmiranda (generated)" id="1290449480096-39">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="inventory_item" columnName="ideal_quantity"/>
+		</preConditions>
+        <dropColumn tableName="inventory_item" columnName="ideal_quantity"/>
+	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1290449480096-40">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="inventory_item" columnName="low_quantity"/>
+		</preConditions>
+        <dropColumn tableName="inventory_item" columnName="low_quantity"/>
+    </changeSet>
+	<changeSet author="jmiranda (generated)" id="1290449480096-41">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="inventory_item" columnName="max_quantity"/>
+		</preConditions>
+        <dropColumn tableName="inventory_item" columnName="max_quantity"/>
+    </changeSet>
+	<changeSet author="jmiranda (generated)" id="1290449480096-42">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="inventory_item" columnName="min_quantity"/>
+		</preConditions>
+        <dropColumn tableName="inventory_item" columnName="min_quantity"/>
+    </changeSet>
+	<changeSet author="jmiranda (generated)" id="1290449480096-43">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="inventory_item" columnName="reorder_quantity"/>
+		</preConditions>
+        <dropColumn tableName="inventory_item" columnName="reorder_quantity"/>
+    </changeSet>
+	
+
+	<!--  Creating the new inventory level table -->	
+    <changeSet author="jmiranda (generated)" id="1290452414238-1">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="inventory_level" /></not>
+		</preConditions>    
+        <createTable tableName="inventory_level">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ideal_quantity" type="INT"/>
+            <column name="inventory_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="low_quantity" type="INT"/>
+            <column name="max_quantity" type="INT"/>
+            <column name="min_quantity" type="INT"/>
+            <column name="product_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reorder_quantity" type="INT"/>
+        </createTable>
+    </changeSet>    
+    <changeSet author="jmiranda (generated)" id="1290452414238-2">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="location" columnName="local"/></not>
+		</preConditions>
+        <addColumn tableName="location">
+            <column name="local" type="BIT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290452414238-3">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="location" columnName="local"/>
+		</preConditions>
+		<update tableName="location">
+		    <column name="local" valueBoolean="true"/>
+		</update>
+	</changeSet>
+    <changeSet author="jmiranda (generated)" id="1290452414238-4">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="location" columnName="active"/>
+		</preConditions>
+		<update tableName="location">
+		    <column name="active" valueBoolean="true"/>
+		</update>
+	</changeSet>
+	
+	
+<!-- 
+
+    <changeSet author="jmiranda (generated)" id="1290477989262-1">
+        <createIndex indexName="FKFE01941672A2C5B4" tableName="inventory_item" unique="false">
+            <column name="inventory_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290477989262-2">
+        <createIndex indexName="FKFE019416DED5FAE7" tableName="inventory_item" unique="false">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290477989262-3">
+        <createIndex indexName="FKC254A2E172A2C5B4" tableName="inventory_level" unique="false">
+            <column name="inventory_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290477989262-4">
+        <createIndex indexName="FKC254A2E1DED5FAE7" tableName="inventory_level" unique="false">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290477989262-5">
+        <createIndex indexName="FKA518DDEE72A2C5B4" tableName="inventory_lot" unique="false">
+            <column name="inventory_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290477989262-6">
+        <createIndex indexName="FKA518DDEEDED5FAE7" tableName="inventory_lot" unique="false">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290477989262-7">
+        <createIndex indexName="FK714F9FB572A2C5B4" tableName="location" unique="false">
+            <column name="inventory_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290477989262-8">
+        <createIndex indexName="FK714F9FB57AF9A3C0" tableName="location" unique="false">
+            <column name="parent_location_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290477989262-9">
+        <createIndex indexName="FK7FA0D2DE10746729" tableName="transaction" unique="false">
+            <column name="destination_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290477989262-10">
+        <createIndex indexName="FK7FA0D2DE217F5972" tableName="transaction" unique="false">
+            <column name="created_by_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290477989262-11">
+        <createIndex indexName="FK7FA0D2DE72A2C5B4" tableName="transaction" unique="false">
+            <column name="inventory_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290477989262-12">
+        <createIndex indexName="FK7FA0D2DE74CDABFC" tableName="transaction" unique="false">
+            <column name="source_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290477989262-13">
+        <createIndex indexName="FKABC21FD1DED5FAE7" tableName="transaction_entry" unique="false">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+
+
+ -->
+
+    	
 </databaseChangeLog>

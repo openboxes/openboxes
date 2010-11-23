@@ -4,132 +4,103 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'product.label', default: 'Inventory')}" />
-        <title><g:message code="default.browse.label" args="[entityName]" /></title>
-		<!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.browse.label" args="[entityName]" /></content>
-    
-    	<style>
-    		.selected { font-weight: bold; border: 2px solid black; background-color: whitesmoke; padding: 5px; } 
-    	
-    	</style>
+        <g:set var="entityName" value="${message(code: 'inventory.label', default: 'Inventory')}" />
+        <title><g:message code="default.browse.label" args="[entityName]" /></title>    
+        
+        <style>
+        	.tabSelected { 
+        		text-align: center;
+	        	background-color: white; 
+	        	border: 1px solid black;
+	        	border-bottom: hidden; 
+        	}
+        	.tabDefault { 
+        		text-align: center;
+        		background-color: #f0f0f0; 
+        		border: 1px solid black; 
+        		border-bottom: 1px solid black; 
+        		border-top: 1px solid black; 
+        		border-right: 1px solid black; 
+        		border-left: 1px solid black;
+        	}
+        	.tabSpacer { 
+        		width: 3px;
+        		border-top: 0px;
+        		border-bottom: 1px solid black;
+        	}
+        	
+        </style>
     </head>    
 
-
     <body>
-    
         <div class="body" style="width: 95%">
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>						
-            <g:hasErrors bean="${productInstance}">
+            <g:hasErrors bean="${inventoryInstance}">
 	            <div class="errors">
-	                <g:renderErrors bean="${productInstance}" as="list" />
+	                <g:renderErrors bean="${inventoryInstance}" as="list" />
 	            </div>
-            </g:hasErrors>                        
-			<g:if test="${!inventoryInstance}">
-
-			</g:if>
-	 		<g:else>
-				<fieldset>
-					<legend></legend>						
-					<table>
-						<tr>
-							<td>			
-								<div id="inventoryBrowser">
-									<g:form method="get" action="browse">
-										<table>
-											<tr class="prop">
-												<td class="name">
-													<label>Name contains</label>
-												</td>
-												<td>
-													<g:textField name="nameContains" value="${params.nameContains}" size="30"/>		
-												</td>
-												<td>
-													<span class="buttons">
-														<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Filter" /> 
-															${message(code: 'default.button.filter.label', default: 'Filter')}</button>
-													</span>											
-												</td>
-												
-											</tr>
-							
-											<tr class="prop">
-												<td class="name"><label>Types</label></td>
-												<td class="value" colspan="2">										
-													<table>
-														<tr>
-															<g:each in="${productTypes}" status="i" var="productType">
-																<td>
-																	<span class="${(productType==selectedProductType)?'selected':''}">
-																		<a href="${createLink(action:'browse',params:["productTypeId":productType.id])}">${productType.name}</a>
-																	</span>
-																</td>
-																<g:if test="${(i+1)%6==0}"></tr><tr></g:if>
-															</g:each>
-														</tr>
-													</table>												
-												</td>
-											</tr>
-										</table>							
-									</g:form>			
-								</div>
-							</td>					
-						</tr>				
-						<tr>
-							<td colspan="2">
-								<div>
-						            <g:if test="${productInstanceList}">
-							 			<div>Your search returned ${productInstanceList.size} products.  </div>					            
-						                <table width="100%">
-						                    <thead>
-						                        <tr>             
-						                            <g:sortableColumn property="name" title="${message(code: 'inventory.product.label', default: 'Product')}" />
-						                            <g:sortableColumn property="name" title="${message(code: 'inventory.quantity.label', default: 'Quantity')}" />
-						                        </tr>
-						                    </thead>
-						                    <tbody>
-							                    <g:each in="${productInstanceList}" status="i" var="productInstance">
-							                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}" style="height: 3.5em">
-							                        	            
-														<td style="text-align: left">										
-															<%--<g:link action="show" id="${productInstance.id}">${fieldValue(bean: productInstance, field: "id")}</g:link> --%>
-															<g:if test="${productInstance.class.simpleName == 'DrugProduct'}">															
-																<img src="${createLinkTo(dir:'images/icons/silk',file: 'pill.png')}"/>
-															</g:if>
-															<g:elseif test="${productInstance.class.simpleName == 'DurableProduct' }">
-																<img src="${createLinkTo(dir:'images/icons/silk',file: 'computer.png')}"/>
-															</g:elseif>
-															<g:else>
-																<img src="${createLinkTo(dir:'images/icons/silk',file: 'page_white.png')}"/>
-															</g:else>
-															&nbsp;
-															<g:link action="show" id="${productInstance.id}">
-																${fieldValue(bean: productInstance, field: "upc")}
-																${fieldValue(bean: productInstance, field: "name")}
-															</g:link>
-															
-														</td>
-														
-														<td>
-															<span style="font-size: 2em;">													
-																<g:if test="${inventory}">
-																	${inventory.inventoryMap.get(productInstance) }
-																</g:if>
-															</span>
-														</td>
-							                        </tr>
-							                    </g:each>		                    
-						                    </tbody>
-						                </table>       
-						        	</g:if>   						        
-						        </div>
-							</td>
-						</tr>
+            </g:hasErrors>    
+            
+            
+            
+            <!-- <h1>${warehouseInstance?.name }</h1><br/> -->
+            <table>
+	            <thead>
+    				<tr>				
+						<th class="tabSpacer"></th>
+						<g:each var="productType" in="${productTypes}" status="i">
+							<th class="${((String.valueOf(productType.id)==params?.productType?.id) || (!params?.productType && i == 0))?'tabSelected':'tabDefault'}">								
+								<a href="${createLink(action:'browse',params:["productType.id":productType.id])}">${productType.name}</a>
+							</th>
+							<th class="tabSpacer"></th>
+						</g:each>    				
+    				</tr>        
+            	</thead>
+            </table>
+            
+            <div style="overflow: auto; height: 600px"> 
+            	<g:if test="${productType}">
+            		<g:set var="varStatus" value="${0 }"/>
+					<table border="1" style="border: 1px solid #a0a0a0">
+						<thead>
+							<tr class="even">
+								<th>Status</th>
+								<th>Product type</th>
+								<th>Product</th>
+								<th>Dosage</th>
+								<th>Quantity</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+					
+						<tbody>
+							<g:each var="productInstance" in="${productMap.get(productType) }" status="i">
+							 	<g:set var="itemInstanceList" value="${inventoryMap.get(productInstance)}"/>							
+								<tr class="${varStatus++%2==0?'odd':'even' }">
+									<td style="width: 2%;">
+									</td>								
+									<td style="width: 8%; text-align: center;">${productInstance?.productType?.name }</td>					
+									<td style="width: 30%;">${productInstance?.name }</td>					
+									<td style="width: 10%; text-align: left;">${productInstance?.dosageStrength } ${productInstance?.dosageUnit } ${productInstance?.dosageForm?.name }</td>
+									<td style="width: 5%; text-align: center;">
+										<g:if test="${itemInstanceList }">
+											${itemInstanceList*.quantity.sum() }
+										</g:if>
+										<g:else>
+											0
+										</g:else>
+									</td>
+									<td style="width: 15%; text-align: center">
+										<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">view stock card</g:link>
+									</td>
+								</tr>
+							</g:each>
+						</tbody>
 					</table>
-				</fieldset>
-			</g:else>
+				</g:if>
+			</div>
 		</div>
     </body>
 </html>

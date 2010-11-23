@@ -1,6 +1,9 @@
 package org.pih.warehouse.inventory;
 
+import java.util.Date;
+
 import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.core.User
 
 /**
  *  Represents a unit of work completed within a single warehouse.  A
@@ -20,22 +23,27 @@ import org.pih.warehouse.inventory.Inventory
  */
 class Transaction {
 
-    Date transactionDate	    		// Date entered into the warehouse
-    TransactionType transactionType 	// Detailed transaction type (e.g. Order, Transfer, Stock Count) 
-    Inventory inventory		    		// The inventory to which this is connected
-    Warehouse thisWarehouse	    		// The local warehouse that the transaction is 
-    Warehouse targetWarehouse	    	// where the transaction is going to / coming from
-
+    Warehouse source	    		
+    Warehouse destination					    		 
+	Date transactionDate	    		// Date entered into the warehouse
+    TransactionType transactionType 	// Detailed transaction type (e.g. Order, Transfer, Stock Count)
+	
+	// Auditing fields
+	User createdBy
+	Date dateCreated
+	Date lastUpdated
+	
+	
     // Association mapping
     static hasMany = [ transactionEntries : TransactionEntry ]
-    static belongsTo = [ thisWarehouse : Warehouse ]
+    static belongsTo = [ inventory : Inventory ]
 
     // Constraints 
     static constraints = {
-	    transactionDate(min:new Date(),nullable:false)
+	    transactionDate(nullable:false)
 	    transactionType(nullable:true)
-	    inventory(nullable:true)	    
-	    thisWarehouse(nullable:false)
-	    targetWarehouse(nullable:false)
+	    source(nullable:false)
+	    destination(nullable:true)
+		createdBy(nullable:true)
     }
 }

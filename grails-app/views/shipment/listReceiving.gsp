@@ -30,7 +30,7 @@
             	</g:if>
             
 				<g:each var="entry" in="${shipmentInstanceMap}">	                    
-					<h2><b>${entry.key}</b> Shipments (${entry.value.objectList.size})</h2>	      
+					<h2><b>${entry.key}</b> (${entry.value.objectList.size})</h2>	      
 					<table>
 	                    <thead>
 	                        <tr>   

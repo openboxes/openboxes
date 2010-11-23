@@ -4,7 +4,6 @@ class HomeController {
 	
     def index = {
 		
-		log.warn "something"	
 	}
     
     def dashboard = { 

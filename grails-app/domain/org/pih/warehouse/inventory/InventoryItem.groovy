@@ -1,31 +1,92 @@
 package org.pih.warehouse.inventory
 
-import org.pih.warehouse.product.Product;
+import java.util.Date;
 
+import org.pih.warehouse.product.Product;
+import org.pih.warehouse.inventory.Transaction;
 
 /**
  * Represents products that are usually stocked by this location.
  */
 class InventoryItem {
 	
-	String serialNumber;			// Serial number of the product 
-	Product product;		    	// Specific product that we're tracking
-	InventoryLot inventoryLot;		// The product lot
-    
-    Integer quantityOnHand;			// Current quantity - this is just a cached value based on a calculation
-    //Integer quantityLow;			// Should reorder product when quanity falls below this value
-    //Integer quantityIdeal;	    	// Should warn user when the quantity is below this value
-        
+	Product product;		    			// Specific product that we're tracking
+	String lotNumber;						// Lot information for a product  
+	String serialNumber						// Only used if this is a "serialized" item (e.g. equipment)
+	InventoryItemType inventoryItemType		// Serialized or non-serialized
+	Boolean active = Boolean.TRUE			// Actively managed
+	
+	// Auditing
+	Date dateCreated;
+	Date lastUpdated;
+	
     // TODO Cannot have a reference to product for some reason
     static belongsTo = [ inventory : Inventory ];
 
-    // TODO Add suppliers to inventory item so we know who to reorder from
-    //static hasMany = [ suppliers : Supplier]
-                         
+	static transients = ['warnings', 'quantity', 'inventoryLot']
+	
     static constraints = {
-		product(nullable:true)
+		product(nullable:false)
+		lotNumber(nullable:true, unique: true)
 		serialNumber(nullable:true)
-		inventoryLot(nullable:true)
-		quantityOnHand(min:0, nullable:false)
+		inventoryItemType(nullable:false);
+		active(nullable:false)
+		
+		//onHandQuantity(min:0, nullable:false)
+
     }
+	
+	
+	List getWarnings() { 
+		def warnings = new ArrayList<String>()
+		/*
+		def quantityOnHand = this.quantity;
+		if (minQuantity && onHandQuantity <= quantityLow) { 
+			warnings << "inventoryItem.lowStock.alert";
+		}
+		else { 
+			if (quantityIdeal && quantityOnHand <= quantityIdeal) {
+				warnings << "inventoryItem.idealQuantity.info";
+				
+			} 
+			else { 
+				if (quantityReorder && quantityOnHand <= quantityReorder) {
+					warnings << "inventoryItem.reorder.alert";
+				}
+			}
+		} 
+		if (!expirationDate) { 
+			warnings << "inventoryItem.noExpirationDate.warning"	
+		} 
+		else { 
+			if (expirationDate <= new Date()) { 
+				warnings << "inventoryItem.expiredStock.error";			
+			} 
+			else if (expirationDate <= (new Date()+90) && expirationDate >= (new Date()+61) ) { 
+				warnings << "inventoryItem.expiringStock.info"				
+			}
+			else if (expirationDate <= (new Date()+60) && expirationDate >= (new Date()+31) ) { 
+				warnings << "inventoryItem.expiringStock.warning"				
+			}
+			else if (expirationDate <= (new Date()+30) ) { 
+				warnings << "inventoryItem.expiringStock.error"
+			}
+		}*/
+		
+		return warnings;
+		
+	}
+	
+	
+	Integer getQuantity() { 
+		return TransactionEntry.findAllByInventoryItem(this).inject(0) { count, item -> count + (item?.quantity ?: 0) }
+	}
+	
+	InventoryLot getInventoryLot() {
+		InventoryLot.findByProductAndLotNumber(product, lotNumber);
+	}
+	
+
+	
+	
 }

@@ -56,7 +56,7 @@ class ShipmentService {
 		Location location = Location.get(locationId);
 		//return Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30, 
 		return Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, null, null,
-			[max:5, offset:2, sort:"expectedShippingDate", order:"desc"]);
+			[max:10, offset:2, sort:"expectedShippingDate", order:"desc"]);
 	}
 	
 	

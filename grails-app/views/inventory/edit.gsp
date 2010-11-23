@@ -19,9 +19,101 @@
 	                <g:renderErrors bean="${warehouseInstance}" as="list" />
 	            </div>
             </g:hasErrors>
+            
+            
+            
             <g:form method="post" >
-                <g:hiddenField name="id" value="${warehouseInstance?.id}" />
-                <g:hiddenField name="version" value="${warehouseInstance?.version}" />
+            	<fieldset>
+	                <g:hiddenField name="id" value="${warehouseInstance?.id}" />
+	                <g:hiddenField name="version" value="${warehouseInstance?.version}" />
+	                            
+				<script type="text/javascript">
+					$(function() {
+						$("#tabs").tabs();
+					});
+					</script>
+					<style type="text/css">						
+					</style>
+					<div id="tabs">
+						<ul>
+							<g:each in="${productInstanceMap.keySet()}" var="productType">
+								<li><a href="#tab-${productType?.id}">${productType?.name?:'Other'}</a></li>
+					        </g:each>        
+						</ul>
+						
+						<g:set var="rowStatus" value="${0 }"/>
+						<g:each in="${productInstanceMap.keySet()}" var="productType">
+							<div id="tab-${productType?.id}">
+								<table>
+									<thead>
+										<tr class="${rowStatus++%2==0?'odd':'even'}">
+											<th></th>
+											<th>Item</th>
+											<th></th>
+										</tr>
+									</thead>
+									<tbody>
+										<g:each var="productInstance" in="${productInstanceMap.get(productType) }">
+											<tr class="${rowStatus++%2==0?'odd':'even'}">
+												<td><g:checkBox name="product.id" value="${productInstance?.id }"/></td>
+												<td>${productInstance?.name }</td>
+												<td>
+													
+												</td>
+											</tr>
+										</g:each>
+									</tbody>
+								</table>                
+							</div>
+						</g:each>						
+					</div>
+		            <div class="buttons">
+	                    <g:actionSubmit class="save" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" /></span>
+	                </div> 
+
+	                
+	                
+	                
+	                
+	                <%-- 
+	                	// someday we'll want to only manage the inventory items themselves.
+	               <div class="dialog">
+						<h2>Inventory Items </h2>
+						<table>
+							<thead>
+								<tr>
+									<th>Item</th>
+									<th>Manage?</th>
+								</tr>
+							</thead>
+							<tbody>				
+								
+								<g:each var="itemInstance" in="${inventoryInstance?.inventoryItems }">
+									<tr class="${rowStatus++%2==0?'odd':'even'}">
+										<td>${inventoryItem?.product?.name }</td>
+										<td>
+											<g:createLink controller="inventoryItem" action="removeFromInventory"
+												id="${inventoryItem?.product.id}"> Remove Product
+											</g:createLink>
+										</td>
+									</tr>								
+								</g:each>
+							</tbody>
+						</table>
+	                </div>                
+	                --%>
+           
+                </fieldset>
+                
+            </g:form>
+        </div>
+    </body>
+</html>
+                
+                
+                
+                
+                <%-- 
                 <div class="dialog">
 					<script type="text/javascript">
 					$(function() {
@@ -68,13 +160,9 @@
 							</g:each>
 						</div>
 					</div>
-
 	                <div class="buttons">
 	                    <g:actionSubmit class="save" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" /></span>
 	                </div>                            	
-
                 </div>
-            </g:form>
-        </div>
-    </body>
-</html>
+                --%>
+                

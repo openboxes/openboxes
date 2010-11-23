@@ -19,8 +19,10 @@
 								<td>
 									<g:if test="${session?.user?.warehouse}">
 										<span style="font-size: 80%; width: 100%; text-align: right; color: #aaa">
-											You last logged into <b>${session?.user?.warehouse}</b> on
-											<b><g:formatDate format="MMM dd, yyyy hh:mm a" date="${session?.user?.lastLoginDate}"/></b> 
+											<g:if test="${session?.user?.lastLoginDate}">
+												You last logged into <b>${session?.user?.warehouse?.name}</b> on
+												<b><g:formatDate format="MMM dd, yyyy hh:mm a" date="${session?.user?.lastLoginDate}"/></b> 
+											</g:if>
 										</span>
 									</g:if>
 								</td>
@@ -28,8 +30,8 @@
 							<g:each var="warehouse" in="${warehouses}" status="i">								
 								<tr>
 									<td nowrap="nowrap">
-										<div style="border: 1px solid #F5F5F5; padding: 10px; display: block;">												
-											<g:if test="${warehouse.managedLocally}">
+										<div style="border: 0px solid #F5F5F5; padding: 0px; display: block;">												
+											<g:if test="${warehouse.local}">
 												<a style="display: block;" class="home" href='${createLink(action:"chooseWarehouse", id: warehouse.id)}'>
 													<g:if test="${warehouse.logo}">	
 														<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'warehouse', action:'viewLogo', id: warehouse.id)}" />															

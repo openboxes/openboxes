@@ -6,25 +6,13 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'product.label', default: 'Product')}" />
         <title><g:message code="default.browse.label" args="[entityName]" /></title>
-		<!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.browse.label" args="[entityName]" /></content>
-    
-    	<style>
-    		.selected { font-weight: bold; border: 2px solid black; background-color: whitesmoke; padding: 5px; } 
-    	
-    	</style>
+        
+
     </head>    
 
 
     <body>
-    
-    
-<script type="text/javascript">
-	$(function() { 
-		$('#productSearch').accordion({active: true, navigation: true, autoheight: false, alwaysOpen: true, clearStyle: true });
-	});
-</script>
-    
+        
         <div class="body" style="width: 95%">
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
@@ -35,15 +23,17 @@
 						<script type="text/javascript">
 							$(function() { $("#productSearchTabs").tabs(); });
 						</script>
+												
+						
 						<div id="productSearchTabs">
 							<ul>
-								<li><a href="#tabs-1">Serenic Code</a></li>
-								<li><a href="#tabs-2">Categories</a></li>
+								<li><a href="#tabs-1">Type</a></li>
+								<li><a href="#tabs-2">Category</a></li>
 								<li><a href="#tabs-3">Search</a></li>
 							</ul>
 							<div id="tabs-1">
 							
-								<h3>Filter by Serenic Code</h3><br/>
+								<h3>Filter by Product Type</h3><br/>
 								<table>
 									<tr>
 										<g:each in="${productTypes}" status="i" var="productType">
@@ -184,10 +174,7 @@
 					                            --%>
 					                            <th width="5%" style="text-align: center">${message(code: 'product.type.label', default: 'Type')}</th>
 					                            <g:sortableColumn property="name" title="${message(code: 'product.name.label', default: 'Name')}" />
-					                            <g:sortableColumn property="upc" title="${message(code: 'product.upc.label', default: 'UPC')}" />
-					                            <g:sortableColumn property="productType" title="${message(code: 'product.productType.label', default: 'Serenic Code')}" />
 					                            <g:sortableColumn property="categories" title="${message(code: 'product.categories.label', default: 'Categories')}" />
-					                            <g:sortableColumn property="tags" title="${message(code: 'product.tags.label', default: 'Tags')}" />
 					                            <g:sortableColumn property="complete" title="${message(code: 'product.unverified.label', default: 'Valid')}" />
 					                        </tr>
 					                    </thead>
@@ -210,20 +197,14 @@
 													<td align="center">
 														<g:link action="edit" id="${productInstance.id}">
 															${fieldValue(bean: productInstance, field: "name")}
+															<span class="fade">
+															${fieldValue(bean: productInstance, field: "productType.name")}
+															</span>
 														</g:link>
 													</td>
-													<td align="center" width="10%">
-														${fieldValue(bean: productInstance, field: "upc")}
-													</td>
-													<td width="10%">
-														${fieldValue(bean: productInstance, field: "productType.name")}
-													</td>					                            
-													<td width="10%">
+													<td width="30%">
 														${fieldValue(bean: productInstance, field: "categories")}
-													</td>					                            
-													<td width="10%">
-														${fieldValue(bean: productInstance, field: "tags")}
-													</td>					                            
+													</td>						                            
 													<td valign="top" style="text-align: center" width="5%">
 														<g:if test="${productInstance.unverified}">
 															<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="Invalid" />														

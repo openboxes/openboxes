@@ -20,7 +20,7 @@
                         <tr>                        
                             <g:sortableColumn property="name" title="${message(code: 'warehouse.name.label', default: 'Name')}" />
                             <th><g:message code="warehouse.manager.label" default="Manager" /></th>
-                            <th><g:message code="warehouse.managedLocally.label" default="Managed Locally" /></th>
+                            <th><g:message code="warehouse.local.label" default="Managed Locally?" /></th>
                             <%-- 
                             <th><g:message code="warehouse.inventory.label" default="Inventory" /></th>
                             <th><g:message code="warehouse.transactions.label" default="Transactions" /></th>
@@ -34,7 +34,7 @@
 								<g:link action="show" id="${warehouseInstance.id}">${fieldValue(bean: warehouseInstance, field: "name")}</g:link>
 							</td>
                             <td>${fieldValue(bean: warehouseInstance, field: "manager")}</td>                            
-                            <td>${fieldValue(bean: warehouseInstance, field: "managedLocally")}</td>                            
+                            <td>${fieldValue(bean: warehouseInstance, field: "local")}</td>                            
                             
                             <%-- 
                             <td>

@@ -32,9 +32,10 @@ class ProductController {
     	
     	// Root level product types
 		def typeCriteria = ProductType.createCriteria();
-		def allProductTypes = typeCriteria.list {
-			isNull("parentProductType")
-		}    		
+		def allProductTypes = ProductType.getAll();		
+		//def allProductTypes = typeCriteria.list {
+		//	isNull("parentProductType")
+		//}    		
 
 		// Root categories
 		def categoryCriteria = Category.createCriteria();		
@@ -206,6 +207,28 @@ class ProductController {
     }
 	
 	/**
+	 * 
+	 */
+	def importDependencies = { 		
+		if (session.dosageForms) {
+			session.dosageForms.unique().each() {
+				new DosageForm(code: it, name: it).save(flush:true)
+			}
+			session.dosageForms = null
+
+		}
+		
+		if (session.productTypes) { 
+			session.productTypes.unique().each() {
+				new ProductType(code: it, name: it).save(flush:true)
+			}
+			session.productTypes = null;
+		}
+		
+		redirect(controller: "product", action: "importProducts")	
+	}
+	
+	/**
 	* Import contents of CSV file
 	*/
    def importProducts = {
@@ -220,14 +243,28 @@ class ProductController {
 			   
 			   flash.message = "Please upload a CSV file with valid products";
 		   }
-		   else {
-			   session.products.each() {
-				   new Product(name: it.name, description: it.description, productType: it.productType).save(failOnError:true);
-			   };
-								   
-			   // import
-			   flash.message = "Products imported successfully"
-			   redirect(controller: "product", action: "browse")
+		   else {			   
+			   
+			   if (!session.dosageForms && !session.productTypes) { 
+				   session.products.each() {					   
+					   def productInstance = new DrugProduct(	name: it.name, 
+																frenchName: it.frenchName, 
+																description: it.name, 
+																productCode: it.productCode,
+																dosageStrength: it.dosageStrength,
+																dosageUnit: it.dosageUnit,
+																productType: it.productType,
+																dosageForm: it.dosageForm);						
+						productInstance.save(failOnError:true);
+					};
+				   // import
+				   flash.message = "Products imported successfully"
+				   redirect(controller: "product", action: "browse")
+			   }			   								   
+			   else { 
+				   flash.message = "Please import dependencies first"
+				   redirect(controller: "product", action: "importProducts")				   
+			   }
 		   }
 	   }
    }
@@ -272,26 +309,75 @@ class ProductController {
 			   }*/
 
 			   
-			   // Process CSV file
-			   def columns;
-			   CSVReader csvReader = new CSVReader(new FileReader(csvFile.getAbsolutePath()), (char) ',', (char) '\"', 1);
-			   while ((columns = csvReader.readNext()) != null) {
-				   log.info "product type: " + columns[4]
-				   def productType = ProductType.findByName(columns[4]);
-				   if (!productType) {
-					   throw new Exception("Could not find Product Type with name '" + columns[4] + "'")
-				   }
-				   
-				   products.add(
-					   new Product(
-						   //id: columns[0],
-						   ean: columns[1],
-						   name: columns[2],
-						   description: columns[3],
-						   productType: productType));
+				// Process CSV file
+				def columns;
+				def productTypes = new HashSet<String>();
+				def categories = []
+				def unitOfMeasures = []
+				def dosageForms = new HashSet<String>();
+				
+				
+				CSVReader csvReader = new CSVReader(new FileReader(csvFile.getAbsolutePath()), (char) ',', (char) '\"', 1);
+				while ((columns = csvReader.readNext()) != null) {
+					
+					// 0 => type
+					// 1 => productType
+					// 2 => productCode
+					// 3 => name
+					// 4 => frenchName
+					// 5 => dosageStrength
+					// 6 => unitOfMeasure
+					// 7 => dosageForm
+					
+					def productInstance = new DrugProduct();
+					productInstance.productCode = columns[2]
+					productInstance.name = columns[3]
+					productInstance.frenchName = columns[4]
+					productInstance.dosageStrength = columns[5]
+					productInstance.dosageUnit = columns[6]
+					
+					def productTypeValue = columns[1];
+					if (productTypeValue && !productTypeValue.equals("") && !productTypeValue.equals("null")) { 
+						def productType = ProductType.findByName(productTypeValue);
+						if (!productType) { 
+							productInstance.productType = new ProductType(name: productTypeValue, code: productTypeValue);						
+							productTypes.add(productTypeValue);
+						   //throw new Exception("Could not find Product Type with name '" + columns[4] + "'")
+						}else { 
+							productInstance.productType = productType
+						}
+					}					
+					
+					def dosageFormValue = columns[7];
+					if (dosageFormValue && !dosageFormValue.equals("") && !dosageFormValue.equals("null")) { 					
+						def dosageForm = DosageForm.findByName(dosageFormValue);					
+						if (!dosageForm) { 
+							productInstance.dosageForm = new DosageForm(name: dosageFormValue, code: dosageFormValue)
+							dosageForms.add(dosageFormValue);
+						}
+						else { 
+							productInstance.dosageForm = dosageForm
+						}
+					}
+											
+					products.add(productInstance);
+
 			   }
+			   
+			   
+			   
 			   session.products = products;
-			   render(view: "importProducts", model: [products:products]);
+			   //session.categories = categories;
+			   session.productTypes = productTypes;
+			   session.dosageForms = dosageForms;
+			   
+			   if (dosageForms || productTypes) { 
+				   flash.message = "Please import all dependencies first"
+				   render(view: "importProducts", model: [productTypes: productTypes, dosageForms: dosageForms]);
+			   }
+			   else { 
+				   render(view: "importProducts", model: [products:products]);				   
+			   }
 		   }
 		   else {
 			   flash.message = "Please upload a non-empty CSV file";

@@ -122,6 +122,15 @@
 	                                    	size="10" value="${productInstance?.categories}" noSelection="['0': '']" />
 	                                </td>
 	                            </tr>
+		                          <tr class="prop">
+		                              <td valign="top" class="name">
+		                                <label for="budgetCode.id"><g:message code="product.budgetCode.label" default="Budget Code" /></label>
+		                              </td>
+		                              <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'budgetCode', 'errors')}">
+		                                  <g:select name="budgetCode.id" from="${org.pih.warehouse.accounting.BudgetCode.list()}"
+		                                  		optionKey="id" optionValue="name" value="${productInstance?.budgetCode?.id}"  />
+		                              </td>
+		                          </tr>
 	                            <%-- 
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
@@ -169,9 +178,13 @@
 		                                </td>
 		                                <td valign="top" class="value ${hasErrors(bean: drugProductInstance, field: 'dosageForm', 'errors')}">
 
-		                                    <g:textField name="dosageForm" value="${drugProductInstance?.dosageForm}" />
+		                                    <g:select name="categories"  from="${org.pih.warehouse.product.DosageForm.list()}" 
+		                                    	multiple="yes" optionKey="id" optionValue="dosageForm"
+		                                    	size="10" value="${productInstance?.dosageForm}" noSelection="['0': '']" />
 		                                </td>
 		                            </tr>
+
+
 		                            <tr class="prop">
 		                                <td valign="top" class="name">
 		                                    <label for="dosageRegimen"><g:message code="drugProduct.dosageRegimen.label" default="Dosage Regimen" /></label>

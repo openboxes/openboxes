@@ -111,31 +111,29 @@ class JqueryTagLib {
 		
 		def id = attrs.id ? attrs.id : attrs.name;
 		def name = attrs.name;
-		
+		def autoSize = attrs.autoSize ?: "true";
+		def showOn = attrs.showOn ?: "both";
+		def showTrigger = Boolean.valueOf(attrs.showTrigger ?: "true");
+				
 		def value = (attrs.format && attrs.value) ? new SimpleDateFormat(attrs.format).format(attrs.value) : ""
 
 		if (name == null) { 
 			throw new IllegalArgumentException("name parameter must be specified")			
 		}
+		
 		def html = """
 
 		<div>
-			<style>
-				.ui-datepicker-trigger { 
-					position: relative; left: -20px; top: 2px; 
-				}
-			</style>
 			<input id='${id}' name='${name}' type='hidden'/> 
 			<input id='${id}-datepicker' name='${name}-datepicker' type='text' class='date' /> 
 			<script type=\'text/javascript\'> 
 				jQuery(function() {
 					jQuery('#${id}-datepicker').datepicker({
-						showOn: 'both',
 						altField: '#${name}',
 						altFormat: 'mm/dd/yy',
-						dateFormat: 'MM dd yy',
-						//autoSize: true,
-						//closeText: 'Done',
+						dateFormat: 'dd/M/yy',
+						autoSize: ${autoSize},
+						showOn: '${showOn}',
 						buttonImageOnly: true, 
 						buttonImage: '/warehouse/images/icons/silk/calendar.png',
 						//buttonText: '...',
@@ -151,7 +149,18 @@ class JqueryTagLib {
 			</script> 
 		</div>
 		""";
+
+		if (showTrigger) { 
+			html += """
+			<style>
+			.ui-datepicker-trigger {
+				position: relative; left: -20px; top: -2px;
+			}
+			</style>
+			""";
+		}
 		
+				
 		out << html;
 				
 	}

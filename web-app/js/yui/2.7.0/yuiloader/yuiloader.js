@@ -2,7 +2,7 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.1
+version: 2.8.2r1
 */
 /**
  * The YAHOO object is the single global object used by YUI Library.  It
@@ -1072,7 +1072,7 @@ YAHOO.augment = L.augmentProto;
 YAHOO.extend = L.extend;
 
 })();
-YAHOO.register("yahoo", YAHOO, {version: "2.8.1", build: "19"});
+YAHOO.register("yahoo", YAHOO, {version: "2.8.2r1", build: "7"});
 /**
  * Provides a mechanism to fetch remote resources and
  * insert them into a document
@@ -1821,7 +1821,7 @@ YAHOO.util.Get = function() {
     };
 }();
 
-YAHOO.register("get", YAHOO.util.Get, {version: "2.8.1", build: "19"});
+YAHOO.register("get", YAHOO.util.Get, {version: "2.8.2r1", build: "7"});
 /**
  * Provides dynamic loading for the YUI library.  It includes the dependency
  * info for the library, and will automatically pull in dependencies for
@@ -1861,8 +1861,8 @@ YAHOO.register("get", YAHOO.util.Get, {version: "2.8.1", build: "19"});
     // 'root': '2.5.2/build/',
     // 'base': 'http://yui.yahooapis.com/2.5.2/build/',
 
-    'root': '2.8.1/build/',
-    'base': 'http://yui.yahooapis.com/2.8.1/build/',
+    'root': '2.8.2r1/build/',
+    'base': 'http://yui.yahooapis.com/2.8.2r1/build/',
 
     'comboBase': 'http://yui.yahooapis.com/combo?',
 
@@ -3876,4 +3876,4 @@ throw new Error("You must supply an onSuccess handler for your sandbox");
 
 })();
 
-YAHOO.register("yuiloader", YAHOO.util.YUILoader, {version: "2.8.1", build: "19"});
+YAHOO.register("yuiloader", YAHOO.util.YUILoader, {version: "2.8.2r1", build: "7"});

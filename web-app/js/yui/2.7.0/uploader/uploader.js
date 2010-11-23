@@ -2,7 +2,7 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.1
+version: 2.8.2r1
 */
 /*extern ActiveXObject, __flash_unloadHandler, __flash_savedUnloadHandler */
 /*!
@@ -1066,4 +1066,4 @@ YAHOO.extend(YAHOO.widget.Uploader, YAHOO.widget.FlashAdapter,
 		this._swf.disable();
 	}
 });
-YAHOO.register("uploader", YAHOO.widget.Uploader, {version: "2.8.1", build: "19"});
+YAHOO.register("uploader", YAHOO.widget.Uploader, {version: "2.8.2r1", build: "7"});

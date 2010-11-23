@@ -2,7 +2,7 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.1
+version: 2.8.2r1
 */
 YAHOO.namespace("tool");
 
@@ -554,4 +554,4 @@ YAHOO.tool.Profiler = function(){
 
 }();  
 
-YAHOO.register("profiler", YAHOO.tool.Profiler, {version: "2.8.1", build: "19"});
+YAHOO.register("profiler", YAHOO.tool.Profiler, {version: "2.8.2r1", build: "7"});

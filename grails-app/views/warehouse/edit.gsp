@@ -45,8 +45,8 @@
                                 <td valign="top" class="name">
                                   <label for="manager"><g:message code="warehouse.manager.label" default="Managed Locally" /></label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'managedLocally', 'errors')}">
-                                    <g:textField name="managedLocally" value="${warehouseInstance?.managedLocally}" />
+                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'local', 'errors')}">
+                                    <g:textField name="local" value="${warehouseInstance?.local}" />
                                 </td>
                             </tr>
                             <tr>

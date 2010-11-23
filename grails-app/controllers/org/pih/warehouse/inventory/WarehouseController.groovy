@@ -34,8 +34,7 @@ class WarehouseController {
 		// Create an inventory item for each product in the database
 		// TODO There should be a Warehouse->Products association
 		Map<Product, Long> inventory = new HashMap<Product, Long>()
-		Product.getAll().each { inventory.put(it, 0l)
-		}
+		Product.getAll().each { inventory.put(it, 0l) }
 		
 		// Get all transaction entries
 		def entries = TransactionEntry.withCriteria {
@@ -47,8 +46,8 @@ class WarehouseController {
 		for (TransactionEntry entry in entries) {
 			def quantityNow = inventory.get(entry.product);
 			
-			log.debug "$quantityNow + $entry?.quantityChange"	    
-			quantityNow += entry.quantityChange
+			log.debug "$quantityNow + $entry?.quantity"	    
+			quantityNow += entry.quantity
 			
 			log.debug "quantity = $quantityNow"
 			inventory.put(entry.product, quantityNow)
@@ -77,8 +76,8 @@ class WarehouseController {
 		 */
 		
 		return [
-		warehouseInstance : warehouse,
-		inventory : inventory
+			warehouseInstance : warehouse,
+			inventory : inventory
 		]
 	}
 	
@@ -88,8 +87,8 @@ class WarehouseController {
 		def transactionList = inventoryService.getAllTransactions(warehouseInstance);
 		
 		return [
-		warehouseInstance : warehouseInstance,
-		transactions : transactionList
+			warehouseInstance : warehouseInstance,
+			transactions : transactionList
 		]
 	}
 	

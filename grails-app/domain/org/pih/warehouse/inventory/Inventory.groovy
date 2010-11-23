@@ -1,14 +1,21 @@
 package org.pih.warehouse.inventory;
 
+import java.util.Date;
+
 class Inventory implements java.io.Serializable {
 
     // Core data elements
     Warehouse warehouse		// we could assume that a warehouse has an inventory
     Date lastInventoryDate	// last time an inventory was completed
 
+	// Auditing
+	Date dateCreated;
+	Date lastUpdated;
+	
+	
     // Association mapping
-    static hasMany = [ inventoryItems : InventoryItem ]
-    static belongsTo = [ warehouse : Warehouse ]
+    static belongsTo = [ warehouse: Warehouse ]
+    static hasMany = [ inventoryItems: InventoryItem, inventoryLots: InventoryLot, inventoryLevels: InventoryLevel ]
 
     // Show use warehouse name
     String toString() { return "${warehouse.name}"; }
@@ -16,7 +23,6 @@ class Inventory implements java.io.Serializable {
     // Constraints
     static constraints = {
 		lastInventoryDate(nullable:true)
-		inventoryItems(nullable:true)
 		warehouse(nullable:false)
     }
 	

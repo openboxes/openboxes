@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="warehouse">
+        <wb-resource deploy-path="/" source-path="/settings-1.4-grails-app-services"/>
+        <wb-resource deploy-path="/" source-path="/settings-1.4-grails-app-i18n"/>
+        <wb-resource deploy-path="/" source-path="/settings-1.4-grails-app-taglib"/>
+        <wb-resource deploy-path="/" source-path="/settings-1.4-grails-app-controllers"/>
+        <wb-resource deploy-path="/" source-path="/settings-1.4-grails-app-domain"/>
+        <wb-resource deploy-path="/" source-path="/settings-1.4-grails-app-views"/>
+        <wb-resource deploy-path="/" source-path="/tomcat-1.3.4-src-groovy"/>
+    </wb-module>
+</project-modules>
