@@ -1537,30 +1537,13 @@
     
     <changeSet author="jmiranda (generated)" id="1291325368079-5">
 		<preConditions onFail="MARK_RAN">
-			<not><indexExists indexName="FK714F9FB572A2C5B4"/></not>
-		</preConditions>    
-        <createIndex indexName="FK714F9FB572A2C5B4" tableName="location" unique="false">
-            <column name="inventory_id"/>
-        </createIndex>
-    </changeSet>
-    <changeSet author="jmiranda (generated)" id="1291325368079-6">
-		<preConditions onFail="MARK_RAN">
-			<not><foreignKeyConstraintExists foreignKeyName="FK714F9FB572A2C5B4"/></not>
-		</preConditions>    
-		<addForeignKeyConstraint constraintName="FK714F9FB572A2C5B4"
-		    baseTableName="location" baseColumnNames="inventory_id"
-		    referencedTableName="inventory" referencedColumnNames="id" />
-    </changeSet>          
-
-    <changeSet author="jmiranda (generated)" id="1291325368079-7">
-		<preConditions onFail="MARK_RAN">
 			<not><indexExists indexName="FK7FA0D2DE3265A8A9"/></not>
 		</preConditions>    
         <createIndex indexName="FK7FA0D2DE3265A8A9" tableName="transaction" unique="false">
             <column name="confirmed_by_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="jmiranda (generated)" id="1291325368079-8">
+    <changeSet author="jmiranda (generated)" id="1291325368079-6">
 		<preConditions onFail="MARK_RAN">
 			<not><foreignKeyConstraintExists foreignKeyName="FK7FA0D2DE3265A8A9"/></not>
 		</preConditions>    
