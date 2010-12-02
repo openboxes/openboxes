@@ -20,33 +20,37 @@
 	                <g:renderErrors bean="${productInstance}" as="list" />
 	            </div>
             </g:hasErrors>
-            <g:form action="create" method="post">
-                <div class="dialog">
-                    <table>
-                        <tbody>                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="name"><g:message code="product.name.label" default="Choose Type" /></label>
-                                </td>
-                                <td valign="top" class="value">
-                                	<g:radio name="type" value="drug" /> Drug &nbsp;
-                                	<g:radio name="type" value="durable" /> Equipment &nbsp;
-                                	<g:radio name="type" value="other" /> Other &nbsp;                               
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                            	<td valign="top" class="name"></td>
-                            	<td>
-					                <div class="buttons">
-										<button type="submit" class="positive">
-											${message(code: 'default.button.next.label', default: 'Next &raquo;')}</button>
-									</div>	                         
-                            	</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </g:form>
+            
+            <div class="dialog">
+	            <g:form action="create" method="post">
+                
+    	        	<fieldset>
+	                    <table>
+	                        <tbody>                        
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
+	                                    <label for="name"><g:message code="product.name.label" default="Choose Type" /></label>
+	                                </td>
+	                                <td valign="top" class="value">
+	                                	<g:radio name="type" value="drug" /> Drug &nbsp;
+	                                	<g:radio name="type" value="durable" /> Equipment &nbsp;
+	                                	<g:radio name="type" value="other" /> Other &nbsp;                               
+	                                </td>
+	                            </tr>
+	                            <tr class="prop">
+	                            	<td valign="top" class="name"></td>
+	                            	<td>
+						                <div class="buttons">
+											<button type="submit" class="positive">
+												${message(code: 'default.button.next.label', default: 'Next &raquo;')}</button>
+										</div>	                         
+	                            	</td>
+	                            </tr>
+	                        </tbody>
+	                    </table>
+	                </fieldset>              
+	            </g:form>
+           	</div>
         </div>
     </body>
 </html>

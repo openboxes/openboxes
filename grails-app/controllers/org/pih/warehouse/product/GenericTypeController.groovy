@@ -3,6 +3,6 @@ package org.pih.warehouse.product;
 
 class GenericTypeController {
 
-	//def scaffold = GenericType;
+	def scaffold = GenericType;
 	
 }

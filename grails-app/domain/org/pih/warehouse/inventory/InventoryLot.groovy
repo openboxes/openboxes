@@ -22,7 +22,7 @@ class InventoryLot {
 	
     static constraints = {
 		product(nullable:false)	
-		lotNumber(nullable:true, unique: true)
+		lotNumber(nullable:true, unique: 'product')
 		initialQuantity(nullable:false)
 		manufactureDate(nullable:true)
 		expirationDate(nullable:true)		

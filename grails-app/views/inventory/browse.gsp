@@ -33,7 +33,13 @@
     </head>    
 
     <body>
-        <div class="body" style="width: 95%">
+        <div class="body">
+        
+        
+			<div class="nav">
+				<g:render template="nav"/>
+			</div>
+        
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>						
@@ -43,10 +49,8 @@
 	            </div>
             </g:hasErrors>    
             
-            
-            
-            <!-- <h1>${warehouseInstance?.name }</h1><br/> -->
-            <table>
+                        
+            <table style="margin-top: 10px;">
 	            <thead>
     				<tr>				
 						<th class="tabSpacer"></th>
@@ -60,10 +64,10 @@
             	</thead>
             </table>
             
-            <div style="overflow: auto; height: 600px"> 
+            <div style="overflow: auto; height: 600px; padding: 10px;"> 
             	<g:if test="${productType}">
             		<g:set var="varStatus" value="${0 }"/>
-					<table border="1" style="border: 1px solid #a0a0a0">
+					<table border="1" style="border: 1px solid #ccc">
 						<thead>
 							<tr class="even">
 								<th>Status</th>
@@ -93,7 +97,7 @@
 										</g:else>
 									</td>
 									<td style="width: 15%; text-align: center">
-										<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">view stock card</g:link>
+										<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">view stock</g:link>
 									</td>
 								</tr>
 							</g:each>

@@ -21,54 +21,57 @@
 	            </div>
             </g:hasErrors>
             <g:form action="save" method="post">
-                <div class="dialog">
-                    <table>
-                        <tbody>                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="name"><g:message code="product.name.label" default="Name" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'name', 'errors')}">
-                                    <g:textField name="name" value="${productInstance?.name}" />
-                                </td>
-                            </tr>
-		 					<tr class="prop">
-                                <td valign="top" class="name">
-                                  <label for="productType.id"><g:message code="product.productType.label" default="Product Type" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'type', 'errors')}">
-                                    <g:select name="productType.id" from="${org.pih.warehouse.product.ProductType.list()}" optionKey="id" value="${productInstance?.productType?.id}"  />
-                                </td>
-                            </tr>                            
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="upc"><g:message code="product.upc.label" default="UPC" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'upc', 'errors')}">
-                                    <g:textField name="upc" value="${productInstance?.upc}" />
-                                </td>
-                            </tr>                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="description"><g:message code="product.description.label" default="Description" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'description', 'errors')}">
-                                    <g:textField name="description" value="${productInstance?.description}" />
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                            	<td valign="top" class="name"></td>
-                            	<td>
-					                <div class="buttons">
-										<button type="submit" class="positive">
-											<img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Save" /> 
-											${message(code: 'default.button.save.label', default: 'Save')}</button>
-									</div>	                         
-                            	</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            
+            	<fieldset>
+	                <div class="dialog">
+	                    <table>
+	                        <tbody>                        
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
+	                                    <label for="name"><g:message code="product.name.label" default="Name" /></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'name', 'errors')}">
+	                                    <g:textField name="name" value="${productInstance?.name}" />
+	                                </td>
+	                            </tr>
+			 					<tr class="prop">
+	                                <td valign="top" class="name">
+	                                  <label for="productType.id"><g:message code="product.productType.label" default="Product Type" /></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'type', 'errors')}">
+	                                    <g:select name="productType.id" from="${org.pih.warehouse.product.ProductType.list()}" optionKey="id" value="${productInstance?.productType?.id}"  />
+	                                </td>
+	                            </tr>                            
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
+	                                    <label for="upc"><g:message code="product.upc.label" default="UPC" /></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'upc', 'errors')}">
+	                                    <g:textField name="upc" value="${productInstance?.upc}" />
+	                                </td>
+	                            </tr>                        
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
+	                                    <label for="description"><g:message code="product.description.label" default="Description" /></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'description', 'errors')}">
+	                                    <g:textField name="description" value="${productInstance?.description}" />
+	                                </td>
+	                            </tr>
+	                            <tr class="prop">
+	                            	<td valign="top" class="name"></td>
+	                            	<td>
+						                <div class="buttons">
+											<button type="submit" class="positive">
+												<img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Save" /> 
+												${message(code: 'default.button.save.label', default: 'Save')}</button>
+										</div>	                         
+	                            	</td>
+	                            </tr>
+	                        </tbody>
+	                    </table>
+	                </div>
+	        	</fieldset>
             </g:form>
         </div>
     </body>

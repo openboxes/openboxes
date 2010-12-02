@@ -13,9 +13,11 @@ class ProductGroup {
 	
 	static constraints = {
 		name(nullable:false)
-		name(nullable:false)
+		code(nullable:false)
 		description(nullable:true)
 		sortOrder(nullable:true)
+		dateCreated(display:false)
+		lastUpdated(display:false)
 	}
 
 	static mapping = {

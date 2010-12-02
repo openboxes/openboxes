@@ -19,12 +19,12 @@
                     <thead>
                         <tr>                        
                             <g:sortableColumn property="name" title="${message(code: 'warehouse.name.label', default: 'Name')}" />
+                            <th><g:message code="warehouse.locationType.label" default="Location Type" /></th>
                             <th><g:message code="warehouse.manager.label" default="Manager" /></th>
                             <th><g:message code="warehouse.local.label" default="Managed Locally?" /></th>
-                            <%-- 
+                            <th><g:message code="warehouse.active.label" default="Active?" /></th>
                             <th><g:message code="warehouse.inventory.label" default="Inventory" /></th>
                             <th><g:message code="warehouse.transactions.label" default="Transactions" /></th>
-                            --%>
                         </tr>
                     </thead>
                     <tbody>
@@ -33,17 +33,17 @@
 							<td>
 								<g:link action="show" id="${warehouseInstance.id}">${fieldValue(bean: warehouseInstance, field: "name")}</g:link>
 							</td>
+                            <td>${fieldValue(bean: warehouseInstance, field: "locationType.name")}</td>                            
                             <td>${fieldValue(bean: warehouseInstance, field: "manager")}</td>                            
                             <td>${fieldValue(bean: warehouseInstance, field: "local")}</td>                            
+                            <td>${fieldValue(bean: warehouseInstance, field: "active")}</td>                            
                             
-                            <%-- 
                             <td>
-								<g:link action="showInventory" id="${warehouseInstance.id}">Show Inventory</g:link>
+								<g:link controller="inventory" action="browse" params="['warehouse.id':warehouseInstance.inventory?.id]">Show Inventory</g:link>
 							</td>
                             <td>
-								<g:link action="showTransactions" id="${warehouseInstance.id}">Show Transactions</g:link>
+								<g:link action="transaction" action="list" id="${warehouseInstance.id}">Show Transactions</g:link>
 							</td>
-							--%>
 						</tr>
                     </g:each>
                     </tbody>

@@ -17,13 +17,12 @@ class DosageForm {
 		name(nullable:false)
 		description(nullable:true)
 		sortOrder(nullable:true)
+		dateCreated(display:false)
+		lastUpdated(display:false)
 	}
 
 	static mapping = {
 		sort "sortOrder"
 	}
-
-	String toString() { return "$name"; }
-	
 		
 }

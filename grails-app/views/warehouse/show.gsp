@@ -13,20 +13,14 @@
             <g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>
             </g:if>
-            
-            <div class="dialog">
-            
-            
-				<table>
+
+			<fieldset>            
+	            <div class="dialog">
+					<table>
 	                    <tbody>                    
 	                    	<tr>
 			        			<td valign="top" colspan="2">
-			        				<g:if test="${warehouseInstance?.logo }">
-		            				<img class="photo" width="25" height="25" 
-		            					src="${createLink(controller:'warehouse', action:'viewLogo', id:warehouseInstance.id)}" style="vertical-align: bottom" />		            				
-		            				&nbsp;
-		            				</g:if>
-			            			<span style="font-weight: bold; font-size: 200%">${fieldValue(bean: warehouseInstance, field: "name")}</span>
+									<g:render template="summary"/>			            			
 								</td>            
 	                    	</tr>
 	                        <tr class="prop">
@@ -69,30 +63,15 @@
 									<g:form controller="warehouse" method="post" action="uploadLogo" enctype="multipart/form-data">
 										<input type="hidden" name="id" value="${warehouseInstance.id}" />
 										<input type="file" name="logo"/>
-										<span class="buttons"><input class="positive" type="submit" value="Upload"/></span>
+										<input class="positive" type="submit" value="Upload"/>
 									</g:form>
 									
 								</td>                            
 	                        </tr>
-							<tr class="prop">
-								<td valign="top" class="name"></td>
-								<td valign="top" class="value">
-	
-									<div class="buttons">
-										<g:form>
-											<g:hiddenField name="id" value="${warehouseInstance?.id}" />
-											<g:actionSubmit class="edit" action="edit" value="${message(code: 'default.button.edit.label', default: 'Edit')}" />
-											<g:actionSubmit class="delete" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
-										</g:form>
-									</div>
-	
-								</td>		
-							</tr>
 	                    </tbody>
 					</table>
-          
-		                
-            </div>
+	            </div>
+	    	</fieldset>
         </div>
     </body>
 </html>

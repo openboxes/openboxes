@@ -25,9 +25,10 @@ class InventoryItem {
 
 	static transients = ['warnings', 'quantity', 'inventoryLot']
 	
+	// Notice the unique constraint on lotNumber/product
     static constraints = {
 		product(nullable:false)
-		lotNumber(nullable:true, unique: true)
+		lotNumber(nullable:true, unique:'product')
 		serialNumber(nullable:true)
 		inventoryItemType(nullable:false);
 		active(nullable:false)
@@ -79,7 +80,8 @@ class InventoryItem {
 	
 	
 	Integer getQuantity() { 
-		return TransactionEntry.findAllByInventoryItem(this).inject(0) { count, item -> count + (item?.quantity ?: 0) }
+		//return TransactionEntry.findAllByInventoryItem(this).inject(0) { count, item -> count + (item?.quantity ?: 0) }
+		return TransactionEntry.findAllByProductAndLotNumber(product, lotNumber).inject(0) { count, item -> count + (item?.quantity ?: 0) }
 	}
 	
 	InventoryLot getInventoryLot() {

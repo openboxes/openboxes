@@ -69,15 +69,30 @@
 				<table width="100%">
 					<thead>
 						<tr>         
-							<th width="10%">Product</th>
-							<th width="10%">Product Type</th>
+							<th>Product Type</th>
+							<th>Name</th>
+							<th>French Name</th>
+							<th>Product Code</th>
+							<th>Dosage Strength</th>
+							<th>Dosage Unit</th>
+							<th>Dosage Form</th>								
 						</tr>
 					</thead>
 					<tbody>
 						<g:each var="productInstance" in="${products}" status="i">
 							<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">         
-								<td align="center">${fieldValue(bean: productInstance, field: "name")}</td>
 								<td>${fieldValue(bean: productInstance, field: "productType.name")}</td>
+								<td align="center">${fieldValue(bean: productInstance, field: "name")}</td>
+								<td>${fieldValue(bean: productInstance, field: "frenchName")}</td>
+								<td>${fieldValue(bean: productInstance, field: "productCode")}</td>
+								<g:if test="${productInstance?.class?.simpleName=='DrugProduct' }">
+									<td>${fieldValue(bean: productInstance, field: "dosageStrength")}</td>
+									<td>${fieldValue(bean: productInstance, field: "dosageUnit")}</td>
+									<td>${fieldValue(bean: productInstance, field: "dosageForm.name")}</td>
+								</g:if>
+								<g:else>
+									<td colspan="3">Not applicable</td>
+								</g:else>
 							</tr>
 						</g:each>		                    
 					</tbody>

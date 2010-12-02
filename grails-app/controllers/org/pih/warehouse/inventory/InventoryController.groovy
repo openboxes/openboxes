@@ -10,21 +10,31 @@ class InventoryController {
     //def scaffold = Inventory		
 	def inventoryService;
 		
+	def index = { 
+		redirect(action: "browse");
+	}
+	
+	
 	def list = { 
 		[ warehouses : Warehouse.getAll() ]
 	}
 	
 	def browse = {
+		
+		// Get the warehouse from the request parameter
 		def warehouseInstance = Warehouse.get(params?.warehouse?.id) 
+		
+		// If it doesn't exist or if the parameter is null, get 
+		// warehouse from the session
 		if (!warehouseInstance) { 
 			warehouseInstance = Warehouse.get(session?.warehouse?.id);
 		}
 							
 		if (!warehouseInstance?.inventory) { 
-			flash.message = "Warehouse does not have an inventory, please create one now."
 			redirect(action: "create")
 		}
 		
+		// Get all product types and set the default product type 
 		def productTypes = ProductType.getAll()
 		def productType = ProductType.get(params?.productType?.id);
 		if (!productType) { 
@@ -62,7 +72,7 @@ class InventoryController {
 			//inventoryInstance.warehouse = session.warehouse;
 			if (warehouseInstance.save(flush: true)) {
 				flash.message = "${message(code: 'default.created.message', args: [message(code: 'inventory.label', default: 'Inventory'), warehouseInstance.inventory.id])}"
-				redirect(action: "edit", id: warehouseInstance?.inventory?.id)
+				redirect(action: "show", id: warehouseInstance?.inventory?.id)
 			}
 			else {
 				render(view: "create", model: [warehouseInstance: warehouseInstance])
@@ -216,6 +226,156 @@ class InventoryController {
 	}
 	
 	
+	def createTransaction = { 
+		redirect(action: "editTransaction")
+		//render(view: "editTransaction", model: [ productInstanceMap: productMap, 
+		//	transactionTypeList: transactionTypes, warehouseInstanceList: warehouses, transactionInstance: transaction]);
+	}
+
+	def listTransactions = { 
+		redirect(action: listAllTransactions)
+	}
+	
+	def listAllTransactions = {
+		def transactions = Transaction.list()
+		render(view: "listTransactions", model: [transactionInstanceList: transactions])
+	}
+
+		
+	def listPendingTransactions = { 
+		def transactions = Transaction.findAllByConfirmedOrConfirmedIsNull(Boolean.FALSE)
+		render(view: "listTransactions", model: [transactionInstanceList: transactions])
+	}
+	
+	def listConfirmedTransactions = { 		
+		def transactions = Transaction.findAllByConfirmed(Boolean.TRUE)
+		render(view: "listTransactions", model: [transactionInstanceList: transactions])
+	}
+	
+	
+	def deleteTransaction = { 
+		def transactionInstance = Transaction.get(params.id);
+		
+		if (transactionInstance) {
+			try {
+				transactionInstance.delete(flush: true)
+				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'transaction.label', default: 'Transaction'), params.id])}"
+				redirect(action: "listTransactions")
+			}
+			catch (org.springframework.dao.DataIntegrityViolationException e) {
+				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'transaction.label', default: 'Transaction'), params.id])}"
+				redirect(action: "editTransaction", id: params.id)
+			}
+		}
+		else {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'transaction.label', default: 'Transaction'), params.id])}"
+			redirect(action: "listTransactions")
+		}
+	}
+	
+	def saveTransaction = {	
+		log.info "save transaction: " + params
+		def transactionInstance = Transaction.get(params.id);
+		def inventoryInstance = Inventory.get(params.inventory.id);
+		
+		
+		if (!transactionInstance) {
+			transactionInstance = new Transaction();
+		} 
+		
+		transactionInstance.properties = params
+		transactionInstance.transactionEntries.each { 
+			def inventoryItem = InventoryItem.findByProductAndLotNumber(it.product, it.lotNumber);
+			if (!inventoryItem) { 
+				inventoryItem = new InventoryItem(
+					active: Boolean.TRUE, 
+					product: it.product, 
+					lotNumber: it.lotNumber, 
+					inventoryItemType: InventoryItemType.NON_SERIALIZED,
+					inventory: inventoryInstance);
+				
+				if (!inventoryItem.hasErrors() && inventoryItem.save()) { 
+					println "saved inventory item"
+				}
+				else { 
+					transactionInstance.errors = inventoryItem.errors;
+					flash.message = "Unable to save inventory item";
+					render(view: "editTransaction", model: [
+						warehouseInstance: Warehouse.get(session?.warehouse?.id),
+						transactionInstance: transactionInstance,
+						productInstanceMap: Product.list().groupBy { it?.productType },
+						transactionTypeList: TransactionType.list(),
+						warehouseInstanceList: Warehouse.list()])
+				}				
+			}
+			
+			def inventoryLot = InventoryLot.findByProductAndLotNumber(it.product, it.lotNumber);
+			if (!inventoryLot) {
+				inventoryLot = new InventoryLot(params);
+				inventoryLot.product = it.product
+				inventoryLot.lotNumber = it.lotNumber
+				inventoryLot.initialQuantity = 0;
+				if (!inventoryLot.hasErrors() && inventoryLot.save()) {
+					println "saved inventory lot"
+				}
+				else { 
+					transactionInstance.errors = inventoryLot.errors;
+					flash.message = "Unable to save inventory lot";
+					render(view: "editTransaction", model: [
+						warehouseInstance: Warehouse.get(session?.warehouse?.id),
+						transactionInstance: transactionInstance,
+						productInstanceMap: Product.list().groupBy { it?.productType },
+						transactionTypeList: TransactionType.list(),
+						warehouseInstanceList: Warehouse.list()])
+				}				
+			}
+			it.inventoryItem = inventoryItem;
+		}
+		
+		if (!transactionInstance.hasErrors() && transactionInstance.save(flush: true)) {
+			flash.message = "${message(code: 'default.saved.message', args: [message(code: 'transaction.label', default: 'Transaction'), transactionInstance.id])}"
+			redirect(action: "showTransaction", id: transactionInstance?.id)
+		}
+		else {			
+			render(view: "editTransaction", model: [
+						warehouseInstance: Warehouse.get(session?.warehouse?.id),
+						transactionInstance: transactionInstance,
+						productInstanceMap: Product.list().groupBy { it?.productType },
+						transactionTypeList: TransactionType.list(),
+						warehouseInstanceList: Warehouse.list()])
+		}		
+	}
+
+	def showTransaction = {
+		def transactionInstnace = Transaction.get(params?.id)
+		
+		[transactionInstance: transactionInstnace]
+	}
+
+		
+	def confirmTransaction = { 
+		def transactionInstnace = Transaction.get(params?.id)
+		
+		[transactionInstance: transactionInstnace]
+	}
+	
+	
+	def editTransaction = { 		
+		log.info "edit transaction: " + params
+		def transactionInstance = Transaction.get(params?.id)
+		
+		def model = [ 
+			transactionInstance: transactionInstance?:new Transaction(),
+			productInstanceMap: Product.list().groupBy { it?.productType },
+			transactionTypeList: TransactionType.list(),
+			warehouseInstanceList: Warehouse.list(),
+			warehouseInstance: Warehouse.get(session?.warehouse?.id) ]
+
+		render(view: "editTransaction", model: model)
+
+	}
+	
+	
 	/*
 	def edit = {
 		def selectedProductType = ProductType.get(params.productTypeId);
@@ -264,8 +424,5 @@ class InventoryController {
 			selectedProductType : selectedProductType])
 	}
 	*/
-		
-
-	
-
 }
+

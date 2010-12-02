@@ -11,12 +11,11 @@ class TransactionEntry {
 	
     static belongsTo = [ transaction : Transaction ]
 
-    static constraints = {
-		//product(nullable:false)
+    static constraints = {		
 		inventoryItem(nullable:false)		
-		quantity(nullable:false)
-		product(nullable:true)	
+		product(nullable:false)	
 		lotNumber(nullable:true)
+		quantity(nullable:false)
 		
     }
 }

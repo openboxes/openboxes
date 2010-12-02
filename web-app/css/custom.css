@@ -180,6 +180,7 @@ table#listOutgoing th {
 
 .nav { 
 	margin: 0px;
+	margin-bottom: 1px;
 	padding: 10px;
 	background-color: #F7F7F7;
 }

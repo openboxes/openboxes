@@ -20,47 +20,65 @@
 	            </div>
             </g:hasErrors>
             <g:form method="post" >
-                <g:hiddenField name="id" value="${warehouseInstance?.id}" />
-                <g:hiddenField name="version" value="${warehouseInstance?.version}" />
-                <div class="dialog">
-                    <table>
-                        <tbody>
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                  <label for="name"><g:message code="warehouse.name.label" default="Name" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'name', 'errors')}">
-                                    <g:textField name="name" value="${warehouseInstance?.name}" />
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                  <label for="manager"><g:message code="warehouse.manager.label" default="Manager" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'manager', 'errors')}">
-                                    <g:select name="manager.id" from="${org.pih.warehouse.core.User.list()}" optionKey="id" value="${warehouseInstance?.manager?.id}"  />
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                  <label for="manager"><g:message code="warehouse.manager.label" default="Managed Locally" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'local', 'errors')}">
-                                    <g:textField name="local" value="${warehouseInstance?.local}" />
-                                </td>
-                            </tr>
-                            <tr>
-                            	<td valign="top"></td>
-                            	<td valign="top">
-					                <div class="buttons">
-					                    <g:actionSubmit class="save" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" /></span>
-					                    <g:actionSubmit class="delete" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /></span>
-					                </div>                            	
-                            	</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            	<fieldset>
+            		
+	                <g:hiddenField name="id" value="${warehouseInstance?.id}" />
+	                <g:hiddenField name="version" value="${warehouseInstance?.version}" />
+	                <div class="dialog">
+	                    <table>
+	                    	<thead>
+								<tr>
+				        			<td valign="top" colspan="2">
+										<g:render template="summary"/>			            			
+									</td>            
+		                    	</tr>	                    	
+	                    	</thead>
+	                        <tbody>
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
+	                                  <label for="name"><g:message code="warehouse.name.label" default="Name" /></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'name', 'errors')}">
+	                                    <g:textField name="name" value="${warehouseInstance?.name}" />
+	                                </td>
+	                            </tr>
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
+	                                  <label for="manager"><g:message code="warehouse.manager.label" default="Manager" /></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'manager', 'errors')}">
+	                                    <g:select name="manager.id" from="${org.pih.warehouse.core.User.list()}" optionKey="id" value="${warehouseInstance?.manager?.id}"  />
+	                                </td>
+	                            </tr>
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
+	                                  <label for="manager"><g:message code="warehouse.manager.label" default="Managed Locally" /></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'local', 'errors')}">
+	                                    <g:checkBox name="local" value="${warehouseInstance?.local}" />
+	                                </td>
+	                            </tr>
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
+	                                  <label for="manager"><g:message code="warehouse.manager.label" default="Active" /></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'local', 'errors')}">
+	                                    <g:checkBox name="active" value="${warehouseInstance?.active}" />
+	                                </td>
+	                            </tr>
+	                            <tr>
+	                            	<td valign="top"></td>
+	                            	<td valign="top">
+						                    <g:actionSubmit class="save" action="update" value="${message(code: 'default.button.save.label', default: 'Save')}" /></span>
+											&nbsp;
+											<g:link class="cancel" action="show" id="${warehouseInstance?.id }">${message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
+	                            	
+	                            	</td>
+	                            </tr>
+	                        </tbody>
+	                    </table>
+	                </div>
+                </fieldset>
             </g:form>
         </div>
     </body>

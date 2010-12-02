@@ -18,6 +18,8 @@ class ContainerType implements java.io.Serializable {
 		name(nullable:false)
 		description(nullable:true)
 		sortOrder(nullable:true)
+		dateCreated(display:false)
+		lastUpdated(display:false)
 	}	
 
 	static mapping = {

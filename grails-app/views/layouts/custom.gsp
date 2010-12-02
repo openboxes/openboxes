@@ -19,40 +19,12 @@
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'form.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footer.css')}" type="text/css" media="screen, projection" />
 	
-	
-	<%--
-	<!-- Include Blueprint CSS --> 
-	<link rel="stylesheet" href="${createLinkTo(dir:'css/blueprint', file:'reset.css')}" type="text/css" media="screen, projection">
-	<link rel="stylesheet" href="${createLinkTo(dir:'css/blueprint',file:'typography.css')}" type="text/css" media="screen, projection" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css/blueprint',file:'grid.css')}" type="text/css" media="screen, projection" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css/blueprint',file:'forms.css')}" type="text/css" media="screen, projection" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css/blueprint', file:'print.css')}" type="text/css" media="print">
-	<!--[if IE]><link rel="stylesheet" href="${createLinkTo(dir:'css/blueprint', file:'ie.css')}" type="text/css" media="screen, projection"><![endif]-->
-	<!-- TODO Would like to use the bp:blueprintCss <bp:blueprintCss/> -->
-	--%>
-
-	
 	<!-- Grails Layout : write head element for page-->
 	<g:layoutHead />
 	
 	<!-- Include javascript files -->
 	<g:javascript library="application"/>
-	<g:javascript library="jquery"/>
-	<script type="text/javascript">
-		//$.noConflict();
-		/*
-		$(function () {
-			$.notifyBar({
-				html: "Thank you, your settings were updated!",
-				delay: 100000,
-				animationSpeed: "normal",
-				close:true
-			});  
-		});
-		*/
-		
-		// Code that uses other library's $ can follow here.
-	</script>
+	<g:javascript library="jquery" plugin="jquery"/>
 
 	<!-- Manually include jquery-ui resources -->
 	<link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui-1.8.2.custom.css')}" type="text/css" rel="stylesheet" media="screen, projection" />

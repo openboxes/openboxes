@@ -29,10 +29,12 @@ class Transaction {
     TransactionType transactionType 	// Detailed transaction type (e.g. Order, Transfer, Stock Count)
 	
 	// Auditing fields
+	Boolean confirmed = Boolean.FALSE;	// Transactions need to be confirmed by a supervisor
+	User confirmedBy
 	User createdBy
 	Date dateCreated
 	Date lastUpdated
-	
+	Date dateConfirmed
 	
     // Association mapping
     static hasMany = [ transactionEntries : TransactionEntry ]
@@ -45,5 +47,8 @@ class Transaction {
 	    source(nullable:false)
 	    destination(nullable:true)
 		createdBy(nullable:true)
+		confirmed(nullable:true)
+		confirmedBy(nullable:true)
+		dateConfirmed(nullable:true)
     }
 }

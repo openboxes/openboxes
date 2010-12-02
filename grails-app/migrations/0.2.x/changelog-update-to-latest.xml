@@ -1285,77 +1285,287 @@
 		</update>
 	</changeSet>
 	
-	
-<!-- 
-
-    <changeSet author="jmiranda (generated)" id="1290477989262-1">
+    <changeSet author="jmiranda (generated)" id="1290477989262-1a">
+		<preConditions onFail="MARK_RAN">
+			<not><indexExists indexName="FKFE01941672A2C5B4"/></not>
+		</preConditions>    
         <createIndex indexName="FKFE01941672A2C5B4" tableName="inventory_item" unique="false">
             <column name="inventory_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="jmiranda (generated)" id="1290477989262-2">
+    <changeSet author="jmiranda (generated)" id="1290477989262-1b">
+		<preConditions onFail="MARK_RAN">
+			<not><foreignKeyConstraintExists foreignKeyName="FKFE01941672A2C5B4"/></not>
+		</preConditions>    
+		<addForeignKeyConstraint constraintName="FKFE01941672A2C5B4"
+		    baseTableName="inventory_item" baseColumnNames="inventory_id"
+		    referencedTableName="inventory" referencedColumnNames="id" />
+    </changeSet>
+    
+    <changeSet author="jmiranda (generated)" id="1290477989262-2a">
+		<preConditions onFail="MARK_RAN">
+			<not><indexExists indexName="FKFE019416DED5FAE7"/></not>
+		</preConditions>    
         <createIndex indexName="FKFE019416DED5FAE7" tableName="inventory_item" unique="false">
             <column name="product_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="jmiranda (generated)" id="1290477989262-3">
+    <changeSet author="jmiranda (generated)" id="1290477989262-2b">
+		<preConditions onFail="MARK_RAN">
+			<not><foreignKeyConstraintExists foreignKeyName="FKFE019416DED5FAE7"/></not>
+		</preConditions>    
+		<addForeignKeyConstraint constraintName="FKFE019416DED5FAE7"
+		    baseTableName="inventory_item" baseColumnNames="product_id"
+		    referencedTableName="product" referencedColumnNames="id" />
+    </changeSet>    
+    
+    <changeSet author="jmiranda (generated)" id="1290477989262-3a">
+		<preConditions onFail="MARK_RAN">
+			<not><indexExists indexName="FKC254A2E172A2C5B4"/></not>
+		</preConditions>    
         <createIndex indexName="FKC254A2E172A2C5B4" tableName="inventory_level" unique="false">
             <column name="inventory_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="jmiranda (generated)" id="1290477989262-4">
+    <changeSet author="jmiranda (generated)" id="1290477989262-3b">
+		<preConditions onFail="MARK_RAN">
+			<not><foreignKeyConstraintExists foreignKeyName="FKC254A2E172A2C5B4"/></not>
+		</preConditions>    
+		<addForeignKeyConstraint constraintName="FKC254A2E172A2C5B4"
+		    baseTableName="inventory_level" baseColumnNames="inventory_id"
+		    referencedTableName="inventory" referencedColumnNames="id" />
+    </changeSet>    
+    
+    <changeSet author="jmiranda (generated)" id="1290477989262-4a">
+		<preConditions onFail="MARK_RAN">
+			<not><indexExists indexName="FKC254A2E1DED5FAE7"/></not>
+		</preConditions>    
         <createIndex indexName="FKC254A2E1DED5FAE7" tableName="inventory_level" unique="false">
             <column name="product_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="jmiranda (generated)" id="1290477989262-5">
+    <changeSet author="jmiranda (generated)" id="1290477989262-4b">
+		<preConditions onFail="MARK_RAN">
+			<not><foreignKeyConstraintExists foreignKeyName="FKC254A2E1DED5FAE7"/></not>
+		</preConditions>    
+		<addForeignKeyConstraint constraintName="FKC254A2E1DED5FAE7"
+		    baseTableName="inventory_level" baseColumnNames="product_id"
+		    referencedTableName="product" referencedColumnNames="id" />
+    </changeSet>    
+    
+    <changeSet author="jmiranda (generated)" id="1290477989262-5a">
+		<preConditions onFail="MARK_RAN">
+			<not><indexExists indexName="FKA518DDEE72A2C5B4"/></not>
+		</preConditions>    
         <createIndex indexName="FKA518DDEE72A2C5B4" tableName="inventory_lot" unique="false">
             <column name="inventory_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="jmiranda (generated)" id="1290477989262-6">
+    <changeSet author="jmiranda (generated)" id="1290477989262-5b">
+		<preConditions onFail="MARK_RAN">
+			<not><foreignKeyConstraintExists foreignKeyName="FKA518DDEE72A2C5B4"/></not>
+		</preConditions>    
+		<addForeignKeyConstraint constraintName="FKA518DDEE72A2C5B4"
+		    baseTableName="inventory_lot" baseColumnNames="inventory_id"
+		    referencedTableName="inventory" referencedColumnNames="id" />
+    </changeSet>        
+    
+    <changeSet author="jmiranda (generated)" id="1290477989262-6a">
+		<preConditions onFail="MARK_RAN">
+			<not><indexExists indexName="FKA518DDEEDED5FAE7"/></not>
+		</preConditions>    
         <createIndex indexName="FKA518DDEEDED5FAE7" tableName="inventory_lot" unique="false">
             <column name="product_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="jmiranda (generated)" id="1290477989262-7">
+    <changeSet author="jmiranda (generated)" id="1290477989262-6b">
+		<preConditions onFail="MARK_RAN">
+			<not><foreignKeyConstraintExists foreignKeyName="FKA518DDEEDED5FAE7"/></not>
+		</preConditions>    
+		<addForeignKeyConstraint constraintName="FKA518DDEEDED5FAE7"
+		    baseTableName="inventory_lot" baseColumnNames="product_id"
+		    referencedTableName="product" referencedColumnNames="id" />
+    </changeSet>  
+	<!-- Already exists -->        
+	<!--  
+    <changeSet author="jmiranda (generated)" id="1290477989262-7a">
+		<preConditions onFail="MARK_RAN">
+			<not><indexExists indexName="FK714F9FB572A2C5B4"/></not>
+		</preConditions>    
         <createIndex indexName="FK714F9FB572A2C5B4" tableName="location" unique="false">
             <column name="inventory_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="jmiranda (generated)" id="1290477989262-8">
+    <changeSet author="jmiranda (generated)" id="1290477989262-7b">
+		<preConditions onFail="MARK_RAN">
+			<not><foreignKeyConstraintExists foreignKeyName="FK714F9FB572A2C5B4"/></not>
+		</preConditions>    
+		<addForeignKeyConstraint constraintName="FK714F9FB572A2C5B4"
+		    baseTableName="location" baseColumnNames="inventory_id"
+		    referencedTableName="inventory" referencedColumnNames="id" />
+    </changeSet>            
+	-->
+    <changeSet author="jmiranda (generated)" id="1290477989262-8a">
+		<preConditions onFail="MARK_RAN">
+			<not><indexExists indexName="FK714F9FB57AF9A3C0"/></not>
+		</preConditions>    
         <createIndex indexName="FK714F9FB57AF9A3C0" tableName="location" unique="false">
             <column name="parent_location_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="jmiranda (generated)" id="1290477989262-9">
+    <changeSet author="jmiranda (generated)" id="1290477989262-8b">
+		<preConditions onFail="MARK_RAN">
+			<not><foreignKeyConstraintExists foreignKeyName="FK714F9FB57AF9A3C0"/></not>
+		</preConditions>    
+		<addForeignKeyConstraint constraintName="FK714F9FB57AF9A3C0"
+		    baseTableName="location" baseColumnNames="parent_location_id"
+		    referencedTableName="location" referencedColumnNames="id" />
+    </changeSet>            
+    
+    <changeSet author="jmiranda (generated)" id="1290477989262-9a">
+		<preConditions onFail="MARK_RAN">
+			<not><indexExists indexName="FK7FA0D2DE10746729"/></not>
+		</preConditions>    
         <createIndex indexName="FK7FA0D2DE10746729" tableName="transaction" unique="false">
             <column name="destination_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="jmiranda (generated)" id="1290477989262-10">
+    <changeSet author="jmiranda (generated)" id="1290477989262-9b">
+		<preConditions onFail="MARK_RAN">
+			<not><foreignKeyConstraintExists foreignKeyName="FK7FA0D2DE10746729"/></not>
+		</preConditions>    
+		<addForeignKeyConstraint constraintName="FK7FA0D2DE10746729"
+		    baseTableName="transaction" baseColumnNames="destination_id"
+		    referencedTableName="location" referencedColumnNames="id" />
+    </changeSet>
+    
+    <changeSet author="jmiranda (generated)" id="1290477989262-10a">
+		<preConditions onFail="MARK_RAN">
+			<not><indexExists indexName="FK7FA0D2DE217F5972"/></not>
+		</preConditions>    
         <createIndex indexName="FK7FA0D2DE217F5972" tableName="transaction" unique="false">
             <column name="created_by_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="jmiranda (generated)" id="1290477989262-11">
+    <changeSet author="jmiranda (generated)" id="1290477989262-10b">
+		<preConditions onFail="MARK_RAN">
+			<not><foreignKeyConstraintExists foreignKeyName="FK7FA0D2DE217F5972"/></not>
+		</preConditions>    
+		<addForeignKeyConstraint constraintName="FK7FA0D2DE217F5972"
+		    baseTableName="transaction" baseColumnNames="created_by_id"
+		    referencedTableName="user" referencedColumnNames="id" />
+    </changeSet> 
+
+    <changeSet author="jmiranda (generated)" id="1290477989262-11a">
+		<preConditions onFail="MARK_RAN">
+			<not><indexExists indexName="FK7FA0D2DE72A2C5B4"/></not>
+		</preConditions>    
         <createIndex indexName="FK7FA0D2DE72A2C5B4" tableName="transaction" unique="false">
             <column name="inventory_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="jmiranda (generated)" id="1290477989262-12">
+    <changeSet author="jmiranda (generated)" id="1290477989262-11b">
+		<preConditions onFail="MARK_RAN">
+			<not><foreignKeyConstraintExists foreignKeyName="FK7FA0D2DE72A2C5B4"/></not>
+		</preConditions>    
+		<addForeignKeyConstraint constraintName="FK7FA0D2DE72A2C5B4"
+		    baseTableName="transaction" baseColumnNames="inventory_id"
+		    referencedTableName="inventory" referencedColumnNames="id" />
+    </changeSet>            
+    
+    <changeSet author="jmiranda (generated)" id="1290477989262-12a">
+		<preConditions onFail="MARK_RAN">
+			<not><indexExists indexName="FK7FA0D2DE74CDABFC"/></not>
+		</preConditions>    
         <createIndex indexName="FK7FA0D2DE74CDABFC" tableName="transaction" unique="false">
             <column name="source_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="jmiranda (generated)" id="1290477989262-13">
+    <changeSet author="jmiranda (generated)" id="1290477989262-12b">
+		<preConditions onFail="MARK_RAN">
+			<not><foreignKeyConstraintExists foreignKeyName="FK7FA0D2DE74CDABFC"/></not>
+		</preConditions>    
+		<addForeignKeyConstraint constraintName="FK7FA0D2DE74CDABFC"
+		    baseTableName="transaction" baseColumnNames="source_id"
+		    referencedTableName="location" referencedColumnNames="id" />
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1290477989262-13a">
+		<preConditions onFail="MARK_RAN">
+			<not><indexExists indexName="FKABC21FD1DED5FAE7"/></not>
+		</preConditions>    
         <createIndex indexName="FKABC21FD1DED5FAE7" tableName="transaction_entry" unique="false">
             <column name="product_id"/>
         </createIndex>
     </changeSet>
+    <changeSet author="jmiranda (generated)" id="1290477989262-13b">
+		<preConditions onFail="MARK_RAN">
+			<not><foreignKeyConstraintExists foreignKeyName="FKABC21FD1DED5FAE7"/></not>
+		</preConditions>    
+		<addForeignKeyConstraint constraintName="FKABC21FD1DED5FAE7"
+		    baseTableName="transaction_entry" baseColumnNames="product_id"
+		    referencedTableName="product" referencedColumnNames="id" />
+    </changeSet>         
+    
+    <changeSet author="jmiranda (generated)" id="1291325368079-1">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="transaction" columnName="confirmed"/></not>
+		</preConditions>    
+        <addColumn tableName="transaction">
+            <column name="confirmed" type="BIT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1291325368079-2">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="transaction" columnName="confirmed_by_id"/></not>
+		</preConditions>    
+        <addColumn tableName="transaction">
+            <column name="confirmed_by_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1291325368079-3">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="transaction" columnName="date_confirmed"/></not>
+		</preConditions>    
+        <addColumn tableName="transaction">
+            <column name="date_confirmed" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1291325368079-4">
+        <dropNotNullConstraint columnDataType="BIGINT" columnName="inventory_item_id" tableName="transaction_entry"/>
+    </changeSet>
+    
+    <changeSet author="jmiranda (generated)" id="1291325368079-5">
+		<preConditions onFail="MARK_RAN">
+			<not><indexExists indexName="FK714F9FB572A2C5B4"/></not>
+		</preConditions>    
+        <createIndex indexName="FK714F9FB572A2C5B4" tableName="location" unique="false">
+            <column name="inventory_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1291325368079-6">
+		<preConditions onFail="MARK_RAN">
+			<not><foreignKeyConstraintExists foreignKeyName="FK714F9FB572A2C5B4"/></not>
+		</preConditions>    
+		<addForeignKeyConstraint constraintName="FK714F9FB572A2C5B4"
+		    baseTableName="location" baseColumnNames="inventory_id"
+		    referencedTableName="inventory" referencedColumnNames="id" />
+    </changeSet>          
 
-
- -->
-
-    	
+    <changeSet author="jmiranda (generated)" id="1291325368079-7">
+		<preConditions onFail="MARK_RAN">
+			<not><indexExists indexName="FK7FA0D2DE3265A8A9"/></not>
+		</preConditions>    
+        <createIndex indexName="FK7FA0D2DE3265A8A9" tableName="transaction" unique="false">
+            <column name="confirmed_by_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1291325368079-8">
+		<preConditions onFail="MARK_RAN">
+			<not><foreignKeyConstraintExists foreignKeyName="FK7FA0D2DE3265A8A9"/></not>
+		</preConditions>    
+		<addForeignKeyConstraint constraintName="FK7FA0D2DE3265A8A9"
+		    baseTableName="transaction" baseColumnNames="confirmed_by_id"
+		    referencedTableName="user" referencedColumnNames="id" />
+    </changeSet>          
 </databaseChangeLog>

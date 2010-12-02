@@ -2,6 +2,6 @@ package org.pih.warehouse.product;
 
 class PackageTypeController {
 
-	//def scaffold = PackageType;
+	def scaffold = PackageType;
 	
 }

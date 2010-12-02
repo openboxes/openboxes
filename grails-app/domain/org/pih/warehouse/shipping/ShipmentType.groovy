@@ -20,6 +20,8 @@ class ShipmentType implements java.io.Serializable {
 		description(nullable:true)
 		sortOrder(nullable:true)
 		containerTypes(nullable:true)
+		dateCreated(display:false)
+		lastUpdated(display:false)
 	}
 
 	static mapping = {
