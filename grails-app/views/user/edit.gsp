@@ -9,6 +9,11 @@
     </head>
     <body>
         <div class="body">
+        
+        	<div class="nav">
+        		<g:render template="nav"/>
+        	</div>        
+        
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>
@@ -25,10 +30,18 @@
                 <g:hiddenField name="version" value="${userInstance?.version}" />
                 
                 
-				<g:render template="summary"/>
+				
 				<fieldset>                
 	                <div class="dialog">
 	                    <table>
+							<thead>
+								<tr>
+				        			<td valign="top" colspan="2">
+										<g:render template="summary"/>			            			
+									</td>            
+		                    	</tr>	                    	
+	                    	</thead>	                    
+	                    
 	                        <tbody>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
@@ -83,16 +96,24 @@
 	                                    <g:textField name="email" value="${userInstance?.email}" />
 	                                </td>
 	                            </tr>
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
+	                                  <label for="email"><g:message code="user.email.label" default="Active" /></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'active', 'errors')}">
+	                                    <g:checkBox name="active" value="${userInstance?.active}" />
+	                                </td>
+	                            </tr>
 	                            	                            
 								<tr class="prop">
 									<td valign="top" class="name">
 				
 									</td>
 									<td valign="top">
-										<div class="buttons">
-										    <g:actionSubmit class="positive" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-										    
-										</div>
+					                    <g:actionSubmit class="save" action="update" value="${message(code: 'default.button.save.label', default: 'Save')}" /></span>
+										&nbsp;
+										<g:link class="cancel" action="show" id="${warehouseInstance?.id }">${message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
+	                            	
 									</td>
 								</tr>
 	                        </tbody>

@@ -12,6 +12,10 @@
     <body>
       
         <div class="body">
+        
+        	<div class="nav">
+        		<g:render template="nav"/>
+        	</div>        
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
@@ -21,6 +25,7 @@
 		    </div>
             </g:hasErrors>
             <g:form action="save" method="post" >
+            	<fieldset>
                 <div class="dialog">
                     <table>
                         <tbody>
@@ -73,9 +78,10 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="buttons">
-                    <span class="button"><g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" /></span>
+                <div class="buttonBar">
+                    <g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" />
                 </div>
+                </fieldset>
             </g:form>
         </div>
     </body>

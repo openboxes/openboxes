@@ -21,10 +21,12 @@ class SecurityFilters {
 				}
 				// When there's no authenticated user in the session and a request requires authentication 
 				// we redirect to the auth login page.  targetUri is the URI the user was trying to get to.
-				else if(!session.user && !(
-					Arrays.asList(actionsWithAuthUserNotRequired).contains(actionName))) {
-					redirect(controller: 'auth', action:'login', 
-						params: ['targetUri': (request.forwardURI - request.contextPath) + "?" + request.queryString])
+				else if(!session.user && !(Arrays.asList(actionsWithAuthUserNotRequired).contains(actionName))) {
+					def targetUri = (request.forwardURI - request.contextPath);
+					if (request.queryString) 
+						targetUri += "?" + request.queryString
+
+					redirect(controller: 'auth', action:'login', params: ['targetUri': targetUri])
 					return false;
 				}
 					

@@ -308,6 +308,9 @@ th.desc a {
 .menuButton a.warehouse {
     background: url(../images/icons/silk/building.png) center left no-repeat;
 }
+.menuButton a.location {
+    background: url(../images/icons/silk/map.png) center left no-repeat;
+}
 .menuButton a.inventory {
     background: url(../images/icons/stockbook.png) center left no-repeat;
 }

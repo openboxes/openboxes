@@ -11,16 +11,29 @@
     </head>
     <body>   
         <div class="body">
+            
+        	<div class="nav">
+        		<g:render template="nav"/>
+        	</div>        
+            
+            
             <g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>
             </g:if>
             
             
-            <g:render template="summary"/>
 			<fieldset>
 				
 	            <div class="dialog">
 	                <table>
+	                	<thead>
+							<tr>
+								<td colspan="2">
+						            <g:render template="summary"/>
+								
+								</td>	
+							</tr>
+	                	</thead>
 	                    <tbody>
 	                        <tr class="prop">
 	                            <td valign="top" class="name"><g:message code="user.id.label" default="ID" /></td>                            
@@ -74,6 +87,7 @@
 	                            	</table>
 								</td>
 							</tr>
+							<!-- 
 							<tr class="prop">
 	                            <td valign="top" class="prop name"></td>
 	                            <td valign="top" class="prop value">
@@ -91,7 +105,8 @@
 										</div>						
 									</g:form>
 								</td>
-	                        </tr>	                        
+	                        </tr>
+	                        -->	                        
 	                    </tbody>
 	                </table>
 	            </div>

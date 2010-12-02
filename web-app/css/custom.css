@@ -34,7 +34,7 @@ body {
 
 /* controls width of the page */
 .body { 
-	padding: 10px 0 10px 0;
+	padding: 0px 0 10px 0;
 }
 
 .fade { 
@@ -177,14 +177,18 @@ table#listOutgoing th {
 #menu { 
 
 }
-/* TODO figure out if this is needed */
-#nav {
-	margin-top: 20px;
-	margin-left: 0px;
-	width: 228px;
-	float: left;
-	border: 0px solid black;
+
+.nav { 
+	margin: 0px;
+	padding: 10px;
+	background-color: #F7F7F7;
 }
+.buttonBar { 
+	background-color: #F7F7F7;
+	padding: 10px;
+	text-align: center;
+}
+
 #resultSummary { 
 	font-size: 9pt;	
 }
@@ -391,9 +395,10 @@ div#dashboard li {
 	vertical-align: top;
 	line-height: 1.5em;
 }
-
+/*
 .active	{ background-color: #6699CC; color: white;} 
 .inactive { background-color: #EEE; } 
+*/
 label { display: inline; text-decoration: none; }
 label.block { display: block; } 
 fieldset .prop { margin: 10px; }

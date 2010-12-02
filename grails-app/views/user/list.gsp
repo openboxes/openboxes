@@ -1,19 +1,21 @@
 
 <%@ page import="org.pih.warehouse.core.User" %>
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'user.label', default: 'User')}" />
-        <title><g:message code="default.list.label" args="[entityName]" /></title>
-	<content tag="pageTitle"><g:message code="default.list.label" args="[entityName]" /></content>
-
-    </head>
-    <body>
-        <div class="body">
-	    <g:if test="${flash.message}">
-	    	<div class="message">${flash.message}</div>
-            </g:if>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="layout" content="custom" />
+	<g:set var="entityName" value="${message(code: 'user.label', default: 'User')}" />
+	<title><g:message code="default.list.label" args="[entityName]" /></title>
+</head>
+<body>
+    <div class="body">
+		    <div class="nav">
+		    	<g:render template="nav"/>		    
+		    </div>
+		    <g:if test="${flash.message}">
+		    	<div class="message">${flash.message}</div>
+	        </g:if>
+	        
             <div class="list">
                 <table>
                     <thead>
@@ -42,5 +44,6 @@
                 <g:paginate total="${userInstanceTotal}" />
             </div>
         </div>
+
     </body>
 </html>
