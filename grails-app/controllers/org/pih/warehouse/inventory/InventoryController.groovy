@@ -1,5 +1,6 @@
 package org.pih.warehouse.inventory;
 
+import org.pih.warehouse.core.User;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.ProductType;
@@ -46,6 +47,7 @@ class InventoryController {
 			inventoryInstance: warehouseInstance.inventory,
 			productMap : inventoryService.getProductMap(warehouseInstance?.id),
 			inventoryMap : inventoryService.getInventoryMap(warehouseInstance?.id),
+			inventoryLevelMap : inventoryService.getInventoryLevelMap(warehouseInstance?.id),
 			//productInstanceList : Product.getAll(),
 			productType: productType,
 			productTypes: productTypes
@@ -354,9 +356,20 @@ class InventoryController {
 
 		
 	def confirmTransaction = { 
-		def transactionInstnace = Transaction.get(params?.id)
-		
-		[transactionInstance: transactionInstnace]
+		def transactionInstance = Transaction.get(params?.id)
+		if (transactionInstance?.confirmed) { 
+			transactionInstance?.confirmed = Boolean.FALSE;
+			transactionInstance?.confirmedBy = null;
+			transactionInstance?.dateConfirmed = null;
+			flash.message = "Transaction has been unconfirmed"
+		}
+		else { 
+			transactionInstance?.confirmed = Boolean.TRUE;
+			transactionInstance?.confirmedBy = User.get(session?.user?.id);
+			transactionInstance?.dateConfirmed = new Date();
+			flash.message = "Transaction has been confirmed"
+		}
+		redirect(action: "listAllTransactions")
 	}
 	
 	

@@ -26,20 +26,6 @@ class InventoryService {
 	Map getProductMap(Long id) { 		
 		// Get a warehouse specific product map
 		//def warehouse = Warehouse.get(id);		
-		/*		
-		def products = Product.getAll();
-		def productMap = products.inject([:]) { map, element ->
-			def productType = element.productType
-			if (productType) { 
-				def productList = map[productType?.name]
-				if (!productList) productList = new ArrayList<Product>();
-				productList.add(element);
-				map[productType?.name] = productList;
-			}
-			map
-		}
-		return productMap;
-		*/
 		
 		return Product.getAll().groupBy { it.productType } 
 	}
@@ -63,21 +49,13 @@ class InventoryService {
 	
 	
 	Map getInventoryMap(Long id) { 
-		
-		/*
-		def inventoryMap;
-		def warehouse = Warehouse.get(id);
-		if (warehouse && warehouse?.inventory) { 
-			inventoryMap = warehouse?.inventory?.inventoryItems.inject([:]) { map, element ->				
-				map[element.product] = element; 
-			}
-		}
-		return inventoryMap;
-		*/
 		return Warehouse.get(id)?.inventory?.inventoryItems.groupBy { it.product } 
-		
 	}
-	
+
+	Map getInventoryLevelMap(Long id) { 
+		return Warehouse.get(id)?.inventory?.inventoryLevels.groupBy { it.product } 
+	}
+		
 	
 	Warehouse getWarehouse(Long id) { 
 		return Warehouse.get(id);

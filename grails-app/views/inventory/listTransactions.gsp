@@ -22,9 +22,10 @@
                     <thead>
                         <tr>   
 							<th>ID</th>
+							<th>Date</th>
+							<th>Type</th>
 							<th>Source</th>
 							<th>Destination</th>
-							<th>Date</th>
 							<th>Confirmed?</th>
 							<th>Entries</th>
 							<th>Actions</th>
@@ -33,7 +34,15 @@
        	           	<tbody>			
 						<g:each var="transactionInstance" in="${transactionInstanceList}" status="i">           
 							<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
-								<td>${transactionInstance?.id }</td>				
+								<td>
+									${transactionInstance?.id }
+								</td>				
+								<td>
+									${formatDate(date: transactionInstance?.transactionDate, format: 'dd-MMM-yyyy') }
+								</td>
+								<td>
+									${transactionInstance?.transactionType?.name }
+								</td>
 								<td>
 									${transactionInstance?.source?.name }
 								</td>
@@ -41,11 +50,8 @@
 									${transactionInstance?.destination?.name }
 								</td>
 								<td>
-									${formatDate(date: transactionInstance?.transactionDate, format: 'dd-MMM-yyyy') }
-								</td>
-								<td>
 									<g:if test="${!transactionInstance?.confirmed}">
-										Not confirmed yet
+										
 									</g:if>
 									<g:else>
 										Confirmed by ${transactionInstance?.confirmedBy?.name } on
@@ -56,7 +62,14 @@
 									${transactionInstance?.transactionEntries?.size() }
 								</td>
 								<td>
-									<g:link action="showTransaction" id="${transactionInstance?.id }">view</g:link>
+									<g:link action="showTransaction" id="${transactionInstance?.id }">View</g:link>
+									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png') }"/>
+									<g:if test="${transactionInstance?.confirmed }">
+										<g:link action="confirmTransaction" id="${transactionInstance?.id }">Reset</g:link>	
+									</g:if>
+									<g:else>
+										<g:link action="confirmTransaction" id="${transactionInstance?.id }">Confirm</g:link>	
+									</g:else>
 								</td>
 							</tr>
 						</g:each>

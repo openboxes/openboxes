@@ -91,22 +91,22 @@
 												<thead>
 													<tr>
 														<th>
-														${message(code: 'transaction.transactionDate.label', default: 'Date')}
+															${message(code: 'transaction.transactionDate.label', default: 'Date')}
 														</th>
 														<th>
-														${message(code: 'transaction.transactionType.label', default: 'Type')}
+															${message(code: 'transaction.transactionType.label', default: 'Type')}
 														</th>
 														<th>
-														${message(code: 'transaction.source.label', default: 'Source')}
+															${message(code: 'transaction.source.label', default: 'Source')}
 														</th>
 														<th>
-														${message(code: 'inventory.destination.label', default: 'Destination')}
+															${message(code: 'inventory.destination.label', default: 'Destination')}
 														</th>
 														<th>
-														${message(code: 'inventoryItem.lotNumber.label', default: 'Lot Number')}
+															${message(code: 'inventoryItem.lotNumber.label', default: 'Lot Number')}
 														</th>
 														<th>
-														${message(code: 'inventory.quantity.label', default: 'Qty')}
+															${message(code: 'inventory.quantity.label', default: 'Qty')}
 														</th>
 														<th>&nbsp;</th>
 													</tr>

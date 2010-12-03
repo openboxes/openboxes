@@ -82,28 +82,28 @@
 									<g:hiddenField name="destination.id" value="${warehouseInstance?.id }"/>
 								</td>
 							</tr>
-							<tr class="prop">
-								<td class="name"><label>Confirmed</label></td>
-								<td class="value">
-									<g:checkBox name="confirmed" value="${transactionInstance?.confirmed }"/>
-			                	</td>
-			                </tr>
-							<tr class="prop">
-								<td class="name"><label>Confirmed by</label></td>
-								<td class="value">
-									<g:select name="confirmedBy.id" from="${org.pih.warehouse.core.User.list()}" 
-			                       		optionKey="id" optionValue="name" value="${transactionInstance?.confirmedBy?.id}" noSelection="['null': '']" />									
-								</td>
-							</tr>							
-							<tr class="prop">
-								<td class="name"><label>Confirmed on</label></td>
-								<td class="value">
-									<g:jqueryDatePicker id="dateConfirmed" name="dateConfirmed"
-											value="${transactionInstance?.dateConfirmed}" format="MM/dd/yyyy"/>
-									
-								</td>
-							</tr>							
-						<g:if test="${transactionInstance?.id }">
+							<g:if test="${transactionInstance?.id }">
+								<tr class="prop">
+									<td class="name"><label>Confirmed</label></td>
+									<td class="value">
+										<g:checkBox name="confirmed" value="${transactionInstance?.confirmed }"/>
+				                	</td>
+				                </tr>
+								<tr class="prop">
+									<td class="name"><label>Confirmed by</label></td>
+									<td class="value">
+										<g:select name="confirmedBy.id" from="${org.pih.warehouse.core.User.list()}" 
+				                       		optionKey="id" optionValue="name" value="${transactionInstance?.confirmedBy?.id}" noSelection="['null': '']" />									
+									</td>
+								</tr>							
+								<tr class="prop">
+									<td class="name"><label>Confirmed on</label></td>
+									<td class="value">
+										<g:jqueryDatePicker id="dateConfirmed" name="dateConfirmed"
+												value="${transactionInstance?.dateConfirmed}" format="MM/dd/yyyy"/>
+										
+									</td>
+								</tr>							
 								<tr class="prop">
 									<td class="name">
 										<label>Transaction Entries</label>

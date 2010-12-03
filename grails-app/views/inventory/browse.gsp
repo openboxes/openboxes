@@ -71,9 +71,7 @@
 						<thead>
 							<tr class="even">
 								<th>Status</th>
-								<th>Product type</th>
 								<th>Product</th>
-								<th>Dosage</th>
 								<th>Quantity</th>
 								<th>Action</th>
 							</tr>
@@ -81,23 +79,37 @@
 					
 						<tbody>
 							<g:each var="productInstance" in="${productMap.get(productType) }" status="i">
-							 	<g:set var="itemInstanceList" value="${inventoryMap.get(productInstance)}"/>							
+							 	<g:set var="itemInstanceList" value="${inventoryMap.get(productInstance)}"/>	
+							 	<g:set var="inventoryLevel" value="${inventoryLevelMap?.get(productInstance)?.get(0)}"/>
+							 	<g:set var="quantity" value="${(itemInstanceList)?itemInstanceList*.quantity.sum():0 }"/>
 								<tr class="${varStatus++%2==0?'odd':'even' }">
-									<td style="width: 2%;">
-									</td>								
-									<td style="width: 8%; text-align: center;">${productInstance?.productType?.name }</td>					
-									<td style="width: 30%;">${productInstance?.name }</td>					
-									<td style="width: 10%; text-align: left;">${productInstance?.dosageStrength } ${productInstance?.dosageUnit } ${productInstance?.dosageForm?.name }</td>
 									<td style="width: 5%; text-align: center;">
 										<g:if test="${itemInstanceList }">
-											${itemInstanceList*.quantity.sum() }
-										</g:if>
-										<g:else>
-											0
-										</g:else>
+											<g:if test="${quantity < 0}">
+												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'exclamation.png') }" alt="Out of Stock"/>
+											</g:if>
+											<g:elseif test="${inventoryLevel?.minQuantity && quantity <= inventoryLevel?.minQuantity}">
+												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'exclamation.png') }" alt="Low Stock"/>
+											</g:elseif>
+											<g:elseif test="${inventoryLevel?.reorderQuantity && quantity <= inventoryLevel?.reorderQuantity}">
+												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'error.png') }" alt="Reorder"/>
+											</g:elseif>										
+											<g:elseif test="${inventoryLevel?.maxQuantity && quantity >= inventoryLevel?.maxQuantity}" >
+												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'error.png') }" alt="Overstock"/>
+											</g:elseif>	
+											<g:else>
+												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'tick.png') }" alt="Ok"/>
+											</g:else>
+										</g:if>								
+									</td>								
+									<td style="width: 30%;">
+										<b>${productInstance?.name }</b>					
+										${productInstance?.dosageStrength } ${productInstance?.dosageUnit } ${productInstance?.dosageForm?.name }</td>
+									<td style="width: 5%; text-align: center;">
+										${(itemInstanceList)?itemInstanceList*.quantity.sum():'Not Available' }
 									</td>
 									<td style="width: 15%; text-align: center">
-										<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">view stock</g:link>
+										<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">View Stock</g:link>
 									</td>
 								</tr>
 							</g:each>
