@@ -3,8 +3,6 @@ class SecurityFilters {
 	def filters = {
 		loginCheck(controller:'*', action:'*') {
 			before = {	
-				
-				log.info params
 				String [] controllersWithAuthUserNotRequired = "api,test".split(",");
 				String [] actionsWithAuthUserNotRequired = "login,handleLogin,signup,handleSignup,json".split(",");
 				String [] actionsWithWarehouseNotRequired = "login,handleLogin,signup,handleSignup,chooseWarehouse,viewLogo,json".split(",");
