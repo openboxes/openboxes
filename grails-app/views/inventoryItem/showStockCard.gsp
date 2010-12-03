@@ -10,28 +10,34 @@
 </head>
 
 <body>
-<div class="body"><g:if test="${flash.message}">
-	<div class="message">
-	${flash.message}
+<div class="body">
+
+	<div class="nav">
+		<g:render template="../inventory/nav"/>
 	</div>
-</g:if> <g:hasErrors bean="${itemInstance}">
-	<div class="errors"><g:renderErrors bean="${itemInstance}"
-		as="list" /></div>
-</g:hasErrors>
-
-<div class="dialog">
-<fieldset>
 
 
-<h1><span class="fade"> ${productInstance?.productType?.name }
-</span> &nbsp; ${productInstance?.name } ${productInstance?.dosageStrength } ${productInstance?.dosageUnit }
+	<g:if test="${flash.message}">
+		<div class="message">
+			${flash.message}
+		</div>
+	</g:if> 
+	<g:hasErrors bean="${itemInstance}">
+		<div class="errors"><g:renderErrors bean="${itemInstance}" as="list" /></div>
+	</g:hasErrors>
 
+	<div class="dialog">
+		<fieldset>
+			<h1>${productInstance?.name } ${productInstance?.dosageStrength } ${productInstance?.dosageUnit }</h1>
+			<a href="${createLink(controller: 'inventory', action: 'browse', params: ['productType.id' : productInstance?.productType?.id])}">&laquo; back to ${productInstance?.productType?.name } </a>
+					
+			
 <%-- 
 						&nbsp;
 						<span style="font-size: 1em;">					
 							<a href="${createLink(action: 'edit', id: itemInstance?.id, params: ['inventory.id':itemInstance?.inventory?.id]) }">edit</a>
 						</span>
-						--%></h1>
+						--%>
 <%-- 
 					<table>
 						<tr>
@@ -77,83 +83,82 @@
 
 
 
-<table>
-	<tr>
-		<td width="75%">
-		<fieldset><legend>Transactions</legend>
-		<table border="1" style="border: 1px solid #f5f5f5">
-			<thead>
-				<tr>
-					<th>
-					${message(code: 'transaction.transactionDate.label', default: 'Date')}
-					</th>
-					<th>
-					${message(code: 'transaction.transactionType.label', default: 'Type')}
-					</th>
-					<th>
-					${message(code: 'transaction.source.label', default: 'Source')}
-					</th>
-					<th>
-					${message(code: 'inventory.destination.label', default: 'Destination')}
-					</th>
-					<th>
-					${message(code: 'inventoryItem.lotNumber.label', default: 'Lot Number')}
-					</th>
-					<th>
-					${message(code: 'inventory.quantity.label', default: 'Qty')}
-					</th>
-					<th>Actions</th>
-				</tr>
-			</thead>
-			<tbody>
-				<g:if test="${transactionEntryList}">
-					<g:each var="transactionEntry" in="${transactionEntryList}"
-						status="i">
-						<tr class="${(i%2==0)?'odd':'even' }">
-							<td><g:formatDate
-								date="${transactionEntry?.transaction?.transactionDate}"
-								format="MMM dd" /></td>
-							<td>
-							${transactionEntry?.transaction?.transactionType?.name }
-							</td>
-							<td>
-							${transactionEntry?.transaction?.source?.name }
-							</td>
-														<td>${transactionEntry?.transaction?.destination?.name }</td>
-														<td>${transactionEntry?.lotNumber}</td>
-														<td style="text-align: right;">${transactionEntry?.quantity}</td>
-														<td>
-															<g:link controller="inventoryItem" action="deleteTransactionEntry" id="${transactionEntry?.id }" params="['inventoryItem.id':itemInstance?.id]">Remove</g:link>	
-														</td>
-													</tr>			
-												</g:each>
-											</g:if>			
-											<g:else>
-												<tr>
-													<td colspan="7" style="text-align: center">
-														<div class="fade">enter a transaction below</div>
-													</td>
-												</tr>
-											</g:else>				
-										</tbody>
-										<g:if test="${inventoryItemList }">
-											<tfoot>
-												<tr>
-													<th colspan="5">
-														Total												 
-													</th>
-													<th style="text-align: right">
-														${inventoryItemList*.quantity?.sum() }
-													</th>
-													<th></th>
-												</tr>
-												
-											</tfoot>
-										</g:if>
-									</table>
-								</fieldset>
+							<table>
+								<tr>
+									<td width="75%">
+										<fieldset>
+											<legend>Transactions</legend>
+											<table border="1" style="border: 1px solid #f5f5f5">
+												<thead>
+													<tr>
+														<th>
+														${message(code: 'transaction.transactionDate.label', default: 'Date')}
+														</th>
+														<th>
+														${message(code: 'transaction.transactionType.label', default: 'Type')}
+														</th>
+														<th>
+														${message(code: 'transaction.source.label', default: 'Source')}
+														</th>
+														<th>
+														${message(code: 'inventory.destination.label', default: 'Destination')}
+														</th>
+														<th>
+														${message(code: 'inventoryItem.lotNumber.label', default: 'Lot Number')}
+														</th>
+														<th>
+														${message(code: 'inventory.quantity.label', default: 'Qty')}
+														</th>
+														<th>Actions</th>
+													</tr>
+												</thead>
+												<tbody>
+													<g:if test="${transactionEntryList}">
+														<g:each var="transactionEntry" in="${transactionEntryList}"
+															status="i">
+															<tr class="${(i%2==0)?'odd':'even' }">
+																<td><g:formatDate
+																	date="${transactionEntry?.transaction?.transactionDate}"
+																	format="MMM dd" /></td>
+																<td>
+																	${transactionEntry?.transaction?.transactionType?.name }
+																</td>
+																<td>
+																	${transactionEntry?.transaction?.source?.name }
+																</td>
+																<td>${transactionEntry?.transaction?.destination?.name }</td>
+																<td>${transactionEntry?.lotNumber}</td>
+																<td style="text-align: right;">${transactionEntry?.quantity}</td>
+																<td>
+																	<g:link controller="inventoryItem" action="deleteTransactionEntry" id="${transactionEntry?.id }" params="['inventoryItem.id':itemInstance?.id]">Remove</g:link>	
+																</td>
+															</tr>			
+														</g:each>
+													</g:if>			
+													<g:else>
+														<tr>
+															<td colspan="7" style="text-align: center">
+																<div class="fade">enter a transaction below</div>
+															</td>
+														</tr>
+													</g:else>				
+												</tbody>
+												<g:if test="${inventoryItemList }">
+													<tfoot>
+														<tr>
+															<th colspan="5">
+																Total												 
+															</th>
+															<th style="text-align: right">
+																${inventoryItemList*.quantity?.sum() }
+															</th>
+															<th></th>
+														</tr>
+														
+													</tfoot>
+												</g:if>
+											</table>
 								
-								<br/>
 								<style>
 									.selected { font-weight: bold; } 
 								</style>
@@ -250,8 +255,7 @@
 										<img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/>
 										close</a>
 									</div>									
-									<fieldset>				
-										<legend>New Transaction</legend>						
+									<fieldset>
 										<g:if test="${inventoryItemList }">
 											<div id="transactionLinkBar">
 												<a href="#" id="initialLink">
@@ -303,7 +307,7 @@
 																		<input type=submit value="Submit">													
 																	
 																	</td>
-															
+																</tr>
 															</table>
 															<br/>
 															<span class="fade">(use negative quantity to subtract stock)</span>
@@ -502,14 +506,19 @@
 											</table>		
 										</g:if>
 										<g:else>
-											You must add a lot before entering quantities.
-										</g:else>								
-									</fieldset>
-								</div>
+											You must create at least one lot before entering quantities.
+										</g:else>	
+
+										</fieldset>						
+									</div>
+								</fieldset>
 							</td>
+
+
+
+
 						
 							<td width="25%">
-							
 								<script>
 									$(document).ready(function() {
 										$("#inventoryLotReport").show();
@@ -526,21 +535,9 @@
 
 									});
 								</script>		
-								
-									
 								<div id="inventoryLotReport" style="text-align: right;">										
-									
-								
-								
 									<fieldset>
 										<legend>Quantity by Lots</legend>
-										
-										<div style="text-align: right">
-											<a href="#" id="showInventoryLotFormLink">
-												<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}"/>
-												add new lot</a>
-										</div>
-										
 										<table border="1" style="border:1px solid #f5f5f5">
 											<thead>
 												<tr>
@@ -550,6 +547,14 @@
 												</tr>											
 											</thead>
 											<tbody>
+												<g:if test="${!inventoryItemList}">
+													<tr class="odd">
+														<td colspan="3" style="text-align: center">
+															No lots
+														</td>
+													</tr>
+												</g:if>
+											
 												<g:each var="itemInstance" in="${inventoryItemList }">				
 													<tr>
 														<td>${itemInstance?.lotNumber?:'<span class="fade">empty</span>' }</td>
@@ -575,6 +580,14 @@
 												</tr>
 											</tfoot>
 										</table>
+										
+										<div style="text-align: right">
+											<a href="#" id="showInventoryLotFormLink">
+												<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}"/>
+												add new lot</a>
+										</div>
+										
+										
 									</fieldset>										
 								</div>										
 
@@ -585,7 +598,8 @@
 										<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
 										<g:hiddenField name="product.id" value="${productInstance?.id}"/>
 										<g:hiddenField name="active" value="true"/>
-										<g:hiddenField name="createdBy" value="${session?.user?.id }"/>									
+										<g:hiddenField name="createdBy" value="${session?.user?.id }"/>		
+										<g:hiddenField name="initialQuantity" value="0"/>							
 										<g:hiddenField name="inventoryItemType" value="${org.pih.warehouse.inventory.InventoryItemType.NON_SERIALIZED}"/>
 											
 										<g:hasErrors bean="${inventoryLotInstance}">
@@ -597,14 +611,6 @@
 										
 										<fieldset>
 											<legend>Quantity by Lots</legend>
-											
-											<div style="text-align: right">
-												<a href="#" id="showInventoryLotReportLink">
-													<img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/>
-													close</a>
-											</div>
-													
-											
 											<table border="1" style="border:1px solid #f5f5f5">
 												<thead>
 													<tr>
@@ -616,7 +622,7 @@
 												<tbody>
 													<g:each var="itemInstance" in="${inventoryItemList }" status="i">				
 														<tr class="${(i%2 == 0)?'odd':'even' }">
-															<td>${itemInstance?.lotNumber?:'<span class="fade">empty</span>' }</td>
+															<td>${itemInstance?.lotNumber?:'<span class="fade">EMPTY</span>' }</td>
 															<td><g:formatDate date="${itemInstance?.inventoryLot?.expirationDate }" format="dd/MMM/yy" /></td>
 															<td nowrap>
 																<g:link controller="inventoryItem" action="deleteInventoryItem" id="${itemInstance?.id }" params="['inventory.id':inventoryInstance?.id]">
@@ -625,6 +631,7 @@
 															</td>
 														</tr>
 													</g:each>
+													
 													<tr>
 														<td>
 															<g:textField name="lotNumber" size="10"/>
@@ -639,6 +646,13 @@
 													</tr>
 												</tbody>
 											</table>
+											
+											<div style="text-align: right">
+												<a href="#" id="showInventoryLotReportLink">
+													<img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/>
+													close</a>
+											</div>											
+											
 										</fieldset>
 									</g:form>
 								</div>

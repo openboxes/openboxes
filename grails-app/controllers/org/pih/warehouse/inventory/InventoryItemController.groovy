@@ -197,7 +197,15 @@ class InventoryItemController {
 					if (!inventoryInstance.validate()) { 
 						flash.message = "Inventory is not valid"			
 					}
-					inventoryInstance.save(flush:true)
+					if (inventoryInstance.save(flush:true)) { 
+						flash.message = "A lot was created successfully"
+						
+					} else { 
+						flash.message = "A lot was not created"
+						inventoryInstance.errors.allErrors.each { 
+							println it
+						}
+					}
 					
 					/*
 					transactionInstance.transactionType = TransactionType.findByName("Inventory");
@@ -217,7 +225,6 @@ class InventoryItemController {
 						transactionInstance.addToTransactionEntries(transactionEntry).save(flush:true)
 					}
 					*/						
-					flash.message = "A lot was created successfully"	
 				}
 				else { 
 					flash.message = "Inventory with ID ${params.inventory.id} does not exist"
