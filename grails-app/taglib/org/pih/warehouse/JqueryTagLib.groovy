@@ -129,7 +129,7 @@ class JqueryTagLib {
 			<script type=\'text/javascript\'> 
 				jQuery(function() {
 					jQuery('#${id}-datepicker').datepicker({
-						altField: '#${name}',
+						altField: '#${id}',
 						altFormat: 'mm/dd/yy',
 						dateFormat: 'dd/M/yy',
 						autoSize: ${autoSize},

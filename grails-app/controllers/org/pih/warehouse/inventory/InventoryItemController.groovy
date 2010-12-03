@@ -26,8 +26,13 @@ class InventoryItemController {
 		def inventoryItemList = inventoryService.getInventoryItemsByProduct(productInstance)
 		def transactionEntryList = TransactionEntry.findAllByProduct(productInstance)
 		def inventoryLotList = InventoryLot.findByProduct(productInstance)
+		def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, inventoryInstance);
 		
-		[ inventoryInstance: inventoryInstance, productInstance: productInstance, inventoryItemList: inventoryItemList, transactionEntryList: transactionEntryList,
+		[ 	inventoryInstance: inventoryInstance, 
+			inventoryLevelInstance: inventoryLevelInstance,
+			productInstance: productInstance, 
+			inventoryItemList: inventoryItemList, 
+			transactionEntryList: transactionEntryList,
 			inventoryLotList: inventoryLotList ]
 	}
 	
@@ -146,10 +151,12 @@ class InventoryItemController {
 	
 	def deleteTransactionEntry = { 
 		def transactionEntry = TransactionEntry.get(params.id)
-		if (transactionEntry) { 
+		def productInstance 
+		if (transactionEntry) {
+			productInstance = transactionEntry.product 
 			transactionEntry.delete();
 		}
-		redirect(action: "show", id: params.inventoryItem.id)
+		redirect(action: 'showStockCard', params: ['product.id':productInstance?.id])
 	}
 	
 	def addToInventory = {
@@ -158,7 +165,34 @@ class InventoryItemController {
 		//return product as XML		
 	}	
 	
-	def postInventoryItem = {
+	
+	def saveInventoryLevel = {
+		// Get existing inventory level
+		def inventoryLevelInstance = InventoryLevel.get(params.id)		
+		def productInstance = Product.get(params?.product?.id)
+		//def inventoryInstance = Inventory.get(params?.inventory?.id);
+
+		if (inventoryLevelInstance) { 
+			inventoryLevelInstance.properties = params;
+		}
+		else { 
+			inventoryLevelInstance = new InventoryLevel(params);
+		}
+		
+		if (!inventoryLevelInstance.hasErrors() && inventoryLevelInstance.save()) { 
+			
+		}
+		else { 
+			flash.message = "error saving inventory levels<br/>" 
+			inventoryLevelInstance.errors.allErrors.each { 
+				flash.message += it + "<br/>";
+			}
+		}
+		redirect(action: 'showStockCard', params: ['product.id':productInstance?.id])
+	}
+	
+		
+	def saveInventoryItem = {
 		def inventory = Inventory.get(params.id)
 		def inventoryItem = new InventoryItem(params)
 		inventory.addToInventoryItem(inventoryItem)
@@ -167,7 +201,7 @@ class InventoryItemController {
 		}
 	}
 	
-	def postInventoryLot = { 
+	def saveInventoryLot = { 
 		log.info params
 		def productInstance = Product.get(params?.product?.id)
 		
@@ -299,7 +333,8 @@ class InventoryItemController {
 	}
 	*/	
 	
-	def postTransactionEntry = {				
+	
+	def saveTransactionEntry = {			
 		def productInstance = Product.get(params?.product?.id)				
 		if (!productInstance) {
 			flash.message = "${message(code: 'default.notfound.message', args: [message(code: 'product.label', default: 'Product'), productInstance.id])}"
@@ -313,6 +348,16 @@ class InventoryItemController {
 			else {  
 				def transactionInstance = new Transaction(params)
 				def transactionEntry = new TransactionEntry(params)
+				
+				// If we're transferring stock to another location OR consuming stock, 
+				// then we need to make sure the quantity is negative
+				if (transactionInstance?.destination?.id != session?.warehouse?.id 
+					|| transactionInstance?.transactionType?.name == 'Consumption') { 
+					if (transactionEntry.quantity > 0) { 
+						transactionEntry.quantity = -transactionEntry.quantity;
+					}
+				}
+				
 				transactionEntry.inventoryItem = inventoryItem;
 				if (!transactionEntry.hasErrors() &&
 					transactionInstance.addToTransactionEntries(transactionEntry).save(flush:true)) {
@@ -333,7 +378,7 @@ class InventoryItemController {
 						transactionEntry.errors.each { println it }
 						flash.message = "Unable to save transaction entry"
 					} else { 
-						flash.message = "${message(code: 'default.updated.message', args: [message(code: 'inventory.label', default: 'Inventory item'), itemInstance.id])}"					
+						flash.message = "${message(code: 'default.saved.message', args: [message(code: 'inventory.label', default: 'Inventory item'), itemInstance.id])}"					
 					}
 				}
 				else { 

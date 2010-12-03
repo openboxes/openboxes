@@ -29,8 +29,7 @@
 	<div class="dialog">
 		<fieldset>
 			<h1>${productInstance?.name } ${productInstance?.dosageStrength } ${productInstance?.dosageUnit }</h1>
-			<a href="${createLink(controller: 'inventory', action: 'browse', params: ['productType.id' : productInstance?.productType?.id])}">&laquo; back to ${productInstance?.productType?.name } </a>
-					
+			<span style="padding-left: 15px;"><a href="${createLink(controller: 'inventory', action: 'browse', params: ['productType.id' : productInstance?.productType?.id])}">&laquo; back to ${productInstance?.productType?.name } </a></span>
 			
 <%-- 
 						&nbsp;
@@ -87,7 +86,7 @@
 								<tr>
 									<td width="75%">
 										<fieldset>
-											<legend>Transactions</legend>
+											<legend>Stock Card</legend>
 											<table border="1" style="border: 1px solid #f5f5f5">
 												<thead>
 													<tr>
@@ -109,14 +108,13 @@
 														<th>
 														${message(code: 'inventory.quantity.label', default: 'Qty')}
 														</th>
-														<th>Actions</th>
+														<th>&nbsp;</th>
 													</tr>
 												</thead>
 												<tbody>
 													<g:if test="${transactionEntryList}">
-														<g:each var="transactionEntry" in="${transactionEntryList}"
-															status="i">
-															<tr class="${(i%2==0)?'odd':'even' }">
+														<g:each var="transactionEntry" in="${transactionEntryList}" status="status">
+															<tr class="${(status%2==0)?'odd':'even' }">
 																<td><g:formatDate
 																	date="${transactionEntry?.transaction?.transactionDate}"
 																	format="MMM dd" /></td>
@@ -127,10 +125,13 @@
 																	${transactionEntry?.transaction?.source?.name }
 																</td>
 																<td>${transactionEntry?.transaction?.destination?.name }</td>
-																<td>${transactionEntry?.lotNumber}</td>
-																<td style="text-align: right;">${transactionEntry?.quantity}</td>
+																<td>${transactionEntry?.lotNumber?:'<span class="fade">EMPTY</span>'}</td>
+																<td style="text-align: center;">${transactionEntry?.quantity}</td>
 																<td>
-																	<g:link controller="inventoryItem" action="deleteTransactionEntry" id="${transactionEntry?.id }" params="['inventoryItem.id':itemInstance?.id]">Remove</g:link>	
+																	<g:link controller="inventoryItem" action="deleteTransactionEntry" 
+																		id="${transactionEntry?.id }" params="['inventoryItem.id':itemInstance?.id]">
+																		<img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>
+																	</g:link>	
 																</td>
 															</tr>			
 														</g:each>
@@ -138,7 +139,7 @@
 													<g:else>
 														<tr>
 															<td colspan="7" style="text-align: center">
-																<div class="fade">enter a transaction below</div>
+																<div class="fade">add stock movements below</div>
 															</td>
 														</tr>
 													</g:else>				
@@ -149,7 +150,7 @@
 															<th colspan="5">
 																Total												 
 															</th>
-															<th style="text-align: right">
+															<th style="text-align: center">
 																${inventoryItemList*.quantity?.sum() }
 															</th>
 															<th></th>
@@ -158,74 +159,10 @@
 													</tfoot>
 												</g:if>
 											</table>
+										</fieldset>
 								
-								<style>
-									.selected { font-weight: bold; } 
-								</style>
-								<script>
-									$(document).ready(function() {
-										$("tr.transactionEntry").each(function() {		
-											$this = $(this)
-											$this.hide();
-										});
-										$("#initialLink").click(function() { 
-											$('#transactionLinkBar a').removeClass('selected');											
-											$(this).addClass('selected'); 
-											$("tr.transactionEntry").each(function() {		
-												$this = $(this)
-												$this.hide();
-											});
-											$("#initial").toggle(); 
-										});
-										$("#transferLink").click(function() { 
-											$('#transactionLinkBar a').removeClass('selected');											
-											$(this).addClass('selected'); 
-											$("tr.transactionEntry").each(function() {		
-												$this = $(this)
-												$this.hide();
-											});
-											$("#transfer").toggle(); 
-										});
-										$("#adjustmentLink").click(function() { 
-											$('#transactionLinkBar a').removeClass('selected');											
-											$(this).addClass('selected'); 
-											$("tr.transactionEntry").each(function() {		
-												$this = $(this)
-												$this.hide();
-											});
-											$("#adjustment").toggle(); 
-
-										});
-										$("#consumptionLink").click(function() { 
-											$('#transactionLinkBar a').removeClass('selected');											
-											$(this).addClass('selected'); 
-											$("tr.transactionEntry").each(function() {		
-												$this = $(this)
-												$this.hide();
-											});
-											$("#consumption").toggle(); 
-										});
-										$("#expirationLink").click(function() { 
-											$('#transactionLinkBar a').removeClass('selected');											
-											$(this).addClass('selected'); 
-											$("tr.transactionEntry").each(function() {		
-												$this = $(this)
-												$this.hide();
-											});
-											$("#expiration").toggle(); 
-										});
-										$("#otherLink").click(function() { 											
-											$('#transactionLinkBar a').removeClass('selected');											
-											$(this).addClass('selected'); 
-											$("tr.transactionEntry").each(function() {		
-												$this = $(this)
-												$this.hide();
-											});
-											$("#other").toggle(); 
-										});
-									});
-								</script>
-
+								
+								
 								<script>
 									$(document).ready(function() {
 										$("#transactionEntryButton").show();
@@ -235,7 +172,7 @@
 											$("#transactionEntryButton").hide(''); 
 											$("#transactionEntryForm").show(''); 
 										});
-										$("#closeTransactionEntryLink").click(function() { 
+										$(".closeTransactionEntryLink").click(function() { 
 											$("#transactionEntryButton").show(''); 
 											$("#transactionEntryForm").hide(''); 
 										});
@@ -245,271 +182,352 @@
 								
 								<div id="transactionEntryButton" style="text-align: right;">
 									<a href="#" id="addTransactionEntryLink">
-										<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}"/>
-										add new transaction</a>
+										<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
+										edit stock card</a>
 								</div>																	
 	
 								<div id="transactionEntryForm">						
-									<div style="text-align: right">			
-										<a href="#" id="closeTransactionEntryLink">
-										<img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/>
-										close</a>
-									</div>									
-									<fieldset>
-										<g:if test="${inventoryItemList }">
-											<div id="transactionLinkBar">
-												<a href="#" id="initialLink">
-													<img src="${resource(dir: 'images/icons/silk', file: 'door_in.png')}"/>
-													enter intial stock</a> &nbsp;<span class="fade">|</span>&nbsp;
-												<a href="#" id="transferLink">
-													<img src="${resource(dir: 'images/icons/silk', file: 'door_out.png')}"/>
-													transfer stock</a> &nbsp;<span class="fade">|</span>&nbsp;
-												<a href="#" id="adjustmentLink">
-													<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}"/>
-													adjust stock</a> &nbsp;<span class="fade">|</span>&nbsp;
-												<a href="#" id="consumptionLink">
-													<img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>
-													consume stock</a> &nbsp;<span class="fade">|</span>&nbsp; 
-												<a href="#" id="expirationLink">
-													<img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/>
-													expire stock</a> &nbsp;<span class="fade">|</span>&nbsp; 
-												<a href="#" id="otherLink">
-													other</a> 
-											</div>
+									<style>
+										.selected { font-weight: bold; } 
+									</style>
+									<script>
+										$(document).ready(function() {
+											$("div.transactionEntry").each(function() {		
+												$this = $(this)
+												$this.hide();
+											});
+											$("#initialLink").click(function() { 
+												$('#transactionLinkBar a').removeClass('selected');											
+												$(this).addClass('selected'); 
+												$("div.transactionEntry").each(function() {		
+													$this = $(this)
+													$this.hide();
+												});
+												$("#initial").toggle(); 
+											});
+											$("#transferInLink").click(function() { 
+												$('#transactionLinkBar a').removeClass('selected');											
+												$(this).addClass('selected'); 
+												$("div.transactionEntry").each(function() {		
+													$this = $(this)
+													$this.hide();
+												});
+												$("#transferIn").toggle(); 
+											});
+											$("#transferOutLink").click(function() { 
+												$('#transactionLinkBar a').removeClass('selected');											
+												$(this).addClass('selected'); 
+												$("div.transactionEntry").each(function() {		
+													$this = $(this)
+													$this.hide();
+												});
+												$("#transferOut").toggle(); 
+											});
+											$("#adjustmentLink").click(function() { 
+												$('#transactionLinkBar a').removeClass('selected');											
+												$(this).addClass('selected'); 
+												$("div.transactionEntry").each(function() {		
+													$this = $(this)
+													$this.hide();
+												});
+												$("#adjustment").toggle(); 
 	
-											<table id="transactionTable">
-												<tr id="initial" class="transactionEntry">
-													<td>												
-														<g:form action="postTransactionEntry" autocomplete="off">
-															<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
-															<g:hiddenField name="inventoryItem.id" value="${itemInstance?.id}"/>
-															<g:hiddenField name="product.id" value="${productInstance?.id}"/>
-															<g:hiddenField name="createdBy.id" value="${session?.user?.id }"/>											
-															<g:hiddenField name="transactionType.id" value="7"/>
-															<g:hiddenField name="source.id" value="${session?.warehouse?.id }"/>											
-															<g:hiddenField name="destination.id" value="${session?.warehouse?.id }"/>											
-															<table>
-																<tr>
-																	<td nowrap>
-																		Enter initial quantity  
-																			<g:textField name="quantity" size="3" value=""/> units
-																		units of
+											});
+											$("#consumptionLink").click(function() { 
+												$('#transactionLinkBar a').removeClass('selected');											
+												$(this).addClass('selected'); 
+												$("div.transactionEntry").each(function() {		
+													$this = $(this)
+													$this.hide();
+												});
+												$("#consumption").toggle(); 
+											});
+											$("#expirationLink").click(function() { 
+												$('#transactionLinkBar a').removeClass('selected');											
+												$(this).addClass('selected'); 
+												$("div.transactionEntry").each(function() {		
+													$this = $(this)
+													$this.hide();
+												});
+												$("#expiration").toggle(); 
+											});
+											$("#otherLink").click(function() { 											
+												$('#transactionLinkBar a').removeClass('selected');											
+												$(this).addClass('selected'); 
+												$("div.transactionEntry").each(function() {		
+													$this = $(this)
+													$this.hide();
+												});
+												$("#other").toggle(); 
+											});
+										});
+									</script>
+										<div id="transactionEntryForm">						
+											<g:if test="${inventoryItemList }">
+												<div id="transactionLinkBar" style="text-align: right;">
+													<a href="#" id="initialLink"><img src="${resource(dir: 'images/icons/silk', file: 'basket.png')}"/>
+														Intial Quantity</a> 
+													<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png') }"/>
+													<a href="#" id="transferInLink"><img src="${resource(dir: 'images/icons/silk', file: 'basket_put.png')}"/>
+														Transfer In</a> 
+													<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png') }"/>
+													<a href="#" id="transferOutLink"><img src="${resource(dir: 'images/icons/silk', file: 'basket_remove.png')}"/>
+														Transfer Out</a> 
+													<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png') }"/>
+													<a href="#" id="adjustmentLink"><img src="${resource(dir: 'images/icons/silk', file: 'basket_edit.png')}"/>
+														Adjustment</a> 
+													<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png') }"/>
+													<a href="#" id="consumptionLink"><img src="${resource(dir: 'images/icons/silk', file: 'basket_delete.png')}"/>
+														Consumption</a> 
+												</div>
+
+
+											
+												<div id="initial" class="transactionEntry">
+													<g:form autocomplete="off">
+														<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
+														<g:hiddenField name="inventoryItem.id" value="${itemInstance?.id}"/>
+														<g:hiddenField name="product.id" value="${productInstance?.id}"/>
+														<g:hiddenField name="createdBy.id" value="${session?.user?.id }"/>											
+														<g:hiddenField name="transactionType.id" value="7"/>
+														<g:hiddenField name="source.id" value="${session?.warehouse?.id }"/>											
+														<g:hiddenField name="destination.id" value="${session?.warehouse?.id }"/>											
+														<fieldset>
+															<legend>Initial Quantity</legend>
+															<table border="0" cellspacing="5" cellpadding="5">
+																<tr class="prop">
+																	<td class="name"><label>Date</label></td>
+																	<td class="value">
+																		<g:jqueryDatePicker id="transactionDate0" name="transactionDate" value="" format="MM/dd/yyyy"/>
+																	</td>
+																</tr>
+																<tr class="prop">
+																	<td class="name"><label>Quantity</label></td>
+																	<td class="value"><g:textField name="quantity" size="3" value=""/></td>
+																</tr>
+																<tr class="prop">
+																	<td class="name"><label>Lot Number</label></td>
+																	<td class="value">
 																		<select name="lotNumber">
-																			<option value=""></option>
 																			<g:each var="inventoryItem" in="${inventoryItemList}">
-																				<option value="${inventoryItem?.lotNumber }">${inventoryItem?.lotNumber }</option>
+																				<option value="${inventoryItem?.lotNumber }">${inventoryItem?.lotNumber?:"EMPTY" }</option>
 																			</g:each>
 																		</select>	
-																		<g:jqueryDatePicker id="transactionDate" name="transactionDate" value="" format="MM/dd/yyyy"/>
-																		
-																	</td>
-																	<td>
-																		<input type=submit value="Submit">													
-																	
 																	</td>
 																</tr>
 															</table>
-															<br/>
-															<span class="fade">(use negative quantity to subtract stock)</span>
-														</g:form>
-													</td>
-												</tr>
-												<tr id="transfer" class="transactionEntry">
-													<td>
-													
-														<g:form action="postTransactionEntry" autocomplete="off">
-															<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
-															<g:hiddenField name="inventoryItem.id" value="${itemInstance?.id}"/>
-															<g:hiddenField name="product.id" value="${productInstance?.id}"/>
-															<g:hiddenField name="createdBy.id" value="${session?.user?.id }"/>											
-															<g:hiddenField name="transactionType.id" value="1"/>
-													
-															Transfer 
-																<g:textField name="quantity" size="3" value=""/> 
-															units of
-															<select name="lotNumber">
-																<option value=""></option>
-																<g:each var="inventoryItem" in="${inventoryItemList}">
-																	<option value="${inventoryItem?.lotNumber }">${inventoryItem?.lotNumber }</option>
-																</g:each>
-															</select>
-															<br/>
-															from 		
-																<g:select name="source.id" from="${org.pih.warehouse.inventory.Warehouse.list()}" 
-																	optionKey="id" optionValue="name" value="" noSelection="['0': '']" />							
-															to
-																<g:select name="destination.id" from="${org.pih.warehouse.inventory.Warehouse.list()}" 
-																	optionKey="id" optionValue="name" value="" noSelection="['0': '']" />
-		
-															<g:jqueryDatePicker id="transactionDate-transfer" name="transactionDate" value="" format="MM/dd/yyyy"/>
-															
-															
-															<input type=submit value="Submit">													
-															<br/>
-															<span class="fade">(use negative quantity to subtract stock)</span>
-														</g:form>
-													</td>
-												</tr>
-												<tr id="consumption" class="transactionEntry">
-													<td>
-														<g:form action="postTransactionEntry" autocomplete="off">
-															<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
-															<g:hiddenField name="inventoryItem.id" value="${itemInstance?.id}"/>
-															<g:hiddenField name="product.id" value="${productInstance?.id}"/>
-															<g:hiddenField name="createdBy.id" value="${session?.user?.id }"/>											
-															<g:hiddenField name="transactionType.id" value="2"/>
-															<g:hiddenField name="source.id" value="${session?.warehouse?.id }"/>											
-															<g:hiddenField name="destination.id" value="${session?.warehouse?.id }"/>											
-															Consume 
-															<g:textField name="quantity" size="3" value=""/> units
-															 units from 
-															<select name="lotNumber">
-																<option value=""></option>
-																<g:each var="inventoryItem" in="${inventoryItemList}">
-																	<option value="${inventoryItem?.lotNumber }">${inventoryItem?.lotNumber }</option>
-																</g:each>
-															</select>
-															
-															<g:jqueryDatePicker id="transactionDate-consumption" name="transactionDate" value="" format="MM/dd/yyyy"/>
-															
-															
-															<input type=submit value="Submit">
-															<br/>
-															<span class="fade">(use negative quantity to subtract stock)</span>
-														</g:form>
-													</td>
-												</tr>
-												
-												<tr id="adjustment" class="transactionEntry">
-													<td>
-														<g:form action="postTransactionEntry" autocomplete="off">
-															<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
-															<g:hiddenField name="inventoryItem.id" value="${itemInstance?.id}"/>
-															<g:hiddenField name="product.id" value="${productInstance?.id}"/>
-															<g:hiddenField name="createdBy.id" value="${session?.user?.id }"/>											
-															<g:hiddenField name="transactionType.id" value="3"/>
-															<g:hiddenField name="source.id" value="${session?.warehouse?.id }"/>											
-															<g:hiddenField name="destination.id" value="${session?.warehouse?.id }"/>											
-															Adjust inventory by adding 
-																<g:textField name="quantity" size="3" value=""/> units
-															to lot 
-															<select name="lotNumber">
-																<option value=""></option>
-																<g:each var="inventoryItem" in="${inventoryItemList}">
-																	<option value="${inventoryItem?.lotNumber }">${inventoryItem?.lotNumber }</option>
-																</g:each>
-															</select>
-															<input type=submit value="Submit">
-															
-															<g:jqueryDatePicker id="transactionDate-adjustment" name="transactionDate" value="" format="MM/dd/yyyy"/>
-															
-															
-															<br/>
-															<span class="fade">(use negative quantity to subtract stock)</span>
-														</g:form>
-													</td>
-												</tr>
-												<tr id="expiration" class="transactionEntry">
-													<td>
-														<g:form action="postTransactionEntry" autocomplete="off">
-															
-															<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
-															<g:hiddenField name="inventoryItem.id" value="${itemInstance?.id}"/>
-															<g:hiddenField name="product.id" value="${productInstance?.id}"/>
-															<g:hiddenField name="createdBy.id" value="${session?.user?.id }"/>											
-															<g:hiddenField name="transactionType.id" value="4"/>
-															<g:hiddenField name="source.id" value="${session?.warehouse?.id }"/>											
-															<g:hiddenField name="destination.id" value="${session?.warehouse?.id }"/>											
-															<g:hiddenField name="quantity" value="0"/>
-															<div style="background-color: #efdfb7">
-																Lot 
-																<select name="lotNumber">
-																	<option value=""></option>
-																	<g:each var="inventoryItem" in="${inventoryItemList}">
-																		<option value="${inventoryItem?.lotNumber }">${inventoryItem?.lotNumber }</option>
-																	</g:each>
-																</select>
-																has expired. 																
-																
-																<input type=submit value="Submit">
-																<br/>
-																
-																<g:jqueryDatePicker id="transactionDate-expiration" name="transactionDate" value="" format="MM/dd/yyyy"/>
-															
-																
-																<span class="fade">(use negative quantity to subtract stock)</span>															
+															<div class="buttonBar">
+																<g:actionSubmit action="saveTransactionEntry" value="Save"/>		
+																&nbsp;
+																<a href="#" class="closeTransactionEntryLink"><img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/> Cancel</a>
+																										
 															</div>
-														</g:form>											
-													</td>
-												</tr>
-												
-												<tr id="other" class="transactionEntry">
-													<td>
+		
+															<span class="fade">(use negative quantity to subtract stock)</span>
+														</fieldset>
+													</g:form>
+												</div>
+												<div id="transferIn" class="transactionEntry">
+													<g:form autocomplete="off">
+														<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
+														<g:hiddenField name="inventoryItem.id" value="${itemInstance?.id}"/>
+														<g:hiddenField name="product.id" value="${productInstance?.id}"/>
+														<g:hiddenField name="createdBy.id" value="${session?.user?.id }"/>											
+														<g:hiddenField name="transactionType.id" value="1"/>
+														<g:hiddenField name="destination.id" value="${session?.warehouse?.id }"/>											
 														
-														<g:form action="postTransactionEntry" autocomplete="off">
-															<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
-															<g:hiddenField name="inventoryItem.id" value="${itemInstance?.id}"/>
-															<g:hiddenField name="product.id" value="${productInstance?.id}"/>
-															<g:hiddenField name="createdBy.id" value="${session?.user?.id }"/>									
-															
-															<table bgcolor="#efdfb7" border=0 cellspacing=5 cellpadding=5>
-																<tr>
-																	<th>Date</th>
-																	<th>Type</th>
-																</tr>
-																<tr>
-																	<td>
-																		<g:jqueryDatePicker id="transactionDate" name="transactionDate" value="" format="MM/dd/yyyy"/>
-																	</td>
-																	<td>
-																		<g:select name="transactionType.id" from="${org.pih.warehouse.inventory.TransactionType.list()}" 
-																			optionKey="id" optionValue="name" value=""  />
-																	</td>
-																</tr>
-																<tr>
-																	<th>Lot Number</th>
-																	<th>Qty </th>	
-																</tr>
-																<tr>
-																	<td align=center>
-																		<g:textField name="lotNumber" size="10"/>
-																		
-																	</td>
-																	<td align=center>
-																		<g:textField name="quantity" size="3"/>
-																	</td>							
-																</tr>
-																<tr>
-																	<th>Source</th>
-																	<th>Destination</th>
-																</tr>
-																<tr>
-																	<td>
+														<fieldset>
+															<legend>Transfer In</legend>
+															<table border="0" cellspacing="5" cellpadding="5">
+																<tr class="prop">
+																	<td class="name"><label>Transfer From</label></td>
+																	<td class="value">
 																		<g:select name="source.id" from="${org.pih.warehouse.inventory.Warehouse.list()}" 
 																			optionKey="id" optionValue="name" value="" noSelection="['0': '']" />							
 																	</td>
-																	<td>
+																</tr>
+																<tr class="prop">
+																	<td class="name"><label>Date</label></td>
+																	<td class="value">
+																		<g:jqueryDatePicker id="transactionDate1" name="transactionDate" value="" format="MM/dd/yyyy"/>
+																	</td>
+																</tr>		
+																<tr class="prop">
+																	<td class="name"><label>Quantity</label></td>
+																	<td class="value"><g:textField name="quantity" size="3" value=""/></td>
+																</tr>
+																<tr class="prop">
+																	<td class="name"><label>Lot Number</label></td>
+																	<td class="value">
+																		<select name="lotNumber">
+																			<g:each var="inventoryItem" in="${inventoryItemList}">
+																				<option value="${inventoryItem?.lotNumber }">${inventoryItem?.lotNumber?:"EMPTY" }</option>
+																			</g:each>
+																		</select>	
+																	</td>
+																</tr>
+															</table>	
+															<div class="buttonBar">
+																<g:actionSubmit action="saveTransactionEntry" value="Save"/>																
+																&nbsp;
+																<a href="#" class="closeTransactionEntryLink"><img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/> Cancel</a>
+																
+															</div>
+		
+															<span class="fade">(use negative quantity to subtract stock)</span>
+														</fieldset>
+													</g:form>
+												</div>
+												<div id="transferOut" class="transactionEntry">
+													<g:form autocomplete="off">
+														<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
+														<g:hiddenField name="inventoryItem.id" value="${itemInstance?.id}"/>
+														<g:hiddenField name="product.id" value="${productInstance?.id}"/>
+														<g:hiddenField name="createdBy.id" value="${session?.user?.id }"/>											
+														<g:hiddenField name="transactionType.id" value="1"/>
+														<g:hiddenField name="source.id" value="${session?.warehouse?.id }"/>											
+														<fieldset>
+															<legend>Transfer Out</legend>
+															<table border="0" cellspacing="5" cellpadding="5">
+																<tr class="prop">
+																	<td class="name"><label>Transfer To</label></td>
+																	<td class="value">
 																		<g:select name="destination.id" from="${org.pih.warehouse.inventory.Warehouse.list()}" 
-																			optionKey="id" optionValue="name" value="" noSelection="['0': '']" />
+																			optionKey="id" optionValue="name" value="" noSelection="['0': '']" />							
 																	</td>
 																</tr>
-																<tr>
-																	<td colspan="2" align=center>
-																		<input type=submit value="Submit">
+																<tr class="prop">
+																	<td class="name"><label>Date</label></td>
+																	<td class="value">
+																		<g:jqueryDatePicker id="transactionDate2" name="transactionDate" value="" format="MM/dd/yyyy"/>
+																	</td>
+																</tr>		
+																<tr class="prop">
+																	<td class="name"><label>Quantity</label></td>
+																	<td class="value"><g:textField name="quantity" size="3" value=""/></td>
+																</tr>
+																<tr class="prop">
+																	<td class="name"><label>Lot Number</label></td>
+																	<td class="value">
+																		<select name="lotNumber">
+																			<g:each var="inventoryItem" in="${inventoryItemList}">
+																				<option value="${inventoryItem?.lotNumber }">${inventoryItem?.lotNumber?:"EMPTY" }</option>
+																			</g:each>
+																		</select>	
 																	</td>
 																</tr>
-															</table>
-														</g:form>
-														<span class="fade">(use negative quantity to subtract stock)</span>											
-													</td>
-												</tr>
-											</table>		
-										</g:if>
-										<g:else>
-											You must create at least one lot before entering quantities.
-										</g:else>	
-
-										</fieldset>						
+															</table>	
+															<div class="buttonBar">
+																<g:actionSubmit action="saveTransactionEntry" value="Save"/>												
+																&nbsp;
+																<a href="#" class="closeTransactionEntryLink"><img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/> Cancel</a>
+															</div>
+		
+															<span class="fade">(use negative quantity to subtract stock)</span>
+														</fieldset>
+													</g:form>
+												</div>
+																								
+												<div id="consumption" class="transactionEntry">
+													<g:form autocomplete="off">
+														<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
+														<g:hiddenField name="inventoryItem.id" value="${itemInstance?.id}"/>
+														<g:hiddenField name="product.id" value="${productInstance?.id}"/>
+														<g:hiddenField name="createdBy.id" value="${session?.user?.id }"/>											
+														<g:hiddenField name="transactionType.id" value="2"/>
+														<g:hiddenField name="source.id" value="${session?.warehouse?.id }"/>											
+														<g:hiddenField name="destination.id" value="${session?.warehouse?.id }"/>											
+		
+														<fieldset>
+															<legend>Consumption</legend>
+														
+															<table border="0" cellspacing="5" cellpadding="5">
+																<tr class="prop">
+																	<td class="name"><label>Date</label></td>
+																	<td class="value">
+																		<g:jqueryDatePicker id="transactionDate3" name="transactionDate" value="" format="MM/dd/yyyy"/>
+																	</td>
+																</tr>		
+																<tr class="prop">
+																	<td class="name"><label>Quantity</label></td>
+																	<td class="value">
+																		<g:textField name="quantity" size="3" value=""/>
+																	</td>
+																</tr>
+																<tr class="prop">
+																	<td class="name"><label>Lot Number</label></td>
+																	<td class="value">
+																		<select name="lotNumber">
+																			<g:each var="inventoryItem" in="${inventoryItemList}">
+																				<option value="${inventoryItem?.lotNumber }">${inventoryItem?.lotNumber?:"EMPTY" }</option>
+																			</g:each>
+																		</select>	
+																	</td>
+																</tr>
+															</table>	
+															<div class="buttonBar">
+																<g:actionSubmit action="saveTransactionEntry" value="Save"/>												
+																&nbsp;
+																<a href="#" class="closeTransactionEntryLink"><img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/> Cancel</a>
+															</div>
+		
+															<span class="fade">(use negative quantity to subtract stock)</span>
+														</fieldset>
+													</g:form>
+												</div>
+												
+												<div id="adjustment" class="transactionEntry">
+													<g:form autocomplete="off">
+														<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
+														<g:hiddenField name="inventoryItem.id" value="${itemInstance?.id}"/>
+														<g:hiddenField name="product.id" value="${productInstance?.id}"/>
+														<g:hiddenField name="createdBy.id" value="${session?.user?.id }"/>											
+														<g:hiddenField name="transactionType.id" value="3"/>
+														<g:hiddenField name="source.id" value="${session?.warehouse?.id }"/>											
+														<g:hiddenField name="destination.id" value="${session?.warehouse?.id }"/>											
+														
+														
+														<fieldset>
+															<legend>Adjustment</legend>
+														
+															<table border="0" cellspacing="5" cellpadding="5">
+																<tr class="prop">
+																	<td class="name"><label>Date</label></td>
+																	<td class="value">
+																		<g:jqueryDatePicker id="transactionDate4" name="transactionDate" value="" format="MM/dd/yyyy"/>
+																	</td>
+																</tr>		
+																<tr class="prop">
+																	<td class="name"><label>Quantity</label></td>
+																	<td class="value"><g:textField name="quantity" size="3" value=""/></td>
+																</tr>
+																<tr class="prop">
+																	<td class="name"><label>Lot Number</label></td>
+																	<td class="value">
+																		<select name="lotNumber">
+																			<g:each var="inventoryItem" in="${inventoryItemList}">
+																				<option value="${inventoryItem?.lotNumber }">${inventoryItem?.lotNumber?:"EMPTY" }</option>
+																			</g:each>
+																		</select>	
+																	</td>
+																</tr>
+															</table>	
+															<div class="buttonBar">
+																<g:actionSubmit action="saveTransactionEntry" value="Save"/>	
+																&nbsp;
+																<a href="#" class="closeTransactionEntryLink"><img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/> Cancel</a>
+															</div>
+		
+															<span class="fade">(use negative quantity to subtract stock)</span>
+														</fieldset>																		
+													</g:form>
+												</div>
+												
+											</g:if>
+											<g:else>
+												You must create at least one lot before entering quantities.
+											</g:else>	
+										</div>
 									</div>
 								</fieldset>
 							</td>
@@ -555,9 +573,9 @@
 													</tr>
 												</g:if>
 											
-												<g:each var="itemInstance" in="${inventoryItemList }">				
-													<tr>
-														<td>${itemInstance?.lotNumber?:'<span class="fade">empty</span>' }</td>
+												<g:each var="itemInstance" in="${inventoryItemList }" status="status">				
+													<tr class="${(status%2==0)?'odd':'even' }">
+														<td>${itemInstance?.lotNumber?:'<span class="fade">EMPTY</span>' }</td>
 														<td>
 															<g:if test="${itemInstance?.inventoryLot?.expirationDate}">
 																<g:formatDate date="${itemInstance?.inventoryLot?.expirationDate }" format="dd/MMM/yy" />
@@ -574,27 +592,21 @@
 											</tbody>
 											<tfoot>
 												<tr>
-													<th></th>
+													<th>Total</th>
 													<th></th>
 													<th style="text-align: center;">${inventoryItemList*.quantity.sum() }</th>
 												</tr>
 											</tfoot>
-										</table>
-										
-										<div style="text-align: right">
-											<a href="#" id="showInventoryLotFormLink">
-												<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}"/>
-												add new lot</a>
-										</div>
-										
-										
+										</table>										
 									</fieldset>										
+									<div style="text-align: right">
+										<a href="#" id="showInventoryLotFormLink">
+											<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
+											edit lots</a>
+									</div>
 								</div>										
-
-
-							
 								<div id="inventoryLotForm">
-									<g:form action="postInventoryLot" autocomplete="off">
+									<g:form action="saveInventoryLot" autocomplete="off">
 										<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
 										<g:hiddenField name="product.id" value="${productInstance?.id}"/>
 										<g:hiddenField name="active" value="true"/>
@@ -611,12 +623,13 @@
 										
 										<fieldset>
 											<legend>Quantity by Lots</legend>
+											
 											<table border="1" style="border:1px solid #f5f5f5">
 												<thead>
 													<tr>
 														<th>Lot Number</th>
 														<th>Expires</th>
-														<th>Actions</th>
+														<th>&nbsp;</th>
 													</tr>											
 												</thead>
 												<tbody>
@@ -624,7 +637,7 @@
 														<tr class="${(i%2 == 0)?'odd':'even' }">
 															<td>${itemInstance?.lotNumber?:'<span class="fade">EMPTY</span>' }</td>
 															<td><g:formatDate date="${itemInstance?.inventoryLot?.expirationDate }" format="dd/MMM/yy" /></td>
-															<td nowrap>
+															<td style="text-align:center;">
 																<g:link controller="inventoryItem" action="deleteInventoryItem" id="${itemInstance?.id }" params="['inventory.id':inventoryInstance?.id]">
 																	<img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>
 																</g:link>
@@ -641,17 +654,17 @@
 															showTrigger="false" />
 														</td>
 														<td>
-															<g:submitButton name="submit" value="Add"/>
 														</td>
 													</tr>
 												</tbody>
 											</table>
-											
-											<div style="text-align: right">
+											<div class="buttonBar" >
+												<g:submitButton name="save" value="Save"/>
+												&nbsp;
 												<a href="#" id="showInventoryLotReportLink">
-													<img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/>
-													close</a>
-											</div>											
+													<img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/> Cancel</a>
+											</div>												
+											
 											
 										</fieldset>
 									</g:form>
@@ -678,84 +691,74 @@
 								<div id="showWarningLevels">
 									<fieldset>				
 										<legend>Warning Levels</legend>
-										<div style="text-align: right">			
-											<a href="#" id="configureWarningLevelsLink">
-											<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}"/>
-											configure</a>
-										</div>
 										<table>
 											<tr class="prop">
 												<td class="name"><label>Minimum Quantity </label></td>
 												<td class="value">
-													${itemInstance?.minQuantity?:0 }
+													${inventoryLevelInstance?.minQuantity?:0 }
 												</td>
 											</tr>
 											<tr class="prop">
 												<td class="name"><label>Reorder Quantity</label></td>
 												<td class="value">
-													${itemInstance?.reorderQuantity?:0 }
+													${inventoryLevelInstance?.reorderQuantity?:0 }
 												</td>
 											</tr>
 											<tr class="prop">
 												<td class="name"><label>Maximum Quantity</label></td>
 												<td class="value">
-													${itemInstance?.maxQuantity?:0}
+													${inventoryLevelInstance?.maxQuantity?:0}
 												</td>
 											</tr>
 										</table>			
 									</fieldset>
+									<div style="text-align: right">			
+										<a href="#" id="configureWarningLevelsLink">
+										<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
+										configure</a>
+									</div>
 								</div>
 								
 								<div id="configureWarningLevels">
-									<g:form action="update">
-										<g:hiddenField name="id" value="${itemInstance?.id}"/>
-										<g:hiddenField name="inventory.id" value="${itemInstance?.inventory?.id}"/>
+									<g:form>
+										<g:hiddenField name="id" value="${inventoryLevelInstance?.id}"/>
+										<g:hiddenField name="product.id" value="${productInstance?.id}"/>
+										<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
 										<fieldset>				
 											<legend>Warning Levels</legend>
-											<div style="text-align: right">			
-												<a href="#" id="showWarningLevelsLink">
-												<img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/>
-												close</a>
-											</div>
 											<table>
 												<tr class="prop">
 													<td class="name"><label>Minimum Quantity </label></td>
 													<td class="value">
-														<g:textField name="minQuantity" value="${itemInstance?.minQuantity }" size="3"/>
+														<g:textField name="minQuantity" value="${inventoryLevelInstance?.minQuantity }" size="3"/>
 													</td>
 												</tr>
 												<tr class="prop">
 													<td class="name"><label>Reorder Quantity</label></td>
 													<td class="value">
-														<g:textField name="reorderQuantity" value="${itemInstance?.reorderQuantity }" size="3"/>
+														<g:textField name="reorderQuantity" value="${inventoryLevelInstance?.reorderQuantity }" size="3"/>
 													</td>
 												</tr>
 												<tr class="prop">
 													<td class="name"><label>Maximum Quantity</label></td>
 													<td class="value">
-														<g:textField name="maxQuantity" value="${itemInstance?.maxQuantity }" size="3"/>
-													</td>
-												</tr>
-												<tr class="prop">
-													<td colspan="2">
-														<div class="buttons" style="text-align: center;">
-										                    <g:actionSubmit class="save" action="update" value="${message(code: 'default.button.save.label', default: 'Save')}" />
-									                    </div>
+														<g:textField name="maxQuantity" value="${inventoryLevelInstance?.maxQuantity }" size="3"/>
 													</td>
 												</tr>
 											</table>
+											<div class="buttonBar" style="text-align: center;">
+							                    <g:actionSubmit class="save" action="saveInventoryLevel" value="${message(code: 'default.button.save.label', default: 'Save')}" />
+							                    &nbsp;
+												<a href="#" id="showWarningLevelsLink">
+													<img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/> Cancel</a>
+						                    </div>
 										</fieldset>									
 									</g:form>								
 								</div>				
-								
-													
 							</td>
 						</tr>
 					</table>
-				
-				</fieldset>
-				
-				
+				</fieldset>				
 			</div>			
 		</div>
 	</body>
