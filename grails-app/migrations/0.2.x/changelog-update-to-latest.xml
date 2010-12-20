@@ -1536,6 +1536,7 @@
     </changeSet>
     
     <changeSet author="jmiranda (generated)" id="1291325368079-5">
+	    <validCheckSum>669055452cca72623ed36ee392d84bb</validCheckSum>
 		<preConditions onFail="MARK_RAN">
 			<not><indexExists indexName="FK7FA0D2DE3265A8A9"/></not>
 		</preConditions>    
@@ -1544,6 +1545,7 @@
         </createIndex>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1291325368079-6">
+		<validCheckSum>57d75746652eb44deab2779c4c038a0</validCheckSum>
 		<preConditions onFail="MARK_RAN">
 			<not><foreignKeyConstraintExists foreignKeyName="FK7FA0D2DE3265A8A9"/></not>
 		</preConditions>    
@@ -1551,4 +1553,81 @@
 		    baseTableName="transaction" baseColumnNames="confirmed_by_id"
 		    referencedTableName="user" referencedColumnNames="id" />
     </changeSet>          
+    
+    <changeSet author="jmiranda (generated)" id="1291651429819-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from transaction_type where name = "Inventory"</sqlCheck>
+        </preConditions>
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="7"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-12-06"/>
+            <column name="description" value="Inventory"/>
+            <column name="last_updated" valueDate="2010-12-06"/>
+            <column name="name" value="Inventory"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+	</changeSet>
+	
+    <changeSet author="jmiranda (generated)" id="1291651429819-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from location_type where name = "Warehouse"</sqlCheck>
+        </preConditions>
+        <insert tableName="location_type">
+            <column name="id" valueNumeric="1"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="code" value="locationType.warehouse"/>
+            <column name="date_created" valueDate="2010-12-06"/>
+            <column name="description" value="Warehouse"/>
+            <column name="last_updated" valueDate="2010-12-06"/>
+            <column name="name" value="Warehouse"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+	</changeSet>
+    <changeSet author="jmiranda (generated)" id="1291651429819-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from location_type where name = "Depot"</sqlCheck>
+        </preConditions>
+        <insert tableName="location_type">
+            <column name="id" valueNumeric="2"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="code" value="locationType.depot"/>
+            <column name="date_created" valueDate="2010-12-06"/>
+            <column name="description" value="Depot"/>
+            <column name="last_updated" valueDate="2010-12-06"/>
+            <column name="name" value="Depot"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+	</changeSet>
+    <changeSet author="jmiranda (generated)" id="1291651429819-4">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from location_type where name = "Pharmacy"</sqlCheck>
+        </preConditions>
+        <insert tableName="location_type">
+            <column name="id" valueNumeric="3"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="code" value="locationType.pharmacy"/>
+            <column name="date_created" valueDate="2010-12-06"/>
+            <column name="description" value="Pharmacy"/>
+            <column name="last_updated" valueDate="2010-12-06"/>
+            <column name="name" value="Pharmacy"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+	</changeSet>
+    <changeSet author="jmiranda (generated)" id="1291651429819-5">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from location_type where name = "Supplier"</sqlCheck>
+        </preConditions>
+        <insert tableName="location_type">
+            <column name="id" valueNumeric="4"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="code" value="locationType.supplier"/>
+            <column name="date_created" valueDate="2010-12-06"/>
+            <column name="description" value="Supplier"/>
+            <column name="last_updated" valueDate="2010-12-06"/>
+            <column name="name" value="Supplier"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+	</changeSet>
+
 </databaseChangeLog>

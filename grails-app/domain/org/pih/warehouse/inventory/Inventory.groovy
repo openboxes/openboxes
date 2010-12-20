@@ -2,12 +2,13 @@ package org.pih.warehouse.inventory;
 
 import java.util.Date;
 
+
 class Inventory implements java.io.Serializable {
 
     // Core data elements
     Warehouse warehouse		// we could assume that a warehouse has an inventory
     Date lastInventoryDate	// last time an inventory was completed
-
+	
 	// Auditing
 	Date dateCreated;
 	Date lastUpdated;

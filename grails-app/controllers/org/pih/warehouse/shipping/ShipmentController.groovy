@@ -530,7 +530,7 @@ class ShipmentController {
 		
 		// Create a new unverified product
 		if (!product) { 			
-			product = new Product(name: params.selectedItem.name, unverified: true);			
+			product = new Product(name: params.selectedItem.name);			
 			if (!product.hasErrors() && product.save(flush: true)) {
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'container.label', default: 'Product'), product.id])}"
 				//redirect(action: "editContents", id: shipment.id, params: ["container.id": container?.id])

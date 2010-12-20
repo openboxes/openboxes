@@ -16,10 +16,11 @@ class EventType implements Comparable, Serializable {
 	String name
 	String description
 	Integer sortOrder = 0;
-	ActivityType activityType;
 	Date dateCreated;
 	Date lastUpdated;
 
+	EventTypes eventType;
+	ActivityType activityType;
 	EventStatus eventStatus;		// default status: initial, completed, pending
 			
 	static transients = [ "status", "optionValue" ]

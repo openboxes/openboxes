@@ -4,18 +4,115 @@ import grails.converters.*;
 
 import org.pih.warehouse.core.DialogForm;
 import org.pih.warehouse.core.Person;
+import org.pih.warehouse.core.UnitOfMeasure;
 import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.product.DosageForm;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.shipping.Container;
 import org.pih.warehouse.shipping.ShipmentItem;
 import org.pih.warehouse.shipping.Shipper;
 import org.pih.warehouse.shipping.ShipperService;
 import org.pih.warehouse.shipping.Shipment;
-
+import org.pih.warehouse.product.ProductType;
 
 
 class JsonController {
 
+	/*
+	def getProductTypes = { params ->
+		ProductType.withCriteria { 
+			ilike("name", "%" +  params.term + "%")			
+		}
+	}
+	
+	def findByName = { searchMethod ->	
+		def items = new TreeSet();
+		if (params.term) {
+			items = searchMethod.call(params)
+			if (items) {
+				items = items.collect() {
+					[	value: it.id,
+						label: it.name,
+						valueText: it.name,
+						desc: it.name,
+						icon: "none" 	]
+				}
+			}
+		}
+		render items as JSON;
+	}
+	*/
+	
+	def findProductTypeByName = { 
+		log.info params
+		def items = new TreeSet();
+		if (params.term) {
+			items = ProductType.withCriteria {
+				or {
+					ilike("name", "%" +  params.term + "%")
+				}
+			}
+			if (items) {
+				items = items.collect() {
+					[	value: it.id,
+						label: it.name,
+						valueText: it.name,
+						desc: it.name,
+						icon: "none" 	]
+				}
+			}
+		}
+		render items as JSON;
+	}	
+	
+	
+	def findUnitOfMeasureByName = { 
+		log.info params
+		def items = new TreeSet();
+		if (params.term) {
+			items = UnitOfMeasure.withCriteria {
+				or {
+					ilike("name", "%" +  params.term + "%")
+				}
+			}
+			if (items) {
+				items = items.collect() {
+					[	value: it.id,
+						label: it.name,
+						valueText: it.name,
+						desc: it.name,
+						icon: "none" 	]
+				}
+			}
+		}
+		render items as JSON;
+	}
+
+	def findDosageFormByName = {
+		log.info params
+		def items = new TreeSet();
+		if (params.term) {
+			items = DosageForm.withCriteria {
+				or {
+					ilike("name", "%" +  params.term + "%")
+				}
+			}
+			if (items) {
+				items = items.collect() {
+					[	value: it.id,
+						label: it.name,
+						valueText: it.name,
+						desc: it.name,
+						icon: "none" 	]
+				}
+			}
+		}
+		render items as JSON;
+		
+		
+	}
+	
+		
 	def findShipperServiceByName = {
 		log.info params
 		def items = new TreeSet();
@@ -345,7 +442,7 @@ class JsonController {
 		// Create a new unverified product
 		/*
 		if (!productInstance) {
-			productInstance = new Product(name: params.selectedItem.name, unverified: true);
+			productInstance = new Product(name: params.selectedItem.name);
 			if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'container.label', default: 'Product'), product.id])}"
 				log.info("saved product")

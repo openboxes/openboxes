@@ -243,47 +243,51 @@
 					.attr('value', prodId)								
 					.attr('name', 'transactionEntries[' + numberOfRows + '].product.id');
 					
-				var $quantityField = $('<input>')
-					.attr('type', 'text')
-					.attr('size','3')
-					.attr('name','transactionEntries[' + numberOfRows + '].quantity');
+				var quantityField = $("<input/>", { type: "hidden", size: "3", name: 'transactionEntries[' + numberOfRows + '].quantity' });					
+				var lotNumberField = $("<input/>", { type: "text", size: "10", 
+					id: 'transactionEntries[' + numberOfRows + '].lotNumber', name: 'transactionEntries[' + numberOfRows + '].lotNumber' });
 					
-				var $lotNumberField = $('<input>')
-					.attr('type', 'text')
-					.attr('size','10')
-					.attr('id', 'transactionEntries[' + numberOfRows + '].lotNumber')
-					.attr('name','transactionEntries[' + numberOfRows + '].lotNumber');
+				//var $quantityField = $('<input>')
+				//	.attr('type', 'text')
+				//	.attr('size','3')
+				//	.attr('name',);
 					
-				var $expiryField = $('<select name="transactionEntries[' + numberOfRows + '].expirationDate">' + monthsYears + '</select>');
+				//var $lotNumberField = $('<input>')
+				//	.attr('type', 'text')
+				//	.attr('size','10')
+				//	.attr('id', 'transactionEntries[' + numberOfRows + '].lotNumber')
+				//	.attr('name','transactionEntries[' + numberOfRows + '].lotNumber');
+					
+				var expiryField = $('<select name="transactionEntries[' + numberOfRows + '].expirationDate">' + monthsYears + '</select>');
 				
-				$newRow = $('<tr id="prodRow' + prodId + lotIndex + '" class="prodRow' + prodId + '">');
+				newRow = $('<tr id="prodRow' + prodId + lotIndex + '" class="prodRow' + prodId + '">');
 				
 				
 				
 				if (lotIndex == 1) {
 					var addIcon = $('<img>').attr('src', '/warehouse/images/icons/silk/add.png');
 					
-					$productNameCell = $('<td id="prodNameCell' + prodId + '" class="prodNameCell">')
+					productNameCell = $('<td id="prodNameCell' + prodId + '" class="prodNameCell">')
 						.attr('valign','top').attr('rowspan','1')																
 						.html(prodName);								
 				
 					var addProductLink = $('<a href="javascript:selectProduct(' + prodId + ');">').html(addIcon);								
-					$addProductCell = $('<td id="addProductCell' + prodId + '" class="addProductCell">')
+					addProductCell = $('<td id="addProductCell' + prodId + '" class="addProductCell">')
 						.attr('valign','top')
 						.attr('rowspan','1')									
 						.html(addProductLink);
 					
-					$newRow.append($addProductCell);
-					$newRow.append($productNameCell);
+					newRow.append(addProductCell);
+					newRow.append(productNameCell);
 				}
 				updateRowSpan(prodId, 1);
 				
 				
 				var removeIcon = $('<img>').attr('src', '/warehouse/images/icons/silk/cross.png');
 				
-				$newRow.append( $('<td>').append($quantityField).append(productField) );
-				$newRow.append( $('<td>').append($lotNumberField) );
-				$newRow.append( $('<td>').append($expiryField) );
+				newRow.append( $('<td>').append(quantityField).append(productField) );
+				newRow.append( $('<td>').append(lotNumberField) );
+				newRow.append( $('<td>').append(expiryField) );
 				
 				//$newRow.append($('<td>').text(''));
 				
@@ -294,18 +298,18 @@
 						$('<a href="javascript:removeRow(' + prodId + ', ' + lotIndex + ');">').html(removeIcon)));									
 				}
 				else {
-					$newRow.append($('<td>').text(''));
+					newRow.append($('<td>').text(''));
 				}
 				
 				if (lotIndex == 1) {
-					$('#prodSelectRow').before($newRow);
+					$('#prodSelectRow').before(newRow);
 				}
 				else {
-					$('.prodRow' + prodId).last().after($newRow);
+					$('.prodRow' + prodId).last().after(newRow);
 				}
 				
 				if (existingProdLots != null && existingProdLots[prodId].length > 0) {
-					$textField.autocomplete(existingProdLots[prodId],{
+					textField.autocomplete(existingProdLots[prodId],{
 						minChars: 0,
 						width: 600,
 						scroll: true,
@@ -316,14 +320,14 @@
 						formatMatch: function(row, i, max) { return row.label; },
 						formatResult: function(row) { return row.label; }
 					});
-					$lotNumberField.blur(function() {
-						$lotNumberField.removeAttr('autocomplete');
+					lotNumberField.blur(function() {
+						lotNumberField.removeAttr('autocomplete');
 					});
-					$lotNumberField.focus(function() {
-						$lotNumberField.attr('autocomplete', 'off');
+					lotNumberField.focus(function() {
+						lotNumberField.attr('autocomplete', 'off');
 					});
-					$lotNumberField.result(function(event, data, formatted) {
-						$expiryField.val(lotExpOptions[data.code]);
+					lotNumberField.result(function(event, data, formatted) {
+						expiryField.val(lotExpOptions[data.code]);
 					});
 				}		
 				numberOfRows++;

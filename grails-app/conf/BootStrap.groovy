@@ -24,18 +24,9 @@ import org.pih.warehouse.inventory.TransactionType;
 import org.pih.warehouse.inventory.Warehouse;
 import org.pih.warehouse.product.Attribute;
 import org.pih.warehouse.product.Category;
-import org.pih.warehouse.product.DrugClass;
-import org.pih.warehouse.product.DrugProduct;
-import org.pih.warehouse.product.DrugRouteType;
-import org.pih.warehouse.product.DrugProduct;
-import org.pih.warehouse.product.DrugRouteType;
-import org.pih.warehouse.product.DurableProduct;
-import org.pih.warehouse.product.GenericType;
-import org.pih.warehouse.product.PackageType;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.ProductAttribute;
 import org.pih.warehouse.product.ProductType;
-import org.pih.warehouse.product.Value;
 import org.pih.warehouse.shipping.Container;
 import org.pih.warehouse.shipping.ContainerType;
 import org.pih.warehouse.shipping.ReferenceNumberType;
@@ -73,24 +64,6 @@ class BootStrap {
 		//
 		if (GrailsUtil.environment == 'demo') {
 			
-			Attribute ATTRIBUTE_VITALITY = new Attribute(name:"Vitality", dataType: DataType.STRING).save(flush:true);
-			Value VALUE_VITAL = new Value(stringValue:"Vital").save();
-			Value VALUE_ESSENTIAL = new Value(stringValue:"Essential").save();
-			Value VALUE_NON_ESSENTIAL = new Value(stringValue:"Non-essential").save();
-			ATTRIBUTE_VITALITY.addToOptions(VALUE_VITAL).save(flush:true);
-			ATTRIBUTE_VITALITY.addToOptions(VALUE_ESSENTIAL).save(flush:true);
-			ATTRIBUTE_VITALITY.addToOptions(VALUE_NON_ESSENTIAL).save(flush:true);
-		
-			Attribute ATTRIBUTE_SIZE = new Attribute(name: "Size", dataType: DataType.STRING).save();
-			Value VALUE_SMALL = new Value(stringValue:"Small").save();
-			Value VALUE_MEDIUM = new Value(stringValue:"Medium").save();
-			Value VALUE_LARGE = new Value(stringValue:"Large").save();
-			Value VALUE_EXTRA_LARGE = new Value(stringValue:"X-large").save();
-			ATTRIBUTE_SIZE.addToOptions(VALUE_SMALL).save(flush:true);
-			ATTRIBUTE_SIZE.addToOptions(VALUE_MEDIUM).save(flush:true);
-			ATTRIBUTE_SIZE.addToOptions(VALUE_LARGE).save(flush:true);
-			ATTRIBUTE_SIZE.addToOptions(VALUE_EXTRA_LARGE).save(flush:true);
-				
 			Category CATEGORY_MEDICINES = new Category(parentCategory: null, name: "Medicines").save();
 			Category CATEGORY_SUPPLIES = new Category(parentCategory: null, name: "Supplies").save();
 			Category CATEGORY_EQUIPMENT = new Category(parentCategory: null, name: "Equipment").save();
@@ -144,60 +117,6 @@ class BootStrap {
 			Donor DONOR_ABC = new Donor(name: "Donor Organization ABC", description: "").save();
 			Donor DONOR_XYZ = new Donor(name: "Donor Organization XYZ", description: "").save();
 			Donor DONOR_123 = new Donor(name: "Donor Organization 123", description: "").save();
-
-			DrugClass DRUG_CLASS_ANTI_INFECTIVES = new DrugClass(parentDrugClass: null, name: "anti-infectives").save(flush:true);
-			DrugClass DRUG_CLASS_AMEMBICIDES = new DrugClass(parentDrugClass: DRUG_CLASS_ANTI_INFECTIVES, name: "amebicides").save(flush:true);
-			DrugClass DRUG_CLASS_AMINOGLYCOSIDES = new DrugClass(parentDrugClass: DRUG_CLASS_ANTI_INFECTIVES, name: "aminoglycosides").save(flush:true);
-			DrugClass DRUG_CLASS_ANTHELMINTICS = new DrugClass(parentDrugClass: DRUG_CLASS_ANTI_INFECTIVES, name: "anthelmintics").save(flush:true);
-			DrugClass DRUG_CLASS_ANTIFUNGALS = new DrugClass(parentDrugClass: DRUG_CLASS_ANTI_INFECTIVES, name: "antifungals").save(flush:true);
-			DrugClass DRUG_CLASS_ANTIMALARIAL_AGENTS = new DrugClass(parentDrugClass: DRUG_CLASS_ANTI_INFECTIVES, name: "antimalarial agents").save(flush:true);
-			DrugClass DRUG_CLASS_ANTITUBERCULOSIS_AGENTS = new DrugClass(parentDrugClass: DRUG_CLASS_ANTI_INFECTIVES, name: "antituberculosis agents").save(flush:true);
-			DrugClass DRUG_CLASS_ANTIVIRAL_AGENTS = new DrugClass(parentDrugClass: DRUG_CLASS_ANTI_INFECTIVES, name: "antiviral agents").save(flush:true);
-			DrugClass DRUG_CLASS_CARBAPENEMS = new DrugClass(parentDrugClass: DRUG_CLASS_ANTI_INFECTIVES, name: "carbapenems").save(flush:true);
-			DrugClass DRUG_CLASS_CEPHALOSPORINS = new DrugClass(parentDrugClass: DRUG_CLASS_ANTI_INFECTIVES, name: "cephalosporins").save(flush:true);
-			DrugClass DRUG_CLASS_GLYCOPEPTIDE_ANTIBIOTICS = new DrugClass(parentDrugClass: DRUG_CLASS_ANTI_INFECTIVES, name: "glycopeptide antibiotics").save(flush:true);
-
-			DrugRouteType DRUG_ROUTE_DENTAL = new DrugRouteType(name: "DENTAL").save();
-			DrugRouteType DRUG_ROUTE_ORAL = new DrugRouteType(name: "ORAL").save();
-			DrugRouteType DRUG_ROUTE_RECTAL = new DrugRouteType(name: "RECTAL").save();
-			DrugRouteType DRUG_ROUTE_INTRAMUSCULAR = new DrugRouteType(name: "INTRAMUSCULAR").save();
-			DrugRouteType DRUG_ROUTE_INTRAVENOUS = new DrugRouteType(name: "INTRAVENOUS").save();
-			DrugRouteType DRUG_ROUTE_SUBCUTANEOUS = new DrugRouteType(name: "SUBCUTANEOUS").save();
-			DrugRouteType DRUG_ROUTE_SUBLINGUAL = new DrugRouteType(name: "SUBLINGUAL").save();						
-			DrugRouteType DRUG_ROUTE_OPHTHALMIC = new DrugRouteType(name: "OPHTHALMIC").save();
-			DrugRouteType DRUG_ROUTE_INTRASPINAL = new DrugRouteType(name: "INTRASPINAL").save();
-			DrugRouteType DRUG_ROUTE_INTRACAVITARY = new DrugRouteType(name: "INTRACAVITARY").save();
-			DrugRouteType DRUG_ROUTE_BUCCAL = new DrugRouteType(name: "BUCCAL").save();
-			DrugRouteType DRUG_ROUTE_INTRATRACHEAL = new DrugRouteType(name: "INTRATRACHEAL").save();
-			DrugRouteType DRUG_ROUTE_PERIODONTAL = new DrugRouteType(name: "PERIODONTAL").save();
-			DrugRouteType DRUG_ROUTE_INTRAPLEURAL = new DrugRouteType(name: "INTRAPLEURAL").save();
-			DrugRouteType DRUG_ROUTE_INTRATHECAL = new DrugRouteType(name: "INTRATHECAL").save();
-			DrugRouteType DRUG_ROUTE_TRANSMUCOSAL = new DrugRouteType(name: "TRANSMUCOSAL").save();
-			DrugRouteType DRUG_ROUTE_TRANSTRACHEAL = new DrugRouteType(name: "TRANSTRACHEAL").save();
-			DrugRouteType DRUG_ROUTE_TRANSDERMAL = new DrugRouteType(name: "TRANSDERMAL").save();
-			DrugRouteType DRUG_ROUTE_INFILTRATION = new DrugRouteType(name: "INFILTRATION").save();
-			DrugRouteType DRUG_ROUTE_RESPIRATORY_INHALATION  = new DrugRouteType(name: "RESPIRATORY_INHALATION").save();
-			DrugRouteType DRUG_ROUTE_INTRAOCULAR = new DrugRouteType(name: "INTRAOCULAR").save();
-
-			GenericType GENERIC_LAPTOP = new GenericType(name: "Laptop").save();
-			GenericType GENERIC_GLOVE = new GenericType(name: "Glove").save();
-			GenericType GENERIC_GUAZE = new GenericType(name: "Guaze").save();
-			GenericType GENERIC_TISSUE = new GenericType(name: "Tissue").save();
-			GenericType GENERIC_FOOTWEAR = new GenericType(name: "Shoe").save();
-			GenericType GENERIC_ARV_MEDICATION = new GenericType(name: "ARV Medication").save();
-			GenericType GENERIC_PAIN_MEDICATION = new GenericType(name: "Pain Medication").save();
-			GenericType GENERIC_VEGETABLE = new GenericType(name: "Vegetable").save();
-			GenericType GENERIC_ELECTRONICS = new GenericType(name: "Electronics").save();
-			
-			//Organization ZL = new Organization(name:  "Zanmi Lasante", description: "").save();
-			//Organization PIH = new Organization(name: "Partners In Health", description: "").save();
-	
-			PackageType PACKAGE_BOTTLE = new PackageType(name:"Bottle").save();
-			PackageType PACKAGE_BOX = new PackageType(name:"Box").save();
-			PackageType PACKAGE_GLASS = new PackageType(name:"Glass").save();
-			PackageType PACKAGE_PLASTIC = new PackageType(name:"Plastic").save();
-			PackageType PACKAGE_VIAL = new PackageType(name:"Vial").save();
-			PackageType PACKAGE_OTHER = new PackageType(name:"Other").save();
 
 			ProductType PRODUCT_MEDS_ARV = new ProductType(parentProductType: null, name: "Meds-ARV").save();
 			ProductType PRODUCT_MEDS_TB = new ProductType(parentProductType: null, name: "Meds-TB").save();
@@ -253,7 +172,7 @@ class BootStrap {
 			//ShipmentStatus SHIPMENT_STATUS_READY = new ShipmentStatus(name:"Ready", color: "green", description: "Items are ready to be shipped.", finalStatus:false, sortOrder: 5).save();
 			//ShipmentStatus SHIPMENT_STATUS_SHIPPED = new ShipmentStatus(name:"Shipped", color: "green", description: "Items have been shipped from the warehouse.", finalStatus:false, sortOrder: 6).save();
 			//ShipmentStatus SHIPMENT_STATUS_IN_TRANSIT = new ShipmentStatus(name:"In transit", color: "green", description: "In transit to destination.", finalStatus:false, sortOrder: 7).save();
-			//ShipmentStatus SHIPMENT_STATUS_IN_CUSTOMS = new ShipmentStatus(name:"In customs", description: "Going through customs inspection", finalStatus:false, sortOrder: 8).save();
+			//ShipmentStatus SHIPMENT_STATUS_IN_S = new ShipmentStatus(name:"In s", description: "Going through s inspection", finalStatus:false, sortOrder: 8).save();
 			//ShipmentStatus SHIPMENT_STATUS_RETURNED = new ShipmentStatus(name:"Returned", color: "red", description: "Items returned by recipient.", finalStatus:false, sortOrder: 9).save();
 			//ShipmentStatus SHIPMENT_STATUS_ARRIVED = new ShipmentStatus(name:"Arrived", color: "green", description: "Awaiting confirmation from recipient.", finalStatus:true, sortOrder: 10).save();	
 			//ShipmentStatus SHIPMENT_STATUS_DELIVERED = new ShipmentStatus(name:"Delivered", color: "#AAA", description: "Received confirmation from recipient.", finalStatus:true, sortOrder: 11).save();	
@@ -282,9 +201,9 @@ class BootStrap {
 			//EventType EVENT_GOODS_UNPACKED = new EventType(name:"Shipment has been unpacked", description:"Shipment has arrived").save();
 			//EventType EVENT_GOODS_STORED = new EventType(name:"Shipment has been stored", description:"Shipment has been stored in warehouse").save();
 
-			// Unique internal identifier, PO Number, Bill of Lading Number, or customer name,      	
+			// Unique internal identifier, PO Number, Bill of Lading Number, or er name,      	
 			ReferenceNumberType REFERENCE_PO_NUMBER = new ReferenceNumberType(name: "Purchase Order Number", description: "Purchase Order Number").save();
-			ReferenceNumberType REFERENCE_CUSTOMER_NAME = new ReferenceNumberType(name: "Customer Name", description: "Customer name").save();
+			ReferenceNumberType REFERENCE_ER_NAME = new ReferenceNumberType(name: "er Name", description: "er name").save();
 			ReferenceNumberType REFERENCE_INTERNAL_IDENTIFIER = new ReferenceNumberType(name: "Internal Identifier", description: "Internal Identifier").save();
 			ReferenceNumberType REFERENCE_BILL_OF_LADING_NUMBER = new ReferenceNumberType(name: "Bill of Lading Number", description: "Bill of Lading Number").save();
 		
@@ -348,66 +267,6 @@ class BootStrap {
 		
 
 		
-			ProductAttribute productVitality = new ProductAttribute(attribute: ATTRIBUTE_VITALITY, allowMultiple: Boolean.FALSE)
-			productVitality.addToValues(VALUE_ESSENTIAL);		
-		
-			DrugProduct advil = new DrugProduct(upc:"AD00001VIL", productCode:"00001", name:"Advil 200mg", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER, weight: 1.6).save(flush:true);
-			//advil.addToConditionTypes(CONDITION_PAIN).save(flush:true);		
-			//advil.addToProductAttributeValues(productVitality).save(flush:true);
-			advil.addToCategories(CATEGORY_MEDICINES).save(flush:true);
-			advil.addToCategories(CATEGORY_MEDICINES_PAIN).save(flush:true);
-
-			DrugProduct tylenol = new DrugProduct(upc:"TY00006LENOL",productCode:"00006", name: "Tylenol 325mg", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER, weight: 1.1).save(flush:true);		
-			//tylenol.addToConditionTypes(CONDITION_PAIN).save(flush:true);
-			tylenol.addToCategories(CATEGORY_MEDICINES).save(flush:true);
-			tylenol.addToCategories(CATEGORY_MEDICINES_PAIN).save(flush:true);
-		
-			DrugProduct aspirin = new DrugProduct(upc:"AS00007PIRIN",productCode:"00007", name: "Aspirin 20mg", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER, weight: 1.2).save(flush:true);
-			//aspirin.addToConditionTypes(CONDITION_PAIN).save(flush:true);
-			aspirin.addToCategories(CATEGORY_MEDICINES);
-			aspirin.addToCategories(CATEGORY_MEDICINES_PAIN);
-		
-			DrugProduct generic = new DrugProduct(upc:"GENERAL00008PAIN", productCode:"00008", name: "General Pain Reliever", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER, weight: 1.3).save(flush:true)
-			//generic.addToConditionTypes(CONDITION_PAIN).save(flush:true);
-			generic.addToCategories(CATEGORY_MEDICINES);
-			generic.addToCategories(CATEGORY_MEDICINES_PAIN);
-		
-		
-			//Product genpril = new DrugProduct(upc:"GEN00002PRIL", productCode:"00002", name:"Genpril", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER).save(flush:true);
-			//genpril.addToConditionTypes(CONDITION_PAIN).save(flush:true);
-			//genpril.addToCategories(CATEGORY_MEDICINES).save(flush:true);
-			//genpril.addToCategories(CATEGORY_MEDICINES_PAIN).save(flush:true);
-		
-			//Product midol = new DrugProduct(upc:"MI00003DOL", productCode:"00003", name:"Midol", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER).save(flush:true);
-			//midol.addToConditionTypes(CONDITION_PAIN).save(flush:true);
-			//midol.addToCategories(CATEGORY_MEDICINES).save(flush:true);
-			//midol.addToCategories(CATEGORY_MEDICINES_PAIN).save(flush:true);
-		
-			//Product motrin = new DrugProduct(upc:"MOT00004RIN", productCode:"00004", name:"Motrin", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER).save(flush:true);
-			//motrin.addToConditionTypes(CONDITION_PAIN).save(flush:true);
-			//motrin.addToCategories(CATEGORY_MEDICINES).save(flush:true);
-			//motrin.addToCategories(CATEGORY_MEDICINES_PAIN).save(flush:true);
-		
-			//Product nuprin = new DrugProduct(upc:"NUP00005RIN", productCode:"00005", name:"Nuprin", genericName: "Ibuprofen", productType: PRODUCT_MEDS_OTHER).save(flush:true);
-			//nuprin.addToConditionTypes(CONDITION_PAIN).save(flush:true);
-			//nuprin.addToCategories(CATEGORY_MEDICINES).save(flush:true);
-			//nuprin.addToCategories(CATEGORY_MEDICINES_PAIN).save(flush:true);
-		
-		
-			DrugProduct didanosine = new DrugProduct(upc: "DIDAN00009OSINE", productCode:"00009", name:"Didanosine 200mg", productType: PRODUCT_MEDS_OTHER).save(flush:true);		
-			//didanosine.addToConditionTypes(CONDITION_AIDS_HIV).save(flush:true);
-			didanosine.addToCategories(CATEGORY_MEDICINES).save(flush:true);
-			didanosine.addToCategories(CATEGORY_MEDICINES_ARV).save(flush:true);
-		
-			//Product reflotron = new DurableProduct(upc: "RE00010FLOTRON", productCode: "00010", name: "Reflotron", productType: CATEGORY_SURGICAL_EQUIPMENT, make: "Roche", model: "Model No. 284282").save(flush:true); 
-			//reflotron.addToCategories(CATEGORY_EQUIPMENT).save(flush:true);
-			//reflotron.addToCategories(CATEGORY_SURGICAL_EQUIPMENT).save(flush:true);
-		
-			Product similacAdvanceLowIron = new Product(name: "Similac Advance low iron 400g", weight: 12.0).save(flush:true);
-			similacAdvanceLowIron.addToCategories(CATEGORY_FOOD).save(flush:true);
-				
-			Product similacAdvancePlusIron = new Product(name: "Similac Advance + iron 365g", weight: 10.0).save(flush:true);		
-			similacAdvancePlusIron.addToCategories(CATEGORY_FOOD).save(flush:true);
 
 		
 			// ================================    Demo data    ============================================

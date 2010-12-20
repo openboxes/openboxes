@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<!-- Add new attribute columns and tables -->
+    <changeSet author="jmiranda (generated)" id="1291916325456-1">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="attribute_options" /></not>
+		</preConditions>       
+        <createTable tableName="attribute_options">
+            <column name="attribute_id" type="BIGINT"/>
+            <column name="options_string" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1291916325456-2">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="attribute" columnName="allow_other" /></not>
+		</preConditions>       
+        <addColumn tableName="attribute">
+            <column name="allow_other" type="BIT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1291916325456-3">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="product_attribute" columnName="value" /></not>
+		</preConditions>       
+        <addColumn tableName="product_attribute">
+            <column name="value" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1291916325456-4">
+		<preConditions onFail="MARK_RAN">
+			<not><indexExists indexName="FK57477BFB47B0D087" /></not>
+		</preConditions>       
+        <createIndex indexName="FK57477BFB47B0D087" tableName="attribute_options" unique="false">
+            <column name="attribute_id"/>
+        </createIndex>
+    </changeSet>
+
+	
+
+	<!-- Remove unused product columns -->
+	<changeSet author="jmiranda (generated)" id="1291916325456-7">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="product" columnName="budget_code_id" />
+		</preConditions>	
+		<dropColumn columnName="budget_code_id" tableName="product" />
+	</changeSet>
+	
+	<changeSet author="jmiranda (generated)" id="1291916325456-8a">
+		<preConditions onFail="MARK_RAN">
+			<foreignKeyConstraintExists foreignKeyName="FKED8DCCEFEF4C770D" />
+		</preConditions>	
+		<dropForeignKeyConstraint constraintName="FKED8DCCEFEF4C770D" baseTableName="product" />
+	</changeSet>	
+	<changeSet author="jmiranda (generated)" id="1291916325456-8b">
+		<preConditions onFail="MARK_RAN">
+			<indexExists indexName="FKED8DCCEFEF4C770D" />
+		</preConditions>	
+		<dropIndex indexName="FKED8DCCEFEF4C770D" tableName="product" />
+	</changeSet>	
+	<changeSet author="jmiranda (generated)" id="1291916325456-8c">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="product" columnName="category_id" />
+		</preConditions>	
+		<dropColumn columnName="category_id" tableName="product" />
+	</changeSet>
+	
+	<changeSet author="jmiranda (generated)" id="1291916325456-9">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="product" columnName="code" />
+		</preConditions>	
+		<dropColumn columnName="code" tableName="product" />
+	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1291916325456-10">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="product" columnName="description" />
+		</preConditions>	
+		<dropColumn columnName="description" tableName="product" />
+	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1291916325456-11">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="product" columnName="ean" />
+		</preConditions>	
+		<dropColumn columnName="ean" tableName="product" />
+	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1291916325456-12">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="product" columnName="french_name" />
+		</preConditions>	
+		<dropColumn columnName="french_name" tableName="product" />
+	</changeSet>
+	
+	<changeSet author="jmiranda (generated)" id="1291916325456-13a">
+		<preConditions onFail="MARK_RAN">
+			<foreignKeyConstraintExists foreignKeyName="FKED8DCCEFE0FEE896" />
+		</preConditions>	
+		<dropForeignKeyConstraint constraintName="FKED8DCCEFE0FEE896" baseTableName="product" />
+	</changeSet>	
+	<changeSet author="jmiranda (generated)" id="1291916325456-13b">
+		<preConditions onFail="MARK_RAN">
+			<indexExists indexName="FKED8DCCEFE0FEE896" />
+		</preConditions>	
+		<dropIndex indexName="FKED8DCCEFE0FEE896" tableName="product" />
+	</changeSet>	
+	<changeSet author="jmiranda (generated)" id="1291916325456-13c">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="product" columnName="generic_type_id" />
+		</preConditions>	
+		<dropColumn columnName="generic_type_id" tableName="product" />
+	</changeSet>
+
+	<changeSet author="jmiranda (generated)" id="1291916325456-14">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="product" columnName="image_src" />
+		</preConditions>	
+		<dropColumn columnName="image_src" tableName="product" />
+	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1291916325456-15">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="product" columnName="product_group_id" />
+		</preConditions>	
+		<dropColumn columnName="product_group_id" tableName="product" />
+	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1291916325456-16">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="product" columnName="quantity_per_unit" />
+		</preConditions>	
+		<dropColumn columnName="quantity_per_unit" tableName="product" />
+	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1291916325456-17">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="product" columnName="sku" />
+		</preConditions>	
+		<dropColumn columnName="sku" tableName="product" />
+	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1291916325456-18">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="product" columnName="unit_of_measure_id" />
+		</preConditions>	
+		<dropColumn columnName="unit_of_measure_id" tableName="product" />
+	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1291916325456-19">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="product" columnName="upc" />
+		</preConditions>	
+		<dropColumn columnName="upc" tableName="product" />
+	</changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1291934888184-1">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="product" columnName="drug_class_id" />
+		</preConditions>	
+        <dropColumn columnName="drug_class_id" tableName="drug_product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1291934888184-2">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="product" columnName="drug_route_type_id" />
+		</preConditions>	
+        <dropColumn columnName="drug_route_type_id" tableName="drug_product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1291934888184-3">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="product" columnName="package_size" />
+		</preConditions>	
+        <dropColumn columnName="package_size" tableName="drug_product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1291934888184-4">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="product" columnName="package_type_id" />
+		</preConditions>	
+        <dropColumn columnName="package_type_id" tableName="drug_product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1291934888184-5">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="attribute_value" />
+		</preConditions>	
+        <dropTable tableName="attribute_value"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1291934888184-6">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="drug_class" />
+		</preConditions>	
+        <dropTable tableName="drug_class"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1291934888184-7">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="drug_route_type" />
+		</preConditions>	
+        <dropTable tableName="drug_route_type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1291934888184-8">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="generic_type" />
+		</preConditions>	
+        <dropTable tableName="generic_type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1291934888184-9">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="lookup" />
+		</preConditions>	
+        <dropTable tableName="lookup"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1291934888184-10">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="product_attribute_value" />
+		</preConditions>	
+        <dropTable tableName="product_attribute_value"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1291934888184-11">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="product_code" />
+		</preConditions>	
+        <dropTable tableName="product_code"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1291934888184-12">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="product_group" />
+		</preConditions>	
+        <dropTable tableName="product_group"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1291934888184-13">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="product_name" />
+		</preConditions>	
+        <dropTable tableName="product_name"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1291934888184-14">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="product_tags" />
+		</preConditions>	
+        <dropTable tableName="product_tags"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1291934888184-15">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="product" columnName="name"/>
+		</preConditions>	
+        <sql>
+        	UPDATE drug_product, product SET inn = name WHERE drug_product.id = product.id;
+        	UPDATE consumable_product, product SET brandName = name WHERE consumable_product.id = product.id;
+        	UPDATE durable_product, product SET make = name WHERE durable_product.id = product.id;
+        </sql>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1291934888184-16">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="product" columnName="name" />
+		</preConditions>	
+        <dropColumn columnName="name" tableName="product"/>
+    </changeSet>
+
+
+
+</databaseChangeLog>

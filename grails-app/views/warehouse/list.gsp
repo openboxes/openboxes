@@ -11,6 +11,10 @@
     </head>
     <body>        
         <div class="body">
+        
+        	<div class="nav">
+				<g:render template="nav"/>        	
+        	</div>
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>
@@ -18,32 +22,28 @@
                 <table>
                     <thead>
                         <tr>                        
+                            <th><g:message code="warehouse.active.label" default="Active?" /></th>
                             <g:sortableColumn property="name" title="${message(code: 'warehouse.name.label', default: 'Name')}" />
                             <th><g:message code="warehouse.locationType.label" default="Location Type" /></th>
                             <th><g:message code="warehouse.manager.label" default="Manager" /></th>
                             <th><g:message code="warehouse.local.label" default="Managed Locally?" /></th>
-                            <th><g:message code="warehouse.active.label" default="Active?" /></th>
-                            <th><g:message code="warehouse.inventory.label" default="Inventory" /></th>
-                            <th><g:message code="warehouse.transactions.label" default="Transactions" /></th>
                         </tr>
                     </thead>
                     <tbody>
                     <g:each in="${warehouseInstanceList}" status="i" var="warehouseInstance">
 						<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+                            <td>${fieldValue(bean: warehouseInstance, field: "active")}</td>                            
 							<td>
-								<g:link action="show" id="${warehouseInstance.id}">${fieldValue(bean: warehouseInstance, field: "name")}</g:link>
+								<g:link action="edit" id="${warehouseInstance.id}">${fieldValue(bean: warehouseInstance, field: "name")}</g:link>
 							</td>
                             <td>${fieldValue(bean: warehouseInstance, field: "locationType.name")}</td>                            
                             <td>${fieldValue(bean: warehouseInstance, field: "manager")}</td>                            
                             <td>${fieldValue(bean: warehouseInstance, field: "local")}</td>                            
-                            <td>${fieldValue(bean: warehouseInstance, field: "active")}</td>                            
-                            
-                            <td>
-								<g:link controller="inventory" action="browse" params="['warehouse.id':warehouseInstance.inventory?.id]">Show Inventory</g:link>
-							</td>
-                            <td>
-								<g:link action="transaction" action="list" id="${warehouseInstance.id}">Show Transactions</g:link>
-							</td>
+							<td><g:link class="edit" action="edit" id="${warehouseInstance?.id}" >${message(code: 'default.button.edit.label', default: 'Edit')}</g:link></td>
+							<td><g:link class="delete" action="delete" id="${warehouseInstance?.id}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">${message(code: 'default.button.delete.label', default: 'Delete')}</g:link></td>                            
+
+			
+
 						</tr>
                     </g:each>
                     </tbody>

@@ -8,10 +8,6 @@
 				&nbsp;
 			</g:if>
 			<span style="font-weight: bold; font-size: 2em">${fieldValue(bean: warehouseInstance, field: "name")}</span>
-			&nbsp;
-			<g:link class="edit" action="edit" id="${warehouseInstance?.id}" >${message(code: 'default.button.edit.label', default: 'Edit')}</g:link>
-			&nbsp;
-			<g:link class="delete" action="delete" id="${warehouseInstance?.id}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">${message(code: 'default.button.delete.label', default: 'Delete')}</g:link>
 		</td>
 		<td style="text-align: right;">
 			<div style="font-size: 1.2em">

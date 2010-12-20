@@ -16,11 +16,13 @@ class ProductController {
         redirect(action: "list", params: params)
     }
 
-	
+	//params.max = Math.min(params.max ? params.int('max') : 10, 100)
+    //    [eventTypeInstanceList: EventType.list(params), eventTypeInstanceTotal: EventType.count()]
 
 	
     def browse = { 
-    		
+		params.max = Math.min(params.max ? params.int('max') : 10, 100);
+		
     	// Get selected 
 		def selectedCategory = Category.get(params.categoryId);		
 		def selectedProductType = ProductType.get(params.productTypeId);
@@ -42,12 +44,11 @@ class ProductController {
 		def allCategories = categoryCriteria.list { 
 			isNull("parentCategory")
 		}
-				
+
+		log.info params.productTypeId
+						
 		// Search for Products matching criteria 
-		def results = null;		
-		def productCriteria = Product.createCriteria();
-		log.info "product filter " + params;
-		results = productCriteria.list {
+		def results = Product.createCriteria().list(max:params.max, offset: params.offset ?: 0) {
             and{
                 if(params.productTypeId){
                     eq("productType.id", Long.parseLong(params.productTypeId))
@@ -58,19 +59,20 @@ class ProductController {
           			}
                 } 
 				if (params.nameContains) {  
-					like("name", "%" + params.nameContains + "%")
-				}
-				if (params.unverified) { 
-					eq("unverified", true)
+					or { 
+						ilike("inn", "%" + params.nameContains + "%")
+						ilike("brandName", "%" + params.nameContains + "%")
+					}
 				}
             }				
 		}		
+		
 				
 		def rootCategory = new Category(name: "/", categories: allCategories);
 		
         //params.max = Math.min(params.max ? params.int('max') : 10, 100)		
 		render(view:'browse', model:[productInstanceList : results, 
-    	                             productInstanceTotal: Product.count(), 
+    	                             productInstanceTotal: results.totalCount, 
 									 rootCategory : rootCategory,
     	                             categories : allCategories, selectedCategory : selectedCategory,
     	                             productTypes : allProductTypes, selectedProductType : selectedProductType,
@@ -83,26 +85,33 @@ class ProductController {
         [productInstanceList: Product.list(params), productInstanceTotal: Product.count()]
     }
 
+	def createType = { 
+		[ productTypeInstance: new ProductType(productClass:params.productClass)]
+	}
 	
+	def saveType = { 
+		log.info "params: " + params
+		def productTypeInstance = new ProductType(params);
+		if (!productTypeInstance.hasErrors() && productTypeInstance.save(flush:true)) { 
+			//redirect("")
+			
+			// send to create product page with params.productClass & params.productType populated
+			
+		}
+		else { 
+			render(view: "createType", model: [productTypeInstance: productTypeInstance])
+		}
+		
+	}
 	
 	
 	def create = { 
 
-		if (!params.type) {
+		if (!params.productClass) {
 			render(view: "selectType")
 		}
 		else { 			
-			def productInstance = null;
-			if (params.type == 'drug') {			
-				productInstance = new DrugProduct();			
-			} 	
-			else if (params.type == 'durable') { 
-				productInstance = new DurableProduct();
-			}	
-			else { 
-				productInstance = new Product();
-			}			
-			productInstance.properties = params
+			def productInstance = new Product(params)
 			render(view: "edit", model: [productInstance : productInstance])
 		}
 	}
@@ -113,19 +122,18 @@ class ProductController {
 		log.info "save called with params " + params
 		log.info "type = " + params.type;
 		
-		def productInstance = null;
-		if (params.type == 'drug') {
-			productInstance = new DrugProduct(params);
-		} 
-		else if (params.type == 'durable') {
-			productInstance = new DurableProduct(params);
-		} 
-		else {
-			productInstance = new Product(params);
-		}
+		def productInstance = new Product(params);	
+		productInstance?.categories?.clear();
+		println "size: " + productInstance?.categories?.size()
+		params.each {
+			println ("category: " + it.key +  " starts with category_ " + it.key.startsWith("category_"))			
+			if (it.key.startsWith("category_")) {
+				def category = Category.get((it.key - "category_") as Integer);
+				log.info "adding " + category?.name
+				productInstance.addToCategories(category)
+			}
+		  }
 
-		log.info "class = " + productInstance?.class?.simpleName
-		
 		if (productInstance.save(flush: true)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'product.label', default: 'Product'), productInstance.name])}"
             redirect(action: "browse")
@@ -156,6 +164,7 @@ class ProductController {
             return [productInstance: productInstance]
         }
     }
+	
 
     def update = {
 		
@@ -173,6 +182,18 @@ class ProductController {
                 }
             }
             productInstance.properties = params
+			
+			productInstance?.categories?.clear();		
+			params.each {
+				println ("category: " + it.key +  " starts with category_ " + it.key.startsWith("category_"))
+				
+				if (it.key.startsWith("category_")) {
+					def category = Category.get((it.key - "category_") as Integer);
+					log.info "adding " + category?.name
+					productInstance.addToCategories(category)
+				}
+			  }
+			
             if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
                 flash.message = "${message(code: 'default.updated.message', args: [message(code: 'product.label', default: 'Product'), productInstance.name])}"
                 redirect(action: "browse")
@@ -247,7 +268,7 @@ class ProductController {
 			   
 			   if (!session.dosageForms && !session.productTypes) { 
 				   session.products.each() {					   
-					   def productInstance = new DrugProduct(	name: it.name, 
+					   def productInstance = new Product(	name: it.name, 
 																frenchName: it.frenchName, 
 																description: it.name, 
 																productCode: it.productCode,
@@ -329,7 +350,7 @@ class ProductController {
 					// 6 => unitOfMeasure
 					// 7 => dosageForm
 					
-					def productInstance = new DrugProduct();
+					def productInstance = new Product();
 					productInstance.productCode = columns[2]
 					productInstance.name = columns[3]
 					productInstance.frenchName = columns[4]

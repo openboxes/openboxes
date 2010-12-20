@@ -13,14 +13,17 @@
 }
 
 li.ui-menu-item { text-align: left; font-weight: bold; }
-h3 { font-size: 1.25em; } 
-h3.ui-state-active { background-color: #F8F7EF; }
+h3 { 
+	font-size: 1.25em;
+	vertical-align: middle;
+} 
+h3.ui-state-active { background-color: #f7f7f7; }  /* #F8F7EF */
 .ui-accordion .ui-accordion-content { padding: 0px; } 
 .body { 
 	margin-right: 5px;
 }
 #dashboard { 
-	margin: 20px; 	
+	margin: 0px; 	
 }
 
 img { 
@@ -31,7 +34,10 @@ body {
 	font-family: "Lucida Grande", arial, verdana;
 }
 
+a:hover { 
+	text-decoration: underline;
 
+}
 /* controls width of the page */
 .body { 
 	padding: 0px 0 10px 0;
@@ -46,16 +52,23 @@ body {
 }
 
 #loginForm { 
-	width:400px;
+	width:600px;
 	position: absolute;
-	top: 50px;
+	top: 150px;
 	left: 50%;
-	margin-left: -200px;
+	margin-left: -300px;
 }
 #loginFormBox { 
 	border: 1px solid lightgrey;	
 	padding: 20px;
 }
+	
+.loginField { 
+	font-weight: bold;
+	font-size: 1.5em;
+}
+
+input { font-size: 1.5em; } 
 	
 #signupForm { 
 	width:400px;
@@ -65,8 +78,6 @@ body {
 	left: 50%;
 	margin-left: -150px;
 }
-
-
 
 .menuButton, label, input, td, th { 	
 	font-size: 10pt;
@@ -134,11 +145,11 @@ table#listOutgoing th {
 }  
 .menu .heading { 
 	font-size: 1.25em;
-	line-height: 1.5em; 
+	line-height: 2em; 
 	vertical-align: middle;
 	padding: 2px 0px 2px 15px; 
 	display: block; 
-	background-color: #F8F7EF; 
+	background-color: #fafafa /*#F8F7EF*/; 
 }
 .menu .menuSection { 
 	padding-right: 0px; 
@@ -229,7 +240,7 @@ h2 {
 
 #pageTitle { 
 	border-top: 1px solid #EEE;
-	background-color: #F8F7EF;
+	background-color: #f0f0f0 /*#F8F7EF*/;
 	padding: 5px 5px 5px 5px;	
 }
 
@@ -277,6 +288,10 @@ hr.space {background:#fff;color:#fff;}
 	text-align: right;
 }
 
+ul#categories li { 
+	padding-left: 15px;
+}
+
 #loggedIn { 	
 	text-align: right;
 	margin: 0px;
@@ -285,6 +300,7 @@ hr.space {background:#fff;color:#fff;}
 	padding: 5px 10px 10px 15px;  	
 }
 
+
 #loggedIn ul {
     list-style:none;
     margin: 0;
@@ -292,7 +308,7 @@ hr.space {background:#fff;color:#fff;}
 }
 #loggedIn ul li  {
     display: inline;
-    margin: 0 5px;
+    margin: 0 0px;
 }
 
 /* breadcrumb 
@@ -407,9 +423,44 @@ fieldset .prop { margin: 10px; }
 .body {  } 
 #progressbar {  padding: 10px; margin: 10px; } 
 #progressbar .step { padding-left: 0; border: 1px solid #aaa; background-color: whitesmoke; padding: 10px;}
-.step.selected { font-weight: bold; text-decoration: underline; background-color: #F8F7EF; } 
+.step.selected { font-weight: bold; text-decoration: underline; background-color: #f7f7f7 /*#F8F7EF*/; } 
 span.right { float: left; } 
 span.left { width: 10%;  float: left; text-align: center; } 
 #wizard { }
 
+.selected { 
+	font-weight: bold; 
+}
 
+.tabSelected { 
+text-align: center;
+background-color: white; 
+border: 1px solid black;
+border-bottom: hidden; 
+}
+.tabDefault { 
+text-align: center;
+background-color: #f0f0f0; 
+border: 1px solid black; 
+border-bottom: 1px solid black; 
+border-top: 1px solid black; 
+border-right: 1px solid black; 
+border-left: 1px solid black;
+}
+.tabSpacer { 
+width: 3px;
+border-top: 0px;
+border-bottom: 1px solid black;
+}
+
+.verticalTabSelected { 
+text-align: left;
+background-color: white; 
+border: 1px solid #CCC;
+}
+
+.verticalTabDefault { 
+text-align: left;
+background-color: #f7f7f7; 
+border: 1px solid #CCC; 
+}

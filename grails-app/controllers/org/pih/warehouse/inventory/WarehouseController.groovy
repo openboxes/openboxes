@@ -194,11 +194,10 @@ class WarehouseController {
 		def warehouseInstance = Warehouse.get(params.id);		
 		if (warehouseInstance) { 
 			byte[] logo = warehouseInstance.logo 
-			response.outputStream << logo
+			if (logo) { 
+				response.outputStream << logo
+			}
 		} 
-		else { 
-			"${message(code: 'default.not.found.message', args: [message(code: 'warehouse.label', default: 'Warehouse'), params.id])}"
-		}
 	} 
 
 

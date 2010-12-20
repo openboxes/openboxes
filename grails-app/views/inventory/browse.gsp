@@ -103,8 +103,11 @@
 										</g:if>								
 									</td>								
 									<td style="width: 30%;">
-										<b>${productInstance?.name }</b>					
-										${productInstance?.dosageStrength } ${productInstance?.dosageUnit } ${productInstance?.dosageForm?.name }</td>
+										<b>${productInstance?.name }</b>	
+										<%-- 				
+										${productInstance?.dosageStrength } ${productInstance?.dosageUnit } ${productInstance?.dosageForm?.name }
+										--%>
+									</td>
 									<td style="width: 5%; text-align: center;">
 										${(itemInstanceList)?itemInstanceList*.quantity.sum():'Not Available' }
 									</td>

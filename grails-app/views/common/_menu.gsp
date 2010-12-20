@@ -36,6 +36,24 @@ $(function() {
 			--%>				
 		</ul>
 	</div>
+	
+	<h3 class="heading">
+		<img src="${createLinkTo(dir:'images/icons/silk',file:'cart.png')}" alt="Orders" style="vertical-align: middle"/> &nbsp; 
+		<g:message code="order.label"  default="Orders"/>
+	</h3>
+	<div class="menuSection">									
+		<ul>
+
+			<li>
+				<span class="menuButton">
+					<g:link class="browse" class="bullet" controller="catalog" action="list"><g:message code="catalog.show.label" default="Show Catalog"/></g:link>
+				</span>
+			</li>		
+
+		</ul>	
+	</div>
+	
+	
 	<h3 class="heading" >
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}"  alt="Shipping" style="vertical-align: middle"/> &nbsp; 
 		<g:message code="shipping.label"  default="Shipping"/>
@@ -62,12 +80,12 @@ $(function() {
 			--%>					
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="shipment" action="listShipping"><g:message code="shipment.listShipping.label"  default="Show All "/></g:link>
+					<g:link class="bullet" controller="shipment" action="listShipping"><g:message code="shipment.listShipping.label"  default="Show Shipments "/></g:link>
 				</span>
 			</li>				
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="createShipment" action="index"><g:message code="suitcase.create.label" default="Create Suitcase" /></g:link>
+					<g:link class="bullet" controller="createShipment" action="index"><g:message code="suitcase.add.label" default="Add Suitcase" args="['Suitcase']"/></g:link>
 				</span>
 			</li>					
 			<%-- 			
@@ -117,44 +135,12 @@ $(function() {
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="shipment" action="listReceiving"><g:message code="shipment.listReceiving.label"  default="Show All"/></g:link>
+					<g:link class="bullet" controller="shipment" action="listReceiving"><g:message code="shipment.listReceiving.label"  default="Show Receipts"/></g:link>
 				</span>		
 			</li>										
-			<%-- 
-			<g:each in="${org.pih.warehouse.core.EventType.list()}" var="eventType">
-				<g:if test="${eventType?.activityType == org.pih.warehouse.core.ActivityType.RECEIVING}">
-					<li class="">
-						<span class="menuButton">
-							<g:link class="bullet" controller="shipment" action="listReceiving" params="['eventType.id':eventType.id]"><g:message code="shipment.list.outgoing.label"  default="show ${eventType?.name?.toLowerCase()}"/></g:link>
-						</span>
-					</li>
-				</g:if>
-			</g:each>
-			--%>
-			<%-- 
-			<g:each in="${org.pih.warehouse.core.EventStatus.list()}" var="eventStatus">
-				<li class="">
-					<span class="menuButton">
-						<g:link class="bullet" controller="shipment" action="listReceiving" params="['activityType':'RECEIVING','eventStatus':eventStatus]"><g:message code="shipment.list.outgoing.label"  default="show ${eventStatus?.name?.toLowerCase()}"/></g:link>
-					</span>
-				</li>
-			</g:each>	
-			--%>	
-			<!-- 
-			<li class="">
-				<span class="menuButton">
-					<g:link class="invalid" controller="shipment" action="listReceiving" params="['eventType.id':0]"><g:message code="shipment.list.incoming.label"  default="show invalid shipments"/></g:link>
-				</span>
-			</li>			
-			<li class="">
-				<span class="menuButton">
-					<g:link class="create" controller="shipment" action="create" params="['type':'incoming']"><g:message code="shipment.create.incoming.label" default="new receipt" /></g:link>
-				</span>
-			</li>
-			 -->						
 			<li>
 				<span class="menuButton">
-					<g:link class="browse" class="bullet" controller="receipt" action="process"><g:message code="receiving.process.label" default="Process Receiving"/></g:link>
+					<g:link class="browse" class="bullet" controller="receipt" action="process"><g:message code="receiving.process.label" default="Process Receipts"/></g:link>
 				</span>
 			</li>		
 		</ul>										
@@ -167,17 +153,9 @@ $(function() {
 		<ul>
 			<li>
 				<span class="menuButton">
-					<g:link class="browse" class="bullet" controller="inventory" action="browse"><g:message code="inventory.manage.label" default="Manage Inventory"/></g:link>
+					<g:link class="browse" class="bullet" controller="inventory" action="browse"><g:message code="inventory.show.label" default="Show Inventory"/></g:link>
 				</span>
 			</li>
-			<!-- 
-			<li><span class="menuButton"><g:link class="nobullet" controller="inventory" action="browse"><g:message code="inventory.browse.label"  default="show Inventory"/></g:link></span></li>		
-		 	-->
-			<!--  
-			<li><span class="menuButton"><g:link class="list" controller="product" action="list"><g:message code="default.list.label"  args="['Product']"/></g:link></span></li>		
-			<li><span class="menuButton"><g:link class="create" controller="product" action="create"><g:message code="default.create.label" args="['Product']" default="Create a new Product" /></g:link></span></li>						
-			-->
-		
 		</ul>	
 	</div>							
 	<h3 class="heading">
@@ -188,12 +166,20 @@ $(function() {
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="product" action="browse"><g:message code="default.browse.label" args="['Products']" default="Show All Products"/></g:link>
+					<g:link class="bullet" controller="product" action="browse"><g:message code="default.show.label" args="['Products']" default="Show Products"/></g:link>
 				</span>
 			</li>		
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="product" action="create"><g:message code="default.create.label" args="['Product']" default="Add New Product" /></g:link>
+					<g:link class="bullet" controller="product" action="create"><g:message code="default.add.label" args="['Product']" default="Add New Product" /></g:link>
+				</span>
+			</li>
+			
+			
+<!-- 			
+			<li class="">
+				<span class="menuButton">
+					<g:link class="bullet" controller="product" action="create"><g:message code="default.add.label" args="['Product']" default="Add New Product" /></g:link>
 				</span>
 			</li>
 			<li class="">
@@ -201,6 +187,7 @@ $(function() {
 					<g:link class="bullet" controller="product" action="importProducts"><g:message code="default.import.label" args="['Products']" default="Import New Products" /></g:link>
 				</span>
 			</li>						
+ -->			
 			<%-- 
 				<li><span class="menuButton"><g:link class="list" controller="product" action="list"><g:message code="default.list.label"  args="['Product']"/></g:link></span></li>		
 				<li><span class="menuButton"><g:link class="create" controller="drugProduct" action="create"><g:message code="default.create.label" args="['Drug Product']" default="Create a new Drug Product" /></g:link></span></li>						
@@ -210,22 +197,28 @@ $(function() {
 		</ul>	
 	</div>						
 	<h3 class="heading">
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'map.png')}" alt="Organizations" style="vertical-align: middle"/> &nbsp; 
+		<img src="${createLinkTo(dir:'images/icons/silk',file:'map.png')}" alt="Locations" style="vertical-align: middle"/> &nbsp; 
 		<g:message code="locations.label"  default="Locations"/>
 	</h3>
 	<div class="menuSection">								
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="warehouse" action="list"><g:message code="default.manage.label" args="['Warehouses']"/></g:link>
-				</span>		
-			</li>														
+					<g:link class="bullet" controller="warehouse" action="list"><g:message code="default.show.label" args="['Locations']"/></g:link>
+				</span>
+			</li>
+			<!-- 
 			<li class="">
 				<span class="menuButton">
 					<g:link class="bullet" controller="shipper" action="list"><g:message code="default.manage.label" args="['Shippers']"/></g:link>
 				</span>
 			</li>
-			<!-- 
+			<li class="">
+				<span class="menuButton">
+					<g:link class="bullet" controller="warehouse" action="list"><g:message code="default.manage.label" args="['Warehouses']"/></g:link>
+				</span>		
+			</li>														
+
 			<li class="">
 				<span class="menuButton">
 					<g:link class="bullet" controller="donor" action="list"><g:message code="default.manage.label" args="['Donors']"/></g:link>
@@ -235,25 +228,6 @@ $(function() {
 		</ul>
 	</div>																	
 		
-	<h3 class="heading">
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'cart.png')}" alt="Orders" style="vertical-align: middle"/> &nbsp; 
-		<g:message code="order.label"  default="Orders"/>
-	</h3>
-	<div class="menuSection">									
-		<ul>
-			<!-- 
-			<li><span class="menuButton"><g:link class="nobullet" controller="order" action="search"><g:message code="order.search.label" default="Search Orders" /></g:link></span></li>						
-			<li><span class="menuButton"><g:link class="nobullet" controller="order" action="create"><g:message code="order.create.label" default="New Order" /></g:link></span></li>						
-			 -->
-			<!--  
-			<li><span class="menuButton"><g:link class="list" controller="order" action="search"><g:message code="order.search.label"  default="Search orders"/></g:link></span></li>		
-			<li><span class="menuButton"><g:link class="list" controller="order" action="listPending"><g:message code="default.list.label"  args="['Pending Order']"/></g:link></span></li>		
-			<li><span class="menuButton"><g:link class="list" controller="order" action="listMine"><g:message code="default.list.label"  args="['My Order']"/></g:link></span></li>		
-			<li><span class="menuButton"><g:link class="list" controller="order" action="list"><g:message code="default.list.label"  args="['Order']"/></g:link></span></li>		
-			<li><span class="menuButton"><g:link class="create" controller="order" action="create"><g:message code="default.create.label" args="['Order']" default="Create Order" /></g:link></span></li>						
-			-->
-		</ul>	
-	</div>
 	<h3 class="heading">
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'chart_bar.png')}" alt="Reports" style="vertical-align: middle"/> &nbsp; 
 		<g:message code="settings.label" args="['Reports']" default="Reports"/>
@@ -277,6 +251,7 @@ $(function() {
 					<g:link class="bullet" controller="person" action="list"><g:message code="default.manage.label" args="['People']"/></g:link>
 				</span>		
 			</li>										
+			<%-- 
 			<li class="">
 				<span class="menuButton">
 					<g:link class="bullet" controller="role" action="list"><g:message code="default.manage.label" args="['Roles']"/></g:link>
@@ -286,7 +261,8 @@ $(function() {
 				<span class="menuButton">
 					<g:link class="bullet" controller="user" action="list"><g:message code="default.manage.label" args="['Users']"/></g:link>
 				</span>	
-			</li>	
+			</li>
+			--%>	
 		</ul>
 	</div>
 	<h3 class="heading">
@@ -295,6 +271,29 @@ $(function() {
 	</h3>
 	<div class="menuSection">
 		<ul>
+			<li class="">
+				<span class="menuButton">
+					<g:link class="bullet" controller="admin" action="index"><g:message code="default.manage.label" args="['Settings']" /></g:link>
+				</span>
+			</li>
+			<li class="">
+				<span class="menuButton">
+					<g:link class="bullet" controller="category" action="list"><g:message code="default.manage.label"  args="['Categories']"/></g:link>
+				</span>
+			</li>		
+			<li class="">
+				<span class="menuButton">
+					<g:link class="bullet" controller="productType" action="list"><g:message code="default.manage.label"  args="['Product Types']"/></g:link>
+				</span>
+			</li>		
+			
+
+<!--  
+			<li class="">
+				<span class="menuButton">
+					<g:link class="bullet" controller="attribute" action="list"><g:message code="default.manage.label" args="['Attributes']" /></g:link>
+				</span>
+			</li>
 			<li class="">
 				<span class="menuButton">
 					<g:link class="bullet" controller="eventType" action="list"><g:message code="default.manage.label"  args="['Event Types']"/></g:link>
@@ -335,6 +334,12 @@ $(function() {
 					<g:link class="bullet" controller="transactionType" action="list"><g:message code="default.manage.label"  args="['Transaction Types']"/></g:link>
 				</span>
 			</li>		
+			<li class="">
+				<span class="menuButton">
+					<g:link class="bullet" controller="unitOfMeasure" action="list"><g:message code="default.manage.label"  args="['Unit Of Measures']"/></g:link>
+				</span>
+			</li>		
+-->			
  			<!-- 
 			<li><span class="menuButton"><g:link class="nobullet" controller="containerType" action="list"><g:message code="default.manage.label" args="['Metadata']"/></g:link></span></li>		
 			<li><span class="menuButton"><g:link class="nobullet" controller="referenceNumberType" action="list"><g:message code="default.manage.label" args="['Reference # Types']"/></g:link></span></li>		

@@ -199,9 +199,6 @@
 																									width="150" 
 																									valueId="${item?.product?.id}" 
 																									valueName="${item?.product?.name}"/>																								
-																								<g:if test="${item?.product?.unverified}">
-																									<span class="fade">(unverified)</span>
-																								</g:if> 
 																							</td>
 																							<td width="15%">
 																								<g:textField name="shipmentItems[${itemStatus}].serialNumber" value="${item.serialNumber}" size="10" />																									

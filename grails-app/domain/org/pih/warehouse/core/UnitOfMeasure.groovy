@@ -15,4 +15,6 @@ class UnitOfMeasure {
 	}
 	
 	
+	String toString() { return "${name}" } 
+	
 }

@@ -6,223 +6,210 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'product.label', default: 'Product')}" />
         <title><g:message code="default.browse.label" args="[entityName]" /></title>
-        
-
     </head>    
-
-
     <body>
-        
         <div class="body" style="width: 95%">
+		    <div class="nav">
+		    	<g:render template="nav"/>		    
+		    </div>
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
-            </g:if>						
-			<table>
-				<tr>
-					<td>			
-						<script type="text/javascript">
-							$(function() { $("#productSearchTabs").tabs(); });
-						</script>
-												
-						
-						<div id="productSearchTabs">
-							<ul>
-								<li><a href="#tabs-1">Type</a></li>
-								<li><a href="#tabs-2">Category</a></li>
-								<li><a href="#tabs-3">Search</a></li>
-							</ul>
-							<div id="tabs-1">
-							
-								<h3>Filter by Product Type</h3><br/>
-								<table>
-									<tr>
-										<g:each in="${productTypes}" status="i" var="productType">
-											<td>
-												<span class="${(productType?.name==selectedProductType?.name)?'selected':''}">
-													<a href="${createLink(action:'browse',params:["productTypeId":productType.id])}">${productType.name}</a>
-												</span>
-											</td>
-											<g:if test="${(i+1)%6==0}"></tr><tr></g:if>
-										</g:each>
-									</tr>
-								</table>							
-							</div>
-							<div id="tabs-2">							
-								<h3>Filter by Category</h3><br/>
-								<table>
-									<tr>
-										<g:each in="${categories}" status="i" var="category">
-											<td>
-												<span class="${(category?.name==selectedCategory?.name)?'selected':''}" style="text-variant: small-caps;">
-													<a href="${createLink(action:'browse',params:["categoryId":category.id])}">${category.name}</a>
-												</span>
-												<div style="padding: 10px;">
-												<ul>
-													<g:each in="${category.categories}" status="j" var="childCategory">
-														<li>
-															<span class="${(childCategory?.name==selectedCategory?.name)?'selected':''}">
-																<a href="${createLink(action:'browse',params:["categoryId":childCategory.id])}">${childCategory.name}</a>
-															</span>
-														</li>
+            </g:if>		
+            <div>            
+				<table>
+					<tr>
+						<td>			
+							<script type="text/javascript">
+								$( function() {
+									var cookieName = 'stickyTab';				
+									$( '#productSearchTabs' ).tabs( {
+										selected: ( $.cookies.get( cookieName ) || 0 ),
+										select: function( e, ui ) {
+											$.cookies.set( cookieName, ui.index );
+										}
+									});
+								});
+							</script>	
+							<%-- --%>											
+							<div id="productSearchTabs">
+								<ul>
+									<li><a href="#tabs-1">Type</a></li>
+									<li><a href="#tabs-2">Category</a></li>
+								</ul>
+								<div class="clear"></div>
+								<div class="tab_contents_container">
+								
+									<div id="tabs-1">							
+									
+										<g:form method="get" action="browse">
+											<table>
+												<tr class="prop">
+													<td class="">
+														<label>Search </label>
+
+														<g:textField name="nameContains" value="${params.nameContains}" size="30"/>		
+														<span class="buttons">
+															<button type="submit" class="positive">
+																${message(code: 'default.button.go.label', default: 'Go')}</button>
+														</span>											
+													</td>
+												</tr>
+											</table>	
+										</g:form>			
+									
+									
+									
+										<table>
+											<tr>
+												<td>
+													<g:each in="${productTypes}" status="i" var="productType">
+														<g:set var="selected" value="${productType?.id==selectedProductType?.id}"/>
+														<g:if test="${selected }">
+															<img src="${createLinkTo(dir:'images/icons/silk',file: 'bullet_go.png')}" style="vertical-align: middle;"/>																			
+														</g:if>
+														<g:else>
+															<img src="${createLinkTo(dir:'images/icons/silk',file: 'bullet_white.png')}" style="vertical-align: middle;"/>																			
+														</g:else>
+														<span class="${(productType?.id==selectedProductType?.id)?'selected':''}">
+															<a href="${createLink(action:'browse',params:["productTypeId":productType.id])}">${productType.name}</a>
+															<%-- <a href="${request.request.requestURL }?${request.request.queryString }&productTypeId=${productType.id}">${productType.name}</a> --%>
+														</span>
 													</g:each>
-												</ul>
-												</div>
-											</td>
-											<g:if test="${(i+1)%6==0}"></tr><tr></g:if>
-											
-										</g:each>
-									</tr>
-								</table>														
-							</div>
-							<div id="tabs-3">
-								<h3>Filter by Name</h3><br/>
-								<g:form method="get" action="browse">
-									<table>
-										<tr class="prop">
-											<td class="name">
-												<label>Name contains</label>
-											</td>
-											<td>
-												<g:textField name="nameContains" value="${params.nameContains}" size="30"/>		
-											</td>
-											<td colspan="2" valign="top">
-												<g:checkBox name="unverified" value="${params.unverified}" /> Show  only invalid products <br/>											 
-											</td>										
-											<td>
-												<span class="buttons">
-													<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Filter" /> 
-														${message(code: 'default.button.filter.label', default: 'Filter')}</button>
-												</span>											
-											</td>
-											
-										</tr>
-<%-- 	
-									<tr class="prop">
-											<td class="name">
-												<label>Has product type</label>
-											</td>
-											<td>
-												<g:select multiple="true" size="5" 
-													name="productTypeId" 
-													from="${productTypes}" 
-													value="${selectedProductType}"
-													optionKey="id" 
-													optionValue="name">
-												</g:select>										
-											</td>
-											<td class="name">
-												<label>Has category</label>
-											</td>
-											<td>
-												<g:selectCategory name="categoryId" rootNode="${rootCategory}" />
-											</td>
-										</tr>
-										<tr class="prop">
-											<td class="name">
-												<label>Has attribute(s)</label>
-											</td>
-											<td>
-												<g:select multiple="true" 
-													name="attributeId" 
-													from="${org.pih.warehouse.product.Attribute.list()}" 
-													value="${selectedAttribute}"
-													optionKey="id" 
-													optionValue="name">
-												</g:select>
-											</td>
-										</tr>
-										<tr class="prop">
-											<td class="name">
-												<label>Match</label>
-											</td>
-											<td>
-												<g:radio name="match" value="matchAll" checked="true" disabled="true" /> Match all  &nbsp;&nbsp;&nbsp;<br/>
-												<g:radio name="match" value="matchAll" disabled="true"/> Match any <i>(not supported)</i>											 
-											</td>
-											<td>
-												<span class="buttons">
-													<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Filter" /> 
-														${message(code: 'default.button.filter.label', default: 'Filter')}</button>
-												</span>											
-											</td>
-											
-										</tr>
---%>
-									</table>	
-								</g:form>			
-							</div>
-							
-							
-						</div>
-					</td>					
-				</tr>
-				
-				<tr>
-					<td colspan="2">
-						<div>
-							<fieldset>
-			            		<legend>Search results</legend>						
-								<div>
-									Your search returned ${productInstanceList.size} products.  
-					            </div>					            
-					            <g:if test="${productInstanceList.size > 0}">
-					                <table width="100%">
-					                    <thead>
-					                        <tr>             
-					                        	<%-- 
-					                            <g:sortableColumn property="id" title="${message(code: 'product.id.label', default: 'ID')}" />
-					                            --%>
-					                            <th width="5%" style="text-align: center">${message(code: 'product.type.label', default: 'Type')}</th>
-					                            <g:sortableColumn property="name" title="${message(code: 'product.name.label', default: 'Name')}" />
-					                            <g:sortableColumn property="categories" title="${message(code: 'product.categories.label', default: 'Categories')}" />
-					                            <g:sortableColumn property="complete" title="${message(code: 'product.unverified.label', default: 'Valid')}" />
-					                        </tr>
-					                    </thead>
-					                    <tbody>
-						                    <g:each in="${productInstanceList}" status="i" var="productInstance">
-						                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-						                        	            
-													<td style="text-align: center" width="5%">										
-														<%--<g:link action="show" id="${productInstance.id}">${fieldValue(bean: productInstance, field: "id")}</g:link> --%>
-														<g:if test="${productInstance.class.simpleName == 'DrugProduct'}">															
-															<img src="${createLinkTo(dir:'images/icons/silk',file: 'pill.png')}"/>
-														</g:if>
-														<g:elseif test="${productInstance.class.simpleName == 'DurableProduct' }">
-															<img src="${createLinkTo(dir:'images/icons/silk',file: 'computer.png')}"/>
-														</g:elseif>
-														<g:else>
-															<img src="${createLinkTo(dir:'images/icons/silk',file: 'attach.png')}"/>
-														</g:else>
+												</td>
+											</tr>
+										</table>							
+									</div>
+									<div id="tabs-2">							
+									
+										<g:form method="get" action="browse">
+											<table>
+												<tr class="prop">
+													<td class="">
+														<label>Search </label>
+
+														<g:textField name="nameContains" value="${params.nameContains}" size="30"/>		
+														<span class="buttons">
+															<button type="submit" class="positive">
+																${message(code: 'default.button.go.label', default: 'Go')}</button>
+														</span>											
 													</td>
-													<td align="center">
-														<g:link action="edit" id="${productInstance.id}">
-															${fieldValue(bean: productInstance, field: "name")}
-															<span class="fade">
-															${fieldValue(bean: productInstance, field: "productType.name")}
+												</tr>
+											</table>	
+										</g:form>			
+									
+										<table>
+											<tr>										
+												<g:each in="${categories}" status="i" var="category">
+													<td>
+														<ul id="categories">
+															<g:set var="selected" value="${category?.id==selectedCategory?.id}"/>
+															<span class="${(category?.id==selectedCategory?.id)?'selected':''}">													
+																<li>
+																	<g:if test="${selected }">
+																		<img src="${createLinkTo(dir:'images/icons/silk',file: 'bullet_go.png')}" style="vertical-align: middle;"/>																			
+																	</g:if>
+																	<g:else>
+																		<img src="${createLinkTo(dir:'images/icons/silk',file: 'bullet_white.png')}" style="vertical-align: middle;"/>																			
+																	</g:else>
+																	<a href="${createLink(action:'browse',params:["categoryId":category.id])}">${category.name}</a>
+																</li>
 															</span>
-														</g:link>
+															<li>
+																<ul>
+																	<g:each in="${category.categories}" status="j" var="childCategory">
+																		<li>
+																			<g:set var="selected" value="${childCategory?.id==selectedCategory?.id}"/>
+																			<span class="${(selected)?'selected':''}">
+																				<g:if test="${selected }">
+																					<img src="${createLinkTo(dir:'images/icons/silk',file: 'bullet_go.png')}" style="vertical-align: middle;"/>																			
+																				</g:if>
+																				<g:else>
+																					<img src="${createLinkTo(dir:'images/icons/silk',file: 'bullet_white.png')}" style="vertical-align: middle;"/>																			
+																				</g:else>
+																				<a href="${createLink(action:'browse',params:["categoryId":childCategory.id])}">${childCategory?.name }</a>
+																			</span>																		
+																		</li>
+																	</g:each>
+																</ul>
+															</li>
+														</ul>
 													</td>
-													<td width="30%">
-														${fieldValue(bean: productInstance, field: "categories")}
-													</td>						                            
-													<td valign="top" style="text-align: center" width="5%">
-														<g:if test="${productInstance.unverified}">
-															<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="Invalid" />														
-														</g:if>
-														<g:else>
-															<img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Valid" />														
-														</g:else>
-													</td>
-						                        </tr>
-						                    </g:each>		                    
-					                    </tbody>
-					                </table>       
-					        	</g:if>         
-							</fieldset>
-			            </div>
-					</td>
-				</tr>
-			</table>
-        </div>
+												</g:each>
+											</tr>													
+										</table>														
+									</div>
+								</div>
+							</div>
+						</td>			
+					</tr>
+					<tr>		
+						<td colspan="2">
+							<div>
+								<fieldset>
+				            		<legend>Search results</legend>						
+						            <g:if test="${productInstanceList}">
+						            	<div class="list">						            	
+						            		<span>Your search returned ${productInstanceList?.totalCount } results</span>
+							                <table>
+							                    <thead>
+							                        <tr>             
+							                        	<%-- 
+							                            <g:sortableColumn property="id" title="${message(code: 'product.id.label', default: 'ID')}" />
+							                            --%>
+							                            <th width="5%" style="text-align: center">${message(code: 'product.type.label', default: 'Type')}</th>
+							                            <g:sortableColumn property="name" title="${message(code: 'product.name.label', default: 'Name')}" />
+							                            <g:sortableColumn property="categories" title="${message(code: 'product.categories.label', default: 'Categories')}" />
+							                        </tr>
+							                    </thead>
+							                    <tbody>
+								                    <g:each in="${productInstanceList}" status="i" var="productInstance">
+								                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+								                        	            
+															<td style="text-align: center" width="5%">										
+																<%--<g:link action="show" id="${productInstance.id}">${fieldValue(bean: productInstance, field: "id")}</g:link> --%>
+																<g:if test="${productInstance?.productClass?.name == 'Drug'}">															
+																	<img src="${createLinkTo(dir:'images/icons/silk',file: 'pill.png')}"/>
+																</g:if>
+																<g:elseif test="${productInstance?.productClass?.name == 'Durable' }">
+																	<img src="${createLinkTo(dir:'images/icons/silk',file: 'computer.png')}"/>
+																</g:elseif>
+																<g:elseif test="${productInstance?.productClass?.name == 'Consumable' }">
+																	<img src="${createLinkTo(dir:'images/icons/silk',file: 'cup.png')}"/>
+																</g:elseif>
+																<g:else>
+																	<img src="${createLinkTo(dir:'images/icons/silk',file: 'help.png')}"/>
+																</g:else>
+															</td>
+															<td align="center">
+																<g:link action="edit" id="${productInstance.id}">
+																	${fieldValue(bean: productInstance, field: "name")}
+																	<span class="fade">
+																	${fieldValue(bean: productInstance, field: "productType.name")}
+																	</span>
+																</g:link>
+															</td>
+															<td width="30%">
+																${fieldValue(bean: productInstance, field: "categories")}
+															</td>						                            
+								                        </tr>
+								                    </g:each>		                    
+							                    </tbody>
+							                </table>  
+							            </div>
+										<div class="paginateButtons">
+							                <g:paginate total="${productInstanceTotal}" params="${params }" />
+							            </div>		    
+						                
+						                
+						        	</g:if>         
+								</fieldset>
+				            </div>
+								            
+				            
+						</td>
+					</tr>
+				</table>
+        	</div>
+    	</div>    	
     </body>
 </html>

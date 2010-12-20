@@ -32,6 +32,7 @@
 	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.contextMenu/', file:'jquery.contextMenu.js')}" type="text/javascript" ></script>
 	<link href="${createLinkTo(dir:'js/jquery.contextMenu/', file:'jquery.contextMenu.css')}" rel="stylesheet" type="text/css" />
+	<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.cookies.2.2.0.min.js')}" type="text/javascript" ></script>
 
 	<!--  
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.notifyBar',file:'jquery.notifyBar.css')}" type="text/css" media="screen"  />
@@ -86,27 +87,44 @@
 					    </div>
 					    <div id="bannerRight" class="yui-u" >
 					    	<div id="loggedIn">
+					    		
 								<ul>
 								    <g:if test="${session.user}">
+										<li>
+											Welcome, <b>${session.user.username}</b>
+										</li>
+										<li>
+											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
+										</li>																		
+										<li>
+											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cart.png')}" style="vertical-align: middle" />
+											<g:link controller="shoppingCart" action="list">Cart <span style="color: orange; font-weight: bold;">${session?.cart ? session?.cart?.items?.size() : '0'}</span></g:link>
+											
+										</li>
+										<li>
+											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
+										</li>					
+											<li>
+												<g:link style="vertical-align: middle" class="home" controller="user" action="show" id="${session.user.id}">
+													My Profile
+												</g:link>	
+											</li>
+										<li>
+											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
+										</li>												
+																	
 										<g:if test="${session?.warehouse}">
 											<li>
-												<%-- <g:if test="${session?.warehouse?.logoUrl}"><img src="${session?.warehouse?.logoUrl}" width="24" height="24" border="1" style="vertical-align: bottom"></img></g:if>
-												&nbsp;--%>
-													<g:if test="${session?.warehouse?.logo}">
-														<img class="photo" width="25" height="25" 
-			            									src="${createLink(controller:'warehouse', action:'viewLogo', id:session.warehouse.id)}" style="vertical-align: middle" />
-			            							</g:if>
-													<b>${session?.warehouse?.name}</b>
-													<a style="vertical-align: middle" class="home" href='${createLink(controller: "dashboard", action:"chooseWarehouse")}'>
-														change
-													</a>	
+												<a style="vertical-align: middle" class="home" href='${createLink(controller: "dashboard", action:"chooseWarehouse")}'>
+													${session?.warehouse?.name }
+												</a>	
 											</li>
-											<li>|</li>
-																		
+											<li>
+												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
+											</li>																		
 										</g:if>
 										<li>
-											logged in as <b>${session.user.username}</b>
-											<g:link class="list" controller="auth" action="logout"><g:message code="default.logout.label"  default="logout"/></g:link>
+											<g:link class="list" controller="auth" action="logout"><g:message code="default.logout.label"  default="Sign Out"/></g:link>
 										</li>
 										<!-- 
 										 <li><g:link class="list" controller="user" action="preferences"><g:message code="default.preferences.label"  default="Preferences"/></g:link></li>
@@ -147,16 +165,21 @@
 					<!-- Populated using the 'pageTitle' property defined in the GSP file -->
 					<g:if test="${session.user}">
 						<h3>
-						    <div id="pageTitle">		
-								<img src="${createLinkTo(dir:'images/icons/silk/',file: 'building.png')}" /> 
-								<g:if test="${session?.warehouse}">${session?.warehouse?.name}&nbsp;&raquo;&nbsp;</g:if>
-							    <g:message code="${params.controller }.label"/>&nbsp;&raquo;&nbsp;			
+						    <div id="pageTitle" style="padding: 5px;">		
+								<img class="photo" width="25" height="25" 
+									src="${createLink(controller:'warehouse', action:'viewLogo', id:session.warehouse.id)}" style="vertical-align: middle" />
+								&nbsp;
+								<g:if test="${session?.warehouse}">${session?.warehouse?.name}&nbsp;&rsaquo;&nbsp;</g:if>
+							    <g:message code="${params.controller }.label"/>&nbsp;&rsaquo;&nbsp;			
 								
 								<g:if test="${pageProperty(name:'page.pageTitle')}"><b>${pageProperty(name:'page.pageTitle')}</b></g:if>
 								<g:else><b><g:layoutTitle /></b></g:else>
 							</div>
 						</h3>
-					</g:if>
+					</g:if>		
+					
+					
+								
 					<g:layoutBody />
 				</div>
 	      	</div>
@@ -164,8 +187,7 @@
 	      	<!-- YUI nav block that includes the local navigation menu -->
 	      	<div id="menu" role="navigation" class="yui-b">
 		  		<g:if test="${session?.user}">
-					<!-- Navigation Menu -->				
-					
+					<!-- Navigation Menu -->
 					<g:render template="/common/menu"/>
 					<%-- 			  		
 			  		<div id="navMenu" class="homePagePanel">

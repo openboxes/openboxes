@@ -9,9 +9,9 @@
     <body>        
     
     	<style>
-    		.widgetLarge { width: 94%; border: 1px solid lightgrey; height: 75px; margin: 15px; }
-			.widgetSmall { width: 45%; float: left; border: 1px solid lightgrey;  margin: 15px; }    		
-    		.widgetHeader { background-color: #F3F7ED; padding: 10px; font-weight: bold; font-size: 110%;} 
+    		.widgetLarge { width: 90%; border: 1px solid lightgrey; height: 75px; margin: 5px; }
+			.widgetSmall { width: 400px; float: left; border: 1px solid lightgrey;  margin: 5px; }    		
+    		.widgetHeader { background-color: #FAFAFA; padding: 10px; font-weight: bold; font-size: 110%;} 
     		.widgetContent { padding: 10px; } 
     	</style>
     	
@@ -115,6 +115,8 @@
 
 				<br clear="all"/>
 
+
+<%-- 
 				
 				<div class="widgetSmall">
 					<div class="widgetHeader"><g:message code="shipping.mostRecent.label" args="[session.warehouse.name]" /></div>
@@ -209,6 +211,8 @@
 						</div>
 	    			</div>
 				</div>
+--%>
+				
 	    	</div>
 		</div>
     </body>

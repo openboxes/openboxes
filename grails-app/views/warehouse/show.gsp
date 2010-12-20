@@ -10,6 +10,9 @@
     </head>
     <body>
         <div class="body">
+        	<div class="nav">
+				<g:render template="nav"/>        	
+        	</div>
             <g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>
             </g:if>
@@ -32,6 +35,14 @@
 	                            <td valign="top" class="value">${fieldValue(bean: warehouseInstance, field: "name")}</td>                            
 	                        </tr>
 	                        <tr class="prop">
+	                            <td valign="top" class="name"><g:message code="warehouse.locationType.label" default="Location Type" /></td>                            
+	                            <td valign="top" class="value">${fieldValue(bean: warehouseInstance, field: "locationType.name")}</td>                            
+	                        </tr>
+	                        <tr class="prop">
+	                            <td valign="top" class="name"><g:message code="warehouse.parentLocation.label" default="Parent Location" /></td>
+	                            <td valign="top" class="value">${fieldValue(bean: warehouseInstance, field: "parentLocation.name")}</td>
+	                        </tr>
+	                        <tr class="prop">
 	                            <td valign="top" class="name"><g:message code="warehouse.city.label" default="City" /></td>
 	                            <td valign="top" class="value">${fieldValue(bean: warehouseInstance, field: "address.city")}</td>
 	                        </tr>
@@ -51,15 +62,20 @@
 	                        <tr class="prop">
 	                            <td valign="top" class="name"><g:message code="warehouse.inventory.label" default="Inventory" /></td>
 	                            <td valign="top" class="value">
-				      				<g:link controller="inventory" action="show" id="${warehouseInstance?.inventory?.id}">${warehouseInstance?.inventory?.encodeAsHTML()}</g:link>
+				      				<g:link controller="inventory" action="browse" id="${warehouseInstance?.inventory?.id}">
+				      				Browse Inventory
+				      				</g:link>
 							    </td>
 	                        </tr>
 	                        
 	                        <tr class="prop">
 	                            <td valign="top" class="name"><g:message code="user.photo.label" default="Profile Photo" /></td>                            
-	                            <td valign="top" class="value">							
+	                            <td valign="top" class="value">		
+	                            
+	                            	<%--					
 									<img class="photo" src="${createLink(controller:'warehouse', action:'viewLogo', id:warehouseInstance.id)}" />
 									<br/>
+									 --%>
 									<g:form controller="warehouse" method="post" action="uploadLogo" enctype="multipart/form-data">
 										<input type="hidden" name="id" value="${warehouseInstance.id}" />
 										<input type="file" name="logo"/>

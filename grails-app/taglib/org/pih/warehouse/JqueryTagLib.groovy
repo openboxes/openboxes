@@ -34,9 +34,8 @@ class JqueryTagLib {
 				<input id="${id}-id" type="hidden" name="${name}.id" value="${valueId}"/>
 				<input id="${id}-suggest" type="text" name="${name}.name" value="${valueName}" style="width: ${width}px; display: ${suggestDisplay};"> 	
 				<span id="${id}-span" style="text-align: left; display: ${spanDisplay};">${valueName}</span>
+				
 				<script>
-				
-				
 					\$(document).ready(function() {
 						// Captures 'Enter' key presses
 						//\$(window).keydown(function(event){
@@ -86,7 +85,13 @@ class JqueryTagLib {
 					      		\$('#${id}-suggest').val(ui.item.valueText);					
 					      		return false;
 					        },	
+					        change: function(event, ui) { 
+								//  alert("changed " + ui.item)
+								\$('#${id}-id').val(0);
+								//\$('#${id}-suggest').val(ui.item.valueText);
+					        },
 							select: function(event, ui) {
+								//alert("selected " + ui.item)
 								\$('#${id}-id').val(ui.item.value);
 								\$('#${id}-suggest').val(ui.item.valueText);
 								\$('#${id}-span').html(ui.item.valueText);
@@ -123,7 +128,7 @@ class JqueryTagLib {
 		
 		def html = """
 
-		<div>
+		<span>
 			<input id='${id}' name='${name}' type='hidden'/> 
 			<input id='${id}-datepicker' name='${name}-datepicker' type='text' class='date' /> 
 			<script type=\'text/javascript\'> 
@@ -147,7 +152,7 @@ class JqueryTagLib {
 					}
 				}); 
 			</script> 
-		</div>
+		</span>
 		""";
 
 		if (showTrigger) { 

@@ -412,9 +412,6 @@ class InventoryController {
 				if (params.nameContains) {
 					like("name", "%" + params.nameContains + "%")
 				}
-				if (params.unverified) {
-					eq("unverified", true)
-				}
 			}
 		}
 		

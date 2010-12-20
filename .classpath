@@ -23,7 +23,6 @@
 	<classpathentry kind="lib" path="lib/poi-ooxml-3.6-20091214.jar"/>
 	<classpathentry kind="lib" path="lib/poi-ooxml-schemas-3.6-20091214.jar"/>
 	<classpathentry kind="lib" path="lib/poi-scratchpad-3.6-20091214.jar"/>
-	<classpathentry kind="lib" path="lib/liquibase-1.9.5.jar"/>
 	<classpathentry kind="lib" path="lib/commons-email-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/mail.jar"/>
 	<classpathentry kind="lib" path="lib/c3p0-0.9.1.2.jar"/>
@@ -207,5 +206,6 @@
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/liquibase-1.9.5.jar"/>
 	<classpathentry kind="output" path="web-app/WEB-INF/classes"/>
 </classpath>

@@ -20,39 +20,44 @@
 	            </div>
             </g:hasErrors>
             <g:form action="save" method="post" <%= multiPart ? ' enctype="multipart/form-data"' : '' %>>
-                <div class="dialog">
-                    <table>
-                        <tbody>
-                        <%  excludedProps = Event.allEvents.toList() << 'version' << 'id'
-                            props = domainClass.properties.findAll { !excludedProps.contains(it.name) }
-                            Collections.sort(props, comparator.constructors[0].newInstance([domainClass] as Object[]))
-                            props.each { p ->
-                                if (!Collection.class.isAssignableFrom(p.type)) {
-                                    cp = domainClass.constrainedProperties[p.name]
-                                    display = (cp ? cp.display : true)        
-                                    if (display) { %>
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="${p.name}"><g:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" /></label>
-                                </td>
-                                <td valign="top" class="value \${hasErrors(bean: ${propertyName}, field: '${p.name}', 'errors')}">
-                                    ${renderEditor(p)}
-                                </td>
-                            </tr>
-                        <%  }   }   } %>
-                        
-	                        <tr class="prop">
-	                        	<td valign="top"></td>
-	                        	<td valign="top">
-					                <div class="buttons">
-					                   <g:submitButton name="create" class="save" value="\${message(code: 'default.button.create.label', default: 'Create')}" />
-					                </div>                        	
-	                        	</td>
-	                        </tr>
+            	<fieldset>
+	                <div class="dialog">
+	                    <table>
+	                        <tbody>
+	                        <%  excludedProps = Event.allEvents.toList() << 'version' << 'id'
+	                            props = domainClass.properties.findAll { !excludedProps.contains(it.name) }
+	                            Collections.sort(props, comparator.constructors[0].newInstance([domainClass] as Object[]))
+	                            props.each { p ->
+	                                if (!Collection.class.isAssignableFrom(p.type)) {
+	                                    cp = domainClass.constrainedProperties[p.name]
+	                                    display = (cp ? cp.display : true)        
+	                                    if (display) { %>
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
+	                                    <label for="${p.name}"><g:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" /></label>
+	                                </td>
+	                                <td valign="top" class="value \${hasErrors(bean: ${propertyName}, field: '${p.name}', 'errors')}">
+	                                    ${renderEditor(p)}
+	                                </td>
+	                            </tr>
+	                        <%  }   }   } %>
 	                        
-                        </tbody>
-                    </table>
-                </div>
+		                        <tr class="prop">
+		                        	<td valign="top"></td>
+		                        	<td valign="top">
+						                <div class="buttons">
+						                   <g:submitButton name="create" class="save" value="\${message(code: 'default.button.create.label', default: 'Create')}" />
+						                   
+						                   <g:link action="list">\${message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
+						                   
+						                </div>                        	
+		                        	</td>
+		                        </tr>
+		                        
+	                        </tbody>
+	                    </table>
+	                </div>
+                </fieldset>
             </g:form>
         </div>
     </body>
