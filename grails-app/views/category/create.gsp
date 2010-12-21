@@ -11,6 +11,10 @@
     </head>
     <body>
         <div class="body">
+			<div class="nav">            	
+				<g:render template="nav"/>
+           	</div>
+        
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
@@ -29,7 +33,12 @@
 	                                    <label for="parentCategory"><g:message code="category.parentCategory.label" default="Parent Category" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: categoryInstance, field: 'parentCategory', 'errors')}">
-	                                    <g:select name="parentCategory.id" from="${org.pih.warehouse.product.Category.list()}" optionKey="id" value="${categoryInstance?.parentCategory?.id}" noSelection="['null': '']" />
+	                                    <%--<g:select name="parentCategory.id" from="${org.pih.warehouse.product.Category.list()}" optionKey="id" value="${categoryInstance?.parentCategory?.id}" noSelection="['null': '']" /> --%>
+										<select name="parentCategory.id">
+											<option value="">no parent</option>
+											<g:render template="optionTree" model="[category:rootCategory, level: 1]"/>
+										</select>	                                    
+	                                    
 	                                </td>
 	                            </tr>
 	                        

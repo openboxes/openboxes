@@ -251,7 +251,6 @@ $(function() {
 					<g:link class="bullet" controller="person" action="list"><g:message code="default.manage.label" args="['People']"/></g:link>
 				</span>		
 			</li>										
-			<%-- 
 			<li class="">
 				<span class="menuButton">
 					<g:link class="bullet" controller="role" action="list"><g:message code="default.manage.label" args="['Roles']"/></g:link>
@@ -262,7 +261,6 @@ $(function() {
 					<g:link class="bullet" controller="user" action="list"><g:message code="default.manage.label" args="['Users']"/></g:link>
 				</span>	
 			</li>
-			--%>	
 		</ul>
 	</div>
 	<h3 class="heading">
@@ -273,12 +271,12 @@ $(function() {
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="admin" action="index"><g:message code="default.manage.label" args="['Settings']" /></g:link>
+					<g:link class="bullet" controller="admin" action="index"><g:message code="default.manage.label" args="['All Settings']" /></g:link>
 				</span>
 			</li>
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="category" action="list"><g:message code="default.manage.label"  args="['Categories']"/></g:link>
+					<g:link class="bullet" controller="category" action="tree"><g:message code="default.manage.label"  args="['Categories']"/></g:link>
 				</span>
 			</li>		
 			<li class="">
@@ -286,9 +284,6 @@ $(function() {
 					<g:link class="bullet" controller="productType" action="list"><g:message code="default.manage.label"  args="['Product Types']"/></g:link>
 				</span>
 			</li>		
-			
-
-<!--  
 			<li class="">
 				<span class="menuButton">
 					<g:link class="bullet" controller="attribute" action="list"><g:message code="default.manage.label" args="['Attributes']" /></g:link>
@@ -339,7 +334,6 @@ $(function() {
 					<g:link class="bullet" controller="unitOfMeasure" action="list"><g:message code="default.manage.label"  args="['Unit Of Measures']"/></g:link>
 				</span>
 			</li>		
--->			
  			<!-- 
 			<li><span class="menuButton"><g:link class="nobullet" controller="containerType" action="list"><g:message code="default.manage.label" args="['Metadata']"/></g:link></span></li>		
 			<li><span class="menuButton"><g:link class="nobullet" controller="referenceNumberType" action="list"><g:message code="default.manage.label" args="['Reference # Types']"/></g:link></span></li>		

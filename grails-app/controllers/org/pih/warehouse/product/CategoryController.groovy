@@ -10,13 +10,51 @@ class CategoryController {
 	
 	
 	def tree = { 
+		log.info params 
 		def categoryInstanceList = Category.findAllByParentCategoryIsNull();
-		println categoryInstanceList.class.name
 		def rootCategory = new Category(name: "root");
 		rootCategory.categories = categoryInstanceList
 		[categoryInstanceList: categoryInstanceList, categoryInstanceTotal: Category.count(), rootCategory: rootCategory ]
 	}
+		
+	def editCategory = { 
+		log.info params 
+		def categoryInstance = Category.get(params.id)
+		if (!categoryInstance) { 
+			flash.message = "Unable to locate category with ID ${params.id}" 
+		}
+		def categoryInstanceList = Category.findAllByParentCategoryIsNull();
+		def rootCategory = new Category(name: "root");
+		rootCategory.categories = categoryInstanceList
+		
+		render(view: "tree", model: [categoryInstanceList: categoryInstanceList, categoryInstanceTotal: Category.count(), rootCategory: rootCategory, categoryInstance: categoryInstance ])		
+	}
+
+	def saveCategory = { 		
+		def categoryInstance = Category.get(params.id)		
+		if (!categoryInstance)
+			categoryInstance = new Category(params)
+		else
+			categoryInstance.properties = params;
+		
+		if (!categoryInstance.hasErrors() && categoryInstance.save(flush:true)) {
+			flash.message = "Saved category ${categoryInstance?.name} successfully";
+		}
+		redirect(action: tree);
+	}
 	
+	def deleteCategory = {
+		log.info params
+		def categoryInstance = Category.get(params.id)
+
+		if (categoryInstance) { 
+			categoryInstance.delete();
+		}
+		
+		redirect(action: tree);		
+	}
+
+		
 
     def list = {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
@@ -26,14 +64,18 @@ class CategoryController {
     def create = {
         def categoryInstance = new Category()
         categoryInstance.properties = params
-        return [categoryInstance: categoryInstance]
+		
+		def rootCategory = new Category(name: "root");
+		rootCategory.categories = Category.findAllByParentCategoryIsNull()
+
+        return [categoryInstance: categoryInstance, rootCategory: rootCategory]
     }
 
     def save = {
         def categoryInstance = new Category(params)
         if (categoryInstance.save(flush: true)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'category.label', default: 'Category'), categoryInstance.id])}"
-            redirect(action: "list", id: categoryInstance.id)
+            redirect(action: "tree", id: categoryInstance.id)
         }
         else {
             render(view: "create", model: [categoryInstance: categoryInstance])
@@ -44,7 +86,7 @@ class CategoryController {
         def categoryInstance = Category.get(params.id)
         if (!categoryInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'category.label', default: 'Category'), params.id])}"
-            redirect(action: "list")
+            redirect(action: "tree")
         }
         else {
             [categoryInstance: categoryInstance]
@@ -53,9 +95,13 @@ class CategoryController {
 
     def edit = {
         def categoryInstance = Category.get(params.id)
+		
+		def rootCategory = new Category(name: "root");
+		rootCategory.categories = Category.findAllByParentCategoryIsNull()
+
         if (!categoryInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'category.label', default: 'Category'), params.id])}"
-            redirect(action: "list")
+            redirect(action: "tree")
         }
         else {
             return [categoryInstance: categoryInstance]
@@ -77,7 +123,7 @@ class CategoryController {
             categoryInstance.properties = params
             if (!categoryInstance.hasErrors() && categoryInstance.save(flush: true)) {
                 flash.message = "${message(code: 'default.updated.message', args: [message(code: 'category.label', default: 'Category'), categoryInstance.id])}"
-                redirect(action: "list", id: categoryInstance.id)
+                redirect(action: "tree", id: categoryInstance.id)
             }
             else {
                 render(view: "edit", model: [categoryInstance: categoryInstance])
@@ -85,7 +131,7 @@ class CategoryController {
         }
         else {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'category.label', default: 'Category'), params.id])}"
-            redirect(action: "list")
+            redirect(action: "tree")
         }
     }
 
@@ -95,16 +141,16 @@ class CategoryController {
             try {
                 categoryInstance.delete(flush: true)
                 flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'category.label', default: 'Category'), params.id])}"
-                redirect(action: "list")
+                redirect(action: "tree")
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
                 flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'category.label', default: 'Category'), params.id])}"
-                redirect(action: "list", id: params.id)
+                redirect(action: "tree", id: params.id)
             }
         }
         else {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'category.label', default: 'Category'), params.id])}"
-            redirect(action: "list")
+            redirect(action: "tree")
         }
     }
 }
