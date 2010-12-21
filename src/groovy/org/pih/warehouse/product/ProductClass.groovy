@@ -8,11 +8,9 @@ package org.pih.warehouse.product
 
 public enum ProductClass {
 
-	BUNDLED('Bundled'),
 	CONSUMABLE('Consumable'),
 	DRUG('Drug'),
 	DURABLE('Durable'),
-	MIXED('Mixed'),
 	NON_INVENTORY('Non-Inventory');
 	
 	String name
@@ -20,7 +18,7 @@ public enum ProductClass {
 	ProductClass(String name) { this.name = name; }
 
 	static list() {
-		[ BUNDLED, CONSUMABLE, DRUG, DURABLE, MIXED, NON_INVENTORY ]
+		[ CONSUMABLE, DRUG, DURABLE, NON_INVENTORY ]
 	}
 	
 }
