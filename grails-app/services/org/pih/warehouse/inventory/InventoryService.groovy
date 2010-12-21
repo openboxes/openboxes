@@ -49,11 +49,11 @@ class InventoryService {
 	
 	
 	Map getInventoryMap(Long id) { 
-		return Warehouse.get(id)?.inventory?.inventoryItems.groupBy { it.product } 
+		return Warehouse.get(id)?.inventory?.inventoryItems?.groupBy { it.product } 
 	}
 
 	Map getInventoryLevelMap(Long id) { 
-		return Warehouse.get(id)?.inventory?.inventoryLevels.groupBy { it.product } 
+		return Warehouse.get(id)?.inventory?.inventoryLevels?.groupBy { it.product } 
 	}
 		
 	
