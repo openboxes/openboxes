@@ -18,7 +18,46 @@
             <div>            
 				<table>
 					<tr>
-						<td>			
+						<td width="25%">
+							<fieldset>
+							<legend>Browse by category</legend>
+							<g:each in="${categories}" status="i" var="category">
+								<ul id="categories">
+									<g:set var="selected" value="${category?.id==selectedCategory?.id}"/>
+									<span class="${(category?.id==selectedCategory?.id)?'selected':''}">													
+										<li>
+											<g:if test="${selected }">
+												<img src="${createLinkTo(dir:'images/icons/silk',file: 'bullet_go.png')}" style="vertical-align: middle;"/>																			
+											</g:if>
+											<g:else>
+												<img src="${createLinkTo(dir:'images/icons/silk',file: 'bullet_white.png')}" style="vertical-align: middle;"/>																			
+											</g:else>
+											<a href="${createLink(action:'browse',params:["categoryId":category.id])}">${category.name}</a>
+										</li>
+									</span>
+									<li>
+										<ul>
+											<g:each in="${category.categories}" status="j" var="childCategory">
+												<li>
+													<g:set var="selected" value="${childCategory?.id==selectedCategory?.id}"/>
+													<span class="${(selected)?'selected':''}">
+														<g:if test="${selected }">
+															<img src="${createLinkTo(dir:'images/icons/silk',file: 'bullet_go.png')}" style="vertical-align: middle;"/>																			
+														</g:if>
+														<g:else>
+															<img src="${createLinkTo(dir:'images/icons/silk',file: 'bullet_white.png')}" style="vertical-align: middle;"/>																			
+														</g:else>
+														<a href="${createLink(action:'browse',params:["categoryId":childCategory.id])}">${childCategory?.name }</a>
+													</span>																		
+												</li>
+											</g:each>
+										</ul>
+									</li>
+								</ul>
+							</g:each>	
+						</fieldset>					
+									
+<!-- 
 							<script type="text/javascript">
 								$( function() {
 									var cookieName = 'stickyTab';				
@@ -30,7 +69,6 @@
 									});
 								});
 							</script>	
-							<%-- --%>											
 							<div id="productSearchTabs">
 								<ul>
 									<li><a href="#tabs-1">Type</a></li>
@@ -140,13 +178,13 @@
 									</div>
 								</div>
 							</div>
+							
+							-->
 						</td>			
-					</tr>
-					<tr>		
-						<td colspan="2">
+						<td>
 							<div>
 								<fieldset>
-				            		<legend>Search results</legend>						
+				            		<legend>Products</legend>						
 						            <g:if test="${productInstanceList}">
 						            	<div class="list">						            	
 						            		<span>Your search returned ${productInstanceList?.totalCount } results</span>

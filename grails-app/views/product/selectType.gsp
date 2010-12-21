@@ -42,7 +42,7 @@
 											<tr class="prop">
 												<td>
 	                                				<img src="${createLinkTo(dir:'images/icons/silk', file:'pill.png') }"/> &nbsp;
-													<g:link action="create" params="[productClass: ProductClass.DRUG]"></g:link>Medicines
+													<g:link action="create" params="[productClass: ProductClass.DRUG]">Medicines</g:link>
 												</td>
 											</tr>
 											<tr>
@@ -51,14 +51,13 @@
 														<g:link action="create" params="['productType.id': productType.id]">${productType?.name }</g:link>
 														<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
 													</g:each>
-													<g:link action="createType" params="[productClass: ProductClass.DRUG]">add new type &rsaquo;</g:link>											
 												</td>
 											</tr>
 											
 											<tr class="prop">
 												<td>
 	                    			            	<img src="${createLinkTo(dir:'images/icons/silk', file:'cup.png') }"/>  &nbsp;
-													<g:link action="create" params="[productClass: org.pih.warehouse.product.ProductClass.CONSUMABLE]"></g:link>Supplies & Consumable
+													<g:link action="create" params="[productClass: org.pih.warehouse.product.ProductClass.CONSUMABLE]">Supplies & Consumable</g:link>
 												</td>
 	                                		</tr>
 											<tr>
@@ -67,13 +66,12 @@
 														<g:link action="create" params="['productType.id': productType.id]">${productType?.name }</g:link>
 														<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
 													</g:each>
-													<g:link action="createType" params="[productClass: ProductClass.DRUG]">add new type &rsaquo;</g:link>													
 												</td>
 											</tr>
 											<tr class="prop">
 												<td>
 	                    			            	<img src="${createLinkTo(dir:'images/icons/silk', file:'computer.png') }"/> &nbsp;
-													<g:link action="create" params="[productClass: org.pih.warehouse.product.ProductClass.DURABLE]"></g:link>Equipment & Furniture
+													<g:link action="create" params="[productClass: org.pih.warehouse.product.ProductClass.DURABLE]">Equipment & Furniture</g:link>
 												</td>
 											</tr>
 											<tr>

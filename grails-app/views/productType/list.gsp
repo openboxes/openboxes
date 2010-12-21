@@ -11,16 +11,16 @@
     </head>
     <body>
         <div class="body">
+        
+			<div class="nav">            	
+				<g:render template="nav"/>
+           	</div>
+        
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
             <div class="list">
             
-				<div>            	
-	            	<span class="menuButton">
-	            		<g:link class="new" action="create"><g:message code="default.add.label" args="['productType']"/></g:link>
-	            	</span>
-            	</div>
                 <table>
                     <thead>
                         <tr>

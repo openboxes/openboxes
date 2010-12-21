@@ -51,8 +51,17 @@
 		           			<g:if test="${categoryInstance}">
 				           		<g:form action="saveCategory">
 				           			<fieldset>
-				           				<legend>Add a category</legend>
+				           				<legend>Edit existing category</legend>
 				           				<table>
+				           					<tr class="prop">
+				           						<td class="name">
+				           							<label>ID</label>
+				           						</td>
+				           						<td class="value">
+							           				<g:hiddenField name="id" value="${categoryInstance?.id }"/>
+							           				${categoryInstance?.id }
+				           						</td>
+				           					</tr>
 				           					<tr class="prop">
 				           						<td class="name">
 				           							<label>Parent</label>
@@ -75,7 +84,6 @@
 				           							<label>Name</label>
 				           						</td>
 				           						<td class="value">
-							           				<g:hiddenField name="id" value="${categoryInstance?.id }"/>
 							           				<g:textField name="name" value="${categoryInstance?.name }"/>
 				           						</td>
 				           					</tr>
@@ -113,6 +121,11 @@
 				           						<td class="value">
 													
 													<g:submitButton name="submit" value="Submit"/>
+													
+													&nbsp;
+													
+													<g:link action="tree">cancel</g:link>
+													
 				           						</td>
 				           					</tr>
 	

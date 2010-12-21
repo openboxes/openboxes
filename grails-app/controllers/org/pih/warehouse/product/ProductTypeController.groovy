@@ -9,7 +9,7 @@ class ProductTypeController {
     }
 
     def list = {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+        params.max = Math.min(params.max ? params.int('max') : 25, 100)
         [productTypeInstanceList: ProductType.list(params), productTypeInstanceTotal: ProductType.count()]
     }
 
@@ -79,7 +79,7 @@ class ProductTypeController {
             }
             productTypeInstance.properties = params
 			
-			productInstance?.categories?.clear();
+			productTypeInstance?.categories?.clear();
 			params.each {
 				println ("category: " + it.key +  " starts with category_ " + it.key.startsWith("category_"))
 				
