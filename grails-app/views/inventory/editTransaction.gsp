@@ -1,6 +1,5 @@
 
 <%@ page import="org.pih.warehouse.product.Product" %>
-<%@ page import="org.pih.warehouse.product.DrugProduct" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -150,16 +149,7 @@
 															<g:set var="productInstanceList" value="${productInstanceMap.get(key) }"/>
 															<optgroup label="${key?.name?:'None'}"></optgroup>
 															<g:each var="productInstance" in="${productInstanceList}">
-																<g:if test="${productInstance?.class?.simpleName == 'DrugProduct' }">
-																	<option value="${productInstance?.id }">
-																		${((DrugProduct)productInstance)?.name }
-																		${((DrugProduct)productInstance)?.dosageStrength }
-																		${((DrugProduct)productInstance)?.dosageUnit }
-																	</option>
-																</g:if>
-																<g:else>
-																	<option value="${productInstance?.id }">${productInstance?.name }</option>
-																</g:else>
+																<option value="${productInstance?.id }">${productInstance?.name }</option>
 															</g:each>
 														</g:each>
 													</select>
