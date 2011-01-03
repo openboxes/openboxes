@@ -3,7 +3,6 @@ package org.pih.warehouse.product;
 import org.junit.runner.Request;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
-import org.pih.warehouse.product.ProductType;
 import grails.converters.JSON;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -230,21 +229,14 @@ class ProductController {
 	 * 
 	 */
 	def importDependencies = { 		
+		/*
 		if (session.dosageForms) {
 			session.dosageForms.unique().each() {
 				new DosageForm(code: it, name: it).save(flush:true)
 			}
 			session.dosageForms = null
-
-		}
-		
-		if (session.productTypes) { 
-			session.productTypes.unique().each() {
-				new ProductType(code: it, name: it).save(flush:true)
-			}
-			session.productTypes = null;
-		}
-		
+		}*/
+				
 		redirect(controller: "product", action: "importProducts")	
 	}
 	
@@ -356,13 +348,13 @@ class ProductController {
 					productInstance.dosageStrength = columns[5]
 					productInstance.dosageUnit = columns[6]
 					
+					/*
 					def productTypeValue = columns[1];
 					if (productTypeValue && !productTypeValue.equals("") && !productTypeValue.equals("null")) { 
 						def productType = ProductType.findByName(productTypeValue);
 						if (!productType) { 
 							productInstance.productType = new ProductType(name: productTypeValue, code: productTypeValue);						
 							productTypes.add(productTypeValue);
-						   //throw new Exception("Could not find Product Type with name '" + columns[4] + "'")
 						}else { 
 							productInstance.productType = productType
 						}
@@ -379,6 +371,8 @@ class ProductController {
 							productInstance.dosageForm = dosageForm
 						}
 					}
+					*/
+					
 											
 					products.add(productInstance);
 

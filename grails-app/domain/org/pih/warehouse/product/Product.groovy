@@ -22,25 +22,9 @@ class Product implements Serializable {
 	// Base product information 
 	String name;				// A display name for the product
 	String description;			// A description for the product
-	String productCode;			// An internal product code
-	//ProductType productType		// the specific type of product
-	//ProductClass productClass;	// The class of the product
-	
-	// Consumable information	
-	//String brandName
+	String productCode;			// An internal product code	
 	Category category;			// primary category
 	Boolean coldChain = Boolean.FALSE;
-	// Drug information 
-	//String inn						// international name
-	//String dosageStrength			// e.g. "200"
-	//String dosageUnit				// e.g. "MG"
-	//DosageForm dosageForm			// e.g. "tablet"
-	//UnitOfMeasure unitOfMeasure		// e.g. "mg"
-
-	// Durable information 	
-	//String make 
-	//String model
-	//String year 
 
 	// Associations 
 	List attributes;
@@ -52,42 +36,14 @@ class Product implements Serializable {
 	
 	static transients = ["rootCategory"];
 	
-	static hasMany = [ categories : Category, attributes : ProductAttribute ]
+	static hasMany = [ categories : Category, attributes : ProductAttribute, tags : String ]
 	
     static constraints = {
-		// Basic
 		name(nullable:true)
 		description(nullable:true)
 		productCode(nullable:true)		
-		//productType(nullable:false)		
-		//productClass(nullable:false)
-		// Drug
-		//dosageStrength(nullable:true)
-		//dosageForm(nullable:true)
-		//unitOfMeasure(nullable:true)
-		// Consumable
-		//inn(nullable:true)
-		//brandName(nullable:true)
+		category(nullable:true)
 		coldChain(nullable:true)
-		// Durable goods
-		//make(nullable:true)
-		//model(nullable:true)
-		//year(nullable:true)
-		
-		//ingredients validator: { value, obj, errors ->
-		//	if (val?.size() > 0 && !obj.productClass == ProductClass.DRUG)
-		//		errors.rejectValue();
-		//}
-
-		// Example of a custom validator 
-		//fieldName validator: { value, obj, errors ->
-		//	def customValidator = CustomValidator.getInstance()
-		//	if (!customValidator.isValid(value)) {
-		//		// call errors.rejectValue(), or return false, or return an error code
-		//		errors.rejectValue();
-		//	}
-		//}
-
     }
 	
 	

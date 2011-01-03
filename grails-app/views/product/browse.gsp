@@ -20,37 +20,27 @@
 					<tr>
 						<td width="25%">
 							<fieldset>	
-							
-<style>
-#myMenu li { 
-	margin: 12px;
-}
-#myMenu ul li { 
-	margin: 12px;
-}
-#myMenu li { } 
-</style>							
-							
-													
+
 								<h2>Browse by category</h2>								
-																
-								<div style="text-align: center; padding: 10px;">
-									<g:render template="../category/menuTree" model="[root:rootCategory, selected:selectedCategory, level: 0]"/>
-								</div>
-								<br clear="all"/>
-								 
 								<div style="text-align: left; padding: 5px; background-color: #f5f5f5;">
 									<b>
 										<g:render template="../category/breadcrumb" model="[categoryInstance: selectedCategory]"/>
 									</b>
 								</div>
 								<div style="text-align:left;">
+									<style>
+										#myMenu li { margin: 12px; padding: 10px; }
+										#myMenu ul li { margin: 12px; padding: 10px; }
+									</style>							
 									<ul id="myMenu">
 										<g:render template="../category/menuTreeOptions" model="[root:selectedCategory, selected:selectedCategory, level: 0]"/>
 									</ul>
 								</div>
-										
-												
+								<div style="text-align: center; padding: 10px;">
+									<g:render template="../category/menuTree" model="[root:rootCategory, selected:selectedCategory, level: 0]"/>
+								</div>
+								<br clear="all"/>
+								 
 								
 								<%-- 
 								<h2>Browse by attribute</h2>							
@@ -76,29 +66,33 @@
 							</fieldset>					
 						</td>			
 						<td>
-							<div>
-		            			<table>
-			            			<tbody>
-					            		<g:each var="key" in="${productsByCategory.keySet() }">
-					            			<tr>
-					            				<th><h2><g:render template="../category/breadcrumb" model="[categoryInstance: key]"/></h2></th>
-					            			</tr>
-					            			<g:each var="productInstance" in="${productsByCategory.get(key) }" status="i">
-												 <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-													<td>
-														<g:link action="edit" id="${productInstance.id}">
-															${fieldValue(bean: productInstance, field: "name") }
-														</g:link>
-													</td>
-												</tr>				            				
-					            			
-					            			</g:each>
-					            		</g:each>
-			            			</tbody>
-		            			</table>
-			            		<div style="text-align: right;">
-			            			Showing ${productInstanceList?.totalCount } products
-			            		</div>
+	            			<table>
+	            				<thead>
+		            				<tr>
+		            					<th>Products</th>
+		            				</tr>
+		            			</thead>
+		            			<tbody>
+				            		<g:each var="key" in="${productsByCategory.keySet() }">
+				            			<tr>
+				            				<th><h2><g:render template="../category/breadcrumb" model="[categoryInstance: key]"/></h2></th>
+				            			</tr>
+				            			<g:each var="productInstance" in="${productsByCategory.get(key) }" status="i">
+											 <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+												<td>
+													<g:link action="edit" id="${productInstance.id}">
+														${fieldValue(bean: productInstance, field: "name") }
+													</g:link>
+												</td>
+											</tr>				            				
+				            			
+				            			</g:each>
+				            		</g:each>
+		            			</tbody>
+	            			</table>
+		            		<div style="text-align: right; border-top: 1px solid #f7f7f7; padding: 10px;">
+		            			Showing ${productInstanceList?.totalCount } products
+		            		</div>
 		            		
 			            		
 			            		<%-- 
@@ -142,7 +136,6 @@
 									</div>
 								</g:if>
 								--%>
-				            </div>
 						</td>
 					</tr>
 				</table>

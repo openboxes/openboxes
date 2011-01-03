@@ -3,7 +3,6 @@ package org.pih.warehouse.inventory;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
-import org.pih.warehouse.product.ProductType;
 import org.pih.warehouse.inventory.Warehouse;
 
 

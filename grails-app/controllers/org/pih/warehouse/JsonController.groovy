@@ -6,15 +6,12 @@ import org.pih.warehouse.core.DialogForm;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.UnitOfMeasure;
 import org.pih.warehouse.inventory.Warehouse;
-import org.pih.warehouse.product.DosageForm;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.shipping.Container;
 import org.pih.warehouse.shipping.ShipmentItem;
 import org.pih.warehouse.shipping.Shipper;
 import org.pih.warehouse.shipping.ShipperService;
 import org.pih.warehouse.shipping.Shipment;
-import org.pih.warehouse.product.ProductType;
-
 
 class JsonController {
 
@@ -43,11 +40,11 @@ class JsonController {
 	}
 	*/
 	
-	def findProductTypeByName = { 
+	def findCategoryByName = { 
 		log.info params
 		def items = new TreeSet();
 		if (params.term) {
-			items = ProductType.withCriteria {
+			items = Category.withCriteria {
 				or {
 					ilike("name", params.term + "%")
 				}

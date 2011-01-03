@@ -692,25 +692,6 @@ class ShipmentController {
 	}    
 	
 	
-	/*
-	 def addItem = {     		
-	 log.debug params;
-	 def container = Container.get(params.containerId);
-	 def product = Product.get(params.productId);
-	 def quantity = params.quantity;
-	 // if container already includes a shipment item with this product, 
-	 // we just need to add to the total quantity
-	 def weight = product.weight * Integer.valueOf(quantity);
-	 //def donor = null;
-	 //if (params.donorId)
-	 def donor = Organization.get(params.donorId);
-	 def shipmentItem = new ShipmentItem(product: product, quantity: quantity, weight: weight, donor: donor);
-	 container.shipment.addToShipmentItems(shipmentItem).save(flush:true);
-	 flash.message = "Added $params.quantity units of $product.name";		
-	 redirect(action: 'show', id: params.shipmentId)    	
-	 }
-	 */	
-	
 	def addDocument = { 
 		log.info params
 		def shipmentInstance = Shipment.get(params.id);

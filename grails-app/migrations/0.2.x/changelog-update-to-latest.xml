@@ -1630,4 +1630,97 @@
         </insert>
 	</changeSet>
 
+    <changeSet author="jmiranda (generated)" id="1294078999350-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="attribute_options" />
+			</not>
+		</preConditions>
+        <createTable tableName="attribute_options">
+            <column name="attribute_id" type="BIGINT"/>
+            <column name="options_string" type="VARCHAR(255)"/>
+            <column name="options_idx" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1294078999350-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="attribute" columnName="allow_other" />
+			</not>
+		</preConditions>
+        <addColumn tableName="attribute">
+            <column name="allow_other" type="BIT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1294078999350-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="event_type" columnName="event_type" />
+			</not>
+		</preConditions>
+        <addColumn tableName="event_type">
+            <column name="event_type" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1294078999350-4">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="product" columnName="cold_chain" />
+			</not>
+		</preConditions>
+        <addColumn tableName="product">
+            <column name="cold_chain" type="BIT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1294078999350-5">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="product_attribute" columnName="attributes_idx" />
+			</not>
+		</preConditions>
+        <addColumn tableName="product_attribute">
+            <column name="attributes_idx" type="INT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1294078999350-6">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="product_attribute" columnName="value" />
+			</not>
+		</preConditions>
+        <addColumn tableName="product_attribute">
+            <column name="value" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1294078999350-7">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="product_category" columnName="categories_idx" />
+			</not>
+		</preConditions>
+        <addColumn tableName="product_category">
+            <column name="categories_idx" type="INT"/>
+        </addColumn>
+    </changeSet>
+	<changeSet author="jmiranda (generated)" id="1294078999350-8">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="product_category" columnName="product_categories_id" />
+			</not>
+		</preConditions>
+		<addColumn tableName="product_category">
+			<column name="product_categories_id" type="BIGINT" />
+		</addColumn>
+	</changeSet>
+    <changeSet author="jmiranda (generated)" id="1294078999350-9">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="transaction_type" columnName="transaction_type"/>
+			</not>
+		</preConditions>    
+        <addColumn tableName="transaction_type">
+            <column name="transaction_type" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
