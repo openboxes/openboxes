@@ -20,6 +20,17 @@
 					<tr>
 						<td width="25%">
 							<fieldset>	
+							
+<style>
+#myMenu li { 
+	margin: 12px;
+}
+#myMenu ul li { 
+	margin: 12px;
+}
+#myMenu li { } 
+</style>							
+							
 													
 								<h2>Browse by category</h2>								
 																
@@ -34,7 +45,7 @@
 									</b>
 								</div>
 								<div style="text-align:left;">
-									<ul>
+									<ul id="myMenu">
 										<g:render template="../category/menuTreeOptions" model="[root:selectedCategory, selected:selectedCategory, level: 0]"/>
 									</ul>
 								</div>

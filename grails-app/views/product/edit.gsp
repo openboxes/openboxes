@@ -37,6 +37,7 @@
 				<g:hiddenField name="action" value="save"/>                					
                 <g:hiddenField name="id" value="${productInstance?.id}" />
                 <g:hiddenField name="version" value="${productInstance?.version}" />
+            	<g:hiddenField name="categoryId" value="${params?.category?.id }"/><!--  So we know which category to show on browse page after submit -->
 
                 <div class="dialog">
 					<fieldset>	              		

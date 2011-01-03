@@ -25,7 +25,6 @@
 	            </div>
             </g:hasErrors>
             <g:form action="save" method="post">
-            
             	<fieldset>
 	                <div class="dialog">
 	                    <table>
