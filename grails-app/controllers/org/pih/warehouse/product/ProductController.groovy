@@ -24,39 +24,23 @@ class ProductController {
 		
     	// Get selected 
 		def selectedCategory = Category.get(params.categoryId);		
-		def selectedProductType = ProductType.get(params.productTypeId);
     	def selectedAttribute = Attribute.get(params.attributeId)	
 		
 		
     	// Condition types	
     	def allAttributes = Attribute.getAll();
     	
-    	// Root level product types
-		def typeCriteria = ProductType.createCriteria();
-		def allProductTypes = ProductType.getAll();		
-		//def allProductTypes = typeCriteria.list {
-		//	isNull("parentProductType")
-		//}    		
-
 		// Root categories
 		def categoryCriteria = Category.createCriteria();		
 		def allCategories = categoryCriteria.list { 
 			isNull("parentCategory")
 		}
 
-		
-		
-		log.info params.productTypeId
-						
-		log.info "selected category: " + selectedCategory?.children
 				
 		// Search for Products matching criteria 
 		/*
 		def results = Product.createCriteria().list(max:params.max, offset: params.offset ?: 0) {
             and{
-                if(params.productTypeId){
-                    eq("productType.id", Long.parseLong(params.productTypeId))
-                }
           		if(params.categoryId){
 					//or { 
 					//	eq ("category.id", Long.parseLong(params.categoryId))
@@ -64,8 +48,6 @@ class ProductController {
 	          		//		eq("id", Long.parseLong(params.categoryId))
 	          		//	}
 					//}
-				  
-				  	
                 } 
 				if (params.nameContains) {  
 					or { 
@@ -87,19 +69,15 @@ class ProductController {
 			}
 		}
 		def productsByCategory = results.groupBy { it.category } 
-		
-		
-		//def rootCategory = new Category(name: "/", categories: allCategories);
+				
 		def rootCategory = Category.findByName("ROOT");
 
-        //params.max = Math.min(params.max ? params.int('max') : 10, 100)		
 		render(view:'browse', model:[productInstanceList : results, 
     	                             productInstanceTotal: results.totalCount, 
 									 productsByCategory : productsByCategory,
 									 rootCategory : rootCategory,
 									 categoryInstance: selectedCategory,
     	                             categories : allCategories, selectedCategory : selectedCategory,
-    	                             productTypes : allProductTypes, selectedProductType : selectedProductType,
     	                             attributes : allAttributes, selectedAttribute : selectedAttribute ])
 	}
     
@@ -260,13 +238,7 @@ class ProductController {
 			   if (!session.dosageForms && !session.productTypes) { 
 				   session.products.each() {					   
 					   def productInstance = new Product(	name: it.name, 
-																frenchName: it.frenchName, 
-																description: it.name, 
-																productCode: it.productCode,
-																dosageStrength: it.dosageStrength,
-																dosageUnit: it.dosageUnit,
-																productType: it.productType,
-																dosageForm: it.dosageForm);						
+															productCode: it.productCode);						
 						productInstance.save(failOnError:true);
 					};
 				   // import

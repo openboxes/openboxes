@@ -32,24 +32,6 @@
 		</tr>
 	</table>	
 </g:form>			
-<table>
-	<tr>
-		<td>
-			<g:each in="${productTypes}" status="i" var="productType">
-				<g:set var="selected" value="${productType?.id==selectedProductType?.id}"/>
-				<g:if test="${selected }">
-					<img src="${createLinkTo(dir:'images/icons/silk',file: 'bullet_go.png')}" style="vertical-align: middle;"/>																			
-				</g:if>
-				<g:else>
-					<img src="${createLinkTo(dir:'images/icons/silk',file: 'bullet_white.png')}" style="vertical-align: middle;"/>																			
-				</g:else>
-				<span class="${(productType?.id==selectedProductType?.id)?'selected':''}">
-					<a href="${createLink(action:'browse',params:["productTypeId":productType.id])}">${productType.name}</a>
-					
-				</span>
-			</g:each>
-		</td>
-	</tr>
-</table>	
+
 --%>
 			

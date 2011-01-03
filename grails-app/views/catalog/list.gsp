@@ -32,7 +32,7 @@
 						<g:if test="${productTypes }">
 							<table>
 								<tr>
-								<th>by Type</th>
+									<th>by Type</th>
 								</tr>
 								<tbody>
 									<g:each var="productType" in="${productTypes}" status="i">

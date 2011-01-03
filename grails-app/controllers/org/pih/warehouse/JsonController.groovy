@@ -14,31 +14,6 @@ import org.pih.warehouse.shipping.ShipperService;
 import org.pih.warehouse.shipping.Shipment;
 
 class JsonController {
-
-	/*
-	def getProductTypes = { params ->
-		ProductType.withCriteria { 
-			ilike("name", "%" +  params.term + "%")			
-		}
-	}
-	
-	def findByName = { searchMethod ->	
-		def items = new TreeSet();
-		if (params.term) {
-			items = searchMethod.call(params)
-			if (items) {
-				items = items.collect() {
-					[	value: it.id,
-						label: it.name,
-						valueText: it.name,
-						desc: it.name,
-						icon: "none" 	]
-				}
-			}
-		}
-		render items as JSON;
-	}
-	*/
 	
 	def findCategoryByName = { 
 		log.info params
@@ -231,9 +206,6 @@ class JsonController {
 							ilike("name", "%" + term + "%")
 							ilike("upc", "%" + term + "%")
 							categories { 
-								ilike("name", "%" + term + "%")
-							}
-							productType { 							
 								ilike("name", "%" + term + "%")
 							}
 						}

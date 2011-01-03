@@ -1,7 +1,5 @@
 
 <%@ page import="org.pih.warehouse.product.Product" %>
-<%@ page import="org.pih.warehouse.product.ProductClass" %>
-<%@ page import="org.pih.warehouse.product.ProductType" %>
 <html>
 <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />

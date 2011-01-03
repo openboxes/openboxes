@@ -25,11 +25,6 @@ class InventoryService {
 	}
 	
 	Map getProductMap(Long id) { 		
-		// Get a warehouse specific product map
-		//def warehouse = Warehouse.get(id);		
-		
-		//return Product.getAll().groupBy { it.productType } 
-		
 		return Product.getAll().groupBy { it.categories*.parents } 
 	}
 	

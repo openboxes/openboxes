@@ -23,22 +23,12 @@ class CatalogController {
 			warehouseInstance = Warehouse.get(session?.warehouse?.id);
 		}
 		
-		// Get all product types and set the default product type
-		def productTypes = ProductType.getAll()
-		def productType = ProductType.get(params?.productType?.id);
-		if (!productType) {
-			productType = productTypes.head();
-		}
-		
 		[
 			warehouseInstance: warehouseInstance,
 			inventoryInstance: warehouseInstance.inventory,
 			productMap : inventoryService.getProductMap(warehouseInstance?.id),
 			inventoryMap : inventoryService.getInventoryMap(warehouseInstance?.id),
-			inventoryLevelMap : inventoryService.getInventoryLevelMap(warehouseInstance?.id),
-			//productInstanceList : Product.getAll(),
-			productType: productType,
-			productTypes: productTypes
+			inventoryLevelMap : inventoryService.getInventoryLevelMap(warehouseInstance?.id)
 		]
 
 	}
