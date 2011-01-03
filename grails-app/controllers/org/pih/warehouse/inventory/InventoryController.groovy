@@ -42,13 +42,19 @@ class InventoryController {
 			productType = productTypes.head();
 		}
 		
+		def categoryInstance = Category.get(params?.categoryId)
+		def rootCategory = Category.findByName("ROOT");
+		
 		[
 			warehouseInstance: warehouseInstance,
 			inventoryInstance: warehouseInstance.inventory,
+			categoryInstance: categoryInstance,
 			productMap : inventoryService.getProductMap(warehouseInstance?.id),
 			inventoryMap : inventoryService.getInventoryMap(warehouseInstance?.id),
 			inventoryLevelMap : inventoryService.getInventoryLevelMap(warehouseInstance?.id),
 			//productInstanceList : Product.getAll(),
+			productList : inventoryService.getProducts(warehouseInstance?.id, categoryInstance),
+			rootCategory: rootCategory,
 			productType: productType,
 			productTypes: productTypes
 		]
@@ -74,7 +80,7 @@ class InventoryController {
 			//inventoryInstance.warehouse = session.warehouse;
 			if (warehouseInstance.save(flush: true)) {
 				flash.message = "${message(code: 'default.created.message', args: [message(code: 'inventory.label', default: 'Inventory'), warehouseInstance.inventory.id])}"
-				redirect(action: "show", id: warehouseInstance?.inventory?.id)
+				redirect(action: "browse")
 			}
 			else {
 				render(view: "create", model: [warehouseInstance: warehouseInstance])
@@ -113,7 +119,7 @@ class InventoryController {
 			def itemInstance = new InventoryItem(product: productInstance)
 			if (!itemInstance.hasErrors() && itemInstance.save(flush: true)) {
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'inventory.label', default: 'Inventory'), inventoryInstance.id])}"
-				redirect(action: "show", id: inventoryInstance.id)
+				redirect(action: "browse", id: inventoryInstance.id)
 			}
 			else {
 				flash.message = "unable to create an inventory item"
@@ -152,7 +158,7 @@ class InventoryController {
 			inventoryInstance.properties = params
 			if (!inventoryInstance.hasErrors() && inventoryInstance.save(flush: true)) {
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'inventory.label', default: 'Inventory'), inventoryInstance.id])}"
-				redirect(action: "show", id: inventoryInstance.id)
+				redirect(action: "browse", id: inventoryInstance.id)
 			}
 			else {
 				render(view: "edit", model: [inventoryInstance: inventoryInstance])

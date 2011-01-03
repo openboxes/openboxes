@@ -36,7 +36,7 @@
 	                                    <%--<g:select name="parentCategory.id" from="${org.pih.warehouse.product.Category.list()}" optionKey="id" value="${categoryInstance?.parentCategory?.id}" noSelection="['null': '']" /> --%>
 										<select name="parentCategory.id">
 											<option value="">no parent</option>
-											<g:render template="optionTree" model="[category:rootCategory, level: 1]"/>
+											<g:render template="selectOptions" model="[category:rootCategory, level: 1]"/>
 										</select>	                                    
 	                                    
 	                                </td>

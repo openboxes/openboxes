@@ -45,35 +45,60 @@ class ProductController {
 			isNull("parentCategory")
 		}
 
+		
+		
 		log.info params.productTypeId
 						
+		log.info "selected category: " + selectedCategory?.children
+				
 		// Search for Products matching criteria 
+		/*
 		def results = Product.createCriteria().list(max:params.max, offset: params.offset ?: 0) {
             and{
                 if(params.productTypeId){
                     eq("productType.id", Long.parseLong(params.productTypeId))
                 }
           		if(params.categoryId){
-          			categories { 
-          				eq("id", Long.parseLong(params.categoryId))
-          			}
+					//or { 
+					//	eq ("category.id", Long.parseLong(params.categoryId))
+	          		//	categories { 
+	          		//		eq("id", Long.parseLong(params.categoryId))
+	          		//	}
+					//}
+				  
+				  	
                 } 
 				if (params.nameContains) {  
 					or { 
+						ilike("name", "%" + params.nameContains + "%")
 						ilike("inn", "%" + params.nameContains + "%")
 						ilike("brandName", "%" + params.nameContains + "%")
 					}
 				}
             }				
 		}		
+		*/
 		
-				
-		def rootCategory = new Category(name: "/", categories: allCategories);
+		def results = []
+		def categories = (selectedCategory?.children)?selectedCategory.children:[];
+		categories << selectedCategory;
+		if (categories) { 
+			results = Product.createCriteria().list(max:params.max, offset: params.offset ?: 0) { 		
+				'in'("category", categories)		
+			}
+		}
+		def productsByCategory = results.groupBy { it.category } 
 		
+		
+		//def rootCategory = new Category(name: "/", categories: allCategories);
+		def rootCategory = Category.findByName("ROOT");
+
         //params.max = Math.min(params.max ? params.int('max') : 10, 100)		
 		render(view:'browse', model:[productInstanceList : results, 
     	                             productInstanceTotal: results.totalCount, 
+									 productsByCategory : productsByCategory,
 									 rootCategory : rootCategory,
+									 categoryInstance: selectedCategory,
     	                             categories : allCategories, selectedCategory : selectedCategory,
     	                             productTypes : allProductTypes, selectedProductType : selectedProductType,
     	                             attributes : allAttributes, selectedAttribute : selectedAttribute ])
@@ -84,36 +109,10 @@ class ProductController {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [productInstanceList: Product.list(params), productInstanceTotal: Product.count()]
     }
-
-	def createType = { 
-		[ productTypeInstance: new ProductType(productClass:params.productClass)]
-	}
-	
-	def saveType = { 
-		log.info "params: " + params
-		def productTypeInstance = new ProductType(params);
-		if (!productTypeInstance.hasErrors() && productTypeInstance.save(flush:true)) { 
-			//redirect("")
-			
-			// send to create product page with params.productClass & params.productType populated
-			
-		}
-		else { 
-			render(view: "createType", model: [productTypeInstance: productTypeInstance])
-		}
-		
-	}
-	
 	
 	def create = { 
-
-		if (!params.productClass) {
-			render(view: "selectType")
-		}
-		else { 			
-			def productInstance = new Product(params)
-			render(view: "edit", model: [productInstance : productInstance])
-		}
+		def productInstance = new Product(params)
+		render(view: "edit", model: [productInstance : productInstance, rootCategory: Category.findByName("ROOT")])
 	}
 
 	
@@ -136,7 +135,7 @@ class ProductController {
 
 		if (productInstance.save(flush: true)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'product.label', default: 'Product'), productInstance.name])}"
-            redirect(action: "browse")
+            redirect(action: "browse", params:params)
         }
         else {
             render(view: "edit", model: [productInstance: productInstance])
@@ -161,7 +160,7 @@ class ProductController {
             redirect(action: "browse")
         }
         else {
-            return [productInstance: productInstance]
+            return [productInstance: productInstance, rootCategory: Category.findByName("ROOT")]
         }
     }
 	
@@ -196,7 +195,7 @@ class ProductController {
 			
             if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
                 flash.message = "${message(code: 'default.updated.message', args: [message(code: 'product.label', default: 'Product'), productInstance.name])}"
-                redirect(action: "browse")
+                redirect(action: "browse", params:params)
             }
             else {
                 render(view: "edit", model: [productInstance: productInstance])
@@ -204,7 +203,7 @@ class ProductController {
         }
         else {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
-            redirect(action: "browse")
+            redirect(action: "browse", params:params)
         }
     }
 

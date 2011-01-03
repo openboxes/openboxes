@@ -49,12 +49,12 @@ class JsonController {
 		if (params.term) {
 			items = ProductType.withCriteria {
 				or {
-					ilike("name", "%" +  params.term + "%")
+					ilike("name", params.term + "%")
 				}
 			}
 			if (items) {
 				items = items.collect() {
-					[	value: it.id,
+					[	value: it.name,
 						label: it.name,
 						valueText: it.name,
 						desc: it.name,

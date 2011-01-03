@@ -33,18 +33,18 @@
 	                        <tbody>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="name"><g:message code="productType.name.label" default="Name" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: productTypeInstance, field: 'name', 'errors')}">
-	                                    <g:textField name="name" value="${productTypeInstance?.name}" />
-	                                </td>
-	                            </tr>
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
 	                                  <label for="productClass"><g:message code="productType.productClass.label" default="Product Class" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: productTypeInstance, field: 'productClass', 'errors')}">
 	                                    <g:select name="productClass" from="${org.pih.warehouse.product.ProductClass?.values()}" value="${productTypeInstance?.productClass}" noSelection="['': '']" />
+	                                </td>
+	                            </tr>
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
+	                                  <label for="name"><g:message code="productType.name.label" default="Name" /></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: productTypeInstance, field: 'name', 'errors')}">
+	                                    <g:textField name="name" value="${productTypeInstance?.name}" />
 	                                </td>
 	                            </tr>
 	                        

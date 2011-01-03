@@ -6,6 +6,7 @@ import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.Warehouse;
 import org.pih.warehouse.product.Product;
+import org.pih.warehouse.product.Category;
 
 class InventoryService {
 	
@@ -27,8 +28,28 @@ class InventoryService {
 		// Get a warehouse specific product map
 		//def warehouse = Warehouse.get(id);		
 		
-		return Product.getAll().groupBy { it.productType } 
+		//return Product.getAll().groupBy { it.productType } 
+		
+		return Product.getAll().groupBy { it.categories*.parents } 
 	}
+	
+	List getProducts(Long id, Category category) { 
+		def myList = [] 
+		def myCategories = [1, 18]
+		if (category) { 
+			
+			myList = Product.createCriteria().list {
+				categories { 
+					eq ("id", category?.id)
+				}
+			}
+		}
+		log.info "category " + category + " " + myList?.size();
+		
+		
+		return myList;
+	}
+	
 	
 	
 	/**

@@ -11,10 +11,12 @@ class CategoryController {
 	
 	def tree = { 
 		log.info params 
-		def categoryInstanceList = Category.findAllByParentCategoryIsNull();
-		def rootCategory = new Category(name: "root");
-		rootCategory.categories = categoryInstanceList
-		[categoryInstanceList: categoryInstanceList, categoryInstanceTotal: Category.count(), rootCategory: rootCategory ]
+		def categoryInstanceList = Category.findAllByParentCategoryIsNull([sort: "name", order: "asc"]);
+		
+		log.info "categories: " + categoryInstanceList;
+		
+		def rootCategory = Category.findByName("ROOT");
+		[rootCategory: rootCategory ]
 	}
 		
 	def editCategory = { 
@@ -23,14 +25,13 @@ class CategoryController {
 		if (!categoryInstance) { 
 			flash.message = "Unable to locate category with ID ${params.id}" 
 		}
-		def categoryInstanceList = Category.findAllByParentCategoryIsNull();
-		def rootCategory = new Category(name: "root");
-		rootCategory.categories = categoryInstanceList
-		
-		render(view: "tree", model: [categoryInstanceList: categoryInstanceList, categoryInstanceTotal: Category.count(), rootCategory: rootCategory, categoryInstance: categoryInstance ])		
+		def rootCategory = Category.findByName("ROOT");		
+		render(view: "tree", model: [rootCategory: rootCategory, categoryInstance: categoryInstance ])		
 	}
 
 	def saveCategory = { 		
+		log.info params;
+		
 		def categoryInstance = Category.get(params.id)		
 		if (!categoryInstance)
 			categoryInstance = new Category(params)

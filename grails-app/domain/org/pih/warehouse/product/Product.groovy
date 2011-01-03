@@ -23,28 +23,28 @@ class Product implements Serializable {
 	String name;				// A display name for the product
 	String description;			// A description for the product
 	String productCode;			// An internal product code
-	ProductType productType		// the specific type of product
-	ProductClass productClass;	// The class of the product
+	//ProductType productType		// the specific type of product
+	//ProductClass productClass;	// The class of the product
 	
 	// Consumable information	
-	String brandName
+	//String brandName
+	Category category;			// primary category
 	Boolean coldChain = Boolean.FALSE;
 	// Drug information 
-	String inn						// international name
-	String dosageStrength			// e.g. "200"
+	//String inn						// international name
+	//String dosageStrength			// e.g. "200"
 	//String dosageUnit				// e.g. "MG"
-	DosageForm dosageForm			// e.g. "tablet"
-	UnitOfMeasure unitOfMeasure		// e.g. "mg"
+	//DosageForm dosageForm			// e.g. "tablet"
+	//UnitOfMeasure unitOfMeasure		// e.g. "mg"
 
 	// Durable information 	
-	String make 
-	String model
-	String year 
+	//String make 
+	//String model
+	//String year 
 
 	// Associations 
 	List attributes;
 	List categories;
-	List ingredients;
 	
 	// Auditing
 	Date dateCreated;
@@ -52,33 +52,27 @@ class Product implements Serializable {
 	
 	static transients = ["rootCategory"];
 	
-	static hasMany = [ categories : Category, attributes : ProductAttribute, ingredients : Ingredient ]
-	static mapping = {
-		table 'product'
-		tablePerHierarchy false
-		categories joinTable: [name:'product_category', column: 'category_id', key: 'product_id']
-		//productNames joinTable: [name:'product_name', column: 'product_name_id', key: 'product_id']
-	}
+	static hasMany = [ categories : Category, attributes : ProductAttribute ]
 	
     static constraints = {
 		// Basic
 		name(nullable:true)
 		description(nullable:true)
 		productCode(nullable:true)		
-		productType(nullable:false)		
-		productClass(nullable:false)
+		//productType(nullable:false)		
+		//productClass(nullable:false)
 		// Drug
-		dosageStrength(nullable:true)
-		dosageForm(nullable:true)
-		unitOfMeasure(nullable:true)
+		//dosageStrength(nullable:true)
+		//dosageForm(nullable:true)
+		//unitOfMeasure(nullable:true)
 		// Consumable
-		inn(nullable:true)
-		brandName(nullable:true)
+		//inn(nullable:true)
+		//brandName(nullable:true)
 		coldChain(nullable:true)
 		// Durable goods
-		make(nullable:true)
-		model(nullable:true)
-		year(nullable:true)
+		//make(nullable:true)
+		//model(nullable:true)
+		//year(nullable:true)
 		
 		//ingredients validator: { value, obj, errors ->
 		//	if (val?.size() > 0 && !obj.productClass == ProductClass.DRUG)
@@ -102,31 +96,6 @@ class Product implements Serializable {
 		rootCategory.categories = this.categories;
 		return rootCategory;
 	}
-
-	/*
-	String getName() { 	
-		String name = "";	
-		
-		if (!id) { 
-			return "New Product"
-		}		
-		else { 
-			switch(productClass) {
-				case ProductClass.DRUG :
-					name = inn;
-					break; 
-				case ProductClass.DURABLE:
-					name = make + " " + model + " " + year;
-					break;			
-				case ProductClass.CONSUMABLE:  
-					name = inn;
-					break;
-				default: 
-					"New Product"
-			}		
-		}		
-	}
-	*/
     
 }
 

@@ -410,4 +410,7 @@ th.desc a {
 .menuButton a.new {
     background: url(../images/icons/silk/add.png) center left no-repeat;
 }
+.menuButton a.edit {
+    background: url(../images/icons/silk/pencil.png) center left no-repeat;
+}
 

@@ -86,7 +86,7 @@ class ProductTypeController {
 				if (it.key.startsWith("category_")) {
 					def category = Category.get((it.key - "category_") as Integer);
 					log.info "adding " + category?.name
-					productInstance.addToCategories(category)
+					productTypeInstance.addToCategories(category)
 				}
 			  }
 

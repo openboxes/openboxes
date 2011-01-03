@@ -22,6 +22,9 @@ h3.ui-state-active { background-color: #f7f7f7; }  /* #F8F7EF */
 .body { 
 	margin-right: 5px;
 }
+body { 
+	text-align: left; 
+}
 #dashboard { 
 	margin: 0px; 	
 }
@@ -288,7 +291,10 @@ hr.space {background:#fff;color:#fff;}
 	text-align: right;
 }
 
-ul#categories li { 
+ul.treeList { 
+	list-style-type: square; 
+}
+ul.treeList li ul li { 
 	padding-left: 15px;
 }
 

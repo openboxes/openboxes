@@ -27,14 +27,13 @@
 	            </div>
             </g:hasErrors>            
             <div class="dialog">
-	            <g:form action="create" method="post">
-                
+	            <g:form action="create" method="post">                
     	        	<fieldset>
 	                    <table>
 	                        <tbody>                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                    <label for="name"><g:message code="product.name.label" default="Add a new product" /></label>
+	                                    <label for="name"><g:message code="product.name.label" default="Choose Product Type" /></label>
 	                                </td>
 	                                <td valign="top" class="value">
 	                                
@@ -48,8 +47,8 @@
 											<tr>
 												<td style="padding-left: 50px;">
 													<g:each var="productType" in="${ProductType.findAllByProductClass(ProductClass.DRUG) }">
-														<g:link action="create" params="['productType.id': productType.id]">${productType?.name }</g:link>
 														<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
+														<g:link action="create" params="[productClass: ProductClass.DRUG, 'productType.id': productType.id]">${productType?.name }</g:link>
 													</g:each>
 												</td>
 											</tr>
@@ -57,32 +56,40 @@
 											<tr class="prop">
 												<td>
 	                    			            	<img src="${createLinkTo(dir:'images/icons/silk', file:'cup.png') }"/>  &nbsp;
-													<g:link action="create" params="[productClass: org.pih.warehouse.product.ProductClass.CONSUMABLE]">Supplies & Consumable</g:link>
+													<g:link action="create" params="[productClass: ProductClass.CONSUMABLE]">Supplies & Consumable</g:link>
 												</td>
 	                                		</tr>
 											<tr>
 												<td style="padding-left: 50px;">
 													<g:each var="productType" in="${ProductType.findAllByProductClass(ProductClass.CONSUMABLE) }">
-														<g:link action="create" params="['productType.id': productType.id]">${productType?.name }</g:link>
 														<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
+														<g:link action="create" params="[productClass: ProductClass.CONSUMABLE, 'productType.id': productType.id]">${productType?.name }</g:link>
 													</g:each>
 												</td>
 											</tr>
 											<tr class="prop">
 												<td>
 	                    			            	<img src="${createLinkTo(dir:'images/icons/silk', file:'computer.png') }"/> &nbsp;
-													<g:link action="create" params="[productClass: org.pih.warehouse.product.ProductClass.DURABLE]">Equipment & Furniture</g:link>
+													<g:link action="create" params="[productClass: ProductClass.DURABLE]">Equipment & Furniture</g:link>
 												</td>
 											</tr>
 											<tr>
 												<td style="padding-left: 50px;">
 													<g:each var="productType" in="${ProductType.findAllByProductClass(ProductClass.DURABLE) }">
-														<g:link action="create" params="['productType.id': productType.id]">${productType?.name }</g:link>
 														<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
+														<g:link action="create" params="[productClass: ProductClass.DURABLE, 'productType.id': productType.id]">${productType?.name }</g:link>
 													</g:each>
-													<g:link action="createType" params="[productClass: ProductClass.DRUG]">add new  &rsaquo;</g:link>													
 												</td>
 											</tr>
+											<%-- 
+											<tr class="prop">
+												<td>
+													<span class="menuButton">
+														<g:link class="new" controller="productType" action="create" params="">Add Product Type&nbsp;&rsaquo;</g:link>													
+													</span>
+												</td>
+											</tr>
+											--%>
 	                                	</table>
 	                                </td>
 	                            </tr>

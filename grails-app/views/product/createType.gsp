@@ -21,24 +21,24 @@
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
-            <g:hasErrors bean="${productInstance}">
+            <g:hasErrors bean="${productTypeInstance}">
 	            <div class="errors">
-	                <g:renderErrors bean="${productInstance}" as="list" />
+	                <g:renderErrors bean="${productTypeInstance}" as="list" />
 	            </div>
             </g:hasErrors>            
             <div class="dialog">
-	            <g:form action="create" method="post">
+	            <g:form action="saveType" method="post">
                 
     	        	<fieldset>
 	                    <table>
 	                        <tbody>                        
 	                            <tr class="prop">
-									<td class="name">
-	                                    <label for="name"><g:message code="productType.productClass.label" default="Class" /></label>
-									</td>
-									<td class="value">
-										${productTypeInstance?.productClass?.name }												
-									</td>
+	                                <td valign="top" class="name">
+	                                    <label for="productClass"><g:message code="productType.productClass.label" default="Product Class" /></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: productTypeInstance, field: 'productClass', 'errors')}">
+	                                    <g:select name="productClass" from="${org.pih.warehouse.product.ProductClass?.values()}" value="${productTypeInstance?.productClass}" noSelection="['': '']" />
+	                                </td>
 	                            </tr>
 	                            <tr class="prop">
 									<td class="name">

@@ -51,7 +51,7 @@
 		           			<g:if test="${categoryInstance}">
 				           		<g:form action="saveCategory">
 				           			<fieldset>
-				           				<legend>Edit existing category</legend>
+				           				<legend>Edit category</legend>
 				           				<table>
 				           					<tr class="prop">
 				           						<td class="name">
@@ -67,16 +67,10 @@
 				           							<label>Parent</label>
 				           						</td>
 				           						<td class="value">
-				           							<g:if test="${categoryInstance }">
-					           							${(categoryInstance?.parentCategory)?categoryInstance?.parentCategory?.name:'no parent' }
-					           							<g:hiddenField name="parentCategory.id" value="${categoryInstance?.parentCategory?.id }"/>			           						
-				           							</g:if>
-				           							<g:else>
-				           								<select name="parentCategory.id">
-				           									<option value="0">no parent</option>
-				           									<g:render template="optionTree" model="[category:rootCategory, level: 1]"/>
-				           								</select>
-				           							</g:else>
+			           								<select name="parentCategory.id">
+			           									<option value="0">no parent</option>
+			           									<g:render template="selectOptions" model="[root:rootCategory, selected:categoryInstance, level: 1]"/>
+			           								</select>
 				           						</td>
 				           					</tr>
 				           					<tr class="prop">
@@ -101,19 +95,6 @@
 							           				</table>
 				           						</td>
 				           					</tr>
-				           					
-				           					
-				           					
-				           					<%-- 
-				           					<tr class="prop">
-				           						<td class="name">
-				           							<label>Class</label>
-				           						</td>
-				           						<td class="value">
-													<g:select in="${org.pih.warehouse.product.ProductClass.list() }" value="${categoryInstance.productClass}"></g:select>
-				           						</td>
-				           					</tr>
-				           					--%>
 				           					<tr class="prop">
 				           						<td class="name">
 	
@@ -151,7 +132,7 @@
 						                                    <%--<g:select name="parentCategory.id" from="${org.pih.warehouse.product.Category.list()}" optionKey="id" value="${categoryInstance?.parentCategory?.id}" noSelection="['null': '']" /> --%>
 															<select name="parentCategory.id">
 																<option value="">no parent</option>
-																<g:render template="optionTree" model="[category:rootCategory, level: 1]"/>
+																<g:render template="selectOptions" model="[category:rootCategory, level: 1, selectedCategory: categoryInstance]"/>
 															</select>	                                    
 						                                    
 						                                </td>
@@ -165,6 +146,7 @@
 						                                    <g:textField name="name" value="${categoryInstance?.name}" />
 						                                </td>
 						                            </tr>
+						                        <%-- 
 						                        
 						                            <tr class="prop">
 						                                <td valign="top" class="name">
@@ -184,7 +166,6 @@
 						                                </td>
 						                            </tr>
 						                        
-						                        <%-- 
 						                            <tr class="prop">
 						                                <td valign="top" class="name">
 						                                    <label for="dateCreated"><g:message code="category.dateCreated.label" default="Date Created" /></label>

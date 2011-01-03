@@ -88,7 +88,7 @@
 													</g:if>								
 												</td>								
 												<td style="width: 30%;">
-													<b>${productInstance?.name }</b>&nbsp;${productInstance?.productClass?.name }			
+													<b>${productInstance?.name }</b>			
 													<%-- 		
 													${productInstance?.dosageStrength } ${productInstance?.dosageUnit } ${productInstance?.dosageForm?.name }
 													--%>

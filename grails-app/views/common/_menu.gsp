@@ -166,7 +166,7 @@ $(function() {
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="product" action="browse"><g:message code="default.show.label" args="['Products']" default="Show Products"/></g:link>
+					<g:link class="bullet" controller="product" action="browse"><g:message code="default.edit.label" args="['Products']" default="Show Products"/></g:link>
 				</span>
 			</li>		
 			<li class="">

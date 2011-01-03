@@ -14,7 +14,7 @@ class Category {
 	static hasMany = [ categories : Category ];
 	static mappedBy = [ categories : "parentCategory" ];
 	static belongsTo = [ parentCategory : Category ];
-	static transients = [ "parents" ]
+	static transients = [ "parents", "children" ]
 	static mapping = {
 		sort name:"desc"
 		categories sort:"name"
@@ -32,8 +32,12 @@ class Category {
 
 	List getParents() { 
 		def parents = []
-		getAllParents(this, parents)		
-		return (parents ? parents.reverse() : []);
+		getAllParents(this, parents)	
+		if (parents) { 
+			parents = parents.reverse();
+			parents.remove(0);
+		}
+		return (parents?: []);
 	}
 	
 
@@ -48,6 +52,12 @@ class Category {
 			}
 		}
 	}
+	
+	def getChildren() {
+		return categories ? categories*.children.flatten() + categories : []
+	}
+
+	
 
 
 	
