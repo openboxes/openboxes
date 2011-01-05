@@ -18,8 +18,11 @@ $(function() {
 <div id="leftnavMenu" class="menu">
 	<h3 class="heading" >
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_tile.png')}"  alt="Dashboard" style="vertical-align: middle"/> &nbsp; 
-		<g:message code="dashboard.label" default="Dashboard"/>
+		<g:link class="bullet" controller="dashboard" action="index">
+			<g:message code="dashboard.label" default="Dashboard"/>
+		</g:link>
 	</h3>
+	<%-- 
 	<div class="menuSection">
 		<ul>
 			<li class="">
@@ -27,20 +30,16 @@ $(function() {
 					<g:link class="bullet" controller="dashboard" action="index"><g:message code="default.show.label" args="['Dashboard']" default="Show Dashboard"/></g:link>
 				</span>
 			</li>				
-			<%-- 
-			<li class="">
-				<span class="menuButton">
-					<g:link class="bullet" controller="sync" action="index"><g:message code="sync.list.label"  default="Show sync dashboard"/></g:link>
-				</span>
-			</li>
-			--%>				
 		</ul>
 	</div>
-	
+	--%>
 	<h3 class="heading">
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'cart.png')}" alt="Orders" style="vertical-align: middle"/> &nbsp; 
-		<g:message code="order.label"  default="Orders"/>
+		<g:link class="browse" class="bullet" controller="catalog" action="list">
+			<g:message code="order.label"  default="Orders"/>
+		</g:link>
 	</h3>
+	<%-- 
 	<div class="menuSection">									
 		<ul>
 
@@ -52,15 +51,18 @@ $(function() {
 
 		</ul>	
 	</div>
-	
+	--%>
 	
 	<h3 class="heading" >
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}"  alt="Shipping" style="vertical-align: middle"/> &nbsp; 
-		<g:message code="shipping.label"  default="Shipping"/>
+		<g:link class="bullet" controller="shipment" action="listShipping">
+			<g:message code="shipping.label"  default="Shipping"/>
+		</g:link>
 	</h3>
+	<%-- 
 	<div class="menuSection">
 		<ul>
-			<%-- 
+			<!-- 
 			<li class="">
 				<span class="menuButton">
 					<g:link class="bullet" controller="createShipment" action="shoppingCart"><g:message code="shipment.create.label" default="shopping cart wizard" /></g:link>
@@ -77,7 +79,7 @@ $(function() {
 					<g:link class="bullet" controller="shipment" action="create" params="['type':'outgoing']"><g:message code="shipment.create.label" default="Create Shipment" /></g:link>
 				</span>
 			</li>					
-			--%>					
+			-->
 			<li class="">
 				<span class="menuButton">
 					<g:link class="bullet" controller="shipment" action="listShipping"><g:message code="shipment.listShipping.label"  default="Show Shipments "/></g:link>
@@ -88,7 +90,7 @@ $(function() {
 					<g:link class="bullet" controller="createShipment" action="index"><g:message code="suitcase.add.label" default="Add Suitcase" args="['Suitcase']"/></g:link>
 				</span>
 			</li>					
-			<%-- 			
+			<!-- 			
 			<li class="">
 				<span class="menuButton">
 					<g:link class="bullet" controller="shipment" action="listShipping" params="['activityType':'SHIPPING', 'browseBy':'eventStatus']"><g:message code="shipment.listShippingByStatus.label"  default="Show By Status"/></g:link>
@@ -106,31 +108,17 @@ $(function() {
 					</span>
 				</li>
 			</g:each>
-			--%>
-			
-			<%-- 
-			<g:each in="${org.pih.warehouse.core.EventType.list()}" var="eventType">
-				<g:if test="${eventType?.activityType?.name == 'Shipping'}">
-					<li class="">
-						<span class="menuButton">
-							<g:link class="bullet" controller="shipment" action="listShipping" params="['eventType.id':eventType.id]"><g:message code="shipment.list.outgoing.label"  default="show ${eventType?.name?.toLowerCase()}"/></g:link>
-						</span>
-					</li>
-				</g:if>
-			</g:each>
-			<li class="">
-				<span class="menuButton">
-					<g:link class="invalid" controller="shipment" action="listShipping" params="['eventType.id':0]"><g:message code="shipment.list.outgoing.label"  default="show invalid shipments"/></g:link>
-				</span>
-			</li>			
-			--%>
-									
+			-->
 		</ul>										
 	</div>
+	--%>
 	<h3 class="heading">
 		<img src="${createLinkTo(dir:'images/icons/',file:'handtruck.png')}" width="16" height="16" alt="Receiving" style="vertical-align: middle"/> &nbsp; 
-		<g:message code="receiving.label"  default="Receiving"/>
+		<g:link class="bullet" controller="shipment" action="listReceiving">
+			<g:message code="receiving.label"  default="Receiving"/>
+		</g:link>
 	</h3>
+	<%-- 
 	<div class="menuSection">
 		<ul>
 			<li class="">
@@ -145,10 +133,14 @@ $(function() {
 			</li>		
 		</ul>										
 	</div>
+	--%>
 	<h3 class="heading">
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'table_refresh.png')}" alt="Inventory" style="vertical-align: middle"/> &nbsp; 
-		<g:message code="inventory.label"  default="Inventory"/>
+		<g:link class="bullet" controller="inventory" action="browse">
+			<g:message code="inventory.label"  default="Inventory"/>
+		</g:link>
 	</h3>
+	<%-- 
 	<div class="menuSection">									
 		<ul>
 			<li>
@@ -157,11 +149,15 @@ $(function() {
 				</span>
 			</li>
 		</ul>	
-	</div>							
+	</div>
+	--%>							
 	<h3 class="heading">
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" alt="Products" style="vertical-align: middle"/> &nbsp; 
-		<g:message code="product.label" default="Product" />
+		<g:link class="bullet" controller="product" action="browse">
+			<g:message code="product.label" default="Products" />
+		</g:link>
 	</h3>
+	<%-- 
 	<div class="menuSection">									
 		<ul>
 			<li class="">
@@ -176,7 +172,7 @@ $(function() {
 			</li>
 			
 			
-<!-- 			
+		<!-- 			
 			<li class="">
 				<span class="menuButton">
 					<g:link class="bullet" controller="product" action="create"><g:message code="default.add.label" args="['Product']" default="Add New Product" /></g:link>
@@ -187,16 +183,17 @@ $(function() {
 					<g:link class="bullet" controller="product" action="importProducts"><g:message code="default.import.label" args="['Products']" default="Import New Products" /></g:link>
 				</span>
 			</li>						
- -->			
-			<%-- 
-				<li><span class="menuButton"><g:link class="list" controller="product" action="list"><g:message code="default.list.label"  args="['Product']"/></g:link></span></li>		
-			--%>
+ 		-->			
 		</ul>	
-	</div>						
+	</div>
+	--%>						
 	<h3 class="heading">
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'map.png')}" alt="Locations" style="vertical-align: middle"/> &nbsp; 
-		<g:message code="locations.label"  default="Locations"/>
+		<g:link class="bullet" controller="warehouse" action="list">
+			<g:message code="locations.label"  default="Locations"/>
+		</g:link>
 	</h3>
+	<%-- 
 	<div class="menuSection">								
 		<ul>
 			<li class="">
@@ -224,11 +221,12 @@ $(function() {
 			 -->
 		</ul>
 	</div>																	
-		
+	--%>
 	<h3 class="heading">
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'chart_bar.png')}" alt="Reports" style="vertical-align: middle"/> &nbsp; 
 		<g:message code="settings.label" args="['Reports']" default="Reports"/>
 	</h3>
+	<%-- 
 	<div class="menuSection">
 		<ul>
 			<!-- 
@@ -236,11 +234,14 @@ $(function() {
 			-->
 		</ul>
 	</div>					
-
+	--%>
 	<h3 class="heading">
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'user.png')}" alt="Users" style="vertical-align: middle"/> &nbsp; 
-		<g:message code="users.label"  default="Users"/>
+		<g:link class="bullet" controller="user" action="list">
+			<g:message code="users.label"  default="Users"/>
+		</g:link>
 	</h3>			
+	<%-- 
 	<div class="menuSection">
 		<ul>			
 			<li class="">
@@ -260,10 +261,14 @@ $(function() {
 			</li>
 		</ul>
 	</div>
+	--%>
 	<h3 class="heading">
 		<img src="${createLinkTo(dir:'images/icons/',file:'wrench.png')}" alt="Administration" style="vertical-align: middle"/> &nbsp; 
-		<g:message code="metadata.label"  default="Administration"/>
+		<g:link class="bullet" controller="admin" action="index">
+			<g:message code="metadata.label"  default="Settings"/>
+		</g:link>
 	</h3>
+	<%-- 
 	<div class="menuSection">
 		<ul>
 			<li class="">
@@ -341,6 +346,6 @@ $(function() {
 			-->
 		</ul>
 	</div>
-	
+	--%>
 	
 </div>

@@ -3,11 +3,13 @@
 	<g:each var="child" in="${root.categories }">	
 		<li>
 			<g:link controller="product" action="browse" params="[categoryId: child?.id ]">${child?.name }</g:link>
+			<%--
 			<g:if test="${child?.categories}">
 				<ul>
 					<g:render template="../category/menuTreeOptions" model="${['root': child, 'level': level, 'selected': selected]}"/>
 				</ul>
 			</g:if>
+			 --%>
 		</li>
 	</g:each>
 </g:if>

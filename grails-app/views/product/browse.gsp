@@ -29,16 +29,20 @@
 								</div>
 								<div style="text-align:left;">
 									<style>
-										#myMenu li { margin: 12px; padding: 10px; }
-										#myMenu ul li { margin: 12px; padding: 10px; }
+										.myMenu li { margin: 2px; padding: 2px; }
+										.myMenu ul li { margin: 2px; padding: 2px; }
 									</style>							
-									<ul id="myMenu">
+									<ul class="myMenu">
 										<g:render template="../category/menuTreeOptions" model="[root:selectedCategory, selected:selectedCategory, level: 0]"/>
 									</ul>
+								</div>
+								<div style="text-align: left; padding: 5px; background-color: #f5f5f5;">
+									&nbsp;
 								</div>
 								<div style="text-align: center; padding: 10px;">
 									<g:render template="../category/menuTree" model="[root:rootCategory, selected:selectedCategory, level: 0]"/>
 								</div>
+								
 								<br clear="all"/>
 								 
 								
@@ -66,17 +70,11 @@
 							</fieldset>					
 						</td>			
 						<td>
-	            			<table>
-	            				<thead>
-		            				<tr>
-		            					<th>Products</th>
-		            				</tr>
-		            			</thead>
-		            			<tbody>
-				            		<g:each var="key" in="${productsByCategory.keySet() }">
-				            			<tr>
-				            				<th><h2><g:render template="../category/breadcrumb" model="[categoryInstance: key]"/></h2></th>
-				            			</tr>
+		            		<g:each var="key" in="${productsByCategory.keySet() }">
+		            			<h2><g:render template="../category/breadcrumb" model="[categoryInstance: key]"/></h2>
+		            		
+	            				<table border="1">
+			            			<tbody>
 				            			<g:each var="productInstance" in="${productsByCategory.get(key) }" status="i">
 											 <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 												<td>
@@ -87,9 +85,9 @@
 											</tr>				            				
 				            			
 				            			</g:each>
-				            		</g:each>
-		            			</tbody>
-	            			</table>
+			            			</tbody>
+		            			</table>
+		            		</g:each>
 		            		<div style="text-align: right; border-top: 1px solid #f7f7f7; padding: 10px;">
 		            			Showing ${productInstanceList?.totalCount } products
 		            		</div>

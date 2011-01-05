@@ -71,16 +71,6 @@
             		<td width="25%">          
             			<fieldset>  		
             				<div>
-	            				<h2>Search</h2>
-	            				<g:form>
-	            					<img src="${createLinkTo(dir: '/images/icons/silk', file: 'magnifier.png')}"/>
-	            					<g:textField name="search"/>
-	            					<g:submitButton name="submit" value="Go"/>
-	            				</g:form>
-            				</div>
-            				<br/>
-            			
-            				<div>
 					       		<h2>Browse by category</h2>
 								<%-- <g:render template="menuTree" model="[category:rootCategory, level: 0]"/>--%>
 								<g:render template="dynamicMenuTree" model="[category:rootCategory, level: 0, selectedCategory: categoryInstance]"/>
