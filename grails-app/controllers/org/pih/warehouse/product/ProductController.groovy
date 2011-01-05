@@ -10,7 +10,9 @@ import au.com.bytecode.opencsv.CSVReader;
 class ProductController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"];    
-
+	def inventoryService;
+	
+	
     def index = {
         redirect(action: "list", params: params)
     }
@@ -60,20 +62,15 @@ class ProductController {
 		}		
 		*/
 		
-		def results = []
-		def categories = (selectedCategory?.children)?selectedCategory.children:[];
-		categories << selectedCategory;
-		if (categories) { 
-			results = Product.createCriteria().list(max:params.max, offset: params.offset ?: 0) { 		
-				'in'("category", categories)		
-			}
-		}
-		def productsByCategory = results.groupBy { it.category } 
+		def products = inventoryService.getProductsByCategory(selectedCategory, params);
+		def productsByCategory = products.groupBy { it.category } 
 				
 		def rootCategory = Category.findByName("ROOT");
-
-		render(view:'browse', model:[productInstanceList : results, 
-    	                             productInstanceTotal: results.totalCount, 
+		selectedCategory = (selectedCategory)?:rootCategory;
+		
+		
+		render(view:'browse', model:[productInstanceList : products, 
+    	                             productInstanceTotal: products.totalCount, 
 									 productsByCategory : productsByCategory,
 									 rootCategory : rootCategory,
 									 categoryInstance: selectedCategory,

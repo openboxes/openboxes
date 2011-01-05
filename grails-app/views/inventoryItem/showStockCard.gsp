@@ -28,9 +28,10 @@
 
 	<div class="dialog">
 		<fieldset>
-			<h1>${productInstance?.name } ${productInstance?.dosageStrength } ${productInstance?.dosageUnit }</h1>
-			<span style="padding-left: 15px;"><a href="${createLink(controller: 'inventory', action: 'browse', params: ['productType.id' : productInstance?.productType?.id])}">&laquo; back to ${productInstance?.productType?.name } </a></span>
-			
+			<h1>${productInstance?.name }</h1>
+			<g:if test="${productInstance?.category }">
+				<span style="padding-left: 15px;"><a href="${createLink(controller: 'inventory', action: 'browse', params: ['categoryIid' : productInstance?.category?.id])}">&laquo; back to ${productInstance?.category?.name } </a></span>
+			</g:if>
 <%-- 
 						&nbsp;
 						<span style="font-size: 1em;">					

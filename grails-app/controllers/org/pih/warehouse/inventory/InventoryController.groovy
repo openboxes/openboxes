@@ -34,10 +34,12 @@ class InventoryController {
 			redirect(action: "create")
 		}
 		
-		// Get all product types and set the default product type 
-		
-		def categoryInstance = Category.get(params?.categoryId)
+		// Get all product types and set the default product type 		
 		def rootCategory = Category.findByName("ROOT");
+		def categoryInstance = Category.get(params?.categoryId)
+		categoryInstance = (categoryInstance)?:rootCategory;
+		def productList = (categoryInstance) ? inventoryService.getProductsByCategory(categoryInstance, params) : Product.getAll();
+		
 		[
 			warehouseInstance: warehouseInstance,
 			inventoryInstance: warehouseInstance.inventory,
@@ -45,8 +47,7 @@ class InventoryController {
 			productMap : inventoryService.getProductMap(warehouseInstance?.id),
 			inventoryMap : inventoryService.getInventoryMap(warehouseInstance?.id),
 			inventoryLevelMap : inventoryService.getInventoryLevelMap(warehouseInstance?.id),
-			//productInstanceList : Product.getAll(),
-			productList : inventoryService.getProducts(warehouseInstance?.id, categoryInstance),
+			productList : productList,
 			rootCategory: rootCategory
 		]
 	}

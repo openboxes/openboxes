@@ -28,24 +28,35 @@ class InventoryService {
 		return Product.getAll().groupBy { it.categories*.parents } 
 	}
 	
+	/*
 	List getProducts(Long id, Category category) { 
-		def myList = [] 
-		def myCategories = [1, 18]
+		def productList = [] 
 		if (category) { 
-			
-			myList = Product.createCriteria().list {
+			productList = Product.createCriteria().list {
 				categories { 
 					eq ("id", category?.id)
 				}
 			}
 		}
-		log.info "category " + category + " " + myList?.size();
+		log.info "category " + category?.name + " " + productList?.size();
 		
 		
-		return myList;
+		return productList;
+	}*/
+	
+	List getProductsByCategory(Category category, Map params) { 
+		def products = [];
+		if (category) { 
+			def categories = (category?.children)?category.children:[];
+			categories << category;
+			if (categories) {
+				products = Product.createCriteria().list(max:params.max, offset: params.offset ?: 0) {
+					'in'("category", categories)
+				}
+			}
+		}
+		return products;
 	}
-	
-	
 	
 	/**
 	 * @param productId
