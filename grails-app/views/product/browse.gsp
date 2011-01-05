@@ -21,20 +21,23 @@
 						<td colspan="2">
 							<div style="text-align: left; padding: 5px; background-color: #fff;">
 								<h2>
+									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'map.png') }"/>
+				            		You are here: 
+								
 									<g:render template="../category/breadcrumb" model="[categoryInstance: selectedCategory]"/>
 								</h2>
 							</div>
 						</td>
 					</tr>
 					<tr>
-						<td width="25%">
-						
-								<div style="text-align:left;">
+						<td width="25%">						
+								<div style="text-align:left; padding-left: 20px;">
 									<style>
 										.myMenu li { margin: 2px; padding: 2px; }
 										.myMenu ul li { margin: 2px; padding: 2px; }
 									</style>							
 									<ul class="myMenu">
+										<b>${selectedCategory?.name }</b>
 										<g:render template="../category/menuTreeOptions" model="[root:selectedCategory, selected:selectedCategory, level: 0, recursive: false]"/>
 									</ul>
 								</div>
@@ -68,31 +71,40 @@
 								--%>						
 						</td>			
 						<td>
-		            		<g:each var="key" in="${productsByCategory.keySet() }">
-		            			<b>
-		            				<g:render template="../category/breadcrumb" model="[categoryInstance: key]"/>
-		            			</b>
-		            		
-	            				<table border="1">
-			            			<tbody>
-				            			<g:each var="productInstance" in="${productsByCategory.get(key) }" status="i">
-											 <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-												<td>
-													<g:link action="edit" id="${productInstance.id}">
-														${fieldValue(bean: productInstance, field: "name") }
-													</g:link>
-												</td>
-											</tr>				            				
-				            			
-				            			</g:each>
-			            			</tbody>
-		            			</table>
-		            		</g:each>
-		            		<div style="text-align: right; border-top: 1px solid #f7f7f7; padding: 10px;">
-		            			Showing ${productInstanceList?.totalCount } products
-		            		</div>
-		            		
+						
+							<g:if test="${productsByCategory }">
+			            		<g:each var="key" in="${productsByCategory.keySet() }">
+			            			<b>
+			            				${key }
+			            			</b>
 			            		
+		            				<table border="0">
+				            			<tbody>
+					            			<g:each var="productInstance" in="${productsByCategory.get(key) }" status="i">
+												 <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+													<td>
+														<g:link action="edit" id="${productInstance.id}">
+															${fieldValue(bean: productInstance, field: "name") }
+														</g:link>
+													</td>
+												</tr>				            				
+					            			
+					            			</g:each>
+				            			</tbody>
+			            			</table>
+			            		</g:each>
+		            		</g:if>
+		            		<g:else>
+			            		<table border="0">
+			            			<tbody>
+			            				<tr>
+			            					<td>
+			            						There are no products under ${selectedCategory?.name }.
+			            					</td>
+			            				</tr>
+			            			</tbody>
+		            			</table>			            		
+			            	</g:else>
 			            		<%-- 
 					            <g:if test="${productInstanceList}">
 					            	<div class="list">						            	
@@ -134,8 +146,25 @@
 									</div>
 								</g:if>
 								--%>
+	       				    <div style="text-align: left; padding: 10px;">
+	       				    
+	       				    	<span class="menuButton">
+		        				    <g:link class="list" controller="product" action="browse">Show all products</g:link>
+		        				</span>
+		        				<span class="menuButton">
+									<g:link class="new" controller="product" action="create" params="['category.id':params.categoryId]"><g:message code="default.add.label" args="['Product']"/></g:link> 			
+	        				    </span>
+	       				    </div>		
 						</td>
 					</tr>
+					<tr>
+						<td colspan="2">
+		            		<div style="text-align: right; border-top: 1px solid #f7f7f7; padding: 10px;">
+		            			Showing ${productInstanceList?.totalCount } products
+		            		</div>
+						</td>
+					</tr>
+					
 				</table>
         	</div>
     	</div>    	

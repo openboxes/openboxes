@@ -69,44 +69,31 @@
             <table>
             
             	<tr>
-					<td style="border-right: 1px solid #f5f5f5;">
+					<td style="border-right: 1px solid #f5f5f5;" width="25%">
          				<h2>Browse by Category</h2>
            				<div>      
            					<ul>
-								<g:if test="${categoryInstance.parentCategory }">
+								<g:if test="${categoryInstance.parentCategory}">
 	           						<li>
-										<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png') }"/>
-										<g:link controller="inventory" action="browse" params="[categoryId: categoryInstance.parentCategory?.id ]">
-											${categoryInstance.parentCategory.name }
-										</g:link>
+	           							<g:if test="${categoryInstance?.parentCategory?.name != 'ROOT' }">
+											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png') }"/>
+											<g:link controller="inventory" action="browse" params="[categoryId: categoryInstance.parentCategory?.id ]">
+												${categoryInstance.parentCategory.name }
+											</g:link>
+										</g:if>
+										<li>
+											<g:render template="dynamicMenuTree" model="[category:categoryInstance?.parentCategory, level: 0, selectedCategory: categoryInstance]"/>
+										</li>
 									</li>
 								</g:if>
-								<li>
-									<ul>
-										<g:if test="${categoryInstance }">
-											<li>
-												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png') }"/>
-												<g:link controller="inventory" action="browse" params="[categoryId: categoryInstance?.id ]">
-													${categoryInstance }
-												</g:link>
-											</li>
-										</g:if>
-									</ul>
-								</li>
-								<li>
-									<ul>
-										<li>
-											<g:render template="dynamicMenuTree" model="[category:categoryInstance, level: 0, selectedCategory: categoryInstance]"/>
-										</li>
-									</ul>
-								</li>
+								<g:else>
+									<li>
+										<g:render template="dynamicMenuTree" model="[category:categoryInstance, level: 0, selectedCategory: categoryInstance]"/>
+									</li>
+								</g:else>
 							</ul>
-							
 						</div>
-       				    <div style="text-align: center; padding: 10px;">
-        				    <g:link controller="inventory" action="browse">Show all products</g:link>
-       				    </div>		
-						
+						<%-- 						
          				<h2>Browse by Site</h2>
            				<div>      
 							<ul>
@@ -121,15 +108,19 @@
 								</g:each>
 							</ul>
 						</div>
+						--%>
 					</td>          
 					<td>
 			            <div> 
 		            		<span>
+		            		
+		            			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'map.png') }"/>
+				            		You are here: 
 		            			<g:if test="${categoryInstance }">
 		            				<g:render template="../category/breadcrumb" model="[categoryInstance:categoryInstance]"/>
 		            			</g:if>
 		            			<g:else>
-		            				All Products
+		            				<b>All Products</b>
 		            			</g:else>
 		            		</span>		
 		            		<script>
@@ -203,8 +194,10 @@
 								</g:else>
 							</table>
 						</div>
-       				    <div style="text-align: center; padding: 10px;">
-        				    <g:link controller="inventory" action="browse">Show all products</g:link>
+       				    <div style="text-align: left; padding: 10px;">
+       				    	<span class="menuButton">
+	        				    <g:link class="list" controller="inventory" action="browse">Show all products</g:link>
+	        				</span>
        				    </div>		
 					</td>
 				</tr>

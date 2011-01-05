@@ -13,9 +13,9 @@
 						<span class="${(selectedCategory?.id==childCategory?.id)?'selected':''}">${childCategory?.name }</span>
 					</g:link>
 				</li>
-				<%-- 
-				<g:render template="dynamicMenuTree" model="${['category': childCategory, 'level': level, 'selectedCategory': selectedCategory]}"/>
-				--%>
+				<g:if test="${(selectedCategory?.id==childCategory?.id)?'selected':''}">
+					<g:render template="dynamicMenuTree" model="${['category': childCategory, 'level': level, 'selectedCategory': selectedCategory]}"/>
+				</g:if>
 			</g:each>
 		</ul>
 	</g:if>
