@@ -28,7 +28,9 @@ class ProductController {
 		def selectedCategory = Category.get(params.categoryId);		
     	def selectedAttribute = Attribute.get(params.attributeId)	
 		
-		
+		def rootCategory = Category.findByName("ROOT");
+		selectedCategory = (selectedCategory)?:rootCategory;
+
     	// Condition types	
     	def allAttributes = Attribute.getAll();
     	
@@ -65,8 +67,6 @@ class ProductController {
 		def products = inventoryService.getProductsByCategory(selectedCategory, params);
 		def productsByCategory = products.groupBy { it.category } 
 				
-		def rootCategory = Category.findByName("ROOT");
-		selectedCategory = (selectedCategory)?:rootCategory;
 		
 		
 		render(view:'browse', model:[productInstanceList : products, 
