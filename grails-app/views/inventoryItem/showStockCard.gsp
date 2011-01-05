@@ -85,6 +85,228 @@
 
 							<table>
 								<tr>
+								
+								
+								
+							<td width="25%">
+								<script>
+									$(document).ready(function() {
+										$("#inventoryLotReport").show();
+										$("#inventoryLotForm").hide();
+										
+										$("#showInventoryLotFormLink").click(function() { 
+											$("#inventoryLotReport").hide(''); 
+											$("#inventoryLotForm").show(''); 
+										});
+										$("#showInventoryLotReportLink").click(function() { 
+											$("#inventoryLotReport").show(''); 
+											$("#inventoryLotForm").hide(''); 
+										});
+
+									});
+								</script>
+								
+								
+								<fieldset>
+									<legend>Product Details</legend>
+																						
+									<div id="inventoryLotReport" style="text-align: right;">										
+										<div style="text-align: right">
+											<a href="#" id="showInventoryLotFormLink">
+												<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
+												edit lots</a>
+										</div>
+										<table border="1" style="border:1px solid #f5f5f5">
+											<thead>
+												<tr>
+													<th>Lot Number</th>
+													<th>Expires</th>
+													<th>Qty</th>
+												</tr>											
+											</thead>
+											<tbody>
+												<g:if test="${!inventoryItemList}">
+													<tr class="odd">
+														<td colspan="3" style="text-align: center">
+															No lots
+														</td>
+													</tr>
+												</g:if>
+											
+												<g:each var="itemInstance" in="${inventoryItemList }" status="status">				
+													<tr class="${(status%2==0)?'odd':'even' }">
+														<td>${itemInstance?.lotNumber?:'<span class="fade">EMPTY</span>' }</td>
+														<td>
+															<g:if test="${itemInstance?.inventoryLot?.expirationDate}">
+																<g:formatDate date="${itemInstance?.inventoryLot?.expirationDate }" format="dd/MMM/yy" />
+															</g:if>
+															<g:else>
+																<span class="fade">n/a</span>
+															</g:else>
+															
+															
+														</td>
+														<td style="text-align: center;">${itemInstance?.quantity }</td>												
+													</tr>
+												</g:each>
+											</tbody>
+											<tfoot>
+												<tr>
+													<th>Total</th>
+													<th></th>
+													<th style="text-align: center;">${inventoryItemList*.quantity.sum() }</th>
+												</tr>
+											</tfoot>
+										</table>										
+									</div>										
+									<div id="inventoryLotForm">
+										<g:form action="saveInventoryLot" autocomplete="off">
+											<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
+											<g:hiddenField name="product.id" value="${productInstance?.id}"/>
+											<g:hiddenField name="active" value="true"/>
+											<g:hiddenField name="createdBy" value="${session?.user?.id }"/>		
+											<g:hiddenField name="initialQuantity" value="0"/>							
+											<g:hiddenField name="inventoryItemType" value="${org.pih.warehouse.inventory.InventoryItemType.NON_SERIALIZED}"/>
+												
+											<g:hasErrors bean="${inventoryLotInstance}">
+									            <div class="errors">
+									                <g:renderErrors bean="${inventoryLotInstance}" as="list" />
+									            </div>
+								            </g:hasErrors>									
+												
+												<table border="1" style="border:1px solid #f5f5f5">
+													<thead>
+														<tr>
+															<th>Lot Number</th>
+															<th>Expires</th>
+															<th>&nbsp;</th>
+														</tr>											
+													</thead>
+													<tbody>
+														<g:each var="itemInstance" in="${inventoryItemList }" status="i">				
+															<tr class="${(i%2 == 0)?'odd':'even' }">
+																<td>${itemInstance?.lotNumber?:'<span class="fade">EMPTY</span>' }</td>
+																<td><g:formatDate date="${itemInstance?.inventoryLot?.expirationDate }" format="dd/MMM/yy" /></td>
+																<td style="text-align:center;">
+																	<g:link controller="inventoryItem" action="deleteInventoryItem" id="${itemInstance?.id }" params="['inventory.id':inventoryInstance?.id]">
+																		<img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>
+																	</g:link>
+																</td>
+															</tr>
+														</g:each>
+														
+														<tr>
+															<td>
+																<g:textField name="lotNumber" size="10"/>
+															</td>
+															<td nowrap>
+																<g:jqueryDatePicker id="expirationDate" name="expirationDate" value="" format="MM/dd/yyyy"
+																showTrigger="false" />
+															</td>
+															<td>
+															</td>
+														</tr>
+													</tbody>
+												</table>
+												<div class="buttonBar" >
+													<g:submitButton name="save" value="Save"/>
+													&nbsp;
+													<a href="#" id="showInventoryLotReportLink">
+														<img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/> Cancel</a>
+												</div>												
+												
+												
+										</g:form>
+									</div>
+									<br/>
+								
+									<script>
+										$(document).ready(function() {
+											$("#showWarningLevels").show();
+											$("#configureWarningLevels").hide();
+											$("#configureWarningLevelsLink").click(function() { 
+												$("#showWarningLevels").hide(); 
+												$("#configureWarningLevels").show(); 
+											});
+											$("#showWarningLevelsLink").click(function() { 
+												$("#showWarningLevels").show(); 
+												$("#configureWarningLevels").hide(); 
+											});
+	
+										});
+									</script>								
+								
+									<div id="showWarningLevels">
+										<div style="text-align: right">			
+											<a href="#" id="configureWarningLevelsLink">
+											<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
+											configure</a>
+										</div>
+										<table>
+											<tr class="prop">
+												<td class="name"><label>Minimum Quantity </label></td>
+												<td class="value">
+													${inventoryLevelInstance?.minQuantity?:0 }
+												</td>
+											</tr>
+											<tr class="prop">
+												<td class="name"><label>Reorder Quantity</label></td>
+												<td class="value">
+													${inventoryLevelInstance?.reorderQuantity?:0 }
+												</td>
+											</tr>
+											<tr class="prop">
+												<td class="name"><label>Maximum Quantity</label></td>
+												<td class="value">
+													${inventoryLevelInstance?.maxQuantity?:0}
+												</td>
+											</tr>
+										</table>	
+									</div>
+								
+									<div id="configureWarningLevels">
+										<g:form>
+											<g:hiddenField name="id" value="${inventoryLevelInstance?.id}"/>
+											<g:hiddenField name="product.id" value="${productInstance?.id}"/>
+											<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
+												<table>
+													<tr class="prop">
+														<td class="name"><label>Minimum Quantity </label></td>
+														<td class="value">
+															<g:textField name="minQuantity" value="${inventoryLevelInstance?.minQuantity }" size="3"/>
+														</td>
+													</tr>
+													<tr class="prop">
+														<td class="name"><label>Reorder Quantity</label></td>
+														<td class="value">
+															<g:textField name="reorderQuantity" value="${inventoryLevelInstance?.reorderQuantity }" size="3"/>
+														</td>
+													</tr>
+													<tr class="prop">
+														<td class="name"><label>Maximum Quantity</label></td>
+														<td class="value">
+															<g:textField name="maxQuantity" value="${inventoryLevelInstance?.maxQuantity }" size="3"/>
+														</td>
+													</tr>
+												</table>
+												<div class="buttonBar" style="text-align: center;">
+								                    <g:actionSubmit class="save" action="saveInventoryLevel" value="${message(code: 'default.button.save.label', default: 'Save')}" />
+								                    &nbsp;
+													<a href="#" id="showWarningLevelsLink">
+														<img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/> Cancel</a>
+							                    </div>
+										</g:form>								
+									</div>				
+								</fieldset>
+							</td>
+								
+								
+								
+								
+								
+								
+								
+								
 									<td width="75%">
 										<fieldset>
 											<legend>Stock Card</legend>
@@ -533,230 +755,6 @@
 								</fieldset>
 							</td>
 
-
-
-
-						
-							<td width="25%">
-								<script>
-									$(document).ready(function() {
-										$("#inventoryLotReport").show();
-										$("#inventoryLotForm").hide();
-										
-										$("#showInventoryLotFormLink").click(function() { 
-											$("#inventoryLotReport").hide(''); 
-											$("#inventoryLotForm").show(''); 
-										});
-										$("#showInventoryLotReportLink").click(function() { 
-											$("#inventoryLotReport").show(''); 
-											$("#inventoryLotForm").hide(''); 
-										});
-
-									});
-								</script>		
-								<div id="inventoryLotReport" style="text-align: right;">										
-									<fieldset>
-										<legend>Quantity by Lots</legend>
-										<table border="1" style="border:1px solid #f5f5f5">
-											<thead>
-												<tr>
-													<th>Lot Number</th>
-													<th>Expires</th>
-													<th>Qty</th>
-												</tr>											
-											</thead>
-											<tbody>
-												<g:if test="${!inventoryItemList}">
-													<tr class="odd">
-														<td colspan="3" style="text-align: center">
-															No lots
-														</td>
-													</tr>
-												</g:if>
-											
-												<g:each var="itemInstance" in="${inventoryItemList }" status="status">				
-													<tr class="${(status%2==0)?'odd':'even' }">
-														<td>${itemInstance?.lotNumber?:'<span class="fade">EMPTY</span>' }</td>
-														<td>
-															<g:if test="${itemInstance?.inventoryLot?.expirationDate}">
-																<g:formatDate date="${itemInstance?.inventoryLot?.expirationDate }" format="dd/MMM/yy" />
-															</g:if>
-															<g:else>
-																<span class="fade">n/a</span>
-															</g:else>
-															
-															
-														</td>
-														<td style="text-align: center;">${itemInstance?.quantity }</td>												
-													</tr>
-												</g:each>
-											</tbody>
-											<tfoot>
-												<tr>
-													<th>Total</th>
-													<th></th>
-													<th style="text-align: center;">${inventoryItemList*.quantity.sum() }</th>
-												</tr>
-											</tfoot>
-										</table>										
-									</fieldset>										
-									<div style="text-align: right">
-										<a href="#" id="showInventoryLotFormLink">
-											<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
-											edit lots</a>
-									</div>
-								</div>										
-								<div id="inventoryLotForm">
-									<g:form action="saveInventoryLot" autocomplete="off">
-										<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
-										<g:hiddenField name="product.id" value="${productInstance?.id}"/>
-										<g:hiddenField name="active" value="true"/>
-										<g:hiddenField name="createdBy" value="${session?.user?.id }"/>		
-										<g:hiddenField name="initialQuantity" value="0"/>							
-										<g:hiddenField name="inventoryItemType" value="${org.pih.warehouse.inventory.InventoryItemType.NON_SERIALIZED}"/>
-											
-										<g:hasErrors bean="${inventoryLotInstance}">
-								            <div class="errors">
-								                <g:renderErrors bean="${inventoryLotInstance}" as="list" />
-								            </div>
-							            </g:hasErrors>									
-																
-										
-										<fieldset>
-											<legend>Quantity by Lots</legend>
-											
-											<table border="1" style="border:1px solid #f5f5f5">
-												<thead>
-													<tr>
-														<th>Lot Number</th>
-														<th>Expires</th>
-														<th>&nbsp;</th>
-													</tr>											
-												</thead>
-												<tbody>
-													<g:each var="itemInstance" in="${inventoryItemList }" status="i">				
-														<tr class="${(i%2 == 0)?'odd':'even' }">
-															<td>${itemInstance?.lotNumber?:'<span class="fade">EMPTY</span>' }</td>
-															<td><g:formatDate date="${itemInstance?.inventoryLot?.expirationDate }" format="dd/MMM/yy" /></td>
-															<td style="text-align:center;">
-																<g:link controller="inventoryItem" action="deleteInventoryItem" id="${itemInstance?.id }" params="['inventory.id':inventoryInstance?.id]">
-																	<img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>
-																</g:link>
-															</td>
-														</tr>
-													</g:each>
-													
-													<tr>
-														<td>
-															<g:textField name="lotNumber" size="10"/>
-														</td>
-														<td nowrap>
-															<g:jqueryDatePicker id="expirationDate" name="expirationDate" value="" format="MM/dd/yyyy"
-															showTrigger="false" />
-														</td>
-														<td>
-														</td>
-													</tr>
-												</tbody>
-											</table>
-											<div class="buttonBar" >
-												<g:submitButton name="save" value="Save"/>
-												&nbsp;
-												<a href="#" id="showInventoryLotReportLink">
-													<img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/> Cancel</a>
-											</div>												
-											
-											
-										</fieldset>
-									</g:form>
-								</div>
-								<br/>
-								
-								
-								<script>
-									$(document).ready(function() {
-										$("#showWarningLevels").show();
-										$("#configureWarningLevels").hide();
-										$("#configureWarningLevelsLink").click(function() { 
-											$("#showWarningLevels").hide(); 
-											$("#configureWarningLevels").show(); 
-										});
-										$("#showWarningLevelsLink").click(function() { 
-											$("#showWarningLevels").show(); 
-											$("#configureWarningLevels").hide(); 
-										});
-
-									});
-								</script>								
-								
-								<div id="showWarningLevels">
-									<fieldset>				
-										<legend>Warning Levels</legend>
-										<table>
-											<tr class="prop">
-												<td class="name"><label>Minimum Quantity </label></td>
-												<td class="value">
-													${inventoryLevelInstance?.minQuantity?:0 }
-												</td>
-											</tr>
-											<tr class="prop">
-												<td class="name"><label>Reorder Quantity</label></td>
-												<td class="value">
-													${inventoryLevelInstance?.reorderQuantity?:0 }
-												</td>
-											</tr>
-											<tr class="prop">
-												<td class="name"><label>Maximum Quantity</label></td>
-												<td class="value">
-													${inventoryLevelInstance?.maxQuantity?:0}
-												</td>
-											</tr>
-										</table>			
-									</fieldset>
-									<div style="text-align: right">			
-										<a href="#" id="configureWarningLevelsLink">
-										<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
-										configure</a>
-									</div>
-								</div>
-								
-								<div id="configureWarningLevels">
-									<g:form>
-										<g:hiddenField name="id" value="${inventoryLevelInstance?.id}"/>
-										<g:hiddenField name="product.id" value="${productInstance?.id}"/>
-										<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
-										<fieldset>				
-											<legend>Warning Levels</legend>
-											<table>
-												<tr class="prop">
-													<td class="name"><label>Minimum Quantity </label></td>
-													<td class="value">
-														<g:textField name="minQuantity" value="${inventoryLevelInstance?.minQuantity }" size="3"/>
-													</td>
-												</tr>
-												<tr class="prop">
-													<td class="name"><label>Reorder Quantity</label></td>
-													<td class="value">
-														<g:textField name="reorderQuantity" value="${inventoryLevelInstance?.reorderQuantity }" size="3"/>
-													</td>
-												</tr>
-												<tr class="prop">
-													<td class="name"><label>Maximum Quantity</label></td>
-													<td class="value">
-														<g:textField name="maxQuantity" value="${inventoryLevelInstance?.maxQuantity }" size="3"/>
-													</td>
-												</tr>
-											</table>
-											<div class="buttonBar" style="text-align: center;">
-							                    <g:actionSubmit class="save" action="saveInventoryLevel" value="${message(code: 'default.button.save.label', default: 'Save')}" />
-							                    &nbsp;
-												<a href="#" id="showWarningLevelsLink">
-													<img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/> Cancel</a>
-						                    </div>
-										</fieldset>									
-									</g:form>								
-								</div>				
-							</td>
 						</tr>
 					</table>
 				</fieldset>				
