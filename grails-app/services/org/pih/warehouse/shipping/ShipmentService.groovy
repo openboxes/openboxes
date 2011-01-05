@@ -61,6 +61,7 @@ class ShipmentService {
 	
 	
 	Map<EventType, ListCommand> getShipmentsByStatus(List shipments) {
+		//return shipments.groupBy { it.mostRecentStatus } 
 		def shipmentMap = new TreeMap<EventType, ListCommand>();
 		shipments.each {
 			
@@ -73,8 +74,7 @@ class ShipmentService {
 			shipmentList.objectList.add(it);
 			shipmentMap.put(key, shipmentList)
 		}
-		log.info("shipmentMap: " + shipmentMap)
-		
+		//log.info("shipmentMap: " + shipmentMap)		
 		return shipmentMap;
 	}
 	

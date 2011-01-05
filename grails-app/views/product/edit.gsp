@@ -53,7 +53,7 @@
 	                                	
 										<select name="category.id">
 											<option value="">no parent</option>
-											<g:render template="../category/selectOptions" model="[root:rootCategory, selected:productInstance?.category, level: 0]"/>
+											<g:render template="../category/selectOptions" model="[category:rootCategory, selected:productInstance?.category, level: 0]"/>
 										</select>	      
 									</td>
 								</tr>	

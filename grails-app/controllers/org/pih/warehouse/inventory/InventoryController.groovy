@@ -35,15 +35,9 @@ class InventoryController {
 		}
 		
 		// Get all product types and set the default product type 
-		def productTypes = ProductType.getAll()
-		def productType = ProductType.get(params?.productType?.id);
-		if (!productType) { 
-			productType = productTypes.head();
-		}
 		
 		def categoryInstance = Category.get(params?.categoryId)
 		def rootCategory = Category.findByName("ROOT");
-		
 		[
 			warehouseInstance: warehouseInstance,
 			inventoryInstance: warehouseInstance.inventory,
@@ -53,9 +47,7 @@ class InventoryController {
 			inventoryLevelMap : inventoryService.getInventoryLevelMap(warehouseInstance?.id),
 			//productInstanceList : Product.getAll(),
 			productList : inventoryService.getProducts(warehouseInstance?.id, categoryInstance),
-			rootCategory: rootCategory,
-			productType: productType,
-			productTypes: productTypes
+			rootCategory: rootCategory
 		]
 	}
 	

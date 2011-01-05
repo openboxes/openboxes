@@ -8,4 +8,7 @@
 	<span class="menuButton">
 		<g:link class="edit" controller="category" action="tree"><g:message code="default.edit.label" args="['Categories']"/></g:link>
 	</span>
+	<span class="menuButton">
+		<g:link class="edit" controller="attribute" action="list"><g:message code="default.edit.label" args="['Attributes']"/></g:link>
+	</span>
 </div>

@@ -11,14 +11,16 @@ class CategoryController {
 	
 	def tree = { 
 		log.info params 
-		def categoryInstanceList = Category.findAllByParentCategoryIsNull([sort: "name", order: "asc"]);
-		
-		log.info "categories: " + categoryInstanceList;
-		
-		def rootCategory = Category.findByName("ROOT");
-		[rootCategory: rootCategory ]
+		def categoryInstance = Category.get(params.id)
+		if (!categoryInstance) {
+			flash.message = "Unable to locate category with ID ${params.id}"
+		}
+		def rootCategory = new Category(name: "All Products");
+		rootCategory.categories = Category.findAllByParentCategoryIsNull([sort: "name", order: "asc"]);
+		[ rootCategory : rootCategory, categoryInstance : categoryInstance ]
 	}
 		
+	/*
 	def editCategory = { 
 		log.info params 
 		def categoryInstance = Category.get(params.id)
@@ -26,8 +28,14 @@ class CategoryController {
 			flash.message = "Unable to locate category with ID ${params.id}" 
 		}
 		def rootCategory = Category.findByName("ROOT");		
-		render(view: "tree", model: [rootCategory: rootCategory, categoryInstance: categoryInstance ])		
+		render(view: "editCategory", model: [rootCategory: rootCategory, categoryInstance: categoryInstance ])		
 	}
+	
+	def createCategory = {
+		def categoryInstance = new Category();
+		def rootCategory = Category.findByName("ROOT");
+		render(view: "createCategory", model: [rootCategory: rootCategory, categoryInstance: categoryInstance ])
+	}*/
 
 	def saveCategory = { 		
 		log.info params;
@@ -41,7 +49,7 @@ class CategoryController {
 		if (!categoryInstance.hasErrors() && categoryInstance.save(flush:true)) {
 			flash.message = "Saved category ${categoryInstance?.name} successfully";
 		}
-		redirect(action: tree);
+		redirect(action: tree, params: params);
 	}
 	
 	def deleteCategory = {

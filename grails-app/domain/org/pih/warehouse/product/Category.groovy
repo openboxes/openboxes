@@ -33,11 +33,7 @@ class Category {
 	List getParents() { 
 		def parents = []
 		getAllParents(this, parents)	
-		if (parents) { 
-			parents = parents.reverse();
-			parents.remove(0);
-		}
-		return (parents?: []);
+		return (parents? parents.reverse() : []);
 	}
 	
 
