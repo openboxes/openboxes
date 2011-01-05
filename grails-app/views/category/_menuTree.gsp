@@ -40,7 +40,8 @@
     });
 </script>
 <!-- <p id="menuLog">You chose: <span id="menuSelection"></span></p>-->
-<a tabindex="0" href="#menu-items1" class="fg-button fg-button-icon-right ui-widget ui-state-default ui-corner-all" id="flyout"><span class="ui-icon ui-icon-triangle-1-s"></span>choose category</a>
+<a tabindex="0" href="#menu-items1" class="fg-button fg-button-icon-right ui-widget ui-state-default ui-corner-all" id="flyout">
+<span class="ui-icon ui-icon-triangle-1-s"></span>choose</a>
 <div id="menu-items1" class="hidden">
 	<ul>
 		<g:render template="../category/menuTreeOptions" model="[root:root, selected:selected, level: 0]"/>

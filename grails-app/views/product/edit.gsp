@@ -45,6 +45,14 @@
 		                <table>
 	                      <tbody>                
 								<tr class="prop">
+									<td valign="top" class="name"><label for="name"><g:message
+										code="product.name.label" default="Product Description" /></label></td>
+									<td valign="top"
+										class="value ${hasErrors(bean: productInstance, field: 'name', 'errors')}">
+									<g:textField name="name" value="${productInstance?.name}" size="40" />
+									</td>
+								</tr>
+								<tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="categories"><g:message code="product.categories.label" default="Category" /></label>
 	                                </td>
@@ -57,15 +65,6 @@
 										</select>	      
 									</td>
 								</tr>	
-								<tr class="prop">
-									<td valign="top" class="name"><label for="name"><g:message
-										code="product.name.label" default="Product Description" /></label></td>
-									<td valign="top"
-										class="value ${hasErrors(bean: productInstance, field: 'name', 'errors')}">
-									<g:textField name="name" value="${productInstance?.name}" size="40" />
-									</td>
-								</tr>
-								
 								<g:each var="attribute" in="${org.pih.warehouse.product.Attribute.list()}" status="status">
 									<tr class="prop">
 										<td valign="top" class="name"><label for="attributes">

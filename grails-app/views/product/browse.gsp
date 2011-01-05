@@ -18,32 +18,31 @@
             <div>            
 				<table>
 					<tr>
+						<td colspan="2">
+							<div style="text-align: left; padding: 5px; background-color: #fff;">
+								<h2>
+									<g:render template="../category/breadcrumb" model="[categoryInstance: selectedCategory]"/>
+								</h2>
+							</div>
+						</td>
+					</tr>
+					<tr>
 						<td width="25%">
-							<fieldset>	
-
-								<h2>Browse by category</h2>								
-								<div style="text-align: left; padding: 5px; background-color: #f5f5f5;">
-									<b>
-										<g:render template="../category/breadcrumb" model="[categoryInstance: selectedCategory]"/>
-									</b>
-								</div>
+						
 								<div style="text-align:left;">
 									<style>
 										.myMenu li { margin: 2px; padding: 2px; }
 										.myMenu ul li { margin: 2px; padding: 2px; }
 									</style>							
 									<ul class="myMenu">
-										<g:render template="../category/menuTreeOptions" model="[root:selectedCategory, selected:selectedCategory, level: 0]"/>
+										<g:render template="../category/menuTreeOptions" model="[root:selectedCategory, selected:selectedCategory, level: 0, recursive: false]"/>
 									</ul>
 								</div>
-								<div style="text-align: left; padding: 5px; background-color: #f5f5f5;">
-									&nbsp;
-								</div>
+								<br clear="all"/><br/>
 								<div style="text-align: center; padding: 10px;">
-									<g:render template="../category/menuTree" model="[root:rootCategory, selected:selectedCategory, level: 0]"/>
+									<g:render template="../category/menuTree" model="[root:rootCategory, selected:selectedCategory, level: 0, recursive: true]"/>
 								</div>
 								
-								<br clear="all"/>
 								 
 								
 								<%-- 
@@ -67,11 +66,12 @@
 									</ul>
 								</g:each>	
 								--%>						
-							</fieldset>					
 						</td>			
 						<td>
 		            		<g:each var="key" in="${productsByCategory.keySet() }">
-		            			<h2><g:render template="../category/breadcrumb" model="[categoryInstance: key]"/></h2>
+		            			<b>
+		            				<g:render template="../category/breadcrumb" model="[categoryInstance: key]"/>
+		            			</b>
 		            		
 	            				<table border="1">
 			            			<tbody>
