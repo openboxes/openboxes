@@ -133,53 +133,31 @@
 	            							<th>Primary Category</th>
 	            						</tr>
 	            					</thead>
-									<g:set var="index" value="${0 }"/>
-				            		<g:each var="key" in="${productsByCategory.keySet() }">
-				            					<%-- 
-				            					<thead>
-							            			<tr>
-							            				<td colspan="${attributeList?.size()+5 }" style="border: 0px;">
-									            			<h2>${key }</h2>
-									            		</td>
-									            	</tr>
-									            	
-					            					<tr>
-				            							<th width="5%">ID</th>
-				            							<th width="10%">Code</th>
-				            							<th>Description</th>
+				            			<tbody>
+											<g:set var="index" value="${0 }"/>
+						            		<g:each var="key" in="${productsByCategory.keySet() }">
+						            			<g:each var="productInstance" in="${productsByCategory.get(key) }" status="i">
+													 <tr class="${(index++ % 2) == 0 ? 'odd' : 'even'}">
+													 	<td>
+															${productInstance?.id }													 	
+													 	</td>
+													 	<td>
+													 		${productInstance?.productCode }
+													 	</td>
+														<td>
+															<g:link action="edit" id="${productInstance.id}">
+																${fieldValue(bean: productInstance, field: "name") }
+															</g:link>
+														</td>
 				            							<g:each var="attribute" in="${attributeList}">
-				            								<th>${attribute.name }</th>
+				            								<td></td>
 				            							</g:each>
-				            							<th>Cold Chain</th>
-				            							<th>Primary Category</th>
-				            						</tr>
-				            					</thead>
-				            					--%>
-						            			<tbody>
-							            			<g:each var="productInstance" in="${productsByCategory.get(key) }" status="i">
-														 <tr class="${(index++ % 2) == 0 ? 'odd' : 'even'}">
-														 	<td>
-																${productInstance?.id }													 	
-														 	</td>
-														 	<td>
-														 		${productInstance?.productCode }
-														 	</td>
-															<td>
-																<g:link action="edit" id="${productInstance.id}">
-																	${fieldValue(bean: productInstance, field: "name") }
-																</g:link>
-															</td>
-					            							<g:each var="attribute" in="${attributeList}">
-					            								<td></td>
-					            							</g:each>
-					            							<td>${(productInstance?.coldChain)?"Yes":"No" }</td>
-					            							<td>${productInstance?.category?.name }</td>
-														</tr>				            				
-							            			
-							            			</g:each>
-						            			</tbody>
-					            			</div>
-					            		</g:each>
+				            							<td>${(productInstance?.coldChain)?"Yes":"No" }</td>
+				            							<td>${productInstance?.category?.name }</td>
+													</tr>							            			
+						            			</g:each>
+						            		</g:each>
+				            			</tbody>
 			            			</table>
 			            		</g:if>
 		            		<g:else>
@@ -248,7 +226,7 @@
 									</div>
 								</g:if>
 								--%>
-	       				    <div style="text-align: left; padding: 10px; border-top: 1px solid #f7f7f7;">
+	       				    <div style="text-align: left; padding: 10px; border-top: 0px solid #f7f7f7;">
 	       				    	<table>
 	       				    		<tr>
 	       				    			<td>

@@ -23,11 +23,18 @@
 	<g:hasErrors bean="${itemInstance}">
 		<div class="errors"><g:renderErrors bean="${itemInstance}" as="list" /></div>
 	</g:hasErrors>
-	<div class="dialog">
-		
+	<div class="dialog">		
+	
+	<%-- 
 			<g:if test="${productInstance?.category }">
-				<span style="padding-left: 15px;"><a href="${createLink(controller: 'inventory', action: 'browse', params: ['categoryId' : productInstance?.category?.id])}">&laquo; back to ${productInstance?.category?.name } </a></span>
-			</g:if>
+				<div style="padding: 15px;">
+					<a href="${createLink(controller: 'inventory', action: 'browse', params: ['categoryId' : productInstance?.category?.id])}">
+					</a>
+					<g:render template="../inventory/breadcrumb" model="${['categoryInstance':productInstance?.category]}"/> 
+					
+				</div>
+			</g:if>			
+	--%>	
 <%-- 
 						&nbsp;
 						<span style="font-size: 1em;">					
@@ -84,7 +91,7 @@
 								
 								
 								
-									<td width="25%">
+									<td style="width: 300px">
 										<script>
 											$(document).ready(function() {
 												$("#inventoryLotReport").show();
@@ -102,13 +109,96 @@
 											});
 										</script>
 										
-										
+										<style>
+											span.name {   } 
+											span.value { font-size: 1.0em; } 
+											span.name:after { content: ": " }
+											th { color: lightgrey; } 
+										</style>
 										<fieldset>
-											<legend>Product Details</legend>
-																								
+											<legend><span class="fade">Product Details</span></legend>
+											<table>
+												<tr class="">	
+													<td style="text-align: left;">
+														<span class="name">Description</span>
+													</td>
+													<td>
+														<span class="value">${productInstance?.name }</span>
+													</td>
+												</tr>
+												<tr class="">	
+													<td style="text-align: left;">
+														<span class="name">Product Code</span>
+													</td>
+													<td>
+														<span class="value">${productInstance?.productCode?:'<span class="fade">none</span>' }</span>
+													</td>
+												</tr>
+												
+												<tr class="">	
+													<td style="text-align: left;">
+														<span class="name">Cold Chain</span>
+													</td>
+													<td>
+														<span class="value">${productInstance?.coldChain?'Yes':'No' }</span>
+													</td>
+												</tr>
+												<tr class="">	
+													<td style="text-align: left;">
+														<span class="name">Category</span>
+													</td>
+													<td>
+														<g:if test="${productInstance?.category?.parentCategory }">
+															<span class="value">${productInstance?.category?.parentCategory?.name } &rsaquo;</span>
+														</g:if>
+														<span class="value">${productInstance?.category?.name }
+													</td>
+												</tr>
+												<g:each var="productAttribute" in="${productAttributes}">
+												<tr>
+													<td style="text-align: left;">
+														<span class="name">${productAttribute?.name }</span>
+													</td>
+													<td>
+														<span class="value">${productAttribute.value }</span>
+													</td>
+												</tr>													
+												</g:each>
+												<tr>
+													<td colspan="3"><hr/></td>
+												</tr>
+												<tr class="">
+													<td style="text-align: left;">
+														<span class="name">Minimum Quantity</span>
+													</td>
+													<td>
+														<span class="value">${inventoryLevelInstance?.minQuantity?:'<span class="fade">Not Configured</span>' }</span>
+													</td>
+												</tr>
+												<tr class="">
+													<td style="text-align: left;">
+														<span class="name">Reorder Quantity</span>
+													</td>
+													<td>
+														<span class="value">${inventoryLevelInstance?.reorderQuantity?:'<span class="fade">Not Configured</span>' }</span>
+													</td>
+												</tr>										
+												<tr class="">
+													<td></td>
+													<td>
+														<div style="text-align: left;">			
+															<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
+															<a href="#" id="configureWarningLevelsLink">
+															Configure</a>
+														</div>													
+													</td>
+												</tr>
+											</table>
 											
-											<h1>${productInstance?.name }</h1>
-										
+											
+											
+											
+											<%-- 								
 											<script>
 												$(document).ready(function() {
 													$("#showWarningLevels").show();
@@ -124,33 +214,27 @@
 			
 												});
 											</script>								
-										
+
 											<div id="showWarningLevels">
+												<table>
+													<tr class="prop">
+														<td style="text-align: right"><label>Minimum Quantity </label></td>
+														<td class="value">
+															${inventoryLevelInstance?.minQuantity?:'Not Configured' }
+														</td>
+													</tr>
+													<tr class="prop">
+														<td style="text-align: right"><label>Reorder Quantity</label></td>
+														<td class="value">
+															${inventoryLevelInstance?.reorderQuantity?:'Not Configured' }
+														</td>
+													</tr>
+												</table>	
 												<div style="text-align: right">			
 													<a href="#" id="configureWarningLevelsLink">
 													<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
 													configure</a>
 												</div>
-												<table>
-													<tr class="prop">
-														<td class="name"><label>Minimum Quantity </label></td>
-														<td class="value">
-															${inventoryLevelInstance?.minQuantity?:0 }
-														</td>
-													</tr>
-													<tr class="prop">
-														<td class="name"><label>Reorder Quantity</label></td>
-														<td class="value">
-															${inventoryLevelInstance?.reorderQuantity?:0 }
-														</td>
-													</tr>
-													<tr class="prop">
-														<td class="name"><label>Maximum Quantity</label></td>
-														<td class="value">
-															${inventoryLevelInstance?.maxQuantity?:0}
-														</td>
-													</tr>
-												</table>	
 											</div>
 										
 											<div id="configureWarningLevels">
@@ -171,12 +255,6 @@
 																	<g:textField name="reorderQuantity" value="${inventoryLevelInstance?.reorderQuantity }" size="3"/>
 																</td>
 															</tr>
-															<tr class="prop">
-																<td class="name"><label>Maximum Quantity</label></td>
-																<td class="value">
-																	<g:textField name="maxQuantity" value="${inventoryLevelInstance?.maxQuantity }" size="3"/>
-																</td>
-															</tr>
 														</table>
 														<div class="buttonBar" style="text-align: center;">
 										                    <g:actionSubmit class="save" action="saveInventoryLevel" value="${message(code: 'default.button.save.label', default: 'Save')}" />
@@ -185,33 +263,40 @@
 																<img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/> Cancel</a>
 									                    </div>
 												</g:form>								
-											</div>				
+											</div>		
+											--%>		
 										</fieldset>
 									</td>
-									<td width="75%">
+									<td>										
+										
+										<div style="text-align: right">
+											<label>Actions:</label> 
+											<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
+											<g:link controller="inventory" action="enterStock" params="['product.id':productInstance?.id]">
+												Record inventory</g:link>
+										</div>
+									
 									
 										<fieldset>
 											<legend>Current Stock</legend>
 										
 											<div id="inventoryLotReport" style="text-align: right;">										
-												<div style="text-align: right">
-													<a href="#" id="showInventoryLotFormLink">
-														<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
-														edit lots</a>
-												</div>
+												
 												<table border="1" style="border:1px solid #f5f5f5">
 													<thead>
 														<tr>
 															<th>Lot Number</th>
 															<th>Expires</th>
+															<th>Description</th>
 															<th>Qty</th>
+															<th>Actions</th>
 														</tr>											
 													</thead>
 													<tbody>
 														<g:if test="${!inventoryItemList}">
 															<tr class="odd">
-																<td colspan="3" style="text-align: center">
-																	No lots
+																<td colspan="5" style="text-align: center">
+																	<span class="fade">No current stock </span>
 																</td>
 															</tr>
 														</g:if>
@@ -226,10 +311,10 @@
 																	<g:else>
 																		<span class="fade">n/a</span>
 																	</g:else>
-																	
-																	
 																</td>
+																<td>${itemInstance?.product?.name }</td>
 																<td style="text-align: center;">${itemInstance?.quantity }</td>												
+																<td></td>
 															</tr>
 														</g:each>
 													</tbody>
@@ -284,7 +369,7 @@
 																	</td>
 																	<td nowrap>
 																		<g:jqueryDatePicker id="expirationDate" name="expirationDate" value="" format="MM/dd/yyyy"
-																		showTrigger="false" />
+																			showTrigger="false" />
 																	</td>
 																	<td>
 																	</td>
@@ -302,15 +387,20 @@
 												</g:form>
 											</div>									
 										</fieldset>
+										
+										
+										<br/>
+										
 										<fieldset>
-											<legend>Transactions</legend>
+											<legend><span class="fade">Transaction Log</span></legend>
 											
-											
+											<%-- 
 											<div id="transactionEntryButton" style="text-align: right;">
 												<a href="#" id="addTransactionEntryLink">
 													<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
 													edit stock card</a>
-											</div>												
+											</div>
+											--%>												
 											<table border="1" style="border: 1px solid #f5f5f5">
 												<thead>
 													<tr>
@@ -340,8 +430,8 @@
 														<g:each var="transactionEntry" in="${transactionEntryList}" status="status">
 															<tr class="${(status%2==0)?'odd':'even' }">
 																<td><g:formatDate
-																	date="${transactionEntry?.transaction?.transactionDate}"
-																	format="MMM dd" /></td>
+																	date="${transactionEntry?.transaction?.transactionDate}" format="MMM dd" />
+																</td>
 																<td>
 																	${transactionEntry?.transaction?.transactionType?.name }
 																</td>
@@ -361,9 +451,9 @@
 														</g:each>
 													</g:if>			
 													<g:else>
-														<tr>
+														<tr class="odd">
 															<td colspan="7" style="text-align: center">
-																<div class="fade">add stock movements below</div>
+																<div class="fade">No stock movements</div>
 															</td>
 														</tr>
 													</g:else>				
