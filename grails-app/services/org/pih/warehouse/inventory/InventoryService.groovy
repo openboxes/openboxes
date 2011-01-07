@@ -44,6 +44,26 @@ class InventoryService {
 		return productList;
 	}*/
 	
+	List getProductsByCategories(List categories, Map params) { 
+		def products = []
+		def matchCategories = []
+		if (categories) { 
+			categories.each { c -> 
+				if (c) {
+					matchCategories << c;
+					matchCategories.addAll( (c?.children)?c.children:[]);
+				}
+			}
+		}
+		log.info matchCategories
+		if (matchCategories) { 
+			products = Product.createCriteria().list(max:params.max, offset: params.offset ?: 0) {
+				'in'("category", matchCategories)
+			}
+		}
+		return products;	 
+	}
+	
 	List getProductsByCategory(Category category, Map params) { 
 		def products = [];
 		if (category) { 

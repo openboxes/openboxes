@@ -8,6 +8,11 @@
 	<span class="menuButton">
 		<g:link class="new" controller="inventory" action="createTransaction">Add Transaction</g:link> 				
 	</span>
+	<%-- 
+	<span class="menuButton">
+		<g:link class="new" controller="inventory" action="searchStock">Enter Stock</g:link> 				
+	</span>
+	--%>
 </div>
 <%-- 
 <img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png') }"/>

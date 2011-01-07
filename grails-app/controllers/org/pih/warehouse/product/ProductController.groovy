@@ -20,6 +20,29 @@ class ProductController {
 	//params.max = Math.min(params.max ? params.int('max') : 10, 100)
     //    [eventTypeInstanceList: EventType.list(params), eventTypeInstanceTotal: EventType.count()]
 
+	def removeCategoryFilter = {
+		
+		def category = Category.get(params?.categoryId)
+		if (category)
+			session.categoryFilters.remove(category?.id);
+			
+		redirect(action: browse);
+	}
+	
+	def clearCategoryFilters = {
+		session.categoryFilters.clear();
+		session.categoryFilters = null;
+		redirect(action: browse);
+	}
+	
+	def addCategoryFilter = {
+		def category = Category.get(params?.categoryId);
+		if (category && !session.categoryFilters.contains(category?.id))
+			session.categoryFilters << category?.id;
+		redirect(action: browse);
+	}
+	
+	
 	
     def browse = { 
 		params.max = Math.min(params.max ? params.int('max') : 10, 100);
@@ -63,16 +86,27 @@ class ProductController {
             }				
 		}		
 		*/
-		
-		def products = inventoryService.getProductsByCategory(selectedCategory, params);
-		def productsByCategory = products.groupBy { it.category } 
+
+		// Hydrate the category filters from the session
+		// Allow us to get any attribute of a category without get a lazy init exception
+		def categoryFilters = []
+		if (session.categoryFilters) {
+			session.categoryFilters.each {
+				categoryFilters << Category.get(it);
+			}
+		}
 				
-		
+		//def products = inventoryService.getProductsByCategory(selectedCategory, params);
+		//def productsByCategory = products.groupBy { it.category } 
+				
+		def products = inventoryService.getProductsByCategories(categoryFilters, params);
+		def productsByCategory = products.groupBy { it.category }
 		
 		render(view:'browse', model:[productInstanceList : products, 
     	                             productInstanceTotal: products.totalCount, 
 									 productsByCategory : productsByCategory,
 									 rootCategory : rootCategory,
+									 categoryFilters: categoryFilters,
 									 categoryInstance: selectedCategory,
     	                             categories : allCategories, selectedCategory : selectedCategory,
     	                             attributes : allAttributes, selectedAttribute : selectedAttribute ])

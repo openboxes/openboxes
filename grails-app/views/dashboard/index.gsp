@@ -9,13 +9,19 @@
     <body>        
     
     	<style>
-    		.widgetLarge { width: 90%; border: 1px solid lightgrey; height: 75px; margin: 5px; }
-			.widgetSmall { width: 400px; float: left; border: 1px solid lightgrey;  margin: 5px; }    		
+    		.widgetLarge { border: 1px solid lightgrey; height: 75px; margin: 5px; }
+			.widgetSmall { border: 1px solid lightgrey;  margin: 5px; }    		
     		.widgetHeader { background-color: #FAFAFA; padding: 10px; font-weight: bold; font-size: 110%;} 
     		.widgetContent { padding: 10px; } 
+    		.widgetSmall .widgetContent { float: left; width: 45%; } 
     	</style>
     	
 		<div class="body">		
+		
+			<div class="nav">
+				<g:render template="nav"/>
+			</div>		
+		
 	    	<div id="dashboard">				
 	    		<div class="widgetLarge">
 			    	<div class="widgetHeader"><g:message code="dashboard.welcome.label"/></div>
@@ -36,8 +42,7 @@
 					</div>
 				</div>
 				
-				
-				<div class="widgetSmall">					
+				<div class="widgetSmall">
 					<div class="widgetHeader"><g:message code="shipping.summary.label" args="[session.warehouse.name]"/></div>
 	    			<div class="widgetContent">
 	    				<div id="outgoingShipmentSummary">
@@ -47,36 +52,33 @@
    								</div>
    							</g:if>	    		
    							<g:else>			
-					    		<table>				    			
+					    		<table border="1" style="border: 1px solid #ccc">
 					    			<thead>
-					    				<tr>
-					    					<th><g:message code="shipping.status.label"/></th>
-					    					<th><g:message code="shipping.total.label"/></th>
+					    				<tr class="odd">
+					    					<th>All Shipping</th>
+					    					<th style="text-align: center;">Total</th>
 					    				</tr>
-					    			</thead>	    			
+					    			</thead>				    			
 					    			<tbody>
 										<g:each var="entry" in="${outgoingShipmentsByStatus}" status="i">											
-											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-												<td><g:link controller="shipment" action="listShipping" params="['eventStatus':entry.key, 'activityType':'SHIPPING']">${entry.key.name}</g:link></td>
-												<td>${entry.value.objectList.size}</td>
+											<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+												<td>${entry.key.name}</td>
+												<td style="text-align: center;"><g:link controller="shipment" action="listShipping" params="['eventStatus':entry.key, 'activityType':'SHIPPING']">${entry.value.objectList.size}</g:link></td>
 											</tr>	
 											
 								    	</g:each>
 							    	</tbody>
 							    	<tfoot>
 								    	<tr>
-								    		<th><g:message code="shipping.total.label"/></th>
-								    		<th>${allOutgoingShipments.size()}</td>
+								    		<td style="text-align: right;"><%-- <g:message code="shipping.total.label"/>--%></td>
+								    		<td style="text-align: center;"><g:link controller="shipment" action="listShipping" params="['activityType':'SHIPPING']">${allOutgoingShipments.size()}</g:link></td>
 								    	</tr>
 							    	</tfoot>
 						    	</table>
 						    </g:else>
 						</div>
 	    			</div>
-				</div>				
-				
-				<div class="widgetSmall">
-					<div class="widgetHeader"><g:message code="receiving.summary.label" args="[session.warehouse.name]" default="Receiving" /></div>
+
 	    			<div class="widgetContent">	    					    			
 	    				<div id="incomingShipmentSummary">	
 		    				<g:if test="${!incomingShipmentsByStatus}">
@@ -85,36 +87,36 @@
    								</div>
    							</g:if>	    		
    							<g:else>			
-					    		<table>			
-					    			<thead>
-					    				<tr>
-					    					<th>Status</th>
-					    					<th>Count</th>
+					    		<table border="1" style="border: 1px solid #ccc">
+						    		<thead>
+					    				<tr class="odd">
+					    					<th>All Receiving</th>
+					    					<th style="text-align: center;">Total</th>
 					    				</tr>
-					    			</thead>	    			
+					    			</thead>				
 					    			<tbody>
 										<g:each var="entry" in="${incomingShipmentsByStatus}" status="i">	 
-											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-												<td><g:link controller="shipment" action="listReceiving" params="['eventStatus':entry.key, 'activityType':'RECEIVING']">${entry.key.name}</g:link></td>
-												<td>${entry.value.objectList.size}</td>
+											<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+												<td>${entry.key.name}</td>
+												<td style="text-align: center;"><g:link controller="shipment" action="listReceiving" params="['eventStatus':entry.key, 'activityType':'RECEIVING']">${entry.value.objectList.size}</g:link></td>
 											</tr>	
-											
 								    	</g:each>
 							    	</tbody>
 							    	<tfoot>
 								    	<tr>
-								    		<th>Total</th>							    		
-								    		<th>${allIncomingShipments.size()}</td>
+								    		<td style="text-align: right;"><%-- <g:message code="shipping.total.label"/>--%></td>							    		
+								    		<td style="text-align: center;"><g:link controller="shipment" action="listReceiving" params="['activityType':'RECEIVING']">${allIncomingShipments.size()}</g:link></td>
 								    	</tr>
 							    	</tfoot>
 						    	</table>
 						    </g:else>
 						</div>
 	    			</div>
+	    			<br clear="all"/>
+	    			
 				</div>								
 
-				<br clear="all"/>
-
+				
 
 <%-- 
 				

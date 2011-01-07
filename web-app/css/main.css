@@ -293,6 +293,9 @@ th.desc a {
 .menuButton a { 
 	padding-left: 25px;
 }
+.menuButton a.alert {
+    background: url(../images/icons/silk/error.png) center left no-repeat;
+}
 .menuButton a.settings {
     background: url(../images/icons/settings.png) center left no-repeat;
 }
@@ -396,7 +399,7 @@ th.desc a {
     background: url(../images/icons/browse.png) center left no-repeat;
 }
 .menuButton a.dashboard {
-    background: url(../images/icons/browse3.png) center left no-repeat;
+    background: url(../images/icons/silk/application_view_tile.png) center left no-repeat;
 }
 .menuButton a.metadata {
     background: url(../images/icons/wrench.png) center left no-repeat;

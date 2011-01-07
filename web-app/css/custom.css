@@ -57,7 +57,7 @@ a:hover {
 #loginForm { 
 	width:600px;
 	position: absolute;
-	top: 150px;
+	top: 10%;
 	left: 50%;
 	margin-left: -300px;
 }
@@ -68,7 +68,7 @@ a:hover {
 	
 .loginField { 
 	font-weight: bold;
-	font-size: 1.5em;
+	font-size: 1.2em;
 }
 
 input { font-size: 1.5em; } 

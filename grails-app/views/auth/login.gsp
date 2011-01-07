@@ -57,7 +57,7 @@
 								</tr>
 								<tr class="prop">
 									<td valign="top" class="name">
-										<label for="email"><g:message code="user.usernameOrEmail.label" default="Username or email" /></label>
+										<label for="email" class="loginField"><g:message code="user.usernameOrEmail.label" default="Username or email" /></label>
 									</td>
 									<td valign="top" class="value ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
 										<g:textField class="loginField" name="username" value="${userInstance?.username}" size="25" />
@@ -65,7 +65,7 @@
 								</tr>
 								<tr class="prop">
 									<td valign="top" class="name">
-										<label for="password"><g:message code="user.password.label" default="Password" /></label>
+										<label for="password" class="loginField"><g:message code="user.password.label" default="Password" /></label>
 									</td>
 									<td valign="top" class="value ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
 										<g:passwordField class="loginField" name="password" value="${userInstance?.password}" size="25" />

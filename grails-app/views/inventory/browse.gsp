@@ -68,8 +68,69 @@
              
             <table>
             
+            	<%-- 
+            	<tr>
+            		<td colspan="2">
+						<span>		            		
+	            			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'map.png') }"/>
+			            		You are here: 
+	            			<g:if test="${categoryInstance }">
+	            				<g:render template="../category/breadcrumb" model="[categoryInstance:categoryInstance]"/>
+	            			</g:if>
+	            			<g:else>
+	            				<b>All Products</b>
+	            			</g:else>
+	            		</span>		            		
+            		</td>
+            	</tr>
+				--%>            
             	<tr>
 					<td style="border-right: 1px solid #f5f5f5;" width="25%">
+						<script>
+							$(function() {
+								$("#categoryFilter").change(function () { 
+									$(this).closest("form").submit();
+								});
+							});
+						</script>
+						<div id="searchCriteria">
+							<fieldset>
+								<table>
+									<tr class="odd">
+										<td colspan="2"><b>Search Criteria</b> &nbsp; 
+										<g:link action="clearCategoryFilters">clear all</g:link></td>
+									</tr>
+									<tr>
+										<td>
+											<g:form action="addCategoryFilter">
+												<select id="categoryFilter" name="categoryId">
+													<option value="">Search by category</option>
+													<g:render template="../category/selectOptions" model="[category:rootCategory, selected:null, level: 0]"/>								
+												</select>										
+											</g:form>
+										</td>
+									</tr>							
+									<g:each var="categoryFilter" in="${categoryFilters }">
+										<tr>
+											<td>
+												<div style="padding-left: 25px;">
+													<%-- 
+													<g:if test="${categoryFilter?.parentCategory }">
+														${categoryFilter?.parentCategory?.name } &rasquo;
+													</g:if>
+													--%>
+													${categoryFilter?.name }
+													<g:link action="removeCategoryFilter" params="[categoryId:categoryFilter.id]"><img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png' )}"/></g:link>
+												</div>
+											</td>
+										</tr>
+									</g:each>
+								</table>
+							</fieldset>
+						</div>
+					
+						<%--
+						<!-- Initial implementation of the product category --> 
          				<h2>Browse by Category</h2>
            				<div>      
            					<ul>
@@ -93,6 +154,7 @@
 								</g:else>
 							</ul>
 						</div>
+						--%>
 						<%-- 						
          				<h2>Browse by Site</h2>
            				<div>      
@@ -112,17 +174,7 @@
 					</td>          
 					<td>
 			            <div> 
-		            		<span>
 		            		
-		            			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'map.png') }"/>
-				            		You are here: 
-		            			<g:if test="${categoryInstance }">
-		            				<g:render template="../category/breadcrumb" model="[categoryInstance:categoryInstance]"/>
-		            			</g:if>
-		            			<g:else>
-		            				<b>All Products</b>
-		            			</g:else>
-		            		</span>		
 		            		<script>
 								$(function() {
 									$("#dialogButton").click(function () { 
@@ -135,9 +187,11 @@
 								<table border="1" style="border: 1px solid #ccc">
 									<thead>
 										<tr class="even">
-											<th>Product</th>
+											<th>ID</th>
+											<th>Code</th>
+											<th>Description</th>
 											<th>Quantity</th>
-											<th>Action</th>
+											<th>Alerts</th>
 										</tr>
 									</thead>
 								
@@ -168,15 +222,20 @@
 														</g:else>
 													</g:if>								
 												</td>
-												--%>								
-												<td style="width: 30%;">
-													${productInstance?.name }
+												--%>		
+												<td>${productInstance?.id }</td>						
+												<td>${productInstance?.productCode }</td>						
+												<td style="">
+													<g:link controller="product" action="edit" id="${productInstance?.id }">
+														${productInstance?.name }
+													</g:link> <span class="fade">${productInstance?.category?.name }</span>
+														
 												</td>
 												<td style="width: 5%; text-align: center;">
-													${(itemInstanceList)?itemInstanceList*.quantity.sum():'N/A' }
+													<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">${(itemInstanceList)?itemInstanceList*.quantity.sum():'<span class="fade">N/A</span>' }</g:link>
 												</td>
-												<td style="width: 15%; text-align: center">
-													<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">View Stock</g:link>
+												<td>
+													<!-- no alerts yet -->
 												</td>
 											</tr>
 										</g:each>
@@ -186,19 +245,23 @@
 									<tbody>
 										<tr>
 											<td colspan="3" style="padding: 10px; text-align: center;">
-												There are no products under 
+												There are no products matching the selected criteria.
+												<%-- 
 												<g:render template="../category/breadcrumb" model="[categoryInstance:categoryInstance]"/>
+												--%>
 											</td>
 										</tr>
 									</tbody>
 								</g:else>
 							</table>
 						</div>
+						<%-- 
        				    <div style="text-align: left; padding: 10px;">
        				    	<span class="menuButton">
 	        				    <g:link class="list" controller="inventory" action="browse">Show all products</g:link>
 	        				</span>
-       				    </div>		
+       				    </div>
+       				    --%>		
 					</td>
 				</tr>
 			</table>

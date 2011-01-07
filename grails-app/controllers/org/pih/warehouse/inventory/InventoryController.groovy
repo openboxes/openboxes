@@ -19,6 +19,29 @@ class InventoryController {
 		[ warehouses : Warehouse.getAll() ]
 	}
 	
+	def removeCategoryFilter = { 
+		
+		def category = Category.get(params?.categoryId)		
+		if (category)
+			session.categoryFilters.remove(category?.id);
+			
+		redirect(action: browse);		
+	}
+	
+	def clearCategoryFilters = { 
+		session.categoryFilters.clear();
+		session.categoryFilters = null;
+		redirect(action: browse);		
+	}
+	
+	def addCategoryFilter = { 
+		def category = Category.get(params?.categoryId);
+		if (category && !session.categoryFilters.contains(category?.id)) 
+			session.categoryFilters << category?.id;
+		redirect(action: browse);		
+	}
+	
+		
 	def browse = {
 		
 		// Get the warehouse from the request parameter
@@ -33,27 +56,105 @@ class InventoryController {
 		if (!warehouseInstance?.inventory) { 
 			redirect(action: "create")
 		}
+		/*
+		log.info "categoryId " + params.categoryId;
+		def category = Category.get(params?.categoryId);
+		if (category) { 			
+			category?.parentCategory;	// need to reference this in order to keep from getting a lazy initialization error
+			session.categoryFilters << category?.id;
+		}
+		*/
+		// Hydrate the category filters from the session 
+		// Allow us to get any attribute of a category without get a lazy init exception 
+		def categoryFilters = [] 
+		if (session.categoryFilters) { 
+			session.categoryFilters.each { 
+				categoryFilters << Category.get(it);
+			}
+		}
 		
 		// Get all product types and set the default product type 		
 		def rootCategory = Category.findByName("ROOT");
 		def categoryInstance = Category.get(params?.categoryId)
 		categoryInstance = (categoryInstance)?:rootCategory;
-
-		def productList = (categoryInstance) ? inventoryService.getProductsByCategory(categoryInstance, params) : Product.getAll();
+		//def productList = (categoryInstance) ? inventoryService.getProductsByCategory(categoryInstance, params) : Product.getAll();
+		def productList = (categoryFilters)?inventoryService.getProductsByCategories(categoryFilters, params):Product.getAll();
+		
 		
 		[
-			warehouseInstance: warehouseInstance,
-			inventoryInstance: warehouseInstance.inventory,
-			categoryInstance: categoryInstance,
-			productMap : inventoryService.getProductMap(warehouseInstance?.id),
-			inventoryMap : inventoryService.getInventoryMap(warehouseInstance?.id),
-			inventoryLevelMap : inventoryService.getInventoryLevelMap(warehouseInstance?.id),
-			productList : productList,
-			rootCategory: rootCategory
-		]
+					warehouseInstance: warehouseInstance,
+					inventoryInstance: warehouseInstance.inventory,
+					categoryInstance: categoryInstance,
+					categoryFilters: categoryFilters,
+					productMap : inventoryService.getProductMap(warehouseInstance?.id),
+					inventoryMap : inventoryService.getInventoryMap(warehouseInstance?.id),
+					inventoryLevelMap : inventoryService.getInventoryLevelMap(warehouseInstance?.id),
+					productList : productList?.sort() { it.name },
+					rootCategory: rootCategory
+				]
 	}
 	
-
+	def searchStock = {
+		log.info params.query
+		def products = []
+		def inventoryItemMap = [:]
+		
+		
+		def inventoryItems = InventoryItem.createCriteria().list() { 
+			ilike("lotNumber", params.query + "%");
+		}
+		if (inventoryItems) { 
+			inventoryItemMap = inventoryItems.groupBy { it.product } 
+			inventoryItems.each { 
+				products << it.product;
+			}
+			log.info "products: " + products
+			if (inventoryItems?.size() == 1) { 
+				params.put("inventoryItem.id", inventoryItems?.get(0)?.id)
+				redirect(action: "enterStock", params: params);
+			}
+		}
+		else { 		
+			products = Product.createCriteria().list() {
+				ilike("name", params.query + "%")
+			}
+			
+			log.info products
+			if (products) { 
+				def items = InventoryItem.createCriteria().list() { 
+					'in'("product", products)
+				}
+				log.info items;
+				if (items) { 
+					inventoryItemMap = items.groupBy { it.product } 
+				}
+			}
+			if (products?.size() == 1) {
+				params.put("product.id", products?.get(0)?.id);
+				redirect(action: "enterStock", params: params);
+			}
+	
+		}
+		
+		[productInstanceList : products, inventoryItemMap : inventoryItemMap]
+	}
+	
+	def enterStock = { 
+		def inventoryItem = InventoryItem.get(params?.inventoryItem?.id);		
+		def productInstance = new Product();
+		if (inventoryItem) { 
+			productInstance = inventoryItem?.product;	
+		} else {  
+			productInstance = Product.get(params?.product?.id)
+		}
+		def warehouseInstance = Warehouse.get(params?.warehouse?.id)
+		if (!warehouseInstance) {
+			warehouseInstance = Warehouse.get(session?.warehouse?.id);
+		}
+		render(view: "enterStock", model: 
+			[warehouseInstance: warehouseInstance, transactionInstance : new Transaction(), productInstance: productInstance, inventoryItem: inventoryItem])
+	}
+	
 		
 	def create = {
 		def warehouseInstance = Warehouse.get(params?.warehouse?.id)
