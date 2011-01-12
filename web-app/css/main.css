@@ -87,8 +87,9 @@ input:focus, select:focus, textarea:focus {
 }
 
 .menuButton {
-    font-size: 10px;
-    padding: 0 5px;
+/*    font-size: 10px;*/
+/*    padding: 0 5px;*/
+	padding: 0 1px;
 }
 .menuButton a {
     /*color: #333;*/
@@ -288,7 +289,7 @@ th.desc a {
 
 /* more menu button icons */
 .menuButton { 
-	padding-left: 10px;
+	padding-left: 5px;
 }
 .menuButton a { 
 	padding-left: 25px;
@@ -415,5 +416,14 @@ th.desc a {
 }
 .menuButton a.edit {
     background: url(../images/icons/silk/pencil.png) center left no-repeat;
+}
+.menuButton a.browse {
+    background: url(../images/icons/silk/magnifier.png) center left no-repeat;
+}
+.menuButton a.delete {
+    background: url(../images/icons/silk/delete.png) center left no-repeat;
+}
+.menuButton a.trash {
+    background: url(../images/icons/silk/bin.png) center left no-repeat;
 }
 

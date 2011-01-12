@@ -19,8 +19,6 @@
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'form.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footer.css')}" type="text/css" media="screen, projection" />
 	
-	<!-- Grails Layout : write head element for page-->
-	<g:layoutHead />
 	
 	<!-- Include javascript files -->
 	<g:javascript library="application"/>
@@ -30,32 +28,34 @@
 	<link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui-1.8.2.custom.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
 	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-ui-1.8.2.custom.min.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>
-<!-- 
-	<script src="${createLinkTo(dir:'js/jquery.contextMenu/', file:'jquery.contextMenu.js')}" type="text/javascript" ></script>
-	<link href="${createLinkTo(dir:'js/jquery.contextMenu/', file:'jquery.contextMenu.css')}" rel="stylesheet" type="text/css" />
- -->
 	<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.cookies.2.2.0.min.js')}" type="text/javascript" ></script>
     <script type="text/javascript" src="${createLinkTo(dir:'js/jquery/', file:'fg.menu.js')}"></script>
-    <link type="text/css" href="${createLinkTo(dir:'js/jquery/', file:'fg.menu.css')}" media="screen" rel="stylesheet" />
-
-	<!--  
-	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.notifyBar',file:'jquery.notifyBar.css')}" type="text/css" media="screen"  />
-	<script type="text/javascript" src="${createLinkTo(dir:'js/jquery.notifyBar',file:'jquery.notifyBar.js')}"></script>
-	<script type="text/javascript" src="${createLinkTo(dir:'js/jquery',file:'jquery.ezCookie_0.7.01.js')}"></script>
-	-->
-	
-	<!-- Dynamically include jquery-ui resources :  NOT WORKING CORRECTLY -->
-	<!-- <jqui:resources components="dialog, datepicker"/> -->	
-	<!-- <jqui:resources components="datepicker" mode="normal" theme="cupertino" /> -->
-
-	<!-- Dynamically include Grails UI components 
-	<gui:resources components="richEditor, dialog, tabView, autoComplete"/>
-	-->
-	
+    <link type="text/css" href="${createLinkTo(dir:'js/jquery/', file:'fg.menu.css')}" media="screen" rel="stylesheet" />	
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'custom.css')}" type="text/css" media="screen, projection" />
 	
 	<!-- Custom styles to be applied to all pages -->
 	<style type="text/css" media="screen"></style>
+	
+	<!-- Grails Layout : write head element for page-->
+	<g:layoutHead />
+	
+	
+	<script>
+		$(document).ready(function() {
+	  		$('table.dataTable tr').hover(function() {
+				//$(this).css('background-color', '#FFFF99');
+				$(this).contents('td').css({'border': '1px solid red', 'border-left': 'none', 'border-right': 'none'});
+				$(this).contents('td:first').css('border-left', '1px solid red');
+				$(this).contents('td:last').css('border-right', '1px solid red');
+			},
+			function() {
+				//$(this).css('background-color', '#FFFFFF');
+				$(this).contents('td').css('border', 'none');
+			});
+		});
+	</script>
+	
+	
 </head>
 <body class="yui-skin-sam">
 
@@ -169,13 +169,18 @@
 					<!-- Populated using the 'pageTitle' property defined in the GSP file -->
 					<g:if test="${session.user}">
 						<h3>
-						    <div id="pageTitle" style="padding: 5px;">		
-								<img class="photo" width="25" height="25" 
-									src="${createLink(controller:'warehouse', action:'viewLogo', id:session.warehouse.id)}" style="vertical-align: middle" />
-								&nbsp;
-								<g:if test="${session?.warehouse}">${session?.warehouse?.name}&nbsp;&rsaquo;&nbsp;</g:if>
-							    <g:message code="${params.controller }.label"/>&nbsp;&rsaquo;&nbsp;			
-								
+						    <div id="pageTitle" style="padding: 5px;">							    
+						    	<g:link controller="dashboard" action="index">
+							    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'house.png')}"/>
+						    	</g:link>
+							    &nbsp;&rsaquo;&nbsp;								
+								<g:if test="${session?.warehouse}">
+									<img class="photo" width="25" height="25" 
+										src="${createLink(controller:'warehouse', action:'viewLogo', id:session.warehouse.id)}" style="vertical-align: middle" />
+									${session?.warehouse?.name} &nbsp;&rsaquo;&nbsp;
+								</g:if>
+							    <g:message code="${params.controller }.label"/>
+								&nbsp;&rsaquo;&nbsp;								
 								<g:if test="${pageProperty(name:'page.pageTitle')}"><b>${pageProperty(name:'page.pageTitle')}</b></g:if>
 								<g:else><b><g:layoutTitle /></b></g:else>
 							</div>

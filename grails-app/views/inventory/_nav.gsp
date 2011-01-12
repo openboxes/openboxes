@@ -1,4 +1,5 @@
 <div>
+<%-- 
 	<span class="menuButton">
 		<g:link class="list" controller="inventory" action="browse">Browse Inventory</g:link>
 	</span>
@@ -8,7 +9,6 @@
 	<span class="menuButton">
 		<g:link class="new" controller="inventory" action="createTransaction">Add Transaction</g:link> 				
 	</span>
-	<%-- 
 	<span class="menuButton">
 		<g:link class="new" controller="inventory" action="searchStock">Enter Stock</g:link> 				
 	</span>

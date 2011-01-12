@@ -5,11 +5,14 @@
 	margin:auto;
 }
 
+/* temporarily hide the nav bar until we figure out whether we want to keep it or not */
+.nav { display: none; } 
+
 /* used to give the main content some protection against hitting the right edge of the browser */
 #content { 
 	margin-left: 0px;	/* hack to move content over */
 	/*margin-right: 30px;*/	/* moved to .body */
-	width: 95%;		/* stretch the main content */
+	/*width: 95%;		 stretch the main content */
 }
 
 li.ui-menu-item { text-align: left; font-weight: bold; }
@@ -20,10 +23,13 @@ h3 {
 h3.ui-state-active { background-color: #f7f7f7; }  /* #F8F7EF */
 .ui-accordion .ui-accordion-content { padding: 0px; } 
 .body { 
-	margin-right: 5px;
+	/*margin-right: 5px;*/
+	/*padding: 0px 0 10px 0;*/
+	
 }
 body { 
 	text-align: left; 
+	margin:1px; 
 }
 #dashboard { 
 	margin: 0px; 	
@@ -38,14 +44,9 @@ body {
 }
 
 a:hover { 
-	text-decoration: underline;
+	text-decoration: none;
 
 }
-/* controls width of the page */
-.body { 
-	padding: 0px 0 10px 0;
-}
-
 .fade { 
 	color: #aaa;	
 }
@@ -67,11 +68,9 @@ a:hover {
 }
 	
 .loginField { 
-	font-weight: bold;
+	font-weight: none;
 	font-size: 1.2em;
 }
-
-input { font-size: 1.5em; } 
 	
 #signupForm { 
 	width:400px;
@@ -150,7 +149,7 @@ table#listOutgoing th {
 	font-size: 1.25em;
 	line-height: 2em; 
 	vertical-align: middle;
-	padding: 2px 0px 2px 15px; 
+	padding: 2px 0px 2px 25px; 
 	display: block; 
 	background-color: #fafafa /*#F8F7EF*/; 
 }
@@ -242,8 +241,8 @@ h2 {
 }
 
 #pageTitle { 
-	border-top: 1px solid #EEE;
-	background-color: #f0f0f0 /*#F8F7EF*/;
+	border-bottom: 1px solid #CCC;
+	background-color: #f0f0f0;
 	padding: 5px 5px 5px 5px;	
 }
 
@@ -426,7 +425,6 @@ label { display: inline; text-decoration: none; }
 label.block { display: block; } 
 fieldset .prop { margin: 10px; }
 .radio { padding-left: 10px; } 
-.body {  } 
 #progressbar {  padding: 10px; margin: 10px; } 
 #progressbar .step { padding-left: 0; border: 1px solid #aaa; background-color: whitesmoke; padding: 10px;}
 .step.selected { font-weight: bold; text-decoration: underline; background-color: #f7f7f7 /*#F8F7EF*/; } 

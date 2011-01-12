@@ -8,7 +8,7 @@
         <title><g:message code="default.browse.label" args="[entityName]" /></title>
     </head>    
     <body>
-        <div class="body" style="width: 95%">
+        <div class="body">
 		    <div class="nav">
 		    	<g:render template="nav"/>		    
 		    </div>
@@ -35,48 +35,7 @@
 					<tr>
 						<td width="25%">	
 						
-							<script>
-								$(function() {
-									$("#categoryFilter").change(function () { 
-										$(this).closest("form").submit();
-									});
-								});
-							</script>
-							<div id="searchCriteria">
-								<fieldset>
-									<table>
-										<tr class="odd">
-											<td colspan="2"><b>Search Criteria</b> &nbsp; <g:link action="clearCategoryFilters">clear all</g:link></td>
-										</tr>
-										<tr>
-											<td>
-												<g:form action="addCategoryFilter">
-													<select id="categoryFilter" name="categoryId">
-														<option value="">Search by category</option>
-														<g:render template="../category/selectOptions" model="[category:rootCategory, selected:null, level: 0]"/>								
-													</select>										
-												</g:form>
-											</td>
-										</tr>							
-										<g:each var="categoryFilter" in="${categoryFilters }">
-											<tr>
-												<td>
-													<div style="padding-left: 25px;">
-														<%-- 
-														<g:if test="${categoryFilter?.parentCategory }">
-															${categoryFilter?.parentCategory?.name } &rasquo;
-														</g:if>
-														--%>
-														${categoryFilter?.name }
-														<g:link action="removeCategoryFilter" params="[categoryId:categoryFilter.id]"><img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png' )}"/></g:link>
-													</div>
-												</td>
-											</tr>
-										</g:each>
-									</table>
-								</fieldset>
-							</div>						
-						
+							<g:render template="/common/searchCriteriaVertical"	/>				
 							<%-- 		
 							<div style="text-align:left; padding-left: 20px;">
 								<style>
@@ -118,6 +77,8 @@
 								--%>						
 						</td>			
 						<td>
+						
+							Showing ${productInstanceList?.size() } products
 							<g:set var="attributeList" value="${org.pih.warehouse.product.Attribute.list() }"></g:set>
 							<g:if test="${productsByCategory }">
 	            				<table border="1" style="border: 1px solid lightgrey">
@@ -133,33 +94,33 @@
 	            							<th>Primary Category</th>
 	            						</tr>
 	            					</thead>
-				            			<tbody>
-											<g:set var="index" value="${0 }"/>
-						            		<g:each var="key" in="${productsByCategory.keySet() }">
-						            			<g:each var="productInstance" in="${productsByCategory.get(key) }" status="i">
-													 <tr class="${(index++ % 2) == 0 ? 'odd' : 'even'}">
-													 	<td>
-															${productInstance?.id }													 	
-													 	</td>
-													 	<td>
-													 		${productInstance?.productCode }
-													 	</td>
-														<td>
-															<g:link action="edit" id="${productInstance.id}">
-																${fieldValue(bean: productInstance, field: "name") }
-															</g:link>
-														</td>
-				            							<g:each var="attribute" in="${attributeList}">
-				            								<td></td>
-				            							</g:each>
-				            							<td>${(productInstance?.coldChain)?"Yes":"No" }</td>
-				            							<td>${productInstance?.category?.name }</td>
-													</tr>							            			
-						            			</g:each>
-						            		</g:each>
-				            			</tbody>
-			            			</table>
-			            		</g:if>
+			            			<tbody>
+										<g:set var="index" value="${0 }"/>
+					            		<g:each var="key" in="${productsByCategory.keySet() }">
+					            			<g:each var="productInstance" in="${productsByCategory.get(key) }" status="i">
+												 <tr class="${(index++ % 2) == 0 ? 'odd' : 'even'}">
+												 	<td>
+														${productInstance?.id }													 	
+												 	</td>
+												 	<td>
+												 		${productInstance?.productCode }
+												 	</td>
+													<td>
+														<g:link action="edit" id="${productInstance.id}">
+															${fieldValue(bean: productInstance, field: "name") }
+														</g:link>
+													</td>
+			            							<g:each var="attribute" in="${attributeList}">
+			            								<td></td>
+			            							</g:each>
+			            							<td>${(productInstance?.coldChain)?"Yes":"No" }</td>
+			            							<td>${productInstance?.category?.name }</td>
+												</tr>							            			
+					            			</g:each>
+					            		</g:each>
+			            			</tbody>
+		            			</table>
+		            		</g:if>
 		            		<g:else>
 			            		
 								<table border="1" style="border: 1px solid lightgrey">
@@ -236,7 +197,7 @@
 	       				    			
 	       				    			</td>
 	       				    			<td style="text-align: right;">
-					            			Showing ${productInstanceList?.totalCount } products
+					            			
 	       				    			</td>
 	       				    		</tr>
 	       				    	</table>

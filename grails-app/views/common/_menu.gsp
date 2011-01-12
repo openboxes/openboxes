@@ -1,30 +1,34 @@
 <script type="text/javascript">
 $(function() { 
-	//$('#leftnavMenu').accordion({
-	//	active: true, 
-	//	navigation: true, 
-	//	autoheight: false, 
-	//	alwaysOpen: true,
-	//	clearStyle: true 
-	//});
+	$('#leftnavMenu').accordion({
+		active: true, 
+		navigation: true, 
+		autoheight: true, 
+		alwaysOpen: true,
+		clearStyle: false, 
+		animated: false,
+		navigation: true,
+		event: "click" /*mouseover*/ 
+	});
 });
 </script>
 
 <style>
-	/*.menuButton { font-variant: small-caps; }*/ 
+/*.menuButton { font-variant: small-caps; }*/ 
+/* remove gaudy background image */	
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+	background-image: none; 
+} 	
+	
 </style>
-
-
 <div id="leftnavMenu" class="menu">
 	<h3 class="heading" >
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_tile.png')}"  alt="Dashboard" style="vertical-align: middle"/> &nbsp; 
-		<g:link class="bullet" controller="dashboard" action="index">
-			<g:message code="dashboard.label" default="Dashboard"/>
-		</g:link>
+		
+		<g:message code="dashboard.label" default="Dashboard"/>
 	</h3>
-	<%-- 
+	 
 	<div class="menuSection">
-		<ul>
+	 	<ul>
 			<li class="">
 				<span class="menuButton">
 					<g:link class="bullet" controller="dashboard" action="index"><g:message code="default.show.label" args="['Dashboard']" default="Show Dashboard"/></g:link>
@@ -32,14 +36,10 @@ $(function() {
 			</li>				
 		</ul>
 	</div>
-	--%>
+	
 	<h3 class="heading">
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'cart.png')}" alt="Orders" style="vertical-align: middle"/> &nbsp; 
-		<g:link class="browse" class="bullet" controller="catalog" action="list">
-			<g:message code="order.label"  default="Orders"/>
-		</g:link>
+		<g:message code="order.label"  default="Orders"/>
 	</h3>
-	<%-- 
 	<div class="menuSection">									
 		<ul>
 
@@ -51,15 +51,10 @@ $(function() {
 
 		</ul>	
 	</div>
-	--%>
 	
 	<h3 class="heading" >
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}"  alt="Shipping" style="vertical-align: middle"/> &nbsp; 
-		<g:link class="bullet" controller="shipment" action="listShipping">
-			<g:message code="shipping.label"  default="Shipping"/>
-		</g:link>
+		<g:message code="shipping.label"  default="Shipping"/>
 	</h3>
-	<%-- 
 	<div class="menuSection">
 		<ul>
 			<!-- 
@@ -111,14 +106,9 @@ $(function() {
 			-->
 		</ul>										
 	</div>
-	--%>
 	<h3 class="heading">
-		<img src="${createLinkTo(dir:'images/icons/',file:'handtruck.png')}" width="16" height="16" alt="Receiving" style="vertical-align: middle"/> &nbsp; 
-		<g:link class="bullet" controller="shipment" action="listReceiving">
-			<g:message code="receiving.label"  default="Receiving"/>
-		</g:link>
+		<g:message code="receiving.label"  default="Receiving"/>
 	</h3>
-	<%-- 
 	<div class="menuSection">
 		<ul>
 			<li class="">
@@ -133,31 +123,32 @@ $(function() {
 			</li>		
 		</ul>										
 	</div>
-	--%>
 	<h3 class="heading">
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'table_refresh.png')}" alt="Inventory" style="vertical-align: middle"/> &nbsp; 
-		<g:link class="bullet" controller="inventory" action="browse">
-			<g:message code="inventory.label"  default="Inventory"/>
-		</g:link>
+		<g:message code="inventory.label"  default="Inventory"/>
 	</h3>
-	<%-- 
 	<div class="menuSection">									
 		<ul>
 			<li>
 				<span class="menuButton">
-					<g:link class="browse" class="bullet" controller="inventory" action="browse"><g:message code="inventory.show.label" default="Show Inventory"/></g:link>
+					<g:link class="browse" controller="inventory" action="browse">Browse Inventory</g:link>
 				</span>
 			</li>
+			<li>
+				<span class="menuButton">
+					<g:link class="list" controller="inventory" action="listAllTransactions">All Transactions</g:link> 
+				</span>
+			</li>
+			<li>
+				<span class="menuButton">
+					<g:link class="new" controller="inventory" action="createTransaction">Add Transaction</g:link> 				
+				</span>			
+			</li>
+			
 		</ul>	
 	</div>
-	--%>							
 	<h3 class="heading">
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" alt="Products" style="vertical-align: middle"/> &nbsp; 
-		<g:link class="bullet" controller="product" action="browse">
-			<g:message code="product.label" default="Products" />
-		</g:link>
+		<g:message code="product.label" default="Products" />
 	</h3>
-	<%-- 
 	<div class="menuSection">									
 		<ul>
 			<li class="">
@@ -186,14 +177,9 @@ $(function() {
  		-->			
 		</ul>	
 	</div>
-	--%>						
 	<h3 class="heading">
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'map.png')}" alt="Locations" style="vertical-align: middle"/> &nbsp; 
-		<g:link class="bullet" controller="warehouse" action="list">
-			<g:message code="locations.label"  default="Locations"/>
-		</g:link>
+		<g:message code="locations.label"  default="Locations"/>
 	</h3>
-	<%-- 
 	<div class="menuSection">								
 		<ul>
 			<li class="">
@@ -221,11 +207,12 @@ $(function() {
 			 -->
 		</ul>
 	</div>																	
-	--%>
+	<%-- 
 	<h3 class="heading">
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'chart_bar.png')}" alt="Reports" style="vertical-align: middle"/> &nbsp; 
 		<g:message code="settings.label" args="['Reports']" default="Reports"/>
 	</h3>
+	--%>
 	<%-- 
 	<div class="menuSection">
 		<ul>
@@ -236,12 +223,8 @@ $(function() {
 	</div>					
 	--%>
 	<h3 class="heading">
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'user.png')}" alt="Users" style="vertical-align: middle"/> &nbsp; 
-		<g:link class="bullet" controller="user" action="list">
-			<g:message code="users.label"  default="Users"/>
-		</g:link>
+		<g:message code="users.label"  default="Users"/>
 	</h3>			
-	<%-- 
 	<div class="menuSection">
 		<ul>			
 			<li class="">
@@ -261,14 +244,9 @@ $(function() {
 			</li>
 		</ul>
 	</div>
-	--%>
 	<h3 class="heading">
-		<img src="${createLinkTo(dir:'images/icons/',file:'wrench.png')}" alt="Administration" style="vertical-align: middle"/> &nbsp; 
-		<g:link class="bullet" controller="admin" action="index">
-			<g:message code="metadata.label"  default="Settings"/>
-		</g:link>
+		<g:message code="metadata.label"  default="Settings"/>
 	</h3>
-	<%-- 
 	<div class="menuSection">
 		<ul>
 			<li class="">
@@ -276,6 +254,7 @@ $(function() {
 					<g:link class="bullet" controller="admin" action="index"><g:message code="default.manage.label" args="['All Settings']" /></g:link>
 				</span>
 			</li>
+			<%--
 			<li class="">
 				<span class="menuButton">
 					<g:link class="bullet" controller="category" action="tree"><g:message code="default.manage.label"  args="['Categories']"/></g:link>
@@ -335,7 +314,8 @@ $(function() {
 				<span class="menuButton">
 					<g:link class="bullet" controller="unitOfMeasure" action="list"><g:message code="default.manage.label"  args="['Unit Of Measures']"/></g:link>
 				</span>
-			</li>		
+			</li>
+			 --%>		
  			<!-- 
 			<li><span class="menuButton"><g:link class="nobullet" controller="containerType" action="list"><g:message code="default.manage.label" args="['Metadata']"/></g:link></span></li>		
 			<li><span class="menuButton"><g:link class="nobullet" controller="referenceNumberType" action="list"><g:message code="default.manage.label" args="['Reference # Types']"/></g:link></span></li>		
@@ -346,6 +326,5 @@ $(function() {
 			-->
 		</ul>
 	</div>
-	--%>
 	
 </div>

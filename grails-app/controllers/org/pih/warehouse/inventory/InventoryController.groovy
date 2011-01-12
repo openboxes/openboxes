@@ -78,7 +78,7 @@ class InventoryController {
 		def categoryInstance = Category.get(params?.categoryId)
 		categoryInstance = (categoryInstance)?:rootCategory;
 		//def productList = (categoryInstance) ? inventoryService.getProductsByCategory(categoryInstance, params) : Product.getAll();
-		def productList = (categoryFilters)?inventoryService.getProductsByCategories(categoryFilters, params):Product.getAll();
+		def productList = (categoryFilters)?inventoryService.getProductsByCategories(categoryFilters, params): [];
 		
 		
 		[

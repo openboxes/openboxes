@@ -66,69 +66,10 @@
             </table>
              --%>
              
-            <table>
-            
-            	<%-- 
-            	<tr>
-            		<td colspan="2">
-						<span>		            		
-	            			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'map.png') }"/>
-			            		You are here: 
-	            			<g:if test="${categoryInstance }">
-	            				<g:render template="../category/breadcrumb" model="[categoryInstance:categoryInstance]"/>
-	            			</g:if>
-	            			<g:else>
-	            				<b>All Products</b>
-	            			</g:else>
-	            		</span>		            		
-            		</td>
-            	</tr>
-				--%>            
-            	<tr>
-					<td style="border-right: 1px solid #f5f5f5;" width="25%">
-						<script>
-							$(function() {
-								$("#categoryFilter").change(function () { 
-									$(this).closest("form").submit();
-								});
-							});
-						</script>
-						<div id="searchCriteria">
-							<fieldset>
-								<table>
-									<tr class="odd">
-										<td colspan="2"><b>Search Criteria</b> &nbsp; 
-										<g:link action="clearCategoryFilters">clear all</g:link></td>
-									</tr>
-									<tr>
-										<td>
-											<g:form action="addCategoryFilter">
-												<select id="categoryFilter" name="categoryId">
-													<option value="">Search by category</option>
-													<g:render template="../category/selectOptions" model="[category:rootCategory, selected:null, level: 0]"/>								
-												</select>										
-											</g:form>
-										</td>
-									</tr>							
-									<g:each var="categoryFilter" in="${categoryFilters }">
-										<tr>
-											<td>
-												<div style="padding-left: 25px;">
-													<%-- 
-													<g:if test="${categoryFilter?.parentCategory }">
-														${categoryFilter?.parentCategory?.name } &rasquo;
-													</g:if>
-													--%>
-													${categoryFilter?.name }
-													<g:link action="removeCategoryFilter" params="[categoryId:categoryFilter.id]"><img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png' )}"/></g:link>
-												</div>
-											</td>
-										</tr>
-									</g:each>
-								</table>
-							</fieldset>
-						</div>
-					
+						<g:render template="/common/searchCriteriaHorizontal"/>					
+						<br/>
+						
+						Showing ${productList?.totalCount } products
 						<%--
 						<!-- Initial implementation of the product category --> 
          				<h2>Browse by Category</h2>
@@ -171,8 +112,6 @@
 							</ul>
 						</div>
 						--%>
-					</td>          
-					<td>
 			            <div> 
 		            		
 		            		<script>
@@ -183,17 +122,17 @@
 								});
 							</script>
 							
-			            		<g:set var="varStatus" value="${0 }"/>
-								<table border="1" style="border: 1px solid #ccc">
-									<thead>
-										<tr class="even">
-											<th>ID</th>
-											<th>Code</th>
-											<th>Description</th>
-											<th>Quantity</th>
-											<th>Alerts</th>
-										</tr>
-									</thead>
+		            		<g:set var="varStatus" value="${0 }"/>
+							<table border="1" style="border: 1px solid #ccc" class="dataTable">
+								<thead>
+									<tr class="even">
+										<th>ID</th>
+										<th>Code</th>
+										<th>Description</th>
+										<th>Quantity</th>
+										<th>Alerts</th>
+									</tr>
+								</thead>
 								
 			            		<g:if test="${productList }">         		
 									<tbody>
@@ -226,9 +165,9 @@
 												<td>${productInstance?.id }</td>						
 												<td>${productInstance?.productCode }</td>						
 												<td style="">
-													<g:link controller="product" action="edit" id="${productInstance?.id }">
+													<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">
 														${productInstance?.name }
-													</g:link> <span class="fade">${productInstance?.category?.name }</span>
+													</g:link> &nbsp; <span class="fade">${productInstance?.category?.name }</span>
 														
 												</td>
 												<td style="width: 5%; text-align: center;">
@@ -243,8 +182,8 @@
 								</g:if>
 								<g:else>
 									<tbody>
-										<tr>
-											<td colspan="3" style="padding: 10px; text-align: center;">
+										<tr class="odd">
+											<td colspan="5" style="padding: 10px; text-align: center;">
 												There are no products matching the selected criteria.
 												<%-- 
 												<g:render template="../category/breadcrumb" model="[categoryInstance:categoryInstance]"/>
@@ -262,9 +201,6 @@
 	        				</span>
        				    </div>
        				    --%>		
-					</td>
-				</tr>
-			</table>
 		</div>
     </body>
 </html>

@@ -24,8 +24,8 @@
 		<div class="errors"><g:renderErrors bean="${itemInstance}" as="list" /></div>
 	</g:hasErrors>
 	<div class="dialog">		
-	
-	<%-- 
+
+<%-- 	
 			<g:if test="${productInstance?.category }">
 				<div style="padding: 15px;">
 					<a href="${createLink(controller: 'inventory', action: 'browse', params: ['categoryId' : productInstance?.category?.id])}">
@@ -34,7 +34,7 @@
 					
 				</div>
 			</g:if>			
-	--%>	
+--%>
 <%-- 
 						&nbsp;
 						<span style="font-size: 1em;">					
@@ -269,8 +269,10 @@
 									</td>
 									<td>										
 										
-										<div style="text-align: right">
-											<label>Actions:</label> 
+										<div style="text-align: left; padding: 10px;">
+											<img src="${resource(dir: 'images/icons/silk', file: 'table_refresh.png')}"/>
+											<g:link controller="inventory" action="browse" >Back to Inventory</g:link>
+											&nbsp;
 											<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
 											<g:link controller="inventory" action="enterStock" params="['product.id':productInstance?.id]">
 												Record inventory</g:link>
@@ -278,7 +280,8 @@
 									
 									
 										<fieldset>
-											<legend>Current Stock</legend>
+										<!-- <legend>Current Stock</legend>
+										 -->
 										
 											<div id="inventoryLotReport" style="text-align: right;">										
 												

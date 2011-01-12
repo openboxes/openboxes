@@ -43,7 +43,6 @@ class ProductController {
 	}
 	
 	
-	
     def browse = { 
 		params.max = Math.min(params.max ? params.int('max') : 10, 100);
 		
@@ -100,10 +99,11 @@ class ProductController {
 		//def productsByCategory = products.groupBy { it.category } 
 				
 		def products = inventoryService.getProductsByCategories(categoryFilters, params);
+		products = products ?: Product.list(params);
 		def productsByCategory = products.groupBy { it.category }
 		
 		render(view:'browse', model:[productInstanceList : products, 
-    	                             productInstanceTotal: products.totalCount, 
+    	                             productInstanceTotal: products.size(), 
 									 productsByCategory : productsByCategory,
 									 rootCategory : rootCategory,
 									 categoryFilters: categoryFilters,
