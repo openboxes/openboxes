@@ -56,11 +56,11 @@ a:hover {
 }
 
 #loginForm { 
-	width:600px;
+	width:450px;
 	position: absolute;
 	top: 10%;
 	left: 50%;
-	margin-left: -300px;
+	margin-left: -225px;
 }
 #loginFormBox { 
 	border: 1px solid lightgrey;	
@@ -241,8 +241,8 @@ h2 {
 }
 
 #pageTitle { 
-	border-bottom: 1px solid #CCC;
-	background-color: #f0f0f0;
+	/*border-top: 1px solid lightgrey;
+	background-color: #f0f0f0;*/
 	padding: 5px 5px 5px 5px;	
 }
 

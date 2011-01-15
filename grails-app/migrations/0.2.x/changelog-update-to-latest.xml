@@ -1722,5 +1722,28 @@
             <column name="transaction_type" type="VARCHAR(255)"/>
         </addColumn>
     </changeSet>
+    <changeSet author="jmiranda (generated)" id="1294078999350-10">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="inventory_item" columnName="description"/>
+			</not>
+		</preConditions>    
+        <addColumn tableName="inventory_item">
+            <column name="description" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1294078999350-11">
+        <dropNotNullConstraint columnDataType="BIGINT" columnName="source_id" tableName="transaction"/>
+    </changeSet>    
+
+	<!-- 	
+			update inventory_item, product 
+			set inventory_item.description = product.name 
+			where inventory_item.description is null 
+			and product.id = inventory_item.product_id 
+	 -->
 
 </databaseChangeLog>
+
+
+

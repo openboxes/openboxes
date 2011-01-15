@@ -11,9 +11,13 @@
 
 
 label       { font-weight: none; }
-fieldset    { padding:1em; margin: 0 0 .2em 0; border: 1px solid #ccc; }
-legend      { font-weight: bold; font-size:1.2em; }
-
+fieldset    { padding:0em; margin: 0 0 .2em 0; border: 1px solid #ccc; }
+legend      { font-weight: none; font-size:1.2em;  margin-left: 10px; margin-right: 10px; }
+/*
+legend span {      
+	position: absolute;      
+	margin-top: -1em;  
+}*/
 
 /* Form fields
 -------------------------------------------------------------- */

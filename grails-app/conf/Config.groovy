@@ -11,7 +11,6 @@ grails.config.locations = [
 // if(System.properties["${appName}.config.location"]) {
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
 // }
-
 grails { 
 	mail { 
 		from = "info@localhost"
@@ -54,10 +53,8 @@ grails.views.gsp.sitemesh.preprocess = true
 grails.views.javascript.library="jquery"
 // scaffolding templates configuration
 grails.scaffolding.templates.domainSuffix = 'Instance'
-
 // Set to true if BootStrap.groovy is failing to add all sample data 
 grails.gorm.failOnError = false
-
 // Set to false to use the new Grails 1.2 JSONBuilder in the render method
 grails.json.legacy.builder = false
 // enabled native2ascii conversion of i18n properties files
@@ -66,6 +63,7 @@ grails.enable.native2ascii = true
 grails.logging.jul.usebridge = true
 // packages to include in Spring bean scanning
 grails.spring.bean.packages = []
+grails.validateable.packages = ['org.pih.warehouse.inventory']
 
 // set per-environment serverURL stem for creating absolute links
 environments {
@@ -110,10 +108,12 @@ log4j = {
 	//		'org.codehaus.groovy.grails.plugins', // plugins
 	//		'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
 	//		'org.springframework'
+	error 'org.codehaus.groovy.grails.web.pages'			// GSP
+		
+	
 	
 	warn	'org.mortbay.log',
 		'org.codehaus.groovy.grails.web.servlet',		// controllers
-		'org.codehaus.groovy.grails.web.pages',			// GSP
 		'org.codehaus.groovy.grails.web.sitemesh',		// layouts
 		'org.codehaus.groovy.grails.web.mapping.filter',	// URL mapping
 		'org.codehaus.groovy.grails.web.mapping', 		// URL mapping

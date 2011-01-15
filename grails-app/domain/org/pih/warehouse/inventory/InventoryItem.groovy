@@ -10,7 +10,8 @@ import org.pih.warehouse.inventory.Transaction;
  */
 class InventoryItem {
 	
-	Product product;		    			// Specific product that we're tracking
+	String description;						// Description of the specific instance of a product that we're tracking
+	Product product;		    			// Product that we're tracking
 	String lotNumber;						// Lot information for a product  
 	String serialNumber						// Only used if this is a "serialized" item (e.g. equipment)
 	InventoryItemType inventoryItemType		// Serialized or non-serialized
@@ -22,13 +23,13 @@ class InventoryItem {
 	
     // TODO Cannot have a reference to product for some reason
     static belongsTo = [ inventory : Inventory ];
-
 	static transients = ['warnings', 'quantity', 'inventoryLot']
 	
 	// Notice the unique constraint on lotNumber/product
     static constraints = {
+		description(nullable:false)
 		product(nullable:false)
-		lotNumber(nullable:true, unique:'product')
+		lotNumber(nullable:false, unique:'product')
 		serialNumber(nullable:true)
 		inventoryItemType(nullable:false);
 		active(nullable:false)

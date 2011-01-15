@@ -1,0 +1,152 @@
+
+<%@ page import="org.pih.warehouse.product.Product"%>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="layout" content="custom" />
+<g:set var="entityName"
+	value="${message(code: 'inventory.label', default: 'inventory')}" />
+<title><g:message code="default.edit.label" args="[entityName]" /></title>
+</head>
+
+<body>
+<div class="body">
+
+	<div class="nav">
+		<g:render template="../inventory/nav"/>
+	</div>
+	<g:if test="${flash.message}">
+		<div class="message">
+			${flash.message}
+		</div>
+	</g:if> 
+	<g:hasErrors bean="${commandInstance}">
+		<div class="errors"><g:renderErrors bean="${commandInstance}" as="list" /></div>
+	</g:hasErrors>
+	<div class="dialog">		
+		<table >
+			<tr>
+				<td style="width: 250px;">
+					<g:render template="productDetails" model="[productInstance:commandInstance.product]"/>
+				</td>
+				<td>				
+					<div style="text-align: left; padding: 10px;">
+						<img src="${resource(dir: 'images/icons/silk', file: 'table_refresh.png')}"/>
+						<g:link controller="inventoryItem" 
+							action="showStockCard" params="['product.id':commandInstance?.product?.id]">Show Stock Card</g:link>
+					</div>					
+					<fieldset style="min-height:200px;">	
+						<div id="inventoryForm">
+							<g:form action="saveRecordInventory" autocomplete="off">
+								<g:hiddenField name="product.id" value="${commandInstance.product?.id}"/>
+								<g:hiddenField name="inventory.id" value="${commandInstance?.inventory?.id}"/>
+							<%--
+								<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
+								<g:hiddenField name="active" value="true"/>
+								<g:hiddenField name="initialQuantity" value="0"/>							
+								<g:hiddenField name="inventoryItemType" value="${org.pih.warehouse.inventory.InventoryItemType.NON_SERIALIZED}"/>
+							 --%>	
+								<div style="padding: 10px; text-align: left;" class="odd">
+									<label>Inventory date:</label>
+									<g:jqueryDatePicker 
+										id="transactionDate" 
+										name="transactionDate" 
+										value="${commandInstance?.transactionDate}" 
+										format="MM/dd/yyyy"
+										showTrigger="false" />
+								</div>
+								<style>
+									
+								</style>
+								
+								<table id="recordInventoryTable">
+									<thead>
+										<tr>
+											<th>ID</th>
+											<th>Description</th>
+											<th>Lot/Serial #</th>
+											<th>Expires</th>
+											<th style="text-align:center;">Old Qty</th>
+											<th style="text-align:center;">New Qty</th>
+										</tr>											
+									</thead>
+									<tbody>
+										<g:each var="recordInventoryRow" in="${commandInstance?.recordInventoryRows }" status="status">				
+											<tr class="${(status%2==0)?'odd':'even' }">
+												<td>
+													${status+1 }
+													<g:hiddenField name="recordInventoryRows[${status}].id" value="${recordInventoryRow?.id }"/>
+												</td>
+												<td>
+													<g:textField name="recordInventoryRows[${status}].description" size="25" value="${recordInventoryRow?.description }"/>
+
+												</td>
+												<td>
+													<g:textField name="recordInventoryRows[${status}].lotNumber" size="10" value="${recordInventoryRow?.lotNumber }"/>
+												</td>
+												<td>
+													<g:jqueryDatePicker id="expirationDate${status }" name="recordInventoryRows[${status}].expirationDate" 
+														value="${recordInventoryRow?.expirationDate}" format="MM/dd/yyyy" showTrigger="false" />
+
+												</td>
+												<td style="text-align: center; vertical-align: middle;">
+													${recordInventoryRow?.oldQuantity }	
+													<g:hiddenField name="recordInventoryRows[${status}].oldQuantity" value="${recordInventoryRow?.oldQuantity }"/>
+												</td>	
+												<td style="text-align: center; vertical-align: middle;">
+													<g:textField style="text-align: center;" name="recordInventoryRows[${status }].newQuantity" size="3" value="${recordInventoryRow?.newQuantity }" onFocus="this.select();"/>
+												</td>	
+											</tr>
+										</g:each>
+										
+										<%-- 
+										
+										<g:set var="count" value="${commandInstance?.recordInventoryRows?.size() }"/>
+										<tr class="${count%2==0?'odd':'even'}">
+											<td>
+												<span class="fade">${count+1 }</span>
+											</td>
+											<td class="${hasErrors(bean:user,field:'lotNumber', 'errors')}">
+												<g:textField name="recordInventoryRows[${count }].lotNumber" size="10" value=""/>
+											</td>
+											<td class="${hasErrors(bean:user,field:'expirationDate', 'errors')}" nowrap>
+												<g:jqueryDatePicker id="expirationDate" name="recordInventoryRows[${count }].expirationDate" 
+													value="" format="MM/dd/yyyy" showTrigger="false" />
+											</td>
+											<td class="${hasErrors(bean:user,field:'description', 'errors')}">
+												<g:textField name="recordInventoryRows[${count }].description" size="25" value=""/>
+											</td>
+											<td style="text-align: center;">
+
+											</td>
+											<td style="text-align: center;" class="${hasErrors(bean:user,field:'quantity', 'errors')}">
+												<g:textField name="recordInventoryRows[${count }].quantity" size="3" value=""/>
+											</td>
+										</tr>
+										--%>
+									</tbody>										
+								</table>
+								<div style="text-align: center; border-top: 1px solid lightgrey; padding:10px;">
+									<span class="buttons">
+										<g:submitButton name="validate" value="Validate"/>
+										&nbsp;
+										<g:if test="${commandInstance.hasErrors() }">
+										
+											<g:submitButton id="saveButton" name="save" disabled="true" style="color: lightgrey" value="Save"/>
+										</g:if>
+										<g:else>
+											<g:submitButton name="save" value="Save"/>
+										</g:else>
+									</span>
+									<g:link controller="inventoryItem" action="showStockCard" params="['product.id':commandInstance.product?.id]">Cancel</g:link>
+								</div>												
+							</g:form>
+						</div>									
+					</fieldset>
+				</td>
+			</tr>
+		</table>
+	</div>			
+</div>
+</body>
+</html>

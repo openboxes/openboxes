@@ -72,20 +72,17 @@
 									</td>
 								</tr>
 								<tr class="prop">
-									<td valign="top" class="">
-									</td>
-									<td valign="top">
-										<div style="text-align: right;">
-											<span class="buttons" >
-												<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt=""/> Login</button>												
-											</span>
-										</div>  	
+									
+									<td colspan="2" valign="top" style="text-align: center;">
+										<span class="buttons" >
+											<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt=""/> Login</button>												
+										</span>
 									</td>
 								</tr>
 								<tr class="prop">
 									<td valign="top" class="" colspan="2">
 										<div style="text-align: left">				
-											New user? <g:link class="list" controller="auth" action="signup"><g:message code="default.signup.label" default="Signup"/></g:link>
+											Are you a new user? <g:link class="list" controller="auth" action="signup"><g:message code="default.signup.label" default="Signup"/></g:link>
 										</div>
 									</td>
 								</tr>

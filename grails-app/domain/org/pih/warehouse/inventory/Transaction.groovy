@@ -44,7 +44,7 @@ class Transaction {
     static constraints = {
 	    transactionDate(nullable:false)
 	    transactionType(nullable:true)
-	    source(nullable:false)
+	    source(nullable:true)
 	    destination(nullable:true)
 		createdBy(nullable:true)
 		confirmed(nullable:true)

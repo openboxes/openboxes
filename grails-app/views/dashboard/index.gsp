@@ -52,7 +52,7 @@
    								</div>
    							</g:if>	    		
    							<g:else>			
-					    		<table border="1" style="border: 1px solid #ccc">
+					    		<table>
 					    			<thead>
 					    				<tr class="odd">
 					    					<th>All Shipping</th>
@@ -70,7 +70,7 @@
 							    	</tbody>
 							    	<tfoot>
 								    	<tr>
-								    		<td style="text-align: right;"><%-- <g:message code="shipping.total.label"/>--%></td>
+								    		<td style="text-align: left;"><g:message code="shipping.total.label"/></td>
 								    		<td style="text-align: center;"><g:link controller="shipment" action="listShipping" params="['activityType':'SHIPPING']">${allOutgoingShipments.size()}</g:link></td>
 								    	</tr>
 							    	</tfoot>
@@ -87,7 +87,7 @@
    								</div>
    							</g:if>	    		
    							<g:else>			
-					    		<table border="1" style="border: 1px solid #ccc">
+					    		<table>
 						    		<thead>
 					    				<tr class="odd">
 					    					<th>All Receiving</th>
@@ -104,7 +104,7 @@
 							    	</tbody>
 							    	<tfoot>
 								    	<tr>
-								    		<td style="text-align: right;"><%-- <g:message code="shipping.total.label"/>--%></td>							    		
+								    		<td style="text-align: left;"><g:message code="shipping.total.label"/></td>							    		
 								    		<td style="text-align: center;"><g:link controller="shipment" action="listReceiving" params="['activityType':'RECEIVING']">${allIncomingShipments.size()}</g:link></td>
 								    	</tr>
 							    	</tfoot>

@@ -13,24 +13,32 @@
 	<!-- Include Main CSS -->
 	<!-- TODO Apparently there's a slight distinction between these two ... need to figure out what that distinction is -->
 	<%--<link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" />--%>
-	
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'menu.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'form.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footer.css')}" type="text/css" media="screen, projection" />
 	
-	
 	<!-- Include javascript files -->
 	<g:javascript library="application"/>
-	<g:javascript library="jquery" plugin="jquery"/>
 
-	<!-- Manually include jquery-ui resources -->
+	<g:javascript library="jquery" plugin="jquery" />
+	<%--<jqui:resources theme="smoothness" /> --%> 
+	<link href="${createLinkTo(dir:'js/jquery.ui/css/cupertino', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
+	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-ui-1.8.7.js')}" type="text/javascript" ></script>
+
+	<!-- Manually include jquery-ui resources 	
 	<link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui-1.8.2.custom.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
 	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-ui-1.8.2.custom.min.js')}" type="text/javascript" ></script>
+	-->
+	
+	<!-- Include other plugins -->
 	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.cookies.2.2.0.min.js')}" type="text/javascript" ></script>
+	<%--
+	<!-- Broken --> 
     <script type="text/javascript" src="${createLinkTo(dir:'js/jquery/', file:'fg.menu.js')}"></script>
     <link type="text/css" href="${createLinkTo(dir:'js/jquery/', file:'fg.menu.css')}" media="screen" rel="stylesheet" />	
+	--%>
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'custom.css')}" type="text/css" media="screen, projection" />
 	
 	<!-- Custom styles to be applied to all pages -->
@@ -39,7 +47,7 @@
 	<!-- Grails Layout : write head element for page-->
 	<g:layoutHead />
 	
-	
+	<%--  
 	<script>
 		$(document).ready(function() {
 	  		$('table.dataTable tr').hover(function() {
@@ -54,6 +62,7 @@
 			});
 		});
 	</script>
+	--%>
 	
 	
 </head>
@@ -108,17 +117,19 @@
 										<li>
 											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
 										</li>					
-											<li>
-												<g:link style="vertical-align: middle" class="home" controller="user" action="show" id="${session.user.id}">
-													My Profile
-												</g:link>	
-											</li>
+										<li>
+											<img src="${createLinkTo(dir: 'images/icons', file: 'profile.png')}" style="vertical-align: top" />
+											<g:link style="vertical-align: middle" class="home" controller="user" action="show" id="${session.user.id}">
+												Profile
+											</g:link>	
+										</li>
 										<li>
 											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
 										</li>												
 																	
 										<g:if test="${session?.warehouse}">
 											<li>
+												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'building.png')}" style="vertical-align: middle" />
 												<a style="vertical-align: middle" class="home" href='${createLink(controller: "dashboard", action:"chooseWarehouse")}'>
 													${session?.warehouse?.name }
 												</a>	

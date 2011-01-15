@@ -5,6 +5,7 @@ import grails.converters.*;
 import org.pih.warehouse.core.DialogForm;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.UnitOfMeasure;
+import org.pih.warehouse.inventory.InventoryLot;
 import org.pih.warehouse.inventory.Warehouse;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.shipping.Container;
@@ -14,6 +15,30 @@ import org.pih.warehouse.shipping.ShipperService;
 import org.pih.warehouse.shipping.Shipment;
 
 class JsonController {
+	
+	
+	def findLotsByName = { 
+		log.info params
+		def items = new TreeSet();
+		if (params.term) {
+			items = InventoryLot.withCriteria {
+				or {
+					ilike("lotNumber", params.term + "%")
+				}
+			}
+			if (items) {
+				items = items.collect() {
+					[value: it.lotNumber,
+					label: it.lotNumber,
+					valueText: it.lotNumber,
+					desc: it.lotNumber,
+					icon: "none" 	]
+				}
+			}
+		}
+		render items as JSON;
+	}
+	
 	
 	def findCategoryByName = { 
 		log.info params

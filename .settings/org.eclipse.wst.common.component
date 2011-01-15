@@ -1,21 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-modules id="moduleCoreId" project-version="1.5.0">
     <wb-module deploy-name="warehouse">
-        <wb-resource deploy-path="/" source-path="/settings-1.4-grails-app-services"/>
-        <wb-resource deploy-path="/" source-path="/settings-1.4-grails-app-i18n"/>
-        <wb-resource deploy-path="/" source-path="/settings-1.4-grails-app-taglib"/>
-        <wb-resource deploy-path="/" source-path="/settings-1.4-grails-app-controllers"/>
-        <wb-resource deploy-path="/" source-path="/settings-1.4-grails-app-domain"/>
-        <wb-resource deploy-path="/" source-path="/settings-1.4-grails-app-views"/>
-        <wb-resource deploy-path="/" source-path="/tomcat-1.3.4-src-groovy"/>
-        <wb-resource deploy-path="/" source-path="/spock-0.5-groovy-1.7-SNAPSHOT-src-java"/>
-        <wb-resource deploy-path="/" source-path="/jquery-1.4.3.2-grails-app-services"/>
-        <wb-resource deploy-path="/" source-path="/jquery-1.4.3.2-grails-app-i18n"/>
-        <wb-resource deploy-path="/" source-path="/jquery-1.4.3.2-grails-app-taglib"/>
-        <wb-resource deploy-path="/" source-path="/jquery-1.4.3.2-grails-app-conf"/>
-        <wb-resource deploy-path="/" source-path="/jquery-1.4.3.2-src-groovy"/>
-        <wb-resource deploy-path="/" source-path="/liquibase-1.9.3.5-grails-app-migrations"/>
-        <wb-resource deploy-path="/" source-path="/liquibase-1.9.3.5-src-java"/>
-        <wb-resource deploy-path="/" source-path="/liquibase-1.9.3.5-src-groovy"/>
     </wb-module>
 </project-modules>

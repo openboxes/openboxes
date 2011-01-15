@@ -2,10 +2,15 @@
 
 	<div id="shipmentMenu" class="menu" style="width: 250px">
 		<fieldset>
-			<legend>Actions</legend>			
+			
 			<table>
+				<thead>
+					<tr>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
 				<g:if test="${session?.warehouse?.id == shipmentInstance?.origin?.id}">			
-
 					<tr>
 						<td>
 							<g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}"><img
@@ -43,7 +48,7 @@
 						<tr class="prop">
 							<td>
 								<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}"><img 
-								src="${createLinkTo(dir:'images/icons',file:'pack-shipment.png')}" 
+								src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" 
 								alt="Edit Contents" style="vertical-align: middle"/> &nbsp; 
 									<g:if test="${request.request.requestURL.toString().contains('editContents')}"><b>edit contents</b></g:if>
 									<g:else>edit contents</g:else>
@@ -140,19 +145,26 @@
 					</g:link>				
 				</td>
 			</tr>
+			</tbody>
 		</table>
 	</fieldset>
 </div>
 <br/>
 <div style="width: 250px" class="menu" >
 	<fieldset>
-		<legend>Packages</legend>
 		<table>
 			<tr>
 				<th>Package</th>
 				<th>Items</th>
 				<th>Weight (lbs)</th>
 			</tr>
+			<g:if test="${!shipmentInstance.containers }">
+				<tr class="odd">
+					<td colspan="3">
+						<span class="fade">No contents</span>
+					</td>
+				</tr>			
+			</g:if>
 			<g:each in="${shipmentInstance.containers}" var="container" status="i">				
 				<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 					<td>
@@ -184,12 +196,18 @@
 <br/>
 <div style="width: 250px" class="menu" >
 	<fieldset>
-		<legend>Shipping</legend>
 		<table>
 			<tr>
 				<th>Date</th>
 				<th>Description</th>
 			</tr>
+			<g:if test="${!shipmentInstance.events }">
+				<tr class="odd">
+					<td colspan="2">
+						<span class="fade">No events</span>
+					</td>
+				</tr>			
+			</g:if>
 			<g:each in="${shipmentInstance.events}" var="event" status="i">				
 				<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 					<td nowrap="nowrap">						

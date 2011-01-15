@@ -127,7 +127,7 @@ div.errors {
     border: 1px solid red;
     color: #cc0000;
     margin: 10px 0 5px 0;
-    padding: 5px 0 5px 0;
+    padding: 0px 0 5px 0;
 }
 div.errors ul {
     list-style: none;

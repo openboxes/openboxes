@@ -1,18 +1,3 @@
-<script type="text/javascript">
-$(function() { 
-	$('#leftnavMenu').accordion({
-		active: true, 
-		navigation: true, 
-		autoheight: true, 
-		alwaysOpen: true,
-		clearStyle: false, 
-		animated: false,
-		navigation: true,
-		event: "click" /*mouseover*/ 
-	});
-});
-</script>
-
 <style>
 /*.menuButton { font-variant: small-caps; }*/ 
 /* remove gaudy background image */	
@@ -36,7 +21,7 @@ $(function() {
 			</li>				
 		</ul>
 	</div>
-	
+	<%-- 
 	<h3 class="heading">
 		<g:message code="order.label"  default="Orders"/>
 	</h3>
@@ -51,7 +36,7 @@ $(function() {
 
 		</ul>	
 	</div>
-	
+	--%>
 	<h3 class="heading" >
 		<g:message code="shipping.label"  default="Shipping"/>
 	</h3>
@@ -328,3 +313,18 @@ $(function() {
 	</div>
 	
 </div>
+
+<script type="text/javascript">
+$(function() { 
+	$('#leftnavMenu').accordion({
+		active: true, 
+		navigation: true, 
+		autoheight: true, 
+		alwaysOpen: true,
+		clearStyle: false, 
+		animated: false,
+		navigation: true,
+		event: "click" /*mouseover*/ 
+	});
+});
+</script>
