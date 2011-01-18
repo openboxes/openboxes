@@ -107,16 +107,31 @@
 														<g:hiddenField name="recordInventoryRows[${status}].id" value="${recordInventoryRow?.id }"/>
 													</td>
 													<td>
+														<%-- 
 														<g:textField name="recordInventoryRows[${status}].description" size="25" value="${recordInventoryRow?.description }"/>
-	
+														--%>
+														<g:hiddenField name="recordInventoryRows[${status}].description" value="${recordInventoryRow?.description }"/>
+														${recordInventoryRow?.description }
 													</td>
 													<td>
+														<%-- 
 														<g:textField name="recordInventoryRows[${status}].lotNumber" size="10" value="${recordInventoryRow?.lotNumber }"/>
+														--%>
+														<g:hiddenField name="recordInventoryRows[${status}].lotNumber" value="${recordInventoryRow?.lotNumber }"/>
+														${recordInventoryRow?.lotNumber }
 													</td>
 													<td>
+														<%-- 
 														<g:jqueryDatePicker id="expirationDate${status }" name="recordInventoryRows[${status}].expirationDate" 
 															value="${recordInventoryRow?.expirationDate}" format="MM/dd/yyyy" showTrigger="false" />
-	
+														--%>
+														<g:hiddenField name="recordInventoryRows[${status}].expirationDate" value="${formatDate(date: recordInventoryRow?.expirationDate, format: 'MM/dd/yyyy') }"/>
+														<g:if test="${recordInventoryRow?.expirationDate}">
+															<g:formatDate date="${recordInventoryRow?.expirationDate}" format="MMM dd yyyy"/>
+														</g:if>
+														<g:else>
+															<span class="fade">never</span>
+														</g:else>
 													</td>
 													<td style="text-align: center; vertical-align: middle;">
 														${recordInventoryRow?.oldQuantity }	
