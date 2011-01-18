@@ -33,7 +33,7 @@
 							<div style="text-align: left; padding: 10px;">
 								<img src="${resource(dir: 'images/icons/silk', file: 'table_refresh.png')}"/>
 								<g:link controller="inventoryItem" 
-									action="showStockCard" params="['product.id':itemInstance?.product?.id]">Show Stock Card</g:link>
+									action="showStockCard" params="['product.id':itemInstance?.product?.id]">Back to Stock Card</g:link>
 							</div>					
 						
 						
@@ -116,7 +116,7 @@
 													<g:textField name="lotNumber" 
 														value="${inventoryItem?.lotNumber }" size="10"/>
 													--%>
-													<g:lotNumberComboBox name="lotNumber" />
+													<g:lotNumberComboBox id="lotNumber" name="lotNumber" />
 												</td>
 												<td>
 													<g:jqueryDatePicker id="expirationDate-${status }" 

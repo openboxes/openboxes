@@ -138,12 +138,22 @@
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="product" action="browse"><g:message code="default.edit.label" args="['Products']" default="Show Products"/></g:link>
+					<g:link class="new" controller="product" action="create"><g:message code="default.add.label" args="['Product']" default="Add New Product" /></g:link>
+				</span>
+			</li>
+			<li class="">
+				<span class="menuButton">
+					<g:link class="view" controller="product" action="browse"><g:message code="default.show.label" args="['Products']" default="Show Products"/></g:link>
 				</span>
 			</li>		
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="product" action="create"><g:message code="default.add.label" args="['Product']" default="Add New Product" /></g:link>
+					<g:link class="view" controller="category" action="tree"><g:message code="default.show.label" args="['Categories']"/></g:link>
+				</span>
+			</li>
+			<li class="">
+				<span class="menuButton">
+					<g:link class="view" controller="attribute" action="list"><g:message code="default.show.label" args="['Attributes']"/></g:link>
 				</span>
 			</li>
 			

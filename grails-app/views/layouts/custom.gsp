@@ -23,13 +23,8 @@
 
 	<g:javascript library="jquery" plugin="jquery" />
 	<%--<jqui:resources theme="smoothness" /> --%> 
-	<link href="${createLinkTo(dir:'js/jquery.ui/css/cupertino', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
+	<link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
 	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-ui-1.8.7.js')}" type="text/javascript" ></script>
-
-	<!-- Manually include jquery-ui resources 	
-	<link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui-1.8.2.custom.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
-	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-ui-1.8.2.custom.min.js')}" type="text/javascript" ></script>
-	-->
 	
 	<!-- Include other plugins -->
 	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>
@@ -180,7 +175,7 @@
 					<!-- Populated using the 'pageTitle' property defined in the GSP file -->
 					<g:if test="${session.user}">
 						<h3>
-						    <div id="pageTitle" style="padding: 5px;">							    
+						    <div id="pageTitle">							    
 						    	<g:link controller="dashboard" action="index">
 							    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'house.png')}"/>
 						    	</g:link>

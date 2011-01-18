@@ -7,30 +7,6 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'inventory.label', default: 'Inventory')}" />
         <title><g:message code="default.browse.label" args="[entityName]" /></title>    
-        
-        <style>
-        	.tabSelected { 
-        		text-align: center;
-	        	background-color: white; 
-	        	border: 1px solid black;
-	        	border-bottom: hidden; 
-        	}
-        	.tabDefault { 
-        		text-align: center;
-        		background-color: #f0f0f0; 
-        		border: 1px solid black; 
-        		border-bottom: 1px solid black; 
-        		border-top: 1px solid black; 
-        		border-right: 1px solid black; 
-        		border-left: 1px solid black;
-        	}
-        	.tabSpacer { 
-        		width: 3px;
-        		border-top: 0px;
-        		border-bottom: 1px solid black;
-        	}
-        	
-        </style>
     </head>    
 
     <body>
@@ -50,22 +26,6 @@
 	            </div>
             </g:hasErrors>    
             
-            <%--
-            <table style="margin-top: 10px;">
-	            <thead>
-    				<tr>				
-						<th class="tabSpacer"></th>
-						<g:each var="productType" in="${productTypes}" status="i">
-							<th class="${((String.valueOf(productType.id)==params?.productType?.id) || (!params?.productType && i == 0))?'tabSelected':'tabDefault'}">								
-								<a href="${createLink(action:'browse',params:["productType.id":productType.id])}">${productType.name}</a>
-							</th>
-							<th class="tabSpacer"></th>
-						</g:each>    				
-    				</tr>        
-            	</thead>
-            </table>
-             --%>
-             
 			<table>
 				<%--
 				<tr>
@@ -121,10 +81,10 @@
 							</ul>
 						</div>
 						--%>
-						
+					</td>
 					<td>	
 					
-						<span>Showing ${productList?.totalCount } products</span>						
+											
 						
 					
 						<fieldset>
@@ -222,6 +182,7 @@
 								</table>
 							</div>
 						</fieldset>
+						<span>Showing ${productList?.totalCount } products</span>	
 					</td>
 				</tr>
 			</table>

@@ -183,7 +183,8 @@ class InventoryItemController {
 			redirect(controller: "inventoryItem", action: "showStockCard", id: itemInstance.id)
 		}
 		else {
-			render(view: "create", model: [itemInstance: inventoryItem, inventoryInstance: inventoryInstance])
+			def inventoryItems = inventoryService.getInventoryItemsByProduct(inventoryItem.product);
+			render(view: "create", model: [itemInstance: inventoryItem, inventoryInstance: inventoryInstance, inventoryItems: inventoryItems])
 		}
 	}
 	

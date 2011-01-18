@@ -420,6 +420,9 @@ th.desc a {
 .menuButton a.browse {
     background: url(../images/icons/silk/magnifier.png) center left no-repeat;
 }
+.menuButton a.view {
+    background: url(../images/icons/silk/magnifier.png) center left no-repeat;
+}
 .menuButton a.delete {
     background: url(../images/icons/silk/delete.png) center left no-repeat;
 }

@@ -22,14 +22,47 @@
 			<g:hasErrors bean="${itemInstance}">
 				<div class="errors"><g:renderErrors bean="${itemInstance}" as="list" /></div>
 			</g:hasErrors>
+			
+			
+															
+												
 			<div class="dialog">		
 				<table>
 					<tr>
-						<td>
+						<td style="width: 250px;">
 							<g:render template="productDetails" model="[productInstance:productInstance]"/>											
 						</td>
-						<td>										
-							<fieldset>										
+						<td>			
+							<div class="stockOptions">
+								<ul>
+									<li>
+										<img src="${resource(dir: 'images/icons/silk', file: 'table_refresh.png')}"/>
+										<g:link controller="inventory" action="browse" >Back to Inventory</g:link>
+									</li>
+									<li>
+										<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
+										<g:link controller="inventoryItem" action="showRecordInventory" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
+											Record stock
+										</g:link>
+									</li>
+									<li>
+										<img src="${resource(dir: 'images/icons/silk', file: 'magnifier.png')}"/>
+										<g:link controller="inventoryItem" action="showTransactions" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
+											Show changes
+										</g:link>
+									</li>
+									<li>
+										<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}"/>
+										<g:link controller="inventoryItem" action="create" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
+											Add item
+										</g:link>
+									</li>
+								</ul>
+							</div>									
+						
+													
+							<fieldset>	
+								<legend class="fade">Current Stock</legend>																
 								<div id="inventoryView" style="text-align: right;">										
 									<table border="0" style="border:1px solid #f5f5f5" width="100%">
 										<thead>
@@ -78,25 +111,7 @@
 									</table>										
 								</div>			
 								
-							<div style="text-align: left; padding: 10px;">
-								<img src="${resource(dir: 'images/icons/silk', file: 'table_refresh.png')}"/>
-								<g:link controller="inventory" action="browse" >Show Inventory</g:link>
-								&nbsp;
-								<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}"/>
-								<g:link controller="inventoryItem" action="create" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
-									Add item
-								</g:link>
-								&nbsp;
-								<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
-								<g:link controller="inventoryItem" action="showRecordInventory" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
-									Record stock
-								</g:link>
-								&nbsp;
-								<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
-								<g:link controller="inventoryItem" action="showTransactions" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
-									Show changes
-								</g:link>
-							</div>															
+															
 							</fieldset>
 						</td>
 					</tr>

@@ -32,8 +32,8 @@ class InventoryTagLib {
 					}
 				</style>
 				
-				<input id="${id}-id" type="hidden" name="${name}.id" value="${valueId}"/>
-				<input id="${id}-suggest" type="text" name="${name}.name" value="${valueName}" style="width: ${width}px; display: ${suggestDisplay};">
+				<input id="${id}-id" type="hidden" name="${name}" value="${valueId}"/>
+				<input id="${id}-suggest" type="text" name="${name}" value="${valueName}" style="width: ${width}px; display: ${suggestDisplay};">
 				<span id="${id}-span" style="text-align: left; display: ${spanDisplay};">${valueName}</span>
 				
 				<script>

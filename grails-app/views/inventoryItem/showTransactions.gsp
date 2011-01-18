@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
 <g:set var="entityName"
-	value="${message(code: 'stockCard.label', default: 'Stock Card')}" />
+	value="${message(code: 'transactions.label', default: 'Transactions')}" />
 <title><g:message code="default.show.label" args="[entityName]" /></title>
 </head>
 
@@ -29,13 +29,37 @@
 							
 							
 								<tr>
-									<td>
+									<td style="width: 250px;">
 										<g:render template="productDetails" model="[productInstance:productInstance]"/>											
 									</td>
 									<td>										
-										
-									
-										
+										<div class="stockOptions">
+											<ul>
+												<li>							
+													<img src="${resource(dir: 'images/icons/silk', file: 'table_refresh.png')}"/>
+													<g:link controller="inventoryItem" 
+														action="showStockCard" params="['product.id':productInstance?.id]">Back to Stock Card</g:link>							
+												</li>
+												<li>
+													<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
+													<g:link controller="inventoryItem" action="showRecordInventory" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
+														Record stock
+													</g:link>
+												</li>
+												<li>
+													<img src="${resource(dir: 'images/icons/silk', file: 'magnifier.png')}"/>
+													<g:link controller="inventoryItem" action="showTransactions" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
+														Show changes
+													</g:link>
+												</li>
+												<li>
+													<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}"/>
+													<g:link controller="inventoryItem" action="create" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
+														Add item
+													</g:link>
+												</li>
+											</ul>
+										</div>											
 										
 										<fieldset>
 											<legend><span class="fade">Recent Transactions</span></legend>
@@ -91,18 +115,7 @@
 												</tbody>
 											</table>
 											
-										<div style="text-align: left; padding: 10px;">
-											<img src="${resource(dir: 'images/icons/silk', file: 'table_refresh.png')}"/>
-											<g:link controller="inventory" action="browse" >Show Inventory</g:link>
-											&nbsp;
-											<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}"/>
-											<g:link controller="inventoryItem" action="create" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
-												Add item</g:link>
-											&nbsp;
-											<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
-											<g:link controller="inventoryItem" action="showRecordInventory" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
-												Record stock</g:link>
-										</div>											
+																		
 											
 											<%-- 
 											<div id="transactionEntryButton" style="text-align: right;">

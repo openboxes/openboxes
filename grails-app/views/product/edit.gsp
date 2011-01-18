@@ -38,10 +38,7 @@
             	<g:hiddenField name="categoryId" value="${params?.category?.id }"/><!--  So we know which category to show on browse page after submit -->
 
                 <div class="dialog">
-					<fieldset>	              		
-					
-						<g:render template="summary"/>
-					
+					<fieldset>	              							
 		                <table>
 	                      <tbody>                
 								<tr class="prop">
@@ -118,6 +115,7 @@
 				
 						</tbody>
 					</table>
+					</fieldset>
 				</div>
 			</g:form>
         </div>

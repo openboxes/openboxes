@@ -22,25 +22,28 @@
                 <table>
                     <thead>
                         <tr>                        
-                            <th><g:message code="warehouse.active.label" default="Active?" /></th>
                             <g:sortableColumn property="name" title="${message(code: 'warehouse.name.label', default: 'Name')}" />
                             <th><g:message code="warehouse.locationType.label" default="Location Type" /></th>
                             <th><g:message code="warehouse.manager.label" default="Manager" /></th>
-                            <th><g:message code="warehouse.local.label" default="Managed Locally?" /></th>
+                            <th class="center"><g:message code="warehouse.active.label" default="Active?" /></th>
+                            <th class="center"><g:message code="warehouse.local.label" default="Managed Locally?" /></th>
+                            <th class="center"><g:message code="warehouse.edit.label" default="Edit" /></th>
+                            <th class="center"><g:message code="warehouse.delete.label" default="Delete" /></th>
+                            
                         </tr>
                     </thead>
                     <tbody>
                     <g:each in="${warehouseInstanceList}" status="i" var="warehouseInstance">
 						<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                            <td>${fieldValue(bean: warehouseInstance, field: "active")}</td>                            
 							<td>
 								<g:link action="edit" id="${warehouseInstance.id}">${fieldValue(bean: warehouseInstance, field: "name")}</g:link>
 							</td>
                             <td>${fieldValue(bean: warehouseInstance, field: "locationType.name")}</td>                            
                             <td>${fieldValue(bean: warehouseInstance, field: "manager")}</td>                            
-                            <td>${fieldValue(bean: warehouseInstance, field: "local")}</td>                            
-							<td><g:link class="edit" action="edit" id="${warehouseInstance?.id}" >${message(code: 'default.button.edit.label', default: 'Edit')}</g:link></td>
-							<td><g:link class="delete" action="delete" id="${warehouseInstance?.id}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">${message(code: 'default.button.delete.label', default: 'Delete')}</g:link></td>                            
+                            <td class="center tenth">${fieldValue(bean: warehouseInstance, field: "active")?'yes':'no'}</td>                            
+                            <td class="center tenth">${fieldValue(bean: warehouseInstance, field: "local")?'yes':'no'}</td>                            
+							<td class="center tenth"><g:link class="edit" action="edit" id="${warehouseInstance?.id}" >${message(code: 'default.button.edit.label', default: 'Edit')}</g:link></td>
+							<td class="center tenth"><g:link class="delete" action="delete" id="${warehouseInstance?.id}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">${message(code: 'default.button.delete.label', default: 'Delete')}</g:link></td>                            
 
 			
 

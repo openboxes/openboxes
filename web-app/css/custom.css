@@ -4,7 +4,9 @@
 #doc3 {
 	margin:auto;
 }
-
+#hd { 
+	background-color: #f7f7f7; 
+}
 /* temporarily hide the nav bar until we figure out whether we want to keep it or not */
 .nav { display: none; } 
 
@@ -34,6 +36,17 @@ body {
 #dashboard { 
 	margin: 0px; 	
 }
+#productDetails { 
+	width: 250px;
+}
+.stockOptions { 
+	text-align: left; padding: 10px;
+}
+.stockOptions ul li { 
+	display: inline;
+	padding-right: 15px;
+}
+
 
 img { 
 	vertical-align: middle;
@@ -127,6 +140,29 @@ table#listOutgoing td {
 }
 
 table#listOutgoing th { 
+}
+
+
+.five { 
+	width: 5%;
+}
+.tenth { 
+	width: 10%;
+}
+.quarter { 
+	width: 25%;
+}
+.full { 
+	width: 100%;
+}
+.right { 
+	text-align: right;
+}
+.left { 
+	text-align: left;
+}
+.center { 
+	text-align: center;
 }
 	
 .dialog td { 
@@ -243,7 +279,7 @@ h2 {
 #pageTitle { 
 	/*border-top: 1px solid lightgrey;
 	background-color: #f0f0f0;*/
-	padding: 5px 5px 5px 5px;	
+	padding: 5px 5px 15px 5px;	
 }
 
 .section { 	
