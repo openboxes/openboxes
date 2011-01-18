@@ -24,7 +24,7 @@ class InventoryItemController {
 
 	def showRecordInventory = { RecordInventoryCommand cmd -> 
 		def commandInstance = inventoryService.getRecordInventoryCommand(cmd, params)
-
+		
 		// We need to set the inventory instance in order to save an 'inventory' transaction
 		def warehouseInstance = Warehouse.get(session?.warehouse?.id)				
 		

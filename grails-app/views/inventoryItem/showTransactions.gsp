@@ -40,6 +40,7 @@
 													<g:link controller="inventoryItem" 
 														action="showStockCard" params="['product.id':productInstance?.id]">Back to Stock Card</g:link>							
 												</li>
+												<%-- 
 												<li>
 													<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
 													<g:link controller="inventoryItem" action="showRecordInventory" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
@@ -58,6 +59,7 @@
 														Add item
 													</g:link>
 												</li>
+												--%>
 											</ul>
 										</div>											
 										

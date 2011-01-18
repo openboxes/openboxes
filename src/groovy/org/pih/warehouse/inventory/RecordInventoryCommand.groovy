@@ -10,7 +10,7 @@ import org.codehaus.groovy.grails.validation.Validateable
 class RecordInventoryCommand {
 	
 	Product product;
-	Date transactionDate;
+	Date transactionDate = new Date();
 	Inventory inventory;
 	RecordInventoryRowCommand recordInventoryRow;
 	List<RecordInventoryRowCommand> recordInventoryRows =
