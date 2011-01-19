@@ -57,7 +57,7 @@
 								</tr>
 								<tr class="prop">
 									<td valign="top" class="name">
-										<label for="email" class="loginField"><g:message code="user.usernameOrEmail.label" default="Username or email" /></label>
+										<label for="email" class="loginField"><g:message code="user.usernameOrEmail.label" default="Username" /></label>
 									</td>
 									<td valign="top" class="value ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
 										<g:textField class="loginField" name="username" value="${userInstance?.username}" size="25" />

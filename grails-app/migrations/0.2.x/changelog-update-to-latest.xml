@@ -1735,7 +1735,8 @@
     <changeSet author="jmiranda (generated)" id="1294078999350-11">
         <dropNotNullConstraint columnDataType="BIGINT" columnName="source_id" tableName="transaction"/>
     </changeSet>    
-
+    
+    
 	<!-- 	
 			update inventory_item, product 
 			set inventory_item.description = product.name 

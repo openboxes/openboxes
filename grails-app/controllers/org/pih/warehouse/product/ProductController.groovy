@@ -99,7 +99,7 @@ class ProductController {
 		//def productsByCategory = products.groupBy { it.category } 
 				
 		def products = inventoryService.getProductsByCategories(categoryFilters, params);
-		products = products ?: Product.list(params);
+		products = products ?: Product.list();
 		def productsByCategory = products.groupBy { it.category }
 		
 		render(view:'browse', model:[productInstanceList : products, 
@@ -190,6 +190,24 @@ class ProductController {
             }
             productInstance.properties = params
 			
+			log.info("Categories " + productInstance?.categories);
+			
+			// find the phones that are marked for deletion
+			def _toBeDeleted = productInstance.categories.findAll {(it?.deleted || (it == null))}
+			
+			log.info("toBeDeleted: " + _toBeDeleted )
+			
+			// if there are phones to be deleted remove them all
+			if (_toBeDeleted) {
+				productInstance.categories.removeAll(_toBeDeleted)
+			}
+			 
+			//update my indexes
+			//productInstance.categories.eachWithIndex(){cat, i ->
+			//	cat.index = i
+			//}
+			
+			/*
 			productInstance?.categories?.clear();		
 			params.each {
 				println ("category: " + it.key +  " starts with category_ " + it.key.startsWith("category_"))
@@ -199,8 +217,8 @@ class ProductController {
 					log.info "adding " + category?.name
 					productInstance.addToCategories(category)
 				}
-			  }
-			
+			}
+			*/
             if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
                 flash.message = "${message(code: 'default.updated.message', args: [message(code: 'product.label', default: 'Product'), productInstance.name])}"
                 redirect(action: "browse", params:params)

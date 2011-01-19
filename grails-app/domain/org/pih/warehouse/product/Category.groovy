@@ -10,11 +10,13 @@ class Category {
 	Category parentCategory
 	Date dateCreated;
 	Date lastUpdated;
+	boolean deleted 
+	
 	
 	static hasMany = [ categories : Category ];
 	static mappedBy = [ categories : "parentCategory" ];
 	static belongsTo = [ parentCategory : Category ];
-	static transients = [ "parents", "children" ]
+	static transients = [ "parents", "children", "deleted" ]
 	static mapping = {
 		sort name:"desc"
 		categories sort:"name"

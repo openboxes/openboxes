@@ -1,6 +1,9 @@
 package org.pih.warehouse.product
 
 import java.util.Date;
+
+import org.apache.commons.collections.FactoryUtils;
+import org.apache.commons.collections.list.LazyList;
 import org.pih.warehouse.core.UnitOfMeasure;
 import org.pih.warehouse.product.Category;
 
@@ -27,8 +30,8 @@ class Product implements Serializable {
 	Boolean coldChain = Boolean.FALSE;
 
 	// Associations 
-	List attributes;
-	List categories;
+	List attributes = new ArrayList();
+	List categories = new ArrayList();
 	
 	// Auditing
 	Date dateCreated;
@@ -37,7 +40,10 @@ class Product implements Serializable {
 	static transients = ["rootCategory"];
 	
 	static hasMany = [ categories : Category, attributes : ProductAttribute, tags : String ]
-	
+	static mapping = {
+		categories joinTable: [name:'product_category', column: 'category_id', key: 'product_id']
+	}
+		
     static constraints = {
 		name(nullable:true)
 		description(nullable:true)
@@ -46,6 +52,10 @@ class Product implements Serializable {
 		coldChain(nullable:true)
     }
 	
+	def getCategoriesList() {
+		return LazyList.decorate(categories,
+			  FactoryUtils.instantiateFactory(Category.class))
+	}
 	
 	Category getRootCategory() { 
 		Category rootCategory = new Category();

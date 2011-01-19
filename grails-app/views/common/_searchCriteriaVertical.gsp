@@ -39,9 +39,6 @@
 				</td>
 			</tr>
 			<tr>
-				<td><hr/></td>
-			</tr>
-			<tr>
 				<td style="text-align: center;">
 					<g:form action="addCategoryFilter">
 						<select id="categoryFilter" name="categoryId">

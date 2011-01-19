@@ -43,25 +43,76 @@
 	                      <tbody>                
 								<tr class="prop">
 									<td valign="top" class="name"><label for="name"><g:message
-										code="product.name.label" default="Product Description" /></label></td>
+										code="product.name.label" default="Description" /></label></td>
 									<td valign="top"
 										class="value ${hasErrors(bean: productInstance, field: 'name', 'errors')}">
 									<g:textField name="name" value="${productInstance?.name}" size="40" />
 									</td>
 								</tr>
 								<tr class="prop">
+									<td valign="top" class="name"><label for="name"><g:message
+										code="product.productCode.label" default="Product Code" /></label></td>
+									<td valign="top"
+										class="value ${hasErrors(bean: productInstance, field: 'productCode', 'errors')}">
+									<g:textField name="productCode" value="${productInstance?.productCode}" size="15" />
+									</td>
+								</tr>								
+								<tr class="prop">
+									<td valign="top" class="name"><label for="name"><g:message
+										code="product.coldChain.label" default="Cold Chain" /></label></td>
+									<td valign="top"
+										class="value ${hasErrors(bean: productInstance, field: 'coldChain', 'errors')}">
+									<g:checkBox name="coldChain" value="${productInstance?.coldChain}" />
+									</td>
+								</tr>								
+								<tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="categories"><g:message code="product.categories.label" default="Category" /></label>
+	                                  <label for="categories"><g:message code="product.primaryCategory.label" default="Primary Category" /></label>
 	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'categories', 'errors')}">
+	                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'category', 'errors')}">
 	                                	<%-- <g:render template="../category/chooser"/>--%>
 	                                	
 										<select name="category.id">
-											<option value="">no parent</option>
+											<option value=""></option>
 											<g:render template="../category/selectOptions" model="[category:rootCategory, selected:productInstance?.category, level: 0]"/>
-										</select>	      
+										</select>	
 									</td>
 								</tr>	
+								
+								<%--
+								<tr class="prop">
+	                                <td valign="top" class="name">
+	                                  <label for="categories"><g:message code="product.otherCategories.label" default="Other Categories" /></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'categories', 'errors')}">
+	                                	<ul>
+		                                	<g:each var="category" in="${productInstance?.categories}">
+												<li>${category?.name }</li>
+		                                	</g:each>
+		                                </ul>
+										<select name="categories.id" >
+											<g:render template="../category/selectOptions" model="[category:rootCategory, selected:[], level: 0]"/>
+										</select>	      
+										${productInstance?.categories }
+									</td>
+								</tr>	
+								 --%>
+								 
+								<style>
+									.category-div { 
+										padding: 5px;
+										}
+								</style>
+								 
+								<tr class="prop">
+								   <td valign="top" class="name">
+								      <label for="categories"><g:message code="product.categories.label" default="Categories" /></label>
+								   </td>
+								   <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'categories', 'errors')}">
+								       <g:render template="categories" model="['productInstance':productInstance]" />
+								   </td>
+								</tr>								
+								
 								<g:each var="attribute" in="${org.pih.warehouse.product.Attribute.list()}" status="status">
 									<tr class="prop">
 										<td valign="top" class="name"><label for="attributes">
@@ -95,7 +146,7 @@
 										</button>
 										
 										<g:if test="${productInstance?.id}">
-											<g:link controller='product' action='show' id='${productInstance.id}' class="negative">			
+											<g:link controller='product' action='browse' class="negative">			
 												<img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="" /> ${message(code: 'default.button.save.label', default: 'Cancel')}			
 											</g:link>  
 										</g:if>
@@ -119,5 +170,6 @@
 				</div>
 			</g:form>
         </div>
+        <g:render template='category' model="['category':null,'i':'_clone','hidden':true]"/>
     </body>
 </html>

@@ -92,7 +92,7 @@
 															<g:formatDate date="${itemInstance?.inventoryLot?.expirationDate }" format="dd/MMM/yy" />
 														</g:if>
 														<g:else>
-															<span class="fade">n/a</span>
+															<span class="fade">never</span>
 														</g:else>
 													</td>
 													<td style="text-align: center;">${itemInstance?.quantity }</td>												

@@ -150,10 +150,10 @@ class InventoryService {
 		def products = []
 		def matchCategories = []
 		if (categories) { 
-			categories.each { c -> 
-				if (c) {
-					matchCategories << c;
-					matchCategories.addAll( (c?.children)?c.children:[]);
+			categories.each { cat -> 
+				if (cat) {
+					matchCategories << cat;
+					matchCategories.addAll( (cat?.children)?cat.children:[]);
 				}
 			}
 		}
