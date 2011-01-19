@@ -19,8 +19,9 @@
 
 li.ui-menu-item { text-align: left; font-weight: bold; }
 h3 { 
-	font-size: 1.25em;
+	font-size: 1.1em;
 	vertical-align: middle;
+	color: #008000;
 } 
 h3.ui-state-active { background-color: #f7f7f7; }  /* #F8F7EF */
 .ui-accordion .ui-accordion-content { padding: 0px; } 

@@ -45,7 +45,7 @@ class Product implements Serializable {
 	}
 		
     static constraints = {
-		name(nullable:true)
+		name(nullable:false)
 		description(nullable:true)
 		productCode(nullable:true)		
 		category(nullable:true)

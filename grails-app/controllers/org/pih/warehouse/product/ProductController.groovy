@@ -129,7 +129,8 @@ class ProductController {
 		log.info "save called with params " + params
 		log.info "type = " + params.type;
 		
-		def productInstance = new Product(params);	
+		def productInstance = new Product();	
+		/*
 		productInstance?.categories?.clear();
 		println "size: " + productInstance?.categories?.size()
 		params.each {
@@ -140,8 +141,23 @@ class ProductController {
 				productInstance.addToCategories(category)
 			}
 		  }
-
-		if (productInstance.save(flush: true)) {
+		*/
+		productInstance.properties = params
+		
+		log.info("Categories " + productInstance?.categories);
+		
+		// find the phones that are marked for deletion
+		def _toBeDeleted = productInstance.categories.findAll {(it?.deleted || (it == null))}
+		
+		log.info("toBeDeleted: " + _toBeDeleted )
+		
+		// if there are phones to be deleted remove them all
+		if (_toBeDeleted) {
+			productInstance.categories.removeAll(_toBeDeleted)
+		}
+		
+		
+		if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'product.label', default: 'Product'), productInstance.name])}"
             redirect(action: "browse", params:params)
         }

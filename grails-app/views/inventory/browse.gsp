@@ -7,7 +7,12 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'inventory.label', default: 'Inventory')}" />
         <title><g:message code="default.browse.label" args="[entityName]" /></title>    
+
+
+
+
     </head>    
+    
 
     <body>
         <div class="body">
@@ -37,7 +42,7 @@
 				 --%>
 				<tr>
 					<td style="width:100px;">             
-						<g:render template="/common/searchCriteriaVertical"/>					
+						<g:render template="/common/searchCriteriaVertical" model="[productInstanceList:productList]"/>					
              
 						<%--
 						<!-- Initial implementation of the product category --> 
@@ -83,14 +88,7 @@
 						--%>
 					</td>
 					<td>	
-					
-											
-						
-					
-						<fieldset>
-
-				            <div> 
-			            		
+								            		
 			            		<script>
 									$(function() {
 										$("#dialogButton").click(function () { 
@@ -100,89 +98,93 @@
 								</script>
 								
 			            		<g:set var="varStatus" value="${0 }"/>
-								<table class="dataTable">
-									<thead>
-										<tr class="even">
-											<th>ID</th>
-											<th>Code</th>
-											<th>Description</th>
-											<th>Quantity</th>
-										</tr>
-									</thead>
-									
-				            		<g:if test="${productList }">         		
-										<tbody>
-											<g:set var="totalQuantity" value="${0 }"/>
-											<g:each var="productInstance" in="${productList }" status="i">
-											 	<g:set var="itemInstanceList" value="${inventoryMap.get(productInstance)}"/>	
-											 	<g:set var="inventoryLevel" value="${inventoryLevelMap?.get(productInstance)?.get(0)}"/>
-											 	<g:set var="quantity" value="${(itemInstanceList)?itemInstanceList*.quantity.sum():0 }"/>
-												<g:set var="totalQuantity" value="${totalQuantity+quantity }"/>
-												<tr class="${varStatus++%2==0?'odd':'even' }">
-													<%-- 
-													<td style="width: 5%; text-align: center;">
-														<g:if test="${itemInstanceList }">
-															<g:if test="${quantity < 0}">
-																<img src="${createLinkTo(dir: 'images/icons/silk', file: 'exclamation.png') }" alt="Out of Stock"/>
-															</g:if>
-															<g:elseif test="${inventoryLevel?.minQuantity && quantity <= inventoryLevel?.minQuantity}">
-																<img src="${createLinkTo(dir: 'images/icons/silk', file: 'exclamation.png') }" alt="Low Stock"/>
-															</g:elseif>
-															<g:elseif test="${inventoryLevel?.reorderQuantity && quantity <= inventoryLevel?.reorderQuantity}">
-																<img src="${createLinkTo(dir: 'images/icons/silk', file: 'error.png') }" alt="Reorder"/>
-															</g:elseif>										
-															<g:elseif test="${inventoryLevel?.maxQuantity && quantity >= inventoryLevel?.maxQuantity}" >
-																<img src="${createLinkTo(dir: 'images/icons/silk', file: 'error.png') }" alt="Overstock"/>
-															</g:elseif>	
-															<g:else>
-																<img src="${createLinkTo(dir: 'images/icons/silk', file: 'tick.png') }" alt="Ok"/>
-															</g:else>
-														</g:if>								
-													</td>
-													--%>		
-													<td>${productInstance?.id }</td>						
-													<td>${productInstance?.productCode }</td>						
-													<td style="">
-														<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">
-															${productInstance?.name }
-														</g:link> &nbsp; <span class="fade">${productInstance?.category?.name }</span>
-															
-													</td>
-													<td style="width: 5%; text-align: center;">
-														<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">${(itemInstanceList)?itemInstanceList*.quantity.sum():'<span class="fade">N/A</span>' }</g:link>
-													</td>
+			            			<div>
+										<table class="dataTable">
+											<thead>
+												<tr class="odd">
+													<th width="5%">ID</th>
+													<th width="10%">Code</th>
+													<th>Description</th>
+													<th width="5%">Qty</th>
 												</tr>
-											</g:each>										
-										</tbody>
-										<tfoot>
-										
-											<tr>
-												<th colspan="3">
-													Total
-												</th>
-												<th style="text-align: center">
-													${totalQuantity }
-												</th>
-											</tr>
-										</tfoot>										
-										
+											</thead>
+										</table>
+									</div>
+				            		<g:if test="${productList }">
+				            			<div style="overflow: auto; height: 400px;">
+					            			<table>         		
+												<tbody>
+													<g:set var="totalQuantity" value="${0 }"/>
+													<g:each var="productInstance" in="${productList }" status="i">
+													 	<g:set var="itemInstanceList" value="${inventoryMap.get(productInstance)}"/>	
+													 	<g:set var="inventoryLevel" value="${inventoryLevelMap?.get(productInstance)?.get(0)}"/>
+													 	<g:set var="quantity" value="${(itemInstanceList)?itemInstanceList*.quantity.sum():0 }"/>
+														<g:set var="totalQuantity" value="${totalQuantity+quantity }"/>
+														<tr class="${varStatus++%2==0?'even':'odd' }">
+															<%-- 
+															<td style="width: 5%; text-align: center;">
+																<g:if test="${itemInstanceList }">
+																	<g:if test="${quantity < 0}">
+																		<img src="${createLinkTo(dir: 'images/icons/silk', file: 'exclamation.png') }" alt="Out of Stock"/>
+																	</g:if>
+																	<g:elseif test="${inventoryLevel?.minQuantity && quantity <= inventoryLevel?.minQuantity}">
+																		<img src="${createLinkTo(dir: 'images/icons/silk', file: 'exclamation.png') }" alt="Low Stock"/>
+																	</g:elseif>
+																	<g:elseif test="${inventoryLevel?.reorderQuantity && quantity <= inventoryLevel?.reorderQuantity}">
+																		<img src="${createLinkTo(dir: 'images/icons/silk', file: 'error.png') }" alt="Reorder"/>
+																	</g:elseif>										
+																	<g:elseif test="${inventoryLevel?.maxQuantity && quantity >= inventoryLevel?.maxQuantity}" >
+																		<img src="${createLinkTo(dir: 'images/icons/silk', file: 'error.png') }" alt="Overstock"/>
+																	</g:elseif>	
+																	<g:else>
+																		<img src="${createLinkTo(dir: 'images/icons/silk', file: 'tick.png') }" alt="Ok"/>
+																	</g:else>
+																</g:if>								
+															</td>
+															--%>		
+															<td width="5%">${productInstance?.id }</td>						
+															<td width="10%">${productInstance?.productCode }</td>						
+															<td style="">
+																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">
+																	${productInstance?.name }
+																</g:link> &nbsp; <span class="fade">${productInstance?.category?.name }</span>
+																	
+															</td>
+															<td style="width: 5%; text-align: center;">
+																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">${(itemInstanceList)?itemInstanceList*.quantity.sum():'<span class="fade">N/A</span>' }</g:link>
+															</td>
+														</tr>
+													</g:each>										
+												</tbody>
+												<tfoot>
+												
+													<tr class="${varStatus%2==0?'even':'odd' }">
+														<th colspan="3">
+															Total
+														</th>
+														<th style="text-align: center">
+															${totalQuantity }
+														</th>
+													</tr>
+												</tfoot>										
+											</table>	
+										</div>									
 									</g:if>
 									<g:else>
-										<tbody>
-											<tr class="odd">
-												<td colspan="4" style="padding: 10px; text-align: center;">
-													There are no products matching the selected criteria.
-													<%-- 
-													<g:render template="../category/breadcrumb" model="[categoryInstance:categoryInstance]"/>
-													--%>
-												</td>
-											</tr>
-										</tbody>
+										<table>									
+											<tbody>
+												<tr class="even">
+													<td colspan="4" style="padding: 10px; text-align: center;">
+														There are no products matching the selected criteria.
+														<%-- 
+														<g:render template="../category/breadcrumb" model="[categoryInstance:categoryInstance]"/>
+														--%>
+													</td>
+												</tr>
+											</tbody>
+										</table>
 									</g:else>
 								</table>
-							</div>
-						</fieldset>
-						<span>Showing ${productList?.totalCount } products</span>	
 					</td>
 				</tr>
 			</table>

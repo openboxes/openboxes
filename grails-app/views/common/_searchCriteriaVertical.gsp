@@ -19,6 +19,11 @@
 			</tr>
 			<tr>
 				<td>
+					<span class="fade">Showing ${productInstanceList?.size() } product(s)</span>
+				</td>
+			</tr>
+			<tr>
+				<td>
 					<g:each var="categoryFilter" in="${categoryFilters }">
 						<div style="width: 100%; float: left; border: 0px solid lightgrey; height: 30px; margin: 1px; background-color: #fcfcfc;">
 							<table>

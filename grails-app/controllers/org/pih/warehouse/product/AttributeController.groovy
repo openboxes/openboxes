@@ -23,7 +23,7 @@ class AttributeController {
         def attributeInstance = new Attribute(params)
         if (attributeInstance.save(flush: true)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'attribute.label', default: 'Attribute'), attributeInstance.id])}"
-            redirect(action: "list", id: attributeInstance.id)
+            redirect(action: "edit", id: attributeInstance.id)
         }
         else {
             render(view: "create", model: [attributeInstance: attributeInstance])

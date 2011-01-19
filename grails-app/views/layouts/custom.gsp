@@ -18,6 +18,7 @@
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'form.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footer.css')}" type="text/css" media="screen, projection" />
 	
+	
 	<!-- Include javascript files -->
 	<g:javascript library="application"/>
 

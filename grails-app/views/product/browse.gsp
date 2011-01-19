@@ -6,6 +6,7 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'product.label', default: 'Product')}" />
         <title><g:message code="default.browse.label" args="[entityName]" /></title>
+
     </head>    
     <body>
         <div class="body">
@@ -77,53 +78,58 @@
 								--%>						
 						</td>			
 						<td>
-						
-							Showing ${productInstanceList?.size() } products
 							<g:set var="attributeList" value="${org.pih.warehouse.product.Attribute.list() }"></g:set>
 							<g:if test="${productsByCategory }">
-	            				<table border="1" style="border: 1px solid lightgrey">
-          							<thead>
-		            					<tr>
-	            							<th width="5%">ID</th>
-	            							<th width="10%">Code</th>
-	            							<th>Description</th>
-	            							<g:each var="attribute" in="${attributeList}">
-	            								<th>${attribute.name }</th>
-	            							</g:each>
-	            							<th>Cold Chain</th>
-	            							<th>Primary Category</th>
-	            						</tr>
-	            					</thead>
-			            			<tbody>
-										<g:set var="index" value="${0 }"/>
-					            		<g:each var="key" in="${productsByCategory.keySet() }">
-					            			<g:each var="productInstance" in="${productsByCategory.get(key) }" status="i">
-												 <tr class="${(index++ % 2) == 0 ? 'odd' : 'even'}">
-												 	<td>
-														${productInstance?.id }													 	
-												 	</td>
-												 	<td>
-												 		${productInstance?.productCode }
-												 	</td>
-													<td>
-														<g:link action="edit" id="${productInstance.id}">
+								<div>
+		            				<table border="1">
+	          							<thead>
+			            					<tr class="odd">
+		            							<th width="5%">ID</th>
+		            							<th width="25%">Description</th>
+		            							<%-- 
+		            							<g:each var="attribute" in="${attributeList}">
+		            								<th>${attribute.name }</th>
+		            							</g:each>
+		            							--%>
+		            							<th width="27%">Primary Category</th>
+		            							<th width="10%" style="text-align: center;">Cold Chain</th>
+		            						</tr>
+		            					</thead>
+		            				</table>
+		            			</div>
+		            			<div style="overflow: auto; height: 400px;">
+		            				<table bprder="0">
+				            			<tbody>
+											<g:set var="index" value="${0 }"/>
+						            		<g:each var="key" in="${productsByCategory.keySet() }">
+						            			<g:each var="productInstance" in="${productsByCategory.get(key) }" status="i">
+													 <tr class="${(index++ % 2) == 0 ? 'even' : 'odd'}">
+													 	<td width="5%">
+															<g:link action="edit" id="${productInstance.id}">
+																${productInstance?.id }													 	
+															</g:link>
+													 	</td>
+														<td width="25%">
 															${fieldValue(bean: productInstance, field: "name") }
-														</g:link>
-													</td>
-			            							<g:each var="attribute" in="${attributeList}">
-			            								<td></td>
-			            							</g:each>
-			            							<td>${(productInstance?.coldChain)?"Yes":"No" }</td>
-			            							<td>${productInstance?.category?.name }</td>
-												</tr>							            			
-					            			</g:each>
-					            		</g:each>
-			            			</tbody>
-		            			</table>
+															<span class="fade">${productInstance?.productCode }</span>
+														</td>
+														<%--
+				            							<g:each var="attribute" in="${attributeList}">
+				            								<td></td>
+				            							</g:each>
+				            							 --%>
+				            							<td width="25%">${productInstance?.category?.name }</td>
+				            							<td width="10%" style="text-align: center;">${(productInstance?.coldChain)?"Yes":"No" }</td>
+													</tr>							            			
+						            			</g:each>
+						            		</g:each>
+				            			</tbody>
+			            			</table>
+			            		</div>
 		            		</g:if>
 		            		<g:else>
 			            		
-								<table border="1" style="border: 1px solid lightgrey">
+								<table border="0">
           							<thead>
 		            					<tr>
 	            							<th width="5%">ID</th>
@@ -187,21 +193,8 @@
 									</div>
 								</g:if>
 								--%>
-	       				    <div style="text-align: left; padding: 10px; border-top: 0px solid #f7f7f7;">
-	       				    	<table>
-	       				    		<tr>
-	       				    			<td>
-					        				<span class="menuButton">
-												<g:link class="new" controller="product" action="create" params="['category.id':params.categoryId]"><g:message code="default.add.label" args="['Product']"/></g:link> 			
-				        				    </span>
-	       				    			
-	       				    			</td>
-	       				    			<td style="text-align: right;">
-					            			
-	       				    			</td>
-	       				    		</tr>
-	       				    	</table>
-	       				    </div>		
+	       				 
+
 	       				    
 						</td>
 					</tr>
