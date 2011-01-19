@@ -4,8 +4,12 @@ class InitializationFilters {
 		sessionCheck(controller:'*', action:'*') {
 			before = {	
 				// Make sure all session variables are initialized
-				if (!session.categoryFilters)
-					session.categoryFilters = []; 
+				if (!session.inventoryCategoryFilters)
+					session.inventoryCategoryFilters = []; 
+					
+				if (!session.productCategoryFilters)
+					session.productCategoryFilters = [];
+
 			}
 		}
 	}

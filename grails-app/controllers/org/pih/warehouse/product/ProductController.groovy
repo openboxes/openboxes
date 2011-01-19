@@ -24,21 +24,21 @@ class ProductController {
 		
 		def category = Category.get(params?.categoryId)
 		if (category)
-			session.categoryFilters.remove(category?.id);
+			session.productCategoryFilters.remove(category?.id);
 			
 		redirect(action: browse);
 	}
 	
 	def clearCategoryFilters = {
-		session.categoryFilters.clear();
-		session.categoryFilters = null;
+		session.productCategoryFilters.clear();
+		session.productCategoryFilters = null;
 		redirect(action: browse);
 	}
 	
 	def addCategoryFilter = {
 		def category = Category.get(params?.categoryId);
-		if (category && !session.categoryFilters.contains(category?.id))
-			session.categoryFilters << category?.id;
+		if (category && !session.productCategoryFilters.contains(category?.id))
+			session.productCategoryFilters << category?.id;
 		redirect(action: browse);
 	}
 	
@@ -89,8 +89,8 @@ class ProductController {
 		// Hydrate the category filters from the session
 		// Allow us to get any attribute of a category without get a lazy init exception
 		def categoryFilters = []
-		if (session.categoryFilters) {
-			session.categoryFilters.each {
+		if (session.productCategoryFilters) {
+			session.productCategoryFilters.each {
 				categoryFilters << Category.get(it);
 			}
 		}

@@ -23,21 +23,21 @@ class InventoryController {
 		
 		def category = Category.get(params?.categoryId)		
 		if (category)
-			session.categoryFilters.remove(category?.id);
+			session.inventoryCategoryFilters.remove(category?.id);
 			
 		redirect(action: browse);		
 	}
 	
 	def clearCategoryFilters = { 
-		session.categoryFilters.clear();
-		session.categoryFilters = null;
+		session.inventoryCategoryFilters.clear();
+		session.inventoryCategoryFilters = null;
 		redirect(action: browse);		
 	}
 	
 	def addCategoryFilter = { 
 		def category = Category.get(params?.categoryId);
-		if (category && !session.categoryFilters.contains(category?.id)) 
-			session.categoryFilters << category?.id;
+		if (category && !session.inventoryCategoryFilters.contains(category?.id)) 
+			session.inventoryCategoryFilters << category?.id;
 		redirect(action: browse);		
 	}
 	
@@ -61,14 +61,14 @@ class InventoryController {
 		def category = Category.get(params?.categoryId);
 		if (category) { 			
 			category?.parentCategory;	// need to reference this in order to keep from getting a lazy initialization error
-			session.categoryFilters << category?.id;
+			session.inventoryCategoryFilters << category?.id;
 		}
 		*/
 		// Hydrate the category filters from the session 
 		// Allow us to get any attribute of a category without get a lazy init exception 
 		def categoryFilters = [] 
-		if (session.categoryFilters) { 
-			session.categoryFilters.each { 
+		if (session.inventoryCategoryFilters) { 
+			session.inventoryCategoryFilters.each { 
 				categoryFilters << Category.get(it);
 			}
 		}
