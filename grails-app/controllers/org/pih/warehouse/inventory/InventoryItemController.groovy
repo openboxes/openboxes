@@ -53,78 +53,7 @@ class InventoryItemController {
 
 	
 	
-	/*
-	def recordInventory = {
-		log.info "Record inventory: " + params;
-		def warehouseInstance = Warehouse.get(session?.warehouse?.id)
-		def productInstance = Product.get(params?.productId)
-				
-		// Populate the model with the following data
-		def inventoryInstance = warehouseInstance.inventory
-		def inventoryItemList = inventoryService.getInventoryItemsByProduct(productInstance)
-		def transactionEntryList = TransactionEntry.findAllByProduct(productInstance)
-		def inventoryLotList = InventoryLot.findByProduct(productInstance)
-		def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, inventoryInstance);
-		
-		[ 	inventoryInstance: inventoryInstance,
-			inventoryLevelInstance: inventoryLevelInstance,
-			productInstance: productInstance,
-			inventoryItemList: inventoryItemList,
-			transactionEntryList: transactionEntryList,
-			inventoryLotList: inventoryLotList ]
-	}
 
-	def saveInventoryItems = {
-		log.info "Save inventory items: " + params;		
-		def inventoryItem = new InventoryItem(params);						
-		def inventoryLot = new InventoryLot(params);
-		def productInstance = Product.get(params.productId);		
-		def createdBy = User.get(session?.user?.id);
-		
-		if (params.quantity <= 0) { 
-			inventoryItem.errors.rejectValue('quantity', 'inventoryItem.quantity.required',
-				[params.quantity] as Object[], 'Quantity is required and must be greater than 0');
-		}
-		inventoryItem.product = productInstance;
-		// Look up lotOrSerialNumber to make sure it doesn't already exist.
-		def itemsFound = InventoryItem.findByLotNumber(params.lotNumber);
-		if (itemsFound) {
-			// Add an error to the model object			
-			inventoryItem.errors.rejectValue('lotNumber', 'inventoryItem.lotNumber.alreadyExists', 
-				[params.lotNumber] as Object[], 'Inventory item already exists');					
-		}
-		else {
-			def transaction = new Transaction(params);
-			transaction.transactionType = TransactionType.get(7);
-			transaction.source = Warehouse.get(session.warehouse.id);
-			
-			def transactionEntry = new TransactionEntry(params);
-			transactionEntry.inventoryItem = inventoryItem;
-			transactionEntry.product = productInstance;
-			transactionEntry.lotNumber = params.lotNumber;
-			transactionEntry.quantity = params.quantity;
-			transaction.addToTransactionEntries(transactionEntry);
-			if (transaction.hasErrors()) { 
-				inventoryItem.errors = transaction.errors 
-			}
-			else if (transactionEntry.hasErrors()) { 
-				inventoryItem.errors = transactionEntry.errors
-			}	
-			else { 	
-				if (!inventoryItem.hasErrors() && inventoryItem.save()) {
-					flash.message = "Saved inventory item successfully";
-					if (!transaction.hasErrors() && transaction.save()) {
-						flash.message = "Saved inventory item and transaction successfully";
-					}
-				}
-			}
-		}		
-		
-		// Redirect to the record inventory action
-		chain(action: recordInventory, model:[productInstance: productInstance,
-			inventoryItem: inventoryItem, inventoryLot: inventoryLot], params: params);		
-	}
-	*/
 	
 	def showTransactions = {
 		
@@ -145,8 +74,8 @@ class InventoryItemController {
 			inventoryLotList: inventoryLotList ]
 	}	
 	
-	def showStockCard = {
-				
+	def showStockCard = { StockCardCommand cmd ->
+		
 		def warehouseInstance = Warehouse.get(session?.warehouse?.id)
 		def productInstance = Product.get(params?.product?.id)
 		def inventoryInstance = warehouseInstance.inventory
@@ -154,14 +83,27 @@ class InventoryItemController {
 		def transactionEntryList = TransactionEntry.findAllByProduct(productInstance)
 		def inventoryLotList = InventoryLot.findByProduct(productInstance)
 		def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, inventoryInstance);
+
+		// TODO Eventually, we'll push this to the service 
+
+		if (cmd.startDate)
+			transactionEntryList = transactionEntryList.findAll{it.transaction.transactionDate >= cmd.startDate}
+
+		if (cmd.endDate)
+			transactionEntryList = transactionEntryList.findAll{it.transaction.transactionDate <= cmd.endDate}
+			
+		if (cmd.transactionType && cmd.transactionType.id != 0)
+			transactionEntryList = transactionEntryList.findAll{it.transaction.transactionType == cmd.transactionType}					
 		
+			
 		[ 	inventoryInstance: inventoryInstance, 
 			inventoryLevelInstance: inventoryLevelInstance,
 			productInstance: productInstance, 
 			inventoryItemList: inventoryItemList, 
 			transactionEntryList: transactionEntryList,
 			transactionEntryMap: transactionEntryList.groupBy { it.transaction },
-			inventoryLotList: inventoryLotList ]
+			inventoryLotList: inventoryLotList,
+			commandInstance: cmd ]
 	}
 		
 	def create = {
@@ -493,5 +435,94 @@ class InventoryItemController {
 		}
 		redirect(action: "showStockCard",  params: ['product.id':productInstance?.id])		
 	}
+	
+	/*
+	def recordInventory = {
+		log.info "Record inventory: " + params;
+		def warehouseInstance = Warehouse.get(session?.warehouse?.id)
+		def productInstance = Product.get(params?.productId)
+				
+		// Populate the model with the following data
+		def inventoryInstance = warehouseInstance.inventory
+		def inventoryItemList = inventoryService.getInventoryItemsByProduct(productInstance)
+		def transactionEntryList = TransactionEntry.findAllByProduct(productInstance)
+		def inventoryLotList = InventoryLot.findByProduct(productInstance)
+		def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, inventoryInstance);
+		
+		[ 	inventoryInstance: inventoryInstance,
+			inventoryLevelInstance: inventoryLevelInstance,
+			productInstance: productInstance,
+			inventoryItemList: inventoryItemList,
+			transactionEntryList: transactionEntryList,
+			inventoryLotList: inventoryLotList ]
+	}
 
+	def saveInventoryItems = {
+		log.info "Save inventory items: " + params;
+		def inventoryItem = new InventoryItem(params);
+		def inventoryLot = new InventoryLot(params);
+		def productInstance = Product.get(params.productId);
+		def createdBy = User.get(session?.user?.id);
+		
+		if (params.quantity <= 0) {
+			inventoryItem.errors.rejectValue('quantity', 'inventoryItem.quantity.required',
+				[params.quantity] as Object[], 'Quantity is required and must be greater than 0');
+		}
+		inventoryItem.product = productInstance;
+		// Look up lotOrSerialNumber to make sure it doesn't already exist.
+		def itemsFound = InventoryItem.findByLotNumber(params.lotNumber);
+		if (itemsFound) {
+			// Add an error to the model object
+			inventoryItem.errors.rejectValue('lotNumber', 'inventoryItem.lotNumber.alreadyExists',
+				[params.lotNumber] as Object[], 'Inventory item already exists');
+		}
+		else {
+			def transaction = new Transaction(params);
+			transaction.transactionType = TransactionType.get(7);
+			transaction.source = Warehouse.get(session.warehouse.id);
+			
+			def transactionEntry = new TransactionEntry(params);
+			transactionEntry.inventoryItem = inventoryItem;
+			transactionEntry.product = productInstance;
+			transactionEntry.lotNumber = params.lotNumber;
+			transactionEntry.quantity = params.quantity;
+			transaction.addToTransactionEntries(transactionEntry);
+			if (transaction.hasErrors()) {
+				inventoryItem.errors = transaction.errors
+			}
+			else if (transactionEntry.hasErrors()) {
+				inventoryItem.errors = transactionEntry.errors
+			}
+			else {
+				if (!inventoryItem.hasErrors() && inventoryItem.save()) {
+					flash.message = "Saved inventory item successfully";
+					if (!transaction.hasErrors() && transaction.save()) {
+						flash.message = "Saved inventory item and transaction successfully";
+					}
+				}
+			}
+		}
+		
+		// Redirect to the record inventory action
+		chain(action: recordInventory, model:[productInstance: productInstance,
+			inventoryItem: inventoryItem, inventoryLot: inventoryLot], params: params);
+	}
+	*/
+	
+
+}
+
+
+class StockCardCommand { 
+	
+	Date startDate = new Date() - 30;		// defaults to today - 30d
+	Date endDate = new Date();				// defaults to today
+	TransactionType transactionType
+	
+	static constraints = { 
+		startDate(nullable:true)
+		endDate(nullable:true)
+		transactionType(nullable:true)
+	}
+	
 }

@@ -81,7 +81,7 @@
 							<g:set var="attributeList" value="${org.pih.warehouse.product.Attribute.list() }"></g:set>
 							<g:if test="${productsByCategory }">
 								<div>
-		            				<table border="1">
+		            				<table border="0">
 	          							<thead>
 			            					<tr class="odd">
 		            							<th width="5%">ID</th>

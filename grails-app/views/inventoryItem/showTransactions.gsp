@@ -25,9 +25,6 @@
 	</g:hasErrors>
 	<div class="dialog">		
 							<table>
-								
-							
-							
 								<tr>
 									<td style="width: 250px;">
 										<g:render template="productDetails" model="[productInstance:productInstance]"/>											
@@ -64,7 +61,7 @@
 										</div>											
 										
 										<fieldset>
-											<legend><span class="fade">Recent Transactions</span></legend>
+											<legend><span class="fade">Transaction Log</span></legend>
 											
 											<table width="100%">
 												<thead>

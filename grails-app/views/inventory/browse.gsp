@@ -41,7 +41,7 @@
 				</tr>			
 				 --%>
 				<tr>
-					<td style="width:100px;">             
+					<td style="width:100px; border-right: 1px solid lightgrey;">             
 						<g:render template="/common/searchCriteriaVertical" model="[productInstanceList:productList]"/>					
              
 						<%--

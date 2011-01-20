@@ -73,7 +73,8 @@ fieldset table td { padding: 6px; }
 				<td>
 					<span class="value">${inventoryLevelInstance?.reorderQuantity?:'<span class="fade">Not Configured</span>' }</span>
 				</td>
-			</tr>										
+			</tr>				
+			<%-- 						
 			<tr class="odd">
 				<td></td>
 				<td>
@@ -83,6 +84,7 @@ fieldset table td { padding: 6px; }
 					</div>													
 				</td>
 			</tr>
+			--%>
 		</table>
 	</fieldset>
 </div>

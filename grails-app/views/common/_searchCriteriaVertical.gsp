@@ -1,4 +1,4 @@
-<div id="searchCriteria"  style="border: 1px solid lightgrey; padding: 1px;">
+<div id="searchCriteria"  style="border-right: 0px solid lightgrey; padding: 0px;">
 	<script>
 		$(function() {
 			$("#categoryFilter").change(function () { 
@@ -11,10 +11,7 @@
 			<tr class="odd">
 				<td colspan="2">
 					<img src="${createLinkTo(dir: 'images/icons/silk', file: 'find.png' )}" style="vertical-align:middle"/>
-					&nbsp;
 					<label>Filters</label> 
-					&nbsp; 
- 					<g:link action="clearCategoryFilters">clear all</g:link>
  				</td>
 			</tr>
 			<tr>
@@ -52,7 +49,12 @@
 						</select>										
 					</g:form>
 				</td>
-			</tr>							
+			</tr>
+			<tr>
+				<td>
+					<g:link action="clearCategoryFilters">clear all</g:link>							
+				</td>
+			</tr>
 		</table>
 	</div>
 </div>						
