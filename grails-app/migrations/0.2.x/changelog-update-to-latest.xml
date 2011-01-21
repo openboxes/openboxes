@@ -2125,7 +2125,47 @@
     	</preConditions>        
         <dropColumn columnName="data_type" tableName="attribute"/>
     </changeSet>    
-
+    
+    
+    
+    <changeSet author="jmiranda (generated)" id="1295640983183-56">
+    	<preConditions onFail="MARK_RAN">
+    		<not><columnExists tableName="inventory_level" columnName="date_created"/></not>
+    	</preConditions>
+        <addColumn tableName="inventory_level">
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1295640983183-57">
+    	<preConditions onFail="MARK_RAN">
+    		<not><columnExists tableName="inventory_level" columnName="last_updated"/></not>
+    	</preConditions>
+        <addColumn tableName="inventory_level">
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1295640983183-58">
+    	<preConditions onFail="MARK_RAN">
+    		<not><columnExists tableName="inventory_level" columnName="supported"/></not>
+    	</preConditions>
+        <addColumn tableName="inventory_level">
+            <column name="supported" type="BIT">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1295640983183-59">
+    	<preConditions onFail="MARK_RAN">
+    		<not><columnExists tableName="transaction_entry" columnName="comments"/></not>
+    	</preConditions>
+        <addColumn tableName="transaction_entry">
+            <column name="comments" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
 
 </databaseChangeLog>
 
