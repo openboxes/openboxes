@@ -4,9 +4,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
-<g:set var="entityName"
-	value="${message(code: 'inventory.label', default: 'inventory')}" />
-<title><g:message code="default.edit.label" args="[entityName]" /></title>
+<g:set var="entityName" value="${message(code: 'inventory.label', default: 'inventory')}" />
+<title><g:message code="inventory.record.label" args="[entityName]" default="Record Inventory"/></title>
 </head>
 
 <body>
@@ -24,42 +23,46 @@
 		<div class="errors"><g:renderErrors bean="${commandInstance}" as="list" /></div>
 	</g:hasErrors>
 	<div class="dialog">		
+	
+	
+		<div class="stockOptions" >
+			<ul>
+				<li>							
+					<img src="${resource(dir: 'images/icons/silk', file: 'table_refresh.png')}"/>
+					<g:link controller="inventoryItem" 
+						action="showStockCard" params="['product.id':commandInstance?.product?.id]">Back to Stock Card</g:link>							
+				</li>
+				<%--
+				<li>
+					<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
+					<g:link controller="inventoryItem" action="showRecordInventory" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
+						Record stock
+					</g:link>
+				</li>
+				<li>
+					<img src="${resource(dir: 'images/icons/silk', file: 'magnifier.png')}"/>
+					<g:link controller="inventoryItem" action="showTransactions" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
+						Show changes
+					</g:link>
+				</li>
+				<li>
+					<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}"/>
+					<g:link controller="inventoryItem" action="create" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
+						Add item
+					</g:link>
+				</li>
+				 --%>
+			</ul>
+		</div>									
+						
+
 		<table >
 			<tr>
 				<td style="width: 250px;">
 					<g:render template="productDetails" model="[productInstance:commandInstance.product]"/>
 				</td>
 				<td>				
-					<div class="stockOptions">
-						<ul>
-							<li>							
-								<img src="${resource(dir: 'images/icons/silk', file: 'table_refresh.png')}"/>
-								<g:link controller="inventoryItem" 
-									action="showStockCard" params="['product.id':commandInstance?.product?.id]">Back to Stock Card</g:link>							
-							</li>
-							<%--
-							<li>
-								<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
-								<g:link controller="inventoryItem" action="showRecordInventory" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
-									Record stock
-								</g:link>
-							</li>
-							<li>
-								<img src="${resource(dir: 'images/icons/silk', file: 'magnifier.png')}"/>
-								<g:link controller="inventoryItem" action="showTransactions" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
-									Show changes
-								</g:link>
-							</li>
-							<li>
-								<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}"/>
-								<g:link controller="inventoryItem" action="create" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
-									Add item
-								</g:link>
-							</li>
-							 --%>
-						</ul>
-					</div>									
-									
+						
 					<div>
 						<fieldset style="min-height:200px;">	
 							<legend class="fade">
@@ -172,15 +175,7 @@
 									</table>
 									<div style="text-align: center; border-top: 1px solid lightgrey; padding:10px;">
 										<span class="buttons">
-											<g:submitButton name="validate" value="Validate"/>
-											&nbsp;
-											<g:if test="${commandInstance.hasErrors() }">
-											
-												<g:submitButton id="saveButton" name="save" disabled="true" style="color: lightgrey" value="Save"/>
-											</g:if>
-											<g:else>
-												<g:submitButton name="save" value="Save"/>
-											</g:else>
+											<g:submitButton name="save" value="Save"/>
 										</span>
 										<g:link controller="inventoryItem" action="showStockCard" params="['product.id':commandInstance.product?.id]">Cancel</g:link>
 									</div>												

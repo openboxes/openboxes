@@ -84,7 +84,7 @@
 	                        </tr>
 	                    </thead>
 	       	           	<tbody>
-							<g:if test="${!inventoryInstance?.inventoryItems}">
+							<g:if test="${!inventoryMapping}">
 								<tr>								
 									<td colspan="3">no inventory items</td>
 								</tr>

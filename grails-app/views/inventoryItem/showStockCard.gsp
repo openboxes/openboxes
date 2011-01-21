@@ -19,40 +19,50 @@
 					${flash.message}
 				</div>
 			</g:if> 
-			<g:hasErrors bean="${itemInstance}">
-				<div class="errors"><g:renderErrors bean="${itemInstance}" as="list" /></div>
+			<g:hasErrors bean="${commandInstance}">
+				<div class="errors"><g:renderErrors bean="${commandInstance}" as="list" /></div>
 			</g:hasErrors>
 			
-				<div style="text-align: right; padding-right: 15px;" >	
-					<span style="width: 500px;">
-						<label>Actions:</label>
-								
+			
+			<div class="dialog">		
+			
+				<div style="float: left; margin-left: 15px;">	
+					<span>		
 						<img src="${resource(dir: 'images/icons/silk', file: 'table_refresh.png')}"/>
 						<g:link controller="inventory" action="browse" >
 							Back to Inventory
 						</g:link>
-	
-						<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
-						<g:link controller="inventoryItem" action="showRecordInventory" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
-							Record stock
-						</g:link>
-						<%-- 
-						<img src="${resource(dir: 'images/icons/silk', file: 'magnifier.png')}"/>
-						<g:link controller="inventoryItem" action="showTransactions" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
-							Show changes
-						</g:link>
-						--%>
-						<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}"/>
-						<g:link controller="inventoryItem" action="create" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
-							Add item
-						</g:link>	
-					</span>									
+					</span>
 				</div>
-			<div class="dialog">		
+				
+				<div style="float: right; margin-right: 15px;">					
+					
+					<label>Actions:</label>
+					<span style="margin-right: 15px;">
+						<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
+						<g:link controller="inventoryItem" action="showRecordInventory" params="['product.id':commandInstance?.productInstance?.id,'inventory.id':commandInstance?.inventoryInstance?.id]">
+							Record inventory
+						</g:link>
+					</span>
+					<%-- 
+					<img src="${resource(dir: 'images/icons/silk', file: 'magnifier.png')}"/>
+					<g:link controller="inventoryItem" action="showTransactions" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
+						Show changes
+					</g:link>
+					--%>
+					<span>
+						<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}"/>
+						<g:link controller="inventoryItem" action="createInventoryItem" params="['product.id':commandInstance?.productInstance?.id,'inventory.id':commandInstance?.inventoryInstance?.id]">
+							Add item to inventory
+						</g:link>
+					</span>	
+				</div>
+				
+				
 				<table>
 					<tr>
 						<td style="width: 250px;">
-							<g:render template="productDetails" model="[productInstance:productInstance]"/>											
+							<g:render template="productDetails" model="[productInstance:commandInstance?.productInstance]"/>											
 						</td>
 						<td>			
 						
@@ -71,38 +81,40 @@
 												</tr>											
 											</thead>
 											<tbody>
-												<g:if test="${!inventoryItemList}">
+												<g:if test="${!commandInstance?.inventoryItemList}">
 													<tr class="even">
-														<td colspan="4" style="text-align: center">
-															<span class="fade">No current stock </span>
+														<td colspan="4">
+															No current stock 
 														</td>
 													</tr>
 												</g:if>
 											
-												<g:each var="itemInstance" in="${inventoryItemList }" status="status">				
+												<g:each var="itemInstance" in="${commandInstance?.inventoryItemList }" status="status">				
 													<tr class="${(status%2==0)?'even':'odd' }">
 														<td class="fade">${itemInstance?.id}</td>
 														<td>${itemInstance?.description}</td>
 														<td>${itemInstance?.lotNumber?:'<span class="fade">EMPTY</span>' }</td>
 														<td>
-															<g:if test="${itemInstance?.inventoryLot?.expirationDate}">
-																<g:formatDate date="${itemInstance?.inventoryLot?.expirationDate }" format="dd/MMM/yy" />
+															<g:if test="${itemInstance?.expirationDate}">
+																<g:formatDate date="${itemInstance?.expirationDate }" format="dd/MMM/yy" />
 															</g:if>
 															<g:else>
 																<span class="fade">never</span>
 															</g:else>
 														</td>
-														<td style="text-align: center;">${itemInstance?.quantity }</td>												
+														<td style="text-align: center;">
+															<g:set var="transactionEntries" value="${commandInstance?.transactionEntriesByInventoryItem?.get(itemInstance)}"/>
+															
+															${transactionEntries?transactionEntries*.quantity.sum():0}	
+														</td>
 													</tr>
 												</g:each>
 											</tbody>
 											<tfoot>
-												<tr>
-													<th>Total</th>
-													<th></th>
-													<th></th>
-													<th></th>
-													<th style="text-align: center;">${inventoryItemList*.quantity.sum() }</th>
+												<tr style="font-size: 1.5em; line-height: 2em;">
+													<th colspan="4" style="text-align: right;"></th>
+													<th class="large" style="text-align: center;">
+														${(commandInstance?.transactionEntryList)?commandInstance?.transactionEntryList*.quantity.sum():0 }</th>
 												</tr>
 											</tfoot>
 										</table>										
@@ -115,7 +127,7 @@
 									<legend><span class="fade">Transaction Log</span></legend>
 									<div style="padding: 10px;">
 										<g:form method="GET" action="showStockCard">
-											<g:hiddenField name="product.id" value="${productInstance?.id }"/>
+											<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
 											<label>Filter transactions: </label>
 											<span>
 												<g:jqueryDatePicker 
@@ -174,8 +186,17 @@
 												</th>
 											</tr>
 										</thead>
-										<tbody>												
-											<g:each var="transaction" in="${transactionEntryMap.keySet().sort {it.transactionDate}.reverse() }" status="status">
+										<tbody>			
+											<g:if test="${!commandInstance?.transactionEntryMap }">
+												<tr>
+													<td colspan="5">												
+														No transaction entries
+													</td>
+												</tr>
+											</g:if>
+										
+																			
+											<g:each var="transaction" in="${commandInstance?.transactionEntryMap.keySet().sort {it.transactionDate}.reverse() }" status="status">
 												<tr id="${transacton?.id }" class="transaction ${(status%2==0)?'even':'odd' }">
 													<td class="fade">
 														${transaction?.id }
@@ -202,7 +223,7 @@
 														</g:else>
 													</td>
 												</tr>
-												<g:each var="transactionEntry" in="${transactionEntryMap.get(transaction) }">
+												<g:each var="transactionEntry" in="${commandInstance?.transactionEntryMap.get(transaction) }">
 													<tr id="transactionEntry?.id" class="transactionEntry transaction${transaction?.id } ${(status%2==0)?'even':'odd' }">
 														<td>
 														</td>

@@ -64,7 +64,7 @@
 									</thead>
 									<tbody>
 										<g:each var="productInstance" in="${productMap.get(productType)}" status="i">
-										 	<g:set var="itemInstanceList" value="${inventoryMap.get(productInstance)}"/>	
+										 	<g:set var="itemInstanceList" value="${inventoryItempMap.get(productInstance)}"/>	
 										 	<g:set var="inventoryLevel" value="${inventoryLevelMap?.get(productInstance)?.get(0)}"/>
 										 	<g:set var="quantity" value="${(itemInstanceList)?itemInstanceList*.quantity.sum():0 }"/>
 											<tr class="${varStatus++%2==0?'odd':'even' }">

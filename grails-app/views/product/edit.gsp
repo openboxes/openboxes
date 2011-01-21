@@ -111,7 +111,9 @@
 							   <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'categories', 'errors')}">
 							       <g:render template="categories" model="['productInstance':productInstance]" />
 							   </td>
-							</tr>								
+							</tr>					
+							
+										
 							<g:each var="attribute" in="${org.pih.warehouse.product.Attribute.list()}" status="status">
 								<tr class="prop">
 									<td valign="top" class="name"><label for="attributes">

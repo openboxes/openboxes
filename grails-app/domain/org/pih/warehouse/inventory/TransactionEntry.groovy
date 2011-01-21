@@ -8,6 +8,7 @@ class TransactionEntry {
 	String lotNumber				// Optional 
     Integer quantity				// Convention: negative number means OUT, positive number means IN
 	InventoryItem inventoryItem		// The inventory item (or product being tracked)
+	String comments					// 
 	
     static belongsTo = [ transaction : Transaction ]
 
@@ -16,6 +17,6 @@ class TransactionEntry {
 		product(nullable:false)	
 		lotNumber(nullable:true)
 		quantity(nullable:false)
-		
+		comments(nullable:true)	
     }
 }

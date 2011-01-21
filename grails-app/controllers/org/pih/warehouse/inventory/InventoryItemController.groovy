@@ -41,13 +41,18 @@ class InventoryItemController {
 		//bindData(ric, params)
 		//bindData(cmd.recordInventoryRows, params)
 		//bindData(cmd.recordInventoryRow, params)
-						
-		if (params.save) { 
-			inventoryService.saveRecordInventoryCommand(cmd, params)
-			if (!cmd.hasErrors())
-				redirect(action: showStockCard, params: ['product.id':cmd.product.id])
-		}
 		
+		log.info ("Before saving record inventory")				
+		inventoryService.saveRecordInventoryCommand(cmd, params)
+		if (!cmd.hasErrors()) { 
+			log.info ("No errors, show stock card")				
+			redirect(action: "showStockCard", params: ['product.id':cmd.product.id])
+			return;
+		}
+			
+		log.info ("User chose to validate or there are errors")
+		
+		//chain(action: "showRecordInventory", model: [commandInstance:cmd])
 		render(view: "showRecordInventory", model: [commandInstance:cmd])
 	}
 
@@ -60,9 +65,8 @@ class InventoryItemController {
 		def warehouseInstance = Warehouse.get(session?.warehouse?.id)
 		def productInstance = Product.get(params?.product?.id)
 		def inventoryInstance = warehouseInstance.inventory
-		def inventoryItemList = inventoryService.getInventoryItemsByProduct(productInstance)
+		def inventoryItemList = inventoryService.getInventoryItemsByProductAndProduct(productInstance, inventoryInstance)
 		def transactionEntryList = TransactionEntry.findAllByProduct(productInstance)
-		def inventoryLotList = InventoryLot.findByProduct(productInstance)
 		def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, inventoryInstance);
 		
 		[ 	inventoryInstance: inventoryInstance,
@@ -70,64 +74,106 @@ class InventoryItemController {
 			productInstance: productInstance,
 			inventoryItemList: inventoryItemList,
 			transactionEntryList: transactionEntryList,
-			transactionEntryMap: transactionEntryList.groupBy { it.transaction },
-			inventoryLotList: inventoryLotList ]
+			transactionEntryMap: transactionEntryList.groupBy { it.transaction } ]
 	}	
 	
-	def showStockCard = { StockCardCommand cmd ->
+	def showStockCard = { StockCardCommand cmd ->		
+		// TODO Eventually, we'll push all of this logic to the service 
+		// Right now, the command class is private, so we can't pass it to the service
+		//inventoryService.getStockCard(cmd)
 		
-		def warehouseInstance = Warehouse.get(session?.warehouse?.id)
-		def productInstance = Product.get(params?.product?.id)
-		def inventoryInstance = warehouseInstance.inventory
-		def inventoryItemList = inventoryService.getInventoryItemsByProduct(productInstance)
-		def transactionEntryList = TransactionEntry.findAllByProduct(productInstance)
-		def inventoryLotList = InventoryLot.findByProduct(productInstance)
-		def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, inventoryInstance);
-
-		// TODO Eventually, we'll push this to the service 
-
-		if (cmd.startDate)
-			transactionEntryList = transactionEntryList.findAll{it.transaction.transactionDate >= cmd.startDate}
-
-		if (cmd.endDate)
-			transactionEntryList = transactionEntryList.findAll{it.transaction.transactionDate <= cmd.endDate}
-			
-		if (cmd.transactionType && cmd.transactionType.id != 0)
-			transactionEntryList = transactionEntryList.findAll{it.transaction.transactionType == cmd.transactionType}					
+		cmd.productInstance = Product.get(params?.product?.id?:params.id);  // check product.id and id
+		cmd.warehouseInstance = Warehouse.get(session?.warehouse?.id);
+		cmd.inventoryInstance = cmd.warehouseInstance?.inventory
+		
+		// Get current stock of a particular product within an inventory
+		Set inventoryItems = inventoryService.getInventoryItemsByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);		
+		cmd.inventoryItemList = inventoryItems as List
+		
+		// Get transaction log for a particular product within an inventory
+		cmd.transactionEntryList = inventoryService.getTransactionEntriesByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);
+		cmd.transactionEntriesByInventoryItem = cmd.transactionEntryList.groupBy { it.inventoryItem }
+		cmd.transactionEntryMap = cmd.transactionEntryList.groupBy { it.transaction }
+		
+		
+				
+		// Filter the transaction entry list by date range and transaction type
+		//if (cmd.startDate) cmd.transactionEntryList = cmd.transactionEntryList.findAll{it.transaction.transactionDate >= cmd.startDate}
+		//if (cmd.endDate) cmd.transactionEntryList = cmd.transactionEntryList.findAll{it.transaction.transactionDate <= cmd.endDate}
+		//if (cmd.transactionType) cmd.transactionEntryList = cmd.transactionEntryList.findAll{it.transaction.transactionType.equals(cmd.transactionType)}					
+		
+		log.info "transactionEntries: " + cmd.transactionEntryList;
+		log.info "transactionEntriesByInventoryItem: " + cmd.transactionEntriesByInventoryItem;
 		
 			
-		[ 	inventoryInstance: inventoryInstance, 
-			inventoryLevelInstance: inventoryLevelInstance,
-			productInstance: productInstance, 
-			inventoryItemList: inventoryItemList, 
-			transactionEntryList: transactionEntryList,
-			transactionEntryMap: transactionEntryList.groupBy { it.transaction },
-			inventoryLotList: inventoryLotList,
-			commandInstance: cmd ]
+			
+		[ commandInstance: cmd ]
 	}
 		
-	def create = {
-		def productInstance = Product.get(params?.product?.id)			
+	def createInventoryItem = {
+		
+		flash.message = "Please note that this page is tempoary.  In the future, you will be able to create new inventory items through the 'Record Stock' page."; 
+		
+		def productInstance = Product.get(params?.product?.id)
 		def inventoryInstance = Inventory.get(params?.inventory?.id)
-		def itemInstance = new InventoryItem(product: productInstance)				
+		def itemInstance = new InventoryItem(product: productInstance)
 		def inventoryItems = inventoryService.getInventoryItemsByProduct(productInstance);
 		[itemInstance: itemInstance, inventoryInstance: inventoryInstance, inventoryItems: inventoryItems]
 	}
 
-	def save = {
+	def saveInventoryItem = {
+		log.info "save inventory item " + params
+		def productInstance = Product.get(params.product.id)
+		def inventoryInstance = Inventory.get(params.inventory.id)
 		def inventoryItem = new InventoryItem(params)
-		def inventoryLot = new InventoryLot(params)		
-		def inventoryInstance = Inventory.get(params?.inventory?.id)
+		def inventoryItems = inventoryService.getInventoryItemsByProduct(inventoryItem.product);
 		inventoryInstance.properties = params;		
 
-		if (!inventoryItem.hasErrors() && !inventoryLot.hasErrors() && inventoryItem.save() && inventoryLot.save()) { 
-			flash.message = "${message(code: 'default.created.message', args: [message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"
-			redirect(controller: "inventoryItem", action: "showStockCard", id: itemInstance.id)
+		def transactionInstance = new Transaction(params);
+		def transactionEntry = new TransactionEntry(params);
+		if (!transactionEntry.quantity) {
+			transactionEntry.errors.rejectValue("quantity", 'transactionEntry.quantity.invalid')
 		}
-		else {
-			def inventoryItems = inventoryService.getInventoryItemsByProduct(inventoryItem.product);
-			render(view: "create", model: [itemInstance: inventoryItem, inventoryInstance: inventoryInstance, inventoryItems: inventoryItems])
+		
+		if (transactionEntry.hasErrors()) { 
+			inventoryItem.errors = transactionEntry.errors
 		}
+		if (transactionInstance.hasErrors()) {
+			inventoryItem.errors = transactionInstance.errors
+		}
+		
+		
+				
+		// TODO Move all of this logic into the service layer in order to take advantage of Hibernate/Spring transactions
+		if (!inventoryItem.hasErrors() && inventoryItem.save()) { 
+			//flash.message = "${message(code: 'default.created.message', args: [message(code: 'inventoryItem.label', default: 'Inventory item'), inventoryItem.id])}"
+			//redirect(controller: "inventoryItem", action: "showStockCard", id: inventoryItem.product.id);
+
+			// Need to create a transaction if we want the inventory item 
+			// to show up in the stock card			
+			transactionInstance.transactionDate = new Date();
+			transactionInstance.transactionType = TransactionType.get(7);
+			def warehouseInstance = Warehouse.get(session.warehouse.id);
+			transactionInstance.source = warehouseInstance;
+			transactionInstance.inventory = warehouseInstance.inventory;
+			
+			transactionEntry.inventoryItem = inventoryItem;
+			transactionEntry.product = inventoryItem.product;
+			transactionEntry.lotNumber = params.lotNumber;
+			//transactionEntry.quantity = params.quantity;
+			transactionInstance.addToTransactionEntries(transactionEntry);
+			
+			transactionInstance.save()
+			flash.message = "Saved inventory item " + inventoryItem.id + " within a new transaction " + transactionInstance.id
+	
+		} else { 	
+			render(view: "createInventoryItem", model: [itemInstance: inventoryItem, inventoryInstance: inventoryInstance, inventoryItems: inventoryItems])
+			return;
+		}
+		
+		 
+		// If all else fails, return to the show stock card page
+		redirect(action: 'showStockCard', params: ['product.id':productInstance?.id])
 	}
 	
 
@@ -231,7 +277,7 @@ class InventoryItemController {
 		redirect(action: 'showStockCard', params: ['product.id':productInstance?.id])
 	}
 	
-		
+	/*
 	def saveInventoryItem = {
 		def inventory = Inventory.get(params.id)
 		def inventoryItem = new InventoryItem(params)
@@ -240,96 +286,9 @@ class InventoryItemController {
 			render template:'inventoryItemRow', bean:inventoryItem, var:'inventoryItem'
 		}
 	}
+	*/
 	
-	def saveInventoryLot = { 
-		log.info params
-		def productInstance = Product.get(params?.product?.id)
-		
-		if (productInstance) { 
-			Inventory.withTransaction { status ->			
-				def inventoryInstance = Inventory.get(params?.inventory?.id);		
-				def warehouseInstance = Warehouse.get(session?.warehouse?.id);
-				def createdBy = User.get(session?.user?.id);
-				
-				def inventoryLot = new InventoryLot(params)
-				def inventoryItem = new InventoryItem(params);
-				def transactionInstance = new Transaction(params);
-				def transactionEntry = new TransactionEntry(params);
-				
-				if (!inventoryItem.validate()) { 
-					flash.message = "Inventory item is not valid"	
-				}
-				
-				if (!inventoryLot.validate()) { 
-					flash.message = "Inventory lot is not valid"
-				}
-				
-				if (inventoryInstance) { 
-					inventoryInstance.addToInventoryItems(inventoryItem);					
-					inventoryInstance.addToInventoryLots(inventoryLot);
-					
-					if (!inventoryInstance.validate()) { 
-						flash.message = "Inventory is not valid"			
-					}
-					if (inventoryInstance.save(flush:true)) { 
-						flash.message = "A lot was created successfully"
-						
-					} else { 
-						flash.message = "A lot was not created"
-						inventoryInstance.errors.allErrors.each { 
-							println it
-						}
-					}
-					
-					/*
-					transactionInstance.transactionType = TransactionType.findByName("Inventory");
-					if (!transactionInstance?.transactionType) {						
-						throw new Exception("errors.inventory.TransactionTypeNotFound")
-					}
-					else { 
-						transactionInstance.source = warehouseInstance;
-						transactionInstance.destination = warehouseInstance;
-						transactionInstance.transactionDate = new Date();
-						transactionInstance.createdBy = createdBy;						
-						if (!transactionInstance.validate()) { 
-							flash.message = "Transaction is not valid";
-						}
-						inventoryItem = InventoryItem.findByProductAndLotNumber(productInstance, params.lotNumber);
-						transactionEntry.inventoryItem = inventoryItem;
-						transactionInstance.addToTransactionEntries(transactionEntry).save(flush:true)
-					}
-					*/						
-				}
-				else { 
-					flash.message = "Inventory with ID ${params.inventory.id} does not exist"
-				}		
-			}
-		}
-		else { 
-			flash.message = "Unable to locate product with product ID ${params.product.id}"
-		}
-		redirect(action: 'showStockCard', params: ['product.id':productInstance?.id])
-	}
 	
-	def deleteInventoryLot = { 
-		def inventoryLot = InventoryLot.get(params.id);
-		def productInstance = inventoryLot?.product;
-		
-		if (inventoryLot) { 
-			def inventoryInstance = Inventory.get(params?.inventory?.id);
-			if (inventoryInstance.removeFromInventoryLots(inventoryLot).save(flush:true)) {
-				inventoryLot.delete();
-			}
-			else { 
-				flash.message = "could not remove inventory lot"
-			}
-		}
-		else { 
-			flash.message = "could not find inventory lot"
-		}
-		redirect(action: 'showStockCard', params: ['product.id':productInstance?.id])
-		
-	}
 
 	def deleteInventoryItem = {
 		def inventoryItem = InventoryItem.get(params.id);
@@ -345,7 +304,7 @@ class InventoryItemController {
 			params.put("product.id", productInstance?.id);
 			params.put("inventory.id", inventoryInstance?.id);
 			log.info "Params " + params;
-			chain(action: "create", model: [inventoryItem: inventoryItem], params: params)
+			chain(action: "createInventoryItem", model: [inventoryItem: inventoryItem], params: params)
 			return;
 		}
 		redirect(action: 'showStockCard', params: ['product.id':productInstance?.id])
@@ -514,6 +473,15 @@ class InventoryItemController {
 
 
 class StockCardCommand { 
+	
+	InventoryItem inventoryItem;
+	Product productInstance;
+	Warehouse warehouseInstance;
+	Inventory inventoryInstance;
+	List inventoryItemList;
+	List transactionEntryList;
+	Map transactionEntryMap;
+	Map transactionEntriesByInventoryItem
 	
 	Date startDate = new Date() - 30;		// defaults to today - 30d
 	Date endDate = new Date();				// defaults to today

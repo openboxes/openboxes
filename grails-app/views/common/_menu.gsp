@@ -156,6 +156,11 @@
 					<g:link class="new" controller="product" action="create"><g:message code="default.add.label" args="['Product']" default="Add New Product" /></g:link>
 				</span>
 			</li>
+			<li class="">
+				<span class="menuButton">
+					<g:link class="edit" controller="product" action="batchEdit"><g:message code="default.edit.label" args="['Products']" default="Edit Products" /></g:link>
+				</span>
+			</li>
 			
 			
 		<!-- 			

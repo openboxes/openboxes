@@ -12,6 +12,7 @@ import org.pih.warehouse.product.Category;
 
 class InventoryService {
 	
+	def productService;
 	boolean transactional = true
 	
 	List<Warehouse> getAllWarehouses() {
@@ -30,6 +31,9 @@ class InventoryService {
 		return Product.getAll().groupBy { it.categories*.parents } 
 	}
 	
+	
+	
+	
 	/*
 	List getProducts(Long id, Category category) { 
 		def productList = [] 
@@ -46,6 +50,22 @@ class InventoryService {
 		return productList;
 	}*/
 
+	BrowseInventoryCommand browseInventory(BrowseInventoryCommand commandInstance, Map params) { 
+		
+		// Get all product types and set the default product type				
+		commandInstance.rootCategory = productService.getRootCategory();
+		commandInstance.categoryInstance = Category.get(params?.categoryId)
+		commandInstance.categoryInstance = commandInstance?.categoryInstance ?: commandInstance?.rootCategory;
+		commandInstance.productList = (commandInstance?.categoryFilters) ? getProductsByCategories(commandInstance?.categoryFilters, params) : [];		
+		commandInstance.productMap = getProductMap(commandInstance?.warehouseInstance?.id);
+		commandInstance.inventoryItemMap =  getInventoryItemMap(commandInstance?.warehouseInstance?.id);
+		commandInstance.productList = commandInstance?.productList?.sort() { it.name };
+		
+		return commandInstance;
+	}
+	
+
+	
 	
 	RecordInventoryCommand getRecordInventoryCommand(RecordInventoryCommand commandInstance, Map params) { 		
 		log.info "Params " + params;
@@ -60,14 +80,19 @@ class InventoryService {
 			
 			def inventoryItemList = getInventoryItemsByProduct(productInstance)
 			inventoryItemList.each { 
-				def lot = InventoryLot.findByProductAndLotNumber(productInstance, it.lotNumber);				
+				//def lot = InventoryLot.findByProductAndLotNumber(productInstance, it.lotNumber);				
+				def transactionEntryList = getTransactionEntriesByInventoryItem(it);
+				log.info "entries: " + transactionEntryList*.quantity;
+				def quantity = (transactionEntryList)?transactionEntryList*.quantity.sum():0;
+				
+				
 				def row = new RecordInventoryRowCommand()
 				row.id = it.id;
 				row.lotNumber = it.lotNumber;
-				row.expirationDate = lot?.expirationDate;
+				row.expirationDate = it.expirationDate;
 				row.description = it.description;
-				row.oldQuantity = it.quantity;
-				row.newQuantity = it.quantity;
+				row.oldQuantity = quantity;
+				row.newQuantity = quantity;
 				
 				//if (!commandInstance.recordInventoryRows)
 				//	commandInstance.recordInventoryRows = ListUtils.lazyList([], FactoryUtils.constantFactory(new RecordInventoryRowCommand()))
@@ -86,7 +111,7 @@ class InventoryService {
 		try { 
 			// Validation was done during bind, but let's do this just in case
 			if (cmd.validate()) { 
-				def inventoryItems = getInventoryItemsByProduct(cmd.product)
+				def inventoryItems = getInventoryItemsByProductAndInventory(cmd.product, cmd.inventory)
 				// Create a new transaction
 				def transaction = new Transaction(cmd.properties)
 				
@@ -186,25 +211,105 @@ class InventoryService {
 	 */
 	List getInventoryItemsByProduct(Product productInstance) { 
 		if (!productInstance) 
-			throw new Exception("errors.product.ProductNotFoundException")
-		def results = InventoryItem.findAllByProduct(productInstance)					
-		return results;
-	}
-	
-	List getTransactionEntriesByProduct(Product productInstance) { 		
-		def results = TransactionEntry.findAllByProduct(productInstance)		
-		return results;
-	}
-	
-	
-	Map getInventoryMap(Long id) { 
-		return Warehouse.get(id)?.inventory?.inventoryItems?.groupBy { it.product } 
+			throw new Exception("ProductNotFoundException")
+		return InventoryItem.findAllByProduct(productInstance)					
+		
 	}
 
-	Map getInventoryLevelMap(Long id) { 
-		return Warehouse.get(id)?.inventory?.inventoryLevels?.groupBy { it.product } 
+	
+	
+	/**
+	 * Get all inventory items for a given product within the given inventory.
+	 * @param productInstance
+	 * @param inventoryInstance
+	 * @return a list of inventory items.
+	 */
+	Set getInventoryItemsByProductAndInventory(Product productInstance, Inventory inventoryInstance) {	   
+		def inventoryItems = [] as Set
+		def transactionEntries = getTransactionEntriesByProductAndInventory(productInstance, inventoryInstance);
+		transactionEntries.each { 
+			inventoryItems << it.inventoryItem;
+		}
+		return inventoryItems;
 	}
+
+	/**
+	 * Get all transaction entries for a particular inventory item.
+	 * @param itemInstance
+	 * @return
+	 */
+	List getTransactionEntriesByInventoryItem(InventoryItem itemInstance) { 
+		return TransactionEntry.findAllByInventoryItem(itemInstance);
+	}
+	
+	/**
+	 * Get all transaction entries by product (this isn't very useful).  
+	 * 
+	 * @param productInstance
+	 * @return
+	 */
+	List getTransactionEntriesByProduct(Product productInstance) { 		
+		return TransactionEntry.findAllByProduct(productInstance)		
+	}
+	
+	
+	/**
+	 * Get all transaction entries over all products/inventory items.
+	 * 
+	 * @param inventoryInstance
+	 * @return
+	 */
+	List getTransactionEntriesByInventory(Inventory inventoryInstance) { 
+		return TransactionEntry.createCriteria().list() {
+			transaction {
+				eq("inventory", inventoryInstance)
+			}
+		}
+	}
+
+	
+	/**
+	 * Get all transaction entries for a product within an inventory.  
+	 * 
+	 * @param productInstance
+	 * @param inventoryInstance
+	 * @return
+	 */
+	List getTransactionEntriesByProductAndInventory(Product productInstance, Inventory inventoryInstance) {
+		return TransactionEntry.createCriteria().list() {
+			and { 
+				eq("product.id", productInstance.id)
+				transaction {
+					eq("inventory", inventoryInstance)
+				}
+			}
+		}
+	}
+
+
+	
 		
+	List getInventoryItemList(Long id) { 
+		def list = []
+		def warehouseInstance = Warehouse.get(id);
+		def inventoryInstance = warehouseInstance?.inventory;
+		if (inventoryInstance) { 
+			def transactionEntries = getTransactionEntriesByInventory(inventoryInstance)
+			list = transactionEntries*.inventoryItem
+		}				
+		return list;
+	}	
+	
+	Map getInventoryItemMap(Long id) { 
+		return getInventoryItemList(id)?.groupBy { it.product } 
+	}
+
+	
+	Map getInventoryLevelMap(Long id) { 
+		//return Warehouse.get(id)?.inventory?.inventoryLevels?.groupBy { it.product } 
+		return new HashMap();
+	}
+			
 	
 	Warehouse getWarehouse(Long id) { 
 		return Warehouse.get(id);

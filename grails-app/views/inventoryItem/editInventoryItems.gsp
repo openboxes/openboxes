@@ -1,4 +1,8 @@
-<%-- This is just a fragment moved from the showStockCard.gsp (it needs to be refactored in order to get it to work) --%>
+<%--
+
+	NOTE:  This is just a fragment moved from the showStockCard.gsp (it needs to be refactored in order to get it to work) 
+	
+--%>
 
 <div id="inventoryForm">
 	<g:form action="saveInventoryLot" autocomplete="off">
@@ -27,7 +31,7 @@
 					<g:each var="itemInstance" in="${inventoryItemList }" status="i">				
 						<tr class="${(i%2 == 0)?'odd':'even' }">
 							<td>${itemInstance?.lotNumber?:'<span class="fade">EMPTY</span>' }</td>
-							<td><g:formatDate date="${itemInstance?.inventoryLot?.expirationDate }" format="dd/MMM/yy" /></td>
+							<td><g:formatDate date="${itemInstance?.expirationDate }" format="dd/MMM/yy" /></td>
 							<td style="text-align:center;">
 								<g:link controller="inventoryItem" action="deleteInventoryItem" id="${itemInstance?.id }" params="['inventory.id':inventoryInstance?.id]">
 									<img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>

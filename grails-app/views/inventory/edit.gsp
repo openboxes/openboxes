@@ -70,41 +70,7 @@
 		            <div class="buttons">
 	                    <g:actionSubmit class="save" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" /></span>
 	                </div> 
-
-	                
-	                
-	                
-	                
-	                <%-- 
-	                	// someday we'll want to only manage the inventory items themselves.
-	               <div class="dialog">
-						<h2>Inventory Items </h2>
-						<table>
-							<thead>
-								<tr>
-									<th>Item</th>
-									<th>Manage?</th>
-								</tr>
-							</thead>
-							<tbody>				
-								
-								<g:each var="itemInstance" in="${inventoryInstance?.inventoryItems }">
-									<tr class="${rowStatus++%2==0?'odd':'even'}">
-										<td>${inventoryItem?.product?.name }</td>
-										<td>
-											<g:createLink controller="inventoryItem" action="removeFromInventory"
-												id="${inventoryItem?.product.id}"> Remove Product
-											</g:createLink>
-										</td>
-									</tr>								
-								</g:each>
-							</tbody>
-						</table>
-	                </div>                
-	                --%>
-           
                 </fieldset>
-                
             </g:form>
         </div>
     </body>

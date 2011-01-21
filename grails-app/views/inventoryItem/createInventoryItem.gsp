@@ -21,57 +21,60 @@
 
 			<div class="dialog">
 
-
-			
+				<div style="text-align: left; margin-left: 15px;">
+					<img src="${resource(dir: 'images/icons/silk', file: 'table_refresh.png')}"/>
+					<g:link controller="inventoryItem" 
+						action="showStockCard" params="['product.id':itemInstance?.product?.id]">
+						Back to Stock Card
+					</g:link>
+				</div>	
+				
+				
 				<table>
 					<tr>
 						<td style="width:250px;">
 							<g:render template="productDetails" model="[productInstance:itemInstance.product]"/>
 						</td>
 						<td>
-						
-							<div style="text-align: left; padding: 10px;">
-								<img src="${resource(dir: 'images/icons/silk', file: 'table_refresh.png')}"/>
-								<g:link controller="inventoryItem" 
-									action="showStockCard" params="['product.id':itemInstance?.product?.id]">Back to Stock Card</g:link>
-							</div>					
-						
-						
-							<g:form action="save">
+							<g:form action="saveInventoryItem">
 								<g:hiddenField name="id" value="${itemInstance?.id}"/>
 								<g:hiddenField name="inventory.id" value="${params?.inventory?.id}"/>
-								<g:hiddenField name="inventoryItemType" value="${org.pih.warehouse.inventory.InventoryItemType.NON_SERIALIZED}"/>
 								<g:hiddenField name="product.id" value="${itemInstance?.product?.id }"/>
 								<fieldset>	
 									<table>
 										<thead>
-											<tr>
+											<tr class="odd">
 												<th>ID</th>
-												<th>Description</th>
 												<th>Lot/Serial Number</th>
+												<th>Description</th>
 												<th>Expires</th>
-												<th style="text-align: center;">Qty</th>
+												<th style="text-align: center;">Initial Qty</th>
 												<th></th>
 											</tr>
 										</thead>
 										<tbody>
 											<g:set var="counter" value="${0 }"/>
 											<g:each var="inventoryItem" in="${inventoryItems}" status="status">
-												<tr class="${(status % 2 ==0)?'odd':'even' }">
+												<tr class="${(status % 2)?'odd':'even' }">
 													<td>
 														${inventoryItem?.id }
-													</td>
-													<td>
-														${inventoryItem?.description }
 													</td>
 													<td>
 														${inventoryItem?.lotNumber }
 													</td>
 													<td>
-														<g:formatDate date="${inventoryItem?.inventoryLot?.expirationDate }" format="MM-yyyy"/>
+														${inventoryItem?.description }
+													</td>
+													<td>
+														<g:if test="${inventoryItem?.expirationDate }">
+															<g:formatDate date="${inventoryItem?.expirationDate }" format="MM-yyyy"/>
+														</g:if>
+														<g:else>
+															<span class="fade">never</span>
+														</g:else>
 													</td>
 													<td style="text-align: center;">
-														${inventoryItem?.quantity}
+														n/a
 													</td>
 													<td>
 														<g:link controller="inventoryItem" action="deleteInventoryItem" id="${inventoryItem?.id }">
@@ -79,56 +82,28 @@
 														</g:link>
 													</td>
 												</tr>
-												<%-- 
-												<tr class="${(status % 2 ==0)?'odd':'even' }">
-													<td>
-														${inventoryItem?.id }
-														<g:hiddenField name="inventoryItems[${status }].id" value="${inventoryItem?.id }"/>
-														<g:hiddenField name="inventoryItems[${status }].product.id" value="${inventoryItem?.product?.id }"/>
-													</td>
-													<td>
-														<g:textField name="inventoryItems[${status }].description" 
-															value="${inventoryItem?.description }" size="25"/>
-													</td>
-													<td>
-														<g:textField name="inventoryItems[${status }].lotNumber" 
-															value="${inventoryItem?.lotNumber }" size="10"/>
-													</td>
-													<td>
-														<g:jqueryDatePicker id="inventoryItems-expirationDate-${status }" 
-															name="inventoryItems[${status }].expirationDate" 
-															value="${inventoryItem?.inventoryLot?.expirationDate }" 
-															format="MM/dd/yyyy"/>
-													</td>
-												</tr>
-												--%>
 											</g:each>
-											<tr class="${(counter % 2 ==0)?'odd':'even' }">
+											<tr >
 												<td>
-													${inventoryItem?.id }
+													${itemInstance?.id }
+												</td>
+												<td>
+													<g:lotNumberComboBox id="lotNumberId" name="lotNumber" valueName="${params.lotNumber }"
+														value="${params.lotNumber }"/>
 												</td>
 												<td>
 													<g:textField name="description" 
-														value="${inventoryItem?.description }" size="25"/>
-												</td>
-												<td>
-													<%-- 
-													<g:textField name="lotNumber" 
-														value="${inventoryItem?.lotNumber }" size="10"/>
-													--%>
-													<g:lotNumberComboBox id="lotNumber" name="lotNumber" />
+														value="${itemInstance?.description }" size="25"/>
 												</td>
 												<td>
 													<g:jqueryDatePicker id="expirationDate-${status }" 
 														name="expirationDate" 
-														value="" 
+														value="${itemInstance.expirationDate}" 
 														format="MM/dd/yyyy"/>
 												</td>
 												<td style="text-align: center;">
-													<%--
-													<g:textField name="initialQuantity" 
-														value="${inventoryLot?.initialQuantity }" size="3"/>
-													--%>
+													<g:textField name="quantity" size="3" style="text-align: center;"
+														value="${params.quantity }"/>
 												</td>
 												<td>
 																									
@@ -138,7 +113,7 @@
 									</table>
 									<div style="text-align: center; padding: 10px; border-top: 1px solid lightgrey; ">
 					                    <span class="buttons">
-						                    <g:actionSubmit class="save" action="save" value="${message(code: 'default.button.save.label', default: 'Save')}" />
+						                    <g:actionSubmit class="save" action="saveInventoryItem" value="${message(code: 'default.button.save.label', default: 'Save')}" />
 					                    </span>
 					                    &nbsp;
 					                    <g:link controller="inventoryItem" 

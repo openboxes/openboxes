@@ -27,8 +27,7 @@ class CatalogController {
 			warehouseInstance: warehouseInstance,
 			inventoryInstance: warehouseInstance.inventory,
 			productMap : inventoryService.getProductMap(warehouseInstance?.id),
-			inventoryMap : inventoryService.getInventoryMap(warehouseInstance?.id),
-			inventoryLevelMap : inventoryService.getInventoryLevelMap(warehouseInstance?.id)
+			inventoryMap : inventoryService.getInventoryItemMap(warehouseInstance?.id)
 		]
 
 	}

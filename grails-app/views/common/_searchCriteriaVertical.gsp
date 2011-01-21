@@ -16,13 +16,8 @@
 			</tr>
 			<tr>
 				<td>
-					<span class="fade">Showing ${productInstanceList?.size() } product(s)</span>
-				</td>
-			</tr>
-			<tr>
-				<td>
 					<g:each var="categoryFilter" in="${categoryFilters }">
-						<div style="width: 100%; float: left; border: 0px solid lightgrey; height: 30px; margin: 1px; background-color: #fcfcfc;">
+						<div style="width: 100%; float: left; border: 0px solid lightgrey; margin: 1px; background-color: #fcfcfc;">
 							<table>
 								<tr>
 									<td>
@@ -43,18 +38,23 @@
 			<tr>
 				<td style="text-align: center;">
 					<g:form action="addCategoryFilter">
-						<select id="categoryFilter" name="categoryId">
+						<select id="categoryFilter" name="categoryId" >
 							<option value="">Search by category</option>
 							<g:render template="../category/selectOptions" model="[category:rootCategory, selected:null, level: 0]"/>								
 						</select>										
 					</g:form>
 				</td>
 			</tr>
-			<tr>
-				<td>
-					<g:link action="clearCategoryFilters">clear all</g:link>							
-				</td>
-			</tr>
+			<g:if test="${categoryFilters }">
+				<tr>
+					<td style="text-align: left; border-top: 1px solid lightgrey;">
+						<span class="fade">Returned ${productInstanceList?.size() } product(s)</span>			
+						<g:if test="${categoryFilters.size() >= 2 }">
+							<g:link action="clearCategoryFilters">clear all</g:link>							
+						</g:if>
+					</td>
+				</tr>
+			</g:if>
 		</table>
 	</div>
 </div>						

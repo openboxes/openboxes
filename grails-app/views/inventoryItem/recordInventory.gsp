@@ -170,8 +170,8 @@
 													${itemInstance?.lotNumber?:'<span class="fade">EMPTY</span>' }
 												</td>
 												<td>
-													<g:if test="${itemInstance?.inventoryLot?.expirationDate}">
-														<g:formatDate date="${itemInstance?.inventoryLot?.expirationDate }" format=" MMM dd yyyy" />
+													<g:if test="${itemInstance?.expirationDate}">
+														<g:formatDate date="${itemInstance?.expirationDate }" format=" MMM dd yyyy" />
 													</g:if>
 													<g:else>
 														<span class="fade">n/a</span>
@@ -194,7 +194,7 @@
 											</td>
 											<td nowrap>
 												<g:jqueryDatePicker id="expirationDate" name="expirationDate" 
-													value="${inventoryLot?.expirationDate}" format="MM/dd/yyyy" showTrigger="false" />
+													value="${inventoryItem?.expirationDate}" format="MM/dd/yyyy" showTrigger="false" />
 											</td>
 											<td>
 												<g:textField name="description" size="20" value="${inventoryItem?.description}"/>

@@ -134,7 +134,7 @@
 															${transactionEntry?.inventoryItem?.lotNumber }
 														</td>		
 														<td>
-															${transactionEntry?.inventoryItem?.inventoryLot?.expirationDate }
+															${transactionEntry?.inventoryItem?.expirationDate }
 														</td>
 														<td></td>
 													</tr>

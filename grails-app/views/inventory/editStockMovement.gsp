@@ -119,7 +119,7 @@
 														${transactionEntry?.inventoryItem?.lotNumber }
 													</td>		
 													<td>
-														${transactionEntry?.inventoryItem?.inventoryLot?.expirationDate }
+														${transactionEntry?.inventoryItem?.expirationDate }
 													</td>
 												</tr>
 											</g:each>

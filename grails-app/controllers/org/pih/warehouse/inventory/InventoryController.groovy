@@ -42,56 +42,32 @@ class InventoryController {
 	}
 	
 		
-	def browse = {
-		
+	def browse = { BrowseInventoryCommand cmd ->
 		// Get the warehouse from the request parameter
-		def warehouseInstance = Warehouse.get(params?.warehouse?.id) 
+		cmd.warehouseInstance = Warehouse.get(params?.warehouse?.id) 
 		
 		// If it doesn't exist or if the parameter is null, get 
 		// warehouse from the session
-		if (!warehouseInstance) { 
-			warehouseInstance = Warehouse.get(session?.warehouse?.id);
+		if (!cmd.warehouseInstance) { 
+			cmd.warehouseInstance = Warehouse.get(session?.warehouse?.id);
 		}
+		
 							
-		if (!warehouseInstance?.inventory) { 
+		if (!cmd?.warehouseInstance?.inventory) { 
 			redirect(action: "create")
 		}
-		/*
-		log.info "categoryId " + params.categoryId;
-		def category = Category.get(params?.categoryId);
-		if (category) { 			
-			category?.parentCategory;	// need to reference this in order to keep from getting a lazy initialization error
-			session.inventoryCategoryFilters << category?.id;
-		}
-		*/
-		// Hydrate the category filters from the session 
-		// Allow us to get any attribute of a category without get a lazy init exception 
-		def categoryFilters = [] 
-		if (session.inventoryCategoryFilters) { 
-			session.inventoryCategoryFilters.each { 
-				categoryFilters << Category.get(it);
+		
+		// Hydrate the category filters from the session
+		// Allow us to get any attribute of a category without get a lazy init exception
+		cmd.categoryFilters = []
+		if (session.inventoryCategoryFilters) {
+			session.inventoryCategoryFilters.each {
+				cmd.categoryFilters << Category.get(it);
 			}
 		}
+		inventoryService.browseInventory(cmd, params);
 		
-		// Get all product types and set the default product type 		
-		def rootCategory = Category.findByName("ROOT");
-		def categoryInstance = Category.get(params?.categoryId)
-		categoryInstance = (categoryInstance)?:rootCategory;
-		//def productList = (categoryInstance) ? inventoryService.getProductsByCategory(categoryInstance, params) : Product.getAll();
-		def productList = (categoryFilters)?inventoryService.getProductsByCategories(categoryFilters, params): [];
-		
-		
-		[
-					warehouseInstance: warehouseInstance,
-					inventoryInstance: warehouseInstance.inventory,
-					categoryInstance: categoryInstance,
-					categoryFilters: categoryFilters,
-					productMap : inventoryService.getProductMap(warehouseInstance?.id),
-					inventoryMap : inventoryService.getInventoryMap(warehouseInstance?.id),
-					inventoryLevelMap : inventoryService.getInventoryLevelMap(warehouseInstance?.id),
-					productList : productList?.sort() { it.name },
-					rootCategory: rootCategory
-				]
+		[ commandInstance: cmd ]
 	}
 	
 	def searchStock = {
@@ -392,9 +368,7 @@ class InventoryController {
 				inventoryItem = new InventoryItem(
 					active: Boolean.TRUE, 
 					product: it.product, 
-					lotNumber: it.lotNumber, 
-					inventoryItemType: InventoryItemType.NON_SERIALIZED,
-					inventory: inventoryInstance);
+					lotNumber: it.lotNumber);
 				
 				if (!inventoryItem.hasErrors() && inventoryItem.save()) { 
 					println "saved inventory item"
@@ -402,27 +376,6 @@ class InventoryController {
 				else { 
 					transactionInstance.errors = inventoryItem.errors;
 					flash.message = "Unable to save inventory item";
-					render(view: "editTransaction", model: [
-						warehouseInstance: Warehouse.get(session?.warehouse?.id),
-						transactionInstance: transactionInstance,
-						productInstanceMap: Product.list().groupBy { it?.productType },
-						transactionTypeList: TransactionType.list(),
-						warehouseInstanceList: Warehouse.list()])
-				}				
-			}
-			
-			def inventoryLot = InventoryLot.findByProductAndLotNumber(it.product, it.lotNumber);
-			if (!inventoryLot) {
-				inventoryLot = new InventoryLot(params);
-				inventoryLot.product = it.product
-				inventoryLot.lotNumber = it.lotNumber
-				inventoryLot.initialQuantity = 0;
-				if (!inventoryLot.hasErrors() && inventoryLot.save()) {
-					println "saved inventory lot"
-				}
-				else { 
-					transactionInstance.errors = inventoryLot.errors;
-					flash.message = "Unable to save inventory lot";
 					render(view: "editTransaction", model: [
 						warehouseInstance: Warehouse.get(session?.warehouse?.id),
 						transactionInstance: transactionInstance,
@@ -448,9 +401,12 @@ class InventoryController {
 		}		
 	}
 
+	
+	/**
+	 * Show the transaction.
+	 */
 	def showTransaction = {
-		def transactionInstnace = Transaction.get(params?.id)
-		
+		def transactionInstnace = Transaction.get(params?.id)		
 		[transactionInstance: transactionInstnace]
 	}
 
@@ -535,4 +491,5 @@ class InventoryController {
 	}
 	*/
 }
+
 

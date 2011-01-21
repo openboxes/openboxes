@@ -86,12 +86,12 @@ class JqueryTagLib {
 					      		return false;
 					        },	
 					        change: function(event, ui) { 
-								  alert("changed " + ui.item)
+								  //alert("changed " + ui.item)
 								\$('#${id}-id').val(0);
 								//\$('#${id}-suggest').val(ui.item.valueText);
 					        },
 							select: function(event, ui) {
-								alert("selected " + ui.item)
+								//alert("selected " + ui.item)
 								\$('#${id}-id').val(ui.item.value);
 								\$('#${id}-suggest').val(ui.item.valueText);
 								\$('#${id}-span').html(ui.item.valueText);

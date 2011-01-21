@@ -30,6 +30,12 @@
 	<!-- Include other plugins -->
 	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.cookies.2.2.0.min.js')}" type="text/javascript" ></script>
+
+	<%--
+	<!-- Not using yet -->
+	<link href="${createLinkTo(dir:'js/jquery.jqGrid/css', file:'ui.jqgrid.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
+	<script src="${createLinkTo(dir:'js/jquery.jqGrid/js', file:'jquery.jqGrid.min.js')}" type="text/javascript" ></script>
+	 --%>
 	<%--
 	<!-- Broken --> 
     <script type="text/javascript" src="${createLinkTo(dir:'js/jquery/', file:'fg.menu.js')}"></script>
@@ -181,9 +187,11 @@
 							    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'house.png')}"/>
 						    	</g:link>
 							    &nbsp;&rsaquo;&nbsp;								
-								<g:if test="${session?.warehouse}">
-									<img class="photo" width="25" height="25" 
-										src="${createLink(controller:'warehouse', action:'viewLogo', id:session.warehouse.id)}" style="vertical-align: middle" />
+								<g:if test="${session?.warehouse}">									
+									<g:if test="${session.warehouse.logo }">
+										<img class="photo" width="25" height="25" 
+											src="${createLink(controller:'warehouse', action:'viewLogo', id:session.warehouse.id)}" style="vertical-align: middle" />
+									</g:if>
 									${session?.warehouse?.name} &nbsp;&rsaquo;&nbsp;
 								</g:if>
 							    <g:message code="${params.controller }.label"/>

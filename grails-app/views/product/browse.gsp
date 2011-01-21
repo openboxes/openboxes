@@ -34,7 +34,7 @@
 					</tr>
 					--%>
 					<tr>
-						<td width="25%">	
+						<td width="25%" style="border-right: 1px solid lightgrey;">	
 						
 							<g:render template="/common/searchCriteriaVertical"	/>				
 							<%-- 		

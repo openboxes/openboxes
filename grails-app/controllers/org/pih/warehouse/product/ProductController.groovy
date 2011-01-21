@@ -1,5 +1,7 @@
 package org.pih.warehouse.product;
 
+import org.apache.commons.collections.FactoryUtils;
+import org.apache.commons.collections.list.LazyList;
 import org.junit.runner.Request;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
@@ -9,8 +11,10 @@ import au.com.bytecode.opencsv.CSVReader;
 
 class ProductController {
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"];    
 	def inventoryService;
+	def productService;
+
+    static allowedMethods = [save: "POST", update: "POST", delete: "POST"];    
 	
 	
     def index = {
@@ -45,46 +49,6 @@ class ProductController {
 	
     def browse = { 
 		params.max = Math.min(params.max ? params.int('max') : 10, 100);
-		
-    	// Get selected 
-		def selectedCategory = Category.get(params.categoryId);		
-    	def selectedAttribute = Attribute.get(params.attributeId)	
-		
-		def rootCategory = Category.findByName("ROOT");
-		selectedCategory = (selectedCategory)?:rootCategory;
-
-    	// Condition types	
-    	def allAttributes = Attribute.getAll();
-    	
-		// Root categories
-		def categoryCriteria = Category.createCriteria();		
-		def allCategories = categoryCriteria.list { 
-			isNull("parentCategory")
-		}
-
-				
-		// Search for Products matching criteria 
-		/*
-		def results = Product.createCriteria().list(max:params.max, offset: params.offset ?: 0) {
-            and{
-          		if(params.categoryId){
-					//or { 
-					//	eq ("category.id", Long.parseLong(params.categoryId))
-	          		//	categories { 
-	          		//		eq("id", Long.parseLong(params.categoryId))
-	          		//	}
-					//}
-                } 
-				if (params.nameContains) {  
-					or { 
-						ilike("name", "%" + params.nameContains + "%")
-						ilike("inn", "%" + params.nameContains + "%")
-						ilike("brandName", "%" + params.nameContains + "%")
-					}
-				}
-            }				
-		}		
-		*/
 
 		// Hydrate the category filters from the session
 		// Allow us to get any attribute of a category without get a lazy init exception
@@ -94,24 +58,78 @@ class ProductController {
 				categoryFilters << Category.get(it);
 			}
 		}
-				
-		//def products = inventoryService.getProductsByCategory(selectedCategory, params);
-		//def productsByCategory = products.groupBy { it.category } 
-				
-		def products = inventoryService.getProductsByCategories(categoryFilters, params);
+		
+		// Get all products in the given categories.  If there are no products returned, 
+		// we should to display all products by default.
+		def products = inventoryService.getProductsByCategories(categoryFilters, params);		
 		products = products ?: Product.list();
 		def productsByCategory = products.groupBy { it.category }
 		
 		render(view:'browse', model:[productInstanceList : products, 
     	                             productInstanceTotal: products.size(), 
 									 productsByCategory : productsByCategory,
-									 rootCategory : rootCategory,
-									 categoryFilters: categoryFilters,
-									 categoryInstance: selectedCategory,
-    	                             categories : allCategories, selectedCategory : selectedCategory,
-    	                             attributes : allAttributes, selectedAttribute : selectedAttribute ])
+									 rootCategory : productService.getRootCategory(),
+									 categoryFilters: categoryFilters ])
 	}
     
+	
+	/** 
+	 * Perform a bulk update of 
+	 */
+	def batchEdit = { BatchEditCommand cmd -> 
+		
+		log.info "Batch edit: " + params
+		
+		cmd.productInstanceList = Product.getAll();
+		cmd.productInstanceList.eachWithIndex { product, index ->
+			println product.category
+			cmd.categoryInstanceList << product.category;
+		}		
+		cmd.rootCategory = productService.getRootCategory();
+		
+		[ commandInstance : cmd ]
+		
+	}
+	
+	def batchSave = { BatchEditCommand cmd ->
+		
+		// If there are no products (usually when returning to batchSave after login
+		if (!cmd.productInstanceList) { 
+			
+			redirect(action: 'batchEdit')	
+		}
+		// We needed to hack the category binding in order to make this work.
+		// When changing the product.category directly, we received an error 
+		// from Hibernate stating that we were trying to change the primary key
+		// of the category object.
+		cmd.categoryInstanceList.eachWithIndex { cat, i ->
+			log.info "categoryInstanceList[" + i + "]: " + cat;
+			cmd.productInstanceList[i].category = Category.get(cat.id);
+		}
+
+		cmd.productInstanceList.eachWithIndex { prod, i ->
+			log.info "productInstanceList[" + i + "]: " + prod.category;
+			if (!prod.hasErrors() && prod.save()) { 
+				// saved with no errors
+			}
+			else { 
+				cmd.errors.rejectValue('productInstanceList', "batchEditCommand.productInstanceList.invalid", "Errors with product")
+				
+			}
+		}
+
+		if (!cmd.hasErrors()) { 
+			flash.message = "All products were saved successfully"
+		}		
+		
+		
+		cmd.rootCategory = productService.getRootCategory();
+		
+		render(view: "batchEdit", model: [commandInstance:cmd]);
+				
+	}
+	
+	
     
     def list = {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
@@ -120,7 +138,7 @@ class ProductController {
 	
 	def create = { 
 		def productInstance = new Product(params)
-		render(view: "edit", model: [productInstance : productInstance, rootCategory: Category.findByName("ROOT")])
+		render(view: "edit", model: [productInstance : productInstance, rootCategory: productService.getRootCategory()])
 	}
 
 	
@@ -159,10 +177,11 @@ class ProductController {
 		
 		if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'product.label', default: 'Product'), productInstance.name])}"
+			
             redirect(action: "browse", params:params)
         }
         else {
-            render(view: "edit", model: [productInstance: productInstance])
+            render(view: "edit", model: [productInstance: productInstance, rootCategory: productService.getRootCategory()])
         }
     }
 
@@ -184,7 +203,7 @@ class ProductController {
             redirect(action: "browse")
         }
         else {
-            return [productInstance: productInstance, rootCategory: Category.findByName("ROOT")]
+            return [productInstance: productInstance, rootCategory: productService.getRootCategory()]
         }
     }
 	

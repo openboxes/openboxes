@@ -2,6 +2,7 @@ package org.pih.warehouse.product
 
 class CategoryController {
 
+	def productService;
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def index = {
@@ -15,9 +16,8 @@ class CategoryController {
 		if (!categoryInstance) {
 			flash.message = "Unable to locate category with ID ${params.id}"
 		}
-		def rootCategory = new Category(name: "All Products");
-		rootCategory.categories = Category.findAllByParentCategoryIsNull([sort: "name", order: "asc"]);
-		[ rootCategory : rootCategory, categoryInstance : categoryInstance ]
+		
+		[ rootCategory : productService.getRootCategory(), categoryInstance : categoryInstance ]
 	}
 		
 	/*
@@ -27,14 +27,11 @@ class CategoryController {
 		if (!categoryInstance) { 
 			flash.message = "Unable to locate category with ID ${params.id}" 
 		}
-		def rootCategory = Category.findByName("ROOT");		
-		render(view: "editCategory", model: [rootCategory: rootCategory, categoryInstance: categoryInstance ])		
+		render(view: "editCategory", model: [rootCategory: productService.getRootCategory(), categoryInstance: categoryInstance ])		
 	}
 	
 	def createCategory = {
-		def categoryInstance = new Category();
-		def rootCategory = Category.findByName("ROOT");
-		render(view: "createCategory", model: [rootCategory: rootCategory, categoryInstance: categoryInstance ])
+		render(view: "createCategory", model: [rootCategory: productService.getRootCategory(), categoryInstance: new Category() ])
 	}*/
 
 	def saveCategory = { 		
@@ -74,10 +71,7 @@ class CategoryController {
         def categoryInstance = new Category()
         categoryInstance.properties = params
 		
-		def rootCategory = new Category(name: "root");
-		rootCategory.categories = Category.findAllByParentCategoryIsNull()
-
-        return [categoryInstance: categoryInstance, rootCategory: rootCategory]
+        return [categoryInstance: categoryInstance, rootCategory: productService.getRootCategory()]
     }
 
     def save = {
@@ -104,9 +98,6 @@ class CategoryController {
 
     def edit = {
         def categoryInstance = Category.get(params.id)
-		
-		def rootCategory = new Category(name: "root");
-		rootCategory.categories = Category.findAllByParentCategoryIsNull()
 
         if (!categoryInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'category.label', default: 'Category'), params.id])}"

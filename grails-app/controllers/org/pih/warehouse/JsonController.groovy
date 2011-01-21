@@ -5,8 +5,9 @@ import grails.converters.*;
 import org.pih.warehouse.core.DialogForm;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.UnitOfMeasure;
-import org.pih.warehouse.inventory.InventoryLot;
+import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.shipping.Container;
 import org.pih.warehouse.shipping.ShipmentItem;
@@ -16,23 +17,25 @@ import org.pih.warehouse.shipping.Shipment;
 
 class JsonController {
 	
-	
 	def findLotsByName = { 
 		log.info params
 		def items = new TreeSet();
 		if (params.term) {
-			items = InventoryLot.withCriteria {
+			items = InventoryItem.withCriteria {
 				or {
 					ilike("lotNumber", params.term + "%")
 				}
 			}
 			if (items) {
 				items = items.collect() {
-					[value: it.lotNumber,
-					label: it.lotNumber,
-					valueText: it.lotNumber,
-					desc: it.lotNumber,
-					icon: "none" 	]
+					[
+						value: it.lotNumber,
+						label: it.lotNumber,
+						valueText: it.lotNumber,
+						desc: it.description,
+						date: it.expirationDate,						
+						icon: "none" 	
+					]
 				}
 			}
 		}
@@ -45,9 +48,7 @@ class JsonController {
 		def items = new TreeSet();
 		if (params.term) {
 			items = Category.withCriteria {
-				or {
-					ilike("name", params.term + "%")
-				}
+				ilike("name", params.term + "%")
 			}
 			if (items) {
 				items = items.collect() {
