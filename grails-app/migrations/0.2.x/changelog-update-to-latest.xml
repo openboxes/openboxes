@@ -1782,6 +1782,7 @@
             <column name="comments" type="VARCHAR(255)"/>
         </addColumn>
     </changeSet>
+    <!-- 
     <changeSet author="jmiranda (generated)" id="1295640983183-6">
     	<preConditions onFail="MARK_RAN">
     		<not><indexExists indexName="FK714F9FB572A2C5B4"/></not>
@@ -1790,7 +1791,7 @@
             <column name="inventory_id"/>
         </createIndex>
     </changeSet>
-        
+     -->
     <changeSet author="jmiranda (generated)" id="1295640983183-7">
     	<preConditions onFail="MARK_RAN">
     		<indexExists indexName="FKD7F53A0E361812E7"/>
