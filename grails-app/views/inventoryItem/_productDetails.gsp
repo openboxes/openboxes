@@ -17,6 +17,7 @@ fieldset table td { padding: 6px; }
 				<td>
 					<span class="value">${productInstance?.name }</span>
 				</td>
+				<td></td>
 			</tr>
 			<tr class="even">	
 				<td style="text-align: left;">
@@ -25,6 +26,7 @@ fieldset table td { padding: 6px; }
 				<td>
 					<span class="value">${productInstance?.category?.name }
 				</td>
+				<td></td>
 			</tr>
 			<tr class="odd">	
 				<td style="text-align: left;">
@@ -33,6 +35,7 @@ fieldset table td { padding: 6px; }
 				<td>
 					<span class="value">${productInstance?.productCode?:'<span class="fade">none</span>' }</span>
 				</td>
+				<td></td>
 			</tr>
 			
 			<tr class="even">	
@@ -42,6 +45,7 @@ fieldset table td { padding: 6px; }
 				<td>
 					<span class="value">${productInstance?.coldChain?'Yes':'No' }</span>
 				</td>
+				<td></td>
 			</tr>
 			<g:each var="productAttribute" in="${productInstance?.attributes}" status="status">
 				<tr class="${status%2==0?'odd':'even' }">
@@ -51,6 +55,7 @@ fieldset table td { padding: 6px; }
 					<td>
 						<span class="value">${productAttribute.value }</span>
 					</td>
+					<td></td>
 				</tr>													
 			</g:each>
 			<tr class="odd" style="border-top: 1px solid lightgrey;">
@@ -58,10 +63,24 @@ fieldset table td { padding: 6px; }
 					<span class="name">Supported</span>
 				</td>
 				<td>
+				
+					<script>
+						$(document).ready(function() {
+							$('#toggleSupportedImage').click(function() {	
+								var image = $('#toggleSupportedImage');
+								var currImageSrc = image.attr("src");
+								var playImageSrc = "${createLinkTo(dir: 'images/icons/silk', file: 'control_play.png' )}";							
+								var stopImageSrc = "${createLinkTo(dir: 'images/icons/silk', file: 'control_stop.png' )}";							
+								var imageSrc = (currImageSrc == playImageSrc)?stopImageSrc:playImageSrc;							
+								image.attr("src",imageSrc);								
+							});
+						});
+					</script>
+								
 					<span id="supported" class="value">
 						<span id="supportedValue">
-							<g:if test="${commandInstance?.inventoryLevelInstance}">
-								<g:if test="${commandInstance?.inventoryLevelInstance?.supported}">
+							<g:if test="${inventoryLevelInstance}">
+								<g:if test="${inventoryLevelInstance?.supported}">
 									Yes  
 								</g:if>			
 								<g:else>										
@@ -72,10 +91,13 @@ fieldset table td { padding: 6px; }
 								<span class="fade">N/A</span>
 							</g:else>
 						</span>
-						&nbsp;
-						<g:remoteLink action="toggleSupported" params="['product.id':productInstance.id, 'inventory.id':inventoryInstance?.id]"
-						update="[success:'supportedValue',failure:'supportedValue']">Toggle</g:remoteLink>
 					</span>
+				</td>
+				<td>
+					<g:remoteLink action="toggleSupported" params="['product.id':productInstance.id, 'inventory.id':inventoryInstance?.id]"
+					update="[success:'supportedValue',failure:'supportedValue']">
+						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'control_play.png' )}" id="toggleSupportedImage"/>
+					</g:remoteLink>
 				</td>
 			</tr>				
 			<tr class="even">
@@ -94,21 +116,32 @@ fieldset table td { padding: 6px; }
 
 							$('#clickError').click(function() {
 								$('#errorMessage').show();
-							});						
+							});					
+
+							$('#toggleMinQuantityImage').click(function() {	
+								var image = $('#toggleMinQuantityImage');
+								var currImageSrc = image.attr("src");
+								var onImageSrc = "${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png' )}";							
+								var offImageSrc = "${createLinkTo(dir: 'images/icons/silk', file: 'cross.png' )}";							
+								var imageSrc = (currImageSrc == onImageSrc)?offImageSrc:onImageSrc;							
+								image.attr("src",imageSrc);								
+							});
 						});
+
+						function successCallback() { alert("success");}
+						
 					</script>
 				
 					<span id="minQuantityTextValue" class="value">
 						<span id="minQuantityValue">
-							<g:if test="${commandInstance?.inventoryLevelInstance?.minQuantity}">
-								${commandInstance?.inventoryLevelInstance?.minQuantity?:'' }
+							<g:if test="${inventoryLevelInstance?.minQuantity}">
+								${inventoryLevelInstance?.minQuantity?:'' }
 							</g:if>
 							<g:else>
 								<span class="fade">N/A</span>
 							</g:else>
 						</span>
 						&nbsp;
-						<a class="toggleMinQuantity" href="#"><img src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png' )}"/></a>
 					</span>
 					<span id="minQuantityTextField" class="value">
 						<g:formRemote url="[controller:'inventoryItem',action:'updateQuantity']" update="[success:'minQuantityValue',failure:'minQuantityValue']" name="updateForm">
@@ -116,12 +149,13 @@ fieldset table td { padding: 6px; }
 							<input type="hidden" name="inventory.id" value="${inventoryInstance?.id }" />
 							<g:textField id="minQuantity" name="minQuantity" size="3"/>
 							<input class="button toggleMinQuantity" type="image" border="0"  src="${createLinkTo(dir: 'images/icons/silk', file: 'disk.png' )}" alt="Submit button">
-							<a href="#" class="toggleMinQuantity">
-								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png' )}" alt="Cancel"/>
-							</a>	
 						</g:formRemote >					
 					</span>					
 				</td>
+				<td>
+					<a class="toggleMinQuantity" href="#"><img id="toggleMinQuantityImage" src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png' )}"/></a>
+				</td>				
+				
 			</tr>
 			<tr class="odd">
 				<td style="text-align: left;">
@@ -145,15 +179,13 @@ fieldset table td { padding: 6px; }
 				
 					<span id="reorderQuantityTextValue" class="value">
 						<span id="reorderQuantityValue">
-							<g:if test="${commandInstance?.inventoryLevelInstance?.reorderQuantity}">
-								${commandInstance?.inventoryLevelInstance?.reorderQuantity?:'' }
+							<g:if test="${inventoryLevelInstance?.reorderQuantity}">
+								${inventoryLevelInstance?.reorderQuantity?:'' }
 							</g:if>
 							<g:else>
 								<span class="fade">N/A</span>
 							</g:else>
 						</span>
-						&nbsp;
-						<a class="toggleReorderQuantity" href="#"><img src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png' )}"/></a>
 					</span>
 					<span id="reorderQuantityTextField" class="value">
 						<g:formRemote url="[controller:'inventoryItem',action:'updateQuantity']" update="[success:'reorderQuantityValue',failure:'reorderQuantityValue']" name="updateForm">
@@ -165,8 +197,12 @@ fieldset table td { padding: 6px; }
 								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png' )}" alt="Cancel"/>
 							</a>	
 						</g:formRemote >					
-					</span>					
+					</span>	
+									
 					
+				</td>
+				<td>
+					<a class="toggleReorderQuantity" href="#"><img src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png' )}"/></a>
 				</td>
 			</tr>				
 			<%-- 						

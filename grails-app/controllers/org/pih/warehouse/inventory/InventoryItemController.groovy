@@ -180,8 +180,9 @@ class InventoryItemController {
 		def productInstance = Product.get(params?.product?.id)
 		def inventoryInstance = Inventory.get(params?.inventory?.id)
 		def itemInstance = new InventoryItem(product: productInstance)
+		def inventoryLevelInstance = inventoryService.getInventoryLevelByProductAndInventory(productInstance, inventoryInstance)
 		def inventoryItems = inventoryService.getInventoryItemsByProduct(productInstance);
-		[itemInstance: itemInstance, inventoryInstance: inventoryInstance, inventoryItems: inventoryItems]
+		[itemInstance: itemInstance, inventoryInstance: inventoryInstance, inventoryItems: inventoryItems, inventoryLevelInstance: inventoryLevelInstance]
 	}
 
 	def saveInventoryItem = {

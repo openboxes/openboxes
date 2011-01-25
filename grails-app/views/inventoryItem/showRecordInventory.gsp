@@ -28,9 +28,8 @@
 		<div class="stockOptions" >
 			<ul>
 				<li>							
-					<img src="${resource(dir: 'images/icons/silk', file: 'table_refresh.png')}"/>
 					<g:link controller="inventoryItem" 
-						action="showStockCard" params="['product.id':commandInstance?.product?.id]">Back to Stock Card</g:link>							
+						action="showStockCard" params="['product.id':commandInstance?.product?.id]">&lsaquo; Back to Stock Card</g:link>							
 				</li>
 				<%--
 				<li>
@@ -59,7 +58,7 @@
 		<table >
 			<tr>
 				<td style="width: 250px;">
-					<g:render template="productDetails" model="[productInstance:commandInstance.product]"/>
+					<g:render template="productDetails" model="[productInstance:commandInstance?.product, inventoryLevelInstance: commandInstance?.inventoryLevel]"/>
 				</td>
 				<td>				
 						

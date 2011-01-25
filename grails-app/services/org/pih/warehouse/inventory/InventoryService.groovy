@@ -101,17 +101,15 @@ class InventoryService {
 	RecordInventoryCommand getRecordInventoryCommand(RecordInventoryCommand commandInstance, Map params) { 		
 		log.info "Params " + params;
 		
-		def productInstance = commandInstance.product;
-		
-		if (!productInstance) { 
+		if (!commandInstance?.product) { 
 			commandInstance.errors.reject("error.product.invalid","Product does not exist");
 		}
-		else { 		
+		else { 			
 			commandInstance.recordInventoryRow = new RecordInventoryRowCommand();
 			
-			def inventoryItemList = getInventoryItemsByProduct(productInstance)
+			def inventoryItemList = getInventoryItemsByProduct(commandInstance?.product)
 			inventoryItemList.each { 
-				//def lot = InventoryLot.findByProductAndLotNumber(productInstance, it.lotNumber);				
+				//def lot = InventoryLot.findByProductAndLotNumber(commandInstance?.product, it.lotNumber);				
 				def transactionEntryList = getTransactionEntriesByInventoryItem(it);
 				log.info "entries: " + transactionEntryList*.quantity;
 				def quantity = (transactionEntryList)?transactionEntryList*.quantity.sum():0;

@@ -22,10 +22,9 @@
 			<div class="dialog">
 
 				<div style="text-align: left; margin-left: 15px;">
-					<img src="${resource(dir: 'images/icons/silk', file: 'table_refresh.png')}"/>
 					<g:link controller="inventoryItem" 
 						action="showStockCard" params="['product.id':itemInstance?.product?.id]">
-						Back to Stock Card
+						&lsaquo; Back to Stock Card
 					</g:link>
 				</div>	
 				
@@ -33,7 +32,7 @@
 				<table>
 					<tr>
 						<td style="width:250px;">
-							<g:render template="productDetails" model="[productInstance:itemInstance.product]"/>
+							<g:render template="productDetails" model="[productInstance:itemInstance.product, inventoryLevelInstance: inventoryLevelInstance]"/>
 						</td>
 						<td>
 							<g:form action="saveInventoryItem">

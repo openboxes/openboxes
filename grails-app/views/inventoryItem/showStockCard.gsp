@@ -62,7 +62,7 @@
 				<table>
 					<tr>
 						<td style="width: 250px;">
-							<g:render template="productDetails" model="[productInstance:commandInstance?.productInstance, inventoryInstance:commandInstance?.inventoryInstance]"/>											
+							<g:render template="productDetails" model="[productInstance:commandInstance?.productInstance, inventoryInstance:commandInstance?.inventoryInstance, inventoryLevelInstance: commandInstance?.inventoryLevelInstance]"/>											
 						</td>
 						<td>			
 						

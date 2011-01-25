@@ -14,8 +14,8 @@ class RecordInventoryRowCommand {
 	static constraints = {
 		id(nullable:true)
 		expirationDate(nullable:true)
-		lotNumber(nullable:false, blank: false)
-		description(nullable:false, blank: false)
+		lotNumber(nullable:true)
+		description(nullable:true)
 		oldQuantity(nullable:false, min: 0)
 		newQuantity(nullable:false, min: 0)
 	}
