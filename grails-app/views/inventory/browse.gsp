@@ -60,7 +60,7 @@
 											<g:set var="totalQuantity" value="${0 }"/>
 											<g:each var="productInstance" in="${commandInstance?.productList }" status="i">											 	
 												<g:set var="quantity" value="${commandInstance?.quantityMap?.get(productInstance) }"/>
-												<g:set var="totalQuantity" value="${totalQuantity + quantity }"/>
+												<g:set var="totalQuantity" value="${totalQuantity + (quantity?:0) }"/>
 												
 												
 												<tr class="${varStatus++%2==0?'even':'odd' }">

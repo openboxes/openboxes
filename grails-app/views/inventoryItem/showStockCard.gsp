@@ -196,7 +196,7 @@
 											</g:if>
 											<g:else>
 												<g:set var="totalQuantityChange" value="${0 }"/>							
-												<g:each var="transaction" in="${commandInstance?.transactionLogMap.keySet().sort {it.transactionDate}.reverse() }" status="status">
+												<g:each var="transaction" in="${commandInstance?.transactionLogMap?.keySet().sort {it.transactionDate}.reverse() }" status="status">
 													<tr id="${transacton?.id }" class="transaction ${(status%2==0)?'even':'odd' }">
 														<td class="fade">
 															${transaction?.id }
@@ -224,7 +224,7 @@
 															
 														</td>
 													</tr>
-													<g:each var="transactionEntry" in="${commandInstance?.transactionLogMap.get(transaction) }">
+													<g:each var="transactionEntry" in="${commandInstance?.transactionLogMap?.get(transaction) }">
 														<tr id="transactionEntry?.id" class="transactionEntry transaction${transaction?.id } ${(status%2==0)?'even':'odd' }">
 															<td></td>
 															<td></td>
