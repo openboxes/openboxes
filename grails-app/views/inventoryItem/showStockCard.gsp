@@ -253,7 +253,6 @@
 													<th></th>
 													<th></th>
 													<th class="large" style="text-align: center;">
-														${}
 														<g:if test="${totalQuantityChange>0}">
 															+${totalQuantityChange}
 														</g:if>
