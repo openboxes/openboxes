@@ -2167,6 +2167,29 @@
         </addColumn>
     </changeSet>
 
+    <changeSet author="jmiranda (generated)" id="1295974965762-1">
+        <dropNotNullConstraint columnDataType="DATETIME" columnName="date_created" tableName="inventory_level"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1295974965762-2">
+        <dropNotNullConstraint columnDataType="DATETIME" columnName="last_updated" tableName="inventory_level"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1295974965762-3">
+        <dropNotNullConstraint columnDataType="BIT" columnName="supported" tableName="inventory_level"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1295974965762-4">
+		<sql>
+			DELETE FROM product_attribute 
+			WHERE product_attribute.attribute_id IN 
+				(SELECT attribute.id FROM attribute WHERE attribute.name IN ('Size', 'Vitality'));
+		</sql>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1295974965762-5">
+		<sql>
+			DELETE FROM attribute WHERE name IN ('Size', 'Vitality');
+		</sql>
+    </changeSet>
+
+
 </databaseChangeLog>
 
 
