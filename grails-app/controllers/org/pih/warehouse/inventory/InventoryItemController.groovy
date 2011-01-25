@@ -151,10 +151,15 @@ class InventoryItemController {
 	
 	
 	def showStockCard = { StockCardCommand cmd ->		
+		
+		log.info "Show stock card params: \t" + params
+		log.info "Show stock card command: \t" + cmd.transactionType;
+		
 		// TODO Eventually, we'll push all of this logic to the service 
 		// Right now, the command class is private, so we can't pass it to the service
 		//inventoryService.getStockCard(cmd)
 		
+		// Get basic details required for the whole page
 		cmd.productInstance = Product.get(params?.product?.id?:params.id);  // check product.id and id
 		cmd.warehouseInstance = Warehouse.get(session?.warehouse?.id);
 		cmd.inventoryInstance = cmd.warehouseInstance?.inventory
@@ -603,16 +608,17 @@ class StockCardCommand {
 		if (startDate) {
 			filteredTransactionLog = filteredTransactionLog.findAll{it.transaction.transactionDate >= startDate}
 		}
+		
+		// Need to add +1 to endDate because date comparison includes time 
+		// TODO Should set endDate to midnight of the date to be more accurate
 		if (endDate) {
 			filteredTransactionLog = filteredTransactionLog.findAll{it.transaction.transactionDate <= endDate+1}
 		}
 		
-		// Filter by transaction type (0 = all items
-		if (transactionType && !transactionType?.id == 0) {	
-			//log.info ("filter by type " + transactionType.id)
-			filteredTransactionLog = filteredTransactionLog.findAll{it.transaction.transactionType.equals(transactionType)}
+		// Filter by transaction type (0 = return all types)
+		if (transactionType && transactionType?.id != 0) {	
+			filteredTransactionLog = filteredTransactionLog.findAll{it?.transaction?.transactionType?.id == transactionType?.id}
 		}
-		//log.info ("filtered transaction log" + filteredTransactionLog)
 		
 		return filteredTransactionLog.groupBy { it.transaction } 
 	}
