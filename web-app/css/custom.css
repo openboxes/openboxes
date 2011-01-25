@@ -4,9 +4,7 @@
 #doc3 {
 	margin:auto;
 }
-#hd { 
-	background-color: #f7f7f7; 
-}
+
 /* temporarily hide the nav bar until we figure out whether we want to keep it or not */
 .nav { display: none; } 
 
@@ -21,7 +19,7 @@ li.ui-menu-item { text-align: left; font-weight: bold; }
 h3 { 
 	font-size: 1.1em;
 	vertical-align: middle;
-	color: #008000;
+	/*color: #008000;*//*green */
 } 
 h3.ui-state-active { background-color: #f7f7f7; }  /* #F8F7EF */
 .ui-accordion .ui-accordion-content { padding: 0px; } 
@@ -198,6 +196,11 @@ table#listOutgoing th {
 	padding-top: 5px; 
 	padding-bottom: 5px;
 }
+input.button { 
+	vertical-align: middle;
+	border: 0px;
+	margin: 0px;
+}
 .menu .menuSection ul li { 
     /*display: block;*/
     
@@ -280,7 +283,10 @@ h2 {
 #pageTitle { 
 	/*border-top: 1px solid lightgrey;
 	background-color: #f0f0f0;*/
-	padding: 5px 5px 15px 5px;	
+	background-color: #525D76;
+	padding: 10px;	
+	margin-bottom: 10px;
+	color: white;
 }
 
 .section { 	
@@ -312,12 +318,6 @@ hr.space {background:#fff;color:#fff;}
 	height: 24px;
 }
 
-#banner { 
-	background-color: #eee; 
-	padding-right: 25px;
-}
-
-	
 
 #bannerLeft {
 

@@ -10,7 +10,7 @@ class BrowseInventoryCommand {
 	def inventoryItemMap;	 //inventoryService.getInventoryItemMap(warehouseInstance?.id),
 	def productList;		//productList?.sort() { it.name },
 	def rootCategory;		//rootCategory
-
+	def quantityMap;
 	
 	static constraints = { 
 		warehouseInstance(nullable:true)
@@ -21,7 +21,8 @@ class BrowseInventoryCommand {
 		inventoryItemMap(nullable:true)
 		productList(nullable:true)
 		rootCategory(nullable:true)		
+		quantityMap(nullable:true)
 	}
-			
+	
 }
 

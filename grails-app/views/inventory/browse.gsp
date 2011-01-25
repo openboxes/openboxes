@@ -46,6 +46,7 @@
 									<thead>
 										<tr class="odd">
 											<th width="5%">ID</th>
+											<th width="5%">Code</th>
 											<th>Description</th>
 											<th width="5%" style="text-align: center">Qty</th>
 										</tr>
@@ -57,12 +58,14 @@
 			            			<table>         		
 										<tbody>
 											<g:set var="totalQuantity" value="${0 }"/>
-											<g:each var="productInstance" in="${commandInstance?.productList }" status="i">
-											 	<g:set var="itemInstanceList" value="${commandInstance?.inventoryItemMap.get(productInstance)}"/>	
-											 	<g:set var="quantity" value="${(itemInstanceList)?itemInstanceList*.quantity.sum():0 }"/>
-												<g:set var="totalQuantity" value="${totalQuantity+quantity }"/>
+											<g:each var="productInstance" in="${commandInstance?.productList }" status="i">											 	
+												<g:set var="quantity" value="${commandInstance?.quantityMap.get(productInstance) }"/>
+												<g:set var="totalQuantity" value="${totalQuantity + quantity }"/>
+												
+												
 												<tr class="${varStatus++%2==0?'even':'odd' }">
 													<td width="5%">${productInstance?.id }</td>						
+													<td width="5%">${productInstance?.productCode }</td>																			
 													<td style="">
 														<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">
 															${productInstance?.name }
@@ -70,7 +73,9 @@
 															
 													</td>
 													<td style="width: 5%; text-align: center;">
-														<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">${(itemInstanceList)?itemInstanceList*.quantity.sum():'<span class="fade">N/A</span>' }</g:link>
+														<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">
+															${quantity}
+														</g:link>
 													</td>
 												</tr>
 											</g:each>										
@@ -78,6 +83,7 @@
 										<tfoot>
 										
 											<tr class="${varStatus%2==0?'even':'odd' }">
+												<th></th>
 												<th></th>
 												<th style="text-align: right;">
 													Total
@@ -94,10 +100,9 @@
 								<table>									
 									<tbody>
 										<tr class="even">
-											<td colspan="3" style="padding: 10px; text-align: center;">
-											
+											<td colspan="3" style="padding: 25px; text-align: left;">
 												<g:if test="${!commandInstance?.categoryFilters}">
-													Please choose at least one category on the left.
+													&laquo; Please choose at least one category on the left.
 												</g:if>
 												<g:else>													
 													There are no inventory items matching the selected criteria.

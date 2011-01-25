@@ -27,6 +27,15 @@ class InventoryService {
 		return Inventory.withCriteria { eq("warehouse", warehouse) }
 	}
 	
+	/**
+	 * Returns a map of products grouped by category.
+	 * 
+	 * TODO Make sure this is doing what it's intended to do.  The groupBy 
+	 * expression looks a little weird to me.
+	 * 
+	 * @param id
+	 * @return
+	 */
 	Map getProductMap(Long id) { 		
 		return Product.getAll().groupBy { it.categories*.parents } 
 	}
@@ -54,16 +63,38 @@ class InventoryService {
 		
 		// Get all product types and set the default product type				
 		commandInstance.rootCategory = productService.getRootCategory();
+		commandInstance.inventoryInstance = commandInstance?.warehouseInstance?.inventory;
 		commandInstance.categoryInstance = Category.get(params?.categoryId)
 		commandInstance.categoryInstance = commandInstance?.categoryInstance ?: commandInstance?.rootCategory;
 		commandInstance.productList = (commandInstance?.categoryFilters) ? getProductsByCategories(commandInstance?.categoryFilters, params) : [];		
 		commandInstance.productMap = getProductMap(commandInstance?.warehouseInstance?.id);
 		commandInstance.inventoryItemMap =  getInventoryItemMap(commandInstance?.warehouseInstance?.id);
 		commandInstance.productList = commandInstance?.productList?.sort() { it.name };
-		
+		commandInstance.quantityMap = getQuantityMap(commandInstance?.inventoryInstance);
 		return commandInstance;
 	}
 	
+	/** 
+	 * Get a map of quantities (indexed by product) for a particular inventory.
+	 * 
+	 * TODO This might perform poorly as we add more and more transaction entries 
+	 * into an inventory.
+	 */
+	Map getQuantityMap(def inventoryInstance) { 
+		def quantityMap = [:]
+		def transactionEntries = TransactionEntry.createCriteria().list { 
+			transaction { 
+				eq("inventory.id", inventoryInstance?.id)
+			}	
+		}
+		log.info "transaction entries " + transactionEntries;		
+		transactionEntries.each { 
+			def currentQuantity = (quantityMap.get(it.product))?:0;			
+			currentQuantity += it.quantity
+			quantityMap.put(it.product, currentQuantity)
+		}
+		return quantityMap;		
+	}
 
 	
 	
@@ -233,6 +264,22 @@ class InventoryService {
 		return inventoryItems;
 	}
 
+	
+	/**
+	 * Get a single inventory level instance for the given product and inventory.
+	 * 
+	 * @param productInstance
+	 * @param inventoryInstance
+	 * @return
+	 */
+	InventoryLevel getInventoryLevelByProductAndInventory(Product productInstance, Inventory inventoryInstance) { 		
+		def inventoryLevel = InventoryLevel.findByProductAndInventory(productInstance, inventoryInstance)
+				
+		return (inventoryLevel)?:new InventoryLevel();
+		
+	}
+	
+	
 	/**
 	 * Get all transaction entries for a particular inventory item.
 	 * @param itemInstance

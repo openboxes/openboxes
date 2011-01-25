@@ -23,11 +23,6 @@ fieldset table td { padding: 6px; }
 					<span class="name">Category</span>
 				</td>
 				<td>
-					<%-- 
-					<g:if test="${productInstance?.category?.parentCategory }">
-						<span class="value">${productInstance?.category?.parentCategory?.name } &rsaquo;</span>
-					</g:if>
-					--%>
 					<span class="value">${productInstance?.category?.name }
 				</td>
 			</tr>
@@ -58,20 +53,120 @@ fieldset table td { padding: 6px; }
 					</td>
 				</tr>													
 			</g:each>
-			<tr class="odd">
+			<tr class="odd" style="border-top: 1px solid lightgrey;">
 				<td style="text-align: left;">
-					<span class="name">Min Qty</span>
+					<span class="name">Supported</span>
 				</td>
 				<td>
-					<span class="value">${inventoryLevelInstance?.minQuantity?:'<span class="fade">Not Configured</span>' }</span>
+					<span id="supported" class="value">
+						<span id="supportedValue">
+							<g:if test="${commandInstance?.inventoryLevelInstance}">
+								<g:if test="${commandInstance?.inventoryLevelInstance?.supported}">
+									Yes  
+								</g:if>			
+								<g:else>										
+									No 
+								</g:else>
+							</g:if>
+							<g:else>
+								<span class="fade">N/A</span>
+							</g:else>
+						</span>
+						&nbsp;
+						<g:remoteLink action="toggleSupported" params="['product.id':productInstance.id, 'inventory.id':inventoryInstance?.id]"
+						update="[success:'supportedValue',failure:'supportedValue']">Toggle</g:remoteLink>
+					</span>
 				</td>
-			</tr>
+			</tr>				
 			<tr class="even">
 				<td style="text-align: left;">
-					<span class="name">Reorder Qty</span>
+					<span class="name">Min Level</span>
 				</td>
 				<td>
-					<span class="value">${inventoryLevelInstance?.reorderQuantity?:'<span class="fade">Not Configured</span>' }</span>
+					<script>
+						$(document).ready(function() {
+							$("#minQuantityTextField").hide();
+							$('.toggleMinQuantity').click(function() {
+								$('#minQuantityTextValue').toggle();
+								$('#minQuantityTextField').toggle();
+								$('#minQuantity').focus();
+							});
+
+							$('#clickError').click(function() {
+								$('#errorMessage').show();
+							});						
+						});
+					</script>
+				
+					<span id="minQuantityTextValue" class="value">
+						<span id="minQuantityValue">
+							<g:if test="${commandInstance?.inventoryLevelInstance?.minQuantity}">
+								${commandInstance?.inventoryLevelInstance?.minQuantity?:'' }
+							</g:if>
+							<g:else>
+								<span class="fade">N/A</span>
+							</g:else>
+						</span>
+						&nbsp;
+						<a class="toggleMinQuantity" href="#"><img src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png' )}"/></a>
+					</span>
+					<span id="minQuantityTextField" class="value">
+						<g:formRemote url="[controller:'inventoryItem',action:'updateQuantity']" update="[success:'minQuantityValue',failure:'minQuantityValue']" name="updateForm">
+							<input type="hidden" name="product.id" value="${productInstance?.id }" />
+							<input type="hidden" name="inventory.id" value="${inventoryInstance?.id }" />
+							<g:textField id="minQuantity" name="minQuantity" size="3"/>
+							<input class="button toggleMinQuantity" type="image" border="0"  src="${createLinkTo(dir: 'images/icons/silk', file: 'disk.png' )}" alt="Submit button">
+							<a href="#" class="toggleMinQuantity">
+								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png' )}" alt="Cancel"/>
+							</a>	
+						</g:formRemote >					
+					</span>					
+				</td>
+			</tr>
+			<tr class="odd">
+				<td style="text-align: left;">
+					<span class="name">Reorder Level</span>
+				</td>
+				<td>
+					<script>
+						$(document).ready(function() {
+							$("#reorderQuantityTextField").hide();
+							$('.toggleReorderQuantity').click(function() {
+								$('#reorderQuantityTextValue').toggle();
+								$('#reorderQuantityTextField').toggle();
+								$('#reorderQuantity').focus();
+							});
+
+							$('#clickError').click(function() {
+								$('#errorMessage').show();
+							});						
+						});
+					</script>
+				
+					<span id="reorderQuantityTextValue" class="value">
+						<span id="reorderQuantityValue">
+							<g:if test="${commandInstance?.inventoryLevelInstance?.reorderQuantity}">
+								${commandInstance?.inventoryLevelInstance?.reorderQuantity?:'' }
+							</g:if>
+							<g:else>
+								<span class="fade">N/A</span>
+							</g:else>
+						</span>
+						&nbsp;
+						<a class="toggleReorderQuantity" href="#"><img src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png' )}"/></a>
+					</span>
+					<span id="reorderQuantityTextField" class="value">
+						<g:formRemote url="[controller:'inventoryItem',action:'updateQuantity']" update="[success:'reorderQuantityValue',failure:'reorderQuantityValue']" name="updateForm">
+							<input type="hidden" name="product.id" value="${productInstance?.id }" />
+							<input type="hidden" name="inventory.id" value="${inventoryInstance?.id }" />
+							<g:textField id="reorderQuantity" name="reorderQuantity" size="3"/>
+							<input class="button toggleReorderQuantity" type="image" border="0"  src="${createLinkTo(dir: 'images/icons/silk', file: 'disk.png' )}" alt="Submit button">
+							<a href="#" class="toggleReorderQuantity">
+								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png' )}" alt="Cancel"/>
+							</a>	
+						</g:formRemote >					
+					</span>					
+					
 				</td>
 			</tr>				
 			<%-- 						

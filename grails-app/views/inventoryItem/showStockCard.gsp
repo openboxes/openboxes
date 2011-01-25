@@ -28,9 +28,9 @@
 			
 				<div style="float: left; margin-left: 15px;">	
 					<span>		
-						<img src="${resource(dir: 'images/icons/silk', file: 'table_refresh.png')}"/>
+						
 						<g:link controller="inventory" action="browse" >
-							Back to Inventory
+							&lsaquo; Back to Inventory
 						</g:link>
 					</span>
 				</div>
@@ -58,17 +58,17 @@
 					</span>	
 				</div>
 				
-				
+				<br clear="all">
 				<table>
 					<tr>
 						<td style="width: 250px;">
-							<g:render template="productDetails" model="[productInstance:commandInstance?.productInstance]"/>											
+							<g:render template="productDetails" model="[productInstance:commandInstance?.productInstance, inventoryInstance:commandInstance?.inventoryInstance]"/>											
 						</td>
 						<td>			
 						
 							<div> 					
 								<fieldset>	
-									<legend class="fade">Current Stock</legend>																
+									<legend class="fade">Current Stock</legend>	
 									<div id="inventoryView" style="text-align: right;">										
 										<table border="0" style="border:1px solid #f5f5f5" width="100%">
 											<thead>
@@ -103,18 +103,18 @@
 															</g:else>
 														</td>
 														<td style="text-align: center;">
-															<g:set var="transactionEntries" value="${commandInstance?.transactionEntriesByInventoryItem?.get(itemInstance)}"/>
-															
-															${transactionEntries?transactionEntries*.quantity.sum():0}	
+														
+															${commandInstance.quantityByInventoryItemMap.get(itemInstance) }
+														
 														</td>
 													</tr>
 												</g:each>
 											</tbody>
 											<tfoot>
-												<tr style="font-size: 1.5em; line-height: 2em;">
+												<tr>
 													<th colspan="4" style="text-align: right;"></th>
-													<th class="large" style="text-align: center;">
-														${(commandInstance?.transactionEntryList)?commandInstance?.transactionEntryList*.quantity.sum():0 }</th>
+													<th style="text-align: center;">
+														${commandInstance.totalQuantity }</th>
 												</tr>
 											</tfoot>
 										</table>										
@@ -187,68 +187,86 @@
 											</tr>
 										</thead>
 										<tbody>			
-											<g:if test="${!commandInstance?.transactionEntryMap }">
+											<g:if test="${!commandInstance?.transactionLogMap }">
 												<tr>
 													<td colspan="5">												
 														No transaction entries
 													</td>
 												</tr>
 											</g:if>
-										
-																			
-											<g:each var="transaction" in="${commandInstance?.transactionEntryMap.keySet().sort {it.transactionDate}.reverse() }" status="status">
-												<tr id="${transacton?.id }" class="transaction ${(status%2==0)?'even':'odd' }">
-													<td class="fade">
-														${transaction?.id }
-													</td>
-													<td>
-														<g:formatDate
-															date="${transaction?.transactionDate}" format="MMM dd" />
-	
-													</td>
-													<td>	
-														${transaction?.transactionType?.name }
-													</td>
-													<td>
-														There were ${transaction?.transactionEntries?.size() } inventory item(s) involved in this transaction.														
-														<a href="#" id="${transaction?.id }" class="toggleDetails">Show details &rsaquo;</a>
-													</td>
-													<td>
-														<g:set var="quantityChange" value="${transaction?.transactionEntries*.quantity?.sum() }"/>
-														<g:if test="${quantityChange>0}">
-															+${quantityChange }
+											<g:else>
+												<g:set var="totalQuantityChange" value="${0 }"/>							
+												<g:each var="transaction" in="${commandInstance?.transactionLogMap.keySet().sort {it.transactionDate}.reverse() }" status="status">
+													<tr id="${transacton?.id }" class="transaction ${(status%2==0)?'even':'odd' }">
+														<td class="fade">
+															${transaction?.id }
+														</td>
+														<td>
+															<g:formatDate
+																date="${transaction?.transactionDate}" format="MMM dd" />
+														</td>
+														<td>	
+															${transaction?.transactionType?.name }
+														</td>
+														<td>
+															There were ${transaction?.transactionEntries?.size() } inventory item(s) involved in this transaction.														
+															<a href="#" id="${transaction?.id }" class="toggleDetails">Show details &rsaquo;</a>
+														</td>
+														<td style="text-align: center">
+															<g:set var="quantityChange" value="${transaction?.transactionEntries*.quantity?.sum() }"/>
+															<g:set var="totalQuantityChange" value="${totalQuantityChange + quantityChange}"/>
+															<g:if test="${quantityChange>0}">
+																+${quantityChange }
+															</g:if>
+															<g:else>
+																${quantityChange }
+															</g:else>
+															
+														</td>
+													</tr>
+													<g:each var="transactionEntry" in="${commandInstance?.transactionLogMap.get(transaction) }">
+														<tr id="transactionEntry?.id" class="transactionEntry transaction${transaction?.id } ${(status%2==0)?'even':'odd' }">
+															<td></td>
+															<td></td>
+															<td></td>												
+															<td>
+																<span class="fade">
+																	${transactionEntry?.inventoryItem?.description }
+																	${transactionEntry?.lotNumber }</span>
+															</td>
+															<td>
+																<span class="fade">
+																	<g:if test="${transactionEntry.quantity>0}">
+																		+${transactionEntry.quantity }
+																	</g:if>
+																	<g:else>
+																		${transactionEntry.quantity }
+																	</g:else>														
+																</span>
+															</td>
+														</tr>
+													</g:each>
+												</g:each>
+												<tr>
+													<th></th>
+													<th></th>
+													<th></th>
+													<th></th>
+													<th class="large" style="text-align: center;">
+														${}
+														<g:if test="${totalQuantityChange>0}">
+															+${totalQuantityChange}
 														</g:if>
 														<g:else>
-															${quantityChange }
-														</g:else>
-													</td>
+															${totalQuantityChange}
+														</g:else>														
+													</th>
 												</tr>
-												<g:each var="transactionEntry" in="${commandInstance?.transactionEntryMap.get(transaction) }">
-													<tr id="transactionEntry?.id" class="transactionEntry transaction${transaction?.id } ${(status%2==0)?'even':'odd' }">
-														<td>
-														</td>
-														<td>
-														</td>
-														<td>
-														</td>												
-														<td>
-															<span class="fade">
-																${transactionEntry?.inventoryItem?.description }
-																${transactionEntry?.lotNumber }</span>
-														</td>
-														<td>
-															<span class="fade">
-															${transactionEntry?.quantity }</span>
-														</td>
-														
-													</tr>
-												</g:each>
-											</g:each>
+											</g:else>
 										</tbody>
 									</table>
 								</fieldset>
 							</div>
-																	
 						</td>
 					</tr>
 				</table>

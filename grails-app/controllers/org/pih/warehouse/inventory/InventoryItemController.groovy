@@ -77,6 +77,79 @@ class InventoryItemController {
 			transactionEntryMap: transactionEntryList.groupBy { it.transaction } ]
 	}	
 	
+	def toggleSupported = { 
+		def inventoryLevel;
+		def productInstance = Product.get(params?.product?.id);
+		def inventoryInstance = Inventory.get(params?.inventory?.id);
+		if (productInstance && inventoryInstance) {
+			inventoryLevel = inventoryService.getInventoryLevelByProductAndInventory(productInstance, inventoryInstance)
+			if (!inventoryLevel) inventoryLevel = new InventoryLevel(params);
+			inventoryLevel.product = productInstance;
+			inventoryLevel.inventory = inventoryInstance;
+			inventoryLevel.supported = !inventoryLevel.supported;	
+			if (!inventoryLevel.hasErrors() && inventoryLevel.save()) { 
+				// 
+			}		
+			else { 
+				def errorMessage = "<ul>";
+				inventoryLevel.errors.allErrors.each {
+					errorMessage += "<li>" + it + "</li>";
+				}
+				errorMessage += "</ul>";
+				render errorMessage;
+			}
+		}
+		else { 
+			render "Could not find product or inventory."
+		}
+		
+		render (inventoryLevel.supported?"Yes":"No");
+	}
+	
+	
+	def updateQuantity = { 
+		log.info params;
+		try { 
+			def productInstance = Product.get(params?.product?.id);
+			def inventoryInstance = Inventory.get(params?.inventory?.id);
+			if (productInstance && inventoryInstance) { 
+				def successMessage = "";
+				def inventoryLevel = inventoryService.getInventoryLevelByProductAndInventory(productInstance, inventoryInstance)				
+				if (!inventoryLevel) inventoryLevel = new InventoryLevel(params);
+				inventoryLevel.product = productInstance;
+				inventoryLevel.inventory = inventoryInstance;
+				inventoryLevel.supported = Boolean.TRUE;
+				if (params.minQuantity) { 
+					successMessage = params.minQuantity; 
+					inventoryLevel.minQuantity = Integer.valueOf(params.minQuantity)
+				}
+				if (params.reorderQuantity) { 
+					successMessage = params.reorderQuantity;
+					inventoryLevel.reorderQuantity = Integer.valueOf(params.reorderQuantity)
+				}
+				
+				if (!inventoryLevel.hasErrors() && inventoryLevel.save()) { 
+					render successMessage;
+				}
+				else { 
+					def errorMessage = "<ul>";
+					inventoryLevel.errors.allErrors.each {
+						errorMessage += "<li>" + it + "</li>";
+					} 
+					errorMessage += "</ul>";					
+					render errorMessage;
+				}
+			}
+			else { 
+				render "Error: Could not find product or inventory!"
+			}
+		} 
+		catch (Exception e) { 
+			render "Error: " + e.getMessage();
+		}
+	}
+	
+	
 	def showStockCard = { StockCardCommand cmd ->		
 		// TODO Eventually, we'll push all of this logic to the service 
 		// Right now, the command class is private, so we can't pass it to the service
@@ -85,28 +158,18 @@ class InventoryItemController {
 		cmd.productInstance = Product.get(params?.product?.id?:params.id);  // check product.id and id
 		cmd.warehouseInstance = Warehouse.get(session?.warehouse?.id);
 		cmd.inventoryInstance = cmd.warehouseInstance?.inventory
-		
-		// Get current stock of a particular product within an inventory
+		cmd.inventoryLevelInstance = inventoryService.getInventoryLevelByProductAndInventory(cmd.productInstance, cmd.inventoryInstance)
+				
+		// Get current stock of a particular product within an inventory		
+		// Using set to make sure we only return one object per inventory items
 		Set inventoryItems = inventoryService.getInventoryItemsByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);		
 		cmd.inventoryItemList = inventoryItems as List
 		
 		// Get transaction log for a particular product within an inventory
 		cmd.transactionEntryList = inventoryService.getTransactionEntriesByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);
-		cmd.transactionEntriesByInventoryItem = cmd.transactionEntryList.groupBy { it.inventoryItem }
-		cmd.transactionEntryMap = cmd.transactionEntryList.groupBy { it.transaction }
-		
-		
-				
-		// Filter the transaction entry list by date range and transaction type
-		//if (cmd.startDate) cmd.transactionEntryList = cmd.transactionEntryList.findAll{it.transaction.transactionDate >= cmd.startDate}
-		//if (cmd.endDate) cmd.transactionEntryList = cmd.transactionEntryList.findAll{it.transaction.transactionDate <= cmd.endDate}
-		//if (cmd.transactionType) cmd.transactionEntryList = cmd.transactionEntryList.findAll{it.transaction.transactionType.equals(cmd.transactionType)}					
-		
-		log.info "transactionEntries: " + cmd.transactionEntryList;
-		log.info "transactionEntriesByInventoryItem: " + cmd.transactionEntriesByInventoryItem;
-		
-			
-			
+		cmd.transactionEntriesByInventoryItemMap = cmd.transactionEntryList.groupBy { it.inventoryItem }
+		cmd.transactionEntriesByTransactionMap = cmd.transactionEntryList.groupBy { it.transaction }
+								
 		[ commandInstance: cmd ]
 	}
 		
@@ -471,26 +534,87 @@ class InventoryItemController {
 
 }
 
-
 class StockCardCommand { 
-	
+
+	// Used when adding a new inventory item (not implemented yet)
 	InventoryItem inventoryItem;
+
+	// Entire page
 	Product productInstance;
 	Warehouse warehouseInstance;
 	Inventory inventoryInstance;
+	InventoryLevel inventoryLevelInstance;
+	
+	// Current stock section
 	List inventoryItemList;
 	List transactionEntryList;
-	Map transactionEntryMap;
-	Map transactionEntriesByInventoryItem
-	
+	Map transactionEntriesByTransactionMap;
+	Map transactionEntriesByInventoryItemMap
+
+	// Transaction log section
 	Date startDate = new Date() - 30;		// defaults to today - 30d
 	Date endDate = new Date();				// defaults to today
 	TransactionType transactionType
-	
-	static constraints = { 
+	Map transactionLogMap;
+		
+	static constraints = {
 		startDate(nullable:true)
 		endDate(nullable:true)
 		transactionType(nullable:true)
 	}
+
+	/**
+	 * Returns a map of quantity values indexed by inventory item to be used in the 
+	 * current stock portion of the stock card page.
+	 * 
+	 * @return a map (inventory item -> quantity)
+	 */
+	Map getQuantityByInventoryItemMap() { 
+		Map quantityByInventoryItemMap = [:]
+		if (inventoryItemList) { 
+			inventoryItemList.each { 
+				def transactionEntries = transactionEntriesByInventoryItemMap?.get(it)
+				def quantity = (transactionEntries)?transactionEntries*.quantity.sum():0;
+				quantityByInventoryItemMap.put(it, quantity)
+			}
+		}
+		return quantityByInventoryItemMap;
+	}
+	
+	/**
+	 * Return the total quantity for all inventory items.
+	 * 
+	 * @return 	the sum of quantities across all transaction entries
+	 */
+	Integer getTotalQuantity() { 
+		return (transactionEntryList)?transactionEntryList*.quantity.sum():0
+	}
+	
+	/**
+	 * Filter the transaction entry list by date range and transaction type
+	 * 
+	 * TODO Should move this to the DAO/service layer in order to make it perform better.
+	 * 
+	 * @return
+	 */
+	Map getTransactionLogMap() { 
+		def filteredTransactionLog = transactionEntryList;
+		if (startDate) {
+			filteredTransactionLog = filteredTransactionLog.findAll{it.transaction.transactionDate >= startDate}
+		}
+		if (endDate) {
+			filteredTransactionLog = filteredTransactionLog.findAll{it.transaction.transactionDate <= endDate+1}
+		}
+		
+		// Filter by transaction type (0 = all items
+		if (transactionType && !transactionType?.id == 0) {	
+			//log.info ("filter by type " + transactionType.id)
+			filteredTransactionLog = filteredTransactionLog.findAll{it.transaction.transactionType.equals(transactionType)}
+		}
+		//log.info ("filtered transaction log" + filteredTransactionLog)
+		
+		return filteredTransactionLog.groupBy { it.transaction } 
+	}
+	
 	
 }

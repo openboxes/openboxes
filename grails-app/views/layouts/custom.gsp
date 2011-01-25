@@ -164,11 +164,35 @@
 							</div>					
 					    </div>
 					</div>
+					
 				</div>
 		    </div>		    
 		</div>
     </div>
-    
+    <div id="doc3" class="yui-t7" style="clear: both;">
+		<!-- Populated using the 'pageTitle' property defined in the GSP file -->
+		<g:if test="${session.user}">
+			<h3>
+			    <div id="pageTitle">							    
+			    	<g:link controller="dashboard" action="index">
+				    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'house.png')}"/>
+			    	</g:link>
+				    &nbsp;&rsaquo;&nbsp;								
+					<g:if test="${session?.warehouse}">									
+						<g:if test="${session.warehouse.logo }">
+							<img class="photo" width="25" height="25" 
+								src="${createLink(controller:'warehouse', action:'viewLogo', id:session.warehouse.id)}" style="vertical-align: middle" />
+						</g:if>
+						${session?.warehouse?.name} &nbsp;&rsaquo;&nbsp;
+					</g:if>
+				    <g:message code="${params.controller }.label"/>
+					&nbsp;&rsaquo;&nbsp;								
+					<g:if test="${pageProperty(name:'page.pageTitle')}"><b>${pageProperty(name:'page.pageTitle')}</b></g:if>
+					<g:else><b><g:layoutTitle /></b></g:else>
+				</div>
+			</h3>
+		</g:if>		
+	</div>
     <div id="doc3" class="yui-t2">	    
 		<!-- 
 				Body includes the divs for the main body content and left navigation menu 
@@ -179,31 +203,6 @@
 	    	<!-- YUI main Block including page title and content -->
 	      	<div id="yui-main">
 		    	<div id="content" class="yui-b">
-					<!-- Populated using the 'pageTitle' property defined in the GSP file -->
-					<g:if test="${session.user}">
-						<h3>
-						    <div id="pageTitle">							    
-						    	<g:link controller="dashboard" action="index">
-							    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'house.png')}"/>
-						    	</g:link>
-							    &nbsp;&rsaquo;&nbsp;								
-								<g:if test="${session?.warehouse}">									
-									<g:if test="${session.warehouse.logo }">
-										<img class="photo" width="25" height="25" 
-											src="${createLink(controller:'warehouse', action:'viewLogo', id:session.warehouse.id)}" style="vertical-align: middle" />
-									</g:if>
-									${session?.warehouse?.name} &nbsp;&rsaquo;&nbsp;
-								</g:if>
-							    <g:message code="${params.controller }.label"/>
-								&nbsp;&rsaquo;&nbsp;								
-								<g:if test="${pageProperty(name:'page.pageTitle')}"><b>${pageProperty(name:'page.pageTitle')}</b></g:if>
-								<g:else><b><g:layoutTitle /></b></g:else>
-							</div>
-						</h3>
-					</g:if>		
-					
-					
-								
 					<g:layoutBody />
 				</div>
 	      	</div>

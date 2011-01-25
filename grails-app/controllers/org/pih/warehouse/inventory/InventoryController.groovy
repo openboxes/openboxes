@@ -3,6 +3,7 @@ package org.pih.warehouse.inventory;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
+import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.Warehouse;
 
 
@@ -19,29 +20,34 @@ class InventoryController {
 		[ warehouses : Warehouse.getAll() ]
 	}
 	
-	def removeCategoryFilter = { 
-		
+	
+	/** 
+	 * TODO These are the same methods used in the product browser.  Need to figure out a better
+	 * way to handle this (e.g. through a generic ajax call or taglib).
+	 */
+	def removeCategoryFilter = { 	
 		def category = Category.get(params?.categoryId)		
 		if (category)
 			session.inventoryCategoryFilters.remove(category?.id);
-			
 		redirect(action: browse);		
 	}
-	
 	def clearCategoryFilters = { 
 		session.inventoryCategoryFilters.clear();
 		session.inventoryCategoryFilters = null;
 		redirect(action: browse);		
 	}
-	
 	def addCategoryFilter = { 
 		def category = Category.get(params?.categoryId);
 		if (category && !session.inventoryCategoryFilters.contains(category?.id)) 
 			session.inventoryCategoryFilters << category?.id;
 		redirect(action: browse);		
 	}
-	
-		
+
+	/**
+	 * Allows a user to browse the inventory for a particular warehouse.  
+	 * 
+	 * 	
+	 */
 	def browse = { BrowseInventoryCommand cmd ->
 		// Get the warehouse from the request parameter
 		cmd.warehouseInstance = Warehouse.get(params?.warehouse?.id) 
