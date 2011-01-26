@@ -96,7 +96,14 @@ fieldset table td { padding: 6px; }
 				<td>
 					<g:remoteLink action="toggleSupported" params="['product.id':productInstance.id, 'inventory.id':inventoryInstance?.id]"
 					update="[success:'supportedValue',failure:'supportedValue']">
-						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'control_play.png' )}" id="toggleSupportedImage"/>
+					
+						<g:if test="${inventoryLevelInstance?.supported }">
+							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'control_stop.png' )}" id="toggleSupportedImage"/>
+						</g:if>
+						<g:else>
+							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'control_play.png' )}" id="toggleSupportedImage"/>
+						</g:else>					
+						
 					</g:remoteLink>
 				</td>
 			</tr>				
