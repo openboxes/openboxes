@@ -63,10 +63,6 @@
 				<td>				
 						
 					<div>
-						<fieldset style="min-height:200px;">	
-							<legend class="fade">
-								Record Inventory
-							</legend>
 							<div id="inventoryForm">
 								<g:form action="saveRecordInventory" autocomplete="off">
 									<g:hiddenField name="product.id" value="${commandInstance.product?.id}"/>
@@ -77,7 +73,7 @@
 									<g:hiddenField name="initialQuantity" value="0"/>							
 									<g:hiddenField name="inventoryItemType" value="${org.pih.warehouse.inventory.InventoryItemType.NON_SERIALIZED}"/>
 								 --%>	
-									<div style="padding: 10px; text-align: left;" class="odd">
+									<div style="padding: 10px; text-align: left;">
 										<label>Inventory date:</label>
 										<g:jqueryDatePicker 
 											id="transactionDate" 
@@ -86,17 +82,34 @@
 											format="MM/dd/yyyy"
 											showTrigger="false" />
 									</div>
-									<style>
-										
-									</style>
+
+									<script>
+										$(document).ready(function() {
+											$(".buttonUp").click(function(event, data) { 
+												var status = this.id;
+												var qtyFieldId = "#newQuantity-" + status + "";
+												var value = parseInt($(qtyFieldId).val());
+												
+												$(qtyFieldId).val(value+1);
+												event.preventDefault();
+											});
+											$(".buttonDown").click(function(event, data) { 
+												var status = this.id;
+												var qtyFieldId = "#newQuantity-" + status + "";
+												var value = parseInt($(qtyFieldId).val());
+												$(qtyFieldId).val(value-1);
+												event.preventDefault();
+											});
+										});
+									</script>
 									
-									<table id="recordInventoryTable">
+									<table id="recordInventoryTable" style="border: 1px solid lightgrey" border="1">
 										<thead>
 											<tr>
 												<th>ID</th>
-												<th>Description</th>
 												<th>Lot/Serial #</th>
 												<th>Expires</th>
+												<th>Description</th>
 												<th style="text-align:center;">Old Qty</th>
 												<th style="text-align:center;">New Qty</th>
 											</tr>											
@@ -104,25 +117,18 @@
 										<tbody>
 											<g:each var="recordInventoryRow" in="${commandInstance?.recordInventoryRows }" status="status">				
 												<tr class="${(status%2==0)?'odd':'even' }">
-													<td>
+													<td width="5%">
 														${status+1 }
 														<g:hiddenField name="recordInventoryRows[${status}].id" value="${recordInventoryRow?.id }"/>
 													</td>
-													<td>
-														<%-- 
-														<g:textField name="recordInventoryRows[${status}].description" size="25" value="${recordInventoryRow?.description }"/>
-														--%>
-														<g:hiddenField name="recordInventoryRows[${status}].description" value="${recordInventoryRow?.description }"/>
-														${recordInventoryRow?.description }
-													</td>
-													<td>
+													<td width="15%">
 														<%-- 
 														<g:textField name="recordInventoryRows[${status}].lotNumber" size="10" value="${recordInventoryRow?.lotNumber }"/>
 														--%>
 														<g:hiddenField name="recordInventoryRows[${status}].lotNumber" value="${recordInventoryRow?.lotNumber }"/>
 														${recordInventoryRow?.lotNumber }
 													</td>
-													<td>
+													<td width="10%">
 														<%-- 
 														<g:jqueryDatePicker id="expirationDate${status }" name="recordInventoryRows[${status}].expirationDate" 
 															value="${recordInventoryRow?.expirationDate}" format="MM/dd/yyyy" showTrigger="false" />
@@ -135,15 +141,55 @@
 															<span class="fade">never</span>
 														</g:else>
 													</td>
-													<td style="text-align: center; vertical-align: middle;">
+													<td width="45%">
+														<%-- 
+														<g:textField name="recordInventoryRows[${status}].description" size="25" value="${recordInventoryRow?.description }"/>
+														--%>
+														<g:hiddenField name="recordInventoryRows[${status}].description" value="${recordInventoryRow?.description }"/>
+														${recordInventoryRow?.description }
+													</td>
+													<td width="10%" style="text-align: center; vertical-align: middle;">
 														${recordInventoryRow?.oldQuantity }	
 														<g:hiddenField name="recordInventoryRows[${status}].oldQuantity" value="${recordInventoryRow?.oldQuantity }"/>
 													</td>	
-													<td style="text-align: center; vertical-align: middle;">
-														<g:textField style="text-align: center;" name="recordInventoryRows[${status }].newQuantity" size="3" value="${recordInventoryRow?.newQuantity }" onFocus="this.select();"/>
+													<td width="10%" style="text-align: center; vertical-align: middle;">
+														<g:textField style="text-align: center;"  id="newQuantity-${status }" name="recordInventoryRows[${status }].newQuantity" size="3" value="${recordInventoryRow?.newQuantity }" onFocus="this.select();" onClick="this.select();"/>
 													</td>	
+													<td>
+														<button id="${status }" class="buttonUp">
+															<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_up.png') }"/>
+														</button>
+														<button id="${status }" class="buttonDown">
+															<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_down.png') }"/>
+														</button>
+													</td>
 												</tr>
 											</g:each>
+											<%-- 
+											
+											<tr>
+												<td></td>
+												<td> 
+													<input type="text" id="lotNumber" name="lotNumber" size="5" />
+												</td>
+												<td> 
+													<input type="text" id="lotNumberDate" name="lotNumberDate" size="5"/>
+												</td>
+												<td> 
+													<input type="text" id="lotNumberDescription" name="lotNumberDescription" size="10" />
+												</td>
+												
+											</tr>
+
+											<tr>
+												<td></td>
+												<td colspan="4">
+													Add another item:
+													<g:lotNumberComboBox id="lotNumberWidget" name="lotNumberWidget"></g:lotNumberComboBox>
+												</td>
+											</tr>
+
+											--%>
 											
 											<%-- 
 											
@@ -180,7 +226,6 @@
 									</div>												
 								</g:form>
 							</div>									
-						</fieldset>
 					</div>
 				</td>
 			</tr>
