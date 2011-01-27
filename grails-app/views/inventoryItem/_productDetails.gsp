@@ -113,20 +113,36 @@ fieldset table td { padding: 6px; }
 				</td>
 				<td>
 					<script>
+
+						function onCompleteCallback(id) { 
+							$(id).click();
+						}
+						
 						$(document).ready(function() {
 							$("#minQuantityTextField").hide();
-							$('.toggleMinQuantity').click(function() {
+							$('.minQuantityToggle').click(function() {
 								$('#minQuantityTextValue').toggle();
 								$('#minQuantityTextField').toggle();
 								$('#minQuantity').focus();
 							});
 
-							$('#clickError').click(function() {
-								$('#errorMessage').show();
-							});					
-
-							$('#toggleMinQuantityImage').click(function() {	
-								var image = $('#toggleMinQuantityImage');
+							$("#reorderQuantityTextField").hide();
+							$('.reorderQuantityToggle').click(function() {
+								$('#reorderQuantityTextValue').toggle();
+								$('#reorderQuantityTextField').toggle();
+								$('#reorderQuantity').focus();
+							});							
+						
+							$('#minQuantityImage').click(function() {	
+								var image = $('#minQuantityImage');
+								var currImageSrc = image.attr("src");
+								var onImageSrc = "${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png' )}";							
+								var offImageSrc = "${createLinkTo(dir: 'images/icons/silk', file: 'cross.png' )}";							
+								var imageSrc = (currImageSrc == onImageSrc)?offImageSrc:onImageSrc;							
+								image.attr("src",imageSrc);								
+							});
+							$('#reorderQuantityImage').click(function() {	
+								var image = $('#reorderQuantityImage');
 								var currImageSrc = image.attr("src");
 								var onImageSrc = "${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png' )}";							
 								var offImageSrc = "${createLinkTo(dir: 'images/icons/silk', file: 'cross.png' )}";							
@@ -134,9 +150,6 @@ fieldset table td { padding: 6px; }
 								image.attr("src",imageSrc);								
 							});
 						});
-
-						function successCallback() { alert("success");}
-						
 					</script>
 				
 					<span id="minQuantityTextValue" class="value">
@@ -151,16 +164,22 @@ fieldset table td { padding: 6px; }
 						&nbsp;
 					</span>
 					<span id="minQuantityTextField" class="value">
-						<g:formRemote url="[controller:'inventoryItem',action:'updateQuantity']" update="[success:'minQuantityValue',failure:'minQuantityValue']" name="updateForm">
+						<g:formRemote url="[controller:'inventoryItem',action:'updateQuantity']" 							
+							update="[success:'minQuantityValue',failure:'minQuantityValue']" 
+							onComplete="onCompleteCallback('#minQuantityImage');"
+							id="minQuantityForm" name="minQuantityForm">
+							
 							<input type="hidden" name="product.id" value="${productInstance?.id }" />
 							<input type="hidden" name="inventory.id" value="${inventoryInstance?.id }" />
 							<g:textField id="minQuantity" name="minQuantity" size="3"/>
-							<input class="button toggleMinQuantity" type="image" border="0"  src="${createLinkTo(dir: 'images/icons/silk', file: 'disk.png' )}" alt="Submit button">
+							<input class="button  " type="image" border="0"  src="${createLinkTo(dir: 'images/icons/silk', file: 'disk.png' )}" alt="Submit button">
 						</g:formRemote >					
 					</span>					
 				</td>
 				<td>
-					<a class="toggleMinQuantity" href="#"><img id="toggleMinQuantityImage" src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png' )}"/></a>
+					<a class="minQuantityToggle" href="#">
+						<img id="minQuantityImage" src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png' )}"/>
+					</a>
 				</td>				
 				
 			</tr>
@@ -169,21 +188,6 @@ fieldset table td { padding: 6px; }
 					<span class="name">Reorder Level</span>
 				</td>
 				<td>
-					<script>
-						$(document).ready(function() {
-							$("#reorderQuantityTextField").hide();
-							$('.toggleReorderQuantity').click(function() {
-								$('#reorderQuantityTextValue').toggle();
-								$('#reorderQuantityTextField').toggle();
-								$('#reorderQuantity').focus();
-							});
-
-							$('#clickError').click(function() {
-								$('#errorMessage').show();
-							});						
-						});
-					</script>
-				
 					<span id="reorderQuantityTextValue" class="value">
 						<span id="reorderQuantityValue">
 							<g:if test="${inventoryLevelInstance?.reorderQuantity}">
@@ -195,21 +199,22 @@ fieldset table td { padding: 6px; }
 						</span>
 					</span>
 					<span id="reorderQuantityTextField" class="value">
-						<g:formRemote url="[controller:'inventoryItem',action:'updateQuantity']" update="[success:'reorderQuantityValue',failure:'reorderQuantityValue']" name="updateForm">
+						<g:formRemote url="[controller:'inventoryItem',action:'updateQuantity']" 
+							update="[success:'reorderQuantityValue',failure:'reorderQuantityValue']" 
+							onComplete="onCompleteCallback('#reorderQuantityImage');"
+							id="reorderQuantityForm" name="reorderQuantityForm">
+							
 							<input type="hidden" name="product.id" value="${productInstance?.id }" />
 							<input type="hidden" name="inventory.id" value="${inventoryInstance?.id }" />
 							<g:textField id="reorderQuantity" name="reorderQuantity" size="3"/>
-							<input class="button toggleReorderQuantity" type="image" border="0"  src="${createLinkTo(dir: 'images/icons/silk', file: 'disk.png' )}" alt="Submit button">
-							<a href="#" class="toggleReorderQuantity">
-								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png' )}" alt="Cancel"/>
-							</a>	
+							<input class="button" type="image" border="0"  src="${createLinkTo(dir: 'images/icons/silk', file: 'disk.png' )}" alt="Submit button">
 						</g:formRemote >					
 					</span>	
-									
-					
 				</td>
 				<td>
-					<a class="toggleReorderQuantity" href="#"><img src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png' )}"/></a>
+					<a class="reorderQuantityToggle" href="#">
+						<img id="reorderQuantityImage" src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png' )}"/>
+					</a>
 				</td>
 			</tr>				
 			<%-- 						
