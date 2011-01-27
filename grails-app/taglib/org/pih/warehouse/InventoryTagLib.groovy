@@ -8,49 +8,94 @@ class InventoryTagLib {
 	def lotNumberComboBox = { attrs, body ->
 		def id = attrs.id
 		def name = attrs.name
-		def valueId = (attrs.valueId)?attrs.valueId:"";
-		def valueName = (attrs.valueName)?attrs.valueName:"";
-		def valueDate = (attrs.valueDate)?attrs.valueDate:"";
-		def valueDesc = (attrs.valueDesc)?attrs.valueDesc:"";
 		
-		def width = (attrs.width) ? attrs.width : 100;
+		def onSelectCallback = attrs.onSelectCallback;
+		def width = (attrs.width) ? attrs.width : "100px";
 		def minLength = (attrs.minLength) ? attrs.minLength : 1;
-		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "/warehouse/json/findLotsByName";
-		def showValue = (valueName && valueId) ? true : false;
-		//def spanDisplay = (showValue) ? "inline" : "none";
-		//def suggestDisplay = (showValue) ? "none" : "inline";
-		def spanDisplay = "none";
+		def searchUrl = (attrs.searchUrl) ? attrs.searchUrl : "/warehouse/json/findLotsByName";
+		
+		def spanDisplay = "";
 		def suggestDisplay = "inline";
 		
 		def html = """
 			<div>
-				<style>
-					#${id}-suggest {
-						background-image: url('/warehouse/images/icons/silk/magnifier.png');
-						background-repeat: no-repeat;
-						background-position: center left;
-						padding-left: 20px;
-					}
-				</style>
 				
-				<input id="${id}-id" type="hidden" name="${id}" value="${valueId}"/>
-				<input id="${id}-suggest" type="text" name="${name}" value="${valueName}" style="width: ${width}px; display: ${suggestDisplay};">
-				<span id="${id}-name" style="text-align: left; display: ${spanDisplay};">${valueName}</span>
-				<span id="${id}-date" style="text-align: left; display: ${spanDisplay};">${valueDate}</span>
-				<span id="${id}-description" style="text-align: left; display: ${spanDisplay};">${valueDesc}</span>
+				<input id="${id}-suggest" type="text" name="${name}" style="display: ${suggestDisplay};">
+				
 				<script>
 					\$(document).ready(function() {
+					
+						\$('#${id}-suggest').val("Enter serial number, lot number, or barcode");
+						\$('#${id}-suggest').addClass("fade")
+					
+						\$('#${id}-suggest').click(function() { 
+							\$('#${id}-suggest').val("");
+						});
+						\$('#${id}-suggest').focus(function() { 
+							\$('#${id}-suggest').val("");
+						});
+						
+					
 						\$("#${id}-suggest").autocomplete( {
 							source: function(req, add){
-								\$.getJSON('${jsonUrl}', req, function(data) {
+								\$.getJSON('${searchUrl}', req, function(data) {
 									var items = [];
 									\$.each(data, function(i, item) {
 										items.push(item);
 									});
 									add(items);
 								});
-							  }
+							},
+					        focus: function(event, ui) {	
+								\$('#${id}-suggest').val("");
+					      		//\$('#${id}-suggest').val(ui.item.valueText);					
+					      		//return false;
+					        },	
+					        change: function(event, ui) { 
+								//alert("changed " + ui.item)
+								\$('#${id}-id').val(0);
+								//\$('#${id}-suggest').val(ui.item.valueText);
+					        },
+							select: function(event, ui) {
+								//alert("selected " + ui.item)
+								\$('#${id}-id').val(ui.item.value);
+								//\$('#${id}-suggest').val(ui.item.valueText);
+								//\$('#${id}-suggest').val("Enter serial number, lot number, or barcode");
+								\$('#${id}-span').html(ui.item.valueText);
+								\$('#${id}-name').html(ui.item.lotNumber);
+								\$('#${id}-description').html(ui.item.description);
+								if (ui.item.expirationDate=='') {
+									\$('#${id}-date').html(ui.item.expirationDate);
+								}
+								else { 
+									\$('#${id}-date').html('<span class="fade">never</span>');								
+								}
+								\$('#lotNumberDescription').val(ui.item.description);
+								\$('#lotNumberDate').val(ui.item.expirationDate);
+								\$('#${id}-suggest').focus();
+								
+								
+								// Call our own callback function
+								${onSelectCallback}(event, ui);
+								
+								
+								return false;
+							}							  
 						});
+						
+						\$("#${id}-suggest").blur(function() { 							
+							\$('#${id}-suggest').val("Enter serial number, lot number, or barcode");
+						});                        
+						\$("#${id}-span").click(function() {
+							alert("onclick");
+							//\$('#${id}-span').hide();							
+							//\$('#${id}-suggest').show();
+							//\$('#${id}-suggest').val('');
+							//\$('#${id}-span').html('');
+							//\$('#${id}-id').val('');
+						});
+						
+						
 					});
 					
 				</script>

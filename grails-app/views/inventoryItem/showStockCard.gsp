@@ -35,7 +35,7 @@
 					</span>
 				</div>
 				
-				<div style="float: right; margin-right: 15px;">					
+				<div class="actionsMenu" style="float: right; margin-right: 15px;">					
 					
 					<label>Actions:</label>
 					<span style="margin-right: 15px;">

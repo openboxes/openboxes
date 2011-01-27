@@ -38,10 +38,16 @@ body {
 #productDetails { 
 	width: 250px;
 }
-.stockOptions { 
-	text-align: left; padding: 10px;
+.actionsMenu { 
+	font-size: 1.2em;
+	
+	text-align: left; 
+	padding: 5px;
 }
-.stockOptions ul li { 
+.actionsMenu a { 
+	padding-left: 2px;
+}
+.actionsMenu ul li { 
 	display: inline;
 	padding-right: 15px;
 }

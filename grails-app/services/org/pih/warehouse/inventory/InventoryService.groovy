@@ -107,7 +107,12 @@ class InventoryService {
 		else { 			
 			commandInstance.recordInventoryRow = new RecordInventoryRowCommand();
 			
-			def inventoryItemList = getInventoryItemsByProduct(commandInstance?.product)
+			// This gets all inventory items for a product
+			//def inventoryItemList = getInventoryItemsByProduct(commandInstance?.product)
+			
+			// What we want is to get all inventory items that have been involved in transactions at this warehouse
+			def inventoryItemList = getInventoryItemsByProductAndInventory(commandInstance?.product, commandInstance?.inventory);
+			
 			inventoryItemList.each { 
 				//def lot = InventoryLot.findByProductAndLotNumber(commandInstance?.product, it.lotNumber);				
 				def transactionEntryList = getTransactionEntriesByInventoryItem(it);
@@ -147,50 +152,61 @@ class InventoryService {
 				// TODO Change this to be a valid lookup
 				transaction.transactionType = TransactionType.get(7)
 				
-				cmd.recordInventoryRows.each { row -> 
+				// Process each row added to the record inventory page
+				cmd.recordInventoryRows.each { row -> 					
+					// 1. Find an existing inventory item for the given lot number and product
+					def inventoryItem = InventoryItem.findByLotNumberAndProduct(row.lotNumber, cmd.product)
 					
-					// Update existing inventory item
-					def inventoryItem = new InventoryItem(); 
-					if (row.id) { 
-						inventoryItem = InventoryItem.get(row.id);
-					}
-					inventoryItem.properties = row.properties
-					if (!inventoryItem.hasErrors() && inventoryItem.save()) { 					
-						// Create a new transaction entry	
-						if (row.oldQuantity != row.newQuantity) {
-							TransactionEntry transactionEntry = new TransactionEntry();
-							transactionEntry.properties = row.properties;
-							transactionEntry.quantity = row.newQuantity - row.oldQuantity;  // difference
-							transactionEntry.product = cmd.product
-							transactionEntry.inventoryItem = inventoryItem;
-							transaction.addToTransactionEntries(transactionEntry);						
+					// 2. If the inventory item doesn't exist, we create a new one
+					if (!inventoryItem) { 
+						inventoryItem.properties = row.properties
+						inventoryItem.product = cmd.product;
+						if (!inventoryItem.hasErrors() && inventoryItem.save()) { 										
+							
+						}
+						else {
+							// TODO Old error message = "Property [${error.getField()}] of [${inventoryItem.class.name}] with value [${error.getRejectedValue()}] is invalid"
+							inventoryItem.errors.allErrors.each { error->
+								cmd.errors.reject("inventoryItem.invalid",
+									[inventoryItem, error.getField(), error.getRejectedValue()] as Object[],
+									"[${error.getField()} ${error.getRejectedValue()}] - ${error.defaultMessage} ");
+								
+							}
+							// We need to fix these errors before we can move on
+							return cmd;
 						}
 					}
-					else { 
-						inventoryItem.errors.allErrors.each { error->
-							cmd.errors.reject("inventoryItem.invalid",
-								[inventoryItem, error.getField(), error.getRejectedValue()] as Object[],
-								"Property [${error.getField()}] of [${inventoryItem.class.name}] with value [${error.getRejectedValue()}] is invalid");
-						}
+					// 3. If the quantities are different, we create a new transaction entry	
+					if (row.oldQuantity != row.newQuantity) {
+						TransactionEntry transactionEntry = new TransactionEntry();
+						transactionEntry.properties = row.properties;
+						transactionEntry.quantity = row.newQuantity - row.oldQuantity;  // difference
+						transactionEntry.product = cmd.product
+						transactionEntry.inventoryItem = inventoryItem;
+						transaction.addToTransactionEntries(transactionEntry);						
 					}
 				}		
 				
-				// Check if there are any changes recorded ... no reason to  
-				if (transaction.transactionEntries) { 	
-					if (!transaction.hasErrors() && transaction.save()) { 
-						
+				
+				// 4. Make sure that the inventory item has been saved before we process the transactions
+				if (!cmd.hasErrors()) { 
+					// Check if there are any changes recorded ... no reason to  
+					if (!transaction.transactionEntries) { 	
+						// We could do this, but it keeps us from changing the lot number and description
+						cmd.errors.reject("transaction.noChanges", "There are no quantity changes in the current transaction");
 					}
 					else { 
-						transaction.errors.allErrors.each { error ->
-							cmd.errors.reject("transaction.invalid",
-								[transaction, error.getField(), error.getRejectedValue()] as Object[],
-								"Property [${error.getField()}] of [${transaction.class.name}] with value [${error.getRejectedValue()}] is invalid");
+						if (!transaction.hasErrors() && transaction.save()) { 
+							// We saved the transaction successfully
 						}
-					}
-				}				
-				else {
-					// We could do this, but it keeps us from changing the lot number and description  
-					//cmd.errors.reject("transaction.noChanges", "There are no quantity changes in the current transaction");
+						else { 
+							transaction.errors.allErrors.each { error ->
+								cmd.errors.reject("transaction.invalid",
+									[transaction, error.getField(), error.getRejectedValue()] as Object[],
+									"Property [${error.getField()}] of [${transaction.class.name}] with value [${error.getRejectedValue()}] is invalid");
+							}
+						}
+					}				
 				}
 			}
 		} catch (Exception e) { 

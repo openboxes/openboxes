@@ -57,38 +57,32 @@
 	                                
 	                                
 										<script type="text/javascript">
-										var lastIndex = '${attributeInstance?.options?.size() }';
-										function addTableRow() {
-											var indexField = $('<td>' + lastIndex + '</td>');
-											var optionField = $('<input>')
-												.attr('type', 'text').attr('size','40').attr('name','options[' + lastIndex + ']');
-											//var removeField = $('<a href="#" onClick="javascript:removeTableRow(' + lastIndex + ')">remove</a>');
-											var removeField = '';
+											var lastIndex = '${attributeInstance?.options?.size() }';
+											function addTableRow() {
+												var indexField = $('<td>' + lastIndex + '</td>');
+												var optionField = $('<input>')
+													.attr('type', 'text').attr('size','40').attr('name','options[' + lastIndex + ']');
+												//var removeField = $('<a href="#" onClick="javascript:removeTableRow(' + lastIndex + ')">remove</a>');
+												var removeField = '';												
+												$('#optionsTable').append(
+														$('<tr id="optionRow' + lastIndex + '" class="optionRow">')
+															.append(indexField)
+															.append($('<td>').append(optionField).append(removeField)
+														)
+													);											
+												//reindexTable()
+												lastIndex++;												
+											}
 											
-											$('#optionsTable').append(
-													$('<tr id="optionRow' + lastIndex + '" class="optionRow">')
-														.append(indexField)
-														.append($('<td>').append(optionField).append(removeField)
-													)
-												);
-										
-											//reindexTable()
+											function reindexTable() { 
+												$('#optionsTable tr').each(function() { 
+														//alert("test " + $(this).attr('id')); 
+													});												
+											}											
 											
-											lastIndex++;
-											
-										}
-										
-										function reindexTable() { 
-											$('#optionsTable tr').each(function() { 
-													//alert("test " + $(this).attr('id')); 
-												});
-											
-										}
-										
-										
-										function removeTableRow(index) { 
-											$('#optionRow' + index).remove();
-										}
+											function removeTableRow(index) { 
+												$('#optionRow' + index).remove();
+											}
 										
 										</script>	                                
 	                                

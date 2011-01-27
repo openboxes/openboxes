@@ -20,7 +20,16 @@ class InventoryItemController {
 			transactionEntryList : transactionEntryList
 		]
 	}
-
+	
+	/**
+	 * Ajax method for the Record Inventory page.
+	 */
+	def getInventoryItems = { 
+		log.info params
+		def productInstance = Product.get(params?.product?.id);
+		def inventoryItemList = inventoryService.getInventoryItemsByProduct(productInstance)
+		render inventoryItemList as JSON;
+	}
 
 	def showRecordInventory = { RecordInventoryCommand cmd -> 
 		def commandInstance = inventoryService.getRecordInventoryCommand(cmd, params)

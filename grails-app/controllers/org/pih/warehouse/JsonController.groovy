@@ -30,10 +30,12 @@ class JsonController {
 				items = items.collect() {
 					[
 						value: it.lotNumber,
-						label: it.lotNumber,
+						label: it.lotNumber + " " + it.description,
 						valueText: it.lotNumber,
-						desc: it.description,
-						date: it.expirationDate,						
+						lotNumber: it.lotNumber,
+						description: it.description,
+						productId: it.product.id,
+						expirationDate: it.expirationDate,						
 						icon: "none" 	
 					]
 				}
