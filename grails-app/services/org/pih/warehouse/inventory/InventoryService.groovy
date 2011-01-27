@@ -159,6 +159,7 @@ class InventoryService {
 					
 					// 2. If the inventory item doesn't exist, we create a new one
 					if (!inventoryItem) { 
+						inventoryItem = new InventoryItem();
 						inventoryItem.properties = row.properties
 						inventoryItem.product = cmd.product;
 						if (!inventoryItem.hasErrors() && inventoryItem.save()) { 										
