@@ -27,8 +27,8 @@
 
 	// Return a template selector that matches our  convention of <type>RowTemplate.
 	function get_inventoryRowTemplateName(type) {
-		//return '#' + type + 'RowTemplate';
-		return '#rowTemplate';
+		return '#' + type + 'RowTemplate';
+		//return '#rowTemplate';
 	}
 
 	/**
@@ -37,17 +37,22 @@
 	function onSelectCallback(event, ui) { 
 		var inventoryItem = { 
 				Id: ui.item.id, 
-				Type: '', 
+				Type: 'existing', 
 				ProductId: ui.item.productId,
 				LotNumber: ui.item.lotNumber, 
 				Description: ui.item.description, 
 				ExpirationDate: ui.item.expirationDate, 
 				Qty: 0 
 			};
+
+		// Indicates whether we display the lotnumber, etc as read-only or not
+		inventoryItem.Type = (ui.item.exists) ? 'existing' : 'new';
 			
 		addItemToTable(inventoryItem);
 	}
 
+	
+	
 	var buttonUpHandler = function(event, data) {
 		event.preventDefault();
 		changeQuantity(this.id, +1);	
@@ -63,22 +68,20 @@
 	 */
 	function addItemToTable(inventoryItem) { 
 		// Add to the array
-		inventory.InventoryItems.push(inventoryItem);
-		
+		inventory.InventoryItems.push(inventoryItem);		
 		// Determine which template should be used to render the new item.
 		// Only necessary if we have multiple row types
-		//var tmpl = get_inventoryRowTemplateName(inventoryItem.Type);
+		var tmpl = get_inventoryRowTemplateName(inventoryItem.Type);
 		
 		// Render that template, using the new item as data,
 		//  and append that new row to the end of the existing invoice table.
-		//$(tmpl).tmpl(inventoryItem).appendTo('#inventoryItemsTable');		
-
-		$("#rowTemplate").tmpl(inventoryItem).appendTo('#inventoryItemsTable');	
+		$(tmpl).tmpl(inventoryItem).appendTo('#inventoryItemsTable');		
+		//$("#rowTemplate").tmpl(inventoryItem).appendTo('#inventoryItemsTable');	
 
 		// TODO This is a bit redundant since we are doing this in the , but I couldn't figure out how to get the 
 		// buttons in the newly added row to 
-		$('.newButtonUp').bind('click', buttonUpHandler);
-		$('.newButtonDown').bind('click', buttonDownHandler);	
+		//$('.newButtonUp').bind('click', buttonUpHandler);
+		//$('.newButtonDown').bind('click', buttonDownHandler);	
 	}
 
 
@@ -108,10 +111,15 @@
 	
 	$(document).ready(function() {
 		// Bind the click event to the up buttons and call the change quantity function
-		$(".buttonUp").click(buttonUpHandler);
+		//$(".buttonUp").click(buttonUpHandler);
 
 		// Bind the click event to the down buttons and call the change quantity function
-		$(".buttonDown").click(buttonDownHandler);
+		//$(".buttonDown").click(buttonDownHandler);
+
+
+		$('.buttonUp').live('click', buttonUpHandler);
+		$('.buttonDown').live('click', buttonDownHandler);
+		
 	});
 
 </script>
@@ -299,7 +307,6 @@
 								</div>												
 							</g:form>
 						</div>
-						<div class="result"></div>
 					</div>
 				</td>
 			</tr>
@@ -309,7 +316,7 @@
 
 
 
-<script id="rowTemplate" type="x-jquery-tmpl">
+<script id="existingRowTemplate" type="x-jquery-tmpl">
 <tr class="{{= getClass()}}">
 	<td width="5%" style="text-align: center;">
 		{{= getIndex()}}
@@ -339,10 +346,47 @@
 			id="newQuantity-{{= getIndex()}}" name="recordInventoryRows[{{= getIndex()}}].newQuantity" size="3" value="{{= Qty}}" onFocus="this.select();" onClick="this.select();"/>
 	</td>	
 	<td width="10%" style="text-align: center;">
-		<button id="{{= getIndex()}}" class="newButtonUp">
+		<button id="{{= getIndex()}}" class="buttonUp">
 			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_up.png') }"/>
 		</button>
-		<button id="{{= getIndex()}}" class="newButtonDown">
+		<button id="{{= getIndex()}}" class="buttonDown">
+			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_down.png') }"/>
+		</button>
+	</td>
+</tr>
+</script>									
+
+<script id="newRowTemplate" type="x-jquery-tmpl">
+<tr class="{{= getClass()}}">
+	<td width="5%" style="text-align: center;">
+		{{= getIndex()}}
+	</td>
+	<td width="5%" style="text-align: center;">	
+		{{= Id}}
+		<g:hiddenField name="recordInventoryRows[{{= getIndex()}}].id" value="{{= Id}}" size="1" />
+	</td>		
+	<td width="15%">
+		<g:textField name="recordInventoryRows[{{= getIndex()}}].lotNumber" value="{{= LotNumber}}" size="10" />
+	</td>
+	<td width="10%">
+		<g:hiddenField name="recordInventoryRows[{{= getIndex()}}].expirationDate" value="{{= ExpirationDate}}"/>
+	</td>
+	<td width="35%">
+		<g:textField name="recordInventoryRows[{{= getIndex()}}].description" value="{{= Description}}"/>
+	</td>
+	<td width="10%" style="text-align: center; vertical-align: middle;">
+		{{= Qty}}
+		<g:hiddenField name="recordInventoryRows[{{= getIndex()}}].oldQuantity" value="{{= Qty}}"/>
+	</td>	
+	<td width="10%" style="text-align: center; vertical-align: middle;">
+		<g:textField style="text-align: center;"  
+			id="newQuantity-{{= getIndex()}}" name="recordInventoryRows[{{= getIndex()}}].newQuantity" size="3" value="{{= Qty}}" onFocus="this.select();" onClick="this.select();"/>
+	</td>	
+	<td width="10%" style="text-align: center;">
+		<button id="{{= getIndex()}}" class="buttonUp">
+			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_up.png') }"/>
+		</button>
+		<button id="{{= getIndex()}}" class="buttonDown">
 			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_down.png') }"/>
 		</button>
 	</td>

@@ -225,7 +225,7 @@
 														</td>
 													</tr>
 													<g:each var="transactionEntry" in="${commandInstance?.transactionLogMap?.get(transaction) }">
-														<tr id="transactionEntry?.id" class="transactionEntry transaction${transaction?.id } ${(status%2==0)?'even':'odd' }">
+														<tr id="transactionEntry?.id" style="display: none;" class="transactionEntry transaction${transaction?.id } ${(status%2==0)?'even':'odd' }">
 															<td></td>
 															<td></td>
 															<td></td>												

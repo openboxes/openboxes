@@ -56,6 +56,9 @@ class InventoryTagLib {
 								\$('#${id}-id').val(0);
 								//\$('#${id}-suggest').val(ui.item.valueText);
 					        },
+					        close: function(even, ui) { 
+								//alert("closed" + ui.item);
+							},
 							select: function(event, ui) {
 								//alert("selected " + ui.item)
 								\$('#${id}-id').val(ui.item.value);
@@ -87,7 +90,7 @@ class InventoryTagLib {
 							\$('#${id}-suggest').val("Enter serial number, lot number, or barcode");
 						});                        
 						\$("#${id}-span").click(function() {
-							alert("onclick");
+							//alert("onclick");
 							//\$('#${id}-span').hide();							
 							//\$('#${id}-suggest').show();
 							//\$('#${id}-suggest').val('');

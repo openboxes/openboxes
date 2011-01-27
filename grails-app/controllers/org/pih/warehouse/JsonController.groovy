@@ -36,9 +36,25 @@ class JsonController {
 						description: it.description,
 						productId: it.product.id,
 						expirationDate: it.expirationDate,						
-						icon: "none" 	
+						icon: "none",	
+						exists: true
 					]
 				}
+			}
+			else { 
+
+				def item =  [
+					value: null,
+					label: "No matches found for '" + params.term + "'.  Click here to add a new item?",
+					valueText : params.term,
+					lotNumber: params.term,
+					description: '',
+					expirationDate: null,
+					icon: "none",
+					exists: false
+				];
+				items.add(item)
+
 			}
 		}
 		render items as JSON;
