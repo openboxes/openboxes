@@ -228,9 +228,9 @@ class JsonController {
 				for (term in terms) { 						
 					items = Person.withCriteria {
 						or {
-							ilike("firstName", "%" + term)
-							ilike("lastName", "%" + term)
-							ilike("email", "%" + term)
+							ilike("firstName", term + "%")
+							ilike("lastName", term + "%")
+							ilike("email", term + "%")
 						}
 					}
 				}
