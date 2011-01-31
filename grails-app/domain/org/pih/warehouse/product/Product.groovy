@@ -62,6 +62,8 @@ class Product implements Serializable {
 		rootCategory.categories = this.categories;
 		return rootCategory;
 	}
+	
+	String toString() { return "$name"; }
     
 }
 

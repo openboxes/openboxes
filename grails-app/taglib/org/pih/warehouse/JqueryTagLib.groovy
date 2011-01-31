@@ -32,8 +32,9 @@ class JqueryTagLib {
 				</style>
 				
 				<input id="${id}-id" type="hidden" name="${name}.id" value="${valueId}"/>
-				<input id="${id}-suggest" type="text" name="${name}.name" value="${valueName}" style="width: ${width}px; display: ${suggestDisplay};"> 	
 				<span id="${id}-span" style="text-align: left; display: ${spanDisplay};">${valueName}</span>
+				<input id="${id}-suggest" type="text" name="${name}.name" value="${valueName}" style="width: ${width}px; display: ${suggestDisplay};"> 	
+				
 				
 				<script>
 					\$(document).ready(function() {
@@ -82,16 +83,16 @@ class JqueryTagLib {
 								});
 					      	},
 					        focus: function(event, ui) {			
-					      		\$('#${id}-suggest').val(ui.item.valueText);					
-					      		return false;
+					      		//\$('#${id}-suggest').val(ui.item.valueText);					
+					      		//return false;
 					        },	
 					        change: function(event, ui) { 
-								  //alert("changed " + ui.item)
-								\$('#${id}-id').val(0);
+								//alert("changed " + ui.item)
+								//\$('#${id}-id').val(0);
 								//\$('#${id}-suggest').val(ui.item.valueText);
 					        },
 							select: function(event, ui) {
-								//alert("selected " + ui.item)
+								//alert("selected " + ui.item.value + " " + ui.item.valueText);								
 								\$('#${id}-id').val(ui.item.value);
 								\$('#${id}-suggest').val(ui.item.valueText);
 								\$('#${id}-span').html(ui.item.valueText);

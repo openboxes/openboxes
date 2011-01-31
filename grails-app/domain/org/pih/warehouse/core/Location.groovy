@@ -24,4 +24,6 @@ class Location implements java.io.Serializable {
 		locationType(nullable:true)
 		logo(nullable:true, maxSize:10485760) // 10 MBs
 	}
+	
+	String toString() { return this.name } 
 }

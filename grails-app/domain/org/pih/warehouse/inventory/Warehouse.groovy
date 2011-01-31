@@ -30,6 +30,8 @@ class Warehouse extends Location {
 	    inventory(nullable:true)
 		active(nullable:false)
     }
+	
+	String toString() { return this.name }
 }
 
 

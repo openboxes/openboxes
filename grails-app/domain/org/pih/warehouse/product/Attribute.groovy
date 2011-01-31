@@ -38,7 +38,7 @@ class Attribute {
 		lastUpdated(display:false)
 	}
 	       
-	                  
+	String toString() { return "$name"; }
 	                  
 	
 }

@@ -99,11 +99,12 @@
 								</tr>										
 								<tr class="prop">
 									<td valign="top" class="name"><label><g:message
-										code="shipment.totalValue.label" default="Total value (USD)" /></label></td>
+										code="shipment.totalValue.label" default="Total value" /></label></td>
 									<td valign="top"
 										class=" ${hasErrors(bean: shipmentInstance, field: 'totalValue', 'errors')}"
 										nowrap="nowrap">
-											$ <g:textField name="totalValue" value="${formatNumber(format: '##,##0.00', number: shipmentInstance.totalValue)}" size="10"/>
+											<g:textField name="totalValue" value="${formatNumber(format: '##,##0.00', number: shipmentInstance.totalValue)}" size="10"/> 
+											<span class="fade">USD</span>
 									</td>
 								</tr>										
 		                    </tbody>

@@ -26,5 +26,5 @@ class LocationType implements Serializable {
 		lastUpdated(display:false)
 	}
 	
-	
+	String toString() { return "$name"; }
 }

@@ -24,24 +24,63 @@ class JsonController {
 			items = InventoryItem.withCriteria {
 				or {
 					ilike("lotNumber", params.term + "%")
+					ilike("description", params.term + "%")
 				}
 			}
 			if (items) {
 				items = items.collect() {
 					[
+						id: it.id,
 						value: it.lotNumber,
-						label: it.lotNumber + " " + it.description,
-						valueText: it.lotNumber,
-						lotNumber: it.lotNumber,
+						label: it.lotNumber + " - " + it.description, 
+						valueText: it.lotNumber + " - " + it.description,
+						expirationDate: it.expirationDate,
 						description: it.description,
-						productId: it.product.id,
-						expirationDate: it.expirationDate,						
-						icon: "none",	
-						exists: true
 					]
 				}
 			}
 			else { 
+
+				def item =  [
+					value: params.term,
+					label: "No matches found for '" + params.term + "'.  Click here to add a new item?",
+					valueText : params.term,
+					lotNumber: params.term,
+					description: '',
+					expirationDate: null,
+					
+					exists: false
+				];
+				items.add(item)
+
+			}
+		}
+		render items as JSON;
+	}
+	
+	
+	def findDescriptionByName = { 
+		
+		def items = new TreeSet();
+		if (params.term) {
+			items = InventoryItem.withCriteria {
+				or {
+					ilike("description", params.term + "%")
+					product {
+						ilike("name", params.term + "%")
+					}
+				}
+			}
+			if (items) {
+				items = items.collect() {
+					[
+						value: it.description,
+						label: it.description,
+						valueText: it.description
+					]
+				}
+			}
+			else {
 
 				def item =  [
 					value: null,
@@ -189,9 +228,9 @@ class JsonController {
 				for (term in terms) { 						
 					items = Person.withCriteria {
 						or {
-							ilike("firstName", "%" + term + "%")
-							ilike("lastName", "%" + term + "%")
-							ilike("email", "%" + term + "%")
+							ilike("firstName", "%" + term)
+							ilike("lastName", "%" + term)
+							ilike("email", "%" + term)
 						}
 					}
 				}
@@ -202,7 +241,7 @@ class JsonController {
 						
 						[	value: it.id,
 							valueText: it.name,
-							label:  "" + it.firstName + " " + it.lastName + "&nbsp;&lt;" +  it.email + "&gt;",
+							label:  "" + it.firstName + " " + it.lastName + " " +  it.email + " ",
 							desc: (it?.email) ? it.email : "no email",
 						]
 					}

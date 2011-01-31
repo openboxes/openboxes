@@ -122,6 +122,7 @@ class Shipment implements Serializable {
 		//documents(nullable:true)
 	}
 
+	String toString() { return "$name"; }
 	
 	/** 
 	 * Transient method that gets all shipment items two-levels deep.
