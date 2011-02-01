@@ -3,6 +3,8 @@ package org.pih.warehouse
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.ocpsoft.pretty.time.PrettyTime;
+
 class DateTagLib {
    	
 	def relativeDate = { attrs, body ->
@@ -23,6 +25,12 @@ class DateTagLib {
 				out << "${-days} days ago"
 			}
 		}
+	}
+	
+	def prettyDateFormat = { attrs, body ->
+		def date = (attrs.date)?:new Date();
+		def prettyTime = new PrettyTime();
+		out << 	prettyTime.format(date);
 	}
 		
 }

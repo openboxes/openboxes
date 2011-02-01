@@ -1,6 +1,7 @@
 package org.pih.warehouse.shipping;
 
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import grails.converters.JSON
@@ -21,6 +22,8 @@ import org.pih.warehouse.product.Product;
 import org.pih.warehouse.receiving.Receipt;
 import org.pih.warehouse.receiving.ReceiptItem;
 import org.pih.warehouse.core.ListCommand;
+
+import com.ocpsoft.pretty.time.PrettyTime;
 
 
 class ShipmentController {
@@ -440,7 +443,27 @@ class ShipmentController {
 		];
 	}
 	
+	def listShippingByDate = { 
+		def currentLocation = Location.get(session.warehouse.id);
+		def outgoingShipments = shipmentService.getShipmentsByOrigin(currentLocation);
+		def formatter = new PrettyTime();		
+		def groupBy = (params.groupBy) ? params.groupBy : "lastUpdated";
+		
+		outgoingShipments = outgoingShipments.sort { it[groupBy] }.reverse();
+		def shipmentInstanceMap = outgoingShipments.groupBy { it[groupBy] ? formatter.format(it[groupBy]) : "Empty" }
+		render(view: "listShippingByDate", model: [ shipmentInstanceMap : shipmentInstanceMap ]);		
+	}
+
+	def listShippingByType = {
+		def currentLocation = Location.get(session.warehouse.id);
+		def outgoingShipments = shipmentService.getShipmentsByOrigin(currentLocation);		
+		outgoingShipments = outgoingShipments.sort { it.lastUpdated }.reverse();
+		def shipmentInstanceMap = outgoingShipments.groupBy { it.shipmentType }
+		render (view: "listShippingByDate", model: [ shipmentInstanceMap : shipmentInstanceMap ]);
+	}
+
 	
+		
 	def listShipping = { 
 		def currentLocation = Location.get(session.warehouse.id);		
 		def outgoingShipments = shipmentService.getShipmentsByOrigin(currentLocation);	

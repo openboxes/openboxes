@@ -62,7 +62,17 @@
 			-->
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="shipment" action="listShipping"><g:message code="shipment.listShipping.label"  default="Show Shipments "/></g:link>
+					<g:link class="bullet" controller="shipment" action="listShippingByDate" params="['groupBy':'lastUpdated']"><g:message code="shipment.listShipping.label"  default="List by Date "/></g:link>					
+				</span>				
+			</li>				
+			<li class="">
+				<span class="menuButton">
+					<g:link class="bullet" controller="shipment" action="listShippingByType"><g:message code="shipment.listShipping.label"  default="List by Type "/></g:link>
+				</span>
+			</li>				
+			<li class="">
+				<span class="menuButton">
+					<g:link class="bullet" controller="shipment" action="listShipping"><g:message code="shipment.listShipping.label"  default="List by Status "/></g:link>
 				</span>
 			</li>				
 			<li class="">
