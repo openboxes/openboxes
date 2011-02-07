@@ -2188,6 +2188,17 @@
 			DELETE FROM attribute WHERE name IN ('Size', 'Vitality');
 		</sql>
     </changeSet>
+    
+    <changeSet author="jmiranda (generated)" id="1297115531347-1">
+    	<preConditions onFail="MARK_RAN">
+    		<not><columnExists tableName="transaction_entry" columnName="transaction_entries_idx"/></not>
+    	</preConditions>
+        <addColumn tableName="transaction_entry">
+            <column name="transaction_entries_idx" type="INT"/>
+        </addColumn>
+    </changeSet>
+    
+    
 
 
 </databaseChangeLog>
