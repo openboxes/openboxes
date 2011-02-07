@@ -13,7 +13,11 @@
 			#transactionEntryTable th { text-align: center; } 
         	#prodSelectRow { padding: 10px; }  
         	#transactionEntryTable td.prodNameCell { text-align: left; } 
-        	
+			.dialog form label { position: absolute; display: inline; width: 140px; text-align: right;}
+        	.dialog form .value { margin-left: 160px; }
+        	.dialog form ul li { padding: 10px; } 
+        	.dialog form { width: 100%; } 
+        	.header th { background-color: #525D76; color: white; }         	
         </style>
     </head>    
 
@@ -41,48 +45,44 @@
 					<g:hiddenField name="id" value="${transactionInstance?.id}"/>
 					<g:hiddenField name="inventory.id" value="${transactionInstance?.inventory?.id}"/>
 				
-					<fieldset>
-						<legend>Transaction Details</legend>
-						<table>
-							<tr class="prop">
-								<td class="name"><label>Transaction ID</label></td>
-								<td class="value">
+						<ul>
+							<li class="prop odd">
+								<label>Transaction ID</label>
+								<span class="value">
 									<g:if test="${transactionInstance?.id }">
 										${transactionInstance?.id }
 									</g:if>
 									<g:else><span class="fade">(new transaction)</span></g:else>
-								</td>
-							</tr>
-							<tr class="prop">
-								<td class="name">
-									<label>Transaction Date</label>
-								</td>
-								<td class="value">
+								</span>
+							</li>
+							<li class="prop even">
+								<label>Transaction Date</label>
+								<span class="value">
 									<g:formatDate date="${transactionInstance?.transactionDate}" format="MM/dd/yyyy"/>
-								</td>
-							</tr>
-							<tr class="prop">
-								<td class="name"><label>Transaction Type</label></td>
-								<td class="value">
+								</span>
+							</li>
+							<li class="prop odd">
+								<label>Transaction Type</label>
+								<span class="value">
 									${transactionInstance?.transactionType?.name }
 
-								</td>
-							</tr>
-							<tr class="prop">
-								<td class="name"><label>Source</label></td>
-								<td class="value">
+								</span>
+							</li>
+							<li class="prop even">
+								<label>From</label>
+								<span class="value">
 									${transactionInstance?.source?.name }
-								</td>
-							</tr>
-							<tr class="prop">
-								<td class="name"><label>Destination</label></td>
-								<td class="value">
+								</span>
+							</li>
+							<li class="even">
+								<label>To</label>
+								<span class="value">
 									${transactionInstance?.destination?.name }
-								</td>
-							</tr>
-							<tr class="prop">
-								<td class="name"><label>Confirmed</label></td>
-								<td class="value">
+								</span>
+							</li>
+							<li class="prop odd">
+								<label>Confirmed</label>
+								<span class="value">
 									<g:if test="${!transactionInstance?.confirmed}">
 										Not confirmed yet
 									</g:if>
@@ -90,22 +90,20 @@
 										Confirmed by ${transactionInstance?.confirmedBy?.name } on
 										${formatDate(date: transactionInstance?.dateConfirmed, format: 'dd-MMM-yyyy') }
 									</g:else>									
-								</td>
-							</tr>
+								</span>
+							</li>
 									
 							<g:if test="${transactionInstance?.id }">
-								<tr class="prop">
-									<td class="name">
-										<label>Transaction Entries</label>
-									</td>
-									<td class="value">
+								<li class="prop even">
+									<label>Transaction Entries</label>
+									<span class="value">
 										<table id="prodEntryTable" border="1" style="border: 1px solid #ccc;">
 											<tr>
 												<th>ID</th>
 												<th>Product</th>
-												<th>Qty</th>
 												<th>Lot Number</th>
 												<th>Expiration Date</th>
+												<th>Qty</th>
 												<th>&nbsp;</th>
 											</tr>
 											<g:if test="${transactionInstance?.transactionEntries }">
@@ -119,14 +117,14 @@
 															${transactionEntry?.product?.name }
 														</td>										
 														<td>
-															${transactionEntry?.quantity}
-														</td>		
-														<td>
 															${transactionEntry?.inventoryItem?.lotNumber }
 														</td>		
 														<td>
 															${transactionEntry?.inventoryItem?.expirationDate }
 														</td>
+														<td>
+															${transactionEntry?.quantity}
+														</td>		
 														<td></td>
 													</tr>
 												</g:each>
@@ -138,10 +136,10 @@
 											</g:else>
 										</table>
 									</td>
-								</tr>
+								</li>
 							</g:if>
 						</table>
-						<div class="buttonBar">
+						<div style="text-align: center; padding: 10px;">
 							<button class="positive" name="_action_editTransaction" id="${transactionInstance?.id }">
 								<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" />
 							    ${message(code: 'default.button.edit.label', default: 'Edit')}        						
@@ -153,7 +151,6 @@
 							</button>							
 						</div>
 							
-					</fieldset>
 				</g:form>
 			</div>
 		</div>

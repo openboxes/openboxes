@@ -28,7 +28,9 @@ class JsonController {
 						ilike("lotNumber", searchTerm)
 						ilike("description", searchTerm)
 					}
-					eq("product.id", new Long(params.productId));
+					eq("product.id", new Long(params.productId))
+					maxResults(5)
+					
 				}
 			}
 			if (items) {

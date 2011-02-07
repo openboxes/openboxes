@@ -1,5 +1,7 @@
 package org.pih.warehouse.inventory;
 
+import org.apache.commons.collections.FactoryUtils;
+import org.apache.commons.collections.ListUtils;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
@@ -420,7 +422,7 @@ class InventoryController {
 			warehouseInstance: Warehouse.get(session?.warehouse?.id)
 		];
 		
-		render(view: "createTransaction", model: model);
+		render(view: "showTransaction", model: model);
 	}
 
 		
@@ -460,16 +462,27 @@ class InventoryController {
 		log.info ("Save new transaction " + params);
 		def transactionInstance = Transaction.get(params.id);
 		
+		log.info("transaction entries " + transactionInstance?.transactionEntries?.size());
+		log.info("transaction entries " + transactionInstance?.transactionEntries);
+		
+		
 		
 		
 		if (!transactionInstance) { 
 			transactionInstance = new Transaction(params);
 		}
-		else { 		
+		else {
+			//bindData(transactionInstance, params, [exclude: ['transactionEntries']]);
+			
+			//List transactionEntries = 
+			//	ListUtils.lazyList([], FactoryUtils.instantiateFactory(TransactionEntry.class))		
+			//bindData(transactionEntries, params, "entries");			
+			//log.info("bind transaction entries " + transactionEntries);	
 			transactionInstance.properties = params;
 		}
-
-		transactionInstance.transactionEntries.each { 
+		
+		
+		transactionInstance?.transactionEntries.each { 
 			log.info("Process transaction entry " + it.id);
 			log.info("Find inventory item by lot number " + it.lotNumber);
 			
@@ -486,8 +499,10 @@ class InventoryController {
 					inventoryItem = new InventoryItem();
 					inventoryItem.product = it.product;
 					inventoryItem.lotNumber = it.lotNumber;
-					inventoryItem.description = "Instance of " + it.product.name;
+					inventoryItem.description = it.product.name;
 					inventoryItem.save();
+					
+					// FIXME Need to check for errors here
 				}
 				it.inventoryItem = inventoryItem;
 			}
@@ -496,8 +511,8 @@ class InventoryController {
 
 		if (!transactionInstance.hasErrors() && transactionInstance.save(flush:true)) {
 			flash.message = "Transaction saved successfully";
+			redirect(action: "editTransaction", id: transactionInstance?.id);
 		}
-
 						
 		def model = [ 
 			transactionInstance : transactionInstance,
@@ -525,7 +540,7 @@ class InventoryController {
 			warehouseInstanceList: Warehouse.list(),
 			warehouseInstance: Warehouse.get(session?.warehouse?.id) ]
 
-		render(view: "editTransaction", model: model)
+		render(view: "createTransaction", model: model)
 
 	}
 	

@@ -3,14 +3,19 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'transaction.label', default: 'Transaction')}" />
-        <title><g:message code="default.create.label" args="[entityName]" /></title>    
-        
+        <title>
+	        <g:if test="${transactionInstance?.id }">
+		        <g:message code="default.edit.label" args="[entityName]" />  
+	    	</g:if>
+	    	<g:else>
+		        <g:message code="default.create.label" args="[entityName]" />    
+			</g:else>    	    
+		</title>
         <style>
         	.dialog form label { position: absolute; display: inline; width: 140px; text-align: right;}
         	.dialog form .value { margin-left: 160px; }
         	.dialog form ul li { padding: 10px; } 
         	.dialog form { width: 100%; } 
-        	.lotNumberTable tr td { padding: 2px; margin: 0px; }
         	.header th { background-color: #525D76; color: white; } 
         </style>
         
@@ -105,7 +110,9 @@
 		    			transaction.TransactionEntries.push(transactionEntry);
 
 		    			// Display new row in the table 
-		    			$("#transactionEntryRowTemplate").tmpl(transactionEntry).appendTo('#unsavedTransactionEntryTable');		    			
+		    			$("#unsavedTransactionEntryTable > thead").hide();
+		    			console.log("adding new row to transaction entry table");
+		    			$("#transactionEntryRowTemplate").tmpl(transactionEntry).appendTo('#unsavedTransactionEntryTable > tbody');		    			
 					}
 					$("#productSearch").trigger("focus");
 	    		});
@@ -270,30 +277,25 @@
         <script id="transactionEntryRowTemplate" type="x-jquery-tmpl">
 			<tr id="product{{= Index }}" class="product">
 				<td colspan="3">
-					<table id="lotNumberTable{{= Index }}" class="lotNumberTable" border="1" width="100%" style="border: 1px solid lightgrey;">
-						<thead>
-							<tr class="header">
-								<th>Product</th>
-								<th>Lot/Serial Number</th>
-								<th>Qty</th>
-								<th></th>
-							</tr>
-						</thead>
+					<table id="lotNumberTable{{= Index }}" class="lotNumberTable" border="1" width="100%" style="border: 1px solid lightgrey;">		
 						<tbody class="lotNumberTableBody">							
 							<tr class="{{= StyleClass}}">
-								<td width="40%">
+								<td width="5%">
+									<span class="fade">(new)</span>
+								</td>
+								<td width="35%">
 									{{= ProductName}}
 								</td>
 								<td width="25%">
-									<g:hiddenField type="hidden" name="transactionEntries[{{= Index}}].product.id" class="hiddeProductId" value="{{= ProductId}}"/>
-									<g:hiddenField type="hidden" name="transactionEntries[{{= Index}}].lotNumber" class="hiddenLotNumber" value=""/>
-									<g:textField type="text" name="lotNumber" value="" class="lotNumber" size="15"/>
+									<g:hiddenField name="transactionEntries[{{= Index}}].product.id" class="hiddeProductId" value="{{= ProductId}}"/>
+									<g:hiddenField name="transactionEntries[{{= Index}}].lotNumber" class="hiddenLotNumber" value=""/>
+									<g:textField name="lotNumber" value="" class="lotNumber" size="15"/>
 								</td>
 								<td width="5%">
-									<input type="text" class="quantity" name="transactionEntries[{{= Index}}].quantity" size="3"/>
+									<g:textField class="quantity" name="transactionEntries[{{= Index}}].quantity" size="3"/>
 								</td>
-								<td width="20%" nowrap="nowrap">
-									<input type="hidden" id="product.id" name="product.id" value="{{= ProductId}}"/>
+								<td width="10%" nowrap="nowrap">
+									<g:hiddenField id="product.id" name="product.id" value="{{= ProductId}}"/>
 									<button type="button" class="addLotNumber">
 										<img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png')}"/>
 									</button>	
@@ -310,18 +312,20 @@
 		</script>
         <script id="lotNumberRowTemplate" type="x-jquery-tmpl">
 			<tr class="{{= StyleClass}}">
-				<td>
+				<td width="5%">
 				</td>
-				<td>
+				<td width="35%">
+				</td>
+				<td width="25%">
 					
 					<g:hiddenField name="transactionEntries[{{= Index}}].product.id" class="hiddenProductId" value="{{= ProductId}}"/>
 					<g:hiddenField name="transactionEntries[{{= Index}}].lotNumber" class="hiddenLotNumber" value=""/>
 					<g:textField name="lotNumber" class="lotNumber" size="15"/>
 				</td>
-				<td>
+				<td width="5%">
 					<g:textField class="quantity" name="transactionEntries[{{= Index}}].quantity" size="3"/>
 				</td>
-				<td>
+				<td width="10%">
 					<button class="deleteLotNumber">
 						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png')}"/>	
 					</button>
@@ -353,7 +357,7 @@
 					<h2>Create New Transaction</h2>
 
 					<ul>
-						<li class="prop odd">											
+						<li class="prop even">											
 							<label>ID</label>
 							<span class="value">
 								${transactionInstance.id }
@@ -380,7 +384,7 @@
 		                       		optionKey="id" optionValue="name" value="${transactionInstance?.source?.id}" noSelection="['null': '']" />
                        		</span>
 						</li>
-						<li>
+						<li class="odd">
 							<label>To</label>
 							<span class="value">
 								<g:select id="destination.id" name="destination.id" from="${warehouseInstanceList}" 
@@ -394,56 +398,17 @@
 								${warehouseInstance?.name }
 							</span>								
 						</li>
-						
-						
-						<%-- 
-						<g:if test="${transactionInstance?.id }">
-							<li>
-								<label>Confirmed</label>
-								<span class="value">								
-									<g:checkBox name="confirmed" value="${transactionInstance?.confirmed }"/>
-								</span>
-							</li>
-							<li>
-								<label>Confirmed by</label>
-								<span class="value">
-									<g:select name="confirmedBy.id" from="${org.pih.warehouse.core.User.list()}" 
-			                       		optionKey="id" optionValue="name" value="${transactionInstance?.confirmedBy?.id}" noSelection="['null': '']" />									
-			               		</span>
-							</li>
-							<li>
-								<label>Confirmed on</label>
-								<span class="value">
-									<g:jqueryDatePicker id="dateConfirmed" name="dateConfirmed"
-											value="${transactionInstance?.dateConfirmed}" format="MM/dd/yyyy"/>
-								</span>
-							</li>
-						</g:if>
-						--%>
-					</ul>
-
-						
-						
-					<h2>Add Transaction Entries</h2>
-						
-					<ul>
-						<li class="prop odd">
-							<label>Add another product</label>
-							<div class="value">
-								
-								<input type="hidden" id="productId"/>
-								<input type="hidden" id="productName"/>
-								<input type="text" id="productSearch" value="Find another product to add"> &nbsp;
-								<button id="addProduct" type="button">
-									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png')}"/>	
-								</button>
-							</div>								
-						</li>
-						
 						<li class="prop even">
-							
-							<div  style="float: left; padding: 0px;  width: 50%">
-								<h3>Saved Items</h3>
+							<label>Items</label>
+							<div style="margin:1%; width: 60%; padding-left: 20%" class="value">
+								<div style="text-align: left; padding-bottom: 5px;">
+									<g:hiddenField id="productId" name="productId"/>
+									<g:hiddenField id="productName" name="productName"/>
+									<g:textField  id="productSearch" name="productSearch" value="Find another product to add" /> &nbsp;
+									<button id="addProduct" type="button">
+										<img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png')}"/>	
+									</button>							
+								</div>
 								<table id="transactionEntryTable" border="1" style="border: 1px solid lightgrey;">
 									<g:if test="${transactionInstance?.transactionEntries }">
 										<thead>
@@ -452,6 +417,7 @@
 												<th>Product</th>
 												<th>ID / Serial / Exp Date</th>
 												<th>Qty</th>
+												<th>Actions</th>
 											</tr>
 										</thead>
 										<tbody>
@@ -460,24 +426,30 @@
 											<g:each in="${transactionMap.keySet()}" var="key" >
 												<g:set var="transactionEntries" value="${transactionMap.get(key) }"/>
 												<g:each in="${transactionEntries }" var="transactionEntry" status="status">
-													<tr class="${(status%2==0)?'odd':'even'}">
-														<td>
+													<tr class="${(index%2==0)?'odd':'even'}">
+														<td width="5%">
 															${transactionEntry?.id}
 														
 														</td>
-														<td style="text-align: left;">
-															<g:if test="${status == 0}">${transactionEntry?.product?.name }</g:if>
+														<td width="35%" style="text-align: left;">
+															<g:if test="${status == 0}">
+																${transactionEntry?.product?.name }
+																&nbsp;
+																<g:link controller="inventoryItem" action="showStockCard" id="${transactionEntry?.product?.id }">Show stock card</g:link> 
+																
+															</g:if>
 															<g:hiddenField name="transactionEntries[${index}].id" value="${transactionEntry?.id}"/>
 															<g:hiddenField name="transactionEntries[${index}].product.id" value="${transactionEntry?.product?.id}"/>
 														</td>										
-														<td>
+														<td width="25%">
 															<g:hiddenField name="transactionEntries[${index}].inventoryItem.id" value="${transactionEntry?.inventoryItem?.id}"/>
 															<g:hiddenField name="transactionEntries[${index}].lotNumber" class="hiddenLotNumber" value="${transactionEntry?.inventoryItem?.lotNumber}"/>
 															<g:textField type="text" name="lotNumber" class="lotNumber" value="${transactionEntry?.inventoryItem?.lotNumber}" size="15"/>															
 														</td>		
-														<td>
+														<td width="5%">
 															<g:textField class="quantity" name="transactionEntries[${index}].quantity" value="${transactionEntry?.quantity }" size="3"/>
 														</td>
+														<td width="10%"></td>
 													</tr>
 													<g:set var="index" value="${index+1 }"/>
 												</g:each>
@@ -488,29 +460,35 @@
 										<thead>
 											<tr>
 												<td>
-													<span class="fade">No saved transaction entries</span>
+													<div id="" style="border: 1px dashed lightgrey; font-size: 1.5em; padding: 50px; vertical-align: middle; text-align: center;">
+														<span class="fade">Click 'save' to move items from Staging Area.</span>
+													</div>												
 												</td>
 											</tr>
 										</thead>
-									</g:else>
-									
+									</g:else>									
 								</table>
-							</div>
-							
-							<div style="float: left; padding: 0px; margin: 0px; width: 40%; padding-left: 10%;">
-								<h3>Unsaved Items</h3>
-								
-								<table id="unsavedTransactionEntryTable">
-									<!--  Empty to start -->								
+								<br/>
+								<table id="unsavedTransactionEntryTable" style="border: 1px solid lightgrey;">
+									<thead>
+										<td>
+											<div id="" style="border: 1px dashed lightgrey; font-size: 1.5em; padding: 50px; vertical-align: middle; text-align: center;">
+												<span class="fade">Staging Area</span>
+											</div>
+										</td>									
+									</thead>	
+									<tbody>
+									</tbody>
+																
 								</table>																
-
 								
 							</div>							
-							
-							<br clear='all'/>
-						</li>
+						</li>						
+						
+						
 						
 					</ul>
+					
 					<ul>
 						<li class="prop even">
 							<div style="text-align: center;">
@@ -518,9 +496,17 @@
 									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'tick.png')}"/>&nbsp;Save
 								</button>
 								&nbsp;
-								<g:link action="listTransactions">
-				                    ${message(code: 'default.button.cancel.label', default: 'Cancel')}						
-								</g:link>			
+								
+								<g:if test="${transactionInstance?.id }">
+									<g:link action="listTransactions">
+					                    ${message(code: 'default.button.cancel.label', default: '&lsaquo; Back to transactions')}						
+									</g:link>			
+								</g:if>
+								<g:else>
+									<g:link action="listTransactions">
+					                    ${message(code: 'default.button.cancel.label', default: 'Cancel')}						
+									</g:link>								
+								</g:else>
 							</div>
 						</li>
 					</ul>

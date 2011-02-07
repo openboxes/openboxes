@@ -35,6 +35,7 @@ class Transaction {
 	Date dateCreated
 	Date lastUpdated
 	Date dateConfirmed
+	List transactionEntries;
 	
     // Association mapping
     static hasMany = [ transactionEntries : TransactionEntry ]
