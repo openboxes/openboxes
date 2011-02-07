@@ -310,12 +310,6 @@ class InventoryController {
 	}
 	
 	
-	def createTransaction = { 
-		redirect(action: "editTransaction")
-		//render(view: "editTransaction", model: [ productInstanceMap: productMap, 
-		//	transactionTypeList: transactionTypes, warehouseInstanceList: warehouses, transactionInstance: transaction]);
-	}
-
 	def listTransactions = { 
 		redirect(action: listAllTransactions)
 	}
@@ -412,8 +406,21 @@ class InventoryController {
 	 * Show the transaction.
 	 */
 	def showTransaction = {
-		def transactionInstnace = Transaction.get(params?.id)		
-		[transactionInstance: transactionInstnace]
+		def transactionInstance = Transaction.get(params.id);
+		if (!transactionInstance) {
+			flash.message = "There was no transaction with ID " + params.id;
+			transactionInstance = new Transaction();
+		}
+		
+		def model = [
+			transactionInstance : transactionInstance,
+			productInstanceMap: Product.list().groupBy { it.category },
+			transactionTypeList: TransactionType.list(),
+			warehouseInstanceList: Warehouse.list(),
+			warehouseInstance: Warehouse.get(session?.warehouse?.id)
+		];
+		
+		render(view: "createTransaction", model: model);
 	}
 
 		
@@ -434,6 +441,78 @@ class InventoryController {
 		redirect(action: "listAllTransactions")
 	}
 	
+	def createTransaction = { 
+		
+		def transactionInstance = new Transaction();
+		def model = [
+			transactionInstance : transactionInstance,
+			productInstanceMap: Product.list().groupBy { it.category },
+			transactionTypeList: TransactionType.list(),
+			warehouseInstanceList: Warehouse.list(),
+			warehouseInstance: Warehouse.get(session?.warehouse?.id) 
+		];
+		
+		render(view: "createTransaction", model: model);
+	}
+	
+	
+	def saveNewTransaction = { 
+		log.info ("Save new transaction " + params);
+		def transactionInstance = Transaction.get(params.id);
+		
+		
+		
+		if (!transactionInstance) { 
+			transactionInstance = new Transaction(params);
+		}
+		else { 		
+			transactionInstance.properties = params;
+		}
+
+		transactionInstance.transactionEntries.each { 
+			log.info("Process transaction entry " + it.id);
+			log.info("Find inventory item by lot number " + it.lotNumber);
+			
+			// FIXME This never actually show this error
+			if (!it.lotNumber) { 
+				it.errors.rejectValue("lotNumber", "lotNumber.invalid");
+			}
+			else { 
+				// Find inventory item by lot number
+				def inventoryItem = InventoryItem.findByLotNumber(it.lotNumber);
+	
+				// Create a new inventory item if one is not found 
+				if (!inventoryItem) { 
+					inventoryItem = new InventoryItem();
+					inventoryItem.product = it.product;
+					inventoryItem.lotNumber = it.lotNumber;
+					inventoryItem.description = "Instance of " + it.product.name;
+					inventoryItem.save();
+				}
+				it.inventoryItem = inventoryItem;
+			}
+		}
+		log.info("Transaction entries " + transactionInstance?.transactionEntries)
+
+		if (!transactionInstance.hasErrors() && transactionInstance.save(flush:true)) {
+			flash.message = "Transaction saved successfully";
+		}
+
+						
+		def model = [ 
+			transactionInstance : transactionInstance,
+			productInstanceMap: Product.list().groupBy { it.category },
+			transactionTypeList: TransactionType.list(),
+			warehouseInstanceList: Warehouse.list(),
+			warehouseInstance: Warehouse.get(session?.warehouse?.id)
+		]
+		
+		
+		render(view: "createTransaction", model: model);
+		
+		
+	}
+	
 	
 	def editTransaction = { 		
 		log.info "edit transaction: " + params
@@ -441,7 +520,7 @@ class InventoryController {
 		
 		def model = [ 
 			transactionInstance: transactionInstance?:new Transaction(),
-			productInstanceMap: Product.list().groupBy { it?.productType },
+			productInstanceMap: Product.list().groupBy { it?.category },
 			transactionTypeList: TransactionType.list(),
 			warehouseInstanceList: Warehouse.list(),
 			warehouseInstance: Warehouse.get(session?.warehouse?.id) ]

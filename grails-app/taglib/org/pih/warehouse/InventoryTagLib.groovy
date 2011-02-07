@@ -86,8 +86,14 @@ class InventoryTagLib {
 							}							  
 						});
 						
-						\$("#${id}-suggest").blur(function() { 							
-							\$('#${id}-suggest').val("Enter serial number, lot number, or barcode");
+						\$("#${id}-suggest").blur(function(event, ui) { 	
+							// Call our own callback function
+							${onSelectCallback}(event, ui);
+							
+							
+							return false;
+											
+							//\$('#${id}-suggest').val("Enter serial number, lot number, or barcode");
 						});                        
 						\$("#${id}-span").click(function() {
 							//alert("onclick");

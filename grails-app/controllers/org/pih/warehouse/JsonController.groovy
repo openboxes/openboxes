@@ -21,26 +21,32 @@ class JsonController {
 		log.info params
 		def items = new TreeSet();
 		if (params.term) {
+			def searchTerm = params.term + "%";
 			items = InventoryItem.withCriteria {
-				or {
-					ilike("lotNumber", params.term + "%")
-					ilike("description", params.term + "%")
+				and { 
+					or {
+						ilike("lotNumber", searchTerm)
+						ilike("description", searchTerm)
+					}
+					eq("product.id", new Long(params.productId));
 				}
 			}
 			if (items) {
 				items = items.collect() {
 					[
-						id: it.id,
 						value: it.lotNumber,
-						label: it.lotNumber + " - " + it.description, 
-						valueText: it.lotNumber + " - " + it.description,
+						label: it.lotNumber, 
+						valueText: it.lotNumber,
+						lotNumber: it.lotNumber,
 						expirationDate: it.expirationDate,
 						description: it.description,
+						id: it.id
 					]
 				}
 			}
+			/*
 			else { 
-
+				
 				def item =  [
 					value: params.term,
 					label: "No matches found for '" + params.term + "'.  Click here to add a new item?",
@@ -52,8 +58,7 @@ class JsonController {
 					exists: false
 				];
 				items.add(item)
-
-			}
+			}*/
 		}
 		render items as JSON;
 	}
@@ -274,10 +279,9 @@ class JsonController {
 		def items = new TreeSet();
 		
 		if (params.term) {			
-			
 			// Match full name
 			items = Product.withCriteria { 
-				ilike("name", "%" + params.term + "%")				
+				ilike("name", params.term + "%")				
 			}
 			
 			// If no items found, we search by category, product type, name, upc
@@ -286,11 +290,11 @@ class JsonController {
 				for (term in terms) {
 					items = Product.withCriteria {
 						or {
-							ilike("name", "%" + term + "%")
-							ilike("upc", "%" + term + "%")
-							categories { 
-								ilike("name", "%" + term + "%")
-							}
+							ilike("name", term + "%")
+							//category { 
+							//	ilike("name", term + "%")
+							//}
+							
 						}
 					}
 				}
@@ -298,8 +302,8 @@ class JsonController {
 		}
 
 		if (!items) { 
-			items.add(new Product(name: "No matching products"))
-			//items.addAll(Product.getAll());		
+			//items.add(new Product(name: "No matching products"))
+			//items.addAll(Product.list(params));		
 		}
 		
 		
@@ -307,13 +311,13 @@ class JsonController {
 			// Make sure items are unique
 			items.unique();
 			items = items.collect() {
-				[	value: it.id,
+				[	label: it.name,
 					valueText: it.name,
-					label: it.name,
+					value: it.id,
 					desc: it.description,
 					icon: "none"]
 			}
-		}
+		}/*
 		else {
 			def item =  [
 				value: null,
@@ -323,7 +327,7 @@ class JsonController {
 				icon: "none"
 			];
 			items.add(item)
-		}
+		}*/
 		render items as JSON;
 	}
 	

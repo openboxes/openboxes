@@ -8,13 +8,6 @@
     </head>
     <body>        
     
-    	<style>
-    		.widgetLarge { border: 1px solid lightgrey; height: 75px; margin: 5px; }
-			.widgetSmall { border: 1px solid lightgrey;  margin: 5px; }    		
-    		.widgetHeader { background-color: #FAFAFA; padding: 10px; font-weight: bold; font-size: 110%;} 
-    		.widgetContent { padding: 10px; } 
-    		.widgetSmall .widgetContent { float: left; width: 45%; } 
-    	</style>
     	
 		<div class="body">		
 		

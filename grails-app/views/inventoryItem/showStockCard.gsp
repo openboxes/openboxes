@@ -161,7 +161,8 @@
 										jQuery(document).ready(function() {
 											jQuery("tr.transactionEntry").hide();
 
-											jQuery(".toggleDetails").click(function() {
+											jQuery(".toggleDetails").click(function(event) {
+												event.preventDefault();
 												jQuery("tr.transaction" + this.id).toggle();								
 											});
 										});	
@@ -199,7 +200,7 @@
 												<g:each var="transaction" in="${commandInstance?.transactionLogMap?.keySet().sort {it.transactionDate}.reverse() }" status="status">
 													<tr id="${transacton?.id }" class="transaction ${(status%2==0)?'even':'odd' }">
 														<td class="fade">
-															${transaction?.id }
+															<g:link controller="inventory" action="showTransaction" id="${transaction.id }">${transaction?.id }</g:link>
 														</td>
 														<td>
 															<g:formatDate
@@ -231,19 +232,20 @@
 															<td></td>												
 															<td>
 																<span class="fade">
-																	${transactionEntry?.inventoryItem?.description }
-																	${transactionEntry?.lotNumber }</span>
-															</td>
-															<td>
-																<span class="fade">
+																
 																	<g:if test="${transactionEntry.quantity>0}">
 																		+${transactionEntry.quantity }
 																	</g:if>
 																	<g:else>
 																		${transactionEntry.quantity }
-																	</g:else>														
+																	</g:else>	
+																	&nbsp;															
+																	${transactionEntry?.inventoryItem?.description }
+																	&nbsp;
+																	${transactionEntry?.lotNumber }
 																</span>
 															</td>
+															<td></td>
 														</tr>
 													</g:each>
 												</g:each>

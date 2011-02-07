@@ -477,6 +477,8 @@ class ShipmentController {
 			// Match the shipment's most recent event type against the selected event type
 			if (eventType) {  
 				outgoingShipments = outgoingShipments.findAll() { shipment -> 
+					
+					log.info(shipment?.mostRecentEvent?.eventType == eventType);
 					shipment?.mostRecentEvent?.eventType == eventType
 				}
 			}
@@ -487,11 +489,22 @@ class ShipmentController {
 				}
 			}
 		} 
-		else if (params?.eventStatus && params?.activityType) { 			
-			outgoingShipments = outgoingShipments.findAll() { shipment ->
+		else if (params?.eventStatus && params?.activityType) { 	
+			// Fixed bug 
+			if (EventStatus.valueOf(params.eventStatus) == EventStatus.UNKNOWN) {
+				outgoingShipments = outgoingShipments.findAll() { shipment ->
+					// Should include 
+					// shipment?.mostRecentEvent?.eventType?.activityType == ActivityType.valueOf(params.activityType
+					(shipment?.mostRecentEvent?.eventType?.eventStatus == null)
+				}
 				
-				(shipment?.mostRecentEvent?.eventType?.activityType == ActivityType.valueOf(params.activityType) &&
-				shipment?.mostRecentEvent?.eventType?.eventStatus == EventStatus.valueOf(params.eventStatus))
+			}
+			else { 
+				outgoingShipments = outgoingShipments.findAll() { shipment ->
+					
+					// shipment?.mostRecentEvent?.eventType?.activityType == ActivityType.valueOf(params.activityType) &&
+					(shipment?.mostRecentEvent?.eventType?.eventStatus == EventStatus.valueOf(params.eventStatus))
+				}
 			}
 		}
 		[

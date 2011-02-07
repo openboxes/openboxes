@@ -33,7 +33,6 @@
 
 	/**
 	 * When an item is selected, this is the callback we use to populate the table
-	 */
 	function onSelectCallback(event, ui) { 
 		var inventoryItem = { 
 				Id: ui.item.id, 
@@ -50,17 +49,30 @@
 			
 		addItemToTable(inventoryItem);
 	}
+	 */
 
-	
-	
-	var buttonUpHandler = function(event, data) {
-		event.preventDefault();
-		changeQuantity(this.id, +1);	
+	function onSelectCallback(id, event, ui) { 
+		alert(id);
 	}
 
-	var buttonDownHandler = function(event, data) { 
+	 
+	function addNewInventoryItem(id, type, productId, lotNumber, description, expDate, qty) { 
+		var inventoryItem = 
+			{ Id: id, Type: 'new', ProductId: productId,LotNumber: lotNumber, Description: description, ExpirationDate: expDate, Qty: 0 };
+
+
+	}
+	
+	var buttonUpMouseHandler = function(event, data) {
+		event.preventDefault();		
+		var accelerator = (event.ctrlKey) ? 100 : (event.shiftKey) ? 10 : 1;
+		changeQuantity($(this).parent().parent().find('.newQuantity'), +1 * accelerator);	
+	}
+
+	var buttonDownMouseHandler = function(event, data) { 
 		event.preventDefault();
-		changeQuantity(this.id, -1);	
+		var accelerator = (event.ctrlKey) ? 100 : (event.shiftKey) ? 10 : 1;
+		changeQuantity($(this).parent().parent().find('.newQuantity'), -1 * accelerator);	
 	}
 	
 	/**
@@ -85,10 +97,8 @@
 	}
 
 
-	function changeQuantity(id, delta){ 
-		var qtyFieldId = "#newQuantity-" + id + "";
-		var value = parseInt($(qtyFieldId).val());											
-		$(qtyFieldId).val(value + delta);
+	function changeQuantity(textField, delta){ 
+		textField.val(parseInt(textField.val()) + delta);
 	}
 
 	function populateInventoryItemsArray() { 
@@ -107,18 +117,165 @@
 		*/
 
 	}
-	
-	
+
+	function removeRow(index) { 
+		$('#row-' + index).remove();
+	}
+
 	$(document).ready(function() {
+
+		$('#addAnother').focus();		
+		$('#addAnother').click(function() { 
+			var inventoryItem = {Qty: 0};
+
+			// Add to the array of new inventory items
+			inventory.InventoryItems.push(inventoryItem);
+
+			// Add a new row to the table
+			$("#newRowTemplate").tmpl(inventoryItem).appendTo('#inventoryItemsTable');		
+
+			//$("#inventoryItemsTable tbody tr:even").addClass("even");
+			//$("#inventoryItemsTable tbody tr:odd").addClass("odd");
+
+			
+			$('#inventoryItemsTable tbody tr:last').find('.lotNumber').focus();
+					
+		});
+
+
+		//$('.newQuantity').livequery(function() { 
+		//	$(this).blur(function() { $('#addAnother').focus();	});
+		//});
+		
+
+		$('.lotNumber').livequery(function() {
+			//$(this).addClass("fade");
+			//$(this).val("Enter serial number, lot number, or barcode");
+			//$(this).click(function() { $(this).val(""); });
+			//$(this).focus(function() { $(this).val(""); });
+			
+			$(this).autocomplete( {
+				source: function(req, add){
+					$.getJSON('/warehouse/json/findLotsByName', req, function(data) {
+						var items = [];
+						$.each(data, function(i, item) {
+							items.push(item);
+						});
+						add(items);
+					});
+				},
+		        focus: function(event, ui) {	
+			        //alert("focus");
+					//$('#lotNumberWidget-suggest').val("");
+		        },	
+		        change: function(event, ui) { 
+					//$('#lotNumberWidget-id').val(0);
+					var lotNumber = $(this).parent().parent().find('.lotNumber');
+					var lotNumberValue = $(this).parent().parent().find('.lotNumberValue');
+					lotNumberValue.val(lotNumber.val());				
+					
+		        },
+		        close: function(even, ui) { 
+				},
+				select: function(event, ui) {
+
+					var id = $(this).parent().parent().find('.id');
+					var lotNumber = $(this).parent().parent().find('.lotNumber');
+					var lotNumberValue = $(this).parent().parent().find('.lotNumberValue');
+					var quantity = $(this).parent().parent().find('.newQuantity');
+					var expirationDate = $(this).parent().parent().find('.expirationDate');
+					var description = $(this).parent().parent().find('.description');
+
+
+					lotNumber.val(ui.item.value);
+					lotNumberValue.val(ui.item.value);
+
+					if (description.val() == '') { 
+						quantity.focus();
+						quantity.select();					
+					}
+					else { 
+						description.focus();
+					}
+					 
+						
+					//alert("selected " + ui.item)
+					/*
+					$('#lotNumberWidget-id').val(ui.item.value);
+					$('#lotNumberWidget-span').html(ui.item.valueText);
+					$('#lotNumberWidget-name').html(ui.item.lotNumber);
+					$('#lotNumberWidget-description').html(ui.item.description);
+					if (ui.item.expirationDate=='') {
+						$('#lotNumberWidget-date').html(ui.item.expirationDate);
+					}
+					else { 
+						$('#lotNumberWidget-date').html('<span class="fade">never</span>');								
+					}
+					$('#lotNumberDescription').val(ui.item.description);
+					$('#lotNumberDate').val(ui.item.expirationDate);
+					$('#lotNumberWidget-suggest').focus();
+					*/
+
+					
+					// Set the lot number and disable the field
+					$(this).attr('disabled', 'disabled');
+					
+					// Set the ID
+					
+					id.val(ui.item.id);
+					// Set the lot number and disable the field
+					
+					if (ui.item.expirationDate) {
+						expirationDate.val(ui.item.expirationDate);						
+					}
+					else { 
+						expirationDate.val('never');
+					}
+					expirationDate.attr('disabled', 'disabled');
+					
+					// Set the description and disable the field (unless it's null)						
+					
+					description.val(ui.item.description);
+					//description.addClass("fade");
+					if (description.val()) { 
+						description.attr('disabled', 'disabled');
+					}
+					
+				
+				}							  
+			});				
+		});
+
+		$('.description').livequery(function() { 
+			$(this).autocomplete( {
+				source: function(req, add){
+					$.getJSON('/warehouse/json/findDescriptionByName', req, function(data) {
+						var items = [];
+						$.each(data, function(i, item) {
+							items.push(item);
+						});
+						add(items);
+					});
+				},
+				select: function(event, ui) {
+
+					$(this).parent().parent().find('.description').val(ui.item.value);
+					$(this).parent().parent().find('.descriptionValue').val(ui.item.value);
+					
+				}
+			});
+		});
+
 		// Bind the click event to the up buttons and call the change quantity function
-		//$(".buttonUp").click(buttonUpHandler);
+		$(".buttonUp").livequery(function() { 
+			$(this).click(buttonUpMouseHandler);
+		});
 
 		// Bind the click event to the down buttons and call the change quantity function
-		//$(".buttonDown").click(buttonDownHandler);
+		$(".buttonDown").livequery(function() { 
+			$(this).click(buttonDownMouseHandler);
+		});
 
-
-		$('.buttonUp').live('click', buttonUpHandler);
-		$('.buttonDown').live('click', buttonDownHandler);
 		
 	});
 
@@ -190,7 +347,7 @@
 								<g:hiddenField name="inventoryItemType" value="${org.pih.warehouse.inventory.InventoryItemType.NON_SERIALIZED}"/>
 							 --%>	
 								<div style="padding: 10px; text-align: left;">
-									<label>Inventory date:</label>
+									<label>Inventory date:</label><br/>
 									<g:jqueryDatePicker 
 										id="transactionDate" 
 										name="transactionDate" 
@@ -202,8 +359,7 @@
 								<table id="inventoryItemsTable" style="border: 1px solid lightgrey" border="1">
 									<thead>
 										<tr>	
-											<th>Index</th>
-											<th>ID</th>
+											<th>Remove</th>
 											<th>Lot/Serial #</th>
 											<th>Expires</th>
 											<th>Description</th>
@@ -215,11 +371,7 @@
 									<tbody>
 										<g:each var="recordInventoryRow" in="${commandInstance?.recordInventoryRows }" status="status">				
 											<tr class="${(status%2==0)?'odd':'even' }">
-												<td width="5%">
-													${status }												
-												</td>
 												<td width="5%" style="text-align: center;">
-													${recordInventoryRow?.id }
 													<g:hiddenField name="recordInventoryRows[${status}].id" value="${recordInventoryRow?.id }"/>
 												</td>
 												<td width="15%">
@@ -242,7 +394,7 @@
 														<span class="fade">never</span>
 													</g:else>
 												</td>
-												<td width="35%">
+												<td width="25%">
 													<%-- 
 													<g:textField name="recordInventoryRows[${status}].description" size="25" value="${recordInventoryRow?.description }"/>
 													--%>
@@ -254,7 +406,7 @@
 													<g:hiddenField name="recordInventoryRows[${status}].oldQuantity" value="${recordInventoryRow?.oldQuantity }"/>
 												</td>	
 												<td width="10%" style="text-align: center; vertical-align: middle;">
-													<g:textField style="text-align: center;"  id="newQuantity-${status }" name="recordInventoryRows[${status }].newQuantity" size="3" value="${recordInventoryRow?.newQuantity }" onFocus="this.select();" onClick="this.select();"/>
+													<g:textField style="text-align: center;" id="newQuantity-${status }" name="recordInventoryRows[${status }].newQuantity" size="3" value="${recordInventoryRow?.newQuantity }" onFocus="this.select();" onClick="this.select();"/>
 												</td>	
 												<td width="10%" style="text-align: center;">
 													<button id="${status }" class="buttonUp">
@@ -266,39 +418,16 @@
 												</td>
 											</tr>
 										</g:each>
-									</tbody>	
+									</tbody>
 									<tfoot>
 										<tr>
-											<td>
-											
+											<td colspan="8">
+												<a href="#" id="addAnother"> <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png') }"/>&nbsp;Add a new item </a>
 											</td>
-											<td>
-											
-											</td>
-											<td colspan="3">
-												<div id="#lotNumberWidget" style="padding: 0px; text-align: left;">									
-													<style>
-														#lotNumberWidget { font-size: 1.2em; } 
-														#lotNumberWidget-suggest { 
-															font-size: 1.2em;  
-															background-image: url('/warehouse/images/icons/silk/magnifier.png');
-															background-repeat: no-repeat;
-															background-position: center left;
-															padding: 5px;
-															padding-left: 20px;
-															width: 350px;
-														}
-													</style>
-													<g:lotNumberComboBox id="lotNumberWidget" onSelectCallback="onSelectCallback" name="lotNumberWidget" display="inline"></g:lotNumberComboBox>
-												</div>
-											</td>
-											<td></td>
-											<td></td>
-											<td></td>
 										</tr>
 									</tfoot>
 								</table>
-
+								
 								<div style="text-align: center; border-top: 1px solid lightgrey; padding:10px;">
 									<span class="buttons">
 										<g:submitButton name="save" value="Save"/>
@@ -316,15 +445,72 @@
 
 
 
+
+
+
+<script id="newRowTemplate" type="x-jquery-tmpl">
+<tr id="row-{{= getIndex()}}" class="{{= getClass()}}">
+	<td width="5%" style="text-align: center;">
+		<a href="#" onclick="removeRow({{= getIndex()}});"><img src="${createLinkTo(dir:'images/icons/silk', file:'delete.png')}"/></a>
+		<g:hiddenField name="recordInventoryRows[{{= getIndex()}}].id" value="{{= Id}}" size="1" />
+	</td>
+	
+	<td width="15%">
+		<style>
+			#lotNumber-{{= getIndex()}} { 
+				background-image: url('/warehouse/images/icons/silk/magnifier.png');
+				background-repeat: no-repeat;
+				background-position: center left;
+				padding: 5px;
+				padding-left: 20px;
+			}
+		</style>
+		<g:textField id="lotNumber-{{= getIndex()}}" class="lotNumber" name="lotNumber-{{= getIndex()}}" value="{{= LotNumber}}" size="10"  /><br/>
+		<g:hiddenField id="lotNumberValue-{{= getIndex()}}" class="lotNumberValue" name="recordInventoryRows[{{= getIndex()}}].lotNumber" value="{{= LotNumber}}" size="10"  />
+	</td>
+	<td width="10%">
+		<%-- <g:hiddenField name="recordInventoryRows[{{= getIndex()}}].expirationDate" value="{{= ExpirationDate}}"/> --%>	
+		<g:textField id="expirationDate-{{= getIndex()}}" class="expirationDate" name="recordInventoryRows[{{= getIndex()}}].expirationDate" value="{{= ExpirationDate}}" size="10" />
+		
+	</td>
+	<td width="25%">		
+		<style>
+			#description-{{= getIndex()}} { 
+				background-image: url('/warehouse/images/icons/silk/magnifier.png');
+				background-repeat: no-repeat;
+				background-position: center left;
+				padding: 2px;
+				padding-left: 20px;
+			}
+		</style>
+		<g:textField id="description-{{= getIndex()}}" class="description" name="recordInventoryRows[{{= getIndex()}}].description" value="{{= Description}}" size="20" />		
+	</td>
+	<td width="10%" style="text-align: center; vertical-align: middle;">
+		{{= Qty}}
+		<g:hiddenField id="oldQuantity-{{= getIndex()}}" class="oldQuantity" name="recordInventoryRows[{{= getIndex()}}].oldQuantity" value="{{= Qty}}"/>
+	</td>	
+	<td width="10%" style="text-align: center; vertical-align: middle;">
+		<g:textField style="text-align: center;"  
+			id="newQuantity-{{= getIndex()}}" class="newQuantity" name="recordInventoryRows[{{= getIndex()}}].newQuantity" size="3" value="{{= Qty}}" onFocus="this.select();" onClick="this.select();"/>
+	</td>	
+	<td width="10%" style="text-align: center;">
+		<button id="buttonUp-{{= getIndex()}}" class="buttonUp">
+			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_up.png') }"/>
+		</button>
+		<button id="buttonDown-{{= getIndex()}}" class="buttonDown">
+			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_down.png') }"/>
+		</button>
+	</td>	
+
+</tr>
+</script>									
+
 <script id="existingRowTemplate" type="x-jquery-tmpl">
-<tr class="{{= getClass()}}">
+<tr id="row{{= getIndex()}}" class="{{= getClass()}}">
 	<td width="5%" style="text-align: center;">
 		{{= getIndex()}}
-	</td>
-	<td width="5%" style="text-align: center;">	
-		{{= Id}}
 		<g:hiddenField name="recordInventoryRows[{{= getIndex()}}].id" value="{{= Id}}" size="1" />
-	</td>		
+	</td>
 	<td width="15%">
 		<g:hiddenField name="recordInventoryRows[{{= getIndex()}}].lotNumber" value="{{= LotNumber}}"/>
 		{{= LotNumber}}
@@ -354,45 +540,7 @@
 		</button>
 	</td>
 </tr>
-</script>									
-
-<script id="newRowTemplate" type="x-jquery-tmpl">
-<tr class="{{= getClass()}}">
-	<td width="5%" style="text-align: center;">
-		{{= getIndex()}}
-	</td>
-	<td width="5%" style="text-align: center;">	
-		{{= Id}}
-		<g:hiddenField name="recordInventoryRows[{{= getIndex()}}].id" value="{{= Id}}" size="1" />
-	</td>		
-	<td width="15%">
-		<g:textField name="recordInventoryRows[{{= getIndex()}}].lotNumber" value="{{= LotNumber}}" size="10" />
-	</td>
-	<td width="10%">
-		<g:hiddenField name="recordInventoryRows[{{= getIndex()}}].expirationDate" value="{{= ExpirationDate}}"/>
-	</td>
-	<td width="35%">
-		<g:textField name="recordInventoryRows[{{= getIndex()}}].description" value="{{= Description}}"/>
-	</td>
-	<td width="10%" style="text-align: center; vertical-align: middle;">
-		{{= Qty}}
-		<g:hiddenField name="recordInventoryRows[{{= getIndex()}}].oldQuantity" value="{{= Qty}}"/>
-	</td>	
-	<td width="10%" style="text-align: center; vertical-align: middle;">
-		<g:textField style="text-align: center;"  
-			id="newQuantity-{{= getIndex()}}" name="recordInventoryRows[{{= getIndex()}}].newQuantity" size="3" value="{{= Qty}}" onFocus="this.select();" onClick="this.select();"/>
-	</td>	
-	<td width="10%" style="text-align: center;">
-		<button id="{{= getIndex()}}" class="buttonUp">
-			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_up.png') }"/>
-		</button>
-		<button id="{{= getIndex()}}" class="buttonDown">
-			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_down.png') }"/>
-		</button>
-	</td>
-</tr>
-</script>									
-
+</script>
 
 <script id="inventoryTableTemplate" type="x-jquery-tmpl">
 	<table class="inventoryItems" border="1">	
@@ -408,68 +556,4 @@
 
 											
 
-								<%--
-								<table id="newItemsTable" border="1" style="border: 1px solid lightgrey;">
-									<thead>
-										<tr class="even">
-											<th>ID</th>
-											<th>Lot/Serial #</th>
-											<th>Expires</th>
-											<th>Description</th>
-											<th style="text-align:center;">Old Qty</th>
-											<th style="text-align:center;">New Qty</th>
-											<th></th>
-										</tr>											
-									</thead>
-									<tbody>
-										<tr class="odd" style="display: none;">
-											<td width="10%">{which}</td>
-											<td width="15%">
-												<!-- These are the elements that are updated -->
-												<input id="lotNumberWidget-id" type="hidden" name="lotNumber" value=""/>
-												<span id="lotNumberWidget-name"></span>
-											</td>
-											<td width="10%">												
-												<span id="lotNumberWidget-date">Date:</span>
-											</td>
-											<td width="35%">
-												<span id="lotNumberWidget-description">Description: </span>
-											</td>
-											<td width="10%">
-												0
-											</td>
-											<td width="10%">
-												<input type="text" id="lotNumberWidget-quantity" name="quantity" value=""/>
-											</td>
-											<td width="10%">
-											</td>
-										</tr>
-									</tbody>
-										<!-- 
-										
-										<g:set var="count" value="${commandInstance?.recordInventoryRows?.size() }"/>
-										<tr class="${count%2==0?'odd':'even'}">
-											<td>
-												<span class="fade">${count+1 }</span>
-											</td>
-											<td class="${hasErrors(bean:user,field:'lotNumber', 'errors')}">
-												<g:textField name="recordInventoryRows[${count }].lotNumber" size="10" value=""/>
-											</td>
-											<td class="${hasErrors(bean:user,field:'expirationDate', 'errors')}" nowrap>
-												<g:jqueryDatePicker id="expirationDate" name="recordInventoryRows[${count }].expirationDate" 
-													value="" format="MM/dd/yyyy" showTrigger="false" />
-											</td> 
-											<td class="${hasErrors(bean:user,field:'description', 'errors')}">
-												<g:textField name="recordInventoryRows[${count }].description" size="25" value=""/>
-											</td>
-											<td style="text-align: center;">
-
-											</td>
-											<td style="text-align: center;" class="${hasErrors(bean:user,field:'quantity', 'errors')}">
-												<g:textField name="recordInventoryRows[${count }].quantity" size="3" value=""/>
-											</td>
-										</tr>
-										 --> 
-									</tbody>										
-								</table>
-								--%>
+								
