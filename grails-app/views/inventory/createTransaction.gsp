@@ -62,7 +62,7 @@
 			 * Initialize the transaction entry array
 			 */
 	        var transaction = { TransactionEntries: [] };
-	        <g:if test="${!transactionInstance?.transactionEntries }">
+	        <g:if test="${transactionInstance?.transactionEntries }">
 		        <g:set var="transactionMap" value="${transactionInstance?.transactionEntries?.groupBy { it?.product?.name } }"/>
 				<g:each in="${transactionMap?.keySet()}" var="key" >
 					<g:set var="transactionEntries" value="${transactionMap?.get(key) }"/>
@@ -84,7 +84,6 @@
 			 * On load event 
 			 */	        
 	    	$(document).ready(function() {
-
 				// Initialize table with the transaction entries from the server 
 				if (transaction.TransactionEntries.length > 0) { 
 					$.each(transaction.TransactionEntries, function(index, value) { 
