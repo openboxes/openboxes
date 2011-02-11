@@ -3,6 +3,7 @@ package org.pih.warehouse.shipping;
 import java.util.List;
 import java.util.Map;
 
+import org.pih.warehouse.core.Event;
 import org.pih.warehouse.core.EventStatus;
 import org.pih.warehouse.core.EventType;
 import org.pih.warehouse.core.Location;
@@ -13,6 +14,46 @@ class ShipmentService {
 	
 	def sessionFactory;
 	boolean transactional = true
+	
+	/**
+	 * Returns the shipment referenced by the passed id parameter;
+	 * if id is null, returns a new Shipment object
+	 */
+	
+	Shipment getShipmentInstance(Long shipmentId) {
+		return getShipmentInstance(shipmentId, null)
+	}
+	
+	/**
+	 * Returns the shipment referenced by the passed id parameter;
+	 * if id is null, returns a new Shipment object of the specified
+	 * shipment type
+	 */
+	Shipment getShipmentInstance(Long shipmentId, String shipmentType) {
+		if (shipmentId) {
+			Shipment shipment = Shipment.get(shipmentId)
+			if (!shipment) {
+				throw new Exception("No shipment found with shipmentId " + shipmentId)
+			}
+			else {
+				return shipment
+			}
+		}
+		else {
+			Shipment shipment = new Shipment()
+			
+			if (shipmentType) {
+				ShipmentType shipmentTypeObject = ShipmentType.findByNameIlike(shipmentType)
+				if (!shipmentTypeObject) {
+					throw new Exception(shipmentType + " is not a valid shipment type")
+				}
+				else {
+					shipment.shipmentType = shipmentTypeObject
+				}
+			}		
+			return shipment
+		}
+	}
 	
 	List<Shipment> getAllShipments() {
 		return Shipment.list()
@@ -84,6 +125,9 @@ class ShipmentService {
 	
 	
 	List<Shipment> getShipments() { 		
+		
+		return getAllShipments()
+		
 		/*
 		return Shipment.withCriteria { 				
 			eq("mostRecentEvent.eventType.id", EventType.findByName("Departed"))
@@ -108,14 +152,14 @@ class ShipmentService {
 		return query.list();	// return query.list()*.name;
 		*/
 		
-		def criteria = Shipment.createCriteria()
-		def results = criteria.list {
+		//def criteria = Shipment.createCriteria()
+		//def results = criteria.list {
 			//or {
 			//	   for (e in branchList) {
 			//		   eq("branch", b)
 			//	   }
 			//	}
-		}
+		//}
 	}
 	
 
@@ -166,5 +210,59 @@ class ShipmentService {
 		return Shipment.withCriteria { 
 			eq("origin", location);
 		}
+	}
+	
+	/**
+	 * Saves a shipment
+	 */
+	
+	void saveShipment(Shipment shipment) {
+		if (shipment) {
+			// if this is shipment has no events (i.e., it is a new shipment) set it as pending
+			if (!(shipment.events?.size() > 0)) {
+				def event = new Event(
+					eventDate: new Date(),
+					eventType: EventType.findByName("Pending"),
+					//eventLocation: Location.get(session.warehouse.id)
+				)
+				event.save(flush:true);
+				shipment.addToEvents(event)
+			}
+			
+			shipment.save(flush:true)
+		}
+	}
+	
+	/**
+	 * Saves a container
+	 */
+	
+	void saveContainer(Container container) {
+		container.save(flush:true)
+	}
+	
+	/**
+	 * Deletes a container
+	 */
+	void deleteContainer(Container container) {
+		// first we need to handle deleting all the child containers
+		for (childContainer in container.containers) {
+				deleteContainer(childContainer)
+		}
+		
+		// remove the container from its parent
+		container?.parentContainer?.containers?.remove(container)
+				
+		// remove all items in the container from the parent shipment
+		def shipment = container?.shipment
+		for (shipmentItem in container.getShipmentItems()) {
+			shipment.shipmentItems.remove(shipmentItem)
+		}
+				
+		// remove the container itself from the parent shipment
+		shipment?.containers?.remove(container)
+			
+		saveShipment(shipment)
+		//container.delete()	
 	}
 }

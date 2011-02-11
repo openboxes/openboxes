@@ -465,8 +465,10 @@ class ShipmentController {
 	
 		
 	def listShipping = { 
-		def currentLocation = Location.get(session.warehouse.id);		
-		def outgoingShipments = shipmentService.getShipmentsByOrigin(currentLocation);	
+		def currentLocation = Location.get(session.warehouse.id);	
+		
+		def shipments = shipmentService.getAllShipments()
+		//def shipments = shipmentService.getShipmentsByOrigin(currentLocation);	
 		
 		// If there's no event type filter, return all outgoing shipments
 		// otherwise, we try to filter down the shipments
@@ -476,7 +478,7 @@ class ShipmentController {
 			
 			// Match the shipment's most recent event type against the selected event type
 			if (eventType) {  
-				outgoingShipments = outgoingShipments.findAll() { shipment -> 
+				shipments = shipments.findAll() { shipment -> 
 					
 					log.info(shipment?.mostRecentEvent?.eventType == eventType);
 					shipment?.mostRecentEvent?.eventType == eventType
@@ -484,7 +486,7 @@ class ShipmentController {
 			}
 			// Yes, there could actually be shipments with no most recent event	
 			else {
-				outgoingShipments = outgoingShipments.findAll() { shipment -> 
+				shipments = shipments.findAll() { shipment -> 
 					shipment?.mostRecentEvent?.eventType == null
 				}
 			}
@@ -492,7 +494,7 @@ class ShipmentController {
 		else if (params?.eventStatus && params?.activityType) { 	
 			// Fixed bug 
 			if (EventStatus.valueOf(params.eventStatus) == EventStatus.UNKNOWN) {
-				outgoingShipments = outgoingShipments.findAll() { shipment ->
+				shipments = shipments.findAll() { shipment ->
 					// Should include 
 					// shipment?.mostRecentEvent?.eventType?.activityType == ActivityType.valueOf(params.activityType
 					(shipment?.mostRecentEvent?.eventType?.eventStatus == null)
@@ -500,7 +502,7 @@ class ShipmentController {
 				
 			}
 			else { 
-				outgoingShipments = outgoingShipments.findAll() { shipment ->
+				shipments = shipments.findAll() { shipment ->
 					
 					// shipment?.mostRecentEvent?.eventType?.activityType == ActivityType.valueOf(params.activityType) &&
 					(shipment?.mostRecentEvent?.eventType?.eventStatus == EventStatus.valueOf(params.eventStatus))
@@ -509,9 +511,9 @@ class ShipmentController {
 		}
 		[
 			eventType : eventType,			
-			shipmentInstanceMap : shipmentService.getShipmentsByStatus(outgoingShipments),
-			shipmentInstanceList : outgoingShipments,
-			shipmentInstanceTotal : outgoingShipments.size(),
+			shipmentInstanceMap : shipmentService.getShipmentsByStatus(shipments),
+			shipmentInstanceList : shipments,
+			shipmentInstanceTotal : shipments.size(),
 		];
 	}
 	

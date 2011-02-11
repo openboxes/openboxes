@@ -6,14 +6,17 @@ public enum EventStatus {
 	UNKNOWN('Unknown'),
 	INITIAL('Initial'),
 	PENDING('Pending'),
-	COMPLETE('Complete');
+	COMPLETE('Complete'),
+	PACKED('Packed'),
+	SHIPPED('Shipped'),
+	RECEIVED('Received')
  
 	String name
 
 	EventStatus(String name) { this.name = name; }
 
 	static list() {
-		[ NEW, INITIAL, PENDING, COMPLETE, UNKNOWN ]
+		[ INITIAL, PENDING, COMPLETE, UNKNOWN, NEW, PACKED, SHIPPED, RECEIVED ]
 	}
 }
 

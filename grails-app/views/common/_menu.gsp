@@ -58,8 +58,7 @@
 				<span class="menuButton">
 					<g:link class="bullet" controller="shipment" action="create" params="['type':'outgoing']"><g:message code="shipment.create.label" default="Create Shipment" /></g:link>
 				</span>
-			</li>					
-			-->
+			</li>				
 			<li class="">
 				<span class="menuButton">
 					<g:link class="bullet" controller="shipment" action="listShippingByDate" params="['groupBy':'lastUpdated']"><g:message code="shipment.listShipping.label"  default="List by Date "/></g:link>					
@@ -69,15 +68,16 @@
 				<span class="menuButton">
 					<g:link class="bullet" controller="shipment" action="listShippingByType"><g:message code="shipment.listShipping.label"  default="List by Type "/></g:link>
 				</span>
-			</li>				
+			</li>	
+			-->		
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="shipment" action="listShipping"><g:message code="shipment.listShipping.label"  default="List by Status "/></g:link>
+					<g:link class="bullet" controller="shipment" action="listShipping"><g:message code="shipment.listShipping.label"  default="List Shipments "/></g:link>
 				</span>
 			</li>				
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="createShipment" action="index"><g:message code="suitcase.add.label" default="Add Suitcase" args="['Suitcase']"/></g:link>
+					<g:link class="bullet" controller="createShipmentNew" action="index"><g:message code="suitcase.add.label" default="Add Shipment"/></g:link>
 				</span>
 			</li>					
 			<!-- 			

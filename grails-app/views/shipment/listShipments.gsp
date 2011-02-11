@@ -30,9 +30,10 @@
 	                   </thead>
 	                   <tbody>				
 						<g:each in="${shipments}" var="shipmentInstance" status="i">							
+							<g:link action="show" id="${shipmentInstance.id}" alt="showDetails">
 							<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 	                            <td style="vertical-align: top; text-align: center" width="5%">											
-	                            	<g:link action="show" id="${shipmentInstance.id}" alt="showDetails"><span style="color:#aaa">${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}</span></g:link>
+	                            	<span style="color:#aaa">${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}</span>
 								</td>
 	                            <td style="vertical-align: top; text-align: left" width="10%">
 	                            	${fieldValue(bean: shipmentInstance, field: "name")}
@@ -92,7 +93,8 @@
 										</div>										
 									</div>
 	                            </td>	                            
-	                        </tr>							
+	                        </tr>			
+	                        </g:link>				
 	  						</g:each>
 					</tbody>            
 	            </table>
