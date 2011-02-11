@@ -188,7 +188,7 @@ class JqueryTagLib {
 			<input id='${id}' name='${name}' type='hidden'/> 
 			<input id='${id}-datepicker' name='${name}-datepicker' type='text' class='date' /> 
 			<script type=\'text/javascript\'> 
-				jQuery(function() {
+				jQuery(document).ready(function() {
 					jQuery('#${id}-datepicker').datepicker({
 						altField: '#${id}',
 						altFormat: 'mm/dd/yy',

@@ -12,7 +12,9 @@
 			    <div class="message">${flash.message}</div>
 			</g:if>		
 
-	    	<div id="chooseWarehouse" class="dialog">				
+	    	<div id="chooseWarehouse" class="dialog">			
+	    	
+	    		<h2>Choose your warehouse:</h2>	
 					<table>
 						<tbody>							
 							<tr>

@@ -462,50 +462,37 @@ class InventoryController {
 		log.info ("Save new transaction " + params);
 		def transactionInstance = Transaction.get(params.id);
 		
-		log.info("transaction entries " + transactionInstance?.transactionEntries?.size());
-		log.info("transaction entries " + transactionInstance?.transactionEntries);
-		
-		
-		
 		
 		if (!transactionInstance) { 
 			transactionInstance = new Transaction(params);
 		}
 		else {
 			//bindData(transactionInstance, params, [exclude: ['transactionEntries']]);
-			
 			//List transactionEntries = 
 			//	ListUtils.lazyList([], FactoryUtils.instantiateFactory(TransactionEntry.class))		
 			//bindData(transactionEntries, params, "entries");			
 			//log.info("bind transaction entries " + transactionEntries);	
 			transactionInstance.properties = params;
 		}
-		
-		
+				
 		transactionInstance?.transactionEntries.each { 
 			log.info("Process transaction entry " + it.id);
 			log.info("Find inventory item by lot number " + it.lotNumber);
 			
-			// FIXME This never actually show this error
-			if (!it.lotNumber) { 
-				it.errors.rejectValue("lotNumber", "lotNumber.invalid");
-			}
-			else { 
 				// Find inventory item by lot number
-				def inventoryItem = InventoryItem.findByLotNumber(it.lotNumber);
+			def inventoryItem = InventoryItem.findByLotNumberAndProduct(it?.lotNumber, it?.product);
 	
-				// Create a new inventory item if one is not found 
-				if (!inventoryItem) { 
-					inventoryItem = new InventoryItem();
-					inventoryItem.product = it.product;
-					inventoryItem.lotNumber = it.lotNumber;
-					inventoryItem.description = it.product.name;
-					inventoryItem.save();
-					
-					// FIXME Need to check for errors here
-				}
-				it.inventoryItem = inventoryItem;
+			// Create a new inventory item if one is not found 
+			if (!inventoryItem) { 
+				inventoryItem = new InventoryItem();
+				inventoryItem.product = it.product;
+				inventoryItem.lotNumber = it.lotNumber;
+				//inventoryItem.description = it.product.name;
+				inventoryItem.save();
+				
+				// FIXME Need to check for errors here
 			}
+			it.inventoryItem = inventoryItem;
 		}
 		log.info("Transaction entries " + transactionInstance?.transactionEntries)
 

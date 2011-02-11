@@ -2198,9 +2198,22 @@
         </addColumn>
     </changeSet>
     
+	<changeSet author="jmiranda" id="1297432141595-1">
+    	<comment>Remove all secondary product categories that have a null product category index value.</comment>
+    	<sql>	
+		    DELETE FROM product_category WHERE categories_idx IS NULL;
+    	</sql>
+	</changeSet>        
     
+	<changeSet author="jmiranda" id="1297432141595-2">
+    	<comment>Assign Boston warehouse to all users.</comment>
+    	<sql>	
+			UPDATE user SET warehouse_id = 1 WHERE warehouse_id IS NULL;
+    	</sql>
+	</changeSet>        
 
 
+        
 </databaseChangeLog>
 
 

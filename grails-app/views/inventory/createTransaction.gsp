@@ -20,7 +20,12 @@
         </style>
         
         <script>
-
+        	function paintStripes(obj) { 
+            	obj.not(":hidden").removeClass("even");
+            	obj.not(":hidden").removeClass("odd");            	
+				obj.not(":hidden").filter(":even").addClass("even");
+				obj.not(":hidden").filter(":odd").addClass("odd");
+            }
 			function initializeTypeSelector(select) { 
 				var transactionType = select.val();
 				console.log(transactionType == 1);
@@ -37,30 +42,64 @@
 					$("#destination\\.id").closest("li").hide();
 					$("#inventory\\.id").closest("li").show();
 				}						
+				var stripedList = $(".striped li").not(":hidden");
+				
+				$.each(stripedList, function(index, value) { 
+					console.log(index + ': ' + value.id + " : " + value.attributes); 
+				});
+				
+				paintStripes($(".striped li"));
+				$("#transaction-entries-li").addClass("even");
+				
 			}
 
 			function clearField(field) { 
 		    	field.removeClass("fade"); 
 		    	field.val(''); 
 			}
-			
-	        var transaction = { TransactionEntries: [] };	
 
-			<g:each var="entry" in="${transactionInstance.transactionEntries}" status="status">
-				var transactionEntry = { Id: 0, Index: ${status}, ProductId: 0, ProductName: '', LotNumber: '', Description: '', ExpirationDate: '', Qty: 0, StyleClass: '' };
-				transaction.TransactionEntries.push(transactionEntry);
+			/**
+			 * Initialize the transaction entry array
+			 */
+	        var transaction = { TransactionEntries: [] };
+	        <g:set var="transactionMap" value="${transactionInstance?.transactionEntries.groupBy { it?.product?.name } }"/>
+			<g:each in="${transactionMap.keySet()}" var="key" >
+				<g:set var="transactionEntries" value="${transactionMap.get(key) }"/>
+				<g:each in="${transactionEntries }" var="transactionEntry" status="status">	        
+					transaction.TransactionEntries.push({ 	Id: '${transactionEntry?.id}', 
+															Index: ${status}, 
+															Template: '${status==0?'#transaction-entry-template':'#lot-number-template'}',
+															ProductId: '${transactionEntry?.product?.id}', 
+															ProductName: '${transactionEntry?.product?.name}', 
+															LotNumber: '${transactionEntry?.inventoryItem?.lotNumber}', 
+															Description: '${transactionEntry?.inventoryItem?.description}', 
+															ExpirationDate: '', Qty: '${transactionEntry?.quantity}', 
+															StyleClass: '' });
+				</g:each>
 			</g:each>
-	        
+
+
+			/**
+			 * On load event 
+			 */	        
 	    	$(document).ready(function() {
 
-	    		var cache = {}, lastXhr;
-			    	
+				// Initialize table with the transaction entries from the server 
+				if (transaction.TransactionEntries.length > 0) { 
+					$.each(transaction.TransactionEntries, function(index, value) { 
+						if (value.ProductId) { 
+							$(value.Template).tmpl(value).appendTo('#transaction-entries-table > tbody');								
+						}
+					});
+					$("#transaction-entries-table > tbody tr.empty").hide();	
+					paintStripes($("#transaction-entries-table > tbody tr"));  
+				} 					    	
+
 		    	// Initialize the transaction type selector
 		    	initializeTypeSelector($("#transactionType\\.id"));
 		    	
 		    	// Initialize the product search autocomplete
 				$('#productSearch').addClass("fade");
-
 
 		    	
 		    	/**
@@ -71,8 +110,8 @@
 					initializeTypeSelector($(this));					
 				});
 				
-
-				/**
+				
+								/**
 				 * When product search becomes focus, we remove fade, reset values
 				 */
 		    	$('#productSearch').focus(function() { 
@@ -103,16 +142,18 @@
 					// Otherwise, add to the transaction entries array and display new row
 					else { 
 		    			var index = transaction.TransactionEntries.length;
-		    			var transactionEntry = { Id: 0, Index: index++, ProductId: productId, ProductName: productName, 
-		    	    			LotNumber: '', Description: '', ExpirationDate: '', Qty: 0, StyleClass: (index % 2) ? 'odd':'even' };
+		    			var transactionEntry = { Id: '(new)', Index: index++, ProductId: productId, ProductName: productName, 
+		    	    			LotNumber: '', Description: '', ExpirationDate: '', Qty: 0, StyleClass: '' };
 
     	    			// Add to the array
 		    			transaction.TransactionEntries.push(transactionEntry);
 
 		    			// Display new row in the table 
-		    			$("#unsavedTransactionEntryTable > thead").hide();
-		    			console.log("adding new row to transaction entry table");
-		    			$("#transactionEntryRowTemplate").tmpl(transactionEntry).appendTo('#unsavedTransactionEntryTable > tbody');		    			
+		    			//$("#transaction-entries-table > thead").hide();
+		    			$("#transaction-entry-template").tmpl(transactionEntry).appendTo('#transaction-entries-table > tbody');		
+		    			$("#transaction-entries-table > tbody tr.empty").hide();    
+		    			paintStripes($("#transaction-entries-table > tbody tr"));    
+		    						
 					}
 					$("#productSearch").trigger("focus");
 	    		});
@@ -121,39 +162,59 @@
 	    		/**
 	    		 * On click "addLotNumber", add new lot number row
 	    		 */
-	    		$(".addLotNumber").livequery(function() { 
+	    		$(".add-lot-number").livequery(function() { 
 	    			$(this).click(function(event) { 
 
 		    			var productId = $(this).siblings().filter("#product\\.id");
 	    				var index = transaction.TransactionEntries.length;
-		    			var transactionEntry = { Id: 0, Index: index++, ProductId: productId.attr('value'), ProductName: '', 
-		    	    			LotNumber: '', Description: '', ExpirationDate: '', Qty: 0, StyleClass: (index % 2) ? 'odd':'even' };
+		    			var transactionEntry = { 
+			    			Id: '(new)', 
+			    			Index: index++, 
+			    			ProductId: productId.val(), 
+			    			ProductName: '', 
+	    	    			LotNumber: '', 
+	    	    			Description: '', 
+	    	    			ExpirationDate: '', 
+	    	    			Qty: 0, 
+	    	    			StyleClass: '' 
+			    	    };
 						transaction.TransactionEntries.push(transactionEntry);
 		    			
-						var lotNumberTableBody = $(this).parent().parent().parent();
-						$("#lotNumberRowTemplate").tmpl(transactionEntry).appendTo(lotNumberTableBody);
+						//var lotNumberTableBody = $(this).parent().parent().parent();
+						//$("#lot-number-template").tmpl(transactionEntry).appendTo(lotNumberTableBody);
+						var tr = $(this).closest("tr");
+						console.log(tr);
+						var lotNumberTr = $("#lot-number-template").tmpl(transactionEntry);
+						console.log(lotNumberTr);
+						lotNumberTr.insertAfter(tr);
+						paintStripes($("#transaction-entries-table > tbody tr"));    
 						event.preventDefault();
+
+						
 	    			});
 		    	});
 
 
 	    		/**
-	    		 * On deleteLotNumber click, remove lot number row
+	    		 * On delete-lot-number click, remove lot number row
 	    		 */
-	    		$(".deleteLotNumber").livequery(function() { 
+	    		$(".delete-lot-number").livequery(function() { 
 	    			$(this).click(function(event) { 
 						console.log("remove lot number");
 		    			$(this).closest("tr").remove();
+		    			paintStripes($("#transaction-entries-table > tbody tr"));   
 	    			});
 	    		});
 
 	    		/**
-	    		 * On click of deleteProduct button, remove entire product row.
+	    		 * On click of delete-product button, remove entire product row.
 	    		 */
-	    		$(".deleteProduct").livequery(function(){
+	    		$(".delete-product").livequery(function(){
 					$(this).click(function(event) {
 						//event.preventDefault();
-						$(this).closest("tr").parent().parent().closest("tr").remove();
+						var rowClass = "tr.product-" + $(this).val();
+						$("#transaction-entries-table > tbody").find(rowClass).remove();
+						paintStripes($("#transaction-entries-table > tbody tr"));   
 					});
 			    });
 
@@ -218,7 +279,7 @@
     				
 	    		});
 
-	    		
+
 	    		/**
 	    		 * Bind autocomplete widget to the all .lotNumber input fields.  
 	    		 * The livequery feature allows us to bind the autocomplete 
@@ -274,59 +335,67 @@
 		    	
 	    	});
         </script>
-        <script id="transactionEntryRowTemplate" type="x-jquery-tmpl">
-			<tr id="product{{= Index }}" class="product">
-				<td colspan="3">
-					<table id="lotNumberTable{{= Index }}" class="lotNumberTable" border="1" width="100%" style="border: 1px solid lightgrey;">		
-						<tbody class="lotNumberTableBody">							
-							<tr class="{{= StyleClass}}">
-								<td width="5%">
-									<span class="fade">(new)</span>
-								</td>
-								<td width="35%">
-									{{= ProductName}}
-								</td>
-								<td width="25%">
-									<g:hiddenField name="transactionEntries[{{= Index}}].product.id" class="hiddeProductId" value="{{= ProductId}}"/>
-									<g:hiddenField name="transactionEntries[{{= Index}}].lotNumber" class="hiddenLotNumber" value=""/>
-									<g:textField name="lotNumber" value="" class="lotNumber" size="15"/>
-								</td>
-								<td width="5%">
-									<g:textField class="quantity" name="transactionEntries[{{= Index}}].quantity" size="3"/>
-								</td>
-								<td width="10%" nowrap="nowrap">
-									<g:hiddenField id="product.id" name="product.id" value="{{= ProductId}}"/>
-									<button type="button" class="addLotNumber">
-										<img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png')}"/>
-									</button>	
-									<button type="button" class="deleteProduct" value="{{= Index}}">
-										<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bin.png')}"/>
-									</button>
-								</td>
-							</tr>
+        
 
-						</tbody>
-					</table>
-				</td>
+        
+        <script id="transaction-entry-empty-template" type="x-jquery-tmpl">
+			<tr>
+				<td colspan="5">No products</td>
 			</tr>
-		</script>
-        <script id="lotNumberRowTemplate" type="x-jquery-tmpl">
-			<tr class="{{= StyleClass}}">
+        </script>
+        <script id="transaction-entry-template" type="x-jquery-tmpl">						
+			<tr id="product-lot-row-{{= Index }}" class="{{= StyleClass}} product-{{= ProductId}}">
 				<td width="5%">
+					<span class="fade">{{= Id }}</span>
 				</td>
 				<td width="35%">
+					{{= ProductName}} 
+					&nbsp; <a href="${createLink(controller: 'inventoryItem', action: 'showStockCard')}/{{= ProductId}}">show stock card</a>
+				</td>
+				<td width="25%">
+					<g:hiddenField name="transactionEntries[{{= Index}}].product.id" class="hiddeProductId" value="{{= ProductId}}"/>
+					<g:hiddenField name="transactionEntries[{{= Index}}].lotNumber" class="hiddenLotNumber" value="{{= LotNumber}}"/>
+					<g:textField name="lotNumber" value="" class="lotNumber" size="15" value="{{= LotNumber}}"/>
+				</td>
+				<td>
+
+				</td>
+				<td width="5%">
+					<g:textField class="quantity" name="transactionEntries[{{= Index}}].quantity" value="{{= Qty}}" size="3"/>
+				</td>
+				<td width="10%" nowrap="nowrap">
+					<g:hiddenField id="product.id" name="product.id" value="{{= ProductId}}"/>
+					<button type="button" class="add-lot-number">
+						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png')}"/>
+					</button>	
+					<button type="button" class="delete-product" value="{{= ProductId}}">
+						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bin.png')}"/>
+					</button>
+				</td>
+			</tr>        
+		</script>
+        <script id="lot-number-template" type="x-jquery-tmpl">
+			<tr id="product-lot-row-{{= Index }}" class="{{= StyleClass}} product-{{= ProductId}}">
+				<td width="5%">
+					<span class="fade">{{= Id }}</span>
+				</td>
+				<td width="35%">
+					
 				</td>
 				<td width="25%">
 					
 					<g:hiddenField name="transactionEntries[{{= Index}}].product.id" class="hiddenProductId" value="{{= ProductId}}"/>
-					<g:hiddenField name="transactionEntries[{{= Index}}].lotNumber" class="hiddenLotNumber" value=""/>
-					<g:textField name="lotNumber" class="lotNumber" size="15"/>
+					<g:hiddenField name="transactionEntries[{{= Index}}].lotNumber" class="hiddenLotNumber" value="{{= LotNumber}}"/>
+					<g:textField name="lotNumber" class="lotNumber" size="15" value="{{= LotNumber}}"/>
+				</td>
+				<td>
+
 				</td>
 				<td width="5%">
-					<g:textField class="quantity" name="transactionEntries[{{= Index}}].quantity" size="3"/>
+					<g:textField class="quantity" name="transactionEntries[{{= Index}}].quantity" value="{{= Qty}}" size="3"/>
 				</td>
 				<td width="10%">
-					<button class="deleteLotNumber">
+					<button class="delete-lot-number">
 						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png')}"/>	
 					</button>
 				</td>
@@ -348,79 +417,84 @@
 	            </div>
             </g:hasErrors>    
 
-			<div class="dialog">
+			<div class="dialog" >
 			
 				
 				<g:form action="saveNewTransaction">
 					<g:hiddenField name="id" value="${transactionInstance?.id}"/>
 					
-					<h2>Create New Transaction</h2>
-
-					<ul>
-						<li class="prop even">											
-							<label>ID</label>
-							<span class="value">
-								${transactionInstance.id }
-	                       	</span>
-						</li>
-						<li class="prop odd">											
+					<ul class="striped">
+						<li id="transaction-type-li" class="prop">											
 							<label>Transaction Type</label>
 							<span class="value">
 								<g:select name="transactionType.id" from="${transactionTypeList}" 
 		                       		optionKey="id" optionValue="name" value="${transactionInstance.transactionType?.id}" noSelection="['null': '']" />
 	                       	</span>
 						</li>
-						<li class="prop even">
+						<li id="transaction-date-li" class="prop transactionDate">
 							<label>Transaction Date</label>
 							<span class="value">
 								<g:jqueryDatePicker id="transactionDate" name="transactionDate"
 										value="${transactionInstance?.transactionDate}" format="MM/dd/yyyy"/>
 							</span>								
 						</li>
-						<li class="prop odd">
+						<li id="from-li"  lass="prop from">
 							<label>From</label>
 							<span class="value">
 								<g:select id="source.id" name="source.id" from="${warehouseInstanceList}" 
 		                       		optionKey="id" optionValue="name" value="${transactionInstance?.source?.id}" noSelection="['null': '']" />
                        		</span>
 						</li>
-						<li class="odd">
+						<li id="to-li" class="prop to">
 							<label>To</label>
 							<span class="value">
 								<g:select id="destination.id" name="destination.id" from="${warehouseInstanceList}" 
 		                       		optionKey="id" optionValue="name" value="${transactionInstance?.destination?.id}" noSelection="['null': '']" />
 							</span>
 						</li>
-						<li class="prop odd">
+						<li id="inventory-li" class="prop inventory">
 							<label>Inventory</label>
 							<span class="value">
 								<g:hiddenField name="inventory.id" value="${warehouseInstance?.inventory?.id}"/>
 								${warehouseInstance?.name }
 							</span>								
 						</li>
-						<li class="prop even">
-							<label>Items</label>
-							<div style="margin:1%; width: 60%; padding-left: 20%" class="value">
-								<div style="text-align: left; padding-bottom: 5px;">
-									<g:hiddenField id="productId" name="productId"/>
-									<g:hiddenField id="productName" name="productName"/>
-									<g:textField  id="productSearch" name="productSearch" value="Find another product to add" /> &nbsp;
-									<button id="addProduct" type="button">
-										<img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png')}"/>	
-									</button>							
-								</div>
-								<table id="transactionEntryTable" border="1" style="border: 1px solid lightgrey;">
-									<g:if test="${transactionInstance?.transactionEntries }">
-										<thead>
-											<tr class="header">
-												<th>ID</th>
-												<th>Product</th>
-												<th>ID / Serial / Exp Date</th>
-												<th>Qty</th>
-												<th>Actions</th>
-											</tr>
-										</thead>
-										<tbody>
+						<li id="add-product-li" class="prop lookup">
+							<label>Add a product</label>
+							<span class="value">
+								<g:hiddenField id="productId" name="productId"/>
+								<g:hiddenField id="productName" name="productName"/>
+								<g:textField  id="productSearch" name="productSearch" value="Find another product to add" /> &nbsp;
+								<button id="addProduct" type="button">
+									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png')}"/>	
+								</button>							
+							</span>
+							
+							<br clear="all"/>
+						</li>
+						<li id="transaction-entries-li" class="prop entries">
+							<div style="width: 100%;" >
+								
+								<table id="transaction-entries-table" border="1" style="border: 1px solid lightgrey; background-color: white;">
+									<thead>
+										<tr class="header">
+											<th>ID</th>
+											<th>Product</th>
+											<th>Lot / Serial Number</th>
+											<th>Expires</th>
+											<th>Qty</th>
+											<th>Actions</th>
+										</tr>
+									</thead>
+									<tbody>
+										<g:if test="${!transactionInstance?.transactionEntries }">
+											<tr class="empty"><td colspan="6" style="text-align: center"><span class="fade">empty</span></td></tr>
+										</g:if>
+										<!--  Empty to start -->
+										<%--
+										
+										<g:if test="${transactionInstance?.transactionEntries }">
+										
 											<g:set var="index" value="${0 }"/>
 											<g:set var="transactionMap" value="${transactionInstance?.transactionEntries.groupBy { it.product.name } }"/>
 											<g:each in="${transactionMap.keySet()}" var="key" >
@@ -454,39 +528,14 @@
 													<g:set var="index" value="${index+1 }"/>
 												</g:each>
 											</g:each>
-										</tbody>
-									</g:if>
-									<g:else>
-										<thead>
-											<tr>
-												<td>
-													<div id="" style="border: 1px dashed lightgrey; font-size: 1.5em; padding: 50px; vertical-align: middle; text-align: center;">
-														<span class="fade">Click 'save' to move items from Staging Area.</span>
-													</div>												
-												</td>
-											</tr>
-										</thead>
-									</g:else>									
-								</table>
-								<br/>
-								<table id="unsavedTransactionEntryTable" style="border: 1px solid lightgrey;">
-									<thead>
-										<td>
-											<div id="" style="border: 1px dashed lightgrey; font-size: 1.5em; padding: 50px; vertical-align: middle; text-align: center;">
-												<span class="fade">Staging Area</span>
-											</div>
-										</td>									
-									</thead>	
-									<tbody>
+										</g:if>
+										
+										 --%>
 									</tbody>
-																
-								</table>																
-								
+																	
+								</table>
 							</div>							
 						</li>						
-						
-						
-						
 					</ul>
 					
 					<ul>

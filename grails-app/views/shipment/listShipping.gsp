@@ -38,6 +38,7 @@
 	                            <g:sortableColumn property="eventDate" title="${message(code: 'shipment.eventDate.label', default: 'Event Date')}" />                            
 	                            <g:sortableColumn property="destination" title="${message(code: 'shipment.destination.label', default: 'Destination')}" />
 	                            <g:sortableColumn property="documents" title="${message(code: 'shipment.documents.label', default: 'Documents')}" />                              
+	                            <th></th>
 	                        </tr>
 	                    </thead>
 	                   
@@ -81,6 +82,10 @@
 													</div>
 												</g:each>							
 											</g:else>
+										</td>
+										<td>
+
+				
 										</td>
 			                        </tr>
 								</g:each>                    		

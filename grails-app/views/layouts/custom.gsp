@@ -26,6 +26,7 @@
 	<%--<jqui:resources theme="smoothness" /> --%> 
 	<link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
 	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-ui-1.8.7.js')}" type="text/javascript" ></script>
+	<%-- <script src="${createLinkTo(dir:'js/jquery-ui-1.9m3/ui/minified', file:'jquery-ui.min.js')}" type="text/javascript" ></script>--%>
 	
 	<!-- Include other plugins -->
 	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>

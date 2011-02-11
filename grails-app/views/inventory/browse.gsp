@@ -7,6 +7,10 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'inventory.label', default: 'Inventory')}" />
         <title><g:message code="default.browse.label" args="[entityName]" /></title>    
+        
+		<style>
+			.data-table td, .data-table th { height: 3em; vertical-align: middle; }
+		</style>        
     </head>    
     <body>
         <div class="body">
@@ -25,7 +29,7 @@
             
 			<table>
 				<tr>
-					<td style="width: 150px; border-right: 1px solid lightgrey;">             
+					<td style="width: 150px; border: 1px solid lightgrey;">             
 						<g:render template="/common/searchCriteriaVertical" model="[productInstanceList: commandInstance?.productList, categoryFilters: commandInstance?.categoryFilters, rootCategory: commandInstance?.rootCategory]"/>					
              
 
@@ -55,7 +59,7 @@
 							</div>
 		            		<g:if test="${commandInstance?.productList }">
 		            			<div style="overflow: auto; height: 400px;">
-			            			<table>         		
+			            			<table class="data-table">         		
 										<tbody>
 											<g:set var="totalQuantity" value="${0 }"/>
 											<g:each var="productInstance" in="${commandInstance?.productList }" status="i">											 	

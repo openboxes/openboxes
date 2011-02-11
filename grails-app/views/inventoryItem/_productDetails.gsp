@@ -8,14 +8,15 @@ fieldset table td { padding: 6px; }
 	
 <div id="productDetails">
 	<fieldset>
-		<legend class="fade">Product Details</legend>
+		<legend class="fade">${productInstance?.name }</legend>
 		<table>
 			<tr class="odd">	
 				<td style="text-align: left;">
-					<span class="name">Description</span>
+					<span class="name">On-Hand Quantity</span>
 				</td>
 				<td>
-					<span class="value">${productInstance?.name }</span>
+					<span class="value">
+						<b>${totalQuantity }</b></span> units
 				</td>
 				<td></td>
 			</tr>
@@ -24,7 +25,7 @@ fieldset table td { padding: 6px; }
 					<span class="name">Category</span>
 				</td>
 				<td>
-					<span class="value">${productInstance?.category?.name }
+					<span class="value">${productInstance?.category?.name }</span>
 				</td>
 				<td></td>
 			</tr>

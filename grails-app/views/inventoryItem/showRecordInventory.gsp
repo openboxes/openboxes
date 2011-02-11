@@ -365,7 +365,6 @@
 											<th>Description</th>
 											<th style="text-align:center;">Old Qty</th>
 											<th style="text-align:center;">New Qty</th>
-											<th></th>
 										</tr>											
 									</thead>
 									<tbody>
@@ -405,10 +404,8 @@
 													${recordInventoryRow?.oldQuantity }	
 													<g:hiddenField name="recordInventoryRows[${status}].oldQuantity" value="${recordInventoryRow?.oldQuantity }"/>
 												</td>	
-												<td width="10%" style="text-align: center; vertical-align: middle;">
-													<g:textField style="text-align: center;" id="newQuantity-${status }" name="recordInventoryRows[${status }].newQuantity" size="3" value="${recordInventoryRow?.newQuantity }" onFocus="this.select();" onClick="this.select();"/>
-												</td>	
-												<td width="10%" style="text-align: center;">
+												<td width="20%" style="text-align: center; vertical-align: middle;">
+													<g:textField style="text-align: center;" id="newQuantity-${status }" class="newQuantity" name="recordInventoryRows[${status }].newQuantity" size="3" value="${recordInventoryRow?.newQuantity }" onFocus="this.select();" onClick="this.select();"/>
 													<button id="${status }" class="buttonUp">
 														<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_up.png') }"/>
 													</button>
@@ -492,8 +489,7 @@
 	<td width="10%" style="text-align: center; vertical-align: middle;">
 		<g:textField style="text-align: center;"  
 			id="newQuantity-{{= getIndex()}}" class="newQuantity" name="recordInventoryRows[{{= getIndex()}}].newQuantity" size="3" value="{{= Qty}}" onFocus="this.select();" onClick="this.select();"/>
-	</td>	
-	<td width="10%" style="text-align: center;">
+
 		<button id="buttonUp-{{= getIndex()}}" class="buttonUp">
 			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_up.png') }"/>
 		</button>

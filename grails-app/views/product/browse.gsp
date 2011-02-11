@@ -6,7 +6,9 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'product.label', default: 'Product')}" />
         <title><g:message code="default.browse.label" args="[entityName]" /></title>
-
+		<style>
+			.data-table td, .data-table th { height: 3em; vertical-align: middle; }
+		</style>
     </head>    
     <body>
         <div class="body">
@@ -17,6 +19,7 @@
 				<div class="message">${flash.message}</div>
             </g:if>		
             <div>            
+            
 				<table>
 				
 					<%-- 
@@ -33,8 +36,8 @@
 						</td>
 					</tr>
 					--%>
-					<tr>
-						<td width="25%" style="border-right: 1px solid lightgrey;">	
+					<tr >
+						<td width="25%" style="border: 1px solid lightgrey;">	
 						
 							<g:render template="/common/searchCriteriaVertical"	/>				
 							<%-- 		
@@ -81,7 +84,7 @@
 							<g:set var="attributeList" value="${org.pih.warehouse.product.Attribute.list() }"></g:set>
 							<g:if test="${productsByCategory }">
 								<div>
-		            				<table border="0">
+		            				<table border="0" >
 	          							<thead>
 			            					<tr class="odd">
 		            							<th width="5%">ID</th>
@@ -91,14 +94,14 @@
 		            								<th>${attribute.name }</th>
 		            							</g:each>
 		            							--%>
-		            							<th width="27%">Primary Category</th>
+		            							<th width="25%">Primary Category</th>
 		            							<th width="10%" style="text-align: center;">Cold Chain</th>
 		            						</tr>
 		            					</thead>
 		            				</table>
 		            			</div>
 		            			<div style="overflow: auto; height: 400px;">
-		            				<table bprder="0">
+		            				<table border="0" class="data-table">
 				            			<tbody>
 											<g:set var="index" value="${0 }"/>
 						            		<g:each var="key" in="${productsByCategory.keySet() }">
@@ -110,7 +113,9 @@
 															</g:link>
 													 	</td>
 														<td width="25%">
-															${fieldValue(bean: productInstance, field: "name") }
+															<g:link action="edit" id="${productInstance.id}">
+																${fieldValue(bean: productInstance, field: "name") }
+															</g:link>
 															<span class="fade">${productInstance?.productCode }</span>
 														</td>
 														<%--
@@ -118,8 +123,12 @@
 				            								<td></td>
 				            							</g:each>
 				            							 --%>
-				            							<td width="25%">${productInstance?.category?.name }</td>
-				            							<td width="10%" style="text-align: center;">${(productInstance?.coldChain)?"Yes":"No" }</td>
+				            							<td width="25%">
+				            								${productInstance?.category?.name }
+				            							</td>
+				            							<td width="10%" style="text-align: center;">
+				            								${(productInstance?.coldChain)?"Yes":"No" }
+				            							</td>
 													</tr>							            			
 						            			</g:each>
 						            		</g:each>
