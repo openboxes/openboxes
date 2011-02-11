@@ -62,7 +62,7 @@
 			 * Initialize the transaction entry array
 			 */
 	        var transaction = { TransactionEntries: [] };
-	        <g:set var="transactionMap" value="${transactionInstance?.transactionEntries.groupBy { it?.product?.name } }"/>
+	        <g:set var="transactionMap" value="${transactionInstance?.transactionEntries?.groupBy { it?.product?.name } }"/>
 			<g:each in="${transactionMap.keySet()}" var="key" >
 				<g:set var="transactionEntries" value="${transactionMap.get(key) }"/>
 				<g:each in="${transactionEntries }" var="transactionEntry" status="status">	        
