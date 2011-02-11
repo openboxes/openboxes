@@ -62,22 +62,23 @@
 			 * Initialize the transaction entry array
 			 */
 	        var transaction = { TransactionEntries: [] };
-	        <g:set var="transactionMap" value="${transactionInstance?.transactionEntries?.groupBy { it?.product?.name } }"/>
-			<g:each in="${transactionMap.keySet()}" var="key" >
-				<g:set var="transactionEntries" value="${transactionMap.get(key) }"/>
-				<g:each in="${transactionEntries }" var="transactionEntry" status="status">	        
-					transaction.TransactionEntries.push({ 	Id: '${transactionEntry?.id}', 
-															Index: ${status}, 
-															Template: '${status==0?'#transaction-entry-template':'#lot-number-template'}',
-															ProductId: '${transactionEntry?.product?.id}', 
-															ProductName: '${transactionEntry?.product?.name}', 
-															LotNumber: '${transactionEntry?.inventoryItem?.lotNumber}', 
-															Description: '${transactionEntry?.inventoryItem?.description}', 
-															ExpirationDate: '', Qty: '${transactionEntry?.quantity}', 
-															StyleClass: '' });
+	        <g:if test="${!transactionInstance?.transactionEntries }">
+		        <g:set var="transactionMap" value="${transactionInstance?.transactionEntries?.groupBy { it?.product?.name } }"/>
+				<g:each in="${transactionMap?.keySet()}" var="key" >
+					<g:set var="transactionEntries" value="${transactionMap?.get(key) }"/>
+					<g:each in="${transactionEntries }" var="transactionEntry" status="status">	        
+						transaction.TransactionEntries.push({ 	Id: '${transactionEntry?.id}', 
+																Index: ${status}, 
+																Template: '${status==0?'#transaction-entry-template':'#lot-number-template'}',
+																ProductId: '${transactionEntry?.product?.id}', 
+																ProductName: '${transactionEntry?.product?.name}', 
+																LotNumber: '${transactionEntry?.inventoryItem?.lotNumber}', 
+																Description: '${transactionEntry?.inventoryItem?.description}', 
+																ExpirationDate: '', Qty: '${transactionEntry?.quantity}', 
+																StyleClass: '' });
+					</g:each>
 				</g:each>
-			</g:each>
-
+			</g:if>
 
 			/**
 			 * On load event 
