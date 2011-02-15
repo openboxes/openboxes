@@ -120,10 +120,6 @@ class ShipmentService {
 	}
 	
 	
-	
-	
-	
-	
 	List<Shipment> getShipments() { 		
 		
 		return getAllShipments()
@@ -215,7 +211,6 @@ class ShipmentService {
 	/**
 	 * Saves a shipment
 	 */
-	
 	void saveShipment(Shipment shipment) {
 		if (shipment) {
 			// if this is shipment has no events (i.e., it is a new shipment) set it as pending
@@ -236,9 +231,15 @@ class ShipmentService {
 	/**
 	 * Saves a container
 	 */
-	
 	void saveContainer(Container container) {
 		container.save(flush:true)
+	}
+	
+	/**
+	 * Saves an item
+	 */
+	void saveShipmentItem(ShipmentItem item) {
+		item.save(flush:true)
 	}
 	
 	/**
@@ -262,7 +263,16 @@ class ShipmentService {
 		// remove the container itself from the parent shipment
 		shipment?.containers?.remove(container)
 			
-		saveShipment(shipment)
-		//container.delete()	
+		saveShipment(shipment)	
+	}
+	
+	/**
+	 * Deletes a shipment item
+	 */
+	void deleteShipmentItem(ShipmentItem item) {
+		// remove the item from the associated shipment
+		item.shipment.shipmentItems.remove(item)
+		
+		saveShipment(item.shipment)
 	}
 }

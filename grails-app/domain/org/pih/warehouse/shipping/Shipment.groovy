@@ -37,8 +37,11 @@ class Shipment implements Serializable {
 	//Event mostRecentEvent			// a reference to the most recent event (needed for querying)
 	
 	// One-to-many associations
-	SortedSet events;
+	// these sorted sets don't work because sets aren't allowed to have identical items
+	//SortedSet events;
 	SortedSet containers;
+	//SortedSet shipmentItems;
+	
 	List documents;
 	List comments;
 	List referenceNumbers;
@@ -206,5 +209,21 @@ class Shipment implements Serializable {
 		return new EventType(sortOrder: 0, name: "Invalid", description: "Shipment has no current status and should be fixed");
 	}
 		
+	/**
+	 * Adds a new container to the shipment of the specified type
+	 */
+	Container addNewContainer (ContainerType containerType) {
+		def sortOrder = (this.containers) ? this.containers.size()+1 : 1
+		
+		def container = new Container(
+			containerType: containerType, 
+			shipment: this,
+			sortOrder: sortOrder
+		)
+		
+		this.addToContainers(container)
+			
+		return container
+	}
 }
 

@@ -40,5 +40,15 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 		donor(nullable:true)
 	}
     
-	int compareTo(obj) { product.name.compareTo(obj.product.name) }
+	int compareTo(obj) { 
+		if (!product || !product.name) {
+			return -1
+		}
+		else if (!obj || !obj.product || !obj.product.name) {
+			return 1;
+		}
+		else {
+			return product.name.compareTo(obj.product.name) 
+		}
+	}
 }

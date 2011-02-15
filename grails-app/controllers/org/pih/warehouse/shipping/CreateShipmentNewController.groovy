@@ -2,10 +2,9 @@ package org.pih.warehouse.shipping
 
 import org.apache.poi.hssf.record.formula.functions.NumericFunction.OneArg;
 
-class CreateShipmentNewController {
+import sun.util.logging.resources.logging;
 
-	// TODOS:
-	// confirm that it can load up an existing shipment by id
+class CreateShipmentNewController {
 	
 	ShipmentService shipmentService
 	
@@ -30,7 +29,7 @@ class CreateShipmentNewController {
     		
     	enterShipmentDetails {
     		on("next") {
-    			flow.shipmentInstance.properties = params
+    			bindData(flow.shipmentInstance, params)
     			
     			if(flow.shipmentInstance.hasErrors() || !flow.shipmentInstance.validate()) { 
 					return error()
@@ -41,7 +40,7 @@ class CreateShipmentNewController {
     		}.to("enterTrackingDetails")
     		
     		on("save") {
-    			flow.shipmentInstance.properties = params
+    			bindData(flow.shipmentInstance, params)
     			
     			if(flow.shipmentInstance.hasErrors() || !flow.shipmentInstance.validate()) { 
 					return error()
@@ -63,7 +62,7 @@ class CreateShipmentNewController {
     		}.to("enterShipmentDetails")
     		
     		on("next") {
-    			flow.shipmentInstance.properties = params
+    			bindData(flow.shipmentInstance, params)
     			
     			if(flow.shipmentInstance.hasErrors() || !flow.shipmentInstance.validate()) { 
 					return error()
@@ -75,7 +74,7 @@ class CreateShipmentNewController {
     		}.to("enterContainerDetails")
     		
     		on("save") {
-    			flow.shipmentInstance.properties = params
+    			bindData(flow.shipmentInstance, params)
     			
     			if(flow.shipmentInstance.hasErrors() || !flow.shipmentInstance.validate()) { 
 					return error()
@@ -107,48 +106,109 @@ class CreateShipmentNewController {
 			
 			on("cancel").to("finish")
     		
-    		on("addContainer") {				
-    			def sortOrder = (flow.shipmentInstance?.containers) ? flow.shipmentInstance?.containers?.size()+1 : 1
-				def name = sortOrder as String
-				
-				def container = new Container(
-					name: name, 
-					containerType:ContainerType.findByName(params.type), 
-					shipment: flow.shipmentInstance,
-					sortOrder: sortOrder
-				)
-				
-				flow.shipmentInstance?.addToContainers(container)
-						
-				shipmentService.saveShipment(flow.shipmentInstance)		
-			}.to("enterContainerDetails")	
-    	
-			on("editContainer") {
-				def container = Container.get(params.id)
-				
-				container.properties = params
-				
-				if(container.hasErrors() || !container.validate()) { 
-					return error()
-    			}
-    			else {
-    				shipmentService.saveContainer(container)
-    			}	
-			}.to("enterContainerDetails")
+			on("saveContainer").to("saveContainerAction")
 			
 			on("deleteContainer") {
-				def container = Container.get(params.id)
-				
+				def container = Container.get(params.id)	
 				shipmentService.deleteContainer(container)
 			}.to("enterContainerDetails")
 			
 			on("cancelContainer").to("enterContainerDetails")
 			
-		
+			on("saveItem").to("saveItemAction")
+			
+			on("deleteItem"){
+				def item = ShipmentItem.get(params.item.id)
+				shipmentService.deleteShipmentItem(item)
+			}.to("enterContainerDetails")
+			
+			on("cancelItem").to("enterContainerDetails")
+			
+			on("addBox"){
+				// this parameter triggers the "Add Box" for the container to be opened on page reload 
+				flash.addBox = params.id as Integer
+			}.to("saveContainerAction")
+			
+			on("addItem") {
+				// this parameter triggers the "Add Item" for the container to be opened on page reload 
+				flash.addItem = params.id as Integer
+			}.to("saveContainerAction")
+			
+			on("addAnotherItem") {
+				// this parameter triggers the "Add Item" for the container to be opened on page reload
+				flash.addItem = params.container.id as Integer
+			}.to("saveItemAction")
+    	}
+    	
+    	saveContainerAction {
+    		action {
+    			def container
+				
+				// fetch the existing container if this is an edit, otherwise add a container to this shipment
+				if (params.id) {
+					container = Container.get(params.id)
+				}
+				else {
+					def containerType = ContainerType.findByName(params.type)
+					if (!containerType) {
+						throw new Exception("Invaild container type passed to editContainer action.")
+					}
+					
+					container = flow.shipmentInstance.addNewContainer(containerType)
+				}
+				
+				bindData(container,params)
+				
+				// TODO: make sure that this works properly if there are errors?
+				if(container.hasErrors() || !container.validate()) { 
+					invalid()
+    			}
+    			else {
+    				shipmentService.saveContainer(container)
+    				valid()
+    			}	
+    		}
+    		
+    		on("valid").to("enterContainerDetails")
+    		on("invalid").to("enterContainerDetails")
+    	}
+    
+    	saveItemAction {
+    		action {
+    			def item
+    			
+    			// fetch the existing item if this is an edit, otherwise add an item to this shipment
+				if (params.item?.id) {
+					item = ShipmentItem.get(params.item?.id)
+				}
+				else {
+					def container = Container.get(params.container?.id)
+					
+					if (!container) {
+						throw new Exception("Invaild container passed to editItem action.")
+					}
+					item = container.addNewItem()
+				}
+    			
+    			bindData(item,params)
+				
+				// TODO: make sure that this works properly if there are errors?
+				if(item.hasErrors() || !item.validate()) { 
+					invalid()
+    			}
+    			else {
+    				shipmentService.saveShipmentItem(item)
+    				valid()
+    			}	
+    		}
+    		
+    		on("valid").to("enterContainerDetails")
+    		on("invalid").to("enterContainerDetails")
     	}
     	
     	finish {
     		redirect(controller:"shipment", action : "listShipping")
     	}
     }
+	
 }
