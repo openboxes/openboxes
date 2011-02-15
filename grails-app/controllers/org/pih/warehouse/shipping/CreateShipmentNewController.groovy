@@ -115,6 +115,8 @@ class CreateShipmentNewController {
 			
 			on("cancelContainer").to("enterContainerDetails")
 			
+			on("saveBox").to("saveBoxAction")
+			
 			on("saveItem").to("saveItemAction")
 			
 			on("deleteItem"){
@@ -173,6 +175,58 @@ class CreateShipmentNewController {
     		on("invalid").to("enterContainerDetails")
     	}
     
+    	saveBoxAction {
+    		action {
+    			
+    			// first handle the box
+    			def box
+				
+				// fetch the existing container if this is an edit, otherwise add a container to this shipment
+				if (params.box?.id) {
+					box = Container.get(params.box.id)
+				}
+				else {
+					// if not, get the container that we are adding the box to
+					def container = Container.get(params.container.id)
+					box = container.addNewContainer(ContainerType.findByName("Box"))
+				}
+				
+    			// NOTE: remember if we add fields, we need to add them here; need to white-list them since one form is populating two objects
+				box.properties['name','height','width','length','weight'] = params
+				
+				// TODO: make sure that this works properly if there are errors?
+				if(box.hasErrors() || !box.validate()) { 
+					invalid()
+    			}
+				else {
+					shipmentService.saveContainer(box)
+				}
+				
+				// now add the item, if one has been specified
+				if (params.product) {
+			
+					def item = box.addNewItem()
+					
+					// NOTE: remember if we add fields, we need to add them here; need to white-list them since oen form is populating two objects
+					item.properties['product','quantity','lotNumber','recipient'] = params
+					
+					// TODO: make sure that this works properly if there are errors?
+					if(item.hasErrors() || !item.validate()) { 
+						invalid()
+	    			}
+					else {
+						shipmentService.saveShipmentItem(item)
+					}
+				}
+
+				valid()
+    		}
+    		
+    		
+			on("valid").to("enterContainerDetails")
+    		on("invalid").to("enterContainerDetails")
+    	}
+    	
     	saveItemAction {
     		action {
     			def item
@@ -190,7 +244,7 @@ class CreateShipmentNewController {
 					item = container.addNewItem()
 				}
     			
-    			bindData(item,params)
+    			bindData(item, params)
 				
 				// TODO: make sure that this works properly if there are errors?
 				if(item.hasErrors() || !item.validate()) { 

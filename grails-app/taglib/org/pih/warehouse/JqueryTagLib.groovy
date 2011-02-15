@@ -6,7 +6,7 @@ import org.pih.warehouse.core.Person;
 class JqueryTagLib {
 		
 	def autoSuggest = { attrs, body ->
-		def id = attrs.id
+		def id = (attrs.id) ? attrs.id : "autoSuggest_" + (new Random()).nextInt()
 		def name = attrs.name	
 		def valueId = (attrs.valueId)?attrs.valueId:"";
 		def valueName = (attrs.valueName)?attrs.valueName:"";

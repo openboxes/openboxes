@@ -35,6 +35,7 @@
 						</thead>
 						<g:set var="count" value="${0 }"/>	
 						<g:each var="containerInstance" in="${shipmentInstance?.containers}">
+						<g:if test="${!containerInstance.parentContainer}">  <!--  only list top-level containers -->
 							<tbody>
 								<tr class="${count++%2==0?'odd':'even' }">
 									<td style="width:30%;">
@@ -66,6 +67,7 @@
 											</g:link>
 										</span>
 										<g:render template="editItem" model="['containerInstance':containerInstance, 'addItem':addItem]"/>
+										<g:render template="editBox" model="['containerInstance':containerInstance, 'addBox':addBox]"/>
 									</td>
 								</tr>
 								
@@ -98,8 +100,10 @@
 									<tr class="${count++%2==0?'odd':'even' }">
 										<td>
 											<span style="padding-left: 32px;">
+											<a href="#" id="btnEditBox-${boxInstance?.id}">
 												<img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" alt="Package" style="vertical-align: middle"/>
-												&nbsp;${boxInstance?.containerType?.name} ${boxInstance?.name}
+												&nbsp;${boxInstance?.name}
+											</a>
 											</span>
 										</td>
 										<td style="text-align:center;">-</td>
@@ -115,7 +119,7 @@
 												<img src="${createLinkTo(dir:'images/icons/silk',file:'package_delete.png')}" alt="Add an item" style="vertical-align: middle"/>
 												&nbsp;remove box
 											</g:link>
-											
+											<g:render template="editBox" model="['boxInstance':boxInstance]"/>
 											<g:render template="editItem" model="['containerInstance':boxInstance,'addItem':addItem]"/>															
 										</td>
 									</tr>
@@ -146,7 +150,8 @@
 										</g:if>
 									</g:each>												
 								</g:each>
-							</tbody>											
+							</tbody>
+						</g:if>											
 						</g:each>
 						<tfoot>
 							<tr class="${count++%2==0?'odd':'even' }">

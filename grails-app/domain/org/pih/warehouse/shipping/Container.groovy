@@ -74,12 +74,30 @@ class Container implements Comparable, java.io.Serializable {
 		return containerType.name + "-" + name
 	}
 	
+	/**
+	 * Adds a new container to this container of the specified type
+	 */
+	Container addNewContainer (ContainerType containerType) {
+		def sortOrder = (this.containers) ? this.containers.size()+1 : 1
+		
+		def container = new Container(
+			containerType: containerType, 
+			shipment: this,
+			sortOrder: sortOrder
+		)
+		
+		this.addToContainers(container)
+		this.shipment.addToContainers(container)
+		
+		return container
+	}
+	
 	
 	/**
 	 * Adds a new item to the container
 	 */
 	ShipmentItem addNewItem () {
-			
+		
 		def item = new ShipmentItem(
 			container: this, 
 			shipment: this.shipment
