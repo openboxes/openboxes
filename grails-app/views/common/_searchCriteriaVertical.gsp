@@ -15,14 +15,18 @@
  				</td>
 			</tr>
 			<tr>
+				<td colspan="3">				
+					<label>Category </label>
+				</td>
+			</tr>
+			<tr>
 				<td>
 					<table>
 						<g:each var="categoryFilter" in="${categoryFilters }" status="status">
-							<tr>
-								<td width="5%">
-									<g:if test="${status!=0 }"><label>OR</label></g:if>
-								</td>
+							<tr class="prop ${status%2?'even':'odd' }">
 								<td style="text-align: left;">
+									<g:if test="${status!=0 }"><label>OR</label></g:if>
+									<g:else><label>=</label></g:else>
 									${categoryFilter?.name }
 								</td>
 								<td style="text-align: right">
@@ -32,11 +36,8 @@
 								</td>
 							</tr>
 						</g:each>
-						<tr>
-							<td>
-								<label>OR</label>
-							</td>
-							<td>
+						<tr class="prop">
+							<td colspan="2">
 								<g:form action="addCategoryFilter">
 									<select id="categoryFilter" name="categoryId" >
 										<option value="">Search by category</option>
@@ -45,12 +46,9 @@
 								</g:form>
 							</td>
 						</tr>
-						<tr style="border-top: 0px solid lightgrey;">
+						<tr class="prop">
 							<td style="text-align: right;">
-								<label>=></label>
-							
-							</td>
-							<td style="text-align: left;" >
+								<label></label>
 								<span class="fade">Returned ${productInstanceList?.size() } product(s)</span>			
 							</td>
 							<td>

@@ -32,7 +32,7 @@
 				<table>
 					<tr>
 						<td style="width:250px;">
-							<g:render template="productDetails" model="[productInstance:itemInstance.product, inventoryLevelInstance: inventoryLevelInstance, totalQuantity: commandInstance?.totalQuantity]"/>
+							<g:render template="productDetails" model="[productInstance:itemInstance.product, inventoryInstance: inventoryInstance, inventoryLevelInstance: inventoryLevelInstance, totalQuantity: commandInstance?.totalQuantity]"/>
 						</td>
 						<td>
 							<g:form action="saveInventoryItem">

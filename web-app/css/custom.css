@@ -38,9 +38,7 @@ body {
 #productDetails { 
 	width: 250px;
 }
-.actionsMenu { 
-	font-size: 1.2em;
-	
+.actionsMenu { 	
 	text-align: left; 
 	padding: 5px;
 }

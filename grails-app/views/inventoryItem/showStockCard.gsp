@@ -24,38 +24,36 @@
 			</g:hasErrors>
 			
 			
-			<div class="dialog">		
+			<div class="dialog" style="min-height: 880px">		
 			
-				<div style="float: left; margin-left: 15px;">	
+				<div class="actionsMenu" style="float: left; margin-left: 15px;">	
 					<span>		
-						
-						<g:link controller="inventory" action="browse" >
-							&lsaquo; Back to Inventory
-						</g:link>
+						<g:link controller="inventory" action="browse" >&lsaquo; Back to Inventory</g:link>
 					</span>
 				</div>
 				
 				<div class="actionsMenu" style="float: right; margin-right: 15px;">					
-					
-					<label>Actions:</label>
-					<span style="margin-right: 15px;">
-						<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
-						<g:link controller="inventoryItem" action="showRecordInventory" params="['product.id':commandInstance?.productInstance?.id,'inventory.id':commandInstance?.inventoryInstance?.id]">
-							Record inventory
-						</g:link>
-					</span>
-					<%-- 
-					<img src="${resource(dir: 'images/icons/silk', file: 'magnifier.png')}"/>
-					<g:link controller="inventoryItem" action="showTransactions" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
-						Show changes
-					</g:link>
-					--%>
-					<span>
-						<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}"/>
-						<g:link controller="inventoryItem" action="createInventoryItem" params="['product.id':commandInstance?.productInstance?.id,'inventory.id':commandInstance?.inventoryInstance?.id]">
-							Add item to inventory
-						</g:link>
-					</span>	
+					<ul>
+						<li>
+							<label>Actions:</label>
+						</li>
+						<li>
+							<g:link controller="inventoryItem" action="showRecordInventory" params="['product.id':commandInstance?.productInstance?.id,'inventory.id':commandInstance?.inventoryInstance?.id]">
+								<button class="positive">
+									<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
+									Record inventory
+								</button>
+							</g:link>
+						</li>
+						<li>
+							<g:link class="new button" controller="inventory" action="createTransaction">
+								<button class="positive">
+									<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}"/>
+									Add new transaction
+								</button>
+							</g:link>
+						</li>	
+					</ul>					
 				</div>
 				
 				<br clear="all">
@@ -69,15 +67,16 @@
 						
 							<div style="min-height: 200px;"> 					
 								<fieldset>	
-									<legend class="fade">Current Stock</legend>	
+									<legend class="fade">In Stock</legend>	
 									<div id="inventoryView" style="text-align: right;">										
-										<table border="0" style="border:1px solid #f5f5f5" width="100%">
+										<table border="0" style="border:1px solid #f5f5f5;" >
 											<thead>
-												<tr class="odd">
-													<th>Description</th>
+												<tr class="even">
 													<th>Lot Number</th>
 													<th>Expires</th>
+													<th>Description</th>
 													<th style="text-align: center;" >Qty</th>
+													<th style="text-align: right;">Actions</th>
 												</tr>											
 											</thead>
 											<tbody>
@@ -88,169 +87,253 @@
 														</td>
 													</tr>
 												</g:if>
-											
-												<g:each var="itemInstance" in="${commandInstance?.inventoryItemList }" status="status">				
-													<tr class="${(status%2==0)?'even':'odd' } prop">
-														<td>${(itemInstance?.description)?:'<span class="fade">None</span>'}</td>
-														<td>${itemInstance?.lotNumber?:'<span class="fade">EMPTY</span>' }</td>
-														<td>
-															<g:if test="${itemInstance?.expirationDate}">
-																<g:formatDate date="${itemInstance?.expirationDate }" format="dd/MMM/yy" />
-															</g:if>
-															<g:else>
-																<span class="fade">never</span>
-															</g:else>
-														</td>
-														<td style="text-align: center;">
-														
-															${commandInstance.quantityByInventoryItemMap.get(itemInstance) }
-														
-														</td>														
-													
-													</tr>
+												<g:set var="count" value="${0 }"/>
+												<g:each var="itemInstance" in="${commandInstance?.inventoryItemList }" status="status">	
+													<g:if test="${commandInstance.quantityByInventoryItemMap.get(itemInstance)!=0}">			
+														<tr class="${(count++%2==0)?'odd':'even' } prop">
+															<td>
+																
+																${itemInstance?.lotNumber?:'<span class="fade">EMPTY</span>' }
+																<g:link action="show" controller="inventoryItem" id="${itemInstance?.id }">
+																</g:link>
+															</td>
+															<td>
+																<g:if test="${itemInstance?.expirationDate}">
+																	<g:formatDate date="${itemInstance?.expirationDate }" format="dd/MMM/yy" />
+																</g:if>
+																<g:else>
+																	<span class="fade">never</span>
+																</g:else>
+															</td>
+															<td>
+																${(itemInstance?.description)?:'<span class="fade">None</span>'}
+															</td>
+															<td style="text-align: center;">
+																<g:set var="itemQuantity" value="${commandInstance.quantityByInventoryItemMap.get(itemInstance) }"/>
+																<g:set var="styleClass" value=""/>
+																<g:if test="${itemQuantity<0}">
+																	<g:set var="styleClass" value="color: red;"/>																	
+																</g:if>
+																<span style="${styleClass}">${itemQuantity }</span>
+															</td>	
+															
+															<td style="text-align: right;" width="100px">
+																<g:link controller="inventoryItem" action="showRecordInventory" params="['product.id':commandInstance?.productInstance?.id,'inventory.id':commandInstance?.inventoryInstance?.id, 'inventoryItem.id':itemInstance?.id]">
+																	<button class="positive">
+																		<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
+																		Adjust
+																	</button>
+																</g:link>
+															</td>													
+														</tr>
+													</g:if>
 												</g:each>
 											</tbody>
 											<tfoot>
-												<tr style="height: 3em;">
-													<th colspan="3" style="text-align: right;"></th>
-													<th style="text-align: center; font-size: 1.5em; vertical-align: middle">
-														${commandInstance.totalQuantity }</th>
+												<tr class="prop" style="height: 3em;">
+													<td colspan="3" style="text-align: left; font-size: 1.5em; vertical-align: middle;">
+														Net total
+													</td>
+													<td style="text-align: center; font-size: 1.5em; vertical-align: middle">
+														${commandInstance.totalQuantity }</td>
 												</tr>
 											</tfoot>
 										</table>										
 									</div>			
 								</fieldset>
 							</div>
-							<br/>						
+						</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>
 							<div>							
 								<fieldset>
-									<legend><span class="fade">Transaction Log</span></legend>
-									<div style="padding: 10px;">
-										<g:form method="GET" action="showStockCard">
-											<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
-											<label>Filter transactions: </label>
-											<span>
-												<g:jqueryDatePicker 
-													id="startDate" 
-													name="startDate" 
-													value="${commandInstance?.startDate }" 
-													format="MM/dd/yyyy"
-													showTrigger="false" />
-											</span>
-											<span> - </span>
-											<span> 
-												<g:jqueryDatePicker 
-													id="endDate" 
-													name="endDate" 
-													value="${commandInstance?.endDate }" 
-													format="MM/dd/yyyy"
-													showTrigger="false" />
-											</span>
-											<span>
-												<g:select name="transactionType.id" 
-													from="${org.pih.warehouse.inventory.TransactionType.list()}" 
-													optionKey="id" optionValue="name" value="${commandInstance?.transactionType?.id }" 
-													noSelection="['0': '-- All types --']" /> 
-											</span>
-											<span class="buttons">
-												<g:submitButton name="filter" value="Go"/>
-											</span>
-										</g:form>
-									</div>		
+									<legend><span class="fade">Recent Transactions</span></legend>
+									
+									
 									<script>
 										jQuery(document).ready(function() {
-											jQuery("tr.transactionEntry").hide();
-
 											jQuery(".toggleDetails").click(function(event) {
-												event.preventDefault();
-												jQuery("tr.transaction" + this.id).toggle();								
+												//event.preventDefault();
 											});
+											/*
+											jQuery(".toggleDetails").mouseover(function(event) {
+												console.log(this.id);
+												jQuery("#transactionEntries" + this.id).toggle('slow');								
+											});
+											jQuery(".toggleDetails").mouseout(function(event) {
+												console.log(this.id);
+												jQuery("#transactionEntries" + this.id).toggle('slow');								
+											});
+											*/
+
+											jQuery(".toggleDetails").hoverIntent({
+												over: function(event) {
+													jQuery("#transactionEntries" + this.id).slideDown('fast');													
+												},
+												timeout: 500,
+												out: function(event) {
+													jQuery("#transactionEntries" + this.id).slideUp('fast');								
+												}
+											});	
 										});	
 									</script>
-									<table width="100%">
-										<thead>
-											<tr class="odd">
-												<th>
-													${message(code: 'transaction.transactionType.label', default: 'Type')}
-												</th>
-												<th>
-													${message(code: 'transaction.transactionDate.label', default: 'Date')}
-												</th>
-												<th>
-													${message(code: 'transaction.transactionEntries.label', default: 'Details')}
-												</th>
-												<th>
-													${message(code: 'transaction.quantityChange.label', default: 'Qty +/-')}
-												</th>
-											</tr>
-										</thead>
-										<tbody>			
-											<g:if test="${!commandInstance?.transactionLogMap }">
-												<tr>
-													<td colspan="5">												
-														No transaction entries
-													</td>
-												</tr>
-											</g:if>
-											<g:else>
-												<g:set var="totalQuantityChange" value="${0 }"/>							
-												<g:each var="transaction" in="${commandInstance?.transactionLogMap?.keySet().sort {it.transactionDate}.reverse() }" status="status">
-													<tr id="${transacton?.id }" class="transaction ${(status%2==0)?'even':'odd' } prop">
-														<td>	
-															<g:link controller="inventory" action="showTransaction" id="${transaction.id }">
-																${transaction?.transactionType?.name }
-															</g:link>
-														</td>
+									<div>
+										<g:form method="GET" action="showStockCard">
+											<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
+									
+											<table style="inline-block;">
+												<thead>
+													<tr class="even prop">
+														<th>
+															${message(code: 'transaction.transactionType.label', default: 'Details')}
+														</th>													
+														<th>
+															${message(code: 'transaction.transactionType.label', default: 'Type')}
+														</th>
+														<th>
+															${message(code: 'transaction.transactionDate.label', default: 'Date')}
+														</th>
+														<th style="text-align: center">
+															${message(code: 'transaction.quantityChange.label', default: 'Qty In/Out')}
+														</th>
+													</tr>
+													<tr class="odd prop">
 														<td>
-															<g:formatDate
-																date="${transaction?.transactionDate}" format="MMM dd" />																
 															<span class="fade">
-																<g:prettyDateFormat date="${transaction?.dateCreated}" /> 
+																${message(code: 'transaction.filterTransactions.label', default: 'Filter transactions')}
 															</span>
 														</td>
 														<td>
-															<a href="#" id="${transaction?.id }" class="toggleDetails">Show details &rsaquo;</a>
+															<g:select name="transactionType.id" 
+																from="${org.pih.warehouse.inventory.TransactionType.list()}" 
+																optionKey="id" optionValue="name" value="${commandInstance?.transactionType?.id }" 
+																noSelection="['0': '-- All types --']" /> 
+																
+														</td>													
+														<td>
+															<g:jqueryDatePicker 
+																id="startDate" 
+																name="startDate" 
+																value="${commandInstance?.startDate }" 
+																format="MM/dd/yyyy"
+																showTrigger="false" />
+															to
+															<g:jqueryDatePicker 
+																id="endDate" 
+																name="endDate" 
+																value="${commandInstance?.endDate }" 
+																format="MM/dd/yyyy"
+																showTrigger="false" />
+															&nbsp;
+															<button  class="positive" name="filter">Search</button>
 														</td>
-														<td style="text-align: center">
-															<g:set var="quantityChange" value="${transaction?.transactionEntries*.quantity?.sum() }"/>
-															<g:set var="totalQuantityChange" value="${totalQuantityChange + quantityChange}"/>
-															<g:if test="${quantityChange>0}">
-																${quantityChange }
-															</g:if>
-															<g:else>
-																-${quantityChange }
-															</g:else>
-															
-														</td>
-													</tr>
-													<g:each var="transactionEntry" in="${commandInstance?.transactionLogMap?.get(transaction) }" status="status2">
-														<tr id="transactionEntry?.id" style="display: none;" class="transactionEntry transaction${transaction?.id } ${(status2%2==0)?'odd':'even' }">
-															<td></td>
-															<td colspan="3">
-																<span class="fade">																
-																	<g:if test="${transactionEntry.quantity>0}">${transactionEntry.quantity }</g:if>
-																	<g:else>-${transactionEntry.quantity }</g:else>	
-																	&nbsp;x&nbsp															
-																	${transactionEntry?.inventoryItem?.description }
-																	&nbsp;
-																	(${transactionEntry?.lotNumber }),
-																</span>
+														<td></td>
+													</tr>												
+												</thead>
+												<tbody>			
+													<g:if test="${!commandInstance?.transactionLogMap }">
+														<tr>
+															<td colspan="4">												
+																No transaction entries
 															</td>
 														</tr>
-													</g:each>
-												</g:each>
-												<tr>
-													<th></th>
-													<th></th>
-													<th></th>
-													<th class="large" style="text-align: center;">
-														<g:if test="${totalQuantityChange>0}">${totalQuantityChange}</g:if>
-														<g:else>-${totalQuantityChange}</g:else>														
-													</th>
-												</tr>
-											</g:else>
-										</tbody>
-									</table>
+													</g:if>
+													<g:else>
+														<g:set var="totalQuantityChange" value="${0 }"/>							
+														<g:each var="transaction" in="${commandInstance?.transactionLogMap?.keySet().sort {it.transactionDate}.reverse() }" status="status">
+															<tr class="transaction ${(status%2==0)?'even':'odd' } prop">
+																<td>	
+																	<a href="${createLink(controller: 'inventory', action:'showTransaction', id: transaction.id, params: ['product.id', 'test'])}" style="display: inline-block; padding: 2px;" href="#" id="${transaction?.id }" class="toggleDetails">
+																		<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>
+																		Show details &rsaquo;
+																	</a>
+																	<span id="transactionEntries${transaction?.id}" style="text-align: left; padding: 10px; margin: 10px; display: none; position:absolute; padding: 10px; background-color: white; border: 1px dashed black">
+																		<label>Entries for Transaction #${transaction.id }</label>
+																		<table width="100%">
+																			<tr> 
+																				<th>Description</th>
+																				<th>Serial/Lot Number</th>
+																				<th style="text-align: center;">Qty Change</th>
+																			</tr>
+																			<g:each var="transactionEntry" in="${commandInstance?.transactionLogMap?.get(transaction) }" status="status2">
+																				<tr class="${(status2%2==0)?'odd':'even' }">
+																					<td>
+																						${transactionEntry?.inventoryItem?.product?.name }
+																						<g:if test="${transactionEntry?.inventoryItem?.description }">
+																							&rsaquo;
+																						</g:if>
+																						${transactionEntry?.inventoryItem?.description }
+																					</td>
+																					<td>
+																						${transactionEntry?.lotNumber }
+																					</td>
+																					<td style="text-align: center;">
+																						<g:if test="${transactionEntry.quantity<0}">
+																							<g:set var="styleClass" value="color: red;"/>																	
+																						</g:if>
+																						<span style="${styleClass}">${transactionEntry.quantity }</span> 
+																						
+																					</td>
+																				</tr>
+																			</g:each>
+																			<tfoot>
+																				<tr style="border-top: 1px solid lightgrey;">
+																					<th colspan="2">
+																					</th>
+																					<th style="text-align: center;">
+	
+																						<g:set var="quantityChange" value="${transaction?.transactionEntries.findAll{it.product == commandInstance?.productInstance}.quantity?.sum() }"/>
+																						<g:set var="totalQuantityChange" value="${totalQuantityChange + quantityChange}"/>
+																																						<g:set var="styleClass" value="color:black;"/>														
+																						<g:if test="${quantityChange<0}">
+																							<g:set var="styleClass" value="color: red;"/>																	
+																						</g:if>
+																						<span style="${styleClass}">${quantityChange }</span> 
+																					</th>
+																				</tr>
+																			</tfoot>
+																		</table>
+																	</span>															
+																</td>
+																<td>
+																	${transaction?.transactionType?.name }&nbsp;
+																
+																</td>
+																<td>
+																	<span class="fade">
+																		<g:formatDate
+																			date="${transaction?.transactionDate}" format="MMM dd" />																
+																	</span>
+																	&nbsp;
+																	<g:prettyDateFormat date="${transaction?.dateCreated}" /> 
+																</td>
+																<td style="text-align: center">
+																	
+																	<g:set var="styleClass" value="color:black;"/>														
+																	<g:if test="${quantityChange<0}">
+																		<g:set var="styleClass" value="color: red;"/>																	
+																	</g:if>
+																	<span style="${styleClass}">${quantityChange }</span> 
+																</td>
+															</tr>
+														</g:each>
+														<tr>
+															<th></th>
+															<th></th>
+															<th></th>
+															<th class="large" style="text-align: center;">
+																<g:if test="${totalQuantityChange>0}">${totalQuantityChange}</g:if>
+																<g:else>${totalQuantityChange}</g:else>														
+															</th>
+														</tr>
+													</g:else>
+												</tbody>
+											</table>
+										</g:form>
+										
+									</div>
 								</fieldset>
 							</div>
 						</td>

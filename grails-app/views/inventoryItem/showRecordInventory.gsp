@@ -11,7 +11,7 @@
 	var inventory = { InventoryItems: [] };	
 
 	// We need to do this in order to make sure the index for new items is correct
-	<g:each var="row" in="${commandInstance?.recordInventoryRows }" status="status">
+	<g:each var="row" in="${commandInstance?.recordInventoryRows.findAll{ it.newQuantity > 0 } }" status="status">
 		var existingInventoryItem = { Id: '${row.id}', Type: '', ProductId: '', LotNumber: '${row.lotNumber}', Description: '${row.description}', ExpirationDate: '${row.expirationDate?:never}', Qty: 0 };	
 		inventory.InventoryItems.push(existingInventoryItem);
 	</g:each>
@@ -125,7 +125,8 @@
 	$(document).ready(function() {
 
 		$('#addAnother').focus();		
-		$('#addAnother').click(function() { 
+		$('#addAnother').click(function(event) { 
+			event.preventDefault();
 			var inventoryItem = {Qty: 0};
 
 			// Add to the array of new inventory items
@@ -218,7 +219,7 @@
 
 					
 					// Set the lot number and disable the field
-					$(this).attr('disabled', 'disabled');
+					//$(this).attr('disabled', 'disabled');
 					
 					// Set the ID
 					
@@ -231,19 +232,30 @@
 					else { 
 						expirationDate.val('never');
 					}
-					expirationDate.attr('disabled', 'disabled');
+					//expirationDate.attr('disabled', 'disabled');
 					
 					// Set the description and disable the field (unless it's null)						
 					
 					description.val(ui.item.description);
 					//description.addClass("fade");
-					if (description.val()) { 
-						description.attr('disabled', 'disabled');
-					}
+					//if (description.val()) { 
+					//	description.attr('disabled', 'disabled');
+					//}
 					
 				
 				}							  
 			});				
+		});
+		$('.expirationDate').livequery(function() {
+			var altFieldId = "#" + $(this).attr('id') + "-hidden"; 
+			console.log(altFieldId);
+			$(this).datepicker({
+				altField: altFieldId,
+				altFormat: 'mm/dd/yy',
+				dateFormat: 'dd M yy',
+				buttonImageOnly: true, 
+				buttonImage: '/warehouse/images/icons/silk/calendar.png',
+			});								
 		});
 
 		$('.description').livequery(function() { 
@@ -298,16 +310,27 @@
 	<g:hasErrors bean="${commandInstance}">
 		<div class="errors"><g:renderErrors bean="${commandInstance}" as="list" /></div>
 	</g:hasErrors>
-	<div class="dialog">		
-		<table >
+	<div class="dialog">	
+		<table>
 			<tr>
 				<td style="width: 250px;">
-				
 					<div class="actionsMenu">
 						<ul>
 							<li>							
 								<g:link controller="inventoryItem" 
-									action="showStockCard" params="['product.id':commandInstance?.product?.id]">&lsaquo; Back to Stock Card</g:link>							
+									action="showStockCard" params="['product.id':commandInstance?.product?.id]">&lsaquo; Back to stock card</g:link>							
+							</li>
+						</ul>
+					</div>	
+					<br/>				
+					<g:render template="productDetails" model="[productInstance:commandInstance?.product, inventoryInstance: inventoryInstance, inventoryLevelInstance: inventoryLevelInstance, totalQuantity: totalQuantity]"/>
+				</td>
+				<td>				
+						
+					<div class="actionsMenu">
+						<ul>
+							<li>								
+						
 							</li>
 							<%--
 							<li>
@@ -330,109 +353,139 @@
 							</li>
 							 --%>
 						</ul>
-					</div>						
-					<g:render template="productDetails" model="[productInstance:commandInstance?.product, inventoryLevelInstance: commandInstance?.inventoryLevel]"/>
-				</td>
-				<td>				
+					</div>					
+					<div id="inventoryForm">		
+						<g:form action="saveRecordInventory" autocomplete="off">
+							<style>
+								.form-content { 
+									border: 0px solid black;
+									min-height: 100%;
+									height: auto !important;
+									height: 100%;
+									margin: 0 auto -4em;
+									padding: 10px;
+								}
+								.form-footer {
+									text-align:right; 
+									height: 4em;
+									clear: both;
+								}	
+								fieldset { 
+									min-height: 500px;
+								}
+							</style>
 						
-					<div>
-						<div id="inventoryForm">
-							<g:form action="saveRecordInventory" autocomplete="off">
+							<fieldset>
+								<legend>Record Current Inventory</legend>
+								
 								<g:hiddenField name="product.id" value="${commandInstance.product?.id}"/>
 								<g:hiddenField name="inventory.id" value="${commandInstance?.inventory?.id}"/>
-							<%--
-								<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
-								<g:hiddenField name="active" value="true"/>
-								<g:hiddenField name="initialQuantity" value="0"/>							
-								<g:hiddenField name="inventoryItemType" value="${org.pih.warehouse.inventory.InventoryItemType.NON_SERIALIZED}"/>
-							 --%>	
-								<div style="padding: 10px; text-align: left;">
-									<label>Inventory date:</label><br/>
+								<%--
+									<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
+									<g:hiddenField name="active" value="true"/>
+									<g:hiddenField name="initialQuantity" value="0"/>							
+									<g:hiddenField name="inventoryItemType" value="${org.pih.warehouse.inventory.InventoryItemType.NON_SERIALIZED}"/>
+								 --%>	
+								<div style="padding: 10px">
+									<label>Inventory date:</label>
 									<g:jqueryDatePicker 
 										id="transactionDate" 
 										name="transactionDate" 
 										value="${commandInstance?.transactionDate}" 
 										format="MM/dd/yyyy"
-										showTrigger="false" />
+										showTrigger="false" />						
 								</div>
-								
-								<table id="inventoryItemsTable" style="border: 1px solid lightgrey" border="1">
-									<thead>
-										<tr>	
-											<th>Remove</th>
-											<th>Lot/Serial #</th>
-											<th>Expires</th>
-											<th>Description</th>
-											<th style="text-align:center;">Old Qty</th>
-											<th style="text-align:center;">New Qty</th>
-										</tr>											
-									</thead>
-									<tbody>
-										<g:each var="recordInventoryRow" in="${commandInstance?.recordInventoryRows }" status="status">				
-											<tr class="${(status%2==0)?'odd':'even' }">
-												<td width="5%" style="text-align: center;">
-													<g:hiddenField name="recordInventoryRows[${status}].id" value="${recordInventoryRow?.id }"/>
-												</td>
-												<td width="15%">
-													<%-- 
-													<g:textField name="recordInventoryRows[${status}].lotNumber" size="10" value="${recordInventoryRow?.lotNumber }"/>
-													--%>
-													<g:hiddenField name="recordInventoryRows[${status}].lotNumber" value="${recordInventoryRow?.lotNumber }"/>
-													${recordInventoryRow?.lotNumber }
-												</td>
-												<td width="10%">
-													<%-- 
-													<g:jqueryDatePicker id="expirationDate${status }" name="recordInventoryRows[${status}].expirationDate" 
-														value="${recordInventoryRow?.expirationDate}" format="MM/dd/yyyy" showTrigger="false" />
-													--%>
-													<g:hiddenField name="recordInventoryRows[${status}].expirationDate" value="${formatDate(date: recordInventoryRow?.expirationDate, format: 'MM/dd/yyyy') }"/>
-													<g:if test="${recordInventoryRow?.expirationDate}">
-														<g:formatDate date="${recordInventoryRow?.expirationDate}" format="MMM dd yyyy"/>
-													</g:if>
-													<g:else>
-														<span class="fade">never</span>
-													</g:else>
-												</td>
-												<td width="25%">
-													<%-- 
-													<g:textField name="recordInventoryRows[${status}].description" size="25" value="${recordInventoryRow?.description }"/>
-													--%>
-													<g:hiddenField name="recordInventoryRows[${status}].description" value="${recordInventoryRow?.description }"/>
-													${recordInventoryRow?.description }
-												</td>
-												<td width="10%" style="text-align: center; vertical-align: middle;">
-													${recordInventoryRow?.oldQuantity }	
-													<g:hiddenField name="recordInventoryRows[${status}].oldQuantity" value="${recordInventoryRow?.oldQuantity }"/>
-												</td>	
-												<td width="20%" style="text-align: center; vertical-align: middle;">
-													<g:textField style="text-align: center;" id="newQuantity-${status }" class="newQuantity" name="recordInventoryRows[${status }].newQuantity" size="3" value="${recordInventoryRow?.newQuantity }" onFocus="this.select();" onClick="this.select();"/>
-													<button id="${status }" class="buttonUp">
-														<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_up.png') }"/>
-													</button>
-													<button id="${status }" class="buttonDown">
-														<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_down.png') }"/>
-													</button>
+													
+								<div class="form-content">
+									<table id="inventoryItemsTable" style="border: 0px solid lightgrey" border="1">
+										<thead>
+											<tr>	
+												<th>Lot/Serial #</th>
+												<th>Expires</th>
+												<th>Description</th>
+												<th style="text-align:center;">Old Qty</th>
+												<th style="text-align:center;">New Qty</th>
+												<th>Actions</th>
+											</tr>											
+										</thead>									
+										<tbody>
+											<style>
+												.selected-row { background-color: #ffffe0; } 
+											</style>
+											<g:each var="recordInventoryRow" in="${commandInstance?.recordInventoryRows.findAll{it.newQuantity > 0} }" status="status">
+												<g:set var="styleClass" value="${params?.inventoryItem?.id && recordInventoryRow?.id == Integer.valueOf(params?.inventoryItem?.id) ? 'selected-row' : ''}"/>
+												
+												<tr class="${(status%2==0)?'odd':'even' } ${styleClass}">
+													<td width="15%">
+														<%-- 
+														<g:textField name="recordInventoryRows[${status}].lotNumber" size="10" value="${recordInventoryRow?.lotNumber }"/>
+														--%>
+														<g:hiddenField name="recordInventoryRows[${status}].id" value="${recordInventoryRow?.id }"/>
+														<g:hiddenField name="recordInventoryRows[${status}].lotNumber" value="${recordInventoryRow?.lotNumber }"/>
+														${recordInventoryRow?.lotNumber?:'<span class="fade">EMPTY</span>' }
+													</td>
+													<td width="10%">
+														<%-- 
+														<g:jqueryDatePicker id="expirationDate${status }" name="recordInventoryRows[${status}].expirationDate" 
+															value="${recordInventoryRow?.expirationDate}" format="MM/dd/yyyy" showTrigger="false" />
+														--%>
+														<g:hiddenField name="recordInventoryRows[${status}].expirationDate" value="${formatDate(date: recordInventoryRow?.expirationDate, format: 'MM/dd/yyyy') }"/>
+														<g:if test="${recordInventoryRow?.expirationDate}">
+															<g:formatDate date="${recordInventoryRow?.expirationDate}" format="MMM dd yyyy"/>
+														</g:if>
+														<g:else>
+															<span class="fade">never</span>
+														</g:else>
+													</td>
+													<td width="25%">
+														<%-- 
+														<g:textField name="recordInventoryRows[${status}].description" size="25" value="${recordInventoryRow?.description }"/>
+														--%>
+														<g:hiddenField name="recordInventoryRows[${status}].description" value="${recordInventoryRow?.description }"/>
+														${(recordInventoryRow?.description)?:'<span class="fade">None</span>'}
+													</td>
+													<td width="10%" style="text-align: center; vertical-align: middle;">
+														${recordInventoryRow?.oldQuantity }	
+														<g:hiddenField name="recordInventoryRows[${status}].oldQuantity" value="${recordInventoryRow?.oldQuantity }"/>
+													</td>	
+													<td width="10%" style="text-align: center; vertical-align: middle;">
+														<g:textField style="text-align: center;" id="newQuantity-${status }" class="newQuantity" name="recordInventoryRows[${status }].newQuantity" size="3" value="${recordInventoryRow?.newQuantity }" onFocus="this.select();" onClick="this.select();"/>
+													</td>
+													<td width="15%" style="text-align: left">
+														<button id="${status }" class="buttonUp">
+															<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_up.png') }"/>
+														</button>
+														<button id="${status }" class="buttonDown">
+															<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_down.png') }"/>
+														</button>
+													
+													</td>
+												</tr>
+											</g:each>
+										</tbody>
+										<tfoot>
+											<tr>
+												<td colspan="6">
+													<div style="float: left;">
+														<button id="addAnother" type="button" class="positive">
+															<img src="${createLinkTo(dir:'images/icons/silk', file:'add.png') }"/>&nbsp;Add Item
+														</button>
+													</div>
+													<div style="float: right;">
+														<g:link controller="inventoryItem" action="showStockCard" 
+															params="['product.id':commandInstance.product?.id]" class="negative">Cancel</g:link>
+														&nbsp;
+														<button name="save" type="submit" class="positive">
+															<img src="${createLinkTo(dir:'images/icons/silk', file:'tick.png') }"/>&nbsp;Save 
+														</button>
+													</div>
 												</td>
 											</tr>
-										</g:each>
-									</tbody>
-									<tfoot>
-										<tr>
-											<td colspan="8">
-												<a href="#" id="addAnother"> <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png') }"/>&nbsp;Add a new item </a>
-											</td>
-										</tr>
-									</tfoot>
-								</table>
-								
-								<div style="text-align: center; border-top: 1px solid lightgrey; padding:10px;">
-									<span class="buttons">
-										<g:submitButton name="save" value="Save"/>
-									</span>
-									<g:link controller="inventoryItem" action="showStockCard" params="['product.id':commandInstance.product?.id]">Cancel</g:link>
+										</tfoot>
+									</table>
 								</div>												
-							</g:form>
-						</div>
+							</fieldset>						
+						</g:form>
 					</div>
 				</td>
 			</tr>
@@ -440,18 +493,8 @@
 	</div>			
 </div>
 
-
-
-
-
-
 <script id="newRowTemplate" type="x-jquery-tmpl">
-<tr id="row-{{= getIndex()}}" class="{{= getClass()}}">
-	<td width="5%" style="text-align: center;">
-		<a href="#" onclick="removeRow({{= getIndex()}});"><img src="${createLinkTo(dir:'images/icons/silk', file:'delete.png')}"/></a>
-		<g:hiddenField name="recordInventoryRows[{{= getIndex()}}].id" value="{{= Id}}" size="1" />
-	</td>
-	
+<tr id="row-{{= getIndex()}}" class="{{= getClass()}}">	
 	<td width="15%">
 		<style>
 			#lotNumber-{{= getIndex()}} { 
@@ -462,12 +505,21 @@
 				padding-left: 20px;
 			}
 		</style>
-		<g:textField id="lotNumber-{{= getIndex()}}" class="lotNumber" name="lotNumber-{{= getIndex()}}" value="{{= LotNumber}}" size="10"  /><br/>
+		<g:textField id="lotNumber-{{= getIndex()}}" class="lotNumber" name="lotNumber-{{= getIndex()}}" value="{{= LotNumber}}" size="15"  /><br/>
 		<g:hiddenField id="lotNumberValue-{{= getIndex()}}" class="lotNumberValue" name="recordInventoryRows[{{= getIndex()}}].lotNumber" value="{{= LotNumber}}" size="10"  />
 	</td>
 	<td width="10%">
-		<%-- <g:hiddenField name="recordInventoryRows[{{= getIndex()}}].expirationDate" value="{{= ExpirationDate}}"/> --%>	
-		<g:textField id="expirationDate-{{= getIndex()}}" class="expirationDate" name="recordInventoryRows[{{= getIndex()}}].expirationDate" value="{{= ExpirationDate}}" size="10" />
+		<style>
+			#expirationDate{{= getIndex()}} { 
+				background-image: url('/warehouse/images/icons/silk/calendar.png');
+				background-repeat: no-repeat;
+				background-position: center left;
+				padding: 5px;
+				padding-left: 20px;
+			}
+		</style>
+		<g:hiddenField id="expirationDate{{= getIndex()}}-hidden" name="recordInventoryRows[{{= getIndex()}}].expirationDate" value="{{= ExpirationDate}}"/>	
+		<g:textField id="expirationDate{{= getIndex()}}" class="expirationDate" name="recordInventoryRows[{{= getIndex()}}].expirationDate-text" value="{{= ExpirationDate}}" size="10" />
 		
 	</td>
 	<td width="25%">		
@@ -476,11 +528,11 @@
 				background-image: url('/warehouse/images/icons/silk/magnifier.png');
 				background-repeat: no-repeat;
 				background-position: center left;
-				padding: 2px;
+				padding: 5px;
 				padding-left: 20px;
 			}
 		</style>
-		<g:textField id="description-{{= getIndex()}}" class="description" name="recordInventoryRows[{{= getIndex()}}].description" value="{{= Description}}" size="20" />		
+		<g:textField id="description-{{= getIndex()}}" class="description" name="recordInventoryRows[{{= getIndex()}}].description" value="{{= Description}}" size="18" />		
 	</td>
 	<td width="10%" style="text-align: center; vertical-align: middle;">
 		{{= Qty}}
@@ -490,23 +542,23 @@
 		<g:textField style="text-align: center;"  
 			id="newQuantity-{{= getIndex()}}" class="newQuantity" name="recordInventoryRows[{{= getIndex()}}].newQuantity" size="3" value="{{= Qty}}" onFocus="this.select();" onClick="this.select();"/>
 
+	</td>	
+	<td width="5%" style="text-align: left;">
 		<button id="buttonUp-{{= getIndex()}}" class="buttonUp">
 			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_up.png') }"/>
 		</button>
 		<button id="buttonDown-{{= getIndex()}}" class="buttonDown">
 			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_down.png') }"/>
 		</button>
-	</td>	
+		<a href="#" onclick="removeRow({{= getIndex()}});"><img src="${createLinkTo(dir:'images/icons/silk', file:'delete.png')}"/></a>
+		<g:hiddenField name="recordInventoryRows[{{= getIndex()}}].id" value="{{= Id}}" size="1" />
+	</td>
 
 </tr>
 </script>									
 
 <script id="existingRowTemplate" type="x-jquery-tmpl">
 <tr id="row{{= getIndex()}}" class="{{= getClass()}}">
-	<td width="5%" style="text-align: center;">
-		{{= getIndex()}}
-		<g:hiddenField name="recordInventoryRows[{{= getIndex()}}].id" value="{{= Id}}" size="1" />
-	</td>
 	<td width="15%">
 		<g:hiddenField name="recordInventoryRows[{{= getIndex()}}].lotNumber" value="{{= LotNumber}}"/>
 		{{= LotNumber}}
@@ -527,13 +579,17 @@
 		<g:textField style="text-align: center;"  
 			id="newQuantity-{{= getIndex()}}" name="recordInventoryRows[{{= getIndex()}}].newQuantity" size="3" value="{{= Qty}}" onFocus="this.select();" onClick="this.select();"/>
 	</td>	
-	<td width="10%" style="text-align: center;">
+	<td width="10%" style="text-align: left;">
 		<button id="{{= getIndex()}}" class="buttonUp">
 			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_up.png') }"/>
 		</button>
 		<button id="{{= getIndex()}}" class="buttonDown">
 			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_down.png') }"/>
 		</button>
+	</td>
+	<td width="5%" style="text-align: center;">
+		{{= getIndex()}}
+		<g:hiddenField name="recordInventoryRows[{{= getIndex()}}].id" value="{{= Id}}" size="1" />
 	</td>
 </tr>
 </script>

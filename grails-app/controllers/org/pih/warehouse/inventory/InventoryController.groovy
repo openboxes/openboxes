@@ -317,7 +317,11 @@ class InventoryController {
 	}
 	
 	def listAllTransactions = {
-		def transactions = Transaction.list()
+		if (!params.sort) {
+			params.sort = "dateCreated"
+			params.order = "desc"
+		}		
+		def transactions = Transaction.list(params)
 		render(view: "listTransactions", model: [transactionInstanceList: transactions])
 	}
 

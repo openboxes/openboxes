@@ -36,8 +36,13 @@ class InventoryItemController {
 		
 		// We need to set the inventory instance in order to save an 'inventory' transaction
 		def warehouseInstance = Warehouse.get(session?.warehouse?.id)				
-		
-		[ commandInstance : commandInstance, inventoryInstance: warehouseInstance.inventory ]
+
+		def productInstance = cmd.product;		
+		def transactionEntryList = TransactionEntry.findAllByProduct(cmd.product);
+		def totalQuantity = (transactionEntryList)?transactionEntryList.quantity.sum():0
+		def inventoryInstance = warehouseInstance?.inventory;
+		def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, inventoryInstance);
+		[ commandInstance : commandInstance, inventoryInstance: warehouseInstance.inventory, inventoryLevelInstance: inventoryLevelInstance, totalQuantity: totalQuantity ]
 	}
 	
 	def saveRecordInventory = { RecordInventoryCommand cmd ->
@@ -62,7 +67,15 @@ class InventoryItemController {
 		log.info ("User chose to validate or there are errors")
 		
 		//chain(action: "showRecordInventory", model: [commandInstance:cmd])
-		render(view: "showRecordInventory", model: [commandInstance:cmd])
+		def warehouseInstance = Warehouse.get(session?.warehouse?.id)
+		def productInstance = cmd.product;
+		def transactionEntryList = TransactionEntry.findAllByProduct(productInstance);
+		def totalQuantity = (transactionEntryList)?transactionEntryList.quantity.sum():0
+		def inventoryInstance = warehouseInstance?.inventory;
+		def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, inventoryInstance);
+		
+		render(view: "showRecordInventory", model: 
+			[ commandInstance : cmd, inventoryInstance: warehouseInstance.inventory, inventoryLevelInstance: inventoryLevelInstance, totalQuantity: totalQuantity ])
 	}
 
 	
@@ -189,14 +202,14 @@ class InventoryItemController {
 		
 	def createInventoryItem = {
 		
-		flash.message = "Please note that this page is tempoary.  In the future, you will be able to create new inventory items through the 'Record Stock' page."; 
+		flash.message = "Please note that this page is temporary.  In the future, you will be able to create new inventory items through the 'Record Stock' page."; 
 		
 		def productInstance = Product.get(params?.product?.id)
 		def inventoryInstance = Inventory.get(params?.inventory?.id)
 		def itemInstance = new InventoryItem(product: productInstance)
 		def inventoryLevelInstance = inventoryService.getInventoryLevelByProductAndInventory(productInstance, inventoryInstance)
 		def inventoryItems = inventoryService.getInventoryItemsByProduct(productInstance);
-		[itemInstance: itemInstance, inventoryInstance: inventoryInstance, inventoryItems: inventoryItems, inventoryLevelInstance: inventoryLevelInstance]
+		[itemInstance: itemInstance, inventoryInstance: inventoryInstance, inventoryItems: inventoryItems, inventoryLevelInstance: inventoryLevelInstance, totalQuantity: totalQuantity]
 	}
 
 	def saveInventoryItem = {
@@ -567,7 +580,7 @@ class StockCardCommand {
 	Map transactionEntriesByInventoryItemMap
 
 	// Transaction log section
-	Date startDate = new Date() - 30;		// defaults to today - 30d
+	Date startDate = new Date() - 7;		// defaults to today - 7d
 	Date endDate = new Date();				// defaults to today
 	TransactionType transactionType
 	Map transactionLogMap;
@@ -602,7 +615,7 @@ class StockCardCommand {
 	 * @return 	the sum of quantities across all transaction entries
 	 */
 	Integer getTotalQuantity() { 
-		return (transactionEntryList)?transactionEntryList*.quantity.sum():0
+		return (transactionEntryList)?transactionEntryList.findAll { it.product == productInstance }.quantity.sum():0
 	}
 	
 	/**

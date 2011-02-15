@@ -11,38 +11,26 @@ fieldset table td { padding: 6px; }
 		<legend class="fade">${productInstance?.name }</legend>
 		<table>
 			<tr class="odd">	
-				<td style="text-align: left;">
-					<span class="name">On-Hand Quantity</span>
-				</td>
-				<td>
-					<span class="value">
-						<b>${totalQuantity }</b></span> units
-				</td>
-				<td></td>
-			</tr>
-			<tr class="even">	
-				<td style="text-align: left;">
+				<th style="text-align: left;">
 					<span class="name">Category</span>
-				</td>
-				<td>
+				</th>
+				<td colspan="2">
 					<span class="value">${productInstance?.category?.name }</span>
 				</td>
-				<td></td>
 			</tr>
-			<tr class="odd">	
-				<td style="text-align: left;">
+			<tr class="even">	
+				<th style="text-align: left;">
 					<span class="name">Product Code</span>
-				</td>
-				<td>
+				</th>
+				<td colspan="2">
 					<span class="value">${productInstance?.productCode?:'<span class="fade">none</span>' }</span>
 				</td>
-				<td></td>
 			</tr>
 			
-			<tr class="even">	
-				<td style="text-align: left;">
+			<tr class="odd">	
+				<th style="text-align: left;">
 					<span class="name">Cold Chain</span>
-				</td>
+				</th>
 				<td>
 					<span class="value">${productInstance?.coldChain?'Yes':'No' }</span>
 				</td>
@@ -50,19 +38,52 @@ fieldset table td { padding: 6px; }
 			</tr>
 			<g:each var="productAttribute" in="${productInstance?.attributes}" status="status">
 				<tr class="${status%2==0?'odd':'even' }">
-					<td style="text-align: left;">
+					<th style="text-align: left;">
 						<span class="name">${productAttribute?.attribute.name }</span>
-					</td>
+					</th>
 					<td>
 						<span class="value">${productAttribute.value }</span>
 					</td>
 					<td></td>
 				</tr>													
 			</g:each>
-			<tr class="odd" style="border-top: 1px solid lightgrey;">
-				<td style="text-align: left;">
-					<span class="name">Supported</span>
+		</table>
+		<br/>
+		<table>
+			<tr class="odd" style="border-top: 1px solid lightgrey;">	
+				<th style="text-align: left;">
+					<span class="name">Status</span>
+				</th>
+				<td colspan="2">
+					<span class="value">
+						<g:if test="${totalQuantity <= 0}">
+							<span style="color: red">Stock out!!!!</span>
+						</g:if>
+						<g:elseif test="${totalQuantity <= inventoryLevelInstance?.minQuantity}">
+							<span style="color: red">Low stock!!</span>
+						</g:elseif>
+						<g:elseif test="${totalQuantity <= inventoryLevelInstance?.reorderQuantity }">
+							<span style="color: orange;">Reorder Now!</span>
+						</g:elseif>
+						<g:else>
+							<span style="color: green;">In Stock</span>
+						</g:else>
+					</span>
 				</td>
+			</tr>			
+			<tr class="even">	
+				<th style="text-align: left;">
+					<span class="name">On-Hand Quantity</span>
+				</th>
+				<td colspan="2">
+					<span class="value">
+						<b>${totalQuantity }</b></span>
+				</td>
+			</tr>			
+			<tr class="odd" >
+				<th style="text-align: left;">
+					<span class="name">Supported</span>
+				</th>
 				<td>
 				
 					<script>
@@ -109,9 +130,9 @@ fieldset table td { padding: 6px; }
 				</td>
 			</tr>				
 			<tr class="even">
-				<td style="text-align: left;">
+				<th style="text-align: left;">
 					<span class="name">Min Level</span>
-				</td>
+				</th>
 				<td>
 					<script>
 
@@ -185,9 +206,9 @@ fieldset table td { padding: 6px; }
 				
 			</tr>
 			<tr class="odd">
-				<td style="text-align: left;">
+				<th style="text-align: left;">
 					<span class="name">Reorder Level</span>
-				</td>
+				</th>
 				<td>
 					<span id="reorderQuantityTextValue" class="value">
 						<span id="reorderQuantityValue">
@@ -218,6 +239,9 @@ fieldset table td { padding: 6px; }
 					</a>
 				</td>
 			</tr>				
+
+						
+			
 			<%-- 						
 			<tr class="odd">
 				<td></td>

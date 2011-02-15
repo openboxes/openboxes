@@ -27,7 +27,7 @@
 							<table>
 								<tr>
 									<td style="width: 250px;">
-										<g:render template="productDetails" model="[productInstance:productInstance, inventoryLevelInstance: inventoryLevelInstance]"/>											
+										<g:render template="productDetails" model="[productInstance:productInstance, inventoryLevelInstance: inventoryLevelInstance, totalQuantity: commandInstance?.totalQuantity]"/>											
 									</td>
 									<td>										
 										<div class="stockOptions">
