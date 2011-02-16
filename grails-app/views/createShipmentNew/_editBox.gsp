@@ -8,10 +8,10 @@
 	});
 </script>
 <g:if test="${boxInstance}">	   
-	<div id="dlgEditBox-${boxInstance?.id}" title="Edit a box" style="padding: 10px; display: none;" >
+	<div id="dlgEditBox-${boxInstance?.id}" title="Edit a Box" style="padding: 10px; display: none;" >
 </g:if>
 <g:else>
-	<div id="dlgAddBox-${containerInstance?.id}" title="Add an box" style="padding: 10px; display: none;" >
+	<div id="dlgAddBox-${containerInstance?.id}" title="Add a Box" style="padding: 10px; display: none;" >
 </g:else>
 	<g:form action="createShipment">
 		<table>
@@ -29,9 +29,21 @@
 					<td style="text-align: left;">
 						<div class="buttons">
 							<g:submitButton name="saveBox" value="Save Box"></g:submitButton>
-							<g:submitButton name="deleteBox" value="Delete Box"></g:submitButton>
-							<g:submitButton name="cancelBox" value="Cancel"></g:submitButton>
+							<g:if test="${boxInstance}">
+								<g:submitButton name="deleteBox" value="Remove Box"></g:submitButton>
+							</g:if>
+							<g:submitButton name="cancelDialog" value="Cancel"></g:submitButton>
 						</div>
+						<g:if test="${boxInstance}">
+							<div class="buttons">
+								<g:submitButton name="addItemToBox" value="Add an Item to this Box"></g:submitButton>
+							</div>
+						</g:if>
+						<g:if test="${containerInstance}">
+							<div class="buttons">
+								<g:submitButton name="addAnotherBox" value="Save Box and Add Another Box"></g:submitButton>
+							</div>
+						</g:if>
 					</td>
 				</tr>
 			</tbody>

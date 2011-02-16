@@ -29,8 +29,10 @@
 					<td style="text-align: left;">
 						<div class="buttons">
 							<g:submitButton name="saveItem" value="Save Item"></g:submitButton>
-							<g:submitButton name="deleteItem" value="Delete Item"></g:submitButton>
-							<g:submitButton name="cancelItem" value="Cancel"></g:submitButton>
+							<g:if test="${itemInstance}">
+								<g:submitButton name="deleteItem" value="Remove Item"></g:submitButton>
+							</g:if>
+							<g:submitButton name="cancelDialog" value="Cancel"></g:submitButton>
 						</div>
 						<g:if test="${containerInstance}">
 							<div class="buttons">

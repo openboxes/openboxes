@@ -105,17 +105,22 @@ class CreateShipmentNewController {
 			}.to("finish")
 			
 			on("cancel").to("finish")
+			
+			on("cancelDialog").to("enterContainerDetails")
     		
 			on("saveContainer").to("saveContainerAction")
 			
 			on("deleteContainer") {
-				def container = Container.get(params.id)	
+				def container = Container.get(params.container.id)	
 				shipmentService.deleteContainer(container)
 			}.to("enterContainerDetails")
 			
-			on("cancelContainer").to("enterContainerDetails")
-			
 			on("saveBox").to("saveBoxAction")
+			
+			on("deleteBox") {
+				def box = Container.get(params.box.id)
+				shipmentService.deleteContainer(box)
+			}.to("enterContainerDetails")
 			
 			on("saveItem").to("saveItemAction")
 			
@@ -124,22 +129,32 @@ class CreateShipmentNewController {
 				shipmentService.deleteShipmentItem(item)
 			}.to("enterContainerDetails")
 			
-			on("cancelItem").to("enterContainerDetails")
-			
-			on("addBox"){
-				// this parameter triggers the "Add Box" for the container to be opened on page reload 
-				flash.addBox = params.id as Integer
+			on("addBoxToContainer"){
+				// this parameter triggers the "Add Box" dialog for the container to be opened on page reload
+				// -1 means we need to assign the id of the new container to add box
+				flash.addBox = (params.container?.id) ? params.container.id as Integer : -1
 			}.to("saveContainerAction")
 			
-			on("addItem") {
-				// this parameter triggers the "Add Item" for the container to be opened on page reload 
-				flash.addItem = params.id as Integer
+			on("addItemToContainer") {
+				// this parameter triggers the "Add Item" dialog for the container to be opened on page reload 
+				// -1 means we need to assign the id of the new container to add item
+				flash.addItem = (params.container?.id) ? params.container.id as Integer : -1
 			}.to("saveContainerAction")
+			
+			on("addItemToBox") {	
+				// this parameter triggers the "Add Item" dialog for the container to be opened on page reloa
+				flash.addItem = params.box.id as Integer
+			}.to("saveBoxAction")
 			
 			on("addAnotherItem") {
-				// this parameter triggers the "Add Item" for the container to be opened on page reload
+				// this parameter triggers the "Add Item" dialog for the container to be opened on page reload
 				flash.addItem = params.container.id as Integer
 			}.to("saveItemAction")
+			
+			on("addAnotherBox") {
+				// this parameter triggers the "Add Box" dialog for the container to be opened on page reload
+				flash.addBox = params.container.id as Integer
+			}.to("saveBoxAction")
     	}
     	
     	saveContainerAction {
@@ -147,8 +162,8 @@ class CreateShipmentNewController {
     			def container
 				
 				// fetch the existing container if this is an edit, otherwise add a container to this shipment
-				if (params.id) {
-					container = Container.get(params.id)
+				if (params.container?.id) {
+					container = Container.get(params.container?.id)
 				}
 				else {
 					def containerType = ContainerType.findByName(params.type)
@@ -167,6 +182,11 @@ class CreateShipmentNewController {
     			}
     			else {
     				shipmentService.saveContainer(container)
+    				
+    				// assign the id of the container if needed
+    				if (flash.addItem == -1) { flash.addItem = container.id }
+    				if (flash.addBox == -1) { flash.addBox = container.id }
+    				
     				valid()
     			}	
     		}
@@ -203,8 +223,8 @@ class CreateShipmentNewController {
 				}
 				
 				// now add the item, if one has been specified
-				if (params.product) {
-			
+				if (params.product?.id) {
+					
 					def item = box.addNewItem()
 					
 					// NOTE: remember if we add fields, we need to add them here; need to white-list them since oen form is populating two objects
@@ -231,10 +251,11 @@ class CreateShipmentNewController {
     		action {
     			def item
     			
-    			// fetch the existing item if this is an edit, otherwise add an item to this shipment
+    			// if we have an item id, we are editing an existing item, so we need to fetch it
 				if (params.item?.id) {
 					item = ShipmentItem.get(params.item?.id)
 				}
+    			// otherwise, if we have a container id we are adding a new item to this container
 				else {
 					def container = Container.get(params.container?.id)
 					

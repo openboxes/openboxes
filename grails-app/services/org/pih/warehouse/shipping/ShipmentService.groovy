@@ -248,31 +248,34 @@ class ShipmentService {
 	void deleteContainer(Container container) {
 		// first we need to handle deleting all the child containers
 		for (childContainer in container.containers) {
-				deleteContainer(childContainer)
+			deleteContainer(childContainer)
 		}
+		
+		// remove all items in the container from the parent shipment
+		def shipment = container?.shipment
+		for (ShipmentItem item in container.getShipmentItems()) {
+			shipment.removeFromShipmentItems(item).save(flush:true)
+		}	
+		
+		// NOTE: I'm using the standard "remove" set method here instead of the removeFrom Grails
+		// code because the removeFrom code wasn't working correctly, I think because of
+		// the fact that a container can be associated with both a shipment and another container
 		
 		// remove the container from its parent
 		container?.parentContainer?.containers?.remove(container)
 				
-		// remove all items in the container from the parent shipment
-		def shipment = container?.shipment
-		for (shipmentItem in container.getShipmentItems()) {
-			shipment.shipmentItems.remove(shipmentItem)
-		}
-				
 		// remove the container itself from the parent shipment
 		shipment?.containers?.remove(container)
-			
-		saveShipment(shipment)	
+		
+		shipment.save(flush:true)
 	}
 	
 	/**
 	 * Deletes a shipment item
 	 */
 	void deleteShipmentItem(ShipmentItem item) {
-		// remove the item from the associated shipment
-		item.shipment.shipmentItems.remove(item)
+		def shipment = item.shipment
+		shipment.removeFromShipmentItems(item)
 		
-		saveShipment(item.shipment)
 	}
 }

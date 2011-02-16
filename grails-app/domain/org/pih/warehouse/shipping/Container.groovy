@@ -29,7 +29,7 @@ class Container implements Comparable, java.io.Serializable {
 	
 	//Shipment shipment
 	Container parentContainer			// the "containing" container
-	SortedSet containers				// Child containers (in combination with mapping, helps to order containers)
+	//SortedSet containers				// Child containers (in combination with mapping, helps to order containers)
 
 	//static belongsTo = [ parentContainer : Container ]
 	static belongsTo = [ shipment : Shipment ];
@@ -38,7 +38,7 @@ class Container implements Comparable, java.io.Serializable {
 
 	static transients = [ "optionValue", "shipmentItems" ]
 	static mapping = {
-		//containers sort: 'sortOrder', order: 'asc'
+		containers sort: 'sortOrder', order: 'asc'
 		containers cascade: "all-delete-orphan"
 	}
 		

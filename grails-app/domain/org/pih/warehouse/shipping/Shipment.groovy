@@ -38,8 +38,8 @@ class Shipment implements Serializable {
 	
 	// One-to-many associations
 	// these sorted sets don't work because sets aren't allowed to have identical items
-	//SortedSet events;
-	SortedSet containers;
+	SortedSet events;
+	//SortedSet containers;
 	//SortedSet shipmentItems;
 	
 	List documents;
@@ -61,6 +61,7 @@ class Shipment implements Serializable {
 	                  documents : Document, 	                  
 					  shipmentItems : ShipmentItem,
 	                  referenceNumbers : ReferenceNumber ]
+	
 
 	
 	// Ran into Hibernate bug HHH-4394 and GRAILS-4089 when trying to order the associations.  This is due to the 
@@ -77,7 +78,7 @@ class Shipment implements Serializable {
 		documents cascade: "all-delete-orphan"
 		shipmentItems cascade: "all-delete-orphan"
 		referenceNumbers cascade: "all-delete-orphan"
-		//containers sort: 'dateCreated', order: 'asc'
+		containers sort: 'sortOrder', order: 'asc'
 		//events joinTable:[name:'shipment_event', key:'shipment_id', column:'event_id']
 	}	
 
@@ -134,6 +135,7 @@ class Shipment implements Serializable {
 	 * 	
 	 * @return
 	 */
+	
 	List<ShipmentItem> getAllShipmentItems() { 		
 		List<ShipmentItem> allShipmentItems = new ArrayList<ShipmentItem>();		
 		for (container in containers) {
@@ -148,7 +150,6 @@ class Shipment implements Serializable {
 		}
 		return allShipmentItems;		
 	}
-
 	
 	String getShipmentNumber() {
 		return (id) ? String.valueOf(id).padLeft(6, "0")  : "(new shipment)";

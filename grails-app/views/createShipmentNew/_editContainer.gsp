@@ -16,7 +16,7 @@
 </g:else>
 	<g:form action="createShipment">
 		<g:if test="${containerInstance}">
-			<g:hiddenField name="id" value="${containerInstance?.id }"/>
+			<g:hiddenField name="container.id" value="${containerInstance?.id }"/>
 		</g:if>
 		<g:else>
 			<g:hiddenField name="type" value="${type}"/>
@@ -30,15 +30,15 @@
 						<div class="buttons">
 							<g:submitButton name="saveContainer" value="Save ${containerInstance ? containerInstance?.containerType?.name : type}"></g:submitButton>
 							<g:if test="${containerInstance}">
-								<g:submitButton name="deleteContainer" value="Delete ${containerInstance ? containerInstance?.containerType?.name : type}"></g:submitButton>
+								<g:submitButton name="deleteContainer" value="Remove ${containerInstance ? containerInstance?.containerType?.name : type}"></g:submitButton>
 							</g:if>
-							<g:submitButton name="cancelContainer" value="Cancel"></g:submitButton>
+							<g:submitButton name="cancelDialog" value="Cancel"></g:submitButton>
 						</div>
 						<div class="buttons">
-							<g:submitButton name="addBox" value="Add a Box to this ${containerInstance ? containerInstance?.containerType?.name : type}"></g:submitButton>
+							<g:submitButton name="addBoxToContainer" value="Add a Box to this ${containerInstance ? containerInstance?.containerType?.name : type}"></g:submitButton>
 						</div>
 						<div class="buttons">
-							<g:submitButton name="addItem" value="Add an Item to this ${containerInstance ? containerInstance?.containerType?.name : type}"></g:submitButton>
+							<g:submitButton name="addItemToContainer" value="Add an Item to this ${containerInstance ? containerInstance?.containerType?.name : type}"></g:submitButton>
 						</div>
 					</td>
 				</tr>

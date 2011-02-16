@@ -61,10 +61,10 @@
 												&nbsp;add item
 											</a> 													
 											&nbsp;
-											<g:link action="suitcase" event="addBox" id="${shipmentInstance?.id}" params="['suitcase.id':containerInstance?.id]">
+											<a href="#" id="btnAddBox-${containerInstance?.id}">
 												<img src="${createLinkTo(dir:'images/icons/silk',file:'package_add.png')}" alt="Add a box" style="vertical-align: middle"/>
 												&nbsp;add box
-											</g:link>
+											</a>
 										</span>
 										<g:render template="editItem" model="['containerInstance':containerInstance, 'addItem':addItem]"/>
 										<g:render template="editBox" model="['containerInstance':containerInstance, 'addBox':addBox]"/>
@@ -96,7 +96,7 @@
 									</g:if>
 								</g:each>
 	
-								<g:each in="${containerInstance?.containers}" var="boxInstance">
+								<g:each  var="boxInstance" in="${containerInstance?.containers}">
 									<tr class="${count++%2==0?'odd':'even' }">
 										<td>
 											<span style="padding-left: 32px;">
@@ -115,7 +115,7 @@
 											</a> 		
 											&nbsp;
 											
-											<g:link action="suitcase" event="removeBox" id="${shipmentInstance?.id}" params="['suitcase.id':containerInstance?.id,'box.id':boxInstance?.id]">
+											<g:link action="createShipment" event="deleteBox" params="['box.id':boxInstance?.id]">
 												<img src="${createLinkTo(dir:'images/icons/silk',file:'package_delete.png')}" alt="Add an item" style="vertical-align: middle"/>
 												&nbsp;remove box
 											</g:link>
