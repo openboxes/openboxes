@@ -40,15 +40,46 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 		donor(nullable:true)
 	}
     
+	/**
+	 * Sorts shipping items by associated product name, then lot number, then quantity,
+	 * and finally by id. 
+	 */
 	int compareTo(obj) { 
-		if (!product || !product.name) {
+		if (!product?.name && obj?.product?.name) {
 			return -1
 		}
-		else if (!obj || !obj.product || !obj.product.name) {
-			return 1;
+		else if (!obj?.product?.name && product?.name) {
+			return 1
 		}
 		else {
-			return product.name.compareTo(obj.product.name) 
+			if (product?.name <=> obj?.product?.name != 0) {
+				return product.name <=> obj.product.name
+			}
+			else {
+				if (!lotNumber && obj?.lotNumber) {
+					return -1
+				}
+				else if (!obj.lotNumber && lotNumber) {
+					return 1
+				}
+				else if (lotNumber <=> obj?.lotNumber != 0) {
+					return lotNumber <=> obj.lotNumber
+				}
+				else {
+					if (!quantity && obj?.quantity) {
+						return -1
+					}
+					else if (!obj.quantity && quantity) {
+						return 1
+					}
+					else if (quantity <=> obj?.quantity != 0) {
+						return quantity <=> obj.quantity
+					}
+					else {
+						return id <=> obj.id
+					}
+				}
+			}
 		}
 	}
 }
