@@ -41,7 +41,9 @@
 										<td>
 											<g:if test="${shipmentInstance?.mostRecentEvent}">
 												<span class="fade">
-													${fieldValue(bean: shipmentInstance, field: "mostRecentEvent.eventLocation.name")}
+													<g:if test="${shipmentInstance?.mostRecentEvent?.eventLocation}">
+														${fieldValue(bean: shipmentInstance, field: "mostRecentEvent.eventLocation.name")}
+													</g:if>
 													on <g:formatDate format="dd MMM yyyy" date="${shipmentInstance?.mostRecentEvent?.eventDate}"/>
 												</span>
 											</g:if>

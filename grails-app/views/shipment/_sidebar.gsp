@@ -215,7 +215,7 @@
 					</td>
 					<td>
 						<span style="font-size: 0.9em; color: #aaa;">
-							<b>${event?.eventType?.name}</b> at ${event.eventLocation.name}
+							<b>${event?.eventType?.name}</b> at ${event?.eventLocation?.name}
 						</span>
 					</td>
 				</tr>
