@@ -3,12 +3,18 @@ package org.pih.warehouse.shipping;
 import java.util.List;
 import java.util.Map;
 
+import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Event;
 import org.pih.warehouse.core.EventStatus;
 import org.pih.warehouse.core.EventType;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.ListCommand;
+import org.pih.warehouse.core.User;
+import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.Transaction;
+import org.pih.warehouse.inventory.TransactionEntry;
+import org.pih.warehouse.inventory.TransactionType;
+import org.pih.warehouse.receiving.Receipt;
 
 class ShipmentService {
 	
@@ -170,7 +176,8 @@ class ShipmentService {
 			}
 		}
 	}    
-
+	
+	
 	List<Shipment> getShipmentsByName(String name) {
 		return Shipment.withCriteria { 
 			ilike("name", "%" +name + "%")
@@ -217,7 +224,7 @@ class ShipmentService {
 			if (!(shipment.events?.size() > 0)) {
 				def event = new Event(
 					eventDate: new Date(),
-					eventType: EventType.findByName("Pending"),
+					eventType: EventType.findByName("Requested"),		// FIXME Event type needs to be refactored a bit
 					//eventLocation: Location.get(session.warehouse.id)
 				)
 				event.save(flush:true);
@@ -278,4 +285,174 @@ class ShipmentService {
 		shipment.removeFromShipmentItems(item)
 		
 	}
+	
+	
+	/**
+	 * Get a list of shipments 
+	 * @param location
+	 * @param eventStatus
+	 * @return
+	 */
+	List<Shipment> getReceivingByDestinationAndStatus(Location location, EventStatus eventStatus) { 		
+		def shipmentList = getRecentIncomingShipments(location?.id)
+		if (shipmentList) { 
+			//shipmentList = shipmentList.findAll { it.mostRecentStatus = eventStatus } 
+		}
+		return shipmentList;		
+	}
+	
+	
+	void sendShipment(Shipment shipmentInstance, String comment, User user, Location location) { 
+		
+		try { 
+			if (!shipmentInstance.hasErrors() && shipmentInstance.save(flush: true)) {				
+				// Add comment to shipment (as long as there's an actual comment 
+				// after trimming off the extra spaces)
+				if (comment) {
+					shipmentInstance.addToComments(
+						new Comment(comment: comment, sender: user));
+				}
+
+				// Add a Shipped event to the shipment
+				EventType eventType = EventType.findByName("Shipped")
+				if (eventType) {
+					def event = new Event();
+					event.eventDate = new Date()
+					event.eventType = eventType
+					event.eventLocation = location
+					event.save(flush:true);
+					shipmentInstance.addToEvents(event);
+				}
+				else {
+					throw new Exception("Expected event type 'Shipped'")
+				}
+												
+				// Save updated shipment instance
+				shipmentInstance.save();
+			
+				// Create a new transaction for outgoing items
+				Transaction debitTransaction = new Transaction();
+				debitTransaction.transactionType = TransactionType.get(1); 	// transfer
+				debitTransaction.source = shipmentInstance?.origin
+				debitTransaction.destination = shipmentInstance?.destination;
+				debitTransaction.inventory = shipmentInstance?.origin?.inventory
+				debitTransaction.transactionDate = new Date();
+				
+				shipmentInstance.shipmentItems.each { 
+					def inventoryItem = InventoryItem.findByLotNumberAndProduct(it.lotNumber, it.product)
+					
+					// If the inventory item doesn't exist, we create a new one
+					if (!inventoryItem) {
+						inventoryItem = new InventoryItem();
+						inventoryItem.lotNumber = it.lotNumber
+						inventoryItem.product = it.product
+						if (!inventoryItem.hasErrors() && inventoryItem.save()) {
+							// at this point we've saved the inventory item successfully
+						}
+						else {
+							// 
+							inventoryItem.errors.allErrors.each { error->
+								def errorObj = [inventoryItem, error.getField(), error.getRejectedValue()] as Object[]
+								shipmentInstance.errors.reject("inventoryItem.invalid",
+									errorObj, "[${error.getField()} ${error.getRejectedValue()}] - ${error.defaultMessage} ");
+							}
+							return;
+						}
+					}
+					
+					// Create a new transaction entry
+					TransactionEntry transactionEntry = new TransactionEntry();
+					transactionEntry.quantity = 0 - it.quantity;
+					transactionEntry.lotNumber = it.lotNumber
+					transactionEntry.product = it.product;
+					transactionEntry.inventoryItem = inventoryItem;
+					debitTransaction.addToTransactionEntries(transactionEntry);
+				}
+				debitTransaction.save(flush:true);
+			}
+		} catch (Exception e) { 
+			// rollback all updates 
+			log.error(e);
+			shipmentInstance.errors.reject("shipmentInstance.invalid", e.message);
+		}				
+	} 	
+	
+	
+	void receiveShipment(Shipment shipmentInstance, Receipt receiptInstance, String comment, User user, Location location) { 
+		
+		try {
+			
+			if (!receiptInstance.hasErrors() && receiptInstance.save(flush: true)) {
+				
+				// Add comment to shipment (as long as there's an actual comment
+				// after trimming off the extra spaces)
+				if (comment) {
+					shipmentInstance.addToComments(
+						new Comment(comment: comment, sender: user));
+				}
+
+				// Add a Shipped event to the shipment
+				EventType eventType = EventType.findByName("Received")
+				if (eventType) {
+					def event = new Event();
+					event.eventDate = new Date()
+					event.eventType = eventType
+					event.eventLocation = location
+					event.save(flush:true);
+					shipmentInstance.addToEvents(event);
+				}
+				else {
+					throw new Exception("Expected event type 'Shipped'")
+				}
+												
+				// Save updated shipment instance
+				shipmentInstance.save();
+			
+				// Create a new transaction for outgoing items
+				Transaction creditTransaction = new Transaction();
+				creditTransaction.transactionType = TransactionType.get(1); 	// transfer
+				creditTransaction.source = shipmentInstance?.origin
+				creditTransaction.destination = shipmentInstance?.destination;
+				creditTransaction.inventory = shipmentInstance?.destination?.inventory
+				creditTransaction.transactionDate = new Date();
+				
+				shipmentInstance.shipmentItems.each {
+					def inventoryItem = InventoryItem.findByLotNumberAndProduct(it.lotNumber, it.product)
+					
+					// If the inventory item doesn't exist, we create a new one
+					if (!inventoryItem) {
+						inventoryItem = new InventoryItem();
+						inventoryItem.lotNumber = it.lotNumber
+						inventoryItem.product = it.product
+						if (!inventoryItem.hasErrors() && inventoryItem.save()) {
+							// at this point we've saved the inventory item successfully
+						}
+						else {
+							//
+							inventoryItem.errors.allErrors.each { error->
+								def errorObj = [inventoryItem, error.getField(), error.getRejectedValue()] as Object[]
+								shipmentInstance.errors.reject("inventoryItem.invalid",
+									errorObj, "[${error.getField()} ${error.getRejectedValue()}] - ${error.defaultMessage} ");
+							}
+							return;
+						}
+					}
+					
+					// Create a new transaction entry
+					TransactionEntry transactionEntry = new TransactionEntry();
+					transactionEntry.quantity = it.quantity;
+					transactionEntry.lotNumber = it.lotNumber
+					transactionEntry.product = it.product;
+					transactionEntry.inventoryItem = inventoryItem;
+					creditTransaction.addToTransactionEntries(transactionEntry);
+				}
+				creditTransaction.save(flush:true);
+			}
+		} catch (Exception e) {
+			// rollback all updates
+			log.error(e);
+			shipmentInstance.errors.reject("shipmentInstance.invalid", e.message);
+		}
+	}
+		
 }

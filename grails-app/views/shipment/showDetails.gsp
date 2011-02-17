@@ -213,7 +213,7 @@
 																	<tr id="container-${container.id}" class="${(count++ % 2 == 0)?'odd':'even'}">
 																		<td>	
 																			<img src="${createLinkTo(dir:'images/icons/silk',file:'briefcase.png')}" alt="package" style="vertical-align: middle"/> &nbsp;
-																			<span style="font-weight: bold;">${container?.containerType?.name} ${container?.name}</span> &nbsp;
+																			<span style="font-weight: bold;">${container?.containerType?.name}</span> ${container?.name}&nbsp;
 																		</td>
 																		<td>	
 																			${container?.description}
@@ -326,15 +326,12 @@
 									</tr>
 									<tr class="prop">
 										<td class="name">
-											<img src="${createLinkTo(dir:'images/icons',file:'document.png')}" alt="document" style="vertical-align: middle"/>
+											<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="document" style="vertical-align: middle"/>
 											<label>Documents</label>
 										</td>
 										<td class="value"  colspan="3">										
 											<div>
-												<g:if test="${!shipmentInstance.documents}">
-													<div class="fade" style="text-align: center">(empty)</div>
-												</g:if> 
-												<g:else>													
+												<g:if test="${shipmentInstance.documents}">
 													<table>
 														<tbody>
 															<tr>
@@ -373,7 +370,11 @@
 															</g:each>	
 														</tbody>
 													</table>
-												</g:else>												
+												</g:if>												
+												<a href="${createLink(controller: "shipment", action: "addDocument", id: shipmentInstance.id)}">
+													<button><img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" 
+																alt="Add Document" style="vertical-align: middle"/> Add Document</button></a>													
+												
 											</div>
 										</td>					
 									</tr>
@@ -384,12 +385,9 @@
 										</td>
 										<td class="value" colspan="3">
 											<div>
-												<table>
-													<tbody>
-														<g:if test="${!shipmentInstance.comments}">
-															<div class="fade" style="text-align: center">(empty)</div>
-														</g:if> 
-														<g:else>
+												<g:if test="${shipmentInstance.comments}">
+													<table>
+														<tbody>
 															<tr>
 																<th width="40%">Comment</th>
 																<th width="15%">Date</th>																	
@@ -414,9 +412,13 @@
 																	</td>
 																</tr>
 															</g:each>	
-														</g:else>									
-													</tbody>
-												</table>	
+														</tbody>
+													</table>												
+												</g:if> 
+												<a href="${createLink(controller: "shipment", action: "addComment", id: shipmentInstance.id)}">
+													<button><img src="${createLinkTo(dir:'images/icons/silk',file:'comment_add.png')}" 
+																alt="Add Comment" style="vertical-align: middle"/> Add Comment</button></a>													
+																									
 											</div>
 										</td>
 									</tr>			
@@ -427,10 +429,7 @@
 										</td>
 										<td class="value" colspan="3">
 											<div>
-												<g:if test="${!shipmentInstance.events}">
-													<div class="fade" style="text-align: center">(empty)</div>
-												</g:if> 
-												<g:else>
+												<g:if test="${shipmentInstance.events}">
 													<table>	
 														<tbody>
 															<tr>
@@ -466,7 +465,14 @@
 															</g:each>
 														</tbody>								
 													</table>
-												</g:else>
+												</g:if>
+											<a href="${createLink(controller: "shipment", action: "addEvent", id: shipmentInstance.id)}">
+												<button>
+													<img src="${createLinkTo(dir:'images/icons/silk',file:'calendar_add.png')}" 
+														alt="Add Event" style="vertical-align: middle"/> Add Event
+												</button>
+											</a>													
+												
 											</div>
 										</td>
 									</tr>									

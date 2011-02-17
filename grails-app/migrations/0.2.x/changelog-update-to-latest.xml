@@ -2212,7 +2212,81 @@
     	</sql>
 	</changeSet>        
 
+    <changeSet author="jmiranda (generated)" id="1297432141595-3">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT count(*) FROM inventory JOIN location ON location.inventory_id = inventory.id WHERE location.id = 1]]>
+			</sqlCheck>
+		</preConditions>
+        <insert tableName="inventory">
+            <column name="id" valueNumeric="1"/>
+            <column name="version" valueNumeric="0"/>
+			<column name="date_created" valueDate="2011-02-17"/>
+            <column name="last_updated" valueDate="2011-02-17"/>            
+        </insert>
+		<update tableName="location">
+		    <column name="inventory_id" value="1"/>
+		    <where>id=1</where>
+		</update>        
+    </changeSet>
 
+    <changeSet author="jmiranda (generated)" id="1297432141595-4">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT count(*) FROM inventory JOIN location ON location.inventory_id = inventory.id WHERE location.id = 2]]>
+			</sqlCheck>
+		</preConditions>
+        <insert tableName="inventory">
+            <column name="id" valueNumeric="2"/>
+            <column name="version" valueNumeric="0"/>
+			<column name="date_created" valueDate="2011-02-17"/>
+            <column name="last_updated" valueDate="2011-02-17"/>            
+        </insert>
+		<update tableName="location">
+		    <column name="inventory_id" value="2"/>
+		    <where>id=2</where>
+		</update>        
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1297432141595-5">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT count(*) FROM inventory JOIN location ON location.inventory_id = inventory.id WHERE location.id = 3]]>
+			</sqlCheck>
+		</preConditions>
+        <insert tableName="inventory">
+            <column name="id" valueNumeric="3"/>
+            <column name="version" valueNumeric="0"/>
+			<column name="date_created" valueDate="2011-02-17"/>
+            <column name="last_updated" valueDate="2011-02-17"/>            
+        </insert>
+		<update tableName="location">
+		    <column name="inventory_id" value="3"/>
+		    <where>id=3</where>
+		</update>        
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1297432141595-6">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT count(*) FROM inventory JOIN location ON location.inventory_id = inventory.id WHERE location.id = 4]]>
+			</sqlCheck>
+		</preConditions>
+        <insert tableName="inventory">
+            <column name="id" valueNumeric="4"/>
+            <column name="version" valueNumeric="0"/>
+			<column name="date_created" valueDate="2011-02-17"/>
+            <column name="last_updated" valueDate="2011-02-17"/>            
+        </insert>
+		<update tableName="location">
+		    <column name="inventory_id" value="4"/>
+		    <where>id=4</where>
+		</update>        
+        
+    </changeSet>
+        
+        
+	        
         
 </databaseChangeLog>
 

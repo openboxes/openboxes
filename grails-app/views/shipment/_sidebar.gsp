@@ -65,7 +65,8 @@
 								</a>				
 							</td>
 						</tr>										
-					</g:else>					
+					</g:else>
+					<%-- 					
 					<tr class="prop">
 						<td>
 							<a href="${createLink(controller: "shipment", action: "addDocument", id: shipmentInstance.id)}"><img 
@@ -98,6 +99,7 @@
 						
 						</td>
 					</tr>
+					--%>
 				</g:if>
 			<tr class="prop">
 				<td>
@@ -109,20 +111,20 @@
 					</g:link>		
 				</td>
 			</tr>					
-			<%-- 
+
 			<g:if test="${session?.warehouse?.id == shipmentInstance?.origin?.id}">
 				<tr class="prop">
 					<td>
-						<g:link controller="shipment" action="sendShipment" id="${shipmentInstance.id}"><img
-						src="${createLinkTo(dir:'images/icons',file:'truck.png')}"
-						alt="Send Shipment" style="vertical-align: middle" /> &nbsp; 
-							<g:if test="${request.request.requestURL.toString().contains('sendShipment')}"><b>send shipment</b></g:if>
-							<g:else>send shipment</g:else>
+						<g:link controller="shipment" action="sendShipment" id="${shipmentInstance.id}">
+							<img src="${createLinkTo(dir:'images/icons',file:'truck.png')}"
+							alt="Send Shipment" style="vertical-align: middle" /> &nbsp; 
+								<g:if test="${request.request.requestURL.toString().contains('sendShipment')}"><b>send shipment</b></g:if>
+								<g:else>send shipment</g:else>
 						</g:link>				
 					</td>
 				</tr>
 			</g:if>
-			--%>
+
 			<g:if test="${session?.warehouse?.id == shipmentInstance?.destination?.id}">
 				<tr class="prop">
 					<td>

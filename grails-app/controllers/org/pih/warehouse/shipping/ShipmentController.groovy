@@ -30,6 +30,8 @@ class ShipmentController {
 	
 	def scaffold = Shipment
 	def shipmentService
+	def inventoryService;
+	
 	def dataSource
 	def sessionFactory
 	
@@ -215,25 +217,11 @@ class ShipmentController {
 		else {
 			if ("POST".equalsIgnoreCase(request.getMethod())) { 				
 				shipmentInstance.properties = params
-				if (!shipmentInstance.hasErrors() && shipmentInstance.save(flush: true)) {			
-
-					EventType eventType = EventType.findByName("Shipped")
-					if (eventType) {
-						def event = new Event(eventDate: new Date(), eventType: eventType,
-							eventLocation: Location.get(session.warehouse.id)).save(flush:true);
-						shipmentInstance.addToEvents(event).save(flush:true);
-					}
-					else { 
-						throw new Exception("Expected event type 'Shipped'")
-					}
-					
-					if (params.comment) { 
-						def comment = new Comment(comment: params.comment, sender: session.user)
-						shipmentInstance.addToComments(comment).save(flush:true);
-					}					
-					
+				
+				shipmentService.sendShipment(shipmentInstance, params.comment, session.user, session.warehouse);
+				if (!shipmentInstance.hasErrors()) { 
 					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
-					redirect(action: "listShipping")
+					redirect(action: "showDetails", id: shipmentInstance?.id)
 				}
 			}
 			render(view: "sendShipment", model: [shipmentInstance: shipmentInstance])
@@ -277,20 +265,12 @@ class ShipmentController {
 		}
 		else {			
 			if ("POST".equalsIgnoreCase(request.getMethod())) {				
-				
-				//receiptInstance.shipment = shipmentInstance;
-				if (!receiptInstance.hasErrors() && receiptInstance.save(flush: true)) {
-					def event = new Event(
-					eventDate: new Date(),
-					eventType:EventType.findByName("Received"),
-					eventLocation: Location.get(session.warehouse.id)).save(flush:true);
-					shipmentInstance.addToEvents(event).save(flush:true);
-					
-					def comment = new Comment(comment: params.comment, sender: session.user)
-					shipmentInstance.addToComments(comment).save(flush:true);
-					
+				shipmentService.receiveShipment(shipmentInstance, receiptInstance, params.comment, session.user, session.warehouse);
+
+				if (!shipmentInstance.hasErrors()) {
 					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
-					redirect(action: "listReceiving")
+					redirect(action: "showDetails", id: shipmentInstance?.id)
+					return;
 				}
 			}
 			else { 
@@ -306,8 +286,8 @@ class ShipmentController {
 					receiptInstance.addToReceiptItems(receiptItem);
 				}
 			}
-			[shipmentInstance:shipmentInstance, receiptInstance:receiptInstance]
 		}
+		render(view: "receiveShipment", model: [shipmentInstance: shipmentInstance, receiptInstance:receiptInstance])
 	}
 	
 	def showPackingList = { 
@@ -847,7 +827,7 @@ class ShipmentController {
 		def event = Event.get(params.id);
 		def shipment = Shipment.get(params.shipmentId);
 		if (shipment && event) {
-			shipment.removeFromEvents(event).save(flush:true);
+			shipment.removeFromEvents(event).save();
 			event.delete();
 			flash.message = "Deleted event $params.id from shipment";
 		}

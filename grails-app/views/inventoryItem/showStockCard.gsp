@@ -119,9 +119,9 @@
 															
 															<td style="text-align: right;" width="100px">
 																<g:link controller="inventoryItem" action="showRecordInventory" params="['product.id':commandInstance?.productInstance?.id,'inventory.id':commandInstance?.inventoryInstance?.id, 'inventoryItem.id':itemInstance?.id]">
-																	<button class="positive">
-																		<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
-																		Adjust
+																	<button class="">
+																		<img src="${resource(dir: 'images/icons/silk', file: 'book_open.png')}"/>
+																		
 																	</button>
 																</g:link>
 															</td>													

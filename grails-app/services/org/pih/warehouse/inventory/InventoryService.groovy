@@ -149,7 +149,7 @@ class InventoryService {
 				// Create a new transaction
 				def transaction = new Transaction(cmd.properties)
 				
-				// TODO Change this to be a valid lookup
+				// FIXME Change this to be a valid lookup
 				transaction.transactionType = TransactionType.get(7)
 				
 				// Process each row added to the record inventory page
@@ -276,6 +276,7 @@ class InventoryService {
 		transactionEntries.each { 
 			inventoryItems << it.inventoryItem;
 		}
+		inventoryItems.sort { it.lotNumber } 
 		return inventoryItems;
 	}
 

@@ -2,9 +2,11 @@ package org.pih.warehouse.inventory;
 
 import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.ListUtils;
+import org.pih.warehouse.core.EventStatus;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
+import org.pih.warehouse.shipping.ShipmentService;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.Warehouse;
 
@@ -12,7 +14,8 @@ import org.pih.warehouse.inventory.Warehouse;
 class InventoryController {
     //def scaffold = Inventory		
 	def inventoryService;
-		
+	def shipmentService;
+	
 	def index = { 
 		redirect(action: "browse");
 	}
@@ -64,6 +67,8 @@ class InventoryController {
 		if (!cmd?.warehouseInstance?.inventory) { 
 			redirect(action: "create")
 		}
+		
+		cmd.shipmentList = shipmentService.getReceivingByDestinationAndStatus(cmd.warehouseInstance, EventStatus.SHIPPED);
 		
 		// Hydrate the category filters from the session
 		// Allow us to get any attribute of a category without get a lazy init exception

@@ -11,6 +11,8 @@ class BrowseInventoryCommand {
 	def productList;		//productList?.sort() { it.name },
 	def rootCategory;		//rootCategory
 	def quantityMap;
+	def shipmentList;		// pending shipments
+	
 	
 	static constraints = { 
 		warehouseInstance(nullable:true)
@@ -20,6 +22,7 @@ class BrowseInventoryCommand {
 		productMap(nullable:true)
 		inventoryItemMap(nullable:true)
 		productList(nullable:true)
+		shipmentList(nullable:true)
 		rootCategory(nullable:true)		
 		quantityMap(nullable:true)
 	}

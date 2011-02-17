@@ -30,7 +30,13 @@ class Event implements Comparable, Serializable {
 	}
 
 	String toString() { return "$eventType $eventLocation on $eventDate"; }
-	int compareTo(obj) { obj.eventDate <=> eventDate }
+	int compareTo(obj) { 
+		def diff = obj?.eventDate <=> eventDate 
+		if (diff==0) {
+			diff = obj?.dateCreated <=> dateCreated
+		}
+		return diff
+	}
 	
 	
 }

@@ -192,6 +192,8 @@ class InventoryItemController {
 		Set inventoryItems = inventoryService.getInventoryItemsByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);		
 		cmd.inventoryItemList = inventoryItems as List
 		
+		cmd.inventoryItemList.sort { it.lotNumber } 
+		
 		// Get transaction log for a particular product within an inventory
 		cmd.transactionEntryList = inventoryService.getTransactionEntriesByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);
 		cmd.transactionEntriesByInventoryItemMap = cmd.transactionEntryList.groupBy { it.inventoryItem }

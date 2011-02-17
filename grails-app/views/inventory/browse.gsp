@@ -34,7 +34,7 @@
              
 
 					</td>
-					<td>&nbsp;</td>
+					<td width="1%"></td>
 					<td style="border: 1px solid lightgrey;">	
 								            		
 	            		<script>
@@ -44,12 +44,11 @@
 								});
 							});
 						</script>
-						
 	            			<g:set var="varStatus" value="${0 }"/>	            			
 		            		<table>
 		            			<tr class="odd">
 			            			<td colspan="2">
-										<img src="${createLinkTo(dir: 'images/icons/silk', file: 'find.png' )}" style="vertical-align:middle"/>
+										<img src="${createLinkTo(dir: 'images/icons/silk', file: 'product.png' )}" style="vertical-align:middle"/>
 										<label>Inventory Items</label> 
 					 				</td>
 		            			</tr>
