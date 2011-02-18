@@ -15,16 +15,45 @@
             </g:if>
 			<g:if test="${params.groupBy}">
 				<div class="left">
+					<style>
+						.selected { disabled: true; }
+					</style>
+				
 					<label>Group by:</label>
-					<g:set var="lastUpdatedClass" value="${(params.groupBy=='lastUpdated')?'selected':''}"/>
-					<g:set var="dateCreatedClass" value="${params.groupBy=='dateCreated'?'selected':''}"/>
-					<g:set var="expectedShippingDateClass" value="${params.groupBy=='expectedShippingDate'?'selected':''}"/>
-					<g:link class="${dateCreatedClass}" controller="shipment" action="listShippingByDate" params="['groupBy':'dateCreated']"><g:message code="shipment.listShipping.label" default="Created date"/></g:link>
-					&nbsp;|&nbsp;
-					<g:link class="${lastUpdatedClass}" controller="shipment" action="listShippingByDate" params="['groupBy':'lastUpdated']"><g:message code="shipment.listShipping.label" default="Modified date"/></g:link>
-					&nbsp;|&nbsp;
-					<g:link class="${expectedShippingDateClass}" controller="shipment" action="listShippingByDate" params="['groupBy':'expectedShippingDate']"><g:message code="shipment.listShipping.label" default="Expected ship date"/></g:link>
-					&nbsp;			
+					
+					<g:if test="${params.groupBy=='expectedShippingDate'}">
+						<span class="selected">
+							<g:message code="shipment.expectedShippingDate.label" default="Expected Shipping"/>
+						</span>
+					</g:if>
+					<g:else>
+						<g:link controller="shipment" action="listShippingByDate" params="['groupBy':'expectedShippingDate']">
+							<g:message code="shipment.expectedShippingDate.label" default="Expected shipping"/>
+						</g:link>
+					</g:else>
+					|
+					<g:if test="${params.groupBy=='dateCreated'}">
+						<span class="selected">
+							<g:message code="shipment.dateCreated.label" default="Created"/>
+						</span>
+					</g:if>
+					<g:else>
+						<g:link controller="shipment" action="listShippingByDate" params="['groupBy':'dateCreated']">
+							<g:message code="shipment.dateCreated.label" default="Created"/>
+						</g:link>
+					</g:else>
+					|
+					<g:if test="${params.groupBy=='lastUpdated'}">
+						<span class="selected">
+							<g:message code="shipment.lastUpdated.label" default="Modified"/>
+						</span>
+					</g:if>
+					<g:else>
+						<g:link controller="shipment" action="listShippingByDate" params="['groupBy':'lastUpdated']">
+							<g:message code="shipment.lastUpdated.label" default="Modified"/>
+						</g:link>
+					</g:else>
+					
 				</div>	
 			</g:if>
 
