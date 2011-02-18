@@ -32,7 +32,7 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 	//static belongsTo = [ container : Container ] // + shipment : Shipment
 	static constraints = {
 		container(nullable:true)
-		product(blank:false)
+		product(blank:false, nullable:false)  // TODO: this doesn't seem to prevent the product field from being empty
 		lotNumber(nullable:true)
 		quantity(min:0, blank:false)
 		serialNumber(nullable:true)

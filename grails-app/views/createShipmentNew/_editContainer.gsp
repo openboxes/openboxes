@@ -1,26 +1,28 @@
-<script type="text/javascript">
-	$(document).ready(function(){
-		$("#btnEditContainer-${containerInstance?.id}").click(function() { $("#dlgEditContainer-${containerInstance?.id}").dialog('open'); });									
-		$("#dlgEditContainer-${containerInstance?.id}").dialog({ autoOpen: false, modal: true, width: '600px' });	
-		
-		$("#btnAddContainer-${type}").click(function() { $("#dlgAddContainer-${type}").dialog('open'); });									
-		$("#dlgAddContainer-${type}").dialog({ autoOpen: false, modal: true, width: '600px' });	
-					
-	});
-</script>	   
 <g:if test="${containerInstance}">
-	<div id="dlgEditContainer-${containerInstance?.id}" title="Edit ${containerInstance?.containerType?.name}" style="padding: 10px; display: none;" >
+	<g:set var="formName" value="EditContainer-${containerInstance?.id}" />
 </g:if>
 <g:else>
-	<div id="dlgAddContainer-${type}" title="Add ${type}" style="padding: 10px; display: none;" >
+	<g:set var="formName" value="AddContainer-${type}" />
 </g:else>
-	<g:form action="createShipment">
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#btn${formName}").click(function() { $("#dlg${formName}").dialog('open'); });									
+		$("#dlg${formName}").dialog({ autoOpen: false, modal: true, width: '600px' });						
+	});
+</script>	   
+	<div id="dlg${formName}" title="${containerInstance ? 'Edit ' + containerInstance?.containerType?.name : 'Add ' + type}" style="padding: 10px; display: none;" >
+	
+	<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.Container" form="${formName}"/>
+	<g:form name="${formName}" action="createShipment">
+		
 		<g:if test="${containerInstance}">
 			<g:hiddenField name="container.id" value="${containerInstance?.id }"/>
 		</g:if>
 		<g:else>
 			<g:hiddenField name="type" value="${type}"/>
 		</g:else>
+		
 		<table>
 			<tbody>
 				<g:render template="containerFields" model="['containerInstance':containerInstance]"/>
@@ -32,7 +34,7 @@
 							<g:if test="${containerInstance}">
 								<g:submitButton name="deleteContainer" value="Remove ${containerInstance ? containerInstance?.containerType?.name : type}"></g:submitButton>
 							</g:if>
-							<g:submitButton name="cancelDialog" value="Cancel"></g:submitButton>
+							<button name="cancelDialog" type="reset" onclick="$('#dlg${formName}').dialog('close');">Cancel</button>
 						</div>
 						<div class="buttons">
 							<g:submitButton name="addBoxToContainer" value="Add a Box to this ${containerInstance ? containerInstance?.containerType?.name : type}"></g:submitButton>

@@ -105,8 +105,6 @@ class CreateShipmentNewController {
 			}.to("finish")
 			
 			on("cancel").to("finish")
-			
-			on("cancelDialog").to("enterContainerDetails")
     		
 			on("saveContainer").to("saveContainerAction")
 			
@@ -117,7 +115,7 @@ class CreateShipmentNewController {
 			
 			on("saveBox").to("saveBoxAction")
 			
-			on("deleteBox") {
+			on("deleteBox") {		
 				def box = Container.get(params.box.id)
 				shipmentService.deleteContainer(box)
 			}.to("enterContainerDetails")
@@ -125,7 +123,13 @@ class CreateShipmentNewController {
 			on("saveItem").to("saveItemAction")
 			
 			on("deleteItem"){
+				
+				log.error("the parameter passed is " + params.item.id)
+				
 				def item = ShipmentItem.get(params.item.id)
+				
+				log.error("the item fetched has id " + item.id + " and quantity " + item.quantity)
+				
 				shipmentService.deleteShipmentItem(item)
 			}.to("enterContainerDetails")
 			

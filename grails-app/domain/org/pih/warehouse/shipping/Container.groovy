@@ -38,13 +38,12 @@ class Container implements Comparable, java.io.Serializable {
 
 	static transients = [ "optionValue", "shipmentItems" ]
 	static mapping = {
-		containers sort: 'sortOrder', order: 'asc'
 		containers cascade: "all-delete-orphan"
 	}
 		
 	// Constraints
 	static constraints = {	 
-		name(nullable:false)
+		name(empty:false)
 		description(nullable:true)
 		containerNumber(nullable:true)
 		parentContainer(nullable:true)
@@ -63,7 +62,18 @@ class Container implements Comparable, java.io.Serializable {
 	}	
 
 	int compareTo(obj) { 
-		return sortOrder.compareTo(obj.sortOrder) 
+		if (!sortOrder && obj?.sortOrder) {
+			return -1
+		}
+		else if (!obj?.sortOrder && sortOrder) {
+			return 1
+		}
+		else if (sortOrder <=> obj?.sortOrder != 0) {
+			return sortOrder <=> obj?.sortOrder
+		}
+		else {
+			return id <=> obj?.id
+		}
 	}
 	
 	List<ShipmentItem> getShipmentItems() { 

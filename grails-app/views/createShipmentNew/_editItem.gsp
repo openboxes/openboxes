@@ -1,19 +1,21 @@
+<g:if test="${itemInstance}">
+	<g:set var="formName" value="EditItem-${itemInstance?.id}" />
+</g:if>
+<g:if test="${containerInstance}">
+	<g:set var="formName" value="AddItem-${containerInstance?.id}" />
+</g:if>
+
 <script type="text/javascript">
 	$(document).ready(function(){
-		$("#btnEditItem-${itemInstance?.id}").click(function() { $("#dlgEditItem-${itemInstance?.id}").dialog('open'); });									
-		$("#dlgEditItem-${itemInstance?.id}").dialog({ autoOpen: false, modal: true, width: '600px' });				
-	
-		$("#btnAddItem-${containerInstance?.id}").click(function() { $("#dlgAddItem-${containerInstance?.id}").dialog('open'); });									
-		$("#dlgAddItem-${containerInstance?.id}").dialog({ autoOpen: ${addItem == containerInstance?.id ? 'true' : 'false'}, modal: true, width: '600px' });				
+		$("#btn${formName}").click(function() { $("#dlg${formName}").dialog('open'); });									
+		$("#dlg${formName}").dialog({ autoOpen: ${containerInstance && (addItem == containerInstance?.id) ? 'true' : 'false'}, modal: true, width: '600px' });				
 	});
 </script>
-<g:if test="${itemInstance}">	   
-	<div id="dlgEditItem-${itemInstance?.id}" title="Edit an item" style="padding: 10px; display: none;" >
-</g:if>
-<g:else>
-	<div id="dlgAddItem-${containerInstance?.id}" title="Add an item" style="padding: 10px; display: none;" >
-</g:else>
-	<g:form action="createShipment">
+
+	<div id="dlg${formName}" title="Edit an Item" style="padding: 10px; display: none;" >
+		<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.ShipmentItem" form="${formName}"/>
+		<g:form name="${formName}" action="createShipment">
+
 		<table>
 			<tbody>
 				<g:if test="${containerInstance}">
@@ -32,7 +34,7 @@
 							<g:if test="${itemInstance}">
 								<g:submitButton name="deleteItem" value="Remove Item"></g:submitButton>
 							</g:if>
-							<g:submitButton name="cancelDialog" value="Cancel"></g:submitButton>
+							<button name="cancelDialog" type="reset" onclick="$('#dlg${formName}').dialog('close');">Cancel</button>
 						</div>
 						<g:if test="${containerInstance}">
 							<div class="buttons">
@@ -43,7 +45,7 @@
 				</tr>
 			</tbody>
 		</table>
-	</g:form>																	
+	</g:form>														
 </div>		
 		     
 

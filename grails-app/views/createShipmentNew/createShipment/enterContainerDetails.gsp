@@ -3,7 +3,7 @@
     <head>
          <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
          <meta name="layout" content="custom" />
-         <title>Add Contents</title>         
+         <title>Add Contents</title>  
     </head>
     <body>
 		<div class="body">
@@ -34,7 +34,7 @@
 							</tr>
 						</thead>
 						<g:set var="count" value="${0 }"/>	
-						<g:each var="containerInstance" in="${shipmentInstance?.containers}">
+						<g:each var="containerInstance" in="${shipmentInstance?.containers?.sort()}">
 						<g:if test="${!containerInstance.parentContainer}">  <!--  only list top-level containers -->
 							<tbody>
 								<tr class="${count++%2==0?'odd':'even' }">
@@ -71,7 +71,7 @@
 									</td>
 								</tr>
 								
-								<g:each var="itemInstance" in="${shipmentInstance?.shipmentItems}">		
+								<g:each var="itemInstance" in="${shipmentInstance?.shipmentItems?.sort()}">		
 									<g:if test="${itemInstance?.container?.id == containerInstance?.id}">	
 										<tr class="${count++%2==0?'odd':'even' }">
 											<td>
@@ -96,7 +96,7 @@
 									</g:if>
 								</g:each>
 	
-								<g:each  var="boxInstance" in="${containerInstance?.containers}">
+								<g:each  var="boxInstance" in="${containerInstance?.containers?.sort()}">
 									<tr class="${count++%2==0?'odd':'even' }">
 										<td>
 											<span style="padding-left: 32px;">
@@ -124,7 +124,7 @@
 										</td>
 									</tr>
 									
-									<g:each var="itemInstance" in="${shipmentInstance?.shipmentItems}">	
+									<g:each var="itemInstance" in="${shipmentInstance?.shipmentItems?.sort()}">	
 										<g:if test="${boxInstance?.id == itemInstance?.container?.id }">
 											<tr class="${count++%2==0?'odd':'even' }">
 												<td>

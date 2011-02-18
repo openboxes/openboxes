@@ -37,10 +37,7 @@ class Shipment implements Serializable {
 	//Event mostRecentEvent			// a reference to the most recent event (needed for querying)
 	
 	// One-to-many associations
-	// these sorted sets don't work because sets aren't allowed to have identical items
 	SortedSet events;
-	//SortedSet containers;
-	//SortedSet shipmentItems;
 	
 	List documents;
 	List comments;

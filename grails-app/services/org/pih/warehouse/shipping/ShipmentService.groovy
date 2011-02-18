@@ -282,6 +282,9 @@ class ShipmentService {
 	 */
 	void deleteShipmentItem(ShipmentItem item) {
 		def shipment = item.shipment
+		
+		log.error("so we are trying to remove item with id = " + item.id + " and quantity = " + item.quantity)
+		
 		shipment.removeFromShipmentItems(item)
 		
 	}

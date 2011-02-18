@@ -1,19 +1,20 @@
-<script type="text/javascript">
-	$(document).ready(function(){
-		$("#btnEditBox-${boxInstance?.id}").click(function() { $("#dlgEditBox-${boxInstance?.id}").dialog('open'); });									
-		$("#dlgEditBox-${boxInstance?.id}").dialog({ autoOpen: false, modal: true, width: '600px' });				
-	
-		$("#btnAddBox-${containerInstance?.id}").click(function() { $("#dlgAddBox-${containerInstance?.id}").dialog('open'); });									
-		$("#dlgAddBox-${containerInstance?.id}").dialog({ autoOpen: ${addBox == containerInstance?.id ? 'true' : 'false'}, modal: true, width: '600px' });				
-	});
-</script>
-<g:if test="${boxInstance}">	   
-	<div id="dlgEditBox-${boxInstance?.id}" title="Edit a Box" style="padding: 10px; display: none;" >
+<g:if test="${boxInstance}">
+	<g:set var="formName" value="EditBox-${boxInstance?.id}" />
 </g:if>
 <g:else>
-	<div id="dlgAddBox-${containerInstance?.id}" title="Add a Box" style="padding: 10px; display: none;" >
+	<g:set var="formName" value="AddBox-${container?.id}" />
 </g:else>
-	<g:form action="createShipment">
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#btn${formName}").click(function() { $("#dlg${formName}").dialog('open'); });									
+		$("#dlg${formName}").dialog({ autoOpen: ${!boxInstance && (addBox == containerInstance?.id) ? 'true' : 'false'}, modal: true, width: '600px' });				
+	});
+</script>	   
+	<div id="dlg${formName}" title="Edit a Box" style="padding: 10px; display: none;" >
+	<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.Container" form="${formName}"/>
+
+	<g:form name="${formName}" action="createShipment">
 		<table>
 			<tbody>
 				<g:render template="containerFields" model="['boxInstance':boxInstance]"/>
@@ -32,7 +33,7 @@
 							<g:if test="${boxInstance}">
 								<g:submitButton name="deleteBox" value="Remove Box"></g:submitButton>
 							</g:if>
-							<g:submitButton name="cancelDialog" value="Cancel"></g:submitButton>
+							<button name="cancelDialog" type="reset" onclick="$('#dlg${formName}').dialog('close');">Cancel</button>
 						</div>
 						<g:if test="${boxInstance}">
 							<div class="buttons">

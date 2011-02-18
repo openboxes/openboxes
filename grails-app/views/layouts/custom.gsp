@@ -35,6 +35,11 @@
 	<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.tmplPlus.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.livequery.min.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.hoverIntent.minified.js')}" type="text/javascript" ></script>
+	
+ 	<!-- Include Jquery Validation and Jquery Validation UI plugins -->
+ 	<jqval:resources />       
+    <jqvalui:resources />
+	
 	<%--
 	<!-- Not using yet -->
 	<link href="${createLinkTo(dir:'js/jquery.jqGrid/css', file:'ui.jqgrid.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
