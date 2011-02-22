@@ -105,12 +105,22 @@ class CreateShipmentNewController {
 			}.to("finish")
 			
 			on("cancel").to("finish")
-    		
+			
+			on("editContainer") {
+				// set the container we will to edit
+				flash.containerToEdit = Container.get(params.containerToEditId)
+			}.to("enterContainerDetails")
+			
 			on("saveContainer").to("saveContainerAction")
 			
 			on("deleteContainer") {
 				def container = Container.get(params.container.id)	
 				shipmentService.deleteContainer(container)
+			}.to("enterContainerDetails")
+			
+			on("editBox") {
+				// set the box we will to edit
+				flash.boxToEdit = Container.get(params.boxToEditId)
 			}.to("enterContainerDetails")
 			
 			on("saveBox").to("saveBoxAction")
@@ -124,6 +134,12 @@ class CreateShipmentNewController {
 				flash.cloneQuantity = params.cloneQuantity  // TODO: validate this?
 			}.to("saveBoxAction")
 			
+			on("editItem") {
+				// set the item we will to edit
+				flash.itemToEdit = ShipmentItem.get(params.itemToEditId)
+			}.to("enterContainerDetails")
+			
+			
 			on("saveItem").to("saveItemAction")
 			
 			on("deleteItem"){	
@@ -131,31 +147,36 @@ class CreateShipmentNewController {
 				shipmentService.deleteShipmentItem(item)
 			}.to("enterContainerDetails")
 			
+			on("addContainer") {
+				// set the container type to add
+				flash.containerTypeToAdd = ContainerType.findByName(params.containerTypeToAddName)
+			}.to("enterContainerDetails")
+			
 			on("addBoxToContainer"){
 				// this parameter triggers the "Add Box" dialog for the container to be opened on page reload
 				// -1 means we need to assign the id of the new container to add box
-				flash.addBox = (params.container?.id) ? params.container.id as Integer : -1
+				flash.addBoxToContainerId = (params.container?.id) ? params.container.id as Integer : -1
 			}.to("saveContainerAction")
 			
 			on("addItemToContainer") {
 				// this parameter triggers the "Add Item" dialog for the container to be opened on page reload 
 				// -1 means we need to assign the id of the new container to add item
-				flash.addItem = (params.container?.id) ? params.container.id as Integer : -1
+				flash.addItemToContainerId = (params.container?.id) ? params.container.id as Integer : -1
 			}.to("saveContainerAction")
 			
 			on("addItemToBox") {	
 				// this parameter triggers the "Add Item" dialog for the container to be opened on page reloa
-				flash.addItem = params.box.id as Integer
+				flash.addItemToContainerId = params.box.id as Integer
 			}.to("saveBoxAction")
 			
 			on("addAnotherItem") {
 				// this parameter triggers the "Add Item" dialog for the container to be opened on page reload
-				flash.addItem = params.container.id as Integer
+				flash.addItemToContainerId = params.container.id as Integer
 			}.to("saveItemAction")
 			
 			on("addAnotherBox") {
 				// this parameter triggers the "Add Box" dialog for the container to be opened on page reload
-				flash.addBox = params.container.id as Integer
+				flash.addBoxToContainerId = params.container.id as Integer
 			}.to("saveBoxAction")
     	}
     	
@@ -168,7 +189,7 @@ class CreateShipmentNewController {
 					container = Container.get(params.container?.id)
 				}
 				else {
-					def containerType = ContainerType.findByName(params.type)
+					def containerType = ContainerType.get(params.containerTypeToAddId)
 					if (!containerType) {
 						throw new Exception("Invaild container type passed to editContainer action.")
 					}

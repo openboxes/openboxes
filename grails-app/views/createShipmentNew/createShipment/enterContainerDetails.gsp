@@ -23,6 +23,17 @@
 				<%--<legend>Step 3&nbsp;Add shipment items</legend> --%>	
 					<g:render template="../shipment/summary" />	
 			 		
+			 		<!-- figure out what dialog box, if any, we need to render -->
+			 		<g:if test="${containerToEdit || containerTypeToAdd}">
+			 			<g:render template="editContainer" model="['container':containerToEdit, 'containerTypeToAdd':containerTypeToAdd]"/>
+			 		</g:if>
+			 		<g:if test="${boxToEdit || addBoxToContainerId}">
+			 			<g:render template="editBox" model="['box':boxToEdit, 'addBoxToContainerId':addBoxToContainerId]"/>
+			 		</g:if>
+			 		<g:if test="${itemToEdit || addItemToContainerId}">
+			 			<g:render template="editItem" model="['item':itemToEdit, 'addItemToContainerId':addItemToContainerId]"/>
+			 		</g:if>
+			 		
 					<div class="dialog">
 					<table style="border: 1px solid #CCC;" border="0">
 						<thead>	
@@ -34,8 +45,7 @@
 							</tr>
 						</thead>
 						<g:set var="count" value="${0 }"/>	
-						<g:each var="containerInstance" in="${shipmentInstance?.containers?.sort()}">
-						<g:if test="${!containerInstance.parentContainer}">  <!--  only list top-level containers -->
+						<g:each var="containerInstance" in="${shipmentInstance?.containers?.findAll({!it.parentContainer}).sort()}">
 							<tbody>
 								<tr class="${count++%2==0?'odd':'even' }">
 									<td style="width:30%;">
@@ -46,40 +56,84 @@
 											<g:if test="${containerInstance?.containerType?.name == 'Pallet'}">
 												<img src="${createLinkTo(dir:'images/icons',file:'pallet-truck.png')}" alt="Pallet" style="vertical-align: middle"/>&nbsp;
 											</g:if>
-											<b><a href="#" id="btnEditContainer-${containerInstance?.id}">
+											<b><g:link action="createShipment" event="editContainer" params="[containerToEditId:containerInstance?.id]">
 												${containerInstance?.name}
-											</a></b>
+											</g:link></b>
 										</span>
-										<g:render template="editContainer" model="['containerInstance':containerInstance]"/>
 									</td>
 									<td style="text-align:center;width:5%;">-</td>
 									<td></td>
 									<td style="width:25%; text-align: left;">
 										<span nowrap>
-											<a href="#" id="btnAddItem-${containerInstance?.id}">
+											<g:link action="createShipment" event="addItemToContainer" params="['container.id':containerInstance.id]">
 												<img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" alt="Add an item" style="vertical-align: middle"/>
 												&nbsp;add item
-											</a> 													
+											</g:link> 													
 											&nbsp;
-											<a href="#" id="btnAddBox-${containerInstance?.id}">
+											<g:link action="createShipment" event="addBoxToContainer" params="['container.id':containerInstance.id]">
 												<img src="${createLinkTo(dir:'images/icons/silk',file:'package_add.png')}" alt="Add a box" style="vertical-align: middle"/>
 												&nbsp;add box
-											</a>
+											</g:link>
 										</span>
-										<g:render template="editItem" model="['containerInstance':containerInstance, 'addItem':addItem]"/>
-										<g:render template="editBox" model="['containerInstance':containerInstance, 'addBox':addBox]"/>
 									</td>
 								</tr>
 								
-								<g:each var="itemInstance" in="${shipmentInstance?.shipmentItems?.sort()}">		
-									<g:if test="${itemInstance?.container?.id == containerInstance?.id}">	
+								<g:each var="itemInstance" in="${shipmentInstance?.shipmentItems?.findAll({it.container?.id == containerInstance?.id})?.sort()}">		
+									<tr class="${count++%2==0?'odd':'even' }">
+										<td>
+											<span style="padding-left: 32px;">
+												<g:link action="createShipment" event="editItem" params="[itemToEditId:itemInstance?.id]">
+													<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="Item" style="vertical-align: middle"/>
+													&nbsp;${itemInstance?.product?.name } 	
+												</g:link>
+											</span>
+										</td>
+										<td style="text-align:center;">
+											${itemInstance?.quantity}
+										</td>
+										<td></td>
+										<td style="text-align: left;">		
+											<g:link action="createShipment" event="deleteItem" params="['item.id':itemInstance?.id]">	<img src="${createLinkTo(dir:'images/icons/silk',file:'page_delete.png')}" alt="remove item" style="vertical-align: middle"/>
+												&nbsp;remove item
+											</g:link>	
+										</td>
+									</tr>
+								</g:each>
+	
+								<g:each  var="boxInstance" in="${containerInstance?.containers?.sort()}">
+									<tr class="${count++%2==0?'odd':'even' }">
+										<td>
+											<span style="padding-left: 32px;">
+											<g:link action="createShipment" event="editBox" params="[boxToEditId:boxInstance?.id]">
+												<img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" alt="Package" style="vertical-align: middle"/>
+												&nbsp;${boxInstance?.name}
+											</g:link>
+											</span>
+										</td>
+										<td style="text-align:center;">-</td>
+										<td></td>
+										<td style="text-align: left;">
+											<g:link action="createShipment" event="addItemToContainer" params="['container.id':boxInstance.id]">
+												<img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" alt="Add an item" style="vertical-align: middle"/>
+												&nbsp;add item
+											</g:link> 		
+											&nbsp;
+											
+											<g:link action="createShipment" event="deleteBox" params="['box.id':boxInstance?.id]">
+												<img src="${createLinkTo(dir:'images/icons/silk',file:'package_delete.png')}" alt="Add an item" style="vertical-align: middle"/>
+												&nbsp;remove box
+											</g:link>														
+										</td>
+									</tr>
+									
+									<g:each var="itemInstance" in="${shipmentInstance?.shipmentItems?.findAll({it.container?.id == boxInstance?.id})?.sort()}">	
 										<tr class="${count++%2==0?'odd':'even' }">
 											<td>
-												<span style="padding-left: 32px;">
-													<a href="#" id="btnEditItem-${itemInstance?.id}">
+												<span style="padding-left: 64px;">
+													<g:link action="createShipment" event="editItem" params="[itemToEditId:itemInstance?.id]">
 														<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="Item" style="vertical-align: middle"/>
-														&nbsp;${itemInstance?.product?.name } 	
-													</a>
+														&nbsp;${itemInstance?.product?.name }
+													</g:link>																	
 												</span>
 											</td>
 											<td style="text-align:center;">
@@ -87,71 +141,15 @@
 											</td>
 											<td></td>
 											<td style="text-align: left;">		
-												<g:link action="createShipment" event="deleteItem" params="['item.id':itemInstance?.id]">	<img src="${createLinkTo(dir:'images/icons/silk',file:'page_delete.png')}" alt="remove item" style="vertical-align: middle"/>
+												<g:link action="createShipment" event="deleteItem" params="['item.id':itemInstance?.id]">
+													<img src="${createLinkTo(dir:'images/icons/silk',file:'page_delete.png')}" alt="remove item" style="vertical-align: middle"/>
 													&nbsp;remove item
-												</g:link>
-												<g:render template="editItem" model="['itemInstance':itemInstance]"/>	
+												</g:link>	
 											</td>
 										</tr>
-									</g:if>
-								</g:each>
-	
-								<g:each  var="boxInstance" in="${containerInstance?.containers?.sort()}">
-									<tr class="${count++%2==0?'odd':'even' }">
-										<td>
-											<span style="padding-left: 32px;">
-											<a href="#" id="btnEditBox-${boxInstance?.id}">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" alt="Package" style="vertical-align: middle"/>
-												&nbsp;${boxInstance?.name}
-											</a>
-											</span>
-										</td>
-										<td style="text-align:center;">-</td>
-										<td></td>
-										<td style="text-align: left;">
-											<a href="#" id="btnAddItem-${boxInstance?.id}">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" alt="Add an item" style="vertical-align: middle"/>
-												&nbsp;add item
-											</a> 		
-											&nbsp;
-											
-											<g:link action="createShipment" event="deleteBox" params="['box.id':boxInstance?.id]">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'package_delete.png')}" alt="Add an item" style="vertical-align: middle"/>
-												&nbsp;remove box
-											</g:link>
-											<g:render template="editBox" model="['boxInstance':boxInstance]"/>
-											<g:render template="editItem" model="['containerInstance':boxInstance,'addItem':addItem]"/>															
-										</td>
-									</tr>
-									
-									<g:each var="itemInstance" in="${shipmentInstance?.shipmentItems?.sort()}">	
-										<g:if test="${boxInstance?.id == itemInstance?.container?.id }">
-											<tr class="${count++%2==0?'odd':'even' }">
-												<td>
-													<span style="padding-left: 64px;">
-														<a href="#" id="btnEditItem-${itemInstance?.id}">
-															<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="Item" style="vertical-align: middle"/>
-															&nbsp;${itemInstance?.product?.name }
-														</a>																	
-													</span>
-												</td>
-												<td style="text-align:center;">
-													${itemInstance?.quantity}
-												</td>
-												<td></td>
-												<td style="text-align: left;">		
-													<g:link action="createShipment" event="deleteItem" params="['item.id':itemInstance?.id]">
-														<img src="${createLinkTo(dir:'images/icons/silk',file:'page_delete.png')}" alt="remove item" style="vertical-align: middle"/>
-														&nbsp;remove item
-													</g:link>
-													<g:render template="editItem" model="['itemInstance':itemInstance]"/>	
-												</td>
-											</tr>
-										</g:if>
 									</g:each>												
 								</g:each>
-							</tbody>
-						</g:if>											
+							</tbody>							
 						</g:each>
 						<tfoot>
 							<tr class="${count++%2==0?'odd':'even' }">
@@ -159,16 +157,14 @@
 								<td></td>
 								<td></td>
 								<td>
-									<a href="#" id="btnAddContainer-Pallet">
+									<g:link action="createShipment" event="addContainer" params="[containerTypeToAddName:'Pallet']">
 										<img src="${createLinkTo(dir:'images/icons',file:'pallet-truck.png')}" alt="add a pallet" style="vertical-align: middle"/>
 										&nbsp;add a pallet
-									</a>
-									<g:render template="editContainer" model="['type':'Pallet']"/>
-									<a href="#" id="btnAddContainer-Suitcase">
+									</g:link>
+									<g:link action="createShipment" event="addContainer" params="[containerTypeToAddName:'Suitcase']">
 										<img src="${createLinkTo(dir:'images/icons/silk',file:'briefcase.png')}" alt="add a suitcase" style="vertical-align: middle"/>
 										&nbsp;add a suitcase
-									</a>
-									<g:render template="editContainer" model="['type':'Suitcase']"/>
+									</g:link>
 								</td>
 							</tr>
 						</tfoot>
