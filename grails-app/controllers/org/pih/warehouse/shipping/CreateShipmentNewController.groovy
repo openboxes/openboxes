@@ -120,16 +120,14 @@ class CreateShipmentNewController {
 				shipmentService.deleteContainer(box)
 			}.to("enterContainerDetails")
 			
+			on("cloneBox") {
+				flash.cloneQuantity = params.cloneQuantity  // TODO: validate this?
+			}.to("saveBoxAction")
+			
 			on("saveItem").to("saveItemAction")
 			
-			on("deleteItem"){
-				
-				log.error("the parameter passed is " + params.item.id)
-				
+			on("deleteItem"){	
 				def item = ShipmentItem.get(params.item.id)
-				
-				log.error("the item fetched has id " + item.id + " and quantity " + item.quantity)
-				
 				shipmentService.deleteShipmentItem(item)
 			}.to("enterContainerDetails")
 			
@@ -242,13 +240,28 @@ class CreateShipmentNewController {
 						shipmentService.saveShipmentItem(item)
 					}
 				}
-
+				
 				valid()
     		}
     		
-    		
-			on("valid").to("enterContainerDetails")
+			on("valid").to("cloneBoxAction")
     		on("invalid").to("enterContainerDetails")
+    	}
+    	
+    	cloneBoxAction {
+    		action {
+    			
+    			// see if we have to make copies of this box
+    			if (flash.cloneQuantity) {
+    				def box
+    				box = Container.get(params.box.id)
+    				shipmentService.copyContainer(box, flash.cloneQuantity as Integer)
+    			}
+    		
+    			valid()
+    		}
+    		
+    		on("valid").to("enterContainerDetails")
     	}
     	
     	saveItemAction {

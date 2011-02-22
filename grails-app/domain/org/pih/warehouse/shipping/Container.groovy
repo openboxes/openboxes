@@ -76,6 +76,33 @@ class Container implements Comparable, java.io.Serializable {
 		}
 	}
 	
+	/**
+	 * Makes a copy of this container
+	 * But does not copy references to associated shipments or child containers
+	 * Also doesn't copy id, date created and last updated
+	 */
+	Container copyContainer() {
+
+		// TODO: figure out sort order!
+
+		Container newContainer = new Container (
+			name: this.name,
+			containerNumber: this.containerNumber,
+			description: this.description,
+			recipient: this.recipient,
+			sortOrder: this.sortOrder,
+			height: this.height,
+			width: this.width,
+			length: this.length,
+			volumeUnits: this.volumeUnits,
+			weight: this.weight,
+			weightUnits: this.weight,
+			containerType: this.containerType,
+			containerStatus: this.containerStatus
+		)
+	
+	}
+	
 	List<ShipmentItem> getShipmentItems() { 
 		return ShipmentItem.findAllByContainer(this)
 	}

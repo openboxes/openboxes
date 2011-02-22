@@ -253,28 +253,31 @@ class ShipmentService {
 	 * Deletes a container
 	 */
 	void deleteContainer(Container container) {
-		// first we need to handle deleting all the child containers
-		for (childContainer in container.containers) {
-			deleteContainer(childContainer)
+		// nothing to do if null
+		if (!container) { return }
+		
+		// first we need recursively call method to handle deleting all the child containers
+		def childContainers = container.containers.collect { it }   // make a copy to avoid concurrent modification
+		childContainers.each { 
+			deleteContainer(it) 
 		}
 		
 		// remove all items in the container from the parent shipment
-		def shipment = container?.shipment
-		for (ShipmentItem item in container.getShipmentItems()) {
-			shipment.removeFromShipmentItems(item).save(flush:true)
-		}	
+		container.getShipmentItems().each { 
+			container.shipment.removeFromShipmentItems(it).save(flush:true) 
+		}
 		
 		// NOTE: I'm using the standard "remove" set method here instead of the removeFrom Grails
 		// code because the removeFrom code wasn't working correctly, I think because of
 		// the fact that a container can be associated with both a shipment and another container
 		
 		// remove the container from its parent
-		container?.parentContainer?.containers?.remove(container)
-				
+		container.parentContainer?.containers.remove(container)
+					
 		// remove the container itself from the parent shipment
-		shipment?.containers?.remove(container)
+		container.shipment.containers.remove(container)
 		
-		shipment.save(flush:true)
+		container.shipment.save(flush:true)
 	}
 	
 	/**
@@ -282,11 +285,61 @@ class ShipmentService {
 	 */
 	void deleteShipmentItem(ShipmentItem item) {
 		def shipment = item.shipment
-		
-		log.error("so we are trying to remove item with id = " + item.id + " and quantity = " + item.quantity)
-		
 		shipment.removeFromShipmentItems(item)
+	}
+	
+	/**
+	 * Makes a specified number of copies of the passed container, including it's children containers 
+	 * and shipment item, and connects them all properly to the parent shipment
+	 */
+	void copyContainer(Container container, Integer quantity) {
+		// probably could speed the performance up on this by not going one by one
+		// but this is pretty clear to understand
+		quantity.times { 
+			copyContainer(container) 
+		}
+	}
+	
+	/**
+	 * Makes a copy of the passed container, including it's children containers and shipment items,
+	 * and connects it properly to the parent shipment
+	 */
+	Container copyContainer(Container container) {
+		// first we need to clone all the child containers		
+		// TODO: make this "not implemented" functionality for now???
+		def childContainers = container.containers?.collect { copyContainer(it) }
+	
+		// TODO: figure out sort order!
 		
+		// now create a new container
+		Container newContainer = container.copyContainer()
+	
+		// add the new child containers to the new container
+		if (childContainers) {
+			newContainer.addToContainers(childContainers)
+		}
+		
+		
+		// now create clones of all the shipping items on this container
+		for (ShipmentItem item in container.getShipmentItems()) {
+			def newItem = item.cloneShipmentItem()
+			// set the container for the new item to this container
+			newItem.container = newContainer
+			// add the item to the parent shipment
+			container.shipment.addToShipmentItems(newItem)
+		}
+		
+		// add the new container to the shipment
+		container.shipment.addToContainers(newContainer)
+		
+		
+		// TODO: this may be problematic... ? only want to add to parent if this is top level???
+		// add the new container to the parent container, if it exists
+		container.parentContainer?.addToContainers(newContainer)
+		
+		saveShipment(container.shipment)
+				
+		return newContainer	
 	}
 	
 	

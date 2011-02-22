@@ -13,7 +13,7 @@
 </script>	   
 	<div id="dlg${formName}" title="${containerInstance ? 'Edit ' + containerInstance?.containerType?.name : 'Add ' + type}" style="padding: 10px; display: none;" >
 	
-	<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.Container" form="${formName}"/>
+
 	<g:form name="${formName}" action="createShipment">
 		
 		<g:if test="${containerInstance}">

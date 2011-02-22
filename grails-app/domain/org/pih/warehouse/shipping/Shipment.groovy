@@ -223,5 +223,21 @@ class Shipment implements Serializable {
 			
 		return container
 	}
+	
+	/**
+	 * Adds an existing container to this shipment
+	 */
+	
+	/**
+	 * Clones the specified container
+	 */
+	void cloneContainer(Container container, Integer quantity) {
+		def newContainer = new Container(
+			
+		)
+		
+		log.error("name = " + newContainer.name + " id = " + newContainer.id)
+	}
+	
 }
 

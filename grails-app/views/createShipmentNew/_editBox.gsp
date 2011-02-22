@@ -12,7 +12,7 @@
 	});
 </script>	   
 	<div id="dlg${formName}" title="Edit a Box" style="padding: 10px; display: none;" >
-	<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.Container" form="${formName}"/>
+
 
 	<g:form name="${formName}" action="createShipment">
 		<table>
@@ -45,6 +45,9 @@
 								<g:submitButton name="addAnotherBox" value="Save Box and Add Another Box"></g:submitButton>
 							</div>
 						</g:if>
+							<div class="buttons">
+								<g:submitButton name="cloneBox" value="Clone Box"></g:submitButton> Quantity: <g:textField id="cloneQuantity" name="cloneQuantity" size="3" value="0"/> 
+							</div>
 					</td>
 				</tr>
 			</tbody>

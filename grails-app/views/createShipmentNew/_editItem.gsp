@@ -13,7 +13,7 @@
 </script>
 
 	<div id="dlg${formName}" title="Edit an Item" style="padding: 10px; display: none;" >
-		<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.ShipmentItem" form="${formName}"/>
+		
 		<g:form name="${formName}" action="createShipment">
 
 		<table>
