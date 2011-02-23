@@ -272,7 +272,7 @@ class ShipmentService {
 		// the fact that a container can be associated with both a shipment and another container
 		
 		// remove the container from its parent
-		container.parentContainer?.containers.remove(container)
+		container.parentContainer?.containers?.remove(container)
 					
 		// remove the container itself from the parent shipment
 		container.shipment.containers.remove(container)
@@ -304,24 +304,38 @@ class ShipmentService {
 	 * Makes a copy of the passed container, including it's children containers and shipment items,
 	 * and connects it properly to the parent shipment
 	 */
-	Container copyContainer(Container container) {
-		// first we need to clone all the child containers		
-		// TODO: make this "not implemented" functionality for now???
-		def childContainers = container.containers?.collect { copyContainer(it) }
+	Container copyContainer(Container container)  {
+		Container newContainer = copyContainerHelper(container)
+
+		// the new container should have the same parent as the old container
+		if (container.parentContainer) { container.parentContainer.addToContainers(newContainer) }		
+		saveShipment(container.shipment)
+	}
 	
-		// TODO: figure out sort order!
+	
+	private Container copyContainerHelper(Container container) {
 		
-		// now create a new container
+		println("trying to make a copy of container " + container.id)
+		
+		// first, make a copy of this container
 		Container newContainer = container.copyContainer()
-	
-		// add the new child containers to the new container
-		if (childContainers) {
-			newContainer.addToContainers(childContainers)
+		
+		// clone all the child containers and attach them to this container		
+		// TODO: make this "not implemented" functionality for now???
+	//	def childContainers
+		//for (Container c in container.containers) {
+			//childContainers.add(copyContainer(c))
+		//}
+		
+		// def childContainers = 
+		for (Container c in container.containers) {	
+			newContainer.addToContainers(copyContainerHelper(c)) 
 		}
 		
+		// TODO: figure out sort order
 		
 		// now create clones of all the shipping items on this container
-		for (ShipmentItem item in container.getShipmentItems()) {
+		for (ShipmentItem item in container.shipment.shipmentItems.findAll( {it.container == container} )) {
 			def newItem = item.cloneShipmentItem()
 			// set the container for the new item to this container
 			newItem.container = newContainer
@@ -331,13 +345,6 @@ class ShipmentService {
 		
 		// add the new container to the shipment
 		container.shipment.addToContainers(newContainer)
-		
-		
-		// TODO: this may be problematic... ? only want to add to parent if this is top level???
-		// add the new container to the parent container, if it exists
-		container.parentContainer?.addToContainers(newContainer)
-		
-		saveShipment(container.shipment)
 				
 		return newContainer	
 	}

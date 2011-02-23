@@ -118,6 +118,10 @@ class CreateShipmentNewController {
 				shipmentService.deleteContainer(container)
 			}.to("enterContainerDetails")
 			
+			on("cloneContainer") {
+				flash.cloneQuantity = params.cloneQuantity 
+			}.to("saveContainerAction")
+			
 			on("editBox") {
 				// set the box we will to edit
 				flash.boxToEdit = Container.get(params.boxToEditId)
@@ -131,7 +135,7 @@ class CreateShipmentNewController {
 			}.to("enterContainerDetails")
 			
 			on("cloneBox") {
-				flash.cloneQuantity = params.cloneQuantity  // TODO: validate this?
+				flash.cloneQuantity = params.cloneQuantity  
 			}.to("saveBoxAction")
 			
 			on("editItem") {
@@ -206,6 +210,9 @@ class CreateShipmentNewController {
     			else {
     				shipmentService.saveContainer(container)
     				
+    				// save a reference to this container if we need to clone it
+    				if (flash.cloneQuantity) { flash.cloneContainer = container }
+    				
     				// assign the id of the container if needed
     				if (flash.addItem == -1) { flash.addItem = container.id }
     				if (flash.addBox == -1) { flash.addBox = container.id }
@@ -214,8 +221,23 @@ class CreateShipmentNewController {
     			}	
     		}
     		
-    		on("valid").to("enterContainerDetails")
+    		on("valid").to("cloneContainerAction")
     		on("invalid").to("enterContainerDetails")
+    	}
+    	
+     	cloneContainerAction {
+    		action {
+    			
+    			// see if we have to make copies of this container
+    			if (flash.cloneQuantity && flash.cloneContainer) {
+    				def container
+    				shipmentService.copyContainer(flash.cloneContainer, flash.cloneQuantity as Integer)
+    			}
+    		
+    			valid()
+    		}
+    		
+    		on("valid").to("enterContainerDetails")
     	}
     
     	saveBoxAction {
@@ -243,6 +265,9 @@ class CreateShipmentNewController {
     			}
 				else {
 					shipmentService.saveContainer(box)
+					
+					// save a reference to this box if we need to clone it
+					if (flash.cloneQuantity) { flash.cloneContainer = box }
 				}
 				
 				// now add the item, if one has been specified
@@ -265,25 +290,10 @@ class CreateShipmentNewController {
 				valid()
     		}
     		
-			on("valid").to("cloneBoxAction")
+			on("valid").to("cloneContainerAction")
     		on("invalid").to("enterContainerDetails")
     	}
     	
-    	cloneBoxAction {
-    		action {
-    			
-    			// see if we have to make copies of this box
-    			if (flash.cloneQuantity) {
-    				def box
-    				box = Container.get(params.box.id)
-    				shipmentService.copyContainer(box, flash.cloneQuantity as Integer)
-    			}
-    		
-    			valid()
-    		}
-    		
-    		on("valid").to("enterContainerDetails")
-    	}
     	
     	saveItemAction {
     		action {
