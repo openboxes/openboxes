@@ -172,6 +172,10 @@ class Shipment implements Serializable {
 	 * FIXME The eventType.name value might change, so we need to make this 
 	 * more robust.
 	 */
+	Boolean hasShipped() {
+		return events.any { it.eventType?.name == "Shipped" }
+	}
+	
 	Date getActualShippingDate() { 
 		for (event in events) { 
 			if (event?.eventType?.name == "Shipped") { 

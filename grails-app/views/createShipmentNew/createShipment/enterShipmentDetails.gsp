@@ -91,10 +91,11 @@
 					<div class="buttons">
 						<table>
 							<tr>
-								<td style="text-align: center;">
+								<td width="45%" style="text-align: right;">
 									<g:submitButton name="next" value="Next"></g:submitButton> 
 								</td>
-								<td style="text-align: right;">
+								<td width="10%">&nbsp;</td>
+								<td width="45%" style="text-align: left;">
 									<g:submitButton name="save" value="Save and Exit"></g:submitButton>
 									<g:submitButton name="cancel" value="Cancel"></g:submitButton>						
 								</td>

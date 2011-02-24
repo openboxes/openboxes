@@ -6,7 +6,8 @@
 	<div id="dlgEditContainer" title="${container ? 'Edit ' + container?.containerType?.name : 'Add ' + containerTypeToAdd?.name}" style="padding: 10px; display: none;" >
 	
 
-	<g:form name="dlgEditContainer" action="createShipment">
+	<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.Container" form="editContainer"/>
+	<g:form name="editContainer" action="createShipment">
 		
 		<g:if test="${container}">
 			<g:hiddenField name="container.id" value="${container?.id}"/>
@@ -24,7 +25,7 @@
 						<div class="buttons">
 							<g:submitButton name="saveContainer" value="Save ${container ? container?.containerType?.name : containerTypeToAdd?.name}"></g:submitButton>
 							<g:if test="${container}">
-								<g:submitButton name="deleteContainer" value="Remove ${container ? container?.containerType?.name : containerTypeToAdd?.name}"></g:submitButton>
+								<g:submitButton name="deleteContainer" value="Remove ${container ? container?.containerType?.name : containerTypeToAdd?.name}"  onclick="return confirm('Are you sure you want to delete this ${container ? container?.containerType?.name : containerTypeToAdd?.name}?')"></g:submitButton>
 							</g:if>
 							<button name="cancelDialog" type="reset" onclick="$('#dlgEditContainer').dialog('close');">Cancel</button>
 						</div>

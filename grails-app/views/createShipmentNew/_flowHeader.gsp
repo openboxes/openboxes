@@ -8,31 +8,31 @@
 			<table border="0" style="color: #ccc">
 				<tr>
 					<td width="20%" style="text-align:center" nowrap class="${currentState=='Details'?'currentState':''}">
-						<g:link action="suitcase" event="enterShipmentDetails">1. Details</g:link>
+						<g:link action="createShipment" event="enterShipmentDetails">1. Details</g:link>
 					</td>
 					<td rowspan="2" style="vertical-align: middle">
 						<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_go.png')}" style="vertical-align: middle;"/>
 					</td>
 					<td width="20%" style="text-align:center" nowrap class="${currentState=='Traveler'?'currentState':''}">
-						<g:link action="suitcase" event="enterTravelerDetails" >2. Traveler</g:link>
+						<g:link action="createShipment" event="enterTrackingDetails" >2. Tracking</g:link>
 					</td>
 					<td rowspan="2" style="vertical-align: middle">
 						<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_go.png')}" style="vertical-align: middle;"/>
 					</td>
 					<td width="20%" style="text-align:center" nowrap class="${currentState=='Pack'?'currentState':''}">
-						<g:link action="suitcase" event="enterContainerDetails">3. Pack</g:link>
+						<g:link action="createShipment" event="enterContainerDetails">3. Pack</g:link>
 					</td>
 					<td rowspan="2" style="vertical-align: middle">
 						<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_go.png')}" style="vertical-align: middle;"/>
 					</td>
 					<td width="20%" style="text-align:center" nowrap class="${currentState=='Review'?'currentState':''}">
-						<g:link action="suitcase" event="reviewShipment">4. Review</g:link>
+						<g:link action="createShipment" event="reviewShipment">4. Review</g:link>
 					</td>
 					<td rowspan="2" style="vertical-align: middle">
 						<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_go.png')}" style="vertical-align: middle;"/>
 					</td>
 					<td width="20%" style="text-align:center" nowrap class="${currentState=='Ship'?'currentState':''}">
-						<g:link action="suitcase" event="sendShipment">5. Ship</g:link>
+						<g:link action="createShipment" event="sendShipment">5. Ship</g:link>
 					</td>
 				</tr>
 			</table>
@@ -46,7 +46,7 @@
 					<td rowspan="2" style="vertical-align: middle">
 						<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_go.png')}" style="vertical-align: middle;"/>
 					</td>
-					<td width="20%" style="text-align:center" nowrap>2. Traveler
+					<td width="20%" style="text-align:center" nowrap>2. Tracking
 					</td>
 					<td rowspan="2" style="vertical-align: middle">
 						<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_go.png')}" style="vertical-align: middle;"/>

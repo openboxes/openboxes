@@ -3,7 +3,7 @@
     <head>
          <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
          <meta name="layout" content="custom" />
-         <title>Add Contents</title>  
+         <title>Add Shipment Items</title>  
     </head>
     <body>
 		<div class="body">
@@ -20,7 +20,7 @@
 			 		
 	
 			<fieldset>
-				<%--<legend>Step 3&nbsp;Add shipment items</legend> --%>	
+				<legend>Step 3&nbsp;Add shipment items</legend>	
 					<g:render template="../shipment/summary" />	
 			 		
 			 		<!-- figure out what dialog box, if any, we need to render -->
@@ -45,7 +45,7 @@
 							</tr>
 						</thead>
 						<g:set var="count" value="${0 }"/>	
-						<g:each var="containerInstance" in="${shipmentInstance?.containers?.findAll({!it.parentContainer}).sort()}">
+						<g:each var="containerInstance" in="${shipmentInstance?.containers?.findAll({!it.parentContainer})?.sort()}">
 							<tbody>
 								<tr class="${count++%2==0?'odd':'even' }">
 									<td style="width:30%;">
@@ -174,11 +174,12 @@
 					<g:form action="createShipment" method="post" >
 						<table>
 							<tr>
-								<td style="text-align: center;">
+								<td width="45%" style="text-align: right;">
 									<g:submitButton name="back" value="Back"></g:submitButton>	
 									<g:submitButton name="next" value="Next"></g:submitButton> 
 								</td>
-								<td style="text-align: right;">
+								<td width="10%">&nbsp;</td>
+								<td width="45%" style="text-align: left;">
 									<g:submitButton name="save" value="Save and Exit"></g:submitButton>
 									<g:submitButton name="cancel" value="Cancel"></g:submitButton>						
 								</td>

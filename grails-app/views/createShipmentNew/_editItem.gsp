@@ -6,6 +6,7 @@
 
 	<div id="dlgEditItem" title="Edit an Item" style="padding: 10px; display: none;" >
 		
+		<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.ShipmentItem" form="editItem"/>
 		<g:form name="editItem" action="createShipment">
 
 		<table>
@@ -24,7 +25,7 @@
 						<div class="buttons">
 							<g:submitButton name="saveItem" value="Save Item"></g:submitButton>
 							<g:if test="${itemToEdit}">
-								<g:submitButton name="deleteItem" value="Remove Item"></g:submitButton>
+								<g:submitButton name="deleteItem" value="Remove Item" onclick="return confirm('Are you sure you want to delete this item?')"></g:submitButton>
 							</g:if>
 							<button name="cancelDialog" type="reset" onclick="$('#dlgEditItem').dialog('close');">Cancel</button>
 						</div>

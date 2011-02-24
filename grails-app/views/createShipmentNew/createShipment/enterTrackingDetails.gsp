@@ -3,7 +3,7 @@
     <head>
          <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
          <meta name="layout" content="custom" />
-         <title>Enter Traveler Details</title>         
+         <title>Enter Tracking Details</title>         
     </head>
     <body>
         <div class="body">
@@ -21,7 +21,7 @@
 			<g:form action="createShipment" method="post">
 				<g:hiddenField name="id" value="${shipmentInstance?.id}"/>
 				<fieldset>
-					<%-- <legend>Step 2&nbsp;Enter tracking details</legend>--%>					
+					<legend>Step 2&nbsp;Enter tracking details</legend>				
 						
 					<g:render template="../shipment/summary" />	
 					
@@ -103,6 +103,13 @@
 								</tr>
 								<tr class="prop">
 									<td valign="top" class="name" style="width: 10%;"><label><g:message
+										code="shipment.bol.label" default="AWB #" /></label></td>
+									<td valign="top" style="width: 30%;">
+										&nbsp;	
+									</td>
+								</tr>
+								<tr class="prop">
+									<td valign="top" class="name" style="width: 10%;"><label><g:message
 										code="shipment.container.label" default="Container #"  /></label></td>
 									<td valign="top" style="width: 30%;">
 										&nbsp;	
@@ -148,11 +155,12 @@
 					<div class="buttons">
 						<table>
 							<tr>
-								<td style="text-align: center;">
+								<td width="45%" style="text-align: right;">
 									<g:submitButton name="back" value="Back"></g:submitButton> 
 									<g:submitButton name="next" value="Next"></g:submitButton> 
 								</td>
-								<td style="text-align: right;">
+								<td width="10%">&nbsp;</td>
+								<td width="45%" style="text-align: left;">
 									<g:submitButton name="save" value="Save and Exit"></g:submitButton>
 									<g:submitButton name="cancel" value="Cancel"></g:submitButton>							
 								</td>

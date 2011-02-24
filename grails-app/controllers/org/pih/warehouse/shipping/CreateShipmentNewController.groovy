@@ -98,7 +98,7 @@ class CreateShipmentNewController {
     		
     		on("next") {
 				shipmentService.saveShipment(flow.shipmentInstance)	
-			}.to("finish")
+			}.to("reviewShipment")
 			
 			on("save") {
 				shipmentService.saveShipment(flow.shipmentInstance)	
@@ -327,6 +327,37 @@ class CreateShipmentNewController {
     		
     		on("valid").to("enterContainerDetails")
     		on("invalid").to("enterContainerDetails")
+    	}
+    	
+    	reviewShipment {
+    		on("back").to("enterContainerDetails")	
+    		on("next").to("sendShipment")
+    		on("save").to("finish")
+    		on("cancel").to("finish")
+    	}
+    	
+    	sendShipment {
+    		on("back").to("reviewShipment")
+    		on("send").to("sendShipmentAction")
+    		on("save").to("finish")
+    		on("cancel").to("finish")
+    	}
+    	
+    	sendShipmentAction {
+    		action {
+    			
+    			// TODO: add all to sendShipment service method (or other appropriate method) here
+    			// TODO: needs to handle email as well
+    			
+    			valid()
+    		}
+    	
+    		on("valid").to("shipmentComplete")
+    		on("invalid").to("sendShipment")
+    	}
+    	
+    	shipmentComplete {
+    		on("done").to("finish")
     	}
     	
     	finish {

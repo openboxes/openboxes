@@ -6,7 +6,8 @@
 	<div id="dlgEditBox" title="Edit a Box" style="padding: 10px; display: none;" >
 
 
-	<g:form name="dlgEditBox" action="createShipment">
+	<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.Container" form="editBox"/>
+	<g:form name="editBox" action="createShipment">
 		<table>
 			<tbody>
 				<g:render template="containerFields" model="['box':boxToEdit]"/>
@@ -23,7 +24,7 @@
 						<div class="buttons">
 							<g:submitButton name="saveBox" value="Save Box"></g:submitButton>
 							<g:if test="${boxToEdit}">
-								<g:submitButton name="deleteBox" value="Remove Box"></g:submitButton>
+								<g:submitButton name="deleteBox" value="Remove Box" onclick="return confirm('Are you sure you want to delete this box?')"></g:submitButton>
 							</g:if>
 							<button name="cancelDialog" type="reset" onclick="$('#dlgEditBox').dialog('close');">Cancel</button>
 						</div>
