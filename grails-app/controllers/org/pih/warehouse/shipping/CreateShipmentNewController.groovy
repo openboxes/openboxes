@@ -51,6 +51,13 @@ class CreateShipmentNewController {
     		}.to("finish")
     		
     		on("cancel").to("finish")
+    		
+    		// for the top-level links
+    		on("enterShipmentDetails").to("enterShipmentDetails")
+			on("enterTrackingDetails").to("enterTrackingDetails")
+			on("enterContainerDetails").to("enterContainerDetails")
+			on("reviewShipment").to("reviewShipment")
+			on("sendShipment").to("sendShipment")
     	}
     	
     	enterTrackingDetails {
@@ -86,6 +93,13 @@ class CreateShipmentNewController {
     		}.to("finish")
     		
     		on("cancel").to("finish")
+    		
+    		// for the top-level links
+    		on("enterShipmentDetails").to("enterShipmentDetails")
+			on("enterTrackingDetails").to("enterTrackingDetails")
+			on("enterContainerDetails").to("enterContainerDetails")
+			on("reviewShipment").to("reviewShipment")
+			on("sendShipment").to("sendShipment")
     	}
     	
     	enterContainerDetails {
@@ -182,6 +196,13 @@ class CreateShipmentNewController {
 				// this parameter triggers the "Add Box" dialog for the container to be opened on page reload
 				flash.addBoxToContainerId = params.container.id as Integer
 			}.to("saveBoxAction")
+			
+			// for the top-level links
+    		on("enterShipmentDetails").to("enterShipmentDetails")
+			on("enterTrackingDetails").to("enterTrackingDetails")
+			on("enterContainerDetails").to("enterContainerDetails")
+			on("reviewShipment").to("reviewShipment")
+			on("sendShipment").to("sendShipment")
     	}
     	
     	saveContainerAction {
@@ -334,6 +355,13 @@ class CreateShipmentNewController {
     		on("next").to("sendShipment")
     		on("save").to("finish")
     		on("cancel").to("finish")
+    		
+    		// for the top-level links
+    		on("enterShipmentDetails").to("enterShipmentDetails")
+			on("enterTrackingDetails").to("enterTrackingDetails")
+			on("enterContainerDetails").to("enterContainerDetails")
+			on("reviewShipment").to("reviewShipment")
+			on("sendShipment").to("sendShipment")
     	}
     	
     	sendShipment {
@@ -341,6 +369,13 @@ class CreateShipmentNewController {
     		on("send").to("sendShipmentAction")
     		on("save").to("finish")
     		on("cancel").to("finish")
+    		
+    		// for the top-level links
+    		on("enterShipmentDetails").to("enterShipmentDetails")
+			on("enterTrackingDetails").to("enterTrackingDetails")
+			on("enterContainerDetails").to("enterContainerDetails")
+			on("reviewShipment").to("reviewShipment")
+			on("sendShipment").to("sendShipment")
     	}
     	
     	sendShipmentAction {

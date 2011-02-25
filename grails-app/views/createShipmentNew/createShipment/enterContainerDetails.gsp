@@ -56,6 +56,9 @@
 											<g:if test="${containerInstance?.containerType?.name == 'Pallet'}">
 												<img src="${createLinkTo(dir:'images/icons',file:'pallet-truck.png')}" alt="Pallet" style="vertical-align: middle"/>&nbsp;
 											</g:if>
+											<g:if test="${containerInstance?.containerType?.name == 'Crate'}">
+												<img src="${createLinkTo(dir:'images/icons',file:'forklift.png')}" alt="Pallet" style="vertical-align: middle"/>&nbsp;
+											</g:if>
 											<b><g:link action="createShipment" event="editContainer" params="[containerToEditId:containerInstance?.id]">
 												${containerInstance?.name}
 											</g:link></b>
@@ -152,19 +155,22 @@
 							</tbody>							
 						</g:each>
 						<tfoot>
-							<tr class="${count++%2==0?'odd':'even' }">
-								<td></td>
-								<td></td>
-								<td></td>
-								<td>
+							<tr>
+								<td rowspan="4">
+								<nobr>
 									<g:link action="createShipment" event="addContainer" params="[containerTypeToAddName:'Pallet']">
 										<img src="${createLinkTo(dir:'images/icons',file:'pallet-truck.png')}" alt="add a pallet" style="vertical-align: middle"/>
 										&nbsp;add a pallet
 									</g:link>
+									<g:link action="createShipment" event="addContainer" params="[containerTypeToAddName:'Crate']">
+										<img src="${createLinkTo(dir:'images/icons',file:'forklift.png')}" alt="add a crate" style="vertical-align: middle"/>
+										&nbsp;add a crate
+									</g:link>			
 									<g:link action="createShipment" event="addContainer" params="[containerTypeToAddName:'Suitcase']">
 										<img src="${createLinkTo(dir:'images/icons/silk',file:'briefcase.png')}" alt="add a suitcase" style="vertical-align: middle"/>
 										&nbsp;add a suitcase
 									</g:link>
+								</nobr>
 								</td>
 							</tr>
 						</tfoot>

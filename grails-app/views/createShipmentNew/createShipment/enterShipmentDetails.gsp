@@ -46,14 +46,14 @@
 								</tr>
 								<tr class='prop'>
 									<td valign='top' class='name'>
-										<label for='name'><label><g:message code="shipment.name.label" default="Name" /></label>
+										<label for='name'><g:message code="shipment.name.label" default="Name" /></label>
 									</td>
 									<td valign='top' class='value ${hasErrors(bean:shipmentInstance,field:'name','errors')}'>
 										<input type="text" name='name' value="${shipmentInstance?.name?.encodeAsHTML()}" size="40"/>
 									</td>
 								</tr>  
 								<tr class="prop">
-									<td valign="top" class="name"><label><label><g:message code="shipment.origin.label" default="Origin" /></label></td>
+									<td valign="top" class="name"><label><g:message code="shipment.origin.label" default="Origin" /></label></td>
 									<td valign="top"
 										class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">								
 										<g:select name="origin.id" from="${org.pih.warehouse.inventory.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.origin?.id}" style="width: 180px" />							

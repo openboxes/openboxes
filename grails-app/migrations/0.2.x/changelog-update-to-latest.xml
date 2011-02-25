@@ -2229,6 +2229,23 @@
 		    <where>id=1</where>
 		</update>        
     </changeSet>
+    
+     <changeSet author="mgoodrich" id="2011-02-25-1">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT count(*) FROM container_type WHERE name = 'Crate']]>
+			</sqlCheck>
+		</preConditions>
+        <insert tableName="container_type">
+        	<column name="id" valueNumeric="8"/>
+        	<column name="name" value="Crate"/>
+        	<column name="sort_order" valueNumeric="0"/>
+            <column name="version" valueNumeric="0"/>
+			<column name="date_created" valueDate="2011-02-25"/>
+            <column name="last_updated" valueDate="2011-02-25"/>            
+        </insert>      
+    </changeSet>
+    
 <!--
     <changeSet author="jmiranda (generated)" id="1297432141595-4">
         <preConditions onFail="MARK_RAN">
