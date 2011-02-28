@@ -1,22 +1,18 @@
 package org.pih.warehouse.order
 
-import org.pih.warehouse.order.cart.ShoppingCart;
+import org.pih.warehouse.order.cart.Cart;
 
 class OrderService {
 
 	boolean transactional = true
 	
-	
-	
+
 	void createOrder() { 
-		
 		
 	}
 	
 	
-	void createOrderFromShoppingCart(ShoppingCart cart) { 
-		
-		
+	void createOrderFromCart(Cart cart) { 		
 		
 	}
 	
