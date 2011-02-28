@@ -2,8 +2,12 @@ package org.pih.warehouse.inventory;
 
 import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.ListUtils;
+import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.product.Product;
+import org.pih.warehouse.shipping.Container;
+import org.pih.warehouse.shipping.Shipment;
+import org.pih.warehouse.shipping.ShipmentItem;
 import org.pih.warehouse.inventory.TransactionType;
 import grails.converters.*
 
@@ -30,18 +34,51 @@ class InventoryItemController {
 		def inventoryItemList = inventoryService.getInventoryItemsByProduct(productInstance)
 		render inventoryItemList as JSON;
 	}
+	
+	def showStockCard = { StockCardCommand cmd ->
+		// TODO Eventually, we'll push all of this logic to the service
+		// Right now, the command class is private, so we can't pass it to the service
+		//inventoryService.getStockCard(cmd)
+		
+		// Get basic details required for the whole page
+		cmd.productInstance = Product.get(params?.product?.id?:params.id);  // check product.id and id
+		cmd.warehouseInstance = Warehouse.get(session?.warehouse?.id);
+		cmd.inventoryInstance = cmd.warehouseInstance?.inventory
+		cmd.inventoryLevelInstance = inventoryService.getInventoryLevelByProductAndInventory(cmd.productInstance, cmd.inventoryInstance)
+				
+		// Get current stock of a particular product within an inventory
+		// Using set to make sure we only return one object per inventory items
+		Set inventoryItems = inventoryService.getInventoryItemsByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);
+		cmd.inventoryItemList = inventoryItems as List
+		
+		cmd.inventoryItemList.sort { it.lotNumber }
+		
+		// Get transaction log for a particular product within an inventory
+		cmd.transactionEntryList = inventoryService.getTransactionEntriesByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);
+		cmd.transactionEntriesByInventoryItemMap = cmd.transactionEntryList.groupBy { it.inventoryItem }
+		cmd.transactionEntriesByTransactionMap = cmd.transactionEntryList.groupBy { it.transaction }
+										
+		[ commandInstance: cmd ]
+	}
 
+	
+	/**
+	 * Display the Record Inventory form for the product 
+	 */
 	def showRecordInventory = { RecordInventoryCommand cmd -> 
 		def commandInstance = inventoryService.getRecordInventoryCommand(cmd, params)
 		
 		// We need to set the inventory instance in order to save an 'inventory' transaction
 		def warehouseInstance = Warehouse.get(session?.warehouse?.id)				
-
-		def productInstance = cmd.product;		
-		def transactionEntryList = TransactionEntry.findAllByProduct(cmd.product);
-		def totalQuantity = (transactionEntryList)?transactionEntryList.quantity.sum():0
+		def productInstance = cmd.product;
 		def inventoryInstance = warehouseInstance?.inventory;
+		
 		def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, inventoryInstance);
+		def transactionEntryList = inventoryService.getTransactionEntriesByProductAndInventory(productInstance, inventoryInstance);
+		
+		// Compute the total quantity for the given 
+		def totalQuantity = (transactionEntryList)?transactionEntryList.quantity.sum():0
+		
 		[ commandInstance : commandInstance, inventoryInstance: warehouseInstance.inventory, inventoryLevelInstance: inventoryLevelInstance, totalQuantity: totalQuantity ]
 	}
 	
@@ -87,8 +124,8 @@ class InventoryItemController {
 		def warehouseInstance = Warehouse.get(session?.warehouse?.id)
 		def productInstance = Product.get(params?.product?.id)
 		def inventoryInstance = warehouseInstance.inventory
-		def inventoryItemList = inventoryService.getInventoryItemsByProductAndProduct(productInstance, inventoryInstance)
-		def transactionEntryList = TransactionEntry.findAllByProduct(productInstance)
+		def inventoryItemList = inventoryService.getInventoryItemsByProductAndInventory(productInstance, inventoryInstance)
+		def transactionEntryList = TransactionEntry.findAllByProductAndInventory(productInstance, inventoryInstance)
 		def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, inventoryInstance);
 		
 		[ 	inventoryInstance: inventoryInstance,
@@ -172,35 +209,7 @@ class InventoryItemController {
 	}
 	
 	
-	def showStockCard = { StockCardCommand cmd ->		
-		
-		log.info "Show stock card params: \t" + params
-		log.info "Show stock card command: \t" + cmd.transactionType;
-		
-		// TODO Eventually, we'll push all of this logic to the service 
-		// Right now, the command class is private, so we can't pass it to the service
-		//inventoryService.getStockCard(cmd)
-		
-		// Get basic details required for the whole page
-		cmd.productInstance = Product.get(params?.product?.id?:params.id);  // check product.id and id
-		cmd.warehouseInstance = Warehouse.get(session?.warehouse?.id);
-		cmd.inventoryInstance = cmd.warehouseInstance?.inventory
-		cmd.inventoryLevelInstance = inventoryService.getInventoryLevelByProductAndInventory(cmd.productInstance, cmd.inventoryInstance)
-				
-		// Get current stock of a particular product within an inventory		
-		// Using set to make sure we only return one object per inventory items
-		Set inventoryItems = inventoryService.getInventoryItemsByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);		
-		cmd.inventoryItemList = inventoryItems as List
-		
-		cmd.inventoryItemList.sort { it.lotNumber } 
-		
-		// Get transaction log for a particular product within an inventory
-		cmd.transactionEntryList = inventoryService.getTransactionEntriesByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);
-		cmd.transactionEntriesByInventoryItemMap = cmd.transactionEntryList.groupBy { it.inventoryItem }
-		cmd.transactionEntriesByTransactionMap = cmd.transactionEntryList.groupBy { it.transaction }
-								
-		[ commandInstance: cmd ]
-	}
+
 		
 	def createInventoryItem = {
 		
@@ -343,8 +352,67 @@ class InventoryItemController {
 		render "${product.name} was added to inventory"
 		//return product as XML		
 	}	
+	/**
+	 * shipment.name:1, 
+	 * shipment:[name:1, id:1], 
+	 * inventory.id:1, 
+	 * inventory:[id:1], 
+	 * recipient.name:3, 
+	 * recipient:[name:3, id:3], 
+	 * product.id:8, product:[id:8], 
+	 * quantity:1, 
+	 * recipient.id:3, addItem:, 
+	 * shipment.id:1, 
+	 * inventoryItem.id:1, 
+	 * inventoryItem:[id:1], 
+	 * action:addToShipment, 
+	 * controller:inventoryItem]
+	*/
+	def addToShipment = {
+		log.info "params" + params
+		def shipmentInstance = null;
+		def containerInstance = null;
+		def productInstance = Product.get(params?.product?.id);
+		def personInstance = Person.get(params?.recipient?.id);
+		def inventoryItem = InventoryItem.get(params?.inventoryItem?.id);
+		if (params.shipment.type == 'container') { 
+			containerInstance = Container.get(params?.shipment?.id);
+			shipmentInstance = containerInstance.shipment;
+		}
+		else { 
+			shipmentInstance = Shipment.get(params?.shipment?.id);
+			//containerInstance = shipmentInstance?.containers?.get(0);
+		}
+				
+		def itemInstance = new ShipmentItem(
+			product: productInstance,
+			quantity: params.quantity,
+			recipient: personInstance,
+			lotNumber: inventoryItem.lotNumber?:'',
+			shipment: shipmentInstance,
+			container: null);
+				
+		if(itemInstance.hasErrors() || !itemInstance.validate()) {
+			println "Errors: " + itemInstance.errors.each { println it }
+			flash.message = "Sorry, there was an error validating item to be added";
+		}
+
+		if (!shipmentInstance.addToShipmentItems(itemInstance).save(flush:true)) {
+			log.error("Sorry, unable to add new item to shipment.  Please try again.");
+			flash.message = "Unable to add new item to shipment";
+		}
+		else { 
+			def itemName = (inventoryItem?.description)?:productInstance?.name + (inventoryItem?.lotNumber) ? " #" + inventoryItem?.lotNumber : "";		
+			flash.message = "Added item " + itemName + " to shipment " + shipmentInstance?.name;
+		}
+
+		
+		redirect(action: "showStockCard", params: ['product.id':productInstance?.id]);
+	}
 	
+
 	
+		
 	def saveInventoryLevel = {
 		// Get existing inventory level
 		def inventoryLevelInstance = InventoryLevel.get(params.id)		

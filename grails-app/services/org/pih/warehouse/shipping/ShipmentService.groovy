@@ -17,8 +17,10 @@ import org.pih.warehouse.inventory.TransactionType;
 import org.pih.warehouse.receiving.Receipt;
 
 class ShipmentService {
-	
+
+	def mailService;
 	def sessionFactory;
+	def inventoryService;
 	boolean transactional = true
 	
 	/**
@@ -365,80 +367,103 @@ class ShipmentService {
 	}
 	
 	
-	void sendShipment(Shipment shipmentInstance, String comment, User user, Location location) { 
-		
+	void sendShipment(Shipment shipmentInstance, String comment, User userInstance, Location locationInstance) { 
+		log.info "sending shipment";
 		try { 
-			if (!shipmentInstance.hasErrors() && shipmentInstance.save(flush: true)) {				
+			if (!shipmentInstance.hasErrors()) {				
 				// Add comment to shipment (as long as there's an actual comment 
 				// after trimming off the extra spaces)
 				if (comment) {
-					shipmentInstance.addToComments(
-						new Comment(comment: comment, sender: user));
+					shipmentInstance.addToComments(new Comment(comment: comment, sender: userInstance));
 				}
-
+					
 				// Add a Shipped event to the shipment
 				EventType eventType = EventType.findByName("Shipped")
-				if (eventType) {
-					def event = new Event();
-					event.eventDate = new Date()
-					event.eventType = eventType
-					event.eventLocation = location
-					event.save(flush:true);
-					shipmentInstance.addToEvents(event);
+				if (eventType) {					
+					createShipmentEvent(shipmentInstance, new Date(), eventType, locationInstance);
 				}
 				else {
-					throw new Exception("Expected event type 'Shipped'")
+					throw new RuntimeException("System could not find event type 'Shipped'")
 				}
 												
-				// Save updated shipment instance
-				shipmentInstance.save();
-			
-				// Create a new transaction for outgoing items
-				Transaction debitTransaction = new Transaction();
-				debitTransaction.transactionType = TransactionType.get(1); 	// transfer
-				debitTransaction.source = shipmentInstance?.origin
-				debitTransaction.destination = shipmentInstance?.destination;
-				debitTransaction.inventory = shipmentInstance?.origin?.inventory
-				debitTransaction.transactionDate = new Date();
-				
-				shipmentInstance.shipmentItems.each { 
-					def inventoryItem = InventoryItem.findByLotNumberAndProduct(it.lotNumber, it.product)
+				// Save updated shipment instance (adding an event and comment)
+				if (!shipmentInstance.hasErrors() && shipmentInstance.save()) { 
 					
-					// If the inventory item doesn't exist, we create a new one
-					if (!inventoryItem) {
-						inventoryItem = new InventoryItem();
-						inventoryItem.lotNumber = it.lotNumber
-						inventoryItem.product = it.product
-						if (!inventoryItem.hasErrors() && inventoryItem.save()) {
-							// at this point we've saved the inventory item successfully
-						}
-						else {
-							// 
-							inventoryItem.errors.allErrors.each { error->
-								def errorObj = [inventoryItem, error.getField(), error.getRejectedValue()] as Object[]
-								shipmentInstance.errors.reject("inventoryItem.invalid",
-									errorObj, "[${error.getField()} ${error.getRejectedValue()}] - ${error.defaultMessage} ");
-							}
-							return;
-						}
-					}
-					
-					// Create a new transaction entry
-					TransactionEntry transactionEntry = new TransactionEntry();
-					transactionEntry.quantity = 0 - it.quantity;
-					transactionEntry.lotNumber = it.lotNumber
-					transactionEntry.product = it.product;
-					transactionEntry.inventoryItem = inventoryItem;
-					debitTransaction.addToTransactionEntries(transactionEntry);
+					inventoryService.createSendShipmentTransaction(shipmentInstance);
+					triggerSendShipmentEmails(shipmentInstance, userInstance);
 				}
-				debitTransaction.save(flush:true);
+				else { 
+					throw new RuntimeException("Failed to save 'Send Shipment' transaction");
+				}
 			}
 		} catch (Exception e) { 
 			// rollback all updates 
 			log.error(e);
-			shipmentInstance.errors.reject("shipmentInstance.invalid", e.message);
+			shipmentInstance.errors.reject("shipment.invalid", e.message);
 		}				
 	} 	
+	
+	void createShipmentEvent(Shipment shipmentInstance, Date eventDate, EventType eventType, Location location) { 
+		
+		boolean exists = Boolean.FALSE;
+		// If 'requested' event type already exists, return
+		log.info("exists " + exists)
+		shipmentInstance?.events.each {
+			if (it.eventType == eventType)
+				exists = Boolean.TRUE;
+		}
+		// Avoid duplicate events
+		if (!exists) {
+			log.info ("Event does not exist")
+			def eventInstance = new Event(eventDate: eventDate, eventType: eventType, eventLocation: location);
+			if (!eventInstance.hasErrors() && eventInstance.save()) { 
+				shipmentInstance.addToEvents(eventInstance);
+			}
+			else { 
+				shipementInstance.errors.reject("shipment.shipmentEvents.invalid");
+			}
+		}
+
+	}
+	
+	void triggerSendShipmentEmails(Shipment shipmentInstance, User userInstance) { 
+		
+		//shipmentInstance.properties = params
+		if (!shipmentInstance.hasErrors()) {
+
+			// Send an email message to the shipment owner
+			if (userInstance) {
+				def subject = "Your suitcase shipment " + shipmentInstance?.name + " has been successfully created";
+				def message = "You have successfully created a suitcase shipment."
+				mailService.sendMail(subject, message, userInstance?.email);
+			}
+			
+			// Send an email message to the shipment traveler
+			if (shipmentInstance?.carrier) {
+				def subject = "A suitcase shipment " + shipmentInstance?.name + " is ready for pickup";
+				def message = "The suitcase you will be traveling with is ready for pickup."
+				mailService.sendMail(subject, message, shipmentInstance?.carrier?.email);
+			}
+			
+			// Send an email message to the shipment recipient
+			if (shipmentInstance?.recipient) {
+				def subject = "A suitcase shipment " + shipmentInstance?.name + " is ready to ship to you";
+				def message = "A suitcase that is being sent to you is ready to be shipped."
+				mailService.sendMail(subject, message, shipmentInstance?.recipient?.email);
+			}
+			
+			// Send emails to each person receiving shipment
+			shipmentInstance?.allShipmentItems?.each { item ->
+				// If the item has a recepient, we send them an email
+				if (item?.recipient?.email) {
+					def subject = "An item is being shipped to you as part of shipment " + shipmentInstance?.name;
+					def message = "You should expect to receive " + item?.quantity + " units of " + item?.product?.name +
+						 " within a few days of " + shipmentInstance?.expectedDeliveryDate;
+					mailService.sendMail(subject, message, item?.recipient?.email);
+				}
+			}
+		}
+	}
 	
 	
 	void receiveShipment(Shipment shipmentInstance, Receipt receiptInstance, String comment, User user, Location location) { 
@@ -509,7 +534,16 @@ class ShipmentService {
 					transactionEntry.inventoryItem = inventoryItem;
 					creditTransaction.addToTransactionEntries(transactionEntry);
 				}
-				creditTransaction.save(flush:true);
+				
+				
+				if (!creditTransaction.hasErrors() && creditTransaction.save(flush:true)) { 
+					// saved successfully
+					flash.message = "Transaction was created successfully"
+				}
+				else { 
+					// did not save successfully, display errors message
+					flash.message = "Transaction has errors"
+				}
 			}
 		} catch (Exception e) {
 			// rollback all updates

@@ -16,6 +16,7 @@ import org.pih.warehouse.shipping.ShipperService;
 import org.pih.warehouse.shipping.Shipment;
 
 class JsonController {
+
 	
 	def findLotsByName = { 
 		log.info params
@@ -47,21 +48,6 @@ class JsonController {
 					]
 				}
 			}
-			/*
-			else { 
-				
-				def item =  [
-					value: params.term,
-					label: "No matches found for '" + params.term + "'.  Click here to add a new item?",
-					valueText : params.term,
-					lotNumber: params.term,
-					description: '',
-					expirationDate: null,
-					
-					exists: false
-				];
-				items.add(item)
-			}*/
 		}
 		render items as JSON;
 	}
@@ -105,6 +91,63 @@ class JsonController {
 			}
 		}
 		render items as JSON;
+	}
+	
+	def findShipmentByName = {
+		log.info "Find shipment by name " + params;
+		def finalItems = []
+		def items = new TreeSet();
+		if (params.term) {
+			items = Shipment.withCriteria {
+				or {
+					ilike("name", "%" + params.term + "%")
+					ilike("shipmentNumber", "%" + params.term + "%")
+					destination {
+						ilike("name", params.term + "%")
+					}
+					origin {
+						ilike("name", params.term + "%")
+					}
+				}
+			}
+				
+			if (items) {
+				
+				items.each { shipment ->
+					
+					if (!shipment?.hasShipped() && !shipment?.hasArrived()) { 
+						finalItems << [ value: shipment.id,
+							type: "shipment", 
+							label: shipment.name + " [" + 
+							shipment.shipmentNumber + "] - " + shipment?.mostRecentStatus,
+							valueText: shipment.name, 
+							icon: "<img src=\"/warehouse/images/icons/silk/add.png\" />"
+							]
+						
+						shipment.containers.each { 
+							finalItems << [ 
+								value: it.id, 
+								type: "container", 
+								label: "    * " + shipment.name + " > " + it.containerType.name + " " + it.name, 
+								valueText: it.shipment.name + " &rsaquo; " + it.containerType.name + " " + it.name 
+							]
+						}
+					}					
+				}
+				/*
+				items = items.collect() { shipment ->					
+					[
+						value: shipment.id,
+						label: shipment.name + " [" + shipment.shipmentNumber + "]",
+						valueText: shipment.name
+					]
+					
+					
+				}
+				*/
+			}
+		}
+		render finalItems as JSON;
 	}
 	
 	

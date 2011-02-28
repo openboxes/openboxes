@@ -1,36 +1,28 @@
-<style>
-span.name {   } 
-span.value { font-size: 1.0em; } 
-span.name:after { content: ": " }
-th { color: lightgrey; } 
-fieldset table td { padding: 6px; } 
-</style>
-	
-<div id="productDetails">
+<div id="product-details">
 	<fieldset>
 		<legend class="fade">${productInstance?.name }</legend>
 		<table>
-			<tr class="odd">	
-				<th style="text-align: left;">
+			<tr class="details odd">	
+				<td class="left label">
 					<span class="name">Category</span>
-				</th>
+				</td>
 				<td colspan="2">
 					<span class="value">${productInstance?.category?.name }</span>
 				</td>
 			</tr>
-			<tr class="even">	
-				<th style="text-align: left;">
+			<tr class="details even">	
+				<td class="left label">
 					<span class="name">Product Code</span>
-				</th>
+				</td>
 				<td colspan="2">
 					<span class="value">${productInstance?.productCode?:'<span class="fade">none</span>' }</span>
 				</td>
 			</tr>
 			
-			<tr class="odd">	
-				<th style="text-align: left;">
+			<tr class="details odd">	
+				<td class="left label">
 					<span class="name">Cold Chain</span>
-				</th>
+				</td>
 				<td>
 					<span class="value">${productInstance?.coldChain?'Yes':'No' }</span>
 				</td>
@@ -38,22 +30,25 @@ fieldset table td { padding: 6px; }
 			</tr>
 			<g:each var="productAttribute" in="${productInstance?.attributes}" status="status">
 				<tr class="${status%2==0?'odd':'even' }">
-					<th style="text-align: left;">
+					<td class="label left">
 						<span class="name">${productAttribute?.attribute.name }</span>
-					</th>
+					</td>
 					<td>
 						<span class="value">${productAttribute.value }</span>
 					</td>
 					<td></td>
 				</tr>													
 			</g:each>
+
+	
 		</table>
-		<br/>
+	</fieldset>
+	<fieldset>
 		<table>
-			<tr class="odd" style="border-top: 1px solid lightgrey;">	
-				<th style="text-align: left;">
+			<tr class="details odd">	
+				<td class="label left">
 					<span class="name">Status</span>
-				</th>
+				</td>
 				<td colspan="2">
 					<span class="value">
 						<g:if test="${totalQuantity <= 0}">
@@ -70,20 +65,11 @@ fieldset table td { padding: 6px; }
 						</g:else>
 					</span>
 				</td>
-			</tr>			
-			<tr class="even">	
-				<th style="text-align: left;">
-					<span class="name">On-Hand Quantity</span>
-				</th>
-				<td colspan="2">
-					<span class="value">
-						<b>${totalQuantity }</b></span>
-				</td>
-			</tr>			
-			<tr class="odd" >
-				<th style="text-align: left;">
+			</tr>				
+			<tr class="details even">
+				<td class="label left">
 					<span class="name">Supported</span>
-				</th>
+				</td>
 				<td>
 				
 					<script>
@@ -115,7 +101,7 @@ fieldset table td { padding: 6px; }
 						</span>
 					</span>
 				</td>
-				<td>
+				<td class="right">
 					<g:remoteLink action="toggleSupported" params="['product.id':productInstance.id, 'inventory.id':inventoryInstance?.id]"
 					update="[success:'supportedValue',failure:'supportedValue']">
 					
@@ -129,10 +115,21 @@ fieldset table td { padding: 6px; }
 					</g:remoteLink>
 				</td>
 			</tr>				
-			<tr class="even">
-				<th style="text-align: left;">
+		
+			<tr class="details odd">	
+				<td class="label left">
+					<span class="name">On-Hand Quantity</span>
+				</td>
+				<td colspan="2">
+					<span class="value">
+						<b>${totalQuantity }</b></span>
+				</td>
+			</tr>			
+		
+			<tr class="details even">
+				<td class="label left">
 					<span class="name">Min Level</span>
-				</th>
+				</td>
 				<td>
 					<script>
 
@@ -174,7 +171,7 @@ fieldset table td { padding: 6px; }
 						});
 					</script>
 				
-					<span id="minQuantityTextValue" class="value">
+					<span id="minQuantityTextValue" class="value" >
 						<span id="minQuantityValue">
 							<g:if test="${inventoryLevelInstance?.minQuantity}">
 								${inventoryLevelInstance?.minQuantity?:'' }
@@ -193,23 +190,24 @@ fieldset table td { padding: 6px; }
 							
 							<input type="hidden" name="product.id" value="${productInstance?.id }" />
 							<input type="hidden" name="inventory.id" value="${inventoryInstance?.id }" />
-							<g:textField id="minQuantity" name="minQuantity" size="3"/>
-							<input class="button  " type="image" border="0"  src="${createLinkTo(dir: 'images/icons/silk', file: 'disk.png' )}" alt="Submit button">
+							<g:textField id="minQuantity" name="minQuantity" size="1" value="${inventoryLevelInstance?.minQuantity}" />
+							<input class="button  " type="image" border="0" 
+								src="${createLinkTo(dir: 'images/icons/silk', file: 'disk.png' )}" alt="Submit button">
 						</g:formRemote >					
 					</span>					
 				</td>
-				<td>
+				<td class="button right">
 					<a class="minQuantityToggle" href="#">
 						<img id="minQuantityImage" src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png' )}"/>
 					</a>
 				</td>				
 				
 			</tr>
-			<tr class="odd">
-				<th style="text-align: left;">
+			<tr class="details odd">
+				<td class="label left">
 					<span class="name">Reorder Level</span>
-				</th>
-				<td>
+				</td>
+				<td class="value left">
 					<span id="reorderQuantityTextValue" class="value">
 						<span id="reorderQuantityValue">
 							<g:if test="${inventoryLevelInstance?.reorderQuantity}">
@@ -228,12 +226,12 @@ fieldset table td { padding: 6px; }
 							
 							<input type="hidden" name="product.id" value="${productInstance?.id }" />
 							<input type="hidden" name="inventory.id" value="${inventoryInstance?.id }" />
-							<g:textField id="reorderQuantity" name="reorderQuantity" size="3"/>
+							<g:textField id="reorderQuantity" name="reorderQuantity" size="1" value="${inventoryLevelInstance?.reorderQuantity}"/>
 							<input class="button" type="image" border="0"  src="${createLinkTo(dir: 'images/icons/silk', file: 'disk.png' )}" alt="Submit button">
 						</g:formRemote >					
 					</span>	
 				</td>
-				<td>
+				<td class="button right">
 					<a class="reorderQuantityToggle" href="#">
 						<img id="reorderQuantityImage" src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png' )}"/>
 					</a>

@@ -6,13 +6,13 @@
 } 	
 	
 </style>
-<div id="leftnavMenu" class="menu">
-	<h3 class="heading" >
+<div id="leftnav-accordion-menu" class="menu">
+	<h3 class="menu-heading" >
 		
 		<g:message code="dashboard.label" default="Dashboard"/>
 	</h3>
 	 
-	<div class="menuSection">
+	<div class="menu-section">
 	 	<ul>
 			<li class="">
 				<span class="menuButton">
@@ -22,10 +22,10 @@
 		</ul>
 	</div>
 	<%-- 
-	<h3 class="heading">
+	<h3 class="menu-heading">
 		<g:message code="order.label"  default="Orders"/>
 	</h3>
-	<div class="menuSection">									
+	<div class="menu-section">									
 		<ul>
 
 			<li>
@@ -37,10 +37,10 @@
 		</ul>	
 	</div>
 	--%>
-	<h3 class="heading" >
+	<h3 class="menu-heading" >
 		<g:message code="shipping.label"  default="Shipping"/>
 	</h3>
-	<div class="menuSection">
+	<div class="menu-section">
 		<ul>
 			<!-- 
 			<li class="">
@@ -101,10 +101,10 @@
 			-->
 		</ul>										
 	</div>
-	<h3 class="heading">
+	<h3 class="menu-heading">
 		<g:message code="receiving.label"  default="Receiving"/>
 	</h3>
-	<div class="menuSection">
+	<div class="menu-section">
 		<ul>
 			<li class="">
 				<span class="menuButton">
@@ -118,10 +118,10 @@
 			</li>		
 		</ul>										
 	</div>
-	<h3 class="heading">
+	<h3 class="menu-heading">
 		<g:message code="inventory.label"  default="Inventory"/>
 	</h3>
-	<div class="menuSection">									
+	<div class="menu-section">									
 		<ul>
 			<li>
 				<span class="menuButton">
@@ -141,10 +141,10 @@
 			
 		</ul>	
 	</div>
-	<h3 class="heading">
+	<h3 class="menu-heading">
 		<g:message code="product.label" default="Products" />
 	</h3>
-	<div class="menuSection">									
+	<div class="menu-section">									
 		<ul>
 			<li class="">
 				<span class="menuButton">
@@ -187,10 +187,10 @@
  		-->			
 		</ul>	
 	</div>
-	<h3 class="heading">
+	<h3 class="menu-heading">
 		<g:message code="locations.label"  default="Locations"/>
 	</h3>
-	<div class="menuSection">								
+	<div class="menu-section">								
 		<ul>
 			<li class="">
 				<span class="menuButton">
@@ -218,13 +218,13 @@
 		</ul>
 	</div>																	
 	<%-- 
-	<h3 class="heading">
+	<h3 class="menu-heading">
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'chart_bar.png')}" alt="Reports" style="vertical-align: middle"/> &nbsp; 
 		<g:message code="settings.label" args="['Reports']" default="Reports"/>
 	</h3>
 	--%>
 	<%-- 
-	<div class="menuSection">
+	<div class="menu-section">
 		<ul>
 			<!-- 
 			<li><span class="menuButton"><g:link class="nobullet" controller="admin" action="index"><g:message code="default.manage.label" args="['Settings']" default="Manage Settings" /></g:link></span></li>
@@ -232,10 +232,10 @@
 		</ul>
 	</div>					
 	--%>
-	<h3 class="heading">
+	<h3 class="menu-heading">
 		<g:message code="users.label"  default="Users"/>
 	</h3>			
-	<div class="menuSection">
+	<div class="menu-section">
 		<ul>			
 			<li class="">
 				<span class="menuButton">
@@ -254,10 +254,10 @@
 			</li>
 		</ul>
 	</div>
-	<h3 class="heading">
+	<h3 class="menu-heading">
 		<g:message code="metadata.label"  default="Settings"/>
 	</h3>
-	<div class="menuSection">
+	<div class="menu-section">
 		<ul>
 			<li class="">
 				<span class="menuButton">
@@ -341,7 +341,7 @@
 
 <script type="text/javascript">
 $(function() { 
-	$('#leftnavMenu').accordion({
+	$('#leftnav-accordion-menu').accordion({
 		active: true, 
 		navigation: true, 
 		autoheight: true, 

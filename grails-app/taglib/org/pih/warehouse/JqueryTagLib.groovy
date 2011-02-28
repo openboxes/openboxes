@@ -167,6 +167,125 @@ class JqueryTagLib {
 	}
 	
 	
+	def autoSuggestEditable = { attrs, body ->
+		def id = (attrs.id) ? attrs.id : "autoSuggest_" + (new Random()).nextInt()
+		def name = attrs.name
+		def valueId = (attrs.valueId)?attrs.valueId:"";
+		def valueName = (attrs.valueName)?attrs.valueName:"";
+		def valueType = (attrs.valueType)?attrs.valueType:"";
+		def width = (attrs.width) ? attrs.width : 200;
+		def size = (attrs.size) ? attrs.size : 20;
+		def minLength = (attrs.minLength) ? attrs.minLength : 1;
+		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "/warehouse/json/findPersonByName";
+
+		def showValue = (valueName && valueId) ? true : false;
+		//def spanDisplay = (showValue) ? "inline" : "none";
+		//def suggestDisplay = (showValue) ? "none" : "inline";
+		def spanDisplay = "none";
+		def suggestDisplay = "inline";		
+		def html = """
+			<div>
+				<style>
+					#${id}-suggest {
+						background-image: url('/warehouse/images/icons/silk/zoom.png');
+						background-repeat: no-repeat;
+						background-position: center left;
+						padding: 5px;
+						padding-left: 20px;
+					}
+					#${id}-span { padding: 5px; border: 1px solid lightgrey; background-color: #eee;}
+				</style>
+				
+				<input id="${id}-id" type="hidden" name="${name}.id" value="${valueId}"/>
+				<input id="${id}-type" type="hidden" name="${name}.type" value="${valueType}"/>
+				<div id="${id}-span" style="text-align: left; display: ${spanDisplay}; width: ${width}px;">
+					<span id="${id}-span-value">${valueName}</span>
+					<img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}" style="float: right;"/>
+				</div>
+				<input id="${id}-suggest" type="text" name="${name}.name" value="${valueName}" 
+					size="${size}" style="width: ${width}px; display: ${suggestDisplay};">
+				
+				
+				<script>
+					\$(document).ready(function() {
+						// Captures 'Enter' key presses
+						\$(window).keydown(function(event){
+							if(event.keyCode == 13) {
+								event.preventDefault();
+								return false;
+							}
+						});
+						
+						\$("#${id}-span").click(function() {
+							\$('#${id}-span').hide();
+							\$('#${id}-suggest').show();
+							\$('#${id}-suggest').val('');
+							\$('#${id}-span-value').html('');
+							\$('#${id}-id').val('');
+						});
+						
+						\$("#${id}-suggest").click(function() {
+							\$("#${id}-suggest").trigger("focus");
+						});
+						
+						\$("#${id}-suggest").blur(function() {
+							var text = \$('#${id}-suggest').val();							
+							console.log("blur: " + text);
+							//\$('#${id}-suggest').hide();
+							//\$('#${id}-span').html(text?text:'<b>empty</b> &nbsp; click to change');
+							//\$('#${id}-span').show();
+						});
+						
+						\$("#${id}-suggest").autocomplete({
+							width: ${width},
+							minLength: ${minLength},
+							dataType: 'json',
+							highlight: true,
+							//selectFirst: true,
+							scroll: true,
+							autoFill: true,
+							//scrollHeight: 300,
+							//define callback to format results
+							source: function(req, add){
+								\$.getJSON('${jsonUrl}', req, function(data) {
+									var items = [];
+									\$.each(data, function(i, item) {
+										items.push(item);
+									});
+									add(items);
+								});
+							  },
+							focus: function(event, ui) {
+								  //\$('#${id}-suggest').val(ui.item.valueText);
+								  //return false;
+							},
+							change: function(event, ui) {
+								//console.log("changed " + ui.item)
+								//\$('#${id}-id').val(0);
+								//\$('#${id}-suggest').val(ui.item.valueText);
+							},
+							select: function(event, ui) {
+								//console.log("selected " + ui.item.value + " " + ui.item.valueText);
+								\$('#${id}-id').val(ui.item.value);
+								\$('#${id}-type').val(ui.item.type);
+								\$('#${id}-suggest').val(ui.item.valueText);
+								\$('#${id}-span-value').html(ui.item.valueText);
+								\$('#${id}-suggest').hide();
+								\$('#${id}-span').show();
+								//return false;
+							}
+						});
+					});
+					
+				</script>
+			</div>
+		""";
+			
+		
+		out << html;
+	}
+
+	
 	
 	def jqueryDatePicker = {attrs, body ->
 		

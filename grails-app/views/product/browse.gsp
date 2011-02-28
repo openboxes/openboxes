@@ -21,64 +21,11 @@
             <div>            
             
 				<table>
-				
-					<%-- 
 					<tr>
-						<td colspan="2">
-							<div style="text-align: left; padding: 5px; background-color: #fff;">
-								<h2>
-									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'map.png') }"/>
-				            		You are here: 
-								
-									<g:render template="../category/breadcrumb" model="[categoryInstance: selectedCategory]"/>
-								</h2>
-							</div>
-						</td>
-					</tr>
-					--%>
-					<tr >
-						<td width="25%" style="border: 1px solid lightgrey;">	
+						<td style="border-right: 1px solid lightgrey; width: 150px;">	
 						
 							<g:render template="/common/searchCriteriaVertical"	/>				
-							<%-- 		
-							<div style="text-align:left; padding-left: 20px;">
-								<style>
-									.myMenu li { margin: 2px; padding: 2px; }
-									.myMenu ul li { margin: 2px; padding: 2px; }
-								</style>							
-								<ul class="myMenu">
-									<b>${selectedCategory?.name }</b>
-									<g:render template="../category/menuTreeOptions" model="[root:selectedCategory, selected:selectedCategory, level: 0, recursive: false]"/>
-								</ul>
-							</div>
-							<br clear="all"/><br/>
-							<div style="text-align: center; padding: 10px;">
-								<g:render template="../category/menuTree" model="[root:rootCategory, selected:selectedCategory, level: 0, recursive: true]"/>
-							</div>
-							--%>
-								 
-								
-								<%-- 
-								<h2>Browse by attribute</h2>							
-								<g:each var="attribute" in="${org.pih.warehouse.product.Attribute.list()}" status="status">
-									<ul class="treeList">
-										<li>
-											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png') }"/>
-											${attribute.name }							
-											<g:if test="${attribute.options }">
-												<ul class="treeList">
-													<g:each var="attributeOption" in="${attribute?.options }">
-														<li>
-															<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png') }"/>
-															<a href="${createLink(action:'browse',params:["attributeId":attribute.id])}">${(attributeOption)?:'none' }</a>
-														</li>
-													</g:each>
-												</ul>
-											</g:if>
-										</li>
-									</ul>
-								</g:each>	
-								--%>						
+				
 						</td>			
 						<td>
 							<g:set var="attributeList" value="${org.pih.warehouse.product.Attribute.list() }"></g:set>

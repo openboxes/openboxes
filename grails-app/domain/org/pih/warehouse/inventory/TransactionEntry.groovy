@@ -2,7 +2,7 @@ package org.pih.warehouse.inventory;
 
 import org.pih.warehouse.product.Product;
 
-class TransactionEntry {
+class TransactionEntry implements Serializable {
 	
 	Product product					// Optional
 	String lotNumber				// Optional 

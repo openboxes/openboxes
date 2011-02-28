@@ -14,8 +14,8 @@ class Shipment implements Serializable {
 		
 	String name 					// user-defined name of the shipment 
 	String shipmentNumber			// an auto-generated shipment number
-	Date expectedShippingDate		// the date the origin expects to ship the goods
-	Date expectedDeliveryDate		// the date the destination should expect to receive the goods
+	Date expectedShippingDate		// the date the origin expects to ship the goods (required)
+	Date expectedDeliveryDate		// the date the destination should expect to receive the goods (optional)
 	String flightInformation		// the flight number and airline 
 	Float totalValue				// the total value of all items in the shipment		
 
@@ -102,7 +102,7 @@ class Shipment implements Serializable {
 		flightInformation(nullable:true)
 		expectedShippingDate(nullable:false)
 		//expectedShippingDate(validator:{value, obj-> return value.after(obj.checkIn)})		
-		expectedDeliveryDate(nullable:false)
+		expectedDeliveryDate(nullable:true)	// optional
 		//expectedDeliveryDate(validator:{value, obj-> return value.after(obj.checkIn)})		
 		shipmentType(nullable:true)
 		shipmentMethod(nullable:true)
@@ -174,6 +174,10 @@ class Shipment implements Serializable {
 	 */
 	Boolean hasShipped() {
 		return events.any { it.eventType?.name == "Shipped" }
+	}
+	
+	Boolean hasArrived() { 
+		return events.any { it.eventType?.name == "Arrived" }
 	}
 	
 	Date getActualShippingDate() { 

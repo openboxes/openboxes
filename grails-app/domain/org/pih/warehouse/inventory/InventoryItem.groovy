@@ -8,7 +8,7 @@ import org.pih.warehouse.inventory.Transaction;
 /**
  * Represents products that are usually stocked by this location.
  */
-class InventoryItem {
+class InventoryItem implements Serializable {
 	
 	Boolean active = Boolean.TRUE			// Actively managed
 	String description;						// Description of the specific instance of a product that we're tracking

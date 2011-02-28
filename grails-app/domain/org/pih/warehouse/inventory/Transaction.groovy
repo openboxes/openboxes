@@ -21,7 +21,7 @@ import org.pih.warehouse.core.User
  *  will be represented in two transactions (incoming and outgoing).
  *  
  */
-class Transaction {
+class Transaction implements Serializable {
 
     Warehouse source	    		
     Warehouse destination					    		 

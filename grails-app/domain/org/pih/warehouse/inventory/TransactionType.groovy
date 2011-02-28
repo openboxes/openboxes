@@ -3,7 +3,7 @@ package org.pih.warehouse.inventory;
 import java.util.Date;
 import org.pih.warehouse.core.TransactionTypes;
 
-class TransactionType {
+class TransactionType implements Serializable {
 	
 	String name
 	String description

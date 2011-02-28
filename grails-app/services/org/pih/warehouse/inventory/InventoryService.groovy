@@ -7,8 +7,11 @@ import org.apache.commons.collections.ListUtils;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.product.Attribute;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.Category;
+import org.pih.warehouse.product.ProductAttribute;
+import org.pih.warehouse.shipping.Shipment;
 
 class InventoryService {
 	
@@ -53,7 +56,7 @@ class InventoryService {
 				}
 			}
 		}
-		log.info "category " + category?.name + " " + productList?.size();
+		log.debug "category " + category?.name + " " + productList?.size();
 		
 		
 		return productList;
@@ -66,13 +69,34 @@ class InventoryService {
 		commandInstance.inventoryInstance = commandInstance?.warehouseInstance?.inventory;
 		commandInstance.categoryInstance = Category.get(params?.categoryId)
 		commandInstance.categoryInstance = commandInstance?.categoryInstance ?: commandInstance?.rootCategory;
-		commandInstance.productList = (commandInstance?.categoryFilters) ? getProductsByCategories(commandInstance?.categoryFilters, params) : [];		
+		//commandInstance.productList = (commandInstance?.categoryFilters) ? getProductsByCategories(commandInstance?.categoryFilters, params) : [];		
+		
+		commandInstance.productList = getProducts(commandInstance, params);
+		
+		// This list gets calculated AFTER the product list, because we need to use the product list as the basis. 
+		commandInstance.attributeMap = getProductAttributes();
 		commandInstance.productMap = getProductMap(commandInstance?.warehouseInstance?.id);
 		commandInstance.inventoryItemMap =  getInventoryItemMap(commandInstance?.warehouseInstance?.id);
 		commandInstance.productList = commandInstance?.productList?.sort() { it.name };
 		commandInstance.quantityMap = getQuantityMap(commandInstance?.inventoryInstance);
 		return commandInstance;
 	}
+	
+	
+	/**
+	 * Get a map of product attribute-value pairs for the given products.
+	 * If products is empty, then we return all attribute-value pairs.
+	 */
+	Map getProductAttributes() { 
+		//def map = new HashMap<Attribute, List<String>>();
+		def productAttributes = ProductAttribute.list()
+		//productAttributes.each { 			
+		//	log.info it.product + " " + it.attribute + " " + it.value;
+		//	map.put(it.attribute, it.value);
+		//}
+		return productAttributes.groupBy { it.attribute } 
+	}
+	
 	
 	/** 
 	 * Get a map of quantities (indexed by product) for a particular inventory.
@@ -87,7 +111,7 @@ class InventoryService {
 				eq("inventory.id", inventoryInstance?.id)
 			}	
 		}
-		log.info "transaction entries " + transactionEntries;		
+		log.debug "transaction entries " + transactionEntries;		
 		transactionEntries.each { 
 			def currentQuantity = (quantityMap.get(it.product))?:0;			
 			currentQuantity += it.quantity
@@ -99,7 +123,7 @@ class InventoryService {
 	
 	
 	RecordInventoryCommand getRecordInventoryCommand(RecordInventoryCommand commandInstance, Map params) { 		
-		log.info "Params " + params;
+		log.debug "Params " + params;
 		
 		if (!commandInstance?.product) { 
 			commandInstance.errors.reject("error.product.invalid","Product does not exist");
@@ -111,12 +135,31 @@ class InventoryService {
 			//def inventoryItemList = getInventoryItemsByProduct(commandInstance?.product)
 			
 			// What we want is to get all inventory items that have been involved in transactions at this warehouse
-			def inventoryItemList = getInventoryItemsByProductAndInventory(commandInstance?.product, commandInstance?.inventory);
+			//def inventoryItemList = getInventoryItemsByProductAndInventory(commandInstance?.product, commandInstance?.inventory);
 			
+			def transactionEntryList = getTransactionEntriesByProductAndInventory(commandInstance?.product, commandInstance?.inventory);
+			
+			def transactionEntryMap = transactionEntryList.groupBy { it.inventoryItem } 
+			
+			transactionEntryMap.keySet().each { 
+				def transactionEntries = transactionEntryMap.get(it);
+				def quantity = (transactionEntries)?transactionEntries*.quantity.sum():0;
+				
+				def inventoryItemRow = new RecordInventoryRowCommand()
+				inventoryItemRow.id = it.id;
+				inventoryItemRow.lotNumber = it.lotNumber;
+				inventoryItemRow.expirationDate = it.expirationDate;
+				inventoryItemRow.description = it.description;
+				inventoryItemRow.oldQuantity = quantity;
+				inventoryItemRow.newQuantity = quantity;
+				commandInstance.recordInventoryRows.add(inventoryItemRow);
+			}
+			
+			/*
 			inventoryItemList.each { 
 				//def lot = InventoryLot.findByProductAndLotNumber(commandInstance?.product, it.lotNumber);				
-				def transactionEntryList = getTransactionEntriesByInventoryItem(it);
-				log.info "entries: " + transactionEntryList*.quantity;
+				//def transactionEntryList = getTransactionEntriesByInventoryItem(it);
+				log.debug "entries: " + transactionEntryList*.quantity;
 				def quantity = (transactionEntryList)?transactionEntryList*.quantity.sum():0;
 				
 				
@@ -132,7 +175,7 @@ class InventoryService {
 				//	commandInstance.recordInventoryRows = ListUtils.lazyList([], FactoryUtils.constantFactory(new RecordInventoryRowCommand()))
 				
 				commandInstance.recordInventoryRows.add(row);
-			}
+			}*/
 		}
 		return commandInstance;
 		
@@ -140,7 +183,7 @@ class InventoryService {
 		
 	
 	RecordInventoryCommand saveRecordInventoryCommand(RecordInventoryCommand cmd, Map params) { 
-		log.info "Saving record inventory command params: " + params
+		log.debug "Saving record inventory command params: " + params
 		
 		try { 
 			// Validation was done during bind, but let's do this just in case
@@ -217,18 +260,92 @@ class InventoryService {
 		return cmd;
 	}
 	
-	List getProductsByCategories(List categories, Map params) { 
-		def products = []
+	Set getProducts(BrowseInventoryCommand command, Map params) { 
+		def products = new HashSet();
+		
+			
+		if (command?.searchTerms) { 
+			log.info "search " + command?.searchTerms;
+			products += getProductsBySearchTerms(command?.searchTerms);
+		}
+		else { 
+			if (command?.categoryFilters)
+			products = getProductsByCategories(command?.categoryFilters, params);
+		}
+		log.info "products " + products.unique();
+		return products;		
+	}
+
+		
+	List getProductsBySearchTerms(String searchTerms) { 
+		
+		// Get products that match the search terms by name and category
+		def products = Product.createCriteria().list() { 
+			if (searchTerms) {
+				or {
+					ilike("name", searchTerms + "%")					
+					category { 
+						ilike("name", searchTerms + "%")
+					}
+				}
+			}
+		}
+		
+		// Get products that match a category (e.g. Equipment matches all products 
+		// under Equipment and its subcategories.
+		def categories = Category.withCriteria { 
+			ilike("name", searchTerms + "%");
+		}		
+		def matchedCategories = getExplodedCategories(categories);
+		if (matchedCategories) { 
+			products += Product.createCriteria().list() {
+				'in'("category", matchedCategories)
+			}		
+		}
+		// Get producst that match inventory item by description, lot number, or name.
+		def inventoryItems = InventoryItem.withCriteria {
+			or {
+				ilike("lotNumber", searchTerms + "%")
+				ilike("description", searchTerms + "%")
+				product {
+					ilike("name", searchTerms + "%")
+				}
+			}
+		}
+
+		products += inventoryItems*.product;
+		
+		return products;
+	}
+	
+	/**
+	 * Returns a list of categories and their children, given an initial set of 
+	 * categories.  This function should probably be recursive so that we traverse 
+	 * the entire category tree. 
+	 * 
+	 * @param categories
+	 * @return
+	 */
+	List getExplodedCategories(List categories) { 		
 		def matchCategories = []
-		if (categories) { 
-			categories.each { cat -> 
+		if (categories) {
+			categories.each { cat ->
 				if (cat) {
 					matchCategories << cat;
 					matchCategories.addAll( (cat?.children)?cat.children:[]);
 				}
 			}
 		}
-		log.info matchCategories
+		return matchCategories;
+	}
+	
+	
+	List getProductsByCategories(List categories, Map params) { 
+		def products = []
+		
+		def matchCategories = getExplodedCategories(categories);
+		
+		log.debug matchCategories
 		if (matchCategories) { 
 			products = Product.createCriteria().list(max:params.max, offset: params.offset ?: 0) {
 				'in'("category", matchCategories)
@@ -377,4 +494,61 @@ class InventoryService {
 	Warehouse getWarehouse(Long id) { 
 		return Warehouse.get(id);
 	}
+	
+	
+	
+	/**
+	 * Create a transaction for the Send Shipment event.
+	 * 
+	 * @param shipmentInstance
+	 */
+	void createSendShipmentTransaction(Shipment shipmentInstance) { 
+		log.info "create send shipment transaction" 
+		
+		try { 
+			// Create a new transaction for outgoing items
+			Transaction debitTransaction = new Transaction();
+			debitTransaction.transactionType = TransactionType.get(1); 	// transfer
+			debitTransaction.source = shipmentInstance?.origin
+			debitTransaction.destination = shipmentInstance?.destination;
+			debitTransaction.inventory = shipmentInstance?.origin?.inventory
+			debitTransaction.transactionDate = new Date();
+			
+			shipmentInstance.shipmentItems.each {
+				def inventoryItem = InventoryItem.findByLotNumberAndProduct(it.lotNumber, it.product)
+				
+				// If the inventory item doesn't exist, we create a new one
+				if (!inventoryItem) {
+					inventoryItem = new InventoryItem();
+					inventoryItem.lotNumber = it.lotNumber
+					inventoryItem.product = it.product
+					if (!inventoryItem.hasErrors() && inventoryItem.save()) {
+						// at this point we've saved the inventory item successfully
+					}
+					else {
+						//
+						inventoryItem.errors.allErrors.each { error->
+							def errorObj = [inventoryItem, error.getField(), error.getRejectedValue()] as Object[]
+							shipmentInstance.errors.reject("inventoryItem.invalid",
+								errorObj, "[${error.getField()} ${error.getRejectedValue()}] - ${error.defaultMessage} ");
+						}
+						return;
+					}
+				}
+				
+				// Create a new transaction entry
+				TransactionEntry transactionEntry = new TransactionEntry();
+				transactionEntry.quantity = 0 - it.quantity;
+				transactionEntry.lotNumber = it.lotNumber
+				transactionEntry.product = it.product;
+				transactionEntry.inventoryItem = inventoryItem;
+				debitTransaction.addToTransactionEntries(transactionEntry);
+			}
+			debitTransaction.save();
+		} catch (Exception e) { 
+			log.error("error occrred while creating transaction ", e);
+			shipmentInstance.errors.reject("shipment.invalid", e.message);
+		}
+	}	
+	
 }

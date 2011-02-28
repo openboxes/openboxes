@@ -903,11 +903,15 @@ class ShipmentController {
 			def shipmentInstance = Shipment.get(params.shipmentId);     	
 			if (!eventInstance.hasErrors() && shipmentInstance.addToEvents(eventInstance).save(flush:true)) { 			
 				flash.message = "Added event ${eventInstance?.eventType?.name} to shipment";		
+				redirect(action: 'showDetails', id: shipmentInstance.id)
 			}
 			else { 
 				flash.message = "Unable to add event ${eventInstance?.eventType?.name} to shipment"
+				shipmentInstance?.errors.allErrors.each { 
+					log.error it
+				}
+				render(view: "addEvent", model: [shipmentInstance : shipmentInstance, eventInstance : eventInstance]);
 			}
-			redirect(action: 'showDetails', id: shipmentInstance.id)
 		}
 	}    
 	def addShipmentItem = { 

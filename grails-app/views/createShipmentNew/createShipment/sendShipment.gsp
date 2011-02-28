@@ -25,6 +25,7 @@
 
 		
 		<g:form action="createShipment">
+			<g:hiddenField name="id" value="${shipmentInstance?.id}" />
 			<g:hiddenField name="version" value="${shipmentInstance?.version}" />
 
 	
@@ -55,56 +56,125 @@
 							</tr>
 							
 							<g:if test="${!shipmentInstance.hasShipped()}">
-							<tr class="prop">
-								<td valign="top" class="name"><label>Instructions</label></td>
-								<td valign="top" class="value">
-									<p>By clicking <b>Send Shipment</b>, your ${shipmentInstance.shipmentType?.name} shipment will be marked as <b>Shipped</b> and 
-									a notification email will be sent to the following people:</p>
-							
-									<br/>
-
-									<table>	
-										<tr>
-											<th></th>
-											<th>Recipient</th>
-											<th>Notification</th>
-										</tr>
-										<tr class="prop">
-											<td>
-												<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
-											</td>
-											<td>${shipmentInstance?.carrier?.name }  &nbsp;<br/> <span class="fade">${shipmentInstance?.carrier?.email}</span></td>
-											<td>Your ${shipmentInstance.shipmentType?.name} shipment is ready for pickup</td>
-										</tr>
-										<tr class="prop">
-											<td>
-												<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
-											</td>
-											<td>${shipmentInstance?.recipient?.name }  &nbsp;<br/> <span class="fade">${shipmentInstance?.recipient?.email}</span></td>
-											<td>Your ${shipmentInstance.shipmentType?.name} shipment is ready to ship</td>
-										</tr>
-										
-										<g:each var="recipient" in="${shipmentInstance.allShipmentItems.recipient.unique() }">
-											<tr class="prop">
+								<tr class="prop">
+									
+									<td valign="top" class="name"><label>Overview</label></td>
+									<td valign="top" class="value">
+										<p>By clicking <b>Send Shipment</b> below, you are autorizing that the  
+										following inventory items will be sent from <b>${shipmentInstance?.origin?.name }</b>
+										to <b>${shipmentInstance?.destination?.name }</b>.  Upon submission, the following
+										actions will take place:
+										</p>
+										<table style="display: inline">
+											<tr>
+												<td>
+													<img src="${createLinkTo(dir:'images/icons/silk',file: 'lorry_go.png')}" style="vertical-align: middle"/>
+												</td>
+												<td>Shipment <b>${shipmentInstance?.name}</b> will transition from <b>${shipmentInstance?.mostRecentStatus}</b> to <b>Shipped</b></td>
+											<tr>
 												<td>
 													<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
 												</td>
+												<td>Notification emails will be sent to you, the traveler, and all recepients</td>
+											</tr>
+											<tr>
 												<td>
-													<g:if test="${recipient}">
-														${recipient?.name } &nbsp;<br/><span class="fade">${recipient?.email}</span>
-													</g:if>
-													<g:else>
-														<i>no recipient selected</i>
-													</g:else>
+													<img src="${createLinkTo(dir:'images/icons/silk',file: 'delete.png')}" style="vertical-align: middle"/>
 												</td>
+												<td><b>${shipmentInstance?.shipmentItems?.size() } items</b> in the shipment will be debited from ${shipmentInstance?.origin?.name }</td>
+											</tr>
+										</table>
+									</td>								
+								</tr>
+							
+							
+								<tr class="prop">
+									<td valign="top" class="name"><label>Items</label></td>
+									<td valign="top" class="value">
+										The following items will be debited from <b>${shipmentInstance?.origin?.name }</b>.
+										<br/>
+										<g:if test="${shipmentInstance.shipmentItems}">
+											<table style="display: inline">
+												<tr>
+													<th></th>
+													<th>Item</th>
+													<th>Quantity</th>
+												</tr>
+												<g:each var="item" in="${shipmentInstance?.shipmentItems }" status="status">
+													<tr class="${status % 2 ? 'even' : 'odd' }">
+														<td>
+															<img src="${createLinkTo(dir:'images/icons/silk',file: 'delete.png')}" style="vertical-align: middle"/>
+														</td>
+														<td>
+															${item?.product?.name } ${item?.lotNumber }
+														</td>
+														<td>
+															-${item?.quantity }
+														</td>
+													</tr>
+												</g:each>
+											</table>	
+										</g:if>
+										<g:else>
+											There are no shipment items to be shipped.
+										</g:else>
+								
+									</td>
+								
+								</tr>
+							
+							
+							
+								<tr class="prop">
+									<td valign="top" class="name"><label>Notifications</label></td>
+									<td valign="top" class="value">
+										<p>The following people will receive email notifications:</p>								
+										<table style="display: inline">	
+											<tr>
+												<th></th>
+												<th>Role</th>
+												<th>Recipient</th>
+												<th>Notification</th>
+											</tr>
+											<tr class="prop odd">
 												<td>
-													Your item(s) are ready to ship
+													<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
 												</td>
-											</tr>						
-										</g:each>
-									</table>
-								</td>							
-							</tr>
+												<td>Traveler</td>
+												<td>${shipmentInstance?.carrier?.name }  &nbsp;<br/> <span class="fade">${shipmentInstance?.carrier?.email}</span></td>
+												<td>Your ${shipmentInstance.shipmentType?.name} shipment is ready for pickup</td>
+											</tr>
+											<tr class="prop even">
+												<td>
+													<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
+												</td>
+												<td>Owner</td>
+												<td>${shipmentInstance?.recipient?.name }  &nbsp;<br/> <span class="fade">${shipmentInstance?.recipient?.email}</span></td>
+												<td>Your ${shipmentInstance.shipmentType?.name} shipment is ready to ship</td>
+											</tr>
+											
+											<g:each var="recipient" in="${shipmentInstance.allShipmentItems.recipient.unique() }">
+												<tr class="prop odd">
+													<td>
+														<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
+													</td>
+													<td>Recipient</td>
+													<td>
+														<g:if test="${recipient}">
+															${recipient?.name } &nbsp;<br/><span class="fade">${recipient?.email}</span>
+														</g:if>
+														<g:else>
+															<i>no recipient selected</i>
+														</g:else>
+													</td>
+													<td>
+														Your item(s) are about to ship
+													</td>
+												</tr>						
+											</g:each>
+										</table>
+									</td>							
+								</tr>
 							</g:if>
 							<g:else>
 								<tr class="prop">

@@ -1,6 +1,8 @@
 package org.pih.warehouse.shipping
 
 import org.apache.poi.hssf.record.formula.functions.NumericFunction.OneArg;
+import org.pih.warehouse.core.User;
+import org.pih.warehouse.inventory.Warehouse;
 
 import sun.util.logging.resources.logging;
 
@@ -384,7 +386,16 @@ class CreateShipmentNewController {
     			// TODO: add all to sendShipment service method (or other appropriate method) here
     			// TODO: needs to handle email as well
     			
-    			valid()
+				def shipmentInstance = Shipment.get(params.id);
+				def userInstance = User.get(session.user.id);
+				def warehouseInstance = Warehouse.get(session.warehouse.id)
+				shipmentService.sendShipment(shipmentInstance, params.comment, userInstance, warehouseInstance);
+				if (shipmentInstance.hasErrors() || !shipmentInstance.validate()) { 
+					invalid();
+				}
+				else { 
+					valid()
+				}
     		}
     	
     		on("valid").to("shipmentComplete")

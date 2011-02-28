@@ -2,6 +2,7 @@ package org.pih.warehouse.inventory
 
 class BrowseInventoryCommand {
 	
+	def searchTerms;		// search terms 
 	def warehouseInstance;	//warehouseInstance,
 	def inventoryInstance; 	//warehouseInstance.inventory,
 	def categoryInstance; 	//categoryInstance,
@@ -10,6 +11,7 @@ class BrowseInventoryCommand {
 	def inventoryItemMap;	 //inventoryService.getInventoryItemMap(warehouseInstance?.id),
 	def productList;		//productList?.sort() { it.name },
 	def rootCategory;		//rootCategory
+	def attributeMap;
 	def quantityMap;
 	def shipmentList;		// pending shipments
 	

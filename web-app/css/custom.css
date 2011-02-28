@@ -4,6 +4,37 @@
 #doc3 {
 	margin:auto;
 }
+button { 
+	padding: 1px;
+}
+
+.action-btn { 
+	width: 150px; 
+	margin: 1px;
+}
+
+
+/* Product Details box */
+#product-details-box { width: 260px;}
+#product-details-box span.name {   } 
+#product-details-box span.value { font-size: 1.0em; } 
+#product-details-box span.name:after { content: ": " }
+#product-details-box th { color: lightgrey; } 
+#product-details-box fieldset table td { padding: 6px; } 
+.product-details { height: 45px; line-height: 2px; }
+.product-details .label { width: 80px; }
+.product-details .value { width: 150px; }
+.product-details .button { width: 20px; }
+
+/* Text Alignment classes */
+.right { text-align: right; } 
+.left { text-align: left; }
+.center { text-align: center; }
+
+/* Vertical Alignment classes */
+.top { vertical-align: top; }
+.bottom { vertical-align: bottom; }
+.middle { vertical-align: middle; }
 
 /* temporarily hide the nav bar until we figure out whether we want to keep it or not */
 .nav { display: none; } 
@@ -190,7 +221,7 @@ table#listOutgoing th {
 	border-bottom: 1px solid #eee;
 	border-top: 1px solid #eee;
 }  
-.menu .heading { 
+.menu .menu-heading { 
 	font-size: 1.25em;
 	line-height: 2em; 
 	vertical-align: middle;
@@ -198,11 +229,11 @@ table#listOutgoing th {
 	display: block; 
 	background-color: #fafafa /*#F8F7EF*/; 
 }
-.menu .menuSection { 
+.menu .menu-section { 
 	padding-right: 0px; 
 	padding-bottom: 0px;
 }
-.menu .menuSection ul { 
+.menu .menu-section ul { 
 	padding-top: 5px; 
 	padding-bottom: 5px;
 }
@@ -211,7 +242,7 @@ input.button {
 	border: 0px;
 	margin: 0px;
 }
-.menu .menuSection ul li { 
+.menu .menu-section ul li { 
     /*display: block;*/
     
     padding: 0px 0px 2px 0px;
@@ -236,10 +267,6 @@ input.button {
 }
 */
 	
-/* nothing to do right now */
-#menu { 
-
-}
 
 .nav { 
 	margin: 0px;

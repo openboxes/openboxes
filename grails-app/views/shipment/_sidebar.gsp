@@ -22,84 +22,16 @@
 							
 						</td>
 					</tr>				
-					<g:if test="${shipmentInstance?.shipmentType?.name == 'Suitcase'}">
-						<tr class="prop">
-							<td>
-								<g:link controller="createShipment" action="suitcase" id="${shipmentInstance.id}"><img
-								src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}"
-								alt="Edit Suitcase" style="vertical-align: middle" /> &nbsp; 
-									<g:if test="${request.request.requestURL.toString().contains('suitcase')}"><b>edit suitcase</b></g:if>
-									<g:else>edit suitcase</g:else>
-								</g:link>
-							</td>
-						</tr>
-					</g:if>				
-					<g:else>
-						<tr class="prop">
-							<td>
-								<g:link controller="shipment" action="editDetails" id="${shipmentInstance.id}"><img
-								src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}"
-								alt="Edit Shipment" style="vertical-align: middle" /> &nbsp; 
-									<g:if test="${request.request.requestURL.toString().contains('editDetails')}"><b>edit details</b></g:if>
-									<g:else>edit details</g:else>
-								</g:link>
-							</td>
-						</tr>
-						<tr class="prop">
-							<td>
-								<g:link controller="shipment" action="editContents" id="${shipmentInstance.id}"><img 
-								src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" 
-								alt="Edit Contents" style="vertical-align: middle"/> &nbsp; 
-									<g:if test="${request.request.requestURL.toString().contains('editContents')}"><b>edit contents</b></g:if>
-									<g:else>edit contents</g:else>
-								</g:link>
-							</td>
-						</tr>
-						<tr class="prop">
-							<td>
-								<a href="${createLink(controller: "shipment", action: "addPackage", id: shipmentInstance.id)}?containerType=Box"><img 
-								src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" 
-								alt="Add Box" style="vertical-align: middle"/> &nbsp; 
-									<g:if test="${request.request.requestURL.toString().contains('addPackage')}"><b>add package</b></g:if>
-									<g:else>add package</g:else>
-								</a>				
-							</td>
-						</tr>										
-					</g:else>
-					<%-- 					
 					<tr class="prop">
 						<td>
-							<a href="${createLink(controller: "shipment", action: "addDocument", id: shipmentInstance.id)}"><img 
-							src="${createLinkTo(dir:'images/icons',file:'document.png')}" 
-							alt="Add Document" style="vertical-align: middle"/> &nbsp; 
-								<g:if test="${request.request.requestURL.toString().contains('addDocument')}"><b>add document</b></g:if>
-								<g:else>add document</g:else>
-							</a>										
-						
+							<g:link controller="createShipmentNew" action="createShipment" id="${shipmentInstance.id}"><img
+							src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}"
+							alt="Edit Suitcase" style="vertical-align: middle" /> &nbsp; 
+								<g:if test="${request.request.requestURL.toString().contains('createShipment')}"><b>edit shipment</b></g:if>
+								<g:else>edit suitcase</g:else>
+							</g:link>
 						</td>
 					</tr>
-					<tr class="prop">
-						<td>
-							<a href="${createLink(controller: "shipment", action: "addComment", id: shipmentInstance.id)}"><img 
-							src="${createLinkTo(dir:'images/icons/silk',file:'comment.png')}" 
-							alt="Add Document" style="vertical-align: middle"/> &nbsp; 
-								<g:if test="${request.request.requestURL.toString().contains('addComment')}"><b>add comment</b></g:if>
-								<g:else>add comment</g:else>
-							</a>				
-						</td>
-					</tr>
-					<tr class="prop">
-						<td>
-							<a href="${createLink(controller: "shipment", action: "addEvent", id: shipmentInstance.id)}"><img 
-							src="${createLinkTo(dir:'images/icons/silk',file:'calendar.png')}" 
-							alt="Add Document" style="vertical-align: middle"/> &nbsp; 
-								<g:if test="${request.request.requestURL.toString().contains('addEvent')}"><b>add event</b></g:if>
-								<g:else>add event</g:else>
-							</a>										
-						
-						</td>
-					</tr>
-					--%>
 				</g:if>
 			<tr class="prop">
 				<td>

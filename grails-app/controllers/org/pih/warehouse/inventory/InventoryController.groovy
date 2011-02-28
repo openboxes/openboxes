@@ -54,6 +54,8 @@ class InventoryController {
 	 * 	
 	 */
 	def browse = { BrowseInventoryCommand cmd ->
+		
+		log.info "Browse inventory " + cmd;
 		// Get the warehouse from the request parameter
 		cmd.warehouseInstance = Warehouse.get(params?.warehouse?.id) 
 		
@@ -83,6 +85,10 @@ class InventoryController {
 		[ commandInstance: cmd ]
 	}
 	
+	
+	/**
+	 * 
+	 */
 	def searchStock = {
 		log.info params.query
 		def products = []
@@ -128,6 +134,10 @@ class InventoryController {
 		[productInstanceList : products, inventoryItemMap : inventoryItemMap]
 	}
 	
+	
+	/**
+	 * 
+	 */
 	def enterStock = { 
 		def inventoryItem = InventoryItem.get(params?.inventoryItem?.id);		
 		def productInstance = new Product();
@@ -145,6 +155,9 @@ class InventoryController {
 	}
 	
 		
+	/**
+	 * 
+	 */
 	def create = {
 		def warehouseInstance = Warehouse.get(params?.warehouse?.id)
 		if (!warehouseInstance) { 
@@ -153,6 +166,10 @@ class InventoryController {
 		return [warehouseInstance: warehouseInstance]
 	}
 	
+	
+	/**
+	 * 
+	 */
 	def save = {		
 		def warehouseInstance = Warehouse.get(params.warehouse?.id)
 		if (!warehouseInstance) {
@@ -171,6 +188,9 @@ class InventoryController {
 		}
 	}
 	
+	/**
+	 * 
+	 */
 	def show = {
 		def inventoryInstance = Inventory.get(params.id)
 		if (!inventoryInstance) {

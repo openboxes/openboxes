@@ -14,6 +14,11 @@
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
 		</g:if>
+		<g:hasErrors bean="${shipmentInstance}">
+			<div class="errors">
+				<g:renderErrors bean="${shipmentInstance}" as="list" />
+			</div>
+		</g:hasErrors>	
 				
 		<table>
 			<tr>
@@ -249,21 +254,33 @@
 																			--%>
 																		</td>		
 																	</tr>
-																	<g:each in="${container?.shipmentItems}" var="itemInstance">
+																	<g:if test="${container?.shipmentItems }">
+																		<g:each in="${container?.shipmentItems}" var="itemInstance">
+																			<tr class="${(count++ % 2 == 0)?'odd':'even'}">
+																				<td>
+																					<span style="padding-left: 30px;">
+																						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'page.png')}" style="vertical-align: middle"/>
+																						&nbsp; ${itemInstance?.product?.name}
+																					</span>
+																				</td>
+																				<td>${itemInstance?.quantity}</td>																		
+																				<td>${itemInstance?.lotNumber}</td>																		
+																				<td>${itemInstance?.recipient?.name}</td>																		
+																				<td></td>																		
+																			</tr>
+																		</g:each>
+																	</g:if>
+																	<g:else>
 																		<tr class="${(count++ % 2 == 0)?'odd':'even'}">
-																			<td>
-																				<span style="padding-left: 30px;">
+																			<td>				
+																				<span style="padding-left: 30px">
 																					<img src="${createLinkTo(dir: 'images/icons/silk', file: 'page.png')}" style="vertical-align: middle"/>
-																					&nbsp; ${itemInstance?.product?.name}
-																				</span>
+																					&nbsp; No items					
+																				</span>	
 																			</td>
-																			<td>${itemInstance?.quantity}</td>																		
-																			<td>${itemInstance?.lotNumber}</td>																		
-																			<td>${itemInstance?.recipient?.name}</td>																		
-																			<td></td>																		
-																		</tr>
-																	
-																	</g:each>
+																		</tr>													
+																	</g:else>
+
 																	
 																	<g:each in="${container?.containers}" var="childContainer">
 																		<tr class="${(count++ % 2 == 0)?'odd':'even'}">
@@ -291,33 +308,57 @@
 																					<img src="${createLinkTo(dir:'images/icons/silk',file:'package_delete.png')}" alt="Delete" style="vertical-align: middle"/>
 																				</g:link>																		
 																				--%>
-																				
-																			
 																			</td>																		
-																			
 																		</tr>
-																		<g:each var="childItem" in="${childContainer?.shipmentItems}">
+																		<g:if test="${childContainer?.shipmentItems }">
+																			<g:each var="childItem" in="${childContainer?.shipmentItems}">
+																				<tr class="${(count++ % 2 == 0)?'odd':'even'}">
+																					<td>
+																						<span style="padding-left: 60px">
+																							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'page.png')}" style="vertical-align: middle"/>
+																							&nbsp; ${childItem?.product?.name }
+																						</span>
+																					</td>
+																					<td>${childItem?.quantity}</td>																		
+																					<td>${childItem?.lotNumber}</td>																		
+																					<td>${childItem?.recipient?.name}</td>																		
+																					<td></td>																		
+																				</tr>
+																			</g:each>
+																		</g:if>
+																		<g:else>
 																			<tr class="${(count++ % 2 == 0)?'odd':'even'}">
-																				<td>
+																				<td>				
 																					<span style="padding-left: 60px">
 																						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'page.png')}" style="vertical-align: middle"/>
-																						&nbsp; ${childItem?.product?.name }
+																						&nbsp; ${childContainer?.name } contains no items 																				
 																					</span>
 																				</td>
-																				<td>${childItem?.quantity}</td>																		
-																				<td>${childItem?.lotNumber}</td>																		
-																				<td>${childItem?.recipient?.name}</td>																		
-																				<td></td>																		
-																			</tr>
-																		</g:each>
+																			</tr>													
+																		</g:else>
 																	</g:each>
-																	
 																</g:if>
-																
-																
 															</g:each>		
-															
-															
+															<g:each in="${shipmentInstance.shipmentItems.findAll { !it.container } }" var="item" status="i">	
+																<tr class="${(count++ % 2 == 0)?'odd':'even'}">
+																	<td>
+																		<span style="padding-left: 0px">
+																			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'page.png')}" style="vertical-align: middle"/>
+																			&nbsp;${item?.product?.name}
+																		</span>
+																	</td>
+																	<td>
+																		${item?.quantity}
+																	</td>
+																	<td>
+																		${item?.lotNumber}
+																	</td>
+																	<td>
+																		${item?.recipient?.name}
+																	</td>
+																	<td></td>																		
+																</tr>
+															</g:each>
 														</table>							
 													</div>
 												</g:else>

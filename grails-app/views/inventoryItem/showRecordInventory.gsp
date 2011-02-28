@@ -311,69 +311,46 @@
 		<div class="errors"><g:renderErrors bean="${commandInstance}" as="list" /></div>
 	</g:hasErrors>
 	<div class="dialog">	
-		<table>
+	
+		<div class="actionsMenu" style="float: left;">					
+			<ul>
+				<li>							
+					<g:link controller="inventoryItem" 
+						action="showStockCard" params="['product.id':commandInstance?.product?.id]">
+						<button>
+							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_left.png' )}" style="vertical-align:middle"/>
+							&nbsp; Back to <b>Stock Card</b>&nbsp;
+						</button>
+					</g:link>							
+				</li>
+			</ul>					
+		</div>
+		<div class="actionsMenu" style="float: right;">					
+			<ul>
+				<li>
+					<g:form method="GET" controller="inventory" action="browse">
+						<g:textField name="searchTerms" value="${params.searchTerms }" size="18"/>
+						<button type="submit" class="" name="submitSearch">
+							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'zoom.png' )}" style="vertical-align:middle"/>
+							&nbsp;Find&nbsp;
+						</button>
+					</g:form>						
+				</li>
+			</ul>
+		</div>	
+		
+		<br clear="all">	
+	
+	
+		<table border="0" >
 			<tr>
 				<td style="width: 250px;">
-					<div class="actionsMenu">
-						<ul>
-							<li>							
-								<g:link controller="inventoryItem" 
-									action="showStockCard" params="['product.id':commandInstance?.product?.id]">&lsaquo; Back to stock card</g:link>							
-							</li>
-						</ul>
-					</div>	
-					<br/>				
 					<g:render template="productDetails" model="[productInstance:commandInstance?.product, inventoryInstance: inventoryInstance, inventoryLevelInstance: inventoryLevelInstance, totalQuantity: totalQuantity]"/>
 				</td>
 				<td>				
-						
-					<div class="actionsMenu">
-						<ul>
-							<li>								
-						
-							</li>
-							<%--
-							<li>
-								<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
-								<g:link controller="inventoryItem" action="showRecordInventory" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
-									Record stock
-								</g:link>
-							</li>
-							<li>
-								<img src="${resource(dir: 'images/icons/silk', file: 'magnifier.png')}"/>
-								<g:link controller="inventoryItem" action="showTransactions" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
-									Show changes
-								</g:link>
-							</li>
-							<li>
-								<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}"/>
-								<g:link controller="inventoryItem" action="create" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
-									Add item
-								</g:link>
-							</li>
-							 --%>
-						</ul>
-					</div>					
 					<div id="inventoryForm">		
 						<g:form action="saveRecordInventory" autocomplete="off">
-							<style>
-								.form-content { 
-									border: 0px solid black;
-									min-height: 100%;
-									height: auto !important;
-									height: 100%;
-									margin: 0 auto -4em;
-									padding: 10px;
-								}
-								.form-footer {
-									text-align:right; 
-									height: 4em;
-									clear: both;
-								}	
-								fieldset { 
-									min-height: 500px;
-								}
-							</style>
+							
 						
 							<fieldset>
 								<legend>Record Current Inventory</legend>
@@ -397,7 +374,7 @@
 								</div>
 													
 								<div class="form-content">
-									<table id="inventoryItemsTable" style="border: 0px solid lightgrey" border="1">
+									<table id="inventoryItemsTable" style="border: 0px solid lightgrey" border="0">
 										<thead>
 											<tr>	
 												<th>Lot/Serial #</th>
@@ -412,7 +389,7 @@
 											<style>
 												.selected-row { background-color: #ffffe0; } 
 											</style>
-											<g:each var="recordInventoryRow" in="${commandInstance?.recordInventoryRows.findAll{it.newQuantity > 0} }" status="status">
+											<g:each var="recordInventoryRow" in="${commandInstance?.recordInventoryRows.findAll{it.oldQuantity > 0 || it.newQuantity > 0}.sort { it.lotNumber }}" status="status">
 												<g:set var="styleClass" value="${params?.inventoryItem?.id && recordInventoryRow?.id == Integer.valueOf(params?.inventoryItem?.id) ? 'selected-row' : ''}"/>
 												
 												<tr class="${(status%2==0)?'odd':'even' } ${styleClass}">
@@ -470,14 +447,13 @@
 														<button id="addAnother" type="button" class="positive">
 															<img src="${createLinkTo(dir:'images/icons/silk', file:'add.png') }"/>&nbsp;Add Item
 														</button>
-													</div>
-													<div style="float: right;">
-														<g:link controller="inventoryItem" action="showStockCard" 
-															params="['product.id':commandInstance.product?.id]" class="negative">Cancel</g:link>
 														&nbsp;
 														<button name="save" type="submit" class="positive">
 															<img src="${createLinkTo(dir:'images/icons/silk', file:'tick.png') }"/>&nbsp;Save 
 														</button>
+														&nbsp;
+														<g:link controller="inventoryItem" action="showStockCard" 
+															params="['product.id':commandInstance.product?.id]" class="negative">Cancel</g:link>
 													</div>
 												</td>
 											</tr>
