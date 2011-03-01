@@ -29,9 +29,9 @@
 					<table>
 							<tr>
 								<td style="text-align: center;">
-									<form name="shipmentComplete" action="createShipment">
+									<g:form action="createShipment" method="post">
 										<g:submitButton name="done" value="Done"></g:submitButton>				
-									</form>
+									</g:form>
 								</td>
 							</tr>
 					</table>

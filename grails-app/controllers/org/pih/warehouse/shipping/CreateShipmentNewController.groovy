@@ -392,20 +392,15 @@ class CreateShipmentNewController {
     	
     	sendShipmentAction {
     		action {
-    			
-    			// TODO: add all to sendShipment service method (or other appropriate method) here
-    			// TODO: needs to handle email as well
-    			
-				def shipmentInstance = Shipment.get(params.id);
 				def userInstance = User.get(session.user.id);
 				def warehouseInstance = Warehouse.get(session.warehouse.id)
-				shipmentService.sendShipment(shipmentInstance, params.comment, userInstance, warehouseInstance);
-				if (shipmentInstance.hasErrors() || !shipmentInstance.validate()) { 
+				shipmentService.sendShipment(flow.shipmentInstance, params.comment, userInstance, warehouseInstance);
+				if (flow.shipmentInstance.hasErrors() || !flow.shipmentInstance.validate()) { 
 					invalid();
 				}
 				else { 
 					valid()
-				}
+				} 
     		}
     	
     		on("valid").to("shipmentComplete")

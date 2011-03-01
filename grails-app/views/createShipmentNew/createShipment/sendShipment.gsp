@@ -24,7 +24,7 @@
 		<g:render template="flowHeader" model="['currentState':'Ship']"/>	
 
 		
-		<g:form action="createShipment">
+		<g:form action="createShipment" method="post">
 			<g:hiddenField name="id" value="${shipmentInstance?.id}" />
 			<g:hiddenField name="version" value="${shipmentInstance?.version}" />
 
