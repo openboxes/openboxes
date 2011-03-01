@@ -2,7 +2,7 @@ package org.pih.warehouse.shipping
 
 import java.util.Date;
 
-class Shipper {
+class Shipper implements java.io.Serializable {
 	
 	String name
 	String description	

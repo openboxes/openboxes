@@ -81,12 +81,12 @@
 								<tr class="prop">
 									<td valign="top" class="name"><label><g:message
 										code="shipment.freightForwarder.label" default="Freight forwarder" /></label></td>
-									<td>&nbsp;</td>
+									<td>${shipmentInstance?.shipmentMethod?.shipper?.name}</td>
 								</tr>
 								<tr class="prop">
 									<td valign="top" class="name"><label><g:message
 										code="shipment.recipient.label" default="Recipient" /></label></td>
-									<td>&nbsp;</td>
+									<td>${shipmentInstance?.recipient?.name}</td>
 								</tr>
 								<tr class="prop">
 									<td valign="top" class="name"><label><g:message

@@ -44,7 +44,12 @@
 									<td valign="top" class="name" style="width: 10%;"><label><g:message
 										code="shipment.freightForwarder.label" default="Freight Forwarder" /></label></td>
 									<td valign="top" style="width: 30%;">
-										&nbsp;	
+										<g:autoSuggest id="shipperInput" name="shipperInput" jsonUrl="/warehouse/json/findShipperByName" 
+											width="180" size="30"
+											valueId="${shipmentInstance?.shipmentMethod?.shipper?.id}" 
+											valueName="${shipmentInstance?.shipmentMethod?.shipper?.name}"/>	
+											<br/>
+											<g:link controller="shipper" action="list" target="_blank"><span class="small">Add a New Freight Forwarder</span></g:link>	
 									</td>
 								</tr>
 								<tr class="prop">

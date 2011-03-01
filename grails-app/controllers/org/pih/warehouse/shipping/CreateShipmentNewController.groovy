@@ -77,8 +77,9 @@ class CreateShipmentNewController {
     		on("next") {
     			bindData(flow.shipmentInstance, params)
     			
-    			// need to manually bind the reference numbers
+    			// need to manually bind the reference numbers and shipper
      			bindReferenceNumbers(flow.shipmentInstance, flow.shipmentWorkflow, params)
+     			bindShipper(flow.shipmentInstance, params)
     			
     			if(flow.shipmentInstance.hasErrors() || !flow.shipmentInstance.validate()) { 
 					return error()
@@ -92,9 +93,10 @@ class CreateShipmentNewController {
     		on("save") {
     			bindData(flow.shipmentInstance, params)
     			
-    			// need to manually bind the reference numbers
+    			// need to manually bind the reference numbers and shipper
      			bindReferenceNumbers(flow.shipmentInstance, flow.shipmentWorkflow, params)
-    			
+     			bindShipper(flow.shipmentInstance, params)
+     			
     			if(flow.shipmentInstance.hasErrors() || !flow.shipmentInstance.validate()) { 
 					return error()
     			}
@@ -443,5 +445,21 @@ class CreateShipmentNewController {
 				}
 			}
 		}
+	}
+	
+	void bindShipper(Shipment shipment, Map params) {		
+		// need to manually bind the shipper since it is nested within the "shipmentMethod"
+		if (params.shipperInput) {	
+			if (!shipment.shipmentMethod) {
+				// create the new ShipmentMethod object if need be
+				shipment.shipmentMethod = new ShipmentMethod()
+			}
+			shipment.shipmentMethod.shipper = Shipper.get(params.shipperInput.id)
+		}
+		else {
+			// if there is no input for shipper, we remove the *entire* shipment method
+			// TODO: does this delete the underlying shipment method upon saving?		
+			shipment.shipmentMethod = null   
+		}		
 	}
 }
