@@ -49,7 +49,7 @@
 											valueId="${shipmentInstance?.shipmentMethod?.shipper?.id}" 
 											valueName="${shipmentInstance?.shipmentMethod?.shipper?.name}"/>	
 											<br/>
-											<g:link controller="shipper" action="list" target="_blank"><span class="small">Add a New Freight Forwarder</span></g:link>	
+											<g:link controller="shipper" action="create" target="_blank"><span class="small">Add a New Freight Forwarder</span></g:link>	
 									</td>
 								</tr>
 								<tr class="prop">
