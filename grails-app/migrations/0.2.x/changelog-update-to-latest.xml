@@ -2246,6 +2246,275 @@
         </insert>      
     </changeSet>
     
+     <changeSet author="mgoodrich" id="2011-02-28-1">
+        <preConditions onFail="MARK_RAN">
+        	<not>
+				<tableExists tableName="shipment_workflow"/>
+			</not>
+		</preConditions>
+         <sql>
+         	CREATE TABLE `shipment_workflow` (
+	  			`id` bigint(20) NOT NULL AUTO_INCREMENT,
+	  			`version` bigint(20) NOT NULL,
+	  			`date_created` datetime DEFAULT NULL,
+	  			`last_updated` datetime DEFAULT NULL,
+	  			`name` varchar(255) NOT NULL,
+	  			`shipment_type_id` bigint(20) NOT NULL,
+	  			PRIMARY KEY (`id`),
+	  			UNIQUE KEY `shipment_type_id` (`shipment_type_id`),
+	 			KEY `FKD584C4C4FF77FF9B` (`shipment_type_id`),
+	  			CONSTRAINT `FKD584C4C4FF77FF9B` FOREIGN KEY (`shipment_type_id`) REFERENCES `shipment_type` (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8
+         </sql>
+    </changeSet>
+    
+    <changeSet author="mgoodrich" id="2011-02-28-2">
+        <preConditions onFail="MARK_RAN">
+        	<not>
+				<tableExists tableName="shipment_workflow_container_type"/>
+			</not>
+		</preConditions>
+         <sql>
+         	CREATE TABLE `shipment_workflow_container_type` (
+			  `shipment_workflow_container_types_id` bigint(20) DEFAULT NULL,
+			  `container_type_id` bigint(20) DEFAULT NULL,
+			  `container_types_idx` int(11) DEFAULT NULL,
+			  KEY `FKDEF5AD1317A6E251` (`container_type_id`),
+			  CONSTRAINT `FKDEF5AD1317A6E251` FOREIGN KEY (`container_type_id`) REFERENCES `container_type` (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+         </sql>
+    </changeSet>
+    
+    <changeSet author="mgoodrich" id="2011-02-28-3">
+        <preConditions onFail="MARK_RAN">
+        	<not>
+				<tableExists tableName="shipment_workflow_reference_number_type"/>
+			</not>
+		</preConditions>
+         <sql>
+			CREATE TABLE `shipment_workflow_reference_number_type` (
+			  `shipment_workflow_reference_number_types_id` bigint(20) DEFAULT NULL,
+			  `reference_number_type_id` bigint(20) DEFAULT NULL,
+			  `reference_number_types_idx` int(11) DEFAULT NULL,
+			  KEY `FK4BB27241154F600` (`reference_number_type_id`),
+			  CONSTRAINT `FK4BB27241154F600` FOREIGN KEY (`reference_number_type_id`) REFERENCES `reference_number_type` (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+		</sql>
+    </changeSet>
+    
+    <changeSet author="mgoodrich" id="2011-02-28-4">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT count(*) FROM shipment_workflow]]>
+			</sqlCheck>
+		</preConditions>
+        <insert tableName="shipment_workflow">
+        	<column name="id" valueNumeric="1"/>
+        	<column name="name" value="Air shipment workflow"/>
+        	<column name="shipment_type_id" valueNumeric="1"/>
+            <column name="version" valueNumeric="0"/>
+			<column name="date_created" valueDate="2011-02-28"/>
+            <column name="last_updated" valueDate="2011-02-28"/>            
+        </insert> 
+        <insert tableName="shipment_workflow">
+        	<column name="id" valueNumeric="2"/>
+        	<column name="name" value="Sea shipment workflow"/>
+        	<column name="shipment_type_id" valueNumeric="2"/>
+            <column name="version" valueNumeric="0"/>
+			<column name="date_created" valueDate="2011-02-28"/>
+            <column name="last_updated" valueDate="2011-02-28"/>            
+        </insert>     
+         <insert tableName="shipment_workflow">
+        	<column name="id" valueNumeric="3"/>
+        	<column name="name" value="Suitcase shipment workflow"/>
+        	<column name="shipment_type_id" valueNumeric="4"/>
+            <column name="version" valueNumeric="0"/>
+			<column name="date_created" valueDate="2011-02-28"/>
+            <column name="last_updated" valueDate="2011-02-28"/>            
+        </insert>   
+    </changeSet>
+    
+     <changeSet author="mgoodrich" id="2011-03-01-1">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT count(*) FROM reference_number_type WHERE name="Air Waybill Number"]]>
+			</sqlCheck>
+		</preConditions>
+        <insert tableName="reference_number_type">
+        	<column name="id" valueNumeric="5"/>
+        	<column name="name" value="Air Waybill Number"/>
+        	<column name="description" value="Air Waybill Number"/>
+        	<column name="sort_order" valueNumeric="0"/>
+            <column name="version" valueNumeric="0"/>
+			<column name="date_created" valueDate="2011-03-01"/>
+            <column name="last_updated" valueDate="2011-03-01"/>            
+        </insert>        
+     </changeSet>
+ 
+      <changeSet author="mgoodrich" id="2011-03-01-2">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT count(*) FROM reference_number_type WHERE name="Container Number"]]>
+			</sqlCheck>
+		</preConditions>
+        <insert tableName="reference_number_type">
+        	<column name="id" valueNumeric="6"/>
+        	<column name="name" value="Container Number"/>
+        	<column name="description" value="Container Number"/>
+        	<column name="sort_order" valueNumeric="0"/>
+            <column name="version" valueNumeric="0"/>
+			<column name="date_created" valueDate="2011-03-01"/>
+            <column name="last_updated" valueDate="2011-03-01"/>            
+        </insert>        
+     </changeSet>
+     
+     <changeSet author="mgoodrich" id="2011-03-01-3">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT count(*) FROM reference_number_type WHERE name="Seal Number"]]>
+			</sqlCheck>
+		</preConditions>
+        <insert tableName="reference_number_type">
+        	<column name="id" valueNumeric="7"/>
+        	<column name="name" value="Seal Number"/>
+        	<column name="description" value="Seal Number"/>
+        	<column name="sort_order" valueNumeric="0"/>
+            <column name="version" valueNumeric="0"/>
+			<column name="date_created" valueDate="2011-03-01"/>
+            <column name="last_updated" valueDate="2011-03-01"/>            
+        </insert>        
+     </changeSet>
+     
+          <changeSet author="mgoodrich" id="2011-03-01-4">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT count(*) FROM reference_number_type WHERE name="Flight Number"]]>
+			</sqlCheck>
+		</preConditions>
+        <insert tableName="reference_number_type">
+        	<column name="id" valueNumeric="8"/>
+        	<column name="name" value="Flight Number"/>
+        	<column name="description" value="Flight Number"/>
+        	<column name="sort_order" valueNumeric="0"/>
+            <column name="version" valueNumeric="0"/>
+			<column name="date_created" valueDate="2011-03-01"/>
+            <column name="last_updated" valueDate="2011-03-01"/>            
+        </insert>        
+     </changeSet>
+ 
+ 	   <changeSet author="mgoodrich" id="2011-03-01-5">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT count(*) FROM shipment_workflow_container_type]]>
+			</sqlCheck>
+		</preConditions>
+        <insert tableName="shipment_workflow_container_type">
+        	<column name="shipment_workflow_container_types_id" valueNumeric="1"/>
+        	<column name="container_type_id" valueNumeric="2"/>
+        	<column name="container_types_idx" valueNumeric="0"/>   
+        </insert>      
+           <insert tableName="shipment_workflow_container_type">
+        	<column name="shipment_workflow_container_types_id" valueNumeric="1"/>
+        	<column name="container_type_id" valueNumeric="8"/>
+        	<column name="container_types_idx" valueNumeric="1"/>   
+        </insert>  
+           <insert tableName="shipment_workflow_container_type">
+        	<column name="shipment_workflow_container_types_id" valueNumeric="2"/>
+        	<column name="container_type_id" valueNumeric="2"/>
+        	<column name="container_types_idx" valueNumeric="0"/>   
+        </insert>  
+           <insert tableName="shipment_workflow_container_type">
+        	<column name="shipment_workflow_container_types_id" valueNumeric="2"/>
+        	<column name="container_type_id" valueNumeric="8"/>
+        	<column name="container_types_idx" valueNumeric="1"/>   
+        </insert>  
+           <insert tableName="shipment_workflow_container_type">
+        	<column name="shipment_workflow_container_types_id" valueNumeric="3"/>
+        	<column name="container_type_id" valueNumeric="3"/>
+        	<column name="container_types_idx" valueNumeric="0"/>   
+        </insert>       
+     </changeSet> 
+ 
+    <changeSet author="mgoodrich" id="2011-03-01-6">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT count(*) FROM shipment_workflow_reference_number_type]]>
+			</sqlCheck>
+		</preConditions>
+        <insert tableName="shipment_workflow_reference_number_type">
+        	<column name="shipment_workflow_reference_number_types_id" valueNumeric="1"/>
+        	<column name="reference_number_type_id" valueNumeric="5"/>
+        	<column name="reference_number_types_idx" valueNumeric="0"/>   
+        </insert>
+          <insert tableName="shipment_workflow_reference_number_type">
+        	<column name="shipment_workflow_reference_number_types_id" valueNumeric="1"/>
+        	<column name="reference_number_type_id" valueNumeric="6"/>
+        	<column name="reference_number_types_idx" valueNumeric="1"/>   
+        </insert> 
+          <insert tableName="shipment_workflow_reference_number_type">
+        	<column name="shipment_workflow_reference_number_types_id" valueNumeric="1"/>
+        	<column name="reference_number_type_id" valueNumeric="7"/>
+        	<column name="reference_number_types_idx" valueNumeric="2"/>   
+        </insert>  
+          <insert tableName="shipment_workflow_reference_number_type">
+        	<column name="shipment_workflow_reference_number_types_id" valueNumeric="2"/>
+        	<column name="reference_number_type_id" valueNumeric="4"/>
+        	<column name="reference_number_types_idx" valueNumeric="0"/>   
+        </insert>
+          <insert tableName="shipment_workflow_reference_number_type">
+        	<column name="shipment_workflow_reference_number_types_id" valueNumeric="2"/>
+        	<column name="reference_number_type_id" valueNumeric="6"/>
+        	<column name="reference_number_types_idx" valueNumeric="1"/>   
+        </insert>  
+          <insert tableName="shipment_workflow_reference_number_type">
+        	<column name="shipment_workflow_reference_number_types_id" valueNumeric="2"/>
+        	<column name="reference_number_type_id" valueNumeric="7"/>
+        	<column name="reference_number_types_idx" valueNumeric="2"/>   
+        </insert> 
+        <insert tableName="shipment_workflow_reference_number_type">
+        	<column name="shipment_workflow_reference_number_types_id" valueNumeric="3"/>
+        	<column name="reference_number_type_id" valueNumeric="8"/>
+        	<column name="reference_number_types_idx" valueNumeric="0"/>   
+        </insert> 
+	</changeSet>
+
+	<changeSet author="mgoodrich" id="2011-03-01-6-1">
+        <preConditions onFail="MARK_RAN">
+			<tableExists tableName="shipment_type_container_type"/>
+		</preConditions>
+			<dropTable tableName="shipment_type_container_type"/>
+	</changeSet>
+	
+	<changeSet author="mgoodrich" id="2011-03-01-7">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				<![CDATA[SELECT count(*) FROM shipment_type WHERE name = 'Domestic']]>
+			</sqlCheck>
+		</preConditions>
+			<delete tableName="shipment_type">
+   				 <where>name='Domestic'</where>
+			</delete>
+	</changeSet>
+	
+	<changeSet author="mgoodrich" id="2011-03-01-8">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				<![CDATA[SELECT count(*) FROM shipment_type WHERE name = 'Other']]>
+			</sqlCheck>
+		</preConditions>
+			<delete tableName="shipment_type">
+   				 <where>name='Other'</where>
+			</delete>
+	</changeSet>
+	
+	<changeSet author="mgoodrich" id="2011-03-01-9">
+        <preConditions onFail="MARK_RAN">
+			<columnExists tableName="shipment" columnName="flight_information"/>
+		</preConditions>
+			<dropColumn tableName="shipment" columnName="flight_information"/>
+	</changeSet>
+	
+	
 <!--
     <changeSet author="jmiranda (generated)" id="1297432141595-4">
         <preConditions onFail="MARK_RAN">

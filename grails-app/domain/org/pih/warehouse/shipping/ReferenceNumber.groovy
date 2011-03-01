@@ -1,6 +1,8 @@
 package org.pih.warehouse.shipping
 
-class ReferenceNumber {
+import java.io.Serializable;
+
+class ReferenceNumber implements Serializable{
 
 	String identifier
 	ReferenceNumberType referenceNumberType

@@ -16,7 +16,6 @@ class Shipment implements Serializable {
 	String shipmentNumber			// an auto-generated shipment number
 	Date expectedShippingDate		// the date the origin expects to ship the goods (required)
 	Date expectedDeliveryDate		// the date the destination should expect to receive the goods (optional)
-	String flightInformation		// the flight number and airline 
 	Float totalValue				// the total value of all items in the shipment		
 
 	// Audit fields
@@ -99,7 +98,6 @@ class Shipment implements Serializable {
 		origin(nullable:false, blank: false, 
 			validator: { value, obj -> return !value.equals(obj.destination)})
 		destination(nullable:false, blank: false)		
-		flightInformation(nullable:true)
 		expectedShippingDate(nullable:false)
 		//expectedShippingDate(validator:{value, obj-> return value.after(obj.checkIn)})		
 		expectedDeliveryDate(nullable:true)	// optional
@@ -111,6 +109,12 @@ class Shipment implements Serializable {
 		recipient(nullable:true)
 		donor(nullable:true)
 		totalValue(nullable:true)
+		
+		// a shipment can't have two reference numbers of the same type (we may want to change this, but UI makes this assumption at this point)
+		referenceNumbers ( validator: { referenceNumbers ->
+        	referenceNumbers?.collect( {it.referenceNumberType?.id} )?.unique( { a, b -> a <=> b } )?.size() == referenceNumbers?.size()        
+		} )
+		
 		
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)

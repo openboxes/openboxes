@@ -127,11 +127,6 @@
 												<span class="fade">(empty)</span>
 											</g:else>												
 										</td>
-										<td>
-											<span class="fade">
-											${fieldValue(bean: shipmentInstance, field: "flightInformation")}
-											</span>
-										</td>
 									</tr>
 									
 									<%-- 

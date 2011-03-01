@@ -23,6 +23,7 @@ class CreateShipmentNewController {
     			// create a new shipment instance if we don't have one already
     			if (!flow.shipmentInstance) { 
     				flow.shipmentInstance = shipmentService.getShipmentInstance(params.id as Long)
+    				flow.shipmentWorkflow = shipmentService.getShipmentWorkflow(flow.shipmentInstance)
     			}
     			return success()
     		}
@@ -32,12 +33,15 @@ class CreateShipmentNewController {
     	enterShipmentDetails {
     		on("next") {
     			bindData(flow.shipmentInstance, params)
-    			
+    		    				
     			if(flow.shipmentInstance.hasErrors() || !flow.shipmentInstance.validate()) { 
 					return error()
     			}
     			else {
     				shipmentService.saveShipment(flow.shipmentInstance)
+    				
+    				// set (or reset) the shipment workflow here, since the shipment type may have change
+    				flow.shipmentWorkflow = shipmentService.getShipmentWorkflow(flow.shipmentInstance)
     			}	
     		}.to("enterTrackingDetails")
     		
@@ -73,6 +77,9 @@ class CreateShipmentNewController {
     		on("next") {
     			bindData(flow.shipmentInstance, params)
     			
+    			// need to manually bind the reference numbers
+     			bindReferenceNumbers(flow.shipmentInstance, flow.shipmentWorkflow, params)
+    			
     			if(flow.shipmentInstance.hasErrors() || !flow.shipmentInstance.validate()) { 
 					return error()
     			}
@@ -84,6 +91,9 @@ class CreateShipmentNewController {
     		
     		on("save") {
     			bindData(flow.shipmentInstance, params)
+    			
+    			// need to manually bind the reference numbers
+     			bindReferenceNumbers(flow.shipmentInstance, flow.shipmentWorkflow, params)
     			
     			if(flow.shipmentInstance.hasErrors() || !flow.shipmentInstance.validate()) { 
 					return error()
@@ -237,8 +247,8 @@ class CreateShipmentNewController {
     				if (flash.cloneQuantity) { flash.cloneContainer = container }
     				
     				// assign the id of the container if needed
-    				if (flash.addItem == -1) { flash.addItem = container.id }
-    				if (flash.addBox == -1) { flash.addBox = container.id }
+    				if (flash.addItemToContainerId == -1) { flash.addItemToContainerId = container.id }
+    				if (flash.addBoxToContainerId == -1) { flash.addBoxToContainerId = container.id }
     				
     				valid()
     			}	
@@ -411,4 +421,32 @@ class CreateShipmentNewController {
     	}
     }
 	
+	void bindReferenceNumbers(Shipment shipment, ShipmentWorkflow workflow, Map params) {
+		// need to manually bind the reference numbers
+		if (!shipment.referenceNumbers) {shipment.referenceNumbers = [] }
+		for (ReferenceNumberType type in workflow.referenceNumberTypes) {
+			
+			// find the reference number for this reference number type
+			ReferenceNumber referenceNumber = shipment.referenceNumbers.find( {it.referenceNumberType.id == type.id} )	
+			
+			if (params.referenceNumbersInput?."${type.id}") {
+				// check to see if this reference value already exists
+				if (referenceNumber) {
+					// if it exists, assign the new id
+					referenceNumber.identifier = params.referenceNumbersInput?."${type.id}"
+				}
+				else {
+					// otherwise, we need to add a new reference number
+					shipment.referenceNumbers.add(new ReferenceNumber( [identifier: params.referenceNumbersInput?."${type.id}",
+																		referenceNumberType: type]))
+				}
+			}
+			else {
+				// if there is no param for this reference number, we need to remove it from the list of reference numbers
+				if (referenceNumber) {
+					shipment.referenceNumbers.remove(referenceNumber)
+				}
+			}
+		}
+	}
 }

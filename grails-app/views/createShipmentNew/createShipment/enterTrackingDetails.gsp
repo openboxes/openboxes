@@ -29,44 +29,7 @@
 					
 					<div class="dialog">
 						<table>
-		                    <tbody>
-		                    
-		                    <%-- 
-								<tr class="prop">
-									<td valign="top" class="name"><label><g:message
-										code="shipment.name.label" default="Shipment Number" /></label>
-									</td>
-									<td colspan="3" valign="top"
-										class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">
-										<span style="line-height: 1.5em">${shipmentInstance?.shipmentNumber}</span>
-									</td>
-								</tr>
-								<tr class="prop">
-									<td valign="top" class="name"><label><g:message code="shipment.type.label" default="Type" /></label></td>
-									<td valign="top"
-										class="value ${hasErrors(bean: shipmentInstance, field: 'shipmentType', 'errors')}">
-										<g:if test="${shipmentInstance?.shipmentType}">
-											<g:hiddenField name="shipmentType.id" value="${shipmentInstance?.shipmentType?.id}" />
-											${shipmentInstance?.shipmentType?.name }																	
-										</g:if>
-										<g:else>
-											<g:select
-												name="shipmentType.id"
-												from="${org.pih.warehouse.shipping.ShipmentType.list()}"
-												optionKey="id" optionValue="name" value="${shipmentInstance?.shipmentType?.id}" />								
-										</g:else>
-									</td>
-								</tr>
-								<tr class='prop'>
-									<td valign='top' class='name'>
-										<label for='name'><label><g:message code="shipment.name.label" default="Name" /></label>
-									</td>
-									<td valign='top' class='value ${hasErrors(bean:shipmentInstance,field:'name','errors')}'>
-										${shipmentInstance?.name?.encodeAsHTML()}
-									</td>
-								</tr>
-								--%>
-								  
+		                    <tbody>				  
 								<tr class="prop">
 									<td valign="top" class="name" style="width: 10%;"><label><g:message
 										code="shipment.traveler.label" default="Traveler" /></label></td>
@@ -94,44 +57,18 @@
 											valueName="${shipmentInstance?.recipient?.name}"/>		
 									</td>
 								</tr>
-								<tr class="prop">
-									<td valign="top" class="name" style="width: 10%;"><label><g:message
-										code="shipment.bol.label" default="BOL #" /></label></td>
-									<td valign="top" style="width: 30%;">
-										&nbsp;	
-									</td>
-								</tr>
-								<tr class="prop">
-									<td valign="top" class="name" style="width: 10%;"><label><g:message
-										code="shipment.bol.label" default="AWB #" /></label></td>
-									<td valign="top" style="width: 30%;">
-										&nbsp;	
-									</td>
-								</tr>
-								<tr class="prop">
-									<td valign="top" class="name" style="width: 10%;"><label><g:message
-										code="shipment.container.label" default="Container #"  /></label></td>
-									<td valign="top" style="width: 30%;">
-										&nbsp;	
-									</td>
-								</tr>
-								<tr class="prop">
-									<td valign="top" class="name" style="width: 10%;"><label><g:message
-										code="shipment.seal.label" default="Seal #" /></label></td>
-									<td valign="top" style="width: 30%;">
-										&nbsp;	
-									</td>
-								</tr>
-								<tr class="prop">
-									<td valign="top" class="name"><label><g:message
-										code="shipment.totalValue.label" default="Flight #" /></label></td>
-									<td valign="top"
-										class=" ${hasErrors(bean: shipmentInstance, field: 'flightInformation', 'errors')}"
-										nowrap="nowrap">
-											<g:textField name="flightInformation" size="10" value="${shipmentInstance?.flightInformation}" /> 
-											<span class="fade">(e.g. AA 2292)</span>
-									</td>
-								</tr>										
+								
+								<!-- list all the reference numbers valid for this workflow -->
+								<g:each var="referenceNumberType" in="${shipmentWorkflow?.referenceNumberTypes}">
+									<tr class="prop">
+										<td valign="top" class="name" style="width: 10%;"><label><g:message
+											code="shipment.${referenceNumberType?.name}" default="${referenceNumberType?.name}" /></label></td>
+										<td valign="top" style="width: 30%;">
+											<g:textField name="referenceNumbersInput.${referenceNumberType?.id}" size="10" value="${shipmentInstance?.referenceNumbers?.find({it.referenceNumberType.id == referenceNumberType.id})?.identifier}" /> 
+										</td>
+									</tr>
+								</g:each>
+																	
 								<tr class="prop">
 									<td valign="top" class="name"><label><g:message
 										code="shipment.totalValue.label" default="Total value" /></label></td>

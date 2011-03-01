@@ -13,13 +13,10 @@ class ShipmentType implements java.io.Serializable {
 	Date dateCreated;
 	Date lastUpdated;
 	
-	static hasMany = [ containerTypes : ContainerType ]
-	
 	static constraints = {
 		name(nullable:false)
 		description(nullable:true)
 		sortOrder(nullable:true)
-		containerTypes(nullable:true)
 		dateCreated(display:false)
 		lastUpdated(display:false)
 	}

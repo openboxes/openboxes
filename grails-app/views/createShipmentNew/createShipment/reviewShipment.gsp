@@ -111,35 +111,17 @@
 											<g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="MMM dd, yyyy"/>
 									</td>
 								</tr>					
-								<tr class="prop">
-									<td valign="top" class="name"><label><g:message
-										code="shipment.billOfLadingNumber.label" default="BOL #" /></label></td>
-									<td>&nbsp;</td>
-								</tr>
 								
-								<tr class="prop">
-									<td valign="top" class="name"><label><g:message
-										code="shipment.airWaybillNumber.label" default="AWB #" /></label></td>
-									<td>&nbsp;</td>
-								</tr>
-								
-								<tr class="prop">
-									<td valign="top" class="name"><label><g:message
-										code="shipment.containerNumber.label" default="Container #" /></label></td>
-									<td>&nbsp;</td>
-								</tr>
-								
-								<tr class="prop">
-									<td valign="top" class="name"><label><g:message
-										code="shipment.sealNumber.label" default="Seal #" /></label></td>
-									<td>&nbsp;</td>
-								</tr>
-								
-								<tr class="prop">
-									<td valign="top" class="name"><label><g:message
-										code="shipment.flightNumber.label" default="Flight #" /></label></td>
-									<td>&nbsp;</td>
-								</tr>
+								<g:each var="referenceNumberType" in="${shipmentWorkflow?.referenceNumberTypes}">
+									<tr class="prop">
+										<td valign="top" class="name"><label><g:message
+											code="shipment.${referenceNumberType?.name}" default="${referenceNumberType?.name}" /></label></td>
+										<td valign="top">
+										<g:findAll in="${shipmentInstance?.referenceNumbers}" expr="it.referenceNumberType.id == referenceNumberType.id">
+											${it.identifier}
+										</g:findAll>			
+									</tr>
+								</g:each>
 								
 								<tr class="prop">
 									<td valign="top" class="name"><label><g:message

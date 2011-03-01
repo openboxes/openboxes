@@ -1,12 +1,13 @@
 package org.pih.warehouse.shipping
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Represents a means of packaging all or part of a Shipment
  * Examples of this would be Pallet, Box, Piece, Suitcase, etc
  */
-class ReferenceNumberType {
+class ReferenceNumberType implements Serializable {
 	
 	String name
 	String description

@@ -50,15 +50,7 @@
 								<tr class="${count++%2==0?'odd':'even' }">
 									<td style="width:30%;">
 										<span>
-											<g:if test="${containerInstance?.containerType?.name == 'Suitcase'}">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'briefcase.png')}" alt="Suitcase" style="vertical-align: middle"/>&nbsp;
-											</g:if>
-											<g:if test="${containerInstance?.containerType?.name == 'Pallet'}">
-												<img src="${createLinkTo(dir:'images/icons',file:'pallet-truck.png')}" alt="Pallet" style="vertical-align: middle"/>&nbsp;
-											</g:if>
-											<g:if test="${containerInstance?.containerType?.name == 'Crate'}">
-												<img src="${createLinkTo(dir:'images/icons',file:'forklift.png')}" alt="Pallet" style="vertical-align: middle"/>&nbsp;
-											</g:if>
+											<img src="${createLinkTo(dir:'images/icons/shipmentType',file:containerInstance.containerType.name.toLowerCase() + '.jpg')}" style="vertical-align: middle"/>
 											<b><g:link action="createShipment" event="editContainer" params="[containerToEditId:containerInstance?.id]">
 												${containerInstance?.name}
 											</g:link></b>
@@ -158,18 +150,12 @@
 							<tr>
 								<td rowspan="4">
 								<nobr>
-									<g:link action="createShipment" event="addContainer" params="[containerTypeToAddName:'Pallet']">
-										<img src="${createLinkTo(dir:'images/icons',file:'pallet-truck.png')}" alt="add a pallet" style="vertical-align: middle"/>
-										&nbsp;add a pallet
-									</g:link>
-									<g:link action="createShipment" event="addContainer" params="[containerTypeToAddName:'Crate']">
-										<img src="${createLinkTo(dir:'images/icons',file:'forklift.png')}" alt="add a crate" style="vertical-align: middle"/>
-										&nbsp;add a crate
-									</g:link>			
-									<g:link action="createShipment" event="addContainer" params="[containerTypeToAddName:'Suitcase']">
-										<img src="${createLinkTo(dir:'images/icons/silk',file:'briefcase.png')}" alt="add a suitcase" style="vertical-align: middle"/>
-										&nbsp;add a suitcase
-									</g:link>
+									<g:each var="containerType" in="${shipmentWorkflow.containerTypes}">
+										<g:link action="createShipment" event="addContainer" params="[containerTypeToAddName:containerType.name]">
+											<img src="${createLinkTo(dir:'images/icons/shipmentType',file:containerType.name.toLowerCase() + '.jpg')}" style="vertical-align: middle"/>
+											&nbsp;Add a ${containerType.name}
+										</g:link>
+									</g:each>
 								</nobr>
 								</td>
 							</tr>

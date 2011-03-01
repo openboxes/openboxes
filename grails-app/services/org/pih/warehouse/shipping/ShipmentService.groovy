@@ -317,19 +317,10 @@ class ShipmentService {
 	
 	private Container copyContainerHelper(Container container) {
 		
-		println("trying to make a copy of container " + container.id)
-		
 		// first, make a copy of this container
 		Container newContainer = container.copyContainer()
 		
 		// clone all the child containers and attach them to this container		
-		// TODO: make this "not implemented" functionality for now???
-	//	def childContainers
-		//for (Container c in container.containers) {
-			//childContainers.add(copyContainer(c))
-		//}
-		
-		// def childContainers = 
 		for (Container c in container.containers) {	
 			newContainer.addToContainers(copyContainerHelper(c)) 
 		}
@@ -552,4 +543,12 @@ class ShipmentService {
 		}
 	}
 		
+	/**
+	 * Fetches the shipment workflow associated with this shipment
+	 * (Note that, as of now, there can only be one shipment workflow per shipment type)
+	 */
+	ShipmentWorkflow getShipmentWorkflow(Shipment shipment) {
+		if (!shipment?.shipmentType) { return null }
+		return ShipmentWorkflow.findByShipmentType(shipment.shipmentType)
+	}
 }
