@@ -86,9 +86,9 @@
 								</tr>				
 								<tr class="prop">
 									<td valign="top" class="name" style="width: 10%;"><label><g:message
-										code="shipment.comments.label" default="Comments" /></label></td>
+										code="shipment.additionalInformation.label" default="Comments" /></label></td>
 									<td valign="top" style="width: 30%;">
-										&nbsp;	
+										<g:textArea name="additionalInformation" value="${shipmentInstance?.additionalInformation}" cols="30" rows="2"/>
 									</td>
 								</tr>						
 		                    </tbody>

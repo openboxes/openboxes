@@ -137,8 +137,8 @@
 								
 								<tr class="prop">
 									<td valign="top" class="name"><label><g:message
-										code="shipment.comment.label" default="Comments" /></label></td>
-									<td>&nbsp;</td>
+										code="shipment.addtionalInformation.label" default="Comments" /></label></td>
+									<td>${shipmentInstance?.additionalInformation}</td>
 								</tr>
 															
 								<tr class="prop">

@@ -17,13 +17,11 @@ class Shipment implements Serializable {
 	Date expectedShippingDate		// the date the origin expects to ship the goods (required)
 	Date expectedDeliveryDate		// the date the destination should expect to receive the goods (optional)
 	Float totalValue				// the total value of all items in the shipment		
+	String additionalInformation	// any additional information about the shipment (e.g., comments)
 
 	// Audit fields
 	Date dateCreated
 	Date lastUpdated
-	//String createdBy
-	//String lastModifiedBy
-
 	
 	// One-to-one associations
 	Location origin					// the location from which the shipment will depart
@@ -68,6 +66,7 @@ class Shipment implements Serializable {
 	// use a SortedSet for events and have the Event class implement Comparable. 
 
 	static mapping = {
+		additionalInformation type: "text"
 		events cascade: "all-delete-orphan"
 		comments cascade: "all-delete-orphan"
 		containers cascade: "all-delete-orphan"
@@ -96,35 +95,25 @@ class Shipment implements Serializable {
 		name(nullable:false, blank: false)
 		shipmentNumber(nullable:true)	
 		origin(nullable:false, blank: false, 
-			validator: { value, obj -> return !value.equals(obj.destination)})
+			validator: { value, obj -> !value.equals(obj.destination)})
 		destination(nullable:false, blank: false)		
-		expectedShippingDate(nullable:false)
-		//expectedShippingDate(validator:{value, obj-> return value.after(obj.checkIn)})		
-		expectedDeliveryDate(nullable:true)	// optional
-		//expectedDeliveryDate(validator:{value, obj-> return value.after(obj.checkIn)})		
+		expectedShippingDate(nullable:false, 
+			validator: { value, obj-> !obj.expectedDeliveryDate || value.before(obj.expectedDeliveryDate + 1)})		
+		expectedDeliveryDate(nullable:true)	// optional		
 		shipmentType(nullable:true)
 		shipmentMethod(nullable:true)
-
+		additionalInformation(nullable:true)
 		carrier(nullable:true)
 		recipient(nullable:true)
 		donor(nullable:true)
 		totalValue(nullable:true)
+		dateCreated(nullable:true)
+		lastUpdated(nullable:true)
 		
 		// a shipment can't have two reference numbers of the same type (we may want to change this, but UI makes this assumption at this point)
 		referenceNumbers ( validator: { referenceNumbers ->
         	referenceNumbers?.collect( {it.referenceNumberType?.id} )?.unique( { a, b -> a <=> b } )?.size() == referenceNumbers?.size()        
 		} )
-		
-		
-		dateCreated(nullable:true)
-		lastUpdated(nullable:true)
-		//createdBy(nullable:true)
-		//lastModifiedBy(nullable:true)
-
-		//comments(nullable:true)
-		//containers(nullable:true)
-		//events(nullable:true)
-		//documents(nullable:true)
 	}
 
 	String toString() { return "$name"; }

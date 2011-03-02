@@ -2514,6 +2514,15 @@
 			<dropColumn tableName="shipment" columnName="flight_information"/>
 	</changeSet>
 	
+	<changeSet author="mgoodrich" id="2011-03-01-10">
+        <preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="shipment" columnName="additional_information"/></not>
+		</preConditions>
+			<addColumn tableName="shipment">
+			  <column name="additional_information" type="longtext"/>
+			 </addColumn>
+	</changeSet>
+	
 	
 <!--
     <changeSet author="jmiranda (generated)" id="1297432141595-4">
