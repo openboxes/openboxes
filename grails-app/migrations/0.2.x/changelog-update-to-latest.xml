@@ -2550,9 +2550,10 @@
 				<![CDATA[SELECT count(*) FROM location WHERE id = 4]]>
 			</sqlCheck>
 		</preConditions>
-		<delete tableName="location">
+		<update tableName="location">
+			<column name="name" value="ZZZ Supply Company" />
   		    <where>id = 4</where>
-		</delete>
+		</update>
 	</changeSet>
 	
 	
