@@ -38,5 +38,5 @@ class ShipmentWorkflow implements Serializable {
 		
     }
 	
-	String toString() { return "$name"; }
+	String toString() { name }
 }

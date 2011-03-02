@@ -60,6 +60,8 @@ class Container implements Comparable, java.io.Serializable {
 		containerStatus(nullable:true)
 		sortOrder(nullable:true)
 	}	
+	
+	String toString() { name } 
 
 	int compareTo(obj) { 
 		if (!sortOrder && obj?.sortOrder) {

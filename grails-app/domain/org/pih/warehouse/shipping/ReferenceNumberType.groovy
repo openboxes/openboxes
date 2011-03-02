@@ -27,5 +27,5 @@ class ReferenceNumberType implements Serializable {
 		sort "sortOrder"
 	}
 
-		
+	String toString() { name } 	
 }

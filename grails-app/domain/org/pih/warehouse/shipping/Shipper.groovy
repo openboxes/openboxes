@@ -23,10 +23,11 @@ class Shipper implements java.io.Serializable {
 		trackingUrl(nullable:true, blank:true)
 		trackingFormat(nullable:true)
 		parameterName(nullable:true, blank:true)
-		dateCreated(nullable:true)
-		lastUpdated(nullable:true)
+		
+		dateCreated(display:false)
+		lastUpdated(display:false)
    	}
 	
-	String toString() { return "${name}"; }
+	String toString() { name }
 
 }

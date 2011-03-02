@@ -26,6 +26,5 @@ class ContainerType implements java.io.Serializable {
 		sort "sortOrder"
 	}
 
-	
-	
+	String toString() { name } 
 }

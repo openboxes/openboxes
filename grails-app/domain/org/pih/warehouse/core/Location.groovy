@@ -5,7 +5,7 @@ import java.util.Date;
 /**
  * A location can be a customer, warehouse, or supplier.  
  */
-class Location implements java.io.Serializable {
+class Location implements Comparable, java.io.Serializable {
 	String name
 	byte [] logo				// logo
 	Address address
@@ -19,11 +19,19 @@ class Location implements java.io.Serializable {
 	static hasMany = [ locations : Location ]
 	
 	static constraints = {
-		name(nullable:false)
+		name(nullable:false, blank: false)
 		address(nullable:true)
-		locationType(nullable:true)
+		locationType(nullable:false)
+		parentLocation(nullable:true)
 		logo(nullable:true, maxSize:10485760) // 10 MBs
+		
+		dateCreated(display:false)
+		lastUpdated(display:false)
 	}
 	
 	String toString() { return this.name } 
+	
+	int compareTo(obj) { 
+		return name <=> obj?.name
+	}
 }

@@ -26,6 +26,6 @@ class ShipmentType implements java.io.Serializable {
 	}
 
 	
-	String toString() { return "$name"; }	
+	String toString() { name }	
 		
 }

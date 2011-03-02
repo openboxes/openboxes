@@ -14,7 +14,5 @@ class ReferenceNumber implements Serializable{
 		referenceNumberType(nullable:true)
 	}
 	
-	
-	
-	
+	String toString() { identifier } 
 }
