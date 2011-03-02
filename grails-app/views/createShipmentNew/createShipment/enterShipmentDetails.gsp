@@ -28,22 +28,24 @@
                		<div class="dialog">
 		                <table>
 		                    <tbody>
-								<tr class="prop">
-									<td valign="top" class="name"><label><g:message code="shipment.type.label" default="Type" /></label></td>
-									<td valign="top"
-										class="value ${hasErrors(bean: shipmentInstance, field: 'shipmentType', 'errors')}">
-										<g:if test="${shipmentInstance?.shipmentType}">
-											<g:hiddenField name="shipmentType.id" value="${shipmentInstance?.shipmentType?.id}" />
-											${shipmentInstance?.shipmentType?.name }																	
-										</g:if>
-										<g:else>
-											<g:select
-												name="shipmentType.id"
-												from="${org.pih.warehouse.shipping.ShipmentType.list()}"
-												optionKey="id" optionValue="name" value="${shipmentInstance?.shipmentType?.id}" />								
-										</g:else>
-									</td>
-								</tr>
+		                    	<g:if test="${!shipmentWorkflow?.isExcluded('shipmentType')}">
+									<tr class="prop">
+										<td valign="top" class="name"><label><g:message code="shipment.type.label" default="Type" /></label></td>
+										<td valign="top"
+											class="value ${hasErrors(bean: shipmentInstance, field: 'shipmentType', 'errors')}">
+											<g:if test="${shipmentInstance?.shipmentType}">
+												<g:hiddenField name="shipmentType.id" value="${shipmentInstance?.shipmentType?.id}" />
+												${shipmentInstance?.shipmentType?.name }																	
+											</g:if>
+											<g:else>
+												<g:select
+													name="shipmentType.id"
+													from="${org.pih.warehouse.shipping.ShipmentType.list()}"
+													optionKey="id" optionValue="name" value="${shipmentInstance?.shipmentType?.id}" />								
+											</g:else>
+										</td>
+									</tr>
+								</g:if>
 								<tr class='prop'>
 									<td valign='top' class='name'>
 										<label for='name'><g:message code="shipment.name.label" default="Name" /></label>
@@ -67,10 +69,14 @@
 										<g:select name="destination.id" from="${org.pih.warehouse.core.Location.list().sort()}" optionKey="id" value="${shipmentInstance?.destination?.id}" style="width: 180px" />	
 									</td>
 								</tr>
+								
+								<!--  
 								<tr class="prop">
 									<td valign="top" class="name"><label><g:message code="shipment.loadingDate.label" default="Loading Date" /></td>
 									<td>&nbsp;</td>
 								</tr>
+								-->
+								
 								<tr class="prop">
 									<td valign="top" class="name"><label><g:message code="shipment.expectedShippingDate.label" default="Expected to ship on" /></td>
 									<td class="value ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}"> 
@@ -79,14 +85,15 @@
 									
 									</td>
 								</tr>
+								<g:if test="${!shipmentWorkflow?.isExcluded('expectedDeliveryDate')}">
 								<tr class="prop">
 									<td valign="top" class="name"><label><g:message code="shipment.expectedDeliveryDate.label" default="Expected to arrive on" /></td>
 									<td class="value ${hasErrors(bean: shipmentInstance, field: 'expectedDeliveryDate', 'errors')}"> 
 										<g:jqueryDatePicker id="expectedDeliveryDate" name="expectedDeliveryDate"
 											value="${shipmentInstance?.expectedDeliveryDate}" format="MM/dd/yyyy"/>
 									</td>
-									
 								</tr>
+								</g:if>
 		                    </tbody>
 		               </table>
 					</div>

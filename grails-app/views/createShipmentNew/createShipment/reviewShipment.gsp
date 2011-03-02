@@ -40,24 +40,28 @@
 										${shipmentInstance?.name}
 									</td>
 								</tr>	
-								<tr class="prop">
-									<td valign="top" class="name"><label><g:message
-										code="shipment.name.label" default="Shipment Number" /></label>
-									</td>
-									<td colspan="3" valign="top"
-										class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">
-										<span style="line-height: 1.5em">${shipmentInstance?.shipmentNumber}</span>
-									</td>
-								</tr>
-								<tr class="prop">
-									<td valign="middle" class="name"><label><g:message
-										code="shipment.shipmentType.label" default="Type" /></label></td>
-									<td valign="middle" class="value" nowrap="nowrap">
-										<g:hiddenField name="shipmentType.id" value="${shipmentInstance?.shipmentType?.id}"/>
-										${shipmentInstance?.shipmentType?.name}								
-		
-									</td>
-								</tr>											
+								<g:if test="${!shipmentWorkflow?.isExcluded('shipmentNumber')}">
+									<tr class="prop">
+										<td valign="top" class="name"><label><g:message
+											code="shipment.name.label" default="Shipment Number" /></label>
+										</td>
+										<td colspan="3" valign="top"
+											class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">
+											<span style="line-height: 1.5em">${shipmentInstance?.shipmentNumber}</span>
+										</td>
+									</tr>
+								</g:if>
+								<g:if test="${!shipmentWorkflow?.isExcluded('shipmentType')}">
+									<tr class="prop">
+										<td valign="middle" class="name"><label><g:message
+											code="shipment.shipmentType.label" default="Type" /></label></td>
+										<td valign="middle" class="value" nowrap="nowrap">
+											<g:hiddenField name="shipmentType.id" value="${shipmentInstance?.shipmentType?.id}"/>
+											${shipmentInstance?.shipmentType?.name}								
+			
+										</td>
+									</tr>
+								</g:if>											
 								<tr class="prop">
 									<td valign="top" class="name"><label>Origin</label></td>
 									<td valign="top" class="value">
@@ -70,29 +74,36 @@
 										${shipmentInstance?.destination?.name}
 									</td>
 								</tr>
-								<tr class="prop">
-									<td valign="top" class="name" style="width: 10%;"><label><g:message
-										code="shipment.traveler.label" default="Traveler" /></label></td>
-									<td valign="top" style="width: 30%;" class="value">
-										${shipmentInstance?.carrier?.name}
-											
-									</td>
-								</tr>	
-								<tr class="prop">
-									<td valign="top" class="name"><label><g:message
-										code="shipment.freightForwarder.label" default="Freight forwarder" /></label></td>
-									<td>${shipmentInstance?.shipmentMethod?.shipper?.name}</td>
-								</tr>
-								<tr class="prop">
-									<td valign="top" class="name"><label><g:message
-										code="shipment.recipient.label" default="Recipient" /></label></td>
-									<td>${shipmentInstance?.recipient?.name}</td>
-								</tr>
+								<g:if test="${!shipmentWorkflow?.isExcluded('carrier')}">
+									<tr class="prop">
+										<td valign="top" class="name" style="width: 10%;"><label><g:message
+											code="shipment.traveler.label" default="Traveler" /></label></td>
+										<td valign="top" style="width: 30%;" class="value">
+											${shipmentInstance?.carrier?.name}
+												
+										</td>
+									</tr>	
+								</g:if>
+								<g:if test="${!shipmentWorkflow?.isExcluded('shipmentMethod.shipper')}">
+									<tr class="prop">
+										<td valign="top" class="name"><label><g:message
+											code="shipment.freightForwarder.label" default="Freight forwarder" /></label></td>
+										<td>${shipmentInstance?.shipmentMethod?.shipper?.name}</td>
+									</tr>
+								</g:if>
+								<g:if test="${!shipmentWorkflow?.isExcluded('recipient')}">
+									<tr class="prop">
+										<td valign="top" class="name"><label><g:message
+											code="shipment.recipient.label" default="Recipient" /></label></td>
+										<td>${shipmentInstance?.recipient?.name}</td>
+									</tr>
+								</g:if>
+						<!-- 
 								<tr class="prop">
 									<td valign="top" class="name"><label><g:message
 										code="shipment.loadingDate.label" default="Loading date" /></label></td>
 									<td>&nbsp;</td>
-								</tr>			
+								</tr>		-->	
 								<tr class="prop">
 									<td valign="top" class="name"><label><g:message
 										code="shipment.expectedShippingDate.label" default="Expected shipping date" /></label></td>
@@ -102,15 +113,18 @@
 											<g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="MMM dd, yyyy"/>
 									</td>
 								</tr>		
-								<tr class="prop">
-									<td valign="top" class="name"><label><g:message
-										code="shipment.expectedShippingDate.label" default="Expected arrival date" /></label></td>
-									<td valign="top"
-										class="value ${hasErrors(bean: shipmentInstance, field: 'expectedDeliveryDate', 'errors')}"
-										nowrap="nowrap">
-											<g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="MMM dd, yyyy"/>
-									</td>
-								</tr>					
+								
+								<g:if test="${!shipmentWorkflow?.isExcluded('expectedDeliveryDate')}">
+									<tr class="prop">
+										<td valign="top" class="name"><label><g:message
+											code="shipment.expectedDeliveryDate.label" default="Expected arrival date" /></label></td>
+										<td valign="top"
+											class="value ${hasErrors(bean: shipmentInstance, field: 'expectedDeliveryDate', 'errors')}"
+											nowrap="nowrap">
+												<g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="MMM dd, yyyy"/>
+										</td>
+									</tr>				
+								</g:if>	
 								
 								<g:each var="referenceNumberType" in="${shipmentWorkflow?.referenceNumberTypes}">
 									<tr class="prop">
@@ -123,23 +137,27 @@
 									</tr>
 								</g:each>
 								
-								<tr class="prop">
-									<td valign="top" class="name"><label><g:message
-										code="shipment.totalValue.label" default="Total Value (USD)" /></label></td>
-									<td valign="top"
-										class="value ${hasErrors(bean: shipmentInstance, field: 'totalValue', 'errors')}"
-										nowrap="nowrap">
-										<g:if test="${shipmentInstance?.totalValue}">
-											USD $<g:formatNumber number="${shipmentInstance?.totalValue}" format="###,##0.00"/>
-										</g:if>
-									</td>
-								</tr>		
+								<g:if test="${!shipmentWorkflow?.isExcluded('totalValue')}">
+									<tr class="prop">
+										<td valign="top" class="name"><label><g:message
+											code="shipment.totalValue.label" default="Total Value (USD)" /></label></td>
+										<td valign="top"
+											class="value ${hasErrors(bean: shipmentInstance, field: 'totalValue', 'errors')}"
+											nowrap="nowrap">
+											<g:if test="${shipmentInstance?.totalValue}">
+												USD $<g:formatNumber number="${shipmentInstance?.totalValue}" format="###,##0.00"/>
+											</g:if>
+										</td>
+									</tr>	
+								</g:if>	
 								
-								<tr class="prop">
-									<td valign="top" class="name"><label><g:message
-										code="shipment.addtionalInformation.label" default="Comments" /></label></td>
-									<td>${shipmentInstance?.additionalInformation}</td>
-								</tr>
+								<g:if test="${!shipmentWorkflow?.isExcluded('additionalInformation')}">
+									<tr class="prop">
+										<td valign="top" class="name"><label><g:message
+											code="shipment.addtionalInformation.label" default="Comments" /></label></td>
+										<td>${shipmentInstance?.additionalInformation}</td>
+									</tr>
+								</g:if>
 															
 								<tr class="prop">
 									<td class="name"><label>Suitcase Letter</label></td>

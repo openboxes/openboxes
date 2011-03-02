@@ -7,6 +7,7 @@ class ShipmentWorkflow implements Serializable {
 
 	String name					// user-defined name of the workflow
 	ShipmentType shipmentType  	// the shipment type this workflow is associated with
+	String excludedFields   	// comma-delimited (with no spaces) list of Shipment fields to exclude in this workflow
 	
 	// Audit fields
 	Date dateCreated
@@ -23,8 +24,9 @@ class ShipmentWorkflow implements Serializable {
     static constraints = {
 		name(nullable:false, blank: false)
 		shipmentType(nullable:false, unique:true)  // for now, we are only allowing one workflow per shipment type, though we may want to change this
-		dateCreated(nullable:true)
-		lastUpdated(nullable:true)
+		excludedFields(nullable:true)
+		dateCreated(blank:true)
+		lastUpdated(blank:true)
 		
 		// a shipment workflow can't have two identical reference number types
 		referenceNumberTypes ( validator: { referenceNumberTypes ->
@@ -39,4 +41,11 @@ class ShipmentWorkflow implements Serializable {
     }
 	
 	String toString() { name }
+	
+	Boolean isExcluded(String field) {
+		// ?i: -> sets case insensitive
+		// (^|,) -> matches start-of-line or comma
+		// (,|$) -> matches comma or end-of-line	
+		return excludedFields =~ (/(?i:(^|,)$field(,|$))/)
+	}
 }

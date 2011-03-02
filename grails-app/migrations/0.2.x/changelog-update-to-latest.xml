@@ -2556,7 +2556,28 @@
 		</update>
 	</changeSet>
 	
-	
+	<changeSet author="mgoodrich" id="2011-03-02-4">
+        <preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="shipment_workflow" columnName="excluded_fields"/></not>
+		</preConditions>
+		<addColumn tableName="shipment_workflow">
+			<column name="excluded_fields" type="varchar(255)">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<update tableName="shipment_workflow">
+			<column name="excluded_fields" value="carrier,recipient" />
+ 		    <where>id = 1</where>
+		</update>
+		<update tableName="shipment_workflow">
+			<column name="excluded_fields" value="carrier,recipient" />
+ 		    <where>id = 2</where>
+		</update>	
+		<update tableName="shipment_workflow">
+			<column name="excluded_fields" value="shipmentMethod.shipper" />
+ 		    <where>id = 3</where>
+		</update>	
+	</changeSet>
 	
 <!--
     <changeSet author="jmiranda (generated)" id="1297432141595-4">
