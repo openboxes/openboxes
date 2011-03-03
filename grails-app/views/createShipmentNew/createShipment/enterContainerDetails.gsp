@@ -39,8 +39,9 @@
 						<thead>	
 							<tr>
 								<th>Item</th>
+								<th>Lot/Serial #</th>
 								<th>Qty</th>
-								<th></th>
+								<th>Recipient</th>
 								<th>Actions</th>
 							</tr>
 						</thead>
@@ -56,7 +57,8 @@
 											</g:link></b>
 										</span>
 									</td>
-									<td style="text-align:center;width:5%;">-</td>
+									<td></td>
+									<td></td>
 									<td></td>
 									<td style="width:25%; text-align: left;">
 										<span nowrap>
@@ -83,10 +85,15 @@
 												</g:link>
 											</span>
 										</td>
-										<td style="text-align:center;">
+										<td style="text-align:left;">
+											${itemInstance?.lotNumber}
+										</td>
+										<td style="text-align:left;">
 											${itemInstance?.quantity}
 										</td>
-										<td></td>
+										<td style="text-align:left;">
+											${itemInstance?.recipient?.name}
+										</td>
 										<td style="text-align: left;">		
 											<g:link action="createShipment" event="deleteItem" params="['item.id':itemInstance?.id]">	<img src="${createLinkTo(dir:'images/icons/silk',file:'page_delete.png')}" alt="remove item" style="vertical-align: middle"/>
 												&nbsp;remove item
@@ -105,7 +112,8 @@
 											</g:link>
 											</span>
 										</td>
-										<td style="text-align:center;">-</td>
+										<td></td>
+										<td></td>
 										<td></td>
 										<td style="text-align: left;">
 											<g:link action="createShipment" event="addItemToContainer" params="['container.id':boxInstance.id]">
@@ -131,10 +139,15 @@
 													</g:link>																	
 												</span>
 											</td>
-											<td style="text-align:center;">
+											<td style="text-align:left;">
+												${itemInstance?.lotNumber}
+											</td>
+											<td style="text-align:left;">
 												${itemInstance?.quantity}
 											</td>
-											<td></td>
+											<td style="text-align:left;">
+												${itemInstance?.recipient?.name}
+											</td>
 											<td style="text-align: left;">		
 												<g:link action="createShipment" event="deleteItem" params="['item.id':itemInstance?.id]">
 													<img src="${createLinkTo(dir:'images/icons/silk',file:'page_delete.png')}" alt="remove item" style="vertical-align: middle"/>

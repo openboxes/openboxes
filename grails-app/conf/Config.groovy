@@ -153,7 +153,7 @@ jqueryValidationUi {
 	errorClass = 'error'
 	validClass = 'valid'
 	onsubmit = true
-	renderErrorsOnTop = false
+	renderErrorsOnTop = true
 	
 	qTip {
 		packed = true
