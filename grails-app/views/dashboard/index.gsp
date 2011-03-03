@@ -56,7 +56,7 @@
 										<g:each var="entry" in="${outgoingShipmentsByStatus}" status="i">											
 											<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 												<td>${entry.key.name}</td>
-												<td style="text-align: center;"><g:link controller="shipment" action="listShipping" params="['eventStatus':entry.key, 'activityType':'SHIPPING']">${entry.value.objectList.size}</g:link></td>
+												<td style="text-align: center;"><g:link controller="shipment" action="listShipping" params="['eventStatus':entry.key]">${entry.value.objectList.size}</g:link></td>
 											</tr>	
 											
 								    	</g:each>
@@ -64,7 +64,7 @@
 							    	<tfoot>
 								    	<tr>
 								    		<td style="text-align: left;"><g:message code="shipping.total.label"/></td>
-								    		<td style="text-align: center;"><g:link controller="shipment" action="listShipping" params="['activityType':'SHIPPING']">${allOutgoingShipments.size()}</g:link></td>
+								    		<td style="text-align: center;"><g:link controller="shipment" action="listShipping" params="">${allOutgoingShipments.size()}</g:link></td>
 								    	</tr>
 							    	</tfoot>
 						    	</table>
@@ -91,14 +91,14 @@
 										<g:each var="entry" in="${incomingShipmentsByStatus}" status="i">	 
 											<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 												<td>${entry.key.name}</td>
-												<td style="text-align: center;"><g:link controller="shipment" action="listReceiving" params="['eventStatus':entry.key, 'activityType':'RECEIVING']">${entry.value.objectList.size}</g:link></td>
+												<td style="text-align: center;"><g:link controller="shipment" action="listReceiving" params="['eventStatus':entry.key]">${entry.value.objectList.size}</g:link></td>
 											</tr>	
 								    	</g:each>
 							    	</tbody>
 							    	<tfoot>
 								    	<tr>
 								    		<td style="text-align: left;"><g:message code="shipping.total.label"/></td>							    		
-								    		<td style="text-align: center;"><g:link controller="shipment" action="listReceiving" params="['activityType':'RECEIVING']">${allIncomingShipments.size()}</g:link></td>
+								    		<td style="text-align: center;"><g:link controller="shipment" action="listReceiving" params="">${allIncomingShipments.size()}</g:link></td>
 								    	</tr>
 							    	</tfoot>
 						    	</table>

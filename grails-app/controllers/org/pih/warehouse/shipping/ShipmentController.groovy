@@ -8,7 +8,6 @@ import grails.converters.JSON
 import groovy.sql.Sql;
 import au.com.bytecode.opencsv.CSVWriter;
 
-import org.pih.warehouse.core.ActivityType;
 import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Document;
 import org.pih.warehouse.core.Event;
@@ -175,13 +174,7 @@ class ShipmentController {
 		}
 		else {
 			def eventTypes =  org.pih.warehouse.core.EventType.list();
-			def shippingEventTypes = eventTypes.findAll() { eventType -> 
-				eventType?.activityType == ActivityType.SHIPPING
-			}
-			def receivingEventTypes = eventTypes.findAll() { eventType ->
-				eventType?.activityType == ActivityType.RECEIVING
-			}
-			[shipmentInstance: shipmentInstance, shippingEventTypes : shippingEventTypes]
+			[shipmentInstance: shipmentInstance, shippingEventTypes : eventTypes]
 		}
 	}
 	
@@ -388,44 +381,34 @@ class ShipmentController {
 	}
 	
 	def listReceiving = { 
-		def incomingShipments = null;		
-		def currentLocation = Location.get(session.warehouse.id);		
-		if (params.searchQuery) { 
-			incomingShipments = shipmentService.getShipments(params.searchQuery, currentLocation);
-		} 
-		else {  
-			incomingShipments = shipmentService.getShipmentsByDestination(currentLocation);
-		}
-		def eventType = null;
-		// If there's no event type filter, return all outgoing shipments
-		// otherwise, we try to filter down the shipments
-		if (params?.eventType?.id) {
-			eventType = (params.eventType?.id) ? EventType.get(params.eventType.id) : null;
-			log.info "eventType: " + eventType?.name
-			
-			// Match the shipment's most recent event type against the selected event type
-			if (eventType) {
-				incomingShipments = incomingShipments.findAll() { s -> 
-					s?.mostRecentEvent?.eventType == eventType
-				}
-			}
-			// Yes, there could actually be shipments with no most recent event
-			else
-			incomingShipments = incomingShipments.findAll() { s -> s?.mostRecentEvent?.eventType == null
-			}
-		}
+		def currentLocation = Location.get(session.warehouse.id);
+		def shipments = params.sort ? shipmentService.getAllShipments(params.sort, params.order) : 
+							   			shipmentService.getAllShipments('expectedShippingDate','asc')  // probably could default on something better than this
+		
+		// filter by destination location
+		shipments = shipments.findAll( {it.destination == currentLocation} )
+							   		
+		// filter by event status
+		if (params.eventStatus) {
+			shipments = shipments.findAll( { it.mostRecentEvent?.eventType?.eventStatus == EventStatus.valueOf(params.eventStatus) } )		
+		}	
 		
 		[
-			eventType : eventType,
-			shipmentInstanceMap : shipmentService.getShipmentsByStatus(incomingShipments),
-			shipmentInstanceList : incomingShipments,
-			shipmentInstanceTotal : incomingShipments.size(),
-		];
+			shipmentInstanceMap : shipmentService.getShipmentsByStatus(shipments),
+			shipmentInstanceList : shipments,
+			shipmentInstanceTotal : shipments.size(),
+		]
 	}
 	
 	def listShippingByDate = { 
 		def currentLocation = Location.get(session.warehouse.id);
-		def outgoingShipments = shipmentService.getShipmentsByOrigin(currentLocation);
+		
+		def outgoingShipments = params.sort ? shipmentService.getAllShipments(params.sort, params.order) : 
+   			shipmentService.getAllShipments('expectedShippingDate','asc')  // probably could default on something better than this
+
+   		// filter by origin location
+   		outgoingShipments = outgoingShipments.findAll( {it.origin == currentLocation} )
+
 		def formatter = new PrettyTime();		
 		def groupBy = (params.groupBy) ? params.groupBy : "lastUpdated";
 		
@@ -442,61 +425,28 @@ class ShipmentController {
 		render (view: "listShippingByDate", model: [ shipmentInstanceMap : shipmentInstanceMap ]);
 	}
 
-	
-		
-	def listShipping = { 
-		def currentLocation = Location.get(session.warehouse.id);	
-		
-		def shipments = shipmentService.getAllShipments()
-		//def shipments = shipmentService.getShipmentsByOrigin(currentLocation);	
-		
-		// If there's no event type filter, return all outgoing shipments
-		// otherwise, we try to filter down the shipments
-		def eventType = null;
-		if (params?.eventType?.id) { 
-			eventType = (params.eventType?.id) ? EventType.get(params.eventType.id) : null;		
+	def listShipping = {	
 			
-			// Match the shipment's most recent event type against the selected event type
-			if (eventType) {  
-				shipments = shipments.findAll() { shipment -> 
-					
-					log.info(shipment?.mostRecentEvent?.eventType == eventType);
-					shipment?.mostRecentEvent?.eventType == eventType
-				}
-			}
-			// Yes, there could actually be shipments with no most recent event	
-			else {
-				shipments = shipments.findAll() { shipment -> 
-					shipment?.mostRecentEvent?.eventType == null
-				}
-			}
-		} 
-		else if (params?.eventStatus && params?.activityType) { 	
-			// Fixed bug 
-			if (EventStatus.valueOf(params.eventStatus) == EventStatus.UNKNOWN) {
-				shipments = shipments.findAll() { shipment ->
-					// Should include 
-					// shipment?.mostRecentEvent?.eventType?.activityType == ActivityType.valueOf(params.activityType
-					(shipment?.mostRecentEvent?.eventType?.eventStatus == null)
-				}
-				
-			}
-			else { 
-				shipments = shipments.findAll() { shipment ->
-					
-					// shipment?.mostRecentEvent?.eventType?.activityType == ActivityType.valueOf(params.activityType) &&
-					(shipment?.mostRecentEvent?.eventType?.eventStatus == EventStatus.valueOf(params.eventStatus))
-				}
-			}
-		}
+		def currentLocation = Location.get(session.warehouse.id);
+		def shipments = params.sort ? shipmentService.getAllShipments(params.sort, params.order) : 
+							   			shipmentService.getAllShipments('expectedShippingDate','asc')
+		
+		// filter by origin location
+		shipments = shipments.findAll( {it.origin == currentLocation} )
+							   		
+		// filter by event status
+		if (params.eventStatus) {
+			shipments = shipments.findAll( { it.mostRecentEvent?.eventType?.eventStatus == EventStatus.valueOf(params.eventStatus) } )		
+		}	
+		
 		[
-			eventType : eventType,			
 			shipmentInstanceMap : shipmentService.getShipmentsByStatus(shipments),
 			shipmentInstanceList : shipments,
 			shipmentInstanceTotal : shipments.size(),
-		];
+		]
+		
 	}
-	
+		
 	
 	def list = { 
 		def browseBy = params.id;

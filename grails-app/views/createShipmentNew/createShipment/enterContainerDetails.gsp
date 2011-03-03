@@ -39,8 +39,8 @@
 						<thead>	
 							<tr>
 								<th>Item</th>
-								<th>Lot/Serial #</th>
 								<th>Qty</th>
+								<th>Lot/Serial #</th>
 								<th>Recipient</th>
 								<th>Actions</th>
 							</tr>
@@ -86,10 +86,10 @@
 											</span>
 										</td>
 										<td style="text-align:left;">
-											${itemInstance?.lotNumber}
+											${itemInstance?.quantity}
 										</td>
 										<td style="text-align:left;">
-											${itemInstance?.quantity}
+											${itemInstance?.lotNumber}
 										</td>
 										<td style="text-align:left;">
 											${itemInstance?.recipient?.name}
@@ -140,10 +140,10 @@
 												</span>
 											</td>
 											<td style="text-align:left;">
-												${itemInstance?.lotNumber}
+												${itemInstance?.quantity}
 											</td>
 											<td style="text-align:left;">
-												${itemInstance?.quantity}
+												${itemInstance?.lotNumber}
 											</td>
 											<td style="text-align:left;">
 												${itemInstance?.recipient?.name}

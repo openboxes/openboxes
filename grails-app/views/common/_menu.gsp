@@ -108,12 +108,12 @@
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="shipment" action="listReceiving"><g:message code="shipment.listReceiving.label"  default="Show Receipts"/></g:link>
+					<g:link class="bullet" controller="shipment" action="listReceiving"><g:message code="shipment.listReceiving.label"  default="List All"/></g:link>
 				</span>		
 			</li>										
 			<li>
 				<span class="menuButton">
-					<g:link class="browse" class="bullet" controller="receipt" action="process"><g:message code="receiving.process.label" default="Process Receipts"/></g:link>
+				<!--  <g:link class="browse" class="bullet" controller="receipt" action="process"><g:message code="receiving.process.label" default="Process Receipts"/></g:link>  -->
 				</span>
 			</li>		
 		</ul>										

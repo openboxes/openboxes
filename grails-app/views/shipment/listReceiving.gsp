@@ -11,7 +11,7 @@
 			valign="top" style="vertical-align: middle;" /> 
 			<g:message code="default.list.label" args="[entityName]" /></content>
     </head>    
-    <body>
+       <body>
         <div class="body">
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
@@ -30,16 +30,16 @@
             	</g:if>
             
 				<g:each var="entry" in="${shipmentInstanceMap}">	                    
-					<h2><b>${entry.key}</b> (${entry.value.objectList.size})</h2>	      
+					<h2><b>${entry.key.name}</b> Shipments (${entry.value.objectList.size})</h2>
+						      
 					<table>
 	                    <thead>
 	                        <tr>   
 								<g:sortableColumn property="shipmentType" title="${message(code: 'shipment.shipmentType.label', default: 'Type')}" />
 	                            <g:sortableColumn property="shipmentNumber" title="${message(code: 'shipment.shipmentNumber.label', default: 'Shipment')}" />								
-	                            <g:sortableColumn property="status" title="${message(code: 'shipment.status.label', default: 'Status')}" />                            
-	                            <g:sortableColumn property="eventDate" title="${message(code: 'shipment.eventDate.label', default: 'Event Date')}" />                            
-	                            <g:sortableColumn property="origin" title="${message(code: 'shipment.origin.label', default: 'Origin')}" />
-	                            <g:sortableColumn property="documents" title="${message(code: 'shipment.documents.label', default: 'Documents')}" />                              
+	                            <g:sortableColumn property="origin" title="${message(code: 'shipment.destination.label', default: 'Origin')}" />
+	                        	<g:sortableColumn property="status" title="${message(code: 'shipment.status.label', default: 'Status')}" />                            
+	                            <g:sortableColumn property="documents" title="${message(code: 'shipment.documents.label', default: 'Documents')}" />                       
 	                        </tr>
 	                    </thead>
 	                   
@@ -51,27 +51,16 @@
 											<img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + shipmentInstance?.shipmentType?.name + '.png')}"
 											alt="${shipmentInstance?.shipmentType?.name}" style="vertical-align: middle; width: 24px; height: 24px;" />		
 										</td>										
-										<td width="20%">
+										<td width="10%">
 											<g:link action="showDetails" id="${shipmentInstance.id}">
 												${fieldValue(bean: shipmentInstance, field: "name")}
 											</g:link>																														
 										</td>
-										<td width="10%">
-											<g:if test="${!shipmentInstance.events}"></g:if>
-											<g:else>
-												<div>
-													${shipmentInstance?.mostRecentEvent?.eventType?.name}
-												</div>									
-											</g:else>											
-										</td>
-										<td width="10%">
-											<g:if test="${!shipmentInstance.events}"></g:if>
-											<g:else>										
-												<g:formatDate format="MMM dd yyyy" date="${shipmentInstance.mostRecentEvent.eventDate}"/>
-											</g:else>											
-										</td>
 										<td width="10%" align="center">
 											${fieldValue(bean: shipmentInstance, field: "origin.name")}
+										</td>
+										<td width="10%">												
+											${shipmentInstance?.mostRecentEvent?.eventType?.name} - <g:formatDate format="MM/dd/yyyy" date="${shipmentInstance?.mostRecentEvent?.eventDate}"/>									
 										</td>
 										<td width="15%">
 											<g:if test="${!shipmentInstance.documents}"><span class="fade">(empty)</span></g:if>

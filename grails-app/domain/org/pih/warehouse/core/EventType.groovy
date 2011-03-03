@@ -19,17 +19,14 @@ class EventType implements Comparable, Serializable {
 	Date dateCreated;
 	Date lastUpdated;
 
-	EventTypes eventType;
-	ActivityType activityType;
-	EventStatus eventStatus;		// default status: initial, completed, pending
+	EventStatus eventStatus;		// SHIPPED or RECEIVED
 			
 	static transients = [ "status", "optionValue" ]
 	static constraints = { 
 		name(nullable:false)
 		description(nullable:true)
 		sortOrder(nullable:true)
-		eventStatus(nullable:true)		
-		activityType(nullable:true)
+		eventStatus(nullable:false)		
 		
 		dateCreated(display:false)
 		lastUpdated(display:false)
@@ -47,7 +44,7 @@ class EventType implements Comparable, Serializable {
 	}
 	
 	String getOptionValue() { 
-		return (activityType ? activityType.name + " - " : "") + (description) ? description : name; 
+		return (description) ? description : name; 
 	}
 	
 	

@@ -44,7 +44,7 @@
 				</td>
 			</tr>					
 
-			<g:if test="${session?.warehouse?.id == shipmentInstance?.origin?.id}">
+			<g:if test="${session?.warehouse?.id == shipmentInstance?.origin?.id && !shipmentInstance?.hasShipped()}">
 				<tr class="prop">
 					<td>
 						<g:link controller="shipment" action="sendShipment" id="${shipmentInstance.id}">
@@ -57,7 +57,7 @@
 				</tr>
 			</g:if>
 
-			<g:if test="${session?.warehouse?.id == shipmentInstance?.destination?.id}">
+			<g:if test="${session?.warehouse?.id == shipmentInstance?.destination?.id && shipmentInstance.hasShipped() && !shipmentInstance.wasReceived()}">
 				<tr class="prop">
 					<td>
 						<g:link controller="shipment" action="receiveShipment" id="${shipmentInstance.id}"><img

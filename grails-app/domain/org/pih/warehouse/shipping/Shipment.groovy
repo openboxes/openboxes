@@ -3,6 +3,7 @@ package org.pih.warehouse.shipping
 import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Document;
 import org.pih.warehouse.core.Event;
+import org.pih.warehouse.core.EventStatus;
 import org.pih.warehouse.core.EventType;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
@@ -31,7 +32,6 @@ class Shipment implements Serializable {
 	Person carrier 					// the person or organization that actually carries the goods from A to B
 	Person recipient				// the person or organization that is receiving the goods	
 	Donor donor						// the information about the donor (OPTIONAL)
-	//Event mostRecentEvent			// a reference to the most recent event (needed for querying)
 	
 	// One-to-many associations
 	SortedSet events;
@@ -161,21 +161,17 @@ class Shipment implements Serializable {
 		
 	}
 	
-	/**
-	 * FIXME The eventType.name value might change, so we need to make this 
-	 * more robust.
-	 */
 	Boolean hasShipped() {
-		return events.any { it.eventType?.name == "Shipped" }
+		return events.any { it.eventType?.eventStatus == EventStatus.SHIPPED }
 	}
 	
-	Boolean hasArrived() { 
-		return events.any { it.eventType?.name == "Arrived" }
+	Boolean wasReceived() { 
+		return events.any { it.eventType?.eventStatus == EventStatus.RECEIVED }
 	}
 	
 	Date getActualShippingDate() { 
 		for (event in events) { 
-			if (event?.eventType?.name == "Shipped") { 
+			if (event?.eventType?.eventStatus == EventStatus.SHIPPED) { 
 				return event?.eventDate;
 			}
 		}
@@ -184,7 +180,7 @@ class Shipment implements Serializable {
 
 	Date getActualDeliveryDate() { 
 		for (event in events) {
-			if (event?.eventType?.name == "Received") {
+			if (event?.eventType?.eventStatus == EventStatus.RECEIVED) {
 				return event?.eventDate;
 			}
 		}
@@ -199,13 +195,8 @@ class Shipment implements Serializable {
 		return null;
 	}
 	
-	EventType getMostRecentStatus() { 
-		if(mostRecentEvent) { 
-			if (mostRecentEvent.getEventType()) { 
-				return mostRecentEvent.getEventType();
-			}			
-		}
-		return new EventType(sortOrder: 0, name: "Invalid", description: "Shipment has no current status and should be fixed");
+	EventType getMostRecentStatus() { 		
+		return getMostRecentEvent()?.getEventType()
 	}
 		
 	/**
@@ -232,9 +223,6 @@ class Shipment implements Serializable {
 		def newContainer = new Container(
 			
 		)
-		
-		log.error("name = " + newContainer.name + " id = " + newContainer.id)
 	}
-	
 }
 

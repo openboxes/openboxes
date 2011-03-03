@@ -63,6 +63,10 @@ class ShipmentService {
 		}
 	}
 	
+	List<Shipment> getAllShipments(String sort, String order) {
+		return Shipment.list(['sort':sort, 'order':order])
+	}
+	
 	List<Shipment> getAllShipments() {
 		return Shipment.list()
 	}
@@ -109,21 +113,19 @@ class ShipmentService {
 	}
 	
 	
-	Map<EventType, ListCommand> getShipmentsByStatus(List shipments) {
-		//return shipments.groupBy { it.mostRecentStatus } 
-		def shipmentMap = new TreeMap<EventType, ListCommand>();
+	Map<EventType, ListCommand> getShipmentsByStatus(List shipments) { 
+		def shipmentMap = new TreeMap<EventStatus, ListCommand>();
 		shipments.each {
 			
 			def eventType = it.getMostRecentStatus();			
-			def key = (eventType?.eventStatus) ? eventType?.eventStatus : EventStatus.UNKNOWN;
+			def key = eventType?.eventStatus ? eventType?.eventStatus : EventStatus.CREATED; 
 			def shipmentList = shipmentMap[key];
 			if (!shipmentList) {
 				shipmentList = new ListCommand(category: key, objectList: new ArrayList());
 			}
 			shipmentList.objectList.add(it);
 			shipmentMap.put(key, shipmentList)
-		}
-		//log.info("shipmentMap: " + shipmentMap)		
+		}	
 		return shipmentMap;
 	}
 	
@@ -226,7 +228,7 @@ class ShipmentService {
 			if (!(shipment.events?.size() > 0)) {
 				def event = new Event(
 					eventDate: new Date(),
-					eventType: EventType.findByName("Requested"),		// FIXME Event type needs to be refactored a bit
+					eventType: EventType.findByEventStatus(EventStatus.CREATED),
 					//eventLocation: Location.get(session.warehouse.id)
 				)
 				event.save(flush:true);
@@ -352,7 +354,7 @@ class ShipmentService {
 	List<Shipment> getReceivingByDestinationAndStatus(Location location, EventStatus eventStatus) { 		
 		def shipmentList = getRecentIncomingShipments(location?.id)
 		if (shipmentList) { 
-			//shipmentList = shipmentList.findAll { it.mostRecentStatus = eventStatus } 
+			shipmentList = shipmentList.findAll { it.mostRecentStatus = eventStatus } 
 		}
 		return shipmentList;		
 	}
@@ -361,7 +363,8 @@ class ShipmentService {
 	void sendShipment(Shipment shipmentInstance, String comment, User userInstance, Location locationInstance) { 
 		log.info "sending shipment";
 		try { 
-			if (!shipmentInstance.hasErrors()) {				
+			// don't allow the shipment to go out if it has errors, or if this shipment has already been shipped
+			if (!shipmentInstance.hasErrors() && !shipmentInstance.hasShipped()) {				
 				// Add comment to shipment (as long as there's an actual comment 
 				// after trimming off the extra spaces)
 				if (comment) {
@@ -369,7 +372,7 @@ class ShipmentService {
 				}
 					
 				// Add a Shipped event to the shipment
-				EventType eventType = EventType.findByName("Shipped")
+				EventType eventType = EventType.findByEventStatus(EventStatus.SHIPPED)
 				if (eventType) {					
 					createShipmentEvent(shipmentInstance, new Date(), eventType, locationInstance);
 				}
@@ -461,7 +464,7 @@ class ShipmentService {
 		
 		try {
 			
-			if (!receiptInstance.hasErrors() && receiptInstance.save(flush: true)) {
+			if (!receiptInstance.hasErrors() && receiptInstance.hasShipped() && !receiptInstance.wasReceived() && receiptInstance.save(flush: true)) {
 				
 				// Add comment to shipment (as long as there's an actual comment
 				// after trimming off the extra spaces)
@@ -471,7 +474,7 @@ class ShipmentService {
 				}
 
 				// Add a Shipped event to the shipment
-				EventType eventType = EventType.findByName("Received")
+				EventType eventType = EventType.findByEventStatus(EventStatus.RECEIVED)
 				if (eventType) {
 					def event = new Event();
 					event.eventDate = new Date()
@@ -481,7 +484,7 @@ class ShipmentService {
 					shipmentInstance.addToEvents(event);
 				}
 				else {
-					throw new Exception("Expected event type 'Shipped'")
+					throw new Exception("Expected event type 'Received'")
 				}
 												
 				// Save updated shipment instance

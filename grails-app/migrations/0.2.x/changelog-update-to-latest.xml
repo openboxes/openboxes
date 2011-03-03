@@ -2579,6 +2579,57 @@
 		</update>	
 	</changeSet>
 	
+	<changeSet author="mgoodrich" id="2011-03-03-1">
+       <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="7">
+				<![CDATA[SELECT count(*) FROM event_type]]>
+			</sqlCheck>
+		</preConditions>
+		<delete tableName="shipment_event"/>
+		<delete tableName="event"/>
+		<delete tableName="event_type"/>
+		<dropColumn tableName="event_type" columnName="activity_type"/>
+		<dropColumn tableName="event_type" columnName="event_type"/>
+	</changeSet>	
+	
+	<changeSet author="mgoodrich" id="2011-03-03-2">
+       <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT count(*) FROM event_type]]>
+			</sqlCheck>
+		</preConditions>
+		<insert tableName="event_type">
+        	<column name="id" valueNumeric="1"/>
+        	<column name="version" valueNumeric="0"/>
+        	<column name="name" value="Pending"/> 
+        	<column name="description" value="Shipment is pending"/> 
+        	<column name="event_status" value="CREATED"/> 
+        	<column name="sort_order" valueNumeric="1"/> 
+        	<column name="date_created" valueDate="2011-03-03"/> 
+        	<column name="last_updated" valueDate="2011-03-03"/> 
+       	</insert> 
+		<insert tableName="event_type">
+        	<column name="id" valueNumeric="2"/>
+        	<column name="version" valueNumeric="0"/>
+        	<column name="name" value="Shipped"/> 
+        	<column name="description" value="Shipment has been shipped"/> 
+        	<column name="event_status" value="SHIPPED"/> 
+        	<column name="sort_order" valueNumeric="2"/> 
+        	<column name="date_created" valueDate="2011-03-03"/> 
+        	<column name="last_updated" valueDate="2011-03-03"/> 
+       	</insert> 
+       	<insert tableName="event_type">
+        	<column name="id" valueNumeric="3"/>
+        	<column name="version" valueNumeric="0"/>
+        	<column name="name" value="Received"/> 
+        	<column name="description" value="Shipment has been received"/> 
+        	<column name="event_status" value="RECEIVED"/> 
+        	<column name="sort_order" valueNumeric="3"/> 
+        	<column name="date_created" valueDate="2011-03-03"/> 
+        	<column name="last_updated" valueDate="2011-03-03"/> 
+       	</insert>
+	</changeSet>
+	
 <!--
     <changeSet author="jmiranda (generated)" id="1297432141595-4">
         <preConditions onFail="MARK_RAN">
