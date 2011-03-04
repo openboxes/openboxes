@@ -2663,6 +2663,18 @@
       	<delete tableName="receipt" />
 	</changeSet>
 	
+	<changeSet author="mgoodrich" id="2011-03-04-5">
+        <preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="shipment" columnName="receipt_id"/></not>
+		</preConditions>
+		<addColumn tableName="shipment">
+			<column name="receipt_id" type="bigint(20)">
+				<constraints nullable="true" foreignKeyName="FKE139719AFF77FF9B" references="receipt (id)"/>
+			</column>
+		</addColumn>
+	</changeSet>
+	
+	
 	<!--  clear out all the sample crap -->
 <!-- 
 	<changeSet author="mgoodrich" id="2011-03-03-3">
