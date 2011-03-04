@@ -24,7 +24,7 @@
 								<img src="${createLinkTo(dir:'images/icons/eventStatus',file: 'invalid.png')}"
 									alt="Invalid" style="vertical-align: middle"/>							
 							</g:else>
-							${shipmentInstance?.mostRecentEvent?.eventType?.name}
+							${shipmentInstance?.mostRecentEvent?.eventType?.eventCode?.status}
 						</div>
 					</td>
 				</tr>

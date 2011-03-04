@@ -7,6 +7,7 @@ import org.pih.warehouse.core.EventCode;
 import org.pih.warehouse.core.EventType;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
+import org.pih.warehouse.receiving.Receipt;
 import org.pih.warehouse.shipping.ReferenceNumber;
 import org.pih.warehouse.donation.Donor;
 import java.io.Serializable;
@@ -29,6 +30,7 @@ class Shipment implements Serializable {
 	Location destination			// the location to which the shipment will arrive
 	ShipmentType shipmentType		// the shipment type: Air, Sea Freight, Suitcase
 	ShipmentMethod shipmentMethod	// the shipping carrier and shipping service used	
+	Receipt receipt					// the receipt for this shipment
 	Person carrier 					// the person or organization that actually carries the goods from A to B
 	Person recipient				// the person or organization that is receiving the goods	
 	Donor donor						// the information about the donor (OPTIONAL)
@@ -72,7 +74,9 @@ class Shipment implements Serializable {
 		containers cascade: "all-delete-orphan"
 		documents cascade: "all-delete-orphan"
 		shipmentItems cascade: "all-delete-orphan"
+		shipmentMethod cascade: "all-delete-orphan"
 		referenceNumbers cascade: "all-delete-orphan"
+		receipt casade: "all-delete-orphan"
 		containers sort: 'sortOrder', order: 'asc'
 		//events joinTable:[name:'shipment_event', key:'shipment_id', column:'event_id']
 	}	
@@ -102,6 +106,7 @@ class Shipment implements Serializable {
 		expectedDeliveryDate(nullable:true)	// optional		
 		shipmentType(nullable:true)
 		shipmentMethod(nullable:true)
+		receipt(nullable:true)
 		additionalInformation(nullable:true)
 		carrier(nullable:true)
 		recipient(nullable:true)

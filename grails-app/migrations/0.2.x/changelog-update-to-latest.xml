@@ -2648,7 +2648,19 @@
 		</update>
 	</changeSet>
     
+	<changeSet author="mgoodrich" id="2011-03-04-3">
+        <preConditions onFail="MARK_RAN">
+			<columnExists tableName="receipt" columnName="shipment_id"/>
+		</preConditions>
+			<sql>
+				ALTER TABLE receipt DROP FOREIGN KEY FK408272383B5F6286;
+			</sql>
+			<dropColumn tableName="receipt" columnName="shipment_id"/>
+	</changeSet>
 	
+	<changeSet author="mgoodrich" id="2011-03-04-4">
+      	<delete tableName="receipt" />
+	</changeSet>
 	
 	<!--  clear out all the sample crap -->
 <!-- 
