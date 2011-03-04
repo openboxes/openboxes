@@ -458,7 +458,7 @@ class InventoryService {
 	List getTransactionEntriesByProductAndInventory(Product productInstance, Inventory inventoryInstance) {
 		return TransactionEntry.createCriteria().list() {
 			and { 
-				eq("product.id", productInstance.id)
+				eq("product.id", productInstance?.id)
 				transaction {
 					eq("inventory", inventoryInstance)
 				}
@@ -495,6 +495,64 @@ class InventoryService {
 		return Warehouse.get(id);
 	}
 	
+
+	/**
+	 * Adjusts the stock level by adding a new transaction entry with a 
+	 * quantity change.
+	 * 
+	 * Passing in an instance of inventory item so that we can attach errors.	
+	 * @param inventoryItem
+	 * @param params
+	 */
+	boolean adjustStock(InventoryItem itemInstance, Map params) { 
+		
+		def inventoryInstance = Inventory.get(params?.inventory?.id)
+		
+		if (itemInstance && inventoryInstance) { 
+			def transactionEntry = new TransactionEntry(params);
+			def quantityChange = 0;
+			try { 
+				quantityChange = Integer.valueOf(params?.newQuantity) - Integer.valueOf(params?.oldQuantity);				
+			} catch (Exception e) { 
+				itemInstance.errors.reject("inventorItem.quantity.invalid")			
+			}
+						
+			def transactionInstance = new Transaction(params);
+			if (transactionEntry.hasErrors() || transactionInstance.hasErrors()) {
+				itemInstance.errors = transactionEntry.errors
+				itemInstance.errors = transactionInstance.errors
+			}
+			
+			
+						
+			// TODO Move all of this logic into the service layer in order to take advantage of Hibernate/Spring transactions
+			if (!itemInstance.hasErrors() && itemInstance.save()) {			
+				// Need to create a transaction if we want the inventory item
+				// to show up in the stock card
+				transactionInstance.transactionDate = new Date();			
+				// FIXME Not sure what transaction type this is -- should be ADJUSTMENT 
+				transactionInstance.transactionType = TransactionType.get(7);
+				transactionInstance.inventory = inventoryInstance;			
+				transactionEntry.inventoryItem = itemInstance;
+				transactionEntry.product = itemInstance.product;
+				transactionEntry.lotNumber = itemInstance.lotNumber;
+				// FIXME Not a safe way to do this - we should recalculate the old quantity 
+				transactionEntry.quantity = quantityChange;
+				transactionInstance.addToTransactionEntries(transactionEntry);			
+				if (!transactionInstance.hasErrors() && transactionInstance.save()) {			
+				
+				}
+				else { 
+					transactionInstance?.errors.allErrors.each { 
+						itemInstance.errors << it;
+					}
+				}
+
+			}
+			
+
+		}
+	}
 	
 	
 	/**

@@ -25,12 +25,8 @@
 										
 					<h1>${itemInstance?.product?.name }
 					
-							<span class="fade">			
-							${itemInstance?.product?.dosageStrength } ${itemInstance?.product?.dosageUnit }
-							 ${itemInstance?.product?.dosageForm?.name }
-							</span>
 							<span style="font-size: 1em;">					
-								<a href="${createLink(action: 'edit', id: itemInstance?.id, params: ['inventory.id':itemInstance?.inventory?.id]) }">edit</a>
+								<a href="${createLink(action: 'edit', id: itemInstance?.id, params: ['inventory.id':inventoryInstance?.id]) }">edit</a>
 							</span>					
 					
 					</h1> 
@@ -132,7 +128,7 @@
 			</div>
 			<div class="dialog">
 				<g:form action="addTransactionEntry">
-					<g:hiddenField name="inventory.id" value="${itemInstance?.inventory?.id}"/>
+					<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
 					<g:hiddenField name="inventoryItem.id" value="${itemInstance?.id}"/>
 					<fieldset>				
 						<legend>

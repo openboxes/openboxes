@@ -426,6 +426,11 @@ ul.treeList li ul li {
 /*
 -------------------------------------------------------------*/
 
+div.errors {
+    margin: 10px 0 5px 0;
+    padding: 5px 0 5px 0;
+}
+
 /* changed to 5px because div.errors looks weird at 10px */
 div.errors li { 
 	margin-top: 5px; 	

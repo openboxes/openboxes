@@ -305,32 +305,73 @@ class InventoryItemController {
 			return [itemInstance: itemInstance]
 		}
 	}
+
+	
+	/**
+	 * Handles form submission from Show Stock Card > Adjust Stock dialog.	
+	 */
+	def adjustStock = {
+		log.info "Params " + params;
+		def itemInstance = InventoryItem.get(params.id)
+		def productInstance = InventoryItem.get(params?.product?.id)
+		def inventoryInstance = Inventory.get(params?.inventory?.id)
+		if (itemInstance) {
+			boolean hasErrors = inventoryService.adjustStock(itemInstance, params);
+			if (!itemInstance.hasErrors() && !hasErrors) {
+				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"
+			}
+			else {
+				// There were errors, so we want to display the itemInstance.errors to the user
+				flash.itemInstance = itemInstance;
+			}
+		}
+		redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id, params: ['inventoryItem.id':itemInstance?.id])
+	}
 	
 	def update = {		
+		
+		log.info "Params " + params;
 		def itemInstance = InventoryItem.get(params.id)
-		def inventoryInstance = Inventory.get(params.inventory.id)
+		def productInstance = InventoryItem.get(params?.product?.id)
+		def inventoryInstance = Inventory.get(params?.inventory?.id)
 		if (itemInstance) {
 			if (params.version) {
 				def version = params.version.toLong()
 				if (itemInstance.version > version) {
 					itemInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'inventoryItem.label', default: 'Inventory Item')] as Object[], "Another user has updated this inventory item while you were editing")
-					render(view: "show", model: [itemInstance: itemInstance])
+					//render(view: "show", model: [itemInstance: itemInstance])
+					redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
 					return
 				}
 			}
 			itemInstance.properties = params
+			
+			// FIXME Temporary hack to handle a chnaged values for these two fields
+			//if (params?.description?.name) 
+			itemInstance.description = params?.description?.name
+			//if (params?.lotNumber?.name) 
+			itemInstance.lotNumber = params?.lotNumber?.name
+			log.info "Description = " + params?.description?.name;
+			log.info "Lot number = " + params?.lotNumber?.name;
+			
+			
 			if (!itemInstance.hasErrors() && itemInstance.save(flush: true)) {
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"
-				redirect(controller: "inventoryItem", action: "show", id: itemInstance.id)
+				//redirect(controller: "inventoryItem", action: "show", id: itemInstance.id)
+				redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
 			}
 			else {
 				def transactionEntryList = TransactionEntry.findAllByInventoryItem(itemInstance)
-				render(view: "show", model: [itemInstance: itemInstance, transactionEntryList: transactionEntryList])
+				flash.message = "There were errors"
+				//render(view: "show", model: [itemInstance: itemInstance, transactionEntryList: transactionEntryList])
+				redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
+				
 			}
 		}
 		else {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'inventoryItem.label', default: 'Inventory item'), params.id])}"
-			redirect(action: "show", id: itemInstance.id)
+			redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
+			//redirect(action: "show", id: itemInstance.id)
 		}
 	}
 	
@@ -556,6 +597,13 @@ class InventoryItemController {
 		redirect(action: "showStockCard",  params: ['product.id':productInstance?.id])		
 	}
 	
+	
+	def editItemDialog = {
+		def itemInstance = InventoryItem.get(params.id);
+		render(view:'editItemDialog', model: [itemInstance: itemInstance]);
+	}
+	
+	
 	/*
 	def recordInventory = {
 		log.info "Record inventory: " + params;
@@ -714,6 +762,9 @@ class StockCardCommand {
 		
 		return filteredTransactionLog.groupBy { it.transaction } 
 	}
+	
+
+
 	
 	
 }

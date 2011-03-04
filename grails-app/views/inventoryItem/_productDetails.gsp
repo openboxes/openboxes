@@ -1,8 +1,18 @@
 <div id="product-details">
 	<fieldset>
-		<legend class="fade">${productInstance?.name }</legend>
+		<legend class="fade">Product Details</legend>
 		<table>
 			<tr class="details odd">	
+				<td class="left label">
+					<span class="name">Name</span>
+				</td>
+				<td colspan="2">
+					<span class="value">${productInstance?.name }</span>
+				</td>
+			</tr>
+		
+		
+			<tr class="details even">	
 				<td class="left label">
 					<span class="name">Category</span>
 				</td>
@@ -10,7 +20,7 @@
 					<span class="value">${productInstance?.category?.name }</span>
 				</td>
 			</tr>
-			<tr class="details even">	
+			<tr class="details odd">	
 				<td class="left label">
 					<span class="name">Product Code</span>
 				</td>
@@ -19,7 +29,7 @@
 				</td>
 			</tr>
 			
-			<tr class="details odd">	
+			<tr class="details even">	
 				<td class="left label">
 					<span class="name">Cold Chain</span>
 				</td>
@@ -102,7 +112,7 @@
 					</span>
 				</td>
 				<td class="right">
-					<g:remoteLink action="toggleSupported" params="['product.id':productInstance.id, 'inventory.id':inventoryInstance?.id]"
+					<g:remoteLink action="toggleSupported" params="['product.id':productInstance?.id, 'inventory.id':inventoryInstance?.id]"
 					update="[success:'supportedValue',failure:'supportedValue']">
 					
 						<g:if test="${inventoryLevelInstance?.supported }">

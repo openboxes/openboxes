@@ -453,8 +453,33 @@ class InventoryController {
 		
 		render(view: "showTransaction", model: model);
 	}
+	
+	/**
+	* Show the transaction.
+	*/
+   def showTransactionDialog = {
+	   def transactionInstance = Transaction.get(params.id);
+	   if (!transactionInstance) {
+		   flash.message = "There was no transaction with ID " + params.id;
+		   transactionInstance = new Transaction();
+	   }
+	   
+	   def model = [
+		   transactionInstance : transactionInstance,
+		   productInstanceMap: Product.list().groupBy { it.category },
+		   transactionTypeList: TransactionType.list(),
+		   warehouseInstanceList: Warehouse.list(),
+		   warehouseInstance: Warehouse.get(session?.warehouse?.id)
+	   ];
+	   
+	   render(view: "showTransactionDialog", model: model);
+	   
+   }
+   
+   
+   
 
-		
+   	
 	def confirmTransaction = { 
 		def transactionInstance = Transaction.get(params?.id)
 		if (transactionInstance?.confirmed) { 

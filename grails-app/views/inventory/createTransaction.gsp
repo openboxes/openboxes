@@ -28,26 +28,19 @@
             }
 			function initializeTypeSelector(select) { 
 				var transactionType = select.val();
-				console.log(transactionType == 1);
 				//option:selected
 				if (transactionType == 1) {
-					console.log("show all");
 					$("#source\\.id").closest("li").show();
 					$("#destination\\.id").closest("li").show();
 					$("#inventory\\.id").closest("li").hide();
 				}
 				else {
-					console.log("hide all");
 					$("#source\\.id").closest("li").hide();
 					$("#destination\\.id").closest("li").hide();
 					$("#inventory\\.id").closest("li").show();
 				}						
 				var stripedList = $(".striped li").not(":hidden");
-				
-				$.each(stripedList, function(index, value) { 
-					console.log(index + ': ' + value.id + " : " + value.attributes); 
-				});
-				
+								
 				paintStripes($(".striped li"));
 				$("#transaction-entries-li").addClass("even");
 				
@@ -165,14 +158,14 @@
 	    		 */
 	    		$(".add-lot-number").livequery(function() { 
 	    			$(this).click(function(event) { 
-
+	    				var productName = $(this).siblings().filter("#productName");
 		    			var productId = $(this).siblings().filter("#product\\.id");
 	    				var index = transaction.TransactionEntries.length;
 		    			var transactionEntry = { 
 			    			Id: '(new)', 
 			    			Index: index++, 
 			    			ProductId: productId.val(), 
-			    			ProductName: '', 
+			    			ProductName: productName.val(), 
 	    	    			LotNumber: '', 
 	    	    			Description: '', 
 	    	    			ExpirationDate: '', 
@@ -184,9 +177,7 @@
 						//var lotNumberTableBody = $(this).parent().parent().parent();
 						//$("#lot-number-template").tmpl(transactionEntry).appendTo(lotNumberTableBody);
 						var tr = $(this).closest("tr");
-						console.log(tr);
 						var lotNumberTr = $("#lot-number-template").tmpl(transactionEntry);
-						console.log(lotNumberTr);
 						lotNumberTr.insertAfter(tr);
 						paintStripes($("#transaction-entries-table > tbody tr"));    
 						event.preventDefault();
@@ -201,7 +192,6 @@
 	    		 */
 	    		$(".delete-lot-number").livequery(function() { 
 	    			$(this).click(function(event) { 
-						console.log("remove lot number");
 		    			$(this).closest("tr").remove();
 		    			paintStripes($("#transaction-entries-table > tbody tr"));   
 	    			});
@@ -305,20 +295,17 @@
 	    					});
 	    				},
 	    				select: function(event, ui) {
-							console.log("selected " + ui.item.lotNumber);
 		    				$(this).parent().find('.hiddenLotNumber').val(ui.item.lotNumber);
 		    				return false;
 		    				//$(this).parent().siblings().find()
 	    				},
 	    				focus: function(event, ui) { 
-							console.log("on focus " + ui.item.label);
 	    					$(this).val( ui.item.label );	// in order to prevent ID from being displayed in widget
 	    					return false;		    				
 		    			},
 	    				change: function(event, ui) { 
 							// Allows user to enter a new lot number value
 							var value = $(this).attr('value');
-							console.log("changed value " + value);
 							$(this).parent().find('.hiddenLotNumber').val(value);
 							return false;
 		    			}	    				
@@ -351,10 +338,10 @@
 				</td>
 				<td width="35%">
 					{{= ProductName}} 
-					&nbsp; <a href="${createLink(controller: 'inventoryItem', action: 'showStockCard')}/{{= ProductId}}">show stock card</a>
+					&nbsp; <a href="${createLink(controller: 'inventoryItem', action: 'showStockCard')}/{{= ProductId}}">&lsaquo; Stock Card</a>
 				</td>
 				<td width="25%">
-					<g:hiddenField name="transactionEntries[{{= Index}}].product.id" class="hiddeProductId" value="{{= ProductId}}"/>
+					<g:hiddenField name="transactionEntries[{{= Index}}].product.id" class="hiddenProductId" value="{{= ProductId}}"/>
 					<g:hiddenField name="transactionEntries[{{= Index}}].lotNumber" class="hiddenLotNumber" value="{{= LotNumber}}"/>
 					<g:textField name="lotNumber" value="" class="lotNumber" size="15" value="{{= LotNumber}}"/>
 				</td>
@@ -366,6 +353,7 @@
 				</td>
 				<td width="10%" nowrap="nowrap">
 					<g:hiddenField id="product.id" name="product.id" value="{{= ProductId}}"/>
+					<g:hiddenField id="productName" name="productName" value="{{= ProductName}}"/>
 					<button type="button" class="add-lot-number">
 						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png')}"/>
 					</button>	
@@ -381,10 +369,9 @@
 					<span class="fade">{{= Id }}</span>
 				</td>
 				<td width="35%">
-					
+					<span class="fade">{{= ProductName}} </span>
 				</td>
 				<td width="25%">
-					
 					<g:hiddenField name="transactionEntries[{{= Index}}].product.id" class="hiddenProductId" value="{{= ProductId}}"/>
 					<g:hiddenField name="transactionEntries[{{= Index}}].lotNumber" class="hiddenLotNumber" value="{{= LotNumber}}"/>
 					<g:textField name="lotNumber" class="lotNumber" size="15" value="{{= LotNumber}}"/>
@@ -460,19 +447,6 @@
 								${warehouseInstance?.name }
 							</span>								
 						</li>
-						<li id="add-product-li" class="prop lookup">
-							<label>Add a product</label>
-							<span class="value">
-								<g:hiddenField id="productId" name="productId"/>
-								<g:hiddenField id="productName" name="productName"/>
-								<g:textField  id="productSearch" name="productSearch" value="Find another product to add" /> &nbsp;
-								<button id="addProduct" type="button">
-									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png')}"/>	
-								</button>							
-							</span>
-							
-							<br clear="all"/>
-						</li>
 						<li id="transaction-entries-li" class="prop entries">
 							<div style="width: 100%;" >
 								
@@ -533,7 +507,26 @@
 										
 										 --%>
 									</tbody>
-																	
+													
+													
+									<tfoot>
+										<tr>
+											<td></td>
+											<td>
+												<g:hiddenField id="productId" name="productId"/>
+												<g:hiddenField id="productName" name="productName"/>
+												<g:textField  id="productSearch" name="productSearch" value="Find another product to add" /> &nbsp;
+												<button id="addProduct" type="button">
+													<img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png')}"/>	
+												</button>							
+											
+											</td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+									</tfoot>				
 								</table>
 							</div>							
 						</li>						

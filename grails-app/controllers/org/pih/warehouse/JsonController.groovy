@@ -35,6 +35,7 @@ class JsonController {
 					maxResults(10)					
 				}
 			}
+			
 			if (items) {
 				items = items.collect() {
 					[
@@ -48,6 +49,7 @@ class JsonController {
 					]
 				}
 			}
+			items << [ value: params.term, label: params.term, valueText: params.term, lotNumber: params.term ]
 		}
 		render items as JSON;
 	}
@@ -74,22 +76,9 @@ class JsonController {
 					]
 				}
 			}
-			else {
-
-				def item =  [
-					value: null,
-					label: "No matches found for '" + params.term + "'.  Click here to add a new item?",
-					valueText : params.term,
-					lotNumber: params.term,
-					description: '',
-					expirationDate: null,
-					icon: "none",
-					exists: false
-				];
-				items.add(item)
-
-			}
+			items << [ value: params.term, label: params.term, valueText: params.term ]
 		}
+		
 		render items as JSON;
 	}
 	
@@ -347,6 +336,8 @@ class JsonController {
 			}
 		}
 
+		items << [ value: params.term, label: params.term, valueText: params.term, desc: params.term ]
+		
 		if (!items) { 
 			//items.add(new Product(name: "No matching products"))
 			//items.addAll(Product.list(params));		
@@ -363,17 +354,8 @@ class JsonController {
 					desc: it.description,
 					icon: "none"]
 			}
-		}/*
-		else {
-			def item =  [
-				value: null,
-				valueText : params.term,
-				label: "Add a new product '" + params.term + "'?",
-				desc: params.term,
-				icon: "none"
-			];
-			items.add(item)
-		}*/
+		}
+
 		render items as JSON;
 	}
 	
