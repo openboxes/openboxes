@@ -2676,8 +2676,10 @@
 	
 	
 	<!--  clear out all the sample crap -->
-<!-- 
-	<changeSet author="mgoodrich" id="2011-03-03-3">
+	<changeSet author="mgoodrich" id="2011-03-04-20">
+		<sql>
+			set FOREIGN_KEY_CHECKS = 0;
+		</sql>
 		<delete tableName="shipment_comment"/>
 		<delete tableName="shipment_document"/>
 		<delete tableName="shipment_reference_number"/>
@@ -2685,15 +2687,15 @@
 		<delete tableName="shipment_event"/>
 		<delete tableName="event"/>
 		<delete tableName="shipment_item"/>
-		<delete tableName="container">
-			<where>parent_container_id IS NOT NULL</where>
-		</delete>
 		<delete tableName="container"/>
 		<delete tableName="receipt"/>
+		<delete tableName="receipt_item"/>
 		<delete tableName="shipment"/>
 		<delete tableName="shipment_method"/>
-	</changeSet>	
-	-->
+		<sql>
+			set FOREIGN_KEY_CHECKS = 1;
+		</sql>
+	</changeSet>
 	
 	
 <!--
