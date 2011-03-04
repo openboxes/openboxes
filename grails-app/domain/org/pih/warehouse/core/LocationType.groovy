@@ -2,8 +2,6 @@ package org.pih.warehouse.core
 
 import java.util.Date;
 
-import org.pih.warehouse.core.EventStatus;
-
 /**
  * Represents the type of a Location
  * 

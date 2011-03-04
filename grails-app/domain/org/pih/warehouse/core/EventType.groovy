@@ -2,7 +2,7 @@ package org.pih.warehouse.core
 
 import java.util.Date;
 
-import org.pih.warehouse.core.EventStatus;
+import org.pih.warehouse.core.EventCode;
 
 /**
  * Represents the type of an Event
@@ -19,14 +19,14 @@ class EventType implements Comparable, Serializable {
 	Date dateCreated;
 	Date lastUpdated;
 
-	EventStatus eventStatus;		// SHIPPED or RECEIVED
+	EventCode eventCode;		// CREATED, SHIPPED or RECEIVED
 			
-	static transients = [ "status", "optionValue" ]
+	static transients = [ "optionValue" ]
 	static constraints = { 
 		name(nullable:false)
 		description(nullable:true)
 		sortOrder(nullable:true)
-		eventStatus(nullable:false)		
+		eventCode(nullable:false)		
 		
 		dateCreated(display:false)
 		lastUpdated(display:false)
@@ -36,11 +36,6 @@ class EventType implements Comparable, Serializable {
 	
 	static mapping = {
 		sort "sortOrder"
-	}
-
-	
-	String getStatus() { 
-		return (eventStatus) ? eventStatus.name : "Invalid";
 	}
 	
 	String getOptionValue() { 

@@ -16,9 +16,9 @@
 										
 					<td style="text-align: right;">
 						<div class="fade" style="font-weight: bold; font-size:1.5em;">
-							<g:if test="${shipmentInstance?.mostRecentEvent?.eventType?.eventStatus?.name}">
-								<img src="${createLinkTo(dir:'images/icons/eventStatus',file: shipmentInstance?.mostRecentEvent?.eventType?.eventStatus?.name?.toLowerCase() + '.png')}"
-									alt="${shipmentInstance?.mostRecentEvent?.eventType?.eventStatus?.name}" style="vertical-align: middle"/>							
+							<g:if test="${shipmentInstance?.mostRecentEvent?.eventType?.eventCode?.name}">
+								<img src="${createLinkTo(dir:'images/icons/eventStatus',file: shipmentInstance?.mostRecentEvent?.eventType?.eventCode?.name?.toLowerCase() + '.png')}"
+									alt="${shipmentInstance?.mostRecentEvent?.eventType?.eventCode?.name}" style="vertical-align: middle"/>							
 							</g:if>
 							<g:else>
 								<img src="${createLinkTo(dir:'images/icons/eventStatus',file: 'invalid.png')}"

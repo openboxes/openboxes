@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Event;
-import org.pih.warehouse.core.EventStatus;
+import org.pih.warehouse.core.EventCode;
 import org.pih.warehouse.core.EventType;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.ListCommand;
@@ -114,11 +114,11 @@ class ShipmentService {
 	
 	
 	Map<EventType, ListCommand> getShipmentsByStatus(List shipments) { 
-		def shipmentMap = new TreeMap<EventStatus, ListCommand>();
+		def shipmentMap = new TreeMap<EventCode, ListCommand>();
 		shipments.each {
 			
 			def eventType = it.getMostRecentStatus();			
-			def key = eventType?.eventStatus ? eventType?.eventStatus : EventStatus.CREATED; 
+			def key = eventType?.eventCode ? eventType?.eventCode : EventCode.CREATED; 
 			def shipmentList = shipmentMap[key];
 			if (!shipmentList) {
 				shipmentList = new ListCommand(category: key, objectList: new ArrayList());
@@ -224,12 +224,12 @@ class ShipmentService {
 	 */
 	void saveShipment(Shipment shipment) {
 		if (shipment) {
-			// if this is shipment has no events (i.e., it is a new shipment) set it as pending
+			// if this is shipment has no events (i.e., it is a new shipment) set it as created
 			if (!(shipment.events?.size() > 0)) {
 				def event = new Event(
 					eventDate: new Date(),
-					eventType: EventType.findByEventStatus(EventStatus.CREATED),
-					//eventLocation: Location.get(session.warehouse.id)
+					eventType: EventType.findByEventCode(EventCode.CREATED),
+					eventLocation: shipment.origin
 				)
 				event.save(flush:true);
 				shipment.addToEvents(event)
@@ -348,13 +348,13 @@ class ShipmentService {
 	/**
 	 * Get a list of shipments 
 	 * @param location
-	 * @param eventStatus
+	 * @param eventCode
 	 * @return
 	 */
-	List<Shipment> getReceivingByDestinationAndStatus(Location location, EventStatus eventStatus) { 		
+	List<Shipment> getReceivingByDestinationAndStatus(Location location, EventCode eventCode) { 		
 		def shipmentList = getRecentIncomingShipments(location?.id)
 		if (shipmentList) { 
-			shipmentList = shipmentList.findAll { it.mostRecentStatus = eventStatus } 
+			shipmentList = shipmentList.findAll { it.mostRecentStatus = eventCode } 
 		}
 		return shipmentList;		
 	}
@@ -372,7 +372,7 @@ class ShipmentService {
 				}
 					
 				// Add a Shipped event to the shipment
-				EventType eventType = EventType.findByEventStatus(EventStatus.SHIPPED)
+				EventType eventType = EventType.findByEventCode(EventCode.SHIPPED)
 				if (eventType) {					
 					createShipmentEvent(shipmentInstance, new Date(), eventType, locationInstance);
 				}
@@ -464,7 +464,7 @@ class ShipmentService {
 		
 		try {
 			
-			if (!receiptInstance.hasErrors() && receiptInstance.hasShipped() && !receiptInstance.wasReceived() && receiptInstance.save(flush: true)) {
+			if (!receiptInstance.hasErrors() && shipmentInstance.hasShipped() && !shipmentInstance.wasReceived() && receiptInstance.save(flush: true)) {
 				
 				// Add comment to shipment (as long as there's an actual comment
 				// after trimming off the extra spaces)
@@ -474,7 +474,7 @@ class ShipmentService {
 				}
 
 				// Add a Shipped event to the shipment
-				EventType eventType = EventType.findByEventStatus(EventStatus.RECEIVED)
+				EventType eventType = EventType.findByEventCode(EventCode.RECEIVED)
 				if (eventType) {
 					def event = new Event();
 					event.eventDate = new Date()

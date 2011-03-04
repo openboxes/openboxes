@@ -11,7 +11,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Document;
 import org.pih.warehouse.core.Event;
-import org.pih.warehouse.core.EventStatus;
+import org.pih.warehouse.core.EventCode;
 import org.pih.warehouse.core.EventType;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
@@ -389,8 +389,8 @@ class ShipmentController {
 		shipments = shipments.findAll( {it.destination == currentLocation} )
 							   		
 		// filter by event status
-		if (params.eventStatus) {
-			shipments = shipments.findAll( { it.mostRecentEvent?.eventType?.eventStatus == EventStatus.valueOf(params.eventStatus) } )		
+		if (params.eventCode) {
+			shipments = shipments.findAll( { it.mostRecentEvent?.eventType?.eventCode == EventCode.valueOf(params.eventCode) } )		
 		}	
 		
 		[
@@ -435,8 +435,8 @@ class ShipmentController {
 		shipments = shipments.findAll( {it.origin == currentLocation} )
 							   		
 		// filter by event status
-		if (params.eventStatus) {
-			shipments = shipments.findAll( { it.mostRecentEvent?.eventType?.eventStatus == EventStatus.valueOf(params.eventStatus) } )		
+		if (params.eventCode) {
+			shipments = shipments.findAll( { it.mostRecentEvent?.eventType?.eventCode == EventCode.valueOf(params.eventCode) } )		
 		}	
 		
 		[

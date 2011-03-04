@@ -56,10 +56,10 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="eventStatus"><g:message code="eventType.eventStatus.label" default="Event Status" /></label>
+	                                  <label for="eventCode"><g:message code="eventType.eventCode.label" default="Event Status" /></label>
 	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: eventTypeInstance, field: 'eventStatus', 'errors')}">
-	                                    <g:select name="eventStatus" from="${org.pih.warehouse.core.EventStatus?.values()}" value="${eventTypeInstance?.eventStatus}" noSelection="['': '']" />
+	                                <td valign="top" class="value ${hasErrors(bean: eventTypeInstance, field: 'eventCode', 'errors')}">
+	                                    <g:select name="eventCode" from="${org.pih.warehouse.core.EventCode?.values()}" value="${eventTypeInstance?.eventCode}" noSelection="['': '']" />
 	                                </td>
 	                            </tr>
 	                        

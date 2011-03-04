@@ -83,7 +83,7 @@
 			<!-- 			
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="shipment" action="listShipping" params="['activityType':'SHIPPING', 'browseBy':'eventStatus']"><g:message code="shipment.listShippingByStatus.label"  default="Show By Status"/></g:link>
+					<g:link class="bullet" controller="shipment" action="listShipping" params="['activityType':'SHIPPING', 'browseBy':'eventCode']"><g:message code="shipment.listShippingByStatus.label"  default="Show By Status"/></g:link>
 				</span>
 			</li>				
 			<li class="">
@@ -91,10 +91,10 @@
 					<g:link class="bullet" controller="shipment" action="listShipping" params="['activityType':'SHIPPING', 'browseBy':'shipmentType']"><g:message code="shipment.listShippingByType.label"  default="Show By Type"/></g:link>
 				</span>
 			</li>				
-			<g:each in="${org.pih.warehouse.core.EventStatus.list()}" var="eventStatus">
+			<g:each in="${org.pih.warehouse.core.EventCode.list()}" var="eventCode">
 				<li class="">
 					<span class="menuButton">
-						<g:link class="bullet" controller="shipment" action="listShipping" params="['activityType':'SHIPPING','eventStatus':eventStatus]"><g:message code="shipment.list.outgoing.label"  default="show ${eventStatus?.name?.toLowerCase()}"/></g:link>
+						<g:link class="bullet" controller="shipment" action="listShipping" params="['activityType':'SHIPPING','eventCode':eventCode]"><g:message code="shipment.list.outgoing.label"  default="show ${eventCode?.name?.toLowerCase()}"/></g:link>
 					</span>
 				</li>
 			</g:each>

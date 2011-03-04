@@ -56,7 +56,7 @@
 										<g:each var="entry" in="${outgoingShipmentsByStatus}" status="i">											
 											<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 												<td>${entry.key.name}</td>
-												<td style="text-align: center;"><g:link controller="shipment" action="listShipping" params="['eventStatus':entry.key]">${entry.value.objectList.size}</g:link></td>
+												<td style="text-align: center;"><g:link controller="shipment" action="listShipping" params="['eventCode':entry.key]">${entry.value.objectList.size}</g:link></td>
 											</tr>	
 											
 								    	</g:each>
@@ -91,7 +91,7 @@
 										<g:each var="entry" in="${incomingShipmentsByStatus}" status="i">	 
 											<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 												<td>${entry.key.name}</td>
-												<td style="text-align: center;"><g:link controller="shipment" action="listReceiving" params="['eventStatus':entry.key]">${entry.value.objectList.size}</g:link></td>
+												<td style="text-align: center;"><g:link controller="shipment" action="listReceiving" params="['eventCode':entry.key]">${entry.value.objectList.size}</g:link></td>
 											</tr>	
 								    	</g:each>
 							    	</tbody>
@@ -138,7 +138,7 @@
 											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 												<td>
 													<g:link controller="shipment" action="listShipping" params="['eventType.id':shipment?.mostRecentStatus?.id]"></g:link>
-													${shipmentInstance?.mostRecentEvent?.eventType?.eventStatus?.name}
+													${shipmentInstance?.mostRecentEvent?.eventType?.eventCode?.name}
 												</td>									
 												<td><g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id}">${shipmentInstance?.name }</g:link></td>
 												<td>${shipmentInstance?.destination?.name }</td>
@@ -189,7 +189,7 @@
 										<g:each in="${incomingShipments}" var="shipmentInstance" status="i">
 											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 												<td><g:link controller="shipment" action="listReceiving" params="['eventType.id':shipmentInstance?.mostRecentStatus?.id]">
-													</g:link>${shipmentInstance?.mostRecentEvent?.eventType?.eventStatus?.name}</td>
+													</g:link>${shipmentInstance?.mostRecentEvent?.eventType?.eventCode?.name}</td>
 												<td><g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id}">${shipmentInstance?.name }</g:link></td>
 												<td>${shipmentInstance?.origin?.name }</td>
 												<td nowrap>

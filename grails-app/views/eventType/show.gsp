@@ -47,9 +47,9 @@
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="eventType.eventStatus.label" default="Event Status" /></td>
+                            <td valign="top" class="name"><g:message code="eventType.eventCode.label" default="Event Status" /></td>
                             
-                            <td valign="top" class="value">${eventTypeInstance?.eventStatus?.encodeAsHTML()}</td>
+                            <td valign="top" class="value">${eventTypeInstance?.eventCode?.encodeAsHTML()}</td>
                             
                         </tr>
                     

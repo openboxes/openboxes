@@ -33,9 +33,7 @@
                         
                             <g:sortableColumn property="sortOrder" title="${message(code: 'eventType.sortOrder.label', default: 'Sort Order')}" />
                         
-                            <g:sortableColumn property="eventStatus" title="${message(code: 'eventType.eventStatus.label', default: 'Event Status')}" />
-                        
-                            <g:sortableColumn property="activityType" title="${message(code: 'eventType.activityType.label', default: 'Activity Type')}" />
+                            <g:sortableColumn property="eventCode" title="${message(code: 'eventType.eventCode.label', default: 'Event Status')}" />
                         
                         </tr>
                     </thead>
@@ -51,10 +49,7 @@
                         
                             <td>${fieldValue(bean: eventTypeInstance, field: "sortOrder")}</td>
                         
-                            <td>${fieldValue(bean: eventTypeInstance, field: "eventStatus")}</td>
-                        
-                            <td>${fieldValue(bean: eventTypeInstance, field: "activityType")}</td>
-                        
+                            <td>${fieldValue(bean: eventTypeInstance, field: "eventCode")}</td> 
                         </tr>
                     </g:each>
                     </tbody>

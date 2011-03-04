@@ -2,7 +2,7 @@ package org.pih.warehouse.inventory;
 
 import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.ListUtils;
-import org.pih.warehouse.core.EventStatus;
+import org.pih.warehouse.core.EventCode;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
@@ -70,7 +70,7 @@ class InventoryController {
 			redirect(action: "create")
 		}
 		
-		cmd.shipmentList = shipmentService.getReceivingByDestinationAndStatus(cmd.warehouseInstance, EventStatus.SHIPPED);
+		cmd.shipmentList = shipmentService.getReceivingByDestinationAndStatus(cmd.warehouseInstance, EventCode.SHIPPED);
 		
 		// Hydrate the category filters from the session
 		// Allow us to get any attribute of a category without get a lazy init exception

@@ -2630,7 +2630,24 @@
        	</insert>
 	</changeSet>
 	
-	
+		
+	<changeSet author="mgoodrich" id="2011-03-04-1">
+       <preConditions onFail="MARK_RAN">
+			<columnExists tableName="event_type" columnName="event_status"/>
+		</preConditions>
+		<sql>
+			alter table event_type change column event_status event_code varchar(255);	
+		</sql>		
+    </changeSet>
+    
+    <changeSet author="mgoodrich" id="2011-03-04-2">
+    	<update tableName="event_type">
+			<column name="name" value="Created" />
+			<column name="description" value="Shipment has been created" />
+ 		    <where>id = 1</where>
+		</update>
+	</changeSet>
+    
 	
 	
 	<!--  clear out all the sample crap -->

@@ -1,17 +1,19 @@
 package org.pih.warehouse.core;
 
-public enum EventStatus {
+public enum EventCode {
 
 	CREATED('Pending'),
 	SHIPPED('Shipped'),
 	RECEIVED('Received')
  
-	String name
+	String status
 
-	EventStatus(String name) { this.name = name }
+	EventCode(String status) { this.status = status }
 
 	static list() {
 		[ CREATED, SHIPPED, RECEIVED ]
 	}
+	
+	String getName() { return status }
 }
 

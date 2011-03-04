@@ -3,7 +3,7 @@ package org.pih.warehouse.shipping
 import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Document;
 import org.pih.warehouse.core.Event;
-import org.pih.warehouse.core.EventStatus;
+import org.pih.warehouse.core.EventCode;
 import org.pih.warehouse.core.EventType;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
@@ -162,16 +162,16 @@ class Shipment implements Serializable {
 	}
 	
 	Boolean hasShipped() {
-		return events.any { it.eventType?.eventStatus == EventStatus.SHIPPED }
+		return events.any { it.eventType?.eventCode == EventCode.SHIPPED }
 	}
 	
 	Boolean wasReceived() { 
-		return events.any { it.eventType?.eventStatus == EventStatus.RECEIVED }
+		return events.any { it.eventType?.eventCode == EventCode.RECEIVED }
 	}
 	
 	Date getActualShippingDate() { 
 		for (event in events) { 
-			if (event?.eventType?.eventStatus == EventStatus.SHIPPED) { 
+			if (event?.eventType?.eventCode == EventCode.SHIPPED) { 
 				return event?.eventDate;
 			}
 		}
@@ -180,7 +180,7 @@ class Shipment implements Serializable {
 
 	Date getActualDeliveryDate() { 
 		for (event in events) {
-			if (event?.eventType?.eventStatus == EventStatus.RECEIVED) {
+			if (event?.eventType?.eventCode == EventCode.RECEIVED) {
 				return event?.eventDate;
 			}
 		}
