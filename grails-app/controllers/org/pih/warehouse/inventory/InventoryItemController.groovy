@@ -357,22 +357,15 @@ class InventoryItemController {
 			
 			if (!itemInstance.hasErrors() && itemInstance.save(flush: true)) {
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"
-				//redirect(controller: "inventoryItem", action: "show", id: itemInstance.id)
-				redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
 			}
 			else {
-				def transactionEntryList = TransactionEntry.findAllByInventoryItem(itemInstance)
-				flash.message = "There were errors"
-				//render(view: "show", model: [itemInstance: itemInstance, transactionEntryList: transactionEntryList])
-				redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
-				
+				//flash.message = "There were errors"
 			}
 		}
 		else {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'inventoryItem.label', default: 'Inventory item'), params.id])}"
-			redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
-			//redirect(action: "show", id: itemInstance.id)
 		}
+		redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
 	}
 	
 	
