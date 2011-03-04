@@ -248,7 +248,6 @@
 		});
 		$('.expirationDate').livequery(function() {
 			var altFieldId = "#" + $(this).attr('id') + "-hidden"; 
-			console.log(altFieldId);
 			$(this).datepicker({
 				altField: altFieldId,
 				altFormat: 'mm/dd/yy',
