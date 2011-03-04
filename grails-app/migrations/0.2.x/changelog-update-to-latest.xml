@@ -2659,6 +2659,7 @@
 	</changeSet>
 	
 	<changeSet author="mgoodrich" id="2011-03-04-4">
+		<delete tableName="receipt_item" />
       	<delete tableName="receipt" />
 	</changeSet>
 	
