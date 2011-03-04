@@ -2630,8 +2630,11 @@
        	</insert>
 	</changeSet>
 	
+	
+	
+	
 	<!--  clear out all the sample crap -->
-
+<!-- 
 	<changeSet author="mgoodrich" id="2011-03-03-3">
 		<delete tableName="shipment_comment"/>
 		<delete tableName="shipment_document"/>
@@ -2648,7 +2651,7 @@
 		<delete tableName="shipment"/>
 		<delete tableName="shipment_method"/>
 	</changeSet>	
-	
+	-->
 	
 	
 <!--
