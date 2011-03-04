@@ -2631,6 +2631,7 @@
 	</changeSet>
 	
 	<!--  clear out all the sample crap -->
+
 	<changeSet author="mgoodrich" id="2011-03-03-3">
 		<delete tableName="shipment_comment"/>
 		<delete tableName="shipment_document"/>
@@ -2639,11 +2640,16 @@
 		<delete tableName="shipment_event"/>
 		<delete tableName="event"/>
 		<delete tableName="shipment_item"/>
+		<delete tableName="container">
+			<where>parent_container_id IS NOT NULL</where>
+		</delete>
 		<delete tableName="container"/>
 		<delete tableName="receipt"/>
 		<delete tableName="shipment"/>
 		<delete tableName="shipment_method"/>
 	</changeSet>	
+	
+	
 	
 <!--
     <changeSet author="jmiranda (generated)" id="1297432141595-4">
