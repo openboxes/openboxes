@@ -548,24 +548,24 @@ class InventoryController {
 			}
 			it.inventoryItem = inventoryItem;
 		}
-		log.info("Transaction entries " + transactionInstance?.transactionEntries)
 
 		if (!transactionInstance.hasErrors() && transactionInstance.save(flush:true)) {
 			flash.message = "Transaction saved successfully";
-			redirect(action: "editTransaction", id: transactionInstance?.id);
 		}
-						
-		def model = [ 
-			transactionInstance : transactionInstance,
-			productInstanceMap: Product.list().groupBy { it.category },
-			transactionTypeList: TransactionType.list(),
-			warehouseInstanceList: Warehouse.list(),
-			warehouseInstance: Warehouse.get(session?.warehouse?.id)
-		]
+		else { 				
+			def model = [ 
+				transactionInstance : transactionInstance,
+				productInstanceMap: Product.list().groupBy { it.category },
+				transactionTypeList: TransactionType.list(),
+				warehouseInstanceList: Warehouse.list(),
+				warehouseInstance: Warehouse.get(session?.warehouse?.id)
+			]
+			
+			render(view: "createTransaction", model: model);
+			return;
+		}		
 		
-		
-		render(view: "createTransaction", model: model);
-		
+		redirect(action: "showTransaction", id: transactionInstance?.id);
 		
 	}
 	

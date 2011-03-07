@@ -123,7 +123,7 @@
 										<td>	
 											<a id="show-details-${transaction?.id }" class="show-details" href="${createLink(controller: 'inventory', action:'showTransactionDialog', id: transaction.id, params: ['product.id', 'test'])}">
 												<button>
-													<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/> Show Details
+													<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/> Details
 												</button>
 											</a>
 											
