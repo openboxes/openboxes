@@ -1,5 +1,7 @@
 package org.pih.warehouse
 
+import java.text.ParseException;
+
 import grails.converters.*;
 
 import org.pih.warehouse.core.DialogForm;
@@ -17,9 +19,47 @@ import org.pih.warehouse.shipping.Shipment;
 
 class JsonController {
 
+	def inventoryService;
+	
+	def searchInventoryItems = {
+		log.info params
+		def warehouse = Warehouse.get(session.warehouse.id);
+		def items = new TreeSet();
+		if (params.term) {
+			items = inventoryService.searchInventoryItems(params.term, params.productId)
+			
+			if (items) {
+				items = items.collect() {
+					def quantity = inventoryService.getQuantity(it.lotNumber, warehouse?.inventory) 
+					[
+						value: it.lotNumber,
+						label: it.description + ", " + it.lotNumber + ", " + it.product.name + "  [Qty: " + quantity + "]",
+						valueText: it.lotNumber,
+						lotNumber: it.lotNumber,
+						product: it.product.id,
+						productId: it.product.id,
+						productName: it.product.name,
+						quantity: quantity,
+						expirationDate: it.expirationDate,
+						description: it.description,
+						id: it.id
+					]
+				}
+			}
+		}
+		render items as JSON;
+	}
+	
 	
 	def findLotsByName = { 
 		log.info params
+
+		def productId = null;		
+		try { 			
+			productId = new Long(params.productId);
+		} 
+		catch (NumberFormatException e) { /* ignore */ }
+		
 		def items = new TreeSet();
 		if (params.term) {
 			def searchTerm = params.term + "%";
@@ -30,7 +70,7 @@ class JsonController {
 						ilike("description", searchTerm)
 					}
 					if (params?.productId) { 
-						eq("product.id", new Long(params.productId))
+						eq("product.id", productId)
 					}
 					maxResults(10)					
 				}

@@ -28,7 +28,7 @@
 							src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}"
 							alt="Edit Suitcase" style="vertical-align: middle" /> &nbsp; 
 								<g:if test="${request.request.requestURL.toString().contains('createShipment')}"><b>edit shipment</b></g:if>
-								<g:else>edit suitcase</g:else>
+								<g:else>edit shipment</g:else>
 							</g:link>
 						</td>
 					</tr>
@@ -44,28 +44,44 @@
 				</td>
 			</tr>					
 
-			<g:if test="${session?.warehouse?.id == shipmentInstance?.origin?.id && !shipmentInstance?.hasShipped()}">
+			<g:if test="${session?.warehouse?.id == shipmentInstance?.origin?.id}">
 				<tr class="prop">
 					<td>
-						<g:link controller="shipment" action="sendShipment" id="${shipmentInstance.id}">
+						<g:if test="${!shipmentInstance?.hasShipped()}">
+							<g:link controller="shipment" action="sendShipment" id="${shipmentInstance.id}">
+								<img src="${createLinkTo(dir:'images/icons',file:'truck.png')}"
+								alt="Send Shipment" style="vertical-align: middle" /> &nbsp; 
+									<g:if test="${request.request.requestURL.toString().contains('sendShipment')}"><b>send shipment</b></g:if>
+									<g:else>send shipment</g:else>
+							</g:link>				
+						</g:if>
+						<g:else>
 							<img src="${createLinkTo(dir:'images/icons',file:'truck.png')}"
-							alt="Send Shipment" style="vertical-align: middle" /> &nbsp; 
-								<g:if test="${request.request.requestURL.toString().contains('sendShipment')}"><b>send shipment</b></g:if>
-								<g:else>send shipment</g:else>
-						</g:link>				
+								alt="Send Shipment" style="vertical-align: middle" /> &nbsp; 
+							<span class="fade">send shipment</span>
+						</g:else>
 					</td>
 				</tr>
 			</g:if>
 
-			<g:if test="${session?.warehouse?.id == shipmentInstance?.destination?.id && shipmentInstance.hasShipped() && !shipmentInstance.wasReceived()}">
+			<g:if test="${session?.warehouse?.id == shipmentInstance?.destination?.id}">
 				<tr class="prop">
 					<td>
-						<g:link controller="shipment" action="receiveShipment" id="${shipmentInstance.id}"><img
-						src="${createLinkTo(dir:'images/icons',file:'handtruck.png')}"
-						alt="Receive Shipment" style="vertical-align: middle" /> &nbsp; 
-							<g:if test="${request.request.requestURL.toString().contains('receiveShipment')}"><b>receive shipment</b></g:if>
-							<g:else>receive shipment</g:else>
-						</g:link>				
+					
+						<g:if test="${shipmentInstance.hasShipped() && !shipmentInstance.wasReceived()}">
+							<g:link controller="shipment" action="receiveShipment" id="${shipmentInstance.id}">
+							<img src="${createLinkTo(dir:'images/icons',file:'handtruck.png')}"
+							alt="Receive Shipment" style="vertical-align: middle" /> &nbsp; 
+								<g:if test="${request.request.requestURL.toString().contains('receiveShipment')}"><b>receive shipment</b></g:if>
+								<g:else>receive shipment</g:else>
+							</g:link>				
+						</g:if>
+						<g:else>
+							<img src="${createLinkTo(dir:'images/icons',file:'handtruck.png')}"
+							alt="Receive Shipment" style="vertical-align: middle" /> &nbsp; 
+							<span class="fade">receive shipment</span>
+						
+						</g:else>
 					</td>
 				</tr>
 			</g:if>

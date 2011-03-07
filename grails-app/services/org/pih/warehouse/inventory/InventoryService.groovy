@@ -44,7 +44,27 @@ class InventoryService {
 	}
 	
 	
+	List searchInventoryItems(String searchTerm, String productId) { 		
+		searchTerm += "%";
+		def items = InventoryItem.withCriteria {
+			or {
+				ilike("lotNumber", searchTerm)
+				ilike("description", searchTerm)
+				product { 
+					ilike("name", searchTerm)
+				}
+			}				
+			maxResults(10)
+			
+		}
+		return items;
+	}
 	
+	Integer getQuantity(String lotNumber, Inventory inventory) { 		
+		def transactionEntries = getTransactionEntriesByLotNumberAndInventory(lotNumber, inventory);
+		return (transactionEntries) ? transactionEntries*.quantity.sum() : 0;
+		
+	}
 	
 	/*
 	List getProducts(Long id, Category category) { 
@@ -466,7 +486,23 @@ class InventoryService {
 		}
 	}
 
-
+	/**
+	* Get all transaction entries for a lot number within an inventory.
+	*
+	* @param productInstance
+	* @param inventoryInstance
+	* @return
+	*/
+   List getTransactionEntriesByLotNumberAndInventory(String lotNumber, Inventory inventoryInstance) {
+	   return TransactionEntry.createCriteria().list() {
+		   and {
+			   eq("lotNumber", lotNumber)
+			   transaction {
+				   eq("inventory", inventoryInstance)
+			   }
+		   }
+	   }
+   }
 	
 		
 	List getInventoryItemList(Long id) { 

@@ -1,32 +1,29 @@
 
+		
 	<g:form name="editItem" action="createShipment">	
-		<g:if test="${item?.id}">
-			<g:hiddenField name="item.id" value="${item.id }"/>
-		</g:if>
-		<g:if test="${containerId}">
-			<g:hiddenField name="container.id" value="${containerId }"/>
-		</g:if>
+		<g:hiddenField id="container-id" name="container.id" value="${containerId}" size="20" />
 
 		<table>
 			<tbody>
 				<tr class="prop">
 					<td valign="top" class="name"><label><g:message code="shipmentItem.product.label" default="Product" /></label></td>                            
 					<td valign="top" class="value">
-						<g:autoSuggest name="product" jsonUrl="/warehouse/json/findProductByName" 
-							width="200" valueId="${item?.product?.id}" valueName="${item?.product?.name}"/>	
+						<span id="product-text"></span>
+						<g:hiddenField id="product-id" name="product.id" value="${item?.product?.id}" size="20" />
 					</td>
 				</tr>
 				<tr class="prop">
 					<td valign="top" class="name"><label><g:message code="shipmentItem.lotNumber.label" default="Lot / Serial Number" /></label></td>                            
 					<td valign="top" class="value">
-						<g:autoSuggestString name="lotNumber" jsonUrl="/warehouse/json/findLotsByName" 
-							width="200" valueId="${item?.lotNumber}" valueName="${item?.lotNumber}"/>	
+						<span id="lotNumber-text"></span>
+						<g:hiddenField id="lotNumber" name="lotNumber" value="${item?.lotNumber}" size="20" />
 					</td>
 				</tr>
 				<tr class="prop">
 					<td valign="top" class="name"><label><g:message code="shipmentItem.quantity.label" default="Quantity" /></label></td>                            
 					<td valign="top" class="value">
 						<g:textField id="quantity" name="quantity" value="${item?.quantity}" size="3" /> 
+						&nbsp [ Available Qty: <span id="quantity-text"></span> ]
 					</td>
 				</tr>  	        
 				<tr class="prop">
@@ -57,4 +54,4 @@
 				</tr>			
 			</tfoot>
 		</table>
-	</g:form>
+	</g:form>	

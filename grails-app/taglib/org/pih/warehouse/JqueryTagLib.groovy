@@ -324,6 +324,91 @@ class JqueryTagLib {
 	}
 
 	
+	def autoSuggestSearchable = { attrs, body ->
+		def id = (attrs.id) ? attrs.id : "autoSuggest_" + (new Random()).nextInt()
+		def name = attrs.name	
+		def valueId = (attrs.valueId)?attrs.valueId:"";
+		def valueName = (attrs.valueName)?attrs.valueName:"";
+		def width = (attrs.width) ? attrs.width : 200;
+		def minLength = (attrs.minLength) ? attrs.minLength : 1;
+		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "/warehouse/json/findPersonByName";
+
+		def showValue = (valueName && valueId) ? true : false;
+		//def spanDisplay = (showValue) ? "inline" : "none";
+		//def suggestDisplay = (showValue) ? "none" : "inline";
+		def spanDisplay = "none";
+		def suggestDisplay = "inline";
+		
+		def html = """
+			<div>
+				<style>
+					#${id}-suggest {
+						background-image: url('/warehouse/images/icons/silk/magnifier.png');
+						background-repeat: no-repeat;
+						background-position: center left;
+						padding-left: 20px;						
+					}				
+					.ui-autocomplete-term { font-weight: bold; color: #DDD; }
+				</style>
+				
+				<input id="${id}-suggest" type="text" name="${name}.name" 
+					value="${valueName}" style="width: ${width}px; display: ${suggestDisplay};"> 	
+				
+				<script>
+					\$(document).ready(function() {
+						
+                        
+				      	\$("#${id}-suggest").autocomplete({
+				            width: ${width},
+				            minLength: ${minLength},
+				            dataType: 'json',
+				            highlight: true,
+				            //selectFirst: true,
+				            scroll: true,
+				            autoFill: true,
+				            //scrollHeight: 300,
+							//define callback to format results
+							source: function(req, add){								
+								\$.getJSON('${jsonUrl}', req, function(data) {
+									var items = [];
+									\$.each(data, function(i, item) {
+										items.push(item);
+									});
+									add(items);
+								});
+					      	},
+					        focus: function(event, ui) {			
+					        },	
+					        change: function(event, ui) { 
+					        },
+							select: function(event, ui) {
+								// text display
+								\$("#lotNumber-text").html(ui.item.lotNumber);
+								\$("#product-text").html(ui.item.productName);
+								\$("#quantity-text").html(ui.item.quantity);
+								
+								// product hidden values
+								\$("#product-id").val(ui.item.productId);
+								\$("#lotNumber").val(ui.item.lotNumber);
+								\$("#quantity").val(ui.item.quantity);
+								
+								//
+								\$("#itemFoundForm").show();
+								\$("#itemSearchForm").hide();
+								
+							}
+						});
+					});
+					
+				</script>
+			</div>		
+		""";
+			
+		
+		out << html; 
+	}
+
+	
 	
 	def jqueryDatePicker = {attrs, body ->
 		
@@ -384,160 +469,82 @@ class JqueryTagLib {
 	}
 	
 	
-	def jqueryComboBox = { attrs, body ->
-		
-		
+	
+	def autoSuggestString = { attrs, body ->
+		def id = (attrs.id) ? attrs.id : "autoSuggest_" + (new Random()).nextInt()
+		def name = attrs.name
+		def value = (attrs.value)?attrs.value:"";
+		def width = (attrs.width) ? attrs.width : 200;
+		def minLength = (attrs.minLength) ? attrs.minLength : 1;
+		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "/warehouse/json/findPersonByName";
+
+		def showValue = (value) ? true : false;
+		//def spanDisplay = (showValue) ? "inline" : "none";
+		//def suggestDisplay = (showValue) ? "none" : "inline";
+		def spanDisplay = "none";
+		def suggestDisplay = "inline";
 		
 		def html = """
-		
+			<div>
 				<style>
-					.ui-button { margin-left: -1px; }
-					.ui-button-icon-only .ui-button-text { padding: 0.35em; }
-					.ui-autocomplete-input { margin: 0; padding: 0.48em 0 0.47em 0.45em; }
+					#${id}-suggest {
+						background-image: url('/warehouse/images/icons/silk/magnifier.png');
+						background-repeat: no-repeat;
+						background-position: center left;
+						padding-left: 20px;
+					}
 				</style>
+				
+				<input id="${id}" type="hidden" name="${name}" value="${value}"/>
+				<input id="${id}-suggest" type="text" name="${name}.autoSuggest" value="${value}" style="width: ${width}px; display: ${suggestDisplay};">
+				
+				
 				<script>
-					(function( \$ ) {
-						\$.widget( "ui.combobox", {
-							_create: function() {
-								var self = this,
-									select = this.element.hide(),
-									selected = select.children( ":selected" ),
-									value = selected.val() ? selected.text() : "";
-								var input = \$( "<input>" )
-									.insertAfter( select )
-									.val( value )
-									.autocomplete({
-										delay: 0,
-										minLength: 0,
-										source: function( request, response ) {
-											var matcher = new RegExp( \$.ui.autocomplete.escapeRegex(request.term), "i" );
-											response( select.children( "option" ).map(function() {
-												var text = \$( this ).text();
-												if ( this.value && ( !request.term || matcher.test(text) ) )
-													return {
-														label: text.replace(
-															new RegExp(
-																"(?![^&;]+;)(?!<[^<>]*)(" +
-																\$.ui.autocomplete.escapeRegex(request.term) +
-																")(?![^<>]*>)(?![^&;]+;)", "gi"
-															), "<strong>\$1</strong>" ),
-														value: text,
-														option: this
-													};
-											}) );
-										},
-										select: function( event, ui ) {
-											ui.item.option.selected = true;
-											self._trigger( "selected", event, {
-												item: ui.item.option
-											});
-										},
-										change: function( event, ui ) {
-											if ( !ui.item ) {
-												var matcher = new RegExp( "^" + \$.ui.autocomplete.escapeRegex( \$(this).val() ) + "\$", "i" ),
-													valid = false;
-												select.children( "option" ).each(function() {
-													if ( this.value.match( matcher ) ) {
-														this.selected = valid = true;
-														return false;
-													}
-												});
-												if ( !valid ) {
-													// remove invalid value, as it didn't match anything
-													\$( this ).val( "" );
-													select.val( "" );
-													return false;
-												}
-											}
-										}
-									})
-									.addClass( "ui-widget ui-widget-content ui-corner-left" );
-				
-								input.data( "autocomplete" )._renderItem = function( ul, item ) {
-									return \$( "<li></li>" )
-										.data( "item.autocomplete", item )
-										.append( "<a>" + item.label + "</a>" )
-										.appendTo( ul );
-								};
-				
-								\$( "<button>&nbsp;</button>" )
-									.attr( "tabIndex", -1 )
-									.attr( "title", "Show All Items" )
-									.insertAfter( input )
-									.button({
-										icons: {
-											primary: "ui-icon-triangle-1-s"
-										},
-										text: false
-									})
-									.removeClass( "ui-corner-all" )
-									.addClass( "ui-corner-right ui-button-icon" )
-									.click(function() {
-										// close if already visible
-										if ( input.autocomplete( "widget" ).is( ":visible" ) ) {
-											input.autocomplete( "close" );
-											return;
-										}
-				
-										// pass empty string as value to search for, displaying all results
-										input.autocomplete( "search", "" );
-										input.focus();
+					\$(document).ready(function() {
+						
+						\$("#${id}-suggest").autocomplete({
+							width: ${width},
+							minLength: ${minLength},
+							dataType: 'json',
+							highlight: true,
+							//selectFirst: true,
+							scroll: true,
+							autoFill: true,
+							//scrollHeight: 300,
+							//define callback to format results
+							source: function(req, add){
+							
+								var url = '${jsonUrl}';
+								\$.getJSON(url, req, function(data) {
+									var items = [];
+									\$.each(data, function(i, item) {
+										items.push(item);
 									});
+									add(items);
+								});
+							  },
+							focus: function(event, ui) {
+
+							},
+							change: function(event, ui) {
+							},
+							select: function(event, ui) {
+								//alert("selected " + ui.item.value + " " + ui.item.valueText);
+								\$('#${id}').val(ui.item.value);
+								\$('#${id}-suggest').val(ui.item.valueText);
+								return false;
 							}
 						});
-					})( jQuery );
-				
-					\$(function() {
-						\$( "#combobox" ).combobox();
-						\$( "#toggle" ).click(function() {
-							\$( "#combobox" ).toggle();
-						});
 					});
+					
 				</script>
-				
-				<div class="demo">
-					<div class="ui-widget">
-						<label>Your preferred programming language: </label>
-						<select id="combobox">
-							<option value="">Select one...</option>
-							<option value="ActionScript">ActionScript</option>
-							<option value="AppleScript">AppleScript</option>
-							<option value="Asp">Asp</option>
-							<option value="BASIC">BASIC</option>
-							<option value="C">C</option>
-							<option value="C++">C++</option>
-							<option value="Clojure">Clojure</option>
-							<option value="COBOL">COBOL</option>
-							<option value="ColdFusion">ColdFusion</option>
-							<option value="Erlang">Erlang</option>
-							<option value="Fortran">Fortran</option>
-							<option value="Groovy">Groovy</option>
-							<option value="Haskell">Haskell</option>
-							<option value="Java">Java</option>
-							<option value="JavaScript">JavaScript</option>
-							<option value="Lisp">Lisp</option>
-							<option value="Perl">Perl</option>
-							<option value="PHP">PHP</option>
-							<option value="Python">Python</option>
-							<option value="Ruby">Ruby</option>
-							<option value="Scala">Scala</option>
-							<option value="Scheme">Scheme</option>
-						</select>
-					</div>
-					<button id="toggle">Show underlying select</button>
-				</div><!-- End demo -->
+			</div>
+		""";
 			
-				<div class="demo-description">
-					<p>A custom widget built by composition of Autocomplete and Button. You can either type something into the field to get filtered suggestions based on your input, or use the button to get the full list of selections.</p>
-					<p>The input is read from an existing select-element for progressive enhancement, passed to Autocomplete with a customized source-option.</p>
-				</div><!-- End demo-description -->
-		"""
 		
-		out << html
-		
-		
-		
+		out << html;
 	}
+
 	
 	
 	
