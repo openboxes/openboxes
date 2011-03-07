@@ -101,7 +101,7 @@
 											</g:if>
 											<g:else>
 												<div>
-													${shipmentInstance?.mostRecentEvent?.eventType?.name}													
+													${shipmentInstance?.mostRecentEvent?.eventType?.eventCode?.name}													
 													<span class="fade"><g:prettyDateFormat date="${shipmentInstance.mostRecentEvent.eventDate}" /></span>
 												</div>
 											</g:else>											

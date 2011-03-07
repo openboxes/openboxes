@@ -134,6 +134,7 @@
 										<g:findAll in="${shipmentInstance?.referenceNumbers}" expr="it.referenceNumberType.id == referenceNumberType.id">
 											${it.identifier}
 										</g:findAll>			
+										</td>
 									</tr>
 								</g:each>
 								

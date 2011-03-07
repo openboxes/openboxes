@@ -55,12 +55,25 @@
 								</td>
 							</tr>
 							
+							<tr class="prop">
+								<td valign="top" class="name"><label>Ship Date</label></td>
+								<td valign="top" class="value">
+									<g:if test="shipmentInstance.hasShipped()">
+										<g:formatDate date="${shipmentInstance?.actualShippingDate}" format="MMM dd, yyyy"/>
+									</g:if>
+									<g:else>
+										<g:jqueryDatePicker id="shipDate" name="shipDate"
+											value="${new Date()}" format="MM/dd/yyyy"/>	
+									</g:else>
+								</td>
+							</tr>
+							
 							<g:if test="${!shipmentInstance.hasShipped()}">
 								<tr class="prop">
 									
 									<td valign="top" class="name"><label>Overview</label></td>
 									<td valign="top" class="value">
-										<p>By clicking <b>Send Shipment</b> below, you are autorizing that the  
+										<p>By clicking <b>Send Shipment</b> below, you are authorizing that the  
 										following inventory items will be sent from <b>${shipmentInstance?.origin?.name }</b>
 										to <b>${shipmentInstance?.destination?.name }</b>.  Upon submission, the following
 										actions will take place:

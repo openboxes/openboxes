@@ -34,8 +34,8 @@
 			 			<g:render template="editItem" model="['item':itemToEdit, 'addItemToContainerId':addItemToContainerId]"/>
 			 		</g:if>
 			 		
-					<div class="list" style="text-align: center;">
-					<table style="border: 0px solid #CCC; display: inline; clear: both" border="1">
+					<div class="dialog">
+					<table style="border: 1px solid #CCC;" border="0">
 						<thead>	
 							<tr>
 								<th>Item</th>
@@ -62,18 +62,15 @@
 									<td></td>
 									<td style="width:25%; text-align: left;">
 										<span nowrap>
-											<div>
 											<g:link action="createShipment" event="addItemToContainer" params="['container.id':containerInstance.id]">
 												<img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" alt="Add an item" style="vertical-align: middle"/>
-												&nbsp;Add an Item
+												&nbsp;add item
 											</g:link> 													
-											</div>
-											<div>
+											&nbsp;
 											<g:link action="createShipment" event="addBoxToContainer" params="['container.id':containerInstance.id]">
 												<img src="${createLinkTo(dir:'images/icons/silk',file:'package_add.png')}" alt="Add a box" style="vertical-align: middle"/>
-												&nbsp;Add a Box
+												&nbsp;add box
 											</g:link>
-											</div>
 										</span>
 									</td>
 								</tr>
@@ -99,7 +96,7 @@
 										</td>
 										<td style="text-align: left;">		
 											<g:link action="createShipment" event="deleteItem" params="['item.id':itemInstance?.id]">	<img src="${createLinkTo(dir:'images/icons/silk',file:'page_delete.png')}" alt="remove item" style="vertical-align: middle"/>
-												&nbsp;Remove this Item
+												&nbsp;remove item
 											</g:link>	
 										</td>
 									</tr>
@@ -119,18 +116,16 @@
 										<td></td>
 										<td></td>
 										<td style="text-align: left;">
-											<div>
-												<g:link action="createShipment" event="addItemToContainer" params="['container.id':boxInstance.id]">
-													<img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" alt="Add an item" style="vertical-align: middle"/>
-													&nbsp;Add an Item
-												</g:link> 		
-											</div>
-											<div>											
-												<g:link action="createShipment" event="deleteBox" params="['box.id':boxInstance?.id]">
-													<img src="${createLinkTo(dir:'images/icons/silk',file:'package_delete.png')}" alt="Add an item" style="vertical-align: middle"/>
-													&nbsp;Remove this Box
-												</g:link>														
-											</div>
+											<g:link action="createShipment" event="addItemToContainer" params="['container.id':boxInstance.id]">
+												<img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" alt="Add an item" style="vertical-align: middle"/>
+												&nbsp;add item
+											</g:link> 		
+											&nbsp;
+											
+											<g:link action="createShipment" event="deleteBox" params="['box.id':boxInstance?.id]">
+												<img src="${createLinkTo(dir:'images/icons/silk',file:'package_delete.png')}" alt="Add an item" style="vertical-align: middle"/>
+												&nbsp;remove box
+											</g:link>														
 										</td>
 									</tr>
 									
@@ -156,32 +151,25 @@
 											<td style="text-align: left;">		
 												<g:link action="createShipment" event="deleteItem" params="['item.id':itemInstance?.id]">
 													<img src="${createLinkTo(dir:'images/icons/silk',file:'page_delete.png')}" alt="remove item" style="vertical-align: middle"/>
-													&nbsp;Remove this item
+													&nbsp;remove item
 												</g:link>	
 											</td>
 										</tr>
 									</g:each>												
 								</g:each>
-							</tbody>	
-													
+							</tbody>							
 						</g:each>
 						<tfoot>
-							<tr style="border-top: 1px solid black;">
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td>
-									<nobr>
-										<g:each var="containerType" in="${shipmentWorkflow.containerTypes}">
-											<div>
-												<g:link action="createShipment" event="addContainer" params="[containerTypeToAddName:containerType.name]">
-													<img src="${createLinkTo(dir:'images/icons/shipmentType',file:containerType.name.toLowerCase() + '.jpg')}" style="vertical-align: middle"/>
-													&nbsp;Add a ${containerType.name}
-												</g:link>
-											</div>
-										</g:each>
-									</nobr>
+							<tr>
+								<td rowspan="4">
+								<nobr>
+									<g:each var="containerType" in="${shipmentWorkflow.containerTypes}">
+										<g:link action="createShipment" event="addContainer" params="[containerTypeToAddName:containerType.name]">
+											<img src="${createLinkTo(dir:'images/icons/shipmentType',file:containerType.name.toLowerCase() + '.jpg')}" style="vertical-align: middle"/>
+											&nbsp;Add a ${containerType.name}
+										</g:link>
+									</g:each>
+								</nobr>
 								</td>
 							</tr>
 						</tfoot>

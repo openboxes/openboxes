@@ -45,7 +45,7 @@
 										</tr>							
 										<tr class="prop">
 											<td valign="top" class="name"><label><g:message
-												code="shipment.name.label" default="Nickname" /></label>
+												code="shipment.name.label" default="Name" /></label>
 											</td>
 											<td colspan="3" valign="top"
 												class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">

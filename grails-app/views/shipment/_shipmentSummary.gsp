@@ -31,7 +31,7 @@
 								<td style="padding-left:20px;">
 									<g:if test="${shipmentInstance?.mostRecentEvent?.eventType }">
 										<span class="fade">
-											${shipmentInstance?.mostRecentEvent?.eventType?.name }
+											${shipmentInstance?.mostRecentEvent?.eventType?.eventCode?.status }
 											<b><g:relativeDate date="${shipmentInstance?.mostRecentEvent?.eventDate}"/></b>
 											(<g:formatDate format="MMM dd" date="${shipmentInstance?.mostRecentEvent?.eventDate}"/>)
 											

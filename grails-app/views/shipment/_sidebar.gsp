@@ -9,8 +9,7 @@
 						<th>Actions</th>
 					</tr>
 				</thead>
-				<tbody>
-				<g:if test="${session?.warehouse?.id == shipmentInstance?.origin?.id}">			
+				<tbody>		
 					<tr>
 						<td>
 							<g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}"><img
@@ -21,10 +20,11 @@
 							</g:link>
 							
 						</td>
-					</tr>				
+					</tr>	
+				<g:if test="${session?.warehouse?.id == shipmentInstance?.origin?.id}">				
 					<tr class="prop">
 						<td>
-							<g:link controller="createShipmentNew" action="createShipment" id="${shipmentInstance.id}"><img
+							<g:link controller="createShipmentWorkflow" action="createShipment" id="${shipmentInstance.id}"><img
 							src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}"
 							alt="Edit Suitcase" style="vertical-align: middle" /> &nbsp; 
 								<g:if test="${request.request.requestURL.toString().contains('createShipment')}"><b>edit shipment</b></g:if>
@@ -85,16 +85,18 @@
 					</td>
 				</tr>
 			</g:if>
-			<tr class="prop">
-				<td>
-					<g:link controller="shipment" action="deleteShipment" id="${shipmentInstance.id}"><img
-					src="${createLinkTo(dir:'images/icons',file:'trash.png')}"
-					alt="Receive Shipment" style="vertical-align: middle" /> &nbsp; 
-						<g:if test="${request.request.requestURL.toString().contains('deleteShipment')}"><b>delete shipment</b></g:if>
-						<g:else>delete shipment</g:else>
-					</g:link>				
-				</td>
-			</tr>
+			<g:if test="${session?.warehouse?.id == shipmentInstance?.origin?.id}">	
+				<tr class="prop">
+					<td>
+						<g:link controller="shipment" action="deleteShipment" id="${shipmentInstance.id}"><img
+						src="${createLinkTo(dir:'images/icons',file:'trash.png')}"
+						alt="Receive Shipment" style="vertical-align: middle" /> &nbsp; 
+							<g:if test="${request.request.requestURL.toString().contains('deleteShipment')}"><b>delete shipment</b></g:if>
+							<g:else>delete shipment</g:else>
+						</g:link>				
+					</td>
+				</tr>
+			</g:if>
 			</tbody>
 		</table>
 	</fieldset>
@@ -161,11 +163,11 @@
 			<g:each in="${shipmentInstance.events}" var="event" status="i">				
 				<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 					<td nowrap="nowrap">						
-						<span style="font-size: 0.9em; color: #aaa;"><g:formatDate format="MMM dd" date="${event.eventDate}"/></span>						
+						<span style="font-size: 0.9em; color: #aaa;"><g:formatDate format="dd/MMM" date="${event.eventDate}"/></span>						
 					</td>
 					<td>
 						<span style="font-size: 0.9em; color: #aaa;">
-							<b>${event?.eventType?.name}</b> at ${event?.eventLocation?.name}
+							<b>${event?.eventType?.eventCode?.name}</b> at ${event?.eventLocation?.name}
 						</span>
 					</td>
 				</tr>
@@ -173,5 +175,4 @@
 		</table>
 	</fieldset>
 </div>
-
 

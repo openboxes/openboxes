@@ -77,7 +77,7 @@
 			</li>				
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="createShipmentNew" action="index"><g:message code="suitcase.add.label" default="Add Shipment"/></g:link>
+					<g:link class="bullet" controller="createShipmentWorkflow" action="index"><g:message code="suitcase.add.label" default="Add Shipment"/></g:link>
 				</span>
 			</li>					
 			<!-- 			

@@ -169,7 +169,7 @@
                             		<g:if test="${shipmentInstance?.shipmentStatus}">${fieldValue(bean: shipmentInstance, field: "shipmentStatus.name")}</g:if>
                             		<g:else>No status</g:else>
 	                            </td>
-	                            <td style="vertical-align: middle; text-align: center;" nowrap="true"><g:formatDate date="${shipmentInstance.expectedShippingDate}" format="dd MMM yyyy" /></td>
+	                            <td style="vertical-align: middle; text-align: center;" nowrap="true"><g:formatDate date="${shipmentInstance.expectedShippingDate}" format="dd/MMM/yyyy" /></td>
 	                            <td style="vertical-align: middle; text-align: center;">${fieldValue(bean: shipmentInstance, field: "trackingNumber")}</td>
 	                            <td style="vertical-align: middle; text-align: center;">${fieldValue(bean: shipmentInstance, field: "origin")}</td>
 	                            <td style="vertical-align: middle; text-align: center;">${fieldValue(bean: shipmentInstance, field: "destination")}</td>

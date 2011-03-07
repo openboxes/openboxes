@@ -142,7 +142,7 @@
 									<tr id="event-${event.id}" class="${(i % 2) == 0 ? 'odd' : 'even'}">
 										<td><img src="${createLinkTo(dir:'images/icons',file:'event.png')}" alt="Event" /></td>
 										<td><g:formatDate format="yyyy-MM-dd hh:mm:ss" date="${event?.eventDate}"/></td>
-										<td>${event?.eventType?.name}</td>
+										<td>${event?.eventType?.eventCode?.name}</td>
 										<td>${event?.eventLocation?.name}</td>
 										<%-- 
 										<td>${event?.targetLocation?.name}</td>

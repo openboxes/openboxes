@@ -174,7 +174,8 @@ class ShipmentController {
 		}
 		else {
 			def eventTypes =  org.pih.warehouse.core.EventType.list();
-			[shipmentInstance: shipmentInstance, shippingEventTypes : eventTypes]
+			def shipmentWorkflow = shipmentService.getShipmentWorkflow(shipmentInstance)
+			[shipmentInstance: shipmentInstance, shipmentWorkflow: shipmentWorkflow, shippingEventTypes : eventTypes]
 		}
 	}
 	
@@ -217,7 +218,8 @@ class ShipmentController {
 					redirect(action: "showDetails", id: shipmentInstance?.id)
 				}
 			}
-			render(view: "sendShipment", model: [shipmentInstance: shipmentInstance])
+			def shipmentWorkflow = shipmentService.getShipmentWorkflow(shipmentInstance)
+			render(view: "sendShipment", model: [shipmentInstance: shipmentInstance, shipmentWorkflow: shipmentWorkflow])
 		}
 	}
 	
@@ -265,6 +267,7 @@ class ShipmentController {
 					redirect(action: "showDetails", id: shipmentInstance?.id)
 					return;
 				}
+				redirect(controller:"shipment", action : "showDetails", params : [ "id" : shipmentInstance.id ?: '' ])
 			}
 			else { 
 				// Instantiate the model class to be used 

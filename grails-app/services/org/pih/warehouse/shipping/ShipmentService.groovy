@@ -359,8 +359,11 @@ class ShipmentService {
 		return shipmentList;		
 	}
 	
+	void sendShipment(Shipment shipmentInstance, String comment, User userInstance, Location locationInstance) {
+		sendShipment(shipmentInstance, comment, userInstance, locationInstance, new Date())
+	}
 	
-	void sendShipment(Shipment shipmentInstance, String comment, User userInstance, Location locationInstance) { 
+	void sendShipment(Shipment shipmentInstance, String comment, User userInstance, Location locationInstance, Date shipDate) { 
 		log.info "sending shipment";
 		try { 
 			// don't allow the shipment to go out if it has errors, or if this shipment has already been shipped
@@ -374,7 +377,7 @@ class ShipmentService {
 				// Add a Shipped event to the shipment
 				EventType eventType = EventType.findByEventCode(EventCode.SHIPPED)
 				if (eventType) {					
-					createShipmentEvent(shipmentInstance, new Date(), eventType, locationInstance);
+					createShipmentEvent(shipmentInstance, shipDate, eventType, locationInstance);
 				}
 				else {
 					throw new RuntimeException("System could not find event type 'Shipped'")

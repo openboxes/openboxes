@@ -6,7 +6,7 @@ import org.pih.warehouse.inventory.Warehouse;
 
 import sun.util.logging.resources.logging;
 
-class CreateShipmentNewController {
+class CreateShipmentWorkflowController {
 	
 	ShipmentService shipmentService
 	
@@ -18,7 +18,7 @@ class CreateShipmentNewController {
     	
     	start {
     		action {
-    			log.info("starting create shipment workflow")
+    			log.info("starting shipment workflow")
     			
     			// create a new shipment instance if we don't have one already
     			if (!flow.shipmentInstance) { 
@@ -126,7 +126,7 @@ class CreateShipmentNewController {
     		
     		on("next") {
 				shipmentService.saveShipment(flow.shipmentInstance)	
-			}.to("reviewShipment")
+			}.to("showDetails")
 			
 			on("save") {
 				shipmentService.saveShipment(flow.shipmentInstance)	
@@ -364,6 +364,9 @@ class CreateShipmentNewController {
     		on("invalid").to("enterContainerDetails")
     	}
     	
+    	
+    	/**
+    	
     	reviewShipment {
     		on("back").to("enterContainerDetails")	
     		on("next").to("sendShipment")
@@ -396,7 +399,7 @@ class CreateShipmentNewController {
     		action {
 				def userInstance = User.get(session.user.id);
 				def warehouseInstance = Warehouse.get(session.warehouse.id)
-				shipmentService.sendShipment(flow.shipmentInstance, params.comment, userInstance, warehouseInstance);
+				shipmentService.sendShipment(flow.shipmentInstance, params.comment, userInstance, warehouseInstance, params.shipDate ? params.shipDate : new Date());
 				if (flow.shipmentInstance.hasErrors() || !flow.shipmentInstance.validate()) { 
 					invalid();
 				}
@@ -413,8 +416,19 @@ class CreateShipmentNewController {
     		on("done").to("finish")
     	}
     	
+    	*/
+    	
+    	showDetails {
+    		redirect(controller:"shipment", action : "showDetails", params : [ "id" : flow.shipmentInstance.id ?: '' ])
+    	}
+    	
     	finish {
-    		redirect(controller:"shipment", action : "listShipping")
+    		if (flow.shipmentInstance.id) {
+    			redirect(controller:"shipment", action : "showDetails", params : [ "id" : flow.shipmentInstance.id ?: '' ])
+    		}
+    		else {
+    			redirect(controller:"shipment", action : "listShipping")
+    		}
     	}
     }
 	

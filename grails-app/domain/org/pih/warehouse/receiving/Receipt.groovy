@@ -1,11 +1,12 @@
 package org.pih.warehouse.receiving
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.shipping.Shipment;
 
-class Receipt {
+class Receipt implements Serializable {
 
 	Date expectedDeliveryDate			 
 	Date actualDeliveryDate				 

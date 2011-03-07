@@ -90,7 +90,7 @@
 									</g:if>
 									<g:else>
 										Confirmed by ${transactionInstance?.confirmedBy?.name } on
-										${formatDate(date: transactionInstance?.dateConfirmed, format: 'dd MMM yyyy') }
+										${formatDate(date: transactionInstance?.dateConfirmed, format: 'dd/MMM/yyyy') }
 									</g:else>									
 								</span>
 							</li>

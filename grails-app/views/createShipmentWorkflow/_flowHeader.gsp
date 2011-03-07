@@ -7,21 +7,23 @@
 		<g:if test="${shipmentInstance?.id}">
 			<table border="0" style="color: #ccc">
 				<tr>
-					<td width="20%" style="text-align:center" nowrap class="${currentState=='Details'?'currentState':''}">
+					<td width="33%" style="text-align:center" nowrap class="${currentState=='Details'?'currentState':''}">
 						<g:link action="createShipment" event="enterShipmentDetails">1. Details</g:link>
 					</td>
 					<td rowspan="2" style="vertical-align: middle">
 						<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_go.png')}" style="vertical-align: middle;"/>
 					</td>
-					<td width="20%" style="text-align:center" nowrap class="${currentState=='Traveler'?'currentState':''}">
+					<td width="34%" style="text-align:center" nowrap class="${currentState=='Traveler'?'currentState':''}">
 						<g:link action="createShipment" event="enterTrackingDetails" >2. Tracking</g:link>
 					</td>
 					<td rowspan="2" style="vertical-align: middle">
 						<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_go.png')}" style="vertical-align: middle;"/>
 					</td>
-					<td width="20%" style="text-align:center" nowrap class="${currentState=='Pack'?'currentState':''}">
+					<td width="33%" style="text-align:center" nowrap class="${currentState=='Pack'?'currentState':''}">
 						<g:link action="createShipment" event="enterContainerDetails">3. Pack</g:link>
 					</td>
+					
+					<!-- 
 					<td rowspan="2" style="vertical-align: middle">
 						<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_go.png')}" style="vertical-align: middle;"/>
 					</td>
@@ -34,6 +36,8 @@
 					<td width="20%" style="text-align:center" nowrap class="${currentState=='Ship'?'currentState':''}">
 						<g:link action="createShipment" event="sendShipment">5. Ship</g:link>
 					</td>
+					-->
+					
 				</tr>
 			</table>
 		</g:if>

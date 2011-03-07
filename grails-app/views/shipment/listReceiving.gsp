@@ -21,7 +21,7 @@
 				<g:if test="${shipmentInstanceMap.size()==0}">
             		<div class="message">
             			<g:if test="${eventType?.name}">
-            				There are no shipments with event type <b>${eventType?.name}</b>.
+            				There are no shipments with status <b>${eventType?.eventCode?.status}</b>.
             			</g:if>
             			<g:else>
     		        		There are no shipments matching your conditions.
@@ -60,7 +60,7 @@
 											${fieldValue(bean: shipmentInstance, field: "origin.name")}
 										</td>
 										<td width="10%">												
-											${shipmentInstance?.mostRecentEvent?.eventType?.name} - <g:formatDate format="MM/dd/yyyy" date="${shipmentInstance?.mostRecentEvent?.eventDate}"/>									
+											${shipmentInstance?.mostRecentEvent?.eventType?.eventCode?.status} - <g:formatDate format="dd/MMM/yyyy" date="${shipmentInstance?.mostRecentEvent?.eventDate}"/>									
 										</td>
 										<td width="15%">
 											<g:if test="${!shipmentInstance.documents}"><span class="fade">(empty)</span></g:if>
