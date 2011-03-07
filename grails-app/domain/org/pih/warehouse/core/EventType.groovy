@@ -30,7 +30,7 @@ class EventType implements Comparable, Serializable {
 		
 		dateCreated(display:false)
 		lastUpdated(display:false)
-		status(display:false)
+		
 		optionValue(display:false)		
 	}
 	
