@@ -1,6 +1,7 @@
 package org.pih.warehouse.shipping;
 
 import java.util.Date;
+import org.pih.warehouse.core.Constants;
 import org.pih.warehouse.core.Person;
 
 class Container implements Comparable, java.io.Serializable {
@@ -11,16 +12,16 @@ class Container implements Comparable, java.io.Serializable {
 
 	
 	String name	
-	String containerNumber				// An official container number (if it exists)
-	String description					// Description of contents
-	Person recipient					// Person who is assigned to receive the container
-	Integer sortOrder					// 
-	Float height;						// height of container
-	Float width;						// width of container
-	Float length;						// length of container 
-	String volumeUnits					// standard dimensional unit: cm, in, ft, 	
-	Float weight						// weight of container
-	String weightUnits					// standard weight unit: kg, lb
+	String containerNumber									// An official container number (if it exists)
+	String description										// Description of contents
+	Person recipient										// Person who is assigned to receive the container
+	Integer sortOrder										// 
+	Float height;											// height of container
+	Float width;											// width of container
+	Float length;											// length of container 
+	String volumeUnits	= Constants.DEFAULT_VOLUME_UNITS	// standard dimensional unit: cm, in, ft, 	
+	Float weight											// weight of container
+	String weightUnits  = Constants.DEFAULT_WEIGHT_UNITS	// standard weight unit: kg, lb 
 	Date dateCreated;
 	Date lastUpdated;
 	
