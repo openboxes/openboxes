@@ -15,6 +15,8 @@
 				<div class="message">${flash.message}</div>
             </g:if>
 
+			<h1>Shipments originating at ${session.warehouse.name}</h1>
+
             <div class="list">
 				<g:if test="${shipmentInstanceMap.size()==0}">
             		<div class="message">
@@ -26,7 +28,7 @@
 	            		</g:else>
             		</div>
             	</g:if>
-            
+
 				<g:each var="entry" in="${shipmentInstanceMap}">	                    
 					<h2><b>${entry.key.name}</b> Shipments (${entry.value.objectList.size})</h2>
 						      
@@ -38,8 +40,8 @@
 	                            <g:sortableColumn property="destination" title="${message(code: 'shipment.destination.label', default: 'Destination')}" />
 	                        	<g:sortableColumn property="expectedShippingDate"  title="${message(code: 'shipment.expectedShippingDate.label', default: 'Expected Shipping Date')}" />
 	                         	<!-- include actual shipping date? -->
-	                            <g:sortableColumn property="status" title="${message(code: 'shipment.status.label', default: 'Status')}" />                            
-	                            <g:sortableColumn property="documents" title="${message(code: 'shipment.documents.label', default: 'Documents')}" />                       
+	                         	<th><a href="">${message(code: 'shipment.status.label', default: 'Status')}</a></th>
+	                         	<th><a href="">${message(code: 'shipment.documents.label', default: 'Documents')}</a></th>
 	                        </tr>
 	                    </thead>
 	                   

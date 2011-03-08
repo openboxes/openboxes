@@ -238,7 +238,7 @@
 																			<img src="${createLinkTo(dir:'images/icons/silk',file:'disk.png')}" alt="Download" style="vertical-align: middle"/>													
 																		</g:link>
 																		&nbsp;
-																		<g:link class="remove" action="deleteDocument" id="${document?.id}" params="[shipmentId:shipmentInstance.id]">
+																		<g:link class="remove" action="deleteDocument" id="${document?.id}" params="[shipmentId:shipmentInstance.id]" onclick="return confirm('Are you sure you want to delete this document?')">
 																			<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" style="vertical-align: middle"/>
 																		</g:link>																		
 																		
@@ -283,7 +283,7 @@
 																	
 																	</td>																		
 																	<td style="text-align: right">
-																		<g:link class="remove" action="deleteComment" id="${comment?.id}" params="[shipmentId:shipmentInstance.id]">
+																		<g:link class="remove" action="deleteComment" id="${comment?.id}" params="[shipmentId:shipmentInstance.id]" onclick="return confirm('Are you sure you want to delete this note?')">
 																			<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" style="vertical-align: middle"/>
 																		</g:link>	
 																	</td>
@@ -293,8 +293,8 @@
 													</table>												
 												</g:if> 
 												<a href="${createLink(controller: "shipment", action: "addComment", id: shipmentInstance.id)}">
-													<button><img src="${createLinkTo(dir:'images/icons/silk',file:'comment_add.png')}" 
-																alt="Add Notes" style="vertical-align: middle"/> Add Comment</button></a>													
+													<button><!--  <img src="${createLinkTo(dir:'images/icons/silk',file:'comment_add.png')}" 
+																alt="Add Notes" style="vertical-align: middle"/> --> Add Note</button></a>													
 																									
 											</div>
 										</td>
@@ -333,7 +333,7 @@
 																		--%>																			
 																	</td>
 																	<td style="text-align: right">
-																		<g:link class="remove" action="deleteEvent" id="${event?.id}" params="[shipmentId:shipmentInstance.id]">
+																		<g:link class="remove" action="deleteEvent" id="${event?.id}" params="[shipmentId:shipmentInstance.id]" onclick="return confirm('Are you sure you want to delete this event?')">
 																			<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" style="vertical-align: middle"/>
 																		</g:link>	
 																	</td>
@@ -369,7 +369,7 @@
 															<tr>
 																<th>Package</th>
 																<th>Qty</th>
-																<th>Lot Number</th>
+																<th>Lot/Serial No</th>
 																<th>Recipient</th>
 																<th width="10%"></th>
 															</tr>

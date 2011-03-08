@@ -19,6 +19,9 @@
 						.selected { disabled: true; }
 					</style>
 				
+					<h1>Shipments originating at ${session.warehouse.name}</h1>
+					<br/>
+				
 					<label>Group by:</label>
 					
 					<g:if test="${params.groupBy=='expectedShippingDate'}">
@@ -68,8 +71,8 @@
 								<g:sortableColumn property="shipmentType" title="${message(code: 'shipment.shipmentType.label', default: 'Type')}" />
 	                            <g:sortableColumn property="shipmentNumber" title="${message(code: 'shipment.shipmentNumber.label', default: 'Shipment')}" />								
 	                            <g:sortableColumn property="destination" title="${message(code: 'shipment.destination.label', default: 'Destination')}" />
-	                            <g:sortableColumn property="status" title="${message(code: 'shipment.status.label', default: 'Status')}" />                            
-	                            <g:sortableColumn property="documents" title="${message(code: 'shipment.documents.label', default: 'Documents')}" />                              
+	                       		<th><a href="">${message(code: 'shipment.status.label', default: 'Status')}</a></th>
+	                         	<th><a href="">${message(code: 'shipment.documents.label', default: 'Documents')}</a></th>                   
 	                        </tr>
 	                    </thead>
 	                   

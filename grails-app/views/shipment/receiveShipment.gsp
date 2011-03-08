@@ -46,17 +46,7 @@
 													valueId="${receiptInstance?.recipient?.id}"
 													valueName="${receiptInstance?.recipient?.email}"/>	
 											</td>
-										</tr>																
-										<tr class="prop">
-											<td valign="top" class="name"><label><g:message
-												code="receipt.expectedDeliveryDate.label" default="Expected On" /></label></td>
-											<td valign="top"
-												class=" ${hasErrors(bean: receiptInstance, field: 'expectedDeliveryDate', 'errors')}"
-												nowrap="nowrap">
-													<g:jqueryDatePicker name="expectedDeliveryDate" 
-														value="${receiptInstance?.expectedDeliveryDate}" format="MM/dd/yyyy"/>
-											</td>
-										</tr>							
+										</tr>																						
 										<tr class="prop">
 											<td valign="top" class="name"><label><g:message
 												code="receipt.actualDeliveryDate.label" default="Delivered On" /></label></td>

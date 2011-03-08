@@ -376,7 +376,7 @@
 									<table id="inventoryItemsTable" style="border: 0px solid lightgrey" border="0">
 										<thead>
 											<tr>	
-												<th>Lot/Serial #</th>
+												<th>Lot/Serial No</th>
 												<th>Expires</th>
 												<th>Description</th>
 												<th style="text-align:center;">Old Qty</th>

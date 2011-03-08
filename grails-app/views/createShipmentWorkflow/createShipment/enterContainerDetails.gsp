@@ -40,7 +40,7 @@
 							<tr>
 								<th>Item</th>
 								<th>Qty</th>
-								<th>Lot/Serial #</th>
+								<th>Lot/Serial No</th>
 								<th>Recipient</th>
 								<th>Actions</th>
 							</tr>

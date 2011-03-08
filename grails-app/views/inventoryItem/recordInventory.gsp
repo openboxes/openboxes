@@ -154,7 +154,7 @@
 									<thead>
 										<tr>
 											<th>ID</th>
-											<th>Lot/Serial #</th>
+											<th>Lot/Serial No</th>
 											<th>Expires</th>
 											<th>Description</th>
 											<th>Qty</th>

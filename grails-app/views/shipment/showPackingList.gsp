@@ -44,7 +44,7 @@
 									<th>Dimensions</th>
 									<th>Weight</th>
 									<th>Item</th>
-									<th>Serial No.</th>										
+									<th>Lot/Serial No</th>										
 								</tr>				
 								
 								<g:set var="counter" value="${0 }"/>
