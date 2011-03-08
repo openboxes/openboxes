@@ -19,8 +19,7 @@
 			<g:hiddenField name="version" value="${shipmentInstance?.version}" />
 	
 			<div class="">
-				<g:submitButton name="back" value="Back"></g:submitButton>
-				<g:submitButton name="refresh" value="Refresh"></g:submitButton>
+				<g:link action="showDetails" params="${[id:shipmentInstance.id]}">Back</g:link>
 				<a href="javascript:window.print()">Print</a>
 			</div>	
 		
@@ -29,11 +28,11 @@
 
 				<p>To Whom It May Concern:</p>
 
-				<p>This letter is to certify that the luggage carried by ${session.user.name} contains humanitarian donations for Haiti. 
-				<b>${session.user.name}</b> is an employee of Partners In Health. The items <b>${session.user.name}</b> is carrying constitute a charitable donation 
+				<p>This letter is to certify that the luggage carried by ${shipmentInstance?.carrier?.name} contains humanitarian donations for Haiti. 
+				<b>${shipmentInstance?.carrier?.name}</b> is an employee of Partners In Health. The items <b>${shipmentInstance?.carrier?.name}</b> is carrying constitute a charitable donation 
 				from Partners In Health to Haiti.</p>			
 
-				<p>The contents of <b>${session.user.name}</b>'s luggage include:</p>
+				<p>The contents of <b>${shipmentInstance?.carrier?.name}</b>'s luggage include:</p>
 
 				<div style="padding-left: 50px;">					
 					<g:each var="itemInstance" in="${shipmentInstance?.allShipmentItems}">
@@ -47,7 +46,8 @@
 
 				<p>Sincerely,</p>
 
-				<img src="${createLinkTo(dir: 'images/', file: 'signature.jpg') }" border="0"/>
+				<!--  note that we are scaling the image to width=200 -->
+				<img src="${createLinkTo(dir: 'images/signatures', file: 'joiamukherjee.jpg') }" border="0" width="200"/>   
 
 				<p>Joia Mukherjee<br/>
 				Medical Director, Partners In Health</p>

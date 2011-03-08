@@ -201,6 +201,21 @@
 										</tr>
 									</g:if>
 									
+									<g:if test="${shipmentWorkflow?.documentTemplate}">
+										<tr class="prop">
+											<td valign="top" class="name">
+												<label><g:message code="shipment.templates.label" default="Templates" /></label><br/>
+											</td>
+											<td valign="top" class="">
+													<a href="${createLink(controller: "shipment", action: "generateDocuments", id: shipmentInstance.id)}">
+													<button>Generate Documents from Template</button></a>
+											</td>
+											<td>
+												&nbsp;
+											</td>
+										</tr>
+									</g:if>
+									
 									<tr class="prop">
 										<td class="name">
 											<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="document" style="vertical-align: middle"/>
@@ -249,9 +264,7 @@
 													</table>
 												</g:if>												
 												<a href="${createLink(controller: "shipment", action: "addDocument", id: shipmentInstance.id)}">
-													<button><img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" 
-																alt="Add Document" style="vertical-align: middle"/> Add Document</button></a>													
-												
+													<button>Upload an Existing Document</button></a>												
 											</div>
 										</td>					
 									</tr>

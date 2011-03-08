@@ -2698,6 +2698,21 @@
 	</changeSet>
 	
 	
+	<changeSet author="mgoodrich" id="2011-03-08-1">
+        <preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="shipment_workflow" columnName="document_template"/></not>
+		</preConditions>
+			<addColumn tableName="shipment_workflow">
+			  <column name="document_template" type="varchar(255)">
+			  	<constraints nullable="true"/>
+			  </column>
+			</addColumn>
+			<update tableName="shipment_workflow">
+				<column name="document_template" value="suitcaseLetter" />
+ 		    <where>id = 3</where>
+		</update>	
+	</changeSet>
+	
 <!--
     <changeSet author="jmiranda (generated)" id="1297432141595-4">
         <preConditions onFail="MARK_RAN">

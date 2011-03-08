@@ -8,6 +8,7 @@ class ShipmentWorkflow implements Serializable {
 	String name					// user-defined name of the workflow
 	ShipmentType shipmentType  	// the shipment type this workflow is associated with
 	String excludedFields   	// comma-delimited (with no spaces) list of Shipment fields to exclude in this workflow
+	String documentTemplate		// the template to use when auto-generating documents for this workflow
 	
 	// Audit fields
 	Date dateCreated
@@ -25,6 +26,7 @@ class ShipmentWorkflow implements Serializable {
 		name(nullable:false, blank: false)
 		shipmentType(nullable:false, unique:true)  // for now, we are only allowing one workflow per shipment type, though we may want to change this
 		excludedFields(nullable:true)
+		documentTemplate(nullable:true)
 		dateCreated(blank:true)
 		lastUpdated(blank:true)
 		

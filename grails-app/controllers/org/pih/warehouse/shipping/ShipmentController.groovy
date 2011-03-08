@@ -46,7 +46,7 @@ class ShipmentController {
 		}		
 		//return [shipmentInstance: shipmentInstance]
 		render(view: "create", model: [ shipmentInstance : shipmentInstance,
-			warehouses : Warehouse.list(), eventTypes : EventType.list()]);
+		warehouses : Warehouse.list(), eventTypes : EventType.list()]);
 	}
 	
 	def save = {
@@ -66,7 +66,7 @@ class ShipmentController {
 		else {
 			//redirect(action: "create", model: [shipmentInstance: shipmentInstance], params: [type:params.type])
 			render(view: "create", model: [shipmentInstance : shipmentInstance,
-				warehouses : Warehouse.list(), eventTypes : EventType.list()]);
+			warehouses : Warehouse.list(), eventTypes : EventType.list()]);
 		}
 	}
 	
@@ -261,7 +261,7 @@ class ShipmentController {
 		else {			
 			if ("POST".equalsIgnoreCase(request.getMethod())) {				
 				shipmentService.receiveShipment(shipmentInstance, receiptInstance, params.comment, session.user, session.warehouse);
-
+				
 				if (!shipmentInstance.hasErrors()) {
 					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 					redirect(action: "showDetails", id: shipmentInstance?.id)
@@ -386,20 +386,22 @@ class ShipmentController {
 	def listReceiving = { 
 		def currentLocation = Location.get(session.warehouse.id);
 		def shipments = params.sort ? shipmentService.getAllShipments(params.sort, params.order) : 
-							   			shipmentService.getAllShipments('expectedShippingDate','asc')  // probably could default on something better than this
+		shipmentService.getAllShipments('expectedShippingDate','asc')  // probably could default on something better than this
 		
 		// filter by destination location
-		shipments = shipments.findAll( {it.destination == currentLocation} )
-							   		
+		shipments = shipments.findAll( {it.destination == currentLocation
+		} )
+		
 		// filter by event status
 		if (params.eventCode) {
-			shipments = shipments.findAll( { it.mostRecentEvent?.eventType?.eventCode == EventCode.valueOf(params.eventCode) } )		
+			shipments = shipments.findAll( { it.mostRecentEvent?.eventType?.eventCode == EventCode.valueOf(params.eventCode)
+			} )		
 		}	
 		
 		[
-			shipmentInstanceMap : shipmentService.getShipmentsByStatus(shipments),
-			shipmentInstanceList : shipments,
-			shipmentInstanceTotal : shipments.size(),
+		shipmentInstanceMap : shipmentService.getShipmentsByStatus(shipments),
+		shipmentInstanceList : shipments,
+		shipmentInstanceTotal : shipments.size(),
 		]
 	}
 	
@@ -407,49 +409,56 @@ class ShipmentController {
 		def currentLocation = Location.get(session.warehouse.id);
 		
 		def outgoingShipments = params.sort ? shipmentService.getAllShipments(params.sort, params.order) : 
-   			shipmentService.getAllShipments('expectedShippingDate','asc')  // probably could default on something better than this
-
-   		// filter by origin location
-   		outgoingShipments = outgoingShipments.findAll( {it.origin == currentLocation} )
-
+		shipmentService.getAllShipments('expectedShippingDate','asc')  // probably could default on something better than this
+		
+		// filter by origin location
+		outgoingShipments = outgoingShipments.findAll( {it.origin == currentLocation
+		} )
+		
 		def formatter = new PrettyTime();		
 		def groupBy = (params.groupBy) ? params.groupBy : "lastUpdated";
 		
-		outgoingShipments = outgoingShipments.sort { it[groupBy] }.reverse();
-		def shipmentInstanceMap = outgoingShipments.groupBy { it[groupBy] ? formatter.format(it[groupBy]) : "Empty" }
+		outgoingShipments = outgoingShipments.sort { it[groupBy]
+		}.reverse();
+		def shipmentInstanceMap = outgoingShipments.groupBy { it[groupBy] ? formatter.format(it[groupBy]) : "Empty"
+		}
 		render(view: "listShippingByDate", model: [ shipmentInstanceMap : shipmentInstanceMap ]);		
 	}
-
+	
 	def listShippingByType = {
 		def currentLocation = Location.get(session.warehouse.id);
 		def outgoingShipments = shipmentService.getShipmentsByOrigin(currentLocation);		
-		outgoingShipments = outgoingShipments.sort { it.lastUpdated }.reverse();
-		def shipmentInstanceMap = outgoingShipments.groupBy { it.shipmentType }
+		outgoingShipments = outgoingShipments.sort { it.lastUpdated
+		}.reverse();
+		def shipmentInstanceMap = outgoingShipments.groupBy { it.shipmentType
+		}
 		render (view: "listShippingByDate", model: [ shipmentInstanceMap : shipmentInstanceMap ]);
 	}
-
+	
 	def listShipping = {	
-			
+		
 		def currentLocation = Location.get(session.warehouse.id);
 		def shipments = params.sort ? shipmentService.getAllShipments(params.sort, params.order) : 
-							   			shipmentService.getAllShipments('expectedShippingDate','asc')
+		shipmentService.getAllShipments('expectedShippingDate','asc')
 		
 		// filter by origin location
-		shipments = shipments.findAll( {it.origin == currentLocation} )
-							   		
+		shipments = shipments.findAll( {it.origin == currentLocation
+		} )
+		
 		// filter by event status
 		if (params.eventCode) {
-			shipments = shipments.findAll( { it.mostRecentEvent?.eventType?.eventCode == EventCode.valueOf(params.eventCode) } )		
+			shipments = shipments.findAll( { it.mostRecentEvent?.eventType?.eventCode == EventCode.valueOf(params.eventCode)
+			} )		
 		}	
 		
 		[
-			shipmentInstanceMap : shipmentService.getShipmentsByStatus(shipments),
-			shipmentInstanceList : shipments,
-			shipmentInstanceTotal : shipments.size(),
+		shipmentInstanceMap : shipmentService.getShipmentsByStatus(shipments),
+		shipmentInstanceList : shipments,
+		shipmentInstanceTotal : shipments.size(),
 		]
 		
 	}
-		
+	
 	
 	def list = { 
 		def browseBy = params.id;
@@ -485,8 +494,8 @@ class ShipmentController {
 		}			
 		
 		[ 	results : results, shipmentInstanceList : shipmentInstanceList,
-			shipmentInstanceTotal : allShipments.size(), shipmentListByStatus : shipmentListByStatus,
-			incomingShipmentCount : incomingShipments.size(), outgoingShipmentCount : outgoingShipments.size()
+		shipmentInstanceTotal : allShipments.size(), shipmentListByStatus : shipmentListByStatus,
+		incomingShipmentCount : incomingShipments.size(), outgoingShipmentCount : outgoingShipments.size()
 		]
 	}
 	
@@ -529,10 +538,10 @@ class ShipmentController {
 			}			
 			if (!found) { 			
 				shipmentItem = new ShipmentItem(product: product, 
-					quantity: quantity, 
-					serialNumber: params.serialNumber, 
-					recipient: recipient,
-					container: containerInstance);
+				quantity: quantity, 
+				serialNumber: params.serialNumber, 
+				recipient: recipient,
+				container: containerInstance);
 				
 				//container.addToShipmentItems(shipmentItem).save(flush:true);
 				container.addToShipmentItems(shipmentItem).save(flush:true);
@@ -644,11 +653,11 @@ class ShipmentController {
 				
 				container.shipmentItems.each { 
 					def shipmentItemCopy = new ShipmentItem(
-						product: it.product, 
-						quantity: it.quantity, 
-						serialNumber: it.serialNumber, 
-						recipient: it.recipient,
-						container: containerCopy);
+					product: it.product, 
+					quantity: it.quantity, 
+					serialNumber: it.serialNumber, 
+					recipient: it.recipient,
+					container: containerCopy);
 					//containerCopy.addToShipmentItems(shipmentItemCopy).save(flush:true);
 					containerCopy.shipment.addToShipmentItems(shipmentItem).save(flush:true);
 				}    		
@@ -871,8 +880,8 @@ class ShipmentController {
 		log.info "parameters: " + params
 		
 		[shipmentInstance : Shipment.get(params.id), 
-			containerInstance : Container.get(params?.containerId),
-			itemInstance : new ShipmentItem() ]
+		containerInstance : Container.get(params?.containerId),
+		itemInstance : new ShipmentItem() ]
 	}
 	
 	def addReferenceNumber = { 		
@@ -889,6 +898,19 @@ class ShipmentController {
 	
 	def view = {
 		// pass through to "view shipment" page
+	}
+	
+	def generateDocuments = {
+		def shipmentInstance = Shipment.get(params.id)
+		def shipmentWorkflow = shipmentService.getShipmentWorkflow(shipmentInstance)
+		
+		if (shipmentWorkflow.documentTemplate) {
+			render (view: "templates/$shipmentWorkflow.documentTemplate", model: [shipmentInstance : shipmentInstance])
+		}
+		else {
+			// just go back to the show details page if there is no templaet associated with this shipment workflow
+			redirect(action: "showDetails", params : [ 'id':shipmentInstance.id ])
+		}
 	}
 	
 	Person convertStringToPerson(String name) { 
