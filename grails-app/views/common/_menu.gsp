@@ -69,12 +69,16 @@
 				<span class="menuButton">
 					<g:link class="bullet" controller="shipment" action="listShipping"><g:message code="shipment.listShipping.label"  default="List All "/></g:link>
 				</span>
-			</li>				
+			</li>			
+			
+			<!-- 	
 			<li class="">
 				<span class="menuButton">
 					<g:link class="bullet" controller="shipment" action="listShippingByDate" params="['groupBy':'expectedShippingDate']"><g:message code="shipment.listShipping.label"  default="List by Date "/></g:link>					
 				</span>				
-			</li>				
+			</li>
+			-->
+							
 			<li class="">
 				<span class="menuButton">
 					<g:link class="bullet" controller="createShipmentWorkflow" action="index"><g:message code="suitcase.add.label" default="Add Shipment"/></g:link>

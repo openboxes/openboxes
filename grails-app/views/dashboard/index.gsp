@@ -56,7 +56,7 @@
 										<g:each var="entry" in="${outgoingShipmentsByStatus}" status="i">											
 											<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 												<td>${entry.key.name}</td>
-												<td style="text-align: center;"><g:link controller="shipment" action="listShipping" params="['eventCode':entry.key]">${entry.value.objectList.size}</g:link></td>
+												<td style="text-align: center;"><g:link controller="shipment" action="listShipping" params="['status':entry.key.status]">${entry.value.objectList.size}</g:link></td>
 											</tr>	
 											
 								    	</g:each>

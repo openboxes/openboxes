@@ -14,6 +14,10 @@ public enum EventCode {
 		[ CREATED, SHIPPED, RECEIVED ]
 	}
 	
+	static EventCode getByStatus(String status) {
+		list().find( {it.status == status} )
+	}
+	
 	String getName() { return status }
 }
 

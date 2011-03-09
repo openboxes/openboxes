@@ -12,7 +12,7 @@ import org.pih.warehouse.shipping.ReferenceNumber;
 import org.pih.warehouse.donation.Donor;
 import java.io.Serializable;
 
-class Shipment implements Serializable {
+class Shipment implements Comparable, Serializable {
 	
 	String name 					// user-defined name of the shipment 
 	String shipmentNumber			// an auto-generated shipment number
@@ -122,6 +122,13 @@ class Shipment implements Serializable {
 	}
 
 	String toString() { return "$name"; }
+	
+	/**
+	 * Sort by name
+	 */
+	int compareTo(obj) { 
+		obj?.name <=> name 
+	}
 	
 	/** 
 	 * Transient method that gets all shipment items two-levels deep.

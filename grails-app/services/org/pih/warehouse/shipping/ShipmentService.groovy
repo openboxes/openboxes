@@ -213,10 +213,30 @@ class ShipmentService {
 		}
 	}
 	
-	List<Transaction> getShipmentsByOrigin(Location location) {
+	List<Shipment> getShipmentsByOrigin(Location location) {
 		return Shipment.withCriteria { 
 			eq("origin", location);
 		}
+	}
+	
+	List<Shipment> getShipments(ShipmentType shipmentType, Location origin, Location destination, EventCode eventCode, Date eventStartDate, Date eventEndDate) {
+		def shipments = Shipment.withCriteria {
+			and {
+				if (shipmentType) { eq("shipmentType", shipmentType) }
+				if (origin) { eq("origin", origin) }
+				if (destination) { eq("destination", destination) }
+			}
+		}
+		
+		// now filter by event code and eventdate
+		shipments = shipments.findAll( { def mostRecentEvent = it.getMostRecentEvent()
+											if (eventCode && mostRecentEvent.eventType.eventCode != eventCode) { return false }
+											if (eventStartDate && mostRecentEvent.eventDate < eventStartDate) { return false }
+											if (eventEndDate && mostRecentEvent.eventDate >= eventEndDate.plus(1)) { return false }
+											return true
+										} )
+										
+		return shipments
 	}
 	
 	/**

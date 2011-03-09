@@ -47,8 +47,8 @@ class EventType implements Comparable, Serializable {
 	
 	int compareTo(obj) {
 		if (obj?.sortOrder && sortOrder) {
-			return obj.sortOrder <=> sortOrder 
+			return sortOrder <=> obj.sortOrder 
 		}		
-		return obj.id <=> id;
+		return id <=> obj.id;
 	}	
 }
