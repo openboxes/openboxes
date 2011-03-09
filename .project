@@ -45,9 +45,34 @@
 			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/bubbling-2.1.2/src/groovy</locationURI>
 		</link>
 		<link>
+			<name>constraints-0.5.1-grails-app-i18n</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/constraints-0.5.1/grails-app/i18n</locationURI>
+		</link>
+		<link>
+			<name>constraints-0.5.1-grails-app-utils</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/constraints-0.5.1/grails-app/utils</locationURI>
+		</link>
+		<link>
+			<name>constraints-0.5.1-src-java</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/constraints-0.5.1/src/java</locationURI>
+		</link>
+		<link>
 			<name>csv-0.1-src-groovy</name>
 			<type>2</type>
 			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/csv-0.1/src/groovy</locationURI>
+		</link>
+		<link>
+			<name>excel-import-0.3-grails-app-i18n</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/excel-import-0.3/grails-app/i18n</locationURI>
+		</link>
+		<link>
+			<name>excel-import-0.3-src-groovy</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/excel-import-0.3/src/groovy</locationURI>
 		</link>
 		<link>
 			<name>grails-ui-1.2-SNAPSHOT-grails-app-conf</name>
@@ -90,6 +115,21 @@
 			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/jaxrs-0.4/src/java</locationURI>
 		</link>
 		<link>
+			<name>joda-time-1.1-grails-app-taglib</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/joda-time-1.1/grails-app/taglib</locationURI>
+		</link>
+		<link>
+			<name>joda-time-1.1-src-groovy</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/joda-time-1.1/src/groovy</locationURI>
+		</link>
+		<link>
+			<name>joda-time-1.1-src-java</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/joda-time-1.1/src/java</locationURI>
+		</link>
+		<link>
 			<name>jquery-1.4.4.1-grails-app-conf</name>
 			<type>2</type>
 			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/jquery-1.4.4.1/grails-app/conf</locationURI>
@@ -130,6 +170,46 @@
 			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/jquery-ui-1.8.7/grails-app/taglib</locationURI>
 		</link>
 		<link>
+			<name>jquery-validation-1.7.3-grails-app-conf</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/jquery-validation-1.7.3/grails-app/conf</locationURI>
+		</link>
+		<link>
+			<name>jquery-validation-1.7.3-grails-app-taglib</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/jquery-validation-1.7.3/grails-app/taglib</locationURI>
+		</link>
+		<link>
+			<name>jquery-validation-ui-1.1.1-grails-app-controllers</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/jquery-validation-ui-1.1.1/grails-app/controllers</locationURI>
+		</link>
+		<link>
+			<name>jquery-validation-ui-1.1.1-grails-app-i18n</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/jquery-validation-ui-1.1.1/grails-app/i18n</locationURI>
+		</link>
+		<link>
+			<name>jquery-validation-ui-1.1.1-grails-app-services</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/jquery-validation-ui-1.1.1/grails-app/services</locationURI>
+		</link>
+		<link>
+			<name>jquery-validation-ui-1.1.1-grails-app-taglib</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/jquery-validation-ui-1.1.1/grails-app/taglib</locationURI>
+		</link>
+		<link>
+			<name>jquery-validation-ui-1.1.1-grails-app-utils</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/jquery-validation-ui-1.1.1/grails-app/utils</locationURI>
+		</link>
+		<link>
+			<name>jquery-validation-ui-1.1.1-src-groovy</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/jquery-validation-ui-1.1.1/src/groovy</locationURI>
+		</link>
+		<link>
 			<name>liquibase-1.9.3.5-grails-app-migrations</name>
 			<type>2</type>
 			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/liquibase-1.9.3.5/grails-app/migrations</locationURI>
@@ -163,6 +243,21 @@
 			<name>mail-0.9-src-groovy</name>
 			<type>2</type>
 			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/mail-0.9/src/groovy</locationURI>
+		</link>
+		<link>
+			<name>pretty-time-0.3-grails-app-i18n</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/pretty-time-0.3/grails-app/i18n</locationURI>
+		</link>
+		<link>
+			<name>pretty-time-0.3-grails-app-taglib</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/pretty-time-0.3/grails-app/taglib</locationURI>
+		</link>
+		<link>
+			<name>pretty-time-0.3-src-groovy</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/pretty-time-0.3/src/groovy</locationURI>
 		</link>
 		<link>
 			<name>settings-1.4-grails-app-controllers</name>
@@ -203,6 +298,21 @@
 			<name>tomcat-1.3.6-src-groovy</name>
 			<type>2</type>
 			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/tomcat-1.3.6/src/groovy</locationURI>
+		</link>
+		<link>
+			<name>ui-performance-1.2.2-grails-app-taglib</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/ui-performance-1.2.2/grails-app/taglib</locationURI>
+		</link>
+		<link>
+			<name>ui-performance-1.2.2-src-groovy</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/ui-performance-1.2.2/src/groovy</locationURI>
+		</link>
+		<link>
+			<name>ui-performance-1.2.2-src-java</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/ui-performance-1.2.2/src/java</locationURI>
 		</link>
 		<link>
 			<name>yui-2.7.0.1-grails-app-i18n</name>

@@ -16,9 +16,9 @@
 			</div>		
 		
 	    	<div id="dashboard">				
-	    		<div class="widgetLarge">
-			    	<div class="widgetHeader"><g:message code="dashboard.welcome.label"/></div>
-	    			<div class="widgetContent">
+	    		<div class="widgetlarge">
+			    	<div class="widgetheader"><g:message code="dashboard.welcome.label"/></div>
+	    			<div class="widgetcontent">
 						<g:if test="${!session.user}">
 							<p>
 								<g:message code="dashboard.notLoggedIn.label" />
@@ -35,17 +35,17 @@
 					</div>
 				</div>
 				
-				<div class="widgetSmall">
-					<div class="widgetHeader"><g:message code="shipping.summary.label" args="[session.warehouse.name]"/></div>
-	    			<div class="widgetContent">
-	    				<div id="outgoingShipmentSummary">
+				<div class="widgetsmall">
+					<div class="widgetheader"><g:message code="shipping.summary.label" args="[session.warehouse.name]"/></div>
+	    			<div class="widgetcontent">
+	    				<div id="shippingsummary">
 		    				<g:if test="${!outgoingShipmentsByStatus}">
    								<div style="text-align: center; padding: 10px;" class="fade">
    									(<g:message code="shipping.noRecent.label"/>)
    								</div>
    							</g:if>	    		
    							<g:else>			
-					    		<table>
+					    		<table style="display: inline-block;">
 					    			<thead>
 					    				<tr class="odd">
 					    					<th>All Shipping</th>
@@ -72,15 +72,15 @@
 						</div>
 	    			</div>
 
-	    			<div class="widgetContent">	    					    			
-	    				<div id="incomingShipmentSummary">	
+	    			<div class="widgetcontent">	    					    			
+	    				<div id="receivingsummary">	
 		    				<g:if test="${!incomingShipmentsByStatus}">
    								<div style="text-align: center; padding: 10px;" class="fade">
    									(<g:message code="receiving.noRecent.label"/>)
    								</div>
    							</g:if>	    		
    							<g:else>			
-					    		<table>
+					    		<table style="display: inline-block;">
 						    		<thead>
 					    				<tr class="odd">
 					    					<th>All Receiving</th>
@@ -109,13 +109,12 @@
 	    			
 				</div>								
 
-				
+<%-- 				
 
-<%-- 
 				
-				<div class="widgetSmall">
-					<div class="widgetHeader"><g:message code="shipping.mostRecent.label" args="[session.warehouse.name]" /></div>
-	    			<div class="widgetContent">
+				<div class="widgetsmall">
+					<div class="widgetheader"><g:message code="shipping.mostRecent.label" args="[session.warehouse.name]" /></div>
+	    			<div class="widgetcontent">
 	    				<div id="mostRecentShipping">		    				
 	    				
   							<g:if test="${!outgoingShipments}">  				
@@ -165,9 +164,9 @@
 	    			</div>
 				</div>
 				
-				<div class="widgetSmall">
-					<div class="widgetHeader"><g:message code="receiving.mostRecent.label" args="[session.warehouse.name]" /></div>
-	    			<div class="widgetContent">
+				<div class="widgetsmall">
+					<div class="widgetheader"><g:message code="receiving.mostRecent.label" args="[session.warehouse.name]" /></div>
+	    			<div class="widgetcontent">
 	    				<div id="mostRecentReceiving">
 		    				<g:if test="${!incomingShipments}">
    								<div style="text-align: center; padding: 10px;" class="fade">
@@ -206,7 +205,8 @@
 						</div>
 	    			</div>
 				</div>
---%>
+--%>				
+				
 				
 	    	</div>
 		</div>

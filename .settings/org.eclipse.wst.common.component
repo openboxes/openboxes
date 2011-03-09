@@ -39,5 +39,27 @@
         <wb-resource deploy-path="/" source-path="/jquery-1.4.4.1-grails-app-taglib"/>
         <wb-resource deploy-path="/" source-path="/jquery-1.4.4.1-grails-app-conf"/>
         <wb-resource deploy-path="/" source-path="/jquery-1.4.4.1-src-groovy"/>
+        <wb-resource deploy-path="/" source-path="/pretty-time-0.3-grails-app-i18n"/>
+        <wb-resource deploy-path="/" source-path="/pretty-time-0.3-grails-app-taglib"/>
+        <wb-resource deploy-path="/" source-path="/pretty-time-0.3-src-groovy"/>
+        <wb-resource deploy-path="/" source-path="/jquery-validation-1.7.3-grails-app-taglib"/>
+        <wb-resource deploy-path="/" source-path="/jquery-validation-1.7.3-grails-app-conf"/>
+        <wb-resource deploy-path="/" source-path="/constraints-0.5.1-grails-app-i18n"/>
+        <wb-resource deploy-path="/" source-path="/constraints-0.5.1-grails-app-utils"/>
+        <wb-resource deploy-path="/" source-path="/constraints-0.5.1-src-java"/>
+        <wb-resource deploy-path="/" source-path="/joda-time-1.1-grails-app-taglib"/>
+        <wb-resource deploy-path="/" source-path="/joda-time-1.1-src-java"/>
+        <wb-resource deploy-path="/" source-path="/joda-time-1.1-src-groovy"/>
+        <wb-resource deploy-path="/" source-path="/ui-performance-1.2.2-grails-app-taglib"/>
+        <wb-resource deploy-path="/" source-path="/ui-performance-1.2.2-src-java"/>
+        <wb-resource deploy-path="/" source-path="/ui-performance-1.2.2-src-groovy"/>
+        <wb-resource deploy-path="/" source-path="/excel-import-0.3-grails-app-i18n"/>
+        <wb-resource deploy-path="/" source-path="/excel-import-0.3-src-groovy"/>
+        <wb-resource deploy-path="/" source-path="/jquery-validation-ui-1.1.1-grails-app-services"/>
+        <wb-resource deploy-path="/" source-path="/jquery-validation-ui-1.1.1-grails-app-i18n"/>
+        <wb-resource deploy-path="/" source-path="/jquery-validation-ui-1.1.1-grails-app-taglib"/>
+        <wb-resource deploy-path="/" source-path="/jquery-validation-ui-1.1.1-grails-app-controllers"/>
+        <wb-resource deploy-path="/" source-path="/jquery-validation-ui-1.1.1-grails-app-utils"/>
+        <wb-resource deploy-path="/" source-path="/jquery-validation-ui-1.1.1-src-groovy"/>
     </wb-module>
 </project-modules>

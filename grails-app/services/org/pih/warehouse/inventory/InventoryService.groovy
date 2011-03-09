@@ -242,7 +242,7 @@ class InventoryService {
 					}
 					// 3. If the quantities are different, we create a new transaction entry	
 					if (row.oldQuantity != row.newQuantity) {
-						TransactionEntry transactionEntry = new TransactionEntry();
+						def transactionEntry = new TransactionEntry();
 						transactionEntry.properties = row.properties;
 						transactionEntry.quantity = row.newQuantity - row.oldQuantity;  // difference
 						transactionEntry.product = cmd.product
@@ -569,6 +569,8 @@ class InventoryService {
 				// FIXME Not sure what transaction type this is -- should be ADJUSTMENT 
 				transactionInstance.transactionType = TransactionType.get(7);
 				transactionInstance.inventory = inventoryInstance;			
+				
+				// Add transaction entry to transaction
 				transactionEntry.inventoryItem = itemInstance;
 				transactionEntry.product = itemInstance.product;
 				transactionEntry.lotNumber = itemInstance.lotNumber;
@@ -631,7 +633,7 @@ class InventoryService {
 				}
 				
 				// Create a new transaction entry
-				TransactionEntry transactionEntry = new TransactionEntry();
+				def transactionEntry = new TransactionEntry();
 				transactionEntry.quantity = 0 - it.quantity;
 				transactionEntry.lotNumber = it.lotNumber
 				transactionEntry.product = it.product;

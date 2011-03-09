@@ -108,11 +108,7 @@
 								<tr class="prop">	
 									<td class=""></td>					
 									<td valign="top" style="text-align: right">
-										<div class="buttons">		
-											<div class="button" >
-												<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt=""/> Signup</button>					   
-											</div>		
-										</div>
+										<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt=""/> Signup</button>					   
 									</td>
 								</tr>
 								<tr class="prop">

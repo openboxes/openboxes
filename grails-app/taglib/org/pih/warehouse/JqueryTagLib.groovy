@@ -326,12 +326,12 @@ class JqueryTagLib {
 	
 	def autoSuggestSearchable = { attrs, body ->
 		def id = (attrs.id) ? attrs.id : "autoSuggest_" + (new Random()).nextInt()
-		def name = attrs.name	
-		def valueId = (attrs.valueId)?attrs.valueId:"";
-		def valueName = (attrs.valueName)?attrs.valueName:"";
-		def width = (attrs.width) ? attrs.width : 200;
-		def minLength = (attrs.minLength) ? attrs.minLength : 1;
-		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "/warehouse/json/findPersonByName";
+		def name = attrs.name
+		def valueId = (attrs.valueId)?:"";
+		def valueName = (attrs.valueName)?:"";
+		def width = (attrs.width) ?: 200;
+		def minLength = (attrs.minLength) ?: 1;
+		def jsonUrl = (attrs.jsonUrl) ?: "/warehouse/json/findPersonByName";
 
 		def showValue = (valueName && valueId) ? true : false;
 		//def spanDisplay = (showValue) ? "inline" : "none";
@@ -391,7 +391,7 @@ class JqueryTagLib {
 								\$("#product-id").val(ui.item.productId);
 								\$("#lotNumber").val(ui.item.lotNumber);
 								\$("#quantity").val(ui.item.quantity);
-								
+																
 								//
 								\$("#itemFoundForm").show();
 								\$("#itemSearchForm").hide();

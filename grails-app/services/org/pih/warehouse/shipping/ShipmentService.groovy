@@ -384,8 +384,13 @@ class ShipmentService {
 	}
 	
 	void sendShipment(Shipment shipmentInstance, String comment, User userInstance, Location locationInstance, Date shipDate) { 
-		log.info "sending shipment";
+
 		try { 
+			
+			if (shipmentInstance.hasShipped()) { 
+				throw new RuntimeException("Shipment ${shipment?.name} has already shipped");
+			}
+			
 			// don't allow the shipment to go out if it has errors, or if this shipment has already been shipped
 			if (!shipmentInstance.hasErrors() && !shipmentInstance.hasShipped()) {				
 				// Add comment to shipment (as long as there's an actual comment 

@@ -134,12 +134,17 @@
 			</li>
 			<li>
 				<span class="menuButton">
-					<g:link class="list" controller="inventory" action="listAllTransactions">All Transactions</g:link> 
+					<g:link class="list" controller="inventory" action="listAllTransactions">List All</g:link> 
 				</span>
 			</li>
 			<li>
 				<span class="menuButton">
 					<g:link class="new" controller="inventory" action="createTransaction">Add Transaction</g:link> 				
+				</span>			
+			</li>
+			<li>
+				<span class="menuButton">
+					<g:link class="new" controller="inventoryItem" action="importInventoryItems">Import Items</g:link> 				
 				</span>			
 			</li>
 			

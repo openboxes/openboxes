@@ -81,11 +81,11 @@ body {
 	padding-right: 15px;
 }
 
-.widgetLarge { border: 1px solid lightgrey; height: 75px; margin: 5px; }
-.widgetSmall { border: 1px solid lightgrey;  margin: 5px; }    		
-.widgetHeader { background-color: #FAFAFA; padding: 10px; font-weight: bold; font-size: 110%;} 
-.widgetContent { padding: 10px; } 
-.widgetSmall .widgetContent { float: left; width: 45%; } 
+.widgetlarge { border: 1px solid lightgrey; height: 75px; margin: 5px; }
+.widgetsmall { border: 1px solid lightgrey;  margin: 5px; }    		
+.widgetheader { background-color: #FAFAFA; padding: 10px; font-weight: bold; font-size: 110%;} 
+.widgetcontent { padding: 10px; } 
+.widgetsmall .widgetcontent { float: left; width: 45%; font-size: 110%;} 
 
 
 img { 

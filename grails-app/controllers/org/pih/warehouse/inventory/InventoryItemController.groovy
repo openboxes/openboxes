@@ -1,19 +1,202 @@
 package org.pih.warehouse.inventory;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Map;
+
 import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.ListUtils;
+import org.grails.plugins.excelimport.ExcelImportUtils;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.User;
+import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.shipping.Container;
 import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.shipping.ShipmentItem;
 import org.pih.warehouse.inventory.TransactionType;
+import org.pih.warehouse.inventory.StockCardCommand
+import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
+
 import grails.converters.*
 
 class InventoryItemController {
 
 	def inventoryService;
+
+	static Map CONFIG_CELL_MAP = [
+		sheet:'Sheet1', cellMap: [ 'D3':'title', 'D6':'numSold', ]
+	]
+
+	static Map CONFIG_COLUMN_MAP = [
+		sheet:'Sheet1', startRow: 2, columnMap: [ 'A':'category','B':'serenicCode','C':'product', 'D':'make', 
+			'E':'dosage', 'F':'unitOfMeasure', 'G':'model', 'H':'lotNumber', 'I':'expirationDate', 'J':'quantity', 'K':'comments' ]
+	]
+	
+	static Map CONFIG_PROPERTY_MAP = [
+		category:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+		serenicCode:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+		product:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+		make:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+		dosage:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+		unitOfMeasure:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+		model:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+		lotNumber:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+		expirationDate:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+		quantity:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+		comments:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+	]
+	
+	static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM");	
+	
+	def importInventoryItems = {	
+		if ("POST".equals(request.getMethod())) {
+			
+			
+		
+			File xlsFile = null;
+			if (request instanceof DefaultMultipartHttpServletRequest) { 
+				def uploadFile = request.getFile('xlsFile');
+				if (!uploadFile?.empty) {
+					try { 
+						xlsFile = new File("uploads/" + uploadFile.originalFilename);
+						xlsFile.mkdirs()				
+						uploadFile.transferTo(xlsFile);
+						session.xlsFile = xlsFile;
+						flash.message = "File uploaded successfully"
+						
+					} catch (Exception e) { 
+						throw new RuntimeException(e);
+					}
+				}
+				else { 
+					flash.message = "Please upload a non-empty file"
+				}
+			}
+			// Otherwise, we need to retrieve the file from the session 
+			else { 
+				xlsFile = session.xlsFile
+			}
+			
+			// If the file has been successfully uploaded, we need to get the filename 
+			if (xlsFile) {
+				log.info "XLS file " + xlsFile.getAbsolutePath()
+				String filename = xlsFile.getAbsolutePath()
+				def importer = new InventoryExcelImporter(filename, CONFIG_COLUMN_MAP, CONFIG_CELL_MAP, CONFIG_PROPERTY_MAP);
+								
+				def errorMessages = [];
+				def inventoryMapList = importer.getInventoryItems();
+				
+				
+				// Create new transaction
+				Warehouse warehouse = Warehouse.get(session.warehouse.id)
+				def transactionInstance = new Transaction(transactionDate: new Date(), 
+					transactionType: TransactionType.findByName("Inventory"),
+					inventory: warehouse.inventory,
+					destination: warehouse)
+				
+				try {
+					inventoryMapList.each { Map importParams ->
+						//log.info "Inventory item " + importParams
+					
+					
+						
+						def quantity = importParams?.quantity?.intValue();
+						def description = importParams.make + importParams.product + ", " + importParams.model + ", " + importParams.dosage + " " + importParams.unitOfMeasure;
+						
+						def serenicCode = String.valueOf(importParams?.serenicCode?.intValue());							
+						if (importParams?.serenicCode?.class != String.class) {  
+							//errorMessages << "Column 'Serenic Code' with value '${serenicCode}' should be formatted as a text value";
+						}	 								
+						def lotNumber = String.valueOf(importParams.lotNumber);
+						if (importParams?.lotNumber?.class != String.class) { 
+							//errorMessages << "Column 'Serial Number / Lot Number' with value '${lotNumber}' should be formatted as a text value";
+						}
+						def expirationDate = null;
+						if (importParams.expirationDate) {
+							expirationDate = dateFormat.parse(new String(importParams?.expirationDate));
+						}
+						
+						if (errorMessages.isEmpty() && params.importNow) {
+							log.info ("Importing file ...")
+							// Create category if not exists
+							Category category = Category.findByName(importParams.category);
+							if (!category) { 
+								category = new Category(name: importParams.category);
+								category.save();
+								log.info "Created new category " + category.name;
+							}	
+						
+							// Create product if not exists
+							Product product = Product.findByName(importParams.product);
+							if (!product) { 
+								product = new Product(name: importParams.product, category: category);
+								product.save();
+								log.info "Created new product " + product.name;
+							}
+							
+							
+							// Create inventory item if not exists							
+							InventoryItem inventoryItem = InventoryItem.findByProductAndLotNumber(product, importParams.lotNumber);
+							if (!inventoryItem) { 
+								inventoryItem = new InventoryItem()
+								inventoryItem.product = product
+								inventoryItem.lotNumber = lotNumber;
+								inventoryItem.description = description;
+								inventoryItem.expirationDate = expirationDate;
+								inventoryItem.save();
+								log.info "Created new inventoryItem " + inventoryItem.description + " " + inventoryItem.lotNumber;
+							}
+
+							TransactionEntry transactionEntry = new TransactionEntry();
+							transactionEntry.quantity = quantity;
+							transactionEntry.lotNumber = lotNumber;
+							transactionEntry.product = product;
+							transactionEntry.inventoryItem = inventoryItem;
+							transactionEntry.save();
+							transactionInstance.addToTransactionEntries(transactionEntry);
+														
+						}
+					}
+					transactionInstance.save();
+					flash.message = "Successfully imported all inventory items"
+
+				} catch (Exception e) {
+					log.error("Error importing all inventory items")
+					//errorMessages << e.getMessage()
+					// attempt to rollback transaction
+					throw new RuntimeException(e);
+				}
+
+				
+				render(view: "importInventoryItems", model: [ inventoryMapList : inventoryMapList, errorMessages: errorMessages, transactionInstance: transactionInstance ]);
+			}		
+			else { 
+				flash.message = "Please upload a valid XLS file in order to start the import process"
+			}
+			
+		}
+	}	
+	
+	/*
+	def importInventoryItems = {
+		
+		if ("POST".equals(request.getMethod())) { 
+			//String fileName = "/.test-databooks.xls/"
+			String filename = "/home/jmiranda/Desktop/PIMS/Boston Closet Inventory.xls"
+			def importer = new InventoryExcelImporter(filename);
+			def inventoryMapList = importer.getInventoryItems();
+			inventoryMapList.each { Map inventoryItemParams -> 
+				log.info "Inventory item " + inventoryItemParams
+			}
+			//new Book(importer.getOneMoreBookParams()).save()
+			[ inventoryMapList : inventoryMapList ]
+		}
+		else { 
+			redirect(action: "uploadInventoryItems")
+		}
+	}
+	*/
 	
 	def show = {
 		def itemInstance = InventoryItem.get(params.id)
@@ -597,167 +780,9 @@ class InventoryItemController {
 	}
 	
 	
-	/*
-	def recordInventory = {
-		log.info "Record inventory: " + params;
-		def warehouseInstance = Warehouse.get(session?.warehouse?.id)
-		def productInstance = Product.get(params?.productId)
-				
-		// Populate the model with the following data
-		def inventoryInstance = warehouseInstance.inventory
-		def inventoryItemList = inventoryService.getInventoryItemsByProduct(productInstance)
-		def transactionEntryList = TransactionEntry.findAllByProduct(productInstance)
-		def inventoryLotList = InventoryLot.findByProduct(productInstance)
-		def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, inventoryInstance);
-		
-		[ 	inventoryInstance: inventoryInstance,
-			inventoryLevelInstance: inventoryLevelInstance,
-			productInstance: productInstance,
-			inventoryItemList: inventoryItemList,
-			transactionEntryList: transactionEntryList,
-			inventoryLotList: inventoryLotList ]
-	}
 
-	def saveInventoryItems = {
-		log.info "Save inventory items: " + params;
-		def inventoryItem = new InventoryItem(params);
-		def inventoryLot = new InventoryLot(params);
-		def productInstance = Product.get(params.productId);
-		def createdBy = User.get(session?.user?.id);
-		
-		if (params.quantity <= 0) {
-			inventoryItem.errors.rejectValue('quantity', 'inventoryItem.quantity.required',
-				[params.quantity] as Object[], 'Quantity is required and must be greater than 0');
-		}
-		inventoryItem.product = productInstance;
-		// Look up lotOrSerialNumber to make sure it doesn't already exist.
-		def itemsFound = InventoryItem.findByLotNumber(params.lotNumber);
-		if (itemsFound) {
-			// Add an error to the model object
-			inventoryItem.errors.rejectValue('lotNumber', 'inventoryItem.lotNumber.alreadyExists',
-				[params.lotNumber] as Object[], 'Inventory item already exists');
-		}
-		else {
-			def transaction = new Transaction(params);
-			transaction.transactionType = TransactionType.get(7);
-			transaction.source = Warehouse.get(session.warehouse.id);
-			
-			def transactionEntry = new TransactionEntry(params);
-			transactionEntry.inventoryItem = inventoryItem;
-			transactionEntry.product = productInstance;
-			transactionEntry.lotNumber = params.lotNumber;
-			transactionEntry.quantity = params.quantity;
-			transaction.addToTransactionEntries(transactionEntry);
-			if (transaction.hasErrors()) {
-				inventoryItem.errors = transaction.errors
-			}
-			else if (transactionEntry.hasErrors()) {
-				inventoryItem.errors = transactionEntry.errors
-			}
-			else {
-				if (!inventoryItem.hasErrors() && inventoryItem.save()) {
-					flash.message = "Saved inventory item successfully";
-					if (!transaction.hasErrors() && transaction.save()) {
-						flash.message = "Saved inventory item and transaction successfully";
-					}
-				}
-			}
-		}
-		
-		// Redirect to the record inventory action
-		chain(action: recordInventory, model:[productInstance: productInstance,
-			inventoryItem: inventoryItem, inventoryLot: inventoryLot], params: params);
-	}
-	*/
 	
 
 }
 
-class StockCardCommand { 
 
-	// Used when adding a new inventory item (not implemented yet)
-	InventoryItem inventoryItem;
-
-	// Entire page
-	Product productInstance;
-	Warehouse warehouseInstance;
-	Inventory inventoryInstance;
-	InventoryLevel inventoryLevelInstance;
-	
-	// Current stock section
-	List inventoryItemList;
-	List transactionEntryList;
-	Map transactionEntriesByTransactionMap;
-	Map transactionEntriesByInventoryItemMap
-
-	// Transaction log section
-	Date startDate = new Date() - 7;		// defaults to today - 7d
-	Date endDate = new Date();				// defaults to today
-	TransactionType transactionType
-	Map transactionLogMap;
-		
-	static constraints = {
-		startDate(nullable:true)
-		endDate(nullable:true)
-		transactionType(nullable:true)
-	}
-
-	/**
-	 * Returns a map of quantity values indexed by inventory item to be used in the 
-	 * current stock portion of the stock card page.
-	 * 
-	 * @return a map (inventory item -> quantity)
-	 */
-	Map getQuantityByInventoryItemMap() { 
-		Map quantityByInventoryItemMap = [:]
-		if (inventoryItemList) { 
-			inventoryItemList.each { 
-				def transactionEntries = transactionEntriesByInventoryItemMap?.get(it)
-				def quantity = (transactionEntries)?transactionEntries*.quantity.sum():0;
-				quantityByInventoryItemMap.put(it, quantity)
-			}
-		}
-		return quantityByInventoryItemMap;
-	}
-	
-	/**
-	 * Return the total quantity for all inventory items.
-	 * 
-	 * @return 	the sum of quantities across all transaction entries
-	 */
-	Integer getTotalQuantity() { 
-		return (transactionEntryList)?transactionEntryList.findAll { it.product == productInstance }.quantity.sum():0
-	}
-	
-	/**
-	 * Filter the transaction entry list by date range and transaction type
-	 * 
-	 * TODO Should move this to the DAO/service layer in order to make it perform better.
-	 * 
-	 * @return
-	 */
-	Map getTransactionLogMap() { 
-		def filteredTransactionLog = transactionEntryList;
-		if (startDate) {
-			filteredTransactionLog = filteredTransactionLog.findAll{it.transaction.transactionDate >= startDate}
-		}
-		
-		// Need to add +1 to endDate because date comparison includes time 
-		// TODO Should set endDate to midnight of the date to be more accurate
-		if (endDate) {
-			filteredTransactionLog = filteredTransactionLog.findAll{it.transaction.transactionDate <= endDate+1}
-		}
-		
-		// Filter by transaction type (0 = return all types)
-		if (transactionType && transactionType?.id != 0) {	
-			filteredTransactionLog = filteredTransactionLog.findAll{it?.transaction?.transactionType?.id == transactionType?.id}
-		}
-		
-		return filteredTransactionLog.groupBy { it.transaction } 
-	}
-	
-
-
-	
-	
-}
