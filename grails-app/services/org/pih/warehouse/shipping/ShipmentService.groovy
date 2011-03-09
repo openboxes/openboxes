@@ -557,4 +557,5 @@ class ShipmentService {
 		if (!shipment?.shipmentType) { return null }
 		return ShipmentWorkflow.findByShipmentType(shipment.shipmentType)
 	}
+	
 }

@@ -788,7 +788,7 @@ class ShipmentController {
 	def deleteEvent = {		
 		def event = Event.get(params.id);
 		def shipment = Shipment.get(params.shipmentId);
-		if (shipment && event) {
+		if (shipment && event && event.eventType?.eventCode != EventCode.CREATED) {   // not allowed to delete a "created" event
 			shipment.removeFromEvents(event).save();
 			event.delete();
 			flash.message = "Deleted event $params.id from shipment";
@@ -847,35 +847,58 @@ class ShipmentController {
 	}
 	
 	
+	def editEvent = {
+		def eventInstance = Event.get(params.id)
+		def shipmentInstance = Shipment.get(params.shipmentId)
+		
+		if (!eventInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
+			redirect(action: "showDetails", id: params.shipmentId)
+		}
+		
+		render(view: "editEvent", model: [shipmentInstance : shipmentInstance, eventInstance : eventInstance]);
+	}
+	
 	
 	def addEvent = { 
-		if ("GET".equals(request.getMethod())) { 
-			
-			def shipmentInstance = Shipment.get(params.id);
-			if (!shipmentInstance) {
-				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
-				redirect(action: "list")
-			}
-			//def event = new Event(eventType:EventType.get(params.eventType.id), eventDate:new Date())
-			def eventInstance = new Event(params);			
-			render(view: "addEvent", model: [shipmentInstance : shipmentInstance, eventInstance : eventInstance]);
+		def shipmentInstance = Shipment.get(params.id);
+		
+		if (!shipmentInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
+			redirect(action: "list")
 		}
-		else { 						
-			Event eventInstance = new Event(params);			
-			def shipmentInstance = Shipment.get(params.shipmentId);     	
-			if (!eventInstance.hasErrors() && shipmentInstance.addToEvents(eventInstance).save(flush:true)) { 			
-				flash.message = "Added event ${eventInstance?.eventType?.name} to shipment";		
-				redirect(action: 'showDetails', id: shipmentInstance.id)
+		
+		//def event = new Event(eventType:EventType.get(params.eventType.id), eventDate:new Date())
+		def eventInstance = new Event(params);			
+		render(view: "editEvent", model: [shipmentInstance : shipmentInstance, eventInstance : eventInstance]);
+	}
+	
+	def saveEvent = {				
+		def shipmentInstance = Shipment.get(params.shipmentId);
+		def eventInstance = Event.get(params.eventId) ?: new Event()	
+		
+		bindData(eventInstance, params)
+
+		// check for errors
+		if (eventInstance.hasErrors()) {
+			flash.message = "Unable to edit event ${eventInstance?.eventType?.name}"
+			eventInstance?.errors.allErrors.each { 
+				log.error it
 			}
-			else { 
-				flash.message = "Unable to add event ${eventInstance?.eventType?.name} to shipment"
-				shipmentInstance?.errors.allErrors.each { 
-					log.error it
-				}
-				render(view: "addEvent", model: [shipmentInstance : shipmentInstance, eventInstance : eventInstance]);
-			}
+			render(view: "editEvent", model: [shipmentInstance : shipmentInstance, eventInstance : eventInstance])
 		}
+		
+		// save (or add) the event
+		if (params.eventId) {
+			eventInstance.save(flush:true)
+		}
+		else {
+			shipmentInstance.addToEvents(eventInstance).save(flush:true)
+		}
+		
+		redirect(action: 'showDetails', id: shipmentInstance.id)
 	}    
+	
 	def addShipmentItem = { 
 		log.info "parameters: " + params
 		

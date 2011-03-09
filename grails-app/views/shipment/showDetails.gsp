@@ -208,7 +208,7 @@
 											</td>
 											<td valign="top" class="">
 													<a href="${createLink(controller: "shipment", action: "generateDocuments", id: shipmentInstance.id)}">
-													<button>Generate Documents from Template</button></a>
+													<button>Generate ${shipmentWorkflow.shipmentType?.name} Documents</button></a>
 											</td>
 											<td>
 												&nbsp;
@@ -264,7 +264,9 @@
 													</table>
 												</g:if>												
 												<a href="${createLink(controller: "shipment", action: "addDocument", id: shipmentInstance.id)}">
-													<button>Upload an Existing Document</button></a>												
+													<button><img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" 
+																alt="Upload an Existing Document" style="vertical-align: middle"/> Upload an Existing Document</button></a>													
+												
 											</div>
 										</td>					
 									</tr>
@@ -306,8 +308,8 @@
 													</table>												
 												</g:if> 
 												<a href="${createLink(controller: "shipment", action: "addComment", id: shipmentInstance.id)}">
-													<button><!--  <img src="${createLinkTo(dir:'images/icons/silk',file:'comment_add.png')}" 
-																alt="Add Notes" style="vertical-align: middle"/> --> Add Note</button></a>													
+													<button><img src="${createLinkTo(dir:'images/icons/silk',file:'comment_add.png')}" 
+																alt="Add Notes" style="vertical-align: middle"/> Add Note</button></a>													
 																									
 											</div>
 										</td>
@@ -324,7 +326,7 @@
 													<table>	
 														<tbody>
 															<tr>
-																<th width="10%">Status</th>
+																<th width="10%">Event</th>
 																<th width="20%">Location</th>
 																<th width="15%">Date</th>
 																<th width="10%"></th>
@@ -332,7 +334,7 @@
 															<g:each in="${shipmentInstance.events}" var="event" status="i">
 																<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 																	<td>																
-																		${event?.eventType?.eventCode?.name}
+																		${event?.eventType?.name}
 																	</td>
 																	<td>
 																		${event?.eventLocation?.name}
@@ -346,22 +348,28 @@
 																		--%>																			
 																	</td>
 																	<td style="text-align: right">
-																		<g:link class="remove" action="deleteEvent" id="${event?.id}" params="[shipmentId:shipmentInstance.id]" onclick="return confirm('Are you sure you want to delete this event?')">
-																			<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" style="vertical-align: middle"/>
-																		</g:link>	
+																		<g:if test="${event?.eventType?.eventCode != org.pih.warehouse.core.EventCode.CREATED}">
+																			<g:link action="editEvent" id="${event?.id}" params="[shipmentId:shipmentInstance.id]">
+																				<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit" style="vertical-align: middle"/>
+																			</g:link>
+																			<g:link class="remove" action="deleteEvent" id="${event?.id}" params="[shipmentId:shipmentInstance.id]" onclick="return confirm('Are you sure you want to delete this event?')">
+																				<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" style="vertical-align: middle"/>
+																			</g:link>	
+																		</g:if>
 																	</td>
 																</tr>
 															</g:each>
 														</tbody>								
 													</table>
 												</g:if>
+										<!--  	 
 											<a href="${createLink(controller: "shipment", action: "addEvent", id: shipmentInstance.id)}">
 												<button>
 													<img src="${createLinkTo(dir:'images/icons/silk',file:'calendar_add.png')}" 
 														alt="Add Event" style="vertical-align: middle"/> Add Event
 												</button>
-											</a>													
-												
+											</a>		
+										-->		
 											</div>
 										</td>
 									</tr>				

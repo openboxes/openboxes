@@ -26,8 +26,9 @@
 		<table>
 			<tr>
 				<td width="75%">
-					<g:form action="addEvent" method="POST">
+					<g:form action="saveEvent" method="POST">
 						<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
+						<g:hiddenField name="eventId" value="${eventInstance?.id}" />
 						<fieldset>			
 							
 							<g:render template="summary"/>
@@ -41,7 +42,7 @@
 											<g:if test="${!eventInstance?.eventType}">												
 												<g:select id="eventType.id" name='eventType.id' noSelection="${['':'Select one ...']}" 
 													from='${org.pih.warehouse.core.EventType.list()}' optionKey="id" 
-													optionValue="optionValue" value="${eventInstance.eventType}" >
+													optionValue="name" value="${eventInstance.eventType}" >
 												</g:select>
 											</g:if>
 											<g:else>
@@ -54,7 +55,7 @@
 									<tr class="prop">
 				                           <td valign="top" class="name"><label><g:message code="event.eventDate.label" default="Event Date" /></label></td>                            
 				                           <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'eventDate', 'errors')}">
-				                                  <g:jqueryDatePicker name="eventDate" value="${eventInstance?.eventDate}" format="" />
+				                                  <g:jqueryDatePicker name="eventDate" value="${eventInstance?.eventDate}" format="MM/dd/yyyy" />
 				                              </td>
 				                       </tr>  	          
 										 	          
@@ -75,7 +76,7 @@
 									    <td class="name"></td>
 									    <td class="value">
 											<div class="buttons" style="text-align: left;">
-												<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> Add Event</button>
+												<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> Save Event</button>
 												<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id}" class="negative"> <img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="Cancel" /> Cancel </g:link>
 											</div>
 									    </td>					                        
