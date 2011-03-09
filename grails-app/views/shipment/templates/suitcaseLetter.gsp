@@ -54,6 +54,9 @@
 
 				<p>Enclosures<br/>
 				Sworn to and subscribed before me on <g:formatDate date="${new Date()}" format="MMMMM dd, yyyy"/></p>
+				
+				<!--  note that we are scaling the image to width=200 -->
+				<img src="${createLinkTo(dir: 'images/signatures', file: 'kathrynkempton.jpg') }" border="0" width="200"/>   
 
 				<p>Kathryn G. Kempton Amaral, Notary Public<br/>
 				My commission expires: 27 February 2015.</p>
