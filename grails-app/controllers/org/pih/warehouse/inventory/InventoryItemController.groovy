@@ -1,7 +1,5 @@
 package org.pih.warehouse.inventory;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Map;
 
 import org.apache.commons.collections.FactoryUtils;
@@ -24,46 +22,25 @@ class InventoryItemController {
 
 	def inventoryService;
 
-	static Map CONFIG_CELL_MAP = [
-		sheet:'Sheet1', cellMap: [ 'D3':'title', 'D6':'numSold', ]
-	]
 
-	static Map CONFIG_COLUMN_MAP = [
-		sheet:'Sheet1', startRow: 2, columnMap: [ 'A':'category','B':'serenicCode','C':'product', 'D':'make', 
-			'E':'dosage', 'F':'unitOfMeasure', 'G':'model', 'H':'lotNumber', 'I':'expirationDate', 'J':'quantity', 'K':'comments' ]
-	]
 	
-	static Map CONFIG_PROPERTY_MAP = [
-		category:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-		serenicCode:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-		product:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-		make:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-		dosage:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-		unitOfMeasure:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-		model:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-		lotNumber:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-		expirationDate:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-		quantity:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-		comments:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-	]
 	
-	static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM");	
 	
-	def importInventoryItems = {	
-		if ("POST".equals(request.getMethod())) {
-			
-			
+	def importInventoryItems = { ImportInventoryCommand cmd ->
 		
-			File xlsFile = null;
+		
+		def inventoryMapList = null;
+		if ("POST".equals(request.getMethod())) {			
+			File localFile = null;
 			if (request instanceof DefaultMultipartHttpServletRequest) { 
 				def uploadFile = request.getFile('xlsFile');
 				if (!uploadFile?.empty) {
 					try { 
-						xlsFile = new File("uploads/" + uploadFile.originalFilename);
-						xlsFile.mkdirs()				
-						uploadFile.transferTo(xlsFile);
-						session.xlsFile = xlsFile;
-						flash.message = "File uploaded successfully"
+						localFile = new File("uploads/" + uploadFile.originalFilename);
+						localFile.mkdirs()				
+						uploadFile.transferTo(localFile);
+						session.localFile = localFile;
+						//flash.message = "File uploaded successfully"
 						
 					} catch (Exception e) { 
 						throw new RuntimeException(e);
@@ -75,101 +52,24 @@ class InventoryItemController {
 			}
 			// Otherwise, we need to retrieve the file from the session 
 			else { 
-				xlsFile = session.xlsFile
+				localFile = session.localFile
 			}
 			
-			// If the file has been successfully uploaded, we need to get the filename 
-			if (xlsFile) {
-				log.info "XLS file " + xlsFile.getAbsolutePath()
-				String filename = xlsFile.getAbsolutePath()
-				def importer = new InventoryExcelImporter(filename, CONFIG_COLUMN_MAP, CONFIG_CELL_MAP, CONFIG_PROPERTY_MAP);
-								
-				def errorMessages = [];
-				def inventoryMapList = importer.getInventoryItems();
-				
-				
-				// Create new transaction
-				Warehouse warehouse = Warehouse.get(session.warehouse.id)
-				def transactionInstance = new Transaction(transactionDate: new Date(), 
-					transactionType: TransactionType.findByName("Inventory"),
-					inventory: warehouse.inventory,
-					destination: warehouse)
-				
-				try {
-					inventoryMapList.each { Map importParams ->
-						//log.info "Inventory item " + importParams
-					
-					
-						
-						def quantity = importParams?.quantity?.intValue();
-						def description = importParams.make + importParams.product + ", " + importParams.model + ", " + importParams.dosage + " " + importParams.unitOfMeasure;
-						
-						def serenicCode = String.valueOf(importParams?.serenicCode?.intValue());							
-						if (importParams?.serenicCode?.class != String.class) {  
-							//errorMessages << "Column 'Serenic Code' with value '${serenicCode}' should be formatted as a text value";
-						}	 								
-						def lotNumber = String.valueOf(importParams.lotNumber);
-						if (importParams?.lotNumber?.class != String.class) { 
-							//errorMessages << "Column 'Serial Number / Lot Number' with value '${lotNumber}' should be formatted as a text value";
-						}
-						def expirationDate = null;
-						if (importParams.expirationDate) {
-							expirationDate = dateFormat.parse(new String(importParams?.expirationDate));
-						}
-						
-						if (errorMessages.isEmpty() && params.importNow) {
-							log.info ("Importing file ...")
-							// Create category if not exists
-							Category category = Category.findByName(importParams.category);
-							if (!category) { 
-								category = new Category(name: importParams.category);
-								category.save();
-								log.info "Created new category " + category.name;
-							}	
-						
-							// Create product if not exists
-							Product product = Product.findByName(importParams.product);
-							if (!product) { 
-								product = new Product(name: importParams.product, category: category);
-								product.save();
-								log.info "Created new product " + product.name;
-							}
-							
-							
-							// Create inventory item if not exists							
-							InventoryItem inventoryItem = InventoryItem.findByProductAndLotNumber(product, importParams.lotNumber);
-							if (!inventoryItem) { 
-								inventoryItem = new InventoryItem()
-								inventoryItem.product = product
-								inventoryItem.lotNumber = lotNumber;
-								inventoryItem.description = description;
-								inventoryItem.expirationDate = expirationDate;
-								inventoryItem.save();
-								log.info "Created new inventoryItem " + inventoryItem.description + " " + inventoryItem.lotNumber;
-							}
+			if (localFile) {
+				log.info "Local xls file " + localFile.getAbsolutePath()
+				String filename = localFile.getAbsolutePath()
+																
+				inventoryMapList =
+					inventoryService.prepareInventory(filename);
 
-							TransactionEntry transactionEntry = new TransactionEntry();
-							transactionEntry.quantity = quantity;
-							transactionEntry.lotNumber = lotNumber;
-							transactionEntry.product = product;
-							transactionEntry.inventoryItem = inventoryItem;
-							transactionEntry.save();
-							transactionInstance.addToTransactionEntries(transactionEntry);
-														
-						}
-					}
-					transactionInstance.save();
-					flash.message = "Successfully imported all inventory items"
-
-				} catch (Exception e) {
-					log.error("Error importing all inventory items")
-					//errorMessages << e.getMessage()
-					// attempt to rollback transaction
-					throw new RuntimeException(e);
+				if (params.importNow) {
+					Warehouse warehouse = Warehouse.get(session.warehouse.id)
+					inventoryService.importInventory(warehouse, inventoryMapList, cmd.errors);
+					flash.message = "Imported inventory successfully";
 				}
 
 				
-				render(view: "importInventoryItems", model: [ inventoryMapList : inventoryMapList, errorMessages: errorMessages, transactionInstance: transactionInstance ]);
+				render(view: "importInventoryItems", model: [ inventoryMapList : inventoryMapList, commandInstance: cmd]);
 			}		
 			else { 
 				flash.message = "Please upload a valid XLS file in order to start the import process"
@@ -778,11 +678,23 @@ class InventoryItemController {
 		def itemInstance = InventoryItem.get(params.id);
 		render(view:'editItemDialog', model: [itemInstance: itemInstance]);
 	}
-	
-	
-
-	
 
 }
 
+
+class ImportInventoryCommand { 
+	
+	def importFile
+	def transactionInstance
+	def warehouseInstance
+	def inventoryInstance
+	def products
+	def transactionEntries
+	def categories
+	def inventoryItems
+	
+	static constraints = {
+		
+	}
+}
 

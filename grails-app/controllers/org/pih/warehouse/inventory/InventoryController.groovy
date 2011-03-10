@@ -82,6 +82,12 @@ class InventoryController {
 		}
 		inventoryService.browseInventory(cmd, params);
 		
+		if (cmd?.productList.size() == 1) { 
+			def productInstance = cmd?.productList.get(0);
+			redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id);
+		}
+		
+		
 		[ commandInstance: cmd ]
 	}
 	

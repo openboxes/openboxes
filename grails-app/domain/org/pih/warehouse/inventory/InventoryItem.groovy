@@ -27,7 +27,7 @@ class InventoryItem implements Serializable {
 		active(nullable:false)
 		description(nullable:true)
 		product(nullable:false)
-		lotNumber(nullable:true, unique:'product')
+		lotNumber(nullable:true, unique:['product','description'])
 		expirationDate(nullable:true)
     }
 	

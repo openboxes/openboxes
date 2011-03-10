@@ -2,8 +2,13 @@ package org.pih.warehouse.inventory;
 
 import java.util.Map;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.ListUtils;
+import org.grails.plugins.excelimport.ExcelImportUtils;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.Warehouse;
@@ -12,6 +17,7 @@ import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.ProductAttribute;
 import org.pih.warehouse.shipping.Shipment;
+import org.springframework.validation.Errors;
 
 class InventoryService {
 	
@@ -646,5 +652,141 @@ class InventoryService {
 			shipmentInstance.errors.reject("shipment.invalid", e.message);
 		}
 	}	
+	
+	public List prepareInventory(String filename) { 
+		def importer = new InventoryExcelImporter(filename, CONFIG_COLUMN_MAP, CONFIG_CELL_MAP, CONFIG_PROPERTY_MAP);
+		def inventoryMapList = importer.getInventoryItems();
+		
+		return inventoryMapList
+	}
+	
+	public void importInventory(Warehouse warehouse, List inventoryMapList, Errors errors) { 
+		
+		def errorMessages = [];
+		
+		try { 
+			
+			def transactionInstance = new Transaction(transactionDate: new Date(),
+				transactionType: TransactionType.findByName("Inventory"),
+				inventory: warehouse.inventory,
+				destination: warehouse)
+	
+			
+			inventoryMapList.each { Map importParams ->
+				//log.info "Inventory item " + importParams
+				def quantity = importParams?.quantity?.intValue();
+				def description =
+					importParams?.make + " " + importParams?.product + ", " + importParams?.model + ", " + importParams?.dosage + " " + importParams.unitOfMeasure;
+				
+				def serenicCode = String.valueOf(importParams?.serenicCode?.intValue());
+				if (importParams?.serenicCode?.class != String.class) {
+					//errorMessages << "Column 'Serenic Code' with value '${serenicCode}' should be formatted as a text value";
+					//errors.reject("Column 'Serenic Code' with value '${serenicCode}' should be formatted as a text value");
+				}
+				def lotNumber = String.valueOf(importParams.lotNumber);
+				if (importParams?.lotNumber?.class != String.class) {
+					//errorMessages << "Column 'Serial Number / Lot Number' with value '${lotNumber}' should be formatted as a text value";
+					//errors.reject("Column 'Serial Number / Lot Number' with value '${lotNumber}' should be formatted as a text value");
+				}
+				def expirationDate = null;
+				if (importParams.expirationDate) {
+					try { 
+						expirationDate = dateFormat.parse(new String(importParams?.expirationDate));
+					} catch (ParseException e) { 
+						errors.reject("Could not parse date " + importParams?.expirationDate + " " + e.getMessage());
+					}
+				}
+			
+				// Create category if not exists
+				Category category = Category.findByName(importParams.category);
+				if (!category) {
+					category = new Category(name: importParams.category);
+					if (!category.save()) { 
+						//throw new RuntimeException("Error saving category " + category?.name);
+						errors.reject("Error saving category " + category?.name)
+					}
+					log.info "Created new category " + category.name;
+				}
+			
+				// Create product if not exists
+				Product product = Product.findByName(importParams.product);
+				if (!product) {
+					product = new Product(name: importParams.product, category: category);
+					if (!product.save()) { 
+						errors.reject("Error saving product " + product?.name)
+						//throw new RuntimeException("Error saving product " + product?.name)
+					}
+					log.info "Created new product " + product.name;
+				}
+											
+				// Create inventory item if not exists
+				InventoryItem inventoryItem = InventoryItem.findByProductAndLotNumber(product, importParams.lotNumber);
+				if (!inventoryItem) {
+					inventoryItem = new InventoryItem()
+					inventoryItem.product = product
+					inventoryItem.lotNumber = lotNumber;
+					inventoryItem.description = description;
+					inventoryItem.expirationDate = expirationDate;
+					log.info "Creating new inventoryItem for product " + product?.name + " with description " + inventoryItem?.description + " and lot number " + inventoryItem?.lotNumber;
+					if (inventoryItem.hasErrors() || !inventoryItem.save()) {
+						inventoryItem.errors.allErrors.each {
+							errors.addError(it);
+							
+							//errors.rejectValue("fieldname", "message.error.code", [message(code: 'eventType.label', default: 'EventType')] as Object[], "Another user has updated this EventType while you were editing")
+						}
+					}
+				}
+				// If there's a quantity, we create a transaction entry for it.  Otherwise
+				// it's just added to the inventory items 
+				if (importParams?.quantity) {
+					TransactionEntry transactionEntry = new TransactionEntry();
+					transactionEntry.quantity = quantity;
+					transactionEntry.lotNumber = lotNumber;
+					transactionEntry.product = product;
+					transactionEntry.inventoryItem = inventoryItem;
+					transactionInstance.addToTransactionEntries(transactionEntry);
+				}
+			}
+			
+			if (!errors.hasErrors()) { 
+				if (!transactionInstance.save()) {
+					transactionInstance.errors.allErrors.each { 
+						errors.addError(it);
+					}
+				}
+			}
+		} catch (Exception e) { 
+			// Bad practice but need this for testing
+			log.error("Error importing inventory", e);
+			throw e;
+		}
+		
+	}
+	
+	static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
+	
+	
+	static Map CONFIG_CELL_MAP = [
+		sheet:'Sheet1', cellMap: [ 'D3':'title', 'D6':'numSold', ]
+	]
+
+	static Map CONFIG_COLUMN_MAP = [
+		sheet:'Sheet1', startRow: 2, columnMap: [ 'A':'category','B':'serenicCode','C':'product', 'D':'make',
+			'E':'dosage', 'F':'unitOfMeasure', 'G':'model', 'H':'lotNumber', 'I':'expirationDate', 'J':'quantity', 'K':'comments' ]
+	]
+	
+	static Map CONFIG_PROPERTY_MAP = [
+		category:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+		serenicCode:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+		product:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+		make:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+		dosage:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+		unitOfMeasure:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+		model:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+		lotNumber:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+		expirationDate:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+		quantity:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+		comments:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+	]
 	
 }

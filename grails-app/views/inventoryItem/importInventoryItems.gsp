@@ -19,16 +19,7 @@
 			<g:hasErrors bean="${commandInstance}">
 				<div class="errors"><g:renderErrors bean="${commandInstance}" as="list" /></div>
 			</g:hasErrors>
-			<g:if test="${errorMessages }">
-				<div class="errors">
-					<ul>
-						<g:each var="erroMessage" in="${errorMessages.unique() }">
-							<li>${erroMessage }</li>
-						</g:each>
-					</ul>
-				</div>
-			</g:if>
-		
+			${transactionInstance?.id }		
 
 			<div class="dialog">
 				<g:render template="uploadFileForm"/>
@@ -98,11 +89,16 @@
 						</div>
 						
 					</fieldset>
-					
-					<g:form controller="inventoryItem" action="importInventoryItems" method="POST"> 
-						<button type="submit" name="importNow" value="true"><img src="${createLinkTo(dir:'images/icons/silk',file:'disk.png')}" alt="Import Now" /> 
-							&nbsp;${message(code: 'default.button.import.label', default: 'Import Now')}</button>
-					</g:form>			
+					<div style="text-align: center">
+						<g:form controller="inventoryItem" action="importInventoryItems" method="POST"> 
+							<button type="submit" name="importNow" value="true"><img src="${createLinkTo(dir:'images/icons/silk',file:'disk.png')}" alt="Import Now" /> 
+								&nbsp;${message(code: 'default.button.import.label', default: 'Import Now')}</button>
+								
+							&nbsp;
+							<a href="${createLink(controller: "inventoryItem", action: "importInventoryItems")}" class="negative"> Clear </a>
+								
+						</g:form>			
+					</div>
 				</div>
 			</g:if>						
 		</div>

@@ -93,13 +93,10 @@
 						<thead>
 							<tr class="even prop">
 								<th>
-									${message(code: 'transaction.transactionType.label', default: 'Details')}
-								</th>													
-								<th>
-									${message(code: 'transaction.transactionType.label', default: 'Type')}
+									${message(code: 'transaction.transactionDate.label', default: 'Date')}
 								</th>
 								<th>
-									${message(code: 'transaction.transactionDate.label', default: 'Date')}
+									${message(code: 'transaction.transactionType.label', default: 'Type')}
 								</th>
 								<th style="text-align: center">
 									${message(code: 'transaction.quantityChange.label', default: 'Qty In/Out')}
@@ -122,12 +119,9 @@
 									<tr class="transaction ${(status%2==0)?'odd':'even' } prop">
 										<td>	
 											<a id="show-details-${transaction?.id }" class="show-details" href="${createLink(controller: 'inventory', action:'showTransactionDialog', id: transaction.id, params: ['product.id', 'test'])}">
-												<button>
-													<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/> Details
-												</button>
+												<g:formatDate
+													date="${transaction?.transactionDate}" format="MMM dd" />																
 											</a>
-											
-											
 											
 											<!--  Transaction Details -->
 											<span id="transactionEntries${transaction?.id}" style="text-align: left; padding: 10px; margin: 10px; display: none; position:absolute; padding: 10px; background-color: white; border: 1px dashed black">
@@ -183,12 +177,6 @@
 										<td>
 											${transaction?.transactionType?.name }&nbsp;
 										
-										</td>
-										<td>
-											<span class="fade">
-												<g:formatDate
-													date="${transaction?.transactionDate}" format="MMM dd" />																
-											</span>
 										</td>
 										<td style="text-align: center">
 											
