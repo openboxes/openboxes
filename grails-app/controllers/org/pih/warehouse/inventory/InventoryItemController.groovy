@@ -22,10 +22,6 @@ class InventoryItemController {
 
 	def inventoryService;
 
-
-	
-	
-	
 	def importInventoryItems = { ImportInventoryCommand cmd ->
 		
 		
@@ -358,7 +354,7 @@ class InventoryItemController {
 		
 		 
 		// If all else fails, return to the show stock card page
-		redirect(action: 'showStockCard', params: ['product.id':productInstance?.id])
+		redirect(action: 'showStockCard', id: productInstance?.id)
 	}
 	
 
