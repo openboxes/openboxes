@@ -35,9 +35,13 @@
 						<div class="buttons">
 							<g:submitButton name="addItemToContainer" value="Add an Item to this ${container ? container?.containerType?.name : containerTypeToAdd?.name}"></g:submitButton>
 						</div>
+						
+						<!--  
 						<div class="buttons">
 							<g:submitButton name="cloneContainer" value="Clone ${container ? container?.containerType?.name : containerTypeToAdd?.name}"></g:submitButton> Quantity: <g:textField id="cloneQuantity" name="cloneQuantity" size="3" value="0"/> 
 						</div>
+						-->
+						
 					</td>
 				</tr>
 			</tbody>

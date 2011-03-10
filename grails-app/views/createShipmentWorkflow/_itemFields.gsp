@@ -10,9 +10,10 @@
 				<tr class="prop">
 					<td valign="top" class="name"><label><g:message code="shipmentItem.lotNumber.label" default="Lot / Serial Number" /></label></td>                            
 					<td valign="top" class="value">
-						<g:autoSuggestString name="lotNumber" jsonUrl="/warehouse/json/findLotsByName" 
-							width="200" value="${item?.lotNumber}"/>	
-						<g:link controller="inventory" action="createTransaction" target="_blank"><span class="small">Update Inventory</span></g:link>
+						<g:textField id="lotNumber" name="lotNumber" width="200" value="${item?.lotNumber}"/>
+					<!--  <g:autoSuggestString name="lotNumber" jsonUrl="/warehouse/json/findLotsByName" 
+							width="200" value="${item?.lotNumber}"/>  -->	
+	<!--  					<g:link controller="inventory" action="createTransaction" target="_blank"><span class="small">Update Inventory</span></g:link> -->
 					</td>
 				</tr>
 				<tr class="prop">

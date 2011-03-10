@@ -11,10 +11,13 @@
 		<table>
 			<tbody>
 				<g:render template="containerFields" model="['box':boxToEdit]"/>
+				
+			
 				<g:if test="${addBoxToContainerId}">
 					<g:hiddenField name="container.id" value="${addBoxToContainerId}"/>
-					<g:render template="itemFields" model=""/>
 				</g:if>
+		
+				
 				<g:if test="${boxToEdit}">
 					<g:hiddenField name="box.id" value="${boxToEdit.id}"/>
 				</g:if>
@@ -28,19 +31,23 @@
 							</g:if>
 							<button name="cancelDialog" type="reset" onclick="$('#dlgEditBox').dialog('close');">Cancel</button>
 						</div>
-						<g:if test="${boxToEdit}">
+
 							<div class="buttons">
 								<g:submitButton name="addItemToBox" value="Add an Item to this Box"></g:submitButton>
 							</div>
-						</g:if>
+	
+						
+						<!--  
 						<g:if test="${addBoxToContainerId}">
 							<div class="buttons">
 								<g:submitButton name="addAnotherBox" value="Save Box and Add Another Box"></g:submitButton>
 							</div>
 						</g:if>
+				
+						
 							<div class="buttons">
 								<g:submitButton name="cloneBox" value="Clone Box"></g:submitButton> Quantity: <g:textField id="cloneQuantity" name="cloneQuantity" size="3" value="0"/> 
-							</div>
+							</div>  		-->
 					</td>
 				</tr>
 			</tbody>

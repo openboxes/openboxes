@@ -186,7 +186,7 @@ class CreateShipmentWorkflowController {
 			
 			on("addBoxToContainer"){
 				// this parameter triggers the "Add Box" dialog for the container to be opened on page reload
-				// -1 means we need to assign the id of the new container to add box
+				// -1 means we need to assign the id of the newly created container to add box
 				flash.addBoxToContainerId = (params.container?.id) ? params.container.id as Integer : -1
 			}.to("saveContainerAction")
 			
@@ -197,8 +197,9 @@ class CreateShipmentWorkflowController {
 			}.to("saveContainerAction")
 			
 			on("addItemToBox") {	
-				// this parameter triggers the "Add Item" dialog for the container to be opened on page reloa
-				flash.addItemToContainerId = params.box.id as Integer
+				// this parameter triggers the "Add Item" dialog for the container to be opened on page reload
+				// -1 means we need to assign the id of the newly created box to to the item 
+				flash.addItemToContainerId = (params.box?.id) ? params.box.id as Integer : -1
 			}.to("saveBoxAction")
 			
 			on("addAnotherItem") {
@@ -206,10 +207,12 @@ class CreateShipmentWorkflowController {
 				flash.addItemToContainerId = params.container.id as Integer
 			}.to("saveItemAction")
 			
+			/**
 			on("addAnotherBox") {
 				// this parameter triggers the "Add Box" dialog for the container to be opened on page reload
 				flash.addBoxToContainerId = params.container.id as Integer
 			}.to("saveBoxAction")
+		*/
 			
 			// for the top-level links
     		on("enterShipmentDetails").to("enterShipmentDetails")
@@ -275,6 +278,7 @@ class CreateShipmentWorkflowController {
     		on("valid").to("enterContainerDetails")
     	}
     
+     	
     	saveBoxAction {
     		action {
     			
@@ -291,9 +295,8 @@ class CreateShipmentWorkflowController {
 					box = container.addNewContainer(ContainerType.findByName("Box"))
 				}
 				
-    			// NOTE: remember if we add fields, we need to add them here; need to white-list them since one form is populating two objects
-				box.properties['name','height','width','length','weight'] = params
-				
+    			bindData(box,params)
+    		
 				// TODO: make sure that this works properly if there are errors?
 				if(box.hasErrors() || !box.validate()) { 
 					invalid()
@@ -303,23 +306,10 @@ class CreateShipmentWorkflowController {
 					
 					// save a reference to this box if we need to clone it
 					if (flash.cloneQuantity) { flash.cloneContainer = box }
-				}
-				
-				// now add the item, if one has been specified
-				if (params.product?.id) {
 					
-					def item = box.addNewItem()
+					// assign the id of the box if needed
+    				if (flash.addItemToContainerId == -1) { flash.addItemToContainerId = box.id }
 					
-					// NOTE: remember if we add fields, we need to add them here; need to white-list them since oen form is populating two objects
-					item.properties['product','quantity','lotNumber','recipient'] = params
-					
-					// TODO: make sure that this works properly if there are errors?
-					if(item.hasErrors() || !item.validate()) { 
-						invalid()
-	    			}
-					else {
-						shipmentService.saveShipmentItem(item)
-					}
 				}
 				
 				valid()
@@ -328,7 +318,6 @@ class CreateShipmentWorkflowController {
 			on("valid").to("cloneContainerAction")
     		on("invalid").to("enterContainerDetails")
     	}
-    	
     	
     	saveItemAction {
     		action {
@@ -343,12 +332,14 @@ class CreateShipmentWorkflowController {
 					def container = Container.get(params.container?.id)
 					
 					if (!container) {
-						throw new Exception("Invaild container passed to editItem action.")
+						throw new Exception("Invaild container passed to editItem action. Invalid id ${params.container?.id}.")
 					}
 					item = container.addNewItem()
 				}
     			
-    			bindData(item, params)
+    			println("the params to bind = " + params)
+    			
+    			bindData(item, params, ['product.name','recipient.name'])  // blacklisting names so that we don't change product name or recipient name here!
 				
 				// TODO: make sure that this works properly if there are errors?
 				if(item.hasErrors() || !item.validate()) { 
@@ -363,60 +354,6 @@ class CreateShipmentWorkflowController {
     		on("valid").to("enterContainerDetails")
     		on("invalid").to("enterContainerDetails")
     	}
-    	
-    	
-    	/**
-    	
-    	reviewShipment {
-    		on("back").to("enterContainerDetails")	
-    		on("next").to("sendShipment")
-    		on("save").to("finish")
-    		on("cancel").to("finish")
-    		
-    		// for the top-level links
-    		on("enterShipmentDetails").to("enterShipmentDetails")
-			on("enterTrackingDetails").to("enterTrackingDetails")
-			on("enterContainerDetails").to("enterContainerDetails")
-			on("reviewShipment").to("reviewShipment")
-			on("sendShipment").to("sendShipment")
-    	}
-    	
-    	sendShipment {
-    		on("back").to("reviewShipment")
-    		on("send").to("sendShipmentAction")
-    		on("save").to("finish")
-    		on("cancel").to("finish")
-    		
-    		// for the top-level links
-    		on("enterShipmentDetails").to("enterShipmentDetails")
-			on("enterTrackingDetails").to("enterTrackingDetails")
-			on("enterContainerDetails").to("enterContainerDetails")
-			on("reviewShipment").to("reviewShipment")
-			on("sendShipment").to("sendShipment")
-    	}
-    	
-    	sendShipmentAction {
-    		action {
-				def userInstance = User.get(session.user.id);
-				def warehouseInstance = Warehouse.get(session.warehouse.id)
-				shipmentService.sendShipment(flow.shipmentInstance, params.comment, userInstance, warehouseInstance, params.shipDate ? params.shipDate : new Date());
-				if (flow.shipmentInstance.hasErrors() || !flow.shipmentInstance.validate()) { 
-					invalid();
-				}
-				else { 
-					valid()
-				} 
-    		}
-    	
-    		on("valid").to("shipmentComplete")
-    		on("invalid").to("sendShipment")
-    	}
-    	
-    	shipmentComplete {
-    		on("done").to("finish")
-    	}
-    	
-    	*/
     	
     	showDetails {
     		redirect(controller:"shipment", action : "showDetails", params : [ "id" : flow.shipmentInstance.id ?: '' ])

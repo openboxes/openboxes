@@ -1,37 +1,36 @@
 		<div id="itemSearchForm" >
-			<g:form name="editItem" action="createShipment">
-				<h2><g:message code="inventoryItem.search.label" default="Search name, description, lot/serial number ..." /></h2>
-				<div style="text-align: center;">
-					<table style="display: inline;">
-						<tbody>
-							<tr>
-								<td style="text-align: center">
-									<g:autoSuggestSearchable name="searchable" jsonUrl="/warehouse/json/searchInventoryItems" />
-									&nbsp;
-								</td>
-							</tr>
-							<tr>
-								<td style="text-align: center">
-									<b>-OR-</b>
-								</td>
-							</tr>
-							<tr>
-								<td style="text-align: center">						
-									<button class="show-item-form">
-									<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" style="vertical-align: middle"/>
-									&nbsp; Add a new item</button>
-								
-														
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-			</g:form>
+			<h2><g:message code="inventoryItem.search.label" default="Search inventory by name, description, or lot/serial number:" /></h2>
+			<div style="text-align: center;">
+				<table style="display: inline;">
+					<tbody>
+						<tr>
+							<td style="text-align: center">
+								<g:autoSuggestSearchable name="searchable" jsonUrl="/warehouse/json/searchInventoryItems" />
+								&nbsp;
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: center">
+								<b>-OR-</b>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: center">						
+								<button class="show-item-form">
+								<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" style="vertical-align: middle"/>
+								&nbsp; Add an item not currently in inventory</button>
+							
+													
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 		</div>
 		
 		<div id="itemFoundForm" style="display: none">
-			<g:form name="editItem" action="createShipment">
+			<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.ShipmentItem" form="editItemFound"/>
+			<g:form name="editItemFound" action="createShipment">
 				<h2><g:message code="inventoryItem.enterQuantity.label" default="Enter quantity and recipient" /></h2>  
 				<g:hiddenField id="container-id" name="container.id" value="${containerId}" size="20" />			
 				<table>
@@ -45,7 +44,8 @@
 		</div>							
 		
 		<div id="itemEntryForm" style="display: none">
-			<g:form name="editItem" action="createShipment">
+		<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.ShipmentItem" form="editItemEntry"/>
+			<g:form name="editItemEntry" action="createShipment">
 				<h2><g:message code="inventoryItem.enterItem.label" default="Enter item details" /></h2>  
 				<g:if test="${item?.id}">
 					<g:hiddenField name="item.id" value="${item.id }"/>
@@ -75,6 +75,7 @@
 					$("#itemSearchForm").show();
 					$("#itemFoundForm").hide();
 					$("#itemEntryForm").hide();
+					$("[name='searchable.name']").val('');
 					event.preventDefault();
 				});
 				
