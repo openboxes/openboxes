@@ -69,18 +69,22 @@ grails.validateable.packages = ['org.pih.warehouse.inventory']
 environments {
 	production {  
 		grails.serverURL = "http://www.changeme.com"  
+		uiperformance.enabled = false
 	}
 	development {
 		grails.serverURL = "http://localhost:8080/${appName}";
+		uiperformance.enabled = false
 	}
 	test {  
 		grails.serverURL = "http://localhost:8080/${appName}"  
+		uiperformance.enabled = false
 	}
 	child { 
 		grails.serverURL = "http://localhost:8090/${appName}"
 		warehouse.syncServerURL = "http://localhost:8080/${appName}"
 	}
 }
+
 
 // log4j configuration
 /*
