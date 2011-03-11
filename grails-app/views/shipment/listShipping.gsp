@@ -16,17 +16,6 @@
             </g:if>
 
 			<h1>Shipments originating at ${session.warehouse.name}</h1>
-
-			<g:if test="${shipments.size()==0}">
-           		<div class="message">
-           			<g:if test="${eventType?.name}">
-           				There are no shipments with status <b>${eventType?.eventCode?.status}</b>.
-           			</g:if>
-           			<g:else>
-   		        		There are no shipments matching your conditions.
-            		</g:else>
-           		</div>
-           	</g:if>
             	
             <g:form action="listShipping" method="post">
            	<h3>Type:  <g:select name="shipmentType"
@@ -54,64 +43,70 @@
             </g:form>
             
             <br/>
-            <div class="list">
-				<table>
-                    <thead>
-                        <tr>   
-                        	<th>${message(code: 'shipment.shipmentType.label', default: 'Type')}</th>
-                            <th>${message(code: 'shipment.shipment.label', default: 'Shipment')}</th>							
-                            <th>${message(code: 'shipment.destination.label', default: 'Destination')}
-                        	<th>${message(code: 'shipment.expectedShippingDate.label', default: 'Expected Shipping Date')}</th>
-                         	<th>${message(code: 'shipment.status.label', default: 'Status')}</th>
-                         	<th>${message(code: 'shipment.documents.label', default: 'Documents')}</th>
-                        <!--  
-							<g:sortableColumn property="shipmentType" title="${message(code: 'shipment.shipmentType.label', default: 'Type')}" />
-                            <g:sortableColumn property="name" title="${message(code: 'shipment.shipment.label', default: 'Shipment')}" />								
-                            <g:sortableColumn property="destination" title="${message(code: 'shipment.destination.label', default: 'Destination')}" />
-                        	<g:sortableColumn property="expectedShippingDate"  title="${message(code: 'shipment.expectedShippingDate.label', default: 'Expected Shipping Date')}" />
-                         	<th><g:link action="listShipping">${message(code: 'shipment.status.label', default: 'Status')}</g:link></th>
-                         	<th><a href="">${message(code: 'shipment.documents.label', default: 'Documents')}</a></th>
-                        	-->
-                        </tr>
-                    </thead>
-                   
-                   	<tbody>
-						<g:each var="shipmentInstance" in="${shipments}" status="i">
-							<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
-								<td width="3%" style="text-align: center">
-									<img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + shipmentInstance?.shipmentType?.name + '.png')}"
-									alt="${shipmentInstance?.shipmentType?.name}" style="vertical-align: middle; width: 24px; height: 24px;" />		
-								</td>										
-								<td width="10%">
-									<g:link action="showDetails" id="${shipmentInstance.id}">
-										${fieldValue(bean: shipmentInstance, field: "name")}
-									</g:link>																														
-								</td>
-								<td width="10%" align="center">
-									${fieldValue(bean: shipmentInstance, field: "destination.name")}
-								</td>
-								<td width="10%" align="center">
-									<g:formatDate format="dd/MMM/yyyy" date="${shipmentInstance?.expectedShippingDate}"/>
-								</td>
-								<td width="10%">												
-									${shipmentInstance?.mostRecentEvent?.eventType?.eventCode?.status} - <g:formatDate format="dd/MMM/yyyy" date="${shipmentInstance?.mostRecentEvent?.eventDate}"/>									
-								</td>
-								<td width="15%">
-									<g:if test="${!shipmentInstance.documents}"><span class="fade">(empty)</span></g:if>
-									<g:else>
-										<g:each in="${shipmentInstance.documents}" var="document" status="j">
-											<div id="document-${document.id}">
-												<img src="${createLinkTo(dir:'images/icons/',file:'document.png')}" alt="Document" style="vertical-align: middle"/>
-												<g:link controller="document" action="download" id="${document.id}">${document?.documentType?.name} (${document?.filename})</g:link>
-											</div>
-										</g:each>							
-									</g:else>
-								</td>
+            
+            <g:if test="${shipments.size()==0}">
+           		<div>
+           			<g:if test="${shipmentType || destination || status || statusStartDate || statusEndDate}">
+           				There are no shipments matching your conditions.
+           			</g:if>
+           			<g:else>
+   		        		There are no shipments originating at ${session.warehouse.name}.
+            		</g:else>
+           		</div>
+           	</g:if>
+            
+            <g:else>
+	            <div class="list">
+					<table>
+	                    <thead>
+	                        <tr>   
+	                        	<th>${message(code: 'shipment.shipmentType.label', default: 'Type')}</th>
+	                            <th>${message(code: 'shipment.shipment.label', default: 'Shipment')}</th>							
+	                            <th>${message(code: 'shipment.destination.label', default: 'Destination')}</th>
+	                        	<th>${message(code: 'shipment.expectedShippingDate.label', default: 'Expected Shipping Date')}</th>
+	                         	<th>${message(code: 'shipment.status.label', default: 'Status')}</th>
+	                         	<th>${message(code: 'shipment.documents.label', default: 'Documents')}</th>
 	                        </tr>
-						</g:each>                    		
-                    </tbody>
-				</table>
-            </div>
+	                    </thead>
+	                   
+	                   	<tbody>
+							<g:each var="shipmentInstance" in="${shipments}" status="i">
+								<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
+									<td width="3%" style="text-align: center">
+										<img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + shipmentInstance?.shipmentType?.name + '.png')}"
+										alt="${shipmentInstance?.shipmentType?.name}" style="vertical-align: middle; width: 24px; height: 24px;" />		
+									</td>										
+									<td width="10%">
+										<g:link action="showDetails" id="${shipmentInstance.id}">
+											${fieldValue(bean: shipmentInstance, field: "name")}
+										</g:link>																														
+									</td>
+									<td width="10%" align="center">
+										${fieldValue(bean: shipmentInstance, field: "destination.name")}
+									</td>
+									<td width="10%" align="center">
+										<g:formatDate format="dd/MMM/yyyy" date="${shipmentInstance?.expectedShippingDate}"/>
+									</td>
+									<td width="10%">												
+										${shipmentInstance?.mostRecentEvent?.eventType?.eventCode?.status} - <g:formatDate format="dd/MMM/yyyy" date="${shipmentInstance?.mostRecentEvent?.eventDate}"/>									
+									</td>
+									<td width="15%">
+										<g:if test="${!shipmentInstance.documents}"><span class="fade">(empty)</span></g:if>
+										<g:else>
+											<g:each in="${shipmentInstance.documents}" var="document" status="j">
+												<div id="document-${document.id}">
+													<img src="${createLinkTo(dir:'images/icons/',file:'document.png')}" alt="Document" style="vertical-align: middle"/>
+													<g:link controller="document" action="download" id="${document.id}">${document?.documentType?.name} (${document?.filename})</g:link>
+												</div>
+											</g:each>							
+										</g:else>
+									</td>
+		                        </tr>
+							</g:each>                    		
+	                    </tbody>
+					</table>
+	            </div>
+            </g:else>
         </div>		
     </body>
 </html>

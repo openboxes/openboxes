@@ -98,7 +98,7 @@
 											${itemInstance?.recipient?.name}
 										</td>
 										<td style="text-align: left;">		
-											<g:link action="createShipment" event="deleteItem" params="['item.id':itemInstance?.id]">	
+											<g:link action="createShipment" event="deleteItem" params="['item.id':itemInstance?.id]" onclick="return confirm('Are you sure you want to delete this item?')">	
 											<img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="remove item" style="vertical-align: middle"/>
 											</g:link>	
 										</td>
@@ -127,7 +127,7 @@
 											</g:link> 		
 										</td>
 										<td nowrap="nowrap">
-											<g:link action="createShipment" event="deleteBox" params="['box.id':boxInstance?.id]">
+											<g:link action="createShipment" event="deleteBox" params="['box.id':boxInstance?.id]" onclick="return confirm('Are you sure you want to delete this box?')">
 												<img src="${createLinkTo(dir:'images/icons/silk',file:'package_delete.png')}" alt="Add an item" style="vertical-align: middle"/>
 											</g:link>				
 										</td>
@@ -153,7 +153,7 @@
 												${itemInstance?.recipient?.name}
 											</td>
 											<td style="text-align: left;" nowrap="true">		
-												<g:link action="createShipment" event="deleteItem" params="['item.id':itemInstance?.id]">
+												<g:link action="createShipment" event="deleteItem" params="['item.id':itemInstance?.id]" onclick="return confirm('Are you sure you want to delete this item?')">
 													<img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="remove item" style="vertical-align: middle"/>
 												</g:link>	
 											</td>

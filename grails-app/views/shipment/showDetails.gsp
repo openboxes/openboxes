@@ -352,9 +352,11 @@
 																			<g:link action="editEvent" id="${event?.id}" params="[shipmentId:shipmentInstance.id]">
 																				<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit" style="vertical-align: middle"/>
 																			</g:link>
+																			<!--  
 																			<g:link class="remove" action="deleteEvent" id="${event?.id}" params="[shipmentId:shipmentInstance.id]" onclick="return confirm('Are you sure you want to delete this event?')">
 																				<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" style="vertical-align: middle"/>
-																			</g:link>	
+																			</g:link>
+																			-->	
 																		</g:if>
 																	</td>
 																</tr>

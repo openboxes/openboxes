@@ -384,25 +384,22 @@ class ShipmentController {
 	}
 	
 	def listReceiving = { 
-		def currentLocation = Location.get(session.warehouse.id);
-		def shipments = params.sort ? shipmentService.getAllShipments(params.sort, params.order) : 
-		shipmentService.getAllShipments('expectedShippingDate','asc')  // probably could default on something better than this
-		
-		// filter by destination location
-		shipments = shipments.findAll( {it.destination == currentLocation
+		def destination = Location.get(session.warehouse.id)
+		def shipmentType = params.shipmentType ? ShipmentType.get(params.shipmentType) : null
+		def origin = params.origin ? Location.get(params.origin) : null
+		def eventCode = params.status ? EventCode.getByStatus(params.status) : null
+		def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
+		def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
+					
+		def shipments = shipmentService.getShipments(shipmentType, origin, destination, eventCode, statusStartDate, statusEndDate)
+
+		// sort by event status and event date
+		shipments = shipments.sort( { a, b -> 
+			a.getMostRecentEvent().compareByEventTypeAndEventDate(b.getMostRecentEvent())
 		} )
 		
-		// filter by event status
-		if (params.eventCode) {
-			shipments = shipments.findAll( { it.mostRecentEvent?.eventType?.eventCode == EventCode.valueOf(params.eventCode)
-			} )		
-		}	
-		
-		[
-		shipmentInstanceMap : shipmentService.getShipmentsByStatus(shipments),
-		shipmentInstanceList : shipments,
-		shipmentInstanceTotal : shipments.size(),
-		]
+		[ shipments:shipments, shipmentType:shipmentType?.id, origin:origin?.id, status:eventCode?.status, 
+				statusStartDate:statusStartDate, statusEndDate:statusEndDate ]
 	}
 	
 	def listShippingByDate = { 
@@ -445,7 +442,7 @@ class ShipmentController {
 					
 		def shipments = shipmentService.getShipments(shipmentType, origin, destination, eventCode, statusStartDate, statusEndDate)
 		
-		// sort by event status and event date
+		// sort by event status, event date, and expecting shipping date
 		shipments = shipments.sort( { a, b -> 
 			def diff = a.getMostRecentEvent().compareByEventTypeAndEventDate(b.getMostRecentEvent()) 
 			if (diff == 0) {
