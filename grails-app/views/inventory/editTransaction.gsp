@@ -82,6 +82,8 @@
 								</td>
 							</tr>
 							<g:if test="${transactionInstance?.id }">
+								
+								<%--
 								<tr class="prop">
 									<td class="name"><label>Confirmed</label></td>
 									<td class="value">
@@ -102,7 +104,8 @@
 												value="${transactionInstance?.dateConfirmed}" format="MM/dd/yyyy"/>
 										
 									</td>
-								</tr>							
+								</tr>				
+								--%>			
 								<tr class="prop">
 									<td class="name">
 										<label>Transaction Entries</label>

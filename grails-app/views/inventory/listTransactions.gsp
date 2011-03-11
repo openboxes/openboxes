@@ -28,7 +28,6 @@
 							<th>Type</th>
 							<th>Source</th>
 							<th>Destination</th>
-							<th>Confirmed?</th>
 							<th>Entries</th>
 							<th>Actions</th>
                         </tr>
@@ -52,26 +51,19 @@
 									${transactionInstance?.destination?.name }
 								</td>
 								<td>
-									<g:if test="${!transactionInstance?.confirmed}">
-										
-									</g:if>
-									<g:else>
-										Confirmed by ${transactionInstance?.confirmedBy?.name } on
-										${formatDate(date: transactionInstance?.dateConfirmed, format: 'dd-MMM-yyyy') }
-									</g:else>
-								</td>
-								<td>
 									${transactionInstance?.transactionEntries?.size() }
 								</td>
 								<td>
 									<g:link action="showTransaction" id="${transactionInstance?.id }">View</g:link>
 									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png') }"/>
+									<%-- 
 									<g:if test="${transactionInstance?.confirmed }">
 										<g:link action="confirmTransaction" id="${transactionInstance?.id }">Reset</g:link>	
 									</g:if>
 									<g:else>
 										<g:link action="confirmTransaction" id="${transactionInstance?.id }">Confirm</g:link>	
 									</g:else>
+									--%>
 								</td>
 							</tr>
 						</g:each>

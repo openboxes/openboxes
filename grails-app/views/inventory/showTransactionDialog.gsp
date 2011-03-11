@@ -82,19 +82,6 @@
 									${transactionInstance?.destination?.name }
 								</span>
 							</li>
-							<li class="prop">
-								<label>Confirmed</label>
-								<span class="value">
-									<g:if test="${!transactionInstance?.confirmed}">
-										Not confirmed yet
-									</g:if>
-									<g:else>
-										Confirmed by ${transactionInstance?.confirmedBy?.name } on
-										${formatDate(date: transactionInstance?.dateConfirmed, format: 'dd/MMM/yyyy') }
-									</g:else>									
-								</span>
-							</li>
-									
 							<g:if test="${transactionInstance?.id }">
 								<li class="prop">
 									<label>Transaction Entries</label>

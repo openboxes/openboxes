@@ -126,7 +126,7 @@
 	    		$("#addProduct").click(function(event) { 
 		    		event.preventDefault();
 		    		$('#productSearch').addClass("fade");					
-		    		$("#productSearch").val("Find another product to add");
+		    		$("#productSearch").val("Add another product ...");
 		    		var productId = $('#productId').val();
 					var productName = $('#productName').val();
 					// If the product does not exist, show error 
@@ -333,14 +333,14 @@
         </script>
         <script id="transaction-entry-template" type="x-jquery-tmpl">						
 			<tr id="product-lot-row-{{= Index }}" class="{{= StyleClass}} product-{{= ProductId}}">
-				<td width="5%">
+				<td>
 					<span class="fade">{{= Id }}</span>
 				</td>
-				<td width="35%">
+				<td>
 					{{= ProductName}} 
-					&nbsp; <a href="${createLink(controller: 'inventoryItem', action: 'showStockCard')}/{{= ProductId}}">&lsaquo; Stock Card</a>
+					&nbsp; <a href="${createLink(controller: 'inventoryItem', action: 'showStockCard')}/{{= ProductId}}" target="_blank">Open Stock Card &rsaquo;</a>
 				</td>
-				<td width="25%">
+				<td>
 					<g:hiddenField name="transactionEntries[{{= Index}}].product.id" class="hiddenProductId" value="{{= ProductId}}"/>
 					<g:hiddenField name="transactionEntries[{{= Index}}].lotNumber" class="hiddenLotNumber" value="{{= LotNumber}}"/>
 					<g:textField name="lotNumber" value="" class="lotNumber" size="15" value="{{= LotNumber}}"/>
@@ -348,10 +348,10 @@
 				<td>
 
 				</td>
-				<td width="5%">
+				<td>
 					<g:textField class="quantity" name="transactionEntries[{{= Index}}].quantity" value="{{= Qty}}" size="3"/>
 				</td>
-				<td width="10%" nowrap="nowrap">
+				<td nowrap="nowrap">
 					<g:hiddenField id="product.id" name="product.id" value="{{= ProductId}}"/>
 					<g:hiddenField id="productName" name="productName" value="{{= ProductName}}"/>
 					<button type="button" class="add-lot-number">
@@ -365,13 +365,13 @@
 		</script>
         <script id="lot-number-template" type="x-jquery-tmpl">
 			<tr id="product-lot-row-{{= Index }}" class="{{= StyleClass}} product-{{= ProductId}}">
-				<td width="5%">
+				<td>
 					<span class="fade">{{= Id }}</span>
 				</td>
-				<td width="35%">
+				<td>
 					<span class="fade">{{= ProductName}} </span>
 				</td>
-				<td width="25%">
+				<td>
 					<g:hiddenField name="transactionEntries[{{= Index}}].product.id" class="hiddenProductId" value="{{= ProductId}}"/>
 					<g:hiddenField name="transactionEntries[{{= Index}}].lotNumber" class="hiddenLotNumber" value="{{= LotNumber}}"/>
 					<g:textField name="lotNumber" class="lotNumber" size="15" value="{{= LotNumber}}"/>
@@ -379,10 +379,10 @@
 				<td>
 
 				</td>
-				<td width="5%">
+				<td>
 					<g:textField class="quantity" name="transactionEntries[{{= Index}}].quantity" value="{{= Qty}}" size="3"/>
 				</td>
-				<td width="10%">
+				<td>
 					<button class="delete-lot-number">
 						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png')}"/>	
 					</button>
@@ -450,7 +450,7 @@
 						<li id="transaction-entries-li" class="prop entries">
 							<div style="width: 100%;" >
 								
-								<table id="transaction-entries-table" border="1" style="border: 1px solid lightgrey; background-color: white;">
+								<table id="transaction-entries-table" border="0" style="border: 0px solid lightgrey; background-color: white; display: inline;">
 									<thead>
 										<tr class="header">
 											<th>ID</th>
@@ -462,10 +462,6 @@
 										</tr>
 									</thead>
 									<tbody>
-										<g:if test="${!transactionInstance?.transactionEntries }">
-											<tr class="empty"><td colspan="6" style="text-align: center"><span class="fade">empty</span></td></tr>
-										</g:if>
-										<!--  Empty to start -->
 										<%--
 										
 										<g:if test="${transactionInstance?.transactionEntries }">
@@ -511,20 +507,15 @@
 													
 									<tfoot>
 										<tr>
-											<td></td>
-											<td>
+											<td colspan="6">
 												<g:hiddenField id="productId" name="productId"/>
 												<g:hiddenField id="productName" name="productName"/>
-												<g:textField  id="productSearch" name="productSearch" value="Find another product to add" /> &nbsp;
+												<g:textField  id="productSearch" name="productSearch" value="Add another product ..." size="30"/> &nbsp;
 												<button id="addProduct" type="button">
 													<img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png')}"/>	
 												</button>							
 											
 											</td>
-											<td></td>
-											<td></td>
-											<td></td>
-											<td></td>
 										</tr>
 									</tfoot>				
 								</table>
