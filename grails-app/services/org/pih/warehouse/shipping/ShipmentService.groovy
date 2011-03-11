@@ -487,7 +487,6 @@ class ShipmentService {
 	void receiveShipment(Shipment shipmentInstance, Receipt receiptInstance, String comment, User user, Location location) { 
 		
 		try {
-			
 			if (!receiptInstance.hasErrors() && shipmentInstance.hasShipped() && !shipmentInstance.wasReceived() && receiptInstance.save(flush: true)) {
 				
 				// Add comment to shipment (as long as there's an actual comment
@@ -552,7 +551,6 @@ class ShipmentService {
 					transactionEntry.inventoryItem = inventoryItem;
 					creditTransaction.addToTransactionEntries(transactionEntry);
 				}
-				
 				
 				if (!creditTransaction.hasErrors() && creditTransaction.save(flush:true)) { 
 					// saved successfully

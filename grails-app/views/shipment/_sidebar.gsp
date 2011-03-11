@@ -69,7 +69,7 @@
 					<td>
 					
 						<g:if test="${shipmentInstance.hasShipped() && !shipmentInstance.wasReceived()}">
-							<g:link controller="shipment" action="receiveShipment" id="${shipmentInstance.id}">
+							<g:link controller="shipment" action="receiveShipment" params="${ [shipmentId : shipmentInstance.id] }">
 							<img src="${createLinkTo(dir:'images/icons',file:'handtruck.png')}"
 							alt="Receive Shipment" style="vertical-align: middle" /> &nbsp; 
 								<g:if test="${request.request.requestURL.toString().contains('receiveShipment')}"><b>receive shipment</b></g:if>

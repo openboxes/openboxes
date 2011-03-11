@@ -33,7 +33,7 @@
 						
 							<g:form action="receiveShipment" method="POST">
 								<g:hiddenField name="id" value="${shipmentInstance?.id}" />
-								<g:hiddenField name="shipment.id" value="${shipmentInstance?.id}" />								
+								<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />								
 								<table>
 									<tbody>
 										<tr class="prop">

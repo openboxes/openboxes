@@ -252,26 +252,41 @@ class ShipmentController {
 	
 	def receiveShipment = {
 		log.info "params: " + params
-		def receiptInstance = new Receipt(params);
-		def shipmentInstance = Shipment.get(params.id)		
+		def receiptInstance
+		def shipmentInstance = Shipment.get(params.shipmentId)		
+		
 		if (!shipmentInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
 			redirect(action: "listReceiving")
 		}
 		else {			
-			if ("POST".equalsIgnoreCase(request.getMethod())) {				
+			if ("POST".equalsIgnoreCase(request.getMethod())) {			
+				receiptInstance = new Receipt(params)
+				
+				// associate the receipt with the shipment
+				shipmentInstance.receipt = receiptInstance
+				receiptInstance.shipment = shipmentInstance
+				
+				// check for errors
+				if(receiptInstance.hasErrors() || !receiptInstance.validate()) {
+					render(view: "receiveShipment",  model: [shipmentInstance: shipmentInstance, receiptInstance:receiptInstance])
+					return
+				}
+				
+				// actually process the receipt
 				shipmentService.receiveShipment(shipmentInstance, receiptInstance, params.comment, session.user, session.warehouse);
 				
 				if (!shipmentInstance.hasErrors()) {
 					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 					redirect(action: "showDetails", id: shipmentInstance?.id)
-					return;
+					return
 				}
 				redirect(controller:"shipment", action : "showDetails", params : [ "id" : shipmentInstance.id ?: '' ])
 			}
 			else { 
 				// Instantiate the model class to be used 
-				receiptInstance = new Receipt(shipment:shipmentInstance, recipient:shipmentInstance?.recipient);
+				receiptInstance = new Receipt(recipient:shipmentInstance?.recipient);
+				receiptInstance.receiptItems = new HashSet()
 				
 				shipmentInstance.allShipmentItems.each {										
 					ReceiptItem receiptItem = new ReceiptItem(it.properties);
@@ -279,7 +294,7 @@ class ShipmentController {
 					receiptItem.setQuantityReceived (it.quantity);				
 					receiptItem.setLotNumber(it.lotNumber);
 					receiptItem.setSerialNumber (it.serialNumber);
-					receiptInstance.addToReceiptItems(receiptItem);
+					receiptInstance.receiptItems.add(receiptItem);             // use basic "add" method to avoid GORM because we don't want to persist yet
 				}
 			}
 		}
