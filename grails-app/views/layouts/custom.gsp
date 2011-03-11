@@ -117,9 +117,6 @@
 										<li>
 											Welcome, <b>${session.user.username}</b>
 										</li>
-										<li>
-											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
-										</li>	
 										<!-- 																	
 										<li>
 											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cart.png')}" style="vertical-align: middle" />
@@ -131,9 +128,9 @@
 											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
 										</li>					
 										<li>
-											<img src="${createLinkTo(dir: 'images/icons', file: 'profile.png')}" style="vertical-align: top" />
+											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'user.png')}" style="vertical-align: middle" />
 											<g:link style="vertical-align: middle" class="home" controller="user" action="show" id="${session.user.id}">
-												Profile
+												My Account
 											</g:link>	
 										</li>
 										<li>
@@ -154,6 +151,16 @@
 										<li>
 											<g:link class="list" controller="auth" action="logout"><g:message code="default.logout.label"  default="Sign Out"/></g:link>
 										</li>
+										<li>
+											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
+										</li>	
+										<li>
+											<div style="display: inline">
+												<g:render template="../inventoryItem/searchInventory"/>
+											</div>
+										
+										</li>
+										
 										<!-- 
 										 <li><g:link class="list" controller="user" action="preferences"><g:message code="default.preferences.label"  default="Preferences"/></g:link></li>
 										 -->										 

@@ -109,11 +109,11 @@ a:hover {
 }
 
 #loginForm { 
-	width:450px;
+	width:400px;
 	position: absolute;
 	top: 10%;
 	left: 50%;
-	margin-left: -225px;
+	margin-left: -200px;
 }
 #loginFormBox { 
 	border: 1px solid lightgrey;	

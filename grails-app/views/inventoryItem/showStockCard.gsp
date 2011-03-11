@@ -42,11 +42,6 @@
 				<div class="actionsMenu" style="float: right;">					
 					<ul>
 						<li>
-							<div style="display: inline">
-							<g:render template="searchInventory"/>
-							</div>
-						</li>
-						<li>
 							<g:link controller="inventoryItem" action="showRecordInventory" params="['product.id':commandInstance?.productInstance?.id,'inventory.id':commandInstance?.inventoryInstance?.id]">
 								<button class="">
 									<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
