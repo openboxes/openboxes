@@ -210,19 +210,24 @@
 			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/jquery-validation-ui-1.1.1/src/groovy</locationURI>
 		</link>
 		<link>
-			<name>liquibase-1.9.3.5-grails-app-migrations</name>
+			<name>liquibase-1.9.3.6-grails-app-i18n</name>
 			<type>2</type>
-			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/liquibase-1.9.3.5/grails-app/migrations</locationURI>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/liquibase-1.9.3.6/grails-app/i18n</locationURI>
 		</link>
 		<link>
-			<name>liquibase-1.9.3.5-src-groovy</name>
+			<name>liquibase-1.9.3.6-grails-app-migrations</name>
 			<type>2</type>
-			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/liquibase-1.9.3.5/src/groovy</locationURI>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/liquibase-1.9.3.6/grails-app/migrations</locationURI>
 		</link>
 		<link>
-			<name>liquibase-1.9.3.5-src-java</name>
+			<name>liquibase-1.9.3.6-src-groovy</name>
 			<type>2</type>
-			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/liquibase-1.9.3.5/src/java</locationURI>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/liquibase-1.9.3.6/src/groovy</locationURI>
+		</link>
+		<link>
+			<name>liquibase-1.9.3.6-src-java</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.6/projects/warehouse/plugins/liquibase-1.9.3.6/src/java</locationURI>
 		</link>
 		<link>
 			<name>mail-0.9-grails-app-services</name>

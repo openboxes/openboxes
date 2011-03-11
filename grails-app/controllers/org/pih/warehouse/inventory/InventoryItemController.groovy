@@ -74,26 +74,6 @@ class InventoryItemController {
 		}
 	}	
 	
-	/*
-	def importInventoryItems = {
-		
-		if ("POST".equals(request.getMethod())) { 
-			//String fileName = "/.test-databooks.xls/"
-			String filename = "/home/jmiranda/Desktop/PIMS/Boston Closet Inventory.xls"
-			def importer = new InventoryExcelImporter(filename);
-			def inventoryMapList = importer.getInventoryItems();
-			inventoryMapList.each { Map inventoryItemParams -> 
-				log.info "Inventory item " + inventoryItemParams
-			}
-			//new Book(importer.getOneMoreBookParams()).save()
-			[ inventoryMapList : inventoryMapList ]
-		}
-		else { 
-			redirect(action: "uploadInventoryItems")
-		}
-	}
-	*/
-	
 	def show = {
 		def itemInstance = InventoryItem.get(params.id)
 		//def inventoryItemList = inventoryService.getInventoryItemsByProduct(productInstance)

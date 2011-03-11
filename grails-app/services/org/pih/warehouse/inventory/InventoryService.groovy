@@ -654,6 +654,31 @@ class InventoryService {
 	}	
 	
 	public List prepareInventory(String filename) { 
+
+		Map CONFIG_CELL_MAP = [
+			sheet:'Sheet1', cellMap: [ 'D3':'title', 'D6':'numSold', ]
+		]
+	
+		Map CONFIG_COLUMN_MAP = [
+			sheet:'Sheet1', startRow: 2, columnMap: [ 'A':'category','B':'serenicCode','C':'product', 'D':'make',
+				'E':'dosage', 'F':'unitOfMeasure', 'G':'model', 'H':'lotNumber', 'I':'expirationDate', 'J':'quantity', 'K':'comments' ]
+		]
+		
+		Map CONFIG_PROPERTY_MAP = [
+			category:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+			serenicCode:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+			product:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+			make:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+			dosage:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+			unitOfMeasure:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+			model:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+			lotNumber:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+			expirationDate:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+			quantity:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+			comments:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+		]
+	
+		
 		def importer = new InventoryExcelImporter(filename, CONFIG_COLUMN_MAP, CONFIG_CELL_MAP, CONFIG_PROPERTY_MAP);
 		def inventoryMapList = importer.getInventoryItems();
 		
@@ -670,7 +695,7 @@ class InventoryService {
 				transactionType: TransactionType.findByName("Inventory"),
 				inventory: warehouse.inventory,
 				destination: warehouse)
-	
+			def dateFormat = new SimpleDateFormat("yyyy-MM");
 			
 			inventoryMapList.each { Map importParams ->
 				//log.info "Inventory item " + importParams
@@ -763,30 +788,5 @@ class InventoryService {
 		
 	}
 	
-	static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
-	
-	
-	static Map CONFIG_CELL_MAP = [
-		sheet:'Sheet1', cellMap: [ 'D3':'title', 'D6':'numSold', ]
-	]
-
-	static Map CONFIG_COLUMN_MAP = [
-		sheet:'Sheet1', startRow: 2, columnMap: [ 'A':'category','B':'serenicCode','C':'product', 'D':'make',
-			'E':'dosage', 'F':'unitOfMeasure', 'G':'model', 'H':'lotNumber', 'I':'expirationDate', 'J':'quantity', 'K':'comments' ]
-	]
-	
-	static Map CONFIG_PROPERTY_MAP = [
-		category:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-		serenicCode:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-		product:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-		make:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-		dosage:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-		unitOfMeasure:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-		model:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-		lotNumber:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-		expirationDate:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-		quantity:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-		comments:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-	]
-	
+		
 }

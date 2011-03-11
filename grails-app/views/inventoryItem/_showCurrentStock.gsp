@@ -88,16 +88,16 @@
 						</g:if>
 					</g:each>
 					
-									<script type="text/javascript">
-										$(document).ready(function(){
-											//$("#dlgEditItem-${itemInstance?.id}").dialog({ autoOpen: false, modal: true, width: '600px' });	
-											$(".show-action-menu").click(function(event) { 
-												$(this).siblings(".action-menu").toggle();
-												//$("#actions-${itemInstance?.id}").show();
-										        event.preventDefault();
-											});					
-										});
-									</script>	
+					<script type="text/javascript">
+						$(document).ready(function(){
+							//$("#dlgEditItem-${itemInstance?.id}").dialog({ autoOpen: false, modal: true, width: '600px' });	
+							$(".show-action-menu").click(function(event) { 
+								$(this).siblings(".action-menu").toggle();
+								//$("#actions-${itemInstance?.id}").show();
+						        event.preventDefault();
+							});					
+						});
+					</script>	
 					
 				</tbody>
 				<tfoot>

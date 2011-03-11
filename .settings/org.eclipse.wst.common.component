@@ -22,9 +22,6 @@
         <wb-resource deploy-path="/" source-path="/yui-2.7.0.1-grails-app-i18n"/>
         <wb-resource deploy-path="/" source-path="/yui-2.7.0.1-grails-app-taglib"/>
         <wb-resource deploy-path="/" source-path="/yui-2.7.0.1-src-groovy"/>
-        <wb-resource deploy-path="/" source-path="/liquibase-1.9.3.5-grails-app-migrations"/>
-        <wb-resource deploy-path="/" source-path="/liquibase-1.9.3.5-src-java"/>
-        <wb-resource deploy-path="/" source-path="/liquibase-1.9.3.5-src-groovy"/>
         <wb-resource deploy-path="/" source-path="/jaxrs-0.4-grails-app-controllers"/>
         <wb-resource deploy-path="/" source-path="/jaxrs-0.4-grails-app-conf"/>
         <wb-resource deploy-path="/" source-path="/jaxrs-0.4-src-java"/>
@@ -61,5 +58,9 @@
         <wb-resource deploy-path="/" source-path="/jquery-validation-ui-1.1.1-grails-app-controllers"/>
         <wb-resource deploy-path="/" source-path="/jquery-validation-ui-1.1.1-grails-app-utils"/>
         <wb-resource deploy-path="/" source-path="/jquery-validation-ui-1.1.1-src-groovy"/>
+        <wb-resource deploy-path="/" source-path="/liquibase-1.9.3.6-grails-app-i18n"/>
+        <wb-resource deploy-path="/" source-path="/liquibase-1.9.3.6-grails-app-migrations"/>
+        <wb-resource deploy-path="/" source-path="/liquibase-1.9.3.6-src-java"/>
+        <wb-resource deploy-path="/" source-path="/liquibase-1.9.3.6-src-groovy"/>
     </wb-module>
 </project-modules>
