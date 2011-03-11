@@ -414,7 +414,8 @@ class JqueryTagLib {
 		
 		def id = attrs.id ? attrs.id : attrs.name;
 		def name = attrs.name;
-		def autoSize = attrs.autoSize ?: "true";
+		def autoSize = attrs.autoSize ?:(attrs.size)?"false":"true";
+		def size = attrs.size ?: "10"
 		def showOn = attrs.showOn ?: "both";
 		def showTrigger = Boolean.valueOf(attrs.showTrigger ?: "true");
 				
@@ -428,7 +429,7 @@ class JqueryTagLib {
 
 		<span>
 			<input id='${id}' name='${name}' type='hidden'/> 
-			<input id='${id}-datepicker' name='${name}-datepicker' type='text' class='date' /> 
+			<input id='${id}-datepicker' name='${name}-datepicker' type='text' class='date' size="${size}" /> 
 			<script type=\'text/javascript\'> 
 				jQuery(document).ready(function() {
 					jQuery('#${id}-datepicker').datepicker({

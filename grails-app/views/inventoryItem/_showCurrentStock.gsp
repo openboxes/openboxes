@@ -1,10 +1,9 @@
 <div style="min-height: 250px;"> 	
-	<fieldset style="display: inline">				
+	<fieldset>				
 		<div id="inventoryView" style="text-align: left;" class="list">										
 			<table border="0" style="border:1px solid #f5f5f5;">
 				<thead>
 					<tr class="even">
-						<th class="left" style="width: 160px;">Actions</th>
 						<th>Description</th>
 						<th>Serial/Lot Number</th>
 						<th>Expires</th>
@@ -12,6 +11,7 @@
 						<g:hasErrors bean="${flash.itemInstance}">													
 							<th></th>
 						</g:hasErrors>												
+						<th class="left" style="">Actions</th>
 					</tr>											
 				</thead>
 				<tbody>
@@ -36,39 +36,6 @@
 								.selected-row { background-color: lightyellow; } 
 							</style>			
 							<tr class="${styleClass} prop">
-								<td class="top">
-									<%--
-									<script type="text/javascript">
-										$(document).ready(function(){
-											$("#dlgEditItem-${itemInstance?.id}").dialog({ autoOpen: false, modal: true, width: '600px' });	
-											$("#btnEditItem-${itemInstance?.id}").click(function(event) { 
-												var link = $(this);
-												$("#dlgEditItem-${itemInstance?.id}").load(link.attr('href')).dialog('open'); 
-										        event.preventDefault();
-											});					
-										});
-									</script>	
-									 --%>
-									<%-- 
-									<a id="btnEditItem-${itemInstance?.id}" href="${createLink(controller: 'inventoryItem', action:'editItemDialog', id: itemInstance.id)}">
-										<button class="action-btn">
-											<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
-											&nbsp;Edit Item
-										</button>
-									</a>
-								
-									<div id="dlgEditItem-${itemInstance?.id}">
-										<!-- populated by  -->
-									</div>															
-									--%>
-											<g:render template="editItemDialog" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]"/>
-										<g:render template="adjustStock" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />			
-										<g:render template="addToShipment" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />			
-									<%-- 
-										<g:render template="addToCart" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />			
-										<g:render template="addToShipment" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />			
-									--%>																
-								</td>															
 								<td class="top">
 									${itemInstance?.product?.name} &rsaquo;
 									${(itemInstance?.description)?:'<span class="fade">No description</span>'}
@@ -105,18 +72,40 @@
 										</g:if>																									
 									</td>
 								</g:hasErrors>															
+								<td class="top" style="text-align: center; width: 120px;">
+									<button id="show-action-menu-${itemInstance?.id}" class="show-action-menu">
+										Actions<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}"/>
+									</button>
+									<div id="action-menu-${itemInstance?.id}" class="action-menu" style="display: none">
+										<hr/>
+										<g:render template="editItemDialog" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]"/>
+										<g:render template="adjustStock" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />			
+										<g:render template="addToShipment" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />	
+									</div>
+								</td>															
 					
 							</tr>
 						</g:if>
 					</g:each>
+					
+									<script type="text/javascript">
+										$(document).ready(function(){
+											//$("#dlgEditItem-${itemInstance?.id}").dialog({ autoOpen: false, modal: true, width: '600px' });	
+											$(".show-action-menu").click(function(event) { 
+												$(this).siblings(".action-menu").toggle();
+												//$("#actions-${itemInstance?.id}").show();
+										        event.preventDefault();
+											});					
+										});
+									</script>	
+					
 				</tbody>
 				<tfoot>
 					<tr class="prop" style="height: 3em;">
-						<td></td>
-						<td colspan="3" style="text-align: left">
+						<td colspan="3" style="text-align: left; border: 0px;">
 							<span style="font-size: 1.5em;">Net total</span>
 						</td>
-						<td style="text-align: center; vertical-align: middle;">
+						<td style="text-align: center; vertical-align: middle; border: 0px;">
 							<span style="font-size: 1.5em;"> 
 								<g:set var="styleClass" value="color: black;"/>																	
 								<g:if test="${commandInstance.totalQuantity < 0}">
@@ -126,6 +115,7 @@
 								
 							</span>
 						</td>
+						<td style="border: 0px;"></td>
 						
 					</tr>
 				</tfoot>

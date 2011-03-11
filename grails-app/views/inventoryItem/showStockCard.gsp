@@ -63,7 +63,7 @@
 								
 				<table>
 					<tr>
-						<td style="width: 350px;">
+						<td style="width: 300px;">
 							<g:render template="productDetails" 
 								model="[productInstance:commandInstance?.productInstance, inventoryInstance:commandInstance?.inventoryInstance, inventoryLevelInstance: commandInstance?.inventoryLevelInstance, totalQuantity: commandInstance?.totalQuantity]"/>
 								

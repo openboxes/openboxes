@@ -116,6 +116,8 @@
 								    <g:if test="${session.user}">
 										<li>
 											Welcome, <b>${session.user.username}</b>
+											&nbsp;
+											<g:link class="list" controller="auth" action="logout"><g:message code="default.logout.label"  default="Sign Out"/></g:link>
 										</li>
 										<!-- 																	
 										<li>
@@ -129,7 +131,7 @@
 										</li>					
 										<li>
 											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'user.png')}" style="vertical-align: middle" />
-											<g:link style="vertical-align: middle" class="home" controller="user" action="show" id="${session.user.id}">
+											<g:link class="home" controller="user" action="show" id="${session.user.id}">
 												My Account
 											</g:link>	
 										</li>
@@ -140,7 +142,7 @@
 										<g:if test="${session?.warehouse}">
 											<li>
 												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'building.png')}" style="vertical-align: middle" />
-												<a style="vertical-align: middle" class="home" href='${createLink(controller: "dashboard", action:"chooseWarehouse")}'>
+												<a class="home" href='${createLink(controller: "dashboard", action:"chooseWarehouse")}'>
 													${session?.warehouse?.name }
 												</a>	
 											</li>
@@ -148,12 +150,6 @@
 												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
 											</li>																		
 										</g:if>
-										<li>
-											<g:link class="list" controller="auth" action="logout"><g:message code="default.logout.label"  default="Sign Out"/></g:link>
-										</li>
-										<li>
-											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
-										</li>	
 										<li>
 											<div style="display: inline">
 												<g:render template="../inventoryItem/searchInventory"/>

@@ -65,6 +65,7 @@
 							name="startDate" 
 							value="${commandInstance?.startDate }" 
 							format="MM/dd/yyyy"
+							size="8"
 							showTrigger="false" />
 						to
 						<g:jqueryDatePicker 
@@ -72,6 +73,7 @@
 							name="endDate" 
 							value="${commandInstance?.endDate }" 
 							format="MM/dd/yyyy"
+							size="8"
 							showTrigger="false" />
 					</div>
 					<div style="padding: 10px; text-align: center;">
