@@ -250,12 +250,14 @@
 				<span class="menuButton">
 					<g:link class="bullet" controller="person" action="list"><g:message code="default.manage.label" args="['People']"/></g:link>
 				</span>		
-			</li>										
+			</li>		
+			<!--  								
 			<li class="">
 				<span class="menuButton">
 					<g:link class="bullet" controller="role" action="list"><g:message code="default.manage.label" args="['Roles']"/></g:link>
 				</span>		
-			</li>										
+			</li>
+			-->										
 			<li class="">
 				<span class="menuButton">
 					<g:link class="bullet" controller="user" action="list"><g:message code="default.manage.label" args="['Users']"/></g:link>

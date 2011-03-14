@@ -119,6 +119,12 @@ class Shipment implements Comparable, Serializable {
 		referenceNumbers ( validator: { referenceNumbers ->
         	referenceNumbers?.collect( {it.referenceNumberType?.id} )?.unique( { a, b -> a <=> b } )?.size() == referenceNumbers?.size()        
 		} )
+
+		// a shipment can't have two events with the same event code (this should be the case for the current event codes: CREATED, SHIPPED, RECEIVED)
+		// we may want to change this in the future?
+		events ( validator: { events ->
+        	events?.collect( {it.eventType?.eventCode} )?.unique( { a, b -> a <=> b } )?.size() == events?.size()        
+		} )
 	}
 
 	String toString() { return "$name"; }
