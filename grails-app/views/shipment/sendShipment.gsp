@@ -105,55 +105,50 @@
 									<tr class="prop">
 										<td valign="top" class="name"><label>Notifications</label></td>
 										<td valign="top" class="value">
-											<p>The following people will receive email notifications:</p>								
+											<p>The following people will receive an email notification that this shipment has shipped. If you do not
+											want a particular person to receive a notification, uncheck the checkbox next to his/her name.</p>								
 											<table style="display: inline">	
 												<tr>
 													<th></th>
 													<th>Role</th>
 													<th>Recipient</th>
-													<th>Notification</th>
 												</tr>
 												
-												<g:if test="${!shipmentWorkflow?.isExcluded('carrier')}">
+												<g:if test="${!shipmentWorkflow?.isExcluded('carrier') && shipmentInstance?.carrier}">
 													<tr class="prop odd">
-														<td>
-															<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
+														<td style="valign:center">
+															<input type="checkbox" checked="true" name="emailRecipientId" value="${shipmentInstance?.carrier?.id}"/>
+															<!--  <img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>  -->
 														</td>
 														<td>Traveler</td>
 														<td>${shipmentInstance?.carrier?.name }  &nbsp;<br/> <span class="fade">${shipmentInstance?.carrier?.email}</span></td>
-														<td>Your ${shipmentInstance.shipmentType?.name} shipment is ready for pickup</td>
 													</tr>
 												</g:if>
 												
-												<g:if test="${!shipmentWorkflow?.isExcluded('recipient')}">
+												<g:if test="${!shipmentWorkflow?.isExcluded('recipient') && shipmentInstance?.recipient}">
 													<tr class="prop even">
 														<td>
-															<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
-														</td>
-														<td>Owner</td>
+															<input type="checkbox" checked="true" name="emailRecipientId" value="${shipmentInstance?.recipient?.id}"/>
+															<!--  <img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>  -->
+																</td>
+														<td>Recipient</td>
 														<td>${shipmentInstance?.recipient?.name }  &nbsp;<br/> <span class="fade">${shipmentInstance?.recipient?.email}</span></td>
-														<td>Your ${shipmentInstance.shipmentType?.name} shipment is ready to ship</td>
 													</tr>
 												</g:if>
 												
 												<g:each var="recipient" in="${shipmentInstance.allShipmentItems.recipient.unique() }">
-													<tr class="prop odd">
-														<td>
-															<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
-														</td>
-														<td>Recipient</td>
-														<td>
-															<g:if test="${recipient}">
-																${recipient?.name } &nbsp;<br/><span class="fade">${recipient?.email}</span>
-															</g:if>
-															<g:else>
-																<i>no recipient selected</i>
-															</g:else>
-														</td>
-														<td>
-															Your item(s) are about to ship
-														</td>
-													</tr>						
+													<g:if test="${recipient.id != shipmentInstance?.recipient?.id}">
+														<tr class="prop odd">
+															<td>
+																<input type="checkbox" checked="true" name="emailRecipientId" value="${recipient.id}"/>
+																<!--  <img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>  -->
+																</td>
+															<td>Recipient</td>
+															<td>							
+																${recipient?.name } &nbsp;<br/><span class="fade">${recipient?.email}</span>				
+															</td>
+														</tr>
+													</g:if>						
 												</g:each>
 											</table>
 										</td>							

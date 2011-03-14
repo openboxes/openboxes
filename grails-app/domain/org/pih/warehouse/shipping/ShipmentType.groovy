@@ -3,7 +3,7 @@ package org.pih.warehouse.shipping
 import java.util.Date;
 
 /**
- * Represents the type of shipment (Sea, Air, Suitcase, Domestic Freight, Other)
+ * Represents the type of shipment (Sea, Air, Suitcase)
  */
 class ShipmentType implements java.io.Serializable {
 

@@ -12,8 +12,12 @@ class MailService {
 	String from = "${config.grails.mail.from}" 						// warehouse@pih-emr.org
 	String host= "${config.grails.mail.host}" 						// localhost
 	Integer port = Integer.parseInt ("${config.grails.mail.port}") 	// 23; 
+		
+	def sendMail(String subject, String msg, String to) {
+		sendMail(subject, msg, [to])
+	}
 	
-	def sendMail(String subject, String msg, String to) {	
+	def sendMail(String subject, String msg, ArrayList to) {	
 		try { 
 			//SimpleEmail is the class which will do all the hard work for you
 			SimpleEmail email = new SimpleEmail()
@@ -30,8 +34,11 @@ class MailService {
 		}
 	}
 	
+	def sendHtmlMail(String subject, String htmlMessage, String textMessage, String to) {
+		sendHtmlMail(subject, htmlMessage, textMessage, [to])
+	}
 	
-	def sendHtmlMail(String subject, String htmlMessage, String textMessage, String to) { 		
+	def sendHtmlMail(String subject, String htmlMessage, String textMessage, ArrayList to) { 		
 		try { 			
 			// Create the email message
 			HtmlEmail email = new HtmlEmail();
