@@ -245,18 +245,14 @@ class ShipmentService {
 	 */
 	void saveShipment(Shipment shipment) {
 		if (shipment) {
+			shipment.save(flush:true)
+			
 			// if this is shipment has no events (i.e., it is a new shipment) set it as created
 			if (!(shipment.events?.size() > 0)) {
-				def event = new Event(
-					eventDate: new Date(),
-					eventType: EventType.findByEventCode(EventCode.CREATED),
-					eventLocation: shipment.origin
-				)
-				event.save(flush:true);
-				shipment.addToEvents(event)
+				Date dateCreated = new Date()
+				dateCreated.clearTime()     // we only want to store the date component for this event
+				createShipmentEvent(shipment, dateCreated, EventType.findByEventCode(EventCode.CREATED), shipment.origin)
 			}
-			
-			shipment.save(flush:true)
 		}
 	}
 	
@@ -440,6 +436,10 @@ class ShipmentService {
 		// Avoid duplicate events
 		if (!exists) {
 			log.info ("Event does not exist")
+			
+			// enforce that we are only storing the date component here
+			eventDate.clearTime()
+			
 			def eventInstance = new Event(eventDate: eventDate, eventType: eventType, eventLocation: location);
 			if (!eventInstance.hasErrors() && eventInstance.save()) { 
 				shipmentInstance.addToEvents(eventInstance);
@@ -481,18 +481,13 @@ class ShipmentService {
 						new Comment(comment: comment, sender: user));
 				}
 
-				// Add a Shipped event to the shipment
+				// Add a Received event to the shipment
 				EventType eventType = EventType.findByEventCode(EventCode.RECEIVED)
-				if (eventType) {
-					def event = new Event();
-					event.eventDate = new Date()
-					event.eventType = eventType
-					event.eventLocation = location
-					event.save(flush:true);
-					shipmentInstance.addToEvents(event);
+				if (eventType) {					
+					createShipmentEvent(shipmentInstance, receiptInstance.actualDeliveryDate, eventType, location);
 				}
 				else {
-					throw new Exception("Expected event type 'Received'")
+					throw new RuntimeException("System could not find event type 'Received'")
 				}
 												
 				// Save updated shipment instance

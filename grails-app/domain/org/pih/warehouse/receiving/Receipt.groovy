@@ -21,7 +21,7 @@ class Receipt implements Serializable {
 	// Constraints
 	static constraints = {
 		expectedDeliveryDate(nullable:true)
-		actualDeliveryDate(nullable:true)
+		actualDeliveryDate(blank:false)
 		recipient(nullable:true)
 	}
 	

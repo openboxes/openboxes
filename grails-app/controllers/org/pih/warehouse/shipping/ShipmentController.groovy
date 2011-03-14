@@ -299,17 +299,22 @@ class ShipmentController {
 				redirect(controller:"shipment", action : "showDetails", params : [ "id" : shipmentInstance.id ?: '' ])
 			}
 			else { 
-				// Instantiate the model class to be used 
-				receiptInstance = new Receipt(recipient:shipmentInstance?.recipient);
-				receiptInstance.receiptItems = new HashSet()
+				if (shipmentInstance.receipt) {
+					receiptInstance = shipmentInstance.receipt
+				}
+				// If no existing receipt, instantiate the model class to be used 
+				else {
+					receiptInstance = new Receipt(recipient:shipmentInstance?.recipient);
+					receiptInstance.receiptItems = new HashSet()
 				
-				shipmentInstance.allShipmentItems.each {										
-					ReceiptItem receiptItem = new ReceiptItem(it.properties);
-					receiptItem.setQuantityDelivered (it.quantity);
-					receiptItem.setQuantityReceived (it.quantity);				
-					receiptItem.setLotNumber(it.lotNumber);
-					receiptItem.setSerialNumber (it.serialNumber);
-					receiptInstance.receiptItems.add(receiptItem);             // use basic "add" method to avoid GORM because we don't want to persist yet
+					shipmentInstance.allShipmentItems.each {										
+						ReceiptItem receiptItem = new ReceiptItem(it.properties);
+						receiptItem.setQuantityDelivered (it.quantity);
+						receiptItem.setQuantityReceived (it.quantity);				
+						receiptItem.setLotNumber(it.lotNumber);
+						receiptItem.setSerialNumber (it.serialNumber);
+						receiptInstance.receiptItems.add(receiptItem);           // use basic "add" method to avoid GORM because we don't want to persist yet
+					}	
 				}
 			}
 		}
