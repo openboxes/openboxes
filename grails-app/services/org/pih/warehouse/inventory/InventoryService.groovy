@@ -16,7 +16,9 @@ import org.pih.warehouse.product.Attribute;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.ProductAttribute;
+import org.pih.warehouse.shipping.Container;
 import org.pih.warehouse.shipping.Shipment;
+import org.pih.warehouse.core.LocationType;
 import org.springframework.validation.Errors;
 
 class InventoryService {
@@ -28,12 +30,69 @@ class InventoryService {
 		return Warehouse.list()
 	}
 	
+	/**
+    * Returns the Warehouse specified by the passed id parameter;
+    * if no parameter is specified, returns a new warehouse instance
+    */
+    Warehouse getWarehouse(Long warehouseId) {
+	   	if (warehouseId) {
+	   		Warehouse warehouse = Warehouse.get(warehouseId)
+	   		if (!warehouse) {
+	   			throw new Exception("No warehouse found with warehouseId ${warehouseId}")
+	   		}
+	   		else {
+	   			return warehouse
+	   		}
+	   	}
+	   	// otherwise, we need to create a new warehouse
+	   	else {
+	   		Warehouse warehouse = new Warehouse()
+	   		warehouse.locationType = LocationType.findByName('Warehouse')
+	   		
+	   		return warehouse
+	   	}
+    }
+    
+    /**
+     * Saves the specified warehouse
+     */
+	void saveWarehouse(Warehouse warehouse) {
+		// make sure a warehouse has an inventory
+		if (!warehouse.inventory) {
+			addInventory(warehouse)
+		}
+		warehouse.save(flush:true)
+	}
+    
+	
 	List<Transaction> getAllTransactions(Warehouse warehouse) {
 		return Transaction.withCriteria { eq("thisWarehouse", warehouse) }
 	}
 	
+	/**
+	 * Gets the inventory associated with this warehouse;
+	 * if no inventory, create a new inventory
+	 */
 	Inventory getInventory(Warehouse warehouse) {
-		return Inventory.withCriteria { eq("warehouse", warehouse) }
+		Inventory inventory = Inventory.withCriteria { eq("warehouse", warehouse) }
+		return  inventory ?: addInventory(warehouse)
+	}
+	
+	/**
+	 * Adds an inventory to the specified warehouse
+	 */
+	Inventory addInventory(Warehouse warehouse) {
+		if (!warehouse) {
+			throw new RuntimeException("No warehouse specified.")
+		}
+		if (warehouse.inventory) {
+			throw new RuntimeException("An inventory is already associated with this warehouse.")
+		}
+		
+		warehouse.inventory = new Inventory([ 'warehouse' : warehouse ])
+		saveWarehouse(warehouse)
+		
+		return warehouse.inventory
 	}
 	
 	/**
@@ -531,12 +590,6 @@ class InventoryService {
 		//return Warehouse.get(id)?.inventory?.inventoryLevels?.groupBy { it.product } 
 		return new HashMap();
 	}
-			
-	
-	Warehouse getWarehouse(Long id) { 
-		return Warehouse.get(id);
-	}
-	
 
 	/**
 	 * Adjusts the stock level by adding a new transaction entry with a 
@@ -613,8 +666,10 @@ class InventoryService {
 			debitTransaction.transactionType = TransactionType.get(1); 	// transfer
 			debitTransaction.source = shipmentInstance?.origin
 			debitTransaction.destination = shipmentInstance?.destination;
-			debitTransaction.inventory = shipmentInstance?.origin?.inventory
+			debitTransaction.inventory = shipmentInstance?.origin?.inventory ?: addInventory(shipmentInstance.origin)
 			debitTransaction.transactionDate = new Date();
+			
+			println("using inventory = " + debitTransaction?.inventory?.id)
 			
 			shipmentInstance.shipmentItems.each {
 				def inventoryItem = InventoryItem.findByLotNumberAndProduct(it.lotNumber, it.product)

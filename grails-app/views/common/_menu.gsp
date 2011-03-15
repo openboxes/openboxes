@@ -42,67 +42,16 @@
 	</h3>
 	<div class="menu-section">
 		<ul>
-			<!-- 
-			<li class="">
-				<span class="menuButton">
-					<g:link class="bullet" controller="createShipment" action="shoppingCart"><g:message code="shipment.create.label" default="shopping cart wizard" /></g:link>
-				</span>
-			</li>					
-			<hr/>
-			<li class="">
-				<span class="menuButton">
-					<g:link class="bullet" controller="suitcase" action="index"><g:message code="shipment.create.suitcase.label" default="add new suitcase" /></g:link>
-				</span>
-			</li>
-			<li class="">
-				<span class="menuButton">
-					<g:link class="bullet" controller="shipment" action="create" params="['type':'outgoing']"><g:message code="shipment.create.label" default="Create Shipment" /></g:link>
-				</span>
-			</li>				
-			<li class="">
-				<span class="menuButton">
-					<g:link class="bullet" controller="shipment" action="listShippingByType"><g:message code="shipment.listShipping.label"  default="List by Type "/></g:link>
-				</span>
-			</li>	
-			-->		
 			<li class="">
 				<span class="menuButton">
 					<g:link class="bullet" controller="shipment" action="listShipping"><g:message code="shipment.listShipping.label"  default="List All "/></g:link>
 				</span>
-			</li>			
-			
-			<!-- 	
-			<li class="">
-				<span class="menuButton">
-					<g:link class="bullet" controller="shipment" action="listShippingByDate" params="['groupBy':'expectedShippingDate']"><g:message code="shipment.listShipping.label"  default="List by Date "/></g:link>					
-				</span>				
-			</li>
-			-->
-							
+			</li>									
 			<li class="">
 				<span class="menuButton">
 					<g:link class="bullet" controller="createShipmentWorkflow" action="index"><g:message code="suitcase.add.label" default="Add Shipment"/></g:link>
 				</span>
 			</li>					
-			<!-- 			
-			<li class="">
-				<span class="menuButton">
-					<g:link class="bullet" controller="shipment" action="listShipping" params="['activityType':'SHIPPING', 'browseBy':'eventCode']"><g:message code="shipment.listShippingByStatus.label"  default="Show By Status"/></g:link>
-				</span>
-			</li>				
-			<li class="">
-				<span class="menuButton">
-					<g:link class="bullet" controller="shipment" action="listShipping" params="['activityType':'SHIPPING', 'browseBy':'shipmentType']"><g:message code="shipment.listShippingByType.label"  default="Show By Type"/></g:link>
-				</span>
-			</li>				
-			<g:each in="${org.pih.warehouse.core.EventCode.list()}" var="eventCode">
-				<li class="">
-					<span class="menuButton">
-						<g:link class="bullet" controller="shipment" action="listShipping" params="['activityType':'SHIPPING','eventCode':eventCode]"><g:message code="shipment.list.outgoing.label"  default="show ${eventCode?.name?.toLowerCase()}"/></g:link>
-					</span>
-				</li>
-			</g:each>
-			-->
 		</ul>										
 	</div>
 	<h3 class="menu-heading">
@@ -197,13 +146,13 @@
 		</ul>	
 	</div>
 	<h3 class="menu-heading">
-		<g:message code="locations.label"  default="Locations"/>
+		<g:message code="location.label"  default="Location"/>
 	</h3>
 	<div class="menu-section">								
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="warehouse" action="list"><g:message code="default.show.label" args="['Locations']"/></g:link>
+					<g:link class="bullet" controller="warehouse" action="list"><g:message code="default.show.label" args="['Warehouses']"/></g:link>
 				</span>
 			</li>
 			<!-- 
@@ -265,6 +214,9 @@
 			</li>
 		</ul>
 	</div>
+	
+	
+	<%--
 	<h3 class="menu-heading">
 		<g:message code="metadata.label"  default="Settings"/>
 	</h3>
@@ -275,7 +227,7 @@
 					<g:link class="bullet" controller="admin" action="index"><g:message code="default.manage.label" args="['All Settings']" /></g:link>
 				</span>
 			</li>
-			<%--
+			
 			<li class="">
 				<span class="menuButton">
 					<g:link class="bullet" controller="category" action="tree"><g:message code="default.manage.label"  args="['Categories']"/></g:link>

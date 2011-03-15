@@ -101,26 +101,9 @@ class WarehouseController {
 		[warehouseInstanceList: Warehouse.list(params), warehouseInstanceTotal: Warehouse.count()]
 	}
 	
-	def create = {
-		def warehouseInstance = new Warehouse()
-		warehouseInstance.properties = params
-		return [warehouseInstance: warehouseInstance]
-	}
-	
-	def save = {
-		def warehouseInstance = new Warehouse(params)
-		if (warehouseInstance.save(flush: true)) {
-			flash.message = "${message(code: 'default.created.message', args: [message(code: 'warehouse.label', default: 'Warehouse'), warehouseInstance.id])}"
-			redirect(action: "show", id: warehouseInstance.id)
-		}
-		else {
-			render(view: "create", model: [warehouseInstance: warehouseInstance])
-		}
-	}
-	
 	def show = {
-		def warehouseInstance = Warehouse.get(params.id)
-		if (!warehouseInstance) {
+		def warehouseInstance = inventoryService.getWarehouse(params.id as Long)
+		if (!warehouseInstance?.id) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'warehouse.label', default: 'Warehouse'), params.id])}"
 			redirect(action: "list")
 		}
@@ -130,7 +113,7 @@ class WarehouseController {
 	}
 	
 	def edit = {
-		def warehouseInstance = Warehouse.get(params.id)
+		def warehouseInstance = inventoryService.getWarehouse(params.id as Long)
 		if (!warehouseInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'warehouse.label', default: 'Warehouse'), params.id])}"
 			redirect(action: "list")
@@ -141,7 +124,8 @@ class WarehouseController {
 	}
 	
 	def update = {
-		def warehouseInstance = Warehouse.get(params.id)
+		def warehouseInstance = inventoryService.getWarehouse(params.id ? params.id as Long : null)
+		
 		if (warehouseInstance) {
 			if (params.version) {
 				def version = params.version.toLong()
@@ -152,10 +136,13 @@ class WarehouseController {
 					return
 				}
 			}
+			
 			warehouseInstance.properties = params
-			if (!warehouseInstance.hasErrors() && warehouseInstance.save(flush: true)) {
+					
+			if (!warehouseInstance.hasErrors()) {
+				inventoryService.saveWarehouse(warehouseInstance)
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'warehouse.label', default: 'Warehouse'), warehouseInstance.id])}"
-				redirect(action: "show", id: warehouseInstance.id)
+				redirect(action: "list", id: warehouseInstance.id)
 			}
 			else {
 				render(view: "edit", model: [warehouseInstance: warehouseInstance])
@@ -208,7 +195,8 @@ class WarehouseController {
 			def logo = request.getFile("logo");
 			if (!logo?.empty && logo.size < 1024*1000) { // not empty AND less than 1MB
 				warehouseInstance.logo = logo.bytes;			
-		        if (!warehouseInstance.hasErrors() && warehouseInstance.save(flush: true)) {
+		        if (!warehouseInstance.hasErrors()) {
+		        	inventoryService.save(warehouseInstance)
 		            flash.message = "${message(code: 'default.updated.message', args: [message(code: 'warehouse.label', default: 'Warehouse'), warehouseInstance.id])}"
 		        }
 		        else {

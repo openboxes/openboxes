@@ -65,9 +65,9 @@ class InventoryController {
 			cmd.warehouseInstance = Warehouse.get(session?.warehouse?.id);
 		}
 		
-							
+		// add an inventory to this warehouse if it doesn't exist
 		if (!cmd?.warehouseInstance?.inventory) { 
-			redirect(action: "create")
+			inventoryService.addInventory(cmd.warehouseInstance)
 		}
 		
 		cmd.shipmentList = shipmentService.getReceivingByDestinationAndStatus(cmd.warehouseInstance, EventCode.SHIPPED);

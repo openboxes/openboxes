@@ -69,38 +69,40 @@
 										</td>								
 									</tr>
 							
-									<tr class="prop">
-										<td valign="top" class="name"><label>Items</label></td>
-										<td valign="top" class="value">
-											The following items will be debited from <b>${shipmentInstance?.origin?.name }</b>.
-											<br/>
-											<g:if test="${shipmentInstance.shipmentItems}">
-												<table style="display: inline">
-													<tr>
-														<th></th>
-														<th>Item</th>
-														<th>Quantity</th>
-													</tr>
-													<g:each var="item" in="${shipmentInstance?.shipmentItems }" status="status">
-														<tr class="${status % 2 ? 'even' : 'odd' }">
-															<td>
-																<img src="${createLinkTo(dir:'images/icons/silk',file: 'delete.png')}" style="vertical-align: middle"/>
-															</td>
-															<td>
-																${item?.product?.name } ${item?.lotNumber }
-															</td>
-															<td>
-																-${item?.quantity }
-															</td>
+									<g:if test="${shipmentInstance?.origin.isWarehouse()}">
+										<tr class="prop">
+											<td valign="top" class="name"><label>Items</label></td>
+											<td valign="top" class="value">
+												The following items will be debited from <b>${shipmentInstance?.origin?.name }</b>.
+												<br/>
+												<g:if test="${shipmentInstance.shipmentItems}">
+													<table style="display: inline">
+														<tr>
+															<th></th>
+															<th>Item</th>
+															<th>Quantity</th>
 														</tr>
-													</g:each>
-												</table>	
-											</g:if>
-											<g:else>
-												There are no shipment items to be shipped.
-											</g:else>
-										</td>
-									</tr>
+														<g:each var="item" in="${shipmentInstance?.shipmentItems }" status="status">
+															<tr class="${status % 2 ? 'even' : 'odd' }">
+																<td>
+																	<img src="${createLinkTo(dir:'images/icons/silk',file: 'delete.png')}" style="vertical-align: middle"/>
+																</td>
+																<td>
+																	${item?.product?.name } ${item?.lotNumber }
+																</td>
+																<td>
+																	-${item?.quantity }
+																</td>
+															</tr>
+														</g:each>
+													</table>	
+												</g:if>
+												<g:else>
+													There are no shipment items to be shipped.
+												</g:else>
+											</td>
+										</tr>
+									</g:if>
 							
 									<tr class="prop">
 										<td valign="top" class="name"><label>Notifications</label></td>
@@ -137,10 +139,10 @@
 												</g:if>
 												
 												<g:each var="recipient" in="${shipmentInstance.allShipmentItems.recipient.unique() }">
-													<g:if test="${recipient.id != shipmentInstance?.recipient?.id}">
+													<g:if test="${recipient?.id != shipmentInstance?.recipient?.id}">
 														<tr class="prop odd">
 															<td>
-																<input type="checkbox" checked="true" name="emailRecipientId" value="${recipient.id}"/>
+																<input type="checkbox" checked="true" name="emailRecipientId" value="${recipient?.id}"/>
 																<!--  <img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>  -->
 																</td>
 															<td>Recipient</td>

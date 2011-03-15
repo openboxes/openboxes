@@ -49,20 +49,14 @@
 	                            </tr>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="locationType.id"><g:message code="warehouse.locationType.label" default="Location Type" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'locationType', 'errors')}">
-	                                    <g:select name="locationType.id" from="${org.pih.warehouse.core.LocationType.list()}" optionKey="id" optionValue="name" value="${warehouseInstance?.locationType?.id}"  />
-	                                </td>
-	                            </tr>
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
 	                                  <label for="manager"><g:message code="warehouse.manager.label" default="Manager" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'manager', 'errors')}">
 	                                    <g:select name="manager.id" from="${org.pih.warehouse.core.User.list()}" optionKey="id" value="${warehouseInstance?.manager?.id}"  />
 	                                </td>
 	                            </tr>
+	                            
+	                            <!--  
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="parentLocation"><g:message code="warehouse.parentWarehouse.label" default="Parent Location" /></label>
@@ -72,8 +66,7 @@
 											optionKey="id" optionValue="name" value="" noSelection="['null': '']" />							
 	                                </td>
 	                            </tr>
-	                            
-	                            
+	                            -->
 	                            
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
@@ -96,8 +89,7 @@
 	                            	<td valign="top">
 						                    <g:actionSubmit class="save" action="update" value="${message(code: 'default.button.save.label', default: 'Save')}" /></span>
 											&nbsp;
-											<g:link class="cancel" action="show" id="${warehouseInstance?.id }">${message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
-	                            	
+											<g:actionSubmit class="cancel" action="list" value="${message(code: 'default.button.cancel.label', default: 'Cancel')}"/>
 	                            	</td>
 	                            </tr>
 	                        </tbody>

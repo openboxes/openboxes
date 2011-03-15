@@ -25,33 +25,13 @@
 			        			<td valign="top" colspan="2">
 									<g:render template="summary"/>			            			
 								</td>            
-	                    	</tr>
+	                    	</tr>                   
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="warehouse.id.label" default="Id" /></td>                            
-	                            <td valign="top" class="value">${fieldValue(bean: warehouseInstance, field: "id")}</td>                            
-	                        </tr>                    
-	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="warehouse.name.label" default="Name" /></td>                            
+	                            <td valign="top" class="name"><label for="name"><g:message code="warehouse.name.label" default="Name" /></label></td>                            
 	                            <td valign="top" class="value">${fieldValue(bean: warehouseInstance, field: "name")}</td>                            
 	                        </tr>
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="warehouse.locationType.label" default="Location Type" /></td>                            
-	                            <td valign="top" class="value">${fieldValue(bean: warehouseInstance, field: "locationType.name")}</td>                            
-	                        </tr>
-	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="warehouse.parentLocation.label" default="Parent Location" /></td>
-	                            <td valign="top" class="value">${fieldValue(bean: warehouseInstance, field: "parentLocation.name")}</td>
-	                        </tr>
-	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="warehouse.city.label" default="City" /></td>
-	                            <td valign="top" class="value">${fieldValue(bean: warehouseInstance, field: "address.city")}</td>
-	                        </tr>
-	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="warehouse.country.label" default="Country" /></td>
-	                            <td valign="top" class="value">${fieldValue(bean: warehouseInstance, field: "address.country")}</td>
-	                        </tr>
-	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="warehouse.manager.label" default="Manager" /></td>
+	                            <td valign="top" class="name"><label for="manager"><g:message code="warehouse.manager.label" default="Manager" /></label></td>
 	                            <td valign="top" class="value">
 									<g:link controller="user" action="show" id="${warehouseInstance?.manager?.id}">
 										${warehouseInstance?.manager?.firstName?.encodeAsHTML()}
@@ -59,30 +39,19 @@
 									</g:link>
 								</td>
 	                        </tr>
+	                        <!-- 
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="warehouse.inventory.label" default="Inventory" /></td>
-	                            <td valign="top" class="value">
-				      				<g:link controller="inventory" action="browse" id="${warehouseInstance?.inventory?.id}">
-				      				Browse Inventory
-				      				</g:link>
-							    </td>
+	                            <td valign="top" class="name"><label for="parentLocation"><g:message code="warehouse.parentLocation.label" default="Parent Location" /></label></td>
+	                            <td valign="top" class="value">${fieldValue(bean: warehouseInstance, field: "parentLocation.name")}</td>
 	                        </tr>
-	                        
-	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="user.photo.label" default="Profile Photo" /></td>                            
-	                            <td valign="top" class="value">		
-	                            
-	                            	<%--					
-									<img class="photo" src="${createLink(controller:'warehouse', action:'viewLogo', id:warehouseInstance.id)}" />
-									<br/>
-									 --%>
-									<g:form controller="warehouse" method="post" action="uploadLogo" enctype="multipart/form-data">
-										<input type="hidden" name="id" value="${warehouseInstance.id}" />
-										<input type="file" name="logo"/>
-										<input class="positive" type="submit" value="Upload"/>
-									</g:form>
-									
-								</td>                            
+	                        -->
+	                         <tr class="prop">
+	                            <td valign="top" class="name"><label for="managedLocally"><g:message code="warehouse.managedLocally.label" default="Managed Locally" /></label></td>
+	                            <td valign="top" class="value">${fieldValue(bean: warehouseInstance, field: "local") ? 'yes' : 'no'}</td>
+	                        </tr>
+	                         <tr class="prop">
+	                            <td valign="top" class="name"><label for="active"><g:message code="warehouse.active.label" default="Active" /></label></td>
+	                            <td valign="top" class="value">${fieldValue(bean: warehouseInstance, field: "active") ? 'yes' : 'no'}</td>
 	                        </tr>
 	                    </tbody>
 					</table>

@@ -34,4 +34,8 @@ class Location implements Comparable, java.io.Serializable {
 	int compareTo(obj) { 
 		return name <=> obj?.name
 	}
+	
+	Boolean isWarehouse() {
+		return locationType.id == LocationType.findByName("Warehouse").id
+	}
 }
