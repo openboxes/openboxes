@@ -2722,7 +2722,7 @@
 			</sqlCheck>
 		</preConditions>
 			<sql>
-			 	DELETE FROM shipment_event WHERE event_id IN (SELECT id FROM EVENT where event_type_id='1');
+			 	DELETE FROM shipment_event WHERE event_id IN (SELECT id FROM event WHERE event_type_id='1');
 			</sql>
 			<delete tableName="event">
    				 <where>event_type_id='1'</where>
@@ -2744,74 +2744,8 @@
 			</delete>
 	</changeSet>
 	
+
 	
-<!--
-    <changeSet author="jmiranda (generated)" id="1297432141595-4">
-        <preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="0">
-				<![CDATA[
-				SELECT count(*) FROM inventory 
-				JOIN location ON location.inventory_id = inventory.id 
-				WHERE inventory.id = 100
-				]]>
-			</sqlCheck>
-		</preConditions>
-        <insert tableName="inventory">
-            <column name="id" valueNumeric="100"/>
-            <column name="version" valueNumeric="0"/>
-			<column name="date_created" valueDate="2011-02-17"/>
-            <column name="last_updated" valueDate="2011-02-17"/>            
-        </insert>
-		<update tableName="location">
-		    <column name="inventory_id" value="100"/>
-		    <where>id=2 AND inventory_id IS NULL</where>
-		</update>        
-    </changeSet>
-
-    <changeSet author="jmiranda (generated)" id="1297432141595-5">
-        <preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="0">
-				<![CDATA[
-					SELECT count(*) FROM inventory 
-					JOIN location ON location.inventory_id = inventory.id 
-					WHERE location.id = 3
-				]]>
-			</sqlCheck>
-		</preConditions>
-        <insert tableName="inventory">
-            <column name="id" valueNumeric="3"/>
-            <column name="version" valueNumeric="0"/>
-			<column name="date_created" valueDate="2011-02-17"/>
-            <column name="last_updated" valueDate="2011-02-17"/>            
-        </insert>
-		<update tableName="location">
-		    <column name="inventory_id" value="3"/>
-		    <where>id=3 AND inventory_id IS NULL</where>
-		</update>        
-    </changeSet>
-
-    <changeSet author="jmiranda (generated)" id="1297432141595-6">
-        <preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="0">
-				<![CDATA[
-					SELECT count(*) FROM inventory 
-					JOIN location ON location.inventory_id = inventory.id 
-					WHERE location.id = 4
-				]]>
-			</sqlCheck>
-		</preConditions>
-        <insert tableName="inventory">
-            <column name="id" valueNumeric="4"/>
-            <column name="version" valueNumeric="0"/>
-			<column name="date_created" valueDate="2011-02-17"/>
-            <column name="last_updated" valueDate="2011-02-17"/>            
-        </insert>
-		<update tableName="location">
-		    <column name="inventory_id" value="4"/>
-		    <where>id=4 AND inventory_id IS NULL</where>
-		</update>        
-    </changeSet>
--->
       
 </databaseChangeLog>
 
