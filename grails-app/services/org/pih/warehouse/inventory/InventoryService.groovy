@@ -267,8 +267,12 @@ class InventoryService {
 				
 				// Process each row added to the record inventory page
 				cmd.recordInventoryRows.each { row -> 					
-					// 1. Find an existing inventory item for the given lot number and product
-					def inventoryItem = InventoryItem.findByLotNumberAndProduct(row.lotNumber, cmd.product)
+					// 1. Find an existing inventory item for the given lot number and product and description
+					// FIXME need to add description here
+					//def inventoryItem = InventoryItem.findByLotNumberAndProduct(row.lotNumber, cmd.product)
+					def inventoryItem = 
+						findInventoryItemByProductAndLotNumberAndDescription(cmd.product, row.lotNumber, row.description);
+					
 					
 					// 2. If the inventory item doesn't exist, we create a new one
 					if (!inventoryItem) { 
