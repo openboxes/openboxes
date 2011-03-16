@@ -369,7 +369,7 @@ class ShipmentService {
 	List<Shipment> getReceivingByDestinationAndStatus(Location location, ShipmentStatusCode statusCode) { 		
 		def shipmentList = getRecentIncomingShipments(location?.id)
 		if (shipmentList) { 
-			shipmentList = shipmentList.findAll { it.getStatus().code == statusCode } 
+			shipmentList = shipmentList.findAll { it.status.code == statusCode } 
 		}
 		return shipmentList;		
 	}

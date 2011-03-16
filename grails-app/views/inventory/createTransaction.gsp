@@ -8,7 +8,7 @@
 		        <g:message code="default.edit.label" args="[entityName]" />  
 	    	</g:if>
 	    	<g:else>
-		        <g:message code="default.create.label" args="[entityName]" />    
+		        <g:message code="default.add.label" args="[entityName]" />    
 			</g:else>    	    
 		</title>
         <style>
