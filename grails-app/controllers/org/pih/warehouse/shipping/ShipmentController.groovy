@@ -422,18 +422,18 @@ class ShipmentController {
 		def destination = Location.get(session.warehouse.id)
 		def shipmentType = params.shipmentType ? ShipmentType.get(params.shipmentType) : null
 		def origin = params.origin ? Location.get(params.origin) : null
-		def eventCode = params.status ? EventCode.getByStatus(params.status) : null
+		def statusCode = params.status ? ShipmentStatusCode.getByName(params.status) : null
 		def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
 		def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
 					
-		def shipments = shipmentService.getShipments(shipmentType, origin, destination, eventCode, statusStartDate, statusEndDate)
+		def shipments = shipmentService.getShipments(shipmentType, origin, destination, statusCode, statusStartDate, statusEndDate)
 
-		// sort by event status and event date
+		// sort by status
 		shipments = shipments.sort( { a, b -> 
-			a.getMostRecentEvent().compareByEventTypeAndEventDate(b.getMostRecentEvent())
+			a.getStatus() <=> b.getStatus()
 		} )
 		
-		[ shipments:shipments, shipmentType:shipmentType?.id, origin:origin?.id, status:eventCode?.status, 
+		[ shipments:shipments, shipmentType:shipmentType?.id, origin:origin?.id, status:statusCode?.name, 
 				statusStartDate:statusStartDate, statusEndDate:statusEndDate ]
 	}
 	
@@ -471,25 +471,26 @@ class ShipmentController {
 		def origin = Location.get(session.warehouse.id)
 		def shipmentType = params.shipmentType ? ShipmentType.get(params.shipmentType) : null
 		def destination = params.destination ? Location.get(params.destination) : null
-		def eventCode = params.status ? EventCode.getByStatus(params.status) : null
+		def statusCode = params.status ? ShipmentStatusCode.getByName(params.status) : null
 		def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
 		def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
 					
-		def shipments = shipmentService.getShipments(shipmentType, origin, destination, eventCode, statusStartDate, statusEndDate)
+		def shipments = shipmentService.getShipments(shipmentType, origin, destination, statusCode, statusStartDate, statusEndDate)
 		
 		// sort by event status, event date, and expecting shipping date
 		shipments = shipments.sort( { a, b -> 
-			def diff = a.getMostRecentEvent().compareByEventTypeAndEventDate(b.getMostRecentEvent()) 
+			def diff = a.getStatus() <=> b.getStatus() 
 			if (diff == 0) {
 				diff = a.expectedShippingDate <=> b.expectedShippingDate
 			}
 			return diff
 		} )
 		
-		[ shipments:shipments, shipmentType:shipmentType?.id, destination:destination?.id, status:eventCode?.status, 
+		[ shipments:shipments, shipmentType:shipmentType?.id, destination:destination?.id, status:statusCode?.name, 
 				statusStartDate:statusStartDate, statusEndDate:statusEndDate ]	
 	}	
 	
+	/**
 	def list = { 
 		def browseBy = params.id;
 		def currentLocation = Location.get(session.warehouse.id);    	
@@ -528,6 +529,7 @@ class ShipmentController {
 		incomingShipmentCount : incomingShipments.size(), outgoingShipmentCount : outgoingShipments.size()
 		]
 	}
+	*/
 	
 	def saveItem = {     		
 		log.info params;    	

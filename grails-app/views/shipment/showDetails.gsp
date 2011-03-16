@@ -34,19 +34,17 @@
 											code="shipment.currentStatus.label" default="Status" /></label>
 										</td>
 										<td valign="top" class="value">
-											<g:if test="${shipmentInstance?.mostRecentEvent}">
-												${fieldValue(bean: shipmentInstance, field: "mostRecentEvent.eventType.eventCode.status")}<br/>
-											</g:if>
+											${shipmentInstance?.status.name}<br/>
 										</td>
 										<td>
-											<g:if test="${shipmentInstance?.mostRecentEvent}">
-												<span class="fade">
-													<g:if test="${shipmentInstance?.mostRecentEvent?.eventLocation}">
-														${fieldValue(bean: shipmentInstance, field: "mostRecentEvent.eventLocation.name")}
-													</g:if>
-													on <g:formatDate format="dd/MMM/yyyy" date="${shipmentInstance?.mostRecentEvent?.eventDate}"/>
-												</span>
-											</g:if>
+											<span class="fade">
+												<g:if test="${shipmentInstance?.status?.location}">
+													${shipmentInstance?.status.location}
+												</g:if>
+												<g:if test="${shipmentInstance?.status?.date}">
+													on <g:formatDate format="dd/MMM/yyyy" date="${shipmentInstance?.status.date}"/>
+												</g:if>
+											</span>
 										</td>
 									</tr>
 									<tr class="prop">
@@ -57,12 +55,9 @@
 										</td>
 										<td>
 											<span class="fade">
-												<g:if test="${shipmentInstance.expectedShippingDate}">
+												<g:if test="${shipmentInstance.expectedShippingDate && !shipmentInstance.hasShipped()}">
 													Expected to ship on <g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="dd/MMM/yyyy" />
 												</g:if>
-												<g:else>
-													No expected shipping date yet.
-												</g:else>
 											</span>											
 										</td>
 									</tr>
@@ -77,12 +72,9 @@
 										</td>
 										<td>
 											<span class="fade">
-												<g:if test="${shipmentInstance.expectedDeliveryDate}">
+												<g:if test="${shipmentInstance.expectedDeliveryDate && !shipmentInstance.wasReceived()}">
 													Expected to arrive on <g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="dd/MMM/yyyy" />
 												</g:if>
-												<g:else>
-													No expected delivery date yet.
-												</g:else>
 											</span>											
 										</td>
 									</tr>
@@ -340,38 +332,18 @@
 																		${event?.eventLocation?.name}
 																	</td>
 																	<td>																			
-																		<g:formatDate format="dd/MMM/yyyy" date="${event.eventDate}"/> &nbsp; 
-																		<%-- 
-																		<span style="font-size: 0.8em; color: #aaa;">
-																			<g:formatDate type="time" date="${event.eventDate}"/>
-																		</span>
-																		--%>																			
+																		<g:formatDate format="dd/MMM/yyyy" date="${event.eventDate}"/> &nbsp; 																			
 																	</td>
 																	<td style="text-align: right">
-																		<g:if test="${event?.eventType?.eventCode != org.pih.warehouse.core.EventCode.CREATED}">
-																			<g:link action="editEvent" id="${event?.id}" params="[shipmentId:shipmentInstance.id]">
-																				<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit" style="vertical-align: middle"/>
-																			</g:link>
-																			<!--  
-																			<g:link class="remove" action="deleteEvent" id="${event?.id}" params="[shipmentId:shipmentInstance.id]" onclick="return confirm('Are you sure you want to delete this event?')">
-																				<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" style="vertical-align: middle"/>
-																			</g:link>
-																			-->	
-																		</g:if>
+																		<g:link action="editEvent" id="${event?.id}" params="[shipmentId:shipmentInstance.id]">
+																			<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit" style="vertical-align: middle"/>
+																		</g:link>
 																	</td>
 																</tr>
 															</g:each>
 														</tbody>								
 													</table>
 												</g:if>
-										<!--  	 
-											<a href="${createLink(controller: "shipment", action: "addEvent", id: shipmentInstance.id)}">
-												<button>
-													<img src="${createLinkTo(dir:'images/icons/silk',file:'calendar_add.png')}" 
-														alt="Add Event" style="vertical-align: middle"/> Add Event
-												</button>
-											</a>		
-										-->		
 											</div>
 										</td>
 									</tr>				

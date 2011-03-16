@@ -46,7 +46,7 @@ class Shipment implements Comparable, Serializable {
 		"allShipmentItems",
 		"containersByType", 
 		"mostRecentEvent", 
-		"mostRecentStatus",
+		"status",
 		"actualShippingDate",
 		"actualDeliveryDate" ]
 	
@@ -213,8 +213,22 @@ class Shipment implements Comparable, Serializable {
 		return null;
 	}
 	
-	EventType getMostRecentStatus() { 		
-		return getMostRecentEvent()?.getEventType()
+	ShipmentStatus getStatus() { 		
+		if (this.wasReceived()) {
+			return new ShipmentStatus( [ code:ShipmentStatusCode.RECEIVED, 
+			                             date:this.getActualDeliveryDate(),
+			                             location:this.destination] )
+		}
+		else if (this.hasShipped()) {
+			return new ShipmentStatus( [ code:ShipmentStatusCode.SHIPPED,
+			                             date:this.getActualShippingDate(),
+			                             location:this.origin] )
+		}
+		else {
+			return new ShipmentStatus( [ code:ShipmentStatusCode.PENDING, 
+			                             date:null,
+			                             location:null] )
+		}
 	}
 		
 	/**

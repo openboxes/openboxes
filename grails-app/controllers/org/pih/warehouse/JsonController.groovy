@@ -148,7 +148,7 @@ class JsonController {
 						finalItems << [ value: shipment.id,
 							type: "shipment", 
 							label: shipment.name + " [" + 
-							shipment.shipmentNumber + "] - " + shipment?.mostRecentStatus,
+							shipment.shipmentNumber + "] - " + shipment?.status,
 							valueText: shipment.name, 
 							icon: "<img src=\"/warehouse/images/icons/silk/add.png\" />"
 							]

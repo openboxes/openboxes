@@ -52,7 +52,7 @@
 													<td>
 														<img src="${createLinkTo(dir:'images/icons/silk',file: 'lorry_go.png')}" style="vertical-align: middle"/>
 													</td>
-													<td>Shipment <b>${shipmentInstance?.name}</b> will transition from <b>${shipmentInstance?.mostRecentStatus}</b> to <b>Shipped</b></td>
+													<td>Shipment <b>${shipmentInstance?.name}</b> will be marked as <b>Shipped</b></td>
 												<tr>
 													<td>
 														<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>

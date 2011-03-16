@@ -21,7 +21,8 @@ class Receipt implements Serializable {
 	// Constraints
 	static constraints = {
 		expectedDeliveryDate(nullable:true)
-		actualDeliveryDate(blank:false)
+		actualDeliveryDate(bank:false, 
+			validator: { value, obj-> obj.shipment.actualShippingDate && (value + 1).after(obj.shipment.actualShippingDate) })	   // can't be delivered before it is shipped!
 		recipient(nullable:true)
 	}
 	

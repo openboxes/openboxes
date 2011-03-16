@@ -29,8 +29,8 @@
            							noSelection="['':'--All--']" />&nbsp;&nbsp;
            								
            	Status:  <g:select name="status" 
-           					   from="${org.pih.warehouse.core.EventCode.list()}"
-           					   optionKey="status" optionValue="status" value="${status}" 
+           					   from="${org.pih.warehouse.shipping.ShipmentStatusCode.list()}"
+           					   optionKey="name" optionValue="name" value="${status}" 
            					   noSelection="['':'--All--']" />&nbsp;&nbsp;	
            					   
            	from <g:jqueryDatePicker id="statusStartDate" name="statusStartDate"
@@ -88,7 +88,10 @@
 										<g:formatDate format="dd/MMM/yyyy" date="${shipmentInstance?.expectedShippingDate}"/>
 									</td>
 									<td width="10%">												
-										${shipmentInstance?.mostRecentEvent?.eventType?.eventCode?.status} - <g:formatDate format="dd/MMM/yyyy" date="${shipmentInstance?.mostRecentEvent?.eventDate}"/>									
+										${shipmentInstance?.status.name}
+										<g:if test="${shipmentInstance?.status.date}">
+										 - <g:formatDate format="dd/MMM/yyyy" date="${shipmentInstance?.status.date}"/>
+										 </g:if>									
 									</td>
 									<td width="15%">
 										<g:if test="${!shipmentInstance.documents}"><span class="fade">(empty)</span></g:if>

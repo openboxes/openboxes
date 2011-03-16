@@ -2713,6 +2713,25 @@
 		</update>	
 	</changeSet>
 	
+	
+	<!-- remove the "created" event_type and associated events -->
+	<changeSet author="mgoodrich" id="2011-03-16-1">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				<![CDATA[SELECT count(*) FROM event_type WHERE id='1']]>
+			</sqlCheck>
+		</preConditions>
+			<sql>
+			 	DELETE FROM shipment_event WHERE event_id IN (SELECT id FROM EVENT where event_type_id='1');
+			</sql>
+			<delete tableName="event">
+   				 <where>event_type_id='1'</where>
+			</delete>
+			<delete tableName="event_type">
+   				 <where>id='1'</where>
+			</delete>
+	</changeSet>
+	
 <!--
     <changeSet author="jmiranda (generated)" id="1297432141595-4">
         <preConditions onFail="MARK_RAN">

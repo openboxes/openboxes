@@ -105,7 +105,7 @@
 	</fieldset>
 </div>
 
-<!--  
+<%--  
 <br/>
 <div style="width: 250px" class="menu" >
 	<fieldset>
@@ -151,9 +151,10 @@
 	</fieldset>
 </div>
 <br/>
--->
+--%>
 
-<!--  
+
+<%--
 <div style="width: 250px" class="menu" >
 	<fieldset>
 		<table>
@@ -183,4 +184,4 @@
 		</table>
 	</fieldset>
 </div>
--->
+--%>

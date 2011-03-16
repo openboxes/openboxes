@@ -118,8 +118,7 @@ class ShipmentService {
 		def shipmentMap = new TreeMap<EventCode, ListCommand>();
 		shipments.each {
 			
-			def eventType = it.getMostRecentStatus();			
-			def key = eventType?.eventCode ? eventType?.eventCode : EventCode.CREATED; 
+			def key = it.getStatus().code;			 
 			def shipmentList = shipmentMap[key];
 			if (!shipmentList) {
 				shipmentList = new ListCommand(category: key, objectList: new ArrayList());
@@ -228,7 +227,7 @@ class ShipmentService {
 		}
 	}
 	
-	List<Shipment> getShipments(ShipmentType shipmentType, Location origin, Location destination, EventCode eventCode, Date eventStartDate, Date eventEndDate) {
+	List<Shipment> getShipments(ShipmentType shipmentType, Location origin, Location destination, ShipmentStatusCode statusCode, Date statusStartDate, Date statusEndDate) {
 		def shipments = Shipment.withCriteria {
 			and {
 				if (shipmentType) { eq("shipmentType", shipmentType) }
@@ -238,10 +237,10 @@ class ShipmentService {
 		}
 		
 		// now filter by event code and eventdate
-		shipments = shipments.findAll( { def mostRecentEvent = it.getMostRecentEvent()
-											if (eventCode && mostRecentEvent.eventType.eventCode != eventCode) { return false }
-											if (eventStartDate && mostRecentEvent.eventDate < eventStartDate) { return false }
-											if (eventEndDate && mostRecentEvent.eventDate >= eventEndDate.plus(1)) { return false }
+		shipments = shipments.findAll( { def status = it.getStatus()
+											if (statusCode && status.code != statusCode) { return false }
+											if (statusStartDate && status.date < statusStartDate) { return false }
+											if (statusEndDate && status.date >= statusEndDate.plus(1)) { return false }
 											return true
 										} )
 										
@@ -252,16 +251,7 @@ class ShipmentService {
 	 * Saves a shipment
 	 */
 	void saveShipment(Shipment shipment) {
-		if (shipment) {
-			shipment.save(flush:true)
-			
-			// if this is shipment has no events (i.e., it is a new shipment) set it as created
-			if (!(shipment.events?.size() > 0)) {
-				Date dateCreated = new Date()
-				dateCreated.clearTime()     // we only want to store the date component for this event
-				createShipmentEvent(shipment, dateCreated, EventType.findByEventCode(EventCode.CREATED), shipment.origin)
-			}
-		}
+		shipment.save(flush:true)
 	}
 	
 	/**
@@ -376,10 +366,10 @@ class ShipmentService {
 	 * @param eventCode
 	 * @return
 	 */
-	List<Shipment> getReceivingByDestinationAndStatus(Location location, EventCode eventCode) { 		
+	List<Shipment> getReceivingByDestinationAndStatus(Location location, ShipmentStatusCode statusCode) { 		
 		def shipmentList = getRecentIncomingShipments(location?.id)
 		if (shipmentList) { 
-			shipmentList = shipmentList.findAll { it.mostRecentStatus = eventCode } 
+			shipmentList = shipmentList.findAll { it.getStatus().code == statusCode } 
 		}
 		return shipmentList;		
 	}
