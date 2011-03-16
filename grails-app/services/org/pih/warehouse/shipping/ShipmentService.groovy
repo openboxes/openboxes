@@ -15,6 +15,7 @@ import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.TransactionEntry;
 import org.pih.warehouse.inventory.TransactionType;
+import org.pih.warehouse.inventory.Warehouse;
 import org.pih.warehouse.receiving.Receipt;
 
 class ShipmentService {
@@ -391,7 +392,7 @@ class ShipmentService {
 				// Add comment to shipment (as long as there's an actual comment 
 				// after trimming off the extra spaces)
 				if (comment) {
-					shipmentInstance.addToComments(new Comment(comment: comment, sender: userInstance));
+					shipmentInstance.addToComments(new Comment(comment: comment, sender: userInstance))
 				}
 					
 				// Add a Shipped event to the shipment
@@ -406,11 +407,14 @@ class ShipmentService {
 				// Save updated shipment instance (adding an event and comment)
 				if (!shipmentInstance.hasErrors() && shipmentInstance.save()) { 
 					
-					inventoryService.createSendShipmentTransaction(shipmentInstance);
-					triggerSendShipmentEmails(shipmentInstance, userInstance, emailRecipients);
+					// only need to create a transaction if the source is a Warehouse
+					if (shipmentInstance.origin?.isWarehouse()) {
+						inventoryService.createSendShipmentTransaction(shipmentInstance)
+					}
+					triggerSendShipmentEmails(shipmentInstance, userInstance, emailRecipients)
 				}
 				else { 
-					throw new RuntimeException("Failed to save 'Send Shipment' transaction");
+					throw new RuntimeException("Failed to save 'Send Shipment' transaction")
 				}
 			}
 			else {
@@ -493,52 +497,56 @@ class ShipmentService {
 				// Save updated shipment instance
 				shipmentInstance.save();
 			
-				// Create a new transaction for outgoing items
-				Transaction creditTransaction = new Transaction();
-				creditTransaction.transactionType = TransactionType.get(1); 	// transfer
-				creditTransaction.source = shipmentInstance?.origin
-				creditTransaction.destination = shipmentInstance?.destination;
-				creditTransaction.inventory = shipmentInstance?.destination?.inventory ?: inventoryService.addInventory(shipmentInstance.destination)
-				creditTransaction.transactionDate = new Date();
+				// only need to create a transaction if the destination is a warehouse
+				if (shipmentInstance.destination?.isWarehouse()) {
 				
-				shipmentInstance.shipmentItems.each {
-					def inventoryItem = InventoryItem.findByLotNumberAndProduct(it.lotNumber, it.product)
+					// Create a new transaction for outgoing items
+					Transaction creditTransaction = new Transaction();
+					creditTransaction.transactionType = TransactionType.get(1); 	// transfer
+					creditTransaction.source = shipmentInstance?.origin?.isWarehouse() ? shipmentInstance?.origin : null
+					creditTransaction.destination = shipmentInstance?.destination 
+					creditTransaction.inventory = shipmentInstance?.destination?.inventory ?: inventoryService.addInventory(shipmentInstance.destination)
+					creditTransaction.transactionDate = new Date()
 					
-					// If the inventory item doesn't exist, we create a new one
-					if (!inventoryItem) {
-						inventoryItem = new InventoryItem();
-						inventoryItem.lotNumber = it.lotNumber
-						inventoryItem.product = it.product
-						if (!inventoryItem.hasErrors() && inventoryItem.save()) {
-							// at this point we've saved the inventory item successfully
-						}
-						else {
-							//
-							inventoryItem.errors.allErrors.each { error->
-								def errorObj = [inventoryItem, error.getField(), error.getRejectedValue()] as Object[]
-								shipmentInstance.errors.reject("inventoryItem.invalid",
-									errorObj, "[${error.getField()} ${error.getRejectedValue()}] - ${error.defaultMessage} ");
+					shipmentInstance.shipmentItems.each {
+						def inventoryItem = InventoryItem.findByLotNumberAndProduct(it.lotNumber, it.product)
+						
+						// If the inventory item doesn't exist, we create a new one
+						if (!inventoryItem) {
+							inventoryItem = new InventoryItem();
+							inventoryItem.lotNumber = it.lotNumber
+							inventoryItem.product = it.product
+							if (!inventoryItem.hasErrors() && inventoryItem.save()) {
+								// at this point we've saved the inventory item successfully
 							}
-							return;
+							else {
+								//
+								inventoryItem.errors.allErrors.each { error->
+									def errorObj = [inventoryItem, error.getField(), error.getRejectedValue()] as Object[]
+									shipmentInstance.errors.reject("inventoryItem.invalid",
+										errorObj, "[${error.getField()} ${error.getRejectedValue()}] - ${error.defaultMessage} ");
+								}
+								return;
+							}
 						}
+						
+						// Create a new transaction entry
+						TransactionEntry transactionEntry = new TransactionEntry();
+						transactionEntry.quantity = it.quantity;
+						transactionEntry.lotNumber = it.lotNumber
+						transactionEntry.product = it.product;
+						transactionEntry.inventoryItem = inventoryItem;
+						creditTransaction.addToTransactionEntries(transactionEntry);
 					}
 					
-					// Create a new transaction entry
-					TransactionEntry transactionEntry = new TransactionEntry();
-					transactionEntry.quantity = it.quantity;
-					transactionEntry.lotNumber = it.lotNumber
-					transactionEntry.product = it.product;
-					transactionEntry.inventoryItem = inventoryItem;
-					creditTransaction.addToTransactionEntries(transactionEntry);
-				}
-				
-				if (!creditTransaction.hasErrors() && creditTransaction.save(flush:true)) { 
-					// saved successfully
-					flash.message = "Transaction was created successfully"
-				}
-				else { 
-					// did not save successfully, display errors message
-					flash.message = "Transaction has errors"
+					if (!creditTransaction.hasErrors() && creditTransaction.save(flush:true)) { 
+						// saved successfully
+						flash.message = "Transaction was created successfully"
+					}
+					else { 
+						// did not save successfully, display errors message
+						flash.message = "Transaction has errors"
+					}
 				}
 			}
 		} catch (Exception e) {

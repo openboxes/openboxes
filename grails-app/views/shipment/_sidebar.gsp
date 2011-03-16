@@ -87,7 +87,8 @@
 					</td>
 				</tr>
 			</g:if>
-			<g:if test="${session?.warehouse?.id == shipmentInstance?.origin?.id}">	
+			<g:if test="${session?.warehouse?.id == shipmentInstance?.origin?.id ||
+				(!(shipmentInstance?.origin?.isWarehouse()) && session?.warehouse?.id == shipmentInstance?.destination?.id)}">	
 				<tr class="prop">
 					<td>
 						<g:link controller="shipment" action="deleteShipment" id="${shipmentInstance.id}"><img

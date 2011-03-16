@@ -59,12 +59,14 @@
 													</td>
 													<td>Notification emails will be sent out</td>
 												</tr>
-												<tr>
-													<td>
-														<img src="${createLinkTo(dir:'images/icons/silk',file: 'delete.png')}" style="vertical-align: middle"/>
-													</td>
-													<td><b>${shipmentInstance?.shipmentItems?.size() } items</b> in the shipment will be debited from ${shipmentInstance?.origin?.name }</td>
-												</tr>
+												<g:if test="${shipmentInstance?.origin.isWarehouse()}">
+													<tr>
+														<td>
+															<img src="${createLinkTo(dir:'images/icons/silk',file: 'delete.png')}" style="vertical-align: middle"/>
+														</td>
+														<td><b>${shipmentInstance?.shipmentItems?.size() } items</b> in the shipment will be debited from ${shipmentInstance?.origin?.name }</td>
+													</tr>
+												</g:if>
 											</table>
 										</td>								
 									</tr>

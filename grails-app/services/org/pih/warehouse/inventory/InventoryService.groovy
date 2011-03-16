@@ -684,12 +684,16 @@ class InventoryService {
 	void createSendShipmentTransaction(Shipment shipmentInstance) { 
 		log.info "create send shipment transaction" 
 		
+		if (!shipmentInstance.origin.isWarehouse()) {
+			throw new RuntimeException ("Can't create send shipment transaction for origin that is not a warehouse")
+		}
+		
 		try { 
 			// Create a new transaction for outgoing items
 			Transaction debitTransaction = new Transaction();
 			debitTransaction.transactionType = TransactionType.get(1); 	// transfer
 			debitTransaction.source = shipmentInstance?.origin
-			debitTransaction.destination = shipmentInstance?.destination;
+			debitTransaction.destination = shipmentInstance?.destination.isWarehouse() ? shipmentInstance?.destination : null
 			debitTransaction.inventory = shipmentInstance?.origin?.inventory ?: addInventory(shipmentInstance.origin)
 			debitTransaction.transactionDate = new Date();
 			
