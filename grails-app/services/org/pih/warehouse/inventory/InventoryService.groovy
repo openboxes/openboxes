@@ -131,21 +131,6 @@ class InventoryService {
 		
 	}
 	
-	/*
-	List getProducts(Long id, Category category) { 
-		def productList = [] 
-		if (category) { 
-			productList = Product.createCriteria().list {
-				categories { 
-					eq ("id", category?.id)
-				}
-			}
-		}
-		log.debug "category " + category?.name + " " + productList?.size();
-		
-		
-		return productList;
-	}*/
 
 	BrowseInventoryCommand browseInventory(BrowseInventoryCommand commandInstance, Map params) { 
 		
@@ -345,6 +330,10 @@ class InventoryService {
 		return cmd;
 	}
 	
+	/*
+	 * 
+	 * Get products based on the 
+	 */
 	Set getProducts(BrowseInventoryCommand command, Map params) { 
 		def products = new HashSet();
 		
@@ -355,8 +344,12 @@ class InventoryService {
 		}
 		else { 
 			if (command?.categoryFilters)
-			products = getProductsByCategories(command?.categoryFilters, params);
+				products = getProductsByCategories(command?.categoryFilters, params);
 		}
+		/*
+		if (!products)
+			products = Product.list();
+		*/
 		log.info "products " + products.unique();
 		return products;		
 	}
@@ -368,37 +361,38 @@ class InventoryService {
 		def products = Product.createCriteria().list() { 
 			if (searchTerms) {
 				or {
-					ilike("name", searchTerms + "%")					
+					ilike("name", "%" + searchTerms + "%")					
 					category { 
-						ilike("name", searchTerms + "%")
+						ilike("name", "%" + searchTerms + "%")
 					}
 				}
 			}
 		}
-		
-		// Get products that match a category (e.g. Equipment matches all products 
-		// under Equipment and its subcategories.
-		def categories = Category.withCriteria { 
-			ilike("name", searchTerms + "%");
-		}		
-		def matchedCategories = getExplodedCategories(categories);
-		if (matchedCategories) { 
-			products += Product.createCriteria().list() {
-				'in'("category", matchedCategories)
+		if (!products) { 
+			// Get products that match a category (e.g. Equipment matches all products 
+			// under Equipment and its subcategories.
+			def categories = Category.withCriteria { 
+				ilike("name", searchTerms + "%");
 			}		
-		}
-		// Get producst that match inventory item by description, lot number, or name.
-		def inventoryItems = InventoryItem.withCriteria {
-			or {
-				ilike("lotNumber", searchTerms + "%")
-				ilike("description", searchTerms + "%")
-				product {
-					ilike("name", searchTerms + "%")
+			def matchedCategories = getExplodedCategories(categories);
+			if (matchedCategories) { 
+				products += Product.createCriteria().list() {
+					'in'("category", matchedCategories)
+				}		
+			}
+		
+			// Get producst that match inventory item by description, lot number, or name.
+			def inventoryItems = InventoryItem.withCriteria {
+				or {
+					ilike("lotNumber", searchTerms + "%")
+					ilike("description", searchTerms + "%")
+					product {
+						ilike("name", searchTerms + "%")
+					}
 				}
 			}
+			products += inventoryItems*.product;
 		}
-
-		products += inventoryItems*.product;
 		
 		return products;
 	}
@@ -465,6 +459,36 @@ class InventoryService {
 	}
 
 	
+	/**
+	 * 
+	 * @param product
+	 * @param lotNumber
+	 * @param description
+	 * @return
+	 */
+	InventoryItem findInventoryItemByProductAndLotNumberAndDescription(Product product, String lotNumber, String description) {
+		def inventoryItems = InventoryItem.createCriteria().list() {
+			and {
+				eq("product.id", product?.id)
+				if (lotNumber)
+					eq("lotNumber", lotNumber)
+				else 
+					isNull("lotNumber")
+					
+				if (description)
+					eq("description", description)
+				else 
+					isNull("description")
+			}
+		}
+		log.info ("Returned inventory items " + inventoryItems);
+		// If the list is non-empty, return the first item
+		if (inventoryItems) { 
+			return inventoryItems.get(0);
+		}
+		return null;
+	}
+	 
 	
 	/**
 	 * Get all inventory items for a given product within the given inventory.
@@ -707,87 +731,252 @@ class InventoryService {
 			shipmentInstance.errors.reject("shipment.invalid", e.message);
 		}
 	}	
-	
-	public List prepareInventory(String filename) { 
 
+	
+	
+	/**
+	 * Reads a file for the given filename and generates an object that mirrors the 
+	 * file.  Also preprocesses the object to make sure that the data is formatted
+	 * correctly. 
+	 * 
+	 * @param filename
+	 * @param errors
+	 * @return
+	 */
+	public List prepareInventory(Warehouse warehouse, String filename, Errors errors) { 
+		log.info "prepare inventory"
 		Map CONFIG_CELL_MAP = [
-			sheet:'Sheet1', cellMap: [ 'D3':'title', 'D6':'numSold', ]
+			sheet:'Sheet1', cellMap: [ ]
 		]
 	
 		Map CONFIG_COLUMN_MAP = [
-			sheet:'Sheet1', startRow: 2, columnMap: [ 'A':'category','B':'serenicCode','C':'product', 'D':'make',
-				'E':'dosage', 'F':'unitOfMeasure', 'G':'model', 'H':'lotNumber', 'I':'expirationDate', 'J':'quantity', 'K':'comments' ]
+			sheet:'Sheet1', startRow: 1, columnMap: [ 
+				'A':'parentCategory',
+				'B':'category',
+				'C':'product', 
+				'D':'quantity',
+				'E':'lotNumber',
+				'F':'expirationDate',
+				'G':'description', 
+				'H':'manufacturer' 
+			]
 		]
 		
 		Map CONFIG_PROPERTY_MAP = [
+			parentCategory:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
 			category:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-			serenicCode:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
 			product:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-			make:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-			dosage:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-			unitOfMeasure:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-			model:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+			quantity:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
 			lotNumber:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
 			expirationDate:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-			quantity:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-			comments:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+			description:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+			manufacturer:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null])
 		]
 	
 		
 		def importer = new InventoryExcelImporter(filename, CONFIG_COLUMN_MAP, CONFIG_CELL_MAP, CONFIG_PROPERTY_MAP);
 		def inventoryMapList = importer.getInventoryItems();
 		
+		
+		def transactionInstance = new Transaction(transactionDate: new Date(),
+			transactionType: TransactionType.findByName("Inventory"),
+			inventory: warehouse.inventory,
+			destination: warehouse)
+		
+		// Iterate over each row
+		inventoryMapList.each { Map importParams ->
+			//log.info "Inventory item " + importParams
+			def quantity = importParams?.quantity?.intValue();
+			def description = (importParams?.description)?String.valueOf(importParams.description):null;
+			def lotNumber = (importParams.lotNumber)?String.valueOf(importParams.lotNumber):null;
+			if (importParams?.lotNumber instanceof Double) {
+				errors.reject("Property 'Serial Number / Lot Number' with value '${lotNumber}' should be not formatted as a Double value");
+			}
+			if (!importParams?.lotNumber instanceof String) {
+				errors.reject("Property 'Serial Number / Lot Number' with value '${lotNumber}' should be formatted as a Text value");
+			}
+			def expirationDate = null;
+			if (importParams.expirationDate) {
+				// If we're passed a date, we can just set the expiration
+				if (importParams.expirationDate instanceof org.joda.time.LocalDate) {
+					
+					//Calendar calendar = Calendar.getInstance();
+					//calendar.set()
+					expirationDate = importParams.expirationDate.toDateMidnight().toDate();
+				}
+				else {
+					try {
+						expirationDate = dateFormat.parse(new String(importParams?.expirationDate));
+					} catch (ParseException e) {
+						errors.reject("Could not parse date " + importParams?.expirationDate + " " + e.getMessage() + ".  Expected date format: yyyy-MM-dd");
+					}
+				}
+			}
+			def parentCategory = (importParams?.parentCategory) ? Category.findByName(importParams.parentCategory) : null;
+			def category = Category.findByNameAndParentCategory(importParams.category, parentCategory);
+			if (!category) {
+				category = new Category(name: importParams.category, parentCategory: parentCategory);
+				if (!category.validate()) {
+					category.errors.allErrors.each {
+						errors.addError(it);
+					}
+				}
+				log.info "Created new category " + category.name;
+			}
+			
+			
+			// Create product if not exists
+			Product product = Product.findByName(importParams.product);
+			if (!product) {
+				product = new Product(name: importParams.product, category: category);
+				if (!product.validate()) {
+					errors.reject("Error saving product " + product?.name)
+					//throw new RuntimeException("Error saving product " + product?.name)
+				}
+				log.info "Created new product " + product.name;
+			}
+			
+			
+			def manufacturer = importParams?.manufacturer
+			if (manufacturer) {
+				// If the product does not have the Manufacturer attribute, we need to add it
+				def attribute = Attribute.findByName("Manufacturer");
+				// Create a new attribute if it doesn't already exist
+				if (!attribute) {
+					attribute = new Attribute(name: "Manufacturer", allowOther: true);
+					if (!attribute.validate()) {
+						attribute.errors.allErrors.each {
+							errors.addError(it);
+						}
+					}
+				}
+							
+				def hasManufacturer = product.attributes*.attribute.contains(attribute)
+				if (manufacturer && !hasManufacturer) {
+					//attribute.addToOptions(value);
+					//attribute.save();
+					def productAttribute = new ProductAttribute();
+					productAttribute.attribute = attribute;
+					productAttribute.value = manufacturer;
+					product.addToAttributes(productAttribute);
+					if (!product.validate()) {
+						product.errors.allErrors.each {
+							errors.addError(it);
+						}
+					}
+				}
+			}
+			
+										
+			// Find the inventory item by product and lotNumber and description
+			InventoryItem inventoryItem =
+				findInventoryItemByProductAndLotNumberAndDescription(product, lotNumber, description);
+			
+			log.info("Inventory item " + inventoryItem)
+			// Create inventory item if not exists
+			if (!inventoryItem) {
+				inventoryItem = new InventoryItem()
+				inventoryItem.product = product
+				inventoryItem.lotNumber = lotNumber;
+				inventoryItem.description = description;
+				inventoryItem.expirationDate = expirationDate;
+				if (!inventoryItem.validate()) {
+					inventoryItem.errors.allErrors.each {
+						errors.addError(it);
+					}
+				}
+			}
+			
+			// Create a transaction entry if there's a quantity specified
+			if (importParams?.quantity) {
+				TransactionEntry transactionEntry = new TransactionEntry();
+				transactionEntry.quantity = quantity;
+				transactionEntry.lotNumber = importParams.lotNumber;
+				transactionEntry.product = product;
+				transactionEntry.inventoryItem = inventoryItem;
+				transactionInstance.addToTransactionEntries(transactionEntry);
+				if (!transactionEntry.validate()) { 
+					transactionEntry.errors.allErrors.each {
+						errors.addError(it);
+					}
+				}
+			}
+		}
+		
+		if (transactionInstance.validate()) { 
+			transactionInstance.errors.allErrors.each { 
+				errors.addError(it);
+			}
+		}
+		
+		
+		
 		return inventoryMapList
 	}
 	
+	
+	
+	/**
+	 * Import data from given inventoryMapList into database.
+	 * 
+	 * @param warehouse
+	 * @param inventoryMapList
+	 * @param errors
+	 */
 	public void importInventory(Warehouse warehouse, List inventoryMapList, Errors errors) { 
 		
-		def errorMessages = [];
 		
 		try { 
+			def dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 			
 			def transactionInstance = new Transaction(transactionDate: new Date(),
 				transactionType: TransactionType.findByName("Inventory"),
 				inventory: warehouse.inventory,
 				destination: warehouse)
-			def dateFormat = new SimpleDateFormat("yyyy-MM");
 			
+			
+			// Iterate over each row 
 			inventoryMapList.each { Map importParams ->
+				
 				//log.info "Inventory item " + importParams
 				def quantity = importParams?.quantity?.intValue();
-				def description =
-					importParams?.make + " " + importParams?.product + ", " + importParams?.model + ", " + importParams?.dosage + " " + importParams.unitOfMeasure;
-				
-				def serenicCode = String.valueOf(importParams?.serenicCode?.intValue());
-				if (importParams?.serenicCode?.class != String.class) {
-					//errorMessages << "Column 'Serenic Code' with value '${serenicCode}' should be formatted as a text value";
-					//errors.reject("Column 'Serenic Code' with value '${serenicCode}' should be formatted as a text value");
+				def description = (importParams?.description)?String.valueOf(importParams.description):null;
+				def lotNumber = (importParams.lotNumber)?String.valueOf(importParams.lotNumber):null;
+				if (importParams?.lotNumber instanceof Double) {
+					errors.reject("Property 'Serial Number / Lot Number' with value '${lotNumber}' should be not formatted as a Double value");
 				}
-				def lotNumber = String.valueOf(importParams.lotNumber);
-				if (importParams?.lotNumber?.class != String.class) {
-					//errorMessages << "Column 'Serial Number / Lot Number' with value '${lotNumber}' should be formatted as a text value";
-					//errors.reject("Column 'Serial Number / Lot Number' with value '${lotNumber}' should be formatted as a text value");
+				if (!importParams?.lotNumber instanceof String) {
+					errors.reject("Property 'Serial Number / Lot Number' with value '${lotNumber}' should be formatted as a Text value");
 				}
+	
 				def expirationDate = null;
 				if (importParams.expirationDate) {
-					try { 
-						expirationDate = dateFormat.parse(new String(importParams?.expirationDate));
-					} catch (ParseException e) { 
-						errors.reject("Could not parse date " + importParams?.expirationDate + " " + e.getMessage());
+					// If we're passed a date, we can just set the expiration 
+					if (importParams.expirationDate instanceof org.joda.time.LocalDate) {
+						expirationDate = importParams.expirationDate.toDateMidnight().toDate();
+					}
+					else { 
+						try { 
+							expirationDate = dateFormat.parse(new String(importParams?.expirationDate));
+						} catch (ParseException e) { 
+							errors.reject("Could not parse date " + importParams?.expirationDate + " " + e.getMessage() + ".  Expected date format: yyyy-MM-dd");
+						}
 					}
 				}
-			
-				// Create category if not exists
-				Category category = Category.findByName(importParams.category);
+
+				def parentCategory = (importParams?.parentCategory) ? Category.findByName(importParams.parentCategory) : null;			
+				def category = Category.findByNameAndParentCategory(importParams.category, parentCategory);
 				if (!category) {
-					category = new Category(name: importParams.category);
+					category = new Category(name: importParams.category, parentCategory: parentCategory);
 					if (!category.save()) { 
-						//throw new RuntimeException("Error saving category " + category?.name);
-						errors.reject("Error saving category " + category?.name)
+						category.errors.allErrors.each {
+							errors.addError(it);
+						}
 					}
 					log.info "Created new category " + category.name;
 				}
-			
+				
+				
 				// Create product if not exists
 				Product product = Product.findByName(importParams.product);
 				if (!product) {
@@ -798,26 +987,64 @@ class InventoryService {
 					}
 					log.info "Created new product " + product.name;
 				}
+				
+				
+				def manufacturer = importParams?.manufacturer
+				if (manufacturer) { 
+					// If the product does not have the Manufacturer attribute, we need to add it 
+					def attribute = Attribute.findByName("Manufacturer");					
+					// Create a new attribute if it doesn't already exist
+					if (!attribute) { 
+						attribute = new Attribute(name: "Manufacturer", allowOther: true);
+						if (!attribute.save()) {
+							attribute.errors.allErrors.each {
+								errors.addError(it);
+							}
+						}
+					}
+								
+					def hasManufacturer = product.attributes*.attribute.contains(attribute)
+					if (manufacturer && !hasManufacturer) { 
+						//attribute.addToOptions(value);
+						//attribute.save();					
+						def productAttribute = new ProductAttribute();
+						productAttribute.attribute = attribute;
+						productAttribute.value = manufacturer;
+						product.addToAttributes(productAttribute);
+						if (!product.save()) { 
+							product.errors.allErrors.each {
+								errors.addError(it);
+							}
+						}
+					}
+				}				
+				
 											
+				// Find the inventory item by product and lotNumber and description
+				InventoryItem inventoryItem = 
+					findInventoryItemByProductAndLotNumberAndDescription(product, lotNumber, description);
+					
+					
+				
+				log.info("Inventory item " + inventoryItem)
 				// Create inventory item if not exists
-				InventoryItem inventoryItem = InventoryItem.findByProductAndLotNumber(product, importParams.lotNumber);
 				if (!inventoryItem) {
 					inventoryItem = new InventoryItem()
 					inventoryItem.product = product
 					inventoryItem.lotNumber = lotNumber;
 					inventoryItem.description = description;
 					inventoryItem.expirationDate = expirationDate;
-					log.info "Creating new inventoryItem for product " + product?.name + " with description " + inventoryItem?.description + " and lot number " + inventoryItem?.lotNumber;
-					if (inventoryItem.hasErrors() || !inventoryItem.save()) {
+					if (inventoryItem.hasErrors() || !inventoryItem.save()) {				
+						log.info "Product " + product
+						log.info "Inventory item " + importParams.lotNumber;
 						inventoryItem.errors.allErrors.each {
+							log.error "ERROR " + it;
 							errors.addError(it);
-							
-							//errors.rejectValue("fieldname", "message.error.code", [message(code: 'eventType.label', default: 'EventType')] as Object[], "Another user has updated this EventType while you were editing")
 						}
 					}
 				}
-				// If there's a quantity, we create a transaction entry for it.  Otherwise
-				// it's just added to the inventory items 
+				
+				// Create a transaction entry if there's a quantity specified 
 				if (importParams?.quantity) {
 					TransactionEntry transactionEntry = new TransactionEntry();
 					transactionEntry.quantity = quantity;
@@ -827,6 +1054,7 @@ class InventoryService {
 					transactionInstance.addToTransactionEntries(transactionEntry);
 				}
 			}
+			
 			
 			if (!errors.hasErrors()) { 
 				if (!transactionInstance.save()) {

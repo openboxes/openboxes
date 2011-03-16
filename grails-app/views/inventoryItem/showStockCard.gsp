@@ -32,8 +32,8 @@
 						<li>
 							<g:link controller="inventory" action="browse" >
 								<button>		
-									<img src="${resource(dir: 'images/icons/silk', file: 'arrow_left.png')}"/>
-									Back to <b>Inventory</b>
+									<img src="${resource(dir: 'images/icons/silk', file: 'arrow_left.png')}" style="vertical-align: middle;"/>
+									&nbsp;<span style="vertical-align: middle;">Back to <b>Inventory</b></span>
 								</button>
 							</g:link>
 						</li>
@@ -45,7 +45,8 @@
 							<g:link controller="inventoryItem" action="showRecordInventory" params="['product.id':commandInstance?.productInstance?.id,'inventory.id':commandInstance?.inventoryInstance?.id]">
 								<button class="">
 									<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
-									&nbsp;Record inventory
+									&nbsp;
+									<span style="vertical-align: middle;">Record inventory</span>
 								</button>
 							</g:link>
 						</li>
@@ -53,7 +54,7 @@
 							<g:link class="new button" controller="inventory" action="createTransaction">
 								<button class="">
 									<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" style="vertical-align: middle"/>
-									&nbsp;Add new transaction
+									<span style="vertical-align: middle;">&nbsp;Add new transaction</span>
 								</button>
 							</g:link>
 						</li>	

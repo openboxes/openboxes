@@ -9,6 +9,7 @@ import org.pih.warehouse.inventory.Inventory;
 import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.InventoryLevel;
 import org.pih.warehouse.product.Product;
+import org.pih.warehouse.shipping.Shipment;
 
 class StockCardCommand {
 	
@@ -24,6 +25,7 @@ class StockCardCommand {
 	// Current stock section
 	List<InventoryItem> inventoryItemList;
 	List<TransactionEntry> transactionEntryList;
+	List<Shipment> pendingShipmentList;
 	Map<Transaction, List<TransactionEntry>> transactionEntriesByTransactionMap;
 	Map<InventoryItem, List<TransactionEntry>> transactionEntriesByInventoryItemMap
 

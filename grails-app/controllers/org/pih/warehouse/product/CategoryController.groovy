@@ -13,12 +13,25 @@ class CategoryController {
 	def tree = { 
 		log.info params 
 		def categoryInstance = Category.get(params.id)
-		if (!categoryInstance) {
-			flash.message = "Unable to locate category with ID ${params.id}"
-		}
 		
 		[ rootCategory : productService.getRootCategory(), categoryInstance : categoryInstance ]
 	}
+	
+	
+	def move = { 
+		log.info params
+		def parent = Category.get(params.newParent);
+		def child = Category.get(params.child);
+		log.info parent;
+		log.info child;
+		child.parentCategory = parent;
+		if (!child.hasErrors() && child.save(flush:true)) { 
+			flash.message = "Success"
+		}
+		redirect(action: "tree");
+		
+	}
+	
 		
 	/*
 	def editCategory = { 
@@ -43,10 +56,10 @@ class CategoryController {
 		else
 			categoryInstance.properties = params;
 		
-		if (!categoryInstance.hasErrors() && categoryInstance.save(flush:true)) {
+		if (!categoryInstance.hasErrors() && categoryInstance.save()) {
 			flash.message = "Saved category ${categoryInstance?.name} successfully";
 		}
-		redirect(action: tree, params: params);
+		redirect(action: "tree", params: params);
 	}
 	
 	def deleteCategory = {
@@ -54,10 +67,20 @@ class CategoryController {
 		def categoryInstance = Category.get(params.id)
 
 		if (categoryInstance) { 
-			categoryInstance.delete();
+			try { 
+				categoryInstance.delete(flush:true);
+			} catch (Exception e) { 
+				//categoryInstance.errors.reject(e.getMessage())
+				throw e;
+			}
 		}
-		
-		redirect(action: tree);		
+
+		/*
+		if (categoryInstance.hasErrors()) { 
+			render(view: "tree", model: [rootCategory: productService.getRootCategory(), categoryInstance: categoryInstance ])
+		}
+		*/	
+		redirect(action: "tree");		
 	}
 
 		

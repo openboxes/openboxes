@@ -71,19 +71,28 @@
 							<li class="prop even">
 								<label>From</label>
 								<span class="value">
-									${transactionInstance?.source?.name }
+									<g:if test="${transactionInstance?.source }">
+										${transactionInstance?.source?.name }
+									</g:if>
+									<g:else>
+										<span class="fade">None</span>
+									</g:else>
 								</span>
 							</li>
-							<li class="even">
+							<li class="prop odd">
 								<label>To</label>
 								<span class="value">
-									${transactionInstance?.destination?.name }
+									<g:if test="${transactionInstance?.destination }">
+										${transactionInstance?.destination?.name }
+									</g:if>
+									<g:else>
+										<span class="fade">None</span>
+									</g:else>
 								</span>
 							</li>
 									
 							<g:if test="${transactionInstance?.id }">
 								<li class="prop even">
-									<label>Transaction Entries</label>
 									<span class="value">
 										<table id="prodEntryTable" border="1" style="border: 1px solid #ccc;">
 											<tr>

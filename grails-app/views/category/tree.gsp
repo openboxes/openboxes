@@ -11,121 +11,169 @@
     </head>
     <body>
         <div class="body">
-			<div class="nav">            	
-				<g:render template="nav"/>
-           	</div>
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
-            <div class="dialog">        
+			<g:hasErrors bean="${categoryInstance}">
+				<div class="errors"><g:renderErrors bean="${categoryInstance}" as="list" /></div>
+			</g:hasErrors>            
             
-            
-	           
-						        <table>
-						        	<tr>
-						        		<td>
-						           			<div>
-									           	<style>
-									           		.categoryTree li { padding-left: 25px;padding-top: 5px; padding-bottom: 5px; }
-									           	</style>
-												<ul class="categoryTree">
-													<g:render template="tree" model="[category:rootCategory, level: 0]"/>
-												</ul>													
-								            </div>
-										</td>
-										<td>
-											<g:if test="${categoryInstance }">
-												<g:form action="saveCategory">
-													<g:hiddenField name="id" value="${categoryInstance?.id }"/>
-												
-								           			<fieldset>
-								           				<table>
-								           					<tr class="prop">
-								           						<td class="value">
-								           							<label>Name</label><br/>
-											           				<g:textField name="name" value="${categoryInstance?.name }"/>
-								           						</td>
-								           					</tr>
-								           					<tr class="prop">
-								           						<td class="value">
-								           							<label>Parent</label>
-							           								<select name="parentCategory.id">
-							           									<option value="">no parent</option>
-							           									<g:render template="selectOptions" model="[category:rootCategory, selected:categoryInstance?.parentCategory, level: 1]"/>
-							           								</select>
-								           						</td>
-								           						<td class="value">
-								           						</td>
-								           					</tr>
-								           					<tr class="prop">
-								           						<td class="value">
-								           							<label>Children</label>
-								           							<table>			           							
-									           							<g:each var="child" in="${categoryInstance?.categories }" status="status">
-									           								<tr>
-												           						<td>${child?.name }</td>
-									           								</tr>
-												           				</g:each>
-											           				</table>
-								           						</td>
-								           					</tr>
-								           					<tr class="prop">
-								           						<td class="value">																	
-																	<g:submitButton name="submit" value="Submit"/>
-																	&nbsp;
-																	<g:link action="tree">cancel</g:link>
-								           						</td>
-								           					</tr>
-						
+            <div class="dialog" >        
+		        <table>
+		        	<tr>
+		        		<td style="width: 50%;">
+							<div style="padding:10px; text-align: right">
+								<span class="menuButton">
+				            		<g:link class="new" controller="category" action="tree" params="[addCategory:'addCategory']"><g:message code="default.add.label" args="['category']"/></g:link>
+				            	</span>										    	
+							</div>						
+		        		
+		           			<div>
+								<style>
+									ul { margin-left: 2em; } 
+									.category-tree li { background-color: #f7f7f7;
+									border: 1px dashed lightgrey; padding: .5em; margin: .5em;}
+								</style>
+								
+								<%-- Display the category tree from the ROOT node --%>
+								<g:render template="tree" model="[category:rootCategory, level: 0]"/>
+							
+							
+								<script>
+									$(function() {
+										//$( ".draggable" ).draggable();
+							
+										$('li.draggable').draggable(
+												{
+													revert		: true,
+													autoSize		: false,
+													ghosting			: false,
+													onStop		: function()
+													{
+														$('li.droppable').each(
+															function()
+															{
+																this.expanded = false;
+															}
+														);
+													}
+												}
+											);
+							
+										$('li.droppable').droppable(
+												{
+													accept: 'li.draggable',
+													tolerance: 'intersect',
+													over: function(event, ui) { 
+														$( this ).addClass( "ui-state-highlight" );
+													},
+													out: function(event, ui) { 
+														$( this ).removeClass( "ui-state-highlight" );
+													},
+													drop: function( event, ui ) {
+														console.log(this);
+														console.log(ui.draggable);
+														console.log(ui.helper);
+														$( this ).removeClass( "ui-state-highlight" );
+														var child = ui.draggable.attr("id");
+														var parent = $(this).attr("id");
+														var url = "/warehouse/category/move?child=" + child + "&newParent=" + parent;
+														window.location.replace(url);
+													}
+												}
+											);
+										});
+								</script>
+				            </div>
+						</td>
+						<td>
+							<g:if test="${categoryInstance }">
+								<g:form action="saveCategory">
+									<g:hiddenField name="id" value="${categoryInstance?.id }"/>
+				           			<fieldset>
+				           				<legend>Edit Category</legend>
+				           				<table>
+				           					<tr class="prop">
+				           						<td class="value">
+				           							<label>Parent</label>
+			           								<select name="parentCategory.id">
+			           									<option value="null">Choose a category ... </option>
+			           									<g:render template="selectOptions" model="[category:rootCategory, selected:categoryInstance?.parentCategory, level: 0]"/>
+			           								</select>
+			           							</td>
+			           						</tr>
+			           						<tr class="prop">
+			           							<td class="value" style="padding-left: 30px;">
+			           								<label>Name</label>
+							           				<g:textField name="name" value="${categoryInstance?.name }"/>
+				           						</td>
+				           					</tr>
+				           					<g:if test="${categoryInstance?.categories }">
+					           					<tr class="prop">
+					           						<td class="value" style="padding-left: 60px;">
+					           							<table>			           							
+						           							<g:each var="child" in="${categoryInstance?.categories }" status="status">
+						           								<tr>
+									           						<td><g:link action="tree" id="${child.id }">${child?.name }</g:link></td>
+						           								</tr>
+									           				</g:each>
 								           				</table>
-								           			</fieldset>
-						           				</g:form>	
-						           			</g:if>									
-						           			<g:else>
-						           				<g:if test="${params.addCategory=='addCategory' }">					           			
-													<g:form action="save" method="post" >
-										            	<fieldset>
-										                    <table>
-										                        <tbody>
-										                            <tr class="prop">
-										                                <td valign="top" class="value ${hasErrors(bean: categoryInstance, field: 'name', 'errors')}">
-										                                    <label for="name"><g:message code="category.name.label" default="Name" /></label><br/>
-										                                    <g:textField name="name" value="${categoryInstance?.name}" />
-										                                </td>
-										                            </tr>
-										                            <tr class="prop">
-										                                <td valign="top" class="value ${hasErrors(bean: categoryInstance, field: 'parentCategory', 'errors')}">
-										                                    <label for="parentCategory"><g:message code="category.parentCategory.label" default="Parent" /></label><br/>
-										                                    <%--<g:select name="parentCategory.id" from="${org.pih.warehouse.product.Category.list()}" optionKey="id" value="${categoryInstance?.parentCategory?.id}" noSelection="['null': '']" /> --%>
-																			<select name="parentCategory.id">
-																				<option value="">no parent</option>
-																				<g:render template="selectOptions" model="[category:rootCategory, level: 1, selected: categoryInstance]"/>
-																			</select>						                                    
-										                                </td>
-										                            </tr>
-											                        <tr class="prop">
-											                        	<td valign="top">
-															                   <g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" />
-															                   <g:link action="tree">${message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
-											                        	</td>
-											                        </tr>
-										                        </tbody>
-										                    </table>
-									                    </fieldset>
+					           						</td>
+					           					</tr>
+				           					</g:if>
+				           					<tr class="prop">
+				           						<td colspan="2" style="text-align:center">		
+				           						
+					           						<button type="submit" name="save" class="save">${message(code: 'default.button.save.label', default: 'Save')}</button>															
+													&nbsp;
+													<g:link action="tree">${message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
+				           						</td>
+				           					</tr>
+				           				</table>
+				           			</fieldset>
+		           				</g:form>	
+		           			</g:if>									
+		           			<g:else>
+		           				<g:if test="${params.addCategory=='addCategory' }">					           			
+									<g:form action="save" method="post" >
+						            	<fieldset>
+					           				<legend>Create Category</legend>
+						                    <table>
+						                        <tbody>
+													<tr class="prop">
+														<td>
+															<label for="name" class="desc"><g:message code="category.parent.label" default="Parent" /></label>
+															<select name="parentCategory.id" style="display: inline">
+																<option value="null"></option>
+																<g:render template="selectOptions" model="[category:rootCategory, level: 1, selected: categoryInstance]"/>
+															</select>						                                    
+														</td>
+													</tr>
+													<tr class="prop">
+														<td valign="top" class="value ${hasErrors(bean: categoryInstance, field: 'name', 'errors')}">
+															<label for="name" class="desc"><g:message code="category.name.label" default="Name" /></label>
+															<g:textField name="name" value="${categoryInstance?.name}" />
+														</td>
+													</tr>
+							                        <tr class="prop">
+				           								<td colspan="2" style="text-align:center">		
+											                   <button type="submit" name="create" class="save">${message(code: 'default.button.create.label', default: 'Create')}</button>
+											                   &nbsp;
+											                   <g:link action="tree">${message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
+							                        	</td>
+							                        </tr>
+						                        </tbody>
+						                    </table>
+					                    </fieldset>
 
-										            </g:form>	
-										    	</g:if>	
-										    	<g:else>
-													<span class="menuButton">
-									            		<g:link class="new" controller="category" action="tree" params="[addCategory:'addCategory']"><g:message code="default.add.label" args="['category']"/></g:link>
-									            	</span>										    	
-										    	</g:else>
-										    	
-						           			</g:else>
-										
-										</td>
-						        	</tr>
-						        </table>								            
+						            </g:form>	
+						    	</g:if>	
+						    	
+		           			</g:else>
+						
+						</td>
+		        	</tr>
+		        </table>								            
 				
 				<%-- 
 	           	<table>

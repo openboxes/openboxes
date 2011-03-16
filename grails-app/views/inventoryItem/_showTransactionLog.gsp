@@ -110,8 +110,8 @@
 						<tbody>			
 							<g:if test="${!commandInstance?.transactionLogMap }">
 								<tr>
-									<td colspan="4">												
-										No transaction entries
+									<td colspan="4" class="odd">												
+										No <b>${commandInstance?.transactionType?.name }</b> transactions between the given dates.
 									</td>
 								</tr>
 							</g:if>

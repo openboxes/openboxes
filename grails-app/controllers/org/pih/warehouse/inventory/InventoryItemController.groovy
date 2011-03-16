@@ -21,10 +21,9 @@ import grails.converters.*
 class InventoryItemController {
 
 	def inventoryService;
+	def shipmentService;
 
 	def importInventoryItems = { ImportInventoryCommand cmd ->
-		
-		
 		def inventoryMapList = null;
 		if ("POST".equals(request.getMethod())) {			
 			File localFile = null;
@@ -53,15 +52,28 @@ class InventoryItemController {
 			
 			if (localFile) {
 				log.info "Local xls file " + localFile.getAbsolutePath()
-				String filename = localFile.getAbsolutePath()
-																
+				cmd.filename = localFile.getAbsolutePath()
+							
+				Warehouse warehouse = Warehouse.get(session.warehouse.id)
+				
+										
 				inventoryMapList =
-					inventoryService.prepareInventory(filename);
+					inventoryService.prepareInventory(warehouse, cmd.filename, cmd.errors);
 
-				if (params.importNow) {
-					Warehouse warehouse = Warehouse.get(session.warehouse.id)
+				if (!inventoryMapList?.isEmpty) { 
+					flash.message = "Please ensure that there is data on 'Sheet1' of '" + localFile.getAbsolutePath() + "'."
+				}
+				else { 
+					flash.message = "Data is ready to be imported.  Please review the data below and click the 'Import Now' button below to proceed."
+				}
+					
+				// If there are no errors and the user requests to import the data, we should execute the import
+				if (!cmd.errors.hasErrors() && params.importNow) {
 					inventoryService.importInventory(warehouse, inventoryMapList, cmd.errors);
-					flash.message = "Imported inventory successfully";
+					
+					if (!cmd.errors.hasErrors()) {
+						flash.message = "Congratulations!  You have successfully imported inventory from '" + localFile.getAbsolutePath() + "'.";
+					}
 				}
 
 				
@@ -104,7 +116,9 @@ class InventoryItemController {
 		cmd.warehouseInstance = Warehouse.get(session?.warehouse?.id);
 		cmd.inventoryInstance = cmd.warehouseInstance?.inventory
 		cmd.inventoryLevelInstance = inventoryService.getInventoryLevelByProductAndInventory(cmd.productInstance, cmd.inventoryInstance)
-				
+
+		cmd.pendingShipmentList = shipmentService.getPendingShipments(cmd.warehouseInstance);
+						
 		// Get current stock of a particular product within an inventory
 		// Using set to make sure we only return one object per inventory items
 		Set inventoryItems = inventoryService.getInventoryItemsByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);
@@ -486,19 +500,21 @@ class InventoryItemController {
 			container: null);
 				
 		if(itemInstance.hasErrors() || !itemInstance.validate()) {
-			println "Errors: " + itemInstance.errors.each { println it }
-			flash.message = "Sorry, there was an error validating item to be added";
+			flash.message = "There was an error validating item to be added\n" ;
+			itemInstance.errors.each { flash.message += it }
+			
 		}
 
-		if (!shipmentInstance.addToShipmentItems(itemInstance).save(flush:true)) {
-			log.error("Sorry, unable to add new item to shipment.  Please try again.");
-			flash.message = "Unable to add new item to shipment";
+		if (!itemInstance.hasErrors()) { 
+			if (!shipmentInstance.addToShipmentItems(itemInstance).save(flush:true)) {
+				log.error("Sorry, unable to add new item to shipment.  Please try again.");
+				flash.message = "Unable to add new item to shipment";
+			}
+			else { 
+				def itemName = (inventoryItem?.description)?:productInstance?.name + (inventoryItem?.lotNumber) ? " #" + inventoryItem?.lotNumber : "";		
+				flash.message = "Added item " + itemName + " to shipment " + shipmentInstance?.name;
+			}
 		}
-		else { 
-			def itemName = (inventoryItem?.description)?:productInstance?.name + (inventoryItem?.lotNumber) ? " #" + inventoryItem?.lotNumber : "";		
-			flash.message = "Added item " + itemName + " to shipment " + shipmentInstance?.name;
-		}
-
 		
 		redirect(action: "showStockCard", params: ['product.id':productInstance?.id]);
 	}
@@ -564,32 +580,6 @@ class InventoryItemController {
 		redirect(action: 'showStockCard', params: ['product.id':productInstance?.id])
 		
 	}
-
-		
-	/*
-	def addTransactionEntry = { 		
-		def itemInstance = InventoryItem.get(params?.inventoryItem?.id);		
-		if (!itemInstance) { 
-			def productInstance = Product.get(params?.product?.id);
-			if (productInstance && params.lotNumber) { 
-				itemInstance = InventoryItem.findByProductAndLotNumber(productInstance, params.lotNumber)
-				if (!itemInstance) { 
-					itemInstance = new InventoryItem(product: productInstance, lotNumber: params.lotNumber, 
-						inventoryItemType: InventoryItemType.NON_SERIALIZED, active: Boolean.TRUE);					
-					itemInstance.save();
-				}
-			}
-			else { 
-				
-				// error - need to specify product.id and lotNumber
-
-			}			
-		}
-		else { 		
-			
-		}
-	}
-	*/	
 	
 	
 	def saveTransactionEntry = {			
@@ -660,6 +650,7 @@ class InventoryItemController {
 
 class ImportInventoryCommand { 
 	
+	def filename
 	def importFile
 	def transactionInstance
 	def warehouseInstance

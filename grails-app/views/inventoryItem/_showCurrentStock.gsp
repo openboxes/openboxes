@@ -16,9 +16,9 @@
 				</thead>
 				<tbody>
 					<g:if test="${!commandInstance?.inventoryItemList}">
-						<tr class="even">
-							<td colspan="5">
-								No current stock 
+						<tr class="odd" style="height: 100px;">
+							<td colspan="5" style="text-align: center; vertical-align: middle">
+								There are no <b>${commandInstance?.productInstance?.name }</b> items currently in stock.
 							</td>
 						</tr>
 					</g:if>
@@ -100,25 +100,26 @@
 					</script>	
 					
 				</tbody>
-				<tfoot>
-					<tr class="prop" style="height: 3em;">
-						<td colspan="3" style="text-align: left; border: 0px;">
-							<span style="font-size: 1.5em;">Net total</span>
-						</td>
-						<td style="text-align: center; vertical-align: middle; border: 0px;">
-							<span style="font-size: 1.5em;"> 
-								<g:set var="styleClass" value="color: black;"/>																	
-								<g:if test="${commandInstance.totalQuantity < 0}">
-									<g:set var="styleClass" value="color: red;"/>																	
-								</g:if>														
-								<span style="${styleClass }">${commandInstance.totalQuantity }</span>
-								
-							</span>
-						</td>
-						<td style="border: 0px;"></td>
-						
-					</tr>
-				</tfoot>
+				<g:if test="${commandInstance?.inventoryItemList}">
+					<tfoot>
+						<tr class="prop" style="height: 3em;">
+							<td colspan="3" style="text-align: left; border: 0px;">
+							</td>
+							<td style="text-align: center; vertical-align: middle; border: 0px;">
+								<span style="font-size: 1.5em;"> 
+									<g:set var="styleClass" value="color: black;"/>																	
+									<g:if test="${commandInstance.totalQuantity < 0}">
+										<g:set var="styleClass" value="color: red;"/>																	
+									</g:if>														
+									<span style="${styleClass }">${commandInstance.totalQuantity }</span>
+									
+								</span>
+							</td>
+							<td style="border: 0px;"></td>
+							
+						</tr>
+					</tfoot>
+				</g:if>
 			</table>										
 		</div>		
 	</fieldset>	

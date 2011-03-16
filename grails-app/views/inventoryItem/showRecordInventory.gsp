@@ -324,6 +324,7 @@
 				</li>
 			</ul>					
 		</div>
+		<%--
 		<div class="actionsMenu" style="float: right;">					
 			<ul>
 				<li>
@@ -337,7 +338,7 @@
 				</li>
 			</ul>
 		</div>	
-		
+		 --%>
 		<br clear="all">	
 	
 	
@@ -441,19 +442,17 @@
 										</tbody>
 										<tfoot>
 											<tr>
-												<td colspan="6">
-													<div style="float: left;">
-														<button id="addAnother" type="button" class="positive">
-															<img src="${createLinkTo(dir:'images/icons/silk', file:'add.png') }"/>&nbsp;Add Item
-														</button>
-														&nbsp;
-														<button name="save" type="submit" class="positive">
-															<img src="${createLinkTo(dir:'images/icons/silk', file:'tick.png') }"/>&nbsp;Save 
-														</button>
-														&nbsp;
-														<g:link controller="inventoryItem" action="showStockCard" 
-															params="['product.id':commandInstance.product?.id]" class="negative">Cancel</g:link>
-													</div>
+												<td colspan="6" style="text-align: center;">
+													<button id="addAnother" type="button" class="positive">
+														<img src="${createLinkTo(dir:'images/icons/silk', file:'add.png') }"/>&nbsp;Add Item
+													</button>
+													&nbsp;
+													<button name="save" type="submit" class="positive">
+														<img src="${createLinkTo(dir:'images/icons/silk', file:'tick.png') }"/>&nbsp;Save 
+													</button>
+													&nbsp;
+													<g:link controller="inventoryItem" action="showStockCard" 
+														params="['product.id':commandInstance.product?.id]" class="negative">Cancel</g:link>
 												</td>
 											</tr>
 										</tfoot>

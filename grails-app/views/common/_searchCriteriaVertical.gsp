@@ -7,22 +7,27 @@
 		});
 	</script>
 	<div>
-	
-		<fieldset style="padding: 10px">
-			<table>
-				<tr class="">
-					<td colspan="2">				
-						<label>Search</label>
-					</td>
-				</tr>
-				<tr>
-					<td colspan="2" style="text-align: right;">
-						<g:render template="../inventoryItem/searchInventory"/>
-					</td>
-				</tr>
-			</table>
+		<table>
+			<tr>
+				<td colspan="2" style="text-align: left;">
+					<g:render template="../inventoryItem/searchInventory"/>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<g:form action="addCategoryFilter">
+						<select id="categoryFilter" name="categoryId" >
+							<option value="">Add a new filter</option>
+							<g:render template="../category/selectOptions" model="[category:rootCategory, selected:null, level: 0]"/>								
+						</select>										
+					</g:form>
+				</td>
+			
+			</tr>
+		</table>
 			
 		
+		<g:if test="${categoryFilters }">
 			<table>
 				<tr class="">
 					<td>				
@@ -36,7 +41,6 @@
 						</g:if>
 					</td>				
 				</tr>
-			
 				<g:each var="categoryFilter" in="${categoryFilters }" status="status">
 					<tr class="${status%2?'even':'odd' }">
 						<td style="text-align: left;">									
@@ -49,16 +53,7 @@
 						</td>
 					</tr>
 				</g:each>
-				<tr>
-					<td colspan="2">
-						<g:form action="addCategoryFilter">
-							<select id="categoryFilter" name="categoryId" >
-								<option value="">Add a new filter</option>
-								<g:render template="../category/selectOptions" model="[category:rootCategory, selected:null, level: 0]"/>								
-							</select>										
-						</g:form>
-					</td>
-				</tr>
+			
 				<%-- 
 				<tr class="prop">
 					<td colspan="2">				
@@ -115,7 +110,9 @@
 				--%>
 				
 			</table>
-		</fieldset>
-		<span class="fade">Showing ${productInstanceList?.size() } product(s)</span>			
+		</g:if>
+			<%-- 
+			<span class="fade">Showing ${productInstanceList?.size() } product(s)</span>			
+			--%>
 	</div>
 </div>						
