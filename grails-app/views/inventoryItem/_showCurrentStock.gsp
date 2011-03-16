@@ -1,5 +1,31 @@
+ <script type="text/javascript">
+ $(document).ready(function() {
+ 
+   function show() {
+     $(this).children(".actions").slideDown();
+   }
+  
+   function hide() { 
+     $(this).children(".actions").slideUp();
+   }
+ 
+   $(".hover-menu").hoverIntent({
+     sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
+     interval: 50,   // number = milliseconds for onMouseOver polling interval
+     over: show,     // function = onMouseOver callback (required)
+     timeout: 100,   // number = milliseconds delay before onMouseOut
+     out: hide       // function = onMouseOut callback (required)
+   });
+  
+ });
+ </script>
+ <style>
+ .actions li { padding: 10px; } 
+ 
+ </style>
+
+
 <div style="min-height: 250px;"> 	
-	<fieldset>				
 		<div id="inventoryView" style="text-align: left;" class="list">										
 			<table border="0" style="border:1px solid #f5f5f5;">
 				<thead>
@@ -73,15 +99,15 @@
 									</td>
 								</g:hasErrors>															
 								<td class="top" style="text-align: center; width: 120px;">
-									<button id="show-action-menu-${itemInstance?.id}" class="show-action-menu">
-										Actions<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}"/>
-									</button>
-									<div id="action-menu-${itemInstance?.id}" class="action-menu" style="display: none">
-										<hr/>
-										<g:render template="editItemDialog" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]"/>
-										<g:render template="adjustStock" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />			
-										<g:render template="addToShipment" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />	
+									<div class="hover-menu">
+										<button>Actions<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/></button>
+										<div class="actions no-style" style="position: absolute; right: 50px; z-index:999; background-color: #f5f5f5; border: 1px solid lightgrey; padding: 10px; display: none;">
+											<g:render template="editItemDialog" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]"/>
+											<g:render template="adjustStock" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />			
+											<g:render template="addToShipment" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />	
+										</div>
 									</div>
+									
 								</td>															
 					
 							</tr>
@@ -102,11 +128,11 @@
 				</tbody>
 				<g:if test="${commandInstance?.inventoryItemList}">
 					<tfoot>
-						<tr class="prop" style="height: 3em;">
+						<tr class="prop" style="height: border: 0px;">
 							<td colspan="3" style="text-align: left; border: 0px;">
 							</td>
 							<td style="text-align: center; vertical-align: middle; border: 0px;">
-								<span style="font-size: 1.5em;"> 
+								<span style="font-size: 1em;"> 
 									<g:set var="styleClass" value="color: black;"/>																	
 									<g:if test="${commandInstance.totalQuantity < 0}">
 										<g:set var="styleClass" value="color: red;"/>																	
@@ -115,12 +141,12 @@
 									
 								</span>
 							</td>
-							<td style="border: 0px;"></td>
+							<td style="border: 0px;">
 							
+							</td>
 						</tr>
 					</tfoot>
 				</g:if>
 			</table>										
 		</div>		
-	</fieldset>	
 </div>
