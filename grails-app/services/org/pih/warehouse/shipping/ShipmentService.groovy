@@ -28,8 +28,7 @@ class ShipmentService {
 	/**
 	 * Returns the shipment referenced by the passed id parameter;
 	 * if id is null, returns a new Shipment object
-	 */
-	
+	 */	
 	Shipment getShipmentInstance(Long shipmentId) {
 		return getShipmentInstance(shipmentId, null)
 	}
@@ -208,6 +207,14 @@ class ShipmentService {
 		}
 	}
 
+	List<Shipment> getPendingShipments(Location location) { 
+		def shipments = Shipment.withCriteria {
+			eq("origin", location)
+		}
+		
+		return shipments.findAll { !it.hasShipped() }
+	}
+	
 
 	List<Shipment> getShipmentsByDestination(Location location) {
 		return Shipment.withCriteria { 
