@@ -2,7 +2,7 @@ package org.pih.warehouse.inventory;
 
 import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.ListUtils;
-import org.pih.warehouse.core.ShipmentStatusCode;
+import org.pih.warehouse.shipping.ShipmentStatusCode;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
