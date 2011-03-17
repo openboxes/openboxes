@@ -2732,7 +2732,7 @@
 			</delete>
 	</changeSet>
 	
-	<!-- remove "borrowed" transactin type -->
+	<!-- remove "borrowed" transaction type -->
 	<changeSet author="mgoodrich" id="2011-03-16-2">
         <preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
@@ -2744,7 +2744,48 @@
 			</delete>
 	</changeSet>
 	
-
+	<!--  remove "transfer" transaction type -->
+	<changeSet author="mgoodrich" id="2011-03-16-3">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				<![CDATA[SELECT count(*) FROM transaction_type WHERE id='1']]>
+			</sqlCheck>
+		</preConditions>
+			<sql>
+   				 DELETE FROM transaction_entry WHERE transaction_id IN (SELECT id FROM transaction WHERE transaction_type_id='1');
+			</sql>
+			<delete tableName="transaction">
+   				 <where>transaction_type_id='1'</where>
+			</delete>
+			<delete tableName="transaction_type">
+   				 <where>id='1'</where>
+			</delete>
+	</changeSet>
+	
+	<!--  add new transactions "transfer in" and "transfer out" -->
+	<changeSet author="mgoodrich" id="2011-03-16-6">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT count(*) FROM transaction_type WHERE id='8' OR id='9']]>
+			</sqlCheck>
+		</preConditions>
+		<insert tableName="transaction_type">
+        	<column name="id" valueNumeric="8"/>
+        	<column name="version" valueNumeric="0"/>
+        	<column name="date_created" valueDate="2011-03-17"/>
+            <column name="last_updated" valueDate="2011-03-17"/> 
+        	<column name="name" value="Transfer In"/>
+        	<column name="sort_order" valueNumeric="0"/>          
+        </insert>  
+        <insert tableName="transaction_type">
+        	<column name="id" valueNumeric="9"/>
+        	<column name="version" valueNumeric="0"/>
+        	<column name="date_created" valueDate="2011-03-17"/>
+            <column name="last_updated" valueDate="2011-03-17"/> 
+        	<column name="name" value="Transfer Out"/>
+        	<column name="sort_order" valueNumeric="0"/>           
+        </insert>      
+	</changeSet>
 	
       
 </databaseChangeLog>

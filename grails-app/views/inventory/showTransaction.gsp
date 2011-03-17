@@ -68,28 +68,28 @@
 
 								</span>
 							</li>
-							<li class="prop even">
-								<label>From</label>
+							<li id="inventory-li" class="prop even">
+								<label>Inventory</label>
 								<span class="value">
-									<g:if test="${transactionInstance?.source }">
+									${warehouseInstance?.name }
+								</span>								
+							</li>
+							<g:if test="${transactionInstance?.source }">
+								<li class="prop odd">
+									<label>From</label>
+									<span class="value">
 										${transactionInstance?.source?.name }
-									</g:if>
-									<g:else>
-										<span class="fade">None</span>
-									</g:else>
-								</span>
-							</li>
-							<li class="prop odd">
-								<label>To</label>
-								<span class="value">
-									<g:if test="${transactionInstance?.destination }">
+									</span>
+								</li>
+							</g:if>
+							<g:if test="${transactionInstance?.destination }">
+								<li class="prop odd">
+									<label>To</label>
+									<span class="value">
 										${transactionInstance?.destination?.name }
-									</g:if>
-									<g:else>
-										<span class="fade">None</span>
-									</g:else>
-								</span>
-							</li>
+									</span>
+								</li>
+							</g:if>
 									
 							<g:if test="${transactionInstance?.id }">
 								<li class="prop even">

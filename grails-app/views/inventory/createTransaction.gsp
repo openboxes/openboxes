@@ -29,15 +29,17 @@
 			function initializeTypeSelector(select) { 
 				var transactionType = select.val();
 				//option:selected
-				if (transactionType == 1) {
+				if (transactionType == ${org.pih.warehouse.core.Constants.TRANSFER_IN_TRANSACTION_TYPE_ID}) {
 					$("#source\\.id").closest("li").show();
+					$("#destination\\.id").closest("li").hide();
+				}
+				else if (transactionType == ${org.pih.warehouse.core.Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID}) {
+					$("#source\\.id").closest("li").hide();
 					$("#destination\\.id").closest("li").show();
-					$("#inventory\\.id").closest("li").hide();
 				}
 				else {
 					$("#source\\.id").closest("li").hide();
 					$("#destination\\.id").closest("li").hide();
-					$("#inventory\\.id").closest("li").show();
 				}						
 				var stripedList = $(".striped li").not(":hidden");
 								
@@ -426,26 +428,26 @@
 										value="${transactionInstance?.transactionDate}" format="MM/dd/yyyy"/>
 							</span>								
 						</li>
-						<li id="from-li"  lass="prop from">
-							<label>From</label>
-							<span class="value">
-								<g:select id="source.id" name="source.id" from="${warehouseInstanceList}" 
-		                       		optionKey="id" optionValue="name" value="${transactionInstance?.source?.id}" noSelection="['null': '']" />
-                       		</span>
-						</li>
-						<li id="to-li" class="prop to">
-							<label>To</label>
-							<span class="value">
-								<g:select id="destination.id" name="destination.id" from="${warehouseInstanceList}" 
-		                       		optionKey="id" optionValue="name" value="${transactionInstance?.destination?.id}" noSelection="['null': '']" />
-							</span>
-						</li>
 						<li id="inventory-li" class="prop inventory">
 							<label>Inventory</label>
 							<span class="value">
 								<g:hiddenField name="inventory.id" value="${warehouseInstance?.inventory?.id}"/>
 								${warehouseInstance?.name }
 							</span>								
+						</li>
+						<li id="from-li"  lass="prop from">
+							<label>From</label>
+							<span class="value">
+								<g:select id="source.id" name="source.id" from="${locationInstanceList}" 
+		                       		optionKey="id" optionValue="name" value="${transactionInstance?.source?.id}" noSelection="['null': '']" />
+                       		</span>
+						</li>
+						<li id="to-li" class="prop to">
+							<label>To</label>
+							<span class="value">
+								<g:select id="destination.id" name="destination.id" from="${locationInstanceList}" 
+		                       		optionKey="id" optionValue="name" value="${transactionInstance?.destination?.id}" noSelection="['null': '']" />
+							</span>
 						</li>
 						<li id="transaction-entries-li" class="prop entries">
 							<div style="width: 100%;" >

@@ -45,12 +45,19 @@ class Transaction implements Serializable {
     // Constraints 
     static constraints = {
 	    transactionDate(nullable:false)
-	    transactionType(nullable:true)
-	    source(nullable:true)
-	    destination(nullable:true)
+	    transactionType(nullable:false)
 		createdBy(nullable:true)
 		confirmed(nullable:true)
 		confirmedBy(nullable:true)
 		dateConfirmed(nullable:true)
+		
+		// a transaction cannot have both a source and a destination
+		// TODO: not quite sure if this will work if source and destination are assigned at the same time?
+		source(nullable:true, 
+			validator: { value, obj-> if (obj.destination) {!value} }
+	    )
+		destination(nullable:true, 
+			validator: { value, obj-> if (obj.source) {!value} }
+	    )
     }
 }

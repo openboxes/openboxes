@@ -1,14 +1,13 @@
 package org.pih.warehouse.inventory;
 
-import org.apache.commons.collections.FactoryUtils;
-import org.apache.commons.collections.ListUtils;
 import org.pih.warehouse.shipping.ShipmentStatusCode;
+import org.pih.warehouse.core.Location 
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
-import org.pih.warehouse.shipping.ShipmentService;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.Warehouse;
+
 
 
 class InventoryController {
@@ -344,7 +343,6 @@ class InventoryController {
 				
 	}
 	
-	
 	def listTransactions = { 
 		redirect(action: listAllTransactions)
 	}
@@ -354,7 +352,11 @@ class InventoryController {
 			params.sort = "dateCreated"
 			params.order = "desc"
 		}		
-		def transactions = Transaction.list(params)
+		
+		def currentInventory = Inventory.list().find( {it.warehouse.id == session.warehouse.id} )
+		
+		// we are only showing transactions for the inventory associated with the current warehouse
+		def transactions = Transaction.list(params).findAll( {it.inventory.id == currentInventory.id} )
 		render(view: "listTransactions", model: [transactionInstanceList: transactions])
 	}
 
@@ -512,7 +514,7 @@ class InventoryController {
 			transactionInstance : transactionInstance,
 			productInstanceMap: Product.list().groupBy { it.category },
 			transactionTypeList: TransactionType.list(),
-			warehouseInstanceList: Warehouse.list(),
+			locationInstanceList: Location.list(),
 			warehouseInstance: Warehouse.get(session?.warehouse?.id) 
 		];
 		
@@ -586,7 +588,7 @@ class InventoryController {
 			transactionInstance: transactionInstance?:new Transaction(),
 			productInstanceMap: Product.list().groupBy { it?.category },
 			transactionTypeList: TransactionType.list(),
-			warehouseInstanceList: Warehouse.list(),
+			locationInstanceList: Location.list(),
 			warehouseInstance: Warehouse.get(session?.warehouse?.id) ]
 
 		render(view: "createTransaction", model: model)

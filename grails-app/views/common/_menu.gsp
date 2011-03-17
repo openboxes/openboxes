@@ -83,7 +83,7 @@
 			</li>
 			<li>
 				<span class="menuButton">
-					<g:link class="list" controller="inventory" action="listAllTransactions">List All</g:link> 
+					<g:link class="list" controller="inventory" action="listAllTransactions">List Transactions</g:link> 
 				</span>
 			</li>
 			<li>

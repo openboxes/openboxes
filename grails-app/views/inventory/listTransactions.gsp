@@ -18,6 +18,7 @@
 				<div class="message">${flash.message}</div>
 			</g:if>
 			
+			<h1>Transactions for inventory at ${session.warehouse.name}</h1>
 			
 			<div class="list">
 				<table>

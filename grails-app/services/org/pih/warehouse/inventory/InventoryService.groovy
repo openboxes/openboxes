@@ -18,6 +18,7 @@ import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.ProductAttribute;
 import org.pih.warehouse.shipping.Container;
 import org.pih.warehouse.shipping.Shipment;
+import org.pih.warehouse.core.Constants 
 import org.pih.warehouse.core.LocationType;
 import org.springframework.validation.Errors;
 
@@ -695,8 +696,8 @@ class InventoryService {
 		try { 
 			// Create a new transaction for outgoing items
 			Transaction debitTransaction = new Transaction();
-			debitTransaction.transactionType = TransactionType.get(1); 	// transfer
-			debitTransaction.source = shipmentInstance?.origin
+			debitTransaction.transactionType = TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)
+			debitTransaction.source = null
 			debitTransaction.destination = shipmentInstance?.destination
 			debitTransaction.inventory = shipmentInstance?.origin?.inventory ?: addInventory(shipmentInstance.origin)
 			debitTransaction.transactionDate = new Date();

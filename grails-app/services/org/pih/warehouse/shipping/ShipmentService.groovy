@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.pih.warehouse.core.Comment;
+import org.pih.warehouse.core.Constants;
 import org.pih.warehouse.core.Event;
 import org.pih.warehouse.core.EventCode;
 import org.pih.warehouse.core.EventType;
@@ -499,9 +500,9 @@ class ShipmentService {
 				
 					// Create a new transaction for outgoing items
 					Transaction creditTransaction = new Transaction()
-					creditTransaction.transactionType = TransactionType.get(1) 	// transfer
+					creditTransaction.transactionType = TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)
 					creditTransaction.source = shipmentInstance?.origin
-					creditTransaction.destination = shipmentInstance?.destination 
+					creditTransaction.destination = null
 					creditTransaction.inventory = shipmentInstance?.destination?.inventory ?: inventoryService.addInventory(shipmentInstance.destination)
 					creditTransaction.transactionDate = new Date()
 					
@@ -536,13 +537,15 @@ class ShipmentService {
 						creditTransaction.addToTransactionEntries(transactionEntry);
 					}
 					
+					// TODO: had to comment out these flash.message because they were throwing a no-such
+					// property exception; can you use "flash" within a service method?
 					if (!creditTransaction.hasErrors() && creditTransaction.save(flush:true)) { 
 						// saved successfully
-						flash.message = "Transaction was created successfully"
+						//flash.message = "Transaction was created successfully"
 					}
 					else { 
 						// did not save successfully, display errors message
-						flash.message = "Transaction has errors"
+						//flash.message = "Transaction has errors"
 					}
 				}
 			}
