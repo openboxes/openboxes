@@ -10,26 +10,23 @@
 					<span class="value">${productInstance?.name }</span>
 				</td>
 			</tr>
-		
-		
 			<tr class="details even">	
 				<td class="left label">
 					<span class="name">Category</span>
 				</td>
 				<td colspan="2">
-					<span class="value">${productInstance?.category?.name }</span>
-				</td>
-			</tr>
-			<tr class="details odd">	
-				<td class="left label">
-					<span class="name">Product Code</span>
-				</td>
-				<td colspan="2">
-					<span class="value">${productInstance?.productCode?:'<span class="fade">none</span>' }</span>
+					<span class="value">
+						<g:if test="${productInstance?.category?.name }">
+							${productInstance?.category?.name }
+						</g:if>
+						<g:else>
+							<span class="fade">None</span>
+						</g:else>
+					</span>
 				</td>
 			</tr>
 			
-			<tr class="details even">	
+			<tr class="details odd">	
 				<td class="left label">
 					<span class="name">Cold Chain</span>
 				</td>

@@ -33,7 +33,7 @@ class JsonController {
 					def quantity = inventoryService.getQuantity(it.lotNumber, warehouse?.inventory) 
 					[
 						value: it.lotNumber,
-						label: it.description + ", " + it.lotNumber + ", " + it.product.name + "  [Qty: " + quantity + "]",
+						label:  it.product.name + ", " + it.lotNumber + "  [Qty: " + quantity + "]",
 						valueText: it.lotNumber,
 						lotNumber: it.lotNumber,
 						product: it.product.id,
@@ -41,7 +41,6 @@ class JsonController {
 						productName: it.product.name,
 						quantity: quantity,
 						expirationDate: it.expirationDate,
-						description: it.description,
 						id: it.id
 					]
 				}
@@ -67,12 +66,11 @@ class JsonController {
 				and { 
 					or {
 						ilike("lotNumber", searchTerm)
-						ilike("description", searchTerm)
 					}
+					// Search within the inventory items for a specific product
 					if (params?.productId) { 
 						eq("product.id", productId)
 					}
-					maxResults(10)					
 				}
 			}
 			
@@ -84,7 +82,6 @@ class JsonController {
 						valueText: it.lotNumber,
 						lotNumber: it.lotNumber,
 						expirationDate: it.expirationDate,
-						description: it.description,
 						id: it.id
 					]
 				}
@@ -94,34 +91,7 @@ class JsonController {
 		render items as JSON;
 	}
 	
-	
-	def findDescriptionByName = { 
-		
-		def items = new TreeSet();
-		if (params.term) {
-			items = InventoryItem.withCriteria {
-				or {
-					ilike("description", params.term + "%")
-					product {
-						ilike("name", params.term + "%")
-					}
-				}
-			}
-			if (items) {
-				items = items.collect() {
-					[
-						value: it.description,
-						label: it.description,
-						valueText: it.description
-					]
-				}
-			}
-			items << [ value: params.term, label: params.term, valueText: params.term ]
-		}
-		
-		render items as JSON;
-	}
-	
+
 	def findShipmentByName = {
 		log.info "Find shipment by name " + params;
 		def finalItems = []

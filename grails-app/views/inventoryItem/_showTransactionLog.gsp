@@ -44,7 +44,13 @@
 						var dialog = jQuery('#transaction-details').load(link.attr('href')).dialog("open");										        
 				        event.preventDefault();
 			        }
-			    );											
+			    );	
+
+				// Click event -> open dialog
+				jQuery('#show-filters').click(function(event) {
+					jQuery("#filters").toggle();
+					event.preventDefault();
+				});		
 			});	
 
 
@@ -55,39 +61,46 @@
 		<div>
 			<g:form method="GET" action="showStockCard">
 				<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
-				
-				<div class="dialog" style="padding: 10px;">
-					
+
+				<div id="filters" class="dialog odd" style="display: none;" >
 					<!--  Filter -->
-					<div style="padding: 10px; text-align: center;">
-						<g:jqueryDatePicker 
-							id="startDate" 
-							name="startDate" 
-							value="${commandInstance?.startDate }" 
-							format="MM/dd/yyyy"
-							size="8"
-							showTrigger="false" />
-						to
-						<g:jqueryDatePicker 
-							id="endDate" 
-							name="endDate" 
-							value="${commandInstance?.endDate }" 
-							format="MM/dd/yyyy"
-							size="8"
-							showTrigger="false" />
-					</div>
-					<div style="padding: 10px; text-align: center;">
-						<g:select name="transactionType.id" 
-							from="${org.pih.warehouse.inventory.TransactionType.list()}" 
-							optionKey="id" optionValue="name" value="${commandInstance?.transactionType?.id }" 
-							noSelection="['0': '-- All types --']" /> 
-					
-						<button  class="" name="filter">
-							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'zoom.png' )}" style="vertical-align:middle"/>
-							&nbsp;Filter
-						</button>
+					<div style="padding: 10px; ">
+						<div style="padding: 10px; text-align: center;">
+							<g:jqueryDatePicker 
+								id="startDate" 
+								name="startDate" 
+								value="${commandInstance?.startDate }" 
+								format="MM/dd/yyyy"
+								size="8"
+								showTrigger="false" />
+							to
+							<g:jqueryDatePicker 
+								id="endDate" 
+								name="endDate" 
+								value="${commandInstance?.endDate }" 
+								format="MM/dd/yyyy"
+								size="8"
+								showTrigger="false" />
+						</div>
+						<div style="padding: 10px; text-align: center;">
+							<g:select name="transactionType.id" 
+								from="${org.pih.warehouse.inventory.TransactionType.list()}" 
+								optionKey="id" optionValue="name" value="${commandInstance?.transactionType?.id }" 
+								noSelection="['0': '-- All types --']" /> 
+						
+							<button  class="" name="filter">
+								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'zoom.png' )}" style="vertical-align:middle"/>
+								&nbsp;Filter
+							</button>
+						</div>
 					</div>
 				</div>
+				<div class="odd" style="text-align: right; padding: 10px;">
+					<a href="#" id="show-filters">
+						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_up.png' )}" 
+							style="vertical-align:middle"/>Show/Hide Filters
+					</a>						
+				</div>				
 				
 		
 				<div class="list">
@@ -111,7 +124,9 @@
 							<g:if test="${!commandInstance?.transactionLogMap }">
 								<tr>
 									<td colspan="4" class="odd">												
-										No <b>${commandInstance?.transactionType?.name }</b> transactions between the given dates.
+										No <b>${commandInstance?.transactionType?.name }</b> transactions between 
+										<g:formatDate format="MMM dd" date="${commandInstance?.startDate }"/> to
+										<g:formatDate format="MMM dd" date="${commandInstance?.endDate }"/>.
 									</td>
 								</tr>
 							</g:if>
@@ -138,10 +153,6 @@
 														<tr class="${(status2%2==0)?'odd':'even' }">
 															<td>
 																${transactionEntry?.inventoryItem?.product?.name }
-																<g:if test="${transactionEntry?.inventoryItem?.description }">
-																	&rsaquo;
-																</g:if>
-																${transactionEntry?.inventoryItem?.description }
 															</td>
 															<td>
 																${transactionEntry?.lotNumber }

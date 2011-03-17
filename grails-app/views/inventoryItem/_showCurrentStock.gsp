@@ -63,8 +63,7 @@
 							</style>			
 							<tr class="${styleClass} prop">
 								<td class="top">
-									${itemInstance?.product?.name} &rsaquo;
-									${(itemInstance?.description)?:'<span class="fade">No description</span>'}
+									${itemInstance?.product?.name} 
 								</td>
 							
 								<td class="top">
@@ -100,10 +99,10 @@
 								</g:hasErrors>															
 								<td class="top" style="text-align: center; width: 120px;">
 									<div class="hover-menu">
-										<button>Actions<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/></button>
+										<b>Actions<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/></b>
 										<div class="actions no-style" style="position: absolute; right: 50px; z-index:999; background-color: #f5f5f5; border: 1px solid lightgrey; padding: 10px; display: none;">
-											<g:render template="editItemDialog" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]"/>
-											<g:render template="adjustStock" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />			
+											<g:render template="editItemDialog" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]"/><br/>
+											<g:render template="adjustStock" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />	<br/>
 											<g:render template="addToShipment" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />	
 										</div>
 									</div>

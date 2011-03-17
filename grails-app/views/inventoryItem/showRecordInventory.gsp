@@ -12,7 +12,7 @@
 
 	// We need to do this in order to make sure the index for new items is correct
 	<g:each var="row" in="${commandInstance?.recordInventoryRows.findAll{ it.newQuantity > 0 } }" status="status">
-		var existingInventoryItem = { Id: '${row.id}', Type: '', ProductId: '', LotNumber: '${row.lotNumber}', Description: '${row.description}', ExpirationDate: '${row.expirationDate?:never}', Qty: 0 };	
+		var existingInventoryItem = { Id: '${row.id}', Type: '', ProductId: '', LotNumber: '${row.lotNumber}', ExpirationDate: '${row.expirationDate?:never}', Qty: 0 };	
 		inventory.InventoryItems.push(existingInventoryItem);
 	</g:each>
 
@@ -21,7 +21,7 @@
 	}
 	
 	function getClass() {
-		return ($.inArray( this.data, inventory.InventoryItems ) % 2) ? "even" : "odd";
+		return ($.inArray( this.data, inventory.InventoryItems ) % 2) ? "odd" : "even";
 	}
 
 
@@ -39,7 +39,6 @@
 				Type: 'existing', 
 				ProductId: ui.item.productId,
 				LotNumber: ui.item.lotNumber, 
-				Description: ui.item.description, 
 				ExpirationDate: ui.item.expirationDate, 
 				Qty: 0 
 			};
@@ -56,9 +55,9 @@
 	}
 
 	 
-	function addNewInventoryItem(id, type, productId, lotNumber, description, expDate, qty) { 
+	function addNewInventoryItem(id, type, productId, lotNumber, expDate, qty) { 
 		var inventoryItem = 
-			{ Id: id, Type: 'new', ProductId: productId,LotNumber: lotNumber, Description: description, ExpirationDate: expDate, Qty: 0 };
+			{ Id: id, Type: 'new', ProductId: productId,LotNumber: lotNumber, ExpirationDate: expDate, Qty: 0 };
 
 
 	}
@@ -185,44 +184,11 @@
 					var lotNumberValue = $(this).parent().parent().find('.lotNumberValue');
 					var quantity = $(this).parent().parent().find('.newQuantity');
 					var expirationDate = $(this).parent().parent().find('.expirationDate');
-					var description = $(this).parent().parent().find('.description');
-
 
 					lotNumber.val(ui.item.value);
 					lotNumberValue.val(ui.item.value);
 
-					if (description.val() == '') { 
-						quantity.focus();
-						quantity.select();					
-					}
-					else { 
-						description.focus();
-					}
-					 
-						
-					//alert("selected " + ui.item)
-					/*
-					$('#lotNumberWidget-id').val(ui.item.value);
-					$('#lotNumberWidget-span').html(ui.item.valueText);
-					$('#lotNumberWidget-name').html(ui.item.lotNumber);
-					$('#lotNumberWidget-description').html(ui.item.description);
-					if (ui.item.expirationDate=='') {
-						$('#lotNumberWidget-date').html(ui.item.expirationDate);
-					}
-					else { 
-						$('#lotNumberWidget-date').html('<span class="fade">never</span>');								
-					}
-					$('#lotNumberDescription').val(ui.item.description);
-					$('#lotNumberDate').val(ui.item.expirationDate);
-					$('#lotNumberWidget-suggest').focus();
-					*/
-
-					
-					// Set the lot number and disable the field
-					//$(this).attr('disabled', 'disabled');
-					
 					// Set the ID
-					
 					id.val(ui.item.id);
 					// Set the lot number and disable the field
 					
@@ -232,17 +198,6 @@
 					else { 
 						expirationDate.val('never');
 					}
-					//expirationDate.attr('disabled', 'disabled');
-					
-					// Set the description and disable the field (unless it's null)						
-					
-					description.val(ui.item.description);
-					//description.addClass("fade");
-					//if (description.val()) { 
-					//	description.attr('disabled', 'disabled');
-					//}
-					
-				
 				}							  
 			});				
 		});
@@ -256,27 +211,7 @@
 				buttonImage: '/warehouse/images/icons/silk/calendar.png',
 			});								
 		});
-
-		$('.description').livequery(function() { 
-			$(this).autocomplete( {
-				source: function(req, add){
-					$.getJSON('/warehouse/json/findDescriptionByName', req, function(data) {
-						var items = [];
-						$.each(data, function(i, item) {
-							items.push(item);
-						});
-						add(items);
-					});
-				},
-				select: function(event, ui) {
-
-					$(this).parent().parent().find('.description').val(ui.item.value);
-					$(this).parent().parent().find('.descriptionValue').val(ui.item.value);
-					
-				}
-			});
-		});
-
+		
 		// Bind the click event to the up buttons and call the change quantity function
 		$(".buttonUp").livequery(function() { 
 			$(this).click(buttonUpMouseHandler);
@@ -379,7 +314,6 @@
 											<tr>	
 												<th>Lot/Serial No</th>
 												<th>Expires</th>
-												<th>Description</th>
 												<th style="text-align:center;">Old Qty</th>
 												<th style="text-align:center;">New Qty</th>
 												<th>Actions</th>
@@ -389,63 +323,73 @@
 											<style>
 												.selected-row { background-color: #ffffe0; } 
 											</style>
-											<g:each var="recordInventoryRow" in="${commandInstance?.recordInventoryRows.findAll{it.oldQuantity > 0 || it.newQuantity > 0}.sort { it.lotNumber }}" status="status">
-												<g:set var="styleClass" value="${params?.inventoryItem?.id && recordInventoryRow?.id == Integer.valueOf(params?.inventoryItem?.id) ? 'selected-row' : ''}"/>
-												
-												<tr class="${(status%2==0)?'odd':'even' } ${styleClass}">
-													<td width="15%">
-														<%-- 
-														<g:textField name="recordInventoryRows[${status}].lotNumber" size="10" value="${recordInventoryRow?.lotNumber }"/>
-														--%>
-														<g:hiddenField name="recordInventoryRows[${status}].id" value="${recordInventoryRow?.id }"/>
-														<g:hiddenField name="recordInventoryRows[${status}].lotNumber" value="${recordInventoryRow?.lotNumber }"/>
-														${recordInventoryRow?.lotNumber?:'<span class="fade">EMPTY</span>' }
-													</td>
-													<td width="10%">
-														<%-- 
-														<g:jqueryDatePicker id="expirationDate${status }" name="recordInventoryRows[${status}].expirationDate" 
-															value="${recordInventoryRow?.expirationDate}" format="MM/dd/yyyy" showTrigger="false" />
-														--%>
-														<g:hiddenField name="recordInventoryRows[${status}].expirationDate" value="${formatDate(date: recordInventoryRow?.expirationDate, format: 'MM/dd/yyyy') }"/>
-														<g:if test="${recordInventoryRow?.expirationDate}">
-															<g:formatDate date="${recordInventoryRow?.expirationDate}" format="MMM dd yyyy"/>
-														</g:if>
-														<g:else>
-															<span class="fade">never</span>
-														</g:else>
-													</td>
-													<td width="25%">
-														<%-- 
-														<g:textField name="recordInventoryRows[${status}].description" size="25" value="${recordInventoryRow?.description }"/>
-														--%>
-														<g:hiddenField name="recordInventoryRows[${status}].description" value="${recordInventoryRow?.description }"/>
-														${(recordInventoryRow?.description)?:'<span class="fade">None</span>'}
-													</td>
-													<td width="10%" style="text-align: center; vertical-align: middle;">
-														${recordInventoryRow?.oldQuantity }	
-														<g:hiddenField name="recordInventoryRows[${status}].oldQuantity" value="${recordInventoryRow?.oldQuantity }"/>
-													</td>	
-													<td width="10%" style="text-align: center; vertical-align: middle;">
-														<g:textField style="text-align: center;" id="newQuantity-${status }" class="newQuantity" name="recordInventoryRows[${status }].newQuantity" size="3" value="${recordInventoryRow?.newQuantity }" onFocus="this.select();" onClick="this.select();"/>
-													</td>
-													<td width="15%" style="text-align: left">
-														<button id="${status }" class="buttonUp">
-															<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_up.png') }"/>
-														</button>
-														<button id="${status }" class="buttonDown">
-															<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_down.png') }"/>
-														</button>
+											
+											<g:set var="inventoryItems" value="${commandInstance?.recordInventoryRows.findAll{it.oldQuantity > 0 || it.newQuantity > 0}}"/>	
+											<g:if test="${inventoryItems }">											
+												<g:each var="recordInventoryRow" in="${inventoryItems.sort { it.lotNumber }}" status="status">
+													<g:set var="styleClass" value="${params?.inventoryItem?.id && recordInventoryRow?.id == Integer.valueOf(params?.inventoryItem?.id) ? 'selected-row' : ''}"/>
 													
+													<tr class="${(status%2==0)?'odd':'even' } ${styleClass}">
+														<td width="15%">
+															<%-- 
+															<g:textField name="recordInventoryRows[${status}].lotNumber" size="10" value="${recordInventoryRow?.lotNumber }"/>
+															--%>
+															<g:hiddenField name="recordInventoryRows[${status}].id" value="${recordInventoryRow?.id }"/>
+															<g:hiddenField name="recordInventoryRows[${status}].lotNumber" value="${recordInventoryRow?.lotNumber }"/>
+															${recordInventoryRow?.lotNumber?:'<span class="fade">EMPTY</span>' }
+														</td>
+														<td width="10%">
+															<%-- 
+															<g:jqueryDatePicker id="expirationDate${status }" name="recordInventoryRows[${status}].expirationDate" 
+																value="${recordInventoryRow?.expirationDate}" format="MM/dd/yyyy" showTrigger="false" />
+															--%>
+															<g:hiddenField name="recordInventoryRows[${status}].expirationDate" value="${formatDate(date: recordInventoryRow?.expirationDate, format: 'MM/dd/yyyy') }"/>
+															<g:if test="${recordInventoryRow?.expirationDate}">
+																<g:formatDate date="${recordInventoryRow?.expirationDate}" format="MMM dd yyyy"/>
+															</g:if>
+															<g:else>
+																<span class="fade">never</span>
+															</g:else>
+														</td>
+														<td width="10%" style="text-align: center; vertical-align: middle;">
+															${recordInventoryRow?.oldQuantity }	
+															<g:hiddenField name="recordInventoryRows[${status}].oldQuantity" value="${recordInventoryRow?.oldQuantity }"/>
+														</td>	
+														<td width="10%" style="text-align: center; vertical-align: middle;">
+															<g:textField style="text-align: center;" id="newQuantity-${status }" class="newQuantity" name="recordInventoryRows[${status }].newQuantity" size="3" value="${recordInventoryRow?.newQuantity }" onFocus="this.select();" onClick="this.select();"/>
+														</td>
+														<td width="15%" style="text-align: center">
+															<%-- 
+																<button id="${status }" class="buttonUp">
+																	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_up.png') }"/>
+																</button>
+																<button id="${status }" class="buttonDown">
+																	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_down.png') }"/>
+																</button>
+															--%>
+														</td>
+													</tr>
+												</g:each>
+											</g:if>
+											<g:else>
+												<tr class="odd">
+													<td colspan="5" style="text-align: center; min-height: 400px;">
+														Add a new inventory item to proceed.
 													</td>
 												</tr>
-											</g:each>
+												
+											</g:else>
+											
 										</tbody>
 										<tfoot>
-											<tr>
-												<td colspan="6" style="text-align: center;">
+											<tr class="prop">
+												<td colspan="4" style="text-align: left">
 													<button id="addAnother" type="button" class="positive">
 														<img src="${createLinkTo(dir:'images/icons/silk', file:'add.png') }"/>&nbsp;Add Item
 													</button>
+													
+												</td>
+												<td colspan="1" style="text-align: center;">
 													&nbsp;
 													<button name="save" type="submit" class="positive">
 														<img src="${createLinkTo(dir:'images/icons/silk', file:'tick.png') }"/>&nbsp;Save 
@@ -496,18 +440,6 @@
 		<g:textField id="expirationDate{{= getIndex()}}" class="expirationDate" name="recordInventoryRows[{{= getIndex()}}].expirationDate-text" value="{{= ExpirationDate}}" size="10" />
 		
 	</td>
-	<td width="25%">		
-		<style>
-			#description-{{= getIndex()}} { 
-				background-image: url('/warehouse/images/icons/silk/magnifier.png');
-				background-repeat: no-repeat;
-				background-position: center left;
-				padding: 5px;
-				padding-left: 20px;
-			}
-		</style>
-		<g:textField id="description-{{= getIndex()}}" class="description" name="recordInventoryRows[{{= getIndex()}}].description" value="{{= Description}}" size="18" />		
-	</td>
 	<td width="10%" style="text-align: center; vertical-align: middle;">
 		{{= Qty}}
 		<g:hiddenField id="oldQuantity-{{= getIndex()}}" class="oldQuantity" name="recordInventoryRows[{{= getIndex()}}].oldQuantity" value="{{= Qty}}"/>
@@ -518,12 +450,14 @@
 
 	</td>	
 	<td width="5%" style="text-align: left;">
-		<button id="buttonUp-{{= getIndex()}}" class="buttonUp">
-			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_up.png') }"/>
-		</button>
-		<button id="buttonDown-{{= getIndex()}}" class="buttonDown">
-			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_down.png') }"/>
-		</button>
+		<%--
+			<button id="buttonUp-{{= getIndex()}}" class="buttonUp">
+				<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_up.png') }"/>
+			</button>
+			<button id="buttonDown-{{= getIndex()}}" class="buttonDown">
+				<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_down.png') }"/>
+			</button>
+		--%>
 		<a href="#" onclick="removeRow({{= getIndex()}});"><img src="${createLinkTo(dir:'images/icons/silk', file:'delete.png')}"/></a>
 		<g:hiddenField name="recordInventoryRows[{{= getIndex()}}].id" value="{{= Id}}" size="1" />
 	</td>
@@ -541,10 +475,12 @@
 		<g:hiddenField name="recordInventoryRows[{{= getIndex()}}].expirationDate" value="{{= ExpirationDate}}"/>
 		{{= ExpirationDate}}
 	</td>
+	<%--
 	<td width="35%">
 		<g:hiddenField name="recordInventoryRows[{{= getIndex()}}].description" value="{{= Description}}"/>
 		{{= Description}}
 	</td>
+	--%>
 	<td width="10%" style="text-align: center; vertical-align: middle;">
 		{{= Qty}}
 		<g:hiddenField name="recordInventoryRows[{{= getIndex()}}].oldQuantity" value="{{= Qty}}"/>

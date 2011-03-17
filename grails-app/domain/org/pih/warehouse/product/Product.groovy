@@ -23,15 +23,22 @@ import org.pih.warehouse.product.Category;
 class Product implements Serializable {
 	
 	// Base product information 
-	String name;				// A display name for the product
-	String description;			// A description for the product
-	String productCode;			// An internal product code	
-	Category category;			// primary category
+	String name;							// Specific description for the product
+	String description;						// Not used at the moment
+	String productCode 						// Internal product code identifier
 	Boolean coldChain = Boolean.FALSE;
+	
+	// New fields that need to be reviewed
+	String unitOfMeasure	// each, pill, bottle, box
+	String upc				// Universal product code
+	String ndc				// National drug code
+	String mfr				// Manufacturer
+	String mfrCode			// Manufacturer product (e.g. catalog code)
 
 	// Associations 
-	List attributes = new ArrayList();
-	List categories = new ArrayList();
+	Category category;						// primary category
+	List attributes = new ArrayList();		// custom attributes
+	List categories = new ArrayList();		// secondary categories
 	
 	// Auditing
 	Date dateCreated;
@@ -47,9 +54,16 @@ class Product implements Serializable {
     static constraints = {
 		name(nullable:false)
 		description(nullable:true)
-		productCode(nullable:true)		
+		productCode(nullable:true)
+		unitOfMeasure(nullable:true)
 		category(nullable:true)
 		coldChain(nullable:true)
+		
+		upc(nullable:true)
+		ndc(nullable:true)
+		mfr(nullable:true)
+		mfrCode(nullable:true)
+
     }
 	
 	def getCategoriesList() {

@@ -36,10 +36,12 @@
 									
 									<th valign="top"><g:message
 										code="product.name.label" default="Description" /></th>
+									<%-- 
 									<th valign="top">
 										<label for="name"><g:message code="product.productCode.label" default="Product Code" /></th>
+									--%>
 	                                <th valign="top">
-	                                	<g:message code="product.primaryCategory.label" default="Categories" /></th>
+	                                	<g:message code="product.primaryCategory.label" default="Primary Category" /></th>
 									<th valign="top">
 										<label for="name"><g:message code="product.coldChain.label" default="Cold Chain" /></th>
 								</tr>
@@ -56,12 +58,12 @@
 										<g:textField name="productInstanceList[${status }].name" value="${productInstance?.name}" size="20"/>
 										
 									</td>
-	
-									<td valign="top"
-										class="value ${hasErrors(bean: productInstance, field: 'productCode', 'errors')}">
-									<g:textField name="productInstanceList[${status }].productCode" value="${productInstance?.productCode}" size="10" />
+
+									<%-- 	
+									<td valign="top" class="value ${hasErrors(bean: productInstance, field: 'productCode', 'errors')}">
+										<g:textField name="productInstanceList[${status }].productCode" value="${productInstance?.productCode}" size="10" />
 									</td>
-	
+									--%>
 	
 	                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'category', 'errors')}">
 	                                	<%-- 
@@ -131,13 +133,11 @@
 						<tfoot>
 							<tr class="prop">
 								<td colspan="5" style="text-align: center;">
-									<span class="buttons">
-										<button type="submit" class="positive"><img
-											src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" style="vertical-align: middle;"
-											alt="Save" /> ${message(code: 'default.button.save.label', default: 'Save')}
-										</button>
-										
-									</span>
+									<button type="submit" class="positive"><img
+										src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" style="vertical-align: middle;"
+										alt="Save" /> ${message(code: 'default.button.save.label', default: 'Save')}
+									</button>
+									&nbsp;
 									<g:link controller='product' action='browse' class="negative">
 										${message(code: 'default.button.done.label', default: 'Done')}			
 									</g:link>  

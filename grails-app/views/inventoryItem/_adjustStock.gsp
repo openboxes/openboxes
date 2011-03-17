@@ -28,15 +28,7 @@
 								<td valign="top" class="name"><label><g:message code="inventoryItem.product.label" default="Product" /></label></td>                            
 								<td valign="top" class="value">
 									${commandInstance?.productInstance } 
-									<g:if test="${itemInstance?.description}">&rsaquo; ${itemInstance?.description }</g:if> 
 									<g:if test="${itemInstance?.lotNumber }">&rsaquo; ${itemInstance?.lotNumber }</g:if>
-								</td>
-							</tr>
-							<tr class="prop">
-								<td valign="top" class="name"><label><g:message code="inventoryItem.description.label" default="Description" /></label></td>                            
-								<td valign="top" class="value">
-									<g:if test="${itemInstance?.description}">${itemInstance?.description }</g:if> 
-									<g:else><span class="fade">None</span></g:else>
 								</td>
 							</tr>
 							<tr class="prop">
@@ -69,7 +61,7 @@
 							<tr class="prop">
 								<td valign="top" class="name"><label><g:message code="inventoryItem.quantity.label" default="New Quantity" /></label></td>                            
 								<td valign="top" class="value">
-									<g:textField id="newQuantity" name="newQuantity" size="3" value="${itemInstance?.quantity}" />
+									<g:textField id="newQuantity" name="newQuantity" size="3" value="${itemQuantity }" />
 								</td>
 							</tr>  	        
 							<tr>

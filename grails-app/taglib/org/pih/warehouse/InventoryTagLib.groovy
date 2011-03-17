@@ -66,14 +66,13 @@ class InventoryTagLib {
 								//\$('#${id}-suggest').val("Enter serial number, lot number, or barcode");
 								\$('#${id}-span').html(ui.item.valueText);
 								\$('#${id}-name').html(ui.item.lotNumber);
-								\$('#${id}-description').html(ui.item.description);
+								
 								if (ui.item.expirationDate=='') {
 									\$('#${id}-date').html(ui.item.expirationDate);
 								}
 								else { 
 									\$('#${id}-date').html('<span class="fade">never</span>');								
 								}
-								\$('#lotNumberDescription').val(ui.item.description);
 								\$('#lotNumberDate').val(ui.item.expirationDate);
 								\$('#${id}-suggest').focus();
 								

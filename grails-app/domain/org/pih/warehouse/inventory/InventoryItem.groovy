@@ -10,8 +10,6 @@ import org.pih.warehouse.inventory.Transaction;
  */
 class InventoryItem implements Serializable {
 	
-	Boolean active = Boolean.TRUE			// Actively managed
-	String description;						// Description of the specific instance of a product that we're tracking
 	Product product;		    			// Product that we're tracking
 	String lotNumber;						// Lot information for a product  
 	Date expirationDate;
@@ -24,20 +22,13 @@ class InventoryItem implements Serializable {
 	
 	// Notice the unique constraint on lotNumber/product
     static constraints = {
-		active(nullable:false)
-		description(nullable:true, unique:['lotNumber','description'])
 		product(nullable:false)
-		lotNumber(nullable:true, unique:['product','description'])
+		lotNumber(nullable:true, unique:['product'])
 		expirationDate(nullable:true)
+		
     }
 	
-	Integer getQuantity() { 
-		// PIMS-528 TransientObjectException: object references an unsaved transient instance - 
-		// save the transient instance before flushing: org.pih.warehouse.product.Product
-		//return TransactionEntry.findAllByProductAndLotNumber(product, lotNumber).inject(0) { count, item -> count + (item?.quantity ?: 0) }
-		return 0;
-		
-	}
+	
 	
 	
 }

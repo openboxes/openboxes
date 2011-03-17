@@ -21,7 +21,12 @@
             <div class="dialog" >        
 		        <table>
 		        	<tr>
-		        		<td style="width: 50%;">
+		        		<td>
+		        		
+		        		<fieldset>
+		        			<legend>Categories</legend>
+		        		
+		        		
 							<div style="padding:10px; text-align: right">
 								<span class="menuButton">
 				            		<g:link class="new" controller="category" action="tree" params="[addCategory:'addCategory']"><g:message code="default.add.label" args="['category']"/></g:link>
@@ -85,6 +90,9 @@
 										});
 								</script>
 				            </div>
+				            
+				            </fieldset>
+				            
 						</td>
 						<td>
 							<g:if test="${categoryInstance }">
@@ -93,7 +101,7 @@
 				           			<fieldset>
 				           				<legend>Edit Category</legend>
 				           				<table>
-				           					<tr class="prop">
+				           					<tr class="prop odd">
 				           						<td class="value">
 				           							<label>Parent</label>
 			           								<select name="parentCategory.id">
@@ -102,25 +110,45 @@
 			           								</select>
 			           							</td>
 			           						</tr>
-			           						<tr class="prop">
-			           							<td class="value" style="padding-left: 30px;">
+			           						<tr class="prop even">
+			           							<td class="value">
 			           								<label>Name</label>
 							           				<g:textField name="name" value="${categoryInstance?.name }"/>
 				           						</td>
 				           					</tr>
-				           					<g:if test="${categoryInstance?.categories }">
-					           					<tr class="prop">
-					           						<td class="value" style="padding-left: 60px;">
+				           					<tr class="prop odd">
+				           						<td class="value">
+				           							<label>Children</label>
+						           					<g:if test="${categoryInstance?.categories }">
 					           							<table>			           							
 						           							<g:each var="child" in="${categoryInstance?.categories }" status="status">
 						           								<tr>
-									           						<td><g:link action="tree" id="${child.id }">${child?.name }</g:link></td>
+									           						<td>
+									           							<g:link action="tree" id="${child.id }">${child?.name }</g:link>
+									           						</td>
 						           								</tr>
 									           				</g:each>
 								           				</table>
-					           						</td>
-					           					</tr>
-				           					</g:if>
+													</g:if>
+				           						</td>
+				           					</tr>
+				           					<tr class="prop even">
+				           						<td class="value">
+					           						<label>Products</label>
+						           					<g:if test="${categoryInstance?.products }">
+					           							<table>			           							
+						           							<g:each var="product" in="${categoryInstance?.products }" status="status">
+						           								<tr>
+																	<td>
+																		<g:link controller="product" action="edit" id="${product?.id}" target="_blank">${product?.name }</g:link>
+																	</td>
+						           								</tr>
+									           				</g:each>
+								           				</table>
+								           			</g:if>
+				           						</td>
+				           					</tr>
+				           					
 				           					<tr class="prop">
 				           						<td colspan="2" style="text-align:center">		
 				           						

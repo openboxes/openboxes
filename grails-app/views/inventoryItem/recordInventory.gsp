@@ -178,7 +178,7 @@
 													</g:else>
 												</td>
 												<td>
-													${itemInstance?.description?:itemInstance?.product?.name }
+													${itemInstance?.product?.name }
 												</td>
 												<td style="text-align: center;">
 													<g:textField name="inventoryItemList[${status }].quantity" size="3" value="${itemInstance?.quantity }"/>
@@ -197,7 +197,7 @@
 													value="${inventoryItem?.expirationDate}" format="MM/dd/yyyy" showTrigger="false" />
 											</td>
 											<td>
-												<g:textField name="description" size="20" value="${inventoryItem?.description}"/>
+
 											</td>
 											<td style="text-align: center">
 												<g:textField name="quantity" size="3" value="${inventoryItem?.quantity}"/>

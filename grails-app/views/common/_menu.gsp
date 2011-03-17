@@ -21,22 +21,37 @@
 			</li>				
 		</ul>
 	</div>
-	<%-- 
+
+	
+	
 	<h3 class="menu-heading">
-		<g:message code="order.label"  default="Orders"/>
+		<g:message code="inventory.label"  default="Inventory"/>
 	</h3>
 	<div class="menu-section">									
 		<ul>
-
 			<li>
 				<span class="menuButton">
-					<g:link class="browse" class="bullet" controller="catalog" action="list"><g:message code="catalog.show.label" default="Show Catalog"/></g:link>
+					<g:link class="browse" controller="inventory" action="browse">Browse Inventory</g:link>
 				</span>
-			</li>		
-
+			</li>
+			<li>
+				<span class="menuButton">
+					<g:link class="list" controller="inventory" action="listAllTransactions">List Transactions</g:link> 
+				</span>
+			</li>
+			<li>
+				<span class="menuButton">
+					<g:link class="new" controller="inventory" action="createTransaction">Add Transaction</g:link> 				
+				</span>			
+			</li>
+			<li>
+				<span class="menuButton">
+					<g:link class="new" controller="inventoryItem" action="importInventoryItems">Import Items</g:link> 				
+				</span>			
+			</li>
+			
 		</ul>	
 	</div>
-	--%>
 	<h3 class="menu-heading" >
 		<g:message code="shipping.label"  default="Shipping"/>
 	</h3>
@@ -70,34 +85,6 @@
 				</span>
 			</li>		
 		</ul>										
-	</div>
-	<h3 class="menu-heading">
-		<g:message code="inventory.label"  default="Inventory"/>
-	</h3>
-	<div class="menu-section">									
-		<ul>
-			<li>
-				<span class="menuButton">
-					<g:link class="browse" controller="inventory" action="browse">Browse Inventory</g:link>
-				</span>
-			</li>
-			<li>
-				<span class="menuButton">
-					<g:link class="list" controller="inventory" action="listAllTransactions">List Transactions</g:link> 
-				</span>
-			</li>
-			<li>
-				<span class="menuButton">
-					<g:link class="new" controller="inventory" action="createTransaction">Add Transaction</g:link> 				
-				</span>			
-			</li>
-			<li>
-				<span class="menuButton">
-					<g:link class="new" controller="inventoryItem" action="importInventoryItems">Import Items</g:link> 				
-				</span>			
-			</li>
-			
-		</ul>	
 	</div>
 	<h3 class="menu-heading">
 		<g:message code="product.label" default="Products" />

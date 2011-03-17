@@ -28,7 +28,7 @@ class RecordInventoryCommand {
 			def errorsFound = false;
 			val.each{ row ->
 				println "validate row " + row	
-				if(!row.validate()) {
+				if(!row?.validate()) {
 					errorsFound = true;
 					row.errors.allErrors.each{ error->
 						obj.errors.rejectValue('recordInventoryRows', "recordInventoryCommand.recordInventoryRows.invalid",

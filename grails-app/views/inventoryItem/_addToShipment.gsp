@@ -26,7 +26,6 @@
 									<td valign="top" class="name"><label>Item</label></td>                            
 									<td valign="top" class="value">
 										 	${commandInstance?.productInstance.name }
-											<g:if test="${itemInstance?.description}">&rsaquo; ${itemInstance?.description }</g:if> 
 											<g:if test="${itemInstance?.lotNumber }">&rsaquo; ${itemInstance?.lotNumber }</g:if>
 										
 									</td>

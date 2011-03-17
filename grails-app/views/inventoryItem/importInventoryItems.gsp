@@ -38,12 +38,15 @@
 									
 										<th>Parent Category</th>
 										<th>Category</th>
-										<th>Product</th>
-										<th>Quantity</th>
+										<th>Product Description</th>
+										<th>UPC</th>
+										<th>NDC</th>
+										<th>Manufacturer</th>
+										<th>ManufacturerCode</th>
 										<th>Lot Number</th>
 										<th>Expiration Date</th>
-										<th>Description</th>
-										<th>Manufacturer</th>
+										<th>Quantity</th>
+										<th>Unit of Measure</th>
 									</tr>							
 								</thead>
 								<tbody>							
@@ -56,10 +59,19 @@
 												${entry.category}
 											</td>
 											<td>
-												${entry.product }
+												${entry.productDescription }
 											</td>
 											<td>
-												${entry.quantity}
+												${entry.upc}
+											</td>
+											<td>
+												${entry.ndc}
+											</td>
+											<td>
+												${entry.manufacturer}
+											</td>
+											<td>
+												${entry.manufacturerCode}
 											</td>
 											<td>
 												${entry.lotNumber}
@@ -68,10 +80,10 @@
 												${entry.expirationDate}
 											</td>
 											<td>
-												${entry.description}
+												${entry.quantity}
 											</td>
 											<td>
-												${entry.manufacturer}
+												${entry.unitOfMeasure}
 											</td>
 										</tr>
 									</g:each>

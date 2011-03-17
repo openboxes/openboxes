@@ -73,6 +73,8 @@ class InventoryItemController {
 					
 					if (!cmd.errors.hasErrors()) {
 						flash.message = "Congratulations!  You have successfully imported inventory from '" + localFile.getAbsolutePath() + "'.";
+						redirect(action: "importInventoryItems");
+						return;
 					}
 				}
 
@@ -420,13 +422,7 @@ class InventoryItemController {
 			itemInstance.properties = params
 			
 			// FIXME Temporary hack to handle a chnaged values for these two fields
-			//if (params?.description?.name) 
-			itemInstance.description = params?.description?.name
-			//if (params?.lotNumber?.name) 
 			itemInstance.lotNumber = params?.lotNumber?.name
-			log.info "Description = " + params?.description?.name;
-			log.info "Lot number = " + params?.lotNumber?.name;
-			
 			
 			if (!itemInstance.hasErrors() && itemInstance.save(flush: true)) {
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"
@@ -511,8 +507,8 @@ class InventoryItemController {
 				flash.message = "Unable to add new item to shipment";
 			}
 			else { 
-				def itemName = (inventoryItem?.description)?:productInstance?.name + (inventoryItem?.lotNumber) ? " #" + inventoryItem?.lotNumber : "";		
-				flash.message = "Added item " + itemName + " to shipment " + shipmentInstance?.name;
+				def productDescription = productInstance?.name + (inventoryItem?.lotNumber) ? " #" + inventoryItem?.lotNumber : "";		
+				flash.message = "Added item " + productDescription + " to shipment " + shipmentInstance?.name;
 			}
 		}
 		

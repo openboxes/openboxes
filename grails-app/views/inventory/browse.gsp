@@ -14,10 +14,6 @@
     </head>    
     <body>
         <div class="body">
-			<div class="nav">
-				<g:render template="nav"/>
-			</div>
-        
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>						
@@ -27,7 +23,6 @@
 	            </div>
             </g:hasErrors>    
             
-
 			<script>
 				$(function() {
 					$("#dialogButton").click(function () { 
@@ -37,91 +32,96 @@
 			</script>
 
         	<g:set var="varStatus" value="${0 }"/>	            			
-         	<table>
+         	<table style="height: 400px; ">
 				<tr>
-					<td style="border-right: 0px solid lightgrey; width: 200px; border: 1px solid lightgrey;">
-						<g:render template="/common/searchCriteriaVertical" model="[productInstanceList: commandInstance?.productList, categoryFilters: commandInstance?.categoryFilters, rootCategory: commandInstance?.rootCategory]"/>					
+					<td style="border-right: 0px solid lightgrey; width: 200px; border-right: 1px solid lightgrey;">
+						<div style="padding: 10px;">
+							<h3>Filter products</h3>
+							<g:render template="/common/searchCriteriaVertical" model="[productInstanceList: commandInstance?.productList, categoryFilters: commandInstance?.categoryFilters, rootCategory: commandInstance?.rootCategory]"/>					
+						</div>
+						
+						<!--  Disbled 'Actions' until we have time to getting them working as expected -->
+						<g:if test="${!true && commandInstance?.productList }">
+							<hr/>
+							<div style="padding: 10px;">
+								<h3>Actions</h3>
+								<div style="padding: 10px;">
+									<g:if test="${commandInstance?.productList }">
+										<g:link class="new" controller="inventory" action="createTransaction">
+											<button>
+												Record Inventory
+												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_right.png' )}" style="vertical-align:middle"/>
+											</button>
+										</g:link> 				
+									</g:if>
+								</div>
+							</div>	
+						</g:if>					
          			</td>
 	         		<td>
-		            		<g:if test="${commandInstance?.productList }">
-		            			<div style="overflow: auto; height: 400px;">									
-									<g:set var="productMap" value="${commandInstance?.productList.groupBy {it.category} }"/>
-									<g:each var="entry" in="${productMap}" status="i">	
-										<g:set var="totalQuantity" value="${0 }"/>
-										<h3 style="background-color: #525D76; color: white; padding: 10px;">${entry.key }</h3>
-										<div class="list">
-					            			<table class="data-table">         		
-					            			<%-- 
-					            				<thead>
-													<tr>
-														<th width="50%">Description</th>
-														<th width="20%">Category</th>
-														<th width="5%" style="text-align: center">Qty</th>
+	            		<g:if test="${commandInstance?.productList }">
+	            			<div style="overflow: auto; height: 400px;">									
+								<g:set var="productMap" value="${commandInstance?.productList.groupBy {it.category} }"/>
+								<g:each var="entry" in="${productMap}" status="i">	
+									<g:set var="totalQuantity" value="${0 }"/>
+									<h3 style="background-color: #525D76; color: white; padding: 10px;">${entry.key }</h3>
+									<div class="list">
+				            			<table class="data-table">         		
+				            			<%-- 
+				            				<thead>
+												<tr>
+													<th width="50%">Description</th>
+													<th width="20%">Category</th>
+													<th width="5%" style="text-align: center">Qty</th>
+												</tr>
+											</thead>
+										--%>
+											<tbody>
+												<g:each var="productInstance" in="${productMap[entry.key] }">
+													<g:set var="quantity" value="${commandInstance?.quantityMap?.get(productInstance) }"/>
+													<g:set var="totalQuantity" value="${totalQuantity + (quantity?:0) }"/>
+													<tr class="${varStatus++%2==0?'odd':'even' } prop">
+														<td>
+															<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">
+																${productInstance?.name }
+															</g:link> 
+																
+														</td>
+														<td>
+															<span class="fade">${productInstance?.category?.name }</span>
+														</td>
+														<td style="text-align: center;">
+															<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">
+																${quantity}
+															</g:link>
+														</td>
 													</tr>
-												</thead>
-											--%>
-												<tbody>
-													<g:each var="productInstance" in="${productMap[entry.key] }">
-														<g:set var="quantity" value="${commandInstance?.quantityMap?.get(productInstance) }"/>
-														<g:set var="totalQuantity" value="${totalQuantity + (quantity?:0) }"/>
-														<tr class="${varStatus++%2==0?'odd':'even' } prop">
-															<td>
-																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">
-																	${productInstance?.name }
-																</g:link> 
-																	
-															</td>
-															<td>
-																<span class="fade">${productInstance?.category?.name }</span>
-															</td>
-															<td style="text-align: center;">
-																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">
-																	${quantity}
-																</g:link>
-															</td>
-														</tr>
-													</g:each>
-												</tbody>
-												<tfoot>										
-													<tr class="${varStatus%2==0?'odd':'even' } prop">
-														<th style="text-align: left;">
-															Total items
-														</th>
-														<th></th>
-														<th style="text-align: center">
-															${totalQuantity }
-														</th>
-													</tr>
-												</tfoot>										
-											</table>	
-										</div>
-									</g:each>										
-								</div>									
+												</g:each>
+											</tbody>
+											<tfoot>										
+												<tr class="${varStatus%2==0?'odd':'even' } prop">
+													<th style="text-align: left;">
+														Total items
+													</th>
+													<th></th>
+													<th style="text-align: center">
+														${totalQuantity }
+													</th>
+												</tr>
+											</tfoot>										
+										</table>	
+									</div>
+								</g:each>										
+							</div>									
+						</g:if>
+						<g:else>
+							<g:if test="${params.searchTerms || categoryFilters }">
+								<span>
+									Your search did not return any items.  Please try again.
+								</span>
 							</g:if>
-							<g:else>
-								<g:if test="${params.searchTerms || categoryFilters }">
-									<span>
-										Your search did not return any items.  Please try again.
-									</span>
-								</g:if>
-								<%-- 
-								<table>									
-									<tbody>
-										<tr class="even">
-											<td colspan="3" style="padding: 25px; text-align: left;">
-												<g:if test="${!commandInstance?.categoryFilters}">
-													&laquo; Please choose at least one category on the left.
-												</g:if>
-												<g:else>													
-													There are no inventory items matching the selected criteria.
-												</g:else>
-											</td>
-										</tr>
-									</tbody>
-								</table>
-								--%>
-								
-							</g:else>		    
+						</g:else>		    
+													
 	         		</td>
 	         	</tr>
 	        </table>

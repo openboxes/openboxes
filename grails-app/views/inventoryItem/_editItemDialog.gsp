@@ -46,13 +46,6 @@
 					
 					
 					<tr class="prop">
-						<td valign="top" class="name"><label><g:message code="inventoryItem.lotNumber.label" default="Description" /></label></td>                            
-						<td valign="top" class="value">
-							<g:autoSuggestEditable id="editItem-description-${itemInstance?.id}" name="description" jsonUrl="/warehouse/json/findDescriptionByName" 
-								size="20" valueId="" valueName="${itemInstance?.description}"/>							
-						</td>
-					</tr>
-					<tr class="prop">
 						<td valign="top" class="name"><label><g:message code="inventoryItem.lotNumber.label" default="Lot/Serial Number" /></label></td>                            
 						<td valign="top" class="value">
 							<g:autoSuggestEditable id="editItem-lotNumber-${itemInstance?.id}" name="lotNumber" jsonUrl="/warehouse/json/findLotsByName" 

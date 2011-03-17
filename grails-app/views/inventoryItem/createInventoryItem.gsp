@@ -45,7 +45,6 @@
 											<tr class="odd">
 												<th>ID</th>
 												<th>Lot/Serial Number</th>
-												<th>Description</th>
 												<th>Expires</th>
 												<th style="text-align: center;">Initial Qty</th>
 												<th></th>
@@ -60,9 +59,6 @@
 													</td>
 													<td>
 														${inventoryItem?.lotNumber }
-													</td>
-													<td>
-														${inventoryItem?.description }
 													</td>
 													<td>
 														<g:if test="${inventoryItem?.expirationDate }">
@@ -89,10 +85,6 @@
 												<td>
 													<g:lotNumberComboBox id="lotNumberId" name="lotNumber" valueName="${params.lotNumber }"
 														value="${params.lotNumber }"/>
-												</td>
-												<td>
-													<g:textField name="description" 
-														value="${itemInstance?.description }" size="25"/>
 												</td>
 												<td>
 													<g:jqueryDatePicker id="expirationDate-${status }" 

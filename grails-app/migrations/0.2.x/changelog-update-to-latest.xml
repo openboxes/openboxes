@@ -2732,7 +2732,7 @@
 			</delete>
 	</changeSet>
 	
-	<!-- remove "borrowed" transaction type -->
+	<!-- remove "borrowed" transactin type -->
 	<changeSet author="mgoodrich" id="2011-03-16-2">
         <preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
@@ -2787,6 +2787,109 @@
         </insert>      
 	</changeSet>
 	
+    <changeSet author="jmiranda (generated)" id="1300310727276-1">
+        <preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="product" columnName="manufacturer"/></not>
+		</preConditions>    
+        <addColumn tableName="product">
+            <column name="manufacturer" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1300310727276-2">
+        <preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="product" columnName="manufacturer_code"/></not>
+		</preConditions>    
+        <addColumn tableName="product">
+            <column name="manufacturer_code" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1300310727276-3">
+        <preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="product" columnName="ndc"/></not>
+		</preConditions>    
+        <addColumn tableName="product">
+            <column name="ndc" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <!-- We don't need SKU just yet 
+    <changeSet author="jmiranda (generated)" id="1300310727276-4">
+        <preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="product" columnName="sku"/></not>
+		</preConditions>    
+        <addColumn tableName="product">
+            <column name="sku" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    -->
+    <changeSet author="jmiranda (generated)" id="1300310727276-5">
+        <preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="product" columnName="upc"/></not>
+		</preConditions>    
+        <addColumn tableName="product">
+            <column name="upc" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1300310727276-6">
+        <preConditions onFail="MARK_RAN">
+        	<not><columnExists tableName="product" columnName="unit_of_measure"/></not>
+        </preConditions>    
+        <addColumn tableName="product">
+            <column name="unit_of_measure" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1300310727276-7">
+        <addNotNullConstraint columnDataType="DATETIME" columnName="date_created" defaultNullValue="" tableName="shipment_workflow"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1300310727276-8">
+        <addNotNullConstraint columnDataType="DATETIME" columnName="last_updated" defaultNullValue="" tableName="shipment_workflow"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1300310727276-9">
+    	<preConditions onFail="MARK_RAN"><not><indexExists indexName="FK714F9FB572A2C5B4"/></not></preConditions>  
+        <createIndex indexName="FK714F9FB572A2C5B4" tableName="location" unique="false">
+            <column name="inventory_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1300310727276-12">
+        <preConditions onFail="MARK_RAN">
+        	<columnExists tableName="product_category" columnName="product_categories_id"/>
+        </preConditions>    
+        <dropColumn columnName="product_categories_id" tableName="product_category"/>
+    </changeSet>
+    <!-- We decided that we don't want to drop this column yet.      
+    <changeSet author="jmiranda (generated)" id="1300310727276-13">
+        <preConditions onFail="MARK_RAN">
+        	<columnExists tableName="product" columnName="product_code"/>
+        </preConditions>    
+        <dropColumn tableName="product" columnName="product_code"/>
+    </changeSet>
+	-->
+
+    <changeSet author="jmiranda (generated)" id="1300310727276-14">
+        <preConditions onFail="MARK_RAN">
+        	<columnExists tableName="inventory_item" columnName="description"/>
+        </preConditions>
+        <dropColumn tableName="inventory_item" columnName="description"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1300310727276-15">
+        <preConditions onFail="MARK_RAN">
+        	<columnExists tableName="inventory_item" columnName="active"/>
+        </preConditions>
+        <dropColumn tableName="inventory_item" columnName="active"/>
+    </changeSet>
+    <!-- Had trouble creating these indices  
+    <changeSet author="jmiranda (generated)" id="1300310727276-10">
+    	<preConditions onFail="MARK_RAN"><not><indexExists indexName="FKAE3064BAF7076438"/></not></preConditions>  
+        <createIndex indexName="FKAE3064BAF7076438" tableName="receipt_item" unique="false">
+            <column name="receipt_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1300310727276-11">
+    	<preConditions onFail="MARK_RAN"><not><indexExists indexName="FKE139719AF7076438"/></not></preConditions>  
+        <createIndex indexName="FKE139719AF7076438" tableName="shipment" unique="false">
+            <column name="receipt_id"/>
+        </createIndex>
+    </changeSet>
+	-->
       
 </databaseChangeLog>
 

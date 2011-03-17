@@ -9,24 +9,18 @@
 		<title><g:message code="default.show.label" args="[entityName]" /></title>
 	</head>
 	<body>
-		<div class="body">
-	
-			<div class="nav">
-				<g:render template="../inventory/nav"/>
-			</div>
+		<div class="body">	
 			<g:if test="${flash.message}">
 				<div class="message">
 					${flash.message}
 				</div>
 			</g:if> 
+			
 			<g:hasErrors bean="${commandInstance}">
 				<div class="errors"><g:renderErrors bean="${commandInstance}" as="list" /></div>
 			</g:hasErrors>
 
-			
-			
 			<div class="dialog" style="min-height: 880px">			
-				
 				<div class="actionsMenu" style="float: left;">					
 					<ul>
 						<li>
@@ -66,7 +60,8 @@
 					<tr>
 						<td style="width: 300px;">
 							<g:render template="productDetails" 
-								model="[productInstance:commandInstance?.productInstance, inventoryInstance:commandInstance?.inventoryInstance, inventoryLevelInstance: commandInstance?.inventoryLevelInstance, totalQuantity: commandInstance?.totalQuantity]"/>
+								model="[productInstance:commandInstance?.productInstance, inventoryInstance:commandInstance?.inventoryInstance, 
+									inventoryLevelInstance: commandInstance?.inventoryLevelInstance, totalQuantity: commandInstance?.totalQuantity]"/>
 								
 							<br/>
 								

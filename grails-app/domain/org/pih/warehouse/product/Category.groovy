@@ -56,7 +56,13 @@ class Category {
 	}
 	
 	def getProducts() { 
-		return Product.findAllByCategory(this);
+		try {  
+			return Product.findAllByCategory(this);
+		} catch (Exception e) { 
+			log.info("Error getting products for " + this.name + ".")
+			return null;	
+		}
+		
 	}
 
 	

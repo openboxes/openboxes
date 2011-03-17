@@ -17,7 +17,7 @@
 				<td colspan="2">
 					<g:form action="addCategoryFilter">
 						<select id="categoryFilter" name="categoryId" >
-							<option value="">Add a new filter</option>
+							<option value="">Filter by category</option>
 							<g:render template="../category/selectOptions" model="[category:rootCategory, selected:null, level: 0]"/>								
 						</select>										
 					</g:form>

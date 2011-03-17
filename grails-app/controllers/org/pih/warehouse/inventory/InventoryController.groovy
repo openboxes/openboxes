@@ -87,7 +87,10 @@ class InventoryController {
 			redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id);
 		}
 		*/
-		
+		// Add all returned products to flash 
+		cmd.productList.each { 
+			flash.productList = it.id
+		}
 		
 		[ commandInstance: cmd ]
 	}
@@ -510,6 +513,20 @@ class InventoryController {
 	def createTransaction = { 
 		
 		def transactionInstance = new Transaction();
+		
+		if (flash.productList) { 
+			flash.productList.each { 
+				def product = Product.get(it);
+				def inventory = Inventory.findByWarehouse(session.warehouse.id);
+				def inventoryItems = inventoryService.getInventoryItemsByInventoryAndProduct(inventory, product);
+				log.info "inventory items " + inventoryItems
+				inventoryItems.each { inventoryItem ->
+					def transactionEntry = new TransactionEntry(product: product, inventoryItem: inventoryItem);
+					transactionInstance.addToTransactionEntries(transactionEntry);
+				}
+			}
+		}
+		
 		def model = [
 			transactionInstance : transactionInstance,
 			productInstanceMap: Product.list().groupBy { it.category },
@@ -551,7 +568,6 @@ class InventoryController {
 				inventoryItem = new InventoryItem();
 				inventoryItem.product = it.product;
 				inventoryItem.lotNumber = it.lotNumber;
-				//inventoryItem.description = it.product.name;
 				inventoryItem.save();
 				
 				// FIXME Need to check for errors here
