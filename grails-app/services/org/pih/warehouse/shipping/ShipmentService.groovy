@@ -498,9 +498,9 @@ class ShipmentService {
 				if (shipmentInstance.destination?.isWarehouse()) {
 				
 					// Create a new transaction for outgoing items
-					Transaction creditTransaction = new Transaction();
-					creditTransaction.transactionType = TransactionType.get(1); 	// transfer
-					creditTransaction.source = shipmentInstance?.origin?.isWarehouse() ? shipmentInstance?.origin : null
+					Transaction creditTransaction = new Transaction()
+					creditTransaction.transactionType = TransactionType.get(1) 	// transfer
+					creditTransaction.source = shipmentInstance?.origin
 					creditTransaction.destination = shipmentInstance?.destination 
 					creditTransaction.inventory = shipmentInstance?.destination?.inventory ?: inventoryService.addInventory(shipmentInstance.destination)
 					creditTransaction.transactionDate = new Date()

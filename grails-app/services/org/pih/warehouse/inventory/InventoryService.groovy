@@ -697,7 +697,7 @@ class InventoryService {
 			Transaction debitTransaction = new Transaction();
 			debitTransaction.transactionType = TransactionType.get(1); 	// transfer
 			debitTransaction.source = shipmentInstance?.origin
-			debitTransaction.destination = shipmentInstance?.destination.isWarehouse() ? shipmentInstance?.destination : null
+			debitTransaction.destination = shipmentInstance?.destination
 			debitTransaction.inventory = shipmentInstance?.origin?.inventory ?: addInventory(shipmentInstance.origin)
 			debitTransaction.transactionDate = new Date();
 			

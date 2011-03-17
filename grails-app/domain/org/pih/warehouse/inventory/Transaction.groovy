@@ -2,6 +2,7 @@ package org.pih.warehouse.inventory;
 
 import java.util.Date;
 
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.core.User
 
@@ -23,8 +24,8 @@ import org.pih.warehouse.core.User
  */
 class Transaction implements Serializable {
 
-    Warehouse source	    		
-    Warehouse destination					    		 
+    Location source	    		
+    Location destination					    		 
 	Date transactionDate	    		// Date entered into the warehouse
     TransactionType transactionType 	// Detailed transaction type (e.g. Order, Transfer, Stock Count)
 	
