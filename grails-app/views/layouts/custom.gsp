@@ -219,8 +219,9 @@
 	    	<!-- YUI main Block including page title and content -->
 	      	<div id="yui-main">
 		    	<div id="content" class="yui-b">
-		    		<h1><g:layoutTitle /></h1>
-		    	
+		    		<g:if test="${session.user}">
+		    			<h1><g:layoutTitle /></h1>
+		    		</g:if>
 					<g:layoutBody />
 				</div>
 	      	</div>
