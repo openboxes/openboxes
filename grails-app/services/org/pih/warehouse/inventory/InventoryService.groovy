@@ -111,7 +111,7 @@ class InventoryService {
 	
 	
 	List searchInventoryItems(String searchTerm, String productId) { 		
-		searchTerm += "%";
+		searchTerm = "%" + searchTerm + "%";
 		def items = InventoryItem.withCriteria {
 			or {
 				ilike("lotNumber", searchTerm)

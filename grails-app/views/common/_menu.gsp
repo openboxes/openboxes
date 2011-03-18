@@ -60,7 +60,7 @@
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="shipment" action="listShipping"><g:message code="shipment.listShipping.label"  default="List All "/></g:link>
+					<g:link class="bullet" controller="shipment" action="listShipping"><g:message code="shipment.listShipping.label"  default="List Shipments "/></g:link>
 				</span>
 			</li>									
 			<li class="">
@@ -77,7 +77,7 @@
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="shipment" action="listReceiving"><g:message code="shipment.listReceiving.label"  default="List All"/></g:link>
+					<g:link class="bullet" controller="shipment" action="listReceiving"><g:message code="shipment.listReceiving.label"  default="List Receiving"/></g:link>
 				</span>		
 			</li>										
 			<li>
