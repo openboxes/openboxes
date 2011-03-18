@@ -341,7 +341,7 @@
 														<td width="10%">
 															<%-- 
 															<g:jqueryDatePicker id="expirationDate${status }" name="recordInventoryRows[${status}].expirationDate" 
-																value="${recordInventoryRow?.expirationDate}" format="MM/dd/yyyy" showTrigger="false" />
+																value="${recordInventoryRow?.expirationDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" showTrigger="false" />
 															--%>
 															<g:hiddenField name="recordInventoryRows[${status}].expirationDate" value="${formatDate(date: recordInventoryRow?.expirationDate, format: 'MM/dd/yyyy') }"/>
 															<g:if test="${recordInventoryRow?.expirationDate}">

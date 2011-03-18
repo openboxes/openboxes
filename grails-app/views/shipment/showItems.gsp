@@ -248,7 +248,7 @@
 																					<label><g:message code="shipment.expectedShippingDate.label" default="Ship date" /></label>
 																				</td>                            
 																				<td valign="top" class="value" nowrap="nowrap">
-																					<g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="dd/MMM/yyyy"/>
+																					<g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}"/>
 																				</td>
 																			</tr>
 																			<tr class="prop">
@@ -256,7 +256,7 @@
 																					<label><g:message code="shipment.expectedDeliveryDate.label" default="Delivery date" /></label>
 																				</td>   
 																				<td valign="top" class="value" nowrap="nowrap">
-																					<g:if test=""><g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="dd/MMM/yyyy"/></g:if>
+																					<g:if test=""><g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}"/></g:if>
 																					<g:else><span style="color: #aaa">(to be determined)</span></g:else>
 																					
 																				</td>
@@ -322,7 +322,7 @@
 													                            	<label><g:message code="shipment.shipmentNumber.label" default="Last Modified on" /></label>
 													                            </td>                            
 													                            <td valign="top" class="value" nowrap="nowrap">
-													                            	<span style="color: #aaa"><g:formatDate date="${shipmentInstance?.lastUpdated}" format="dd/MMM/yyyy hh:mm:ss"/></span>
+													                            	<span style="color: #aaa"><g:formatDate date="${shipmentInstance?.lastUpdated}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_TIME_FORMAT}"/></span>
 													                            </td>                            
 													                        </tr>                    
 													                        <tr class="prop">
@@ -330,7 +330,7 @@
 													                            	<label><g:message code="shipment.shipmentNumber.label" default="Created on" /></label>
 													                            </td>                            
 													                            <td valign="top" class="value" nowrap="nowrap">
-													                            	<span style="color: #aaa"><g:formatDate date="${shipmentInstance?.dateCreated}" format="dd/MMM/yyyy hh:mm:ss"/></span>
+													                            	<span style="color: #aaa"><g:formatDate date="${shipmentInstance?.dateCreated}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_TIME_FORMAT}"/></span>
 													                            </td>                            
 													                        </tr>		
 																		    <tr>
@@ -417,7 +417,7 @@
 														                            	<label><g:message code="shipment.shipmentNumber.label" default="Last Modified on" /></label>
 														                            </td>                            
 														                            <td valign="top" class="value" nowrap="nowrap">
-														                            	<span style="color: #aaa"><g:formatDate date="${shipmentInstance?.lastUpdated}" format="dd/MMM/yyyy hh:mm:ss"/></span>											                            	
+														                            	<span style="color: #aaa"><g:formatDate date="${shipmentInstance?.lastUpdated}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_TIME_FORMAT}"/></span>											                            	
 														                            </td>                            
 														                        </tr>                    
 									        									<tr class="prop">
@@ -425,7 +425,7 @@
 														                            	<label><g:message code="shipment.shipmentNumber.label" default="Created on" /></label>
 														                            </td>                            
 														                            <td valign="top" class="value" nowrap="nowrap">
-														                            	<span style="color: #aaa"><g:formatDate date="${shipmentInstance?.dateCreated}" format="dd/MMM/yyyy hh:mm:ss"/></span>											                            	
+														                            	<span style="color: #aaa"><g:formatDate date="${shipmentInstance?.dateCreated}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_TIME_FORMAT}"/></span>											                            	
 														                            </td>                            
 														                        </tr>                    
 																                --%>        
@@ -885,7 +885,7 @@
 									    <g:each in="${shipmentInstance.events}" var="event" status="i">
 											<tr id="event-${event.id}" class="${(i % 2) == 0 ? 'odd' : 'even'}">
 												<td><img src="${createLinkTo(dir:'images/icons',file:'event.png')}" alt="Event" /></td>
-												<td><g:formatDate format="dd/MMM/yyyy hh:mm:ss" date="${event?.eventDate}"/></td>
+												<td><g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_TIME_FORMAT}" date="${event?.eventDate}"/></td>
 												<td>${event?.eventType?.eventCode?.status}</td>
 												<td>${event?.eventLocation?.name}</td>
 												<td>

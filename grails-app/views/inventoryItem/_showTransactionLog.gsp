@@ -125,8 +125,8 @@
 								<tr>
 									<td colspan="4" class="odd">												
 										No <b>${commandInstance?.transactionType?.name }</b> transactions between 
-										<g:formatDate format="MMM dd" date="${commandInstance?.startDate }"/> to
-										<g:formatDate format="MMM dd" date="${commandInstance?.endDate }"/>.
+										<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_HOUR_MONTH_DATE_FORMAT}" date="${commandInstance?.startDate }"/> to
+										<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_HOUR_MONTH_DATE_FORMAT}" date="${commandInstance?.endDate }"/>.
 									</td>
 								</tr>
 							</g:if>
@@ -137,7 +137,7 @@
 										<td>	
 											<a id="show-details-${transaction?.id }" class="show-details" href="${createLink(controller: 'inventory', action:'showTransactionDialog', id: transaction.id, params: ['product.id', 'test'])}">
 												<g:formatDate
-													date="${transaction?.transactionDate}" format="MMM dd" />																
+													date="${transaction?.transactionDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_HOUR_MONTH_DATE_FORMAT}" />																
 											</a>
 											
 											<!--  Transaction Details -->

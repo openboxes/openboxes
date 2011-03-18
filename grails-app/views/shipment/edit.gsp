@@ -141,7 +141,7 @@
 							    <g:each in="${shipmentInstance.events}" var="event" status="i">
 									<tr id="event-${event.id}" class="${(i % 2) == 0 ? 'odd' : 'even'}">
 										<td><img src="${createLinkTo(dir:'images/icons',file:'event.png')}" alt="Event" /></td>
-										<td><g:formatDate format="yyyy-MM-dd hh:mm:ss" date="${event?.eventDate}"/></td>
+										<td><g:formatDate format="{org.pih.warehouse.core.Constants.DEFAULT_DATE_TIME_FORMAT}" date="${event?.eventDate}"/></td>
 										<td>${event?.eventType?.eventCode?.name}</td>
 										<td>${event?.eventLocation?.name}</td>
 										<%-- 

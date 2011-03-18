@@ -93,7 +93,7 @@
 		       	           		<g:each var="transactionEntry" in="${transactionEntryList}" status="i">	       	           		
 									<tr class="${(i%2==0)?'odd':'even' }">
 										<td>
-											<g:formatDate date="${transactionEntry?.transaction?.transactionDate}" format="MMM dd"/></td>
+											<g:formatDate date="${transactionEntry?.transaction?.transactionDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}"/></td>
 										<td>${transactionEntry?.transaction?.transactionType?.name }</td>
 										<td>${transactionEntry?.transaction?.source?.name }</td>
 										<td>${transactionEntry?.transaction?.destination?.name }</td>

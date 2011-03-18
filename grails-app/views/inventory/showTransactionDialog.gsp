@@ -60,7 +60,7 @@
 							<li class="prop">
 								<label>Transaction Date</label>
 								<span class="value">
-									<g:formatDate date="${transactionInstance?.transactionDate}" format="MM/dd/yyyy"/>
+									<g:formatDate date="${transactionInstance?.transactionDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}"/>
 								</span>
 							</li>
 							<li class="prop">

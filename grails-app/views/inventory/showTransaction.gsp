@@ -58,7 +58,7 @@
 							<li class="prop even">
 								<label>Transaction Date</label>
 								<span class="value">
-									<g:formatDate date="${transactionInstance?.transactionDate}" format="MM/dd/yyyy"/>
+									<g:formatDate date="${transactionInstance?.transactionDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}"/>
 								</span>
 							</li>
 							<li class="prop odd">
@@ -96,7 +96,6 @@
 									<span class="value">
 										<table id="prodEntryTable" border="1" style="border: 1px solid #ccc;">
 											<tr>
-												<th>ID</th>
 												<th>Product</th>
 												<th>Lot Number</th>
 												<th>Expiration Date</th>
@@ -107,9 +106,6 @@
 											
 												<g:each in="${transactionInstance?.transactionEntries.sort { it.product.name } }" var="transactionEntry" status="status">
 													<tr class="${(status%2==0)?'odd':'even'}">
-														<td>
-															${transactionEntry?.id }
-														</td>
 														<td style="text-align: left;">
 															${transactionEntry?.product?.name }
 														</td>										

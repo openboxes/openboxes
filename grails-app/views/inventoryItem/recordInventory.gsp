@@ -171,7 +171,7 @@
 												</td>
 												<td>
 													<g:if test="${itemInstance?.expirationDate}">
-														<g:formatDate date="${itemInstance?.expirationDate }" format=" MMM dd yyyy" />
+														<g:formatDate date="${itemInstance?.expirationDate }" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />
 													</g:if>
 													<g:else>
 														<span class="fade">n/a</span>

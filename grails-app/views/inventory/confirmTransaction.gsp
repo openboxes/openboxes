@@ -57,7 +57,7 @@
 									<label>Transaction Date</label>
 								</td>
 								<td class="value">
-									<g:formatDate date="${transactionInstance?.transactionDate}" format="MM/dd/yyyy"/>
+									<g:formatDate date="${transactionInstance?.transactionDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}"/>
 								</td>
 							</tr>
 							<tr class="prop">

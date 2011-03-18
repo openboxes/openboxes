@@ -87,7 +87,7 @@
 			                            	</g:else>
 			                            	<span style="${cssClass}">${fieldValue(bean: shipmentInstance, field: "origin")}</span>
 			                            	<span>
-				                            	<g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="MMM dd yyyy" />			                            	
+				                            	<g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />			                            	
 				                            </span>
 			                            </td>
 			                            <td style="vertical-align: top; text-align: left" nowrap="true" width="10%">
@@ -99,7 +99,7 @@
 			                            	</g:else>
 			                            	<span style="${cssClass}">${fieldValue(bean: shipmentInstance, field: "destination")}</span> 
 			                            	<span>
-				                            	<g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="MMM dd yyyy" />
+				                            	<g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />
 			                            	</span>
 			                            </td>
 			                            <td style="vertical-align: top; text-align: center;" width="10%">
@@ -169,7 +169,7 @@
                             		<g:if test="${shipmentInstance?.shipmentStatus}">${fieldValue(bean: shipmentInstance, field: "shipmentStatus.name")}</g:if>
                             		<g:else>No status</g:else>
 	                            </td>
-	                            <td style="vertical-align: middle; text-align: center;" nowrap="true"><g:formatDate date="${shipmentInstance.expectedShippingDate}" format="dd/MMM/yyyy" /></td>
+	                            <td style="vertical-align: middle; text-align: center;" nowrap="true"><g:formatDate date="${shipmentInstance.expectedShippingDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" /></td>
 	                            <td style="vertical-align: middle; text-align: center;">${fieldValue(bean: shipmentInstance, field: "trackingNumber")}</td>
 	                            <td style="vertical-align: middle; text-align: center;">${fieldValue(bean: shipmentInstance, field: "origin")}</td>
 	                            <td style="vertical-align: middle; text-align: center;">${fieldValue(bean: shipmentInstance, field: "destination")}</td>

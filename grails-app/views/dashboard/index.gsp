@@ -142,7 +142,7 @@
 												<td><g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id}">${shipmentInstance?.name }</g:link></td>
 												<td>${shipmentInstance?.destination?.name }</td>
 												<td nowrap>
-													<g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="MMM dd"/>
+													<g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}"/>
 													<span class="fade">
 														(<g:relativeDate date="${shipmentInstance?.expectedShippingDate}"/>)
 													</span>
@@ -192,7 +192,7 @@
 												<td><g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id}">${shipmentInstance?.name }</g:link></td>
 												<td>${shipmentInstance?.origin?.name }</td>
 												<td nowrap>
-													<g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="MMM dd"/>
+													<g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}"/>
 													<span class="fade">
 														(<g:relativeDate date="${shipmentInstance?.expectedShippingDate}"/>)
 													</span>												

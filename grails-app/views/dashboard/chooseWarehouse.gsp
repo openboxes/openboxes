@@ -23,7 +23,7 @@
 										<span style="font-size: 80%; width: 100%; text-align: right; color: #aaa">
 											<g:if test="${session?.user?.lastLoginDate}">
 												You last logged into <b>${session?.user?.warehouse?.name}</b> on
-												<b><g:formatDate format="MMM dd, yyyy hh:mm a" date="${session?.user?.lastLoginDate}"/></b> 
+												<b><g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_TIME_FORMAT}" date="${session?.user?.lastLoginDate}"/></b> 
 											</g:if>
 										</span>
 									</g:if>
