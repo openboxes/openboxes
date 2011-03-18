@@ -12,14 +12,20 @@
 				<td rowspan="2" style="vertical-align: middle">
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_go.png')}" style="vertical-align: middle;"/>
 				</td>
-				<td width="34%" style="text-align:center" nowrap class="${currentState=='Traveler'?'currentState':''}">
-					<g:link action="createShipment" event="enterTrackingDetails" >2. Tracking</g:link>
+				<td width="34%" style="text-align:center" nowrap class="${currentState=='Tracking'?'currentState':''}">
+					<g:if test="${shipmentInstance.id}">
+						<g:link action="createShipment" event="enterTrackingDetails" >2. Tracking</g:link>
+					</g:if>
+					<g:else>2. Tracking</g:else>
 				</td>
 				<td rowspan="2" style="vertical-align: middle">
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_go.png')}" style="vertical-align: middle;"/>
 				</td>
 				<td width="33%" style="text-align:center" nowrap class="${currentState=='Pack'?'currentState':''}">
-					<g:link action="createShipment" event="enterContainerDetails">3. Pack</g:link>
+					<g:if test="${shipmentInstance.id}">
+						<g:link action="createShipment" event="enterContainerDetails">3. Pack</g:link>
+					</g:if>
+					<g:else>3. Pack</g:else>
 				</td>
 				
 				<!-- 

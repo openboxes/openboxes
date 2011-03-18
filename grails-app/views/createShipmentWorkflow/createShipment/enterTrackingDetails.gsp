@@ -16,7 +16,7 @@
 				<div class="errors"><g:renderErrors bean="${shipmentInstance}" as="list" /></div>
 			</g:hasErrors> 
 			
-			<g:render template="flowHeader" model="['currentState':'Traveler']"/>
+			<g:render template="flowHeader" model="['currentState':'Tracking']"/>
 			
 			<g:form action="createShipment" method="post">
 				<g:hiddenField name="id" value="${shipmentInstance?.id}"/>
