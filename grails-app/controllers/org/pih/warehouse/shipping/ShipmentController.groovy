@@ -309,7 +309,7 @@ class ShipmentController {
 				
 					shipmentInstance.allShipmentItems.each {										
 						ReceiptItem receiptItem = new ReceiptItem(it.properties);
-						receiptItem.setQuantityDelivered (it.quantity);
+						receiptItem.setQuantityShipped (it.quantity);
 						receiptItem.setQuantityReceived (it.quantity);				
 						receiptItem.setLotNumber(it.lotNumber);
 						receiptItem.setSerialNumber (it.serialNumber);

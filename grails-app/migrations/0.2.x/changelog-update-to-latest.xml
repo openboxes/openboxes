@@ -2811,6 +2811,7 @@
             <column name="ndc" type="VARCHAR(255)"/>
         </addColumn>
     </changeSet>
+    
     <!-- We don't need SKU just yet 
     <changeSet author="jmiranda (generated)" id="1300310727276-4">
         <preConditions onFail="MARK_RAN">
@@ -2821,6 +2822,7 @@
         </addColumn>
     </changeSet>
     -->
+    
     <changeSet author="jmiranda (generated)" id="1300310727276-5">
         <preConditions onFail="MARK_RAN">
 			<not><columnExists tableName="product" columnName="upc"/></not>
@@ -2829,6 +2831,7 @@
             <column name="upc" type="VARCHAR(255)"/>
         </addColumn>
     </changeSet>
+    
     <changeSet author="jmiranda (generated)" id="1300310727276-6">
         <preConditions onFail="MARK_RAN">
         	<not><columnExists tableName="product" columnName="unit_of_measure"/></not>
@@ -2837,9 +2840,11 @@
             <column name="unit_of_measure" type="VARCHAR(255)"/>
         </addColumn>
     </changeSet>
+    
     <changeSet author="jmiranda (generated)" id="1300310727276-7">
         <addNotNullConstraint columnDataType="DATETIME" columnName="date_created" defaultNullValue="" tableName="shipment_workflow"/>
     </changeSet>
+    
     <changeSet author="jmiranda (generated)" id="1300310727276-8">
         <addNotNullConstraint columnDataType="DATETIME" columnName="last_updated" defaultNullValue="" tableName="shipment_workflow"/>
     </changeSet>
@@ -2857,6 +2862,7 @@
         </preConditions>    
         <dropColumn columnName="product_categories_id" tableName="product_category"/>
     </changeSet>
+    
     <!-- We decided that we don't want to drop this column yet.      
     <changeSet author="jmiranda (generated)" id="1300310727276-13">
         <preConditions onFail="MARK_RAN">
@@ -2878,6 +2884,8 @@
         </preConditions>
         <dropColumn tableName="inventory_item" columnName="active"/>
     </changeSet>
+    
+    
     <!-- Had trouble creating these indices  
     <changeSet author="jmiranda (generated)" id="1300310727276-10">
     	<preConditions onFail="MARK_RAN"><not><indexExists indexName="FKAE3064BAF7076438"/></not></preConditions>  
@@ -2892,6 +2900,24 @@
         </createIndex>
     </changeSet>
 	-->
+	
+		
+	<changeSet author="mgoodrich" id="2011-03-18-1">
+        <preConditions onFail="MARK_RAN">
+			<columnExists tableName="receipt_item" columnName="accepted"/>
+		</preConditions>
+			<dropColumn tableName="receipt_item" columnName="accepted"/>
+	</changeSet>
+      
+      		
+	<changeSet author="mgoodrich" id="2011-03-18-2">
+       <preConditions onFail="MARK_RAN">
+			<columnExists tableName="receipt_item" columnName="quantity_delivered"/>
+		</preConditions>
+		<sql>
+			ALTER TABLE receipt_item CHANGE COLUMN quantity_delivered quantity_shipped int(11);	
+		</sql>		
+    </changeSet>
       
 </databaseChangeLog>
 

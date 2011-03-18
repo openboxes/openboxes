@@ -82,7 +82,6 @@
 																		<th style="text-align: center;">Lot / Serial No</th>
 																		<th style="text-align: center;">Shipped</th>
 																		<th style="text-align: center;">Received</th>
-																		<th style="text-align: center;">Accepted?</th>
 																		<th style="text-align: center;">Comment</th>
 																	</tr>
 																</thead>
@@ -94,19 +93,15 @@
 																				${receiptItem?.product?.name}
 																			</td>
 																			<td style="text-align: center; vertical-align: middle;">
-																				<g:hiddenField name="receiptItems[${i}].serialNumer" value="${receiptItem?.serialNumber}"/>
-																				${receiptItem?.serialNumber}
+																				<g:hiddenField name="receiptItems[${i}].lotNumber" value="${receiptItem?.lotNumber}"/>
+																				${receiptItem?.lotNumber}
 																			</td>
 																			<td style="text-align: center; vertical-align: middle;">
-																				<g:hiddenField name="receiptItems[${i}].quantityDelivered" value="${receiptItem?.quantityDelivered}"/>																	
-																				${receiptItem?.quantityDelivered}
+																				<g:hiddenField name="receiptItems[${i}].quantityShipped" value="${receiptItem?.quantityShipped}"/>																	
+																				${receiptItem?.quantityShipped}
 																			</td>
 																			<td style="text-align: center; vertical-align: middle;">
 																				<g:textField name="receiptItems[${i}].quantityReceived" value="${receiptItem?.quantityReceived}" size="3"/>
-																			</td>
-																			<td style="text-align: center; vertical-align: middle;">
-																				<g:select name="receiptItems[${i}].accepted" from="['true','false']" value="${receiptItem.accepted?receiptItem.accepted:'true'}" 
-																				 noSelection="['null': '']" />																																			
 																			</td>
 																			<td style="text-align: center; vertical-align: middle;">
 																				<g:textField name="receiptItems[${i}].comment" value="${receiptItem?.comment}" size="10"/>

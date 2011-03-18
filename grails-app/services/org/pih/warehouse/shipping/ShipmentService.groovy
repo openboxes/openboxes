@@ -422,7 +422,8 @@ class ShipmentService {
 		} catch (Exception e) { 
 			// rollback all updates 
 			log.error(e);
-			shipmentInstance.errors.reject("shipment.invalid", e.message);
+			throw e
+			//shipmentInstance.errors.reject("shipment.invalid", e.message);  // this didn't seem to be working properly
 		}				
 	} 	
 	
@@ -498,7 +499,7 @@ class ShipmentService {
 				// only need to create a transaction if the destination is a warehouse
 				if (shipmentInstance.destination?.isWarehouse()) {
 				
-					// Create a new transaction for outgoing items
+					// Create a new transaction for incoming items
 					Transaction creditTransaction = new Transaction()
 					creditTransaction.transactionType = TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)
 					creditTransaction.source = shipmentInstance?.origin
@@ -506,7 +507,7 @@ class ShipmentService {
 					creditTransaction.inventory = shipmentInstance?.destination?.inventory ?: inventoryService.addInventory(shipmentInstance.destination)
 					creditTransaction.transactionDate = new Date()
 					
-					shipmentInstance.shipmentItems.each {
+					shipmentInstance.receipt.receiptItems.each {
 						def inventoryItem = InventoryItem.findByLotNumberAndProduct(it.lotNumber, it.product)
 						
 						// If the inventory item doesn't exist, we create a new one
@@ -530,7 +531,7 @@ class ShipmentService {
 						
 						// Create a new transaction entry
 						TransactionEntry transactionEntry = new TransactionEntry();
-						transactionEntry.quantity = it.quantity;
+						transactionEntry.quantity = it.quantityReceived;
 						transactionEntry.lotNumber = it.lotNumber
 						transactionEntry.product = it.product;
 						transactionEntry.inventoryItem = inventoryItem;
@@ -550,9 +551,10 @@ class ShipmentService {
 				}
 			}
 		} catch (Exception e) {
-			// rollback all updates
+			// rollback all updates and throw an exception
 			log.error(e);
-			shipmentInstance.errors.reject("shipmentInstance.invalid", e.message);
+			throw e
+			//shipmentInstance.errors.reject("shipmentInstance.invalid", e.message);  // this didn't seem to be working properly
 		}
 	}
 		

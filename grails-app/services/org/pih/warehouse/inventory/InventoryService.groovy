@@ -710,7 +710,8 @@ class InventoryService {
 			debitTransaction.save();
 		} catch (Exception e) { 
 			log.error("error occrred while creating transaction ", e);
-			shipmentInstance.errors.reject("shipment.invalid", e.message);
+			throw e
+			//shipmentInstance.errors.reject("shipment.invalid", e.message);  // this doesn't seem to working properly
 		}
 	}	
 
