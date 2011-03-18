@@ -790,6 +790,31 @@ class InventoryService {
 				errors.reject("Property [quantity] with value '${lotNumber}' should not be formatted as a Text value");
 			}
 
+			def manufacturerCode = (importParams.manufacturerCode) ? String.valueOf(importParams.manufacturerCode) : null;
+			if (!importParams?.manufacturerCode instanceof String) {
+				errors.reject("Property 'Manufacturer Code' with value '${manufacturerCode}' should be formatted as a Text value");
+			}
+			else if (importParams?.manufacturerCode instanceof Double) {
+				errors.reject("Property 'Manufacturer Code' with value '${manufacturerCode}' should not be formatted as a Double value");
+			}
+
+			def upc = (importParams.upc) ? String.valueOf(importParams.upc) : null;
+			if (!importParams?.upc instanceof String) {
+				errors.reject("Property 'UPC' with value '${upc}' should be formatted as a Text value");
+			}
+			else if (importParams?.upc instanceof Double) {
+				errors.reject("Property 'UPC' with value '${upc}' should be not formatted as a Double value");
+			}
+
+			def ndc = (importParams.ndc) ? String.valueOf(importParams.ndc) : null;
+			if (!importParams?.ndc instanceof String) {
+				errors.reject("Property 'GTIN' with value '${ndc}' should be formatted as a Text value");
+			}
+			else if (importParams?.ndc instanceof Double) {
+				errors.reject("Property 'GTIN' with value '${ndc}' should be not formatted as a Double value");
+			}
+
+			
 			def expirationDate = null;
 			if (importParams.expirationDate) {
 				// If we're passed a date, we can just set the expiration
@@ -822,13 +847,11 @@ class InventoryService {
 			// Create product if not exists
 			Product product = Product.findByName(importParams.productDescription);
 			if (!product) {
-				def upc = importParams.upc;
-				def ndc = importParams.ndc;
 				def manufacturer = importParams.manufacturer;
-				def manufacturerCode = importParams.manufacturerCode;
 				def unitOfMeasure = importParams.unitOfMeasure;
 	
-				product = new Product(name:importParams.productDescription, 
+				product = new Product(
+					name:importParams.productDescription, 
 					upc:upc, 
 					ndc:ndc, 
 					category:category,
@@ -945,22 +968,14 @@ class InventoryService {
 			inventoryMapList.each { Map importParams ->
 				
 				def lotNumber = (importParams.lotNumber) ? String.valueOf(importParams.lotNumber) : null;
-				if (importParams?.lotNumber instanceof Double) {
-					errors.reject("Property 'Serial Number / Lot Number' with value '${lotNumber}' should be not formatted as a Double value");
-				}
-				else if (!importParams?.lotNumber instanceof String) {
-					errors.reject("Property 'Serial Number / Lot Number' with value '${lotNumber}' should be formatted as a Text value");
-				}
-				
 				def quantity = (importParams.quantity) ? importParams.quantity : 0;
-				if (!importParams?.quantity instanceof Double) {
-					errors.reject("Property [quantity] with value '${lotNumber}' should be as a Double value");
-				}
-				else if (importParams?.quantity instanceof String) {
-					errors.reject("Property [quantity] with value '${lotNumber}' should not be formatted as a Text value");
-				}
 
-				
+				def unitOfMeasure = importParams.unitOfMeasure;
+				def manufacturer = (importParams.manufacturer) ? String.valueOf(importParams.manufacturer) : null;
+				def manufacturerCode = (importParams.manufacturerCode) ? String.valueOf(importParams.manufacturerCode) : null;
+				def upc = (importParams.upc) ? String.valueOf(importParams.upc) : null;
+				def ndc = (importParams.ndc) ? String.valueOf(importParams.ndc) : null;
+								
 				def expirationDate = null;
 				if (importParams.expirationDate) {
 					// If we're passed a date, we can just set the expiration 
@@ -995,12 +1010,6 @@ class InventoryService {
 				// Create product if not exists
 				Product product = Product.findByName(importParams.productDescription);
 				if (!product) {
-					def upc = importParams.upc;
-					def ndc = importParams.ndc;
-					def manufacturer = importParams.manufacturer;
-					def manufacturerCode = importParams.manufacturerCode;
-					def unitOfMeasure = importParams.unitOfMeasure;
-		
 					product = new Product(name:importParams.productDescription,
 						upc:upc,
 						ndc:ndc,

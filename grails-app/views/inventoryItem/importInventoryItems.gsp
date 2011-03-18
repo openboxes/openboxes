@@ -35,12 +35,10 @@
 							<table style="display: inline-block;">		
 								<thead>
 									<tr>
-									
-										<th>Parent Category</th>
 										<th>Category</th>
 										<th>Product Description</th>
 										<th>UPC</th>
-										<th>NDC</th>
+										<th>GTIN</th>
 										<th>Manufacturer</th>
 										<th>ManufacturerCode</th>
 										<th>Lot Number</th>
@@ -52,9 +50,6 @@
 								<tbody>							
 									<g:each var="entry" in="${inventoryMapList}" status="status">
 										<tr class="${status%2?'even':'odd' }">
-											<td>
-												${entry.parentCategory }
-											</td>
 											<td>
 												${entry.category}
 											</td>

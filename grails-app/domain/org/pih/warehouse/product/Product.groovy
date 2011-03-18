@@ -61,8 +61,8 @@ class Product implements Serializable {
 		
 		upc(nullable:true)
 		ndc(nullable:true)
-		mfr(nullable:true)
-		mfrCode(nullable:true)
+		manufacturer(nullable:true)
+		manufacturerCode(nullable:true)
 
     }
 	
