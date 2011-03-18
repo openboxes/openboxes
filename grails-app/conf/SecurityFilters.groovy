@@ -31,7 +31,7 @@ class SecurityFilters {
 				// When a user has an authenticated, we want to check if they have an active account
 				if (session?.user && !session?.user?.active) { 
 					session.user = null;
-					flash.message = "Your account is currently inactive";
+					flash.message = "Your account request has been received and is under review by the system administrator. Please contact the system administrator if you have any questions or concerns.";
 					redirect(controller: 'auth', action:'login')
 					return false;
 				}
