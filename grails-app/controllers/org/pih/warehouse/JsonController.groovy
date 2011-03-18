@@ -61,7 +61,7 @@ class JsonController {
 		
 		def items = new TreeSet();
 		if (params.term) {
-			def searchTerm = params.term + "%";
+			def searchTerm = "%" + params.term + "%";
 			items = InventoryItem.withCriteria {
 				and { 
 					or {

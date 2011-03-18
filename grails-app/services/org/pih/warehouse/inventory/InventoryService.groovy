@@ -326,14 +326,12 @@ class InventoryService {
 			log.info "search " + command?.searchTerms;
 			products += getProductsBySearchTerms(command?.searchTerms);
 		}
-		else { 
-			if (command?.categoryFilters)
+		else if (command?.categoryFilters) { 
 				products = getProductsByCategories(command?.categoryFilters, params);
 		}
-		/*
-		if (!products)
+		else { 
 			products = Product.list();
-		*/
+		}
 		log.info "products " + products.unique();
 		return products;		
 	}
@@ -766,6 +764,7 @@ class InventoryService {
 		def importer = new InventoryExcelImporter(filename, CONFIG_COLUMN_MAP, CONFIG_CELL_MAP, CONFIG_PROPERTY_MAP);
 		def inventoryMapList = importer.getInventoryItems();
 		
+		def dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		
 		def transactionInstance = new Transaction(transactionDate: new Date(),
 			transactionType: TransactionType.findByName("Inventory"),
@@ -775,6 +774,7 @@ class InventoryService {
 		// Iterate over each row
 		inventoryMapList.each { Map importParams ->
 			//log.info "Inventory item " + importParams
+			
 			def lotNumber = (importParams.lotNumber) ? String.valueOf(importParams.lotNumber) : null;
 			if (importParams?.lotNumber instanceof Double) {
 				errors.reject("Property 'Serial Number / Lot Number' with value '${lotNumber}' should be not formatted as a Double value");

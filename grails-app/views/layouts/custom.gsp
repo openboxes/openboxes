@@ -152,7 +152,7 @@
 										</g:if>
 										<li>
 											<div style="display: inline">
-												<g:render template="../inventoryItem/searchInventory"/>
+												<g:render template="../common/searchGlobal"/>
 											</div>
 										
 										</li>
@@ -200,9 +200,11 @@
 						${session?.warehouse?.name} &nbsp;&rsaquo;&nbsp;
 					</g:if>
 				    <g:message code="${params.controller }.label"/>
+				    <%-- 
 					&nbsp;&rsaquo;&nbsp;								
 					<g:if test="${pageProperty(name:'page.pageTitle')}"><b>${pageProperty(name:'page.pageTitle')}</b></g:if>
 					<g:else><b><g:layoutTitle /></b></g:else>
+					--%>
 				</div>
 			</h3>
 		</g:if>		
@@ -217,6 +219,8 @@
 	    	<!-- YUI main Block including page title and content -->
 	      	<div id="yui-main">
 		    	<div id="content" class="yui-b">
+		    		<h1><g:layoutTitle /></h1>
+		    	
 					<g:layoutBody />
 				</div>
 	      	</div>

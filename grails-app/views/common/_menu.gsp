@@ -3,6 +3,7 @@
 /* remove gaudy background image */	
 .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
 	background-image: none; 
+	
 } 	
 	
 </style>

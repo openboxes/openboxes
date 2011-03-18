@@ -37,7 +37,7 @@
 					<td style="border-right: 0px solid lightgrey; width: 200px; border-right: 1px solid lightgrey;">
 						<div style="padding: 10px;">
 							<h3>Filter products</h3>
-							<g:render template="/common/searchCriteriaVertical" model="[productInstanceList: commandInstance?.productList, categoryFilters: commandInstance?.categoryFilters, rootCategory: commandInstance?.rootCategory]"/>					
+							<g:render template="/common/searchInventory" model="[productInstanceList: commandInstance?.productList, categoryFilters: commandInstance?.categoryFilters, rootCategory: commandInstance?.rootCategory]"/>					
 						</div>
 						
 						<!--  Disbled 'Actions' until we have time to getting them working as expected -->
@@ -60,7 +60,7 @@
          			</td>
 	         		<td>
 	            		<g:if test="${commandInstance?.productList }">
-	            			<div style="overflow: auto; height: 400px;">									
+	            			<div style="overflow: auto; height: 600px;">									
 								<g:set var="productMap" value="${commandInstance?.productList.groupBy {it.category} }"/>
 								<g:each var="entry" in="${productMap}" status="i">	
 									<g:set var="totalQuantity" value="${0 }"/>
@@ -124,8 +124,17 @@
 													
 	         		</td>
 	         	</tr>
+	         	<g:if test="${commandInstance?.productList}">
+		         	<tr>
+		         		<td>
+		         			<!--  Empty -->
+		         		</td>
+		         		<td>
+							<span class="fade">Showing ${commandInstance?.productList?.size() } product(s)</span>			
+		         		</td>
+		         	</tr>
+	         	</g:if>
 	        </table>
-
 		</div>
     </body>
 </html>

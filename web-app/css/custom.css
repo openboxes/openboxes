@@ -134,7 +134,11 @@ a:hover {
 	margin-left: -150px;
 }
 
-.menuButton, label, input, td, th { 	
+.menuButton { 
+	font-size: 9pt;
+}
+
+label, input, td, th { 	
 	font-size: 10pt;
 }
 

@@ -82,15 +82,18 @@ class InventoryController {
 		inventoryService.browseInventory(cmd, params);
 		
 		/*
+		// If there's 
 		if (cmd?.productList.size() == 1) { 
 			def productInstance = cmd?.productList.get(0);
 			redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id);
 		}
 		*/
-		// Add all returned products to flash 
+		/*
+		// Add all returned products to flash for use within Create Transaction or Batch Edit 
 		cmd.productList.each { 
 			flash.productList = it.id
 		}
+		*/
 		
 		[ commandInstance: cmd ]
 	}

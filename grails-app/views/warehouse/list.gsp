@@ -12,16 +12,15 @@
     <body>        
         <div class="body">
         
-        	<div class="nav">
-				<g:render template="nav"/>        	
-        	</div>
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>
               
-             <span class="menuButton">
-           		<a href="/warehouse/warehouse/edit" class="new">Add warehouse</a>
-           	</span>
+            <div class="dialog">
+				<span class="menuButton">
+           			<a href="/warehouse/warehouse/edit" class="new">Add warehouse</a>
+	           	</span>
+           	</div>
             <div class="list">
                 <table>
                     <thead>

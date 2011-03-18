@@ -24,7 +24,7 @@
 					<tr>
 						<td style="border-right: 1px solid lightgrey; width: 150px;">	
 						
-							<g:render template="/common/searchCriteriaVertical"	/>				
+							<g:render template="/common/searchProduct"	/>				
 				
 						</td>			
 						<td>
@@ -47,7 +47,7 @@
 		            					</thead>
 		            				</table>
 		            			</div>
-		            			<div style="overflow: auto; height: 400px;">
+		            			<div style="overflow: auto; height: 600px;">
 		            				<table border="0" class="data-table">
 				            			<tbody>
 											<g:set var="index" value="${0 }"/>
