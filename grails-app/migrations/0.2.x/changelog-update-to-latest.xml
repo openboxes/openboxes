@@ -2843,12 +2843,14 @@
     <changeSet author="jmiranda (generated)" id="1300310727276-8">
         <addNotNullConstraint columnDataType="DATETIME" columnName="last_updated" defaultNullValue="" tableName="shipment_workflow"/>
     </changeSet>
+    <!--  
     <changeSet author="jmiranda (generated)" id="1300310727276-9">
     	<preConditions onFail="MARK_RAN"><not><indexExists indexName="FK714F9FB572A2C5B4"/></not></preConditions>  
         <createIndex indexName="FK714F9FB572A2C5B4" tableName="location" unique="false">
             <column name="inventory_id"/>
         </createIndex>
     </changeSet>
+    -->
     <changeSet author="jmiranda (generated)" id="1300310727276-12">
         <preConditions onFail="MARK_RAN">
         	<columnExists tableName="product_category" columnName="product_categories_id"/>

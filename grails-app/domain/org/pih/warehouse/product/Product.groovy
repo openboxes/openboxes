@@ -29,12 +29,12 @@ class Product implements Serializable {
 	Boolean coldChain = Boolean.FALSE;
 	
 	// New fields that need to be reviewed
-	String unitOfMeasure	// each, pill, bottle, box
 	String upc				// Universal product code
 	String ndc				// National drug code
-	String mfr				// Manufacturer
-	String mfrCode			// Manufacturer product (e.g. catalog code)
-
+	String manufacturer		// Manufacturer
+	String manufacturerCode // Manufacturer product (e.g. catalog code)
+	String unitOfMeasure	// each, pill, bottle, box
+	
 	// Associations 
 	Category category;						// primary category
 	List attributes = new ArrayList();		// custom attributes
