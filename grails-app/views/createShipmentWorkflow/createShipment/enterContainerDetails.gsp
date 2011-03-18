@@ -168,7 +168,7 @@
 						<tfoot>
 							<tr>
 								<td colspan="6" style="text-align: center; border: 1px dotted lightgrey">
-									<g:each var="containerType" in="${shipmentWorkflow.containerTypes}">
+									<g:each var="containerType" in="${shipmentWorkflow?.containerTypes}">
 										<span>
 											<g:link action="createShipment" event="addContainer" params="[containerTypeToAddName:containerType.name]">
 												<img src="${createLinkTo(dir:'images/icons/silk',file:'package_add.png')}" style="vertical-align: middle"/>
