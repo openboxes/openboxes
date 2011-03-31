@@ -2918,6 +2918,36 @@
 			ALTER TABLE receipt_item CHANGE COLUMN quantity_delivered quantity_shipped int(11);	
 		</sql>		
     </changeSet>
+    
+    <changeSet author="mgoodrich" id="2011-03-31-1">
+       <preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="local_transfer"/></not>
+		</preConditions>
+		  <createTable tableName="local_transfer">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="source_transaction_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="destination_transaction_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+       <addForeignKeyConstraint constraintName="fk_local_transfer_source_transaction_transaction"
+	    	baseTableName="local_transfer" baseColumnNames="source_transaction_id" referencedTableName="transaction" referencedColumnNames="id" />
+  	   <addForeignKeyConstraint constraintName="fk_local_transfer_destination_transaction_transaction"
+	    	baseTableName="local_transfer" baseColumnNames="destination_transaction_id" referencedTableName="transaction" referencedColumnNames="id" />
+    </changeSet>
       
 </databaseChangeLog>
 

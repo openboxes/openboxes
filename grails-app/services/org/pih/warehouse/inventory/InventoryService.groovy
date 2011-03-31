@@ -672,9 +672,7 @@ class InventoryService {
 			debitTransaction.destination = shipmentInstance?.destination.isWarehouse() ? shipmentInstance?.destination : null
 			debitTransaction.inventory = shipmentInstance?.origin?.inventory ?: addInventory(shipmentInstance.origin)
 			debitTransaction.transactionDate = new Date();
-			
-			println("using inventory = " + debitTransaction?.inventory?.id)
-			
+		
 			shipmentInstance.shipmentItems.each {
 				def inventoryItem = InventoryItem.findByLotNumberAndProduct(it.lotNumber, it.product)
 				
@@ -1109,5 +1107,164 @@ class InventoryService {
 		
 	}
 	
+	/**
+	 * Finds the local transfer (if any) associated with the given transaction
+	 */
+	LocalTransfer getLocalTransfer(Transaction transaction) {
+		LocalTransfer transfer = null
+		transfer = LocalTransfer.findBySourceTransaction(transaction)
+		if (transfer == null) { transfer = LocalTransfer.findByDestinationTransaction(transaction) }
+		return transfer
+	}
+	
+	/** 
+	 * Returns true/false if the given transaction is associated with a local transfer
+	 */
+	Boolean isLocalTransfer(Transaction transaction) {
+		getLocalTransfer(transaction) ? true : false
+	}
+	
+	/**
+	 * Returns true/false if the passed transaction is a valid candidate for a local transfer
+	 */
+	Boolean isValidForLocalTransfer(Transaction transaction) {
+		// make sure that the transaction is of a valid type
+		if (transaction.transactionType.id != Constants.TRANSFER_IN_TRANSACTION_TYPE_ID  &&
+				transaction.transactionType.id != Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) {
+			return false
+		}
+	
+		// make sure we are operating only on locally managed warehouses
+		if (transaction.source) {
+			if (!(transaction.source instanceof Warehouse)) { return false }
+			else if (!transaction.source.local){ return false }
+		}
+		if (transaction.destination) {
+			if (!(transaction.destination instanceof Warehouse)) { return false }
+			else if (!transaction.destination.local) { return false }
+		}
 		
+		return true
+	}
+	
+	/**
+	 * Deletes a local transfer (and underlying transactions) associated with the passed transaction
+	 */
+	void deleteLocalTransfer(Transaction transaction) {
+		LocalTransfer transfer = getLocalTransfer(transaction)
+		if (transfer) { 
+			transfer.delete(flush:true) 
+		}
+	}
+	
+	/**
+	 * Creates or updates the local transfer associated with the given transaction
+	 * Returns true if the save/update was successful
+	 */
+	Boolean saveLocalTransfer(Transaction baseTransaction) {
+		// note than we are using exceptions here to take advantage of Grails built-in transactional capabilities on service methods
+		// if there is an error, we want to throw an exception so the whole transaction is rolled back
+		// (we can trap these exceptions if we want in the calling controller)
+		
+		if (!isValidForLocalTransfer(baseTransaction)) {
+			throw new RuntimeException("Invalid transaction for creating a local transaction")
+		}
+		
+		// first save the base transaction
+		if (!baseTransaction.save(flush:true)) {
+			throw new RuntimeException("Unable to save base transaction " + baseTransaction?.id)
+		}
+
+		// try to fetch any existing local transfer
+		LocalTransfer transfer = getLocalTransfer(baseTransaction)
+		
+		// if there is no existing local transfer, we need to create a new one and set the source or destination transaction as appropriate
+		if (!transfer) {
+			transfer = new LocalTransfer()
+			if (baseTransaction.transactionType.id == Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID ) {
+				transfer.sourceTransaction = baseTransaction
+			}
+			else {
+				transfer.destinationTransaction = baseTransaction
+			}
+		}
+			
+		// create and save the new mirrored transaction
+		Transaction mirroredTransaction = createMirroredTransaction(baseTransaction)
+		if (!mirroredTransaction.save(flush:true)) {
+			throw new RuntimeException("Unable to save mirrored transaction " + mirroredTransaction?.id)
+		}
+		
+		// now assign this mirrored transaction to the local transfer
+		Transaction oldTransaction
+		if (baseTransaction.transactionType.id == Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID ) {
+			oldTransaction = transfer.destinationTransaction
+			transfer.destinationTransaction = mirroredTransaction
+		}
+		else {
+			oldTransaction = transfer.sourceTransaction
+			transfer.sourceTransaction = mirroredTransaction
+		}
+		
+		// save the local transfer
+		if (!transfer.save(flush:true)) {
+			throw new RuntimeException("Unable to save local transfer " + transfer?.id)
+		}
+	
+		// delete the old transaction
+		if (oldTransaction) { 
+			oldTransaction.delete(flush:true)
+		}
+		
+		return true
+	}
+	
+	/**
+	 * Private utility method to create a "mirror" of the given transaction
+	 * (If given a Transfer Out transaction, creates the appropriate Transfer In transacion, and vice versa)
+	 */
+	private Transaction createMirroredTransaction(Transaction baseTransaction) {
+		Transaction mirroredTransaction = new Transaction()
+		
+		if (baseTransaction.transactionType.id == Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) {
+			mirroredTransaction.transactionType = TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)
+			mirroredTransaction.source = baseTransaction.inventory.warehouse
+			mirroredTransaction.destination = null
+			mirroredTransaction.inventory = baseTransaction.destination.inventory ?: addInventory(baseTransaction.destination)
+		}
+		else if (baseTransaction.transactionType.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID) {
+			mirroredTransaction.transactionType = TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)
+			mirroredTransaction.source = null
+			mirroredTransaction.destination = baseTransaction.inventory.warehouse
+			mirroredTransaction.inventory = baseTransaction.source.inventory ?: addInventory(baseTransaction.source)
+		}
+		else {
+			throw new RuntimeException("Invalid transaction type for mirrored transaction")
+		}
+				
+		mirroredTransaction.transactionDate = baseTransaction.transactionDate	
+			
+		// create the transaction entries based on the base transaction
+		baseTransaction.transactionEntries.each {		
+			def inventoryItem = InventoryItem.findByLotNumberAndProduct(it.lotNumber, it.product)
+			
+			// If the inventory item doesn't exist, we create a new one
+			if (!inventoryItem) {
+				inventoryItem = new InventoryItem(lotNumber: it.lotNumber, product:it.product)
+				if (inventoryItem.hasErrors() && !inventoryItem.save()) {
+					throw new RuntimeException("Unable to create inventory item $inventoryItem while creating local transfer")
+				}
+			}
+			
+			// Create a new transaction entry (inverting the quantity)
+			def transactionEntry = new TransactionEntry();
+			transactionEntry.quantity = 0 - it.quantity;
+			transactionEntry.lotNumber = it.lotNumber
+			transactionEntry.product = it.product;
+			transactionEntry.inventoryItem = inventoryItem;
+			mirroredTransaction.addToTransactionEntries(transactionEntry);
+		}	
+		
+		return mirroredTransaction
+	}
 }

@@ -1,4 +1,4 @@
-package warehouse
+package org.pih.warehouse
 
 import grails.test.*
 import org.pih.warehouse.shipping.*;

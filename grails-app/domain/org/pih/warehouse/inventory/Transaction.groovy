@@ -5,6 +5,7 @@ import java.util.Date;
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.Constants
 
 /**
  *  Represents a unit of work completed within a single warehouse.  A
@@ -51,13 +52,20 @@ class Transaction implements Serializable {
 		confirmedBy(nullable:true)
 		dateConfirmed(nullable:true)
 		
-		// a transaction cannot have both a source and a destination
-		// TODO: not quite sure if this will work if source and destination are assigned at the same time?
 		source(nullable:true, 
-			validator: { value, obj-> if (obj.destination) {!value} }
-	    )
+			validator: { value, obj-> 
+							if (value && obj.destination) { return false }   // transaction cannot have both a source and a destination
+							if (value && obj.inventory?.warehouse == value) { return false }   // source warehouse can't be the same as transaction warehouse
+							if (obj.transactionType?.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID && !value) { return false } // transfer in transaction must have source
+							return true 
+						})
+	    
 		destination(nullable:true, 
-			validator: { value, obj-> if (obj.source) {!value} }
-	    )
+			validator: { value, obj-> 
+							if (value && obj.source) { return false }  // transaction cannot have both a source and a destination
+							if (value && obj.inventory?.warehouse == value) { return false } // destination warehouse can't be the same as transaction warehouse
+							if (obj.transactionType?.id == Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID && !value) { return false } // transfer out transaction must have destination
+							return true 
+						})
     }
 }

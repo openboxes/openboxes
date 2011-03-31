@@ -383,7 +383,12 @@ class InventoryController {
 		
 		if (transactionInstance) {
 			try {
-				transactionInstance.delete(flush: true)
+				if (inventoryService.isLocalTransfer(transactionInstance)) {
+					inventoryService.deleteLocalTransfer(transactionInstance)
+				}
+				else {
+					transactionInstance.delete(flush: true)
+				}
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'transaction.label', default: 'Transaction'), params.id])}"
 				redirect(action: "listTransactions")
 			}
@@ -428,24 +433,44 @@ class InventoryController {
 						transactionInstance: transactionInstance,
 						productInstanceMap: Product.list().groupBy { it?.productType },
 						transactionTypeList: TransactionType.list(),
-						warehouseInstanceList: Warehouse.list()])
+						locationInstanceList: Location.list()])
 				}				
 			}
 			it.inventoryItem = inventoryItem;
 		}
 		
-		if (!transactionInstance.hasErrors() && transactionInstance.save(flush: true)) {
-			flash.message = "${message(code: 'default.saved.message', args: [message(code: 'transaction.label', default: 'Transaction'), transactionInstance.id])}"
-			redirect(action: "showTransaction", id: transactionInstance?.id)
+		// either save as a local transfer, or a generic transaction
+		// (catch any exceptions so that we display "nice" error messages)
+		Boolean saved = null
+		if (!transactionInstance.hasErrors()) {
+			try {
+				if (inventoryService.isValidForLocalTransfer(transactionInstance)) {
+					saved = inventoryService.saveLocalTransfer(transactionInstance) 
+				}
+				else {
+					saved = transactionInstance.save(flush:true)
+				}
+			}
+			catch (Exception e) {
+				log.error(e)
+			}
 		}
-		else {			
-			render(view: "editTransaction", model: [
-						warehouseInstance: Warehouse.get(session?.warehouse?.id),
-						transactionInstance: transactionInstance,
-						productInstanceMap: Product.list().groupBy { it?.productType },
-						transactionTypeList: TransactionType.list(),
-						warehouseInstanceList: Warehouse.list()])
-		}		
+		
+		if (saved) {	
+			flash.message = "Transaction saved successfully"
+			redirect(action: "showTransaction", id: transactionInstance?.id);
+		}
+		else { 		
+			flash.message = "Unable to save transaction"
+			def model = [ 
+				transactionInstance : transactionInstance,
+				productInstanceMap: Product.list().groupBy { it.category },
+				transactionTypeList: TransactionType.list(),
+				locationInstanceList: Location.list(),
+				warehouseInstance: Warehouse.get(session?.warehouse?.id)
+			]
+			render(view: "createTransaction", model: model);
+		}	
 	}
 
 	
@@ -463,7 +488,7 @@ class InventoryController {
 			transactionInstance : transactionInstance,
 			productInstanceMap: Product.list().groupBy { it.category },
 			transactionTypeList: TransactionType.list(),
-			warehouseInstanceList: Warehouse.list(),
+			locationInstanceList: Location.list(),
 			warehouseInstance: Warehouse.get(session?.warehouse?.id)
 		];
 		
@@ -484,7 +509,7 @@ class InventoryController {
 		   transactionInstance : transactionInstance,
 		   productInstanceMap: Product.list().groupBy { it.category },
 		   transactionTypeList: TransactionType.list(),
-		   warehouseInstanceList: Warehouse.list(),
+		   locationInstanceList: Location.list(),
 		   warehouseInstance: Warehouse.get(session?.warehouse?.id)
 	   ];
 	   
@@ -577,25 +602,39 @@ class InventoryController {
 			}
 			it.inventoryItem = inventoryItem;
 		}
-
-		if (!transactionInstance.hasErrors() && transactionInstance.save(flush:true)) {
-			flash.message = "Transaction saved successfully";
+		
+		// either save as a local transfer, or a generic transaction
+		// (catch any exceptions so that we display "nice" error messages)
+		Boolean saved = null
+		if (!transactionInstance.hasErrors()) {
+			try {
+				if (inventoryService.isValidForLocalTransfer(transactionInstance)) {
+					saved = inventoryService.saveLocalTransfer(transactionInstance) 
+				}
+				else {
+					saved = transactionInstance.save(flush:true)
+				}
+			}
+			catch (Exception e) {
+				log.error(e)
+			}
 		}
-		else { 				
+		
+		if (saved) {	
+			flash.message = "Transaction saved successfully"
+			redirect(action: "showTransaction", id: transactionInstance?.id);
+		}
+		else { 		
+			flash.message = "Unable to save transaction"
 			def model = [ 
 				transactionInstance : transactionInstance,
 				productInstanceMap: Product.list().groupBy { it.category },
 				transactionTypeList: TransactionType.list(),
-				warehouseInstanceList: Warehouse.list(),
+				locationInstanceList: Location.list(),
 				warehouseInstance: Warehouse.get(session?.warehouse?.id)
 			]
-			
 			render(view: "createTransaction", model: model);
-			return;
 		}		
-		
-		redirect(action: "showTransaction", id: transactionInstance?.id);
-		
 	}
 	
 	
