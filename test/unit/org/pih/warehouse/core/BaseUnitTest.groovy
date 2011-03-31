@@ -19,34 +19,28 @@ class BaseUnitTest extends GrailsUnitTestCase {
         mockDomain(LocationType, [ warehouseLocationType, supplierLocationType ])
 
         // create a default location
-        def acmeSupplyCompany = new Location(name: "ACME Supply Company", locationType: supplierLocationType) 
+        def acmeSupplyCompany = new Location(name: "Acme Supply Company", locationType: supplierLocationType) 
         mockDomain(Location, [ acmeSupplyCompany ])
         
-        // create some default warehouses
+        // create some default warehouses and inventories
         def bostonWarehouse = new Warehouse(name: "Boston Warehouse", locationType: warehouseLocationType)
         def haitiWarehouse = new Warehouse(name: "Haiti Warehouse", locationType: warehouseLocationType)
-        mockDomain(Warehouse, [ bostonWarehouse, haitiWarehouse ] )
-        
-        // create some default inventories
+    
         def bostonWarehouseInventory = new Inventory(warehouse: bostonWarehouse)
         def haitiWarehouseInventory = new Inventory(warehouse: haitiWarehouse)
+        
+        bostonWarehouse.inventory = bostonWarehouseInventory
+        haitiWarehouse.inventory = haitiWarehouseInventory
+        
+        mockDomain(Warehouse, [ bostonWarehouse, haitiWarehouse ] )
         mockDomain(Inventory, [ bostonWarehouseInventory, haitiWarehouseInventory ])
-        
+       
         // create some default transaction types
+        def consumptionTransactionType = new TransactionType(id: 2, name: "Consumption")
         def inventoryTransactionType = new TransactionType(id: 7, name: "Inventory")
-        def transferInTransactionType = new TransactionType(id: 8, name: "Transfer In")
-        def transferOutTransactionType = new TransactionType(id: 9, name: "Transfer Out")
+        def transferInTransactionType = new TransactionType(id: Constants.TRANSFER_IN_TRANSACTION_TYPE_ID, name: "Transfer In")
+        def transferOutTransactionType = new TransactionType(id: Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID, name: "Transfer Out")
         mockDomain(TransactionType, [ inventoryTransactionType, transferInTransactionType, transferOutTransactionType ])
-        
-        // create some test transactions
-        mockDomain(Transaction, [ new Transaction(id: 10, transactionType: inventoryTransactionType, transactionDate: new Date(), inventory: bostonWarehouseInventory),
-                                 new Transaction(id: 20, transactionType: transferInTransactionType, transactionDate: new Date(), inventory: bostonWarehouseInventory, source: acmeSupplyCompany),
-                                 new Transaction(id: 30, transactionType: transferOutTransactionType, transactionDate: new Date(), inventory: bostonWarehouseInventory, destination: acmeSupplyCompany),
-                                 new Transaction(id: 40, transactionType: transferInTransactionType, transactionDate: new Date(), inventory: bostonWarehouseInventory, source: haitiWarehouse),
-                                 new Transaction(id: 50, transactionType: transferOutTransactionType, transactionDate: new Date(), inventory: bostonWarehouseInventory, destination: haitiWarehouse)])
-        
-        // create the (empty) LocalTransfer domain
-        mockDomain(LocalTransfer)
         
     }
 
