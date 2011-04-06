@@ -2,29 +2,23 @@ package org.pih.warehouse.inventory;
 
 import java.util.Map;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import org.apache.commons.collections.FactoryUtils;
-import org.apache.commons.collections.ListUtils;
-import org.grails.plugins.excelimport.ExcelImportUtils;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.Warehouse;
-import org.pih.warehouse.product.Attribute;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.ProductAttribute;
-import org.pih.warehouse.shipping.Container;
 import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.core.Constants 
 import org.pih.warehouse.core.LocationType;
 import org.springframework.validation.Errors;
 
-class InventoryService {
-	
-	def productService;
+class InventoryService 
+{
+	def productService
 	boolean transactional = true
 	
 	List<Warehouse> getAllWarehouses() {
@@ -66,6 +60,9 @@ class InventoryService {
 	}
     
 	
+	/**
+	 * Gets all transactions associated with a warehouse
+	 */
 	List<Transaction> getAllTransactions(Warehouse warehouse) {
 		return Transaction.withCriteria { eq("thisWarehouse", warehouse) }
 	}
@@ -110,6 +107,9 @@ class InventoryService {
 	}
 	
 	
+	/**
+	 * Search inventory items by term or product Id
+	 */
 	List searchInventoryItems(String searchTerm, String productId) { 		
 		searchTerm = "%" + searchTerm + "%";
 		def items = InventoryItem.withCriteria {
@@ -126,13 +126,6 @@ class InventoryService {
 		return items;
 	}
 	
-	Integer getQuantity(String lotNumber, Inventory inventory) { 		
-		def transactionEntries = getTransactionEntriesByLotNumberAndInventory(lotNumber, inventory);
-		return (transactionEntries) ? transactionEntries*.quantity.sum() : 0;
-		
-	}
-	
-
 	BrowseInventoryCommand browseInventory(BrowseInventoryCommand commandInstance, Map params) { 
 		
 		// Get all product types and set the default product type				
@@ -149,7 +142,7 @@ class InventoryService {
 		commandInstance.productMap = getProductMap(commandInstance?.warehouseInstance?.id);
 		commandInstance.inventoryItemMap =  getInventoryItemMap(commandInstance?.warehouseInstance?.id);
 		commandInstance.productList = commandInstance?.productList?.sort() { it.name };
-		commandInstance.quantityMap = getQuantityMap(commandInstance?.inventoryInstance);
+		commandInstance.quantityMap = getQuantityByProductMap(commandInstance?.inventoryInstance);
 		return commandInstance;
 	}
 	
@@ -168,6 +161,117 @@ class InventoryService {
 		return productAttributes.groupBy { it.attribute } 
 	}
 	
+	/**
+	 * Converts a list of passed transaction entries into a quantity
+	 * map indexed by product and then by inventory item
+	 * 
+	 * Note that the transaction entries should all be from the same inventory,
+	 * or the quantity results would be somewhat nonsensical
+	 * 
+	 * TODO: add a parameter here to optionally take in a product, which means that we are only
+	 * calculation for a single product, which means that we can stop after we hit a product inventory transaction?
+	 */
+	Map<Product,Map<InventoryItem,Integer>> getQuantityByProductAndInventoryItemMap(List<TransactionEntry> entries) {
+		def quantityMap = [:]
+		def reachedInventoryTransaction = [:]   // used to keep track of which items we've found an inventory transaction for
+		def reachedProductInventoryTransaction = [:]  // used to keep track of which items we've found a product inventory transaction for
+		
+		// first make sure the transaction entries are sorted, with most recent first
+		entries = entries.sort().reverse()
+		
+		entries.each {
+			def item = it.inventoryItem
+			def transaction = it.transaction
+			
+			// first see if this is an entry we can skip (because we've already reach a product inventory transaction
+			// for this product, or a inventory transaction for this inventory item)
+			if ( !(reachedProductInventoryTransaction[item.product] && reachedProductInventoryTransaction[item.product] != transaction) &&
+			      !(reachedInventoryTransaction[item.product] && reachedInventoryTransaction[item.product][item] && reachedInventoryTransaction[item.product][item] != transaction) ) {
+				
+				// check to see if there's an entry in the map for this product and create if needed
+				if (!quantityMap[item.product]) {
+					quantityMap[item.product] = [:]
+				}
+				
+				// check to see if there's an entry for this inventory item in the map and create if needed
+				if (!quantityMap[item.product][item]) {
+					quantityMap[item.product][item] = 0
+				}
+				
+				// now update quantity as necessary
+				def code = it.transaction.transactionType.transactionCode
+				
+				if (code == TransactionCode.CREDIT) { 
+					quantityMap[item.product][item] += it.quantity 
+				}
+				if (code == TransactionCode.DEBIT) { 
+					quantityMap[item.product][item] -= it.quantity  
+				}
+				if (code == TransactionCode.INVENTORY) {
+					quantityMap[item.product][item] += it.quantity
+					
+					// mark that we are done with this inventory item (after this transaction)
+					if (!reachedInventoryTransaction[item.product]) {
+						reachedInventoryTransaction[item.product] = [:]
+					}
+					reachedInventoryTransaction[item.product][item] = transaction
+				}
+				if (code == TransactionCode.PRODUCT_INVENTORY) {
+					quantityMap[item.product][item] += it.quantity
+					
+					// mark that we are done with this product (after this transaction)
+					reachedProductInventoryTransaction[item.product] = transaction
+				}
+			}
+		}
+		
+		return quantityMap
+	}
+	
+	
+	/**
+	 * Converts a list of passed transaction entries into a quantity
+	 * map indexed by product
+	 * 
+	 * Note that the transaction entries should all be from the same inventory,
+	 * or the quantity results would be somewhat nonsensical
+	 */
+	Map<Product,Integer> getQuantityByProductMap(List<TransactionEntry> entries) {
+		def quantityMap = [:]
+		
+		// first get the quantity and inventory item map
+		def quantityMapByProductAndInventoryItem = getQuantityByProductAndInventoryItemMap(entries)
+		
+		// now collapse this down to be by product
+		quantityMapByProductAndInventoryItem.keySet().each {
+			def product = it
+			quantityMap[product] = 0
+			quantityMapByProductAndInventoryItem[product].values().each {
+				quantityMap[product] += it
+			}
+		}                 	
+		return quantityMap
+	}
+	
+	/**
+	 * Converts  list of passed transactions entries into a quantity 
+	 * map indexed by inventory item
+	 */
+	Map<InventoryItem, Integer> getQuantityByInventoryItemMap(List<TransactionEntry> entries) {
+		def quantityMap = [:]
+		                   
+		// first get the quantity and inventory item map
+		def quantityByProductAndInventoryItemMap = getQuantityByProductAndInventoryItemMap(entries)
+		
+		// now collapse this down to be by product
+		quantityByProductAndInventoryItemMap.keySet().each {
+			def product = it
+			quantityByProductAndInventoryItemMap[product].keySet().each {
+				quantityMap[it] = quantityByProductAndInventoryItemMap[product][it]
+			}
+		}
+		return quantityMap
+	}
 	
 	/** 
 	 * Get a map of quantities (indexed by product) for a particular inventory.
@@ -175,26 +279,55 @@ class InventoryService {
 	 * TODO This might perform poorly as we add more and more transaction entries 
 	 * into an inventory.
 	 */
-	Map getQuantityMap(def inventoryInstance) { 
-		def quantityMap = [:]
+	Map<Product,Integer>  getQuantityByProductMap(Inventory inventoryInstance) {                   
 		def transactionEntries = TransactionEntry.createCriteria().list { 
 			transaction { 
 				eq("inventory.id", inventoryInstance?.id)
 			}	
 		}
-		log.debug "transaction entries " + transactionEntries;		
-		transactionEntries.each { 
-			def currentQuantity = (quantityMap.get(it.product))?:0;			
-			currentQuantity += it.quantity
-			quantityMap.put(it.product, currentQuantity)
-		}
-		return quantityMap;		
+		return getQuantityByProductMap(transactionEntries)		
 	}
-
+		
+	/**
+	 * Fetches and populates a StockCard Command object
+	 */
+	StockCardCommand getStockCardCommand(StockCardCommand cmd, Map params) {
+		log.debug "Params " + params
+		
+		// Get basic details required for the whole page
+		cmd.productInstance = Product.get(params?.product?.id?:params.id);  // check product.id and id
+		cmd.inventoryInstance = cmd.warehouseInstance?.inventory
+		cmd.inventoryLevelInstance = getInventoryLevelByProductAndInventory(cmd.productInstance, cmd.inventoryInstance)
+	
+		// Get current stock of a particular product within an inventory
+		// Using set to make sure we only return one object per inventory items
+		Set inventoryItems = getInventoryItemsByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);
+		cmd.inventoryItemList = inventoryItems as List
+		
+		cmd.inventoryItemList.sort { it.lotNumber }
+		
+		// Get transaction log for a particular product within an inventory
+		cmd.transactionEntryList = getTransactionEntriesByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);
+		cmd.transactionEntriesByInventoryItemMap = cmd.transactionEntryList.groupBy { it.inventoryItem }
+		cmd.transactionEntriesByTransactionMap = cmd.transactionEntryList.groupBy { it.transaction }
+		
+		// create the quantity map for this product
+		cmd.quantityByInventoryItemMap = getQuantityByInventoryItemMap(cmd.transactionEntryList)
+		
+		return cmd
+	}
 	
 	
+	
+	/**
+	 * Fetches and populates a RecordInventory Command object
+	 */
 	RecordInventoryCommand getRecordInventoryCommand(RecordInventoryCommand commandInstance, Map params) { 		
 		log.debug "Params " + params;
+		
+		// set the default transaction date to today
+		commandInstance.transactionDate = new Date()
+		commandInstance.transactionDate.clearTime()
 		
 		if (!commandInstance?.product) { 
 			commandInstance.errors.reject("error.product.invalid","Product does not exist");
@@ -202,37 +335,33 @@ class InventoryService {
 		else { 			
 			commandInstance.recordInventoryRow = new RecordInventoryRowCommand();
 			
-			// This gets all inventory items for a product
-			//def inventoryItemList = getInventoryItemsByProduct(commandInstance?.product)
-			
-			// What we want is to get all inventory items that have been involved in transactions at this warehouse
-			//def inventoryItemList = getInventoryItemsByProductAndInventory(commandInstance?.product, commandInstance?.inventory);
-			
-			def transactionEntryList = getTransactionEntriesByProductAndInventory(commandInstance?.product, commandInstance?.inventory);
-			
-			def transactionEntryMap = transactionEntryList.groupBy { it.inventoryItem } 
-			
-			transactionEntryMap.keySet().each { 
-				def transactionEntries = transactionEntryMap.get(it);
-				def quantity = (transactionEntries)?transactionEntries*.quantity.sum():0;
+			// get all transaction entries for this product at this inventory
+			def transactionEntryList = getTransactionEntriesByProductAndInventory(commandInstance?.product, commandInstance?.inventory)
+			// create a map of inventory item quantities from this
+			def quantityByInventoryItemMap = getQuantityByInventoryItemMap(transactionEntryList)
+			                                                                                       		
+			quantityByInventoryItemMap.keySet().each { 
+				def quantity = quantityByInventoryItemMap[it]
 				
 				def inventoryItemRow = new RecordInventoryRowCommand()
-				inventoryItemRow.id = it.id;
-				inventoryItemRow.lotNumber = it.lotNumber;
-				inventoryItemRow.expirationDate = it.expirationDate;
+				inventoryItemRow.id = it.id
+				inventoryItemRow.lotNumber = it.lotNumber
+				inventoryItemRow.expirationDate = it.expirationDate
 				//inventoryItemRow.description = it.description;
-				inventoryItemRow.oldQuantity = quantity;
-				inventoryItemRow.newQuantity = quantity;
-				commandInstance.recordInventoryRows.add(inventoryItemRow);
+				inventoryItemRow.oldQuantity = quantity
+				inventoryItemRow.newQuantity = quantity
+				commandInstance.recordInventoryRows.add(inventoryItemRow)
 			}
 		}
-		return commandInstance;
-		
+		return commandInstance
 	}
 		
 	
+	/**
+	 * Processes a RecordInventory Command object and perform updates
+	 */
 	RecordInventoryCommand saveRecordInventoryCommand(RecordInventoryCommand cmd, Map params) { 
-		log.debug "Saving record inventory command params: " + params
+		log.info "Saving record inventory command params: " + params
 		
 		try { 
 			// Validation was done during bind, but let's do this just in case
@@ -241,15 +370,14 @@ class InventoryService {
 				// Create a new transaction
 				def transaction = new Transaction(cmd.properties)
 				
-				// FIXME Change this to be a valid lookup
-				transaction.transactionType = TransactionType.get(7)
+				transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
 				
 				// Process each row added to the record inventory page
 				cmd.recordInventoryRows.each { row -> 					
 					// 1. Find an existing inventory item for the given lot number and product and description
 					// FIXME need to add description here
 					def inventoryItem = 
-						InventoryItem.findByLotNumberAndProduct(row.lotNumber, cmd.product)
+					InventoryItem.findByLotNumberAndProduct(row.lotNumber, cmd.product)
 					//def inventoryItem = 
 					//	findInventoryItemByProductAndLotNumberAndDescription(cmd.product, row.lotNumber, row.description);
 					
@@ -278,7 +406,7 @@ class InventoryService {
 					if (row.oldQuantity != row.newQuantity) {
 						def transactionEntry = new TransactionEntry();
 						transactionEntry.properties = row.properties;
-						transactionEntry.quantity = row.newQuantity - row.oldQuantity;  // difference
+						transactionEntry.quantity = row.newQuantity
 						transactionEntry.product = cmd.product
 						transactionEntry.inventoryItem = inventoryItem;
 						transaction.addToTransactionEntries(transactionEntry);						
@@ -645,36 +773,32 @@ class InventoryService {
 		
 		if (itemInstance && inventoryInstance) { 
 			def transactionEntry = new TransactionEntry(params);
-			def quantityChange = 0;
+			def quantity = 0;
 			try { 
-				quantityChange = Integer.valueOf(params?.newQuantity) - Integer.valueOf(params?.oldQuantity);				
+				quantity = Integer.valueOf(params?.newQuantity);				
 			} catch (Exception e) { 
-				itemInstance.errors.reject("inventorItem.quantity.invalid")			
+				itemInstance.errors.reject("inventoryItem.quantity.invalid")			
 			}
-						
+			
 			def transactionInstance = new Transaction(params);
 			if (transactionEntry.hasErrors() || transactionInstance.hasErrors()) {
 				itemInstance.errors = transactionEntry.errors
 				itemInstance.errors = transactionInstance.errors
 			}
 			
-			
-						
-			// TODO Move all of this logic into the service layer in order to take advantage of Hibernate/Spring transactions
 			if (!itemInstance.hasErrors() && itemInstance.save()) {			
 				// Need to create a transaction if we want the inventory item
 				// to show up in the stock card
-				transactionInstance.transactionDate = new Date();			
-				// FIXME Not sure what transaction type this is -- should be ADJUSTMENT 
-				transactionInstance.transactionType = TransactionType.get(7);
+				transactionInstance.transactionDate = new Date();	
+				transactionInstance.transactionDate.clearTime();
+				transactionInstance.transactionType = TransactionType.get(Constants.INVENTORY_TRANSACTION_TYPE_ID);
 				transactionInstance.inventory = inventoryInstance;			
 				
 				// Add transaction entry to transaction
 				transactionEntry.inventoryItem = itemInstance;
 				transactionEntry.product = itemInstance.product;
 				transactionEntry.lotNumber = itemInstance.lotNumber;
-				// FIXME Not a safe way to do this - we should recalculate the old quantity 
-				transactionEntry.quantity = quantityChange;
+				transactionEntry.quantity = quantity
 				transactionInstance.addToTransactionEntries(transactionEntry);			
 				if (!transactionInstance.hasErrors() && transactionInstance.save()) {			
 				
@@ -690,7 +814,6 @@ class InventoryService {
 
 		}
 	}
-	
 	
 	/**
 	 * Create a transaction for the Send Shipment event.
@@ -711,7 +834,7 @@ class InventoryService {
 			debitTransaction.source = null
 			debitTransaction.destination = shipmentInstance?.destination.isWarehouse() ? shipmentInstance?.destination : null
 			debitTransaction.inventory = shipmentInstance?.origin?.inventory ?: addInventory(shipmentInstance.origin)
-			debitTransaction.transactionDate = new Date();
+			debitTransaction.transactionDate = shipmentInstance.getActualShippingDate()
 		
 			shipmentInstance.shipmentItems.each {
 				def inventoryItem = InventoryItem.findByLotNumberAndProduct(it.lotNumber, it.product)
@@ -737,7 +860,7 @@ class InventoryService {
 				
 				// Create a new transaction entry
 				def transactionEntry = new TransactionEntry();
-				transactionEntry.quantity = 0 - it.quantity;
+				transactionEntry.quantity = it.quantity;
 				transactionEntry.lotNumber = it.lotNumber
 				transactionEntry.product = it.product;
 				transactionEntry.inventoryItem = inventoryItem;
@@ -750,8 +873,6 @@ class InventoryService {
 			//shipmentInstance.errors.reject("shipment.invalid", e.message);  // this doesn't seem to working properly
 		}
 	}	
-
-	
 	
 	/**
 	 * Reads a file for the given filename and generates an object that mirrors the 
@@ -804,7 +925,9 @@ class InventoryService {
 		
 		def dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		
-		def transactionInstance = new Transaction(transactionDate: new Date(),
+		Date today = new Date()
+		today.clearTime()
+		def transactionInstance = new Transaction(transactionDate: today,
 			transactionType: TransactionType.findByName("Inventory"),
 			inventory: warehouse.inventory,
 			destination: warehouse)
@@ -983,8 +1106,6 @@ class InventoryService {
 		return inventoryMapList
 	}
 	
-	
-	
 	/**
 	 * Import data from given inventoryMapList into database.
 	 * 
@@ -998,7 +1119,9 @@ class InventoryService {
 		try { 
 			def dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 			
-			def transactionInstance = new Transaction(transactionDate: new Date(),
+			Date today = new Date()
+			today.clearTime()
+			def transactionInstance = new Transaction(transactionDate: today,
 				transactionType: TransactionType.findByName("Inventory"),
 				inventory: warehouse.inventory,
 				destination: warehouse)
@@ -1297,9 +1420,9 @@ class InventoryService {
 				}
 			}
 			
-			// Create a new transaction entry (inverting the quantity)
+			// Create a new transaction entry
 			def transactionEntry = new TransactionEntry();
-			transactionEntry.quantity = 0 - it.quantity;
+			transactionEntry.quantity = it.quantity;
 			transactionEntry.lotNumber = it.lotNumber
 			transactionEntry.product = it.product;
 			transactionEntry.inventoryItem = inventoryItem;

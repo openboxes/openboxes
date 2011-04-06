@@ -108,32 +108,22 @@ class InventoryItemController {
 		render inventoryItemList as JSON;
 	}
 	
+	/**
+	 * Displays the stock card for a product
+	 */
 	def showStockCard = { StockCardCommand cmd ->
-		// TODO Eventually, we'll push all of this logic to the service
-		// Right now, the command class is private, so we can't pass it to the service
-		//inventoryService.getStockCard(cmd)
+		// add the current warehouse to the command object
+		cmd.warehouseInstance = Warehouse.get(session?.warehouse?.id)
 		
-		// Get basic details required for the whole page
-		cmd.productInstance = Product.get(params?.product?.id?:params.id);  // check product.id and id
-		cmd.warehouseInstance = Warehouse.get(session?.warehouse?.id);
-		cmd.inventoryInstance = cmd.warehouseInstance?.inventory
-		cmd.inventoryLevelInstance = inventoryService.getInventoryLevelByProductAndInventory(cmd.productInstance, cmd.inventoryInstance)
-
-		cmd.pendingShipmentList = shipmentService.getPendingShipments(cmd.warehouseInstance);
-						
-		// Get current stock of a particular product within an inventory
-		// Using set to make sure we only return one object per inventory items
-		Set inventoryItems = inventoryService.getInventoryItemsByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);
-		cmd.inventoryItemList = inventoryItems as List
+		// now populate the rest of the commmand object
+		def commandInstance = inventoryService.getStockCardCommand(cmd, params)
 		
-		cmd.inventoryItemList.sort { it.lotNumber }
+		// populate the pending shipments
+		// TODO: move this into the service layer after we find a way to add shipping service to inventory service
+		// (that is, find a workaround to GRAILS-5080)
+		commandInstance.pendingShipmentList = shipmentService.getPendingShipments(commandInstance.warehouseInstance);
 		
-		// Get transaction log for a particular product within an inventory
-		cmd.transactionEntryList = inventoryService.getTransactionEntriesByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);
-		cmd.transactionEntriesByInventoryItemMap = cmd.transactionEntryList.groupBy { it.inventoryItem }
-		cmd.transactionEntriesByTransactionMap = cmd.transactionEntryList.groupBy { it.transaction }
-										
-		[ commandInstance: cmd ]
+		[ commandInstance: commandInstance ]
 	}
 
 	
@@ -142,6 +132,7 @@ class InventoryItemController {
 	 */
 	def showRecordInventory = { RecordInventoryCommand cmd -> 
 		def commandInstance = inventoryService.getRecordInventoryCommand(cmd, params)
+		
 		
 		// We need to set the inventory instance in order to save an 'inventory' transaction
 		def warehouseInstance = Warehouse.get(session?.warehouse?.id)				
@@ -329,7 +320,8 @@ class InventoryItemController {
 			// Need to create a transaction if we want the inventory item 
 			// to show up in the stock card			
 			transactionInstance.transactionDate = new Date();
-			transactionInstance.transactionType = TransactionType.get(7);
+			transactionInstance.transactionDate.clearTime(); // we only want to store the date component
+			transactionInstance.transactionType = TransactionType.get(Constants.INVENTORY_TRANSACTION_TYPE_ID);
 			def warehouseInstance = Warehouse.get(session.warehouse.id);
 			transactionInstance.source = warehouseInstance;
 			transactionInstance.inventory = warehouseInstance.inventory;

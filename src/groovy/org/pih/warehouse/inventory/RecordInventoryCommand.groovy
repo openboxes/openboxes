@@ -12,7 +12,7 @@ class RecordInventoryCommand {
 	Product product;
 	Inventory inventory;
 	InventoryLevel inventoryLevel
-	Date transactionDate = new Date();
+	Date transactionDate = new Date()
 	RecordInventoryRowCommand recordInventoryRow;
 	List<RecordInventoryRowCommand> recordInventoryRows =
 		LazyList.decorate(new ArrayList(),FactoryUtils.instantiateFactory(RecordInventoryRowCommand.class));

@@ -50,7 +50,7 @@
 					</g:if>
 					<g:set var="count" value="${0 }"/>
 					<g:each var="itemInstance" in="${commandInstance?.inventoryItemList }" status="status">	
-						<g:if test="${commandInstance.quantityByInventoryItemMap.get(itemInstance)!=0}">			
+						<g:if test="${commandInstance.quantityByInventoryItemMap.get(itemInstance)}">		<!-- only show items with quantities -->	
 							<g:set var="itemQuantity" value="${commandInstance.quantityByInventoryItemMap.get(itemInstance) }"/>
 							<g:set var="selected" value="${params?.inventoryItem?.id && (itemInstance.id == Integer.valueOf(params?.inventoryItem?.id)) }"/>
 							<g:set var="styleClass" value="${(count++%2==0)?'odd':'even' }"/>

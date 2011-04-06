@@ -15,7 +15,7 @@ class StockCardCommand {
 	
 	// Used when adding a new inventory item (not implemented yet)
 	InventoryItem inventoryItem;
-
+	
 	// Entire page
 	Product productInstance;
 	Warehouse warehouseInstance;
@@ -28,35 +28,18 @@ class StockCardCommand {
 	List<Shipment> pendingShipmentList;
 	Map<Transaction, List<TransactionEntry>> transactionEntriesByTransactionMap;
 	Map<InventoryItem, List<TransactionEntry>> transactionEntriesByInventoryItemMap
-
+	Map<InventoryItem, Integer> quantityByInventoryItemMap
+	
 	// Transaction log section
 	Date startDate = new Date() - 7;		// defaults to today - 7d
 	Date endDate = new Date();				// defaults to today
 	TransactionType transactionType
 	Map transactionLogMap;
-		
+	
 	static constraints = {
 		startDate(nullable:true)
 		endDate(nullable:true)
 		transactionType(nullable:true)
-	}
-
-	/**
-	 * Returns a map of quantity values indexed by inventory item to be used in the
-	 * current stock portion of the stock card page.
-	 *
-	 * @return a map (inventory item -> quantity)
-	 */
-	Map<InventoryItem, Integer> getQuantityByInventoryItemMap() {
-		Map<InventoryItem, Integer> quantityByInventoryItemMap = [:]
-		if (inventoryItemList) {
-			inventoryItemList.each {
-				def transactionEntries = transactionEntriesByInventoryItemMap?.get(it)
-				def quantity = (transactionEntries)?transactionEntries*.quantity.sum():0;
-				quantityByInventoryItemMap.put(it, quantity)
-			}
-		}
-		return quantityByInventoryItemMap;
 	}
 	
 	/**
@@ -65,7 +48,7 @@ class StockCardCommand {
 	 * @return 	the sum of quantities across all transaction entries
 	 */
 	Integer getTotalQuantity() {
-		return (transactionEntryList)?transactionEntryList.findAll { it.product == productInstance }.quantity.sum():0
+		return quantityByInventoryItemMap?.values() ? quantityByInventoryItemMap?.values().sum() : 0
 	}
 	
 	/**
@@ -95,7 +78,7 @@ class StockCardCommand {
 		return filteredTransactionLog.groupBy { it.transaction }
 	}
 	
-
+	
 	
 	
 }

@@ -324,7 +324,7 @@
 												.selected-row { background-color: #ffffe0; } 
 											</style>
 											
-											<g:set var="inventoryItems" value="${commandInstance?.recordInventoryRows.findAll{it.oldQuantity > 0 || it.newQuantity > 0}}"/>	
+											<g:set var="inventoryItems" value="${commandInstance?.recordInventoryRows.findAll{it.oldQuantity != 0 || it.newQuantity != 0}}"/>	
 											<g:if test="${inventoryItems }">											
 												<g:each var="recordInventoryRow" in="${inventoryItems.sort { it.lotNumber }}" status="status">
 													<g:set var="styleClass" value="${params?.inventoryItem?.id && recordInventoryRow?.id == Integer.valueOf(params?.inventoryItem?.id) ? 'selected-row' : ''}"/>
@@ -336,7 +336,7 @@
 															--%>
 															<g:hiddenField name="recordInventoryRows[${status}].id" value="${recordInventoryRow?.id }"/>
 															<g:hiddenField name="recordInventoryRows[${status}].lotNumber" value="${recordInventoryRow?.lotNumber }"/>
-															${recordInventoryRow?.lotNumber?:'<span class="fade">EMPTY</span>' }
+															${recordInventoryRow?.lotNumber?:'<span class="fade">None</span>' }
 														</td>
 														<td width="10%">
 															<%-- 

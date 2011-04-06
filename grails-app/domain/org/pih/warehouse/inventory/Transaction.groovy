@@ -45,12 +45,14 @@ class Transaction implements Serializable {
 
     // Constraints 
     static constraints = {
-	    transactionDate(nullable:false)
 	    transactionType(nullable:false)
 		createdBy(nullable:true)
 		confirmed(nullable:true)
 		confirmedBy(nullable:true)
 		dateConfirmed(nullable:true)
+		
+		transactionDate(nullable:false, 
+			validator: { value -> value < new Date() })  // transaction date cannot be in the future
 		
 		source(nullable:true, 
 			validator: { value, obj-> 
@@ -68,4 +70,17 @@ class Transaction implements Serializable {
 							return true 
 						})
     }
+    
+    /**
+	 * Sort by transaction date, and then by date created
+	 * (Note that sorting of transaction entries, and therefore the whole inventory process, relies on this
+	 *  so don't make changes lightly!)
+	 */
+	int compareTo(obj) { 
+		def compare = transactionDate <=> obj.transactionDate		
+		if (compare == 0) {
+			compare = dateCreated <=> obj.dateCreated
+		}
+		return compare
+	}
 }

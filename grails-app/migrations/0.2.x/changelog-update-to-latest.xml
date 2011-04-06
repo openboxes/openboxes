@@ -2950,7 +2950,116 @@
   	   <addForeignKeyConstraint constraintName="fk_local_transfer_destination_transaction_transaction"
 	    	baseTableName="local_transfer" baseColumnNames="destination_transaction_id" referencedTableName="transaction" referencedColumnNames="id" />
     </changeSet>
-      
+    
+    <changeSet author="mgoodrich" id="2011-04-1-1">
+       <preConditions onFail="MARK_RAN">
+			<columnExists tableName="transaction_type" columnName="transaction_type"/>
+		</preConditions>
+		<dropColumn tableName="transaction_type" columnName="transaction_type"/>
+    </changeSet>
+    
+     <changeSet author="mgoodrich" id="2011-04-1-2">
+       <preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="transaction_type" columnName="transaction_code"/></not>
+		</preConditions>  
+    	<addColumn tableName="transaction_type">
+            <column name="transaction_code" type="VARCHAR(255)">
+            	 <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <update tableName="transaction_type">
+		    <column name="transaction_code" value="INVENTORY"/>
+		    <where>id='7'</where>
+		</update> 
+		 <update tableName="transaction_type">
+		    <column name="transaction_code" value="CREDIT"/>
+		    <where>id='3' or id='8'</where>
+		</update> 
+		<update tableName="transaction_type">
+		    <column name="transaction_code" value="DEBIT"/>
+		    <where>id='2' or id='4' or id='5' or id='9'</where>
+		</update> 
+     </changeSet>
+  
+  <!-- split the ADJUSTMENT transaction type into an ADJUSTION - CREDIT and ADJUSTMENT - DEBIT -->
+  	<changeSet author="mgoodrich" id="2011-04-5-1">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT count(*) FROM transaction_type WHERE id='10']]>
+			</sqlCheck>
+		</preConditions>
+		<insert tableName="transaction_type">
+        	<column name="id" valueNumeric="10"/>
+        	<column name="version" valueNumeric="0"/>
+        	<column name="date_created" valueDate="2011-04-05"/>
+            <column name="last_updated" valueDate="2011-04-05"/> 
+        	<column name="name" value="Adjustment - Debit"/>
+        	<column name="sort_order" valueNumeric="0"/>   
+        	<column name="transaction_code" value="DEBIT"/>       
+        </insert>   
+        <update tableName="transaction_type">
+        	<column name="name" value="Adjustment - Credit"/>
+        	<where>id='3'</where>
+        </update>   
+	</changeSet>
+	
+	<!-- migrate to the new transaction model: part 1, make all debit transaction quantities positive -->
+	<changeSet author="mgoodrich" id="2011-04-5-2">
+	  	<!-- we want to fail hard if we find any positive debit transactions, this means that the either we've already -->
+	  	<!-- done this migration, OR that the existing data is in a state we didn't expect -->
+        <preConditions onFail="HALT">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT COUNT(*) FROM transaction, transaction_entry WHERE transaction.id = transaction_entry.transaction_id AND transaction.transaction_type_id IN (2,4,5,9) AND quantity > 0]]>
+			</sqlCheck>
+		</preConditions>
+		<sql>
+			UPDATE transaction, transaction_entry SET quantity = -(quantity) WHERE transaction.id = transaction_entry.transaction_id AND transaction.transaction_type_id IN (2,4,5,9)
+		</sql>
+	</changeSet>
+	
+	<!--  migrate to the new transaction model: part 2, move all inventory transactions to adjustments -->
+	<changeSet author="mgoodrich" id="2011-04-5-3">
+	  	<!-- we want to fail hard if we find any adjustment-debit transactions, this means that the either we've already -->
+	  	<!-- done this migration, or we have some data we didn't expect -->
+        <preConditions onFail="HALT">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT COUNT(*) FROM transaction, transaction_entry WHERE transaction.id = transaction_entry.transaction_id AND transaction.transaction_type_id='10']]>
+			</sqlCheck>
+		</preConditions>
+		<sql>
+			UPDATE transaction, transaction_entry SET transaction_type_id='3' WHERE transaction.id = transaction_entry.transaction_id AND transaction.transaction_type_id='7' AND quantity >= 0;
+			UPDATE transaction, transaction_entry SET transaction_type_id='10' WHERE transaction.id = transaction_entry.transaction_id AND transaction.transaction_type_id='7';
+			UPDATE transaction, transaction_entry SET quantity = -(quantity) WHERE transaction.id = transaction_entry.transaction_id AND transaction.transaction_type_id='10';
+		</sql>
+	</changeSet>
+	
+	<!-- double-check here that all transactions entries now have positive quantities -->
+	<changeSet author="mgoodrich" id="2011-04-5-4">
+        <preConditions onFail="HALT">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT COUNT(*) FROM transaction_entry WHERE quantity < 0]]>
+			</sqlCheck>
+		</preConditions>
+	</changeSet>	
+	
+	<!--  add the new product inventory type -->
+	<changeSet author="mgoodrich" id="2011-04-6-1">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT count(*) FROM transaction_type WHERE id='11']]>
+			</sqlCheck>
+		</preConditions>
+		<insert tableName="transaction_type">
+        	<column name="id" valueNumeric="11"/>
+        	<column name="version" valueNumeric="0"/>
+        	<column name="date_created" valueDate="2011-04-06"/>
+            <column name="last_updated" valueDate="2011-04-06"/> 
+        	<column name="name" value="Product Inventory"/>
+        	<column name="sort_order" valueNumeric="0"/>   
+        	<column name="transaction_code" value="PRODUCT_INVENTORY"/>       
+        </insert>   
+	</changeSet>
+	
 	<changeSet author="jmiranda (generated)" id="1301410966941-1">
        <preConditions onFail="MARK_RAN">
 			<not><columnExists tableName="shipment" columnName="stated_value"/></not>

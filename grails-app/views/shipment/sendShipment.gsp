@@ -93,7 +93,7 @@
 																	${item?.product?.name } ${item?.lotNumber }
 																</td>
 																<td>
-																	-${item?.quantity }
+																	${item?.quantity }
 																</td>
 															</tr>
 														</g:each>

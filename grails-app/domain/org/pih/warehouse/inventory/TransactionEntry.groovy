@@ -2,11 +2,11 @@ package org.pih.warehouse.inventory;
 
 import org.pih.warehouse.product.Product;
 
-class TransactionEntry implements Serializable {
+class TransactionEntry implements Comparable, Serializable {
 	
 	Product product					// Optional
 	String lotNumber				// Optional 
-    Integer quantity				// Convention: negative number means OUT, positive number means IN
+    Integer quantity				
 	InventoryItem inventoryItem		// The inventory item (or product being tracked)
 	String comments					// 
 	
@@ -16,7 +16,14 @@ class TransactionEntry implements Serializable {
 		inventoryItem(nullable:false)		
 		product(nullable:false)	
 		lotNumber(nullable:true)
-		quantity(nullable:false)
+		quantity(nullable:false, min:0)
 		comments(nullable:true)	
     }
+	
+	/**
+	 * Sort by the sort parameters of the parent transaction
+	 */
+	int compareTo(obj) { 
+		transaction.compareTo(obj.transaction)
+	}
 }

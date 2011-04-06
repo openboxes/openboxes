@@ -16,8 +16,8 @@ class RecordInventoryRowCommand {
 		expirationDate(nullable:true)
 		lotNumber(nullable:true)
 		description(nullable:true)
-		oldQuantity(nullable:false, min: 0)
-		newQuantity(nullable:false, min: 0)
+		oldQuantity(nullable:false)
+		newQuantity(nullable:false)
 	}
 	
 }

@@ -505,7 +505,7 @@ class ShipmentService {
 					creditTransaction.source = shipmentInstance?.origin
 					creditTransaction.destination = null
 					creditTransaction.inventory = shipmentInstance?.destination?.inventory ?: inventoryService.addInventory(shipmentInstance.destination)
-					creditTransaction.transactionDate = new Date()
+					creditTransaction.transactionDate = shipmentInstance.getActualDeliveryDate()
 					
 					shipmentInstance.receipt.receiptItems.each {
 						def inventoryItem = InventoryItem.findByLotNumberAndProduct(it.lotNumber, it.product)

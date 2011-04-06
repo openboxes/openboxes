@@ -3,10 +3,11 @@ package org.pih.warehouse.core
 import grails.test.*
 
 import org.pih.warehouse.inventory.Inventory 
-import org.pih.warehouse.inventory.LocalTransfer 
-import org.pih.warehouse.inventory.Transaction 
+import org.pih.warehouse.inventory.InventoryItem 
+import org.pih.warehouse.inventory.TransactionCode;
 import org.pih.warehouse.inventory.TransactionType 
 import org.pih.warehouse.inventory.Warehouse 
+import org.pih.warehouse.product.Product 
 
 
 class BaseUnitTest extends GrailsUnitTestCase {
@@ -37,11 +38,19 @@ class BaseUnitTest extends GrailsUnitTestCase {
        
         // create some default transaction types
         def consumptionTransactionType = new TransactionType(id: 2, name: "Consumption")
-        def inventoryTransactionType = new TransactionType(id: 7, name: "Inventory")
-        def transferInTransactionType = new TransactionType(id: Constants.TRANSFER_IN_TRANSACTION_TYPE_ID, name: "Transfer In")
-        def transferOutTransactionType = new TransactionType(id: Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID, name: "Transfer Out")
+        def inventoryTransactionType = new TransactionType(id: 7, name: "Inventory", transactionCode: TransactionCode.INVENTORY)
+        def transferInTransactionType = new TransactionType(id: Constants.TRANSFER_IN_TRANSACTION_TYPE_ID, name: "Transfer In", transactionCode: TransactionCode.CREDIT)
+        def transferOutTransactionType = new TransactionType(id: Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID, name: "Transfer Out", transactionCode: TransactionCode.DEBIT)
         mockDomain(TransactionType, [ inventoryTransactionType, transferInTransactionType, transferOutTransactionType ])
         
+        // create some products
+        def aspirin = new Product(name: "Aspirin")
+        mockDomain(Product, [aspirin])
+        
+        // create some inventory items
+        def aspirinLot1 = new InventoryItem(product: aspirin, lotNumber: "1")
+        mockDomain(InventoryItem, [aspirinLot1])
+  
     }
 
     protected void tearDown() {
