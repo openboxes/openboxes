@@ -2981,7 +2981,7 @@
 		</update> 
      </changeSet>
   
-  <!-- split the ADJUSTMENT transaction type into an ADJUSTION - CREDIT and ADJUSTMENT - DEBIT -->
+  <!-- split the ADJUSTMENT transaction type into an ADJUSTMENT- CREDIT and ADJUSTMENT - DEBIT -->
   	<changeSet author="mgoodrich" id="2011-04-5-1">
         <preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
@@ -3002,6 +3002,18 @@
         	<where>id='3'</where>
         </update>   
 	</changeSet>
+	
+	<!-- test migration precondition -->
+	<changeSet author="mgoodrich" id="2011-04-5-1-1">
+		<!--  we want to fail hard if we have any transactions with both positive and negative transaction entries -->
+		<!--  because we have to manually finesse that case -->
+		   <preConditions onFail="HALT">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT COUNT(*) FROM transaction_entry as a, transaction_entry as b WHERE a.transaction_id = b.transaction_id AND a.quantity > 0 AND b.quantity < 0]]>
+			</sqlCheck>
+		</preConditions>
+	</changeSet>
+		
 	
 	<!-- migrate to the new transaction model: part 1, make all debit transaction quantities positive -->
 	<changeSet author="mgoodrich" id="2011-04-5-2">
