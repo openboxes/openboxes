@@ -144,7 +144,6 @@ class Doc4jController {
 			}
 			else { 
 				actualShipmentDateCell.setCellValue("Not available");
-				actualShipmentDateCell.setCellStyle(cellStyle);
 			}
 			row = sheet.createRow((short)counter++);
 			row.createCell(0).setCellValue("Expected Arrival Date");
@@ -161,7 +160,6 @@ class Doc4jController {
 			}
 			else { 
 				actualArrivalDateCell.setCellValue("Not available");
-				actualArrivalDateCell.setCellStyle(cellStyle);
 			}
 			row = sheet.createRow((short)counter++);
 
@@ -191,12 +189,15 @@ class Doc4jController {
 				row.createCell(5).setCellValue(itemInstance?.recipient?.name);
 			}
 			
-			//render "nothing"
+			// For some reason, this needs to be here or we get a File Not Found error (ERR_FILE_NOT_FOUND)
+			render ""
 			
-			def filename = shipmentInstance?.name + " - Packing List (3).xls"
+			def filename = shipmentInstance?.name + " - Packing List.xls"
+			log.info ("filename " + filename )
 			response.setHeader("Content-disposition", "attachment; filename=" + filename);
 			response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 			//response.outputStream << tempFile.readBytes()
+			log.info ("workbook " + workbook)
 			workbook.write(response.outputStream)
 			return;
 		} 
