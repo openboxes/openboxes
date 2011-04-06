@@ -171,7 +171,23 @@
 											</td>
 											<td valign="top" class="">
 												<g:if test="${shipmentInstance.totalValue}">
-													$ <g:formatNumber format="#,##0.00" number="${shipmentInstance.totalValue}" /><br/>
+													$<g:formatNumber format="#,##0.00" number="${shipmentInstance.totalValue}" /><br/>
+												</g:if>
+											</td>
+											<td>
+												&nbsp;
+											</td>
+										</tr>
+									</g:if>
+									<g:if test="${!shipmentWorkflow?.isExcluded('statedValue')}">
+										<tr class="prop">
+											<td valign="top" class="name">
+												<img src="${createLinkTo(dir:'images/icons/silk',file:'money.png')}" alt="money" style="vertical-align: middle"/>
+												<label><g:message code="shipment.statedValue.label" default="Stated Value" /></label><br/>
+											</td>
+											<td valign="top" class="">
+												<g:if test="${shipmentInstance.statedValue}">
+													$<g:formatNumber format="#,##0.00" number="${shipmentInstance.statedValue}" /><br/>
 												</g:if>
 											</td>
 											<td>

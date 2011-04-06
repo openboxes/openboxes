@@ -9,8 +9,17 @@
 						<th>Actions</th>
 					</tr>
 				</thead>
-				<tbody>		
+				<tbody>	
 					<tr>
+						<td>
+							<g:link controller="shipment" action="listShipping"> 						
+								<img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_left.png')}" 
+									alt="Show Shipment" style="vertical-align: middle" /> &nbsp;
+								List Shipments
+							</g:link>
+						</td>
+					</tr>					
+					<tr class="prop">
 						<td>
 							<g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}"> 						
 								<g:if test="${request.request.requestURL.toString().contains('showDetails')}">
