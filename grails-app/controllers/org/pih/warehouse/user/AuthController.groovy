@@ -107,7 +107,9 @@ class AuthController {
 				def roles = userInstance?.roles;
 	
 				session.user = userInstance;
-				session.warehouse = userInstance.warehouse
+				
+				// PIMS-782 Force the user to select a warehouse each time
+				//session.warehouse = userInstance.warehouse
 				
 				if (params?.targetUri) {
 					redirect(uri: params.targetUri);

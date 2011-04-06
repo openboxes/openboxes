@@ -8,11 +8,11 @@
 	
 </style>
 <div id="leftnav-accordion-menu" class="menu">
+<%-- 
 	<h3 class="menu-heading" >
 		
 		<g:message code="dashboard.label" default="Dashboard"/>
 	</h3>
-	 
 	<div class="menu-section">
 	 	<ul>
 			<li class="">
@@ -22,7 +22,7 @@
 			</li>				
 		</ul>
 	</div>
-
+--%>
 	
 	
 	<h3 class="menu-heading">

@@ -7,7 +7,7 @@
         <g:set var="entityName" value="${message(code: 'product.label', default: 'Product')}" />
         <title><g:message code="default.browse.label" args="[entityName]" /></title>
 		<style>
-			.data-table td, .data-table th { height: 3em; vertical-align: middle; }
+			.data-table td, .data-table th { vertical-align: middle; }
 		</style>
     </head>    
     <body>

@@ -1,7 +1,14 @@
 <tr class="prop">
 	<td valign="top" class="name"><label>Name</label></td>                            
 	<td valign="top" class="value">
-		<g:textField id="name" name="name" size="15" value="${container ? container?.name : box?.name}"/> 
+		<g:textField id="name" name="name" size="50" value="${container ? container?.name : box?.name}"/> 
+	</td>
+</tr>
+
+<tr class="prop">
+	<td valign="top" class="name"><label>Description</label></td>                            
+	<td valign="top" class="value">
+		<g:textArea id="description" name="description" cols="50" rows="5" value="${container ? container?.description : box?.description}"/> 
 	</td>
 </tr>
 

@@ -16,14 +16,14 @@
 	            </div>				
 			</g:hasErrors>
 
-			<g:render template="flowHeader" model="['currentState':'Details']"/>
 			
            	<g:form action="createShipment" method="post">
 				<g:hiddenField name="id" value="${shipmentInstance?.id}"/>
 				<fieldset>
-					<legend>Step 1&nbsp; Enter shipment details</legend>
-					
 					<g:render template="../shipment/summary" />	
+					<g:render template="flowHeader" model="['currentState':'Details']"/>
+
+					
 					
                		<div class="dialog">
 		                <table>
@@ -97,13 +97,14 @@
 		                    </tbody>
 		               </table>
 					</div>
-					<div class="buttons">
+					<div class="">
 						<table>
 							<tr>
 								<td width="100%" style="text-align: right;">
-									<g:submitButton name="next" value="Next"></g:submitButton> 
-									<g:submitButton name="save" value="Save and Exit"></g:submitButton>
-									<g:submitButton name="cancel" value="Cancel"></g:submitButton>						
+									<button type="submit" name="_eventId_back" disabled>&lsaquo; Back</button>	
+									<button type="submit" name="_eventId_next">Next &rsaquo;</button> 
+									<button type="submit" name="_eventId_save">Save & Exit</button>
+									<button type="submit" name="_eventId_cancel">Cancel</button>						
 								</td>
 							</tr>
 						</table>

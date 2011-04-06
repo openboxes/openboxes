@@ -19,7 +19,7 @@
 				<tr class="prop">
 					<td valign="top" class="name"><label><g:message code="shipmentItem.quantity.label" default="Quantity" /></label></td>                            
 					<td valign="top" class="value">
-						<g:textField id="quantity" name="quantity" value="${item?.quantity}" size="3" /> 
+						<g:textField id="quantity" name="quantity" value="${item?.quantity}" size="5" /> 
 					</td>
 				</tr>  	        
 				<tr class="prop">

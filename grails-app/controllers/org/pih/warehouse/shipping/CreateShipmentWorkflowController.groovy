@@ -18,16 +18,26 @@ class CreateShipmentWorkflowController {
     	
     	start {
     		action {
-    			log.info("starting shipment workflow")
+    			log.info("Starting shipment workflow " + params)
     			
     			// create a new shipment instance if we don't have one already
     			if (!flow.shipmentInstance) { 
     				flow.shipmentInstance = shipmentService.getShipmentInstance(params.id as Long)
     				flow.shipmentWorkflow = shipmentService.getShipmentWorkflow(flow.shipmentInstance)
     			}
+				if (params.skipTo) { 
+					if (params.skipTo == 'Packing')
+						return enterContainerDetails()
+					else if (params.skipTo == 'Details')
+						return enterShipmentDetails()
+					else if (params.skipTo == 'Tracking')
+						return enterTrackingDetails()
+					
+				}
     			return success()
     		}
     		on("success").to("enterShipmentDetails")
+			on("enterContainerDetails").to("enterContainerDetails")
     	}
     		
     	enterShipmentDetails {
@@ -124,6 +134,11 @@ class CreateShipmentWorkflowController {
     			// don't need to do validation if just going back
     		}.to("enterTrackingDetails")
     		
+			on("enterContainerDetails") { 
+				log.info ("enter container details " + params)
+				[ selectedContainer : Container.get(params?.containerId)]
+			}.to("enterContainerDetails")
+			
     		on("next") {
 				shipmentService.saveShipment(flow.shipmentInstance)	
 			}.to("showDetails")
@@ -207,6 +222,10 @@ class CreateShipmentWorkflowController {
 				flash.addItemToContainerId = params.container.id as Integer
 			}.to("saveItemAction")
 			
+			on("moveItemToContainer") { 
+				// move an item to another container
+				log.info params
+			}.to("enterContainerDetails")
 			/**
 			on("addAnotherBox") {
 				// this parameter triggers the "Add Box" dialog for the container to be opened on page reload

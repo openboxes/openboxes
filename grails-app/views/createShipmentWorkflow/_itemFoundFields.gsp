@@ -4,7 +4,7 @@
 					<td valign="top" class="name"><label><g:message code="shipmentItem.product.label" default="Product" /></label></td>                            
 					<td valign="top" class="value">
 						<span id="product-text"></span>
-						<g:hiddenField id="product-id" name="product.id" value="${item?.product?.id}" size="20" />
+						<g:hiddenField id="product-id" name="product.id" value="${item?.product?.id}" size="40" />
 					</td>
 				</tr>
 				<tr class="prop">
@@ -17,8 +17,8 @@
 				<tr class="prop">
 					<td valign="top" class="name"><label><g:message code="shipmentItem.quantity.label" default="Quantity" /></label></td>                            
 					<td valign="top" class="value">
-						<g:textField id="found-quantity" name="quantity" value="${item?.quantity}" size="3" /> 
-						&nbsp [ Available Qty: <span id="quantity-text"></span> ]
+						<g:textField id="found-quantity" name="quantity" value="${item?.quantity}" size="5" /> 
+						&nbsp; [ Available Qty: <span id="quantity-text"></span> ]
 					</td>
 				</tr>  	        
 				<tr class="prop">

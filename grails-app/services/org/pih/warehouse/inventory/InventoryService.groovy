@@ -321,13 +321,17 @@ class InventoryService {
 	Set getProducts(BrowseInventoryCommand command, Map params) { 
 		def products = new HashSet();
 		
-			
-		if (command?.searchTerms) { 
+		if (command?.searchTerms && command?.categoryFilters) { 
 			log.info "search " + command?.searchTerms;
-			products += getProductsBySearchTerms(command?.searchTerms);
+			//products += getProductsBySearchTerms(command?.searchTerms);
+			products = getProductsByAll(command?.searchTerms, command?.categoryFilters);
+			
+		}
+		else if (command?.searchTerms) { 
+			products = getProductsBySearchTerms(command?.searchTerms)
 		}
 		else if (command?.categoryFilters) { 
-				products = getProductsByCategories(command?.categoryFilters, params);
+			products = getProductsByCategories(command?.categoryFilters, params);
 		}
 		else { 
 			products = Product.list();
@@ -336,8 +340,34 @@ class InventoryService {
 		return products;		
 	}
 
+
+	/** 
+	 * 	
+	 * @param searchTerms
+	 * @param categories
+	 * @return
+	 */
+	List getProductsByAll(String searchTerms, List categories) { 
+		// Get products that match the search terms by name and category
+		def matchCategories = getExplodedCategories(categories);
+		def products = Product.createCriteria().list() {
+			if (searchTerms) {
+				and {
+					ilike("name", "%" + searchTerms + "%")
+					'in'("category", matchCategories)
+					
+				}
+			}
+		}
+	}
 		
+	/**
+	 * Get products by search terms only, matching against product name OR category name.
+	 * @param searchTerms
+	 * @return
+	 */
 	List getProductsBySearchTerms(String searchTerms) { 
+		log.info "get producst by search terms " + searchTerms;
 		
 		// Get products that match the search terms by name and category
 		def products = Product.createCriteria().list() { 
@@ -350,6 +380,7 @@ class InventoryService {
 				}
 			}
 		}
+		/*
 		if (!products) { 
 			// Get products that match a category (e.g. Equipment matches all products 
 			// under Equipment and its subcategories.
@@ -375,6 +406,8 @@ class InventoryService {
 			}
 			products += inventoryItems*.product;
 		}
+		*/
+		log.info products
 		
 		return products;
 	}
@@ -400,7 +433,14 @@ class InventoryService {
 		return matchCategories;
 	}
 	
-	
+
+	/**
+	 * Returns a list of products by category.  
+	 * 	
+	 * @param categories
+	 * @param params
+	 * @return
+	 */
 	List getProductsByCategories(List categories, Map params) { 
 		def products = []
 		
@@ -857,6 +897,7 @@ class InventoryService {
 					manufacturer:manufacturer, 
 					manufacturerCode:manufacturerCode, 
 					unitOfMeasure:unitOfMeasure);
+				
 				if (!product.validate()) {
 					errors.reject("Error saving product " + product?.name)
 					//throw new RuntimeException("Error saving product " + product?.name)

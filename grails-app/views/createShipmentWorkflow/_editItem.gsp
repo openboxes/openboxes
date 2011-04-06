@@ -6,8 +6,6 @@
 
 
 <div id="dlgEditItem" title="Edit an Item" style="padding: 10px; display: none;" >
-	
-
 	<g:if test="${addItemToContainerId}">
 		<%-- 
 		<g:hiddenField name="container.id" value="${addItemToContainerId}"/>
@@ -26,5 +24,29 @@
 		</g:form>														
 	</g:if>
 </div>		
+		     
+<script>
+	$(document).ready(function() {
+
+		$(".show-item-form").click(function(event) {
+			$("#itemSearchForm").hide();
+			$("#itemFoundForm").hide();
+			$("#itemEntryForm").show();
+			event.preventDefault();
+		});
+
+		$(".show-search-form").click(function(event) {
+			$("#itemSearchForm").show();
+			$("#itemFoundForm").hide();
+			$("#itemEntryForm").hide();
+			$("[name='searchable.name']").val('');
+			$("#searchable-suggest").focus();
+			event.preventDefault();
+		});
+		
+		$("#searchable-suggest").focus();
+	});
+</script>			
+		     
 		     
 

@@ -18,6 +18,7 @@ class Shipment implements Comparable, Serializable {
 	String shipmentNumber			// an auto-generated shipment number
 	Date expectedShippingDate		// the date the origin expects to ship the goods (required)
 	Date expectedDeliveryDate		// the date the destination should expect to receive the goods (optional)
+	Float statedValue
 	Float totalValue				// the total value of all items in the shipment		
 	String additionalInformation	// any additional information about the shipment (e.g., comments)
 
@@ -111,6 +112,7 @@ class Shipment implements Comparable, Serializable {
 		carrier(nullable:true)
 		recipient(nullable:true)
 		donor(nullable:true)
+		statedValue(nullable:true)
 		totalValue(nullable:true)
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)
@@ -185,6 +187,19 @@ class Shipment implements Comparable, Serializable {
 	
 	Boolean wasReceived() { 
 		return events.any { it.eventType?.eventCode == EventCode.RECEIVED }
+	}
+	
+	ReferenceNumber getReferenceNumber(String typeName) { 
+		def referenceNumberType = ReferenceNumberType.findByName(typeName);
+		if (referenceNumberType) { 
+			for(referenceNumber in referenceNumbers) { 
+				if (referenceNumber.referenceNumberType == referenceNumberType) { 
+					return referenceNumber;
+				}
+			}
+		}
+		return null;
+		
 	}
 	
 	Date getActualShippingDate() { 

@@ -9,7 +9,7 @@
         <title><g:message code="default.browse.label" args="[entityName]" /></title>    
         
 		<style>
-			.data-table td, .data-table th { height: 3em; vertical-align: middle; }
+			.data-table td, .data-table th { vertical-align: middle; }
 		</style>        
     </head>    
     <body>
@@ -34,7 +34,7 @@
         	<g:set var="varStatus" value="${0 }"/>	            			
          	<table style="height: 400px; ">
 				<tr>
-					<td style="border-right: 0px solid lightgrey; width: 200px; border-right: 1px solid lightgrey;">
+					<td style="border-right: 0px solid lightgrey; width: 200px; border-right: 1px solid lightgrey; background-color: #f5f5f5;">
 						<div style="padding: 10px;">
 							<h3>Filter products</h3>
 							<g:render template="/common/searchInventory" model="[productInstanceList: commandInstance?.productList, categoryFilters: commandInstance?.categoryFilters, rootCategory: commandInstance?.rootCategory]"/>					
@@ -64,7 +64,12 @@
 								<g:set var="productMap" value="${commandInstance?.productList.groupBy {it.category} }"/>
 								<g:each var="entry" in="${productMap}" status="i">	
 									<g:set var="totalQuantity" value="${0 }"/>
-									<h3 style="background-color: #525D76; color: white; padding: 10px;">${entry.key }</h3>
+									<h3 style="background-color: #525D76; color: white; padding: 10px;">
+										<g:if test="${entry?.key?.parentCategory }">
+											${entry?.key?.parentCategory?.name } &rsaquo; 
+										</g:if>
+										${entry?.key?.name?:"Uncategorized" }
+									</h3>
 									<div class="list">
 				            			<table class="data-table">         		
 				            			<%-- 
@@ -88,38 +93,44 @@
 																
 														</td>
 														<td>
-															<span class="fade">${productInstance?.category?.name }</span>
+															<span class="fade">
+																${productInstance?.category?.name?:"Uncategorized" }
+															</span>
 														</td>
 														<td style="text-align: center;">
 															<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">
-																${quantity}
+																${quantity?:0}
 															</g:link>
 														</td>
 													</tr>
 												</g:each>
 											</tbody>
-											<tfoot>										
+											<thead>										
 												<tr class="${varStatus%2==0?'odd':'even' } prop">
 													<th style="text-align: left;">
 														Total items
 													</th>
-													<th></th>
-													<th style="text-align: center">
+													<th style="width:20%;">
+														${entry?.key?:"Uncategorized" }
+													</th>
+													<th style="text-align: center; width: 10%">
 														${totalQuantity }
 													</th>
 												</tr>
-											</tfoot>										
+											</thead>										
 										</table>	
 									</div>
 								</g:each>										
 							</div>									
 						</g:if>
 						<g:else>
-							<g:if test="${params.searchTerms || categoryFilters }">
-								<span>
-									Your search did not return any items.  Please try again.
-								</span>
-							</g:if>
+							<div class="center middle">
+								<g:if test="${params.searchTerms || categoryFilters }">
+									<span>
+										Your search did not return any items.  Please try again.
+									</span>
+								</g:if>
+							</div>
 						</g:else>		    
 													
 	         		</td>

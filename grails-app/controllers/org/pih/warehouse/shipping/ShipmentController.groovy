@@ -707,8 +707,41 @@ class ShipmentController {
 	def addDocument = { 
 		log.info params
 		def shipmentInstance = Shipment.get(params.id);
-		render(view: "addDocument", model: [shipmentInstance : shipmentInstance, document : new Document()]);
+		def documentInstance = Document.get(params?.document?.id);
+		if (!documentInstance) { 
+			documentInstance = new Document();
+		}
+		if (!shipmentInstance) { 
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+			redirect(action: "listShipping")
+		}
+		render(view: "addDocument", model: [shipmentInstance : shipmentInstance, documentInstance : documentInstance]);
 	}
+	
+	def editDocument = {
+		def shipmentInstance = Shipment.get(params?.shipmentId);
+		def documentInstance = Document.get(params?.documentId);
+		if (!shipmentInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.shipmentId])}"
+			redirect(action: "listShipping")
+		}
+		if (!documentInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Document'), params.documentId])}"
+			redirect(action: "showDetails", id: shipmentInstance?.id)
+		}
+		render(view: "addDocument", model: [shipmentInstance : shipmentInstance, documentInstance : documentInstance]);
+	}
+
+	/*
+	def saveDocument = { 
+		
+		log.info params 
+	
+		render(view: )	
+	}
+	*/
+	
+	
 	
 	def addComment = {
 		log.debug params;
@@ -997,6 +1030,7 @@ class ShipmentController {
 		}
 		return person;
 	}
+	
 }
 
 

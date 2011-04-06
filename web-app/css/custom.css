@@ -13,6 +13,17 @@ button {
 	margin: 1px;
 }
 
+table { 
+	border-collapse:collapse;
+}
+tr, th, td { 
+	border: 0px;
+}
+tfoot { 
+	border: 0px;
+}
+thead th { 
+}
 
 /* Product Details box */
 #product-details-box { width: 260px;}
@@ -97,8 +108,7 @@ body {
 }
 
 a:hover { 
-	text-decoration: none;
-
+	/*font-weight: bold;*/
 }
 .fade { 
 	color: #aaa;	
@@ -507,8 +517,8 @@ div#dashboard li {
 .active	{ background-color: #6699CC; color: white;} 
 .inactive { background-color: #EEE; } 
 */
-label { display: inline; text-decoration: none; }
-label.block { display: block; } 
+label { display: inline; text-decoration: none;}
+label.block { display: block;} 
 fieldset .prop { margin: 10px; }
 .radio { padding-left: 10px; } 
 #progressbar {  padding: 10px; margin: 10px; } 
@@ -518,8 +528,19 @@ span.right { float: left; }
 span.left { width: 10%;  float: left; text-align: center; } 
 #wizard { }
 
+.actions { cursor: pointer; } 
+.action-menu { cursor: pointer; } 
+.action-menu { padding: 0; }
+.action-menu-root { margin: 10px; } 
+.filter-list-item { margin: 10px; } 
+.document-list-item { margin: 1px; }
+.action-menu-item { margin: 0px; padding: 3px; }
+.action-menu-item a:hover { text-decoration: underline; }
+
 .selected { 
 	font-weight: bold; 
+	background-color: lightgrey; 
+	color: white;
 }
 
 .tabSelected { 

@@ -16,16 +16,12 @@
 				<div class="errors"><g:renderErrors bean="${shipmentInstance}" as="list" /></div>
 			</g:hasErrors> 
 			
-			<g:render template="flowHeader" model="['currentState':'Tracking']"/>
 			
 			<g:form action="createShipment" method="post">
 				<g:hiddenField name="id" value="${shipmentInstance?.id}"/>
 				<fieldset>
-					<legend>Step 2&nbsp;Enter tracking details</legend>				
-						
 					<g:render template="../shipment/summary" />	
-					
-								
+					<g:render template="flowHeader" model="['currentState':'Tracking']"/>
 					
 					<div class="dialog">
 						<table>
@@ -80,6 +76,18 @@
 									</tr>
 								</g:each>
 												
+								<g:if test="${!shipmentWorkflow?.isExcluded('statedValue')}">									
+									<tr class="prop">
+										<td valign="top" class="name"><label><g:message
+											code="shipment.statedValue.label" default="Stated value" /></label></td>
+										<td valign="top"
+											class=" ${hasErrors(bean: shipmentInstance, field: 'statedValue', 'errors')}"
+											nowrap="nowrap">
+												<g:textField name="statedValue" value="${formatNumber(format: '##,##0.00', number: shipmentInstance.statedValue)}" size="10"/> 
+												<span class="fade">The monetary value (USD) to be stated on the Certificate of Donation.  Leave blank if none.</span>
+										</td>
+									</tr>	
+								</g:if>			
 								<g:if test="${!shipmentWorkflow?.isExcluded('totalValue')}">									
 									<tr class="prop">
 										<td valign="top" class="name"><label><g:message
@@ -88,7 +96,7 @@
 											class=" ${hasErrors(bean: shipmentInstance, field: 'totalValue', 'errors')}"
 											nowrap="nowrap">
 												<g:textField name="totalValue" value="${formatNumber(format: '##,##0.00', number: shipmentInstance.totalValue)}" size="10"/> 
-												<span class="fade">USD</span>
+												<span class="fade">Actual monetary value (USD)</span>
 										</td>
 									</tr>	
 								</g:if>			
@@ -104,14 +112,14 @@
 		                    </tbody>
 	               		</table>
 					</div>
-					<div class="buttons">
+					<div class="">
 						<table>
 							<tr>
 								<td width="100%" style="text-align: right;">
-									<g:submitButton name="back" value="Back"></g:submitButton> 
-									<g:submitButton name="next" value="Next"></g:submitButton> 
-									<g:submitButton name="save" value="Save and Exit"></g:submitButton>
-									<g:submitButton name="cancel" value="Cancel"></g:submitButton>							
+									<button name="_eventId_back">&lsaquo; Back</button>	
+									<button name="_eventId_next">Next &rsaquo;</button> 
+									<button name="_eventId_save">Save & Exit</button>
+									<button name="_eventId_cancel">Cancel</button>						
 								</td>
 							</tr>
 						</table>

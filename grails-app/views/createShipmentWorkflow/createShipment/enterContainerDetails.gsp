@@ -15,13 +15,10 @@
 					<g:renderErrors bean="${containerInstance}" as="list" />
 				</div>				
 			</g:hasErrors>          
-	
-			<g:render template="flowHeader" model="['currentState':'Pack']"/>		
-			 		
-	
 			<fieldset>
-				<legend>Step 3&nbsp;Add shipment items</legend>	
+
 				<g:render template="../shipment/summary" />	
+				<g:render template="flowHeader" model="['currentState':'Pack']"/>		
 		 		
 		 		<!-- figure out what dialog box, if any, we need to render -->
 		 		<g:if test="${containerToEdit || containerTypeToAdd}">
@@ -33,164 +30,286 @@
 		 		<g:if test="${itemToEdit || addItemToContainerId}">
 		 			<g:render template="editItem" model="['item':itemToEdit, 'addItemToContainerId':addItemToContainerId]"/>
 		 		</g:if>
-			 		
-				<div class="list" style="text-align: center;">
-					<g:set var="count" value="${0 }"/>	
-					<table style="border: 0px solid #CCC;display: inline;" border="0">
-						<thead>	
-							<tr class="${count++%2==0?'odd':'even' }">
-								<th>Item</th>
-								<th>Qty</th>
-								<th>Lot/Serial No</th>
-								<th>Recipient</th>
-								<th colspan="2">Actions</th>
-							</tr>
-						</thead>
-						<tbody>
-							<g:if test="${!shipmentInstance?.containers }">
-								<tr class="odd" style="height: 50px; text-align: center; vertical-align: middle;">
-									<td colspan="6">
-										This shipment contains no items.
-									</td>
-								</tr>
-							</g:if>
-							<g:each var="containerInstance" in="${shipmentInstance?.containers?.findAll({!it.parentContainer})?.sort()}">
-							
-								<tr class="${count++%2==0?'odd':'even' }" style="border: 1px solid lightgrey;">
-									<td style="vertical-align: middle;">
-										<img src="${createLinkTo(dir:'images/icons/shipmentType',file:containerInstance.containerType.name.toLowerCase() + '.jpg')}" style="vertical-align: middle"/>
-										<g:link action="createShipment" event="editContainer" params="[containerToEditId:containerInstance?.id]">
-											&nbsp;<span class="large">${containerInstance?.name}</span>
-										</g:link>
-									</td>
-									<td></td>
-									<td></td>
-									<td></td>
-									<td nowrap="nowrap">
-										<g:link action="createShipment" event="addItemToContainer" params="['container.id':containerInstance.id]">
-											<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add an item" style="vertical-align: middle"/>
-										</g:link> 													
-									</td>
-									<td nowrap="nowrap">
-										<g:link action="createShipment" event="addBoxToContainer" params="['container.id':containerInstance.id]">
-											<img src="${createLinkTo(dir:'images/icons/silk',file:'package_add.png')}" alt="Add a box" style="vertical-align: middle"/>
-										</g:link>
-									</td>
-								</tr>
-								
-								<g:each var="itemInstance" in="${shipmentInstance?.shipmentItems?.findAll({it.container?.id == containerInstance?.id})?.sort()}">		
-									<tr class="${count++%2==0?'odd':'even' }">
-										<td>
-											<span style="padding-left: 32px;">
-												<g:link action="createShipment" event="editItem" params="[itemToEditId:itemInstance?.id]">
-													<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="Item" style="vertical-align: middle"/>
-													&nbsp;${itemInstance?.product?.name } 	
-												</g:link>
-											</span>
-										</td>
-										<td style="text-align:center;">
-											${itemInstance?.quantity}
-										</td>
-										<td style="text-align:center;">
-											${itemInstance?.lotNumber}
-										</td>
-										<td style="text-align:left;">
-											${itemInstance?.recipient?.name}
-										</td>
-										<td style="text-align: left;">		
-											<g:link action="createShipment" event="deleteItem" params="['item.id':itemInstance?.id]" onclick="return confirm('Are you sure you want to delete this item?')">	
-											<img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="remove item" style="vertical-align: middle"/>
-											</g:link>	
-										</td>
-										<td>
+			 	
+			 	<style>
+			 		.draggable { cursor: move; } 
+			 		.droppable { padding: 10px; border: 1px dashed lightgrey; } 
+			 		.ui-state-highlight { font-weight: bold; color: black; }  
+			 		.strikethrough { color: lightgrey; } 
+			 	</style>
+				<script>
+
+					function moveItemToContainer(item, container) { 
+						$.post('/warehouse/json/moveItemToContainer', 
+				                {item: item, container: container}, 
+				                function(data) {
+									// do nothing
+									console(data)
+		                    		//var item = $("<li>");
+		                    		//var link = $("<a>").attr("href", "/warehouse/person/show/" + data.id).html(data.firstName + " " + data.lastName);
+		                    		//item.append(link);
+		                    		//$('#messages').append("new message");
+		                		}, 'json');
+					}
+
+					function showMenu() {
+						$(this).children(".action-menu-items").show();
+					}
+					
+					function hideMenu() { 
+						$(this).children(".action-menu-items").hide();
+					}
+				
+				
+					$(document).ready(function() { 
+						//$( ".draggable" ).draggable();
+						//$('.selectable').selectable();
+						$('.draggable').draggable(
+							{
+								revert		: true,
+								zIndex		: 2700,
+								autoSize	: true,
+								ghosting	: true,
+								onStop		: function()
+								{
+									$('.droppable').each(
+										function()
+										{
+											this.expanded = false;
+										}
+									);
+								}
+							}
+						);
+			
+						$('.droppable').droppable(
+								{
+									accept: '.draggable',
+									tolerance: 'intersect',
+									//greedy: true,
+									over: function(event, ui) { 
+										$( this ).addClass( "ui-state-highlight" );
+									},
+									out: function(event, ui) { 
+										$( this ).removeClass( "ui-state-highlight" );
+									},
+									drop: function( event, ui ) {
+										console.log(this);
+										//ui.draggable.hide();
+										ui.draggable.addClass( "strikethrough" );
+										$( this ).removeClass( "ui-state-highlight" );
+										var itemId = ui.draggable.attr("id");
+										var moveTo = $(this).attr("id");
+										//var url = "/warehouse/category/moveItem?child=" + child + "&newParent=" + parent;
+										//window.location.replace(url);
+										//moveItemToContainer(itemId, moveTo);
+										//$("#shipmentItemRow-" + itemId).hide();
 										
-										</td>
-									</tr>
-								</g:each>
-	
-								<g:each  var="boxInstance" in="${containerInstance?.containers?.sort()}">
-									<tr class="${count++%2==0?'odd':'even' }">
-										<td>
-											<span style="padding-left: 32px;">
-											<g:link action="createShipment" event="editBox" params="[boxToEditId:boxInstance?.id]">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" alt="Package" style="vertical-align: middle"/>
-												&nbsp;${boxInstance?.name}
-											</g:link>
-											</span>
-										</td>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td style="text-align: left;" nowrap="nowrap">
-											<g:link action="createShipment" event="addItemToContainer" params="['container.id':boxInstance.id]">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add an item" style="vertical-align: middle"/>
-											</g:link> 		
-										</td>
-										<td nowrap="nowrap">
-											<g:link action="createShipment" event="deleteBox" params="['box.id':boxInstance?.id]" onclick="return confirm('Are you sure you want to delete this box?')">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'package_delete.png')}" alt="Add an item" style="vertical-align: middle"/>
-											</g:link>				
-										</td>
-									</tr>
-									
-									<g:each var="itemInstance" in="${shipmentInstance?.shipmentItems?.findAll({it.container?.id == boxInstance?.id})?.sort()}">	
+									}
+								}
+							);
+
+						
+						$(".action-menu").hoverIntent({
+							sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
+							interval: 5,   // number = milliseconds for onMouseOver polling interval
+							over: showMenu,     // function = onMouseOver callback (required)
+							timeout: 10,   // number = milliseconds delay before onMouseOut
+							out: hideMenu       // function = onMouseOut callback (required)
+						});
+						
+						$( ".action-menu-items" ).position({ my: "center top", at: "center top" });															  
+					});
+				</script> 				
+				
+				
+				
+			 	<table style="border: 0px;" border="0">
+			 		<tr>
+			 			<td valign="top" style="width: 25%; border-right: 0px solid lightgrey;">
+							<div style="background-color: #525d76; color: white; padding: 10px;">Choose a Pallet</div>
+							<%--
+							<img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}">&nbsp;<b>Packages</b>
+							 --%>
+							 <div style="background-color: lightgrey; text-align: left; border-bottom: 1px solid black;">
+								<span id="action-menu-1" class="action-menu">
+									<span id="action-menu-root-1" class="action-menu-root">Actions<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/></span>
+									<div id="action-menu-items-1" class="action-menu-items" style="position: absolute; z-index: 1; background-color: #f5f5f5; border: 1px solid lightgrey; padding: 10px; display: none;">
+										<g:render template="shipmentMenuItems"/>
+									</div>
+								</span>										
+							</div>
+							<div class="list" style="text-align: left; border: 1px solid lightgrey;">
+								<g:set var="count" value="${0 }"/>	
+								<div style="height: 350px; overflow: auto; ">
+									<table style="border: 0px solid #CCC;" border="0">									
+										<tbody>
+											<g:if test="${!shipmentInstance?.containers }">
+												<tr class="">
+													<td colspan="1"  style="height: 300px; text-align: center; vertical-align: middle;">
+														<span class="fade">empty</span>
+													</td>
+												</tr>
+											</g:if>
+											<g:else>
+												
+												<tr class="" style="border: 0px solid lightgrey;">
+													<g:set var="styleClass" value="${selectedContainer == null ? 'selected' : '' }"/>
+													<td class="droppable ${styleClass}">
+														<div>
+															<g:if test="${selectedContainer == null  }">
+																<span>Unpacked items</span>
+															</g:if>
+															<g:else>
+																<g:link action="createShipment" event="enterContainerDetails">
+																	<span>Unpacked items</span>
+																</g:link>
+															</g:else>
+														</div>
+													</td>
+												</tr>
+												
+												<g:each var="containerInstance" in="${shipmentInstance?.containers?.findAll({!it.parentContainer})?.sort()}">
+													<g:set var="styleClass" value="${containerInstance?.id == selectedContainer?.id ? 'selected' : '' }"/>
+													
+													<tr class="${count++%2==0?'':'' }" style="border: 0px solid lightgrey;" >
+														<td style="vertical-align: middle;" id="${containerInstance?.id }" class="droppable ${styleClass }">													
+															<a name="container-${containerInstance.id }"></a>
+															<div>
+																<g:if test="${containerInstance?.id == selectedContainer?.id }">
+																	<span>${containerInstance?.name}</span>
+																	<g:if test="${containerInstance?.description }">
+																		- ${containerInstance?.description}
+																	</g:if>
+																</g:if>
+																<g:else>
+																	<g:link action="createShipment" event="enterContainerDetails" params="['containerId':containerInstance?.id]" fragment="container-${containerInstance?.id }">
+																		<span>${containerInstance?.name}</span>
+																		<g:if test="${containerInstance?.description }">
+																			- ${containerInstance?.description}
+																		</g:if>
+																	</g:link>
+																</g:else>
+															</div>
+														</td>
+													</tr>
+													
+													<g:each var="childContainerInstance" in="${shipmentInstance?.containers?.findAll { it.parentContainer == containerInstance}?.sort() }">
+														<g:set var="styleClass" value="${childContainerInstance?.id == selectedContainer?.id ? 'selected' : '' }"/>
+														<tr class="${count++%2==0?'':'' } droppable ${styleClass }" style="border: 0px solid lightgrey;">
+															<td>
+																<div style="margin-left: 25px;">
+																	<a name="container-${childContainerInstance.id }"></a>
+																	<g:link action="createShipment" event="enterContainerDetails" params="['containerId':childContainerInstance?.id]" fragment="container-${childContainerInstance?.id }">
+																		<span>${childContainerInstance?.name }</span>
+																	</g:link>
+																</div>
+															</td>
+														</tr>
+													</g:each>
+												</g:each>
+											</g:else>
+										</tbody>
+									</table>
+								</div>
+							</div>			 			
+			 			</td>
+			 			<td valign="top">
+			 				<div style="background-color: #525d76; color: white; padding: 10px">
+								<g:if test="${selectedContainer}">								
+									<g:if test="${selectedContainer.parentContainer }">
+										${selectedContainer?.parentContainer?.name } &rsaquo;
+									</g:if>								
+				 					<span>${selectedContainer?.name } </span>				 					
+				 					<g:if test="${selectedContainer?.description }">
+										<span class="fade">- ${selectedContainer?.description}</span>
+									</g:if>
+					 				<g:if test="${selectedContainer.weight }">
+						 				<span class="fade">-
+						 					${selectedContainer.weight } lbs. 
+						 				</span> 
+					 				</g:if>
+								</g:if>			 			
+								<g:else>
+									Unpacked items			 						
+								</g:else>
+							</div>
+							<div style="background-color: lightgrey; text-align: left; border-bottom: 1px solid black;">
+								<span class="action-menu">
+									<span class="action-menu-root">Actions<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/></span>
+									<div class="action-menu-items" style="position: absolute; z-index: 1; background-color: #f5f5f5; border: 1px solid lightgrey; padding: 10px; display: none;">
+										<g:render template="containerMenuItems"/>
+									</div>
+								</span>								
+							</div>
+							<div class="list" style="text-align: center;">
+								<g:set var="count" value="${0 }"/>	
+								<table border="0" style="border: 1px solid lightgrey"  width="100%">
+									<thead>	
 										<tr class="${count++%2==0?'odd':'even' }">
-											<td>
-												<span style="padding-left: 64px;">
-													<g:link action="createShipment" event="editItem" params="[itemToEditId:itemInstance?.id]">
-														<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="Item" style="vertical-align: middle"/>
-														&nbsp;${itemInstance?.product?.name }
-													</g:link>																	
-												</span>
-											</td>
-											<td style="text-align:center;">
-												${itemInstance?.quantity}
-											</td>
-											<td style="text-align:center;">
-												${itemInstance?.lotNumber}
-											</td>
-											<td style="text-align:left;">
-												${itemInstance?.recipient?.name}
-											</td>
-											<td style="text-align: left;" nowrap="true">		
-												<g:link action="createShipment" event="deleteItem" params="['item.id':itemInstance?.id]" onclick="return confirm('Are you sure you want to delete this item?')">
-													<img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="remove item" style="vertical-align: middle"/>
-												</g:link>	
-											</td>
-											<td>
-											
-											</td>
+											<th>Item</th>
+											<th>Actions</th>
+											<th>Qty</th>
+											<th>Lot/Serial No</th>
+											<th>Recipient</th>
 										</tr>
-									</g:each>												
-								</g:each>
-							</g:each>
-						</tbody>
-						<tfoot>
-							<tr>
-								<td colspan="6" style="text-align: center; border: 1px dotted lightgrey">
-									<g:each var="containerType" in="${shipmentWorkflow?.containerTypes}">
-										<span>
-											<g:link action="createShipment" event="addContainer" params="[containerTypeToAddName:containerType.name]">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'package_add.png')}" style="vertical-align: middle"/>
-												&nbsp;Add a ${containerType.name}
-											</g:link>
-										</span>
-										&nbsp;
-									</g:each>
-								</td>
-							</tr>
-						</tfoot>						
-					</table>
-				</div>		
-				<div class="buttons">
+									</thead>
+									<tbody>
+										<g:set var="shipmentItems" value="${shipmentInstance?.shipmentItems?.findAll({it.container?.id == selectedContainer?.id})}"/>
+										<g:if test="${shipmentItems }">
+											<g:each var="itemInstance" in="${shipmentItems?.sort()}">		
+												<tr id="shipmentItemRow-${itemInstance?.id }" class="${count++%2==0?'odd':'even' }">
+													<td>
+														<div>
+															<span id="${itemInstance?.id }" class="draggable">
+																<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="Item" style="vertical-align: middle"/>
+																${itemInstance?.product?.name } 
+															</span>
+																
+														</div>
+													</td>
+													<td style="text-align: left;">		
+														<span class="action-menu">
+															<span class="action-menu-root">Actions<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/></span>
+															<div class="action-menu-items" style="position: absolute; z-index: 1; background-color: #f5f5f5; border: 1px solid lightgrey; padding: 10px; display: none;">
+																<g:render template="itemMenuItems" model="[itemInstance:itemInstance]"/>
+															</div>
+														</span>								
+													</td>
+													<td style="text-align:center;">
+														${itemInstance?.quantity}
+													</td>
+													<td style="text-align:center;">
+														${itemInstance?.lotNumber}
+													</td>
+													<td style="text-align:left;">
+														${itemInstance?.recipient?.name}
+													</td>
+												</tr>
+											</g:each>
+										</g:if>
+										<g:else>
+											<tr>
+												<td colspan="5" style="text-align: center;">
+													<span class="fade">empty</span>
+												</td>
+											</tr>
+										</g:else>
+									</tbody>
+								</table>								
+							</div>			 			
+			 			</td>
+			 		</tr>
+			 	</table>
+				<div class="">
 					<g:form action="createShipment" method="post" >
 						<table>
 							<tr>
 								<td width="100%" style="text-align: right;">
-									<g:submitButton name="back" value="Back"></g:submitButton>	
-									<g:submitButton name="next" value="Next"></g:submitButton> 
-									<g:submitButton name="save" value="Save and Exit"></g:submitButton>
-									<g:submitButton name="cancel" value="Cancel"></g:submitButton>						
+									<button type="submit" name="_eventId_back">&lsaquo; Back</button>	
+									<button type="submit" name="_eventId_next">Next &rsaquo;</button> 
+									<button type="submit" name="_eventId_save">Save & Exit</button>
+									<button type="submit" name="_eventId_cancel">Cancel</button>						
 								</td>
 							</tr>
 						</table>

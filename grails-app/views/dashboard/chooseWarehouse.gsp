@@ -13,8 +13,6 @@
 			</g:if>		
 
 	    	<div id="chooseWarehouse" class="dialog">			
-	    	
-	    		<h2>Choose your warehouse:</h2>	
 					<table>
 						<tbody>							
 							<tr>
@@ -34,17 +32,16 @@
 									<td nowrap="nowrap">
 										<div style="border: 0px solid #F5F5F5; padding: 0px; display: block;">												
 											<g:if test="${warehouse.local}">
-												<a style="display: block;" class="home" href='${createLink(action:"chooseWarehouse", id: warehouse.id)}'>
 													<g:if test="${warehouse.logo}">	
-														<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'warehouse', action:'viewLogo', id: warehouse.id)}" />															
+														<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'warehouse', action:'viewLogo', id: warehouse.id)}" />
 														<%--<img src="${warehouse.logo}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img>--%>
 													</g:if>
 													<g:else>
 														<img src="${createLinkTo(dir:'images',file:'icons/building.png')}" style="vertical-align: middle"/>
 													</g:else>
-													&nbsp;
-													${warehouse.name} 
-												</a> 
+													<a class="home" href='${createLink(action:"chooseWarehouse", id: warehouse.id)}'>
+														${warehouse.name} 
+													</a> 
 											</g:if>
 											<g:else>
 												<g:if test="${warehouse.logo}">	

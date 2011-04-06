@@ -482,6 +482,20 @@ class JsonController {
 		render prepareDialogForm(personInstance) as JSON
 	}
 
+	def moveItemToContainer = { 
+		log.info params
+		
+		def itemInstance = ShipmentItem.get(params.item);
+		def containerInstance = Container.get(params.container);
+		
+		if (itemInstance && containerInstance) { 
+			log.info "move item " + itemInstance + " from " + itemInstance?.container + " to " + containerInstance
+			itemInstance.container = containerInstance;
+			itemInstance.save();
+		}		
+		render itemInstance as JSON
+	}
+	
 	
 	def saveBox = {
 		log.info("save box " + params)

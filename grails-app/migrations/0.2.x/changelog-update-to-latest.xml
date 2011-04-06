@@ -2788,6 +2788,7 @@
 	</changeSet>
 	
     <changeSet author="jmiranda (generated)" id="1300310727276-1">
+    	<validCheckSum>b680c2278a5db3230f6c91844ca77</validCheckSum>
         <preConditions onFail="MARK_RAN">
 			<not><columnExists tableName="product" columnName="manufacturer"/></not>
 		</preConditions>    
@@ -2796,6 +2797,7 @@
         </addColumn>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1300310727276-2">
+    	<validCheckSum>78be59fd6c6385d7e9742a6d74d8799</validCheckSum>
         <preConditions onFail="MARK_RAN">
 			<not><columnExists tableName="product" columnName="manufacturer_code"/></not>
 		</preConditions>    
@@ -2949,6 +2951,15 @@
 	    	baseTableName="local_transfer" baseColumnNames="destination_transaction_id" referencedTableName="transaction" referencedColumnNames="id" />
     </changeSet>
       
+	<changeSet author="jmiranda (generated)" id="1301410966941-1">
+       <preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="shipment" columnName="stated_value"/></not>
+		</preConditions>
+		<addColumn tableName="shipment">
+			<column name="stated_value" type="FLOAT(12,0)"/>
+		</addColumn>
+	</changeSet>
+
 </databaseChangeLog>
 
 

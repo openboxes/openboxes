@@ -5,7 +5,7 @@
 					<tbody>
 						<tr>
 							<td style="text-align: center">
-								<g:autoSuggestSearchable name="searchable" jsonUrl="/warehouse/json/searchInventoryItems" />
+								<g:autoSuggestSearchable id="searchable" name="searchable" jsonUrl="/warehouse/json/searchInventoryItems" />
 								&nbsp;
 							</td>
 						</tr>
@@ -19,8 +19,6 @@
 								<button class="show-item-form">
 								<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" style="vertical-align: middle"/>
 								&nbsp; Add an item not currently in inventory</button>
-							
-													
 							</td>
 						</tr>
 					</tbody>
@@ -62,24 +60,5 @@
 			<button class="show-search-form">&lsaquo; Return to search</button>
 		</div>
 		
-		<script>
-			$(document).ready(function() {
-				$(".show-item-form").click(function(event) {
-					$("#itemSearchForm").hide();
-					$("#itemFoundForm").hide();
-					$("#itemEntryForm").show();
-					event.preventDefault();
-				});
-
-				$(".show-search-form").click(function(event) {
-					$("#itemSearchForm").show();
-					$("#itemFoundForm").hide();
-					$("#itemEntryForm").hide();
-					$("[name='searchable.name']").val('');
-					event.preventDefault();
-				});
-				
-			});
-		</script>			
 	</td>
 </tr>
