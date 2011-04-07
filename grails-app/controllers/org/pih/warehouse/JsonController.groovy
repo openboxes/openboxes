@@ -30,7 +30,7 @@ class JsonController {
 			
 			if (items) {
 				items = items.collect() {
-					def quantity = inventoryService.getQuantity(it.lotNumber, warehouse?.inventory) 
+					def quantity = inventoryService.getQuantityForInventoryItem(it, warehouse?.inventory) 
 					[
 						value: it.lotNumber,
 						label:  it.product.name + ", " + it.lotNumber + "  [Qty: " + quantity + "]",

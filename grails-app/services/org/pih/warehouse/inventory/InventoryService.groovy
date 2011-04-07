@@ -289,6 +289,14 @@ class InventoryService
 	}
 		
 	/**
+	 * Gets the quantity of a specific inventory item at a specific inventory
+	 */
+	Integer getQuantityForInventoryItem(InventoryItem item, Inventory inventory) {
+		def transactionEntries = getTransactionEntriesByInventoryItemAndInventory(item, inventory)
+		return getQuantityByInventoryItemMap(transactionEntries)[item]
+	}
+	
+	/**
 	 * Fetches and populates a StockCard Command object
 	 */
 	StockCardCommand getStockCardCommand(StockCardCommand cmd, Map params) {
@@ -737,6 +745,19 @@ class InventoryService
 	   }
    }
 	
+   /**
+    * Gets all transaction entries for a inventory item within an inventory
+    */
+   List getTransactionEntriesByInventoryItemAndInventory(InventoryItem item, Inventory inventoryInstance) {
+	   return TransactionEntry.createCriteria().list() {
+		   and {
+			   eq("inventoryItem", item)
+			    transaction {
+				   eq("inventory", inventoryInstance)
+			   	}
+		   }
+	   }
+   }
 		
 	List getInventoryItemList(Long id) { 
 		def list = []
