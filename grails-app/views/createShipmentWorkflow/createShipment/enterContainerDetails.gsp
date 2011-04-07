@@ -30,6 +30,9 @@
 		 		<g:if test="${itemToEdit || addItemToContainerId}">
 		 			<g:render template="editItem" model="['item':itemToEdit, 'addItemToContainerId':addItemToContainerId]"/>
 		 		</g:if>
+		 		<g:if test="${itemToMove }">
+		 			<g:render template="moveItem" model="['item':itemToMove]"/>
+		 		</g:if>
 			 	
 			 	<style>
 			 		.draggable { cursor: move; } 
@@ -37,90 +40,6 @@
 			 		.ui-state-highlight { font-weight: bold; color: black; }  
 			 		.strikethrough { color: lightgrey; } 
 			 	</style>
-				<script>
-
-					function moveItemToContainer(item, container) { 
-						$.post('/warehouse/json/moveItemToContainer', 
-				                {item: item, container: container}, 
-				                function(data) {
-									// do nothing
-									console(data)
-		                    		//var item = $("<li>");
-		                    		//var link = $("<a>").attr("href", "/warehouse/person/show/" + data.id).html(data.firstName + " " + data.lastName);
-		                    		//item.append(link);
-		                    		//$('#messages').append("new message");
-		                		}, 'json');
-					}
-
-					function showMenu() {
-						$(this).children(".action-menu-items").show();
-					}
-					
-					function hideMenu() { 
-						$(this).children(".action-menu-items").hide();
-					}
-				
-				
-					$(document).ready(function() { 
-						//$( ".draggable" ).draggable();
-						//$('.selectable').selectable();
-						$('.draggable').draggable(
-							{
-								revert		: true,
-								zIndex		: 2700,
-								autoSize	: true,
-								ghosting	: true,
-								onStop		: function()
-								{
-									$('.droppable').each(
-										function()
-										{
-											this.expanded = false;
-										}
-									);
-								}
-							}
-						);
-			
-						$('.droppable').droppable(
-								{
-									accept: '.draggable',
-									tolerance: 'intersect',
-									//greedy: true,
-									over: function(event, ui) { 
-										$( this ).addClass( "ui-state-highlight" );
-									},
-									out: function(event, ui) { 
-										$( this ).removeClass( "ui-state-highlight" );
-									},
-									drop: function( event, ui ) {
-										console.log(this);
-										//ui.draggable.hide();
-										ui.draggable.addClass( "strikethrough" );
-										$( this ).removeClass( "ui-state-highlight" );
-										var itemId = ui.draggable.attr("id");
-										var moveTo = $(this).attr("id");
-										//var url = "/warehouse/category/moveItem?child=" + child + "&newParent=" + parent;
-										//window.location.replace(url);
-										//moveItemToContainer(itemId, moveTo);
-										//$("#shipmentItemRow-" + itemId).hide();
-										
-									}
-								}
-							);
-
-						
-						$(".action-menu").hoverIntent({
-							sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
-							interval: 5,   // number = milliseconds for onMouseOver polling interval
-							over: showMenu,     // function = onMouseOver callback (required)
-							timeout: 10,   // number = milliseconds delay before onMouseOut
-							out: hideMenu       // function = onMouseOut callback (required)
-						});
-						
-						$( ".action-menu-items" ).position({ my: "center top", at: "center top" });															  
-					});
-				</script> 				
 				
 				
 				
@@ -131,17 +50,16 @@
 							<%--
 							<img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}">&nbsp;<b>Packages</b>
 							 --%>
-							 <div style="background-color: lightgrey; text-align: left; border-bottom: 1px solid black;">
-								<span id="action-menu-1" class="action-menu">
-									<span id="action-menu-root-1" class="action-menu-root">Actions<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/></span>
-									<div id="action-menu-items-1" class="action-menu-items" style="position: absolute; z-index: 1; background-color: #f5f5f5; border: 1px solid lightgrey; padding: 10px; display: none;">
-										<g:render template="shipmentMenuItems"/>
-									</div>
-								</span>										
+							 <div class="action-menu" style="background-color: lightgrey; text-align: left; border-bottom: 1px solid black; height: 20px;">
+								<span class="action-menu-root" style="vertical-align: middle;" >Actions
+									<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/></span>
+								<div class="action-menu-items" style="position: absolute; z-index: 1; background-color: #f5f5f5; border: 1px solid lightgrey; padding: 10px; display: none;">
+									<g:render template="shipmentMenuItems"/>
+								</div>
 							</div>
 							<div class="list" style="text-align: left; border: 1px solid lightgrey;">
 								<g:set var="count" value="${0 }"/>	
-								<div style="height: 350px; overflow: auto; ">
+								<div style="min-height: 50px; max-height: 330px; overflow: auto; ">
 									<table style="border: 0px solid #CCC;" border="0">									
 										<tbody>
 											<g:if test="${!shipmentInstance?.containers }">
@@ -171,7 +89,6 @@
 												
 												<g:each var="containerInstance" in="${shipmentInstance?.containers?.findAll({!it.parentContainer})?.sort()}">
 													<g:set var="styleClass" value="${containerInstance?.id == selectedContainer?.id ? 'selected' : '' }"/>
-													
 													<tr class="${count++%2==0?'':'' }" style="border: 0px solid lightgrey;" >
 														<td style="vertical-align: middle;" id="${containerInstance?.id }" class="droppable ${styleClass }">													
 															<a name="container-${containerInstance.id }"></a>
@@ -234,13 +151,11 @@
 									Unpacked items			 						
 								</g:else>
 							</div>
-							<div style="background-color: lightgrey; text-align: left; border-bottom: 1px solid black;">
-								<span class="action-menu">
-									<span class="action-menu-root">Actions<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/></span>
-									<div class="action-menu-items" style="position: absolute; z-index: 1; background-color: #f5f5f5; border: 1px solid lightgrey; padding: 10px; display: none;">
-										<g:render template="containerMenuItems"/>
-									</div>
-								</span>								
+							<div class="action-menu" style="background-color: lightgrey; text-align: left; border-bottom: 1px solid black; height: 20px;">
+								<span class="action-menu-root" style="vertical-align: middle;">Actions<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/></span>
+								<div class="action-menu-items" style="position: absolute; z-index: 1; background-color: #f5f5f5; border: 1px solid lightgrey; padding: 10px; display: none;">
+									<g:render template="containerMenuItems"/>
+								</div>
 							</div>
 							<div class="list" style="text-align: center;">
 								<g:set var="count" value="${0 }"/>	
@@ -317,5 +232,91 @@
 				</div>
 			</fieldset>
         </div>
+        
+				<script>
+
+					function moveItemToContainer(item, container) { 
+						$.post('/warehouse/json/moveItemToContainer', 
+				                {item: item, container: container}, 
+				                function(data) {
+									// do nothing
+									console(data)
+		                    		//var item = $("<li>");
+		                    		//var link = $("<a>").attr("href", "/warehouse/person/show/" + data.id).html(data.firstName + " " + data.lastName);
+		                    		//item.append(link);
+		                    		//$('#messages').append("new message");
+		                		}, 'json');
+					}
+
+					function show() {
+						$(this).children(".action-menu-items").show();
+					}
+					
+					function hide() { 
+						$(this).children(".action-menu-items").hide();
+					}
+				
+				
+					$(function(){ 
+						//$( ".draggable" ).draggable();
+						//$('.selectable').selectable();
+						$('.draggable').draggable(
+							{
+								revert		: true,
+								zIndex		: 2700,
+								autoSize	: true,
+								ghosting	: true,
+								onStop		: function()
+								{
+									$('.droppable').each(
+										function()
+										{
+											this.expanded = false;
+										}
+									);
+								}
+							}
+						);
+			
+						$('.droppable').droppable(
+								{
+									accept: '.draggable',
+									tolerance: 'intersect',
+									//greedy: true,
+									over: function(event, ui) { 
+										$( this ).addClass( "ui-state-highlight" );
+									},
+									out: function(event, ui) { 
+										$( this ).removeClass( "ui-state-highlight" );
+									},
+									drop: function( event, ui ) {
+										//ui.draggable.hide();
+										ui.draggable.addClass( "strikethrough" );
+										$( this ).removeClass( "ui-state-highlight" );
+										var itemId = ui.draggable.attr("id");
+										var moveTo = $(this).attr("id");
+										//var url = "/warehouse/category/moveItem?child=" + child + "&newParent=" + parent;
+										//window.location.replace(url);
+										//moveItemToContainer(itemId, moveTo);
+										//$("#shipmentItemRow-" + itemId).hide();
+										
+									}
+								}
+							);
+
+						
+						$(".action-menu").hoverIntent({
+							sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
+							interval: 5,   // number = milliseconds for onMouseOver polling interval
+							over: show,     // function = onMouseOver callback (required)
+							timeout: 100,   // number = milliseconds delay before onMouseOut
+							out: hide       // function = onMouseOut callback (required)
+						});
+						
+						$( ".action-menu-items" ).position({ my: "center top", at: "center top" });															  
+					});
+				</script> 				
+        
+        
     </body>
 </html>

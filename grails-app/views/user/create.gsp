@@ -13,9 +13,6 @@
       
         <div class="body">
         
-        	<div class="nav">
-        		<g:render template="nav"/>
-        	</div>        
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
@@ -79,7 +76,7 @@
                     </table>
                 </div>
                 <div class="buttonBar">
-                    <g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" />
+                    <button name="create" class="positive">${message(code: 'default.button.save.label', default: 'Save')}</button>
                 </div>
                 </fieldset>
             </g:form>

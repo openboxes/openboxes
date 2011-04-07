@@ -186,7 +186,11 @@ class CreateShipmentWorkflowController {
 				flash.itemToEdit = ShipmentItem.get(params.itemToEditId)
 			}.to("enterContainerDetails")
 			
-			
+			on("moveItem") {
+				// set the item we will to edit
+				flash.itemToMove = ShipmentItem.get(params.itemToMoveId)
+			}.to("enterContainerDetails")
+
 			on("saveItem").to("saveItemAction")
 			
 			on("deleteItem"){	
@@ -222,16 +226,14 @@ class CreateShipmentWorkflowController {
 				flash.addItemToContainerId = params.container.id as Integer
 			}.to("saveItemAction")
 			
-			on("moveItemToContainer") { 
-				// move an item to another container
-				log.info params
-			}.to("enterContainerDetails")
+			on("moveItemToContainer").to("moveItemAction")
+			
 			/**
 			on("addAnotherBox") {
 				// this parameter triggers the "Add Box" dialog for the container to be opened on page reload
 				flash.addBoxToContainerId = params.container.id as Integer
 			}.to("saveBoxAction")
-		*/
+			*/
 			
 			// for the top-level links
     		on("enterShipmentDetails").to("enterShipmentDetails")
@@ -337,7 +339,60 @@ class CreateShipmentWorkflowController {
 			on("valid").to("cloneContainerAction")
     		on("invalid").to("enterContainerDetails")
     	}
-    	
+		
+		moveItemAction {
+			action {
+				
+				// move an item to another container
+				log.info "Move item to container " + params
+				
+				def item = ShipmentItem.get(params.item.id);
+				def container = Container.get(params.container.id);
+				
+				if (item && container) {
+					log.info "move item " + item + " from " + item?.container + " to " + container
+					item.container = container;
+					item.save();
+				}
+				
+				/*
+				def item
+				
+				// if we have an item id, we are editing an existing item, so we need to fetch it
+				if (params.item?.id) {
+					item = ShipmentItem.get(params.item?.id)
+				}
+				// otherwise, if we have a container id we are adding a new item to this container
+				else {
+					def container = Container.get(params.container?.id)
+					
+					if (!container) {
+						throw new Exception("Invaild container passed to editItem action. Invalid id ${params.container?.id}.")
+					}
+					item = container.addNewItem()
+				}
+				
+				println("the params to bind = " + params)
+				
+				bindData(item, params, ['product.name','recipient.name'])  // blacklisting names so that we don't change product name or recipient name here!
+				
+				// TODO: make sure that this works properly if there are errors?
+				if(item.hasErrors() || !item.validate()) {
+					invalid()
+				}
+				else {
+					shipmentService.saveShipmentItem(item)
+					valid()
+				}*/
+				valid()
+			}
+			
+			on("valid").to("enterContainerDetails")
+			on("invalid").to("enterContainerDetails")
+		}
+
+		
+		
     	saveItemAction {
     		action {
     			def item

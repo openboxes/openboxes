@@ -77,7 +77,80 @@
 			<div id="transaction-details" style="height: 200px; overflow: auto;">
 			<!-- will be populated by an jquery ajax  -->
 			</div>
-						
 		</div>
+		
+		<script>
+			jQuery(document).ready(function() {
+				jQuery(".toggleDetails").click(function(event) {
+					//event.preventDefault();
+				});
+				/*
+				jQuery(".toggleDetails").mouseover(function(event) {
+					jQuery("#transactionEntries" + this.id).toggle('slow');								
+				});
+				jQuery(".toggleDetails").mouseout(function(event) {
+					jQuery("#transactionEntries" + this.id).toggle('slow');								
+				});
+				*/
+
+				jQuery(".toggleDetails").hoverIntent({
+					over: function(event) {
+						jQuery("#transactionEntries" + this.id).slideDown('fast');													
+					},
+					timeout: 500,
+					out: function(event) {
+						jQuery("#transactionEntries" + this.id).slideUp('fast');								
+					}
+				});	
+
+				// Define dialog
+				jQuery("#transaction-details").dialog({ title: "Transaction Details", 
+					modal: true, autoOpen: false, width: 800, height: 400, position: 'middle' });    //end dialog									    
+
+				// Click event -> open dialog
+				jQuery('.show-details').click(
+			        function(event) {
+				        //$("#example").load("", [], function() { 
+				        //    jQuery("#example").dialog("open");
+				        //});
+				        //return false
+						var link = $(this);
+						var dialog = jQuery('#transaction-details').load(link.attr('href')).dialog("open");										        
+				        event.preventDefault();
+			        }
+			    );	
+
+				// Click event -> open dialog
+				jQuery('#show-filters').click(function(event) {
+					jQuery("#filters").toggle();
+					event.preventDefault();
+				});		
+
+
+				/* Action Menu */
+
+				function show() {
+					jQuery(this).children(".actions").show();
+				}
+				  
+				function hide() { 
+					jQuery(this).children(".actions").hide();
+				}
+					 
+				jQuery(".action-menu").hoverIntent({
+					sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
+					interval: 50,   // number = milliseconds for onMouseOver polling interval
+					over: show,     // function = onMouseOver callback (required)
+					timeout: 100,   // number = milliseconds delay before onMouseOut
+					out: hide       // function = onMouseOut callback (required)
+				});
+
+				
+				
+			});	
+
+
+			
+		</script>		
 	</body>
 </html>

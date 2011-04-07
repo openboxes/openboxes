@@ -3,7 +3,7 @@
 					<td valign="top" class="name"><label><g:message code="shipmentItem.product.label" default="Product" /></label></td>                            
 					<td valign="top" class="value">
 						<g:autoSuggest name="product" jsonUrl="/warehouse/json/findProductByName" 
-							width="200" valueId="${item?.product?.id}" valueName="${item?.product?.name}"/>	
+							width="300" valueId="${item?.product?.id}" valueName="${item?.product?.name}"/>	
 						<g:link controller="product" action="create" target="_blank"><span class="small">Add a New Product</span></g:link>											
 					</td>
 				</tr>

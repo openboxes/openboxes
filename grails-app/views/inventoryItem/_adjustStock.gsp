@@ -5,11 +5,10 @@
 		$("#dlgAdjustStock-${itemInstance?.id}").dialog({ autoOpen: false, modal: true, width: '500px' });				
 	});
 </script>	
-
-<button id="btnAdjustStock-${itemInstance?.id}" class="action-btn">
-	<img src="${resource(dir: 'images/icons/silk', file: 'book_open.png')}"/>
-	&nbsp;Adjust stock
-</button>
+<div class="action-menu-item">
+	<img src="${resource(dir: 'images/icons/silk', file: 'book_open.png')}"/>&nbsp;
+	<a id="btnAdjustStock-${itemInstance?.id}">Adjust Stock</a>
+</div>
 <g:link controller="inventoryItem" action="showRecordInventory" params="['product.id':commandInstance?.productInstance?.id,'inventory.id':commandInstance?.inventoryInstance?.id, 'inventoryItem.id':itemInstance?.id]">
 </g:link>
 

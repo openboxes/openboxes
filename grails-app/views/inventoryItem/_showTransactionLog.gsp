@@ -3,59 +3,7 @@
 		<legend><span class="fade">Transaction Log</span></legend>
 		
 		
-		<script>
-			jQuery(document).ready(function() {
-				jQuery(".toggleDetails").click(function(event) {
-					//event.preventDefault();
-				});
-				/*
-				jQuery(".toggleDetails").mouseover(function(event) {
-					console.log(this.id);
-					jQuery("#transactionEntries" + this.id).toggle('slow');								
-				});
-				jQuery(".toggleDetails").mouseout(function(event) {
-					console.log(this.id);
-					jQuery("#transactionEntries" + this.id).toggle('slow');								
-				});
-				*/
 
-				jQuery(".toggleDetails").hoverIntent({
-					over: function(event) {
-						jQuery("#transactionEntries" + this.id).slideDown('fast');													
-					},
-					timeout: 500,
-					out: function(event) {
-						jQuery("#transactionEntries" + this.id).slideUp('fast');								
-					}
-				});	
-
-				// Define dialog
-				jQuery("#transaction-details").dialog({ title: "Transaction Details", 
-					modal: true, autoOpen: false, width: 800, height: 400, position: 'middle' });    //end dialog									    
-
-				// Click event -> open dialog
-				jQuery('.show-details').click(
-			        function(event) {
-				        //$("#example").load("", [], function() { 
-				        //    jQuery("#example").dialog("open");
-				        //});
-				        //return false
-						var link = $(this);
-						var dialog = jQuery('#transaction-details').load(link.attr('href')).dialog("open");										        
-				        event.preventDefault();
-			        }
-			    );	
-
-				// Click event -> open dialog
-				jQuery('#show-filters').click(function(event) {
-					jQuery("#filters").toggle();
-					event.preventDefault();
-				});		
-			});	
-
-
-			
-		</script>
 		
 		
 		<div>
@@ -219,7 +167,5 @@
 				</div>
 			</g:form>
 		</div>
-		
-		
 	</fieldset>
 </div>

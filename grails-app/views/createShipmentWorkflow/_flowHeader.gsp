@@ -22,35 +22,39 @@
 
 <div style="float: center; border: 1px solid lightgrey; ">
 	<div style=" padding: 1px;">
-		<table width="100%" style="color: #ccc;">
+		<table width="100%" style="color: #ccc; display: inline;">
 			<tr>
-				<td style="text-align:center; padding-right: 15px;" nowrap class="${currentState=='Details'?'currentState':''}">
+				<td style="border-right: 1px solid lightgrey; text-align: right;">
+					<span class="fade">Progress</span>
+				</td>
+			
+				<td style="text-align:center;border-right: 1px solid lightgrey;" nowrap class="${currentState=='Details'?'currentState':''}">
 					<div class="circle ${currentState=='Details'?'currentState':''}">1</div> 
-					<g:link action="createShipment" event="enterShipmentDetails">Enter shipment details</g:link>
+					<g:link action="createShipment" event="enterShipmentDetails">Details</g:link>
 				</td>
 <%-- 				
 				<td style="vertical-align: middle">
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_go.png')}" style="vertical-align: middle;"/>
 				</td>
 --%>
-				<td style="text-align:center; padding-right: 15px;" nowrap class="${currentState=='Tracking'?'currentState':''}">
+				<td style="text-align:center; border-right: 1px solid lightgrey;" nowrap class="${currentState=='Tracking'?'currentState':''}">
 					<div class="circle ${currentState=='Tracking'?'currentState':''}">2</div> 
 					<g:if test="${shipmentInstance.id}">
-						<g:link action="createShipment" event="enterTrackingDetails">Enter tracking info</g:link>
+						<g:link action="createShipment" event="enterTrackingDetails">Tracking</g:link>
 					</g:if>
-					<g:else>Enter tracking info</g:else>
+					<g:else>Tracking</g:else>
 				</td>
 <%--				
 				<td style="vertical-align: middle">
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_go.png')}" style="vertical-align: middle;"/>
 				</td>
  --%>				
-				<td style="text-align:center; padding-right: 15px;" nowrap class="${currentState=='Pack'?'currentState':''}">
+				<td style="text-align:center; border-right: 1px solid lightgrey;" nowrap class="${currentState=='Pack'?'currentState':''}">
 					<div class="circle ${currentState=='Pack'?'currentState':''}">3</div> 
 					<g:if test="${shipmentInstance.id}">
-						<g:link action="createShipment" event="enterContainerDetails">Pack shipment items</g:link>
+						<g:link action="createShipment" event="enterContainerDetails">Packing</g:link>
 					</g:if>
-					<g:else>Pack shipment items</g:else>
+					<g:else>Packing</g:else>
 				</td>
 				
 				
@@ -91,17 +95,22 @@
 					<g:link action="createShipment" event="sendShipment">5. Ship</g:link>
 				</td>
 				-->
-				<td style="border-left: 1px solid lightgrey; text-align: right;">
+				<%-- 
+				<td style="border-left: 1px solid lightgrey; text-align: center;">
+				
 					<g:if test="${currentState!='Details'}">
 						<g:link action="createShipment" event="back">&lsaquo; Back</g:link>
 					</g:if>
 					<g:else>
 						&lsaquo; Back
 					</g:else>
-					&nbsp;<span class="fade">|</span>&nbsp;
+				</td>
+				<td style="border-left: 1px solid lightgrey; text-align: center;">
+				
+				
 					<g:link action="createShipment" event="next">Next &rsaquo;</g:link> 
 				</td>
-				
+				--%>
 			</tr>
 		</table>
 	</div>

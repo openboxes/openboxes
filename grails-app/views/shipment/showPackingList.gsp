@@ -9,7 +9,6 @@
 </head>
 
 <body>
-
 	<div class="body">
 		<g:if test="${flash.message}">
 			<div class="message">
@@ -21,20 +20,9 @@
 				<g:renderErrors bean="${shipmentInstance}" as="list" />
 			</div>
 		</g:hasErrors>	
-	
 		<table>
-
 			<tr>
-				<td colspan="2">
-					<div style="padding-bottom: 10px;">
-						<g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}">${shipmentInstance?.name}</g:link> 
-						 &nbsp; &raquo; &nbsp; 
-						<span style="font-size: 90%">View Packing List</span>
-					</div>					
-				</td>
-			</tr>
-			<tr>
-				<td width="70%">
+				<td>
 					<fieldset>						
 						<g:render template="summary"/>
 						<table style="padding: 0px; margin: 0px;">
@@ -120,7 +108,7 @@
 													<g:else>&nbsp;</g:else>
 												</td>
 												<td width="10%">
-														${innerContainer?.weight} ${innerContainer?.weightUnits}
+													${innerContainer?.weight} ${innerContainer?.weightUnits}
 												</td>
 												<td width="20%">${innerItem?.product.name} (${innerItem?.quantity})</td>
 												<td width="10%">${innerItem?.serialNumber}</td>
@@ -138,9 +126,6 @@
 						</div>
 						--%>														
 					</fieldset>		
-				</td>
-				<td width="20%">
-					<g:render template="sidebar"/>
 				</td>
 			</tr>
 		</table>

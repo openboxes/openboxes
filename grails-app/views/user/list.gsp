@@ -9,13 +9,15 @@
 </head>
 <body>
     <div class="body">
-		    <div class="nav">
-		    	<g:render template="nav"/>		    
-		    </div>
 		    <g:if test="${flash.message}">
 		    	<div class="message">${flash.message}</div>
 	        </g:if>
-	        
+
+            <div>
+				<span class="menuButton">
+           			<g:link controller="user" action="create" class="new">Add new user</g:link>
+	           	</span>
+           	</div>
             <div class="list">
                 <table>
                     <thead>

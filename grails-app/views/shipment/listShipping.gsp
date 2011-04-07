@@ -13,11 +13,9 @@
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>
-            	
 			<table>            	
             	<tr>
             		<td style="border-right: 0px solid lightgrey; width: 200px; border-right: 1px solid lightgrey; background-color: #f5f5f5;">
-            	
 			            <g:form action="listShipping" method="post">
 				           	<div class="filter-list-item">
 				           		<label class="block">Type</label> 
@@ -34,7 +32,6 @@
 					           							noSelection="['':'--All--']" />&nbsp;&nbsp;
 							</div>
 				           	<div class="filter-list-item">
-					           								
 					           	<label class="block">Status</label> 
 					           	<g:select name="status" 
 					           					   from="${org.pih.warehouse.shipping.ShipmentStatusCode.list()}"
@@ -42,7 +39,6 @@
 					           					   noSelection="['':'--All--']" />&nbsp;&nbsp;	
 							</div>
 				           	<div class="filter-list-item">
-					           					   
 					           	<label class="block">From</label> 
 					           	<g:jqueryDatePicker id="statusStartDate" name="statusStartDate"
 																	value="${statusStartDate}" format="MM/dd/yyyy"/>
@@ -80,10 +76,10 @@
 				                        <tr class="odd">   
 				                        	<th>${message(code: 'shipment.shipmentType.label', default: 'Type')}</th>
 				                            <th>${message(code: 'shipment.shipment.label', default: 'Shipment')}</th>							
+				                         	<th>${message(code: 'shipment.actions.label', default: 'Actions')}</th>
 				                            <th>${message(code: 'shipment.destination.label', default: 'Destination')}</th>
 				                        	<th>${message(code: 'shipment.expectedShippingDate.label', default: 'Shipping Date')}</th>
 				                         	<th>${message(code: 'shipment.status.label', default: 'Status')}</th>
-				                         	<th>${message(code: 'shipment.actions.label', default: 'Actions')}</th>
 				                        </tr>
 				                    </thead>
 				                   	<tbody>
@@ -93,51 +89,32 @@
 													<img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + shipmentInstance?.shipmentType?.name + '.png')}"
 													alt="${shipmentInstance?.shipmentType?.name}" style="vertical-align: middle; width: 24px; height: 24px;" />		
 												</td>										
-												<td width="10%">
+												<td>
 													<g:link action="showDetails" id="${shipmentInstance.id}">
 														${fieldValue(bean: shipmentInstance, field: "name")}
 													</g:link>																														
 												</td>
-												<td width="10%" align="center">
-													${fieldValue(bean: shipmentInstance, field: "destination.name")}
-												</td>
-												<td width="10%" align="center">
-													<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${shipmentInstance?.expectedShippingDate}"/>
-												</td>
-												<td width="10%">												
-													${shipmentInstance?.status.name}
-													<g:if test="${shipmentInstance?.status.date}">
-													 - <g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${shipmentInstance?.status.date}"/>
-													 </g:if>									
-												</td>
 												<td nowrap="true" style="text-align: left;">
-													<script type="text/javascript">
-														$(document).ready(function() { 
-															function show() {
-																$(this).children(".actions").show();
-															}
-															
-															function hide() { 
-																$(this).children(".actions").hide();
-															}
-															
-															$(".action-menu").hoverIntent({
-																sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
-																interval: 5,   // number = milliseconds for onMouseOver polling interval
-																over: show,     // function = onMouseOver callback (required)
-																timeout: 10,   // number = milliseconds delay before onMouseOut
-																out: hide       // function = onMouseOut callback (required)
-															});  
-														});
-													</script>									
 													<div class="action-menu">
 														<span>Actions<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" /></span>
-														<div class="actions" style="position: absolute; z-index:999; background-color: #f5f5f5; border: 1px solid lightgrey; padding: 10px; display: none;">
+														<div class="actions">
 															<g:render template="listShippingMenuItems" model="[shipmentInstance:shipmentInstance]"/>															
 															
 														</div>
 													</div>	
 												</td>															
+												<td align="center">
+													${fieldValue(bean: shipmentInstance, field: "destination.name")}
+												</td>
+												<td align="center">
+													<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${shipmentInstance?.expectedShippingDate}"/>
+												</td>
+												<td>												
+													${shipmentInstance?.status.name}
+													<g:if test="${shipmentInstance?.status.date}">
+													 - <g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${shipmentInstance?.status.date}"/>
+													 </g:if>									
+												</td>
 					                        </tr>
 										</g:each>                    		
 				                    </tbody>
@@ -148,5 +125,25 @@
 				</tr>
 			</table>
         </div>		
+        
+		<script type="text/javascript">
+			$(function(){ 
+				function show() {
+					$(this).children(".actions").show();
+				}
+				
+				function hide() { 
+					$(this).children(".actions").hide();
+				}
+				
+				$(".action-menu").hoverIntent({
+					sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
+					interval: 5,   // number = milliseconds for onMouseOver polling interval
+					over: show,     // function = onMouseOver callback (required)
+					timeout: 100,   // number = milliseconds delay before onMouseOut
+					out: hide       // function = onMouseOut callback (required)
+				});  
+			});
+		</script>	        
     </body>
 </html>

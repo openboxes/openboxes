@@ -1,15 +1,15 @@
 <g:if test="${selectedContainer }">
 	<div class="action-menu-item">
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit container" style="vertical-align: middle"/>&nbsp;
-		<g:link action="createShipment" event="editContainer" params="[containerToEditId:selectedContainer?.id]">
-			Edit ${selectedContainer?.containerType?.name }
-		</g:link> 	
-	</div>
-	<div class="action-menu-item">
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add an item" style="vertical-align: middle"/>&nbsp;
 		<g:link action="createShipment" event="addItemToContainer" params="['container.id':selectedContainer?.id]">
 		 Add an item
 		</g:link> 													
+	</div>
+	<div class="action-menu-item">
+		<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit container" style="vertical-align: middle"/>&nbsp;
+		<g:link action="createShipment" event="editContainer" params="[containerToEditId:selectedContainer?.id]">
+			Edit ${selectedContainer?.containerType?.name }
+		</g:link> 	
 	</div>
 	<div class="action-menu-item">
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'package_add.png')}" alt="Add a box" style="vertical-align: middle"/>&nbsp;

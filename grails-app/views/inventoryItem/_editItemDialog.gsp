@@ -4,9 +4,12 @@
 		$("#dlgEditItem-${itemInstance?.id}").dialog({ autoOpen: false, modal: true, width: '600px' });			
 	});
 </script>	   
-<button id="btnEditItem-${itemInstance?.id}" class="action-btn">
-	<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/> Edit Item
-</button>
+<div class="action-menu-item">
+	<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
+	<a id="btnEditItem-${itemInstance?.id}">
+		Edit Item
+	</a>
+</div>
 <div id="dlgEditItem-${itemInstance?.id}" title="Edit Item" style="padding: 10px; display: none;" >	
 	
 	<div class="dialog" style="padding: 10px;" >	

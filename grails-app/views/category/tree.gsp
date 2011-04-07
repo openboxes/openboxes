@@ -76,10 +76,6 @@
 														$( this ).removeClass( "ui-state-highlight" );
 													},
 													drop: function( event, ui ) {
-														//console.log(this);
-														//console.log(ui.draggable);
-														//console.log(ui.helper);
-														
 														ui.draggable.hide();
 														$( this ).removeClass( "ui-state-highlight" );
 														var child = ui.draggable.attr("id");
