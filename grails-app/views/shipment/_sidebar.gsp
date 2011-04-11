@@ -14,7 +14,8 @@
 					<g:else>Show Details</g:else>
 				</g:link>
 			</div>
-			<g:if test="${session?.warehouse?.id == shipmentInstance?.origin?.id}">				
+			<!-- you can only edit a shipment or it's packing list if you are at the origin warehouse, or if the origin is not a warehouse, and you are at the destination warehouse -->
+			<g:if test="${(session?.warehouse?.id == shipmentInstance?.origin?.id) || (!shipmentInstance?.origin?.isWarehouse() && session?.warehouse?.id == shipmentInstance?.destination?.id)}">				
 				<div class="action-menu-item">
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit Shipment" style="vertical-align: middle" />&nbsp; 
 					<g:link controller="createShipmentWorkflow" action="createShipment" id="${shipmentInstance.id}">
@@ -22,12 +23,12 @@
 						<g:else>Edit Shipment</g:else>
 					</g:link>
 				</div>
+				<div class="action-menu-item">
+					<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit Packing List" style="vertical-align: middle"/>&nbsp;
+					<g:link controller="createShipmentWorkflow" action="createShipment" event="enterContainerDetails" 
+						id="${shipmentInstance?.id }" params="[skipTo:'Packing']">Edit Packing List</g:link>					
+				</div>
 			</g:if>
-			<div class="action-menu-item">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit Packing List" style="vertical-align: middle"/>&nbsp;
-				<g:link controller="createShipmentWorkflow" action="createShipment" event="enterContainerDetails" 
-					id="${shipmentInstance?.id }" params="[skipTo:'Packing']">Edit Packing List</g:link>					
-			</div>
 			<div class="action-menu-item">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="View Packing List" style="vertical-align: middle"/>&nbsp;
 				<g:link controller="shipment" action="showPackingList" id="${shipmentInstance.id}">
