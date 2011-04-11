@@ -21,31 +21,117 @@ class InventoryServiceTests extends BaseUnitTest {
 	}
 	
 	private void setUp_transactionEntryTests() {
-		// create a test transaction with an entry
-		def transaction = new Transaction(transactionType: TransactionType.get(7), transactionDate: new Date(), inventory: Warehouse.findByName("Boston Warehouse").inventory)
-		mockDomain(Transaction, [transaction])
-		def transactionEntry = new TransactionEntry (quantity:10, 
+		def inventory = Warehouse.findByName("Boston Warehouse").inventory
+		
+		// create some transactions
+		def transaction = new Transaction(transactionType: TransactionType.get(7), transactionDate: new Date() - 5, inventory: inventory)
+		def transaction2 = new Transaction(transactionType: TransactionType.get(2), transactionDate: new Date() - 4, inventory: inventory)
+		def transaction3 = new Transaction(transactionType: TransactionType.get(11), transactionDate: new Date() - 3, inventory: inventory)
+		def transaction4 = new Transaction(transactionType: TransactionType.get(8), transactionDate: new Date() - 2, inventory: inventory)
+		def transaction5 = new Transaction(transactionType: TransactionType.get(2), transactionDate: new Date() - 1, inventory: inventory)
+		
+		mockDomain(Transaction, [transaction, transaction2, transaction3, transaction4, transaction5])
+		
+		def transactionEntries = []
+		
+		// define some aspirin lot 1 transaction entries
+		transactionEntries += new TransactionEntry (quantity:10, transaction: transaction,
 			inventoryItem: InventoryItem.findByProductAndLotNumber(Product.findByName("Aspirin"), "1"))
-		mockDomain(TransactionEntry, [transactionEntry])
+		transactionEntries += new TransactionEntry (quantity:2, transaction: transaction2,
+			inventoryItem: InventoryItem.findByProductAndLotNumber(Product.findByName("Aspirin"), "1"))
+		transactionEntries += new TransactionEntry (quantity:100, transaction: transaction3,
+			inventoryItem: InventoryItem.findByProductAndLotNumber(Product.findByName("Aspirin"), "1"))
+		transactionEntries += new TransactionEntry (quantity:24, transaction: transaction4,
+			inventoryItem: InventoryItem.findByProductAndLotNumber(Product.findByName("Aspirin"), "1"))
+		transactionEntries += new TransactionEntry (quantity:30, transaction: transaction5,
+			inventoryItem: InventoryItem.findByProductAndLotNumber(Product.findByName("Aspirin"), "1"))
+		
+		// define some aspirin lot 2 transaction entries
+		transactionEntries += new TransactionEntry (quantity:25, transaction: transaction,
+			inventoryItem: InventoryItem.findByProductAndLotNumber(Product.findByName("Aspirin"), "2"))
+		transactionEntries += new TransactionEntry (quantity:2, transaction: transaction2,
+			inventoryItem: InventoryItem.findByProductAndLotNumber(Product.findByName("Aspirin"), "2"))
+		// even though there is no entry for this lot on this transaction, it is  product inventory transaction so should reset the quantity count
+		transactionEntries += new TransactionEntry (quantity:16, transaction: transaction4,
+			inventoryItem: InventoryItem.findByProductAndLotNumber(Product.findByName("Aspirin"), "2"))
+		transactionEntries += new TransactionEntry (quantity:13, transaction: transaction5,
+			inventoryItem: InventoryItem.findByProductAndLotNumber(Product.findByName("Aspirin"), "2"))
+		
+		// define some tylenol lot 1 transaction entries
+		transactionEntries += new TransactionEntry (quantity:36, transaction: transaction,
+			inventoryItem: InventoryItem.findByProductAndLotNumber(Product.findByName("Tylenol"), "1"))
+		transactionEntries += new TransactionEntry (quantity:21, transaction: transaction2,
+			inventoryItem: InventoryItem.findByProductAndLotNumber(Product.findByName("Tylenol"), "1"))
+		transactionEntries += new TransactionEntry (quantity:33, transaction: transaction4,
+			inventoryItem: InventoryItem.findByProductAndLotNumber(Product.findByName("Tylenol"), "1"))
+		transactionEntries += new TransactionEntry (quantity:23, transaction: transaction5,
+			inventoryItem: InventoryItem.findByProductAndLotNumber(Product.findByName("Tylenol"), "1"))
+		
+		
+		mockDomain(TransactionEntry, transactionEntries)
 	}
 	
-	/**
-	void test_getTransactionEntriesByInventoryItemAndTransactionCode() {
+	void test_getQuantityByProductAndInventoryItemMap() {
 		
 		setUp_transactionEntryTests()
 		
 		def inventoryService = new InventoryService()
 		
-		// fetch all the INVENTORY transaction items for Aspirin Lot 1
-		def results = inventoryService.getTransactionEntriesByInventoryItemAndTransactionCode(
-							InventoryItem.findByProductAndLotNumber(Product.findByName("Aspirin"), lotNumber: "1"), 
-							TransactionCode.INVENTORY)
-			
-		assert results.size() == 1
-		assert results[0].inventoryItem == InventoryItem.findByProductAndLotNumber(Product.findByName("Aspirin"), lotNumber: "1")
-		assert results[0].quantity == 10
+		// fetch the map
+		def map = inventoryService.getQuantityByProductAndInventoryItemMap(TransactionEntry.list())
+		
+		// make sure the quantities are correct
+		def aspirin = Product.findByName("Aspirin")
+		def tylenol = Product.findByName("Tylenol")
+		def aspirinLot1 = InventoryItem.findByProductAndLotNumber(aspirin, "1")
+		def aspirinLot2 = InventoryItem.findByProductAndLotNumber(aspirin, "2")
+		def tylenolLot1 = InventoryItem.findByProductAndLotNumber(tylenol, "1")
+		
+		assert map[aspirin][aspirinLot1] == 94
+		assert map[aspirin][aspirinLot2] == 3
+		assert map[tylenol][tylenolLot1] == 25
+		
 	}
-	*/
+	
+	void test_getQuantityByProductMap() {
+		
+		setUp_transactionEntryTests()
+		
+		def inventoryService = new InventoryService()
+		
+		// fetch the map
+		def map = inventoryService.getQuantityByProductMap(TransactionEntry.list())
+		
+		// make sure the quantities are correct
+		def aspirin = Product.findByName("Aspirin")
+		def tylenol = Product.findByName("Tylenol")
+		
+		assert map[aspirin] == 97
+		assert map[tylenol] == 25
+	}
+	
+	
+	void test_getQuantityByInventoryItemMap() {
+		
+		setUp_transactionEntryTests()
+		
+		def inventoryService = new InventoryService()
+		
+		// fetch the map
+		def map = inventoryService.getQuantityByInventoryItemMap(TransactionEntry.list())
+		
+		// make sure the quantities are correct
+		def aspirin = Product.findByName("Aspirin")
+		def tylenol = Product.findByName("Tylenol")
+		def aspirinLot1 = InventoryItem.findByProductAndLotNumber(aspirin, "1")
+		def aspirinLot2 = InventoryItem.findByProductAndLotNumber(aspirin, "2")
+		def tylenolLot1 = InventoryItem.findByProductAndLotNumber(tylenol, "1")
+		
+		assert map[aspirinLot1] == 94
+		assert map[aspirinLot2] == 3
+		assert map[tylenolLot1] == 25
+		
+	}
 	
 	
 	private void setUp_localTransferTests () {

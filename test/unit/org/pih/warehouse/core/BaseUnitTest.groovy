@@ -37,19 +37,23 @@ class BaseUnitTest extends GrailsUnitTestCase {
         mockDomain(Inventory, [ bostonWarehouseInventory, haitiWarehouseInventory ])
        
         // create some default transaction types
-        def consumptionTransactionType = new TransactionType(id: 2, name: "Consumption")
+        def consumptionTransactionType = new TransactionType(id: 2, name: "Consumption", transactionCode: TransactionCode.DEBIT)
         def inventoryTransactionType = new TransactionType(id: 7, name: "Inventory", transactionCode: TransactionCode.INVENTORY)
+        def productInventoryTransactionType = new TransactionType(id: 11, name: "Product Inventory", transactionCode: TransactionCode.PRODUCT_INVENTORY)
         def transferInTransactionType = new TransactionType(id: Constants.TRANSFER_IN_TRANSACTION_TYPE_ID, name: "Transfer In", transactionCode: TransactionCode.CREDIT)
         def transferOutTransactionType = new TransactionType(id: Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID, name: "Transfer Out", transactionCode: TransactionCode.DEBIT)
-        mockDomain(TransactionType, [ inventoryTransactionType, transferInTransactionType, transferOutTransactionType ])
+        mockDomain(TransactionType, [ consumptionTransactionType, productInventoryTransactionType, inventoryTransactionType, transferInTransactionType, transferOutTransactionType ])
         
         // create some products
         def aspirin = new Product(name: "Aspirin")
-        mockDomain(Product, [aspirin])
+        def tylenol = new Product(name:"Tylenol")
+        mockDomain(Product, [aspirin, tylenol])
         
         // create some inventory items
         def aspirinLot1 = new InventoryItem(product: aspirin, lotNumber: "1")
-        mockDomain(InventoryItem, [aspirinLot1])
+        def aspirinLot2 = new InventoryItem(product: aspirin, lotNumber: "2")
+        def tylenolLot1 = new InventoryItem(product: tylenol, lotNumber: "1")
+        mockDomain(InventoryItem, [aspirinLot1, aspirinLot2, tylenolLot1])
   
     }
 
