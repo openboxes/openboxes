@@ -406,7 +406,9 @@
 																		</g:if>
 																	</td>
 																	<td>
-																		${item?.product?.name}
+																		<g:link controller="product" action="edit" id="${item?.product?.id}">
+																			${item?.product?.name}
+																		</g:link>
 																	</td>
 																	<td>
 																		${item?.quantity}

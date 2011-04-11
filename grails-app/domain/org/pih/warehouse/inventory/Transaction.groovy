@@ -23,7 +23,7 @@ import org.pih.warehouse.core.Constants
  *  will be represented in two transactions (incoming and outgoing).
  *  
  */
-class Transaction implements Serializable {
+class Transaction implements Comparable, Serializable {
 
     Location source	    		
     Location destination					    		 

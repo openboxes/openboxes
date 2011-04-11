@@ -353,16 +353,11 @@ class InventoryController {
 		redirect(action: listAllTransactions)
 	}
 	
-	def listAllTransactions = {
-		if (!params.sort) {
-			params.sort = "dateCreated"
-			params.order = "desc"
-		}		
-		
+	def listAllTransactions = {		
 		def currentInventory = Inventory.list().find( {it.warehouse.id == session.warehouse.id} )
 		
 		// we are only showing transactions for the inventory associated with the current warehouse
-		def transactions = Transaction.list(params).findAll( {it.inventory.id == currentInventory.id} )
+		def transactions = Transaction.list().findAll( {it.inventory.id == currentInventory.id} ).sort().reverse()
 		render(view: "listTransactions", model: [transactionInstanceList: transactions])
 	}
 
