@@ -114,14 +114,20 @@ class ProductController {
 				// saved with no errors
 			}
 			else { 
-				cmd.errors.rejectValue('productInstanceList', "batchEditCommand.productInstanceList.invalid", "Errors with product")
-				
+				// copy the errors from this product on to the overall command object errors
+				prod.errors.getAllErrors(). each {
+					cmd.errors.reject(it.getCode(), it.getDefaultMessage())
+				}
 			}
 		}
 
 		if (!cmd.hasErrors()) { 
 			flash.message = "All products were saved successfully"
-		}		
+		}
+		else {
+			// reset the flash message in the case of two submits in a row
+			flash.message = null
+		}
 		
 		
 		cmd.rootCategory = productService.getRootCategory();

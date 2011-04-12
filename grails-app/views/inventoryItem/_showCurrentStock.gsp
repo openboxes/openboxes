@@ -10,14 +10,13 @@
 			<table border="0" style="border:1px solid #f5f5f5;">
 				<thead>
 					<tr class="even">
-						<th>Description</th>
-						<th class="left" style="">Actions</th>
 						<th>Serial/Lot Number</th>
 						<th>Expires</th>
 						<th class="center middle" >Qty</th>
 						<g:hasErrors bean="${flash.itemInstance}">													
 							<th></th>
-						</g:hasErrors>												
+						</g:hasErrors>
+						<th class="left" style="">Actions</th>												
 					</tr>											
 				</thead>
 				<tbody>
@@ -43,24 +42,10 @@
 							</style>			
 							<tr class="${styleClass} prop">
 								<td class="top">
-									${itemInstance?.product?.name} 
-								</td>
-								<td class="top" style="text-align: left;">
-									<div class="action-menu">
-										<span>Actions<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/></span>
-										<div class="actions">
-											<g:render template="editItemDialog" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]"/><br/>
-											<g:render template="adjustStock" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />	<br/>
-											<g:render template="addToShipment" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />	
-										</div>
-									</div>
-								</td>															
-							
-								<td class="top">
 									${itemInstance?.lotNumber?:'<span class="fade">None</span>' }
 									<g:link action="show" controller="inventoryItem" id="${itemInstance?.id }">
 									</g:link>
-								</td>
+								</td>														
 								<td class="top">
 									<g:if test="${itemInstance?.expirationDate}">
 										<g:formatDate date="${itemInstance?.expirationDate }" format="${org.pih.warehouse.core.Constants.DEFAULT_HOUR_MONTH_DATE_FORMAT}" />
@@ -86,7 +71,17 @@
 											</div>
 										</g:if>																									
 									</td>
-								</g:hasErrors>															
+								</g:hasErrors>	
+								<td class="top" style="text-align: left;">
+								<div class="action-menu">
+									<span>Actions<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/></span>
+									<div class="actions">
+										<g:render template="editItemDialog" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]"/><br/>
+										<g:render template="adjustStock" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />	<br/>
+										<g:render template="addToShipment" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />	
+									</div>
+								</div>
+								</td>															
 							</tr>
 						</g:if>
 					</g:each>
@@ -94,7 +89,7 @@
 				<g:if test="${commandInstance?.inventoryItemList}">
 					<tfoot>
 						<tr class="prop" style="height: border: 0px;">
-							<td colspan="3" style="text-align: left; border: 0px;">
+							<td colspan="2" style="text-align: left; border: 0px;">
 							</td>
 							<td style="text-align: center; vertical-align: middle; border: 0px;">
 								<span style="font-size: 1em;"> 
@@ -106,8 +101,12 @@
 								</span>
 							</td>
 							<td style="border: 0px;">
-							
 							</td>
+							<g:hasErrors bean="${flash.itemInstance}">
+								<td style="border: 0px;">
+								
+								</td>
+							</g:hasErrors>
 						</tr>
 					</tfoot>
 				</g:if>

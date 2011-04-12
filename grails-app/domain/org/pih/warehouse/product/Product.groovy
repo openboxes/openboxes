@@ -55,11 +55,11 @@ class Product implements Serializable {
 	}
 		
     static constraints = {
-		name(nullable:false, maxSize: 255)
+		name(nullable:false, blank: false, maxSize: 255)
 		description(nullable:true, maxSize: 255)
 		productCode(nullable:true, maxSize: 255)
 		unitOfMeasure(nullable:true, maxSize: 255)
-		category(nullable:true)
+		category(nullable:false)
 		coldChain(nullable:true)
 		
 		upc(nullable:true, maxSize: 255)
