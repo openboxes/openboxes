@@ -13,8 +13,8 @@ class TransactionType implements Serializable {
 	TransactionCode transactionCode
 	
 	static constraints = { 
-		name(nullable:false)
-		description(nullable:true)
+		name(nullable:false, maxSize: 255)
+		description(nullable:true, maxSize: 255)
 		sortOrder(nullable:true)
 		transactionCode(nullable:false)
 		dateCreated(display:false)

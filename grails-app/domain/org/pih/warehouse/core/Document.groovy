@@ -30,14 +30,14 @@ class Document implements Serializable {
 	static transients = ["size"]
 
 	static constraints = {
-		name(nullable:true)		
-		filename(nullable:true)
+		name(nullable:true, maxSize: 255)		
+		filename(nullable:true, maxSize: 255)
 		fileContents(nullable:true)
-		extension(nullable:true)
-		contentType(nullable:true)
+		extension(nullable:true, maxSize: 255)
+		contentType(nullable:true, maxSize: 255)
 		fileUri(nullable:true)
 		fileContents(nullable:true, maxSize:10485760) // 10 MBs
-		documentNumber(nullable:true)
+		documentNumber(nullable:true, maxSize: 255)
 		documentType(nullable:true)		
 	}
 

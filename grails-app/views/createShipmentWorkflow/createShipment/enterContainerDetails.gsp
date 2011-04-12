@@ -46,7 +46,7 @@
 			 	<table style="border: 0px;" border="0">
 			 		<tr>
 			 			<td valign="top" style="width: 25%; border-right: 0px solid lightgrey;">
-							<div style="background-color: #525d76; color: white; padding: 10px;">Choose a Pallet</div>
+							<div style="background-color: #525d76; color: white; padding: 10px;">Shipment Containers</div>
 							<%--
 							<img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}">&nbsp;<b>Packages</b>
 							 --%>

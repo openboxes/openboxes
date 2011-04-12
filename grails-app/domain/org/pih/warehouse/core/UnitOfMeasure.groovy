@@ -8,10 +8,10 @@ class UnitOfMeasure {
 	UnitOfMeasureType type		// area, volume, length, weight, currency
 	
 	static constraints = { 
-		name(nullable:false)
-		code(nullable:false)
+		name(nullable:false, maxSize:255)
+		code(nullable:false, maxSize:255)
 		type(nullable:false)
-		description(nullable:true)
+		description(nullable:true, maxSize:255)
 	}
 	
 	

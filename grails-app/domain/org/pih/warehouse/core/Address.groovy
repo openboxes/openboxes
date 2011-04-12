@@ -16,7 +16,11 @@ class Address implements Serializable {
 	Date lastUpdated;
 	
 	static constraints = {
-		postalCode(nullable:true)
-		stateOrProvince(nullable:true)
+		address(nullable: true, maxSize: 255)
+		address2(nullable:true, maxSize: 255)
+		city(maxSize: 255)
+		stateOrProvince(maxSize: 255)
+		postalCode(nullable:true, maxSize: 255)
+		stateOrProvince(nullable:true, maxSize: 255)
 	}
 }

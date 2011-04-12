@@ -97,8 +97,8 @@ class Shipment implements Comparable, Serializable {
 
 	// Constraints
 	static constraints = {
-		name(nullable:false, blank: false)
-		shipmentNumber(nullable:true)	
+		name(nullable:false, blank: false, maxSize: 255)
+		shipmentNumber(nullable:true, maxSize: 255)	
 		origin(nullable:false, blank: false, 
 			validator: { value, obj -> !value.equals(obj.destination)})
 		destination(nullable:false, blank: false)		
@@ -108,7 +108,7 @@ class Shipment implements Comparable, Serializable {
 		shipmentType(nullable:true)
 		shipmentMethod(nullable:true)
 		receipt(nullable:true)
-		additionalInformation(nullable:true)
+		additionalInformation(nullable:true, maxSize: 4294967295)
 		carrier(nullable:true)
 		recipient(nullable:true)
 		donor(nullable:true)

@@ -14,6 +14,7 @@ class ProductAttribute {
 	
 	static constraints = { 
 		attribute(nullable:false)
+		value(maxSize: 255)
 		//values(nullable:true)
 	}
 	

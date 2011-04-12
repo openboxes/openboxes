@@ -23,7 +23,7 @@ class InventoryItem implements Serializable {
 	// Notice the unique constraint on lotNumber/product
     static constraints = {
 		product(nullable:false)
-		lotNumber(nullable:true, unique:['product'])
+		lotNumber(nullable:true, unique:['product'], maxSize:255)
 		expirationDate(nullable:true)
 		
     }

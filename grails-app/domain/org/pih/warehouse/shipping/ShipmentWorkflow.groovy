@@ -23,10 +23,10 @@ class ShipmentWorkflow implements Serializable {
 	                   containerTypes : ContainerType ]
 	                   
     static constraints = {
-		name(nullable:false, blank: false)
+		name(nullable:false, blank: false, maxSize: 255)
 		shipmentType(nullable:false, unique:true)  // for now, we are only allowing one workflow per shipment type, though we may want to change this
-		excludedFields(nullable:true)
-		documentTemplate(nullable:true)
+		excludedFields(nullable:true, maxSize: 255)
+		documentTemplate(nullable:true, maxSize: 255)
 		dateCreated(blank:true)
 		lastUpdated(blank:true)
 		

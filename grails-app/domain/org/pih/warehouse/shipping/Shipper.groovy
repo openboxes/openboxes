@@ -18,11 +18,11 @@ class Shipper implements java.io.Serializable {
 	}
 
     static constraints = {
-		name(nullable:false)
-		description(nullable:true)		
-		trackingUrl(nullable:true, blank:true)
-		trackingFormat(nullable:true)
-		parameterName(nullable:true, blank:true)
+		name(nullable:false, maxSize: 255)
+		description(nullable:true, maxSize: 255)		
+		trackingUrl(nullable:true, blank:true, maxSize: 255)
+		trackingFormat(nullable:true, maxSize: 255)
+		parameterName(nullable:true, blank:true, maxSize: 255)
 		
 		dateCreated(display:false)
 		lastUpdated(display:false)

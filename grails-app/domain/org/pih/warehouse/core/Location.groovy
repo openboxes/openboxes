@@ -19,7 +19,7 @@ class Location implements Comparable, java.io.Serializable {
 	static hasMany = [ locations : Location ]
 	
 	static constraints = {
-		name(nullable:false, blank: false)
+		name(nullable:false, blank: false, maxSize: 255)
 		address(nullable:true)
 		locationType(nullable:false)
 		parentLocation(nullable:true)

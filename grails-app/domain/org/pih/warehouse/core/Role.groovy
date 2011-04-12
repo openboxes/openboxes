@@ -9,7 +9,7 @@ class Role implements Serializable {
 
 	static constraints = {
 		roleType(nullable:false)
-		description(nullable:true)
+		description(nullable:true, 	maxSize:255)
 	}
 
 	String toString() { return "${roleType.name}"; } 

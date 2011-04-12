@@ -10,8 +10,8 @@ class ShipperService {
 	static belongsTo = [ shipper : Shipper ]
 	
 	static constraints = {
-		name(nullable:true)
-		description(nullable:true)
+		name(nullable:true, maxSize: 255)
+		description(nullable:true, maxSize: 255)
 		shipper(nullable:true)
 	}
 		

@@ -15,7 +15,7 @@ class ShipmentMethod implements java.io.Serializable {
 	static constraints = {
 		shipper(nullable:true)
 		shipperService(nullable:true)
-		trackingNumber(nullable:true)
+		trackingNumber(nullable:true, maxSize: 255)
 		//shipment(nullable:true)
 	}
 }

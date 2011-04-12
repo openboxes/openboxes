@@ -10,7 +10,7 @@ class ReferenceNumber implements Serializable{
 	
 	// Constraints
 	static constraints = {
-		identifier(nullable:true)
+		identifier(nullable:true, maxSize:255)
 		referenceNumberType(nullable:true)
 	}
 	

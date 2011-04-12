@@ -29,7 +29,7 @@ class Attribute {
 	//}
 	
 	static constraints = { 
-		name(nullable:false)
+		name(nullable:false, maxSize: 255)
 		//label(nullable:true)
 		//dataType(nullable:true)
 		//defaultValue(nullable:true)

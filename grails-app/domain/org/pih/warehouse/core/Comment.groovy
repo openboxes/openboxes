@@ -19,7 +19,7 @@ class Comment implements Serializable {
 	
 	
 	static constraints = {
-		comment(nullable:false)
+		comment(nullable:false, maxSize: 255)
 		sender(nullable:true)
 		recipient(nullable:true)
 		dateSent(nullable:true, min: new Date())		

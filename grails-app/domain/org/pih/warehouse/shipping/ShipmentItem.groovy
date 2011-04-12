@@ -33,9 +33,9 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 	static constraints = {
 		container(nullable:true)
 		product(blank:false, nullable:false)  // TODO: this doesn't seem to prevent the product field from being empty
-		lotNumber(nullable:true)
-		quantity(min:0, blank:false)
-		serialNumber(nullable:true)
+		lotNumber(nullable:true, maxSize: 255)
+		quantity(min:0, blank:false, range: 0..2147483646)
+		serialNumber(nullable:true, maxSize: 255)
 		recipient(nullable:true)
 		donor(nullable:true)
 	}

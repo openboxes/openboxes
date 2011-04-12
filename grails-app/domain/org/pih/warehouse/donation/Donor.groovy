@@ -16,8 +16,8 @@ class Donor {
 	}*/
 	
 	static constraints = {
-		name(nullable:false)
-		description(nullable:true)
+		name(nullable:false, maxSize:255)
+		description(nullable:true, maxSize:255)
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)
 	}

@@ -14,10 +14,10 @@ class TransactionEntry implements Comparable, Serializable {
 
     static constraints = {		
 		inventoryItem(nullable:false)		
-		product(nullable:false)	
-		lotNumber(nullable:true)
-		quantity(nullable:false, min:0)
-		comments(nullable:true)	
+		product(nullable:false, maxSize: 255)	
+		lotNumber(nullable:true, maxSize: 255)
+		quantity(nullable:false, range: 0..2147483646)
+		comments(nullable:true, maxSize: 255)	
     }
 	
 	/**

@@ -26,13 +26,13 @@ class ReceiptItem {
 	static belongsTo = [ receipt : Receipt ]
 	static constraints = {
 		product(nullable:false)
-		lotNumber(nullable:true)
-		serialNumber(nullable:true)
+		lotNumber(nullable:true, maxSize: 255)
+		serialNumber(nullable:true, maxSize: 255)
 		expirationDate(nullable:true)
-		quantityShipped(min:0, nullable:false)
-		quantityReceived(min:0, nullable:false)		
+		quantityShipped(range: 0..2147483646, nullable:false)
+		quantityReceived(range: 0..2147483646, nullable:false)		
 		recipient(nullable:true)
-		comment(nullable:true)
+		comment(nullable:true, maxSize: 255)
 	}
 	
 	int compareTo(obj) { product.name.compareTo(obj.product.name) }

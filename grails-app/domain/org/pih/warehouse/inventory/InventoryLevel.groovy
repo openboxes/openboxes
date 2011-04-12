@@ -9,7 +9,7 @@ class InventoryLevel {
 	Boolean supported = Boolean.TRUE;
 	Product product;	
 	Integer minQuantity;			// Should warn user when quantity is below this value
-	Integer reorderQuantity;		// Should reorder product when quanity falls below this value
+	Integer reorderQuantity;		// Should reorder product when quantity falls below this value
 	//Integer lowQuantity;			// Should alert user when quantity is below this value (emergency)
 	//Integer idealQuantity;			// Should warn user when the quantity is below this value
 	//Integer maxQuantity;			// Should warn user when quantity is above this value
@@ -24,8 +24,8 @@ class InventoryLevel {
 	static constraints = { 
 		product(nullable:false)
 		supported(nullable:false)
-		minQuantity(nullable:true)
-		reorderQuantity(nullable:true)
+		minQuantity(nullable:true, range: 0..2147483646)
+		reorderQuantity(nullable:true, range: 0..2147483646)
 		//lowQuantity(nullable:true)
 		//idealQuantity(nullable:true)
 		//maxQuantity(nullable:true)

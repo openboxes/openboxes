@@ -23,10 +23,10 @@ class Person implements Comparable, Serializable {
 	
 	static constraints = { 
 		name(display:false)
-		firstName(blank:false)	
-		lastName(blank:false)	
-		email(blank:false, email:true, unique:true)
-		phoneNumber(nullable:true)
+		firstName(blank:false, maxSize: 255)	
+		lastName(blank:false, maxSize: 255)	
+		email(blank:false, email:true, unique:true, maxSize: 255)
+		phoneNumber(nullable:true, maxSize: 255)
 		dateCreated(display:false)
 		lastUpdated(display:false)
 		

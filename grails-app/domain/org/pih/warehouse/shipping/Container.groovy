@@ -16,14 +16,14 @@ class Container implements Comparable, java.io.Serializable {
 	String description										// Description of contents
 	Person recipient										// Person who is assigned to receive the container
 	Integer sortOrder										// 
-	Float height;											// height of container
-	Float width;											// width of container
-	Float length;											// length of container 
+	Float height											// height of container
+	Float width											// width of container
+	Float length											// length of container 
 	String volumeUnits	= Constants.DEFAULT_VOLUME_UNITS	// standard dimensional unit: cm, in, ft, 	
 	Float weight											// weight of container
 	String weightUnits  = Constants.DEFAULT_WEIGHT_UNITS	// standard weight unit: kg, lb 
-	Date dateCreated;
-	Date lastUpdated;
+	Date dateCreated
+	Date lastUpdated
 	
 	ContainerType containerType			// Type of container
 	ContainerStatus containerStatus		// Status of the container (open, closed)
@@ -44,16 +44,16 @@ class Container implements Comparable, java.io.Serializable {
 		
 	// Constraints
 	static constraints = {	 
-		name(empty:false)
-		description(nullable:true)
-		containerNumber(nullable:true)
+		name(empty:false, maxSize:255)
+		description(nullable:true, maxSize:255)
+		containerNumber(nullable:true, maxSize:255)
 		parentContainer(nullable:true)
 		recipient(nullable:true)
 		height(nullable:true)
 		width(nullable:true)
 		length(nullable:true)
-		volumeUnits(nullable:true)
-		weight(nullable:true)
+		volumeUnits(nullable:true, maxSize:255)
+		weight(nullable:true, maxSize:255)
 		weightUnits(nullable:true)
 		containerType(nullable:false)
 		//shipmentItems(nullable:true)		
