@@ -108,7 +108,7 @@ class Shipment implements Comparable, Serializable {
 		shipmentType(nullable:true)
 		shipmentMethod(nullable:true)
 		receipt(nullable:true)
-		additionalInformation(nullable:true, maxSize: 4294967295)
+		additionalInformation(nullable:true, maxSize: 2147483646)
 		carrier(nullable:true)
 		recipient(nullable:true)
 		donor(nullable:true)
