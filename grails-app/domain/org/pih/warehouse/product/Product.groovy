@@ -6,6 +6,9 @@ import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.list.LazyList;
 import org.pih.warehouse.core.UnitOfMeasure;
 import org.pih.warehouse.product.Category;
+import org.pih.warehouse.inventory.InventoryItem;
+import org.pih.warehouse.inventory.TransactionEntry;
+import org.pih.warehouse.shipping.ShipmentItem;
 
 /**
  * An product is an instance of a generic.  For instance,
@@ -78,6 +81,20 @@ class Product implements Serializable {
 	}
 	
 	String toString() { return "$name"; }
-    
+
+	/**
+	 * Some utility methods
+	 */
+	
+	/**
+	 * Returns true if there are any transaction entries or shipment items in the system associated with this product, false otherwise
+	 */
+	Boolean hasAssociatedTransactionEntriesOrShipmentItems() {
+		def items = InventoryItem.findAllByProduct(this)
+		if (items && items.find { TransactionEntry.findByInventoryItem(it) } ) { return true }
+		if (ShipmentItem.findByProduct(this)) { return true }
+		return false
+	}
+	
 }
 

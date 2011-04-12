@@ -5,6 +5,7 @@ import org.apache.commons.collections.list.LazyList;
 import org.junit.runner.Request;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
+import org.pih.warehouse.inventory.InventoryItem;
 import grails.converters.JSON;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -14,7 +15,7 @@ class ProductController {
 	def inventoryService;
 	def productService;
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"];    
+    static allowedMethods = [save: "POST", update: "POST"];    
 	
 	
     def index = {
@@ -207,7 +208,6 @@ class ProductController {
         }
     }
 	
-
     def update = {
 		
 		log.info "update called with params " + params
@@ -269,21 +269,27 @@ class ProductController {
     }
 
     def delete = {
-        def productInstance = Product.get(params.id)
-        if (productInstance) {
-            try {
-                productInstance.delete(flush: true)
-                flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
-                redirect(action: "list")
-            }
-            catch (org.springframework.dao.DataIntegrityViolationException e) {
-                flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
-                redirect(action: "show", id: params.id)
-            }
+    	def productInstance = Product.get(params.id)
+        if (productInstance && !productInstance.hasAssociatedTransactionEntriesOrShipmentItems()) {	        	
+	          try {
+	        	  // first we need to delete any inventory items associated with this transaction
+	        	def items = InventoryItem.findAllByProduct(productInstance)
+	        	items.each { it.delete(flush:true) }
+	        	  	
+	        	// now delete the actual product
+	            productInstance.delete(flush: true)
+	            
+	            flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
+	            redirect(action: "browse")
+		      }
+		      catch (org.springframework.dao.DataIntegrityViolationException e) {
+	            flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
+	            redirect(action: "edit", id: params.id)
+		      }
         }
         else {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
-            redirect(action: "browse")
+            flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
+            redirect(action: "edit", id: params.id)
         }
     }
 	
