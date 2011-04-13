@@ -3162,9 +3162,10 @@
 			<columnExists tableName="transaction_entry" columnName="product_id"/>
 		</preConditions>
 		<sql>
-			ALTER TABLE transaction_entry DROP FOREIGN KEY FKABC21FD1DED5FAE7;
+			set FOREIGN_KEY_CHECKS = 0;
+			ALTER TABLE transaction_entry DROP COLUMN product_id;
+			set FOREIGN_KEY_CHECKS = 1;
 		</sql>
-		<dropColumn tableName="transaction_entry" columnName="product_id"/>
 	</changeSet>
 
 </databaseChangeLog>
