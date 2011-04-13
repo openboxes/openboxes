@@ -2942,7 +2942,6 @@
 			ALTER TABLE inventory ENGINE=InnoDB;
 			ALTER TABLE inventory_item ENGINE=InnoDB;
 			ALTER TABLE inventory_level ENGINE=InnoDB;
-			ALTER TABLE local_transfer ENGINE=InnoDB;
 			ALTER TABLE location ENGINE=InnoDB;
 			ALTER TABLE location_type ENGINE=InnoDB;
 			ALTER TABLE package_type ENGINE=InnoDB;
