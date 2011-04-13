@@ -13,6 +13,7 @@ import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.ProductAttribute;
 import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.core.Constants 
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType;
 import org.springframework.validation.Errors;
 
@@ -59,7 +60,34 @@ class InventoryService
 		warehouse.save(flush:true)
 	}
     
+	/**
+    * Returns the Location specified by the passed id parameter;
+    * if no parameter is specified, returns a new location instance
+    */
+    Location getLocation(Long locationId) {
+	   	if (locationId) {
+	   		Location location = Location.get(locationId)
+	   		if (!location) {
+	   			throw new Exception("No location found with locationId ${locationId}")
+	   		}
+	   		else {
+	   			return location
+	   		}
+	   	}
+	   	// otherwise, we need to create a new, empty location
+	   	else {
+	   		Location location = new Location()
+	   		return location
+	   	}
+    }
 	
+    /**
+     * Saves the specified location
+     */
+	void saveLocation(Location location) {
+		location.save(flush:true)
+	}
+    
 	/**
 	 * Gets all transactions associated with a warehouse
 	 */

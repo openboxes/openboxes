@@ -60,7 +60,7 @@
 										class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">								
 										<g:select name="origin.id" from="${org.pih.warehouse.core.Location.list().sort()}" optionKey="id" value="${shipmentInstance?.origin?.id ? shipmentInstance?.origin?.id : session.warehouse.id}" style="width: 180px" />							
 										<br/>
-										<g:link controller="location" action="create" target="_blank"><span class="small">Add a New Location</span></g:link>							
+										<g:link controller="location" action="edit" target="_blank"><span class="small">Add a New Location</span></g:link>							
 									</td>
 								</tr>
 								<tr class="prop">

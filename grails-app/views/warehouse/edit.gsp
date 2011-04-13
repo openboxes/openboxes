@@ -24,7 +24,7 @@
 	                <g:renderErrors bean="${warehouseInstance}" as="list" />
 	            </div>
             </g:hasErrors>
-            <g:form method="post" >
+            <g:form method="post" action="update">
             	<fieldset>
             		
 	                <g:hiddenField name="id" value="${warehouseInstance?.id}" />
@@ -87,10 +87,14 @@
 	                            <tr>
 	                            	<td valign="top"></td>
 	                            	<td valign="top">
-						                    <g:actionSubmit class="save" action="update" value="${message(code: 'default.button.save.label', default: 'Save')}" /></span>
-											&nbsp;
-											<g:actionSubmit class="cancel" action="list" value="${message(code: 'default.button.cancel.label', default: 'Cancel')}"/>
-	                            	</td>
+					                   <button type="submit">								
+											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'tick.png')}"/>&nbsp;Save
+										</button>
+										&nbsp;
+										<g:link action="list">
+							                    ${message(code: 'default.button.cancel.label', default: 'Cancel')}						
+										</g:link>			
+									</td>
 	                            </tr>
 	                        </tbody>
 	                    </table>

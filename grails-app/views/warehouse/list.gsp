@@ -3,11 +3,11 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'warehouse.label', default: 'Warehouse')}" />
+        <g:set var="entityName" value="${message(code: 'warehouses.label', default: 'Warehouses')}" />
         <g:set var="pageTitle" value="${message(code: 'default.list.label' args="[entityName]")}" />
-        <title><g:message code="default.list.label" args="[entityName]" /></title>
+        <title><g:message code="default.show.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.list.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><g:message code="default.show.label" args="[entityName]" /></content>
     </head>
     <body>        
         <div class="body">

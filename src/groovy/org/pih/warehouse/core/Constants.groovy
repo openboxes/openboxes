@@ -20,4 +20,7 @@ class Constants {
 	static final int TRANSFER_OUT_TRANSACTION_TYPE_ID = 9
 	static final int PRODUCT_INVENTORY_TRANSACTION_TYPE_ID = 11
 	
+	// direct references to location by primary key
+	static final int WAREHOUSE_LOCATION_TYPE_ID = 1
+	
 }

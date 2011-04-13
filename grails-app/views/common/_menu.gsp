@@ -134,13 +134,18 @@
 		</ul>	
 	</div>
 	<h3 class="menu-heading">
-		<g:message code="location.label"  default="Location"/>
+		<g:message code="location.label"  default="Locations"/>
 	</h3>
 	<div class="menu-section">								
 		<ul>
 			<li class="">
 				<span class="menuButton">
 					<g:link class="bullet" controller="warehouse" action="list"><g:message code="default.show.label" args="['Warehouses']"/></g:link>
+				</span>
+			</li>
+			<li class="">
+				<span class="menuButton">
+					<g:link class="bullet" controller="location" action="list"><g:message code="default.show.label" args="['Locations']"/></g:link>
 				</span>
 			</li>
 			<!-- 
