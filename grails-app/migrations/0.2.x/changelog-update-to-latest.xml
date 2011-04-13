@@ -3144,6 +3144,8 @@
        <preConditions onFail="HALT">
 			<sqlCheck expectedResult="0">
 				<![CDATA[SELECT COUNT(*) FROM transaction_entry, inventory_item WHERE transaction_entry.inventory_item_id = inventory_item.id AND transaction_entry.product_id != inventory_item.product_id AND transaction_entry.product_id IS NOT NULL]]>
+			</sqlCheck>
+			<sqlCheck expectedResult="0">
 				<![CDATA[SELECT COUNT(*) FROM transaction_entry, inventory_item WHERE transaction_entry.inventory_item_id = inventory_item.id AND transaction_entry.lot_number != inventory_item.lot_number AND transaction_entry.lot_number IS NOT NULL]]>
 			</sqlCheck>
 		</preConditions>
