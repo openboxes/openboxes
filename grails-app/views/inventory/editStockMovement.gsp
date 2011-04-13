@@ -104,13 +104,13 @@
 												<th>Expiration Date</th>
 												<th>&nbsp;</th>
 											</tr>
-											<g:each in="${transactionInstance?.transactionEntries.sort { it.product.name } }" var="transactionEntry" status="status">
+											<g:each in="${transactionInstance?.transactionEntries.sort { it.inventoryItem?.product.name } }" var="transactionEntry" status="status">
 												<tr class="${(status%2==0)?'even':'odd'}">
 													<td>
 														${transactionEntry?.id }
 													</td>
 													<td style="text-align: left;">
-														${transactionEntry?.product?.name }
+														${transactionEntry?.inventoryItem?.product?.name }
 													</td>										
 													<td>
 														${transactionEntry?.quantity}

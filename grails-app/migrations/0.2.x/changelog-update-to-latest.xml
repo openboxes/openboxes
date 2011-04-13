@@ -2921,6 +2921,64 @@
 		</sql>		
     </changeSet>
     
+    <!--  move back to InnoDB tables -->
+	<changeSet author="jmiranda (generated)" id="1302537251592-1">
+		<sql>
+			ALTER TABLE DATABASECHANGELOG ENGINE=InnoDB;
+			ALTER TABLE DATABASECHANGELOGLOCK ENGINE=InnoDB;
+			ALTER TABLE address ENGINE=InnoDB;
+			ALTER TABLE attribute ENGINE=InnoDB;
+			ALTER TABLE attribute_options ENGINE=InnoDB;
+			ALTER TABLE category ENGINE=InnoDB;
+			ALTER TABLE comment ENGINE=InnoDB;
+			ALTER TABLE container ENGINE=InnoDB;
+			ALTER TABLE container_type ENGINE=InnoDB;
+			ALTER TABLE document ENGINE=InnoDB;
+			ALTER TABLE document_type ENGINE=InnoDB;
+			ALTER TABLE donor ENGINE=InnoDB;
+			ALTER TABLE event ENGINE=InnoDB;
+			ALTER TABLE event_type ENGINE=InnoDB;
+			ALTER TABLE generic_type ENGINE=InnoDB;
+			ALTER TABLE inventory ENGINE=InnoDB;
+			ALTER TABLE inventory_item ENGINE=InnoDB;
+			ALTER TABLE inventory_level ENGINE=InnoDB;
+			ALTER TABLE local_transfer ENGINE=InnoDB;
+			ALTER TABLE location ENGINE=InnoDB;
+			ALTER TABLE location_type ENGINE=InnoDB;
+			ALTER TABLE package_type ENGINE=InnoDB;
+			ALTER TABLE person ENGINE=InnoDB;
+			ALTER TABLE product ENGINE=InnoDB;
+			ALTER TABLE product_attribute ENGINE=InnoDB;
+			ALTER TABLE product_category ENGINE=InnoDB;
+			ALTER TABLE product_tags ENGINE=InnoDB;
+			ALTER TABLE receipt ENGINE=InnoDB;
+			ALTER TABLE receipt_item ENGINE=InnoDB;
+			ALTER TABLE reference_number ENGINE=InnoDB;
+			ALTER TABLE reference_number_type ENGINE=InnoDB;
+			ALTER TABLE role ENGINE=InnoDB;
+			ALTER TABLE setting ENGINE=InnoDB;
+			ALTER TABLE shipment ENGINE=InnoDB;
+			ALTER TABLE shipment_comment ENGINE=InnoDB;
+			ALTER TABLE shipment_document ENGINE=InnoDB;
+			ALTER TABLE shipment_event ENGINE=InnoDB;
+			ALTER TABLE shipment_item ENGINE=InnoDB;
+			ALTER TABLE shipment_method ENGINE=InnoDB;
+			ALTER TABLE shipment_reference_number ENGINE=InnoDB;
+			ALTER TABLE shipment_type ENGINE=InnoDB;
+			ALTER TABLE shipment_workflow ENGINE=InnoDB;
+			ALTER TABLE shipment_workflow_container_type ENGINE=InnoDB;
+			ALTER TABLE shipment_workflow_reference_number_type ENGINE=InnoDB;
+			ALTER TABLE shipper ENGINE=InnoDB;
+			ALTER TABLE shipper_service ENGINE=InnoDB;
+			ALTER TABLE transaction ENGINE=InnoDB;
+			ALTER TABLE transaction_entry ENGINE=InnoDB;
+			ALTER TABLE transaction_type ENGINE=InnoDB;
+			ALTER TABLE unit_of_measure ENGINE=InnoDB;
+			ALTER TABLE user ENGINE=InnoDB;
+			ALTER TABLE user_role ENGINE=InnoDB;		
+		</sql>      
+	</changeSet>
+    
     <changeSet author="mgoodrich" id="2011-03-31-1">
        <preConditions onFail="MARK_RAN">
 			<not><tableExists tableName="local_transfer"/></not>
@@ -3080,64 +3138,33 @@
 			<column name="stated_value" type="FLOAT(12,0)"/>
 		</addColumn>
 	</changeSet>
-
-	<changeSet author="jmiranda (generated)" id="1302537251592-1">
-		<sql>
-			ALTER TABLE DATABASECHANGELOG ENGINE=InnoDB;
-			ALTER TABLE DATABASECHANGELOGLOCK ENGINE=InnoDB;
-			ALTER TABLE address ENGINE=InnoDB;
-			ALTER TABLE attribute ENGINE=InnoDB;
-			ALTER TABLE attribute_options ENGINE=InnoDB;
-			ALTER TABLE category ENGINE=InnoDB;
-			ALTER TABLE comment ENGINE=InnoDB;
-			ALTER TABLE container ENGINE=InnoDB;
-			ALTER TABLE container_type ENGINE=InnoDB;
-			ALTER TABLE document ENGINE=InnoDB;
-			ALTER TABLE document_type ENGINE=InnoDB;
-			ALTER TABLE donor ENGINE=InnoDB;
-			ALTER TABLE event ENGINE=InnoDB;
-			ALTER TABLE event_type ENGINE=InnoDB;
-			ALTER TABLE generic_type ENGINE=InnoDB;
-			ALTER TABLE inventory ENGINE=InnoDB;
-			ALTER TABLE inventory_item ENGINE=InnoDB;
-			ALTER TABLE inventory_level ENGINE=InnoDB;
-			ALTER TABLE local_transfer ENGINE=InnoDB;
-			ALTER TABLE location ENGINE=InnoDB;
-			ALTER TABLE location_type ENGINE=InnoDB;
-			ALTER TABLE package_type ENGINE=InnoDB;
-			ALTER TABLE person ENGINE=InnoDB;
-			ALTER TABLE product ENGINE=InnoDB;
-			ALTER TABLE product_attribute ENGINE=InnoDB;
-			ALTER TABLE product_category ENGINE=InnoDB;
-			ALTER TABLE product_tags ENGINE=InnoDB;
-			ALTER TABLE receipt ENGINE=InnoDB;
-			ALTER TABLE receipt_item ENGINE=InnoDB;
-			ALTER TABLE reference_number ENGINE=InnoDB;
-			ALTER TABLE reference_number_type ENGINE=InnoDB;
-			ALTER TABLE role ENGINE=InnoDB;
-			ALTER TABLE setting ENGINE=InnoDB;
-			ALTER TABLE shipment ENGINE=InnoDB;
-			ALTER TABLE shipment_comment ENGINE=InnoDB;
-			ALTER TABLE shipment_document ENGINE=InnoDB;
-			ALTER TABLE shipment_event ENGINE=InnoDB;
-			ALTER TABLE shipment_item ENGINE=InnoDB;
-			ALTER TABLE shipment_method ENGINE=InnoDB;
-			ALTER TABLE shipment_reference_number ENGINE=InnoDB;
-			ALTER TABLE shipment_type ENGINE=InnoDB;
-			ALTER TABLE shipment_workflow ENGINE=InnoDB;
-			ALTER TABLE shipment_workflow_container_type ENGINE=InnoDB;
-			ALTER TABLE shipment_workflow_reference_number_type ENGINE=InnoDB;
-			ALTER TABLE shipper ENGINE=InnoDB;
-			ALTER TABLE shipper_service ENGINE=InnoDB;
-			ALTER TABLE transaction ENGINE=InnoDB;
-			ALTER TABLE transaction_entry ENGINE=InnoDB;
-			ALTER TABLE transaction_type ENGINE=InnoDB;
-			ALTER TABLE unit_of_measure ENGINE=InnoDB;
-			ALTER TABLE user ENGINE=InnoDB;
-			ALTER TABLE user_role ENGINE=InnoDB;		
-		</sql>      
+	
+	<!-- make sure we don't have any data quality issues before removing lot_number and product_id columns from transactions -->
+	<changeSet author="mgoodrich" id="2011-04-13">
+       <preConditions onFail="HALT">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT COUNT(*) FROM transaction_entry, inventory_item WHERE transaction_entry.inventory_item_id = inventory_item.id AND transaction_entry.product_id != inventory_item.product_id AND transaction_entry.product_id IS NOT NULL]]>
+				<![CDATA[SELECT COUNT(*) FROM transaction_entry, inventory_item WHERE transaction_entry.inventory_item_id = inventory_item.id AND transaction_entry.lot_number != inventory_item.lot_number AND transaction_entry.lot_number IS NOT NULL]]>
+			</sqlCheck>
+		</preConditions>
 	</changeSet>
-
+	
+	<changeSet author="mgoodrich" id="2011-04-13-1">
+       <preConditions onFail="MARK_RAN">
+			<columnExists tableName="transaction_entry" columnName="lot_number"/>
+		</preConditions>
+		<dropColumn tableName="transaction_entry" columnName="lot_number"/>
+	</changeSet>
+	
+	<changeSet author="mgoodrich" id="2011-04-13-2">
+       <preConditions onFail="MARK_RAN">
+			<columnExists tableName="transaction_entry" columnName="product_id"/>
+		</preConditions>
+		<sql>
+			ALTER TABLE transaction_entry DROP FOREIGN KEY FKABC21FD1DED5FAE7;
+		</sql>
+		<dropColumn tableName="transaction_entry" columnName="product_id"/>
+	</changeSet>
 
 </databaseChangeLog>
 

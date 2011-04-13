@@ -59,15 +59,15 @@
 	        var transaction = { TransactionEntries: [] };
 	        <g:if test="${transactionInstance?.transactionEntries }">
 	        	<g:set var="index" value="${0 }"/>
-		        <g:set var="transactionMap" value="${transactionInstance?.transactionEntries?.groupBy { it?.product?.name } }"/>
+		        <g:set var="transactionMap" value="${transactionInstance?.transactionEntries?.groupBy { it?.inventoryItem?.product?.name } }"/>
 				<g:each in="${transactionMap?.keySet()}" var="key" >
 					<g:set var="transactionEntries" value="${transactionMap?.get(key) }"/>
 					<g:each in="${transactionEntries }" var="transactionEntry" status="status">	        
 						transaction.TransactionEntries.push({ 	Id: '${transactionEntry?.id}', 
 																Index: ${index++}, 
 																Template: '${status==0?'#transaction-entry-template':'#lot-number-template'}',
-																ProductId: '${transactionEntry?.product?.id}', 
-																ProductName: '${transactionEntry?.product?.name}', 
+																ProductId: '${transactionEntry?.inventoryItem?.product?.id}', 
+																ProductName: '${transactionEntry?.inventoryItem?.product?.name}', 
 																LotNumber: '${transactionEntry?.inventoryItem?.lotNumber}', 
 																ExpirationDate: '', Qty: '${transactionEntry?.quantity}', 
 																StyleClass: '' });

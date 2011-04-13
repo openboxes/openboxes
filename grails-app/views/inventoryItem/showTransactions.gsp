@@ -165,7 +165,7 @@
 																	${transactionEntry?.transaction?.destination?.name }
 																</td>
 																<td>
-																	${transactionEntry?.lotNumber?:'<span class="fade">EMPTY</span>'}
+																	${transactionEntry?.inventoryItem?.lotNumber?:'<span class="fade">EMPTY</span>'}
 																</td>
 																<td style="text-align: center;">	
 																	${transactionEntry?.quantity}

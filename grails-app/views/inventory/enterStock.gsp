@@ -228,13 +228,13 @@
 												<th>&nbsp;</th>
 											</tr>
 											<g:if test="${transactionInstance?.transactionEntries }">
-												<g:each in="${transactionInstance?.transactionEntries.sort { it.product.name } }" var="transactionEntry" status="status">
+												<g:each in="${transactionInstance?.transactionEntries.sort { it.inventoryItem?.product.name } }" var="transactionEntry" status="status">
 													<tr class="${(status%2==0)?'odd':'even'}">
 														<td>
 															${transactionEntry?.id }
 														</td>
 														<td style="text-align: left;">
-															${transactionEntry?.product?.name }
+															${transactionEntry?.inventoryItem?.product?.name }
 														</td>										
 														<td>
 															${transactionEntry?.quantity}

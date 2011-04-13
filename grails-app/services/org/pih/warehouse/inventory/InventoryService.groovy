@@ -442,7 +442,6 @@ class InventoryService
 					def transactionEntry = new TransactionEntry();
 					transactionEntry.properties = row.properties;
 					transactionEntry.quantity = row.newQuantity
-					transactionEntry.product = cmd.product
 					transactionEntry.inventoryItem = inventoryItem;
 					transaction.addToTransactionEntries(transactionEntry);						
 				}		
@@ -745,7 +744,9 @@ class InventoryService
 	List getTransactionEntriesByProductAndInventory(Product productInstance, Inventory inventoryInstance) {
 		return TransactionEntry.createCriteria().list() {
 			and { 
-				eq("product.id", productInstance?.id)
+				inventoryItem {
+					eq("product.id", productInstance?.id)
+				}
 				transaction {
 					eq("inventory", inventoryInstance)
 				}
@@ -843,8 +844,6 @@ class InventoryService
 				
 				// Add transaction entry to transaction
 				transactionEntry.inventoryItem = itemInstance;
-				transactionEntry.product = itemInstance.product;
-				transactionEntry.lotNumber = itemInstance.lotNumber;
 				transactionEntry.quantity = quantity
 				transactionInstance.addToTransactionEntries(transactionEntry);			
 				if (!transactionInstance.hasErrors() && transactionInstance.save()) {			
@@ -908,8 +907,6 @@ class InventoryService
 				// Create a new transaction entry
 				def transactionEntry = new TransactionEntry();
 				transactionEntry.quantity = it.quantity;
-				transactionEntry.lotNumber = it.lotNumber
-				transactionEntry.product = it.product;
 				transactionEntry.inventoryItem = inventoryItem;
 				debitTransaction.addToTransactionEntries(transactionEntry);
 			}
@@ -1130,8 +1127,6 @@ class InventoryService
 			if (importParams?.quantity) {
 				TransactionEntry transactionEntry = new TransactionEntry();
 				transactionEntry.quantity = quantity;
-				transactionEntry.product = product;
-				transactionEntry.lotNumber = importParams.lotNumber;
 				transactionEntry.inventoryItem = inventoryItem;
 				transactionInstance.addToTransactionEntries(transactionEntry);
 				if (!transactionEntry.validate()) { 
@@ -1295,8 +1290,6 @@ class InventoryService
 				if (importParams?.quantity) {
 					TransactionEntry transactionEntry = new TransactionEntry();
 					transactionEntry.quantity = quantity;
-					transactionEntry.lotNumber = lotNumber;
-					transactionEntry.product = product;
 					transactionEntry.inventoryItem = inventoryItem;
 					transactionInstance.addToTransactionEntries(transactionEntry);
 				}
@@ -1470,8 +1463,6 @@ class InventoryService
 			// Create a new transaction entry
 			def transactionEntry = new TransactionEntry();
 			transactionEntry.quantity = it.quantity;
-			transactionEntry.lotNumber = it.lotNumber
-			transactionEntry.product = it.product;
 			transactionEntry.inventoryItem = inventoryItem;
 			mirroredTransaction.addToTransactionEntries(transactionEntry);
 		}	

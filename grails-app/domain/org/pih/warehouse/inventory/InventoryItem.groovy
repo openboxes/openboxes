@@ -6,7 +6,17 @@ import org.pih.warehouse.product.Product;
 import org.pih.warehouse.inventory.Transaction;
 
 /**
- * Represents products that are usually stocked by this location.
+ * Represents an instance of a product, referenced by lot number
+ * 
+ * Note that an inventory item does not directly reference an inventory,
+ * and in fact a single inventory item may be tied to multiple inventories
+ * at the same time (if a lot is split between multiple warehouses)
+ * 
+ * Transaction Entries are tied to Inventory Items, and
+ * these entries are used to calculate the quantity levels of inventory items
+ * 
+ * We may rename InventoryItem to ProductInstance, as this may 
+ * be a clearer name
  */
 class InventoryItem implements Serializable {
 	

@@ -103,7 +103,7 @@
 																${transactionEntry?.inventoryItem?.product?.name }
 															</td>
 															<td>
-																${transactionEntry?.lotNumber }
+																${transactionEntry?.inventoryItem?.lotNumber }
 															</td>
 															<td style="text-align: center;">
 																<g:if test="${transactionEntry.quantity<0}">
@@ -120,7 +120,7 @@
 															</th>
 															<th style="text-align: center;">
 
-																<g:set var="quantityChange" value="${transaction?.transactionEntries.findAll{it.product == commandInstance?.productInstance}.quantity?.sum() }"/>
+																<g:set var="quantityChange" value="${transaction?.transactionEntries.findAll{it.inventoryItem?.product == commandInstance?.productInstance}.quantity?.sum() }"/>
 																<g:set var="totalQuantityChange" value="${totalQuantityChange + quantityChange}"/>
 																																<g:set var="styleClass" value="color:black;"/>														
 																<g:if test="${quantityChange<0}">

@@ -142,8 +142,8 @@ class InventoryItemController {
 		def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, inventoryInstance);
 		def transactionEntryList = inventoryService.getTransactionEntriesByProductAndInventory(productInstance, inventoryInstance);
 		
-		// Compute the total quantity for the given 
-		def totalQuantity = (transactionEntryList)?transactionEntryList.quantity.sum():0
+		// Compute the total quantity for the given product
+		def totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[productInstance] ?: 0
 		
 		[ commandInstance : commandInstance, inventoryInstance: warehouseInstance.inventory, inventoryLevelInstance: inventoryLevelInstance, totalQuantity: totalQuantity ]
 	}
@@ -173,7 +173,7 @@ class InventoryItemController {
 		def warehouseInstance = Warehouse.get(session?.warehouse?.id)
 		def productInstance = cmd.product;
 		def transactionEntryList = TransactionEntry.findAllByProduct(productInstance);
-		def totalQuantity = (transactionEntryList)?transactionEntryList.quantity.sum():0
+		def totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[productInstance] ?: 0
 		def inventoryInstance = warehouseInstance?.inventory;
 		def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, inventoryInstance);
 		
@@ -327,8 +327,6 @@ class InventoryItemController {
 			transactionInstance.inventory = warehouseInstance.inventory;
 			
 			transactionEntry.inventoryItem = inventoryItem;
-			transactionEntry.product = inventoryItem.product;
-			transactionEntry.lotNumber = params.lotNumber;
 			//transactionEntry.quantity = params.quantity;
 			transactionInstance.addToTransactionEntries(transactionEntry);
 			
@@ -380,7 +378,6 @@ class InventoryItemController {
 	def adjustStock = {
 		log.info "Params " + params;
 		def itemInstance = InventoryItem.get(params.id)
-		def productInstance = InventoryItem.get(params?.product?.id)
 		def inventoryInstance = Inventory.get(params?.inventory?.id)
 		if (itemInstance) {
 			boolean hasErrors = inventoryService.adjustStock(itemInstance, params);
@@ -392,7 +389,7 @@ class InventoryItemController {
 				flash.itemInstance = itemInstance;
 			}
 		}
-		redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id, params: ['inventoryItem.id':itemInstance?.id])
+		redirect(controller: "inventoryItem", action: "showStockCard", id: itemInstance?.product?.id, params: ['inventoryItem.id':itemInstance?.id])
 	}
 	
 	def update = {		
@@ -436,7 +433,7 @@ class InventoryItemController {
 		def transactionEntry = TransactionEntry.get(params.id)
 		def productInstance 
 		if (transactionEntry) {
-			productInstance = transactionEntry.product 
+			productInstance = transactionEntry.inventoryItem.product 
 			transactionEntry.delete();
 		}
 		redirect(action: 'showStockCard', params: ['product.id':productInstance?.id])
