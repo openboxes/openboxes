@@ -49,7 +49,7 @@ class ProductController {
 	
 	
     def browse = { 
-		params.max = Math.min(params.max ? params.int('max') : 10, 100);
+		//params.max = Math.min(params.max ? params.int('max') : 10, 100);
 
 		// Hydrate the category filters from the session
 		// Allow us to get any attribute of a category without get a lazy init exception
@@ -62,7 +62,7 @@ class ProductController {
 		
 		// Get all products in the given categories.  If there are no products returned, 
 		// we should to display all products by default.
-		def products = inventoryService.getProductsByCategories(categoryFilters, params);		
+		def products = inventoryService.getProductsByCategories(categoryFilters);		
 		products = products ?: Product.list();
 		def productsByCategory = products.groupBy { it.category }
 		
