@@ -3081,6 +3081,64 @@
 		</addColumn>
 	</changeSet>
 
+	<changeSet author="jmiranda (generated)" id="1302537251592-1">
+		<sql>
+			ALTER TABLE DATABASECHANGELOG ENGINE=InnoDB;
+			ALTER TABLE DATABASECHANGELOGLOCK ENGINE=InnoDB;
+			ALTER TABLE address ENGINE=InnoDB;
+			ALTER TABLE attribute ENGINE=InnoDB;
+			ALTER TABLE attribute_options ENGINE=InnoDB;
+			ALTER TABLE category ENGINE=InnoDB;
+			ALTER TABLE comment ENGINE=InnoDB;
+			ALTER TABLE container ENGINE=InnoDB;
+			ALTER TABLE container_type ENGINE=InnoDB;
+			ALTER TABLE document ENGINE=InnoDB;
+			ALTER TABLE document_type ENGINE=InnoDB;
+			ALTER TABLE donor ENGINE=InnoDB;
+			ALTER TABLE event ENGINE=InnoDB;
+			ALTER TABLE event_type ENGINE=InnoDB;
+			ALTER TABLE generic_type ENGINE=InnoDB;
+			ALTER TABLE inventory ENGINE=InnoDB;
+			ALTER TABLE inventory_item ENGINE=InnoDB;
+			ALTER TABLE inventory_level ENGINE=InnoDB;
+			ALTER TABLE local_transfer ENGINE=InnoDB;
+			ALTER TABLE location ENGINE=InnoDB;
+			ALTER TABLE location_type ENGINE=InnoDB;
+			ALTER TABLE package_type ENGINE=InnoDB;
+			ALTER TABLE person ENGINE=InnoDB;
+			ALTER TABLE product ENGINE=InnoDB;
+			ALTER TABLE product_attribute ENGINE=InnoDB;
+			ALTER TABLE product_category ENGINE=InnoDB;
+			ALTER TABLE product_tags ENGINE=InnoDB;
+			ALTER TABLE receipt ENGINE=InnoDB;
+			ALTER TABLE receipt_item ENGINE=InnoDB;
+			ALTER TABLE reference_number ENGINE=InnoDB;
+			ALTER TABLE reference_number_type ENGINE=InnoDB;
+			ALTER TABLE role ENGINE=InnoDB;
+			ALTER TABLE setting ENGINE=InnoDB;
+			ALTER TABLE shipment ENGINE=InnoDB;
+			ALTER TABLE shipment_comment ENGINE=InnoDB;
+			ALTER TABLE shipment_document ENGINE=InnoDB;
+			ALTER TABLE shipment_event ENGINE=InnoDB;
+			ALTER TABLE shipment_item ENGINE=InnoDB;
+			ALTER TABLE shipment_method ENGINE=InnoDB;
+			ALTER TABLE shipment_reference_number ENGINE=InnoDB;
+			ALTER TABLE shipment_type ENGINE=InnoDB;
+			ALTER TABLE shipment_workflow ENGINE=InnoDB;
+			ALTER TABLE shipment_workflow_container_type ENGINE=InnoDB;
+			ALTER TABLE shipment_workflow_reference_number_type ENGINE=InnoDB;
+			ALTER TABLE shipper ENGINE=InnoDB;
+			ALTER TABLE shipper_service ENGINE=InnoDB;
+			ALTER TABLE transaction ENGINE=InnoDB;
+			ALTER TABLE transaction_entry ENGINE=InnoDB;
+			ALTER TABLE transaction_type ENGINE=InnoDB;
+			ALTER TABLE unit_of_measure ENGINE=InnoDB;
+			ALTER TABLE user ENGINE=InnoDB;
+			ALTER TABLE user_role ENGINE=InnoDB;		
+		</sql>      
+	</changeSet>
+
+
 </databaseChangeLog>
 
 
