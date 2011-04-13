@@ -410,15 +410,13 @@ class InventoryService
 							return cmd;
 						}
 					}
-					// 3. If the quantities are different, we create a new transaction entry	
-					if (row.oldQuantity != row.newQuantity) {
-						def transactionEntry = new TransactionEntry();
-						transactionEntry.properties = row.properties;
-						transactionEntry.quantity = row.newQuantity
-						transactionEntry.product = cmd.product
-						transactionEntry.inventoryItem = inventoryItem;
-						transaction.addToTransactionEntries(transactionEntry);						
-					}
+					// 3. Create a new transaction entry (even if quantity didn't change)	
+					def transactionEntry = new TransactionEntry();
+					transactionEntry.properties = row.properties;
+					transactionEntry.quantity = row.newQuantity
+					transactionEntry.product = cmd.product
+					transactionEntry.inventoryItem = inventoryItem;
+					transaction.addToTransactionEntries(transactionEntry);						
 				}		
 				
 				
