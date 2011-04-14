@@ -3170,6 +3170,30 @@
 			set FOREIGN_KEY_CHECKS = 1;
 		</sql>
 	</changeSet>
+	
+	<changeSet author="mgoodrich" id="2011-04-14-1">
+   		<modifyColumn tableName="container">
+    		<column name="height" type="float(12,3)"/>
+		</modifyColumn>
+		<modifyColumn tableName="container">
+    		<column name="width" type="float(12,3)"/>
+		</modifyColumn>
+		<modifyColumn tableName="container">
+    		<column name="length" type="float(12,3)"/>
+		</modifyColumn>
+		<modifyColumn tableName="container">
+    		<column name="weight" type="float(12,3)"/>
+		</modifyColumn>
+	</changeSet>
+	
+		<changeSet author="mgoodrich" id="2011-04-14-2">
+   		<modifyColumn tableName="shipment">
+    		<column name="total_value" type="float(12,2)"/>
+		</modifyColumn>
+		<modifyColumn tableName="shipment">
+    		<column name="stated_value" type="float(12,2)"/>
+		</modifyColumn>
+	</changeSet>
 
 </databaseChangeLog>
 

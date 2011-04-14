@@ -112,8 +112,8 @@ class Shipment implements Comparable, Serializable {
 		carrier(nullable:true)
 		recipient(nullable:true)
 		donor(nullable:true)
-		statedValue(nullable:true)
-		totalValue(nullable:true)
+		statedValue(nullable:true, max:99999999F)
+		totalValue(nullable:true, max:99999999F)
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)
 		
