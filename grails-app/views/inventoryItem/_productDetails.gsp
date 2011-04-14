@@ -28,6 +28,70 @@
 			
 			<tr class="details odd">	
 				<td class="left label">
+					<span class="name">Manufacturer</span>
+				</td>
+				<td colspan="2">
+					<span class="value">
+						<g:if test="${productInstance?.manufacturer }">
+							${productInstance?.manufacturer }
+						</g:if>
+						<g:else>
+							<span class="fade">None</span>
+						</g:else>
+					</span>
+				</td>
+			</tr>
+			
+			<tr class="details even">	
+				<td class="left label">
+					<span class="name">Manufacturer Code</span>
+				</td>
+				<td colspan="2">
+					<span class="value">
+						<g:if test="${productInstance?.manufacturerCode }">
+							${productInstance?.manufacturerCode }
+						</g:if>
+						<g:else>
+							<span class="fade">None</span>
+						</g:else>
+					</span>
+				</td>
+			</tr>
+			
+			<tr class="details odd">	
+				<td class="left label">
+					<span class="name">UPC</span>
+				</td>
+				<td colspan="2">
+					<span class="value">
+						<g:if test="${productInstance?.upc }">
+							${productInstance?.upc }
+						</g:if>
+						<g:else>
+							<span class="fade">None</span>
+						</g:else>
+					</span>
+				</td>
+			</tr>
+			
+			<tr class="details even">	
+				<td class="left label">
+					<span class="name">NPC</span>
+				</td>
+				<td colspan="2">
+					<span class="value">
+						<g:if test="${productInstance?.ndc }">
+							${productInstance?.ndc }
+						</g:if>
+						<g:else>
+							<span class="fade">None</span>
+						</g:else>
+					</span>
+				</td>
+			</tr>
+			
+			<tr class="details odd">	
+				<td class="left label">
 					<span class="name">Cold Chain</span>
 				</td>
 				<td>

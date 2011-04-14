@@ -265,7 +265,7 @@ class ProductController {
                 redirect(action: "browse", params:params)
             }
             else {
-                render(view: "edit", model: [productInstance: productInstance])
+                render(view: "edit", model: [productInstance: productInstance, rootCategory: productService.getRootCategory()])
             }
         }
         else {
