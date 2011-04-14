@@ -1,7 +1,7 @@
 <g:set var="level" value="${level+1 }"/>
 <g:if test="${category?.categories }">
 	<g:set var="productCount" value="${category?.products?.size() }"/>		
-	<option value="${category?.id }" ${(category?.id == selected?.id)?'selected':'' }>
+	<option value="${category?.id ?: 'null' }" ${(category?.id && category?.id == selected?.id) ? 'selected' : '' }>
 		${ new String("&nbsp").multiply(1*(level)*(level)) } 
 		<g:if test="${!category.parentCategory}">${category.name } </g:if>
 		<g:else>${category?.name }</g:else>

@@ -51,15 +51,21 @@ class CategoryController {
 		log.info params;
 		
 		def categoryInstance = Category.get(params.id)		
-		if (!categoryInstance)
+		if (!categoryInstance) {
 			categoryInstance = new Category(params)
-		else
+		}
+		else {
 			categoryInstance.properties = params;
+		}
 		
 		if (!categoryInstance.hasErrors() && categoryInstance.save()) {
-			flash.message = "Saved category ${categoryInstance?.name} successfully";
+			flash.message = "Saved category ${categoryInstance?.name} successfully"
+			redirect(action: "tree", params: params)
 		}
-		redirect(action: "tree", params: params);
+		else {	
+			render(view: "tree", model: [categoryInstance: categoryInstance, rootCategory : productService.getRootCategory()])
+		}
+		
 	}
 	
 	def deleteCategory = {

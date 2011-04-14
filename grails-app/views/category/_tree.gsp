@@ -12,12 +12,12 @@
 					</span>
 				</p>
 			</li>
-			<g:each var="childCategory" in="${category?.categories }">		
+			<g:each var="childCategory" in="${category?.categories?.sort()}">		
 				<g:render template="tree" model="${['category': childCategory]}"/>
 			</g:each>
 		</g:if>
 		<g:else>
-			<g:each var="childCategory" in="${category?.categories }">		
+			<g:each var="childCategory" in="${category?.categories?.sort()}">	
 				<g:render template="tree" model="${['category': childCategory]}"/>
 			</g:each>
 		</g:else>

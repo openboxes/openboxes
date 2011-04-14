@@ -2,7 +2,7 @@ package org.pih.warehouse.product;
 
 import java.util.Date;
 
-class Category {
+class Category implements Comparable {
 
 	String name
 	String description
@@ -26,12 +26,21 @@ class Category {
 		name(nullable:false, maxSize: 255)
 		description(nullable:true, maxSize: 255)
 		sortOrder(nullable:true)
-		parentCategory(nullable:true)
+		// parent category can't be the category itself or any of its children
+		parentCategory(nullable:true, 
+						validator: { value, obj ->  value != obj && !(obj.getChildren().find {it == value}) })
 	}  
 	
-	String toString() { return "$name"; }
-	
+	String toString() { return "$name"; }	
 
+	/**
+	 * Sort by name
+	 */
+	int compareTo(obj) { 
+		name <=> obj.name 
+	}
+	
+	
 	List getParents() { 
 		def parents = []
 		getAllParents(this, parents)	

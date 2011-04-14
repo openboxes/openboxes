@@ -134,8 +134,10 @@ class Shipment implements Comparable, Serializable {
 	/**
 	 * Sort by name
 	 */
+	
+	// TODO: is this in descending order for a good reason?
 	int compareTo(obj) { 
-		obj?.name <=> name 
+		obj.name <=> name 
 	}
 	
 	/** 
