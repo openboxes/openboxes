@@ -180,7 +180,7 @@
 			<g:each in="${shipmentInstance.events}" var="event" status="i">				
 				<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 					<td nowrap="nowrap">						
-						<span style="font-size: 0.9em; color: #aaa;"><g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_HOUR_MONTH_DATE_FORMAT}" date="${event.eventDate}"/></span>						
+						<span style="font-size: 0.9em; color: #aaa;"><g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}" date="${event.eventDate}"/></span>						
 					</td>
 					<td>
 						<span style="font-size: 0.9em; color: #aaa;">

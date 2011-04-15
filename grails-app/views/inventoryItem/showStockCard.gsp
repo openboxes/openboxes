@@ -61,15 +61,12 @@
 						<td style="width: 300px;">
 							<g:render template="productDetails" 
 								model="[productInstance:commandInstance?.productInstance, inventoryInstance:commandInstance?.inventoryInstance, 
-									inventoryLevelInstance: commandInstance?.inventoryLevelInstance, totalQuantity: commandInstance?.totalQuantity]"/>
-								
-							<br/>
-								
-							<g:render template="showTransactionLog"/>
-								
+									inventoryLevelInstance: commandInstance?.inventoryLevelInstance, totalQuantity: commandInstance?.totalQuantity]"/>			
 						</td>
 						<td>			
 							<g:render template="showCurrentStock"/>
+							<br/>
+							<g:render template="showTransactionLog"/>
 						</td>
 					</tr>
 				</table>
@@ -119,13 +116,6 @@
 				        event.preventDefault();
 			        }
 			    );	
-
-				// Click event -> open dialog
-				jQuery('#show-filters').click(function(event) {
-					jQuery("#filters").toggle();
-					event.preventDefault();
-				});		
-
 
 				/* Action Menu */
 

@@ -1,55 +1,38 @@
 <div>							
 	<fieldset >
 		<legend><span class="fade">Transaction Log</span></legend>
-		
-		
-
-		
-		
 		<div>
 			<g:form method="GET" action="showStockCard">
 				<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
 
-				<div id="filters" class="dialog odd" style="display: none;" >
 					<!--  Filter -->
 					<div style="padding: 10px; ">
-						<div style="padding: 10px; text-align: center;">
-							<g:jqueryDatePicker 
-								id="startDate" 
-								name="startDate" 
-								value="${commandInstance?.startDate }" 
-								format="MM/dd/yyyy"
-								size="8"
-								showTrigger="false" />
-							to
-							<g:jqueryDatePicker 
-								id="endDate" 
-								name="endDate" 
-								value="${commandInstance?.endDate }" 
-								format="MM/dd/yyyy"
-								size="8"
-								showTrigger="false" />
-						</div>
-						<div style="padding: 10px; text-align: center;">
-							<g:select name="transactionType.id" 
-								from="${org.pih.warehouse.inventory.TransactionType.list()}" 
-								optionKey="id" optionValue="name" value="${commandInstance?.transactionType?.id }" 
-								noSelection="['0': '-- All types --']" /> 
-						
-							<button  class="" name="filter">
-								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'zoom.png' )}" style="vertical-align:middle"/>
-								&nbsp;Filter
-							</button>
-						</div>
-					</div>
-				</div>
-				<div class="odd" style="text-align: right; padding: 10px;">
-					<a href="#" id="show-filters">
-						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_up.png' )}" 
-							style="vertical-align:middle"/>Show/Hide Filters
-					</a>						
-				</div>				
-				
+						<g:jqueryDatePicker 
+							id="startDate" 
+							name="startDate" 
+							value="${commandInstance?.startDate }" 
+							format="MM/dd/yyyy"
+							size="8"
+							showTrigger="false" />
+						to
+						<g:jqueryDatePicker 
+							id="endDate" 
+							name="endDate" 
+							value="${commandInstance?.endDate }" 
+							format="MM/dd/yyyy"
+							size="8"
+							showTrigger="false" />
+	
+						<g:select name="transactionType.id" 
+							from="${org.pih.warehouse.inventory.TransactionType.list()}" 
+							optionKey="id" optionValue="name" value="${commandInstance?.transactionType?.id }" 
+							noSelection="['0': '-- All types --']" /> 
+					
+						<button  class="" name="filter">
+							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'zoom.png' )}" style="vertical-align:middle"/>
+							&nbsp;Filter
+						</button>
+					</div>			
 		
 				<div class="list">
 					<table >
@@ -60,6 +43,12 @@
 								</th>
 								<th>
 									${message(code: 'transaction.transactionType.label', default: 'Type')}
+								</th>
+								<th>
+									${message(code: 'transaction.source.label', default: 'Source')}
+								</th>
+								<th>
+									${message(code: 'transaction.destination.label', default: 'Destination')}
 								</th>
 								<th style="text-align: center">
 									${message(code: 'transaction.quantityChange.label', default: 'Qty In/Out')}
@@ -73,8 +62,8 @@
 								<tr>
 									<td colspan="4" class="odd">												
 										No <b>${commandInstance?.transactionType?.name }</b> transactions between 
-										<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_HOUR_MONTH_DATE_FORMAT}" date="${commandInstance?.startDate }"/> to
-										<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_HOUR_MONTH_DATE_FORMAT}" date="${commandInstance?.endDate }"/>.
+										<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${commandInstance?.startDate }"/> to
+										<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${commandInstance?.endDate }"/>.
 									</td>
 								</tr>
 							</g:if>
@@ -85,10 +74,11 @@
 										<td>	
 											<a id="show-details-${transaction?.id }" class="show-details" href="${createLink(controller: 'inventory', action:'showTransactionDialog', id: transaction.id, params: ['product.id', 'test'])}">
 												<g:formatDate
-													date="${transaction?.transactionDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_HOUR_MONTH_DATE_FORMAT}" />																
+													date="${transaction?.transactionDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />																
 											</a>
 											
 											<!--  Transaction Details -->
+											<!--  
 											<span id="transactionEntries${transaction?.id}" style="text-align: left; padding: 10px; margin: 10px; display: none; position:absolute; padding: 10px; background-color: white; border: 1px dashed black">
 												<label>Entries for Transaction #${transaction.id }</label>
 												<table width="100%">
@@ -132,11 +122,18 @@
 													</tfoot>
 												</table>
 											</span>						
-											
+											-->
 																				
 										</td>
 										<td>
 											${transaction?.transactionType?.name }&nbsp;
+										
+										</td>
+										<td>
+											${transaction?.source?.name }&nbsp;
+										</td>
+											<td>
+											${transaction?.destination?.name }&nbsp;
 										
 										</td>
 										<td style="text-align: center">

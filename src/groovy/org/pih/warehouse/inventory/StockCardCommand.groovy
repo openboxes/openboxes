@@ -31,7 +31,7 @@ class StockCardCommand {
 	Map<InventoryItem, Integer> quantityByInventoryItemMap
 	
 	// Transaction log section
-	Date startDate = new Date() - 7;		// defaults to today - 7d
+	Date startDate = new Date() - 60;		// defaults to today - 60d
 	Date endDate = new Date();				// defaults to today
 	TransactionType transactionType
 	Map transactionLogMap;

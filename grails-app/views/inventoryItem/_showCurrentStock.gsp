@@ -5,8 +5,11 @@
  </style>
 
 
-<div style="min-height: 250px;"> 	
-		<div id="inventoryView" style="text-align: left;" class="list">										
+<div> 	
+	<fieldset >
+		<legend><span class="fade">Current Stock</span></legend>
+		<div id="inventoryView" style="text-align: left;" class="list">	
+			<br/>									
 			<table border="0" style="border:1px solid #f5f5f5;">
 				<thead>
 					<tr class="even">
@@ -48,7 +51,7 @@
 								</td>														
 								<td class="top">
 									<g:if test="${itemInstance?.expirationDate}">
-										<g:formatDate date="${itemInstance?.expirationDate }" format="${org.pih.warehouse.core.Constants.DEFAULT_HOUR_MONTH_DATE_FORMAT}" />
+										<g:formatDate date="${itemInstance?.expirationDate }" format="${org.pih.warehouse.core.Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}" />
 									</g:if>
 									<g:else>
 										<span class="fade">Never</span>
@@ -111,5 +114,6 @@
 					</tfoot>
 				</g:if>
 			</table>										
-		</div>		
+		</div>	
+	</fieldset>	
 </div>

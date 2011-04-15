@@ -41,7 +41,7 @@
 								<td valign="top" class="name"><label><g:message code="inventoryItem.expirationDate.label" default="Expires" /></label></td>                            
 								<td valign="top" class="value">
 									<g:if test="${itemInstance?.expirationDate }">
-										<g:formatDate date="${itemInstance?.expirationDate }" format="${org.pih.warehouse.core.Constants.DEFAULT_HOUR_MONTH_DATE_FORMAT}" />
+										<g:formatDate date="${itemInstance?.expirationDate }" format="${org.pih.warehouse.core.Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}" />
 									</g:if>
 									<g:else>
 										<span class="fade">Never</span>
