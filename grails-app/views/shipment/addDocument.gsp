@@ -28,8 +28,10 @@
 					<fieldset>
 						<g:render template="summary" />
 						<div>
-							<g:uploadForm controller="document" action="upload">
+							<!-- process an upload or save depending on whether we are adding a new doc or modifying a previous one -->					
+							<g:uploadForm controller="document" action="${documentInstance?.id ? 'save' : 'upload'}">
 								<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
+								<g:hiddenField name="documentId" value="${documentInstance?.id}" />
 								<table>
 									<tbody>
 										<tr class="prop">
@@ -37,7 +39,7 @@
 												code="document.documentType.label" default="Document Type" /></label></td>
 											<td valign="top"
 												class="value ${hasErrors(bean: documentInstance, field: 'documentType', 'errors')}">
-												<g:select name="typeId" from="${org.pih.warehouse.core.DocumentType.list()}" optionKey="id" optionValue="name"/>
+												<g:select name="typeId" from="${org.pih.warehouse.core.DocumentType.list()}" value="${documentInstance?.documentType?.id}" optionKey="id" optionValue="name"/>
 											</td>
 										</tr>
 										<tr class="prop">
@@ -64,16 +66,23 @@
 											</td>
 											<td valign="top"
 												class="value ${hasErrors(bean: documentInstance, field: 'fileContents', 'errors')}">
-												<input name="fileContents" type="file" />
+												<!-- determine if this is an add or an edit -- at this point you can only edit document details, not modify the file itself -->
+												<g:if test="${!documentInstance.id}">
+													<input name="fileContents" type="file" />
+												</g:if>
+												<g:else>
+													${documentInstance.filename}
+												</g:else>
 											</td>
 										</tr>
 										<tr class="prop">
 											<td valign="top" class="name"></td>
 											<td valign="top" class="value">
 												<div class="buttons">
+													<!-- show upload or save depending on whether we are adding a new doc or modifying a previous one -->
 													<button type="submit" class="positive"><img
 														src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
-														alt="save" /> Upload</button>
+														alt="save" />${documentInstance?.id ? 'Save' : 'Upload'}</button>
 													<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id}" class="negative">
 														<img
 															src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}"

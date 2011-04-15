@@ -258,6 +258,10 @@
 																		 --%>																		
 																	</td>
 																	<td style="text-align: right">
+																		<g:link action="editDocument" params="[documentId:document.id,shipmentId:shipmentInstance.id]">
+																			<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Download" style="vertical-align: middle"/>													
+																		</g:link>
+																		&nbsp;
 																		<g:link controller="document" action="download" id="${document.id}">
 																			<img src="${createLinkTo(dir:'images/icons/silk',file:'disk.png')}" alt="Download" style="vertical-align: middle"/>													
 																		</g:link>

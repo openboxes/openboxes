@@ -20,8 +20,6 @@ class DocumentController {
     static allowedMethods = [index: "GET", upload: "POST", download: "GET"];
 
     //def scaffold = Document;
-    
- 
 
     /**
      * Show index page - just a redirect to the list page.
@@ -30,8 +28,34 @@ class DocumentController {
 		log.info "document controller index";
 		redirect(action: "list", params:params)
 	}
-           
-
+        
+	/**
+	 * Saves changes to document metadata (or, more specifically, saves changes to metadata--type,name,documentNumber--associated with
+	 * a document without modifying the document itself--the upload method handles this)
+	 */
+	def save = { DocumentCommand command ->
+		// fetch the existing document
+		Document document = Document.get(params.documentId)
+		if (!document) {
+			// this should never happen, so fail hard
+			throw new RuntimeException("Unable to retrieve document " + params.documentId)
+		}
+		
+		// bind the command object to the document object ignoring the shipmentId and fileContents params (which can't change after creation)
+		bindData(document, command, ['shipmentId','fileContents'])
+		// manually update the document type
+		document.documentType = DocumentType.get(Long.parseLong(command.typeId))
+		
+		if (!document.hasErrors()) {
+			flash.message= "Successfully updated document information"	
+			redirect(controller: 'shipment', action: 'showDetails', id: command.shipmentId)
+		}
+		else {
+			redirect(controller: "shipment", action: "addDocument", id: command.shipmentId,
+			  model: [shipmentInstance: Shipment.get(command.shipmentId), document : document])
+		}
+	}
+	
 	/**
 	* Upload a document to the server
 	*/
