@@ -3002,11 +3002,17 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-       <addForeignKeyConstraint constraintName="fk_local_transfer_source_transaction_transaction"
-	    	baseTableName="local_transfer" baseColumnNames="source_transaction_id" referencedTableName="transaction" referencedColumnNames="id" />
-  	   <addForeignKeyConstraint constraintName="fk_local_transfer_destination_transaction_transaction"
-	    	baseTableName="local_transfer" baseColumnNames="destination_transaction_id" referencedTableName="transaction" referencedColumnNames="id" />
+     	<modifySql dbms="mysql">
+         	<append value=" engine innodb"/>
+    	</modifySql>
     </changeSet>
+    
+     <changeSet author="mgoodrich" id="2011-03-31-2">
+     	<addForeignKeyConstraint constraintName="fk_local_transfer_source_transaction_transaction"
+	    	baseTableName="local_transfer" baseColumnNames="source_transaction_id" referencedTableName="transaction" referencedColumnNames="id" />
+  	   	<addForeignKeyConstraint constraintName="fk_local_transfer_destination_transaction_transaction"
+	    	baseTableName="local_transfer" baseColumnNames="destination_transaction_id" referencedTableName="transaction" referencedColumnNames="id" />
+     </changeSet>
     
     <changeSet author="mgoodrich" id="2011-04-1-1">
        <preConditions onFail="MARK_RAN">
