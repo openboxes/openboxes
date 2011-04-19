@@ -49,8 +49,13 @@ class DashboardController {
 				userInstance.lastLoginDate = new Date();
 				userInstance.save(flush:true);
 			}			
-			// Successfully logged in and select a warehouse
+			// Successfully logged in and selected a warehouse
 			//session.user = userInstance;
+			
+			//if (params?.targetUri) {
+			//	redirect(uri: params.targetUri);
+			//	return;
+			//}
 			redirect(controller:'dashboard', action:'index')
 		}
 		else {	

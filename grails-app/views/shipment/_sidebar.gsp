@@ -8,6 +8,9 @@
 				<g:link controller="shipment" action="listShipping">List Shipments</g:link>
 			</div>
 			<div class="action-menu-item">
+				<hr/>
+			</div>
+			<div class="action-menu-item">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="Show Details" style="vertical-align: middle" />&nbsp;
 				<g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}"> 						
 					<g:if test="${request.request.requestURL.toString().contains('showDetails')}"><b>Show Details</b></g:if>
@@ -17,7 +20,7 @@
 			<!-- you can only edit a shipment or it's packing list if you are at the origin warehouse, or if the origin is not a warehouse, and you are at the destination warehouse -->
 			<g:if test="${(session?.warehouse?.id == shipmentInstance?.origin?.id) || (!shipmentInstance?.origin?.isWarehouse() && session?.warehouse?.id == shipmentInstance?.destination?.id)}">				
 				<div class="action-menu-item">
-					<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit Shipment" style="vertical-align: middle" />&nbsp; 
+					<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_edit.png')}" alt="Edit Shipment" style="vertical-align: middle" />&nbsp; 
 					<g:link controller="createShipmentWorkflow" action="createShipment" id="${shipmentInstance.id}">
 						<g:if test="${request.request.requestURL.toString().contains('createShipment')}"><b>Edit Shipment</b></g:if>
 						<g:else>Edit Shipment</g:else>
@@ -30,6 +33,23 @@
 				</div>
 			</g:if>
 			<div class="action-menu-item">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'table_edit.png')}" alt="Edit Packing List" style="vertical-align: middle"/>&nbsp;
+				<g:link controller="createShipmentWorkflow" action="createShipment" event="enterContainerDetails" 
+					id="${shipmentInstance?.id }" params="[skipTo:'Packing']">Edit Packing List</g:link>					
+			</div>
+			<div class="action-menu-item">		
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" alt="Upload a Document" style="vertical-align: middle"/>
+				<a href="${createLink(controller: "shipment", action: "addDocument", id: shipmentInstance.id)}">Upload a Document</a>
+			</div>
+			<div class="action-menu-item">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'comment_add.png')}" alt="Add Note" style="vertical-align: middle"/>
+				<a href="${createLink(controller: "shipment", action: "addComment", id: shipmentInstance.id)}">Add a Note</a>													
+			</div>
+			<div class="action-menu-item">
+				<hr/>
+			</div>
+			
+			<div class="action-menu-item">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="View Packing List" style="vertical-align: middle"/>&nbsp;
 				<g:link controller="shipment" action="showPackingList" id="${shipmentInstance.id}">
 					<g:if test="${request.request.requestURL.toString().contains('showPackingList')}"><b>View Packing List</b></g:if>
@@ -37,12 +57,15 @@
 				</g:link>		
 			</div>
 			<div class="action-menu-item">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'report_word.png')}" alt="View Packing List" style="vertical-align: middle"/>&nbsp;	
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_word.png')}" alt="View Packing List" style="vertical-align: middle"/>&nbsp;	
 				<g:link controller="doc4j" action="downloadLetter" id="${shipmentInstance?.id }">Download Letter</g:link> (.docx)
 			</div>
 			<div class="action-menu-item">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'report.png')}" alt="View Packing List" style="vertical-align: middle"/>&nbsp;	
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}" alt="View Packing List" style="vertical-align: middle"/>&nbsp;	
 				<g:link controller="doc4j" action="downloadPackingList" id="${shipmentInstance?.id }">Download Packing List</g:link> (.xls)
+			</div>
+			<div class="action-menu-item">
+				<hr/>
 			</div>
 		
 			<g:if test="${session?.warehouse?.id == shipmentInstance?.origin?.id || 
@@ -89,8 +112,6 @@
 					</g:link>				
 				</div>
 			</g:if>
-				
-
 		</span>
 	</span>
 	<script type="text/javascript">

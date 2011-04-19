@@ -24,7 +24,7 @@
 			
 		<table>		
 			<tr>
-				<td width="75%">
+				<td>
 					<fieldset>
 						<g:render template="summary" />
 
@@ -72,9 +72,6 @@
 						</g:form>
 					</fieldset>
 				</td>
-				<td width="20%">
-					<g:render template="sidebar" />						
-				</td>				
 			</tr>
 		</table>
 	</div>

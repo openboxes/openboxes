@@ -111,10 +111,10 @@ class AuthController {
 				// PIMS-782 Force the user to select a warehouse each time
 				//session.warehouse = userInstance.warehouse
 				
-				if (params?.targetUri) {
-					redirect(uri: params.targetUri);
-					return;
-				}
+				//if (params?.targetUri) {
+				//	redirect(uri: params.targetUri);
+				//	return;
+				//}
 				redirect(controller:'dashboard',action:'index')
 					
 					

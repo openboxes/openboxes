@@ -13,6 +13,7 @@ class User extends Person {
 
 	Date lastLoginDate;			// keep track of the user's last login
 	Warehouse warehouse;		// keep track of the user's last warehouse
+	//Boolean useSavedWarehouse		// indicates whether we should use this warehouse when user logs in 
 	User manager;				// the user's designated manager 
 
 	byte [] photo				// profile photo
@@ -36,6 +37,7 @@ class User extends Person {
 			passwordConfirm == password ? true : ['invalid.matchingpasswords']
 		})		
 		lastLoginDate(nullable:true)
+		//useSavedWarehouse(nullable:true)
 		warehouse(nullable:true)
 	}
 

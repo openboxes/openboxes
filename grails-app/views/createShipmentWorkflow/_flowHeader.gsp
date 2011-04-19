@@ -95,20 +95,19 @@
 					<g:link action="createShipment" event="sendShipment">5. Ship</g:link>
 				</td>
 				-->
-				<%-- 
+				 <%-- 
 				<td style="border-left: 1px solid lightgrey; text-align: center;">
-				
 					<g:if test="${currentState!='Details'}">
-						<g:link action="createShipment" event="back">&lsaquo; Back</g:link>
+						<g:link action="createShipment" event="back"><img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_left.png')}" style="vertical-align: middle;"/></g:link>
 					</g:if>
 					<g:else>
 						&lsaquo; Back
 					</g:else>
 				</td>
 				<td style="border-left: 1px solid lightgrey; text-align: center;">
-				
-				
-					<g:link action="createShipment" event="next">Next &rsaquo;</g:link> 
+					<g:link action="createShipment" event="next">
+						<img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_right.png')}" style="vertical-align: middle;"/>
+					</g:link> 
 				</td>
 				--%>
 			</tr>

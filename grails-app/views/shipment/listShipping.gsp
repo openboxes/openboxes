@@ -76,7 +76,6 @@
 				                        <tr class="odd">   
 				                        	<th>${message(code: 'shipment.shipmentType.label', default: 'Type')}</th>
 				                            <th>${message(code: 'shipment.shipment.label', default: 'Shipment')}</th>							
-				                         	<th>${message(code: 'shipment.actions.label', default: 'Actions')}</th>
 				                            <th>${message(code: 'shipment.destination.label', default: 'Destination')}</th>
 				                        	<th>${message(code: 'shipment.expectedShippingDate.label', default: 'Shipping Date')}</th>
 				                         	<th>${message(code: 'shipment.status.label', default: 'Status')}</th>
@@ -90,19 +89,17 @@
 													alt="${shipmentInstance?.shipmentType?.name}" style="vertical-align: middle; width: 24px; height: 24px;" />		
 												</td>										
 												<td>
-													<g:link action="showDetails" id="${shipmentInstance.id}">
-														${fieldValue(bean: shipmentInstance, field: "name")}
-													</g:link>																														
-												</td>
-												<td nowrap="true" style="text-align: left;">
-													<div class="action-menu">
-														<span>Actions<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" /></span>
+													<span class="action-menu">
+														<g:link action="showDetails" id="${shipmentInstance.id}">
+															${fieldValue(bean: shipmentInstance, field: "name")}
+														</g:link>																														
+														<span><img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" /></span>
 														<div class="actions">
 															<g:render template="listShippingMenuItems" model="[shipmentInstance:shipmentInstance]"/>															
 															
 														</div>
-													</div>	
-												</td>															
+													</span>	
+												</td>
 												<td align="center">
 													${fieldValue(bean: shipmentInstance, field: "destination.name")}
 												</td>

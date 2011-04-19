@@ -8,8 +8,6 @@ import org.pih.warehouse.product.Product;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.Warehouse;
 
-
-
 class InventoryController {
     //def scaffold = Inventory		
 	def inventoryService;
@@ -25,38 +23,15 @@ class InventoryController {
 	}
 	
 	
-	/** 
-	 * TODO These are the same methods used in the product browser.  Need to figure out a better
-	 * way to handle this (e.g. through a generic ajax call or taglib).
-	 */
-	def removeCategoryFilter = { 	
-		def category = Category.get(params?.categoryId)		
-		if (category)
-			session.inventoryCategoryFilters.remove(category?.id);
-		redirect(action: browse);		
-	}
-	def clearCategoryFilters = { 
-		session.inventoryCategoryFilters.clear();
-		session.inventoryCategoryFilters = null;
-		redirect(action: browse);		
-	}
-	def addCategoryFilter = { 
-		def category = Category.get(params?.categoryId);
-		if (category && !session.inventoryCategoryFilters.contains(category?.id)) 
-			session.inventoryCategoryFilters << category?.id;
-		redirect(action: browse);		
-	}
-
 	/**
 	 * Allows a user to browse the inventory for a particular warehouse.  
-	 * 
-	 * 	
 	 */
 	def browse = { BrowseInventoryCommand cmd ->
 		
 		log.info "Browse inventory " + cmd;
 		// Get the warehouse from the request parameter
 		cmd.warehouseInstance = Warehouse.get(params?.warehouse?.id) 
+		cmd.categoryInstance = Category.get(params?.categoryId)
 		
 		// If it doesn't exist or if the parameter is null, get 
 		// warehouse from the session
@@ -69,32 +44,38 @@ class InventoryController {
 			inventoryService.addInventory(cmd.warehouseInstance)
 		}
 		
+		// Get a list of shipments 
 		cmd.shipmentList = shipmentService.getReceivingByDestinationAndStatus(cmd.warehouseInstance, ShipmentStatusCode.SHIPPED);
-		
-		// Hydrate the category filters from the session
-		// Allow us to get any attribute of a category without get a lazy init exception
+
+		// If the user entered a search term, add it to the session-bound search terms
+		if (cmd.searchTerms) {
+			if (!session.inventorySearchTerms) {
+				session.inventorySearchTerms = []
+			}
+			if (!session.inventorySearchTerms.contains(cmd.searchTerms)) {
+				session.inventorySearchTerms << cmd.searchTerms
+			}
+		}
+
+		// Hydrate the category filters from the session, which allow us 
+		// to get any attribute of a category without get a lazy init exception
 		cmd.categoryFilters = []
 		if (session.inventoryCategoryFilters) {
 			session.inventoryCategoryFilters.each {
 				cmd.categoryFilters << Category.get(it);
 			}
 		}
-		inventoryService.browseInventory(cmd, params);
-		
-		/*
-		// If there's 
-		if (cmd?.productList.size() == 1) { 
-			def productInstance = cmd?.productList.get(0);
-			redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id);
+				
+		// Add session-bound search terms to command object 
+		cmd.searchTermFilters = []
+		if (session.inventorySearchTerms) { 
+			session.inventorySearchTerms.each {
+				cmd.searchTermFilters << it;
+			}
 		}
-		*/
-		/*
-		// Add all returned products to flash for use within Create Transaction or Batch Edit 
-		cmd.productList.each { 
-			flash.productList = it.id
-		}
-		*/
 		
+		inventoryService.browseInventory(cmd, session?.showHiddenProducts);
+
 		[ commandInstance: cmd ]
 	}
 	
@@ -648,6 +629,51 @@ class InventoryController {
 
 	}
 	
+	
+	/**
+	* TODO These are the same methods used in the inventory browser.  Need to figure out a better
+	* way to handle this (e.g. through a generic ajax call or taglib).
+	*/
+	def removeCategoryFilter = {
+		def category = Category.get(params?.categoryId)
+		if (category)
+			session.inventoryCategoryFilters.remove(category?.id);
+		redirect(action: browse);
+	}
+	
+	def clearAllFilters = {
+		session.inventoryCategoryFilters = [];
+		session.inventorySearchTerms = [];
+		redirect(action: browse);
+	}
+	def addCategoryFilter = {
+		def category = Category.get(params?.categoryId);
+		if (category && !session.inventoryCategoryFilters.contains(category?.id))
+			session.inventoryCategoryFilters << category?.id;	
+		redirect(action: browse);
+	}
+	def narrowCategoryFilter = {
+		def category = Category.get(params?.categoryId);
+		session.inventoryCategoryFilters = []
+		if (category && !session.inventoryCategoryFilters.contains(category?.id))
+			   session.inventoryCategoryFilters << category?.id;
+		redirect(action: browse);
+	}
+	def removeSearchTerm = {
+		if (params.searchTerm)
+			session.inventorySearchTerms.remove(params.searchTerm);
+		redirect(action: browse);
+	}
+	
+	def showHiddenProducts = { 
+		if(!session.showHiddenProducts) { 
+			session.showHiddenProducts = true;
+		}
+		else { 
+			session.showHiddenProducts = !session.showHiddenProducts
+		}
+		redirect(action:browse)
+	}
 	
 	/*
 	def edit = {

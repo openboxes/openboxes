@@ -26,15 +26,18 @@ thead th {
 }
 
 /* Product Details box */
-#product-details-box { width: 260px;}
+/*#product-details-box { width: 260px;}*/
 #product-details-box span.name {   } 
 #product-details-box span.value { font-size: 1.0em; } 
 #product-details-box span.name:after { content: ": " }
 #product-details-box th { color: lightgrey; } 
 #product-details-box fieldset table td { padding: 6px; } 
 .product-details { height: 45px; line-height: 2px; }
+/*
 .product-details .label { width: 80px; }
+
 .product-details .value { width: 150px; }
+*/
 .product-details .button { width: 20px; }
 
 /* Text Alignment classes */
@@ -531,16 +534,14 @@ span.left { width: 10%;  float: left; text-align: center; }
 .actions { cursor: pointer; position: absolute; z-index:999; background-color: #f5f5f5; border: 1px solid lightgrey; padding: 10px; display: none; } 
 .action-menu { cursor: pointer; } 
 .action-menu { padding: 0; }
-.action-menu-root { margin: 10px; } 
+.action-menu-root { margin: 0px; } 
 .filter-list-item { margin: 10px; } 
 .document-list-item { margin: 1px; }
 .action-menu-item { margin: 0px; padding: 3px; }
 .action-menu-item a:hover { text-decoration: underline; }
 
 .selected { 
-	font-weight: bold; 
-	background-color: lightgrey; 
-	color: white;
+	font-weight: bold;		
 }
 
 .tabSelected { 

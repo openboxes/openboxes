@@ -16,6 +16,8 @@
 			</div>		
 		
 	    	<div id="dashboard">				
+	    	
+	    		<%-- 
 	    		<div class="widgetlarge">
 			    	<div class="widgetheader"><g:message code="dashboard.welcome.label"/></div>
 	    			<div class="widgetcontent">
@@ -34,7 +36,21 @@
 						</g:else>				
 					</div>
 				</div>
+				--%>
 				
+				<!--  Show the last five transactions? -->
+				<%-- 
+				<div class="widgetsmall">
+					<div class="widgetheader"><g:message code="transaction.summary.label" args="[session.warehouse.name]"/></div>
+	    			<div class="widgetcontent">
+	    				<div id="transaction-summary">
+	    				
+	    				</div>
+	    			</div>
+	    		</div>
+				--%>
+				
+				<!--  Show recent shipments/receipts -->
 				<div class="widgetsmall">
 					<div class="widgetheader"><g:message code="shipping.summary.label" args="[session.warehouse.name]"/></div>
 	    			<div class="widgetcontent">
@@ -45,7 +61,7 @@
    								</div>
    							</g:if>	    		
    							<g:else>			
-					    		<table style="display: inline-block;">
+					    		<table style="border: 1px solid lightgrey">
 					    			<thead>
 					    				<tr class="odd">
 					    					<th>All Shipping</th>

@@ -47,33 +47,36 @@
 									</tr>
 									<tr class="prop">
 										<td valign="top" class="name" ><label><g:message
-											code="shipment.origin.label" default="From" /></label></td>
+											code="shipment.origin.label" default="Departing" /></label></td>
 										<td valign="top" class="value" style="width: 30%;">
-											${fieldValue(bean: shipmentInstance, field: "origin.name")}<br/>										
-										</td>
-										<td>
+											<span>
+												${fieldValue(bean: shipmentInstance, field: "origin.name")}									
+											</span>
 											<span class="fade">
 												<g:if test="${shipmentInstance.expectedShippingDate && !shipmentInstance.hasShipped()}">
-													Expected to ship on <g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />
+													on <g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />
 												</g:if>
 											</span>											
+										</td>
+										<td>
 										</td>
 									</tr>
 									<tr class="prop">
 										<td class="name"  >
-											<label><g:message code="shipment.destination.label" default="To" /></label>
+											<label><g:message code="shipment.destination.label" default="Arriving" /></label>
 										</td>
 										<td class="value" style="width: 30%;">
 											<span>
-												${fieldValue(bean: shipmentInstance, field: "destination.name")}<br/>
+												${fieldValue(bean: shipmentInstance, field: "destination.name")}
 											</span>											
-										</td>
-										<td>
 											<span class="fade">
 												<g:if test="${shipmentInstance.expectedDeliveryDate && !shipmentInstance.wasReceived()}">
-													Expected to arrive on <g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />
+													on <g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />
 												</g:if>
 											</span>											
+											
+										</td>
+										<td>
 										</td>
 									</tr>
 									<g:if test="${!shipmentWorkflow?.isExcluded('carrier')}">  
@@ -152,7 +155,7 @@
 												code="shipment.${referenceNumberType?.name}" default="${referenceNumberType?.name}" /></label></td>
 											<td valign="top" style="width: 30%;">
 												<g:findAll in="${shipmentInstance?.referenceNumbers}" expr="it.referenceNumberType.id == referenceNumberType.id">
-													${it.identifier}
+													${it.identifier }													
 												</g:findAll>	
 											</td>
 											<td>
@@ -244,9 +247,30 @@
 																<tr id="document-${document.id}"
 																	class="${(i % 2) == 0 ? 'odd' : 'even'}">
 																	<td>
-																		${document?.documentType?.name} <br/>
+																		<g:set var="f" value="${document?.filename?.toLowerCase()}"/>
+																		<g:if test="${f.endsWith('.jpg')||f.endsWith('.png')||f.endsWith('.gif') }">
+																			<img src="${createLinkTo(dir:'images/icons/silk',file:'picture.png')}"/>
+																		</g:if>
+																		<g:elseif test="${f.endsWith('.pdf') }">
+																			<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_acrobat.png')}"/>
+																		</g:elseif>
+																		<g:elseif test="${f.endsWith('.doc')||f.endsWith('.docx') }">
+																			<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_word.png')}"/>
+																		</g:elseif>
+																		<g:elseif test="${f.endsWith('.xls')||f.endsWith('.xlsx')||f.endsWith('.csv') }">
+																			<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}"/>2
+																		</g:elseif>
+																		<g:elseif test="${f.endsWith('.gz')||f.endsWith('.jar')||f.endsWith('.zip')||f.endsWith('.tar') }">
+																			<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_compressed.png')}"/>
+																		</g:elseif>
+																		<g:else>
+																			<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white.png')}"/> 
+																		</g:else>
+																		<g:link controller="document" action="download" id="${document.id}">
+																			${document?.filename}
+																		</g:link> 
 																		<span class="fade">
-																		${document?.name} 
+																		${document?.documentType?.name}	
 																		</span>
 																	</td>
 																	<td>
@@ -257,7 +281,7 @@
 																		</span>
 																		 --%>																		
 																	</td>
-																	<td style="text-align: right">
+																	<td style="text-align: right">			
 																		<g:link action="editDocument" params="[documentId:document.id,shipmentId:shipmentInstance.id]">
 																			<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Download" style="vertical-align: middle"/>													
 																		</g:link>
@@ -265,7 +289,8 @@
 																		<g:link controller="document" action="download" id="${document.id}">
 																			<img src="${createLinkTo(dir:'images/icons/silk',file:'disk.png')}" alt="Download" style="vertical-align: middle"/>													
 																		</g:link>
-																		&nbsp;
+																		&nbsp;			
+																																
 																		<g:link class="remove" action="deleteDocument" id="${document?.id}" params="[shipmentId:shipmentInstance.id]" onclick="return confirm('Are you sure you want to delete this document?')">
 																			<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" style="vertical-align: middle"/>
 																		</g:link>																		
@@ -276,9 +301,6 @@
 														</tbody>
 													</table>
 												</g:if>												
-												<a href="${createLink(controller: "shipment", action: "addDocument", id: shipmentInstance.id)}">
-													<button><img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" 
-																alt="Upload an Existing Document" style="vertical-align: middle"/> Upload a Document</button></a>													
 												
 											</div>
 											
@@ -321,9 +343,6 @@
 														</tbody>
 													</table>												
 												</g:if> 
-												<a href="${createLink(controller: "shipment", action: "addComment", id: shipmentInstance.id)}">
-													<button><img src="${createLinkTo(dir:'images/icons/silk',file:'comment_add.png')}" 
-																alt="Add Notes" style="vertical-align: middle"/> Add Note</button></a>													
 																									
 											</div>
 										</td>
@@ -392,22 +411,19 @@
 															</tr>
 															<g:set var="count" value="${0 }"/>
 															<g:set var="previousContainer"/>
-															<g:set var="shipmentItems" value="${shipmentInstance.shipmentItems.sort{it?.container?.sortOrder} }"/>
-															<g:each in="${shipmentItems }" var="item" status="i">	
+															
+															<g:set var="shipmentItems" value="${shipmentInstance.shipmentItems.sort{(it?.container?.parentContainer) ? it?.container?.parentContainer?.sortOrder : it?.container?.sortOrder} }"/>
+															<g:each in="${shipmentItems}" var="item" status="i">	
+																<g:set var="showContainer" value="${previousContainer != item?.container }"/>															
 																<tr class="${(count++ % 2 == 0)?'odd':'even'}">
 																	<td nowrap>
-																		<g:if test="${previousContainer != item?.container }">
-																			<%-- 
-																			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'package.png')}" style="vertical-align: middle"/>
-																			&nbsp;
-																			--%>
-																			<g:if test="${item?.container?.name }">
-																				${item?.container?.name }
-																			</g:if>
-																			<g:else>
-																				Unpacked
-																			</g:else>
+																		<g:if test="${showContainer }">
+																			<%-- <img src="${createLinkTo(dir: 'images/icons/silk', file: 'package.png')}" style="vertical-align: middle"/>&nbsp;--%>
+																			<g:if test="${item?.container?.parentContainer}">${item?.container?.parentContainer?.name } &rsaquo;</g:if>
+																			<g:if test="${item?.container?.name }">${item?.container?.name }</g:if>
+																			<g:else>Unpacked</g:else>
 																		</g:if>
+																		
 																	</td>
 																	<td>
 																		<g:link controller="product" action="edit" id="${item?.product?.id}">

@@ -20,59 +20,7 @@ class ProductController {
 	
     def index = {
         redirect(action: "list", params: params)
-    }
-
-	//params.max = Math.min(params.max ? params.int('max') : 10, 100)
-    //    [eventTypeInstanceList: EventType.list(params), eventTypeInstanceTotal: EventType.count()]
-
-	def removeCategoryFilter = {
-		
-		def category = Category.get(params?.categoryId)
-		if (category)
-			session.productCategoryFilters.remove(category?.id);
-			
-		redirect(action: browse);
-	}
-	
-	def clearCategoryFilters = {
-		session.productCategoryFilters.clear();
-		session.productCategoryFilters = null;
-		redirect(action: browse);
-	}
-	
-	def addCategoryFilter = {
-		def category = Category.get(params?.categoryId);
-		if (category && !session.productCategoryFilters.contains(category?.id))
-			session.productCategoryFilters << category?.id;
-		redirect(action: browse);
-	}
-	
-	
-    def browse = { 
-		//params.max = Math.min(params.max ? params.int('max') : 10, 100);
-
-		// Hydrate the category filters from the session
-		// Allow us to get any attribute of a category without get a lazy init exception
-		def categoryFilters = []
-		if (session.productCategoryFilters) {
-			session.productCategoryFilters.each {
-				categoryFilters << Category.get(it);
-			}
-		}
-		
-		// Get all products in the given categories.  If there are no products returned, 
-		// we should to display all products by default.
-		def products = inventoryService.getProductsByCategories(categoryFilters);		
-		products = products ?: Product.list();
-		def productsByCategory = products.groupBy { it.category }
-		
-		render(view:'browse', model:[productInstanceList : products, 
-    	                             productInstanceTotal: products.size(), 
-									 productsByCategory : productsByCategory,
-									 rootCategory : productService.getRootCategory(),
-									 categoryFilters: categoryFilters ])
-	}
-    
+    }	
 	
 	/** 
 	 * Perform a bulk update of 
@@ -185,7 +133,7 @@ class ProductController {
 		if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'product.label', default: 'Product'), productInstance.name])}"
 			
-            redirect(action: "browse", params:params)
+            redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id, params:params)
         }
         else {
             render(view: "edit", model: [productInstance: productInstance, rootCategory: productService.getRootCategory()])
@@ -196,7 +144,7 @@ class ProductController {
         def productInstance = Product.get(params.id)
         if (!productInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
-            redirect(action: "browse")
+            redirect(controller: "inventoryItem", action: "browse")
         }
         else {
             [productInstance: productInstance]
@@ -207,7 +155,7 @@ class ProductController {
         def productInstance = Product.get(params.id)
         if (!productInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
-            redirect(action: "browse")
+            redirect(controller: "inventoryItem", action: "browse")
         }
         else {
             return [productInstance: productInstance, rootCategory: productService.getRootCategory()]
@@ -262,7 +210,7 @@ class ProductController {
 			*/
             if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
                 flash.message = "${message(code: 'default.updated.message', args: [message(code: 'product.label', default: 'Product'), productInstance.name])}"
-                redirect(action: "browse", params:params)
+                redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id, params:params)
             }
             else {
                 render(view: "edit", model: [productInstance: productInstance, rootCategory: productService.getRootCategory()])
@@ -270,7 +218,7 @@ class ProductController {
         }
         else {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
-            redirect(action: "browse", params:params)
+            redirect(controller: "inventoryItem", action: "browse")
         }
     }
 
@@ -286,7 +234,7 @@ class ProductController {
 	            productInstance.delete(flush: true)
 	            
 	            flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
-	            redirect(action: "browse")
+	            redirect(controller: "inventoryItem", action: "browse")
 		      }
 		      catch (org.springframework.dao.DataIntegrityViolationException e) {
 	            flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
@@ -339,7 +287,7 @@ class ProductController {
 					};
 				   // import
 				   flash.message = "Products imported successfully"
-				   redirect(controller: "product", action: "browse")
+				   redirect(controller: "inventoryItem", action: "browse")
 			   }			   								   
 			   else { 
 				   flash.message = "Please import dependencies first"

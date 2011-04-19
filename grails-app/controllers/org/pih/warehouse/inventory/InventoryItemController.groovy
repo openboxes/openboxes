@@ -359,18 +359,47 @@ class InventoryItemController {
 		}
 	}
 	
-	def editWarningLevels = {
-		def itemInstance = InventoryItem.get(params.id)
+	def editInventoryLevel = {
+		
+		def productInstance = Product.get(params?.product?.id)
 		def inventoryInstance = Inventory.get(params?.inventory?.id)
-		if (!itemInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'inventoryItem.label', default: 'Inventory item'), params.id])}"
-			redirect(action: "show", id: itemInstance.id)
+		def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, inventoryInstance)
+		if (!inventoryLevelInstance) { 
+			inventoryLevelInstance = new InventoryLevel();
 		}
-		else {
-			return [itemInstance: itemInstance]
-		}
+		
+		[productInstance:productInstance, inventoryInstance:inventoryInstance, inventoryLevelInstance:inventoryLevelInstance]
 	}
 
+	def updateInventoryLevel = { 
+		
+		log.info ("update inventory level " + params)
+		
+		def productInstance = Product.get(params?.product?.id)
+		def inventoryInstance = Inventory.get(params?.inventory?.id)
+		def inventoryLevelInstance = InventoryLevel.get(params.id)
+
+		if (inventoryLevelInstance) { 
+			inventoryLevelInstance.properties = params
+		}
+		else { 
+			inventoryLevelInstance = new InventoryLevel(params)
+		}
+		
+		if (!inventoryLevelInstance.hasErrors() && inventoryLevelInstance.save()) { 
+			log.info ("save inventory level ")
+			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'inventoryLevel.label', default: 'Inventory level'), inventoryLevelInstance.id])}"
+		}
+		else { 
+			log.info ("render with errors")
+			render(view: "updateInventoryLevel", model: 
+				[productInstance:productInstance, inventoryInstance:inventoryInstance, inventoryLevelInstance:inventoryLevelInstance]);
+			return;
+		}
+		
+		redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
+	}
+	
 	
 	/**
 	 * Handles form submission from Show Stock Card > Adjust Stock dialog.	
@@ -467,22 +496,22 @@ class InventoryItemController {
 		def productInstance = Product.get(params?.product?.id);
 		def personInstance = Person.get(params?.recipient?.id);
 		def inventoryItem = InventoryItem.get(params?.inventoryItem?.id);
-		if (params.shipment.type == 'container') { 
-			containerInstance = Container.get(params?.shipment?.id);
-			shipmentInstance = containerInstance.shipment;
-		}
-		else { 
-			shipmentInstance = Shipment.get(params?.shipment?.id);
-			//containerInstance = shipmentInstance?.containers?.get(0);
-		}
-				
+		
+		def shipmentContainer = params.shipmentContainer?.split(":")
+		
+		shipmentInstance = Shipment.get(shipmentContainer[0]);
+		containerInstance = Container.get(shipmentContainer[1]);
+		
+		log.info("shipment "  + shipmentInstance);
+		log.info("container "  + containerInstance);
+		
 		def itemInstance = new ShipmentItem(
 			product: productInstance,
 			quantity: params.quantity,
 			recipient: personInstance,
 			lotNumber: inventoryItem.lotNumber?:'',
 			shipment: shipmentInstance,
-			container: null);
+			container: containerInstance);
 				
 		if(itemInstance.hasErrors() || !itemInstance.validate()) {
 			flash.message = "There was an error validating item to be added\n" ;
@@ -500,7 +529,7 @@ class InventoryItemController {
 				flash.message = "Added item " + productDescription + " to shipment " + shipmentInstance?.name;
 			}
 		}
-		
+
 		redirect(action: "showStockCard", params: ['product.id':productInstance?.id]);
 	}
 	

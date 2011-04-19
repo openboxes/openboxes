@@ -32,16 +32,15 @@
 			</script>
 
         	<g:set var="varStatus" value="${0 }"/>	            			
-         	<table style="height: 400px; ">
+         	<table>
 				<tr>
-					<td style="border-right: 0px solid lightgrey; width: 200px; border-right: 1px solid lightgrey; background-color: #f5f5f5;">
-						<div style="padding: 10px;">
-							<h3>Filter products</h3>
-							<g:render template="/common/searchInventory" model="[productInstanceList: commandInstance?.productList, categoryFilters: commandInstance?.categoryFilters, rootCategory: commandInstance?.rootCategory]"/>					
-						</div>
+					<td style="width:20%">
+						<h3 style="background-color: #525D76; color: white; padding: 10px;">Filters</h3>
+						<g:render template="/common/searchInventory" model="[commandInstance:commandInstance]"/>					
 						
 						<!--  Disbled 'Actions' until we have time to getting them working as expected -->
-						<g:if test="${!true && commandInstance?.productList }">
+						<%-- 
+						<g:if test="${commandInstance?.productList }">
 							<hr/>
 							<div style="padding: 10px;">
 								<h3>Actions</h3>
@@ -56,21 +55,25 @@
 									</g:if>
 								</div>
 							</div>	
-						</g:if>					
+						</g:if>
+						--%>					
          			</td>
 	         		<td>
 	            		<g:if test="${commandInstance?.productList }">
-	            			<div style="overflow: auto; height: 600px;">									
+	            			<div style="overflow: auto; height: 500px;">									
 								<g:set var="productMap" value="${commandInstance?.productList.groupBy {it.category} }"/>
 								<g:each var="entry" in="${productMap}" status="i">	
 									<g:set var="totalQuantity" value="${0 }"/>
-									<h3 style="background-color: #525D76; color: white; padding: 10px;">
-										<g:if test="${entry?.key?.parentCategory }">
-											${entry?.key?.parentCategory?.name } &rsaquo; 
-										</g:if>
-										${entry?.key?.name?:"Uncategorized" }
-									</h3>
 									<div class="list">
+										<h3 style="background-color: #525D76; color: white; padding: 10px;">
+											<%-- 
+											<g:if test="${entry?.key?.parentCategory }">
+												${entry?.key?.parentCategory?.name } &rsaquo; 
+											</g:if>
+											${entry?.key?.name?:"Uncategorized" }
+											--%>										
+											<g:render template="../category/breadcrumb" model="[categoryInstance:entry.key]"/>		
+										</h3>
 				            			<table class="data-table">         		
 				            			<%-- 
 				            				<thead>
@@ -88,9 +91,13 @@
 													<tr class="${varStatus++%2==0?'odd':'even' } prop">
 														<td>
 															<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">
-																${productInstance?.name }
+																<g:if test="${productInstance?.name?.trim()}">
+																	${fieldValue(bean: productInstance, field: "name") } 
+																</g:if>
+																<g:else>
+																	Untitled Product
+																</g:else>
 															</g:link> 
-																
 														</td>
 														<td>
 															<span class="fade">
@@ -105,7 +112,7 @@
 													</tr>
 												</g:each>
 											</tbody>
-											<thead>										
+											<tfoot>										
 												<tr class="${varStatus%2==0?'odd':'even' } prop">
 													<th style="text-align: left;">
 														Total items
@@ -117,7 +124,7 @@
 														${totalQuantity }
 													</th>
 												</tr>
-											</thead>										
+											</tfoot>										
 										</table>	
 									</div>
 								</g:each>										
@@ -125,27 +132,55 @@
 						</g:if>
 						<g:else>
 							<div class="center middle">
-								<g:if test="${params.searchTerms || categoryFilters }">
+								<g:if test="${commandInstance?.categoryFilters || commandInstance?.searchTermFilters}">
 									<span>
 										Your search did not return any items.  Please try again.
 									</span>
 								</g:if>
 							</div>
 						</g:else>		    
-													
 	         		</td>
 	         	</tr>
-	         	<g:if test="${commandInstance?.productList}">
-		         	<tr>
-		         		<td>
-		         			<!--  Empty -->
-		         		</td>
-		         		<td>
-							<span class="fade">Showing ${commandInstance?.productList?.size() } product(s)</span>			
-		         		</td>
-		         	</tr>
-	         	</g:if>
 	        </table>
 		</div>
+		
+		<script>
+			$(document).ready(function() {
+				/* Action Menu */
+				function show() {
+					$(this).children(".actions").show();
+				}
+				  
+				function hide() { 
+					$(this).children(".actions").hide();
+				}
+					 
+				$(".action-menu").hoverIntent({
+					sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
+					interval: 50,   // number = milliseconds for onMouseOver polling interval
+					over: show,     // function = onMouseOver callback (required)
+					timeout: 200,   // number = milliseconds delay before onMouseOut
+					out: hide       // function = onMouseOut callback (required)
+				});
+
+				$( ".actions" ).position({ my: "left top", at: "left bottom" });	
+
+
+				$('.toggleSupportedImage').click(function() {	
+					var image = $('.toggleSupportedImage');
+					var currImageSrc = image.attr("src");
+					var playImageSrc = "${createLinkTo(dir: 'images/icons/silk', file: 'control_play.png' )}";							
+					var stopImageSrc = "${createLinkTo(dir: 'images/icons/silk', file: 'control_stop.png' )}";							
+					var imageSrc = (currImageSrc == playImageSrc)?stopImageSrc:playImageSrc;							
+					image.attr("src",imageSrc);								
+				});
+
+				
+			});	
+
+
+			
+		</script>			
+		
     </body>
 </html>

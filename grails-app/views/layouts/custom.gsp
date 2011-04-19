@@ -144,11 +144,8 @@
 												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'building.png')}" style="vertical-align: middle" />
 												<a class="home" href='${createLink(controller: "dashboard", action:"chooseWarehouse")}'>
 													${session?.warehouse?.name }
-												</a>	
+												</a>								
 											</li>
-											<li>
-												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
-											</li>																		
 										</g:if>
 										<li>
 											<div style="display: inline">
@@ -220,7 +217,7 @@
 	      	<div id="yui-main">
 		    	<div id="content" class="yui-b">
 		    		<g:if test="${session.user}">
-		    			<h1><g:layoutTitle /></h1>
+		    			<h3><g:layoutTitle /></h3>
 		    		</g:if>
 					<g:layoutBody />
 				</div>

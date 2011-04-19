@@ -68,7 +68,7 @@ class Category implements Comparable {
 		try {  
 			return Product.findAllByCategory(this);
 		} catch (Exception e) { 
-			log.info("Error getting products for " + this.name + ".")
+			log.info("Error getting products for category " + this.id  + " - " + this.name)
 			return null;	
 		}
 		

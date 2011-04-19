@@ -2334,6 +2334,7 @@
         </insert>   
     </changeSet>
     
+ 
      <changeSet author="mgoodrich" id="2011-03-01-1">
         <preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
@@ -2384,8 +2385,7 @@
             <column name="last_updated" valueDate="2011-03-01"/>            
         </insert>        
      </changeSet>
-     
-          <changeSet author="mgoodrich" id="2011-03-01-4">
+     <changeSet author="mgoodrich" id="2011-03-01-4">
         <preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				<![CDATA[SELECT count(*) FROM reference_number_type WHERE name="Flight Number"]]>
@@ -2921,8 +2921,11 @@
 		</sql>		
     </changeSet>
     
+        
+        
     <!--  move back to InnoDB tables -->
 	<changeSet author="jmiranda (generated)" id="1302537251592-1">
+		<validCheckSum>eef4ebd43add9a49bca649eab72dae6</validCheckSum>
 		<sql>
 			ALTER TABLE DATABASECHANGELOG ENGINE=InnoDB;
 			ALTER TABLE DATABASECHANGELOGLOCK ENGINE=InnoDB;
@@ -2977,9 +2980,10 @@
 			ALTER TABLE user_role ENGINE=InnoDB;		
 		</sql>      
 	</changeSet>
-    
+        
     <changeSet author="mgoodrich" id="2011-03-31-1">
-       <preConditions onFail="MARK_RAN">
+    	<validCheckSum>46c4f58ba2444f373fdd53ab635b85f6</validCheckSum>
+		<preConditions onFail="MARK_RAN">
 			<not><tableExists tableName="local_transfer"/></not>
 		</preConditions>
 		  <createTable tableName="local_transfer">
@@ -3020,8 +3024,9 @@
 		</preConditions>
 		<dropColumn tableName="transaction_type" columnName="transaction_type"/>
     </changeSet>
-    
+        
      <changeSet author="mgoodrich" id="2011-04-1-2">
+     	<validCheckSum>90a053c4b8b8256bfbe4e8f83b895e3c</validCheckSum>
        <preConditions onFail="MARK_RAN">
 			<not><columnExists tableName="transaction_type" columnName="transaction_code"/></not>
 		</preConditions>  
@@ -3192,7 +3197,7 @@
 		</modifyColumn>
 	</changeSet>
 	
-		<changeSet author="mgoodrich" id="2011-04-14-2">
+	<changeSet author="mgoodrich" id="2011-04-14-2">
    		<modifyColumn tableName="shipment">
     		<column name="total_value" type="float(12,2)"/>
 		</modifyColumn>

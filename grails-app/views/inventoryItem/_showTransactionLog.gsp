@@ -1,6 +1,6 @@
 <div>							
 	<fieldset >
-		<legend><span class="fade">Transaction Log</span></legend>
+		<legend class="fade">Transaction Log</legend>
 		<div>
 			<g:form method="GET" action="showStockCard">
 				<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
@@ -60,10 +60,11 @@
 						<tbody>			
 							<g:if test="${!commandInstance?.transactionLogMap }">
 								<tr>
-									<td colspan="4" class="odd">												
-										No <b>${commandInstance?.transactionType?.name }</b> transactions between 
-										<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${commandInstance?.startDate }"/> to
-										<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${commandInstance?.endDate }"/>.
+									<td colspan="5" class="odd center" style="min-height: 100px;">		
+										<div class="fade" >No <b>${commandInstance?.transactionType?.name }</b> transactions between 
+											<b><g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${commandInstance?.startDate }"/></b> and
+											<b><g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${commandInstance?.endDate }"/></b>.
+										</div>
 									</td>
 								</tr>
 							</g:if>
@@ -100,7 +101,6 @@
 																	<g:set var="styleClass" value="color: red;"/>																	
 																</g:if>
 																<span style="${styleClass}">${transactionEntry.quantity }</span> 
-																
 															</td>
 														</tr>
 													</g:each>

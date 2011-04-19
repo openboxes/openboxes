@@ -6,7 +6,11 @@
 		<meta name="layout" content="custom" />
 		<g:set var="entityName"
 			value="${message(code: 'inventoryItem.label', default: 'Inventory Item')}" />
-		<title><g:message code="default.import.label" args="[entityName]" /></title>
+		<title>
+			<g:message code="default.import.label" args="[entityName]" /> &rsaquo;
+			<span style="color: grey">${session?.warehouse?.name }</span>
+		
+		</title>
 	</head>
 	<body>
 		<div class="body">

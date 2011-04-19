@@ -6,15 +6,14 @@
     </head>
     <body>        
 		<div class="body">		
-
-
 			<g:if test="${flash.message}">
 			    <div class="message">${flash.message}</div>
 			</g:if>		
 
 	    	<div id="chooseWarehouse" class="dialog">			
 					<table>
-						<tbody>							
+						<tbody>			
+							<%-- 				
 							<tr>
 								<td>
 									<g:if test="${session?.user?.warehouse}">
@@ -26,7 +25,8 @@
 										</span>
 									</g:if>
 								</td>
-							</tr>							
+							</tr>
+							--%>							
 							<g:each var="warehouse" in="${warehouses}" status="i">								
 								<tr>
 									<td nowrap="nowrap">
@@ -42,6 +42,10 @@
 													<a class="home" href='${createLink(action:"chooseWarehouse", id: warehouse.id)}'>
 														${warehouse.name} 
 													</a> 
+													
+													<g:if test="${warehouse?.id == session?.user?.warehouse?.id }">
+													last logged in here on <b><g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_TIME_FORMAT}" date="${session?.user?.lastLoginDate}"/></b>
+													</g:if>
 											</g:if>
 											<g:else>
 												<g:if test="${warehouse.logo}">	

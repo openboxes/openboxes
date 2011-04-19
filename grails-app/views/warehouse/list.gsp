@@ -37,7 +37,7 @@
 						<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td>
 								<g:link action="edit" id="${warehouseInstance.id}">${fieldValue(bean: warehouseInstance, field: "name")}</g:link>
-							</td>                           
+							</td>
                             <td>${fieldValue(bean: warehouseInstance, field: "manager")}</td>                            
                             <td class="center tenth">${warehouseInstance.active ? 'yes' : 'no'}</td>                            
                             <td class="center tenth">${warehouseInstance.local ? 'yes' : 'no'}</td>                            

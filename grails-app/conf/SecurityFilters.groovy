@@ -39,10 +39,17 @@ class SecurityFilters {
 				// When a user has not selected a warehouse and they are requesting an action that requires one, 
 				// we redirect to the choose warehouse page.
 				if (!session.warehouse && !(Arrays.asList(actionsWithWarehouseNotRequired).contains(actionName))) {						
+					//def targetUri = (request.forwardURI - request.contextPath);
+					//if (request.queryString)
+					//	targetUri += "?" + request.queryString
+
+						
 					if (session?.warehouseStillNotSelected) { 
 						flash.message = "Please choose the warehouse you'd like to manage.";
 					}
+					
 					session.warehouseStillNotSelected = true;
+					//redirect(controller: 'dashboard', action: 'chooseWarehouse', params: ['targetUri': targetUri])
 					redirect(controller: 'dashboard', action: 'chooseWarehouse')
 					return false;
 				}

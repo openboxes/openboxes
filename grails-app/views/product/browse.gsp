@@ -34,15 +34,8 @@
 		            				<table border="0" >
 	          							<thead>
 			            					<tr class="odd">
-		            							<th width="5%">ID</th>
-		            							<th width="25%">Description</th>
-		            							<%-- 
-		            							<g:each var="attribute" in="${attributeList}">
-		            								<th>${attribute.name }</th>
-		            							</g:each>
-		            							--%>
-		            							<th width="25%">Primary Category</th>
-		            							<th width="10%" style="text-align: center;">Cold Chain</th>
+		            							<th>Category</th>
+		            							<th>Description</th>
 		            						</tr>
 		            					</thead>
 		            				</table>
@@ -54,28 +47,25 @@
 						            		<g:each var="key" in="${productsByCategory.keySet() }">
 						            			<g:each var="productInstance" in="${productsByCategory.get(key) }" status="i">
 													 <tr class="${(index++ % 2) == 0 ? 'even' : 'odd'}">
-													 	<td width="5%">
+				            							<td>
+				            								${productInstance?.category?.name }
+				            							</td>
+														<td>
 															<g:link action="edit" id="${productInstance.id}">
-																${productInstance?.id }													 	
+																<g:if test="${productInstance?.name }">
+																	${fieldValue(bean: productInstance, field: "name") }  
+																</g:if>
+																<g:else>
+																	Untitled Product
+																</g:else>
+																<span class="fade">${productInstance?.id }</span>
 															</g:link>
-													 	</td>
-														<td width="25%">
-															<g:link action="edit" id="${productInstance.id}">
-																${fieldValue(bean: productInstance, field: "name") }
-															</g:link>
-															<span class="fade">${productInstance?.productCode }</span>
 														</td>
 														<%--
 				            							<g:each var="attribute" in="${attributeList}">
 				            								<td></td>
 				            							</g:each>
 				            							 --%>
-				            							<td width="25%">
-				            								${productInstance?.category?.name }
-				            							</td>
-				            							<td width="10%" style="text-align: center;">
-				            								${(productInstance?.coldChain)?"Yes":"No" }
-				            							</td>
 													</tr>							            			
 						            			</g:each>
 						            		</g:each>

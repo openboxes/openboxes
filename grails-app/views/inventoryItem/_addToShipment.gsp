@@ -5,9 +5,10 @@
 		$("#dlgAddToShipment-${itemInstance?.id}").dialog({ autoOpen: false, modal: true, width: '600px' });				
 	});
 </script>	   
-<button id="btnAddToShipment-${itemInstance?.id}" class="action-btn">
-	<img src="${resource(dir: 'images/icons/silk', file: 'lorry_add.png')}"/> Add to shipment
-</button>
+<div class="action-menu-item">
+	<img src="${resource(dir: 'images/icons/silk', file: 'lorry_add.png')}"/>&nbsp;
+	<a id="btnAddToShipment-${itemInstance?.id}">Add to Shipment</a>
+</div>
 
 
 <div id="dlgAddToShipment-${itemInstance?.id}" title="Add to Shipment" style="padding: 10px; display: none; vertical-align: middle;" >	
@@ -23,30 +24,38 @@
 						<table>
 							<tbody>
 								<tr class="prop">
-									<td valign="top" class="name"><label>Item</label></td>                            
+									<td valign="top" class="name"><label>Inventory</label></td>                            
 									<td valign="top" class="value">
-										 	${commandInstance?.productInstance.name }
-											<g:if test="${itemInstance?.lotNumber }">&rsaquo; ${itemInstance?.lotNumber }</g:if>
-										
+										 	${commandInstance?.inventoryInstance?.warehouse?.name }
 									</td>
 								</tr>						
 								<tr class="prop">
-									<td valign="top" class="name"><label>Quantity </label></td>                            
+									<td valign="top" class="name"><label>Item</label></td>                            
 									<td valign="top" class="value">
-										 <g:textField id="quantity" name="quantity" size="1" value="${itemQuantity>0?itemQuantity:1 }" /> 
-											<span class="fade">Remaining: ${itemQuantity }</span> 									 
+									 	${commandInstance?.productInstance.name }
+										<g:if test="${itemInstance?.lotNumber }">&rsaquo; ${itemInstance?.lotNumber }</g:if>
 									</td>
-								</tr>  	        
-								
+								</tr>						
 								<tr class="prop">
-									<td valign="top" class="name"><label>to <g:message code="shipmentItem.shipment.label" default="Shipment" /></label></td>                            
+									<td valign="top" class="name"><label>Add to <g:message code="shipmentItem.shipment.label" default="Shipment" /></label></td>                            
 									<td valign="top" class="value">
-										<select name="shipment.id">
+										<select name="shipmentContainer">
+											<option value="null"></option>
 											<g:each var="shipmentInstance" in="${commandInstance?.pendingShipmentList }">
-												<option value="${shipmentInstance?.id }">
-													<img src="${resource(dir: 'images/icons/silk', file: 'lorry_add.png')}"/>
-													${shipmentInstance?.name }
-												</option>
+												<g:set var="expectedShippingDate" value="${prettyDateFormat(date: shipmentInstance?.expectedShippingDate)}"/> 
+												<g:set var="label" value="${shipmentInstance?.name + ' to ' + shipmentInstance?.destination?.name + ', departing ' + expectedShippingDate}"/>
+												<optgroup label="${label }">
+													<option value="${shipmentInstance?.id }:0">
+														<g:set var="looseItems" value="${shipmentInstance?.shipmentItems?.findAll { it.container == null }}"/>
+														&nbsp; Loose Items &rsaquo; ${looseItems.size() } items
+													</option>
+													<g:each var="containerInstance" in="${shipmentInstance?.containers }">
+														<g:set var="containerItems" value="${shipmentInstance?.shipmentItems?.findAll { it?.container?.id == containerInstance?.id }}"/>
+														<option value="${shipmentInstance?.id }:${containerInstance?.id }">
+															&nbsp; ${containerInstance?.name } &rsaquo; ${containerItems.size() } items
+														</option>
+													</g:each>
+												</optgroup>
 											</g:each>
 										</select>
 										<%--
@@ -55,6 +64,14 @@
 										 --%>
 									</td>
 								</tr>
+								<tr class="prop">
+									<td valign="top" class="name"><label>Quantity </label></td>                            
+									<td valign="top" class="value">
+										 <g:textField id="quantity" name="quantity" size="5" value="" /> &nbsp;
+											<span class="fade">Remaining: ${itemQuantity }</span> 									 
+									</td>
+								</tr>  	        
+								
 								<tr class="prop">
 									<td valign="top" class="name"><label><g:message code="shipmentItem.recipient.label" default="Recipient" /></label></td>                            
 									<td valign="top" class="value">

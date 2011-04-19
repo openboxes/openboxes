@@ -17,8 +17,9 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType;
 import org.springframework.validation.Errors;
 
-class InventoryService 
-{
+class InventoryService {
+	
+	def sessionFactory
 	def productService
 	boolean transactional = true
 	
@@ -59,7 +60,7 @@ class InventoryService
 		}
 		warehouse.save(flush:true)
 	}
-    
+	
 	/**
     * Returns the Location specified by the passed id parameter;
     * if no parameter is specified, returns a new location instance
@@ -154,16 +155,17 @@ class InventoryService
 		return items;
 	}
 	
-	BrowseInventoryCommand browseInventory(BrowseInventoryCommand commandInstance, Map params) { 
+	BrowseInventoryCommand browseInventory(BrowseInventoryCommand commandInstance, Boolean showHiddenProducts) { 
 		
 		// Get all product types and set the default product type				
 		commandInstance.rootCategory = productService.getRootCategory();
 		commandInstance.inventoryInstance = commandInstance?.warehouseInstance?.inventory;
-		commandInstance.categoryInstance = Category.get(params?.categoryId)
-		commandInstance.categoryInstance = commandInstance?.categoryInstance ?: commandInstance?.rootCategory;
-		//commandInstance.productList = (commandInstance?.categoryFilters) ? getProductsByCategories(commandInstance?.categoryFilters, params) : [];		
 		
-		commandInstance.productList = getProducts(commandInstance, params);
+		// Get the selected category or use the root category
+		commandInstance.categoryInstance = commandInstance?.categoryInstance ?: commandInstance?.rootCategory;
+						
+		// Search for products 
+		commandInstance.productList = getProducts(commandInstance, showHiddenProducts);
 		
 		// This list gets calculated AFTER the product list, because we need to use the product list as the basis. 
 		commandInstance.attributeMap = getProductAttributes();
@@ -171,9 +173,86 @@ class InventoryService
 		commandInstance.inventoryItemMap =  getInventoryItemMap(commandInstance?.warehouseInstance?.id);
 		commandInstance.productList = commandInstance?.productList?.sort() { it.name };
 		commandInstance.quantityMap = getQuantityByProductMap(commandInstance?.inventoryInstance);
+		
 		return commandInstance;
 	}
 	
+	
+	/*
+	*
+	* Get products based on the
+	*/
+   Set getProducts(BrowseInventoryCommand command, Boolean showHiddenProducts) {
+	   def products = new HashSet();
+	   // Get any category filters that match search terms
+	   products = getProductsByAll(command?.searchTermFilters, command?.categoryFilters, showHiddenProducts);
+			   
+	   return products;
+   }
+
+
+   /**
+	* @param searchTerms
+	* @param categories
+	* @return
+	*/
+   List getProductsByAll(List productFilters, List categoryFilters, Boolean showHiddenProducts) {
+	   // Get products that match the search terms by name and category
+	   def categories = getCategoriesMatchingSearchTerms(productFilters)
+
+	   // Categories
+	   def matchCategories = getExplodedCategories(categoryFilters);
+	   log.info "matchCategories " + matchCategories
+	   
+	   
+	   // Base product list
+	   def session = sessionFactory.getCurrentSession()
+	  
+	   // Get all products, including hidden ones 
+	   def products = []
+	   if (showHiddenProducts) { 
+		   products = Product.list();
+	   }
+	   // Get all products that are managed
+	   else { 
+		   def query = session.createQuery("select product from InventoryLevel as inventoryLevel right outer join inventoryLevel.product as product where inventoryLevel.supported is null or inventoryLevel.supported = true")
+		   products = query.list()
+	   }
+	   
+	   log.info "base products " + products.size();
+	   if (matchCategories && productFilters) {
+		   def searchProducts = Product.createCriteria().list() {
+			   and {
+				   productFilters.each {
+					   ilike("name", "%" + it + "%")
+				   }
+				   'in'("category", matchCategories)
+			   }
+		   }
+		   products = products.intersect(searchProducts);
+	   }
+	   else {
+		   def searchProducts = Product.createCriteria().list() {
+			   or {
+				   if (productFilters) {
+					   productFilters.each {
+						   ilike("name", "%" + it + "%")
+					   }
+				   }
+				   if (matchCategories) {
+					   'in'("category", matchCategories)
+				   }
+				   if (categories) {
+					   'in'("category", categories)
+				   }
+			   }
+		   }
+		   products = products.intersect(searchProducts);
+	   }
+	   
+	   return products;
+   }
+
 	
 	/**
 	 * Get a map of product attribute-value pairs for the given products.
@@ -475,68 +554,26 @@ class InventoryService
 		return cmd;
 	}
 	
-	/*
-	 * 
-	 * Get products based on the 
-	 */
-	Set getProducts(BrowseInventoryCommand command, Map params) { 
-		def products = new HashSet();
-		
-		if (command?.searchTerms && command?.categoryFilters) { 
-			log.info "search " + command?.searchTerms;
-			//products += getProductsBySearchTerms(command?.searchTerms);
-			products = getProductsByAll(command?.searchTerms, command?.categoryFilters);
-			
-		}
-		else if (command?.searchTerms) { 
-			products = getProductsBySearchTerms(command?.searchTerms)
-		}
-		else if (command?.categoryFilters) { 
-			products = getProductsByCategories(command?.categoryFilters, params);
-		}
-		else { 
-			products = Product.list();
-		}
-		log.info "products " + products.unique();
-		return products;		
-	}
-
-
-	/** 
-	 * 	
-	 * @param searchTerms
-	 * @param categories
-	 * @return
-	 */
-	List getProductsByAll(String searchTerms, List categories) { 
-		// Get products that match the search terms by name and category
-		def matchCategories = getExplodedCategories(categories);
-		def products = Product.createCriteria().list() {
-			if (searchTerms) {
-				and {
-					ilike("name", "%" + searchTerms + "%")
-					'in'("category", matchCategories)
-					
-				}
-			}
-		}
-	}
 		
 	/**
 	 * Get products by search terms only, matching against product name OR category name.
 	 * @param searchTerms
 	 * @return
 	 */
-	List getProductsBySearchTerms(String searchTerms) { 
-		log.info "get producst by search terms " + searchTerms;
+	List getProductsBySearchTerms(List productFilters) { 
+		log.info "get products by search terms " + productFilters;
 		
 		// Get products that match the search terms by name and category
 		def products = Product.createCriteria().list() { 
-			if (searchTerms) {
-				or {
-					ilike("name", "%" + searchTerms + "%")					
-					category { 
-						ilike("name", "%" + searchTerms + "%")
+			if (productFilters) {
+				or { 
+					productFilters.each { 
+						ilike("name", "%" + it + "%")				
+					}	
+					productFilters.each {
+						category {
+							ilike("name", "%" + it + "%")
+						}
 					}
 				}
 			}
@@ -584,10 +621,10 @@ class InventoryService
 	List getExplodedCategories(List categories) { 		
 		def matchCategories = []
 		if (categories) {
-			categories.each { cat ->
-				if (cat) {
-					matchCategories << cat;
-					matchCategories.addAll( (cat?.children)?cat.children:[]);
+			categories.each { category ->
+				if (category) {
+					matchCategories << category;
+					matchCategories.addAll( (category?.children)?getExplodedCategories(category?.children):[]);
 				}
 			}
 		}
@@ -596,33 +633,50 @@ class InventoryService
 	
 
 	/**
+	 * 
+	 * @param searchTerms
+	 * @return
+	 */
+	List getCategoriesMatchingSearchTerms(List searchTerms) { 
+		def categories = []
+		if (searchTerms) { 
+			categories = Category.createCriteria().list() { 
+				searchTerms.each { 
+					ilike("name", it)
+				}
+			}
+		}
+		return getExplodedCategories(categories);		
+	}
+	
+	/**
 	 * Returns a list of products by category.  
 	 * 	
 	 * @param categories
 	 * @param params
 	 * @return
 	 */
-	List getProductsByCategories(List categories, Map params) { 
+	List getProductsByCategories(List categories) { 
 		def products = []
 		
 		def matchCategories = getExplodedCategories(categories);
 		
 		log.debug matchCategories
 		if (matchCategories) { 
-			products = Product.createCriteria().list(max:params.max, offset: params.offset ?: 0) {
+			products = Product.createCriteria().list() {
 				'in'("category", matchCategories)
 			}
 		}
 		return products;	 
 	}
 	
-	List getProductsByCategory(Category category, Map params) { 
+	List getProductsByCategory(Category category) { 
 		def products = [];
 		if (category) { 
 			def categories = (category?.children)?category.children:[];
 			categories << category;
 			if (categories) {
-				products = Product.createCriteria().list(max:params.max, offset: params.offset ?: 0) {
+				products = Product.createCriteria().list() {
 					'in'("category", categories)
 				}
 			}

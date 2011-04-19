@@ -24,7 +24,7 @@
 				</thead>
 				<tbody>
 					<g:if test="${!commandInstance?.inventoryItemList}">
-						<tr class="odd" style="height: 100px;">
+						<tr class="odd" style="min-height: 100px;">
 							<td colspan="5" style="text-align: center; vertical-align: middle">
 								There are no <b>${commandInstance?.productInstance?.name }</b> items currently in stock.
 							</td>

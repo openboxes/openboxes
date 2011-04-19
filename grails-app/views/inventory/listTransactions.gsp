@@ -4,7 +4,8 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'transaction.label', default: 'Transaction')}" />
-        <title><g:message code="default.list.label" args="[entityName]" /></title>    
+        
+        <title>List Transactions for inventory at ${session.warehouse.name}</title>    
     </head>    
 
 	<body>
@@ -17,9 +18,7 @@
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
-			
-			<h1>Transactions for inventory at ${session.warehouse.name}</h1>
-			
+						
 			<div class="list">
 				<table>
                     <thead>
