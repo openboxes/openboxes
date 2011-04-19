@@ -100,9 +100,10 @@
 															</g:link> 
 														</td>
 														<td>
-															<span class="fade">
-																${productInstance?.category?.name?:"Uncategorized" }
-															</span>
+															${productInstance?.manufacturer }
+														</td>
+														<td>
+															${productInstance?.productCode }
 														</td>
 														<td style="text-align: center;">
 															<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">
@@ -117,8 +118,11 @@
 													<th style="text-align: left;">
 														Total items
 													</th>
-													<th style="width:20%;">
-														${entry?.key?:"Uncategorized" }
+													<th style="width: 10%">
+														
+													</th>
+													<th style="width: 10%">
+														
 													</th>
 													<th style="text-align: center; width: 10%">
 														${totalQuantity }
