@@ -3206,6 +3206,20 @@
 		</modifyColumn>
 	</changeSet>
 
+	<changeSet author="mgoodrich" id="2011-04-20-01">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="inventory_item" columnName="serial_number"/>
+		</preConditions>
+        <dropColumn tableName="inventory_item" columnName="serial_number"/>
+	</changeSet>
+
+	<changeSet author="mgoodrich" id="2011-04-20-02">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="receipt_item" columnName="serial_number"/>
+		</preConditions>
+        <dropColumn tableName="receipt_item" columnName="serial_number"/>
+	</changeSet>
+
 </databaseChangeLog>
 
 

@@ -11,7 +11,6 @@ class ReceiptItem {
 	
 	Product product		    			// Specific product that we're tracking
 	String lotNumber					// Loose coupling to the inventory lot
-	String serialNumber					// Serial number of a particular product (optional)
 	Date expirationDate					// Date of expiration
 
 	Integer quantityShipped				// Quantity that was shipped
@@ -26,8 +25,7 @@ class ReceiptItem {
 	static belongsTo = [ receipt : Receipt ]
 	static constraints = {
 		product(nullable:false)
-		lotNumber(nullable:true, maxSize: 255)
-		serialNumber(nullable:true, maxSize: 255)
+		lotNumber(nullable:true, unique:['product'], maxSize: 255)
 		expirationDate(nullable:true)
 		quantityShipped(range: 0..2147483646, nullable:false)
 		quantityReceived(range: 0..2147483646, nullable:false)		
