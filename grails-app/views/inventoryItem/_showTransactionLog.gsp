@@ -37,7 +37,7 @@
 				<div class="list">
 					<table >
 						<thead>
-							<tr class="even prop">
+							<tr class="odd prop">
 								<th>
 									${message(code: 'transaction.transactionDate.label', default: 'Date')}
 								</th>
@@ -60,7 +60,7 @@
 						<tbody>			
 							<g:if test="${!commandInstance?.transactionLogMap }">
 								<tr>
-									<td colspan="5" class="odd center" style="min-height: 100px;">		
+									<td colspan="5" class="even center" style="min-height: 100px;">		
 										<div class="fade" >No <b>${commandInstance?.transactionType?.name }</b> transactions between 
 											<b><g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${commandInstance?.startDate }"/></b> and
 											<b><g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${commandInstance?.endDate }"/></b>.
@@ -71,7 +71,7 @@
 							<g:else>
 								<g:set var="totalQuantityChange" value="${0 }"/>							
 								<g:each var="transaction" in="${commandInstance?.transactionLogMap?.keySet().sort {it.transactionDate}.reverse() }" status="status">
-									<tr class="transaction ${(status%2==0)?'odd':'even' } prop">
+									<tr class="transaction ${(status%2==0)?'even':'odd' } prop">
 										<td>	
 											<a id="show-details-${transaction?.id }" class="show-details" href="${createLink(controller: 'inventory', action:'showTransactionDialog', id: transaction.id, params: ['product.id', 'test'])}">
 												<g:formatDate

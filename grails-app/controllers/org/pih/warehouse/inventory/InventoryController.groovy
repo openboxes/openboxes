@@ -517,15 +517,30 @@ class InventoryController {
 	def createTransaction = { 
 		
 		def transactionInstance = new Transaction();
-		
+		def productList = [] 
 		if (flash.productList) { 
 			flash.productList.each { 
+				productList << it;
+			}
+		}
+		
+		if (params.product.id) { 
+			def product = Product.get(params.product.id)
+			if (product) { 
+				productList << product.id;
+			}
+		}
+		
+		if (productList) { 
+			productList.each { 
 				def product = Product.get(it);
-				def inventory = Inventory.findByWarehouse(session.warehouse.id);
-				def inventoryItems = inventoryService.getInventoryItemsByInventoryAndProduct(inventory, product);
+				def warehouse = Warehouse.get(session.warehouse.id)
+				def inventory = Inventory.get(warehouse.inventory.id);
+				log.info ("inventory " + inventory)
+				def inventoryItems = inventoryService.getInventoryItemsByProductAndInventory(product, inventory);
 				log.info "inventory items " + inventoryItems
 				inventoryItems.each { inventoryItem ->
-					def transactionEntry = new TransactionEntry(product: product, inventoryItem: inventoryItem);
+					def transactionEntry = new TransactionEntry(product: product, inventoryItem: inventoryItem, quantity: 0);
 					transactionInstance.addToTransactionEntries(transactionEntry);
 				}
 			}

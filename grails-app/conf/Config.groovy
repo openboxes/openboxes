@@ -1,6 +1,5 @@
 // Locations to search for config files that get merged into the main config
 // config files can either be Java properties files or ConfigSlurper scripts
-
 grails.config.locations = [ 
 	//"classpath:${appName}-config.groovy",
 	//"classpath:${appName}-config.properties",
@@ -8,11 +7,18 @@ grails.config.locations = [
 	"file:${userHome}/.grails/${appName}-config.properties"
 ]
 
+println "Using configuration locations ${grails.config.locations}"
+
 // if(System.properties["${appName}.config.location"]) {
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
 // }
 grails { 
 	mail { 
+		/**
+		 * By default we disable email, enable email using environment settings below or in your 
+		 * ${user.home}/warehouse-config.properties file 
+		 */
+		enabled = false			
 		from = "info@localhost"
 		host = "localhost"
 		port = "25"
@@ -67,21 +73,20 @@ grails.validateable.packages = ['org.pih.warehouse.inventory']
 
 // set per-environment serverURL stem for creating absolute links
 environments {
-	production {  
-		grails.serverURL = "http://www.changeme.com"  
-		uiperformance.enabled = false
-	}
 	development {
 		grails.serverURL = "http://localhost:8080/${appName}";
 		uiperformance.enabled = false
+		grails.mail.enabled = false
 	}
 	test {  
 		grails.serverURL = "http://localhost:8080/${appName}"  
 		uiperformance.enabled = false
+		grails.mail.enabled = true
 	}
-	child { 
-		grails.serverURL = "http://localhost:8090/${appName}"
-		warehouse.syncServerURL = "http://localhost:8080/${appName}"
+	production {  
+		grails.serverURL = "http://localhost:8080/${appName}"  
+		uiperformance.enabled = false
+		grails.mail.enabled = true
 	}
 }
 

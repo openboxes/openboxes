@@ -39,7 +39,7 @@ thead th {
 .product-details .value { width: 150px; }
 */
 .product-details .button { width: 20px; }
-
+.page-title { margin-bottom: 1em; } 
 /* Text Alignment classes */
 .right { text-align: right; } 
 .left { text-align: left; }
@@ -334,11 +334,14 @@ h2 {
 
 #pageTitle { 
 	/*border-top: 1px solid lightgrey;
-	background-color: #f0f0f0;*/
-	background-color: #525D76;
-	padding: 10px;	
+	background-color: #f0f0f0;
+	background-color: #525D76;*/
+	border-bottom: 1px dotted #525D76; 
 	margin-bottom: 10px;
+	/*
+	padding: 5px;
 	color: white;
+	*/
 }
 
 .section { 	
@@ -512,7 +515,7 @@ div#dashboard li {
 
 .prop .value { 
 	text-align:left;
-	width: 30%;
+	/*width: 30%;*/
 	vertical-align: top;
 	line-height: 1.5em;
 }
@@ -535,7 +538,7 @@ span.left { width: 10%;  float: left; text-align: center; }
 .action-menu { cursor: pointer; } 
 .action-menu { padding: 0; }
 .action-menu-root { margin: 0px; } 
-.filter-list-item { margin: 10px; } 
+.filter-list-item { margin: 10px; float: left; } 
 .document-list-item { margin: 1px; }
 .action-menu-item { margin: 0px; padding: 3px; }
 .action-menu-item a:hover { text-decoration: underline; }

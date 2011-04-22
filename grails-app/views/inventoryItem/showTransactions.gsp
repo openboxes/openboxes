@@ -40,7 +40,7 @@
 												<%-- 
 												<li>
 													<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
-													<g:link controller="inventoryItem" action="showRecordInventory" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
+													<g:link controller="inventoryItem" action="recordInventory" params="['product.id':productInstance?.id,'inventory.id':inventoryInstance?.id]">
 														Record stock
 													</g:link>
 												</li>

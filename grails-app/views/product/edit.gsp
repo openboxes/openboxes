@@ -41,6 +41,7 @@
                 <g:hiddenField name="version" value="${productInstance?.version}" />
             	<g:hiddenField name="categoryId" value="${params?.category?.id }"/><!--  So we know which category to show on browse page after submit -->
 					<div class="dialog">
+					
 		                <table style="display: inline;">
 	                      <tbody>                
 							<tr class="prop">
@@ -51,6 +52,29 @@
 								<g:textField name="name" value="${productInstance?.name}" size="40" />
 								</td>
 							</tr>
+							<tr class="prop">
+                                <td valign="top" class="name">
+                                  <label for="categories"><g:message code="product.primaryCategory.label" default="Primary Category" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'category', 'errors')}">
+                                	<%-- <g:render template="../category/chooser"/>--%>
+                                	
+									<select name="category.id">
+										<option value=""></option>
+										<g:render template="../category/selectOptions" model="[category:rootCategory, selected:productInstance?.category, level: 0]"/>
+									</select>	
+								</td>
+							</tr>	
+							 
+							<tr class="prop">
+							   <td valign="top" class="name">
+							      <label for="categories"><g:message code="product.categories.label" default="Other Categories" /></label>
+							   </td>
+							   <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'categories', 'errors')}">
+							       <g:render template="categories" model="['productInstance':productInstance]" />
+							   </td>
+							</tr>					
+							
 							<tr class="prop">
 								<td valign="top" class="name"><label for="name"><g:message
 									code="product.unitOfMeasure.label" default="Unit of Measure" /></label></td>
@@ -142,28 +166,6 @@
 									</td>
 								</tr>
 							</g:each>
-							<tr class="prop">
-                                <td valign="top" class="name">
-                                  <label for="categories"><g:message code="product.primaryCategory.label" default="Primary Category" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'category', 'errors')}">
-                                	<%-- <g:render template="../category/chooser"/>--%>
-                                	
-									<select name="category.id">
-										<option value=""></option>
-										<g:render template="../category/selectOptions" model="[category:rootCategory, selected:productInstance?.category, level: 0]"/>
-									</select>	
-								</td>
-							</tr>	
-							 
-							<tr class="prop">
-							   <td valign="top" class="name">
-							      <label for="categories"><g:message code="product.categories.label" default="Categories" /></label>
-							   </td>
-							   <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'categories', 'errors')}">
-							       <g:render template="categories" model="['productInstance':productInstance]" />
-							   </td>
-							</tr>					
 							
 										
 							<tr class="prop">

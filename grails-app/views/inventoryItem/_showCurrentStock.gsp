@@ -12,7 +12,7 @@
 			<br/>									
 			<table border="0" style="border:1px solid #f5f5f5;">
 				<thead>
-					<tr class="even">
+					<tr class="odd">
 						<th>Serial/Lot Number</th>
 						<th>Expires</th>
 						<th class="center middle" >Qty</th>
@@ -24,7 +24,7 @@
 				</thead>
 				<tbody>
 					<g:if test="${!commandInstance?.inventoryItemList}">
-						<tr class="odd" style="min-height: 100px;">
+						<tr class="even" style="min-height: 100px;">
 							<td colspan="5" style="text-align: center; vertical-align: middle">
 								There are no <b>${commandInstance?.productInstance?.name }</b> items currently in stock.
 							</td>
@@ -32,10 +32,11 @@
 					</g:if>
 					<g:set var="count" value="${0 }"/>
 					<g:each var="itemInstance" in="${commandInstance?.inventoryItemList }" status="status">	
-						<g:if test="${commandInstance.quantityByInventoryItemMap.get(itemInstance)}">		<!-- only show items with quantities -->	
+						<g:if test="${commandInstance.quantityByInventoryItemMap.get(itemInstance)}">		
+							<!-- only show items with quantities -->	
 							<g:set var="itemQuantity" value="${commandInstance.quantityByInventoryItemMap.get(itemInstance) }"/>
 							<g:set var="selected" value="${params?.inventoryItem?.id && (itemInstance.id == Integer.valueOf(params?.inventoryItem?.id)) }"/>
-							<g:set var="styleClass" value="${(count++%2==0)?'odd':'even' }"/>
+							<g:set var="styleClass" value="${(count++%2==0)?'even':'odd' }"/>
 							<g:if test="${selected }">
 								<g:set var="styleClass" value="selected-row"/>
 							</g:if>
@@ -77,10 +78,14 @@
 								</g:hasErrors>	
 								<td class="top" style="text-align: left;">
 								<div class="action-menu">
-									<span>Actions<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/></span>
+								
+									<button>
+										<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle;"/>
+										&nbsp;<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
+									</button>
 									<div class="actions">
-										<g:render template="editItemDialog" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]"/><br/>
-										<g:render template="adjustStock" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />	<br/>
+										<g:render template="editItemDialog" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]"/>
+										<g:render template="adjustStock" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />
 										<g:render template="addToShipment" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />	
 									</div>
 								</div>

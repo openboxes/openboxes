@@ -1,7 +1,10 @@
 <!-- Only allow the originating warehouse to edit the shipment -->
 
 	<span class="shipment-action-menu" >
-		<span>Actions<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" /></span>
+		<button>
+			<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" />
+			Actions<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
+		</button>
 		<div class="actions">
 			<div class="action-menu-item">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_left.png')}" alt="Show Shipment" style="vertical-align: middle" />&nbsp;
@@ -32,17 +35,12 @@
 						id="${shipmentInstance?.id }" params="[skipTo:'Packing']">Edit Packing List</g:link>					
 				</div>
 			</g:if>
-			<div class="action-menu-item">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'table_edit.png')}" alt="Edit Packing List" style="vertical-align: middle"/>&nbsp;
-				<g:link controller="createShipmentWorkflow" action="createShipment" event="enterContainerDetails" 
-					id="${shipmentInstance?.id }" params="[skipTo:'Packing']">Edit Packing List</g:link>					
-			</div>
 			<div class="action-menu-item">		
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" alt="Upload a Document" style="vertical-align: middle"/>
 				<a href="${createLink(controller: "shipment", action: "addDocument", id: shipmentInstance.id)}">Upload a Document</a>
 			</div>
 			<div class="action-menu-item">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'comment_add.png')}" alt="Add Note" style="vertical-align: middle"/>
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'note_add.png')}" alt="Add Note" style="vertical-align: middle"/>
 				<a href="${createLink(controller: "shipment", action: "addComment", id: shipmentInstance.id)}">Add a Note</a>													
 			</div>
 			<div class="action-menu-item">

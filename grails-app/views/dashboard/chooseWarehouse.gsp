@@ -11,63 +11,66 @@
 			</g:if>		
 
 	    	<div id="chooseWarehouse" class="dialog">			
-					<table>
-						<tbody>			
-							<%-- 				
+				<table>
+					<tbody>			
+						<%-- 				
+						<tr>
+							<td>
+								<g:if test="${session?.user?.warehouse}">
+									<span style="font-size: 80%; width: 100%; text-align: right; color: #aaa">
+										<g:if test="${session?.user?.lastLoginDate}">
+											You last logged into <b>${session?.user?.warehouse?.name}</b> on
+											<b><g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_TIME_FORMAT}" date="${session?.user?.lastLoginDate}"/></b> 
+										</g:if>
+									</span>
+								</g:if>
+							</td>
+						</tr>
+						--%>							
+						<g:each var="warehouse" in="${warehouses}" status="i">								
 							<tr>
-								<td>
-									<g:if test="${session?.user?.warehouse}">
-										<span style="font-size: 80%; width: 100%; text-align: right; color: #aaa">
-											<g:if test="${session?.user?.lastLoginDate}">
-												You last logged into <b>${session?.user?.warehouse?.name}</b> on
-												<b><g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_TIME_FORMAT}" date="${session?.user?.lastLoginDate}"/></b> 
-											</g:if>
-										</span>
-									</g:if>
-								</td>
-							</tr>
-							--%>							
-							<g:each var="warehouse" in="${warehouses}" status="i">								
-								<tr>
-									<td nowrap="nowrap">
-										<div style="border: 0px solid #F5F5F5; padding: 0px; display: block;">												
-											<g:if test="${warehouse.local}">
-													<g:if test="${warehouse.logo}">	
-														<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'warehouse', action:'viewLogo', id: warehouse.id)}" />
-														<%--<img src="${warehouse.logo}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img>--%>
-													</g:if>
-													<g:else>
-														<img src="${createLinkTo(dir:'images',file:'icons/building.png')}" style="vertical-align: middle"/>
-													</g:else>
-													<a class="home" href='${createLink(action:"chooseWarehouse", id: warehouse.id)}'>
-														${warehouse.name} 
-													</a> 
-													
-													<g:if test="${warehouse?.id == session?.user?.warehouse?.id }">
-													last logged in here on <b><g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_TIME_FORMAT}" date="${session?.user?.lastLoginDate}"/></b>
-													</g:if>
-											</g:if>
-											<g:else>
+								<td nowrap="nowrap">
+									<div style="border: 0px solid #F5F5F5; padding: 0px; display: block;">												
+										<g:if test="${warehouse.local}">
 												<g:if test="${warehouse.logo}">	
-													<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'warehouse', action:'viewLogo', id: warehouse.id)}" />															
+													<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'warehouse', action:'viewLogo', id: warehouse.id)}" />
 													<%--<img src="${warehouse.logo}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img>--%>
 												</g:if>
 												<g:else>
 													<img src="${createLinkTo(dir:'images',file:'icons/building.png')}" style="vertical-align: middle"/>
 												</g:else>
-												&nbsp;
-												${warehouse.name} <span class="fade">managed remotely</span>
+												<a class="home" href='${createLink(action:"chooseWarehouse", id: warehouse.id)}'>
+													${warehouse.name} 
+												</a> 
+												
+												<g:if test="${warehouse?.id == session?.user?.warehouse?.id }">
+												last logged in here on <b><g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_TIME_FORMAT}" date="${session?.user?.lastLoginDate}"/></b>
+												</g:if>
+										</g:if>
+										<g:else>
+											<g:if test="${warehouse.logo}">	
+												<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'warehouse', action:'viewLogo', id: warehouse.id)}" />															
+												<%--<img src="${warehouse.logo}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img>--%>
+											</g:if>
+											<g:else>
+												<img src="${createLinkTo(dir:'images',file:'icons/building.png')}" style="vertical-align: middle"/>
 											</g:else>
-										</div>												
-									</td>											
-								</tr>																		
-							</g:each>							
-							
-						</tbody>					
-					</table>
+											&nbsp;
+											${warehouse.name} <span class="fade">managed remotely</span>
+										</g:else>
+									</div>												
+								</td>											
+							</tr>																		
+						</g:each>							
+						
+					</tbody>					
+				</table>
 
 	    	</div>
 		</div>
+		
+		
+		
     </body>
 </html>
 

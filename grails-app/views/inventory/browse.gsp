@@ -10,6 +10,7 @@
         
 		<style>
 			.data-table td, .data-table th { vertical-align: middle; }
+			.data-table th { border: 0px; } 
 		</style>        
     </head>    
     <body>
@@ -22,132 +23,134 @@
 	                <g:renderErrors bean="${commandInstance?.inventoryInstance}" as="list" />
 	            </div>
             </g:hasErrors>    
-            
-			<script>
-				$(function() {
-					$("#dialogButton").click(function () { 
-						$("#dialog").dialog({ "modal": "true", "width": 600});
-					});
-				});
-			</script>
+			<div class="dialog">
 
-        	<g:set var="varStatus" value="${0 }"/>	            			
-         	<table>
-				<tr>
-					<td style="width:20%">
-						<h3 style="background-color: #525D76; color: white; padding: 10px;">Filters</h3>
-						<g:render template="/common/searchInventory" model="[commandInstance:commandInstance]"/>					
-						
-						<!--  Disbled 'Actions' until we have time to getting them working as expected -->
-						<%-- 
-						<g:if test="${commandInstance?.productList }">
-							<hr/>
-							<div style="padding: 10px;">
-								<h3>Actions</h3>
+				<!-- Action menu -->
+				<div>
+					<span class="action-menu">
+						<button><img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle;"/>
+						&nbsp;<b>Actions</b>&nbsp;<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/></button>
+						<div class="actions">
+							<g:render template="browseInventoryMenuItems" model="[commandInstance: commandInstance]"/>																				
+						</div>
+					</span>				
+				</div>			
+
+
+	        	<g:set var="varStatus" value="${0 }"/>	            			
+	         	<table>
+					<tr>
+						<td style="width:20%">
+							
+							<g:render template="/common/searchInventory" model="[commandInstance:commandInstance]"/>					
+							
+							<!--  Disbled 'Actions' until we have time to getting them working as expected -->
+							<%-- 
+							<g:if test="${commandInstance?.productList }">
+								<hr/>
 								<div style="padding: 10px;">
-									<g:if test="${commandInstance?.productList }">
-										<g:link class="new" controller="inventory" action="createTransaction">
-											<button>
-												Record Inventory
-												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_right.png' )}" style="vertical-align:middle"/>
-											</button>
-										</g:link> 				
+									<h3>Actions</h3>
+									<div style="padding: 10px;">
+										<g:if test="${commandInstance?.productList }">
+											<g:link class="new" controller="inventory" action="createTransaction">
+												<button>
+													Record Inventory
+													<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_right.png' )}" style="vertical-align:middle"/>
+												</button>
+											</g:link> 				
+										</g:if>
+									</div>
+								</div>	
+							</g:if>
+							--%>					
+	         			</td>
+		         		<td>
+		            		<g:if test="${commandInstance?.productList }">
+								<fieldset>
+			            			<div style="overflow: auto; height: 500px;">		
+			            				<g:set var="productList" value="${commandInstance?.productList?.sort { it.name } }"/>							
+										<g:set var="productMap" value="${commandInstance?.productList.groupBy {it.category} }"/>
+										<g:each var="entry" in="${productMap}" status="i">	
+											<g:set var="totalQuantity" value="${0 }"/>
+											<div class="list">
+												<div style="font-weight: bold; padding: 10px;">
+													<g:render template="../category/breadcrumb" model="[categoryInstance:entry.key]"/>
+												</div>
+						            			<table class="data-table">         		
+						            				<thead>
+														<tr class="odd">
+															<th width="50%">Description</th>
+															<th width="20%">Manufacturer</th>
+															<th width="20%">Product Code</th>
+															<th width="5%" style="text-align: center">Qty</th>
+														</tr>
+													</thead>
+													<tbody>
+														<g:each var="productInstance" in="${productMap[entry.key] }" status="status">
+															<g:set var="quantity" value="${commandInstance?.quantityMap?.get(productInstance) }"/>
+															<g:set var="totalQuantity" value="${totalQuantity + (quantity?:0) }"/>
+															<tr class="${status%2==0?'even':'odd' } prop">
+																<td>
+																	<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]" fragment="inventory">
+																		<g:if test="${productInstance?.name?.trim()}">
+																			${fieldValue(bean: productInstance, field: "name") } 
+																		</g:if>
+																		<g:else>
+																			Untitled Product
+																		</g:else>
+																	</g:link> 
+																</td>
+																<td>
+																	${productInstance?.manufacturer }
+																</td>
+																<td>
+																	${productInstance?.productCode }
+																</td>
+																<td style="text-align: center;">
+																	<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">
+																		${quantity?:0}
+																	</g:link>
+																</td>
+															</tr>
+														</g:each>
+													</tbody>
+													<tfoot>										
+														<tr class="even prop">
+															<th style="text-align: left;">
+																
+															</th>
+															<th style="width: 20%">
+																
+															</th>
+															<th style="width: 20%">
+																
+															</th>
+															<th style="text-align: center; width: 5%">
+																${totalQuantity }
+															</th>
+														</tr>
+													</tfoot>										
+												</table>	
+													
+											</div>
+										</g:each>										
+									</div>									
+								</fieldset>
+							</g:if>
+							<g:else>
+								<div class="center middle">
+									<g:if test="${commandInstance?.categoryFilters || commandInstance?.searchTermFilters}">
+										<span>
+											Your search did not return any items.  Please try again.
+										</span>
 									</g:if>
 								</div>
-							</div>	
-						</g:if>
-						--%>					
-         			</td>
-	         		<td>
-	            		<g:if test="${commandInstance?.productList }">
-	            			<div style="overflow: auto; height: 500px;">									
-								<g:set var="productMap" value="${commandInstance?.productList.groupBy {it.category} }"/>
-								<g:each var="entry" in="${productMap}" status="i">	
-									<g:set var="totalQuantity" value="${0 }"/>
-									<div class="list">
-										<h3 style="background-color: #525D76; color: white; padding: 10px;">
-											<%-- 
-											<g:if test="${entry?.key?.parentCategory }">
-												${entry?.key?.parentCategory?.name } &rsaquo; 
-											</g:if>
-											${entry?.key?.name?:"Uncategorized" }
-											--%>										
-											<g:render template="../category/breadcrumb" model="[categoryInstance:entry.key]"/>		
-										</h3>
-				            			<table class="data-table">         		
-				            			<%-- 
-				            				<thead>
-												<tr>
-													<th width="50%">Description</th>
-													<th width="20%">Category</th>
-													<th width="5%" style="text-align: center">Qty</th>
-												</tr>
-											</thead>
-										--%>
-											<tbody>
-												<g:each var="productInstance" in="${productMap[entry.key] }">
-													<g:set var="quantity" value="${commandInstance?.quantityMap?.get(productInstance) }"/>
-													<g:set var="totalQuantity" value="${totalQuantity + (quantity?:0) }"/>
-													<tr class="${varStatus++%2==0?'odd':'even' } prop">
-														<td>
-															<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">
-																<g:if test="${productInstance?.name?.trim()}">
-																	${fieldValue(bean: productInstance, field: "name") } 
-																</g:if>
-																<g:else>
-																	Untitled Product
-																</g:else>
-															</g:link> 
-														</td>
-														<td>
-															${productInstance?.manufacturer }
-														</td>
-														<td>
-															${productInstance?.productCode }
-														</td>
-														<td style="text-align: center;">
-															<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">
-																${quantity?:0}
-															</g:link>
-														</td>
-													</tr>
-												</g:each>
-											</tbody>
-											<tfoot>										
-												<tr class="${varStatus%2==0?'odd':'even' } prop">
-													<th style="text-align: left;">
-														Total items
-													</th>
-													<th style="width: 10%">
-														
-													</th>
-													<th style="width: 10%">
-														
-													</th>
-													<th style="text-align: center; width: 10%">
-														${totalQuantity }
-													</th>
-												</tr>
-											</tfoot>										
-										</table>	
-									</div>
-								</g:each>										
-							</div>									
-						</g:if>
-						<g:else>
-							<div class="center middle">
-								<g:if test="${commandInstance?.categoryFilters || commandInstance?.searchTermFilters}">
-									<span>
-										Your search did not return any items.  Please try again.
-									</span>
-								</g:if>
-							</div>
-						</g:else>		    
-	         		</td>
-	         	</tr>
-	        </table>
+							</g:else>		    
+		         		</td>
+		         	</tr>
+		        </table>
+			</div>
 		</div>
-		
 		<script>
 			$(document).ready(function() {
 				/* Action Menu */
@@ -179,12 +182,16 @@
 					image.attr("src",imageSrc);								
 				});
 
+				$("#dialogButton").click(function () { 
+					$("#dialog").dialog({ "modal": "true", "width": 600});
+				});
+
+				
 				
 			});	
 
 
 			
-		</script>			
-		
+		</script>	
     </body>
 </html>

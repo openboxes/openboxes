@@ -7,6 +7,9 @@
 	<title><g:message code="default.show.label" args="[entityName]" /></title>        
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<content tag="pageTitle">Show Shipment</content>
+	<style>
+		th { width: 200px; } 
+	</style>
 </head>
 
 <body>    
@@ -25,79 +28,146 @@
 					<fieldset>
 						<g:render template="summary"/>						
 						<div id="details" class="section">
-							<table cellspacing="2" cellpadding="2">
+							<table>
 								<tbody>
 									<tr class="prop">
 										<td valign="top" class="name"><label><g:message
-											code="shipment.currentStatus.label" default="Status" /></label>
+											code="shipment.details.label" default="Details" /></label>
 										</td>
 										<td valign="top" class="value">
-											${shipmentInstance?.status.name}<br/>
-										</td>
-										<td>
-											<span class="fade">
-												<g:if test="${shipmentInstance?.status?.location}">
-													${shipmentInstance?.status.location}
-												</g:if>
-												<g:if test="${shipmentInstance?.status?.date}">
-													on <g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${shipmentInstance?.status.date}"/>
-												</g:if>
-											</span>
+											<table style="display:inline">
+												<tbody>								
+													<tr style="height: 30px;">
+														<th valign="top"><label><g:message
+															code="shipment.currentStatus.label" default="Status" /></label>
+														</th>
+														<td valign="top">
+															${shipmentInstance?.status.name}<br/>
+															<span class="fade">
+																<g:if test="${shipmentInstance?.status?.location}">
+																	${shipmentInstance?.status.location}
+																</g:if>
+																<g:if test="${shipmentInstance?.status?.date}">
+																	on <g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${shipmentInstance?.status.date}"/>
+																</g:if>
+															</span>
+														</td>
+													</tr>
+													<tr style="height: 30px;">
+														<th valign="top"><label><g:message
+															code="shipment.origin.label" default="Departing" /></label>
+														</th>
+														<td valign="top" >
+															<span>
+																${fieldValue(bean: shipmentInstance, field: "origin.name")}									
+															</span>
+															<span class="fade">
+																<g:if test="${shipmentInstance.expectedShippingDate && !shipmentInstance.hasShipped()}">
+																	on <g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />
+																</g:if>
+															</span>											
+														</td>
+													</tr>
+													<tr style="height: 30px;">
+														<th valign="top">
+															<label><g:message code="shipment.destination.label" default="Arriving" /></label>
+														</th>
+														<td >
+															<span>
+																${fieldValue(bean: shipmentInstance, field: "destination.name")}
+															</span>											
+															<span class="fade">
+																<g:if test="${shipmentInstance.expectedDeliveryDate && !shipmentInstance.wasReceived()}">
+																	on <g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />
+																</g:if>
+															</span>											
+														</td>
+													</tr>
+												</tbody>
+											</table>
 										</td>
 									</tr>
+												
 									<tr class="prop">
-										<td valign="top" class="name" ><label><g:message
-											code="shipment.origin.label" default="Departing" /></label></td>
-										<td valign="top" class="value" style="width: 30%;">
-											<span>
-												${fieldValue(bean: shipmentInstance, field: "origin.name")}									
-											</span>
-											<span class="fade">
-												<g:if test="${shipmentInstance.expectedShippingDate && !shipmentInstance.hasShipped()}">
-													on <g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />
-												</g:if>
-											</span>											
+										<td valign="top" class="name"><label>
+											<img src="${createLinkTo(dir:'images/icons/silk',file:'tag.png')}" alt="tag" style="vertical-align: middle"/>
+											<g:message
+												code="shipment.referenceNumbers.label" default="Reference #s" /></label>
 										</td>
-										<td>
+										<td valign="top" class="value">
+											<table style="display:inline">
+												<tbody>								
+													<g:each var="referenceNumberType" in="${shipmentWorkflow?.referenceNumberTypes}">
+														<tr style="height: 30px;">								
+														<!-- list all the reference numbers valid for this workflow -->
+															<th valign="top" ><label><g:message
+																code="shipment.${referenceNumberType?.name}" default="${referenceNumberType?.name}" /></label></th>
+															<td valign="top">
+																<g:findAll in="${shipmentInstance?.referenceNumbers}" expr="it.referenceNumberType.id == referenceNumberType.id">
+																	${it.identifier }
+																</g:findAll>	
+															</td>
+														</tr>
+													</g:each>
+												</tbody>
+											</table>
 										</td>
-									</tr>
-									<tr class="prop">
-										<td class="name"  >
-											<label><g:message code="shipment.destination.label" default="Arriving" /></label>
-										</td>
-										<td class="value" style="width: 30%;">
-											<span>
-												${fieldValue(bean: shipmentInstance, field: "destination.name")}
-											</span>											
-											<span class="fade">
-												<g:if test="${shipmentInstance.expectedDeliveryDate && !shipmentInstance.wasReceived()}">
-													on <g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />
-												</g:if>
-											</span>											
-											
-										</td>
-										<td>
-										</td>
-									</tr>
-									<g:if test="${!shipmentWorkflow?.isExcluded('carrier')}">  
+									</tr>	
+												
+												
+									<g:if test="${!shipmentWorkflow?.isExcluded('totalValue')||!shipmentWorkflow?.isExcluded('statedValue')}">
 										<tr class="prop">
-											<td valign="top" class="name" ><label><g:message
-												code="shipment.traveler.label" default="Traveler" /></label></td>
-											<td valign="top" class="value" style="width: 30%;">
-												<g:if test="${shipmentInstance?.carrier}">
-													${fieldValue(bean: shipmentInstance, field: "carrier.firstName")}
-													${fieldValue(bean: shipmentInstance, field: "carrier.lastName")}
-												</g:if>												
+											<td valign="top" class="name">
+												<img src="${createLinkTo(dir:'images/icons/silk',file:'money.png')}" alt="money" style="vertical-align: middle"/>
+												<label><g:message code="shipment.value.label" default="Value" /></label>
+											</td>
+											<td valign="top" class="value">
+												<table style="display:inline">
+													<tbody>																	
+														<g:if test="${!shipmentWorkflow?.isExcluded('totalValue')}">
+															<tr>
+																<th valign="top">
+																	<label><g:message code="shipment.totalValue.label" default="Total Value" /></label><br/>
+																</th>
+																<td valign="top" >
+																	<g:if test="${shipmentInstance.totalValue}">
+																		$<g:formatNumber format="#,##0.00" number="${shipmentInstance.totalValue}" /><br/>
+																	</g:if>
+																	<g:else>
+																		<span class="fade">N/A</span>
+																	</g:else>
+																</td>
+															</tr>	
+														</g:if>
+														
+														<g:if test="${!shipmentWorkflow?.isExcluded('statedValue')}">
+															<tr>
+																<th valign="top">
+																	<label><g:message code="shipment.statedValue.label" default="Stated Value" /></label><br/>
+																</th>
+																<td valign="top">
+																	<g:if test="${shipmentInstance.statedValue}">
+																		$<g:formatNumber format="#,##0.00" number="${shipmentInstance.statedValue}" /><br/>
+																	</g:if>
+																	<g:else>
+																		<span class="fade">N/A</span>
+																	</g:else>
+																</td>
+															</tr>
+														</g:if>									
+													</tbody>
+												</table>
 											</td>
 										</tr>
 									</g:if>
 									
+									<%-- 
 									<g:if test="${!shipmentWorkflow?.isExcluded('shipmentMethod.shipper')}"> 
 										<tr class="prop">
 											<td valign="top" class="name"><label><g:message
 											code="shipment.freightForwarder.label" default="Freight Forwarder" /></label>
 											</td>
-											<td valign="top" class="value">
+											<td valign="top" >
 												<g:if test="${shipmentInstance?.shipmentMethod?.shipper}">
 													${fieldValue(bean: shipmentInstance, field: "shipmentMethod.shipper.name")} 
 													${fieldValue(bean: shipmentInstance, field: "shipmentMethod.shipperService.name")}																														
@@ -118,7 +188,7 @@
 											<td class="name"  >
 												<label><g:message code="shipment.recipient.label" default="Recipient" /></label>
 											</td>
-											<td class="value" style="width: 30%;">
+											<td  style="width: 30%;">
 												<g:if test="${shipmentInstance?.recipient}">
 													<span>
 														${fieldValue(bean: shipmentInstance, field: "recipient.firstName")}
@@ -131,75 +201,25 @@
 											</td>
 										</tr>
 									</g:if>
-								
-									<%-- 
-									<tr class="prop">
-										<td valign="top" class="name">
-											<label><g:message code="shipment.donor.label" default="Donated by" /></label><br/>
-										</td>
-										<td valign="top" class="">
-											<g:if test="${shipmentInstance.donor}">
-												${shipmentInstance.donor.name}
-											</g:if>
-										</td>
-										<td>
-											&nbsp;
-										</td>
-									</tr>
 									--%>
-									
-									<!-- list all the reference numbers valid for this workflow -->
-									<g:each var="referenceNumberType" in="${shipmentWorkflow?.referenceNumberTypes}">
+									<g:if test="${!shipmentWorkflow?.isExcluded('carrier')}">  
 										<tr class="prop">
-											<td valign="top" class="name" style="width: 10%;"><label><g:message
-												code="shipment.${referenceNumberType?.name}" default="${referenceNumberType?.name}" /></label></td>
-											<td valign="top" style="width: 30%;">
-												<g:findAll in="${shipmentInstance?.referenceNumbers}" expr="it.referenceNumberType.id == referenceNumberType.id">
-													${it.identifier }													
-												</g:findAll>	
-											</td>
-											<td>
-											
-											</td>
-										</tr>
-									</g:each>
-									
-									<g:if test="${!shipmentWorkflow?.isExcluded('totalValue')}">
-										<tr class="prop">
-											<td valign="top" class="name">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'money.png')}" alt="money" style="vertical-align: middle"/>
-												<label><g:message code="shipment.totalValue.label" default="Total Value" /></label><br/>
-											</td>
-											<td valign="top" class="">
-												<g:if test="${shipmentInstance.totalValue}">
-													$<g:formatNumber format="#,##0.00" number="${shipmentInstance.totalValue}" /><br/>
-												</g:if>
-											</td>
-											<td>
-												&nbsp;
+											<td valign="top"><label><g:message
+												code="shipment.traveler.label" default="Traveler" /></label></td>
+											<td valign="top" >
+												<g:if test="${shipmentInstance?.carrier}">
+													${fieldValue(bean: shipmentInstance, field: "carrier.firstName")}
+													${fieldValue(bean: shipmentInstance, field: "carrier.lastName")}
+												</g:if>												
 											</td>
 										</tr>
 									</g:if>
-									<g:if test="${!shipmentWorkflow?.isExcluded('statedValue')}">
-										<tr class="prop">
-											<td valign="top" class="name">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'money.png')}" alt="money" style="vertical-align: middle"/>
-												<label><g:message code="shipment.statedValue.label" default="Stated Value" /></label><br/>
-											</td>
-											<td valign="top" class="">
-												<g:if test="${shipmentInstance.statedValue}">
-													$<g:formatNumber format="#,##0.00" number="${shipmentInstance.statedValue}" /><br/>
-												</g:if>
-											</td>
-											<td>
-												&nbsp;
-											</td>
-										</tr>
-									</g:if>
-									
+													
+
 									<g:if test="${!shipmentWorkflow?.isExcluded('additionalInformation')}">
 										<tr class="prop">
 											<td valign="top" class="name">
+												<img src="${createLinkTo(dir:'images/icons/silk',file:'comment.png')}" alt="comments" style="vertical-align: middle"/>
 												<label><g:message code="shipment.comments.label" default="Comments" /></label><br/>
 											</td>
 											<td valign="top" class="">
@@ -212,6 +232,8 @@
 											</td>
 										</tr>
 									</g:if>
+								
+							
 									
 									<g:if test="${shipmentWorkflow?.documentTemplate}">
 										<tr class="prop">
@@ -233,7 +255,7 @@
 											<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="document" style="vertical-align: middle"/>
 											<label>Documents</label>
 										</td>
-										<td class="value"  colspan="3">										
+										<td class="value" colspan="3">										
 											<div>
 												<g:if test="${shipmentInstance.documents}">
 													<table>
@@ -308,7 +330,7 @@
 									</tr>
 									<tr class="prop">
 										<td class="name">
-											<img src="${createLinkTo(dir:'images/icons/silk',file:'comment.png')}" alt="comment" style="vertical-align: middle"/>
+											<img src="${createLinkTo(dir:'images/icons/silk',file:'note.png')}" alt="note" style="vertical-align: middle"/>
 											<label>Notes</label>
 										</td>
 										<td class="value" colspan="3">

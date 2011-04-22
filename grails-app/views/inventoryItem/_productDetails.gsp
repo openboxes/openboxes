@@ -12,6 +12,14 @@
 			</tr>
 			<tr class="details even">	
 				<td class="left label">
+					<span class="name">Unit Of Measure</span>
+				</td>
+				<td colspan="2">
+					<span class="value">${productInstance?.unitOfMeasure }</span>
+				</td>
+			</tr>
+			<tr class="details odd">	
+				<td class="left label">
 					<span class="name">Category</span>
 				</td>
 				<td>
@@ -26,7 +34,7 @@
 				</td>
 			</tr>
 			
-			<tr class="details odd">	
+			<tr class="details even">	
 				<td class="left label">
 					<span class="name">Manufacturer</span>
 				</td>
@@ -42,7 +50,7 @@
 				</td>
 			</tr>
 			
-			<tr class="details even">	
+			<tr class="details odd">	
 				<td class="left label">
 					<span class="name">Manufacturer Code</span>
 				</td>
@@ -58,7 +66,7 @@
 				</td>
 			</tr>
 			
-			<tr class="details odd">	
+			<tr class="details even">	
 				<td class="left label">
 					<span class="name">UPC</span>
 				</td>
@@ -74,9 +82,9 @@
 				</td>
 			</tr>
 			
-			<tr class="details even">	
+			<tr class="details odd">	
 				<td class="left label">
-					<span class="name">NPC</span>
+					<span class="name">NDC</span>
 				</td>
 				<td>
 					<span class="value">
@@ -90,7 +98,7 @@
 				</td>
 			</tr>
 			
-			<tr class="details odd">	
+			<tr class="details even">	
 				<td class="left label">
 					<span class="name">Cold Chain</span>
 				</td>

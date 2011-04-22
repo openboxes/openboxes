@@ -6,28 +6,27 @@
         <title><g:message code="default.controllers.label" default="Controllers" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="menuTitle"><g:message code="default.controllers.label" default="Controllers" /></content>		
-		<content tag="pageTitle"><g:message code="default.controllers.label" default="Controllers" /></content>
-		<content tag="globalLinksMode">append</content>
-		<content tag="localLinksMode">override</content>
-		<content tag="globalLinks"><g:render template="global"/></content>
-		<content tag="localLinks"><g:render template="local"/></content>
-		<content tag="breadcrumb"><g:render template="breadcrumb" model=""/></content>
-
     </head>
     <body>        
 		<div id="settings" role="main" class="yui-gb">
 			<!-- the first child of a Grid needs the "first" class -->
 			<div class="yui-u first">
-				<ul>
-					<g:each var="c" in="${grailsApplication.controllerClasses}">
-						<g:set var="controllerName"><%= c.getName().toLowerCase() %></g:set>
-						<span class="menuButton">							
-							<li class="controller">
-								<a class="${controllerName}" href="${createLink(uri: '/' + controllerName)}"">${controllerName}</a>
-							</li>
-						</span>
-					</g:each>
-				</ul>									  
+				<table>
+					<tr>
+						<g:set var="status" value="${1 }"/>
+						<g:each var="c" in="${grailsApplication.controllerClasses}">
+							<td>
+								<g:set var="controllerName"><%= c.getName().toLowerCase() %></g:set>
+								<span class="menuButton">						
+									<li class="controller">
+										<a class="${c.name}" href="${createLink(uri: '/' + c.name)}"">${controllerName}</a>
+									</li>
+								</span>
+							</td>
+							<g:if test="${status++ % 6 == 0}"></tr><tr></g:if>
+						</g:each>
+					</tr>
+				</table>								  
 			</div>	
 		</div>
     </body>

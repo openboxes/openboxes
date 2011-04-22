@@ -107,7 +107,9 @@
 												<g:each in="${transactionInstance?.transactionEntries.sort { it.inventoryItem?.product.name } }" var="transactionEntry" status="status">
 													<tr class="${(status%2==0)?'odd':'even'}">
 														<td style="text-align: left;">
-															${transactionEntry?.inventoryItem?.product?.name }
+															<g:link controller="inventoryItem" action="showStockCard" params="['product.id':transactionEntry?.inventoryItem?.product?.id]">
+																${transactionEntry?.inventoryItem?.product?.name }
+															</g:link>
 														</td>										
 														<td>
 															${transactionEntry?.inventoryItem?.lotNumber }

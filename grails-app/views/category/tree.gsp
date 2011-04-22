@@ -35,7 +35,7 @@
 		        		
 		           			<div>
 								<style>
-									ul { margin-left: 2em; } 
+									.category-tree ul { margin-left: 2em; } 
 									.category-tree li { background-color: #f7f7f7;
 									border: 1px dashed lightgrey; padding: .5em; margin: .5em;}
 								</style>

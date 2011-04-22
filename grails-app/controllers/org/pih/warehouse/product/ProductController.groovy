@@ -6,6 +6,8 @@ import org.junit.runner.Request;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.inventory.InventoryItem;
+import org.pih.warehouse.inventory.Warehouse;
+
 import grails.converters.JSON;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -28,23 +30,31 @@ class ProductController {
 	def batchEdit = { BatchEditCommand cmd -> 
 		
 		log.info "Batch edit: " + params
+		def categoryInstance = Category.get(params?.category?.id)		
+		if (categoryInstance) { 			
+			cmd.productInstanceList = Product.findAllByCategory(categoryInstance)
+		}
+		else { 
+			//flash.message = "Only displaying first 100 products.  Please select a category."
+			//params.max = 25;
+			//cmd.productInstanceList = Product.list(params);
+			cmd.productInstanceList = []
+		}
 		
-		cmd.productInstanceList = Product.getAll();
 		cmd.productInstanceList.eachWithIndex { product, index ->
 			println product.category
 			cmd.categoryInstanceList << product.category;
 		}		
 		cmd.rootCategory = productService.getRootCategory();
 		
-		[ commandInstance : cmd ]
+		[ commandInstance : cmd, categoryInstance: categoryInstance ]
 		
 	}
 	
 	def batchSave = { BatchEditCommand cmd ->
 		
 		// If there are no products (usually when returning to batchSave after login
-		if (!cmd.productInstanceList) { 
-			
+		if (!cmd.productInstanceList) { 			
 			redirect(action: 'batchEdit')	
 		}
 		// We needed to hack the category binding in order to make this work.
@@ -97,11 +107,7 @@ class ProductController {
 	}
 
 	
-    def save = {
-        //def productInstance = new Product(params)
-		log.info "save called with params " + params
-		log.info "type = " + params.type;
-		
+    def save = {		
 		def productInstance = new Product();	
 		/*
 		productInstance?.categories?.clear();
@@ -129,11 +135,13 @@ class ProductController {
 			productInstance.categories.removeAll(_toBeDeleted)
 		}
 		
+		def warehouseInstance = Warehouse.get(session.warehouse.id);
+		def inventoryInstance = warehouseInstance?.inventory;
 		
 		if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'product.label', default: 'Product'), productInstance.name])}"
-			
-            redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id, params:params)
+			redirect(controller: "inventoryItem", action: "recordInventory", params: ['product.id':productInstance.id, 'inventory.id': inventoryInstance?.id])
+            //redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id, params:params)
         }
         else {
             render(view: "edit", model: [productInstance: productInstance, rootCategory: productService.getRootCategory()])

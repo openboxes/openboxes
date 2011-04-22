@@ -9,7 +9,7 @@
 	<img src="${resource(dir: 'images/icons/silk', file: 'book_open.png')}"/>&nbsp;
 	<a id="btnAdjustStock-${itemInstance?.id}">Adjust Stock</a>
 </div>
-<g:link controller="inventoryItem" action="showRecordInventory" params="['product.id':commandInstance?.productInstance?.id,'inventory.id':commandInstance?.inventoryInstance?.id, 'inventoryItem.id':itemInstance?.id]">
+<g:link controller="inventoryItem" action="recordInventory" params="['product.id':commandInstance?.productInstance?.id,'inventory.id':commandInstance?.inventoryInstance?.id, 'inventoryItem.id':itemInstance?.id]">
 </g:link>
 
 <div id="dlgAdjustStock-${itemInstance?.id}" title="Adjust Stock" style="padding: 10px; display: none;" >	

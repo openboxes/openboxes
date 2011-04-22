@@ -338,7 +338,10 @@
 				</td>
 				<td>
 					{{= ProductName}} 
-					&nbsp; <a href="${createLink(controller: 'inventoryItem', action: 'showStockCard')}/{{= ProductId}}" target="_blank">Open Stock Card &rsaquo;</a>
+					<!--
+					&nbsp; 
+					<a href="${createLink(controller: 'inventoryItem', action: 'showStockCard')}/{{= ProductId}}" target="_blank">Open Stock Card &rsaquo;</a>
+					-->
 				</td>
 				<td>
 					<g:hiddenField name="transactionEntries[{{= Index}}].product.id" class="hiddenProductId" value="{{= ProductId}}"/>
@@ -413,20 +416,9 @@
 					<table>
 						<tr>
 							<td>
-							
-							
 								<fieldset>
 									<legend>Transaction Summary</legend>
-								
-							
 										<ul class="striped">
-											<li id="transaction-date-li" class="prop transactionDate">
-												<label>Transaction Date</label>
-												<span class="value">
-													<g:jqueryDatePicker id="transactionDate" name="transactionDate"
-															value="${transactionInstance?.transactionDate}" format="MM/dd/yyyy"/>
-												</span>								
-											</li>
 											<li id="transaction-type-li" class="prop transactionType">											
 												<label>Transaction Type</label>
 												<span class="value">
@@ -455,11 +447,14 @@
 							                       		optionKey="id" optionValue="name" value="${transactionInstance?.destination?.id}" noSelection="['null': '']" />
 												</span>
 											</li>
+											<li id="transaction-date-li" class="prop transactionDate">
+												<label>Transaction Date</label>
+												<span class="value">
+													<g:jqueryDatePicker id="transactionDate" name="transactionDate"
+															value="${transactionInstance?.transactionDate}" format="MM/dd/yyyy"/>
+												</span>								
+											</li>
 										</ul>
-									</fieldset>
-									<br/>
-									<fieldset>
-										<legend>Transaction Details</legend>
 										
 										<ul>
 										
@@ -478,15 +473,8 @@
 															</tr>
 														</thead>
 														<tbody>
-															<tr>
-																<td colspan="6" style="text-align: center;">
-																	<span class="fade">
-																		Add new entries using the search box to the right.
-																	</span>
-																</td>															
-															</tr>
+															<!--  dynamically populated -->
 														</tbody>
-																
 													</table>
 												</div>							
 											</li>														
@@ -501,37 +489,44 @@
 											</button>
 											&nbsp;
 											
-											<g:if test="${transactionInstance?.id }">
-												<g:link action="listTransactions">
-								                    ${message(code: 'default.button.cancel.label', default: '&lsaquo; Back to transactions')}						
+											<g:if test="${params?.product?.id }">
+												<g:link controller="inventoryItem" action="showStockCard" params="['product.id':params?.product?.id]">
+													<button>
+														<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_left.png')}"/>
+									                    ${message(code: 'default.button.cancel.label', default: 'Back to stock card')}&nbsp;
+								                    </button>						
 												</g:link>			
+												&nbsp;
 											</g:if>
-											<g:else>
-												<g:link action="listTransactions">
-								                    ${message(code: 'default.button.cancel.label', default: 'Cancel')}						
-												</g:link>								
-											</g:else>
+											<g:link controller="inventory" action="browse">
+												<button>
+													<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_up.png')}"/>
+								                    ${message(code: 'default.button.cancel.label', default: 'Back to transactions')}&nbsp;
+							                    </button>						
+											</g:link>			
+											&nbsp;
 										</div>
 									</li>
 								</ul>
 					
 							</td>
 							
-							<td style="border-left: 1px solid lightgrey">
-								<div>
-									<h3>Add Items</h3>
+							<td style="border-left: 0px solid lightgrey">
+								<fieldset style="padding: 10px;">
+									<legend>Add more items</legend>
 								
-								
-									<g:hiddenField id="productId" name="productId"/>
-									<g:hiddenField id="productName" name="productName"/>
-									<g:textField  id="productSearch" name="productSearch" value="Search for another product ..." size="25"/> 
-									
-									<button id="addProduct" type="button">
+									<div>
+										<g:hiddenField id="productId" name="productId"/>
+										<g:hiddenField id="productName" name="productName"/>
+										<g:textField  id="productSearch" name="productSearch" value="Search for another product ..." size="25"/> 
 										
-										<img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png')}"/>
-										Add Item	
-									</button>								
-								</div>						
+										<button id="addProduct" type="button">
+											
+											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png')}"/>
+											Add	&nbsp;
+										</button>								
+									</div>						
+								</fieldset>
 							</td>
 						</tr>
 					</table>

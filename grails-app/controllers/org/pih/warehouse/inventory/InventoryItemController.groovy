@@ -130,7 +130,7 @@ class InventoryItemController {
 	/**
 	 * Display the Record Inventory form for the product 
 	 */
-	def showRecordInventory = { RecordInventoryCommand cmd -> 
+	def recordInventory = { RecordInventoryCommand cmd -> 
 		def commandInstance = inventoryService.getRecordInventoryCommand(cmd, params)
 		
 		
@@ -169,7 +169,7 @@ class InventoryItemController {
 			
 		log.info ("User chose to validate or there are errors")
 		
-		//chain(action: "showRecordInventory", model: [commandInstance:cmd])
+		//chain(action: "recordInventory", model: [commandInstance:cmd])
 		def warehouseInstance = Warehouse.get(session?.warehouse?.id)
 		def productInstance = cmd.product;
 		def transactionEntryList = TransactionEntry.findAllByProduct(productInstance);
@@ -177,7 +177,7 @@ class InventoryItemController {
 		def inventoryInstance = warehouseInstance?.inventory;
 		def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, inventoryInstance);
 		
-		render(view: "showRecordInventory", model: 
+		render(view: "recordInventory", model: 
 			[ commandInstance : cmd, inventoryInstance: warehouseInstance.inventory, inventoryLevelInstance: inventoryLevelInstance, totalQuantity: totalQuantity ])
 	}
 

@@ -184,7 +184,8 @@
 		<!-- Populated using the 'pageTitle' property defined in the GSP file -->
 		<g:if test="${session.user}">
 			<h3>
-			    <div id="pageTitle">							    
+			    <div id="pageTitle">		
+			  	  <%-- 					    
 			    	<g:link controller="dashboard" action="index">
 				    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'house.png')}"/>
 			    	</g:link>
@@ -197,6 +198,8 @@
 						${session?.warehouse?.name} &nbsp;&rsaquo;&nbsp;
 					</g:if>
 				    <g:message code="${params.controller }.label"/>
+				    --%>
+				    
 				    <%-- 
 					&nbsp;&rsaquo;&nbsp;								
 					<g:if test="${pageProperty(name:'page.pageTitle')}"><b>${pageProperty(name:'page.pageTitle')}</b></g:if>
@@ -217,7 +220,24 @@
 	      	<div id="yui-main">
 		    	<div id="content" class="yui-b">
 		    		<g:if test="${session.user}">
-		    			<h3><g:layoutTitle /></h3>
+		    			<h3 class="page-title">
+						    <div>							    
+						    	<g:link controller="dashboard" action="index">
+							    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'house.png')}"/>
+						    	</g:link>
+							    &nbsp;&rsaquo;&nbsp;								
+								<g:if test="${session?.warehouse}">									
+									<g:if test="${session.warehouse.logo }">
+										<img class="photo" width="25" height="25" 
+											src="${createLink(controller:'warehouse', action:'viewLogo', id:session.warehouse.id)}" style="vertical-align: middle" />
+									</g:if>
+									${session?.warehouse?.name} &nbsp;&rsaquo;&nbsp;
+								</g:if>
+							    <g:message code="${params.controller }.label"/>
+							    &nbsp;&rsaquo;&nbsp;								
+			    				<g:layoutTitle />
+			    			</div>
+		    			</h3>
 		    		</g:if>
 					<g:layoutBody />
 				</div>
@@ -293,5 +313,71 @@
 			</div>
 		</div>
 	</div>
+	
+<script type="text/javascript">
+	$(function() { 
+		var accordion = 
+			$('#leftnav-accordion-menu').accordion({
+				active: true, 
+				navigation: true, 
+				autoHeight: false, 
+				//alwaysOpen: true,
+				//clearStyle: false, 
+				//collapsible: false,
+				//fillSpace: true,
+				event: "click"  
+			});
+		
+		/*
+		$('.accordion h6').click(function() {
+			$(this).next().toggle();
+			return false;
+		}).next().hide();
+		*/
+		<g:if test="${request.request.requestURL.toString().contains('category')}">
+			accordion.accordion( "activate" , 5 );
+		</g:if>
+		<g:elseif test="${request.request.requestURL.toString().contains('attribute')}">
+			accordion.accordion( "activate" , 5 );
+		</g:elseif>
+		<g:elseif test="${request.request.requestURL.toString().contains('product/batchEdit')}">
+			accordion.accordion( "activate" , 5 );
+		</g:elseif>
+		<g:elseif test="${request.request.requestURL.toString().contains('person')}">
+			accordion.accordion( "activate" , 4 );
+		</g:elseif>
+		<g:elseif test="${request.request.requestURL.toString().contains('user')}">
+			accordion.accordion( "activate" , 4 );
+		</g:elseif>
+		<g:elseif test="${request.request.requestURL.toString().contains('location')}">
+			accordion.accordion( "activate" , 3 );
+		</g:elseif>
+		<g:elseif test="${request.request.requestURL.toString().contains('warehouse/warehouse')}">
+			accordion.accordion( "activate" , 3 );
+		</g:elseif>
+		<g:elseif test="${request.request.requestURL.toString().contains('receiving')}">
+			accordion.accordion( "activate" , 2 );
+		</g:elseif>
+		<g:elseif test="${request.request.requestURL.toString().contains('shipment')}">
+			accordion.accordion( "activate" , 1 );
+		</g:elseif>
+		<g:elseif test="${request.request.requestURL.toString().contains('createShipmentWorkflow')}">
+			accordion.accordion( "activate" , 1 );
+		</g:elseif>
+		<g:elseif test="${request.request.requestURL.toString().contains('inventory')}">
+			accordion.accordion( "activate" , 0 );
+		</g:elseif>
+		<g:elseif test="${request.request.requestURL.toString().contains('product')}">
+			accordion.accordion( "activate" , 0 );
+		</g:elseif>
+	
+		$('.goto').click(function(){
+			var li = $(this).parent().closest(".menu-section");
+			console.log(li);
+		});	
+	});
+</script>
+	
+	
 </body>
 </html>

@@ -15,7 +15,7 @@
             </g:if>
 			<table>            	
             	<tr>
-            		<td style="border-right: 0px solid lightgrey; width: 200px; border-right: 1px solid lightgrey; background-color: #f5f5f5;">
+            		<td style="border: 1px solid lightgrey; background-color: #f5f5f5;">
 			            <g:form action="listShipping" method="post">
 				           	<div class="filter-list-item">
 				           		<label class="block">Type</label> 
@@ -48,7 +48,7 @@
 								<g:jqueryDatePicker id="statusEndDate" name="statusEndDate"
 																	value="${statusEndDate}" format="MM/dd/yyyy"/>
 							</div>
-				           	<div class="filter-list-item right">
+				           	<div class="filter-list-item">
 								<button name="filter">
 									<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;
 									Filter </button>
@@ -56,7 +56,8 @@
 							
 			            </g:form>
             		</td>
-            	
+            	</tr>
+            	<tr>
 					<td>            
 			            <g:if test="${shipments.size()==0}">
 			           		<div>
@@ -66,6 +67,8 @@
 			           			<g:else>
 			   		        		There are no shipments originating at <b>${session.warehouse.name}</b>.
 			            		</g:else>
+			            		&nbsp;
+			            		<g:link controller="shipment" action="listShipping"><g:message code="shipment.startOver.label"  default="Start over "/></g:link>
 			           		</div>
 			           	</g:if>
 			            
@@ -92,8 +95,12 @@
 													<span class="action-menu">
 														<g:link action="showDetails" id="${shipmentInstance.id}">
 															${fieldValue(bean: shipmentInstance, field: "name")}
-														</g:link>																														
-														<span><img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" /></span>
+														</g:link>				
+														&nbsp;																										
+														<button>
+															<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" />														
+															<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
+														</button>
 														<div class="actions">
 															<g:render template="listShippingMenuItems" model="[shipmentInstance:shipmentInstance]"/>															
 															

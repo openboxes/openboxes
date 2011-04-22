@@ -2,32 +2,15 @@
 /*.menuButton { font-variant: small-caps; }*/ 
 /* remove gaudy background image */	
 .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
-	background-image: none; 
 	
 } 	
 	
 </style>
-<div id="leftnav-accordion-menu" class="menu">
-<%-- 
-	<h3 class="menu-heading" >
-		
-		<g:message code="dashboard.label" default="Dashboard"/>
-	</h3>
-	<div class="menu-section">
-	 	<ul>
-			<li class="">
-				<span class="menuButton">
-					<g:link class="bullet" controller="dashboard" action="index"><g:message code="default.show.label" args="['Dashboard']" default="Show Dashboard"/></g:link>
-				</span>
-			</li>				
-		</ul>
-	</div>
---%>
+<div id="leftnav-accordion-menu" class="accordion menu">
 	
-	
-	<h3 class="menu-heading">
+	<h6 class="menu-heading">
 		<g:message code="inventory.label"  default="Inventory"/>
-	</h3>
+	</h6>
 	<div class="menu-section">									
 		<ul>
 			<li>
@@ -50,35 +33,17 @@
 					<g:link class="bullet" controller="inventoryItem" action="importInventoryItems">Import Items</g:link> 				
 				</span>			
 			</li>
-			<li>
-				<hr/>
-			</li>
 			<li class="">
 				<span class="menuButton">
 					<g:link class="bullet" controller="product" action="create"><g:message code="default.add.label" args="['Product']" default="Add New Product" /></g:link>
 				</span>
 			</li>
-			<li class="">
-				<span class="menuButton">
-					<g:link class="bullet" controller="category" action="tree"><g:message code="default.show.label" args="['Categories']"/></g:link>
-				</span>
-			</li>
-			<li class="">
-				<span class="menuButton">
-					<g:link class="bullet" controller="attribute" action="list"><g:message code="default.show.label" args="['Attributes']"/></g:link>
-				</span>
-			</li>
-			<li class="">
-				<span class="menuButton">
-					<g:link class="bullet" controller="product" action="batchEdit"><g:message code="default.batchEdit.label" args="['Products']" default="Batch Edit Products" /></g:link>
-				</span>
-			</li>
 			
 		</ul>	
 	</div>
-	<h3 class="menu-heading" >
+	<h6 class="menu-heading" >
 		<g:message code="shipping.label"  default="Shipping"/>
-	</h3>
+	</h6>
 	<div class="menu-section">
 		<ul>
 			<li class="">
@@ -93,9 +58,9 @@
 			</li>					
 		</ul>										
 	</div>
-	<h3 class="menu-heading">
+	<h6 class="menu-heading">
 		<g:message code="receiving.label"  default="Receiving"/>
-	</h3>
+	</h6>
 	<div class="menu-section">
 		<ul>
 			<li class="">
@@ -110,9 +75,9 @@
 			</li>		
 		</ul>										
 	</div>
-	<h3 class="menu-heading">
+	<h6 class="menu-heading">
 		<g:message code="location.label"  default="Locations"/>
-	</h3>
+	</h6>
 	<div class="menu-section">								
 		<ul>
 			<li class="">
@@ -146,10 +111,10 @@
 		</ul>
 	</div>																	
 	<%-- 
-	<h3 class="menu-heading">
+	<h6 class="menu-heading">
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'chart_bar.png')}" alt="Reports" style="vertical-align: middle"/> &nbsp; 
 		<g:message code="settings.label" args="['Reports']" default="Reports"/>
-	</h3>
+	</h6>
 	--%>
 	<%-- 
 	<div class="menu-section">
@@ -160,9 +125,9 @@
 		</ul>
 	</div>					
 	--%>
-	<h3 class="menu-heading">
+	<h6 class="menu-heading">
 		<g:message code="users.label"  default="Users"/>
-	</h3>			
+	</h6>			
 	<div class="menu-section">
 		<ul>			
 			<li class="">
@@ -185,11 +150,38 @@
 		</ul>
 	</div>
 	
+	<h6 class="menu-heading">
+		<g:message code="administration.label"  default="Admin"/>
+	</h6>			
+	<div class="menu-section">
+		<ul>			
+			<li class="">
+				<span class="menuButton">
+					<g:link class="bullet" controller="admin" action="checkSettings"><g:message code="default.show.label" args="['Settings']"/></g:link>
+				</span>		
+			</li>		
+			<li class="">
+				<span class="menuButton">
+					<g:link class="bullet" controller="category" action="tree"><g:message code="default.show.label" args="['Categories']"/></g:link>
+				</span>
+			</li>
+			<li class="">
+				<span class="menuButton">
+					<g:link class="bullet" controller="attribute" action="list"><g:message code="default.show.label" args="['Attributes']"/></g:link>
+				</span>
+			</li>
+			<li class="">
+				<span class="menuButton">
+					<g:link class="bullet" controller="product" action="batchEdit"><g:message code="default.batchEdit.label" args="['Products']" default="Batch Edit Products" /></g:link>
+				</span>
+			</li>
+		</ul>
+	</div>
 	
 	<%--
-	<h3 class="menu-heading">
+	<h6 class="menu-heading">
 		<g:message code="metadata.label"  default="Settings"/>
-	</h3>
+	</h6>
 	<div class="menu-section">
 		<ul>
 			<li class="">
@@ -272,17 +264,3 @@
 	
 </div>
 
-<script type="text/javascript">
-$(function() { 
-	$('#leftnav-accordion-menu').accordion({
-		active: true, 
-		navigation: true, 
-		autoheight: true, 
-		alwaysOpen: true,
-		clearStyle: false, 
-		animated: false,
-		navigation: true,
-		event: "click" /*mouseover*/ 
-	});
-});
-</script>

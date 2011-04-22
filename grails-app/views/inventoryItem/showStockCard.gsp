@@ -7,7 +7,7 @@
 		<g:set var="entityName"
 			value="${message(code: 'stockCard.label', default: 'Stock Card')}" />
 		<title>
-			<g:message code="default.show.label" args="[entityName]" /> &rsaquo; 
+			<g:message code="default.show.label" args="[entityName]" /> &nbsp;&rsaquo;&nbsp; 
 			<span style="color: grey">${commandInstance?.productInstance?.name }</span>
 		</title>
 	</head>
@@ -24,9 +24,12 @@
 			</g:hasErrors>
 
 			<div class="dialog" style="min-height: 880px">
+			
+				<!-- Action menu -->
 				<div>
 					<span class="action-menu">
-						<span><b>Actions</b><img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" /></span>
+						<button><img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle;"/>
+						&nbsp;<b>Actions</b>&nbsp;<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/></button>
 						<div class="actions">
 							<g:render template="showStockCardMenuItems" model="[commandInstance: commandInstance]"/>																				
 						</div>
@@ -34,13 +37,18 @@
 				</div>			
 			
 			
+				<!-- Content -->
 				<table>				
 					<tr>
+					
+						<!--  Product Details -->
 						<td style="width: 300px;">
 							<g:render template="productDetails" 
 								model="[productInstance:commandInstance?.productInstance, inventoryInstance:commandInstance?.inventoryInstance, 
 									inventoryLevelInstance: commandInstance?.inventoryLevelInstance, totalQuantity: commandInstance?.totalQuantity]"/>
 						</td>
+						
+						<!--  Current Stock and Transaction Log -->
 						<td>
 							<g:render template="showCurrentStock"/>
 							<br/>
