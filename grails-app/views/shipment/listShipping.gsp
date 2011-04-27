@@ -4,7 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipping')}" />
-        <title>Shipments originating at <b>${session.warehouse.name}</b></title>
+        <title>Shipments from <b>${session.warehouse.name}</b></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
 		
     </head>    
@@ -17,43 +17,47 @@
             	<tr>
             		<td style="border: 1px solid lightgrey; background-color: #f5f5f5;">
 			            <g:form action="listShipping" method="post">
-				           	<div class="filter-list-item">
-				           		<label class="block">Type</label> 
-				           		<g:select name="shipmentType"
-												from="${org.pih.warehouse.shipping.ShipmentType.list()}"
-												optionKey="id" optionValue="name" value="${shipmentType}" 
-												noSelection="['':'--All--']" />&nbsp;&nbsp;    
-							</div>
-				           	<div class="filter-list-item">
-					           	<label class="block">Destination </label>
-					           	<g:select name="destination" 
-					           							from="${org.pih.warehouse.core.Location.list().sort()}"
-					           							optionKey="id" optionValue="name" value="${destination}" 
-					           							noSelection="['':'--All--']" />&nbsp;&nbsp;
-							</div>
-				           	<div class="filter-list-item">
-					           	<label class="block">Status</label> 
-					           	<g:select name="status" 
-					           					   from="${org.pih.warehouse.shipping.ShipmentStatusCode.list()}"
-					           					   optionKey="name" optionValue="name" value="${status}" 
-					           					   noSelection="['':'--All--']" />&nbsp;&nbsp;	
-							</div>
-				           	<div class="filter-list-item">
-					           	<label class="block">From</label> 
-					           	<g:jqueryDatePicker id="statusStartDate" name="statusStartDate"
-																	value="${statusStartDate}" format="MM/dd/yyyy"/>
-							</div>
-				           	<div class="filter-list-item">
-								<label class="block">To</label> 
-								<g:jqueryDatePicker id="statusEndDate" name="statusEndDate"
-																	value="${statusEndDate}" format="MM/dd/yyyy"/>
-							</div>
-				           	<div class="filter-list-item">
-								<button name="filter">
-									<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;
-									Filter </button>
-							</div>
-							
+			            
+			            	<table >
+			            		<tr>
+						           	<td class="filter-list-item">
+						           		<label class="block">Type</label> 
+						           		<g:select name="shipmentType"
+														from="${org.pih.warehouse.shipping.ShipmentType.list()}"
+														optionKey="id" optionValue="name" value="${shipmentType}" 
+														noSelection="['':'--All--']" />&nbsp;&nbsp;    
+									</td>
+						           	<td class="filter-list-item">
+							           	<label class="block">Destination </label>
+							           	<g:select name="destination" 
+							           							from="${org.pih.warehouse.core.Location.list().sort()}"
+							           							optionKey="id" optionValue="name" value="${destination}" 
+							           							noSelection="['':'--All--']" />&nbsp;&nbsp;
+									</td>
+						           	<td class="filter-list-item">
+							           	<label class="block">Status</label> 
+							           	<g:select name="status" 
+							           					   from="${org.pih.warehouse.shipping.ShipmentStatusCode.list()}"
+							           					   optionKey="name" optionValue="name" value="${status}" 
+							           					   noSelection="['':'--All--']" />&nbsp;&nbsp;	
+									</td>
+						           	<td class="filter-list-item">
+							           	<label class="block">From</label> 
+							           	<g:jqueryDatePicker id="statusStartDate" name="statusStartDate"
+																			value="${statusStartDate}" format="MM/dd/yyyy"/>
+									</td>
+						           	<td class="filter-list-item">
+										<label class="block">To</label> 
+										<g:jqueryDatePicker id="statusEndDate" name="statusEndDate"
+																			value="${statusEndDate}" format="MM/dd/yyyy"/>
+									</td>
+						           	<td class="filter-list-item" style="height: 100%; vertical-align: bottom">
+										<button name="filter">
+											<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;
+											Filter </button>
+									</td>
+								</tr>
+							</table>
 			            </g:form>
             		</td>
             	</tr>
@@ -77,6 +81,7 @@
 								<table>
 				                    <thead>
 				                        <tr class="odd">   
+				                         	<th>${message(code: 'shipment.actions.label', default: 'Actions')}</th>
 				                        	<th>${message(code: 'shipment.shipmentType.label', default: 'Type')}</th>
 				                            <th>${message(code: 'shipment.shipment.label', default: 'Shipment')}</th>							
 				                            <th>${message(code: 'shipment.destination.label', default: 'Destination')}</th>
@@ -87,25 +92,25 @@
 				                   	<tbody>
 										<g:each var="shipmentInstance" in="${shipments}" status="i">
 											<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">            
+												<td>
+													<div class="action-menu">
+														<button class="action-btn">
+															<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" />
+															<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
+														</button>
+														<div class="actions" style="position: absolute; display: none;">
+															<g:render template="listShippingMenuItems" model="[shipmentInstance:shipmentInstance]"/>															
+														</div>
+													</div>	
+												</td>
 												<td width="3%" style="text-align: center">
 													<img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + shipmentInstance?.shipmentType?.name + '.png')}"
 													alt="${shipmentInstance?.shipmentType?.name}" style="vertical-align: middle; width: 24px; height: 24px;" />		
 												</td>										
 												<td>
-													<span class="action-menu">
-														<g:link action="showDetails" id="${shipmentInstance.id}">
-															${fieldValue(bean: shipmentInstance, field: "name")}
-														</g:link>				
-														&nbsp;																										
-														<button>
-															<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" />														
-															<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
-														</button>
-														<div class="actions">
-															<g:render template="listShippingMenuItems" model="[shipmentInstance:shipmentInstance]"/>															
-															
-														</div>
-													</span>	
+													<g:link action="showDetails" id="${shipmentInstance.id}">
+														${fieldValue(bean: shipmentInstance, field: "name")}
+													</g:link>				
 												</td>
 												<td align="center">
 													${fieldValue(bean: shipmentInstance, field: "destination.name")}
@@ -133,20 +138,32 @@
 		<script type="text/javascript">
 			$(function(){ 
 				function show() {
-					$(this).children(".actions").show();
+					//$(this).children(".actions").show();
 				}
-				
 				function hide() { 
 					$(this).children(".actions").hide();
 				}
 				
+				// Create an action button that toggles the action menu on click
+				//.button({ text: false, icons: {primary:'ui-icon-gear',secondary:'ui-icon-triangle-1-s'} })
+				$(".action-btn").click(function() {
+					$(this).parent().children(".actions").toggle();
+				});
+
+				// Add hover intent to the action menu so we can hide the menu when the mouse leaves the area near the menu
 				$(".action-menu").hoverIntent({
 					sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
 					interval: 5,   // number = milliseconds for onMouseOver polling interval
 					over: show,     // function = onMouseOver callback (required)
 					timeout: 100,   // number = milliseconds delay before onMouseOut
 					out: hide       // function = onMouseOut callback (required)
-				});  
+				});
+
+
+				// Position the actions menu, relative to the action button
+				//$(".action-btn").each(function() {
+				//	$(this).parent().find(".actions").position({ my: "left top", at: "left bottom", of: this, collision: "fit"});
+				//});
 			});
 		</script>	        
     </body>

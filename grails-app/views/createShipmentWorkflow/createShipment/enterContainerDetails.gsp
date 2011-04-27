@@ -46,14 +46,18 @@
 			 	<table style="border: 0px;" border="0">
 			 		<tr>
 			 			<td valign="top" style="border-right: 0px solid lightgrey;">
-							<div style="background-color: #525d76; color: white; padding: 10px;">Shipment Containers
-								 <span class="action-menu">
-									<span class="action-menu-root" style="vertical-align: middle;" >
-										<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/></span>
-									<div class="action-menu-items" style="position: absolute; z-index: 1; background-color: #f5f5f5; border: 1px solid lightgrey; padding: 10px; display: none;">
+							<div style="background-color: #525d76; color: white; padding: 5px;">	
+								<span class="action-menu" >
+									<button class="action-btn">
+										<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>							
+										<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
+									</button>
+									<div class="actions" style="position: absolute; z-index: 1; display: none;">
 										<g:render template="shipmentMenuItems"/>
 									</div>
 								</span>
+								&nbsp;
+								Shipment Containers 
 							</div>
 							<div class="list" style="text-align: left; border: 1px solid lightgrey;">
 								<g:set var="count" value="${0 }"/>	
@@ -127,19 +131,13 @@
 							</div>			 			
 			 			</td>
 			 			<td valign="top">
-			 				<div style="background-color: #525d76; color: white; padding: 10px">
-								<g:if test="${selectedContainer}">								
-									<g:if test="${selectedContainer.parentContainer }">
-										${selectedContainer?.parentContainer?.name } &rsaquo;
-									</g:if>								
-				 					<span>${selectedContainer?.name } </span>				 					
-								</g:if>			 			
-								<g:else>
-									Unpacked items			 						
-								</g:else>
+			 				<div style="background-color: #525d76; color: white; padding: 5px">
 								<span class="action-menu">
-									<span class="action-menu-root"><img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/></span>
-									<div class="action-menu-items" style="position: absolute; z-index: 1; background-color: #f5f5f5; border: 1px solid lightgrey; padding: 10px; display: none;">
+									<button class="action-btn">
+										<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>
+										<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
+									</button>
+									<div class="actions" style="position: absolute; z-index: 1; display: none;">
 										<g:render template="containerMenuItems" model="[container:selectedContainer]"/>
 									</div>
 								</span>
@@ -151,6 +149,15 @@
 										&nbsp;|&nbsp; Contents: ${selectedContainer?.description}
 									</g:if>
 								</span>
+								<g:if test="${selectedContainer}">								
+									<g:if test="${selectedContainer.parentContainer }">
+										${selectedContainer?.parentContainer?.name } &rsaquo;
+									</g:if>								
+				 					<span>${selectedContainer?.name } </span>				 					
+								</g:if>			 			
+								<g:else>
+									Unpacked items			 						
+								</g:else>
 							</div>
 							
 							<div class="list" style="text-align: center;">
@@ -158,8 +165,8 @@
 								<table border="0" style="border: 1px solid lightgrey"  width="100%">
 									<thead>	
 										<tr class="${count++%2==0?'odd':'even' }">
-											<th>Item</th>
 											<th>Actions</th>
+											<th>Item</th>
 											<th>Qty</th>
 											<th>Lot/Serial No</th>
 											<th>Recipient</th>
@@ -172,20 +179,23 @@
 												<tr id="shipmentItemRow-${itemInstance?.id }" class="${count++%2==0?'odd':'even' }">
 													<td>
 														<div>
-															<span id="${itemInstance?.id }" class="draggable">
-																<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="Item" style="vertical-align: middle"/>
-																${itemInstance?.product?.name } 
-															</span>
+															<span class="action-menu">
+																<button class="action-btn">
+																	<img src="${createLinkTo(dir:'images/icons/silk',file:'cog.png')}" alt="Actions" style="vertical-align: middle"/>
+																	<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
+																</button>
+																<div class="actions" style="position: absolute; z-index: 1; background-color: #f5f5f5; border: 1px solid lightgrey; padding: 0px; display: none;">
+																	<g:render template="itemMenuItems" model="[itemInstance:itemInstance]"/>
+																</div>
+															</span>								
 														</div>
 													</td>
 													<td>
 														<div>
-															<span class="action-menu">
-																<span class="action-menu-root"><img src="${createLinkTo(dir:'images/icons/silk',file:'cog.png')}" alt="Actions" style="vertical-align: middle"/><img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/></span>
-																<div class="action-menu-items" style="position: absolute; z-index: 1; background-color: #f5f5f5; border: 1px solid lightgrey; padding: 10px; display: none;">
-																	<g:render template="itemMenuItems" model="[itemInstance:itemInstance]"/>
-																</div>
-															</span>								
+															<span id="${itemInstance?.id }" class="draggable">
+																<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="Item" style="vertical-align: middle"/>
+																${itemInstance?.product?.name } 
+															</span>
 														</div>
 													</td>
 													<td style="text-align:center;">
@@ -244,16 +254,8 @@
 		                    		//$('#messages').append("new message");
 		                		}, 'json');
 					}
+				
 
-					function show() {
-						$(this).children(".action-menu-items").show();
-					}
-					
-					function hide() { 
-						$(this).children(".action-menu-items").hide();
-					}
-				
-				
 					$(function(){ 
 						//$( ".draggable" ).draggable();
 						//$('.selectable').selectable();
@@ -275,42 +277,32 @@
 							}
 						);
 			
-						$('.droppable').droppable(
-								{
-									accept: '.draggable',
-									tolerance: 'intersect',
-									//greedy: true,
-									over: function(event, ui) { 
-										$( this ).addClass( "ui-state-highlight" );
-									},
-									out: function(event, ui) { 
-										$( this ).removeClass( "ui-state-highlight" );
-									},
-									drop: function( event, ui ) {
-										//ui.draggable.hide();
-										ui.draggable.addClass( "strikethrough" );
-										$( this ).removeClass( "ui-state-highlight" );
-										var itemId = ui.draggable.attr("id");
-										var moveTo = $(this).attr("id");
-										//var url = "/warehouse/category/moveItem?child=" + child + "&newParent=" + parent;
-										//window.location.replace(url);
-										//moveItemToContainer(itemId, moveTo);
-										//$("#shipmentItemRow-" + itemId).hide();
-										
-									}
-								}
-							);
-
-						
-						$(".action-menu").hoverIntent({
-							sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
-							interval: 5,   // number = milliseconds for onMouseOver polling interval
-							over: show,     // function = onMouseOver callback (required)
-							timeout: 200,   // number = milliseconds delay before onMouseOut
-							out: hide       // function = onMouseOut callback (required)
+						$('.droppable').droppable( {
+							accept: '.draggable',
+							tolerance: 'intersect',
+							//greedy: true,
+							over: function(event, ui) { 
+								$( this ).addClass( "ui-state-highlight" );
+							},
+							out: function(event, ui) { 
+								$( this ).removeClass( "ui-state-highlight" );
+							},
+							drop: function( event, ui ) {
+								//ui.draggable.hide();
+								ui.draggable.addClass( "strikethrough" );
+								$( this ).removeClass( "ui-state-highlight" );
+								var itemId = ui.draggable.attr("id");
+								var moveTo = $(this).attr("id");
+								//var url = "/warehouse/category/moveItem?child=" + child + "&newParent=" + parent;
+								//window.location.replace(url);
+								//moveItemToContainer(itemId, moveTo);
+								//$("#shipmentItemRow-" + itemId).hide();
+								
+							}
 						});
-						
-						//$( ".action-menu-items" ).position({ my: "right top", at: "left bottom" });															  
+
+
+
 					});
 				</script> 				
         

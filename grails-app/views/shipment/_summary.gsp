@@ -13,9 +13,9 @@
 							
 						</div> 
 						<div class="fade" style="font-size: 0.9em; line-height: 20px;">
-							${shipmentInstance?.shipmentType?.name} Shipment <b>#${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}</b> 
+							<g:render template="../shipment/sidebar" />
+							&nbsp;|&nbsp;${shipmentInstance?.shipmentType?.name} Shipment <b>#${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}</b> 
 							&nbsp;|&nbsp; ${shipmentInstance?.status?.name}
-							&nbsp;|&nbsp;<g:render template="../shipment/sidebar" />
 							
 						</div>
 												

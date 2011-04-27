@@ -1,25 +1,3 @@
-<style>
-	.currentState { font-weight: bold; background-color: #eee; color: blue; } 
-.circle {
-  display:inline;
-  padding-left:4px;
-  padding-right:4px;
-  color: white;
-  background: lightgrey;
-  -moz-border-radius:100px;
-  -webkit-border-radius:100px;
-}
-
-.circle a {
-  font-size:9px;
-  text-decoration:none;
-  color: white;
-  position:relative; top:-2px;
-}
-.currentState > .circle { background-color: blue; }
-.currentState > .circle a { font-weight: bold; }  
-</style>
-
 <div style="float: center; border: 1px solid lightgrey; ">
 	<div style=" padding: 1px;">
 		<table width="100%" style="color: #ccc; display: inline;">

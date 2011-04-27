@@ -1,66 +1,68 @@
 <!-- Only allow the originating warehouse to edit the shipment -->
-
-	<span class="shipment-action-menu" >
-		<button>
+	<span id="shipment-action-menu" class="action-menu" >
+		<button class="action-btn">
 			<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" />
-			Actions<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
+			<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
 		</button>
 		<div class="actions">
 			<div class="action-menu-item">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_left.png')}" alt="Show Shipment" style="vertical-align: middle" />&nbsp;
-				<g:link controller="shipment" action="listShipping">List Shipments</g:link>
+				<g:link controller="shipment" action="listShipping">
+					<img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_left.png')}" alt="Show Shipment" style="vertical-align: middle" />&nbsp;List Shipments
+				</g:link>
 			</div>
 			<div class="action-menu-item">
 				<hr/>
 			</div>
 			<div class="action-menu-item">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="Show Details" style="vertical-align: middle" />&nbsp;
 				<g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}"> 						
-					<g:if test="${request.request.requestURL.toString().contains('showDetails')}"><b>Show Details</b></g:if>
+					<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="Show Details" style="vertical-align: middle" />&nbsp;
+					<g:if test="${request.request.requestURL.toString().contains('showDetails')}">Show Details</g:if>
 					<g:else>Show Details</g:else>
 				</g:link>
 			</div>
 			<!-- you can only edit a shipment or it's packing list if you are at the origin warehouse, or if the origin is not a warehouse, and you are at the destination warehouse -->
 			<g:if test="${(session?.warehouse?.id == shipmentInstance?.origin?.id) || (!shipmentInstance?.origin?.isWarehouse() && session?.warehouse?.id == shipmentInstance?.destination?.id)}">				
 				<div class="action-menu-item">
-					<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_edit.png')}" alt="Edit Shipment" style="vertical-align: middle" />&nbsp; 
 					<g:link controller="createShipmentWorkflow" action="createShipment" id="${shipmentInstance.id}">
-						<g:if test="${request.request.requestURL.toString().contains('createShipment')}"><b>Edit Shipment</b></g:if>
+						<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_edit.png')}" alt="Edit Shipment" style="vertical-align: middle" />&nbsp; 
+						<g:if test="${request.request.requestURL.toString().contains('createShipment')}">Edit Shipment</g:if>
 						<g:else>Edit Shipment</g:else>
 					</g:link>
 				</div>
 				<div class="action-menu-item">
-					<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit Packing List" style="vertical-align: middle"/>&nbsp;
-					<g:link controller="createShipmentWorkflow" action="createShipment" event="enterContainerDetails" 
-						id="${shipmentInstance?.id }" params="[skipTo:'Packing']">Edit Packing List</g:link>					
+					<g:link controller="createShipmentWorkflow" action="createShipment" event="enterContainerDetails"  id="${shipmentInstance?.id }" params="[skipTo:'Packing']">
+						<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit Packing List" style="vertical-align: middle"/>&nbsp;
+						Edit Packing List</g:link>					
 				</div>
 			</g:if>
 			<div class="action-menu-item">		
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" alt="Upload a Document" style="vertical-align: middle"/>
-				<a href="${createLink(controller: "shipment", action: "addDocument", id: shipmentInstance.id)}">Upload a Document</a>
+				<a href="${createLink(controller: "shipment", action: "addDocument", id: shipmentInstance.id)}">
+					<img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" alt="Upload a Document" style="vertical-align: middle"/>&nbsp;Upload a Document</a>
 			</div>
 			<div class="action-menu-item">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'note_add.png')}" alt="Add Note" style="vertical-align: middle"/>
-				<a href="${createLink(controller: "shipment", action: "addComment", id: shipmentInstance.id)}">Add a Note</a>													
+				<a href="${createLink(controller: "shipment", action: "addComment", id: shipmentInstance.id)}">
+					<img src="${createLinkTo(dir:'images/icons/silk',file:'note_add.png')}" alt="Add Note" style="vertical-align: middle"/>&nbsp;Add a Note</a>													
 			</div>
 			<div class="action-menu-item">
 				<hr/>
 			</div>
 			
 			<div class="action-menu-item">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="View Packing List" style="vertical-align: middle"/>&nbsp;
 				<g:link controller="shipment" action="showPackingList" id="${shipmentInstance.id}">
-					<g:if test="${request.request.requestURL.toString().contains('showPackingList')}"><b>View Packing List</b></g:if>
+					<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="View Packing List" style="vertical-align: middle"/>&nbsp;
+					<g:if test="${request.request.requestURL.toString().contains('showPackingList')}">View Packing List</g:if>
 					<g:else>View Packing List</g:else>
 				</g:link>		
 			</div>
 			<div class="action-menu-item">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_word.png')}" alt="View Packing List" style="vertical-align: middle"/>&nbsp;	
-				<g:link controller="doc4j" action="downloadLetter" id="${shipmentInstance?.id }">Download Letter</g:link> (.docx)
+				<g:link controller="doc4j" action="downloadLetter" id="${shipmentInstance?.id }">
+					<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_word.png')}" alt="View Packing List" style="vertical-align: middle"/>&nbsp;
+					Download Letter <span class="fade">(.docx)</span></g:link> 
 			</div>
 			<div class="action-menu-item">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}" alt="View Packing List" style="vertical-align: middle"/>&nbsp;	
-				<g:link controller="doc4j" action="downloadPackingList" id="${shipmentInstance?.id }">Download Packing List</g:link> (.xls)
+				<g:link controller="doc4j" action="downloadPackingList" id="${shipmentInstance?.id }">
+					<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}" alt="View Packing List" style="vertical-align: middle"/>&nbsp;	
+					Download Packing List <span class="fade">(.xls)</span></g:link> 
 			</div>
 			<div class="action-menu-item">
 				<hr/>
@@ -68,16 +70,16 @@
 		
 			<g:if test="${session?.warehouse?.id == shipmentInstance?.origin?.id || 
 							(!(shipmentInstance?.origin?.isWarehouse()) && session?.warehouse?.id == shipmentInstance?.destination?.id)}">
-
 				<div class="action-menu-item">		
-					<img src="${createLinkTo(dir:'images/icons',file:'truck.png')}" alt="Send Shipment" style="vertical-align: middle" />&nbsp; 
 					<g:if test="${!shipmentInstance?.hasShipped()}">
 						<g:link controller="shipment" action="sendShipment" id="${shipmentInstance.id}">
-								<g:if test="${request.request.requestURL.toString().contains('sendShipment')}"><b>Send Shipment</b></g:if>
+							<img src="${createLinkTo(dir:'images/icons',file:'truck.png')}" alt="Send Shipment" style="vertical-align: middle" />&nbsp; 
+								<g:if test="${request.request.requestURL.toString().contains('sendShipment')}">Send Shipment</g:if>
 								<g:else>Send Shipment</g:else>
 						</g:link>				
 					</g:if>
 					<g:else>
+						<img src="${createLinkTo(dir:'images/icons',file:'truck.png')}" alt="Send Shipment" style="vertical-align: middle" />&nbsp; 
 						<span class="fade">Send Shipment</span>
 					</g:else>
 				</div>
@@ -87,14 +89,15 @@
 						(!(shipmentInstance?.destination?.isWarehouse()) && session?.warehouse?.id == shipmentInstance?.origin?.id)}">
 
 				<div class="action-menu-item">
-					<img src="${createLinkTo(dir:'images/icons',file:'handtruck.png')}" alt="Receive Shipment" style="vertical-align: middle" />&nbsp;
 					<g:if test="${shipmentInstance.hasShipped() && !shipmentInstance.wasReceived()}">
 						<g:link controller="shipment" action="receiveShipment" params="${ [shipmentId : shipmentInstance.id] }">
-							<g:if test="${request.request.requestURL.toString().contains('receiveShipment')}"><b>Receive Shipment</b></g:if>
+							<img src="${createLinkTo(dir:'images/icons',file:'handtruck.png')}" alt="Receive Shipment" style="vertical-align: middle" />&nbsp;
+							<g:if test="${request.request.requestURL.toString().contains('receiveShipment')}">Receive Shipment</g:if>
 							<g:else>Receive Shipment</g:else>
 						</g:link>				
 					</g:if>
 					<g:else>
+						<img src="${createLinkTo(dir:'images/icons',file:'handtruck.png')}" alt="Receive Shipment" style="vertical-align: middle" />&nbsp;
 						<span class="fade">Receive Shipment</span>
 					</g:else>
 				</div>
@@ -105,31 +108,41 @@
 					<g:link controller="shipment" action="deleteShipment" id="${shipmentInstance.id}"><img
 					src="${createLinkTo(dir:'images/icons',file:'trash.png')}"
 					alt="Delete Shipment" style="vertical-align: middle" />&nbsp; 
-						<g:if test="${request.request.requestURL.toString().contains('deleteShipment')}"><b>Delete Shipment</b></g:if>
+						<g:if test="${request.request.requestURL.toString().contains('deleteShipment')}">Delete Shipment</g:if>
 						<g:else>Delete Shipment</g:else>
 					</g:link>				
 				</div>
 			</g:if>
-		</span>
+		</div>
 	</span>
 	<script type="text/javascript">
+		
 	 	$(function(){
 			function show() {
-				$(this).children(".actions").show();
+				//$(this).children(".actions").show();
 			}
 			
 			function hide() { 
 				$(this).children(".actions").hide();
 			}
 			
-			$(".shipment-action-menu").hoverIntent({
+			$(".action-menu").hoverIntent({
 				sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
 				interval: 5,   // number = milliseconds for onMouseOver polling interval
 				over: show,     // function = onMouseOver callback (required)
 				timeout: 100,   // number = milliseconds delay before onMouseOut
 				out: hide       // function = onMouseOut callback (required)
 			});  
-			$( ".actions" ).position({ my: "left top", at: "left bottom", of: $(".shipment-action-menu") });	
+			
+			// Create an action button that toggles the action menu on click
+			//button({ text: false, icons: {primary:'ui-icon-gear',secondary:'ui-icon-triangle-1-s'} }).
+			$(".action-btn").click(function(event) {
+				$(this).parent().children(".actions").toggle();
+				event.preventDefault();
+			});
+
+			//$( ".actions" ).position({ my: "right top", at: "right bottom", of: $("#shipment-action-menu") });	
+			
 		});
 	</script>	        		
 <%--  
