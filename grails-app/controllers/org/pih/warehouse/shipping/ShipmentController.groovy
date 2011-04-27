@@ -211,11 +211,12 @@ class ShipmentController {
 		else {
 			// handle a submit
 			if ("POST".equalsIgnoreCase(request.getMethod())) { 				
-				// make sure a shipping date has been specified
-				if (!params.actualShippingDate) {
-					flash.message = "Please specify a shipping date."
+				// make sure a shipping date has been specified and that is not the future
+				if (!params.actualShippingDate || Date.parse("MM/dd/yyyy", params.actualShippingDate) > new Date()) {
+					flash.message = "Please specify a valid shipping date. Shipping dates cannot be in the future."
 					def shipmentWorkflow = shipmentService.getShipmentWorkflow(shipmentInstance)	
 					render(view: "sendShipment", model: [shipmentInstance: shipmentInstance, shipmentWorkflow: shipmentWorkflow])
+					return
 				}
 				
 				// create the list of email recipients
@@ -312,7 +313,6 @@ class ShipmentController {
 						receiptItem.setQuantityShipped (it.quantity);
 						receiptItem.setQuantityReceived (it.quantity);				
 						receiptItem.setLotNumber(it.lotNumber);
-						receiptItem.setSerialNumber (it.serialNumber);
 						receiptInstance.receiptItems.add(receiptItem);           // use basic "add" method to avoid GORM because we don't want to persist yet
 					}	
 				}
@@ -571,7 +571,6 @@ class ShipmentController {
 			if (!found) { 			
 				shipmentItem = new ShipmentItem(product: product, 
 				quantity: quantity, 
-				serialNumber: params.serialNumber, 
 				recipient: recipient,
 				container: containerInstance);
 				
@@ -686,8 +685,7 @@ class ShipmentController {
 				container.shipmentItems.each { 
 					def shipmentItemCopy = new ShipmentItem(
 					product: it.product, 
-					quantity: it.quantity, 
-					serialNumber: it.serialNumber, 
+					quantity: it.quantity,  
 					recipient: it.recipient,
 					container: containerCopy);
 					//containerCopy.addToShipmentItems(shipmentItemCopy).save(flush:true);

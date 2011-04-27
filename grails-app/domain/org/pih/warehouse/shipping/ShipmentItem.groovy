@@ -14,8 +14,7 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 	
 	String lotNumber			// Loose coupling to the inventory lot 
 	Product product		    	// Specific product that we're tracking
-	Integer quantity		    // Quantity could be a class on its own
-	String serialNumber			// Serial number of a particular product (optional)				
+	Integer quantity		    // Quantity could be a class on its own				
 	Person recipient 			// Recipient of an item
 	Donor donor					// Organization that donated the goods
 	Date dateCreated;
@@ -35,7 +34,6 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 		product(blank:false, nullable:false)  // TODO: this doesn't seem to prevent the product field from being empty
 		lotNumber(nullable:true, maxSize: 255)
 		quantity(min:0, blank:false, range: 0..2147483646)
-		serialNumber(nullable:true, maxSize: 255)
 		recipient(nullable:true)
 		donor(nullable:true)
 	}
@@ -87,8 +85,7 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 		return new ShipmentItem(
 			lotNumber: this.lotNumber, 
 			product: this.product,
-			quantity: this.quantity,
-			serialNumber: this.serialNumber,				
+			quantity: this.quantity,				
 			recipient: this.recipient,
 			donor: this.donor,
 			container: this.container

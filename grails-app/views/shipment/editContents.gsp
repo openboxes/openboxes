@@ -136,7 +136,7 @@
 																						jsonUrl="/warehouse/json/findProductByName" width="200"/>
 																				</td>
 																				<td width="15%" style="vertical-align: middle; text-align: left;">	
-																					<g:textField name="serialNumber" value="" size="10" style="" />
+																					<g:textField name="lotNumber" value="" size="10" style="" />
 																				</td>
 																				<td width="20%" style="vertical-align: middle; text-align: left;">
 																					<g:autoSuggest id="recipient" name="recipient" 
@@ -199,9 +199,6 @@
 																									width="150" 
 																									valueId="${item?.product?.id}" 
 																									valueName="${item?.product?.name}"/>																								
-																							</td>
-																							<td width="15%">
-																								<g:textField name="shipmentItems[${itemStatus}].serialNumber" value="${item.serialNumber}" size="10" />																									
 																							</td>
 																							<td width="20%">							
 																								<g:autoSuggest id="shipmentItems${itemStatus}-recipient" name="shipmentItems[${itemStatus}].recipient" jsonUrl="/warehouse/json/findPersonByName" 

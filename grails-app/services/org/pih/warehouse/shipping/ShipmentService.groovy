@@ -385,8 +385,8 @@ class ShipmentService {
 
 		try { 
 						
-			// don't allow the shipment to go out if it has errors, or if this shipment has already been shipped
-			if (!shipmentInstance.hasErrors() && !shipmentInstance.hasShipped() && shipDate) {				
+			// don't allow the shipment to go out if it has errors, or if this shipment has already been shipped, or if the shipdate is after today
+			if (!shipmentInstance.hasErrors() && !shipmentInstance.hasShipped() && shipDate && shipDate <= new Date()) {				
 				// Add comment to shipment (as long as there's an actual comment 
 				// after trimming off the extra spaces)
 				if (comment) {
@@ -475,7 +475,7 @@ class ShipmentService {
 	void receiveShipment(Shipment shipmentInstance, Receipt receiptInstance, String comment, User user, Location location) { 
 		
 		try {
-			if (!receiptInstance.hasErrors() && shipmentInstance.hasShipped() && !shipmentInstance.wasReceived() && receiptInstance.save(flush: true)) {
+			if (!receiptInstance.hasErrors() && shipmentInstance.hasShipped() && !shipmentInstance.wasReceived() && receiptInstance.getActualDeliveryDate() <= new Date() && receiptInstance.save(flush: true)) {
 				
 				// Add comment to shipment (as long as there's an actual comment
 				// after trimming off the extra spaces)
@@ -547,6 +547,10 @@ class ShipmentService {
 						//flash.message = "Transaction has errors"
 					}
 				}
+			}
+			else {
+				// TODO: make this a better error message
+				throw new RuntimeException("Unable to receive shipment")
 			}
 		} catch (Exception e) {
 			// rollback all updates and throw an exception

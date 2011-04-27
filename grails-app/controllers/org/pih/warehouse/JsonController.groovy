@@ -530,7 +530,7 @@ class JsonController {
 		def quantity = (params.quantity) ? Integer.parseInt(params.quantity.trim()) : 1;		
 		if (containerInstance) { 
 			itemInstance = new ShipmentItem(product: productInstance, quantity: quantity, 
-				serialNumber: params.lotNumber, recipient: recipientInstance, lotNumber: params.lotNumber);
+				recipient: recipientInstance, lotNumber: params.lotNumber);
 			
 			if (itemInstance) { 
 				log.info("add item to container");
@@ -582,7 +582,7 @@ class JsonController {
 				}
 			}
 			if (!found) {
-				itemInstance = new ShipmentItem(product: productInstance, quantity: quantity, serialNumber: params.lotNumber, recipient: recipientInstance);
+				itemInstance = new ShipmentItem(product: productInstance, quantity: quantity, recipient: recipientInstance);
 				containerInstance.shipment.addToShipmentItems(itemInstance).save(flush:true);
 			}
 			else {

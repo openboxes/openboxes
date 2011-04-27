@@ -964,7 +964,10 @@ class InventoryService {
 				transactionEntry.inventoryItem = inventoryItem;
 				debitTransaction.addToTransactionEntries(transactionEntry);
 			}
-			debitTransaction.save();
+		
+			if (!debitTransaction.save()) {
+				throw new RuntimeException("Failed to save 'Send Shipment' transaction");
+			}
 		} catch (Exception e) { 
 			log.error("error occrred while creating transaction ", e);
 			throw e

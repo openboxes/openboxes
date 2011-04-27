@@ -3219,6 +3219,13 @@
 		</preConditions>
         <dropColumn tableName="receipt_item" columnName="serial_number"/>
 	</changeSet>
+	
+	<changeSet author="mgoodrich" id="2011-04-27-01">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="shipment_item" columnName="serial_number"/>
+		</preConditions>
+        <dropColumn tableName="shipment_item" columnName="serial_number"/>
+	</changeSet>
 
 </databaseChangeLog>
 

@@ -30,12 +30,7 @@
 						${itemInstance?.quantity}
 																</td>
 					<td>
-						<g:if test="${itemInstance?.lotNumber}">
-							${itemInstance?.lotNumber}
-																	</g:if>
-						<g:else>
-							${itemInstance?.serialNumber}
-																	</g:else>
+						${itemInstance?.lotNumber}
 					</td>
 					<td>
 						${itemInstance?.recipient?.name}
@@ -63,12 +58,7 @@
 							${itemInstance?.quantity}
 																</td>
 						<td>
-							<g:if test="${itemInstance?.lotNumber}">
-								${itemInstance?.lotNumber}
-																	</g:if>
-							<g:else>
-								${itemInstance?.serialNumber}
-																	</g:else>
+							${itemInstance?.lotNumber}
 						</td>
 						<td>
 							${itemInstance?.recipient?.name}

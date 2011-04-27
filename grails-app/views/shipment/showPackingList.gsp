@@ -72,7 +72,7 @@
 												${container?.weight} ${container?.weightUnits}
 											</td>
 											<td width="20%">${item?.product.name} (${item?.quantity})</td>
-											<td width="10%">${item?.serialNumber}</td>
+											<td width="10%">${item?.lotNumber}</td>
 										</tr>																			
 									</g:each>	
 									<g:each var="innerContainer" in="${container.containers}" status="innerContainerStatus">
@@ -111,7 +111,7 @@
 													${innerContainer?.weight} ${innerContainer?.weightUnits}
 												</td>
 												<td width="20%">${innerItem?.product.name} (${innerItem?.quantity})</td>
-												<td width="10%">${innerItem?.serialNumber}</td>
+												<td width="10%">${innerItem?.lotNumber}</td>
 											</tr>																			
 										</g:each>										
 									</g:each>							
