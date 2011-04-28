@@ -138,7 +138,7 @@ body {
 .widgetlarge { border: 1px solid lightgrey; height: 75px; margin: 5px; }
 .widgetsmall { border: 1px solid lightgrey;  margin: 5px; }    		
 .widgetheader { background-color: #FFF; margin: 10px; font-weight: bold; font-size: 110%;} 
-.widgetcontent { margin: 15px; } 
+.widgetcontent { margin: 10px; } 
 .widgetsmall .widgetcontent { float: left; width: 45%; font-size: 110%;} 
 
 

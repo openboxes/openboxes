@@ -28,8 +28,10 @@
 				<!-- Action menu -->
 				<div>
 					<span class="action-menu">
-						<button><img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle;"/>
-						&nbsp;<b>Actions</b>&nbsp;<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/></button>
+						<button class="action-btn">
+							<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle;"/>
+							<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
+						</button>
 						<div class="actions">
 							<g:render template="showStockCardMenuItems" model="[commandInstance: commandInstance]"/>																				
 						</div>
@@ -42,7 +44,7 @@
 					<tr>
 					
 						<!--  Product Details -->
-						<td style="width: 300px;">
+						<td style="width: 250px;">
 							<g:render template="productDetails" 
 								model="[productInstance:commandInstance?.productInstance, inventoryInstance:commandInstance?.inventoryInstance, 
 									inventoryLevelInstance: commandInstance?.inventoryLevelInstance, totalQuantity: commandInstance?.totalQuantity]"/>
@@ -86,12 +88,16 @@
 				/* Action Menu */
 
 				function show() {
-					$(this).children(".actions").show();
+					//$(this).children(".actions").show();
 				}
 				  
 				function hide() { 
 					$(this).children(".actions").hide();
 				}
+
+				$(".action-btn").click(function() {
+					$(this).parent().children(".actions").toggle();
+				});
 					 
 				$(".action-menu").hoverIntent({
 					sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
@@ -101,7 +107,7 @@
 					out: hide       // function = onMouseOut callback (required)
 				});
 
-				$( ".actions" ).position({ my: "right top", at: "right bottom" });	
+				//$( ".actions" ).position({ my: "right top", at: "right bottom" });	
 				
 			});	
 

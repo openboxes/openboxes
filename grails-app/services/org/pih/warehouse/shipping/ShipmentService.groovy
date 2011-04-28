@@ -116,7 +116,11 @@ class ShipmentService {
 	
 	
 	Map<EventType, ListCommand> getShipmentsByStatus(List shipments) { 
-		def shipmentMap = new TreeMap<EventCode, ListCommand>();
+		def shipmentMap = new TreeMap<ShipmentStatusCode, ListCommand>();
+		
+		ShipmentStatusCode.list().each { 
+			shipmentMap[it] = [];
+		}
 		shipments.each {
 			
 			def key = it.getStatus().code;			 

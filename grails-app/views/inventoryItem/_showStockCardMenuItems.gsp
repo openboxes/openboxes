@@ -1,32 +1,30 @@
 <div class="action-menu-item">				
-	<img src="${resource(dir: 'images/icons/silk', file: 'arrow_left.png')}" style="vertical-align: middle;"/>&nbsp;
 	<g:link controller="inventory" action="browse" fragment="inventory">
-		<span style="vertical-align: middle;">Browse Inventory</span>
+		<img src="${resource(dir: 'images/icons/silk', file: 'arrow_left.png')}" style="vertical-align: middle;"/>&nbsp;
+		Browse Inventory
 	</g:link>
 </div>	
 <div class="action-menu-item">					
-	<img src="${resource(dir: 'images/icons/silk', file: 'book.png')}"/>&nbsp;
 	<g:link controller="inventoryItem" action="recordInventory" params="['product.id':commandInstance?.productInstance?.id,'inventory.id':commandInstance?.inventoryInstance?.id]">
-		<span style="vertical-align: middle;">Record inventory</span>
+		<img src="${resource(dir: 'images/icons/silk', file: 'book.png')}"/>&nbsp;
+		Record inventory
 	</g:link>
 </div>
 <div class="action-menu-item">
-	<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" style="vertical-align: middle"/>&nbsp;
 	<g:link controller="inventory" action="createTransaction" params="['product.id':commandInstance?.productInstance?.id]">
-		<span style="vertical-align: middle;">Add new transaction</span>
+		<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" style="vertical-align: middle"/>&nbsp;
+		Add new transaction
 	</g:link>
 </div>				
 <div class="action-menu-item">					
-	<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
 	<g:link controller="product" action="edit" id="${commandInstance?.productInstance?.id }">
-		<span style="vertical-align: middle;">Edit product details</span>
+		<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
+		Edit product details
 	</g:link>
 </div>
 <div class="action-menu-item">					
-	<img src="${resource(dir: 'images/icons/silk', file: 'cog_edit.png')}"/>&nbsp;
 	<g:link controller="inventoryItem" action="editInventoryLevel" params="['product.id': commandInstance?.productInstance?.id, 'inventory.id':commandInstance?.inventoryInstance?.id]">
-		<span style="vertical-align: middle;">Edit product status</span>
+		<img src="${resource(dir: 'images/icons/silk', file: 'cog_edit.png')}"/>&nbsp;
+		Edit product status
 	</g:link>
-	
-	
 </div>

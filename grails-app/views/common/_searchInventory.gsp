@@ -1,11 +1,24 @@
 			
 <fieldset>
+	<legend class="fade">Search Inventory</legend>
+
 	<div id="searchCriteria" class="even" style="border: 0px solid lightgrey; margin-top: 0px;">
 		<table>
-			<tr>
+			<tr >
+				<td colspan="2" style="text-align: left;">
+					<g:form method="GET" controller="inventory" action="browse" style="display: inline;">
+						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'find.png' )}" class="middle"/>&nbsp;Search by name, lot/serial number, etc<br/>				
+						<g:textField name="searchTerms" value="" size="20"/>
+						<button type="submit" class="" name="submitSearch">
+							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'zoom.png' )}" class="middle"/>
+							&nbsp;Find&nbsp;</button>
+					</g:form>	
+				</td>
+			</tr>
+			<tr class="prop">
 				<td colspan="2">
 					<g:form action="addCategoryFilter">
-						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'folder.png' )}" class="middle"/>&nbsp;Choose a category
+						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'folder.png' )}" class="middle"/>&nbsp;or choose a category
 						<g:link class="view" controller="category" action="tree"><g:message code="default.edit.label" args="['']"/></g:link>
 						<select id="categoryFilter" name="categoryId" >
 							<option value="">Filter by category</option>
@@ -15,17 +28,6 @@
 					</g:form>
 				</td>
 			
-			</tr>
-			<tr class="prop">
-				<td colspan="2" style="text-align: left;">
-					<g:form method="GET" controller="inventory" action="browse" style="display: inline;">
-						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'find.png' )}" class="middle"/>&nbsp;or search by name, lot/serial number, etc<br/>				
-						<g:textField name="searchTerms" value="" size="20"/>
-						<button type="submit" class="" name="submitSearch">
-							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'zoom.png' )}" class="middle"/>
-							&nbsp;Find&nbsp;</button>
-					</g:form>	
-				</td>
 			</tr>
 			<tr class="prop">
 				<td colspan="2" style="text-align: left;">
@@ -99,9 +101,12 @@
 				<div>
 			        <g:set var="productMap" value="${commandInstance?.productList.groupBy {it.category} }"/>
 					<span class="fade">
-						Showing ${commandInstance?.productList?.size() } product(s) in 
-						<span class="action-menu">
-							<span>${productMap?.keySet()?.size()} categories<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" /></span>
+						Showing ${commandInstance?.productList?.size() } product(s) in 						
+						${productMap?.keySet()?.size()} categories
+							
+							
+							<%-- 
+							<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" /></span>
 							<div class="actions" style="max-height: 300px; overflow: auto;">
 								<div style="padding: 10px;">
 									<b>Choose a category to narrow products displayed</b>
@@ -121,6 +126,7 @@
 									</g:if>
 								</g:each>
 							</div>
+							--%>
 						</span>			
 					</span>	
 			        <g:if test="${commandInstance?.categoryFilters || commandInstance?.searchTermFilters}">	

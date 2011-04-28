@@ -1,7 +1,6 @@
 
  <style>
  .actions li { padding: 10px; } 
- 
  </style>
 
 
@@ -13,13 +12,13 @@
 			<table border="0" style="border:1px solid #f5f5f5;">
 				<thead>
 					<tr class="odd">
+						<th class="left" style="">Actions</th>												
 						<th>Serial/Lot Number</th>
 						<th>Expires</th>
 						<th class="center middle" >Qty</th>
 						<g:hasErrors bean="${flash.itemInstance}">													
 							<th></th>
 						</g:hasErrors>
-						<th class="left" style="">Actions</th>												
 					</tr>											
 				</thead>
 				<tbody>
@@ -45,6 +44,19 @@
 								.selected-row { background-color: lightyellow; } 
 							</style>			
 							<tr class="${styleClass} prop">
+								<td class="top" style="text-align: left;" nowrap="nowrap">
+									<div class="action-menu">
+										<button class="action-btn">
+											<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle;"/>
+											&nbsp;<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
+										</button>
+										<div class="actions">
+											<g:render template="editItemDialog" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]"/>
+											<g:render template="adjustStock" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />
+											<g:render template="addToShipment" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />
+										</div>
+									</div>
+								</td>															
 								<td class="top">
 									${itemInstance?.lotNumber?:'<span class="fade">None</span>' }
 									<g:link action="show" controller="inventoryItem" id="${itemInstance?.id }">
@@ -76,20 +88,6 @@
 										</g:if>																									
 									</td>
 								</g:hasErrors>	
-								<td class="top" style="text-align: left;">
-								<div class="action-menu">
-								
-									<button>
-										<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle;"/>
-										&nbsp;<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
-									</button>
-									<div class="actions">
-										<g:render template="editItemDialog" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]"/>
-										<g:render template="adjustStock" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />
-										<g:render template="addToShipment" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />	
-									</div>
-								</div>
-								</td>															
 							</tr>
 						</g:if>
 					</g:each>
@@ -99,6 +97,8 @@
 						<tr class="prop" style="height: border: 0px;">
 							<td colspan="2" style="text-align: left; border: 0px;">
 							</td>
+							<td style="border: 0px;">
+							</td>
 							<td style="text-align: center; vertical-align: middle; border: 0px;">
 								<span style="font-size: 1em;"> 
 									<g:set var="styleClass" value="color: black;"/>																	
@@ -107,8 +107,6 @@
 									</g:if>														
 									<span style="${styleClass }">${commandInstance.totalQuantity }</span>
 								</span>
-							</td>
-							<td style="border: 0px;">
 							</td>
 							<g:hasErrors bean="${flash.itemInstance}">
 								<td style="border: 0px;">

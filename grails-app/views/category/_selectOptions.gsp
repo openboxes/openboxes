@@ -2,7 +2,7 @@
 <g:if test="${category?.categories }">
 	<g:set var="productCount" value="${category?.products?.size() }"/>		
 	<option value="${category?.id ?: 'null' }" ${(category?.id && category?.id == selected?.id) ? 'selected' : '' }>
-		${ new String("&nbsp").multiply(1*(level)*(level)) } 
+		${ new String("&nbsp").multiply(2*(level)) } 
 		<g:if test="${!category.parentCategory}">${category.name } </g:if>
 		<g:else>${category?.name }</g:else>
 		<g:if test="${productCount > 0 }">
@@ -17,7 +17,7 @@
 <g:else>
 	<g:set var="productCount" value="${category?.products?.size() }"/>		
 	<option value="${category?.id }" ${(category?.id == selected?.id)?'selected':'' }>
-		${ new String("&nbsp").multiply(1*(level)*(level)) } 
+		${ new String("&nbsp").multiply(2*(level)) } 
 		<g:if test="${!category?.parentCategory}">${category?.name } </g:if>
 		<g:else>${category?.name }</g:else>
 		<g:if test="${productCount > 0 }">

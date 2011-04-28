@@ -5,9 +5,8 @@
 	});
 </script>	   
 <div class="action-menu-item">
-	<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
 	<a id="btnEditItem-${itemInstance?.id}">
-		Edit Item
+		<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;Edit Item
 	</a>
 </div>
 <div id="dlgEditItem-${itemInstance?.id}" title="Edit Item" style="padding: 10px; display: none;" >	

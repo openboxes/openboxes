@@ -6,8 +6,8 @@
 	});
 </script>	   
 <div class="action-menu-item">
-	<img src="${resource(dir: 'images/icons/silk', file: 'lorry_add.png')}"/>&nbsp;
-	<a id="btnAddToShipment-${itemInstance?.id}">Add to Shipment</a>
+	<a id="btnAddToShipment-${itemInstance?.id}">
+		<img src="${resource(dir: 'images/icons/silk', file: 'lorry_add.png')}"/>&nbsp;Add to Shipment</a>
 </div>
 
 
