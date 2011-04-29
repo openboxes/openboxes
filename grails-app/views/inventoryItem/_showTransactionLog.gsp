@@ -72,11 +72,18 @@
 								<g:set var="totalQuantityChange" value="${0 }"/>							
 								<g:each var="transaction" in="${commandInstance?.transactionLogMap?.keySet().sort {it.transactionDate}.reverse() }" status="status">
 									<tr class="transaction ${(status%2==0)?'even':'odd' } prop">
-										<td>	
+										<td style="width: 10%; nowrap="nowrap">	
+										
+											<g:link controller="inventory" action="editTransaction" id="${transaction?.id }" params="['product.id':commandInstance?.productInstance?.id]">
+												<g:formatDate
+													date="${transaction?.transactionDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />																
+											</g:link>
+											<%-- 
 											<a id="show-details-${transaction?.id }" class="show-details" href="${createLink(controller: 'inventory', action:'showTransactionDialog', id: transaction.id, params: ['product.id', 'test'])}">
 												<g:formatDate
 													date="${transaction?.transactionDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />																
 											</a>
+											--%>
 											
 											<!--  Transaction Details -->
 											<!--  
@@ -126,23 +133,23 @@
 																				
 										</td>
 										<td>
-											${transaction?.transactionType?.name }&nbsp;
-										
+											<span class="${transaction?.transactionType?.transactionCode?.name()?.toLowerCase()}">
+												${transaction?.transactionType?.name }
+											</span>
 										</td>
 										<td>
-											${transaction?.source?.name }&nbsp;
+											${transaction?.source?.name }
 										</td>
 											<td>
-											${transaction?.destination?.name }&nbsp;
+											${transaction?.destination?.name }
 										
 										</td>
 										<td style="text-align: center">
 											
-											<g:set var="styleClass" value="color:black;"/>														
-											<g:if test="${quantityChange<0}">
-												<g:set var="styleClass" value="color: red;"/>																	
-											</g:if>
-											<span style="${styleClass}">${quantityChange }</span> 
+											<span class="${transaction?.transactionType?.transactionCode?.name()?.toLowerCase()}">
+												${quantityChange }
+											</span>
+											
 										</td>
 									</tr>
 								</g:each>

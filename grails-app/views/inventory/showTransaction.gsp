@@ -23,11 +23,7 @@
 
     <body>
         <div class="body">
-            
-			<div class="nav">
-				<g:render template="nav"/>
-			</div>
-
+     
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>						
@@ -38,6 +34,7 @@
             </g:hasErrors>    
             
             
+            <g:link class="bullet" controller="inventory" action="listAllTransactions">&lsaquo; Back to Transactions</g:link> 
 
 			<div class="dialog">
 			
@@ -63,9 +60,8 @@
 							</li>
 							<li class="prop odd">
 								<label>Transaction Type</label>
-								<span class="value">
+								<span class="value ${transactionInstance?.transactionType?.transactionCode?.name()?.toLowerCase()}">
 									${transactionInstance?.transactionType?.name }
-
 								</span>
 							</li>
 							<li id="inventory-li" class="prop even">

@@ -13,6 +13,7 @@
 				<thead>
 					<tr class="odd">
 						<th class="left" style="">Actions</th>												
+						<th class="center middle" >Unit</th>
 						<th>Serial/Lot Number</th>
 						<th>Expires</th>
 						<th class="center middle" >Qty</th>
@@ -44,7 +45,7 @@
 								.selected-row { background-color: lightyellow; } 
 							</style>			
 							<tr class="${styleClass} prop">
-								<td class="top" style="text-align: left;" nowrap="nowrap">
+								<td class="top" style="text-align: left; width: 10%" nowrap="nowrap">
 									<div class="action-menu">
 										<button class="action-btn">
 											<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle;"/>
@@ -57,6 +58,9 @@
 										</div>
 									</div>
 								</td>															
+								<td class="top center">
+									${commandInstance?.productInstance?.unitOfMeasure }
+								</td>
 								<td class="top">
 									${itemInstance?.lotNumber?:'<span class="fade">None</span>' }
 									<g:link action="show" controller="inventoryItem" id="${itemInstance?.id }">
@@ -75,7 +79,7 @@
 									<g:if test="${itemQuantity<0}">
 										<g:set var="styleClass" value="color: red;"/>																	
 									</g:if>
-									<span style="${styleClass}">${itemQuantity }</span>
+									<span style="${styleClass}">${itemQuantity }</span> 
 								</td>	
 								<g:hasErrors bean="${flash.itemInstance}">
 									<td>
@@ -99,13 +103,14 @@
 							</td>
 							<td style="border: 0px;">
 							</td>
+							<td style="border: 0px;"></td>
 							<td style="text-align: center; vertical-align: middle; border: 0px;">
 								<span style="font-size: 1em;"> 
 									<g:set var="styleClass" value="color: black;"/>																	
 									<g:if test="${commandInstance.totalQuantity < 0}">
 										<g:set var="styleClass" value="color: red;"/>																	
 									</g:if>														
-									<span style="${styleClass }">${commandInstance.totalQuantity }</span>
+									<span style="${styleClass }">${commandInstance.totalQuantity }</span> 
 								</span>
 							</td>
 							<g:hasErrors bean="${flash.itemInstance}">

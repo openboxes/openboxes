@@ -335,11 +335,19 @@ class InventoryController {
 	}
 	
 	def listAllTransactions = {		
+		
+		// FIXME Using the dynamic finder Inventory.findByWarehouse() does not work for some reason
 		def currentInventory = Inventory.list().find( {it.warehouse.id == session.warehouse.id} )
 		
 		// we are only showing transactions for the inventory associated with the current warehouse
-		def transactions = Transaction.list().findAll( {it.inventory.id == currentInventory.id} ).sort().reverse()
-		render(view: "listTransactions", model: [transactionInstanceList: transactions])
+		params.max = Math.min(params.max ? params.int('max') : 10, 100)
+		params.sort = params?.sort ?: "transactionDate"
+		params.order = params?.order ?: "desc"
+		def transactions = Transaction.findAllByInventory(currentInventory, params);
+		def transactionCount = Transaction.countByInventory(currentInventory);
+		
+		
+		render(view: "listTransactions", model: [transactionInstanceList: transactions, transactionCount: transactionCount ])
 	}
 
 		
@@ -579,7 +587,7 @@ class InventoryController {
 			log.info("Process transaction entry " + it.id);
 			log.info("Find inventory item by lot number " + it.lotNumber);
 			
-				// Find inventory item by lot number
+			// Find inventory item by lot number
 			def inventoryItem = InventoryItem.findByLotNumberAndProduct(it?.lotNumber, it?.product);
 	
 			// Create a new inventory item if one is not found 

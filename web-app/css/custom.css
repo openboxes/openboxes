@@ -24,6 +24,21 @@ tfoot {
 thead th { 
 }
 
+.debit { 
+	color: red; 
+}
+
+/* Autocomplete */
+
+.autocomplete {
+	background-image: url('/warehouse/images/icons/silk/magnifier.png');
+	background-repeat: no-repeat;
+	background-position: center left;
+	padding-left: 20px;						
+}				
+
+
+
 /* Action Menu Items */
 
 .actions .action-menu-item { 

@@ -19,9 +19,7 @@
 
     <body>
         <div class="body">
-			<div class="nav">
-				<g:render template="nav"/>
-			</div>
+
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>						

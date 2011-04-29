@@ -12,7 +12,7 @@
 			</tr>
 			<tr class="details even">	
 				<td class="left label">
-					<span class="name">Unit Of Measure</span>
+					<span class="name">Units</span>
 				</td>
 				<td colspan="2">
 					<span class="value">${productInstance?.unitOfMeasure }</span>

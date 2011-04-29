@@ -1,19 +1,15 @@
-
+<%@ page import="org.pih.warehouse.inventory.Transaction" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'transaction.label', default: 'Transaction')}" />
         
-        <title>List Transactions for inventory at ${session.warehouse.name}</title>    
+        <title>Transactions for inventory at ${session.warehouse.name}</title>    
     </head>    
 
 	<body>
        <div class="body">
-       
-			<div class="nav">
-				<g:render template="nav"/>
-			</div>
        
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
@@ -23,26 +19,39 @@
 				<table>
                     <thead>
                         <tr>   
-							<th>ID</th>
+							<th>Actions</th>
 							<th>Date</th>
 							<th>Type</th>
+							<th>Inventory</th>
 							<th>Source</th>
 							<th>Destination</th>
 							<th>Entries</th>
-							<th>Actions</th>
                         </tr>
                     </thead>
        	           	<tbody>			
 						<g:each var="transactionInstance" in="${transactionInstanceList}" status="i">           
 							<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
-								<td>
-									${transactionInstance?.id }
-								</td>				
+								<td align="center">
+									<g:link action="showTransaction" id="${transactionInstance?.id }">View</g:link>
+									<%-- 
+									<g:if test="${transactionInstance?.confirmed }">
+										<g:link action="confirmTransaction" id="${transactionInstance?.id }">Reset</g:link>	
+									</g:if>
+									<g:else>
+										<g:link action="confirmTransaction" id="${transactionInstance?.id }">Confirm</g:link>	
+									</g:else>
+									--%>
+								</td>
 								<td>
 									${formatDate(date: transactionInstance?.transactionDate, format: 'dd-MMM-yyyy') }
 								</td>
 								<td>
-									${transactionInstance?.transactionType?.name }
+									<span class="${transactionInstance?.transactionType?.transactionCode?.name()?.toLowerCase()}">
+										${transactionInstance?.transactionType?.name }
+									</span>
+								</td>
+								<td>
+									${transactionInstance?.inventory }
 								</td>
 								<td>
 									${transactionInstance?.source?.name }
@@ -53,23 +62,14 @@
 								<td>
 									${transactionInstance?.transactionEntries?.size() }
 								</td>
-								<td>
-									<g:link action="showTransaction" id="${transactionInstance?.id }">View</g:link>
-									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png') }"/>
-									<%-- 
-									<g:if test="${transactionInstance?.confirmed }">
-										<g:link action="confirmTransaction" id="${transactionInstance?.id }">Reset</g:link>	
-									</g:if>
-									<g:else>
-										<g:link action="confirmTransaction" id="${transactionInstance?.id }">Confirm</g:link>	
-									</g:else>
-									--%>
-								</td>
 							</tr>
 						</g:each>
 					</tbody>
 				</table>
 			</div>
+		</div>
+		<div class="paginateButtons">
+			<g:paginate total="${transactionCount}" />
 		</div>
 	</body>
 

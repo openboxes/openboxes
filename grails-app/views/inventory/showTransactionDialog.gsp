@@ -46,7 +46,6 @@
 				<g:form>
 					<g:hiddenField name="id" value="${transactionInstance?.id}"/>
 					<g:hiddenField name="inventory.id" value="${transactionInstance?.inventory?.id}"/>
-				
 						<ul>
 							<li class="prop">
 								<label>Transaction ID</label>
