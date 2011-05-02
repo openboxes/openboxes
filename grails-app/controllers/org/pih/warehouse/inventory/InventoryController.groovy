@@ -532,7 +532,7 @@ class InventoryController {
 			}
 		}
 		
-		if (params.product.id) { 
+		if (params?.product?.id) { 
 			def product = Product.get(params.product.id)
 			if (product) { 
 				productList << product.id;
