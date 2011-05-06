@@ -403,7 +403,6 @@
 	
 		$('.goto').click(function(){
 			var li = $(this).parent().closest(".menu-section");
-			console.log(li);
 		});	
 	});
 </script>

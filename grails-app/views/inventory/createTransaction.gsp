@@ -335,7 +335,6 @@
 			// If the transaction exists, remove it from the database
 			function removeItem(index) { 
 				var entry = transaction.TransactionEntries[index];
-				console.log(entry.Id);
 				if (entry.Id && entry.Id != 0) { 
 					$.ajax({
 						type: 'POST',
@@ -384,12 +383,7 @@
 			}
 
 			function format(o, t) {
-				console.log("format date");
-				console.log(typeof(o));
-				console.log(typeof(t));
-				//var date = parseDate(o);
-				var date = $.datepicker.parseDate('yy-mm-dd', '2007-01-26');
-			    return $.format(date, t);
+			    return $.format(o, t);
 			}
 
 			/**
@@ -490,7 +484,6 @@
 	    		 */
 				
 	    		$(":input[id^=expirationDate][id$=month]").livequery(function(){
-	    			//console.log("found a month");
 					$(this).change(function(event) {
 						var index = $(this).parent().prev().children(".index").val();
 						var month = $(this).val();
@@ -606,7 +599,6 @@
         		    		$('#product-details-lotNumbers').show();
         		    		$.each(ui.item.inventoryItems, function(index, value) { 
 	    		    			var lotNumber = value.lotNumber || "<span class='fade'>EMPTY</span>";
-	    		    			console.log(typeof(value.expirationDate));
 	    		    			var expirationDate = value.expirationDate;
 	    		    				    		    			
 	    		    			var existingLotNumber = 
