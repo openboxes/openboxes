@@ -531,6 +531,12 @@ class JqueryTagLib {
 
 							},
 							change: function(event, ui) {
+								console.log(event);
+								console.log(ui.item);								
+								console.log(\$(this).val());
+								\$('#${id}').val(\$(this).val());
+								//\$('#${id}-suggest').val(ui.item.valueText);
+								
 							},
 							select: function(event, ui) {
 								//alert("selected " + ui.item.value + " " + ui.item.valueText);
