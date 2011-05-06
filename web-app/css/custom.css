@@ -11,6 +11,9 @@ button {
 .action-btn { 
 	margin: 1px;
 }
+#banner { 
+	padding: 5px; 
+}
 
 table { 
 	border-collapse:collapse;

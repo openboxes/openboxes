@@ -3226,6 +3226,24 @@
 		</preConditions>
         <dropColumn tableName="shipment_item" columnName="serial_number"/>
 	</changeSet>
+	
+    <changeSet author="jmiranda (generated)" id="1304717097013-1">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="location" columnName="bg_color"/></not>
+		</preConditions>
+        <addColumn tableName="location">
+            <column name="bg_color" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1304717097013-2">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="location" columnName="fg_color"/></not>
+		</preConditions>
+        <addColumn tableName="location">
+            <column name="fg_color" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+	
 
 </databaseChangeLog>
 

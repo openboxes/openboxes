@@ -9,6 +9,8 @@ class Location implements Comparable, java.io.Serializable {
 	String name
 	byte [] logo				// logo
 	Address address
+	String fgColor
+	String bgColor
 	LocationType locationType	
 	Location parentLocation; 
 	
@@ -23,6 +25,8 @@ class Location implements Comparable, java.io.Serializable {
 		address(nullable:true)
 		locationType(nullable:false)
 		parentLocation(nullable:true)
+		bgColor(nullable:true)
+		fgColor(nullable:true)
 		logo(nullable:true, maxSize:10485760) // 10 MBs
 		
 		dateCreated(display:false)

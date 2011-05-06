@@ -140,7 +140,12 @@ class WarehouseController {
 			warehouseInstance.properties = params
 					
 			if (!warehouseInstance.hasErrors()) {
-				inventoryService.saveWarehouse(warehouseInstance)
+				inventoryService.saveWarehouse(warehouseInstance);
+				
+				// Refresh the current warehouse to make sure the color changes take effect 
+				if (session.warehouse.id == warehouseInstance?.id) 
+					session.warehouse = Warehouse.get(warehouseInstance?.id);
+				
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'warehouse.label', default: 'Warehouse'), warehouseInstance.id])}"
 				redirect(action: "list", id: warehouseInstance.id)
 			}

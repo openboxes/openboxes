@@ -8,6 +8,8 @@
         <title><g:message code="default.edit.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><g:message code="default.edit.label" args="[entityName]" /></content>
+		<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery',file:'jquery.colorpicker.css')}" type="text/css" media="screen, projection" />
+		<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.colorpicker.js')}" type="text/javascript" ></script>
     </head>
     <body>
         <div class="body">
@@ -49,6 +51,33 @@
 	                            </tr>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
+	                                  <label for="bgColor"><g:message code="warehouse.bgColor.label" default="Background Color" /></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'bgColor', 'errors')}">
+	                                    
+	                                    <g:select name="bgColor" class="colorpicker" 
+	                                    	from="${org.pih.warehouse.core.Constants.COLORS}" 
+	                                    	value="${warehouseInstance?.bgColor}" />
+	                                    
+                                    	<span class="fade">${warehouseInstance?.bgColor }</span>
+	                              
+	                                    
+	                                </td>
+	                            </tr>
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
+	                                  <label for="fgColor"><g:message code="warehouse.fgColor.label" default="Foreground Color" /></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'fgColor', 'errors')}">
+	                                    <g:select name="fgColor" class="colorpicker" 
+	                                    	from="${org.pih.warehouse.core.Constants.COLORS}" 
+	                                    	value="${warehouseInstance?.fgColor}" />
+	                                    	
+                                    	<span class="fade">${warehouseInstance?.fgColor }</span>
+	                                </td>
+	                            </tr>
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
 	                                  <label for="manager"><g:message code="warehouse.manager.label" default="Manager" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'manager', 'errors')}">
@@ -80,7 +109,7 @@
 	                                <td valign="top" class="name">
 	                                  <label for="manager"><g:message code="warehouse.manager.label" default="Active" /></label>
 	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'local', 'errors')}">
+	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'active', 'errors')}">
 	                                    <g:checkBox name="active" value="${warehouseInstance?.active}" />
 	                                </td>
 	                            </tr>
@@ -92,7 +121,7 @@
 										</button>
 										&nbsp;
 										<g:link action="list">
-							                    ${message(code: 'default.button.cancel.label', default: 'Cancel')}						
+											${message(code: 'default.button.cancel.label', default: 'Cancel')}						
 										</g:link>			
 									</td>
 	                            </tr>
@@ -102,5 +131,37 @@
                 </fieldset>
             </g:form>
         </div>
+	    <script type="text/javascript">
+
+	        function selectCombo(comboBoxElem, value) {
+		        alert(comboBoxElem + " " + value)
+				if (comboBoxElem != null) {
+					if (comboBoxElem.options) { 
+						for (var i = 0; i < comboBoxElem.options.length; i++) {
+				        	if (comboBoxElem.options[i].value == value &&
+				                comboBoxElem.options[i].value != "") { //empty string is for "noSelection handling as "" == 0 in js
+				                comboBoxElem.options[i].selected = true;
+				                break
+				        	}
+						}
+					}
+				}
+			}						
+	    
+	        $(document).ready(function() {
+	            $('#bgColor').colorpicker({
+	                size: 20,
+	                label: '',
+	                hide: true
+	            });
+
+	            $('#fgColor').colorpicker({
+	                size: 20,
+	                label: '',
+	                hide: true
+	            });
+			
+	        });
+	    </script>        
     </body>
 </html>
