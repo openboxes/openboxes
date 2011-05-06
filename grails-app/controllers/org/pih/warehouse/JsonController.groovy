@@ -1,13 +1,18 @@
 package org.pih.warehouse
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import grails.converters.*;
 
+import org.pih.warehouse.core.Constants;
 import org.pih.warehouse.core.DialogForm;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.UnitOfMeasure;
+import org.pih.warehouse.inventory.Inventory;
 import org.pih.warehouse.inventory.InventoryItem;
+import org.pih.warehouse.inventory.InventoryService;
+import org.pih.warehouse.inventory.TransactionEntry;
 import org.pih.warehouse.inventory.Warehouse;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
@@ -316,57 +321,122 @@ class JsonController {
 		}
 		render items as JSON;
 	}
+		
 	
+	def findInventoryItem = { 
+		log.info("params: " + params);
+		def product = Product.get(Integer.parseInt(params.productId));
+		def inventoryItem = InventoryItem.findByProductAndLotNumber(product, params.lotNumber?:null);
+		
+		// We need to pass the inventory.id param
+		//def inventory = Inventory.get(Integer.parseInt(params?.inventory?.id));
+		//def quantity = getQuantityForInventoryItem(inventoryItem, inventory);
+		def data = [ status: true, inventoryItem: inventoryItem, product: product, quantity: 0 ];
+		render data  as JSON
+	}
 	
+	def findProduct = { 
+		log.info (params);
+		def product = Product.get(params.id)
+		def data = []
+		if (!product) { 
+			data = [ status: false, message: "Error attempting to locate product " + params.id ]
+		}
+		else { 
+			data = [ status: true, product: product]
+		}
+		render data as JSON;
+	}
 	
 	def findProductByName = {
+		
+		def dateFormat = new SimpleDateFormat(Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT);
+		
 		log.info params
-		def items = new TreeSet();
+		def products = new TreeSet();
 		
 		if (params.term) {			
 			// Match full name
-			items = Product.withCriteria { 
-				ilike("name", params.term + "%")				
+			products = Product.withCriteria { 
+				ilike("name", "%" + params.term + "%")	
+				maxResults( 15 )
 			}
 			
 			// If no items found, we search by category, product type, name, upc
-			if (!items) { 
+			/*
+			if (!products) { 
 				def terms = params.term.split(" ")
 				for (term in terms) {
-					items = Product.withCriteria {
+					products = Product.withCriteria {
 						or {
-							ilike("name", term + "%")
-							//category { 
-							//	ilike("name", term + "%")
-							//}
-							
+							ilike("name", term + "%")							
 						}
 					}
 				}
 			}
+			*/
 		}
-
-		items << [ value: params.term, label: params.term, valueText: params.term, desc: params.term ]
 		
-		if (!items) { 
+		// Add the search term to the list of items returned
+		products << [ value: params.term, label: params.term, valueText: params.term, desc: params.term ]
+		
+		if (!products) { 
 			//items.add(new Product(name: "No matching products"))
 			//items.addAll(Product.list(params));		
 		}
+		def warehouse = Warehouse.get(params.warehouseId);
 		
 		
-		if (items) {
+		// Convert from products to json objects 
+		if (products) {
 			// Make sure items are unique
-			items.unique();
-			items = items.collect() {
-				[	label: it.name,
-					valueText: it.name,
-					value: it.id,
-					desc: it.description,
-					icon: "none"]
+			products.unique();
+			products = products.collect() { product ->
+				
+				// We need to check to make sure this is a valid product
+				def inventoryItems = []
+				if (product.id) { 
+					inventoryItems = InventoryItem.findAllByProduct(product);
+					inventoryItems = inventoryItems.collect() { inventoryItem ->
+						def quantity = 0;
+						def inventory = null;
+						if (warehouse) { 
+							try { 
+								inventory = Inventory.get(warehouse?.inventory?.id);
+								quantity = inventoryService.getQuantityForInventoryItem(inventoryItem, inventory);
+							} catch (Exception e) { 
+								log.error "Could not locate quantity for inventory item " + inventoryItem?.id + " and inventory " + inventory?.id, e
+							}
+						}
+						
+						// Create inventory items object
+						log.info "quantity " + quantity;
+						if (quantity > 0) { 
+							[	
+								id: inventoryItem.id?:0, 
+								lotNumber: (inventoryItem?.lotNumber)?:"", 
+								expirationDate: (inventoryItem?.expirationDate) ? (dateFormat.format(inventoryItem?.expirationDate)) : "never", 
+								quantity: quantity
+							] 
+						}
+					}
+				}
+				
+				
+				// Convert product attributes to JSON object attributes
+				[	
+					product: product,
+					value: product.id,
+					label: product.name,
+					valueText: product.name,
+					desc: product.description,
+					inventoryItems: inventoryItems,
+					icon: "none"
+				]
 			}
 		}
 
-		render items as JSON;
+		render products as JSON;
 	}
 	
 
@@ -610,6 +680,25 @@ class JsonController {
 		}
 		dialogForm.domainInstance = domainInstance
 		return dialogForm
+	}
+	
+	
+	def deleteTransactionEntry = { 
+		log.info "delete transaction entry " + params;
+		def transactionEntry = TransactionEntry.get(params.id);
+		if (transactionEntry) { 
+			def transaction = transactionEntry.transaction;
+			transaction.removeFromTransactionEntries(transactionEntry);
+			transactionEntry.delete();
+			def result = [ success: true, transactionEntry: transactionEntry ]
+			render result as JSON
+		}
+		else { 
+			response.setStatus(200);
+			response.setContentType('text/plain')
+			response.outputStream << 'Sorry, there was an error while attempting to delete this transaction entry. Please try again or contact your system administrator.' 
+		}
+		
 	}
 	
 	

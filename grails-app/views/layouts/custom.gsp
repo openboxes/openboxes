@@ -78,9 +78,10 @@
 	
 </head>
 <body class="yui-skin-sam">
-
-	<div class="notification-container"></div>
+	<input type="hidden" id="currentWarehouseId" value="${session?.warehouse?.id }"/>
 	<%-- 
+	<div class="notification-container"></div>
+	
 	<g:if test="${flash.message}">	
 		<div id="notify-container" style="display: hidden;">
 			<div id="notify-message" class="message">${flash.message}</div>	
@@ -105,13 +106,12 @@
 							    <a class="home" href="${createLink(uri: '/dashboard/index')}" style="text-decoration: none">						    	
 						    		<img src="${createLinkTo(dir:'images/icons/',file:'logo.gif')}" alt="Your Boxes. You're Welcome." 
 						    			style="vertical-align: absmiddle"/>
-						    			<span style="font-size: 2em; vertical-align: top;">openboxes</span>
+						    			<span style="font-size: 2em; vertical-align: middle;">openBoxes</span>
 							    </a>
 							</div>
 					    </div>
 					    <div id="bannerRight" class="yui-u" >
 					    	<div id="loggedIn">
-					    		
 								<ul>
 								    <g:if test="${session.user}">
 										<li>
@@ -316,6 +316,31 @@
 	
 <script type="text/javascript">
 	$(function() { 
+
+		function show() {
+			//$(this).children(".actions").show();
+		}
+		
+		function hide() { 
+			$(this).children(".actions").hide();
+		}
+		
+		$(".action-menu").hoverIntent({
+			sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
+			interval: 5,   // number = milliseconds for onMouseOver polling interval
+			over: show,     // function = onMouseOver callback (required)
+			timeout: 100,   // number = milliseconds delay before onMouseOut
+			out: hide       // function = onMouseOut callback (required)
+		});  
+		
+		// Create an action button that toggles the action menu on click
+		//button({ text: false, icons: {primary:'ui-icon-gear',secondary:'ui-icon-triangle-1-s'} }).
+		$(".action-btn").click(function(event) {
+			$(this).parent().children(".actions").toggle();
+			event.preventDefault();
+		});
+
+		
 		var accordion = 
 			$('#leftnav-accordion-menu').accordion({
 				active: true, 

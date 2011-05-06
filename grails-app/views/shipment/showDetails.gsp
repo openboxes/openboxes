@@ -204,7 +204,7 @@
 									--%>
 									<g:if test="${!shipmentWorkflow?.isExcluded('carrier')}">  
 										<tr class="prop">
-											<td valign="top"><label><g:message
+											<td valign="top" class="name"><label><g:message
 												code="shipment.traveler.label" default="Traveler" /></label></td>
 											<td valign="top" >
 												<g:if test="${shipmentInstance?.carrier}">

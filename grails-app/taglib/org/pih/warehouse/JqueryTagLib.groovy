@@ -419,8 +419,11 @@ class JqueryTagLib {
 		def showOn = attrs.showOn ?: "both";
 		def showTrigger = Boolean.valueOf(attrs.showTrigger ?: "true");
 				
-		def value = (attrs.format && attrs.value) ? new SimpleDateFormat(attrs.format).format(attrs.value) : ""
-
+		def value = attrs.value
+		if (value instanceof Date) {
+			value = (attrs.format && attrs.value) ? new SimpleDateFormat(attrs.format).format(attrs.value) : ""
+		}
+	
 		if (name == null) { 
 			throw new IllegalArgumentException("name parameter must be specified")			
 		}

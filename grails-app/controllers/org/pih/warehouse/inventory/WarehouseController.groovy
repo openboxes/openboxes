@@ -44,13 +44,13 @@ class WarehouseController {
 		
 		log.debug "transaction entries $entries"
 		for (TransactionEntry entry in entries) {
-			def quantityNow = inventory.get(entry.product);
+			def quantityNow = inventory.get(entry?.inventoryItem?.product);
 			
 			log.debug "$quantityNow + $entry?.quantity"	    
 			quantityNow += entry.quantity
 			
 			log.debug "quantity = $quantityNow"
-			inventory.put(entry.product, quantityNow)
+			inventory.put(entry?.inventoryItem?.product, quantityNow)
 		}
 		
 		// HOWTO Do SQL query "Select Product, Count(*) group from transactionEntry by Product""

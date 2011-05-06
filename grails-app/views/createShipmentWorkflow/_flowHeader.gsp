@@ -92,4 +92,3 @@
 		</table>
 	</div>
 </div>				
-<br clear="all"/>

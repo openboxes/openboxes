@@ -33,115 +33,164 @@
 	            </div>
             </g:hasErrors>    
             
-            
-            <g:link class="bullet" controller="inventory" action="listAllTransactions">&lsaquo; Back to Transactions</g:link> 
-
+            <div style="padding: 10px; ">
+            	<g:if test="${params?.product?.id}">
+		            <g:link class="bullet" controller="inventoryItem" action="showStockCard" params="['product.id': params?.product?.id]"><button>&lsaquo; Back to Stock Card</button></g:link> 
+	            </g:if>
+	            <g:else>
+		            <g:link class="bullet" controller="inventory" action="listAllTransactions"><button>&lsaquo; Back to Transactions</button></g:link> 
+		    	</g:else>
+			</div>
 			<div class="dialog">
 			
 				<g:form>
 					<g:hiddenField name="id" value="${transactionInstance?.id}"/>
 					<g:hiddenField name="inventory.id" value="${transactionInstance?.inventory?.id}"/>
-				
-						<ul>
-							<li class="prop odd">
-								<label>Transaction ID</label>
-								<span class="value">
-									<g:if test="${transactionInstance?.id }">
-										${transactionInstance?.id }
-									</g:if>
-									<g:else><span class="fade">(new transaction)</span></g:else>
-								</span>
-							</li>
-							<li class="prop even">
-								<label>Transaction Date</label>
-								<span class="value">
-									<g:formatDate date="${transactionInstance?.transactionDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}"/>
-								</span>
-							</li>
-							<li class="prop odd">
-								<label>Transaction Type</label>
-								<span class="value ${transactionInstance?.transactionType?.transactionCode?.name()?.toLowerCase()}">
-									${transactionInstance?.transactionType?.name }
-								</span>
-							</li>
-							<li id="inventory-li" class="prop even">
-								<label>Inventory</label>
-								<span class="value">
-									${warehouseInstance?.name }
-								</span>								
-							</li>
-							<g:if test="${transactionInstance?.source }">
-								<li class="prop odd">
-									<label>From</label>
-									<span class="value">
-										${transactionInstance?.source?.name }
-									</span>
-								</li>
-							</g:if>
-							<g:if test="${transactionInstance?.destination }">
-								<li class="prop odd">
-									<label>To</label>
-									<span class="value">
-										${transactionInstance?.destination?.name }
-									</span>
-								</li>
-							</g:if>
-									
-							<g:if test="${transactionInstance?.id }">
-								<li class="prop even">
-									<span class="value">
-										<table id="prodEntryTable" border="1" style="border: 1px solid #ccc;">
-											<tr>
-												<th>Product</th>
-												<th>Lot Number</th>
-												<th>Expiration Date</th>
-												<th>Qty</th>
-												<th>&nbsp;</th>
-											</tr>
-											<g:if test="${transactionInstance?.transactionEntries }">
-											
-												<g:each in="${transactionInstance?.transactionEntries.sort { it.inventoryItem?.product.name } }" var="transactionEntry" status="status">
-													<tr class="${(status%2==0)?'odd':'even'}">
-														<td style="text-align: left;">
-															<g:link controller="inventoryItem" action="showStockCard" params="['product.id':transactionEntry?.inventoryItem?.product?.id]">
-																${transactionEntry?.inventoryItem?.product?.name }
-															</g:link>
-														</td>										
-														<td>
-															${transactionEntry?.inventoryItem?.lotNumber }
-														</td>		
-														<td>
-															${transactionEntry?.inventoryItem?.expirationDate }
-														</td>
-														<td>
-															${transactionEntry?.quantity}
-														</td>		
-														<td></td>
-													</tr>
-												</g:each>
-											</g:if>
-											<g:else>
-												<tr>
-													<td colspan="6">There are no entries</td>
-												</tr>
-											</g:else>
-										</table>
+						<fieldset>
+							<table>
+								<tr class="prop odd">
+									<td>
+										<label>Transaction ID</label>
 									</td>
-								</li>
-							</g:if>
-						</table>
-						<div style="text-align: center; padding: 10px;">
-							<button class="positive" name="_action_editTransaction" id="${transactionInstance?.id }">
-								<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" />
-							    ${message(code: 'default.button.edit.label', default: 'Edit')}        						
-							</button>
-							&nbsp;
-							<button class="negative" name="_action_deleteTransaction" id="${transactionInstance?.id }" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-		    					<img src="${createLinkTo(dir:'images/icons/silk',file:'bin.png')}" alt="Delete" />
-								${message(code: 'default.button.delete.label', default: 'Delete')}
-							</button>							
-						</div>
-							
+									<td>
+										<span class="value">
+											<g:if test="${transactionInstance?.id }">
+												${transactionInstance?.id }
+											</g:if>
+											<g:else><span class="fade">(new transaction)</span></g:else>
+										</span>
+									</td>
+								</tr>
+								<tr class="prop even">
+									<td>
+										<label>Transaction Date</label>
+									</td>
+									<td>
+										<span class="value">
+											<g:formatDate date="${transactionInstance?.transactionDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}"/>
+										</span>
+									</td>										
+								</tr>
+								<tr class="prop odd">
+									<td>
+										<label>Transaction Type</label>
+									</td>
+									<td>
+										<span class="value ${transactionInstance?.transactionType?.transactionCode?.name()?.toLowerCase()}">
+											${transactionInstance?.transactionType?.name }
+										</span>
+									</td>										
+								</tr>
+								<tr id="inventory-li" class="prop even">
+									<td>
+										<label>Inventory</label>
+									</td>
+									<td>
+										<span class="value">
+											${warehouseInstance?.name }
+										</span>								
+									</td>										
+								</tr>
+								<tr class="prop odd">
+									<td>
+										<label># Entries</label>
+									</td>
+									<td>
+										<span class="value">
+											${transactionInstance?.transactionEntries?.size() }
+										</span>
+									</td>
+								</tr>								
+								<g:if test="${transactionInstance?.source }">
+									<tr class="prop even">
+										<td>
+											<label>From</label>
+										</td>
+										<td>
+											<span class="value">
+												${transactionInstance?.source?.name }
+											</span>
+										</td>										
+									</tr>
+								</g:if>
+								<g:if test="${transactionInstance?.destination }">
+									<tr class="prop even">
+										<td>
+											<label>To</label>
+										</td>
+										<td>
+											<span class="value">
+												${transactionInstance?.destination?.name }
+											</span>
+										</td>										
+									</tr>
+								</g:if>
+								
+								
+							</table>
+						</fieldset>
+						<fieldset>
+							<table>
+								<g:if test="${transactionInstance?.id }">
+									<tr class="prop even">
+										<td colspan="2">
+										
+											<table id="prodEntryTable" border="0" style="border: 0px solid #ccc;">
+												<tr>
+													<th>Product</th>
+													<th>Lot Number</th>
+													<th>Expiration Date</th>
+													<th>Qty</th>
+													<th>&nbsp;</th>
+												</tr>
+												<g:if test="${transactionInstance?.transactionEntries }">
+													<g:each in="${transactionInstance?.transactionEntries.sort { it?.inventoryItem?.product?.name } }" var="transactionEntry" status="status">
+														<tr class="${(status%2==0)?'odd':'even'}">
+															<td style="text-align: left;">
+																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':transactionEntry?.inventoryItem?.product?.id]">
+																	${transactionEntry?.inventoryItem?.product?.name }
+																</g:link>
+															</td>										
+															<td>
+																${transactionEntry?.inventoryItem?.lotNumber }
+															</td>		
+															<td>
+																<g:formatDate
+																	date="${transactionEntry?.inventoryItem?.expirationDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}" />															
+															</td>
+															<td>
+																${transactionEntry?.quantity}
+															</td>		
+															<td></td>
+														</tr>
+													</g:each>
+												</g:if>
+												<g:else>
+													<tr>
+														<td colspan="6">There are no entries</td>
+													</tr>
+												</g:else>
+											</table>	
+										</td>
+									</tr>
+								</g:if>
+							</table>
+						</fieldset>	
+						
+						<fieldset>
+							<div style="text-align: center; padding: 10px;" class="odd">
+								<button class="positive" name="_action_editTransaction" id="${transactionInstance?.id }">
+									<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" />
+								    &nbsp;${message(code: 'default.button.edit.label', default: 'Edit')}&nbsp;        						
+								</button>
+								&nbsp;
+								<button class="negative" name="_action_deleteTransaction" id="${transactionInstance?.id }" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+			    					<img src="${createLinkTo(dir:'images/icons/silk',file:'bin.png')}" alt="Delete" />
+									&nbsp;${message(code: 'default.button.delete.label', default: 'Delete')}&nbsp;
+								</button>							
+							</div>
+						</fieldset>
+					
 				</g:form>
 			</div>
 		</div>

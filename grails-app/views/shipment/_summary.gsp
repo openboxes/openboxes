@@ -13,9 +13,15 @@
 							
 						</div> 
 						<div class="fade" style="font-size: 0.9em; line-height: 20px;">
-							<g:render template="../shipment/sidebar" />
-							&nbsp;|&nbsp;${shipmentInstance?.shipmentType?.name} Shipment <b>#${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}</b> 
-							&nbsp;|&nbsp; ${shipmentInstance?.status?.name}
+
+							<!-- Hide action menu menu if the user is in the shipment workflow -->						
+							<g:if test="${!params.execution }">
+								<g:render template="../shipment/sidebar" />
+								&nbsp;|&nbsp;
+							</g:if>
+							${shipmentInstance?.shipmentType?.name} Shipment <b>#${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}</b> 
+							&nbsp;|&nbsp; 
+							${shipmentInstance?.status?.name}
 							
 						</div>
 												

@@ -392,8 +392,8 @@ h2 {
 	background-color: #f0f0f0;
 	background-color: #525D76;*/
 	border-bottom: 1px dotted #525D76; 
-	margin-bottom: 10px;
-	/*
+	/*margin-bottom: 10px;
+	
 	padding: 5px;
 	color: white;
 	*/
@@ -422,11 +422,16 @@ hr.space {background:#fff;color:#fff;}
  	
 #hd { 
     vertical-align: bottom;		
-	/* debugging */
-	padding-bottom: 5px;
-	margin: 0px;
-	height: 24px;
+	
+	background-color: white;
+	margin: 0px;	
 }
+
+.page-title {
+	margin-top: 10px;
+}
+
+
 
 #banner { 
 	

@@ -392,12 +392,13 @@ class InventoryController {
 		def transactionInstance = Transaction.get(params.id);
 		def inventoryInstance = Inventory.get(params.inventory.id);
 		
-		
 		if (!transactionInstance) {
 			transactionInstance = new Transaction();
 		} 
 		
 		transactionInstance.properties = params
+		
+		/*
 		transactionInstance.transactionEntries.each { 
 			def inventoryItem = InventoryItem.findByProductAndLotNumber(it.product, it.lotNumber);
 			if (!inventoryItem) { 
@@ -422,6 +423,7 @@ class InventoryController {
 			}
 			it.inventoryItem = inventoryItem;
 		}
+		*/
 		
 		// either save as a local transfer, or a generic transaction
 		// (catch any exceptions so that we display "nice" error messages)
@@ -436,7 +438,7 @@ class InventoryController {
 				}
 			}
 			catch (Exception e) {
-				log.error(e)
+				log.error("Unabled to save transaction ", e);
 			}
 		}
 		
@@ -445,7 +447,7 @@ class InventoryController {
 			redirect(action: "showTransaction", id: transactionInstance?.id);
 		}
 		else { 		
-			flash.message = "Unable to save transaction"
+			flash.message = "Unable to save transaction "
 			def model = [ 
 				transactionInstance : transactionInstance,
 				productInstanceMap: Product.list().groupBy { it.category },
@@ -568,12 +570,16 @@ class InventoryController {
 	
 	def saveNewTransaction = { 
 		log.info ("Save new transaction " + params);
+		
+		// Try to find an existing transaction
 		def transactionInstance = Transaction.get(params.id);
 		
 		
+		// If there are no transactions with that ID, we create a new one
 		if (!transactionInstance) { 
 			transactionInstance = new Transaction(params);
 		}
+		// Otherwise, we bind parameters to the existing transaction
 		else {
 			//bindData(transactionInstance, params, [exclude: ['transactionEntries']]);
 			//List transactionEntries = 
@@ -582,7 +588,31 @@ class InventoryController {
 			//log.info("bind transaction entries " + transactionEntries);	
 			transactionInstance.properties = params;
 		}
-				
+		
+		// Iterate over all transaction entries to reconcile the inventory item associated with each
+		log.info("Saving inventory items " + transactionInstance.transactionEntries*.inventoryItem);
+		transactionInstance?.transactionEntries.each { 
+		
+			def product = Product.get(it?.inventoryItem?.product?.id)
+			def inventoryItem = InventoryItem.findByLotNumberAndProduct(it?.inventoryItem?.lotNumber, product);
+			if (inventoryItem) {
+				it.inventoryItem = inventoryItem;
+			}
+		 
+			if (!it.inventoryItem.hasErrors() && it.inventoryItem.save()) { 
+				log.info("saved inventory item " + it.inventoryItem.id);
+			}
+			// FIXME this need to be reworked and tested
+			else { 
+				it.inventoryItem.errors.each { error ->
+					log.info "error with inventory item " + it.inventoryItem + " error = " + error
+				}
+				transactionInstance.errors.rejectValue('inventoryItems', 'error', 'this is the default message')
+			}
+			
+		}
+		
+		/*
 		transactionInstance?.transactionEntries.each { 
 			log.info("Process transaction entry " + it.id);
 			log.info("Find inventory item by lot number " + it.lotNumber);
@@ -600,7 +630,7 @@ class InventoryController {
 				// FIXME Need to check for errors here
 			}
 			it.inventoryItem = inventoryItem;
-		}
+		}*/
 		
 		// either save as a local transfer, or a generic transaction
 		// (catch any exceptions so that we display "nice" error messages)
@@ -611,20 +641,34 @@ class InventoryController {
 					saved = inventoryService.saveLocalTransfer(transactionInstance) 
 				}
 				else {
-					saved = transactionInstance.save(flush:true)
+					saved = transactionInstance.save()
 				}
 			}
 			catch (Exception e) {
-				log.error(e)
+				log.error("Unable to save transaction ", e)
 			}
 		}
-		
+
+		/*
+		transactionInstance.transactionEntries.each { 
+			println ("quantity " + it.quantity);
+			if (!it.hasErrors() && it.save()) { 
+				
+			}
+			else { 
+				it.errors.each { error -> 
+					println error
+				}
+			}
+		}
+		*/
+				
 		if (saved) {	
 			flash.message = "Transaction saved successfully"
 			redirect(action: "showTransaction", id: transactionInstance?.id);
+			return;
 		}
 		else { 		
-			flash.message = "Unable to save transaction"
 			def model = [ 
 				transactionInstance : transactionInstance,
 				productInstanceMap: Product.list().groupBy { it.category },

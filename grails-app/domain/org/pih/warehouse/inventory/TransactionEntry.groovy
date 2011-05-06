@@ -12,8 +12,6 @@ class TransactionEntry implements Comparable, Serializable {
 
     static constraints = {		
 		inventoryItem(nullable:false)		
-		product(nullable:false, maxSize: 255)	
-		lotNumber(nullable:true, maxSize: 255)
 		quantity(nullable:false, range: 0..2147483646)
 		comments(nullable:true, maxSize: 255)	
     }
@@ -23,9 +21,9 @@ class TransactionEntry implements Comparable, Serializable {
      * TODO: find a better way to do this... or just remove this once we rework the current "create transaction" interface
      * the danger here is that legacy code we've missed will actually use and rely on the values of these now-transient properties
      */
-    static transients = ['lotNumber','product']
-    String lotNumber
-    Product product
+    //static transients = ['lotNumber','product']
+    //String lotNumber
+    //Product product
     
     /**
     String getLotNumber() {

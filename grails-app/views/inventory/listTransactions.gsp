@@ -32,7 +32,28 @@
 						<g:each var="transactionInstance" in="${transactionInstanceList}" status="i">           
 							<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
 								<td align="center">
-									<g:link action="showTransaction" id="${transactionInstance?.id }">View</g:link>
+									
+									<!-- Action menu -->
+									<div>
+										<span class="action-menu">
+											<button class="action-btn">
+												<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle;"/>
+												<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
+											</button>
+											<div class="actions">
+												<div class="action-menu-item">
+													<g:link action="showTransaction" id="${transactionInstance?.id }">
+														<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}" style="vertical-align: middle;"/>&nbsp;View transaction details
+													</g:link>
+													<g:link action="editTransaction" id="${transactionInstance?.id }">
+														<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" style="vertical-align: middle;"/>&nbsp;Edit transaction details
+													</g:link>
+													
+												</div>
+											</div>
+										</span>				
+									</div>												
+								
 									<%-- 
 									<g:if test="${transactionInstance?.confirmed }">
 										<g:link action="confirmTransaction" id="${transactionInstance?.id }">Reset</g:link>	
@@ -71,6 +92,7 @@
 		<div class="paginateButtons">
 			<g:paginate total="${transactionCount}" />
 		</div>
+		
 	</body>
 
 </html>

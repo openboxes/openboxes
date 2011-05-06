@@ -135,36 +135,5 @@
 			</table>
         </div>		
         
-		<script type="text/javascript">
-			$(function(){ 
-				function show() {
-					//$(this).children(".actions").show();
-				}
-				function hide() { 
-					$(this).children(".actions").hide();
-				}
-				
-				// Create an action button that toggles the action menu on click
-				//.button({ text: false, icons: {primary:'ui-icon-gear',secondary:'ui-icon-triangle-1-s'} })
-				$(".action-btn").click(function() {
-					$(this).parent().children(".actions").toggle();
-				});
-
-				// Add hover intent to the action menu so we can hide the menu when the mouse leaves the area near the menu
-				$(".action-menu").hoverIntent({
-					sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
-					interval: 5,   // number = milliseconds for onMouseOver polling interval
-					over: show,     // function = onMouseOver callback (required)
-					timeout: 100,   // number = milliseconds delay before onMouseOut
-					out: hide       // function = onMouseOut callback (required)
-				});
-
-
-				// Position the actions menu, relative to the action button
-				//$(".action-btn").each(function() {
-				//	$(this).parent().find(".actions").position({ my: "left top", at: "left bottom", of: this, collision: "fit"});
-				//});
-			});
-		</script>	        
     </body>
 </html>

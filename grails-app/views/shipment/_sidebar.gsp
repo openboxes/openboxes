@@ -115,36 +115,7 @@
 			</g:if>
 		</div>
 	</span>
-	<script type="text/javascript">
 		
-	 	$(function(){
-			function show() {
-				//$(this).children(".actions").show();
-			}
-			
-			function hide() { 
-				$(this).children(".actions").hide();
-			}
-			
-			$(".action-menu").hoverIntent({
-				sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
-				interval: 5,   // number = milliseconds for onMouseOver polling interval
-				over: show,     // function = onMouseOver callback (required)
-				timeout: 100,   // number = milliseconds delay before onMouseOut
-				out: hide       // function = onMouseOut callback (required)
-			});  
-			
-			// Create an action button that toggles the action menu on click
-			//button({ text: false, icons: {primary:'ui-icon-gear',secondary:'ui-icon-triangle-1-s'} }).
-			$(".action-btn").click(function(event) {
-				$(this).parent().children(".actions").toggle();
-				event.preventDefault();
-			});
-
-			//$( ".actions" ).position({ my: "right top", at: "right bottom", of: $("#shipment-action-menu") });	
-			
-		});
-	</script>	        		
 <%--  
 <br/>
 <div style="width: 250px" class="menu" >

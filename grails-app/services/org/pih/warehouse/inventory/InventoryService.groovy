@@ -1390,19 +1390,19 @@ class InventoryService {
 	 */
 	Boolean isValidForLocalTransfer(Transaction transaction) {
 		// make sure that the transaction is of a valid type
-		if (transaction.transactionType.id != Constants.TRANSFER_IN_TRANSACTION_TYPE_ID  &&
-				transaction.transactionType.id != Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) {
+		if (transaction?.transactionType?.id != Constants.TRANSFER_IN_TRANSACTION_TYPE_ID  &&
+				transaction?.transactionType?.id != Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) {
 			return false
 		}
 	
 		// make sure we are operating only on locally managed warehouses
-		if (transaction.source) {
-			if (!(transaction.source instanceof Warehouse)) { return false }
-			else if (!transaction.source.local){ return false }
+		if (transaction?.source) {
+			if (!(transaction?.source instanceof Warehouse)) { return false }
+			else if (!transaction?.source.local){ return false }
 		}
-		if (transaction.destination) {
-			if (!(transaction.destination instanceof Warehouse)) { return false }
-			else if (!transaction.destination.local) { return false }
+		if (transaction?.destination) {
+			if (!(transaction?.destination instanceof Warehouse)) { return false }
+			else if (!transaction?.destination.local) { return false }
 		}
 		
 		return true

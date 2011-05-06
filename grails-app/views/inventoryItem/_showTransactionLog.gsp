@@ -74,7 +74,7 @@
 									<tr class="transaction ${(status%2==0)?'even':'odd' } prop">
 										<td style="width: 10%; nowrap="nowrap">	
 										
-											<g:link controller="inventory" action="editTransaction" id="${transaction?.id }" params="['product.id':commandInstance?.productInstance?.id]">
+											<g:link controller="inventory" action="showTransaction" id="${transaction?.id }" params="['product.id':commandInstance?.productInstance?.id]">
 												<g:formatDate
 													date="${transaction?.transactionDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />																
 											</g:link>
@@ -86,7 +86,7 @@
 											--%>
 											
 											<!--  Transaction Details -->
-											<!--  
+											<%--   
 											<span id="transactionEntries${transaction?.id}" style="text-align: left; padding: 10px; margin: 10px; display: none; position:absolute; padding: 10px; background-color: white; border: 1px dashed black">
 												<label>Entries for Transaction #${transaction.id }</label>
 												<table width="100%">
@@ -117,9 +117,7 @@
 															</th>
 															<th style="text-align: center;">
 
-																<g:set var="quantityChange" value="${transaction?.transactionEntries.findAll{it.inventoryItem?.product == commandInstance?.productInstance}.quantity?.sum() }"/>
-																<g:set var="totalQuantityChange" value="${totalQuantityChange + quantityChange}"/>
-																																<g:set var="styleClass" value="color:black;"/>														
+																<g:set var="styleClass" value="color:black;"/>														
 																<g:if test="${quantityChange<0}">
 																	<g:set var="styleClass" value="color: red;"/>																	
 																</g:if>
@@ -129,7 +127,7 @@
 													</tfoot>
 												</table>
 											</span>						
-											-->
+											--%>
 																				
 										</td>
 										<td>
@@ -145,7 +143,11 @@
 										
 										</td>
 										<td style="text-align: center">
-											
+										
+											<g:set var="quantityChange" value="${0 }"/>
+											<g:each var="transactionEntry" in="${commandInstance?.transactionLogMap?.get(transaction) }" status="status2">
+												<g:set var="quantityChange" value="${transaction?.transactionEntries.findAll{it?.inventoryItem?.product == commandInstance?.productInstance}.quantity?.sum() }"/>
+											</g:each>
 											<span class="${transaction?.transactionType?.transactionCode?.name()?.toLowerCase()}">
 												${quantityChange }
 											</span>

@@ -13,7 +13,6 @@
 				<thead>
 					<tr class="odd">
 						<th class="left" style="">Actions</th>												
-						<th class="center middle" >Unit</th>
 						<th>Serial/Lot Number</th>
 						<th>Expires</th>
 						<th class="center middle" >Qty</th>
@@ -58,9 +57,6 @@
 										</div>
 									</div>
 								</td>															
-								<td class="top center">
-									${commandInstance?.productInstance?.unitOfMeasure }
-								</td>
 								<td class="top">
 									${itemInstance?.lotNumber?:'<span class="fade">None</span>' }
 									<g:link action="show" controller="inventoryItem" id="${itemInstance?.id }">
@@ -80,6 +76,7 @@
 										<g:set var="styleClass" value="color: red;"/>																	
 									</g:if>
 									<span style="${styleClass}">${itemQuantity }</span> 
+																
 								</td>	
 								<g:hasErrors bean="${flash.itemInstance}">
 									<td>
@@ -100,8 +97,6 @@
 					<tfoot>
 						<tr class="prop" style="height: border: 0px;">
 							<td colspan="2" style="text-align: left; border: 0px;">
-							</td>
-							<td style="border: 0px;">
 							</td>
 							<td style="border: 0px;"></td>
 							<td style="text-align: center; vertical-align: middle; border: 0px;">
