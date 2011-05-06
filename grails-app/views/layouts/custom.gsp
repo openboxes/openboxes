@@ -74,7 +74,7 @@
 		});
 	</script>
 	--%>
-	<g:if test="${session.warehouse.fgColor && session.warehouse.bgColor }">
+	<g:if test="${session?.warehouse?.fgColor && session?.warehouse?.bgColor }">
 		<style>
 			#hd { background-color: #${session.warehouse.bgColor}; color: #${session.warehouse.fgColor}; } 
 			#hd a { color: #${session.warehouse.fgColor}; }  	
