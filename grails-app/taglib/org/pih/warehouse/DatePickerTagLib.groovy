@@ -3,7 +3,7 @@ package org.pih.warehouse
 import java.text.SimpleDateFormat;
 import org.pih.warehouse.core.Person;
 
-class JqueryDateTagLib {
+class DatePickerTagLib {
 		
 
 	def jqueryDatePicker = {attrs, body ->
