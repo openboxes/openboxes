@@ -30,7 +30,6 @@ class DashboardController {
 	}
 	
 	def chooseWarehouse = {
-		log.info "Choose warehouse"
 		
 		def warehouse = null;
 		if (params.id!='null') {			
@@ -48,7 +47,9 @@ class DashboardController {
 				userInstance.warehouse = warehouse;
 				userInstance.lastLoginDate = new Date();
 				userInstance.save(flush:true);
+				session.user = userInstance;
 			}			
+			
 			// Successfully logged in and selected a warehouse
 			//session.user = userInstance;
 			

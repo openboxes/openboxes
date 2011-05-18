@@ -84,15 +84,15 @@ class JqueryTagLib {
 					      	},
 					        focus: function(event, ui) {			
 					      		//\$('#${id}-suggest').val(ui.item.valueText);					
-					      		//return false;
+					      		return false;
 					        },	
 					        change: function(event, ui) { 
-								//alert("changed " + ui.item)
-								//\$('#${id}-id').val(0);
-								//\$('#${id}-suggest').val(ui.item.valueText);
+								//alert("changed " + \$(this).val());
+								//\$('#${id}-id').val('');
+								//\$('#${id}-suggest').val('');
+								return false;
 					        },
-							select: function(event, ui) {
-								//alert("selected " + ui.item.value + " " + ui.item.valueText);								
+							select: function(event, ui) {			
 								\$('#${id}-id').val(ui.item.value);
 								\$('#${id}-suggest').val(ui.item.valueText);
 								\$('#${id}-span').html(ui.item.valueText);
@@ -356,8 +356,6 @@ class JqueryTagLib {
 				
 				<script>
 					\$(document).ready(function() {
-						
-                        
 				      	\$("#${id}-suggest").autocomplete({
 				            width: ${width},
 				            minLength: ${minLength},
@@ -365,6 +363,7 @@ class JqueryTagLib {
 				            highlight: true,
 				            //selectFirst: true,
 				            scroll: true,
+				            autoFocus: true,
 				            autoFill: true,
 				            //scrollHeight: 300,
 							//define callback to format results
@@ -410,68 +409,7 @@ class JqueryTagLib {
 
 	
 	
-	def jqueryDatePicker = {attrs, body ->
-		
-		def id = attrs.id ? attrs.id : attrs.name;
-		def name = attrs.name;
-		def autoSize = attrs.autoSize ?:(attrs.size)?"false":"true";
-		def size = attrs.size ?: "10"
-		def showOn = attrs.showOn ?: "both";
-		def showTrigger = Boolean.valueOf(attrs.showTrigger ?: "true");
-				
-		def value = attrs.value
-		if (value instanceof Date) {
-			value = (attrs.format && attrs.value) ? new SimpleDateFormat(attrs.format).format(attrs.value) : ""
-		}
-	
-		if (name == null) { 
-			throw new IllegalArgumentException("name parameter must be specified")			
-		}
-		
-		def html = """
 
-		<span>
-			<input id='${id}' name='${name}' type='hidden'/> 
-			<input id='${id}-datepicker' name='${name}-datepicker' type='text' class='date' size="${size}" /> 
-			<script type=\'text/javascript\'> 
-				jQuery(document).ready(function() {
-					jQuery('#${id}-datepicker').datepicker({
-						altField: '#${id}',
-						altFormat: 'mm/dd/yy',
-						dateFormat: 'dd/M/yy',
-						autoSize: ${autoSize},
-						showOn: '${showOn}',
-						buttonImageOnly: true, 
-						buttonImage: '/warehouse/images/icons/silk/calendar.png',
-						//buttonText: '...',
-						//showButtonPanel: true,
-						//showOtherMonths: true,
-						//selectOtherMonths: true
-					});					
-					var dateValue = '${value}';					 
-					if (dateValue) { 
-						jQuery('#${name}-datepicker').datepicker('setDate', new Date('${value}'));
-					}
-				}); 
-			</script> 
-		</span>
-		""";
-
-		if (showTrigger) { 
-			html += """
-			<style>
-			.ui-datepicker-trigger {
-				position: relative; left: -20px; top: -2px;
-			}
-			</style>
-			""";
-		}
-		
-				
-		out << html;
-				
-	}
-	
 	
 	
 	def autoSuggestString = { attrs, body ->

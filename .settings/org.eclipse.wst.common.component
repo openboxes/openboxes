@@ -62,5 +62,14 @@
         <wb-resource deploy-path="/" source-path="/liquibase-1.9.3.6-grails-app-migrations"/>
         <wb-resource deploy-path="/" source-path="/liquibase-1.9.3.6-src-java"/>
         <wb-resource deploy-path="/" source-path="/liquibase-1.9.3.6-src-groovy"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/barcode4j-0.2.1/grails-app/services"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/mail-1.0-SNAPSHOT/grails-app/services"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/mail-1.0-SNAPSHOT/grails-app/i18n"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/mail-1.0-SNAPSHOT/grails-app/taglib"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/mail-1.0-SNAPSHOT/grails-app/views"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/mail-1.0-SNAPSHOT/src/groovy"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/greenmail-1.2.2/grails-app/controllers"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/greenmail-1.2.2/grails-app/views"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/greenmail-1.2.2/src/groovy"/>
     </wb-module>
 </project-modules>

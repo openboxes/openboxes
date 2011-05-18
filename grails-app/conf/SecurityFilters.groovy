@@ -5,7 +5,7 @@ class SecurityFilters {
 			before = {	
 				String [] controllersWithAuthUserNotRequired = "api,test".split(",");
 				String [] actionsWithAuthUserNotRequired = "login,handleLogin,signup,handleSignup,json".split(",");
-				String [] actionsWithWarehouseNotRequired = "login,handleLogin,signup,handleSignup,chooseWarehouse,viewLogo,json".split(",");
+				String [] actionsWithWarehouseNotRequired = "login,logout,handleLogin,signup,handleSignup,chooseWarehouse,viewLogo,json".split(",");
 
 				// Not sure when this happens								
 				if (params.controller == null) {

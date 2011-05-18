@@ -42,6 +42,23 @@
 		</ul>	
 	</div>
 	<h6 class="menu-heading" >
+		<g:message code="orders.label"  default="Orders"/>
+	</h6>
+	<div class="menu-section">
+		<ul>
+			<li class="">
+				<span class="menuButton">
+					<g:link class="bullet" controller="order" action="list"><g:message code="order.list.label"  default="List orders "/></g:link>
+				</span>
+			</li>									
+			<li class="">
+				<span class="menuButton">
+					<g:link class="bullet" controller="purchaseOrderWorkflow" action="index"><g:message code="purchaseOrder.create.label" default="Create a purchase order"/></g:link>
+				</span>
+			</li>					
+		</ul>										
+	</div>
+	<h6 class="menu-heading" >
 		<g:message code="shipping.label"  default="Shipping"/>
 	</h6>
 	<div class="menu-section">
@@ -75,41 +92,6 @@
 			</li>		
 		</ul>										
 	</div>
-	<h6 class="menu-heading">
-		<g:message code="location.label"  default="Locations"/>
-	</h6>
-	<div class="menu-section">								
-		<ul>
-			<li class="">
-				<span class="menuButton">
-					<g:link class="bullet" controller="warehouse" action="list"><g:message code="default.show.label" args="['Warehouses']"/></g:link>
-				</span>
-			</li>
-			<li class="">
-				<span class="menuButton">
-					<g:link class="bullet" controller="location" action="list"><g:message code="default.show.label" args="['Locations']"/></g:link>
-				</span>
-			</li>
-			<!-- 
-			<li class="">
-				<span class="menuButton">
-					<g:link class="bullet" controller="shipper" action="list"><g:message code="default.manage.label" args="['Shippers']"/></g:link>
-				</span>
-			</li>
-			<li class="">
-				<span class="menuButton">
-					<g:link class="bullet" controller="warehouse" action="list"><g:message code="default.manage.label" args="['Warehouses']"/></g:link>
-				</span>		
-			</li>														
-
-			<li class="">
-				<span class="menuButton">
-					<g:link class="bullet" controller="donor" action="list"><g:message code="default.manage.label" args="['Donors']"/></g:link>
-				</span>
-			</li>
-			 -->
-		</ul>
-	</div>																	
 	<%-- 
 	<h6 class="menu-heading">
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'chart_bar.png')}" alt="Reports" style="vertical-align: middle"/> &nbsp; 
@@ -124,32 +106,7 @@
 			-->
 		</ul>
 	</div>					
-	--%>
-	<h6 class="menu-heading">
-		<g:message code="users.label"  default="Users"/>
-	</h6>			
-	<div class="menu-section">
-		<ul>			
-			<li class="">
-				<span class="menuButton">
-					<g:link class="bullet" controller="person" action="list"><g:message code="default.manage.label" args="['People']"/></g:link>
-				</span>		
-			</li>		
-			<!--  								
-			<li class="">
-				<span class="menuButton">
-					<g:link class="bullet" controller="role" action="list"><g:message code="default.manage.label" args="['Roles']"/></g:link>
-				</span>		
-			</li>
-			-->										
-			<li class="">
-				<span class="menuButton">
-					<g:link class="bullet" controller="user" action="list"><g:message code="default.manage.label" args="['Users']"/></g:link>
-				</span>	
-			</li>
-		</ul>
-	</div>
-	
+	--%>	
 	<h6 class="menu-heading">
 		<g:message code="administration.label"  default="Admin"/>
 	</h6>			
@@ -162,17 +119,49 @@
 			</li>		
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="category" action="tree"><g:message code="default.show.label" args="['Categories']"/></g:link>
-				</span>
-			</li>
-			<li class="">
-				<span class="menuButton">
 					<g:link class="bullet" controller="attribute" action="list"><g:message code="default.show.label" args="['Attributes']"/></g:link>
 				</span>
 			</li>
 			<li class="">
 				<span class="menuButton">
+					<g:link class="bullet" controller="category" action="tree"><g:message code="default.show.label" args="['Categories']"/></g:link>
+				</span>
+			</li>
+			<li class="">
+				<span class="menuButton">
+					<g:link class="bullet" controller="location" action="list"><g:message code="default.show.label" args="['Locations']"/></g:link>
+				</span>
+			</li>
+			<li class="">
+				<span class="menuButton">
+					<g:link class="bullet" controller="person" action="list"><g:message code="default.manage.label" args="['People']"/></g:link>
+				</span>		
+			</li>		
+			<li class="">
+				<span class="menuButton">
 					<g:link class="bullet" controller="product" action="batchEdit"><g:message code="default.batchEdit.label" args="['Products']" default="Batch Edit Products" /></g:link>
+				</span>
+			</li>
+			<li class="">
+				<span class="menuButton">
+					<g:link class="bullet" controller="shipper" action="list"><g:message code="default.manage.label" args="['Shippers']"/></g:link>
+				</span>
+			</li>
+			<!--  								
+			<li class="">
+				<span class="menuButton">
+					<g:link class="bullet" controller="role" action="list"><g:message code="default.manage.label" args="['Roles']"/></g:link>
+				</span>		
+			</li>
+			-->										
+			<li class="">
+				<span class="menuButton">
+					<g:link class="bullet" controller="user" action="list"><g:message code="default.manage.label" args="['Users']"/></g:link>
+				</span>	
+			</li>
+			<li class="">
+				<span class="menuButton">
+					<g:link class="bullet" controller="warehouse" action="list"><g:message code="default.show.label" args="['Warehouses']"/></g:link>
 				</span>
 			</li>
 		</ul>

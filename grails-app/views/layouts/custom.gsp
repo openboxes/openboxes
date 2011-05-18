@@ -22,11 +22,10 @@
 	<!-- Include javascript files -->
 	<g:javascript library="application"/>
 
-	<g:javascript library="jquery" plugin="jquery" />
-	<%--<jqui:resources theme="smoothness" /> --%> 
-	<link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
-	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-ui-1.8.7.js')}" type="text/javascript" ></script>
-	<%-- <script src="${createLinkTo(dir:'js/jquery-ui-1.9m3/ui/minified', file:'jquery-ui.min.js')}" type="text/javascript" ></script>--%>
+	<!-- Include jQuery UI files -->
+	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-1.5.1.min.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-ui-1.8.13.custom.min.js')}" type="text/javascript" ></script>
+	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui-1.8.13.custom.css')}" type="text/css" media="screen, projection" />
 	
 	<!-- Include other plugins -->
 	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>
@@ -121,8 +120,6 @@
 								    <g:if test="${session.user}">
 										<li>
 											Welcome, <b>${session.user.username}</b>
-											&nbsp;
-											<g:link class="list" controller="auth" action="logout"><g:message code="default.logout.label"  default="Sign Out"/></g:link>
 										</li>
 										<!-- 																	
 										<li>
@@ -140,11 +137,12 @@
 												My Account
 											</g:link>	
 										</li>
-										<li>
-											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
-										</li>												
 																	
 										<g:if test="${session?.warehouse}">
+											<li>
+												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
+											</li>												
+										
 											<li>
 												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'building.png')}" style="vertical-align: middle" />
 												<a class="home" href='${createLink(controller: "dashboard", action:"chooseWarehouse")}'>
@@ -156,8 +154,13 @@
 											<div style="display: inline">
 												<g:render template="../common/searchGlobal"/>
 											</div>
-										
 										</li>
+										<li>
+											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
+										</li>												
+										<li>
+											<g:link class="list" controller="auth" action="logout"><g:message code="default.logout.label"  default="Sign Out"/></g:link>
+										</li>					
 										
 										<!-- 
 										 <li><g:link class="list" controller="user" action="preferences"><g:message code="default.preferences.label"  default="Preferences"/></g:link></li>
@@ -180,7 +183,6 @@
 							</div>					
 					    </div>
 					</div>
-					
 				</div>
 		    </div>		    
 		</div>

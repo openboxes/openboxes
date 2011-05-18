@@ -3243,6 +3243,181 @@
             <column name="fg_color" type="VARCHAR(255)"/>
         </addColumn>
     </changeSet>
+        
+    <changeSet author="jmiranda (generated)" id="1305747921161-1">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="order" /></not>
+		</preConditions>    
+        <createTable tableName="order">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME"/>
+            <column name="date_ordered" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="destination_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME"/>
+            <column name="order_number" type="VARCHAR(255)"/>
+            <column name="ordered_by_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="origin_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1305747921161-2">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="order_comment" /></not>
+		</preConditions>    
+        <createTable tableName="order_comment">
+            <column name="order_comments_id" type="BIGINT"/>
+            <column name="comment_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1305747921161-3">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="order_document" /></not>
+		</preConditions>    
+        <createTable tableName="order_document">
+            <column name="order_documents_id" type="BIGINT"/>
+            <column name="document_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1305747921161-4">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="order_item" /></not>
+		</preConditions>    
+        <createTable tableName="order_item">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_id" type="BIGINT"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="inventory_item_id" type="BIGINT"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="order_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product_id" type="BIGINT"/>
+            <column name="quantity" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="requested_by_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1305747921161-5">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="order_item_comment" /></not>
+		</preConditions>    
+        <createTable tableName="order_item_comment">
+            <column name="order_item_comments_id" type="BIGINT"/>
+            <column name="comment_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1305747921161-9">
+		<preConditions onFail="MARK_RAN"><not><indexExists indexName="FK651874E1E2B3CDC"/></not></preConditions> 
+        <createIndex indexName="FK651874E1E2B3CDC" tableName="order" unique="false">
+            <column name="destination_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1305747921161-10">
+		<preConditions onFail="MARK_RAN"><not><indexExists indexName="FK651874E44979D51"/></not></preConditions> 
+        <createIndex indexName="FK651874E44979D51" tableName="order" unique="false">
+            <column name="recipient_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1305747921161-11">
+		<preConditions onFail="MARK_RAN"><not><indexExists indexName="FK651874E635BDB37"/></not></preConditions> 
+        <createIndex indexName="FK651874E635BDB37" tableName="order" unique="false">
+            <column name="ordered_by_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1305747921161-12">
+		<preConditions onFail="MARK_RAN"><not><indexExists indexName="FK651874EDBDEDAC4"/></not></preConditions> 
+        <createIndex indexName="FK651874EDBDEDAC4" tableName="order" unique="false">
+            <column name="origin_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1305747921161-13">
+		<preConditions onFail="MARK_RAN"><not><indexExists indexName="FK2DE9EE6EB8839C0F"/></not></preConditions> 
+        <createIndex indexName="FK2DE9EE6EB8839C0F" tableName="order_comment" unique="false">
+            <column name="order_comments_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1305747921161-14">
+		<preConditions onFail="MARK_RAN"><not><indexExists indexName="FK2DE9EE6EC4A49BBF"/></not></preConditions> 
+        <createIndex indexName="FK2DE9EE6EC4A49BBF" tableName="order_comment" unique="false">
+            <column name="comment_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1305747921161-15">
+		<preConditions onFail="MARK_RAN"><not><indexExists indexName="FKE698D2ECC800AA15"/></not></preConditions> 
+        <createIndex indexName="FKE698D2ECC800AA15" tableName="order_document" unique="false">
+            <column name="document_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1305747921161-16">
+		<preConditions onFail="MARK_RAN"><not><indexExists indexName="FKE698D2ECFE10118D"/></not></preConditions> 
+        <createIndex indexName="FKE698D2ECFE10118D" tableName="order_document" unique="false">
+            <column name="order_documents_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1305747921161-17">
+		<preConditions onFail="MARK_RAN"><not><indexExists indexName="FK2D110D64911E7578"/></not></preConditions> 
+        <createIndex indexName="FK2D110D64911E7578" tableName="order_item" unique="false">
+            <column name="requested_by_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1305747921161-18">
+		<preConditions onFail="MARK_RAN"><not><indexExists indexName="FK2D110D64AA992CED"/></not></preConditions> 
+        <createIndex indexName="FK2D110D64AA992CED" tableName="order_item" unique="false">
+            <column name="inventory_item_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1305747921161-19">
+		<preConditions onFail="MARK_RAN"><not><indexExists indexName="FK2D110D64D08EDBE6"/></not></preConditions> 
+        <createIndex indexName="FK2D110D64D08EDBE6" tableName="order_item" unique="false">
+            <column name="order_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1305747921161-20">
+		<preConditions onFail="MARK_RAN"><not><indexExists indexName="FK2D110D64DED5FAE7"/></not></preConditions> 
+        <createIndex indexName="FK2D110D64DED5FAE7" tableName="order_item" unique="false">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1305747921161-21">
+		<preConditions onFail="MARK_RAN"><not><indexExists indexName="FK2D110D64EF4C770D"/></not></preConditions> 
+        <createIndex indexName="FK2D110D64EF4C770D" tableName="order_item" unique="false">
+            <column name="category_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1305747921161-22">
+		<preConditions onFail="MARK_RAN"><not><indexExists indexName="FKB5A4FE84C4A49BBF"/></not></preConditions> 
+        <createIndex indexName="FKB5A4FE84C4A49BBF" tableName="order_item_comment" unique="false">
+            <column name="comment_id"/>
+        </createIndex>
+    </changeSet>
+    
 	
 
 </databaseChangeLog>

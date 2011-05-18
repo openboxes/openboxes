@@ -4,6 +4,11 @@
 #doc3 {
 	margin:auto;
 }
+
+.buttons { 
+	text-align: right; 
+}
+
 button { 
 	padding: 1px;
 }
@@ -125,7 +130,7 @@ h3 {
 	/*color: #008000;*//*green */
 } 
 h3.ui-state-active { background-color: #f7f7f7; }  /* #F8F7EF */
-.ui-accordion .ui-accordion-content { padding: 0px; } 
+.ui-accordion .ui-accordion-content { padding: 0; margin: 0; }
 .body { 
 	/*margin-right: 5px;*/
 	/*padding: 0px 0 10px 0;*/
@@ -177,6 +182,14 @@ a:hover {
 
 #logo { 
 	padding: 1px;	
+}
+
+#chooseWarehouse { 
+	width:400px;
+	position: absolute;
+	top: 10%;
+	left: 50%;
+	margin-left: -200px;
 }
 
 #loginForm { 
@@ -427,7 +440,7 @@ hr.space {background:#fff;color:#fff;}
     vertical-align: bottom;		
 	
 	background-color: white;
-	margin: 0px;	
+	margin: 5px;	
 }
 
 .page-title {
@@ -580,6 +593,7 @@ div#dashboard li {
 .prop .value { 
 	text-align:left;
 	/*width: 30%;*/
+	background-color: white;
 	vertical-align: top;
 	line-height: 1.5em;
 }

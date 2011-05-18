@@ -40,13 +40,13 @@
 	</g:each>							
 	<div class="action-menu-item">														
 		<g:link controller="doc4j" action="downloadLetter" id="${shipmentInstance?.id }">													
-			<img src="${createLinkTo(dir:'images/icons/silk',file:'report_word.png')}" 
-				alt="View Packing List" style="vertical-align: middle"/>&nbsp;Download Letter (.docx)
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_word.png')}"
+				alt="View Packing List" style="vertical-align: middle"/>&nbsp;Download Certificate of Donation (.docx)
 		</g:link> 
 	</div>
 	<div class="action-menu-item">														
 		<g:link controller="doc4j" action="downloadPackingList" id="${shipmentInstance?.id }">													
-			<img src="${createLinkTo(dir:'images/icons/silk',file:'report.png')}" 
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}"
 				alt="View Packing List" style="vertical-align: middle"/>&nbsp;Download Packing List (.xls)
 		</g:link> 
 	</div>

@@ -2,7 +2,7 @@ package org.pih.warehouse.product;
 
 import java.util.Date;
 
-class Category implements Comparable {
+class Category implements Comparable, Serializable {
 
 	String name
 	String description
