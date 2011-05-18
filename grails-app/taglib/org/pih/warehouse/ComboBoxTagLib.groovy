@@ -3,7 +3,7 @@ package org.pih.warehouse
 import java.text.SimpleDateFormat;
 import org.pih.warehouse.core.Person;
 
-class JqueryComboBoxTagLib {
+class ComboBoxTagLib {
 		
 	def jqueryComboBox = { attrs, body ->
 		
