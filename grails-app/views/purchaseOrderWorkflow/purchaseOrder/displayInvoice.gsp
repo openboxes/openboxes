@@ -63,26 +63,43 @@
 					<tr class="prop">
 						<td valign='top' class='name'><label for='orderItems'>Items:</label></td>
 						<td valign='top'>
-							<g:if test="${orderInstance?.orderItems }">
+							<g:if test="${order?.orderItems }">
 								<table>
 									<thead>
-										<tr>
+										<tr class="odd">
 											<th>Type</th>
+											<th>Category</th>
 											<th>Product</th>
 											<th>Quantity</th>										
 										</tr>
 									</thead>									
 									<tbody>
-										<g:each in="${orderInstance?.orderItems}">
-											<tr>
+										<g:each var="orderItem" in="${order?.orderItems}" status="i">
+											<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 												<td>
-													${it?.product?.category?.name}
+													<g:if test="${orderItem?.product }">
+														Product
+													</g:if>
+													<g:elseif test="${orderItem?.category }">
+														Category
+													</g:elseif>							
+													<g:else>
+														Unclassified											
+													</g:else>
 												</td>
 												<td>
-													${it?.product?.name}
+													${orderItem?.category?.name}
 												</td>
 												<td>
-													${it?.quantity}
+													<g:if test="${orderItem?.product }">
+														${orderItem?.product?.name}
+													</g:if>
+													<g:else>
+														${orderItem?.description }
+													</g:else>
+												</td>
+												<td>
+													${orderItem?.quantity}
 												</td>
 											</tr>
 										</g:each>

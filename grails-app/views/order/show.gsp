@@ -19,42 +19,88 @@
                     <tbody>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="order.orderNumber.label" default="Order Number" /></td>
+                            <td valign="top" class="name">
+                            	<label for='orderNumber'><g:message code="order.orderNumber.label" default="Order Number" /></label>
+                            </td>
                             
                             <td valign="top" class="value">${fieldValue(bean: orderInstance, field: "orderNumber")}</td>
                             
                         </tr>
 
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="order.description.label" default="Description" /></td>
+                            <td valign="top" class="name">
+                            	<label for='description'><g:message code="order.description.label" default="Description" /></label>
+                            </td>
                             
                             <td valign="top" class="value">${fieldValue(bean: orderInstance, field: "description")}</td>
                             
                         </tr>
+						<tr class='prop'>
+							<td valign='top' class='name'><label for='source'>Order from</label></td>
+							<td valign='top' class='value'>
+								${orderInstance?.origin?.name?.encodeAsHTML()}
+							</td>
+						</tr>
+						<tr class='prop'>
+							<td valign='top' class='name'><label for="destination">Destination</label></td>
+							<td valign='top' class='value'>
+								${orderInstance?.destination?.name?.encodeAsHTML()}
+							</td>
+						</tr>
+						<tr class='prop'>
+							<td valign='top' class='name'><label for='dateOrdered'>Order date</label></td>
+							<td valign='top' class='value'>								
+								${orderInstance?.dateOrdered } 
+							</td>
+						</tr>
+						<tr class='prop'>
+							<td valign='top' class='name'><label for='orderedBy'>Ordered by</label></td>
+							<td valign='top'class='value'>
+								${orderInstance?.orderedBy?.name }
+							</td>
+						</tr>
                         
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="order.items.label" default="Items" /></td>
+                            <td valign="top" class="name"><label><g:message code="order.items.label" default="Items" /></label></td>
                             <td valign="top" class="value">
 								<g:if test="${orderInstance?.orderItems }">
 									<table>
 										<thead>
-											<tr>
+											<tr class="odd">
+												
 												<th>Type</th>
+												<th>Category</th>
 												<th>Product</th>
 												<th>Quantity</th>										
 											</tr>
 										</thead>									
 										<tbody>
-											<g:each in="${orderInstance?.orderItems}">
-												<tr>
+											<g:each var="orderItem" in="${orderInstance?.orderItems}" status="i">
+												<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 													<td>
-														${it?.product?.category?.name}
+														<g:if test="${orderItem?.product }">
+															Product
+														</g:if>
+														<g:elseif test="${orderItem?.category }">
+															Category
+														</g:elseif>							
+														<g:else>
+															Unclassified											
+														</g:else>
 													</td>
 													<td>
-														${it?.product?.name}
+														${orderItem?.category?.name}
 													</td>
 													<td>
-														${it?.quantity}
+														<g:if test="${orderItem?.product }">
+															${orderItem?.product?.name}
+														</g:if>
+														<g:else>
+															${orderItem?.description }
+														</g:else>
+													</td>
+													<td>
+														${orderItem?.quantity}
 													</td>
 												</tr>
 											</g:each>
@@ -68,7 +114,7 @@
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="order.comments.label" default="Comments" /></td>
+                            <td valign="top" class="name"><label for="comments"><g:message code="order.comments.label" default="Comments" /></label></td>
                             <td valign="top" class="value">
 								<g:if test="${orderInstance?.comments }">
 									<table>
@@ -96,8 +142,9 @@
                             
                         </tr>
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="order.documents.label" default="Documents" /></td>
-                            
+                            <td valign="top" class="name">
+                            	<label for="comments"><g:message code="order.documents.label" default="Documents" /></label>
+                            </td>                            
                             <td valign="top" class="value">
 								<g:if test="${orderInstance?.documents }">
 									<table>
@@ -128,14 +175,18 @@
                     	
                         
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="order.dateCreated.label" default="Date Created" /></td>
-                            
+                            <td valign="top" class="name">
+                            	<label for="dateCreated"><g:message code="order.dateCreated.label" default="Date Created" /></label>
+                            </td>
                             <td valign="top" class="value"><g:formatDate date="${orderInstance?.dateCreated}" /></td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="order.lastUpdated.label" default="Last Updated" /></td>
+                            <td valign="top" class="name">
+                            	<label for="lastUpdated"><g:message code="order.lastUpdated.label" default="Last Updated" /></label>
+                            
+                            </td>
                             
                             <td valign="top" class="value"><g:formatDate date="${orderInstance?.lastUpdated}" /></td>
                             
