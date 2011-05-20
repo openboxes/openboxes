@@ -214,7 +214,13 @@ class CreateShipmentWorkflowController {
 				// -1 means we need to assign the id of the new container to add item
 				flash.addItemToContainerId = (params.container?.id) ? params.container.id as Integer : -1
 			}.to("saveContainerAction")
-			
+
+			on("addItemToShipment") {
+				// this parameter triggers the "Add Item" dialog for the container to be opened on page reload
+				// -1 means we need to assign the id of the new container to add item
+				flash.addItemToShipmentId = (params.container?.id) ? params.container.id as Integer : -1
+			}.to("enterContainerDetails")
+						
 			on("addItemToBox") {	
 				// this parameter triggers the "Add Item" dialog for the container to be opened on page reload
 				// -1 means we need to assign the id of the newly created box to to the item 
@@ -354,36 +360,6 @@ class CreateShipmentWorkflowController {
 					item.container = container;
 					item.save();
 				}
-				
-				/*
-				def item
-				
-				// if we have an item id, we are editing an existing item, so we need to fetch it
-				if (params.item?.id) {
-					item = ShipmentItem.get(params.item?.id)
-				}
-				// otherwise, if we have a container id we are adding a new item to this container
-				else {
-					def container = Container.get(params.container?.id)
-					
-					if (!container) {
-						throw new Exception("Invaild container passed to editItem action. Invalid id ${params.container?.id}.")
-					}
-					item = container.addNewItem()
-				}
-				
-				println("the params to bind = " + params)
-				
-				bindData(item, params, ['product.name','recipient.name'])  // blacklisting names so that we don't change product name or recipient name here!
-				
-				// TODO: make sure that this works properly if there are errors?
-				if(item.hasErrors() || !item.validate()) {
-					invalid()
-				}
-				else {
-					shipmentService.saveShipmentItem(item)
-					valid()
-				}*/
 				valid()
 			}
 			
@@ -395,6 +371,8 @@ class CreateShipmentWorkflowController {
 		
     	saveItemAction {
     		action {
+				
+				log.info "save item action: " + params
     			def item
     			
     			// if we have an item id, we are editing an existing item, so we need to fetch it
@@ -405,15 +383,18 @@ class CreateShipmentWorkflowController {
 				else {
 					def container = Container.get(params.container?.id)
 					
-					if (!container) {
-						throw new Exception("Invaild container passed to editItem action. Invalid id ${params.container?.id}.")
-					}
-					item = container.addNewItem()
+					//if (!container) {
+					//	throw new Exception("Invaild container passed to editItem action. Invalid id ${params.container?.id}.")
+					//}
+					//item = container.addNewItem()
+					item = new ShipmentItem(container: container)
+					flow.shipmentInstance.addToShipmentItems(item);
 				}
-    			
+    			flow.itemInstance = item;
     			println("the params to bind = " + params)
     			
     			bindData(item, params, ['product.name','recipient.name'])  // blacklisting names so that we don't change product name or recipient name here!
+				
 				
 				// TODO: make sure that this works properly if there are errors?
 				if(item.hasErrors() || !item.validate()) { 

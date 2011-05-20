@@ -28,9 +28,11 @@
 	</div>
 </g:if>				
 <g:else>
-	<div class="action-menu-item">														
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="Delete item" style="vertical-align: middle"/>&nbsp;
-		<span style="color: black">No Actions</span>
+	<div class="action-menu-item">
+		<g:link action="createShipment" event="addItemToShipment">
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add an item" style="vertical-align: middle"/>&nbsp;
+			Add an item
+		</g:link> 													
 	</div>
 </g:else>							
 		

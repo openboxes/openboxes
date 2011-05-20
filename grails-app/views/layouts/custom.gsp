@@ -23,9 +23,17 @@
 	<g:javascript library="application"/>
 
 	<!-- Include jQuery UI files -->
+	<g:javascript library="jquery" plugin="jquery" />
+	<%--<jqui:resources theme="smoothness" /> --%> 
+	<link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
+	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-ui-1.8.7.js')}" type="text/javascript" ></script>
+	<%-- <script src="${createLinkTo(dir:'js/jquery-ui-1.9m3/ui/minified', file:'jquery-ui.min.js')}" type="text/javascript" ></script>--%>
+
+	<!--		
 	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-1.5.1.min.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-ui-1.8.13.custom.min.js')}" type="text/javascript" ></script>
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui-1.8.13.custom.css')}" type="text/css" media="screen, projection" />
+	-->
 	
 	<!-- Include other plugins -->
 	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>
@@ -367,13 +375,13 @@
 		}).next().hide();
 		*/
 		<g:if test="${request.request.requestURL.toString().contains('category')}">
-			accordion.accordion( "activate" , 5 );
+			accordion.accordion( "activate" , 4 );
 		</g:if>
 		<g:elseif test="${request.request.requestURL.toString().contains('attribute')}">
-			accordion.accordion( "activate" , 5 );
+			accordion.accordion( "activate" , 4 );
 		</g:elseif>
 		<g:elseif test="${request.request.requestURL.toString().contains('product/batchEdit')}">
-			accordion.accordion( "activate" , 5 );
+			accordion.accordion( "activate" , 4 );
 		</g:elseif>
 		<g:elseif test="${request.request.requestURL.toString().contains('person')}">
 			accordion.accordion( "activate" , 4 );
@@ -382,18 +390,24 @@
 			accordion.accordion( "activate" , 4 );
 		</g:elseif>
 		<g:elseif test="${request.request.requestURL.toString().contains('location')}">
-			accordion.accordion( "activate" , 3 );
+			accordion.accordion( "activate" , 4 );
 		</g:elseif>
 		<g:elseif test="${request.request.requestURL.toString().contains('warehouse/warehouse')}">
+			accordion.accordion( "activate" , 4 );
+		</g:elseif>
+		<g:elseif test="${request.request.requestURL.toString().contains('listReceiving')}">
 			accordion.accordion( "activate" , 3 );
 		</g:elseif>
-		<g:elseif test="${request.request.requestURL.toString().contains('receiving')}">
+		<g:elseif test="${request.request.requestURL.toString().contains('shipment')}">
 			accordion.accordion( "activate" , 2 );
 		</g:elseif>
-		<g:elseif test="${request.request.requestURL.toString().contains('shipment')}">
+		<g:elseif test="${request.request.requestURL.toString().contains('createShipmentWorkflow')}">
+			accordion.accordion( "activate" , 2 );
+		</g:elseif>
+		<g:elseif test="${request.request.requestURL.toString().contains('purchaseOrderWorkflow')}">
 			accordion.accordion( "activate" , 1 );
 		</g:elseif>
-		<g:elseif test="${request.request.requestURL.toString().contains('createShipmentWorkflow')}">
+		<g:elseif test="${request.request.requestURL.toString().contains('order')}">
 			accordion.accordion( "activate" , 1 );
 		</g:elseif>
 		<g:elseif test="${request.request.requestURL.toString().contains('inventory')}">

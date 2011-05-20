@@ -72,7 +72,7 @@ input:focus, select:focus, textarea:focus {
 
 .body {
     /*float: left;*/
-    /*margin: 10px 15px 10px 15px;*/
+    margin: 0px 5px 0px 0px;
 }
 
 /* NAVIGATION MENU */
@@ -202,11 +202,13 @@ th.desc a {
     border-collapse: collapse;
 }
 .list th, .list td {
-    border-left: 1px solid #ddd;
+    /*border-left: 1px solid #ddd;*/
 }
 .list th:hover, .list tr:hover {
-    background: #b2d1ff;
+    background: #b2d1ff; 
 }
+
+
 
 /* PAGINATION */
 

@@ -1,12 +1,12 @@
 <div style="float: center; border: 1px solid lightgrey; ">
 	<div style=" padding: 1px;">
-		<table width="100%" style="color: #ccc; display: inline;">
+		<table width="100%" style="color: #ccc; display: inline">
 			<tr>
-				<td style="border-right: 1px solid lightgrey; text-align: right;">
+				<td style="border-right: 1px solid lightgrey; text-align: left;">
 					<span class="fade">Progress</span>
 				</td>
 			
-				<td style="text-align:center;border-right: 1px solid lightgrey;" nowrap class="${currentState=='Details'?'currentState':''}">
+				<td style="text-align:left;border-right: 1px solid lightgrey;" nowrap class="${currentState=='Details'?'currentState':''}">
 					<div class="circle ${currentState=='Details'?'currentState':''}">1</div> 
 					<g:link action="createShipment" event="enterShipmentDetails">Details</g:link>
 				</td>
@@ -15,7 +15,7 @@
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_go.png')}" style="vertical-align: middle;"/>
 				</td>
 --%>
-				<td style="text-align:center; border-right: 1px solid lightgrey;" nowrap class="${currentState=='Tracking'?'currentState':''}">
+				<td style="text-align:left; border-right: 1px solid lightgrey;" nowrap class="${currentState=='Tracking'?'currentState':''}">
 					<div class="circle ${currentState=='Tracking'?'currentState':''}">2</div> 
 					<g:if test="${shipmentInstance.id}">
 						<g:link action="createShipment" event="enterTrackingDetails">Tracking</g:link>
@@ -27,7 +27,7 @@
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_go.png')}" style="vertical-align: middle;"/>
 				</td>
  --%>				
-				<td style="text-align:center; border-right: 1px solid lightgrey;" nowrap class="${currentState=='Pack'?'currentState':''}">
+				<td style="text-align:left; border-right: 1px solid lightgrey;" nowrap class="${currentState=='Pack'?'currentState':''}">
 					<div class="circle ${currentState=='Pack'?'currentState':''}">3</div> 
 					<g:if test="${shipmentInstance.id}">
 						<g:link action="createShipment" event="enterContainerDetails">Packing</g:link>

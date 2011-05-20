@@ -9,32 +9,65 @@ import org.springframework.dao.DataIntegrityViolationException;
 class PurchaseOrderWorkflowController {
 
 	def index = { redirect(action:"purchaseOrder") }
-	def purchaseOrderFlow = {
+	def purchaseOrderFlow = {		
+		
+		start {
+			action {
+				log.info("Starting order workflow " + params)
+				
+				// create a new shipment instance if we don't have one already
+				if (!flow.order) {
+					flow.order = Order.get(params.id as Long)
+				}
+				/*
+				if (params.skipTo) {
+					if (params.skipTo == 'Packing')
+						return enterContainerDetails()
+					else if (params.skipTo == 'Details')
+						return enterShipmentDetails()
+					else if (params.skipTo == 'Tracking')
+						return enterTrackingDetails()
+				}
+				*/
+				return success()
+			}
+			on("success").to("enterOrderDetails")
+
+		}
+		
+		
 		enterOrderDetails {
 			on("submit") {
-				def order = new Order(params)
-				
-				flow.order = order
+				if (!flow.order) {
+					def order = new Order(params)				
+					flow.order = order
+				}
 				
 				def e = yes()
-				if(order.hasErrors() || !order.validate()) return error()
+				if(flow.order.hasErrors() || !flow.order.validate()) return error()
 			}.to("showOrderItems")
-			on("return").to "showCart"
+			//on("return").to "showCart"
 			//on(Exception).to("handleError")
 		}
 		showOrderItems {
 			on("back").to("enterOrderDetails")
+			on("deleteItem") { 
+				log.info params
+				def orderItem = OrderItem.get(params.id)
+				if (orderItem) { 
+					flow.order.removeFromOrderItems(orderItem);
+				}
+			}.to("showOrderItems")
+			
 			on("addItem") {
 				if(!flow.order.orderItems) flow.order.orderItems = [] as HashSet
 				if (params?.product?.id) { 
 					def product = Product.get(params?.product?.id)
 					if (product) { 
-						def orderItem = new OrderItem();
-						orderItem.product = product;
+						def orderItem = new OrderItem(params);
 						orderItem.description = product.name
 						orderItem.category = product.category
 						orderItem.requestedBy = Person.get(session.user.id)
-						orderItem.quantity = 1
 						flow.order.addToOrderItems(orderItem);
 					}
 				}
@@ -42,25 +75,26 @@ class PurchaseOrderWorkflowController {
 					def category = Category.get(params?.category?.id)
 					if (category) { 
 						log.info "params: " + params;
-						def orderItem = new OrderItem();
-						orderItem.description = params.description
+						def orderItem = new OrderItem(params);
 						orderItem.category = category
 						orderItem.requestedBy = Person.get(session.user.id)
-						orderItem.quantity = 1
 						flow.order.addToOrderItems(orderItem);
 					}
 				}
 				else if (params.description) { 
-					def orderItem = new OrderItem();
-					orderItem.description = params.description
+					def orderItem = new OrderItem(params);
 					orderItem.requestedBy = Person.get(session.user.id)
-					orderItem.quantity = 1
 					flow.order.addToOrderItems(orderItem);
 
 				}
 				else { 
 					flash.message "You must specify a product OR category and description";
 				}
+				
+				if(!flow.order.hasErrors() && flow.order.save(flush:true)) {
+				
+				}
+				
 				//flow.order.orderItems = orderItems
 			}.to("showOrderItems")
 				

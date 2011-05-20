@@ -2,7 +2,7 @@ package org.pih.warehouse.order
 
 class OrderController {
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    static allowedMethods = [save: "POST", update: "POST"]
 
     def index = {
         redirect(action: "list", params: params)

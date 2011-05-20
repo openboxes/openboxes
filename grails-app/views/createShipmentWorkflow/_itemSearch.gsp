@@ -1,20 +1,17 @@
 		<div id="itemSearchForm" >
 			<h2><g:message code="inventoryItem.search.label" default="Search inventory by name, description, or lot/serial number:" /></h2>
-			<div style="text-align: center;">
-				<table style="display: inline;">
+			<div style="text-align: left;">
+				<table>
 					<tbody>
 						<tr>
-							<td style="text-align: center">
-								<g:autoSuggestSearchable id="searchable" name="searchable" jsonUrl="/warehouse/json/searchInventoryItems" />
+							<td style="text-align: left">
+								<g:autoSuggestSearchable id="searchable" name="searchable" 
+									jsonUrl="/warehouse/json/searchInventoryItems" />
 								&nbsp;
 							</td>
-						</tr>
-						<tr>
 							<td style="text-align: center">
 								<b>-OR-</b>
 							</td>
-						</tr>
-						<tr>
 							<td style="text-align: center">						
 								<button class="show-item-form">
 								<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" style="vertical-align: middle"/>
@@ -42,7 +39,7 @@
 		</div>							
 		
 		<div id="itemEntryForm" style="display: none">
-		<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.ShipmentItem" form="editItemEntry"/>
+			<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.ShipmentItem" form="editItemEntry"/>
 			<g:form name="editItemEntry" action="createShipment">
 				<h2><g:message code="inventoryItem.enterItem.label" default="Enter item details" /></h2>  
 				<g:if test="${item?.id}">

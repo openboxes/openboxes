@@ -1,11 +1,12 @@
 <script type="text/javascript">
 	$(document).ready(function(){									
-		$("#dlgEditItem").dialog({ autoOpen: true, modal: true, width: '600px', });				
+		$("#dlgEditItem").dialog({ autoOpen: true, modal: true, width: '600px' });				
 	});
 </script>
 
 
 <div id="dlgEditItem" title="Edit an Item" style="padding: 10px; display: none;" >
+
 	<g:if test="${addItemToContainerId}">
 		<%-- 
 		<g:hiddenField name="container.id" value="${addItemToContainerId}"/>
