@@ -149,7 +149,7 @@ class InventoryService {
 					ilike("name", searchTerm)
 				}
 			}				
-			maxResults(10)
+			//maxResults(10)
 			
 		}
 		return items;
@@ -400,7 +400,8 @@ class InventoryService {
 	 */
 	Integer getQuantityForInventoryItem(InventoryItem item, Inventory inventory) {
 		def transactionEntries = getTransactionEntriesByInventoryItemAndInventory(item, inventory)
-		return getQuantityByInventoryItemMap(transactionEntries)[item]
+		def quantity = getQuantityByInventoryItemMap(transactionEntries)[item]
+		return quantity ? quantity : 0;
 	}
 	
 	/**
