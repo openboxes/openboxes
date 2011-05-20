@@ -76,7 +76,6 @@
 											<thead>
 												<tr class="odd">
 													<g:sortableColumn property="type" title="Type" />
-													<g:sortableColumn property="category" title="Category" />
 													<g:sortableColumn property="name" title="Name" />
 													<g:sortableColumn property="quantity" title="Quantity" />
 													<th></th>
@@ -97,9 +96,6 @@
 															</g:else>
 														</td>
 														<td>
-															${orderItem?.category?.name}
-														</td>
-														<td>
 															${orderItem?.description?.encodeAsHTML()}
 														</td>
 														<td>
@@ -116,20 +112,18 @@
 									</g:else>
 	                            </td>
 	                        </tr>
-	
-	
 						</tbody>
 					</table>
+					<div class="buttons">
+						<span class="formButton"> 
+							<g:submitButton name="back" value="Back"></g:submitButton> 
+							<g:submitButton name="processOrder" value="Finish"></g:submitButton>
+						</span>
+					</div>
 				</fieldset>
 			</div>				
 				
 				
-			<div class="buttons">
-				<span class="formButton"> 
-					<g:submitButton name="back" value="Back"></g:submitButton> 
-					<g:submitButton name="processOrder" value="Finish"></g:submitButton>
-				</span>
-			</div>
 		</g:form>
 	</div>
 </body>

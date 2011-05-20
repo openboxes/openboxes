@@ -73,7 +73,6 @@
 											<thead>
 												<tr class="odd">
 													<th>Type</th>
-													<th>Category</th>
 													<th>Product</th>
 													<th>Quantity</th>										
 												</tr>
@@ -91,9 +90,6 @@
 															<g:else>
 																Unclassified											
 															</g:else>
-														</td>
-														<td>
-															${orderItem?.category?.name}
 														</td>
 														<td>
 															<g:if test="${orderItem?.product }">

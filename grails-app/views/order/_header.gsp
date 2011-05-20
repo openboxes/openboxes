@@ -1,4 +1,4 @@
-<div style="padding: 10px;">
+<div style="padding: 10px; border-bottom: 1px solid lightgrey;">
 	<g:if test="${orderInstance?.id}">
 		<table>
 			<tbody>			
@@ -14,14 +14,12 @@
 							</g:if>
 							<b>Order #:</b> ${orderInstance?.orderNumber}  
 							&nbsp;|&nbsp; 
-							<b>Date ordered:</b> ${orderInstance?.dateOrdered}							
+							<b>Date ordered:</b> <g:formatDate date="${orderInstance?.dateOrdered}"/>							
 						</div>
 					</td>										
 					<td style="text-align: right;">
 						<div class="fade" style="font-weight: bold; font-size:1.5em;">
 						</div>
-						
-						
 					</td>
 				</tr>
 			</tbody>

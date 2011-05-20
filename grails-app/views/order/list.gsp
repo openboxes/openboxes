@@ -40,7 +40,17 @@
                     <g:each in="${orderInstanceList}" status="i" var="orderInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                         
-                            <td><g:link action="show" id="${orderInstance.id}">${fieldValue(bean: orderInstance, field: "orderNumber")}</g:link></td>
+                            <td>
+                            	
+                            	<g:link action="show" id="${orderInstance.id}">
+                            		<g:if test="${orderInstance?.orderNumber }">
+	                            		${fieldValue(bean: orderInstance, field: "orderNumber")}
+                            		</g:if>
+                            		<g:else>
+	                            		${fieldValue(bean: orderInstance, field: "id")}
+                            		</g:else>
+                            	</g:link>
+                            </td>
                         
                             <td>${fieldValue(bean: orderInstance, field: "description")}</td>
 

@@ -37,6 +37,13 @@
 					<table>
 						<tbody>
 							<tr class='prop'>
+								<td valign='top' class='name'><label for='description'>Order Number:</label>
+								</td>
+								<td valign='top' class='value ${hasErrors(bean:order,field:'orderNumber','errors')}'>
+									${order?.orderNumber?.encodeAsHTML()}
+								</td>
+							</tr>
+							<tr class='prop'>
 								<td valign='top' class='name'><label for='description'>Description:</label>
 								</td>
 								<td valign='top' class='value ${hasErrors(bean:order,field:'description','errors')}'>
