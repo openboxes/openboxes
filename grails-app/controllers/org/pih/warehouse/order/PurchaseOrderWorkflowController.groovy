@@ -44,7 +44,7 @@ class PurchaseOrderWorkflowController {
 			on("submit") {
 				def e = yes()
 				flow.order.properties = params
-				if(flow.order.hasErrors() || !flow.order.validate()) { 
+				if (!orderService.saveOrder(flow.order)) {
 					return error()
 				}
 			}.to("showOrderItems")
