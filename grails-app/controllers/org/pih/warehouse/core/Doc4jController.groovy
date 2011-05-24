@@ -1,15 +1,19 @@
 package org.pih.warehouse.core
 
+import org.apache.poi.hssf.usermodel.HSSFFont;
+
 import java.io.File;
 import java.io.FileOutputStream;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.docx4j.XmlUtils;
 import org.docx4j.convert.out.pdf.viaXSLFO.Conversion;
@@ -78,15 +82,44 @@ class Doc4jController {
 			sheet.setColumnWidth((short)3, (short) ((50 * 2) / ((double) 1 / 20)))
 			sheet.setColumnWidth((short)4, (short) ((50 * 2) / ((double) 1 / 20)))
 			sheet.setColumnWidth((short)5, (short) ((50 * 5) / ((double) 1 / 20)))
+
+			// Bold font
+			Font boldFont = workbook.createFont();
+			boldFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
 			
-			// Container, Item, Lot, Quantity, Unit, Recipient
+			// Bold cell style
+			CellStyle boldStyle = workbook.createCellStyle();
+			boldStyle.setFont(boldFont);
+
+			// Bold and align center cell style
+			CellStyle boldAndCenterStyle = workbook.createCellStyle();
+			boldAndCenterStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+			boldAndCenterStyle.setFont(boldFont);
+
+			// Align center cell style
+			CellStyle alignCenterCellStyle = workbook.createCellStyle();
+			alignCenterCellStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+			
+			// Wrap text cell style
+			CellStyle wrapTextCellStyle = workbook.createCellStyle();
+			wrapTextCellStyle.setWrapText(true);
+			
+			// Date cell style
+			CellStyle dateStyle = workbook.createCellStyle();
+			dateStyle.setDataFormat(createHelper.createDataFormat().getFormat("m/d/yy"));
+			dateStyle.setAlignment(XSSFCellStyle.ALIGN_LEFT);
+
+			// SHIPMENT NAME
 			int counter = 0;
-			HSSFRow row     = sheet.createRow((short)counter++);
+			HSSFRow row = sheet.createRow((short)counter++);
 			row.createCell(0).setCellValue("Shipment Name");
+			row.getCell(0).setCellStyle(boldStyle);
 			row.createCell(1).setCellValue(shipmentInstance?.name);
-			
+
+			// SHIPMENT TYPE			
 			row = sheet.createRow((short)counter++);
 			row.createCell(0).setCellValue("Shipment Type");
+			row.getCell(0).setCellStyle(boldStyle);
 			row.createCell(1).setCellValue(shipmentInstance?.shipmentType?.name);
 
 			/* 
@@ -105,78 +138,101 @@ class Doc4jController {
 			}
 			*/
 			
-			// ... instead we'll just display all reference numbers
+			// REFERENCE NUMBERS
 			shipmentInstance.referenceNumbers.each {
 				row = sheet.createRow((short)counter++);
 				row.createCell(0).setCellValue(it?.referenceNumberType?.name);
+				row.getCell(0).setCellStyle(boldStyle);
 				row.createCell(1).setCellValue(it?.identifier);
-			}
-			
+			}			
 
+			// EMPTY ROW 
 			row = sheet.createRow((short)counter++);
 
-			row = sheet.createRow((short)counter++);
+			// FROM
+			row = sheet.createRow((short)counter++);			
 			row.createCell(0, Cell.CELL_TYPE_STRING).setCellValue("From");
+			row.getCell(0).setCellStyle(boldStyle);
 			row.createCell(1).setCellValue(shipmentInstance?.origin?.name);
-
 			row = sheet.createRow((short)counter++);
+			
 			row.createCell(0).setCellValue("To");
+			row.getCell(0).setCellStyle(boldStyle);
 			row.createCell(1).setCellValue(shipmentInstance?.destination?.name);
 
+			// EMPTY ROW
 			row = sheet.createRow((short)counter++);
-
-			CellStyle cellStyle = workbook.createCellStyle();
-			cellStyle.setDataFormat(createHelper.createDataFormat().getFormat("m/d/yy"));
-			cellStyle.setAlignment(XSSFCellStyle.ALIGN_RIGHT);
 			
+			// EXPECTED SHIPMENT DATE
 			row = sheet.createRow((short)counter++);
 			row.createCell(0).setCellValue("Expected Shipment Date");
+			row.getCell(0).setCellStyle(boldStyle);
 			Cell expectedShipmentDateCell = row.createCell(1);
 			expectedShipmentDateCell.setCellValue(shipmentInstance?.expectedShippingDate);
-			expectedShipmentDateCell.setCellStyle(cellStyle);
+			expectedShipmentDateCell.setCellStyle(dateStyle);
 			
+			// ACTUAL SHIPMENT DATE
 			row = sheet.createRow((short)counter++);
 			row.createCell(0).setCellValue("Actual Shipment Date");
+			row.getCell(0).setCellStyle(boldStyle);
 			Cell actualShipmentDateCell = row.createCell(1);
 			if (shipmentInstance?.actualShippingDate) { 
 				actualShipmentDateCell.setCellValue(shipmentInstance?.actualShippingDate);
-				actualShipmentDateCell.setCellStyle(cellStyle);
+				actualShipmentDateCell.setCellStyle(dateStyle);
 			}
 			else { 
 				actualShipmentDateCell.setCellValue("Not available");
 			}
+			
+			// EXPECTED ARRIVAL DATE
 			row = sheet.createRow((short)counter++);
 			row.createCell(0).setCellValue("Expected Arrival Date");
+			row.getCell(0).setCellStyle(boldStyle);
 			Cell expectedArrivalDateCell = row.createCell(1);
 			expectedArrivalDateCell.setCellValue(shipmentInstance?.expectedDeliveryDate);
-			expectedArrivalDateCell.setCellStyle(cellStyle);
+			expectedArrivalDateCell.setCellStyle(dateStyle);
 
+			// ACTUAL ARRIVAL DATE
 			row = sheet.createRow((short)counter++);
 			row.createCell(0).setCellValue("Actual Arrival Date");
+			row.getCell(0).setCellStyle(boldStyle);
 			Cell actualArrivalDateCell = row.createCell(1);
 			if (shipmentInstance?.actualDeliveryDate) { 
 				actualArrivalDateCell.setCellValue(shipmentInstance?.actualDeliveryDate);
-				actualArrivalDateCell.setCellStyle(cellStyle);
+				actualArrivalDateCell.setCellStyle(dateStyle);
 			}
 			else { 
 				actualArrivalDateCell.setCellValue("Not available");
 			}
+			
+			// EMPTY ROW
 			row = sheet.createRow((short)counter++);
 
+			// COMMENTS
 			row = sheet.createRow((short)counter++);
 			row.createCell(0).setCellValue("Comments");
-			row.createCell(1).setCellValue("");
+			row.getCell(0).setCellStyle(boldStyle);
+			row.createCell(1).setCellValue(shipmentInstance?.additionalInformation);
+			row.getCell(1).setCellStyle(wrapTextCellStyle);
 
+			// EMPTY ROW
 			row = sheet.createRow((short)counter++);
 
+			// ITEM TABLE HEADER
 			row = sheet.createRow((short)counter++);
 			row.createCell(0).setCellValue("Container");
+			row.getCell(0).setCellStyle(boldStyle);
 			row.createCell(1).setCellValue("Item");
+			row.getCell(1).setCellStyle(boldStyle);
 			row.createCell(2).setCellValue("Lot");
+			row.getCell(2).setCellStyle(boldStyle);
 			row.createCell(3).setCellValue("Quantity");
+			row.getCell(3).setCellStyle(boldAndCenterStyle);
 			row.createCell(4).setCellValue("Unit");
+			row.getCell(4).setCellStyle(boldAndCenterStyle);
 			row.createCell(5).setCellValue("Recipient");
-
+			row.getCell(5).setCellStyle(boldStyle);
+			
 			
 			shipmentInstance.shipmentItems.sort { it?.container?.sortOrder }. each { itemInstance ->	
 				log.debug "Adding item  to packing list " + itemInstance?.product?.name + " -> " + itemInstance?.container?.name			
@@ -185,7 +241,9 @@ class Doc4jController {
 				row.createCell(1).setCellValue(itemInstance?.product?.name);
 				row.createCell(2).setCellValue(itemInstance?.lotNumber);
 				row.createCell(3).setCellValue(itemInstance?.quantity);
+				row.getCell(3).setCellStyle(alignCenterCellStyle)
 				row.createCell(4).setCellValue("item");
+				row.getCell(4).setCellStyle(alignCenterCellStyle)
 				row.createCell(5).setCellValue(itemInstance?.recipient?.name);
 			}
 			
@@ -206,12 +264,5 @@ class Doc4jController {
 			throw e;
 		}
 	}
-	
-	
-
-	
-	
-	
-	   
 	
 }

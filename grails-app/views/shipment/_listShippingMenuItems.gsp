@@ -23,6 +23,18 @@
 			alt="View Packing List" style="vertical-align: middle"/>&nbsp;View Packing List
 	</g:link>		
 </div>
+<div class="action-menu-item">
+	<g:if test="${session?.warehouse?.id == shipmentInstance?.origin?.id ||
+		(!(shipmentInstance?.origin?.isWarehouse()) && session?.warehouse?.id == shipmentInstance?.destination?.id)}">	
+		<div class="action-menu-item">		
+			<g:link controller="shipment" action="deleteShipment" id="${shipmentInstance.id}"><img
+			src="${createLinkTo(dir:'images/icons',file:'trash.png')}"
+			alt="Delete Shipment" style="vertical-align: middle" />&nbsp; 
+				Delete Shipment				
+			</g:link>				
+		</div>
+	</g:if>
+</div>
 <div>
 	<h2>Documents</h2>
 	<g:each in="${shipmentInstance.documents}" var="document" status="j">

@@ -75,9 +75,6 @@
 						</fieldset>
 					</g:form>
 				</td>		
-				<td width="20%">				
-					<g:render template="sidebar" />
-				</td>	
 			</tr>
 		</table>
 	</div>

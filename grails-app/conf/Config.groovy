@@ -135,6 +135,7 @@ log4j = {
 		'com.mchange',
 		'org.springframework',
 		'org.hibernate',
+		'org.docx4j',
 		'org.pih.warehouse',
 		'grails.app',
 		'grails.app.controller',

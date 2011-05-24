@@ -1,5 +1,6 @@
 package org.pih.warehouse.core;
 
+import java.text.DecimalFormat;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -17,8 +18,10 @@ import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.docx4j.openpackaging.parts.relationships.Namespaces;
 import org.docx4j.wml.Body;
+import org.docx4j.wml.BooleanDefaultTrue;
 import org.docx4j.wml.P;
 import org.docx4j.wml.R;
+import org.docx4j.wml.RPr;
 import org.docx4j.wml.Tbl;
 import org.docx4j.wml.Document;
 import org.docx4j.wml.TblGrid;
@@ -29,6 +32,7 @@ import org.docx4j.wml.Tc;
 import org.docx4j.wml.TcPr;
 import org.docx4j.wml.Text;
 import org.docx4j.wml.Tr;
+import org.docx4j.wml.TrPr;
 import org.pih.warehouse.shipping.ReferenceNumber;
 import org.pih.warehouse.shipping.Shipment;
 
@@ -54,13 +58,12 @@ class FileService {
 	
 	File generateLetter(Shipment shipmentInstance) { 
 		
-		File inputFile = findFile("templates/sea-shipment-letter.docx")
-		
-		if (!inputFile) {
-			throw new FileNotFoundException("templates/sea-shipment-letter.docx");
+		File template = findFile("templates/cod-pl-template.docx")
+		if (!template) {
+			throw new FileNotFoundException("templates/cod-pl-template.docx");
 		}
 		
-		WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(inputFile);
+		WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(template);
 
 		// 2. Fetch the document part
 		MainDocumentPart documentPart = wordMLPackage.getMainDocumentPart();
@@ -68,11 +71,11 @@ class FileService {
 		Document wmlDocumentEl = (Document) documentPart.getJaxbElement();
 
 		//xml --> string
-		String xml = XmlUtils.marshaltoString(wmlDocumentEl, true);
-		HashMap<String, String> mappings = new HashMap<String, String>();
+		def xml = XmlUtils.marshaltoString(wmlDocumentEl, true);
+		def mappings = new HashMap<String, String>();
 		
-		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		String date = formatter.format(shipmentInstance.getExpectedDeliveryDate());
+		def formatter = new SimpleDateFormat("MMM dd, yyyy");
+		def date = formatter.format(shipmentInstance.getExpectedDeliveryDate());
 		mappings.put("date", date);		
 		
 		ReferenceNumber containerNumber = shipmentInstance.getReferenceNumber("Container Number");
@@ -83,22 +86,32 @@ class FileService {
 		if (sealNumber) { 
 			mappings.put("sealNumber", sealNumber.identifier);
 		}
-		mappings.put("contents", "");
+		log.info("stated value: " + shipmentInstance?.statedValue)
 		
+		def value = ""
+		if (shipmentInstance?.statedValue) { 		
+			def decimalFormatter = new DecimalFormat("\$###,###.00")
+			value = decimalFormatter.format(shipmentInstance?.statedValue);
+		}
+		mappings.put("value", value)
+		
+		log.info("mappings: " + mappings)
+		log.info("xml before: " + xml)
 		//valorize template
 		Object obj = XmlUtils.unmarshallFromTemplate(xml, mappings);
-
+		log.info("xml after: " + xml)
+		
 		//change  JaxbElement
 		documentPart.setJaxbElement((Document) obj);
 
-		Tbl table = createSampleTable(wordMLPackage, shipmentInstance, 4, 1000);
-			//createPackingListTable(shipmentInstance, 10, 10, 100);
-		//insertTable(wordMLPackage, "Packing List Table goes here", table);
+		// Create a new table for the Packing List
+		Tbl table = createTable(wordMLPackage, shipmentInstance, 3, 1200);
 
+		// Add table to document
 		wordMLPackage.getMainDocumentPart().addObject(table);
-		
-		
-		File tempFile = File.createTempFile("sea-shipment-letter-" + new Date(), ".docx")
+				
+		// Save document to temporary file
+		File tempFile = File.createTempFile(shipmentInstance?.name + " - Certificate of Donation", ".docx")
 		wordMLPackage.save(tempFile)		
 		return tempFile;
 	}
@@ -111,7 +124,7 @@ class FileService {
 	}
 	
 	
-	void insertTable(WordprocessingMLPackage pkg, String afterText, Tbl table) throws Exception {
+	void insertTableAfter(WordprocessingMLPackage pkg, String afterText, Tbl table) throws Exception {
 		Body b = pkg.getMainDocumentPart().getJaxbElement().getBody();
 		int addPoint = -1, count = 0;
 		for (Object o : b.getEGBlockLevelElts()) {
@@ -205,7 +218,7 @@ class FileService {
 	
 	
 	
-	public Tbl createSampleTable(WordprocessingMLPackage wmlPackage, Shipment shipmentInstance, int cols, int cellWidthTwips) {
+	public Tbl createTable(WordprocessingMLPackage wmlPackage, Shipment shipmentInstance, int cols, int cellWidthTwips) {
 		
 		Tbl tbl = Context.getWmlObjectFactory().createTbl();
 		// w:tblPr
@@ -226,7 +239,7 @@ class FileService {
 		tbl.setTblGrid(tblGrid);
 		// Add required <w:gridCol w:w="4788"/>
 		int writableWidthTwips = wmlPackage.getDocumentModel().getSections().get(0).getPageDimensions().getWritableWidthTwips();		
-		cellWidthTwips = writableWidthTwips/4;
+		cellWidthTwips = writableWidthTwips/3;
 		
 		for (int i=1 ; i<=cols; i++) {
 			TblGridCol gridCol = Context.getWmlObjectFactory().createTblGridCol();
@@ -234,6 +247,22 @@ class FileService {
 			tblGrid.getGridCol().add(gridCol);
 		}
 
+		// Create a repeating header
+		Tr trHeader = Context.getWmlObjectFactory().createTr();
+		tbl.getEGContentRowContent().add(trHeader);
+		BooleanDefaultTrue bdt = Context.getWmlObjectFactory().createBooleanDefaultTrue();
+		
+		TrPr trPr = Context.getWmlObjectFactory().createTrPr();
+		trHeader.setTrPr(trPr)
+		
+
+		//TrPr trPr = trHeader.getTrPr();
+		trPr.getCnfStyleOrDivIdOrGridBefore().add(Context.getWmlObjectFactory().createCTTrPrBaseTblHeader(bdt));
+		addTc(wmlPackage, trHeader, "Pallet/Box #", true);
+		addTc(wmlPackage, trHeader, "Item", true);
+		addTc(wmlPackage, trHeader, "Qty", true);
+		
+				
 		def previousContainer = null;		
 		def shipmentItems = shipmentInstance?.shipmentItems?.sort { it?.container?.sortOrder } 
 		// Iterate over shipment items and add them to the table 
@@ -243,29 +272,28 @@ class FileService {
 			Tr tr = Context.getWmlObjectFactory().createTr();
 			tbl.getEGContentRowContent().add(tr);
 			if (itemInstance?.container != previousContainer) { 
-				addTc(wmlPackage, tr, itemInstance?.container?.name);
+				addTc(wmlPackage, tr, itemInstance?.container?.name, false);
 			}
 			else { 
-				addTc(wmlPackage, tr, "");
+				addTc(wmlPackage, tr, "", false);
 			}
-			addTc(wmlPackage, tr, itemInstance?.product?.name);			
-			addTc(wmlPackage, tr, String.valueOf(itemInstance?.quantity));			
-			addTc(wmlPackage, tr, "item");
+			addTc(wmlPackage, tr, itemInstance?.product?.name, false);			
+			addTc(wmlPackage, tr, String.valueOf(itemInstance?.quantity), false);			
 			previousContainer = itemInstance?.container;
 			
 		}
 		return tbl;
 	}
 	
-	protected void addTc(WordprocessingMLPackage wmlPackage, Tr tr, String text) {
+	void addTc(WordprocessingMLPackage wmlPackage, Tr tr, String text, boolean applyBold) {
 		Tc tc = Context.getWmlObjectFactory().createTc();
 		// wmlPackage.getMainDocumentPart().createParagraphOfText(text)		
-		tc.getEGBlockLevelElts().add( createParagraphOfText(text) );
+		tc.getEGBlockLevelElts().add( createParagraphOfText(text, applyBold) );
 		tr.getEGContentCellContent().add( tc );
 	}
 	
-	
-	P createParagraphOfText(String simpleText) { 
+		
+	P createParagraphOfText(String simpleText, boolean applyBold) { 
 		P para = Context.getWmlObjectFactory().createP();
 		// Create the text element
 		Text t = Context.getWmlObjectFactory().createText();
@@ -273,6 +301,14 @@ class FileService {
 		// Create the run
 		R run = Context.getWmlObjectFactory().createR();
 		run.getRunContent().add(t);
+		//run.getRPr().setB(true);
+		// Set bold property 
+		if (applyBold) {
+			RPr rpr = Context.getWmlObjectFactory().createRPr();
+			BooleanDefaultTrue bdt = Context.getWmlObjectFactory().createBooleanDefaultTrue();
+			rpr.setB(bdt)
+			run.setRPr(rpr);
+		}		
 		para.getParagraphContent().add(run);
 		
 		return para;
