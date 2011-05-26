@@ -15,27 +15,27 @@
 		<ul>
 			<li>
 				<span class="menuButton">
-					<g:link class="bullet" controller="inventory" action="browse">Browse Inventory</g:link>
+					<g:link class="bullet" controller="inventory" action="browse">Browse inventory</g:link>
 				</span>
 			</li>
 			<li>
 				<span class="menuButton">
-					<g:link class="bullet" controller="inventory" action="listAllTransactions">List Transactions</g:link> 
+					<g:link class="bullet" controller="inventory" action="listAllTransactions">List transactions</g:link> 
 				</span>
 			</li>
 			<li>
 				<span class="menuButton">
-					<g:link class="bullet" controller="inventory" action="createTransaction">Add Transaction</g:link> 				
+					<g:link class="bullet" controller="inventory" action="createTransaction">Add transaction</g:link> 				
 				</span>			
 			</li>
 			<li>
 				<span class="menuButton">
-					<g:link class="bullet" controller="inventoryItem" action="importInventoryItems">Import Items</g:link> 				
+					<g:link class="bullet" controller="inventoryItem" action="importInventoryItems">Import items</g:link> 				
 				</span>			
 			</li>
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="product" action="create"><g:message code="default.add.label" args="['Product']" default="Add New Product" /></g:link>
+					<g:link class="bullet" controller="product" action="create"><g:message code="default.add.label" args="['product']" default="Add New Product" /></g:link>
 				</span>
 			</li>
 			
@@ -53,7 +53,7 @@
 			</li>									
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="purchaseOrderWorkflow" action="index"><g:message code="purchaseOrder.create.label" default="Create a purchase order"/></g:link>
+					<g:link class="bullet" controller="purchaseOrderWorkflow" action="index"><g:message code="order.create.label" default="Add an order"/></g:link>
 				</span>
 			</li>					
 		</ul>										
@@ -65,12 +65,12 @@
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="shipment" action="listShipping"><g:message code="shipment.listShipping.label"  default="List Shipments "/></g:link>
+					<g:link class="bullet" controller="shipment" action="listShipping"><g:message code="shipment.listShipping.label"  default="List shipments "/></g:link>
 				</span>
 			</li>									
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="createShipmentWorkflow" action="index"><g:message code="suitcase.add.label" default="Add Shipment"/></g:link>
+					<g:link class="bullet" controller="createShipmentWorkflow" action="index"><g:message code="suitcase.add.label" default="Add a shipment"/></g:link>
 				</span>
 			</li>					
 		</ul>										
@@ -82,7 +82,7 @@
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="shipment" action="listReceiving"><g:message code="shipment.listReceiving.label"  default="List Receiving"/></g:link>
+					<g:link class="bullet" controller="shipment" action="listReceiving"><g:message code="shipment.listReceiving.label"  default="List receiving"/></g:link>
 				</span>		
 			</li>										
 			<li>
@@ -114,54 +114,54 @@
 		<ul>			
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="admin" action="checkSettings"><g:message code="default.show.label" args="['Settings']"/></g:link>
+					<g:link class="bullet" controller="admin" action="checkSettings"><g:message code="default.show.label" args="['settings']"/></g:link>
 				</span>		
 			</li>		
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="attribute" action="list"><g:message code="default.show.label" args="['Attributes']"/></g:link>
+					<g:link class="bullet" controller="attribute" action="list"><g:message code="default.show.label" args="['attributes']"/></g:link>
 				</span>
 			</li>
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="category" action="tree"><g:message code="default.show.label" args="['Categories']"/></g:link>
+					<g:link class="bullet" controller="category" action="tree"><g:message code="default.show.label" args="['categories']"/></g:link>
 				</span>
 			</li>
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="location" action="list"><g:message code="default.show.label" args="['Locations']"/></g:link>
+					<g:link class="bullet" controller="location" action="list"><g:message code="default.show.label" args="['locations']"/></g:link>
 				</span>
 			</li>
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="person" action="list"><g:message code="default.manage.label" args="['People']"/></g:link>
+					<g:link class="bullet" controller="person" action="list"><g:message code="default.manage.label" args="['people']"/></g:link>
 				</span>		
 			</li>		
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="product" action="batchEdit"><g:message code="default.batchEdit.label" args="['Products']" default="Batch Edit Products" /></g:link>
+					<g:link class="bullet" controller="product" action="batchEdit"><g:message code="default.batchEdit.label" args="['products']" default="Batch Edit Products" /></g:link>
 				</span>
 			</li>
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="shipper" action="list"><g:message code="default.manage.label" args="['Shippers']"/></g:link>
+					<g:link class="bullet" controller="shipper" action="list"><g:message code="default.manage.label" args="['shippers']"/></g:link>
 				</span>
 			</li>
 			<!--  								
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="role" action="list"><g:message code="default.manage.label" args="['Roles']"/></g:link>
+					<g:link class="bullet" controller="role" action="list"><g:message code="default.manage.label" args="['roles']"/></g:link>
 				</span>		
 			</li>
 			-->										
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="user" action="list"><g:message code="default.manage.label" args="['Users']"/></g:link>
+					<g:link class="bullet" controller="user" action="list"><g:message code="default.manage.label" args="['users']"/></g:link>
 				</span>	
 			</li>
 			<li class="">
 				<span class="menuButton">
-					<g:link class="bullet" controller="warehouse" action="list"><g:message code="default.show.label" args="['Warehouses']"/></g:link>
+					<g:link class="bullet" controller="warehouse" action="list"><g:message code="default.show.label" args="['warehouses']"/></g:link>
 				</span>
 			</li>
 		</ul>

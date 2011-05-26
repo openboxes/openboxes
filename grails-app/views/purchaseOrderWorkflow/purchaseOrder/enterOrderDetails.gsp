@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
-<title>Enter Order Details</title>
+<title>Enter order details</title>
 </head>
 <body>
 	<div class="nav">
@@ -54,7 +54,7 @@
 								<td valign='top' class='name'><label for='source'>Order from:</label>
 								</td>
 								<td valign='top' class='value ${hasErrors(bean:order,field:'origin','errors')}'>
-									<g:jqueryComboBox />
+									
 									<div class="ui-widget"> 
 										<g:select class="combobox" name="origin.id" from="${org.pih.warehouse.core.Location.list().sort()}" optionKey="id" value="${order?.origin?.id}" noSelection="['':'']" />
 									</div>
@@ -64,7 +64,6 @@
 								<td valign='top' class='name'><label for="destination">Destination:</label>
 								</td>
 								<td valign='top' class='value ${hasErrors(bean:order,field:'destination','errors')}'>
-									<g:jqueryComboBox />
 									<div class="ui-widget"> 
 										<g:select class="combobox" name="destination.id" from="${org.pih.warehouse.core.Location.list().sort()}" optionKey="id" value="${order?.destination?.id}" noSelection="['':'']"/>
 									</div>
@@ -105,5 +104,6 @@
 			</div>
 		</g:form>
 	</div>
+	<g:jqueryComboBox />	
 </body>
 </html>

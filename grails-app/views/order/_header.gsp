@@ -19,10 +19,37 @@
 					</td>										
 					<td style="text-align: right;">
 						<div class="fade" style="font-weight: bold; font-size:1.5em;">
+							Pending
 						</div>
 					</td>
 				</tr>
 			</tbody>
 		</table>			
 	</g:if>
+	<g:else>
+		<table>
+			<tbody>			
+				<tr>
+					<td>
+						<div>
+							<span style="font-size: 1.5em; font-weight: bold; line-height: 1em;">
+								<g:if test="${orderInstance?.description}">
+									${orderInstance?.description }
+								</g:if>
+								<g:else>
+									Untitled order
+								</g:else>
+							</span>							
+						</div> 
+					</td>										
+					<td style="text-align: right;">
+						<div class="fade" style="font-weight: bold; font-size:1.5em;">
+							New
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>			
+	
+	</g:else>
 </div>

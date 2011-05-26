@@ -11,16 +11,11 @@ import org.pih.warehouse.core.User;
 
 class Order implements Serializable {
 	
-	String description // a user-defined, searchable name for the order 
-	String orderNumber // an auto-generated shipment number
-
-	
-	Location origin
-	Location destination 
+	String description 		// a user-defined, searchable name for the order 
+	String orderNumber 		// an auto-generated shipment number
+	Location origin			// the vendor
+	Location destination 	// the customer location 
 	Person recipient
-	
-	
-	
 	User orderedBy
 	Date dateOrdered
 	
@@ -29,12 +24,13 @@ class Order implements Serializable {
 	Date dateCreated
 	Date lastUpdated
 
-	static hasMany = [ orderItems : OrderItem, comments : Comment, documents : Document ]
+	static hasMany = [ orderItems : OrderItem, comments : Comment, documents : Document, events : Event ]
 	static mapping = {
 		table "`order`"
 		orderItems cascade: "all-delete-orphan"
 		comments cascade: "all-delete-orphan"
 		documents cascade: "all-delete-orphan"
+		events cascade: "all-delete-orphan"
 	}
 	
 	static constraints = { 

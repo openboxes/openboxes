@@ -5,13 +5,13 @@ import org.pih.warehouse.core.Person;
 
 class ComboBoxTagLib {
 		
-	def jqueryComboBox = { attrs, body ->
+	def comboBox = { attrs, body ->
 		
 		def html = """
 			<style> 
 			.ui-button { margin-left: -1px; }
 			.ui-button-icon-only .ui-button-text { padding: 0em; } 
-			/*.ui-autocomplete-input { margin: 0; padding: 0.48em 0 0.47em 0.45em; }*/
+			.ui-autocomplete { height: 200px; overflow-y: scroll; overflow-x: hidden; }
 			</style> 
 			
 			<script> 
@@ -22,12 +22,14 @@ class ComboBoxTagLib {
 							select = this.element.hide(),
 							selected = select.children( ":selected" ),
 							value = selected.val() ? selected.text() : "";
+						
 						var input = this.input = \$( "<input>" )
 							.insertAfter( select )
 							.val( value )
 							.autocomplete({
 								delay: 0,
 								minLength: 0,
+								scrollHeight: '200px',
 								source: function( request, response ) {
 									var matcher = new RegExp( \$.ui.autocomplete.escapeRegex(request.term), "i" );
 									response( select.children( "option" ).map(function() {
@@ -55,6 +57,7 @@ class ComboBoxTagLib {
 									if ( !ui.item ) {
 										var matcher = new RegExp( "^" + \$.ui\$autocomplete.escapeRegex( \$(this).val() ) + "\$", "i" ),
 											valid = false;
+											
 										select.children( "option" ).each(function() {
 											if ( \$( this ).text().match( matcher ) ) {
 												this.selected = valid = true;
@@ -65,6 +68,7 @@ class ComboBoxTagLib {
 											// remove invalid value, as it didn't match anything
 											\$( this ).val( "" );
 											select.val( "" );
+											
 											input.data( "autocomplete" ).term = "";
 											return false;
 										}

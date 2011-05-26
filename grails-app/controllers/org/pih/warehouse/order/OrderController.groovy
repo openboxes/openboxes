@@ -1,7 +1,12 @@
 package org.pih.warehouse.order
 
-class OrderController {
+import org.pih.warehouse.core.Comment;
+import org.pih.warehouse.core.Document;
+import org.pih.warehouse.core.Location;
+import org.pih.warehouse.shipping.DocumentCommand;
 
+class OrderController {
+	def orderService
     static allowedMethods = [save: "POST", update: "POST"]
 
     def index = {
@@ -9,8 +14,16 @@ class OrderController {
     }
 
     def list = {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [orderInstanceList: Order.list(params), orderInstanceTotal: Order.count()]
+        //params.max = Math.min(params.max ? params.int('max') : 10, 100)
+        //[orderInstanceList: Order.list(params), orderInstanceTotal: Order.count()]
+		
+		def location = Location.get(session.warehouse.id)
+		def incomingOrders = orderService.getIncomingOrders(location)
+		def outgoingOrders = orderService.getOutgoingOrders(location)
+		
+		[incomingOrders : incomingOrders, outgoingOrders : outgoingOrders]
+
+		
     }
 
     def create = {
@@ -55,6 +68,8 @@ class OrderController {
         }
     }
 
+
+	
     def update = {
         def orderInstance = Order.get(params.id)
         if (orderInstance) {
@@ -100,4 +115,152 @@ class OrderController {
             redirect(action: "list")
         }
     }
+	
+	
+
+	
+	def addComment = { 
+        def orderInstance = Order.get(params?.id)
+        if (!orderInstance) {
+            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'order.label', default: 'Order'), params.id])}"
+            redirect(action: "list")
+        }
+        else {
+            return [orderInstance: orderInstance, commentInstance: new Comment()]
+        }
+	}
+	
+	def editComment = {
+		def orderInstance = Order.get(params?.order?.id)
+		if (!orderInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'order.label', default: 'Order'), params.id])}"
+			redirect(action: "list")
+		}
+		else {
+			def commentInstance = Comment.get(params?.id)
+			if (!commentInstance) {
+				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'comment.label', default: 'Comment'), commentInstance.id])}"
+				redirect(action: "show", id: orderInstance?.id)
+			}
+			render(view: "addComment", model: [orderInstance: orderInstance, commentInstance: commentInstance])
+		}
+	}
+	
+	def deleteComment = { 
+		def orderInstance = Order.get(params.order.id)
+		if (!orderInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'order.label', default: 'Order'), params.order.id])}"
+			redirect(action: "list")
+		}
+		else {
+			def commentInstance = Comment.get(params?.id)
+			if (!commentInstance) {
+				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'comment.label', default: 'Comment'), params.id])}"
+				redirect(action: "show", id: orderInstance?.id)
+			}
+			else { 
+				orderInstance.removeFromComments(commentInstance);
+				if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
+					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'order.label', default: 'Order'), orderInstance.id])}"
+					redirect(action: "show", id: orderInstance.id)
+				}
+				else {
+					render(view: "show", model: [orderInstance: orderInstance])
+				}
+			}
+		}		
+	}
+	
+	def saveComment = { 
+		log.info(params)
+		
+		def orderInstance = Order.get(params?.order?.id)
+		if (orderInstance) { 
+			def commentInstance = Comment.get(params?.id)
+			if (commentInstance) { 
+				commentInstance.properties = params
+				if (!commentInstance.hasErrors() && commentInstance.save(flush: true)) {
+					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'comment.label', default: 'Comment'), commentInstance.id])}"
+					redirect(action: "show", id: orderInstance.id)
+				}
+				else {
+					render(view: "addComment", model: [orderInstance: orderInstance, commentInstance: commentInstance])
+				}
+			}
+			else { 
+				commentInstance = new Comment(params)
+				orderInstance.addToComments(commentInstance);
+				if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
+					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'order.label', default: 'Order'), orderInstance.id])}"
+					redirect(action: "show", id: orderInstance.id)
+				}
+				else {
+					render(view: "addComment", model: [orderInstance: orderInstance, commentInstance:commentInstance])
+				}
+			}
+		}	
+		else { 
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'order.label', default: 'Order'), params.id])}"
+			redirect(action: "list")
+		}
+		
+	}
+
+	def addDocument = {
+		def orderInstance = Order.get(params.id)
+		if (!orderInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'order.label', default: 'Order'), params.id])}"
+			redirect(action: "list")
+		}
+		else {
+			return [orderInstance: orderInstance]
+		}
+	}
+	
+	def editDocument = {
+		def orderInstance = Order.get(params?.order?.id)
+		if (!orderInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'order.label', default: 'Order'), params.id])}"
+			redirect(action: "list")
+		}
+		else {
+			def documentInstance = Document.get(params?.id)
+			if (!documentInstance) {
+				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), documentInstance.id])}"
+				redirect(action: "show", id: orderInstance?.id)
+			}
+			render(view: "addDocument", model: [orderInstance: orderInstance, documentInstance: documentInstance])
+		}
+	}
+	
+	def deleteDocument = {
+		def orderInstance = Order.get(params.order.id)
+		if (!orderInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'order.label', default: 'Order'), params.order.id])}"
+			redirect(action: "list")
+		}
+		else {
+			def documentInstance = Document.get(params?.id)
+			if (!documentInstance) {
+				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'comment.label', default: 'Comment'), params.id])}"
+				redirect(action: "show", id: orderInstance?.id)
+			}
+			else {
+				orderInstance.removeFromDocuments(documentInstance);
+				if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
+					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'order.label', default: 'Order'), orderInstance.id])}"
+					redirect(action: "show", id: orderInstance.id)
+				}
+				else {
+					render(view: "show", model: [orderInstance: orderInstance])
+				}
+			}
+		}
+	}
+	
+	
+
+	
+	
+		
 }

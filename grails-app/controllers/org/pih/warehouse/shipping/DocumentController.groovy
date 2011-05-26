@@ -1,6 +1,7 @@
 package org.pih.warehouse.shipping;
 
 import org.pih.warehouse.core.Document;
+import org.pih.warehouse.order.Order;
 import org.pih.warehouse.core.DocumentType;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,6 +12,7 @@ class DocumentCommand {
    String typeId
    String name
    String shipmentId
+   String orderId
    String documentNumber
    MultipartFile fileContents
 }
@@ -35,24 +37,36 @@ class DocumentController {
 	 */
 	def save = { DocumentCommand command ->
 		// fetch the existing document
-		Document document = Document.get(params.documentId)
-		if (!document) {
+		Document documentInstance = Document.get(params.documentId)
+		if (!documentInstance) {
 			// this should never happen, so fail hard
 			throw new RuntimeException("Unable to retrieve document " + params.documentId)
 		}
 		
 		// bind the command object to the document object ignoring the shipmentId and fileContents params (which can't change after creation)
-		bindData(document, command, ['shipmentId','fileContents'])
+		bindData(documentInstance, command, ['shipmentId','orderId','fileContents'])
 		// manually update the document type
-		document.documentType = DocumentType.get(Long.parseLong(command.typeId))
+		documentInstance.documentType = DocumentType.get(Long.parseLong(command.typeId))
 		
-		if (!document.hasErrors()) {
-			flash.message= "Successfully updated document information"	
-			redirect(controller: 'shipment', action: 'showDetails', id: command.shipmentId)
+		if (!documentInstance.hasErrors()) {
+			flash.message = "Successfully updated document information"	
+			if (command.shipmentId) { 
+				redirect(controller: 'shipment', action: 'showDetails', id: command.shipmentId)
+			} 
+			else if (command.orderId) { 				
+				redirect(controller: 'order', action: 'show', id: command.orderId)
+			}
 		}
 		else {
-			redirect(controller: "shipment", action: "addDocument", id: command.shipmentId,
-			  model: [shipmentInstance: Shipment.get(command.shipmentId), document : document])
+			if (command.shipmentId) { 
+				redirect(controller: "shipment", action: "addDocument", id: command.shipmentId,
+				  model: [shipmentInstance: Shipment.get(command.shipmentId), documentInstance : documentInstance])
+			}
+			else if (command.orderId) { 
+				redirect(controller: "order", action: "addDocument", id: command.orderId,
+					model: [orderInstance: Order.get(command.orderId), documentInstance : documentInstance])
+  
+			}
 		}
 	}
 	
@@ -60,15 +74,20 @@ class DocumentController {
 	* Upload a document to the server
 	*/
    def upload = { DocumentCommand command ->
-	   log.info "upload document: " + params	  	   
+	   log.info "Uploading document: " + params	  	   
 	   def file = command.fileContents;	   
 	   def shipmentInstance = Shipment.get(command.shipmentId);	   
+	   def orderInstance = Order.get(command.orderId);	   
 	   log.info "multipart file: " + file.originalFilename + " " + file.contentType + " " + file.size + " " 
 	   
 	   // file must not be empty and must be less than 10MB
 	   // FIXME The size limit needs to go somewhere
-	   if (!file?.empty && file.size < 10*1024*1000) {		   
-		   Document document = new Document( 
+	   if (file?.isEmpty()) {
+		   flash.message = "Document is too large (must be less than 1MB)";
+	   } 
+	   else if (file.size < 10*1024*1000) {		   
+		   log.info "Creating new document ";
+		   Document documentInstance = new Document( 
 			   size: file.size, 
 			   name: command.name,
 			   filename: file.originalFilename,
@@ -77,25 +96,52 @@ class DocumentController {
 			   documentNumber: command.documentNumber,
 			   documentType:  DocumentType.get(Long.parseLong(command.typeId)));
 		   
-		   if (!document.hasErrors()) {			   
-			   shipmentInstance.addToDocuments(document).save(flush:true)
-			   log.info "saved document to shipment"
-			   flash.message= "Successfully saved file to Shipment"			   
+		   // Check to see if there are any errors
+		   if (documentInstance.validate() && !documentInstance.hasErrors()) {			   
+			   log.info "Saving document " + documentInstance;
+			   if (shipmentInstance) { 
+				   shipmentInstance.addToDocuments(documentInstance).save(flush:true)
+				   flash.message= "Successfully saved file to Shipment #" + shipmentInstance?.shipmentNumber			   
+			   }
+			   else if (orderInstance) { 
+				   orderInstance.addToDocuments(documentInstance).save(flush:true)
+				   flash.message= "Successfully saved file to Order #" + orderInstance?.orderNumber
+			   }
 		   }
+		   // If there are errors, we need to redisplay the document form
 		   else {
-			   log.info "Document did not save " + document.errors;
-			   flash.message = "Cannot save document " + document.errors;
-			   redirect(controller: "shipment", action: "addDocument", id: shipmentInstance.id,
-				   model: [shipmentInstance: shipmentInstance, document : document])
+			   log.info "Document did not save " + documentInstance.errors;
+			   flash.message = "Cannot save document " + documentInstance.errors;
+			   if (shipmentInstance) { 
+				   redirect(controller: "shipment", action: "addDocument", id: shipmentInstance.id,
+					   model: [shipmentInstance: shipmentInstance, documentInstance : documentInstance])
+			   } else if (orderInstance) { 
+				   redirect(controller: "order", action: "addDocument", id: orderInstance.id,
+					   model: [orderInstance: orderInstance, documentInstance : documentInstance])
+			   }
 		   }
 	   }
 	   else {
-		   log.info "Document is empty or too large"		   
-		   flash.message = "File is too large (must be less than 1MB)";
-		   redirect(controller: 'shipment', action: 'showDetails', id: command.shipmentId)
+		   log.info "Document is too large"		   
+		   flash.message = "Document is too large (must be less than 1MB)";
+		   if (shipmentInstance) { 
+			   redirect(controller: 'shipment', action: 'showDetails', id: command.shipmentId)
+		   }
+		   else if (orderInstance) { 
+			   redirect(controller: 'order', action: 'show', id: command.orderId)
+		   }
 	   }
-	   log.info "something happened, just not sure what"
-	   redirect(controller: 'shipment', action: 'showDetails', id: command.shipmentId)
+	   
+	   log.info ("Redirecting to appropriate show details page")
+	   if (shipmentInstance) {
+		   redirect(controller: 'shipment', action: 'showDetails', id: command.shipmentId)
+		   return;
+	   }
+	   else if (orderInstance) {
+		   redirect(controller: 'order', action: 'show', id: command.orderId)
+		   return;
+	   }
+
    }
 		
 	

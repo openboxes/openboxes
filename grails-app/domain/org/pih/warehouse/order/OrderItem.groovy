@@ -22,6 +22,8 @@ class OrderItem implements Serializable {
 	Date dateCreated
 	Date lastUpdated
 
+	static transients = [ "orderItemType" ]
+	
 	static belongsTo = [ order : Order ]
 	
 	static hasMany = [ comments : Comment ]
@@ -34,4 +36,9 @@ class OrderItem implements Serializable {
 		requestedBy(nullable:true)
 		quantity(nullable:false)
 	}
+
+	String getOrderItemType() { 
+		return (product)?"product":(category)?"category":"unclassified"
+	}	
+	
 }

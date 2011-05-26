@@ -2,8 +2,10 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
-	<g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
+	<g:set var="entityName" value="${message(code: 'order.label', default: 'Order')}" />
 	<title><g:message code="default.edit.label" args="[entityName]" /></title>
+</head>
+
 <body>
 
 	<div class="body">
@@ -12,28 +14,35 @@
 				${flash.message}
 			</div>
 		</g:if>
-		<g:hasErrors bean="${shipmentInstance}">
+		<g:hasErrors bean="${orderInstance}">
 			<div class="errors">
-				<g:renderErrors bean="${shipmentInstance}" as="list" />
+				<g:renderErrors bean="${orderInstance}" as="list" />
 			</div>
 		</g:hasErrors>
 			
 
 		<fieldset>
-			<g:render template="summary" />
+			<g:render template="header" />
 			<div>
 				<!-- process an upload or save depending on whether we are adding a new doc or modifying a previous one -->					
 				<g:uploadForm controller="document" action="${documentInstance?.id ? 'save' : 'upload'}">
-					<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
-					<g:hiddenField name="documentId" value="${documentInstance?.id}" />
+					<g:hiddenField name="orderId" value="${orderInstance?.id}" />
+					<g:hiddenField name="documentId" value="${documentInstance?.id}" />					
 					<table>
 						<tbody>
 							<tr class="prop">
 								<td valign="top" class="name"><label><g:message
-									code="document.documentType.label" default="Document Type" /></label></td>
+									code="document.file.label" default="Select a file" /></label>
+								</td>
 								<td valign="top"
-									class="value ${hasErrors(bean: documentInstance, field: 'documentType', 'errors')}">
-												<g:select name="typeId" from="${org.pih.warehouse.core.DocumentType.list()}" value="${documentInstance?.documentType?.id}" optionKey="id" optionValue="name"/>
+									class="value ${hasErrors(bean: documentInstance, field: 'fileContents', 'errors')}">
+									<!-- determine if this is an add or an edit -- at this point you can only edit document details, not modify the file itself -->
+									<g:if test="${!documentInstance?.id}">
+										<input name="fileContents" type="file" />
+									</g:if>
+									<g:else>
+										${documentInstance?.filename}
+									</g:else>
 								</td>
 							</tr>
 							<tr class="prop">
@@ -46,27 +55,20 @@
 								</td>
 							</tr>
 							<tr class="prop">
+								<td valign="top" class="name"><label><g:message
+									code="document.documentType.label" default="Document Type" /></label></td>
+								<td valign="top"
+									class="value ${hasErrors(bean: documentInstance, field: 'documentType', 'errors')}">
+												<g:select name="typeId" from="${org.pih.warehouse.core.DocumentType.list()}" value="${documentInstance?.documentType?.id}" optionKey="id" optionValue="name"/>
+								</td>
+							</tr>
+							<tr class="prop">
 								<td valign="top" class="name"><label class="optional"><g:message
 									code="document.number.label" default="Document Number" /></label>
 								</td>
 								<td valign="top"
 									class="value ${hasErrors(bean: documentInstance, field: 'documentNumber', 'errors')}">
 									<g:textField name="documentNumber" value="${documentInstance?.documentNumber}" />
-								</td>
-							</tr>
-							<tr class="prop">
-								<td valign="top" class="name"><label><g:message
-									code="document.file.label" default="Select a file" /></label>
-								</td>
-								<td valign="top"
-									class="value ${hasErrors(bean: documentInstance, field: 'fileContents', 'errors')}">
-									<!-- determine if this is an add or an edit -- at this point you can only edit document details, not modify the file itself -->
-									<g:if test="${!documentInstance.id}">
-										<input name="fileContents" type="file" />
-									</g:if>
-									<g:else>
-										${documentInstance.filename}
-									</g:else>
 								</td>
 							</tr>
 							<tr class="prop">

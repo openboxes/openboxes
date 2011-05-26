@@ -119,15 +119,37 @@
 									<g:if test="${orderInstance?.comments }">
 										<table>
 											<thead>
-												<tr>
+												<tr class="odd">
+													<th>To</th>
+													<th>From</th>
 													<th>Comment</th>
+													<th>Date</th>
+													<th>Actions</th>
 												</tr>
 											</thead>									
 											<tbody>
-												<g:each in="${orderInstance?.comments}">
+												<g:each var="commentInstance" in="${orderInstance?.comments}">
 													<tr>
+														<td>	
+															${commentInstance?.recipient?.name}
+														</td>
+														<td>	
+															${commentInstance?.sender?.name}
+														</td>
 														<td>
-															${it?.comment}
+															${commentInstance?.comment}
+														</td>
+														<td>	
+															${commentInstance?.lastUpdated}
+														</td>
+														<td>
+															<g:link action="editComment" id="${commentInstance.id}" params="['order.id':orderInstance?.id]">
+																<img src="${createLinkTo(dir:'images/icons/silk',file:'comment_edit.png')}" alt="Edit" />
+															</g:link>
+														
+															<g:link action="deleteComment" id="${commentInstance.id}" params="['order.id':orderInstance?.id]" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+																<img src="${createLinkTo(dir:'images/icons/silk',file:'bin.png')}" alt="Delete" />
+															</g:link>
 														</td>
 													</tr>
 												</g:each>
@@ -150,14 +172,36 @@
 										<table>
 											<thead>
 												<tr>
-													<th>Document</th>
+													<th>Filename</th>
+													<th>Type</th>
+													<th>Description</th>
+													<th>Last Updated</th>
+													<th>Actions</th>
 												</tr>
 											</thead>									
 											<tbody>
-												<g:each in="${orderInstance?.documents}">
+												<g:each var="documentInstance" in="${orderInstance?.documents}">
 													<tr>
 														<td>
-															${it?.name}
+															${documentInstance?.filename}
+														</td>
+														<td>
+															${documentInstance?.documentType?.name}
+														</td>
+														<td>
+															${documentInstance?.name}
+														</td>
+														<td>
+															${documentInstance?.lastUpdated}
+														</td>
+														<td>
+															<g:link action="editDocument" id="${documentInstance.id}" params="['order.id':orderInstance?.id]">
+																<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit" />
+															</g:link>
+														
+															<g:link action="deleteDocument" id="${documentInstance.id}" params="['order.id':orderInstance?.id]" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+																<img src="${createLinkTo(dir:'images/icons/silk',file:'bin.png')}" alt="Delete" />
+															</g:link>
 														</td>
 													</tr>
 												</g:each>

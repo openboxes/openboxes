@@ -15,59 +15,22 @@
             	<div class="message">${flash.message}</div>
             </g:if>
             <div class="list">
-            
-				<div>            	
-	            	<span class="menuButton">
-	            		<g:link class="new" action="create"><g:message code="default.add.label" args="['order']"/></g:link>
-	            	</span>
-            	</div>
-                <table>
-                    <thead>
-                        <tr>
-                        
-                            <g:sortableColumn property="orderNumber" title="${message(code: 'order.orderNumber.label', default: 'Order Number')}" />
 
-                            <g:sortableColumn property="description" title="${message(code: 'order.description.label', default: 'Description')}" />
-                        
-                            <g:sortableColumn property="dateCreated" title="${message(code: 'order.dateCreated.label', default: 'Date Created')}" />
-                        
-                            <g:sortableColumn property="lastUpdated" title="${message(code: 'order.lastUpdated.label', default: 'Last Updated')}" />
-                        
-                        
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <g:each in="${orderInstanceList}" status="i" var="orderInstance">
-                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                        
-                            <td>
-                            	
-                            	<g:link action="show" id="${orderInstance.id}">
-                            		<g:if test="${orderInstance?.orderNumber }">
-	                            		${fieldValue(bean: orderInstance, field: "orderNumber")}
-                            		</g:if>
-                            		<g:else>
-	                            		${fieldValue(bean: orderInstance, field: "id")}
-                            		</g:else>
-                            	</g:link>
-                            </td>
-                        
-                            <td>${fieldValue(bean: orderInstance, field: "description")}</td>
-
-                            <td><g:formatDate date="${orderInstance.dateCreated}" /></td>
-                        
-                            <td><g:formatDate date="${orderInstance.lastUpdated}" /></td>
-                        
-                        
-                        
-                        </tr>
-                    </g:each>
-                    </tbody>
-                </table>
-            </div>
-            <div class="paginateButtons">
-                <g:paginate total="${orderInstanceTotal}" />
-            </div>
+				
+				<div id="outgoingOrders" class="list">            
+	           		<h3>Orders placed <b>with</b> ${session.warehouse?.name }</h3>
+					<g:render template="list" model="[orderInstanceList:outgoingOrders,orderType:'outgoing']"/>
+				</div>
+				
+				<br/>
+				
+				
+				<div id="incomingOrders" class="list">            
+	            	<h3>Orders placed <b>by</b> ${session.warehouse?.name }</h3>
+					<g:render template="list" model="[orderInstanceList:incomingOrders,orderType:'incoming']"/>
+				</div>
+				
+			</div>
         </div>
     </body>
 </html>

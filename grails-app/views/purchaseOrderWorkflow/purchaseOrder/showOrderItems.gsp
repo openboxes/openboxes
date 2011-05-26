@@ -2,7 +2,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
-<title>Add Order Items</title>
+<title>Add order items</title>
 </head>
 <body>
 	<div class="body">
@@ -33,8 +33,8 @@
 								<table>
 									<thead>
 										<tr class="odd">
-											<g:sortableColumn property="type" title="Type" />
 											<g:sortableColumn property="name" title="Name" />
+											<g:sortableColumn property="type" title="Type" />
 											<g:sortableColumn property="quantity" title="Quantity" />
 											<th></th>
 										</tr>
@@ -44,18 +44,10 @@
 											<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 												<g:hiddenField name="orderItems[${i }].order.id" value="${orderItem?.order?.id }" size="5"/>
 												<td>
-													<g:if test="${orderItem?.product }">
-														Product
-													</g:if>
-													<g:elseif test="${orderItem?.category }">
-														Category
-													</g:elseif>							
-													<g:else>
-														Unclassified											
-													</g:else>
+													${orderItem?.description?.encodeAsHTML()}
 												</td>
 												<td>
-													${orderItem?.description?.encodeAsHTML()}
+													${orderItem?.orderItemType }
 												</td>
 												<td>
 													<g:textField name="orderItems[${i }].quantity" value="${orderItem?.quantity }" size="5"></g:textField>
@@ -79,8 +71,6 @@
 							</g:form>
 						</td>
 						<td style="border-left: 1px solid lightgrey; height: 100%; width: 25%;">
-								
-								
 							<div style="margin: 10px">
 								<p>Add an item</p>
 							</div>				
@@ -98,25 +88,30 @@
 												<td valign='top' class='name'><label for='product.id'>Product:</label></td>
 												<td valign='top' class='value' nowrap="nowrap">
 													<div class="ui-widget">
-														<g:select class="combobox" name="product.id" from="${org.pih.warehouse.product.Product.list().sort{it.name}}" optionKey="id" value="${orderItem?.product?.id }" noSelection="['':'']" />
+														<g:select class="combobox" name="product.id" from="${org.pih.warehouse.product.Product.list().sort{it.name}}" optionKey="id" value="" noSelection="['':'']" />
 													</div>
 												</td>
+											</tr>
+											<tr class="prop">
+												<td colspan="2" class="center">-OR-</td>
 											</tr>
 											<tr class='prop'>
 												<td valign='top' class='name'><label for='source'>Category:</label>
 												</td>
-												<td valign='top' class='value'>
-													<g:jqueryComboBox />
+												<td valign='top' class='value'>													
 													<div class="ui-widget"> 
-														<g:select class="combobox" name="category.id" from="${org.pih.warehouse.product.Category.list().sort()}" optionKey="id" value="${orderItem?.category?.id }" noSelection="['':'']" />
+														<g:select class="combobox" name="category.id" from="${org.pih.warehouse.product.Category.list().sort()}" optionKey="id" value="" noSelection="['':'']" />
 													</div>
 												</td>
+											</tr>
+											<tr class="prop">
+												<td colspan="2" class="center">-OR-</td>
 											</tr>
 											<tr class='prop'>
 												<td valign='top' class='name'><label for='description'>Description:</label>
 												</td>
 												<td valign='top' class='value'>
-													<input type="text" name='description' value="${orderItem?.description }" size="30" />
+													<input type="text" name='description' value="" size="30" />
 												</td>
 											</tr>
 											<tr class='prop'>
@@ -151,7 +146,7 @@
 		</div>
 
 	</div>
-	
+	<g:comboBox />
      
 </body>
 </html>

@@ -26,17 +26,22 @@ class PurchaseOrderWorkflowController {
 					order.orderNumber = new Random().nextInt(9999999)
 					flow.order = order;
 				}
-				/*
+				
+				
 				if (params.skipTo) {
-					if (params.skipTo == 'Packing') return enterContainerDetails()
-					else if (params.skipTo == 'Details') return enterShipmentDetails()
-					else if (params.skipTo == 'Tracking') return enterTrackingDetails()
+					if (params.skipTo == 'details') return success()
+					else if (params.skipTo == 'items') return showOrderItems()
+					else if (params.skipTo == 'confirm') return confirmOrder()
+					
 				}
-				*/
+				
 				return success()
 			}
 			on("success").to("enterOrderDetails")
-
+			on("showOrderItems").to("showOrderItems")
+			on("confirmOrder").to("confirmOrder")
+			
+			
 		}
 		
 		
@@ -73,8 +78,15 @@ class PurchaseOrderWorkflowController {
 				if(!flow.order.orderItems) flow.order.orderItems = [] as HashSet
 				
 				def orderItem = new OrderItem(params);
+				orderItem.requestedBy = Person.get(session.user.id)
 				
-				if (params?.product?.id) { 
+				if (params?.product?.id && params?.category?.id) { 
+					log.info("error with product and category")
+					orderItem.errors.rejectValue("product.id", "Please choose a product OR a category OR enter a description")
+					flow.orderItem = orderItem
+					return error()
+				}				
+				else if (params?.product?.id) { 
 					def product = Product.get(params?.product?.id)
 					if (product) { 
 						orderItem.description = product.name
@@ -85,13 +97,12 @@ class PurchaseOrderWorkflowController {
 					def category = Category.get(params?.category?.id) 
 					if (category) {
 						orderItem.description = category.name
-						orderItem.category = category
+						//orderItem.category = category
 					}
-	
-					
 				}
-				orderItem.requestedBy = Person.get(session.user.id)	
-				if (!orderItem.validate()) { 
+				
+				if (!orderItem.validate() || orderItem.hasErrors()) { 
+					
 					flow.orderItem = orderItem
 					return error();
 				}
