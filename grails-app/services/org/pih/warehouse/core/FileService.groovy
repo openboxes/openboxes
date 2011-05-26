@@ -77,16 +77,26 @@ class FileService {
 		def formatter = new SimpleDateFormat("MMM dd, yyyy");
 		def date = formatter.format(shipmentInstance.getExpectedDeliveryDate());
 		mappings.put("date", date);		
-		
-		ReferenceNumber containerNumber = shipmentInstance.getReferenceNumber("Container Number");
-		if (containerNumber) { 
-			mappings.put("containerNumber", containerNumber.identifier);
+
+		String subtitle = "";				
+		if ("Sea".equals(shipmentInstance?.shipmentType?.name)) { 
+			ReferenceNumber containerNumber = shipmentInstance.getReferenceNumber("Container Number");
+			if (containerNumber) {
+				//mappings.put("containerNumber", containerNumber.identifier);
+				subtitle = "Container #${containerNumber.identifier} ";
+			}
+			ReferenceNumber sealNumber = shipmentInstance.getReferenceNumber("Seal Number");
+			if (sealNumber) {
+				//mappings.put("sealNumber", sealNumber.identifier);
+				subtitle += "Seal #${sealNumber.identifier}"
+			}
+			log.info("sea shipment " + subtitle)
 		}
-		ReferenceNumber sealNumber = shipmentInstance.getReferenceNumber("Seal Number");
-		if (sealNumber) { 
-			mappings.put("sealNumber", sealNumber.identifier);
+		else if ("Air".equals(shipmentInstance?.shipmentType?.name)) { 
+			subtitle = "Freight Forwarder ${shipmentInstance?.shipmentMethod?.shipper?.name}"
+			log.info("air shipment " + subtitle)
 		}
-		log.info("stated value: " + shipmentInstance?.statedValue)
+		mappings.put("subtitle", subtitle)
 		
 		def value = ""
 		if (shipmentInstance?.statedValue) { 		
@@ -100,6 +110,7 @@ class FileService {
 		//valorize template
 		Object obj = XmlUtils.unmarshallFromTemplate(xml, mappings);
 		log.info("xml after: " + xml)
+		log.info("mappings: " + mappings)
 		
 		//change  JaxbElement
 		documentPart.setJaxbElement((Document) obj);

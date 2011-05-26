@@ -129,13 +129,13 @@ log4j = {
 		'org.codehaus.groovy.grails.commons', 			// core / classloading
 		'org.codehaus.groovy.grails.plugins',			// plugins
 		'org.codehaus.groovy.grails.orm.hibernate', 		// hibernate integration
+		'org.docx4j',
 		'net.sf.ehcache.hibernate'		
 	
 	info	'org.liquibase', 	
 		'com.mchange',
 		'org.springframework',
 		'org.hibernate',
-		'org.docx4j',
 		'org.pih.warehouse',
 		'grails.app',
 		'grails.app.controller',
