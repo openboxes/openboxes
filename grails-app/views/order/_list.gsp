@@ -20,6 +20,9 @@
 			</g:if>
 			<g:sortableColumn property="lastUpdated"
 				title="${message(code: 'order.lastUpdated.label', default: 'Last Updated')}" />
+				
+			<g:sortableColumn property="status"
+				title="${message(code: 'order.status.label', default: 'Status')}" />
 		</tr>
 	</thead>
 	<tbody>
@@ -50,9 +53,9 @@
 					</td>
 				</g:if>
 
-				<td><g:formatDate date="${orderInstance.lastUpdated}" />
-				</td>
+				<td><g:formatDate date="${orderInstance.lastUpdated}" /></td>
 
+				<td>Pending</td>
 
 
 			</tr>

@@ -3,7 +3,10 @@ package org.pih.warehouse.order
 import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Document;
 import org.pih.warehouse.core.Location;
+import org.pih.warehouse.core.Person;
 import org.pih.warehouse.shipping.DocumentCommand;
+import org.pih.warehouse.shipping.Shipment;
+import org.pih.warehouse.shipping.ShipmentItem;
 
 class OrderController {
 	def orderService
@@ -97,6 +100,9 @@ class OrderController {
         }
     }
 
+
+	
+	
     def delete = {
         def orderInstance = Order.get(params.id)
         if (orderInstance) {
@@ -258,7 +264,90 @@ class OrderController {
 		}
 	}
 	
+	def receive = {
+		log.info "Receive an order as a shipment"
+		def orderInstance = Order.get(params.id)
+		if (!orderInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'order.label', default: 'Order'), params.id])}"
+			redirect(action: "list")
+		}
+		else {
+			OrderCommand orderCommand = new OrderCommand();
+			orderCommand.recipient = Person.get(session.user.id)
+			orderCommand.order = orderInstance;
+			orderCommand.deliveredOn = new Date();
+			orderCommand.shipment = new Shipment();
+			orderInstance?.orderItems?.each { 
+				def orderItemCommand = new OrderItemCommand();
+				orderItemCommand.orderItem = it
+				orderItemCommand.type = it.orderItemType
+				orderItemCommand.description = it.description
+				orderItemCommand.productReceived = it.product
+				orderItemCommand.quantityOrdered = it.quantity;
+				orderItemCommand.quantityReceived = it.quantity
+				orderCommand?.orderItems << orderItemCommand 
+			}
+			return [orderCommand: orderCommand]
+		}
+	}
 	
+	def saveOrderShipment = { OrderCommand orderCommand ->
+		
+		log.info params
+		log.info orderCommand
+		def orderInstance = Order.get(params.id)
+		orderCommand.order = orderInstance 
+		orderCommand?.orderItems.each { 
+			println it.description + " " + it.lotNumber	
+		}
+		
+		render(view: "receive", model: [orderCommand: orderCommand])
+	}
+	
+
+	def fulfill = {
+		def orderInstance = Order.get(params.id)
+		if (!orderInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'order.label', default: 'Order'), params.id])}"
+			redirect(action: "list")
+		}
+		else {
+			return [orderInstance: orderInstance]
+		}
+	}
+
+	def addOrderItemToShipment = { 
+		
+		def orderInstance = Order.get(params?.id)
+		def orderItem = OrderItem.get(params?.orderItem?.id)
+		def shipmentInstance = Shipment.get(params?.shipment?.id)
+		
+		if (orderItem) { 
+			def shipmentItem = new ShipmentItem(orderItem.properties)
+			shipmentInstance.addToShipmentItems(shipmentItem);
+			if (!shipmentInstance.hasErrors() && shipmentInstance?.save(flush:true)) { 
+				
+				def orderShipment = OrderShipment.link(orderItem, shipmentItem);
+				/*
+				if (!orderShipment.hasErrors() && orderShipment.save(flush:true)) { 
+					flash.message = "success"
+				}
+				else { 
+					flash.message = "order shipment error(s)"
+					render(view: "fulfill", model: [orderShipment: orderShipment, orderItemInstance: orderItem, shipmentInstance: shipmentInstance])
+					return;
+				}*/
+			}
+			else { 
+				flash.message = "shipment item error(s)"
+				render(view: "fulfill", model: [orderItemInstance: orderItem, shipmentInstance: shipmentInstance])
+				return;
+			}
+		}
+		
+		redirect(action: "fulfill", id: orderInstance?.id)
+		
+	}
 
 	
 	

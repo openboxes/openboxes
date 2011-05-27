@@ -1,12 +1,12 @@
 package org.pih.warehouse.order
 
 import java.util.Date;
-
 import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
+import org.pih.warehouse.shipping.ShipmentItem;
 
 class OrderItem implements Serializable {
 	
@@ -37,8 +37,25 @@ class OrderItem implements Serializable {
 		quantity(nullable:false)
 	}
 
+	
 	String getOrderItemType() { 
 		return (product)?"product":(category)?"category":"unclassified"
-	}	
+	}
+
+	/*
+	def shipmentItems() {
+		return orderShipments.collect{ it.shipmentItem }
+	}
+		
+	List addToShipmentItems(ShipmentItem shipmentItem) {
+		OrderShipment.link(this, shipmentItem)
+		return shipmentItems()
+	}
+
+	List removeFromShipmentItems(ShipmentItem shipmentItem) {
+		OrderShipment.unlink(this, shipmentItem)
+		return shipmentItems()
+	}
+	*/
 	
 }

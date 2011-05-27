@@ -41,14 +41,31 @@
 			<div class="action-menu-item">
 				<hr/>			
 			</div>
-			<div class="action-menu-item">
-				<g:link controller="order" action="fulfill" id="${orderInstance?.id}">
-					<img src="${resource(dir: 'images/icons/silk', file: 'cart.png')}" />
-					&nbsp;${message(code: 'order.fulfill.label', default: 'Fulfill order')} 
-				</g:link>				
-			</div>		
-			
-			
+			<%-- 
+			<g:if test="${orderInstance?.origin?.id == session?.warehouse?.id }">
+				<div class="action-menu-item">
+					<g:link controller="order" action="fulfill" id="${orderInstance?.id}">
+						<img src="${resource(dir: 'images/icons/silk', file: 'cart.png')}" />
+						&nbsp;${message(code: 'order.fulfill.label', default: 'Fulfill order')} 
+					</g:link>				
+				</div>		
+				<div class="action-menu-item">
+					<g:link controller="order" action="send" id="${orderInstance?.id}">
+						<img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />
+						&nbsp;${message(code: 'order.send.label', default: 'Send order')} 
+					</g:link>				
+				</div>		
+			</g:if>
+			--%>
+			<g:if test="${orderInstance?.destination?.id == session?.warehouse?.id }">
+				<div class="action-menu-item">
+					<g:link controller="order" action="receive" id="${orderInstance?.id}">
+						<img src="${resource(dir: 'images/icons/silk', file: 'lorry_flatbed.png')}" />
+						&nbsp;${message(code: 'order.receive.label', default: 'Receive order')} 
+					</g:link>				
+				</div>		
+			</g:if>
+						
 			<div class="action-menu-item">
 				<hr/>			
 			</div>

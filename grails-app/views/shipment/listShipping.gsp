@@ -105,7 +105,7 @@
 												</td>
 												<td width="3%" style="text-align: center">
 													<img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + shipmentInstance?.shipmentType?.name + '.png')}"
-													alt="${shipmentInstance?.shipmentType?.name}" style="vertical-align: middle; width: 24px; height: 24px;" />		
+													alt="${shipmentInstance?.shipmentType?.name}" style="vertical-align: middle;" />		
 												</td>										
 												<td>
 													<g:link action="showDetails" id="${shipmentInstance.id}">

@@ -10,7 +10,7 @@
 						<div class="fade" style="font-size: 0.9em; line-height: 20px;">
 							<!-- Hide action menu menu if the user is in the shipment workflow -->						
 							<g:if test="${!params.execution }">
-								<g:render template="/order/actions" /> &nbsp;|&nbsp;
+								<g:render template="/order/actions" model="[orderInstance:orderInstance]"/> &nbsp;|&nbsp;
 							</g:if>
 							<b>Order #:</b> ${orderInstance?.orderNumber}  
 							&nbsp;|&nbsp; 

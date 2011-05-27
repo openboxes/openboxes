@@ -1,6 +1,8 @@
 package org.pih.warehouse.shipping
 
 import java.util.Date;
+
+import org.pih.warehouse.order.OrderShipment;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.donation.Donor;
@@ -28,6 +30,9 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 									// actually contained within.
 	
 	static belongsTo = [ shipment : Shipment ]
+	
+	//static hasMany = [ orderShipments : OrderShipment ]
+	
 	//static belongsTo = [ container : Container ] // + shipment : Shipment
 	static constraints = {
 		container(nullable:true)
@@ -38,6 +43,23 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 		donor(nullable:true)
 	}
     
+	/*
+	def orderItems() {
+		return orderShipments.collect{it.orderItem}
+	}
+
+	List addToOrderShipments(OrderShipment orderShipment) {
+		OrderShipment.link(orderShipment, this)
+		return orderShipments()
+	}
+
+	List removeFromOrderShipments(OrderShipment orderShipment) {
+		OrderShipment.unlink(orderShipment, this)
+		return orderShipments()
+	}
+	*/
+	
+	
 	/**
 	 * Sorts shipping items by associated product name, then lot number, then quantity,
 	 * and finally by id. 
