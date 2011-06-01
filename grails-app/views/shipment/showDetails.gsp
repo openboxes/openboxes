@@ -417,7 +417,7 @@
 								</td>										
 								<td class="value" colspan="3">
 									<div>
-										<g:if test="${!shipmentInstance.containers}">
+										<g:if test="${!shipmentInstance.shipmentItems}">
 											<div class="fade">empty</div>											
 										</g:if> 
 										<g:else>

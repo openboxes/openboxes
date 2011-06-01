@@ -69,6 +69,7 @@ class PurchaseOrderWorkflowController {
 				def orderItem = OrderItem.get(params.id)
 				if (orderItem) { 
 					flow.order.removeFromOrderItems(orderItem);
+					orderItem.delete();
 				}
 			}.to("showOrderItems")
 			
@@ -118,7 +119,7 @@ class PurchaseOrderWorkflowController {
 				log.info "confirm order " + params
 				flow.order.properties = params
 				
-				log.info("order item " + flow.order)
+				log.info("order " + flow.order)
 				if (!orderService.saveOrder(flow.order)) {
 					return error()
 				}

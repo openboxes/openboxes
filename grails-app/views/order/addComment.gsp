@@ -88,6 +88,6 @@
 			</tr>
 		</table>
 	</div>
-	<g:jqueryComboBox />
+	<g:comboBox />
 </body>
 </html>

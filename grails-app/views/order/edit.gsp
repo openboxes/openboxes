@@ -47,7 +47,6 @@
 									<td valign='top' class='name'><label for='source'>Order from:</label>
 									</td>
 									<td valign='top' class='value ${hasErrors(bean:orderInstance,field:'origin','errors')}'>
-										<g:jqueryComboBox />
 										<div class="ui-widget"> 
 											<g:select class="combobox" name="origin.id" from="${org.pih.warehouse.core.Location.list().sort()}" optionKey="id" value="${orderInstance?.origin?.id}" noSelection="['':'']" />
 										</div>
@@ -57,7 +56,6 @@
 									<td valign='top' class='name'><label for="destination">Destination:</label>
 									</td>
 									<td valign='top' class='value ${hasErrors(bean:orderInstance,field:'destination','errors')}'>
-										<g:jqueryComboBox />
 										<div class="ui-widget"> 
 											<g:select class="combobox" name="destination.id" from="${org.pih.warehouse.core.Location.list().sort()}" optionKey="id" value="${orderInstance?.destination?.id}" noSelection="['':'']"/>
 										</div>
@@ -118,5 +116,6 @@
                 </fieldset>
             </g:form>
         </div>
+		<g:comboBox />
     </body>
 </html>

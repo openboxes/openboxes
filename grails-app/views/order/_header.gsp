@@ -12,9 +12,9 @@
 							<g:if test="${!params.execution }">
 								<g:render template="/order/actions" model="[orderInstance:orderInstance]"/> &nbsp;|&nbsp;
 							</g:if>
-							<b>Order #:</b> ${orderInstance?.orderNumber}  
+							Order #: <b>${orderInstance?.orderNumber}</b>  
 							&nbsp;|&nbsp; 
-							<b>Date ordered:</b> <g:formatDate date="${orderInstance?.dateOrdered}"/>							
+							Date ordered: <b><g:formatDate date="${orderInstance?.dateOrdered}"/></b>
 						</div>
 					</td>										
 					<td style="text-align: right;">

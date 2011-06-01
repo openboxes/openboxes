@@ -104,6 +104,6 @@
 			</div>
 		</g:form>
 	</div>
-	<g:jqueryComboBox />	
+	<g:comboBox />	
 </body>
 </html>
