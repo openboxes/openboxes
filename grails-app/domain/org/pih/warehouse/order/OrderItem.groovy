@@ -43,7 +43,7 @@ class OrderItem implements Serializable {
 	}
 
 	Integer quantityFulfilled() { 
-		return orderShipments.sum { it?.shipmentItem?.quantity }
+		return orderShipments ? orderShipments.sum { it?.shipmentItem?.quantity } : 0
 	}
 	
 	Boolean isComplete() { 
