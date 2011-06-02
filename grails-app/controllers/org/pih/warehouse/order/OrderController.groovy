@@ -284,8 +284,6 @@ class OrderController {
 		
 		orderService.saveOrderShipment(command)
 		
-		
-		
 		// If the shipment was saved, let's redirect back to the order received page
 		if (!command?.shipment?.hasErrors() && command?.shipment?.id) {
 			redirect(controller: "order", action: "receive", id: params?.order?.id)
@@ -295,37 +293,6 @@ class OrderController {
 		render(view: "receive", model: [orderCommand: command])
 	}
 
-	/*
-	def saveOrderShipmentAndExit = {  OrderCommand orderCommand ->
-		session.orderCommand.recipient = orderCommand.recipient;
-		session.orderCommand.shipment = orderCommand.shipment;		
-		session.orderCommand?.orderItems.eachWithIndex { orderItem, i ->
-			session.orderCommand?.orderItems[i]?.quantityReceived = orderCommand?.orderItems[i]?.quantityReceived; 
-			session.orderCommand?.orderItems[i]?.productReceived = orderCommand?.orderItems[i]?.productReceived;
-			session.orderCommand?.orderItems[i]?.lotNumber = orderCommand?.orderItems[i]?.lotNumber;
-			
-		}
-		
-		// Try to save the shipment
-		orderService.saveOrderShipment(session.orderCommand);
-		if (session?.orderCommand?.shipment.hasErrors()) {
-			log.info("shipment has errors")
-			session.orderCommand.shipment.errors.each { println it }
-			redirect(action: "receive")
-			return;
-		}
-		
-		// Remove the shipment from 
-		session.orderCommand = null
-		if (session?.orderComamnd?.order?.id) { 
-			redirect(action: "show", id: session?.orderComamnd?.order?.id);
-		}
-		else { 
-			redirect(action: "list");
-		}
-	}
-	*/
-	
 	def addOrderShipment = {  
 		def orderCommand = orderService.getOrder(params.id as int, session.user.id as int)
 		int index = Integer.valueOf(params?.index)

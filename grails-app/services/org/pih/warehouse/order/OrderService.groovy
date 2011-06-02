@@ -33,17 +33,16 @@ class OrderService {
 		
 		orderCommand.order = orderInstance;
 		orderInstance?.orderItems?.each {
-			if (!it?.isComplete()) {
-				def orderItemCommand = new OrderItemCommand();
-				orderItemCommand.primary = true;
-				orderItemCommand.orderItem = it
-				orderItemCommand.type = it.orderItemType
-				orderItemCommand.description = it.description
-				orderItemCommand.productReceived = it.product
-				orderItemCommand.quantityOrdered = it.quantity;
-				//orderItemCommand.quantityReceived = it.quantity
-				orderCommand?.orderItems << orderItemCommand
-			}
+			
+			def orderItemCommand = new OrderItemCommand();
+			orderItemCommand.primary = true;
+			orderItemCommand.orderItem = it
+			orderItemCommand.type = it.orderItemType
+			orderItemCommand.description = it.description
+			orderItemCommand.productReceived = it.product
+			orderItemCommand.quantityOrdered = it.quantity;
+			//orderItemCommand.quantityReceived = it.quantity
+			orderCommand?.orderItems << orderItemCommand
 		}
 		return orderCommand;
 	}

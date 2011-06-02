@@ -95,7 +95,7 @@
 											<table id="orderItemsTable">
 												<thead>
 													<tr class="even">
-														<th class="center" align="center" colspan="5">
+														<th class="center" align="center" colspan="6">
 															<img src="${createLinkTo(dir:'images/icons/silk',file:'cart.png')}" alt="ordered" style="vertical-align: middle"/>
 															Items Ordered
 														</th>
@@ -108,63 +108,125 @@
 														<td></td>
 														<td>Type</td>
 														<td>Description</td>
-														<td>Qty Ordered</td>										
-														<td>Qty Fulfilled</td>										
+														<td class="center">Qty Ordered</td>										
+														<td class="center">Qty Fulfilled</td>	
+														<td class="center">Status</td>									
 														<td style="border-left: 1px solid lightgrey;">Qty Recv'd</td>										
 														<td>Product Recv'd</td>										
-														<td>Lot Number</td>										
+														<td>Lot Number</td>		
+														<%-- 								
 														<td>Actions</td>										
+														--%>
 													</tr>
 												</thead>									
 												<tbody>
-													<g:each var="orderItem" in="${orderCommand?.orderItems.sort { it?.orderItem?.product?.name} }" status="i">
-														<tr class="${(orderItem?.primary)?"black-top":""}">
-															<td>
-																<a name="orderItems${i }"></a>
-																${orderItem?.orderItem?.id }
-																<g:hiddenField name="orderItems[${i }].orderItem.id" value="${orderItem?.orderItem?.id }"/>
-																<g:hiddenField name="orderItems[${i }].primary" value="${orderItem?.primary }"/>
-															</td>
-															<td class="center">
-																<g:if test="${orderItem?.primary }">${orderItem?.type }</g:if>
-																<g:hiddenField name="orderItems[${i }].type" value="${orderItem?.type }"/>
-															</td>
-															<td>
-																<g:if test="${orderItem?.primary }">${orderItem?.description }</g:if>
-																<g:hiddenField name="orderItems[${i }].description" value="${orderItem?.description }"/>
-															</td>
-															<td class="center">
-																<g:if test="${orderItem?.primary }">${orderItem?.quantityOrdered}</g:if>
-																<g:hiddenField name="orderItems[${i }].quantityOrdered" value="${orderItem?.quantityOrdered }"/>
-															</td>
-															<td class="center">
-																<g:if test="${orderItem?.primary }">${orderItem?.orderItem?.quantityFulfilled()}</g:if>
-															</td>
-															<td style="border-left: 1px solid lightgrey;">
-																<input type="text" name='orderItems[${i }].quantityReceived' value="${orderItem?.quantityReceived }" size="5" class="center updateable" />
-															</td>
-															<td>
-																<div class="ui-widget">
-																	<g:select class="combobox updateable" name="orderItems[${i }].productReceived.id" from="${org.pih.warehouse.product.Product.list().sort{it.name}}" 
-																		optionKey="id" value="${orderItem?.productReceived?.id }" noSelection="['':'']"/>
-																</div>	
-															</td>
-															<td>
-																<g:textField name="orderItems[${i }].lotNumber" value="${orderItem?.lotNumber }" size="10" class="updateable"/>
-															</td>
-															<td>
-																<g:link controller="order" action="addOrderShipment" id="${orderCommand?.order?.id }" params="[index: i]" class="checkable" fragment="orderItems${i }">
-																	<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="add" style="vertical-align: middle"/>
-																</g:link>
-																&nbsp;
-																<g:if test="${!orderItem?.primary }">
-																	<g:link controller="order" action="removeOrderShipment" id="${orderItem?.orderItem?.id }" params="[index: i]" class="checkable" fragment="orderItems${i }">
-																		<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="tag" style="vertical-align: middle"/>
+													<g:each var="orderItem" in="${orderCommand?.orderItems }" status="i">
+													
+														<g:if test="${!orderItem?.orderItem?.isComplete() }">
+															<tr class="${(orderItem?.primary)?"black-top":""}">
+																<td>
+																	<a name="orderItems${i }"></a>
+																	${i }
+																	<g:hiddenField name="orderItems[${i }].orderItem.id" value="${orderItem?.orderItem?.id }"/>
+																	<g:hiddenField name="orderItems[${i }].primary" value="${orderItem?.primary }"/>
+																</td>
+																<td>
+																	<g:if test="${orderItem?.primary }">${orderItem?.type }</g:if>
+																	<g:hiddenField name="orderItems[${i }].type" value="${orderItem?.type }"/>
+																</td>
+																<td>
+																	<g:if test="${orderItem?.primary }">${orderItem?.description }</g:if>
+																	<g:hiddenField name="orderItems[${i }].description" value="${orderItem?.description }"/>
+																</td>
+																<td class="center">
+																	<g:if test="${orderItem?.primary }">${orderItem?.quantityOrdered}</g:if>
+																	<g:hiddenField name="orderItems[${i }].quantityOrdered" value="${orderItem?.quantityOrdered }"/>
+																</td>
+																<td class="center">
+																	<g:if test="${orderItem?.primary }">${orderItem?.orderItem?.quantityFulfilled()}</g:if>
+																</td>
+																<td>
+																	${(orderItem?.orderItem?.isComplete())?"Complete":"Pending" }																
+																</td>
+																<td style="border-left: 1px solid lightgrey;">
+																	<input type="text" name='orderItems[${i }].quantityReceived' value="${orderItem?.quantityReceived }" size="5" class="center updateable" />
+																</td>
+																<td>
+																	<div class="ui-widget">
+																		<g:select class="combobox updateable" name="orderItems[${i }].productReceived.id" from="${org.pih.warehouse.product.Product.list().sort{it.name}}" 
+																			optionKey="id" value="${orderItem?.productReceived?.id }" noSelection="['':'']"/>
+																	</div>	
+																</td>
+																<td>
+																	<g:textField name="orderItems[${i }].lotNumber" value="${orderItem?.lotNumber }" size="10" class="updateable"/>
+																</td>
+																<%-- 
+																<td>
+																	<g:link controller="order" action="addOrderShipment" id="${orderCommand?.order?.id }" params="[index: i]" class="checkable" fragment="orderItems${i }">
+																		<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="add" style="vertical-align: middle"/>
 																	</g:link>
-																</g:if> 
-															</td>
-															
-														</tr>
+																	&nbsp;
+																	<g:if test="${!orderItem?.primary }">
+																		<g:link controller="order" action="removeOrderShipment" id="${orderItem?.orderItem?.id }" params="[index: i]" class="checkable" fragment="orderItems${i }">
+																			<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="tag" style="vertical-align: middle"/>
+																		</g:link>
+																	</g:if> 
+																</td>
+																--%>
+															</tr>
+														</g:if>
+														<g:else>
+															<tr class="${(orderItem?.primary)?"black-top":""}">
+																<td>
+																	<a name="orderItems${i }"></a>
+																	${i }
+																	<g:hiddenField name="orderItems[${i }].orderItem.id" value="${orderItem?.orderItem?.id }"/>
+																	<g:hiddenField name="orderItems[${i }].primary" value="${orderItem?.primary }"/>
+																</td>
+																<td>
+																	<g:if test="${orderItem?.primary }">${orderItem?.type }</g:if>
+																	<g:hiddenField name="orderItems[${i }].type" value="${orderItem?.type }"/>
+																</td>
+																<td>
+																	<g:if test="${orderItem?.primary }">${orderItem?.description }</g:if>
+																	<g:hiddenField name="orderItems[${i }].description" value="${orderItem?.description }"/>
+																</td>
+																<td class="center">
+																	<g:if test="${orderItem?.primary }">${orderItem?.quantityOrdered}</g:if>
+																	<g:hiddenField name="orderItems[${i }].quantityOrdered" value="${orderItem?.quantityOrdered }"/>
+																</td>
+																<td class="center">
+																	<g:if test="${orderItem?.primary }">${orderItem?.orderItem?.quantityFulfilled()}</g:if>
+																</td>
+																<td>
+																	${(orderItem?.orderItem?.isComplete())?"Complete":"Pending" }																
+																</td>
+																
+																<td style="border-left: 1px solid lightgrey;">
+
+																</td>
+																<td>
+
+																</td>
+																<td>
+
+																</td>
+																<%-- 
+																<td>
+																	<g:link controller="order" action="addOrderShipment" id="${orderCommand?.order?.id }" params="[index: i]" class="checkable" fragment="orderItems${i }">
+																		<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="add" style="vertical-align: middle"/>
+																	</g:link>
+																	&nbsp;
+																	<g:if test="${!orderItem?.primary }">
+																		<g:link controller="order" action="removeOrderShipment" id="${orderItem?.orderItem?.id }" params="[index: i]" class="checkable" fragment="orderItems${i }">
+																			<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="tag" style="vertical-align: middle"/>
+																		</g:link>
+																	</g:if> 
+																</td>
+																--%>
+															</tr>
+														
+														</g:else>
 													</g:each>
 												</tbody>
 											</table>
@@ -177,8 +239,7 @@
 		                        <tr class="prop">
 			                        <td colspan="2">
 			                        	<div class="buttons">
-											<g:actionSubmit action="saveOrderShipment" value="Save & Continue"/> 
-											<g:actionSubmit action="saveOrderShipmentAndExit" value="Save & Exit"/>			                        	
+											<g:actionSubmit action="saveOrderShipment" value="Save"/> 
 			                        	</div>
 			                        </td>
 		                        </tr>
