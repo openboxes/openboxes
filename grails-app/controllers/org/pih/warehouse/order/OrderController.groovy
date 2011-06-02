@@ -1,5 +1,7 @@
 package org.pih.warehouse.order
 
+import java.util.Date;
+
 import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Document;
 import org.pih.warehouse.core.Location;
@@ -264,46 +266,96 @@ class OrderController {
 		}
 	}
 	
-	def receive = {
-		log.info "Receive an order as a shipment"
-		def orderInstance = Order.get(params.id)
-		if (!orderInstance) {
+	def receive = {		
+		def orderCommand = orderService.getOrder(params.id as int, session.user.id as int)
+		if (!orderCommand.order) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'order.label', default: 'Order'), params.id])}"
 			redirect(action: "list")
 		}
-		else {
-			OrderCommand orderCommand = new OrderCommand();
-			orderCommand.recipient = Person.get(session.user.id)
-			orderCommand.order = orderInstance;
-			orderCommand.deliveredOn = new Date();
-			orderCommand.shipment = new Shipment();
-			orderInstance?.orderItems?.each { 
-				def orderItemCommand = new OrderItemCommand();
-				orderItemCommand.orderItem = it
-				orderItemCommand.type = it.orderItemType
-				orderItemCommand.description = it.description
-				orderItemCommand.productReceived = it.product
-				orderItemCommand.quantityOrdered = it.quantity;
-				orderItemCommand.quantityReceived = it.quantity
-				orderCommand?.orderItems << orderItemCommand 
-			}
+		else { 
 			return [orderCommand: orderCommand]
 		}
 	}
 	
-	def saveOrderShipment = { OrderCommand orderCommand ->
+	def saveOrderShipment = { OrderCommand command ->	
+		bindData(command, params)		
+		def orderInstance = Order.get(params?.order?.id);
+		command.order = orderInstance;
 		
-		log.info params
-		log.info orderCommand
-		def orderInstance = Order.get(params.id)
-		orderCommand.order = orderInstance 
-		orderCommand?.orderItems.each { 
-			println it.description + " " + it.lotNumber	
+		orderService.saveOrderShipment(command)
+		
+		
+		
+		// If the shipment was saved, let's redirect back to the order received page
+		if (!command?.shipment?.hasErrors() && command?.shipment?.id) {
+			redirect(controller: "order", action: "receive", id: params?.order?.id)
 		}
 		
-		render(view: "receive", model: [orderCommand: orderCommand])
+		// Otherwise, we want to display the errors, so we need to render the page.
+		render(view: "receive", model: [orderCommand: command])
 	}
+
+	/*
+	def saveOrderShipmentAndExit = {  OrderCommand orderCommand ->
+		session.orderCommand.recipient = orderCommand.recipient;
+		session.orderCommand.shipment = orderCommand.shipment;		
+		session.orderCommand?.orderItems.eachWithIndex { orderItem, i ->
+			session.orderCommand?.orderItems[i]?.quantityReceived = orderCommand?.orderItems[i]?.quantityReceived; 
+			session.orderCommand?.orderItems[i]?.productReceived = orderCommand?.orderItems[i]?.productReceived;
+			session.orderCommand?.orderItems[i]?.lotNumber = orderCommand?.orderItems[i]?.lotNumber;
+			
+		}
+		
+		// Try to save the shipment
+		orderService.saveOrderShipment(session.orderCommand);
+		if (session?.orderCommand?.shipment.hasErrors()) {
+			log.info("shipment has errors")
+			session.orderCommand.shipment.errors.each { println it }
+			redirect(action: "receive")
+			return;
+		}
+		
+		// Remove the shipment from 
+		session.orderCommand = null
+		if (session?.orderComamnd?.order?.id) { 
+			redirect(action: "show", id: session?.orderComamnd?.order?.id);
+		}
+		else { 
+			redirect(action: "list");
+		}
+	}
+	*/
 	
+	def addOrderShipment = {  
+		def orderCommand = orderService.getOrder(params.id as int, session.user.id as int)
+		int index = Integer.valueOf(params?.index)
+		def orderItemToCopy = orderCommand?.orderItems[index]
+		if (orderItemToCopy) { 
+			def orderItemToAdd = new OrderItemCommand();
+			orderItemToAdd.setPrimary(false)
+			orderItemToAdd.setType(orderItemToCopy.type)
+			orderItemToAdd.setDescription(orderItemToCopy.description)
+			orderItemToAdd.setLotNumber(orderItemToCopy.lotNumber);
+			orderItemToAdd.setOrderItem(orderItemToCopy.orderItem)
+			orderItemToAdd.setProductReceived(orderItemToCopy.productReceived)
+			orderItemToAdd.setQuantityOrdered(orderItemToCopy.quantityOrdered)
+			
+			orderCommand?.orderItems?.add(index+1, orderItemToAdd);
+		}
+		render(view: "receive", model: [orderCommand: orderCommand])
+		//redirect(action: "receive")
+	} 
+	
+	def removeOrderShipment = { 
+		log.info("Remove order shipment " + params)
+		def orderCommand = session.orderCommand
+		int index = Integer.valueOf(params?.index)
+		orderCommand.orderItems.remove(index)
+
+		//render(view: "receive", model: [orderCommand: orderCommand])
+		redirect(action: "receive")
+	}
+		
 
 	def fulfill = {
 		def orderInstance = Order.get(params.id)

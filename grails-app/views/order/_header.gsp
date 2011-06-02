@@ -19,7 +19,7 @@
 					</td>										
 					<td style="text-align: right;">
 						<div class="fade" style="font-weight: bold; font-size:1.5em;">
-							Pending
+							${orderInstance?.isComplete() ? "Complete" : "Pending" }
 						</div>
 					</td>
 				</tr>

@@ -19,7 +19,19 @@ button {
 #banner { 
 	padding: 5px; 
 }
-
+.black-top { 
+	border-top: 1px solid black;
+}
+.red { 
+	background-color: red;
+	color: white;
+	height: 2em;
+}
+.blue { 
+	background-color: blue; 
+	color: white;
+	height: 2em;
+}
 
 
 .debit { 

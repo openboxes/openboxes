@@ -55,7 +55,9 @@
 
 				<td><g:formatDate date="${orderInstance.lastUpdated}" /></td>
 
-				<td>Pending</td>
+				<td>
+					${(orderInstance?.isComplete())?"Complete":"Pending" }
+				</td>
 
 
 			</tr>

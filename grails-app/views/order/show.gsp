@@ -23,14 +23,7 @@
 	                <table>
 	                    <tbody>
 	                    
-	                        <tr class="prop">
-	                            <td valign="top" class="name">
-	                            	<label for='orderNumber'><g:message code="order.orderNumber.label" default="Order Number" /></label>
-	                            </td>
-	                            
-	                            <td valign="top" class="value">${fieldValue(bean: orderInstance, field: "orderNumber")}</td>
-	                            
-	                        </tr>
+	                      
 	
 	                        <tr class="prop">
 	                            <td valign="top" class="name">
@@ -74,7 +67,8 @@
 												<tr class="odd">
 													<th>Type</th>
 													<th>Product</th>
-													<th>Quantity</th>										
+													<th>Qty Ordered</th>
+													<th>Qty Fulfilled</th>
 												</tr>
 											</thead>									
 											<tbody>
@@ -101,6 +95,9 @@
 														</td>
 														<td>
 															${orderItem?.quantity}
+														</td>
+														<td>
+															${orderItem?.quantityFulfilled()}
 														</td>
 													</tr>
 												</g:each>
@@ -217,7 +214,7 @@
 	                    
 	                    
 	                    	
-	                        
+	                        <%-- 
 	                        <tr class="prop">
 	                            <td valign="top" class="name">
 	                            	<label for="dateCreated"><g:message code="order.dateCreated.label" default="Date Created" /></label>
@@ -235,7 +232,7 @@
 	                            <td valign="top" class="value"><g:formatDate date="${orderInstance?.lastUpdated}" /></td>
 	                            
 	                        </tr>
-	                    
+		                    --%>
 	                    
 	                    </tbody>
 	                </table>

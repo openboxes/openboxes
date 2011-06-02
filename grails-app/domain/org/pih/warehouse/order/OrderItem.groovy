@@ -26,7 +26,7 @@ class OrderItem implements Serializable {
 	
 	static belongsTo = [ order : Order ]
 	
-	static hasMany = [ comments : Comment ]
+	static hasMany = [ orderShipments : OrderShipment ]
 
     static constraints = {
     	description(nullable:true)
@@ -39,14 +39,30 @@ class OrderItem implements Serializable {
 
 	
 	String getOrderItemType() { 
-		return (product)?"product":(category)?"category":"unclassified"
+		return (product)?"Product":(category)?"Category":"Unclassified"
 	}
 
-	/*
+	Integer quantityFulfilled() { 
+		return orderShipments.sum { it?.shipmentItem?.quantity }
+	}
+	
+	Boolean isComplete() { 
+		return quantityFulfilled() >= quantity;
+	}
+	
+	Boolean isPending() { 
+		return !isComplete()
+	}
+	
 	def shipmentItems() {
 		return orderShipments.collect{ it.shipmentItem }
 	}
+	
+	def shipments() { 
+		return orderShipments.collect { it.shipmentItem.shipment }
+	}
 		
+	/*
 	List addToShipmentItems(ShipmentItem shipmentItem) {
 		OrderShipment.link(this, shipmentItem)
 		return shipmentItems()

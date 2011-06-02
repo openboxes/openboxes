@@ -10,9 +10,11 @@ import org.pih.warehouse.shipping.ShipmentItem;
 
 class OrderShipment implements Serializable {
 
-	OrderItem orderItem
-	ShipmentItem shipmentItem
+	//OrderItem orderItem
+	//ShipmentItem shipmentItem
+	static belongsTo = [shipmentItem: ShipmentItem, orderItem: OrderItem]
 	
+	/*
 	static OrderShipment link(orderItem, shipmentItem) {
 		def orderShipment = OrderShipment.findByOrderItemAndShipmentItem(orderItem, shipmentItem)
 		if (!orderShipment) {
@@ -32,5 +34,5 @@ class OrderShipment implements Serializable {
 			orderShipment.delete()
 		}
 	}	
-	
+	*/
 }

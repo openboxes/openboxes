@@ -3171,6 +3171,15 @@
 		<dropColumn tableName="transaction_entry" columnName="lot_number"/>
 	</changeSet>
 	
+	<changeSet author="jmiranda" id="2011-04-13-1-1">
+		<preConditions onFail="MARK_RAN">
+			<indexExists indexName="FKABC21FD1DED5FAE7"/>
+		</preConditions>
+		<sql>
+			ALTER TABLE transaction_entry DROP INDEX `FKABC21FD1DED5FAE7`, DROP FOREIGN KEY `FKABC21FD1DED5FAE7`;
+		</sql>	
+	</changeSet>
+	
 	<changeSet author="mgoodrich" id="2011-04-13-2">
        <preConditions onFail="MARK_RAN">
 			<columnExists tableName="transaction_entry" columnName="product_id"/>
@@ -3418,7 +3427,47 @@
         </createIndex>
     </changeSet>
     
-	
+    <!-- Adding many-to-many table to link orders to events -->
+    <changeSet author="jmiranda (generated)" id="1306972453064-1">
+	    <preConditions onFail="MARK_RAN"><not><tableExists tableName="order_event"/></not></preConditions> 
+        <createTable tableName="order_event">
+            <column name="order_events_id" type="BIGINT"/>
+            <column name="event_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    
+    <!-- Adding many-to-many table to link orders to shipments -->
+    <changeSet author="jmiranda (generated)" id="1306972453064-2">
+	    <preConditions onFail="MARK_RAN"><not><tableExists tableName="order_shipment"/></not></preConditions> 
+        <createTable tableName="order_shipment">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="order_item_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_item_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+   
+    <changeSet author="jmiranda (generated)" id="1306972453064-6">
+		<preConditions onFail="MARK_RAN"><not><indexExists indexName="FK74D92A69786431F"/></not></preConditions> 
+        <createIndex indexName="FK74D92A69786431F" tableName="order_event" unique="false">
+            <column name="event_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1306972453064-8">
+		<preConditions onFail="MARK_RAN"><not><indexExists indexName="FK9475736B3BE9D843"/></not></preConditions> 
+        <createIndex indexName="FK9475736B3BE9D843" tableName="order_shipment" unique="false">
+            <column name="order_item_id"/>
+        </createIndex>
+    </changeSet>    
 
 </databaseChangeLog>
 

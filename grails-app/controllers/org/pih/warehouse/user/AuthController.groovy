@@ -92,7 +92,7 @@ class AuthController {
 		if (userInstance) {
 			
 			if (!userInstance?.active) {
-				flash.message = "Your account request has been received and is under review by the system administrator. Please contact the system administrator if you have any questions or concerns."
+				flash.message = "Your account request has been received and is under review by a system administrator. Please contact the system administrator if you have any questions or concerns."
 				redirect(controller: 'auth', action: 'login');
 				return;
 			}

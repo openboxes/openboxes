@@ -117,8 +117,8 @@ log4j = {
 	//		'org.codehaus.groovy.grails.plugins', // plugins
 	//		'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
 	//		'org.springframework'
-	error 'org.codehaus.groovy.grails.web.pages'			// GSP
-		
+	error 'org.codehaus.groovy.grails.web.pages',			// GSP
+		'org.hibernate.engine.StatefulPersistenceContext.ProxyWarnLog'
 	
 	
 	warn	'org.mortbay.log',

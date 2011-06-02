@@ -11,6 +11,7 @@ import org.pih.warehouse.shipping.ShipmentItem;
 
 class OrderItemCommand {
 
+	Boolean primary
 	OrderItem orderItem
 	ShipmentItem shipmentItem
 	

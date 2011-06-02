@@ -31,7 +31,7 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 	
 	static belongsTo = [ shipment : Shipment ]
 	
-	//static hasMany = [ orderShipments : OrderShipment ]
+	static hasMany = [ orderShipments : OrderShipment ]
 	
 	//static belongsTo = [ container : Container ] // + shipment : Shipment
 	static constraints = {
@@ -43,11 +43,13 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 		donor(nullable:true)
 	}
     
-	/*
+
 	def orderItems() {
 		return orderShipments.collect{it.orderItem}
 	}
 
+	
+	/*
 	List addToOrderShipments(OrderShipment orderShipment) {
 		OrderShipment.link(orderShipment, this)
 		return orderShipments()

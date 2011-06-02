@@ -45,4 +45,18 @@ class Order implements Serializable {
 		lastUpdated(nullable:true)
 	}	
 	
+	Boolean isComplete() {
+		if (!orderItems) {
+			return false;
+		}
+		else {
+			return !orderItems?.find { !it.isComplete() }
+		}	
+	}
+	
+	def shipments() { 
+		def shipments = orderItems.collect { it.shipments() } 
+		return shipments.flatten()
+	}
+	
 }

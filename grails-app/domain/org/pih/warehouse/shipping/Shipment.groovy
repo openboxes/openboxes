@@ -105,7 +105,7 @@ class Shipment implements Comparable, Serializable {
 		expectedShippingDate(nullable:false, 
 			validator: { value, obj-> !obj.expectedDeliveryDate || value.before(obj.expectedDeliveryDate + 1)})		
 		expectedDeliveryDate(nullable:true)	// optional		
-		shipmentType(nullable:true)
+		shipmentType(nullable:false)
 		shipmentMethod(nullable:true)
 		receipt(nullable:true)
 		additionalInformation(nullable:true, maxSize: 2147483646)
