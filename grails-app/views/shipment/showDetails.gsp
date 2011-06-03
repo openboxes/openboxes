@@ -447,7 +447,7 @@
 																
 															</td>
 															<td>
-																<g:link controller="product" action="edit" id="${item?.product?.id}">
+																<g:link controller="inventoryItem" action="showStockCard" id="${item?.product?.id}">
 																	${item?.product?.name}
 																</g:link>
 															</td>
