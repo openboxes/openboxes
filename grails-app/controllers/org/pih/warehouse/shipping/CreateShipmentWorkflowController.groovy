@@ -353,9 +353,9 @@ class CreateShipmentWorkflowController {
 				log.info "Move item to container " + params
 				
 				def item = ShipmentItem.get(params.item.id);
-				def container = Container.get(params.container.id);
+				def container = params.container.id == -1 ? null : Container.get(params.container.id);
 				
-				if (item && container) {
+				if (item) {
 					log.info "move item " + item + " from " + item?.container + " to " + container
 					item.container = container;
 					item.save();
