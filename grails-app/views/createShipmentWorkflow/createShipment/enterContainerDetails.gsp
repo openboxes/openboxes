@@ -166,15 +166,20 @@
 										 					${selectedContainer?.name }				 					
 														</g:if>			 			
 														<g:else>
-															Unpacked items			 						
+															<g:message code="shipmentItem.unpackedItems" default="Unpacked Items" />			 						
 														</g:else>
 													</h3>
 													<span class="fade">
 										 				<g:if test="${selectedContainer?.weight }">
-											 				&nbsp;|&nbsp; Weight: ${selectedContainer?.weight } lbs. 
+											 				&nbsp;|&nbsp; Weight: ${selectedContainer?.weight } ${selectedContainer?.weightUnits}
 										 				</g:if>
-									 					<g:if test="${selectedContainer?.description }">
-															&nbsp;|&nbsp; Contents: ${selectedContainer?.description}
+									 					<g:if test="${selectedContainer?.width ||  selectedContainer?.length || selectedContainer?.height}">
+															&nbsp;|&nbsp; Dimensions:
+															${selectedContainer.height == null ? '?' : selectedContainer.height} ${selectedContainer?.volumeUnits}
+															x
+															${selectedContainer.width == null ? '?' : selectedContainer.width} ${selectedContainer?.volumeUnits}
+															x
+															${selectedContainer.length == null ? '?' : selectedContainer.length} ${selectedContainer?.volumeUnits}
 														</g:if>
 													</span>								
 												</div>

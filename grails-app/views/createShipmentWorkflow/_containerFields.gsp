@@ -6,13 +6,6 @@
 </tr>
 
 <tr class="prop">
-	<td valign="top" class="name"><label>Description</label></td>                            
-	<td valign="top" class="value">
-		<g:textArea id="description" name="description" cols="50" rows="5" value="${container ? container?.description : box?.description}"/> 
-	</td>
-</tr>
-
-<tr class="prop">
 	<td valign="top" class="name"><label>Dimensions</label></td>                            
 	<td valign="top" class="value">
 		H: <g:textField id="height" name="height" size="5" value="${container ? container?.height : box?.height}"/>&nbsp;
