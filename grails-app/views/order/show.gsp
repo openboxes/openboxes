@@ -172,6 +172,7 @@
 													<th>Filename</th>
 													<th>Type</th>
 													<th>Description</th>
+													<th>Size</th>
 													<th>Last Updated</th>
 													<th>Actions</th>
 												</tr>
@@ -179,25 +180,18 @@
 											<tbody>
 												<g:each var="documentInstance" in="${orderInstance?.documents}">
 													<tr>
-														<td>
-															${documentInstance?.filename}
-														</td>
-														<td>
-															${documentInstance?.documentType?.name}
-														</td>
-														<td>
-															${documentInstance?.name}
-														</td>
-														<td>
-															${documentInstance?.lastUpdated}
-														</td>
+														<td>${documentInstance?.filename} (<g:link controller="document" action="download" id="${documentInstance.id}">download</g:link>)</td>
+														<td>${documentInstance?.documentType?.name}</td>
+														<td>${documentInstance?.name}</td>
+														<td>${documentInstance?.size} bytes</td>
+														<td>${documentInstance?.lastUpdated}</td>
 														<td>
 															<g:link action="editDocument" id="${documentInstance.id}" params="['order.id':orderInstance?.id]">
 																<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit" />
 															</g:link>
 														
 															<g:link action="deleteDocument" id="${documentInstance.id}" params="['order.id':orderInstance?.id]" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-																<img src="${createLinkTo(dir:'images/icons/silk',file:'bin.png')}" alt="Delete" />
+																<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" />
 															</g:link>
 														</td>
 													</tr>
