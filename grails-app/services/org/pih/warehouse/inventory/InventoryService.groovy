@@ -1048,10 +1048,10 @@ class InventoryService {
 			
 			def quantity = (importParams.quantity) ? importParams.quantity : 0;
 			if (!importParams?.quantity instanceof Double) {
-				errors.reject("Property [quantity] with value '${lotNumber}' should be as a Double value");
+				errors.reject("Property [quantity] with value '${quantity} for '${lotNumber}' should be formatted as a Double value");
 			}
 			else if (importParams?.quantity instanceof String) {
-				errors.reject("Property [quantity] with value '${lotNumber}' should not be formatted as a Text value");
+				errors.reject("Property [quantity] with value '${quantity} for '${lotNumber}' should not be formatted as a Text value");
 			}
 
 			def manufacturerCode = (importParams.manufacturerCode) ? String.valueOf(importParams.manufacturerCode) : null;
