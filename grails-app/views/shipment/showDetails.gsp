@@ -424,40 +424,53 @@
 											<div id="items" class="section">											
 												<table>		
 													<tr>
-														<th>Package</th>
-														<th>Item</th>
-														<th>Qty</th>
-														<th>Lot/Serial No</th>
-														<th>Recipient</th>
+														<th style="white-space:nowrap;">&nbsp;</th>
+														<th style="white-space:nowrap;">Qty</th>
+														<th style="white-space:nowrap;">Lot/Serial No</th>
+														<th style="white-space:nowrap;">Recipient</th>
 													</tr>
 													<g:set var="count" value="${0 }"/>
 													<g:set var="previousContainer"/>
 													
 													<g:set var="shipmentItems" value="${shipmentInstance.shipmentItems.sort{(it?.container?.parentContainer) ? it?.container?.parentContainer?.sortOrder : it?.container?.sortOrder} }"/>
-													<g:each in="${shipmentItems}" var="item" status="i">	
-														<g:set var="showContainer" value="${previousContainer != item?.container }"/>															
-														<tr class="${(count++ % 2 == 0)?'odd':'even'}">
-															<td nowrap>
-																<g:if test="${showContainer }">
+													<g:each in="${shipmentItems}" var="item" status="i">
+														<g:if test="${previousContainer != item?.container}">
+															<tr class="${(count++ % 2 == 0)?'odd':'even'}">
+																<th nowrap colspan="4">
 																	<%-- <img src="${createLinkTo(dir: 'images/icons/silk', file: 'package.png')}" style="vertical-align: middle"/>&nbsp;--%>
 																	<g:if test="${item?.container?.parentContainer}">${item?.container?.parentContainer?.name } &rsaquo;</g:if>
 																	<g:if test="${item?.container?.name }">${item?.container?.name }</g:if>
 																	<g:else>Unpacked</g:else>
-																</g:if>
-																
-															</td>
-															<td>
+																	<span class="fade">
+														 				<g:if test="${item?.container?.weight || item?.container?.width || item?.container?.length || item?.container?.height}">
+															 				( 
+															 				<g:if test="${item?.container?.weight}">
+															 					${item?.container?.weight} ${item?.container?.weightUnits}, 
+															 				</g:if>
+																			${item?.container.height ?: '?'} ${item?.container?.volumeUnits}
+																			x
+																			${item?.container.width ?: '?'} ${item?.container?.volumeUnits}
+																			x
+																			${item?.container.length ?: '?'} ${item?.container?.volumeUnits}
+																			)
+																		</g:if>
+																	</span>	
+																</th>
+															</tr>													
+														</g:if>												
+														<tr class="${(count++ % 2 == 0)?'odd':'even'}">
+															<td width="100%">
 																<g:link controller="inventoryItem" action="showStockCard" id="${item?.product?.id}">
 																	${item?.product?.name}
 																</g:link>
 															</td>
-															<td>
+															<td style="white-space:nowrap;">
 																${item?.quantity}
 															</td>
-															<td>
+															<td style="white-space:nowrap;">
 																${item?.lotNumber}
 															</td>
-															<td>
+															<td style="white-space:nowrap;">
 																${item?.recipient?.name}
 															</td>
 														</tr>
