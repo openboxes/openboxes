@@ -1032,8 +1032,7 @@ class InventoryService {
 		today.clearTime()
 		def transactionInstance = new Transaction(transactionDate: today,
 			transactionType: TransactionType.findByName("Inventory"),
-			inventory: warehouse.inventory,
-			destination: warehouse)
+			inventory: warehouse.inventory)
 		
 		// Iterate over each row
 		inventoryMapList.each { Map importParams ->
@@ -1224,8 +1223,7 @@ class InventoryService {
 			today.clearTime()
 			def transactionInstance = new Transaction(transactionDate: today,
 				transactionType: TransactionType.findByName("Inventory"),
-				inventory: warehouse.inventory,
-				destination: warehouse)
+				inventory: warehouse.inventory)
 			
 			
 			// Iterate over each row 
