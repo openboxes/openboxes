@@ -306,16 +306,23 @@ table#listOutgoing th {
 	font-size: 1.25em;
 	line-height: 2em; 
 	vertical-align: middle;
-	padding: 2px 0px 2px 25px; 
+	padding: 0px 0px 2px 25px; 
 	display: block; 
 	background-color: #fafafa /*#F8F7EF*/; 
 }
+.menu .menu-subheading {
+	vertical-align: middle;
+	padding: 2px 0px 2px 15px; 
+	display: block; 
+	font-weight: bold;
+}
 .menu .menu-section { 
+	padding-top: 5px;
 	padding-right: 0px; 
 	padding-bottom: 0px;
 }
 .menu .menu-section ul { 
-	padding-top: 5px; 
+	padding-top: 0px; 
 	padding-bottom: 5px;
 }
 input.button { 
