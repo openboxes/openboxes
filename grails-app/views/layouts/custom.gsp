@@ -247,10 +247,14 @@
 											src="${createLink(controller:'warehouse', action:'viewLogo', id:session.warehouse.id)}" style="vertical-align: middle" />
 									</g:if>
 									${session?.warehouse?.name} &nbsp;&rsaquo;&nbsp;
-								</g:if>
-							    <g:message code="${params.controller }.label"/>
-							    &nbsp;&rsaquo;&nbsp;								
-			    				<g:layoutTitle />
+								</g:if> 
+							    <g:set var="label1"><g:message code="${params.controller }.label"/></g:set>
+							    <g:set var="label2"><g:layoutTitle /></g:set>
+							    ${label1}
+							    <g:if test="${label1 != label2}">
+									&nbsp;&rsaquo;&nbsp;								
+					    			${label2}
+					    		</g:if>
 			    			</div>
 		    			</h3>
 		    		</g:if>
