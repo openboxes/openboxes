@@ -16,46 +16,55 @@
             </g:if>
             <div class="list">
 
-<table>
-	<thead>
-		<tr>
-			<th> </th>
-			<g:sortableColumn property="order"
-				title="${message(code: 'orderItem.order.label', default: 'Order')}" />
-
-			<g:sortableColumn property="description"
-				title="${message(code: 'orderItem.description.label', default: 'Description')}" />
-				
-			<g:sortableColumn property="status"
-				title="${message(code: 'orderItem.status.label', default: 'Status')}" />
-				
-		</tr>
-	</thead>
-	<tbody>
-		<g:each in="${orderItems}" status="i" var="orderItem">
-			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-				<td>
 					
-				</td>
-				<td>		
-					<g:link controller="order" action="show" id="${orderItem?.order?.id}">	
-						${fieldValue(bean: orderItem, field: "order.description")}
-					</g:link>
-				</td>
-				<td>
-					${fieldValue(bean: orderItem, field: "description")}
-				</td>
-				<td>
-					${fieldValue(bean: orderItem, field: "quantity")}
-				</td>
-				<td>
-					${(orderItem?.isComplete())?"Complete":"Pending" }
-				</td>
-
-			</tr>
-		</g:each>
-	</tbody>
-</table>
+				<g:if test="${orderItems }">
+					<table>
+						<thead>
+							<tr>
+								<th> </th>
+								<g:sortableColumn property="order"
+									title="${message(code: 'orderItem.order.label', default: 'Order')}" />
+					
+								<g:sortableColumn property="description"
+									title="${message(code: 'orderItem.description.label', default: 'Description')}" />
+									
+								<g:sortableColumn property="status"
+									title="${message(code: 'orderItem.status.label', default: 'Status')}" />
+									
+							</tr>
+						</thead>
+						<tbody>
+							<g:set var="i" value="${0 }"/> 
+							<g:each in="${orderItems.groupBy { it.order } }" var="entrymap">
+								<g:each in="${entrymap.value }" var="orderItem" >
+									<tr class="${(i++ % 2) == 0 ? 'odd' : 'even'}">
+										<td>
+											
+										</td>
+										<td>		
+											<g:link controller="order" action="show" id="${orderItem?.order?.id}">	
+												${fieldValue(bean: orderItem, field: "order.description")}
+											</g:link>
+										</td>
+										<td>
+											${fieldValue(bean: orderItem, field: "description")}
+										</td>
+										<td>
+											${fieldValue(bean: orderItem, field: "quantity")}
+										</td>
+										<td>
+											${(orderItem?.isComplete())?"Complete":"Pending" }
+										</td>
+						
+									</tr>
+								</g:each>
+							</g:each>
+						</tbody>
+					</table>
+				</g:if>
+				<g:else>
+					There are no pending order items.
+				</g:else>
 
 			</div>
         </div>

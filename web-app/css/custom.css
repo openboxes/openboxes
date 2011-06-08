@@ -154,11 +154,11 @@ body {
 	padding-right: 15px;
 }
 
-.widgetlarge { border: 1px solid lightgrey; height: 75px; margin: 5px; }
-.widgetsmall { border: 1px solid lightgrey;  margin: 5px; }    		
-.widgetheader { background-color: #FFF; margin: 10px; font-weight: bold; font-size: 110%;} 
-.widgetcontent { margin: 10px; } 
-.widgetsmall .widgetcontent { float: left; width: 45%; font-size: 110%;} 
+.widget-large { border: 1px solid lightgrey; height: 75px; margin: 5px; }
+.widget-small { border: 1px solid lightgrey;  margin: 5px; }    		
+.widget-header { background-color: #FFF; margin: 10px; font-weight: bold; font-size: 110%;} 
+.widget-content { margin: 10px; } 
+.widget-small .widget-content { float: left; width: 45%; font-size: 110%;} 
 
 
 img { 

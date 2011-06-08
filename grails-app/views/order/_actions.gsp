@@ -74,6 +74,12 @@
 						&nbsp;${message(code: 'order.receive.label', default: 'Receive order')} 
 					</g:link>				
 				</div>		
+				<div class="action-menu-item">
+					<g:link controller="receiveOrderWorkflow" action="receiveOrderAlt" id="${orderInstance?.id}">
+						<img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />
+						&nbsp;${message(code: 'order.receive.label', default: 'Receive order (alternative)')} 
+					</g:link>				
+				</div>		
 			</g:if>
 						
 			<div class="action-menu-item">
