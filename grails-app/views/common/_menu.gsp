@@ -120,7 +120,7 @@
 			</li>
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="supplier" action="list">Suppliers</g:link>
+					<g:link controller="location" action="list">Suppliers / Customers</g:link>
 				</span>
 			</li>
 			<li class="">
