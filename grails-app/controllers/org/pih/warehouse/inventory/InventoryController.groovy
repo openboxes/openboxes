@@ -56,13 +56,21 @@ class InventoryController {
 				session.inventorySearchTerms << cmd.searchTerms
 			}
 		}
-
-		// Hydrate the category filters from the session, which allow us 
+		
+		// Hydrate the category filters from the session, which allow us
 		// to get any attribute of a category without get a lazy init exception
+		// First remove any that are null, in the event that a Category was deleted
+		
 		cmd.categoryFilters = []
 		if (session.inventoryCategoryFilters) {
-			session.inventoryCategoryFilters.each {
-				cmd.categoryFilters << Category.get(it);
+			for (Iterator iter = session.inventoryCategoryFilters.iterator(); iter.hasNext();) {
+				Category c = Category.get(iter.next());
+				if (c == null) {
+					iter.remove();
+				}
+				else {
+					cmd.categoryFilters << c;
+				}
 			}
 		}
 				
