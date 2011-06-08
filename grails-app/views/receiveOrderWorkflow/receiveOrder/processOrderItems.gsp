@@ -1,127 +1,74 @@
-
-<%@ page import="org.pih.warehouse.order.Order" %>
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'order.label', default: 'Order')}" />
-        <title><g:message code="default.receive.label" default="Receive {0}" args="[entityName]" /></title>
-       
-    </head>
-    <body>
-        <div class="body">
-            <g:if test="${flash.message}">
-	            <div class="message">${flash.message}</div>
-            </g:if>
-			<g:hasErrors bean="${orderCommand}">
-	            <div class="errors">
-	                <g:renderErrors bean="${orderCommand}" as="list" />
-	            </div>
-            </g:hasErrors>            
-			<g:hasErrors bean="${orderCommand.shipment}">
-	            <div class="errors">
-	                <g:renderErrors bean="${orderCommand.shipment}" as="list" />
-	            </div>
-            </g:hasErrors>            
-            
-            <div class="dialog">
-            
-            	<g:form autocomplete="off">
-            		
-	            	<fieldset>
-	            		<g:render template="header" model="[orderInstance:orderCommand?.order]"/>
-		                <table>
-		                    <tbody>
-								<tr class='prop'>
-									<td valign='top' class='name'>
-										<label for='id'>Status</label>
-									</td>
-									<td valign='top'class='value'>
-										<g:hiddenField name="order.id" value="${orderCommand?.order?.id }"/>
-										${ (orderCommand?.order?.isComplete()) ? "Complete" : "Pending" }
-									</td>
-								</tr>
-								<tr class='prop'>
-									<td valign='top' class='name'>
-										<label for='orderedBy'>Shipment type</label>
-									</td>
-									<td valign='top'class='value'>
-										<g:select class="combobox updateable" name="shipmentType.id" from="${org.pih.warehouse.shipping.ShipmentType.list()}" 
-											optionKey="id" optionValue="name" value="${orderCommand?.shipmentType?.id }" noSelection="['':'']" />
-									</td>
-								</tr>
-								<tr class='prop'>
-									<td valign='top' class='name'>
-										<label for='orderedBy'>Receipient</label>
-									</td>
-									<td valign='top'class='value'>
-										<div class="ui-widget">
-											<g:select class="combobox updateable" name="recipient.id" from="${org.pih.warehouse.core.Person.list()}" 
-												optionKey="id" optionValue="name" value="${orderCommand?.recipient?.id }" noSelection="['':'']" />
-										</div>									
-									</td>
-								</tr>
-								<tr class='prop'>
-									<td valign='top' class='name'>
-										<label for='shippedOn'>Shipped on</label>
-									</td>
-									<td valign='top'class='value'>									
-										<g:jqueryDatePicker 
-											id="shippedOn" 
-											name="shippedOn" 
-											class="updateable"
-											value="${orderCommand?.shippedOn }" 
-											format="MM/dd/yyyy"
-											showTrigger="false" />
-									</td>
-								</tr>								
-								<tr class='prop'>
-									<td valign='top' class='name'>
-										<label for='deliveredOn'>Delivered on</label>
-									</td>
-									<td valign='top'class='value'>
-										<g:jqueryDatePicker 
-											id="deliveredOn" 
-											name="deliveredOn" 
-											class="updateable"
-											value="${orderCommand?.deliveredOn }" 
-											format="MM/dd/yyyy"
-											showTrigger="false" />
-									</td>
-								</tr>								
-		                        <tr class="prop">
-		                            <td valign="top" colspan="2">
-										<g:if test="${orderCommand?.orderItems }">
-											<table id="orderItemsTable">
-												<thead>
-													<tr class="even">
-														<th class="center" align="center" colspan="5">
-															<img src="${createLinkTo(dir:'images/icons/silk',file:'cart.png')}" alt="ordered" style="vertical-align: middle"/>
-															Items Ordered
-														</th>
-														<th class="center" align="center" colspan="4" style="border-left: 1px solid lightgrey;">
-															<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="received" style="vertical-align: middle"/>
-															Items Received
-														</th>
-													</tr>
-													<tr class="even">
-														<td></td>
-														<td>Type</td>
-														<td>Description</td>
-														<td class="center">Ordered</td>										
-														<td class="center">Remaining</td>	
-														<td style="border-left: 1px solid lightgrey;">Received</td>										
-														<td>Product</td>										
-														<td>Lot Number</td>		
-														<%-- 								
-														<td>Actions</td>										
-														--%>
-													</tr>
-												</thead>									
-												<tbody>
-													<g:each var="orderItem" in="${orderCommand?.orderItems }" status="i">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="layout" content="custom" />
+<title>Add order items</title>
+
+</head>
+<body>
+	<div class="body">
+		<g:if test="${flash.message}">
+			<div class="message">
+				${flash.message}
+			</div>
+		</g:if>
+		<g:hasErrors bean="${orderCommand}">
+			<div class="errors">
+				<g:renderErrors bean="${orderCommand}" as="list" />
+			</div>
+		</g:hasErrors>
+		<div class="dialog">
+			<g:render template="progressBar" model="['state':'processOrderItems']"/>		
+			<fieldset>
+				<table>
+					<tr>
+						<td >
+							<div style="margin: 10px">
+								<p>There are ${(orderCommand?.orderItems) ? orderCommand?.orderItems?.size() : 0 } items in this order.</p>
+							</div>							
+						
+							<g:form action="receiveOrder" autocomplete="false">
+								<div style="min-height: 175px">
+									<g:hiddenField name="order.id" value="${orderCommand?.order?.id }"/>
+									<g:hiddenField name="shipmentType.id" value="${orderCommand?.shipmentType?.id }"/>
+									<g:hiddenField name="recipient.id" value="${orderCommand?.recipient?.id }"/>
+									<g:hiddenField name="shippedOn" value="${formatDate(format:'MM/dd/yyyy', date: orderCommand?.shippedOn )}"/>
+									<g:hiddenField name="deliveredOn" value="${formatDate(format:'MM/dd/yyyy', date: orderCommand?.deliveredOn )}"/>
+								
+									<g:if test="${orderItems }">
+										<table id="orderItemsTable">
+											<thead>
+												<tr class="even">
+													<th class="center" align="center" colspan="5">
+														<img src="${createLinkTo(dir:'images/icons/silk',file:'cart.png')}" alt="ordered" style="vertical-align: middle"/>
+														Items Ordered
+													</th>
+													<th class="center" align="center" colspan="4" style="border-left: 1px solid lightgrey;">
+														<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="received" style="vertical-align: middle"/>
+														Items Received
+													</th>
+												</tr>
+												<tr class="even">
+													<td></td>
+													<td>Type</td>
+													<td>Description</td>
+													<td class="center">Ordered</td>										
+													<td class="center">Remaining</td>	
+													<td style="border-left: 1px solid lightgrey;">Received</td>										
+													<td>Product</td>										
+													<td>Lot Number</td>		
+													<%-- 								
+													<td>Actions</td>										
+													--%>
+												</tr>
+											</thead>									
+											<tbody>
+											
+												<g:set var="i" value="${0 }"/>
+												<g:each var="entrymap" in="${orderItems?.groupBy { it?.orderItem } }">
+													<g:each var="orderItem" in="${entrymap.value}">
 												
-														<tr class="${(orderItem?.primary)?"black-top":""}">
+														<tr class="${(orderItem?.primary)?"black-top":""} orderItem">
 															<td>
 																<a name="orderItems${i }"></a>
 																${i }
@@ -163,9 +110,11 @@
 																</g:if>
 															</td>
 															<td>
-																<div class="buttons">
-																	<input type="image" src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="add" class="btnAdd" style="vertical-align: middle"/>
-																</div>
+																<g:if test="${!orderItem?.orderItem?.isComplete() }">
+																	<div class="buttons">
+																		<input type="image" src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="add" class="btnAdd" style="vertical-align: middle"/>
+																	</div>
+																</g:if>
 																<%-- 
 																<g:link controller="order" action="addOrderShipment" id="${orderCommand?.order?.id }" params="[index: i]" class="checkable" fragment="orderItems${i }">
 																	<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="add" style="vertical-align: middle"/>
@@ -179,8 +128,9 @@
 																--%>
 															</td>
 														</tr>
+														<%-- 
 														<g:each in="${orderItem?.orderItem?.shipmentItems()}" var="shipmentItem">
-															<tr >
+															<tr class="shipmentItem">
 																<td colspan="5">
 																</td>
 																<td class="center" style="border-left: 1px solid lightgrey;">
@@ -197,37 +147,37 @@
 																</td>		
 															</tr>												
 														</g:each>
-
-															
+														--%>
+														<g:set var="i" value="${i+1 }"/>
 													</g:each>
-													
-													
-												</tbody>
-											</table>
-										</g:if>
-										<g:else>
-											<span class="fade">No items</span>
-										</g:else>
-		                            </td>
-		                        </tr>
-		                        <tr class="prop">
-			                        <td colspan="2">
-			                        	<div class="buttons">
-											<g:actionSubmit action="saveOrderShipment" value="Save"/> 
-			                        	</div>
-			                        </td>
-		                        </tr>
-		                        
-		                    </tbody>
-		                </table>
-	               </fieldset>
-				</g:form>
-            </div>
-        </div>
-        <g:comboBox />
+												</g:each>
+												
+											</tbody>
+										</table>
+									</g:if>
+									<g:else>
+										<span class="fade">No items</span>
+									</g:else>									
+								</div>
+								<div class="buttons">
+									<g:submitButton name="back" value="Back"></g:submitButton>
+									<g:submitButton name="next" value="Next"></g:submitButton>
+								</div>
+							</g:form>
+						</td>						
+					</tr>
+				</table>
+
+				
+
+			</fieldset>
+		</div>
+
+	</div>
+	<g:comboBox />
 		<script>
 			var changed = false;
-			var currentIndex = $("#orderItemsTable tbody tr").length;
+			var currentIndex = $("#orderItemsTable tbody tr.orderItem").length;
 		
 			$(".btnDel").livequery(function(){
 				$(this).click(function(event) {					
@@ -241,7 +191,7 @@
 			$(".btnAdd").click(function(event) {
 				event.preventDefault();
 				//console.log($(this));
-				var index = ++currentIndex;
+				var index = currentIndex++;
 				var currentRow = $(this).parent().parent().parent();
 				var productId = currentRow.find(".productId");
 				var orderItemId = currentRow.find(".orderItemId");
@@ -274,7 +224,7 @@
 	    	});
 	    </script>
 		<script id="new-item-template" type="x-jquery-tmpl">						
-			<tr class="">
+			<tr class="orderItem">
 				<td>
 					<a name="orderItems{{= Index }}"></a>
 					{{= Index }}
@@ -311,6 +261,6 @@
 				</td>
 			</tr>
 		</script>    	    
-
-    </body>
+	
+</body>
 </html>

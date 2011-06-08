@@ -31,6 +31,10 @@ class OrderService {
 		if (recipientId) 
 			orderCommand.recipient = Person.get(recipientId)
 		
+		orderCommand.origin = Location.get(orderInstance?.origin?.id)
+		orderCommand.destination = Location.get(orderInstance?.destination?.id)
+		orderCommand.orderedBy = Person.get(orderInstance?.orderedBy?.id)
+		orderCommand.dateOrdered = orderInstance?.dateOrdered
 		orderCommand.order = orderInstance;
 		orderInstance?.orderItems?.each {
 			
@@ -61,7 +65,7 @@ class OrderService {
 		shipmentInstance.expectedShippingDate = orderCommand?.shippedOn;
 		
 		orderCommand?.orderItems.each { orderItemCommand ->
-			if (orderItemCommand.productReceived && orderItemCommand?.quantityReceived) {
+			if (orderItemCommand && orderItemCommand.productReceived && orderItemCommand?.quantityReceived) {
 				def shipmentItem = new ShipmentItem();
 				shipmentItem.lotNumber = orderItemCommand.lotNumber
 				shipmentItem.product = orderItemCommand.productReceived;

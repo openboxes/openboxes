@@ -44,6 +44,11 @@
 			</li>									
 			<li class="">
 				<span class="menuButton">
+					<g:link controller="order" action="listOrderItems"><g:message code="orderItem.list.label"  default="List order items "/></g:link>
+				</span>
+			</li>									
+			<li class="">
+				<span class="menuButton">
 					<g:link controller="purchaseOrderWorkflow" action="index"><g:message code="order.create.label" default="Add an order"/></g:link>
 				</span>
 			</li>					

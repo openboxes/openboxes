@@ -11,7 +11,8 @@ class ComboBoxTagLib {
 			<style> 
 			.ui-button { margin-left: -1px; }
 			.ui-button-icon-only .ui-button-text { padding: 0em; } 
-			.ui-autocomplete { height: 200px; overflow-y: scroll; overflow-x: hidden; }
+			.ui-autocomplete { height: 200px; overflow-y: scroll; overflow-x: hidden;  }
+			.ui-menu-item { font-size: 11px; } 
 			</style> 
 			
 			<script> 
@@ -122,7 +123,7 @@ class ComboBoxTagLib {
 			})( jQuery );
 		 
 			\$(function() {
-				\$( ".combobox" ).combobox();		
+				\$( ".combobox" ).livequery(function(){ \$(this).combobox(); });		
 			});
 			</script> 		
 			

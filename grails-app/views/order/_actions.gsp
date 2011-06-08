@@ -57,9 +57,19 @@
 				</div>		
 			</g:if>
 			--%>
+			<%-- 
 			<g:if test="${orderInstance?.destination?.id == session?.warehouse?.id }">
 				<div class="action-menu-item">
 					<g:link controller="order" action="receive" id="${orderInstance?.id}">
+						<img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />
+						&nbsp;${message(code: 'order.receive.label', default: 'Receive order')} 
+					</g:link>				
+				</div>		
+			</g:if>
+			--%>
+			<g:if test="${orderInstance?.destination?.id == session?.warehouse?.id }">
+				<div class="action-menu-item">
+					<g:link controller="receiveOrderWorkflow" action="receiveOrder" id="${orderInstance?.id}">
 						<img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />
 						&nbsp;${message(code: 'order.receive.label', default: 'Receive order')} 
 					</g:link>				

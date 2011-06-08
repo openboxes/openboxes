@@ -27,10 +27,16 @@ class OrderController {
 		def outgoingOrders = orderService.getOutgoingOrders(location)
 		
 		[incomingOrders : incomingOrders, outgoingOrders : outgoingOrders]
-
-		
     }
 
+	def listOrderItems = { 
+		//def orderItems = orderService.getOrderItems()
+		def orderItems = OrderItem.getAll().findAll { !it.isComplete() } ;
+		
+		return [orderItems : orderItems]		
+	}
+	
+	
     def create = {
 		redirect(controller: 'purchaseOrderWorkflow', action: 'index');
 		/*

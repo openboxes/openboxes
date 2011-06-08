@@ -1,5 +1,6 @@
 package org.pih.warehouse.order
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.apache.commons.collections.FactoryUtils;
@@ -9,10 +10,11 @@ import org.pih.warehouse.product.Product;
 import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.shipping.ShipmentItem;
 
-class OrderItemCommand {
+class OrderItemCommand  implements Serializable {
 
 	Boolean primary
 	OrderItem orderItem
+	Shipment shipment
 	ShipmentItem shipmentItem
 	
 	// from order item

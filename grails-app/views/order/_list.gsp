@@ -4,9 +4,7 @@
 <table>
 	<thead>
 		<tr>
-			<g:sortableColumn property="orderNumber"
-				title="${message(code: 'order.orderNumber.label', default: 'Order Number')}" />
-
+			<th> </th>
 			<g:sortableColumn property="description"
 				title="${message(code: 'order.description.label', default: 'Description')}" />
 				
@@ -18,29 +16,28 @@
 				<g:sortableColumn property="destination"
 					title="${message(code: 'order.destination.label', default: 'Destination')}" />
 			</g:if>
+
+			<g:sortableColumn property="createdBy"
+				title="${message(code: 'order.createdBy.label', default: 'Created by')}" />
+			
 			<g:sortableColumn property="lastUpdated"
-				title="${message(code: 'order.lastUpdated.label', default: 'Last Updated')}" />
-				
+				title="${message(code: 'order.lastUpdated.label', default: 'Last updated')}" />
+
 			<g:sortableColumn property="status"
 				title="${message(code: 'order.status.label', default: 'Status')}" />
+				
 		</tr>
 	</thead>
 	<tbody>
 		<g:each in="${orderInstanceList}" status="i" var="orderInstance">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-
-				<td>
-					<g:link action="show" id="${orderInstance.id}">
-						<g:if test="${orderInstance?.orderNumber }">
-							${fieldValue(bean: orderInstance, field: "orderNumber")}
-						</g:if>
-						<g:else>
-							${fieldValue(bean: orderInstance, field: "id")}
-						</g:else>
-					</g:link>
+				<td>			
+					<g:render template="/order/actions" model="[orderInstance:orderInstance]"/> 
 				</td>
 				<td>
-					${fieldValue(bean: orderInstance, field: "description")}
+					<g:link action="show" id="${orderInstance.id}">
+						${fieldValue(bean: orderInstance, field: "description")}
+					</g:link>
 				</td>
 				<g:if test="${orderType == 'incoming' }">
 					<td>
@@ -53,12 +50,13 @@
 					</td>
 				</g:if>
 
+				<td>${orderInstance.orderedBy}</td>
+
 				<td><g:formatDate date="${orderInstance.lastUpdated}" /></td>
 
 				<td>
 					${(orderInstance?.isComplete())?"Complete":"Pending" }
 				</td>
-
 
 			</tr>
 		</g:each>

@@ -76,6 +76,16 @@ form.inline p { margin-bottom:0; }
 /* BUTTONS 
 -------------------------------------------------------------- */
 
+/*
+select, input, textarea { 
+	-moz-border-radius: 1px;
+	border-radius: 1px;
+	-moz-box-shadow: 5px 5px 5px #ccc;
+  	-webkit-box-shadow: 5px 5px 5px #ccc;
+  	box-shadow: 5px 5px 5px #ccc;	
+}
+*/	
+
 .buttons a, .buttons button, .buttons input {
     /*display:block;
     float:left;*/
@@ -84,7 +94,14 @@ form.inline p { margin-bottom:0; }
     border:1px solid #dedede;
     border-top:1px solid #eee;
     border-left:1px solid #eee;
-
+	
+	/*
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	-moz-box-shadow: 5px 5px 5px #ccc;
+  	-webkit-box-shadow: 5px 5px 5px #ccc;
+  	box-shadow: 5px 5px 5px #ccc;	
+    */
     font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
     font-size:100%;
     line-height:130%;
