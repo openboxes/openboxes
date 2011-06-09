@@ -150,13 +150,10 @@ class InventoryService {
 		def items = InventoryItem.withCriteria {
 			or {
 				ilike("lotNumber", searchTerm)
-				//ilike("description", searchTerm)
 				product { 
 					ilike("name", searchTerm)
 				}
-			}				
-			//maxResults(10)
-			
+			}
 		}
 		return items;
 	}
@@ -242,7 +239,12 @@ class InventoryService {
 			   or {
 				   if (productFilters) {
 					   productFilters.each {
-						   ilike("name", "%" + it + "%")
+						   String[] filterTerms = it.split("\\s+");
+						   and {
+							   filterTerms.each {
+								   ilike("name", "%" + it + "%")
+							   }
+						   }
 					   }
 				   }
 				   if (matchCategories) {
