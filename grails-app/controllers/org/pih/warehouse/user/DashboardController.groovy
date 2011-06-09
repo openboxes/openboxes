@@ -60,7 +60,10 @@ class DashboardController {
 			redirect(controller:'dashboard', action:'index')
 		}
 		else {	
-			render(view: "chooseWarehouse", model: [warehouses: Warehouse.list()])
+			List warehouses = Warehouse.findAllWhere("active":true)
+			
+			
+			render(view: "chooseWarehouse", model: [warehouses: warehouses])
 		}
 		
 	}
