@@ -124,18 +124,23 @@ class InventoryService {
 	}
 	
 	/**
-	 * Returns a map of products grouped by category.
-	 * 
-	 * TODO Make sure this is doing what it's intended to do.  The groupBy 
-	 * expression looks a little weird to me.
-	 * 
-	 * @param id
-	 * @return
+	 * @return a Sorted Map from product primary category to List of products
 	 */
-	Map getProductMap(Long id) { 		
-		return Product.getAll().groupBy { it.categories*.parents } 
+	Map getProductMap(Collection products) {
+		Map m = new TreeMap();
+		if (products) {
+			products.each {
+				Category c = it.category
+				List l = m.get(c)
+				if (l == null) {
+					l = new ArrayList();
+					m.put(c, l);
+				}
+				l.add(it);
+			}
+		}
+		return m
 	}
-	
 	
 	/**
 	 * Search inventory items by term or product Id
@@ -170,7 +175,7 @@ class InventoryService {
 		
 		// This list gets calculated AFTER the product list, because we need to use the product list as the basis. 
 		commandInstance.attributeMap = getProductAttributes();
-		commandInstance.productMap = getProductMap(commandInstance?.warehouseInstance?.id);
+		commandInstance.productMap = getProductMap(commandInstance.productList);
 		commandInstance.inventoryItemMap =  getInventoryItemMap(commandInstance?.warehouseInstance?.id);
 		commandInstance.productList = commandInstance?.productList?.sort() { it.name };
 		commandInstance.quantityMap = getQuantityByProductMap(commandInstance?.inventoryInstance);
@@ -254,18 +259,12 @@ class InventoryService {
 	   return products;
    }
 
-	
 	/**
 	 * Get a map of product attribute-value pairs for the given products.
 	 * If products is empty, then we return all attribute-value pairs.
 	 */
 	Map getProductAttributes() { 
-		//def map = new HashMap<Attribute, List<String>>();
 		def productAttributes = ProductAttribute.list()
-		//productAttributes.each { 			
-		//	log.info it.product + " " + it.attribute + " " + it.value;
-		//	map.put(it.attribute, it.value);
-		//}
 		return productAttributes.groupBy { it.attribute } 
 	}
 	

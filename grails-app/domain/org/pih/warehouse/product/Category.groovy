@@ -37,9 +37,16 @@ class Category implements Comparable, Serializable {
 	 * Sort by name
 	 */
 	int compareTo(obj) { 
-		name <=> obj.name 
+		this.getHierarchyAsString("|") <=> obj.getHierarchyAsString("|")
 	}
 	
+	String getHierarchyAsString(String separator) {
+		String s = ""
+		getParents().each {
+			s += it.name + separator
+		}
+		return s;
+	}
 	
 	List getParents() { 
 		def parents = []

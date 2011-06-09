@@ -23,7 +23,7 @@ import org.pih.warehouse.shipping.ShipmentItem;
  * 20 mg tablets vs a 50 count bottle of 20 mg tablets will both be stored 
  * as 20 mg tablets).  
  */
-class Product implements Serializable {
+class Product implements Comparable, Serializable {
 	
 	// Base product information 
 	String name;							// Specific description for the product
@@ -81,6 +81,13 @@ class Product implements Serializable {
 	}
 	
 	String toString() { return "$name"; }
+	
+	/**
+	* Sort by name
+	*/
+	int compareTo(obj) {
+		this.name <=> obj.name
+	}
 
 	/**
 	 * Some utility methods

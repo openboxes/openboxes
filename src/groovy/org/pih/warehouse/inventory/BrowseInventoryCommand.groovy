@@ -9,7 +9,7 @@ class BrowseInventoryCommand {
 
 	def searchTermFilters 	// search filters loaded from the session
 	def categoryFilters; 	// category filters loaded from the session
-	def productMap; 		// inventoryService.getProductMap(warehouseInstance?.id),
+	def productMap; 		// inventoryService.getProductMap(productList),
 	def inventoryItemMap;	// inventoryService.getInventoryItemMap(warehouseInstance?.id),
 	def productList;		// productList?.sort() { it.name },
 	def rootCategory;		// rootCategory

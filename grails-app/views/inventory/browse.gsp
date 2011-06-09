@@ -68,11 +68,10 @@
 	         			</td>
 		         		<td>
 	            			<div style="overflow: auto; height: 500px; padding: 10px; border: 1px solid lightgrey">		
-			            		<g:if test="${commandInstance?.productList }">
-		            				<g:set var="productList" value="${commandInstance?.productList?.sort { it.name } }"/>							
-									<g:set var="productMap" value="${commandInstance?.productList.groupBy {it.category} }"/>
-									<g:each var="entry" in="${productMap}" status="i">	
-										<g:set var="totalQuantity" value="${0 }"/>
+			            		<g:if test="${commandInstance?.productMap}">
+									<g:each var="entry" in="${commandInstance?.productMap}" status="i">	
+										<g:set var="totalQuantity" value="${0}"/>
+										<g:set var="categoryProducts" value="${commandInstance?.productMap[entry.key].sort()}"/>
 										<div class="list">
 											<div style="font-weight: bold; padding: 10px;">
 												<g:render template="../category/breadcrumb" model="[categoryInstance:entry.key]"/>
@@ -87,7 +86,7 @@
 													</tr>
 												</thead>
 												<tbody>
-													<g:each var="productInstance" in="${productMap[entry.key] }" status="status">
+													<g:each var="productInstance" in="${categoryProducts}" status="status">
 														<g:set var="quantity" value="${commandInstance?.quantityMap?.get(productInstance) }"/>
 														<g:set var="totalQuantity" value="${totalQuantity + (quantity?:0) }"/>
 														<tr class="${status%2==0?'even':'odd' } prop">

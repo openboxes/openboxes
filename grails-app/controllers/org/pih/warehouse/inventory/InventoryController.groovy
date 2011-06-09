@@ -749,52 +749,6 @@ class InventoryController {
 		}
 		redirect(action:browse)
 	}
-	
-	/*
-	def edit = {
-		def selectedProductType = ProductType.get(params.productTypeId);
-		def warehouseInstance = Warehouse.get(session.warehouse.id);
-		if (!warehouseInstance) {
-			flash.message = "Error retrieving inventory for selected warehouse"
-		}
-				
-		def productCriteria = Product.createCriteria();
-		log.info "product filter " + params;
-		def results = productCriteria.list {
-			and{
-				if(params.productTypeId){
-					eq("productType.id", Long.parseLong(params.productTypeId))
-				}
-				  if(params.categoryId){
-					  categories {
-						  eq("id", Long.parseLong(params.categoryId))
-					  }
-				}
-				if (params.nameContains) {
-					like("name", "%" + params.nameContains + "%")
-				}
-			}
-		}
-		
-		// Quick hack to create a new inventory if one does not already exist
-		// FIXME make sure this doesn't cause inventories to magically disappear
-		if (!warehouseInstance?.inventory) {
-			def inventoryInstance = new Inventory();
-			warehouseInstance.inventory = inventoryInstance;
-			warehouseInstance.save(flush:true);
-			flash.message = "Created a new inventory for warehouse ${session.warehouse.name}."
-		}
-		
-		render(view: "edit", model: [
-			warehouseInstance: warehouseInstance,
-			inventoryInstance: warehouseInstance?.inventory,
-			productMap : inventoryService.getProductMap(warehouseInstance?.id),
-			inventoryMap : inventoryService.getInventoryMap(warehouseInstance?.id),
-			productInstanceList : Product.getAll(),
-			productTypes : ProductType.getAll(),
-			selectedProductType : selectedProductType])
-	}
-	*/
 }
 
 
