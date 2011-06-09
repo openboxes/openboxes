@@ -89,6 +89,14 @@ class AuthController {
 	
 	def handleLogin = {
 		def userInstance = User.findByUsernameOrEmail(params.username, params.username)
+		
+		TimeZone userTimezone = TimeZone.getTimeZone("America/New_York")
+		String browserTimezone = request.getParameter("browserTimezone")
+		if (browserTimezone != null) {
+			userTimezone = TimeZone.getTimeZone(browserTimezone)
+		}
+		session.timezone = userTimezone;
+		
 		if (userInstance) {
 			
 			if (!userInstance?.active) {

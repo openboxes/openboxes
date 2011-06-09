@@ -4,17 +4,26 @@
 	<meta name="layout" content="custom" />
 	<title>Login</title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
+	<script src="${createLinkTo(dir:'js/', file:'detect_timezone.js')}" type="text/javascript" ></script>
 </head>
 <body>
 	<style>
 		#hd { display: none; }  
-		
 	</style>
+	
+	<script type="text/javascript"> 	
+		jQuery(document).ready(function() {
+			jQuery("select:first", document.forms[0]).focus(); // Focus on the first text input field in the page
+			var timezone = jzTimezoneDetector.determine_timezone().timezone; // Now you have an instance of the TimeZone object.
+			jQuery("#browserTimezone").val(timezone.olson_tz); // Set the user timezone offset as a hidden input
+		});	
+	</script>
 
 	<div class="body">
 		<g:form controller="auth" action="handleLogin" method="post">	
 		
 			<g:hiddenField name="targetUri" value="${params?.targetUri}" />
+			<g:hiddenField id="browserTimezone" name="browserTimezone" />
 			  
 		    <div class="dialog">
 
@@ -39,14 +48,7 @@
 						    			<span style="font-size: 2em; vertical-align: top;">openboxes</span>
 							    </a>					
 							</div>	
-						</legend>				
-						<script>	
-							jQuery(document).ready(function() {
-								// focus on the first text input field in the first field on the page
-								jQuery("select:first", document.forms[0]).focus();
-							});	
-						</script>		
-
+						</legend>
 						<table>
 							<tbody>
 

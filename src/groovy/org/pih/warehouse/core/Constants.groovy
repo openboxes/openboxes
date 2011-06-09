@@ -4,8 +4,8 @@ package org.pih.warehouse.core
 class Constants {
 	
 	static final String DEFAULT_DATE_FORMAT = "dd/MMM/yyyy"
-	static final String DEFAULT_DATE_TIME_FORMAT = "dd/MMM/yyyy hh:mm:ss a"
-	static final String DEFAULT_TIME_FORMAT = "hh:mm:ss a"
+	static final String DEFAULT_DATE_TIME_FORMAT = "dd/MMM/yyyy HH:mm:ss z"
+	static final String DEFAULT_TIME_FORMAT = "HH:mm:ss z"
 	static final String DEFAULT_MONTH_YEAR_DATE_FORMAT = "MMM yyyy"
 	
 	static final String DEFAULT_WEIGHT_UNITS = "lbs"

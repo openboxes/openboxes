@@ -67,7 +67,7 @@
 													</a> 
 														
 													<g:if test="${warehouse?.id == session?.user?.warehouse?.id }">
-														You last logged in here on <b><g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_TIME_FORMAT}" date="${session?.user?.lastLoginDate}"/></b>
+														You last logged in here on <b><format:datetime obj="${session?.user?.lastLoginDate}"/></b>
 													</g:if>
 												</g:if>
 												<g:else>
