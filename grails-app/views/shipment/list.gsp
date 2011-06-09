@@ -86,9 +86,7 @@
 			                            		<g:set var="cssClass" >color: #aaa;</g:set>	
 			                            	</g:else>
 			                            	<span style="${cssClass}">${fieldValue(bean: shipmentInstance, field: "origin")}</span>
-			                            	<span>
-				                            	<g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />			                            	
-				                            </span>
+			                            	<span><format:date obj="${shipmentInstance?.expectedShippingDate}"/></span>
 			                            </td>
 			                            <td style="vertical-align: top; text-align: left" nowrap="true" width="10%">
 			                            	<g:if test="${session?.warehouse?.id != shipmentInstance?.destination?.id}">
@@ -99,7 +97,7 @@
 			                            	</g:else>
 			                            	<span style="${cssClass}">${fieldValue(bean: shipmentInstance, field: "destination")}</span> 
 			                            	<span>
-				                            	<g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />
+				                            	<format:date obj="${shipmentInstance?.expectedDeliveryDate}"/>
 			                            	</span>
 			                            </td>
 			                            <td style="vertical-align: top; text-align: center;" width="10%">
@@ -140,44 +138,6 @@
 					</div>
 			            
 				</g:each>
-				<%-- 
-				<h2>All Shipments</h2>				
-                <table>
-                    <thead>
-                        <tr>                        
-                            <g:sortableColumn property="name" title="${message(code: 'shipment.name.label', default: 'Name')}" />                            
-                            <g:sortableColumn property="identifier" title="${message(code: 'shipment.identifier.label', default: 'Identifier')}" />                        
-                            <g:sortableColumn property="shipmentStatus" title="${message(code: 'shipment.status.label', default: 'Status')}" />                            
-                            <g:sortableColumn property="expectedShippingDate" title="${message(code: 'shipment.expectedShippingDate.label', default: 'Shipping Date')}" />
-                            <g:sortableColumn property="trackingNumber" title="${message(code: 'shipment.trackingNumber.label', default: 'Tracking Number')}" />                        
-                            <th><g:message code="shipment.origin.label" default="Origin" /></th>                   	    
-                            <th><g:message code="shipment.destination.label" default="Destination" /></th>                   	    
-                        </tr>
-                    </thead>
-                    <tbody>
-	                    <g:each in="${shipmentInstanceList}" status="i" var="shipmentInstance">
-	                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}" style="height: 50px;">
-	                            <td style="vertical-align: middle; text-align: center;">
-	                            	<g:link action="show" id="${shipmentInstance.id}" alt="show">
-	                            		${fieldValue(bean: shipmentInstance, field: "name")}
-									</g:link>
-								</td>
-	                            <td style="vertical-align: middle; text-align: center;">
-	                            	${fieldValue(bean: shipmentInstance, field: "identifier")}
-	                            </td>
-	                            <td style="vertical-align: middle; text-align: center;" nowrap="true">
-                            		<g:if test="${shipmentInstance?.shipmentStatus}">${fieldValue(bean: shipmentInstance, field: "shipmentStatus.name")}</g:if>
-                            		<g:else>No status</g:else>
-	                            </td>
-	                            <td style="vertical-align: middle; text-align: center;" nowrap="true"><g:formatDate date="${shipmentInstance.expectedShippingDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" /></td>
-	                            <td style="vertical-align: middle; text-align: center;">${fieldValue(bean: shipmentInstance, field: "trackingNumber")}</td>
-	                            <td style="vertical-align: middle; text-align: center;">${fieldValue(bean: shipmentInstance, field: "origin")}</td>
-	                            <td style="vertical-align: middle; text-align: center;">${fieldValue(bean: shipmentInstance, field: "destination")}</td>
-	                        </tr>
-	                    </g:each>
-                    </tbody>
-                </table>
-                --%>
             </div>
             <div class="paginateButtons">
                 <g:paginate total="${shipmentInstanceTotal}" />

@@ -40,7 +40,7 @@
 												<g:if test="${shipmentInstance?.mostRecentEvent}">
 													<span class="fade">
 														${fieldValue(bean: shipmentInstance, field: "mostRecentEvent.eventLocation.name")}
-														on <g:formatDate format="MMM dd yyyy" date="${shipmentInstance?.mostRecentEvent?.eventDate}"/>
+														on <format:date obj="${shipmentInstance?.mostRecentEvent?.eventDate}"/>
 													</span>
 												</g:if>
 											</td>
@@ -56,7 +56,7 @@
 											<td>
 												<span class="fade">
 													<g:if test="${shipmentInstance.expectedShippingDate}">
-														Expected to ship on <g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="MMM dd yyyy" />
+														Expected to ship on <format:datetime obj="${shipmentInstance?.expectedShippingDate}"/>
 													</g:if>
 													<g:else>
 														No expected shipping date yet.
@@ -76,7 +76,7 @@
 											<td>
 												<span class="fade">
 													<g:if test="${shipmentInstance.expectedDeliveryDate}">
-														Expected to arrive on <g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="MMM dd yyyy" />
+														Expected to arrive on format:datetime obj="${shipmentInstance?.expectedDeliveryDate}"/>
 													</g:if>
 													<g:else>
 														No expected delivery date yet.
@@ -226,7 +226,7 @@
 																				${eventType.name}																	
 																				<%-- 																		
 																				<span class="fade">
-																					<g:formatDate format="MMM dd" date="${shipmentInstance?.mostRecentEvent?.eventDate}"/>
+																					<format:date obj="${shipmentInstance?.mostRecentEvent?.eventDate}"/>
 																				</span>
 																				--%>
 																			</g:if>
@@ -392,12 +392,7 @@
 																		</span>
 																	</td>
 																	<td>
-																		<g:formatDate format="MMM dd yyyy" date="${document?.dateCreated}"/> &nbsp; 
-																		<%--
-																		<span style="font-size: 0.8em; color: #aaa;">
-																			<g:formatDate type="time" date="${document.dateCreated}"/>
-																		</span>
-																		 --%>																		
+																		<format:datetime obj="${document?.dateCreated}"/> &nbsp; 																	
 																	</td>
 																	<td style="text-align: right">
 																		<g:link controller="document" action="download" id="${document.id}">
@@ -451,7 +446,7 @@
 																	<td>${i+1}</td>
 																	<td><i>"${comment?.comment}"</i> --<b>${comment?.sender?.username}</b></td>																	
 																	<td>
-																		<g:formatDate format="MMM dd yyyy" date="${comment?.dateCreated}"/> &nbsp; 
+																		<format:date obj="${comment?.dateCreated}"/> &nbsp; 
 																		
 																	</td>																		
 																	<td style="text-align: right">
@@ -507,12 +502,7 @@
 																		${event.eventType.name}
 																	</td>
 																	<td>																			
-																		<g:formatDate format="MMM dd yyyy" date="${event.eventDate}"/> &nbsp; 
-																		<%-- 
-																		<span style="font-size: 0.8em; color: #aaa;">
-																			<g:formatDate type="time" date="${event.eventDate}"/>
-																		</span>
-																		--%>																			
+																		<format:date obj="${event.eventDate}"/> &nbsp; 																		
 																	</td>
 																	<td style="text-align: right">
 																		<g:link class="remove" action="deleteEvent" id="${event?.id}" params="[shipmentId:shipmentInstance.id]">

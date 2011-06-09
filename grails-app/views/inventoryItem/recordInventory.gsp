@@ -365,7 +365,7 @@
 															--%>
 															<g:hiddenField name="recordInventoryRows[${status}].expirationDate" value="${formatDate(date: recordInventoryRow?.expirationDate, format: 'MM/dd/yyyy') }"/>
 															<g:if test="${recordInventoryRow?.expirationDate}">
-																<g:formatDate date="${recordInventoryRow?.expirationDate}" format="MMM dd yyyy"/>
+																<format:expirationDate obj="${recordInventoryRow?.expirationDate}"/>
 															</g:if>
 															<g:else>
 																<span class="fade">never</span>

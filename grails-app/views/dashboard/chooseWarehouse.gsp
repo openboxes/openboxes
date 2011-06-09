@@ -35,21 +35,7 @@
 					<h1>Choose a warehouse</h1>
 		    		<fieldset>
 						<table>
-							<tbody>			
-								<%-- 				
-								<tr>
-									<td>
-										<g:if test="${session?.user?.warehouse}">
-											<span style="font-size: 80%; width: 100%; text-align: right; color: #aaa">
-												<g:if test="${session?.user?.lastLoginDate}">
-													You last logged into <b>${session?.user?.warehouse?.name}</b> on
-													<b><g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_TIME_FORMAT}" date="${session?.user?.lastLoginDate}"/></b> 
-												</g:if>
-											</span>
-										</g:if>
-									</td>
-								</tr>
-								--%>							
+							<tbody>						
 								<g:each var="warehouse" in="${warehouses}" status="i">								
 									<tr class="prop">
 										<td nowrap="nowrap">

@@ -63,14 +63,14 @@
                         <tr class="prop">
                             <td valign="top" class="name"><g:message code="eventType.dateCreated.label" default="Date Created" /></td>
                             
-                            <td valign="top" class="value"><g:formatDate date="${eventTypeInstance?.dateCreated}" /></td>
+                            <td valign="top" class="value"><format:datetime obj="${eventTypeInstance?.dateCreated}" /></td>
                             
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name"><g:message code="eventType.lastUpdated.label" default="Last Updated" /></td>
                             
-                            <td valign="top" class="value"><g:formatDate date="${eventTypeInstance?.lastUpdated}" /></td>
+                            <td valign="top" class="value"><format:datetime obj="${eventTypeInstance?.lastUpdated}" /></td>
                             
                         </tr>
                     

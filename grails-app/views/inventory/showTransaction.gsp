@@ -67,7 +67,7 @@
 									</td>
 									<td>
 										<span class="value">
-											<g:formatDate date="${transactionInstance?.transactionDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}"/>
+											<format:date obj="${transactionInstance?.transactionDate}"/>
 										</span>
 									</td>										
 								</tr>
@@ -155,8 +155,7 @@
 																${transactionEntry?.inventoryItem?.lotNumber }
 															</td>		
 															<td>
-																<g:formatDate
-																	date="${transactionEntry?.inventoryItem?.expirationDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}" />															
+																<format:expirationDate obj="${transactionEntry?.inventoryItem?.expirationDate}"/>															
 															</td>
 															<td>
 																${transactionEntry?.quantity}

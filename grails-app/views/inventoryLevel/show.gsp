@@ -56,7 +56,7 @@
                         <tr class="prop">
                             <td valign="top" class="name"><g:message code="inventoryLevel.dateCreated.label" default="Date Created" /></td>
                             
-                            <td valign="top" class="value"><g:formatDate date="${inventoryLevelInstance?.dateCreated}" /></td>
+                            <td valign="top" class="value"><format:datetime obj="${inventoryLevelInstance?.dateCreated}" /></td>
                             
                         </tr>
                     
@@ -70,7 +70,7 @@
                         <tr class="prop">
                             <td valign="top" class="name"><g:message code="inventoryLevel.lastUpdated.label" default="Last Updated" /></td>
                             
-                            <td valign="top" class="value"><g:formatDate date="${inventoryLevelInstance?.lastUpdated}" /></td>
+                            <td valign="top" class="value"><format:datetime obj="${inventoryLevelInstance?.lastUpdated}" /></td>
                             
                         </tr>
                     

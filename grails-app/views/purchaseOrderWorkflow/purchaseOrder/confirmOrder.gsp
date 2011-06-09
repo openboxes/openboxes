@@ -59,7 +59,7 @@
 							<tr class='prop'>
 								<td valign='top' class='name'><label for='dateOrdered'>Order date:</label></td>
 								<td valign='top' class='value'>								
-									${order?.dateOrdered } 
+									<format:date obj="${order?.dateOrdered }"/>
 								</td>
 							</tr>
 							<tr class='prop'>

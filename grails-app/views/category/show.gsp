@@ -69,14 +69,14 @@
                         <tr class="prop">
                             <td valign="top" class="name"><g:message code="category.dateCreated.label" default="Date Created" /></td>
                             
-                            <td valign="top" class="value"><g:formatDate date="${categoryInstance?.dateCreated}" /></td>
+                            <td valign="top" class="value"><format:datetime obj="${categoryInstance?.dateCreated}" /></td>
                             
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name"><g:message code="category.lastUpdated.label" default="Last Updated" /></td>
                             
-                            <td valign="top" class="value"><g:formatDate date="${categoryInstance?.lastUpdated}" /></td>
+                            <td valign="top" class="value"><format:datetime obj="${categoryInstance?.lastUpdated}" /></td>
                             
                         </tr>
                     

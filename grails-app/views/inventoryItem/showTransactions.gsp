@@ -90,9 +90,7 @@
 																${transaction?.id }
 															</td>
 															<td>
-																<g:formatDate
-																	date="${transaction?.transactionDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />
-
+																<format:date obj="${transaction?.transactionDate}" />
 															</td>
 															<td>	
 																${transaction?.transactionType?.name }
@@ -113,95 +111,9 @@
 													</g:each>
 												</tbody>
 											</table>
-											
-																		
-											
-											<%-- 
-											<div id="transactionEntryButton" style="text-align: right;">
-												<a href="#" id="addTransactionEntryLink">
-													<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
-													edit stock card</a>
-											</div>
-											--%>				
-											<%-- 
-											<table border="0">
-												<thead>
-													<tr>
-														<th>
-															${message(code: 'transaction.transactionDate.label', default: 'Date')}
-														</th>
-														<th>
-															${message(code: 'transaction.transactionType.label', default: 'Type')}
-														</th>
-														<th>
-															${message(code: 'transaction.source.label', default: 'Source')}
-														</th>
-														<th>
-															${message(code: 'inventory.destination.label', default: 'Destination')}
-														</th>
-														<th>
-															${message(code: 'inventoryItem.lotNumber.label', default: 'Lot Number')}
-														</th>
-														<th>
-															${message(code: 'inventory.quantity.label', default: 'Qty')}
-														</th>
-													</tr>
-												</thead>
-												<tbody>
-													<g:if test="${transactionEntryList}">
-														<g:each var="transactionEntry" in="${transactionEntryList}" status="status">
-															<tr class="${(status%2==0)?'odd':'even' }">
-																<td>
-																	<g:formatDate
-																		date="${transactionEntry?.transaction?.transactionDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />
-																</td>
-																<td>
-																	${transactionEntry?.transaction?.transactionType?.name }
-																</td>
-																<td>
-																	${transactionEntry?.transaction?.source?.name }
-																</td>
-																<td>
-																	${transactionEntry?.transaction?.destination?.name }
-																</td>
-																<td>
-																	${transactionEntry?.inventoryItem?.lotNumber?:'<span class="fade">EMPTY</span>'}
-																</td>
-																<td style="text-align: center;">	
-																	${transactionEntry?.quantity}
-																</td>
-															</tr>			
-														</g:each>
-													</g:if>			
-													<g:else>
-														<tr class="odd">
-															<td colspan="7" style="text-align: center">
-																<div class="fade">No stock movements</div>
-															</td>
-														</tr>
-													</g:else>				
-												</tbody>
-												<g:if test="${inventoryItemList }">
-													<tfoot >
-														<tr >
-															<th colspan="5">
-																Total												 
-															</th>
-															<th style="text-align: center">
-																${inventoryItemList*.quantity?.sum() }
-															</th>
-														</tr>
-														
-													</tfoot>
-												</g:if>
-											</table>
-											--%>
-											
-											
 										</fieldset>
 								
-								
-								
+
 								<script>
 									$(document).ready(function() {
 										$("#transactionEntryButton").show();

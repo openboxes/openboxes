@@ -47,7 +47,7 @@
 															${shipmentInstance?.status.location}
 														</g:if>
 														<g:if test="${shipmentInstance?.status?.date}">
-															on <g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${shipmentInstance?.status.date}"/>
+															on <format:date obj="${shipmentInstance?.status.date}"/>
 														</g:if>
 													</span>
 												</td>
@@ -62,7 +62,7 @@
 													</span>
 													<span class="fade">
 														<g:if test="${shipmentInstance.expectedShippingDate && !shipmentInstance.hasShipped()}">
-															on <g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />
+															on <format:date obj="${shipmentInstance?.expectedShippingDate}"/>
 														</g:if>
 													</span>											
 												</td>
@@ -77,7 +77,7 @@
 													</span>											
 													<span class="fade">
 														<g:if test="${shipmentInstance.expectedDeliveryDate && !shipmentInstance.wasReceived()}">
-															on <g:formatDate date="${shipmentInstance?.expectedDeliveryDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />
+															on <format:date obj="${shipmentInstance?.expectedDeliveryDate}"/>
 														</g:if>
 													</span>											
 												</td>
@@ -295,12 +295,7 @@
 																</span>
 															</td>
 															<td>
-																<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${document?.dateCreated}"/> &nbsp; 
-																<%--
-																<span style="font-size: 0.8em; color: #aaa;">
-																	<g:formatDate type="time" date="${document.dateCreated}"/>
-																</span>
-																 --%>																		
+																<format:date obj="${document?.dateCreated}"/> &nbsp; 																	
 															</td>
 															<td style="text-align: right">			
 																<g:link action="editDocument" params="[documentId:document.id,shipmentId:shipmentInstance.id]">
@@ -346,13 +341,7 @@
 														<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 															<td><i>"${comment?.comment}"</i> -<b>${comment?.sender?.username}</b></td>																	
 															<td>
-																<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${comment?.dateCreated}"/> &nbsp; 
-																<%-- 
-																<span style="font-size: 0.8em; color: #aaa;">
-																	<g:formatDate type="time" date="${comment?.dateCreated}"/>
-																</span>
-																--%>	
-															
+																<format:date obj="${comment?.dateCreated}"/> &nbsp; 
 															</td>																		
 															<td style="text-align: right">
 																<g:link class="remove" action="deleteComment" id="${comment?.id}" params="[shipmentId:shipmentInstance.id]" onclick="return confirm('Are you sure you want to delete this note?')">
@@ -394,7 +383,7 @@
 																${event?.eventLocation?.name}
 															</td>
 															<td>																			
-																<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${event.eventDate}"/> &nbsp; 																			
+																<format:date obj="${event.eventDate}"/> &nbsp; 																			
 															</td>
 															<td style="text-align: right">
 																<g:link action="editEvent" id="${event?.id}" params="[shipmentId:shipmentInstance.id]">

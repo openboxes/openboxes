@@ -39,14 +39,14 @@
                         <tr class="prop">
                             <td valign="top" class="name"><g:message code="attribute.dateCreated.label" default="Date Created" /></td>
                             
-                            <td valign="top" class="value"><g:formatDate date="${attributeInstance?.dateCreated}" /></td>
+                            <td valign="top" class="value"><format:datetime obj="${attributeInstance?.dateCreated}" /></td>
                             
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name"><g:message code="attribute.lastUpdated.label" default="Last Updated" /></td>
                             
-                            <td valign="top" class="value"><g:formatDate date="${attributeInstance?.lastUpdated}" /></td>
+                            <td valign="top" class="value"><format:datetime obj="${attributeInstance?.lastUpdated}" /></td>
                             
                         </tr>
                     
@@ -60,7 +60,7 @@
                         <tr class="prop">
                             <td valign="top" class="name"><g:message code="attribute.options.label" default="Options" /></td>
                             
-                            <td valign="top" class="value">${fieldValue(bean: attributeInstance, field: "options")}</td>
+                            <td valign="top" class="value">${attributeInstance.options.join(", ")}</td>
                             
                         </tr>
                     

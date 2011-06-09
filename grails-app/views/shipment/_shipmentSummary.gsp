@@ -33,7 +33,7 @@
 										<span class="fade">
 											${shipmentInstance?.mostRecentEvent?.eventType?.eventCode?.status }
 											<b><g:relativeDate date="${shipmentInstance?.mostRecentEvent?.eventDate}"/></b>
-											(<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${shipmentInstance?.mostRecentEvent?.eventDate}"/>)
+											(<format:date obj="${shipmentInstance?.mostRecentEvent?.eventDate}"/>)
 											
 										</span>
 									</g:if>
@@ -57,11 +57,11 @@
 										<th>Arriving</th>
 									</tr>
 									<tr>
-										<td style="padding-left:20px;">${shipmentInstance?.origin?.name} on <g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${shipmentInstance?.expectedShippingDate}"/></td>	
+										<td style="padding-left:20px;">${shipmentInstance?.origin?.name} on <format:date obj="${shipmentInstance?.expectedShippingDate}"/></td>	
 										<td rowspan="2" valign="middle">
 											<!-- <img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_right.png')}" style="vertical-align: middle;"/> -->
 										</td>							
-										<td style="padding-left:20px;">${shipmentInstance?.destination?.name} on <g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${shipmentInstance?.expectedDeliveryDate}"/></td>
+										<td style="padding-left:20px;">${shipmentInstance?.destination?.name} on <format:date obj="${shipmentInstance?.expectedDeliveryDate}"/></td>
 									</tr>
 								</table>
 							</span>
@@ -78,20 +78,20 @@
 								<td style="padding-left:20px;">
 									<g:if test="${shipmentInstance.actualShippingDate}">
 										Shipment was shipped <b><g:relativeDate date="${shipmentInstance?.actualShippingDate }"/></b>
-											(<g:formatDate format="MMM dd" date="${shipmentInstance?.actualShippingDate}"/>)
+											(<format:date obj="${shipmentInstance?.actualShippingDate}"/>)
 									</g:if>						
 									<g:elseif test="${shipmentInstance?.expectedShippingDate}">
 										<g:if test="${shipmentInstance?.expectedShippingDate > new Date()}">
 											<div class="fade">
 												Expected to ship <b><g:relativeDate date="${shipmentInstance?.expectedShippingDate }"/></b>
-												(<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${shipmentInstance?.expectedShippingDate}"/>)
+												(<format:date obj="${shipmentInstance?.expectedShippingDate}"/>)
 											</div>
 										</g:if>
 										<g:else>
 											<div class="">
 												<img src="${createLinkTo(dir:'images/icons/silk',file:'clock_red.png')}" style="vertical-align: middle;"/> 
 												Shipment is late, was supposed to ship <b><g:relativeDate date="${shipmentInstance?.expectedShippingDate }"/></b>
-												(<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${shipmentInstance?.expectedShippingDate}"/>)
+												(<format:date obj="${shipmentInstance?.expectedShippingDate}"/>)
 												
 											</div>
 										</g:else>									
@@ -107,8 +107,8 @@
 							<tr class="prop">
 								<td style="text-align: right;" colspan="3">
 									<div style="color: #aaa; font-size: 0.75em;">
-										Last modified <b><g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${shipmentInstance?.lastUpdated}"/></b> at								
-										<b><g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_TIME_FORMAT}" date="${shipmentInstance?.lastUpdated}"/></b>
+										Last modified <b><format:date obj="${shipmentInstance?.lastUpdated}"/></b> at								
+										<b><format:time obj="${shipmentInstance?.lastUpdated}"/></b>
 									</div>
 								</td>					
 							</tr>

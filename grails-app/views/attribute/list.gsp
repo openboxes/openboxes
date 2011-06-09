@@ -28,33 +28,19 @@
                 <table>
                     <thead>
                         <tr>
-                        
                             <g:sortableColumn property="id" title="${message(code: 'attribute.id.label', default: 'Id')}" />
-                        
                             <g:sortableColumn property="name" title="${message(code: 'attribute.name.label', default: 'Name')}" />
-                        
-                            <g:sortableColumn property="dateCreated" title="${message(code: 'attribute.dateCreated.label', default: 'Date Created')}" />
-                        
-                            <g:sortableColumn property="lastUpdated" title="${message(code: 'attribute.lastUpdated.label', default: 'Last Updated')}" />
-                        
+                            <g:sortableColumn property="options" title="${message(code: 'attribute.options.label', default: 'Options')}" />
                             <g:sortableColumn property="allowOther" title="${message(code: 'attribute.allowOther.label', default: 'Allow Other')}" />
-                        
                         </tr>
                     </thead>
                     <tbody>
                     <g:each in="${attributeInstanceList}" status="i" var="attributeInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                        
                             <td><g:link action="edit" id="${attributeInstance.id}">${fieldValue(bean: attributeInstance, field: "id")}</g:link></td>
-                        
                             <td>${fieldValue(bean: attributeInstance, field: "name")}</td>
-                        
-                            <td><g:formatDate date="${attributeInstance.dateCreated}" /></td>
-                        
-                            <td><g:formatDate date="${attributeInstance.lastUpdated}" /></td>
-                        
+                            <td>${attributeInstance.options.size()} <g:message code="attribute.options.label" default="Options"/></td>
                             <td><g:formatBoolean boolean="${attributeInstance.allowOther}" /></td>
-                        
                         </tr>
                     </g:each>
                     </tbody>

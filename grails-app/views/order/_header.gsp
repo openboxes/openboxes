@@ -14,7 +14,7 @@
 							</g:if>
 							Order #: <b>${orderInstance?.orderNumber}</b>  
 							&nbsp;|&nbsp; 
-							Date ordered: <b><g:formatDate date="${orderInstance?.dateOrdered}"/></b>
+							Date ordered: <b><format:date obj="${orderInstance?.dateOrdered}"/></b>
 						</div>
 					</td>										
 					<td style="text-align: right;">

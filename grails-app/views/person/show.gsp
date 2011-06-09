@@ -72,14 +72,14 @@
                         <tr class="prop">
                             <td valign="top" class="name"><g:message code="person.dateCreated.label" default="Date Created" /></td>
                             
-                            <td valign="top" class="value"><g:formatDate date="${personInstance?.dateCreated}" /></td>
+                            <td valign="top" class="value"><format:datetime obj="${personInstance?.dateCreated}" /></td>
                             
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name"><g:message code="person.lastUpdated.label" default="Last Updated" /></td>
                             
-                            <td valign="top" class="value"><g:formatDate date="${personInstance?.lastUpdated}" /></td>
+                            <td valign="top" class="value"><format:datetime obj="${personInstance?.lastUpdated}" /></td>
                             
                         </tr>
                     

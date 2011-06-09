@@ -222,7 +222,7 @@
 	                            <td valign="top" class="name">
 	                            	<label for="dateCreated"><g:message code="order.dateCreated.label" default="Date Created" /></label>
 	                            </td>
-	                            <td valign="top" class="value"><g:formatDate date="${orderInstance?.dateCreated}" /></td>
+	                            <td valign="top" class="value"><format:datetime obj="${orderInstance?.dateCreated}" /></td>
 	                            
 	                        </tr>
 	                    
@@ -232,7 +232,7 @@
 	                            
 	                            </td>
 	                            
-	                            <td valign="top" class="value"><g:formatDate date="${orderInstance?.lastUpdated}" /></td>
+	                            <td valign="top" class="value"><format:datetime obj="${orderInstance?.lastUpdated}" /></td>
 	                            
 	                        </tr>
 	                    

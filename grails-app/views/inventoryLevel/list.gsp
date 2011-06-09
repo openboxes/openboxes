@@ -53,7 +53,7 @@
                         
                             <td>${fieldValue(bean: inventoryLevelInstance, field: "reorderQuantity")}</td>
                         
-                            <td><g:formatDate date="${inventoryLevelInstance.dateCreated}" /></td>
+                            <td><format:date obj="${inventoryLevelInstance.dateCreated}" /></td>
                         
                         </tr>
                     </g:each>

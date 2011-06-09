@@ -116,12 +116,12 @@
 													${fieldValue(bean: shipmentInstance, field: "destination.name")}
 												</td>
 												<td align="center">
-													<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${shipmentInstance?.expectedShippingDate}"/>
+													<format:date obj="${shipmentInstance?.expectedShippingDate}"/>
 												</td>
 												<td>												
 													${shipmentInstance?.status.name}
 													<g:if test="${shipmentInstance?.status.date}">
-													 - <g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${shipmentInstance?.status.date}"/>
+													 - <format:date obj="${shipmentInstance?.status.date}"/>
 													 </g:if>									
 												</td>
 					                        </tr>

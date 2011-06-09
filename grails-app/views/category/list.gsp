@@ -51,7 +51,7 @@
                         
                             <td>${fieldValue(bean: categoryInstance, field: "parentCategory")}</td>
                         
-                            <td><g:formatDate date="${categoryInstance.dateCreated}" /></td>
+                            <td><format:datetime obj="${categoryInstance.dateCreated}" /></td>
                         
                         </tr>
                     </g:each>

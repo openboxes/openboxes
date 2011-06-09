@@ -31,7 +31,7 @@
 					<g:each var="itemInstance" in="${inventoryItemList }" status="i">				
 						<tr class="${(i%2 == 0)?'odd':'even' }">
 							<td>${itemInstance?.lotNumber?:'<span class="fade">EMPTY</span>' }</td>
-							<td><g:formatDate date="${itemInstance?.expirationDate }" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT} /></td>
+							<td><format:expirationDate obj="${itemInstance?.expirationDate}"/></td>
 							<td style="text-align:center;">
 								<g:link controller="inventoryItem" action="deleteInventoryItem" id="${itemInstance?.id }" params="['inventory.id':inventoryInstance?.id]">
 									<img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>

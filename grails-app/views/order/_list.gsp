@@ -52,7 +52,7 @@
 
 				<td>${orderInstance.orderedBy}</td>
 
-				<td><g:formatDate date="${orderInstance.lastUpdated}" /></td>
+				<td><format:datetime obj="${orderInstance.lastUpdated}" /></td>
 
 				<td>
 					${(orderInstance?.isComplete())?"Complete":"Pending" }

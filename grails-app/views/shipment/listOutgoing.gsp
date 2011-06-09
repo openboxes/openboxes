@@ -109,7 +109,7 @@
 										<td width="10%">
 											<g:if test="${!shipmentInstance.events}"></g:if>
 											<g:else>										
-												<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${shipmentInstance.mostRecentEvent.eventDate}"/>
+												<format:date obj="${shipmentInstance.mostRecentEvent.eventDate}"/>
 											</g:else>
 											
 										</td>

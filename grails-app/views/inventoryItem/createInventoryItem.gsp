@@ -62,7 +62,7 @@
 													</td>
 													<td>
 														<g:if test="${inventoryItem?.expirationDate }">
-															<g:formatDate date="${inventoryItem?.expirationDate }" format="${org.pih.warehouse.core.Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}"/>
+															<format:expirationDate obj="${inventoryItem?.expirationDate}"/>
 														</g:if>
 														<g:else>
 															<span class="fade">never</span>

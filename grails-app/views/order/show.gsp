@@ -206,28 +206,6 @@
 	                            </td>
 	                        </tr>
 	                    
-	                    
-	                    	
-	                        <%-- 
-	                        <tr class="prop">
-	                            <td valign="top" class="name">
-	                            	<label for="dateCreated"><g:message code="order.dateCreated.label" default="Date Created" /></label>
-	                            </td>
-	                            <td valign="top" class="value"><g:formatDate date="${orderInstance?.dateCreated}" /></td>
-	                            
-	                        </tr>
-	                    
-	                        <tr class="prop">
-	                            <td valign="top" class="name">
-	                            	<label for="lastUpdated"><g:message code="order.lastUpdated.label" default="Last Updated" /></label>
-	                            
-	                            </td>
-	                            
-	                            <td valign="top" class="value"><g:formatDate date="${orderInstance?.lastUpdated}" /></td>
-	                            
-	                        </tr>
-		                    --%>
-	                    
 	                    </tbody>
 	                </table>
                </fieldset>

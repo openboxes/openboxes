@@ -13,8 +13,8 @@
 			${shipmentInstance.name} &nbsp; ${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}
 			<br/>
 			<span style="color: #aaa; font-size: 0.8em;">
-				last modified: <g:formatDate date="${shipmentInstance?.lastUpdated}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_TIME_FORMAT}" />	&nbsp;							
-				created: <g:formatDate date="${shipmentInstance?.dateCreated}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_TIME_FORMAT} hh:mm" />			
+				last modified: <format:datetime obj="${shipmentInstance?.lastUpdated}"/>	&nbsp;							
+				created: <format:datetime obj="${shipmentInstance?.dateCreated}"/>			
 			</span>										
 	</content>
 </head>
@@ -48,7 +48,7 @@
 														${fieldValue(bean: shipmentInstance, field: "origin.name")}<br/>										
 														<g:if test="${shipmentInstance.expectedShippingDate}">
 															<span style="font-size: 0.8em; color: #aaa">
-																Expected to ship on <g:formatDate date="${shipmentInstance?.expectedShippingDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />
+																Expected to ship on <format:date obj="${shipmentInstance?.expectedShippingDate}" />
 															</span>											
 														</g:if>
 													
@@ -92,9 +92,9 @@
 																			<tr id="document-${document.id}"
 																				class="${(i % 2) == 0 ? 'odd' : 'even'}">
 																				<td nowrap="nowrap">
-																					<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${document?.dateCreated}"/><br/>
+																					<format:date obj="${document?.dateCreated}"/><br/>
 																					<span style="font-size: 0.8em; color: #aaa;">
-																						<g:formatDate type="time" date="${document.dateCreated}"/>
+																						<format:time obj="${document.dateCreated}"/>
 																					</span>																							
 																				</td>					
 																				<td>
@@ -127,9 +127,9 @@
 																		<g:each in="${shipmentInstance.comments}" var="comment" status="i">
 																			<div id="comment-${comment?.id}">
 																				
-																					<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${comment?.dateCreated}"/><br/>
+																					<format:date obj="${comment?.dateCreated}"/><br/>
 																					<span style="font-size: 0.8em; color: #aaa;">
-																						<g:formatDate type="time" date="${comment?.dateCreated}"/>
+																						<format:time obj="${comment?.dateCreated}"/>
 																					</span>																					
 																					${comment?.comment}
 
@@ -168,9 +168,9 @@
 														<g:if test="${!(i > 2)}">
 															<tr class="prop">
 																<td class="name">
-																	<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${event.eventDate}"/><br/>
+																	<format:date obj="${event.eventDate}"/><br/>
 																	<span style="font-size: 0.8em; color: #aaa;">
-																		<g:formatDate type="time" date="${event.eventDate}"/>
+																		<format:time obj="${event.eventDate}"/>
 																	</span>
 																</td>
 																<td class="value">

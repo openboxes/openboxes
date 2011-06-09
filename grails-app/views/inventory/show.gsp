@@ -118,7 +118,7 @@
 														
 														</td>
 														<td width="5%">${itemInstance?.quantityAvailable }</td>
-														<td width="10%"><g:formatDate date="${itemInstance?.expirationDate }" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}"/></td>
+														<td width="10%"><format:expirationDate obj="${itemInstance?.expirationDate}"/></td>
 														<td width="40%">
 															<ul>
 																<g:each in="${itemInstance?.warnings }" var="warning">

@@ -67,7 +67,7 @@
                         <tr class="prop">
                             <td valign="top" class="name"><g:message code="stockCardEntry.entryDate.label" default="Entry Date" /></td>
                             
-                            <td valign="top" class="value"><g:formatDate date="${stockCardEntryInstance?.entryDate}" /></td>
+                            <td valign="top" class="value"><format:datetime obj="${stockCardEntryInstance?.entryDate}" /></td>
                             
                         </tr>
                     

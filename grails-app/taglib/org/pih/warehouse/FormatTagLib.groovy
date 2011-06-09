@@ -26,8 +26,8 @@ class FormatTagLib {
 	/**
 	* Formats a DateTime
 	* @attr obj REQUIRED the date to format
-   */
-   def datetime = { attrs, body ->
+    */
+	def datetime = { attrs, body ->
 	   if (attrs.obj != null) {
 		   DateFormat df = new SimpleDateFormat(Constants.DEFAULT_DATE_TIME_FORMAT)
 		   TimeZone tz = session.timezone
@@ -36,13 +36,13 @@ class FormatTagLib {
 		   }
 		   out << df.format(attrs.obj)
 	   }
-   }
+	}
    
-   /**
-   * Formats a Time
-   * @attr obj REQUIRED the date to format
-  */
-  def time = { attrs, body ->
+	/**
+	 *  Formats a Time
+	 *  @attr obj REQUIRED the date to format
+	 */
+	def time = { attrs, body ->
 	  if (attrs.obj != null) {
 		  DateFormat df = new SimpleDateFormat(Constants.DEFAULT_TIME_FORMAT)
 		  TimeZone tz = session.timezone
@@ -52,4 +52,17 @@ class FormatTagLib {
 		  out << df.format(attrs.obj)
 	  }
   }
-}
+  
+  
+	 /**
+	  * Formats an Expiration Date
+	  * @attr obj REQUIRED the date to format
+	 */
+	 def expirationDate = { attrs, body ->
+		 if (attrs.obj != null) {
+			 DateFormat df = new SimpleDateFormat(Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT)
+			 out << df.format(attrs.obj)
+		 }
+	 }
+
+ }

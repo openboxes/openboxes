@@ -61,9 +61,9 @@
 							<g:if test="${!commandInstance?.transactionLogMap }">
 								<tr>
 									<td colspan="5" class="even center" style="min-height: 100px;">		
-										<div class="fade" >No <b>${commandInstance?.transactionType?.name }</b> transactions between 
-											<b><g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${commandInstance?.startDate }"/></b> and
-											<b><g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${commandInstance?.endDate }"/></b>.
+										<div class="fade" >No <b>${commandInstance?.transactionType?.name}</b> transactions between 
+											<b><format:date obj="${commandInstance?.startDate}"/></b> and
+											<b><format:date obj="${commandInstance?.endDate}"/></b>.
 										</div>
 									</td>
 								</tr>
@@ -75,61 +75,8 @@
 										<td style="width: 10%; nowrap="nowrap">	
 										
 											<g:link controller="inventory" action="showTransaction" id="${transaction?.id }" params="['product.id':commandInstance?.productInstance?.id]">
-												<g:formatDate
-													date="${transaction?.transactionDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />																
+												<format:date obj="${transaction?.transactionDate}"/>																
 											</g:link>
-											<%-- 
-											<a id="show-details-${transaction?.id }" class="show-details" href="${createLink(controller: 'inventory', action:'showTransactionDialog', id: transaction.id, params: ['product.id', 'test'])}">
-												<g:formatDate
-													date="${transaction?.transactionDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" />																
-											</a>
-											--%>
-											
-											<!--  Transaction Details -->
-											<%--   
-											<span id="transactionEntries${transaction?.id}" style="text-align: left; padding: 10px; margin: 10px; display: none; position:absolute; padding: 10px; background-color: white; border: 1px dashed black">
-												<label>Entries for Transaction #${transaction.id }</label>
-												<table width="100%">
-													<tr> 
-														<th>Description</th>
-														<th>Serial/Lot Number</th>
-														<th style="text-align: center;">Qty Change</th>
-													</tr>
-													<g:each var="transactionEntry" in="${commandInstance?.transactionLogMap?.get(transaction) }" status="status2">
-														<tr class="${(status2%2==0)?'odd':'even' }">
-															<td>
-																${transactionEntry?.inventoryItem?.product?.name }
-															</td>
-															<td>
-																${transactionEntry?.inventoryItem?.lotNumber }
-															</td>
-															<td style="text-align: center;">
-																<g:if test="${transactionEntry.quantity<0}">
-																	<g:set var="styleClass" value="color: red;"/>																	
-																</g:if>
-																<span style="${styleClass}">${transactionEntry.quantity }</span> 
-															</td>
-														</tr>
-													</g:each>
-													<tfoot>
-														<tr style="border-top: 1px solid lightgrey;">
-															<th colspan="2">
-															</th>
-															<th style="text-align: center;">
-
-																<g:set var="styleClass" value="color:black;"/>														
-																<g:if test="${quantityChange<0}">
-																	<g:set var="styleClass" value="color: red;"/>																	
-																</g:if>
-																<span style="${styleClass}">${quantityChange }</span> 
-															</th>
-														</tr>
-													</tfoot>
-												</table>
-											</span>						
-											--%>
-																				
-										</td>
 										<td>
 											<span class="${transaction?.transactionType?.transactionCode?.name()?.toLowerCase()}">
 												${transaction?.transactionType?.name }
