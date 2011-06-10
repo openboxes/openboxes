@@ -13,7 +13,7 @@
 	
 	<script type="text/javascript"> 	
 		jQuery(document).ready(function() {
-			jQuery("select:first", document.forms[0]).focus(); // Focus on the first text input field in the page
+			jQuery("#usernameField").focus(); // Focus on the first text input field in the page
 			var timezone = jzTimezoneDetector.determine_timezone().timezone; // Now you have an instance of the TimeZone object.
 			jQuery("#browserTimezone").val(timezone.olson_tz); // Set the user timezone offset as a hidden input
 		});	
@@ -62,7 +62,7 @@
 										<label for="email" class="loginField"><g:message code="user.usernameOrEmail.label" default="Username" /></label>
 									</td>
 									<td valign="top" class="name ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
-										<g:textField class="loginField" name="username" value="${userInstance?.username}" size="25" />
+										<g:textField class="loginField" id="usernameField" name="username" value="${userInstance?.username}" size="25" />
 									</td>
 								</tr>
 								<tr class="prop">

@@ -37,8 +37,7 @@
 									<table style="display:inline">
 										<tbody>								
 											<tr style="height: 30px;">
-												<th valign="top"><label><g:message
-													code="shipment.currentStatus.label" default="Status" /></label>
+												<th valign="top"><label><g:message code="shipment.currentStatus.label" default="Status" /></label>
 												</th>
 												<td valign="top">
 													${shipmentInstance?.status.name}<br/>
@@ -414,8 +413,11 @@
 												<table>		
 													<tr>
 														<th style="white-space:nowrap;">&nbsp;</th>
-														<th style="white-space:nowrap;">Qty</th>
 														<th style="white-space:nowrap;">Lot/Serial No</th>
+														<th style="white-space:nowrap;">Qty</th>
+														<g:if test="${shipmentInstance?.wasReceived()}">
+															<th style="white-space:nowrap;">Received</th>
+														</g:if>
 														<th style="white-space:nowrap;">Recipient</th>
 													</tr>
 													<g:set var="count" value="${0 }"/>
@@ -425,7 +427,7 @@
 													<g:each in="${shipmentItems}" var="item" status="i">
 														<g:if test="${previousContainer != item?.container}">
 															<tr class="${(count++ % 2 == 0)?'odd':'even'}">
-																<th nowrap colspan="4">
+																<th nowrap colspan="${shipmentInstance?.wasReceived() ? 5 : 4}">
 																	<%-- <img src="${createLinkTo(dir: 'images/icons/silk', file: 'package.png')}" style="vertical-align: middle"/>&nbsp;--%>
 																	<g:if test="${item?.container?.parentContainer}">${item?.container?.parentContainer?.name } &rsaquo;</g:if>
 																	<g:if test="${item?.container?.name }">${item?.container?.name }</g:if>
@@ -454,11 +456,17 @@
 																</g:link>
 															</td>
 															<td style="white-space:nowrap;">
-																${item?.quantity}
-															</td>
-															<td style="white-space:nowrap;">
 																${item?.lotNumber}
 															</td>
+															<td style="white-space:nowrap;">
+																${item?.quantity}
+															</td>
+															<g:if test="${shipmentInstance?.wasReceived()}">
+																<g:set var="qtyReceived" value="${item?.quantityReceived()}"/>
+																<td style="white-space:nowrap;${qtyReceived != item?.quantity ? ' color:red;' : ''}">
+																	${qtyReceived}
+																</td>
+															</g:if>														
 															<td style="white-space:nowrap;">
 																${item?.recipient?.name}
 															</td>

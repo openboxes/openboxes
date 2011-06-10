@@ -143,10 +143,7 @@
 							</table>
 						</g:form>
 					</fieldset>
-				</td>
-				<td width="20%">
-					<g:render template="sidebar" />						
-				</td>				
+				</td>		
 			</tr>
 		</table>	
 			

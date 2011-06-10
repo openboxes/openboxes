@@ -48,6 +48,15 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 		return orderShipments.collect{it.orderItem}
 	}
 
+	def quantityReceived() {
+		int ret = 0
+		shipment.receipt.receiptItems.each {
+			if (it.product == this.product && it.lotNumber == this.lotNumber) {
+				ret += it.quantityReceived
+			}
+		}
+		return ret
+	}
 	
 	/*
 	List addToOrderShipments(OrderShipment orderShipment) {
