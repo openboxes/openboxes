@@ -1,6 +1,6 @@
 <div style="padding: 10px; border-bottom: 1px solid lightgrey;">
 	<g:if test="${orderInstance?.id}">
-		<table>
+		<table border="0">
 			<tbody>			
 				<tr>
 					<td>
@@ -19,8 +19,18 @@
 					</td>										
 					<td style="text-align: right;">
 						<div class="fade" style="font-weight: bold; font-size:1.5em;">
-							${orderInstance?.isComplete() ? "Complete" : "Pending" }
+							<%-- ${orderInstance?.isComplete() ? "Complete" : "Pending" } --%>
+							${orderInstance?.status() }
 						</div>
+						<br/>
+						<g:if test="${!params.execution && !orderInstance?.isComplete() }">
+							<g:form action="placeOrder">
+								<g:hiddenField name="id" value="${orderInstance?.id }"/>
+								<div class="buttons" style="padding: 0px; margin: 0px;">
+									<g:actionSubmit name="place" value="Place Order"></g:actionSubmit>
+								</div>
+							</g:form>
+						</g:if>					
 					</td>
 				</tr>
 			</tbody>

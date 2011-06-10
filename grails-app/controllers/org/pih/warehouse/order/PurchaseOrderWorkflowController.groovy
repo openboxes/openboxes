@@ -24,6 +24,7 @@ class PurchaseOrderWorkflowController {
 				else {
 					def order = new Order();
 					order.orderNumber = new Random().nextInt(9999999)
+					order.orderedBy = Person.get(session.user.id)
 					flow.order = order;
 				}
 				
@@ -31,7 +32,7 @@ class PurchaseOrderWorkflowController {
 				if (params.skipTo) {
 					if (params.skipTo == 'details') return success()
 					else if (params.skipTo == 'items') return showOrderItems()
-					else if (params.skipTo == 'confirm') return confirmOrder()
+					//else if (params.skipTo == 'confirm') return confirmOrder()
 					
 				}
 				
@@ -39,20 +40,19 @@ class PurchaseOrderWorkflowController {
 			}
 			on("success").to("enterOrderDetails")
 			on("showOrderItems").to("showOrderItems")
-			on("confirmOrder").to("confirmOrder")
-			
-			
+			//on("confirmOrder").to("confirmOrder")			
 		}
 		
 		
 		enterOrderDetails {
-			on("submit") {
-				def e = yes()
+			on("next") {
 				flow.order.properties = params
 				if (!orderService.saveOrder(flow.order)) {
 					return error()
 				}
 			}.to("showOrderItems")
+			on("cancel").to("cancel")
+			on("finish").to("finish")
 		}
 		showOrderItems {
 			on("back") { 
@@ -115,49 +115,62 @@ class PurchaseOrderWorkflowController {
 				
 			}.to("showOrderItems")
 			
-			on("confirmOrder") {
+			on("next") {
 				log.info "confirm order " + params
 				flow.order.properties = params
 				
 				log.info("order " + flow.order)
-				if (!orderService.saveOrder(flow.order)) {
-					return error()
-				}
+			
 
 					
-			}.to("confirmOrder")
+			}.to("finish")
 
+			on("cancel").to("cancel")
+			on("finish").to("finish")
 			on("error").to("showOrderItems")
 		}
+		/*
 		confirmOrder  {
 			on("back").to("showOrderItems")
-			on("processOrder").to("processOrder")
+			on("next").to("finish")
+			on("error").to("confirmOrder")
+			on(Exception).to("confirmOrder")
 		}
-		processOrder  {
-			action {				
+		*/
+		finish {
+			
+			action {
+				log.info("Finishing workflow, save order object " + flow.order)
 				def order = flow.order;
 
 				try {
-					if(!order.hasErrors() && order.save(flush:true)) {
-						return success();
-					}
-					else { 
-						order.errors.allErrors.each { println it; }
+					
+					if (!orderService.saveOrder(flow.order)) {
 						return error()
 					}
-				} catch (DataIntegrityViolationException e) { 
+					else { 
+						return success()
+					} 
+					
+					/*
+					if(!order.hasErrors() && order.save(flush:true)) {
+						log.info "success"
+						return success();
+					}
+					else {
+						order.errors.allErrors.each { println it; }
+						log.info "errors"
+						return error()
+					}
+					*/
+				} catch (DataIntegrityViolationException e) {
 					log.info ("data integrity exception")
 					return error();
 				}
 			}
-			on("error") { 
-				log.info "error"
-			}.to("confirmOrder")
-			on(Exception).to("confirmOrder")
 			on("success").to("showOrder")
-			
 		}
-		showOrder {
+		showOrder { 
 			redirect(controller:"order", action : "show", params : [ "id" : flow.order.id ?: '' ])
 		}
 		

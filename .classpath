@@ -33,6 +33,7 @@
 	<classpathentry kind="lib" path="lib/ocpsoft-pretty-time-1.0.6.jar"/>
 	<classpathentry kind="lib" path="lib/geronimo-stax-api_1.0_spec-1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/xmlbeans-2.3.0.jar"/>
+	<classpathentry exported="true" kind="con" path="GROOVY_DSL_SUPPORT"/>
 	<classpathentry kind="src" path=".link_to_grails_plugins/jquery-ui-1.8.7/grails-app/i18n">
 		<attributes>
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
@@ -238,6 +239,11 @@
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="src" path=".link_to_grails_plugins/famfamfam-1.0.1/grails-app/taglib">
+		<attributes>
+			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="src" path=".link_to_grails_plugins/jaxrs-0.4/grails-app/controllers">
 		<attributes>
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
@@ -328,6 +334,5 @@
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry exported="true" kind="con" path="GROOVY_DSL_SUPPORT"/>
 	<classpathentry kind="output" path="web-app/WEB-INF/classes"/>
 </classpath>

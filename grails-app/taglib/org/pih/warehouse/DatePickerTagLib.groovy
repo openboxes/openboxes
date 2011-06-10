@@ -15,11 +15,15 @@ class DatePickerTagLib {
 		def showOn = attrs.showOn ?: "both";
 		def showTrigger = Boolean.valueOf(attrs.showTrigger ?: "true");
 				
-		def value = attrs.value
-		if (value instanceof Date) {
-			value = (attrs.format && attrs.value) ? new SimpleDateFormat(attrs.format).format(attrs.value) : ""
+		def value = attrs.value;
+		println "value = " + value
+		if (value) { 
+			if (value instanceof Date) {
+				value = (attrs.format && attrs.value) ? new SimpleDateFormat(attrs.format).format(attrs.value) : ""
+				println "value is a date = " + value
+			} 
 		}
-	
+			
 		if (name == null) {
 			throw new IllegalArgumentException("name parameter must be specified")
 		}
@@ -44,8 +48,9 @@ class DatePickerTagLib {
 						//showOtherMonths: true,
 						//selectOtherMonths: true
 					});
+					
 					var dateValue = '${value}';
-					if (dateValue) {
+					if (dateValue && dateValue != 'null') {
 						jQuery('#${name}-datepicker').datepicker('setDate', new Date('${value}'));
 					}
 				});

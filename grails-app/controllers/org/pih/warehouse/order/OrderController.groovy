@@ -56,7 +56,7 @@ class OrderController {
             render(view: "create", model: [orderInstance: orderInstance])
         }
     }
-
+	
     def show = {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
@@ -79,6 +79,25 @@ class OrderController {
         }
     }
 
+	def placeOrder = { 
+		def orderInstance = Order.get(params.id)
+		if (orderInstance) {
+			orderInstance.status = OrderStatus.PLACED;
+			if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
+				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'order.label', default: 'Order'), orderInstance.id])}"
+				redirect(action: "show", id: orderInstance.id)
+			}
+			else {
+				flash.message = "There was an error while placing your order."
+				render(view: "show", model: [orderInstance: orderInstance])
+			}
+		}
+		else { 
+			redirect("show", id: orderInstance?.id)
+			
+		}
+				
+	}
 
 	
     def update = {

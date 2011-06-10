@@ -49,7 +49,7 @@
 			</li>									
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="purchaseOrderWorkflow" action="index"><g:message code="order.create.label" default="Add an order"/></g:link>
+					<g:link controller="purchaseOrderWorkflow" action="index"><g:message code="order.create.label" default="Add incoming order"/></g:link>
 				</span>
 			</li>					
 		</ul>										

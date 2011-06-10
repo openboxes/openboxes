@@ -99,7 +99,7 @@ class OrderService {
 		if (order.validate() && !order.hasErrors()) {
 			log.info("save order")
 			if (!order.hasErrors() && order.save()) {
-				// no errors and saved
+				log.info("no errors, saved " + order.id)
 			}
 			else {
 				log.info("error during save")

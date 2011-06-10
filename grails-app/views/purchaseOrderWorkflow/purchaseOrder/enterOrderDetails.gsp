@@ -37,13 +37,6 @@
 					<table>
 						<tbody>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for='description'>Order Number:</label>
-								</td>
-								<td valign='top' class='value ${hasErrors(bean:order,field:'orderNumber','errors')}'>
-									${order?.orderNumber?.encodeAsHTML()}
-								</td>
-							</tr>
-							<tr class='prop'>
 								<td valign='top' class='name'><label for='description'>Description:</label>
 								</td>
 								<td valign='top' class='value ${hasErrors(bean:order,field:'description','errors')}'>
@@ -51,17 +44,16 @@
 								</td>
 							</tr>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for='source'>Order from:</label>
+								<td valign='top' class='name'><label for='source'>Ordered from:</label>
 								</td>
 								<td valign='top' class='value ${hasErrors(bean:order,field:'origin','errors')}'>
+									${session.warehouse?.name }
 									
-									<div class="ui-widget"> 
-										<g:select class="combobox" name="origin.id" from="${org.pih.warehouse.core.Location.list().sort()}" optionKey="id" value="${order?.origin?.id}" noSelection="['':'']" />
-									</div>
+									<g:hiddenField name="origin.id" value="${session.warehouse?.id}"/>
 								</td>
 							</tr>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for="destination">Destination:</label>
+								<td valign='top' class='name'><label for="destination">Ordered for:</label>
 								</td>
 								<td valign='top' class='value ${hasErrors(bean:order,field:'destination','errors')}'>
 									<div class="ui-widget"> 
@@ -69,8 +61,18 @@
 									</div>
 								</td>
 							</tr>
+							
+							
 							<tr class='prop'>
-								<td valign='top' class='name'><label for='dateOrdered'>Order date:</label></td>
+								<td valign='top' class='name'><label for='orderedBy'>Ordered by:</label></td>
+								<td valign='top'
+									class='value ${hasErrors(bean:order,field:'orderedBy','errors')}'>
+									<g:select class="combobox" name="orderedBy.id" from="${org.pih.warehouse.core.Person.list().sort{it.lastName}}" optionKey="id" value="${order?.orderedBy?.id}" noSelection="['':'']"/>
+	
+								</td>
+							</tr>
+							<tr class='prop'>
+								<td valign='top' class='name'><label for='dateOrdered'>Ordered on:</label></td>
 								<td valign='top'
 									class='value ${hasErrors(bean:order,field:'dateOrdered','errors')}'>								
 									<g:jqueryDatePicker 
@@ -81,21 +83,16 @@
 										size="8"
 										showTrigger="false" />								
 								</td>
-							</tr>
-							<tr class='prop'>
-								<td valign='top' class='name'><label for='orderedBy'>Ordered by:</label></td>
-								<td valign='top'
-									class='value ${hasErrors(bean:order,field:'orderedBy','errors')}'>
-									<g:select class="combobox" name="orderedBy.id" from="${org.pih.warehouse.core.Person.list().sort{it.lastName}}" optionKey="id" value="${order?.orderedBy?.id}" noSelection="['':'']"/>
-	
-								</td>
-							</tr>
+							</tr>							
 	
 						</tbody>
 					</table>
-					<div class="buttons">
+					<div class="buttons" style="border-top: 1px solid lightgrey;">
 						<span class="formButton"> 
-							<g:submitButton name="submit" value="Next"></g:submitButton> 
+							<g:submitButton name="next" value="Add Items"></g:submitButton> 
+							<%-- 
+							<g:submitButton name="finish" value="Save & Exit"></g:submitButton> 
+							--%>
 						</span>
 					</div>
 					

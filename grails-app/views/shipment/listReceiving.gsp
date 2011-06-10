@@ -60,11 +60,12 @@
 				<table>
                     <thead>
                         <tr>   
+                        	
                         	<th>${message(code: 'shipment.shipmentType.label', default: 'Type')}</th>
                             <th>${message(code: 'shipment.shipment.label', default: 'Shipment')}</th>							
                             <th>${message(code: 'shipment.origin.label', default: 'Origin')}</th>
+                         	<th>${message(code: 'shipment.expectedDeliveryDate.label', default: 'Delivery Date')}</th>
                          	<th>${message(code: 'shipment.status.label', default: 'Status')}</th>
-                         	<th>${message(code: 'shipment.documents.label', default: 'Documents')}</th>
                         </tr>
                     </thead>
                    
@@ -75,20 +76,25 @@
 									<img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + shipmentInstance?.shipmentType?.name + '.png')}"
 									alt="${shipmentInstance?.shipmentType?.name}" style="vertical-align: middle; width: 24px; height: 24px;" />		
 								</td>										
-								<td width="10%">
+								<td>
 									<g:link action="showDetails" id="${shipmentInstance.id}">
 										${fieldValue(bean: shipmentInstance, field: "name")}
 									</g:link>																														
 								</td>
-								<td width="10%" align="center">
+								<td align="center">
 									${fieldValue(bean: shipmentInstance, field: "origin.name")}
 								</td>
-								<td width="10%">												
+								
+								<td align="center">
+									<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${shipmentInstance?.expectedDeliveryDate}"/>
+								</td>								
+								<td>												
 									${shipmentInstance?.status.name}
 									<g:if test="${shipmentInstance?.status.date}">
 									 - <format:date obj="${shipmentInstance?.status.date}"/>
 									 </g:if>	
 								</td>
+								<%-- 
 								<td width="15%">
 									<g:if test="${!shipmentInstance.documents}"><span class="fade">(empty)</span></g:if>
 									<g:else>
@@ -100,6 +106,7 @@
 										</g:each>							
 									</g:else>
 								</td>
+								--%>
 	                        </tr>
 						</g:each>                    			                    	         
                     </tbody>

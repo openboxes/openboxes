@@ -11,6 +11,7 @@ import org.pih.warehouse.core.User;
 
 class Order implements Serializable {
 	
+	OrderStatus status;
 	String description 		// a user-defined, searchable name for the order 
 	String orderNumber 		// an auto-generated shipment number
 	Location origin			// the vendor
@@ -34,16 +35,29 @@ class Order implements Serializable {
 	}
 	
 	static constraints = { 
+		status(nullable:true)
 		description(nullable:false, blank: false, maxSize: 255)
 		orderNumber(nullable:true, maxSize: 255)
 		origin(nullable:false)
 		destination(nullable:false)
 		recipient(nullable:true)
 		orderedBy(nullable:false)
-		dateOrdered(nullable:false)
+		dateOrdered(nullable:true)
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)
 	}	
+	
+	String status() { 
+		if (isComplete()) { 
+			return "Complete"
+		}
+		else { 
+			if (status) { 
+				return status.name
+			}
+		}
+		return "Pending"
+	}
 	
 	Boolean isComplete() {
 		if (!orderItems) {

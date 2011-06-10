@@ -22,9 +22,6 @@
             	
 	                <table>
 	                    <tbody>
-	                    
-	                      
-	
 	                        <tr class="prop">
 	                            <td valign="top" class="name">
 	                            	<label for='description'><g:message code="order.description.label" default="Description" /></label>
@@ -40,15 +37,9 @@
 								</td>
 							</tr>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for="destination">Destination</label></td>
+								<td valign='top' class='name'><label for="destination">Order for</label></td>
 								<td valign='top' class='value'>
 									${orderInstance?.destination?.name?.encodeAsHTML()}
-								</td>
-							</tr>
-							<tr class='prop'>
-								<td valign='top' class='name'><label for='dateOrdered'>Order date</label></td>
-								<td valign='top' class='value'>								
-									${orderInstance?.dateOrdered } 
 								</td>
 							</tr>
 							<tr class='prop'>
@@ -57,7 +48,7 @@
 									${orderInstance?.orderedBy?.name }
 								</td>
 							</tr>
-	                        
+							
 	                        <tr class="prop">
 	                            <td valign="top" class="name"><label><g:message code="order.items.label" default="Items" /></label></td>
 	                            <td valign="top" class="value">
@@ -109,6 +100,38 @@
 									</g:else>
 	                            </td>
 	                        </tr>
+							<tr class="prop">
+	                            <td valign="top" class="name"><label><g:message code="order.items.label" default="Shipments" /></label></td>
+	                            <td valign="top" class="value">	    
+	                            
+									<g:if test="${orderInstance?.shipments() }">
+										<table>
+											<thead>
+												<tr class="odd">
+													<th>Type</th>
+													<th>Name</th>
+												</tr>
+											</thead>									
+											<tbody>      
+												<g:each var="shipmentInstance" in="${orderInstance?.shipments()}" status="i">
+													<tr>
+														<td>
+															${shipmentInstance?.shipmentType?.name }
+														</td>
+														<td>
+															<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id }">${shipmentInstance?.name }</g:link>
+														</td>													
+													</tr>
+												</g:each>                                          
+	                        				</tbody>
+	                        			</table>
+	                        		</g:if>
+									<g:else>
+										<span class="fade">No shipments</span>
+									</g:else>
+	                            	                        		
+	                        	</td>
+	                        </tr>	                        
 	                    
 	                        <tr class="prop">
 	                            <td valign="top" class="name"><label for="comments"><g:message code="order.comments.label" default="Comments" /></label></td>

@@ -45,19 +45,19 @@
 								</td>
 							</tr>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for='source'>Order from:</label></td>
+								<td valign='top' class='name'><label for='source'>Ordered from:</label></td>
 								<td valign='top' class='value'>
 									${order?.origin?.name?.encodeAsHTML()}
 								</td>
 							</tr>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for="destination">Destination:</label></td>
+								<td valign='top' class='name'><label for="destination">Ordered for:</label></td>
 								<td valign='top' class='value'>
 									${order?.destination?.name?.encodeAsHTML()}
 								</td>
 							</tr>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for='dateOrdered'>Order date:</label></td>
+								<td valign='top' class='name'><label for='dateOrdered'>Ordered date:</label></td>
 								<td valign='top' class='value'>								
 									<format:date obj="${order?.dateOrdered }"/>
 								</td>
@@ -117,13 +117,11 @@
 					<div class="buttons">
 						<span class="formButton"> 
 							<g:submitButton name="back" value="Back"></g:submitButton> 
-							<g:submitButton name="processOrder" value="Finish"></g:submitButton>
+							<g:submitButton name="finish" value="Place Order"></g:submitButton>
 						</span>
 					</div>
 				</fieldset>
 			</div>				
-				
-				
 		</g:form>
 	</div>
 </body>

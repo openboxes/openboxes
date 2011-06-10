@@ -3468,6 +3468,15 @@
             <column name="order_item_id"/>
         </createIndex>
     </changeSet>    
+    
+    <changeSet author="jmiranda (generated)" id="1307724260524-1">
+		<preConditions onFail="MARK_RAN"><not><columnExists tableName="order" columnName="status"/></not></preConditions> 
+        <addColumn tableName="order">
+            <column name="status" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    
+    
 
 </databaseChangeLog>
 
