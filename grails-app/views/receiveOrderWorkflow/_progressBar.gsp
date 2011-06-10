@@ -1,10 +1,10 @@
 <style>
-	.selected { background-color: lightgrey; } 
+	.selected { background-color: #f7f7f7; } 
 </style>
 
 
 <div style="">
-	<table border="0" width="50%" style="border: 3px solid lightgrey">
+	<table border="0" width="50%" style="border: 1px solid #lightgrey">
 		<tr>
 			<td class="center ${state.equals('enterShipmentDetails')?'selected':''}" >
 				<g:link action="receiveOrder" event="enterShipmentDetails">1. Enter shipment details</g:link>

@@ -47,13 +47,14 @@ class ReceiveOrderWorkflowController {
 			on("next") { OrderCommand cmd ->
 				flow.orderCommand = cmd
 				if (flow.orderCommand.hasErrors() || !flow.orderCommand.validate()) {
-					error() 	
+					return error() 	
 				}
 				log.info("setting order command for process order items " + flow.orderItems)
 				cmd.orderItems = flow.orderItems
 				[orderCommand : cmd]
 							
 			}.to("processOrderItems")
+			on("error").to("enterShipmentDetails")
 			on("enterShipmentDetails").to("enterShipmentDetails")
 			on("processOrderItems").to("processOrderItems")
 			on("confirmOrderReceipt").to("confirmOrderReceipt")
@@ -64,7 +65,12 @@ class ReceiveOrderWorkflowController {
 				//!flow.orderCommand.validate() ? error() : success()
 				
 			}.to("confirmOrderReceipt")
-			on("back") { }.to("enterShipmentDetails")
+			
+			on("back") { OrderItemListCommand cmd ->
+				flow.orderItems = cmd.orderItems	
+				
+				
+			}.to("enterShipmentDetails")
 			on("error").to("processOrderItems")
 			on("enterShipmentDetails").to("enterShipmentDetails")
 			on("processOrderItems").to("processOrderItems")
@@ -95,7 +101,6 @@ class ReceiveOrderWorkflowController {
 		}
 		finish {
 			redirect(controller:"order", action : "show", params : [ "id" : flow.order.id ?: '' ])
-			on("error").to("receiveOrder")
 		}
 		handleError()
 	}
@@ -125,8 +130,11 @@ class ReceiveOrderWorkflowController {
 					else if (params.skipTo == 'processOrderItems') return processOrderItems()
 					else if (params.skipTo == 'confirmOrderReceipt') return confirmOrderReceipt()
 				}
-				return success()
+				success()
 			}
+			
+			
+			on("error").to("enterShipmentDetails")
 			on("success").to("processOrderItems")
 			on("enterShipmentDetails").to("enterShipmentDetails")
 			on("processOrderItems").to("processOrderItems")
@@ -138,6 +146,7 @@ class ReceiveOrderWorkflowController {
 				//!flow.orderCommand.validate() ? error() : success()
 				
 			}.to("enterShipmentDetails")
+			
 			
 			on("error").to("processOrderItems")
 			on("enterShipmentDetails").to("enterShipmentDetails")
@@ -158,25 +167,14 @@ class ReceiveOrderWorkflowController {
 				*/		
 			}.to("confirmOrderReceipt")
 			
-			on("back") { }.to("processOrderItems")
+			on("finish").to("finish")
+			on("back").to("processOrderItems")
 			on("enterShipmentDetails").to("enterShipmentDetails")
 			on("processOrderItems").to("processOrderItems")
 			on("confirmOrderReceipt").to("confirmOrderReceipt")
 		}
 		confirmOrderReceipt  {
-			on("finish") {
-				def orderCommand = flow.orderCommand;
-				orderCommand.orderItems = flow.orderItems;
-				
-				orderService.saveOrderShipment(orderCommand)
-				
-				// If the shipment was saved, let's redirect back to the order received page
-				if (orderCommand?.shipment?.hasErrors() || !orderCommand?.shipment?.id) {
-					error();
-				}
-				
-				
-			}.to("finish")
+			on("finish").to("finish")
 			
 			on("back").to("enterShipmentDetails")
 			on("error") { log.info "error during confirm order receipt" }.to("confirmOrderReceipt")
@@ -187,6 +185,21 @@ class ReceiveOrderWorkflowController {
 			on("confirmOrderReceipt").to("confirmOrderReceipt")
 		}
 		finish {
+			action { 
+				def orderCommand = flow.orderCommand;
+				orderCommand.orderItems = flow?.orderItems;
+				if (orderCommand) { 
+					orderService.saveOrderShipment(orderCommand)
+					flash.message = "Received Order #${flow?.order?.orderNumber} as Shipment '${shipment?.name}'"
+				}
+				else { 
+					flash.message = "Unable to receive order"
+				}
+				// If the shipment was saved, let's redirect back to the order received page
+				if (orderCommand?.shipment?.hasErrors() || !orderCommand?.shipment?.id) {
+					error();
+				}
+			}
 			redirect(controller:"order", action : "show", params : [ "id" : flow.order.id ?: '' ])
 			on("error").to("receiveOrder")
 		}

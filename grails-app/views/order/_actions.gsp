@@ -67,21 +67,32 @@
 				</div>		
 			</g:if>
 			--%>
-			<g:if test="${orderInstance?.destination?.id == session?.warehouse?.id }">
+			<g:if test="${orderInstance?.destination?.id == session?.warehouse?.id}">
+				<g:if test="${orderInstance?.status == org.pih.warehouse.order.OrderStatus.PLACED}">
+					<div class="action-menu-item">
+						<g:link controller="receiveOrderWorkflow" action="receiveOrder" id="${orderInstance?.id}">
+							<img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />
+							&nbsp;${message(code: 'order.receive.label', default: 'Receive order')} 
+						</g:link>				
+					</div>							
+				</g:if>
+				<g:else>
+					<div class="action-menu-item">
+						<a href="javascript:void();" onclick="alert('An order must be placed before it can be received.');">
+							<img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />
+							&nbsp;${message(code: 'order.receive.label', default: 'Receive order')} 
+						</a>				
+					</div>		
+				</g:else>
+			</g:if>
+			<g:else>
 				<div class="action-menu-item">
-					<g:link controller="receiveOrderWorkflow" action="receiveOrder" id="${orderInstance?.id}">
+					<a href="javascript:void();" onclick="alert('You need to login into ${orderInstance?.destination?.name} to receive this order.');">
 						<img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />
 						&nbsp;${message(code: 'order.receive.label', default: 'Receive order')} 
-					</g:link>				
+					</a>				
 				</div>		
-				<div class="action-menu-item">
-					<g:link controller="receiveOrderWorkflow" action="receiveOrderAlt" id="${orderInstance?.id}">
-						<img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />
-						&nbsp;${message(code: 'order.receive.label', default: 'Receive order (alternative)')} 
-					</g:link>				
-				</div>		
-			</g:if>
-						
+			</g:else>
 			<div class="action-menu-item">
 				<hr/>			
 			</div>

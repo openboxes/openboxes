@@ -5,16 +5,24 @@
 				<tr>
 					<td>
 						<div>
-							<span style="font-size: 1.5em; font-weight: bold; line-height: 1em;">${orderInstance?.description}</span>							
+							<span class="order-title" style="font-size: 1.5em; font-weight: bold; line-height: 1em;">${orderInstance?.description}</span>							
 						</div> 
 						<div class="fade" style="font-size: 0.9em; line-height: 20px;">
 							<!-- Hide action menu menu if the user is in the shipment workflow -->						
 							<g:if test="${!params.execution }">
 								<g:render template="/order/actions" model="[orderInstance:orderInstance]"/> &nbsp;|&nbsp;
 							</g:if>
-							Order #: <b>${orderInstance?.orderNumber}</b>  
-							&nbsp;|&nbsp; 
-							Date ordered: <b><format:date obj="${orderInstance?.dateOrdered}"/></b>
+							<span class="order-number">
+								Order #: <b>${orderInstance?.orderNumber}</b>  
+							</span>
+							<span class="fade">&nbsp;|&nbsp;</span> 
+							<span class="ordered-date">
+								Date ordered: <b><format:date obj="${orderInstance?.dateOrdered}"/></b>
+							</span>
+							<span class="fade">&nbsp;|&nbsp;</span>
+							<span class="ordered-by">Ordered by: 
+								<g:if test="${orderInstance?.orderedBy }"><b>${orderInstance?.orderedBy?.name }</b></g:if>
+							</span>
 						</div>
 					</td>										
 					<td style="text-align: right;">

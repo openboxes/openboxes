@@ -18,16 +18,18 @@
 			</div>
 		</g:hasErrors>
 		<div class="dialog">
-			<g:render template="progressBar" model="['state':'processOrderItems']"/>		
 			<fieldset>
-				<table>
-					<tr>
-						<td >
-							<div style="margin: 10px">
-								<p>There are ${(orderCommand?.orderItems) ? orderCommand?.orderItems?.size() : 0 } items in this order.</p>
-							</div>							
+				<g:render template="../order/header" model="[orderInstance:order]"/>
+				<g:render template="progressBar" model="['state':'processOrderItems']"/>		
+				<g:form action="receiveOrder" autocomplete="false">
+					<table>
+						<tr>
+							<td >
+								<div style="margin: 10px">
+									<p>There are ${(orderCommand?.orderItems) ? orderCommand?.orderItems?.size() : 0 } items in this order.</p>
+								</div>							
 						
-							<g:form action="receiveOrder" autocomplete="false">
+							
 								<div style="min-height: 175px">
 									<g:hiddenField name="order.id" value="${orderCommand?.order?.id }"/>
 									<g:hiddenField name="shipmentType.id" value="${orderCommand?.shipmentType?.id }"/>
@@ -36,10 +38,10 @@
 									<g:hiddenField name="deliveredOn" value="${formatDate(format:'MM/dd/yyyy', date: orderCommand?.deliveredOn )}"/>
 								
 									<g:if test="${orderItems }">
-										<table id="orderItemsTable">
+										<table id="orderItemsTable" border="0">
 											<thead>
 												<tr class="even">
-													<th class="center" align="center" colspan="5">
+													<th class="center" align="center" colspan="4">
 														<img src="${createLinkTo(dir:'images/icons/silk',file:'cart.png')}" alt="ordered" style="vertical-align: middle"/>
 														Items Ordered
 													</th>
@@ -49,17 +51,14 @@
 													</th>
 												</tr>
 												<tr class="even">
-													<td></td>
 													<td>Type</td>
 													<td>Description</td>
 													<td class="center">Ordered</td>										
 													<td class="center">Remaining</td>	
 													<td style="border-left: 1px solid lightgrey;">Received</td>										
-													<td>Product</td>										
-													<td>Lot Number</td>		
-													<%-- 								
-													<td>Actions</td>										
-													--%>
+													<td width="250px">Product</td>										
+													<td width="100px">Lot Number</td>		
+													
 												</tr>
 											</thead>									
 											<tbody>
@@ -70,15 +69,11 @@
 												
 														<tr class="${(orderItem?.primary)?"black-top":""} orderItem">
 															<td>
-																<a name="orderItems${i }"></a>
-																${i }
 																<g:hiddenField class="orderItemId" name="orderItems[${i }].orderItem.id" value="${orderItem?.orderItem?.id }"/>
 																<g:hiddenField name="orderItems[${i }].primary" value="${orderItem?.primary }"/>
 																<g:hiddenField name="orderItems[${i }].type" value="${orderItem?.type }"/>
 																<g:hiddenField name="orderItems[${i }].description" value="${orderItem?.description }"/>
 																<g:hiddenField name="orderItems[${i }].quantityOrdered" value="${orderItem?.quantityOrdered }"/>
-															</td>
-															<td>
 																<g:if test="${orderItem?.primary }">${orderItem?.type }</g:if>
 															</td>
 															<td>
@@ -111,9 +106,9 @@
 															</td>
 															<td>
 																<g:if test="${!orderItem?.orderItem?.isComplete() }">
-																	<div class="buttons">
+																	<span class="buttons" style="padding: 0px;">
 																		<input type="image" src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="add" class="btnAdd" style="vertical-align: middle"/>
-																	</div>
+																	</span>
 																</g:if>
 																<%-- 
 																<g:link controller="order" action="addOrderShipment" id="${orderCommand?.order?.id }" params="[index: i]" class="checkable" fragment="orderItems${i }">
@@ -159,15 +154,18 @@
 										<span class="fade">No items</span>
 									</g:else>									
 								</div>
-								<div class="buttons">
-									<g:submitButton name="back" value="Back"></g:submitButton>
-									<g:submitButton name="next" value="Next"></g:submitButton>
-								</div>
-							</g:form>
-						</td>						
-					</tr>
-				</table>
 
+							</td>						
+						</tr>
+					</table>
+					<div class="buttons" style="border-top: 1px solid lightgrey;">
+						<g:submitButton name="back" value="Back"></g:submitButton>
+						<g:submitButton name="next" value="Next"></g:submitButton>
+						<%-- 
+						<g:submitButton name="finish" value="Save & Exit"></g:submitButton>								
+						--%>
+					</div>
+				</g:form>
 				
 
 			</fieldset>
@@ -227,14 +225,12 @@
 			<tr class="orderItem">
 				<td>
 					<a name="orderItems{{= Index }}"></a>
-					{{= Index }}
+					
 					<g:hiddenField name="orderItems[{{= Index }}].orderItem.id" value="{{= OrderItemId }}"/>
 					<g:hiddenField name="orderItems[{{= Index }}].primary" value=""/>
 					<g:hiddenField name="orderItems[{{= Index }}].type" value=""/>
 					<g:hiddenField name="orderItems[{{= Index }}].description" value=""/>
 					<g:hiddenField name="orderItems[{{= Index }}].quantityOrdered" value=""/>
-				</td>
-				<td>
 				</td>
 				<td>
 				</td>
@@ -255,9 +251,9 @@
 					<g:textField name="orderItems[{{= Index }}].lotNumber" value="${orderItem?.lotNumber }" size="10" class="updateable"/>
 				</td>
 				<td>
-					<div class="buttons">
+					<span class="buttons" style="padding: 0px;">
 						<input type="image" src="${createLinkTo(dir:'images/icons/silk',file:'bin.png')}" alt="delete" class="btnDel" style="vertical-align: middle"/>
-					</div>
+					</span>
 				</td>
 			</tr>
 		</script>    	    

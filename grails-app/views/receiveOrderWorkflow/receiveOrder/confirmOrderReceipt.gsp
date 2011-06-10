@@ -23,11 +23,33 @@
 		<g:form action="receiveOrder" method="post">
 			<div class="dialog">
 			
-				<g:render template="progressBar" model="['state':'confirmOrderReceipt']"/>		
-
+			
 				<fieldset>
+					<g:render template="../order/header" model="[orderInstance:order]"/>
+					<g:render template="progressBar" model="['state':'confirmOrderReceipt']"/>		
+
+
 					<table>
 						<tbody>
+							<tr class='prop'>
+								<td valign='top' class='name'>
+									<label for='summary'>Summary</label>
+								</td>
+								<td valign='top'class='value'>
+									You are about to create a new shipment of type  
+									<b>${orderCommand?.shipmentType?.name}</b>
+									
+									being sent from 
+									<b>${orderCommand?.order?.origin?.name?.encodeAsHTML()}</b>
+									on 
+									<b><format:date obj="${orderCommand?.shippedOn}"/></b>
+									to be received by 
+									<b>${orderCommand?.order?.destination?.name?.encodeAsHTML()}</b>
+									on 
+									<b><format:date obj="${orderCommand?.deliveredOn}"/></b>
+								</td>
+							</tr>
+							<%-- 
 							<tr class='prop'>
 								<td valign='top' class='name'><label for='id'>Order Number:</label></td>
 								<td valign='top' class='value'>
@@ -37,12 +59,6 @@
 									<g:else>
 										<span class="fade">New Order</span>
 									</g:else>
-								</td>
-							</tr>
-							<tr class='prop'>
-								<td valign='top' class='name'><label for='description'>Description:</label></td>
-								<td valign='top' class='value'>
-									${orderCommand?.order?.description?.encodeAsHTML()}
 								</td>
 							</tr>
 							
@@ -59,28 +75,7 @@
 								</td>
 							</tr>
 							
-							<tr class='prop'>
-								<td valign='top' class='name'><label for='dateOrdered'>Order date:</label></td>
-								<td valign='top' class='value'>								
-									${orderCommand?.order?.dateOrdered } 
-								</td>
-							</tr>
-							<tr class='prop'>
-								<td valign='top' class='name'><label for='orderedBy'>Ordered by:</label></td>
-								<td valign='top'class='value'>
-									${orderCommand?.order?.orderedBy?.name }
-								</td>
-							</tr>
 							
-							<tr class='prop'>
-								<td valign='top' class='name'>
-									<label for='id'>Status</label>
-								</td>
-								<td valign='top'class='value'>
-									
-									${ (orderCommand?.order?.isComplete()) ? "Complete" : "Pending" }
-								</td>
-							</tr>
 							<tr class='prop'>
 								<td valign='top' class='name'>
 									<label for='orderedBy'>Shipment type</label>
@@ -89,20 +84,13 @@
 									${orderCommand?.shipmentType?.name}
 								</td>
 							</tr>
-							<tr class='prop'>
-								<td valign='top' class='name'>
-									<label for='orderedBy'>Receipient</label>
-								</td>
-								<td valign='top'class='value'>
-									${orderCommand?.recipient?.name }								
-								</td>
-							</tr>
+							
 							<tr class='prop'>
 								<td valign='top' class='name'>
 									<label for='shippedOn'>Shipped on</label>
 								</td>
 								<td valign='top'class='value'>									
-									${orderCommand?.shippedOn }
+									<format:date obj="${orderCommand?.shippedOn}"/>
 								</td>
 							</tr>								
 							<tr class='prop'>
@@ -110,10 +98,10 @@
 									<label for='deliveredOn'>Delivered on</label>
 								</td>
 								<td valign='top'class='value'>
-									${orderCommand?.deliveredOn }
+									<format:date obj="${orderCommand?.deliveredOn}"/>
 								</td>
 							</tr>								
-							
+							--%>
 							
 							<tr class="prop">
 	                            <td valign="top" class="name">
@@ -140,7 +128,7 @@
 													<td class="center">Ordered</td>										
 													<%-- <td class="center">Remaining</td>--%>	
 													<td style="border-left: 1px solid lightgrey;">Received</td>										
-													<td>Product</td>										
+													<td>Product Received</td>										
 													<td>Lot Number</td>		
 													<%-- 								
 													<td>Actions</td>										
@@ -153,7 +141,7 @@
 														<tr class="">
 															<td>
 																<a name="orderItems${i }"></a>
-																${i }
+																
 																<g:hiddenField class="orderItemId" name="orderItems[${i }].orderItem.id" value="${orderItem?.orderItem?.id }"/>
 																<g:hiddenField name="orderItems[${i }].primary" value="${orderItem?.primary }"/>
 																<g:hiddenField name="orderItems[${i }].type" value="${orderItem?.type }"/>
@@ -196,7 +184,7 @@
 	                        </tr>
 						</tbody>
 					</table>
-					<div class="buttons">
+					<div class="buttons" style="border-top: 1px solid lightgrey;">
 						<span class="formButton"> 
 							<g:submitButton name="back" value="Back"></g:submitButton> 
 							<g:submitButton name="finish" value="Finish"></g:submitButton>
