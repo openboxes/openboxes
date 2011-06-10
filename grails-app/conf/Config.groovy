@@ -18,7 +18,7 @@ grails {
 		 * By default we disable email, enable email using environment settings below or in your 
 		 * ${user.home}/warehouse-config.properties file 
 		 */
-		enabled = false			
+		enabled = true			
 		from = "info@localhost"
 		host = "localhost"
 		port = "25"
