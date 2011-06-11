@@ -1,6 +1,7 @@
 package org.pih.warehouse.order
 
 import org.pih.warehouse.core.Location;
+import org.pih.warehouse.core.LocationType;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.order.cart.Cart;
 import org.pih.warehouse.product.Product;
@@ -20,6 +21,15 @@ class OrderService {
 		return Order.findAllByOrigin(location)
 	}
 	
+	List<Location> getSuppliers() { 
+		def suppliers = []
+		LocationType supplierType = LocationType.findByName("Supplier");
+		if (supplierType) { 
+			suppliers = Location.findAllByLocationType(supplierType);
+		}
+		return suppliers;
+		
+	}
 	
 	OrderCommand getOrder(Integer id, Integer recipientId) { 
 		def orderCommand = new OrderCommand();

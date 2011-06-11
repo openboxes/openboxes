@@ -42,7 +42,7 @@ class Order implements Serializable {
 		destination(nullable:false)
 		recipient(nullable:true)
 		orderedBy(nullable:false)
-		dateOrdered(nullable:false)
+		dateOrdered(nullable:true)
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)
 	}	

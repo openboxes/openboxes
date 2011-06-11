@@ -44,25 +44,27 @@
 								</td>
 							</tr>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for='source'>Ordered from:</label>
+								<td valign='top' class='name'><label for='source'>Order from:</label>
 								</td>
-								<td valign='top' class='value ${hasErrors(bean:order,field:'origin','errors')}'>
-									${session.warehouse?.name }
-									
-									<g:hiddenField name="origin.id" value="${session.warehouse?.id}"/>
+								<td valign='top' class='value ${hasErrors(bean:order,field:'destination','errors')}'>
+									<g:if test="${suppliers }">
+										<div class="ui-widget"> 
+											<g:select class="combobox" name="destination.id" from="${suppliers?.sort()}" optionKey="id" value="${order?.destination?.id}" noSelection="['':'']"/>
+										</div>
+									</g:if>
+									<g:else>
+										<span class="fade">There are no suppliers</span> 
+									</g:else>
 								</td>
 							</tr>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for="destination">Ordered for:</label>
+								<td valign='top' class='name'><label for="destination">Order for:</label>
 								</td>
-								<td valign='top' class='value ${hasErrors(bean:order,field:'destination','errors')}'>
-									<div class="ui-widget"> 
-										<g:select class="combobox" name="destination.id" from="${org.pih.warehouse.core.Location.list().sort()}" optionKey="id" value="${order?.destination?.id}" noSelection="['':'']"/>
-									</div>
+								<td valign='top' class='value ${hasErrors(bean:order,field:'origin','errors')}'>
+									${session.warehouse?.name }
+									<g:hiddenField name="origin.id" value="${session.warehouse?.id}"/>
 								</td>
 							</tr>
-							
-							
 							<tr class='prop'>
 								<td valign='top' class='name'><label for='orderedBy'>Ordered by:</label></td>
 								<td valign='top'

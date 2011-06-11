@@ -3475,7 +3475,9 @@
             <column name="status" type="VARCHAR(255)"/>
         </addColumn>
     </changeSet>
-    
+	<changeSet author="jmiranda (generated)" id="1307724260524-2">
+        <dropNotNullConstraint columnDataType="VARCHAR(255)" columnName="date_ordered" tableName="order"/>
+    </changeSet>    
     
 
 </databaseChangeLog>
