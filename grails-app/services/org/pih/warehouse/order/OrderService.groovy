@@ -65,9 +65,8 @@ class OrderService {
 	void saveOrderShipment(OrderCommand orderCommand) { 
 		def shipmentInstance = new Shipment()
 		def numberOfShipments = orderCommand?.order?.shipments()?.size() + 1
-		log.info("shipments " + orderCommand?.order?.shipments())
-		log.info("number of shipments " + numberOfShipments )
-		shipmentInstance.name = "Shipment #"  + numberOfShipments + " - " + orderCommand?.order?.description
+		
+		shipmentInstance.name = orderCommand?.order?.description + " - " + "Shipment #"  + numberOfShipments 
 		shipmentInstance.shipmentType = orderCommand?.shipmentType;
 		shipmentInstance.origin = orderCommand?.order?.origin;
 		shipmentInstance.destination = orderCommand?.order?.destination;		
