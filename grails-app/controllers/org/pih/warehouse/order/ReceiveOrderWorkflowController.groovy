@@ -1,7 +1,9 @@
 package org.pih.warehouse.order
 
 import org.pih.warehouse.core.Address;
+import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
+import org.pih.warehouse.core.User;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.shipping.Shipment;
@@ -82,7 +84,8 @@ class ReceiveOrderWorkflowController {
 			on("finish") { 
 				def orderCommand = flow.orderCommand;
 				orderCommand.orderItems = flow.orderItems;
-				
+				orderCommand.currentUser = User.get(session.user.id)
+				orderCommand.currentLocation = Location.get(session.warehouse.id)
 				orderService.saveOrderShipment(orderCommand)
 				
 				// If the shipment was saved, let's redirect back to the order received page

@@ -1,10 +1,16 @@
 package org.pih.warehouse.order
 
+import java.util.Date;
+import java.util.Set;
+
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.LocationType;
 import org.pih.warehouse.core.Person;
+import org.pih.warehouse.core.User;
 import org.pih.warehouse.order.cart.Cart;
 import org.pih.warehouse.product.Product;
+import org.pih.warehouse.receiving.Receipt;
+import org.pih.warehouse.receiving.ReceiptItem;
 import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.shipping.ShipmentItem;
 
@@ -12,6 +18,7 @@ class OrderService {
 
 	boolean transactional = true
 	
+	def shipmentService;
 
 	List<Order> getIncomingOrders(Location location) { 
 		return Order.findAllByDestination(location)
@@ -91,12 +98,45 @@ class OrderService {
 		// Validate the shipment and save it if there are no errors
 		if (shipmentInstance.validate() && !shipmentInstance.hasErrors()) { 
 			log.info("No errors, save shipment");
-			shipmentInstance.save(flush:true)		
-				
+			//shipmentInstance.save(flush:true)		
+			shipmentService.saveShipment(shipmentInstance);
 		}
 		else { 
 			log.info("Errors with shipment " + shipmentInstance?.errors)
 		}
+		
+		if (shipmentInstance) { 
+			// Send shipment 
+			log.info "Sending shipment " + shipmentInstance?.name
+			shipmentService.sendShipment(shipmentInstance, "", orderCommand?.currentUser, orderCommand?.currentLocation, orderCommand?.shippedOn, [] as Set);
+						
+			// Receive shipment
+			log.info "Receiving shipment " + shipmentInstance?.name
+			Receipt receiptInstance = new Receipt()
+			
+			shipmentInstance.receipt = receiptInstance
+			receiptInstance.shipment = shipmentInstance	
+			
+			receiptInstance.recipient = shipmentInstance?.recipient	
+			receiptInstance.expectedDeliveryDate = shipmentInstance?.expectedDeliveryDate;
+			receiptInstance.actualDeliveryDate = orderCommand?.deliveredOn;
+			shipmentInstance.shipmentItems.each {
+				log.info("Adding shipment item as receipt item" + it.quantity)
+				ReceiptItem receiptItem = new ReceiptItem(it.properties);
+				receiptItem.setQuantityShipped (it.quantity);
+				receiptItem.setQuantityReceived (it.quantity);
+				receiptItem.setLotNumber(it.lotNumber);
+				receiptInstance.addToReceiptItems(receiptItem);           // use basic "add" method to avoid GORM because we don't want to persist yet
+			}
+			if (!receiptInstance.hasErrors() && receiptInstance.save(flush:true)) { 
+				shipmentService.receiveShipment(shipmentInstance, receiptInstance, "", orderCommand?.currentUser, orderCommand?.currentLocation);
+			}
+			else { 
+				throw new RuntimeException("Unable to save receipt " + receiptInstance.errors)
+			}
+			
+		}
+		
 		orderCommand?.shipment = shipmentInstance
 	}
 	

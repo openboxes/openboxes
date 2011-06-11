@@ -7,7 +7,7 @@ import org.pih.warehouse.core.Person;
 import org.pih.warehouse.donation.Donor;
 import org.pih.warehouse.product.Product;
 
-class ReceiptItem {
+class ReceiptItem implements Serializable {
 	
 	Product product		    			// Specific product that we're tracking
 	String lotNumber					// Loose coupling to the inventory lot

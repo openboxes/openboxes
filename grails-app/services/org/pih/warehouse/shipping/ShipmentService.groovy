@@ -388,9 +388,14 @@ class ShipmentService {
 	void sendShipment(Shipment shipmentInstance, String comment, User userInstance, Location locationInstance, Date shipDate, Set<Person> emailRecipients) { 
 
 		try { 
-						
+			if (!shipDate || shipDate > new Date()) 
+				throw new RuntimeException("Shipping date [" + shipDate + "] must occur on or before today.")
+				
+			if (shipmentInstance.hasShipped())
+				throw new RuntimeException("Shipment has already been shipped.");
+			
 			// don't allow the shipment to go out if it has errors, or if this shipment has already been shipped, or if the shipdate is after today
-			if (!shipmentInstance.hasErrors() && !shipmentInstance.hasShipped() && shipDate && shipDate <= new Date()) {				
+			if (!shipmentInstance.hasErrors()) {				
 				// Add comment to shipment (as long as there's an actual comment 
 				// after trimming off the extra spaces)
 				if (comment) {
@@ -416,12 +421,15 @@ class ShipmentService {
 					triggerSendShipmentEmails(shipmentInstance, userInstance, emailRecipients)
 				}
 				else { 
-					throw new RuntimeException("Failed to save 'Send Shipment' transaction")
+					throw new RuntimeException("Failed to send shipment due to errors")
 				}
 			}
+			
+			// Shipment has errors or it has already shipped or ship date is 
 			else {
+				log.error("Failed to send shipment due to errors")
 				// TODO: make this a better error message
-				throw new RuntimeException("Unable to send shipment")
+				throw new RuntimeException("Failed to send shipment")
 			}
 		} catch (Exception e) { 
 			// rollback all updates 
@@ -479,7 +487,21 @@ class ShipmentService {
 	void receiveShipment(Shipment shipmentInstance, Receipt receiptInstance, String comment, User user, Location location) { 
 		
 		try {
-			if (!receiptInstance.hasErrors() && shipmentInstance.hasShipped() && !shipmentInstance.wasReceived() && receiptInstance.getActualDeliveryDate() <= new Date() && receiptInstance.save(flush: true)) {
+			
+			if (!shipmentInstance.hasShipped()) { 
+				throw new RuntimeException("Shipment has not been shipped yet.")
+			}
+			
+			if (shipmentInstance.wasReceived()) {
+				throw new RuntimeException("Shipment has already been received.")
+			}
+			
+			if (receiptInstance.getActualDeliveryDate() > new Date()) { 
+				throw new RuntimeException("Delivery date [" + receiptInstance.getActualDeliveryDate() + "] must occur on or before today.")
+			}
+			
+			
+			if (!receiptInstance.hasErrors() && receiptInstance.save(flush: true)) {
 				
 				// Add comment to shipment (as long as there's an actual comment
 				// after trimming off the extra spaces)
@@ -554,7 +576,7 @@ class ShipmentService {
 			}
 			else {
 				// TODO: make this a better error message
-				throw new RuntimeException("Unable to receive shipment")
+				throw new RuntimeException("Failed to receive shipment")
 			}
 		} catch (Exception e) {
 			// rollback all updates and throw an exception

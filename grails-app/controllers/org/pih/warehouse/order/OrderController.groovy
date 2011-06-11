@@ -82,14 +82,21 @@ class OrderController {
 	def placeOrder = { 
 		def orderInstance = Order.get(params.id)
 		if (orderInstance) {
-			orderInstance.status = OrderStatus.PLACED;
-			if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
-				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'order.label', default: 'Order'), orderInstance.id])}"
-				redirect(action: "show", id: orderInstance.id)
+			
+			if (orderInstance?.orderItems?.size() > 0) { 
+				orderInstance.status = OrderStatus.PLACED;
+				if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
+					flash.message = "Order ${orderInstance?.description} has been placed with vendor ${orderInstance?.origin?.name}"
+					redirect(action: "show", id: orderInstance.id)
+				}
+				else {
+					flash.message = "There was an error while placing your order."
+					render(view: "show", model: [orderInstance: orderInstance])
+				}
 			}
-			else {
-				flash.message = "There was an error while placing your order."
-				render(view: "show", model: [orderInstance: orderInstance])
+			else { 
+				flash.message = "An order must contain at least one item before it can be placed with a vendor."
+				redirect(action: "show", id: orderInstance.id)
 			}
 		}
 		else { 

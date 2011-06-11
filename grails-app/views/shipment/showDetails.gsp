@@ -37,13 +37,14 @@
 									<table style="display:inline">
 										<tbody>								
 											<tr style="height: 30px;">
-												<th valign="top"><label><g:message code="shipment.currentStatus.label" default="Status" /></label>
-												</th>
 												<td valign="top">
-													${shipmentInstance?.status.name}<br/>
+													<label><g:message code="shipment.currentStatus.label" default="Status" /></label>
+												</td>
+												<td valign="top">
+													${shipmentInstance?.status.name}
 													<span class="fade">
 														<g:if test="${shipmentInstance?.status?.location}">
-															${shipmentInstance?.status.location}
+															by ${shipmentInstance?.status.location}
 														</g:if>
 														<g:if test="${shipmentInstance?.status?.date}">
 															on <format:date obj="${shipmentInstance?.status.date}"/>
@@ -52,9 +53,9 @@
 												</td>
 											</tr>
 											<tr style="height: 30px;">
-												<th valign="top"><label><g:message
+												<td valign="top"><label><g:message
 													code="shipment.origin.label" default="Departing" /></label>
-												</th>
+												</td>
 												<td valign="top" >
 													<span>
 														${fieldValue(bean: shipmentInstance, field: "origin.name")}									
@@ -67,9 +68,9 @@
 												</td>
 											</tr>
 											<tr style="height: 30px;">
-												<th valign="top">
+												<td valign="top">
 													<label><g:message code="shipment.destination.label" default="Arriving" /></label>
-												</th>
+												</td>
 												<td >
 													<span>
 														${fieldValue(bean: shipmentInstance, field: "destination.name")}
@@ -98,8 +99,8 @@
 											<g:each var="referenceNumberType" in="${shipmentWorkflow?.referenceNumberTypes}">
 												<tr style="height: 30px;">								
 												<!-- list all the reference numbers valid for this workflow -->
-													<th valign="top" ><label><g:message
-														code="shipment.${referenceNumberType?.name}" default="${referenceNumberType?.name}" /></label></th>
+													<td valign="top" ><label><g:message
+														code="shipment.${referenceNumberType?.name}" default="${referenceNumberType?.name}" /></label></td>
 													<td valign="top">
 														<g:findAll in="${shipmentInstance?.referenceNumbers}" expr="it.referenceNumberType.id == referenceNumberType.id">
 															${it.identifier }
@@ -124,9 +125,9 @@
 											<tbody>																	
 												<g:if test="${!shipmentWorkflow?.isExcluded('totalValue')}">
 													<tr>
-														<th valign="top">
-															<label><g:message code="shipment.totalValue.label" default="Total Value" /></label><br/>
-														</th>
+														<td valign="top">
+															<label><g:message code="shipment.totalValue.label" default="Total value" /></label><br/>
+														</td>
 														<td valign="top" >
 															<g:if test="${shipmentInstance.totalValue}">
 																$<g:formatNumber format="#,##0.00" number="${shipmentInstance.totalValue}" /><br/>
@@ -140,9 +141,9 @@
 												
 												<g:if test="${!shipmentWorkflow?.isExcluded('statedValue')}">
 													<tr>
-														<th valign="top">
-															<label><g:message code="shipment.statedValue.label" default="Stated Value" /></label><br/>
-														</th>
+														<td valign="top">
+															<label><g:message code="shipment.statedValue.label" default="Declared value" /></label><br/>
+														</td>
 														<td valign="top">
 															<g:if test="${shipmentInstance.statedValue}">
 																$<g:formatNumber format="#,##0.00" number="${shipmentInstance.statedValue}" /><br/>

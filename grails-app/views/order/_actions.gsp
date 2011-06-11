@@ -15,6 +15,12 @@
 				<hr/>
 			</div>
 			<div class="action-menu-item">
+				<g:link controller="order" action="show" id="${orderInstance?.id}">
+					<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="Edit" style="vertical-align: middle" />
+					&nbsp;${message(code: 'order.view.label', default: 'View order details')} 
+				</g:link>		
+			</div>
+			<div class="action-menu-item">
 				<g:link controller="purchaseOrderWorkflow" action="purchaseOrder" id="${orderInstance?.id}">
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" style="vertical-align: middle" />
 					&nbsp;${message(code: 'order.edit.label', default: 'Edit order details')} 
@@ -70,6 +76,15 @@
 					<hr/>			
 				</div>			
 				<g:if test="${orderInstance?.destination?.id == session?.warehouse?.id}">
+				
+					<g:if test="${orderInstance?.status != org.pih.warehouse.order.OrderStatus.PLACED }">
+						<div class="action-menu-item">
+							<g:link controller="order" action="placeOrder" id="${orderInstance?.id}">
+								<img src="${resource(dir: 'images/icons/silk', file: 'cart.png')}" />
+								&nbsp;${message(code: 'order.place.label', default: 'Place order')} 
+							</g:link>				
+						</div>							
+					</g:if>				
 					<g:if test="${orderInstance?.status == org.pih.warehouse.order.OrderStatus.PLACED}">
 						<div class="action-menu-item">
 							<g:link controller="receiveOrderWorkflow" action="receiveOrder" id="${orderInstance?.id}">

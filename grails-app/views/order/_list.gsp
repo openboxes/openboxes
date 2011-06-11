@@ -55,7 +55,7 @@
 				<td><format:datetime obj="${orderInstance.lastUpdated}" /></td>
 
 				<td>
-					${(orderInstance?.isComplete())?"Complete":"Pending" }
+					${orderInstance?.status() }
 				</td>
 
 			</tr>
