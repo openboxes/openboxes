@@ -46,10 +46,10 @@
 							<tr class='prop'>
 								<td valign='top' class='name'><label for='source'>Order from:</label>
 								</td>
-								<td valign='top' class='value ${hasErrors(bean:order,field:'destination','errors')}'>
+								<td valign='top' class='value ${hasErrors(bean:order,field:'origin','errors')}'>
 									<g:if test="${suppliers }">
 										<div class="ui-widget"> 
-											<g:select class="combobox" name="destination.id" from="${suppliers?.sort()}" optionKey="id" value="${order?.destination?.id}" noSelection="['':'']"/>
+											<g:select class="combobox" name="origin.id" from="${suppliers?.sort()}" optionKey="id" value="${order?.origin?.id}" noSelection="['':'']"/>
 										</div>
 									</g:if>
 									<g:else>
@@ -60,9 +60,9 @@
 							<tr class='prop'>
 								<td valign='top' class='name'><label for="destination">Order for:</label>
 								</td>
-								<td valign='top' class='value ${hasErrors(bean:order,field:'origin','errors')}'>
+								<td valign='top' class='value ${hasErrors(bean:order,field:'destination','errors')}'>
 									${session.warehouse?.name }
-									<g:hiddenField name="origin.id" value="${session.warehouse?.id}"/>
+									<g:hiddenField name="destination.id" value="${session.warehouse?.id}"/>
 								</td>
 							</tr>
 							<tr class='prop'>
@@ -90,12 +90,11 @@
 						</tbody>
 					</table>
 					<div class="buttons" style="border-top: 1px solid lightgrey;">
-						<span class="formButton"> 
-							<g:submitButton name="next" value="Add Items"></g:submitButton> 
-							<%-- 
-							<g:submitButton name="finish" value="Save & Exit"></g:submitButton> 
-							--%>
-						</span>
+						<g:submitButton name="next" value="Add Items"></g:submitButton> 
+						<%-- 
+						<g:submitButton name="finish" value="Save & Exit"></g:submitButton> 
+						--%>
+						<g:link action="purchaseOrder" event="cancel">Cancel</g:link>
 					</div>
 					
 					

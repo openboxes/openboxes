@@ -53,7 +53,7 @@ class PurchaseOrderWorkflowController {
 					return error()
 				}
 			}.to("showOrderItems")
-			on("cancel").to("cancel")
+			on("cancel").to("showOrder")
 			on("finish").to("finish")
 		}
 		showOrderItems {
@@ -127,7 +127,7 @@ class PurchaseOrderWorkflowController {
 					
 			}.to("finish")
 
-			on("cancel").to("cancel")
+			on("cancel").to("showOrder")
 			on("finish").to("finish")
 			on("error").to("showOrderItems")
 		}
@@ -172,6 +172,7 @@ class PurchaseOrderWorkflowController {
 			}
 			on("success").to("showOrder")
 		}
+		
 		showOrder { 
 			redirect(controller:"order", action : "show", params : [ "id" : flow.order.id ?: '' ])
 		}

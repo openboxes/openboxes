@@ -188,6 +188,7 @@
 						<span class="formButton"> 
 							<g:submitButton name="back" value="Back"></g:submitButton> 
 							<g:submitButton name="finish" value="Finish"></g:submitButton>
+							<g:link action="receiveOrder" event="cancel">Cancel</g:link>
 						</span>
 					</div>
 				</fieldset>

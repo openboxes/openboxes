@@ -103,6 +103,7 @@
 					<div class="buttons" style="border-top: 1px solid lightgrey;">
 						<span class="formButton"> 
 							<g:submitButton name="next" value="Next"></g:submitButton> 
+							<g:link action="receiveOrder" event="cancel">Cancel</g:link>
 						</span>
 					</div>
 					

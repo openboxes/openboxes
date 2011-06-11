@@ -31,13 +31,22 @@
 							${orderInstance?.status() }
 						</div>
 						<br/>
-						<g:if test="${!params.execution && !orderInstance?.isComplete() }">
-							<g:form action="placeOrder">
-								<g:hiddenField name="id" value="${orderInstance?.id }"/>
-								<div class="buttons" style="padding: 0px; margin: 0px;">
-									<g:actionSubmit name="place" value="Place Order"></g:actionSubmit>
-								</div>
-							</g:form>
+						<g:if test="${!params.execution}">						
+							<g:if test="${!orderInstance?.isComplete() && orderInstance?.status != org.pih.warehouse.order.OrderStatus.PLACED }">
+								<g:form action="placeOrder">
+									<g:hiddenField name="id" value="${orderInstance?.id }"/>
+									<button>Place Order</button>
+								</g:form>
+							</g:if>
+							<g:elseif test="${!orderInstance?.isComplete() && orderInstance?.status == org.pih.warehouse.order.OrderStatus.PLACED }">
+								
+								<g:link controller="receiveOrderWorkflow" action="receiveOrder" id="${orderInstance?.id}">
+									<button>
+										${message(code: 'order.receive.label', default: 'Receive order')}
+									</button> 
+								</g:link>										
+								
+							</g:elseif>
 						</g:if>					
 					</td>
 				</tr>

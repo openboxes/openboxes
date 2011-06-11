@@ -11,7 +11,7 @@
 		<div id="settings" role="main" class="yui-gb">
 			<!-- the first child of a Grid needs the "first" class -->
 			<div class="yui-u first">
-			
+					<h2>General Settings</h2>
 					<table>
 						<tr class="prop">
 							<td class="name">
@@ -29,6 +29,10 @@
 								${env }
 							</td>
 						</tr>
+					</table>
+					
+					<h2>Email Settings</h2>
+					<table>
 						<tr class="prop">
 							<td class="name">
 								<label>Email enabled</label>
@@ -52,7 +56,7 @@
 							<td>
 								${port}
 							</td>
-						</tr>
+						</tr>						
 					</table>
 				
 				

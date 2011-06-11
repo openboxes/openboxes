@@ -71,6 +71,7 @@
 									<%-- 
 									<g:submitButton name="finish" value="Save & Exit"></g:submitButton> 
 									--%>
+									<g:link action="purchaseOrder" event="cancel">Cancel</g:link>
 								</div>
 							</g:form>
 						</td>
