@@ -95,10 +95,10 @@
 					</g:if>
 					<g:else>
 						<div class="action-menu-item">
-							<a href="javascript:void();" onclick="alert('An order must be placed before it can be received.');">
+							<span class="fade" style="padding:3px;"></span>
 								<img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />
 								&nbsp;${message(code: 'order.receive.label', default: 'Receive order')} 
-							</a>				
+							</span>			
 						</div>		
 					</g:else>
 				</g:if>
