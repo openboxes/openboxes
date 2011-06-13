@@ -540,6 +540,7 @@ class ShipmentService {
 						if (!inventoryItem) {
 							inventoryItem = new InventoryItem();
 							inventoryItem.lotNumber = it.lotNumber
+							inventoryItem.expirationDate = it.expirationDate;
 							inventoryItem.product = it.product
 							if (!inventoryItem.hasErrors() && inventoryItem.save()) {
 								// at this point we've saved the inventory item successfully

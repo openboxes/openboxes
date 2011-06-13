@@ -15,6 +15,7 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 
 	
 	String lotNumber			// Loose coupling to the inventory lot 
+	Date expirationDate			
 	Product product		    	// Specific product that we're tracking
 	Integer quantity		    // Quantity could be a class on its own				
 	Person recipient 			// Recipient of an item
@@ -38,6 +39,7 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 		container(nullable:true)
 		product(blank:false, nullable:false)  // TODO: this doesn't seem to prevent the product field from being empty
 		lotNumber(nullable:true, maxSize: 255)
+		expirationDate(nullable:true)
 		quantity(min:0, blank:false, range: 0..2147483646)
 		recipient(nullable:true)
 		donor(nullable:true)

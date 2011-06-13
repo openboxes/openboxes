@@ -84,6 +84,7 @@ class OrderService {
 			if (orderItemCommand && orderItemCommand.productReceived && orderItemCommand?.quantityReceived) {
 				def shipmentItem = new ShipmentItem();
 				shipmentItem.lotNumber = orderItemCommand.lotNumber
+				shipmentItem.expirationDate = orderItemCommand.expirationDate
 				shipmentItem.product = orderItemCommand.productReceived;
 				shipmentItem.quantity = orderItemCommand.quantityReceived;
 				shipmentItem.recipient = orderCommand?.recipient;
@@ -126,6 +127,7 @@ class OrderService {
 				receiptItem.setQuantityShipped (it.quantity);
 				receiptItem.setQuantityReceived (it.quantity);
 				receiptItem.setLotNumber(it.lotNumber);
+				receiptItem.setExpirationDate(it.expirationDate);
 				receiptInstance.addToReceiptItems(receiptItem);           // use basic "add" method to avoid GORM because we don't want to persist yet
 			}
 			if (!receiptInstance.hasErrors() && receiptInstance.save(flush:true)) { 

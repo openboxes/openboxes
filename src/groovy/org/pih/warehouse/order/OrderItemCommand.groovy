@@ -24,6 +24,7 @@ class OrderItemCommand  implements Serializable {
 	
 	// for shipment item
 	String lotNumber
+	Date expirationDate
 	Product productReceived
 	Integer quantityReceived	
 		

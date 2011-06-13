@@ -169,7 +169,9 @@
 																${orderItem?.productReceived?.name }
 															</td>
 															<td>
-																${orderItem?.lotNumber }
+																${orderItem?.lotNumber } 
+																<span class="fade">(expires
+																<g:formatDate date="${orderItem?.expirationDate }" format="MMM yyyy"/>)</span>
 															</td>
 														</tr>
 													</g:if>

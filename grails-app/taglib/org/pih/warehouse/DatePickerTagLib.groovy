@@ -16,11 +16,9 @@ class DatePickerTagLib {
 		def showTrigger = Boolean.valueOf(attrs.showTrigger ?: "true");
 				
 		def value = attrs.value;
-		println "value = " + value
 		if (value) { 
 			if (value instanceof Date) {
 				value = (attrs.format && attrs.value) ? new SimpleDateFormat(attrs.format).format(attrs.value) : ""
-				println "value is a date = " + value
 			} 
 		}
 			

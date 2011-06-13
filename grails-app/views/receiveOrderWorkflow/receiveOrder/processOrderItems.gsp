@@ -104,6 +104,12 @@
 																	<g:textField name="orderItems[${i }].lotNumber" value="${orderItem?.lotNumber }" size="10" class="updateable"/>
 																</g:if>
 															</td>
+															<td nowrap="true">
+																<g:if test="${!orderItem?.orderItem?.isComplete() }">
+																	<g:datePicker name="orderItems[${i }].expirationDate" precision="month" default="none" noSelection="['':'']"
+																		years="${(1900 + (new Date().year))..(1900+ (new Date() + (50 * 365)).year)}" value="${orderItem?.expirationDate }" />					
+																</g:if>
+															</td>															
 															<td>
 																<g:if test="${!orderItem?.orderItem?.isComplete() }">
 																	<span class="buttons" style="padding: 0px;">
@@ -174,55 +180,73 @@
 
 	</div>
 	<g:comboBox />
-		<script>
-			var changed = false;
-			var currentIndex = $("#orderItemsTable tbody tr.orderItem").length;
-		
-			$(".btnDel").livequery(function(){
-				$(this).click(function(event) {					
-					//removeItem($(this).val());
-					event.preventDefault();
-					$(this).parent().parent().parent().remove();
-					$("#orderItemsTable").alternateRowColors();
-				});
-		    });			
-			    
-			$(".btnAdd").click(function(event) {
-				event.preventDefault();
-				//console.log($(this));
-				var index = currentIndex++;
-				var currentRow = $(this).parent().parent().parent();
-				var productId = currentRow.find(".productId");
-				var orderItemId = currentRow.find(".orderItemId");
-    			var item = { Id: '0', Index: index, ProductId: productId.val(), OrderItemId: orderItemId.val(), Template: '#new-item-template' };
-				//$(item.Template).tmpl(item).appendTo('#orderItemsTable > tbody');	
-				var newRow = $(item.Template).tmpl(item);
-				currentRow.after(newRow);	
-				$("#orderItemsTable").alternateRowColors();
-			});
-		
-			$(document).ready(function() {
-				jQuery.fn.alternateRowColors = function() {
-					$('tbody tr:odd', this).removeClass('odd').addClass('even');
-					$('tbody tr:even', this).removeClass('even').addClass('odd');
-					return this;
-				};				
+<script>
+	var changed = false;
+	var currentIndex = $("#orderItemsTable tbody tr.orderItem").length;
 
-				$("#orderItemsTable").alternateRowColors();
-		    	$(".updateable").change(function() { 
-					changed = true
-				});
 
-				
-				$(".checkable").click(function() { 
-					if (changed) {
-						alert("Please reset or save your changes first.")
-						return false;
-					}
-				});
-	    	});
-	    </script>
-		<script id="new-item-template" type="x-jquery-tmpl">						
+	function selectCombo(comboBoxElem, value) {
+		if (comboBoxElem != null) {
+			if (comboBoxElem.options) { 
+				for (var i = 0; i < comboBoxElem.options.length; i++) {
+		        	if (comboBoxElem.options[i].value == value &&
+		                comboBoxElem.options[i].value != "") { //empty string is for "noSelection handling as "" == 0 in js
+		                comboBoxElem.options[i].selected = true;
+		                break
+		        	}
+				}
+			}
+		}
+	}					
+	$(".btnDel").livequery(function(){
+		$(this).click(function(event) {					
+			//removeItem($(this).val());
+			event.preventDefault();
+			$(this).parent().parent().parent().remove();
+			$("#orderItemsTable").alternateRowColors();
+		});
+    });			
+	    
+	$(".btnAdd").click(function(event) {
+		event.preventDefault();
+		//console.log($(this));
+		var index = currentIndex++;
+		var currentRow = $(this).parent().parent().parent();
+		var productId = currentRow.find(".productId");
+		var orderItemId = currentRow.find(".orderItemId");
+ 		var item = { Id: '0', Index: index, ProductId: productId.val(), LotNumber: "", ExpirationDate: "", 
+ 		  				OrderItemId: orderItemId.val(), Template: '#new-item-template' };
+		currentRow.after($(item.Template).tmpl(item));	
+		$("#orderItemsTable").alternateRowColors();
+
+		//var productSelect = $("#productReceived-" + index);
+		//console.log(productSelect);
+		//selectCombo(productSelect, productId );
+		
+	});
+
+	$(document).ready(function() {
+		jQuery.fn.alternateRowColors = function() {
+			$('tbody tr:odd', this).removeClass('odd').addClass('even');
+			$('tbody tr:even', this).removeClass('even').addClass('odd');
+			return this;
+		};				
+
+		$("#orderItemsTable").alternateRowColors();
+    	$(".updateable").change(function() { 
+			changed = true
+		});
+
+		
+		$(".checkable").click(function() { 
+			if (changed) {
+				alert("Please reset or save your changes first.")
+				return false;
+			}
+		});
+   	});
+   </script>
+	<script id="new-item-template" type="x-jquery-tmpl">						
 			<tr class="orderItem">
 				<td>
 					<a name="orderItems{{= Index }}"></a>
@@ -244,13 +268,17 @@
 				</td>
 				<td>
 					<div class="ui-widget">
-						<g:select class="combobox updateable" name="orderItems[{{= Index }}].productReceived.id" value="{{= ProductId }}" from="${org.pih.warehouse.product.Product.list().sort{it.name}}" 
-							optionKey="id" value="" noSelection="['':'']"/>
+						<g:select class="combobox updateable" id="productReceived-{{= Index}}" name="orderItems[{{= Index }}].productReceived.id" value="{{= ProductId }}" from="${org.pih.warehouse.product.Product.list().sort{it.name}}" 
+							optionKey="id" noSelection="['':'']"/>
 					</div>	
 				</td>
 				<td>
-					<g:textField name="orderItems[{{= Index }}].lotNumber" value="${orderItem?.lotNumber }" size="10" class="updateable"/>
+					<g:textField name="orderItems[{{= Index }}].lotNumber" value="{{= LotNumber}}" size="10" class="updateable"/>
 				</td>
+				<td nowrap="true">
+					<g:datePicker name="orderItems[{{= Index }}].expirationDate" precision="month" default="none" value="" noSelection="['':'']"
+						years="${(1900 + (new Date().year))..(1900+ (new Date() + (50 * 365)).year)}"/>					
+				</td>															
 				<td>
 					<span class="buttons" style="padding: 0px;">
 						<input type="image" src="${createLinkTo(dir:'images/icons/silk',file:'bin.png')}" alt="delete" class="btnDel" style="vertical-align: middle"/>

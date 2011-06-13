@@ -415,6 +415,7 @@
 													<tr>
 														<th style="white-space:nowrap;">&nbsp;</th>
 														<th style="white-space:nowrap;">Lot/Serial No</th>
+														<th style="white-space:nowrap;">Expires</th>
 														<th style="white-space:nowrap;">Qty</th>
 														<g:if test="${shipmentInstance?.wasReceived()}">
 															<th style="white-space:nowrap;">Received</th>
@@ -448,6 +449,7 @@
 																		</g:if>
 																	</span>	
 																</th>
+																<th></th>
 															</tr>													
 														</g:if>												
 														<tr class="${(count++ % 2 == 0)?'odd':'even'}">
@@ -458,6 +460,9 @@
 															</td>
 															<td style="white-space:nowrap;">
 																${item?.lotNumber}
+															</td>
+															<td style="white-space:nowrap;">
+																<g:formatDate date="${item?.expirationDate}" format="MMM yyyy"/>
 															</td>
 															<td style="white-space:nowrap;">
 																${item?.quantity}

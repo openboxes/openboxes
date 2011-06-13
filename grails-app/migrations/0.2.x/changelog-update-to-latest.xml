@@ -3478,6 +3478,13 @@
 	<changeSet author="jmiranda (generated)" id="1307724260524-2">
         <dropNotNullConstraint columnDataType="VARCHAR(255)" columnName="date_ordered" tableName="order"/>
     </changeSet>    
+
+    <changeSet author="jmiranda (generated)" id="1307984579320-1">
+		<preConditions onFail="MARK_RAN"><not><columnExists tableName="shipment_item" columnName="expiration_date"/></not></preConditions> 
+        <addColumn tableName="shipment_item">
+            <column name="expiration_date" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
     
 
 </databaseChangeLog>
