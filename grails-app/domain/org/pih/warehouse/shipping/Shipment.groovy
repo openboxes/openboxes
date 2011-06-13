@@ -164,7 +164,7 @@ class Shipment implements Comparable, Serializable {
 	}
 	
 	String getShipmentNumber() {
-		return (id) ? String.valueOf(id).padLeft(6, "0")  : "(new shipment)";
+		return (id) ? "S" + String.valueOf(id).padLeft(6, "0")  : "(new shipment)";
 	}
 
 

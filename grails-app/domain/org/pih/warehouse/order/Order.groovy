@@ -25,6 +25,7 @@ class Order implements Serializable {
 	Date dateCreated
 	Date lastUpdated
 
+	
 	static hasMany = [ orderItems : OrderItem, comments : Comment, documents : Document, events : Event ]
 	static mapping = {
 		table "`order`"
@@ -66,6 +67,10 @@ class Order implements Serializable {
 		else {
 			return !orderItems?.find { !it.isComplete() }
 		}	
+	}
+	
+	String getOrderNumber() {
+		return (id) ? "V" + String.valueOf(id).padLeft(6, "0")  : "(new order)";
 	}
 	
 	def shipments() { 

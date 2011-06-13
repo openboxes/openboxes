@@ -45,8 +45,9 @@ class OrderService {
 		if (!orderInstance)
 			throw new Exception("Unable to locate order with ID " + id)
 			
-		if (recipientId) 
+		if (recipientId) {
 			orderCommand.recipient = Person.get(recipientId)
+		}
 		
 		orderCommand.origin = Location.get(orderInstance?.origin?.id)
 		orderCommand.destination = Location.get(orderInstance?.destination?.id)
@@ -54,7 +55,6 @@ class OrderService {
 		orderCommand.dateOrdered = orderInstance?.dateOrdered
 		orderCommand.order = orderInstance;
 		orderInstance?.orderItems?.each {
-			
 			def orderItemCommand = new OrderItemCommand();
 			orderItemCommand.primary = true;
 			orderItemCommand.orderItem = it
@@ -152,17 +152,12 @@ class OrderService {
 	}
 	
 	
-	boolean saveOrder(Order order) { 
-		
-		log.info order?.orderItems
-		
+	boolean saveOrder(Order order) { 		
 		if (order.validate() && !order.hasErrors()) {
-			log.info("save order")
 			if (!order.hasErrors() && order.save()) {
 				log.info("no errors, saved " + order.id)
 			}
 			else {
-				log.info("error during save")
 				return false;
 			}
 		}
@@ -172,12 +167,5 @@ class OrderService {
 		}
 		return true;
 	}
-	
-	
-	void createOrderFromCart(Cart cart) { 		
-		
-	}
-	
-	
 	
 }

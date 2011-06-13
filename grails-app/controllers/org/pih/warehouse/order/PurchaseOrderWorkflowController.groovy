@@ -25,7 +25,6 @@ class PurchaseOrderWorkflowController {
 				}
 				else {
 					def order = new Order();
-					order.orderNumber = new Random().nextInt(9999999)
 					order.orderedBy = Person.get(session.user.id)
 					flow.order = order;
 				}
