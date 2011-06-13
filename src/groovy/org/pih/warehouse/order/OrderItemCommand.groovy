@@ -9,7 +9,9 @@ import org.pih.warehouse.core.Person;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.shipping.ShipmentItem;
+import org.codehaus.groovy.grails.validation.Validateable
 
+@Validateable
 class OrderItemCommand  implements Serializable {
 
 	Boolean primary
@@ -29,7 +31,7 @@ class OrderItemCommand  implements Serializable {
 	Integer quantityReceived	
 		
 	static constraints = {
-
+		productReceived(nullable:false)
 	}
 	
 }

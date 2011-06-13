@@ -69,7 +69,7 @@ grails.enable.native2ascii = true
 grails.logging.jul.usebridge = true
 // packages to include in Spring bean scanning
 grails.spring.bean.packages = []
-grails.validateable.packages = ['org.pih.warehouse.inventory']
+grails.validateable.packages = ['org.pih.warehouse.inventory', 'org.pih.warehouse.order']
 
 // set per-environment serverURL stem for creating absolute links
 environments {

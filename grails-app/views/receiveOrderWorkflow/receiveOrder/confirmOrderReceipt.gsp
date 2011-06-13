@@ -170,8 +170,11 @@
 															</td>
 															<td>
 																${orderItem?.lotNumber } 
-																<span class="fade">(expires
-																<g:formatDate date="${orderItem?.expirationDate }" format="MMM yyyy"/>)</span>
+																<g:if test="${orderItem?.expirationDate }">
+																	<span class="fade">(expires
+																		<g:formatDate date="${orderItem?.expirationDate }" format="MMM yyyy"/>)
+																	</span>
+																</g:if>
 															</td>
 														</tr>
 													</g:if>

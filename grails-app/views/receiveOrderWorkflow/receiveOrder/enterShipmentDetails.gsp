@@ -25,12 +25,15 @@
 			</div>
 		</g:hasErrors>
 		<g:form action="receiveOrder" method="post">
+			<g:hiddenField name="order.id" value="${orderCommand?.order?.id }"/>
+			<g:hiddenField name="dateOrdered" value="${orderCommand?.dateOrdered }"/>			
 			<div class="dialog">
 				<fieldset>
 					<g:render template="../order/header" model="[orderInstance:order]"/>
 					<g:render template="progressBar" model="['state':'enterShipmentDetails']"/>	
 					<table>
 						<tbody>
+						<%-- 
 							<tr class='prop'>
 								<td valign='top' class='name'>
 									<label for='id'>Order number</label>
@@ -49,6 +52,7 @@
 									${ (orderCommand?.order?.isComplete()) ? "Complete" : "Pending" }
 								</td>
 							</tr>
+						--%>
 							<tr class='prop'>
 								<td valign='top' class='name'>
 									<label for='orderedBy'>Shipment type</label>

@@ -11,12 +11,19 @@
 			<div class="message">
 				${flash.message}
 			</div>
-		</g:if>
+		</g:if>	
+	
 		<g:hasErrors bean="${orderCommand}">
 			<div class="errors">
 				<g:renderErrors bean="${orderCommand}" as="list" />
 			</div>
 		</g:hasErrors>
+		<g:hasErrors bean="${orderListCommand}">
+			<div class="errors">
+				<g:renderErrors bean="${orderListCommand}" as="list" />
+			</div>
+		</g:hasErrors>
+				
 		<div class="dialog">
 			<fieldset>
 				<g:render template="../order/header" model="[orderInstance:order]"/>
@@ -218,7 +225,6 @@
  		  				OrderItemId: orderItemId.val(), Template: '#new-item-template' };
 		currentRow.after($(item.Template).tmpl(item));	
 		$("#orderItemsTable").alternateRowColors();
-
 		//var productSelect = $("#productReceived-" + index);
 		//console.log(productSelect);
 		//selectCombo(productSelect, productId );

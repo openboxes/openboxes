@@ -22,6 +22,8 @@
 							<span class="fade">&nbsp;|&nbsp;</span>
 							<span class="ordered-by">Ordered by: 
 								<g:if test="${orderInstance?.orderedBy }"><b>${orderInstance?.orderedBy?.name }</b></g:if>
+								
+								<g:if test="${orderInstance?.origin }">(${orderInstance?.destination?.name })</g:if>
 							</span>
 						</div>
 					</td>										

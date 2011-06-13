@@ -62,17 +62,27 @@ class ReceiveOrderWorkflowController {
 			on("processOrderItems").to("processOrderItems")
 			on("confirmOrderReceipt").to("confirmOrderReceipt")
 		}
-		processOrderItems {
-			on("next") { OrderItemListCommand cmd ->
-				flow.orderItems = cmd.orderItems				
-				//!flow.orderCommand.validate() ? error() : success()
-				
+		processOrderItems {			
+			on("next") { OrderItemListCommand command ->
+				flow.orderListCommand = command
+				flow.orderItems = command.orderItems				
+				if (!command.validate() || command.hasErrors()) {					
+					error()
+				}
+				else { 
+					success();
+				}
 			}.to("confirmOrderReceipt")
 			
-			on("back") { OrderItemListCommand cmd ->
-				flow.orderItems = cmd.orderItems	
-				
-				
+			on("back") { OrderItemListCommand command ->
+				flow.orderListCommand = command
+				flow.orderItems = command.orderItems				
+				if (!command.validate() || command.hasErrors()) {					
+					error()
+				}
+				else { 
+					success();
+				}
 			}.to("enterShipmentDetails")
 			on("cancel").to("finish")
 			on("error").to("processOrderItems")

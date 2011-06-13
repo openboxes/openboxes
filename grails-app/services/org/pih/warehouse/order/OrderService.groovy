@@ -71,10 +71,15 @@ class OrderService {
 		
 	void saveOrderShipment(OrderCommand orderCommand) { 
 		def shipmentInstance = new Shipment()
-		def numberOfShipments = orderCommand?.order?.shipments()?.size() + 1
+		def shipments = orderCommand?.order?.shipments();
+		def numberOfShipments = (shipments) ? shipments?.size() + 1 : 1;
 		
 		shipmentInstance.name = orderCommand?.order?.description + " - " + "Shipment #"  + numberOfShipments 
 		shipmentInstance.shipmentType = orderCommand?.shipmentType;
+		
+		log.info(">>>>>>>>>>>>>>> ORIGIN: " + orderCommand?.order?.origin)
+		log.info(">>>>>>>>>>>>>>> DESTINATION: " + orderCommand?.order?.destination)
+		
 		shipmentInstance.origin = orderCommand?.order?.origin;
 		shipmentInstance.destination = orderCommand?.order?.destination;		
 		shipmentInstance.expectedDeliveryDate = orderCommand?.deliveredOn;
@@ -104,7 +109,11 @@ class OrderService {
 		}
 		else { 
 			log.info("Errors with shipment " + shipmentInstance?.errors)
+			throw new RuntimeException("Validation errors on shipment " + shipmentInstance?.errors)
 		}
+		
+		
+		
 		
 		if (shipmentInstance) { 
 			// Send shipment 

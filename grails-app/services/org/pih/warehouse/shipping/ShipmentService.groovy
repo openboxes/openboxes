@@ -421,7 +421,7 @@ class ShipmentService {
 					triggerSendShipmentEmails(shipmentInstance, userInstance, emailRecipients)
 				}
 				else { 
-					throw new RuntimeException("Failed to send shipment due to errors")
+					throw new RuntimeException("Failed to send shipment due to errors "  + shipmentInstance.errors)
 				}
 			}
 			
@@ -429,7 +429,7 @@ class ShipmentService {
 			else {
 				log.error("Failed to send shipment due to errors")
 				// TODO: make this a better error message
-				throw new RuntimeException("Failed to send shipment")
+				throw new RuntimeException("Failed to send shipment " + shipmentInstance.errors)
 			}
 		} catch (Exception e) { 
 			// rollback all updates 
