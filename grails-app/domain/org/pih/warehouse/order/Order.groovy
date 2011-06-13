@@ -49,13 +49,11 @@ class Order implements Serializable {
 	}	
 	
 	String status() { 
-		if (isComplete()) { 
-			return "Complete"
-		}
-		else { 
-			if (status) { 
-				return status.name
-			}
+		if (status) { 
+			return status.name
+		} 
+		else if (isComplete()) { 
+			return "Completed"
 		}
 		return "Pending"
 	}

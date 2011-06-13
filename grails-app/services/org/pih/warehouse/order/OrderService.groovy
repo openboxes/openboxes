@@ -146,6 +146,12 @@ class OrderService {
 				throw new RuntimeException("Unable to save receipt " + receiptInstance.errors)
 			}
 			
+			// Once the order has been completely received, we set the status to RECEIVED
+			if (orderCommand?.order && orderCommand?.order?.isComplete()) { 
+				orderCommand?.order.status = OrderStatus.RECEIVED;
+				saveOrder(orderCommand?.order);
+			}
+			
 		}
 		
 		orderCommand?.shipment = shipmentInstance

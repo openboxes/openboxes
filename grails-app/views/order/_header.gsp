@@ -29,7 +29,6 @@
 					</td>										
 					<td style="text-align: right;">
 						<div class="fade" style="font-weight: bold; font-size:1.5em;">
-							<%-- ${orderInstance?.isComplete() ? "Complete" : "Pending" } --%>
 							${orderInstance?.status() }
 						</div>
 						<br/>
@@ -41,13 +40,11 @@
 								</g:form>
 							</g:if>
 							<g:elseif test="${!orderInstance?.isComplete() && orderInstance?.status == org.pih.warehouse.order.OrderStatus.PLACED }">
-								
 								<g:link controller="receiveOrderWorkflow" action="receiveOrder" id="${orderInstance?.id}">
 									<button>
 										${message(code: 'order.receive.label', default: 'Receive order')}
 									</button> 
 								</g:link>										
-								
 							</g:elseif>
 						</g:if>					
 					</td>

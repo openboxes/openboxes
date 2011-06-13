@@ -102,8 +102,6 @@ class ReceiveOrderWorkflowController {
 				if (orderCommand?.shipment?.hasErrors() || !orderCommand?.shipment?.id) {
 					error();
 				}
-				
-				
 			}.to("finish")
 			
 			on("cancel").to("finish")

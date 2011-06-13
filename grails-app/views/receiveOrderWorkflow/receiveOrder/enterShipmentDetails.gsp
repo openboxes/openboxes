@@ -33,26 +33,7 @@
 					<g:render template="progressBar" model="['state':'enterShipmentDetails']"/>	
 					<table>
 						<tbody>
-						<%-- 
-							<tr class='prop'>
-								<td valign='top' class='name'>
-									<label for='id'>Order number</label>
-								</td>
-								<td valign='top'class='value'>
-									${orderCommand.order.orderNumber }
-								</td>
-							</tr>
-							<tr class='prop'>
-								<td valign='top' class='name'>
-									<label for='id'>Status</label>
-								</td>
-								<td valign='top'class='value'>
-									<g:hiddenField name="order.id" value="${orderCommand?.order?.id }"/>
-									<g:hiddenField name="dateOrdered" value="${orderCommand?.dateOrdered }"/>
-									${ (orderCommand?.order?.isComplete()) ? "Complete" : "Pending" }
-								</td>
-							</tr>
-						--%>
+						
 							<tr class='prop'>
 								<td valign='top' class='name'>
 									<label for='orderedBy'>Shipment type</label>
