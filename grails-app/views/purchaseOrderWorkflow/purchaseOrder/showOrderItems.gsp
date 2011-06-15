@@ -58,7 +58,8 @@
 														${orderItem?.orderItemType }
 													</td>
 													<td>
-														<g:textField name="orderItems[${i }].quantity" value="${orderItem?.quantity }" size="5"></g:textField>
+														${orderItem?.quantity }
+														<g:hiddenField name="orderItems[${i }].quantity" value="${orderItem?.quantity }" size="5"/>
 													</td>
 												</tr>
 											</g:each>
@@ -88,8 +89,10 @@
 								<div class="tabs">
 									<ul>
 										<li><a href="#tabs-1">Product</a></li>
+										<%--
 										<li><a href="#tabs-2">Category</a></li>
-										<li><a href="#tabs-3">Unclassified</a></li>
+										<li><a href="#tabs-3">Unclassified</a></li> 
+										--%>
 									</ul>
 									<div id="tabs-1">
 										<g:form action="purchaseOrder" method="post">
@@ -123,6 +126,7 @@
 											</table>
 										</g:form>
 									</div>
+									<%--
 									<div id="tabs-2">
 										<g:form action="purchaseOrder" method="post">
 											<g:hiddenField name="order.id" value="${order?.id }"></g:hiddenField>
@@ -187,6 +191,7 @@
 											</table>
 										</g:form>							
 									</div>
+									 --%>
 								</div>								
 							</div>
 						</td>			
