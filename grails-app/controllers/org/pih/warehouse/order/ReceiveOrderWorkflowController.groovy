@@ -1,12 +1,15 @@
 package org.pih.warehouse.order
 
+import grails.util.GrailsUtil;
 import org.pih.warehouse.core.Address;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
+import org.pih.warehouse.shipping.ReceiptException;
 import org.pih.warehouse.shipping.Shipment;
+import org.pih.warehouse.shipping.ShipmentException;
 import org.springframework.dao.DataIntegrityViolationException;
 
 class ReceiveOrderWorkflowController {
@@ -48,7 +51,7 @@ class ReceiveOrderWorkflowController {
 		enterShipmentDetails {
 			on("next") { OrderCommand cmd ->
 				flow.orderCommand = cmd
-				if (flow.orderCommand.hasErrors() || !flow.orderCommand.validate()) {
+				if (flow.orderCommand.hasErrors()) {
 					return error() 	
 				}
 				log.info("setting order command for process order items " + flow.orderItems)
@@ -66,57 +69,73 @@ class ReceiveOrderWorkflowController {
 			on("next") { OrderItemListCommand command ->
 				flow.orderListCommand = command
 				flow.orderItems = command.orderItems				
-				if (!command.validate() || command.hasErrors()) {					
-					error()
-				}
-				else { 
-					success();
+				if (command.hasErrors()) {					
+					return error()
 				}
 			}.to("confirmOrderReceipt")
 			
 			on("back") { OrderItemListCommand command ->
 				flow.orderListCommand = command
 				flow.orderItems = command.orderItems				
-				if (!command.validate() || command.hasErrors()) {					
-					error()
-				}
-				else { 
-					success();
+				if (command.hasErrors()) {					
+					return error()
 				}
 			}.to("enterShipmentDetails")
+			
 			on("cancel").to("finish")
-			on("error").to("processOrderItems")
+			//on("error").to("processOrderItems")
 			on("enterShipmentDetails").to("enterShipmentDetails")
 			on("processOrderItems").to("processOrderItems")
 			on("confirmOrderReceipt").to("confirmOrderReceipt")
 		}
 		confirmOrderReceipt  {
-			on("finish") { 
+			on("submit") { 
 				def orderCommand = flow.orderCommand;
 				orderCommand.orderItems = flow.orderItems;
 				orderCommand.currentUser = User.get(session.user.id)
 				orderCommand.currentLocation = Location.get(session.warehouse.id)
-				orderService.saveOrderShipment(orderCommand)
-				
-				// If the shipment was saved, let's redirect back to the order received page
-				if (orderCommand?.shipment?.hasErrors() || !orderCommand?.shipment?.id) {
-					error();
+				try {
+					orderService.saveOrderShipment(orderCommand)
 				}
+				catch (ShipmentException se) {
+					flow.shipment = se?.shipment;
+					flow.receipt = se?.shipment?.receipt;
+					return error();
+				}
+				catch (ReceiptException re) {
+					flow.receipt = re.receipt;
+					return error();
+				}
+				catch (OrderException oe) {
+					flow.order = oe.order;
+					return error();
+				}
+				catch (RuntimeException e) {
+					flow.orderCommand = orderCommand
+					return error();
+				}
+				log.info(">>>>>>>>>>>>> Success!!!")
+				success()
+				
 			}.to("finish")
-			
 			on("cancel").to("finish")
 			on("back").to("processOrderItems")
-			on("error") { log.info "error during confirm order receipt" }.to("confirmOrderReceipt")
-			//on(Exception).to("confirmOrderReceipt")
+			on("error").to("confirmOrderReceipt")
+			//on(Exception).to("handleError")
 			//on("success").to("finish")
 			on("enterShipmentDetails").to("enterShipmentDetails")
 			on("processOrderItems").to("processOrderItems")
 			on("confirmOrderReceipt").to("confirmOrderReceipt")
 		}		
+		handleError() { 
+			on("enterShipmentDetails").to("enterShipmentDetails")
+			on("processOrderItems").to("processOrderItems")
+			on("confirmOrderReceipt").to("confirmOrderReceipt")
+			
+		}
 		finish {
 			redirect(controller:"order", action : "show", params : [ "id" : flow.order.id ?: '' ])
 		}
-		handleError()
 	}
 
 	

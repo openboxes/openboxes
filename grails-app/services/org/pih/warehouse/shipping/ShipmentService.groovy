@@ -18,6 +18,7 @@ import org.pih.warehouse.inventory.TransactionEntry;
 import org.pih.warehouse.inventory.TransactionType;
 import org.pih.warehouse.inventory.Warehouse;
 import org.pih.warehouse.receiving.Receipt;
+import org.pih.warehouse.receiving.ReceiptItem;
 
 class ShipmentService {
 
@@ -402,15 +403,9 @@ class ShipmentService {
 					shipmentInstance.addToComments(new Comment(comment: comment, sender: userInstance))
 				}
 					
-				// Add a Shipped event to the shipment
-				EventType eventType = EventType.findByEventCode(EventCode.SHIPPED)
-				if (eventType) {					
-					createShipmentEvent(shipmentInstance, shipDate, eventType, locationInstance);
-				}
-				else {
-					throw new RuntimeException("System could not find event type 'Shipped'")
-				}
-												
+				// Add a Shipped event to the shipment									
+				createShipmentEvent(shipmentInstance, shipDate, EventCode.SHIPPED, locationInstance);
+																
 				// Save updated shipment instance (adding an event and comment)
 				if (!shipmentInstance.hasErrors() && shipmentInstance.save()) { 
 					
@@ -439,17 +434,23 @@ class ShipmentService {
 		}				
 	} 	
 	
-	void createShipmentEvent(Shipment shipmentInstance, Date eventDate, EventType eventType, Location location) { 
+	void createShipmentEvent(Shipment shipmentInstance, Date eventDate, EventCode eventCode, Location location) { 
+		boolean eventAlreadyExists = Boolean.FALSE;
 		
-		boolean exists = Boolean.FALSE;
+		// Get the appropriate event type for the given event code
+		EventType eventType = EventType.findByEventCode(eventCode)
+		if (!eventType) {
+			throw new RuntimeException("System could not find event type for event code '" + eventCode + "'")
+		}
+		
 		// If 'requested' event type already exists, return
-		log.info("exists " + exists)
+		log.info("exists " + eventAlreadyExists)
 		shipmentInstance?.events.each {
 			if (it.eventType == eventType)
-				exists = Boolean.TRUE;
+				eventAlreadyExists = Boolean.TRUE;
 		}
 		// Avoid duplicate events
-		if (!exists) {
+		if (!eventAlreadyExists) {
 			log.info ("Event does not exist")
 			
 			// enforce that we are only storing the date component here
@@ -484,7 +485,10 @@ class ShipmentService {
 	}
 	
 	
-	void receiveShipment(Shipment shipmentInstance, Receipt receiptInstance, String comment, User user, Location location) { 
+	
+	
+	
+	void receiveShipment(Shipment shipmentInstance, String comment, User user, Location location) { 
 		
 		try {
 			
@@ -496,31 +500,24 @@ class ShipmentService {
 				throw new RuntimeException("Shipment has already been received.")
 			}
 			
-			if (receiptInstance.getActualDeliveryDate() > new Date()) { 
-				throw new RuntimeException("Delivery date [" + receiptInstance.getActualDeliveryDate() + "] must occur on or before today.")
+			if (shipmentInstance.receipt.getActualDeliveryDate() > new Date()) { 
+				throw new RuntimeException("Delivery date [" + shipmentInstance.receipt.getActualDeliveryDate() + "] must occur on or before today.")
 			}
 			
 			
-			if (!receiptInstance.hasErrors() && receiptInstance.save(flush: true)) {
+			if (!shipmentInstance.receipt.hasErrors() && shipmentInstance.receipt.save(flush: true)) {
 				
 				// Add comment to shipment (as long as there's an actual comment
 				// after trimming off the extra spaces)
 				if (comment) {
-					shipmentInstance.addToComments(
-						new Comment(comment: comment, sender: user));
+					shipmentInstance.addToComments(new Comment(comment: comment, sender: user));
 				}
 
 				// Add a Received event to the shipment
-				EventType eventType = EventType.findByEventCode(EventCode.RECEIVED)
-				if (eventType) {					
-					createShipmentEvent(shipmentInstance, receiptInstance.actualDeliveryDate, eventType, location);
-				}
-				else {
-					throw new RuntimeException("System could not find event type 'Received'")
-				}
+				createShipmentEvent(shipmentInstance, shipmentInstance.receipt.actualDeliveryDate, EventCode.RECEIVED, location);
 												
 				// Save updated shipment instance
-				shipmentInstance.save();
+				shipmentInstance.save(flush:true);
 			
 				// only need to create a transaction if the destination is a warehouse
 				if (shipmentInstance.destination?.isWarehouse()) {
@@ -572,21 +569,44 @@ class ShipmentService {
 					else { 
 						// did not save successfully, display errors message
 						//flash.message = "Transaction has errors"
+						throw new RuntimeException("Failed to receive shipment due to error while saving transaction")
 					}
 				}
 			}
 			else {
+				log.error (shipmentInstance.receipt.errors)
 				// TODO: make this a better error message
-				throw new RuntimeException("Failed to receive shipment")
+				throw new RuntimeException("Failed to receive shipment due to error while saving receipt")
 			}
 		} catch (Exception e) {
 			// rollback all updates and throw an exception
-			log.error(e);
-			throw e
+			log.error("Caught exception ", e);
+			//throw new RuntimeException(e);
+			throw new RuntimeException("Failed to receive shipment due to unknown error", e);
 			//shipmentInstance.errors.reject("shipmentInstance.invalid", e.message);  // this didn't seem to be working properly
 		}
 	}
 		
+	public Receipt createReceipt(Shipment shipmentInstance, Date dateDelivered) { 
+		Receipt receiptInstance = new Receipt()
+		shipmentInstance.receipt = receiptInstance
+		receiptInstance.shipment = shipmentInstance		
+		receiptInstance.recipient = shipmentInstance?.recipient
+		receiptInstance.expectedDeliveryDate = shipmentInstance?.expectedDeliveryDate;
+		receiptInstance.actualDeliveryDate = dateDelivered;
+		shipmentInstance.shipmentItems.each {
+			ReceiptItem receiptItem = new ReceiptItem(it.properties);
+			receiptItem.setQuantityShipped (it.quantity);
+			receiptItem.setQuantityReceived (it.quantity);
+			receiptItem.setLotNumber(it.lotNumber);
+			receiptItem.setExpirationDate(it.expirationDate);
+			receiptInstance.addToReceiptItems(receiptItem);
+		}
+		return receiptInstance;
+	}
+	
+	
+	
 	/**
 	 * Fetches the shipment workflow associated with this shipment
 	 * (Note that, as of now, there can only be one shipment workflow per shipment type)

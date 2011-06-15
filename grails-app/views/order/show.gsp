@@ -49,57 +49,7 @@
 								</td>
 							</tr>
 							
-	                        <tr class="prop">
-	                            <td valign="top" class="name"><label><g:message code="order.items.label" default="Items" /></label></td>
-	                            <td valign="top" class="value">
-									<g:if test="${orderInstance?.orderItems }">
-										<table>
-											<thead>
-												<tr class="odd">
-													<th>Type</th>
-													<th>Product</th>
-													<th>Qty Ordered</th>
-													<th>Qty Fulfilled</th>
-												</tr>
-											</thead>									
-											<tbody>
-												<g:each var="orderItem" in="${orderInstance?.orderItems}" status="i">
-													<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-														<td>
-															<g:if test="${orderItem?.product }">
-																Product
-															</g:if>
-															<g:elseif test="${orderItem?.category }">
-																Category
-															</g:elseif>							
-															<g:else>
-																Unclassified											
-															</g:else>
-														</td>
-														<td>
-															<g:if test="${orderItem?.product }">
-																${orderItem?.product?.name}
-															</g:if>
-															<g:else>
-																${orderItem?.description }
-															</g:else>
-														</td>
-														<td>
-															${orderItem?.quantity}
-														</td>
-														<td>
-															${orderItem?.quantityFulfilled()}
-														</td>
-													</tr>
-												</g:each>
-											</tbody>
-										</table>
-									</g:if>
-									<g:else>
-										<span class="fade">No items</span>
-									</g:else>
-	                            </td>
-	                        </tr>
+	                        
 							<tr class="prop">
 	                            <td valign="top" class="name"><label><g:message code="order.items.label" default="Shipments" /></label></td>
 	                            <td valign="top" class="value">	    
@@ -228,6 +178,57 @@
 	                            
 	                            </td>
 	                        </tr>
+							<tr class="prop">
+	                            <td valign="top" class="name"><label><g:message code="order.items.label" default="Items" /></label></td>
+	                            <td valign="top" class="value">
+									<g:if test="${orderInstance?.orderItems }">
+										<table>
+											<thead>
+												<tr class="odd">
+													<th>Type</th>
+													<th>Product</th>
+													<th>Qty Ordered</th>
+													<th>Qty Fulfilled</th>
+												</tr>
+											</thead>									
+											<tbody>
+												<g:each var="orderItem" in="${orderInstance?.orderItems}" status="i">
+													<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+														<td>
+															<g:if test="${orderItem?.product }">
+																Product
+															</g:if>
+															<g:elseif test="${orderItem?.category }">
+																Category
+															</g:elseif>							
+															<g:else>
+																Unclassified											
+															</g:else>
+														</td>
+														<td>
+															<g:if test="${orderItem?.product }">
+																${orderItem?.product?.name}
+															</g:if>
+															<g:else>
+																${orderItem?.description }
+															</g:else>
+														</td>
+														<td>
+															${orderItem?.quantity}
+														</td>
+														<td>
+															${orderItem?.quantityFulfilled()}
+														</td>
+													</tr>
+												</g:each>
+											</tbody>
+										</table>
+									</g:if>
+									<g:else>
+										<span class="fade">No items</span>
+									</g:else>
+	                            </td>
+	                        </tr>	                        
 	                    
 	                    </tbody>
 	                </table>

@@ -19,6 +19,21 @@
 				<g:renderErrors bean="${orderCommand}" as="list" />
 			</div>
 		</g:hasErrors>
+		<g:hasErrors bean="${shipment}">
+			<div class="errors">
+				<g:renderErrors bean="${shipment}" as="list" />
+			</div>
+		</g:hasErrors>
+		<g:hasErrors bean="${receipt}">
+			<div class="errors">
+				<g:renderErrors bean="${receipt}" as="list" />
+			</div>
+		</g:hasErrors>
+		<g:hasErrors bean="${order}">
+			<div class="errors">
+				<g:renderErrors bean="${order}" as="list" />
+			</div>
+		</g:hasErrors>
 		
 		<g:form action="receiveOrder" method="post">
 			<div class="dialog">
@@ -192,7 +207,7 @@
 					<div class="buttons" style="border-top: 1px solid lightgrey;">
 						<span class="formButton"> 
 							<g:submitButton name="back" value="Back"></g:submitButton> 
-							<g:submitButton name="finish" value="Finish"></g:submitButton>
+							<g:submitButton name="submit" value="Finish"></g:submitButton>
 							<g:link action="receiveOrder" event="cancel">Cancel</g:link>
 						</span>
 					</div>

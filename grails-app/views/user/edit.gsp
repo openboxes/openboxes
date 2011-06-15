@@ -104,7 +104,14 @@
 	                                    <g:checkBox name="active" value="${userInstance?.active}" />
 	                                </td>
 	                            </tr>
-	                            	                            
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
+	                                  <label for="email"><g:message code="user.email.label" default="Warehouse" /></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'warehouse', 'errors')}">
+										<g:select name="warehouse.id" from="${org.pih.warehouse.inventory.Warehouse.list()?.sort()}" optionKey="id" value="${userInstance?.warehouse?.id}" noSelection="['':'']"/>
+	                                </td>
+	                            </tr>	                            	                            
 								<tr class="prop">
 									<td valign="top" class="name">
 				
@@ -113,14 +120,12 @@
 					                    <g:actionSubmit class="save" action="update" value="${message(code: 'default.button.save.label', default: 'Save')}" /></span>
 										&nbsp;
 										<g:link class="cancel" action="show" id="${warehouseInstance?.id }">${message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
-	                            	
 									</td>
 								</tr>
 	                        </tbody>
 	                    </table>
 	                </div>
 				</fieldset>
-
             </g:form>
         </div>
     </body>

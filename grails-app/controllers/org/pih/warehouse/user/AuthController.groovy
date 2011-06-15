@@ -1,5 +1,7 @@
 package org.pih.warehouse.user
 
+import grails.util.GrailsUtil;
+
 import org.pih.warehouse.core.RoleType;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.core.Role;
@@ -116,16 +118,19 @@ class AuthController {
 	
 				session.user = userInstance;
 				
-				// PIMS-782 Force the user to select a warehouse each time
-				//session.warehouse = userInstance.warehouse
-				
-				//if (params?.targetUri) {
-				//	redirect(uri: params.targetUri);
-				//	return;
-				//}
+				// For now, we'll just execute this code in dev environments
+				if (GrailsUtil.environment == "development") { 
+					// PIMS-782 Force the user to select a warehouse each time
+					if (userInstance?.warehouse) { 
+						session.warehouse = userInstance.warehouse
+					}
+					
+					if (params?.targetUri) {
+						redirect(uri: params.targetUri);
+						return;
+					}
+				}
 				redirect(controller:'dashboard',action:'index')
-					
-					
 			}
 			else {
 				flash.message = "Incorrect password for user <b>${params.username}</b>"				

@@ -127,7 +127,7 @@
 								<ul>
 								    <g:if test="${session.user}">
 										<li>
-											Welcome, <b>${session.user.username}</b>
+											Welcome, <b>${session.user.username}</b> <span class="fade">(${grails.util.GrailsUtil.environment})</span>
 										</li>
 										<!-- 																	
 										<li>

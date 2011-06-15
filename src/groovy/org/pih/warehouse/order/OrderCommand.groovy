@@ -37,8 +37,13 @@ class OrderCommand implements Serializable {
 	static constraints = {
 		shipmentType(nullable:false)
 		recipient(nullable:false)
-		shippedOn(nullable:false)
-		deliveredOn(nullable:false)
+		// Should ship on or before the day it's delivered
+		shippedOn(nullable:false, 
+			validator: { value, obj-> 
+				obj.deliveredOn && obj.deliveredOn.after(value-1) // subtract a day from the shippedOn date in case the dates are the same
+			}
+		)
+		deliveredOn(nullable:false, max: new Date())
 		currentUser(nullable:true)
 		currentLocation(nullable:true)
 		origin(nullable:true)

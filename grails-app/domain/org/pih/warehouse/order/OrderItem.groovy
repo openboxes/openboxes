@@ -6,6 +6,7 @@ import org.pih.warehouse.core.User;
 import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
+import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.shipping.ShipmentItem;
 
 class OrderItem implements Serializable {
@@ -43,7 +44,12 @@ class OrderItem implements Serializable {
 	}
 
 	Integer quantityFulfilled() { 
-		return orderShipments ? orderShipments.sum { it?.shipmentItem?.quantity } : 0
+		try { 
+			def shipmentItems = shipmentItems()
+			return shipmentItems ? shipmentItems.sum { it.quantity } : 0 
+			//return orderShipments ? orderShipments.sum { it?.shipmentItem?.quantity } : 0
+		} catch (Exception e) { log.error "Error calculating quantity fulfilled", e }
+		return 0;
 	}
 	
 	Boolean isComplete() { 
@@ -55,11 +61,23 @@ class OrderItem implements Serializable {
 	}
 	
 	def shipmentItems() {
-		return orderShipments.collect{ it.shipmentItem }
+		def shipmentItems = []
+		try { 
+			shipmentItems = orderShipments.collect{ ShipmentItem.get(it?.shipmentItem?.id) } 
+		} catch (Exception e) { 
+			log.error "Error getting shipment items", e 
+		} 
+		return shipmentItems;
 	}
 	
 	def shipments() { 
-		return orderShipments.collect { it.shipmentItem.shipment }
+		def shipments = []
+		try { 
+			shipments = orderShipments.collect { Shipment.get(it?.shipmentItem?.shipment?.id) } 
+		} catch (Exception e) { 
+			log.error "Error getting shipment items", e 
+		} 
+		return shipments;
 	}
 		
 	/*

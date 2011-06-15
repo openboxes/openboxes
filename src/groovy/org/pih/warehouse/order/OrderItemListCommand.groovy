@@ -26,7 +26,7 @@ class OrderItemListCommand implements Serializable {
 				// If the quantity received is not null and the item does not validate, reject the 
 				if(orderItem.quantityReceived && !orderItem?.validate()) {
 					orderItem.errors.allErrors.each { error ->
-						//println(">>>>>>>>>>>>> ERROR " + error.getCode() + " ")
+						println(">>>>>>>>>>>>> ERROR " + error.getCode() + " ")
 						obj.errors.rejectValue("orderItems", error.getField() + "." + error.getCode())
 						
 					}

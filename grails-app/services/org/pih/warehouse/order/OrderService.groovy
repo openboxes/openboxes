@@ -12,6 +12,7 @@ import org.pih.warehouse.product.Product;
 import org.pih.warehouse.receiving.Receipt;
 import org.pih.warehouse.receiving.ReceiptItem;
 import org.pih.warehouse.shipping.Shipment;
+import org.pih.warehouse.shipping.ShipmentException;
 import org.pih.warehouse.shipping.ShipmentItem;
 
 class OrderService {
@@ -69,22 +70,19 @@ class OrderService {
 	}
 	
 		
-	void saveOrderShipment(OrderCommand orderCommand) { 
+	OrderCommand saveOrderShipment(OrderCommand orderCommand) { 
 		def shipmentInstance = new Shipment()
 		def shipments = orderCommand?.order?.shipments();
 		def numberOfShipments = (shipments) ? shipments?.size() + 1 : 1;
 		
 		shipmentInstance.name = orderCommand?.order?.description + " - " + "Shipment #"  + numberOfShipments 
 		shipmentInstance.shipmentType = orderCommand?.shipmentType;
-		
-		log.info(">>>>>>>>>>>>>>> ORIGIN: " + orderCommand?.order?.origin)
-		log.info(">>>>>>>>>>>>>>> DESTINATION: " + orderCommand?.order?.destination)
-		
 		shipmentInstance.origin = orderCommand?.order?.origin;
 		shipmentInstance.destination = orderCommand?.order?.destination;		
 		shipmentInstance.expectedDeliveryDate = orderCommand?.deliveredOn;
 		shipmentInstance.expectedShippingDate = orderCommand?.shippedOn;
 		
+		orderCommand?.shipment = shipmentInstance
 		orderCommand?.orderItems.each { orderItemCommand ->
 			if (orderItemCommand && orderItemCommand.productReceived && orderItemCommand?.quantityReceived) {
 				def shipmentItem = new ShipmentItem();
@@ -103,18 +101,16 @@ class OrderService {
 		
 		// Validate the shipment and save it if there are no errors
 		if (shipmentInstance.validate() && !shipmentInstance.hasErrors()) { 
-			log.info("No errors, save shipment");
-			//shipmentInstance.save(flush:true)		
 			shipmentService.saveShipment(shipmentInstance);
 		}
 		else { 
 			log.info("Errors with shipment " + shipmentInstance?.errors)
-			throw new RuntimeException("Validation errors on shipment " + shipmentInstance?.errors)
+			throw new ShipmentException(message: "Validation errors on shipment ", shipment: shipmentInstance)
 		}
 		
 		
 		
-		
+		// Send shipment, receive shipment, and add 
 		if (shipmentInstance) { 
 			// Send shipment 
 			log.info "Sending shipment " + shipmentInstance?.name
@@ -122,28 +118,12 @@ class OrderService {
 						
 			// Receive shipment
 			log.info "Receiving shipment " + shipmentInstance?.name
-			Receipt receiptInstance = new Receipt()
-			
-			shipmentInstance.receipt = receiptInstance
-			receiptInstance.shipment = shipmentInstance	
-			
-			receiptInstance.recipient = shipmentInstance?.recipient	
-			receiptInstance.expectedDeliveryDate = shipmentInstance?.expectedDeliveryDate;
-			receiptInstance.actualDeliveryDate = orderCommand?.deliveredOn;
-			shipmentInstance.shipmentItems.each {
-				log.info("Adding shipment item as receipt item" + it.quantity)
-				ReceiptItem receiptItem = new ReceiptItem(it.properties);
-				receiptItem.setQuantityShipped (it.quantity);
-				receiptItem.setQuantityReceived (it.quantity);
-				receiptItem.setLotNumber(it.lotNumber);
-				receiptItem.setExpirationDate(it.expirationDate);
-				receiptInstance.addToReceiptItems(receiptItem);           // use basic "add" method to avoid GORM because we don't want to persist yet
-			}
+			Receipt receiptInstance = shipmentService.createReceipt(shipmentInstance, orderCommand?.deliveredOn)
 			if (!receiptInstance.hasErrors() && receiptInstance.save(flush:true)) { 
-				shipmentService.receiveShipment(shipmentInstance, receiptInstance, "", orderCommand?.currentUser, orderCommand?.currentLocation);
+				shipmentService.receiveShipment(shipmentInstance, "", orderCommand?.currentUser, orderCommand?.currentLocation);
 			}
 			else { 
-				throw new RuntimeException("Unable to save receipt " + receiptInstance.errors)
+				throw new ShipmentException(message: "Unable to save receipt ", shipment: shipmentInstance)
 			}
 			
 			// Once the order has been completely received, we set the status to RECEIVED
@@ -151,27 +131,18 @@ class OrderService {
 				orderCommand?.order.status = OrderStatus.RECEIVED;
 				saveOrder(orderCommand?.order);
 			}
-			
 		}
-		
-		orderCommand?.shipment = shipmentInstance
+		return orderCommand;
 	}
 	
 	
-	boolean saveOrder(Order order) { 		
-		if (order.validate() && !order.hasErrors()) {
-			if (!order.hasErrors() && order.save()) {
-				log.info("no errors, saved " + order.id)
-			}
-			else {
-				return false;
-			}
+	Order saveOrder(Order order) { 		
+		if (!order.hasErrors() && order.save()) {
+			return order;
 		}
 		else {
-			log.info("error during validation")
-			return false;
+			throw new OrderException(message: "Unable to save order due to errors", order: order)
 		}
-		return true;
 	}
 	
 }

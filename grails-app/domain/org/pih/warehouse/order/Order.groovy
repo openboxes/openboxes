@@ -73,7 +73,7 @@ class Order implements Serializable {
 	
 	def shipments() { 
 		def shipments = orderItems.collect { it.shipments() } 
-		return shipments.flatten().unique();
+		return shipments.flatten().unique() { it.id } 
 	}
 	
 }
