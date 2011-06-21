@@ -130,7 +130,7 @@ class InventoryService {
 		Map m = new TreeMap();
 		if (products) {
 			products.each {
-				Category c = it.category
+				Category c = it.category ? it.category : new Category(name: "Unclassified")
 				List l = m.get(c)
 				if (l == null) {
 					l = new ArrayList();
@@ -169,12 +169,12 @@ class InventoryService {
 						
 		// Search for products 
 		commandInstance.productList = getProducts(commandInstance, showHiddenProducts);
+		commandInstance.productList = commandInstance?.productList?.sort() { it.name };
 		
 		// This list gets calculated AFTER the product list, because we need to use the product list as the basis. 
 		commandInstance.attributeMap = getProductAttributes();
 		commandInstance.productMap = getProductMap(commandInstance.productList);
 		commandInstance.inventoryItemMap =  getInventoryItemMap(commandInstance?.warehouseInstance?.id);
-		commandInstance.productList = commandInstance?.productList?.sort() { it.name };
 		commandInstance.quantityMap = getQuantityByProductMap(commandInstance?.inventoryInstance);
 		
 		return commandInstance;
@@ -186,11 +186,8 @@ class InventoryService {
 	* Get products based on the
 	*/
    Set getProducts(BrowseInventoryCommand command, Boolean showHiddenProducts) {
-	   def products = new HashSet();
 	   // Get any category filters that match search terms
-	   products = getProductsByAll(command?.searchTermFilters, command?.categoryFilters, showHiddenProducts);
-			   
-	   return products;
+	   return getProductsByAll(command?.searchTermFilters, command?.categoryFilters, showHiddenProducts);
    }
 
 
