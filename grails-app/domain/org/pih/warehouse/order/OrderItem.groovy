@@ -75,7 +75,7 @@ class OrderItem implements Serializable {
 		try { 
 			shipments = orderShipments.collect { Shipment.get(it?.shipmentItem?.shipment?.id) } 
 		} catch (Exception e) { 
-			log.error "Error getting shipment items", e 
+			log.error "Error getting shipment", e 
 		} 
 		return shipments;
 	}

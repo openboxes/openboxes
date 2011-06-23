@@ -110,10 +110,11 @@ class ReceiveOrderWorkflowController {
 					flow.order = oe.order;
 					return error();
 				}
-				catch (RuntimeException e) {
-					flow.orderCommand = orderCommand
-					return error();
-				}
+				// RuntimeExceptions should propagate to the UI
+				//catch (RuntimeException e) {
+				//	flow.orderCommand = orderCommand
+				//	return error();
+				//}
 				log.info(">>>>>>>>>>>>> Success!!!")
 				success()
 				

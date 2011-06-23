@@ -102,9 +102,12 @@
 													<tr class='prop'>
 														<td valign='top' class='name'><label for='product.id'>Product:</label></td>
 														<td valign='top' class='value' nowrap="nowrap">
+															<%-- 
 															<div class="ui-widget">
 																<g:select class="combobox" name="product.id" from="${org.pih.warehouse.product.Product.list().sort{it.name}}" optionKey="id" value="" noSelection="['':'']" />
 															</div>
+															--%>
+															<g:autoSuggest id="product" name="product" jsonUrl="/warehouse/json/findProductByName" width="200" valueId="" valueName=""/>															
 														</td>
 													</tr>
 													<tr class='prop'>

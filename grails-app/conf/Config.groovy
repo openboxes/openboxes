@@ -1,3 +1,4 @@
+import grails.util.GrailsUtil
 import org.apache.log4j.Level
 import org.apache.log4j.net.SMTPAppender
 
@@ -10,7 +11,7 @@ grails.config.locations = [
 	"file:${userHome}/.grails/${appName}-config.properties"
 ]
 
-println "Using configuration locations ${grails.config.locations}"
+println "Using configuration locations ${grails.config.locations} ${GrailsUtil.environment}"
 
 // if(System.properties["${appName}.config.location"]) {
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
@@ -70,7 +71,7 @@ mail.error.server = 'localhost'
 mail.error.port = 25
 mail.error.from = 'error@openboxes.com'
 mail.error.to = 'jmiranda@pih.org'
-mail.error.subject = '[Application Error]'
+mail.error.subject = '[Application Error][' + GrailsUtil.environment + ']'
 mail.error.debug = false
 
 // set per-environment serverURL stem for creating absolute links

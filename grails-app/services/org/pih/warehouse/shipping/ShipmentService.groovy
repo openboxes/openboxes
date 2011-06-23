@@ -15,6 +15,7 @@ import org.pih.warehouse.core.User;
 import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.TransactionEntry;
+import org.pih.warehouse.inventory.TransactionException;
 import org.pih.warehouse.inventory.TransactionType;
 import org.pih.warehouse.inventory.Warehouse;
 import org.pih.warehouse.receiving.Receipt;
@@ -389,12 +390,14 @@ class ShipmentService {
 	void sendShipment(Shipment shipmentInstance, String comment, User userInstance, Location locationInstance, Date shipDate, Set<Person> emailRecipients) { 
 
 		try { 
-			if (!shipDate || shipDate > new Date()) 
-				throw new RuntimeException("Shipping date [" + shipDate + "] must occur on or before today.")
-				
-			if (shipmentInstance.hasShipped())
-				throw new RuntimeException("Shipment has already been shipped.");
-			
+			if (!shipDate || shipDate > new Date()) {
+				shipmentInstance.errors.reject("shipment.invalid.invalidShipDate", "Shipping date [" + shipDate + "] must occur on or before today.") 
+				throw new ShipmentException(message: "Shipping date [" + shipDate + "] must occur on or before today.", shipment: shipmentInstance)
+			}				
+			if (shipmentInstance.hasShipped()) { 
+				shipmentInstance.errors.reject("shipment.invalid.alreadyShipped", "Shipment has alerady shipped")
+				throw new ShipmentException(message: "Shipment has already been shipped.", shipment: shipmentInstance);
+			}
 			// don't allow the shipment to go out if it has errors, or if this shipment has already been shipped, or if the shipdate is after today
 			if (!shipmentInstance.hasErrors()) {				
 				// Add comment to shipment (as long as there's an actual comment 
@@ -416,7 +419,7 @@ class ShipmentService {
 					triggerSendShipmentEmails(shipmentInstance, userInstance, emailRecipients)
 				}
 				else { 
-					throw new RuntimeException("Failed to send shipment due to errors "  + shipmentInstance.errors)
+					throw new ShipmentException(message: "Failed to send shipment due to errors ", shipment: shipmentInstance)
 				}
 			}
 			
@@ -424,7 +427,7 @@ class ShipmentService {
 			else {
 				log.error("Failed to send shipment due to errors")
 				// TODO: make this a better error message
-				throw new RuntimeException("Failed to send shipment " + shipmentInstance.errors)
+				throw new ShipmentException(message: "Failed to send shipment ", shipment: shipmentInstance)
 			}
 		} catch (Exception e) { 
 			// rollback all updates 
@@ -440,7 +443,7 @@ class ShipmentService {
 		// Get the appropriate event type for the given event code
 		EventType eventType = EventType.findByEventCode(eventCode)
 		if (!eventType) {
-			throw new RuntimeException("System could not find event type for event code '" + eventCode + "'")
+			throw new RuntimeException(message: "System could not find event type for event code '" + eventCode + "'")
 		}
 		
 		// If 'requested' event type already exists, return
@@ -490,18 +493,21 @@ class ShipmentService {
 	
 	void receiveShipment(Shipment shipmentInstance, String comment, User user, Location location) { 
 		
-		try {
+		//try {
 			
 			if (!shipmentInstance.hasShipped()) { 
-				throw new RuntimeException("Shipment has not been shipped yet.")
+				throw new ShipmentException(message: "Shipment has not been shipped yet.", shipment: shipmentInstance)
 			}
 			
 			if (shipmentInstance.wasReceived()) {
-				throw new RuntimeException("Shipment has already been received.")
+				throw new ShipmentException(message: "Shipment has already been received.", shipment: shipmentInstance)
 			}
 			
 			if (shipmentInstance.receipt.getActualDeliveryDate() > new Date()) { 
-				throw new RuntimeException("Delivery date [" + shipmentInstance.receipt.getActualDeliveryDate() + "] must occur on or before today.")
+				throw new ReceiptException(
+					message: "Delivery date [" + shipmentInstance.receipt.getActualDeliveryDate() + "] must occur on or before today.", 
+					shipment: shipmentInstance,
+					receipt: shipmentInstance.receipt)
 			}
 			
 			
@@ -549,7 +555,8 @@ class ShipmentService {
 									shipmentInstance.errors.reject("inventoryItem.invalid",
 										errorObj, "[${error.getField()} ${error.getRejectedValue()}] - ${error.defaultMessage} ");
 								}
-								return;
+								throw new ShipmentException("Failed to receive shipment while saving inventory item ",
+									shipment: shipmentInstance)
 							}
 						}
 						
@@ -569,22 +576,23 @@ class ShipmentService {
 					else { 
 						// did not save successfully, display errors message
 						//flash.message = "Transaction has errors"
-						throw new RuntimeException("Failed to receive shipment due to error while saving transaction")
+						throw new TransactionException("Failed to receive shipment due to error while saving transaction", 
+							transaction: creditTransaction)
 					}
 				}
 			}
 			else {
 				log.error (shipmentInstance.receipt.errors)
 				// TODO: make this a better error message
-				throw new RuntimeException("Failed to receive shipment due to error while saving receipt")
+				throw new ReceiptException(message: "Failed to receive shipment due to error while saving receipt", 
+					receipt: shipmentInstance.receipt)
 			}
-		} catch (Exception e) {
+		//} catch (Exception e) {
 			// rollback all updates and throw an exception
-			log.error("Caught exception ", e);
-			//throw new RuntimeException(e);
-			throw new RuntimeException("Failed to receive shipment due to unknown error", e);
+		//	log.error("Caught exception ", e);
+		//	throw new RuntimeException("Failed to receive shipment due to unknown error", e);
 			//shipmentInstance.errors.reject("shipmentInstance.invalid", e.message);  // this didn't seem to be working properly
-		}
+		//}
 	}
 		
 	public Receipt createReceipt(Shipment shipmentInstance, Date dateDelivered) { 

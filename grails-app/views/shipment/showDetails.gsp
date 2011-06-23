@@ -101,7 +101,7 @@
 														code="shipment.weight.label" default="Total weight" /></label>
 												</td>
 												<td valign="top" class="value">
-													${shipmentInstance?.totalWeightInPounds() } lbs
+													${shipmentInstance?.totalWeightInPounds() ? shipmentInstance?.totalWeightInPounds() : 0.00 } lbs
 												
 												</td>												
 											</tr>
