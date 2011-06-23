@@ -13,7 +13,8 @@ class DashboardController {
     def index = {
 		if (!session.warehouse) {			
 			redirect(action: "chooseWarehouse")			
-		}		
+		}
+		
 		Location location = Location.get(session?.warehouse?.id);
 		def recentOutgoingShipments = shipmentService.getRecentOutgoingShipments(location?.id)
 		def recentIncomingShipments = shipmentService.getRecentIncomingShipments(location?.id)

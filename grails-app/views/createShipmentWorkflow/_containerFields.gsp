@@ -16,10 +16,22 @@
 	</td>
 </tr>
 
+
 <tr class="prop">
 	<td valign="top" class="name"><label>Weight</label></td>                            
 	<td valign="top" class="value">
 		<g:textField id="weight" name="weight" size="15" value="${container ? container?.weight : box?.weight}"/>&nbsp;
 		<g:select name="weightUnits" from="${org.pih.warehouse.core.Constants.WEIGHT_UNITS}" value="${container ? container?.weightUnits : box?.weightUnits}" />	
+	</td>
+</tr>
+
+
+<tr class="prop">
+	<td valign="top" class="name"><label>Recipient</label></td>                            
+	<td valign="top" class="value">
+		<g:autoSuggest id="recipient" name="recipient" jsonUrl="/warehouse/json/findPersonByName" 
+			width="180" size="30"
+			valueId="${container?.recipient?.id}" 
+			valueName="${container?.recipient?.name}"/>	
 	</td>
 </tr>

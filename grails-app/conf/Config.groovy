@@ -1,3 +1,6 @@
+import org.apache.log4j.Level
+import org.apache.log4j.net.SMTPAppender
+
 // Locations to search for config files that get merged into the main config
 // config files can either be Java properties files or ConfigSlurper scripts
 grails.config.locations = [ 
@@ -19,18 +22,9 @@ grails {
 		 * ${user.home}/warehouse-config.properties file 
 		 */
 		enabled = true			
-		from = "info@localhost"
+		from = "info@openboxes.com"
 		host = "localhost"
 		port = "25"
-		//from = "justin.miranda@gmail.com"
-		//host = "smtp.gmail.com"
-		//port = 465
-		//username = "justin.miranda@gmail.com"
-		//password = "test"
-		//props = ["mail.smtp.auth":"true",
-		//  "mail.smtp.socketFactory.port":"465",
-		//  "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
-		//  "mail.smtp.socketFactory.fallback":"false"]
 	}
 }
 
@@ -71,6 +65,14 @@ grails.logging.jul.usebridge = true
 grails.spring.bean.packages = []
 grails.validateable.packages = ['org.pih.warehouse.inventory', 'org.pih.warehouse.order']
 
+/* Mail properties */
+mail.error.server = 'localhost'
+mail.error.port = 25
+mail.error.from = 'error@openboxes.com'
+mail.error.to = 'jmiranda@pih.org'
+mail.error.subject = '[Application Error]'
+mail.error.debug = false
+
 // set per-environment serverURL stem for creating absolute links
 environments {
 	development {
@@ -102,21 +104,29 @@ environments {
  }*/
 
 log4j = {
+	
+	System.setProperty 'mail.smtp.port', mail.error.port.toString()
+	System.setProperty 'mail.smtp.starttls.enable', mail.error.starttls.toString()
+	
 	// Example of changing the log pattern for the default console    
 	appenders {
 		//console name:'stdout', layout:pattern(conversionPattern: '%p - %C{1}.%M(%L) |%d{ISO8601}| %m%n')		
 		console name:'stdout', layout:pattern(conversionPattern: '%p %d{ISO8601} %c{4} %m%n')		
+		
+		appender new SMTPAppender(
+			name: 'smtp', 
+			to: mail.error.to, 
+			from: mail.error.from,
+			subject: mail.error.subject, 
+			threshold: Level.ERROR,
+			SMTPHost: mail.error.server, 
+			SMTPUsername: mail.error.username,
+			SMTPDebug: mail.error.debug.toString(), 
+			SMTPPassword: mail.error.password,
+			layout: pattern(conversionPattern:
+			   '%d{[ dd.MM.yyyy HH:mm:ss.SSS]} [%t] %n%-5p %n%c %n%C %n %x %n %m%n'))
 	}
-	
-	//error	'org.codehaus.groovy.grails.web.servlet',  //  controllers
-	//		'org.codehaus.groovy.grails.web.pages', //  GSP
-	//		'org.codehaus.groovy.grails.web.sitemesh', //  layouts
-	//		'org.codehaus.groovy.grails."web.mapping.filter', // URL mapping
-	//		'org.codehaus.groovy.grails."web.mapping', // URL mapping
-	//		'org.codehaus.groovy.grails.commons', // core / classloading
-	//		'org.codehaus.groovy.grails.plugins', // plugins
-	//		'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
-	//		'org.springframework'
+			
 	error 'org.codehaus.groovy.grails.web.pages',			// GSP
 		'org.hibernate.engine.StatefulPersistenceContext.ProxyWarnLog'
 	
@@ -149,7 +159,11 @@ log4j = {
 		'org.apache.http.headers',
 		'org.apache.http.wire'
 	
-	
+	root {
+		error 'stdout', 'smtp'
+		additivity = true
+	 }
+			
 }
 
 // Added by the JQuery Validation plugin:

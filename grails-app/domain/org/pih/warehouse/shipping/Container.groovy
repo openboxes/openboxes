@@ -99,7 +99,7 @@ class Container implements Comparable, java.io.Serializable {
 			length: this.length,
 			volumeUnits: this.volumeUnits,
 			weight: this.weight,
-			weightUnits: this.weight,
+			weightUnits: this.weightUnits,
 			containerType: this.containerType,
 			containerStatus: this.containerStatus
 		)
@@ -136,15 +136,36 @@ class Container implements Comparable, java.io.Serializable {
 	/**
 	 * Adds a new item to the container
 	 */
-	ShipmentItem addNewItem () {
-		
-		def item = new ShipmentItem(
-			container: this, 
-			shipment: this.shipment
-		)
-		
+	ShipmentItem addNewItem () {		
+		def item = new ShipmentItem(container: this, recipient: this.recipient, shipment: this.shipment)
 		this.shipment.addToShipmentItems(item)
-		
 		return item
 	}
+	
+	Float totalWeightInKilograms() {
+		log.info("Container " + this.name + " weighs " + weight + " " + weightUnits)
+		if (weight) { 
+			return ("kg".equals(weightUnits)) ? weight : weight * Constants.KILOGRAMS_PER_POUND;
+		}
+		else if (containers) { 
+			return containers.collect { it.totalWeightInKilograms() }.sum()
+		}
+		else { 
+			return 0.0
+		}
+	}
+
+	Float totalWeightInPounds() { 
+		if (weight) {
+			return ("lbs".equals(weightUnits)) ? weight : weight * Constants.POUNDS_PER_KILOGRAM;
+		}
+		else if (containers) {
+			return containers.collect { it.totalWeightInPounds() }.sum()
+		}
+		else {
+			log.info ("Set total weight = 0.0")
+			return 0.0
+		}
+	}	
+		
 }

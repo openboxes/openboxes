@@ -9,6 +9,8 @@
 	<content tag="pageTitle">Show Shipment</content>
 	<style>
 		th { width: 200px; } 
+		
+		.newContainer { border-top: 1px solid lightgrey }
 	</style>
 </head>
 
@@ -53,34 +55,55 @@
 												</td>
 											</tr>
 											<tr style="height: 30px;">
-												<td valign="top"><label><g:message
-													code="shipment.origin.label" default="Departing" /></label>
+												<td valign="top">
+													<g:if test="${new Date().after(shipmentInstance?.expectedShippingDate) }">												
+														<label><g:message code="shipment.departed.label" default="Departed" /></label>
+													</g:if>
+													<g:else>
+														<label><g:message code="shipment.departing.label" default="Departing" /></label>
+													</g:else>
 												</td>
 												<td valign="top" >
-													<span>
+													<div>
 														${fieldValue(bean: shipmentInstance, field: "origin.name")}									
-													</span>
-													<span class="fade">
+													</div>
+													<div class="fade">
 														<g:if test="${shipmentInstance.expectedShippingDate && !shipmentInstance.hasShipped()}">
-															on <format:date obj="${shipmentInstance?.expectedShippingDate}"/>
+															<format:date obj="${shipmentInstance?.expectedShippingDate}"/>
 														</g:if>
-													</span>											
+													</div>											
 												</td>
 											</tr>
 											<tr style="height: 30px;">
 												<td valign="top">
-													<label><g:message code="shipment.destination.label" default="Arriving" /></label>
+													<g:if test="${new Date().after(shipmentInstance?.expectedDeliveryDate) }">
+														<label><g:message code="shipment.arrived.label" default="Arrived" /></label>
+													</g:if>
+													<g:else>
+														<label><g:message code="shipment.arriving.label" default="Arriving" /></label>
+													</g:else>
 												</td>
-												<td >
-													<span>
+												<td>
+													<div>
 														${fieldValue(bean: shipmentInstance, field: "destination.name")}
-													</span>											
-													<span class="fade">
+													</div>											
+													<div class="fade">
 														<g:if test="${shipmentInstance.expectedDeliveryDate && !shipmentInstance.wasReceived()}">
-															on <format:date obj="${shipmentInstance?.expectedDeliveryDate}"/>
+															<format:date obj="${shipmentInstance?.expectedDeliveryDate}"/>
 														</g:if>
-													</span>											
+													</div>											
 												</td>
+											</tr>
+											<tr>
+												
+												<td valign="top"><label>
+													<g:message
+														code="shipment.weight.label" default="Total weight" /></label>
+												</td>
+												<td valign="top" class="value">
+													${shipmentInstance?.totalWeightInPounds() } lbs
+												
+												</td>												
 											</tr>
 										</tbody>
 									</table>
@@ -112,8 +135,7 @@
 									</table>
 								</td>
 							</tr>	
-										
-										
+							
 							<g:if test="${!shipmentWorkflow?.isExcluded('totalValue')||!shipmentWorkflow?.isExcluded('statedValue')}">
 								<tr class="prop">
 									<td valign="top" class="name">
@@ -215,7 +237,7 @@
 							</g:if>
 											
 	
-							<g:if test="${!shipmentWorkflow?.isExcluded('additionalInformation')}">
+							<g:if test="${!shipmentWorkflow?.isExcluded('additionalInformation') && shipmentInstance?.additionalInformation}">
 								<tr class="prop">
 									<td valign="top" class="name">
 										<img src="${createLinkTo(dir:'images/icons/silk',file:'comment.png')}" alt="comments" style="vertical-align: middle"/>
@@ -248,15 +270,14 @@
 									</td>
 								</tr>
 							</g:if>
-							
-							<tr class="prop">
-								<td class="name">
-									<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="document" style="vertical-align: middle"/>
-									<label>Documents</label>
-								</td>
-								<td class="value" colspan="3">										
-									<div>
-										<g:if test="${shipmentInstance.documents}">
+							<g:if test="${shipmentInstance.documents}">
+								<tr class="prop">
+									<td class="name">
+										<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="document" style="vertical-align: middle"/>
+										<label>Documents</label>
+									</td>
+									<td class="value" colspan="3">										
+										<div>
 											<table>
 												<tbody>
 													<tr>
@@ -316,20 +337,18 @@
 													</g:each>	
 												</tbody>
 											</table>
-										</g:if>												
-										
-									</div>
-									
-								</td>					
-							</tr>
-							<tr class="prop">
-								<td class="name">
-									<img src="${createLinkTo(dir:'images/icons/silk',file:'note.png')}" alt="note" style="vertical-align: middle"/>
-									<label>Notes</label>
-								</td>
-								<td class="value" colspan="3">
-									<div>
-										<g:if test="${shipmentInstance.comments}">
+										</div>
+									</td>					
+								</tr>
+							</g:if>
+							<g:if test="${shipmentInstance.comments}">
+								<tr class="prop">
+									<td class="name">
+										<img src="${createLinkTo(dir:'images/icons/silk',file:'note.png')}" alt="note" style="vertical-align: middle"/>
+										<label>Notes</label>
+									</td>
+									<td class="value" colspan="3">
+										<div>
 											<table>
 												<tbody>
 													<tr>
@@ -352,20 +371,19 @@
 													</g:each>	
 												</tbody>
 											</table>												
-										</g:if> 
-																							
-									</div>
-								</td>
-							</tr>		
+										</div>
+									</td>
+								</tr>		
+							</g:if> 
 								
-							<tr class="prop">
-								<td class="name">
-									<img src="${createLinkTo(dir:'images/icons/silk',file:'calendar.png')}" alt="events" style="vertical-align: middle"/>
-									<label>Events</label>
-								</td>
-								<td class="value" colspan="3">
-									<div>
-										<g:if test="${shipmentInstance.events}">
+							<g:if test="${shipmentInstance.events}">
+								<tr class="prop">
+									<td class="name">
+										<img src="${createLinkTo(dir:'images/icons/silk',file:'calendar.png')}" alt="events" style="vertical-align: middle"/>
+										<label>Events</label>
+									</td>
+									<td class="value" colspan="3">
+										<div>
 											<table>	
 												<tbody>
 													<tr>
@@ -394,99 +412,96 @@
 													</g:each>
 												</tbody>								
 											</table>
-										</g:if>
-									</div>
-								</td>
-							</tr>				
+										</div>
+									</td>
+								</tr>				
+							</g:if>
 							
-							<tr class="prop">																									
-								<td class="name">
-									<img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" alt="package" style="vertical-align: middle"/>
-									<label>Contents</label>
-								</td>										
-								<td class="value" colspan="3">
-									<div>
-										<g:if test="${!shipmentInstance.shipmentItems}">
-											<div class="fade">empty</div>											
-										</g:if> 
-										<g:else>
-											<div id="items" class="section">											
-												<table>		
-													<tr>
-														<th style="white-space:nowrap;">&nbsp;</th>
-														<th style="white-space:nowrap;">Lot/Serial No</th>
-														<th style="white-space:nowrap;">Expires</th>
-														<th style="white-space:nowrap;">Qty</th>
+							<g:if test="${shipmentInstance.shipmentItems}">
+								<tr class="prop">																									
+									<td class="name">
+										<img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" alt="package" style="vertical-align: middle"/>
+										<label>Contents</label>
+									</td>										
+									<td class="value" colspan="3">
+										
+										<div id="items" class="section">											
+											<table border="0">		
+												<tr>
+													<th style="white-space:nowrap;">Package</th>
+													<th style="white-space:nowrap;">Product</th>
+													<th style="white-space:nowrap;">Lot/Serial No</th>
+													<th style="white-space:nowrap;">Expires</th>
+													<th style="white-space:nowrap;">Qty</th>
+													<g:if test="${shipmentInstance?.wasReceived()}">
+														<th style="white-space:nowrap;">Received</th>
+													</g:if>
+													<th style="white-space:nowrap;">Recipient</th>
+												</tr>
+												<g:set var="count" value="${0 }"/>
+												<g:set var="previousContainer"/>
+												
+												<g:set var="shipmentItems" value="${shipmentInstance.shipmentItems.sort{(it?.container?.parentContainer) ? it?.container?.parentContainer?.sortOrder : it?.container?.sortOrder} }"/>
+												<g:each in="${shipmentItems}" var="item" status="i">
+													<g:set var="newContainer" value="${previousContainer != item?.container }"/>
+													<tr class="${(count++ % 2 == 0)?'odd':'even'}" >
+														<g:if test="${newContainer}">
+															<th nowrap class="newContainer">
+																<%-- <img src="${createLinkTo(dir: 'images/icons/silk', file: 'package.png')}" style="vertical-align: middle"/>&nbsp;--%>
+																<g:if test="${item?.container?.parentContainer}">${item?.container?.parentContainer?.name } &rsaquo;</g:if>
+																<g:if test="${item?.container?.name }">${item?.container?.name }</g:if>
+																<g:else>Unpacked</g:else>
+																<span class="fade">
+													 				<g:if test="${item?.container?.weight || item?.container?.width || item?.container?.length || item?.container?.height}">
+														 				( 
+														 				<g:if test="${item?.container?.weight}">
+														 					${item?.container?.weight} ${item?.container?.weightUnits}, 
+														 				</g:if>
+																		${item?.container.height ?: '?'} ${item?.container?.volumeUnits}
+																		x
+																		${item?.container.width ?: '?'} ${item?.container?.volumeUnits}
+																		x
+																		${item?.container.length ?: '?'} ${item?.container?.volumeUnits}
+																		)
+																	</g:if>
+																</span>	
+															</th>
+													</g:if>												
+													<g:else>
+														<th></th>
+													</g:else>														
+														<td class="${newContainer?'newContainer':''}" width="100%">
+															<g:link controller="inventoryItem" action="showStockCard" id="${item?.product?.id}">
+																${item?.product?.name}
+															</g:link>
+														</td>
+														<td class="${newContainer?'newContainer':''}" style="white-space:nowrap;">
+															${item?.lotNumber}
+														</td>
+														<td class="${newContainer?'newContainer':''}" style="white-space:nowrap;">
+															<g:formatDate date="${item?.expirationDate}" format="MMM yyyy"/>
+														</td>
+														<td class="${newContainer?'newContainer':''}" style="white-space:nowrap;">
+															${item?.quantity}
+														</td>
 														<g:if test="${shipmentInstance?.wasReceived()}">
-															<th style="white-space:nowrap;">Received</th>
-														</g:if>
-														<th style="white-space:nowrap;">Recipient</th>
+															<g:set var="qtyReceived" value="${item?.quantityReceived()}"/>
+															<td class="${newContainer?'newContainer':''}" style="white-space:nowrap;${qtyReceived != item?.quantity ? ' color:red;' : ''}">
+																${qtyReceived}
+															</td>
+														</g:if>														
+														<td class="${newContainer?'newContainer':''}" style="white-space:nowrap;">
+															${item?.recipient?.name}
+														</td>
 													</tr>
-													<g:set var="count" value="${0 }"/>
-													<g:set var="previousContainer"/>
+													<g:set var="previousContainer" value="${item.container }"/>
 													
-													<g:set var="shipmentItems" value="${shipmentInstance.shipmentItems.sort{(it?.container?.parentContainer) ? it?.container?.parentContainer?.sortOrder : it?.container?.sortOrder} }"/>
-													<g:each in="${shipmentItems}" var="item" status="i">
-														<g:if test="${previousContainer != item?.container}">
-															<tr class="${(count++ % 2 == 0)?'odd':'even'}">
-																<th nowrap colspan="${shipmentInstance?.wasReceived() ? 5 : 4}">
-																	<%-- <img src="${createLinkTo(dir: 'images/icons/silk', file: 'package.png')}" style="vertical-align: middle"/>&nbsp;--%>
-																	<g:if test="${item?.container?.parentContainer}">${item?.container?.parentContainer?.name } &rsaquo;</g:if>
-																	<g:if test="${item?.container?.name }">${item?.container?.name }</g:if>
-																	<g:else>Unpacked</g:else>
-																	<span class="fade">
-														 				<g:if test="${item?.container?.weight || item?.container?.width || item?.container?.length || item?.container?.height}">
-															 				( 
-															 				<g:if test="${item?.container?.weight}">
-															 					${item?.container?.weight} ${item?.container?.weightUnits}, 
-															 				</g:if>
-																			${item?.container.height ?: '?'} ${item?.container?.volumeUnits}
-																			x
-																			${item?.container.width ?: '?'} ${item?.container?.volumeUnits}
-																			x
-																			${item?.container.length ?: '?'} ${item?.container?.volumeUnits}
-																			)
-																		</g:if>
-																	</span>	
-																</th>
-																<th></th>
-															</tr>													
-														</g:if>												
-														<tr class="${(count++ % 2 == 0)?'odd':'even'}">
-															<td width="100%">
-																<g:link controller="inventoryItem" action="showStockCard" id="${item?.product?.id}">
-																	${item?.product?.name}
-																</g:link>
-															</td>
-															<td style="white-space:nowrap;">
-																${item?.lotNumber}
-															</td>
-															<td style="white-space:nowrap;">
-																<g:formatDate date="${item?.expirationDate}" format="MMM yyyy"/>
-															</td>
-															<td style="white-space:nowrap;">
-																${item?.quantity}
-															</td>
-															<g:if test="${shipmentInstance?.wasReceived()}">
-																<g:set var="qtyReceived" value="${item?.quantityReceived()}"/>
-																<td style="white-space:nowrap;${qtyReceived != item?.quantity ? ' color:red;' : ''}">
-																	${qtyReceived}
-																</td>
-															</g:if>														
-															<td style="white-space:nowrap;">
-																${item?.recipient?.name}
-															</td>
-														</tr>
-														<g:set var="previousContainer" value="${item.container }"/>
-														
-													</g:each>
-												</table>							
-											</div>
-										</g:else>
-									</div>
-								</td>
-							</tr>					
-	
+												</g:each>
+											</table>							
+										</div>
+									</td>
+								</tr>					
+							</g:if>	
 						</tbody>
 					</table>
 				</div>

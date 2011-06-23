@@ -58,6 +58,18 @@ class Order implements Serializable {
 		return "Pending"
 	}
 	
+	Boolean isPending() { 
+		return (status == null || status == OrderStatus.PENDING )
+	}
+	
+	Boolean isPlaced() { 
+		return (status == OrderStatus.PLACED)
+	}
+	
+	Boolean isReceived() { 
+		return (status == OrderStatus.RECEIVED)
+	}
+	
 	Boolean isComplete() {
 		if (!orderItems) {
 			return false;
@@ -72,8 +84,7 @@ class Order implements Serializable {
 	}
 	
 	def shipments() { 
-		def shipments = orderItems.collect { it.shipments() } 
-		return shipments.flatten().unique() { it.id } 
+		return orderItems.collect { it.shipments() }.flatten().unique() { it.id }
 	}
 	
 }

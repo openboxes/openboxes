@@ -35,7 +35,7 @@ class OrderItem implements Serializable {
 		product(nullable:true)
 		inventoryItem(nullable:true)
 		requestedBy(nullable:true)
-		quantity(nullable:false)
+		quantity(nullable:false, min:1)
 	}
 
 	
