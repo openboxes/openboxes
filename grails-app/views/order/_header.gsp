@@ -1,5 +1,8 @@
 <div style="padding: 10px; border-bottom: 1px solid lightgrey;">
 	<g:if test="${orderInstance?.id}">
+	
+		<g:set var="isAddingComment" value="${request.request.requestURL.toString().contains('addComment')}"/>
+		<g:set var="isAddingDocument" value="${request.request.requestURL.toString().contains('addDocument')}"/>
 		<table border="0">
 			<tbody>			
 				<tr>
@@ -9,7 +12,7 @@
 						</div> 
 						<div class="fade" style="font-size: 0.9em; line-height: 20px;">
 							<!-- Hide action menu menu if the user is in the shipment workflow -->						
-							<g:if test="${!params.execution }">
+							<g:if test="${!params.execution  && !isAddingComment && !isAddingDocument }">
 								<g:render template="/order/actions" model="[orderInstance:orderInstance]"/> &nbsp;|&nbsp;
 							</g:if>
 							<span class="order-number">
@@ -32,7 +35,7 @@
 							${orderInstance?.status() }
 						</div>
 						<br/>
-						<g:if test="${!params.execution}">						
+						<g:if test="${!params.execution && !isAddingComment && !isAddingDocument}">						
 							<g:if test="${!orderInstance?.isComplete() && orderInstance?.status != org.pih.warehouse.order.OrderStatus.PLACED }">
 								<g:form action="placeOrder">
 									<g:hiddenField name="id" value="${orderInstance?.id }"/>
