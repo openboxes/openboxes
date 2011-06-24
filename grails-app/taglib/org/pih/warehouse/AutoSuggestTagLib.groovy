@@ -23,46 +23,20 @@ class AutoSuggestTagLib {
 		
 		def html = """
 			<div>
-				<style>
-					#${id}-suggest {
-						background-image: url('/warehouse/images/icons/silk/magnifier.png');
-						background-repeat: no-repeat;
-						background-position: center left;
-						padding-left: 20px;
-					}
-				</style>
+				<span id="${id}-span" class="span" style="text-align: left; display: ${spanDisplay};">${valueName}</span>
+				<input id="${id}-value" class="value" type="hidden" name="${name}.id" value="${valueId}"/>
+				<input id="${id}-suggest" class="autocomplete" type="text" name="${name}.name" value="${valueName}" style="width: ${width}px; display: ${suggestDisplay};">
 				
-				<input id="${id}-id" type="hidden" name="${name}.id" value="${valueId}"/>
-				<span id="${id}-span" style="text-align: left; display: ${spanDisplay};">${valueName}</span>
-				<input id="${id}-suggest" type="text" name="${name}.name" value="${valueName}" style="width: ${width}px; display: ${suggestDisplay};">
-				
-				
-				<script>
+				<script language="javascript">
 					\$(document).ready(function() {
-						// Captures 'Enter' key presses
-						//\$(window).keydown(function(event){
-						//	if(event.keyCode == 13) {
-						//		event.preventDefault();
-						//		return false;
-						//	}
-						//});
-						
 						\$("#${id}-suggest").click(function() {
-							\$("#${id}-suggest").trigger("focus");
+							\$(this).trigger("focus");
 						});
-						
 						\$("#${id}-suggest").blur(function() {
-							var text = \$('#${id}-suggest').val();
-							//\$('#${id}-suggest').hide();
-							//\$('#${id}-span').html(text?text:'<b>empty</b> &nbsp; click to change');
-							//\$('#${id}-span').show();
+							return false;
 						});
 						\$("#${id}-span").click(function() {
-							//\$('#${id}-span').hide();
-							//\$('#${id}-suggest').show();
-							//\$('#${id}-suggest').val('');
-							//\$('#${id}-span').html('');
-							//\$('#${id}-id').val('');
+							return false;
 						});
 						  \$("#${id}-suggest").autocomplete({
 							width: ${width},
@@ -82,28 +56,27 @@ class AutoSuggestTagLib {
 									});
 									add(items);
 								});
-							  },
+							},
 							focus: function(event, ui) {
-								  //\$('#${id}-suggest').val(ui.item.valueText);
-								  return false;
+								return false;
 							},
 							change: function(event, ui) {
-								//alert("changed " + \$(this).val());
-								//\$('#${id}-id').val('');
-								//\$('#${id}-suggest').val('');
+								// If the user does not select a value, we remove the value
+								if (!ui.item) { 
+									\$(this).prev().val("");
+									\$(this).val("");
+								}
 								return false;
 							},
 							select: function(event, ui) {
-								\$('#${id}-id').val(ui.item.value);
-								\$('#${id}-suggest').val(ui.item.valueText);
-								\$('#${id}-span').html(ui.item.valueText);
-								//\$('#${id}-suggest').hide();
-								//\$('#${id}-span').show();
+								if (ui.item) { 
+									\$(this).prev().val(ui.item.value);
+									\$(this).val(ui.item.valueText);
+								}
 								return false;
 							}
 						});
 					});
-					
 				</script>
 			</div>
 		""";

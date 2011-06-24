@@ -46,7 +46,7 @@ class OrderItem implements Serializable {
 	Integer quantityFulfilled() { 
 		try { 
 			def shipmentItems = shipmentItems()
-			return shipmentItems ? shipmentItems.sum { it.quantity } : 0 
+			return shipmentItems ? shipmentItems.sum { it?.quantity } : 0 
 			//return orderShipments ? orderShipments.sum { it?.shipmentItem?.quantity } : 0
 		} catch (Exception e) { log.error "Error calculating quantity fulfilled", e }
 		return 0;

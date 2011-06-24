@@ -65,7 +65,7 @@
 													<td style="border-left: 1px solid lightgrey;">Received</td>										
 													<td width="250px">Product</td>										
 													<td width="100px">Lot Number</td>		
-													
+													<td>Expires</td>
 												</tr>
 											</thead>									
 											<tbody>
@@ -76,7 +76,7 @@
 												
 														<tr class="${(orderItem?.primary)?"black-top":""} orderItem">
 															<td>
-																<g:hiddenField class="orderItemId" name="orderItems[${i }].orderItem.id" value="${orderItem?.orderItem?.id }"/>
+																<g:hiddenField name="orderItems[${i }].orderItem.id" class="orderItemId" value="${orderItem?.orderItem?.id }"/>
 																<g:hiddenField name="orderItems[${i }].primary" value="${orderItem?.primary }"/>
 																<g:hiddenField name="orderItems[${i }].type" value="${orderItem?.type }"/>
 																<g:hiddenField name="orderItems[${i }].description" value="${orderItem?.description }"/>
@@ -100,10 +100,7 @@
 															</td>
 															<td>
 																<g:if test="${!orderItem?.orderItem?.isComplete() }">
-																	<div class="ui-widget">
-																		<g:select class="combobox updateable productId" name="orderItems[${i }].productReceived.id" from="${org.pih.warehouse.product.Product.list().sort{it.name}}" 
-																			optionKey="id" value="${orderItem?.productReceived?.id }" noSelection="['':'']"/>
-																	</div>	
+																	<g:autoSuggest id="productReceived-${i }" name="orderItems[${i }].productReceived" jsonUrl="/warehouse/json/findProductByName" width="200" valueId="${orderItem?.productReceived?.id }" valueName="${orderItem?.productReceived?.name }"/>	
 																</g:if>
 															</td>
 															<td>
@@ -186,8 +183,7 @@
 		</div>
 
 	</div>
-	<g:comboBox />
-<script>
+	<script>
 	var changed = false;
 	var currentIndex = $("#orderItemsTable tbody tr.orderItem").length;
 
@@ -219,9 +215,10 @@
 		//console.log($(this));
 		var index = currentIndex++;
 		var currentRow = $(this).parent().parent().parent();
-		var productId = currentRow.find(".productId");
+		var value = currentRow.find(".value");
+		var valueText = currentRow.find(".autocomplete");
 		var orderItemId = currentRow.find(".orderItemId");
- 		var item = { Id: '0', Index: index, ProductId: productId.val(), LotNumber: "", ExpirationDate: "", 
+ 		var item = { Id: '0', Index: index, ProductId: value.val(), ProductName: valueText.val(), LotNumber: "", ExpirationDate: "", 
  		  				OrderItemId: orderItemId.val(), Template: '#new-item-template' };
 		currentRow.after($(item.Template).tmpl(item));	
 		$("#orderItemsTable").alternateRowColors();
@@ -251,12 +248,11 @@
 			}
 		});
    	});
-   </script>
-	<script id="new-item-template" type="x-jquery-tmpl">						
+	</script>
+	<script id="new-item-template" type="text/x-jquery-tmpl">						
 			<tr class="orderItem">
 				<td>
 					<a name="orderItems{{= Index }}"></a>
-					
 					<g:hiddenField name="orderItems[{{= Index }}].orderItem.id" value="{{= OrderItemId }}"/>
 					<g:hiddenField name="orderItems[{{= Index }}].primary" value=""/>
 					<g:hiddenField name="orderItems[{{= Index }}].type" value=""/>
@@ -273,10 +269,8 @@
 					<input type="text" name='orderItems[{{= Index }}].quantityReceived' value="" size="5" class="center updateable" />
 				</td>
 				<td>
-					<div class="ui-widget">
-						<g:select class="combobox updateable" id="productReceived-{{= Index}}" name="orderItems[{{= Index }}].productReceived.id" value="{{= ProductId }}" from="${org.pih.warehouse.product.Product.list().sort{it.name}}" 
-							optionKey="id" noSelection="['':'']"/>
-					</div>	
+					<input id="productReceived{{= Index}}.id" class="value" type="hidden" name="orderItems[{{= Index }}].productReceived.id" value="{{= ProductId}}"/>
+					<input id="productReceived{{= Index}}.text" class="autocomplete" type="text" name="productReceived{{= Index}}.text" value="{{= ProductName}}" style="width: 200px;">
 				</td>
 				<td>
 					<g:textField name="orderItems[{{= Index }}].lotNumber" value="{{= LotNumber}}" size="10" class="updateable"/>
@@ -291,7 +285,62 @@
 					</span>
 				</td>
 			</tr>
-		</script>    	    
+			
+	</script>    	  
+	<script language="javascript">
+		$(document).ready(function() {
+			/*
+			$(".autocomplete").live({
+				click: function() {
+					$(this).trigger("focus");
+				},
+				blur: function() {
+					var text = $(this).val();
+				}				
+			});
+			*/
+
+			$(".autocomplete").livequery(function() {
+				$(this).autocomplete({
+					width: '200px',
+					minLength: 1,
+					dataType: 'json',
+					highlight: true,
+					scroll: true,
+					autoFill: true,
+					autoFocus: true,
+					//define callback to format results
+					source: function(req, add){
+						$.getJSON('/warehouse/json/findProductByName', req, function(data) {
+							var items = [];
+							$.each(data, function(i, item) {
+								items.push(item);
+							});
+							add(items);
+						});
+					  },
+					focus: function(event, ui) {
+						return false;
+					},
+					change: function(event, ui) {
+						if (!ui.item) { 
+							$(this).prev().val("");
+							$(this).val("");
+						}						
+						return false;
+					},
+					select: function(event, ui) {						
+						if (ui.item) { 
+							$(this).val(ui.item.valueText);
+							$(this).prev().val(ui.item.value);
+						}
+						return false;
+					}
+				});
+			});
+		});
+	</script>	
+	  
 	
 </body>
 </html>

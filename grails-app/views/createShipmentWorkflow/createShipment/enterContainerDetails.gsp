@@ -16,7 +16,6 @@
 				</div>				
 			</g:hasErrors>          
 			<fieldset>
-
 				<g:render template="../shipment/summary" />	
 				<g:render template="flowHeader" model="['currentState':'Pack']"/>		
 		 		
@@ -48,14 +47,14 @@
 			 			display:inline-block;
 						padding-left:20px;
 						line-height:18px;
-				 		background:transparent url('${resource(dir: 'images/icons/silk', file: 'bullet_star.png')}') center left no-repeat;
+				 		background:transparent url('${resource(dir: 'images/icons/silk', file: 'bullet_yellow.png')}') center left no-repeat;
 			 		}
 			 		.not-selected { 
 			 			border-right: 0px; 
 			 			display:inline-block;
 						padding-left:20px;
 						line-height:18px;
-				 		background:transparent url('${resource(dir: 'images/icons/silk', file: 'bullet_yellow.png')}') center left no-repeat;
+				 		background:transparent url('${resource(dir: 'images/icons/silk', file: 'bullet_white.png')}') center left no-repeat;
 			 		}
 			 	</style>
 				
@@ -63,20 +62,17 @@
 				<%-- Main content section --%>
 			 	<table style="border-bottom: 1px solid lightgrey;" border="0" >
 			 		<tr>
-			 		
 				 		<%-- Display the pallets & boxes in this shipment --%> 
 			 			<td valign="top" style="padding: 0px; margin: 0px; border-right: 1px solid lightgrey;" >
 							<div class="list" style="text-align: left; border: 0px solid lightgrey;">
 								<g:set var="count" value="${0 }"/>	
 															
 								<table style="border: 0px" border="0">	
-									<tbody>
-										<tr><%--class="${count++%2==0?'even':'odd' }" --%>
-											<th>
-												<div style="padding: 5px">
-													<h3>All shipment containers</h3>
-												</div>
-											</th>
+									<thead>
+										<tr class="odd"><%-- --%>
+											<td>
+												<h3>All shipment containers</h3>
+											</td>
 										</tr>
 										<tr>
 											<td>
@@ -99,14 +95,19 @@
 															--%>
 														</div>
 													</span>				
-													<span class="fade">
-										 				&nbsp;|&nbsp; Weight: 
-										 			</span>										
+									 				<g:if test="${shipmentInstance?.totalWeightInPounds() }">
+									 					<span class="fade">&nbsp;|&nbsp; Total weight:</span> ${shipmentInstance?.totalWeightInPounds() } lbs
+									 				</g:if>
 										 		</div>
 										 	</td>
 										</tr>
+										<tr class="${count++%2==0?'odd':'even' }">
+											<th>Container</th>
+										</tr>
+									</thead>
+									<tbody>
 										
-										<tr > <%--class="${count++%2==0?'even':'odd' }" --%>
+										<tr class="${count++%2==0?'odd':'even' }">
 											<g:set var="styleClass" value="${selectedContainer == null ? 'selected' : 'not-selected' }"/>
 											<td class="droppable">
 												<span class="${styleClass}">
@@ -117,7 +118,7 @@
 										<g:if test="${shipmentInstance?.containers }">
 											<g:each var="containerInstance" in="${shipmentInstance?.containers?.findAll({!it.parentContainer})?.sort()}">
 												<g:set var="styleClass" value="${containerInstance?.id == selectedContainer?.id ? 'selected' : 'not-selected' }"/>
-												<tr style="border: 0px solid lightgrey;" > <%--class="${count++%2==0?'even':'odd' }"  --%>
+												<tr style="border: 0px solid lightgrey;" class="${count++%2==0?'odd':'even' }">
 													<td style="vertical-align: middle;" id="${containerInstance?.id }" class="droppable">													
 														<a name="container-${containerInstance.id }"></a>
 														<div>
@@ -170,22 +171,19 @@
 								<g:set var="count" value="${0 }"/>	
 								<table style="height: 100%">
 									<thead>	
-										<tr>
+										<tr class="odd">
 											<td colspan="5">
-											
-												<div style="padding: 5px">
-													<h3>
-														<g:if test="${selectedContainer}">								
-															<g:if test="${selectedContainer.parentContainer }">
-																${selectedContainer?.parentContainer?.name } &rsaquo;
-															</g:if>						
-										 					${selectedContainer?.name }				 					
-														</g:if>			 			
-														<g:else>
-															<g:message code="shipmentItem.unpackedItems" default="Unpacked Items" />			 						
-														</g:else>
-													</h3>
-												</div>
+												<h3>
+													<g:if test="${selectedContainer}">								
+														<g:if test="${selectedContainer.parentContainer }">
+															${selectedContainer?.parentContainer?.name } &rsaquo;
+														</g:if>						
+									 					${selectedContainer?.name }				 					
+													</g:if>			 			
+													<g:else>
+														<g:message code="shipmentItem.unpackedItems" default="Unpacked Items" />			 						
+													</g:else>
+												</h3>
 											</td>
 										</tr>
 										<tr>
