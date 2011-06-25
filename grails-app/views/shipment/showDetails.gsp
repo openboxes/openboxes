@@ -446,7 +446,7 @@
 													<g:set var="newContainer" value="${previousContainer != item?.container }"/>
 													<tr class="${(count++ % 2 == 0)?'odd':'even'}" >
 														<g:if test="${newContainer}">
-															<th nowrap class="newContainer">
+															<td nowrap class="newContainer">
 																<%-- <img src="${createLinkTo(dir: 'images/icons/silk', file: 'package.png')}" style="vertical-align: middle"/>&nbsp;--%>
 																<g:if test="${item?.container?.parentContainer}">${item?.container?.parentContainer?.name } &rsaquo;</g:if>
 																<g:if test="${item?.container?.name }">${item?.container?.name }</g:if>
@@ -465,11 +465,11 @@
 																		)
 																	</g:if>
 																</span>	
-															</th>
-													</g:if>												
-													<g:else>
-														<th></th>
-													</g:else>														
+															</td>
+														</g:if>												
+														<g:else>
+															<td></td>
+														</g:else>														
 														<td class="${newContainer?'newContainer':''}" width="100%">
 															<g:link controller="inventoryItem" action="showStockCard" id="${item?.product?.id}">
 																${item?.product?.name}

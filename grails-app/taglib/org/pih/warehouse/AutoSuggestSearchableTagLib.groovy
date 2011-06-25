@@ -49,7 +49,6 @@ class AutoSuggestSearchableTagLib {
 				            //scrollHeight: 300,
 							//define callback to format results
 							source: function(request, response){			
-								
 								\$.getJSON('${jsonUrl}', request, function(data) {
 									var suggestions = [];
 									\$.each(data, function(i, item) {

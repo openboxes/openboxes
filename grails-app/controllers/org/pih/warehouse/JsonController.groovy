@@ -26,6 +26,22 @@ class JsonController {
 
 	def inventoryService;
 	
+	def getQuantity = { 
+		log.info params
+		def quantity = 0
+		def warehouse = Warehouse.get(session.warehouse.id);
+		def lotNumber = (params.lotNumber) ? (params.lotNumber) : "";
+		def product = (params.productId) ? Product.get(params.productId) : null;
+		
+		log.info "find by lotnumber '" + lotNumber + "' and product '" + product + "'";
+		def item = InventoryItem.findByLotNumberAndProduct(lotNumber, product)
+		if (item) { 
+			quantity = inventoryService.getQuantityForInventoryItem(item, warehouse?.inventory)
+		}
+		render quantity;
+	}
+	
+	
 	def searchInventoryItems = {
 		log.info params
 		def warehouse = Warehouse.get(session.warehouse.id);
@@ -101,6 +117,7 @@ class JsonController {
 	def findShipmentByName = {
 		log.info "Find shipment by name " + params;
 		def finalItems = []
+		
 		def items = new TreeSet();
 		if (params.term) {
 			items = Shipment.withCriteria {

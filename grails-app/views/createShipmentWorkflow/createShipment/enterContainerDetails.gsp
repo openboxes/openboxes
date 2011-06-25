@@ -270,10 +270,15 @@
 													</td>
 													<td>
 														<div>
+														
+															<g:link controller="inventoryItem" action="showStockCard" params="['product.id':itemInstance?.product?.id]">
+																${itemInstance?.product?.name } 
+															</g:link>
+															<%-- 
 															<span id="${itemInstance?.id }" class="draggable">
 																<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="Item" style="vertical-align: middle"/>
-																${itemInstance?.product?.name } 
 															</span>
+															--%>
 														</div>
 													</td>
 													<td>
