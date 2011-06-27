@@ -53,7 +53,7 @@
 					$(function() {
 						updateQuantityOnHand();
 						$(".refresh").click(function() { 
-							$("#quantity-on-hand").html("");
+							$("#quantity-on-hand").html("refreshing ...");
 							updateQuantityOnHand();
 						});
 					});
@@ -61,7 +61,7 @@
 					function updateQuantityOnHand() { 
 						var productId = $("#product-value").val();
 						var lotNumber = $("#lotNumber-suggest").val();						
-						$("#quantity-on-hand").load("/warehouse/json/getQuantity?productId=" + productId + "&lotNumber=" + lotNumber);
+						$("#quantity-on-hand").load("/warehouse/json/getQuantity?productId=" + productId + "&lotNumber=" + lotNumber).delay(1800);
 					}
 					
 				</script>

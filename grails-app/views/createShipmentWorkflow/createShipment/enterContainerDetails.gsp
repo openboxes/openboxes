@@ -207,33 +207,33 @@
 									 				<g:else>
 									 					None
 									 				</g:else>
-										 				
+									 				
 													<span class="fade">
 										 				&nbsp;|&nbsp; Dimensions:
 										 			</span>
-									 					<g:if test="${selectedContainer?.width ||  selectedContainer?.length || selectedContainer?.height}">
-															
-															${selectedContainer.height == null ? '?' : selectedContainer.height} ${selectedContainer?.volumeUnits}
-															x
-															${selectedContainer.width == null ? '?' : selectedContainer.width} ${selectedContainer?.volumeUnits}
-															x
-															${selectedContainer.length == null ? '?' : selectedContainer.length} ${selectedContainer?.volumeUnits}
-														</g:if>
-														<g:else>
-															None
-														</g:else>
+								 					<g:if test="${selectedContainer?.width ||  selectedContainer?.length || selectedContainer?.height}">
 														
+														${selectedContainer.height == null ? '?' : selectedContainer.height} ${selectedContainer?.volumeUnits}
+														x
+														${selectedContainer.width == null ? '?' : selectedContainer.width} ${selectedContainer?.volumeUnits}
+														x
+														${selectedContainer.length == null ? '?' : selectedContainer.length} ${selectedContainer?.volumeUnits}
+													</g:if>
+													<g:else>
+														None
+													</g:else>
+													
 													<span class="fade">
 														&nbsp;|&nbsp; Recipient:
 													</span>
-									 					<g:if test="${selectedContainer?.recipient }">
-															${selectedContainer?.recipient?.name }	
-														</g:if>
-														<g:else>
-															None
-														</g:else>
+								 					<g:if test="${selectedContainer?.recipient }">
+														${selectedContainer?.recipient?.name }	
+													</g:if>
+													<g:else>
+														None
+													</g:else>
 													
-													</span>		
+													
 													
 																			
 												</div>
@@ -259,7 +259,7 @@
 																	<img src="${createLinkTo(dir:'images/icons/silk',file:'cog.png')}" alt="Actions" style="vertical-align: middle"/>
 																	<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
 																</button>
-																<div class="actions" style="position: absolute; z-index: 1; background-color: #f5f5f5; border: 0px solid lightgrey; padding: 0px; display: none;">
+																<div class="actions" style="position: absolute; z-index: 1; display: none; min-width: 200px">
 																	<g:render template="itemMenuItems" model="[itemInstance:itemInstance]"/>
 																</div>
 															</span>								
@@ -391,11 +391,51 @@
 								
 							}
 						});
-
-
-
+						
+						var firstField = $(".updateQuantity:first");
+						console.log(firstField);
+						firstField.focus();
+						$(".updateQuantity").focus(function() { 
+							$(this).select(); 
+						});
+						$(".updateQuantity").click(function() { 
+							$(this).select(); 
+						});
+						
+			       
+						$(".updateQuantity").change(function() {
+							var totalQuantity = $("#totalQuantity").val(); 
+							var updateQuantity = getUpdateQuantity();
+							var currentQuantity = parseInt(totalQuantity) - parseInt(updateQuantity);
+							if (currentQuantity >= 0) { 
+								$("#currentQuantity").val(currentQuantity);
+							} 
+							else { 
+								alert("Please specify values that total the initial quantity of " + totalQuantity);
+								$(this).val(0);
+								$(this).focus();
+							}
+							$("#total-quantity").html(getTotalQuantity());
+						});					
+						
 					});
-				</script> 				
+					
+					
+		function getTotalQuantity() {
+			var currentQuantity = $("#currentQuantity").val();
+			var updateQuantity = getUpdateQuantity();
+			return parseInt(currentQuantity) + parseInt(updateQuantity);
+		}
+		
+		function getUpdateQuantity() { 
+			var updateQuantity = 0;
+			$(".updateQuantity").each(function() {
+                updateQuantity += Number($(this).val());
+            });
+            return updateQuantity;
+		}
+       	
+		</script> 				
         
         
     </body>

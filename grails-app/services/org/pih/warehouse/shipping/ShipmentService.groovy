@@ -1,5 +1,6 @@
 package org.pih.warehouse.shipping;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -12,12 +13,14 @@ import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.ListCommand;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.User;
+import org.pih.warehouse.donation.Donor;
 import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.TransactionEntry;
 import org.pih.warehouse.inventory.TransactionException;
 import org.pih.warehouse.inventory.TransactionType;
 import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.product.Product;
 import org.pih.warehouse.receiving.Receipt;
 import org.pih.warehouse.receiving.ReceiptItem;
 
@@ -364,6 +367,47 @@ class ShipmentService {
 		container.shipment.addToContainers(newContainer)
 				
 		return newContainer	
+	}
+	
+	public ShipmentItem copyShipmentItem(ShipmentItem itemToCopy) {
+		def shipmentItem = new ShipmentItem();
+		shipmentItem.lotNumber = itemToCopy.lotNumber
+		shipmentItem.expirationDate = itemToCopy.expirationDate
+		shipmentItem.product = itemToCopy.product
+		shipmentItem.quantity = itemToCopy.quantity
+		shipmentItem.recipient = itemToCopy.recipient
+		shipmentItem.container = itemToCopy.container
+		shipmentItem.shipment =  itemToCopy.shipment
+		shipmentItem.donor =  itemToCopy.donor
+		return shipmentItem;
+	} 
+	
+	public ShipmentItem findShipmentItem(ShipmentItem itemToFind) { 
+		def shipmentItem = null;
+		log.info("find shipment item by " + itemToFind.shipment + " > " + itemToFind.container + " > " + itemToFind.product + " > " + itemToFind.lotNumber )
+		
+		def criteria = ShipmentItem.createCriteria()
+		shipmentItem = criteria.get {
+			and { 
+				eq("shipment", itemToFind.shipment)
+				if (itemToFind.container) { 
+					eq("container", itemToFind.container)
+				}
+				else { 
+					isNull("container")
+				}
+				eq("product", itemToFind.product)
+				if (itemToFind.lotNumber) { 
+					eq("lotNumber", itemToFind.lotNumber)
+				}
+				else { 
+					isNull("lotNumber")
+				}
+			}
+			maxResults(1)
+			
+		}
+		return shipmentItem;
 	}
 	
 	

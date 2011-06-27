@@ -351,8 +351,49 @@ class CreateShipmentWorkflowController {
 				
 				// move an item to another container
 				log.info "Move item to container " + params
-				
+			
 				def item = ShipmentItem.get(params.item.id);
+				def itemContainer = item.container;
+				def itemShipment = item.shipment;
+				
+				if (item && itemShipment) { 
+					def containerIds = itemShipment.containers.collect { it.id }
+					containerIds << 0;					
+					containerIds.each { id -> 
+						def quantity = params["quantity-" + id] as Integer
+						log.info "quantity[" + id + "] = " + quantity;
+						def container = Container.get(id); 
+						def itemToFind = new ShipmentItem(shipment: item.shipment, container: container, product: item.product, lotNumber: item.lotNumber);
+						def shipmentItem = shipmentService.findShipmentItem(itemToFind);
+						if (shipmentItem) { 
+							log.info ("found shipment item " + shipmentItem)
+							if (shipmentItem.container == itemContainer) { 
+								shipmentItem.quantity = quantity;
+							}
+							else { 
+								shipmentItem.quantity += quantity;
+							}
+						}
+						else { 
+							log.info("creating new shipment item " + shipmentItem)
+							shipmentItem = shipmentService.copyShipmentItem(item);
+							shipmentItem.shipment = itemShipment;
+							shipmentItem.container = container;
+							shipmentItem.quantity = quantity;
+						}
+						itemShipment.addToShipmentItems(shipmentItem);
+						if (!itemShipment.hasErrors() && itemShipment.save()) { 
+							log.info("Saved shipment item " + shipmentItem)
+						} 
+						else { 
+							throw new RuntimeException("shipment has errors " + shipmentItem.errors)
+						}
+					}
+				}
+				else { 
+					invalid();
+				}
+				/*
 				def container = params.container.id == -1 ? null : Container.get(params.container.id);
 				
 				if (item) {
@@ -360,6 +401,7 @@ class CreateShipmentWorkflowController {
 					item.container = container;
 					item.save();
 				}
+				*/
 				valid()
 			}
 			
