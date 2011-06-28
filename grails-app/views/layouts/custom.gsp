@@ -127,7 +127,7 @@
 								<ul>
 								    <g:if test="${session.user}">
 										<li>
-											Welcome, <b>${session?.user?.name}</b> <span class="fade">(${grails.util.GrailsUtil.environment})</span>
+											Welcome, <b>${session?.user?.name}</b> 
 										</li>
 										<!-- 																	
 										<li>
@@ -290,10 +290,11 @@
 			<div id="footer">
 				<div style="line-height: 2em;">
 					&copy; 2010 Partners In Health&trade; <b>OpenBoxes</b> &nbsp;&nbsp; | &nbsp;&nbsp;
+					Environment: <b>${grails.util.GrailsUtil.environment}</b> &nbsp;&nbsp; | &nbsp;&nbsp;
 					Application Version: &nbsp;<b><g:meta name="app.version"/></b>&nbsp;&nbsp; | &nbsp;&nbsp;
 					Grails Version: &nbsp; <b><g:meta name="app.grails.version"></g:meta></b>&nbsp;&nbsp; | &nbsp;&nbsp;
+					Date: <b>${new Date() }</b>&nbsp;&nbsp; | &nbsp;&nbsp;
 					Locale: &nbsp;  	
-					
 					<img src="${createLinkTo(dir: 'images/flags', file: 'us.png') }" style="vertical-align: middle;">
 					<g:if test="${session['org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'].toString() != 'en_US'}">			
 						<a href="${createLink(controller: 'dashboard', action: 'index', params: ['lang':'en_US'])}">English (US)</a> &nbsp;

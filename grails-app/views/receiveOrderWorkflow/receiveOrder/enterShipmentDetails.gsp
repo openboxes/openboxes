@@ -39,7 +39,7 @@
 									<label for='orderedBy'>Shipment type</label>
 								</td>
 								<td valign='top'class='value'>
-									<g:select class="combobox updateable" name="shipmentType.id" from="${org.pih.warehouse.shipping.ShipmentType.list()}" 
+									<g:select name="shipmentType.id" from="${org.pih.warehouse.shipping.ShipmentType.list()}" 
 										optionKey="id" optionValue="name" value="${orderCommand?.shipmentType?.id }" noSelection="['':'']" />
 								</td>
 							</tr>
@@ -97,6 +97,5 @@
 			</div>
 		</g:form>
 	</div>
-	<g:comboBox />	
 </body>
 </html>

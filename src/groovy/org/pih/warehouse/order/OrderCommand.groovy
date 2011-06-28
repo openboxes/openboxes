@@ -39,11 +39,34 @@ class OrderCommand implements Serializable {
 		recipient(nullable:false)
 		// Should ship on or before the day it's delivered
 		shippedOn(nullable:false, 
-			validator: { value, obj-> 
-				obj.deliveredOn && obj.deliveredOn.after(value-1) // subtract a day from the shippedOn date in case the dates are the same
+			validator: { value, obj -> 		
+				//println "value: " + value		
+				//println "obj.deliveredOn: " + obj.deliveredOn
+				//println "new Date(): " + new Date()
+				if (!(value <= new Date())) { 
+					//println "value <= new Date(): " + (value <= new Date())
+					return ["invalid.mustOccurOnOrBeforeToday", value, new Date()]
+				}
+				// subtract a day from the shippedOn date in case the dates are the same
+				if (!obj.deliveredOn.after(value-1)) { 
+					//println "obj.deliveredOn.after(value-1): " + obj.deliveredOn.after(value-1)
+					return ["invalid.mustOccurOnOrBeforeDeliveredOn", value, obj.deliveredOn]
+				}
 			}
 		)
-		deliveredOn(nullable:false, max: new Date())
+		deliveredOn(nullable:false, 
+			validator: { value, obj ->
+				//println "value: " + value
+				//println "new Date(): " + new Date()
+				if (!(value <= new Date()) ) { 
+					//println "value <= new Date(): " + (value <= new Date())					
+					return ["invalid.mustOccurOnOrBeforeToday", value, new Date()]
+				}
+				if (!(value).after(obj.shippedOn-1)) { 
+					return ["invalid.mustOccurOnOrAfterShippedOn", value, obj.shippedOn]
+				}
+			}
+		)
 		currentUser(nullable:true)
 		currentLocation(nullable:true)
 		origin(nullable:true)

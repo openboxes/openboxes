@@ -290,7 +290,7 @@ class ShipmentController {
 				}
 				
 				// actually process the receipt
-				shipmentService.receiveShipment(shipmentInstance, receiptInstance, params.comment, session.user, session.warehouse);
+				shipmentService.receiveShipment(shipmentInstance, params.comment, session.user, session.warehouse);
 				
 				if (!shipmentInstance.hasErrors()) {
 					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
