@@ -48,7 +48,11 @@ class PurchaseOrderWorkflowController {
 		enterOrderDetails {
 			on("next") {
 				flow.order.properties = params
-				if (!orderService.saveOrder(flow.order)) {
+				try { 
+					if (!orderService.saveOrder(flow.order)) {
+						return error()
+					}
+				} catch (Exception e) { 
 					return error()
 				}
 			}.to("showOrderItems")

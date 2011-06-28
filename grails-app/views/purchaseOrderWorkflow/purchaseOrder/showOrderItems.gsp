@@ -35,14 +35,17 @@
 										<thead>
 											<tr class="odd">
 												<th></th>
+												<g:sortableColumn property="quantity" title="Quantity" />
 												<g:sortableColumn property="name" title="Name" />
 												<g:sortableColumn property="type" title="Type" />
-												<g:sortableColumn property="quantity" title="Quantity" />
+												<g:sortableColumn class="right" property="unitPrice" title="Unit Price (USD)" />
+												<g:sortableColumn class="right" property="totalPrice" title="Total Price (USD)" />
 											</tr>
 										</thead>
 										<tbody>
-											<g:each var="orderItem" in="${order?.orderItems}" status="i">
-												<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+											<g:set var="i" value="${0 }"/>
+											<g:each var="orderItem" in="${order?.orderItems}">
+												<tr class="${(i++ % 2) == 0 ? 'even' : 'odd'}">
 													<g:hiddenField name="orderItems[${i }].order.id" value="${orderItem?.order?.id }" size="5"/>
 													<td class="actionButtons">
 														<g:if test="${orderItem?.id }">
@@ -52,17 +55,29 @@
 														</g:if>
 													</td>
 													<td>
+														${orderItem?.quantity }
+														<g:hiddenField name="orderItems[${i }].quantity" value="${orderItem?.quantity }" size="5"/>
+													</td>
+													<td>
 														${orderItem?.description?.encodeAsHTML()}
 													</td>
 													<td>
 														${orderItem?.orderItemType }
 													</td>
-													<td>
-														${orderItem?.quantity }
-														<g:hiddenField name="orderItems[${i }].quantity" value="${orderItem?.quantity }" size="5"/>
+													<td class="right">
+														<g:formatNumber number="${orderItem?.unitPrice ?: 0.00 }" format="###,##0.00" />
+													</td>
+													<td class="right">	
+														<g:formatNumber number="${orderItem?.totalPrice() }" format="###,##0.00" />													
 													</td>
 												</tr>
 											</g:each>
+											<tfoot>
+												<tr class="${(i++ % 2) == 0 ? 'even' : 'odd'}">
+													<td colspan="5"></td>
+													<td class="right"><g:formatNumber number="${order?.totalPrice() }" format="###,##0.00" /></td>
+												</tr>
+											</tfoot>											
 										</tbody>
 									</table>
 								</div>
@@ -114,6 +129,12 @@
 														<td valign='top' class='name'><label for='quantity'>Quantity:</label></td>
 														<td valign='top' class='value'>
 															<input type="text" name='quantity' value="${orderItem?.quantity }" size="5" />
+														</td>
+													</tr>
+													<tr class='prop'>
+														<td valign='top' class='name'><label for='quantity'>Unit price:</label></td>
+														<td valign='top' class='value'>
+															<input type="text" name='unitPrice' value="${orderItem?.unitPrice }" size="5" />
 														</td>
 													</tr>
 													<tr>

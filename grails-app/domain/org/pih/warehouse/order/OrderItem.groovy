@@ -16,6 +16,8 @@ class OrderItem implements Serializable {
 	Product product
 	InventoryItem inventoryItem
 	Integer quantity
+	Float unitPrice
+	
 	User requestedBy	// the person who actually requested the item
 	
 	
@@ -36,6 +38,7 @@ class OrderItem implements Serializable {
 		inventoryItem(nullable:true)
 		requestedBy(nullable:true)
 		quantity(nullable:false, min:1)
+		unitPrice(nullable:true)
 	}
 
 	
@@ -79,7 +82,11 @@ class OrderItem implements Serializable {
 		} 
 		return shipments;
 	}
-		
+
+	def totalPrice() { 
+		return ( quantity ? quantity : 0.0 ) * ( unitPrice ? unitPrice : 0.0 );
+	}
+			
 	/*
 	List addToShipmentItems(ShipmentItem shipmentItem) {
 		OrderShipment.link(this, shipmentItem)

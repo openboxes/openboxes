@@ -87,4 +87,8 @@ class Order implements Serializable {
 		return orderItems.collect { it.shipments() }.flatten().unique() { it?.id }
 	}
 	
+	def totalPrice() { 
+		return orderItems.collect { it.totalPrice() }.sum();
+	}
+	
 }
