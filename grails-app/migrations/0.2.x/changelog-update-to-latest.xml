@@ -3486,6 +3486,26 @@
         </addColumn>
     </changeSet>
     
+    <changeSet author="jmiranda (generated)" id="1309292553044-1">
+		<preConditions onFail="MARK_RAN"><not><columnExists tableName="order_item" columnName="unit_price"/></not></preConditions> 
+        <addColumn tableName="order_item">
+            <column name="unit_price" type="FLOAT(12,0)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1309292553044-4">
+		<preConditions onFail="MARK_RAN"><not><columnExists tableName="shipment" columnName="weight"/></not></preConditions> 
+        <addColumn tableName="shipment">
+            <column name="weight" type="FLOAT(12,0)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1309292553044-5">
+		<preConditions onFail="MARK_RAN"><not><columnExists tableName="shipment" columnName="weight_units"/></not></preConditions> 
+        <addColumn tableName="shipment">
+            <column name="weight_units" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    
+    
 
 </databaseChangeLog>
 

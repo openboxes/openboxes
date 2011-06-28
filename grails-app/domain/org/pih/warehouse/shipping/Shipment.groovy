@@ -22,8 +22,8 @@ class Shipment implements Comparable, Serializable {
 	Float statedValue
 	Float totalValue				// the total value of all items in the shipment		
 	String additionalInformation	// any additional information about the shipment (e.g., comments)
-	//Float weight											// weight of container
-	//String weightUnits  = Constants.DEFAULT_WEIGHT_UNITS	// standard weight unit: kg, lb
+	Float weight											// weight of container
+	String weightUnits  = Constants.DEFAULT_WEIGHT_UNITS	// standard weight unit: kg, lb
 	
 	
 	// Audit fields
@@ -120,8 +120,8 @@ class Shipment implements Comparable, Serializable {
 		totalValue(nullable:true, max:99999999F)
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)
-		//weight(nullable:true, max:99999999F)
-		//weightUnits(nullable:true)
+		weight(nullable:true, max:99999999F)
+		weightUnits(nullable:true)
 		// a shipment can't have two reference numbers of the same type (we may want to change this, but UI makes this assumption at this point)
 		referenceNumbers ( validator: { referenceNumbers ->
         	referenceNumbers?.collect( {it.referenceNumberType?.id} )?.unique( { a, b -> a <=> b } )?.size() == referenceNumbers?.size()        
