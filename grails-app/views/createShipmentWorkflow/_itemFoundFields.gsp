@@ -1,16 +1,18 @@
 
+				<g:hiddenField id="containerId" name="container.id" value="${addItemToContainerId }" />
+
 				<tr class="prop">
 					<td valign="top" class="name"><label><g:message code="shipmentItem.product.label" default="Product" /></label></td>                            
 					<td valign="top" class="value">
 						<span id="product-text"></span>
-						<g:hiddenField id="productId" name="product.id" value="" size="40" />
+						<g:hiddenField id="productId" name="product.id" value="" />
 					</td>
 				</tr>
 				<tr class="prop">
 					<td valign="top" class="name"><label><g:message code="shipmentItem.lotNumber.label" default="Lot / Serial Number" /></label></td>                            
 					<td valign="top" class="value">
 						<span id="lotNumber-text"></span>
-						<g:hiddenField id="lotNumber-suggest" name="lotNumber" value="" size="20" />
+						<g:hiddenField id="lotNumber-suggest" name="lotNumber" value="" />
 					</td>
 				</tr>
 				<tr class="prop">
@@ -18,7 +20,6 @@
 					<td valign="top" class="value">
 						<span id="quantity-on-hand"></span>
 						<img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}" style="vertical-align: middle;" class="refresh"/>
-						
 					</td>
 				</tr>  	        
 				<tr class="prop">
