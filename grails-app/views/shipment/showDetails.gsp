@@ -56,7 +56,7 @@
 											</tr>
 											<tr style="height: 30px;">
 												<td valign="top">
-													<g:if test="${new Date().after(shipmentInstance?.expectedShippingDate) }">												
+													<g:if test="${shipmentInstance?.expectedShippingDate && new Date().after(shipmentInstance?.expectedShippingDate) }">												
 														<label><g:message code="shipment.departed.label" default="Departed" /></label>
 													</g:if>
 													<g:else>
@@ -76,7 +76,7 @@
 											</tr>
 											<tr style="height: 30px;">
 												<td valign="top">
-													<g:if test="${new Date().after(shipmentInstance?.expectedDeliveryDate) }">
+													<g:if test="${shipmentInstance?.expectedDeliveryDate && new Date().after(shipmentInstance?.expectedDeliveryDate) }">
 														<label><g:message code="shipment.arrived.label" default="Arrived" /></label>
 													</g:if>
 													<g:else>
