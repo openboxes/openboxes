@@ -37,7 +37,7 @@ class QuantityService {
 	
 	Integer getQuantity(Product product, String lotNumber) { 
 		if (!warehouse) { 
-			throw new RuntimeException("Your warehouse has not been initialized",  inventoryItem.errors);
+			throw new RuntimeException("Your warehouse has not been initialized");
 		}
 		else { 
 			warehouse = Warehouse.get(warehouse?.id)
