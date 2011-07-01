@@ -58,8 +58,10 @@ class AutoSuggestSearchableTagLib {
 								});
 					      	},
 					        focus: function(event, ui) {			
+					        	return false;
 					        },	
 					        change: function(event, ui) { 
+					        	return false;
 					        },
 							select: function(event, ui) {
 								// text display
@@ -68,10 +70,10 @@ class AutoSuggestSearchableTagLib {
 								\$("#quantity-text").html(ui.item.quantity);
 								
 								// product hidden values
-								\$("#product-id").val(ui.item.productId);
-								\$("#lotNumber").val(ui.item.lotNumber);
-								\$("#quantity").val(ui.item.quantity);
-																
+								\$("#productId").val(ui.item.productId);
+								\$("#lotNumber-suggest").val(ui.item.lotNumber);
+								//\$("#quantity").val(ui.item.quantity);
+								updateQuantityOnHand();								
 								//
 								\$("#itemFoundForm").show();
 								\$("#itemSearchForm").hide();

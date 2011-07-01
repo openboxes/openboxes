@@ -14,8 +14,9 @@
 							</td>
 							<td style="text-align: center">						
 								<button class="show-item-form">
-								<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" style="vertical-align: middle"/>
-								&nbsp; Add an item not currently in inventory</button>
+									<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" style="vertical-align: middle"/>
+									&nbsp; Add an item not currently in inventory
+								</button>
 							</td>
 						</tr>
 					</tbody>
@@ -27,7 +28,6 @@
 			<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.ShipmentItem" form="editItemFound"/>
 			<g:form name="editItemFound" action="createShipment">
 				<h2><g:message code="inventoryItem.enterQuantity.label" default="Enter quantity and recipient" /></h2>  
-				<g:hiddenField id="container-id" name="container.id" value="${containerId}" size="20" />			
 				<table>
 					<tbody>
 						<g:render template="itemFoundFields" model="['containerId':containerId]"/>		
@@ -58,4 +58,5 @@
 		</div>
 		
 	</td>
-</tr>
+</tr>		
+				

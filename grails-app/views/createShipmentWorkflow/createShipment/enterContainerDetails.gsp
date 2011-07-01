@@ -14,7 +14,12 @@
 				<div class="errors">
 					<g:renderErrors bean="${containerInstance}" as="list" />
 				</div>				
-			</g:hasErrors>          
+			</g:hasErrors> 
+			<g:hasErrors bean="${itemInstance}">
+				<div class="errors">
+					<g:renderErrors bean="${itemInstance}" as="list" />
+				</div>				
+			</g:hasErrors> 			         
 			<fieldset>
 				<g:render template="../shipment/summary" />	
 				<g:render template="flowHeader" model="['currentState':'Pack']"/>		
@@ -23,11 +28,17 @@
 		 		<g:if test="${containerToEdit || containerTypeToAdd}">
 		 			<g:render template="editContainer" model="['container':containerToEdit, 'containerTypeToAdd':containerTypeToAdd]"/>
 		 		</g:if>
-		 		<g:if test="${boxToEdit || addBoxToContainerId}">
+		 		<g:if test="${boxToEdit}">
 		 			<g:render template="editBox" model="['box':boxToEdit, 'addBoxToContainerId':addBoxToContainerId]"/>
 		 		</g:if>
-		 		<g:if test="${itemToEdit || addItemToContainerId}">
+		 		<g:if test="${addBoxToContainerId}">
+		 			<g:render template="editBox" model="['box':boxToEdit, 'addBoxToContainerId':addBoxToContainerId]"/>
+		 		</g:if>
+		 		<g:if test="${itemToEdit}">
 		 			<g:render template="editItem" model="['item':itemToEdit, 'addItemToContainerId':addItemToContainerId]"/>
+		 		</g:if>
+		 		<g:if test="${addItemToContainerId}">
+		 			<g:render template="addItem" model="['item':itemToEdit, 'addItemToContainerId':addItemToContainerId]"/>
 		 		</g:if>
 		 		<g:if test="${addItemToShipmentId}">
 		 			<g:render template="addItem" model="['item':itemToEdit, 'addItemToContainerId':0]"/>
@@ -140,8 +151,8 @@
 												</tr>
 												
 												<g:each var="childContainerInstance" in="${shipmentInstance?.containers?.findAll { it.parentContainer == containerInstance}?.sort() }">
-													<g:set var="styleClass" value="${childContainerInstance?.id == selectedContainer?.id ? 'selectedOff' : '' }"/>
-													<tr> <%--class="${count++%2==0?'even':'odd' }" --%>
+													<g:set var="styleClass" value="${childContainerInstance?.id == selectedContainer?.id ? 'selected' : 'not-selected' }"/>
+													<tr class="${count++%2==0?'odd':'even' }">
 														<td class="droppable">
 															<span class="${styleClass }" style="margin-left: 25px;">
 																<a name="container-${childContainerInstance.id }"></a>
@@ -153,6 +164,9 @@
 																		${childContainerInstance?.name}
 																	</g:link>
 																</g:else>
+															</span>
+															<span class="fade">
+																(${childContainerInstance?.shipmentItems?.size() } items)
 															</span>
 														</td>
 													</tr>
@@ -232,10 +246,6 @@
 													<g:else>
 														None
 													</g:else>
-													
-													
-													
-																			
 												</div>
 											</td>
 										</tr>
@@ -331,109 +341,99 @@
 			</fieldset>
         </div>
         
-				<script>
-
-					function moveItemToContainer(item, container) { 
-						$.post('/warehouse/json/moveItemToContainer', 
-				                {item: item, container: container}, 
-				                function(data) {
-									// do nothing
-									console(data)
-		                    		//var item = $("<li>");
-		                    		//var link = $("<a>").attr("href", "/warehouse/person/show/" + data.id).html(data.firstName + " " + data.lastName);
-		                    		//item.append(link);
-		                    		//$('#messages').append("new message");
-		                		}, 'json');
-					}
-				
-
-					$(function(){ 
-						//$( ".draggable" ).draggable();
-						//$('.selectable').selectable();
-						$('.draggable').draggable(
-							{
-								revert		: true,
-								zIndex		: 2700,
-								autoSize	: true,
-								ghosting	: true,
-								onStop		: function()
-								{
-									$('.droppable').each(
-										function()
-										{
-											this.expanded = false;
-										}
-									);
-								}
-							}
-						);
+		<script>
 			
-						$('.droppable').droppable( {
-							accept: '.draggable',
-							tolerance: 'intersect',
-							//greedy: true,
-							over: function(event, ui) { 
-								$( this ).addClass( "ui-state-highlight" );
-							},
-							out: function(event, ui) { 
-								$( this ).removeClass( "ui-state-highlight" );
-							},
-							drop: function( event, ui ) {
-								//ui.draggable.hide();
-								ui.draggable.addClass( "strikethrough" );
-								$( this ).removeClass( "ui-state-highlight" );
-								var itemId = ui.draggable.attr("id");
-								var moveTo = $(this).attr("id");
-								//var url = "/warehouse/category/moveItem?child=" + child + "&newParent=" + parent;
-								//window.location.replace(url);
-								//moveItemToContainer(itemId, moveTo);
-								//$("#shipmentItemRow-" + itemId).hide();
-								
-							}
-						});
+			$(document).ready(function() {
+				//$( ".draggable" ).draggable();
+				//$('.selectable').selectable();
+				$('.draggable').draggable(
+					{
+						revert		: true,
+						zIndex		: 2700,
+						autoSize	: true,
+						ghosting	: true,
+						onStop		: function()
+						{
+							$('.droppable').each(
+								function()
+								{
+									this.expanded = false;
+								}
+							);
+						}
+					}
+				);
+	
+				$('.droppable').droppable( {
+					accept: '.draggable',
+					tolerance: 'intersect',
+					//greedy: true,
+					over: function(event, ui) { 
+						$( this ).addClass( "ui-state-highlight" );
+					},
+					out: function(event, ui) { 
+						$( this ).removeClass( "ui-state-highlight" );
+					},
+					drop: function( event, ui ) {
+						//ui.draggable.hide();
+						ui.draggable.addClass( "strikethrough" );
+						$( this ).removeClass( "ui-state-highlight" );
+						var itemId = ui.draggable.attr("id");
+						var moveTo = $(this).attr("id");
+						//var url = "/warehouse/category/moveItem?child=" + child + "&newParent=" + parent;
+						//window.location.replace(url);
+						//moveItemToContainer(itemId, moveTo);
+						//$("#shipmentItemRow-" + itemId).hide();
 						
-						var firstField = $(".updateQuantity:first");
-						console.log(firstField);
-						firstField.focus();
-						$(".updateQuantity").focus(function() { 
-							$(this).select(); 
-						});
-						$(".updateQuantity").click(function() { 
-							$(this).select(); 
-						});
+					}
+				});
+				
 						
-			       
-						$(".updateQuantity").change(function() {
-							var totalQuantity = $("#totalQuantity").val(); 
-							var updateQuantity = getUpdateQuantity();
-							var currentQuantity = parseInt(totalQuantity) - parseInt(updateQuantity);
-							if (currentQuantity >= 0) { 
-								$("#currentQuantity").val(currentQuantity);
-							} 
-							else { 
-								alert("Please specify values that total the initial quantity of " + totalQuantity);
-								$(this).val(0);
-								$(this).focus();
-							}
-							$("#total-quantity").html(getTotalQuantity());
-						});					
-						
-					});
-					
-					
-		function getTotalQuantity() {
-			var currentQuantity = $("#currentQuantity").val();
-			var updateQuantity = getUpdateQuantity();
-			return parseInt(currentQuantity) + parseInt(updateQuantity);
-		}
+				$(".updateQuantity").change(changeQuantity);					
+				
+			});
 		
-		function getUpdateQuantity() { 
-			var updateQuantity = 0;
-			$(".updateQuantity").each(function() {
-                updateQuantity += Number($(this).val());
-            });
-            return updateQuantity;
-		}
+			function changeQuantity() {
+				var totalQuantity = $("#totalQuantity").val(); 
+				var updateQuantity = getUpdateQuantity();
+				var currentQuantity = parseInt(totalQuantity) - parseInt(updateQuantity);
+				if (currentQuantity >= 0) { 
+					$("#currentQuantity").val(currentQuantity);
+				} 
+				else { 
+					alert("Please specify values that total the initial quantity of " + totalQuantity);
+					$(this).val(0);
+					$(this).focus();
+				}
+			}			
+					
+			function getTotalQuantity() {
+				var currentQuantity = $("#currentQuantity").val();
+				var updateQuantity = getUpdateQuantity();
+				return parseInt(currentQuantity) + parseInt(updateQuantity);
+			}
+			
+			function getUpdateQuantity() { 
+				var updateQuantity = 0;
+				$(".updateQuantity").each(function() {
+	                updateQuantity += Number($(this).val());
+	            });
+	            return updateQuantity;
+			}
+
+			function moveItemToContainer(item, container) { 
+				$.post('/warehouse/json/moveItemToContainer', 
+	                {item: item, container: container}, 
+		                function(data) {
+							// do nothing for now
+							//console(data);
+                    		//var item = $("<li>");
+                    		//var link = $("<a>").attr("href", "/warehouse/person/show/" + data.id).html(data.firstName + " " + data.lastName);
+                    		//item.append(link);
+                    		//$('#messages').append("new message");
+                		}, 'json');
+			}
+				
        	
 		</script> 				
         

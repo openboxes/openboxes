@@ -119,7 +119,7 @@ log4j = {
 			to: mail.error.to, 
 			from: mail.error.from,
 			subject: mail.error.subject, 
-			threshold: Level.ERROR,
+			threshold: Level.FATAL,
 			SMTPHost: mail.error.server, 
 			SMTPUsername: mail.error.username,
 			SMTPDebug: mail.error.debug.toString(), 

@@ -163,7 +163,6 @@ class Container implements Comparable, java.io.Serializable {
 			return containers.collect { it.totalWeightInPounds() }.sum()
 		}
 		else {
-			log.info ("Set total weight = 0.0")
 			return 0.0
 		}
 	}	

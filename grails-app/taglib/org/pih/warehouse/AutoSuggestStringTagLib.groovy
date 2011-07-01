@@ -60,12 +60,15 @@ class AutoSuggestStringTagLib {
 								});
 							  },
 							focus: function(event, ui) {
-
+								console.log(event);
+								\$(this).trigger("focus");
 							},
 							change: function(event, ui) {
 								\$('#${id}').val(\$(this).val());
 								//\$('#${id}-suggest').val(ui.item.valueText);
-								
+								console.log(\$(this));
+								console.log(event);
+								\$(this).trigger("change");
 							},
 							select: function(event, ui) {
 								//alert("selected " + ui.item.value + " " + ui.item.valueText);

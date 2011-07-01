@@ -3,6 +3,7 @@ package org.pih.warehouse.shipping
 import org.apache.poi.hssf.record.formula.functions.NumericFunction.OneArg;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.product.Product;
 
 import sun.util.logging.resources.logging;
 
@@ -192,6 +193,7 @@ class CreateShipmentWorkflowController {
 			}.to("enterContainerDetails")
 
 			on("saveItem").to("saveItemAction")
+			on("updateItem").to("updateItemAction")
 			
 			on("deleteItem"){	
 				def item = ShipmentItem.get(params.item.id)
@@ -360,7 +362,8 @@ class CreateShipmentWorkflowController {
 					def containerIds = itemShipment.containers.collect { it.id }
 					containerIds << 0;					
 					containerIds.each { id -> 
-						def quantity = params["quantity-" + id] as Integer
+						def quantity = params["quantity-" + id] 
+						quantity = quantity ? quantity as Integer : 0
 						log.info "quantity[" + id + "] = " + quantity;
 						def container = Container.get(id); 
 						def itemToFind = new ShipmentItem(shipment: item.shipment, container: container, product: item.product, lotNumber: item.lotNumber);
@@ -408,47 +411,159 @@ class CreateShipmentWorkflowController {
 			on("valid").to("enterContainerDetails")
 			on("invalid").to("enterContainerDetails")
 		}
+		saveItemAction { 
+			action { 
+				try {
+					log.info "save new shipment item: " + params
+					def shipmentItem
+					def container
+					// Adding a new shipment item
+						
+					// Try to find an existing shipment item
+					def product = Product.get(params?.product?.id)
+					container = Container.get(params.container?.id)
+					def itemFound = new ShipmentItem(lotNumber: params?.lotNumber, product: product, container: container)
+					shipmentItem = shipmentService.findShipmentItem(itemFound)
+					if (shipmentItem) {
+						log.info("shipment item ID " + itemFound?.id + " " + itemFound?.class?.name);
+						throw new RuntimeException("Shipment item for product [" + product?.name + "] and serial/lot number [" + params.lotNumber + "]  already exists.  Please update the existing item.");
+					}
+					
+					// If the item is actually a new shipping item, we
+					shipmentItem = new ShipmentItem(container: container)
+					
+					// FIXME Property [shipment] of class [class org.pih.warehouse.shipping.ShipmentItem] cannot be null
+					//shipmentItem.shipment = flow.shipmentInstance
+					
+					// Bind the parameters to the item instance
+					bindData(shipmentItem, params, ['product.name','recipient.name'])  // blacklisting names so that we don't change product name or recipient name here!
+						
+					// If a recipient is not specified, we should
+					if (!shipmentItem?.recipient) {
+						shipmentItem.recipient = container?.recipient
+					}
 
-		
-		
-    	saveItemAction {
-    		action {
+					// In case there are errors, we use this flow-scoped variable to display errors to user
+					flow.itemInstance = shipmentItem;
+					
+					// Validate shipment item
+					if (shipmentService.validateShipmentItem(shipmentItem)) {
+						log.info ("saving new shipment item")
+						// Need to validate shipment item before adding it to the shipment
+						flow.shipmentInstance.addToShipmentItems(shipmentItem);
+						shipmentService.saveShipment(flow.shipmentInstance)
+						valid()
+					}
+
+				} catch (RuntimeException e) {
+					//log.error("Error saving shipment item ", e)
+					// Need to instantiate an item instance (if it doesn't exist) so we can add errors to it
+					if (!flow.itemInstance) flow.itemInstance = new ShipmentItem();
+					flow.itemInstance.errors.reject(e.getMessage())
+					invalid();
+				}
+			}
+			on("valid").to("enterContainerDetails")
+			on("invalid").to("enterContainerDetails")
+		}
 				
+    	updateItemAction {
+    		action {
+				try { 
+					log.info "update existing item: " + params
+
+	    			// Updating an existing shipment item 
+					def shipmentItem = ShipmentItem.get(params.item?.id)
+										
+					// Bind the parameters to the item instance
+					bindData(shipmentItem, params, ['product.name','recipient.name'])  // blacklisting names so that we don't change product name or recipient name here!
+						
+					// In case there are errors, we use this flow-scoped variable to display errors to user
+					flow.itemInstance = shipmentItem;
+					
+					// Validate shipment item
+					if (shipmentService.validateShipmentItem(shipmentItem)) {
+						if (!shipmentItem.id) { 
+							log.info ("saving new shipment item")
+							// Need to validate shipment item before adding it to the shipment
+							flow.shipmentInstance.addToShipmentItems(shipmentItem);
+							shipmentService.saveShipment(flow.shipmentInstance)
+						}
+						else { 					
+							log.info ("saving existing shipment item")
+							shipmentService.saveShipmentItem(shipmentItem)
+						}
+						valid()
+					}
+
+				} catch (RuntimeException e) {
+					//log.error("Error saving shipment item ", e)
+					// Need to instantiate an item instance (if it doesn't exist) so we can add errors to it
+					if (!flow.itemInstance) flow.itemInstance = new ShipmentItem();
+					flow.itemInstance.errors.reject(e.getMessage())
+				}
+				invalid();
+				
+				/*
 				log.info "save item action: " + params
-    			def item
+				log.info "params.lotnumber = " + params.lotNumber
+				def shipment = flow.shipmentInstance
     			def container 
+    			def shipmentItem
     			// if we have an item id, we are editing an existing item, so we need to fetch it
 				if (params.item?.id) {
-					item = ShipmentItem.get(params.item?.id)
+					log.info("find existing shipment item");
+					shipmentItem = ShipmentItem.get(params.item?.id)
+					shipmentItem.shipment = flow.shipmentInstance
+					bindData(shipmentItem, params, ['product.name','recipient.name'])  // blacklisting names so that we don't change product name or recipient name here!
 				}
     			// otherwise, if we have a container id we are adding a new item to this container
 				else {
+					log.info("create new shipment item");
 					container = Container.get(params.container?.id)
-					
-					//if (!container) {
-					//	throw new Exception("Invaild container passed to editItem action. Invalid id ${params.container?.id}.")
-					//}
-					//item = container.addNewItem()
-					item = new ShipmentItem(container: container)
-					flow.shipmentInstance.addToShipmentItems(item);
+					//shipmentItem = new ShipmentItem(container: container)
+					shipmentItem = new ShipmentItem(params)
+					shipmentItem.shipment = flow.shipmentInstance
+					shipmentItem.container = container
+					// Assign container.recipient if one is not specified
+					if (!shipmentItem?.recipient) {
+						shipmentItem.recipient = container?.recipient
+					}
 				}
-    			flow.itemInstance = item;
-    			println("the params to bind = " + params)
-    			
-    			bindData(item, params, ['product.name','recipient.name'])  // blacklisting names so that we don't change product name or recipient name here!
-				
-				if (!item?.recipient) { 
-					item.recipient = container?.recipient
+				log.info("shipmentItem.lotnumber = " + shipmentItem.lotNumber)
+				if (shipmentItem.lotNumber) { 
+					log.info ("shipmentItem.lotNumber is not null")
 				}
+				if (!shipmentItem.lotNumber) {
+					log.info ("shipmentItem.lotNumber is null")
+				}
+
 				
-				// TODO: make sure that this works properly if there are errors?
-				if(item.hasErrors() || !item.validate()) { 
-					invalid()
-    			}
-    			else {
-    				shipmentService.saveShipmentItem(item)
-    				valid()
-    			}	
+				flow.itemInstance = shipmentItem;
+				
+				// Get a local instance of the shipment (we don't want to save the shipment item if there's an error)
+				//def shipment = Shipment.get(flow.shipmentInstance.id)
+				//shipment.addToShipmentItems(shipmentItem);
+				
+				try { 
+					// TODO: make sure that this works properly if there are errors?
+					if(shipmentItem.hasErrors() || !shipmentItem.validate()) { 
+						log.info("INVALID")
+						//flow.itemInstance = shipmentItem;
+						invalid()
+	    			}
+	    			else {
+						log.info("VALID")
+						//shipmentService.saveShipment(flow.shipmentInstance);
+	    				shipmentService.addToShipmentItems(shipmentItem, shipment)
+	    				valid()
+	    			}	
+				} catch (RuntimeException e) {
+					log.error("Error saving shipment item ", e)
+					flow.itemInstance.errors.reject(e.getMessage())
+					return invalid();
+				}
+				*/
     		}
     		
     		on("valid").to("enterContainerDetails")

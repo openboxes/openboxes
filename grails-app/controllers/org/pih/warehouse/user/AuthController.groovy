@@ -9,6 +9,7 @@ import org.pih.warehouse.core.Role;
 class AuthController {
 
 	def mailService;
+	def quantityService;
 	
     static allowedMethods = [login: "GET", doLogin: "POST", logout: "GET"];
     
@@ -123,6 +124,7 @@ class AuthController {
 					// PIMS-782 Force the user to select a warehouse each time
 					if (userInstance?.warehouse) { 
 						session.warehouse = userInstance.warehouse
+						quantityService.warehouse = userInstance.warehouse
 					}
 					
 					if (params?.targetUri) {

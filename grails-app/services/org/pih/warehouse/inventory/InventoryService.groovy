@@ -403,6 +403,10 @@ class InventoryService {
 		return quantity ? quantity : 0;
 	}
 	
+	Integer getQuantityForProduct(Product product) { 
+		return 0;
+	}
+	
 	/**
 	 * Fetches and populates a StockCard Command object
 	 */
@@ -703,13 +707,21 @@ class InventoryService {
 	 * @return
 	 */
 	InventoryItem findInventoryItemByProductAndLotNumber(Product product, String lotNumber) {
+		log.info ("Find inventory item by product " + product?.id + " and lot number '" + lotNumber + "'" )
 		def inventoryItems = InventoryItem.createCriteria().list() {
 			and {
 				eq("product.id", product?.id)
-				if (lotNumber)
+				if (lotNumber) { 
+					log.info "lot number is not null"
 					eq("lotNumber", lotNumber)
-				else 
-					isNull("lotNumber")
+				}
+				else {  
+					or { 
+						log.info "lot number is null"
+						isNull("lotNumber")
+						eq("lotNumber", "")
+					}
+				}
 			}
 		}
 		log.info ("Returned inventory items " + inventoryItems);

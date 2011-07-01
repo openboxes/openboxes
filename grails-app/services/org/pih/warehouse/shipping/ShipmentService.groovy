@@ -29,6 +29,7 @@ class ShipmentService {
 	def mailService;
 	def sessionFactory;
 	def inventoryService;
+	def quantityService;
 	boolean transactional = true
 	
 	/**
@@ -278,6 +279,38 @@ class ShipmentService {
 		item.save(flush:true)
 	}
 	
+	
+	
+	/**
+	 * Saves an item
+	 */
+	void addToShipmentItems(ShipmentItem shipmentItem, Shipment shipment) {
+		if (validateShipmentItem(shipmentItem)) { 
+			shipment.addToShipmentItems(shipmentItem);
+			shipment.save()			
+		}
+	}
+
+	
+	/**
+	 * Validte the shipment item 	
+	 * @param shipmentItem
+	 * @return
+	 */
+	boolean validateShipmentItem(def shipmentItem) { 
+		
+		//if(shipmentItem.hasErrors() || !shipmentItem.validate()) {
+		//	return false
+		//}
+
+		def onHandQuantity = quantityService.getQuantity(shipmentItem.product, shipmentItem.lotNumber)
+		if (shipmentItem.quantity > onHandQuantity) { 
+			throw new ShipmentItemException(message: "shipmentItem.cannotExceedOnHandQuantity", shipmentItem: shipmentItem)
+		}
+		return true;
+	}
+	
+	
 	/**
 	 * Deletes a container
 	 */
@@ -401,11 +434,13 @@ class ShipmentService {
 					eq("lotNumber", itemToFind.lotNumber)
 				}
 				else { 
-					isNull("lotNumber")
+					or { 
+						isNull("lotNumber")
+						eq("lotNumber", "")
+					}
 				}
 			}
 			maxResults(1)
-			
 		}
 		return shipmentItem;
 	}

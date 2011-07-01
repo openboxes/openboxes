@@ -31,7 +31,7 @@ class JsonController {
 		def quantity = 0
 		def warehouse = Warehouse.get(session.warehouse.id);
 		def lotNumber = (params.lotNumber) ? (params.lotNumber) : "";
-		def product = (params.productId) ? Product.get(params.productId) : null;
+		def product = (params.productId) ? Product.get(params.productId as Integer) : null;
 		
 		log.info "find by lotnumber '" + lotNumber + "' and product '" + product + "'";
 		def item = InventoryItem.findByLotNumberAndProduct(lotNumber, product)
