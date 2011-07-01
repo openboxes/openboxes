@@ -108,7 +108,8 @@ class JsonController {
 					]
 				}
 			}
-			items << [ value: params.term, label: params.term, valueText: params.term, lotNumber: params.term ]
+			// Add the user-entered lot number to the list 
+			//items << [ value: params.term, label: params.term, valueText: params.term, lotNumber: params.term ]
 		}
 		render items as JSON;
 	}
