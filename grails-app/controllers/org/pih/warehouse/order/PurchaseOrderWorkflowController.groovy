@@ -108,7 +108,6 @@ class PurchaseOrderWorkflowController {
 				}
 				
 				if (!orderItem.validate() || orderItem.hasErrors()) { 
-					
 					flow.orderItem = orderItem
 					return error();
 				}
