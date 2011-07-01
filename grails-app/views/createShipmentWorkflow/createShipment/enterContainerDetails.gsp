@@ -106,9 +106,8 @@
 															--%>
 														</div>
 													</span>				
-									 				<g:if test="${shipmentInstance?.totalWeightInPounds() }">
-									 					<span class="fade">&nbsp;|&nbsp; Total weight:</span> ${shipmentInstance?.totalWeightInPounds() } lbs
-									 				</g:if>
+								 					<span class="fade">&nbsp;|&nbsp; Total weight:</span> 
+													<g:formatNumber format="#,##0.00" number="${shipmentInstance?.totalWeightInPounds() ? shipmentInstance?.totalWeightInPounds() : 0.00 }" /> lbs
 										 		</div>
 										 	</td>
 										</tr>
@@ -216,10 +215,12 @@
 										 				&nbsp;|&nbsp; Weight: 
 										 			</span>
 									 				<g:if test="${selectedContainer?.weight }">
-										 				${selectedContainer?.weight } ${selectedContainer?.weightUnits}
+										 				<g:formatNumber format="#,##0.00" number="${selectedContainer?.weight }"/>
+										 				 ${selectedContainer?.weightUnits}
 									 				</g:if>
 									 				<g:else>
-									 					None
+										 				<g:formatNumber format="#,##0.00" number="${selectedContainer?.totalWeightInPounds() ? selectedContainer?.totalWeightInPounds() : 0.00 }" /> 
+										 				 lbs
 									 				</g:else>
 									 				
 													<span class="fade">

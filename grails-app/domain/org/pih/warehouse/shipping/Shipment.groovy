@@ -280,11 +280,11 @@ class Shipment implements Comparable, Serializable {
 	}
 	
 	Float totalWeightInKilograms() {
-		return containers.collect { it.totalWeightInKilograms() }.sum()
+		return containers.findAll { it.parentContainer == null }.collect { it.totalWeightInKilograms() }.sum()
 	}
 
 	Float totalWeightInPounds() {
-		return containers.collect { it.totalWeightInPounds() }.sum()
+		return containers.findAll { it.parentContainer == null }.collect { it.totalWeightInPounds() }.sum()
 	}
 
 }

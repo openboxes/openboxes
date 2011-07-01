@@ -64,14 +64,14 @@
 													</g:else>
 												</td>
 												<td valign="top" >
-													<div>
+													<span>
 														${fieldValue(bean: shipmentInstance, field: "origin.name")}									
-													</div>
-													<div class="fade">
+													</span>
+													<span class="fade">
 														<g:if test="${shipmentInstance.expectedShippingDate && !shipmentInstance.hasShipped()}">
 															<format:date obj="${shipmentInstance?.expectedShippingDate}"/>
 														</g:if>
-													</div>											
+													</span>											
 												</td>
 											</tr>
 											<tr style="height: 30px;">
@@ -84,14 +84,14 @@
 													</g:else>
 												</td>
 												<td>
-													<div>
+													<span>
 														${fieldValue(bean: shipmentInstance, field: "destination.name")}
-													</div>											
-													<div class="fade">
+													</span>											
+													<span class="fade">
 														<g:if test="${shipmentInstance.expectedDeliveryDate && !shipmentInstance.wasReceived()}">
 															<format:date obj="${shipmentInstance?.expectedDeliveryDate}"/>
 														</g:if>
-													</div>											
+													</span>											
 												</td>
 											</tr>
 											<tr>
@@ -101,8 +101,8 @@
 														code="shipment.weight.label" default="Total weight" /></label>
 												</td>
 												<td valign="top" class="value">
-													${shipmentInstance?.totalWeightInPounds() ? shipmentInstance?.totalWeightInPounds() : 0.00 } lbs
-												
+													<g:formatNumber format="#,##0.00" number="${shipmentInstance?.totalWeightInPounds() ? shipmentInstance?.totalWeightInPounds() : 0.00 }" />
+													lbs
 												</td>												
 											</tr>
 										</tbody>
