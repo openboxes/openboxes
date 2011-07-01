@@ -389,7 +389,14 @@ class CreateShipmentWorkflowController {
 							shipmentItem.container = container;
 							shipmentItem.quantity = quantity;
 						}
-						
+						itemShipment.addToShipmentItems(shipmentItem);
+						if (!itemShipment.hasErrors() && itemShipment.save()) { 
+							log.info("Saved shipment item " + shipmentItem)
+						} 
+						else { 
+							throw new RuntimeException("shipment has errors " + shipmentItem.errors)
+						}
+						/*
 						// If the resulting shipment item has 0 quantity, then we need to remove it
 						if (shipmentItem.quantity == 0) {
 							shipmentItem.shipment.removeFromShipmentItems(shipmentItem);
@@ -407,7 +414,7 @@ class CreateShipmentWorkflowController {
 							else { 
 								throw new RuntimeException("shipment has errors " + shipmentItem.errors)
 							}
-						}
+						}*/
 					}
 				}
 				else { 
