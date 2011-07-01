@@ -253,6 +253,8 @@ class CreateShipmentWorkflowController {
     	
     	saveContainerAction {
     		action {
+				log.info("Save container " + params)
+				
     			def container
 				
 				// fetch the existing container if this is an edit, otherwise add a container to this shipment
@@ -368,6 +370,8 @@ class CreateShipmentWorkflowController {
 						def container = Container.get(id); 
 						def itemToFind = new ShipmentItem(shipment: item.shipment, container: container, product: item.product, lotNumber: item.lotNumber);
 						def shipmentItem = shipmentService.findShipmentItem(itemToFind);
+						
+						// Found existing shipment item
 						if (shipmentItem) { 
 							log.info ("found shipment item " + shipmentItem)
 							if (shipmentItem.container == itemContainer) { 
@@ -377,6 +381,7 @@ class CreateShipmentWorkflowController {
 								shipmentItem.quantity += quantity;
 							}
 						}
+						// New shipment item
 						else { 
 							log.info("creating new shipment item " + shipmentItem)
 							shipmentItem = shipmentService.copyShipmentItem(item);
@@ -384,12 +389,24 @@ class CreateShipmentWorkflowController {
 							shipmentItem.container = container;
 							shipmentItem.quantity = quantity;
 						}
-						itemShipment.addToShipmentItems(shipmentItem);
-						if (!itemShipment.hasErrors() && itemShipment.save()) { 
-							log.info("Saved shipment item " + shipmentItem)
-						} 
-						else { 
-							throw new RuntimeException("shipment has errors " + shipmentItem.errors)
+						
+						// If the resulting shipment item has 0 quantity, then we need to remove it
+						if (shipmentItem.quantity == 0) {
+							shipmentItem.shipment.removeFromShipmentItems(shipmentItem);
+							//shipmentItem.container.removeFromShipmentItems(shipmentItem);
+							shipmentItem.delete();
+							//itemShipment.save();
+						}
+						
+						// Otherwise, add the shipment item 
+						else { 						
+							itemShipment.addToShipmentItems(shipmentItem);
+							if (!itemShipment.hasErrors() && itemShipment.save()) { 
+								log.info("Saved shipment item " + shipmentItem)
+							} 
+							else { 
+								throw new RuntimeException("shipment has errors " + shipmentItem.errors)
+							}
 						}
 					}
 				}

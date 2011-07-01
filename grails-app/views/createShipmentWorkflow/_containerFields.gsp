@@ -6,6 +6,14 @@
 </tr>
 
 <tr class="prop">
+	<td valign="top" class="name"><label>Weight</label></td>                            
+	<td valign="top" class="value">
+		<g:textField id="weight" name="weight" size="15" value="${container ? container?.weight : box?.weight}"/>&nbsp;
+		<g:select name="weightUnits" from="${org.pih.warehouse.core.Constants.WEIGHT_UNITS}" value="${container ? container?.weightUnits : box?.weightUnits}" />	
+	</td>
+</tr>
+
+<tr class="prop">
 	<td valign="top" class="name"><label>Dimensions</label></td>                            
 	<td valign="top" class="value">
 		H: <g:textField id="height" name="height" size="5" value="${container ? container?.height : box?.height}"/>&nbsp;
@@ -13,15 +21,6 @@
 		L: <g:textField id="length" name="length" size="5" value="${container ? container?.length : box?.length}"/>&nbsp;
 		<g:select name="volumeUnits" from="${org.pih.warehouse.core.Constants.VOLUME_UNITS}" value="${container ? container?.volumeUnits : box?.volumeUnits}" />	
 
-	</td>
-</tr>
-
-
-<tr class="prop">
-	<td valign="top" class="name"><label>Weight</label></td>                            
-	<td valign="top" class="value">
-		<g:textField id="weight" name="weight" size="15" value="${container ? container?.weight : box?.weight}"/>&nbsp;
-		<g:select name="weightUnits" from="${org.pih.warehouse.core.Constants.WEIGHT_UNITS}" value="${container ? container?.weightUnits : box?.weightUnits}" />	
 	</td>
 </tr>
 
