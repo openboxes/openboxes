@@ -9,6 +9,7 @@
 									jsonUrl="/warehouse/json/searchInventoryItems" />
 								&nbsp;
 							</td>
+							<%-- 
 							<td style="text-align: center">
 								<b>-OR-</b>
 							</td>
@@ -18,6 +19,7 @@
 									&nbsp; Add an item not currently in inventory
 								</button>
 							</td>
+							--%>
 						</tr>
 					</tbody>
 				</table>

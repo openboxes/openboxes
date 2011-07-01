@@ -102,6 +102,11 @@
 		<ul>			
 			<li class="">
 				<span class="menuButton">
+					<g:link controller="product" action="list">Products</g:link>
+				</span>
+			</li>
+			<li class="">
+				<span class="menuButton">
 					<g:link controller="attribute" action="list">Product Attributes</g:link>
 				</span>
 			</li>
