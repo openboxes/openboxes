@@ -407,6 +407,13 @@ class InventoryService {
 		return 0;
 	}
 	
+	
+	Map<InventoryItem, Integer> getQuantityForInventory(Inventory inventory) { 
+		def transactionEntries = getTransactionEntriesByInventory(inventory);
+		return getQuantityByInventoryItemMap(transactionEntries);
+	}
+	
+	
 	/**
 	 * Fetches and populates a StockCard Command object
 	 */
@@ -494,12 +501,8 @@ class InventoryService {
 				// Process each row added to the record inventory page
 				cmd.recordInventoryRows.each { row -> 					
 					// 1. Find an existing inventory item for the given lot number and product and description
-					// FIXME need to add description here
 					def inventoryItem = 
-					InventoryItem.findByLotNumberAndProduct(row.lotNumber, cmd.product)
-					//def inventoryItem = 
-					//	findInventoryItemByProductAndLotNumberAndDescription(cmd.product, row.lotNumber, row.description);
-					
+						findInventoryItemByProductAndLotNumber(cmd.product, row.lotNumber)
 					
 					// 2. If the inventory item doesn't exist, we create a new one
 					if (!inventoryItem) { 
@@ -763,27 +766,7 @@ class InventoryService {
 		return (inventoryLevel)?:new InventoryLevel();
 		
 	}
-	
-	
-	/**
-	 * Get all transaction entries for a particular inventory item.
-	 * @param itemInstance
-	 * @return
-	 */
-	List getTransactionEntriesByInventoryItem(InventoryItem itemInstance) { 
-		return TransactionEntry.findAllByInventoryItem(itemInstance);
-	}
-	
-	/**
-	 * Get all transaction entries by product (this isn't very useful).  
-	 * 
-	 * @param productInstance
-	 * @return
-	 */
-	List getTransactionEntriesByProduct(Product productInstance) { 		
-		return TransactionEntry.findAllByProduct(productInstance)		
-	}
-	
+
 	
 	/**
 	 * Get all transaction entries over all products/inventory items.
@@ -949,7 +932,8 @@ class InventoryService {
 			debitTransaction.transactionDate = shipmentInstance.getActualShippingDate()
 		
 			shipmentInstance.shipmentItems.each {
-				def inventoryItem = InventoryItem.findByLotNumberAndProduct(it.lotNumber, it.product)
+				def inventoryItem = 
+					findInventoryItemByProductAndLotNumber(it.product, it.lotNumber)
 				
 				// If the inventory item doesn't exist, we create a new one
 				if (!inventoryItem) {
@@ -1517,7 +1501,8 @@ class InventoryService {
 			
 		// create the transaction entries based on the base transaction
 		baseTransaction.transactionEntries.each {		
-			def inventoryItem = InventoryItem.findByLotNumberAndProduct(it.lotNumber, it.product)
+			def inventoryItem = 
+				findInventoryItemByProductAndLotNumber(it.product, it.lotNumber)
 			
 			// If the inventory item doesn't exist, we create a new one
 			if (!inventoryItem) {

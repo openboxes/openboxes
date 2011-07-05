@@ -34,7 +34,7 @@ class JsonController {
 		def product = (params.productId) ? Product.get(params.productId as Integer) : null;
 		
 		log.info "find by lotnumber '" + lotNumber + "' and product '" + product + "'";
-		def item = InventoryItem.findByLotNumberAndProduct(lotNumber, product)
+		def item = inventoryService.findInventoryItemByProductAndLotNumber(product, lotNumber);
 		if (item) { 
 			quantity = inventoryService.getQuantityForInventoryItem(item, warehouse?.inventory)
 		}
@@ -47,12 +47,17 @@ class JsonController {
 		def warehouse = Warehouse.get(session.warehouse.id);
 		def items = new TreeSet();
 		if (params.term) {
+			
+			// Improved the performance of the auto-suggest by moving 
 			items = inventoryService.searchInventoryItems(params.term, params.productId)
+			
+			// Get a map of quantities for all items in inventory
+			def quantitiesByInventoryItem = inventoryService.getQuantityForInventory(warehouse?.inventory)
 			
 			if (items) {
 				items = items.collect() {
-					def quantity = inventoryService.getQuantityForInventoryItem(it, warehouse?.inventory) 
-					log.info("quantity " + quantity);
+					def quantity = quantitiesByInventoryItem[it]
+					quantity = (quantity) ?: 0
 					[
 						id: it.id,
 						value: it.lotNumber,
@@ -75,6 +80,7 @@ class JsonController {
 	def findLotsByName = { 
 		log.info params
 
+		// Constrain by product id if the productId param is passed in
 		def productId = null;		
 		try { 			
 			productId = new Long(params.productId);
@@ -96,11 +102,17 @@ class JsonController {
 				}
 			}
 			
+			def warehouse = Warehouse.get(session.warehouse.id);
+			def quantitiesByInventoryItem = inventoryService.getQuantityForInventory(warehouse?.inventory)
+			
 			if (items) {
 				items = items.collect() {
+					
+					def quantity = quantitiesByInventoryItem[it]
+					quantity = (quantity) ?: 0
 					[
 						value: it.lotNumber,
-						label: it.lotNumber, 
+						label:  it.product.name + " --- Item: " + it.lotNumber + " --- Qty: " + quantity + " --- ",
 						valueText: it.lotNumber,
 						lotNumber: it.lotNumber,
 						expirationDate: it.expirationDate,
@@ -345,7 +357,7 @@ class JsonController {
 	def findInventoryItem = { 
 		log.info("params: " + params);
 		def product = Product.get(Integer.parseInt(params.productId));
-		def inventoryItem = InventoryItem.findByProductAndLotNumber(product, params.lotNumber?:null);
+		def inventoryItem = inventoryService.findByProductAndLotNumber(product, params.lotNumber?:null);
 		
 		// We need to pass the inventory.id param
 		//def inventory = Inventory.get(Integer.parseInt(params?.inventory?.id));

@@ -315,6 +315,7 @@ class CreateShipmentWorkflowController {
     			
     			// first handle the box
     			def box
+				def container 
 				
 				// fetch the existing container if this is an edit, otherwise add a container to this shipment
 				if (params.box?.id) {
@@ -322,12 +323,18 @@ class CreateShipmentWorkflowController {
 				}
 				else {
 					// if not, get the container that we are adding the box to
-					def container = Container.get(params.container.id)
+					container = Container.get(params.container.id)
 					box = container.addNewContainer(ContainerType.findByName("Box"))
 				}
 				
     			bindData(box,params)
-    		
+    						
+				log.info("setting recipient ...");
+				// If a recipient is not specified, we should specify one
+				if (!box?.recipient) {
+					box.recipient = container?.recipient
+				}
+				
 				// TODO: make sure that this works properly if there are errors?
 				if(box.hasErrors() || !box.validate()) { 
 					invalid()
@@ -373,10 +380,10 @@ class CreateShipmentWorkflowController {
 						
 						// Found existing shipment item
 						if (shipmentItem) { 
-							log.info ("found shipment item " + shipmentItem)
+							// FIXME Need to add a comment - I forgot why we're doing this, but it's important (and correct)
 							if (shipmentItem.container == itemContainer) { 
 								shipmentItem.quantity = quantity;
-							}
+							}							
 							else { 
 								shipmentItem.quantity += quantity;
 							}

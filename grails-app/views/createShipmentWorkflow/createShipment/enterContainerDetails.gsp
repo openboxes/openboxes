@@ -4,6 +4,10 @@
          <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
          <meta name="layout" content="custom" />
          <title>Add Shipment Items</title>  
+         
+         <style>
+	         .ui-autocomplete { height: 250px; overflow-y: scroll; overflow-x: hidden;}
+         </style>
     </head>
     <body>
 		<div class="body">

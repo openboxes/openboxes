@@ -90,7 +90,6 @@ class InventoryItemController {
 	
 	def show = {
 		def itemInstance = InventoryItem.get(params.id)
-		//def inventoryItemList = inventoryService.getInventoryItemsByProduct(productInstance)
 		def transactionEntryList = TransactionEntry.findAllByInventoryItem(itemInstance)
 		[
 			itemInstance : itemInstance,
@@ -603,7 +602,7 @@ class InventoryItemController {
 			redirect(action: "showStockCard", id: productInstance?.id)
 		}
 		else { 
-			def inventoryItem = InventoryItem.findByProductAndLotNumber(productInstance, params.lotNumber?:null)
+			def inventoryItem = inventoryService.findByProductAndLotNumber(productInstance, params.lotNumber?:null)
 			if (!inventoryItem) { 
 				flash.message = "${message(code: 'default.notfound.message', args: [message(code: 'inventoryItem.label', default: 'Inventory item'), params.lotNumber])}"
 			} 

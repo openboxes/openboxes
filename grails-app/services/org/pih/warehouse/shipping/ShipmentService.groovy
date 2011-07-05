@@ -269,6 +269,10 @@ class ShipmentService {
 	 * Saves a container
 	 */
 	void saveContainer(Container container) {
+		/*
+		if (!container.recipient) { 
+			container.recipient = container.shipment.recipient;
+		}*/
 		container.save(flush:true)
 	}
 	
@@ -276,6 +280,10 @@ class ShipmentService {
 	 * Saves an item
 	 */
 	void saveShipmentItem(ShipmentItem item) {
+		/*
+		if (!item.recipient) { 
+			item.recipient = (item?.container?.recipient)?:(item?.shipment?.recipient);
+		}*/
 		item.save(flush:true)
 	}
 	
@@ -616,7 +624,8 @@ class ShipmentService {
 					creditTransaction.transactionDate = shipmentInstance.getActualDeliveryDate()
 					
 					shipmentInstance.receipt.receiptItems.each {
-						def inventoryItem = InventoryItem.findByLotNumberAndProduct(it.lotNumber, it.product)
+						def inventoryItem = 
+							inventoryService.findInventoryItemByProductAndLotNumber(it.product, it.lotNumber);
 						
 						// If the inventory item doesn't exist, we create a new one
 						if (!inventoryItem) {

@@ -6,11 +6,6 @@
 					<td valign="top" class="value">
 						<span id="product-text"></span>
 						<g:hiddenField id="productId" name="product.id" value="" />
-					</td>
-				</tr>
-				<tr class="prop">
-					<td valign="top" class="name"><label><g:message code="shipmentItem.lotNumber.label" default="Lot / Serial Number" /></label></td>                            
-					<td valign="top" class="value">
 						<span id="lotNumber-text"></span>
 						<g:hiddenField id="lotNumber-suggest" name="lotNumber" value="" />
 					</td>
@@ -32,7 +27,7 @@
 					<td valign="top" class="name"><label><g:message code="shipmentItem.recipient.label" default="Recipient" /></label></td>                            
 					<td valign="top" class="value">
 						<g:autoSuggest name="recipient" jsonUrl="/warehouse/json/findPersonByName" 
-							width="200" valueId="${item?.recipient?.id}" valueName="${item?.recipient?.name}"/>							
+							width="200" valueId="" valueName=""/>	
 					</td>
 				</tr>				
 				

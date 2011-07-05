@@ -24,10 +24,10 @@
             <div class="list">
                 <table>
                     <thead>
-                        <tr>                        
+                        <tr>
+                        	<g:sortableColumn property="id" title="${message(code: 'eventType.id.label', default: 'Id')}" />
                             <g:sortableColumn property="name" title="${message(code: 'location.name.label', default: 'Name')}" />
                             <th><g:message code="location.type.label" default="Type" /></th>
-                            <th><g:message code="location.edit.label" default="Edit Location" /></th>
                         </tr>
                     </thead>
                     <tbody>

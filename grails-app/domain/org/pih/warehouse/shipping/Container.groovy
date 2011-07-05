@@ -122,7 +122,7 @@ class Container implements Comparable, java.io.Serializable {
 		
 		def container = new Container(
 			containerType: containerType, 
-			shipment: this,
+			shipment: this.shipment,
 			sortOrder: sortOrder
 		)
 		

@@ -297,7 +297,7 @@ class InventoryController {
 	def addItem = {
 		def inventoryInstance = Inventory.get(params?.inventory?.id)
 		def productInstance = Product.get(params?.product?.id);
-		def itemInstance = InventoryItem.findByProductAndLotNumber(productInstance, params.lotNumber)
+		def itemInstance = inventoryService.findByProductAndLotNumber(productInstance, params.lotNumber)
 		if (itemInstance) {
 			flash.message = "${message(code: 'default.alreadyExists.message', args: [message(code: 'inventory.label', default: 'Inventory item'), inventoryInstance.id])}"
 			redirect(action: "show", id: inventoryInstance.id)
@@ -405,33 +405,6 @@ class InventoryController {
 		} 
 		
 		transactionInstance.properties = params
-		
-		/*
-		transactionInstance.transactionEntries.each { 
-			def inventoryItem = InventoryItem.findByProductAndLotNumber(it.product, it.lotNumber);
-			if (!inventoryItem) { 
-				inventoryItem = new InventoryItem(
-					active: Boolean.TRUE, 
-					product: it.product, 
-					lotNumber: it.lotNumber);
-				
-				if (!inventoryItem.hasErrors() && inventoryItem.save()) { 
-					println "saved inventory item"
-				}
-				else { 
-					transactionInstance.errors = inventoryItem.errors;
-					flash.message = "Unable to save inventory item";
-					render(view: "editTransaction", model: [
-						warehouseInstance: Warehouse.get(session?.warehouse?.id),
-						transactionInstance: transactionInstance,
-						productInstanceMap: Product.list().groupBy { it?.productType },
-						transactionTypeList: TransactionType.list(),
-						locationInstanceList: Location.list()])
-				}				
-			}
-			it.inventoryItem = inventoryItem;
-		}
-		*/
 		
 		// either save as a local transfer, or a generic transaction
 		// (catch any exceptions so that we display "nice" error messages)
@@ -602,7 +575,8 @@ class InventoryController {
 		transactionInstance?.transactionEntries.each { 
 		
 			def product = Product.get(it?.inventoryItem?.product?.id)
-			def inventoryItem = InventoryItem.findByLotNumberAndProduct(it?.inventoryItem?.lotNumber, product);
+			def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(product, it?.inventoryItem?.lotNumber)
+				
 			if (inventoryItem) {
 				it.inventoryItem = inventoryItem;
 			}
@@ -620,26 +594,6 @@ class InventoryController {
 			
 		}
 		
-		/*
-		transactionInstance?.transactionEntries.each { 
-			log.info("Process transaction entry " + it.id);
-			log.info("Find inventory item by lot number " + it.lotNumber);
-			
-			// Find inventory item by lot number
-			def inventoryItem = InventoryItem.findByLotNumberAndProduct(it?.lotNumber, it?.product);
-	
-			// Create a new inventory item if one is not found 
-			if (!inventoryItem) { 
-				inventoryItem = new InventoryItem();
-				inventoryItem.product = it.product;
-				inventoryItem.lotNumber = it.lotNumber;
-				inventoryItem.save();
-				
-				// FIXME Need to check for errors here
-			}
-			it.inventoryItem = inventoryItem;
-		}*/
-		
 		// either save as a local transfer, or a generic transaction
 		// (catch any exceptions so that we display "nice" error messages)
 		Boolean saved = null
@@ -656,20 +610,6 @@ class InventoryController {
 				log.error("Unable to save transaction ", e)
 			}
 		}
-
-		/*
-		transactionInstance.transactionEntries.each { 
-			println ("quantity " + it.quantity);
-			if (!it.hasErrors() && it.save()) { 
-				
-			}
-			else { 
-				it.errors.each { error -> 
-					println error
-				}
-			}
-		}
-		*/
 				
 		if (saved) {	
 			flash.message = "Transaction saved successfully"

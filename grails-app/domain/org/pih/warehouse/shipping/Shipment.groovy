@@ -262,6 +262,7 @@ class Shipment implements Comparable, Serializable {
 		def container = new Container(
 			containerType: containerType, 
 			shipment: this,
+			recipient: this.recipient,
 			sortOrder: sortOrder
 		)
 		
