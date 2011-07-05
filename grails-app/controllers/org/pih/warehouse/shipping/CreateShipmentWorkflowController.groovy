@@ -363,79 +363,92 @@ class CreateShipmentWorkflowController {
 				// move an item to another container
 				log.info "Move item to container " + params
 			
-				def item = ShipmentItem.get(params.item.id);
+				def item = ShipmentItem.get(params.item.id);				
 				def itemContainer = item.container;
-				def itemShipment = item.shipment;
+				def shipment = flow.shipmentInstance;
 				
-				if (item && itemShipment) { 
-					def containerIds = itemShipment.containers.collect { it.id }
-					containerIds << 0;					
+				if (item && shipment) { 
+					def containerIds = shipment.containers.collect { it.id }
+					
+					// Need to add id = 0 for the 'unpacked items' container
+					containerIds << 0;		
+					
+					// Iterate over the container ids and add the appropriate amount of units to each			
 					containerIds.each { id -> 
+						
+						// Container from which we're moving items to/from
+						def container = Container.get(id);
+						
+						log.info("container " + container)
+						
+						// Determine the quantity to add/assign
 						def quantity = params["quantity-" + id] 
 						quantity = quantity ? quantity as Integer : 0
 						log.info "quantity[" + id + "] = " + quantity;
-						def container = Container.get(id); 
+						
 						def itemToFind = new ShipmentItem(shipment: item.shipment, container: container, product: item.product, lotNumber: item.lotNumber);
 						def shipmentItem = shipmentService.findShipmentItem(itemToFind);
 						
 						// Found existing shipment item
 						if (shipmentItem) { 
-							// FIXME Need to add a comment - I forgot why we're doing this, but it's important (and correct)
-							if (shipmentItem.container == itemContainer) { 
-								shipmentItem.quantity = quantity;
+							// There's a shipment item that was loaded in the hibernate session above, 
+							// so we need to merge so we don't run into an issue where that instance
+							// is saved after we persist this shipment item (e.g overwriting the 
+							// new quantity with the old quantity)
+							//shipmentItem = shipmentItem.merge();
+							
+							log.info ("Found shipment item" + shipmentItem)
+							// Quantity should be added to all containers except the one you're editing
+							// For example, if I move 4 units from container 1 to container 2, I should 
+							// add 4 units to container 2, and set the quantity of container 1 to 
+							// it's former quantity - 4.  The subtraction is handled in the UI, so we 
+							// just need to set the value to the quantity passed in as a parameter.
+							if (shipmentItem.container != itemContainer) { 
+								log.info("Adding quantity = " + quantity + " to shipment item " + shipmentItem);
+								shipmentItem.quantity += quantity;
 							}							
 							else { 
-								shipmentItem.quantity += quantity;
+								log.info("Setting quantity = " + quantity + " for shipment item " + shipmentItem);
+								shipmentItem.quantity = quantity;
+							}
+							
+							// For items that no longer have any quantity, we want to remove them from their container
+							if (shipmentItem.quantity == 0) { 
+								shipment.removeFromShipmentItems(shipmentItem);
+								//shipment.save();
 							}
 						}
 						// New shipment item
 						else { 
-							log.info("creating new shipment item " + shipmentItem)
-							shipmentItem = shipmentService.copyShipmentItem(item);
-							shipmentItem.shipment = itemShipment;
-							shipmentItem.container = container;
-							shipmentItem.quantity = quantity;
+							if (quantity > 0) { 
+								log.info("Creating new shipment item ")
+								shipmentItem = shipmentService.copyShipmentItem(item);
+								shipmentItem.shipment = shipment;
+								shipmentItem.container = container;
+								shipmentItem.quantity = quantity;
+								shipment.addToShipmentItems(shipmentItem);
+								
+							}
 						}
-						itemShipment.addToShipmentItems(shipmentItem);
-						if (!itemShipment.hasErrors() && itemShipment.save()) { 
-							log.info("Saved shipment item " + shipmentItem)
+						
+						// PIMS-1005 We need to flush the session or else the new quantity for the item we're 
+						// moving will get overwritten by the old quantity (and I have no idea WHY!?!?!?!)
+						if (!shipment.hasErrors() && shipment.save(flush:true)) { 
+							//log.info("Saved shipment item " + shipmentItem + " with quantity " + shipmentItem.quantity);
 						} 
 						else { 
 							throw new RuntimeException("shipment has errors " + shipmentItem.errors)
 						}
-						/*
-						// If the resulting shipment item has 0 quantity, then we need to remove it
-						if (shipmentItem.quantity == 0) {
-							shipmentItem.shipment.removeFromShipmentItems(shipmentItem);
-							//shipmentItem.container.removeFromShipmentItems(shipmentItem);
-							shipmentItem.delete();
-							//itemShipment.save();
-						}
 						
-						// Otherwise, add the shipment item 
-						else { 						
-							itemShipment.addToShipmentItems(shipmentItem);
-							if (!itemShipment.hasErrors() && itemShipment.save()) { 
-								log.info("Saved shipment item " + shipmentItem)
-							} 
-							else { 
-								throw new RuntimeException("shipment has errors " + shipmentItem.errors)
-							}
-						}*/
+						flow.shipmentInstance.save();
+
 					}
 				}
 				else { 
 					invalid();
 				}
-				/*
-				def container = params.container.id == -1 ? null : Container.get(params.container.id);
+
 				
-				if (item) {
-					log.info "move item " + item + " from " + item?.container + " to " + container
-					item.container = container;
-					item.save();
-				}
-				*/
 				valid()
 			}
 			

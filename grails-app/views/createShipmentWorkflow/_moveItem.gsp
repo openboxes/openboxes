@@ -1,6 +1,6 @@
 <script type="text/javascript">
 	$(document).ready(function(){					
-		$("#dlgMoveItem").dialog({ autoOpen: true, modal: true, width: '600px', });	
+		$("#dlgMoveItem").dialog({ autoOpen: true, modal: true, width: '800px'});	
 	});			
 </script>
 
@@ -47,7 +47,7 @@
 					<tr class="prop">
 						<td valign="top" class="name"><label><g:message code="shipmentItem.container.label" default="To" /></label></td>                            
 						<td valign="top" class="value">
-							<div style="height: 150px; overflow: auto;">
+							<div style="height: 350px; overflow: auto;">
 								<g:set var="count" value="${1 }"/>
 								<table>
 									<tr class="${count++ % 2 ? 'odd':'even' }">
