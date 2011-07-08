@@ -491,6 +491,7 @@ class CreateShipmentWorkflowController {
 					flow.itemInstance = shipmentItem;
 					
 					// Validate shipment item
+					shipmentItem.shipment = flow.shipmentInstance;
 					if (shipmentService.validateShipmentItem(shipmentItem)) {
 						log.info ("saving new shipment item")
 						// Need to validate shipment item before adding it to the shipment
@@ -526,6 +527,7 @@ class CreateShipmentWorkflowController {
 					flow.itemInstance = shipmentItem;
 					
 					// Validate shipment item
+					shipmentItem.shipment = flow.shipmentInstance;
 					if (shipmentService.validateShipmentItem(shipmentItem)) {
 						if (!shipmentItem.id) { 
 							log.info ("saving new shipment item")

@@ -293,6 +293,8 @@ class ShipmentService {
 	 * Saves an item
 	 */
 	void addToShipmentItems(ShipmentItem shipmentItem, Shipment shipment) {
+		// Need to set the shipment here for validation purposes
+		shipmentItem.shipment = shipment;
 		if (validateShipmentItem(shipmentItem)) { 
 			shipment.addToShipmentItems(shipmentItem);
 			shipment.save()			
@@ -306,12 +308,9 @@ class ShipmentService {
 	 * @return
 	 */
 	boolean validateShipmentItem(def shipmentItem) { 
-		
-		//if(shipmentItem.hasErrors() || !shipmentItem.validate()) {
-		//	return false
-		//}
-
-		def onHandQuantity = quantityService.getQuantity(shipmentItem.product, shipmentItem.lotNumber)
+		def warehouse = Warehouse.get(shipmentItem?.shipment?.origin?.id);
+		log.info("validating shipment item at " + warehouse?.name )
+		def onHandQuantity = quantityService.getQuantity(warehouse, shipmentItem.product, shipmentItem.lotNumber)
 		if (shipmentItem.quantity > onHandQuantity) { 
 			throw new ShipmentItemException(message: "shipmentItem.cannotExceedOnHandQuantity", shipmentItem: shipmentItem)
 		}

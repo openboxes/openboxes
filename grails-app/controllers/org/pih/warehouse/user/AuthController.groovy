@@ -124,7 +124,7 @@ class AuthController {
 					// PIMS-782 Force the user to select a warehouse each time
 					if (userInstance?.warehouse) { 
 						session.warehouse = userInstance.warehouse
-						quantityService.warehouse = userInstance.warehouse
+						//quantityService.warehouse = userInstance.warehouse
 					}
 					
 					if (params?.targetUri) {

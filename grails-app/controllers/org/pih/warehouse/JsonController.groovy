@@ -44,17 +44,18 @@ class JsonController {
 	
 	def searchInventoryItems = {
 		log.info params
+		def inventoryItems = []
 		def warehouse = Warehouse.get(session.warehouse.id);
-		def items = new TreeSet();
 		if (params.term) {
 			
 			// Improved the performance of the auto-suggest by moving 
-			items = inventoryService.searchInventoryItems(params.term, params.productId)
+			def tempItems = inventoryService.searchInventoryItems(params.term, params.productId)
 			
 			// Get a map of quantities for all items in inventory
 			def quantitiesByInventoryItem = inventoryService.getQuantityForInventory(warehouse?.inventory)
 			
-			if (items) {
+			if (tempItems) {
+				/*
 				items = items.collect() {
 					def quantity = quantitiesByInventoryItem[it]
 					quantity = (quantity) ?: 0
@@ -70,10 +71,28 @@ class JsonController {
 						quantity: quantity,
 						expirationDate: it.expirationDate
 					]
+				}*/
+				tempItems.each { 
+					def quantity = quantitiesByInventoryItem[it]
+					quantity = (quantity) ?: 0
+					if (quantity > 0) { 
+						inventoryItems << [
+							id: it.id,
+							value: it.lotNumber,
+							label:  it.product.name + " --- Item: " + it.lotNumber + " --- Qty: " + quantity + " --- ",
+							valueText: it.lotNumber,
+							lotNumber: it.lotNumber,
+							product: it.product.id,
+							productId: it.product.id,
+							productName: it.product.name,
+							quantity: quantity,
+							expirationDate: it.expirationDate
+						]
+					}					
 				}
 			}
 		}
-		render items as JSON;
+		render inventoryItems as JSON;
 	}
 	
 	

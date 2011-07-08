@@ -29,13 +29,13 @@ class QuantityService {
 
 	// Indicates that the service is session-scoped (it stores state) and proxied (so it can be used injected/used by 
 	// prototype-scoped objects like taglibs).
-	static scope = "session"
-	static proxy = true
+	//static scope = "session"
+	//static proxy = true
 	
-	Warehouse warehouse
+	//Warehouse warehouse
 	InventoryService inventoryService
 	
-	Integer getQuantity(Product product, String lotNumber) { 
+	Integer getQuantity(Warehouse warehouse, Product product, String lotNumber) { 
 		log.info ("Get quantity for product " + product?.name + " lotNumber " + lotNumber + " at location " + warehouse?.name)
 		if (!warehouse) { 
 			throw new RuntimeException("Your warehouse has not been initialized");

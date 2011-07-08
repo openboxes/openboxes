@@ -8,7 +8,7 @@ import org.pih.warehouse.inventory.Warehouse;
 
 class DashboardController {
 
-	def quantityService;
+	//def quantityService;
 	def shipmentService;
 	
     def index = {
@@ -44,7 +44,7 @@ class DashboardController {
 			session.warehouse = warehouse;
 			
 			// Initialize the quantity service
-			quantityService.warehouse = warehouse
+			//quantityService.warehouse = warehouse
 						
 			// Save the warehouse selection for "last logged into" information
 			if (session.user) { 
@@ -66,8 +66,6 @@ class DashboardController {
 		}
 		else {	
 			List warehouses = Warehouse.findAllWhere("active":true)
-			
-			
 			render(view: "chooseWarehouse", model: [warehouses: warehouses])
 		}
 		
