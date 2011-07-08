@@ -34,6 +34,10 @@ button {
 	height: 2em;
 }
 
+/* Added to fix an issue with being able to select actions from the action menu at the bottom of pages */
+.body { 
+	margin-bottom: 200px;
+}
 
 .debit { 
 	color: red; 
@@ -129,7 +133,10 @@ h3.ui-state-active { background-color: #f7f7f7; }  /* #F8F7EF */
 	/*margin-right: 5px;*/
 	/*padding: 0px 0 10px 0;*/
 	
+	
 }
+
+
 body { 
 	text-align: left; 
 	margin:1px; 
@@ -498,6 +505,7 @@ ul.treeList li ul li {
    vertical-align: middle;
    border-top: 1px solid #aaa;
    bottom: 0px;
+   margin-top: 150px;
    padding-top: 5px;
    width:100%;
    text-align: center;

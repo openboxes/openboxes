@@ -36,6 +36,7 @@ class QuantityService {
 	InventoryService inventoryService
 	
 	Integer getQuantity(Product product, String lotNumber) { 
+		log.info ("Get quantity for product " + product?.name + " lotNumber " + lotNumber + " at location " + warehouse?.name)
 		if (!warehouse) { 
 			throw new RuntimeException("Your warehouse has not been initialized");
 		}
