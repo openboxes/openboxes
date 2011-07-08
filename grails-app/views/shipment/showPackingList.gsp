@@ -36,6 +36,22 @@
 								</tr>				
 								
 								<g:set var="counter" value="${0 }"/>
+								<g:findAll var="item" in="${shipmentInstance?.shipmentItems}" expr="${!it.container}" status="itemStatus">
+									<tr class="${(counter++ % 2) == 0 ? 'odd' : 'even'}">
+										<td width="10%">
+											<b>Unpacked items</b>
+										</td>																
+										<td width="10%">
+										</td>
+										<td width="10%">
+											
+										</td>
+										<td width="20%">${item?.product.name} (${item?.quantity})</td>
+										<td width="10%">${item?.lotNumber}</td>
+									</tr>																			
+								</g:findAll>	
+								
+								
 								<g:each var="container" in="${shipmentInstance.containers}" status="containerStatus">
 									<g:if test="${!container.shipmentItems}">
 										<tr class="${(counter++ % 2) == 0 ? 'odd' : 'even'}">
@@ -51,7 +67,9 @@
 												</g:else>
 											</td>
 											<td width="10%">
-												${container?.weight} ${container?.weightUnits}
+												<g:if test="${container?.weight }">
+													${container?.weight} ${container?.weightUnits}
+												</g:if>
 											</td>
 											<td width="20%">(empty)</td>
 											<td width="10%">&nbsp;</td>
@@ -69,7 +87,9 @@
 												<g:else>&nbsp;</g:else>
 											</td>
 											<td width="10%">
-												${container?.weight} ${container?.weightUnits}
+												<g:if test="${container?.weight }">
+													${container?.weight} ${container?.weightUnits}
+												</g:if>
 											</td>
 											<td width="20%">${item?.product.name} (${item?.quantity})</td>
 											<td width="10%">${item?.lotNumber}</td>
@@ -90,7 +110,9 @@
 													</g:else>
 												</td>
 												<td width="10%">
-													${innerContainer?.weight} ${innerContainer?.weightUnits}
+													<g:if test="${innerContainer?.weight }">
+														${innerContainer?.weight} ${innerContainer?.weightUnits}
+													</g:if>
 												</td>
 												<td width="20%">(empty)</td>
 												<td width="10%">&nbsp;</td>
@@ -108,7 +130,9 @@
 													<g:else>&nbsp;</g:else>
 												</td>
 												<td width="10%">
-													${innerContainer?.weight} ${innerContainer?.weightUnits}
+													<g:if test="${innerContainer?.weight }">
+														${innerContainer?.weight} ${innerContainer?.weightUnits}
+													</g:if>
 												</td>
 												<td width="20%">${innerItem?.product.name} (${innerItem?.quantity})</td>
 												<td width="10%">${innerItem?.lotNumber}</td>
