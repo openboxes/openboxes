@@ -66,7 +66,7 @@
 							<tr>
 								<td></td>
 								<td style="text-align: left;">
-									<button id="btnAddToCart-${itemInstance?.id}" class="action-btn">
+									<button>
 										<img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}"/> Adjust stock
 									</button>
 								</td>

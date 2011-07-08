@@ -63,7 +63,7 @@
 					<tr>
 						<td></td>
 						<td style="text-align: left;">								
-							<button type="submit" name="addItem" class="right">
+							<button type="submit" name="addItem">
 								<img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}"/> Save
 							</button>
 						</td>
