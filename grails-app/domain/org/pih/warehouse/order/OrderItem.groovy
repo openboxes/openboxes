@@ -65,20 +65,25 @@ class OrderItem implements Serializable {
 	
 	def shipmentItems() {
 		def shipmentItems = []
-		try { 
-			shipmentItems = orderShipments.collect{ ShipmentItem.get(it?.shipmentItem?.id) } 
-		} catch (Exception e) { 
-			log.error "Error getting shipment items", e 
+		shipmentItems = orderShipments.collect{ 
+			try { 
+				ShipmentItem.get(it?.shipmentItem?.id) 
+			} catch (Exception e) {
+				log.error "Error getting shipment items", e
+			}	
 		} 
 		return shipmentItems;
 	}
 	
 	def shipments() { 
 		def shipments = []
-		try { 
-			shipments = orderShipments.collect { Shipment.get(it?.shipmentItem?.shipment?.id) } 
-		} catch (Exception e) { 
-			log.error "Error getting shipment", e 
+		
+		shipments = orderShipments.collect { 
+			try { 
+				Shipment.get(it?.shipmentItem?.shipment?.id) 
+			} catch (Exception e) { 
+				log.error "Error getting shipment", e 
+			} 
 		} 
 		return shipments;
 	}

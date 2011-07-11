@@ -25,7 +25,7 @@ class ReceiptItem implements Serializable {
 	static belongsTo = [ receipt : Receipt ]
 	static constraints = {
 		product(nullable:false)
-		lotNumber(nullable:true, unique:['product'], maxSize: 255)
+		lotNumber(nullable:true, maxSize: 255)
 		expirationDate(nullable:true)
 		quantityShipped(range: 0..2147483646, nullable:false)
 		quantityReceived(range: 0..2147483646, nullable:false)		
