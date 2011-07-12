@@ -156,17 +156,6 @@ class PurchaseOrderWorkflowController {
 						return success()
 					} 
 					
-					/*
-					if(!order.hasErrors() && order.save(flush:true)) {
-						log.info "success"
-						return success();
-					}
-					else {
-						order.errors.allErrors.each { println it; }
-						log.info "errors"
-						return error()
-					}
-					*/
 				} catch (DataIntegrityViolationException e) {
 					log.info ("data integrity exception")
 					return error();

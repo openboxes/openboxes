@@ -84,6 +84,8 @@ class OrderService {
 		
 		orderCommand?.shipment = shipmentInstance
 		orderCommand?.orderItems.each { orderItemCommand ->
+			
+			// Ignores any null order items and makes sure that the order item has a product and quantity
 			if (orderItemCommand && orderItemCommand.productReceived && orderItemCommand?.quantityReceived) {
 				def shipmentItem = new ShipmentItem();
 				shipmentItem.lotNumber = orderItemCommand.lotNumber
@@ -119,7 +121,10 @@ class OrderService {
 			// Receive shipment
 			log.info "Receiving shipment " + shipmentInstance?.name
 			Receipt receiptInstance = shipmentService.createReceipt(shipmentInstance, orderCommand?.deliveredOn)
-			if (!receiptInstance.hasErrors() && receiptInstance.save(flush:true)) { 
+			
+			// FIXME 
+			// receiptInstance.validate() && !receiptInstance.hasErrors()
+			if (!receiptInstance.hasErrors() && receiptInstance.save()) { 
 				shipmentService.receiveShipment(shipmentInstance, "", orderCommand?.currentUser, orderCommand?.currentLocation);
 			}
 			else { 

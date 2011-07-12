@@ -262,7 +262,7 @@ class ShipmentService {
 	 * Saves a shipment
 	 */
 	void saveShipment(Shipment shipment) {
-		shipment.save(flush:true)
+		shipment.save()
 	}
 	
 	/**
@@ -273,7 +273,7 @@ class ShipmentService {
 		if (!container.recipient) { 
 			container.recipient = container.shipment.recipient;
 		}*/
-		container.save(flush:true)
+		container.save()
 	}
 	
 	/**
@@ -284,7 +284,7 @@ class ShipmentService {
 		if (!item.recipient) { 
 			item.recipient = (item?.container?.recipient)?:(item?.shipment?.recipient);
 		}*/
-		item.save(flush:true)
+		item.save()
 	}
 	
 	
@@ -333,7 +333,7 @@ class ShipmentService {
 		
 		// remove all items in the container from the parent shipment
 		container.getShipmentItems().each { 
-			container.shipment.removeFromShipmentItems(it).save(flush:true) 
+			container.shipment.removeFromShipmentItems(it).save() 
 		}
 		
 		// NOTE: I'm using the standard "remove" set method here instead of the removeFrom Grails
@@ -346,7 +346,7 @@ class ShipmentService {
 		// remove the container itself from the parent shipment
 		container.shipment.containers.remove(container)
 		
-		container.shipment.save(flush:true)
+		container.shipment.save()
 	}
 	
 	/**
@@ -597,7 +597,7 @@ class ShipmentService {
 			}
 			
 			
-			if (!shipmentInstance.receipt.hasErrors() && shipmentInstance.receipt.save(flush: true)) {
+			if (!shipmentInstance.receipt.hasErrors() && shipmentInstance.receipt.save()) {
 				
 				// Add comment to shipment (as long as there's an actual comment
 				// after trimming off the extra spaces)
@@ -609,7 +609,7 @@ class ShipmentService {
 				createShipmentEvent(shipmentInstance, shipmentInstance.receipt.actualDeliveryDate, EventCode.RECEIVED, location);
 												
 				// Save updated shipment instance
-				shipmentInstance.save(flush:true);
+				shipmentInstance.save();
 			
 				// only need to create a transaction if the destination is a warehouse
 				if (shipmentInstance.destination?.isWarehouse()) {
@@ -656,7 +656,7 @@ class ShipmentService {
 					
 					// TODO: had to comment out these flash.message because they were throwing a no-such
 					// property exception; can you use "flash" within a service method?
-					if (!creditTransaction.hasErrors() && creditTransaction.save(flush:true)) { 
+					if (!creditTransaction.hasErrors() && creditTransaction.save()) { 
 						// saved successfully
 						//flash.message = "Transaction was created successfully"
 					}

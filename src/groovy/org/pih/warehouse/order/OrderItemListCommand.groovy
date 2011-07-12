@@ -23,22 +23,21 @@ class OrderItemListCommand implements Serializable {
 		orderItems(validator: { val, obj, errors ->
 			def errorsFound = false;
 			val.each{ orderItem ->
-				// If the quantity received is not null and the item does not validate, reject the 
-				if(orderItem.quantityReceived && !orderItem?.validate()) {
-					orderItem.errors.allErrors.each { error ->
-						println(">>>>>>>>>>>>> ERROR " + error.getCode() + " ")
-						obj.errors.rejectValue("orderItems", error.getField() + "." + error.getCode())
-						
+				
+				// Ignore a null order item
+				if (orderItem) { 
+					// If the quantity received is not null and the item does not validate, reject the 
+					if(orderItem?.quantityReceived && !orderItem?.validate()) {
+						orderItem.errors.allErrors.each { error ->
+							println(">>>>>>>>>>>>> ERROR " + error.getCode() + " ")
+							obj.errors.rejectValue("orderItems", error.getField() + "." + error.getCode())
+							
+						}
 					}
 				}
 				return errorsFound;
 			}
 		});		
-		/*
-		orderItems( validator: { orderItems ->
-			orderItems.every { it.validate() }
-		})
-		*/
 	}	
 }
 

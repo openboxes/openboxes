@@ -47,13 +47,19 @@ class OrderItem implements Serializable {
 	}
 
 	Integer quantityFulfilled() { 
+		def quantity = 0;
 		try { 
 			def shipmentItems = shipmentItems()
-			return shipmentItems ? shipmentItems.sum { it?.quantity } : 0 
-			//return orderShipments ? orderShipments.sum { it?.shipmentItem?.quantity } : 0
-		} catch (Exception e) { log.error "Error calculating quantity fulfilled", e }
-		return 0;
+			quantity = shipmentItems?.sum { it?.quantity }
+		} 
+		catch (Exception e) { log.error "Error calculating quantity fulfilled: " + e.message }
+		return quantity ?: 0;
 	}
+	
+	Integer quantityRemaining() { 
+		return quantity - quantityFulfilled();
+	}
+	
 	
 	Boolean isComplete() { 
 		return quantityFulfilled() >= quantity;
@@ -63,26 +69,43 @@ class OrderItem implements Serializable {
 		return !isComplete()
 	}
 	
+	/**
+	 * Gets all shipment items related to this order item 
+	 * (ignoring any orphaned shipment item references)
+	 * 
+	 * @return
+	 */
 	def shipmentItems() {
 		def shipmentItems = []
-		shipmentItems = orderShipments.collect{ 
+		orderShipments?.each { 
 			try { 
-				ShipmentItem.get(it?.shipmentItem?.id) 
+				def shipmentItem = ShipmentItem.get(it?.shipmentItem?.id) 
+				if (shipmentItem) { 
+					shipmentItems << shipmentItem;
+				}
 			} catch (Exception e) {
-				log.error "Error getting shipment items", e
+				log.error "Error getting shipment items: " + e.message
 			}	
 		} 
 		return shipmentItems;
 	}
 	
+	/**
+	 * Gets all shipments related to this order item 
+	 * (ignoring any orphaned shipment item references)
+	 * 
+	 * @return
+	 */
 	def shipments() { 
 		def shipments = []
-		
-		shipments = orderShipments.collect { 
+		orderShipments.each { 
 			try { 
-				Shipment.get(it?.shipmentItem?.shipment?.id) 
+				def shipment = Shipment.get(it?.shipmentItem?.shipment?.id) 
+				if (shipment) { 
+					shipments << shipment
+				}
 			} catch (Exception e) { 
-				log.error "Error getting shipment", e 
+				log.error "Error getting shipment: " + e.message
 			} 
 		} 
 		return shipments;

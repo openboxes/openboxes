@@ -90,7 +90,9 @@
 																<g:if test="${orderItem?.primary }">${orderItem?.quantityOrdered}</g:if>
 															</td>
 															<td class="center">
-																<g:if test="${orderItem?.primary }">${orderItem?.quantityOrdered - orderItem?.orderItem?.quantityFulfilled()}</g:if>
+																<g:if test="${orderItem?.primary }">
+																	${orderItem?.quantityOrdered - orderItem?.orderItem?.quantityFulfilled()}
+																</g:if>
 															</td>
 															<td class="center" style="border-left: 1px solid lightgrey;">
 																
