@@ -17,7 +17,7 @@ class Order implements Serializable {
 	Location origin			// the vendor
 	Location destination 	// the customer location 
 	Person recipient
-	User orderedBy
+	Person orderedBy
 	Date dateOrdered
 	
 	
