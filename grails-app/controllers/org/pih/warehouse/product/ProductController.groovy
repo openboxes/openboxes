@@ -242,7 +242,7 @@ class ProductController {
 	            productInstance.delete(flush: true)
 	            
 	            flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
-	            redirect(controller: "inventoryItem", action: "browse")
+	            redirect(controller: "product", action: "list")
 		      }
 		      catch (org.springframework.dao.DataIntegrityViolationException e) {
 	            flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
