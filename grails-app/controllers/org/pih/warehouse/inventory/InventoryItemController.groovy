@@ -171,8 +171,9 @@ class InventoryItemController {
 		//chain(action: "recordInventory", model: [commandInstance:cmd])
 		def warehouseInstance = Warehouse.get(session?.warehouse?.id)
 		def productInstance = cmd.product;
-		def transactionEntryList = TransactionEntry.findAllByProduct(productInstance);
-		def totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[productInstance] ?: 0
+		//def transactionEntryList = TransactionEntry.findAllByProduct(productInstance);
+		//def totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[productInstance] ?: 0
+		def totalQuantity = 0;
 		def inventoryInstance = warehouseInstance?.inventory;
 		def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, inventoryInstance);
 		
