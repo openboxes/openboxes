@@ -10,6 +10,10 @@ class TransactionEntry implements Comparable, Serializable {
 	
     static belongsTo = [ transaction : Transaction ]
 
+	static mapping = { 
+		cache true
+	}
+	
     static constraints = {		
 		inventoryItem(nullable:false)		
 		quantity(nullable:false, range: 0..2147483646)

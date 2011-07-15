@@ -50,7 +50,9 @@ class Product implements Comparable, Serializable {
 	static transients = ["rootCategory"];
 	
 	static hasMany = [ categories : Category, attributes : ProductAttribute, tags : String ]
+	
 	static mapping = {
+		cache true
 		categories joinTable: [name:'product_category', column: 'category_id', key: 'product_id']
 	}
 		

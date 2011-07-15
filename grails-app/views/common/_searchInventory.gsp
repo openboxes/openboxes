@@ -7,8 +7,7 @@
 				<div>
 			        <g:set var="productMap" value="${commandInstance?.productList.groupBy {it.category} }"/>
 					<span class="fade">
-						Showing ${commandInstance?.productList?.size() } product(s) in 						
-						${productMap?.keySet()?.size()} categories
+						Showing ${commandInstance?.productList?.size() } product(s) in ${productMap?.keySet()?.size()} categories
 							
 							
 							<%-- 

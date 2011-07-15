@@ -25,44 +25,61 @@
 
 			<div class="dialog" style="min-height: 880px">
 			
-				<!-- Action menu -->
-				<div>
-					<span class="action-menu">
-						<button class="action-btn">
-							<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle;"/>
-							<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
-						</button>
-						<div class="actions">
-							<g:render template="showStockCardMenuItems" model="[commandInstance: commandInstance]"/>																				
-						</div>
-					</span>				
-				</div>			
-			
-			
-				<!-- Content -->
-				<table>				
-					<tr>
-					
-						<!--  Product Details -->
-						<td style="width: 250px;">
-							<g:render template="productDetails" 
-								model="[productInstance:commandInstance?.productInstance, inventoryInstance:commandInstance?.inventoryInstance, 
-									inventoryLevelInstance: commandInstance?.inventoryLevelInstance, totalQuantity: commandInstance?.totalQuantity]"/>
-						</td>
-						
-						<!--  Current Stock and Transaction Log -->
-						<td>
-							<g:render template="showCurrentStock"/>
-							<br/>
-							<g:render template="showTransactionLog"/>
+				<fieldset>
+				
+					<div>
+						<table>
+							<tbody>			
+								<tr>
+									<td style="width: 50px; vertical-align: middle;">
+										<div class="fade" style="font-size: 0.9em;">
+											<!-- Action menu -->
+											<span class="action-menu">
+												<button class="action-btn">
+													<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle;"/>
+													<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
+												</button>
+												<div class="actions">
+													<g:render template="showStockCardMenuItems" model="[commandInstance: commandInstance]"/>																				
+												</div>
+											</span>				
+										</div>			
+									</td>
+									<td style="vertical-align: middle;">
+										<h1>${commandInstance?.productInstance?.name}</h1>
+									
+									</td>
+								</tr>
+							</tbody>
+						</table>
+				
+						<!-- Content -->
+						<table>				
+							<tr>
 							
-						</td>
-					</tr>
-				</table>
+								<!--  Product Details -->
+								<td style="width: 250px;">
+									<g:render template="productDetails" 
+										model="[productInstance:commandInstance?.productInstance, inventoryInstance:commandInstance?.inventoryInstance, 
+											inventoryLevelInstance: commandInstance?.inventoryLevelInstance, totalQuantity: commandInstance?.totalQuantity]"/>
+								</td>
+								
+								<!--  Current Stock and Transaction Log -->
+								<td>
+									<g:render template="showCurrentStock"/>
+									<br/>
+									<g:render template="showTransactionLog"/>
+									
+								</td>
+							</tr>
+						</table>
+					</div>
+				</fieldset>
 			</div>
 			<div id="transaction-details" style="height: 200px; overflow: auto;">
 				<!-- will be populated by an jquery ajax call -->
 			</div>
+			
 		</div>
 		
 		<script>

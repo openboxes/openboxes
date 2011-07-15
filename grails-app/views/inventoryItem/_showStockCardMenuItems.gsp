@@ -1,9 +1,12 @@
 <div class="action-menu-item">				
 	<g:link controller="inventory" action="browse" fragment="inventory">
-		<img src="${resource(dir: 'images/icons/silk', file: 'arrow_left.png')}" style="vertical-align: middle;"/>&nbsp;
+		<img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" style="vertical-align: middle;"/>&nbsp;
 		Browse Inventory
 	</g:link>
 </div>	
+<div class="action-menu-item">
+	<hr/>
+</div>
 <div class="action-menu-item">					
 	<g:link controller="inventoryItem" action="recordInventory" params="['product.id':commandInstance?.productInstance?.id,'inventory.id':commandInstance?.inventoryInstance?.id]">
 		<img src="${resource(dir: 'images/icons/silk', file: 'book.png')}"/>&nbsp;

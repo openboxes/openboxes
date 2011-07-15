@@ -19,6 +19,10 @@ class Inventory implements java.io.Serializable {
     // Show use warehouse name
     String toString() { return "${warehouse.name}"; }
 
+	static mapping = { 
+		cache true
+	}
+	
     // Constraints
     static constraints = {
 		warehouse(nullable:false)

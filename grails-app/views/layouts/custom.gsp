@@ -24,17 +24,11 @@
 
 	<!-- Include jQuery UI files -->
 	<g:javascript library="jquery" plugin="jquery" />
-	<%--<jqui:resources theme="smoothness" /> --%> 
+	<jqui:resources />
+	<%--<jqui:resources theme="smoothness" />  
 	<link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
 	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-ui-1.8.7.js')}" type="text/javascript" ></script>
-	<%-- <script src="${createLinkTo(dir:'js/jquery-ui-1.9m3/ui/minified', file:'jquery-ui.min.js')}" type="text/javascript" ></script>--%>
-
-	<!--		
-	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-1.5.1.min.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-ui-1.8.13.custom.min.js')}" type="text/javascript" ></script>
-	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui-1.8.13.custom.css')}" type="text/css" media="screen, projection" />
-	-->
-	
+	--%>
 	<!-- Include other plugins -->
 	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.cookies.2.2.0.min.js')}" type="text/javascript" ></script>
@@ -65,26 +59,17 @@
 	<!-- Grails Layout : write head element for page-->
 	<g:layoutHead />
 	
-	<%--  
-	<script>
-		$(document).ready(function() {
-	  		$('table.dataTable tr').hover(function() {
-				//$(this).css('background-color', '#FFFF99');
-				$(this).contents('td').css({'border': '1px solid red', 'border-left': 'none', 'border-right': 'none'});
-				$(this).contents('td:first').css('border-left', '1px solid red');
-				$(this).contents('td:last').css('border-right', '1px solid red');
-			},
-			function() {
-				//$(this).css('background-color', '#FFFFFF');
-				$(this).contents('td').css('border', 'none');
-			});
-		});
-	</script>
-	--%>
 	<g:if test="${session?.warehouse?.fgColor && session?.warehouse?.bgColor }">
 		<style>
-			#hd { background-color: #${session.warehouse.bgColor}; color: #${session.warehouse.fgColor}; } 
-			#hd a { color: #${session.warehouse.fgColor}; }  	
+			#hd {
+				padding: 0px;
+				margin: 0px; 
+				background-color: #${session.warehouse.bgColor}; 
+				color: #${session.warehouse.fgColor}; 
+			} 
+			#hd a { 
+				color: #${session.warehouse.fgColor}; 
+			}  	
 		</style>
 	</g:if>		
 	
@@ -319,114 +304,104 @@
 						<span>Spanish</span>					
 					</g:else>
 
-<!--  
-
-					<img src="${createLinkTo(dir: 'images/flags', file: 'do.png') }" style="vertical-align: middle;">
-					<g:if test="${org.springframework.context.i18n.LocaleContextHolder.locale != 'do'}">			
-						<a href="${createLink(controller: 'dashboard', action: 'index', params: ['lang':'do'])}">Spanish (Dominican Republic)</a> &nbsp;
-					</g:if>
-					<g:else>
-						<span>French (Rwanda)</span>					
-					</g:else>
--->
 				</div>
 			</div>
 		</div>
 	</div>
 	
-<script type="text/javascript">
-	$(function() { 
-
-		function show() {
-			//$(this).children(".actions").show();
-		}
-		
-		function hide() { 
-			$(this).children(".actions").hide();
-		}
-		
-		$(".action-menu").hoverIntent({
-			sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
-			interval: 5,   // number = milliseconds for onMouseOver polling interval
-			over: show,     // function = onMouseOver callback (required)
-			timeout: 100,   // number = milliseconds delay before onMouseOut
-			out: hide       // function = onMouseOut callback (required)
-		});  
-		
-		// Create an action button that toggles the action menu on click
-		//button({ text: false, icons: {primary:'ui-icon-gear',secondary:'ui-icon-triangle-1-s'} }).
-		$(".action-btn").click(function(event) {
-			$(this).parent().children(".actions").toggle();
-			event.preventDefault();
-		});
-
-		
-		var accordion = 
-			$('#leftnav-accordion-menu').accordion({
-				active: true, 
-				navigation: true, 
-				autoHeight: false, 
-				//alwaysOpen: true,
-				//clearStyle: false, 
-				//collapsible: false,
-				//fillSpace: true,
-				event: "click"  
-			});
-		
-		/*
-		$('.accordion h6').click(function() {
-			$(this).next().toggle();
-			return false;
-		}).next().hide();
-		*/
-		<g:if test="${request.request.requestURL.toString().contains('category')}">
-			accordion.accordion( "activate" , 4 );
-		</g:if>
-		<g:elseif test="${request.request.requestURL.toString().contains('attribute')}">
-			accordion.accordion( "activate" , 4 );
-		</g:elseif>
-		<g:elseif test="${request.request.requestURL.toString().contains('product/batchEdit')}">
-			accordion.accordion( "activate" , 4 );
-		</g:elseif>
-		<g:elseif test="${request.request.requestURL.toString().contains('person')}">
-			accordion.accordion( "activate" , 4 );
-		</g:elseif>
-		<g:elseif test="${request.request.requestURL.toString().contains('user')}">
-			accordion.accordion( "activate" , 4 );
-		</g:elseif>
-		<g:elseif test="${request.request.requestURL.toString().contains('location')}">
-			accordion.accordion( "activate" , 4 );
-		</g:elseif>
-		<g:elseif test="${request.request.requestURL.toString().contains('warehouse/warehouse')}">
-			accordion.accordion( "activate" , 4 );
-		</g:elseif>
-		<g:elseif test="${request.request.requestURL.toString().contains('listReceiving')}">
-			accordion.accordion( "activate" , 3 );
-		</g:elseif>
-		<g:elseif test="${request.request.requestURL.toString().contains('shipment')}">
-			accordion.accordion( "activate" , 2 );
-		</g:elseif>
-		<g:elseif test="${request.request.requestURL.toString().contains('createShipmentWorkflow')}">
-			accordion.accordion( "activate" , 2 );
-		</g:elseif>
-		<g:elseif test="${request.request.requestURL.toString().contains('purchaseOrderWorkflow')}">
-			accordion.accordion( "activate" , 1 );
-		</g:elseif>
-		<g:elseif test="${request.request.requestURL.toString().contains('order')}">
-			accordion.accordion( "activate" , 1 );
-		</g:elseif>
-		<g:elseif test="${request.request.requestURL.toString().contains('inventory')}">
-			accordion.accordion( "activate" , 0 );
-		</g:elseif>
-		<g:elseif test="${request.request.requestURL.toString().contains('product')}">
-			accordion.accordion( "activate" , 0 );
-		</g:elseif>
+	<script type="text/javascript">
+		$(function() { 
 	
-		$('.goto').click(function(){
-			var li = $(this).parent().closest(".menu-section");
-		});	
-	});
-</script>
+			function show() {
+				//$(this).children(".actions").show();
+			}
+			
+			function hide() { 
+				$(this).children(".actions").hide();
+			}
+			
+			$(".action-menu").hoverIntent({
+				sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
+				interval: 5,   // number = milliseconds for onMouseOver polling interval
+				over: show,     // function = onMouseOver callback (required)
+				timeout: 100,   // number = milliseconds delay before onMouseOut
+				out: hide       // function = onMouseOut callback (required)
+			});  
+			
+			// Create an action button that toggles the action menu on click
+			//button({ text: false, icons: {primary:'ui-icon-gear',secondary:'ui-icon-triangle-1-s'} }).
+			$(".action-btn").click(function(event) {
+				$(this).parent().children(".actions").toggle();
+				event.preventDefault();
+			});
+	
+			
+			var accordion = 
+				$('#leftnav-accordion-menu').accordion({
+					active: true, 
+					navigation: true, 
+					autoHeight: false, 
+					//alwaysOpen: true,
+					//clearStyle: false, 
+					//collapsible: false,
+					//fillSpace: true,
+					event: "click"  
+				});
+			
+			/*
+			$('.accordion h6').click(function() {
+				$(this).next().toggle();
+				return false;
+			}).next().hide();
+			*/
+			<g:if test="${request.request.requestURL.toString().contains('category')}">
+				accordion.accordion( "activate" , 4 );
+			</g:if>
+			<g:elseif test="${request.request.requestURL.toString().contains('attribute')}">
+				accordion.accordion( "activate" , 4 );
+			</g:elseif>
+			<g:elseif test="${request.request.requestURL.toString().contains('product/batchEdit')}">
+				accordion.accordion( "activate" , 4 );
+			</g:elseif>
+			<g:elseif test="${request.request.requestURL.toString().contains('person')}">
+				accordion.accordion( "activate" , 4 );
+			</g:elseif>
+			<g:elseif test="${request.request.requestURL.toString().contains('user')}">
+				accordion.accordion( "activate" , 4 );
+			</g:elseif>
+			<g:elseif test="${request.request.requestURL.toString().contains('location')}">
+				accordion.accordion( "activate" , 4 );
+			</g:elseif>
+			<g:elseif test="${request.request.requestURL.toString().contains('warehouse/warehouse')}">
+				accordion.accordion( "activate" , 4 );
+			</g:elseif>
+			<g:elseif test="${request.request.requestURL.toString().contains('listReceiving')}">
+				accordion.accordion( "activate" , 3 );
+			</g:elseif>
+			<g:elseif test="${request.request.requestURL.toString().contains('shipment')}">
+				accordion.accordion( "activate" , 2 );
+			</g:elseif>
+			<g:elseif test="${request.request.requestURL.toString().contains('createShipmentWorkflow')}">
+				accordion.accordion( "activate" , 2 );
+			</g:elseif>
+			<g:elseif test="${request.request.requestURL.toString().contains('purchaseOrderWorkflow')}">
+				accordion.accordion( "activate" , 1 );
+			</g:elseif>
+			<g:elseif test="${request.request.requestURL.toString().contains('order')}">
+				accordion.accordion( "activate" , 1 );
+			</g:elseif>
+			<g:elseif test="${request.request.requestURL.toString().contains('inventory')}">
+				accordion.accordion( "activate" , 0 );
+			</g:elseif>
+			<g:elseif test="${request.request.requestURL.toString().contains('product')}">
+				accordion.accordion( "activate" , 0 );
+			</g:elseif>
+		
+			$('.goto').click(function(){
+				var li = $(this).parent().closest(".menu-section");
+			});	
+		});
+	</script>
 	
 	
 </body>

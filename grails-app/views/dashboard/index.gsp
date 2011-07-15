@@ -119,8 +119,7 @@
 	    			</div>
 	    			<br clear="all"/>
 	    			
-				</div>								
-
+				</div>	
 <%-- 				
 
 				

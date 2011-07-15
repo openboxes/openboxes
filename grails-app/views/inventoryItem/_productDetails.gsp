@@ -1,6 +1,6 @@
 <div id="product-details">
-	<fieldset>
-		<legend class="fade">Product Details</legend>
+	
+		<h2 class="fade">Product Details</h2>
 		<table>
 			<tr class="details odd">	
 				<td class="left label">
@@ -119,9 +119,8 @@
 
 	
 		</table>
-	</fieldset>
-	<fieldset>
-		<legend class="fade">Product Status</legend>
+
+		<h2 class="fade">Product Status</h2>
 		<table>
 			<tr class="details odd">
 				<td class="label left">
@@ -166,13 +165,13 @@
 				<td>
 					<span class="value">
 						<g:if test="${totalQuantity <= 0}">
-							<span style="color: red">Stock out!!!!</span>
+							<span style="color: red">No stock</span>
 						</g:if>
 						<g:elseif test="${totalQuantity <= inventoryLevelInstance?.minQuantity}">
-							<span style="color: red">Low stock!!</span>
+							<span style="color: yellow">Low stock</span>
 						</g:elseif>
 						<g:elseif test="${totalQuantity <= inventoryLevelInstance?.reorderQuantity }">
-							<span style="color: orange;">Reorder Now!</span>
+							<span style="color: orange;">Reorder</span>
 						</g:elseif>
 						<g:else>
 							<span style="color: green;">In Stock</span>
@@ -227,7 +226,6 @@
 				</td>
 			</tr>				
 		</table>
-	</fieldset>
 </div>
 
 

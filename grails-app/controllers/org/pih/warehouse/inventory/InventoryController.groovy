@@ -45,7 +45,7 @@ class InventoryController {
 		}
 		
 		// Get a list of shipments 
-		cmd.shipmentList = shipmentService.getReceivingByDestinationAndStatus(cmd.warehouseInstance, ShipmentStatusCode.SHIPPED);
+		//cmd.shipmentList = shipmentService.getReceivingByDestinationAndStatus(cmd.warehouseInstance, ShipmentStatusCode.SHIPPED);
 
 		// If the user entered a search term, add it to the session-bound search terms
 		if (cmd.searchTerms) {

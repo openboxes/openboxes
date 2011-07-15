@@ -79,6 +79,34 @@ class ShipmentService {
 		return Shipment.list()
 	}
 	
+	Object getProductMap() { 
+		
+		def criteria = ShipmentItem.createCriteria();
+		/*
+		def products = criteria.list { 
+			projections {
+				property "product"
+			}
+		}
+		*/
+		
+		def quantityMap = criteria.list {
+			projections {
+				sum('quantity')
+			}
+			//gt("stars", 2)
+			//eq("city", city)
+			//eq("deleted", false)
+			groupProperty "product"
+		}
+		println quantityMap
+
+		
+		return quantityMap
+		
+	}
+	
+	
 	
 	List<Shipment> getRecentOutgoingShipments(Long locationId) { 		
 		Location location = Location.get(locationId);

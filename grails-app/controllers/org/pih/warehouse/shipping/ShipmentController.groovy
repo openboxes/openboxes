@@ -1,5 +1,6 @@
 package org.pih.warehouse.shipping;
 
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -8,6 +9,9 @@ import grails.converters.JSON
 import groovy.sql.Sql;
 import au.com.bytecode.opencsv.CSVWriter;
 
+import org.apache.commons.collections.FactoryUtils;
+import org.apache.commons.collections.list.LazyList;
+import org.codehaus.groovy.grails.validation.Validateable;
 import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Document;
 import org.pih.warehouse.core.Event;
@@ -16,6 +20,7 @@ import org.pih.warehouse.core.EventType;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.User;
+import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.Warehouse;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.receiving.Receipt;
@@ -1029,7 +1034,84 @@ class ShipmentController {
 		return person;
 	}
 	
+	
+	
+	
+	def addToShipment = { 
+		//log.info params
+		def ids = params?.productId
+		
+		log.info("params.productId " + ids.size())
+		
+		if (ids.size() > 1)
+			ids = ids.collect { Long.valueOf(it); } 
+		
+		def inventoryItems = [] 
+		if (ids) { 
+			log.info "ids: " + ids
+			inventoryItems = InventoryItem.findAll("from InventoryItem as i where i.product.id in (:ids)", [ids:ids])
+		}
+		
+		def commandInstance = new ItemListCommand();
+		if (inventoryItems) { 
+			inventoryItems.each { inventoryItem ->
+				def item = new ItemCommand();
+				item.inventoryItem = inventoryItem 
+				item.product = inventoryItem?.product
+				item.lotNumber = inventoryItem?.lotNumber
+				commandInstance.items << item;
+			}
+		}
+						
+		def warehouse = Warehouse.get(session.warehouse.id)
+		
+		log.info("Quantity for warehouse: " + warehouse.name + " [" + warehouse.inventory + "]")
+		def quantityMap = inventoryService.getQuantityForInventory(warehouse.inventory)
+		def shipments = shipmentService.getShipments()
+		
+		[quantityMap : quantityMap, shipments : shipments, commandInstance : commandInstance]
+	}
+	
+	
+	def addToShipmentPost = { ItemListCommand command -> 
+		log.info(params);
+		log.info("Command items " + command?.class?.name + " " + command?.items?.size());
+		def lastShipment = null;
+		command.items.each { 			
+			println "Adding item with lotNumber=" + it?.lotNumber + " product=" + it?.product?.name + " and  qty=" + it.quantity +
+				" to shipment=" + it?.shipment?.id
+			
+			def criteria = new ShipmentItem(shipment: it.shipment, product: it.product, lotNumber: it.lotNumber);
+			def shipmentItem = shipmentService.findShipmentItem(criteria)
+			if (it.quantity > 0) { 
+				if (shipmentItem) { 
+					log.info "Found existing shipment item ..." + shipmentItem.id
+				}
+				else {
+					log.info("Creating new shipment item ...");				
+					shipmentItem = new ShipmentItem(shipment: it.shipment, product: it.product, lotNumber: it.lotNumber, quantity: it.quantity);
+					it.shipment.addToShipmentItems(shipmentItem);
+					it.shipment.save();
+					//${message(code: 'default.not.found.message', args: [message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}	
+					flash.message = "Shipment item has been created for product ${shipmentItem?.product?.name}"
+					lastShipment = it.shipment
+				}
+			}			
+		}
+		if (lastShipment) { 
+			redirect(controller: "shipment", action: "showDetails", id: lastShipment?.id )
+			return;
+		}
+		
+		
+		
+		redirect(controller: "inventory", action: "browse")	
+		
+	}
+	
+	
 }
+
 
 
 

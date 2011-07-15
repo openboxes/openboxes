@@ -9,7 +9,7 @@
 			
 			#menu { display: none; } 
 			.page-title { display: none; } 
-			
+			td.warehouse { padding: 0px; } 
 			
 			.warehouse { border: 0px solid #F5F5F5; padding: 10px; display: block; } 			
 			
@@ -38,7 +38,7 @@
 							<tbody>						
 								<g:each var="warehouse" in="${warehouses}" status="i">								
 									<tr class="prop">
-										<td nowrap="nowrap">
+										<td class="warehouse" nowrap="nowrap">
 											<div id="warehouse-${warehouse.id }" class="warehouse">												
 												<g:if test="${warehouse.local}">
 													<a class="home" href='${createLink(action:"chooseWarehouse", id: warehouse.id)}' style="display: block;">

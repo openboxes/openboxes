@@ -23,7 +23,7 @@ class Warehouse extends Location {
 	
     // Association mapping
     static hasMany = [ employees: User ];
-
+	
     // Constraints
     static constraints = {
 	    manager(nullable:true)
