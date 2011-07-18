@@ -42,11 +42,11 @@
 									<g:link controller="inventoryItem" action="showStockCard" id="${item?.product?.id }" target="_blank">
 										${item?.product?.name }
 									</g:link>
-									<g:textField name="items[${i }].product.id" value="${item?.product?.id }"/>
+									<g:hiddenField name="items[${i }].product.id" value="${item?.product?.id }"/>
 								</td>
 								<td>
 									${item?.lotNumber }
-									<g:textField name="items[${i }].lotNumber" value="${item?.lotNumber }"/>
+									<g:hiddenField name="items[${i }].lotNumber" value="${item?.lotNumber }"/>
 								</td>
 								<td class="center">
 									${quantityMap[item.inventoryItem]?:'Not available' }

@@ -1038,20 +1038,18 @@ class ShipmentController {
 	
 	
 	def addToShipment = { 
-		//log.info params
-		def ids = params?.productId
 		
-		log.info("params.productId " + ids.size())
+		// Get product IDs and convert them to Long
+		def productIds = params.list('productId')		
+		productIds = productIds.collect { Long.valueOf(it); } 
 		
-		if (ids.size() > 1)
-			ids = ids.collect { Long.valueOf(it); } 
-		
+		// Find all inventory items that match the selected products
 		def inventoryItems = [] 
-		if (ids) { 
-			log.info "ids: " + ids
-			inventoryItems = InventoryItem.findAll("from InventoryItem as i where i.product.id in (:ids)", [ids:ids])
+		if (productIds) { 
+			inventoryItems = InventoryItem.findAll("from InventoryItem as i where i.product.id in (:ids)", [ids:productIds])
 		}
 		
+		// Create command objects for each item
 		def commandInstance = new ItemListCommand();
 		if (inventoryItems) { 
 			inventoryItems.each { inventoryItem ->

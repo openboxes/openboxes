@@ -20,10 +20,15 @@
 								<g:set var="productMap" value="${commandInstance?.productList.groupBy {it.category} }"/>
 								Showing ${commandInstance?.productList?.size() } product(s) in ${productMap?.keySet()?.size()} categories
 							</span>
+							|
+							<span>
+								<g:link action="clearAllFilters">Show all products</g:link>	
+							</span>
+							
 						</div>
 					</td>	
 										
-					<td style="text-align: right;">
+					<td style="text-align: right; padding: 0px; margin: 0px;">
 						<div id="searchTerms" style="margin: 5px;">
 							<%-- 
 							<g:form method="GET" controller="inventory" action="browse" style="display: inline;">

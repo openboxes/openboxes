@@ -54,13 +54,6 @@
 							</g:link>
 						</span>
 					</g:each>
-					<span class="filter">
-						<g:link action="clearAllFilters">
-							Remove all filters
-							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'delete.png' )}" style="vertical-align:middle"/>
-							
-						</g:link>	
-					</span>
 				</g:if>
 				<g:else>
 					<span class="fade">No filters</span>
