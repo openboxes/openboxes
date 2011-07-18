@@ -1048,24 +1048,29 @@ class ShipmentController {
 		if (productIds) { 
 			inventoryItems = InventoryItem.findAll("from InventoryItem as i where i.product.id in (:ids)", [ids:productIds])
 		}
-		
+
+		// Get quantities for all inventory items
+		def warehouse = Warehouse.get(session.warehouse.id)		
+		log.info("Quantity for warehouse: " + warehouse.name + " [" + warehouse.inventory + "]")
+		def quantityMap = inventoryService.getQuantityForInventory(warehouse.inventory)
+
+				
 		// Create command objects for each item
 		def commandInstance = new ItemListCommand();
 		if (inventoryItems) { 
 			inventoryItems.each { inventoryItem ->
-				def item = new ItemCommand();
-				item.inventoryItem = inventoryItem 
-				item.product = inventoryItem?.product
-				item.lotNumber = inventoryItem?.lotNumber
-				commandInstance.items << item;
+				if (quantityMap[inventoryItem] > 0) { 
+					def item = new ItemCommand();
+					item.inventoryItem = inventoryItem 
+					item.product = inventoryItem?.product
+					item.lotNumber = inventoryItem?.lotNumber
+					commandInstance.items << item;
+				}
 			}
 		}
-						
-		def warehouse = Warehouse.get(session.warehouse.id)
-		
-		log.info("Quantity for warehouse: " + warehouse.name + " [" + warehouse.inventory + "]")
-		def quantityMap = inventoryService.getQuantityForInventory(warehouse.inventory)
-		def shipments = shipmentService.getShipments()
+
+		// Get all pending/outgoing shipments						
+		def shipments = shipmentService.getPendingShipments(warehouse);
 		
 		[quantityMap : quantityMap, shipments : shipments, commandInstance : commandInstance]
 	}
