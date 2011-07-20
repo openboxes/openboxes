@@ -1,5 +1,7 @@
 package org.pih.warehouse.shipping;
 
+import grails.validation.ValidationException;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +31,6 @@ class ShipmentService {
 	def mailService;
 	def sessionFactory;
 	def inventoryService;
-	def quantityService;
 	boolean transactional = true
 	
 	/**
@@ -252,7 +253,15 @@ class ShipmentService {
 		
 		return shipments.findAll { !it.hasShipped() }
 	}
-	
+
+	List<Shipment> getIncomingShipments(Location location) {
+		def shipments = Shipment.withCriteria {
+			eq("destination", location)
+		}
+		
+		return shipments.findAll { !it.wasReceived() }
+	}
+
 
 	List<Shipment> getShipmentsByDestination(Location location) {
 		return Shipment.withCriteria { 
@@ -331,15 +340,17 @@ class ShipmentService {
 
 	
 	/**
-	 * Validte the shipment item 	
+	 * Validate the shipment item 	
 	 * @param shipmentItem
 	 * @return
 	 */
 	boolean validateShipmentItem(def shipmentItem) { 
 		def warehouse = Warehouse.get(shipmentItem?.shipment?.origin?.id);
-		log.info("validating shipment item at " + warehouse?.name )
-		def onHandQuantity = quantityService.getQuantity(warehouse, shipmentItem.product, shipmentItem.lotNumber)
+		log.info("Validating shipment item at " + warehouse?.name )
+		def onHandQuantity = inventoryService.getQuantity(warehouse, shipmentItem.product, shipmentItem.lotNumber)
+		log.info("Checking shipment item quantity [" + shipmentItem.quantity + "] vs onhand quantity [" + onHandQuantity + "]");
 		if (shipmentItem.quantity > onHandQuantity) { 
+			shipmentItem.errors.reject("shipmentItem.cannotExceedOnHandQuantity", "Quantity cannot exceed on-hand quantity");
 			throw new ShipmentItemException(message: "shipmentItem.cannotExceedOnHandQuantity", shipmentItem: shipmentItem)
 		}
 		return true;
@@ -509,7 +520,7 @@ class ShipmentService {
 				throw new ShipmentException(message: "Shipping date [" + shipDate + "] must occur on or before today.", shipment: shipmentInstance)
 			}				
 			if (shipmentInstance.hasShipped()) { 
-				shipmentInstance.errors.reject("shipment.invalid.alreadyShipped", "Shipment has alerady shipped")
+				shipmentInstance.errors.reject("shipment.invalid.alreadyShipped", "Shipment has already shipped")
 				throw new ShipmentException(message: "Shipment has already been shipped.", shipment: shipmentInstance);
 			}
 			// don't allow the shipment to go out if it has errors, or if this shipment has already been shipped, or if the shipdate is after today
@@ -733,10 +744,101 @@ class ShipmentService {
 	/**
 	 * Fetches the shipment workflow associated with this shipment
 	 * (Note that, as of now, there can only be one shipment workflow per shipment type)
+	 * 
+	 * @param shipment
+	 * @return
 	 */
 	ShipmentWorkflow getShipmentWorkflow(Shipment shipment) {
 		if (!shipment?.shipmentType) { return null }
 		return ShipmentWorkflow.findByShipmentType(shipment.shipmentType)
 	}
+	
+	
+	/**
+	 * 
+	 * @param command
+	 */
+	Boolean addToShipment(ItemListCommand command) { 	
+			
+		def atLeastOneUpdate = false;
+		
+		command.items.each {
+			log.info "Adding item with lotNumber=" + it?.lotNumber + " product=" + it?.product?.name + " and  qty=" + it.quantity +
+				" to shipment=" + it?.shipment?.id
+			
+			// Check if shipment item already exists
+			def criteria = new ShipmentItem(shipment: it.shipment, product: it.product, lotNumber: it.lotNumber);
+			def shipmentItem = findShipmentItem(criteria)
+			
+			// Only add a shipment item for rows that have been 
+			if (it.quantity > 0) {
+				
+				if (!it.shipment) { 
+					command.errors.reject("shipmentItem.shipment.required")
+					throw new ValidationException("Shipment is required", command.errors);
+				}
+				
+				// If the shipment item already exists, we just add to the quantity 
+				if (shipmentItem) {
+					log.info "Found existing shipment item ..." + shipmentItem.id
+					shipmentItem.quantity += it.quantity;
+					try { 
+						validateShipmentItem(shipmentItem); 
+					} catch (ShipmentItemException e) {
+						log.info("Validation exception " + e.message);
+						throw new ValidationException(e.message, e.shipmentItem.errors);
+					}
+				}
+				else {
+					log.info("Creating new shipment item ...");
+					shipmentItem = new ShipmentItem(shipment: it.shipment, product: it.product, lotNumber: it.lotNumber, quantity: it.quantity);					
+					addToShipmentItems(shipmentItem, it.shipment);
+				}
+				atLeastOneUpdate = true;
+			}
+		}
+		return atLeastOneUpdate
+	}	
+	
+	/**
+	 * 
+	 * @param location
+	 * @return
+	 */
+	Map getQuantityForShipping(Location location) { 
+		def quantityMap = [:]
+		def shipments = getPendingShipments(location)
+		shipments.each { shipment -> 
+			shipment.shipmentItems.each { shipmentItem -> 				
+				def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(shipmentItem.product, shipmentItem.lotNumber)
+				if (inventoryItem) { 
+					def quantity = quantityMap[inventoryItem];
+					if (!quantity) quantity = 0;
+					quantity += shipmentItem.quantity;
+					quantityMap[inventoryItem] = quantity
+				}					
+			}
+		}
+		return quantityMap;
+	}
+	
+	
+	Map getQuantityForReceiving(Location location) { 
+		def quantityMap = [:]		
+		def shipments = getIncomingShipments(location)
+		shipments.each { shipment ->
+			shipment.shipmentItems.each { shipmentItem ->
+				def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(shipmentItem.product, shipmentItem.lotNumber)
+				if (inventoryItem) {
+					def quantity = quantityMap[inventoryItem];
+					if (!quantity) quantity = 0;
+					quantity += shipmentItem.quantity;
+					quantityMap[inventoryItem] = quantity
+				}
+			}
+		}
+		return quantityMap;		
+	}
+	
 	
 }

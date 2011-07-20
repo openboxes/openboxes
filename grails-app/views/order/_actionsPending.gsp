@@ -26,7 +26,7 @@
 		<div class="action-menu-item">
 			<g:link controller="purchaseOrderWorkflow" action="purchaseOrder" id="${orderInstance?.id}" params="['skipTo': 'items']">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add" style="vertical-align: middle" />
-				&nbsp;${message(code: 'order.add.label', default: 'Add order items')} 
+				&nbsp;${message(code: 'order.add.label', default: 'Edit order items')} 
 			</g:link>		
 		</div>
 		<div class="action-menu-item">

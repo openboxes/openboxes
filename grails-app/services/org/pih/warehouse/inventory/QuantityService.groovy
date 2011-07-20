@@ -27,28 +27,15 @@ import org.springframework.validation.Errors;
  */
 class QuantityService {
 
+
 	// Indicates that the service is session-scoped (it stores state) and proxied (so it can be used injected/used by 
 	// prototype-scoped objects like taglibs).
 	//static scope = "session"
 	//static proxy = true
 	
 	//Warehouse warehouse
-	InventoryService inventoryService
+	//InventoryService inventoryService
 	
-	Integer getQuantity(Warehouse warehouse, Product product, String lotNumber) { 
-		log.info ("Get quantity for product " + product?.name + " lotNumber " + lotNumber + " at location " + warehouse?.name)
-		if (!warehouse) { 
-			throw new RuntimeException("Your warehouse has not been initialized");
-		}
-		else { 
-			warehouse = Warehouse.get(warehouse?.id)
-		}
-		def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(product, lotNumber)
-		if (!inventoryItem) { 
-			throw new RuntimeException("There's no inventory item for product " + product?.name + " lot number " + lotNumber)
-		}
-		
-		return inventoryService.getQuantityForInventoryItem(inventoryItem, warehouse.inventory)
-	}
+
 
 }

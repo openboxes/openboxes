@@ -48,9 +48,7 @@
 								</td>
 								<td valign='top' class='value ${hasErrors(bean:order,field:'origin','errors')}'>
 									<g:if test="${suppliers }">
-										<div class="ui-widget"> 
-											<g:select class="combobox" name="origin.id" from="${suppliers?.sort()}" optionKey="id" value="${order?.origin?.id}" noSelection="['':'']"/>
-										</div>
+										<g:select name="origin.id" from="${suppliers?.sort()}" optionKey="id" value="${order?.origin?.id}" noSelection="['':'']"/>
 									</g:if>
 									<g:else>
 										<span class="fade">There are no suppliers</span> 

@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import grails.converters.JSON
+import grails.validation.ValidationException;
 import groovy.sql.Sql;
 import au.com.bytecode.opencsv.CSVWriter;
 
@@ -313,7 +314,7 @@ class ShipmentController {
 					receiptInstance = new Receipt(recipient:shipmentInstance?.recipient);
 					receiptInstance.receiptItems = new HashSet()
 				
-					shipmentInstance.allShipmentItems.each {										
+					shipmentInstance.shipmentItems.each {										
 						ReceiptItem receiptItem = new ReceiptItem(it.properties);
 						receiptItem.setQuantityShipped (it.quantity);
 						receiptItem.setQuantityReceived (it.quantity);				
@@ -1052,15 +1053,21 @@ class ShipmentController {
 		// Get quantities for all inventory items
 		def warehouse = Warehouse.get(session.warehouse.id)		
 		log.info("Quantity for warehouse: " + warehouse.name + " [" + warehouse.inventory + "]")
-		def quantityMap = inventoryService.getQuantityForInventory(warehouse.inventory)
-
+		def quantityOnHandMap = inventoryService.getQuantityForInventory(warehouse.inventory)
+		def quantityShippingMap = shipmentService.getQuantityForShipping(warehouse)
+		def quantityReceivingMap = shipmentService.getQuantityForReceiving(warehouse)
+		
 				
 		// Create command objects for each item
 		def commandInstance = new ItemListCommand();
 		if (inventoryItems) { 
 			inventoryItems.each { inventoryItem ->
-				if (quantityMap[inventoryItem] > 0) { 
+				def quantityOnHand = quantityOnHandMap[inventoryItem]
+				if (quantityOnHand > 0) { 
 					def item = new ItemCommand();
+					item.quantityOnHand = quantityOnHand
+					item.quantityShipping = quantityShippingMap[inventoryItem]
+					item.quantityReceiving = quantityReceivingMap[inventoryItem]
 					item.inventoryItem = inventoryItem 
 					item.product = inventoryItem?.product
 					item.lotNumber = inventoryItem?.lotNumber
@@ -1072,42 +1079,29 @@ class ShipmentController {
 		// Get all pending/outgoing shipments						
 		def shipments = shipmentService.getPendingShipments(warehouse);
 		
-		[quantityMap : quantityMap, shipments : shipments, commandInstance : commandInstance]
+		[shipments : shipments, commandInstance : commandInstance]
 	}
 	
 	
 	def addToShipmentPost = { ItemListCommand command -> 
 		log.info(params);
 		log.info("Command items " + command?.class?.name + " " + command?.items?.size());
-		def lastShipment = null;
-		command.items.each { 			
-			println "Adding item with lotNumber=" + it?.lotNumber + " product=" + it?.product?.name + " and  qty=" + it.quantity +
-				" to shipment=" + it?.shipment?.id
+		try { 
+			boolean atLeastOneUpdate = shipmentService.addToShipment(command);
+			if (atLeastOneUpdate) { 
+				flash.message = "Shipment items have been added to shipment"
+			}
+			else { 
+				flash.message = "No shipment items have been updated"
+			}
+		} catch (ValidationException e) { 
 			
-			def criteria = new ShipmentItem(shipment: it.shipment, product: it.product, lotNumber: it.lotNumber);
-			def shipmentItem = shipmentService.findShipmentItem(criteria)
-			if (it.quantity > 0) { 
-				if (shipmentItem) { 
-					log.info "Found existing shipment item ..." + shipmentItem.id
-				}
-				else {
-					log.info("Creating new shipment item ...");				
-					shipmentItem = new ShipmentItem(shipment: it.shipment, product: it.product, lotNumber: it.lotNumber, quantity: it.quantity);
-					it.shipment.addToShipmentItems(shipmentItem);
-					it.shipment.save();
-					//${message(code: 'default.not.found.message', args: [message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}	
-					flash.message = "Shipment item has been created for product ${shipmentItem?.product?.name}"
-					lastShipment = it.shipment
-				}
-			}			
-		}
-		if (lastShipment) { 
-			redirect(controller: "shipment", action: "showDetails", id: lastShipment?.id )
+			flash['errors'] = e.errors 
+			//render(view: "addToShipment", model: [commandInstance: command])
+			redirect(action: "addToShipment", params:params)
+			//chain(controller: "inventory", action: "browse", model: [commandInstance: command]);
 			return;
-		}
-		
-		
-		
+		}		
 		redirect(controller: "inventory", action: "browse")	
 		
 	}

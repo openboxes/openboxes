@@ -88,7 +88,7 @@
 														${fieldValue(bean: shipmentInstance, field: "destination.name")}
 													</span>											
 													<span class="fade">
-														<g:if test="${shipmentInstance.expectedDeliveryDate && !shipmentInstance.wasReceived()}">
+														<g:if test="${shipmentInstance.expectedDeliveryDate && !shipmentInstance?.wasReceived()}">
 															<format:date obj="${shipmentInstance?.expectedDeliveryDate}"/>
 														</g:if>
 													</span>											

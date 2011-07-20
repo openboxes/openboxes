@@ -26,7 +26,7 @@ class InventoryController {
 	/**
 	 * Allows a user to browse the inventory for a particular warehouse.  
 	 */
-	def browse = { BrowseInventoryCommand cmd ->
+	def browse = { InventoryCommand cmd ->
 		
 		log.info "Browse inventory " + cmd;
 		// Get the warehouse from the request parameter
@@ -39,19 +39,14 @@ class InventoryController {
 			cmd.warehouseInstance = Warehouse.get(session?.warehouse?.id);
 		}
 		
-		// add an inventory to this warehouse if it doesn't exist
-		if (!cmd?.warehouseInstance?.inventory) { 
-			inventoryService.addInventory(cmd.warehouseInstance)
-		}
-		
-		// Get a list of shipments 
-		//cmd.shipmentList = shipmentService.getReceivingByDestinationAndStatus(cmd.warehouseInstance, ShipmentStatusCode.SHIPPED);
-
 		// If the user entered a search term, add it to the session-bound search terms
 		if (cmd.searchTerms) {
+			// Initialize the array 
 			if (!session.inventorySearchTerms) {
 				session.inventorySearchTerms = []
 			}
+			
+			// Add all search terms to the user's session
 			if (!session.inventorySearchTerms.contains(cmd.searchTerms)) {
 				session.inventorySearchTerms << cmd.searchTerms
 			}
@@ -60,7 +55,6 @@ class InventoryController {
 		// Hydrate the category filters from the session, which allow us
 		// to get any attribute of a category without get a lazy init exception
 		// First remove any that are null, in the event that a Category was deleted
-		
 		cmd.categoryFilters = []
 		if (session.inventoryCategoryFilters) {
 			for (Iterator iter = session.inventoryCategoryFilters.iterator(); iter.hasNext();) {
@@ -81,8 +75,8 @@ class InventoryController {
 				cmd.searchTermFilters << it;
 			}
 		}
-		
-		inventoryService.browseInventory(cmd, session?.showHiddenProducts);
+		cmd.showHiddenProducts = session?.showHiddenProducts;
+		inventoryService.browseInventory(cmd);
 
 		[ commandInstance: cmd ]
 	}

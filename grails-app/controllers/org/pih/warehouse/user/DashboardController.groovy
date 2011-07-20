@@ -8,7 +8,6 @@ import org.pih.warehouse.inventory.Warehouse;
 
 class DashboardController {
 
-	//def quantityService;
 	def shipmentService;
 	
     def index = {
@@ -43,9 +42,6 @@ class DashboardController {
 			// Save the warehouse selection to the session
 			session.warehouse = warehouse;
 			
-			// Initialize the quantity service
-			//quantityService.warehouse = warehouse
-						
 			// Save the warehouse selection for "last logged into" information
 			if (session.user) { 
 				def userInstance = User.get(session.user.id);

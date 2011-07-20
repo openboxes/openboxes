@@ -34,7 +34,7 @@
 								<table style="">
 									<thead>
 										<tr class="odd">
-											<th></th>
+											<th>Actions</th>
 											<g:sortableColumn property="quantity" title="Quantity" />
 											<g:sortableColumn property="name" title="Name" />
 											<g:sortableColumn property="type" title="Type" />
@@ -49,6 +49,9 @@
 												<g:hiddenField name="orderItems[${i }].order.id" value="${orderItem?.order?.id }" size="5"/>
 												<td class="actionButtons">
 													<g:if test="${orderItem?.id }">
+														<g:link action="purchaseOrder" id="${orderItem.id}" event="editItem">
+															<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}"/>
+														</g:link>
 														<g:link action="purchaseOrder" id="${orderItem.id}" event="deleteItem" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
 															<img src="${createLinkTo(dir:'images/icons/silk',file:'bin.png')}"/>
 														</g:link>
@@ -83,9 +86,7 @@
 							</div>
 						</td>
 						<td style="border-left: 1px solid lightgrey; height: 100%; width: 35%;">
-							<div style="margin: 10px">
-								<p>Add an order item</p>
-							</div>				
+											
 							<g:hasErrors bean="${orderItem}">
 								<div class="errors">
 									<g:renderErrors bean="${orderItem}" as="list" />
@@ -94,7 +95,7 @@
 							<div class="dialog">
 								<div class="tabs">
 									<ul>
-										<li><a href="#tabs-1">Product</a></li>
+										<li><a href="#tabs-1">Add a product</a></li>
 										<%--
 										<li><a href="#tabs-2">Category</a></li>
 										<li><a href="#tabs-3">Unclassified</a></li> 
@@ -103,6 +104,7 @@
 									<div id="tabs-1">
 										<g:form action="purchaseOrder" method="post">
 											<g:hiddenField name="order.id" value="${order?.id }"></g:hiddenField>
+											<g:hiddenField name="orderItem.id" value="${orderItem?.id }"></g:hiddenField>
 											<table>
 												<tbody>
 													<tr class='prop'>
@@ -113,7 +115,8 @@
 																<g:select class="combobox" name="product.id" from="${org.pih.warehouse.product.Product.list().sort{it.name}}" optionKey="id" value="" noSelection="['':'']" />
 															</div>
 															--%>
-															<g:autoSuggest id="product" name="product" jsonUrl="/warehouse/json/findProductByName" width="200" valueId="" valueName=""/>															
+															<g:autoSuggest id="product" name="product" jsonUrl="/warehouse/json/findProductByName" 
+																width="200" valueId="${orderItem?.product?.id }" valueName="${orderItem?.product?.name }"/>															
 														</td>
 													</tr>
 													<tr class='prop'>
@@ -130,10 +133,18 @@
 													</tr>
 													<tr>
 														<td valign="top" class="value" colspan="2">
+														
 															<div class="buttons">
-																<span class="formButton"> 
-																	<g:submitButton name="addItem" value="Add Item"></g:submitButton> 
-																</span>
+																<g:if test="${orderItem?.id }">
+																	<span class="formButton"> 
+																		<g:submitButton name="addItem" value="Update Item"></g:submitButton> 
+																	</span>
+																</g:if>
+																<g:else>
+																	<span class="formButton"> 
+																		<g:submitButton name="addItem" value="Add Item"></g:submitButton> 
+																	</span>
+																</g:else>
 															</div>
 														</td>
 													</tr>

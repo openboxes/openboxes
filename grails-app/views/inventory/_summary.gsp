@@ -17,13 +17,20 @@
 							</span>		
 							|
 							<span>
+							
+							Showing ${commandInstance?.products?.size() } products 
+							in ${commandInstance?.inventoryItems?.keySet()?.size() } categories
+							<%-- 
 								<g:set var="productMap" value="${commandInstance?.productList.groupBy {it.category} }"/>
 								Showing ${commandInstance?.productList?.size() } product(s) in ${productMap?.keySet()?.size()} categories
+								--%>
 							</span>
-							|
-							<span>
-								<g:link action="clearAllFilters">Show all products</g:link>	
-							</span>
+							<g:if test="${commandInstance?.categoryFilters || commandInstance?.searchTermFilters}">	
+								|
+								<span>
+									<g:link action="clearAllFilters">Show all products</g:link>	
+								</span>
+							</g:if>
 							
 						</div>
 					</td>	

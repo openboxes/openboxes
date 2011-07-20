@@ -47,6 +47,8 @@ class PurchaseOrderWorkflowController {
 		
 		enterOrderDetails {
 			on("next") {
+				log.info params
+				
 				flow.order.properties = params
 				try { 
 					if (!orderService.saveOrder(flow.order)) {
@@ -78,12 +80,25 @@ class PurchaseOrderWorkflowController {
 				}
 			}.to("showOrderItems")
 			
+			on("editItem") { 
+				def orderItem = OrderItem.get(params.id)
+				if (orderItem) { 
+					flow.orderItem = orderItem;
+				}
+			}.to("showOrderItems")
 			
 			on("addItem") {
 				log.info "adding an item " + params
 				if(!flow.order.orderItems) flow.order.orderItems = [] as HashSet
 				
-				def orderItem = new OrderItem(params);
+				def orderItem = OrderItem.get(params?.orderItem?.id)
+				if (orderItem) { 
+					orderItem.properties = params
+				} 
+				else { 
+					orderItem = new OrderItem(params);
+				}				
+				
 				orderItem.requestedBy = Person.get(session.user.id)
 				
 				if (params?.product?.id && params?.category?.id) { 

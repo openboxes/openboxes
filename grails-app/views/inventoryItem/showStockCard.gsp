@@ -20,7 +20,15 @@
 			</g:if> 
 			
 			<g:hasErrors bean="${commandInstance}">
-				<div class="errors"><g:renderErrors bean="${commandInstance}" as="list" /></div>
+				<div class="errors">
+					<g:renderErrors bean="${commandInstance}" as="list" />
+				</div>
+			</g:hasErrors>
+
+			<g:hasErrors bean="${flash.errors}">
+				<div class="errors">
+					<g:renderErrors bean="${flash.errors}" as="list" />
+				</div>
 			</g:hasErrors>
 
 			<div class="dialog" style="min-height: 880px">

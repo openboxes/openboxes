@@ -11,6 +11,10 @@ class ItemCommand implements Serializable {
 	Shipment shipment
 	ShipmentItem shipmentItem
 	Integer quantity
+	Integer quantityOnHand
+	Integer quantityShipping
+	Integer quantityReceiving
+	
 	
 	static constraints = {
 		product(nullable:true)
@@ -19,6 +23,10 @@ class ItemCommand implements Serializable {
 		shipment(nullable:true)
 		shipmentItem(nullable:true)
 		quantity(nullable:true)
+		quantityOnHand(nullable:true)
+		quantityReceiving(nullable:true)
+		quantityShipping(nullable:true)
+		
 	}
 	
 	

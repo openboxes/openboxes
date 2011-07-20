@@ -97,8 +97,17 @@
 						</g:link>				
 					</g:if>
 					<g:else>
-						<img src="${createLinkTo(dir:'images/icons',file:'handtruck.png')}" alt="Receive Shipment" style="vertical-align: middle" />&nbsp;
-						<span class="fade">Receive Shipment</span>
+						<g:set var="message" value="Shipment cannot be received yet"/>
+						<g:if test="${!shipmentInstance?.hasShipped() }">
+							<g:set var="message" value="Shipment has not been shipped!"/>
+						</g:if>
+						<g:elseif test="${shipmentInstance?.wasReceived() }">
+							<g:set var="message" value="Shipment was already received!"/>							
+						</g:elseif>
+						<a href="javascript:void(0);" onclick="alert('${message}')">
+							<img src="${createLinkTo(dir:'images/icons',file:'handtruck.png')}" alt="Receive Shipment" style="vertical-align: middle" />&nbsp;
+							<span class="fade">Receive Shipment</span>
+						</a>
 					</g:else>
 				</div>
 			</g:if>

@@ -10,7 +10,6 @@
 		<img src="${resource(dir: 'images/icons/silk', file: 'lorry_add.png')}"/>&nbsp;Add to Shipment</a>
 </div>
 
-
 <div id="dlgAddToShipment-${itemInstance?.id}" title="Add to Shipment" style="padding: 10px; display: none; vertical-align: middle;" >	
 
 	<g:if test="${commandInstance?.pendingShipmentList }">

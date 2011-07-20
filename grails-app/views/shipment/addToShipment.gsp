@@ -16,9 +16,14 @@
 				${flash.message}
 			</div>
 		</g:if>
-		<g:hasErrors bean="${shipmentInstance}">
+		<g:hasErrors bean="${flash.errors}">
 			<div class="errors">
-				<g:renderErrors bean="${shipmentInstance}" as="list" />
+				<g:renderErrors bean="${flash.errors}" as="list" />
+			</div>
+		</g:hasErrors>
+		<g:hasErrors bean="${commandInstance.errors}">
+			<div class="errors">
+				<g:renderErrors bean="${commandInstance.errors}" as="list" />
 			</div>
 		</g:hasErrors>
 
@@ -32,7 +37,9 @@
 						<tr>
 							<th>Product</th>
 							<th>Lot Number</th>
-							<th>Qty</th>
+							<th>Qty On-Hand</th>
+							<th>Qty Shipping</th>
+							<th>Qty Receiving</th>
 							<th style="border-left: 1px solid lightgrey;">Shipment</th>
 							<th>Qty To Ship</th>
 						</tr>
@@ -43,13 +50,20 @@
 										${item?.product?.name }
 									</g:link>
 									<g:hiddenField name="items[${i }].product.id" value="${item?.product?.id }"/>
+									<g:hiddenField name="productId" value="${item?.product?.id }"/>	<%-- used when redirecting to page on error --%>
 								</td>
 								<td>
 									${item?.lotNumber }
 									<g:hiddenField name="items[${i }].lotNumber" value="${item?.lotNumber }"/>
 								</td>
 								<td class="center">
-									${quantityMap[item.inventoryItem]?:'Not available' }
+									${item?.quantityOnHand?:'N/A' }
+								</td>
+								<td class="center">
+									${item?.quantityShipping?:'N/A' }
+								</td>
+								<td class="center">
+									${item?.quantityReceiving?:'N/A' }
 								</td>
 								<td style="border-left: 1px solid lightgrey;">
 									<g:select name="items[${i }].shipment.id" from="${shipments }" 
@@ -65,21 +79,28 @@
 						</g:each>
 					</tbody>
 					<tfoot>
-					
-						<td colspan="5" style="border-top: 1px solid lightgrey;">
-							<div class="center">
-								<button type="submit" ><img
-									src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
-									class="btn" alt="save" /> Add to shipment(s)</button>
-								&nbsp;
-								<g:link controller="inventory" action="browse" id="${shipmentInstance?.id}">&lsaquo; Cancel</g:link>
-							</div>				
-						</td>
+						<tr>
+							<td colspan="7" style="border-top: 1px solid lightgrey;">
+								<div class="center">
+									<button type="submit" ><img
+										src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
+										class="btn" alt="save" /> Add to shipment(s)</button>
+									&nbsp;
+									<g:link controller="inventory" action="browse" id="${shipmentInstance?.id}">&lsaquo; Cancel</g:link>
+								</div>				
+							</td>
+						</tr>
 					</tfoot>	
 				</table>						
 				
 			</g:form>
 		</div>
 	</div>
+	
+	<script>
+		$(document).ready(function() {	
+			$("form:not(.filter) :input:visible:enabled:first").focus();
+		});
+	</script>
 </body>
 </html>

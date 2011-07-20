@@ -30,6 +30,10 @@
 			.checked { 
 				background-color: lightyellow; 
 			} 
+			.checkbox { 
+				width: 50px; 
+				border: 1px solid black;
+			}
 			
 		</style>        
     </head>    
@@ -38,9 +42,9 @@
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>						
-            <g:hasErrors bean="${commandInstance?.inventoryInstance}">
+            <g:hasErrors bean="${commandInstance}">
 	            <div class="errors">
-	                <g:renderErrors bean="${commandInstance?.inventoryInstance}" as="list" />
+	                <g:renderErrors bean="${commandInstance}" as="list" />
 	            </div>
             </g:hasErrors>    
             
@@ -62,14 +66,14 @@
 			         		</tr>
 							<tr class="prop">
 				         		<td style="padding: 0; margin: 0; vertical-align: middle; text-align: center">
-				            		<g:if test="${commandInstance?.productMap}">
+				            		<g:if test="${commandInstance?.inventoryItems}">
 				            		
 							            <g:form controller="shipment" action="addToShipment">
 				            		
 					            			<div style="overflow: auto; padding: 0px; height: 400px; ">		
-												<g:each var="entry" in="${commandInstance?.productMap}" status="i">	
+												<g:each var="entry" in="${commandInstance?.inventoryItems}" status="i">	
 													<g:set var="totalQuantity" value="${0}"/>
-													<g:set var="categoryProducts" value="${commandInstance?.productMap[entry.key].sort()}"/>
+													<g:set var="categoryInventoryItems" value="${commandInstance?.inventoryItems[entry.key]}"/>
 													<div class="list">
 														<!-- Category Breadcrumb -->
 														<div class="categoryBreadcrumb">
@@ -86,8 +90,8 @@
 																</tr>
 															</thead>
 															<tbody>
-																<g:each var="productInstance" in="${categoryProducts}" status="status">
-																	<g:set var="quantity" value="${commandInstance?.quantityMap?.get(productInstance) }"/>
+																<g:each var="inventoryItem" in="${categoryInventoryItems}" status="status">
+																	<g:set var="quantity" value="${inventoryItem?.quantityOnHand }"/>
 																	<g:set var="totalQuantity" value="${totalQuantity + (quantity?:0) }"/>
 																	<tr class="${status%2==0?'even':'odd' } prop checkable">
 																	<%-- 
@@ -108,12 +112,14 @@
 																		</td>
 																	--%>
 																		<td>
-																			<g:checkBox name="productId" checked="${false }" value="${productInstance?.id }"/>
+																			<g:checkBox id="${inventoryItem?.product?.id }" name="productId" 
+																				class="checkbox" checked="${false }" 
+																					value="${inventoryItem?.product?.id }" />
 																		</td>																
 																		<td>
-																			<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]" fragment="inventory" style="z-index: 999">
-																				<g:if test="${productInstance?.name?.trim()}">
-																					${fieldValue(bean: productInstance, field: "name") } 
+																			<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]" fragment="inventory" style="z-index: 999">
+																				<g:if test="${inventoryItem?.product?.name?.trim()}">
+																					${fieldValue(bean: inventoryItem?.product, field: "name") } 
 																				</g:if>
 																				<g:else>
 																					Untitled Product
@@ -121,13 +127,13 @@
 																			</g:link> 
 																		</td>
 																		<td>
-																			${productInstance?.manufacturer }
+																			${inventoryItem?.product?.manufacturer }
 																		</td>
 																		<td>
-																			${productInstance?.productCode }
+																			${inventoryItem?.product?.productCode }
 																		</td>
 																		<td style="text-align: center;">
-																			<g:link controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">
+																			<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
 																				${quantity?:0}
 																			</g:link>
 																		</td>
@@ -182,8 +188,7 @@
 			$(document).ready(function() {
 				$(".checkable a").click(function(e) {
 					   e.stopPropagation();
-				})
-
+				});
 				$('.checkable').toggle(
 					function(event) {
 						$(this).find('input').attr('checked', true);

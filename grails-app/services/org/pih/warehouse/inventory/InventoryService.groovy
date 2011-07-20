@@ -24,15 +24,22 @@ class InventoryService {
 	def productService
 	boolean transactional = true
 	
+	/**
+	 * 
+	 * @return
+	 */
 	List<Warehouse> getAllWarehouses() {
 		return Warehouse.list()
 	}
-	
+    
 	/**
-    * Returns the Warehouse specified by the passed id parameter;
-    * if no parameter is specified, returns a new warehouse instance
-    */
-    Warehouse getWarehouse(Long warehouseId) {
+	 * Returns the Warehouse specified by the passed id parameter; 
+	 * if no parameter is specified, returns a new warehouse instance
+	 * 
+	 * @param warehouseId
+	 * @return
+	 */
+	Warehouse getWarehouse(Long warehouseId) {
 	   	if (warehouseId) {
 	   		Warehouse warehouse = Warehouse.get(warehouseId)
 	   		if (!warehouse) {
@@ -142,8 +149,31 @@ class InventoryService {
 		return m
 	}
 	
+	/*
+	Map getInventoryMap(Collection inventoryProducts) { 
+		// Sort inventory items by quantity, then by product name
+		Map inventoryProductMap = new TreeMap();
+		if (inventoryProducts) {
+			inventoryProducts.each {
+				Category category = it.category ? it.category : new Category(name: "Unclassified")
+				List list = inventoryProductMap.get(category)
+				if (list == null) {
+					list = new ArrayList();
+					inventoryProductMap.put(category, list);
+				}
+				list.add(it);
+			}
+		}
+		return inventoryProductMap;
+	}*/
+			
+	
 	/**
 	 * Search inventory items by term or product Id
+	 * 	
+	 * @param searchTerm
+	 * @param productId
+	 * @return
 	 */
 	List searchInventoryItems(String searchTerm, String productId) { 		
 		searchTerm = "%" + searchTerm + "%";
@@ -158,7 +188,18 @@ class InventoryService {
 		return items;
 	}
 	
-	BrowseInventoryCommand browseInventory(BrowseInventoryCommand commandInstance, Boolean showHiddenProducts) { 
+	
+	/**
+	 * 
+	 * @param commandInstance
+	 * @return
+	 */
+	InventoryCommand browseInventory(InventoryCommand commandInstance) { 
+		
+		// add an inventory to this warehouse if it doesn't exist
+		if (!commandInstance?.warehouseInstance?.inventory) {
+			addInventory(commandInstance.warehouseInstance)
+		}
 		
 		// Get all product types and set the default product type				
 		commandInstance.rootCategory = productService.getRootCategory();
@@ -166,28 +207,57 @@ class InventoryService {
 		
 		// Get the selected category or use the root category
 		commandInstance.categoryInstance = commandInstance?.categoryInstance ?: commandInstance?.rootCategory;
-						
-		// Search for products 
-		commandInstance.productList = getProducts(commandInstance, showHiddenProducts);
-		commandInstance.productList = commandInstance?.productList?.sort() { it.name };
 		
-		// This list gets calculated AFTER the product list, because we need to use the product list as the basis. 
-		commandInstance.attributeMap = getProductAttributes();
-		commandInstance.productMap = getProductMap(commandInstance.productList);
-		commandInstance.inventoryItemMap =  getInventoryItemMap(commandInstance?.warehouseInstance?.id);
-		commandInstance.quantityMap = getQuantityByProductMap(commandInstance?.inventoryInstance);
+		// Get current inventory for the given products
+		commandInstance.inventoryItems = getCurrentInventory(commandInstance);								
 		
 		return commandInstance;
 	}
-	
+
+	/**
+	 * 
+	 * @param commandInstance
+	 * @return
+	 */
+	Map getCurrentInventory(def commandInstance) { 
+		
+		def inventoryItems = [];
+		
+		// Only used to count products on page
+		commandInstance.products = getProducts(commandInstance);
+		
+		// Get quantity for each item in inventory 
+		def quantityMap = getQuantityByProductMap(commandInstance?.inventoryInstance);
+		commandInstance?.products.each { product -> 
+			def quantityOnHand = quantityMap[product] ?: 0;
+			inventoryItems << new InventoryItemCommand(category: product.category, product: product, quantityOnHand: quantityOnHand)
+		}
+		
+		// Get inventory and sort by product name 
+		def inventoryProductMap = getProductMap(inventoryItems);
+		for (item in inventoryProductMap) {
+			item.value.sort { item1, item2 ->
+				item1?.product?.name <=> item2?.product?.name
+			}
+		}
+		return inventoryProductMap;
+	}
+		
 	
 	/*
 	*
 	* Get products based on the
 	*/
-   Set getProducts(BrowseInventoryCommand command, Boolean showHiddenProducts) {
+   Set getProducts(def commandInstance) {
 	   // Get any category filters that match search terms
-	   return getProductsByAll(command?.searchTermFilters, command?.categoryFilters, showHiddenProducts);
+	   def products = getProductsByAll(
+		   commandInstance?.searchTermFilters, 
+		   commandInstance?.categoryFilters, 
+		   commandInstance?.showHiddenProducts);
+	   
+	   
+	   products = products?.sort() { it?.name };
+	   return products;
    }
 
 
@@ -265,6 +335,32 @@ class InventoryService {
 	Map getProductAttributes() { 
 		def productAttributes = ProductAttribute.list()
 		return productAttributes.groupBy { it.attribute } 
+	}
+	
+	
+	
+	/**
+	 * Get quantity for the given product and lot number at the given warehouse.
+	 * 
+	 * @param warehouse
+	 * @param product
+	 * @param lotNumber
+	 * @return
+	 */
+	Integer getQuantity(Warehouse warehouse, Product product, String lotNumber) {
+		log.info ("Get quantity for product " + product?.name + " lotNumber " + lotNumber + " at location " + warehouse?.name)
+		if (!warehouse) {
+			throw new RuntimeException("Your warehouse has not been initialized");
+		}
+		else {
+			warehouse = Warehouse.get(warehouse?.id)
+		}
+		def inventoryItem = findInventoryItemByProductAndLotNumber(product, lotNumber)
+		if (!inventoryItem) {
+			throw new RuntimeException("There's no inventory item for product " + product?.name + " lot number " + lotNumber)
+		}
+		
+		return getQuantityForInventoryItem(inventoryItem, warehouse.inventory)
 	}
 	
 	/**

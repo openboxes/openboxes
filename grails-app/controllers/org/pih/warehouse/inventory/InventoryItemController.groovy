@@ -12,11 +12,13 @@ import org.pih.warehouse.product.Product;
 import org.pih.warehouse.shipping.Container;
 import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.shipping.ShipmentItem;
+import org.pih.warehouse.shipping.ShipmentItemException;
 import org.pih.warehouse.inventory.TransactionType;
 import org.pih.warehouse.inventory.StockCardCommand
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
 
 import grails.converters.*
+import grails.validation.ValidationException;
 
 class InventoryItemController {
 
@@ -505,29 +507,41 @@ class InventoryItemController {
 		log.info("shipment "  + shipmentInstance);
 		log.info("container "  + containerInstance);
 		
-		def itemInstance = new ShipmentItem(
+		
+		
+		def shipmentItem = new ShipmentItem(
 			product: productInstance,
 			quantity: params.quantity,
 			recipient: personInstance,
 			lotNumber: inventoryItem.lotNumber?:'',
 			shipment: shipmentInstance,
 			container: containerInstance);
+		
+		try {
+			shipmentService.validateShipmentItem(shipmentItem)
+					
+			if(shipmentItem.hasErrors() || !shipmentItem.validate()) {
+				flash.message = "There was an error validating item to be added\n" ;
+				shipmentItem.errors.each { flash.message += it }
 				
-		if(itemInstance.hasErrors() || !itemInstance.validate()) {
-			flash.message = "There was an error validating item to be added\n" ;
-			itemInstance.errors.each { flash.message += it }
-			
-		}
+			}
+	
+			if (!shipmentItem.hasErrors()) { 
+				if (!shipmentInstance.addToShipmentItems(shipmentItem).save()) {
+					log.error("Sorry, unable to add new item to shipment.  Please try again.");
+					flash.message = "Unable to add new item to shipment";
+				}
+				else { 
+					def productDescription = productInstance?.name + (inventoryItem?.lotNumber) ? " #" + inventoryItem?.lotNumber : "";		
+					flash.message = "Added item " + productDescription + " to shipment " + shipmentInstance?.name;
+				}
+			}
 
-		if (!itemInstance.hasErrors()) { 
-			if (!shipmentInstance.addToShipmentItems(itemInstance).save(flush:true)) {
-				log.error("Sorry, unable to add new item to shipment.  Please try again.");
-				flash.message = "Unable to add new item to shipment";
-			}
-			else { 
-				def productDescription = productInstance?.name + (inventoryItem?.lotNumber) ? " #" + inventoryItem?.lotNumber : "";		
-				flash.message = "Added item " + productDescription + " to shipment " + shipmentInstance?.name;
-			}
+		} catch (ShipmentItemException e) {
+			//e.errors.reject()
+			flash['errors'] = e.shipmentItem.errors		
+		} catch (ValidationException e) { 
+			flash['errors'] = e.errors
 		}
 
 		redirect(action: "showStockCard", params: ['product.id':productInstance?.id]);

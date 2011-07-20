@@ -25,7 +25,11 @@
 	<!-- Include jQuery UI files -->
 	<g:javascript library="jquery" plugin="jquery" />
 	<jqui:resources />
-	<%--<jqui:resources theme="smoothness" />  
+	<link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
+	<%-- 
+	<jqui:resources />
+	<jqui:resources theme="smoothness" />
+	--%><%--  
 	<link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
 	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-ui-1.8.7.js')}" type="text/javascript" ></script>
 	--%>
