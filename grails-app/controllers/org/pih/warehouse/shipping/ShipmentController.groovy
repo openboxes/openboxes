@@ -1094,14 +1094,16 @@ class ShipmentController {
 			else { 
 				flash.message = "No shipment items have been updated"
 			}
-		} catch (ValidationException e) { 
-			
-			flash['errors'] = e.errors 
-			//render(view: "addToShipment", model: [commandInstance: command])
+		} catch (ShipmentItemException e) { 
+			flash['errors'] = e.shipmentItem.errors
 			redirect(action: "addToShipment", params:params)
-			//chain(controller: "inventory", action: "browse", model: [commandInstance: command]);
 			return;
-		}		
+		} catch (ValidationException e) { 			
+			flash['errors'] = e.errors 
+			redirect(action: "addToShipment", params:params)
+			return;
+		}
+		
 		redirect(controller: "inventory", action: "browse")	
 		
 	}
