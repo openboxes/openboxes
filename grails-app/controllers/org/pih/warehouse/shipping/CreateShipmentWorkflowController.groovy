@@ -160,6 +160,8 @@ class CreateShipmentWorkflowController {
 			on("deleteContainer") {
 				def container = Container.get(params.container.id)	
 				shipmentService.deleteContainer(container)
+				flow.selectedContainer = null;
+				
 			}.to("enterContainerDetails")
 			
 			on("cloneContainer") {
@@ -271,6 +273,8 @@ class CreateShipmentWorkflowController {
 				}
 				
 				bindData(container,params)
+				
+				log.info("Container recipient " + container.recipient)
 				
 				// TODO: make sure that this works properly if there are errors?
 				if(container.hasErrors() || !container.validate()) { 

@@ -305,11 +305,13 @@ class ShipmentService {
 	/**
 	 * Saves a container
 	 */
-	void saveContainer(Container container) {
-		/*
-		if (!container.recipient) { 
-			container.recipient = container.shipment.recipient;
-		}*/
+	void saveContainer(Container container) {			
+		log.info("Container recipient " + container.recipient);	
+		if (!container.recipient) { 			
+			container.recipient = (container?.parentContainer?.recipient)?:container.shipment.recipient;
+			log.info("Set recipient to " + container.recipient);	
+		}
+		log.info("Set recipient to " + container.recipient);	
 		container.save()
 	}
 	
@@ -359,6 +361,8 @@ class ShipmentService {
 	
 	/**
 	 * Deletes a container
+	 * 
+	 * @param container
 	 */
 	void deleteContainer(Container container) {
 		// nothing to do if null
@@ -390,6 +394,8 @@ class ShipmentService {
 	
 	/**
 	 * Deletes a shipment item
+	 * 
+	 * @param item
 	 */
 	void deleteShipmentItem(ShipmentItem item) {
 		def shipment = item.shipment
@@ -399,6 +405,9 @@ class ShipmentService {
 	/**
 	 * Makes a specified number of copies of the passed container, including it's children containers 
 	 * and shipment item, and connects them all properly to the parent shipment
+	 * 
+	 * @param container
+	 * @param quantity
 	 */
 	void copyContainer(Container container, Integer quantity) {
 		// probably could speed the performance up on this by not going one by one
@@ -411,6 +420,9 @@ class ShipmentService {
 	/**
 	 * Makes a copy of the passed container, including it's children containers and shipment items,
 	 * and connects it properly to the parent shipment
+	 * 
+	 * @param container
+	 * @return
 	 */
 	Container copyContainer(Container container)  {
 		Container newContainer = copyContainerHelper(container)
@@ -421,6 +433,11 @@ class ShipmentService {
 	}
 	
 	
+	/**
+	 * 
+	 * @param container
+	 * @return
+	 */
 	private Container copyContainerHelper(Container container) {
 		
 		// first, make a copy of this container
@@ -461,6 +478,12 @@ class ShipmentService {
 		return shipmentItem;
 	} 
 	
+	
+	/**
+	 * 
+	 * @param itemToFind
+	 * @return
+	 */
 	public ShipmentItem findShipmentItem(ShipmentItem itemToFind) { 
 		def shipmentItem = null;
 		log.info("find shipment item by " + itemToFind.shipment + " > " + itemToFind.container + " > " + itemToFind.product + " > " + itemToFind.lotNumber )
@@ -493,7 +516,8 @@ class ShipmentService {
 	
 	
 	/**
-	 * Get a list of shipments 
+	 * Get a list of shipments.
+	 * 
 	 * @param location
 	 * @param eventCode
 	 * @return
@@ -507,11 +531,14 @@ class ShipmentService {
 	}
 	
 	/**
-	void sendShipment(Shipment shipmentInstance, String comment, User userInstance, Location locationInstance) {
-		sendShipment(shipmentInstance, comment, userInstance, locationInstance, new Date(), null)
-	}
-	*/
-	
+	 * 
+	 * @param shipmentInstance
+	 * @param comment
+	 * @param userInstance
+	 * @param locationInstance
+	 * @param shipDate
+	 * @param emailRecipients
+	 */
 	void sendShipment(Shipment shipmentInstance, String comment, User userInstance, Location locationInstance, Date shipDate, Set<Person> emailRecipients) { 
 
 		try { 
@@ -562,6 +589,14 @@ class ShipmentService {
 		}				
 	} 	
 	
+	
+	/**
+	 * 
+	 * @param shipmentInstance
+	 * @param eventDate
+	 * @param eventCode
+	 * @param location
+	 */
 	void createShipmentEvent(Shipment shipmentInstance, Date eventDate, EventCode eventCode, Location location) { 
 		boolean eventAlreadyExists = Boolean.FALSE;
 		
@@ -595,6 +630,13 @@ class ShipmentService {
 
 	}
 	
+	
+	/**
+	 * 
+	 * @param shipmentInstance
+	 * @param userInstance
+	 * @param recipients
+	 */
 	void triggerSendShipmentEmails(Shipment shipmentInstance, User userInstance, Set<Person> recipients) { 
 	
 		if (!shipmentInstance.hasErrors() && recipients) {
@@ -615,7 +657,13 @@ class ShipmentService {
 	
 	
 	
-	
+	/**
+	 * 
+	 * @param shipmentInstance
+	 * @param comment
+	 * @param user
+	 * @param location
+	 */
 	void receiveShipment(Shipment shipmentInstance, String comment, User user, Location location) { 
 		
 		//try {
@@ -720,7 +768,14 @@ class ShipmentService {
 			//shipmentInstance.errors.reject("shipmentInstance.invalid", e.message);  // this didn't seem to be working properly
 		//}
 	}
-		
+
+	
+	/**
+	 * 
+	 * @param shipmentInstance
+	 * @param dateDelivered
+	 * @return
+	 */
 	public Receipt createReceipt(Shipment shipmentInstance, Date dateDelivered) { 
 		Receipt receiptInstance = new Receipt()
 		shipmentInstance.receipt = receiptInstance
@@ -823,6 +878,12 @@ class ShipmentService {
 	}
 	
 	
+	
+	/**
+	 * 
+	 * @param location
+	 * @return
+	 */
 	Map getQuantityForReceiving(Location location) { 
 		def quantityMap = [:]		
 		def shipments = getIncomingShipments(location)

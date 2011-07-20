@@ -30,7 +30,7 @@
 	<td valign="top" class="value">
 		<g:autoSuggest id="recipient" name="recipient" jsonUrl="/warehouse/json/findPersonByName" 
 			width="180" size="30"
-			valueId="${container?.recipient?.id}" 
-			valueName="${container?.recipient?.name}"/>	
+			valueId="null" 
+			valueName=""/>	
 	</td>
 </tr>
