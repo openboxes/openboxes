@@ -38,22 +38,27 @@
 				<g:if test="${commandInstance?.categoryFilters || commandInstance?.searchTermFilters}">			
 					<g:each var="filter" in="${commandInstance?.categoryFilters }">
 						<span class="filter">
-							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'folder.png' )}"/>&nbsp;
-							${filter?.name }
+							<%--<img src="${createLinkTo(dir: 'images/icons/silk', file: 'folder.png' )}"/>&nbsp; --%>
 							<g:link action="removeCategoryFilter" params="[categoryId:filter.id]">
 								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'delete.png' )}" style="vertical-align:middle"/>
 							</g:link>
+							${filter?.name }
 						</span>
 					</g:each>
 					<g:each var="filter" in="${commandInstance?.searchTermFilters }">
 						<span class="filter">	
-							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'zoom.png' )}" class=""/>
-							${filter }
+							<%-- <img src="${createLinkTo(dir: 'images/icons/silk', file: 'zoom.png' )}" class=""/>--%>
 							<g:link action="removeSearchTerm" params="[searchTerm:filter]">
 								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'delete.png' )}" style=""/>
 							</g:link>
+							${filter }
 						</span>
 					</g:each>
+					<span class="clear-all">
+						<g:link action="clearAllFilters">
+							Show all
+						</g:link>	
+					</span>
 				</g:if>
 				<g:else>
 					<span class="fade">No filters</span>

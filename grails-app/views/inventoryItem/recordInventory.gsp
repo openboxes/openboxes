@@ -9,6 +9,8 @@
 </head>
 
 <body>
+
+
 <div class="body">
 	<g:if test="${flash.message}">
 		<div class="message">
@@ -19,167 +21,171 @@
 		<div class="errors"><g:renderErrors bean="${commandInstance}" as="list" /></div>
 	</g:hasErrors>
 	<div class="dialog">	
-		<div class="actionsMenu" style="float: left;">					
-			<ul>
-				<li>							
-					<g:link controller="inventoryItem" 
-						action="showStockCard" params="['product.id':commandInstance?.product?.id]">
-						<button>
-							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_left.png' )}" style="vertical-align:middle"/>
-							&nbsp; Back to <b>Stock Card</b>&nbsp;
-						</button>
-					</g:link>							
-				</li>
-			</ul>					
-		</div>
-		<%--
-		<div class="actionsMenu" style="float: right;">					
-			<ul>
-				<li>
-					<g:form method="GET" controller="inventory" action="browse">
-						<g:textField name="searchTerms" value="${params.searchTerms }" size="18"/>
-						<button type="submit" class="" name="submitSearch">
-							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'zoom.png' )}" style="vertical-align:middle"/>
-							&nbsp;Find&nbsp;
-						</button>
-					</g:form>						
-				</li>
-			</ul>
-		</div>	
-		 --%>
-		<br clear="all">	
+		<fieldset>
+		
+			<div class="actionsMenu" style="float: left;">					
+				<ul>
+					<li>							
+						<g:link controller="inventoryItem" 
+							action="showStockCard" params="['product.id':commandInstance?.product?.id]">
+							<button>
+								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_left.png' )}" style="vertical-align:middle"/>
+								&nbsp; Back to <b>Stock Card</b>&nbsp;
+							</button>
+						</g:link>							
+					</li>
+				</ul>					
+			</div>
+			<%--
+			<div class="actionsMenu" style="float: right;">					
+				<ul>
+					<li>
+						<g:form method="GET" controller="inventory" action="browse">
+							<g:textField name="searchTerms" value="${params.searchTerms }" size="18"/>
+							<button type="submit" class="" name="submitSearch">
+								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'zoom.png' )}" style="vertical-align:middle"/>
+								&nbsp;Find&nbsp;
+							</button>
+						</g:form>						
+					</li>
+				</ul>
+			</div>	
+			 --%>
+			<br clear="all">	
+		
 	
-	
-		<table border="0" >
-			<tr>
-				<td style="width: 250px;">
-					<g:render template="productDetails" model="[productInstance:commandInstance?.product, inventoryInstance: inventoryInstance, inventoryLevelInstance: inventoryLevelInstance, totalQuantity: totalQuantity]"/>
-				</td>
-				<td>				
-					<div id="inventoryForm">		
-						<g:form action="saveRecordInventory" autocomplete="off">
-							
-								<h2>Record Current Inventory</h2>
+			<table border="0" >
+				<tr>
+					<td style="width: 250px;">
+						<g:render template="productDetails" model="[productInstance:commandInstance?.product, inventoryInstance: inventoryInstance, inventoryLevelInstance: inventoryLevelInstance, totalQuantity: totalQuantity]"/>
+					</td>
+					<td>				
+						<div id="inventoryForm">		
+							<g:form action="saveRecordInventory" autocomplete="off">
 								
-								<g:hiddenField name="product.id" value="${commandInstance.product?.id}"/>
-								<g:hiddenField name="inventory.id" value="${commandInstance?.inventory?.id}"/>
-								<%--
-									<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
-									<g:hiddenField name="active" value="true"/>
-									<g:hiddenField name="initialQuantity" value="0"/>							
-									<g:hiddenField name="inventoryItemType" value="${org.pih.warehouse.inventory.InventoryItemType.NON_SERIALIZED}"/>
-								 --%>			
-								<div class="form-content">
-									<table id="inventoryItemsTable">
-										<thead>
-											<tr>
-												<td class="middle">
-													<label>Date of inventory</label>													
-													<g:jqueryDatePicker 
-														id="transactionDate" 
-														name="transactionDate" 
-														value="${commandInstance?.transactionDate}" 
-														format="MM/dd/yyyy"
-														showTrigger="false" />						
-												
-												</td>
-												<td colspan="4" class="right middle">
-													<button id="addAnother" type="button" class="positive">
-														<img src="${createLinkTo(dir:'images/icons/silk', file:'add.png') }"/>&nbsp;Add Item
-													</button>
-												
-												
-												</td>
-											</tr>
-											<tr class="prop odd">	
-												<th>Lot/Serial No</th>
-												<th>Expires</th>
-												<th style="text-align:center;">Old Qty</th>
-												<th style="text-align:center;">New Qty</th>
-												<th>Actions</th>
-											</tr>											
-										</thead>									
-										<tbody>
-											<style>
-												.selected-row { background-color: #ffffe0; } 
-											</style>
-											
-											<g:set var="inventoryItems" value="${commandInstance?.recordInventoryRows.findAll{it.oldQuantity != 0 || it.newQuantity != 0}}"/>	
-											<g:if test="${inventoryItems }">											
-												<g:each var="recordInventoryRow" in="${inventoryItems.sort { it.lotNumber }}" status="status">
-													<g:set var="styleClass" value="${params?.inventoryItem?.id && recordInventoryRow?.id == Integer.valueOf(params?.inventoryItem?.id) ? 'selected-row' : ''}"/>
+									<h2>Record Current Inventory</h2>
+									
+									<g:hiddenField name="product.id" value="${commandInstance.product?.id}"/>
+									<g:hiddenField name="inventory.id" value="${commandInstance?.inventory?.id}"/>
+									<%--
+										<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
+										<g:hiddenField name="active" value="true"/>
+										<g:hiddenField name="initialQuantity" value="0"/>							
+										<g:hiddenField name="inventoryItemType" value="${org.pih.warehouse.inventory.InventoryItemType.NON_SERIALIZED}"/>
+									 --%>			
+									<div class="form-content">
+										<table id="inventoryItemsTable">
+											<thead>
+												<tr>
+													<td class="middle">
+														<label>Date of inventory</label>													
+														<g:jqueryDatePicker 
+															id="transactionDate" 
+															name="transactionDate" 
+															value="${commandInstance?.transactionDate}" 
+															format="MM/dd/yyyy"
+															showTrigger="false" />						
 													
-													<tr class="${styleClass} ${status%2==0?'even':'odd'}">
-														<td width="15%">
-															<%-- 
-															<g:textField name="recordInventoryRows[${status}].lotNumber" size="10" value="${recordInventoryRow?.lotNumber }"/>
-															--%>
-															<g:hiddenField name="recordInventoryRows[${status}].id" value="${recordInventoryRow?.id }"/>
-															<g:hiddenField name="recordInventoryRows[${status}].lotNumber" value="${recordInventoryRow?.lotNumber }"/>
-															${recordInventoryRow?.lotNumber?:'<span class="fade">None</span>' }
-														</td>
-														<td width="10%">
-															<%-- 
-															<g:jqueryDatePicker id="expirationDate${status }" name="recordInventoryRows[${status}].expirationDate" 
-																value="${recordInventoryRow?.expirationDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" showTrigger="false" />
-															--%>
-															<g:hiddenField name="recordInventoryRows[${status}].expirationDate" value="${formatDate(date: recordInventoryRow?.expirationDate, format: 'MM/dd/yyyy') }"/>
-															<g:if test="${recordInventoryRow?.expirationDate}">
-																<format:expirationDate obj="${recordInventoryRow?.expirationDate}"/>
-															</g:if>
-															<g:else>
-																<span class="fade">never</span>
-															</g:else>
-														</td>
-														<td width="10%" style="text-align: center; vertical-align: middle;">
-															${recordInventoryRow?.oldQuantity }	
-															<g:hiddenField name="recordInventoryRows[${status}].oldQuantity" value="${recordInventoryRow?.oldQuantity }"/>
-														</td>	
-														<td width="10%" style="text-align: center; vertical-align: middle;">
-															<g:textField style="text-align: center;" id="newQuantity-${status }" class="newQuantity" name="recordInventoryRows[${status }].newQuantity" size="3" value="${recordInventoryRow?.newQuantity }" onFocus="this.select();" onClick="this.select();"/>
-														</td>
-														<td width="15%" style="text-align: center">
-															<%-- 
-																<button id="${status }" class="buttonUp">
-																	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_up.png') }"/>
-																</button>
-																<button id="${status }" class="buttonDown">
-																	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_down.png') }"/>
-																</button>
-															--%>
-														</td>
-													</tr>
-												</g:each>
-											</g:if>
-											<g:else>
-												<tr class="odd">
-													<td colspan="5" style="text-align: center; min-height: 400px;">
-														Add a new inventory item to proceed.
+													</td>
+													<td colspan="4" class="right middle">
+														<button id="addAnother" type="button" class="positive">
+															<img src="${createLinkTo(dir:'images/icons/silk', file:'add.png') }"/>&nbsp;Add Item
+														</button>
+													
+													
 													</td>
 												</tr>
+												<tr class="prop odd">	
+													<th>Lot/Serial No</th>
+													<th>Expires</th>
+													<th style="text-align:center;">Old Qty</th>
+													<th style="text-align:center;">New Qty</th>
+													<th>Actions</th>
+												</tr>											
+											</thead>									
+											<tbody>
+												<style>
+													.selected-row { background-color: #ffffe0; } 
+												</style>
 												
-											</g:else>
-											
-										</tbody>
-										<tfoot>
-											<tr class="prop">
-												<td colspan="5" style="text-align: center">
-													<button name="save" type="submit" class="positive">
-														<img src="${createLinkTo(dir:'images/icons/silk', file:'tick.png') }"/>&nbsp;Save 
-													</button>
-													&nbsp;
-													<g:link controller="inventoryItem" action="showStockCard" 
-														params="['product.id':commandInstance.product?.id]" class="negative">Cancel</g:link>
-												</td>
-											</tr>
-										</tfoot>
-									</table>
-								</div>												
-						</g:form>
-					</div>
-				</td>
-			</tr>
-		</table>
+												<g:set var="inventoryItems" value="${commandInstance?.recordInventoryRows.findAll{it.oldQuantity != 0 || it.newQuantity != 0}}"/>	
+												<g:if test="${inventoryItems }">											
+													<g:each var="recordInventoryRow" in="${inventoryItems.sort { it.lotNumber }}" status="status">
+														<g:set var="styleClass" value="${params?.inventoryItem?.id && recordInventoryRow?.id == Integer.valueOf(params?.inventoryItem?.id) ? 'selected-row' : ''}"/>
+														
+														<tr class="${styleClass} ${status%2==0?'even':'odd'}">
+															<td width="15%">
+																<%-- 
+																<g:textField name="recordInventoryRows[${status}].lotNumber" size="10" value="${recordInventoryRow?.lotNumber }"/>
+																--%>
+																<g:hiddenField name="recordInventoryRows[${status}].id" value="${recordInventoryRow?.id }"/>
+																<g:hiddenField name="recordInventoryRows[${status}].lotNumber" value="${recordInventoryRow?.lotNumber }"/>
+																${recordInventoryRow?.lotNumber?:'<span class="fade">None</span>' }
+															</td>
+															<td width="10%">
+																<%-- 
+																<g:jqueryDatePicker id="expirationDate${status }" name="recordInventoryRows[${status}].expirationDate" 
+																	value="${recordInventoryRow?.expirationDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" showTrigger="false" />
+																--%>
+																<g:hiddenField name="recordInventoryRows[${status}].expirationDate" value="${formatDate(date: recordInventoryRow?.expirationDate, format: 'MM/dd/yyyy') }"/>
+																<g:if test="${recordInventoryRow?.expirationDate}">
+																	<format:expirationDate obj="${recordInventoryRow?.expirationDate}"/>
+																</g:if>
+																<g:else>
+																	<span class="fade">never</span>
+																</g:else>
+															</td>
+															<td width="10%" style="text-align: center; vertical-align: middle;">
+																${recordInventoryRow?.oldQuantity }	
+																<g:hiddenField name="recordInventoryRows[${status}].oldQuantity" value="${recordInventoryRow?.oldQuantity }"/>
+															</td>	
+															<td width="10%" style="text-align: center; vertical-align: middle;">
+																<g:textField style="text-align: center;" id="newQuantity-${status }" class="newQuantity" name="recordInventoryRows[${status }].newQuantity" size="3" value="${recordInventoryRow?.newQuantity }" onFocus="this.select();" onClick="this.select();"/>
+															</td>
+															<td width="15%" style="text-align: center">
+																<%-- 
+																	<button id="${status }" class="buttonUp">
+																		<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_up.png') }"/>
+																	</button>
+																	<button id="${status }" class="buttonDown">
+																		<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_down.png') }"/>
+																	</button>
+																--%>
+															</td>
+														</tr>
+													</g:each>
+												</g:if>
+												<g:else>
+													<tr class="odd">
+														<td colspan="5" style="text-align: center; min-height: 400px;">
+															Add a new inventory item to proceed.
+														</td>
+													</tr>
+													
+												</g:else>
+												
+											</tbody>
+											<tfoot>
+												<tr class="prop">
+													<td colspan="5" style="text-align: center">
+														<button name="save" type="submit" class="positive">
+															<img src="${createLinkTo(dir:'images/icons/silk', file:'tick.png') }"/>&nbsp;Save 
+														</button>
+														&nbsp;
+														<g:link controller="inventoryItem" action="showStockCard" 
+															params="['product.id':commandInstance.product?.id]" class="negative">Cancel</g:link>
+													</td>
+												</tr>
+											</tfoot>
+										</table>
+									</div>												
+							</g:form>
+						</div>
+					</td>
+				</tr>
+			</table>
+			
+		</fieldset>
 	</div>			
 </div>
 

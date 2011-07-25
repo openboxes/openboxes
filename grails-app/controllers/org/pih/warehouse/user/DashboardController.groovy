@@ -9,6 +9,7 @@ import org.pih.warehouse.inventory.Warehouse;
 class DashboardController {
 
 	def shipmentService;
+	def orderService
 	
     def index = {
 		if (!session.warehouse) {			
@@ -16,15 +17,22 @@ class DashboardController {
 		}
 		
 		Location location = Location.get(session?.warehouse?.id);
+		
+		
 		def recentOutgoingShipments = shipmentService.getRecentOutgoingShipments(location?.id)
 		def recentIncomingShipments = shipmentService.getRecentIncomingShipments(location?.id)
 		def allOutgoingShipments = shipmentService.getShipmentsByOrigin(location)
 		def allIncomingShipments = shipmentService.getShipmentsByDestination(location)
 		
+		def outgoingOrders = orderService.getOutgoingOrders(location).groupBy { it?.status };
+		def incomingOrders = orderService.getIncomingOrders(location).groupBy { it?.status };
+		
 		[ 	outgoingShipments : recentOutgoingShipments, 
 			incomingShipments : recentIncomingShipments,
 			allOutgoingShipments : allOutgoingShipments,
 			allIncomingShipments : allIncomingShipments,
+			outgoingOrders : outgoingOrders,
+			incomingOrders : incomingOrders,
 			outgoingShipmentsByStatus : shipmentService.getShipmentsByStatus(allOutgoingShipments),
 			incomingShipmentsByStatus : shipmentService.getShipmentsByStatus(allIncomingShipments)
 		]

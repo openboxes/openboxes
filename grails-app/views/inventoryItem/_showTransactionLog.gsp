@@ -1,7 +1,7 @@
 <div>							
 	
 	<h2 class="fade">Transaction Log</h2>
-	<div style="text-align: center;">
+	<div style="text-align: left;">
 		<g:form method="GET" action="showStockCard">
 			<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
 
@@ -77,6 +77,7 @@
 										<g:link controller="inventory" action="showTransaction" id="${transaction?.id }" params="['product.id':commandInstance?.productInstance?.id]">
 											<format:date obj="${transaction?.transactionDate}"/>																
 										</g:link>
+									</td>
 									<td>
 										<span class="${transaction?.transactionType?.transactionCode?.name()?.toLowerCase()}">
 											${transaction?.transactionType?.name }

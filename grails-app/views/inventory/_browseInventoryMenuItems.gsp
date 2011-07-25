@@ -14,4 +14,10 @@
 		</g:link>
 	</div>	
 </g:else>
+<div class="action-menu-item">			
+	<a class="toggle-outofstock" href="javascript:void();">
+		<img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}" style="vertical-align: middle;"/>
+		Toggle out of stock items
+	</a>
+</div>
 

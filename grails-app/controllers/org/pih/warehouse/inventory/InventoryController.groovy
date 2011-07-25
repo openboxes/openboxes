@@ -1,6 +1,9 @@
 package org.pih.warehouse.inventory;
 
+import java.text.SimpleDateFormat;
+
 import org.pih.warehouse.shipping.ShipmentStatusCode;
+import org.pih.warehouse.core.Constants;
 import org.pih.warehouse.core.Location 
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.product.Category;
@@ -76,6 +79,8 @@ class InventoryController {
 			}
 		}
 		cmd.showHiddenProducts = session?.showHiddenProducts;
+		
+		
 		inventoryService.browseInventory(cmd);
 
 		[ commandInstance: cmd ]
@@ -335,6 +340,46 @@ class InventoryController {
 	def listTransactions = { 
 		redirect(action: listAllTransactions)
 	}
+	
+	def listDailyTransactions = { 
+
+		def date = (params.date) ?: new Date();
+		def dateFormat = new SimpleDateFormat(Constants.DEFAULT_DATE_FORMAT);		
+		def transactionsByDate = Transaction.list().groupBy { it.transactionDate } 
+		def transactions = Transaction.findAllByTransactionDate(date);
+		log.info("params.date " + params.date)
+		
+		[ transactions: transactions, transactionsByDate: transactionsByDate ]
+		/*
+		def currentInventory = Inventory.list().find( {it.warehouse.id == session.warehouse.id} )
+		
+		// we are only showing transactions for the inventory associated with the current warehouse
+		params.max = Math.min(params.max ? params.int('max') : 10, 100)
+		params.sort = params?.sort ?: "transactionDate"
+		params.order = params?.order ?: "desc"
+		def transactions = Transaction.findAllByInventory(currentInventory, params);
+		def transactionCount = Transaction.countByInventory(currentInventory);
+		*/
+		
+	}
+	
+	def listExpiringStock = { 
+		def today = new Date();
+		
+		// Stock that has already expired
+		def expiredStock = InventoryItem.findAllByExpirationDateLessThan(today, [sort: 'expirationDate', order: 'desc']);
+		
+		// Stock expiring within the next 365 days
+		def expiringStock = InventoryItem.findAllByExpirationDateBetween(today+1, today+180, [sort: 'expirationDate', order: 'asc']);
+		
+		def warehouse = Warehouse.get(session.warehouse.id)		
+		def quantityMap = inventoryService.getQuantityForInventory(warehouse.inventory)
+		
+		
+		[expiredStock : expiredStock, expiringStock: expiringStock, quantityMap: quantityMap]
+	}
+	
+	
 	
 	def listAllTransactions = {		
 		

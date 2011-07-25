@@ -20,6 +20,10 @@
 				padding: 10px;
 				text-align: left;
 			}
+			.clear-all { 
+				padding: 5px; 
+				margin-left: 20px;
+			}			
 			.filter { 
 				background-color: #f7f7f7;
 				font-size: 13px;
@@ -86,6 +90,8 @@
 																	<th width="50%">Description</th>
 																	<th width="20%">Manufacturer</th>
 																	<th width="20%">Product Code</th>
+																	<th width="5%" style="text-align: center">Qty In</th>
+																	<th width="5%" style="text-align: center">Qty Out</th>
 																	<th width="5%" style="text-align: center">Qty</th>
 																</tr>
 															</thead>
@@ -93,7 +99,8 @@
 																<g:each var="inventoryItem" in="${categoryInventoryItems}" status="status">
 																	<g:set var="quantity" value="${inventoryItem?.quantityOnHand }"/>
 																	<g:set var="totalQuantity" value="${totalQuantity + (quantity?:0) }"/>
-																	<tr class="${status%2==0?'even':'odd' } prop checkable">
+																	<g:set var="cssClass" value="${quantity == 0 ? 'outofstock' : 'instock'  }"/>
+																	<tr class="${status%2==0?'even':'odd' } prop checkable ${cssClass}">
 																	<%-- 
 																		<td nowrap="true">
 																			<div class="action-menu">
@@ -132,9 +139,15 @@
 																		<td>
 																			${inventoryItem?.product?.productCode }
 																		</td>
+																		<td style="text-align: center; border-left: 1px solid lightgrey;">
+																			${inventoryItem?.quantityToReceive?:0}
+																		</td>
+																		<td style="text-align: center; border-right: 1px solid lightgrey;">
+																			${inventoryItem?.quantityToShip?:0}
+																		</td>
 																		<td style="text-align: center;">
 																			<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
-																				${quantity?:0}
+																				${inventoryItem?.quantityOnHand?:0}
 																			</g:link>
 																		</td>
 																	</tr>
@@ -152,6 +165,12 @@
 																	</th>
 																	<th style="width: 20%">
 																		
+																	</th>
+																	<th>
+																	
+																	</th>
+																	<th>
+																	
 																	</th>
 																	<th style="text-align: center; width: 5%">
 																		${totalQuantity }
@@ -201,6 +220,14 @@
 						return false;
 					}
 				);
+
+				
+				$(".toggle-outofstock").click(function() { 
+					$(".outofstock").toggle();					
+				});
+				
+				
+				
 			});	
 		</script>	
     </body>

@@ -16,16 +16,21 @@ import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.core.Constants 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.validation.Errors;
 
-class InventoryService {
+class InventoryService implements ApplicationContextAware {
 	
 	def sessionFactory
 	def productService
+
+	ApplicationContext applicationContext
+	
 	boolean transactional = true
 	
 	/**
-	 * 
+	 * Gets all warehouses
 	 * @return
 	 */
 	List<Warehouse> getAllWarehouses() {
@@ -60,7 +65,9 @@ class InventoryService {
     
     /**
      * Saves the specified warehouse
-     */
+	 * 
+	 * @param warehouse
+	 */
 	void saveWarehouse(Warehouse warehouse) {
 		// make sure a warehouse has an inventory
 		if (!warehouse.inventory) {
@@ -70,9 +77,12 @@ class InventoryService {
 	}
 	
 	/**
-    * Returns the Location specified by the passed id parameter;
-    * if no parameter is specified, returns a new location instance
-    */
+	 * Returns the Location specified by the passed id parameter;
+	 * if no parameter is specified, returns a new location instance
+	 * 
+	 * @param locationId
+	 * @return
+	 */
     Location getLocation(Long locationId) {
 	   	if (locationId) {
 	   		Location location = Location.get(locationId)
@@ -92,13 +102,18 @@ class InventoryService {
 	
     /**
      * Saves the specified location
-     */
+	 * 
+	 * @param location
+	 */
 	void saveLocation(Location location) {
 		location.save(flush:true)
 	}
     
 	/**
 	 * Gets all transactions associated with a warehouse
+	 * 
+	 * @param warehouse
+	 * @return
 	 */
 	List<Transaction> getAllTransactions(Warehouse warehouse) {
 		return Transaction.withCriteria { eq("thisWarehouse", warehouse) }
@@ -107,6 +122,9 @@ class InventoryService {
 	/**
 	 * Gets the inventory associated with this warehouse;
 	 * if no inventory, create a new inventory
+	 * 
+	 * @param warehouse
+	 * @return
 	 */
 	Inventory getInventory(Warehouse warehouse) {
 		Inventory inventory = Inventory.withCriteria { eq("warehouse", warehouse) }
@@ -115,6 +133,9 @@ class InventoryService {
 	
 	/**
 	 * Adds an inventory to the specified warehouse
+	 * 
+	 * @param warehouse
+	 * @return
 	 */
 	Inventory addInventory(Warehouse warehouse) {
 		if (!warehouse) {
@@ -214,6 +235,11 @@ class InventoryService {
 		return commandInstance;
 	}
 
+	def getShipmentService() { 
+		return applicationContext.getBean("shipmentService")
+	}
+	
+	
 	/**
 	 * 
 	 * @param commandInstance
@@ -221,16 +247,25 @@ class InventoryService {
 	 */
 	Map getCurrentInventory(def commandInstance) { 
 		
+		def shipmentService = getShipmentService()
+		
 		def inventoryItems = [];
 		
 		// Only used to count products on page
 		commandInstance.products = getProducts(commandInstance);
 		
 		// Get quantity for each item in inventory 
-		def quantityMap = getQuantityByProductMap(commandInstance?.inventoryInstance);
+		def quantityOnHandMap = getQuantityByProductMap(commandInstance?.inventoryInstance);
+		def quantityShippingMap = shipmentService.getShippingQuantityByProduct(commandInstance?.warehouseInstance);
+		def quantityReceivingMap = shipmentService.getReceivingQuantityByProduct(commandInstance?.warehouseInstance);
+		
 		commandInstance?.products.each { product -> 
-			def quantityOnHand = quantityMap[product] ?: 0;
-			inventoryItems << new InventoryItemCommand(category: product.category, product: product, quantityOnHand: quantityOnHand)
+			def quantityOnHand = quantityOnHandMap[product] ?: 0;
+			def quantityToReceive = quantityReceivingMap[product] ?: 0;
+			def quantityToShip = quantityShippingMap[product] ?: 0;
+			
+			inventoryItems << new InventoryItemCommand(category: product.category, product: product, 
+				quantityOnHand: quantityOnHand, quantityToReceive: quantityToReceive, quantityToShip: quantityToShip );
 		}
 		
 		// Get inventory and sort by product name 
@@ -243,22 +278,22 @@ class InventoryService {
 		return inventoryProductMap;
 	}
 		
-	
-	/*
-	*
-	* Get products based on the
-	*/
-   Set getProducts(def commandInstance) {
-	   // Get any category filters that match search terms
-	   def products = getProductsByAll(
-		   commandInstance?.searchTermFilters, 
-		   commandInstance?.categoryFilters, 
-		   commandInstance?.showHiddenProducts);
-	   
-	   
-	   products = products?.sort() { it?.name };
-	   return products;
-   }
+	/**
+	 * 
+	 * @param commandInstance
+	 * @return
+	 */
+	Set getProducts(def commandInstance) {
+		// Get any category filters that match search terms
+		def products = getProductsByAll(
+				commandInstance?.searchTermFilters,
+				commandInstance?.categoryFilters,
+				commandInstance?.showHiddenProducts);
+
+
+		products = products?.sort() { it?.name };
+		return products;
+	}
 
 
    /**
@@ -331,10 +366,12 @@ class InventoryService {
 	/**
 	 * Get a map of product attribute-value pairs for the given products.
 	 * If products is empty, then we return all attribute-value pairs.
+	 * 
+	 * @return
 	 */
-	Map getProductAttributes() { 
+	Map getProductAttributes() {
 		def productAttributes = ProductAttribute.list()
-		return productAttributes.groupBy { it.attribute } 
+		return productAttributes.groupBy { it.attribute }
 	}
 	
 	
@@ -463,7 +500,8 @@ class InventoryService {
 		def quantityMap = [:]
 		                   
 		// first get the quantity and inventory item map
-		def quantityByProductAndInventoryItemMap = getQuantityByProductAndInventoryItemMap(entries)
+		def quantityByProductAndInventoryItemMap = 
+			getQuantityByProductAndInventoryItemMap(entries)
 		
 		// now collapse this down to be by product
 		quantityByProductAndInventoryItemMap.keySet().each {

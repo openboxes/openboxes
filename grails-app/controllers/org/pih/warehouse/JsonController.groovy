@@ -42,6 +42,29 @@ class JsonController {
 	}
 	
 	
+	def searchAll = { 
+		
+		def searchTerm = "%" + params.term + "%";
+		def c = Product.createCriteria()
+		def productNames = c.list {
+			projections {
+				property "name"
+			}
+			ilike("name", searchTerm)
+		}
+
+				
+		def results = productNames.collect { 
+			[ id: '0', value: '', type: 'product', label: it ]
+		}
+		
+		log.info(results);
+		
+		render results as JSON;
+
+	}
+	
+	
 	def searchInventoryItems = {
 		log.info params
 		def inventoryItems = []

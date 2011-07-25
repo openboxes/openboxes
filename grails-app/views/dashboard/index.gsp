@@ -42,6 +42,48 @@
 	    		</div>
 				--%>
 				
+				<div class="widget-small">
+					<div class="widget-header"><h2><g:message code="order.summary.label" args="[session.warehouse.name]"/></h2></div>
+	    			
+	    			<div class="widget-content">	    					    			
+	    				<div id="receivingsummary">	
+		    				<g:if test="${!incomingOrders}">
+   								<div style="text-align: center; padding: 10px;" class="fade">
+   									(<g:message code="receiving.noRecent.label"/>)
+   								</div>
+   							</g:if>	    		
+   							<g:else>			
+					    		<table>
+						    		<thead>
+					    				<tr class="">
+					    					<td colspan="2">
+					    						Orders into ${session.warehouse.name }
+					    					</td>
+					    				</tr>
+					    			</thead>				
+					    			<tbody>
+										<g:each var="entry" in="${incomingOrders}" status="i">	 
+											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+												<td>${entry.key.name}</td>
+												<td style="text-align: center;"><g:link controller="shipment" action="listReceiving" params="['status':entry.key.name]">
+													${entry.value.size}</g:link></td>
+											</tr>	
+								    	</g:each>
+							    	</tbody>
+							    	<tfoot>
+								    	<tr style="border-top: 1px solid lightgrey">
+								    		<th style="text-align: right;"><g:message code="shipping.total.label"/></td>							    		
+								    		<th style="text-align: center;"><g:link controller="shipment" action="listReceiving" params="">${allIncomingShipments.size()}</g:link></td>
+								    	</tr>
+							    	</tfoot>
+						    	</table>
+						    </g:else>
+						</div>
+	    			</div>
+	    			<br clear="all"/>
+	    			
+				</div>					
+				
 				<!--  Show recent shipments/receipts -->
 				<div class="widget-small">
 					<div class="widget-header"><h2><g:message code="shipping.summary.label" args="[session.warehouse.name]"/></h2></div>

@@ -7,7 +7,23 @@
          
          <style>
 	         .ui-autocomplete { height: 250px; overflow-y: scroll; overflow-x: hidden;}
-         </style>
+	 		.draggable { cursor: move; } 
+	 		.droppable { /*padding: 10px; border: 0px dashed lightgrey;*/ } 
+	 		.ui-state-highlight { font-weight: bold; color: black; }  
+	 		.strikethrough { color: lightgrey; } 
+	 		.containers td { border-right: 0px solid lightgrey; }
+	 		.selected { 
+	 			border-right: 0px; 
+				padding-left:20px;
+		 		background:transparent url('${resource(dir: 'images/icons/silk', file: 'bullet_yellow.png')}') center left no-repeat;
+	 		}
+	 		.not-selected { 
+	 			border-right: 0px; 
+				padding-left:20px;
+		 		background:transparent url('${resource(dir: 'images/icons/silk', file: 'bullet_white.png')}') center left no-repeat;
+	 		}
+		</style>
+				
     </head>
     <body>
 		<div class="body">
@@ -51,47 +67,25 @@
 		 			<g:render template="moveItem" model="['item':itemToMove]"/>
 		 		</g:if>
 			 	
-			 	<style>
-			 		.draggable { cursor: move; } 
-			 		.droppable { /*padding: 10px; border: 0px dashed lightgrey;*/ } 
-			 		.ui-state-highlight { font-weight: bold; color: black; }  
-			 		.strikethrough { color: lightgrey; } 
-			 		.containers td { border-right: 0px solid lightgrey; }
-			 		.selected { 
-			 			border-right: 0px; 
-			 			display:inline-block;
-						padding-left:20px;
-						line-height:18px;
-				 		background:transparent url('${resource(dir: 'images/icons/silk', file: 'bullet_yellow.png')}') center left no-repeat;
-			 		}
-			 		.not-selected { 
-			 			border-right: 0px; 
-			 			display:inline-block;
-						padding-left:20px;
-						line-height:18px;
-				 		background:transparent url('${resource(dir: 'images/icons/silk', file: 'bullet_white.png')}') center left no-repeat;
-			 		}
-			 	</style>
-				
-				
+			 	
 				<%-- Main content section --%>
 			 	<table style="border-bottom: 1px solid lightgrey;" border="0" >
 			 		<tr>
 				 		<%-- Display the pallets & boxes in this shipment --%> 
-			 			<td valign="top" style="padding: 0px; margin: 0px; border-right: 1px solid lightgrey;" >
+			 			<td valign="top" style="padding: 0px; margin: 0px; width: 35%; border-right: 1px solid lightgrey;" >
 							<div class="list" style="text-align: left; border: 0px solid lightgrey;">
 								<g:set var="count" value="${0 }"/>	
 															
 								<table style="border: 0px" border="0">	
 									<thead>
 										<tr class="odd"><%-- --%>
-											<td>
+											<td colspan="2">
 												<h3>All shipment containers</h3>
 											</td>
 										</tr>
 										<tr>
-											<td>
-												<div style="border: 0px; height: 30px;">
+											<td colspan="2">
+												<div style="border: 0px; ">
 													<span class="action-menu" >
 														<button class="action-btn">
 															<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>							
@@ -116,6 +110,7 @@
 										 	</td>
 										</tr>
 										<tr class="${count++%2==0?'odd':'even' }">
+											<th>Items</th>
 											<th>Container</th>
 										</tr>
 									</thead>
@@ -123,6 +118,9 @@
 										
 										<tr class="${count++%2==0?'odd':'even' }">
 											<g:set var="styleClass" value="${selectedContainer == null ? 'selected' : 'not-selected' }"/>
+											<td>
+												
+											</td>
 											<td class="droppable">
 												<span class="${styleClass}">
 													<g:link action="createShipment" event="enterContainerDetails" style="display: block;">Unpacked items</g:link>
@@ -133,6 +131,11 @@
 											<g:each var="containerInstance" in="${shipmentInstance?.containers?.findAll({!it.parentContainer})?.sort()}">
 												<g:set var="styleClass" value="${containerInstance?.id == selectedContainer?.id ? 'selected' : 'not-selected' }"/>
 												<tr style="border: 0px solid lightgrey;" class="${count++%2==0?'odd':'even' }">
+													<td width="5%">
+														<span class="fade">
+															${containerInstance?.shipmentItems?.size() }
+														</span>
+													</td>
 													<td style="vertical-align: middle;" id="${containerInstance?.id }" class="droppable">													
 														<a name="container-${containerInstance.id }"></a>
 														<div>
@@ -141,13 +144,11 @@
 																	${containerInstance?.name}
 																</g:if>
 																<g:else>
-																	<g:link action="createShipment" event="enterContainerDetails" params="['containerId':containerInstance?.id]" fragment="container-${containerInstance?.id }" style="display: block;">
+																	<%-- fragment="container-${containerInstance?.id }"  --%>
+																	<g:link action="createShipment" event="enterContainerDetails" params="['containerId':containerInstance?.id]" style="display: block;">
 																		${containerInstance?.name}
 																	</g:link>
 																</g:else>
-															</span>
-															<span class="fade">
-																(${containerInstance?.shipmentItems?.size() } items)
 															</span>
 														</div>
 													</td>
@@ -163,13 +164,16 @@
 																	${childContainerInstance?.name}
 																</g:if>
 																<g:else>
-																	<g:link action="createShipment" event="enterContainerDetails" params="['containerId':childContainerInstance?.id]" fragment="container-${childContainerInstance?.id }" style="display: block;">
+																	<%-- fragment="container-${childContainerInstance?.id }" --%>
+																	<g:link action="createShipment" event="enterContainerDetails" params="['containerId':childContainerInstance?.id]" style="display: block;">
 																		${childContainerInstance?.name}
 																	</g:link>
 																</g:else>
 															</span>
+														</td>
+														<td>
 															<span class="fade">
-																(${childContainerInstance?.shipmentItems?.size() } items)
+																${childContainerInstance?.shipmentItems?.size() }
 															</span>
 														</td>
 													</tr>
@@ -184,7 +188,7 @@
 			 			
 			 			<%-- Display the contents of the currently selected container --%>			 			
 			 			<td valign="top" style="padding: 0; margin: 0">
-							<div class="list" >
+							<div class="list">
 								<g:set var="count" value="${0 }"/>	
 								<table style="height: 100%">
 									<thead>	
@@ -254,6 +258,12 @@
 												</div>
 											</td>
 										</tr>
+									</thead>
+								</table>
+							</div>
+							<div class="list">
+								<table>
+									<thead>
 										<tr class="${count++%2==0?'odd':'even' }">
 											<th>Actions</th>
 											<th class="center">Qty</th>
@@ -261,7 +271,7 @@
 											<th nowrap="nowrap">Lot/Serial No</th>
 											<th>Recipient</th>
 										</tr>
-									</thead>
+									</thead>									
 									<tbody>
 										<g:set var="shipmentItems" value="${shipmentInstance?.shipmentItems?.findAll({it.container?.id == selectedContainer?.id})}"/>
 										<g:if test="${shipmentItems }">

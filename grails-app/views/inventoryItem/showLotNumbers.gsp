@@ -64,7 +64,6 @@
 						<!-- Content -->
 						<table>				
 							<tr>
-							
 								<!--  Product Details -->
 								<td style="width: 250px;" rowspan="3">
 									<g:render template="productDetails" 
@@ -72,54 +71,16 @@
 											inventoryLevelInstance: commandInstance?.inventoryLevelInstance, totalQuantity: commandInstance?.totalQuantity]"/>
 								</td>
 								
-								<!--  Current Stock and Transaction Log -->
+								<!--  Lot Numbers -->
 								<td>
-									<g:render template="showCurrentStock"/>
+									<g:render template="showLotNumbers"/>
 								</td>
 							</tr>
-							<tr>
-								<td>
-									<g:render template="showTransactionLog"/>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<g:render template="showPendingTransactionLog"/>
-								</td>
-							</tr>
+							
 						</table>
 					</div>
 				</fieldset>
 			</div>
-			<div id="transaction-details" style="height: 200px; overflow: auto;">
-				<!-- will be populated by an jquery ajax call -->
-			</div>
-			
-		</div>
-		
-		<script>
-			$(document).ready(function() {
-
-				// Define dialog
-				$("#transaction-details").dialog({ title: "Transaction Details", 
-					modal: true, autoOpen: false, width: 800, height: 400, position: 'middle' });    //end dialog									    
-
-				// Click event -> open dialog
-				$('.show-details').click(
-			        function(event) {
-				        //$("#example").load("", [], function() { 
-				        //    jQuery("#example").dialog("open");
-				        //});
-				        //return false
-						var link = $(this);
-						var dialog = jQuery('#transaction-details').load(link.attr('href')).dialog("open");										        
-				        event.preventDefault();
-			        }
-			    );	
-			});	
-
-
-			
-		</script>		
+		</div>	
 	</body>
 </html>

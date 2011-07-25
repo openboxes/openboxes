@@ -36,7 +36,10 @@ class ShipmentService {
 	/**
 	 * Returns the shipment referenced by the passed id parameter;
 	 * if id is null, returns a new Shipment object
-	 */	
+	 * 
+	 * @param shipmentId
+	 * @return
+	 */
 	Shipment getShipmentInstance(Long shipmentId) {
 		return getShipmentInstance(shipmentId, null)
 	}
@@ -45,6 +48,10 @@ class ShipmentService {
 	 * Returns the shipment referenced by the passed id parameter;
 	 * if id is null, returns a new Shipment object of the specified
 	 * shipment type
+	 * 
+	 * @param shipmentId
+	 * @param shipmentType
+	 * @return
 	 */
 	Shipment getShipmentInstance(Long shipmentId, String shipmentType) {
 		if (shipmentId) {
@@ -72,43 +79,48 @@ class ShipmentService {
 		}
 	}
 	
+	
+	/**
+	 * @param sort
+	 * @param order
+	 * @return	all shipments sorted by the given sort column and ordering
+	 */
 	List<Shipment> getAllShipments(String sort, String order) {
 		return Shipment.list(['sort':sort, 'order':order])
 	}
 	
+	
+	/**
+	 * @return all shipments 
+	 */
 	List<Shipment> getAllShipments() {
 		return Shipment.list()
 	}
+
 	
+	/**
+	 * 	
+	 * @return
+	 */
 	Object getProductMap() { 
 		
-		def criteria = ShipmentItem.createCriteria();
-		/*
-		def products = criteria.list { 
-			projections {
-				property "product"
-			}
-		}
-		*/
-		
+		def criteria = ShipmentItem.createCriteria();		
 		def quantityMap = criteria.list {
 			projections {
 				sum('quantity')
 			}
-			//gt("stars", 2)
-			//eq("city", city)
-			//eq("deleted", false)
 			groupProperty "product"
 		}
-		println quantityMap
-
-		
 		return quantityMap
 		
 	}
 	
 	
-	
+	/**
+	 * 
+	 * @param locationId
+	 * @return
+	 */
 	List<Shipment> getRecentOutgoingShipments(Long locationId) { 		
 		Location location = Location.get(locationId);
 		//def upcomingShipments = Shipment.findAllByOriginAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30, 
@@ -141,7 +153,11 @@ class ShipmentService {
 		return shipments;
 	}
 	
-	
+	/**
+	 * 
+	 * @param locationId
+	 * @return
+	 */
 	List<Shipment> getRecentIncomingShipments(Long locationId) { 		
 		Location location = Location.get(locationId);
 		//return Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30, 
@@ -149,7 +165,12 @@ class ShipmentService {
 			[max:10, offset:2, sort:"expectedShippingDate", order:"desc"]);
 	}
 	
-	
+
+	/**
+	 * 	
+	 * @param shipments
+	 * @return
+	 */
 	Map<EventType, ListCommand> getShipmentsByStatus(List shipments) { 
 		def shipmentMap = new TreeMap<ShipmentStatusCode, ListCommand>();
 		
@@ -169,7 +190,10 @@ class ShipmentService {
 		return shipmentMap;
 	}
 	
-	
+	/**
+	 * 
+	 * @return
+	 */
 	List<Shipment> getShipments() { 		
 		
 		return getAllShipments()
@@ -211,7 +235,11 @@ class ShipmentService {
 
 	
 	
-	
+	/**
+	 * 
+	 * @param location
+	 * @return
+	 */
 	List<Shipment> getShipmentsByLocation(Location location) {
 		return Shipment.withCriteria { 
 			or {	
@@ -222,12 +250,23 @@ class ShipmentService {
 	}    
 	
 	
+	/**
+	 * 
+	 * @param name
+	 * @return
+	 */
 	List<Shipment> getShipmentsByName(String name) {
 		return Shipment.withCriteria { 
 			ilike("name", "%" +name + "%")
 		}
 	}
 	
+	/**
+	 * 
+	 * @param name
+	 * @param location
+	 * @return
+	 */
 	List<Shipment> getShipmentsByNameAndDestination(String name, Location location) {
 		return Shipment.withCriteria {
 			and { 
@@ -237,6 +276,13 @@ class ShipmentService {
 		}
 	}
 
+	
+	/**
+	 * 
+	 * @param name
+	 * @param location
+	 * @return
+	 */
 	List<Shipment> getShipmentsByNameAndOrigin(String name, Location location) {
 		return Shipment.withCriteria {
 			and {
@@ -246,6 +292,12 @@ class ShipmentService {
 		}
 	}
 
+	
+	/**
+	 * 
+	 * @param location
+	 * @return
+	 */
 	List<Shipment> getPendingShipments(Location location) { 
 		def shipments = Shipment.withCriteria {
 			eq("origin", location)
@@ -253,7 +305,27 @@ class ShipmentService {
 		
 		return shipments.findAll { !it.hasShipped() }
 	}
-
+	
+	/**
+	 * 
+	 * @param location
+	 * @param product
+	 * @return
+	 */
+	List<ShipmentItem> getPendingShipmentItemsWithProduct(Location location, Product product) {
+		def shipmentItems = []
+		def shipments = getPendingShipments(location);		
+		
+		shipments.each { 
+			def shipmentItemList = it.shipmentItems.findAll { it.product == product }
+			shipmentItemList.each { 
+				shipmentItems << it;
+			}
+		}
+	
+		return shipmentItems;		
+	}
+	
 	List<Shipment> getIncomingShipments(Location location) {
 		def shipments = Shipment.withCriteria {
 			eq("destination", location)
@@ -861,32 +933,27 @@ class ShipmentService {
 	 * @return
 	 */
 	Map getQuantityForShipping(Location location) { 
-		def quantityMap = [:]
-		def shipments = getPendingShipments(location)
-		shipments.each { shipment -> 
-			shipment.shipmentItems.each { shipmentItem -> 				
-				def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(shipmentItem.product, shipmentItem.lotNumber)
-				if (inventoryItem) { 
-					def quantity = quantityMap[inventoryItem];
-					if (!quantity) quantity = 0;
-					quantity += shipmentItem.quantity;
-					quantityMap[inventoryItem] = quantity
-				}					
-			}
-		}
-		return quantityMap;
+		return getQuantityByInventoryItem(getPendingShipments(location));
+		
 	}
 	
-	
-	
+
 	/**
 	 * 
 	 * @param location
 	 * @return
 	 */
 	Map getQuantityForReceiving(Location location) { 
-		def quantityMap = [:]		
-		def shipments = getIncomingShipments(location)
+		return getQuantityByInventoryItem(getIncomingShipments(location));
+	}
+	
+	/**
+	 * 
+	 * @param shipments
+	 * @return
+	 */
+	Map getQuantityByInventoryItem(def shipments) { 		
+		def quantityMap = [:]
 		shipments.each { shipment ->
 			shipment.shipmentItems.each { shipmentItem ->
 				def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(shipmentItem.product, shipmentItem.lotNumber)
@@ -898,8 +965,53 @@ class ShipmentService {
 				}
 			}
 		}
-		return quantityMap;		
+		return quantityMap;
+
 	}
 	
+   /**
+	*
+	* @param location
+	* @return
+	*/
+   Map getReceivingQuantityByProduct(Location location) {
+	   def shipments = getIncomingShipments(location)
+	   return getQuantityByProduct(shipments)
+   }
+   
+   /**
+   *
+   * @param location
+   * @return
+   */
+  Map getShippingQuantityByProduct(Location location) {
+	  def shipments = getPendingShipments(location)
+	  return getQuantityByProduct(shipments)
+  }
+  
+  /**
+   * 
+   * @param shipments
+   * @return
+   */
+   Map getQuantityByProduct(def shipments) { 	   
+	   def quantityMap = [:]
+	   
+	   shipments.each { shipment ->
+		   shipment.shipmentItems.each { shipmentItem ->
+			   def product = shipmentItem.product
+			   if (product) {
+				   def quantity = quantityMap[product];
+				   if (!quantity) quantity = 0;
+				   quantity += shipmentItem.quantity;
+				   quantityMap[product] = quantity
+			   }
+		   }
+	   }
+	   return quantityMap;
+   }   	
+
+   
+   	
 	
 }

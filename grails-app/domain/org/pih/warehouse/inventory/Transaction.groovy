@@ -70,6 +70,11 @@ class Transaction implements Comparable, Serializable {
 							return true 
 						})
     }
+	
+	String transactionNumber() {
+		return (id) ? "T" + String.valueOf(id).padLeft(6, "0")  : "(new transaction)";
+	}
+	
     
     /**
 	 * Sort by transaction date, and then by date created

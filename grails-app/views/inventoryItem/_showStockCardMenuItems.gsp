@@ -31,3 +31,15 @@
 		Edit product status
 	</g:link>
 </div>
+<div class="action-menu-item">					
+	<g:link controller="inventoryItem" action="showStockCard" params="['product.id': commandInstance?.productInstance?.id]">
+		<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;
+		Show stock card
+	</g:link>
+</div>
+<div class="action-menu-item">					
+	<g:link controller="inventoryItem" action="showLotNumbers" params="['product.id': commandInstance?.productInstance?.id]">
+		<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;
+		Show lot numbers
+	</g:link>
+</div>

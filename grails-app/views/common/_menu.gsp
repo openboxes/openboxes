@@ -12,6 +12,16 @@
 			</li>
 			<li>
 				<span class="menuButton">
+					<g:link controller="inventory" action="listDailyTransactions">Daily transactions</g:link> 
+				</span>
+			</li>
+			<li>
+				<span class="menuButton">
+					<g:link controller="inventory" action="listExpiringStock">Expiring stock</g:link> 
+				</span>
+			</li>
+			<li>
+				<span class="menuButton">
 					<g:link controller="inventory" action="listAllTransactions">List transactions</g:link> 
 				</span>
 			</li>

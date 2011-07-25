@@ -90,6 +90,9 @@ class InventoryItemController {
 		}
 	}	
 	
+	/**
+	 * 
+	 */
 	def show = {
 		def itemInstance = InventoryItem.get(params.id)
 		def transactionEntryList = TransactionEntry.findAllByInventoryItem(itemInstance)
@@ -122,11 +125,38 @@ class InventoryItemController {
 		// populate the pending shipments
 		// TODO: move this into the service layer after we find a way to add shipping service to inventory service
 		// (that is, find a workaround to GRAILS-5080)
-		commandInstance.pendingShipmentList = shipmentService.getPendingShipments(commandInstance.warehouseInstance);
+		//commandInstance.pendingShipmentList = 
+		//	shipmentService.getPendingShipmentsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance)
+		//shipmentService.getPendingShipments(commandInstance.warehouseInstance);
+
+		def shipmentItems = 
+			shipmentService.getPendingShipmentItemsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance)
 		
-		[ commandInstance: commandInstance ]
+		def shipmentMap = shipmentItems.groupBy { it.shipment } 
+		if (shipmentMap) { 
+			shipmentMap.keySet().each { 
+				def quantity = shipmentMap[it].sum() { it.quantity } 
+				shipmentMap.put(it, quantity)
+			}
+		}	
+		[ commandInstance: commandInstance, shipmentItems: shipmentItems, shipmentMap: shipmentMap ]
 	}
 
+	/**
+	 * Displays the stock card for a product
+	 */
+	def showLotNumbers = { StockCardCommand cmd ->
+		// add the current warehouse to the command object
+		cmd.warehouseInstance = Warehouse.get(session?.warehouse?.id)
+
+		// now populate the rest of the commmand object
+		def commandInstance = inventoryService.getStockCardCommand(cmd, params)
+
+		log.info ("Inventory item list: " + commandInstance?.inventoryItemList)
+		[ commandInstance: commandInstance  ]
+	}
+	
+	
 	
 	/**
 	 * Display the Record Inventory form for the product 
