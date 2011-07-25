@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 .yui-carousel {
     visibility: hidden;
@@ -31,7 +31,7 @@ version: 2.8.2r1
     position: absolute;
     text-align: center;
 }
-
+ 
 .yui-carousel-vertical .yui-carousel-element li {
     display: block;
     float: none;
@@ -56,28 +56,28 @@ version: 2.8.2r1
 .yui-carousel-button-focus {
     outline: 1px dotted #000;
 }
-
+ 
 .yui-carousel-min-width {
     min-width: 115px;
 }
-
+ 
 .yui-carousel-element   {
     overflow: hidden;
     position:relative;
-	margin: 0 auto;
+    margin: 0 auto;
     padding:0;
     text-align:left;
     *margin:0;
 }
-
+ 
 .yui-carousel-horizontal .yui-carousel-element {
     width: 320000px;
 }
-
+ 
 .yui-carousel-vertical .yui-carousel-element {
     height:320000px;
 }
-
+ 
 .yui-skin-sam .yui-carousel-nav select {
     position:static;
 }

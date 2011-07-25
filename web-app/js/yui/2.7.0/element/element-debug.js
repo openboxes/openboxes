@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 /**
  * Provides Attribute configurations.
@@ -19,6 +19,8 @@ YAHOO.util.Attribute = function(hash, owner) {
         this.configure(hash, true);
     }
 };
+
+YAHOO.util.Attribute.INVALID_VALUE = {};
 
 YAHOO.util.Attribute.prototype = {
     /**
@@ -131,12 +133,13 @@ YAHOO.util.Attribute.prototype = {
     setValue: function(value, silent) {
         var beforeRetVal,
             owner = this.owner,
-            name = this.name;
+            name = this.name,
+            invalidValue = YAHOO.util.Attribute.INVALID_VALUE,
         
-        var event = {
-            type: name, 
-            prevValue: this.getValue(),
-            newValue: value
+            event = {
+                type: name, 
+                prevValue: this.getValue(),
+                newValue: value
         };
         
         if (this.readOnly || ( this.writeOnce && this._written) ) {
@@ -165,10 +168,16 @@ YAHOO.util.Attribute.prototype = {
             if (value === undefined) {
                 YAHOO.log('setter for ' + this.name + ' returned undefined', 'warn', 'Attribute');
             }
+
+            if (value === invalidValue) {
+                return false;
+            }
         }
         
         if (this.method) {
-            this.method.call(owner, value, this.name);
+            if (this.method.call(owner, value, this.name) === invalidValue) {
+                return false; 
+            }
         }
         
         this.value = value; // TODO: set before calling setter/method?
@@ -1103,4 +1112,4 @@ YAHOO.augment(Element, AttributeProvider);
 YAHOO.util.Element = Element;
 })();
 
-YAHOO.register("element", YAHOO.util.Element, {version: "2.8.2r1", build: "7"});
+YAHOO.register("element", YAHOO.util.Element, {version: "2.9.0", build: "2800"});

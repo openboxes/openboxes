@@ -1,15 +1,14 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 /**
  * @description <p>Creates a Image Cropper control.</p>
  * @namespace YAHOO.widget
  * @requires yahoo, dom, dragdrop, element, event, resize
  * @module imagecropper
- * @beta
  */
 (function() {
 var Dom = YAHOO.util.Dom,
@@ -74,7 +73,7 @@ var Dom = YAHOO.util.Dom,
         * @private
         * @property CSS_RESIZE_MASK
         * @description The CSS class for the mask inside the resize element
-        * @type String
+        * @type {HTML}
         */
         CSS_RESIZE_MASK: 'yui-crop-resize-mask',
 
@@ -714,7 +713,6 @@ var Dom = YAHOO.util.Dom,
             * @type Array
             */
             this.setAttributeConfig('initialXY', {
-                writeOnce: true,
                 validator: YAHOO.lang.isArray,
                 value: attr.initialXY || [10, 10]
             });
@@ -904,4 +902,4 @@ var Dom = YAHOO.util.Dom,
 
 })();
 
-YAHOO.register("imagecropper", YAHOO.widget.ImageCropper, {version: "2.8.2r1", build: "7"});
+YAHOO.register("imagecropper", YAHOO.widget.ImageCropper, {version: "2.9.0", build: "2800"});

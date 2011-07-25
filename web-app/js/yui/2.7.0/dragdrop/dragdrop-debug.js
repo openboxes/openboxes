@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 /**
  * The drag and drop utility provides a framework for building drag and drop
@@ -833,8 +833,8 @@ YAHOO.util.DragDropMgr = function() {
                 // var button = e.which || e.button;
                 // YAHOO.log("which: " + e.which + ", button: "+ e.button);
 
-                // check for IE mouseup outside of page boundary
-                if (YAHOO.util.Event.isIE && !e.button) {
+                // check for IE < 9 mouseup outside of page boundary
+                if (YAHOO.env.ua.ie && (YAHOO.env.ua.ie < 9) && !e.button) {
                     YAHOO.log("button failure", "info", "DragDropMgr");
                     this.stopEvent(e);
                     return this.handleMouseUp(e);
@@ -909,6 +909,7 @@ YAHOO.util.DragDropMgr = function() {
             
                 oldOvers = [], // cache the previous dragOver array
                 inGroupsObj  = {},
+                b4Results = {},
                 inGroups  = [],
                 data = {
                     outEvts: [],
@@ -1012,10 +1013,10 @@ YAHOO.util.DragDropMgr = function() {
                         YAHOO.log(dc.id + ' ' + ev + ': ' + tmp, "info", "DragDropMgr");
                         if (dc.events[b4]) {
                             dc[b4](e, tmp, inGroups);
-                            dc.fireEvent(b4 + 'Event', { event: e, info: tmp, group: inGroups });
+                            b4Results[ev] = dc.fireEvent(b4 + 'Event', { event: e, info: tmp, group: inGroups });
                             
                         }
-                        if (dc.events[check]) {
+                        if (dc.events[check] && (b4Results[ev] !== false)) {
                             dc[ev](e, tmp, inGroups);
                             dc.fireEvent(cev, { event: e, info: tmp, group: inGroups });
                         }
@@ -1024,9 +1025,9 @@ YAHOO.util.DragDropMgr = function() {
                             YAHOO.log(dc.id + ' ' + ev + ': ' + tmp[b].id, "info", "DragDropMgr");
                             if (dc.events[b4]) {
                                 dc[b4](e, tmp[b].id, inGroups[0]);
-                                dc.fireEvent(b4 + 'Event', { event: e, info: tmp[b].id, group: inGroups[0] });
+                                b4Results[ev] = dc.fireEvent(b4 + 'Event', { event: e, info: tmp[b].id, group: inGroups[0] });
                             }
-                            if (dc.events[check]) {
+                            if (dc.events[check] && (b4Results[ev] !== false)) {
                                 dc[ev](e, tmp[b].id, inGroups[0]);
                                 dc.fireEvent(cev, { event: e, info: tmp[b].id, group: inGroups[0] });
                             }
@@ -2475,7 +2476,12 @@ YAHOO.util.DragDrop.prototype = {
         var mDownReturn = this.onMouseDown(e),
             mDownReturn2 = true;
         if (this.events.mouseDown) {
-            mDownReturn2 = this.fireEvent('mouseDownEvent', e);
+            if (mDownReturn === false) {
+                //Fixes #2528759 - Mousedown function returned false, don't fire the event and cancel everything.
+                 mDownReturn2 = false;
+            } else {
+                mDownReturn2 = this.fireEvent('mouseDownEvent', e);
+            }
         }
 
         if ((b4Return === false) || (mDownReturn === false) || (b4Return2 === false) || (mDownReturn2 === false)) {
@@ -3707,4 +3713,4 @@ YAHOO.extend(YAHOO.util.DDTarget, YAHOO.util.DragDrop, {
         return ("DDTarget " + this.id);
     }
 });
-YAHOO.register("dragdrop", YAHOO.util.DragDropMgr, {version: "2.8.2r1", build: "7"});
+YAHOO.register("dragdrop", YAHOO.util.DragDropMgr, {version: "2.9.0", build: "2800"});

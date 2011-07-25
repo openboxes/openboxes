@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 /**
  * Provides a swf based storage implementation
@@ -58,7 +58,7 @@ YAHOO.util.SWFStore = function(containerID, shareData, useCompression)
 					fixedAttributes:
 						{allowScriptAccess:"always", allowNetworking:"all", scale:"noScale"},
 						flashVars:
-							{shareData: shareData, browser: newValue, useCompression: useCompression}
+							{allowedDomain : document.location.hostname, shareData: shareData, browser: newValue, useCompression: useCompression}
 				 };
 	
 	
@@ -251,6 +251,13 @@ YAHOO.extend(YAHOO.util.SWFStore, YAHOO.util.AttributeProvider,
 	    */
 		setItem: function(location,data) 
 		{	
+			if(typeof data == "string")
+			{
+				//double encode strings to prevent parsing error
+				//http://yuilibrary.com/projects/yui2/ticket/2528593
+				data = data.replace(/\\/g, '\\\\');
+			}
+			
 			return this.embeddedSWF.callSWF("setItem", [location, data]);
 		} ,
 	    	
@@ -448,6 +455,4 @@ YAHOO.extend(YAHOO.util.SWFStore, YAHOO.util.AttributeProvider,
 
 
 YAHOO.util.SWFStore.SWFURL = "swfstore.swf";
-
-YAHOO.register("swfstore", YAHOO.util.SWFStore, {version: "2.8.2r1", build: "7"});
-YAHOO.register("swfstore", YAHOO.util.SWFStore, {version: "2.8.2r1", build: "7"});
+YAHOO.register("swfstore", YAHOO.util.SWFStore, {version: "2.9.0", build: "2800"});

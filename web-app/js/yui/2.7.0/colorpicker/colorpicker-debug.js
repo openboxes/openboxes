@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 /**
  * Provides color conversion and validation utils
@@ -245,7 +245,7 @@ YAHOO.util.Color = function() {
             el = this._createHostElement(attr);
         }
 
-    	ColorPicker.superclass.constructor.call(this, el, attr); 
+        ColorPicker.superclass.constructor.call(this, el, attr); 
 
         this.initPicker();
     }
@@ -457,6 +457,7 @@ YAHOO.util.Color = function() {
          * Constants for any script-generated messages.  The values here
          * are the default messages.  They can be updated by providing
          * the complete list to the constructor for the "txt" attribute.
+         * Note: the strings are added to the DOM as HTML.
          * @property TXT
          * @final
          */
@@ -1351,7 +1352,7 @@ YAHOO.util.Color = function() {
         },
 
         /**
-         * Wrapper for _updateRGB, but allows setting 
+         * Wrapper for _updateRGB, but allows non-animated update
          *
          * @method syncUI
          * @param skipAnim {Boolean} Omit Slider animation for this action
@@ -1780,4 +1781,4 @@ YAHOO.util.Color = function() {
 
     YAHOO.widget.ColorPicker = ColorPicker;
 })();
-YAHOO.register("colorpicker", YAHOO.widget.ColorPicker, {version: "2.8.2r1", build: "7"});
+YAHOO.register("colorpicker", YAHOO.widget.ColorPicker, {version: "2.9.0", build: "2800"});

@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 /**
  * The Browser History Manager provides the ability to use the back/forward
@@ -94,7 +94,7 @@ YAHOO.util.History = (function () {
      */
     function _getHash() {
         var i, href;
-        href = top.location.href;
+        href = self.location.href;
         i = href.indexOf("#");
         return i >= 0 ? href.substr(i + 1) : null;
     }
@@ -121,10 +121,6 @@ YAHOO.util.History = (function () {
         }
 
         _stateField.value = initialStates.join("&") + "|" + currentStates.join("&");
-
-        if (YAHOO.env.ua.webkit) {
-            _stateField.value += "|" + _fqstates.join(",");
-        }
     }
 
     /**
@@ -146,7 +142,7 @@ YAHOO.util.History = (function () {
                 if (YAHOO.lang.hasOwnProperty(_modules, moduleName)) {
                     moduleObj = _modules[moduleName];
                     moduleObj.currentState = moduleObj.initialState;
-                    moduleObj.onStateChange(unescape(moduleObj.currentState));
+                    moduleObj.onStateChange(_decode(moduleObj.currentState));
                 }
             }
             return;
@@ -168,8 +164,8 @@ YAHOO.util.History = (function () {
                 moduleObj = _modules[moduleName];
                 currentState = modules[moduleName];
                 if (!currentState || moduleObj.currentState !== currentState) {
-                    moduleObj.currentState = currentState || moduleObj.initialState;
-                    moduleObj.onStateChange(unescape(moduleObj.currentState));
+                    moduleObj.currentState = typeof currentState === 'undefined' ? moduleObj.initialState : currentState;
+                    moduleObj.onStateChange(_decode(moduleObj.currentState));
                 }
             }
         }
@@ -187,10 +183,7 @@ YAHOO.util.History = (function () {
         var html, doc;
 
         html = '<html><body><div id="state">' +
-                   fqstate.replace(/&/g,'&amp;').
-                           replace(/</g,'&lt;').
-                           replace(/>/g,'&gt;').
-                           replace(/"/g,'&quot;') +
+                    YAHOO.lang.escapeHTML(fqstate) +
                '</div></body></html>';
 
         try {
@@ -268,9 +261,9 @@ YAHOO.util.History = (function () {
                 // URL fragment identifier. Note that here, we are on IE, and
                 // IE does not touch the browser history when setting the hash
                 // (unlike all the other browsers). I used to write:
-                //     top.location.replace( "#" + hash );
+                //     self.location.replace( "#" + hash );
                 // but this had a side effect when the page was not the top frame.
-                top.location.hash = newHash;
+                self.location.hash = newHash;
                 hash = newHash;
 
                 _storeStates();
@@ -323,7 +316,10 @@ YAHOO.util.History = (function () {
                 if (tokens.length === 2) {
                     moduleName = tokens[0];
                     initialState = tokens[1];
-                    moduleObj = _modules[moduleName];
+
+                    moduleObj = YAHOO.lang.hasOwnProperty(_modules, moduleName)
+                            && _modules[moduleName];
+
                     if (moduleObj) {
                         moduleObj.initialState = initialState;
                     }
@@ -336,7 +332,10 @@ YAHOO.util.History = (function () {
                 if (tokens.length >= 2) {
                     moduleName = tokens[0];
                     currentState = tokens[1];
-                    moduleObj = _modules[moduleName];
+
+                    moduleObj = YAHOO.lang.hasOwnProperty(_modules, moduleName)
+                            && _modules[moduleName];
+
                     if (moduleObj) {
                         moduleObj.currentState = currentState;
                     }
@@ -378,16 +377,6 @@ YAHOO.util.History = (function () {
             // YAHOO.util.History.navigate has been called or after
             // the user has hit the back/forward button.
 
-            // On Safari 1.x and 2.0, the only way to catch a back/forward
-            // operation is to watch history.length... We basically exploit
-            // what I consider to be a bug (history.length is not supposed
-            // to change when going back/forward in the history...) This is
-            // why, in the following thread, we first compare the hash,
-            // because the hash thing will be fixed in the next major
-            // version of Safari. So even if they fix the history.length
-            // bug, all this will still work!
-            counter = history.length;
-
             // On Gecko and Opera, we just need to watch the hash...
             hash = _getHash();
 
@@ -396,17 +385,9 @@ YAHOO.util.History = (function () {
                 var state, newHash, newCounter;
 
                 newHash = _getHash();
-                newCounter = history.length;
                 if (newHash !== hash) {
                     hash = newHash;
-                    counter = newCounter;
                     _handleFQStateChange(hash);
-                    _storeStates();
-                } else if (newCounter !== counter && YAHOO.env.ua.webkit) {
-                    hash = newHash;
-                    counter = newCounter;
-                    state = _fqstates[counter - 1];
-                    _handleFQStateChange(state);
                     _storeStates();
                 }
 
@@ -415,6 +396,34 @@ YAHOO.util.History = (function () {
             _initialized = true;
             YAHOO.util.History.onLoadEvent.fire();
         }
+    }
+
+    /**
+     * Wrapper around <code>decodeURIComponent()</code> that also converts +
+     * chars into spaces.
+     *
+     * @method _decode
+     * @param {String} string string to decode
+     * @return {String} decoded string
+     * @private
+     * @since 2.9.0
+     */
+    function _decode(string) {
+        return decodeURIComponent(string.replace(/\+/g, ' '));
+    }
+
+    /**
+     * Wrapper around <code>encodeURIComponent()</code> that converts spaces to
+     * + chars.
+     *
+     * @method _encode
+     * @param {String} string string to encode
+     * @return {String} encoded string
+     * @private
+     * @since 2.9.0
+     */
+    function _encode(string) {
+        return encodeURIComponent(string).replace(/%20/g, '+');
     }
 
     return {
@@ -489,7 +498,7 @@ YAHOO.util.History = (function () {
                 throw new Error("Missing or invalid argument");
             }
 
-            if (_modules[module]) {
+            if (YAHOO.lang.hasOwnProperty(_modules, module)) {
                 // Here, we used to throw an exception. However, users have
                 // complained about this behavior, so we now just return.
                 return;
@@ -507,8 +516,8 @@ YAHOO.util.History = (function () {
             }
 
             // Make sure the strings passed in do not contain our separators "," and "|"
-            module = escape(module);
-            initialState = escape(initialState);
+            module = _encode(module);
+            initialState = _encode(initialState);
 
             // If the user chooses to override the scope, we use the
             // custom object passed in as the execution scope.
@@ -637,7 +646,7 @@ YAHOO.util.History = (function () {
             }
 
             for (moduleName in states) {
-                if (!_modules[moduleName]) {
+                if (!YAHOO.lang.hasOwnProperty(_modules, _encode(moduleName))) {
                     throw new Error("The following module has not been registered: " + moduleName);
                 }
             }
@@ -649,14 +658,14 @@ YAHOO.util.History = (function () {
                 if (YAHOO.lang.hasOwnProperty(_modules, moduleName)) {
                     moduleObj = _modules[moduleName];
                     if (YAHOO.lang.hasOwnProperty(states, moduleName)) {
-                        currentState = states[unescape(moduleName)];
+                        currentState = states[_decode(moduleName)];
                     } else {
-                        currentState = unescape(moduleObj.currentState);
+                        currentState = _decode(moduleObj.currentState);
                     }
 
                     // Make sure the strings passed in do not contain our separators "," and "|"
-                    moduleName = escape(moduleName);
-                    currentState = escape(currentState);
+                    moduleName = _encode(moduleName);
+                    currentState = _encode(currentState);
 
                     currentStates.push(moduleName + "=" + currentState);
                 }
@@ -678,19 +687,9 @@ YAHOO.util.History = (function () {
                 // and 2.0 but creates bigger problems on WebKit. So for now,
                 // we'll consider this an acceptable bug, and hope that Apple
                 // comes out with their next version of Safari very soon.
-                top.location.hash = fqstate;
-                if (YAHOO.env.ua.webkit) {
-                    // The following two lines are only useful for Safari 1.x
-                    // and 2.0. Recent nightly builds of WebKit do not require
-                    // that, but unfortunately, it is not easy to differentiate
-                    // between the two. Once Safari 2.0 departs the A-grade
-                    // list, we can remove the following two lines...
-                    _fqstates[history.length] = fqstate;
-                    _storeStates();
-                }
+                self.location.hash = fqstate;
 
                 return true;
-
             }
         },
 
@@ -714,12 +713,14 @@ YAHOO.util.History = (function () {
                 throw new Error("The Browser History Manager is not initialized");
             }
 
-            moduleObj = _modules[module];
+            moduleObj = YAHOO.lang.hasOwnProperty(_modules, module)
+                    && _modules[module];
+
             if (!moduleObj) {
                 throw new Error("No such registered module: " + module);
             }
 
-            return unescape(moduleObj.currentState);
+            return _decode(moduleObj.currentState);
         },
 
         /**
@@ -743,16 +744,16 @@ YAHOO.util.History = (function () {
             // Use location.href instead of location.hash which is already
             // URL-decoded, which creates problems if the state value
             // contained special characters...
-            idx = top.location.href.indexOf("#");
+            idx = self.location.href.indexOf("#");
             if (idx >= 0) {
-                hash = top.location.href.substr(idx + 1);
+                hash = self.location.href.substr(idx + 1);
                 states = hash.split("&");
                 for (i = 0, len = states.length; i < len; i++) {
                     tokens = states[i].split("=");
                     if (tokens.length === 2) {
                         moduleName = tokens[0];
                         if (moduleName === module) {
-                            return unescape(tokens[1]);
+                            return _decode(tokens[1]);
                         }
                     }
                 }
@@ -779,7 +780,7 @@ YAHOO.util.History = (function () {
 
             var i, len, idx, queryString, params, tokens;
 
-            url = url || top.location.href;
+            url = url || self.location.href;
 
             idx = url.indexOf("?");
             queryString = idx >= 0 ? url.substr(idx + 1) : url;
@@ -794,7 +795,7 @@ YAHOO.util.History = (function () {
                 tokens = params[i].split("=");
                 if (tokens.length >= 2) {
                     if (tokens[0] === paramName) {
-                        return unescape(tokens[1]);
+                        return _decode(tokens[1]);
                     }
                 }
             }
@@ -805,4 +806,4 @@ YAHOO.util.History = (function () {
     };
 
 })();
-YAHOO.register("history", YAHOO.util.History, {version: "2.8.2r1", build: "7"});
+YAHOO.register("history", YAHOO.util.History, {version: "2.9.0", build: "2800"});

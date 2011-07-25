@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 (function () {
 
@@ -238,27 +238,18 @@ version: 2.8.2r1
         * @return {Boolean} True is the property was reset, false if not
         */
         resetProperty: function (key) {
-    
             key = key.toLowerCase();
-        
-            var property = this.config[key];
-    
-            if (property && property.event) {
-    
-                if (this.initialConfig[key] && 
-                    !Lang.isUndefined(this.initialConfig[key])) {
-    
-                    this.setProperty(key, this.initialConfig[key]);
 
+            var property = this.config[key];
+
+            if (property && property.event) {
+                if (key in this.initialConfig) {
+                    this.setProperty(key, this.initialConfig[key]);
                     return true;
-    
                 }
-    
             } else {
-    
                 return false;
             }
-    
         },
         
         /**
@@ -1295,6 +1286,7 @@ Calendar.DEFAULT_CONFIG = {
     MINDATE : {key:"mindate", value:null},
     MAXDATE : {key:"maxdate", value:null},
     MULTI_SELECT : {key:"multi_select", value:false},
+    OOM_SELECT : {key:"oom_select", value:false},
     START_WEEKDAY : {key:"start_weekday", value:0},
     SHOW_WEEKDAYS : {key:"show_weekdays", value:true},
     SHOW_WEEK_HEADER : {key:"show_week_header", value:false},
@@ -1620,11 +1612,17 @@ Calendar.prototype = {
         config = nArgs.config;
 
         this.oDomContainer = Dom.get(container);
-        if (!this.oDomContainer) { this.logger.log("Container not found in document.", "error"); }
+        // Removing due to order of operations issue [ logger/id ]. 
+        // The log is kind of pointless because it'll barf on the next statement anyway.
+        // Any code related changes are beyond the scope of 2.9.0 at this point 
+        // if (!this.oDomContainer) { this.logger.log("Container not found in document.", "error"); }
+
+        this._oDoc = this.oDomContainer.ownerDocument;
 
         if (!this.oDomContainer.id) {
             this.oDomContainer.id = Dom.generateId();
         }
+
         if (!id) {
             id = this.oDomContainer.id + "_t";
         }
@@ -2022,7 +2020,7 @@ Calendar.prototype = {
                             cal.deselectCell(index);
                         } else {
                             cal.selectCell(index);
-                        } 
+                        }
 
                     } else {
                         link = cell.getElementsByTagName("a")[0];
@@ -2118,9 +2116,9 @@ Calendar.prototype = {
         cfg.addProperty(DEF_CFG.SELECTED.key, { value:DEF_CFG.SELECTED.value.concat(), handler:this.configSelected } );
 
         /**
-        * The title to display above the Calendar's month header
+        * The title to display above the Calendar's month header. The title is inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.   
         * @config title
-        * @type String
+        * @type HTML
         * @default ""
         */
         cfg.addProperty(DEF_CFG.TITLE.key, { value:DEF_CFG.TITLE.value, handler:this.configTitle } );
@@ -2171,6 +2169,14 @@ Calendar.prototype = {
         cfg.addProperty(DEF_CFG.MULTI_SELECT.key, { value:DEF_CFG.MULTI_SELECT.value, handler:this.configOptions, validator:cfg.checkBoolean } );
 
         /**
+        * True if the Calendar should allow selection of out-of-month dates. False by default.
+        * @config OOM_SELECT
+        * @type Boolean
+        * @default false
+        */
+        cfg.addProperty(DEF_CFG.OOM_SELECT.key, { value:DEF_CFG.OOM_SELECT.value, handler:this.configOptions, validator:cfg.checkBoolean } );
+
+        /**
         * The weekday the week begins on. Default is 0 (Sunday = 0, Monday = 1 ... Saturday = 6).
         * @config START_WEEKDAY
         * @type number
@@ -2211,7 +2217,7 @@ Calendar.prototype = {
         cfg.addProperty(DEF_CFG.HIDE_BLANK_WEEKS.key, { value:DEF_CFG.HIDE_BLANK_WEEKS.value, handler:this.configOptions, validator:cfg.checkBoolean } );
         
         /**
-        * The image that should be used for the left navigation arrow.
+        * The image URL that should be used for the left navigation arrow. The image URL is inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.
         * @config NAV_ARROW_LEFT
         * @type String
         * @deprecated You can customize the image by overriding the default CSS class for the left arrow - "calnavleft"  
@@ -2220,7 +2226,7 @@ Calendar.prototype = {
         cfg.addProperty(DEF_CFG.NAV_ARROW_LEFT.key, { value:DEF_CFG.NAV_ARROW_LEFT.value, handler:this.configOptions } );
     
         /**
-        * The image that should be used for the right navigation arrow.
+        * The image URL that should be used for the right navigation arrow. The image URL is inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.
         * @config NAV_ARROW_RIGHT
         * @type String
         * @deprecated You can customize the image by overriding the default CSS class for the right arrow - "calnavright"
@@ -2231,49 +2237,49 @@ Calendar.prototype = {
         // Locale properties
     
         /**
-        * The short month labels for the current locale.
+        * The short month labels for the current locale. The month labels are inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.
         * @config MONTHS_SHORT
-        * @type String[]
+        * @type HTML[]
         * @default ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         */
         cfg.addProperty(DEF_CFG.MONTHS_SHORT.key, { value:DEF_CFG.MONTHS_SHORT.value, handler:this.configLocale } );
-        
+
         /**
-        * The long month labels for the current locale.
+        * The long month labels for the current locale. The month labels are inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.
         * @config MONTHS_LONG
-        * @type String[]
+        * @type HTML[]
         * @default ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
         */ 
         cfg.addProperty(DEF_CFG.MONTHS_LONG.key,  { value:DEF_CFG.MONTHS_LONG.value, handler:this.configLocale } );
 
         /**
-        * The 1-character weekday labels for the current locale.
+        * The 1-character weekday labels for the current locale. The weekday labels are inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.
         * @config WEEKDAYS_1CHAR
-        * @type String[]
+        * @type HTML[]
         * @default ["S", "M", "T", "W", "T", "F", "S"]
         */ 
         cfg.addProperty(DEF_CFG.WEEKDAYS_1CHAR.key, { value:DEF_CFG.WEEKDAYS_1CHAR.value, handler:this.configLocale } );
         
         /**
-        * The short weekday labels for the current locale.
+        * The short weekday labels for the current locale. The weekday labels are inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.
         * @config WEEKDAYS_SHORT
-        * @type String[]
+        * @type HTML[]
         * @default ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
         */ 
         cfg.addProperty(DEF_CFG.WEEKDAYS_SHORT.key, { value:DEF_CFG.WEEKDAYS_SHORT.value, handler:this.configLocale } );
         
         /**
-        * The medium weekday labels for the current locale.
+        * The medium weekday labels for the current locale. The weekday labels are inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.
         * @config WEEKDAYS_MEDIUM
-        * @type String[]
+        * @type HTML[]
         * @default ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
         */ 
         cfg.addProperty(DEF_CFG.WEEKDAYS_MEDIUM.key, { value:DEF_CFG.WEEKDAYS_MEDIUM.value, handler:this.configLocale } );
         
         /**
-        * The long weekday labels for the current locale.
+        * The long weekday labels for the current locale. The weekday labels are inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.
         * @config WEEKDAYS_LONG
-        * @type String[]
+        * @type HTML[]
         * @default ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
         */ 
         cfg.addProperty(DEF_CFG.WEEKDAYS_LONG.key, { value:DEF_CFG.WEEKDAYS_LONG.value, handler:this.configLocale } );
@@ -2420,17 +2426,17 @@ Calendar.prototype = {
         cfg.addProperty(DEF_CFG.MY_LABEL_YEAR_POSITION.key, { value:DEF_CFG.MY_LABEL_YEAR_POSITION.value, handler:this.configLocale, validator:cfg.checkNumber } );
         
         /**
-        * The suffix used after the month when rendering the Calendar header
+        * The suffix used after the month when rendering the Calendar header. The suffix is inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.
         * @config MY_LABEL_MONTH_SUFFIX
-        * @type String
+        * @type HTML
         * @default " "
         */
         cfg.addProperty(DEF_CFG.MY_LABEL_MONTH_SUFFIX.key, { value:DEF_CFG.MY_LABEL_MONTH_SUFFIX.value, handler:this.configLocale } );
         
         /**
-        * The suffix used after the year when rendering the Calendar header
+        * The suffix used after the year when rendering the Calendar header. The suffix is inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.
         * @config MY_LABEL_YEAR_SUFFIX
-        * @type String
+        * @type HTML
         * @default ""
         */
         cfg.addProperty(DEF_CFG.MY_LABEL_YEAR_SUFFIX.key, { value:DEF_CFG.MY_LABEL_YEAR_SUFFIX.value, handler:this.configLocale } );
@@ -2451,13 +2457,13 @@ Calendar.prototype = {
         * </p>
         * <dl>
         * <dt>strings</dt>
-        * <dd><em>Object</em> :  An object with the properties shown below, defining the string labels to use in the Navigator's UI
+        * <dd><em>Object</em> :  An object with the properties shown below, defining the string labels to use in the Navigator's UI. The strings are inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source. 
         *     <dl>
-        *         <dt>month</dt><dd><em>String</em> : The string to use for the month label. Defaults to "Month".</dd>
-        *         <dt>year</dt><dd><em>String</em> : The string to use for the year label. Defaults to "Year".</dd>
-        *         <dt>submit</dt><dd><em>String</em> : The string to use for the submit button label. Defaults to "Okay".</dd>
-        *         <dt>cancel</dt><dd><em>String</em> : The string to use for the cancel button label. Defaults to "Cancel".</dd>
-        *         <dt>invalidYear</dt><dd><em>String</em> : The string to use for invalid year values. Defaults to "Year needs to be a number".</dd>
+        *         <dt>month</dt><dd><em>HTML</em> : The markup to use for the month label. Defaults to "Month".</dd>
+        *         <dt>year</dt><dd><em>HTML</em> : The markup to use for the year label. Defaults to "Year".</dd>
+        *         <dt>submit</dt><dd><em>HTML</em> : The markup to use for the submit button label. Defaults to "Okay".</dd>
+        *         <dt>cancel</dt><dd><em>HTML</em> : The markup to use for the cancel button label. Defaults to "Cancel".</dd>
+        *         <dt>invalidYear</dt><dd><em>HTML</em> : The markup to use for invalid year values. Defaults to "Year needs to be a number".</dd>
         *     </dl>
         * </dd>
         * <dt>monthFormat</dt><dd><em>String</em> : The month format to use. Either YAHOO.widget.Calendar.LONG, or YAHOO.widget.Calendar.SHORT. Defaults to YAHOO.widget.Calendar.LONG</dd>
@@ -2490,9 +2496,9 @@ Calendar.prototype = {
          * @type {Object}
          * @default An object with the properties shown below:
          *     <dl>
-         *         <dt>previousMonth</dt><dd><em>String</em> : The string to use for the "Previous Month" navigation UI. Defaults to "Previous Month".</dd>
-         *         <dt>nextMonth</dt><dd><em>String</em> : The string to use for the "Next Month" navigation UI. Defaults to "Next Month".</dd>
-         *         <dt>close</dt><dd><em>String</em> : The string to use for the close button label. Defaults to "Close".</dd>
+         *         <dt>previousMonth</dt><dd><em>HTML</em> : The markup to use for the "Previous Month" navigation label. Defaults to "Previous Month". The string is added to the DOM as HTML, and should be escaped by the implementor if coming from an external source.</dd>
+         *         <dt>nextMonth</dt><dd><em>HTML</em> : The markup to use for the "Next Month" navigation UI. Defaults to "Next Month". The string is added to the DOM as HTML, and should be escaped by the implementor if coming from an external source.</dd>
+         *         <dt>close</dt><dd><em>HTML</em> : The markup to use for the close button label. Defaults to "Close". The string is added to the DOM as HTML, and should be escaped by the implementor if coming from an external source.</dd>
          *     </dl>
          */
         cfg.addProperty(DEF_CFG.STRINGS.key, { 
@@ -2677,7 +2683,7 @@ Calendar.prototype = {
     },
 
     /**
-    * Defines the style constants for the Calendar
+    * Defines the class names used by Calendar when rendering to DOM. NOTE: The class names are added to the DOM as HTML and should be escaped by the implementor if coming from an external source. 
     * @method initStyles
     */
     initStyles : function() {
@@ -2832,7 +2838,7 @@ Calendar.prototype = {
     * Builds the date label that will be displayed in the calendar header or
     * footer, depending on configuration.
     * @method buildMonthLabel
-    * @return {String} The formatted calendar month label
+    * @return {HTML} The formatted calendar month label
     */
     buildMonthLabel : function() {
         return this._buildMonthLabel(this.cfg.getProperty(DEF_CFG.PAGEDATE.key));
@@ -2845,7 +2851,7 @@ Calendar.prototype = {
      * @method _buildMonthLabel
      * @private
      * @param {Date} date
-     * @return {String} Formated month, year string
+     * @return {HTML} Formated month, year string
      */
     _buildMonthLabel : function(date) {
         var monthLabel  = this.Locale.LOCALE_MONTHS[date.getMonth()] + this.Locale.MY_LABEL_MONTH_SUFFIX,
@@ -2857,22 +2863,22 @@ Calendar.prototype = {
             return monthLabel + yearLabel;
         }
     },
-    
+
     /**
     * Builds the date digit that will be displayed in calendar cells
     * @method buildDayLabel
     * @param {Date} workingDate The current working date
-    * @return {String} The formatted day label
+    * @return {Number} The day
     */
     buildDayLabel : function(workingDate) {
         return workingDate.getDate();
     },
-    
+
     /**
-     * Creates the title bar element and adds it to Calendar container DIV
+     * Creates the title bar element and adds it to Calendar container DIV. NOTE: The title parameter passed into this method is added to the DOM as HTML and should be escaped by the implementor if coming from an external source.  
      * 
      * @method createTitleBar
-     * @param {String} strTitle The title to display in the title bar
+     * @param {HTML} strTitle The title to display in the title bar
      * @return The title bar element
      */
     createTitleBar : function(strTitle) {
@@ -2899,18 +2905,18 @@ Calendar.prototype = {
         }
         Dom.removeClass(this.oDomContainer, this.Style.CSS_WITH_TITLE);
     },
-    
+
     /**
      * Creates the close button HTML element and adds it to Calendar container DIV
      * 
      * @method createCloseButton
-     * @return The close HTML element created
+     * @return {HTMLElement} The close HTML element created
      */
     createCloseButton : function() {
         var cssClose = YAHOO.widget.CalendarGroup.CSS_2UPCLOSE,
             cssLinkClose = this.Style.CSS_LINK_CLOSE,
             DEPR_CLOSE_PATH = "us/my/bn/x_d.gif",
-            
+
             lnk = Dom.getElementsByClassName(cssLinkClose, "a", this.oDomContainer)[0],
             strings = this.cfg.getProperty(DEF_CFG.STRINGS.key),
             closeStr = (strings && strings.close) ? strings.close : "";
@@ -2953,10 +2959,10 @@ Calendar.prototype = {
     },
 
     /**
-    * Renders the calendar header.
+    * Renders the calendar header. NOTE: The contents of the array passed into this method are added to the DOM as HTML, and should be escaped by the implementor if coming from an external source.
     * @method renderHeader
-    * @param {Array} html The current working HTML array
-    * @return {Array} The current working HTML array
+    * @param {HTML[]} html The current working HTML array
+    * @return {HTML[]} The current working HTML array
     */
     renderHeader : function(html) {
 
@@ -3039,12 +3045,12 @@ Calendar.prototype = {
     
         return html;
     },
-    
+
     /**
-    * Renders the Calendar's weekday headers.
+    * Renders the Calendar's weekday headers. NOTE: The contents of the array passed into this method are added to the DOM as HTML, and should be escaped by the implementor if coming from an external source.
     * @method buildWeekdays
-    * @param {Array} html The current working HTML array
-    * @return {Array} The current working HTML array
+    * @param {HTML[]} html The current working HTML array
+    * @return {HTML[]} The current working HTML array
     */
     buildWeekdays : function(html) {
 
@@ -3068,11 +3074,11 @@ Calendar.prototype = {
     },
     
     /**
-    * Renders the calendar body.
+    * Renders the calendar body. NOTE: The contents of the array passed into this method are added to the DOM as HTML, and should be escaped by the implementor if coming from an external source.
     * @method renderBody
     * @param {Date} workingDate The current working Date being used for the render process
-    * @param {Array} html The current working HTML array
-    * @return {Array} The current working HTML array
+    * @param {HTML[]} html The current working HTML array
+    * @return {HTML[]} The current working HTML array
     */
     renderBody : function(workingDate, html) {
         this.logger.log("Rendering body", "render");
@@ -3107,6 +3113,7 @@ Calendar.prototype = {
             renderer,
             t = this.today,
             cfg = this.cfg,
+            oom,
             todayYear = t.getFullYear(),
             todayMonth = t.getMonth(),
             todayDate = t.getDate(),
@@ -3114,6 +3121,7 @@ Calendar.prototype = {
             hideBlankWeeks = cfg.getProperty(DEF_CFG.HIDE_BLANK_WEEKS.key),
             showWeekFooter = cfg.getProperty(DEF_CFG.SHOW_WEEK_FOOTER.key),
             showWeekHeader = cfg.getProperty(DEF_CFG.SHOW_WEEK_HEADER.key),
+            oomSelect = cfg.getProperty(DEF_CFG.OOM_SELECT.key),
             mindate = cfg.getProperty(DEF_CFG.MINDATE.key),
             maxdate = cfg.getProperty(DEF_CFG.MAXDATE.key),
             yearOffset = this.Locale.YEAR_OFFSET;
@@ -3135,7 +3143,7 @@ Calendar.prototype = {
 
         var cal = this.parent || this;
 
-        for (var r=0;r<6;r++) {
+        for (var r = 0; r < 6; r++) {
             weekNum = DateMath.getWeekNumber(workingDate, startDay);
             weekClass = weekPrefix + weekNum;
 
@@ -3166,17 +3174,22 @@ Calendar.prototype = {
                     this.cellDates[this.cellDates.length] = workingArray; // Add this date to cellDates
 
                     // Local OOM check for performance, since we already have pagedate
-                    if (workingDate.getMonth() != useDate.getMonth()) {
+                    oom = workingDate.getMonth() != useDate.getMonth(); 
+                    if (oom && !oomSelect) {
                         cellRenderers[cellRenderers.length]=cal.renderCellNotThisMonth;
                     } else {
                         Dom.addClass(cell, workingDayPrefix + workingDate.getDay());
                         Dom.addClass(cell, dayPrefix + workingDate.getDate());
 
-                        for (var s=0;s<this.renderStack.length;++s) {
+                        // Concat, so that we're not splicing from an array 
+                        // which we're also iterating
+                        var rs = this.renderStack.concat();
+
+                        for (var s=0, l = rs.length; s < l; ++s) {
 
                             renderer = null;
 
-                            var rArray = this.renderStack[s],
+                            var rArray = rs[s],
                                 type = rArray[0],
                                 month,
                                 day,
@@ -3192,6 +3205,7 @@ Calendar.prototype = {
                                         renderer = rArray[2];
                                         this.renderStack.splice(s,1);
                                     }
+
                                     break;
                                 case Calendar.MONTH_DAY:
                                     month = rArray[1][0];
@@ -3247,13 +3261,15 @@ Calendar.prototype = {
                         cellRenderers[cellRenderers.length]=cal.renderCellStyleSelected; 
                     }
 
-                    if ((mindate && (workingDate.getTime() < mindate.getTime())) ||
-                        (maxdate && (workingDate.getTime() > maxdate.getTime()))
-                    ) {
-                        cellRenderers[cellRenderers.length]=cal.renderOutOfBoundsDate;
+                    if (oom) {
+                        cellRenderers[cellRenderers.length] = cal.styleCellNotThisMonth; 
+                    }
+
+                    if ((mindate && (workingDate.getTime() < mindate.getTime())) || (maxdate && (workingDate.getTime() > maxdate.getTime()))) {
+                        cellRenderers[cellRenderers.length] = cal.renderOutOfBoundsDate;
                     } else {
-                        cellRenderers[cellRenderers.length]=cal.styleCellDefault;
-                        cellRenderers[cellRenderers.length]=cal.renderCellDefault; 
+                        cellRenderers[cellRenderers.length] = cal.styleCellDefault;
+                        cellRenderers[cellRenderers.length] = cal.renderCellDefault;
                     }
 
                     for (var x=0; x < cellRenderers.length; ++x) {
@@ -3305,19 +3321,17 @@ Calendar.prototype = {
     },
     
     /**
-    * Renders the calendar footer. In the default implementation, there is
-    * no footer.
+    * Renders the calendar footer. In the default implementation, there is no footer. NOTE: The contents of the array passed into this method are added to the DOM as HTML, and should be escaped by the implementor if coming from an external source.
     * @method renderFooter
-    * @param {Array} html The current working HTML array
-    * @return {Array} The current working HTML array
+    * @param {HTML[]} html The current working HTML array
+    * @return {HTML[]} The current working HTML array
     */
     renderFooter : function(html) { return html; },
     
     /**
     * Renders the calendar after it has been configured. The render() method has a specific call chain that will execute
     * when the method is called: renderHeader, renderBody, renderFooter.
-    * Refer to the documentation for those methods for information on 
-    * individual render tasks.
+    * Refer to the documentation for those methods for information on individual render tasks.
     * @method render
     */
     render : function() {
@@ -3331,7 +3345,8 @@ Calendar.prototype = {
 
         Event.purgeElement(this.oDomContainer, true);
 
-        var html = [];
+        var html = [], 
+            table;
 
         html[html.length] = '<table cellSpacing="0" class="' + this.Style.CSS_CALENDAR + ' y' + (workingDate.getFullYear() + this.Locale.YEAR_OFFSET) +'" id="' + this.id + '">';
         html = this.renderHeader(html);
@@ -3342,8 +3357,12 @@ Calendar.prototype = {
         this.oDomContainer.innerHTML = html.join("\n");
 
         this.applyListeners();
-        this.cells = Dom.getElementsByClassName(this.Style.CSS_CELL, "td", this.id);
-    
+
+        // Using oDomContainer.ownerDocument, to allow for cross-frame rendering
+        table = ((this._oDoc) && this._oDoc.getElementById(this.id)) || (this.id);
+
+        this.cells = Dom.getElementsByClassName(this.Style.CSS_CELL, "td", table);
+
         this.cfg.refireEvent(DEF_CFG.TITLE.key);
         this.cfg.refireEvent(DEF_CFG.CLOSE.key);
         this.cfg.refireEvent(DEF_CFG.IFRAME.key);
@@ -3406,6 +3425,10 @@ Calendar.prototype = {
         Event.addListener(this.oDomContainer, "mouseout", this.doCellMouseOut, this);
     },
 
+    /**
+    * Applies the DOM listeners to activate the Calendar Navigator.
+    * @method applyNavListeners
+    */
     applyNavListeners : function() {
         var calParent = this.parent || this,
             cal = this,
@@ -3509,7 +3532,6 @@ Calendar.prototype = {
     
     /**
     * Renders a cell that falls before the minimum date or after the maximum date.
-    * widget class.
     * @method renderOutOfBoundsDate
     * @param {Date}     workingDate  The current working Date object being used to generate the calendar
     * @param {HTMLTableCellElement} cell   The current working cell in the calendar
@@ -3523,10 +3545,11 @@ Calendar.prototype = {
     },
 
     /**
-    * Renders the row header for a week.
+    * Renders the row header HTML for a week.
+    *
     * @method renderRowHeader
     * @param {Number} weekNum The week number of the current row
-    * @param {Array} cell The current working HTML array
+    * @param {HTML[]} cell The current working HTML array
     */
     renderRowHeader : function(weekNum, html) {
         html[html.length] = '<th class="' + this.Style.CSS_ROW_HEADER + '">' + weekNum + '</th>';
@@ -3534,21 +3557,24 @@ Calendar.prototype = {
     },
 
     /**
-    * Renders the row footer for a week.
+    * Renders the row footer HTML for a week.
+    *
     * @method renderRowFooter
     * @param {Number} weekNum The week number of the current row
-    * @param {Array} cell The current working HTML array
+    * @param {HTML[]} cell The current working HTML array
     */
     renderRowFooter : function(weekNum, html) {
         html[html.length] = '<th class="' + this.Style.CSS_ROW_FOOTER + '">' + weekNum + '</th>';
         return html;
     },
-    
+
     /**
     * Renders a single standard calendar cell in the calendar widget table.
+    *
     * All logic for determining how a standard default cell will be rendered is 
     * encapsulated in this method, and must be accounted for when extending the
     * widget class.
+    *
     * @method renderCellDefault
     * @param {Date}     workingDate  The current working Date object being used to generate the calendar
     * @param {HTMLTableCellElement} cell   The current working cell in the calendar
@@ -3629,10 +3655,11 @@ Calendar.prototype = {
     renderCellStyleSelected : function(workingDate, cell) {
         Dom.addClass(cell, this.Style.CSS_CELL_SELECTED);
     },
-    
+
     /**
     * Applies the default style used for rendering dates that are not a part of the current
     * month (preceding or trailing the cells for the current month)
+    *
     * @method renderCellNotThisMonth
     * @param {Date}     workingDate  The current working Date object being used to generate the calendar
     * @param {HTMLTableCellElement} cell   The current working cell in the calendar
@@ -3640,11 +3667,20 @@ Calendar.prototype = {
     *   should not be terminated
     */
     renderCellNotThisMonth : function(workingDate, cell) {
-        Dom.addClass(cell, this.Style.CSS_CELL_OOM);
+        this.styleCellNotThisMonth(workingDate, cell);
         cell.innerHTML=workingDate.getDate();
         return Calendar.STOP_RENDER;
     },
-    
+
+    /** Applies the style used for rendering out-of-month dates to the current calendar cell
+    * @method styleCellNotThisMonth
+    * @param {Date}                 workingDate     The current working Date object being used to generate the calendar
+    * @param {HTMLTableCellElement} cell            The current working cell in the calendar
+    */
+    styleCellNotThisMonth : function(workingDate, cell) {
+        YAHOO.util.Dom.addClass(cell, this.Style.CSS_CELL_OOM);
+    },
+
     /**
     * Renders the current calendar cell as a non-selectable "black-out" date using the default
     * restricted style.
@@ -3973,8 +4009,8 @@ Calendar.prototype = {
                 selectDate = cellDate.concat();
 
             if (cellDateIndex > -1) {
-                if (this.cfg.getProperty(DEF_CFG.PAGEDATE.key).getMonth() == dCellDate.getMonth() &&
-                    this.cfg.getProperty(DEF_CFG.PAGEDATE.key).getFullYear() == dCellDate.getFullYear()) {
+                if ((this.cfg.getProperty(DEF_CFG.PAGEDATE.key).getMonth() == dCellDate.getMonth() &&
+                    this.cfg.getProperty(DEF_CFG.PAGEDATE.key).getFullYear() == dCellDate.getFullYear()) || this.cfg.getProperty(DEF_CFG.OOM_SELECT.key)) {
                     Dom.removeClass(cell, this.Style.CSS_CELL_SELECTED);
                 }
                 selected.splice(cellDateIndex, 1);
@@ -4356,7 +4392,7 @@ Calendar.prototype = {
     resetRenderers : function() {
         this.renderStack = this._renderStack.concat();
     },
-    
+
     /**
      * Removes all custom renderers added to the Calendar through the addRenderer, addMonthRenderer and 
      * addWeekdayRenderer methods. Calendar's render method needs to be called after removing renderers 
@@ -4380,6 +4416,9 @@ Calendar.prototype = {
     /**
     * Adds a renderer to the render stack. The function reference passed to this method will be executed
     * when a date cell matches the conditions specified in the date string for this renderer.
+    * 
+    * <p>NOTE: The contents of the cell set by the renderer will be added to the DOM as HTML. The custom renderer implementation should 
+    * escape markup used to set the cell contents, if coming from an external source.<p>
     * @method addRenderer
     * @param {String} sDates  A date string to associate with the specified renderer. Valid formats
     *         include date (12/24/2005), month/day (12/24), and range (12/1/2004-1/1/2005)
@@ -4421,8 +4460,11 @@ Calendar.prototype = {
     },
 
     /**
-    * Adds a month to the render stack. The function reference passed to this method will be executed
-    * when a date cell matches the month passed to this method.
+    * Adds a month renderer to the render stack. The function reference passed to this method will be executed
+    * when a date cell matches the month passed to this method
+    * 
+    * <p>NOTE: The contents of the cell set by the renderer will be added to the DOM as HTML. The custom renderer implementation should 
+    * escape markup used to set the cell contents, if coming from an external source.<p>
     * @method addMonthRenderer
     * @param {Number} month  The month (1-12) to associate with this renderer
     * @param {Function} fnRender The function executed to render cells that match the render rules for this renderer.
@@ -4432,8 +4474,12 @@ Calendar.prototype = {
     },
 
     /**
-    * Adds a weekday to the render stack. The function reference passed to this method will be executed
+    * Adds a weekday renderer to the render stack. The function reference passed to this method will be executed
     * when a date cell matches the weekday passed to this method.
+    *
+    * <p>NOTE: The contents of the cell set by the renderer will be added to the DOM as HTML. The custom renderer implementation should 
+    * escape HTML used to set the cell contents, if coming from an external source.<p>
+    *
     * @method addWeekdayRenderer
     * @param {Number} weekday  The weekday (Sunday = 1, Monday = 2 ... Saturday = 7) to associate with this renderer
     * @param {Function} fnRender The function executed to render cells that match the render rules for this renderer.
@@ -4785,12 +4831,6 @@ CalendarGroup.prototype = {
 
         this.cfg.fireQueue();
 
-        // OPERA HACK FOR MISWRAPPED FLOATS
-        if (YAHOO.env.ua.opera){
-            this.renderEvent.subscribe(this._fixWidth, this, true);
-            this.showEvent.subscribe(this._fixWidth, this, true);
-        }
-
         this.logger.log("Initialized " + this.pages.length + "-page CalendarGroup", "info");
     },
 
@@ -4844,9 +4884,9 @@ CalendarGroup.prototype = {
         cfg.addProperty(DEF_CFG.SELECTED.key, { value:[], handler:this.configSelected } );
 
         /**
-        * The title to display above the CalendarGroup's month header
+        * The title to display above the CalendarGroup's month header. The title is inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.
         * @config title
-        * @type String
+        * @type HTML
         * @default ""
         */
         cfg.addProperty(DEF_CFG.TITLE.key, { value:DEF_CFG.TITLE.value, handler:this.configTitle } );
@@ -4886,8 +4926,6 @@ CalendarGroup.prototype = {
         */
         cfg.addProperty(DEF_CFG.MAXDATE.key, { value:DEF_CFG.MAXDATE.value, handler:this.delegateConfig  } );
 
-        // Options properties
-
         /**
         * True if the Calendar should allow multiple selections. False by default.
         * @config MULTI_SELECT
@@ -4895,6 +4933,14 @@ CalendarGroup.prototype = {
         * @default false
         */
         cfg.addProperty(DEF_CFG.MULTI_SELECT.key, { value:DEF_CFG.MULTI_SELECT.value, handler:this.delegateConfig, validator:cfg.checkBoolean } );
+
+        /**
+        * True if the Calendar should allow selection of out-of-month dates. False by default.
+        * @config OOM_SELECT
+        * @type Boolean
+        * @default false
+        */
+        cfg.addProperty(DEF_CFG.OOM_SELECT.key, { value:DEF_CFG.OOM_SELECT.value, handler:this.delegateConfig, validator:cfg.checkBoolean } );
 
         /**
         * The weekday the week begins on. Default is 0 (Sunday).
@@ -4935,18 +4981,18 @@ CalendarGroup.prototype = {
         * @default false
         */  
         cfg.addProperty(DEF_CFG.HIDE_BLANK_WEEKS.key,{ value:DEF_CFG.HIDE_BLANK_WEEKS.value, handler:this.delegateConfig, validator:cfg.checkBoolean } );
-        
+
         /**
-        * The image that should be used for the left navigation arrow.
+        * The image URL that should be used for the left navigation arrow. The image URL is inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.
         * @config NAV_ARROW_LEFT
         * @type String
         * @deprecated You can customize the image by overriding the default CSS class for the left arrow - "calnavleft"
         * @default null
         */  
         cfg.addProperty(DEF_CFG.NAV_ARROW_LEFT.key, { value:DEF_CFG.NAV_ARROW_LEFT.value, handler:this.delegateConfig } );
-        
+
         /**
-        * The image that should be used for the right navigation arrow.
+        * The image URL that should be used for the right navigation arrow. The image URL is inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.
         * @config NAV_ARROW_RIGHT
         * @type String
         * @deprecated You can customize the image by overriding the default CSS class for the right arrow - "calnavright"
@@ -4957,51 +5003,51 @@ CalendarGroup.prototype = {
         // Locale properties
         
         /**
-        * The short month labels for the current locale.
+        * The short month labels for the current locale. The month labels are inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.
         * @config MONTHS_SHORT
-        * @type String[]
+        * @type HTML[]
         * @default ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         */
         cfg.addProperty(DEF_CFG.MONTHS_SHORT.key, { value:DEF_CFG.MONTHS_SHORT.value, handler:this.delegateConfig } );
         
         /**
-        * The long month labels for the current locale.
+        * The long month labels for the current locale. The month labels are inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.
         * @config MONTHS_LONG
-        * @type String[]
+        * @type HTML[]
         * @default ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
-        */  
+        */ 
         cfg.addProperty(DEF_CFG.MONTHS_LONG.key,  { value:DEF_CFG.MONTHS_LONG.value, handler:this.delegateConfig } );
         
         /**
-        * The 1-character weekday labels for the current locale.
+        * The 1-character weekday labels for the current locale. The weekday labels are inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.
         * @config WEEKDAYS_1CHAR
-        * @type String[]
+        * @type HTML[]
         * @default ["S", "M", "T", "W", "T", "F", "S"]
-        */  
+        */ 
         cfg.addProperty(DEF_CFG.WEEKDAYS_1CHAR.key, { value:DEF_CFG.WEEKDAYS_1CHAR.value, handler:this.delegateConfig } );
         
         /**
-        * The short weekday labels for the current locale.
+        * The short weekday labels for the current locale. The weekday labels are inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.
         * @config WEEKDAYS_SHORT
-        * @type String[]
+        * @type HTML[]
         * @default ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
-        */  
+        */ 
         cfg.addProperty(DEF_CFG.WEEKDAYS_SHORT.key, { value:DEF_CFG.WEEKDAYS_SHORT.value, handler:this.delegateConfig } );
         
         /**
-        * The medium weekday labels for the current locale.
+        * The medium weekday labels for the current locale. The weekday labels are inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.
         * @config WEEKDAYS_MEDIUM
-        * @type String[]
+        * @type HTML[]
         * @default ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-        */  
+        */ 
         cfg.addProperty(DEF_CFG.WEEKDAYS_MEDIUM.key, { value:DEF_CFG.WEEKDAYS_MEDIUM.value, handler:this.delegateConfig } );
         
         /**
-        * The long weekday labels for the current locale.
+        * The long weekday labels for the current locale. The weekday labels are inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.
         * @config WEEKDAYS_LONG
-        * @type String[]
+        * @type HTML[]
         * @default ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-        */  
+        */ 
         cfg.addProperty(DEF_CFG.WEEKDAYS_LONG.key, { value:DEF_CFG.WEEKDAYS_LONG.value, handler:this.delegateConfig } );
     
         /**
@@ -5133,9 +5179,49 @@ CalendarGroup.prototype = {
         cfg.addProperty(DEF_CFG.MY_LABEL_YEAR_SUFFIX.key, { value:DEF_CFG.MY_LABEL_YEAR_SUFFIX.value, handler:this.delegateConfig } );
 
         /**
-        * Configuration for the Month Year Navigation UI. By default it is disabled
-        * @config NAV
-        * @type Object
+        * Configuration for the Month/Year CalendarNavigator UI which allows the user to jump directly to a 
+        * specific Month/Year without having to scroll sequentially through months.
+        * <p>
+        * Setting this property to null (default value) or false, will disable the CalendarNavigator UI.
+        * </p>
+        * <p>
+        * Setting this property to true will enable the CalendarNavigatior UI with the default CalendarNavigator configuration values.
+        * </p>
+        * <p>
+        * This property can also be set to an object literal containing configuration properties for the CalendarNavigator UI.
+        * The configuration object expects the the following case-sensitive properties, with the "strings" property being a nested object.
+        * Any properties which are not provided will use the default values (defined in the CalendarNavigator class).
+        * </p>
+        * <dl>
+        * <dt>strings</dt>
+        * <dd><em>Object</em> :  An object with the properties shown below, defining the string labels to use in the Navigator's UI. The strings are inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source. 
+        *     <dl>
+        *         <dt>month</dt><dd><em>HTML</em> : The markup to use for the month label. Defaults to "Month".</dd>
+        *         <dt>year</dt><dd><em>HTML</em> : The markup to use for the year label. Defaults to "Year".</dd>
+        *         <dt>submit</dt><dd><em>HTML</em> : The markup to use for the submit button label. Defaults to "Okay".</dd>
+        *         <dt>cancel</dt><dd><em>HTML</em> : The markup to use for the cancel button label. Defaults to "Cancel".</dd>
+        *         <dt>invalidYear</dt><dd><em>HTML</em> : The markup to use for invalid year values. Defaults to "Year needs to be a number".</dd>
+        *     </dl>
+        * </dd>
+        * <dt>monthFormat</dt><dd><em>String</em> : The month format to use. Either YAHOO.widget.Calendar.LONG, or YAHOO.widget.Calendar.SHORT. Defaults to YAHOO.widget.Calendar.LONG</dd>
+        * <dt>initialFocus</dt><dd><em>String</em> : Either "year" or "month" specifying which input control should get initial focus. Defaults to "year"</dd>
+        * </dl>
+        * <p>E.g.</p>
+        * <pre>
+        * var navConfig = {
+        *   strings: {
+        *    month:"Calendar Month",
+        *    year:"Calendar Year",
+        *    submit: "Submit",
+        *    cancel: "Cancel",
+        *    invalidYear: "Please enter a valid year"
+        *   },
+        *   monthFormat: YAHOO.widget.Calendar.SHORT,
+        *   initialFocus: "month"
+        * }
+        * </pre>
+        * @config navigator
+        * @type {Object|Boolean}
         * @default null
         */
         cfg.addProperty(DEF_CFG.NAV.key, { value:DEF_CFG.NAV.value, handler:this.configNavigator } );
@@ -5147,9 +5233,9 @@ CalendarGroup.prototype = {
          * @type {Object}
          * @default An object with the properties shown below:
          *     <dl>
-         *         <dt>previousMonth</dt><dd><em>String</em> : The string to use for the "Previous Month" navigation UI. Defaults to "Previous Month".</dd>
-         *         <dt>nextMonth</dt><dd><em>String</em> : The string to use for the "Next Month" navigation UI. Defaults to "Next Month".</dd>
-         *         <dt>close</dt><dd><em>String</em> : The string to use for the close button label. Defaults to "Close".</dd>
+         *         <dt>previousMonth</dt><dd><em>HTML</em> : The markup to use for the "Previous Month" navigation label. Defaults to "Previous Month". The string is added to the DOM as HTML, and should be escaped by the implementor if coming from an external source.</dd>
+         *         <dt>nextMonth</dt><dd><em>HTML</em> : The markup to use for the "Next Month" navigation UI. Defaults to "Next Month". The string is added to the DOM as HTML, and should be escaped by the implementor if coming from an external source.</dd>
+         *         <dt>close</dt><dd><em>HTML</em> : The markup to use for the close button label. Defaults to "Close". The string is added to the DOM as HTML, and should be escaped by the implementor if coming from an external source.</dd>
          *     </dl>
          */
         cfg.addProperty(DEF_CFG.STRINGS.key, { 
@@ -5751,6 +5837,9 @@ CalendarGroup.prototype = {
     /**
     * Adds a renderer to the render stack. The function reference passed to this method will be executed
     * when a date cell matches the conditions specified in the date string for this renderer.
+    * 
+    * <p>NOTE: The contents of the cell set by the renderer will be added to the DOM as HTML. The custom renderer implementation should 
+    * escape markup used to set the cell contents, if coming from an external source.<p>
     * @method addRenderer
     * @param {String} sDates  A date string to associate with the specified renderer. Valid formats
     *         include date (12/24/2005), month/day (12/24), and range (12/1/2004-1/1/2005)
@@ -5764,8 +5853,11 @@ CalendarGroup.prototype = {
     },
 
     /**
-    * Adds a month to the render stack. The function reference passed to this method will be executed
-    * when a date cell matches the month passed to this method.
+    * Adds a month renderer to the render stack. The function reference passed to this method will be executed
+    * when a date cell matches the month passed to this method
+    * 
+    * <p>NOTE: The contents of the cell set by the renderer will be added to the DOM as HTML. The custom renderer implementation should 
+    * escape markup used to set the cell contents, if coming from an external source.<p>
     * @method addMonthRenderer
     * @param {Number} month  The month (1-12) to associate with this renderer
     * @param {Function} fnRender The function executed to render cells that match the render rules for this renderer.
@@ -5778,10 +5870,14 @@ CalendarGroup.prototype = {
     },
 
     /**
-    * Adds a weekday to the render stack. The function reference passed to this method will be executed
+    * Adds a weekday renderer to the render stack. The function reference passed to this method will be executed
     * when a date cell matches the weekday passed to this method.
+    *
+    * <p>NOTE: The contents of the cell set by the renderer will be added to the DOM as HTML. The custom renderer implementation should 
+    * escape HTML used to set the cell contents, if coming from an external source.<p>
+    *
     * @method addWeekdayRenderer
-    * @param {Number} weekday  The weekday (1-7) to associate with this renderer. 1=Sunday, 2=Monday etc.
+    * @param {Number} weekday  The weekday (Sunday = 1, Monday = 2 ... Saturday = 7) to associate with this renderer
     * @param {Function} fnRender The function executed to render cells that match the render rules for this renderer.
     */
     addWeekdayRenderer : function(weekday, fnRender) {
@@ -6027,6 +6123,7 @@ YAHOO.lang.augmentProto(CalendarGroup, Calendar, "buildDayLabel",
                                                  "renderCellStyleToday",
                                                  "renderCellStyleSelected",
                                                  "renderCellNotThisMonth",
+                                                 "styleCellNotThisMonth",
                                                  "renderBodyCellRestricted",
                                                  "initStyles",
                                                  "configTitle",
@@ -6189,11 +6286,11 @@ YAHOO.widget.CalendarNavigator = function(cal) {
      * <dt>strings</dt>
      * <dd><em>Object</em> :  An object with the properties shown below, defining the string labels to use in the Navigator's UI
      *     <dl>
-     *         <dt>month</dt><dd><em>String</em> : The string to use for the month label. Defaults to "Month".</dd>
-     *         <dt>year</dt><dd><em>String</em> : The string to use for the year label. Defaults to "Year".</dd>
-     *         <dt>submit</dt><dd><em>String</em> : The string to use for the submit button label. Defaults to "Okay".</dd>
-     *         <dt>cancel</dt><dd><em>String</em> : The string to use for the cancel button label. Defaults to "Cancel".</dd>
-     *         <dt>invalidYear</dt><dd><em>String</em> : The string to use for invalid year values. Defaults to "Year needs to be a number".</dd>
+     *         <dt>month</dt><dd><em>HTML</em> : The markup to use for the month label. Defaults to "Month".</dd>
+     *         <dt>year</dt><dd><em>HTML</em> : The markup to use for the year label. Defaults to "Year".</dd>
+     *         <dt>submit</dt><dd><em>HTML</em> : The markup to use for the submit button label. Defaults to "Okay".</dd>
+     *         <dt>cancel</dt><dd><em>HTML</em> : The markup to use for the cancel button label. Defaults to "Cancel".</dd>
+     *         <dt>invalidYear</dt><dd><em>HTML</em> : The markup to use for invalid year values. Defaults to "Year needs to be a number".</dd>
      *     </dl>
      * </dd>
      * <dt>monthFormat</dt><dd><em>String</em> : The month format to use. Either YAHOO.widget.Calendar.LONG, or YAHOO.widget.Calendar.SHORT. Defaults to YAHOO.widget.Calendar.LONG</dd>
@@ -6214,7 +6311,7 @@ YAHOO.widget.CalendarNavigator = function(cal) {
         monthFormat: YAHOO.widget.Calendar.LONG,
         initialFocus: "year"
     };
-    
+
     /**
      * Object literal containing the default configuration values for the CalendarNavigator
      * @property _DEFAULT_CFG
@@ -6682,12 +6779,12 @@ YAHOO.widget.CalendarNavigator.prototype = {
     },
 
     /**
-     * Renders the contents of the navigator
+     * Renders the contents of the navigator. NOTE: The contents of the array passed into this method are added to the DOM as HTML, and should be escaped by the implementor if coming from an external source.
      * 
      * @method renderNavContents
      * 
-     * @param {Array} html The HTML buffer to append the HTML to.
-     * @return {Array} A reference to the buffer passed in.
+     * @param {HTML[]} html The HTML buffer to append the HTML to.
+     * @return {HTML[]} A reference to the buffer passed in.
      */
     renderNavContents : function(html) {
         var NAV = YAHOO.widget.CalendarNavigator,
@@ -6709,11 +6806,11 @@ YAHOO.widget.CalendarNavigator.prototype = {
     },
 
     /**
-     * Renders the month label and control for the navigator
+     * Renders the month label and control for the navigator. NOTE: The contents of the array passed into this method are added to the DOM as HTML, and should be escaped by the implementor if coming from an external source.
      * 
      * @method renderNavContents
-     * @param {Array} html The HTML buffer to append the HTML to.
-     * @return {Array} A reference to the buffer passed in.
+     * @param {HTML[]} html The HTML buffer to append the HTML to.
+     * @return {HTML[]} A reference to the buffer passed in.
      */
     renderMonth : function(html) {
         var NAV = YAHOO.widget.CalendarNavigator,
@@ -6740,7 +6837,7 @@ YAHOO.widget.CalendarNavigator.prototype = {
     },
 
     /**
-     * Renders the year label and control for the navigator
+     * Renders the year label and control for the navigator. NOTE: The contents of the array passed into this method are added to the DOM as HTML, and should be escaped by the implementor if coming from an external source. 
      * 
      * @method renderYear
      * @param {Array} html The HTML buffer to append the HTML to.
@@ -6762,10 +6859,11 @@ YAHOO.widget.CalendarNavigator.prototype = {
     },
 
     /**
-     * Renders the submit/cancel buttons for the navigator
+     * Renders the submit/cancel buttons for the navigator. NOTE: The contents of the array passed into this method are added to the DOM as HTML, and should be escaped by the implementor if coming from an external source.
      * 
-     * @method renderButton
-     * @return {String} The HTML created for the Button UI
+     * @method renderButtons
+     * @param {Array} html The HTML buffer to append the HTML to.
+     * @return {Array} A reference to the buffer passed in.
      */
     renderButtons : function(html) {
         var C = YAHOO.widget.CalendarNavigator.CLASSES;
@@ -6953,9 +7051,10 @@ YAHOO.widget.CalendarNavigator.prototype = {
     },
 
     /**
-     * Displays an error message in the Navigator's error panel
+     * Displays an error message in the Navigator's error panel.
+     * 
      * @method setError
-     * @param {String} msg The error message to display
+     * @param {HTML} msg The markup for the error message to display. NOTE: The msg passed into this method is added to the DOM as HTML, and should be escaped by the implementor if coming from an external source. 
      */
     setError : function(msg) {
         if (this.errorEl) {
@@ -7321,4 +7420,4 @@ YAHOO.widget.CalendarNavigator.prototype = {
     __isMac : (navigator.userAgent.toLowerCase().indexOf("macintosh") != -1)
 
 };
-YAHOO.register("calendar", YAHOO.widget.Calendar, {version: "2.8.2r1", build: "7"});
+YAHOO.register("calendar", YAHOO.widget.Calendar, {version: "2.9.0", build: "2800"});

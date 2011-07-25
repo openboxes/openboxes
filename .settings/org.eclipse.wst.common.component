@@ -68,9 +68,7 @@
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/mail-1.0-SNAPSHOT/grails-app/taglib"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/mail-1.0-SNAPSHOT/grails-app/views"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/mail-1.0-SNAPSHOT/src/groovy"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/greenmail-1.2.2/grails-app/controllers"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/greenmail-1.2.2/grails-app/views"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/greenmail-1.2.2/src/groovy"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/famfamfam-1.0.1/grails-app/taglib"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/grails-melody-1.6/src/groovy"/>
     </wb-module>
 </project-modules>

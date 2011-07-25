@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 (function () {
 
@@ -319,7 +319,53 @@ _nTransactionId : 0,
 // DataSourceBase private static methods
 //
 /////////////////////////////////////////////////////////////////////////////
+/**
+ * Clones object literal or array of object literals.
+ *
+ * @method DataSourceBase._cloneObject
+ * @param o {Object} Object.
+ * @private
+ * @static
+ */
+_cloneObject: function(o) {
+    if(!lang.isValue(o)) {
+        return o;
+    }
 
+    var copy = {};
+
+    if(Object.prototype.toString.apply(o) === "[object RegExp]") {
+        copy = o;
+    }
+    else if(lang.isFunction(o)) {
+        copy = o;
+    }
+    else if(lang.isArray(o)) {
+        var array = [];
+        for(var i=0,len=o.length;i<len;i++) {
+            array[i] = DS._cloneObject(o[i]);
+        }
+        copy = array;
+    }
+    else if(lang.isObject(o)) {
+        for (var x in o){
+            if(lang.hasOwnProperty(o, x)) {
+                if(lang.isValue(o[x]) && lang.isObject(o[x]) || lang.isArray(o[x])) {
+                    copy[x] = DS._cloneObject(o[x]);
+                }
+                else {
+                    copy[x] = o[x];
+                }
+            }
+        }
+    }
+    else {
+        copy = o;
+    }
+
+    return copy;
+},
+    
 /**
  * Get an XPath-specified value for a given field from an XML node or document.
  *
@@ -463,7 +509,7 @@ parseDate : function(oData) {
     var date = null;
     
     //Convert to date
-    if(!(oData instanceof Date)) {
+    if(lang.isValue(oData) && !(oData instanceof Date)) {
         date = new Date(oData);
     }
     else {
@@ -649,6 +695,15 @@ responseSchema : null,
  */
 useXPath : false,
 
+/**
+ * Clones entries before adding to cache.
+ *
+ * @property cloneBeforeCaching
+ * @type Boolean
+ * @default false
+ */
+cloneBeforeCaching : false,
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // DataSourceBase public methods
@@ -765,6 +820,7 @@ addToCache : function(oRequest, oResponse) {
     }
 
     // Add to cache in the newest position, at the end of the array
+    oResponse = (this.cloneBeforeCaching) ? DS._cloneObject(oResponse) : oResponse;
     var oCacheElem = {request:oRequest,response:oResponse};
     aCache[aCache.length] = oCacheElem;
     this.fireEvent("responseCacheEvent", {request:oRequest,response:oResponse});
@@ -811,7 +867,8 @@ setInterval : function(nMsec, oRequest, oCallback, oCaller) {
 },
 
 /**
- * Disables polling mechanism associated with the given interval ID.
+ * Disables polling mechanism associated with the given interval ID. Does not
+ * affect transactions that are in progress.
  *
  * @method clearInterval
  * @param nId {Number} Interval ID.
@@ -828,7 +885,8 @@ clearInterval : function(nId) {
 },
 
 /**
- * Disables all known polling intervals.
+ * Disables all known polling intervals. Does not affect transactions that are
+ * in progress.
  *
  * @method clearAllIntervals
  */
@@ -1698,7 +1756,7 @@ parseJSONData : function(oRequest, oFullResponse) {
 
                         for (j = fieldParsers.length - 1; j >= 0; --j) {
                             var p = fieldParsers[j].key;
-                            rec[p] = fieldParsers[j].parser(rec[p]);
+                            rec[p] = fieldParsers[j].parser.call(this, rec[p]);
                             if (rec[p] === undefined) {
                                 rec[p] = null;
                             }
@@ -1946,7 +2004,7 @@ makeConnection : function(oRequest, oCallback, oCaller) {
     // forward the return value to the handler
     
     
-    var oRawResponse = (this.scope) ? this.liveData.call(this.scope, oRequest, this) : this.liveData(oRequest);
+    var oRawResponse = (this.scope) ? this.liveData.call(this.scope, oRequest, this, oCallback) : this.liveData(oRequest, oCallback);
     
     // Try to sniff data type if it has not been defined
     if(this.responseType === DS.TYPE_UNKNOWN) {
@@ -2050,7 +2108,7 @@ asyncMode : "allowAll",
 /**
  * Callback string parameter name sent to the remote script. By default,
  * requests are sent to
- * &#60;URI&#62;?&#60;scriptCallbackParam&#62;=callbackFunction
+ * &#60;URI&#62;?&#60;scriptCallbackParam&#62;=callback
  *
  * @property scriptCallbackParam
  * @type String
@@ -2551,33 +2609,26 @@ util.DataSource = function(oLiveData, oConfigs) {
     var dataType = oConfigs.dataType;
     if(dataType) {
         if(dataType == DS.TYPE_LOCAL) {
-            lang.augmentObject(util.DataSource, util.LocalDataSource);
-            return new util.LocalDataSource(oLiveData, oConfigs);            
+            return new util.LocalDataSource(oLiveData, oConfigs);
         }
         else if(dataType == DS.TYPE_XHR) {
-            lang.augmentObject(util.DataSource, util.XHRDataSource);
             return new util.XHRDataSource(oLiveData, oConfigs);            
         }
         else if(dataType == DS.TYPE_SCRIPTNODE) {
-            lang.augmentObject(util.DataSource, util.ScriptNodeDataSource);
             return new util.ScriptNodeDataSource(oLiveData, oConfigs);            
         }
         else if(dataType == DS.TYPE_JSFUNCTION) {
-            lang.augmentObject(util.DataSource, util.FunctionDataSource);
             return new util.FunctionDataSource(oLiveData, oConfigs);            
         }
     }
     
     if(YAHOO.lang.isString(oLiveData)) { // strings default to xhr
-        lang.augmentObject(util.DataSource, util.XHRDataSource);
         return new util.XHRDataSource(oLiveData, oConfigs);
     }
     else if(YAHOO.lang.isFunction(oLiveData)) {
-        lang.augmentObject(util.DataSource, util.FunctionDataSource);
         return new util.FunctionDataSource(oLiveData, oConfigs);
     }
     else { // ultimate default is local
-        lang.augmentObject(util.DataSource, util.LocalDataSource);
         return new util.LocalDataSource(oLiveData, oConfigs);
     }
 };
@@ -2603,40 +2654,61 @@ lang.augmentObject(util.DataSource, DS);
  YAHOO.util.Number = {
  
      /**
-     * Takes a native JavaScript Number and formats to string for display to user.
+     * Takes a native JavaScript Number and formats to a string for display.
      *
      * @method format
      * @param nData {Number} Number.
      * @param oConfig {Object} (Optional) Optional configuration values:
      *  <dl>
-     *   <dt>prefix {String}</dd>
-     *   <dd>String prepended before each number, like a currency designator "$"</dd>
-     *   <dt>decimalPlaces {Number}</dd>
-     *   <dd>Number of decimal places to round.</dd>
-     *   <dt>decimalSeparator {String}</dd>
-     *   <dd>Decimal separator</dd>
-     *   <dt>thousandsSeparator {String}</dd>
-     *   <dd>Thousands separator</dd>
-     *   <dt>suffix {String}</dd>
-     *   <dd>String appended after each number, like " items" (note the space)</dd>
+     *   <dt>format</dt>
+     *   <dd>String used as a template for formatting positive numbers.
+     *   {placeholders} in the string are applied from the values in this
+     *   config object. {number} is used to indicate where the numeric portion
+     *   of the output goes.  For example &quot;{prefix}{number} per item&quot;
+     *   might yield &quot;$5.25 per item&quot;.  The only required
+     *   {placeholder} is {number}.</dd>
+     *
      *   <dt>negativeFormat</dt>
-     *   <dd>String used as a guide for how to indicate negative numbers.  The first '#' character in the string will be replaced by the number.  Default '-#'.</dd>
+     *   <dd>Like format, but applied to negative numbers.  If set to null,
+     *   defaults from the configured format, prefixed with -.  This is
+     *   separate from format to support formats like &quot;($12,345.67)&quot;.
+     *
+     *   <dt>prefix {String} (deprecated, use format/negativeFormat)</dt>
+     *   <dd>String prepended before each number, like a currency designator "$"</dd>
+     *   <dt>decimalPlaces {Number}</dt>
+     *   <dd>Number of decimal places to round.</dd>
+     *
+     *   <dt>decimalSeparator {String}</dt>
+     *   <dd>Decimal separator</dd>
+     *
+     *   <dt>thousandsSeparator {String}</dt>
+     *   <dd>Thousands separator</dd>
+     *
+     *   <dt>suffix {String} (deprecated, use format/negativeFormat)</dt>
+     *   <dd>String appended after each number, like " items" (note the space)</dd>
      *  </dl>
      * @return {String} Formatted number for display. Note, the following values
      * return as "": null, undefined, NaN, "".
      */
     format : function(n, cfg) {
-        if (!isFinite(+n)) {
+        if (n === '' || n === null || !isFinite(n)) {
             return '';
         }
 
-        n   = !isFinite(+n) ? 0 : +n;
+        n   = +n;
         cfg = YAHOO.lang.merge(YAHOO.util.Number.format.defaults, (cfg || {}));
 
-        var neg    = n < 0,        absN   = Math.abs(n),
-            places = cfg.decimalPlaces,
+        var stringN = n+'',
+            absN   = Math.abs(n),
+            places = cfg.decimalPlaces || 0,
             sep    = cfg.thousandsSeparator,
-            s, bits, i;
+            negFmt = cfg.negativeFormat || ('-' + cfg.format),
+            s, bits, i, precision;
+
+        if (negFmt.indexOf('#') > -1) {
+            // for backward compatibility of negativeFormat supporting '-#'
+            negFmt = negFmt.replace(/#/, cfg.format);
+        }
 
         if (places < 0) {
             // Get rid of the decimal info
@@ -2645,41 +2717,105 @@ lang.augmentObject(util.DataSource, DS);
 
             // avoid 123 vs decimalPlaces -4 (should return "0")
             if (i > 0) {
-                    // leverage toFixed by making 123 => 0.123 for the rounding
-                    // operation, then add the appropriate number of zeros back on
+                // leverage toFixed by making 123 => 0.123 for the rounding
+                // operation, then add the appropriate number of zeros back on
                 s = Number('.' + s).toFixed(i).slice(2) +
                     new Array(s.length - i + 1).join('0');
             } else {
                 s = "0";
             }
-        } else {        // There is a bug in IE's toFixed implementation:
-            // for n in {(-0.94, -0.5], [0.5, 0.94)} n.toFixed() returns 0
-            // instead of -1 and 1. Manually handle that case.
-            s = absN < 1 && absN >= 0.5 && !places ? '1' : absN.toFixed(places);
+        } else {
+            // Avoid toFixed on floats:
+            // Bug 2528976
+            // Bug 2528977
+            var unfloatedN = absN+'';
+            if(places > 0 || unfloatedN.indexOf('.') > 0) {
+                var power = Math.pow(10, places);
+                s = Math.round(absN * power) / power + '';
+                var dot = s.indexOf('.'),
+                    padding, zeroes;
+                
+                // Add padding
+                if(dot < 0) {
+                    padding = places;
+                    zeroes = (Math.pow(10, padding) + '').substring(1);
+                    if(places > 0) {
+                        s = s + '.' + zeroes;
+                    }
+                }
+                else {
+                    padding = places - (s.length - dot - 1);
+                    zeroes = (Math.pow(10, padding) + '').substring(1);
+                    s = s + zeroes;
+                }
+            }
+            else {
+                s = absN.toFixed(places)+'';
+            }
         }
 
-        if (absN > 1000) {
-            bits  = s.split(/\D/);
+        bits  = s.split(/\D/);
+
+        if (absN >= 1000) {
             i  = bits[0].length % 3 || 3;
 
             bits[0] = bits[0].slice(0,i) +
                       bits[0].slice(i).replace(/(\d{3})/g, sep + '$1');
 
-            s = bits.join(cfg.decimalSeparator);
         }
 
-        s = cfg.prefix + s + cfg.suffix;
-
-        return neg ? cfg.negativeFormat.replace(/#/,s) : s;
+        return YAHOO.util.Number.format._applyFormat(
+            (n < 0 ? negFmt : cfg.format),
+            bits.join(cfg.decimalSeparator),
+            cfg);
     }
 };
+
+/**
+ * <p>Default values for Number.format behavior.  Override properties of this
+ * object if you want every call to Number.format in your system to use
+ * specific presets.</p>
+ *
+ * <p>Available keys include:</p>
+ * <ul>
+ *   <li>format</li>
+ *   <li>negativeFormat</li>
+ *   <li>decimalSeparator</li>
+ *   <li>decimalPlaces</li>
+ *   <li>thousandsSeparator</li>
+ *   <li>prefix/suffix or any other token you want to use in the format templates</li>
+ * </ul>
+ *
+ * @property Number.format.defaults
+ * @type {Object}
+ * @static
+ */
 YAHOO.util.Number.format.defaults = {
+    format : '{prefix}{number}{suffix}',
+    negativeFormat : null, // defaults to -(format)
     decimalSeparator : '.',
     decimalPlaces    : null,
-    thousandsSeparator : '',
-    prefix : '',
-    suffix : '',
-    negativeFormat : '-#'
+    thousandsSeparator : ''
+};
+
+/**
+ * Apply any special formatting to the "d,ddd.dd" string.  Takes either the
+ * cfg.format or cfg.negativeFormat template and replaces any {placeholders}
+ * with either the number or a value from a so-named property of the config
+ * object.
+ *
+ * @method Number.format._applyFormat
+ * @static
+ * @param tmpl {String} the cfg.format or cfg.numberFormat template string
+ * @param num {String} the number with separators and decimalPlaces applied
+ * @param data {Object} the config object, used here to populate {placeholder}s
+ * @return {String} the number with any decorators added
+ */
+YAHOO.util.Number.format._applyFormat = function (tmpl, num, data) {
+    return tmpl.replace(/\{(\w+)\}/g, function (_, token) {
+        return token === 'number' ? num :
+               token in data ? data[token] : '';
+    });
 };
 
 
@@ -2900,7 +3036,8 @@ var xPad=function (x, pad, r)
      *  </dl>
      *  More locales may be added by subclassing of YAHOO.util.DateLocale.
      *  See YAHOO.util.DateLocale for more information.
-     * @return {String} Formatted date for display.
+     * @return {HTML} Formatted date for display. Non-date values are passed
+     * through as-is.
      * @sa YAHOO.util.DateLocale
      */
     format : function (oDate, oConfig, sLocale) {
@@ -3064,4 +3201,4 @@ var xPad=function (x, pad, r)
 
 })();
 
-YAHOO.register("datasource", YAHOO.util.DataSource, {version: "2.8.2r1", build: "7"});
+YAHOO.register("datasource", YAHOO.util.DataSource, {version: "2.9.0", build: "2800"});

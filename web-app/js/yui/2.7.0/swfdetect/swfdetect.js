@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 /**
  * Utility for Flash version detection
@@ -21,6 +21,7 @@ YAHOO.namespace("util");
 var version = 0;
 var uA = YAHOO.env.ua;
 var sF = "ShockwaveFlash";
+var mF, eP;
 
  	if (uA.gecko || uA.webkit || uA.opera) {
 		   if ((mF = navigator.mimeTypes['application/x-shockwave-flash'])) {
@@ -87,7 +88,26 @@ YAHOO.util.SWFDetect = {
 		
 		isFlashVersionAtLeast : function (ver) {
 			return version >= ver;
-		}	
+		},
+		
+		parseFlashVersion : function (ver)
+		{
+			var flashVersion = ver;
+			if(YAHOO.lang.isString(ver))
+			{
+				var verSplit = ver.split(".");
+				if(verSplit.length > 2)
+				{
+					flashVersion = parseInt(verSplit[0]);
+					flashVersion += parseInt(verSplit[2]) * .001;
+				}
+				else
+				{
+					flashVersion = parseFloat(ver);
+				}					
+			}
+			return YAHOO.lang.isNumber(flashVersion) ? flashVersion : null;
+		}			
 	};
 })();
-YAHOO.register("swfdetect", YAHOO.util.SWFDetect, {version: "2.8.2r1", build: "7"});
+YAHOO.register("swfdetect", YAHOO.util.SWFDetect, {version: "2.9.0", build: "2800"});

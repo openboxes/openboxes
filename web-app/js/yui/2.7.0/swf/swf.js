@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 YAHOO.namespace("widget");
 
@@ -11,6 +11,7 @@ YAHOO.namespace("widget");
 	var version = 0;
 	var UA = YAHOO.env.ua;
 	var sF = "ShockwaveFlash";
+    var mF, eP;
 
 	 	if (UA.gecko || UA.webkit || UA.opera) {
 			   if ((mF = navigator.mimeTypes['application/x-shockwave-flash'])) {
@@ -77,8 +78,27 @@ YAHOO.namespace("widget");
 
 			isFlashVersionAtLeast : function (ver) {
 				return version >= ver;
-			}	
-		};	
+			},
+					
+            parseFlashVersion : function (ver)	 	
+		     {	
+		        var flashVersion = ver;	 	
+		        if(YAHOO.lang.isString(ver))	 	
+		        { 	
+		          var verSplit = ver.split(".");	
+		          if(verSplit.length > 2)	
+		          {	
+		            flashVersion = parseInt(verSplit[0]);	 	
+		            flashVersion += parseInt(verSplit[2]) * .001;	
+		          }	
+		          else	
+		          {
+		            flashVersion = parseFloat(ver);	
+		          }          
+		        }
+		        return YAHOO.lang.isNumber(flashVersion) ? flashVersion : null;
+		       }  		
+			};	
 	
 	var Dom = YAHOO.util.Dom,
         Event = YAHOO.util.Event,
@@ -91,7 +111,7 @@ YAHOO.namespace("widget");
 		FLASH_VER = "10.22",
 		EXPRESS_INSTALL_URL = "http://fpdownload.macromedia.com/pub/flashplayer/update/current/swf/autoUpdater.swf?" + Math.random(),
 		EVENT_HANDLER = "YAHOO.widget.SWF.eventHandler",
-		possibleAttributes = {align:"", allowNetworking:"", allowScriptAccess:"", base:"", bgcolor:"", menu:"", name:"", quality:"", salign:"", scale:"", tabindex:"", wmode:""};
+		possibleAttributes = {align:"", allowfullscreen: "", allownetworking:"", allowscriptaccess:"", base:"", bgcolor:"", devicefont: "", loop: "", menu:"", name:"", play: "", quality:"", salign:"", seamlesstabbing: "", scale:"", swliveconnect: "", tabindex:"", wmode:""};
 		
 		/**
 		 * The SWF utility is a tool for embedding Flash applications in HTMl pages.
@@ -131,7 +151,7 @@ YAHOO.widget.SWF = function (p_oElement /*:String*/, swfURL /*:String*/, p_oAttr
 	
 	var _id = this._id;
     var oElement = Dom.get(p_oElement);
-	var flashVersion = (p_oAttributes["version"] || FLASH_VER);
+	var flashVersion = SWFDetect.parseFlashVersion((p_oAttributes["version"]) || FLASH_VER);
 	var isFlashVersionRight = SWFDetect.isFlashVersionAtLeast(flashVersion);
 	var canExpressInstall = (UA.flash >= 8.0);
 	var shouldExpressInstall = canExpressInstall && !isFlashVersionRight && p_oAttributes["useExpressInstall"];
@@ -148,7 +168,7 @@ YAHOO.widget.SWF = function (p_oElement /*:String*/, swfURL /*:String*/, p_oAttr
 					objstring += 'classid="' + FLASH_CID + '" '
 				}
 				else {
-					objstring += 'type="' + FLASH_TYPE + '" data="' + flashURL + '" ';
+					objstring += 'type="' + FLASH_TYPE + '" data="' + YAHOO.lang.escapeHTML(flashURL) + '" ';
 				}
 				
                 w = "100%";
@@ -157,19 +177,19 @@ YAHOO.widget.SWF = function (p_oElement /*:String*/, swfURL /*:String*/, p_oAttr
 				objstring += 'width="' + w + '" height="' + h + '">';
 				
 				if (UA.ie) {
-					objstring += '<param name="movie" value="' + flashURL + '"/>';
+					objstring += '<param name="movie" value="' + YAHOO.lang.escapeHTML(flashURL) + '"/>';
 				}
 				
 				for (var attribute in p_oAttributes.fixedAttributes) {
-					if (possibleAttributes.hasOwnProperty(attribute)) {
-						objstring += '<param name="' + attribute + '" value="' + p_oAttributes.fixedAttributes[attribute] + '"/>';
+					if (possibleAttributes.hasOwnProperty(attribute.toLowerCase())) {
+						objstring += '<param name="' + YAHOO.lang.escapeHTML(attribute.toLowerCase()) + '" value="' + YAHOO.lang.escapeHTML(p_oAttributes.fixedAttributes[attribute]) + '"/>';
 					}
 				}
 
 				for (var flashvar in p_oAttributes.flashVars) {
 					var fvar = p_oAttributes.flashVars[flashvar];
 					if (Lang.isString(fvar)) {
-						flashvarstring += "&" + flashvar + "=" + encodeURIComponent(fvar);
+						flashvarstring += "&" + YAHOO.lang.escapeHTML(flashvar) + "=" + YAHOO.lang.escapeHTML(encodeURIComponent(fvar));
 					}
 				}
 				
@@ -180,10 +200,9 @@ YAHOO.widget.SWF = function (p_oElement /*:String*/, swfURL /*:String*/, p_oAttr
 				objstring += "</object>"; 
 
 				oElement.innerHTML = objstring;
+				YAHOO.widget.SWF.superclass.constructor.call(this, Dom.get(_id));
+				this._swf = Dom.get(_id);
 			}
-			
-			YAHOO.widget.SWF.superclass.constructor.call(this, Dom.get(_id));
-			this._swf = Dom.get(_id);	
 };
 
 /**
@@ -265,4 +284,4 @@ YAHOO.extend(YAHOO.widget.SWF, YAHOO.util.Element, {
 
 	
 })();
-YAHOO.register("swf", YAHOO.widget.SWF, {version: "2.8.2r1", build: "7"});
+YAHOO.register("swf", YAHOO.widget.SWF, {version: "2.9.0", build: "2800"});

@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 
 /**
@@ -45,7 +45,7 @@ YAHOO.util.UserAction = {
      *      default. The default is true.
      * @param {Boolean} cancelable (Optional) Indicates if the event can be
      *      canceled using preventDefault(). DOM Level 3 specifies that all
-     *      key events can be cancelled. The default 
+     *      key events can be cancelled. The default
      *      is true.
      * @param {Window} view (Optional) The view containing the target. This is
      *      typically the window object. The default is window.
@@ -57,24 +57,24 @@ YAHOO.util.UserAction = {
      *      is pressed while the event is firing. The default is false.
      * @param {Boolean} metaKey (Optional) Indicates if one of the META keys
      *      is pressed while the event is firing. The default is false.
-     * @param {int} keyCode (Optional) The code for the key that is in use. 
+     * @param {int} keyCode (Optional) The code for the key that is in use.
      *      The default is 0.
      * @param {int} charCode (Optional) The Unicode code for the character
      *      associated with the key being used. The default is 0.
      */
-    simulateKeyEvent : function (target /*:HTMLElement*/, type /*:String*/, 
-                                 bubbles /*:Boolean*/,  cancelable /*:Boolean*/,    
+    simulateKeyEvent : function (target /*:HTMLElement*/, type /*:String*/,
+                                 bubbles /*:Boolean*/,  cancelable /*:Boolean*/,
                                  view /*:Window*/,
-                                 ctrlKey /*:Boolean*/,    altKey /*:Boolean*/, 
-                                 shiftKey /*:Boolean*/,   metaKey /*:Boolean*/, 
-                                 keyCode /*:int*/,        charCode /*:int*/) /*:Void*/                             
+                                 ctrlKey /*:Boolean*/,    altKey /*:Boolean*/,
+                                 shiftKey /*:Boolean*/,   metaKey /*:Boolean*/,
+                                 keyCode /*:int*/,        charCode /*:int*/) /*:Void*/
     {
         //check target
-        target = YAHOO.util.Dom.get(target);        
+        target = YAHOO.util.Dom.get(target);
         if (!target){
             throw new Error("simulateKeyEvent(): Invalid target.");
         }
-        
+
         //check event type
         if (YAHOO.lang.isString(type)){
             type = type.toLowerCase();
@@ -93,7 +93,7 @@ YAHOO.util.UserAction = {
         } else {
             throw new Error("simulateKeyEvent(): Event type must be a string.");
         }
-        
+
         //setup default values
         if (!YAHOO.lang.isBoolean(bubbles)){
             bubbles = true; //all key events bubble
@@ -120,20 +120,20 @@ YAHOO.util.UserAction = {
             keyCode = 0;
         }
         if (!YAHOO.lang.isNumber(charCode)){
-            charCode = 0; 
+            charCode = 0;
         }
 
         //try to create a mouse event
         var customEvent /*:MouseEvent*/ = null;
-            
+
         //check for DOM-compliant browsers first
         if (YAHOO.lang.isFunction(document.createEvent)){
-        
+
             try {
-                
+
                 //try to create key event
                 customEvent = document.createEvent("KeyEvents");
-                
+
                 /*
                  * Interesting problem: Firefox implemented a non-standard
                  * version of initKeyEvent() based on DOM Level 2 specs.
@@ -144,12 +144,12 @@ YAHOO.util.UserAction = {
                  */
                 //TODO: Decipher between Firefox's implementation and a correct one.
                 customEvent.initKeyEvent(type, bubbles, cancelable, view, ctrlKey,
-                    altKey, shiftKey, metaKey, keyCode, charCode);       
-                
+                    altKey, shiftKey, metaKey, keyCode, charCode);
+
             } catch (ex /*:Error*/){
 
                 /*
-                 * If it got here, that means key events aren't officially supported. 
+                 * If it got here, that means key events aren't officially supported.
                  * Safari/WebKit is a real problem now. WebKit 522 won't let you
                  * set keyCode, charCode, or other properties if you use a
                  * UIEvent, so we first must try to create a generic event. The
@@ -170,7 +170,7 @@ YAHOO.util.UserAction = {
                 } finally {
 
                     customEvent.initEvent(type, bubbles, cancelable);
-    
+
                     //initialize
                     customEvent.view = view;
                     customEvent.altKey = altKey;
@@ -179,19 +179,19 @@ YAHOO.util.UserAction = {
                     customEvent.metaKey = metaKey;
                     customEvent.keyCode = keyCode;
                     customEvent.charCode = charCode;
-          
-                }          
-             
+
+                }
+
             }
-            
+
             //fire the event
             target.dispatchEvent(customEvent);
 
         } else if (YAHOO.lang.isObject(document.createEventObject)){ //IE
-        
+
             //create an IE event object
             customEvent = document.createEventObject();
-            
+
             //assign available properties
             customEvent.bubbles = bubbles;
             customEvent.cancelable = cancelable;
@@ -200,17 +200,17 @@ YAHOO.util.UserAction = {
             customEvent.altKey = altKey;
             customEvent.shiftKey = shiftKey;
             customEvent.metaKey = metaKey;
-            
+
             /*
              * IE doesn't support charCode explicitly. CharCode should
              * take precedence over any keyCode value for accurate
              * representation.
              */
             customEvent.keyCode = (charCode > 0) ? charCode : keyCode;
-            
+
             //fire the event
-            target.fireEvent("on" + type, customEvent);  
-                    
+            target.fireEvent("on" + type, customEvent);
+
         } else {
             throw new Error("simulateKeyEvent(): No event simulation framework present.");
         }
@@ -233,8 +233,8 @@ YAHOO.util.UserAction = {
      *      default. The default is true.
      * @param {Boolean} cancelable (Optional) Indicates if the event can be
      *      canceled using preventDefault(). DOM Level 2 specifies that all
-     *      mouse events except mousemove can be cancelled. The default 
-     *      is true for all events except mousemove, for which the default 
+     *      mouse events except mousemove can be cancelled. The default
+     *      is true for all events except mousemove, for which the default
      *      is false.
      * @param {Window} view (Optional) The view containing the target. This is
      *      typically the window object. The default is window.
@@ -266,22 +266,24 @@ YAHOO.util.UserAction = {
      *      events, this is the element that the mouse has moved from. This
      *      argument is ignored for all other events. The default is null.
      */
-    simulateMouseEvent : function (target /*:HTMLElement*/, type /*:String*/, 
-                                   bubbles /*:Boolean*/,  cancelable /*:Boolean*/,    
-                                   view /*:Window*/,        detail /*:int*/, 
-                                   screenX /*:int*/,        screenY /*:int*/, 
-                                   clientX /*:int*/,        clientY /*:int*/,       
-                                   ctrlKey /*:Boolean*/,    altKey /*:Boolean*/, 
-                                   shiftKey /*:Boolean*/,   metaKey /*:Boolean*/, 
+    simulateMouseEvent : function (target /*:HTMLElement*/, type /*:String*/,
+                                   bubbles /*:Boolean*/,  cancelable /*:Boolean*/,
+                                   view /*:Window*/,        detail /*:int*/,
+                                   screenX /*:int*/,        screenY /*:int*/,
+                                   clientX /*:int*/,        clientY /*:int*/,
+                                   ctrlKey /*:Boolean*/,    altKey /*:Boolean*/,
+                                   shiftKey /*:Boolean*/,   metaKey /*:Boolean*/,
                                    button /*:int*/,         relatedTarget /*:HTMLElement*/) /*:Void*/
     {
-        
+
         //check target
-        target = YAHOO.util.Dom.get(target);        
+        target = YAHOO.util.Dom.get(target);
         if (!target){
             throw new Error("simulateMouseEvent(): Invalid target.");
         }
-        
+
+        relatedTarget = relatedTarget || null;
+
         //check event type
         if (YAHOO.lang.isString(type)){
             type = type.toLowerCase();
@@ -300,7 +302,7 @@ YAHOO.util.UserAction = {
         } else {
             throw new Error("simulateMouseEvent(): Event type must be a string.");
         }
-        
+
         //setup default values
         if (!YAHOO.lang.isBoolean(bubbles)){
             bubbles = true; //all mouse events bubble
@@ -315,16 +317,16 @@ YAHOO.util.UserAction = {
             detail = 1;  //number of mouse clicks must be at least one
         }
         if (!YAHOO.lang.isNumber(screenX)){
-            screenX = 0; 
+            screenX = 0;
         }
         if (!YAHOO.lang.isNumber(screenY)){
-            screenY = 0; 
+            screenY = 0;
         }
         if (!YAHOO.lang.isNumber(clientX)){
-            clientX = 0; 
+            clientX = 0;
         }
         if (!YAHOO.lang.isNumber(clientY)){
-            clientY = 0; 
+            clientY = 0;
         }
         if (!YAHOO.lang.isBoolean(ctrlKey)){
             ctrlKey = false;
@@ -339,25 +341,25 @@ YAHOO.util.UserAction = {
             metaKey = false;
         }
         if (!YAHOO.lang.isNumber(button)){
-            button = 0; 
+            button = 0;
         }
 
         //try to create a mouse event
         var customEvent /*:MouseEvent*/ = null;
-            
+
         //check for DOM-compliant browsers first
         if (YAHOO.lang.isFunction(document.createEvent)){
-        
+
             customEvent = document.createEvent("MouseEvents");
-        
+
             //Safari 2.x (WebKit 418) still doesn't implement initMouseEvent()
             if (customEvent.initMouseEvent){
                 customEvent.initMouseEvent(type, bubbles, cancelable, view, detail,
-                                     screenX, screenY, clientX, clientY, 
-                                     ctrlKey, altKey, shiftKey, metaKey, 
+                                     screenX, screenY, clientX, clientY,
+                                     ctrlKey, altKey, shiftKey, metaKey,
                                      button, relatedTarget);
             } else { //Safari
-            
+
                 //the closest thing available in Safari 2.x is UIEvents
                 customEvent = document.createEvent("UIEvents");
                 customEvent.initEvent(type, bubbles, cancelable);
@@ -374,7 +376,7 @@ YAHOO.util.UserAction = {
                 customEvent.button = button;
                 customEvent.relatedTarget = relatedTarget;
             }
-            
+
             /*
              * Check to see if relatedTarget has been assigned. Firefox
              * versions less than 2.0 don't allow it to be assigned via
@@ -391,15 +393,15 @@ YAHOO.util.UserAction = {
                     customEvent.fromElement = relatedTarget;
                 }
             }
-            
+
             //fire the event
             target.dispatchEvent(customEvent);
 
         } else if (YAHOO.lang.isObject(document.createEventObject)){ //IE
-        
+
             //create an IE event object
             customEvent = document.createEventObject();
-            
+
             //assign available properties
             customEvent.bubbles = bubbles;
             customEvent.cancelable = cancelable;
@@ -426,8 +428,8 @@ YAHOO.util.UserAction = {
                     //leave as is
                     break;
                 default:
-                    customEvent.button = 0;                    
-            }    
+                    customEvent.button = 0;
+            }
 
             /*
              * Have to use relatedTarget because IE won't allow assignment
@@ -435,15 +437,15 @@ YAHOO.util.UserAction = {
              * YAHOO.util.customEvent.getRelatedTarget() functional.
              */
             customEvent.relatedTarget = relatedTarget;
-            
+
             //fire the event
             target.fireEvent("on" + type, customEvent);
-                    
+
         } else {
             throw new Error("simulateMouseEvent(): No event simulation framework present.");
         }
     },
-   
+
     //--------------------------------------------------------------------------
     // Mouse events
     //--------------------------------------------------------------------------
@@ -458,15 +460,15 @@ YAHOO.util.UserAction = {
      * @method mouseEvent
      * @static
      */
-    fireMouseEvent : function (target /*:HTMLElement*/, type /*:String*/, 
+    fireMouseEvent : function (target /*:HTMLElement*/, type /*:String*/,
                            options /*:Object*/) /*:Void*/
     {
         options = options || {};
         this.simulateMouseEvent(target, type, options.bubbles,
-            options.cancelable, options.view, options.detail, options.screenX,        
+            options.cancelable, options.view, options.detail, options.screenX,
             options.screenY, options.clientX, options.clientY, options.ctrlKey,
-            options.altKey, options.shiftKey, options.metaKey, options.button,         
-            options.relatedTarget);        
+            options.altKey, options.shiftKey, options.metaKey, options.button,
+            options.relatedTarget);
     },
 
     /**
@@ -474,12 +476,12 @@ YAHOO.util.UserAction = {
      * @param {HTMLElement} target The element to click on.
      * @param {Object} options Additional event options (use DOM standard names).
      * @method click
-     * @static     
+     * @static
      */
     click : function (target /*:HTMLElement*/, options /*:Object*/) /*:Void*/ {
         this.fireMouseEvent(target, "click", options);
     },
-    
+
     /**
      * Simulates a double click on a particular element.
      * @param {HTMLElement} target The element to double click on.
@@ -490,7 +492,7 @@ YAHOO.util.UserAction = {
     dblclick : function (target /*:HTMLElement*/, options /*:Object*/) /*:Void*/ {
         this.fireMouseEvent( target, "dblclick", options);
     },
-    
+
     /**
      * Simulates a mousedown on a particular element.
      * @param {HTMLElement} target The element to act on.
@@ -501,7 +503,7 @@ YAHOO.util.UserAction = {
     mousedown : function (target /*:HTMLElement*/, options /*Object*/) /*:Void*/ {
         this.fireMouseEvent(target, "mousedown", options);
     },
-    
+
     /**
      * Simulates a mousemove on a particular element.
      * @param {HTMLElement} target The element to act on.
@@ -512,7 +514,7 @@ YAHOO.util.UserAction = {
     mousemove : function (target /*:HTMLElement*/, options /*Object*/) /*:Void*/ {
         this.fireMouseEvent(target, "mousemove", options);
     },
-    
+
     /**
      * Simulates a mouseout event on a particular element. Use "relatedTarget"
      * on the options object to specify where the mouse moved to.
@@ -529,7 +531,7 @@ YAHOO.util.UserAction = {
     mouseout : function (target /*:HTMLElement*/, options /*Object*/) /*:Void*/ {
         this.fireMouseEvent(target, "mouseout", options);
     },
-    
+
     /**
      * Simulates a mouseover event on a particular element. Use "relatedTarget"
      * on the options object to specify where the mouse moved from.
@@ -546,7 +548,7 @@ YAHOO.util.UserAction = {
     mouseover : function (target /*:HTMLElement*/, options /*Object*/) /*:Void*/ {
         this.fireMouseEvent(target, "mouseover", options);
     },
-    
+
     /**
      * Simulates a mouseup on a particular element.
      * @param {HTMLElement} target The element to act on.
@@ -557,7 +559,7 @@ YAHOO.util.UserAction = {
     mouseup : function (target /*:HTMLElement*/, options /*Object*/) /*:Void*/ {
         this.fireMouseEvent(target, "mouseup", options);
     },
-    
+
     //--------------------------------------------------------------------------
     // Key events
     //--------------------------------------------------------------------------
@@ -573,17 +575,17 @@ YAHOO.util.UserAction = {
      *                         are required.
      * @method fireKeyEvent
      * @static
-     */     
+     */
     fireKeyEvent : function (type /*:String*/, target /*:HTMLElement*/,
-                             options /*:Object*/) /*:Void*/ 
+                             options /*:Object*/) /*:Void*/
     {
         options = options || {};
         this.simulateKeyEvent(target, type, options.bubbles,
             options.cancelable, options.view, options.ctrlKey,
-            options.altKey, options.shiftKey, options.metaKey, 
-            options.keyCode, options.charCode);    
+            options.altKey, options.shiftKey, options.metaKey,
+            options.keyCode, options.charCode);
     },
-    
+
     /**
      * Simulates a keydown event on a particular element.
      * @param {HTMLElement} target The element to act on.
@@ -594,7 +596,7 @@ YAHOO.util.UserAction = {
     keydown : function (target /*:HTMLElement*/, options /*:Object*/) /*:Void*/ {
         this.fireKeyEvent("keydown", target, options);
     },
-    
+
     /**
      * Simulates a keypress on a particular element.
      * @param {HTMLElement} target The element to act on.
@@ -605,7 +607,7 @@ YAHOO.util.UserAction = {
     keypress : function (target /*:HTMLElement*/, options /*:Object*/) /*:Void*/ {
         this.fireKeyEvent("keypress", target, options);
     },
-    
+
     /**
      * Simulates a keyup event on a particular element.
      * @param {HTMLElement} target The element to act on.
@@ -616,7 +618,7 @@ YAHOO.util.UserAction = {
     keyup : function (target /*:HTMLElement*/, options /*Object*/) /*:Void*/ {
         this.fireKeyEvent("keyup", target, options);
     }
-    
+
 
 };
-YAHOO.register("event-simulate", YAHOO.util.UserAction, {version: "2.8.2r1", build: "7"});
+YAHOO.register("event-simulate", YAHOO.util.UserAction, {version: "2.9.0", build: "2800"});

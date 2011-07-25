@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 /****************************************************************************/
 /****************************************************************************/
@@ -104,10 +104,11 @@ YAHOO.widget.LogWriter.prototype.toString = function() {
 
 /**
  * Logs a message attached to the source of the LogWriter.
+ * Note: the LogReader adds the message and category to the DOM as HTML.
  *
  * @method log
- * @param sMsg {String} The log message.
- * @param sCategory {String} Category name.
+ * @param sMsg {HTML} The log message.
+ * @param sCategory {HTML} Category name.
  */
 YAHOO.widget.LogWriter.prototype.log = function(sMsg, sCategory) {
     YAHOO.widget.Logger.log(sMsg, sCategory, this._source);
@@ -290,11 +291,13 @@ if(!YAHOO.widget.Logger) {
      * assigned to an unknown category, creates a new category. If the log message is
      * from an unknown source, creates a new source.  If browser console is enabled,
      * outputs the log message to browser console.
+     * Note: the LogReader adds the message, category, and source to the DOM
+     * as HTML.
      *
      * @method log
-     * @param sMsg {String} The log message.
-     * @param sCategory {String} Category of log message, or null.
-     * @param sSource {String} Source of LogWriter, or null if global.
+     * @param sMsg {HTML} The log message.
+     * @param sCategory {HTML} Category of log message, or null.
+     * @param sSource {HTML} Source of LogWriter, or null if global.
      */
     YAHOO.widget.Logger.log = function(sMsg, sCategory, sSource) {
         if(this.loggerEnabled) {
@@ -568,7 +571,8 @@ if(!YAHOO.widget.Logger) {
      * @private
      */
     YAHOO.widget.Logger._printToBrowserConsole = function(oEntry) {
-        if(window.console && console.log) {
+        if ((window.console && console.log) ||
+            (window.opera && opera.postError)) {
             var category = oEntry.category;
             var label = oEntry.category.substring(0,4).toUpperCase();
 
@@ -591,12 +595,11 @@ if(!YAHOO.widget.Logger) {
                 elapsedTime + "ms): " +
                 oEntry.source + ": ";
 
-            // for bug 1987607
-            if (YAHOO.env.ua.webkit) {
-                output += oEntry.msg;
+            if (window.console) {
+                console.log(output, oEntry.msg);
+            } else {
+                opera.postError(output + oEntry.msg);
             }
-
-            console.log(output, oEntry.msg);
         }
     };
 
@@ -1580,9 +1583,9 @@ LogReader.prototype = {
         // Create header
         // TODO: refactor this into an innerHTML
         this._elHd = make("div",{
-            id: 'yui-log-hd' + this._sName,
             className: "yui-log-hd"
         });
+        Dom.generateId(this._elHd, 'yui-log-hd' + this._sName);
 
         this._elCollapse = make("div",{ className: 'yui-log-btns' });
 
@@ -1754,14 +1757,15 @@ LogReader.prototype = {
     _createCategoryCheckbox : function(sCategory) {
         if(this._elFt) {
             var filter = make("span",{ className: "yui-log-filtergrp" }),
+                checkid = Dom.generateId(null, "yui-log-filter-" + sCategory + this._sName),
                 check  = make("input", {
-                    id: "yui-log-filter-" + sCategory + this._sName,
+                    id: checkid,
                     className: "yui-log-filter-" + sCategory,
                     type: "checkbox",
                     category: sCategory
                 }),
                 label  = make("label", {
-                    htmlFor: check.id,
+                    htmlFor: checkid,
                     className: sCategory,
                     innerHTML: sCategory
                 });
@@ -1791,14 +1795,15 @@ LogReader.prototype = {
     _createSourceCheckbox : function(sSource) {
         if(this._elFt) {
             var filter = make("span",{ className: "yui-log-filtergrp" }),
+                checkid = Dom.generateId(null, "yui-log-filter-" + sSource + this._sName),
                 check  = make("input", {
-                    id: "yui-log-filter-" + sSource + this._sName,
+                    id: checkid,
                     className: "yui-log-filter-" + sSource,
                     type: "checkbox",
                     source: sSource
                 }),
                 label  = make("label", {
-                    htmlFor: check.id,
+                    htmlFor: checkid,
                     className: sSource,
                     innerHTML: sSource
                 });
@@ -2101,4 +2106,4 @@ LogReader.prototype = {
 YAHOO.widget.LogReader = LogReader;
 
 })();
-YAHOO.register("logger", YAHOO.widget.Logger, {version: "2.8.2r1", build: "7"});
+YAHOO.register("logger", YAHOO.widget.Logger, {version: "2.9.0", build: "2800"});

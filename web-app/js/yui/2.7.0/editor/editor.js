@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 (function() {
 var Dom = YAHOO.util.Dom,
@@ -127,9 +127,11 @@ var Dom = YAHOO.util.Dom,
         checkValue: function(value) {
             if (this.get('type') == 'menu') {
                 var opts = this._button.options;
-                for (var i = 0; i < opts.length; i++) {
-                    if (opts[i].value == value) {
-                        opts.selectedIndex = i;
+                if (opts) {
+                    for (var i = 0; i < opts.length; i++) {
+                        if (opts[i].value == value) {
+                            opts.selectedIndex = i;
+                        }
                     }
                 }
             }
@@ -1302,10 +1304,10 @@ var Dom = YAHOO.util.Dom,
                     } else {
                         //Stop the mousedown event so we can trap the selection in the editor!
                         tmp.on('mousedown', function(ev) {
-                            YAHOO.util.Event.stopEvent(ev);
+                            //YAHOO.util.Event.stopEvent(ev);
                         });
                         tmp.on('click', function(ev) {
-                            YAHOO.util.Event.stopEvent(ev);
+                            //YAHOO.util.Event.stopEvent(ev);
                         });
                         tmp.on('change', function(ev) {
                             if (!ev.target) {
@@ -2063,7 +2065,7 @@ var Dom = YAHOO.util.Dom,
         * @return {Boolean}
         */
         destroy: function() {
-            var len = this._configuredButtons.length, j, i;
+            var len = this._configuredButtons.length, j, i, b;
             for(b = 0; b < len; b++) {
                 this.destroyButton(this._configuredButtons[b]);
             }
@@ -2828,7 +2830,7 @@ var Dom = YAHOO.util.Dom,
             }
 
             //Internet Explorer
-            if (this.browser.ie || this.browser.opera) {
+            if (this.browser.ie) {
                 if (range.text) {
                     hasSel = true;
                 }
@@ -2857,7 +2859,7 @@ var Dom = YAHOO.util.Dom,
         _getSelection: function() {
             var _sel = null;
             if (this._getDoc() && this._getWindow()) {
-                if (this._getDoc().selection) {
+                if (this._getDoc().selection &&! this.browser.opera) {
                     _sel = this._getDoc().selection;
                 } else {
                     _sel = this._getWindow().getSelection();
@@ -2948,7 +2950,7 @@ var Dom = YAHOO.util.Dom,
                 return _range;
             }
 
-            if (this.browser.ie || this.browser.opera) {
+            if (this.browser.ie) {
                 try {
                     return sel.createRange();
                 } catch (e2) {
@@ -6743,9 +6745,11 @@ var Dom = YAHOO.util.Dom,
 
             //Convert b and i tags to strong and em tags
             if ((markup == 'semantic') || (markup == 'xhtml')) {
-                html = html.replace(/<i(\s+[^>]*)?>/gi, '<em$1>');
+                //html = html.replace(/<i(\s+[^>]*)?>/gi, "<em$1>");
+                html = html.replace(/<i([^>]*)>/gi, "<em$1>");
                 html = html.replace(/<\/i>/gi, '</em>');
-                html = html.replace(/<b(\s+[^>]*)?>/gi, '<strong$1>');
+                //html = html.replace(/<b(\s+[^>]*)?>/gi, "<strong$1>");
+                html = html.replace(/<b([^>]*)>/gi, "<strong$1>");
                 html = html.replace(/<\/b>/gi, '</strong>');
             }
 
@@ -7485,6 +7489,7 @@ var Dom = YAHOO.util.Dom,
                     tmp.push(this._undoCache[i]);
                 }
                 this._undoCache = tmp;
+                this._undoLevel = this._undoCache.length;
             }
         },
         /**
@@ -9444,4 +9449,4 @@ var Dom = YAHOO.util.Dom,
         }
     };
 })();
-YAHOO.register("editor", YAHOO.widget.Editor, {version: "2.8.2r1", build: "7"});
+YAHOO.register("editor", YAHOO.widget.Editor, {version: "2.9.0", build: "2800"});

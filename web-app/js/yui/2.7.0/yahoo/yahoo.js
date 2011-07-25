@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 /**
  * The YAHOO object is the single global object used by YUI Library.  It
@@ -14,10 +14,10 @@ version: 2.8.2r1
  */
 
 /**
- * YAHOO_config is not included as part of the library.  Instead it is an 
- * object that can be defined by the implementer immediately before 
+ * YAHOO_config is not included as part of the library.  Instead it is an
+ * object that can be defined by the implementer immediately before
  * including the YUI library.  The properties included in this object
- * will be used to configure global properties needed as soon as the 
+ * will be used to configure global properties needed as soon as the
  * library begins to load.
  * @class YAHOO_config
  * @static
@@ -36,7 +36,7 @@ version: 2.8.2r1
 
 /**
  * Set to true if the library will be dynamically loaded after window.onload.
- * Defaults to false 
+ * Defaults to false
  * @property injecting
  * @type boolean
  * @static
@@ -90,16 +90,16 @@ if (typeof YAHOO == "undefined" || !YAHOO) {
  *
  * For implementation code that uses YUI, do not create your components
  * in the namespaces defined by YUI (
- * <code>YAHOO.util</code>, 
- * <code>YAHOO.widget</code>, 
- * <code>YAHOO.lang</code>, 
- * <code>YAHOO.tool</code>, 
- * <code>YAHOO.example</code>, 
+ * <code>YAHOO.util</code>,
+ * <code>YAHOO.widget</code>,
+ * <code>YAHOO.lang</code>,
+ * <code>YAHOO.tool</code>,
+ * <code>YAHOO.example</code>,
  * <code>YAHOO.env</code>) -- create your own namespace (e.g., 'companyname').
  *
  * @method namespace
  * @static
- * @param  {String*} arguments 1-n namespaces to create 
+ * @param  {String*} arguments 1-n namespaces to create
  * @return {Object}  A reference to the last namespace object created
  */
 YAHOO.namespace = function() {
@@ -121,14 +121,15 @@ YAHOO.namespace = function() {
 /**
  * Uses YAHOO.widget.Logger to output a log message, if the widget is
  * available.
+ * Note: LogReader adds the message, category, and source to the DOM as HTML.
  *
  * @method log
  * @static
- * @param  {String}  msg  The message to log.
- * @param  {String}  cat  The log category for the message.  Default
+ * @param  {HTML}  msg  The message to log.
+ * @param  {HTML}  cat  The log category for the message.  Default
  *                        categories are "info", "warn", "error", time".
  *                        Custom categories can be used as well. (opt)
- * @param  {String}  src  The source of the the message (opt)
+ * @param  {HTML}  src  The source of the the message (opt)
  * @return {Boolean}      True if the log operation was successful.
  */
 YAHOO.log = function(msg, cat, src) {
@@ -158,9 +159,9 @@ YAHOO.register = function(name, mainClass, data) {
     var mods = YAHOO.env.modules, m, v, b, ls, i;
 
     if (!mods[name]) {
-        mods[name] = { 
-            versions:[], 
-            builds:[] 
+        mods[name] = {
+            versions:[],
+            builds:[]
         };
     }
 
@@ -203,7 +204,7 @@ YAHOO.env = YAHOO.env || {
      * @type Object[]
      */
     modules: [],
-    
+
     /**
      * List of functions that should be executed every time a YUI module
      * reports itself.
@@ -222,7 +223,7 @@ YAHOO.env = YAHOO.env || {
  *      <dt>versions:</dt>  <dd>All versions that were registered</dd>
  *      <dt>builds:</dt>    <dd>All builds that were registered.</dd>
  *      <dt>mainClass:</dt> <dd>An object that was was stamped with the
- *                 current version and build. If 
+ *                 current version and build. If
  *                 mainClass.VERSION != version or mainClass.BUILD != build,
  *                 multiple versions of pieces of the library have been
  *                 loaded, potentially causing issues.</dd>
@@ -241,17 +242,25 @@ YAHOO.env.getVersion = function(name) {
  * Do not fork for a browser if it can be avoided.  Use feature detection when
  * you can.  Use the user agent as a last resort.  YAHOO.env.ua stores a version
  * number for the browser engine, 0 otherwise.  This value may or may not map
- * to the version number of the browser using the engine.  The value is 
- * presented as a float so that it can easily be used for boolean evaluation 
- * as well as for looking for a particular range of versions.  Because of this, 
- * some of the granularity of the version info may be lost (e.g., Gecko 1.8.0.9 
+ * to the version number of the browser using the engine.  The value is
+ * presented as a float so that it can easily be used for boolean evaluation
+ * as well as for looking for a particular range of versions.  Because of this,
+ * some of the granularity of the version info may be lost (e.g., Gecko 1.8.0.9
  * reports 1.8).
  * @class YAHOO.env.ua
  * @static
  */
-YAHOO.env.ua = function() {
 
-        var numberfy = function(s) {
+/**
+ * parses a user agent string (or looks for one in navigator to parse if
+ * not supplied).
+ * @method parseUA
+ * @since 2.9.0
+ * @static
+ */
+YAHOO.env.parseUA = function(agent) {
+
+        var numberify = function(s) {
             var c = 0;
             return parseFloat(s.replace(/\./g, function() {
                 return (c++ == 1) ? '' : '.';
@@ -266,6 +275,7 @@ YAHOO.env.ua = function() {
          * Internet Explorer version number or 0.  Example: 6
          * @property ie
          * @type float
+         * @static
          */
         ie: 0,
 
@@ -273,29 +283,32 @@ YAHOO.env.ua = function() {
          * Opera version number or 0.  Example: 9.2
          * @property opera
          * @type float
+         * @static
          */
         opera: 0,
 
         /**
-         * Gecko engine revision number.  Will evaluate to 1 if Gecko 
+         * Gecko engine revision number.  Will evaluate to 1 if Gecko
          * is detected but the revision could not be found. Other browsers
          * will be 0.  Example: 1.8
          * <pre>
          * Firefox 1.0.0.4: 1.7.8   <-- Reports 1.7
-         * Firefox 1.5.0.9: 1.8.0.9 <-- Reports 1.8
-         * Firefox 2.0.0.3: 1.8.1.3 <-- Reports 1.8
-         * Firefox 3 alpha: 1.9a4   <-- Reports 1.9
+         * Firefox 1.5.0.9: 1.8.0.9 <-- 1.8
+         * Firefox 2.0.0.3: 1.8.1.3 <-- 1.81
+         * Firefox 3.0   <-- 1.9
+         * Firefox 3.5   <-- 1.91
          * </pre>
          * @property gecko
          * @type float
+         * @static
          */
         gecko: 0,
 
         /**
-         * AppleWebKit version.  KHTML browsers that are not WebKit browsers 
-         * will evaluate to 1, other browsers 0.  Example: 418.9.1
+         * AppleWebKit version.  KHTML browsers that are not WebKit browsers
+         * will evaluate to 1, other browsers 0.  Example: 418.9
          * <pre>
-         * Safari 1.3.2 (312.6): 312.8.1 <-- Reports 312.8 -- currently the 
+         * Safari 1.3.2 (312.6): 312.8.1 <-- Reports 312.8 -- currently the
          *                                   latest available for Mac OSX 10.3.
          * Safari 2.0.2:         416     <-- hasOwnProperty introduced
          * Safari 2.0.4:         418     <-- preventDefault fixed
@@ -304,30 +317,37 @@ YAHOO.env.ua = function() {
          * Safari 2.0.4 (419.3): 419     <-- Tiger installations that have been
          *                                   updated, but not updated
          *                                   to the latest patch.
-         * Webkit 212 nightly:   522+    <-- Safari 3.0 precursor (with native SVG
-         *                                   and many major issues fixed).  
-         * 3.x yahoo.com, flickr:422     <-- Safari 3.x hacks the user agent
-         *                                   string when hitting yahoo.com and 
-         *                                   flickr.com.
-         * Safari 3.0.4 (523.12):523.12  <-- First Tiger release - automatic update
-         *                                   from 2.x via the 10.4.11 OS patch
+         * Webkit 212 nightly:   522+    <-- Safari 3.0 precursor (with native
+         * SVG and many major issues fixed).
+         * Safari 3.0.4 (523.12) 523.12  <-- First Tiger release - automatic
+         * update from 2.x via the 10.4.11 OS patch.
          * Webkit nightly 1/2008:525+    <-- Supports DOMContentLoaded event.
          *                                   yahoo.com user agent hack removed.
-         *                                   
          * </pre>
-         * http://developer.apple.com/internet/safari/uamatrix.html
+         * http://en.wikipedia.org/wiki/Safari_version_history
          * @property webkit
          * @type float
+         * @static
          */
         webkit: 0,
+
+        /**
+         * Chrome will be detected as webkit, but this property will also
+         * be populated with the Chrome version number
+         * @property chrome
+         * @type float
+         * @static
+         */
+        chrome: 0,
 
         /**
          * The mobile property will be set to a string containing any relevant
          * user agent information when a modern mobile browser is detected.
          * Currently limited to Safari on the iPhone/iPod Touch, Nokia N-series
-         * devices with the WebKit-based browser, and Opera Mini.  
-         * @property mobile 
+         * devices with the WebKit-based browser, and Opera Mini.
+         * @property mobile
          * @type string
+         * @static
          */
         mobile: null,
 
@@ -338,13 +358,55 @@ YAHOO.env.ua = function() {
          * @type float
          */
         air: 0,
+        /**
+         * Detects Apple iPad's OS version
+         * @property ipad
+         * @type float
+         * @static
+         */
+        ipad: 0,
+        /**
+         * Detects Apple iPhone's OS version
+         * @property iphone
+         * @type float
+         * @static
+         */
+        iphone: 0,
+        /**
+         * Detects Apples iPod's OS version
+         * @property ipod
+         * @type float
+         * @static
+         */
+        ipod: 0,
+        /**
+         * General truthy check for iPad, iPhone or iPod
+         * @property ios
+         * @type float
+         * @static
+         */
+        ios: null,
+        /**
+         * Detects Googles Android OS version
+         * @property android
+         * @type float
+         * @static
+         */
+        android: 0,
+        /**
+         * Detects Palms WebOS version
+         * @property webos
+         * @type float
+         * @static
+         */
+        webos: 0,
 
         /**
          * Google Caja version number or 0.
          * @property caja
          * @type float
          */
-        caja: nav.cajaVersion,
+        caja: nav && nav.cajaVersion,
 
         /**
          * Set to true if the page appears to be in SSL
@@ -364,12 +426,12 @@ YAHOO.env.ua = function() {
 
     },
 
-    ua = navigator && navigator.userAgent, 
-    
+    ua = agent || (navigator && navigator.userAgent),
+
     loc = window && window.location,
 
     href = loc && loc.href,
-    
+
     m;
 
     o.secure = href && (href.toLowerCase().indexOf("https") === 0);
@@ -380,55 +442,92 @@ YAHOO.env.ua = function() {
             o.os = 'windows';
         } else if ((/macintosh/i).test(ua)) {
             o.os = 'macintosh';
-        }
-    
-        // Modern KHTML browsers should qualify as Safari X-Grade
-        if ((/KHTML/).test(ua)) {
-            o.webkit=1;
+        } else if ((/rhino/i).test(ua)) {
+            o.os = 'rhino';
         }
 
+        // Modern KHTML browsers should qualify as Safari X-Grade
+        if ((/KHTML/).test(ua)) {
+            o.webkit = 1;
+        }
         // Modern WebKit browsers are at least X-Grade
-        m=ua.match(/AppleWebKit\/([^\s]*)/);
-        if (m&&m[1]) {
-            o.webkit=numberfy(m[1]);
+        m = ua.match(/AppleWebKit\/([^\s]*)/);
+        if (m && m[1]) {
+            o.webkit = numberify(m[1]);
 
             // Mobile browser check
             if (/ Mobile\//.test(ua)) {
-                o.mobile = "Apple"; // iPhone or iPod Touch
+                o.mobile = 'Apple'; // iPhone or iPod Touch
+
+                m = ua.match(/OS ([^\s]*)/);
+                if (m && m[1]) {
+                    m = numberify(m[1].replace('_', '.'));
+                }
+                o.ios = m;
+                o.ipad = o.ipod = o.iphone = 0;
+
+                m = ua.match(/iPad|iPod|iPhone/);
+                if (m && m[0]) {
+                    o[m[0].toLowerCase()] = o.ios;
+                }
             } else {
-                m=ua.match(/NokiaN[^\/]*/);
+                m = ua.match(/NokiaN[^\/]*|Android \d\.\d|webOS\/\d\.\d/);
                 if (m) {
-                    o.mobile = m[0]; // Nokia N-series, ex: NokiaN95
+                    // Nokia N-series, Android, webOS, ex: NokiaN95
+                    o.mobile = m[0];
+                }
+                if (/webOS/.test(ua)) {
+                    o.mobile = 'WebOS';
+                    m = ua.match(/webOS\/([^\s]*);/);
+                    if (m && m[1]) {
+                        o.webos = numberify(m[1]);
+                    }
+                }
+                if (/ Android/.test(ua)) {
+                    o.mobile = 'Android';
+                    m = ua.match(/Android ([^\s]*);/);
+                    if (m && m[1]) {
+                        o.android = numberify(m[1]);
+                    }
+
                 }
             }
 
-            m=ua.match(/AdobeAIR\/([^\s]*)/);
-            if (m) {
-                o.air = m[0]; // Adobe AIR 1.0 or better
+            m = ua.match(/Chrome\/([^\s]*)/);
+            if (m && m[1]) {
+                o.chrome = numberify(m[1]); // Chrome
+            } else {
+                m = ua.match(/AdobeAIR\/([^\s]*)/);
+                if (m) {
+                    o.air = m[0]; // Adobe AIR 1.0 or better
+                }
             }
-
         }
 
         if (!o.webkit) { // not webkit
-            // @todo check Opera/8.01 (J2ME/MIDP; Opera Mini/2.0.4509/1316; fi; U; ssr)
-            m=ua.match(/Opera[\s\/]([^\s]*)/);
-            if (m&&m[1]) {
-                o.opera=numberfy(m[1]);
-                m=ua.match(/Opera Mini[^;]*/);
+// @todo check Opera/8.01 (J2ME/MIDP; Opera Mini/2.0.4509/1316; fi; U; ssr)
+            m = ua.match(/Opera[\s\/]([^\s]*)/);
+            if (m && m[1]) {
+                o.opera = numberify(m[1]);
+                m = ua.match(/Version\/([^\s]*)/);
+                if (m && m[1]) {
+                    o.opera = numberify(m[1]); // opera 10+
+                }
+                m = ua.match(/Opera Mini[^;]*/);
                 if (m) {
                     o.mobile = m[0]; // ex: Opera Mini/2.0.4509/1316
                 }
             } else { // not opera or webkit
-                m=ua.match(/MSIE\s([^;]*)/);
-                if (m&&m[1]) {
-                    o.ie=numberfy(m[1]);
+                m = ua.match(/MSIE\s([^;]*)/);
+                if (m && m[1]) {
+                    o.ie = numberify(m[1]);
                 } else { // not opera, webkit, or ie
-                    m=ua.match(/Gecko\/([^\s]*)/);
+                    m = ua.match(/Gecko\/([^\s]*)/);
                     if (m) {
-                        o.gecko=1; // Gecko detected, look for revision
-                        m=ua.match(/rv:([^\s\)]*)/);
-                        if (m&&m[1]) {
-                            o.gecko=numberfy(m[1]);
+                        o.gecko = 1; // Gecko detected, look for revision
+                        m = ua.match(/rv:([^\s\)]*)/);
+                        if (m && m[1]) {
+                            o.gecko = numberify(m[1]);
                         }
                     }
                 }
@@ -437,7 +536,9 @@ YAHOO.env.ua = function() {
     }
 
     return o;
-}();
+};
+
+YAHOO.env.ua = YAHOO.env.parseUA();
 
 /*
  * Initializes the global by creating the default namespaces and applying
@@ -486,6 +587,16 @@ var L = YAHOO.lang,
     OBJECT_TOSTRING = '[object Object]',
     NOTHING = [],
 
+    HTML_CHARS = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#x27;',
+        '/': '&#x2F;',
+        '`': '&#x60;'
+    },
+
     // ADD = ["toString", "valueOf", "hasOwnProperty"],
     ADD = ["toString", "valueOf"],
 
@@ -497,7 +608,7 @@ var L = YAHOO.lang,
      * @param {any} o The object being testing
      * @return {boolean} the result
      */
-    isArray: function(o) { 
+    isArray: function(o) {
         return OP.toString.apply(o) === ARRAY_TOSTRING;
     },
 
@@ -510,7 +621,7 @@ var L = YAHOO.lang,
     isBoolean: function(o) {
         return typeof o === 'boolean';
     },
-    
+
     /**
      * Determines whether or not the provided object is a function.
      * Note: Internet Explorer thinks certain functions are objects:
@@ -531,7 +642,7 @@ var L = YAHOO.lang,
     isFunction: function(o) {
         return (typeof o === 'function') || OP.toString.apply(o) === FUNCTION_TOSTRING;
     },
-        
+
     /**
      * Determines whether or not the provided object is null
      * @method isNull
@@ -541,7 +652,7 @@ var L = YAHOO.lang,
     isNull: function(o) {
         return o === null;
     },
-        
+
     /**
      * Determines whether or not the provided object is a legal number
      * @method isNumber
@@ -551,18 +662,18 @@ var L = YAHOO.lang,
     isNumber: function(o) {
         return typeof o === 'number' && isFinite(o);
     },
-      
+
     /**
      * Determines whether or not the provided object is of type object
      * or function
      * @method isObject
      * @param {any} o The object being testing
      * @return {boolean} the result
-     */  
+     */
     isObject: function(o) {
 return (o && (typeof o === 'object' || L.isFunction(o))) || false;
     },
-        
+
     /**
      * Determines whether or not the provided object is a string
      * @method isString
@@ -572,7 +683,7 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
     isString: function(o) {
         return typeof o === 'string';
     },
-        
+
     /**
      * Determines whether or not the provided object is undefined
      * @method isUndefined
@@ -582,12 +693,12 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
     isUndefined: function(o) {
         return typeof o === 'undefined';
     },
-    
- 
+
+
     /**
      * IE will not enumerate native functions in a derived object even if the
-     * function was overridden.  This is a workaround for specific functions 
-     * we care about on the Object prototype. 
+     * function was overridden.  This is a workaround for specific functions
+     * we care about on the Object prototype.
      * @property _IEEnumFix
      * @param {Function} r  the object to receive the augmentation
      * @param {Function} s  the object that supplies the properties to augment
@@ -606,7 +717,36 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
                 }
             }
     } : function(){},
-       
+
+    /**
+     * <p>
+     * Returns a copy of the specified string with special HTML characters
+     * escaped. The following characters will be converted to their
+     * corresponding character entities:
+     * <code>&amp; &lt; &gt; &quot; &#x27; &#x2F; &#x60;</code>
+     * </p>
+     *
+     * <p>
+     * This implementation is based on the
+     * <a href="http://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet">OWASP
+     * HTML escaping recommendations</a>. In addition to the characters
+     * in the OWASP recommendation, we also escape the <code>&#x60;</code>
+     * character, since IE interprets it as an attribute delimiter when used in
+     * innerHTML.
+     * </p>
+     *
+     * @method escapeHTML
+     * @param {String} html String to escape.
+     * @return {String} Escaped string.
+     * @static
+     * @since 2.9.0
+     */
+    escapeHTML: function (html) {
+        return html.replace(/[&<>"'\/`]/g, function (match) {
+            return HTML_CHARS[match];
+        });
+    },
+
     /**
      * Utility to set up the prototype, constructor and superclass properties to
      * support an inheritance strategy that can chain constructors and methods.
@@ -618,7 +758,7 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
      * @param {Function} superc the object to inherit
      * @param {Object} overrides  additional properties/methods to add to the
      *                              subclass prototype.  These will override the
-     *                              matching items obtained from the superclass 
+     *                              matching items obtained from the superclass
      *                              if present.
      */
     extend: function(subc, superc, overrides) {
@@ -634,7 +774,7 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
         if (superc.prototype.constructor == OP.constructor) {
             superc.prototype.constructor=superc;
         }
-    
+
         if (overrides) {
             for (i in overrides) {
                 if (L.hasOwnProperty(overrides, i)) {
@@ -645,14 +785,14 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
             L._IEEnumFix(subc.prototype, overrides);
         }
     },
-   
+
     /**
      * Applies all properties in the supplier to the receiver if the
-     * receiver does not have these properties yet.  Optionally, one or 
-     * more methods/properties can be specified (as additional 
-     * parameters).  This option will overwrite the property if receiver 
-     * has it already.  If true is passed as the third parameter, all 
-     * properties will be applied and _will_ overwrite properties in 
+     * receiver does not have these properties yet.  Optionally, one or
+     * more methods/properties can be specified (as additional
+     * parameters).  This option will overwrite the property if receiver
+     * has it already.  If true is passed as the third parameter, all
+     * properties will be applied and _will_ overwrite properties in
      * the receiver.
      *
      * @method augmentObject
@@ -660,7 +800,7 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
      * @since 2.3.0
      * @param {Function} r  the object to receive the augmentation
      * @param {Function} s  the object that supplies the properties to augment
-     * @param {String*|boolean}  arguments zero or more properties methods 
+     * @param {String*|boolean}  arguments zero or more properties methods
      *        to augment the receiver with.  If none specified, everything
      *        in the supplier will be used unless it would
      *        overwrite an existing property in the receiver. If true
@@ -678,16 +818,18 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
                 r[a[i]] = s[a[i]];
             }
         } else { // take everything, overwriting only if the third parameter is true
-            for (p in s) { 
+            for (p in s) {
                 if (overrideList || !(p in r)) {
                     r[p] = s[p];
                 }
             }
-            
+
             L._IEEnumFix(r, s);
         }
+
+        return r;
     },
- 
+
     /**
      * Same as YAHOO.lang.augmentObject, except it only applies prototype properties
      * @see YAHOO.lang.augmentObject
@@ -695,11 +837,11 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
      * @static
      * @param {Function} r  the object to receive the augmentation
      * @param {Function} s  the object that supplies the properties to augment
-     * @param {String*|boolean}  arguments zero or more properties methods 
-     *        to augment the receiver with.  If none specified, everything 
-     *        in the supplier will be used unless it would overwrite an existing 
-     *        property in the receiver.  if true is specified as the third 
-     *        parameter, all properties will be applied and will overwrite an 
+     * @param {String*|boolean}  arguments zero or more properties methods
+     *        to augment the receiver with.  If none specified, everything
+     *        in the supplier will be used unless it would overwrite an existing
+     *        property in the receiver.  if true is specified as the third
+     *        parameter, all properties will be applied and will overwrite an
      *        existing property in the receiver
      */
     augmentProto: function(r, s) {
@@ -712,9 +854,11 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
             a.push(arguments[i]);
         }
         L.augmentObject.apply(this, a);
+
+        return r;
     },
 
-      
+
     /**
      * Returns a simple string representation of the object or array.
      * Other types of objects will be returned unprocessed.  Arrays
@@ -732,7 +876,7 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
 
         // Cast non-objects to string
         // Skip dates because the std toString is what we want
-        // Skip HTMLElement-like objects because trying to dump 
+        // Skip HTMLElement-like objects because trying to dump
         // an element will cause an unhandled exception in FF 2.x
         if (!L.isObject(o)) {
             return o + "";
@@ -784,18 +928,24 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
     },
 
     /**
-     * Does variable substitution on a string. It scans through the string 
-     * looking for expressions enclosed in { } braces. If an expression 
+     * Does variable substitution on a string. It scans through the string
+     * looking for expressions enclosed in { } braces. If an expression
      * is found, it is used a key on the object.  If there is a space in
      * the key, the first word is used for the key and the rest is provided
      * to an optional function to be used to programatically determine the
-     * value (the extra information might be used for this decision). If 
+     * value (the extra information might be used for this decision). If
      * the value for the key in the object, or what is returned from the
-     * function has a string value, number value, or object value, it is 
+     * function has a string value, number value, or object value, it is
      * substituted for the bracket expression and it repeats.  If this
      * value is an object, it uses the Object's toString() if this has
      * been overridden, otherwise it does a shallow dump of the key/value
      * pairs.
+     *
+     * By specifying the recurse option, the string is rescanned after
+     * every replacement, allowing for nested template substitutions.
+     * The side effect of this option is that curly braces in the
+     * replacement content must be encoded.
+     *
      * @method substitute
      * @since 2.3.0
      * @param s {String} The string that will be modified.
@@ -804,25 +954,26 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
      *                     process each match.  It receives the key,
      *                     value, and any extra metadata included with
      *                     the key inside of the braces.
+     * @param recurse {boolean} default true - if not false, the replaced
+     * string will be rescanned so that nested substitutions are possible.
      * @return {String} the substituted string
      */
-    substitute: function (s, o, f) {
-        var i, j, k, key, v, meta, saved=[], token, 
+    substitute: function (s, o, f, recurse) {
+        var i, j, k, key, v, meta, saved=[], token, lidx=s.length,
             DUMP='dump', SPACE=' ', LBRACE='{', RBRACE='}',
             dump, objstr;
 
-
         for (;;) {
-            i = s.lastIndexOf(LBRACE);
+            i = s.lastIndexOf(LBRACE, lidx);
             if (i < 0) {
                 break;
             }
             j = s.indexOf(RBRACE, i);
-            if (i + 1 >= j) {
+            if (i + 1 > j) {
                 break;
             }
 
-            //Extract key and meta info 
+            //Extract key and meta info
             token = s.substring(i + 1, j);
             key = token;
             meta = null;
@@ -854,7 +1005,7 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
 
                     objstr = v.toString();
 
-                    // use the toString if it is not the Object toString 
+                    // use the toString if it is not the Object toString
                     // and the 'dump' meta info was not found
                     if (objstr === OBJECT_TOSTRING || dump > -1) {
                         v = L.dump(v, parseInt(meta, 10));
@@ -872,6 +1023,9 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
 
             s = s.substring(0, i) + v + s.substring(j + 1);
 
+            if (recurse === false) {
+                lidx = i-1;
+            }
 
         }
 
@@ -885,7 +1039,7 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
 
 
     /**
-     * Returns a string without any leading or trailing whitespace.  If 
+     * Returns a string without any leading or trailing whitespace.  If
      * the input is not a string, the input will be returned untouched.
      * @method trim
      * @since 2.3.0
@@ -918,28 +1072,28 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
     },
 
     /**
-     * Executes the supplied function in the context of the supplied 
-     * object 'when' milliseconds later.  Executes the function a 
+     * Executes the supplied function in the context of the supplied
+     * object 'when' milliseconds later.  Executes the function a
      * single time unless periodic is set to true.
      * @method later
      * @since 2.4.0
-     * @param when {int} the number of milliseconds to wait until the fn 
+     * @param when {int} the number of milliseconds to wait until the fn
      * is executed
      * @param o the context object
-     * @param fn {Function|String} the function to execute or the name of 
+     * @param fn {Function|String} the function to execute or the name of
      * the method in the 'o' object to execute
      * @param data [Array] data that is provided to the function.  This accepts
      * either a single item or an array.  If an array is provided, the
      * function is executed with one parameter for each array item.  If
      * you need to pass a single array parameter, it needs to be wrapped in
      * an array [myarray]
-     * @param periodic {boolean} if true, executes continuously at supplied 
+     * @param periodic {boolean} if true, executes continuously at supplied
      * interval until canceled
-     * @return a timer object. Call the cancel() method on this object to 
+     * @return a timer object. Call the cancel() method on this object to
      * stop the timer.
      */
     later: function(when, o, fn, data, periodic) {
-        when = when || 0; 
+        when = when || 0;
         o = o || {};
         var m=fn, d=data, f, r;
 
@@ -951,7 +1105,7 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
             throw new TypeError("method undefined");
         }
 
-        if (d && !L.isArray(d)) {
+        if (!L.isUndefined(data) && !L.isArray(d)) {
             d = [data];
         }
 
@@ -972,10 +1126,10 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
             }
         };
     },
-    
+
     /**
      * A convenience method for detecting a legitimate non-null value.
-     * Returns false for null/undefined/NaN, true for other values, 
+     * Returns false for null/undefined/NaN, true for other values,
      * including 0/false/''
      * @method isValue
      * @since 2.3.0
@@ -1012,9 +1166,9 @@ return (L.isObject(o) || L.isString(o) || L.isNumber(o) || L.isBoolean(o));
  */
 L.hasOwnProperty = (OP.hasOwnProperty) ?
     function(o, prop) {
-        return o && o.hasOwnProperty(prop);
+        return o && o.hasOwnProperty && o.hasOwnProperty(prop);
     } : function(o, prop) {
-        return !L.isUndefined(o[prop]) && 
+        return !L.isUndefined(o[prop]) &&
                 o.constructor.prototype[prop] !== o[prop];
     };
 
@@ -1026,16 +1180,16 @@ OB.augmentObject(L, OB, true);
  * @class YAHOO.util.Lang
  */
 YAHOO.util.Lang = L;
- 
+
 /**
- * Same as YAHOO.lang.augmentObject, except it only applies prototype 
+ * Same as YAHOO.lang.augmentObject, except it only applies prototype
  * properties.  This is an alias for augmentProto.
  * @see YAHOO.lang.augmentObject
  * @method augment
  * @static
  * @param {Function} r  the object to receive the augmentation
  * @param {Function} s  the object that supplies the properties to augment
- * @param {String*|boolean}  arguments zero or more properties methods to 
+ * @param {String*|boolean}  arguments zero or more properties methods to
  *        augment the receiver with.  If none specified, everything
  *        in the supplier will be used unless it would
  *        overwrite an existing property in the receiver.  if true
@@ -1052,13 +1206,13 @@ L.augment = L.augmentProto;
  * @static
  * @param {Function} r  the object to receive the augmentation
  * @param {Function} s  the object that supplies the properties to augment
- * @param {String*}  arguments zero or more properties methods to 
+ * @param {String*}  arguments zero or more properties methods to
  *        augment the receiver with.  If none specified, everything
  *        in the supplier will be used unless it would
  *        overwrite an existing property in the receiver
  */
 YAHOO.augment = L.augmentProto;
-       
+
 /**
  * An alias for <a href="YAHOO.lang.html#extend">YAHOO.lang.extend</a>
  * @method extend
@@ -1072,4 +1226,4 @@ YAHOO.augment = L.augmentProto;
 YAHOO.extend = L.extend;
 
 })();
-YAHOO.register("yahoo", YAHOO, {version: "2.8.2r1", build: "7"});
+YAHOO.register("yahoo", YAHOO, {version: "2.9.0", build: "2800"});

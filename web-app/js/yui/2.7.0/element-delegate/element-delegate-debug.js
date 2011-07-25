@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 /**
  * Augments the Element Utility with a <code>delegate</code> method that 
@@ -138,4 +138,4 @@ version: 2.8.2r1
 	});
 
 }());
-YAHOO.register("element-delegate", YAHOO.util.Element, {version: "2.8.2r1", build: "7"});
+YAHOO.register("element-delegate", YAHOO.util.Element, {version: "2.9.0", build: "2800"});

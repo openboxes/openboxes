@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 /**
  * The Charts widget provides a Flash control for displaying data
@@ -11,7 +11,6 @@ version: 2.8.2r1
  * @module charts
  * @requires yahoo, dom, event, datasource
  * @title Charts Widget
- * @experimental
  */
  
 /****************************************************************************/
@@ -52,28 +51,10 @@ YAHOO.widget.Chart = function(type, containerId, dataSource, configurationAttrib
 	
 	this._id = attributes.id = attributes.id || YAHOO.util.Dom.generateId(null, "yuigen");
 	
-	if(attributes.version && attributes.version != null && attributes.version != undefined && attributes.version != "undefined")
-	{ 
-		var version = (/\w*.\w*/.exec(((attributes.version).toString()).replace(/.0./g, "."))).toString();
-		var verSplit = version.split(".");
-		version = verSplit[0] + ".";
-		switch((verSplit[1].toString()).length)
-		{
-			case 1: 
-				version += "00";
-			break;
-			case 2:
-				version += "0";
-			break;	
-		} 
-		version += verSplit[1];
-		attributes.version = parseFloat(version); 
-	}
-	
 	this._swfURL = YAHOO.widget.Chart.SWFURL;
 	this._containerID = containerId;
 	
-	this._attributes = attributes
+	this._attributes = attributes;
 	this._swfEmbed = new YAHOO.widget.SWF(containerId, YAHOO.widget.Chart.SWFURL, attributes);
 	
 	this._swf = this._swfEmbed.swf;
@@ -462,7 +443,7 @@ YAHOO.extend(YAHOO.widget.Chart, YAHOO.util.AttributeProvider,
 		this.setAttributeConfig("legendLabelFunction",
 		{
 			method: this._setLegendLabelFunction,
-			getter: this._legendLabelFunction
+			getter: this._getLegendLabelFunction
 		});
 
 		/**
@@ -827,6 +808,17 @@ YAHOO.extend(YAHOO.widget.Chart, YAHOO.util.AttributeProvider,
 		}
 		this._swf.setLegendLabelFunction(value);
 	},
+
+    /**
+     * Getter for the legendLabelFunction attribute.
+     *
+     * @method _getLegendLabelFunction
+     * @private
+     */
+    _getLegendLabelFunction: function()
+    {
+        return this._legendLabelFunction;
+    },
 
 	/**
 	 * Getter for the polling attribute.
@@ -2057,4 +2049,4 @@ YAHOO.lang.extend(YAHOO.widget.StackedColumnSeries, YAHOO.widget.CartesianSeries
 {
 	type: "stackcolumn"
 });
-YAHOO.register("charts", YAHOO.widget.Chart, {version: "2.8.2r1", build: "7"});
+YAHOO.register("charts", YAHOO.widget.Chart, {version: "2.9.0", build: "2800"});

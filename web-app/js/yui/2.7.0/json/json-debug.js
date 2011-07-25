@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 /**
  * Provides methods to parse JSON strings and convert objects to JSON strings.
@@ -81,7 +81,7 @@ var l = YAHOO.lang,
      * @static
      * @private
      */
-    _UNSAFE  = /^[\],:{}\s]*$/,
+    _UNSAFE  = /[^\],:{}\s]/,
 
 
 /* Variables used by stringify */
@@ -207,7 +207,7 @@ function _prepare(s) {
 
 function _isSafe(str) {
     return l.isString(str) &&
-            _UNSAFE.test(str.replace(_ESCAPES,'@').
+            !_UNSAFE.test(str.replace(_ESCAPES,'@').
                              replace(_VALUES,']').
                              replace(_BRACKETS,''));
 }
@@ -341,7 +341,7 @@ function _stringify(o,w,space) {
             i = 0;
 
             for (k in keys) {
-                if (keys.hasOwnProperty(k)) {
+                if (l.hasOwnProperty(keys, k)) {
                     v = _serialize(value, k);
                     if (v) {
                         a[i++] = _string(k) + colon + v;
@@ -430,6 +430,10 @@ YAHOO.lang.JSON = {
      * @static
      */
     parse : function (s,reviver) {
+        if (typeof s !== 'string') {
+            s += '';
+        }
+
         return Native && YAHOO.lang.JSON.useNativeParse ?
             Native.parse(s,reviver) : _parse(s,reviver);
     },
@@ -535,4 +539,4 @@ YAHOO.lang.JSON = {
 YAHOO.lang.JSON.isValid = YAHOO.lang.JSON.isSafe;
 
 })();
-YAHOO.register("json", YAHOO.lang.JSON, {version: "2.8.2r1", build: "7"});
+YAHOO.register("json", YAHOO.lang.JSON, {version: "2.9.0", build: "2800"});

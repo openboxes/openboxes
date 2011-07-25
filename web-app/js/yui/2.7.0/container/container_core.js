@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 (function () {
 
@@ -235,27 +235,18 @@ version: 2.8.2r1
         * @return {Boolean} True is the property was reset, false if not
         */
         resetProperty: function (key) {
-    
             key = key.toLowerCase();
-        
-            var property = this.config[key];
-    
-            if (property && property.event) {
-    
-                if (this.initialConfig[key] && 
-                    !Lang.isUndefined(this.initialConfig[key])) {
-    
-                    this.setProperty(key, this.initialConfig[key]);
 
+            var property = this.config[key];
+
+            if (property && property.event) {
+                if (key in this.initialConfig) {
+                    this.setProperty(key, this.initialConfig[key]);
                     return true;
-    
                 }
-    
             } else {
-    
                 return false;
             }
-    
         },
         
         /**
@@ -824,7 +815,7 @@ version: 2.8.2r1
     Module.CSS_MODULE = "yui-module";
     
     /**
-    * Constant representing the module header
+    * CSS classname representing the module header. NOTE: The classname is inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.
     * @property YAHOO.widget.Module.CSS_HEADER
     * @static
     * @final
@@ -833,7 +824,7 @@ version: 2.8.2r1
     Module.CSS_HEADER = "hd";
 
     /**
-    * Constant representing the module body
+    * CSS classname representing the module body. NOTE: The classname is inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.
     * @property YAHOO.widget.Module.CSS_BODY
     * @static
     * @final
@@ -842,7 +833,7 @@ version: 2.8.2r1
     Module.CSS_BODY = "bd";
     
     /**
-    * Constant representing the module footer
+    * CSS classname representing the module footer. NOTE: The classname is inserted into the DOM as HTML, and should be escaped by the implementor if coming from an external source.
     * @property YAHOO.widget.Module.CSS_FOOTER
     * @static
     * @final
@@ -1110,9 +1101,11 @@ version: 2.8.2r1
         }, 
 
         /**
-        * String representing the current user-agent platform
+        * String identifying whether the current platform is windows or mac. This property
+        * currently only identifies these 2 platforms, and returns false otherwise. 
         * @property platform
-        * @type String
+        * @deprecated Use YAHOO.env.ua
+        * @type {String|Boolean}
         */
         platform: function () {
             var ua = navigator.userAgent.toLowerCase();
@@ -1130,7 +1123,7 @@ version: 2.8.2r1
         * String representing the user-agent of the browser
         * @deprecated Use YAHOO.env.ua
         * @property browser
-        * @type String
+        * @type {String|Boolean}
         */
         browser: function () {
             var ua = navigator.userAgent.toLowerCase();
@@ -1203,6 +1196,7 @@ version: 2.8.2r1
             * @default null
             */
             this.cfg.addProperty(DEFAULT_CONFIG.EFFECT.key, {
+                handler: this.configEffect,
                 suppressEvent: DEFAULT_CONFIG.EFFECT.suppressEvent, 
                 supercedes: DEFAULT_CONFIG.EFFECT.supercedes
             });
@@ -1389,6 +1383,9 @@ version: 2.8.2r1
 
                     oIFrame.id = "_yuiResizeMonitor";
                     oIFrame.title = "Text Resize Monitor";
+                    oIFrame.tabIndex = -1;
+                    oIFrame.setAttribute("role", "presentation");
+
                     /*
                         Need to set "position" property before inserting the 
                         iframe into the document or Safari's status bar will 
@@ -1489,16 +1486,21 @@ version: 2.8.2r1
         },
 
         /**
-        * Sets the Module's header content to the string specified, or appends 
-        * the passed element to the header. If no header is present, one will 
+        * Sets the Module's header content to the markup specified, or appends 
+        * the passed element to the header. 
+        * 
+        * If no header is present, one will 
         * be automatically created. An empty string can be passed to the method
         * to clear the contents of the header.
         * 
         * @method setHeader
-        * @param {String} headerContent The string used to set the header.
+        * @param {HTML} headerContent The markup used to set the header content.
         * As a convenience, non HTMLElement objects can also be passed into 
         * the method, and will be treated as strings, with the header innerHTML
-        * set to their default toString implementations.
+        * set to their default toString implementations. 
+        * 
+        * <p>NOTE: Markup passed into this method is added to the DOM as HTML, and should be escaped by the implementor if coming from an external source.</p>
+        * 
         * <em>OR</em>
         * @param {HTMLElement} headerContent The HTMLElement to append to 
         * <em>OR</em>
@@ -1549,10 +1551,13 @@ version: 2.8.2r1
         * 
         * An empty string can be passed to the method to clear the contents of the body.
         * @method setBody
-        * @param {String} bodyContent The HTML used to set the body. 
+        * @param {HTML} bodyContent The HTML used to set the body content 
         * As a convenience, non HTMLElement objects can also be passed into 
         * the method, and will be treated as strings, with the body innerHTML
         * set to their default toString implementations.
+        * 
+        * <p>NOTE: Markup passed into this method is added to the DOM as HTML, and should be escaped by the implementor if coming from an external source.</p>
+        * 
         * <em>OR</em>
         * @param {HTMLElement} bodyContent The HTMLElement to add as the first and only
         * child of the body element.
@@ -1596,17 +1601,20 @@ version: 2.8.2r1
             this.changeContentEvent.fire();
 
         },
-        
+
         /**
         * Sets the Module's footer content to the HTML specified, or appends 
         * the passed element to the footer. If no footer is present, one will 
         * be automatically created. An empty string can be passed to the method
         * to clear the contents of the footer.
         * @method setFooter
-        * @param {String} footerContent The HTML used to set the footer 
+        * @param {HTML} footerContent The HTML used to set the footer 
         * As a convenience, non HTMLElement objects can also be passed into 
         * the method, and will be treated as strings, with the footer innerHTML
         * set to their default toString implementations.
+        * 
+        * <p>NOTE: Markup passed into this method is added to the DOM as HTML, and should be escaped by the implementor if coming from an external source.</p>
+        * 
         * <em>OR</em>
         * @param {HTMLElement} footerContent The HTMLElement to append to 
         * the footer
@@ -1784,16 +1792,18 @@ version: 2.8.2r1
         },
 
         /**
-        * Removes the Module element from the DOM and sets all child elements 
-        * to null.
+        * Removes the Module element from the DOM, sets all child elements to null, and purges the bounding element of event listeners.
         * @method destroy
+        * @param {boolean} shallowPurge If true, only the parent element's DOM event listeners are purged. If false, or not provided, all children are also purged of DOM event listeners. 
+        * NOTE: The flag is a "shallowPurge" flag, as opposed to what may be a more intuitive "purgeChildren" flag to maintain backwards compatibility with behavior prior to 2.9.0.
         */
-        destroy: function () {
+        destroy: function (shallowPurge) {
 
-            var parent;
+            var parent,
+                purgeChildren = !(shallowPurge);
 
             if (this.element) {
-                Event.purgeElement(this.element, true);
+                Event.purgeElement(this.element, purgeChildren);
                 parent = this.element.parentNode;
             }
 
@@ -1850,14 +1860,73 @@ version: 2.8.2r1
         configVisible: function (type, args, obj) {
             var visible = args[0];
             if (visible) {
-                this.beforeShowEvent.fire();
-                Dom.setStyle(this.element, "display", "block");
-                this.showEvent.fire();
+                if(this.beforeShowEvent.fire()) {
+                    Dom.setStyle(this.element, "display", "block");
+                    this.showEvent.fire();
+                }
             } else {
-                this.beforeHideEvent.fire();
-                Dom.setStyle(this.element, "display", "none");
-                this.hideEvent.fire();
+                if (this.beforeHideEvent.fire()) {
+                    Dom.setStyle(this.element, "display", "none");
+                    this.hideEvent.fire();
+                }
             }
+        },
+
+        /**
+        * Default event handler for the "effect" configuration property
+        * @param {String} type The CustomEvent type (usually the property name)
+        * @param {Object[]} args The CustomEvent arguments. For configuration 
+        * handlers, args[0] will equal the newly applied value for the property.
+        * @param {Object} obj The scope object. For configuration handlers, 
+        * this will usually equal the owner.
+        * @method configEffect
+        */
+        configEffect: function (type, args, obj) {
+            this._cachedEffects = (this.cacheEffects) ? this._createEffects(args[0]) : null;
+        },
+
+        /**
+         * If true, ContainerEffects (and Anim instances) are cached when "effect" is set, and reused. 
+         * If false, new instances are created each time the container is hidden or shown, as was the 
+         * behavior prior to 2.9.0. 
+         *
+         * @property cacheEffects
+         * @since 2.9.0
+         * @default true
+         * @type boolean
+         */
+        cacheEffects : true,
+
+        /**
+         * Creates an array of ContainerEffect instances from the provided configs
+         * 
+         * @method _createEffects
+         * @param {Array|Object} effectCfg An effect configuration or array of effect configurations
+         * @return {Array} An array of ContainerEffect instances.
+         * @protected
+         */
+        _createEffects: function(effectCfg) {
+            var effectInstances = null,
+                n, 
+                i,
+                eff;
+
+            if (effectCfg) {
+                if (effectCfg instanceof Array) {
+                    effectInstances = [];
+                    n = effectCfg.length;
+                    for (i = 0; i < n; i++) {
+                        eff = effectCfg[i];
+                        if (eff.effect) {
+                            effectInstances[effectInstances.length] = eff.effect(this, eff.duration);
+                        }
+                    }
+                } else if (effectCfg.effect) {
+                    effectInstances = [effectCfg.effect(this, effectCfg.duration)];
+                }
+            }
+
+            return effectInstances;
         },
 
         /**
@@ -2723,12 +2792,10 @@ version: 2.8.2r1
 
             var visible = args[0],
                 currentVis = Dom.getStyle(this.element, "visibility"),
-                effect = this.cfg.getProperty("effect"),
-                effectInstances = [],
+                effects = this._cachedEffects || this._createEffects(this.cfg.getProperty("effect")),
                 isMacGecko = (this.platform == "mac" && UA.gecko),
                 alreadySubscribed = Config.alreadySubscribed,
-                eff, ei, e, i, j, k, h,
-                nEffects,
+                ei, e, j, k, h,
                 nEffectInstances;
 
             if (currentVis == "inherit") {
@@ -2749,59 +2816,40 @@ version: 2.8.2r1
                 }
             }
 
-            if (effect) {
-                if (effect instanceof Array) {
-                    nEffects = effect.length;
-
-                    for (i = 0; i < nEffects; i++) {
-                        eff = effect[i];
-                        effectInstances[effectInstances.length] = 
-                            eff.effect(this, eff.duration);
-
-                    }
-                } else {
-                    effectInstances[effectInstances.length] = 
-                        effect.effect(this, effect.duration);
-                }
-            }
-
             if (visible) { // Show
+
                 if (isMacGecko) {
                     this.showMacGeckoScrollbars();
                 }
 
-                if (effect) { // Animate in
+                if (effects) { // Animate in
                     if (visible) { // Animate in if not showing
-                        if (currentVis != "visible" || currentVis === "") {
-                            this.beforeShowEvent.fire();
-                            nEffectInstances = effectInstances.length;
 
-                            for (j = 0; j < nEffectInstances; j++) {
-                                ei = effectInstances[j];
-                                if (j === 0 && !alreadySubscribed(
-                                        ei.animateInCompleteEvent, 
-                                        this.showEvent.fire, this.showEvent)) {
+                         // Fading out is a bit of a hack, but didn't want to risk doing 
+                         // something broader (e.g a generic this._animatingOut) for 2.9.0
 
-                                    /*
-                                         Delegate showEvent until end 
-                                         of animateInComplete
-                                    */
+                        if (currentVis != "visible" || currentVis === "" || this._fadingOut) {
+                            if (this.beforeShowEvent.fire()) {
 
-                                    ei.animateInCompleteEvent.subscribe(
-                                     this.showEvent.fire, this.showEvent, true);
+                                nEffectInstances = effects.length;
+
+                                for (j = 0; j < nEffectInstances; j++) {
+                                    ei = effects[j];
+                                    if (j === 0 && !alreadySubscribed(ei.animateInCompleteEvent, this.showEvent.fire, this.showEvent)) {
+                                        ei.animateInCompleteEvent.subscribe(this.showEvent.fire, this.showEvent, true);
+                                    }
+                                    ei.animateIn();
                                 }
-                                ei.animateIn();
                             }
                         }
                     }
                 } else { // Show
                     if (currentVis != "visible" || currentVis === "") {
-                        this.beforeShowEvent.fire();
-
-                        this._setDomVisibility(true);
-
-                        this.cfg.refireEvent("iframe");
-                        this.showEvent.fire();
+                        if (this.beforeShowEvent.fire()) {
+                            this._setDomVisibility(true);
+                            this.cfg.refireEvent("iframe");
+                            this.showEvent.fire();
+                        }
                     } else {
                         this._setDomVisibility(true);
                     }
@@ -2812,28 +2860,18 @@ version: 2.8.2r1
                     this.hideMacGeckoScrollbars();
                 }
 
-                if (effect) { // Animate out if showing
-                    if (currentVis == "visible") {
-                        this.beforeHideEvent.fire();
-
-                        nEffectInstances = effectInstances.length;
-                        for (k = 0; k < nEffectInstances; k++) {
-                            h = effectInstances[k];
-    
-                            if (k === 0 && !alreadySubscribed(
-                                h.animateOutCompleteEvent, this.hideEvent.fire, 
-                                this.hideEvent)) {
-    
-                                /*
-                                     Delegate hideEvent until end 
-                                     of animateOutComplete
-                                */
-    
-                                h.animateOutCompleteEvent.subscribe(
-                                    this.hideEvent.fire, this.hideEvent, true);
-    
+                if (effects) { // Animate out if showing
+                    if (currentVis == "visible" || this._fadingIn) {
+                        if (this.beforeHideEvent.fire()) {
+                            nEffectInstances = effects.length;
+                            for (k = 0; k < nEffectInstances; k++) {
+                                h = effects[k];
+        
+                                if (k === 0 && !alreadySubscribed(h.animateOutCompleteEvent, this.hideEvent.fire, this.hideEvent)) {
+                                    h.animateOutCompleteEvent.subscribe(this.hideEvent.fire, this.hideEvent, true);
+                                }
+                                h.animateOut();
                             }
-                            h.animateOut();
                         }
 
                     } else if (currentVis === "") {
@@ -2843,9 +2881,10 @@ version: 2.8.2r1
                 } else { // Simple hide
 
                     if (currentVis == "visible" || currentVis === "") {
-                        this.beforeHideEvent.fire();
-                        this._setDomVisibility(false);
-                        this.hideEvent.fire();
+                        if (this.beforeHideEvent.fire()) {
+                            this._setDomVisibility(false);
+                            this.hideEvent.fire();
+                        }
                     } else {
                         this._setDomVisibility(false);
                     }
@@ -4043,7 +4082,7 @@ version: 2.8.2r1
                 }
             }
 
-            Dom.getElementsBy(isOverlayElement, "DIV", document.body);
+            Dom.getElementsBy(isOverlayElement, "div", document.body);
 
             aOverlays.sort(compareZIndexDesc);
 
@@ -4076,8 +4115,10 @@ version: 2.8.2r1
         * Removes the Overlay element from the DOM and sets all child 
         * elements to null.
         * @method destroy
+        * @param {boolean} shallowPurge If true, only the parent element's DOM event listeners are purged. If false, or not provided, all children are also purged of DOM event listeners. 
+        * NOTE: The flag is a "shallowPurge" flag, as opposed to what may be a more intuitive "purgeChildren" flag to maintain backwards compatibility with behavior prior to 2.9.0.
         */
-        destroy: function () {
+        destroy: function (shallowPurge) {
 
             if (this.iframe) {
                 this.iframe.parentNode.removeChild(this.iframe);
@@ -4099,7 +4140,7 @@ version: 2.8.2r1
                 this._processTriggers(this._contextTriggers, _UNSUBSCRIBE, this._alignOnTrigger);
             }
 
-            Overlay.superclass.destroy.call(this);
+            Overlay.superclass.destroy.call(this, shallowPurge);
         },
 
         /**
@@ -4801,14 +4842,11 @@ version: 2.8.2r1
         * @type class
         */
         this.animClass = animClass;
-    
     };
-
 
     var Dom = YAHOO.util.Dom,
         CustomEvent = YAHOO.util.CustomEvent,
         ContainerEffect = YAHOO.widget.ContainerEffect;
-
 
     /**
     * A pre-configured ContainerEffect instance that can be used for fading 
@@ -4852,6 +4890,8 @@ version: 2.8.2r1
         };
 
         fade.handleStartAnimateIn = function (type, args, obj) {
+            obj.overlay._fadingIn = true;
+
             Dom.addClass(obj.overlay.element, "hide-select");
 
             if (!obj.overlay.underlay) {
@@ -4865,6 +4905,8 @@ version: 2.8.2r1
         };
 
         fade.handleCompleteAnimateIn = function (type,args,obj) {
+            obj.overlay._fadingIn = false;
+            
             Dom.removeClass(obj.overlay.element, "hide-select");
 
             if (obj.overlay.element.style.filter) {
@@ -4878,12 +4920,15 @@ version: 2.8.2r1
         };
 
         fade.handleStartAnimateOut = function (type, args, obj) {
+            obj.overlay._fadingOut = true;
             Dom.addClass(obj.overlay.element, "hide-select");
             obj.handleUnderlayStart();
         };
 
         fade.handleCompleteAnimateOut =  function (type, args, obj) {
+            obj.overlay._fadingOut = false;
             Dom.removeClass(obj.overlay.element, "hide-select");
+
             if (obj.overlay.element.style.filter) {
                 obj.overlay.element.style.filter = null;
             }
@@ -4961,7 +5006,7 @@ version: 2.8.2r1
             obj.overlay.cfg.refireEvent("iframe");
             obj.animateInCompleteEvent.fire();
         };
-        
+
         slide.handleStartAnimateOut = function (type, args, obj) {
     
             var vw = Dom.getViewportWidth(),
@@ -5009,36 +5054,37 @@ version: 2.8.2r1
             this.animateInCompleteEvent = this.createEvent("animateInComplete");
             this.animateInCompleteEvent.signature = CustomEvent.LIST;
         
-            this.animateOutCompleteEvent = 
-                this.createEvent("animateOutComplete");
+            this.animateOutCompleteEvent = this.createEvent("animateOutComplete");
             this.animateOutCompleteEvent.signature = CustomEvent.LIST;
-        
-            this.animIn = new this.animClass(this.targetElement, 
-                this.attrIn.attributes, this.attrIn.duration, 
+
+            this.animIn = new this.animClass(
+                this.targetElement, 
+                this.attrIn.attributes, 
+                this.attrIn.duration, 
                 this.attrIn.method);
 
             this.animIn.onStart.subscribe(this.handleStartAnimateIn, this);
             this.animIn.onTween.subscribe(this.handleTweenAnimateIn, this);
-
-            this.animIn.onComplete.subscribe(this.handleCompleteAnimateIn, 
-                this);
+            this.animIn.onComplete.subscribe(this.handleCompleteAnimateIn,this);
         
-            this.animOut = new this.animClass(this.targetElement, 
-                this.attrOut.attributes, this.attrOut.duration, 
+            this.animOut = new this.animClass(
+                this.targetElement, 
+                this.attrOut.attributes, 
+                this.attrOut.duration, 
                 this.attrOut.method);
 
             this.animOut.onStart.subscribe(this.handleStartAnimateOut, this);
             this.animOut.onTween.subscribe(this.handleTweenAnimateOut, this);
-            this.animOut.onComplete.subscribe(this.handleCompleteAnimateOut, 
-                this);
+            this.animOut.onComplete.subscribe(this.handleCompleteAnimateOut, this);
 
         },
-        
+
         /**
         * Triggers the in-animation.
         * @method animateIn
         */
         animateIn: function () {
+            this._stopAnims(this.lastFrameOnStop);
             this.beforeAnimateInEvent.fire();
             this.animIn.animate();
         },
@@ -5048,8 +5094,36 @@ version: 2.8.2r1
         * @method animateOut
         */
         animateOut: function () {
+            this._stopAnims(this.lastFrameOnStop);
             this.beforeAnimateOutEvent.fire();
             this.animOut.animate();
+        },
+        
+        /**
+         * Flag to define whether Anim should jump to the last frame,
+         * when animateIn or animateOut is stopped.
+         *
+         * @property lastFrameOnStop
+         * @default true
+         * @type boolean
+         */
+        lastFrameOnStop : true,
+
+        /**
+         * Stops both animIn and animOut instances, if in progress.
+         *
+         * @method _stopAnims
+         * @param {boolean} finish If true, animation will jump to final frame.
+         * @protected
+         */
+        _stopAnims : function(finish) {
+            if (this.animOut && this.animOut.isAnimated()) {
+                this.animOut.stop(finish);
+            }
+
+            if (this.animIn && this.animIn.isAnimated()) {
+                this.animIn.stop(finish);
+            }
         },
 
         /**
@@ -5123,4 +5197,4 @@ version: 2.8.2r1
     YAHOO.lang.augmentProto(ContainerEffect, YAHOO.util.EventProvider);
 
 })();
-YAHOO.register("containercore", YAHOO.widget.Module, {version: "2.8.2r1", build: "7"});
+YAHOO.register("containercore", YAHOO.widget.Module, {version: "2.9.0", build: "2800"});

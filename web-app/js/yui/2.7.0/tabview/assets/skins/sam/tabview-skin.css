@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 /* .yui-navset defaults to .yui-navset-top */
 .yui-skin-sam .yui-navset .yui-nav,
@@ -38,7 +38,6 @@ version: 2.8.2r1
 .yui-skin-sam .yui-navset .yui-navset-top .yui-nav a em {
     border:solid #a3a3a3;
     border-width:1px 0 0;
-    cursor:hand;
     padding:0.25em .75em;
     left:0; right: 0; bottom: 0; /* protect from other orientations */
     top:-1px; /* for 1px rounded corners */

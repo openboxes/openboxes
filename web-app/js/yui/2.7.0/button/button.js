@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 /**
 * @module button
@@ -121,7 +121,7 @@ version: 2.8.2r1
     
         if (Lang.isString(p_sType) && Lang.isString(p_sName)) {
         
-            if (UA.ie) {
+            if (UA.ie && (UA.ie < 9)) {
         
                 /*
                     For IE it is necessary to create the element with the 
@@ -142,12 +142,14 @@ version: 2.8.2r1
         
                 oInput = document.createElement(sInput);
         
-            }
-            else {
+                oInput.value = p_sValue;
+
+            } else {
             
                 oInput = document.createElement("input");
                 oInput.name = p_sName;
                 oInput.type = p_sType;
+                oInput.value = p_sValue;
         
                 if (p_bChecked) {
         
@@ -157,7 +159,6 @@ version: 2.8.2r1
         
             }
         
-            oInput.value = p_sValue;
         
         }
 
@@ -712,7 +713,7 @@ version: 2.8.2r1
         * @method _setLabel
         * @description Sets the value of the button's "label" attribute.
         * @protected
-        * @param {String} p_sLabel String indicating the value for the button's 
+        * @param {HTML} p_sLabel String indicating the value for the button's 
         * "label" attribute.
         */
         _setLabel: function (p_sLabel) {
@@ -1623,7 +1624,7 @@ version: 2.8.2r1
         * passed back by the event utility (YAHOO.util.Event).
         */
         _onMouseDown: function (p_oEvent) {
-        
+
             var sType,
             	bReturnVal = true;
         
@@ -1640,9 +1641,8 @@ version: 2.8.2r1
         
         
                 if (!this.hasFocus()) {
-                
-                    this.focus();
-                
+                    Lang.later(0, this, this.focus);
+                    //this.focus();
                 }
         
         
@@ -1715,6 +1715,7 @@ version: 2.8.2r1
         * passed back by the event utility (YAHOO.util.Event).
         */
         _onMouseUp: function (p_oEvent) {
+            this.inMouseDown = false;
         
             var sType = this.get("type"),
             	oHideMenuTimer = this._hideMenuTimer,
@@ -1729,7 +1730,10 @@ version: 2.8.2r1
         
         
             if (sType == "checkbox" || sType == "radio") {
-        
+                if ((p_oEvent.which || p_oEvent.button) != 1) {
+                    return;
+                }
+
                 this.set("checked", !(this.get("checked")));
             
             }
@@ -2098,12 +2102,39 @@ version: 2.8.2r1
                 oButtonElement = this.get("element"),
                 oMenuElement = this._menu.element;
            
+            function findTargetInSubmenus(aSubmenus) {
+                var i, iMax, oSubmenuElement;
+                if (!aSubmenus) {
+                    return true;
+                }
+                for (i = 0, iMax = aSubmenus.length; i < iMax; i++) {
+                    oSubmenuElement = aSubmenus[i].element;
+                    if (oTarget == oSubmenuElement || Dom.isAncestor(oSubmenuElement, oTarget)) {
+                        return true;
+                    }
+                    if (aSubmenus[i] && aSubmenus[i].getSubmenus) {
+                        if (findTargetInSubmenus(aSubmenus[i].getSubmenus())) {
+                            return true;
+                        }
+                    }
+                }
         
+                return false;
+            }
+
             if (oTarget != oButtonElement && 
                 !Dom.isAncestor(oButtonElement, oTarget) && 
                 oTarget != oMenuElement && 
                 !Dom.isAncestor(oMenuElement, oTarget)) {
-        
+                
+                
+                if (this._menu  && this._menu.getSubmenus) {
+                    if (!findTargetInSubmenus(this._menu.getSubmenus())) {
+                        return;
+                    }
+                }
+                
+
                 this._hideMenu();
 
 				//	In IE when the user mouses down on a focusable element
@@ -2118,7 +2149,7 @@ version: 2.8.2r1
 				//	appears to have focus.	The following call to "setActive"
 				//	fixes this bug.
 
-				if (UA.ie && oTarget.focus) {
+                if (UA.ie && (UA.ie < 9) && oTarget.focus) {
 					oTarget.setActive();
 				}
         
@@ -2643,7 +2674,7 @@ version: 2.8.2r1
                 }
         
         
-                if (UA.ie) {
+                if (UA.ie && (UA.ie < 9)) {
         
                     bSubmitForm = oForm.fireEvent("onsubmit");
         
@@ -2930,7 +2961,7 @@ version: 2.8.2r1
         
             /**
             * @attribute label
-            * @description String specifying the button's text label 
+            * @description {HTML} specifying the button's text label 
             * or innerHTML.
             * @default null
             * @type String
@@ -3324,8 +3355,12 @@ version: 2.8.2r1
         focus: function () {
         
             if (!this.get("disabled")) {
-        
-                this._button.focus();
+                //Adding a try/catch in case the element is not
+                //  visible by the time it's focus is being called.
+                //  for example, on a dialog that closes on button click
+                try {
+                    this._button.focus();
+                } catch (e) {}
             
             }
         
@@ -3340,8 +3375,12 @@ version: 2.8.2r1
         blur: function () {
         
             if (!this.get("disabled")) {
-        
-                this._button.blur();
+                //Adding a try/catch in case the element is not
+                //  visible by the time it's focus is being called.
+                //  for example, on a dialog that closes on button click
+                try {
+                    this._button.blur();
+                } catch (e) {}
         
             }
         
@@ -4630,4 +4669,4 @@ version: 2.8.2r1
     });
 
 })();
-YAHOO.register("button", YAHOO.widget.Button, {version: "2.8.2r1", build: "7"});
+YAHOO.register("button", YAHOO.widget.Button, {version: "2.9.0", build: "2800"});

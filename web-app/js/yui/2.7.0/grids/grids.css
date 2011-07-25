@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 /**
  * YUI Grids
@@ -13,8 +13,8 @@ version: 2.8.2r1
 
 /**  
  * Note: Throughout this file, the *property (star-property) filter is used 
- * to give a value to IE that other browsers do not see. _property is only seen 
- * by IE7, so the combo of *prop and _prop can target between IE6 and IE7.
+ * to give a value to IE < 8 that other browsers do not see. The _property (underscore-property)
+ * is only seen by IE < 7, so the combo of *prop and _prop can differentiate between IE6 and IE7.
  * 
  * More information on these filters and related validation errors:
  * http://tech.groups.yahoo.com/group/ydn-javascript/message/40059
@@ -311,7 +311,7 @@ body {
 	width: 48.1%;
 }
 
-/*YUILibrary bug #1927599 from 1.14 to 2.6.0*/
+/* YUILibrary bug #1927599 from 1.14 to 2.6.0*/
 .yui-g .yui-gb div.first,
 	.yui-gb .yui-gb div.first {
 	*margin-right: 0;
@@ -447,11 +447,9 @@ body {
 .yui-gd:after, 
 .yui-ge:after, 
 .yui-gf:after {
-	content: ".";
+	content: "";
 	display: block;
-	height: 0;
 	clear: both;
-	visibility: hidden;
 }
 
 #hd,

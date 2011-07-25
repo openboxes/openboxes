@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 /**
  *
@@ -40,7 +40,9 @@ version: 2.8.2r1
 		BAR_EL = 'barEl',
 		MASK_EL = 'maskEl',
 		ARIA_TEXT_TEMPLATE = 'ariaTextTemplate',
-		
+		ACC = 'animAcceleration',
+		BG_POSITION = 'background-position',
+		PX = 'px',
 		// Events
 		START = 'start',
 		PROGRESS = 'progress',
@@ -66,10 +68,11 @@ version: 2.8.2r1
 	YAHOO.widget.ProgressBar = Prog;
 
     /**
-     * String containing the HTML string which is the basis for the Progress Bar.
+     * String containing the HTML string which is the basis for the Progress
+     * Bar. Value is inserted into the DOM with innerHTML.
      *
      * @property ProgressBar.MARKUP
-     * @type String
+     * @type HTML
      * @static
      * @final
      * @default (too long)
@@ -180,7 +183,7 @@ version: 2.8.2r1
 			 * @attribute direction
 			 * @description Direction of movement of the bar.  
 			 *    It can be any of 'ltr' (left to right), 'rtl' (the reverse) , 'ttb' (top to bottom) or 'btt'.
-			 *    Can only be set once and only before rendering.
+			 *    Can only be set before rendering.
 			 * @default 'ltr'
 			 * @type String (any of "ltr", "rtl", "ttb" or "btt")
 			 */			
@@ -197,9 +200,6 @@ version: 2.8.2r1
 						default:
 							return false;
 					}
-				},
-				method: function(value) {
-					this._barSizeFunction = this._barSizeFunctions[this.get(ANIM)?1:0][value];
 				}
 			});
 			
@@ -239,9 +239,7 @@ version: 2.8.2r1
 		    });
 			/**
 			 * @attribute width
-			 * @description Width of the ProgressBar.
-			 *     If a number, it will be assumed to be in pixels.  
-			 *     If a string it should be a valid setting for the CSS width attribute.  
+			 * @description Pixel width of the ProgressBar, i.e., 200 or "200px".
 			 *     It will always be returned as a string including units.
 			 * @default "200px"
 			 * @type Number or String
@@ -257,9 +255,7 @@ version: 2.8.2r1
 
 			/**
 			 * @attribute height
-			 * @description Height of the ProgressBar.
-			 *     If a number, it will be assumed to be in pixels.  
-			 *     If a string it should be a valid setting for the CSS height attribute.  
+			 * @description Pixel height of the ProgressBar, i.e., 200 or "200px".
 			 *     It will always be returned as a string including units.
 			 * @default "20px"
 			 * @type Number or String
@@ -302,7 +298,7 @@ version: 2.8.2r1
 			
 			/**
 			 * @attribute anim
-			 * @description it accepts either a boolean (recommended) or an instance of <a href="YAHOO.util.Anim.html">YAHOO.util.Anim</a>.
+			 * @description It accepts either a boolean (recommended) or an instance of <a href="YAHOO.util.Anim.html">YAHOO.util.Anim</a>.
 			 *   If a boolean, it will enable/disable animation creating its own instance of the animation utility.  
 			 *   If given an instance of <a href="YAHOO.util.Anim.html">YAHOO.util.Anim</a> it will use that instance.
 			 *   The <a href="YAHOO.util.Anim.html">animation</a> utility needs to be loaded.
@@ -318,6 +314,26 @@ version: 2.8.2r1
 				setter: this._animSetter
 			});
 			
+			/**
+			 * @attribute animAcceleration
+			 * @description It accepts a number or null to cancel.  
+			 * If a number, it is how fast the background image for the bar will move in the 
+			 * opposite direction to the bar itself. null or 0 means the background won't move.
+			 * Negative values will make the background move along the bar.
+			 * Only valid with animation active and it requires a suitable background image to make it evident.
+			 * @default null
+			 * @type {number} or {null}
+			 */
+			
+			this.setAttributeConfig(ACC, {
+				value:null,
+				validator: function(value) {
+					return Lang.isNumber(value) || Lang.isNull(value);
+				},
+				method: function(value) {
+					this._fixAnim(this.get(ANIM),value);
+				}
+			});
 			
 		},
 		/** 
@@ -331,7 +347,7 @@ version: 2.8.2r1
 		 * @return {YAHOO.widget.ProgressBar}
 		 * @chainable
 		 */
-		render: function(parent,before) {
+		render: function(parent, before) {
 
 			if (this._rendered) { return; }
 			this._rendered = true;
@@ -353,15 +369,9 @@ version: 2.8.2r1
 			this.appendTo(parent,before);
 			
 					
-			// I need to use the non-animated bar resizing function for initial redraw
-			this._barSizeFunction = this._barSizeFunctions[0][direction];
-			this.redraw();
+			this.redraw(false);
 			this._previousValue = this.get(VALUE);
 			this._fixEdges();
-			// I can now set the correct bar resizer
-			if (this.get(ANIM)) {
-				this._barSizeFunction = this._barSizeFunctions[1][direction];
-			}
 
 			this.on('minValueChange',this.redraw);
 			this.on('maxValueChange',this.redraw);
@@ -372,11 +382,12 @@ version: 2.8.2r1
 		/** 
 		 * Recalculates the bar size and position and redraws it
 		 * @method redraw
+		 * @param noAnim {boolean} Don't use animation to redraw
 		 * @return  void
 		 */
-		redraw: function () {
+		redraw: function (noAnim) {
 			this._recalculateConstants();
-			this._valueChange(this.get(VALUE));
+			this._valueChange(this.get(VALUE), noAnim);
 		},
 			
 		/** 
@@ -424,16 +435,6 @@ version: 2.8.2r1
 		 */
 		_rendered:false,
 		
-		/**
-		 * Function to be used to calculate bar size.  
-		 * It is picked from <a href="#property_barSizeFunctions">_barSizeFunctions</a>
-		 * depending on direction and whether animation is active.
-		 * @property _barSizeFunction
-		 * @type {function}
-		 * @default null
-		 * @private
-		 */		
-		_barSizeFunction: null,
 		
 		/** 
 		 * Method called when the height attribute is changed
@@ -444,11 +445,11 @@ version: 2.8.2r1
 		 */
 		_heightChange: function(value) {
 			if (Lang.isNumber(value)) {
-				value += 'px';
+				value += PX;
 			}
 			this.setStyle(HEIGHT,value);
 			this._fixEdges();
-			this.redraw();
+			this.redraw(false);
 		},
 
 		/** 
@@ -460,11 +461,11 @@ version: 2.8.2r1
 		 */
 		_widthChange: function(value) {
 			if (Lang.isNumber(value)) {
-				value += 'px';
+				value += PX;
 			}
 			this.setStyle(WIDTH,value);
 			this._fixEdges();
-			this.redraw();
+			this.redraw(false);
 		},
 		
 		/** 
@@ -483,12 +484,12 @@ version: 2.8.2r1
 				blEl = Dom.getElementsByClassName(CLASS_BL,undefined,maskEl)[0],
 				brEl = Dom.getElementsByClassName(CLASS_BR,undefined,maskEl)[0],
 				newSize = (parseInt(Dom.getStyle(maskEl,HEIGHT),10) -
-				parseInt(Dom.getStyle(tlEl,HEIGHT),10)) + 'px';
+				parseInt(Dom.getStyle(tlEl,HEIGHT),10)) + PX;
 				
 			Dom.setStyle(blEl,HEIGHT,newSize);
 			Dom.setStyle(brEl,HEIGHT,newSize);
 			newSize = (parseInt(Dom.getStyle(maskEl,WIDTH),10) -
-				parseInt(Dom.getStyle(tlEl,WIDTH),10)) + 'px';
+				parseInt(Dom.getStyle(tlEl,WIDTH),10)) + PX;
 			Dom.setStyle(trEl,WIDTH,newSize);
 			Dom.setStyle(brEl,WIDTH,newSize);
 		},
@@ -525,6 +526,7 @@ version: 2.8.2r1
 		 * Called in response to a change in the <a href="#config_anim">anim</a> attribute.
 		 * It creates and sets up or destroys the instance of the animation utility that will move the bar
 		 * @method _animSetter
+		 * @param value {boolean ,YAHOO.util.Anim} Enable animation or set to specific instance
 		 * @return  void
 		 * @private
 		 */		
@@ -539,27 +541,8 @@ version: 2.8.2r1
 				anim.onTween.subscribe(this._animOnTween,this,true);
 				anim.onComplete.subscribe(this._animComplete,this,true);
 				
-				// Temporary solution until http://yuilibrary.com/projects/yui2/ticket/2528222 gets solved:
-				var oldSetAttribute = anim.setAttribute,
-					pb = this;
-				switch(this.get(DIRECTION)) {
-					case DIRECTION_BTT:
-						anim.setAttribute = function(attr , val , unit) {
-							val = Math.round(val);
-							oldSetAttribute.call(this,attr,val,unit);
-							Dom.setStyle(barEl,'top',(pb._barSpace - val) + 'px');
-						};
-						break;
-					case DIRECTION_RTL:
-						anim.setAttribute = function(attr , val , unit) {
-							val = Math.round(val);
-							oldSetAttribute.call(this,attr,val,unit);
-							Dom.setStyle(barEl,'left',(pb._barSpace - val) + 'px');
-						};
-						break;
-				}
-				// up to here
-
+				this._fixAnim(anim,this.get(ACC));
+				
 			} else {
 				anim = this.get(ANIM);
 				if (anim) {
@@ -568,10 +551,79 @@ version: 2.8.2r1
 				}
 				anim = null;
 			}
-			this._barSizeFunction = this._barSizeFunctions[anim?1:0][this.get(DIRECTION)];
 			return anim;
 		},
-		
+		/** 
+		 * Temporary solution until http://yuilibrary.com/projects/yui2/ticket/2528222 gets solved.
+		 * Also fixes: http://yuilibrary.com/projects/yui2/ticket/2528919.
+		 * It also handles moving the background as per the animAcceleration configuration attribute
+		 * since it turned out to be the best place to handle it.
+		 * @method _fixAnim
+		 * @param anim {YAHOO.util.Anim} Instance of Animation to fix
+		 * @param acc {number} Value of animAcceleration attribute
+		 * @return  void
+		 * @private
+		 */	
+		_fixAnim: function(anim, acc) {
+
+
+			if (anim) {
+				if (!this._oldSetAttribute) {
+					this._oldSetAttribute = anim.setAttribute;
+				}
+				var	pb = this;
+				switch(this.get(DIRECTION)) {
+					case DIRECTION_LTR:
+						anim.setAttribute = function(attr , val , unit) {
+							val = Math.round(val);
+							pb._oldSetAttribute.call(this,attr,val,unit);
+							if (attr == WIDTH) {
+								pb._oldSetAttribute.call(this,BG_POSITION,-val * acc,PX);
+							}
+						};
+						break;
+					case DIRECTION_RTL:
+						anim.setAttribute = function(attr , val , unit) {
+							val = Math.round(val);
+							pb._oldSetAttribute.call(this,attr,val,unit);
+							if (attr == WIDTH) {
+								var left = pb._barSpace - val;
+								pb._oldSetAttribute.call(this,'left',left, PX);
+								pb._oldSetAttribute.call(this, BG_POSITION, -left +  val * acc, PX);
+							}
+						};
+						break;
+					case DIRECTION_TTB:
+						anim.setAttribute = function(attr , val , unit) {
+							val = Math.round(val);
+							pb._oldSetAttribute.call(this,attr,val,unit);
+							if (attr == HEIGHT) {
+								pb._oldSetAttribute.call(this,BG_POSITION,'center ' + (- val * acc),PX);
+							}
+						};
+						break;
+					
+					case DIRECTION_BTT:
+						anim.setAttribute = function(attr , val , unit) {
+							val = Math.round(val);
+							pb._oldSetAttribute.call(this,attr,val,unit);
+							if (attr == HEIGHT) {
+								var top = pb._barSpace - val;
+								pb._oldSetAttribute.call(this,'top',top, PX);
+								pb._oldSetAttribute.call(this, BG_POSITION,'center ' + (val * acc - top), PX);
+							}
+						};
+						break;
+				}
+				// up to here
+			}
+		},
+		/** 
+		 * Called when the animation signals it has completed.
+		 * @method _animComplete
+		 * @return  void
+		 * @private
+		 */			
 		_animComplete: function() {
 			var value = this.get(VALUE);
 			this._previousValue = value;
@@ -579,6 +631,14 @@ version: 2.8.2r1
 			this.fireEvent(COMPLETE, value);
 			Dom.removeClass(this.get(BAR_EL),CLASS_ANIM);
 		},
+		/** 
+		 * Called for each onTween event of the animation instance.
+		 * @method _animComplete
+		 * @param name {string} Name of the event fired
+		 * @param oArgs {object} Arguments provided by the Anim instance
+		 * @return  void
+		 * @private
+		 */			
 		_animOnTween:function (name,oArgs) {
 			var value = Math.floor(this._tweenFactor * oArgs[0].currentFrame + this._previousValue);
 			this.fireEvent(PROGRESS,value);
@@ -588,13 +648,14 @@ version: 2.8.2r1
 		 * Called in response to a change in the <a href="#config_value">value</a> attribute.
 		 * Moves the bar to reflect the new value
 		 * @method _valueChange
+		 * @param value {number} New value to be set
+		 * @param noAnim {boolean} Disable animation for this redraw
 		 * @return  void
 		 * @private
 		 */		
-		_valueChange: function (value) {
+		_valueChange: function (value, noAnim) {
 			var anim = this.get(ANIM),
-				pixelValue = Math.floor((value - this.get(MIN_VALUE)) * this._barFactor),
-				barEl = this.get(BAR_EL);
+				pixelValue = Math.floor((value - this.get(MIN_VALUE)) * this._barFactor);
 			
 			this._setAriaText(value);
 			if (this._rendered) {
@@ -603,13 +664,14 @@ version: 2.8.2r1
 					if (anim.isAnimated()) { anim._onComplete.fire(); } // see: http://yuilibrary.com/projects/yui2/ticket/2528217
 				}
 				this.fireEvent(START,this._previousValue);
-				this._barSizeFunction(value, pixelValue, barEl, anim);
+				Prog._barSizeFunctions[((noAnim !== false) && anim)?1:0][this.get(DIRECTION)].call(this, value, pixelValue, this.get(BAR_EL), anim);
 			}
 		},
 
 		/** 
 		 * Utility method to set the ARIA value attributes
 		 * @method _setAriaText
+		 * @param value {number} Value to be voiced
 		 * @return  void
 		 * @private
 		 */
@@ -626,34 +688,35 @@ version: 2.8.2r1
 		}
 	});
 	/**
-	 * Collection of functions used by to calculate the size of the bar.
+	 * Collection of functions used to calculate the size of the bar.
 	 * One of this will be used depending on direction and whether animation is active.
 	 * @property _barSizeFunctions
 	 * @type {collection of functions}
 	 * @private
+	 * @static
 	 */
 	var b = [{},{}];
-	Prog.prototype._barSizeFunctions = b;
+	Prog._barSizeFunctions = b;
 	
 	b[0][DIRECTION_LTR] = function(value, pixelValue, barEl, anim) {
-		Dom.setStyle(barEl,WIDTH,  pixelValue + 'px');
+		Dom.setStyle(barEl,WIDTH,  pixelValue + PX);
 		this.fireEvent(PROGRESS,value);
 		this.fireEvent(COMPLETE,value);
 	};
 	b[0][DIRECTION_RTL] = function(value, pixelValue, barEl, anim) {
-		Dom.setStyle(barEl,WIDTH,  pixelValue + 'px');
-		Dom.setStyle(barEl,'left',(this._barSpace - pixelValue) + 'px');
+		Dom.setStyle(barEl,WIDTH,  pixelValue + PX);
+		Dom.setStyle(barEl,'left',(this._barSpace - pixelValue) + PX);
 		this.fireEvent(PROGRESS,value);
 		this.fireEvent(COMPLETE,value);
 	};
 	b[0][DIRECTION_TTB] = function(value, pixelValue, barEl, anim) {
-		Dom.setStyle(barEl,HEIGHT,  pixelValue + 'px');
+		Dom.setStyle(barEl,HEIGHT,  pixelValue + PX);
 		this.fireEvent(PROGRESS,value);
 		this.fireEvent(COMPLETE,value);
 	};
 	b[0][DIRECTION_BTT] = function(value, pixelValue, barEl, anim) {
-		Dom.setStyle(barEl,HEIGHT,  pixelValue + 'px');
-		Dom.setStyle(barEl,'top',  (this._barSpace - pixelValue) + 'px');
+		Dom.setStyle(barEl,HEIGHT,  pixelValue + PX);
+		Dom.setStyle(barEl,'top',  (this._barSpace - pixelValue) + PX);
 		this.fireEvent(PROGRESS,value);
 		this.fireEvent(COMPLETE,value);
 	};
@@ -663,15 +726,15 @@ version: 2.8.2r1
 		anim.attributes = {width:{ to: pixelValue }}; 
 		anim.animate();
 	};
-	b[1][DIRECTION_RTL] =  b[1][DIRECTION_LTR];
-	b[1][DIRECTION_TTB] =  function(value, pixelValue, barEl, anim) {
+	b[1][DIRECTION_RTL] = b[1][DIRECTION_LTR]; 
+	b[1][DIRECTION_TTB] = function(value, pixelValue, barEl, anim) {
 		Dom.addClass(barEl,CLASS_ANIM);
 		this._tweenFactor = (value - this._previousValue) / anim.totalFrames  / anim.duration;
 		anim.attributes = {height:{to: pixelValue}};
 		anim.animate();
 	};
-	b[1][DIRECTION_BTT] =  b[1][DIRECTION_TTB];
+	b[1][DIRECTION_BTT] = b[1][DIRECTION_TTB]; 
 				
 })();
 
-YAHOO.register("progressbar", YAHOO.widget.ProgressBar, {version: "2.8.2r1", build: "7"});
+YAHOO.register("progressbar", YAHOO.widget.ProgressBar, {version: "2.9.0", build: "2800"});

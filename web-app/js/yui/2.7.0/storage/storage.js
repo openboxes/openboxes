@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Copyright (c) 2011, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 2.8.2r1
+version: 2.9.0
 */
 /**
  * The Storage module manages client-side data storage.
@@ -13,11 +13,15 @@ version: 2.8.2r1
 
 	// internal shorthand
 var Y = YAHOO,
-	YU = Y.util,
-	YL = Y.lang,
-	_logOverwriteError;
+	Util = Y.util,
+	Lang = Y.lang,
+	_logOverwriteError,
+    Storage,
 
-if (! YU.Storage) {
+	RX_TYPE = /^type=(\w+)/i,
+	RX_VALUE = /&value=(.*)/i;
+
+if (! Util.Storage) {
 	_logOverwriteError = function(fxName) {
 		Y.log('Exception in YAHOO.util.Storage.?? - must be extended by a storage engine'.replace('??', fxName).replace('??', this.getName ? this.getName() : 'Unknown'), 'error');
 	};
@@ -27,30 +31,33 @@ if (! YU.Storage) {
 	 * @class Storage
 	 * @namespace YAHOO.util
 	 * @constructor
-	 * @param location {String} Required. The storage location.
-	 * @parm name {String} Required. The engine name.
-	 * @param conf {Object} Required. A configuration object.
+	 * @param sLocation {String} Required. The storage location.
+	 * @parm sName {String} Required. The engine name.
+	 * @param oConf {Object} Required. A configuration object.
 	 */
-	YU.Storage = function(location, name, conf) {
+	Storage = function(sLocation, sName, oConf) {
 		var that = this;
 		Y.env._id_counter += 1;
 
 		// protected variables
-		that._cfg = YL.isObject(conf) ? conf : {};
-		that._location = location;
-		that._name = name;
+		that._cfg = Lang.isObject(oConf) ? oConf : {};
+		that._location = sLocation;
+		that._name = sName;
 		that.isReady = false;
 
 		// public variables
-		that.createEvent(that.CE_READY, {scope: that});
-		that.createEvent(that.CE_CHANGE, {scope: that});
+		that.createEvent(Storage.CE_READY, {scope: that, fireOnce: true});
+		that.createEvent(Storage.CE_CHANGE, {scope: that});
 		
-		that.subscribe(that.CE_READY, function() {
+		that.subscribe(Storage.CE_READY, function() {
 			that.isReady = true;
 		});
 	};
 
-	YU.Storage.prototype = {
+    Storage.CE_READY = 'YUIStorageReady';
+    Storage.CE_CHANGE = 'YUIStorageChange';
+
+	Storage.prototype = {
 
 		/**
 		 * The event name for when the storage item is ready.
@@ -58,7 +65,7 @@ if (! YU.Storage) {
 		 * @type {String}
 		 * @public
 		 */
-		CE_READY: 'YUIStorageReady',
+		CE_READY: Storage.CE_READY,
 
 		/**
 		 * The event name for when the storage item has changed.
@@ -66,15 +73,7 @@ if (! YU.Storage) {
 		 * @type {String}
 		 * @public
 		 */
-		CE_CHANGE: 'YUIStorageChange',
-
-		/**
-		 * The delimiter uesed between the data type and the data.
-		 * @property DELIMITER
-		 * @type {String}
-		 * @public
-		 */
-		DELIMITER: '__',
+		CE_CHANGE: Storage.CE_CHANGE,
 
 		/**
 		 * The configuration of the engine.
@@ -129,14 +128,14 @@ if (! YU.Storage) {
 		/**
 		 * Fetches the data stored and the provided key.
 		 * @method getItem
-		 * @param key {String} Required. The key used to reference this value (DOMString in HTML 5 spec).
+		 * @param sKey {String} Required. The key used to reference this value (DOMString in HTML 5 spec).
 		 * @return {String|NULL} The value stored at the provided key (DOMString in HTML 5 spec).
 		 * @public
 		 */
-		getItem: function(key) {
-			Y.log("Fetching item at  " + key);
-			var item = this._getItem(key);
-			return YL.isValue(item) ? this._getValue(item) : null; // required by HTML 5 spec
+		getItem: function(sKey) {
+			Y.log("Fetching item at  " + sKey);
+			var oItem = this._getItem(sKey);
+			return Lang.isValue(oItem) ? this._getValue(oItem) : null; // required by HTML 5 spec
 		},
 
 		/**
@@ -150,47 +149,49 @@ if (! YU.Storage) {
 		/**
 		 * Tests if the key has been set (not in HTML 5 spec); should be overwritten by storage engine.
 		 * @method hasKey
-		 * @param key {String} Required. The key to search for.
+		 * @param sKey {String} Required. The key to search for.
 		 * @return {Boolean} True when key has been set.
 		 * @public
 		 */
-		hasKey: function(key) {
-			return YL.isString(key) && this._hasKey(key);
+		hasKey: function(sKey) {
+			return Lang.isString(sKey) && this._hasKey(sKey);
 		},
 
 		/**
 		 * Retrieve the key stored at the provided index; should be overwritten by storage engine.
 		 * @method key
-		 * @param index {Number} Required. The index to retrieve (unsigned long in HTML 5 spec).
+		 * @param nIndex {Number} Required. The index to retrieve (unsigned long in HTML 5 spec).
 		 * @return {String} Required. The key at the provided index (DOMString in HTML 5 spec).
 		 * @public
 		 */
-		key: function(index) {
-			Y.log("Fetching key at " + index);
+		key: function(nIndex) {
+			Y.log("Fetching key at " + nIndex);
 
-			if (YL.isNumber(index) && -1 < index && this.length > index) {
-				var value = this._key(index);
+			if (Lang.isNumber(nIndex) && -1 < nIndex && this.length > nIndex) {
+				var value = this._key(nIndex);
 				if (value) {return value;}
 			}
 
 			// this is thrown according to the HTML5 spec
-			throw('INDEX_SIZE_ERR - Storage.setItem - The provided index (' + index + ') is not available');
+			throw('INDEX_SIZE_ERR - Storage.setItem - The provided index (' + nIndex + ') is not available');
 		},
 
 		/**
 		 * Remove an item from the data storage.
-		 * @method setItem
-		 * @param key {String} Required. The key to remove (DOMString in HTML 5 spec).
+		 * @method removeItem
+		 * @param sKey {String} Required. The key to remove (DOMString in HTML 5 spec).
 		 * @public
 		 */
-		removeItem: function(key) {
-			Y.log("removing " + key);
+		removeItem: function(sKey) {
+			Y.log("removing " + sKey);
+            var that = this,
+                oOldValue;
 			
-			if (this.hasKey(key)) {
-                var oldValue = this._getItem(key);
-                if (! oldValue) {oldValue = null;}
-                this._removeItem(key);
-				this.fireEvent(this.CE_CHANGE, new YU.StorageEvent(this, key, oldValue, null, YU.StorageEvent.TYPE_REMOVE_ITEM));
+			if (that.hasKey(sKey)) {
+                oOldValue = that._getItem(sKey);
+                if (! oOldValue) {oOldValue = null;}
+                that._removeItem(sKey);
+				that.fireEvent(Storage.CE_CHANGE, new Util.StorageEvent(that, sKey, oOldValue, null, Util.StorageEvent.TYPE_REMOVE_ITEM));
 			}
 			else {
 				// HTML 5 spec says to do nothing
@@ -200,26 +201,28 @@ if (! YU.Storage) {
 		/**
 		 * Adds an item to the data storage.
 		 * @method setItem
-		 * @param key {String} Required. The key used to reference this value (DOMString in HTML 5 spec).
-		 * @param data {Object} Required. The data to store at key (DOMString in HTML 5 spec).
+		 * @param sKey {String} Required. The key used to reference this value (DOMString in HTML 5 spec).
+		 * @param oData {Object} Required. The data to store at key (DOMString in HTML 5 spec).
 		 * @public
 		 * @throws QUOTA_EXCEEDED_ERROR
 		 */
-		setItem: function(key, data) {
-			Y.log("SETTING " + data + " to " + key);
+		setItem: function(sKey, oData) {
+			Y.log("SETTING " + oData + " to " + sKey);
 			
-			if (YL.isString(key)) {
-				var eventType = this.hasKey(key) ? YU.StorageEvent.TYPE_UPDATE_ITEM : YU.StorageEvent.TYPE_ADD_ITEM,
-					oldValue = this._getItem(key);
-				if (! oldValue) {oldValue = null;}
+			if (Lang.isString(sKey)) {
+				var that = this,
+                    oOldValue = that._getItem(sKey);
 
-				if (this._setItem(key, this._createValue(data))) {
-					this.fireEvent(this.CE_CHANGE, new YU.StorageEvent(this, key, oldValue, data, eventType));
+				if (! oOldValue) {oOldValue = null;}
+
+				if (that._setItem(sKey, that._createValue(oData))) {
+					that.fireEvent(Storage.CE_CHANGE, new Util.StorageEvent(that, sKey, oOldValue, oData,
+                            that.hasKey(sKey) ? Util.StorageEvent.TYPE_UPDATE_ITEM : Util.StorageEvent.TYPE_ADD_ITEM));
 				}
 				else {
-					// this is thrown according to the HTML5 spec
+					// that is thrown according to the HTML5 spec
 					throw('QUOTA_EXCEEDED_ERROR - Storage.setItem - The choosen storage method (' +
-						  this.getName() + ') has exceeded capacity');
+						  that.getName() + ') has exceeded capacity');
 				}
 			}
 			else {
@@ -240,22 +243,22 @@ if (! YU.Storage) {
 		/**
 		 * Converts the object into a string, with meta data (type), so it can be restored later.
 		 * @method _createValue
-		 * @param s {Object} Required. An object to store.
+		 * @param o {Object} Required. An object to store.
 		 * @protected
 		 */
-		_createValue: function(s) {
-			var type = (YL.isNull(s) || YL.isUndefined(s)) ? ('' + s) : typeof s;
-			return 'string' === type ? s : type + this.DELIMITER + s;
+		_createValue: function(o) {
+			var sType = (Lang.isNull(o) || Lang.isUndefined(o)) ? ('' + o) : typeof o;
+			return 'type=' + sType + '&value=' + encodeURIComponent('' + o);
 		},
 
 		/**
 		 * Implementation of the getItem login; should be overwritten by storage engine.
 		 * @method _getItem
-		 * @param key {String} Required. The key used to reference this value.
+		 * @param sKey {String} Required. The key used to reference this value.
 		 * @return {String|NULL} The value stored at the provided key.
 		 * @protected
 		 */
-		_getItem: function(key) {
+		_getItem: function(sKey) {
 			_logOverwriteError('_getItem');
 			return '';
 		},
@@ -267,44 +270,43 @@ if (! YU.Storage) {
 		 * @protected
 		 */
 		_getValue: function(s) {
-			var a = s ? s.split(this.DELIMITER) : [];
-			if (1 == a.length) {return s;}
+			var sType = s.match(RX_TYPE)[1],
+				sValue = s.match(RX_VALUE)[1];
 
-			switch (a[0]) {
-				case 'boolean': return 'true' === a[1];
-				case 'number': return parseFloat(a[1]);
+			switch (sType) {
+				case 'boolean': return 'true' == sValue;
+				case 'number': return parseFloat(sValue);
 				case 'null': return null;
-				default: return a[1];
+				default: return decodeURIComponent(sValue);
 			}
 		},
 
 		/**
 		 * Implementation of the key logic; should be overwritten by storage engine.
 		 * @method _key
-		 * @param index {Number} Required. The index to retrieve (unsigned long in HTML 5 spec).
+		 * @param nIndex {Number} Required. The index to retrieve (unsigned long in HTML 5 spec).
 		 * @return {String|NULL} Required. The key at the provided index (DOMString in HTML 5 spec).
 		 * @protected
 		 */
-		_key: function(index) {
+		_key: function(nIndex) {
 			_logOverwriteError('_key');
 			return '';
 		},
 
 		/*
 		 * Implementation to fetch evaluate the existence of a key.
-		 * @see YAHOO.util.Storage._hasKey
 		 */
-		_hasKey: function(key) {
-			return null !== this._getItem(key);
+		_hasKey: function(sKey) {
+			return null !== this._getItem(sKey);
 		},
 
 		/**
 		 * Implementation of the removeItem login; should be overwritten by storage engine.
 		 * @method _removeItem
-		 * @param key {String} Required. The key to remove.
+		 * @param sKey {String} Required. The key to remove.
 		 * @protected
 		 */
-		_removeItem: function(key) {
+		_removeItem: function(sKey) {
 			_logOverwriteError('_removeItem');
 			return '';
 		},
@@ -312,18 +314,20 @@ if (! YU.Storage) {
 		/**
 		 * Implementation of the setItem login; should be overwritten by storage engine.
 		 * @method _setItem
-		 * @param key {String} Required. The key used to reference this value.
-		 * @param data {Object} Required. The data to storage at key.
+		 * @param sKey {String} Required. The key used to reference this value.
+		 * @param oData {Object} Required. The data to storage at key.
 		 * @return {Boolean} True when successful, false when size QUOTA exceeded.
 		 * @protected
 		 */
-		_setItem: function(key, data) {
+		_setItem: function(sKey, oData) {
 			_logOverwriteError('_setItem');
 			return '';
 		}
 	};
 
-	YL.augmentProto(YU.Storage, YU.EventProvider);
+	Lang.augmentProto(Storage, Util.EventProvider);
+
+    Util.Storage = Storage;
 }
 
 }());
@@ -335,8 +339,8 @@ if (! YU.Storage) {
  */
 (function() {
 	// internal shorthand
-var Y = YAHOO.util,
-	YL = YAHOO.lang,
+var Util = YAHOO.util,
+	Lang = YAHOO.lang,
 
 	// private variables
 	_locationEngineMap = {}, // cached engines
@@ -346,28 +350,28 @@ var Y = YAHOO.util,
 	/**
 	 * Fetches a storage constructor if it is available, otherwise returns NULL.
 	 * @method _getClass
-	 * @param klass {Function} Required. The storage constructor to test.
+	 * @param fnClass {Function} Required. The storage constructor to test.
 	 * @return {Function} An available storage constructor or NULL.
 	 * @private
 	 */
-	_getClass = function(klass) {
-		return (klass && klass.isAvailable()) ? klass : null;
+	_getClass = function(fnClass) {
+		return (fnClass && fnClass.isAvailable()) ? fnClass : null;
 	},
 
 	/**
 	 * Fetches the storage engine from the cache, or creates and caches it.
 	 * @method _getStorageEngine
-	 * @param location {String} Required. The location to store.
-	 * @param klass {Function} Required. A pointer to the engineType Class.
-	 * @param conf {Object} Optional. Additional configuration for the data source engine.
+	 * @param sLocation {String} Required. The location to store.
+	 * @param fnClass {Function} Required. A pointer to the engineType Class.
+	 * @param oConf {Object} Optional. Additional configuration for the data source engine.
 	 * @private
 	 */
-	_getStorageEngine = function(location, klass, conf) {
-		var engine = _locationEngineMap[location + klass.ENGINE_NAME];
+	_getStorageEngine = function(sLocation, fnClass, oConf) {
+		var engine = _locationEngineMap[sLocation + fnClass.ENGINE_NAME];
 
 		if (! engine) {
-			engine = new klass(location, conf);
-			_locationEngineMap[location + klass.ENGINE_NAME] = engine;
+			engine = new fnClass(sLocation, oConf);
+			_locationEngineMap[sLocation + fnClass.ENGINE_NAME] = engine;
 		}
 
 		return engine;
@@ -376,21 +380,21 @@ var Y = YAHOO.util,
 	/**
 	 * Ensures that the location is valid before returning it or a default value.
 	 * @method _getValidLocation
-	 * @param location {String} Required. The location to evaluate.
+	 * @param sLocation {String} Required. The location to evaluate.
 	 * @private
 	 */
-	_getValidLocation = function(location) {
-		switch (location) {
-			case Y.StorageManager.LOCATION_LOCAL:
-			case Y.StorageManager.LOCATION_SESSION:
-				return location;
+	_getValidLocation = function(sLocation) {
+		switch (sLocation) {
+			case Util.StorageManager.LOCATION_LOCAL:
+			case Util.StorageManager.LOCATION_SESSION:
+				return sLocation;
 
-			default: return Y.StorageManager.LOCATION_SESSION;
+			default: return Util.StorageManager.LOCATION_SESSION;
 		}
 	};
 
 	// public namespace
-	Y.StorageManager = {
+	Util.StorageManager = {
 
         /**
          * The storage location - session; data cleared at the end of a user's session.
@@ -412,40 +416,40 @@ var Y = YAHOO.util,
 		 * Fetches the desired engine type or first available engine type.
 		 * @method get
 		 * @param engineType {String} Optional. The engine type, see engines.
-		 * @param location {String} Optional. The storage location - LOCATION_SESSION & LOCATION_LOCAL; default is LOCAL.
-		 * @param conf {Object} Optional. Additional configuration for the getting the storage engine.
+		 * @param sLocation {String} Optional. The storage location - LOCATION_SESSION & LOCATION_LOCAL; default is LOCAL.
+		 * @param oConf {Object} Optional. Additional configuration for the getting the storage engine.
 		 * {
 		 * 	engine: {Object} configuration parameters for the desired engine
+		 * 	force: {Boolean} force the <code>engineType</code> or fail
 		 * 	order: {Array} an array of storage engine names; the desired order to try engines}
 		 * }
 		 * @static
 		 */
-		get: function(engineType, location, conf) {
-			var _cfg = YL.isObject(conf) ? conf : {},
-				klass = _getClass(_registeredEngineMap[engineType]);
+		get: function(engineType, sLocation, oConf) {
+			var oCfg = Lang.isObject(oConf) ? oConf : {},
+				fnClass = _getClass(_registeredEngineMap[engineType]),
+                i , j;
 
-			if (! klass && ! _cfg.force) {
-				var i, j;
+			if (! fnClass && ! oCfg.force) {
+				if (oCfg.order) {
+					j = oCfg.order.length;
 
-				if (_cfg.order) {
-					j = _cfg.order.length;
-
-					for (i = 0; i < j && ! klass; i += 1) {
-						klass = _getClass(_cfg.order[i]);
+					for (i = 0; i < j && ! fnClass; i += 1) {
+						fnClass = _getClass(oCfg.order[i]);
 					}
 				}
 
-				if (! klass) {
+				if (! fnClass) {
 					j = _registeredEngineSet.length;
 
-					for (i = 0; i < j && ! klass; i += 1) {
-						klass = _getClass(_registeredEngineSet[i]);
+					for (i = 0; i < j && ! fnClass; i += 1) {
+						fnClass = _getClass(_registeredEngineSet[i]);
 					}
 				}
 			}
 
-			if (klass) {
-				return _getStorageEngine(_getValidLocation(location), klass, _cfg.engine);
+			if (fnClass) {
+				return _getStorageEngine(_getValidLocation(sLocation), fnClass, oCfg.engine);
 			}
 
 			throw('YAHOO.util.StorageManager.get - No engine available, please include an engine before calling this function.');
@@ -470,7 +474,8 @@ var Y = YAHOO.util,
 		 * @static
 		 */
 		register: function(engineConstructor) {
-			if (YL.isFunction(engineConstructor) && YL.isFunction(engineConstructor.isAvailable) && YL.isString(engineConstructor.ENGINE_NAME)) {
+			if (Lang.isFunction(engineConstructor) && Lang.isFunction(engineConstructor.isAvailable) &&
+                    Lang.isString(engineConstructor.ENGINE_NAME)) {
 				_registeredEngineMap[engineConstructor.ENGINE_NAME] = engineConstructor;
 				_registeredEngineSet.push(engineConstructor);
 				return true;
@@ -480,7 +485,7 @@ var Y = YAHOO.util,
 		}
 	};
 
-	YAHOO.register("StorageManager", Y.SWFStore, {version: "2.8.2r1", build: "7"});
+	YAHOO.register("StorageManager", Util.SWFStore, {version: "2.9.0", build: "2800"});
 }());
 (function() {
 
@@ -489,29 +494,29 @@ var Y = YAHOO.util,
  * @namespace YAHOO.util
  * @class StorageEvent
  * @constructor
- * @param storageArea {Object} Required. The Storage object that was affected.
- * @param key {String} Required. The key being changed; DOMString in HTML 5 spec.
- * @param oldValue {String} Required. The old value of the key being changed; DOMString in HTML 5 spec.
- * @param newValue {String} Required. The new value of the key being changed; DOMString in HTML 5 spec.
- * @param type {String} Required. The storage event type.
+ * @param oStorageArea {Object} Required. The Storage object that was affected.
+ * @param sKey {String} Required. The key being changed; DOMString in HTML 5 spec.
+ * @param oOldValue {Mixed} Required. The old value of the key being changed; DOMString in HTML 5 spec.
+ * @param oNewValue {Mixed} Required. The new value of the key being changed; DOMString in HTML 5 spec.
+ * @param sType {String} Required. The storage event type.
  */
-YAHOO.util.StorageEvent = function(storageArea, key, oldValue, newValue, type) {
-	this.key = key;
-	this.oldValue = oldValue;
-	this.newValue = newValue;
+function StorageEvent(oStorageArea, sKey, oOldValue, oNewValue, sType) {
+	this.key = sKey;
+	this.oldValue = oOldValue;
+	this.newValue = oNewValue;
 	this.url = window.location.href;
 	this.window = window; // todo: think about the CAJA and innocent code
-	this.storageArea = storageArea;
-	this.type = type;
-};
+	this.storageArea = oStorageArea;
+	this.type = sType;
+}
 
-YAHOO.lang.augmentObject(YAHOO.util.StorageEvent, {
+YAHOO.lang.augmentObject(StorageEvent, {
 	TYPE_ADD_ITEM: 'addItem',
 	TYPE_REMOVE_ITEM: 'removeItem',
 	TYPE_UPDATE_ITEM: 'updateItem'
 });
 
-YAHOO.util.StorageEvent.prototype = {
+StorageEvent.prototype = {
 
     /**
      * The 'key' attribute represents the key being changed.
@@ -525,7 +530,7 @@ YAHOO.util.StorageEvent.prototype = {
     /**
      * The 'newValue' attribute represents the new value of the key being changed.
      * @property newValue
-     * @type {String}
+     * @type {Mixed}
      * @static
      * @readonly
      */
@@ -534,7 +539,7 @@ YAHOO.util.StorageEvent.prototype = {
     /**
      * The 'oldValue' attribute represents the old value of the key being changed.
      * @property oldValue
-     * @type {String}
+     * @type {Mixed}
      * @static
      * @readonly
      */
@@ -576,11 +581,12 @@ YAHOO.util.StorageEvent.prototype = {
      */
     url: null
 };
+
+YAHOO.util.StorageEvent = StorageEvent;
 	
 }());
 (function() {
-var Y = YAHOO.util,
-	YL = YAHOO.lang;
+var Util = YAHOO.util;
 
 	/**
 	 * The StorageEngineKeyed class implements the interface necessary for managing keys.
@@ -589,13 +595,13 @@ var Y = YAHOO.util,
 	 * @constructor
 	 * @extend YAHOO.util.Storage
 	 */
-	Y.StorageEngineKeyed = function() {
-		Y.StorageEngineKeyed.superclass.constructor.apply(this, arguments);
+	Util.StorageEngineKeyed = function() {
+		Util.StorageEngineKeyed.superclass.constructor.apply(this, arguments);
 		this._keys = [];
 		this._keyMap = {};
 	};
 
-	YL.extend(Y.StorageEngineKeyed, Y.Storage, {
+	YAHOO.lang.extend(Util.StorageEngineKeyed, Util.Storage, {
 
 		/**
 		 * A collection of keys applicable to the current location. This should never be edited by the developer.
@@ -616,47 +622,67 @@ var Y = YAHOO.util,
 		/**
 		 * Adds the key to the set.
 		 * @method _addKey
-		 * @param key {String} Required. The key to evaluate.
+		 * @param sKey {String} Required. The key to evaluate.
 		 * @protected
 		 */
-		_addKey: function(key) {
-			this._keyMap[key] = this.length;
-			this._keys.push(key);
-			this.length = this._keys.length;
+		_addKey: function(sKey) {
+		    if (!this._keyMap.hasOwnProperty(sKey)) {
+    			this._keys.push(sKey);
+			    this._keyMap[sKey] = this.length;
+			    this.length = this._keys.length;
+			}
+		},
+
+		/*
+		 * Implementation to clear the values from the storage engine.
+		 * @see YAHOO.util.Storage._clear
+		 */
+		_clear: function() {
+			this._keys = [];
+			this.length = 0;
 		},
 
 		/**
 		 * Evaluates if a key exists in the keys array; indexOf does not work in all flavors of IE.
 		 * @method _indexOfKey
-		 * @param key {String} Required. The key to evaluate.
+		 * @param sKey {String} Required. The key to evaluate.
 		 * @protected
 		 */
-		_indexOfKey: function(key) {
-			var i = this._keyMap[key];
+		_indexOfKey: function(sKey) {
+			var i = this._keyMap[sKey];
 			return undefined === i ? -1 : i;
 		},
 
+		/*
+		 * Implementation to fetch a key from the storage engine.
+		 * @see YAHOO.util.Storage.key
+		 */
+		_key: function(nIndex) {return this._keys[nIndex];},
+
 		/**
 		 * Removes a key from the keys array.
-		 * @method _removeKey
-		 * @param key {String} Required. The key to remove.
+		 * @method _removeItem
+		 * @param sKey {String} Required. The key to remove.
 		 * @protected
 		 */
-		_removeKey: function(key) {
-			var j = this._indexOfKey(key),
-				rest = this._keys.slice(j + 1);
+		_removeItem: function(sKey) {
+			var that = this,
+                j = that._indexOfKey(sKey),
+				rest = that._keys.slice(j + 1),
+                k;
 
-			delete this._keyMap[key];
+			delete that._keyMap[sKey];
 
-			for (var k in this._keyMap) {
-				if (j < this._keyMap[k]) {
-					this._keyMap[k] -= 1;
+			// update values in keymap that are greater than current position
+			for (k in that._keyMap) {
+				if (j < that._keyMap[k]) {
+					that._keyMap[k] -= 1;
 				}
 			}
 			
-			this._keys.length = j;
-			this._keys = this._keys.concat(rest);
-			this.length = this._keys.length;
+			that._keys.length = j;
+			that._keys = that._keys.concat(rest);
+			that.length = that._keys.length;
 		}
 	});
 }());
@@ -670,22 +696,22 @@ var Y = YAHOO.util,
  */
 (function() {
 	// internal shorthand
-var Y = YAHOO.util,
-	YL = YAHOO.lang,
+var Util = YAHOO.util,
+	Lang = YAHOO.lang,
 
 	/*
 	 * Required for IE 8 to make synchronous.
 	 */
-	_beginTransaction = function(engine) {
-		if (engine.begin) {engine.begin();}
+	_beginTransaction = function(driver) {
+		driver.begin();
 	},
 
 	/*
 	 * Required for IE 8 to make synchronous.
 	 */
-	_commitTransaction = function(engine) {
-		if (engine.commit) {engine.commit();}
-	};
+	_commitTransaction = function(driver) {
+		driver.commit();
+	},
 
 	/**
 	 * The StorageEngineHTML5 class implements the HTML5 storage engine.
@@ -693,37 +719,43 @@ var Y = YAHOO.util,
 	 * @class StorageEngineHTML5
 	 * @constructor
 	 * @extend YAHOO.util.Storage
-	 * @param location {String} Required. The storage location.
-	 * @param conf {Object} Required. A configuration object.
+	 * @param sLocation {String} Required. The storage location.
+	 * @param oConf {Object} Required. A configuration object.
 	 */
-	Y.StorageEngineHTML5 = function(location, conf) {
-		var _this = this;
-		Y.StorageEngineHTML5.superclass.constructor.call(_this, location, Y.StorageEngineHTML5.ENGINE_NAME, conf);// not set, are cookies available
-		_this._engine = window[location];
-		_this.length = _this._engine.length;
-		YL.later(250, _this, function() { // temporary solution so that CE_READY can be subscribed to after this object is created
-			_this.fireEvent(_this.CE_READY);
-		});
+	StorageEngineHTML5 = function(sLocation, oConf) {
+		var that = this,
+            oDriver = window[sLocation];
+        
+		StorageEngineHTML5.superclass.constructor.call(that, sLocation, StorageEngineHTML5.ENGINE_NAME, oConf);// not set, are cookies available
+
+		// simplifieds the begin/commit functions, if not using IE; this provides a massive performance boost
+		if (! oDriver.begin) {_beginTransaction = function() {}; }
+		if (! oDriver.commit) {_commitTransaction = function() {}; }
+
+		that.length = oDriver.length;
+        that._driver = oDriver;
+        that.fireEvent(Util.Storage.CE_READY);
 	};
 
-	YAHOO.lang.extend(Y.StorageEngineHTML5, Y.Storage, {
+	Lang.extend(StorageEngineHTML5, Util.Storage, {
 
-		_engine: null,
+		_driver: null,
 
 		/*
 		 * Implementation to clear the values from the storage engine.
 		 * @see YAHOO.util.Storage._clear
 		 */
 		_clear: function() {
-			var _this = this;
-			if (_this._engine.clear) {
-				_this._engine.clear();
+			var that = this, i, sKey;
+
+			if (that._driver.clear) {
+				that._driver.clear();
 			}
 			// for FF 3, fixed in FF 3.5
 			else {
-				for (var i = _this.length, key; 0 <= i; i -= 1) {
-					key = _this._key(i);
-					_this._removeItem(key);
+				for (i = that.length; 0 <= i; i -= 1) {
+					sKey = that._key(i);
+					that._removeItem(sKey);
 				}
 			}
 		},
@@ -732,41 +764,41 @@ var Y = YAHOO.util,
 		 * Implementation to fetch an item from the storage engine.
 		 * @see YAHOO.util.Storage._getItem
 		 */
-		_getItem: function(key) {
-			var o = this._engine.getItem(key);
-			return YL.isObject(o) ? o.value : o; // for FF 3, fixed in FF 3.5
+		_getItem: function(sKey) {
+			var o = this._driver.getItem(sKey);
+			return Lang.isObject(o) ? o.value : o; // for FF 3, fixed in FF 3.5
 		},
 
 		/*
 		 * Implementation to fetch a key from the storage engine.
 		 * @see YAHOO.util.Storage._key
 		 */
-		_key: function(index) {return this._engine.key(index);},
+		_key: function(nIndex) {return this._driver.key(nIndex);},
 
 		/*
 		 * Implementation to remove an item from the storage engine.
 		 * @see YAHOO.util.Storage._removeItem
 		 */
-		_removeItem: function(key) {
-			var _this = this;
-			_beginTransaction(_this._engine);
-			_this._engine.removeItem(key);
-			_commitTransaction(_this._engine);
-			_this.length = _this._engine.length;
+		_removeItem: function(sKey) {
+			var oDriver = this._driver;
+			_beginTransaction(oDriver);
+			oDriver.removeItem(sKey);
+			_commitTransaction(oDriver);
+			this.length = oDriver.length;
 		},
 
 		/*
 		 * Implementation to remove an item from the storage engine.
 		 * @see YAHOO.util.Storage._setItem
 		 */
-		_setItem: function(key, value) {
-			var _this = this;
-			
+		_setItem: function(sKey, oValue) {
+			var oDriver = this._driver;
+
 			try {
-				_beginTransaction(_this._engine);
-				_this._engine.setItem(key, value);
-				_commitTransaction(_this._engine);
-				_this.length = _this._engine.length;
+				_beginTransaction(oDriver);
+				oDriver.setItem(sKey, oValue);
+				_commitTransaction(oDriver);
+				this.length = oDriver.length;
 				return true;
 			}
 			catch (e) {
@@ -775,11 +807,24 @@ var Y = YAHOO.util,
 		}
 	}, true);
 
-	Y.StorageEngineHTML5.ENGINE_NAME = 'html5';
-	Y.StorageEngineHTML5.isAvailable = function() {
-		return window.localStorage;
-	};
-    Y.StorageManager.register(Y.StorageEngineHTML5);
+	StorageEngineHTML5.ENGINE_NAME = 'html5';
+    
+	StorageEngineHTML5.isAvailable = function() {
+        try {
+            return ('localStorage' in window) && window['localStorage'] !== null &&
+                    ('sessionStorage' in window) && window['sessionStorage'] !== null;
+        }
+        catch (e) {
+            /*
+                In FireFox and maybe other browsers, you can disable storage in the configuration settings, which
+                will cause an error to be thrown instead of evaluating the simple if/else statement.
+             */
+            return false;
+        }
+    };
+
+    Util.StorageManager.register(StorageEngineHTML5);
+	Util.StorageEngineHTML5 = StorageEngineHTML5;
 }());
 /*
  * Gears limitation:
@@ -796,16 +841,16 @@ var Y = YAHOO.util,
  */
 (function() {
 	// internal shorthand
-var Y = YAHOO.util,
-	YL = YAHOO.lang,
-	_SQL_STMT_LIMIT = 9948,
-	_TABLE_NAME = 'YUIStorageEngine',
+var Util = YAHOO.util,
+	Lang = YAHOO.lang,
+	SQL_STMT_LIMIT = 9948,
+	TABLE_NAME = 'YUIStorageEngine',
 
 	// local variables
-	_engine = null,
+	_driver = null,
 
 	eURI = encodeURIComponent,
-	dURI = decodeURIComponent;
+	dURI = decodeURIComponent,
 
 	/**
 	 * The StorageEngineGears class implements the Google Gears storage engine.
@@ -813,31 +858,35 @@ var Y = YAHOO.util,
 	 * @class StorageEngineGears
 	 * @constructor
 	 * @extend YAHOO.util.Storage
-	 * @param location {String} Required. The storage location.
-	 * @param conf {Object} Required. A configuration object.
+	 * @param sLocation {String} Required. The storage location.
+	 * @param oConf {Object} Required. A configuration object.
 	 */
-	Y.StorageEngineGears = function(location, conf) {
-		var _this = this;
-		Y.StorageEngineGears.superclass.constructor.call(_this, location, Y.StorageEngineGears.ENGINE_NAME, conf);
+	StorageEngineGears = function(sLocation, oConf) {
+		var that = this,
+            keyMap = {},
+            isSessionStorage, sessionKey, rs;
+        
+		StorageEngineGears.superclass.constructor.call(that, sLocation, StorageEngineGears.ENGINE_NAME, oConf);
 
-		if (! _engine) {
+		if (! _driver) {
 			// create the database
-			_engine = google.gears.factory.create(Y.StorageEngineGears.GEARS);
-			_engine.open(window.location.host + '-' + Y.StorageEngineGears.DATABASE);
-			_engine.execute('CREATE TABLE IF NOT EXISTS ' + _TABLE_NAME + ' (key TEXT, location TEXT, value TEXT)');
+			_driver = google.gears.factory.create(StorageEngineGears.GEARS);
+      // the replace regex fixes http://yuilibrary.com/projects/yui2/ticket/2529411, all ascii characters are allowede except / : * ? " < > | ; ,
+			_driver.open(window.location.host.replace(/[\/\:\*\?"\<\>\|;,]/g, '') + '-' + StorageEngineGears.DATABASE);
+			_driver.execute('CREATE TABLE IF NOT EXISTS ' + TABLE_NAME + ' (key TEXT, location TEXT, value TEXT)');
 		}
 
-		var isSessionStorage = Y.StorageManager.LOCATION_SESSION === _this._location,
-			sessionKey = Y.Cookie.get('sessionKey' + Y.StorageEngineGears.ENGINE_NAME);
+		isSessionStorage = Util.StorageManager.LOCATION_SESSION === that._location;
+		sessionKey = Util.Cookie.get('sessionKey' + StorageEngineGears.ENGINE_NAME);
 
 		if (! sessionKey) {
-			_engine.execute('BEGIN');
-			_engine.execute('DELETE FROM ' + _TABLE_NAME + ' WHERE location="' + eURI(Y.StorageManager.LOCATION_SESSION) + '"');
-			_engine.execute('COMMIT');
+			_driver.execute('BEGIN');
+			_driver.execute('DELETE FROM ' + TABLE_NAME + ' WHERE location="' + eURI(Util.StorageManager.LOCATION_SESSION) + '"');
+			_driver.execute('COMMIT');
 		}
 
-		var rs = _engine.execute('SELECT key FROM ' + _TABLE_NAME + ' WHERE location="' + eURI(_this._location) + '"'),
-			keyMap = {};
+		rs = _driver.execute('SELECT key FROM ' + TABLE_NAME + ' WHERE location="' + eURI(that._location) + '"');
+		keyMap = {};
 	
 		try {
 			// iterate on the rows and map the keys
@@ -846,57 +895,50 @@ var Y = YAHOO.util,
 
 				if (! keyMap[fld]) {
 					keyMap[fld] = true;
-					_this._addKey(fld);
+					that._addKey(fld);
 				}
 
 				rs.next();
 			}
-		}
-		finally {
+		} finally {
 			rs.close();
 		}
 
 		// this is session storage, ensure that the session key is set
 		if (isSessionStorage) {
-			Y.Cookie.set('sessionKey' + Y.StorageEngineGears.ENGINE_NAME, true);
+			Util.Cookie.set('sessionKey' + StorageEngineGears.ENGINE_NAME, true);
 		}
 
-		_this.length = _this._keys.length;
-		YL.later(250, _this, function() { // temporary solution so that CE_READY can be subscribed to after this object is created
-			_this.fireEvent(_this.CE_READY);
-		});
+        that.fireEvent(Util.Storage.CE_READY);
 	};
 
-	YL.extend(Y.StorageEngineGears, Y.StorageEngineKeyed, {
+	Lang.extend(StorageEngineGears, Util.StorageEngineKeyed, {
 
 		/*
 		 * Implementation to clear the values from the storage engine.
 		 * @see YAHOO.util.Storage._clear
 		 */
 		_clear: function() {
-			_engine.execute('BEGIN');
-			_engine.execute('DELETE FROM ' + _TABLE_NAME + ' WHERE location="' + eURI(this._location) + '"');
-			_engine.execute('COMMIT');
-			this._keys = [];
-			this.length = 0;
+			StorageEngineGears.superclass._clear.call(this);
+			_driver.execute('BEGIN');
+			_driver.execute('DELETE FROM ' + TABLE_NAME + ' WHERE location="' + eURI(this._location) + '"');
+			_driver.execute('COMMIT');
 		},
 
 		/*
 		 * Implementation to fetch an item from the storage engine.
 		 * @see YAHOO.util.Storage._getItem
 		 */
-		_getItem: function(key) {
-			var rs = _engine.execute('SELECT value FROM ' + _TABLE_NAME + ' WHERE key="' + eURI(key) + '" AND location="' + eURI(this._location) + '"'),
+		_getItem: function(sKey) {
+			var rs = _driver.execute('SELECT value FROM ' + TABLE_NAME + ' WHERE key="' + eURI(sKey) + '" AND location="' + eURI(this._location) + '"'),
 				value = '';
 
 			try {
 				while (rs.isValidRow()) {
-					var temp = rs.field(0);
 					value += rs.field(0);
 					rs.next();
 				}
-			}
-			finally {
+			} finally {
 				rs.close();
 			}
 
@@ -904,72 +946,66 @@ var Y = YAHOO.util,
 		},
 
 		/*
-		 * Implementation to fetch a key from the storage engine.
-		 * @see YAHOO.util.Storage.key
-		 */
-		_key: function(index) {return this._keys[index];},
-
-		/*
 		 * Implementation to remove an item from the storage engine.
 		 * @see YAHOO.util.Storage._removeItem
 		 */
-		_removeItem: function(key) {
-			_engine.execute('BEGIN');
-			_engine.execute('DELETE FROM ' + _TABLE_NAME + ' WHERE key="' + eURI(key) + '" AND location="' + eURI(this._location) + '"');
-			_engine.execute('COMMIT');
-			this._removeKey(key);
+		_removeItem: function(sKey) {
+			StorageEngineGears.superclass._removeItem.call(this, sKey);
+			_driver.execute('BEGIN');
+			_driver.execute('DELETE FROM ' + TABLE_NAME + ' WHERE key="' + eURI(sKey) + '" AND location="' + eURI(this._location) + '"');
+			_driver.execute('COMMIT');
 		},
 
 		/*
 		 * Implementation to remove an item from the storage engine.
 		 * @see YAHOO.util.Storage._setItem
 		 */
-		_setItem: function(key, data) {
+		_setItem: function(sKey, oData) {
 
-			if (! this.hasKey(key)) {
-				this._addKey(key);
-			}
+			this._addKey(sKey);
 
-			var _key = eURI(key),
-				_location = eURI(this._location),
-				_value = eURI(data),
-				_values = [],
-				_len = _SQL_STMT_LIMIT - (_key + _location).length;
+			var sEscapedKey = eURI(sKey),
+				sEscapedLocation = eURI(this._location),
+				sEscapedValue = eURI(oData), // escaped twice, maybe not necessary
+				aValues = [],
+				nLen = SQL_STMT_LIMIT - (sEscapedKey + sEscapedLocation).length,
+                i=0, j;
 
 			// the length of the value exceeds the available space
-			if (_len < _value.length) {
-				for (var i = 0, j = _value.length; i < j; i += _len) {
-					_values.push(_value.substr(i, _len));
+			if (nLen < sEscapedValue.length) {
+				for (j = sEscapedValue.length; i < j; i += nLen) {
+					aValues.push(sEscapedValue.substr(i, nLen));
 				}
-			}
-			else {
-				_values.push(_value);
+			} else {
+				aValues.push(sEscapedValue);
 			}
 
 			// Google recommends using INSERT instead of update, because it is faster
-			_engine.execute('BEGIN');
-			_engine.execute('DELETE FROM ' + _TABLE_NAME + ' WHERE key="' + eURI(key) + '" AND location="' + eURI(this._location) + '"');
-			for (var m = 0, n = _values.length; m < n; m += 1) {
-				_engine.execute('INSERT INTO ' + _TABLE_NAME + ' VALUES ("' + _key + '", "' + _location + '", "' + _values[m] + '")');
+			_driver.execute('BEGIN');
+			_driver.execute('DELETE FROM ' + TABLE_NAME + ' WHERE key="' + sEscapedKey + '" AND location="' + sEscapedLocation + '"');
+			for (i = 0, j = aValues.length; i < j; i += 1) {
+				_driver.execute('INSERT INTO ' + TABLE_NAME + ' VALUES ("' + sEscapedKey + '", "' + sEscapedLocation + '", "' + aValues[i] + '")');
 			}
-			_engine.execute('COMMIT');
+			_driver.execute('COMMIT');
 			
 			return true;
 		}
 	});
 
 	// releases the engine when the page unloads
-	Y.Event.on('unload', function() {
-		if (_engine) {_engine.close();}
+	Util.Event.on('unload', function() {
+		if (_driver) {_driver.close();}
 	});
-	Y.StorageEngineGears.ENGINE_NAME = 'gears';
-	Y.StorageEngineGears.GEARS = 'beta.database';
-	Y.StorageEngineGears.DATABASE = 'yui.database';
-	Y.StorageEngineGears.isAvailable = function() {
-		if (window.google && window.google.gears) {
+
+    StorageEngineGears.ENGINE_NAME = 'gears';
+	StorageEngineGears.GEARS = 'beta.database';
+	StorageEngineGears.DATABASE = 'yui.database';
+
+	StorageEngineGears.isAvailable = function() {
+		if (('google' in window) && ('gears' in window.google)) {
 			try {
 				// this will throw an exception if the user denies gears
-				google.gears.factory.create(Y.StorageEngineGears.GEARS);
+				google.gears.factory.create(StorageEngineGears.GEARS);
 				return true;
 			}
 			catch (e) {
@@ -979,11 +1015,13 @@ var Y = YAHOO.util,
 
 		return false;
 	};
-    Y.StorageManager.register(Y.StorageEngineGears);
+
+    Util.StorageManager.register(StorageEngineGears);
+	Util.StorageEngineGears = StorageEngineGears;
 }());
 /*
  * SWF limitation:
- *  - only 100,000 bytes of data may be stored this way
+ * 	- only 100,000 bytes of data may be stored this way
  *  - data is publicly available on user machine
  *
  * Thoughts:
@@ -991,193 +1029,215 @@ var Y = YAHOO.util,
  *  - how can we not use cookies to handle session location
  */
 (function() {
-    // internal shorthand
-var Y = YAHOO.util,
-    YL = YAHOO.lang,
-    YD = Y.Dom,
-    
-    /*
-     * The minimum width required to be able to display the settings panel within the SWF.
-     */ 
-    MINIMUM_WIDTH = 215,
+	// internal shorthand
+var Y = YAHOO,
+    Util = Y.util,
+	Lang = Y.lang,
+	Dom = Util.Dom,
+	StorageManager = Util.StorageManager,
+	
+	/*
+	 * The minimum width required to be able to display the settings panel within the SWF.
+	 */	
+	MINIMUM_WIDTH = 215,
 
-    /*
-     * The minimum height required to be able to display the settings panel within the SWF.
-     */ 
-    MINIMUM_HEIGHT = 138,
+	/*
+	 * The minimum height required to be able to display the settings panel within the SWF.
+	 */	
+	MINIMUM_HEIGHT = 138,
 
-    // local variables
-    _engine = null,
+	RX_STORAGE_PREFIX = new RegExp('^(' + StorageManager.LOCATION_SESSION + '|' + StorageManager.LOCATION_LOCAL + ')'),
 
-    /*
-     * Creates a location bound key.
-     */
-    _getKey = function(that, key) {
-        return that._location + that.DELIMITER + key;
-    },
+	// local variables
+	_driver = null,
 
-    /*
-     * Initializes the engine, if it isn't already initialized.
-     */
-    _initEngine = function(cfg) {
-        if (! _engine) {
-            if (! YL.isString(cfg.swfURL)) {cfg.swfURL = Y.StorageEngineSWF.SWFURL;}
-            if (! cfg.containerID) {
-                var bd = document.getElementsByTagName('body')[0],
-                    container = bd.appendChild(document.createElement('div'));
-                cfg.containerID = YD.generateId(container);
-            }
+	/*
+	 * Creates a location bound key.
+	 */
+	_getKey = function(that, sKey) {
+		return that._location + sKey;
+	},
 
-            if (! cfg.attributes) {cfg.attributes  = {};}
-            if (! cfg.attributes.flashVars) {cfg.attributes.flashVars = {};}
-            cfg.attributes.flashVars.useCompression = 'true';
-            cfg.attributes.version = 9.115;
-            _engine = new YAHOO.widget.SWF(cfg.containerID, cfg.swfURL, cfg.attributes);
-        }
-    };
+	/*
+	 * Initializes the engine, if it isn't already initialized.
+	 */
+	_initDriver = function(oCfg) {
+		if (! _driver) {
+			if (! Lang.isString(oCfg.swfURL)) {oCfg.swfURL = StorageEngineSWF.SWFURL;}
+			if (! oCfg.containerID) {
+				var bd = document.getElementsByTagName('body')[0],
+					container = bd.appendChild(document.createElement('div'));
+				oCfg.containerID = Dom.generateId(container);
+			}
 
-    /**
-     * The StorageEngineSWF class implements the SWF storage engine.
-     * @namespace YAHOO.util
-     * @class StorageEngineSWF
-     * @uses YAHOO.widget.SWF
-     * @constructor
-     * @extend YAHOO.util.Storage
-     * @param location {String} Required. The storage location.
-     * @param conf {Object} Required. A configuration object.
-     */
-    Y.StorageEngineSWF = function(location, conf) {
-        var _this = this;
-        Y.StorageEngineSWF.superclass.constructor.call(_this, location, Y.StorageEngineSWF.ENGINE_NAME, conf);
-        
-        _initEngine(_this._cfg);
+			if (! oCfg.attributes) {oCfg.attributes  = {};}
+			if (! oCfg.attributes.flashVars) {oCfg.attributes.flashVars = {};}
+			oCfg.attributes.flashVars.allowedDomain = document.location.hostname;
+			oCfg.attributes.flashVars.useCompression = 'true';
+			oCfg.attributes.version = 9.115;
+			_driver = new Y.widget.SWF(oCfg.containerID, oCfg.swfURL, oCfg.attributes);
 
-        // evaluates when the SWF is loaded
-		_engine.unsubscribe('contentReady'); // prevents local and session content ready callbacks from firing, when switching between context
-        _engine.addListener("contentReady", function() {
-            _this._swf = _engine._swf;
-            _engine.initialized = true;
+			// subscribe to save for info
+			_driver.subscribe('save', function(o) {
+				Y.log(o.message, 'info');
+			});
+
+			// subscribe to errors
+			_driver.subscribe('quotaExceededError', function(o) {
+				Y.log(o.message, 'error');
+			});
+			_driver.subscribe('inadequateDimensions', function(o) {
+				Y.log(o.message, 'error');
+			});
+			_driver.subscribe('error', function(o) {
+				Y.log(o.message, 'error');
+			});
+			_driver.subscribe('securityError', function(o) {
+				Y.log(o.message, 'error');
+			});
+		}
+	},
+
+	/**
+	 * The StorageEngineSWF class implements the SWF storage engine.
+	 * @namespace YAHOO.util
+	 * @class StorageEngineSWF
+	 * @uses YAHOO.widget.SWF
+	 * @constructor
+	 * @extend YAHOO.util.Storage
+	 * @param sLocation {String} Required. The storage location.
+	 * @param oConf {Object} Required. A configuration object.
+	 */
+	StorageEngineSWF = function(sLocation, oConf) {
+		var that = this;
+		StorageEngineSWF.superclass.constructor.call(that, sLocation, StorageEngineSWF.ENGINE_NAME, oConf);
+		
+		_initDriver(that._cfg);
+		
+		var _onContentReady = function() {
+			that._swf = _driver._swf;
+			_driver.initialized = true;
 			
-			var isSessionStorage = Y.StorageManager.LOCATION_SESSION === _this._location,
-				sessionKey = Y.Cookie.get('sessionKey' + Y.StorageEngineSWF.ENGINE_NAME);
+			var isSessionStorage = StorageManager.LOCATION_SESSION === that._location,
+				sessionKey = Util.Cookie.get('sessionKey' + StorageEngineSWF.ENGINE_NAME),
+                i, key, isKeySessionStorage;
 
-            for (var i = _engine.callSWF("getLength", []) - 1; 0 <= i; i -= 1) {
-                var key = _engine.callSWF("getNameAt", [i]),
-                    isKeySessionStorage = -1 < key.indexOf(Y.StorageManager.LOCATION_SESSION + _this.DELIMITER);
+			for (i = _driver.callSWF("getLength", []) - 1; 0 <= i; i -= 1) {
+				key = _driver.callSWF("getNameAt", [i]);
+				isKeySessionStorage = isSessionStorage && (-1 < key.indexOf(StorageManager.LOCATION_SESSION));
 
-                // this is session storage, but the session key is not set, so remove item
-                if (isSessionStorage && ! sessionKey) {
-                    _engine.callSWF("removeItem", [key]);
-                }
-                // the key matches the storage type, add to key collection
-                else if (isSessionStorage === isKeySessionStorage) {
-                    _this._addKey(key);
-                }
-            }
+				// this is session storage, but the session key is not set, so remove item
+				if (isKeySessionStorage && ! sessionKey) {
+					_driver.callSWF("removeItem", [key]);
+				}
+				else if (isSessionStorage === isKeySessionStorage) {
+                    // the key matches the storage type, add to key collection
+					that._addKey(key);
+				}
+			}
 
-            // this is session storage, ensure that the session key is set
-            if (isSessionStorage) {
-                Y.Cookie.set('sessionKey' + Y.StorageEngineSWF.ENGINE_NAME, true);
-            }
+			// this is session storage, ensure that the session key is set
+			if (isSessionStorage) {
+				Util.Cookie.set('sessionKey' + StorageEngineSWF.ENGINE_NAME, true);
+			}
 
-            _this.length = _this._keys.length;
-            _this.fireEvent(_this.CE_READY);
-        });
-        
-        // required for pages with both a session and local storage
-        if (_engine.initialized) {_engine.fireEvent('contentReady');}
-    };
+			that.fireEvent(Util.Storage.CE_READY);
+		};
+		
+		// evaluate immediately, SWF is already loaded
+		if (_driver.initialized) {
+            _onContentReady();
+		}
+		else {
+            // evaluates when the SWF is loaded
+			_driver.addListener("contentReady", _onContentReady);
+		}
+	};
 
-    YL.extend(Y.StorageEngineSWF, Y.StorageEngineKeyed, {
-        /**
-         * The underlying SWF of the engine, exposed so developers can modify the adapter behavior.
-         * @property _swf
-         * @type {Object}
-         * @protected
-         */
-        _swf: null,
+	Lang.extend(StorageEngineSWF, Util.StorageEngineKeyed, {
+		/**
+		 * The underlying SWF of the engine, exposed so developers can modify the adapter behavior.
+		 * @property _swf
+		 * @type {Object}
+		 * @protected
+		 */
+		_swf: null,
 
-        /*
-         * Implementation to clear the values from the storage engine.
-         * @see YAHOO.util.Storage._clear
-         */
-        _clear: function() {
-            for (var i = this._keys.length - 1; 0 <= i; i -= 1) {
-                var key = this._keys[i];
-                _engine.callSWF("removeItem", [key]);
-            }
+		/*
+		 * Implementation to clear the values from the storage engine.
+		 * @see YAHOO.util.Storage._clear
+		 */
+		_clear: function() {
+			for (var i = this._keys.length - 1, sKey; 0 <= i; i -= 1) {
+				sKey = this._keys[i];
+				_driver.callSWF("removeItem", [sKey]);
+			}
+			// since keys are used to clear, we call the super function second
+			StorageEngineSWF.superclass._clear.call(this);
+		},
 
-            this._keys = [];
-            this.length = 0;
-        },
+		/*
+		 * Implementation to fetch an item from the storage engine.
+		 * @see YAHOO.util.Storage._getItem
+		 */
+		_getItem: function(sKey) {
+			var sLocationKey = _getKey(this, sKey);
+			return _driver.callSWF("getValueOf", [sLocationKey]);
+		},
 
-        /*
-         * Implementation to fetch an item from the storage engine.
-         * @see YAHOO.util.Storage._getItem
-         */
-        _getItem: function(key) {
-            var _key = _getKey(this, key);
-            return _engine.callSWF("getValueOf", [_key]);
-        },
+		/*
+		 * Implementation to fetch a key from the storage engine.
+		 * @see YAHOO.util.Storage.key
+		 */
+		_key: function(index) {
+			return StorageEngineSWF.superclass._key.call(this, index).replace(RX_STORAGE_PREFIX, '');
+		},
 
-        /*
-         * Implementation to fetch a key from the storage engine.
-         * @see YAHOO.util.Storage.key
-         */
-        _key: function(index) {
-            return (this._keys[index] || '').replace(/^.*?__/, '');
-        },
+		/*
+		 * Implementation to remove an item from the storage engine.
+		 * @see YAHOO.util.Storage._removeItem
+		 */
+		_removeItem: function(sKey) {
+			Y.log("removing SWF key: " + sKey);
+			var sLocationKey = _getKey(this, sKey);
+			StorageEngineSWF.superclass._removeItem.call(this, sLocationKey);
+			_driver.callSWF("removeItem", [sLocationKey]);
+		},
 
-        /*
-         * Implementation to remove an item from the storage engine.
-         * @see YAHOO.util.Storage._removeItem
-         */
-        _removeItem: function(key) {
-            var _key = _getKey(this, key);
-            _engine.callSWF("removeItem", [_key]);
-            this._removeKey(_key);
-        },
+		/*
+		 * Implementation to remove an item from the storage engine.
+		 * @see YAHOO.util.Storage._setItem
+		 */
+		_setItem: function(sKey, oData) {
+			var sLocationKey = _getKey(this, sKey), swfNode;
 
-        /*
-         * Implementation to remove an item from the storage engine.
-         * @see YAHOO.util.Storage._setItem
-         */
-        _setItem: function(key, data) {
-            var _key = _getKey(this, key), swfNode;
+			if (_driver.callSWF("setItem", [sLocationKey, oData])) {
+				this._addKey(sLocationKey);
+				return true;
+			}
+			else {
+                /*
+                    note:
+                        right if the FLASH SLO size needs to be adjusted, then this request and all future requests fail
+                        should we queue these up and poll for when there is enough space?
+                 */
+				swfNode = Dom.get(_driver._id);
+				if (MINIMUM_WIDTH > Dom.getStyle(swfNode, 'width').replace(/\D+/g, '')) {Dom.setStyle(swfNode, 'width', MINIMUM_WIDTH + 'px');}
+				if (MINIMUM_HEIGHT > Dom.getStyle(swfNode, 'height').replace(/\D+/g, '')) {Dom.setStyle(swfNode, 'height', MINIMUM_HEIGHT + 'px');}
+				Y.log("attempting to show settings. are dimensions adequate? " + _driver.callSWF("hasAdequateDimensions"));
+				return _driver.callSWF("displaySettings", []);
+			}
+		}
+	});
 
-            // setting the value returns false if the value didn't change,
-            // so I changed this to clear the key if it exists so that the
-            // fork below works.
-            if (_engine.callSWF("getValueOf", [_key])) {
-                this._removeItem(key);
-            }
+	StorageEngineSWF.SWFURL = "swfstore.swf";
+	StorageEngineSWF.ENGINE_NAME = 'swf';
 
-            this._addKey(_key);
+    StorageEngineSWF.isAvailable = function() {
+		return (6 <= Y.env.ua.flash && Y.widget.SWF);
+	};
 
-            if (_engine.callSWF("setItem", [_key, data])) {
-                return true;
-            } else {
-
-                // @TODO we should not assume that a false return means that
-                // the quota has been exceeded.  this dialog should only be
-                // displayed if the quotaExceededError event fired.
-                swfNode = YD.get(_engine._id);
-                if (MINIMUM_WIDTH > YD.getStyle(swfNode, 'width').replace(/\D+/g, '')) {
-                    YD.setStyle(swfNode, 'width', MINIMUM_WIDTH + 'px');
-                }
-                if (MINIMUM_HEIGHT > YD.getStyle(swfNode, 'height').replace(/\D+/g, '')) {
-                    YD.setStyle(swfNode, 'height', MINIMUM_HEIGHT + 'px');
-                }
-                return _engine.callSWF("displaySettings", []);
-            }
-        }
-    });
-
-    Y.StorageEngineSWF.SWFURL = "swfstore.swf";
-    Y.StorageEngineSWF.ENGINE_NAME = 'swf';
-    Y.StorageEngineSWF.isAvailable = function() {
-        return (6 <= YAHOO.env.ua.flash && YAHOO.widget.SWF);
-    };
-    Y.StorageManager.register(Y.StorageEngineSWF);
+    StorageManager.register(StorageEngineSWF);
+	Util.StorageEngineSWF = StorageEngineSWF;
 }());
-YAHOO.register("storage", YAHOO.util.Storage, {version: "2.8.2r1", build: "7"});
+YAHOO.register("storage", YAHOO.util.Storage, {version: "2.9.0", build: "2800"});
