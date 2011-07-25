@@ -64,9 +64,9 @@
 					    			<tbody>
 										<g:each var="entry" in="${incomingOrders}" status="i">	 
 											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-												<td>${entry.key.name}</td>
-												<td style="text-align: center;"><g:link controller="shipment" action="listReceiving" params="['status':entry.key.name]">
-													${entry.value.size}</g:link></td>
+												<td>${entry?.key?.name}</td>
+												<td style="text-align: center;"><g:link controller="shipment" action="listReceiving" params="['status':entry?.key?.name]">
+													${entry?.value?.size}</g:link></td>
 											</tr>	
 								    	</g:each>
 							    	</tbody>
