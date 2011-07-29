@@ -77,6 +77,7 @@ class AutoSuggestSearchableTagLib {
 								//
 								\$("#itemFoundForm").show();
 								\$("#itemSearchForm").hide();
+								\$("#quantity").focus();
 								
 							}
 						});

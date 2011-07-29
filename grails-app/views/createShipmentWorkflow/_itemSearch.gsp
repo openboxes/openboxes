@@ -1,3 +1,11 @@
+<script>
+	$(document).ready(function() {
+		$("#searchable-suggest").blur( function () { 
+			$(this).focus();
+		});
+	});
+</script>
+
 		<div id="itemSearchForm" >
 			<h2><g:message code="inventoryItem.search.label" default="Search inventory by name, description, or lot/serial number:" /></h2>
 			<div style="text-align: left;">
