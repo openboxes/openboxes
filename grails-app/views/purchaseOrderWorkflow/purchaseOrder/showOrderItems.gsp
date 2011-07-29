@@ -226,8 +226,8 @@
 
 				<g:form action="purchaseOrder" autocomplete="false">
 					<div class="buttons" style="border-top: 1px solid lightgrey;">
-						<g:submitButton name="back" value="Order Details"></g:submitButton>
-						<g:submitButton name="next" value="View Order Summary"></g:submitButton>
+						<g:submitButton name="back" value="Back to Order Details"></g:submitButton>
+						<g:submitButton name="next" value="Continue to Order Summary"></g:submitButton>
 						<%-- 
 						<g:submitButton name="finish" value="Save & Exit"></g:submitButton> 
 						--%>
