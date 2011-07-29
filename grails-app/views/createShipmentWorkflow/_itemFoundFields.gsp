@@ -42,7 +42,7 @@
 							<g:else>
 								<g:submitButton name="saveItem" value="Save Item"></g:submitButton>
 							</g:else>
-							<button name="cancelDialog" type="reset" onclick="$('#dlgEditItem').dialog('close');">Cancel</button>
+							<button name="cancelDialog" type="reset" onclick="$('.ui-dialog-titlebar-close').click();">Cancel</button>
 						</div>
 						<g:if test="${addItemToContainerId}">
 							<div class="buttons">
