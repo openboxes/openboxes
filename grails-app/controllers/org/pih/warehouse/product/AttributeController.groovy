@@ -12,70 +12,68 @@ class AttributeController {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [attributeInstanceList: Attribute.list(params), attributeInstanceTotal: Attribute.count()]
     }
+	
+	def show = {
+		def attributeInstance = Attribute.get(params.id)
+		if (!attributeInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'attribute.label', default: 'Attribute'), params.id])}"
+			redirect(action: "list")
+		}
+		else {
+			[attributeInstance: attributeInstance]
+		}
+	}
 
     def create = {
         def attributeInstance = new Attribute()
         attributeInstance.properties = params
-        return [attributeInstance: attributeInstance]
+        render(view:"edit", model: [attributeInstance: attributeInstance])
     }
+	
+	def edit = {
+		def attributeInstance = Attribute.get(params.id)
+		if (!attributeInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'attribute.label', default: 'Attribute'), params.id])}"
+			redirect(action: "list")
+		}
+		else {
+			return [attributeInstance: attributeInstance]
+		}
+	}
 
     def save = {
-        def attributeInstance = new Attribute(params)
+		def attributeInstance = null
+		if (params.id) {
+			attributeInstance = Attribute.get(params.id)
+			attributeInstance.properties = params
+		}
+		else {
+			params.id = null
+			attributeInstance = new Attribute(params)
+		}
+		if (params.version) {
+			def version = params.version.toLong()
+			if (attributeInstance.version > version) {
+				attributeInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'attribute.label', default: 'Attribute')] as Object[], "Another user has updated this Attribute while you were editing")
+				render(view: "edit", model: [attributeInstance: attributeInstance])
+				return
+			}
+		}
+		
+		// TODO: Add some validation in here (or better yet in the service) to make sure we do not remove options that are in use
+		attributeInstance.options = new ArrayList()
+		params.option.each {o->
+			if (o) {
+				attributeInstance.options.add(o)
+			}
+		}
+		
         if (attributeInstance.save(flush: true)) {
-            flash.message = "${message(code: 'default.created.message', args: [message(code: 'attribute.label', default: 'Attribute'), attributeInstance.id])}"
-            redirect(action: "edit", id: attributeInstance.id)
+            flash.message = "${message(code: 'default.saved.message', args: [message(code: 'attribute.label', default: 'Attribute'), attributeInstance.id])}"
+            redirect(action: "show", id: attributeInstance.id)
         }
         else {
-            render(view: "create", model: [attributeInstance: attributeInstance])
-        }
-    }
-
-    def show = {
-        def attributeInstance = Attribute.get(params.id)
-        if (!attributeInstance) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'attribute.label', default: 'Attribute'), params.id])}"
-            redirect(action: "list")
-        }
-        else {
-            [attributeInstance: attributeInstance]
-        }
-    }
-
-    def edit = {
-        def attributeInstance = Attribute.get(params.id)
-        if (!attributeInstance) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'attribute.label', default: 'Attribute'), params.id])}"
-            redirect(action: "list")
-        }
-        else {
-            return [attributeInstance: attributeInstance]
-        }
-    }
-
-    def update = {
-        def attributeInstance = Attribute.get(params.id)
-        if (attributeInstance) {
-            if (params.version) {
-                def version = params.version.toLong()
-                if (attributeInstance.version > version) {                    
-                    attributeInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'attribute.label', default: 'Attribute')] as Object[], "Another user has updated this Attribute while you were editing")
-                    render(view: "edit", model: [attributeInstance: attributeInstance])
-                    return
-                }
-            }
-            attributeInstance.properties = params
-						
-            if (!attributeInstance.hasErrors() && attributeInstance.save(flush: true)) {
-                flash.message = "${message(code: 'default.updated.message', args: [message(code: 'attribute.label', default: 'Attribute'), attributeInstance.id])}"
-                redirect(action: "edit", id: attributeInstance.id)
-            }
-            else {
-                render(view: "edit", model: [attributeInstance: attributeInstance])
-            }
-        }
-        else {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'attribute.label', default: 'Attribute'), params.id])}"
-            redirect(action: "list")
+            render(view: (params.id ? "edit" : "create"), model: [attributeInstance: attributeInstance])
         }
     }
 
@@ -97,63 +95,4 @@ class AttributeController {
             redirect(action: "list")
         }
     }
-	
-	def addOption = { 
-		def attributeInstance = Attribute.get(params.id)
-		if (attributeInstance) {
-			if (params.version) {
-				def version = params.version.toLong()
-				if (attributeInstance.version > version) {
-					
-					attributeInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'attribute.label', default: 'Attribute')] as Object[], "Another user has updated this Attribute while you were editing")
-					render(view: "edit", model: [attributeInstance: attributeInstance])
-					return
-				}
-			}
-			attributeInstance.properties = params
-			if (!attributeInstance.hasErrors() && attributeInstance.save(flush: true)) {
-				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'attribute.label', default: 'Attribute'), attributeInstance.id])}"
-				redirect(action: "edit", id: attributeInstance.id)
-			}
-			else {
-				render(view: "edit", model: [attributeInstance: attributeInstance])
-			}
-		}
-		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'attribute.label', default: 'Attribute'), params.id])}"
-			redirect(action: "list")
-		}
-	}
-	
-	
-	def deleteOption = {
-		def attributeInstance = Attribute.get(params.id)
-		if (attributeInstance) {
-			if (params.version) {
-				def version = params.version.toLong()
-				if (attributeInstance.version > version) {
-					
-					attributeInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'attribute.label', default: 'Attribute')] as Object[], "Another user has updated this Attribute while you were editing")
-					render(view: "edit", model: [attributeInstance: attributeInstance])
-					return
-				}
-			}
-			//attributeInstance.properties = params
-			def selectedOption = params.selectedOption;
-			attributeInstance.removeFromOptions(selectedOption);
-			
-			if (!attributeInstance.hasErrors() && attributeInstance.save(flush: true)) {
-				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'attribute.label', default: 'Attribute'), attributeInstance.id])}"
-				redirect(action: "edit", id: attributeInstance.id)
-			}
-			else {
-				render(view: "edit", model: [attributeInstance: attributeInstance])
-			}
-		}
-		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'attribute.label', default: 'Attribute'), params.id])}"
-			redirect(action: "list")
-		}
-	}
-	
 }
