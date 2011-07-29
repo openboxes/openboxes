@@ -40,12 +40,14 @@
 				<img src="${resource(dir: 'images/icons/silk', file: 'cart_delete.png')}" />
 				&nbsp;${message(code: 'order.cancel.label', default: 'Cancel order')} 
 			</g:link>				
-		</div>		
-		<div class="action-menu-item">
-			<g:link controller="order" action="delete" id="${orderInstance?.id}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-				<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />
-				&nbsp;${message(code: 'order.delete.label', default: 'Delete order')} 
-			</g:link>				
-		</div>		
+		</div>
+		<g:if test="${!hideDelete}">
+			<div class="action-menu-item">
+				<g:link controller="order" action="delete" id="${orderInstance?.id}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+					<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />
+					&nbsp;${message(code: 'order.delete.label', default: 'Delete order')} 
+				</g:link>				
+			</div>
+		</g:if>
 	</div>
 </g:if>

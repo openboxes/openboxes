@@ -6,13 +6,13 @@
 		</button>
 		
 		<g:if test="${orderInstance?.isReceived() || orderInstance?.isComplete() }">
-			<g:render template="actionsReceived" model="[orderInstance:orderInstance]"/>
+			<g:render template="actionsReceived" model="[orderInstance:orderInstance,hideDelete:hideDelete]"/>
 		</g:if>
 		<g:elseif test="${orderInstance?.isPlaced() }">
-			<g:render template="actionsPlaced" model="[orderInstance:orderInstance]"/>
+			<g:render template="actionsPlaced" model="[orderInstance:orderInstance,hideDelete:hideDelete]"/>
 		</g:elseif>
 		<g:elseif test="${orderInstance?.isPending() }">
-			<g:render template="actionsPending" model="[orderInstance:orderInstance]"/>
+			<g:render template="actionsPending" model="[orderInstance:orderInstance,hideDelete:hideDelete]"/>
 		</g:elseif>
 		<g:else>
 			<div class="actions" style="min-width: 200px;">

@@ -32,7 +32,7 @@
 		<g:each in="${orderInstanceList}" status="i" var="orderInstance">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 				<td>			
-					<g:render template="/order/actions" model="[orderInstance:orderInstance]"/> 
+					<g:render template="/order/actions" model="[orderInstance:orderInstance,hideDelete:true]"/> 
 				</td>
 				<td>
 					<g:link action="show" id="${orderInstance.id}">

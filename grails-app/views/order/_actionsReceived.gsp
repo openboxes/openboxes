@@ -28,12 +28,14 @@
 				<img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />
 				&nbsp;${message(code: 'order.addDocument.label', default: 'Add document')} 
 			</g:link>				
-		</div>		
-		<div class="action-menu-item">
-			<g:link controller="order" action="delete" id="${orderInstance?.id}" onclick="alert('${message(code: 'default.button.notSupported.message', default: 'This feature is not currently supported')}'); return false;">
-				<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />
-				&nbsp;${message(code: 'order.delete.label', default: 'Delete order')} 
-			</g:link>				
-		</div>		
+		</div>
+		<g:if test="${!hideDelete}">	
+			<div class="action-menu-item">
+				<g:link controller="order" action="delete" id="${orderInstance?.id}" onclick="alert('${message(code: 'default.button.notSupported.message', default: 'This feature is not currently supported')}'); return false;">
+					<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />
+					&nbsp;${message(code: 'order.delete.label', default: 'Delete order')} 
+				</g:link>				
+			</div>
+		</g:if>
 	</div>
 </g:if>
