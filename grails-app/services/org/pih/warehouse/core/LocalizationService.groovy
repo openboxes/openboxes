@@ -5,8 +5,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 
 class LocalizationService {
 
-	// TODO: can I change this b/c I think all calls in this service will be read-only?
-    boolean transactional = true
+	// TODO: do we need to make this read-only?
+    boolean transactional = false
 
 	// session-scoped (because it needs access to the user)
 	static scope = "session"
