@@ -100,7 +100,7 @@
 																	<g:set var="quantity" value="${inventoryItem?.quantityOnHand }"/>
 																	<g:set var="totalQuantity" value="${totalQuantity + (quantity?:0) }"/>
 																	<g:set var="cssClass" value="${quantity == 0 ? 'outofstock' : 'instock'  }"/>
-																	<tr class="${status%2==0?'even':'odd' } prop checkable ${cssClass}">
+																	<tr class="${status%2==0?'even':'odd' } prop ${cssClass}">
 																	<%-- 
 																		<td nowrap="true">
 																			<div class="action-menu">
@@ -123,7 +123,7 @@
 																				class="checkbox" checked="${false }" 
 																					value="${inventoryItem?.product?.id }" />
 																		</td>																
-																		<td>
+																		<td class="checkable">
 																			<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]" fragment="inventory" style="z-index: 999">
 																				<g:if test="${inventoryItem?.product?.name?.trim()}">
 																					${fieldValue(bean: inventoryItem?.product, field: "name") } 
@@ -133,19 +133,19 @@
 																				</g:else>
 																			</g:link> 
 																		</td>
-																		<td>
+																		<td class="checkable">
 																			${inventoryItem?.product?.manufacturer }
 																		</td>
-																		<td>
+																		<td class="checkable">
 																			${inventoryItem?.product?.productCode }
 																		</td>
-																		<td style="text-align: center; border-left: 1px solid lightgrey;">
+																		<td class="checkable" style="text-align: center; border-left: 1px solid lightgrey;">
 																			${inventoryItem?.quantityToReceive?:0}
 																		</td>
-																		<td style="text-align: center; border-right: 1px solid lightgrey;">
+																		<td class="checkable" style="text-align: center; border-right: 1px solid lightgrey;">
 																			${inventoryItem?.quantityToShip?:0}
 																		</td>
-																		<td style="text-align: center;">
+																		<td class="checkable" style="text-align: center;">
 																			<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
 																				${inventoryItem?.quantityOnHand?:0}
 																			</g:link>
@@ -210,13 +210,13 @@
 				});
 				$('.checkable').toggle(
 					function(event) {
-						$(this).find('input').attr('checked', true);
-						$(this).addClass('checked');
+						$(this).parent().find('input').click();
+						$(this).parent().addClass('checked');
 						return false;
 					},
 					function(event) {
-						$(this).find('input').attr('checked', false);
-						$(this).removeClass('checked');
+						$(this).parent().find('input').click();
+						$(this).parent().removeClass('checked');
 						return false;
 					}
 				);
