@@ -10,6 +10,7 @@ class User extends Person {
 	String username;			// email or username
 	String password;			// encrypted password
 	String passwordConfirm;		// password confirm used on signup and password reset
+	Locale locale;				// the user's locale
 
 	Date lastLoginDate;			// keep track of the user's last login
 	Warehouse warehouse;		// keep track of the user's last warehouse

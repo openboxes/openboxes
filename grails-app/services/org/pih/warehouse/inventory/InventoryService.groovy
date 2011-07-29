@@ -239,6 +239,10 @@ class InventoryService implements ApplicationContextAware {
 		return applicationContext.getBean("shipmentService")
 	}
 	
+	def getLocalizationService() {
+		return applicationContext.getBean("localizationService")
+	}
+	
 	
 	/**
 	 * 
@@ -359,6 +363,15 @@ class InventoryService implements ApplicationContextAware {
 		   }
 		   products = products.intersect(searchProducts);
 	   }
+	   
+	   // now localize to only match products for the current locale
+	   // TODO: this would also have to handle the category filtering
+	//  products = products.findAll { product ->
+		//  def localizedProductName = getLocalizationService().getLocalizedString(product.name);  // TODO: obviously, this would have to use the actual locale		   
+		  // return productFilters.any {
+			//   localizedProductName.contains(it)  // TODO: this would also have to be case insensitive
+		   // }
+	   // }
 	   
 	   return products;
    }
@@ -719,6 +732,8 @@ class InventoryService implements ApplicationContextAware {
 				}
 			}
 		}
+		
+		
 		/*
 		if (!products) { 
 			// Get products that match a category (e.g. Equipment matches all products 

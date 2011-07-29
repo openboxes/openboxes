@@ -3504,9 +3504,12 @@
             <column name="weight_units" type="VARCHAR(255)"/>
         </addColumn>
     </changeSet>
-    
-    
-
+    <changeSet author="mgoodrich" id="2011-07-29-1">
+		<preConditions onFail="MARK_RAN"><not><columnExists tableName="user" columnName="locale"/></not></preConditions> 
+        <addColumn tableName="user">
+            <column name="locale" type="VARCHAR(10)"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
 
 

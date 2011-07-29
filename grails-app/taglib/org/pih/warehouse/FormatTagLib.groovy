@@ -10,6 +10,9 @@ import com.ocpsoft.pretty.time.PrettyTime;
 
 class FormatTagLib {
 	
+	// TODO: why is this working? from what I read (though maybe it is outdate) this shouldn't be working
+	def localizationService
+	
 	static namespace = "format"
 	
 	/**
@@ -65,4 +68,14 @@ class FormatTagLib {
 		 }
 	 }
 
+	 /**
+	  * Localizes a string
+	  * TODO: change to metadata
+	  */
+	 def product = { attrs ->		 
+	 	if (attrs.product != null) {
+			 // default format is to display the localized name of the product 
+			 out << localizationService.getLocalizedString(attrs.product.name)
+		 }
+	 }
  }

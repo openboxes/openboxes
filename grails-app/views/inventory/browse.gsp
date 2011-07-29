@@ -126,7 +126,7 @@
 																		<td class="checkable">
 																			<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]" fragment="inventory" style="z-index: 999">
 																				<g:if test="${inventoryItem?.product?.name?.trim()}">
-																					${fieldValue(bean: inventoryItem?.product, field: "name") } 
+																					<format:product product="${inventoryItem?.product}"/> 
 																				</g:if>
 																				<g:else>
 																					Untitled Product
