@@ -5,15 +5,12 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'attribute.label', default: 'Attribute')}" />
         <g:set var="createEdit" value="${attributeInstance?.id ? 'edit' : 'create'}"/>
-        <title><g:message code="default.${createEdit}.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.${createEdit}.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.${createEdit}.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.${createEdit}.label" args="[entityName]" /></content>
     </head>
     <body>
-        <div class="body">
-		    <div class="nav">
-		    	<g:render template="nav"/>		    
-		    </div>        
+        <div class="body">      
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
@@ -32,7 +29,7 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="name"><g:message code="attribute.name.label" default="Name" /></label>
+	                                  <label for="name"><warehouse:message code="attribute.name.label" default="Name" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: attributeInstance, field: 'name', 'errors')}">
 	                                    <g:textField name="name" value="${attributeInstance?.name}" />
@@ -41,7 +38,7 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="allowOther"><g:message code="attribute.allowOther.label" default="Allow Other" /></label>
+	                                  <label for="allowOther"><warehouse:message code="attribute.allowOther.label" default="Allow Other" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: attributeInstance, field: 'allowOther', 'errors')}">
 	                                    <g:checkBox name="allowOther" value="${attributeInstance?.allowOther}" />
@@ -50,7 +47,7 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="options"><g:message code="attribute.options.label" default="Options" /></label>
+	                                  <label for="options"><warehouse:message code="attribute.options.label" default="Options" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: attributeInstance, field: 'options', 'errors')}">
                                 		<table id="optionsTable">
@@ -65,7 +62,8 @@
 	                                    </table>
 	                                    <div>
 	                                    	<a href="#" onClick="javascript:addOption('');">
-		                                    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png') }" style="vertical-align: middle;"/>Add Option
+		                                    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png') }" style="vertical-align: middle;"/>
+		                                    	<warehouse:message code="default.add.option" />
 		                                   	</a>
 	                                    </div>
 	                                    
@@ -101,7 +99,7 @@
 						                    <g:actionSubmit class="delete" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
 						                </div>
 						                
-						                <g:link action="list">&lsaquo; back to attributes</g:link>
+						                <g:link action="list">&lsaquo; <warehouse:message code="attribute.backToAttributes.link"/></g:link>
 		    						</td>                    	
 	                        	</tr>	                        
 	                        </tbody>
