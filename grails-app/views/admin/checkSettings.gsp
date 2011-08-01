@@ -3,19 +3,19 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <title><g:message code="default.controllers.label" default="Settings" /></title>
+        <title><warehouse:message code="admin.title" default="Settings" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="menuTitle"><g:message code="default.controllers.label" default="Check Email" /></content>		
+		<content tag="menuTitle"><warehouse:message code="admin.title" default="Settings" /></content>		
     </head>
     <body>        
 		<div id="settings" role="main" class="yui-gb">
 			<!-- the first child of a Grid needs the "first" class -->
 			<div class="yui-u first">
-					<h2>General Settings</h2>
+					<h2><warehouse:message code="admin.generalSettings.header"/></h2>
 					<table>
 						<tr class="prop">
 							<td class="name">
-								<label>External config file</label>
+								<label><warehouse:message code="admin.externalConfigFile.label"/></label>
 							</td>
 							<td>
 								${grailsApplication.config.grails.config.locations }
@@ -23,7 +23,7 @@
 						</tr>
 						<tr class="prop">
 							<td class="name">
-								<label>Environment</label>
+								<label><warehouse:message code="admin.environment.label"/></label>
 							</td>
 							<td>
 								${env }
@@ -31,11 +31,11 @@
 						</tr>
 					</table>
 					
-					<h2>Email Settings</h2>
+					<h2><warehouse:message code="admin.emailSettings.header"/></h2>
 					<table>
 						<tr class="prop">
 							<td class="name">
-								<label>Email enabled</label>
+								<label><warehouse:message code="admin.emailEnabled.label"/></label>
 							</td>
 							<td>
 								${enabled }
@@ -43,7 +43,7 @@
 						</tr>
 						<tr class="prop">
 							<td class="name">
-								<label>Hostname </label>
+								<label><warehouse:message code="admin.hostname.label"/> </label>
 							</td>
 							<td>
 								${host }
@@ -51,7 +51,7 @@
 						</tr>
 						<tr class="prop">
 							<td class="name">
-								<label>Port </label>
+								<label><warehouse:message code="admin.port.label"/> </label>
 							</td>
 							<td>
 								${port}
