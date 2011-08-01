@@ -1063,16 +1063,15 @@ class ShipmentController {
 		if (inventoryItems) { 
 			inventoryItems.each { inventoryItem ->
 				def quantityOnHand = quantityOnHandMap[inventoryItem]
-				if (quantityOnHand > 0) { 
-					def item = new ItemCommand();
-					item.quantityOnHand = quantityOnHand
-					item.quantityShipping = quantityShippingMap[inventoryItem]
-					item.quantityReceiving = quantityReceivingMap[inventoryItem]
-					item.inventoryItem = inventoryItem 
-					item.product = inventoryItem?.product
-					item.lotNumber = inventoryItem?.lotNumber
-					commandInstance.items << item;
-				}
+				
+				def item = new ItemCommand();
+				item.quantityOnHand = quantityOnHand
+				item.quantityShipping = quantityShippingMap[inventoryItem]
+				item.quantityReceiving = quantityReceivingMap[inventoryItem]
+				item.inventoryItem = inventoryItem 
+				item.product = inventoryItem?.product
+				item.lotNumber = inventoryItem?.lotNumber
+				commandInstance.items << item;
 			}
 		}
 

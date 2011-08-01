@@ -32,7 +32,7 @@
 			<div class="dialog">
 			
 				<fieldset>
-            		<g:render template="/order/header" model="[orderInstance:order]"/>
+            		<g:render template="/order/summary" model="[orderInstance:order]"/>
 			
 					<table>
 						<tbody>

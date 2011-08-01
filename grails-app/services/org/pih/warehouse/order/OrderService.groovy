@@ -132,7 +132,7 @@ class OrderService {
 			}
 			
 			// Once the order has been completely received, we set the status to RECEIVED
-			if (orderCommand?.order && orderCommand?.order?.isComplete()) { 
+			if (orderCommand?.order && orderCommand?.order?.isCompletelyReceived()) { 
 				orderCommand?.order.status = OrderStatus.RECEIVED;
 				saveOrder(orderCommand?.order);
 			}

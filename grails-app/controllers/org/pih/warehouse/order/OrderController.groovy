@@ -31,7 +31,7 @@ class OrderController {
 
 	def listOrderItems = { 
 		//def orderItems = orderService.getOrderItems()
-		def orderItems = OrderItem.getAll().findAll { !it.isComplete() } ;
+		def orderItems = OrderItem.getAll().findAll { !it.isCompletelyFulfilled() } ;
 		
 		return [orderItems : orderItems]		
 	}

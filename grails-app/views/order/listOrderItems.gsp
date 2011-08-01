@@ -53,7 +53,7 @@
 											${fieldValue(bean: orderItem, field: "quantity")}
 										</td>
 										<td>
-											${(orderItem?.isComplete())?"Complete":"Pending" }
+											${(orderItem?.isCompletelyFulfilled())?"Complete":"Pending" }
 										</td>
 						
 									</tr>

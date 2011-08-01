@@ -66,13 +66,18 @@
 									${item?.quantityReceiving?:'N/A' }
 								</td>
 								<td style="border-left: 1px solid lightgrey;">
-									<g:select name="items[${i }].shipment.id" from="${shipments }" 
-										noSelection="${['null':'Select a shipment...']}" value="${item?.shipment?.id }"
-										optionKey="id" optionValue="name" />
+								
+									<g:if test="${item?.quantityOnHand > 0 }">
+										<g:select name="items[${i }].shipment.id" from="${shipments }" 
+											noSelection="${['null':'Select a shipment...']}" value="${item?.shipment?.id }"
+											optionKey="id" optionValue="name" />
+									</g:if>
 								</td>
 								<td>
-									<g:textField name="items[${i }].quantity" size="4" style="text-align: center;" 
-										value="${item?.quantity }"/>
+									<g:if test="${item?.quantityOnHand > 0 }">
+										<g:textField name="items[${i }].quantity" size="4" style="text-align: center;" 
+											value="${item?.quantity }"/>
+									</g:if>
 								</td>
 								
 							</tr>

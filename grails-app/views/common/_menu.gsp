@@ -49,21 +49,43 @@
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="order" action="list"><g:message code="order.list.label"  default="List orders "/></g:link>
+					<g:link controller="order" action="list"><warehouse:message code="order.list.label" default="List orders "/></g:link>
 				</span>
 			</li>									
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="order" action="listOrderItems"><g:message code="orderItem.list.label"  default="List order items "/></g:link>
+					<g:link controller="order" action="listOrderItems"><warehouse:message code="orderItem.list.label"  default="List order items "/></g:link>
 				</span>
 			</li>									
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="purchaseOrderWorkflow" action="index"><g:message code="order.create.label" default="Add incoming order"/></g:link>
+					<g:link controller="purchaseOrderWorkflow" action="index"><warehouse:message code="order.create.label" default="Add incoming order"/></g:link>
 				</span>
 			</li>					
 		</ul>										
 	</div>
+	<h6 class="menu-heading" >
+		<g:message code="requests.label"  default="Requests"/>
+	</h6>
+	<div class="menu-section">
+		<ul>
+			<li class="">
+				<span class="menuButton">
+					<g:link controller="request" action="list"><g:message code="request.list.label"  default="List requests "/></g:link>
+				</span>
+			</li>						
+			
+			<li class="">
+				<span class="menuButton">
+					<g:link controller="createRequestWorkflow" action="index"><g:message code="request.create.label" default="Add new request"/></g:link>
+				</span>
+			</li>					
+		</ul>
+		
+						
+	</div>			
+	
+	
 	<h6 class="menu-heading" >
 		<g:message code="shipping.label"  default="Shipping"/>
 	</h6>

@@ -64,8 +64,8 @@
 					    			<tbody>
 										<g:each var="entry" in="${incomingOrders}" status="i">	 
 											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-												<td>${entry?.key?.name}</td>
-												<td style="text-align: center;"><g:link controller="shipment" action="listReceiving" params="['status':entry?.key?.name]">
+												<td>${entry?.key?.name?:'Pending'}</td>
+												<td style="text-align: center;"><g:link controller="order" action="list" params="['status':entry?.key?.name]">
 													${entry?.value?.size}</g:link></td>
 											</tr>	
 								    	</g:each>
@@ -73,7 +73,7 @@
 							    	<tfoot>
 								    	<tr style="border-top: 1px solid lightgrey">
 								    		<th style="text-align: right;"><g:message code="shipping.total.label"/></td>							    		
-								    		<th style="text-align: center;"><g:link controller="shipment" action="listReceiving" params="">${allIncomingShipments.size()}</g:link></td>
+								    		<th style="text-align: center;"><g:link controller="order" action="list" params="">${incomingOrders.size()}</g:link></td>
 								    	</tr>
 							    	</tfoot>
 						    	</table>
@@ -83,7 +83,6 @@
 	    			<br clear="all"/>
 	    			
 				</div>					
-				
 				<!--  Show recent shipments/receipts -->
 				<div class="widget-small">
 					<div class="widget-header"><h2><g:message code="shipping.summary.label" args="[session.warehouse.name]"/></h2></div>

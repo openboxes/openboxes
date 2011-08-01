@@ -1,5 +1,8 @@
 package org.pih.warehouse.core
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 
 class Constants {
 	
@@ -8,8 +11,9 @@ class Constants {
 	static final String DEFAULT_TIME_FORMAT = "HH:mm:ss z"
 	static final String DEFAULT_MONTH_YEAR_DATE_FORMAT = "MMM yyyy"
 	
+	static final DateFormat DEFAULT_DATE_FORMATTER = new SimpleDateFormat(DEFAULT_DATE_FORMAT);	
 	static final Locale [] SUPPORTED_LOCALES = [new Locale('en'), new Locale('fr'), new Locale('ht')]  
-	
+
 	static final String DEFAULT_WEIGHT_UNITS = "lbs"
 	static final String DEFAULT_VOLUME_UNITS = "ft"
 	

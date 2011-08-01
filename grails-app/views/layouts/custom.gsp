@@ -359,33 +359,39 @@
 			}).next().hide();
 			*/
 			<g:if test="${request.request.requestURL.toString().contains('category')}">
-				accordion.accordion( "activate" , 4 );
+				accordion.accordion( "activate" , 5 );
 			</g:if>
 			<g:elseif test="${request.request.requestURL.toString().contains('attribute')}">
-				accordion.accordion( "activate" , 4 );
+				accordion.accordion( "activate" , 5 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('product/batchEdit')}">
-				accordion.accordion( "activate" , 4 );
+				accordion.accordion( "activate" , 5 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('person')}">
-				accordion.accordion( "activate" , 4 );
+				accordion.accordion( "activate" , 5 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('user')}">
-				accordion.accordion( "activate" , 4 );
+				accordion.accordion( "activate" , 5 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('location')}">
-				accordion.accordion( "activate" , 4 );
+				accordion.accordion( "activate" , 5 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('warehouse/warehouse')}">
-				accordion.accordion( "activate" , 4 );
+				accordion.accordion( "activate" , 5 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('listReceiving')}">
-				accordion.accordion( "activate" , 3 );
+				accordion.accordion( "activate" , 4 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('shipment')}">
-				accordion.accordion( "activate" , 2 );
+				accordion.accordion( "activate" , 3 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('createShipmentWorkflow')}">
+				accordion.accordion( "activate" , 3 );
+			</g:elseif>
+			<g:elseif test="${request.request.requestURL.toString().contains('createRequestWorkflow')}">
+				accordion.accordion( "activate" , 2 );
+			</g:elseif>
+			<g:elseif test="${request.request.requestURL.toString().contains('request')}">
 				accordion.accordion( "activate" , 2 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('purchaseOrderWorkflow')}">

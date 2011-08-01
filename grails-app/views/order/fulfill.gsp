@@ -23,7 +23,7 @@
             		<g:hiddenField name="id" value="${orderInstance?.id }"/>
             	
 	            	<fieldset>
-	            		<g:render template="header" model="[orderInstance:orderInstance]"/>
+	            		<g:render template="summary" model="[orderInstance:orderInstance]"/>
 		                <table>
 		                    <tbody>
 		                        <g:each var="orderItem" in="${orderInstance?.orderItems }">

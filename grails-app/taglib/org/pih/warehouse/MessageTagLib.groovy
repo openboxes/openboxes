@@ -5,6 +5,6 @@ class MessageTagLib {
 	static namespace = "warehouse"
 	
 	def message = { attr, body ->
-		out << "${g.message(code:attr.code, default: attr.default, args: attr.args, encodeAs: attr.encodeAs)}"
+		out << "${g.message(code:attr.code, default: attr.default, args: attr.args, encodeAs: attr.encodeAs, error: attr.error, message: attr.message)}"
 	}
 }

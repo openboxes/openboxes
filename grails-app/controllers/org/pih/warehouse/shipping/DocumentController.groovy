@@ -2,6 +2,7 @@ package org.pih.warehouse.shipping;
 
 import org.pih.warehouse.core.Document;
 import org.pih.warehouse.order.Order;
+import org.pih.warehouse.request.Request;
 import org.pih.warehouse.core.DocumentType;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 class DocumentCommand {
    String typeId
    String name
+   String requestId
    String shipmentId
    String orderId
    String documentNumber
@@ -78,6 +80,8 @@ class DocumentController {
 	   def file = command.fileContents;	   
 	   def shipmentInstance = Shipment.get(command.shipmentId);	   
 	   def orderInstance = Order.get(command.orderId);	   
+	   def requestInstance = Request.get(command.requestId);
+	   
 	   log.info "multipart file: " + file.originalFilename + " " + file.contentType + " " + file.size + " " 
 	   
 	   // file must not be empty and must be less than 10MB
@@ -87,6 +91,7 @@ class DocumentController {
 	   } 
 	   else if (file.size < 10*1024*1000) {		   
 		   log.info "Creating new document ";
+		   def typeId = Long.parseLong(command?.typeId?:0)
 		   Document documentInstance = new Document( 
 			   size: file.size, 
 			   name: command.name,
@@ -94,7 +99,7 @@ class DocumentController {
 			   fileContents: command.fileContents.bytes,
 			   contentType: file.contentType, 
 			   documentNumber: command.documentNumber,
-			   documentType:  DocumentType.get(Long.parseLong(command.typeId)));
+			   documentType:  DocumentType.get(typeId))
 		   
 		   // Check to see if there are any errors
 		   if (documentInstance.validate() && !documentInstance.hasErrors()) {			   
@@ -107,6 +112,10 @@ class DocumentController {
 				   orderInstance.addToDocuments(documentInstance).save(flush:true)
 				   flash.message= "Successfully saved file to Order #" + orderInstance?.orderNumber
 			   }
+			   else if (requestInstance) { 
+				   requestInstance.addToDocuments(documentInstance).save(flush:true)
+				   flash.message= "Successfully saved file to Request #" + requestInstance?.requestNumber
+			   }
 		   }
 		   // If there are errors, we need to redisplay the document form
 		   else {
@@ -115,9 +124,17 @@ class DocumentController {
 			   if (shipmentInstance) { 
 				   redirect(controller: "shipment", action: "addDocument", id: shipmentInstance.id,
 					   model: [shipmentInstance: shipmentInstance, documentInstance : documentInstance])
+				   return;
 			   } else if (orderInstance) { 
 				   redirect(controller: "order", action: "addDocument", id: orderInstance.id,
 					   model: [orderInstance: orderInstance, documentInstance : documentInstance])
+				   return;
+			   }
+			   else if (requestInstance) { 
+				   redirect(controller: "request", action: "addDocument", id: requestInstance.id,
+					   model: [requestInstance: requestInstance, documentInstance : documentInstance])
+				   return;
+
 			   }
 		   }
 	   }
@@ -126,12 +143,21 @@ class DocumentController {
 		   flash.message = "Document is too large (must be less than 1MB)";
 		   if (shipmentInstance) { 
 			   redirect(controller: 'shipment', action: 'showDetails', id: command.shipmentId)
+			   return;
 		   }
 		   else if (orderInstance) { 
 			   redirect(controller: 'order', action: 'show', id: command.orderId)
+			   return;
+		   }
+		   else if (requestInstance) { 
+			   redirect(controller: 'request', action: 'show', id: command.requestId)
+			   return;
+	
 		   }
 	   }
 	   
+	   // This is, admittedly, a hack but I wanted to avoid having to add this code to each of 
+	   // these controllers.
 	   log.info ("Redirecting to appropriate show details page")
 	   if (shipmentInstance) {
 		   redirect(controller: 'shipment', action: 'showDetails', id: command.shipmentId)
@@ -140,6 +166,11 @@ class DocumentController {
 	   else if (orderInstance) {
 		   redirect(controller: 'order', action: 'show', id: command.orderId)
 		   return;
+	   }
+	   else if (requestInstance) { 
+		   redirect(controller: 'request', action: 'show', id: command.requestId)
+		   return;
+
 	   }
 
    }

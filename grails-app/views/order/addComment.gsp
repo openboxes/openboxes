@@ -28,7 +28,7 @@
 			<tr>
 				<td>
 					<fieldset>
-						<g:render template="header" model="[orderInstance:orderInstance]" />
+						<g:render template="summary" model="[orderInstance:orderInstance]" />
 							<g:form action="saveComment">
 								<g:hiddenField name="id" value="${commentInstance?.id}" />
 								<g:hiddenField name="order.id" value="${orderInstance?.id}" />

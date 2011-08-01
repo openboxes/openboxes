@@ -17,7 +17,7 @@
             <div class="dialog">
             
             	<fieldset>
-            		<g:render template="header" model="[orderInstance:orderInstance]"/>
+            		<g:render template="summary" model="[orderInstance:orderInstance]"/>
             	
             	
 	                <table>

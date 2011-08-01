@@ -36,13 +36,13 @@
 						</div>
 						<br/>
 						<g:if test="${!params.execution && !isAddingComment && !isAddingDocument}">						
-							<g:if test="${!orderInstance?.isComplete() && orderInstance?.status != org.pih.warehouse.order.OrderStatus.PLACED }">
+							<g:if test="${!orderInstance?.isCompletelyReceived() && orderInstance?.status != org.pih.warehouse.order.OrderStatus.PLACED }">
 								<g:form action="placeOrder">
 									<g:hiddenField name="id" value="${orderInstance?.id }"/>
 									<button>Place Order</button>
 								</g:form>
 							</g:if>
-							<g:elseif test="${!orderInstance?.isComplete() && orderInstance?.status == org.pih.warehouse.order.OrderStatus.PLACED }">
+							<g:elseif test="${!orderInstance?.isCompletelyReceived() && orderInstance?.status == org.pih.warehouse.order.OrderStatus.PLACED }">
 								<g:link controller="receiveOrderWorkflow" action="receiveOrder" id="${orderInstance?.id}">
 									<button>
 										${message(code: 'order.receive.label', default: 'Receive order')}

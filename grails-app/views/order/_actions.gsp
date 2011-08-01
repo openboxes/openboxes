@@ -5,7 +5,7 @@
 			<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
 		</button>
 		
-		<g:if test="${orderInstance?.isReceived() || orderInstance?.isComplete() }">
+		<g:if test="${orderInstance?.isReceived() || orderInstance?.isCompletelyReceived() }">
 			<g:render template="actionsReceived" model="[orderInstance:orderInstance,hideDelete:hideDelete]"/>
 		</g:if>
 		<g:elseif test="${orderInstance?.isPlaced() }">

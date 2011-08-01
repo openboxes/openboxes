@@ -21,7 +21,7 @@ environments {
 	development {
 		dataSource {	
 			// disable dbCreate when you create the initial database using '$ grails dev migrate'
-			//dbCreate = "update" 	
+			dbCreate = "update" 	
 			//dbCreate = "create-drop"			
 			url = "jdbc:mysql://localhost:3306/warehouse_dev?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
 		}

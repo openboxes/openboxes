@@ -29,7 +29,7 @@
             	<g:form autocomplete="off">
             		
 	            	<fieldset>
-	            		<g:render template="header" model="[orderInstance:orderCommand?.order]"/>
+	            		<g:render template="summary" model="[orderInstance:orderCommand?.order]"/>
 		                <table>
 		                    <tbody>
 								<tr class='prop'>
@@ -38,7 +38,7 @@
 									</td>
 									<td valign='top'class='value'>
 										<g:hiddenField name="order.id" value="${orderCommand?.order?.id }"/>
-										${ (orderCommand?.order?.isComplete()) ? "Complete" : "Pending" }
+										${ (orderCommand?.order?.isCompletelyReceived()) ? "Complete" : "Pending" }
 									</td>
 								</tr>
 								<tr class='prop'>
@@ -145,12 +145,12 @@
 															</td>
 															<td class="center" style="border-left: 1px solid lightgrey;">
 																
-																<g:if test="${!orderItem?.orderItem?.isComplete() }">
+																<g:if test="${!orderItem?.orderItem?.isCompletelyFulfilled() }">
 																	<input type="text" name='orderItems[${i }].quantityReceived' value="${orderItem?.quantityReceived }" size="5" class="center updateable" />
 																</g:if>
 															</td>
 															<td>
-																<g:if test="${!orderItem?.orderItem?.isComplete() }">
+																<g:if test="${!orderItem?.orderItem?.isCompletelyFulfilled() }">
 																	<div class="ui-widget">
 																		<g:select class="combobox updateable productId" name="orderItems[${i }].productReceived.id" from="${org.pih.warehouse.product.Product.list().sort{it.name}}" 
 																			optionKey="id" value="${orderItem?.productReceived?.id }" noSelection="['':'']"/>
@@ -158,7 +158,7 @@
 																</g:if>
 															</td>
 															<td>
-																<g:if test="${!orderItem?.orderItem?.isComplete() }">
+																<g:if test="${!orderItem?.orderItem?.isCompletelyFulfilled() }">
 																	<g:textField name="orderItems[${i }].lotNumber" value="${orderItem?.lotNumber }" size="10" class="updateable"/>
 																</g:if>
 															</td>

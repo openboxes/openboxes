@@ -61,12 +61,17 @@ class OrderItem implements Serializable {
 	}
 	
 	
-	Boolean isComplete() { 
+	
+	Boolean isPartiallyFulfilled() { 
+		return quantityFulfilled() > 0 && quantityFulfilled() < quantity;
+	}	
+	
+	Boolean isCompletelyFulfilled() { 
 		return quantityFulfilled() >= quantity;
 	}
 	
 	Boolean isPending() { 
-		return !isComplete()
+		return !isCompletelyFulfilled()
 	}
 	
 	/**

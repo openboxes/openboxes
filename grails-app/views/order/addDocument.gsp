@@ -22,7 +22,7 @@
 			
 
 		<fieldset>
-			<g:render template="header" />
+			<g:render template="summary" />
 			<div>
 				<!-- process an upload or save depending on whether we are adding a new doc or modifying a previous one -->					
 				<g:uploadForm controller="document" action="${documentInstance?.id ? 'save' : 'upload'}">

@@ -49,38 +49,62 @@ class Order implements Serializable {
 	}	
 	
 	String status() { 
-		if (status) { 
-			return status.name
-		} 
-		else if (isComplete()) { 
-			return "Completed"
+		if (isPlaced() && isPartiallyReceived()) {
+			return "Partially Received"
 		}
+		else if (isPlaced()) { 
+			return "Placed"
+		}
+		else if (isReceived()) { 
+			return "Received"
+		} 
 		return "Pending"
 	}
 	
+	/**
+	 * @return	a boolean indicating whether the order is pending
+	 */
 	Boolean isPending() { 
 		return (status == null || status == OrderStatus.PENDING )
 	}
 	
+	/**
+	 * @return	a boolean indicating whether the order has been placed
+	 */
 	Boolean isPlaced() { 
 		return (status == OrderStatus.PLACED)
 	}
 	
+	/**
+	 * @return	a boolean indicating whether the order has been received
+	 */
 	Boolean isReceived() { 
 		return (status == OrderStatus.RECEIVED)
 	}
 	
-	Boolean isComplete() {
-		if (!orderItems) {
-			return false;
-		}
-		else {
-			return !orderItems?.find { !it.isComplete() }
-		}	
+	
+	/**
+	 * After an order is placed and before it is completed received, the order can 
+	 * be partially received.  This occurs when the order contains items that have 
+	 * been completely received and some that have not been completely received.
+	 * 
+	 * @return
+	 */
+	Boolean isPartiallyReceived() { 
+		return orderItems?.find { it.isPartiallyFulfilled() } 
+	}
+
+	/**
+	 * After an order has been placed, it will be in a state where it can be received.
+	 * 
+	 * @return	a boolean value indicating whether all items have been received entirely
+	 */
+	Boolean isCompletelyReceived() {
+		return orderItems?.size() == orderItems?.find { it.isCompletelyFulfilled() }?.size()
 	}
 	
 	String getOrderNumber() {
-		return (id) ? "V" + String.valueOf(id).padLeft(6, "0")  : "(new order)";
+		return (id) ? "V" + String.valueOf(id).padLeft(6, "0")  : "(New Request)";
 	}
 	
 	def shipments() { 

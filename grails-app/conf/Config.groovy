@@ -64,7 +64,7 @@ grails.enable.native2ascii = true
 grails.logging.jul.usebridge = true
 // packages to include in Spring bean scanning
 grails.spring.bean.packages = []
-grails.validateable.packages = ['org.pih.warehouse.inventory', 'org.pih.warehouse.order', 'org.pih.warehouse.shipment']
+grails.validateable.packages = ['org.pih.warehouse.inventory', 'org.pih.warehouse.order', 'org.pih.warehouse.shipment', 'org.pih.warehouse.request']
 
 /* Mail properties */
 mail.error.server = 'localhost'
@@ -128,8 +128,7 @@ log4j = {
 			   '%d{[ dd.MM.yyyy HH:mm:ss.SSS]} [%t] %n%-5p %n%c %n%C %n %x %n %m%n'))
 	}
 			
-	error 'org.codehaus.groovy.grails.web.pages',			// GSP
-		'org.hibernate.engine.StatefulPersistenceContext.ProxyWarnLog'
+	error	'org.hibernate.engine.StatefulPersistenceContext.ProxyWarnLog'
 	
 	
 	warn	'org.mortbay.log',
@@ -144,22 +143,23 @@ log4j = {
 		'net.sf.ehcache.hibernate'		
 	
 	info	'org.liquibase', 	
+		'grails.app.controller',
+		'org.codehaus.groovy.grails.web.pages',			// GSP		
 		'com.mchange',
 		'org.springframework',
 		'org.hibernate',
 		'org.pih.warehouse',
 		'grails.app',
-		'grails.app.controller',
 		'grails.app.bootstrap',
 		'grails.app.service',
 		'grails.app.task'
 		'BootStrap'
 
 	debug	'liquibase',
-		'org.apache.ddlutils',
 		'org.apache.http.headers',
+		'org.apache.ddlutils',
 		'org.apache.http.wire'
-	
+		
 	root {
 		error 'stdout', 'smtp'
 		additivity = true

@@ -23,7 +23,7 @@ Turn on Grails Service monitoring by adding 'spring' in displayed-counters param
  */
 javamelody.'displayed-counters' = 'http,sql,error,log,spring,jsp'
 
-
+javamelody.disabled = true
 
 
 /*
