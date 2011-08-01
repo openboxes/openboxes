@@ -53,6 +53,11 @@
 	                            <td valign="top" class="name"><g:message code="user.email.label" default="Email" /></td>
 	                            <td valign="top" class="value">${fieldValue(bean: userInstance, field: "email")}</td>
 	                        </tr>
+	                        <tr class="prop">
+	                            <td valign="top" class="name"><g:message code="user.locale.label" default="Locale" /></td>
+	                            <td valign="top" class="value">${fieldValue(bean: userInstance, field: "locale.displayName")}</td>
+	                        </tr>
+	                        
 	                        <!-- 
 	                        <tr class="prop">
 	                            <td valign="top" class="name"><g:message code="user.roles.label" default="Roles" /></td>

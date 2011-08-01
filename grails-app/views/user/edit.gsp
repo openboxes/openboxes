@@ -98,6 +98,14 @@
 	                            </tr>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
+	                                  <label for="locale"><g:message code="user.locale.label" default="Locale" /></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'locale', 'errors')}">
+	                                    <g:select name="locale" from="${org.pih.warehouse.core.Constants.SUPPORTED_LOCALES}" optionValue="displayName" value="${userInstance?.locale}" noSelection="['':'']"/>
+	                                </td>
+	                            </tr>
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
 	                                  <label for="email"><g:message code="user.email.label" default="Active" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'active', 'errors')}">

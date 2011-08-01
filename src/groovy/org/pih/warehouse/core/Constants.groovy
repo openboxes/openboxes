@@ -8,6 +8,8 @@ class Constants {
 	static final String DEFAULT_TIME_FORMAT = "HH:mm:ss z"
 	static final String DEFAULT_MONTH_YEAR_DATE_FORMAT = "MMM yyyy"
 	
+	static final Locale [] SUPPORTED_LOCALES = [new Locale('en'), new Locale('fr'), new Locale('ht')]  
+	
 	static final String DEFAULT_WEIGHT_UNITS = "lbs"
 	static final String DEFAULT_VOLUME_UNITS = "ft"
 	

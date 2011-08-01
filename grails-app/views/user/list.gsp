@@ -25,7 +25,8 @@
                             <g:sortableColumn property="id" title="${message(code: 'user.id.label', default: 'Id')}" />
                             <g:sortableColumn property="username" title="${message(code: 'user.username.label', default: 'Username')}" />
                             <g:sortableColumn property="name" title="${message(code: 'user.name.label', default: 'Name')}" />
-                            <g:sortableColumn property="email" title="${message(code: 'user.name.label', default: 'Email')}" />
+                            <g:sortableColumn property="email" title="${message(code: 'user.email.label', default: 'Email')}" />
+                            <g:sortableColumn property="locale" title="${message(code: 'user.locale.label', default: 'Locale')}" />
                         <!--      <g:sortableColumn property="email" title="${message(code: 'user.role.label', default: 'Roles')}" />  -->
                             <g:sortableColumn property="active" title="${message(code: 'user.active.label', default: 'Active')}" />
                         </tr>
@@ -37,6 +38,7 @@
                             <td><g:link action="show" id="${userInstance.id}">${fieldValue(bean: userInstance, field: "username")}</g:link></td>
                             <td>${fieldValue(bean: userInstance, field: "name")}</td>
                             <td>${fieldValue(bean: userInstance, field: "email")}</td>
+                            <td>${fieldValue(bean: userInstance, field: "locale.displayName")}</td>
                    <!--          <td>${fieldValue(bean: userInstance, field: "roles")}</td>  -->
                             <td>
                             	<g:if test="${userInstance?.active }">Y</g:if>
