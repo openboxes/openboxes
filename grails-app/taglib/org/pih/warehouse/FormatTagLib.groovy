@@ -69,13 +69,23 @@ class FormatTagLib {
 	 }
 
 	 /**
-	  * Localizes a string
-	  * TODO: change to metadata
+	  * Custom tag to display a product
 	  */
 	 def product = { attrs ->		 
 	 	if (attrs.product != null) {
 			 // default format is to display the localized name of the product 
 			 out << localizationService.getLocalizedString(attrs.product.name)
+		 }
+		 // TODO: add more formats
+	 }
+	 
+	 /**
+	  * Custom tag to display warehouse metadata
+	  */
+	 def metadata = { attrs ->
+		 if (attrs.obj != null) {
+			 // default format is to display the localized name of the product
+			 out << localizationService.getLocalizedString(attrs.obj.name)
 		 }
 	 }
  }
