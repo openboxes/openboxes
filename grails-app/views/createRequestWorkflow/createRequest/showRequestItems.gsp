@@ -2,7 +2,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
-<title>Add request items</title>
+<title><warehouse:message code="request.addRequestItems.label"/></title>
 </head>
 <body>
 	<div class="body">
@@ -24,7 +24,7 @@
 					<tr>
 						<td >
 							<div style="margin: 10px">
-								<p>There are ${(requestInstance?.requestItems)?requestInstance?.requestItems?.size():0 } items in this request.</p>
+								<p><warehouse:message code="request.itemCount.message" args="[(requestInstance?.requestItems)?requestInstance?.requestItems?.size():0]"/>
 							</div>							
 						
 							
@@ -32,10 +32,10 @@
 								<table style="">
 									<thead>
 										<tr class="odd">
-											<th>Actions</th>
-											<g:sortableColumn property="quantity" title="Quantity" />
-											<g:sortableColumn property="name" title="Name" />
-											<g:sortableColumn property="type" title="Type" />
+											<th><warehouse:message code="default.actions.label"/></th>
+											<g:sortableColumn property="quantity" title="${warehouse.message(code:'default.quantity.label')}" />
+											<g:sortableColumn property="name" title="${warehouse.message(code:'default.name.label')}" />
+											<g:sortableColumn property="type" title="${warehouse.message(code:'request.type.label')}" />
 										</tr>
 									</thead>
 									<tbody>
@@ -81,9 +81,9 @@
 							<div class="dialog">
 								<div class="tabs">
 									<ul>
-										<li><a href="#Product">Product</a></li>
-										<li><a href="#Category">Category</a></li>
-										<li><a href="#Unclassified">Unclassified</a></li> 
+										<li><a href="#Product"><warehouse:message code="product.label"/></a></li>
+										<li><a href="#Category"><warehouse:message code="category.label"/></a></li>
+										<li><a href="#Unclassified"><warehouse:message code="default.unclassified.label"/></a></li> 
 									</ul>
 									<div id="Product">
 										<g:form action="createRequest" method="post">
@@ -93,7 +93,7 @@
 											<table>
 												<tbody>
 													<tr class='prop'>
-														<td valign='top' class='name'><label for='product.id'>Product:</label></td>
+														<td valign='top' class='name'><label for='product.id'><warehouse:message code="product.label"/>:</label></td>
 														<td valign='top' class='value' nowrap="nowrap">
 															<%-- 
 															<div class="ui-widget">
@@ -105,7 +105,7 @@
 														</td>
 													</tr>
 													<tr class='prop'>
-														<td valign='top' class='name'><label for='quantity'>Quantity:</label></td>
+														<td valign='top' class='name'><label for='quantity'><warehouse:message code="default.quantity.label"/>:</label></td>
 														<td valign='top' class='value'>
 															<input type="text" name='quantity' value="${requestItem?.quantity }" size="5" />
 														</td>
@@ -116,12 +116,12 @@
 															<div class="buttons">
 																<g:if test="${requestItem?.id }">
 																	<span class="formButton"> 
-																		<g:submitButton name="addItem" value="Update Item"></g:submitButton> 
+																		<g:submitButton name="addItem" value="${warehouse.message(code:'default.button.updateItem.label')}"></g:submitButton> 
 																	</span>
 																</g:if>
 																<g:else>
 																	<span class="formButton"> 
-																		<g:submitButton name="addItem" value="Add Item"></g:submitButton> 
+																		<g:submitButton name="addItem" value="${warehouse.message(code:'default.button.addItem.label')}"></g:submitButton> 
 																	</span>
 																</g:else>
 															</div>
@@ -137,7 +137,7 @@
 											<table>
 												<tbody>
 													<tr class='prop'>
-														<td valign='top' class='name'><label for='source'>Category:</label>
+														<td valign='top' class='name'><label for='source'><warehouse:message code="category.label"/>:</label>
 														</td>
 														<td valign='top' class='value'>													
 															<div class="ui-widget"> 
@@ -150,7 +150,7 @@
 														</td>
 													</tr>
 													<tr class='prop'>
-														<td valign='top' class='name'><label for='quantity'>Quantity:</label></td>
+														<td valign='top' class='name'><label for='quantity'><warehouse:message code="default.quantity.label"/>:</label></td>
 														<td valign='top' class='value'>
 															<input type="text" name='quantity' value="${requestItem?.quantity }" size="5" />
 														</td>
@@ -159,7 +159,7 @@
 														<td valign="top" colspan="2">
 															<div class="buttons">
 																<span class="formButton"> 
-																	<g:submitButton name="addItem" value="Add Item"></g:submitButton> 
+																	<g:submitButton name="addItem" value="${warehouse.message(code:'default.button.addItem.label')}"></g:submitButton> 
 																</span>
 															</div>
 														</td>
@@ -174,14 +174,14 @@
 											<table>
 												<tbody>
 													<tr class='prop'>
-														<td valign='top' class='name'><label for='description'>Description:</label>
+														<td valign='top' class='name'><label for='description'><warehouse:message code="default.description.label"/>:</label>
 														</td>
 														<td valign='top' class='value'>
 															<input type="text" name='description' value="" size="30" />
 														</td>
 													</tr>
 													<tr class='prop'>
-														<td valign='top' class='name'><label for='quantity'>Quantity:</label></td>
+														<td valign='top' class='name'><label for='quantity'><warehouse:message code="default.quantity.label"/>:</label></td>
 														<td valign='top' class='value'>
 															<input type="text" name='quantity' value="${requestItem?.quantity }" size="5" />
 														</td>
@@ -190,7 +190,7 @@
 														<td valign="top" class="value" colspan="2">
 															<div class="buttons">
 																<span class="formButton"> 
-																	<g:submitButton name="addItem" value="Add Item"></g:submitButton> 
+																	<g:submitButton name="addItem" value="${warehouse.message(code:'default.button.addItem.label')}"></g:submitButton> 
 																</span>
 															</div>
 														</td>
@@ -207,9 +207,9 @@
 
 				<g:form action="createRequest" autocomplete="false">
 					<div class="buttons" style="border-top: 1px solid lightgrey;">
-						<g:submitButton name="back" value="Back"></g:submitButton>
-						<g:submitButton name="next" value="Next"></g:submitButton>
-						<g:link action="createRequest" event="cancel">Cancel</g:link>
+						<g:submitButton name="back" value="${warehouse.message(code:'default.button.back.label')}"></g:submitButton>
+						<g:submitButton name="next" value="${warehouse.message(code:'default.button.next.label')}"></g:submitButton>
+						<g:link action="createRequest" event="cancel"><warehouse:message code="default.button.cancel.label"/></g:link>
 					</div>
 				</g:form>
 				

@@ -144,7 +144,7 @@
 			</li>
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="category" action="tree"><warehouse:message code="category.label"/></g:link>
+					<g:link controller="category" action="tree"><warehouse:message code="category.productCategories.label"/></g:link>
 				</span>
 			</li>
 			<li class="">

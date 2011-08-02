@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
-<title>Confirm Order</title>
+<title><warehouse:message code="request.confirmOrder.label"/></title>
 </head>
 <body>
 	<div class="body">
@@ -28,7 +28,7 @@
 					<table>
 						<tbody>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for='id'>Order Number:</label></td>
+								<td valign='top' class='name'><label for='id'><warehouse:message code="request.orderNumber.label"/>:</label></td>
 								<td valign='top' class='value'>
 									<g:if test="${requestInstance?.requestNumber }">
 										${requestInstance?.requestNumber }
@@ -39,31 +39,31 @@
 								</td>
 							</tr>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for='description'>Description:</label></td>
+								<td valign='top' class='name'><label for='description'><warehouse:message code="default.description.label"/>:</label></td>
 								<td valign='top' class='value'>
 									${requestInstance?.description?.encodeAsHTML()}
 								</td>
 							</tr>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for='source'>Ordered from:</label></td>
+								<td valign='top' class='name'><label for='source'><warehouse:message code="request.orderedFrom.label"/>:</label></td>
 								<td valign='top' class='value'>
 									${requestInstance?.origin?.name?.encodeAsHTML()}
 								</td>
 							</tr>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for="destination">Ordered for:</label></td>
+								<td valign='top' class='name'><label for="destination"><warehouse:message code="request.orderedFor.label"/>:</label></td>
 								<td valign='top' class='value'>
 									${requestInstance?.destination?.name?.encodeAsHTML()}
 								</td>
 							</tr>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for='dateRequested'>Requested date:</label></td>
+								<td valign='top' class='name'><label for='dateRequested'><warehouse:message code="request.date.label"/>:</label></td>
 								<td valign='top' class='value'>								
 									<format:date obj="${requestInstance?.dateRequested }"/>
 								</td>
 							</tr>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for='requestedBy'>Ordered by:</label></td>
+								<td valign='top' class='name'><label for='requestedBy'><warehouse:message code="request.orderedBy.label"/>:</label></td>
 								<td valign='top'class='value'>
 									${requestInstance?.requestedBy?.name }
 								</td>
@@ -75,9 +75,9 @@
 										<table>
 											<thead>
 												<tr class="odd">
-													<g:sortableColumn property="type" title="Type" />
-													<g:sortableColumn property="name" title="Name" />
-													<g:sortableColumn property="quantity" title="Quantity" />
+													<g:sortableColumn property="type" title="${warehouse.message(code:'request.type.label')}" />
+													<g:sortableColumn property="name" title="${warehouse.message(code:'default.name.label')}" />
+													<g:sortableColumn property="quantity" title="${warehouse.message(code:'default.quantity.label')}" />
 													<th></th>
 												</tr>
 											</thead>
@@ -86,13 +86,13 @@
 													<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 														<td>
 															<g:if test="${requestItem?.product }">
-																Product
+																<warehouse:message code="product.label"/>
 															</g:if>
 															<g:elseif test="${requestItem?.category }">
-																Category
+																<warehouse:message code="product.category"/>
 															</g:elseif>							
 															<g:else>
-																Unclassified											
+																<warehouse:message code="default.unclassified.label"/>											
 															</g:else>
 														</td>
 														<td>
@@ -108,7 +108,7 @@
 										</table>
 									</g:if>
 									<g:else>
-										<span class="fade">No items</span>
+										<span class="fade"><warehouse:message code="default.noItems.label"/></span>
 									</g:else>
 	                            </td>
 	                        </tr>
@@ -116,9 +116,9 @@
 					</table>
 					<div class="buttons">
 						<span class="formButton"> 
-							<g:submitButton name="back" value="Back"></g:submitButton> 
-							<g:submitButton name="finish" value="Finish"></g:submitButton>
-							<g:link action="createRequest" event="cancel">Cancel</g:link>
+							<g:submitButton name="back" value="${warehouse.message(code:'default.button.back.label')}"></g:submitButton> 
+							<g:submitButton name="finish" value="${warehouse.message(code:'default.button.finish.label')}"></g:submitButton>
+							<g:link action="createRequest" event="cancel"><warehouse:message code="default.button.cancel.label"/></g:link>
 						</span>
 					</div>
 				</fieldset>
