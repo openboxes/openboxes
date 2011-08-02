@@ -122,7 +122,7 @@
 						           							<g:each var="child" in="${categoryInstance?.categories }" status="status">
 						           								<tr>
 									           						<td>
-									           							<g:link action="tree" id="${child.id }">${child?.name }</g:link>
+									           							<g:link action="tree" id="${child.id }"><format:category category="${child}"/></g:link>
 									           						</td>
 						           								</tr>
 									           				</g:each>
@@ -138,7 +138,7 @@
 						           							<g:each var="product" in="${categoryInstance?.products }" status="status">
 						           								<tr>
 																	<td>
-																		<g:link controller="product" action="edit" id="${product?.id}" target="_blank">${product?.name }</g:link>
+																		<g:link controller="product" action="edit" id="${product?.id}" target="_blank"><format:product product="${product}"/></g:link>
 																	</td>
 						           								</tr>
 									           				</g:each>
@@ -210,8 +210,8 @@
 								<td>
 									<div style="padding-left: 25px;">
 										<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_white.png')}" alt="Bullet" /> &nbsp;										 
-										<g:if test="${!category.parentCategory }"><b>${category.name }</b></g:if> 
-										<g:else>${category.name }</g:else>
+										<g:if test="${!category.parentCategory }"><b><format:category category="${category}"/></b></g:if> 
+										<g:else><format:category category="${category}"/></g:else>
 										<g:link class="new" action="create" params="['parentCategory.id':category.id]"><warehouse:message code="default.add.label" args="[entityName]"/></g:link>
 										| 
 										<g:link class="new" action="delete" params="['category.id':category.id]"><warehouse:message code="default.delete.label" args="[entityName]"/></g:link>
@@ -225,10 +225,10 @@
 											<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_white.png')}" alt="Bullet" /> &nbsp;
 											
 											<g:if test="${!childCategory.parentCategory }">
-												<b>${childCategory.name }</b>
+												<b><format:category category="${childCategory}"/></b>
 											</g:if>
 											<g:else>
-												${childCategory.name }
+												<format:category category="${childCategory}"/>
 											</g:else>
 											<g:link class="new" action="create" params="['parentCategory.id':childCategory.id]"><warehouse:message code="default.add.label" args="[entityName]"/></g:link>
 											| 

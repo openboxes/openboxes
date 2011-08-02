@@ -3,8 +3,8 @@
 	<g:set var="productCount" value="${category?.products?.size() }"/>		
 	<option value="${category?.id ?: 'null' }" ${(category?.id && category?.id == selected?.id) ? 'selected' : '' }>
 		${ new String("&nbsp").multiply(2*(level)) } 
-		<g:if test="${!category.parentCategory}">${category.name } </g:if>
-		<g:else>${category?.name }</g:else>
+		<g:if test="${!category.parentCategory}"><format:category category="${category}"/> </g:if>
+		<g:else><format:category category="${category}"/></g:else>
 		<g:if test="${productCount > 0 }">
 			<span class="fade">(${productCount })</span>
 		</g:if>
@@ -18,8 +18,8 @@
 	<g:set var="productCount" value="${category?.products?.size() }"/>		
 	<option value="${category?.id }" ${(category?.id == selected?.id)?'selected':'' }>
 		${ new String("&nbsp").multiply(2*(level)) } 
-		<g:if test="${!category?.parentCategory}">${category?.name } </g:if>
-		<g:else>${category?.name }</g:else>
+		<g:if test="${!category?.parentCategory}"><format:category category="${category}"/> </g:if>
+		<g:else><format:category category="${category}"/></g:else>
 		<g:if test="${productCount > 0 }">
 			<span class="fade">(${productCount })</span>
 		</g:if>

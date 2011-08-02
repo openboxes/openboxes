@@ -80,11 +80,21 @@ class FormatTagLib {
 	 }
 	 
 	 /**
+	 * Custom tag to display a category
+	 */
+	def category = { attrs ->
+		if (attrs.category != null) {
+			// default format is to display the localized name of the catergory
+			out << localizationService.getLocalizedString(attrs.category.name)
+		}
+		// TODO: add more formats
+	}
+	 
+	 /**
 	  * Custom tag to display warehouse metadata
 	  */
 	 def metadata = { attrs ->
 		 if (attrs.obj != null) {
-			 // default format is to display the localized name of the product
 			 out << localizationService.getLocalizedString(attrs.obj.name)
 		 }
 	 }
