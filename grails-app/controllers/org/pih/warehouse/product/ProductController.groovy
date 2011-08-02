@@ -139,7 +139,7 @@ class ProductController {
 		def inventoryInstance = warehouseInstance?.inventory;
 		
 		if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
-            flash.message = "${message(code: 'default.created.message', args: [message(code: 'product.label', default: 'Product'), productInstance.name])}"
+            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'product.label', default: 'Product'), productInstance.name])}"
 			redirect(controller: "inventoryItem", action: "recordInventory", params: ['product.id':productInstance.id, 'inventory.id': inventoryInstance?.id])
             //redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id, params:params)
         }
@@ -151,7 +151,7 @@ class ProductController {
     def show = {
         def productInstance = Product.get(params.id)
         if (!productInstance) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
             redirect(controller: "inventoryItem", action: "browse")
         }
         else {
@@ -162,7 +162,7 @@ class ProductController {
     def edit = {
         def productInstance = Product.get(params.id)
         if (!productInstance) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
             redirect(controller: "inventoryItem", action: "browse")
         }
         else {
@@ -180,7 +180,7 @@ class ProductController {
             if (params.version) {
                 def version = params.version.toLong()
                 if (productInstance.version > version) {                    
-                    productInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'product.label', default: 'Product')] as Object[], "Another user has updated this Product while you were editing")
+                    productInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'product.label', default: 'Product')] as Object[], "Another user has updated this Product while you were editing")
                     render(view: "edit", model: [productInstance: productInstance])
                     return
                 }
@@ -217,7 +217,7 @@ class ProductController {
 			}
 			*/
             if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
-                flash.message = "${message(code: 'default.updated.message', args: [message(code: 'product.label', default: 'Product'), productInstance.name])}"
+                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product'), productInstance.name])}"
                 redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id, params:params)
             }
             else {
@@ -225,7 +225,7 @@ class ProductController {
             }
         }
         else {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
             redirect(controller: "inventoryItem", action: "browse")
         }
     }
@@ -241,16 +241,16 @@ class ProductController {
 	        	// now delete the actual product
 	            productInstance.delete(flush: true)
 	            
-	            flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
+	            flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
 	            redirect(controller: "product", action: "list")
 		      }
 		      catch (org.springframework.dao.DataIntegrityViolationException e) {
-	            flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
+	            flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
 	            redirect(action: "edit", id: params.id)
 		      }
         }
         else {
-            flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'product.label', default: 'Product'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
             redirect(action: "edit", id: params.id)
         }
     }

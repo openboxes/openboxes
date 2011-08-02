@@ -8,7 +8,7 @@
 						<input name="xlsFile" type="file" />
 				
 						<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="upload" /> 
-							${message(code: 'default.button.upload.label', default: 'Upload')}</button>
+							${warehouse.message(code: 'default.button.upload.label', default: 'Upload')}</button>
 					</td>
 				</tr>
 			</tbody>						

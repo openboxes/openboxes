@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'warehouse.label', default: 'Warehouse')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'warehouse.label', default: 'Warehouse')}" />
         <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.edit.label" args="[entityName]" /></content>
@@ -121,7 +121,7 @@
 										</button>
 										&nbsp;
 										<g:link action="list">
-											${message(code: 'default.button.cancel.label', default: 'Cancel')}						
+											${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}						
 										</g:link>			
 									</td>
 	                            </tr>

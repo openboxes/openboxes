@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'inventory.label', default: 'Inventory')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'inventory.label', default: 'Inventory')}" />
         <title><warehouse:message code="default.create.label" args="[entityName]" /></title>
 				
     </head>
@@ -27,7 +27,7 @@
             	<g:form>            
 	                <div class="buttons">
 	                	<g:hiddenField name="warehouse.id" value="${warehouseInstance?.id }"/>
-	                    <g:actionSubmit class="save" action="save" value="${message(code: 'default.button.create.label', default: 'Create')}" /></span>
+	                    <g:actionSubmit class="save" action="save" value="${warehouse.message(code: 'default.button.create.label', default: 'Create')}" /></span>
 	                </div>                            	
             	</g:form>
             </g:if>

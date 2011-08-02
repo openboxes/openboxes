@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="main" />
-        <g:set var="entityName" value="${message(code: 'stockCard.label', default: 'Manage Stock Card Entries')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'stockCard.label', default: 'Manage Stock Card Entries')}" />
         <title><warehouse:message code="default.manage.label" args="[entityName]" /></title>
     </head>
     <body>
@@ -93,7 +93,7 @@
                             <td>
 			      <div class="buttons">
 				<span class="button">
-				  <g:submitButton name="save" class="save" value="${message(code: 'default.button.save.label', default: 'Save')}" />
+				  <g:submitButton name="save" class="save" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
 				</span>
 			      </div>
 			    </td>

@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'transaction.label', default: 'Transaction')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'transaction.label', default: 'Transaction')}" />
         <title><warehouse:message code="default.show.label" args="[entityName]" /></title>    
         <style>
         	optgroup { font-weight: bold; } 
@@ -180,12 +180,12 @@
 							<div style="text-align: center; padding: 10px;" class="odd">
 								<button class="positive" name="_action_editTransaction" id="${transactionInstance?.id }">
 									<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" />
-								    &nbsp;${message(code: 'default.button.edit.label', default: 'Edit')}&nbsp;        						
+								    &nbsp;${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}&nbsp;        						
 								</button>
 								&nbsp;
-								<button class="negative" name="_action_deleteTransaction" id="${transactionInstance?.id }" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+								<button class="negative" name="_action_deleteTransaction" id="${transactionInstance?.id }" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
 			    					<img src="${createLinkTo(dir:'images/icons/silk',file:'bin.png')}" alt="Delete" />
-									&nbsp;${message(code: 'default.button.delete.label', default: 'Delete')}&nbsp;
+									&nbsp;${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}&nbsp;
 								</button>							
 							</div>
 						</fieldset>

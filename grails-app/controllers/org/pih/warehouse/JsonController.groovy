@@ -695,7 +695,7 @@ class JsonController {
 		if (!productInstance) {
 			productInstance = new Product(name: params.selectedItem.name);
 			if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
-				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'container.label', default: 'Product'), product.id])}"
+				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'container.label', default: 'Product'), product.id])}"
 				log.info("saved product")
 			}
 			else {

@@ -2,7 +2,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <title>${message(code: 'default.chooseWarehouse.label', default: 'Choose a warehouse to manage')}</title>
+        <title>${warehouse.message(code: 'default.chooseWarehouse.label', default: 'Choose a warehouse to manage')}</title>
     </head>
     <body>        
 		<style>

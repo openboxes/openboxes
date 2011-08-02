@@ -36,7 +36,7 @@
 								<td class="value">
 									<span class="buttons">
 										<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="upload" /> 
-											${message(code: 'default.button.upload.label', default: 'Upload')}</button>
+											${warehouse.message(code: 'default.button.upload.label', default: 'Upload')}</button>
 										<a href="${createLink(controller: "product", action: "browse")}" id="edit-origin-link" class="negative"> 
 											<img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="" /> Cancel </a>															
 									</span>						

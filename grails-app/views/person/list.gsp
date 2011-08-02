@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'person.label', default: 'Person')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'person.label', default: 'Person')}" />
         <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.list.label" args="[entityName]" /></content>
@@ -25,17 +25,17 @@
                     <thead>
                         <tr>
                         
-                            <g:sortableColumn property="id" title="${message(code: 'person.id.label', default: 'Id')}" />
+                            <g:sortableColumn property="id" title="${warehouse.message(code: 'person.id.label', default: 'Id')}" />
                         
-                            <g:sortableColumn property="type" title="${message(code: 'person.type.label', default: 'Type')}" />
+                            <g:sortableColumn property="type" title="${warehouse.message(code: 'person.type.label', default: 'Type')}" />
                                                     
-                            <g:sortableColumn property="firstName" title="${message(code: 'person.firstName.label', default: 'First Name')}" />
+                            <g:sortableColumn property="firstName" title="${warehouse.message(code: 'person.firstName.label', default: 'First Name')}" />
                         
-                            <g:sortableColumn property="lastName" title="${message(code: 'person.lastName.label', default: 'Last Name')}" />
+                            <g:sortableColumn property="lastName" title="${warehouse.message(code: 'person.lastName.label', default: 'Last Name')}" />
                         
-                            <g:sortableColumn property="email" title="${message(code: 'person.email.label', default: 'Email')}" />
+                            <g:sortableColumn property="email" title="${warehouse.message(code: 'person.email.label', default: 'Email')}" />
                         
-                            <g:sortableColumn property="phoneNumber" title="${message(code: 'person.phoneNumber.label', default: 'Phone Number')}" />
+                            <g:sortableColumn property="phoneNumber" title="${warehouse.message(code: 'person.phoneNumber.label', default: 'Phone Number')}" />
                         
                         </tr>
                     </thead>

@@ -50,7 +50,7 @@
 															<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}"/>
 														</g:link>
 														--%>
-														<g:link action="createRequest" id="${requestItem.id}" event="deleteItem" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+														<g:link action="createRequest" id="${requestItem.id}" event="deleteItem" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
 															<img src="${createLinkTo(dir:'images/icons/silk',file:'bin.png')}"/>
 														</g:link>
 													</g:if>

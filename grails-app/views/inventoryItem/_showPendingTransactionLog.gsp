@@ -10,19 +10,19 @@
 					<thead>
 						<tr class="odd prop">
 							<th>
-								${message(code: 'transaction.transactionDate.label', default: 'Date')}
+								${warehouse.message(code: 'transaction.transactionDate.label', default: 'Date')}
 							</th>
 							<th>
-								${message(code: 'transaction.transactionType.label', default: 'Type')}
+								${warehouse.message(code: 'transaction.transactionType.label', default: 'Type')}
 							</th>
 							<th>
-								${message(code: 'transaction.source.label', default: 'Source')}
+								${warehouse.message(code: 'transaction.source.label', default: 'Source')}
 							</th>
 							<th>
-								${message(code: 'transaction.destination.label', default: 'Destination')}
+								${warehouse.message(code: 'transaction.destination.label', default: 'Destination')}
 							</th>
 							<th style="text-align: center">
-								${message(code: 'transaction.quantityChange.label', default: 'Qty In/Out')}
+								${warehouse.message(code: 'transaction.quantityChange.label', default: 'Qty In/Out')}
 							</th>
 						</tr>
 

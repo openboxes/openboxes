@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'attribute.label', default: 'Attribute')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'attribute.label', default: 'Attribute')}" />
         <g:set var="createEdit" value="${attributeInstance?.id ? 'edit' : 'create'}"/>
         <title><warehouse:message code="default.${createEdit}.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
@@ -95,8 +95,8 @@
 		                        	<td valign="top"></td>
 		                        	<td valign="top">                        	
 						                <div class="buttons">
-						                    <g:actionSubmit class="save" action="save" value="${message(code: 'default.button.save.label', default: 'Save')}" />
-						                    <g:actionSubmit class="delete" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+						                    <g:actionSubmit class="save" action="save" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
+						                    <g:actionSubmit class="delete" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
 						                </div>
 						                
 						                <g:link action="list">&lsaquo; <warehouse:message code="attribute.backToAttributes.link"/></g:link>

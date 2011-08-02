@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
 <g:set var="entityName"
-	value="${message(code: 'transactions.label', default: 'Transactions')}" />
+	value="${warehouse.message(code: 'transactions.label', default: 'Transactions')}" />
 <title><warehouse:message code="default.show.label" args="[entityName]" /></title>
 </head>
 
@@ -67,19 +67,19 @@
 												<thead>
 													<tr>
 														<th>
-															${message(code: 'transaction.id.label', default: 'ID')}
+															${warehouse.message(code: 'transaction.id.label', default: 'ID')}
 														</th>
 														<th>
-															${message(code: 'transaction.transactionDate.label', default: 'Date')}
+															${warehouse.message(code: 'transaction.transactionDate.label', default: 'Date')}
 														</th>
 														<th>
-															${message(code: 'transaction.transactionType.label', default: 'Type')}
+															${warehouse.message(code: 'transaction.transactionType.label', default: 'Type')}
 														</th>
 														<th>
-															${message(code: 'transaction.transactionEntries.label', default: 'Entries')}
+															${warehouse.message(code: 'transaction.transactionEntries.label', default: 'Entries')}
 														</th>
 														<th>
-															${message(code: 'transaction.quantityChange.label', default: 'Qty +/-')}
+															${warehouse.message(code: 'transaction.quantityChange.label', default: 'Qty +/-')}
 														</th>
 													</tr>
 												</thead>

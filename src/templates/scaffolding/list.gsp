@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="\${message(code: '${domainClass.propertyName}.label', default: '${className}')}" />
+        <g:set var="entityName" value="\${warehouse.message(code: '${domainClass.propertyName}.label', default: '${className}')}" />
         <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.list.label" args="[entityName]" /></content>
@@ -32,7 +32,7 @@
                                     if (p.isAssociation()) { %>
                             <th><warehouse:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" /></th>
                    	    <%      } else { %>
-                            <g:sortableColumn property="${p.name}" title="\${message(code: '${domainClass.propertyName}.${p.name}.label', default: '${p.naturalName}')}" />
+                            <g:sortableColumn property="${p.name}" title="\${warehouse.message(code: '${domainClass.propertyName}.${p.name}.label', default: '${p.naturalName}')}" />
                         <%  }   }   } %>
                         </tr>
                     </thead>

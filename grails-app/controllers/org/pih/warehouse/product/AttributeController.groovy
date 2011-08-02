@@ -16,7 +16,7 @@ class AttributeController {
 	def show = {
 		def attributeInstance = Attribute.get(params.id)
 		if (!attributeInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'attribute.label', default: 'Attribute'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'attribute.label', default: 'Attribute'), params.id])}"
 			redirect(action: "list")
 		}
 		else {
@@ -33,7 +33,7 @@ class AttributeController {
 	def edit = {
 		def attributeInstance = Attribute.get(params.id)
 		if (!attributeInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'attribute.label', default: 'Attribute'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'attribute.label', default: 'Attribute'), params.id])}"
 			redirect(action: "list")
 		}
 		else {
@@ -54,7 +54,7 @@ class AttributeController {
 		if (params.version) {
 			def version = params.version.toLong()
 			if (attributeInstance.version > version) {
-				attributeInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'attribute.label', default: 'Attribute')] as Object[], "Another user has updated this Attribute while you were editing")
+				attributeInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'attribute.label', default: 'Attribute')] as Object[], "Another user has updated this Attribute while you were editing")
 				render(view: "edit", model: [attributeInstance: attributeInstance])
 				return
 			}
@@ -69,7 +69,7 @@ class AttributeController {
 		}
 		
         if (attributeInstance.save(flush: true)) {
-            flash.message = "${message(code: 'default.saved.message', args: [message(code: 'attribute.label', default: 'Attribute'), attributeInstance.id])}"
+            flash.message = "${warehouse.message(code: 'default.saved.message', args: [warehouse.message(code: 'attribute.label', default: 'Attribute'), attributeInstance.id])}"
             redirect(action: "show", id: attributeInstance.id)
         }
         else {
@@ -82,16 +82,16 @@ class AttributeController {
         if (attributeInstance) {
             try {
                 attributeInstance.delete(flush: true)
-                flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'attribute.label', default: 'Attribute'), params.id])}"
+                flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'attribute.label', default: 'Attribute'), params.id])}"
                 redirect(action: "list")
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
-                flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'attribute.label', default: 'Attribute'), params.id])}"
+                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'attribute.label', default: 'Attribute'), params.id])}"
                 redirect(action: "list", id: params.id)
             }
         }
         else {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'attribute.label', default: 'Attribute'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'attribute.label', default: 'Attribute'), params.id])}"
             redirect(action: "list")
         }
     }

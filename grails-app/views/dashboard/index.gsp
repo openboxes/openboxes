@@ -2,9 +2,9 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <title>${message(code: 'default.dashboard.label', default: 'Dashboard')}</title>
+        <title>${warehouse.message(code: 'default.dashboard.label', default: 'Dashboard')}</title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle">${message(code: 'default.dashboard.label', default: 'Dashboard')}</content>
+		<content tag="pageTitle">${warehouse.message(code: 'default.dashboard.label', default: 'Dashboard')}</content>
     </head>
     <body>        
 		<div class="body">				

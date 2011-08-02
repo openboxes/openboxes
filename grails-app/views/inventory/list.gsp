@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'inventory.label', default: 'Inventory')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'inventory.label', default: 'Inventory')}" />
         <title><warehouse:message code="default.list.label" args="[entityName]" /></title>    
     </head>    
 
@@ -17,8 +17,8 @@
 				<table>
                     <thead>
                         <tr>   
-							<g:sortableColumn property="name" title="${message(code: 'warehouse.name.label', default: 'Name')}" />
-                            <g:sortableColumn property="manager" title="${message(code: 'warehouse.manager.label', default: 'Manager')}" />								
+							<g:sortableColumn property="name" title="${warehouse.message(code: 'warehouse.name.label', default: 'Name')}" />
+                            <g:sortableColumn property="manager" title="${warehouse.message(code: 'warehouse.manager.label', default: 'Manager')}" />								
 							<th>Actions</th>
                         </tr>
                     </thead>

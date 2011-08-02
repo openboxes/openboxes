@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'inventoryLevel.label', default: 'InventoryLevel')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel')}" />
         <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.list.label" args="[entityName]" /></content>
@@ -25,17 +25,17 @@
                     <thead>
                         <tr>
                         
-                            <g:sortableColumn property="id" title="${message(code: 'inventoryLevel.id.label', default: 'Id')}" />
+                            <g:sortableColumn property="id" title="${warehouse.message(code: 'inventoryLevel.id.label', default: 'Id')}" />
                         
                             <th><warehouse:message code="inventoryLevel.product.label" default="Product" /></th>
                    	    
-                            <g:sortableColumn property="supported" title="${message(code: 'inventoryLevel.supported.label', default: 'Supported')}" />
+                            <g:sortableColumn property="supported" title="${warehouse.message(code: 'inventoryLevel.supported.label', default: 'Supported')}" />
                         
-                            <g:sortableColumn property="minQuantity" title="${message(code: 'inventoryLevel.minQuantity.label', default: 'Min Quantity')}" />
+                            <g:sortableColumn property="minQuantity" title="${warehouse.message(code: 'inventoryLevel.minQuantity.label', default: 'Min Quantity')}" />
                         
-                            <g:sortableColumn property="reorderQuantity" title="${message(code: 'inventoryLevel.reorderQuantity.label', default: 'Reorder Quantity')}" />
+                            <g:sortableColumn property="reorderQuantity" title="${warehouse.message(code: 'inventoryLevel.reorderQuantity.label', default: 'Reorder Quantity')}" />
                         
-                            <g:sortableColumn property="dateCreated" title="${message(code: 'inventoryLevel.dateCreated.label', default: 'Date Created')}" />
+                            <g:sortableColumn property="dateCreated" title="${warehouse.message(code: 'inventoryLevel.dateCreated.label', default: 'Date Created')}" />
                         
                         </tr>
                     </thead>

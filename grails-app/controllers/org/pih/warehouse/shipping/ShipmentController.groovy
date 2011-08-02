@@ -66,7 +66,7 @@ class ShipmentController {
 				def shipmentEvent = new Event(eventType: eventType, eventLocation: session.warehouse, eventDate: new Date())
 				shipmentInstance.addToEvents(shipmentEvent).save(flush:true);
 			}
-			flash.message = "${message(code: 'default.created.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
+			flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 			redirect(action: "showDetails", id: shipmentInstance.id)
 		}
 		else {
@@ -84,7 +84,7 @@ class ShipmentController {
 			if (params.version) {
 				def version = params.version.toLong()
 				if (shipmentInstance.version > version) {					
-					shipmentInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'shipment.label', default: 'Shipment')] as Object[], "Another user has updated this Shipment while you were editing")
+					shipmentInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'shipment.label', default: 'Shipment')] as Object[], "Another user has updated this Shipment while you were editing")
 					render(view: "editDetails", model: [shipmentInstance: shipmentInstance])
 					return
 				}
@@ -157,7 +157,7 @@ class ShipmentController {
 			}
 			
 			if (!shipmentInstance.hasErrors() && shipmentInstance.save(flush: true)) {
-				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
+				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 				redirect(action: "showDetails", id: shipmentInstance.id)
 			}
 			else {
@@ -165,7 +165,7 @@ class ShipmentController {
 			}
 		}
 		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
 			redirect(action: "list")
 		}
 	}
@@ -175,7 +175,7 @@ class ShipmentController {
 	def showDetails = {
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
 			redirect(action: (params.type == "incoming") ? "listReceiving" : "listShipping")
 		}
 		else {
@@ -188,7 +188,7 @@ class ShipmentController {
 	def showDetailsAlt = {
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
 			redirect(action: (params.type == "incoming") ? "listReceiving" : "listShipping")
 		}
 		else {
@@ -200,7 +200,7 @@ class ShipmentController {
 		log.info params
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
 			redirect(action: (params.type == "incoming") ? "listReceiving" : "listShipping")
 		}
 		else {
@@ -211,7 +211,7 @@ class ShipmentController {
 	def sendShipment = {
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
 			redirect(action: (params.type == "incoming") ? "listReceiving" : "listShipping")
 		}
 		else {
@@ -234,7 +234,7 @@ class ShipmentController {
 												Date.parse("MM/dd/yyyy", params.actualShippingDate), emailRecipients);
 				
 				if (!shipmentInstance.hasErrors()) { 
-					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
+					flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 					redirect(action: "showDetails", id: shipmentInstance?.id)
 				}
 			}
@@ -249,7 +249,7 @@ class ShipmentController {
 	def deleteShipment = {
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
 			redirect(controller: "dashboard", action: "index");
 			return;
 		}
@@ -264,7 +264,7 @@ class ShipmentController {
 					//tx.setRollbackOnly();
 				}
 				
-				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
+				flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 				redirect(controller: "dashboard", action: "index")
 				return;
 			}
@@ -278,7 +278,7 @@ class ShipmentController {
 		def shipmentInstance = Shipment.get(params.shipmentId)		
 		
 		if (!shipmentInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
 			redirect(action: "listReceiving")
 		}
 		else {			
@@ -299,7 +299,7 @@ class ShipmentController {
 				shipmentService.receiveShipment(shipmentInstance, params.comment, session.user, session.warehouse);
 				
 				if (!shipmentInstance.hasErrors()) {
-					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
+					flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 					redirect(action: "showDetails", id: shipmentInstance?.id)
 					return
 				}
@@ -330,7 +330,7 @@ class ShipmentController {
 	def showPackingList = { 
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
 			redirect(action: (params.type == "incoming") ? "listReceiving" : "listShipping")
 		}
 		else {
@@ -341,7 +341,7 @@ class ShipmentController {
 	def downloadPackingList = { 
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
 			redirect(action: (params.type == "incoming") ? "listReceiving" : "listShipping")
 		}
 		else {
@@ -408,7 +408,7 @@ class ShipmentController {
 		def containerInstance = Container.get(params?.container?.id);
 		
 		if (!shipmentInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
 			redirect(action: (params.type == "incoming") ? "listReceiving" : "listShipping")
 		}
 		else {
@@ -550,7 +550,7 @@ class ShipmentController {
 		if (!product) { 			
 			product = new Product(name: params.selectedItem.name);			
 			if (!product.hasErrors() && product.save(flush: true)) {
-				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'container.label', default: 'Product'), product.id])}"
+				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'container.label', default: 'Product'), product.id])}"
 				//redirect(action: "editContents", id: shipment.id, params: ["container.id": container?.id])
 			}
 			else {
@@ -646,7 +646,7 @@ class ShipmentController {
 			}
 			
 			if (!containerInstance.hasErrors() && containerInstance.save(flush: true)) {
-				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'container.label', default: 'Container'), containerInstance.id])}"
+				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'container.label', default: 'Container'), containerInstance.id])}"
 				redirect(action: "editContents", id: shipmentInstance.id, params: ["container.id" : params.containerId])
 			}
 			else {
@@ -656,7 +656,7 @@ class ShipmentController {
 			}
 		}
 		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'container.label', default: 'Container'), params.containerId])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'container.label', default: 'Container'), params.containerId])}"
 			redirect(action: "showDetails", id: shipmentInstance.id, params: ["containerId" : params.containerId])
 			//redirect(action: "list")
 		}
@@ -716,7 +716,7 @@ class ShipmentController {
 			documentInstance = new Document();
 		}
 		if (!shipmentInstance) { 
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
 			redirect(action: "listShipping")
 		}
 		render(view: "addDocument", model: [shipmentInstance : shipmentInstance, documentInstance : documentInstance]);
@@ -726,11 +726,11 @@ class ShipmentController {
 		def shipmentInstance = Shipment.get(params?.shipmentId);
 		def documentInstance = Document.get(params?.documentId);
 		if (!shipmentInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Shipment'), params.shipmentId])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.shipmentId])}"
 			redirect(action: "listShipping")
 		}
 		if (!documentInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipment.label', default: 'Document'), params.documentId])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Document'), params.documentId])}"
 			redirect(action: "showDetails", id: shipmentInstance?.id)
 		}
 		render(view: "addDocument", model: [shipmentInstance : shipmentInstance, documentInstance : documentInstance]);
@@ -791,7 +791,7 @@ class ShipmentController {
 		if (containerInstance && shipmentInstance) {	
 			shipmentInstance.addToContainers(containerInstance);
 			if (!shipmentInstance.hasErrors() && shipmentInstance.save(flush: true)) {
-				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'container.label', default: 'Container'), containerInstance.id])}"
+				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'container.label', default: 'Container'), containerInstance.id])}"
 				if (parentContainerInstance) { 
 					parentContainerInstance.addToContainers(containerInstance).save(flush: true);
 				}
@@ -921,7 +921,7 @@ class ShipmentController {
 		def shipmentInstance = Shipment.get(params.shipmentId)
 		
 		if (!eventInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
 			redirect(action: "showDetails", id: params.shipmentId)
 		}
 		
@@ -933,7 +933,7 @@ class ShipmentController {
 		def shipmentInstance = Shipment.get(params.id);
 		
 		if (!shipmentInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
 			redirect(action: "list")
 		}
 		

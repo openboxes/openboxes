@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'inventory.label', default: 'Inventory')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'inventory.label', default: 'Inventory')}" />
         <title><warehouse:message code="default.show.label" args="[entityName]" /></title>    
     </head>    
 
@@ -132,7 +132,7 @@
 																		<g:elseif test="${warning?.contains('info')}">
 																			<img src="${resource(dir: 'images/icons/silk', file: 'information.png') }" />
 																		</g:elseif>														
-																		&nbsp;${message(code: warning)}<br/>
+																		&nbsp;${warehouse.message(code: warning)}<br/>
 																	</li>
 																</g:each>
 															</ul>

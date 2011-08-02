@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'order.label', default: 'Order')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'order.label', default: 'Order')}" />
         <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.list.label" args="[entityName]" /></content>
@@ -23,13 +23,13 @@
 							<tr>
 								<th> </th>
 								<g:sortableColumn property="order"
-									title="${message(code: 'orderItem.order.label', default: 'Order')}" />
+									title="${warehouse.message(code: 'orderItem.order.label', default: 'Order')}" />
 					
 								<g:sortableColumn property="description"
-									title="${message(code: 'orderItem.description.label', default: 'Description')}" />
+									title="${warehouse.message(code: 'orderItem.description.label', default: 'Description')}" />
 									
 								<g:sortableColumn property="status"
-									title="${message(code: 'orderItem.status.label', default: 'Status')}" />
+									title="${warehouse.message(code: 'orderItem.status.label', default: 'Status')}" />
 									
 							</tr>
 						</thead>

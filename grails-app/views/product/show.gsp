@@ -4,7 +4,7 @@
 	<head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'product.label', default: 'Product')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'product.label', default: 'Product')}" />
         <title><warehouse:message code="default.show.label" args="[entityName]" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.show.label" args="[entityName]" /></content>
@@ -59,11 +59,11 @@
 						                    <g:hiddenField name="id" value="${productInstance?.id}" />
 						                    <g:link controller="product" action="edit" id="${productInstance.id}">
 							                    <img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Edit" />
-						    					${message(code: 'default.button.edit.label', default: 'Edit')}        
+						    					${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}        
 						                    </g:link>
-						                    <button class="negative" name="_action_delete" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+						                    <button class="negative" name="_action_delete" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
 						    					<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="Delete" />
-							                    ${message(code: 'default.button.delete.label', default: 'Delete')}
+							                    ${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}
 						                    </button> 
 						                </g:form>
 						            </div>            

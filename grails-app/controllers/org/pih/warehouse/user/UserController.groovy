@@ -44,7 +44,7 @@ class UserController {
     	log.info "attempt to save the user; show form with validation errors on failure"
         def userInstance = new User(params)
         if (userInstance.save(flush: true)) {
-            flash.message = "${message(code: 'default.created.message', args: [message(code: 'user.label', default: 'User'), userInstance.id])}"
+            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'user.label', default: 'User'), userInstance.id])}"
             redirect(action: "show", id: userInstance.id)
         }
         else {
@@ -60,7 +60,7 @@ class UserController {
     	log.info "show user"
         def userInstance = User.get(params.id)
         if (!userInstance) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
             redirect(action: "list")
         }
         else {
@@ -84,7 +84,7 @@ class UserController {
     	log.info "edit user"
         def userInstance = User.get(params.id)
         if (!userInstance) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
             redirect(action: "list")
         }
         else {
@@ -96,12 +96,12 @@ class UserController {
 	def toggleActivation = { 
 		def userInstance = User.get(params.id)
 		if (!userInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
 		}
 		else {			
 			userInstance.active = !userInstance.active;
 			if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
-				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), userInstance.id])}"
+				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label', default: 'User'), userInstance.id])}"
 				
 				// FIXME Refactor (place code in service layer)
 				// Send notification emails to all administrators
@@ -139,7 +139,7 @@ class UserController {
             if (params.version) {
                 def version = params.version.toLong()
                 if (userInstance.version > version) {
-                    userInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'user.label', default: 'User')] as Object[], "Another user has updated this User while you were editing")
+                    userInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'user.label', default: 'User')] as Object[], "Another user has updated this User while you were editing")
                     render(view: "edit", model: [userInstance: userInstance])
                     return
                 }
@@ -161,7 +161,7 @@ class UserController {
 			
 			
             if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
-                flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), userInstance.id])}"
+                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label', default: 'User'), userInstance.id])}"
                 redirect(action: "show", id: userInstance.id)
             }
             else {
@@ -169,7 +169,7 @@ class UserController {
             }
         }
         else {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
             redirect(action: "list")
         }
     }
@@ -181,23 +181,23 @@ class UserController {
         def userInstance = User.get(params.id)
         if (userInstance) {			
 			if (userInstance?.id == session?.user?.id) { 
-				flash.message = "${message(code: 'default.cannot.delete.self.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+				flash.message = "${warehouse.message(code: 'default.cannot.delete.self.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
 				redirect(action: "show", id: params.id)
 			}
 			else { 			
 	            try {
 	                userInstance.delete(flush: true)
-	                flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+	                flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
 	                redirect(action: "list")
 	            }
 	            catch (org.springframework.dao.DataIntegrityViolationException e) {
-	                flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+	                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
 	                redirect(action: "show", id: params.id)
 	            }
 			}
         }
         else {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
             redirect(action: "list")
         }
     }
@@ -212,7 +212,7 @@ class UserController {
 			response.outputStream << image
 		} 
 		else { 
-			"${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+			"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
 		}
 	} 
 
@@ -225,7 +225,7 @@ class UserController {
 			if (!photo?.empty && photo.size < 1024*1000) { // not empty AND less than 1MB
 				userInstance.photo = photo.bytes;			
 		        if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
-		            flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), userInstance.id])}"
+		            flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label', default: 'User'), userInstance.id])}"
 		        }
 		        else {
 					// there were errors, the photo was not saved
@@ -234,7 +234,7 @@ class UserController {
             redirect(action: "show", id: userInstance.id)
 		} 
 		else { 
-			"${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+			"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
 		}
 	}
 

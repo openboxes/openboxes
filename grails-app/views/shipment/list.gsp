@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'shipment.label', default: 'Shipment')}" />
         <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.list.label" args="[entityName]" /></content>
@@ -62,10 +62,10 @@
 						<table>
 		                    <thead>
 		                        <tr style="height:20px">                        
-		                            <g:sortableColumn property="shipmentNumber" title="${message(code: 'shipment.shipmentNumber.label', default: 'Identifier')}" />                            
-		                            <g:sortableColumn property="name" title="${message(code: 'shipment.name.label', default: 'Name')}" />
-		                            <g:sortableColumn property="origin" title="${message(code: 'shipment.origin.label', default: 'Departing')}" />
-		                            <g:sortableColumn property="destination" title="${message(code: 'shipment.destination.label', default: 'Arriving')}" />
+		                            <g:sortableColumn property="shipmentNumber" title="${warehouse.message(code: 'shipment.shipmentNumber.label', default: 'Identifier')}" />                            
+		                            <g:sortableColumn property="name" title="${warehouse.message(code: 'shipment.name.label', default: 'Name')}" />
+		                            <g:sortableColumn property="origin" title="${warehouse.message(code: 'shipment.origin.label', default: 'Departing')}" />
+		                            <g:sortableColumn property="destination" title="${warehouse.message(code: 'shipment.destination.label', default: 'Arriving')}" />
 		                            <th><warehouse:message code="shipment.document.label" default="Documents" /></th>		                            
 		                        </tr>
 		                    </thead>

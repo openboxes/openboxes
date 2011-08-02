@@ -24,7 +24,7 @@ class InventoryLevelController {
     def save = {
         def inventoryLevelInstance = new InventoryLevel(params)
         if (inventoryLevelInstance.save(flush: true)) {
-            flash.message = "${message(code: 'default.created.message', args: [message(code: 'inventoryLevel.label', default: 'InventoryLevel'), inventoryLevelInstance.id])}"
+            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), inventoryLevelInstance.id])}"
             redirect(action: "list", id: inventoryLevelInstance.id)
         }
         else {
@@ -35,7 +35,7 @@ class InventoryLevelController {
     def show = {
         def inventoryLevelInstance = InventoryLevel.get(params.id)
         if (!inventoryLevelInstance) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
             redirect(action: "list")
         }
         else {
@@ -48,7 +48,7 @@ class InventoryLevelController {
 		def inventoryLevelInstance = InventoryLevel.findByProduct(productInstance)
         //def inventoryLevelInstance = InventoryLevel.get(params.id)
         if (!inventoryLevelInstance) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
             //redirect(action: "list")
 			redirect(action: "create")
         }
@@ -64,14 +64,14 @@ class InventoryLevelController {
                 def version = params.version.toLong()
                 if (inventoryLevelInstance.version > version) {
                     
-                    inventoryLevelInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'inventoryLevel.label', default: 'InventoryLevel')] as Object[], "Another user has updated this InventoryLevel while you were editing")
+                    inventoryLevelInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel')] as Object[], "Another user has updated this InventoryLevel while you were editing")
                     render(view: "edit", model: [inventoryLevelInstance: inventoryLevelInstance])
                     return
                 }
             }
             inventoryLevelInstance.properties = params
             if (!inventoryLevelInstance.hasErrors() && inventoryLevelInstance.save(flush: true)) {
-                flash.message = "${message(code: 'default.updated.message', args: [message(code: 'inventoryLevel.label', default: 'InventoryLevel'), inventoryLevelInstance.id])}"
+                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), inventoryLevelInstance.id])}"
                 redirect(action: "list", id: inventoryLevelInstance.id)
             }
             else {
@@ -79,7 +79,7 @@ class InventoryLevelController {
             }
         }
         else {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
             redirect(action: "list")
         }
     }
@@ -89,16 +89,16 @@ class InventoryLevelController {
         if (inventoryLevelInstance) {
             try {
                 inventoryLevelInstance.delete(flush: true)
-                flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
+                flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
                 redirect(action: "list")
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
-                flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
+                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
                 redirect(action: "list", id: params.id)
             }
         }
         else {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
             redirect(action: "list")
         }
     }

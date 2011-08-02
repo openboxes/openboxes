@@ -2,7 +2,7 @@
    <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipping')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'shipment.label', default: 'Shipping')}" />
         <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle">
@@ -68,11 +68,11 @@
 					<table>
 	                    <thead>
 	                        <tr>   
-								<g:sortableColumn property="shipmentType" title="${message(code: 'shipment.shipmentType.label', default: 'Type')}" />
-	                            <g:sortableColumn property="shipmentNumber" title="${message(code: 'shipment.shipmentNumber.label', default: 'Shipment')}" />								
-	                            <g:sortableColumn property="destination" title="${message(code: 'shipment.destination.label', default: 'Destination')}" />
-	                       		<th><a href="">${message(code: 'shipment.status.label', default: 'Status')}</a></th>
-	                         	<th><a href="">${message(code: 'shipment.documents.label', default: 'Documents')}</a></th>                   
+								<g:sortableColumn property="shipmentType" title="${warehouse.message(code: 'shipment.shipmentType.label', default: 'Type')}" />
+	                            <g:sortableColumn property="shipmentNumber" title="${warehouse.message(code: 'shipment.shipmentNumber.label', default: 'Shipment')}" />								
+	                            <g:sortableColumn property="destination" title="${warehouse.message(code: 'shipment.destination.label', default: 'Destination')}" />
+	                       		<th><a href="">${warehouse.message(code: 'shipment.status.label', default: 'Status')}</a></th>
+	                         	<th><a href="">${warehouse.message(code: 'shipment.documents.label', default: 'Documents')}</a></th>                   
 	                        </tr>
 	                    </thead>
 	                   

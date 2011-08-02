@@ -4,7 +4,7 @@
 	<head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'product.label', default: 'Product')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'product.label', default: 'Product')}" />
         
         <g:if test="${productInstance?.id}">
 	        <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
@@ -174,17 +174,17 @@
 								<td>
 									<button type="submit" class="positive"><img
 										src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
-										alt="Save" /> ${message(code: 'default.button.save.label', default: 'Save')}
+										alt="Save" /> ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
 									</button>
 									&nbsp;
 									<!-- we only can delete products that 1) exist, and 2) dont have associated transaction entries or shipment items -->
 									<g:if test="${productInstance.id && !productInstance.hasAssociatedTransactionEntriesOrShipmentItems()}">
-									<g:link action="delete" id="${productInstance.id}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"> 
-							                <button type="button" class="negative"><img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="Delete" /> ${message(code: 'default.button.delete.label', default: 'Delete')}</button></g:link>
+									<g:link action="delete" id="${productInstance.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"> 
+							                <button type="button" class="negative"><img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="Delete" /> ${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}</button></g:link>
 									</g:if>
 									&nbsp;
 									<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="negative">			
-										${message(code: 'default.button.cancel.label', default: 'Cancel')}			
+										${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}			
 									</g:link>  
 								</td>
 							</tr>

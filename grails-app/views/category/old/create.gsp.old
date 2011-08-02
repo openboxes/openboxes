@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'category.label', default: 'Category')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'category.label', default: 'Category')}" />
         <title><warehouse:message code="default.create.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.create.label" args="[entityName]" /></content>
@@ -93,9 +93,9 @@
 		                        	<td valign="top"></td>
 		                        	<td valign="top">
 						                <div class="buttons">
-						                   <g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" />
+						                   <g:submitButton name="create" class="save" value="${warehouse.message(code: 'default.button.create.label', default: 'Create')}" />
 						                   
-						                   <g:link action="list">${message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
+						                   <g:link action="list">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
 						                   
 						                </div>                        	
 		                        	</td>

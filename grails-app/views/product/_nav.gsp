@@ -26,7 +26,7 @@
 				<g:textField name="nameContains" value="${params.nameContains}" size="30"/>		
 				<span class="buttons">
 					<button type="submit" class="positive">
-						${message(code: 'default.button.go.label', default: 'Go')}</button>
+						${warehouse.message(code: 'default.button.go.label', default: 'Go')}</button>
 				</span>											
 			</td>
 		</tr>

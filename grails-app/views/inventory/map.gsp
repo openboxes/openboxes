@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'product.label', default: 'Inventory')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'product.label', default: 'Inventory')}" />
         <title><warehouse:message code="default.browse.label" args="[entityName]" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.browse.label" args="[entityName]" /></content>
@@ -52,7 +52,7 @@
 													<td>
 														<span class="buttons">
 															<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Filter" /> 
-																${message(code: 'default.button.filter.label', default: 'Filter')}</button>
+																${warehouse.message(code: 'default.button.filter.label', default: 'Filter')}</button>
 														</span>											
 													</td>
 													
@@ -88,8 +88,8 @@
 							                <table width="100%">
 							                    <thead>
 							                        <tr>             
-							                            <g:sortableColumn property="name" title="${message(code: 'inventory.product.label', default: 'Product')}" />
-							                            <g:sortableColumn property="name" title="${message(code: 'inventory.quantity.label', default: 'Quantity')}" />
+							                            <g:sortableColumn property="name" title="${warehouse.message(code: 'inventory.product.label', default: 'Product')}" />
+							                            <g:sortableColumn property="name" title="${warehouse.message(code: 'inventory.quantity.label', default: 'Quantity')}" />
 							                        </tr>
 							                    </thead>
 							                    <tbody>

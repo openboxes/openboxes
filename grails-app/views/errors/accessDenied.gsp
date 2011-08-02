@@ -2,7 +2,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
-	<g:set var="entityName" value="${message(code: 'accessDenied.label', default: 'Access Denied')}" />
+	<g:set var="entityName" value="${warehouse.message(code: 'accessDenied.label', default: 'Access Denied')}" />
 	<title>Access Denied</title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<content tag="pageTitle">Access Denied</content>

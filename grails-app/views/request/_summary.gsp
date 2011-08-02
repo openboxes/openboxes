@@ -47,7 +47,7 @@
 							<g:elseif test="${!requestInstance?.isComplete() && requestInstance?.status == org.pih.warehouse.request.OrderStatus.PLACED }">
 								<g:link controller="receiveOrderWorkflow" action="receiveOrder" id="${requestInstance?.id}">
 									<button>
-										${message(code: 'request.receive.label', default: 'Receive request')}
+										${warehouse.message(code: 'request.receive.label', default: 'Receive request')}
 									</button> 
 								</g:link>										
 							</g:elseif>

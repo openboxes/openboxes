@@ -174,13 +174,13 @@ class InventoryController {
 	def save = {		
 		def warehouseInstance = Warehouse.get(params.warehouse?.id)
 		if (!warehouseInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'warehouse.label', default: 'Warehouse'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'warehouse.label', default: 'Warehouse'), params.id])}"
 			redirect(action: "list")
 		} else {  
 			warehouseInstance.inventory = new Inventory(params);
 			//inventoryInstance.warehouse = session.warehouse;
 			if (warehouseInstance.save(flush: true)) {
-				flash.message = "${message(code: 'default.created.message', args: [message(code: 'inventory.label', default: 'Inventory'), warehouseInstance.inventory.id])}"
+				flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory'), warehouseInstance.inventory.id])}"
 				redirect(action: "browse")
 			}
 			else {
@@ -195,7 +195,7 @@ class InventoryController {
 	def show = {
 		def inventoryInstance = Inventory.get(params.id)
 		if (!inventoryInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'inventory.label', default: 'Inventory'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory'), params.id])}"
 			redirect(action: "list")
 		}
 		else {
@@ -216,13 +216,13 @@ class InventoryController {
 		def productInstance = Product.get( params.product.id )
 
 		if (!productInstance) { 
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'product.label', default: 'Product'), params?.product?.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params?.product?.id])}"
 			redirect(action: "browse");
 		}
 		else { 
 			def itemInstance = new InventoryItem(product: productInstance)
 			if (!itemInstance.hasErrors() && itemInstance.save(flush: true)) {
-				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'inventory.label', default: 'Inventory'), inventoryInstance.id])}"
+				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory'), inventoryInstance.id])}"
 				redirect(action: "browse", id: inventoryInstance.id)
 			}
 			else {
@@ -237,7 +237,7 @@ class InventoryController {
 	def edit = {
 		def inventoryInstance = Inventory.get(params.id)
 		if (!inventoryInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'inventory.label', default: 'Inventory'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory'), params.id])}"
 			redirect(action: "list")
 		}
 		else {
@@ -253,7 +253,7 @@ class InventoryController {
 			if (params.version) {
 				def version = params.version.toLong()
 				if (inventoryInstance.version > version) {					
-					inventoryInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'inventory.label', default: 'Inventory')] as Object[], 
+					inventoryInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'inventory.label', default: 'Inventory')] as Object[], 
 						"Another user has updated this Inventory while you were editing")
 					render(view: "edit", model: [inventoryInstance: inventoryInstance])
 					return
@@ -261,7 +261,7 @@ class InventoryController {
 			}
 			inventoryInstance.properties = params
 			if (!inventoryInstance.hasErrors() && inventoryInstance.save(flush: true)) {
-				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'inventory.label', default: 'Inventory'), inventoryInstance.id])}"
+				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory'), inventoryInstance.id])}"
 				redirect(action: "browse", id: inventoryInstance.id)
 			}
 			else {
@@ -269,7 +269,7 @@ class InventoryController {
 			}
 		}
 		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'inventory.label', default: 'Inventory'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory'), params.id])}"
 			redirect(action: "list")
 		}
 	}
@@ -279,16 +279,16 @@ class InventoryController {
 		if (inventoryInstance) {
 			try {
 				inventoryInstance.delete(flush: true)
-				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'inventory.label', default: 'Inventory'), params.id])}"
+				flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory'), params.id])}"
 				redirect(action: "list")
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
-				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'inventory.label', default: 'Inventory'), params.id])}"
+				flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory'), params.id])}"
 				redirect(action: "show", id: params.id)
 			}
 		}
 		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'inventory.label', default: 'Inventory'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory'), params.id])}"
 			redirect(action: "list")
 		}
 	}
@@ -298,19 +298,19 @@ class InventoryController {
 		def productInstance = Product.get(params?.product?.id);
 		def itemInstance = inventoryService.findByProductAndLotNumber(productInstance, params.lotNumber)
 		if (itemInstance) {
-			flash.message = "${message(code: 'default.alreadyExists.message', args: [message(code: 'inventory.label', default: 'Inventory item'), inventoryInstance.id])}"
+			flash.message = "${warehouse.message(code: 'default.alreadyExists.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory item'), inventoryInstance.id])}"
 			redirect(action: "show", id: inventoryInstance.id)
 		}
 		else {
 			itemInstance = new InventoryItem(params)
 			if (itemInstance.hasErrors() || !itemInstance.save(flush:true)) {
-				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'inventory.label', default: 'Inventory item'), inventoryInstance.id])}"
+				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory item'), inventoryInstance.id])}"
 				redirect(action: "show", id: inventoryInstance.id)				
 			}
 			else {
 				itemInstance.errors.each { println it }
 				//redirect(action: "show", id: inventoryInstance.id)
-				flash.message = "${message(code: 'default.notUpdated.message', args: [message(code: 'inventory.label', default: 'Inventory item'), inventoryInstance.id])}"
+				flash.message = "${warehouse.message(code: 'default.notUpdated.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory item'), inventoryInstance.id])}"
 				render(view: "show", model: [inventoryInstance: inventoryInstance, itemInstance : itemInstance])
 			}
 		}
@@ -321,16 +321,16 @@ class InventoryController {
 		if (itemInstance) {
 			try {
 				itemInstance.delete(flush: true)
-				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'inventoryItem.label', default: 'Inventory item'), params.id])}"
+				flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), params.id])}"
 				redirect(action: "show", id: params.inventory.id)
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
-				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'inventoryItem.label', default: 'Inventory item'), params.id])}"
+				flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), params.id])}"
 				redirect(action: "show", id: params.inventory.id)
 			}
 		}
 		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'inventory.label', default: 'Inventory'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory'), params.id])}"
 			redirect(action: "show", id: params.inventory.id)
 		}
 
@@ -420,16 +420,16 @@ class InventoryController {
 				else {
 					transactionInstance.delete(flush: true)
 				}
-				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'transaction.label', default: 'Transaction'), params.id])}"
+				flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'transaction.label', default: 'Transaction'), params.id])}"
 				redirect(action: "listTransactions")
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
-				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'transaction.label', default: 'Transaction'), params.id])}"
+				flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'transaction.label', default: 'Transaction'), params.id])}"
 				redirect(action: "editTransaction", id: params.id)
 			}
 		}
 		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'transaction.label', default: 'Transaction'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'transaction.label', default: 'Transaction'), params.id])}"
 			redirect(action: "listTransactions")
 		}
 	}

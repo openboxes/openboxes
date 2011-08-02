@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'inventoryItem.label', default: 'Inventory Item')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'inventoryItem.label', default: 'Inventory Item')}" />
         <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
     </head>
     <body>
@@ -48,8 +48,8 @@
 							<tr class="prop">
 								<td colspan="2">
 									<div class="buttons" style="text-align: right;">
-					                    <g:actionSubmit class="save" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-					                    <g:actionSubmit class="delete" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+					                    <g:actionSubmit class="save" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
+					                    <g:actionSubmit class="delete" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
 				                    </div>
 								</td>
 							</tr>

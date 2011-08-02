@@ -3,7 +3,7 @@
    <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipping')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'shipment.label', default: 'Shipping')}" />
         <title>Shipments from <b>${session.warehouse.name}</b></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
 		
@@ -81,12 +81,12 @@
 								<table>
 				                    <thead>
 				                        <tr class="odd">   
-				                         	<th>${message(code: 'shipment.actions.label', default: 'Actions')}</th>
-				                        	<th>${message(code: 'shipment.shipmentType.label', default: 'Type')}</th>
-				                            <th>${message(code: 'shipment.shipment.label', default: 'Shipment')}</th>							
-				                            <th>${message(code: 'shipment.destination.label', default: 'Destination')}</th>
-				                        	<th>${message(code: 'shipment.expectedShippingDate.label', default: 'Shipping Date')}</th>
-				                         	<th>${message(code: 'shipment.status.label', default: 'Status')}</th>
+				                         	<th>${warehouse.message(code: 'shipment.actions.label', default: 'Actions')}</th>
+				                        	<th>${warehouse.message(code: 'shipment.shipmentType.label', default: 'Type')}</th>
+				                            <th>${warehouse.message(code: 'shipment.shipment.label', default: 'Shipment')}</th>							
+				                            <th>${warehouse.message(code: 'shipment.destination.label', default: 'Destination')}</th>
+				                        	<th>${warehouse.message(code: 'shipment.expectedShippingDate.label', default: 'Shipping Date')}</th>
+				                         	<th>${warehouse.message(code: 'shipment.status.label', default: 'Status')}</th>
 				                        </tr>
 				                    </thead>
 				                   	<tbody>

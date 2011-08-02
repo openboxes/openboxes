@@ -106,7 +106,7 @@ class CategoryController {
     def save = {
         def categoryInstance = new Category(params)
         if (categoryInstance.save(flush: true)) {
-            flash.message = "${message(code: 'default.created.message', args: [message(code: 'category.label', default: 'Category'), categoryInstance.id])}"
+            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'category.label', default: 'Category'), categoryInstance.id])}"
             redirect(action: "tree", id: categoryInstance.id)
         }
         else {
@@ -117,7 +117,7 @@ class CategoryController {
     def show = {
         def categoryInstance = Category.get(params.id)
         if (!categoryInstance) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'category.label', default: 'Category'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'category.label', default: 'Category'), params.id])}"
             redirect(action: "tree")
         }
         else {
@@ -129,7 +129,7 @@ class CategoryController {
         def categoryInstance = Category.get(params.id)
 
         if (!categoryInstance) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'category.label', default: 'Category'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'category.label', default: 'Category'), params.id])}"
             redirect(action: "tree")
         }
         else {
@@ -144,14 +144,14 @@ class CategoryController {
                 def version = params.version.toLong()
                 if (categoryInstance.version > version) {
                     
-                    categoryInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'category.label', default: 'Category')] as Object[], "Another user has updated this Category while you were editing")
+                    categoryInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'category.label', default: 'Category')] as Object[], "Another user has updated this Category while you were editing")
                     render(view: "edit", model: [categoryInstance: categoryInstance])
                     return
                 }
             }
             categoryInstance.properties = params
             if (!categoryInstance.hasErrors() && categoryInstance.save(flush: true)) {
-                flash.message = "${message(code: 'default.updated.message', args: [message(code: 'category.label', default: 'Category'), categoryInstance.id])}"
+                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'category.label', default: 'Category'), categoryInstance.id])}"
                 redirect(action: "tree", id: categoryInstance.id)
             }
             else {
@@ -159,7 +159,7 @@ class CategoryController {
             }
         }
         else {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'category.label', default: 'Category'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'category.label', default: 'Category'), params.id])}"
             redirect(action: "tree")
         }
     }
@@ -169,16 +169,16 @@ class CategoryController {
         if (categoryInstance) {
             try {
                 categoryInstance.delete(flush: true)
-                flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'category.label', default: 'Category'), params.id])}"
+                flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'category.label', default: 'Category'), params.id])}"
                 redirect(action: "tree")
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
-                flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'category.label', default: 'Category'), params.id])}"
+                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'category.label', default: 'Category'), params.id])}"
                 redirect(action: "tree", id: params.id)
             }
         }
         else {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'category.label', default: 'Category'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'category.label', default: 'Category'), params.id])}"
             redirect(action: "tree")
         }
     }

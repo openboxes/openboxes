@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'request.label', default: 'Request')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'request.label', default: 'Request')}" />
         <title><warehouse:message code="default.show.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.show.label" args="[entityName]" /></content>
@@ -116,7 +116,7 @@
 																<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit" />
 															</g:link>
 														
-															<g:link action="deleteComment" id="${commentInstance.id}" params="['request.id':requestInstance?.id]" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+															<g:link action="deleteComment" id="${commentInstance.id}" params="['request.id':requestInstance?.id]" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
 																<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" />
 															</g:link>
 														</td>
@@ -165,7 +165,7 @@
 																<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit" />
 															</g:link>
 														
-															<g:link action="deleteDocument" id="${documentInstance.id}" params="['request.id':requestInstance?.id]" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+															<g:link action="deleteDocument" id="${documentInstance.id}" params="['request.id':requestInstance?.id]" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
 																<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" />
 															</g:link>
 														</td>

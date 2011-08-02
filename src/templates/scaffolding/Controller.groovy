@@ -20,7 +20,7 @@
     def save = {
         def ${propertyName} = new ${className}(params)
         if (${propertyName}.save(flush: true)) {
-            flash.message = "\${message(code: 'default.created.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), ${propertyName}.id])}"
+            flash.message = "\${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: '${domainClass.propertyName}.label', default: '${className}'), ${propertyName}.id])}"
             redirect(action: "list", id: ${propertyName}.id)
         }
         else {
@@ -31,7 +31,7 @@
     def show = {
         def ${propertyName} = ${className}.get(params.id)
         if (!${propertyName}) {
-            flash.message = "\${message(code: 'default.not.found.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])}"
+            flash.message = "\${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])}"
             redirect(action: "list")
         }
         else {
@@ -42,7 +42,7 @@
     def edit = {
         def ${propertyName} = ${className}.get(params.id)
         if (!${propertyName}) {
-            flash.message = "\${message(code: 'default.not.found.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])}"
+            flash.message = "\${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])}"
             redirect(action: "list")
         }
         else {
@@ -57,14 +57,14 @@
                 def version = params.version.toLong()
                 if (${propertyName}.version > version) {
                     <% def lowerCaseName = grails.util.GrailsNameUtils.getPropertyName(className) %>
-                    ${propertyName}.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: '${domainClass.propertyName}.label', default: '${className}')] as Object[], "Another user has updated this ${className} while you were editing")
+                    ${propertyName}.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: '${domainClass.propertyName}.label', default: '${className}')] as Object[], "Another user has updated this ${className} while you were editing")
                     render(view: "edit", model: [${propertyName}: ${propertyName}])
                     return
                 }
             }
             ${propertyName}.properties = params
             if (!${propertyName}.hasErrors() && ${propertyName}.save(flush: true)) {
-                flash.message = "\${message(code: 'default.updated.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), ${propertyName}.id])}"
+                flash.message = "\${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: '${domainClass.propertyName}.label', default: '${className}'), ${propertyName}.id])}"
                 redirect(action: "list", id: ${propertyName}.id)
             }
             else {
@@ -72,7 +72,7 @@
             }
         }
         else {
-            flash.message = "\${message(code: 'default.not.found.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])}"
+            flash.message = "\${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])}"
             redirect(action: "list")
         }
     }
@@ -82,16 +82,16 @@
         if (${propertyName}) {
             try {
                 ${propertyName}.delete(flush: true)
-                flash.message = "\${message(code: 'default.deleted.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])}"
+                flash.message = "\${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])}"
                 redirect(action: "list")
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
-                flash.message = "\${message(code: 'default.not.deleted.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])}"
+                flash.message = "\${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])}"
                 redirect(action: "list", id: params.id)
             }
         }
         else {
-            flash.message = "\${message(code: 'default.not.found.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])}"
+            flash.message = "\${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])}"
             redirect(action: "list")
         }
     }

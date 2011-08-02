@@ -150,9 +150,9 @@
 				           					<tr class="prop">
 				           						<td colspan="2" style="text-align:center">		
 				           						
-					           						<button type="submit" name="save" class="save">${message(code: 'default.button.save.label', default: 'Save')}</button>															
+					           						<button type="submit" name="save" class="save">${warehouse.message(code: 'default.button.save.label', default: 'Save')}</button>															
 													&nbsp;
-													<g:link action="tree">${message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
+													<g:link action="tree">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
 				           						</td>
 				           					</tr>
 				           				</table>
@@ -183,9 +183,9 @@
 													</tr>
 							                        <tr class="prop">
 				           								<td colspan="2" style="text-align:center">		
-											                   <button type="submit" name="create" class="save">${message(code: 'default.button.create.label', default: 'Create')}</button>
+											                   <button type="submit" name="create" class="save">${warehouse.message(code: 'default.button.create.label', default: 'Create')}</button>
 											                   &nbsp;
-											                   <g:link action="tree">${message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
+											                   <g:link action="tree">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
 							                        	</td>
 							                        </tr>
 						                        </tbody>

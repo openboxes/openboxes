@@ -28,7 +28,7 @@ class ReceiveOrderWorkflowController {
 					orderCommand = orderService.getOrder(params.id as int, session.user.id as int)
 				}
 				else {
-					flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'order.label', default: 'Order'), params.id])}"
+					flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
 					redirect(controller: "order", action: "list")
 				}
 				

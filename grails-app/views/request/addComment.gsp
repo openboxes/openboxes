@@ -2,7 +2,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
-	<g:set var="entityName" value="${message(code: 'request.label', default: 'Request')}" />
+	<g:set var="entityName" value="${warehouse.message(code: 'request.label', default: 'Request')}" />
 	<title><warehouse:message code="default.edit.label" args="[entityName]" /></title>	
 </head>
 

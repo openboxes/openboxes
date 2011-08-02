@@ -2,7 +2,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'inventoryLevel.label', default: 'Inventory Level')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'inventoryLevel.label', default: 'Inventory Level')}" />
         <title><warehouse:message code="default.edit.label" args="[entityName]" /> &rsaquo; <span style="color: grey">
 			${productInstance?.name }</span>        
         </title>
@@ -60,11 +60,11 @@
 								
 									<button type="submit" class="positive"><img
 										src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
-										alt="Save" /> ${message(code: 'default.button.save.label', default: 'Save')}
+										alt="Save" /> ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
 									</button>
 									&nbsp;
 									<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="negative">			
-										${message(code: 'default.button.cancel.label', default: 'Cancel')}			
+										${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}			
 									</g:link>  
 								
 								</td>

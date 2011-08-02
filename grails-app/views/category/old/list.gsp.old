@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'category.label', default: 'Category')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'category.label', default: 'Category')}" />
         <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.list.label" args="[entityName]" /></content>
@@ -23,17 +23,17 @@
                     <thead>
                         <tr>
                         
-                            <g:sortableColumn property="id" title="${message(code: 'default.id.label', default: 'Id')}" />
+                            <g:sortableColumn property="id" title="${warehouse.message(code: 'default.id.label', default: 'Id')}" />
                         
-                            <g:sortableColumn property="name" title="${message(code: 'default.name.label', default: 'Name')}" />
+                            <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label', default: 'Name')}" />
                         
-                            <g:sortableColumn property="description" title="${message(code: 'default.description.label', default: 'Description')}" />
+                            <g:sortableColumn property="description" title="${warehouse.message(code: 'default.description.label', default: 'Description')}" />
                         
-                            <g:sortableColumn property="sortOrder" title="${message(code: 'category.sortOrder.label', default: 'Sort Order')}" />
+                            <g:sortableColumn property="sortOrder" title="${warehouse.message(code: 'category.sortOrder.label', default: 'Sort Order')}" />
                         
                             <th><warehouse:message code="category.parentCategory.label" default="Parent Category" /></th>
                    	    
-                            <g:sortableColumn property="dateCreated" title="${message(code: 'default.dateCreated.label', default: 'Date Created')}" />
+                            <g:sortableColumn property="dateCreated" title="${warehouse.message(code: 'default.dateCreated.label', default: 'Date Created')}" />
                         
                         </tr>
                     </thead>

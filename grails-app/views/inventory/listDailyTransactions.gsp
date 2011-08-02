@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'transaction.label', default: 'Transaction')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'transaction.label', default: 'Transaction')}" />
         
         <title>Daily transactions ${session.warehouse.name}</title>    
     </head>    

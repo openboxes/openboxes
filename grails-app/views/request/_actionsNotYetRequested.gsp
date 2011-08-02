@@ -4,7 +4,7 @@
 			<div class="action-menu-item">
 				<g:link controller="request" action="list">
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
-					&nbsp;${message(code: 'requests.view.label', default: 'View requests')} 
+					&nbsp;${warehouse.message(code: 'requests.view.label', default: 'View requests')} 
 				</g:link>
 			</div>
 			<div class="action-menu-item">
@@ -14,19 +14,19 @@
 		<div class="action-menu-item">
 			<g:link controller="request" action="show" id="${requestInstance?.id}">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" />
-				&nbsp;${message(code: 'request.view.label', default: 'View request details')} 
+				&nbsp;${warehouse.message(code: 'request.view.label', default: 'View request details')} 
 			</g:link>		
 		</div>
 		<div class="action-menu-item">
 			<g:link controller="request" action="addComment" id="${requestInstance?.id}">
 				<img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />
-				&nbsp;${message(code: 'request.addComment.label', default: 'Add comment')} 
+				&nbsp;${warehouse.message(code: 'request.addComment.label', default: 'Add comment')} 
 			</g:link>				
 		</div>		
 		<div class="action-menu-item">
 			<g:link controller="request" action="addDocument" id="${requestInstance?.id}">
 				<img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />
-				&nbsp;${message(code: 'request.addDocument.label', default: 'Add document')} 
+				&nbsp;${warehouse.message(code: 'request.addDocument.label', default: 'Add document')} 
 			</g:link>				
 		</div>				
 		<g:if test="${session?.warehouse?.id == requestInstance?.destination?.id }">
@@ -34,19 +34,19 @@
 			<div class="action-menu-item">
 				<g:link controller="request" action="place" id="${requestInstance?.id}">
 					<img src="${resource(dir: 'images/icons/silk', file: 'cart_go.png')}" />
-					&nbsp;${message(code: 'request.place.label', default: 'Place request')} 
+					&nbsp;${warehouse.message(code: 'request.place.label', default: 'Place request')} 
 				</g:link>				
 			</div>		
 			<div class="action-menu-item">
-				<g:link controller="request" action="withdraw" id="${requestInstance?.id}" onclick="alert('${message(code: 'default.button.notSupported.message', default: 'This feature is not currently supported.')}'); return false;">
+				<g:link controller="request" action="withdraw" id="${requestInstance?.id}" onclick="alert('${warehouse.message(code: 'default.button.notSupported.message', default: 'This feature is not currently supported.')}'); return false;">
 					<img src="${resource(dir: 'images/icons/silk', file: 'cart_delete.png')}" />
-					&nbsp;${message(code: 'request.cancel.label', default: 'Cancel request')} 
+					&nbsp;${warehouse.message(code: 'request.cancel.label', default: 'Cancel request')} 
 				</g:link>				
 			</div>		
 			<div class="action-menu-item">
-				<g:link controller="request" action="delete" id="${requestInstance?.id}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+				<g:link controller="request" action="delete" id="${requestInstance?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
 					<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />
-					&nbsp;${message(code: 'request.delete.label', default: 'Delete request')} 
+					&nbsp;${warehouse.message(code: 'request.delete.label', default: 'Delete request')} 
 				</g:link>				
 			</div>
 		</g:if>		

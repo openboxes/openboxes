@@ -346,7 +346,7 @@ class InventoryItemController {
 				
 		// TODO Move all of this logic into the service layer in order to take advantage of Hibernate/Spring transactions
 		if (!inventoryItem.hasErrors() && inventoryItem.save()) { 
-			//flash.message = "${message(code: 'default.created.message', args: [message(code: 'inventoryItem.label', default: 'Inventory item'), inventoryItem.id])}"
+			//flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), inventoryItem.id])}"
 			//redirect(controller: "inventoryItem", action: "showStockCard", id: inventoryItem.product.id);
 
 			// Need to create a transaction if we want the inventory item 
@@ -383,7 +383,7 @@ class InventoryItemController {
 		def itemInstance = InventoryItem.get(params.id)
 		def inventoryInstance = Inventory.get(params?.inventory?.id)
 		if (!itemInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'inventoryItem.label', default: 'Inventory item'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), params.id])}"
 			redirect(action: "show", id: itemInstance.id)
 		}
 		else {
@@ -420,7 +420,7 @@ class InventoryItemController {
 		
 		if (!inventoryLevelInstance.hasErrors() && inventoryLevelInstance.save()) { 
 			log.info ("save inventory level ")
-			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'inventoryLevel.label', default: 'Inventory level'), inventoryLevelInstance.id])}"
+			flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'Inventory level'), inventoryLevelInstance.id])}"
 		}
 		else { 
 			log.info ("render with errors")
@@ -443,7 +443,7 @@ class InventoryItemController {
 		if (itemInstance) {
 			boolean hasErrors = inventoryService.adjustStock(itemInstance, params);
 			if (!itemInstance.hasErrors() && !hasErrors) {
-				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"
+				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"
 			}
 			else {
 				// There were errors, so we want to display the itemInstance.errors to the user
@@ -463,7 +463,7 @@ class InventoryItemController {
 			if (params.version) {
 				def version = params.version.toLong()
 				if (itemInstance.version > version) {
-					itemInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'inventoryItem.label', default: 'Inventory Item')] as Object[], "Another user has updated this inventory item while you were editing")
+					itemInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'inventoryItem.label', default: 'Inventory Item')] as Object[], "Another user has updated this inventory item while you were editing")
 					//render(view: "show", model: [itemInstance: itemInstance])
 					redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
 					return
@@ -475,14 +475,14 @@ class InventoryItemController {
 			itemInstance.lotNumber = params?.lotNumber?.name
 			
 			if (!itemInstance.hasErrors() && itemInstance.save(flush: true)) {
-				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"
+				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"
 			}
 			else {
 				//flash.message = "There were errors"
 			}
 		}
 		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'inventoryItem.label', default: 'Inventory item'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), params.id])}"
 		}
 		redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
 	}
@@ -643,13 +643,13 @@ class InventoryItemController {
 	def saveTransactionEntry = {			
 		def productInstance = Product.get(params?.product?.id)				
 		if (!productInstance) {
-			flash.message = "${message(code: 'default.notfound.message', args: [message(code: 'product.label', default: 'Product'), productInstance.id])}"
+			flash.message = "${warehouse.message(code: 'default.notfound.message', args: [warehouse.message(code: 'product.label', default: 'Product'), productInstance.id])}"
 			redirect(action: "showStockCard", id: productInstance?.id)
 		}
 		else { 
 			def inventoryItem = inventoryService.findByProductAndLotNumber(productInstance, params.lotNumber?:null)
 			if (!inventoryItem) { 
-				flash.message = "${message(code: 'default.notfound.message', args: [message(code: 'inventoryItem.label', default: 'Inventory item'), params.lotNumber])}"
+				flash.message = "${warehouse.message(code: 'default.notfound.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), params.lotNumber])}"
 			} 
 			else {  
 				def transactionInstance = new Transaction(params)
@@ -684,7 +684,7 @@ class InventoryItemController {
 						transactionEntry.errors.each { println it }
 						flash.message = "Unable to save transaction entry"
 					} else { 
-						flash.message = "${message(code: 'default.saved.message', args: [message(code: 'inventory.label', default: 'Inventory item'), itemInstance.id])}"					
+						flash.message = "${warehouse.message(code: 'default.saved.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory item'), itemInstance.id])}"					
 					}
 				}
 				else { 

@@ -34,7 +34,7 @@ class AuthController {
      * Allows user to log into the system.
      */
     def login = {			
-		//"${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+		//"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
 	}
 	
 	
@@ -82,7 +82,7 @@ class AuthController {
 
 		    //userInstance = new User();
 		    userInstance.errors.rejectValue("version", "default.authentication.failure",
-		    	[message(code: 'user.label', default: 'User')] as Object[], "Unable to authenticate user with the provided credentials.");
+		    	[warehouse.message(code: 'user.label', default: 'User')] as Object[], "Unable to authenticate user with the provided credentials.");
 	
 		    render(view: "login", model: [userInstance: userInstance])
 		}
@@ -136,7 +136,7 @@ class AuthController {
 				flash.message = "Incorrect password for user <b>${params.username}</b>"				
 				userInstance = new User(username:params['username'])				
 				userInstance.errors.rejectValue("version", "default.authentication.failure",
-					[message(code: 'user.label', default: 'User')] as Object[], "Unable to authenticate user with the provided credentials.");
+					[warehouse.message(code: 'user.label', default: 'User')] as Object[], "Unable to authenticate user with the provided credentials.");
 				render(view: "login", model: [userInstance: userInstance])
 			}
 		}
@@ -205,14 +205,14 @@ class AuthController {
 				}
 
 				
-				flash.message = "${message(code: 'default.create.message', args: [message(code: 'user.label', default: 'User'), userInstance.id])}"
+				flash.message = "${warehouse.message(code: 'default.create.message', args: [warehouse.message(code: 'user.label', default: 'User'), userInstance.id])}"
 				redirect(controller:'dashboard', action:'index')
 			}			
 			else { 
 				// Reset the password to what the user entered
 				userInstance.password = params.password;
 				userInstance.passwordConfirm = params.passwordConfirm;
-				//flash.message = "${message(code: 'default.error.message', args: [message(code: 'user.label', default: 'User'), userInstance.id])}"
+				//flash.message = "${warehouse.message(code: 'default.error.message', args: [warehouse.message(code: 'user.label', default: 'User'), userInstance.id])}"
 				render(view: "signup", model: [userInstance : userInstance]);
 			}
 		}		

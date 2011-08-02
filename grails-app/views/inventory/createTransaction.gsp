@@ -2,7 +2,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'transaction.label', default: 'Transaction')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'transaction.label', default: 'Transaction')}" />
         <title>
 	        <g:if test="${transactionInstance?.id }">
 		        <warehouse:message code="default.edit.label" args="[entityName]" />  
@@ -50,21 +50,21 @@
 								<div class="action-menu-item">
 									<g:link controller="inventoryItem" action="showStockCard" params="['product.id':params?.product?.id]">
 										<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_left.png')}"/>
-										${message(code: 'default.button.cancel.label', default: 'Back to stock card')}
+										${warehouse.message(code: 'default.button.cancel.label', default: 'Back to stock card')}
 									</g:link>		
 								</div>	
 							</g:if>
 							<div class="action-menu-item">
 								<g:link controller="inventory" action="browse">
 									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_up.png')}"/>
-									${message(code: 'default.button.cancel.label', default: 'Back to inventory')}
+									${warehouse.message(code: 'default.button.cancel.label', default: 'Back to inventory')}
 								</g:link>			
 							</div>							
 
 							<div class="action-menu-item">
 								<g:link controller="inventory" action="listTransactions">
 									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_up.png')}"/>
-									${message(code: 'default.button.cancel.label', default: 'Back to transactions')}
+									${warehouse.message(code: 'default.button.cancel.label', default: 'Back to transactions')}
 								</g:link>			
 							</div>
 						</div>
@@ -201,9 +201,9 @@
 											--%>
 											<g:if test="${transactionInstance?.id }">
 												&nbsp;
-												<button name="_action_deleteTransaction" id="${transactionInstance?.id }" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+												<button name="_action_deleteTransaction" id="${transactionInstance?.id }" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
 							    					<img src="${createLinkTo(dir:'images/icons/silk',file:'bin.png')}" alt="Delete" />
-													&nbsp;${message(code: 'default.button.delete.label', default: 'Delete')}&nbsp;
+													&nbsp;${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}&nbsp;
 												</button>							
 											</g:if>
 										</div>		

@@ -56,7 +56,7 @@ class RequestController {
     def save = {
         def requestInstance = new Request(params)
         if (requestInstance.save(flush: true)) {
-            flash.message = "${message(code: 'default.created.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
+            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'request.label', default: 'Request'), requestInstance.id])}"
             redirect(action: "list", id: requestInstance.id)
         }
         else {
@@ -67,7 +67,7 @@ class RequestController {
     def show = {
         def requestInstance = Request.get(params.id)
         if (!requestInstance) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'request.label', default: 'Request'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
             redirect(action: "list")
         }
         else {
@@ -78,7 +78,7 @@ class RequestController {
     def edit = {
         def requestInstance = Request.get(params.id)
         if (!requestInstance) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'request.label', default: 'Request'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
             redirect(action: "list")
         }
         else {
@@ -122,14 +122,14 @@ class RequestController {
                 def version = params.version.toLong()
                 if (requestInstance.version > version) {
                     
-                    requestInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'request.label', default: 'Request')] as Object[], "Another user has updated this Request while you were editing")
+                    requestInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'request.label', default: 'Request')] as Object[], "Another user has updated this Request while you were editing")
                     render(view: "edit", model: [requestInstance: requestInstance])
                     return
                 }
             }
             requestInstance.properties = params
             if (!requestInstance.hasErrors() && requestInstance.save(flush: true)) {
-                flash.message = "${message(code: 'default.updated.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
+                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'request.label', default: 'Request'), requestInstance.id])}"
                 redirect(action: "list", id: requestInstance.id)
             }
             else {
@@ -137,7 +137,7 @@ class RequestController {
             }
         }
         else {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'request.label', default: 'Request'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
             redirect(action: "list")
         }
     }
@@ -150,16 +150,16 @@ class RequestController {
         if (requestInstance) {
             try {
                 requestInstance.delete(flush: true)
-                flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'request.label', default: 'Request'), params.id])}"
+                flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
                 redirect(action: "list")
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
-                flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'request.label', default: 'Request'), params.id])}"
+                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
                 redirect(action: "list", id: params.id)
             }
         }
         else {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'request.label', default: 'Request'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
             redirect(action: "list")
         }
     }
@@ -170,7 +170,7 @@ class RequestController {
 	def addComment = { 
         def requestInstance = Request.get(params?.id)
         if (!requestInstance) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'request.label', default: 'Request'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
             redirect(action: "list")
         }
         else {
@@ -181,13 +181,13 @@ class RequestController {
 	def editComment = {
 		def requestInstance = Request.get(params?.request?.id)
 		if (!requestInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'request.label', default: 'Request'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
 			redirect(action: "list")
 		}
 		else {
 			def commentInstance = Comment.get(params?.id)
 			if (!commentInstance) {
-				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'comment.label', default: 'Comment'), commentInstance.id])}"
+				flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'comment.label', default: 'Comment'), commentInstance.id])}"
 				redirect(action: "show", id: requestInstance?.id)
 			}
 			render(view: "addComment", model: [requestInstance: requestInstance, commentInstance: commentInstance])
@@ -197,19 +197,19 @@ class RequestController {
 	def deleteComment = { 
 		def requestInstance = Request.get(params.request.id)
 		if (!requestInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'request.label', default: 'Request'), params.request.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.request.id])}"
 			redirect(action: "list")
 		}
 		else {
 			def commentInstance = Comment.get(params?.id)
 			if (!commentInstance) {
-				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'comment.label', default: 'Comment'), params.id])}"
+				flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'comment.label', default: 'Comment'), params.id])}"
 				redirect(action: "show", id: requestInstance?.id)
 			}
 			else { 
 				requestInstance.removeFromComments(commentInstance);
 				if (!requestInstance.hasErrors() && requestInstance.save(flush: true)) {
-					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
+					flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 					redirect(action: "show", id: requestInstance.id)
 				}
 				else {
@@ -228,7 +228,7 @@ class RequestController {
 			if (commentInstance) { 
 				commentInstance.properties = params
 				if (!commentInstance.hasErrors() && commentInstance.save(flush: true)) {
-					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'comment.label', default: 'Comment'), commentInstance.id])}"
+					flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'comment.label', default: 'Comment'), commentInstance.id])}"
 					redirect(action: "show", id: requestInstance.id)
 				}
 				else {
@@ -239,7 +239,7 @@ class RequestController {
 				commentInstance = new Comment(params)
 				requestInstance.addToComments(commentInstance);
 				if (!requestInstance.hasErrors() && requestInstance.save(flush: true)) {
-					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
+					flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 					redirect(action: "show", id: requestInstance.id)
 				}
 				else {
@@ -248,7 +248,7 @@ class RequestController {
 			}
 		}	
 		else { 
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'request.label', default: 'Request'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
 			redirect(action: "list")
 		}
 		
@@ -257,7 +257,7 @@ class RequestController {
 	def addDocument = {
 		def requestInstance = Request.get(params.id)
 		if (!requestInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'request.label', default: 'Request'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
 			redirect(action: "list")
 		}
 		else {
@@ -268,13 +268,13 @@ class RequestController {
 	def editDocument = {
 		def requestInstance = Request.get(params?.request?.id)
 		if (!requestInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'request.label', default: 'Request'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
 			redirect(action: "list")
 		}
 		else {
 			def documentInstance = Document.get(params?.id)
 			if (!documentInstance) {
-				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), documentInstance.id])}"
+				flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), documentInstance.id])}"
 				redirect(action: "show", id: requestInstance?.id)
 			}
 			render(view: "addDocument", model: [requestInstance: requestInstance, documentInstance: documentInstance])
@@ -284,19 +284,19 @@ class RequestController {
 	def deleteDocument = {
 		def requestInstance = Request.get(params.request.id)
 		if (!requestInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'request.label', default: 'Request'), params.request.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.request.id])}"
 			redirect(action: "list")
 		}
 		else {
 			def documentInstance = Document.get(params?.id)
 			if (!documentInstance) {
-				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'comment.label', default: 'Comment'), params.id])}"
+				flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'comment.label', default: 'Comment'), params.id])}"
 				redirect(action: "show", id: requestInstance?.id)
 			}
 			else {
 				requestInstance.removeFromDocuments(documentInstance);
 				if (!requestInstance.hasErrors() && requestInstance.save(flush: true)) {
-					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
+					flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 					redirect(action: "show", id: requestInstance.id)
 				}
 				else {
@@ -309,7 +309,7 @@ class RequestController {
 	def receive = {		
 		def requestCommand = requestService.getRequest(params.id as int, session.user.id as int)
 		if (!requestCommand.request) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'request.label', default: 'Request'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
 			redirect(action: "list")
 		}
 		else { 
@@ -367,7 +367,7 @@ class RequestController {
 	def fulfill = {
 		def requestInstance = Request.get(params.id)
 		if (!requestInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'request.label', default: 'Request'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
 			redirect(action: "list")
 		}
 		else {

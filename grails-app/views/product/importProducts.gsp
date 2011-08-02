@@ -57,7 +57,7 @@
 					<g:form action="importDependencies" method="post">
 						<div class="buttons">
 							<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="import" /> 
-								${message(code: 'default.button.import.label', default: 'Import')}</button>
+								${warehouse.message(code: 'default.button.import.label', default: 'Import')}</button>
 							<a href="${createLink(controller: "product", action: "importProducts")}" id="" class="negative"> 
 								<img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="" /> Cancel </a>															
 						</div>						
@@ -101,7 +101,7 @@
 					<g:form action="importProducts" method="post">
 						<span class="buttons">
 							<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="upload" /> 
-								${message(code: 'default.button.import.label', default: 'Import')}</button>
+								${warehouse.message(code: 'default.button.import.label', default: 'Import')}</button>
 							<a href="${createLink(controller: "product", action: "importProducts")}" id="" class="negative"> 
 								<img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="" /> Cancel </a>															
 						</span>						

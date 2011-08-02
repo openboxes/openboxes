@@ -15,7 +15,7 @@ class LocationController {
 	def edit = {
 		def locationInstance = inventoryService.getLocation(params.id as Long)
 		if (!locationInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'location.label', default: 'Location'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
 			redirect(action: "list")
 		}
 		else {
@@ -31,7 +31,7 @@ class LocationController {
 					def version = params.version.toLong()
 					if (locationInstance.version > version) {
 						
-						locationInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'location.label', default: 'Location')] as Object[], "Another user has updated this Location while you were editing")
+						locationInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'location.label', default: 'Location')] as Object[], "Another user has updated this Location while you were editing")
 						render(view: "edit", model: [locationInstance: locationInstance])
 						return
 					}
@@ -41,7 +41,7 @@ class LocationController {
 						
 				if (!locationInstance.hasErrors()) {
 					inventoryService.saveLocation(locationInstance)
-					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'location.label', default: 'Location'), locationInstance.id])}"
+					flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'location.label', default: 'Location'), locationInstance.id])}"
 					redirect(action: "list", id: locationInstance.id)
 				}
 				else {
@@ -49,7 +49,7 @@ class LocationController {
 				}
 			}
 			else {
-				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'location.label', default: 'Location'), params.id])}"
+				flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
 				redirect(action: "list")
 			}
 		}
@@ -60,16 +60,16 @@ class LocationController {
 		          try {
 		            locationInstance.delete(flush: true)
 		            
-		            flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'location.label', default: 'Location'), params.id])}"
+		            flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
 		            redirect(action: "list")
 			      }
 			      catch (org.springframework.dao.DataIntegrityViolationException e) {
-		            flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'location.label', default: 'Location'), params.id])}"
+		            flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
 		            redirect(action: "edit", id: params.id)
 			      }
 	        }
 	        else {
-	            flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'location.label', default: 'Location'), params.id])}"
+	            flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
 	            redirect(action: "edit", id: params.id)
 	        }
 		}

@@ -4,7 +4,7 @@
 	<head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'product.label', default: 'Product')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'product.label', default: 'Product')}" />
         
         <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
 		
@@ -30,7 +30,7 @@
 					
 					<button type="submit" class="positive"><img
 						src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" style="vertical-align: middle;"
-						alt="Save" /> ${message(code: 'default.button.find.label', default: 'Find')}
+						alt="Save" /> ${warehouse.message(code: 'default.button.find.label', default: 'Find')}
 					</button>
 					          
 				</div> 
@@ -151,11 +151,11 @@
 									<td colspan="9" style="text-align: center;">
 										<button type="submit" class="positive"><img
 											src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" style="vertical-align: middle;"
-											alt="Save" /> ${message(code: 'default.button.save.label', default: 'Save')}
+											alt="Save" /> ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
 										</button>
 										&nbsp;
 										<g:link controller='inventory' action='browse' class="negative">
-											${message(code: 'default.button.done.label', default: 'Done')}			
+											${warehouse.message(code: 'default.button.done.label', default: 'Done')}			
 										</g:link>  
 									</td>
 								</tr>

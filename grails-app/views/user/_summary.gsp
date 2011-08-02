@@ -22,19 +22,19 @@
 		            				${fieldValue(bean: userInstance, field: "lastName")}
 		            			</span>
 								&nbsp;
-								<g:link class="edit" action="edit" id="${userInstance?.id}" >${message(code: 'default.button.edit.label', default: 'Edit')}</g:link>
+								<g:link class="edit" action="edit" id="${userInstance?.id}" >${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}</g:link>
 								&nbsp;
 								
 								
-								<g:link class="delete" action="delete" id="${userInstance?.id}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">${message(code: 'default.button.delete.label', default: 'Delete')}</g:link>
+								<g:link class="delete" action="delete" id="${userInstance?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}</g:link>
 							</td>							
 							<td style="text-align: right;">
 								<g:link action="toggleActivation" id="${userInstance?.id}">
 									<g:if test="${userInstance?.active}">
-										${message(code: 'default.button.deactivate.label', default: 'De-activate')}
+										${warehouse.message(code: 'default.button.deactivate.label', default: 'De-activate')}
 									</g:if>
 									<g:else>
-										${message(code: 'default.button.activate.label', default: 'Activate')}
+										${warehouse.message(code: 'default.button.activate.label', default: 'Activate')}
 									</g:else>
 								</g:link>
 								&nbsp;							

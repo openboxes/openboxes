@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'user.label', default: 'User')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'user.label', default: 'User')}" />
         <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
     </head>
     <body>
@@ -125,9 +125,9 @@
 				
 									</td>
 									<td valign="top">
-					                    <g:actionSubmit class="save" action="update" value="${message(code: 'default.button.save.label', default: 'Save')}" /></span>
+					                    <g:actionSubmit class="save" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" /></span>
 										&nbsp;
-										<g:link class="cancel" action="show" id="${warehouseInstance?.id }">${message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
+										<g:link class="cancel" action="show" id="${warehouseInstance?.id }">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
 									</td>
 								</tr>
 	                        </tbody>

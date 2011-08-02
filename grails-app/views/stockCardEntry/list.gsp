@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="main" />
-        <g:set var="entityName" value="${message(code: 'stockCardEntry.label', default: 'StockCardEntry')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'stockCardEntry.label', default: 'StockCardEntry')}" />
         <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
     </head>
     <body>
@@ -22,17 +22,17 @@
                     <thead>
                         <tr>
                         
-                            <g:sortableColumn property="id" title="${message(code: 'stockCardEntry.id.label', default: 'Id')}" />
+                            <g:sortableColumn property="id" title="${warehouse.message(code: 'stockCardEntry.id.label', default: 'Id')}" />
                         
-                            <g:sortableColumn property="quantityOutgoing" title="${message(code: 'stockCardEntry.quantityOutgoing.label', default: 'Quantity Outgoing')}" />
+                            <g:sortableColumn property="quantityOutgoing" title="${warehouse.message(code: 'stockCardEntry.quantityOutgoing.label', default: 'Quantity Outgoing')}" />
                         
                             <th><warehouse:message code="stockCardEntry.stockCard.label" default="Stock Card" /></th>
                    	    
-                            <g:sortableColumn property="remainingBalance" title="${message(code: 'stockCardEntry.remainingBalance.label', default: 'Remaining Balance')}" />
+                            <g:sortableColumn property="remainingBalance" title="${warehouse.message(code: 'stockCardEntry.remainingBalance.label', default: 'Remaining Balance')}" />
                         
-                            <g:sortableColumn property="quantityIncoming" title="${message(code: 'stockCardEntry.quantityIncoming.label', default: 'Quantity Incoming')}" />
+                            <g:sortableColumn property="quantityIncoming" title="${warehouse.message(code: 'stockCardEntry.quantityIncoming.label', default: 'Quantity Incoming')}" />
                         
-                            <g:sortableColumn property="startingBalance" title="${message(code: 'stockCardEntry.startingBalance.label', default: 'Starting Balance')}" />
+                            <g:sortableColumn property="startingBalance" title="${warehouse.message(code: 'stockCardEntry.startingBalance.label', default: 'Starting Balance')}" />
                         
                         </tr>
                     </thead>

@@ -26,7 +26,7 @@
 					<div class="buttons">
 						<button type="submit" class="positive"><img
 							src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
-							alt="Save" /> ${message(code: 'default.button.save.label', default: 'Save')}
+							alt="Save" /> ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
 						</button>
 					</div>
 				</td>

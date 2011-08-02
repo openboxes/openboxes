@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'eventType.label', default: 'EventType')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'eventType.label', default: 'EventType')}" />
         <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.list.label" args="[entityName]" /></content>
@@ -25,15 +25,15 @@
                     <thead>
                         <tr>
                         
-                            <g:sortableColumn property="id" title="${message(code: 'eventType.id.label', default: 'Id')}" />
+                            <g:sortableColumn property="id" title="${warehouse.message(code: 'eventType.id.label', default: 'Id')}" />
                         
-                            <g:sortableColumn property="name" title="${message(code: 'eventType.name.label', default: 'Name')}" />
+                            <g:sortableColumn property="name" title="${warehouse.message(code: 'eventType.name.label', default: 'Name')}" />
                         
-                            <g:sortableColumn property="description" title="${message(code: 'eventType.description.label', default: 'Description')}" />
+                            <g:sortableColumn property="description" title="${warehouse.message(code: 'eventType.description.label', default: 'Description')}" />
                         
-                            <g:sortableColumn property="sortOrder" title="${message(code: 'eventType.sortOrder.label', default: 'Sort Order')}" />
+                            <g:sortableColumn property="sortOrder" title="${warehouse.message(code: 'eventType.sortOrder.label', default: 'Sort Order')}" />
                         
-                            <g:sortableColumn property="eventCode" title="${message(code: 'eventType.eventCode.label', default: 'Event Status')}" />
+                            <g:sortableColumn property="eventCode" title="${warehouse.message(code: 'eventType.eventCode.label', default: 'Event Status')}" />
                         
                         </tr>
                     </thead>

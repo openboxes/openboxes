@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'shipment.label', default: 'Shipment')}" />
         <title><warehouse:message code="default.show.label" args="[entityName]" /></title>        
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle">Shipment Details</content>
@@ -152,7 +152,7 @@
 																		<br/><br/>
 
 																		<span class="buttons">
-																			<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> ${message(code: 'default.button.save.label', default: 'Save')}</button>
+																			<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> ${warehouse.message(code: 'default.button.save.label', default: 'Save')}</button>
 																			<a href="#" id="edit-origin-link" class="negative"> <img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="" /> Cancel </a>															
 																		</span>
 																	</g:form>
@@ -196,7 +196,7 @@
 																		</span>
 																		<br/><br/>
 																		<span class="buttons">
-																			<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> ${message(code: 'default.button.save.label', default: 'Save')}</button>
+																			<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> ${warehouse.message(code: 'default.button.save.label', default: 'Save')}</button>
 																			<a href="#" id="edit-destination-link" class="negative"> <img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="" /> Cancel </a>
 																		</span>
 																	</g:form>

@@ -3,7 +3,7 @@
    <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'receiving.label', default: 'Receiving')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'receiving.label', default: 'Receiving')}" />
         <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle">
@@ -61,11 +61,11 @@
                     <thead>
                         <tr>   
                         	
-                        	<th>${message(code: 'shipment.shipmentType.label', default: 'Type')}</th>
-                            <th>${message(code: 'shipment.shipment.label', default: 'Shipment')}</th>							
-                            <th>${message(code: 'shipment.origin.label', default: 'Origin')}</th>
-                         	<th>${message(code: 'shipment.expectedDeliveryDate.label', default: 'Delivery Date')}</th>
-                         	<th>${message(code: 'shipment.status.label', default: 'Status')}</th>
+                        	<th>${warehouse.message(code: 'shipment.shipmentType.label', default: 'Type')}</th>
+                            <th>${warehouse.message(code: 'shipment.shipment.label', default: 'Shipment')}</th>							
+                            <th>${warehouse.message(code: 'shipment.origin.label', default: 'Origin')}</th>
+                         	<th>${warehouse.message(code: 'shipment.expectedDeliveryDate.label', default: 'Delivery Date')}</th>
+                         	<th>${warehouse.message(code: 'shipment.status.label', default: 'Status')}</th>
                         </tr>
                     </thead>
                    

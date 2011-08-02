@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'inventoryItem.label', default: 'Inventory Item')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'inventoryItem.label', default: 'Inventory Item')}" />
         <title><warehouse:message code="default.create.label" args="[entityName]" /></title>
     </head>
     <body>
@@ -104,7 +104,7 @@
 									</table>
 									<div style="text-align: center; padding: 10px; border-top: 1px solid lightgrey; ">
 					                    <span class="buttons">
-						                    <g:actionSubmit class="save" action="saveInventoryItem" value="${message(code: 'default.button.save.label', default: 'Save')}" />
+						                    <g:actionSubmit class="save" action="saveInventoryItem" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
 					                    </span>
 					                    &nbsp;
 					                    <g:link controller="inventoryItem" 

@@ -6,25 +6,25 @@
 		<tr>
 			<th> </th>
 			<g:sortableColumn property="description"
-				title="${message(code: 'request.description.label', default: 'Description')}" />
+				title="${warehouse.message(code: 'request.description.label', default: 'Description')}" />
 				
 			<g:if test="${requestType == 'incoming' }">
 				<g:sortableColumn property="origin"
-					title="${message(code: 'request.origin.label', default: 'Origin')}" />
+					title="${warehouse.message(code: 'request.origin.label', default: 'Origin')}" />
 			</g:if>
 			<g:if test="${requestType == 'outgoing' }">
 				<g:sortableColumn property="destination"
-					title="${message(code: 'request.destination.label', default: 'Destination')}" />
+					title="${warehouse.message(code: 'request.destination.label', default: 'Destination')}" />
 			</g:if>
 
 			<g:sortableColumn property="createdBy"
-				title="${message(code: 'request.createdBy.label', default: 'Created by')}" />
+				title="${warehouse.message(code: 'request.createdBy.label', default: 'Created by')}" />
 			
 			<g:sortableColumn property="lastUpdated"
-				title="${message(code: 'request.lastUpdated.label', default: 'Last updated')}" />
+				title="${warehouse.message(code: 'request.lastUpdated.label', default: 'Last updated')}" />
 
 			<g:sortableColumn property="status"
-				title="${message(code: 'request.status.label', default: 'Status')}" />
+				title="${warehouse.message(code: 'request.status.label', default: 'Status')}" />
 				
 		</tr>
 	</thead>

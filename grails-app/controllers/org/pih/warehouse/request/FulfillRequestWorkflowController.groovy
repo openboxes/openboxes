@@ -28,7 +28,7 @@ class FulfillRequestWorkflowController {
 					requestCommand = requestService.getRequest(params.id as int, session.user.id as int)
 				}
 				else {
-					flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'request.label', default: 'Request'), params.id])}"
+					flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
 					redirect(controller: "request", action: "list")
 				}
 				

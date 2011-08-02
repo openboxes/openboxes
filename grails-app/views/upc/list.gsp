@@ -4,8 +4,8 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'upc.label', default: 'UPC')}" />
-        <g:set var="pageTitle" value="${message(code: 'default.search.label' args="[entityName]")}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'upc.label', default: 'UPC')}" />
+        <g:set var="pageTitle" value="${warehouse.message(code: 'default.search.label' args="[entityName]")}" />
         <title><warehouse:message code="default.search.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.search.label" args="[entityName]" /></content>

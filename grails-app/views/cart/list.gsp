@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'catalog.label', default: 'Cart')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'catalog.label', default: 'Cart')}" />
         <title><warehouse:message code="default.show.label" args="[entityName]" /></title>            
     </head>    
 

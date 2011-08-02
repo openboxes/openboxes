@@ -3,7 +3,7 @@
    <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'shipment.label', default: 'Receiving')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'shipment.label', default: 'Receiving')}" />
         <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle">
@@ -34,12 +34,12 @@
 					<table>
 	                    <thead>
 	                        <tr>   
-								<g:sortableColumn property="shipmentType" title="${message(code: 'shipment.shipmentType.label', default: 'Type')}" />
-	                            <g:sortableColumn property="shipmentNumber" title="${message(code: 'shipment.shipmentNumber.label', default: 'Shipment')}" />								
-	                            <g:sortableColumn property="status" title="${message(code: 'shipment.status.label', default: 'Status')}" />                            
-	                            <g:sortableColumn property="eventDate" title="${message(code: 'shipment.eventDate.label', default: 'Event Date')}" />                            
-	                            <g:sortableColumn property="destination" title="${message(code: 'shipment.origin.label', default: 'Origin')}" />
-	                            <g:sortableColumn property="documents" title="${message(code: 'shipment.documents.label', default: 'Documents')}" />                              
+								<g:sortableColumn property="shipmentType" title="${warehouse.message(code: 'shipment.shipmentType.label', default: 'Type')}" />
+	                            <g:sortableColumn property="shipmentNumber" title="${warehouse.message(code: 'shipment.shipmentNumber.label', default: 'Shipment')}" />								
+	                            <g:sortableColumn property="status" title="${warehouse.message(code: 'shipment.status.label', default: 'Status')}" />                            
+	                            <g:sortableColumn property="eventDate" title="${warehouse.message(code: 'shipment.eventDate.label', default: 'Event Date')}" />                            
+	                            <g:sortableColumn property="destination" title="${warehouse.message(code: 'shipment.origin.label', default: 'Origin')}" />
+	                            <g:sortableColumn property="documents" title="${warehouse.message(code: 'shipment.documents.label', default: 'Documents')}" />                              
 	                        </tr>
 	                    </thead>
 	                   

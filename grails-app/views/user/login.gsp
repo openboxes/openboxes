@@ -43,7 +43,7 @@
 					<span class="button"> 
 						<g:submitButton
 							name="login" class="save"
-							value="${message(code: 'default.button.login.label', default: 'Login')}" />
+							value="${warehouse.message(code: 'default.button.login.label', default: 'Login')}" />
 					</span>
 				</div>
 			</g:form>

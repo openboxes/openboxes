@@ -25,7 +25,7 @@ class ShipmentEventController {
     def save = {
         def shipmentEventInstance = new Event(params)
         if (shipmentEventInstance.save(flush: true)) {
-            flash.message = "${message(code: 'default.created.message', args: [message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), shipmentEventInstance.id])}"
+            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), shipmentEventInstance.id])}"
             redirect(action: "show", id: shipmentEventInstance.id)
         }
         else {
@@ -36,7 +36,7 @@ class ShipmentEventController {
     def show = {
         def shipmentEventInstance = Event.get(params.id)
         if (!shipmentEventInstance) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
             redirect(action: "list")
         }
         else {
@@ -47,7 +47,7 @@ class ShipmentEventController {
     def edit = {
         def shipmentEventInstance = Event.get(params.id)
         if (!shipmentEventInstance) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
             redirect(action: "list")
         }
         else {
@@ -62,14 +62,14 @@ class ShipmentEventController {
                 def version = params.version.toLong()
                 if (shipmentEventInstance.version > version) {
                     
-                    shipmentEventInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'shipmentEvent.label', default: 'ShipmentEvent')] as Object[], "Another user has updated this ShipmentEvent while you were editing")
+                    shipmentEventInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'shipmentEvent.label', default: 'ShipmentEvent')] as Object[], "Another user has updated this ShipmentEvent while you were editing")
                     render(view: "edit", model: [shipmentEventInstance: shipmentEventInstance])
                     return
                 }
             }
             shipmentEventInstance.properties = params
             if (!shipmentEventInstance.hasErrors() && shipmentEventInstance.save(flush: true)) {
-                flash.message = "${message(code: 'default.updated.message', args: [message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), shipmentEventInstance.id])}"
+                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), shipmentEventInstance.id])}"
                 redirect(action: "show", id: shipmentEventInstance.id)
             }
             else {
@@ -77,7 +77,7 @@ class ShipmentEventController {
             }
         }
         else {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
             redirect(action: "list")
         }
     }
@@ -87,16 +87,16 @@ class ShipmentEventController {
         if (shipmentEventInstance) {
             try {
                 shipmentEventInstance.delete(flush: true)
-                flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
+                flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
                 redirect(action: "list")
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
-                flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
+                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
                 redirect(action: "show", id: params.id)
             }
         }
         else {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
             redirect(action: "list")
         }
     }

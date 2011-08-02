@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'transaction.label', default: 'Transaction')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'transaction.label', default: 'Transaction')}" />
         <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>    
         <style>
         	optgroup { font-weight: bold; } 
@@ -164,13 +164,13 @@
 						<div class="buttonBar" style="text-align: center;">
 							<button name="_action_saveTransaction">
 		    					<img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Save" />
-			                    ${message(code: 'default.button.save.label', default: 'Save')}						
+			                    ${warehouse.message(code: 'default.button.save.label', default: 'Save')}						
 							</button>
 							&nbsp;
 							
 							<g:link action="showTransaction" id="${transactionInstance?.id }">
 								<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="Cancel" />
-			                    ${message(code: 'default.button.cancel.label', default: 'Cancel')}						
+			                    ${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}						
 							</g:link>			
 						</div>
 						

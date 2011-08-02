@@ -2,7 +2,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'shipment.label', default: 'Shipment')}" />
         <g:set var="pageTitle"><warehouse:message code="default.create.label" args="[entityName]" /></g:set>
         <title>${pageTitle}</title>        
         <!-- Specify content to overload like global navigation links, page titles, etc. -->

@@ -5,7 +5,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="custom" />
 		<g:set var="entityName"
-			value="${message(code: 'stockCard.label', default: 'Stock Card')}" />
+			value="${warehouse.message(code: 'stockCard.label', default: 'Stock Card')}" />
 		<title>
 			<warehouse:message code="default.show.label" args="[entityName]" /> &nbsp;&rsaquo;&nbsp; 
 			<span style="color: grey">${commandInstance?.productInstance?.name }</span>

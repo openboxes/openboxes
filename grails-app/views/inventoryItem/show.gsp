@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'stockCard.label', default: 'Stock Card')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'stockCard.label', default: 'Stock Card')}" />
         <title><warehouse:message code="default.show.label" args="[entityName]" /></title>    
     </head>    
 
@@ -59,7 +59,7 @@
 													<g:elseif test="${warning?.contains('info')}">
 														<img src="${resource(dir: 'images/icons/silk', file: 'information.png') }" />
 													</g:elseif>														
-													&nbsp;${message(code: warning)}								
+													&nbsp;${warehouse.message(code: warning)}								
 												</li>							
 											</g:each>
 										</ul>						
@@ -80,11 +80,11 @@
 					<table border="1" style="border:1px solid #f5f5f5">
 	                    <thead>
 	                        <tr>    	
-	                            <g:sortableColumn property="transactionDate" title="${message(code: 'transaction.transactionDate.label', default: 'Transaction Date')}" />								
-	                            <g:sortableColumn property="transactionType" title="${message(code: 'transaction.transactionType.label', default: 'Transaction Type')}" />								
-	                            <g:sortableColumn property="source" title="${message(code: 'transaction.source.label', default: 'Origin')}" />								
-	                            <g:sortableColumn property="destination" title="${message(code: 'inventory.destination.label', default: 'Destination')}" />								
-	                            <g:sortableColumn property="quantity" title="${message(code: 'inventory.quantity.label', default: 'Qty')}" />								
+	                            <g:sortableColumn property="transactionDate" title="${warehouse.message(code: 'transaction.transactionDate.label', default: 'Transaction Date')}" />								
+	                            <g:sortableColumn property="transactionType" title="${warehouse.message(code: 'transaction.transactionType.label', default: 'Transaction Type')}" />								
+	                            <g:sortableColumn property="source" title="${warehouse.message(code: 'transaction.source.label', default: 'Origin')}" />								
+	                            <g:sortableColumn property="destination" title="${warehouse.message(code: 'inventory.destination.label', default: 'Destination')}" />								
+	                            <g:sortableColumn property="quantity" title="${warehouse.message(code: 'inventory.quantity.label', default: 'Qty')}" />								
 								<th>Actions</th>
 	                        </tr>
 	                    </thead>

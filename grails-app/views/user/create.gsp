@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'user.label', default: 'User')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'user.label', default: 'User')}" />
         <title><warehouse:message code="default.create.label" args="[entityName]" /></title>
 	<content tag="pageTitle"><warehouse:message code="default.create.label" args="[entityName]" /></content>
 
@@ -76,7 +76,7 @@
                     </table>
                 </div>
                 <div class="buttonBar">
-                    <button name="create" class="positive">${message(code: 'default.button.save.label', default: 'Save')}</button>
+                    <button name="create" class="positive">${warehouse.message(code: 'default.button.save.label', default: 'Save')}</button>
                 </div>
                 </fieldset>
             </g:form>

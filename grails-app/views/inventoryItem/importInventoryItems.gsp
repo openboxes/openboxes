@@ -5,7 +5,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="custom" />
 		<g:set var="entityName"
-			value="${message(code: 'inventoryItem.label', default: 'Inventory Item')}" />
+			value="${warehouse.message(code: 'inventoryItem.label', default: 'Inventory Item')}" />
 		<title>
 			<warehouse:message code="default.import.label" args="[entityName]" /> &rsaquo;
 			<span style="color: grey">${session?.warehouse?.name }</span>
@@ -94,7 +94,7 @@
 						<div style="text-align: center; display: inline">
 							<g:form controller="inventoryItem" action="importInventoryItems" method="POST"> 
 								<button type="submit" name="importNow" value="true"><img src="${createLinkTo(dir:'images/icons/silk',file:'disk.png')}" alt="Import Now" /> 
-									&nbsp;${message(code: 'default.button.import.label', default: 'Import Now')}</button>
+									&nbsp;${warehouse.message(code: 'default.button.import.label', default: 'Import Now')}</button>
 									
 								&nbsp;
 								<a href="${createLink(controller: "inventoryItem", action: "importInventoryItems")}" class="negative"> Clear </a>
