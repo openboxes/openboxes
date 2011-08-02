@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${message(code: 'category.label', default: 'Category')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'category.label', default: 'Category')}" />
         <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.list.label" args="[entityName]" /></content>
@@ -24,12 +24,12 @@
 		        		<td>
 		        		
 		        		<fieldset>
-		        			<legend>Categories</legend>
+		        			<legend><warehouse:message code="category.categories.label"/></legend>
 		        		
 		        		
 							<div style="padding:10px; text-align: right">
 								<span class="menuButton">
-				            		<g:link class="new" controller="category" action="tree" params="[addCategory:'addCategory']"><warehouse:message code="default.add.label" args="['category']"/></g:link>
+				            		<g:link class="new" controller="category" action="tree" params="[addCategory:'addCategory']"><warehouse:message code="default.add.label" args="[entityName]"/></g:link>
 				            	</span>										    	
 							</div>						
 		        		
@@ -97,26 +97,26 @@
 								<g:form action="saveCategory">
 									<g:hiddenField name="id" value="${categoryInstance?.id }"/>
 				           			<fieldset>
-				           				<legend>Edit Category</legend>
+				           				<legend><warehouse:message code="category.editCategory.label"/></legend>
 				           				<table>
 				           					<tr class="prop odd">
 				           						<td class="value">
-				           							<label>Parent</label>
+				           							<label><warehouse:message code="category.parent.label"/></label>
 			           								<select name="parentCategory.id">
-			           									<option value="null">Choose a category ... </option>
+			           									<option value="null"><warehouse:message code="category.chooseACategory.label"/></option>
 			           									<g:render template="selectOptions" model="[category:rootCategory, selected:categoryInstance?.parentCategory, level: 0]"/>
 			           								</select>
 			           							</td>
 			           						</tr>
 			           						<tr class="prop even">
 			           							<td class="value">
-			           								<label>Name</label>
+			           								<label><warehouse:message code="default.name.label"/></label>
 							           				<g:textField name="name" value="${categoryInstance?.name }"/>
 				           						</td>
 				           					</tr>
 				           					<tr class="prop odd">
 				           						<td class="value">
-				           							<label>Children</label>
+				           							<label><warehouse:message code="category.children.label"/></label>
 						           					<g:if test="${categoryInstance?.categories }">
 					           							<table>			           							
 						           							<g:each var="child" in="${categoryInstance?.categories }" status="status">
@@ -132,7 +132,7 @@
 				           					</tr>
 				           					<tr class="prop even">
 				           						<td class="value">
-					           						<label>Products</label>
+					           						<label><warehouse:message code="category.products.label"/></label>
 						           					<g:if test="${categoryInstance?.products }">
 					           							<table>			           							
 						           							<g:each var="product" in="${categoryInstance?.products }" status="status">
@@ -163,7 +163,7 @@
 		           				<g:if test="${params.addCategory=='addCategory' }">					           			
 									<g:form action="save" method="post" >
 						            	<fieldset>
-					           				<legend>Create Category</legend>
+					           				<legend><warehouse:message code="category.createCategory.label"/></legend>
 						                    <table>
 						                        <tbody>
 													<tr class="prop">
@@ -177,7 +177,7 @@
 													</tr>
 													<tr class="prop">
 														<td valign="top" class="value ${hasErrors(bean: categoryInstance, field: 'name', 'errors')}">
-															<label for="name" class="desc"><warehouse:message code="category.name.label" default="Name" /></label>
+															<label for="name" class="desc"><warehouse:message code="default.name.label" default="Name" /></label>
 															<g:textField name="name" value="${categoryInstance?.name}" />
 														</td>
 													</tr>
@@ -212,9 +212,9 @@
 										<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_white.png')}" alt="Bullet" /> &nbsp;										 
 										<g:if test="${!category.parentCategory }"><b>${category.name }</b></g:if> 
 										<g:else>${category.name }</g:else>
-										<g:link class="new" action="create" params="['parentCategory.id':category.id]"><warehouse:message code="default.add.label" args="['category']"/></g:link>
+										<g:link class="new" action="create" params="['parentCategory.id':category.id]"><warehouse:message code="default.add.label" args="[entityName]"/></g:link>
 										| 
-										<g:link class="new" action="delete" params="['category.id':category.id]"><warehouse:message code="default.delete.label" args="['category']"/></g:link>
+										<g:link class="new" action="delete" params="['category.id':category.id]"><warehouse:message code="default.delete.label" args="[entityName]"/></g:link>
 									</div>
 								</td>
 							</tr>
@@ -230,9 +230,9 @@
 											<g:else>
 												${childCategory.name }
 											</g:else>
-											<g:link class="new" action="create" params="['parentCategory.id':childCategory.id]"><warehouse:message code="default.add.label" args="['category']"/></g:link>
+											<g:link class="new" action="create" params="['parentCategory.id':childCategory.id]"><warehouse:message code="default.add.label" args="[entityName]"/></g:link>
 											| 
-											<g:link class="new" action="delete" params="['category.id':childCategory.id]"><warehouse:message code="default.delete.label" args="['category']"/></g:link>
+											<g:link class="new" action="delete" params="['category.id':childCategory.id]"><warehouse:message code="default.delete.label" args="[entityName]"/></g:link>
 											
 											
 										</div>

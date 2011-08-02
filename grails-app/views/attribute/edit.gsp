@@ -29,7 +29,7 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="name"><warehouse:message code="attribute.name.label" default="Name" /></label>
+	                                  <label for="name"><warehouse:message code="default.name.label" default="Name" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: attributeInstance, field: 'name', 'errors')}">
 	                                    <g:textField name="name" value="${attributeInstance?.name}" />

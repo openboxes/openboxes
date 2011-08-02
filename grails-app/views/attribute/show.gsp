@@ -18,28 +18,28 @@
                     <tbody>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><warehouse:message code="attribute.id.label" default="Id" /></td>
+                            <td valign="top" class="name"><warehouse:message code="default.id.label" default="Id" /></td>
                             
                             <td valign="top" class="value">${fieldValue(bean: attributeInstance, field: "id")}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><warehouse:message code="attribute.name.label" default="Name" /></td>
+                            <td valign="top" class="name"><warehouse:message code="default.name.label" default="Name" /></td>
                             
                             <td valign="top" class="value"><format:metadate obj="${attributeInstance}"/></td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><warehouse:message code="attribute.dateCreated.label" default="Date Created" /></td>
+                            <td valign="top" class="name"><warehouse:message code="default.dateCreated.label" default="Date Created" /></td>
                             
                             <td valign="top" class="value"><format:datetime obj="${attributeInstance?.dateCreated}" /></td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><warehouse:message code="attribute.lastUpdated.label" default="Last Updated" /></td>
+                            <td valign="top" class="name"><warehouse:message code="default.lastUpdated.label" default="Last Updated" /></td>
                             
                             <td valign="top" class="value"><format:datetime obj="${attributeInstance?.lastUpdated}" /></td>
                             

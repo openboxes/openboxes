@@ -23,17 +23,17 @@
                     <thead>
                         <tr>
                         
-                            <g:sortableColumn property="id" title="${message(code: 'category.id.label', default: 'Id')}" />
+                            <g:sortableColumn property="id" title="${message(code: 'default.id.label', default: 'Id')}" />
                         
-                            <g:sortableColumn property="name" title="${message(code: 'category.name.label', default: 'Name')}" />
+                            <g:sortableColumn property="name" title="${message(code: 'default.name.label', default: 'Name')}" />
                         
-                            <g:sortableColumn property="description" title="${message(code: 'category.description.label', default: 'Description')}" />
+                            <g:sortableColumn property="description" title="${message(code: 'default.description.label', default: 'Description')}" />
                         
                             <g:sortableColumn property="sortOrder" title="${message(code: 'category.sortOrder.label', default: 'Sort Order')}" />
                         
                             <th><warehouse:message code="category.parentCategory.label" default="Parent Category" /></th>
                    	    
-                            <g:sortableColumn property="dateCreated" title="${message(code: 'category.dateCreated.label', default: 'Date Created')}" />
+                            <g:sortableColumn property="dateCreated" title="${message(code: 'default.dateCreated.label', default: 'Date Created')}" />
                         
                         </tr>
                     </thead>

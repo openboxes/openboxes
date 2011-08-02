@@ -24,8 +24,8 @@
                 <table>
                     <thead>
                         <tr>
-                            <g:sortableColumn property="id" title="${warehouse.message(code: 'attribute.id.label', default: 'Id')}" />
-                            <g:sortableColumn property="name" title="${warehouse.message(code: 'attribute.name.label', default: 'Name')}" />
+                            <g:sortableColumn property="id" title="${warehouse.message(code: 'default.id.label', default: 'Id')}" />
+                            <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label', default: 'Name')}" />
                             <g:sortableColumn property="options" title="${warehouse.message(code: 'attribute.options.label', default: 'Options')}" />
                             <g:sortableColumn property="allowOther" title="${warehouse.message(code: 'attribute.allowOther.label', default: 'Allow Other')}" />
                         </tr>
