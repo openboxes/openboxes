@@ -4,7 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'request.label', default: 'Order')}" />
-        <title><g:message code="default.fulfill.label" default="Fulfill {0}" args="[entityName]" /></title>
+        <title><warehouse:message code="default.fulfill.label" default="Fulfill {0}" args="[entityName]" /></title>
        
     </head>
     <body>

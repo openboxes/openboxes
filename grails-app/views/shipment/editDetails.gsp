@@ -3,7 +3,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
 	<g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
-	<title><g:message code="default.edit.label" args="[entityName]" /></title>
+	<title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<content tag="pageTitle">Edit Shipment</content>
 </head>
@@ -34,7 +34,7 @@
 							<table>
 								<tbody>
 									<tr class="prop">
-										<td valign="top" class="name"><label><g:message
+										<td valign="top" class="name"><label><warehouse:message
 											code="shipment.name.label" default="Shipment Number" /></label>
 										</td>
 										<td colspan="3" valign="top"
@@ -43,7 +43,7 @@
 										</td>
 									</tr>
 									<tr class="prop">
-										<td valign="middle" class="name"><label><g:message
+										<td valign="middle" class="name"><label><warehouse:message
 											code="shipment.shipmentType.label" default="Type" /></label></td>
 										<td valign="middle" class="value" nowrap="nowrap"><g:select
 											name="shipmentType.id"
@@ -52,7 +52,7 @@
 										</td>
 									</tr>							
 									<tr class="prop">
-										<td valign="top" class="name"><label><g:message
+										<td valign="top" class="name"><label><warehouse:message
 											code="shipment.name.label" default="Nickname" /></label>
 										</td>
 										<td colspan="3" valign="top"
@@ -61,7 +61,7 @@
 										</td>
 									</tr>									
 									<tr class="prop">
-										<td valign="top" class="name" style="width: 10%;"><label><g:message
+										<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
 											code="shipment.shipper.label" default="Origin" /></label>
 										</td>
 										<td valign="top" style="width: 30%; line-height: 1.5em">											
@@ -75,7 +75,7 @@
 										</td>
 									</tr>
 									<tr class="prop">
-										<td valign="top" class="name" style="width: 10%;"><label><g:message
+										<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
 											code="shipment.shipper.label" default="Destination" /></label>
 										</td>
 										<td valign="top" style="width: 30%; line-height: 1.5em">											
@@ -86,7 +86,7 @@
 										</td>
 									</tr>
 									<tr class="prop">
-										<td valign="top" class="name" style="width: 10%;"><label><g:message
+										<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
 											code="shipment.shipper.label" default="Shipping Method" /></label>
 										</td>
 										<td valign="top" style="width: 30%; line-height: 1.5em">			
@@ -103,7 +103,7 @@
 										</td>
 									</tr>
 									<tr class="prop">
-										<td valign="top" class="name" style="width: 10%;"><label><g:message
+										<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
 											code="shipment.shipper.label" default="Tracking Number" /></label>
 										</td>
 										<td valign="top" style="width: 30%;">											
@@ -113,7 +113,7 @@
 									
 									 
 									<tr class="prop">
-										<td valign="top" class="name" style="width: 10%;"><label><g:message
+										<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
 											code="shipment.carrier.label" default="Carrier" /></label></td>
 										<td valign="top" style="width: 30%; line-height: 1.5em">											
 											<g:if test="${shipmentInstance?.carrier}">
@@ -130,7 +130,7 @@
 									<%--
 									<tr class="prop">
 										<td class="name"  style="width: 10%;">
-											<label><g:message code="shipment.recipient.label" default="Recipient" /></label>
+											<label><warehouse:message code="shipment.recipient.label" default="Recipient" /></label>
 										</td>
 										<td class="value" style="width: 30%;">		
 											<g:if test="${shipmentInstance?.recipient}">
@@ -145,7 +145,7 @@
 									</tr>
 									--%>						
 									<tr class="prop">
-										<td valign="top" class="name"><label><g:message
+										<td valign="top" class="name"><label><warehouse:message
 											code="shipment.expectedShippingDate.label" default="Expected shipping date" /></label></td>
 										<td valign="top"
 											class=" ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}"
@@ -156,7 +156,7 @@
 									</tr>		
 									
 									<tr class="prop">
-										<td valign="top" class="name"><label><g:message
+										<td valign="top" class="name"><label><warehouse:message
 											code="shipment.totalValue.label" default="Total Value (USD)" /></label></td>
 										<td valign="top"
 											class=" ${hasErrors(bean: shipmentInstance, field: 'totalValue', 'errors')}"

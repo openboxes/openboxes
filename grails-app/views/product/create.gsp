@@ -5,9 +5,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'product.label', default: 'Product')}" />
-        <title><g:message code="default.add.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.add.label" args="[entityName]" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.add.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.add.label" args="[entityName]" /></content>
     </head>    
     <body>
     
@@ -31,7 +31,7 @@
 	                        <tbody>                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                    <label for="name"><g:message code="product.name.label" default="Name" /></label>
+	                                    <label for="name"><warehouse:message code="product.name.label" default="Name" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'name', 'errors')}">
 	                                    <g:textField name="name" value="${productInstance?.name}" />
@@ -39,7 +39,7 @@
 	                            </tr>
 			 					<tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="productType.id"><g:message code="product.productType.label" default="Product Type" /></label>
+	                                  <label for="productType.id"><warehouse:message code="product.productType.label" default="Product Type" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'type', 'errors')}">
 	                                    <g:select name="productType.id" from="${org.pih.warehouse.product.ProductType.list()}" optionKey="id" value="${productInstance?.productType?.id}"  />
@@ -47,7 +47,7 @@
 	                            </tr>                            
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                    <label for="upc"><g:message code="product.upc.label" default="UPC" /></label>
+	                                    <label for="upc"><warehouse:message code="product.upc.label" default="UPC" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'upc', 'errors')}">
 	                                    <g:textField name="upc" value="${productInstance?.upc}" />
@@ -55,7 +55,7 @@
 	                            </tr>                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                    <label for="description"><g:message code="product.description.label" default="Description" /></label>
+	                                    <label for="description"><warehouse:message code="product.description.label" default="Description" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'description', 'errors')}">
 	                                    <g:textField name="description" value="${productInstance?.description}" />

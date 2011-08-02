@@ -4,7 +4,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
 	<g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
-	<title><g:message code="default.edit.label" args="[entityName]" /></title>
+	<title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<content tag="pageTitle">
 		Edit Shipment
@@ -159,7 +159,7 @@
 									</tr>
 						
 									<tr class="prop">
-										<td valign="top" class="name"><label><g:message
+										<td valign="top" class="name"><label><warehouse:message
 											code="shipment.actualShippingDate.label" default="Shipping date" /></label></td>
 										<td valign="top"
 											class=" ${hasErrors(bean: shipmentInstance, field: 'actualShippingDate', 'errors')}"
@@ -169,7 +169,7 @@
 										</td>
 									</tr>											
 									<tr class="prop">
-			                            <td valign="top" class="name"><label><g:message code="note.label" default="Note" /></label></td>                            
+			                            <td valign="top" class="name"><label><warehouse:message code="note.label" default="Note" /></label></td>                            
 			                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'comment', 'errors')}">
 		                                    <g:textArea name="comment" cols="60" rows="5"/>
 		                                </td>

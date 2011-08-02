@@ -48,7 +48,7 @@
 								</tr>
 					            <tr class="prop">
 					                <td valign="top" class="name">
-					                    <label for="firstName"><g:message code="user.firstName.label" default="First Name" /></label>
+					                    <label for="firstName"><warehouse:message code="user.firstName.label" default="First Name" /></label>
 					                </td>
 					                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'firstName', 'errors')}">
 					                    <g:textField name="firstName" value="${userInstance?.firstName}" />
@@ -57,7 +57,7 @@
 	
 					            <tr class="prop">
 					                <td valign="top" class="name">
-					                    <label for="lastName"><g:message code="user.lastName.label" default="Last Name" /></label>
+					                    <label for="lastName"><warehouse:message code="user.lastName.label" default="Last Name" /></label>
 					                </td>
 					                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'lastName', 'errors')}">
 					                    <g:textField name="lastName" value="${userInstance?.lastName}" />
@@ -66,7 +66,7 @@
 
 					            <tr class="prop">
 					                <td valign="top" class="name">
-					                    <label for="email"><g:message code="user.email.label" default="Email" /></label>
+					                    <label for="email"><warehouse:message code="user.email.label" default="Email" /></label>
 					                </td>
 					                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'email', 'errors')}">
 					                    <g:textField name="email" value="${userInstance?.email}" />
@@ -79,7 +79,7 @@
 						
 					            <tr class="prop">
 					                <td valign="top" class="name">
-					                    <label for="username"><g:message code="user.username.label" default="Username" /></label>
+					                    <label for="username"><warehouse:message code="user.username.label" default="Username" /></label>
 					                </td>
 					                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
 					                    <g:textField name="username" value="${userInstance?.username}" />
@@ -89,7 +89,7 @@
 	
 					            <tr class="prop">
 					                <td valign="top" class="name">
-					                    <label for="password"><g:message code="user.password.label" default="Password" /></label>
+					                    <label for="password"><warehouse:message code="user.password.label" default="Password" /></label>
 					                </td>
 					                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
 					                    <g:passwordField name="password" value="${userInstance?.password}" />
@@ -98,7 +98,7 @@
 						    
 					            <tr class="prop">
 					                <td valign="top" class="name">
-					                  <label for="passwordConfirm"><g:message code="user.email.label" default="Confirm Password" /></label>
+					                  <label for="passwordConfirm"><warehouse:message code="user.email.label" default="Confirm Password" /></label>
 					                </td>
 					                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'passwordConfirm', 'errors')}">
 					                    <g:passwordField name="passwordConfirm" value="${userInstance?.passwordConfirm}" />
@@ -114,7 +114,7 @@
 								<tr class="prop">
 									<td valign="top" class="" colspan="2">
 										<div style="text-align: left">				
-											Already have an account? <g:link class="list" controller="auth" action="login"><g:message code="default.login.label" default="Login"/></g:link>
+											Already have an account? <g:link class="list" controller="auth" action="login"><warehouse:message code="default.login.label" default="Login"/></g:link>
 										</div>
 									</td>
 								</tr>								

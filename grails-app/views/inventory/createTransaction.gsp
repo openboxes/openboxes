@@ -5,10 +5,10 @@
         <g:set var="entityName" value="${message(code: 'transaction.label', default: 'Transaction')}" />
         <title>
 	        <g:if test="${transactionInstance?.id }">
-		        <g:message code="default.edit.label" args="[entityName]" />  
+		        <warehouse:message code="default.edit.label" args="[entityName]" />  
 	    	</g:if>
 	    	<g:else>
-		        <g:message code="default.create.label" args="[entityName]" />    
+		        <warehouse:message code="default.create.label" args="[entityName]" />    
 			</g:else>    	    
 		</title>
         <style>

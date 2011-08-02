@@ -3,7 +3,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
 	<g:set var="entityName" value="${message(code: 'order.label', default: 'Order')}" />
-	<title><g:message code="default.edit.label" args="[entityName]" /></title>
+	<title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
 </head>
 
 <body>
@@ -31,7 +31,7 @@
 					<table>
 						<tbody>
 							<tr class="prop">
-								<td valign="top" class="name"><label><g:message
+								<td valign="top" class="name"><label><warehouse:message
 									code="document.file.label" default="Select a file" /></label>
 								</td>
 								<td valign="top"
@@ -46,7 +46,7 @@
 								</td>
 							</tr>
 							<tr class="prop">
-								<td valign="top" class="name"><label class="optional"><g:message
+								<td valign="top" class="name"><label class="optional"><warehouse:message
 									code="document.name.label" default="Description" /></label>
 								</td>
 								<td valign="top"
@@ -55,7 +55,7 @@
 								</td>
 							</tr>
 							<tr class="prop">
-								<td valign="top" class="name"><label><g:message
+								<td valign="top" class="name"><label><warehouse:message
 									code="document.documentType.label" default="Document Type" /></label></td>
 								<td valign="top"
 									class="value ${hasErrors(bean: documentInstance, field: 'documentType', 'errors')}">
@@ -63,7 +63,7 @@
 								</td>
 							</tr>
 							<tr class="prop">
-								<td valign="top" class="name"><label class="optional"><g:message
+								<td valign="top" class="name"><label class="optional"><warehouse:message
 									code="document.number.label" default="Document Number" /></label>
 								</td>
 								<td valign="top"

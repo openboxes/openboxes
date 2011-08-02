@@ -34,7 +34,7 @@
 				
 				
 					<tr class="prop">
-						<td valign="top" class="name"><label><g:message code="inventoryItem.product.label" default="Product" /></label></td>                            
+						<td valign="top" class="name"><label><warehouse:message code="inventoryItem.product.label" default="Product" /></label></td>                            
 						<td valign="top" class="value">
 							<%-- 
 							<g:autoSuggestEditable id="editItem-product-${itemInstance?.id}" name="product" jsonUrl="/warehouse/json/findProductByName" 
@@ -48,14 +48,14 @@
 					
 					
 					<tr class="prop">
-						<td valign="top" class="name"><label><g:message code="inventoryItem.lotNumber.label" default="Lot/Serial Number" /></label></td>                            
+						<td valign="top" class="name"><label><warehouse:message code="inventoryItem.lotNumber.label" default="Lot/Serial Number" /></label></td>                            
 						<td valign="top" class="value">
 							<g:autoSuggestEditable id="editItem-lotNumber-${itemInstance?.id}" name="lotNumber" jsonUrl="/warehouse/json/findLotsByName?productId=${itemInstance?.product?.id }" 
 								size="20" valueId="${itemInstance?.lotNumber}" valueName="${itemInstance?.lotNumber}"/>							
 						</td>
 					</tr>
 					<tr class="prop">
-						<td valign="top" class="name"><label><g:message code="inventoryItem.expirationDate.label" default="Expiration Date" /></label></td>                            
+						<td valign="top" class="name"><label><warehouse:message code="inventoryItem.expirationDate.label" default="Expiration Date" /></label></td>                            
 						<td valign="top" class="">
 							<g:datePicker name="expirationDate" value="" precision="month" default="none" value="${itemInstance?.expirationDate }" noSelection="['':'']"/>
 						</td>

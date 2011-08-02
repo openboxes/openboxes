@@ -5,7 +5,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'product.label', default: 'Product')}" />
-        <title><g:message code="default.browse.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.browse.label" args="[entityName]" /></title>
 		<style>
 			.data-table td, .data-table th { vertical-align: middle; }
 		</style>

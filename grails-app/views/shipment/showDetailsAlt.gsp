@@ -4,7 +4,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
 	<g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
-	<title><g:message code="default.show.label" args="[entityName]" /></title>        
+	<title><warehouse:message code="default.show.label" args="[entityName]" /></title>        
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<content tag="pageTitle">
 		<img src="${createLinkTo(dir:'images/icons/silk/',file: 'lorry.png')}"
@@ -35,14 +35,14 @@
 										<table>
 											<tbody>
 												<tr class="prop">
-													<td valign="top" class="name"><label><g:message
+													<td valign="top" class="name"><label><warehouse:message
 														code="shipment.currentStatus.label" default="Status" /></label></td>
 													<td valign="top" class="value">
 														${fieldValue(bean: shipmentInstance, field: "mostRecentEvent.eventType.name")}
 													</td>
 												</tr>
 												<tr class="prop">
-													<td valign="top" class="name"><label><g:message
+													<td valign="top" class="name"><label><warehouse:message
 														code="shipment.origin.label" default="From" /></label></td>
 													<td valign="top" class="value">
 														${fieldValue(bean: shipmentInstance, field: "origin.name")}<br/>										
@@ -55,14 +55,14 @@
 													</td>
 												</tr>
 												<tr class="prop">
-													<td valign="top" class="name"><label><g:message
+													<td valign="top" class="name"><label><warehouse:message
 														code="shipment.destination.label" default="To" /></label></td>
 													<td valign="top" class="value">
 													${fieldValue(bean: shipmentInstance, field: "destination.name")}
 													</td>
 												</tr>
 												<tr class="prop">
-													<td valign="top" class="name"><label><g:message
+													<td valign="top" class="name"><label><warehouse:message
 														code="shipment.method.label" default="Shipper" /></label></td>
 													<td valign="top" class="value">
 													${fieldValue(bean: shipmentInstance, field: "shipmentMethod.name")} <img

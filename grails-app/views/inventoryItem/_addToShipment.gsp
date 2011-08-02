@@ -36,7 +36,7 @@
 									</td>
 								</tr>						
 								<tr class="prop">
-									<td valign="top" class="name"><label>Add to <g:message code="shipmentItem.shipment.label" default="Shipment" /></label></td>                            
+									<td valign="top" class="name"><label>Add to <warehouse:message code="shipmentItem.shipment.label" default="Shipment" /></label></td>                            
 									<td valign="top" class="value">
 										<select name="shipmentContainer">
 											<option value="null"></option>
@@ -72,7 +72,7 @@
 								</tr>  	        
 								
 								<tr class="prop">
-									<td valign="top" class="name"><label><g:message code="shipmentItem.recipient.label" default="Recipient" /></label></td>                            
+									<td valign="top" class="name"><label><warehouse:message code="shipmentItem.recipient.label" default="Recipient" /></label></td>                            
 									<td valign="top" class="value">
 										<g:autoSuggestEditable id="recipient-${itemInstance?.id}" name="recipient" jsonUrl="/warehouse/json/findPersonByName" 
 											width="200" valueId="" valueName=""/>							

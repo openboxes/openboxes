@@ -5,8 +5,8 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'user.label', default: 'User')}" />
-        <title><g:message code="default.create.label" args="[entityName]" /></title>
-	<content tag="pageTitle"><g:message code="default.create.label" args="[entityName]" /></content>
+        <title><warehouse:message code="default.create.label" args="[entityName]" /></title>
+	<content tag="pageTitle"><warehouse:message code="default.create.label" args="[entityName]" /></content>
 
     </head>
     <body>
@@ -29,7 +29,7 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="username"><g:message code="user.username.label" default="Username" /></label>
+                                    <label for="username"><warehouse:message code="user.username.label" default="Username" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
                                     <g:textField name="username" value="${userInstance?.username}" />
@@ -38,7 +38,7 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="name"><g:message code="user.name.label" default="First Name" /></label>
+                                    <label for="name"><warehouse:message code="user.name.label" default="First Name" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'firstName', 'errors')}">
                                     <g:textField name="firstName" value="${userInstance?.firstName}" />
@@ -47,7 +47,7 @@
 
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="name"><g:message code="user.name.label" default="Last Name" /></label>
+                                    <label for="name"><warehouse:message code="user.name.label" default="Last Name" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'lastName', 'errors')}">
                                     <g:textField name="lastName" value="${userInstance?.lastName}" />
@@ -56,7 +56,7 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="password"><g:message code="user.password.label" default="Password" /></label>
+                                    <label for="password"><warehouse:message code="user.password.label" default="Password" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
                                     <g:textField type="password" name="password" value="${userInstance?.password}" />
@@ -65,7 +65,7 @@
 			    
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                  <label for="email"><g:message code="user.email.label" default="Email" /></label>
+                                  <label for="email"><warehouse:message code="user.email.label" default="Email" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'email', 'errors')}">
                                     <g:textField name="email" value="${userInstance?.email}" />

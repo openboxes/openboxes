@@ -3,7 +3,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
 	<g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
-	<title><g:message code="default.edit.label" args="[entityName]" /></title>
+	<title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<content tag="pageTitle">Edit Shipment Contents</content>
 </head>
@@ -250,19 +250,19 @@
 																	<table>
 																		<tbody>
 																			<tr class="prop">
-													                            <td valign="top" class="name"><label><g:message code="person.firstName.label" default="First Name" /></label></td>                            
+													                            <td valign="top" class="name"><label><warehouse:message code="person.firstName.label" default="First Name" /></label></td>                            
 													                            <td valign="top" class="value ${hasErrors(bean: personInstance, field: 'firstName', 'errors')}">
 																					<g:textField id="firstName" name="firstName" size="15" />
 												                                </td>
 													                        </tr>  	          
 																			<tr class="prop">
-													                            <td valign="top" class="name"><label><g:message code="person.lastName.label" default="Last Name" /></label></td>                            
+													                            <td valign="top" class="name"><label><warehouse:message code="person.lastName.label" default="Last Name" /></label></td>                            
 													                            <td valign="top" class="value ${hasErrors(bean: personInstance, field: 'lastName', 'errors')}">
 												                                    <g:textField id="lastName" name="lastName" size="15" /> 
 												                                </td>
 													                        </tr>  	        
 																			<tr class="prop">
-													                            <td valign="top" class="name"><label><g:message code="person.email.label" default="Email" /></label></td>                            
+													                            <td valign="top" class="name"><label><warehouse:message code="person.email.label" default="Email" /></label></td>                            
 													                            <td valign="top" class="value ${hasErrors(bean: personInstance, field: 'email', 'errors')}">
 												                                    <g:textField id="email" name="email" size="15" /> 
 												                                </td>
@@ -295,7 +295,7 @@
 															    	<table>
 															    	
 																		<tr class="prop">
-												                            <td valign="top" class="name"><label><g:message code="container.parentContainer.label" default="Parent" /></label></td>                            
+												                            <td valign="top" class="name"><label><warehouse:message code="container.parentContainer.label" default="Parent" /></label></td>                            
 												                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'parentContainer', 'errors')}">
 																				<g:select id="parentContainer.id" name='parentContainer.id' noSelection="${['':'']}" 
 											                                    	from='${shipmentInstance?.containers}' optionKey="id" optionValue="name"></g:select>
@@ -364,13 +364,13 @@
 																<table>
 																	<tbody>
 																		<tr class="prop">
-													                           <td valign="top" class="name"><label><g:message code="container.name.label" default="Copying unit" /></label></td>                            
+													                           <td valign="top" class="name"><label><warehouse:message code="container.name.label" default="Copying unit" /></label></td>                            
 													                           <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'name', 'errors')}">
 																				${containerInstance.containerType.name}-${containerInstance.name}
 																			</td>
 													                       </tr>  	          
 																			<tr class="prop">
-													                           <td valign="top" class="name"><label><g:message code="container.copies.label" default="How Many?" /></label></td>                            
+													                           <td valign="top" class="name"><label><warehouse:message code="container.copies.label" default="How Many?" /></label></td>                            
 													                           <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'name', 'errors')}">
 																				<g:textField name="copies" value="1" size="3"/>
 													                              </td>

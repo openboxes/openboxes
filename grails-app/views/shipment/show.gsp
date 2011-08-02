@@ -3,7 +3,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
-        <title><g:message code="default.show.label" args="[entityName]" /></title>        
+        <title><warehouse:message code="default.show.label" args="[entityName]" /></title>        
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle">Shipment Details</content>
 				
@@ -213,7 +213,7 @@
 																		<tbody>                 			
 												           					<tr class="prop">	                        	
 													                            <td valign="top" class="name">
-													                            	<label><g:message code="shipment.shipmentStatus.label" default="Nickname" /></label>
+													                            	<label><warehouse:message code="shipment.shipmentStatus.label" default="Nickname" /></label>
 													                            </td>        
 													                            <td valign="top" class="value">
 													                            	${fieldValue(bean: shipmentInstance, field: "name")}		  
@@ -221,7 +221,7 @@
 													                        </tr>                    
 												           					<tr class="prop">	                        	
 													                            <td valign="top" class="name">
-													                            	<label><g:message code="shipment.shipmentType.label" default="Type" /></label>
+													                            	<label><warehouse:message code="shipment.shipmentType.label" default="Type" /></label>
 													                            </td>        
 													                            <td valign="top" class="value">
 													                            	${fieldValue(bean: shipmentInstance, field: "shipmentType.name")}		                            	
@@ -229,7 +229,7 @@
 													                        </tr>                    
 												           					<tr class="prop">	                        	
 													                            <td valign="top" class="name">
-													                            	<label><g:message code="shipment.shipmentStatus.label" default="Status" /></label>
+													                            	<label><warehouse:message code="shipment.shipmentStatus.label" default="Status" /></label>
 													                            </td>        
 													                            <td valign="top" class="value">
 													                            	${fieldValue(bean: shipmentInstance, field: "shipmentStatus.name")}										                            	                          	
@@ -238,7 +238,7 @@
 																			
 																			<tr class="prop">
 																				<td valign="top" class="name">
-																					<label><g:message code="shipment.expectedShippingDate.label" default="Ship date" /></label>
+																					<label><warehouse:message code="shipment.expectedShippingDate.label" default="Ship date" /></label>
 																				</td>                            
 																				<td valign="top" class="value" nowrap="nowrap">
 																					<format:date obj="${shipmentInstance?.expectedShippingDate}"/>
@@ -246,7 +246,7 @@
 																			</tr>
 																			<tr class="prop">
 																				<td valign="top" class="name">
-																					<label><g:message code="shipment.expectedDeliveryDate.label" default="Delivery date" /></label>
+																					<label><warehouse:message code="shipment.expectedDeliveryDate.label" default="Delivery date" /></label>
 																				</td>   
 																				<td valign="top" class="value" nowrap="nowrap">
 																					<g:if test=""><format:date obj="${shipmentInstance?.expectedDeliveryDate}"/></g:if>
@@ -261,7 +261,7 @@
 																			</tr>										                        
 												           					<tr class="prop">	                        	
 													                            <td valign="top" class="name">
-													                            	<label><g:message code="shipment.method.label" default="Shipment method" /></label>
+													                            	<label><warehouse:message code="shipment.method.label" default="Shipment method" /></label>
 													                            </td>        
 													                            <td valign="top" class="value">
 													                            	${fieldValue(bean: shipmentInstance, field: "shipmentMethod.name")}
@@ -271,7 +271,7 @@
 													                        </tr>                    
 													                        <tr class="prop">
 													                            <td valign="top" class="name">
-													                            	<label><g:message code="shipment.trackingNumber.label" default="Tracking number" /></label>
+													                            	<label><warehouse:message code="shipment.trackingNumber.label" default="Tracking number" /></label>
 													                            </td>                            
 													                            <td valign="top" class="value">
 													                            	<span style="color:#aaa">
@@ -312,7 +312,7 @@
 																			
 								        									<tr class="prop">
 													                            <td valign="middle" class="name">
-													                            	<label><g:message code="shipment.shipmentNumber.label" default="Last Modified on" /></label>
+													                            	<label><warehouse:message code="shipment.shipmentNumber.label" default="Last Modified on" /></label>
 													                            </td>                            
 													                            <td valign="top" class="value" nowrap="nowrap">
 													                            	<span style="color: #aaa"><format:datetime obj="${shipmentInstance?.lastUpdated}"/></span>
@@ -320,7 +320,7 @@
 													                        </tr>                    
 													                        <tr class="prop">
 													                            <td valign="middle" class="name">
-													                            	<label><g:message code="shipment.shipmentNumber.label" default="Created on" /></label>
+													                            	<label><warehouse:message code="shipment.shipmentNumber.label" default="Created on" /></label>
 													                            </td>                            
 													                            <td valign="top" class="value" nowrap="nowrap">
 													                            	<span style="color: #aaa"><format:datetime obj="${shipmentInstance?.dateCreated}"/></span>
@@ -350,26 +350,26 @@
 														                    <tbody>	            
 														                        <tr class="prop">
 														                            <td valign="top" class="name">
-														                            	<label><g:message code="shipment.name.label" default="Nickname" /></label>
+														                            	<label><warehouse:message code="shipment.name.label" default="Nickname" /></label>
 														                           	</td>           
 														                            <td colspan="3" valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">
 													                                    <g:textField name="name" value="${shipmentInstance?.name}" />
 														                            </td>                            
 														                        </tr>                    
 														                        <tr class="prop">
-														                            <td valign="middle" class="name"><label><g:message code="shipment.shipmentType.label" default="Type" /></label></td>                            
+														                            <td valign="middle" class="name"><label><warehouse:message code="shipment.shipmentType.label" default="Type" /></label></td>                            
 														                            <td valign="middle" class="value" nowrap="nowrap">
 																                    	<g:select name="shipmentType" from="${org.pih.warehouse.shipping.ShipmentType.list()}" optionKey="id" value="${shipmentInstance?.shipmentType?.id}"  /> 
 														                            </td>                            
 														                        </tr>                    						                                
 																				<tr class="prop">
-																					<td valign="top" class="name"><label><g:message code="shipment.expectedShippingDate.label" default="Ship date" /></label></td>                            
+																					<td valign="top" class="name"><label><warehouse:message code="shipment.expectedShippingDate.label" default="Ship date" /></label></td>                            
 													                                <td valign="top" class=" ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}" nowrap="nowrap">
 														           						<g:datePicker name="expectedShippingDate" precision="day" value="${shipmentInstance?.expectedShippingDate}" />
 													                                </td>
 																				</tr>
 																				<tr class="prop">
-																					<td valign="top" class="name"><label><g:message code="shipment.expectedDeliveryDate.label" default="Delivery date" /></label></td>   
+																					<td valign="top" class="name"><label><warehouse:message code="shipment.expectedDeliveryDate.label" default="Delivery date" /></label></td>   
 													                                <td valign="top" class=" ${hasErrors(bean: shipmentInstance, field: 'expectedDeliveryDate', 'errors')}" nowrap="nowrap">
 														           						<g:datePicker name="expectedDeliveryDate" precision="day" value="${shipmentInstance?.expectedDeliveryDate}" />
 													                                </td>
@@ -381,7 +381,7 @@
 																				</tr>
 													           					                 
 														                        <tr class="prop">
-														                            <td valign="top" class="name"><label><g:message code="shipment.trackingNumber.label" default="Tracking number" /></label></td>                            
+														                            <td valign="top" class="name"><label><warehouse:message code="shipment.trackingNumber.label" default="Tracking number" /></label></td>                            
 														                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'trackingNumber', 'errors')}">
 												                                    	<g:textField name="trackingNumber" value="${shipmentInstance?.trackingNumber}" />
 												                                    	<span style="color:#aaa">format: ${shipmentInstance?.shipmentMethod?.trackingFormat}</span>
@@ -424,7 +424,7 @@
 								<table class="withoutBorder">
 									<tbody>
 										<tr class="prop">
-										    <td valign="top" class="name"><label><g:message code="shipment.description.label" default="Description" /></label></td>   
+										    <td valign="top" class="name"><label><warehouse:message code="shipment.description.label" default="Description" /></label></td>   
 										    <td valign="top" class="value" nowrap="nowrap">
 												${shipment?.description}
 										    </td>                          
@@ -575,7 +575,7 @@
 																				    <%-- 
 																					<tr class="prop">
 																						<td colspan="4">
-																							<label><g:message code="shipment.contents.quickAdd.label" default="Quick Add" /></label></td>   
+																							<label><warehouse:message code="shipment.contents.quickAdd.label" default="Quick Add" /></label></td>   
 																							<div style="width:50%">
 																								<g:form action="addItemAutoComplete" id="${shipmentInstance.id}">	
 																									<gui:autoComplete size="20" width="100" id="selectedItem" name="selectedItem" controller="json" action="availableItems"/>											
@@ -653,13 +653,13 @@
 											<table>
 												<tbody>
 													<tr class="prop">
-							                            <td valign="top" class="name"><label><g:message code="container.name.label" default="Copy ..." /></label></td>                            
+							                            <td valign="top" class="name"><label><warehouse:message code="container.name.label" default="Copy ..." /></label></td>                            
 							                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'name', 'errors')}">
 															${container?.name}
 						                                </td>
 							                        </tr>  	          
 													<tr class="prop">
-							                            <td valign="top" class="name"><label><g:message code="container.copies.label" default="# of Copies" /></label></td>                            
+							                            <td valign="top" class="name"><label><warehouse:message code="container.copies.label" default="# of Copies" /></label></td>                            
 							                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'name', 'errors')}">
 															<g:textField name="copies" value="1" />
 						                                </td>
@@ -684,7 +684,7 @@
 												<tbody>
 													<tr class="prop">
 							                            <td valign="top" class="name">
-							                            	<label><g:message code="container.name.label" default="Nickname" /></label>
+							                            	<label><warehouse:message code="container.name.label" default="Nickname" /></label>
 							                            </td>                            
 							                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'name', 'errors')}">
 															<g:textField name="name" value="${container?.name}" />
@@ -692,7 +692,7 @@
 							                        </tr>  	          
 													<tr class="prop">
 							                            <td valign="top" class="name">
-							                            	<label><g:message code="container.name.label" default="Dimensions" /></label>
+							                            	<label><warehouse:message code="container.name.label" default="Dimensions" /></label>
 							                            </td>                            
 							                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'dimensions', 'errors')}">
 															<g:textField name="dimensions" value="${container?.dimensions}" />
@@ -700,7 +700,7 @@
 							                        </tr>  	          
 													<tr class="prop">
 							                            <td valign="top" class="name">
-							                            	<label><g:message code="container.name.label" default="Weight" /></label>
+							                            	<label><warehouse:message code="container.name.label" default="Weight" /></label>
 							                            </td>                            
 							                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'weight', 'errors')}">
 															<g:textField name="weight" value="${container?.weight}" />
@@ -727,7 +727,7 @@
 												<tbody>
 													<tr>  
 														<td valign="top" class="name">
-															<label><g:message code="shipmentItem.quantity.label" default="Quantity" /></label>
+															<label><warehouse:message code="shipmentItem.quantity.label" default="Quantity" /></label>
 														</td>                            
 									                    <td valign="top" class="value ${hasErrors(bean: shipmentItem, field: 'quantity', 'errors')}">
 															<g:textField name="quantity" size="5" /> 
@@ -735,7 +735,7 @@
 													</tr>
 													<tr>
 														<td valign="top" class="name">
-															<label><g:message code="shipmentItem.product.label" default="Product" /></label>
+															<label><warehouse:message code="shipmentItem.product.label" default="Product" /></label>
 														</td>                            
 									                    <td valign="top" class="value ${hasErrors(bean: shipmentItem, field: 'product', 'errors')}">												
 															<g:select 
@@ -748,7 +748,7 @@
 													</tr>
 													<tr>  
 														<td valign="top" class="name">
-															<label><g:message code="shipmentItem.donor.label" default="Donor" /></label>
+															<label><warehouse:message code="shipmentItem.donor.label" default="Donor" /></label>
 														</td>                            
 									                    <td valign="top" class="value ${hasErrors(bean: shipmentItem, field: 'donor', 'errors')}">
 															<g:select 
@@ -821,7 +821,7 @@
 					</gui:tab>
 							
 					<gui:tab id="shipmentEventsTab" label="Events">
-						<h2><g:message code="shipment.events.label" default="Tracking" /></h2>
+						<h2><warehouse:message code="shipment.events.label" default="Tracking" /></h2>
 						<div id="eventsTab" class="tab">
 							<g:if test="${!shipmentInstance.events}">	
 								<div class="notice">
@@ -898,7 +898,7 @@
 							
 				    
 				    <gui:tab id="shipmentDocumentsTab" label="Documents">				    
-						<h2><g:message code="shipment.document.label" default="Documents" /></h2>
+						<h2><warehouse:message code="shipment.document.label" default="Documents" /></h2>
 						<div id="documentsTab" class="tab">
 							<g:if test="${!shipmentInstance.documents}">	
 								<div class="notice">
@@ -968,7 +968,7 @@
 				    </gui:tab>
 				    <gui:tab id="shipmentCommentsTab" label="Comments">				
 				    	    
-				    	<h2><g:message code="shipment.comments.label" default="Comments" /></h2>
+				    	<h2><warehouse:message code="shipment.comments.label" default="Comments" /></h2>
 				    
 					    <div id="commentsTab" class="tab">	
 					    	<g:if test="${!shipmentInstance?.comments}">
@@ -1047,7 +1047,7 @@
 										<tbody>
 											<tr class="prop">
 					                            <td valign="top" class="name">
-					                            	<label><g:message code="container.containerType.label" default="Grouping" /></label>
+					                            	<label><warehouse:message code="container.containerType.label" default="Grouping" /></label>
 					                            </td> 						                                        
 					                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'containerType', 'errors')}">							                            
 					                            	<g:if test="${shipmentInstance?.shipmentType?.containerTypes}">
@@ -1071,7 +1071,7 @@
 					                        </tr>  	          
 											<tr class="prop">
 					                            <td valign="top" class="name">
-					                            	<label><g:message code="container.name.label" default="Dimensions" /></label>
+					                            	<label><warehouse:message code="container.name.label" default="Dimensions" /></label>
 					                            </td>                            
 					                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'name', 'errors')}">
 													<g:textField name="dimensions" />
@@ -1079,7 +1079,7 @@
 					                        </tr>
 											<tr class="prop">
 					                            <td valign="top" class="name">
-					                            	<label><g:message code="container.name.label" default="Weight" /></label>
+					                            	<label><warehouse:message code="container.name.label" default="Weight" /></label>
 					                            </td>                            
 					                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'name', 'errors')}">
 													<g:textField name="weight" /> kgs
@@ -1090,7 +1090,7 @@
 					                          	 
 					                        <%-- Should default to Pallet #1 or Container #2 
 											<tr class="prop">
-					                            <td valign="top" class="name"><label><g:message code="container.name.label" default="Nickname" /></label></td>                            
+					                            <td valign="top" class="name"><label><warehouse:message code="container.name.label" default="Nickname" /></label></td>                            
 					                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'name', 'errors')}">
 													<g:textField name="name" />
 				                                </td>
@@ -1116,20 +1116,20 @@
 									<table>
 										<tbody>
 											<tr class="prop">
-					                            <td valign="top" class="name"><label><g:message code="event.eventDate.label" default="Event Date" /></label></td>                            
+					                            <td valign="top" class="name"><label><warehouse:message code="event.eventDate.label" default="Event Date" /></label></td>                            
 					                            <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'eventDate', 'errors')}">
 				                                    <g:datePicker id="eventDate" name="eventDate" value="" />
 				                                </td>
 					                        </tr>  	          
 											<tr class="prop">
-					                            <td valign="top" class="name"><label><g:message code="event.eventType.label" default="Event Type" /></label></td>                            
+					                            <td valign="top" class="name"><label><warehouse:message code="event.eventType.label" default="Event Type" /></label></td>                            
 					                            <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'eventDate', 'errors')}">
 				                                    <g:select id="eventTypeId" name='eventTypeId' noSelection="${['':'Select one ...']}" 
 				                                    	from='${org.pih.warehouse.core.EventType.list()}' optionKey="id" optionValue="name"></g:select>
 				                                </td>
 					                        </tr>  	          
 											<tr class="prop">
-					                            <td valign="top" class="name"><label><g:message code="event.eventDate.label" default="Location" /></label></td>                            
+					                            <td valign="top" class="name"><label><warehouse:message code="event.eventDate.label" default="Location" /></label></td>                            
 					                            <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'location', 'errors')}">
 													<g:select id="eventLocationId" name='eventLocationId' noSelection="${['':'Select one ...']}" 
 														from='${org.pih.warehouse.core.Location.list()}' optionKey="id" optionValue="name">
@@ -1138,14 +1138,14 @@
 					                        </tr>  	          
 										<%-- 
 											<tr class="prop">
-					                            <td valign="top" class="name"><label><g:message code="event.eventDate.label" default="Event Date" /></label></td>                            
+					                            <td valign="top" class="name"><label><warehouse:message code="event.eventDate.label" default="Event Date" /></label></td>                            
 					                            <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'eventDate', 'errors')}">
 													<g:select id="targetLocationId" name='targetLocationId' noSelection="${['':'Select one ...']}" 
 														from='${Location.list()}' optionKey="id" optionValue="name"></g:select>									
 				                                </td>
 					                        </tr>  	          
 											<tr class="prop">
-					                            <td valign="top" class="name"><label><g:message code="event.description.label" default="Comment" /></label></td>                            
+					                            <td valign="top" class="name"><label><warehouse:message code="event.description.label" default="Comment" /></label></td>                            
 					                            <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'description', 'errors')}">
 													<g:textField name="description" size="15" /> 
 				                                </td>
@@ -1169,13 +1169,13 @@
 									<table>
 										<tbody>
 											<tr class="prop">
-					                            <td valign="top" class="name"><label><g:message code="document.documentType.label" default="Document Type" /></label></td>                            
+					                            <td valign="top" class="name"><label><warehouse:message code="document.documentType.label" default="Document Type" /></label></td>                            
 					                            <td valign="top" class="value ${hasErrors(bean: documentInstance, field: 'documentType', 'errors')}">																
 													<g:select name="type" from="${org.pih.warehouse.core.DocumentType.list()}" valueMessagePrefix="document.type"  />							    												
 												</td>
 											</tr>
 											<tr>
-												<td valign="top" class="name"><label><g:message code="document.file.label" default="Select a file" /></label></td>                            
+												<td valign="top" class="name"><label><warehouse:message code="document.file.label" default="Select a file" /></label></td>                            
 					                            <td valign="top" class="value ${hasErrors(bean: documentInstance, field: 'contents', 'errors')}">																
 													<input name="contents" type="file" />												
 												</td>
@@ -1198,20 +1198,20 @@
 									<table>
 										<tbody>
 											<tr class="prop">
-					                            <td valign="top" class="name"><label><g:message code="comment.commenter.label" default="From" /></label></td>                            
+					                            <td valign="top" class="name"><label><warehouse:message code="comment.commenter.label" default="From" /></label></td>                            
 					                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'commenter', 'errors')}">
 				                                    ${session.user.username}
 				                                </td>
 					                        </tr>  	          
 											<tr class="prop">
-					                            <td valign="top" class="name"><label><g:message code="comment.recipient.label" default="To" /></label></td>                            
+					                            <td valign="top" class="name"><label><warehouse:message code="comment.recipient.label" default="To" /></label></td>                            
 					                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'recipient', 'errors')}">
 													<g:select id="recipientId" name='recipientId' noSelection="${['':'Select one ...']}" 
 				                                    	from='${org.pih.warehouse.core.User.list()}' optionKey="id" optionValue="username"></g:select>
 				                                </td>
 					                        </tr>  	          
 											<tr class="prop">
-					                            <td valign="top" class="name"><label><g:message code="comment.comment.label" default="Comment" /></label></td>                            
+					                            <td valign="top" class="name"><label><warehouse:message code="comment.comment.label" default="Comment" /></label></td>                            
 					                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'comment', 'errors')}">
 				                                    <g:textArea name="comment" size="15" />
 				                                </td>
@@ -1232,14 +1232,14 @@
 									<table>
 										<tbody>
 											<tr class="prop">
-					                            <td valign="top" class="name"><label><g:message code="shipment.referenceNumberType.label" default="Type" /></label></td>                            
+					                            <td valign="top" class="name"><label><warehouse:message code="shipment.referenceNumberType.label" default="Type" /></label></td>                            
 					                            <td valign="top" class="value ${hasErrors(bean: referenceNumber, field: 'referenceNumber', 'errors')}">
 													<g:select id="recipientId" name='recipientId' noSelection="${['':'Select one ...']}" 
 				                                    	from='${org.pih.warehouse.shipping.ReferenceNumberType.list()}' optionKey="id" optionValue="name"></g:select>
 				                                </td>
 					                        </tr>  	          
 											<tr class="prop">
-					                            <td valign="top" class="name"><label><g:message code="comment.comment.label" default="Number" /></label></td>                            
+					                            <td valign="top" class="name"><label><warehouse:message code="comment.comment.label" default="Number" /></label></td>                            
 					                            <td valign="top" class="value ${hasErrors(bean: referenceNumber, field: 'identifier', 'errors')}">
 				                                    <g:textField name="identifier" size="15" /> 
 				                                </td>

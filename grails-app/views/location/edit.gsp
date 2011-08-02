@@ -5,9 +5,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'locations.label', default: 'Location')}" />
-        <title><g:message code="default.edit.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.edit.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.edit.label" args="[entityName]" /></content>
     </head>
     <body>
         <div class="body">
@@ -30,7 +30,7 @@
 	                        <tbody>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="name"><g:message code="location.name.label" default="Name" /></label>
+	                                  <label for="name"><warehouse:message code="location.name.label" default="Name" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'name', 'errors')}">
 	                                    <g:textField name="name" value="${locationInstance?.name}" />
@@ -38,7 +38,7 @@
 	                            </tr>
 	                             <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="type"><g:message code="location.type.label" default="Type" /></label>
+	                                  <label for="type"><warehouse:message code="location.type.label" default="Type" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'name', 'errors')}">
 	                                   <g:select name="locationType.id"

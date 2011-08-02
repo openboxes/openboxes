@@ -134,10 +134,10 @@
 										</g:if>
 										<li>
 											logged in as <b>${session.user.username}</b>
-											<g:link class="list" controller="auth" action="logout"><g:message code="default.logout.label"  default="logout"/></g:link>
+											<g:link class="list" controller="auth" action="logout"><warehouse:message code="default.logout.label"  default="logout"/></g:link>
 										</li>
 										<!-- 
-										 <li><g:link class="list" controller="user" action="preferences"><g:message code="default.preferences.label"  default="Preferences"/></g:link></li>
+										 <li><g:link class="list" controller="user" action="preferences"><warehouse:message code="default.preferences.label"  default="Preferences"/></g:link></li>
 										 -->										 
 										<!-- 
 										 <li><input type="text" value="search" name="q" style="color: #aaa; font-weight: bold;" disabled=disabled /></li>
@@ -145,11 +145,11 @@
 								    </g:if>
 								    <g:else test="${!session.user}">
 										<li>Not logged in</li>
-										<li><g:link class="list" controller="auth" action="signup"><g:message code="default.signup.label" default="Signup"/></g:link></li>
-										<li><g:link class="list" controller="auth" action="login"><g:message code="default.login.label" default="Login"/></g:link></li>
+										<li><g:link class="list" controller="auth" action="signup"><warehouse:message code="default.signup.label" default="Signup"/></g:link></li>
+										<li><g:link class="list" controller="auth" action="login"><warehouse:message code="default.login.label" default="Login"/></g:link></li>
 										<!-- 
-										  <li><g:link class="list" controller="user" action="register"><g:message code="default.register.label" default="Register"/></g:link></li>
-										  <li><g:link class="list" controller="user" action="help"><g:message code="default.help.label" default="Help"/></g:link></li>
+										  <li><g:link class="list" controller="user" action="register"><warehouse:message code="default.register.label" default="Register"/></g:link></li>
+										  <li><g:link class="list" controller="user" action="help"><warehouse:message code="default.help.label" default="Help"/></g:link></li>
 										 -->
 										 
 								    </g:else>
@@ -178,7 +178,7 @@
 						    <div id="pageTitle">		
 								<img src="${createLinkTo(dir:'images/icons/silk/',file: 'building.png')}" /> 
 								<g:if test="${session?.warehouse}">${session?.warehouse?.name} &nbsp;&raquo; </g:if>
-							    &nbsp; <g:message code="${params.controller }.label"/> &nbsp;&raquo;
+							    &nbsp; <warehouse:message code="${params.controller }.label"/> &nbsp;&raquo;
 								<g:if test="${pageProperty(name:'page.pageTitle')}">
 								    &nbsp;<b>${pageProperty(name:'page.pageTitle')}</b>
 								</g:if>

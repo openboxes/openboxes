@@ -5,9 +5,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'category.label', default: 'Category')}" />
-        <title><g:message code="default.show.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.show.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.show.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.show.label" args="[entityName]" /></content>
     </head>
     <body>
         <div class="body">
@@ -19,42 +19,42 @@
                     <tbody>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="category.id.label" default="Id" /></td>
+                            <td valign="top" class="name"><warehouse:message code="category.id.label" default="Id" /></td>
                             
                             <td valign="top" class="value">${fieldValue(bean: categoryInstance, field: "id")}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="category.name.label" default="Name" /></td>
+                            <td valign="top" class="name"><warehouse:message code="category.name.label" default="Name" /></td>
                             
                             <td valign="top" class="value">${fieldValue(bean: categoryInstance, field: "name")}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="category.description.label" default="Description" /></td>
+                            <td valign="top" class="name"><warehouse:message code="category.description.label" default="Description" /></td>
                             
                             <td valign="top" class="value">${fieldValue(bean: categoryInstance, field: "description")}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="category.sortOrder.label" default="Sort Order" /></td>
+                            <td valign="top" class="name"><warehouse:message code="category.sortOrder.label" default="Sort Order" /></td>
                             
                             <td valign="top" class="value">${fieldValue(bean: categoryInstance, field: "sortOrder")}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="category.parentCategory.label" default="Parent Category" /></td>
+                            <td valign="top" class="name"><warehouse:message code="category.parentCategory.label" default="Parent Category" /></td>
                             
                             <td valign="top" class="value"><g:link controller="category" action="show" id="${categoryInstance?.parentCategory?.id}">${categoryInstance?.parentCategory?.encodeAsHTML()}</g:link></td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="category.categories.label" default="Categories" /></td>
+                            <td valign="top" class="name"><warehouse:message code="category.categories.label" default="Categories" /></td>
                             
                             <td valign="top" style="text-align: left;" class="value">
                                 <ul>
@@ -67,21 +67,21 @@
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="category.dateCreated.label" default="Date Created" /></td>
+                            <td valign="top" class="name"><warehouse:message code="category.dateCreated.label" default="Date Created" /></td>
                             
                             <td valign="top" class="value"><format:datetime obj="${categoryInstance?.dateCreated}" /></td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="category.lastUpdated.label" default="Last Updated" /></td>
+                            <td valign="top" class="name"><warehouse:message code="category.lastUpdated.label" default="Last Updated" /></td>
                             
                             <td valign="top" class="value"><format:datetime obj="${categoryInstance?.lastUpdated}" /></td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="category.parents.label" default="Parents" /></td>
+                            <td valign="top" class="name"><warehouse:message code="category.parents.label" default="Parents" /></td>
                             
                             <td valign="top" class="value">${fieldValue(bean: categoryInstance, field: "parents")}</td>
                             

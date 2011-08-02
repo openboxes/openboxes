@@ -5,9 +5,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'category.label', default: 'Category')}" />
-        <title><g:message code="default.list.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.list.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.list.label" args="[entityName]" /></content>
     </head>
     <body>
         <div class="body">
@@ -29,7 +29,7 @@
 		        		
 							<div style="padding:10px; text-align: right">
 								<span class="menuButton">
-				            		<g:link class="new" controller="category" action="tree" params="[addCategory:'addCategory']"><g:message code="default.add.label" args="['category']"/></g:link>
+				            		<g:link class="new" controller="category" action="tree" params="[addCategory:'addCategory']"><warehouse:message code="default.add.label" args="['category']"/></g:link>
 				            	</span>										    	
 							</div>						
 		        		
@@ -168,7 +168,7 @@
 						                        <tbody>
 													<tr class="prop">
 														<td>
-															<label for="name" class="desc"><g:message code="category.parent.label" default="Parent" /></label>
+															<label for="name" class="desc"><warehouse:message code="category.parent.label" default="Parent" /></label>
 															<select name="parentCategory.id" style="display: inline">
 																<option value="null"></option>
 																<g:render template="selectOptions" model="[category:rootCategory, level: 1, selected: categoryInstance]"/>
@@ -177,7 +177,7 @@
 													</tr>
 													<tr class="prop">
 														<td valign="top" class="value ${hasErrors(bean: categoryInstance, field: 'name', 'errors')}">
-															<label for="name" class="desc"><g:message code="category.name.label" default="Name" /></label>
+															<label for="name" class="desc"><warehouse:message code="category.name.label" default="Name" /></label>
 															<g:textField name="name" value="${categoryInstance?.name}" />
 														</td>
 													</tr>
@@ -212,9 +212,9 @@
 										<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_white.png')}" alt="Bullet" /> &nbsp;										 
 										<g:if test="${!category.parentCategory }"><b>${category.name }</b></g:if> 
 										<g:else>${category.name }</g:else>
-										<g:link class="new" action="create" params="['parentCategory.id':category.id]"><g:message code="default.add.label" args="['category']"/></g:link>
+										<g:link class="new" action="create" params="['parentCategory.id':category.id]"><warehouse:message code="default.add.label" args="['category']"/></g:link>
 										| 
-										<g:link class="new" action="delete" params="['category.id':category.id]"><g:message code="default.delete.label" args="['category']"/></g:link>
+										<g:link class="new" action="delete" params="['category.id':category.id]"><warehouse:message code="default.delete.label" args="['category']"/></g:link>
 									</div>
 								</td>
 							</tr>
@@ -230,9 +230,9 @@
 											<g:else>
 												${childCategory.name }
 											</g:else>
-											<g:link class="new" action="create" params="['parentCategory.id':childCategory.id]"><g:message code="default.add.label" args="['category']"/></g:link>
+											<g:link class="new" action="create" params="['parentCategory.id':childCategory.id]"><warehouse:message code="default.add.label" args="['category']"/></g:link>
 											| 
-											<g:link class="new" action="delete" params="['category.id':childCategory.id]"><g:message code="default.delete.label" args="['category']"/></g:link>
+											<g:link class="new" action="delete" params="['category.id':childCategory.id]"><warehouse:message code="default.delete.label" args="['category']"/></g:link>
 											
 											
 										</div>

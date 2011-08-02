@@ -5,9 +5,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'order.label', default: 'Order')}" />
-        <title><g:message code="default.edit.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.edit.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.edit.label" args="[entityName]" /></content>
     </head>
     <body>
         <div class="body">
@@ -28,7 +28,7 @@
 	                        <tbody>                      
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="orderNumber"><g:message code="order.orderNumber.label" default="Order Number" /></label>
+	                                  <label for="orderNumber"><warehouse:message code="order.orderNumber.label" default="Order Number" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: orderInstance, field: 'orderNumber', 'errors')}">
 	                                    ${orderInstance?.orderNumber}
@@ -37,7 +37,7 @@
 
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="description"><g:message code="order.description.label" default="Description" /></label>
+	                                  <label for="description"><warehouse:message code="order.description.label" default="Description" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: orderInstance, field: 'description', 'errors')}">
 	                                    <g:textField name="description" value="${orderInstance?.description}" />
@@ -84,7 +84,7 @@
 								</tr>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="dateCreated"><g:message code="order.dateCreated.label" default="Date Created" /></label>
+	                                  <label for="dateCreated"><warehouse:message code="order.dateCreated.label" default="Date Created" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: orderInstance, field: 'dateCreated', 'errors')}">
 	                                    <g:datePicker name="dateCreated" precision="day" value="${orderInstance?.dateCreated}"  />
@@ -93,7 +93,7 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="lastUpdated"><g:message code="order.lastUpdated.label" default="Last Updated" /></label>
+	                                  <label for="lastUpdated"><warehouse:message code="order.lastUpdated.label" default="Last Updated" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: orderInstance, field: 'lastUpdated', 'errors')}">
 	                                    <g:datePicker name="lastUpdated" precision="day" value="${orderInstance?.lastUpdated}"  />

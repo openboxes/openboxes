@@ -5,9 +5,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'product.label', default: 'Product')}" />
-        <title><g:message code="default.create.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.create.label" args="[entityName]" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.create.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.create.label" args="[entityName]" /></content>
     </head>    
     <body>
     	
@@ -32,7 +32,7 @@
 	                        <tbody>                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                    <label for="productClass"><g:message code="productType.productClass.label" default="Product Class" /></label>
+	                                    <label for="productClass"><warehouse:message code="productType.productClass.label" default="Product Class" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: productTypeInstance, field: 'productClass', 'errors')}">
 	                                    <g:select name="productClass" from="${org.pih.warehouse.product.ProductClass?.values()}" value="${productTypeInstance?.productClass}" noSelection="['': '']" />
@@ -40,7 +40,7 @@
 	                            </tr>
 	                            <tr class="prop">
 									<td class="name">
-	                                    <label for="name"><g:message code="product.name.label" default="Product" /></label>
+	                                    <label for="name"><warehouse:message code="product.name.label" default="Product" /></label>
 									</td>
 									<td class="value">
 										<g:textField name="name" value="${productTypeInstance?.name }"/>

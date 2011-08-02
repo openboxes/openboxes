@@ -1,15 +1,15 @@
 <div>            	
 	<span class="menuButton">
-		<g:link class="list" controller="product" action="browse"><g:message code="default.browse.label" args="['Products']"/></g:link>
+		<g:link class="list" controller="product" action="browse"><warehouse:message code="default.browse.label" args="['Products']"/></g:link>
 	</span>
 	<span class="menuButton">
-		<g:link class="new" controller="product" action="create" params="['category.id':params.categoryId]"><g:message code="default.add.label" args="['Product']"/></g:link> 			
+		<g:link class="new" controller="product" action="create" params="['category.id':params.categoryId]"><warehouse:message code="default.add.label" args="['Product']"/></g:link> 			
 	</span>
 	<span class="menuButton">
-		<g:link class="edit" controller="category" action="tree"><g:message code="default.edit.label" args="['Categories']"/></g:link>
+		<g:link class="edit" controller="category" action="tree"><warehouse:message code="default.edit.label" args="['Categories']"/></g:link>
 	</span>
 	<span class="menuButton">
-		<g:link class="edit" controller="attribute" action="list"><g:message code="default.edit.label" args="['Attributes']"/></g:link>
+		<g:link class="edit" controller="attribute" action="list"><warehouse:message code="default.edit.label" args="['Attributes']"/></g:link>
 	</span>
 </div>
 

@@ -5,8 +5,8 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'user.label', default: 'User')}" />
-        <title><g:message code="default.show.label" args="[entityName]" /></title>
-	<content tag="pageTitle"><g:message code="default.show.label" args="[entityName]" /></content>
+        <title><warehouse:message code="default.show.label" args="[entityName]" /></title>
+	<content tag="pageTitle"><warehouse:message code="default.show.label" args="[entityName]" /></content>
 
     </head>
     <body>   
@@ -36,31 +36,31 @@
 	                	</thead>
 	                    <tbody>
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="user.id.label" default="ID" /></td>                            
+	                            <td valign="top" class="name"><warehouse:message code="user.id.label" default="ID" /></td>                            
 	                            <td valign="top" class="value">${fieldValue(bean: userInstance, field: "id")}</td>                            
 	                        </tr>
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="user.username.label" default="Username" /></td>                            
+	                            <td valign="top" class="name"><warehouse:message code="user.username.label" default="Username" /></td>                            
 	                            <td valign="top" class="value">${fieldValue(bean: userInstance, field: "username")}</td>                            
 	                        </tr>
 	                    
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="user.name.label" default="Name" /></td>                            
+	                            <td valign="top" class="name"><warehouse:message code="user.name.label" default="Name" /></td>                            
 	                            <td valign="top" class="value">${fieldValue(bean: userInstance, field: "name")}</td>                            
 	                        </tr>
 	        
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="user.email.label" default="Email" /></td>
+	                            <td valign="top" class="name"><warehouse:message code="user.email.label" default="Email" /></td>
 	                            <td valign="top" class="value">${fieldValue(bean: userInstance, field: "email")}</td>
 	                        </tr>
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="user.locale.label" default="Locale" /></td>
+	                            <td valign="top" class="name"><warehouse:message code="user.locale.label" default="Locale" /></td>
 	                            <td valign="top" class="value">${fieldValue(bean: userInstance, field: "locale.displayName")}</td>
 	                        </tr>
 	                        
 	                        <!-- 
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="user.roles.label" default="Roles" /></td>
+	                            <td valign="top" class="name"><warehouse:message code="user.roles.label" default="Roles" /></td>
 	                            <td valign="top" class="value">
 	                            	<g:if test="${userInstance?.roles}">${fieldValue(bean: userInstance, field: "roles")}</g:if>
 	                            	<g:else><span class="fade">empty</span></g:else>
@@ -68,7 +68,7 @@
 	                        </tr>
 	                        -->
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="user.photo.label" default="Profile Photo" /></td>                            
+	                            <td valign="top" class="name"><warehouse:message code="user.photo.label" default="Profile Photo" /></td>                            
 	                            <td valign="top" class="value">
 	                            
 	                            	<table>

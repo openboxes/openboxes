@@ -81,7 +81,7 @@
 									<g:if test="${selected }">
 										<div class="errors dialog">
 											<g:eachError bean="${flash.itemInstance}">
-												<g:message error="${it}"/>
+												<warehouse:message error="${it}"/>
 											</g:eachError>																	
 										</div>
 									</g:if>																									

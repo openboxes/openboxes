@@ -5,7 +5,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'transaction.label', default: 'Transaction')}" />
-        <title><g:message code="default.edit.label" args="[entityName]" /></title>    
+        <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>    
         <style>
         	optgroup { font-weight: bold; } 
         	#transactionEntryTable { border: 1px solid #ccc; } 

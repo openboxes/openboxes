@@ -5,9 +5,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'category.label', default: 'Category')}" />
-        <title><g:message code="default.edit.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.edit.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.edit.label" args="[entityName]" /></content>
     </head>
     <body>
         <div class="body">
@@ -29,7 +29,7 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="name"><g:message code="category.name.label" default="Name" /></label>
+	                                  <label for="name"><warehouse:message code="category.name.label" default="Name" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: categoryInstance, field: 'name', 'errors')}">
 	                                    <g:textField name="name" value="${categoryInstance?.name}" />
@@ -38,7 +38,7 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="description"><g:message code="category.description.label" default="Description" /></label>
+	                                  <label for="description"><warehouse:message code="category.description.label" default="Description" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: categoryInstance, field: 'description', 'errors')}">
 	                                    <g:textField name="description" value="${categoryInstance?.description}" />
@@ -47,7 +47,7 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="sortOrder"><g:message code="category.sortOrder.label" default="Sort Order" /></label>
+	                                  <label for="sortOrder"><warehouse:message code="category.sortOrder.label" default="Sort Order" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: categoryInstance, field: 'sortOrder', 'errors')}">
 	                                    <g:textField name="sortOrder" value="${fieldValue(bean: categoryInstance, field: 'sortOrder')}" />
@@ -56,7 +56,7 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="parentCategory"><g:message code="category.parentCategory.label" default="Parent Category" /></label>
+	                                  <label for="parentCategory"><warehouse:message code="category.parentCategory.label" default="Parent Category" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: categoryInstance, field: 'parentCategory', 'errors')}">
 	                                    <g:select name="parentCategory.id" from="${org.pih.warehouse.product.Category.list()}" optionKey="id" value="${categoryInstance?.parentCategory?.id}" noSelection="['null': '']" />
@@ -65,7 +65,7 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="categories"><g:message code="category.categories.label" default="Categories" /></label>
+	                                  <label for="categories"><warehouse:message code="category.categories.label" default="Categories" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: categoryInstance, field: 'categories', 'errors')}">
 	                                    
@@ -82,7 +82,7 @@
 	                        <%-- 
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="dateCreated"><g:message code="category.dateCreated.label" default="Date Created" /></label>
+	                                  <label for="dateCreated"><warehouse:message code="category.dateCreated.label" default="Date Created" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: categoryInstance, field: 'dateCreated', 'errors')}">
 	                                    <g:datePicker name="dateCreated" precision="day" value="${categoryInstance?.dateCreated}"  />
@@ -91,7 +91,7 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="lastUpdated"><g:message code="category.lastUpdated.label" default="Last Updated" /></label>
+	                                  <label for="lastUpdated"><warehouse:message code="category.lastUpdated.label" default="Last Updated" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: categoryInstance, field: 'lastUpdated', 'errors')}">
 	                                    <g:datePicker name="lastUpdated" precision="day" value="${categoryInstance?.lastUpdated}"  />
@@ -100,7 +100,7 @@
 	                        --%>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="parents"><g:message code="category.parents.label" default="Parents" /></label>
+	                                  <label for="parents"><warehouse:message code="category.parents.label" default="Parents" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: categoryInstance, field: 'parents', 'errors')}">
 	                                    

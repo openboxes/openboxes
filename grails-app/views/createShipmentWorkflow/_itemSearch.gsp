@@ -7,7 +7,7 @@
 </script>
 
 		<div id="itemSearchForm" >
-			<h2><g:message code="inventoryItem.search.label" default="Search inventory by name, description, or lot/serial number:" /></h2>
+			<h2><warehouse:message code="inventoryItem.search.label" default="Search inventory by name, description, or lot/serial number:" /></h2>
 			<div style="text-align: left;">
 				<table>
 					<tbody>
@@ -37,7 +37,7 @@
 		<div id="itemFoundForm" style="display: none">
 			<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.ShipmentItem" form="editItemFound"/>
 			<g:form name="editItemFound" action="createShipment">
-				<h2><g:message code="inventoryItem.enterQuantity.label" default="Enter quantity and recipient" /></h2>  
+				<h2><warehouse:message code="inventoryItem.enterQuantity.label" default="Enter quantity and recipient" /></h2>  
 				<table>
 					<tbody>
 						<g:render template="itemFoundFields" model="['containerId':containerId]"/>		
@@ -51,7 +51,7 @@
 		<div id="itemEntryForm" style="display: none">
 			<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.ShipmentItem" form="editItemEntry"/>
 			<g:form name="editItemEntry" action="createShipment">
-				<h2><g:message code="inventoryItem.enterItem.label" default="Enter item details" /></h2>  
+				<h2><warehouse:message code="inventoryItem.enterItem.label" default="Enter item details" /></h2>  
 				<g:if test="${item?.id}">
 					<g:hiddenField name="item.id" value="${item.id }"/>
 				</g:if>

@@ -7,7 +7,7 @@
 		<g:set var="entityName"
 			value="${message(code: 'stockCard.label', default: 'Stock Card')}" />
 		<title>
-			<g:message code="default.show.label" args="[entityName]" /> &nbsp;&rsaquo;&nbsp; 
+			<warehouse:message code="default.show.label" args="[entityName]" /> &nbsp;&rsaquo;&nbsp; 
 			<span style="color: grey">${commandInstance?.productInstance?.name }</span>
 		</title>
 	</head>

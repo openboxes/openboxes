@@ -3,9 +3,9 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <title><g:message code="default.controllers.label" default="Controllers" /></title>
+        <title><warehouse:message code="default.controllers.label" default="Controllers" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="menuTitle"><g:message code="default.controllers.label" default="Controllers" /></content>		
+		<content tag="menuTitle"><warehouse:message code="default.controllers.label" default="Controllers" /></content>		
     </head>
     <body>        
 		<div id="settings" role="main" class="yui-gb">

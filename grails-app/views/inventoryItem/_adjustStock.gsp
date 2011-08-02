@@ -24,21 +24,21 @@
 					<table>
 						<tbody>
 							<tr class="prop">
-								<td valign="top" class="name"><label><g:message code="inventoryItem.product.label" default="Product" /></label></td>                            
+								<td valign="top" class="name"><label><warehouse:message code="inventoryItem.product.label" default="Product" /></label></td>                            
 								<td valign="top" class="value">
 									${commandInstance?.productInstance } 
 									<g:if test="${itemInstance?.lotNumber }">&rsaquo; ${itemInstance?.lotNumber }</g:if>
 								</td>
 							</tr>
 							<tr class="prop">
-								<td valign="top" class="name"><label><g:message code="inventoryItem.lotNumber.label" default="Serial/Lot Number" /></label></td>                            
+								<td valign="top" class="name"><label><warehouse:message code="inventoryItem.lotNumber.label" default="Serial/Lot Number" /></label></td>                            
 								<td valign="top" class="value">
 									<g:if test="${itemInstance?.lotNumber }">${itemInstance?.lotNumber }</g:if>
 									<g:else><span class="fade">None</span></g:else>
 								</td>
 							</tr>
 							<tr class="prop">
-								<td valign="top" class="name"><label><g:message code="inventoryItem.expirationDate.label" default="Expires" /></label></td>                            
+								<td valign="top" class="name"><label><warehouse:message code="inventoryItem.expirationDate.label" default="Expires" /></label></td>                            
 								<td valign="top" class="value">
 									<g:if test="${itemInstance?.expirationDate }">
 										<format:expirationDate obj="${itemInstance?.expirationDate}"/>
@@ -49,7 +49,7 @@
 								</td>
 							</tr>
 							<tr class="prop">
-								<td valign="top" class="name"><label><g:message code="inventoryItem.quantity.label" default="Previous Quantity" /></label></td>                            
+								<td valign="top" class="name"><label><warehouse:message code="inventoryItem.quantity.label" default="Previous Quantity" /></label></td>                            
 								<td valign="top" class="value">
 									<g:hiddenField id="oldQuantity" name="oldQuantity" value="${itemQuantity }"/>
 									${itemQuantity }
@@ -58,7 +58,7 @@
 							
 							
 							<tr class="prop">
-								<td valign="top" class="name"><label><g:message code="inventoryItem.quantity.label" default="New Quantity" /></label></td>                            
+								<td valign="top" class="name"><label><warehouse:message code="inventoryItem.quantity.label" default="New Quantity" /></label></td>                            
 								<td valign="top" class="value">
 									<g:textField id="newQuantity" name="newQuantity" size="3" value="${itemQuantity }" />
 								</td>

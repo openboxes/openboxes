@@ -6,7 +6,7 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'product.label', default: 'Product')}" />
         
-        <title><g:message code="default.edit.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
 		
     </head>    
     <body>    
@@ -42,24 +42,24 @@
 		                <table>
 							<thead>                
 								<tr class="odd">
-									<th valign="top"><g:message code="product.name.label" default="Product Description" /></th>
+									<th valign="top"><warehouse:message code="product.name.label" default="Product Description" /></th>
 									<th valign="top">
-										<label for="name"><g:message code="product.manufacturer.label" default="Manufacturer" /></th>
+										<label for="name"><warehouse:message code="product.manufacturer.label" default="Manufacturer" /></th>
 									<th valign="top">
-										<label for="name"><g:message code="product.manufacturerCode.label" default="Mfg Code" /></th>
+										<label for="name"><warehouse:message code="product.manufacturerCode.label" default="Mfg Code" /></th>
 									<th valign="top">
-										<label for="name"><g:message code="product.upc.label" default="UPC" /></th>
+										<label for="name"><warehouse:message code="product.upc.label" default="UPC" /></th>
 									<th valign="top">
-										<label for="name"><g:message code="product.ndc.label" default="NDC" /></th>
+										<label for="name"><warehouse:message code="product.ndc.label" default="NDC" /></th>
 										
 									<th valign="top">
-										<label for="name"><g:message code="product.unitOfMeasure.label" default="Unit of Measure" /></th>
+										<label for="name"><warehouse:message code="product.unitOfMeasure.label" default="Unit of Measure" /></th>
 									<th valign="top">
-										<label for="name"><g:message code="product.productCode.label" default="Product Code" /></th>
+										<label for="name"><warehouse:message code="product.productCode.label" default="Product Code" /></th>
 	                               <th valign="top">
-		                               	<g:message code="product.primaryCategory.label" default="Primary Category" /></th>
+		                               	<warehouse:message code="product.primaryCategory.label" default="Primary Category" /></th>
 									<th valign="top">
-										<label for="name"><g:message code="product.coldChain.label" default="Cold Chain" /></th>
+										<label for="name"><warehouse:message code="product.coldChain.label" default="Cold Chain" /></th>
 								</tr>
 							</thead>
 							<tbody>

@@ -5,9 +5,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
-        <title><g:message code="default.list.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.list.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.list.label" args="[entityName]" /></content>
 		<content tag="menuTitle">${entityName}</content>		
 		<content tag="globalLinksMode">append</content>
 		<content tag="localLinksMode">override</content>
@@ -66,7 +66,7 @@
 		                            <g:sortableColumn property="name" title="${message(code: 'shipment.name.label', default: 'Name')}" />
 		                            <g:sortableColumn property="origin" title="${message(code: 'shipment.origin.label', default: 'Departing')}" />
 		                            <g:sortableColumn property="destination" title="${message(code: 'shipment.destination.label', default: 'Arriving')}" />
-		                            <th><g:message code="shipment.document.label" default="Documents" /></th>		                            
+		                            <th><warehouse:message code="shipment.document.label" default="Documents" /></th>		                            
 		                        </tr>
 		                    </thead>
 		                    <tbody>				

@@ -10,14 +10,14 @@
 			<table>
 				<tbody>
 					<tr class="prop">
-						<td valign="top" class="name"><label><g:message code="shipmentItem.item.label" default="Item" /></label></td>                            
+						<td valign="top" class="name"><label><warehouse:message code="shipmentItem.item.label" default="Item" /></label></td>                            
 						<td valign="top" class="value">
 							<g:hiddenField name="item.id" value="${itemToMove.id }"/>
 							<b>${itemToMove?.quantity }</b> x ${itemToMove?.product?.name }
 						</td>
 					</tr>
 					<tr class="prop">
-						<td valign="top" class="name"><label><g:message code="shipmentItem.container.label" default="From" /></label></td>                            
+						<td valign="top" class="name"><label><warehouse:message code="shipmentItem.container.label" default="From" /></label></td>                            
 						<td valign="top" class="value">
 							<div>
 								<g:set var="count" value="${1 }"/>
@@ -29,7 +29,7 @@
 									<tr>
 										<td>
 											<g:if test="${!itemToMove.container}">
-												<g:message code="shipmentItem.unpackedItems" default="Unpacked Items" />
+												<warehouse:message code="shipmentItem.unpackedItems" default="Unpacked Items" />
 											</g:if>
 											<g:if test="${itemToMove?.container?.parentContainer }">
 												${itemToMove?.container?.parentContainer?.name } &rsaquo;
@@ -45,7 +45,7 @@
 						</td>
 					</tr>
 					<tr class="prop">
-						<td valign="top" class="name"><label><g:message code="shipmentItem.container.label" default="To" /></label></td>                            
+						<td valign="top" class="name"><label><warehouse:message code="shipmentItem.container.label" default="To" /></label></td>                            
 						<td valign="top" class="value">
 							<div style="height: 350px; overflow: auto;">
 								<g:set var="count" value="${1 }"/>
@@ -58,7 +58,7 @@
 									
 									<tr class="${count++ % 2 ? 'odd':'even' }">
 										<td>
-											<g:message code="shipmentItem.unpackedItems" default="Unpacked Items" />
+											<warehouse:message code="shipmentItem.unpackedItems" default="Unpacked Items" />
 										</td>
 										<td>
 											<g:if test="${itemToMove.container}">

@@ -5,9 +5,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'person.label', default: 'Person')}" />
-        <title><g:message code="default.show.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.show.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.show.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.show.label" args="[entityName]" /></content>
     </head>
     <body>
         <div class="body">
@@ -19,14 +19,14 @@
                     <tbody>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="person.id.label" default="Id" /></td>
+                            <td valign="top" class="name"><warehouse:message code="person.id.label" default="Id" /></td>
                             
                             <td valign="top" class="value">${fieldValue(bean: personInstance, field: "id")}</td>
                             
                         </tr>
 						<tr class="prop">
                             <td valign="top" class="name">
-                                <g:message code="person.type.label" default="Type" />
+                                <warehouse:message code="person.type.label" default="Type" />
                             </td>
                             <td valign="top" class="value">
 								${personInstance?.class?.simpleName} 
@@ -35,49 +35,49 @@
                         
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="person.name.label" default="Name" /></td>
+                            <td valign="top" class="name"><warehouse:message code="person.name.label" default="Name" /></td>
                             
                             <td valign="top" class="value">${fieldValue(bean: personInstance, field: "name")}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="person.firstName.label" default="First Name" /></td>
+                            <td valign="top" class="name"><warehouse:message code="person.firstName.label" default="First Name" /></td>
                             
                             <td valign="top" class="value">${fieldValue(bean: personInstance, field: "firstName")}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="person.lastName.label" default="Last Name" /></td>
+                            <td valign="top" class="name"><warehouse:message code="person.lastName.label" default="Last Name" /></td>
                             
                             <td valign="top" class="value">${fieldValue(bean: personInstance, field: "lastName")}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="person.email.label" default="Email" /></td>
+                            <td valign="top" class="name"><warehouse:message code="person.email.label" default="Email" /></td>
                             
                             <td valign="top" class="value">${fieldValue(bean: personInstance, field: "email")}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="person.phoneNumber.label" default="Phone Number" /></td>
+                            <td valign="top" class="name"><warehouse:message code="person.phoneNumber.label" default="Phone Number" /></td>
                             
                             <td valign="top" class="value">${fieldValue(bean: personInstance, field: "phoneNumber")}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="person.dateCreated.label" default="Date Created" /></td>
+                            <td valign="top" class="name"><warehouse:message code="person.dateCreated.label" default="Date Created" /></td>
                             
                             <td valign="top" class="value"><format:datetime obj="${personInstance?.dateCreated}" /></td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="person.lastUpdated.label" default="Last Updated" /></td>
+                            <td valign="top" class="name"><warehouse:message code="person.lastUpdated.label" default="Last Updated" /></td>
                             
                             <td valign="top" class="value"><format:datetime obj="${personInstance?.lastUpdated}" /></td>
                             

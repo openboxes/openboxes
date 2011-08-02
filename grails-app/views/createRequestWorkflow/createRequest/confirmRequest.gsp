@@ -69,7 +69,7 @@
 								</td>
 							</tr>
 							<tr class="prop">
-	                            <td valign="top" class="name"><g:message code="request.items.label" default="Items" /></td>
+	                            <td valign="top" class="name"><warehouse:message code="request.items.label" default="Items" /></td>
 	                            <td valign="top" class="value">
 									<g:if test="${requestInstance?.requestItems }">
 										<table>

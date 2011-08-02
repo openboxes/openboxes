@@ -3,7 +3,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
 	<g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
-	<title><g:message code="default.edit.label" args="[entityName]" /></title>
+	<title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<content tag="pageTitle">Add Package</content>
 </head>
@@ -34,14 +34,14 @@
 								<table>
 									<tbody>
 										<tr class="prop">
-				                            <td valign="top" class="name"><label><g:message code="container.parentContainer.label" default="Parent" /></label></td>                            
+				                            <td valign="top" class="name"><label><warehouse:message code="container.parentContainer.label" default="Parent" /></label></td>                            
 				                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'parentContainer', 'errors')}">
 												<g:select id="parentContainer.id" name='parentContainer.id' noSelection="${['':'']}" 
 			                                    	from='${shipmentInstance?.containers}' optionKey="id" optionValue="${{it?.containerType?.name + ' ' + it?.name}}"></g:select>
 			                                </td>
 				                        </tr>  	          
 										<tr class="prop">
-				                            <td valign="top" class="name"><label><g:message code="container.containerType.label" default="Type" /></label></td>                            
+				                            <td valign="top" class="name"><label><warehouse:message code="container.containerType.label" default="Type" /></label></td>                            
 				                            <td valign="top" class="value ${hasErrors(bean: containerInstance, field: 'containerType', 'errors')}">
 												<g:select id="containerType.id" name='containerType.id' noSelection="${['':'Select one ...']}" 
 			                                    	from='${org.pih.warehouse.shipping.ContainerType.list()}' optionKey="id" optionValue="name"></g:select>

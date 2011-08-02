@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
 <g:set var="entityName" value="${message(code: 'inventory.label', default: 'inventory')}" />
-<title><g:message code="inventory.record.label" args="[entityName]" default="Record Inventory"/></title>
+<title><warehouse:message code="inventory.record.label" args="[entityName]" default="Record Inventory"/></title>
 </head>
 
 <body>

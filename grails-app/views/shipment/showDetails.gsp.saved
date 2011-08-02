@@ -4,7 +4,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
 	<g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
-	<title><g:message code="default.show.label" args="[entityName]" /></title>        
+	<title><warehouse:message code="default.show.label" args="[entityName]" /></title>        
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<content tag="pageTitle">Show Shipment</content>
 </head>
@@ -25,7 +25,7 @@
 								<table >
 									<tbody>
 										<tr class="prop">
-											<td valign="top" class="name"><label><g:message
+											<td valign="top" class="name"><label><warehouse:message
 												code="shipment.currentStatus.label" default="Status" /></label>
 											</td>
 											<td valign="top" class="value">
@@ -46,7 +46,7 @@
 											</td>
 										</tr>	
 										<tr class="prop">
-											<td valign="top" class="name"><label><g:message
+											<td valign="top" class="name"><label><warehouse:message
 												code="shipment.origin.label" default="From" /></label></td>
 											<td class="value" valign="top">
 												<span>
@@ -66,7 +66,7 @@
 										</tr>
 										<tr class="prop">
 											<td class="name">
-												<label><g:message code="shipment.destination.label" default="To" /></label>
+												<label><warehouse:message code="shipment.destination.label" default="To" /></label>
 											</td>
 											<td class="value">
 												<span>
@@ -89,7 +89,7 @@
 											
 												<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="shipper" style="vertical-align: middle"/>											
 											
-												<label><g:message
+												<label><warehouse:message
 													code="shipment.method.label" default="Shipper" /></label>
 											</td>
 											<td class="value">
@@ -115,7 +115,7 @@
 										<tr class="prop">
 											<td valign="top" class="name" style="width: 10%;">											
 												<img src="${createLinkTo(dir:'images/icons/silk',file:'user.png')}" alt="person" style="vertical-align: middle"/>											
-												<label><g:message
+												<label><warehouse:message
 													code="shipment.carrier.label" default="Carrier" /></label>
 											</td>
 											<td valign="top" class="value">
@@ -136,7 +136,7 @@
 										<%-- 
 										<tr class="prop">
 											<td class="name"  style="width: 10%;">
-												<label><g:message code="shipment.recipient.label" default="Recipient" /></label>
+												<label><warehouse:message code="shipment.recipient.label" default="Recipient" /></label>
 											</td>
 											<td class="value" style="width: 30%;">
 												<g:if test="${shipmentInstance?.recipient}">
@@ -158,7 +158,7 @@
 										<%-- 
 										<tr class="prop">
 											<td valign="top" class="name">
-												<label><g:message code="shipment.donor.label" default="Donated by" /></label><br/>
+												<label><warehouse:message code="shipment.donor.label" default="Donated by" /></label><br/>
 											</td>
 											<td valign="top" class="">
 												<g:if test="${shipmentInstance.donor}">
@@ -177,7 +177,7 @@
 										<tr class="prop">
 											<td valign="top" class="name">
 												<img src="${createLinkTo(dir:'images/icons/silk',file:'money.png')}" alt="money" style="vertical-align: middle"/>
-												<label><g:message code="shipment.totalValue.label" default="Total Value" /></label><br/>
+												<label><warehouse:message code="shipment.totalValue.label" default="Total Value" /></label><br/>
 											</td>
 											<td valign="top" class="value">
 												<g:if test="${shipmentInstance.totalValue}">

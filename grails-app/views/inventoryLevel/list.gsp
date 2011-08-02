@@ -5,9 +5,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'inventoryLevel.label', default: 'InventoryLevel')}" />
-        <title><g:message code="default.list.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.list.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.list.label" args="[entityName]" /></content>
     </head>
     <body>
         <div class="body">
@@ -18,7 +18,7 @@
             
 				<div>            	
 	            	<span class="menuButton">
-	            		<g:link class="new" action="create"><g:message code="default.add.label" args="['inventoryLevel']"/></g:link>
+	            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="['inventoryLevel']"/></g:link>
 	            	</span>
             	</div>
                 <table>
@@ -27,7 +27,7 @@
                         
                             <g:sortableColumn property="id" title="${message(code: 'inventoryLevel.id.label', default: 'Id')}" />
                         
-                            <th><g:message code="inventoryLevel.product.label" default="Product" /></th>
+                            <th><warehouse:message code="inventoryLevel.product.label" default="Product" /></th>
                    	    
                             <g:sortableColumn property="supported" title="${message(code: 'inventoryLevel.supported.label', default: 'Supported')}" />
                         

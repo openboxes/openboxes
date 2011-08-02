@@ -3,7 +3,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
 	<g:set var="entityName" value="${message(code: 'order.label', default: 'Order')}" />
-	<title><g:message code="default.edit.label" args="[entityName]" /></title>	
+	<title><warehouse:message code="default.edit.label" args="[entityName]" /></title>	
 </head>
 
 <body>
@@ -35,33 +35,33 @@
 								<table>
 									<tbody>
 										<tr class="prop">
-				                            <td valign="top" class="name"><label><g:message code="comment.recipient.label" default="To" /></label></td>                            
+				                            <td valign="top" class="name"><label><warehouse:message code="comment.recipient.label" default="To" /></label></td>                            
 				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'recipient', 'errors')}">
 												<g:select id="recipient.id" class="combobox" name='recipient.id' noSelection="${['':'Select one ...']}" 
 			                                    	from='${org.pih.warehouse.core.User.list()}' optionKey="id" optionValue="name" value="${commentInstance?.recipient?.id }"></g:select>
 			                                </td>
 				                        </tr>  	          
 										<tr class="prop">
-				                            <td valign="top" class="name"><label><g:message code="comment.sender.label" default="From" /></label></td>                            
+				                            <td valign="top" class="name"><label><warehouse:message code="comment.sender.label" default="From" /></label></td>                            
 				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'sender', 'errors')}">
 				                            	<g:hiddenField name="sender.id" value="${session.user.id }"/>
 			                                     ${session.user.firstName} ${session.user.lastName} <span class="fade">(${session.user.username})</span>
 			                                </td>
 				                        </tr>  	          
 										<tr class="prop">
-				                            <td valign="top" class="name"><label><g:message code="comment.comment.label" default="Comment" /></label></td>                            
+				                            <td valign="top" class="name"><label><warehouse:message code="comment.comment.label" default="Comment" /></label></td>                            
 				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'comment', 'errors')}">
 			                                    <g:textArea name="comment" cols="60" rows="10" value="${commentInstance?.comment }"/>
 			                                </td>
 				                        </tr>  	        
 										<tr class="prop">
-				                            <td valign="top" class="name"><label><g:message code="comment.dateCreated.label" default="Date created" /></label></td>                            
+				                            <td valign="top" class="name"><label><warehouse:message code="comment.dateCreated.label" default="Date created" /></label></td>                            
 				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'dateCreated', 'errors')}">
 												${commentInstance?.dateCreated }
 			                                </td>
 				                        </tr>  	        
 										<tr class="prop">
-				                            <td valign="top" class="name"><label><g:message code="comment.lastUpdated.label" default="Last updated" /></label></td>                            
+				                            <td valign="top" class="name"><label><warehouse:message code="comment.lastUpdated.label" default="Last updated" /></label></td>                            
 				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'lastUpdated', 'errors')}">
 												${commentInstance?.lastUpdated}
 			                                </td>

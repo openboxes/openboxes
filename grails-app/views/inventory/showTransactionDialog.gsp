@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <g:set var="entityName" value="${message(code: 'transaction.label', default: 'Transaction')}" />
-        <title><g:message code="default.show.label" args="[entityName]" /></title>    
+        <title><warehouse:message code="default.show.label" args="[entityName]" /></title>    
         
         <%-- 
         <style>

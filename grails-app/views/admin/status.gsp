@@ -3,10 +3,10 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <title><g:message code="default.appstatus.label" default="App Status" /></title>
+        <title><warehouse:message code="default.appstatus.label" default="App Status" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.appstatus.label" default="App Status" /></content>
-		<content tag="menuTitle"><g:message code="default.appstatus.label" default="App Status" /></content>		
+		<content tag="pageTitle"><warehouse:message code="default.appstatus.label" default="App Status" /></content>
+		<content tag="menuTitle"><warehouse:message code="default.appstatus.label" default="App Status" /></content>		
 		<content tag="globalLinksMode">append</content>
 		<content tag="localLinksMode">override</content>
 		<content tag="globalLinks"><g:render template="global"/></content>

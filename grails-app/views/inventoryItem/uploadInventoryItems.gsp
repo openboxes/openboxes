@@ -6,7 +6,7 @@
 		<meta name="layout" content="custom" />
 		<g:set var="entityName"
 			value="${message(code: 'inventoryItem.label', default: 'Inventory item')}" />
-		<title><g:message code="default.import.label" args="[entityName]" /></title>
+		<title><warehouse:message code="default.import.label" args="[entityName]" /></title>
 	</head>
 	<body>
 		<div class="body">

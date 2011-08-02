@@ -11,17 +11,17 @@
 	    	<div id="dashboard">				
 	    		<%-- 
 	    		<div class="widget-large">
-			    	<div class="widget-header"><g:message code="dashboard.welcome.label"/></div>
+			    	<div class="widget-header"><warehouse:message code="dashboard.welcome.label"/></div>
 	    			<div class="widget-content">
 						<g:if test="${!session.user}">
 							<p>
-								<g:message code="dashboard.notLoggedIn.label" />
+								<warehouse:message code="dashboard.notLoggedIn.label" />
 							</p>
 						</g:if>
 						<g:else>
 							<p class="large" align="justify">				
 								<span class="greeting">
-									<g:message code="dashboard.greeting.label" args="[session.user.name, session.warehouse.name]" />
+									<warehouse:message code="dashboard.greeting.label" args="[session.user.name, session.warehouse.name]" />
 																
 								</span>	 
 							</p>
@@ -33,7 +33,7 @@
 				<!--  Show the last five transactions? -->
 				<%-- 
 				<div class="widget-small">
-					<div class="widget-header"><g:message code="transaction.summary.label" args="[session.warehouse.name]"/></div>
+					<div class="widget-header"><warehouse:message code="transaction.summary.label" args="[session.warehouse.name]"/></div>
 	    			<div class="widget-content">
 	    				<div id="transaction-summary">
 	    				
@@ -43,13 +43,13 @@
 				--%>
 				
 				<div class="widget-small">
-					<div class="widget-header"><h2><g:message code="order.summary.label" args="[session.warehouse.name]"/></h2></div>
+					<div class="widget-header"><h2><warehouse:message code="order.summary.label" args="[session.warehouse.name]"/></h2></div>
 	    			
 	    			<div class="widget-content">	    					    			
 	    				<div id="receivingsummary">	
 		    				<g:if test="${!incomingOrders}">
    								<div style="text-align: center; padding: 10px;" class="fade">
-   									(<g:message code="receiving.noRecent.label"/>)
+   									(<warehouse:message code="receiving.noRecent.label"/>)
    								</div>
    							</g:if>	    		
    							<g:else>			
@@ -72,7 +72,7 @@
 							    	</tbody>
 							    	<tfoot>
 								    	<tr style="border-top: 1px solid lightgrey">
-								    		<th style="text-align: right;"><g:message code="shipping.total.label"/></td>							    		
+								    		<th style="text-align: right;"><warehouse:message code="shipping.total.label"/></td>							    		
 								    		<th style="text-align: center;"><g:link controller="order" action="list" params="">${incomingOrders.size()}</g:link></td>
 								    	</tr>
 							    	</tfoot>
@@ -85,12 +85,12 @@
 				</div>					
 				<!--  Show recent shipments/receipts -->
 				<div class="widget-small">
-					<div class="widget-header"><h2><g:message code="shipping.summary.label" args="[session.warehouse.name]"/></h2></div>
+					<div class="widget-header"><h2><warehouse:message code="shipping.summary.label" args="[session.warehouse.name]"/></h2></div>
 	    			<div class="widget-content">
 	    				<div id="shippingsummary">
 		    				<g:if test="${!outgoingShipmentsByStatus}">
    								<div style="text-align: center; padding: 10px;" class="fade">
-   									(<g:message code="shipping.noRecent.label"/>)
+   									(<warehouse:message code="shipping.noRecent.label"/>)
    								</div>
    							</g:if>	    		
    							<g:else>			
@@ -114,7 +114,7 @@
 							    	</tbody>
 							    	<tfoot>
 								    	<tr style="border-top: 1px solid lightgrey">
-								    		<th style="text-align: right;"><g:message code="shipping.total.label"/></th>
+								    		<th style="text-align: right;"><warehouse:message code="shipping.total.label"/></th>
 								    		<th style="text-align: center;"><g:link controller="shipment" action="listShipping" params="">${allOutgoingShipments.size()}</g:link></th>
 								    	</tr>
 							    	</tfoot>
@@ -127,7 +127,7 @@
 	    				<div id="receivingsummary">	
 		    				<g:if test="${!incomingShipmentsByStatus}">
    								<div style="text-align: center; padding: 10px;" class="fade">
-   									(<g:message code="receiving.noRecent.label"/>)
+   									(<warehouse:message code="receiving.noRecent.label"/>)
    								</div>
    							</g:if>	    		
    							<g:else>			
@@ -150,7 +150,7 @@
 							    	</tbody>
 							    	<tfoot>
 								    	<tr style="border-top: 1px solid lightgrey">
-								    		<th style="text-align: right;"><g:message code="shipping.total.label"/></td>							    		
+								    		<th style="text-align: right;"><warehouse:message code="shipping.total.label"/></td>							    		
 								    		<th style="text-align: center;"><g:link controller="shipment" action="listReceiving" params="">${allIncomingShipments.size()}</g:link></td>
 								    	</tr>
 							    	</tfoot>
@@ -165,23 +165,23 @@
 
 				
 				<div class="widget-small">
-					<div class="widget-header"><g:message code="shipping.mostRecent.label" args="[session.warehouse.name]" /></div>
+					<div class="widget-header"><warehouse:message code="shipping.mostRecent.label" args="[session.warehouse.name]" /></div>
 	    			<div class="widget-content">
 	    				<div id="mostRecentShipping">		    				
 	    				
   							<g:if test="${!outgoingShipments}">  				
    								<div style="text-align: center; padding: 10px;" class="fade">
-   									(<g:message code="shipping.noRecent.label"/>)
+   									(<warehouse:message code="shipping.noRecent.label"/>)
    								</div>
 	    					</g:if>
 	    					<g:else>
 		    					<table>	    				
 		    						<thead>
 		    							<tr>
-		    								<th><g:message code="shipping.status.label"  /></th>
-		    								<th><g:message code="shipping.name.label" /></th>
-		    								<th><g:message code="shipping.to.label" /></th>
-		    								<th><g:message code="shipping.date.label" /></th>
+		    								<th><warehouse:message code="shipping.status.label"  /></th>
+		    								<th><warehouse:message code="shipping.name.label" /></th>
+		    								<th><warehouse:message code="shipping.to.label" /></th>
+		    								<th><warehouse:message code="shipping.date.label" /></th>
 		    							</tr>
 		    						</thead>
 									<tbody>	    				
@@ -205,7 +205,7 @@
 											<th colspan="4" style="text-align:left;">
 												<g:link class="new" controller="createShipment" action="suitcase">
 													<img src="${createLinkTo(dir: 'images/icons/silk/', file: 'add.png') }" style="vertical-align:middle;"/>
-													<g:message code="suitcase.create.label" default="Create Suitcase" />
+													<warehouse:message code="suitcase.create.label" default="Create Suitcase" />
 												</g:link>
 											</th>
 										</tr>
@@ -217,12 +217,12 @@
 				</div>
 				
 				<div class="widget-small">
-					<div class="widget-header"><g:message code="receiving.mostRecent.label" args="[session.warehouse.name]" /></div>
+					<div class="widget-header"><warehouse:message code="receiving.mostRecent.label" args="[session.warehouse.name]" /></div>
 	    			<div class="widget-content">
 	    				<div id="mostRecentReceiving">
 		    				<g:if test="${!incomingShipments}">
    								<div style="text-align: center; padding: 10px;" class="fade">
-   									( <g:message code="receiving.noRecent.label"/>)
+   									( <warehouse:message code="receiving.noRecent.label"/>)
    								</div>
    							</g:if>
 	    					<g:else>
@@ -230,10 +230,10 @@
 			    				<table>
 		    						<thead>
 		    							<tr>
-		    								<th><g:message code="receiving.status.label"  /></th>
-		    								<th><g:message code="receiving.name.label"  /></th>
-		    								<th><g:message code="receiving.from.label"  /></th>
-		    								<th><g:message code="receiving.date.label"  /></th>
+		    								<th><warehouse:message code="receiving.status.label"  /></th>
+		    								<th><warehouse:message code="receiving.name.label"  /></th>
+		    								<th><warehouse:message code="receiving.from.label"  /></th>
+		    								<th><warehouse:message code="receiving.date.label"  /></th>
 		    							</tr>
 		    						</thead>
 		    						<tbody>

@@ -5,9 +5,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'inventoryLevel.label', default: 'InventoryLevel')}" />
-        <title><g:message code="default.show.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.show.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.show.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.show.label" args="[entityName]" /></content>
     </head>
     <body>
         <div class="body">
@@ -19,56 +19,56 @@
                     <tbody>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="inventoryLevel.id.label" default="Id" /></td>
+                            <td valign="top" class="name"><warehouse:message code="inventoryLevel.id.label" default="Id" /></td>
                             
                             <td valign="top" class="value">${fieldValue(bean: inventoryLevelInstance, field: "id")}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="inventoryLevel.product.label" default="Product" /></td>
+                            <td valign="top" class="name"><warehouse:message code="inventoryLevel.product.label" default="Product" /></td>
                             
                             <td valign="top" class="value"><g:link controller="product" action="show" id="${inventoryLevelInstance?.product?.id}">${inventoryLevelInstance?.product?.encodeAsHTML()}</g:link></td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="inventoryLevel.supported.label" default="Supported" /></td>
+                            <td valign="top" class="name"><warehouse:message code="inventoryLevel.supported.label" default="Supported" /></td>
                             
                             <td valign="top" class="value"><g:formatBoolean boolean="${inventoryLevelInstance?.supported}" /></td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="inventoryLevel.minQuantity.label" default="Min Quantity" /></td>
+                            <td valign="top" class="name"><warehouse:message code="inventoryLevel.minQuantity.label" default="Min Quantity" /></td>
                             
                             <td valign="top" class="value">${fieldValue(bean: inventoryLevelInstance, field: "minQuantity")}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="inventoryLevel.reorderQuantity.label" default="Reorder Quantity" /></td>
+                            <td valign="top" class="name"><warehouse:message code="inventoryLevel.reorderQuantity.label" default="Reorder Quantity" /></td>
                             
                             <td valign="top" class="value">${fieldValue(bean: inventoryLevelInstance, field: "reorderQuantity")}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="inventoryLevel.dateCreated.label" default="Date Created" /></td>
+                            <td valign="top" class="name"><warehouse:message code="inventoryLevel.dateCreated.label" default="Date Created" /></td>
                             
                             <td valign="top" class="value"><format:datetime obj="${inventoryLevelInstance?.dateCreated}" /></td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="inventoryLevel.inventory.label" default="Inventory" /></td>
+                            <td valign="top" class="name"><warehouse:message code="inventoryLevel.inventory.label" default="Inventory" /></td>
                             
                             <td valign="top" class="value"><g:link controller="inventory" action="show" id="${inventoryLevelInstance?.inventory?.id}">${inventoryLevelInstance?.inventory?.encodeAsHTML()}</g:link></td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="inventoryLevel.lastUpdated.label" default="Last Updated" /></td>
+                            <td valign="top" class="name"><warehouse:message code="inventoryLevel.lastUpdated.label" default="Last Updated" /></td>
                             
                             <td valign="top" class="value"><format:datetime obj="${inventoryLevelInstance?.lastUpdated}" /></td>
                             

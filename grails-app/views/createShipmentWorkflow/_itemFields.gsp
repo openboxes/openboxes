@@ -1,6 +1,6 @@
 
 				<tr class="prop">
-					<td valign="top" class="name"><label><g:message code="shipmentItem.product.label" default="Product" /></label></td>                            
+					<td valign="top" class="name"><label><warehouse:message code="shipmentItem.product.label" default="Product" /></label></td>                            
 					<td valign="top" class="value">
 						${item?.product?.name }
 						<g:hiddenField id="productId" name="product.id" value="${item?.product?.id }"/>
@@ -12,7 +12,7 @@
 					</td>
 				</tr>
 				<tr class="prop">
-					<td valign="top" class="name"><label><g:message code="shipmentItem.lotNumber.label" default="Lot / Serial Number" /></label></td>                            
+					<td valign="top" class="name"><label><warehouse:message code="shipmentItem.lotNumber.label" default="Lot / Serial Number" /></label></td>                            
 					<td valign="top" class="value">
 						<%-- <g:textField id="lotNumber" name="lotNumber" width="200" value="${item?.lotNumber}"/>--%>
 						<g:autoSuggestString id="lotNumber" name="lotNumber" jsonUrl="/warehouse/json/findLotsByName?productId=${item?.product?.id }" 
@@ -21,7 +21,7 @@
 					</td>
 				</tr>
 				<tr class="prop">
-					<td valign="top" class="name"><label><g:message code="shipmentItem.availableQuantity.label" default="Available Quantity" /></label></td>                            
+					<td valign="top" class="name"><label><warehouse:message code="shipmentItem.availableQuantity.label" default="Available Quantity" /></label></td>                            
 					<td valign="top" class="value">
 						<span id="quantity-on-hand"></span>
 						<img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}" style="vertical-align: middle;" class="refresh"/>
@@ -30,13 +30,13 @@
 				
 				
 				<tr class="prop">
-					<td valign="top" class="name"><label><g:message code="shipmentItem.quantity.label" default="Quantity" /></label></td>                            
+					<td valign="top" class="name"><label><warehouse:message code="shipmentItem.quantity.label" default="Quantity" /></label></td>                            
 					<td valign="top" class="value">
 						<g:textField id="quantity" name="quantity" value="${item?.quantity}" size="5" /> 
 					</td>
 				</tr>  	        
 				<tr class="prop">
-					<td valign="top" class="name"><label><g:message code="shipmentItem.recipient.label" default="Recipient" /></label></td>                            
+					<td valign="top" class="name"><label><warehouse:message code="shipmentItem.recipient.label" default="Recipient" /></label></td>                            
 					<td valign="top" class="value">
 						<g:autoSuggest id="recipient" name="recipient" jsonUrl="/warehouse/json/findPersonByName" 
 							width="200" valueId="${item?.recipient?.id}" valueName="${item?.recipient?.name}"/>							

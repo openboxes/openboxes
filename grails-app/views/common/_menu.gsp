@@ -1,7 +1,7 @@
 <div id="leftnav-accordion-menu" class="accordion menu">
 	
 	<h6 class="menu-heading">
-		<g:message code="inventory.label"  default="Inventory"/>
+		<warehouse:message code="inventory.label"  default="Inventory"/>
 	</h6>
 	<div class="menu-section">									
 		<ul>
@@ -37,13 +37,13 @@
 			</li>
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="product" action="create"><g:message code="default.add.label" args="['product']" default="Add New Product" /></g:link>
+					<g:link controller="product" action="create"><warehouse:message code="default.add.label" args="['product']" default="Add New Product" /></g:link>
 				</span>
 			</li>
 		</ul>
 	</div>
 	<h6 class="menu-heading" >
-		<g:message code="orders.label"  default="Orders"/>
+		<warehouse:message code="orders.label"  default="Orders"/>
 	</h6>
 	<div class="menu-section">
 		<ul>
@@ -65,19 +65,19 @@
 		</ul>										
 	</div>
 	<h6 class="menu-heading" >
-		<g:message code="requests.label"  default="Requests"/>
+		<warehouse:message code="requests.label"  default="Requests"/>
 	</h6>
 	<div class="menu-section">
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="request" action="list"><g:message code="request.list.label"  default="List requests "/></g:link>
+					<g:link controller="request" action="list"><warehouse:message code="request.list.label"  default="List requests "/></g:link>
 				</span>
 			</li>						
 			
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="createRequestWorkflow" action="index"><g:message code="request.create.label" default="Add new request"/></g:link>
+					<g:link controller="createRequestWorkflow" action="index"><warehouse:message code="request.create.label" default="Add new request"/></g:link>
 				</span>
 			</li>					
 		</ul>
@@ -87,35 +87,35 @@
 	
 	
 	<h6 class="menu-heading" >
-		<g:message code="shipping.label"  default="Shipping"/>
+		<warehouse:message code="shipping.label"  default="Shipping"/>
 	</h6>
 	<div class="menu-section">
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="shipment" action="listShipping"><g:message code="shipment.listShipping.label"  default="List shipments "/></g:link>
+					<g:link controller="shipment" action="listShipping"><warehouse:message code="shipment.listShipping.label"  default="List shipments "/></g:link>
 				</span>
 			</li>									
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="createShipmentWorkflow" action="index"><g:message code="suitcase.add.label" default="Add a shipment"/></g:link>
+					<g:link controller="createShipmentWorkflow" action="index"><warehouse:message code="suitcase.add.label" default="Add a shipment"/></g:link>
 				</span>
 			</li>					
 		</ul>										
 	</div>
 	<h6 class="menu-heading">
-		<g:message code="receiving.label"  default="Receiving"/>
+		<warehouse:message code="receiving.label"  default="Receiving"/>
 	</h6>
 	<div class="menu-section">
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="shipment" action="listReceiving"><g:message code="shipment.listReceiving.label"  default="List receiving"/></g:link>
+					<g:link controller="shipment" action="listReceiving"><warehouse:message code="shipment.listReceiving.label"  default="List receiving"/></g:link>
 				</span>		
 			</li>										
 			<li>
 				<span class="menuButton">
-				<!--  <g:link class="browse" class="bullet" controller="receipt" action="process"><g:message code="receiving.process.label" default="Process Receipts"/></g:link>  -->
+				<!--  <g:link class="browse" class="bullet" controller="receipt" action="process"><warehouse:message code="receiving.process.label" default="Process Receipts"/></g:link>  -->
 				</span>
 			</li>		
 		</ul>										
@@ -123,11 +123,11 @@
 	<%-- 
 	<h6 class="menu-heading">
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'chart_bar.png')}" alt="Reports" style="vertical-align: middle"/> &nbsp; 
-		<g:message code="settings.label" args="['Reports']" default="Reports"/>
+		<warehouse:message code="settings.label" args="['Reports']" default="Reports"/>
 	</h6>
 	--%>
 	<h6 class="menu-heading">
-		<g:message code="administration.label"  default="Administration"/>
+		<warehouse:message code="administration.label"  default="Administration"/>
 	</h6>			
 	<div class="menu-section">
 		<span class="menu-subheading">Products</span>
@@ -149,7 +149,7 @@
 			</li>
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="product" action="batchEdit"><g:message code="default.batchEdit.label" args="['products']" default="Batch Edit Products" /></g:link>
+					<g:link controller="product" action="batchEdit"><warehouse:message code="default.batchEdit.label" args="['products']" default="Batch Edit Products" /></g:link>
 				</span>
 			</li>
 		</ul>
@@ -186,7 +186,7 @@
 			<!--  								
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="role" action="list"><g:message code="default.manage.label" args="['roles']"/></g:link>
+					<g:link controller="role" action="list"><warehouse:message code="default.manage.label" args="['roles']"/></g:link>
 				</span>		
 			</li>
 			-->
@@ -195,7 +195,7 @@
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="admin" action="checkSettings"><g:message code="default.manage.label" args="['settings']"/></g:link>
+					<g:link controller="admin" action="checkSettings"><warehouse:message code="default.manage.label" args="['settings']"/></g:link>
 				</span>		
 			</li>
 		</ul>

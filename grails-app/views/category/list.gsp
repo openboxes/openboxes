@@ -5,9 +5,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'category.label', default: 'Category')}" />
-        <title><g:message code="default.list.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.list.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.list.label" args="[entityName]" /></content>
     </head>
     <body>
         <div class="body">
@@ -31,7 +31,7 @@
                         
                             <g:sortableColumn property="sortOrder" title="${message(code: 'category.sortOrder.label', default: 'Sort Order')}" />
                         
-                            <th><g:message code="category.parentCategory.label" default="Parent Category" /></th>
+                            <th><warehouse:message code="category.parentCategory.label" default="Parent Category" /></th>
                    	    
                             <g:sortableColumn property="dateCreated" title="${message(code: 'category.dateCreated.label', default: 'Date Created')}" />
                         

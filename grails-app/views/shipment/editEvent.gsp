@@ -3,7 +3,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
 	<g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
-	<title><g:message code="default.edit.label" args="[entityName]" /></title>
+	<title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<content tag="pageTitle">Add New Event</content>
 </head>
@@ -37,7 +37,7 @@
 							<table>
 								<tbody>
 									<tr class="prop">
-			                           <td valign="top" class="name"><label><g:message code="event.eventType.label" default="Event Type" /></label></td>                            
+			                           <td valign="top" class="name"><label><warehouse:message code="event.eventType.label" default="Event Type" /></label></td>                            
 			                           <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'eventType', 'errors')}">
 											<g:if test="${!eventInstance?.eventType}">												
 												<g:select id="eventType.id" name='eventType.id' noSelection="${['':'Select one ...']}" 
@@ -53,14 +53,14 @@
 									</tr> 								
 								
 									<tr class="prop">
-				                           <td valign="top" class="name"><label><g:message code="event.eventDate.label" default="Event Date" /></label></td>                            
+				                           <td valign="top" class="name"><label><warehouse:message code="event.eventDate.label" default="Event Date" /></label></td>                            
 				                           <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'eventDate', 'errors')}">
 				                                  <g:jqueryDatePicker name="eventDate" value="${eventInstance?.eventDate}" format="MM/dd/yyyy" />
 				                              </td>
 				                       </tr>  	          
 										 	          
 										<tr class="prop">
-				                           <td valign="top" class="name"><label><g:message code="event.eventDate.label" default="Location" /></label></td>                            
+				                           <td valign="top" class="name"><label><warehouse:message code="event.eventDate.label" default="Location" /></label></td>                            
 				                           <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'location', 'errors')}">
 											<g:select id="eventLocation.id" name='eventLocation.id' noSelection="${['':'Select one ...']}" 
 												from='${org.pih.warehouse.core.Location.list()}' optionKey="id" optionValue="name"

@@ -3,7 +3,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
-        <g:set var="pageTitle"><g:message code="default.create.label" args="[entityName]" /></g:set>
+        <g:set var="pageTitle"><warehouse:message code="default.create.label" args="[entityName]" /></g:set>
         <title>${pageTitle}</title>        
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle">${pageTitle}</content>
@@ -39,7 +39,7 @@
 						                    
 												<tr class="prop">
 						                            <td valign="top" class="name">
-						                            	<label><g:message code="shipment.shipmentType.label" default="Shipment Type" /></label>
+						                            	<label><warehouse:message code="shipment.shipmentType.label" default="Shipment Type" /></label>
 						                            </td>                            
 						                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'shipmentType', 'errors')}">
 														<table>
@@ -57,7 +57,7 @@
 						                        </tr>         					
 						                        <tr class="prop">
 						                        	<td valign="top" class="name">
-						                        		<label><g:message code="shipment.name.label" default="Nickname" /></label>
+						                        		<label><warehouse:message code="shipment.name.label" default="Nickname" /></label>
 						                        	</td>
 						                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">
 					                                    <g:textField name="name" size="30" value="${shipmentInstance?.name}" />
@@ -65,7 +65,7 @@
 						                        </tr>
 						                        <tr class="prop">
 						                            <td valign="top" class="name">
-						                            	<label><g:message code="shipment.origin.label" default="Where is it coming from?" /></label>
+						                            	<label><warehouse:message code="shipment.origin.label" default="Where is it coming from?" /></label>
 						                            </td>                            
 						                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">
 								                        <g:if test="${params.type=='incoming'}">                   							                            	
@@ -81,7 +81,7 @@
 						                        </tr>		     
 						                        <tr class="prop">
 						                            <td valign="top" class="name">
-						                            	<label><g:message code="shipment.destination.label" default="Where is it going?" /></label>
+						                            	<label><warehouse:message code="shipment.destination.label" default="Where is it going?" /></label>
 						                            </td>                            
 						                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">
 														<g:if test="${params.type=='outgoing'}">  
@@ -98,7 +98,7 @@
 						                        </tr>	
 						                        <tr class="prop">
 													<td valign="top" class="name">
-						                            	<label><g:message code="shipment.expectedShippingDate.label" default="When is it expected to ship?" /></label>
+						                            	<label><warehouse:message code="shipment.expectedShippingDate.label" default="When is it expected to ship?" /></label>
 						                            </td>
 						                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}">										
 														<g:jqueryDatePicker name="expectedShippingDate" />																			
@@ -106,7 +106,7 @@
 						                        </tr>          
 												<tr class="prop">
 						                        	<td valign="top" class="name">
-						                        		<label><g:message code="shipment.initialStatus.label" default="What is the status?" /></label>
+						                        		<label><warehouse:message code="shipment.initialStatus.label" default="What is the status?" /></label>
 						                        	</td>
 						                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'shipmentStatus', 'errors')}">
 					                                    <g:select name="eventType.id" from="${eventTypes}" optionKey="id" optionValue="${{it?.description}}" value="" noSelection="['0':'']" />

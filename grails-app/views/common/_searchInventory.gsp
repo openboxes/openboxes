@@ -113,7 +113,7 @@
 				<td colspan="2">
 					<g:form action="addCategoryFilter">
 						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'folder.png' )}" class="middle"/>&nbsp;or choose a category
-						<g:link class="view" controller="category" action="tree"><g:message code="default.edit.label" args="['']"/></g:link>
+						<g:link class="view" controller="category" action="tree"><warehouse:message code="default.edit.label" args="['']"/></g:link>
 						<select id="categoryFilter" name="categoryId" >
 							<option value="">Filter by category</option>
 							<g:render template="../category/selectOptions" model="[category:commandInstance?.rootCategory, selected:null, level: 0]"/>								

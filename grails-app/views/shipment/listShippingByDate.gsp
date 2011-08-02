@@ -3,10 +3,10 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipping')}" />
-        <title><g:message code="default.list.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle">
-			<g:message code="default.list.label" args="[entityName]" /></content>
+			<warehouse:message code="default.list.label" args="[entityName]" /></content>
     </head>    
     <body>
         <div class="body">
@@ -26,34 +26,34 @@
 					
 					<g:if test="${params.groupBy=='expectedShippingDate'}">
 						<span class="selected">
-							<g:message code="shipment.expectedShippingDate.label" default="Expected Shipping"/>
+							<warehouse:message code="shipment.expectedShippingDate.label" default="Expected Shipping"/>
 						</span>
 					</g:if>
 					<g:else>
 						<g:link controller="shipment" action="listShippingByDate" params="['groupBy':'expectedShippingDate']">
-							<g:message code="shipment.expectedShippingDate.label" default="Expected shipping"/>
+							<warehouse:message code="shipment.expectedShippingDate.label" default="Expected shipping"/>
 						</g:link>
 					</g:else>
 					|
 					<g:if test="${params.groupBy=='dateCreated'}">
 						<span class="selected">
-							<g:message code="shipment.dateCreated.label" default="Created"/>
+							<warehouse:message code="shipment.dateCreated.label" default="Created"/>
 						</span>
 					</g:if>
 					<g:else>
 						<g:link controller="shipment" action="listShippingByDate" params="['groupBy':'dateCreated']">
-							<g:message code="shipment.dateCreated.label" default="Created"/>
+							<warehouse:message code="shipment.dateCreated.label" default="Created"/>
 						</g:link>
 					</g:else>
 					|
 					<g:if test="${params.groupBy=='lastUpdated'}">
 						<span class="selected">
-							<g:message code="shipment.lastUpdated.label" default="Modified"/>
+							<warehouse:message code="shipment.lastUpdated.label" default="Modified"/>
 						</span>
 					</g:if>
 					<g:else>
 						<g:link controller="shipment" action="listShippingByDate" params="['groupBy':'lastUpdated']">
-							<g:message code="shipment.lastUpdated.label" default="Modified"/>
+							<warehouse:message code="shipment.lastUpdated.label" default="Modified"/>
 						</g:link>
 					</g:else>
 					

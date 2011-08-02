@@ -5,9 +5,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'inventoryLevel.label', default: 'InventoryLevel')}" />
-        <title><g:message code="default.edit.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.edit.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.edit.label" args="[entityName]" /></content>
     </head>
     <body>
         <div class="body">
@@ -29,7 +29,7 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="product"><g:message code="inventoryLevel.product.label" default="Product" /></label>
+	                                  <label for="product"><warehouse:message code="inventoryLevel.product.label" default="Product" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'product', 'errors')}">
 	                                    <g:select name="product.id" from="${org.pih.warehouse.product.Product.list()}" optionKey="id" value="${inventoryLevelInstance?.product?.id}"  />
@@ -38,7 +38,7 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="supported"><g:message code="inventoryLevel.supported.label" default="Supported" /></label>
+	                                  <label for="supported"><warehouse:message code="inventoryLevel.supported.label" default="Supported" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'supported', 'errors')}">
 	                                    <g:checkBox name="supported" value="${inventoryLevelInstance?.supported}" />
@@ -47,7 +47,7 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="minQuantity"><g:message code="inventoryLevel.minQuantity.label" default="Min Quantity" /></label>
+	                                  <label for="minQuantity"><warehouse:message code="inventoryLevel.minQuantity.label" default="Min Quantity" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'minQuantity', 'errors')}">
 	                                    <g:select name="minQuantity" from="${0..2147483646}" value="${fieldValue(bean: inventoryLevelInstance, field: 'minQuantity')}" noSelection="['': '']" />
@@ -56,7 +56,7 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="reorderQuantity"><g:message code="inventoryLevel.reorderQuantity.label" default="Reorder Quantity" /></label>
+	                                  <label for="reorderQuantity"><warehouse:message code="inventoryLevel.reorderQuantity.label" default="Reorder Quantity" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'reorderQuantity', 'errors')}">
 	                                    <g:select name="reorderQuantity" from="${0..2147483646}" value="${fieldValue(bean: inventoryLevelInstance, field: 'reorderQuantity')}" noSelection="['': '']" />
@@ -65,7 +65,7 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="dateCreated"><g:message code="inventoryLevel.dateCreated.label" default="Date Created" /></label>
+	                                  <label for="dateCreated"><warehouse:message code="inventoryLevel.dateCreated.label" default="Date Created" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'dateCreated', 'errors')}">
 	                                    <g:datePicker name="dateCreated" precision="day" value="${inventoryLevelInstance?.dateCreated}"  />
@@ -74,7 +74,7 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="inventory"><g:message code="inventoryLevel.inventory.label" default="Inventory" /></label>
+	                                  <label for="inventory"><warehouse:message code="inventoryLevel.inventory.label" default="Inventory" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'inventory', 'errors')}">
 	                                    <g:select name="inventory.id" from="${org.pih.warehouse.inventory.Inventory.list()}" optionKey="id" value="${inventoryLevelInstance?.inventory?.id}"  />
@@ -83,7 +83,7 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="lastUpdated"><g:message code="inventoryLevel.lastUpdated.label" default="Last Updated" /></label>
+	                                  <label for="lastUpdated"><warehouse:message code="inventoryLevel.lastUpdated.label" default="Last Updated" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'lastUpdated', 'errors')}">
 	                                    <g:datePicker name="lastUpdated" precision="day" value="${inventoryLevelInstance?.lastUpdated}"  />

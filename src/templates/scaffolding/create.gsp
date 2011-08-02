@@ -5,9 +5,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="\${message(code: '${domainClass.propertyName}.label', default: '${className}')}" />
-        <title><g:message code="default.create.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.create.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.create.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.create.label" args="[entityName]" /></content>
     </head>
     <body>
         <div class="body">
@@ -34,7 +34,7 @@
 	                                    if (display) { %>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                    <label for="${p.name}"><g:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" /></label>
+	                                    <label for="${p.name}"><warehouse:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" /></label>
 	                                </td>
 	                                <td valign="top" class="value \${hasErrors(bean: ${propertyName}, field: '${p.name}', 'errors')}">
 	                                    ${renderEditor(p)}

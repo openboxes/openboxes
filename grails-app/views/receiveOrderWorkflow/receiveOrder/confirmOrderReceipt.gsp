@@ -120,7 +120,7 @@
 							
 							<tr class="prop">
 	                            <td valign="top" class="name">
-	                            	<label for='orderItems'><g:message code="order.items.label" default="Items" /></label></td>
+	                            	<label for='orderItems'><warehouse:message code="order.items.label" default="Items" /></label></td>
 	                            <td valign="top" class="value">
 
 									<g:if test="${orderItems }">

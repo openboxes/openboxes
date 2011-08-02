@@ -30,7 +30,7 @@
 		                    <tbody>
 		                    	<g:if test="${!shipmentWorkflow?.isExcluded('shipmentType')}">
 									<tr class="prop">
-										<td valign="top" class="name"><label><g:message code="shipment.type.label" default="Type" /></label></td>
+										<td valign="top" class="name"><label><warehouse:message code="shipment.type.label" default="Type" /></label></td>
 										<td valign="top"
 											class="value ${hasErrors(bean: shipmentInstance, field: 'shipmentType', 'errors')}">
 											<g:if test="${shipmentInstance?.shipmentType}">
@@ -48,14 +48,14 @@
 								</g:if>
 								<tr class='prop'>
 									<td valign='top' class='name'>
-										<label for='name'><g:message code="shipment.name.label" default="Name" /></label>
+										<label for='name'><warehouse:message code="shipment.name.label" default="Name" /></label>
 									</td>
 									<td valign='top' class='value ${hasErrors(bean:shipmentInstance,field:'name','errors')}'>
 										<input type="text" name='name' value="${shipmentInstance?.name?.encodeAsHTML()}" size="40"/>
 									</td>
 								</tr>  
 								<tr class="prop">
-									<td valign="top" class="name"><label><g:message code="shipment.origin.label" default="Origin" /></label></td>
+									<td valign="top" class="name"><label><warehouse:message code="shipment.origin.label" default="Origin" /></label></td>
 									<td valign="top"
 										class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">								
 										<g:select name="origin.id" from="${org.pih.warehouse.core.Location.list().sort()}" optionKey="id" value="${shipmentInstance?.origin?.id ? shipmentInstance?.origin?.id : session.warehouse.id}" style="width: 180px" />							
@@ -64,7 +64,7 @@
 									</td>
 								</tr>
 								<tr class="prop">
-									<td valign="top" class="name"><label><g:message code="shipment.destination.label" default="Destination" /></td>
+									<td valign="top" class="name"><label><warehouse:message code="shipment.destination.label" default="Destination" /></td>
 									<td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'destination', 'errors')}">
 										<g:select name="destination.id" from="${org.pih.warehouse.core.Location.list().sort()}" optionKey="id" value="${shipmentInstance?.destination?.id}" style="width: 180px" />	
 									</td>
@@ -72,13 +72,13 @@
 								
 								<!--  
 								<tr class="prop">
-									<td valign="top" class="name"><label><g:message code="shipment.loadingDate.label" default="Loading Date" /></td>
+									<td valign="top" class="name"><label><warehouse:message code="shipment.loadingDate.label" default="Loading Date" /></td>
 									<td>&nbsp;</td>
 								</tr>
 								-->
 								
 								<tr class="prop">
-									<td valign="top" class="name"><label><g:message code="shipment.expectedShippingDate.label" default="Expected to ship on" /></td>
+									<td valign="top" class="name"><label><warehouse:message code="shipment.expectedShippingDate.label" default="Expected to ship on" /></td>
 									<td class="value ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}"> 
 										<g:jqueryDatePicker id="expectedShippingDate" name="expectedShippingDate"
 											value="${shipmentInstance?.expectedShippingDate}" format="MM/dd/yyyy"/>							
@@ -87,7 +87,7 @@
 								</tr>
 								<g:if test="${!shipmentWorkflow?.isExcluded('expectedDeliveryDate')}">
 									<tr class="prop">
-										<td valign="top" class="name"><label><g:message code="shipment.expectedDeliveryDate.label" default="Expected to arrive on" /></td>
+										<td valign="top" class="name"><label><warehouse:message code="shipment.expectedDeliveryDate.label" default="Expected to arrive on" /></td>
 										<td class="value ${hasErrors(bean: shipmentInstance, field: 'expectedDeliveryDate', 'errors')}"> 
 											<g:jqueryDatePicker id="expectedDeliveryDate" name="expectedDeliveryDate"
 												value="${shipmentInstance?.expectedDeliveryDate}" format="MM/dd/yyyy"/>

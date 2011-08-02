@@ -3,7 +3,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
-        <title><g:message code="default.edit.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"></content>
     </head>
@@ -40,13 +40,13 @@
 	                    	<g:select name="shipmentStatus.id" from="${org.pih.warehouse.shipping.ShipmentStatus.list()}" optionKey="id" value="${shipmentInstance?.shipmentStatus?.id}"  />                          	
 	                    </div>
 
-		            	<h2><g:message code="shipment.shipment.label" default="Shipment Details" /></h2>
+		            	<h2><warehouse:message code="shipment.shipment.label" default="Shipment Details" /></h2>
 
 		                <table class="withoutBorder" border="0">
 		                    <tbody>	                        
 								<tr class="prop">
 		                            <td valign="top" class="name">
-		                            	<label><g:message code="shipment.shipmentType.label" default="Type" /></label>
+		                            	<label><warehouse:message code="shipment.shipmentType.label" default="Type" /></label>
 		                            </td>                            
 		                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">
 										<g:select name="shipmentType.id" from="${org.pih.warehouse.shipping.ShipmentType.list()}" optionKey="id" value="${shipmentInstance?.shipmentType?.id}" noSelection="['0':'']" />
@@ -54,22 +54,22 @@
 		                        </tr> 
 		                        <tr class="prop">
 		                            <td valign="top" class="name">
-		                            	<label><g:message code="shipment.origin.label" default="From" /></label>
+		                            	<label><warehouse:message code="shipment.origin.label" default="From" /></label>
 		                            </td>                            
 		                            <td valign="top" class=" ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">
 					                	<g:select name="origin.id" from="${org.pih.warehouse.inventory.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.origin?.id}"  />
 		                            </td>                            
-		                            <td valign="top" class="name"><label><g:message code="shipment.expectedShippingDate.label" default="Ship date" /></label></td>                            
+		                            <td valign="top" class="name"><label><warehouse:message code="shipment.expectedShippingDate.label" default="Ship date" /></label></td>                            
 	                                <td valign="top" class=" ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}" nowrap="nowrap">
 		           						<g:datePicker name="expectedShippingDate" precision="day" value="${shipmentInstance?.expectedShippingDate}" />
 	                                </td>
 		                        </tr>                    
 		                        <tr class="prop">
-		                            <td valign="top" class="name"><label><g:message code="shipment.destination.label" default="To" /></label></td>
+		                            <td valign="top" class="name"><label><warehouse:message code="shipment.destination.label" default="To" /></label></td>
 		                            <td valign="top" class=" ${hasErrors(bean: shipmentInstance, field: 'destination', 'errors')}">
 					                	<g:select name="destination.id" from="${org.pih.warehouse.inventory.Warehouse.list()}" optionKey="id" value="${shipmentInstance?.destination?.id}"  />
 		                            </td>                            
-		                            <td valign="top" class="name"><label><g:message code="shipment.expectedDeliveryDate.label" default="Delivery date" /></label></td>   
+		                            <td valign="top" class="name"><label><warehouse:message code="shipment.expectedDeliveryDate.label" default="Delivery date" /></label></td>   
 	                                <td valign="top" class=" ${hasErrors(bean: shipmentInstance, field: 'expectedDeliveryDate', 'errors')}" nowrap="nowrap">
 		           						<g:datePicker name="expectedDeliveryDate" precision="day" value="${shipmentInstance?.expectedDeliveryDate}" />
 	                                </td>
@@ -77,19 +77,19 @@
 		  					</tbody>
 						</table>
 							            	        
-		  				<h2><g:message code="shipment.shipment.label" default="Shipper" /></h2>
+		  				<h2><warehouse:message code="shipment.shipment.label" default="Shipper" /></h2>
 		  				
 		  				<table class="withoutBorder">
 		  					<tbody>
 		                        <tr class="prop">
 		                        	<td rowspan="3"><img src="${createLinkTo(dir:'images/icons',file: shipmentInstance?.shipmentMethod?.methodName + '.jpg')}"/></td>
-		                            <td valign="top" class="name"><label><g:message code="shipment.shipmentMethod.label" default="Shipment Method" /></label></td>        
+		                            <td valign="top" class="name"><label><warehouse:message code="shipment.shipmentMethod.label" default="Shipment Method" /></label></td>        
 		                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'shipmentMethod', 'errors')}">
 										<g:select name="shipmentMethod.id" from="${org.pih.warehouse.shipping.ShipmentMethod.list()}" optionKey="id" optionValue="name" value="${shipmentInstance?.shipmentMethod?.id}"  />
 		                            </td>
 		                        </tr>                    
 		                        <tr class="prop">
-		                            <td valign="top" class="name"><label><g:message code="shipment.trackingNumber.label" default="Tracking Number" /></label></td>                            
+		                            <td valign="top" class="name"><label><warehouse:message code="shipment.trackingNumber.label" default="Tracking Number" /></label></td>                            
 		                            <td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'trackingNumber', 'errors')}">
 	                                    <g:textField name="trackingNumber" value="${shipmentInstance?.trackingNumber}" />
 	                                </td>
@@ -120,7 +120,7 @@
 	 			<div class="dialog" style="clear:both"></div>
 		 			<fieldset>
 				
-						<h2><g:message code="shipment.events.label" default="Event History" /></h2>
+						<h2><warehouse:message code="shipment.events.label" default="Event History" /></h2>
 						
 						<div id="eventMessage"></div>
 						<table>
@@ -182,7 +182,7 @@
 	
 						<br/>
 						<br/>
-		  				<h2><g:message code="shipment.document.label" default="Documents" /></h2>
+		  				<h2><warehouse:message code="shipment.document.label" default="Documents" /></h2>
 		  				<hr/>
 		  				<br/>
 		  				
@@ -224,7 +224,7 @@
 	
 						<br/>
 						<br/>
-		  				<h2><g:message code="shipment.shipmentItem.label" default="Shipment Contents" /></h2>
+		  				<h2><warehouse:message code="shipment.shipmentItem.label" default="Shipment Contents" /></h2>
 		  				<hr/>
 		  				<br/>
 					    <g:each in="${shipmentInstance.containers}" var="container" status="c">

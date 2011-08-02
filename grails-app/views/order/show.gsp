@@ -5,9 +5,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'order.label', default: 'Order')}" />
-        <title><g:message code="default.show.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.show.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.show.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.show.label" args="[entityName]" /></content>
     </head>
     <body>
         <div class="body">
@@ -24,7 +24,7 @@
 	                    <tbody>
 	                        <tr class="prop">
 	                            <td valign="top" class="name">
-	                            	<label for='description'><g:message code="order.description.label" default="Description" /></label>
+	                            	<label for='description'><warehouse:message code="order.description.label" default="Description" /></label>
 	                            </td>
 	                            
 	                            <td valign="top" class="value">${fieldValue(bean: orderInstance, field: "description")}</td>
@@ -51,7 +51,7 @@
 							
 	                        
 							<tr class="prop">
-	                            <td valign="top" class="name"><label><g:message code="order.items.label" default="Shipments" /></label></td>
+	                            <td valign="top" class="name"><label><warehouse:message code="order.items.label" default="Shipments" /></label></td>
 	                            <td valign="top" class="value">	    
 	                            
 									<g:if test="${orderInstance?.shipments() }">
@@ -84,7 +84,7 @@
 	                        </tr>	                        
 	                    
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><label for="comments"><g:message code="order.comments.label" default="Comments" /></label></td>
+	                            <td valign="top" class="name"><label for="comments"><warehouse:message code="order.comments.label" default="Comments" /></label></td>
 	                            <td valign="top" class="value">
 									<g:if test="${orderInstance?.comments }">
 										<table>
@@ -135,7 +135,7 @@
 	                        </tr>
 	                        <tr class="prop">
 	                            <td valign="top" class="name">
-	                            	<label for="comments"><g:message code="order.documents.label" default="Documents" /></label>
+	                            	<label for="comments"><warehouse:message code="order.documents.label" default="Documents" /></label>
 	                            </td>                            
 	                            <td valign="top" class="value">
 									<g:if test="${orderInstance?.documents }">
@@ -179,7 +179,7 @@
 	                            </td>
 	                        </tr>
 							<tr class="prop">
-	                            <td valign="top" class="name"><label><g:message code="order.items.label" default="Items" /></label></td>
+	                            <td valign="top" class="name"><label><warehouse:message code="order.items.label" default="Items" /></label></td>
 	                            <td valign="top" class="value">
 									<g:if test="${orderInstance?.orderItems }">
 										<table>

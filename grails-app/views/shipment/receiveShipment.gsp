@@ -4,7 +4,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
 	<g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
-	<title><g:message code="default.edit.label" args="[entityName]" /></title>
+	<title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<content tag="pageTitle">Receive Shipment</content>
 </head>
@@ -36,7 +36,7 @@
 									<tbody>
 										<tr class="prop">
 											<td class="name"  style="width: 10%;">
-												<label><g:message code="receipt.recipient.label" default="Recipient" /></label>
+												<label><warehouse:message code="receipt.recipient.label" default="Recipient" /></label>
 											</td>
 											<td class="value" style="width: 30%;">
 												<g:autoSuggest id="recipient" name="recipient" jsonUrl="/warehouse/json/findPersonByName"
@@ -46,7 +46,7 @@
 											</td>
 										</tr>																						
 										<tr class="prop">
-											<td valign="top" class="name"><label><g:message
+											<td valign="top" class="name"><label><warehouse:message
 												code="receipt.actualDeliveryDate.label" default="Delivered On" /></label></td>
 											<td valign="top"
 												class=" ${hasErrors(bean: receiptInstance, field: 'actualDeliveryDate', 'errors')}"
@@ -58,7 +58,7 @@
 										
 										<g:if test="${shipmentInstance?.destination.isWarehouse()}">					
 											<tr class="prop">
-												<td valign="top" class="name"><label><g:message
+												<td valign="top" class="name"><label><warehouse:message
 													code="receipt.receiptItems.label" default="Receipt Items" /></label></td>
 												<td valign="top"
 													class=" ${hasErrors(bean: receiptInstance, field: 'receiptItem', 'errors')}"
@@ -116,7 +116,7 @@
 										
 														
 										<tr class="prop">
-				                            <td valign="top" class="name"><label><g:message code="comment.comment.label" default="Comment" /></label></td>                            
+				                            <td valign="top" class="name"><label><warehouse:message code="comment.comment.label" default="Comment" /></label></td>                            
 				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'comment', 'errors')}">
 			                                    <g:textArea name="comment" cols="60" rows="3"/>
 			                                </td>

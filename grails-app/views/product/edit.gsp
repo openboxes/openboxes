@@ -7,12 +7,12 @@
         <g:set var="entityName" value="${message(code: 'product.label', default: 'Product')}" />
         
         <g:if test="${productInstance?.id}">
-	        <title><g:message code="default.edit.label" args="[entityName]" /></title>
-			<content tag="pageTitle"><g:message code="default.edit.label" args="[entityName]" /></content>
+	        <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
+			<content tag="pageTitle"><warehouse:message code="default.edit.label" args="[entityName]" /></content>
 		</g:if>
 		<g:else>
-	        <title><g:message code="default.create.label" args="[entityName]" /></title>
-			<content tag="pageTitle"><g:message code="default.create.label" args="[entityName]" /></content>		
+	        <title><warehouse:message code="default.create.label" args="[entityName]" /></title>
+			<content tag="pageTitle"><warehouse:message code="default.create.label" args="[entityName]" /></content>		
 		</g:else>
 
 		<style>
@@ -45,7 +45,7 @@
 		                <table style="display: inline;">
 	                      <tbody>                
 							<tr class="prop">
-								<td valign="top" class="name"><label for="name"><g:message
+								<td valign="top" class="name"><label for="name"><warehouse:message
 									code="product.name.label" default="Description" /></label></td>
 								<td valign="top"
 									class="value ${hasErrors(bean: productInstance, field: 'name', 'errors')}">
@@ -54,7 +54,7 @@
 							</tr>
 							<tr class="prop">
                                 <td valign="top" class="name">
-                                  <label for="categories"><g:message code="product.primaryCategory.label" default="Primary Category" /></label>
+                                  <label for="categories"><warehouse:message code="product.primaryCategory.label" default="Primary Category" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'category', 'errors')}">
                                 	<%-- <g:render template="../category/chooser"/>--%>
@@ -68,7 +68,7 @@
 							 
 							<tr class="prop">
 							   <td valign="top" class="name">
-							      <label for="categories"><g:message code="product.categories.label" default="Other Categories" /></label>
+							      <label for="categories"><warehouse:message code="product.categories.label" default="Other Categories" /></label>
 							   </td>
 							   <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'categories', 'errors')}">
 							       <g:render template="categories" model="['productInstance':productInstance]" />
@@ -76,7 +76,7 @@
 							</tr>					
 							
 							<tr class="prop">
-								<td valign="top" class="name"><label for="name"><g:message
+								<td valign="top" class="name"><label for="name"><warehouse:message
 									code="product.unitOfMeasure.label" default="Unit of Measure" /></label></td>
 								<td valign="top"
 									class="${hasErrors(bean: productInstance, field: 'unitOfMeasure', 'errors')}">
@@ -84,7 +84,7 @@
 								</td>
 							</tr>								
 							<tr class="prop">
-								<td valign="top" class="name"><label for="manufacturer"><g:message
+								<td valign="top" class="name"><label for="manufacturer"><warehouse:message
 									code="product.manufacturer.label" default="Manufacturer" /></label></td>
 								<td valign="top"
 									class="${hasErrors(bean: productInstance, field: 'manufacturer', 'errors')}">
@@ -92,7 +92,7 @@
 								</td>
 							</tr>								
 							<tr class="prop">
-								<td valign="top" class="name"><label for="name"><g:message
+								<td valign="top" class="name"><label for="name"><warehouse:message
 									code="product.manufacturerCode.label" default="Manufacturer Code" /></label></td>
 								<td valign="top"
 									class="${hasErrors(bean: productInstance, field: 'manufacturerCode', 'errors')}">
@@ -100,7 +100,7 @@
 								</td>
 							</tr>								
 							<tr class="prop">
-								<td valign="top" class="name"><label for="upc"><g:message
+								<td valign="top" class="name"><label for="upc"><warehouse:message
 									code="product.upc.label" default="UPC" /></label></td>
 								<td valign="top"
 									class="${hasErrors(bean: productInstance, field: 'upc', 'errors')}">
@@ -108,7 +108,7 @@
 								</td>
 							</tr>								
 							<tr class="prop">
-								<td valign="top" class="name"><label for="ndc"><g:message
+								<td valign="top" class="name"><label for="ndc"><warehouse:message
 									code="product.ndc.label" default="NDC" /></label></td>
 								<td valign="top"
 									class="${hasErrors(bean: productInstance, field: 'ndc', 'errors')}">
@@ -116,7 +116,7 @@
 								</td>
 							</tr>								
 							<tr class="prop">
-								<td valign="top" class="name"><label for="name"><g:message
+								<td valign="top" class="name"><label for="name"><warehouse:message
 									code="product.coldChain.label" default="Cold Chain" /></label></td>
 								<td valign="top"
 									class=" ${hasErrors(bean: productInstance, field: 'coldChain', 'errors')}">
@@ -127,7 +127,7 @@
 							<%--
 							<tr class="prop">
                                 <td valign="top" class="name">
-                                  <label for="categories"><g:message code="product.otherCategories.label" default="Other Categories" /></label>
+                                  <label for="categories"><warehouse:message code="product.otherCategories.label" default="Other Categories" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'categories', 'errors')}">
                                 	<ul>

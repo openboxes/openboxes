@@ -5,16 +5,16 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="main" />
         <g:set var="entityName" value="${message(code: 'stockCard.label', default: 'StockCard')}" />
-        <title><g:message code="default.edit.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
     </head>
     <body>
         <div class="nav">
             <span class="menuButton"><a class="home" href="${createLink(uri: '/')}">Home</a></span>
-            <span class="menuButton"><g:link class="list" action="list"><g:message code="default.list.label" args="[entityName]" /></g:link></span>
-            <span class="menuButton"><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></span>
+            <span class="menuButton"><g:link class="list" action="list"><warehouse:message code="default.list.label" args="[entityName]" /></g:link></span>
+            <span class="menuButton"><g:link class="create" action="create"><warehouse:message code="default.new.label" args="[entityName]" /></g:link></span>
         </div>
         <div class="body">
-            <h1><g:message code="default.edit.label" args="[entityName]" /></h1>
+            <h1><warehouse:message code="default.edit.label" args="[entityName]" /></h1>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
@@ -32,7 +32,7 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                  <label for="product"><g:message code="stockCard.product.label" default="Product" /></label>
+                                  <label for="product"><warehouse:message code="stockCard.product.label" default="Product" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: stockCardInstance, field: 'product', 'errors')}">
                                     <g:select name="product.id" from="${org.pih.warehouse.product.Product.list()}" optionKey="id" value="${stockCardInstance?.product?.id}"  />
@@ -41,7 +41,7 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                  <label for="entries"><g:message code="stockCard.entries.label" default="Entries" /></label>
+                                  <label for="entries"><warehouse:message code="stockCard.entries.label" default="Entries" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: stockCardInstance, field: 'entries', 'errors')}">
                                     

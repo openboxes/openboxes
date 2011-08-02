@@ -5,9 +5,9 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'warehouses.label', default: 'Warehouses')}" />
         <g:set var="pageTitle" value="${message(code: 'default.list.label' args="[entityName]")}" />
-        <title><g:message code="default.show.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.show.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.show.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.show.label" args="[entityName]" /></content>
     </head>
     <body>        
         <div class="body">
@@ -26,10 +26,10 @@
                     <thead>
                         <tr>                        
                             <g:sortableColumn property="name" title="${message(code: 'warehouse.name.label', default: 'Name')}" />
-                            <th><g:message code="warehouse.manager.label" default="Manager" /></th>
-                            <th class="center"><g:message code="warehouse.active.label" default="Active?" /></th>
-                            <th class="center"><g:message code="warehouse.local.label" default="Managed Locally?" /></th>
-                            <th class="center"><g:message code="warehouse.edit.label" default="Edit" /></th>
+                            <th><warehouse:message code="warehouse.manager.label" default="Manager" /></th>
+                            <th class="center"><warehouse:message code="warehouse.active.label" default="Active?" /></th>
+                            <th class="center"><warehouse:message code="warehouse.local.label" default="Managed Locally?" /></th>
+                            <th class="center"><warehouse:message code="warehouse.edit.label" default="Edit" /></th>
                         </tr>
                     </thead>
                     <tbody>

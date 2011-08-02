@@ -3,7 +3,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
 	<g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
-	<title><g:message code="default.edit.label" args="[entityName]" /></title>
+	<title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<content tag="pageTitle">Add Comment</content>
 </head>
@@ -34,20 +34,20 @@
 								<table>
 									<tbody>
 										<tr class="prop">
-				                            <td valign="top" class="name"><label><g:message code="comment.recipient.label" default="To" /></label></td>                            
+				                            <td valign="top" class="name"><label><warehouse:message code="comment.recipient.label" default="To" /></label></td>                            
 				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'recipient', 'errors')}">
 												<g:select id="recipientId" name='recipientId' noSelection="${['':'Select one ...']}" 
 			                                    	from='${org.pih.warehouse.core.User.list()}' optionKey="id" optionValue="username"></g:select>
 			                                </td>
 				                        </tr>  	          
 										<tr class="prop">
-				                            <td valign="top" class="name"><label><g:message code="comment.sender.label" default="From" /></label></td>                            
+				                            <td valign="top" class="name"><label><warehouse:message code="comment.sender.label" default="From" /></label></td>                            
 				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'sender', 'errors')}">
 			                                    ${session.user.username}
 			                                </td>
 				                        </tr>  	          
 										<tr class="prop">
-				                            <td valign="top" class="name"><label><g:message code="comment.comment.label" default="Comment" /></label></td>                            
+				                            <td valign="top" class="name"><label><warehouse:message code="comment.comment.label" default="Comment" /></label></td>                            
 				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'comment', 'errors')}">
 			                                    <g:textArea name="comment" cols="60" rows="10"/>
 			                                </td>

@@ -4,7 +4,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
 	<g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
-	<title><g:message code="default.show.label" args="[entityName]" /></title>        
+	<title><warehouse:message code="default.show.label" args="[entityName]" /></title>        
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<content tag="pageTitle">Show Shipment</content>
 	<style>
@@ -32,7 +32,7 @@
 					<table>
 						<tbody>
 							<tr class="prop">
-								<td valign="top" class="name"><label><g:message
+								<td valign="top" class="name"><label><warehouse:message
 									code="shipment.details.label" default="Details" /></label>
 								</td>
 								<td valign="top" class="value">
@@ -40,7 +40,7 @@
 										<tbody>								
 											<tr style="height: 30px;">
 												<td valign="top">
-													<label><g:message code="shipment.currentStatus.label" default="Status" /></label>
+													<label><warehouse:message code="shipment.currentStatus.label" default="Status" /></label>
 												</td>
 												<td valign="top">
 													${shipmentInstance?.status.name}
@@ -57,10 +57,10 @@
 											<tr style="height: 30px;">
 												<td valign="top">
 													<g:if test="${shipmentInstance?.expectedShippingDate && new Date().after(shipmentInstance?.expectedShippingDate) }">												
-														<label><g:message code="shipment.departed.label" default="Departed" /></label>
+														<label><warehouse:message code="shipment.departed.label" default="Departed" /></label>
 													</g:if>
 													<g:else>
-														<label><g:message code="shipment.departing.label" default="Departing" /></label>
+														<label><warehouse:message code="shipment.departing.label" default="Departing" /></label>
 													</g:else>
 												</td>
 												<td valign="top" >
@@ -77,10 +77,10 @@
 											<tr style="height: 30px;">
 												<td valign="top">
 													<g:if test="${shipmentInstance?.expectedDeliveryDate && new Date().after(shipmentInstance?.expectedDeliveryDate) }">
-														<label><g:message code="shipment.arrived.label" default="Arrived" /></label>
+														<label><warehouse:message code="shipment.arrived.label" default="Arrived" /></label>
 													</g:if>
 													<g:else>
-														<label><g:message code="shipment.arriving.label" default="Arriving" /></label>
+														<label><warehouse:message code="shipment.arriving.label" default="Arriving" /></label>
 													</g:else>
 												</td>
 												<td>
@@ -97,7 +97,7 @@
 											<tr>
 												
 												<td valign="top"><label>
-													<g:message
+													<warehouse:message
 														code="shipment.weight.label" default="Total weight" /></label>
 												</td>
 												<td valign="top" class="value">
@@ -113,7 +113,7 @@
 							<tr class="prop">
 								<td valign="top" class="name"><label>
 									<img src="${createLinkTo(dir:'images/icons/silk',file:'tag.png')}" alt="tag" style="vertical-align: middle"/>
-									<g:message
+									<warehouse:message
 										code="shipment.referenceNumbers.label" default="Reference #s" /></label>
 								</td>
 								<td valign="top" class="value">
@@ -122,7 +122,7 @@
 											<g:each var="referenceNumberType" in="${shipmentWorkflow?.referenceNumberTypes}">
 												<tr style="height: 30px;">								
 												<!-- list all the reference numbers valid for this workflow -->
-													<td valign="top" ><label><g:message
+													<td valign="top" ><label><warehouse:message
 														code="shipment.${referenceNumberType?.name}" default="${referenceNumberType?.name}" /></label></td>
 													<td valign="top">
 														<g:findAll in="${shipmentInstance?.referenceNumbers}" expr="it.referenceNumberType.id == referenceNumberType.id">
@@ -140,7 +140,7 @@
 								<tr class="prop">
 									<td valign="top" class="name">
 										<img src="${createLinkTo(dir:'images/icons/silk',file:'money.png')}" alt="money" style="vertical-align: middle"/>
-										<label><g:message code="shipment.value.label" default="Value" /></label>
+										<label><warehouse:message code="shipment.value.label" default="Value" /></label>
 									</td>
 									<td valign="top" class="value">
 										<table style="display:inline">
@@ -148,7 +148,7 @@
 												<g:if test="${!shipmentWorkflow?.isExcluded('totalValue')}">
 													<tr>
 														<td valign="top">
-															<label><g:message code="shipment.totalValue.label" default="Total value" /></label><br/>
+															<label><warehouse:message code="shipment.totalValue.label" default="Total value" /></label><br/>
 														</td>
 														<td valign="top" >
 															<g:if test="${shipmentInstance.totalValue}">
@@ -164,7 +164,7 @@
 												<g:if test="${!shipmentWorkflow?.isExcluded('statedValue')}">
 													<tr>
 														<td valign="top">
-															<label><g:message code="shipment.statedValue.label" default="Declared value" /></label><br/>
+															<label><warehouse:message code="shipment.statedValue.label" default="Declared value" /></label><br/>
 														</td>
 														<td valign="top">
 															<g:if test="${shipmentInstance.statedValue}">
@@ -185,7 +185,7 @@
 							<%-- 
 							<g:if test="${!shipmentWorkflow?.isExcluded('shipmentMethod.shipper')}"> 
 								<tr class="prop">
-									<td valign="top" class="name"><label><g:message
+									<td valign="top" class="name"><label><warehouse:message
 									code="shipment.freightForwarder.label" default="Freight Forwarder" /></label>
 									</td>
 									<td valign="top" >
@@ -207,7 +207,7 @@
 							<g:if test="${!shipmentWorkflow?.isExcluded('recipient')}"> 
 								<tr class="prop">
 									<td class="name"  >
-										<label><g:message code="shipment.recipient.label" default="Recipient" /></label>
+										<label><warehouse:message code="shipment.recipient.label" default="Recipient" /></label>
 									</td>
 									<td  style="width: 30%;">
 										<g:if test="${shipmentInstance?.recipient}">
@@ -225,7 +225,7 @@
 							--%>
 							<g:if test="${!shipmentWorkflow?.isExcluded('carrier')}">  
 								<tr class="prop">
-									<td valign="top" class="name"><label><g:message
+									<td valign="top" class="name"><label><warehouse:message
 										code="shipment.traveler.label" default="Traveler" /></label></td>
 									<td valign="top" >
 										<g:if test="${shipmentInstance?.carrier}">
@@ -241,7 +241,7 @@
 								<tr class="prop">
 									<td valign="top" class="name">
 										<img src="${createLinkTo(dir:'images/icons/silk',file:'comment.png')}" alt="comments" style="vertical-align: middle"/>
-										<label><g:message code="shipment.comments.label" default="Comments" /></label><br/>
+										<label><warehouse:message code="shipment.comments.label" default="Comments" /></label><br/>
 									</td>
 									<td valign="top" class="">
 										<g:if test="${shipmentInstance.additionalInformation}">
@@ -259,7 +259,7 @@
 							<g:if test="${shipmentWorkflow?.documentTemplate}">
 								<tr class="prop">
 									<td valign="top" class="name">
-										<label><g:message code="shipment.templates.label" default="Templates" /></label><br/>
+										<label><warehouse:message code="shipment.templates.label" default="Templates" /></label><br/>
 									</td>
 									<td valign="top" class="">
 											<a href="${createLink(controller: "shipment", action: "generateDocuments", id: shipmentInstance.id)}">

@@ -70,11 +70,11 @@
 	    <ul>
 	      <g:if test="${session.user}">
 		<li>Hello ${session.user.username}!</li>
-		<li><g:link class="list" controller="user" action="profile"><g:message code="default.profile.label"  default="My Profile"/></g:link></li>
-		<li><g:link class="list" controller="user" action="logout"><g:message code="default.logout.label"  default="Logout"/></g:link></li>
+		<li><g:link class="list" controller="user" action="profile"><warehouse:message code="default.profile.label"  default="My Profile"/></g:link></li>
+		<li><g:link class="list" controller="user" action="logout"><warehouse:message code="default.logout.label"  default="Logout"/></g:link></li>
 	      </g:if>
 	      <g:elseif test="${!session.user}">
-		<li><g:link class="list" controller="user" action="login"><g:message code="default.login.label" default="Login"/></g:link></li>
+		<li><g:link class="list" controller="user" action="login"><warehouse:message code="default.login.label" default="Login"/></g:link></li>
 	      </g:elseif>
 	    </ul>
 	  </div>

@@ -3,9 +3,9 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <title><g:message code="default.plugins.label" default="Installed Plug-ins" /></title>
+        <title><warehouse:message code="default.plugins.label" default="Installed Plug-ins" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.plugins.label" default="Installed Plug-ins" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.plugins.label" default="Installed Plug-ins" /></content>
     </head>
     <body>        
 		<div id="settings" role="main" class="yui-gb">

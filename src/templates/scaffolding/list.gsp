@@ -5,9 +5,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="\${message(code: '${domainClass.propertyName}.label', default: '${className}')}" />
-        <title><g:message code="default.list.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.list.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.list.label" args="[entityName]" /></content>
     </head>
     <body>
         <div class="body">
@@ -18,7 +18,7 @@
             
 				<div>            	
 	            	<span class="menuButton">
-	            		<g:link class="new" action="create"><g:message code="default.add.label" args="['${domainClass.propertyName}']"/></g:link>
+	            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="['${domainClass.propertyName}']"/></g:link>
 	            	</span>
             	</div>
                 <table>
@@ -30,7 +30,7 @@
                             props.eachWithIndex { p, i ->
                                 if (i < 6) {
                                     if (p.isAssociation()) { %>
-                            <th><g:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" /></th>
+                            <th><warehouse:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" /></th>
                    	    <%      } else { %>
                             <g:sortableColumn property="${p.name}" title="\${message(code: '${domainClass.propertyName}.${p.name}.label', default: '${p.naturalName}')}" />
                         <%  }   }   } %>

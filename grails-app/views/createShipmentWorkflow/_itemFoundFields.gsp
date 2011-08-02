@@ -2,7 +2,7 @@
 				<g:hiddenField id="containerId" name="container.id" value="${addItemToContainerId }" />
 
 				<tr class="prop">
-					<td valign="top" class="name"><label><g:message code="shipmentItem.product.label" default="Product" /></label></td>                            
+					<td valign="top" class="name"><label><warehouse:message code="shipmentItem.product.label" default="Product" /></label></td>                            
 					<td valign="top" class="value">
 						<span id="product-text"></span>
 						<g:hiddenField id="productId" name="product.id" value="" />
@@ -11,20 +11,20 @@
 					</td>
 				</tr>
 				<tr class="prop">
-					<td valign="top" class="name"><label><g:message code="shipmentItem.availableQuantity.label" default="Available Quantity" /></label></td>                            
+					<td valign="top" class="name"><label><warehouse:message code="shipmentItem.availableQuantity.label" default="Available Quantity" /></label></td>                            
 					<td valign="top" class="value">
 						<span id="quantity-on-hand"></span>
 						<img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}" style="vertical-align: middle;" class="refresh"/>
 					</td>
 				</tr>  	        
 				<tr class="prop">
-					<td valign="top" class="name"><label><g:message code="shipmentItem.quantity.label" default="Quantity" /></label></td>                            
+					<td valign="top" class="name"><label><warehouse:message code="shipmentItem.quantity.label" default="Quantity" /></label></td>                            
 					<td valign="top" class="value">
 						<g:textField id="quantity" name="quantity" value="" size="5" /> 
 					</td>
 				</tr>  	        
 				<tr class="prop">
-					<td valign="top" class="name"><label><g:message code="shipmentItem.recipient.label" default="Recipient" /></label></td>                            
+					<td valign="top" class="name"><label><warehouse:message code="shipmentItem.recipient.label" default="Recipient" /></label></td>                            
 					<td valign="top" class="value">
 						<g:autoSuggest name="recipient" jsonUrl="/warehouse/json/findPersonByName" 
 							width="200" valueId="" valueName=""/>	

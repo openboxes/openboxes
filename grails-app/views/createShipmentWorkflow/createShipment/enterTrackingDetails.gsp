@@ -28,7 +28,7 @@
 		                    <tbody>			
 		                    	<g:if test="${!shipmentWorkflow?.isExcluded('carrier')}">  
 									<tr class="prop">
-										<td valign="top" class="name" style="width: 10%;"><label><g:message
+										<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
 											code="shipment.traveler.label" default="Traveler" /></label></td>
 										<td valign="top" style="width: 30%;">
 											<g:autoSuggest id="carrier" name="carrier" jsonUrl="/warehouse/json/findPersonByName" 
@@ -40,7 +40,7 @@
 								</g:if>	
 								<g:if test="${!shipmentWorkflow?.isExcluded('shipmentMethod.shipper')}">
 									<tr class="prop">
-										<td valign="top" class="name" style="width: 10%;"><label><g:message
+										<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
 											code="shipment.freightForwarder.label" default="Freight Forwarder" /></label></td>
 										<td valign="top" style="width: 30%;">
 											<g:autoSuggest id="shipperInput" name="shipperInput" jsonUrl="/warehouse/json/findShipperByName" 
@@ -54,7 +54,7 @@
 								</g:if>
 								<g:if test="${!shipmentWorkflow?.isExcluded('recipient')}">
 									<tr class="prop">
-										<td valign="top" class="name" style="width: 10%;"><label><g:message
+										<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
 											code="shipment.recipient.label" default="Recipient" /></label></td>
 										<td valign="top" style="width: 30%;">
 											<g:autoSuggest id="recipient" name="recipient" jsonUrl="/warehouse/json/findPersonByName" 
@@ -68,7 +68,7 @@
 								<!-- list all the reference numbers valid for this workflow -->
 								<g:each var="referenceNumberType" in="${shipmentWorkflow?.referenceNumberTypes}">
 									<tr class="prop">
-										<td valign="top" class="name" style="width: 10%;"><label><g:message
+										<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
 											code="shipment.${referenceNumberType?.name}" default="${referenceNumberType?.name}" /></label></td>
 										<td valign="top" style="width: 30%;">
 											<g:textField name="referenceNumbersInput.${referenceNumberType?.id}" size="10" value="${shipmentInstance?.referenceNumbers?.find({it.referenceNumberType.id == referenceNumberType.id})?.identifier}" /> 
@@ -78,7 +78,7 @@
 												
 								<g:if test="${!shipmentWorkflow?.isExcluded('statedValue')}">									
 									<tr class="prop">
-										<td valign="top" class="name"><label><g:message
+										<td valign="top" class="name"><label><warehouse:message
 											code="shipment.statedValue.label" default="Stated value" /></label></td>
 										<td valign="top"
 											class=" ${hasErrors(bean: shipmentInstance, field: 'statedValue', 'errors')}"
@@ -90,7 +90,7 @@
 								</g:if>			
 								<g:if test="${!shipmentWorkflow?.isExcluded('totalValue')}">									
 									<tr class="prop">
-										<td valign="top" class="name"><label><g:message
+										<td valign="top" class="name"><label><warehouse:message
 											code="shipment.totalValue.label" default="Total value" /></label></td>
 										<td valign="top"
 											class=" ${hasErrors(bean: shipmentInstance, field: 'totalValue', 'errors')}"
@@ -102,7 +102,7 @@
 								</g:if>			
 								<g:if test="${!shipmentWorkflow?.isExcluded('additionalInformation')}">
 									<tr class="prop">
-										<td valign="top" class="name" style="width: 10%;"><label><g:message
+										<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
 											code="shipment.additionalInformation.label" default="Comments" /></label></td>
 										<td valign="top" style="width: 30%;">
 											<g:textArea name="additionalInformation" value="${shipmentInstance?.additionalInformation}" cols="30" rows="2"/>

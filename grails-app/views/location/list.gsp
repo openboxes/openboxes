@@ -5,9 +5,9 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'locations.label', default: 'Locations')}" />
         <g:set var="pageTitle" value="${message(code: 'default.show.label' args="[entityName]")}" />
-        <title><g:message code="default.show.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.show.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.show.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.show.label" args="[entityName]" /></content>
     </head>
     <body>        
         <div class="body">
@@ -27,7 +27,7 @@
                         <tr>
                         	<g:sortableColumn property="id" title="${message(code: 'eventType.id.label', default: 'Id')}" />
                             <g:sortableColumn property="name" title="${message(code: 'location.name.label', default: 'Name')}" />
-                            <th><g:message code="location.type.label" default="Type" /></th>
+                            <th><warehouse:message code="location.type.label" default="Type" /></th>
                         </tr>
                     </thead>
                     <tbody>

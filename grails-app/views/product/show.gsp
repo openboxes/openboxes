@@ -5,9 +5,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'product.label', default: 'Product')}" />
-        <title><g:message code="default.show.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.show.label" args="[entityName]" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.show.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.show.label" args="[entityName]" /></content>
     </head>    
 
     <body>
@@ -21,19 +21,19 @@
 	                <table>
 	                    <tbody>                    
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="product.id.label" default="ID" /></td>                            
+	                            <td valign="top" class="name"><warehouse:message code="product.id.label" default="ID" /></td>                            
 	                            <td valign="top" class="value">${fieldValue(bean: productInstance, field: "id")}</td>                            
 	                        </tr>                    
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="product.name.label" default="Name" /></td>                            
+	                            <td valign="top" class="name"><warehouse:message code="product.name.label" default="Name" /></td>                            
 	                            <td valign="top" class="value">${fieldValue(bean: productInstance, field: "name")}</td>                            
 	                        </tr>                    
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="product.type.label" default="Type" /></td>                            
+	                            <td valign="top" class="name"><warehouse:message code="product.type.label" default="Type" /></td>                            
 	                            <td valign="top" class="value">${fieldValue(bean: productInstance, field: "productType.name")}</td>                            
 	                        </tr>                    
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="product.upc.label" default="UPC" /></td>                            
+	                            <td valign="top" class="name"><warehouse:message code="product.upc.label" default="UPC" /></td>                            
 	                            <td valign="top" class="value">
 	                            	${fieldValue(bean: productInstance, field: "upc")}
 	                            	<g:if test="${productInstance?.upc}">
@@ -44,11 +44,11 @@
 	                            </td>                            
 	                        </tr>                    
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="product.description.label" default="Description" /></td>                            
+	                            <td valign="top" class="name"><warehouse:message code="product.description.label" default="Description" /></td>                            
 	                            <td valign="top" class="value">${fieldValue(bean: productInstance, field: "description")}</td>                            
 	                        </tr>
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><g:message code="product.categories.label" default="Categories" /></td>                            
+	                            <td valign="top" class="name"><warehouse:message code="product.categories.label" default="Categories" /></td>                            
 	                            <td valign="top" class="value">${fieldValue(bean: productInstance, field: "categories")}</td>                            
 	                        </tr>
 							<tr class="prop">

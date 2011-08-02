@@ -3,7 +3,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="dialog" />
         <g:set var="entityName" value="${message(code: 'inventoryItem.label', default: 'Inventory Item')}" />
-        <title><g:message code="default.edit.label" args="[entityName]" /></title>    
+        <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>    
 	</head>
 	
 	
@@ -23,21 +23,21 @@
 				<table>
 					<tbody>
 						<tr class="prop">
-							<td valign="top" class="name"><label><g:message code="inventoryItem.product.label" default="Product" /></label></td>                            
+							<td valign="top" class="name"><label><warehouse:message code="inventoryItem.product.label" default="Product" /></label></td>                            
 							<td valign="top" class="value">
 								<g:autoSuggestEditable id="editItem-product-${itemInstance?.id}" name="product" jsonUrl="/warehouse/json/findProductByName" 
 									size="20" valueId="${itemInstance?.product?.id }" valueName="${itemInstance?.product?.name }"/>	
 							</td>
 						</tr>
 						<tr class="prop">
-							<td valign="top" class="name"><label><g:message code="inventoryItem.lotNumber.label" default="Lot/Serial Number" /></label></td>                            
+							<td valign="top" class="name"><label><warehouse:message code="inventoryItem.lotNumber.label" default="Lot/Serial Number" /></label></td>                            
 							<td valign="top" class="value">
 								<g:autoSuggestEditable id="editItem-lotNumber-${itemInstance?.id}" name="lotNumber" jsonUrl="/warehouse/json/findLotsByName?productId=${itemInstance?.product?.id }" 
 									size="20" valueId="${itemInstance?.lotNumber}" valueName="${itemInstance?.lotNumber}"/>							
 							</td>
 						</tr>
 						<tr class="prop">
-							<td valign="top" class="name"><label><g:message code="inventoryItem.expirationDate.label" default="Expiration Date" /></label></td>                            
+							<td valign="top" class="name"><label><warehouse:message code="inventoryItem.expirationDate.label" default="Expiration Date" /></label></td>                            
 							<td valign="top" class="value">
 								<g:datePicker name="expirationDate" value="" precision="month" default="none" noSelection="['':'']"/>
 							</td>

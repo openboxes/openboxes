@@ -59,7 +59,7 @@
 								</tr>
 								<tr class="prop">
 									<td valign="top" class="name">
-										<label for="email" class="loginField"><g:message code="user.usernameOrEmail.label" default="Username" /></label>
+										<label for="email" class="loginField"><warehouse:message code="user.usernameOrEmail.label" default="Username" /></label>
 									</td>
 									<td valign="top" class="name ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
 										<g:textField class="loginField" id="usernameField" name="username" value="${userInstance?.username}" size="25" />
@@ -67,7 +67,7 @@
 								</tr>
 								<tr class="prop">
 									<td valign="top" class="name">
-										<label for="password" class="loginField"><g:message code="user.password.label" default="Password" /></label>
+										<label for="password" class="loginField"><warehouse:message code="user.password.label" default="Password" /></label>
 									</td>
 									<td valign="top" class="name ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
 										<g:passwordField class="loginField" name="password" value="${userInstance?.password}" size="25" />
@@ -81,7 +81,7 @@
 								<tr class="prop">
 									<td valign="top" class="" colspan="2">
 										<div style="text-align: left">				
-											New user? <g:link class="list" controller="auth" action="signup"><g:message code="default.signup.label" default="Signup"/></g:link>
+											New user? <g:link class="list" controller="auth" action="signup"><warehouse:message code="default.signup.label" default="Signup"/></g:link>
 										</div>
 									</td>
 								</tr>

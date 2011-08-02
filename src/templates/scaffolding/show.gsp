@@ -5,9 +5,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="\${message(code: '${domainClass.propertyName}.label', default: '${className}')}" />
-        <title><g:message code="default.show.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.show.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.show.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.show.label" args="[entityName]" /></content>
     </head>
     <body>
         <div class="body">
@@ -22,7 +22,7 @@
                         Collections.sort(props, comparator.constructors[0].newInstance([domainClass] as Object[]))
                         props.each { p -> %>
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" /></td>
+                            <td valign="top" class="name"><warehouse:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" /></td>
                             <%  if (p.isEnum()) { %>
                             <td valign="top" class="value">\${${propertyName}?.${p.name}?.encodeAsHTML()}</td>
                             <%  } else if (p.oneToMany || p.manyToMany) { %>

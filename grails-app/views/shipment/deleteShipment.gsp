@@ -4,7 +4,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
 	<g:set var="entityName" value="${message(code: 'shipment.label', default: 'Shipment')}" />
-	<title><g:message code="default.show.label" args="[entityName]" /></title>        
+	<title><warehouse:message code="default.show.label" args="[entityName]" /></title>        
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<content tag="pageTitle">Show Shipment</content>
 </head>
@@ -28,7 +28,7 @@
 								<table cellspacing="5" cellpadding="5">
 									<tbody>
 										<tr class="prop">
-											<td valign="top" class="name"><label><g:message
+											<td valign="top" class="name"><label><warehouse:message
 												code="shipment.name.label" default="Shipment Number" /></label>
 											</td>
 											<td colspan="3" valign="top"
@@ -37,14 +37,14 @@
 											</td>
 										</tr>
 										<tr class="prop">
-											<td valign="middle" class="name"><label><g:message
+											<td valign="middle" class="name"><label><warehouse:message
 												code="shipment.shipmentType.label" default="Type" /></label></td>
 											<td valign="middle" class="value" nowrap="nowrap">
 												${shipmentInstance?.shipmentType?.name}
 											</td>
 										</tr>							
 										<tr class="prop">
-											<td valign="top" class="name"><label><g:message
+											<td valign="top" class="name"><label><warehouse:message
 												code="shipment.name.label" default="Name" /></label>
 											</td>
 											<td colspan="3" valign="top"

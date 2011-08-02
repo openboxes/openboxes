@@ -202,7 +202,7 @@
 									 					${selectedContainer?.name }				 					
 													</g:if>			 			
 													<g:else>
-														<g:message code="shipmentItem.unpackedItems" default="Unpacked Items" />			 						
+														<warehouse:message code="shipmentItem.unpackedItems" default="Unpacked Items" />			 						
 													</g:else>
 												</h3>
 											</td>

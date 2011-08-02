@@ -5,9 +5,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'category.label', default: 'Category')}" />
-        <title><g:message code="default.list.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.list.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.list.label" args="[entityName]" /></content>
     </head>
     <body>
         <div class="body">
@@ -21,7 +21,7 @@
             <%-- 
 				<div>            	
 	            	<span class="menuButton">
-	            		<g:link class="new" action="create"><g:message code="default.add.label" args="['category']"/></g:link>
+	            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="['category']"/></g:link>
 	            	</span>
 	           	</div>
 	           	--%>
@@ -108,9 +108,9 @@
 										<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_white.png')}" alt="Bullet" /> &nbsp;										 
 										<g:if test="${!category.parentCategory }"><b>${category.name }</b></g:if> 
 										<g:else>${category.name }</g:else>
-										<g:link class="new" action="create" params="['parentCategory.id':category.id]"><g:message code="default.add.label" args="['category']"/></g:link>
+										<g:link class="new" action="create" params="['parentCategory.id':category.id]"><warehouse:message code="default.add.label" args="['category']"/></g:link>
 										| 
-										<g:link class="new" action="delete" params="['category.id':category.id]"><g:message code="default.delete.label" args="['category']"/></g:link>
+										<g:link class="new" action="delete" params="['category.id':category.id]"><warehouse:message code="default.delete.label" args="['category']"/></g:link>
 									</div>
 								</td>
 							</tr>
@@ -126,9 +126,9 @@
 											<g:else>
 												${childCategory.name }
 											</g:else>
-											<g:link class="new" action="create" params="['parentCategory.id':childCategory.id]"><g:message code="default.add.label" args="['category']"/></g:link>
+											<g:link class="new" action="create" params="['parentCategory.id':childCategory.id]"><warehouse:message code="default.add.label" args="['category']"/></g:link>
 											| 
-											<g:link class="new" action="delete" params="['category.id':childCategory.id]"><g:message code="default.delete.label" args="['category']"/></g:link>
+											<g:link class="new" action="delete" params="['category.id':childCategory.id]"><warehouse:message code="default.delete.label" args="['category']"/></g:link>
 											
 											
 										</div>

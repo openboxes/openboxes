@@ -72,7 +72,7 @@
 			   		        		There are no shipments originating at <b>${session.warehouse.name}</b>.
 			            		</g:else>
 			            		&nbsp;
-			            		<g:link controller="shipment" action="listShipping"><g:message code="shipment.startOver.label"  default="Start over "/></g:link>
+			            		<g:link controller="shipment" action="listShipping"><warehouse:message code="shipment.startOver.label"  default="Start over "/></g:link>
 			           		</div>
 			           	</g:if>
 			            

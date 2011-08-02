@@ -5,9 +5,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${message(code: 'warehouse.label', default: 'Warehouse')}" />
-        <title><g:message code="default.edit.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><g:message code="default.edit.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.edit.label" args="[entityName]" /></content>
 		<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery',file:'jquery.colorpicker.css')}" type="text/css" media="screen, projection" />
 		<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.colorpicker.js')}" type="text/javascript" ></script>
     </head>
@@ -43,7 +43,7 @@
 	                        <tbody>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="name"><g:message code="warehouse.name.label" default="Name" /></label>
+	                                  <label for="name"><warehouse:message code="warehouse.name.label" default="Name" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'name', 'errors')}">
 	                                    <g:textField name="name" value="${warehouseInstance?.name}" />
@@ -51,7 +51,7 @@
 	                            </tr>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="bgColor"><g:message code="warehouse.bgColor.label" default="Background Color" /></label>
+	                                  <label for="bgColor"><warehouse:message code="warehouse.bgColor.label" default="Background Color" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'bgColor', 'errors')}">
 	                                    
@@ -66,7 +66,7 @@
 	                            </tr>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="fgColor"><g:message code="warehouse.fgColor.label" default="Foreground Color" /></label>
+	                                  <label for="fgColor"><warehouse:message code="warehouse.fgColor.label" default="Foreground Color" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'fgColor', 'errors')}">
 	                                    <g:select name="fgColor" class="colorpicker" 
@@ -78,7 +78,7 @@
 	                            </tr>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="manager"><g:message code="warehouse.manager.label" default="Manager" /></label>
+	                                  <label for="manager"><warehouse:message code="warehouse.manager.label" default="Manager" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'manager', 'errors')}">
 	                                    <g:select name="manager.id" from="${org.pih.warehouse.core.User.list()}" optionKey="id" value="${warehouseInstance?.manager?.id}"  />
@@ -88,7 +88,7 @@
 	                            <!--  
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="parentLocation"><g:message code="warehouse.parentWarehouse.label" default="Parent Location" /></label>
+	                                  <label for="parentLocation"><warehouse:message code="warehouse.parentWarehouse.label" default="Parent Location" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'parentLocation', 'errors')}">
 										<g:select name="parentLocation.id" from="${org.pih.warehouse.core.Location.list()}" 
@@ -99,7 +99,7 @@
 	                            
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="manager"><g:message code="warehouse.manager.label" default="Managed Locally" /></label>
+	                                  <label for="manager"><warehouse:message code="warehouse.manager.label" default="Managed Locally" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'local', 'errors')}">
 	                                    <g:checkBox name="local" value="${warehouseInstance?.local}" />
@@ -107,7 +107,7 @@
 	                            </tr>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="manager"><g:message code="warehouse.manager.label" default="Active" /></label>
+	                                  <label for="manager"><warehouse:message code="warehouse.manager.label" default="Active" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'active', 'errors')}">
 	                                    <g:checkBox name="active" value="${warehouseInstance?.active}" />

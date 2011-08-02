@@ -5,25 +5,25 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="main" />
         <g:set var="entityName" value="${message(code: 'stockCard.label', default: 'Manage Stock Card Entries')}" />
-        <title><g:message code="default.manage.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.manage.label" args="[entityName]" /></title>
     </head>
     <body>
         <div class="nav">
             <span class="menuButton"><a class="home" href="${createLink(uri: '/')}">Home</a></span>
 	    <!--
-            <span class="menuButton"><g:link class="list" action="list"><g:message code="default.list.label" args="[entityName]" /></g:link></span>
-            <span class="menuButton"><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></span>
+            <span class="menuButton"><g:link class="list" action="list"><warehouse:message code="default.list.label" args="[entityName]" /></g:link></span>
+            <span class="menuButton"><g:link class="create" action="create"><warehouse:message code="default.new.label" args="[entityName]" /></g:link></span>
 
 	    -->
         </div>
         <div class="body">
 	    <h1>
-	      <g:message code="stockCard.product.label" default="Product" />
+	      <warehouse:message code="stockCard.product.label" default="Product" />
 	      <g:link controller="product" action="show" id="${stockCardInstance?.product?.id}">${stockCardInstance?.product?.encodeAsHTML()}</g:link>
 	      (${stockCardInstance?.product?.upc})
 	    </h1>
 	    <h2>
-	      <g:message code="product.description.label" default="Description" />
+	      <warehouse:message code="product.description.label" default="Description" />
 	      ${stockCardInstance?.product?.description}.
 	    </h2>
             <g:if test="${flash.message}">
