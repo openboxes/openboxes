@@ -2,7 +2,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
-	<title>Signup</title>
+	<title><warehouse:message code="auth.signup.label"/></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 
 		
@@ -34,7 +34,7 @@
 								<a class="home" href="${createLink(uri: '/dashboard/index')}" style="text-decoration: none">						    	
 						    		<img src="${createLinkTo(dir:'images/icons/',file:'logo.gif')}" alt="Your Boxes. You're Welcome." 
 						    			style="vertical-align: absmiddle"/>
-						    			<span style="font-size: 2em; vertical-align: top;">openboxes</span>
+						    			<span style="font-size: 2em; vertical-align: top;"><warehouse:message code="default.openboxes"/></span>
 							    </a>					
 							</div>			
 						</legend>
@@ -43,7 +43,7 @@
 
 								<tr>
 									<td colspan="2">
-										Enter your account details below.
+										<warehouse:message code="auth.enterAccountDetails.text"/>
 									</td>	
 								</tr>
 					            <tr class="prop">
@@ -98,7 +98,7 @@
 						    
 					            <tr class="prop">
 					                <td valign="top" class="name">
-					                  <label for="passwordConfirm"><warehouse:message code="user.email.label" default="Confirm Password" /></label>
+					                  <label for="passwordConfirm"><warehouse:message code="user.confirmPassword.label" default="Confirm Password" /></label>
 					                </td>
 					                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'passwordConfirm', 'errors')}">
 					                    <g:passwordField name="passwordConfirm" value="${userInstance?.passwordConfirm}" />
@@ -108,13 +108,13 @@
 								<tr class="prop">	
 									<td class=""></td>					
 									<td valign="top" style="text-align: right">
-										<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt=""/> Signup</button>					   
+										<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt=""/> <warehouse:message code="auth.signup.label"/></button>					   
 									</td>
 								</tr>
 								<tr class="prop">
 									<td valign="top" class="" colspan="2">
 										<div style="text-align: left">				
-											Already have an account? <g:link class="list" controller="auth" action="login"><warehouse:message code="default.login.label" default="Login"/></g:link>
+											<warehouse:message code="auth.alreadyHaveAccount.text"/> <g:link class="list" controller="auth" action="login"><warehouse:message code="auth.login.label" default="Login"/></g:link>
 										</div>
 									</td>
 								</tr>								

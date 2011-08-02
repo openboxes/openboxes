@@ -2,7 +2,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
-	<title>Login</title>
+	<title><warehouse:message code="auth.title"/></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<script src="${createLinkTo(dir:'js/', file:'detect_timezone.js')}" type="text/javascript" ></script>
 </head>
@@ -45,7 +45,7 @@
 								<a class="home" href="${createLink(uri: '/dashboard/index')}" style="text-decoration: none">						    	
 						    		<img src="${createLinkTo(dir:'images/icons/',file:'logo.gif')}" alt="Your Boxes. You're Welcome." 
 						    			style="vertical-align: absmiddle"/>
-						    			<span style="font-size: 2em; vertical-align: top;">openboxes</span>
+						    			<span style="font-size: 2em; vertical-align: top;"><warehouse:message code="default.openboxes"/></span>
 							    </a>					
 							</div>	
 						</legend>
@@ -59,7 +59,7 @@
 								</tr>
 								<tr class="prop">
 									<td valign="top" class="name">
-										<label for="email" class="loginField"><warehouse:message code="user.usernameOrEmail.label" default="Username" /></label>
+										<label for="email" class="loginField"><warehouse:message code="user.username.label" default="Username" /></label>
 									</td>
 									<td valign="top" class="name ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
 										<g:textField class="loginField" id="usernameField" name="username" value="${userInstance?.username}" size="25" />
@@ -75,13 +75,13 @@
 								</tr>
 								<tr class="prop">
 									<td colspan="2" valign="top" style="text-align: center;">
-										<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt=""/> Login</button>												
+										<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt=""/> <g:message code="auth.login.label"/></button>												
 									</td>
 								</tr>
 								<tr class="prop">
 									<td valign="top" class="" colspan="2">
 										<div style="text-align: left">				
-											New user? <g:link class="list" controller="auth" action="signup"><warehouse:message code="default.signup.label" default="Signup"/></g:link>
+											<warehouse:message code="auth.newuser.text"/> <g:link class="list" controller="auth" action="signup"><warehouse:message code="auth.signup.label" default="Signup"/></g:link>
 										</div>
 									</td>
 								</tr>
