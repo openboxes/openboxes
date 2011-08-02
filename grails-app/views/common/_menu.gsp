@@ -7,37 +7,37 @@
 		<ul>
 			<li>
 				<span class="menuButton">
-					<g:link controller="inventory" action="browse">Browse inventory</g:link>
+					<g:link controller="inventory" action="browse"><warehouse:message code="inventory.browse.label"/></g:link>
 				</span>
 			</li>
 			<li>
 				<span class="menuButton">
-					<g:link controller="inventory" action="listDailyTransactions">Daily transactions</g:link> 
+					<g:link controller="inventory" action="listDailyTransactions"><warehouse:message code="transaction.dailyTransactions.label"/></g:link> 
 				</span>
 			</li>
 			<li>
 				<span class="menuButton">
-					<g:link controller="inventory" action="listExpiringStock">Expiring stock</g:link> 
+					<g:link controller="inventory" action="listExpiringStock"><warehouse:message code="inventory.expiringStock.label"/></g:link> 
 				</span>
 			</li>
 			<li>
 				<span class="menuButton">
-					<g:link controller="inventory" action="listAllTransactions">List transactions</g:link> 
+					<g:link controller="inventory" action="listAllTransactions"><warehouse:message code="transaction.list.label"/></g:link> 
 				</span>
 			</li>
 			<li>
 				<span class="menuButton">
-					<g:link controller="inventory" action="createTransaction">Add transaction</g:link> 				
+					<g:link controller="inventory" action="createTransaction"><warehouse:message code="transaction.add.label"/></g:link> 				
 				</span>			
 			</li>
 			<li>
 				<span class="menuButton">
-					<g:link controller="inventoryItem" action="importInventoryItems">Import items</g:link> 				
+					<g:link controller="inventoryItem" action="importInventoryItems"><warehouse:message code="inventory.import.label"/></g:link> 				
 				</span>			
 			</li>
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="product" action="create"><warehouse:message code="default.add.label" args="['product']" default="Add New Product" /></g:link>
+					<g:link controller="product" action="create"><warehouse:message code="product.create.label" /></g:link>
 				</span>
 			</li>
 		</ul>
@@ -93,12 +93,12 @@
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="shipment" action="listShipping"><warehouse:message code="shipment.listShipping.label"  default="List shipments "/></g:link>
+					<g:link controller="shipment" action="listShipping"><warehouse:message code="shipping.list.label"  default="List shipments "/></g:link>
 				</span>
 			</li>									
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="createShipmentWorkflow" action="index"><warehouse:message code="suitcase.add.label" default="Add a shipment"/></g:link>
+					<g:link controller="createShipmentWorkflow" action="index"><warehouse:message code="shipping.add.label" default="Add a shipment"/></g:link>
 				</span>
 			</li>					
 		</ul>										
@@ -110,7 +110,7 @@
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="shipment" action="listReceiving"><warehouse:message code="shipment.listReceiving.label"  default="List receiving"/></g:link>
+					<g:link controller="shipment" action="listReceiving"><warehouse:message code="receiving.list.label"  default="List receiving"/></g:link>
 				</span>		
 			</li>										
 			<li>
@@ -130,57 +130,57 @@
 		<warehouse:message code="administration.label"  default="Administration"/>
 	</h6>			
 	<div class="menu-section">
-		<span class="menu-subheading">Products</span>
+		<span class="menu-subheading"><warehouse:message code="products.label"/></span>
 		<ul>			
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="product" action="list">Products</g:link>
+					<g:link controller="product" action="list"><warehouse:message code="products.label"/></g:link>
 				</span>
 			</li>
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="attribute" action="list">Product Attributes</g:link>
+					<g:link controller="attribute" action="list"><warehouse:message code="attribute.label"/></g:link>
 				</span>
 			</li>
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="category" action="tree">Product Categories</g:link>
+					<g:link controller="category" action="tree"><warehouse:message code="category.label"/></g:link>
 				</span>
 			</li>
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="product" action="batchEdit"><warehouse:message code="default.batchEdit.label" args="['products']" default="Batch Edit Products" /></g:link>
-				</span>
-			</li>
-		</ul>
-		<span class="menu-subheading">Locations</span>
-		<ul>
-			<li class="">
-				<span class="menuButton">
-					<g:link controller="warehouse" action="list">Warehouses</g:link>
-				</span>
-			</li>
-			<li class="">
-				<span class="menuButton">
-					<g:link controller="location" action="list">Suppliers / Customers</g:link>
-				</span>
-			</li>
-			<li class="">
-				<span class="menuButton">
-					<g:link controller="shipper" action="list">Shippers</g:link>
+					<g:link controller="product" action="batchEdit"><g:message code="default.batchEdit.label" args="[warehouse.message(code:'products.label')]" default="Batch Edit Products" /></g:link>
 				</span>
 			</li>
 		</ul>
-		<span class="menu-subheading">Persons</span>
+		<span class="menu-subheading"><warehouse:message code="locations.label"/></span>
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="person" action="list">All Persons</g:link>
+					<g:link controller="warehouse" action="list"><warehouse:message code="location.warehouses.label"/></g:link>
+				</span>
+			</li>
+			<li class="">
+				<span class="menuButton">
+					<g:link controller="location" action="list"><warehouse:message code="location.suppliersCustomers.label"/></g:link>
+				</span>
+			</li>
+			<li class="">
+				<span class="menuButton">
+					<g:link controller="shipper" action="list"><warehouse:message code="location.shippers.label"/></g:link>
+				</span>
+			</li>
+		</ul>
+		<span class="menu-subheading"><warehouse:message code="person.label"/></span>
+		<ul>
+			<li class="">
+				<span class="menuButton">
+					<g:link controller="person" action="list"><warehouse:message code="person.list.label"/></g:link>
 				</span>		
 			</li>
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="user" action="list">Users</g:link>
+					<g:link controller="user" action="list"><warehouse:message code="user.label"/></g:link>
 				</span>	
 			</li>
 			<!--  								
@@ -191,11 +191,11 @@
 			</li>
 			-->
 		</ul>
-		<span class="menu-subheading">General</span>
+		<span class="menu-subheading"><warehouse:message code="default.general.label"/></span>
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="admin" action="checkSettings"><warehouse:message code="default.manage.label" args="['settings']"/></g:link>
+					<g:link controller="admin" action="checkSettings"><warehouse:message code="default.manage.label" args="[warehouse.message(code:'default.settings.label')]"/></g:link>
 				</span>		
 			</li>
 		</ul>

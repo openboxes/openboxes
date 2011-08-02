@@ -147,11 +147,16 @@
 												</a>								
 											</li>
 										</g:if>
+										
+										<%--
 										<li>
 											<div style="display: inline">
 												<g:render template="../common/searchGlobal"/>
 											</div>
 										</li>
+										--%>
+										
+										
 										<li>
 											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
 										</li>												
