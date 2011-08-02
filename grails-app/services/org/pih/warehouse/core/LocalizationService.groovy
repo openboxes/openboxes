@@ -19,6 +19,11 @@ class LocalizationService {
 	 */
 	String getLocalizedString(String value) {
 	
+		// null check
+		if (!value) {
+			return value
+		}
+		
 		// fetch the locale of the current user
 		Locale locale = RequestContextHolder.currentRequestAttributes().getSession().user.locale
 		
