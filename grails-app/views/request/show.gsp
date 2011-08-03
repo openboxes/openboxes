@@ -23,26 +23,26 @@
 	                    <tbody>
 	                        <tr class="prop">
 	                            <td valign="top" class="name">
-	                            	<label for='description'><warehouse:message code="request.description.label" default="Description" /></label>
+	                            	<label for='description'><warehouse:message code="default.description.label" default="Description" /></label>
 	                            </td>
 	                            
 	                            <td valign="top" class="value">${fieldValue(bean: requestInstance, field: "description")}</td>
 	                            
 	                        </tr>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for='source'>Request from</label></td>
+								<td valign='top' class='name'><label for='source'><warehouse:message code="request.requestFrom.label"/></label></td>
 								<td valign='top' class='value'>
 									${requestInstance?.origin?.name?.encodeAsHTML()}
 								</td>
 							</tr>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for="destination">Request for</label></td>
+								<td valign='top' class='name'><label for="destination"><warehouse:message code="request.requestFor.label"/></label></td>
 								<td valign='top' class='value'>
 									${requestInstance?.destination?.name?.encodeAsHTML()}
 								</td>
 							</tr>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for='requestedBy'>Requested by</label></td>
+								<td valign='top' class='name'><label for='requestedBy'><warehouse:message code="request.requestedBy.label"/></label></td>
 								<td valign='top'class='value'>
 									${requestInstance?.requestedBy?.name }
 								</td>
@@ -83,17 +83,17 @@
 	                        </tr>	                        
 	                     --%>
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><label for="comments"><warehouse:message code="request.comments.label" default="Comments" /></label></td>
+	                            <td valign="top" class="name"><label for="comments"><warehouse:message code="default.comments.label" default="Comments" /></label></td>
 	                            <td valign="top" class="value">
 									<g:if test="${requestInstance?.comments }">
 										<table>
 											<thead>
 												<tr class="odd">
-													<th>To</th>
-													<th>From</th>
-													<th>Comment</th>
-													<th>Date</th>
-													<th>Actions</th>
+													<th><warehouse:message code="default.to.label"/></th>
+													<th><warehouse:message code="default.from.label"/></th>
+													<th><warehouse:message code="default.comment.label"/></th>
+													<th><warehouse:message code="default.date.label"/></th>
+													<th><warehouse:message code="default.actions.label"/></th>
 												</tr>
 											</thead>									
 											<tbody>
@@ -113,11 +113,11 @@
 														</td>
 														<td align="right">
 															<g:link action="editComment" id="${commentInstance.id}" params="['request.id':requestInstance?.id]">
-																<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit" />
+																<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="${warehouse.message(code:'default.button.edit.label')}" />
 															</g:link>
 														
 															<g:link action="deleteComment" id="${commentInstance.id}" params="['request.id':requestInstance?.id]" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-																<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" />
+																<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="${warehouse.message(code:'default.button.delete.label')}" />
 															</g:link>
 														</td>
 													</tr>
@@ -126,7 +126,7 @@
 										</table>
 									</g:if>
 									<g:else>
-										<span class="fade">No comments</span>
+										<span class="fade"><warehouse:message code="default.noComments.message"/></span>
 									</g:else>
 	                            
 	                            </td>
@@ -141,12 +141,12 @@
 										<table>
 											<thead>
 												<tr class="odd">
-													<th>Filename</th>
-													<th>Type</th>
-													<th>Description</th>
-													<th>Size</th>
-													<th>Last Updated</th>
-													<th>Actions</th>
+													<th><warehouse:message code="document.filename.label"/></th>
+													<th><warehouse:message code="default.type.label"/></th>
+													<th><warehouse:message code="default.description.label"/></th>
+													<th><warehouse:message code="document.size.label"/></th>
+													<th><warehouse:message code="default.lastUpdated.label"/></th>
+													<th><warehouse:message code="default.actions.label"/></th>
 												</tr>
 											</thead>									
 											<tbody>
@@ -154,19 +154,19 @@
 													<tr>
 														<td>
 															<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="Edit" />
-															${documentInstance?.filename} (<g:link controller="document" action="download" id="${documentInstance.id}">download</g:link>)
+															${documentInstance?.filename} (<g:link controller="document" action="download" id="${documentInstance.id}"><warehouse:message code="document.download.label"/></g:link>)
 														</td>
-														<td>${documentInstance?.documentType?.name}</td>
+														<td><format:metadata obj="${documentInstance?.documentType}"/></td>
 														<td>${documentInstance?.name}</td>
 														<td>${documentInstance?.size} bytes</td>
 														<td>${documentInstance?.lastUpdated}</td>
 														<td align="right">
 															<g:link action="editDocument" id="${documentInstance.id}" params="['request.id':requestInstance?.id]">
-																<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit" />
+																<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="${warehouse.message(code:'default.button.edit.label')}" />
 															</g:link>
 														
 															<g:link action="deleteDocument" id="${documentInstance.id}" params="['request.id':requestInstance?.id]" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-																<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" />
+																<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="${warehouse.message(code:'default.button.delete.label')}" />
 															</g:link>
 														</td>
 													</tr>
@@ -175,7 +175,7 @@
 										</table>
 									</g:if>
 									<g:else>
-										<span class="fade">No documents</span>
+										<span class="fade"><warehouse:message code="document.noDocuments.message"/></span>
 									</g:else>
 	                            
 	                            </td>
@@ -187,10 +187,10 @@
 										<table>
 											<thead>
 												<tr class="odd">
-													<th>Type</th>
-													<th>Product</th>
-													<th>Qty Requested</th>
-													<th>Qty Fulfilled</th>
+													<th><warehouse:message code="default.type.label"/></th>
+													<th><warehouse:message code="product.label"/></th>
+													<th><warehouse:message code="request.qtyRequested.label"/></th>
+													<th><warehouse:message code="request.qtyFulfilled.label"/></th>
 												</tr>
 											</thead>									
 											<tbody>
@@ -198,18 +198,18 @@
 													<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 														<td>
 															<g:if test="${requestItem?.product }">
-																Product
+																<warehouse:message code="product.label"/>
 															</g:if>
 															<g:elseif test="${requestItem?.category }">
-																Category
+																<warehouse:message code="category.label"/>
 															</g:elseif>							
 															<g:else>
-																Unclassified											
+																<warehouse:message code="default.unclassified.label"/>											
 															</g:else>
 														</td>
 														<td>
 															<g:if test="${requestItem?.product }">
-																${requestItem?.product?.name}
+																<format:product product="${requestItem?.product}"/>
 															</g:if>
 															<g:else>
 																${requestItem?.description }
@@ -227,7 +227,7 @@
 										</table>
 									</g:if>
 									<g:else>
-										<span class="fade">No items</span>
+										<span class="fade"><warehouse:message code="default.noItems.label"/></span>
 									</g:else>
 	                            </td>
 	                        </tr>	                        

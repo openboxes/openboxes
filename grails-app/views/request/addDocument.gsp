@@ -32,7 +32,7 @@
 						<tbody>
 							<tr class="prop">
 								<td valign="top" class="name"><label><warehouse:message
-									code="document.file.label" default="Select a file" /></label>
+									code="document.selectAFile.label"/></label>
 								</td>
 								<td valign="top"
 									class="value ${hasErrors(bean: documentInstance, field: 'fileContents', 'errors')}">
@@ -47,7 +47,7 @@
 							</tr>
 							<tr class="prop">
 								<td valign="top" class="name"><label class="optional"><warehouse:message
-									code="document.name.label" default="Description" /></label>
+									code="default.description.label" default="Description" /></label>
 								</td>
 								<td valign="top"
 									class="value ${hasErrors(bean: documentInstance, field: 'name', 'errors')}">
@@ -56,16 +56,16 @@
 							</tr>
 							<tr class="prop">
 								<td valign="top" class="name"><label><warehouse:message
-									code="document.documentType.label" default="Document Type" /></label></td>
+									code="document.type.label"/></label></td>
 								<td valign="top"
 									class="value ${hasErrors(bean: documentInstance, field: 'documentType', 'errors')}">
 												<g:select name="typeId" from="${org.pih.warehouse.core.DocumentType.list()}" value="${documentInstance?.documentType?.id}" 
-													noSelection="['0':'-Choose a document type-']" optionKey="id" optionValue="name"/>
+													noSelection="['0': warehouse.message(code:'document.chooseADocumentType.label')]" optionKey="id" optionValue="${{format.metadata(obj:it)}}"/>
 								</td>
 							</tr>
 							<tr class="prop">
 								<td valign="top" class="name"><label class="optional"><warehouse:message
-									code="document.number.label" default="Document Number" /></label>
+									code="document.number.label" /></label>
 								</td>
 								<td valign="top"
 									class="value ${hasErrors(bean: documentInstance, field: 'documentNumber', 'errors')}">
@@ -78,10 +78,11 @@
 									<div class="buttons">
 										<!-- show upload or save depending on whether we are adding a new doc or modifying a previous one -->
 										<button type="submit" class="positive">
-											<img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" />${documentInstance?.id ? 'Save' : 'Upload'}
+											<img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" />${documentInstance?.id ? warehouse.message(code:'default.button.save.label') : warehouse.message(code:'default.button.upload.label')}
 										</button>
 										<g:link controller="request" action="show" id="${requestInstance?.id}" class="negative">
-											<img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="Cancel" /> Cancel </g:link>
+											<img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="Cancel" /> <warehouse:message
+									code="default.button.cancel.label" /> </g:link>
 									</div>				
 								</td>
 							</tr>

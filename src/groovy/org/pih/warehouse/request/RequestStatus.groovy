@@ -5,12 +5,12 @@ import org.pih.warehouse.shipping.ShipmentStatusCode;
 
 public enum RequestStatus {
 
-	NOT_YET_REQUESTED("Not yet requested",1),
-	REQUESTED("Requested",2),
-	FULFILLED("Fulfilled", 3),
-	SHIPPED("Shipped", 4),
-	RECEIVED("Received",5),
-	CANCELED("Canceled", 6)
+	NOT_YET_REQUESTED("request.status.notYetRequested.label",1),
+	REQUESTED("request.status.requested.label",2),
+	FULFILLED("request.status.fulfilled.label", 3),
+	SHIPPED("request.status.shipped.label", 4),
+	RECEIVED("request.status.received.label",5),
+	CANCELED("request.status.canceled.label", 6)
 	
 	String name
 	int sortOrder

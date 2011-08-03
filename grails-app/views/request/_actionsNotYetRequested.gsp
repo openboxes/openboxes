@@ -4,7 +4,7 @@
 			<div class="action-menu-item">
 				<g:link controller="request" action="list">
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
-					&nbsp;${warehouse.message(code: 'requests.view.label', default: 'View requests')} 
+					&nbsp;${warehouse.message(code: 'request.view.label', default: 'View requests')} 
 				</g:link>
 			</div>
 			<div class="action-menu-item">
@@ -14,7 +14,7 @@
 		<div class="action-menu-item">
 			<g:link controller="request" action="show" id="${requestInstance?.id}">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" />
-				&nbsp;${warehouse.message(code: 'request.view.label', default: 'View request details')} 
+				&nbsp;${warehouse.message(code: 'request.viewDetails.label', default: 'View request details')} 
 			</g:link>		
 		</div>
 		<div class="action-menu-item">

@@ -16,14 +16,14 @@
 								<g:render template="/request/actions" model="[requestInstance:requestInstance]"/> &nbsp;|&nbsp;
 							</g:if>
 							<span class="request-number">
-								Order #: <b>${requestInstance?.requestNumber}</b>  
+								<warehouse:message code="request.orderNumber.label"/>: <b>${requestInstance?.requestNumber}</b>  
 							</span>
 							<span class="fade">&nbsp;|&nbsp;</span> 
 							<span class="requested-date">
-								Date requested: <b><format:date obj="${requestInstance?.dateRequested}"/></b>
+								<warehouse:message code="request.date.label"/>: <b><format:date obj="${requestInstance?.dateRequested}"/></b>
 							</span>
 							<span class="fade">&nbsp;|&nbsp;</span>
-							<span class="requested-by">Requested by: 
+							<span class="requested-by"<warehouse:message code="request.requestedBy.label"/>: 
 								<g:if test="${requestInstance?.requestedBy }"><b>${requestInstance?.requestedBy?.name }</b></g:if>
 								
 								<g:if test="${requestInstance?.origin }">(${requestInstance?.destination?.name })</g:if>
@@ -32,7 +32,7 @@
 					</td>										
 					<td style="text-align: right;">
 						<div class="fade" style="font-weight: bold; font-size:1.5em;">
-							${requestInstance?.status() }
+							<warehouse:message code="${requestInstance?.status() }"/>
 						</div>
 						<br/>
 						
@@ -69,14 +69,14 @@
 									${requestInstance?.description }
 								</g:if>
 								<g:else>
-									Untitled request
+									<warehouse:message code="request.untitledRequest.message"/>
 								</g:else>
 							</span>							
 						</div> 
 					</td>										
 					<td style="text-align: right;">
 						<div class="fade" style="font-weight: bold; font-size:1.5em;">
-							New
+							<warehouse:message code="request.new.label"/>
 						</div>
 					</td>
 				</tr>

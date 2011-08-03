@@ -20,7 +20,7 @@
 				</div>
 				
 				<div id="outgoingRequests" class="list">            
-	           		<h3>Requests placed <b>with</b> you (${session.warehouse?.name })</h3>
+	           		<h3><warehouse:message code="request.requestsPlacedWithYou.message"/> (${session.warehouse?.name })</h3>
 					<g:render template="list" model="[requestInstanceList:outgoingRequests,requestType:'outgoing']"/>
 				</div>
 				
@@ -28,7 +28,7 @@
 				
 				
 				<div id="incomingRequests" class="list">            
-	            	<h3>Requests placed <b>by</b> you (${session.warehouse?.name })</h3>
+	            	<h3><warehouse:message code="request.requestsPlacedByYou.message"/> (${session.warehouse?.name })</h3>
 					<g:render template="list" model="[requestInstanceList:incomingRequests,requestType:'incoming']"/>
 				</div>
 				
