@@ -42,7 +42,7 @@
 			${itemInstance?.recipient?.name}
 		</td>
 		<td style="text-align: left;" nowrap="true">		
-			<g:link action="createShipment" event="deleteItem" params="['item.id':itemInstance?.id]" onclick="return confirm('${warehouse.message(code:'shipping.confirm.deleteItem.message')')">
+			<g:link action="createShipment" event="deleteItem" params="['item.id':itemInstance?.id]" onclick="return confirm('${warehouse.message(code:'shipping.confirm.deleteItem.message')}')">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="remove item" style="vertical-align: middle"/>
 			</g:link>	
 		</td>
