@@ -18,27 +18,27 @@
 			<h1>Shipments destined for ${session.warehouse.name}</h1>
 
 			 <g:form action="listReceiving" method="post">
-           		<h3>Type:  <g:select name="shipmentType"
+           		<h3><warehouse:message code="default.type.label"/>:  <g:select name="shipmentType"
 								from="${org.pih.warehouse.shipping.ShipmentType.list()}"
 								optionKey="id" optionValue="name" value="${shipmentType}" 
-								noSelection="['':'--All--']" />&nbsp;&nbsp;    
+								noSelection="['':warehouse.message(code:'default.all.label')]" />&nbsp;&nbsp;    
            
-           		Origin:  <g:select name="origin" 
+           		<warehouse:message code="default.destination.label"/>:  <g:select name="origin" 
            							from="${org.pih.warehouse.core.Location.list().sort()}"
            							optionKey="id" optionValue="name" value="${origin}" 
-           							noSelection="['':'--All--']" />&nbsp;&nbsp;
+           							noSelection="['':warehouse.message(code:'default.all.label')]" />&nbsp;&nbsp;
            								
-           		Status:  <g:select name="status" 
+           		<warehouse:message code="default.status.label"/>:  <g:select name="status" 
            					   from="${org.pih.warehouse.shipping.ShipmentStatusCode.list()}"
-           					   optionKey="name" optionValue="name" value="${status}" 
-           					   noSelection="['':'--All--']" />&nbsp;&nbsp;	
+           					   optionKey="name" optionValue="${{warehouse.message(code:it.name)}}" value="${status}" 
+           					   noSelection="['':warehouse.message(code:'default.all.label')]" />&nbsp;&nbsp;	
            					   
-           		from <g:jqueryDatePicker id="statusStartDate" name="statusStartDate"
+           		<warehouse:message code="default.from.label"/>: <g:jqueryDatePicker id="statusStartDate" name="statusStartDate"
 												value="${statusStartDate}" format="MM/dd/yyyy"/>
-				to <g:jqueryDatePicker id="statusEndDate" name="statusEndDate"
+				<warehouse:message code="default.to.label"/>: <g:jqueryDatePicker id="statusEndDate" name="statusEndDate"
 												value="${statusEndDate}" format="MM/dd/yyyy"/>
            							
-				<g:submitButton name="filter" value="Filter"/>
+				<g:submitButton name="filter" value="${warehouse.message(code:'default.button.filter.label')}"/>
 				</h3>  
             </g:form>
             
@@ -47,10 +47,10 @@
             <g:if test="${shipments.size()==0}">
            		<div>
            			<g:if test="${shipmentType || origin || status || statusStartDate || statusEndDate}">
-           				There are no shipments matching your conditions.
+           				<warehouse:message code="shipping.noShipmentsMatchingConditions.message"/>
            			</g:if>
            			<g:else>
-   		        		There are no shipments destined for ${session.warehouse.name}.
+   		        		<warehouse:message code="shipping.noShipmentsDestinedFor.message"/> <b>${session.warehouse.name}</b>.
             		</g:else>
            		</div>
            	</g:if>
@@ -61,11 +61,11 @@
                     <thead>
                         <tr>   
                         	
-                        	<th>${warehouse.message(code: 'shipment.shipmentType.label', default: 'Type')}</th>
-                            <th>${warehouse.message(code: 'shipment.shipment.label', default: 'Shipment')}</th>							
-                            <th>${warehouse.message(code: 'shipment.origin.label', default: 'Origin')}</th>
-                         	<th>${warehouse.message(code: 'shipment.expectedDeliveryDate.label', default: 'Delivery Date')}</th>
-                         	<th>${warehouse.message(code: 'shipment.status.label', default: 'Status')}</th>
+                        	<th>${warehouse.message(code: 'default.type.label')}</th>
+                            <th>${warehouse.message(code: 'shipping.shipment.label')}</th>							
+                            <th>${warehouse.message(code: 'default.origin.label')}</th>
+                         	<th>${warehouse.message(code: 'shipping.expectedDeliveryDate.label')}</th>
+                         	<th>${warehouse.message(code: 'default.status.label')}</th>
                         </tr>
                     </thead>
                    
@@ -73,8 +73,8 @@
 						<g:each var="shipmentInstance" in="${shipments}" status="i">
 							<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
 								<td width="3%" style="text-align: center">
-									<img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + shipmentInstance?.shipmentType?.name + '.png')}"
-									alt="${shipmentInstance?.shipmentType?.name}" style="vertical-align: middle; width: 24px; height: 24px;" />		
+									<img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + format.metadata(obj:shipmentInstance?.shipmentType) + '.png')}"
+									alt="${format.metadata(obj:shipmentInstance?.shipmentType)}" style="vertical-align: middle; width: 24px; height: 24px;" />		
 								</td>										
 								<td>
 									<g:link action="showDetails" id="${shipmentInstance.id}">
@@ -89,7 +89,7 @@
 									<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${shipmentInstance?.expectedDeliveryDate}"/>
 								</td>								
 								<td>												
-									${shipmentInstance?.status.name}
+									<warehouse:message code="${shipmentInstance?.status.name}"/>
 									<g:if test="${shipmentInstance?.status.date}">
 									 - <format:date obj="${shipmentInstance?.status.date}"/>
 									 </g:if>	

@@ -3,7 +3,7 @@
 		<span style="padding-left: 32px;">
 			<g:link action="createShipment" event="editItem" params="[itemToEditId:itemInstance?.id]">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="Item" style="vertical-align: middle"/>
-				&nbsp;${itemInstance?.product?.name } 	
+				&nbsp;<format:product product="${itemInstance?.product}"/> 	
 			</g:link>
 		</span>
 	</td>

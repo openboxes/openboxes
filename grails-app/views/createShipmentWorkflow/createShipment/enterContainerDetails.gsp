@@ -297,7 +297,7 @@
 														<div>
 														
 															<g:link controller="inventoryItem" action="showStockCard" params="['product.id':itemInstance?.product?.id]">
-																${itemInstance?.product?.name } 
+																<format:product product="${itemInstance?.product}"/> 
 															</g:link>
 															<%-- 
 															<span id="${itemInstance?.id }" class="draggable">

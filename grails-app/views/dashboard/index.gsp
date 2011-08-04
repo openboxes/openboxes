@@ -57,14 +57,14 @@
 						    		<thead>
 					    				<tr class="">
 					    					<td colspan="2">
-					    						Orders into ${session.warehouse.name }
+					    						<warehouse:message code="order.ordersInto.label"/> ${session.warehouse.name }
 					    					</td>
 					    				</tr>
 					    			</thead>				
 					    			<tbody>
 										<g:each var="entry" in="${incomingOrders}" status="i">	 
 											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-												<td>${entry?.key?.name?:'Pending'}</td>
+												<td>${entry?.key?.name?:warehouse.message(code:'default.pending.label')}</td>
 												<td style="text-align: center;"><g:link controller="order" action="list" params="['status':entry?.key?.name]">
 													${entry?.value?.size}</g:link></td>
 											</tr>	
@@ -99,14 +99,14 @@
 					    				<tr class="">
 					    					<td colspan="2">
 					    						
-					    						Shipping from ${session.warehouse.name }
+					    						<warehouse:message code="shipping.shippingFrom.label"/> ${session.warehouse.name }
 					    					</td>
 					    				</tr>
 					    			</thead>				    			
 					    			<tbody>
 										<g:each var="entry" in="${outgoingShipmentsByStatus}" status="i">											
 											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-												<td>${entry.key.name}</td>
+												<td><warehouse:message code="${entry.key.name}"/></td>
 												<td style="text-align: center;"><g:link controller="shipment" action="listShipping" params="['status':entry.key.name]">${entry.value.objectList.size}</g:link></td>
 											</tr>	
 											
@@ -135,14 +135,14 @@
 						    		<thead>
 					    				<tr class="">
 					    					<td colspan="2">
-					    						Receiving into ${session.warehouse.name }
+					    						<warehouse:message code="shipping.receivingInto.label"/> ${session.warehouse.name }
 					    					</td>
 					    				</tr>
 					    			</thead>				
 					    			<tbody>
 										<g:each var="entry" in="${incomingShipmentsByStatus}" status="i">	 
 											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-												<td>${entry.key.name}</td>
+												<td><warehouse:message code="${entry.key.name}"/></td>
 												<td style="text-align: center;"><g:link controller="shipment" action="listReceiving" params="['status':entry.key.name]">
 													${entry.value.objectList.size}</g:link></td>
 											</tr>	

@@ -6,7 +6,7 @@
 	<g:set var="entityName" value="${warehouse.message(code: 'shipment.label', default: 'Shipment')}" />
 	<title><warehouse:message code="default.show.label" args="[entityName]" /></title>        
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
-	<content tag="pageTitle">Show Shipment</content>
+	<content tag="pageTitle"><warehouse:message code="shipping.deleteShipment.label"/></content>
 </head>
 
 <body>    
@@ -29,7 +29,7 @@
 									<tbody>
 										<tr class="prop">
 											<td valign="top" class="name"><label><warehouse:message
-												code="shipment.name.label" default="Shipment Number" /></label>
+												code="shipping.shipmentNumber.label" /></label>
 											</td>
 											<td colspan="3" valign="top"
 												class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">
@@ -38,14 +38,14 @@
 										</tr>
 										<tr class="prop">
 											<td valign="middle" class="name"><label><warehouse:message
-												code="shipment.shipmentType.label" default="Type" /></label></td>
+												code="default.type.label" default="Type" /></label></td>
 											<td valign="middle" class="value" nowrap="nowrap">
-												${shipmentInstance?.shipmentType?.name}
+												<format:metadata obj="${shipmentInstance?.shipmentType}"/>
 											</td>
 										</tr>							
 										<tr class="prop">
 											<td valign="top" class="name"><label><warehouse:message
-												code="shipment.name.label" default="Name" /></label>
+												code="default.name.label" default="Name" /></label>
 											</td>
 											<td colspan="3" valign="top"
 												class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">
@@ -55,15 +55,15 @@
 										<tr class="prop">
 											<td class="name"></td>
 											<td class="value">
-												Are you sure you want to delete this shipment?
+												<warehouse:message code="shipping.confirm.deleteShipment.message"/>
 												<div class="buttons">
 													<button type="submit" class="positive"><img
 													src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
-													alt="Save" /> Delete</button>
+													 /> <warehouse:message code="default.button.delete.label"/></button>
 													
 													<g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}">
 														<img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}"
-														alt="Cancel" /> Cancel</g:link>
+														 /> <warehouse:message code="default.button.cancel.label"/></g:link>
 													
 												</div>
 												

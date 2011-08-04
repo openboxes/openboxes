@@ -5,7 +5,7 @@
 	<g:set var="entityName" value="${warehouse.message(code: 'shipment.label', default: 'Shipment')}" />
 	<title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
-	<content tag="pageTitle">Add New Event</content>
+	<content tag="pageTitle"><warehouse:message code="shipping.addNewEvent.label"/></content>
 </head>
 
 <body>
@@ -37,32 +37,32 @@
 							<table>
 								<tbody>
 									<tr class="prop">
-			                           <td valign="top" class="name"><label><warehouse:message code="event.eventType.label" default="Event Type" /></label></td>                            
+			                           <td valign="top" class="name"><label><warehouse:message code="shipping.eventType.label"/></label></td>                            
 			                           <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'eventType', 'errors')}">
 											<g:if test="${!eventInstance?.eventType}">												
-												<g:select id="eventType.id" name='eventType.id' noSelection="${['':'Select one ...']}" 
+												<g:select id="eventType.id" name='eventType.id' noSelection="['':warehouse.message(code:'default.selectOne.label')]" 
 													from='${org.pih.warehouse.core.EventType.list()}' optionKey="id" 
 													optionValue="name" value="${eventInstance.eventType}" >
 												</g:select>
 											</g:if>
 											<g:else>
 												<g:hiddenField name="eventType.id" value="${eventInstance?.eventType?.id}"/>
-												${eventInstance?.eventType?.name}
+												<format:metadata obj="${eventInstance?.eventType}"/>
 											</g:else>
 			                       		</td>
 									</tr> 								
 								
 									<tr class="prop">
-				                           <td valign="top" class="name"><label><warehouse:message code="event.eventDate.label" default="Event Date" /></label></td>                            
+				                           <td valign="top" class="name"><label><warehouse:message code="shipping.eventDate.label" /></label></td>                            
 				                           <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'eventDate', 'errors')}">
 				                                  <g:jqueryDatePicker name="eventDate" value="${eventInstance?.eventDate}" format="MM/dd/yyyy" />
 				                              </td>
 				                       </tr>  	          
 										 	          
 										<tr class="prop">
-				                           <td valign="top" class="name"><label><warehouse:message code="event.eventDate.label" default="Location" /></label></td>                            
+				                           <td valign="top" class="name"><label><warehouse:message code="location.label" /></label></td>                            
 				                           <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'location', 'errors')}">
-											<g:select id="eventLocation.id" name='eventLocation.id' noSelection="${['':'Select one ...']}" 
+											<g:select id="eventLocation.id" name='eventLocation.id' noSelection="['':warehouse.message(code:'default.selectOne.label')]" 
 												from='${org.pih.warehouse.core.Location.list()}' optionKey="id" optionValue="name"
 												value="${eventInstance?.eventLocation?.id}">
 												</g:select>									
@@ -76,8 +76,8 @@
 									    <td class="name"></td>
 									    <td class="value">
 											<div class="buttons" style="text-align: left;">
-												<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> Save Event</button>
-												<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id}" class="negative"> <img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="Cancel" /> Cancel </g:link>
+												<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" /> <warehouse:message code="shipping.saveEvent.label"/></button>
+												<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id}" class="negative"> <img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="Cancel" /> <warehouse:message code="default.button.cancel.label"/> </g:link>
 											</div>
 									    </td>					                        
 				                       </tr>         

@@ -2,11 +2,11 @@
 				<tr class="prop">
 					<td valign="top" class="name"><label><warehouse:message code="product.label" default="Product" /></label></td>                            
 					<td valign="top" class="value">
-						${item?.product?.name }
+						<format:product product="${item?.product}"/>
 						<g:hiddenField id="productId" name="product.id" value="${item?.product?.id }"/>
 						<%-- 
 						<g:autoSuggest id="product" name="product" jsonUrl="/warehouse/json/findProductByName" 
-							width="300" valueId="${item?.product?.id}" valueName="${item?.product?.name}"/>	
+							width="300" valueId="${item?.product?.id}" valueName="${format.product(product:item?.product}"/>	
 						<g:link controller="product" action="create" target="_blank"><span class="small"><warehouse:message code="product.add.label"/></span></g:link>											
 						--%>
 					</td>

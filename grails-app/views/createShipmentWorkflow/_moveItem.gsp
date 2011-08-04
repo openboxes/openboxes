@@ -13,7 +13,7 @@
 						<td valign="top" class="name"><label><warehouse:message code="item.label" /></label></td>                            
 						<td valign="top" class="value">
 							<g:hiddenField name="item.id" value="${itemToMove.id }"/>
-							<b>${itemToMove?.quantity }</b> x ${itemToMove?.product?.name }
+							<b>${itemToMove?.quantity }</b> x <format:product product="${itemToMove?.product}"/>
 						</td>
 					</tr>
 					<tr class="prop">

@@ -34,6 +34,18 @@ class ShipmentService {
 	boolean transactional = true
 	
 	/**
+	* Returns the shipment referenced by the passed id parameter;
+	* if id is null, returns a new Shipment object
+	*
+	* @param shipmentId
+	* @return
+	*/
+   Shipment getShipmentInstance(String shipmentId) {
+	   return getShipmentInstance(shipmentId?.toLong(), null)
+   }
+   
+	
+	/**
 	 * Returns the shipment referenced by the passed id parameter;
 	 * if id is null, returns a new Shipment object
 	 * 

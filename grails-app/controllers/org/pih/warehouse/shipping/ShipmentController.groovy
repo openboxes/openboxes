@@ -185,6 +185,8 @@ class ShipmentController {
 		}
 	}
 	
+	
+	/**
 	def showDetailsAlt = {
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
@@ -195,6 +197,7 @@ class ShipmentController {
 			[shipmentInstance: shipmentInstance]
 		}
 	}
+	**/
 	
 	def editDetails = {
 		log.info params
@@ -420,9 +423,11 @@ class ShipmentController {
 		}
 	}
 	
+	/**
 	def listShipments = { 		
 		[ shipments : shipmentService.getShipments() ]
 	}
+	**/
 	
 	def listReceiving = { 
 		def destination = Location.get(session.warehouse.id)
@@ -443,6 +448,8 @@ class ShipmentController {
 				statusStartDate:statusStartDate, statusEndDate:statusEndDate ]
 	}
 	
+	
+	/**
 	def listShippingByDate = { 
 		def currentLocation = Location.get(session.warehouse.id);
 		
@@ -462,6 +469,8 @@ class ShipmentController {
 		}
 		render(view: "listShippingByDate", model: [ shipmentInstanceMap : shipmentInstanceMap ]);		
 	}
+	**/
+	
 	
 	def listShippingByType = {
 		def currentLocation = Location.get(session.warehouse.id);

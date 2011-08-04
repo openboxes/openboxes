@@ -8,7 +8,7 @@
 		<table border="0">
 			<tbody>
 				<tr>
-					<th>Name</th>
+					<th><warehouse:message code="default.name.label"/></th>
 				</tr>
 				<tr>
 					<td  style="padding-left:20px;" colspan="1">

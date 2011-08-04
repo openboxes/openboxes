@@ -4,8 +4,8 @@
 			<tbody>			
 				<tr>
 					<td width="24px;">
-						<img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + shipmentInstance?.shipmentType?.name + '.png')}"
-							alt="${shipmentInstance?.shipmentType?.name}" style="vertical-align: middle; width: 48px; height: 48px;" />					
+						<img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + format.metadata(obj:shipmentInstance?.shipmentType) + '.png')}"
+							alt="${format.metadata(obj:shipmentInstance?.shipmentType)}" style="vertical-align: middle; width: 48px; height: 48px;" />					
 					</td>
 					<td>
 						<div>
@@ -19,9 +19,9 @@
 								<g:render template="../shipment/sidebar" />
 								&nbsp;|&nbsp;
 							</g:if>
-							${shipmentInstance?.shipmentType?.name} Shipment <b>#${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}</b> 
+							${format.metadata(obj:shipmentInstance?.shipmentType)} <warehouse:message code="shipping.shipment.label"/> <b>#${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}</b> 
 							&nbsp;|&nbsp; 
-							${shipmentInstance?.status?.name}
+							<warehouse:message code="${shipmentInstance?.status?.name}"/>
 							
 						</div>
 												

@@ -33,7 +33,7 @@
 											class="value ${hasErrors(bean: shipmentInstance, field: 'shipmentType', 'errors')}">
 											<g:if test="${shipmentInstance?.shipmentType}">
 												<g:hiddenField name="shipmentType.id" value="${shipmentInstance?.shipmentType?.id}" />
-												${shipmentInstance?.shipmentType?.name }																	
+												<format:metadata obj="${shipmentInstance?.shipmentType}"/>																	
 											</g:if>
 											<g:else>
 												<g:select

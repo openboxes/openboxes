@@ -36,7 +36,7 @@
 
 				<div style="padding-left: 50px;">					
 					<g:each var="itemInstance" in="${shipmentInstance?.allShipmentItems}">
-						${itemInstance?.product?.name}<br/>
+						<format:product product="${itemInstance?.product}"/><br/>
 					</g:each>
 				</div>
 

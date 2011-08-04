@@ -5,7 +5,7 @@
 	<g:set var="entityName" value="${warehouse.message(code: 'shipment.label', default: 'Shipment')}" />
 	<title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
-	<content tag="pageTitle">Packing List</content>
+	<content tag="pageTitle"><warehouse:message code="shipping.packingList.label"/></content>
 </head>
 
 <body>
@@ -28,11 +28,11 @@
 						<table style="padding: 0px; margin: 0px;">
 							<tbody>
 								<tr style="height: 30px;">
-									<th>Package</th>
-									<th>Dimensions</th>
-									<th>Weight</th>
-									<th>Item</th>
-									<th>Lot/Serial No</th>										
+									<th><warehouse:message code="shipping.package.label"/></th>
+									<th><warehouse:message code="shipping.dimensions.label"/></th>
+									<th><warehouse:message code="default.weight.label"/></th>
+									<th><warehouse:message code="default.item.label"/></th>
+									<th><warehouse:message code="default.lotSerialNo.label"/></th>										
 								</tr>				
 								
 								<g:set var="counter" value="${0 }"/>
@@ -46,7 +46,7 @@
 										<td width="10%">
 											
 										</td>
-										<td width="20%">${item?.product.name} (${item?.quantity})</td>
+										<td width="20%"><format:product product="${item?.product}"/> (${item?.quantity})</td>
 										<td width="10%">${item?.lotNumber}</td>
 									</tr>																			
 								</g:findAll>	
@@ -56,7 +56,7 @@
 									<g:if test="${!container.shipmentItems}">
 										<tr class="${(counter++ % 2) == 0 ? 'odd' : 'even'}">
 											<td width="10%">
-												<b>${container?.containerType?.name}-${container?.name}</b>
+												<b><format:metadata obj="${container?.containerType}"/>-${container?.name}</b>
 											</td>																
 											<td width="10%">
 												<g:if test="${container?.height && container?.width && container?.length}">	
@@ -78,7 +78,7 @@
 									<g:each var="item" in="${container.shipmentItems}" status="itemStatus">
 										<tr class="${(counter++ % 2) == 0 ? 'odd' : 'even'}">
 											<td width="10%">
-												<b>${container?.containerType?.name} ${container?.name}</b>
+												<b><format:metadata obj="${container?.containerType}"/> ${container?.name}</b>
 											</td>																
 											<td width="10%">
 												<g:if test="${container?.height && container?.width && container?.length}">	
@@ -91,7 +91,7 @@
 													${container?.weight} ${container?.weightUnits}
 												</g:if>
 											</td>
-											<td width="20%">${item?.product.name} (${item?.quantity})</td>
+											<td width="20%"><format:product product="${item?.product}"/> (${item?.quantity})</td>
 											<td width="10%">${item?.lotNumber}</td>
 										</tr>																			
 									</g:each>	
@@ -99,7 +99,7 @@
 										<g:if test="${!innerContainer.shipmentItems}">
 											<tr class="${(counter++ % 2) == 0 ? 'odd' : 'even'}">
 												<td width="10%">
-													<b>${innerContainer?.containerType?.name}-${container?.name}</b>
+													<b><format:metadata obj="${innerContainer?.containerType}"/>-${container?.name}</b>
 												</td>																
 												<td width="10%">
 													<g:if test="${innerContainer?.height && innerContainer?.width && innerContainer?.length}">	
@@ -121,7 +121,7 @@
 										<g:each var="innerItem" in="${innerContainer.shipmentItems}" status="innerItemStatus">
 											<tr class="${(counter++ % 2) == 0 ? 'odd' : 'even'}">
 												<td width="10%">
-													<b>${innerContainer?.containerType?.name} ${innerContainer?.name}</b>
+													<b><format:metadata obj="${innerContainer?.containerType}"/> ${innerContainer?.name}</b>
 												</td>																
 												<td width="10%">
 													<g:if test="${innerContainer?.height && innerContainer?.width && innerContainer?.length}">	
@@ -134,7 +134,7 @@
 														${innerContainer?.weight} ${innerContainer?.weightUnits}
 													</g:if>
 												</td>
-												<td width="20%">${innerItem?.product.name} (${innerItem?.quantity})</td>
+												<td width="20%"><format:product product="${innerItem?.product}"/> (${innerItem?.quantity})</td>
 												<td width="10%">${innerItem?.lotNumber}</td>
 											</tr>																			
 										</g:each>										

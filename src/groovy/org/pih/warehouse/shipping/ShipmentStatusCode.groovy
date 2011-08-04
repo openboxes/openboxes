@@ -2,9 +2,9 @@ package org.pih.warehouse.shipping
 
 public enum ShipmentStatusCode {
 
-	PENDING("Pending",1),
-	SHIPPED("Shipped",2),
-	RECEIVED("Received",3)
+	PENDING("shipping.pending.label",1),
+	SHIPPED("shipping.shipped.label",2),
+	RECEIVED("shipping.received.label",3)
 	
 	String name
 	int sortOrder

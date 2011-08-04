@@ -3,9 +3,9 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
 	<g:set var="entityName" value="${warehouse.message(code: 'shipment.label', default: 'Shipment')}" />
-	<title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
+	<title><warehouse:message code="shipping.addComment.label"/></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
-	<content tag="pageTitle">Add Comment</content>
+	<content tag="pageTitle"><warehouse:message code="shipping.addComment.label"/></content>
 </head>
 
 <body>
@@ -34,20 +34,20 @@
 								<table>
 									<tbody>
 										<tr class="prop">
-				                            <td valign="top" class="name"><label><warehouse:message code="comment.recipient.label" default="To" /></label></td>                            
+				                            <td valign="top" class="name"><label><warehouse:message code="default.to.label" /></label></td>                            
 				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'recipient', 'errors')}">
-												<g:select id="recipientId" name='recipientId' noSelection="${['':'Select one ...']}" 
+												<g:select id="recipientId" name='recipientId' noSelection="['':warehouse.message(code:'default.selectOne.label')]" 
 			                                    	from='${org.pih.warehouse.core.User.list()}' optionKey="id" optionValue="username"></g:select>
 			                                </td>
 				                        </tr>  	          
 										<tr class="prop">
-				                            <td valign="top" class="name"><label><warehouse:message code="comment.sender.label" default="From" /></label></td>                            
+				                            <td valign="top" class="name"><label><warehouse:message code="default.from.label" /></label></td>                            
 				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'sender', 'errors')}">
 			                                    ${session.user.username}
 			                                </td>
 				                        </tr>  	          
 										<tr class="prop">
-				                            <td valign="top" class="name"><label><warehouse:message code="comment.comment.label" default="Comment" /></label></td>                            
+				                            <td valign="top" class="name"><label><warehouse:message code="default.comment.label" /></label></td>                            
 				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'comment', 'errors')}">
 			                                    <g:textArea name="comment" cols="60" rows="10"/>
 			                                </td>
@@ -59,11 +59,11 @@
 												<div class="buttons">
 													<button type="submit" class="positive"><img
 														src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
-														alt="save" /> Add</button>
+														alt="save" /> <warehouse:message code="default.button.add.label"/></button>
 													<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id}" class="negative">
 														<img
 															src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}"
-															alt="Cancel" /> Cancel </g:link>
+															alt="Cancel" /> <warehouse:message code="default.button.cancel.label"/> </g:link>
 												</div>				
 											</td>
 										</tr>

@@ -4,10 +4,10 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
 	<g:set var="entityName" value="${warehouse.message(code: 'shipment.label', default: 'Shipment')}" />
-	<title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
+	<title><warehouse:message code="shipping.sendShipment.label" /></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<content tag="pageTitle">
-		Edit Shipment
+		<warehouse:message code="shipping.sendShipment.label" />
 	</content>
 </head>
 
@@ -40,31 +40,28 @@
 							
 									<tr class="prop">
 										
-										<td valign="top" class="name"><label>Overview</label></td>
+										<td valign="top" class="name"><label><warehouse:message code="shipping.overview.label"/></label></td>
 										<td valign="top" class="value">
-											<p>By clicking <b>Send Shipment</b> below, you are authorizing that the  
-											following inventory items will be sent from <b>${shipmentInstance?.origin?.name }</b>
-											to <b>${shipmentInstance?.destination?.name }</b>.  Upon submission, the following
-											actions will take place:
+											<p><warehouse:message code="shipping.sendShipment.message" args="[shipmentInstance?.origin?.name,shipmentInstance?.destination?.name]"/>
 											</p>
 											<table style="display: inline">
 												<tr>
 													<td>
 														<img src="${createLinkTo(dir:'images/icons/silk',file: 'lorry_go.png')}" style="vertical-align: middle"/>
 													</td>
-													<td>Shipment <b>${shipmentInstance?.name}</b> will be marked as <b>Shipped</b></td>
+													<td><warehouse:message code="shipping.shipmentWillBeMarkedAsShipped.message" args="[shipmentInstance?.name]"/></td>
 												<tr>
 													<td>
 														<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
 													</td>
-													<td>Notification emails will be sent out</td>
+													<td><warehouse:message code="shipping.notificationEmailsWillBeSentOut.message"/></td>
 												</tr>
 												<g:if test="${shipmentInstance?.origin.isWarehouse()}">
 													<tr>
 														<td>
 															<img src="${createLinkTo(dir:'images/icons/silk',file: 'delete.png')}" style="vertical-align: middle"/>
 														</td>
-														<td><b>${shipmentInstance?.shipmentItems?.size() } items</b> in the shipment will be debited from ${shipmentInstance?.origin?.name }</td>
+														<td><warehouse:message code="shipping.itemsInShipmentWillBeDebited.message" args="[shipmentInstance?.shipmentItems?.size(),shipmentInstance?.origin?.name]"/></td>
 													</tr>
 												</g:if>
 											</table>
@@ -73,16 +70,16 @@
 							
 									<g:if test="${shipmentInstance?.origin.isWarehouse()}">
 										<tr class="prop">
-											<td valign="top" class="name"><label>Items</label></td>
+											<td valign="top" class="name"><label><warehouse:message code="default.items.label"/></label></td>
 											<td valign="top" class="value">
-												The following items will be debited from <b>${shipmentInstance?.origin?.name }</b>.
+												<warehouse:message code="shipping.willBeDebited.message" args="[shipmentInstance?.origin?.name]"/>
 												<br/>
 												<g:if test="${shipmentInstance.shipmentItems}">
 													<table style="display: inline">
 														<tr>
 															<th></th>
-															<th>Item</th>
-															<th>Quantity</th>
+															<th><warehouse:message code="default.item.label"/></th>
+															<th><warehouse:message code="default.quantity.label"/></th>
 														</tr>
 														<g:each var="item" in="${shipmentInstance?.shipmentItems }" status="status">
 															<tr class="${status % 2 ? 'even' : 'odd' }">
@@ -90,7 +87,7 @@
 																	<img src="${createLinkTo(dir:'images/icons/silk',file: 'delete.png')}" style="vertical-align: middle"/>
 																</td>
 																<td>
-																	${item?.product?.name } ${item?.lotNumber }
+																	<format:product product="${item?.product}"/> ${item?.lotNumber }
 																</td>
 																<td>
 																	${item?.quantity }
@@ -100,22 +97,21 @@
 													</table>	
 												</g:if>
 												<g:else>
-													There are no shipment items to be shipped.
+													<warehouse:message code="shipping.noItemsToShip.message"/>
 												</g:else>
 											</td>
 										</tr>
 									</g:if>
 							
 									<tr class="prop">
-										<td valign="top" class="name"><label>Notifications</label></td>
+										<td valign="top" class="name"><label><warehouse:message code="shipping.notifications.label"/></label></td>
 										<td valign="top" class="value">
-											<p>The following people will receive an email notification that this shipment has shipped. If you do not
-											want a particular person to receive a notification, uncheck the checkbox next to his/her name.</p>								
+											<p><warehouse:message code="shipping.notifications.message"/></p>								
 											<table style="display: inline">	
 												<tr>
 													<th></th>
-													<th>Role</th>
-													<th>Recipient</th>
+													<th><warehouse:message code="default.role.label"/></th>
+													<th><warehouse:message code="shipping.recipient.label"/></th>
 												</tr>
 												
 												<g:if test="${!shipmentWorkflow?.isExcluded('carrier') && shipmentInstance?.carrier}">
@@ -124,7 +120,7 @@
 															<input type="checkbox" checked="true" name="emailRecipientId" value="${shipmentInstance?.carrier?.id}"/>
 															<!--  <img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>  -->
 														</td>
-														<td>Traveler</td>
+														<td><warehouse:message code="shippping.traveler.label"/></td>
 														<td>${shipmentInstance?.carrier?.name }  &nbsp;<br/> <span class="fade">${shipmentInstance?.carrier?.email}</span></td>
 													</tr>
 												</g:if>
@@ -135,7 +131,7 @@
 															<input type="checkbox" checked="true" name="emailRecipientId" value="${shipmentInstance?.recipient?.id}"/>
 															<!--  <img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>  -->
 																</td>
-														<td>Recipient</td>
+														<td><warehouse:message code="shippping.recipient.label"/></td>
 														<td>${shipmentInstance?.recipient?.name }  &nbsp;<br/> <span class="fade">${shipmentInstance?.recipient?.email}</span></td>
 													</tr>
 												</g:if>
@@ -147,7 +143,7 @@
 																<input type="checkbox" checked="true" name="emailRecipientId" value="${recipient?.id}"/>
 																<!--  <img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>  -->
 																</td>
-															<td>Recipient</td>
+															<td><warehouse:message code="shippping.recipient.label"/></td>
 															<td>							
 																${recipient?.name } &nbsp;<br/><span class="fade">${recipient?.email}</span>				
 															</td>
@@ -160,7 +156,7 @@
 						
 									<tr class="prop">
 										<td valign="top" class="name"><label><warehouse:message
-											code="shipment.actualShippingDate.label" default="Shipping date" /></label></td>
+											code="shipping.shippingDate.label" /></label></td>
 										<td valign="top"
 											class=" ${hasErrors(bean: shipmentInstance, field: 'actualShippingDate', 'errors')}"
 											nowrap="nowrap">
@@ -169,7 +165,7 @@
 										</td>
 									</tr>											
 									<tr class="prop">
-			                            <td valign="top" class="name"><label><warehouse:message code="note.label" default="Note" /></label></td>                            
+			                            <td valign="top" class="name"><label><warehouse:message code="shipping.note.label"/></label></td>                            
 			                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'comment', 'errors')}">
 		                                    <g:textArea name="comment" cols="60" rows="5"/>
 		                                </td>
@@ -181,11 +177,11 @@
 												<div class="buttons">
 													<button type="submit" class="positive"><img
 														src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
-														alt="save" /> Send Shipment</button>
+														alt="save" /> <warehouse:message code="shipping.sendShipment.label"/></button>
 													<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id}" class="negative">
 														<img
 															src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}"
-															alt="Cancel" /> Cancel </g:link>
+															alt="Cancel" /> <warehouse:message code="default.button.cancel.label"/> </g:link>
 												</div>				
 											</td>
 										</tr>

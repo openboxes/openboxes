@@ -4,9 +4,9 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
 	<g:set var="entityName" value="${warehouse.message(code: 'shipment.label', default: 'Shipment')}" />
-	<title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
+	<title><warehouse:message code="shipping.receiveShipment.label"/></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
-	<content tag="pageTitle">Receive Shipment</content>
+	<content tag="pageTitle"><warehouse:message code="shipping.receiveShipment.label"/></content>
 </head>
 
 <body>
@@ -36,7 +36,7 @@
 									<tbody>
 										<tr class="prop">
 											<td class="name"  style="width: 10%;">
-												<label><warehouse:message code="receipt.recipient.label" default="Recipient" /></label>
+												<label><warehouse:message code="shipping.recipient.label" /></label>
 											</td>
 											<td class="value" style="width: 30%;">
 												<g:autoSuggest id="recipient" name="recipient" jsonUrl="/warehouse/json/findPersonByName"
@@ -47,7 +47,7 @@
 										</tr>																						
 										<tr class="prop">
 											<td valign="top" class="name"><label><warehouse:message
-												code="receipt.actualDeliveryDate.label" default="Delivered On" /></label></td>
+												code="shipping.deliveredOn.label"/></label></td>
 											<td valign="top"
 												class=" ${hasErrors(bean: receiptInstance, field: 'actualDeliveryDate', 'errors')}"
 												nowrap="nowrap">
@@ -59,28 +59,28 @@
 										<g:if test="${shipmentInstance?.destination.isWarehouse()}">					
 											<tr class="prop">
 												<td valign="top" class="name"><label><warehouse:message
-													code="receipt.receiptItems.label" default="Receipt Items" /></label></td>
+													code="shipping.receiptItems.label" /></label></td>
 												<td valign="top"
 													class=" ${hasErrors(bean: receiptInstance, field: 'receiptItem', 'errors')}"
 													nowrap="nowrap">
 													
 														<g:if test="${!receiptInstance.receiptItems}">
-															There are no shipment items to receive.
+															<warehouse:message code="shipping.noItemsToReceive.label" />
 														</g:if>			
 														<g:else>										
 															<table>
 																<thead>
 																	<tr>
 																		<th colspan="2"></th>
-																		<th colspan="2" style="text-align: center;">Quantity</th>
+																		<th colspan="2" style="text-align: center;"><warehouse:message code="default.quantity.label" /></th>
 																		<th colspan="2"></th>
 																	</tr>
 																	<tr>
-																		<th style="text-align: left;">Item</th>
-																		<th style="text-align: center;">Lot / Serial No</th>
-																		<th style="text-align: center;">Shipped</th>
-																		<th style="text-align: center;">Received</th>
-																		<th style="text-align: center;">Comment</th>
+																		<th style="text-align: left;"><warehouse:message code="default.item.label" /></th>
+																		<th style="text-align: center;"><warehouse:message code="default.lotSerialNo.label" /></th>
+																		<th style="text-align: center;"><warehouse:message code="shipping.shipped.label" /></th>
+																		<th style="text-align: center;"><warehouse:message code="shipping.received.label" /></th>
+																		<th style="text-align: center;"><warehouse:message code="default.comment.label" /></th>
 																	</tr>
 																</thead>
 																<tbody>
@@ -88,7 +88,7 @@
 																		<tr class="prop ${(i % 2) == 0 ? 'odd' : 'even'}">
 																			<td style="text-align: left; vertical-align: middle;">
 																				<g:hiddenField name="receiptItems[${i}].product.id" value="${receiptItem?.product?.id}"/>
-																				${receiptItem?.product?.name}
+																			<format:product product="${receiptItem?.product}"/>
 																			</td>
 																			<td style="text-align: center; vertical-align: middle;">
 																				<g:hiddenField name="receiptItems[${i}].lotNumber" value="${receiptItem?.lotNumber}"/>
@@ -116,7 +116,7 @@
 										
 														
 										<tr class="prop">
-				                            <td valign="top" class="name"><label><warehouse:message code="comment.comment.label" default="Comment" /></label></td>                            
+				                            <td valign="top" class="name"><label><warehouse:message code="default.comment.label" /></label></td>                            
 				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'comment', 'errors')}">
 			                                    <g:textArea name="comment" cols="60" rows="3"/>
 			                                </td>
@@ -129,11 +129,11 @@
 												<div class="buttons">
 													<button type="submit" class="positive"><img
 														src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
-														alt="save" /> Receive Shipment</button>
+														alt="save" /> <warehouse:message code="shipping.receiveShipment.label" /></button>
 													<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id}" class="negative">
 														<img
 															src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}"
-															alt="Cancel" /> Cancel </g:link>
+															alt="Cancel" /> <warehouse:message code="default.button.cancel.label" /> </g:link>
 												</div>				
 											</td>
 										</tr>
