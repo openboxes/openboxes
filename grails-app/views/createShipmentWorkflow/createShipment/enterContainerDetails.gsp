@@ -3,7 +3,7 @@
     <head>
          <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
          <meta name="layout" content="custom" />
-         <title>Add Shipment Items</title>  
+         <title><warehouse:message code="shipping.addShipmentItems.label"/></title>  
          
          <style>
 	         .ui-autocomplete { height: 250px; overflow-y: scroll; overflow-x: hidden;}
@@ -80,7 +80,7 @@
 									<thead>
 										<tr class="odd"><%-- --%>
 											<td colspan="2">
-												<h3>All shipment containers</h3>
+												<h3><warehouse:message code="shipping.allShipmentContainers.label"/></h3>
 											</td>
 										</tr>
 										<tr>
@@ -104,14 +104,14 @@
 															--%>
 														</div>
 													</span>				
-								 					<span class="fade">&nbsp;|&nbsp; Total weight:</span> 
-													<g:formatNumber format="#,##0.00" number="${shipmentInstance?.totalWeightInPounds() ? shipmentInstance?.totalWeightInPounds() : 0.00 }" /> lbs
+								 					<span class="fade">&nbsp;|&nbsp; <warehouse:message code="shipping.totalWeight.label"/>:</span> 
+													<g:formatNumber format="#,##0.00" number="${shipmentInstance?.totalWeightInPounds() ? shipmentInstance?.totalWeightInPounds() : 0.00 }" /> <warehouse:message code="default.lbs.label"/>
 										 		</div>
 										 	</td>
 										</tr>
 										<tr class="${count++%2==0?'odd':'even' }">
-											<th>Items</th>
-											<th>Container</th>
+											<th><warehouse:message code="default.items.label"/></th>
+											<th><warehouse:message code="container.label"/></th>
 										</tr>
 									</thead>
 									<tbody>
@@ -123,7 +123,7 @@
 											</td>
 											<td class="droppable">
 												<span class="${styleClass}">
-													<g:link action="createShipment" event="enterContainerDetails" style="display: block;">Unpacked items</g:link>
+													<g:link action="createShipment" event="enterContainerDetails" style="display: block;"><warehouse:message code="shipping.unpackedItems.label"/></g:link>
 												</span>
 											</td>
 										</tr>										
@@ -202,7 +202,7 @@
 									 					${selectedContainer?.name }				 					
 													</g:if>			 			
 													<g:else>
-														<warehouse:message code="shipmentItem.unpackedItems" default="Unpacked Items" />			 						
+														<warehouse:message code="shipping.unpackedItems.label" />			 						
 													</g:else>
 												</h3>
 											</td>
@@ -220,7 +220,7 @@
 														</div>
 													</span>				
 													<span class="fade">
-										 				&nbsp;|&nbsp; Weight: 
+										 				&nbsp;|&nbsp; <warehouse:message code="default.weight.label"/>: 
 										 			</span>
 									 				<g:if test="${selectedContainer?.weight }">
 										 				<g:formatNumber format="#,##0.00" number="${selectedContainer?.weight }"/>
@@ -228,11 +228,11 @@
 									 				</g:if>
 									 				<g:else>
 										 				<g:formatNumber format="#,##0.00" number="${selectedContainer?.totalWeightInPounds() ? selectedContainer?.totalWeightInPounds() : 0.00 }" /> 
-										 				 lbs
+										 				 <warehouse:message code="default.lbs.label"/>
 									 				</g:else>
 									 				
 													<span class="fade">
-										 				&nbsp;|&nbsp; Dimensions:
+										 				&nbsp;|&nbsp; <warehouse:message code="shipping.dimensions.label"/>:
 										 			</span>
 								 					<g:if test="${selectedContainer?.width ||  selectedContainer?.length || selectedContainer?.height}">
 														
@@ -243,17 +243,17 @@
 														${selectedContainer.length == null ? '?' : selectedContainer.length} ${selectedContainer?.volumeUnits}
 													</g:if>
 													<g:else>
-														None
+														<warehouse:message code="default.none.label"/>
 													</g:else>
 													
 													<span class="fade">
-														&nbsp;|&nbsp; Recipient:
+														&nbsp;|&nbsp; <warehouse:message code="shipping.recipient.label"/>:
 													</span>
 								 					<g:if test="${selectedContainer?.recipient }">
 														${selectedContainer?.recipient?.name }	
 													</g:if>
 													<g:else>
-														None
+														<warehouse:message code="default.none.label"/>
 													</g:else>
 												</div>
 											</td>
@@ -265,11 +265,11 @@
 								<table>
 									<thead>
 										<tr class="${count++%2==0?'odd':'even' }">
-											<th>Actions</th>
-											<th class="center">Qty</th>
-											<th>Item</th>
-											<th nowrap="nowrap">Lot/Serial No</th>
-											<th>Recipient</th>
+											<th><warehouse:message code="default.actions.label"/></th>
+											<th class="center"><warehouse:message code="default.qty.label"/></th>
+											<th><warehouse:message code="default.item.label"/></th>
+											<th nowrap="nowrap"><warehouse:message code="default.lotSerialNo.label"/></th>
+											<th><warehouse:message code="shipping.recipients.label"/></th>
 										</tr>
 									</thead>									
 									<tbody>
@@ -344,10 +344,10 @@
 						<table>
 							<tr>
 								<td width="100%" style="text-align: right;">
-									<button type="submit" name="_eventId_back">&lsaquo; Back</button>	
-									<button type="submit" name="_eventId_next">Next &rsaquo;</button> 
-									<button type="submit" name="_eventId_save">Save & Exit</button>
-									<button type="submit" name="_eventId_cancel">Cancel</button>						
+									<button name="_eventId_back">&lsaquo; <warehouse:message code="default.button.back.label"/></button>	
+									<button name="_eventId_next"><warehouse:message code="default.button.next.label"/> &rsaquo;</button> 
+									<button name="_eventId_save"><warehouse:message code="default.button.saveAndExit.label"/></button>
+									<button name="_eventId_cancel"><warehouse:message code="default.button.cancel.label"/></button>					
 								</td>
 							</tr>
 						</table>

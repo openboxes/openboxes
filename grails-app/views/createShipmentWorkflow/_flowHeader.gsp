@@ -3,12 +3,12 @@
 		<table width="100%" style="color: #ccc; display: inline">
 			<tr>
 				<td style="border-right: 1px solid lightgrey; text-align: left;">
-					<span class="fade">Progress</span>
+					<span class="fade"><warehouse:message code="shipping.progress.label"/></span>
 				</td>
 			
 				<td style="text-align:left;border-right: 1px solid lightgrey;" nowrap class="${currentState=='Details'?'currentState':''}">
 					<div class="circle ${currentState=='Details'?'currentState':''}">1</div> 
-					<g:link action="createShipment" event="enterShipmentDetails">Details</g:link>
+					<g:link action="createShipment" event="enterShipmentDetails"><warehouse:message code="shipping.details.label"/></g:link>
 				</td>
 <%-- 				
 				<td style="vertical-align: middle">
@@ -18,9 +18,9 @@
 				<td style="text-align:left; border-right: 1px solid lightgrey;" nowrap class="${currentState=='Tracking'?'currentState':''}">
 					<div class="circle ${currentState=='Tracking'?'currentState':''}">2</div> 
 					<g:if test="${shipmentInstance.id}">
-						<g:link action="createShipment" event="enterTrackingDetails">Tracking</g:link>
+						<g:link action="createShipment" event="enterTrackingDetails"><warehouse:message code="shipping.tracking.label"/></g:link>
 					</g:if>
-					<g:else>Tracking</g:else>
+					<g:else><warehouse:message code="shipping.tracking.label"/></g:else>
 				</td>
 <%--				
 				<td style="vertical-align: middle">
@@ -30,9 +30,9 @@
 				<td style="text-align:left; border-right: 1px solid lightgrey;" nowrap class="${currentState=='Pack'?'currentState':''}">
 					<div class="circle ${currentState=='Pack'?'currentState':''}">3</div> 
 					<g:if test="${shipmentInstance.id}">
-						<g:link action="createShipment" event="enterContainerDetails">Packing</g:link>
+						<g:link action="createShipment" event="enterContainerDetails"><warehouse:message code="shipping.packing.label"/></g:link>
 					</g:if>
-					<g:else>Packing</g:else>
+					<g:else><warehouse:message code="shipping.packing.label"/></g:else>
 				</td>
 				
 				

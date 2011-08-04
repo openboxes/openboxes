@@ -7,7 +7,7 @@
 </script>
 
 		<div id="itemSearchForm" >
-			<h2><warehouse:message code="inventoryItem.search.label" default="Search inventory by name, description, or lot/serial number:" /></h2>
+			<h2><warehouse:message code="shipping.itemSearch.label"/>:</h2>
 			<div style="text-align: left;">
 				<table>
 					<tbody>
@@ -19,12 +19,12 @@
 							</td>
 							<%-- 
 							<td style="text-align: center">
-								<b>-OR-</b>
+								<b><warehouse:message code="shipping.or.label"/></b>
 							</td>
 							<td style="text-align: center">						
 								<button class="show-item-form">
 									<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" style="vertical-align: middle"/>
-									&nbsp; Add an item not currently in inventory
+									&nbsp; <warehouse:message code="shipping.addItemNotInInventory.label"/>
 								</button>
 							</td>
 							--%>
@@ -37,21 +37,21 @@
 		<div id="itemFoundForm" style="display: none">
 			<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.ShipmentItem" form="editItemFound"/>
 			<g:form name="editItemFound" action="createShipment">
-				<h2><warehouse:message code="inventoryItem.enterQuantity.label" default="Enter quantity and recipient" /></h2>  
+				<h2><warehouse:message code="shipping.enterQuantityAndRecipient.label"/></h2>  
 				<table>
 					<tbody>
 						<g:render template="itemFoundFields" model="['containerId':containerId]"/>		
 					</tbody>
 				</table>
 			</g:form>
-			<button class="show-search-form">&lsaquo; Return to search</button>
+			<button class="show-search-form">&lsaquo; <warehouse:message code="shipping.returnToSearch.label"/></button>
 		
 		</div>							
 		
 		<div id="itemEntryForm" style="display: none">
 			<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.ShipmentItem" form="editItemEntry"/>
 			<g:form name="editItemEntry" action="createShipment">
-				<h2><warehouse:message code="inventoryItem.enterItem.label" default="Enter item details" /></h2>  
+				<h2><warehouse:message code="shipping.enterItemDetails.label"/></h2>  
 				<g:if test="${item?.id}">
 					<g:hiddenField name="item.id" value="${item.id }"/>
 				</g:if>
@@ -64,7 +64,7 @@
 					</tbody>
 				</table>
 			</g:form>
-			<button class="show-search-form">&lsaquo; Return to search</button>
+			<button class="show-search-form">&lsaquo; <warehouse:message code="shipping.returnToSearch.label"/></button>
 		</div>
 		
 	</td>

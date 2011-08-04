@@ -10,26 +10,26 @@
 			<table>
 				<tbody>
 					<tr class="prop">
-						<td valign="top" class="name"><label><warehouse:message code="shipmentItem.item.label" default="Item" /></label></td>                            
+						<td valign="top" class="name"><label><warehouse:message code="item.label" /></label></td>                            
 						<td valign="top" class="value">
 							<g:hiddenField name="item.id" value="${itemToMove.id }"/>
 							<b>${itemToMove?.quantity }</b> x ${itemToMove?.product?.name }
 						</td>
 					</tr>
 					<tr class="prop">
-						<td valign="top" class="name"><label><warehouse:message code="shipmentItem.container.label" default="From" /></label></td>                            
+						<td valign="top" class="name"><label><warehouse:message code="default.from.label" /></label></td>                            
 						<td valign="top" class="value">
 							<div>
 								<g:set var="count" value="${1 }"/>
 								<table>
 									<tr class="${count++ % 2 ? 'odd':'even' }">
-										<th>Container</th>
-										<th>Quantity</th>
+										<th><warehouse:message code="container.label" /></th>
+										<th><warehouse:message code="default.quantity.label" /></th>
 									</tr>
 									<tr>
 										<td>
 											<g:if test="${!itemToMove.container}">
-												<warehouse:message code="shipmentItem.unpackedItems" default="Unpacked Items" />
+												<warehouse:message code="shipping.unpackedItems.label/>
 											</g:if>
 											<g:if test="${itemToMove?.container?.parentContainer }">
 												${itemToMove?.container?.parentContainer?.name } &rsaquo;
@@ -45,20 +45,20 @@
 						</td>
 					</tr>
 					<tr class="prop">
-						<td valign="top" class="name"><label><warehouse:message code="shipmentItem.container.label" default="To" /></label></td>                            
+						<td valign="top" class="name"><label><warehouse:message code="default.to.label"/></label></td>                            
 						<td valign="top" class="value">
 							<div style="height: 350px; overflow: auto;">
 								<g:set var="count" value="${1 }"/>
 								<table>
 									<tr class="${count++ % 2 ? 'odd':'even' }">
-										<th>Container</th>
-										<th>Quantity</th>
+										<th><warehouse:message code="container.label" /></th>
+										<th><warehouse:message code="default.quantity.label" /></th>
 									</tr>
 								
 									
 									<tr class="${count++ % 2 ? 'odd':'even' }">
 										<td>
-											<warehouse:message code="shipmentItem.unpackedItems" default="Unpacked Items" />
+											<warehouse:message code="shipping.unpackedItems.label" default="Unpacked Items" />
 										</td>
 										<td>
 											<g:if test="${itemToMove.container}">
@@ -71,7 +71,7 @@
 									</tr>
 									
 									
-									<g:each var="containerTo" in="${shipmentInstance?.containers.sort{it.sortOrder}}">
+									<g:each var="containerTo" in="${shipmentInstance?.containers?.sort{it.sortOrder}}">
 										<tr class="${count++ % 2 ? 'odd':'even' }">
 											<td>
 												<g:set var="selected" test="${itemToMove?.container?.id == containerTo?.id}"/>
@@ -97,8 +97,8 @@
 						<td></td>
 						<td style="text-align: left;">
 							<div class="buttons">
-								<g:submitButton name="moveItemToContainer" value="Move"></g:submitButton>
-								<button name="cancelDialog" type="reset" onclick="$('#dlgMoveItem').dialog('close');">Cancel</button>
+								<g:submitButton name="moveItemToContainer" value="${warehouse.message(code:'default.button.move.label')}"></g:submitButton>
+								<button name="cancelDialog" type="reset" onclick="$('#dlgMoveItem').dialog('close');"><warehouse:message code="default.button.cancel.label"/></button>
 							</div>
 						</td>
 					</tr>

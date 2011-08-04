@@ -3,7 +3,7 @@
 		$("#dlgEditContainer").dialog({ autoOpen: true, modal: true, width: '600px' });						
 	});
 </script>	   
-	<div id="dlgEditContainer" title="${container ? 'Edit ' + container?.containerType?.name : 'Add ' + containerTypeToAdd?.name}" style="padding: 10px; display: none;" >
+	<div id="dlgEditContainer" title="${container ? 'Edit ' + format.metadata(obj:container?.containerType).toLowerCase() : 'Add ' + format.metadata(obj:containerTypeToAdd).toLowerCase()}" style="padding: 10px; display: none;" >
 	
 
 	<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.Container" form="editContainer"/>
@@ -23,17 +23,17 @@
 					<td></td>
 					<td style="text-align: left;">
 						<div class="buttons">
-							<g:submitButton name="saveContainer" value="Save ${container ? container?.containerType?.name : containerTypeToAdd?.name}"></g:submitButton>
+							<g:submitButton name="saveContainer" value="${warehouse.message(code:'shipping.save.label')} ${container ? format.metadata(obj:container?.containerType).toLowerCase() : format.metadata(obj:containerTypeToAdd).toLowerCase()}"></g:submitButton>
 							<g:if test="${container}">
-								<g:submitButton name="deleteContainer" value="Remove ${container ? container?.containerType?.name : containerTypeToAdd?.name}"  onclick="return confirm('Are you sure you want to delete this ${container ? container?.containerType?.name : containerTypeToAdd?.name}?')"></g:submitButton>
+								<g:submitButton name="deleteContainer" value="${warehouse.message(code:'shipping.remove.label')} ${container ? format.metadata(obj:container?.containerType).toLowerCase() : format.metadata(obj:containerTypeToAdd).toLowerCase()}"  onclick="return confirm('${warehouse.message(code:'shipping.confirm.deleteThis.message')} ${container ? format.metadata(obj:container?.containerType).toLowerCase() : format.metadata(obj:containerTypeToAdd).toLowerCase()}?')"></g:submitButton>
 							</g:if>
-							<button name="cancelDialog" type="reset" onclick="$('#dlgEditContainer').dialog('close');">Cancel</button>
+							<button name="cancelDialog" type="reset" onclick="$('#dlgEditContainer').dialog('close');"><warehouse:message code="default.button.cancel.label"/></button>
 						</div>
 						<div class="buttons">
-							<g:submitButton name="addBoxToContainer" value="Add a Box to this ${container ? container?.containerType?.name : containerTypeToAdd?.name}"></g:submitButton>
+							<g:submitButton name="addBoxToContainer" value="${warehouse.message(code:'shipping.addBoxToThis.label')} ${container ? format.metadata(obj:container?.containerType).toLowerCase() : format.metadata(obj:containerTypeToAdd).toLowerCase()}"></g:submitButton>
 						</div>
 						<div class="buttons">
-							<g:submitButton name="addItemToContainer" value="Add an Item to this ${container ? container?.containerType?.name : containerTypeToAdd?.name}"></g:submitButton>
+							<g:submitButton name="addItemToContainer" value="${warehouse.message(code:'shipping.addItemToThis.label')} ${container ? format.metadata(obj:container?.containerType).toLowerCase() : format.metadata(obj:containerTypeToAdd).toLowerCase()}"></g:submitButton>
 						</div>
 						
 						<!--  

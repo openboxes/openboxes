@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * Represents a means of packaging all or part of a Shipment
- * Examples of this would be Pallet, Box, Piece, Suitcase, etc
+ * Represents a type of reference number that 
+ * may be associated with a shipment
  */
 class ReferenceNumberType implements Serializable {
 	

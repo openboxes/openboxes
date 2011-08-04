@@ -204,7 +204,7 @@ class CreateShipmentWorkflowController {
 			
 			on("addContainer") {
 				// set the container type to add
-				flash.containerTypeToAdd = ContainerType.findByName(params.containerTypeToAddName)
+				flash.containerTypeToAdd = ContainerType.findById(params.containerTypeToAddId)
 			}.to("enterContainerDetails")
 			
 			on("addBoxToContainer"){

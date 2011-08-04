@@ -1,18 +1,18 @@
 
 				<tr class="prop">
-					<td valign="top" class="name"><label><warehouse:message code="shipmentItem.product.label" default="Product" /></label></td>                            
+					<td valign="top" class="name"><label><warehouse:message code="product.label" default="Product" /></label></td>                            
 					<td valign="top" class="value">
 						${item?.product?.name }
 						<g:hiddenField id="productId" name="product.id" value="${item?.product?.id }"/>
 						<%-- 
 						<g:autoSuggest id="product" name="product" jsonUrl="/warehouse/json/findProductByName" 
 							width="300" valueId="${item?.product?.id}" valueName="${item?.product?.name}"/>	
-						<g:link controller="product" action="create" target="_blank"><span class="small">Add a New Product</span></g:link>											
+						<g:link controller="product" action="create" target="_blank"><span class="small"><warehouse:message code="product.add.label"/></span></g:link>											
 						--%>
 					</td>
 				</tr>
 				<tr class="prop">
-					<td valign="top" class="name"><label><warehouse:message code="shipmentItem.lotNumber.label" default="Lot / Serial Number" /></label></td>                            
+					<td valign="top" class="name"><label><warehouse:message code="default.lotSerialNo.label" /></label></td>                            
 					<td valign="top" class="value">
 						<%-- <g:textField id="lotNumber" name="lotNumber" width="200" value="${item?.lotNumber}"/>--%>
 						<g:autoSuggestString id="lotNumber" name="lotNumber" jsonUrl="/warehouse/json/findLotsByName?productId=${item?.product?.id }" 
@@ -21,7 +21,7 @@
 					</td>
 				</tr>
 				<tr class="prop">
-					<td valign="top" class="name"><label><warehouse:message code="shipmentItem.availableQuantity.label" default="Available Quantity" /></label></td>                            
+					<td valign="top" class="name"><label><warehouse:message code="shipping.availableQuantity.label" /></label></td>                            
 					<td valign="top" class="value">
 						<span id="quantity-on-hand"></span>
 						<img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}" style="vertical-align: middle;" class="refresh"/>
@@ -30,13 +30,13 @@
 				
 				
 				<tr class="prop">
-					<td valign="top" class="name"><label><warehouse:message code="shipmentItem.quantity.label" default="Quantity" /></label></td>                            
+					<td valign="top" class="name"><label><warehouse:message code="default.quantity.label" /></label></td>                            
 					<td valign="top" class="value">
 						<g:textField id="quantity" name="quantity" value="${item?.quantity}" size="5" /> 
 					</td>
 				</tr>  	        
 				<tr class="prop">
-					<td valign="top" class="name"><label><warehouse:message code="shipmentItem.recipient.label" default="Recipient" /></label></td>                            
+					<td valign="top" class="name"><label><warehouse:message code="shipping.recipient.label"/></label></td>                            
 					<td valign="top" class="value">
 						<g:autoSuggest id="recipient" name="recipient" jsonUrl="/warehouse/json/findPersonByName" 
 							width="200" valueId="${item?.recipient?.id}" valueName="${item?.recipient?.name}"/>							
@@ -47,17 +47,17 @@
 					<td style="text-align: left;">
 						<div class="buttons">
 							<g:if test="${itemToEdit}">
-								<g:submitButton name="updateItem" value="Update Item"></g:submitButton>
-								<g:submitButton name="deleteItem" value="Remove Item" onclick="return confirm('Are you sure you want to delete this item?')"></g:submitButton>
+								<g:submitButton name="updateItem" value="${warehouse.message(code:'shipping.updateItem.label')}"></g:submitButton>
+								<g:submitButton name="deleteItem" value="${warehouse.message(code:'shipping.removeItem.label')}" onclick="return confirm('${warehouse.message(code:'shipping.confirm.deleteItem.message')}')"></g:submitButton>
 							</g:if>
 							<g:else>
-								<g:submitButton name="saveItem" value="Save Item"></g:submitButton>
+								<g:submitButton name="saveItem" value="${warehouse.message(code:'shipping.saveItem.label')}"></g:submitButton>
 							</g:else>
-							<button name="cancelDialog" type="reset" onclick="$('#dlgEditItem').dialog('close');">Cancel</button>
+							<button name="cancelDialog" type="reset" onclick="$('#dlgEditItem').dialog('close');"><warehouse:message code="default.button.cancel.label"/></button>
 						</div>
 						<g:if test="${addItemToContainerId}">
 							<div class="buttons">
-								<g:submitButton name="addAnotherItem" value="Save Item and Add Another Item"></g:submitButton>
+								<g:submitButton name="addAnotherItem" value="${warehouse.message(code:'shipping.saveItemAndAddAnother.label')}"></g:submitButton>
 							</div>
 						</g:if>
 					</td>

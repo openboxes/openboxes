@@ -25,15 +25,15 @@
 					<td></td>
 					<td style="text-align: left;">
 						<div class="buttons">
-							<g:submitButton name="saveBox" value="Save Box"></g:submitButton>
+							<g:submitButton name="saveBox" value="${warehouse.message(code:'shipping.button.saveBox.label')}"></g:submitButton>
 							<g:if test="${boxToEdit}">
-								<g:submitButton name="deleteBox" value="Remove Box" onclick="return confirm('Are you sure you want to delete this box?')"></g:submitButton>
+								<g:submitButton name="deleteBox" value="${warehouse.message(code:'shipping.button.removeBox.label')}" onclick="return confirm('${warehouse.message(code:'shipping.confirm.deleteBox.message')}')"></g:submitButton>
 							</g:if>
-							<button name="cancelDialog" type="reset" onclick="$('#dlgEditBox').dialog('close');">Cancel</button>
+							<button name="cancelDialog" type="reset" onclick="$('#dlgEditBox').dialog('close');"><warehouse:message code="default.button.cancel.label"/></button>
 						</div>
 
 							<div class="buttons">
-								<g:submitButton name="addItemToBox" value="Add an Item to this Box"></g:submitButton>
+								<g:submitButton name="addItemToBox" value="${warehouse.message(code:'shipping.addItemToBox.label')}"></g:submitButton>
 							</div>
 	
 						
