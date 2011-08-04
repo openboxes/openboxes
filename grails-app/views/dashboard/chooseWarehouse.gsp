@@ -32,7 +32,7 @@
 					<g:if test="${flash.message}">
 				    	<div class="message">${flash.message}</div>
 					</g:if>		
-					<h1>Choose a warehouse</h1>
+					<h1><warehouse:message code="dashboard.chooseAWarehouse.label"/></h1>
 		    		<fieldset>
 						<table>
 							<tbody>						
@@ -53,7 +53,7 @@
 													</a> 
 														
 													<g:if test="${warehouse?.id == session?.user?.warehouse?.id }">
-														You last logged in here on <b><format:datetime obj="${session?.user?.lastLoginDate}"/></b>
+														<warehouse:message code="dashboard.youLastLoggednHereOn.message" args="[format.datetime(obj:session?.user?.lastLoginDate)]"/> 
 													</g:if>
 												</g:if>
 												<g:else>
@@ -65,7 +65,7 @@
 														<img src="${createLinkTo(dir:'images',file:'icons/building.png')}" style="vertical-align: middle"/>
 													</g:else>
 													&nbsp;
-													${warehouse.name} <span class="fade">managed remotely</span>
+													<warehouse:message code="dashboard.managedRemotely.message" args="[warehouse.name]"/>/span>
 												</g:else>
 											</div>												
 										</td>											
