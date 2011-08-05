@@ -16,7 +16,7 @@
 </g:if>
 <g:else>
 	<g:set var="productCount" value="${category?.products?.size() }"/>		
-	<option value="${category?.id }" ${(category?.id == selected?.id)?'selected':'' }>
+	<option value="${category?.id ?: 'null' }" ${(category?.id == selected?.id)?'selected':'' }>
 		${ new String("&nbsp").multiply(2*(level)) } 
 		<g:if test="${!category?.parentCategory}"><format:category category="${category}"/> </g:if>
 		<g:else><format:category category="${category}"/></g:else>

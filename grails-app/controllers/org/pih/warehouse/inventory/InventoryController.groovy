@@ -366,10 +366,12 @@ class InventoryController {
 		
 		// Get the set of categories BEFORE we filter		
 		def categories = [] as Set
+		
 		categories.addAll(expiredStock.collect { it.product.category })
 		categories.addAll(expiringStock.collect { it.product.category })
 		log.info "categories: " + categories
 
+		categories = categories.findAll { it != null }
 		
 		// poor man's filter
 		def categorySelected = (params.category) ? Category.get(params.category as int) : null;

@@ -20,7 +20,7 @@
 			            <g:form action="listExpiringStock" method="get">
 			            	<table >
 			            		<tr>
-			            			<th><warehouse:message code="default.category.label"/></th>
+			            			<th><warehouse:message code="category.label"/></th>
 			            			<th><warehouse:message code="inventory.expiresWithin.label"/></th>
 			            			<th><warehouse:message code="inventory.excludeExpired.label"/></th>
 			            		</tr>
@@ -29,7 +29,7 @@
 						           		<g:select name="category"
 														from="${categories}"
 														optionKey="id" optionValue="name" value="${categorySelected?.id}" 
-														noSelection="['':'--All--']" />&nbsp;&nbsp;    
+														noSelection="['':'--All--']" />   
 									</td>
 									<td>
 						           		<g:select name="threshhold"
@@ -37,7 +37,7 @@
 															'60':'two months', '90':'three months',
 															'180': 'six months', '365':'one year']"
 														optionKey="key" optionValue="value" value="${threshholdSelected}" 
-														noSelection="['':'--All--']" />&nbsp;&nbsp;    
+														noSelection="['':'--All--']" />  
 						           	</td>
 						           	<td>	
 						           		<g:checkBox name="excludeExpired" value="${excludeExpired }" } />
@@ -45,7 +45,7 @@
 						           	</td>						           	
 									<td class="filter-list-item" style="height: 100%; vertical-align: bottom">
 										<button name="filter">
-											<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;Filter </button>
+											<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;<warehouse:message code="default.button.filter.label"/> </button>
 									</td>							           	
 								</tr>
 							</table>
@@ -55,13 +55,14 @@
 			</table>
 			<br/>
 			<fieldset>
-				<h3><warehouse:message code="inventory.expiringStockWithin6Months.label"/></h3>
+				
 				<table>
 					<tr>					
 						<td>
-							<div style="padding: 10px;">
-								<h1><img src="${resource(dir:'images/icons/silk',file:'error.png')}" style="vertical-align: middle"/> Expiring Stock</h1>
-							</div>
+							<label>
+								<img src="${resource(dir:'images/icons/silk',file:'error.png')}" style="vertical-align: middle"/> 
+								<warehouse:message code="inventory.expiringStock.label"/>
+							</label>
 							<div class="list">
 								
 								<table>
@@ -81,13 +82,13 @@
 											<tr class="${(counter++ % 2) == 0 ? 'odd' : 'even'}">            
 												<td>
 													<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
-														${inventoryItem.product.name } 
-														<span class="fade">${inventoryItem.product.category.name } </span>
+														${inventoryItem?.product?.name } 
+														<span class="fade">${inventoryItem?.product?.category?.name } </span>
 													</g:link>
 													
 												</td>
 												<td>
-													${inventoryItem.lotNumber }
+													${inventoryItem?.lotNumber }
 												</td>
 												<td>
 													<g:formatDate date="${inventoryItem?.expirationDate}" format="MMM yyyy"/>
@@ -106,9 +107,10 @@
 							</div>
 							<br/><br/>
 							<g:if test="${!excludeExpired }">
-								<div style="padding: 10px;">
-									<h1><img src="${resource(dir:'images/icons/silk',file:'exclamation.png')}" style="vertical-align: middle"/> Expired Stock </h1>
-								</div>
+								<label>
+									<img src="${resource(dir:'images/icons/silk',file:'exclamation.png')}" style="vertical-align: middle"/> 
+									<warehouse:message code="inventory.expiredStock.label"/>
+								</label>
 								<div class="list">
 								
 									<table>
@@ -128,8 +130,8 @@
 												<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
 													<td>
 														<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
-															<format:product product="${inventoryItem.product}"/>
-															<span class="fade">${inventoryItem.product.category.name } </span>
+															<format:product product="${inventoryItem?.product}"/>
+															<span class="fade">${inventoryItem?.product?.category?.name } </span>
 														</g:link>
 													</td>
 													<td>
