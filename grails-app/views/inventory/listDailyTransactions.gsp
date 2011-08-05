@@ -51,7 +51,7 @@
 								
 			<fieldset>		
 				<div style="padding: 10px;">
-					<h1>Daily transactions for ${session.warehouse.name} <span class="fade small">${formatDate(date: dateSelected, format: 'EEEEE, MMMMM dd yyyy') }</span></h1>
+					<h1><warehouse:message code="transactions.dailyTransactionsFor.label"/> ${session.warehouse.name} <span class="fade small">${formatDate(date: dateSelected, format: 'EEEEE, MMMMM dd yyyy') }</span></h1>
 				</div>
 				
 				<table>				
@@ -60,7 +60,7 @@
 							<div class="list">
 								<table>			
 									<tr>
-										<th class="odd">Dates</th>
+										<th class="odd"><warehouse:message code="default.dates.label"/></th>
 									</tr>
 										
 									<g:if test="${transactionsByDate }">		
@@ -78,7 +78,7 @@
 										</g:each>
 									</g:if>
 									<g:else>
-										No transactions 
+										<warehouse:message code="transaction.noTransactions.label"/>
 									</g:else>								
 								</table>
 							</div>

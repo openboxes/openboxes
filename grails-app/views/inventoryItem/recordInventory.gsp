@@ -30,7 +30,7 @@
 							action="showStockCard" params="['product.id':commandInstance?.product?.id]">
 							<button>
 								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_left.png' )}" style="vertical-align:middle"/>
-								&nbsp; Back to <b>Stock Card</b>&nbsp;
+								&nbsp; <warehouse:message code="inventory.backToStockCard.label"/>&nbsp;
 							</button>
 						</g:link>							
 					</li>
@@ -63,7 +63,7 @@
 						<div id="inventoryForm">		
 							<g:form action="saveRecordInventory" autocomplete="off">
 								
-									<h2>Record Current Inventory</h2>
+									<h2> <warehouse:message code="inventory.recordCurrentInventory.label"/></h2>
 									
 									<g:hiddenField name="product.id" value="${commandInstance.product?.id}"/>
 									<g:hiddenField name="inventory.id" value="${commandInstance?.inventory?.id}"/>
@@ -78,7 +78,7 @@
 											<thead>
 												<tr>
 													<td class="middle">
-														<label>Date of inventory</label>													
+														<label><warehouse:message code="inventory.dateOfInventory.label"/></label>													
 														<g:jqueryDatePicker 
 															id="transactionDate" 
 															name="transactionDate" 
@@ -89,18 +89,18 @@
 													</td>
 													<td colspan="4" class="right middle">
 														<button id="addAnother" type="button" class="positive">
-															<img src="${createLinkTo(dir:'images/icons/silk', file:'add.png') }"/>&nbsp;Add Item
+															<img src="${createLinkTo(dir:'images/icons/silk', file:'add.png') }"/>&nbsp;<warehouse:message code="inventory.addItem.label"/>
 														</button>
 													
 													
 													</td>
 												</tr>
 												<tr class="prop odd">	
-													<th>Lot/Serial No</th>
-													<th>Expires</th>
-													<th style="text-align:center;">Old Qty</th>
-													<th style="text-align:center;">New Qty</th>
-													<th>Actions</th>
+													<th><warehouse:message code="default.lotSerialNo.label"/></th>
+													<th><warehouse:message code="default.expires.label"/></th>
+													<th style="text-align:center;"><warehouse:message code="inventory.oldQty.label"/></th>
+													<th style="text-align:center;"><warehouse:message code="inventory.newQty.label"/></th>
+													<th><warehouse:message code="default.actions.label"/></th>
 												</tr>											
 											</thead>									
 											<tbody>
@@ -120,7 +120,7 @@
 																--%>
 																<g:hiddenField name="recordInventoryRows[${status}].id" value="${recordInventoryRow?.id }"/>
 																<g:hiddenField name="recordInventoryRows[${status}].lotNumber" value="${recordInventoryRow?.lotNumber }"/>
-																${recordInventoryRow?.lotNumber?:'<span class="fade">None</span>' }
+																${recordInventoryRow?.lotNumber?:'<span class="fade"><warehouse:message code="default.none.label"/></span>' }
 															</td>
 															<td width="10%">
 																<%-- 
@@ -158,7 +158,7 @@
 												<g:else>
 													<tr class="odd">
 														<td colspan="5" style="text-align: center; min-height: 400px;">
-															Add a new inventory item to proceed.
+														<warehouse:message code="inventory.addNewInventoryItem.message"/>
 														</td>
 													</tr>
 													
@@ -169,11 +169,11 @@
 												<tr class="prop">
 													<td colspan="5" style="text-align: center">
 														<button name="save" type="submit" class="positive">
-															<img src="${createLinkTo(dir:'images/icons/silk', file:'tick.png') }"/>&nbsp;Save 
+															<img src="${createLinkTo(dir:'images/icons/silk', file:'tick.png') }"/>&nbsp;<warehouse:message code="default.button.save.label"/>
 														</button>
 														&nbsp;
 														<g:link controller="inventoryItem" action="showStockCard" 
-															params="['product.id':commandInstance.product?.id]" class="negative">Cancel</g:link>
+															params="['product.id':commandInstance.product?.id]" class="negative"><warehouse:message code="default.button.cancel.label"/></g:link>
 													</td>
 												</tr>
 											</tfoot>

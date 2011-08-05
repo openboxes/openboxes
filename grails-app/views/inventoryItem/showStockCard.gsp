@@ -8,7 +8,7 @@
 			value="${warehouse.message(code: 'stockCard.label', default: 'Stock Card')}" />
 		<title>
 			<warehouse:message code="default.show.label" args="[entityName]" /> &nbsp;&rsaquo;&nbsp; 
-			<span style="color: grey">${commandInstance?.productInstance?.name }</span>
+			<format:product product="${commandInstance?.productInstance}"/>
 		</title>
 	</head>
 	<body>
@@ -54,7 +54,7 @@
 										</div>			
 									</td>
 									<td style="vertical-align: middle;">
-										<h1>${commandInstance?.productInstance?.name}</h1>
+										<h1><format:product product="${commandInstance?.productInstance}"/></h1>
 									
 									</td>
 								</tr>

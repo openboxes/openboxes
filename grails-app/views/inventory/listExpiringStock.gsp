@@ -5,7 +5,7 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'transaction.label', default: 'Transaction')}" />
         
-        <title>Expiring/expired stock ${session.warehouse.name}</title>    
+        <title>Expiring/expired stock</title>    
     </head>    
 
 	<body>

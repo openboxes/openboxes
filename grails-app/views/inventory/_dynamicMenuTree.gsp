@@ -10,7 +10,7 @@
 					${ new String("&nbsp").multiply(5*(level-1)) }			
 					<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png') }"/>
 					<g:link controller="inventory" action="browse" params="[categoryId: childCategory?.id ]">
-						<span class="${(selectedCategory?.id==childCategory?.id)?'selected':''}">${childCategory?.name }</span>
+						<span class="${(selectedCategory?.id==childCategory?.id)?'selected':''}"><format:category category="${childCategory}"/></span>
 					</g:link>
 				</li>
 				<g:if test="${(selectedCategory?.id==childCategory?.id)?'selected':''}">

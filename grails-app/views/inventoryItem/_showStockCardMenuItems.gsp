@@ -1,7 +1,7 @@
 <div class="action-menu-item">				
 	<g:link controller="inventory" action="browse" fragment="inventory">
 		<img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" style="vertical-align: middle;"/>&nbsp;
-		Browse Inventory
+		<warehouse:message code="inventory.browse.label"/>
 	</g:link>
 </div>	
 <div class="action-menu-item">
@@ -10,36 +10,36 @@
 <div class="action-menu-item">					
 	<g:link controller="inventoryItem" action="recordInventory" params="['product.id':commandInstance?.productInstance?.id,'inventory.id':commandInstance?.inventoryInstance?.id]">
 		<img src="${resource(dir: 'images/icons/silk', file: 'book.png')}"/>&nbsp;
-		Record inventory
+		<warehouse:message code="inventory.record.label"/>
 	</g:link>
 </div>
 <div class="action-menu-item">
 	<g:link controller="inventory" action="createTransaction" params="['product.id':commandInstance?.productInstance?.id]">
 		<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" style="vertical-align: middle"/>&nbsp;
-		Add new transaction
+		<warehouse:message code="transaction.addNewTransaction.label"/>
 	</g:link>
 </div>				
 <div class="action-menu-item">					
 	<g:link controller="product" action="edit" id="${commandInstance?.productInstance?.id }">
 		<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
-		Edit product details
+		<warehouse:message code="product.edit.label"/>
 	</g:link>
 </div>
 <div class="action-menu-item">					
 	<g:link controller="inventoryItem" action="editInventoryLevel" params="['product.id': commandInstance?.productInstance?.id, 'inventory.id':commandInstance?.inventoryInstance?.id]">
 		<img src="${resource(dir: 'images/icons/silk', file: 'cog_edit.png')}"/>&nbsp;
-		Edit product status
+		<warehouse:message code="product.editStatus.label"/>
 	</g:link>
 </div>
 <div class="action-menu-item">					
 	<g:link controller="inventoryItem" action="showStockCard" params="['product.id': commandInstance?.productInstance?.id]">
 		<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;
-		Show stock card
+		<warehouse:message code="inventory.showStockCard.label"/>
 	</g:link>
 </div>
 <div class="action-menu-item">					
 	<g:link controller="inventoryItem" action="showLotNumbers" params="['product.id': commandInstance?.productInstance?.id]">
 		<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;
-		Show lot numbers
+		<warehouse:message code="inventory.showLotNumbers.label"/>
 	</g:link>
 </div>

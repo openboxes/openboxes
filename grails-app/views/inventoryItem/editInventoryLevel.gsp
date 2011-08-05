@@ -2,9 +2,9 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${warehouse.message(code: 'inventoryLevel.label', default: 'Inventory Level')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'inventory.level.label', default: 'Inventory Level')}" />
         <title><warehouse:message code="default.edit.label" args="[entityName]" /> &rsaquo; <span style="color: grey">
-			${productInstance?.name }</span>        
+			<format:product product="${productInstance}"/></span>        
         </title>
     </head>
     <body>
@@ -25,31 +25,31 @@
 					<fieldset>				
 						<table>
 							<tr class="prop">
-								<td class="name"><label>Inventory</label></td>
+								<td class="name"><label><warehouse:message code="inventory.label"/></label></td>
 								<td class="value">
 									${inventoryInstance?.warehouse?.name }
 								</td>
 							</tr>
 							<tr class="prop">
-								<td class="name"><label>Product</label></td>
+								<td class="name"><label><warehouse:message code="product.label"/></label></td>
 								<td class="value">
-									${productInstance?.name }
+									<format:product product="${productInstance}" />
 								</td>
 							</tr>
 							<tr class="prop">
-								<td class="name"><label>Supported</label></td>
+								<td class="name"><label><warehouse:message code="inventory.supported.label"/></label></td>
 								<td class="value">
 									<g:checkBox name="supported" value="${inventoryLevelInstance?.supported }"/>
 								</td>
 							</tr>
 							<tr class="prop">
-								<td class="name"><label>Minimum Quantity </label></td>
+								<td class="name"><label><warehouse:message code="inventory.minimumQuantity.label"/></label></td>
 								<td class="value">
 									<g:textField name="minQuantity" value="${inventoryLevelInstance?.minQuantity }" size="3"/>
 								</td>
 							</tr>
 							<tr class="prop">
-								<td class="name"><label>Reorder Quantity</label></td>
+								<td class="name"><label><warehouse:message code="inventory.reorderQuantity.label"/></label></td>
 								<td class="value">
 									<g:textField name="reorderQuantity" value="${inventoryLevelInstance?.reorderQuantity }" size="3"/>
 								</td>

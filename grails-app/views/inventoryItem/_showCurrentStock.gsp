@@ -5,15 +5,15 @@
 
 
 <div> 	
-	<h2 class="fade">Current Stock</h2>
+	<h2 class="fade"><warehouse:message code="inventory.currentStock.label"/></h2>
 	<div id="inventoryView" style="text-align: left;" class="list">	
 		<table border="0" style="">
 			<thead>
 				<tr class="odd">
-					<th class="left" style="">Actions</th>												
-					<th>Serial/Lot Number</th>
-					<th>Expires</th>
-					<th class="center middle" >Qty</th>
+					<th class="left" style=""><warehouse:message code="default.actions.label"/></th>												
+					<th><warehouse:message code="default.lotSerialNo.label"/></th>
+					<th><warehouse:message code="default.expires.label"/></th>
+					<th class="center middle" ><warehouse:message code="default.qty.label"/></th>
 					<g:hasErrors bean="${flash.itemInstance}">													
 						<th></th>
 					</g:hasErrors>
@@ -23,7 +23,7 @@
 				<g:if test="${!commandInstance?.inventoryItemList}">
 					<tr class="even" style="min-height: 100px;">
 						<td colspan="5" style="text-align: center; vertical-align: middle">
-							There are no <b>${commandInstance?.productInstance?.name }</b> items currently in stock.
+							<warehouse:message code="inventory.thereAreNoItemsCurrentlyInStock.message" args="[format.product(product:commandInstance?.productInstance)]"/>
 						</td>
 					</tr>
 				</g:if>
@@ -56,7 +56,7 @@
 								</div>
 							</td>															
 							<td class="top">
-								${itemInstance?.lotNumber?:'<span class="fade">None</span>' }
+								${itemInstance?.lotNumber ?: '<span class="fade"><warehouse:message code="default.none.label"/></span>' }
 								<g:link action="show" controller="inventoryItem" id="${itemInstance?.id }">
 								</g:link>
 							</td>														
@@ -65,7 +65,7 @@
 									<format:expirationDate obj="${itemInstance?.expirationDate}"/>
 								</g:if>
 								<g:else>
-									<span class="fade">Never</span>
+									<span class="fade"><warehouse:message code="default.never.label"/></span>
 								</g:else>
 							</td>
 							<td class="top center">

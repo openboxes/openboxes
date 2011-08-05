@@ -1,6 +1,6 @@
 <div>							
 	
-	<h2 class="fade">Pending Transaction Log</h2>
+	<h2 class="fade"><warehouse:message code="transaction.pendingTransactionLog.label"/></h2>
 	<div style="text-align: center;">
 		<g:form method="GET" action="showStockCard">
 			<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
@@ -10,19 +10,19 @@
 					<thead>
 						<tr class="odd prop">
 							<th>
-								${warehouse.message(code: 'transaction.transactionDate.label', default: 'Date')}
+								${warehouse.message(code: 'default.date.label')}
 							</th>
 							<th>
-								${warehouse.message(code: 'transaction.transactionType.label', default: 'Type')}
+								${warehouse.message(code: 'default.type.label')}
 							</th>
 							<th>
-								${warehouse.message(code: 'transaction.source.label', default: 'Source')}
+								${warehouse.message(code: 'transaction.source.label')}
 							</th>
 							<th>
-								${warehouse.message(code: 'transaction.destination.label', default: 'Destination')}
+								${warehouse.message(code: 'transaction.destination.label')}
 							</th>
 							<th style="text-align: center">
-								${warehouse.message(code: 'transaction.quantityChange.label', default: 'Qty In/Out')}
+								${warehouse.message(code: 'transaction.quantityChange.label')}
 							</th>
 						</tr>
 
@@ -33,7 +33,7 @@
 							<tr>
 								<td colspan="5" class="even center" style="min-height: 100px;">		
 									<div class="fade">
-										None
+										<warehouse:message code="default.none.label"/>
 									</div>
 								</td>
 							</tr>

@@ -5,7 +5,7 @@
 	<g:set var="entityName" value="${warehouse.message(code: 'shipmentItem.label', default: 'Shipment item')}" />
 	<title><warehouse:message code="default.add.label" args="[entityName]" /></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
-	<content tag="pageTitle">Add to shipment(s)</content>
+	<content tag="pageTitle"><warehouse:message code="shipping.addToShipments.label"/></content>
 </head>
 
 <body>
@@ -30,25 +30,25 @@
 		<div class="dialog">			
 			<g:form action="addToShipmentPost">
 
-				<g:link controller="inventory" action="browse" id="${shipmentInstance?.id}">&lsaquo; Return to inventory browser</g:link>
+				<g:link controller="inventory" action="browse" id="${shipmentInstance?.id}">&lsaquo; <warehouse:message code="shipping.returnToInventoryBrowser.label"/></g:link>
 				
 				<table>
 					<tbody>	
 						<tr>
-							<th>Product</th>
-							<th>Lot Number</th>
-							<th>Expires</th>
-							<th>Qty On-Hand</th>
-							<th>Qty Shipping</th>
-							<th>Qty Receiving</th>
-							<th style="border-left: 1px solid lightgrey;">Shipment</th>
-							<th>Qty To Ship</th>
+							<th><warehouse:message code="product.label"/></th>
+							<th><warehouse:message code="product.lotNumber.label"/></th>
+							<th><warehouse:message code="default.expires.label"/></th>
+							<th><warehouse:message code="inventory.qtyOnHand.label"/></th>
+							<th><warehouse:message code="inventory.qtyShipping.label"/></th>
+							<th><warehouse:message code="inventory.qtyReceiving.label"/></th>
+							<th style="border-left: 1px solid lightgrey;"><warehouse:message code="shipping.shipment.label"/></th>
+							<th><warehouse:message code="inventory.qtyToShip.label"/></th>
 						</tr>
 						<g:each var="item" in="${commandInstance?.items }" status="i">
 							<tr class="${i%2==0?'odd':'even' }">
 								<td>
 									<g:link controller="inventoryItem" action="showStockCard" id="${item?.product?.id }" target="_blank">
-										${item?.product?.name }
+										<format:product product="${item?.product}"/>
 									</g:link>
 									<g:hiddenField name="items[${i }].product.id" value="${item?.product?.id }"/>
 									<g:hiddenField name="productId" value="${item?.product?.id }"/>	<%-- used when redirecting to page on error --%>
@@ -66,13 +66,13 @@
 									</g:else>
 								</td>
 								<td class="center">
-									${item?.quantityOnHand?:'N/A' }
+									${item?.quantityOnHand?:warehouse.message(code:'default.na.label')}
 								</td>
 								<td class="center">
-									${item?.quantityShipping?:'N/A' }
+									${item?.quantityShipping?:warehouse.message(code:'default.na.label')}
 								</td>
 								<td class="center">
-									${item?.quantityReceiving?:'N/A' }
+									${item?.quantityReceiving?:warehouse.message(code:'default.na.label')}
 								</td>
 								<td style="border-left: 1px solid lightgrey;">
 								
@@ -98,9 +98,9 @@
 								<div class="center">
 									<button type="submit" ><img
 										src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
-										class="btn" alt="save" /> Add to shipment(s)</button>
+										class="btn" alt="save" /><warehouse:message code="shipping.addToShipments.label"/></button>
 									&nbsp;
-									<g:link controller="inventory" action="browse" id="${shipmentInstance?.id}">Cancel</g:link>
+									<g:link controller="inventory" action="browse" id="${shipmentInstance?.id}"><warehouse:message code="default.button.cancel.label"/></g:link>
 								</div>				
 							</td>
 						</tr>

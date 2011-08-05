@@ -3,7 +3,7 @@
 		<table>
 			<tbody>
 				<tr class="prop">
-					<td class="name"><label>Upload a file to import</label></td>
+					<td class="name"><label><warehouse:message code="inventory.uploadAFileToImport.label"/></label></td>
 					<td class="value" style="background-color: #f7f7f7;">
 						<input name="xlsFile" type="file" />
 				

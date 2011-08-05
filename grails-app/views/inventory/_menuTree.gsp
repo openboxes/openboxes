@@ -6,7 +6,7 @@
 				${ new String("&nbsp").multiply(5*(level-1)) }			
 				<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png') }"/>
 				<g:link controller="inventory" action="browse" params="[categoryId: childCategory?.id ]">
-					${childCategory?.name }
+					<format:category category="${childCategory}"/>
 				</g:link>
 			</li>
 			<g:render template="menuTree" model="${['category': childCategory, 'level': level, 'selectedCategory': selectedCategory]}"/>

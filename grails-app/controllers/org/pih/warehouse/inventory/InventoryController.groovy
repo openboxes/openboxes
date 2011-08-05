@@ -494,7 +494,7 @@ class InventoryController {
 				locationInstanceList: Location.list(),
 				warehouseInstance: Warehouse.get(session?.warehouse?.id)
 			]
-			render(view: "createTransaction", model: model);
+			render(view: "editTransaction", model: model);
 		}	
 	}
 
@@ -603,7 +603,7 @@ class InventoryController {
 			warehouseInstance: Warehouse.get(session?.warehouse?.id) 
 		];
 		
-		render(view: "createTransaction", model: model);
+		render(view: "editTransaction", model: model);
 	}
 	
 	
@@ -682,7 +682,7 @@ class InventoryController {
 				locationInstanceList: Location.list(),
 				warehouseInstance: Warehouse.get(session?.warehouse?.id)
 			]
-			render(view: "createTransaction", model: model);
+			render(view: "editTransaction", model: model);
 		}		
 	}
 	

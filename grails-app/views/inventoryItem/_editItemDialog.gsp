@@ -6,7 +6,7 @@
 </script>	   
 <div class="action-menu-item">
 	<a id="btnEditItem-${itemInstance?.id}">
-		<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;Edit Item
+		<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;<warehouse:message code="inventory.editItem.label"/>
 	</a>
 </div>
 <div id="dlgEditItem-${itemInstance?.id}" title="Edit Item" style="padding: 10px; display: none;" >	
@@ -34,28 +34,28 @@
 				
 				
 					<tr class="prop">
-						<td valign="top" class="name"><label><warehouse:message code="inventoryItem.product.label" default="Product" /></label></td>                            
+						<td valign="top" class="name"><label><warehouse:message code="product.label" /></label></td>                            
 						<td valign="top" class="value">
 							<%-- 
 							<g:autoSuggestEditable id="editItem-product-${itemInstance?.id}" name="product" jsonUrl="/warehouse/json/findProductByName" 
 								size="20" valueId="${itemInstance?.product?.id }" valueName="${itemInstance?.product?.name }"/>	
 							--%>
 							
-							${itemInstance?.product?.name }
+							<format:product product="${itemInstance?.product}"/>
 						</td>
 						<td>
 					</tr>
 					
 					
 					<tr class="prop">
-						<td valign="top" class="name"><label><warehouse:message code="inventoryItem.lotNumber.label" default="Lot/Serial Number" /></label></td>                            
+						<td valign="top" class="name"><label><warehouse:message code="product.lotNumber.label"/></label></td>                            
 						<td valign="top" class="value">
 							<g:autoSuggestEditable id="editItem-lotNumber-${itemInstance?.id}" name="lotNumber" jsonUrl="/warehouse/json/findLotsByName?productId=${itemInstance?.product?.id }" 
 								size="20" valueId="${itemInstance?.lotNumber}" valueName="${itemInstance?.lotNumber}"/>							
 						</td>
 					</tr>
 					<tr class="prop">
-						<td valign="top" class="name"><label><warehouse:message code="inventoryItem.expirationDate.label" default="Expiration Date" /></label></td>                            
+						<td valign="top" class="name"><label><warehouse:message code="product.expirationDate.label"/></label></td>                            
 						<td valign="top" class="">
 							<g:datePicker name="expirationDate" value="" precision="month" default="none" value="${itemInstance?.expirationDate }" noSelection="['':'']"/>
 						</td>
@@ -64,7 +64,7 @@
 						<td></td>
 						<td style="text-align: left;">								
 							<button type="submit" name="addItem">
-								<img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}"/> Save
+								<img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}"/> <warehouse:message code="default.button.save.label"/>
 							</button>
 						</td>
 					</tr>

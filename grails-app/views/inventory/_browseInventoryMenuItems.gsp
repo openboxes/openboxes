@@ -2,7 +2,7 @@
 	<div class="action-menu-item">				
 		<g:link controller="inventory" action="showHiddenProducts">
 			<img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}" style="vertical-align: middle;"/>
-			&nbsp;Hide unsupported products
+			&nbsp;<warehouse:message code="inventory.hideUnsupportedProducts.label"/>
 		</g:link>
 	</div>	
 </g:if> 
@@ -10,14 +10,14 @@
 	<div class="action-menu-item">				
 		<g:link controller="inventory" action="showHiddenProducts">
 			<img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}" style="vertical-align: middle;"/>
-			&nbsp;Show unsupported products
+			&nbsp;<warehouse:message code="inventory.showUnsupportedProducts.label"/>
 		</g:link>
 	</div>	
 </g:else>
 <div class="action-menu-item">			
 	<a class="toggle-outofstock" href="javascript:void();">
 		<img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}" style="vertical-align: middle;"/>
-		Toggle out of stock items
+		<warehouse:message code="inventory.toggleOutOfStockItems.label"/>
 	</a>
 </div>
 

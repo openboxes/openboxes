@@ -1,6 +1,6 @@
 <div>							
 	
-	<h2 class="fade">Transaction Log</h2>
+	<h2 class="fade"><warehouse:message code="transaction.transactionLog.label"/></h2>
 	<div style="text-align: left;">
 		<g:form method="GET" action="showStockCard">
 			<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
@@ -14,7 +14,7 @@
 						format="MM/dd/yyyy"
 						size="8"
 						showTrigger="false" />
-					to
+					<warehouse:message code="default.to.label"/>
 					<g:jqueryDatePicker 
 						id="endDate" 
 						name="endDate" 
@@ -25,12 +25,12 @@
 
 					<g:select name="transactionType.id" 
 						from="${org.pih.warehouse.inventory.TransactionType.list()}" 
-						optionKey="id" optionValue="name" value="${commandInstance?.transactionType?.id }" 
-						noSelection="['0': '-- All types --']" /> 
+						optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${commandInstance?.transactionType?.id }" 
+						noSelection="['0': warehouse.message(code:'default.all.label')]" /> 
 				
 					<button  class="" name="filter">
 						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'zoom.png' )}" style="vertical-align:middle"/>
-						&nbsp;Filter
+						&nbsp;<warehouse:message code="default.button.filter.label"/>
 					</button>
 				</div>			
 	
@@ -39,19 +39,19 @@
 					<thead>
 						<tr class="odd prop">
 							<th>
-								${warehouse.message(code: 'transaction.transactionDate.label', default: 'Date')}
+								${warehouse.message(code: 'default.date.label')}
 							</th>
 							<th>
-								${warehouse.message(code: 'transaction.transactionType.label', default: 'Type')}
+								${warehouse.message(code: 'default.type.label')}
 							</th>
 							<th>
-								${warehouse.message(code: 'transaction.source.label', default: 'Source')}
+								${warehouse.message(code: 'transaction.source.label')}
 							</th>
 							<th>
-								${warehouse.message(code: 'transaction.destination.label', default: 'Destination')}
+								${warehouse.message(code: 'transaction.destination.label')}
 							</th>
 							<th style="text-align: center">
-								${warehouse.message(code: 'transaction.quantityChange.label', default: 'Qty In/Out')}
+								${warehouse.message(code: 'transaction.quantityChange.label')}
 							</th>
 						</tr>
 
@@ -61,9 +61,7 @@
 						<g:if test="${!commandInstance?.transactionLogMap }">
 							<tr>
 								<td colspan="5" class="even center" style="min-height: 100px;">		
-									<div class="fade" >No <b>${commandInstance?.transactionType?.name}</b> transactions between 
-										<b><format:date obj="${commandInstance?.startDate}"/></b> and
-										<b><format:date obj="${commandInstance?.endDate}"/></b>.
+									<div class="fade" ><warehouse:message code="transaction.noTransactions.message" args="[format.metadata(obj:commandInstance?.transactionType),commandInstance?.startDate,commandInstance?.endDate]"/>
 									</div>
 								</td>
 							</tr>
@@ -80,7 +78,7 @@
 									</td>
 									<td>
 										<span class="${transaction?.transactionType?.transactionCode?.name()?.toLowerCase()}">
-											${transaction?.transactionType?.name }
+											<format:metadata obj="${transaction?.transactionType}"/>
 										</span>
 									</td>
 									<td>

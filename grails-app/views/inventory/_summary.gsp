@@ -18,8 +18,8 @@
 							|
 							<span>
 							
-							Showing ${commandInstance?.products?.size() } products 
-							in ${commandInstance?.inventoryItems?.keySet()?.size() } categories
+							<warehouse:message code="inventory.showingProductsInCategories.label" args="[commandInstance?.products?.size(),commandInstance?.inventoryItems?.keySet()?.size()]" />
+					
 							<%-- 
 								<g:set var="productMap" value="${commandInstance?.productList.groupBy {it.category} }"/>
 								Showing ${commandInstance?.productList?.size() } product(s) in ${productMap?.keySet()?.size()} categories
@@ -28,7 +28,7 @@
 							<g:if test="${commandInstance?.categoryFilters || commandInstance?.searchTermFilters}">	
 								|
 								<span>
-									<g:link action="clearAllFilters">Show all products</g:link>	
+									<g:link action="clearAllFilters"><warehouse:message code="inventory.showAllProducts.label"/></g:link>	
 								</span>
 							</g:if>
 							
@@ -50,14 +50,14 @@
 								<g:textField name="searchTerms" value="" size="24"/>
 								<button type="submit" class="" name="submitSearch">
 									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'zoom.png' )}" class="middle"/>
-									&nbsp;Find&nbsp;</button>
+									&nbsp;<warehouse:message code="default.find.label"/>&nbsp;</button>
 							</g:form>	
 						</div>
 						<div style="margin: 5px;">
 							<g:form action="addCategoryFilter">
 								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'folder.png' )}" class="middle"/>
 								<select id="categoryFilter" name="categoryId" >
-									<option value="">Filter by category</option>
+									<option value=""><warehouse:message code="inventory.filterByCategory.label"/></option>
 									<g:render template="../category/selectOptions" model="[category:commandInstance?.rootCategory, selected:null, level: 0]"/>								
 								</select>
 							</g:form>								

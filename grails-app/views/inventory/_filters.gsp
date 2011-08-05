@@ -33,7 +33,7 @@
 	<table>
 		<tr>
 			<td style="padding: 0; margin: 0;">
-				Filters: &nbsp;
+				<warehouse:message code="inventory.filters.label"/>: &nbsp;
 
 				<g:if test="${commandInstance?.categoryFilters || commandInstance?.searchTermFilters}">			
 					<g:each var="filter" in="${commandInstance?.categoryFilters }">
@@ -42,7 +42,7 @@
 							<g:link action="removeCategoryFilter" params="[categoryId:filter.id]">
 								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'delete.png' )}" style="vertical-align:middle"/>
 							</g:link>
-							${filter?.name }
+							<format:category category="${filter}"/>
 						</span>
 					</g:each>
 					<g:each var="filter" in="${commandInstance?.searchTermFilters }">
@@ -56,12 +56,12 @@
 					</g:each>
 					<span class="clear-all">
 						<g:link action="clearAllFilters">
-							Show all
+							<warehouse:message code="inventory.showAll.label"/>
 						</g:link>	
 					</span>
 				</g:if>
 				<g:else>
-					<span class="fade">No filters</span>
+					<span class="fade"><warehouse:message code="inventory.noFilters.label"/></span>
 				</g:else>
 			</td>
 		</tr>

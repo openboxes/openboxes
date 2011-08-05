@@ -5,11 +5,9 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="custom" />
 		<g:set var="entityName"
-			value="${warehouse.message(code: 'inventoryItem.label', default: 'Inventory Item')}" />
+			value="${warehouse.message(code: 'default.items.label')}" />
 		<title>
-			<warehouse:message code="default.import.label" args="[entityName]" /> &rsaquo;
-			<span style="color: grey">${session?.warehouse?.name }</span>
-		
+			<warehouse:message code="default.import.label" args="[entityName.toLowerCase()]" />	
 		</title>
 	</head>
 	<body>
@@ -30,7 +28,7 @@
 						
 			<g:if test="${inventoryMapList}">
 				<div>
-					There are ${inventoryMapList.size() } rows in ${commandInstance.filename }
+					<warehouse:message code="inventory.thereAreRowsIn.message" args="[inventoryMapList.size(), commandInstance.filename]" />
 				</div>
 				<div class="list">
 					<fieldset>
@@ -39,16 +37,16 @@
 							<table style="display: inline-block;">		
 								<thead>
 									<tr>
-										<th>Category</th>
-										<th>Product Description</th>
-										<th>UPC</th>
-										<th>GTIN</th>
-										<th>Manufacturer</th>
-										<th>ManufacturerCode</th>
-										<th>Lot Number</th>
-										<th>Expiration Date</th>
-										<th>Quantity</th>
-										<th>Unit of Measure</th>
+										<th><warehouse:message code="category.label"/></th>
+										<th><warehouse:message code="product.description.label"/></th>
+										<th><warehouse:message code="product.upc.label"/></th>
+										<th><warehouse:message code="product.gtin.label"/></th>
+										<th><warehouse:message code="product.manufacturer.label"/></th>
+										<th><warehouse:message code="product.manufacturerCode.label"/></th>
+										<th><warehouse:message code="product.lotNumber.label"/></th>
+										<th><warehouse:message code="product.expirationDate.label"/></th>
+										<th><warehouse:message code="default.quantity.label"/></th>
+										<th><warehouse:message code="default.unitOfMeasure.label"/></th>
 									</tr>							
 								</thead>
 								<tbody>							
@@ -97,7 +95,7 @@
 									&nbsp;${warehouse.message(code: 'default.button.import.label', default: 'Import Now')}</button>
 									
 								&nbsp;
-								<a href="${createLink(controller: "inventoryItem", action: "importInventoryItems")}" class="negative"> Clear </a>
+								<a href="${createLink(controller: "inventoryItem", action: "importInventoryItems")}" class="negative"><warehouse:message code="default.button.clear.label"/></a>
 									
 							</g:form>			
 						</div>
