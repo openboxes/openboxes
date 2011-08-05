@@ -5,7 +5,7 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'transaction.label', default: 'Transaction')}" />
         
-        <title>Expiring/expired stock ${session.warehouse.name}</title>    
+        <title><warehouse:message code="inventory.expiringStock.label"/></title>    
     </head>    
 
 	<body>
@@ -17,14 +17,14 @@
 						
 			<div class="list">
 				
-				<h3>Expired Stock </h3>
+				<h3><warehouse:message code="inventory.expiredStock.label"/></h3>
 				<table>
                     <thead>
                         <tr>                           	
-	                        <%--<th width="2%">Actions</th> --%>
-							<th class="center" width="5%">Qty</th>
-							<th width="20%">Item</th>
-							<th width="10%">Expires</th>
+	                        <%--<th width="2%"><warehouse:message code="default.actions.label"/></th> --%>
+							<th class="center" width="5%"><warehouse:message code="default.qty.label"/></th>
+							<th width="20%"><warehouse:message code="item.label"/></th>
+							<th width="10%"><warehouse:message code="inventory.expires.label"/></th>
                         </tr>
                     </thead>
        	           	<tbody>			
@@ -63,7 +63,7 @@
 									</td>
 									<td>
 										<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
-											${inventoryItem.product.name } ${inventoryItem.lotNumber }
+											<format:product product="${inventoryItem.product}"/> ${inventoryItem.lotNumber }
 										</g:link>
 									</td>
 									<td>
@@ -77,14 +77,14 @@
 			</div>
 			
 			<div class="list">
-				<h3>Expiring Stock within the next 6 months </h3>
+				<h3><warehouse:message code="inventory.expiringStockWithin6Months.label"/></h3>
 				<table>
                     <thead>
                         <tr>   
-	                        <%--<th width="2%">Actions</th> --%>
-							<th class="center" width="5%">Qty</th>
-							<th width="20%">Item</th>
-							<th width="10%">Expires</th>
+	                        <%--<th width="2%"><warehouse:message code="default.actions.label"/></th> --%>
+							<th class="center" width="5%"><warehouse:message code="default.qty.label"/></th>
+							<th width="20%"><warehouse:message code="item.label"/></th>
+							<th width="10%"><warehouse:message code="inventory.expires.label"/></th>
                         </tr>
                     </thead>
        	           	<tbody>			
@@ -123,7 +123,7 @@
 									</td>									
 									<td>
 										<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
-											${inventoryItem.product.name } ${inventoryItem.lotNumber }
+											<format:product product="${inventoryItem.product}"/> ${inventoryItem.lotNumber }
 										</g:link>
 									</td>
 									<td>

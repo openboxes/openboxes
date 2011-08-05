@@ -5,7 +5,7 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'transaction.label', default: 'Transaction')}" />
         
-        <title>Daily transactions ${session.warehouse.name}</title>    
+        <title><warehouse:message code="transaction.dailyTransactions.label"/></title>    
     </head>    
 
 	<body>
@@ -50,13 +50,13 @@
 								<table>
 				                    <thead>
 				                        <tr>                           	
-					                        <%--<th width="2%">Actions</th> --%>
-					                        <th>ID</th>
-											<th>Type</th>
-											<th>Product</th>
-											<th>Lot Number</th>
-											<th>Quantity</th>
-											<th>Date</th>
+					                        <%--<th width="2%"><warehouse:message code="default.actions.label"/></th> --%>
+					                        <th><warehouse:message code="transaction.id.label"/></th>
+											<th><warehouse:message code="transaction.type.label"/></th>
+											<th><warehouse:message code="product.label"/></th>
+											<th><warehouse:message code="product.lotNumber.label"/></th>
+											<th><warehouse:message code="default.quantity.label"/></th>
+											<th><warehouse:message code="default.date.label"/></th>
 				                        </tr>
 				                    </thead>
 				       	           	<tbody>			
@@ -68,7 +68,7 @@
 														${transaction?.transactionNumber() }
 													</td>
 										      		<td>
-										      			${transaction?.transactionType?.name }
+										      			<format:metadata obj="${transaction?.transactionType}"/>
 										      			<g:if test="${transaction.source }">
 											      			from ${transaction?.source?.name }
 										      			</g:if>
@@ -79,7 +79,7 @@
 													</td>
 										      		
 													<td>
-														${transactionEntry?.inventoryItem?.product }
+														<format:product product="${transactionEntry?.inventoryItem?.product}"/>
 													</td>
 													<td>
 														${transactionEntry?.inventoryItem?.lotNumber }

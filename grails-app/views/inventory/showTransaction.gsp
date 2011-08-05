@@ -5,7 +5,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'transaction.label', default: 'Transaction')}" />
-        <title><warehouse:message code="default.show.label" args="[entityName]" /></title>    
+        <title><warehouse:message code="default.view.label" args="[entityName.toLowerCase()]" /></title>    
         <style>
         	optgroup { font-weight: bold; } 
         	#transactionEntryTable { border: 1px solid #ccc; } 
@@ -38,7 +38,7 @@
 		            <g:link class="bullet" controller="inventoryItem" action="showStockCard" params="['product.id': params?.product?.id]"><button>&lsaquo; Back to Stock Card</button></g:link> 
 	            </g:if>
 	            <g:else>
-		            <g:link class="bullet" controller="inventory" action="listAllTransactions"><button>&lsaquo; Back to Transactions</button></g:link> 
+		            <g:link class="bullet" controller="inventory" action="listAllTransactions"><button>&lsaquo; <warehouse:message code="transaction.back.label"/></button></g:link> 
 		    	</g:else>
 			</div>
 			<div class="dialog">
@@ -50,20 +50,20 @@
 							<table>
 								<tr class="prop odd">
 									<td>
-										<label>Transaction ID</label>
+										<label><warehouse:message code="transaction.transactionId.label"/></label>
 									</td>
 									<td>
 										<span class="value">
 											<g:if test="${transactionInstance?.id }">
 												${transactionInstance?.id }
 											</g:if>
-											<g:else><span class="fade">(new transaction)</span></g:else>
+											<g:else><span class="fade"><warehouse:message code="transaction.new.label"/></span></g:else>
 										</span>
 									</td>
 								</tr>
 								<tr class="prop even">
 									<td>
-										<label>Transaction Date</label>
+										<label><warehouse:message code="transaction.date.label"/></label>
 									</td>
 									<td>
 										<span class="value">
@@ -73,17 +73,17 @@
 								</tr>
 								<tr class="prop odd">
 									<td>
-										<label>Transaction Type</label>
+										<label><warehouse:message code="transaction.type.label"/></label>
 									</td>
 									<td>
 										<span class="value ${transactionInstance?.transactionType?.transactionCode?.name()?.toLowerCase()}">
-											${transactionInstance?.transactionType?.name }
+											<format:metadata obj="${transactionInstance?.transactionType}"/>
 										</span>
 									</td>										
 								</tr>
 								<tr id="inventory-li" class="prop even">
 									<td>
-										<label>Inventory</label>
+										<label><warehouse:message code="inventory.label"/></label>
 									</td>
 									<td>
 										<span class="value">
@@ -93,7 +93,7 @@
 								</tr>
 								<tr class="prop odd">
 									<td>
-										<label># Entries</label>
+										<label><warehouse:message code="transaction.numEntries.label"/></label>
 									</td>
 									<td>
 										<span class="value">
@@ -104,7 +104,7 @@
 								<g:if test="${transactionInstance?.source }">
 									<tr class="prop even">
 										<td>
-											<label>From</label>
+											<label><warehouse:message code="default.from.label"/></label>
 										</td>
 										<td>
 											<span class="value">
@@ -116,7 +116,7 @@
 								<g:if test="${transactionInstance?.destination }">
 									<tr class="prop even">
 										<td>
-											<label>To</label>
+											<label><warehouse:message code="default.to.label"/></label>
 										</td>
 										<td>
 											<span class="value">
@@ -137,10 +137,10 @@
 										
 											<table id="prodEntryTable" border="0" style="border: 0px solid #ccc;">
 												<tr>
-													<th>Product</th>
-													<th>Lot Number</th>
-													<th>Expiration Date</th>
-													<th>Qty</th>
+													<th><warehouse:message code="product.label"/></th>
+													<th><warehouse:message code="product.lotNumber.label"/></th>
+													<th><warehouse:message code="product.expirationDate.label"/></th>
+													<th><warehouse:message code="default.qty.label"/></th>
 													<th>&nbsp;</th>
 												</tr>
 												<g:if test="${transactionInstance?.transactionEntries }">
@@ -148,7 +148,7 @@
 														<tr class="${(status%2==0)?'odd':'even'}">
 															<td style="text-align: left;">
 																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':transactionEntry?.inventoryItem?.product?.id]">
-																	${transactionEntry?.inventoryItem?.product?.name }
+																	<format:product product="${transactionEntry?.inventoryItem?.product}"/>
 																</g:link>
 															</td>										
 															<td>
@@ -166,7 +166,7 @@
 												</g:if>
 												<g:else>
 													<tr>
-														<td colspan="6">There are no entries</td>
+														<td colspan="6"><warehouse:message code="transaction.noEntries.message"/></td>
 													</tr>
 												</g:else>
 											</table>	

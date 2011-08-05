@@ -87,12 +87,12 @@
 								            				<thead>
 																<tr class="odd">
 																	<th></th>
-																	<th width="50%">Description</th>
-																	<th width="20%">Manufacturer</th>
-																	<th width="20%">Product Code</th>
-																	<th width="5%" style="text-align: center">Qty In</th>
-																	<th width="5%" style="text-align: center">Qty Out</th>
-																	<th width="5%" style="text-align: center">Qty</th>
+																	<th width="50%"><warehouse:message code="default.description.label"/></th>
+																	<th width="20%"><warehouse:message code="product.manufacturer.label"/></th>
+																	<th width="20%"><warehouse:message code="product.code.label"/></th>
+																	<th width="5%" style="text-align: center"><warehouse:message code="inventory.qtyin.label"/></th>
+																	<th width="5%" style="text-align: center"><warehouse:message code="inventory.qtyout.label"/></th>
+																	<th width="5%" style="text-align: center"><warehouse:message code="default.qty.label"/></th>
 																</tr>
 															</thead>
 															<tbody>
@@ -129,7 +129,7 @@
 																					<format:product product="${inventoryItem?.product}"/> 
 																				</g:if>
 																				<g:else>
-																					Untitled Product
+																					<warehouse:message code="product.untitled.label"/>
 																				</g:else>
 																			</g:link> 
 																		</td>
@@ -184,7 +184,7 @@
 											</div>			
 											<div class="center" style="padding: 10px;">
 												<button>
-													<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" style="vertical-align: middle;"/>Add to shipment(s)
+													<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" style="vertical-align: middle;"/><warehouse:message code="shipping.addToShipments.label"/>
 												</button>
 											</div>
 										</g:form>
@@ -192,7 +192,7 @@
 									<g:else>
 										<span >
 											<g:if test="${commandInstance?.categoryFilters || commandInstance?.searchTermFilters}">
-												Your search did not return any items.  Please try again.
+												<warehouse:message code="product.code.label"/>
 											</g:if>
 										</span>
 									</g:else>		    

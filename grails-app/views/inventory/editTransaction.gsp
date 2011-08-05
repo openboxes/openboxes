@@ -1,20 +1,27 @@
-
-<%@ page import="org.pih.warehouse.product.Product" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'transaction.label', default: 'Transaction')}" />
-        <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>    
+        <title>
+	        <g:if test="${transactionInstance?.id }">
+		        <warehouse:message code="default.edit.label" args="[entityName.toLowerCase()]" />  
+	    	</g:if>
+	    	<g:else>
+		        <warehouse:message code="default.create.label" args="[entityName.toLowerCase()]" />    
+			</g:else>    	    
+		</title>
         <style>
-        	optgroup { font-weight: bold; } 
-        	#transactionEntryTable { border: 1px solid #ccc; } 
-			#transactionEntryTable td { padding: 5px; text-align: center; }
-			#transactionEntryTable th { text-align: center; } 
-        	#prodSelectRow { padding: 10px; }  
-        	#transactionEntryTable td.prodNameCell { text-align: left; } 
-        	
+        	.dialog form label { position: absolute; display: inline; width: 140px; text-align: right;}
+        	.dialog form .value { margin-left: 160px; }
+        	.dialog form ul li { padding: 10px; } 
+        	.dialog form { width: 100%; } 
+        	.header th { background-color: #525D76; color: white; } 
         </style>
+        
+
+		
+
     </head>    
 
     <body>
@@ -29,302 +36,740 @@
 	            </div>
             </g:hasErrors>    
 
-            
-
-			<div class="dialog">
+			<div class="dialog" >
 			
-				<g:form>
-					<g:hiddenField name="id" value="${transactionInstance?.id}"/>
-					<g:hiddenField name="inventory.id" value="${warehouseInstance?.inventory?.id}"/>
-				
-					<fieldset>
-						<legend>Transaction Details</legend>
-						<table>
-							<tr class="prop">
-								<td class="name"><label>Transaction ID</label></td>
-								<td class="value">
-									<g:if test="${transactionInstance?.id }">
-										${transactionInstance?.id }
-									</g:if>
-									<g:else><span class="fade">(new transaction)</span></g:else>
-								</td>
-							</tr>
-							<tr class="prop">
-								<td class="name">
-									<label>Transaction Date</label>
-								</td>
-								<td class="value">
-									<g:jqueryDatePicker id="transactionDate" name="transactionDate"
-											value="${transactionInstance?.transactionDate}" format="MM/dd/yyyy"/>
-								</td>
-							</tr>
-							<tr class="prop">
-								<td class="name"><label>Transaction Type</label></td>
-								<td class="value">
-									<g:select name="transactionType.id" from="${transactionTypeList}" 
-			                       		optionKey="id" optionValue="name" value="${transactionInstance.transactionType?.id}" noSelection="['null': '']" />
-								</td>
-							</tr>
-							<tr class="prop">
-								<td class="name"><label>Source</label></td>
-								<td class="value">
-									<g:select name="source.id" from="${warehouseInstanceList}" 
-			                       		optionKey="id" optionValue="name" value="${transactionInstance?.source?.id}" noSelection="['null': '']" />
-								</td>
-							</tr>
-							<tr class="prop">
-								<td class="name"><label>Destination</label></td>
-								<td class="value">
-									${warehouseInstance?.name }
-									<g:hiddenField name="destination.id" value="${warehouseInstance?.id }"/>
-								</td>
-							</tr>
-							<g:if test="${transactionInstance?.id }">
+				<!-- Action menu -->
+				<div>
+					<span class="action-menu">
+						<button class="action-btn">
+							<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle;"/>
+							<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
+						</button>
+						<div class="actions">
+							<g:if test="${params?.product?.id }">
+								<div class="action-menu-item">
+									<g:link controller="inventoryItem" action="showStockCard" params="['product.id':params?.product?.id]">
+										<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_left.png')}"/>
+										${warehouse.message(code: 'transaction.backToStockCard.label', default: 'Back to stock card')}
+									</g:link>		
+								</div>	
+							</g:if>
+							<div class="action-menu-item">
+								<g:link controller="inventory" action="browse">
+									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_up.png')}"/>
+									${warehouse.message(code: 'transaction.backToInventory.label', default: 'Back to inventory')}
+								</g:link>			
+							</div>							
+
+							<div class="action-menu-item">
+								<g:link controller="inventory" action="listTransactions">
+									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_up.png')}"/>
+									${warehouse.message(code: 'transaction.back.label', default: 'Back to transactions')}
+								</g:link>			
+							</div>
+						</div>
+					</span>				
+				</div>			
+				<table style="height: 100%;">
+					<tr>
+						<td>							
+							<div class="left" >
+								<g:form action="saveNewTransaction">
 								
-								<%--
-								<tr class="prop">
-									<td class="name"><label>Confirmed</label></td>
-									<td class="value">
-										<g:checkBox name="confirmed" value="${transactionInstance?.confirmed }"/>
-				                	</td>
-				                </tr>
-								<tr class="prop">
-									<td class="name"><label>Confirmed by</label></td>
-									<td class="value">
-										<g:select name="confirmedBy.id" from="${org.pih.warehouse.core.User.list()}" 
-				                       		optionKey="id" optionValue="name" value="${transactionInstance?.confirmedBy?.id}" noSelection="['null': '']" />									
-									</td>
-								</tr>							
-								<tr class="prop">
-									<td class="name"><label>Confirmed on</label></td>
-									<td class="value">
-										<g:jqueryDatePicker id="dateConfirmed" name="dateConfirmed"
-												value="${transactionInstance?.dateConfirmed}" format="MM/dd/yyyy"/>
+									<fieldset>
 										
-									</td>
-								</tr>				
-								--%>			
-								<tr class="prop">
-									<td class="name">
-										<label>Transaction Entries</label>
-									</td>
-									<td class="value">
-										
-										<table id="prodEntryTable" border="1" style="border: 1px solid #ccc;">
-											<tr>
-												<th>ID</th>
-												<th>Product</th>
-												<th>Qty</th>
-												<th>Lot Number</th>
-												<th>Expiration Date</th>
-												<th>&nbsp;</th>
+										<g:hiddenField name="id" value="${transactionInstance?.id}"/>
+										<table class="striped">
+											<tr class="prop">
+												<td>
+													<label><warehouse:message code="transaction.transactionId.label"/></label>
+												</td>
+												<td>
+													<span class="value">
+														<g:if test="${transactionInstance?.id }">
+															${transactionInstance?.id }
+														</g:if>
+														<g:else><span class="fade">(new transaction)</span></g:else>
+													</span>
+												</td>
+											</tr>										
+											<tr class="prop">
+												<td>
+													<label><warehouse:message code="inventory.label"/></label>
+												</td>
+												<td>
+													<span class="value">
+														<g:hiddenField name="inventory.id" value="${warehouseInstance?.inventory?.id}"/>
+														${warehouseInstance?.name }
+													</span>								
+												</td>
 											</tr>
-											<g:if test="${transactionInstance?.transactionEntries }">
-												<g:each in="${transactionInstance?.transactionEntries.sort { it.inventoryItem?.product.name } }" var="transactionEntry" status="status">
-													<tr class="${(status%2==0)?'odd':'even'}">
-														<td>
-															${transactionEntry?.id }
-														</td>
-														<td style="text-align: left;">
-															${transactionEntry?.inventoryItem?.product?.name }
-														</td>										
-														<td>
-															${transactionEntry?.quantity}
-														</td>		
-														<td>
-															${transactionEntry?.inventoryItem?.lotNumber }
-														</td>		
-														<td>
-															${transactionEntry?.inventoryItem?.expirationDate }
-														</td>
-														<td></td>
-													</tr>
-												</g:each>
-											</g:if>
-																					 
-											<tr id="prodSelectRow" >
-												<td colspan="5" style="text-align: center; padding: 10px;">
-													<select id="productSelect">
-														<option value="">Choose a product to add</option>
-														<g:each var="key" in="${productInstanceMap.keySet() }">
-															<g:set var="productInstanceList" value="${productInstanceMap.get(key) }"/>
-															<optgroup label="${key?.name?:'None'}"></optgroup>
-															<g:each var="productInstance" in="${productInstanceList}">
-																<option value="${productInstance?.id }">${productInstance?.name }</option>
-															</g:each>
-														</g:each>
-													</select>
+											<tr class="prop">
+												<td>
+													<label><warehouse:message code="transaction.type.label"/></label>
+												</td>
+												<td>
+													<span class="value">
+														<g:select name="transactionType.id" from="${transactionTypeList}" 
+								                       		optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${transactionInstance.transactionType?.id}" noSelection="['null': '']" />
+							                       	</span>
+												</td>
+											</tr>
+											<tr class="prop">
+												<td>
+													<label><warehouse:message code="transaction.date.label"/></label>
+												</td>
+												<td>
+													<span class="value">
+														<g:jqueryDatePicker id="transactionDate" name="transactionDate"
+																value="${transactionInstance?.transactionDate}" format="MM/dd/yyyy"/>
+													</span>								
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<label><warehouse:message code="default.from.label"/></label>
+												</td>
+												<td>
+													<span class="value">
+														<g:select id="source.id" name="source.id" from="${locationInstanceList}" 
+								                       		optionKey="id" optionValue="name" value="${transactionInstance?.source?.id}" noSelection="['null': '']" />
+						                       		</span>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<label><warehouse:message code="default.to.label"/></label>
+												</td>
+												<td>
+													<span class="value">
+														<g:select id="destination.id" name="destination.id" from="${locationInstanceList}" 
+								                       		optionKey="id" optionValue="name" value="${transactionInstance?.destination?.id}" noSelection="['null': '']" />
+													</span>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<label><warehouse:message code="transaction.numEntries.label"/></label>
+												</td>
+												<td>
+													<span class="value">
+														${transactionInstance?.transactionEntries?.size() } &nbsp;
+													</span>
 												</td>
 											</tr>
 										</table>
-									</td>
-								</tr>
-							</g:if>
-						</table>
-						<div class="buttonBar" style="text-align: center;">
-							<button name="_action_saveTransaction">
-		    					<img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="Save" />
-			                    ${warehouse.message(code: 'default.button.save.label', default: 'Save')}						
-							</button>
-							&nbsp;
+									</fieldset>
+									<fieldset>
+										<div>
+											<table id="transaction-entries-table" border="0" style="margin: 0; padding: 0; border: 0px solid lightgrey; background-color: white;">
+												<thead>
+													<tr class="odd">
+														<th></th>
+														<th style="width: 60%"><warehouse:message code="product.label"/></th>
+														<th nowrap="true"><warehouse:message code="poduct.lotNumber.label"/></th>
+														<th nowrap="true"><warehouse:message code="default.expires.label"/></th>
+														<th><warehouse:message code="default.qty.label"/></th>
+														<th><warehouse:message code="default.actions.label"/></th>
+													</tr>
+												</thead>
+												
+												<tbody>
+													<tr class="empty">
+														<td colspan="6" style="text-align: center">
+															<span class="fade"><warehouse:message code="transaction.noItems.message"/></span>
+														
+														</td>
+													</tr>
+													<!--  dynamically populated -->
+												</tbody>
+											</table>
+										</div>							
+									</fieldset>
+									
+									<fieldset>
+										<div style="text-align: center; padding: 10px;" class="odd">
+											<button type="submit" name="save">								
+												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'tick.png')}"/>&nbsp;<warehouse:message code="default.button.save.label"/>&nbsp;
+											</button>
+											
+											<%-- 
+											&nbsp;
+											<button name="clear" class="clear">								
+												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png')}"/>&nbsp;Clear&nbsp;
+											</button>
+											--%>
+											<g:if test="${transactionInstance?.id }">
+												&nbsp;
+												<button name="_action_deleteTransaction" id="${transactionInstance?.id }" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+							    					<img src="${createLinkTo(dir:'images/icons/silk',file:'bin.png')}" alt="Delete" />
+													&nbsp;${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}&nbsp;
+												</button>							
+											</g:if>
+										</div>		
+									</fieldset>		
+								</g:form>
+							</div>
+						</td>
+						
+						<td style="border: 1px solid lightgrey; width: 25%; padding: 0px; margin: 0; height: 100%; background-color: #f7f7f7;">
 							
-							<g:link action="showTransaction" id="${transactionInstance?.id }">
-								<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="Cancel" />
-			                    ${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}						
-							</g:link>			
-						</div>
-						
-						
-					</fieldset>
-				</g:form>
-				
+							<h3 style="padding: 10px;"><warehouse:message code="transaction.addAnItem.label"/></h3>
+							<input type="hidden" id="hiddenProductId" value=""/>
+							<input type="hidden" id="hiddenProductName" value=""/>
+							<div style="padding: 10px;">
+								<g:textField  id="productSearch" name="productSearch" value="${warehouse.message(code:'transaction.searchForProduct.label')}" size="25"/> 										
+							</div>				
+							<div id="product-details">
+								<table>
+									<tr class="prop">
+										<td><b><warehouse:message code="default.description.label"/></b></td>
+										<td><span id="product-details-name"></span></td>
+									</tr>
+									<tr class="prop">
+										<td><b><warehouse:message code="product.manufacturer.label"/></b></td>
+										<td><span id="product-details-manufacturer"></span></td>
+									</tr>
+									<tr class="prop">
+										<td colspan="2" style="padding: 0; margin: 0;">
+											<table id="product-details-lotNumbers">
+												<thead>
+													<tr class="odd">
+														<th></th>
+														<th><warehouse:message code="item.label"/></th>
+														<th><warehouse:message code="default.expires.label"/></th>
+														<th><warehouse:message code="default.qty.label"/></th>
+														<th></th>
+													</tr>
+												</thead>
+												<tbody>
+												</tbody>														
+											</table>
+										</td>
+									</tr>
+								</table>									
+							</div>
+						</td>
+					</tr>
+				</table>
 			</div>
 		</div>
 
-		<script type="text/javascript">var monthsYears = '<option value=""></option><option value="2000-01-31">2000 Jan</option>,<option value="2000-02-29">2000 Feb</option>,<option value="2000-03-31">2000 Mar</option>,<option value="2000-04-30">2000 Apr</option>,<option value="2000-05-31">2000 May</option>,<option value="2000-06-30">2000 Jun</option>,<option value="2000-07-31">2000 Jul</option>,<option value="2000-08-31">2000 Aug</option>,<option value="2000-09-30">2000 Sep</option>,<option value="2000-10-31">2000 Oct</option>,<option value="2000-11-30">2000 Nov</option>,<option value="2000-12-31">2000 Dec</option>,<option value="2001-01-31">2001 Jan</option>,<option value="2001-02-28">2001 Feb</option>,<option value="2001-03-31">2001 Mar</option>,<option value="2001-04-30">2001 Apr</option>,<option value="2001-05-31">2001 May</option>,<option value="2001-06-30">2001 Jun</option>,<option value="2001-07-31">2001 Jul</option>,<option value="2001-08-31">2001 Aug</option>,<option value="2001-09-30">2001 Sep</option>,<option value="2001-10-31">2001 Oct</option>,<option value="2001-11-30">2001 Nov</option>,<option value="2001-12-31">2001 Dec</option>,<option value="2002-01-31">2002 Jan</option>,<option value="2002-02-28">2002 Feb</option>,<option value="2002-03-31">2002 Mar</option>,<option value="2002-04-30">2002 Apr</option>,<option value="2002-05-31">2002 May</option>,<option value="2002-06-30">2002 Jun</option>,<option value="2002-07-31">2002 Jul</option>,<option value="2002-08-31">2002 Aug</option>,<option value="2002-09-30">2002 Sep</option>,<option value="2002-10-31">2002 Oct</option>,<option value="2002-11-30">2002 Nov</option>,<option value="2002-12-31">2002 Dec</option>,<option value="2003-01-31">2003 Jan</option>,<option value="2003-02-28">2003 Feb</option>,<option value="2003-03-31">2003 Mar</option>,<option value="2003-04-30">2003 Apr</option>,<option value="2003-05-31">2003 May</option>,<option value="2003-06-30">2003 Jun</option>,<option value="2003-07-31">2003 Jul</option>,<option value="2003-08-31">2003 Aug</option>,<option value="2003-09-30">2003 Sep</option>,<option value="2003-10-31">2003 Oct</option>,<option value="2003-11-30">2003 Nov</option>,<option value="2003-12-31">2003 Dec</option>,<option value="2004-01-31">2004 Jan</option>,<option value="2004-02-29">2004 Feb</option>,<option value="2004-03-31">2004 Mar</option>,<option value="2004-04-30">2004 Apr</option>,<option value="2004-05-31">2004 May</option>,<option value="2004-06-30">2004 Jun</option>,<option value="2004-07-31">2004 Jul</option>,<option value="2004-08-31">2004 Aug</option>,<option value="2004-09-30">2004 Sep</option>,<option value="2004-10-31">2004 Oct</option>,<option value="2004-11-30">2004 Nov</option>,<option value="2004-12-31">2004 Dec</option>,<option value="2005-01-31">2005 Jan</option>,<option value="2005-02-28">2005 Feb</option>,<option value="2005-03-31">2005 Mar</option>,<option value="2005-04-30">2005 Apr</option>,<option value="2005-05-31">2005 May</option>,<option value="2005-06-30">2005 Jun</option>,<option value="2005-07-31">2005 Jul</option>,<option value="2005-08-31">2005 Aug</option>,<option value="2005-09-30">2005 Sep</option>,<option value="2005-10-31">2005 Oct</option>,<option value="2005-11-30">2005 Nov</option>,<option value="2005-12-31">2005 Dec</option>,<option value="2006-01-31">2006 Jan</option>,<option value="2006-02-28">2006 Feb</option>,<option value="2006-03-31">2006 Mar</option>,<option value="2006-04-30">2006 Apr</option>,<option value="2006-05-31">2006 May</option>,<option value="2006-06-30">2006 Jun</option>,<option value="2006-07-31">2006 Jul</option>,<option value="2006-08-31">2006 Aug</option>,<option value="2006-09-30">2006 Sep</option>,<option value="2006-10-31">2006 Oct</option>,<option value="2006-11-30">2006 Nov</option>,<option value="2006-12-31">2006 Dec</option>,<option value="2007-01-31">2007 Jan</option>,<option value="2007-02-28">2007 Feb</option>,<option value="2007-03-31">2007 Mar</option>,<option value="2007-04-30">2007 Apr</option>,<option value="2007-05-31">2007 May</option>,<option value="2007-06-30">2007 Jun</option>,<option value="2007-07-31">2007 Jul</option>,<option value="2007-08-31">2007 Aug</option>,<option value="2007-09-30">2007 Sep</option>,<option value="2007-10-31">2007 Oct</option>,<option value="2007-11-30">2007 Nov</option>,<option value="2007-12-31">2007 Dec</option>,<option value="2008-01-31">2008 Jan</option>,<option value="2008-02-29">2008 Feb</option>,<option value="2008-03-31">2008 Mar</option>,<option value="2008-04-30">2008 Apr</option>,<option value="2008-05-31">2008 May</option>,<option value="2008-06-30">2008 Jun</option>,<option value="2008-07-31">2008 Jul</option>,<option value="2008-08-31">2008 Aug</option>,<option value="2008-09-30">2008 Sep</option>,<option value="2008-10-31">2008 Oct</option>,<option value="2008-11-30">2008 Nov</option>,<option value="2008-12-31">2008 Dec</option>,<option value="2009-01-31">2009 Jan</option>,<option value="2009-02-28">2009 Feb</option>,<option value="2009-03-31">2009 Mar</option>,<option value="2009-04-30">2009 Apr</option>,<option value="2009-05-31">2009 May</option>,<option value="2009-06-30">2009 Jun</option>,<option value="2009-07-31">2009 Jul</option>,<option value="2009-08-31">2009 Aug</option>,<option value="2009-09-30">2009 Sep</option>,<option value="2009-10-31">2009 Oct</option>,<option value="2009-11-30">2009 Nov</option>,<option value="2009-12-31">2009 Dec</option>,<option value="2010-01-31">2010 Jan</option>,<option value="2010-02-28">2010 Feb</option>,<option value="2010-03-31">2010 Mar</option>,<option value="2010-04-30">2010 Apr</option>,<option value="2010-05-31">2010 May</option>,<option value="2010-06-30">2010 Jun</option>,<option value="2010-07-31">2010 Jul</option>,<option value="2010-08-31">2010 Aug</option>,<option value="2010-09-30">2010 Sep</option>,<option value="2010-10-31">2010 Oct</option>,<option value="2010-11-30">2010 Nov</option>,<option value="2010-12-31">2010 Dec</option>,<option value="2011-01-31">2011 Jan</option>,<option value="2011-02-28">2011 Feb</option>,<option value="2011-03-31">2011 Mar</option>,<option value="2011-04-30">2011 Apr</option>,<option value="2011-05-31">2011 May</option>,<option value="2011-06-30">2011 Jun</option>,<option value="2011-07-31">2011 Jul</option>,<option value="2011-08-31">2011 Aug</option>,<option value="2011-09-30">2011 Sep</option>,<option value="2011-10-31">2011 Oct</option>,<option value="2011-11-30">2011 Nov</option>,<option value="2011-12-31">2011 Dec</option>,<option value="2012-01-31">2012 Jan</option>,<option value="2012-02-29">2012 Feb</option>,<option value="2012-03-31">2012 Mar</option>,<option value="2012-04-30">2012 Apr</option>,<option value="2012-05-31">2012 May</option>,<option value="2012-06-30">2012 Jun</option>,<option value="2012-07-31">2012 Jul</option>,<option value="2012-08-31">2012 Aug</option>,<option value="2012-09-30">2012 Sep</option>,<option value="2012-10-31">2012 Oct</option>,<option value="2012-11-30">2012 Nov</option>,<option value="2012-12-31">2012 Dec</option>,<option value="2013-01-31">2013 Jan</option>,<option value="2013-02-28">2013 Feb</option>,<option value="2013-03-31">2013 Mar</option>,<option value="2013-04-30">2013 Apr</option>,<option value="2013-05-31">2013 May</option>,<option value="2013-06-30">2013 Jun</option>,<option value="2013-07-31">2013 Jul</option>,<option value="2013-08-31">2013 Aug</option>,<option value="2013-09-30">2013 Sep</option>,<option value="2013-10-31">2013 Oct</option>,<option value="2013-11-30">2013 Nov</option>,<option value="2013-12-31">2013 Dec</option>,<option value="2014-01-31">2014 Jan</option>,<option value="2014-02-28">2014 Feb</option>,<option value="2014-03-31">2014 Mar</option>,<option value="2014-04-30">2014 Apr</option>,<option value="2014-05-31">2014 May</option>,<option value="2014-06-30">2014 Jun</option>,<option value="2014-07-31">2014 Jul</option>,<option value="2014-08-31">2014 Aug</option>,<option value="2014-09-30">2014 Sep</option>,<option value="2014-10-31">2014 Oct</option>,<option value="2014-11-30">2014 Nov</option>,<option value="2014-12-31">2014 Dec</option>,<option value="2015-01-31">2015 Jan</option>,<option value="2015-02-28">2015 Feb</option>,<option value="2015-03-31">2015 Mar</option>,<option value="2015-04-30">2015 Apr</option>,<option value="2015-05-31">2015 May</option>,<option value="2015-06-30">2015 Jun</option>,<option value="2015-07-31">2015 Jul</option>,<option value="2015-08-31">2015 Aug</option>,<option value="2015-09-30">2015 Sep</option>,<option value="2015-10-31">2015 Oct</option>,<option value="2015-11-30">2015 Nov</option>,<option value="2015-12-31">2015 Dec</option>,<option value="2016-01-31">2016 Jan</option>,<option value="2016-02-29">2016 Feb</option>,<option value="2016-03-31">2016 Mar</option>,<option value="2016-04-30">2016 Apr</option>,<option value="2016-05-31">2016 May</option>,<option value="2016-06-30">2016 Jun</option>,<option value="2016-07-31">2016 Jul</option>,<option value="2016-08-31">2016 Aug</option>,<option value="2016-09-30">2016 Sep</option>,<option value="2016-10-31">2016 Oct</option>,<option value="2016-11-30">2016 Nov</option>,<option value="2016-12-31">2016 Dec</option>,<option value="2017-01-31">2017 Jan</option>,<option value="2017-02-28">2017 Feb</option>,<option value="2017-03-31">2017 Mar</option>,<option value="2017-04-30">2017 Apr</option>,<option value="2017-05-31">2017 May</option>,<option value="2017-06-30">2017 Jun</option>,<option value="2017-07-31">2017 Jul</option>,<option value="2017-08-31">2017 Aug</option>,<option value="2017-09-30">2017 Sep</option>,<option value="2017-10-31">2017 Oct</option>,<option value="2017-11-30">2017 Nov</option>,<option value="2017-12-31">2017 Dec</option>,<option value="2018-01-31">2018 Jan</option>,<option value="2018-02-28">2018 Feb</option>,<option value="2018-03-31">2018 Mar</option>,<option value="2018-04-30">2018 Apr</option>,<option value="2018-05-31">2018 May</option>,<option value="2018-06-30">2018 Jun</option>,<option value="2018-07-31">2018 Jul</option>,<option value="2018-08-31">2018 Aug</option>,<option value="2018-09-30">2018 Sep</option>,<option value="2018-10-31">2018 Oct</option>,<option value="2018-11-30">2018 Nov</option>,<option value="2018-12-31">2018 Dec</option>,<option value="2019-01-31">2019 Jan</option>,<option value="2019-02-28">2019 Feb</option>,<option value="2019-03-31">2019 Mar</option>,<option value="2019-04-30">2019 Apr</option>,<option value="2019-05-31">2019 May</option>,<option value="2019-06-30">2019 Jun</option>,<option value="2019-07-31">2019 Jul</option>,<option value="2019-08-31">2019 Aug</option>,<option value="2019-09-30">2019 Sep</option>,<option value="2019-10-31">2019 Oct</option>,<option value="2019-11-30">2019 Nov</option>,<option value="2019-12-31">2019 Dec</option>,<option value="2020-01-31">2020 Jan</option>,<option value="2020-02-29">2020 Feb</option>,<option value="2020-03-31">2020 Mar</option>,<option value="2020-04-30">2020 Apr</option>,<option value="2020-05-31">2020 May</option>,<option value="2020-06-30">2020 Jun</option>,<option value="2020-07-31">2020 Jul</option>,<option value="2020-08-31">2020 Aug</option>,<option value="2020-09-30">2020 Sep</option>,<option value="2020-10-31">2020 Oct</option>,<option value="2020-11-30">2020 Nov</option>,<option value="2020-12-31">2020 Dec</option>,<option value="2021-01-31">2021 Jan</option>,<option value="2021-02-28">2021 Feb</option>,<option value="2021-03-31">2021 Mar</option>,<option value="2021-04-30">2021 Apr</option>,<option value="2021-05-31">2021 May</option>,<option value="2021-06-30">2021 Jun</option>,<option value="2021-07-31">2021 Jul</option>,<option value="2021-08-31">2021 Aug</option>,<option value="2021-09-30">2021 Sep</option>,<option value="2021-10-31">2021 Oct</option>,<option value="2021-11-30">2021 Nov</option>,<option value="2021-12-31">2021 Dec</option>,<option value="2022-01-31">2022 Jan</option>,<option value="2022-02-28">2022 Feb</option>,<option value="2022-03-31">2022 Mar</option>,<option value="2022-04-30">2022 Apr</option>,<option value="2022-05-31">2022 May</option>,<option value="2022-06-30">2022 Jun</option>,<option value="2022-07-31">2022 Jul</option>,<option value="2022-08-31">2022 Aug</option>,<option value="2022-09-30">2022 Sep</option>,<option value="2022-10-31">2022 Oct</option>,<option value="2022-11-30">2022 Nov</option>,<option value="2022-12-31">2022 Dec</option>,<option value="2023-01-31">2023 Jan</option>,<option value="2023-02-28">2023 Feb</option>,<option value="2023-03-31">2023 Mar</option>,<option value="2023-04-30">2023 Apr</option>,<option value="2023-05-31">2023 May</option>,<option value="2023-06-30">2023 Jun</option>,<option value="2023-07-31">2023 Jul</option>,<option value="2023-08-31">2023 Aug</option>,<option value="2023-09-30">2023 Sep</option>,<option value="2023-10-31">2023 Oct</option>,<option value="2023-11-30">2023 Nov</option>,<option value="2023-12-31">2023 Dec</option>,<option value="2024-01-31">2024 Jan</option>,<option value="2024-02-29">2024 Feb</option>,<option value="2024-03-31">2024 Mar</option>,<option value="2024-04-30">2024 Apr</option>,<option value="2024-05-31">2024 May</option>,<option value="2024-06-30">2024 Jun</option>,<option value="2024-07-31">2024 Jul</option>,<option value="2024-08-31">2024 Aug</option>,<option value="2024-09-30">2024 Sep</option>,<option value="2024-10-31">2024 Oct</option>,<option value="2024-11-30">2024 Nov</option>,<option value="2024-12-31">2024 Dec</option>,<option value="2025-01-31">2025 Jan</option>,<option value="2025-02-28">2025 Feb</option>,<option value="2025-03-31">2025 Mar</option>,<option value="2025-04-30">2025 Apr</option>,<option value="2025-05-31">2025 May</option>,<option value="2025-06-30">2025 Jun</option>,<option value="2025-07-31">2025 Jul</option>,<option value="2025-08-31">2025 Aug</option>,<option value="2025-09-30">2025 Sep</option>,<option value="2025-10-31">2025 Oct</option>,<option value="2025-11-30">2025 Nov</option>,<option value="2025-12-31">2025 Dec</option>,<option value="2026-01-31">2026 Jan</option>,<option value="2026-02-28">2026 Feb</option>,<option value="2026-03-31">2026 Mar</option>,<option value="2026-04-30">2026 Apr</option>,<option value="2026-05-31">2026 May</option>,<option value="2026-06-30">2026 Jun</option>,<option value="2026-07-31">2026 Jul</option>,<option value="2026-08-31">2026 Aug</option>,<option value="2026-09-30">2026 Sep</option>,<option value="2026-10-31">2026 Oct</option>,<option value="2026-11-30">2026 Nov</option>,<option value="2026-12-31">2026 Dec</option>,<option value="2027-01-31">2027 Jan</option>,<option value="2027-02-28">2027 Feb</option>,<option value="2027-03-31">2027 Mar</option>,<option value="2027-04-30">2027 Apr</option>,<option value="2027-05-31">2027 May</option>,<option value="2027-06-30">2027 Jun</option>,<option value="2027-07-31">2027 Jul</option>,<option value="2027-08-31">2027 Aug</option>,<option value="2027-09-30">2027 Sep</option>,<option value="2027-10-31">2027 Oct</option>,<option value="2027-11-30">2027 Nov</option>,<option value="2027-12-31">2027 Dec</option>,<option value="2028-01-31">2028 Jan</option>,<option value="2028-02-29">2028 Feb</option>,<option value="2028-03-31">2028 Mar</option>,<option value="2028-04-30">2028 Apr</option>,<option value="2028-05-31">2028 May</option>,<option value="2028-06-30">2028 Jun</option>,<option value="2028-07-31">2028 Jul</option>,<option value="2028-08-31">2028 Aug</option>,<option value="2028-09-30">2028 Sep</option>,<option value="2028-10-31">2028 Oct</option>,<option value="2028-11-30">2028 Nov</option>,<option value="2028-12-31">2028 Dec</option>,<option value="2029-01-31">2029 Jan</option>,<option value="2029-02-28">2029 Feb</option>,<option value="2029-03-31">2029 Mar</option>,<option value="2029-04-30">2029 Apr</option>,<option value="2029-05-31">2029 May</option>,<option value="2029-06-30">2029 Jun</option>,<option value="2029-07-31">2029 Jul</option>,<option value="2029-08-31">2029 Aug</option>,<option value="2029-09-30">2029 Sep</option>,<option value="2029-10-31">2029 Oct</option>,<option value="2029-11-30">2029 Nov</option>,<option value="2029-12-31">2029 Dec</option>,<option value="2030-01-31">2030 Jan</option>,<option value="2030-02-28">2030 Feb</option>,<option value="2030-03-31">2030 Mar</option>,<option value="2030-04-30">2030 Apr</option>,<option value="2030-05-31">2030 May</option>,<option value="2030-06-30">2030 Jun</option>,<option value="2030-07-31">2030 Jul</option>,<option value="2030-08-31">2030 Aug</option>,<option value="2030-09-30">2030 Sep</option>,<option value="2030-10-31">2030 Oct</option>';</script>
-		<script type="text/javascript">
-			var numberOfRows = '${(transactionInstance?.transactionEntries)?transactionInstance?.transactionEntries.size():0}';
-			var lotsForProducts = new Array();
-			var existingProdLots = null;
-			
-			$(document).ready(function() {
-				$("#productSelect").change(function() {
-					addRowForProduct($(this).val());
-					$(this).val('');
-				});
-				
-			});
 
-			function updateRowSpan(prodId, num) {
-				var productLinkCell = $('#addProductCell' + prodId);
-				var productNameCell = $('#prodNameCell' + prodId);
+        <script>
+			/**
+			 * FIXME Mixing javascript and GSP logic is a terrible idea!!!
+			 * Initialize the transaction entry array
+			 */
+	        var transaction = { TransactionEntries: [] };
+	        <g:if test="${transactionInstance?.transactionEntries }">
+	        	<g:set var="index" value="${0 }"/>
+		        <g:set var="transactionMap" value="${transactionInstance?.transactionEntries?.groupBy { it?.inventoryItem?.product?.name } }"/>
+				<g:each in="${transactionMap?.keySet()}" var="key" >
+					<g:set var="transactionEntries" value="${transactionMap?.get(key) }"/>
+					<g:each in="${transactionEntries }" var="transactionEntry" status="status">	        
+						var entry = { 
+							Id: '${transactionEntry?.id}', 
+							Index: ${index++}, 
+							Template: '${(transactionEntry?.inventoryItem?.id)?"#existing-item-template":"#new-item-template"}', 
+							ProductId: '${transactionEntry?.inventoryItem?.product?.id}', 
+							ProductName: '${format.product(obj:transactionEntry?.inventoryItem?.product)}', 
+							InventoryItemId: '${transactionEntry?.inventoryItem?.id}', 
+							LotNumber: '${transactionEntry?.inventoryItem?.lotNumber}', 
+							Qty: '${transactionEntry?.quantity}', 
+							ExpirationMonth: '<g:formatDate date="${transactionEntry?.inventoryItem?.expirationDate}" format="M"/>', 
+							ExpirationYear: '<g:formatDate date="${transactionEntry?.inventoryItem?.expirationDate}" format="yyyy"/>',
+							ExpirationDate: '<g:formatDate date="${transactionEntry?.inventoryItem?.expirationDate}" format="MMM yyyy"/>'
+						};
+						
+						transaction.TransactionEntries.push(entry);
+					</g:each>
+				</g:each>
+			</g:if>
+		</script>
+		<script>
+
+			function selectCombo(comboBoxElem, value) {
+				if (comboBoxElem != null) {
+					if (comboBoxElem.options) { 
+						for (var i = 0; i < comboBoxElem.options.length; i++) {
+				        	if (comboBoxElem.options[i].value == value &&
+				                comboBoxElem.options[i].value != "") { //empty string is for "noSelection handling as "" == 0 in js
+				                comboBoxElem.options[i].selected = true;
+				                break
+				        	}
+						}
+					}
+				}
+			}		
+		
+			function paintStripes(obj) { 
+            	obj.not(":hidden").removeClass("even");
+            	obj.not(":hidden").removeClass("odd");            	
+				obj.not(":hidden").filter(":even").addClass("even");
+				obj.not(":hidden").filter(":odd").addClass("odd");
+            }
+            
+			function changeTransactionType(select) { 
+				var transactionType = select.val();
+				//option:selected
+				if (transactionType == ${org.pih.warehouse.core.Constants.TRANSFER_IN_TRANSACTION_TYPE_ID}) {
+					$("#source\\.id").closest("tr").show();
+					$("#destination\\.id").closest("tr").hide();
+				}
+				else if (transactionType == ${org.pih.warehouse.core.Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID}) {
+					$("#source\\.id").closest("tr").hide();
+					$("#destination\\.id").closest("tr").show();
+				}
+				else {
+					$("#source\\.id").closest("tr").hide();
+					$("#destination\\.id").closest("tr").hide();
+				}						
+				//var stripedList = $(".striped li").not(":hidden");
+								
+				paintStripes($(".striped tr"));
+				//$("#transaction-entries-li").addClass("even");
 				
-				var currSpan = productNameCell.attr('rowspan');
-				productLinkCell.attr('rowspan', currSpan + num);
-				productNameCell.attr('rowspan', currSpan + num);
-				
 			}
-		
-			function removeRow(prodId, lotIndex) {
-				numberOfRows--;
-				$('#prodRow' + prodId + lotIndex).remove();
-				updateRowSpan(prodId, -1);
+
+			// If the transaction exists, remove it from the database
+			function removeItem(index) { 
+				var entry = transaction.TransactionEntries[index];
+				if (entry.Id && entry.Id != 0) { 
+					$.ajax({
+						type: 'POST',
+						url: '/warehouse/json/deleteTransactionEntry',
+						data: 'id='+ entry.Id,
+						cache: false,
+						success: function(){
+							transaction.TransactionEntries.splice(index, 1);
+							renderTable();
+						},
+						error: function (request, status, error) {
+							alert(request.responseText);
+						}
+					});					
+				}
+				// Only remove entry from page-scoped transaction since it's not in the database yet
+				else { 
+					transaction.TransactionEntries.splice(index, 1);
+					renderTable();
+				}
 			}
-		
-			function selectProduct(prodId) {
-				$("#productSelect").val(prodId).change();
-			}
-		
 			
 			
-			function addRowForProduct(prodId) {
-				var prodName = $("#productSelect option:selected").text();
-				var lotIndex = lotsForProducts[prodId];
-				if (lotIndex == null) {
-					lotIndex = 1;
-				}
-				else {
-					lotIndex = lotIndex + 1;
-				}
-				lotsForProducts[prodId] = lotIndex;
-		
-		
-				var productField = $('<input>')
-					.attr('type', 'hidden')
-					.attr('value', prodId)								
-					.attr('name', 'transactionEntries[' + numberOfRows + '].product.id');
-					
-				var quantityField = $("<input/>", { type: "hidden", size: "3", name: 'transactionEntries[' + numberOfRows + '].quantity' });					
-				var lotNumberField = $("<input/>", { type: "text", size: "10", 
-					id: 'transactionEntries[' + numberOfRows + '].lotNumber', name: 'transactionEntries[' + numberOfRows + '].lotNumber' });
-					
-				//var $quantityField = $('<input>')
-				//	.attr('type', 'text')
-				//	.attr('size','3')
-				//	.attr('name',);
-					
-				//var $lotNumberField = $('<input>')
-				//	.attr('type', 'text')
-				//	.attr('size','10')
-				//	.attr('id', 'transactionEntries[' + numberOfRows + '].lotNumber')
-				//	.attr('name','transactionEntries[' + numberOfRows + '].lotNumber');
-					
-				var expiryField = $('<select name="transactionEntries[' + numberOfRows + '].expirationDate">' + monthsYears + '</select>');
-				
-				newRow = $('<tr id="prodRow' + prodId + lotIndex + '" class="prodRow' + prodId + '">');
-				
-				
-				
-				if (lotIndex == 1) {
-					var addIcon = $('<img>').attr('src', '/warehouse/images/icons/silk/add.png');
-					
-					productNameCell = $('<td id="prodNameCell' + prodId + '" class="prodNameCell">')
-						.attr('valign','top').attr('rowspan','1')																
-						.html(prodName);								
-				
-					var addProductLink = $('<a href="javascript:selectProduct(' + prodId + ');">').html(addIcon);								
-					addProductCell = $('<td id="addProductCell' + prodId + '" class="addProductCell">')
-						.attr('valign','top')
-						.attr('rowspan','1')									
-						.html(addProductLink);
-					
-					newRow.append(addProductCell);
-					newRow.append(productNameCell);
-				}
-				updateRowSpan(prodId, 1);
-				
-				
-				var removeIcon = $('<img>').attr('src', '/warehouse/images/icons/silk/cross.png');
-				
-				newRow.append( $('<td>').append(quantityField).append(productField) );
-				newRow.append( $('<td>').append(lotNumberField) );
-				newRow.append( $('<td>').append(expiryField) );
-				
-				//$newRow.append($('<td>').text(''));
-				
-		
-				if (lotIndex > 1) {
-					$newRow.append(
-					$('<td>').append(
-						$('<a href="javascript:removeRow(' + prodId + ', ' + lotIndex + ');">').html(removeIcon)));									
-				}
-				else {
-					newRow.append($('<td>').text(''));
-				}
-				
-				if (lotIndex == 1) {
-					$('#prodSelectRow').before(newRow);
-				}
-				else {
-					$('.prodRow' + prodId).last().after(newRow);
-				}
-				
-				if (existingProdLots != null && existingProdLots[prodId].length > 0) {
-					textField.autocomplete(existingProdLots[prodId],{
-						minChars: 0,
-						width: 600,
-						scroll: true,
-						matchContains: true,
-						autoFill: false,
-						max: 1000,
-						formatItem: function(row, i, max) { return row.label; },
-						formatMatch: function(row, i, max) { return row.label; },
-						formatResult: function(row) { return row.label; }
-					});
-					lotNumberField.blur(function() {
-						lotNumberField.removeAttr('autocomplete');
-					});
-					lotNumberField.focus(function() {
-						lotNumberField.attr('autocomplete', 'off');
-					});
-					lotNumberField.result(function(event, data, formatted) {
-						expiryField.val(lotExpOptions[data.code]);
-					});
-				}		
-				numberOfRows++;
+			function addNewItem(productId) { 
+				$.getJSON('/warehouse/json/findProduct', {id: productId}, function(data) {
+    				var index = transaction.TransactionEntries.length;
+	    			var entry = { Id: '0', Index: index, ProductId: data.product.id, Template: '#new-item-template', ProductName: data.product.name, LotNumber: '', ExpirationDate: '', ExpirationMonth: '', ExpirationYear: '', Qty: 0 };
+					transaction.TransactionEntries.push(entry);	    			
+					renderTable();
+				}); 
 			}
+
+			
+
+			function addExistingItem(productId, lotNumber) {
+				//alert("add existing item with product: " + product + ", lotNumber: " + lotNumber); 
+				$.getJSON('/warehouse/json/findInventoryItem', {productId: productId, lotNumber: lotNumber}, function(data) {
+    				var index = transaction.TransactionEntries.length;
+	    			var entry = { Id: '0', Index: index, ProductId: data.product.id, Template: '#existing-item-template', InventoryItemId: data.inventoryItem.id, ProductName: data.product.name, LotNumber: data.inventoryItem.lotNumber, ExpirationDate: data.inventoryItem.expirationDate, ExpirationMonth: '', ExpirationYear: '', Qty: 0 };
+	    			// for some reason, the following "exists" check does not work
+					//if (!$.inArray(entry, transaction.TransactionEntries)) { 	    			
+						transaction.TransactionEntries.push(entry);	    			
+					//}
+					renderTable();
+				}); 				
+			}
+
+			function format(o, t) {
+			    return $.format(o, t);
+			}
+
+			/**
+			 * Clear the given field
+			 */
+			function clear(field) { 
+		    	field.removeClass("fade"); 
+		    	field.val(''); 
+			}					
+			
+			function renderTable() { 
+				// Need to remove all existing rows before re-rendering table 
+				$("#transaction-entries-table > tbody tr").remove();
+				if (transaction.TransactionEntries.length > 0) { 
+					//$("#transaction-entries-table > tbody tr.empty").hide();	
+					$.each(transaction.TransactionEntries, function(index, value) { 
+						value.Index = index;
+						$(value.Template).tmpl(value).appendTo('#transaction-entries-table > tbody');	
+					});
+
+					// Select all months 
+					var expirationMonths = $(":input[id^=expirationDate][id$=month]");
+					$.each(expirationMonths, function(index, select) { 
+						//var index = select.parent().prev().children(".index").val();
+						var month = transaction.TransactionEntries[index].ExpirationMonth;
+						selectCombo(select, month);
+					});					
+
+					// Select all years 
+					var expirationYears = $(":input[id^=expirationDate][id$=year]");
+					$.each(expirationYears, function(index, select) { 
+						//var index = select.parent().prev().children(".index").val();
+						var year = transaction.TransactionEntries[index].ExpirationYear;
+						selectCombo(select, year);						
+					});
+					paintStripes($("#transaction-entries-table > tbody tr"));  
+				} 			
+			}			
+
+
+					
 		</script>
 
+		<script>
+	    	$(document).ready(function() {
 
+/* ------------------------------	Initialization ------------------------------ */
+
+	    		$('#product-details').hide();		    	
+
+				// Initialize table with the transaction entries from the server 
+		    	renderTable();
+
+		    	// Initialize the transaction type selector
+		    	changeTransactionType($("#transactionType\\.id"));
+		    	
+		    	// Initialize the product search autocomplete
+				$('#productSearch').addClass("fade");
+		    	
+		    	
+/* --------------------	Transaction Type Switcher Handler	----------------------- */
+		    			    	
+		    	/**
+		    	 * On change of transaction type, initialize the fields 
+		    	 * to display.
+		    	 */
+				$("#transactionType\\.id").change(function(){
+					changeTransactionType($(this));					
+				});
+				
+/* --------------------	Delete Item Handler	----------------------- */
+
+	    		/**
+	    		 * On click of delete-product button, remove entire product row.
+	    		 */
+	    		$(".delete-item").livequery(function(){
+					$(this).click(function(event) {					
+						removeItem($(this).val());
+					});
+			    });
+
+/* --------------------	Lot Number Save Handler	----------------------- */
+
+	    		/**
+	    		 * On click of delete-product button, remove entire product row.
+	    		 */
+	    		$(".lotNumber").livequery(function(){
+					$(this).change(function(event) {					
+						var index = $(this).parent().children(".index").val();
+						transaction.TransactionEntries[index].LotNumber = $(this).val();						
+					});
+			    });
+
+/* --------------------	Expiration Date Save Handler	----------------------- */
+
+	    		/**
+	    		 * On click of delete-product button, remove entire product row.
+	    		 */
+				
+	    		$(":input[id^=expirationDate][id$=month]").livequery(function(){
+					$(this).change(function(event) {
+						var index = $(this).parent().prev().children(".index").val();
+						var month = $(this).val();
+						transaction.TransactionEntries[index].ExpirationMonth = month;
+					});
+			    });
+
+
+	    		/**
+	    		 * On click of delete-product button, remove entire product row.
+	    		 */
+	    		$(":input[id^=expirationDate][id$=year]").livequery(function(){
+					$(this).change(function(event) {
+						var index = $(this).parent().prev().children(".index").val();
+						var year = $(this).val();
+						transaction.TransactionEntries[index].ExpirationYear = year;
+					});
+			    });
+
+
+
+
+/* --------------------	Quantity Save Handler	----------------------- */
+
+	    		/**
+	    		 * On click of delete-product button, remove entire product row.
+	    		 */
+	    		$(".quantity").livequery(function(){
+					$(this).change(function(event) {					
+						var index = $(this).parent().children(".index").val();
+						transaction.TransactionEntries[index].Quantity = $(this).val();						
+					});
+			    });
+
+
+
+/* --------------------	Product Search Handler	----------------------- */
+
+				/**
+				 * When product search becomes focus, we remove fade, reset values
+				 */
+		    	$('#productSearch').focus(function() { 
+			    	clear($(this));
+			    	//$("#product-details").hide();
+					//$("#productId").val('');
+					//$("#productName").val('');			    				    	
+			    });
+
+			    
+		    	//$("#productSearch").blur(function() { 
+				//	$(this).addClass("fade");
+			    //	$(this).val('Find another product to add'); 
+			    //});		    	
+
+
+	    		/**
+	    		 * Suppress the submit action when the ENTER key is pressed during a product search.
+	    		 * In addition, we want to trigger a CLICK event on the addProduct button.
+	    		 */
+	    		$("#productSearch").keypress(function (event) {
+	    			if (event.keyCode == 13) {
+	    			    event.preventDefault();
+	    			    //$("#addProduct").trigger("click");
+	    			}
+	    		});   		
+	    		
+	    		/**
+	    		 * Bind autocomplete widget to the product search field.
+	    		 */
+	    		$('#productSearch').autocomplete( {
+		    		//selectFirst: true,
+					minLength: 2,
+					delay: 100,
+    				source: function(request, response) {
+    					var currentWarehouseId = $("#currentWarehouseId").val();
+    					$.getJSON('/warehouse/json/findProductByName', { term: request.term, warehouseId: currentWarehouseId }, function(data, status, xhr) {
+    						var items = [];
+    						$.each(data, function(i, item) { items.push(item); });
+    						response(items);
+    					});
+    				},
+    				focus: function( event, ui ) {
+    					$(this).val( ui.item.label );	// in order to prevent ID from being displayed in widget
+    					return false;
+    				},
+    				select: function(event, ui) {
+    					$('#productSearch').blur();
+    					
+    					// in order to prevent ID from being displayed in widget
+    					$(this).val( ui.item.label ); 	
+        				
+        				// Show product details
+        				$('#product-details').show();
+    		    		$("#hiddenProductId").val(ui.item.product.id);
+        				$("#hiddenProductName").val(ui.item.product.name);
+        				$("#product-details-id").html(ui.item.product.id);
+    					$("#product-details-name").html(ui.item.product.name);
+        				$("#product-details-manufacturer").html(ui.item.product.manufacturer);
+
+    					// Reset product search
+    					$('#productSearch').addClass("fade");					
+    		    		$('#productSearch').val("Search products ...");    					
+
+    		    		// Show product display DIV
+						$('#product-details').slideDown("fast");
+    		    		//$("#addProduct").focus();
+
+
+    		    		// Clear table and add inventory items     		    		
+    		    		$('#product-details-lotNumbers > tbody tr').remove();
+    		    		
+    		    		if (ui.item.inventoryItems) { 
+        		    		$('#product-details-lotNumbers').show();
+        		    		$.each(ui.item.inventoryItems, function(index, value) { 
+	    		    			var lotNumber = value.lotNumber || "<span class='fade'>EMPTY</span>";
+	    		    			var expirationDate = value.expirationDate;
+	    		    				    		    			
+	    		    			var existingLotNumber = 
+		    		    			"<tr>" + 
+		    		    			"<td><button onClick=\"addExistingItem('" + ui.item.product.id + "','" + value.lotNumber + "');\"><img src=\"${resource(dir: 'images/icons/silk', file: 'add.png')}\" style=\"vertical-align: middle;\"/></button></td>" + 
+		    		    			"<td>" + lotNumber + "</td>" + 
+	    		    				"<td>" + value.expirationDate + "</td>" + 
+	    		    				"<td>" + value.quantity + "</td>" + 
+	    		    				"<td></td>" + 
+	    		    				"</tr>";
+		    		    		
+								$("#product-details-lotNumbers > tbody:last").append($(existingLotNumber));	        		    		
+							});
+
+    		    			var newLotNumber = 
+	    		    			"<tr class=\"prop\">" + 
+	    		    			"<td><button onClick=\"addNewItem('" + ui.item.product.id + "');\"><img src=\"${resource(dir: 'images/icons/silk', file: 'add.png')}\" style=\"vertical-align: middle;\"/></button></td>" + 
+	    		    			"<td colspan=\"3\">Add a new lot/serial number?</td>" + 
+    		    				"<td></td>" + 
+    		    				"</tr>";
+							$("#product-details-lotNumbers > tbody:first").append($(newLotNumber));	        		    		
+	    		    		
+							
+    		    		}
+    		    		else { 
+        		    		$('#product-details-lotNumbers').hide();
+        		    	}
+    		    		
+    					return false;
+    				}
+    				
+	    		});
+
+
+	    		/**
+	    		 * Bind autocomplete widget to the all .lotNumber input fields.  
+	    		 * The livequery feature allows us to bind the autocomplete 
+	    		 * widget to all lot number fields (including those created after
+	    	     * the onload event has completed.
+	    		 */
+	    		 /*
+				$(".lotNumber").livequery(function() {
+					// For some reason, we have to get the product ID outside of the autocomplete.
+					var productId = $(this).parent().children(".productId").val();
+					$(this).autocomplete( {
+						delay: 100,
+						minLength: 2,
+	    				source: function(request, response) {	    				
+	    					// Pass productId and search term to the server
+	    					$.getJSON('/warehouse/json/findLotsByName', {term: request.term, productId: productId}, function(data) {
+	    						var items = [];
+	    						$.each(data, function(i, item) { items.push(item); });
+	    						response(items);
+	    					});
+	    				},
+	    				select: function(event, ui) {
+		    				//$(this).parent().find('.lotNumber').val(ui.item.lotNumber);
+		    				$(this).val(ui.item.lotNumber)
+		    				return false;
+		    				//$(this).parent().siblings().find()
+	    				},
+	    				focus: function(event, ui) { 
+	    					$(this).val( ui.item.label );	// in order to prevent ID from being displayed in widget
+	    					return false;		    				
+		    			},
+	    				change: function(event, ui) { 
+							// Allows user to enter a new lot number value
+							var value = $(this).attr('value');
+							$(this).parent().find('.hiddenLotNumber').val(value);
+							return false;
+		    			}	    				
+		    		});
+
+		    		$(this).keypress(function (event) {
+		    			if (event.keyCode == 13) {
+		    			    event.preventDefault();
+		    			}
+		    		});   
+				});
+	    		*/	    		
+		    	
+	    	});
+        </script>
+
+        <script id="existing-item-template" type="x-jquery-tmpl">						
+			<tr id="row-{{= Index }}">
+				<td>
+					<span class="fade">{{= Index }}</span>
+				</td>
+				<td>
+					<!-- Product ID: {{= ProductId}} --> 
+					
+					{{= ProductName}} 
+					
+					<!-- Supported for backwards compatibility -->
+					<g:hiddenField name="transactionEntries[{{= Index}}].product.id" value="{{= ProductId}}"/>
+					<g:hiddenField name="transactionEntries[{{= Index}}].lotNumber" value="{{= LotNumber}}"/>
+				</td>
+				<td>
+					<!-- Inventory Item ID: {{= InventoryItemId}} --> 
+					
+					{{= LotNumber}}
+					<g:hiddenField class="index" name="index" value="{{= Index}}"/>
+					<g:hiddenField class="lotNumber" name="transactionEntries[{{= Index}}].inventoryItem.lotNumber" size="15" value="{{= LotNumber}}"/>
+					<g:hiddenField class="productId" name="transactionEntries[{{= Index}}].inventoryItem.product.id" value="{{= ProductId}}"/>
+					<g:hiddenField class="inventoryItemId" name="transactionEntries[{{= Index}}].inventoryItem.id" value="{{= InventoryItemId}}"/>
+				</td>
+				<td nowrap="true">
+				
+					
+					{{if ExpirationDate}}
+						{{= ExpirationDate}}
+					{{else}}
+						never
+					{{/if}}	
+					
+							
+					<!-- Needed in order to keep the order of date field indexes in sync with transaction entry index (see renderTable() method). -->
+					<input type="hidden" id="expirationDate[{{= Index}}]_month" name="transactionEntries[{{= Index}}].inventoryItem.expirationDate_month"/>
+					<input type="hidden" id="expirationDate[{{= Index}}]_year" name="transactionEntries[{{= Index}}].inventoryItem.expirationDate_year"/>
+				</td>
+				<td>
+					<g:textField class="quantity" name="transactionEntries[{{= Index}}].quantity" value="{{= Qty}}" size="3"/>
+				</td>
+				<td nowrap="nowrap">
+					<g:hiddenField id="product.id" name="product.id" value="{{= ProductId}}"/>
+					<g:hiddenField id="productName" name="productName" value="{{= ProductName}}"/>
+					<button type="button" class="delete-item" value="{{= Index}}">
+						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png')}"/>
+					</button>					
+				</td>
+			</tr>        
+		</script>
+		
+        <script id="new-item-template" type="x-jquery-tmpl">						
+			<tr id="row-{{= Index }}">
+				<td>
+					<span class="fade">{{= Index }}</span>
+				</td>
+				<td>
+					<!-- Product ID: {{= ProductId}}  -->
+					{{= ProductName}} 
+					
+					<!-- Supported for backwards compatibility -->
+					<g:hiddenField name="transactionEntries[{{= Index}}].product.id" value="{{= ProductId}}"/>
+					<g:hiddenField name="transactionEntries[{{= Index}}].lotNumber" value="{{= LotNumber}}"/>
+					
+				</td>
+				<td>
+					<!-- Inventory ID: {{= InventoryItemId}} -->
+					<g:hiddenField class="index" name="index" value="{{= Index}}"/>
+					<g:textField class="lotNumber" name="transactionEntries[{{= Index}}].inventoryItem.lotNumber" size="15" value="{{= LotNumber}}"/>
+					<g:hiddenField class="productId" name="transactionEntries[{{= Index}}].inventoryItem.product.id" value="{{= ProductId}}"/>
+					<g:hiddenField class="inventoryItemId" name="transactionEntries[{{= Index}}].inventoryItem.id" value="{{= InventoryItemId}}"/>
+				</td>
+				<td nowrap="true">
+					<g:datePicker id="expirationDate[{{= Index}}]" name="transactionEntries[{{= Index}}].inventoryItem.expirationDate" precision="month" default="none" noSelection="['':'']"
+						years="${(1900 + (new Date().year))..(1900+ (new Date() + (50 * 365)).year)}"/>					
+				</td>
+				<td>
+					<g:textField class="quantity" name="transactionEntries[{{= Index}}].quantity" value="{{= Qty}}" size="3"/>
+				</td>
+				<td nowrap="nowrap">
+					<button type="button" class="delete-item" value="{{= Index}}">
+						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png')}"/>
+					</button>					
+				</td>
+			</tr>        
+		</script>        
+        
+       		
+		
     </body>
 </html>

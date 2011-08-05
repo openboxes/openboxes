@@ -5,7 +5,7 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'transaction.label', default: 'Transaction')}" />
         
-        <title>Transactions for inventory at ${session.warehouse.name}</title>    
+        <title><warehouse:message code="transaction.list.label"/></title>    
     </head>    
 
 	<body>
@@ -19,13 +19,13 @@
 				<table>
                     <thead>
                         <tr>   
-							<th>Actions</th>
-							<th>Date</th>
-							<th>Type</th>
-							<th>Inventory</th>
-							<th>Source</th>
-							<th>Destination</th>
-							<th>Entries</th>
+							<th><warehouse:message code="default.actions.label"/></th>
+							<th><warehouse:message code="default.date.label"/></th>
+							<th><warehouse:message code="transaction.type.label"/></th>
+							<th><warehouse:message code="inventory.label"/></th>
+							<th><warehouse:message code="default.source.label"/></th>
+							<th><warehouse:message code="default.destination.label"/></th>
+							<th><warehouse:message code="transaction.entries.label"/></th>
                         </tr>
                     </thead>
        	           	<tbody>			
@@ -43,10 +43,10 @@
 											<div class="actions">
 												<div class="action-menu-item">
 													<g:link action="showTransaction" id="${transactionInstance?.id }">
-														<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}" style="vertical-align: middle;"/>&nbsp;View transaction details
+														<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}" style="vertical-align: middle;"/>&nbsp;<warehouse:message code="transaction.view.label"/>
 													</g:link>
 													<g:link action="editTransaction" id="${transactionInstance?.id }">
-														<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" style="vertical-align: middle;"/>&nbsp;Edit transaction details
+														<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" style="vertical-align: middle;"/>&nbsp;<warehouse:message code="transaction.edit.label"/>
 													</g:link>
 													
 												</div>
@@ -68,7 +68,7 @@
 								</td>
 								<td>
 									<span class="${transactionInstance?.transactionType?.transactionCode?.name()?.toLowerCase()}">
-										${transactionInstance?.transactionType?.name }
+										<format:metadata obj="${transactionInstance?.transactionType}"/>
 									</span>
 								</td>
 								<td>
