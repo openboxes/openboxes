@@ -27,7 +27,7 @@
 			</li>
 			<li>
 				<span class="menuButton">
-					<g:link controller="inventory" action="createTransaction"><warehouse:message code="transaction.add.label"/></g:link> 				
+					<g:link controller="inventory" action="editTransaction"><warehouse:message code="transaction.add.label"/></g:link> 				
 				</span>			
 			</li>
 			<li>

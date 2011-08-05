@@ -8,7 +8,7 @@
 		        <warehouse:message code="default.edit.label" args="[entityName.toLowerCase()]" />  
 	    	</g:if>
 	    	<g:else>
-		        <warehouse:message code="default.create.label" args="[entityName.toLowerCase()]" />    
+		        <warehouse:message code="default.add.label" args="[entityName.toLowerCase()]" />    
 			</g:else>    	    
 		</title>
         <style>
@@ -167,7 +167,7 @@
 													<tr class="odd">
 														<th></th>
 														<th style="width: 60%"><warehouse:message code="product.label"/></th>
-														<th nowrap="true"><warehouse:message code="poduct.lotNumber.label"/></th>
+														<th nowrap="true"><warehouse:message code="product.lotNumber.label"/></th>
 														<th nowrap="true"><warehouse:message code="default.expires.label"/></th>
 														<th><warehouse:message code="default.qty.label"/></th>
 														<th><warehouse:message code="default.actions.label"/></th>
@@ -273,7 +273,7 @@
 							Index: ${index++}, 
 							Template: '${(transactionEntry?.inventoryItem?.id)?"#existing-item-template":"#new-item-template"}', 
 							ProductId: '${transactionEntry?.inventoryItem?.product?.id}', 
-							ProductName: '${format.product(obj:transactionEntry?.inventoryItem?.product)}', 
+							ProductName: '${format.product(product:transactionEntry?.inventoryItem?.product)}', 
 							InventoryItemId: '${transactionEntry?.inventoryItem?.id}', 
 							LotNumber: '${transactionEntry?.inventoryItem?.lotNumber}', 
 							Qty: '${transactionEntry?.quantity}', 
@@ -598,7 +598,7 @@
     		    		if (ui.item.inventoryItems) { 
         		    		$('#product-details-lotNumbers').show();
         		    		$.each(ui.item.inventoryItems, function(index, value) { 
-	    		    			var lotNumber = value.lotNumber || "<span class='fade'>EMPTY</span>";
+	    		    			var lotNumber = value.lotNumber || "<span class='fade'><warehouse:message code="default.empty.label"/></span>";
 	    		    			var expirationDate = value.expirationDate;
 	    		    				    		    			
 	    		    			var existingLotNumber = 
@@ -616,7 +616,7 @@
     		    			var newLotNumber = 
 	    		    			"<tr class=\"prop\">" + 
 	    		    			"<td><button onClick=\"addNewItem('" + ui.item.product.id + "');\"><img src=\"${resource(dir: 'images/icons/silk', file: 'add.png')}\" style=\"vertical-align: middle;\"/></button></td>" + 
-	    		    			"<td colspan=\"3\">Add a new lot/serial number?</td>" + 
+	    		    			"<td colspan=\"3\"><warehouse:message code="transaction.addNewLotSerialNumber.label"/></td>" + 
     		    				"<td></td>" + 
     		    				"</tr>";
 							$("#product-details-lotNumbers > tbody:first").append($(newLotNumber));	        		    		
