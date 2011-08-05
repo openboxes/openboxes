@@ -34,9 +34,9 @@
 			</g:link>				
 		</div>
 	</g:if>
-</div>
-<div>
-	<h2><warehouse:message code="documents.label"/></h2>
+	<div class="action-menu-item">
+		<hr/>
+	</div>
 	<g:each in="${shipmentInstance.documents}" var="document" status="j">
 		<div class="action-menu-item">
 			<g:link controller="document" action="download" id="${document.id}">
@@ -53,7 +53,7 @@
 	<div class="action-menu-item">														
 		<g:link controller="doc4j" action="downloadLetter" id="${shipmentInstance?.id }">													
 			<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_word.png')}"
-				alt="View Packing List" style="vertical-align: middle"/>&nbsp;<warehouse:message code="shipping.downloadCertificateOfDonation.label"/> (.docx)
+				alt="Download Certificate of Donation" style="vertical-align: middle"/>&nbsp;<warehouse:message code="shipping.downloadCertificateOfDonation.label"/> (.docx)
 		</g:link> 
 	</div>
 	<div class="action-menu-item">														

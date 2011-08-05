@@ -6,14 +6,19 @@ import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Document;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
+import org.pih.warehouse.inventory.InventoryItem;
+import org.pih.warehouse.inventory.Warehouse;
 import org.pih.warehouse.shipping.DocumentCommand;
 import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.shipping.ShipmentItem;
 
 class RequestController {
 	
+	
 	def requestService
-    static allowedMethods = [save: "POST", update: "POST"]
+    def inventoryService
+	
+	static allowedMethods = [save: "POST", update: "POST"]
 
     def index = {
         redirect(action: "list", params: params)
@@ -362,6 +367,17 @@ class RequestController {
 		//render(view: "receive", model: [requestCommand: requestCommand])
 		redirect(action: "receive")
 	}
+	
+	def showPicklist = { 
+		def requestInstance = Request.get(params.id)
+		if (!requestInstance) {
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
+			redirect(action: "list")
+		}
+		else {
+			return [requestInstance: requestInstance]
+		}
+	}
 		
 
 	def fulfill = {
@@ -374,6 +390,30 @@ class RequestController {
 			return [requestInstance: requestInstance]
 		}
 	}
+	
+	
+	def fulfillItem = {
+		log.info "fulfillItem " + params
+		
+		def inventoryItems = [:] 
+		def requestItem = RequestItem.get(params.id)
+		if (!requestItem) {
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
+		}
+		else {
+			def warehouse = Warehouse.get(session.warehouse.id);
+			if (warehouse.inventory) { 
+				inventoryItems =
+					inventoryService.getQuantityByInventoryAndProduct(warehouse.inventory, requestItem.product);				
+			}
+			else { 
+				throw new RuntimeException("Warehouse does not have an associated inventory")
+			}
+		}
+		return [requestItem: requestItem, inventoryItems: inventoryItems]
+	}
+	
+
 
 		
 	def addRequestItemToShipment = { 

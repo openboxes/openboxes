@@ -73,7 +73,7 @@
 							    	<tfoot>
 								    	<tr style="border-top: 1px solid lightgrey">
 								    		<th style="text-align: right;"><warehouse:message code="shipping.total.label"/></td>							    		
-								    		<th style="text-align: center;"><g:link controller="order" action="list" params="">${incomingOrders.size()}</g:link></td>
+								    		<th style="text-align: center;"><g:link controller="order" action="list" params="">${incomingOrders?.values()?.flatten()?.size()}</g:link></td>
 								    	</tr>
 							    	</tfoot>
 						    	</table>

@@ -3,6 +3,7 @@ package org.pih.warehouse.inventory;
 import java.text.SimpleDateFormat;
 
 import org.pih.warehouse.shipping.ShipmentStatusCode;
+import org.pih.warehouse.util.DateUtil;
 import org.pih.warehouse.core.Constants;
 import org.pih.warehouse.core.Location 
 import org.pih.warehouse.core.User;
@@ -342,29 +343,20 @@ class InventoryController {
 	}
 	
 	def listDailyTransactions = { 
-
-		def date = (params.date) ?: new Date();
-		def dateFormat = new SimpleDateFormat(Constants.DEFAULT_DATE_FORMAT);		
-		def transactionsByDate = Transaction.list().groupBy { it.transactionDate } 
-		def transactions = Transaction.findAllByTransactionDate(date);
-		log.info("params.date " + params.date)
+		def dateFormat = new SimpleDateFormat(Constants.DEFAULT_DATE_FORMAT);
+		def dateSelected = (params.date) ? dateFormat.parse(params.date) : new Date();
 		
-		[ transactions: transactions, transactionsByDate: transactionsByDate ]
-		/*
-		def currentInventory = Inventory.list().find( {it.warehouse.id == session.warehouse.id} )
+		def transactionsByDate = Transaction.list().groupBy { DateUtil.clearTime(it?.transactionDate) }?.entrySet()?.sort{ it.key }?.reverse()
 		
-		// we are only showing transactions for the inventory associated with the current warehouse
-		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-		params.sort = params?.sort ?: "transactionDate"
-		params.order = params?.order ?: "desc"
-		def transactions = Transaction.findAllByInventory(currentInventory, params);
-		def transactionCount = Transaction.countByInventory(currentInventory);
-		*/
+		def transactions = Transaction.findAllByTransactionDate(dateSelected);
 		
+		[ transactions: transactions, transactionsByDate: transactionsByDate, dateSelected: dateSelected ]
 	}
 	
 	def listExpiringStock = { 
 		def today = new Date();
+		
+		def excludeExpired = params.excludeExpired as Boolean
 		
 		// Stock that has already expired
 		def expiredStock = InventoryItem.findAllByExpirationDateLessThan(today, [sort: 'expirationDate', order: 'desc']);
@@ -372,11 +364,36 @@ class InventoryController {
 		// Stock expiring within the next 365 days
 		def expiringStock = InventoryItem.findAllByExpirationDateBetween(today+1, today+180, [sort: 'expirationDate', order: 'asc']);
 		
+		// Get the set of categories BEFORE we filter		
+		def categories = [] as Set
+		categories.addAll(expiredStock.collect { it.product.category })
+		categories.addAll(expiringStock.collect { it.product.category })
+		log.info "categories: " + categories
+
+		
+		// poor man's filter
+		def categorySelected = (params.category) ? Category.get(params.category as int) : null;
+		log.info "categorySelected: " + categorySelected
+		if (categorySelected) { 
+			expiredStock = expiredStock.findAll { item -> item?.product?.category == categorySelected } 
+			expiringStock = expiringStock.findAll { item -> item?.product?.category == categorySelected }
+		}
+		
+		// filter by threshhold
+		def threshholdSelected = (params.threshhold) ? params.threshhold as int : 0;
+		log.info "threshholdSelected: " + threshholdSelected
+		if (threshholdSelected) { 
+			expiredStock = expiredStock.findAll { item -> (item?.expirationDate - today) < threshholdSelected }
+			expiringStock = expiringStock.findAll { item -> (item?.expirationDate - today) <= threshholdSelected }
+		}
+		
 		def warehouse = Warehouse.get(session.warehouse.id)		
 		def quantityMap = inventoryService.getQuantityForInventory(warehouse.inventory)
 		
 		
-		[expiredStock : expiredStock, expiringStock: expiringStock, quantityMap: quantityMap]
+		
+		[expiredStock : expiredStock, expiringStock: expiringStock, quantityMap: quantityMap, categories : categories, 
+			categorySelected: categorySelected, threshholdSelected: threshholdSelected, excludeExpired: excludeExpired]
 	}
 	
 	

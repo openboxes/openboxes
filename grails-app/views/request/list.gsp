@@ -12,21 +12,12 @@
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
-            <div class="list">
-
-
-				<div id="mymenu">
-					<g:include controller="request" action="menu"></g:include>
-				</div>
-				
+            <div class="list">				
 				<div id="outgoingRequests" class="list">            
 	           		<h3><warehouse:message code="request.requestsPlacedWithYou.message"/> (${session.warehouse?.name })</h3>
 					<g:render template="list" model="[requestInstanceList:outgoingRequests,requestType:'outgoing']"/>
-				</div>
-				
+				</div>				
 				<br/>
-				
-				
 				<div id="incomingRequests" class="list">            
 	            	<h3><warehouse:message code="request.requestsPlacedByYou.message"/> (${session.warehouse?.name })</h3>
 					<g:render template="list" model="[requestInstanceList:incomingRequests,requestType:'incoming']"/>

@@ -19,10 +19,10 @@ class RequestItemCommand  implements Serializable {
 	Shipment shipment
 	ShipmentItem shipmentItem
 	
-	// from order item
+	// from request item
 	String type
 	String description
-	Integer quantityOrdered
+	Integer quantityRequested
 	
 	// for shipment item
 	String lotNumber

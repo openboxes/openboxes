@@ -27,10 +27,11 @@ class Request implements Serializable {
 	Date lastUpdated
 
 	
-	static hasMany = [ requestItems : RequestItem, comments : Comment, documents : Document, events : Event ]
+	static hasMany = [ requestItems : RequestItem, fulfillItems: RequestItem, comments : Comment, documents : Document, events : Event ]
 	static mapping = {
 		table "`request`"
 		requestItems cascade: "all-delete-orphan"
+		fulfillItems cascade: "all-delete-orphan"
 		comments cascade: "all-delete-orphan"
 		documents cascade: "all-delete-orphan"
 		events cascade: "all-delete-orphan"

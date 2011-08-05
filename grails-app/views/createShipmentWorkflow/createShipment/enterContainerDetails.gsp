@@ -110,7 +110,6 @@
 										 	</td>
 										</tr>
 										<tr class="${count++%2==0?'odd':'even' }">
-											<th><warehouse:message code="default.items.label"/></th>
 											<th><warehouse:message code="container.label"/></th>
 										</tr>
 									</thead>
@@ -118,12 +117,9 @@
 										
 										<tr class="${count++%2==0?'odd':'even' }">
 											<g:set var="styleClass" value="${selectedContainer == null ? 'selected' : 'not-selected' }"/>
-											<td>
-												
-											</td>
 											<td class="droppable">
 												<span class="${styleClass}">
-													<g:link action="createShipment" event="enterContainerDetails" style="display: block;"><warehouse:message code="shipping.unpackedItems.label"/></g:link>
+													<g:link action="createShipment" event="enterContainerDetails"><warehouse:message code="shipping.unpackedItems.label"/></g:link>
 												</span>
 											</td>
 										</tr>										
@@ -131,11 +127,6 @@
 											<g:each var="containerInstance" in="${shipmentInstance?.containers?.findAll({!it.parentContainer})?.sort()}">
 												<g:set var="styleClass" value="${containerInstance?.id == selectedContainer?.id ? 'selected' : 'not-selected' }"/>
 												<tr style="border: 0px solid lightgrey;" class="${count++%2==0?'odd':'even' }">
-													<td width="5%">
-														<span class="fade">
-															${containerInstance?.shipmentItems?.size() }
-														</span>
-													</td>
 													<td style="vertical-align: middle;" id="${containerInstance?.id }" class="droppable">													
 														<a name="container-${containerInstance.id }"></a>
 														<div>
@@ -145,10 +136,13 @@
 																</g:if>
 																<g:else>
 																	<%-- fragment="container-${containerInstance?.id }"  --%>
-																	<g:link action="createShipment" event="enterContainerDetails" params="['containerId':containerInstance?.id]" style="display: block;">
+																	<g:link action="createShipment" event="enterContainerDetails" params="['containerId':containerInstance?.id]">
 																		${containerInstance?.name}
 																	</g:link>
 																</g:else>
+															</span>
+															<span class="fade rounded">
+																(${containerInstance?.shipmentItems?.size() })
 															</span>
 														</div>
 													</td>
@@ -165,13 +159,11 @@
 																</g:if>
 																<g:else>
 																	<%-- fragment="container-${childContainerInstance?.id }" --%>
-																	<g:link action="createShipment" event="enterContainerDetails" params="['containerId':childContainerInstance?.id]" style="display: block;">
+																	<g:link action="createShipment" event="enterContainerDetails" params="['containerId':childContainerInstance?.id]">
 																		${childContainerInstance?.name}
 																	</g:link>
 																</g:else>
 															</span>
-														</td>
-														<td>
 															<span class="fade">
 																${childContainerInstance?.shipmentItems?.size() }
 															</span>
@@ -277,11 +269,10 @@
 										<g:if test="${shipmentItems }">
 											<g:each var="itemInstance" in="${shipmentItems?.sort()}">		
 												<tr id="shipmentItemRow-${itemInstance?.id }" class="${count++%2==0?'odd':'even' }">
-													<td nowrap="nowrap">
+													<td nowrap="nowrap" width="3%">
 														<div>
 															<span class="action-menu">
 																<button class="action-btn">
-																	<img src="${createLinkTo(dir:'images/icons/silk',file:'cog.png')}" alt="Actions" style="vertical-align: middle"/>
 																	<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
 																</button>
 																<div class="actions" style="position: absolute; z-index: 1; display: none; min-width: 200px">
@@ -295,7 +286,6 @@
 													</td>
 													<td>
 														<div>
-														
 															<g:link controller="inventoryItem" action="showStockCard" params="['product.id':itemInstance?.product?.id]">
 																<format:product product="${itemInstance?.product}"/> 
 															</g:link>

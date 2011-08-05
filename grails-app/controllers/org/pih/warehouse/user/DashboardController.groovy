@@ -8,8 +8,8 @@ import org.pih.warehouse.inventory.Warehouse;
 
 class DashboardController {
 
-	def shipmentService;
 	def orderService
+	def shipmentService;
 	
     def index = {
 		if (!session.warehouse) {			

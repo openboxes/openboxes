@@ -37,6 +37,7 @@
 						<tr>
 							<th>Product</th>
 							<th>Lot Number</th>
+							<th>Expires</th>
 							<th>Qty On-Hand</th>
 							<th>Qty Shipping</th>
 							<th>Qty Receiving</th>
@@ -55,6 +56,14 @@
 								<td>
 									${item?.lotNumber }
 									<g:hiddenField name="items[${i }].lotNumber" value="${item?.lotNumber }"/>
+								</td>
+								<td>
+									<g:if test="${item?.inventoryItem?.expirationDate }">
+										<g:formatDate date="${item?.inventoryItem?.expirationDate }" format="MMM yyyy"/>								
+									</g:if>
+									<g:else>
+										<span class="fade">never</span>
+									</g:else>
 								</td>
 								<td class="center">
 									${item?.quantityOnHand?:'N/A' }
@@ -85,13 +94,13 @@
 					</tbody>
 					<tfoot>
 						<tr>
-							<td colspan="7" style="border-top: 1px solid lightgrey;">
+							<td colspan="8" style="border-top: 1px solid lightgrey;">
 								<div class="center">
 									<button type="submit" ><img
 										src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
 										class="btn" alt="save" /> Add to shipment(s)</button>
 									&nbsp;
-									<g:link controller="inventory" action="browse" id="${shipmentInstance?.id}">&lsaquo; Cancel</g:link>
+									<g:link controller="inventory" action="browse" id="${shipmentInstance?.id}">Cancel</g:link>
 								</div>				
 							</td>
 						</tr>

@@ -14,7 +14,13 @@
 		<div class="action-menu-item">
 			<g:link controller="request" action="show" id="${requestInstance?.id}">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" />
-				&nbsp;${warehouse.message(code: 'request.viewDetails.label', default: 'View request details')} 
+				&nbsp;${warehouse.message(code: 'request.show.label', default: 'Show request details')} 
+			</g:link>		
+		</div>
+		<div class="action-menu-item">
+			<g:link controller="createRequestWorkflow" action="createRequest" event="pickRequestItems" id="${requestInstance?.id}">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />
+				&nbsp;${warehouse.message(code: 'request.edit.label', default: 'Edit request details')} 
 			</g:link>		
 		</div>
 		<div class="action-menu-item">
@@ -34,13 +40,7 @@
 			<div class="action-menu-item">
 				<g:link controller="request" action="place" id="${requestInstance?.id}">
 					<img src="${resource(dir: 'images/icons/silk', file: 'cart_go.png')}" />
-					&nbsp;${warehouse.message(code: 'request.place.label', default: 'Place request')} 
-				</g:link>				
-			</div>		
-			<div class="action-menu-item">
-				<g:link controller="request" action="withdraw" id="${requestInstance?.id}" onclick="alert('${warehouse.message(code: 'default.button.notSupported.message', default: 'This feature is not currently supported.')}'); return false;">
-					<img src="${resource(dir: 'images/icons/silk', file: 'cart_delete.png')}" />
-					&nbsp;${warehouse.message(code: 'request.cancel.label', default: 'Cancel request')} 
+					&nbsp;${warehouse.message(code: 'request.submit.label', default: 'Submit request')} 
 				</g:link>				
 			</div>		
 			<div class="action-menu-item">

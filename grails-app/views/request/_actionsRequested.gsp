@@ -14,9 +14,15 @@
 		<div class="action-menu-item">
 			<g:link controller="request" action="show" id="${requestInstance?.id}">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" />
-				&nbsp;${warehouse.message(code: 'request.viewDetails.label', default: 'View request details')} 
+				&nbsp;${warehouse.message(code: 'request.show.label', default: 'Show request details')} 
 			</g:link>		
 		</div>
+		<div class="action-menu-item">
+			<g:link controller="createRequestWorkflow" action="createRequest" event="pickRequestItems" id="${requestInstance?.id}">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />
+				&nbsp;${warehouse.message(code: 'request.edit.label', default: 'Edit request details')} 
+			</g:link>		
+		</div>		
 		<div class="action-menu-item">
 			<g:link controller="request" action="addComment" id="${requestInstance?.id}">
 				<img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />
@@ -31,7 +37,13 @@
 		</div>		
 		<g:if test="${session?.warehouse?.id == requestInstance?.origin?.id }">
 			<div class="action-menu-item">
-				<g:link controller="request" action="fulfill" id="${requestInstance?.id}">
+				<g:link controller="request" action="showPicklist" id="${requestInstance?.id}">
+					<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}" />
+					&nbsp;${warehouse.message(code: 'request.pick.label', default: 'Show pick list')} 
+				</g:link>				
+			</div>		
+			<div class="action-menu-item">
+				<g:link controller="fulfillRequestWorkflow" action="fulfillRequest" id="${requestInstance?.id}">
 					<img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}" />
 					&nbsp;${warehouse.message(code: 'request.fulfill.label', default: 'Fulfill request')} 
 				</g:link>				
@@ -46,6 +58,12 @@
 					</g:link>				
 				</div>						
 			</g:if>
+			<div class="action-menu-item">
+				<g:link controller="request" action="withdraw" id="${requestInstance?.id}" onclick="alert('${warehouse.message(code: 'default.button.notSupported.message', default: 'This feature is not currently supported.')}'); return false;">
+					<img src="${resource(dir: 'images/icons/silk', file: 'cart_delete.png')}" />
+					&nbsp;${warehouse.message(code: 'request.cancel.label', default: 'Cancel request')} 
+				</g:link>				
+			</div>		
 			<div class="action-menu-item">
 				<g:link controller="request" action="delete" id="${requestInstance?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
 					<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />

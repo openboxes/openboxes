@@ -30,6 +30,23 @@ class InventoryService implements ApplicationContextAware {
 	boolean transactional = true
 	
 	/**
+	 * 
+	 * @return
+	 */
+	def getShipmentService() {
+		return applicationContext.getBean("shipmentService")
+	}
+   
+   
+	/**
+	 *
+	 * @return
+	 */
+	def getLocalizationService() {
+		return applicationContext.getBean("localizationService")
+	}
+
+	/**
 	 * Gets all warehouses
 	 * @return
 	 */
@@ -196,7 +213,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param productId
 	 * @return
 	 */
-	List searchInventoryItems(String searchTerm, String productId) { 		
+	List findInventoryItems(String searchTerm, String productId) { 		
 		searchTerm = "%" + searchTerm + "%";
 		def items = InventoryItem.withCriteria {
 			or {
@@ -233,14 +250,6 @@ class InventoryService implements ApplicationContextAware {
 		commandInstance.inventoryItems = getCurrentInventory(commandInstance);								
 		
 		return commandInstance;
-	}
-
-	def getShipmentService() { 
-		return applicationContext.getBean("shipmentService")
-	}
-	
-	def getLocalizationService() {
-		return applicationContext.getBean("localizationService")
 	}
 	
 	
@@ -280,6 +289,22 @@ class InventoryService implements ApplicationContextAware {
 			}
 		}
 		return inventoryProductMap;
+	}
+	
+	/**
+	 * 
+	 * @param warehouse
+	 * @param product
+	 * @return
+	 */
+	Map getQuantityByInventoryAndProduct(Inventory inventory, Product product) { 
+		Map inventoryItemQuantity = [:]
+		Set inventoryItems = getInventoryItemsByProductAndInventory(product, inventory);
+		Map<InventoryItem, Integer> quantityMap = getQuantityForInventory(inventory)
+		inventoryItems.each { 
+			inventoryItemQuantity[it] = quantityMap[it]
+		}
+		return inventoryItemQuantity;
 	}
 		
 	/**
@@ -364,14 +389,14 @@ class InventoryService implements ApplicationContextAware {
 		   products = products.intersect(searchProducts);
 	   }
 	   
-	   // now localize to only match products for the current locale
-	   // TODO: this would also have to handle the category filtering
-	//  products = products.findAll { product ->
-		//  def localizedProductName = getLocalizationService().getLocalizedString(product.name);  // TODO: obviously, this would have to use the actual locale		   
-		  // return productFilters.any {
-			//   localizedProductName.contains(it)  // TODO: this would also have to be case insensitive
-		   // }
-	   // }
+		// now localize to only match products for the current locale
+		// TODO: this would also have to handle the category filtering
+		//  products = products.findAll { product ->
+		//  def localizedProductName = getLocalizationService().getLocalizedString(product.name);  // TODO: obviously, this would have to use the actual locale
+		// return productFilters.any {
+		//   localizedProductName.contains(it)  // TODO: this would also have to be case insensitive
+		// }
+		// }
 	   
 	   return products;
    }
@@ -422,6 +447,9 @@ class InventoryService implements ApplicationContextAware {
 	 * 
 	 * TODO: add a parameter here to optionally take in a product, which means that we are only
 	 * calculation for a single product, which means that we can stop after we hit a product inventory transaction?
+	 * 
+	 * @param entries
+	 * @return
 	 */
 	Map<Product,Map<InventoryItem,Integer>> getQuantityByProductAndInventoryItemMap(List<TransactionEntry> entries) {
 		def quantityMap = [:]
@@ -487,6 +515,9 @@ class InventoryService implements ApplicationContextAware {
 	 * 
 	 * Note that the transaction entries should all be from the same inventory,
 	 * or the quantity results would be somewhat nonsensical
+	 * 
+	 * @param entries
+	 * @return
 	 */
 	Map<Product,Integer> getQuantityByProductMap(List<TransactionEntry> entries) {
 		def quantityMap = [:]
@@ -508,6 +539,9 @@ class InventoryService implements ApplicationContextAware {
 	/**
 	 * Converts  list of passed transactions entries into a quantity 
 	 * map indexed by inventory item
+	 * 
+	 * @param entries
+	 * @return
 	 */
 	Map<InventoryItem, Integer> getQuantityByInventoryItemMap(List<TransactionEntry> entries) {
 		def quantityMap = [:]
@@ -531,6 +565,9 @@ class InventoryService implements ApplicationContextAware {
 	 * 
 	 * TODO This might perform poorly as we add more and more transaction entries 
 	 * into an inventory.
+	 * 
+	 * @param inventoryInstance
+	 * @return
 	 */
 	Map<Product,Integer>  getQuantityByProductMap(Inventory inventoryInstance) {                   
 		def transactionEntries = TransactionEntry.createCriteria().list { 
@@ -543,6 +580,10 @@ class InventoryService implements ApplicationContextAware {
 		
 	/**
 	 * Gets the quantity of a specific inventory item at a specific inventory
+	 * 
+	 * @param item
+	 * @param inventory
+	 * @return
 	 */
 	Integer getQuantityForInventoryItem(InventoryItem item, Inventory inventory) {
 		def transactionEntries = getTransactionEntriesByInventoryItemAndInventory(item, inventory)
@@ -550,11 +591,21 @@ class InventoryService implements ApplicationContextAware {
 		return quantity ? quantity : 0;
 	}
 	
+	/**
+	 * 
+	 * @param product
+	 * @return
+	 */
 	Integer getQuantityForProduct(Product product) { 
 		return 0;
 	}
 	
-	
+
+	/**
+	 * 	
+	 * @param inventory
+	 * @return
+	 */
 	Map<InventoryItem, Integer> getQuantityForInventory(Inventory inventory) { 
 		def transactionEntries = getTransactionEntriesByInventory(inventory);
 		return getQuantityByInventoryItemMap(transactionEntries);
@@ -563,6 +614,10 @@ class InventoryService implements ApplicationContextAware {
 	
 	/**
 	 * Fetches and populates a StockCard Command object
+	 * 
+	 * @param cmd
+	 * @param params
+	 * @return
 	 */
 	StockCardCommand getStockCardCommand(StockCardCommand cmd, Map params) {
 		log.debug "Params " + params
@@ -594,6 +649,10 @@ class InventoryService implements ApplicationContextAware {
 	
 	/**
 	 * Fetches and populates a RecordInventory Command object
+	 * 
+	 * @param commandInstance
+	 * @param params
+	 * @return
 	 */
 	RecordInventoryCommand getRecordInventoryCommand(RecordInventoryCommand commandInstance, Map params) { 		
 		log.debug "Params " + params;
@@ -632,6 +691,10 @@ class InventoryService implements ApplicationContextAware {
 	
 	/**
 	 * Processes a RecordInventory Command object and perform updates
+	 * 
+	 * @param cmd
+	 * @param params
+	 * @return
 	 */
 	RecordInventoryCommand saveRecordInventoryCommand(RecordInventoryCommand cmd, Map params) { 
 		log.info "Saving record inventory command params: " + params
@@ -826,6 +889,11 @@ class InventoryService implements ApplicationContextAware {
 		return products;	 
 	}
 	
+	/**
+	 * 
+	 * @param category
+	 * @return
+	 */
 	List getProductsByCategory(Category category) { 
 		def products = [];
 		if (category) { 
@@ -887,6 +955,7 @@ class InventoryService implements ApplicationContextAware {
 	
 	/**
 	 * Get all inventory items for a given product within the given inventory.
+	 * 
 	 * @param productInstance
 	 * @param inventoryInstance
 	 * @return a list of inventory items.
@@ -984,6 +1053,12 @@ class InventoryService implements ApplicationContextAware {
 	   }
    }
 		
+   
+   /**
+    * 
+    * @param id
+    * @return
+    */
 	List getInventoryItemList(Long id) { 
 		def list = []
 		def warehouseInstance = Warehouse.get(id);
@@ -995,11 +1070,21 @@ class InventoryService implements ApplicationContextAware {
 		return list;
 	}	
 	
+	
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 */
 	Map getInventoryItemMap(Long id) { 
 		return getInventoryItemList(id)?.groupBy { it.product } 
 	}
 
-	
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 */
 	Map getInventoryLevelMap(Long id) { 
 		//return Warehouse.get(id)?.inventory?.inventoryLevels?.groupBy { it.product } 
 		return new HashMap();
@@ -1513,6 +1598,9 @@ class InventoryService implements ApplicationContextAware {
 	
 	/**
 	 * Finds the local transfer (if any) associated with the given transaction
+	 * 
+	 * @param transaction
+	 * @return
 	 */
 	LocalTransfer getLocalTransfer(Transaction transaction) {
 		LocalTransfer transfer = null
@@ -1523,6 +1611,9 @@ class InventoryService implements ApplicationContextAware {
 	
 	/** 
 	 * Returns true/false if the given transaction is associated with a local transfer
+	 * 
+	 * @param transaction
+	 * @return
 	 */
 	Boolean isLocalTransfer(Transaction transaction) {
 		getLocalTransfer(transaction) ? true : false
@@ -1530,6 +1621,9 @@ class InventoryService implements ApplicationContextAware {
 	
 	/**
 	 * Returns true/false if the passed transaction is a valid candidate for a local transfer
+	 * 
+	 * @param transaction
+	 * @return
 	 */
 	Boolean isValidForLocalTransfer(Transaction transaction) {
 		// make sure that the transaction is of a valid type
@@ -1553,6 +1647,8 @@ class InventoryService implements ApplicationContextAware {
 	
 	/**
 	 * Deletes a local transfer (and underlying transactions) associated with the passed transaction
+	 * 
+	 * @param transaction
 	 */
 	void deleteLocalTransfer(Transaction transaction) {
 		LocalTransfer transfer = getLocalTransfer(transaction)
@@ -1564,6 +1660,9 @@ class InventoryService implements ApplicationContextAware {
 	/**
 	 * Creates or updates the local transfer associated with the given transaction
 	 * Returns true if the save/update was successful
+	 * 
+	 * @param baseTransaction
+	 * @return
 	 */
 	Boolean saveLocalTransfer(Transaction baseTransaction) {
 		// note than we are using exceptions here to take advantage of Grails built-in transactional capabilities on service methods
@@ -1626,6 +1725,9 @@ class InventoryService implements ApplicationContextAware {
 	/**
 	 * Private utility method to create a "mirror" of the given transaction
 	 * (If given a Transfer Out transaction, creates the appropriate Transfer In transacion, and vice versa)
+	 * 
+	 * @param baseTransaction
+	 * @return
 	 */
 	private Transaction createMirroredTransaction(Transaction baseTransaction) {
 		Transaction mirroredTransaction = new Transaction()

@@ -11,6 +11,7 @@ import org.docx4j.TextUtils;
 import org.docx4j.XmlUtils;
 import org.docx4j.convert.out.pdf.PdfConversion;
 import org.docx4j.convert.out.pdf.viaXSLFO.Conversion;
+import org.docx4j.fonts.IdentityPlusMapper;
 import org.docx4j.jaxb.Context;
 import org.docx4j.model.table.TblFactory;
 import org.docx4j.openpackaging.io.SaveToZipFile;
@@ -56,7 +57,38 @@ class FileService {
 		return file
 	}
 	
-	File generateLetter(Shipment shipmentInstance) { 
+	
+	/**
+	 * 
+	 * @param shipmentInstance
+	 * @return
+	 */
+	File generateLetterAsDocx(Shipment shipmentInstance) { 
+		// Save document to temporary file
+		WordprocessingMLPackage wordMLPackage = generateLetter(shipmentInstance);
+		File tempFile = File.createTempFile(shipmentInstance?.name + " - Certificate of Donation", ".docx")
+		wordMLPackage.save(tempFile)
+		return tempFile;
+	}
+	
+	/**
+	 * 
+	 * @param shipmentInstance
+	 * @return
+	 */
+	void generateLetterAsPdf(Shipment shipmentInstance, OutputStream outputStream) { 
+		WordprocessingMLPackage wordMLPackage = generateLetter(shipmentInstance);
+		convertToPdf(wordMLPackage, outputStream);				
+	}
+	
+	
+	/**
+	 * Generate the 'Certificate of Donation' letter from a template.
+	 * 
+	 * @param shipmentInstance
+	 * @return
+	 */
+	WordprocessingMLPackage generateLetter(Shipment shipmentInstance) { 
 		
 		File template = findFile("templates/cod-pl-template.docx")
 		if (!template) {
@@ -75,7 +107,7 @@ class FileService {
 		def mappings = new HashMap<String, String>();
 		
 		def formatter = new SimpleDateFormat("MMM dd, yyyy");
-		def date = formatter.format(shipmentInstance.getExpectedDeliveryDate());
+		def date = formatter.format(shipmentInstance.getExpectedShippingDate());
 		mappings.put("date", date);		
 
 		String subtitle = "";				
@@ -105,12 +137,12 @@ class FileService {
 		}
 		mappings.put("value", value)
 		
-		log.info("mappings: " + mappings)
-		log.info("xml before: " + xml)
+		log.debug("mappings: " + mappings)
+		log.debug("xml before: " + xml)
 		//valorize template
 		Object obj = XmlUtils.unmarshallFromTemplate(xml, mappings);
-		log.info("xml after: " + xml)
-		log.info("mappings: " + mappings)
+		log.debug("xml after: " + xml)
+		log.debug("mappings: " + mappings)
 		
 		//change  JaxbElement
 		documentPart.setJaxbElement((Document) obj);
@@ -120,14 +152,15 @@ class FileService {
 
 		// Add table to document
 		wordMLPackage.getMainDocumentPart().addObject(table);
-				
-		// Save document to temporary file
-		File tempFile = File.createTempFile(shipmentInstance?.name + " - Certificate of Donation", ".docx")
-		wordMLPackage.save(tempFile)		
-		return tempFile;
+
+		return wordMLPackage;				
 	}
 	
-	
+	/**
+	 * 
+	 * @param wordMLPackage
+	 * @param filePath
+	 */
 	void savePackageToFile(WordprocessingMLPackage wordMLPackage, String filePath) { 		
 		SaveToZipFile saver = new SaveToZipFile(wordMLPackage);
 		saver.save(filePath);
@@ -135,6 +168,13 @@ class FileService {
 	}
 	
 	
+	/**
+	 * 
+	 * @param pkg
+	 * @param afterText
+	 * @param table
+	 * @throws Exception
+	 */
 	void insertTableAfter(WordprocessingMLPackage pkg, String afterText, Tbl table) throws Exception {
 		Body b = pkg.getMainDocumentPart().getJaxbElement().getBody();
 		int addPoint = -1, count = 0;
@@ -159,7 +199,13 @@ class FileService {
 	}
 	
    
-   
+	/**
+	 * 
+	 * @param shipmentInstance
+	 * @param cols
+	 * @param cellWidthTwips
+	 * @return
+	 */
 	public Tbl createPackingListTable(Shipment shipmentInstance, int cols, int cellWidthTwips) {
 		
 		Tbl tbl = Context.getWmlObjectFactory().createTbl();		
@@ -202,6 +248,11 @@ class FileService {
 		return tbl;
 	}
 	
+	/**
+	 * 
+	 * @param tr
+	 * @param cellWidthTwips
+	 */
 	void createPackingListCell(Tr tr, int cellWidthTwips) { 
 		
 		Tc tc = Context.getWmlObjectFactory().createTc();
@@ -228,7 +279,14 @@ class FileService {
 	} 
 	
 	
-	
+	/**
+	 * 
+	 * @param wmlPackage
+	 * @param shipmentInstance
+	 * @param cols
+	 * @param cellWidthTwips
+	 * @return
+	 */
 	public Tbl createTable(WordprocessingMLPackage wmlPackage, Shipment shipmentInstance, int cols, int cellWidthTwips) {
 		
 		Tbl tbl = Context.getWmlObjectFactory().createTbl();
@@ -296,6 +354,13 @@ class FileService {
 		return tbl;
 	}
 	
+	/**
+	 * 
+	 * @param wmlPackage
+	 * @param tr
+	 * @param text
+	 * @param applyBold
+	 */
 	void addTc(WordprocessingMLPackage wmlPackage, Tr tr, String text, boolean applyBold) {
 		Tc tc = Context.getWmlObjectFactory().createTc();
 		// wmlPackage.getMainDocumentPart().createParagraphOfText(text)		
@@ -303,7 +368,12 @@ class FileService {
 		tr.getEGContentCellContent().add( tc );
 	}
 	
-		
+	/**
+	 * 
+	 * @param simpleText
+	 * @param applyBold
+	 * @return
+	 */
 	P createParagraphOfText(String simpleText, boolean applyBold) { 
 		P para = Context.getWmlObjectFactory().createP();
 		// Create the text element
@@ -325,58 +395,21 @@ class FileService {
 		return para;
 	}
 	
-	
-	
-	def downloadAsPdf = {
-		
-		def inputfilepath = System.getProperty("user.dir");
-		WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.createPackage()
-		def mainPart = wordMLPackage.getMainDocumentPart()
-
-		// create some styled heading...
-		mainPart.addStyledParagraphOfText("Title", "Partners In Health")
-		mainPart.addStyledParagraphOfText("Subtitle", "Generated at " + Calendar.getInstance().getTime().toString())
-
-		
-		// Add our list of assets to the document
-		Shipment.list().each { shipment ->
-			mainPart.addParagraphOfText(shipment?.name)
-		}
-
+	/**
+	 * 
+	 * @param wordMLPackage
+	 * @return
+	 */
+	void convertToPdf(WordprocessingMLPackage wordMLPackage, OutputStream outputStream) {
+		wordMLPackage.setFontMapper(new IdentityPlusMapper());
 		PdfConversion conversion = new Conversion(wordMLPackage);
-		
-		((Conversion)conversion).setSaveFO(new File(inputfilepath + ".fo"));
-			OutputStream os = new FileOutputStream(inputfilepath + ".pdf");
-		//response.setHeader("Content-disposition", "attachment; filename=letter.pdf");
-		//conversion.output(response.outputStream);
+		//((Conversion)conversion).setSaveFO(new File(inputfilepath + ".fo"));
+		//OutputStream outputStream = new FileOutputStream(inputfilepath + ".pdf");
+		conversion.output(outputStream);
+		//return outputStream;
 	}
 
-	def downloadAsDoc = {
-		
-		def inputfilepath = System.getProperty("user.dir");
-		WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.createPackage()
-		def mainPart = wordMLPackage.getMainDocumentPart()
-
-		// create some styled heading...
-		mainPart.addStyledParagraphOfText("Title", "Partners In Health")
-		mainPart.addStyledParagraphOfText("Subtitle", "Generated at " + Calendar.getInstance().getTime().toString())
-
-		
-		// Add our list of assets to the document
-		Shipment.list().each { shipment ->
-			mainPart.addParagraphOfText(shipment?.name)
-		}
-			
-		// write out our word doc to disk
-		File file = File.createTempFile("wordexport-", ".docx")
-		wordMLPackage.save(file);
-
-		// and send it all back to the browser
-		//response.setHeader("Content-disposition", "attachment; filename=assets.docx");
-		//response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-		//response.outputStream << file.readBytes()
-		file.delete();
-	}
+	
 	
    
 }

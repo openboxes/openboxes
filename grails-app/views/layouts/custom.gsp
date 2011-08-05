@@ -89,7 +89,7 @@
 		</div>
 	</g:if>
  	--%>
-
+ 	
     <div id="doc3" class="yui-t7">
 		<!-- Spinner gets displayed when AJAX is invoked -->
 		<div id="spinner" class="spinner" style="display:none;">

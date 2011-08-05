@@ -9,10 +9,10 @@
         <title><warehouse:message code="default.browse.label" args="[entityName]" /></title>    
         
 		<style>
-			.data-table td, .data-table th { 
+			.data td, .data th { 
 				vertical-align: middle; 
 			}
-			.data-table th { 
+			.data th { 
 				border: 0px; 
 			} 
 			.categoryBreadcrumb { 			
@@ -52,7 +52,7 @@
 	            </div>
             </g:hasErrors>    
             
-			<div class="dialog">
+			<div class="">
 				<fieldset>
 					<!-- Inventory Browser -->
 					<div>
@@ -83,16 +83,24 @@
 														<div class="categoryBreadcrumb">
 															<g:render template="../category/breadcrumb" model="[categoryInstance:entry.key]"/>
 														</div>
-								            			<table class="data-table" style="width: 100%;">         		
+								            			<table class="data" style="width: 100%;" border="0">         		
 								            				<thead>
+								            					<tr class="odd">
+								            						<th></th>
+								            						<th></th>
+								            						<th></th>
+								            						<th></th>
+								            		 				<th colspan="2" class="center"style="text-align: center; border-left: 1px solid lightgrey; border-right: 1px solid lightgrey;"><warehouse:message code="default.pending.label"/></th>
+								            						<th></th>
+								            					</tr>
 																<tr class="odd">
-																	<th></th>
-																	<th width="50%"><warehouse:message code="default.description.label"/></th>
-																	<th width="20%"><warehouse:message code="product.manufacturer.label"/></th>
-																	<th width="20%"><warehouse:message code="product.code.label"/></th>
-																	<th width="5%" style="text-align: center"><warehouse:message code="inventory.qtyin.label"/></th>
-																	<th width="5%" style="text-align: center"><warehouse:message code="inventory.qtyout.label"/></th>
-																	<th width="5%" style="text-align: center"><warehouse:message code="default.qty.label"/></th>
+																	<th style="width: 50px;"></th>
+																	<th style="width: 400px;"><warehouse:message code="default.description.label"/></th>
+																	<th style="width: 100px;"><warehouse:message code="product.manufacturer.label"/></th>
+																	<th style="width: 100px;"><warehouse:message code="product.code.label"/></th>
+																	<th style="text-align: center; border-left: 1px solid lightgrey; width: 50px;"><warehouse:message code="inventory.qtyin.label"/></th>
+																	<th style="text-align: center; border-right: 1px solid lightgrey; width: 50px;"><warehouse:message code="inventory.qtyout.label"/></th>
+																	<th style="text-align: center; width: 50px;"><warehouse:message code="default.qty.label"/></th>
 																</tr>
 															</thead>
 															<tbody>
@@ -101,23 +109,6 @@
 																	<g:set var="totalQuantity" value="${totalQuantity + (quantity?:0) }"/>
 																	<g:set var="cssClass" value="${quantity == 0 ? 'outofstock' : 'instock'  }"/>
 																	<tr class="${status%2==0?'even':'odd' } prop ${cssClass}">
-																	<%-- 
-																		<td nowrap="true">
-																			<div class="action-menu">
-																				<button class="action-btn">
-																					<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" />
-																					<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
-																				</button>
-																				<div class="actions" style="position: absolute; display: none;">
-																					<div class="action-menu-item">				
-																						<g:link controller="inventory" action="browse">
-																							<img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}" style="vertical-align: middle;"/>&nbsp;Refresh
-																						</g:link>
-																					</div>																			
-																				</div>
-																			</div>	
-																		</td>
-																	--%>
 																		<td>
 																			<g:checkBox id="${inventoryItem?.product?.id }" name="productId" 
 																				class="checkbox" checked="${false }" 
@@ -160,10 +151,10 @@
 																	<th style="text-align: left;">
 																		
 																	</th>
-																	<th style="width: 20%">
+																	<th>
 																		
 																	</th>
-																	<th style="width: 20%">
+																	<th>
 																		
 																	</th>
 																	<th>
@@ -172,7 +163,7 @@
 																	<th>
 																	
 																	</th>
-																	<th style="text-align: center; width: 5%">
+																	<th style="text-align: center;">
 																		${totalQuantity }
 																	</th>
 																</tr>

@@ -93,6 +93,12 @@
 											<table>
 												<tbody>
 													<tr class='prop'>
+														<td valign='top' class='name'><label for='quantity'><warehouse:message code="default.quantity.label"/>:</label></td>
+														<td valign='top' class='value'>
+															<input type="text" name='quantity' value="${requestItem?.quantity }" size="5" />
+														</td>
+													</tr>
+													<tr class='prop'>
 														<td valign='top' class='name'><label for='product.id'><warehouse:message code="product.label"/>:</label></td>
 														<td valign='top' class='value' nowrap="nowrap">
 															<%-- 
@@ -102,12 +108,6 @@
 															--%>
 															<g:autoSuggest id="product" name="product" jsonUrl="/warehouse/json/findProductByName" 
 																width="200" valueId="${requestItem?.product?.id }" valueName="${requestItem?.product?.name }"/>															
-														</td>
-													</tr>
-													<tr class='prop'>
-														<td valign='top' class='name'><label for='quantity'><warehouse:message code="default.quantity.label"/>:</label></td>
-														<td valign='top' class='value'>
-															<input type="text" name='quantity' value="${requestItem?.quantity }" size="5" />
 														</td>
 													</tr>
 													<tr>
@@ -137,6 +137,12 @@
 											<table>
 												<tbody>
 													<tr class='prop'>
+														<td valign='top' class='name'><label for='quantity'><warehouse:message code="default.quantity.label"/>:</label></td>
+														<td valign='top' class='value'>
+															<input type="text" name='quantity' value="${requestItem?.quantity }" size="5" />
+														</td>
+													</tr>
+													<tr class='prop'>
 														<td valign='top' class='name'><label for='source'><warehouse:message code="category.label"/>:</label>
 														</td>
 														<td valign='top' class='value'>													
@@ -147,12 +153,6 @@
 																<g:select class="combobox" name="category.id" from="${org.pih.warehouse.product.Category.list().sort()}" optionKey="id" value="" noSelection="['':'']" />
 																 --%>
 															</div>
-														</td>
-													</tr>
-													<tr class='prop'>
-														<td valign='top' class='name'><label for='quantity'><warehouse:message code="default.quantity.label"/>:</label></td>
-														<td valign='top' class='value'>
-															<input type="text" name='quantity' value="${requestItem?.quantity }" size="5" />
 														</td>
 													</tr>
 													<tr>
@@ -174,16 +174,16 @@
 											<table>
 												<tbody>
 													<tr class='prop'>
+														<td valign='top' class='name'><label for='quantity'><warehouse:message code="default.quantity.label"/>:</label></td>
+														<td valign='top' class='value'>
+															<input type="text" name='quantity' value="${requestItem?.quantity }" size="5" />
+														</td>
+													</tr>
+													<tr class='prop'>
 														<td valign='top' class='name'><label for='description'><warehouse:message code="default.description.label"/>:</label>
 														</td>
 														<td valign='top' class='value'>
 															<input type="text" name='description' value="" size="30" />
-														</td>
-													</tr>
-													<tr class='prop'>
-														<td valign='top' class='name'><label for='quantity'><warehouse:message code="default.quantity.label"/>:</label></td>
-														<td valign='top' class='value'>
-															<input type="text" name='quantity' value="${requestItem?.quantity }" size="5" />
 														</td>
 													</tr>
 													<tr>

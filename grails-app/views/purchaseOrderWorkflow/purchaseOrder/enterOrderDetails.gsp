@@ -59,8 +59,15 @@
 								<td valign='top' class='name'><label for="destination">Order for:</label>
 								</td>
 								<td valign='top' class='value ${hasErrors(bean:order,field:'destination','errors')}'>
-									${session.warehouse?.name }
-									<g:hiddenField name="destination.id" value="${session.warehouse?.id}"/>
+									<g:if test="${order.destination }">
+										${order?.destination?.name }
+										<g:hiddenField name="destination.id" value="${order?.destination?.id}"/>									
+									</g:if>
+									<g:else>
+										${session.warehouse?.name }
+										<g:hiddenField name="destination.id" value="${session.warehouse?.id}"/>									
+									</g:else>									
+									
 								</td>
 							</tr>
 							<tr class='prop'>

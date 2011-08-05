@@ -47,22 +47,28 @@
 							<tr class='prop'>
 								<td valign='top' class='name'><label for='source'><warehouse:message code="request.from.label"/>:</label>
 								</td>
-								<td valign='top' class='value ${hasErrors(bean:request,field:'origin','errors')}'>
+								<td valign='top' class='value ${hasErrors(bean:requestInstance,field:'origin','errors')}'>
 									<g:select name="origin.id" from="${org.pih.warehouse.inventory.Warehouse.list()}" optionKey="id" value="${requestInstance?.origin?.id}" noSelection="['':'']"/>
 								</td>
 							</tr>
 							<tr class='prop'>
 								<td valign='top' class='name'><label for="destination"><warehouse:message code="request.for.label"/>:</label>
 								</td>
-								<td valign='top' class='value ${hasErrors(bean:request,field:'destination','errors')}'>
-									${session.warehouse?.name }
-									<g:hiddenField name="destination.id" value="${session.warehouse?.id}"/>
+								<td valign='top' class='value ${hasErrors(bean:requestInstance,field:'destination','errors')}'>
+									<g:if test="${requestInstance.destination }">
+										${requestInstance?.destination?.name }
+										<g:hiddenField name="destination.id" value="${requestInstance?.destination?.id}"/>									
+									</g:if>
+									<g:else>
+										${session.warehouse?.name }
+										<g:hiddenField name="destination.id" value="${session.warehouse?.id}"/>									
+									</g:else>
 								</td>
 							</tr>
 							<tr class='prop'>
 								<td valign='top' class='name'><label for='requestedBy'><warehouse:message code="request.requestedBy.label"/>:</label></td>
 								<td valign='top'
-									class='value ${hasErrors(bean:request,field:'requestedBy','errors')}'>
+									class='value ${hasErrors(bean:requestInstance,field:'requestedBy','errors')}'>
 									<%-- 
 									<g:select class="combobox" name="requestedBy.id" from="${org.pih.warehouse.core.Person.list().sort{it.lastName}}" optionKey="id" value="${request?.requestedBy?.id}" noSelection="['':'']"/>
 									--%>

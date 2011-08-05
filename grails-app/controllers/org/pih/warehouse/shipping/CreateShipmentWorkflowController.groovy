@@ -23,7 +23,7 @@ class CreateShipmentWorkflowController {
     			
     			// create a new shipment instance if we don't have one already
     			if (!flow.shipmentInstance) { 
-    				flow.shipmentInstance = shipmentService.getShipmentInstance(params.id)
+    				flow.shipmentInstance = shipmentService.getShipmentInstance(params.id as Long)
     				flow.shipmentWorkflow = shipmentService.getShipmentWorkflow(flow.shipmentInstance)
     			}
 				if (params.skipTo) { 

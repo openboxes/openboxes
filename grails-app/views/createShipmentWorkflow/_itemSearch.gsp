@@ -14,7 +14,7 @@
 						<tr>
 							<td style="text-align: left">
 								<g:autoSuggestSearchable id="searchable" name="searchable" 
-									jsonUrl="/warehouse/json/searchInventoryItems" />
+									jsonUrl="/warehouse/json/findInventoryItems" />
 								&nbsp;
 							</td>
 							<%-- 

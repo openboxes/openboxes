@@ -25,7 +25,7 @@ class RequestService {
 	}
 
 	List<Request> getOutgoingRequests(Location location) { 
-		return Request.findAllByOrigin(location)
+		return Request.findAllByOriginAndStatus(location, RequestStatus.REQUESTED)
 	}
 	
 	List<Location> getSuppliers() { 

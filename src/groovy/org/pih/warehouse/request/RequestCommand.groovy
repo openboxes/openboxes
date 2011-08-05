@@ -34,6 +34,9 @@ class RequestCommand implements Serializable {
 	def requestItems = 
 		LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(RequestItemCommand.class));
 	
+	def fulfillItems = 
+		LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(RequestItemCommand.class));
+	
 	static constraints = {
 		shipmentType(nullable:false)
 		recipient(nullable:false)

@@ -35,20 +35,54 @@ class FulfillRequestWorkflowController {
 				flow.requestCommand = requestCommand;
 				flow.request = requestCommand.request;
 				flow.requestItems = requestCommand.requestItems 
-
+				
+				
 				if (params.skipTo) {
-					if (params.skipTo == 'enterShipmentDetails') return enterShipmentDetails()
-					else if (params.skipTo == 'processRequestItems') return processRequestItems()
-					else if (params.skipTo == 'confirmRequestReceipt') return confirmRequestReceipt()
-				}				
+					if (params.skipTo == 'packRequestItems') return packRequestItems()
+					else if (params.skipTo == 'pickRequestItems') return pickRequestItems()
+					else if (params.skipTo == 'confirmRequestFulfillment') return confirmRequestFulfillment()
+				}	
+							
 				return success()
 			}
-			on("success").to("enterShipmentDetails")
-			on("enterShipmentDetails").to("enterShipmentDetails")
-			on("processRequestItems").to("processRequestItems")
-			on("confirmRequestReceipt").to("confirmRequestReceipt")
+			on("success").to("pickRequestItems")
+			on("pickRequestItems").to("pickRequestItems")
+			on("packRequestItems").to("packRequestItems")
+			on("confirmFulfillment").to("confirmFulfillment")
 		}
-		enterShipmentDetails {
+		pickRequestItems {			
+			on("back").to("pickRequestItems")
+			on("next").to("packRequestItems")
+			
+			
+			on("fulfillRequestItem") { RequestItemCommand command ->				
+				log.info "fulfill request item " + params 
+				log.info "command " + command?.requestItem?.id + " " + command?.productReceived
+				flow.requestCommand.fulfillItems.add(command)
+			}.to("pickRequestItems")
+
+			
+			on("fulfillRequestItem") { 
+				
+			}
+			
+			on("fulfillRequestItemRemote") { RequestItemCommand command ->
+				log.info "remote: " + params	
+			}.to("pickRequestItems")			
+			
+			on("cancel").to("finish")
+			//on("error").to("processRequestItems")
+			on("packRequestItems").to("packRequestItems")
+			on("pickRequestItems").to("pickRequestItems")
+			on("confirmFulfillment").to("confirmFulfillment")
+		}
+		
+			
+			
+			
+
+		packRequestItems {
+			on("back").to("pickRequestItems")			
 			on("next") { RequestCommand cmd ->
 				flow.requestCommand = cmd
 				if (flow.requestCommand.hasErrors()) {
@@ -58,37 +92,14 @@ class FulfillRequestWorkflowController {
 				cmd.requestItems = flow.requestItems
 				[requestCommand : cmd]
 							
-			}.to("processRequestItems")
+			}.to("confirmFulfillment")
 			on("cancel").to("finish")
-			on("error").to("enterShipmentDetails")
-			on("enterShipmentDetails").to("enterShipmentDetails")
-			on("processRequestItems").to("processRequestItems")
-			on("confirmRequestReceipt").to("confirmRequestReceipt")
+			on("error").to("packRequestItems")
+			on("pickRequestItems").to("pickRequestItems")
+			on("packRequestItems").to("packRequestItems")
+			on("confirmFulfillment").to("confirmFulfillment")
 		}
-		processRequestItems {			
-			on("next") { RequestItemListCommand command ->
-				flow.requestListCommand = command
-				flow.requestItems = command.requestItems				
-				if (command.hasErrors()) {					
-					return error()
-				}
-			}.to("confirmRequestReceipt")
-			
-			on("back") { RequestItemListCommand command ->
-				flow.requestListCommand = command
-				flow.requestItems = command.requestItems				
-				if (command.hasErrors()) {					
-					return error()
-				}
-			}.to("enterShipmentDetails")
-			
-			on("cancel").to("finish")
-			//on("error").to("processRequestItems")
-			on("enterShipmentDetails").to("enterShipmentDetails")
-			on("processRequestItems").to("processRequestItems")
-			on("confirmRequestReceipt").to("confirmRequestReceipt")
-		}
-		confirmRequestReceipt  {
+		confirmRequestFulfillment  {
 			on("submit") { 
 				def requestCommand = flow.requestCommand;
 				requestCommand.requestItems = flow.requestItems;
@@ -120,18 +131,18 @@ class FulfillRequestWorkflowController {
 				
 			}.to("finish")
 			on("cancel").to("finish")
-			on("back").to("processRequestItems")
-			on("error").to("confirmRequestReceipt")
+			on("back").to("packRequestItems")
+			on("error").to("confirmFulfillment")
 			//on(Exception).to("handleError")
 			//on("success").to("finish")
-			on("enterShipmentDetails").to("enterShipmentDetails")
-			on("processRequestItems").to("processRequestItems")
-			on("confirmRequestReceipt").to("confirmRequestReceipt")
+			on("pickRequestItems").to("pickRequestItems")
+			on("packRequestItems").to("packRequestItems")
+			on("confirmFulfillment").to("confirmFulfillment")
 		}		
 		handleError() { 
-			on("enterShipmentDetails").to("enterShipmentDetails")
-			on("processRequestItems").to("processRequestItems")
-			on("confirmRequestReceipt").to("confirmRequestReceipt")
+			on("pickRequestItems").to("pickRequestItems")
+			on("packRequestItems").to("packRequestItems")
+			on("confirmFulfillment").to("confirmFulfillment")
 			
 		}
 		finish {
