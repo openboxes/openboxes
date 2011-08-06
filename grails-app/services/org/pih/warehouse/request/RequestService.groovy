@@ -20,14 +20,29 @@ class RequestService {
 	
 	def shipmentService;
 
+	/**
+	 * 
+	 * @param location
+	 * @return
+	 */
 	List<Request> getIncomingRequests(Location location) { 
 		return Request.findAllByDestination(location)
 	}
 
+	
+	/**
+	 * 
+	 * @param location
+	 * @return
+	 */
 	List<Request> getOutgoingRequests(Location location) { 
 		return Request.findAllByOriginAndStatus(location, RequestStatus.REQUESTED)
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	List<Location> getSuppliers() { 
 		def suppliers = []
 		LocationType supplierType = LocationType.findByName("Supplier");
@@ -38,6 +53,46 @@ class RequestService {
 		
 	}
 	
+	
+	/**
+	 * 
+	 * @param requestItems
+	 * @param requestItem
+	 * @return
+	 */
+	RequestItem getNextRequestItem(List requestItems, RequestItem requestItem) { 
+		return getRequestItemAt(requestItems, requestItem, +1);
+	}
+	
+	/**
+	 * 
+	 * @param requestItems
+	 * @param requestItem
+	 * @return
+	 */
+	RequestItem getPreviousRequestItem(List requestItems, RequestItem requestItem) {
+		return getRequestItemAt(requestItems, requestItem, -1);
+	}
+	
+	/**
+	 * 
+	 * @param requestItems
+	 * @param requestItem
+	 * @param direction
+	 * @return
+	 */
+	RequestItem getRequestItemAt(List requestItems, RequestItem requestItem, int direction) { 
+		log.info ("request item " + requestItem.class.name)
+		return requestItems[requestItems.indexOf(requestItem)+direction];	
+	}
+
+	
+	/**
+	 * 
+	 * @param id
+	 * @param recipientId
+	 * @return
+	 */
 	RequestCommand getRequest(Integer id, Integer recipientId) { 
 		def requestCommand = new RequestCommand();
 		
@@ -68,7 +123,11 @@ class RequestService {
 		return requestCommand;
 	}
 	
-		
+	/**
+	 * 
+	 * @param requestCommand
+	 * @return
+	 */
 	RequestCommand saveRequestShipment(RequestCommand requestCommand) { 
 		def shipmentInstance = new Shipment()
 		def shipments = requestCommand?.request?.shipments();
@@ -139,7 +198,11 @@ class RequestService {
 		return requestCommand;
 	}
 	
-	
+	/**
+	 * 
+	 * @param request
+	 * @return
+	 */
 	Request saveRequest(Request request) { 		
 		if (!request.hasErrors() && request.save()) {
 			return request;

@@ -11,3 +11,19 @@ if (Ajax && (Ajax != null)) {
 	  }
 	});
 }
+
+
+function selectCombo(comboBoxElem, value) {
+	if (comboBoxElem != null) {
+		if (comboBoxElem.options) { 
+			for (var i = 0; i < comboBoxElem.options.length; i++) {
+	        	if (comboBoxElem.options[i].value == value &&
+	                comboBoxElem.options[i].value != "") { //empty string is for "noSelection handling as "" == 0 in js
+	                comboBoxElem.options[i].selected = true;
+	                break
+	        	}
+			}
+		}
+	}
+}					
+

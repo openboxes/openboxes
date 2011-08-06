@@ -16,8 +16,8 @@
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'menu.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'form.css')}" type="text/css" media="screen, projection" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footer.css')}" type="text/css" media="screen, projection" />
-	
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footer.css')}" type="text/css" media="screen, projection" />	
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'wizard.css')}" type="text/css" media="screen, projection" />
 	
 	<!-- Include javascript files -->
 	<g:javascript library="application"/>
@@ -142,9 +142,66 @@
 										
 											<li>
 												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'building.png')}" style="vertical-align: middle" />
-												<a class="home" href='${createLink(controller: "dashboard", action:"chooseWarehouse")}'>
+												<%-- 
+												<a class="home" href='${createLink(controller: "dashboard", action:"chooseWarehouse")}'></a>
+												--%>
+												<a href="javascript:void(0);" id="warehouse-switch">
 													${session?.warehouse?.name }
-												</a>								
+												</a>
+												
+												<div id="warehouse-menu" style="display: none; position: absolute; right: 50px; top: 38px;  
+													background-color: white; border: 1px solid black;">
+													<table>
+														<tbody>						
+															<g:each var="warehouse" in="${org.pih.warehouse.inventory.Warehouse.list()}" status="i">								
+																<tr class="prop">
+																	<td class="warehouse" nowrap="nowrap" style="padding: 0px;">
+																	
+																		<g:if test="${warehouse?.fgColor && warehouse?.bgColor }">
+																			<style>
+																				#warehouse-${warehouse?.id} { border: 0px solid #F5F5F5; padding: 10px; display: block; } 
+																				#warehouse-${warehouse?.id} { background-color: #${warehouse.bgColor}; color: #${warehouse.fgColor}; } 
+																				#warehouse-${warehouse?.id} a { color: #${warehouse.fgColor}; }  	
+																			</style>				
+																		</g:if>					
+																	
+																		<div id="warehouse-${warehouse.id }" class="warehouse">												
+																			<g:if test="${warehouse.local}">
+																				<a class="home" href='${createLink(controller: "dashboard", action:"chooseWarehouse", id: warehouse.id)}' style="display: block;">
+																					<g:if test="${warehouse.logo}">	
+																						<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'warehouse', action:'viewLogo', id: warehouse.id)}" />
+																						<%--<img src="${warehouse.logo}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img>--%>
+																					</g:if>
+																					<g:else>
+																						<img src="${createLinkTo(dir:'images',file:'icons/building.png')}" style="vertical-align: middle"/>
+																					</g:else>
+																					${warehouse.name} 
+																				</a> 
+																					
+																				<%-- 
+																				<g:if test="${warehouse?.id == session?.user?.warehouse?.id }">
+																					<warehouse:message code="dashboard.youLastLoggednHereOn.message" args="[format.datetime(obj:session?.user?.lastLoginDate)]"/> 
+																				</g:if>
+																				--%>
+																			</g:if>
+																			<g:else>
+																				<g:if test="${warehouse.logo}">	
+																					<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'warehouse', action:'viewLogo', id: warehouse.id)}" />															
+																					<%--<img src="${warehouse.logo}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img>--%>
+																				</g:if>
+																				<g:else>
+																					<img src="${createLinkTo(dir:'images',file:'icons/building.png')}" style="vertical-align: middle"/>
+																				</g:else>
+																				&nbsp;
+																				<warehouse:message code="dashboard.managedRemotely.message" args="[warehouse.name]"/>
+																			</g:else>
+																		</div>												
+																	</td>											
+																</tr>																		
+															</g:each>																	
+														</tbody>					
+													</table>													
+												</div>
 											</li>
 										</g:if>
 										
@@ -320,7 +377,11 @@
 	
 	<script type="text/javascript">
 		$(function() { 
-	
+
+			$("#warehouse-switch").click(function() {
+				$("#warehouse-menu").toggle();
+			});
+			
 			function show() {
 				//$(this).children(".actions").show();
 			}

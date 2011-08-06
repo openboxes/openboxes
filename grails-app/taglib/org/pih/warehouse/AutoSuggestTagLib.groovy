@@ -22,7 +22,6 @@ class AutoSuggestTagLib {
 		def suggestDisplay = "inline";
 		
 		def html = """
-			<div>
 				<span id="${id}-span" class="span" style="text-align: left; display: ${spanDisplay};">${valueName}</span>
 				<input id="${id}-value" class="value" type="hidden" name="${name}.id" value="${valueId}"/>
 				<input id="${id}-suggest" class="autocomplete" type="text" name="${name}.name" value="${valueName}" style="width: ${width}px; display: ${suggestDisplay};">
@@ -78,7 +77,6 @@ class AutoSuggestTagLib {
 						});
 					});
 				</script>
-			</div>
 		""";
 			
 		

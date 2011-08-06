@@ -24,13 +24,17 @@
 				<g:renderErrors bean="${requestCommand}" as="list" />
 			</div>
 		</g:hasErrors>
-		<g:form action="fulfillRequest" method="post">
-			<g:hiddenField name="request.id" value="${requestCommand?.request?.id }"/>
-			<g:hiddenField name="dateRequested" value="${requestCommand?.dateRequested }"/>			
-			<div class="dialog">
+		<div class="dialog">
+			
+			<g:render template="progressBar" model="['state':'packRequestItems']"/>	
+			<br clear='all'/>
+			
+			<g:form action="fulfillRequest" method="post">
+				<g:hiddenField name="request.id" value="${requestCommand?.request?.id }"/>
+				<g:hiddenField name="dateRequested" value="${requestCommand?.dateRequested }"/>			
+			
 				<fieldset>
 					<g:render template="../request/summary" model="[requestInstance:request]"/>
-					<g:render template="progressBar" model="['state':'packRequestItems']"/>	
 					<table>
 						<tbody>
 						
@@ -94,8 +98,9 @@
 					
 					
 				</fieldset>
-			</div>
-		</g:form>
+			</g:form>
+		</div>
+
 	</div>
 </body>
 </html>

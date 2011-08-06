@@ -38,11 +38,11 @@
 		<g:form action="fulfillRequest" method="post">
 			<div class="dialog">
 			
-			
+				<g:render template="progressBar" model="['state':'confirmFulfillment']"/>		
+				<br clear='all'/>
+				
 				<fieldset>
 					<g:render template="../request/summary" model="[requestInstance:request]"/>
-					<g:render template="progressBar" model="['state':'confirmFulfillment']"/>		
-
 
 					<table>
 						<tbody>

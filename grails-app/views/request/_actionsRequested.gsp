@@ -35,17 +35,21 @@
 				&nbsp;${warehouse.message(code: 'request.addDocument.label', default: 'Add document')} 
 			</g:link>				
 		</div>		
+		<div class="action-menu-item">
+			<hr/>
+		</div>
+		
 		<g:if test="${session?.warehouse?.id == requestInstance?.origin?.id }">
-			<div class="action-menu-item">
-				<g:link controller="request" action="showPicklist" id="${requestInstance?.id}">
-					<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}" />
-					&nbsp;${warehouse.message(code: 'request.pick.label', default: 'Show pick list')} 
-				</g:link>				
-			</div>		
 			<div class="action-menu-item">
 				<g:link controller="fulfillRequestWorkflow" action="fulfillRequest" id="${requestInstance?.id}">
 					<img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}" />
 					&nbsp;${warehouse.message(code: 'request.fulfill.label', default: 'Fulfill request')} 
+				</g:link>				
+			</div>		
+			<div class="action-menu-item">
+				<g:link controller="request" action="showPicklist" id="${requestInstance?.id}">
+					<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}" />
+					&nbsp;${warehouse.message(code: 'request.pick.label', default: 'Show pick list')} 
 				</g:link>				
 			</div>		
 		</g:if>
