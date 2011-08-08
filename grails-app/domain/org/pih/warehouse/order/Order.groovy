@@ -100,7 +100,7 @@ class Order implements Serializable {
 	 * @return	a boolean value indicating whether all items have been received entirely
 	 */
 	Boolean isCompletelyReceived() {
-		return orderItems?.size() == orderItems?.find { it.isCompletelyFulfilled() }?.size()
+		return orderItems?.size() == orderItems?.findAll { it.isCompletelyFulfilled() }?.size()
 	}
 	
 	String getOrderNumber() {
