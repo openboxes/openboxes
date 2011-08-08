@@ -96,28 +96,28 @@
 															</td>
 															<td class="center" style="border-left: 1px solid lightgrey;">
 																
-																<g:if test="${!orderItem?.orderItem?.isComplete() }">
+																<g:if test="${!orderItem?.orderItem?.isCompletelyFulfilled() }">
 																	<input type="text" name='orderItems[${i }].quantityReceived' value="${orderItem?.quantityReceived }" size="5" class="center updateable" />
 																</g:if>
 															</td>
 															<td>
-																<g:if test="${!orderItem?.orderItem?.isComplete() }">
+																<g:if test="${!orderItem?.orderItem?.isCompletelyFulfilled() }">
 																	<g:autoSuggest id="productReceived-${i }" name="orderItems[${i }].productReceived" jsonUrl="/warehouse/json/findProductByName" width="200" valueId="${orderItem?.productReceived?.id }" valueName="${orderItem?.productReceived?.name }"/>	
 																</g:if>
 															</td>
 															<td>
-																<g:if test="${!orderItem?.orderItem?.isComplete() }">
+																<g:if test="${!orderItem?.orderItem?.isCompletelyFulfilled() }">
 																	<g:textField name="orderItems[${i }].lotNumber" value="${orderItem?.lotNumber }" size="10" class="updateable"/>
 																</g:if>
 															</td>
 															<td nowrap="true">
-																<g:if test="${!orderItem?.orderItem?.isComplete() }">
+																<g:if test="${!orderItem?.orderItem?.isCompletelyFulfilled() }">
 																	<g:datePicker name="orderItems[${i }].expirationDate" precision="month" default="none" noSelection="['':'']"
 																		years="${(1900 + (new Date().year))..(1900+ (new Date() + (50 * 365)).year)}" value="${orderItem?.expirationDate }" />					
 																</g:if>
 															</td>															
 															<td>
-																<g:if test="${!orderItem?.orderItem?.isComplete() }">
+																<g:if test="${!orderItem?.orderItem?.isCompletelyFulfilled() }">
 																	<span class="buttons" style="padding: 0px;">
 																		<input type="image" src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="add" class="btnAdd" style="vertical-align: middle"/>
 																	</span>
