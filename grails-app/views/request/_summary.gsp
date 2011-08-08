@@ -32,7 +32,7 @@
 					</td>										
 					<td style="text-align: right;">
 						<div class="fade" style="font-weight: bold; font-size:1.5em;">
-							<warehouse:message code="${requestInstance?.status() }"/>
+							<format:metadata obj="${requestInstance?.status}"/>
 						</div>
 						<br/>
 						

@@ -32,7 +32,7 @@
 					</td>										
 					<td style="text-align: right;">
 						<div class="fade" style="font-weight: bold; font-size:1.5em;">
-							${orderInstance?.status() }
+							<format:metadata obj="${orderInstance?.status}"/>
 						</div>
 						<br/>
 						<g:if test="${!params.execution && !isAddingComment && !isAddingDocument}">						

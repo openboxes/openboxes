@@ -11,7 +11,7 @@ import org.pih.warehouse.core.User;
 
 class Order implements Serializable {
 	
-	OrderStatus status;
+	OrderStatus status 
 	String description 		// a user-defined, searchable name for the order 
 	String orderNumber 		// an auto-generated shipment number
 	Location origin			// the vendor
@@ -48,18 +48,13 @@ class Order implements Serializable {
 		lastUpdated(nullable:true)
 	}	
 	
-	String status() { 
-		if (isPlaced() && isPartiallyReceived()) {
-			return "Partially Received"
-		}
-		else if (isPlaced()) { 
-			return "Placed"
-		}
-		else if (isReceived()) { 
-			return "Received"
-		} 
-		return "Pending"
+	/**
+	 * Override the status getter so that we return pending if no state set
+	 */
+	OrderStatus getStatus() {
+		return status ?: OrderStatus.PENDING
 	}
+	
 	
 	/**
 	 * @return	a boolean indicating whether the order is pending
@@ -91,7 +86,7 @@ class Order implements Serializable {
 	 * @return
 	 */
 	Boolean isPartiallyReceived() { 
-		return orderItems?.find { it.isPartiallyFulfilled() } 
+		return (status == OrderStatus.PARTIALLY_RECEIVED)
 	}
 
 	/**

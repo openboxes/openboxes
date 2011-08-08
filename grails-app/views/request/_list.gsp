@@ -55,7 +55,7 @@
 				<td><format:datetime obj="${requestInstance.lastUpdated}" /></td>
 
 				<td>
-					<warehouse:message code="${requestInstance?.status()}"/>
+					<format:metadata obj="${requestInstance?.status}"/>
 				</td>
 
 			</tr>

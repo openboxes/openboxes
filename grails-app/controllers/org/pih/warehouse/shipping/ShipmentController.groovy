@@ -433,7 +433,7 @@ class ShipmentController {
 		def destination = Location.get(session.warehouse.id)
 		def shipmentType = params.shipmentType ? ShipmentType.get(params.shipmentType) : null
 		def origin = params.origin ? Location.get(params.origin) : null
-		def statusCode = params.status ? ShipmentStatusCode.getByName(params.status) : null
+		def statusCode = params.status ? Enum.valueOf(ShipmentStatusCode.class, params.status) : null
 		def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
 		def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
 					
@@ -486,7 +486,7 @@ class ShipmentController {
 		def origin = Location.get(session.warehouse.id)
 		def shipmentType = params.shipmentType ? ShipmentType.get(params.shipmentType) : null
 		def destination = params.destination ? Location.get(params.destination) : null
-		def statusCode = params.status ? ShipmentStatusCode.getByName(params.status) : null
+		def statusCode = params.status ? Enum.valueOf(ShipmentStatusCode.class, params.status) : null
 		def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
 		def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
 					

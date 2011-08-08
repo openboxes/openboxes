@@ -43,7 +43,7 @@
 													<label><warehouse:message code="default.status.label" /></label>
 												</td>
 												<td valign="top">
-													<warehouse:message code="${shipmentInstance?.status.name}"/>
+													<format:metadata obj="${shipmentInstance?.status.code}"/>
 													<span class="fade">
 														<g:if test="${shipmentInstance?.status?.location}">
 															<warehouse:message code="default.by.label"/> ${shipmentInstance?.status.location}

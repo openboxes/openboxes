@@ -8,7 +8,8 @@ class ShipmentStatus implements Comparable {
 	Date date
 	Location location
 	
-	String getName() { return code.name }
+	String getName() { return code.getName() }
+	
 	String toString() { return getName() }
 	
 	int compareTo(obj) { 

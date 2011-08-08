@@ -55,7 +55,7 @@
 				<td><format:datetime obj="${orderInstance.lastUpdated}" /></td>
 
 				<td>
-					${orderInstance?.status() }
+					<format:metadata obj="${orderInstance?.status}"/>
 				</td>
 
 			</tr>

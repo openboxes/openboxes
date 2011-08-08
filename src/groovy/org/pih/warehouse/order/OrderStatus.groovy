@@ -5,26 +5,23 @@ import org.pih.warehouse.shipping.ShipmentStatusCode;
 
 public enum OrderStatus {
 
-	PENDING("Pending",1),
-	PLACED("Placed",2),
-	RECEIVED("Received",3)
+	PENDING(1),
+	PLACED(2),
+	PARTIALLY_RECEIVED(3),
+	RECEIVED(4)
 	
-	String name
 	int sortOrder
 
-	OrderStatus(String name, int sortOrder) { [ this.name = name, this.sortOrder = sortOrder ] }
+	OrderStatus(int sortOrder) { [ this.sortOrder = sortOrder ] }
 	
 	static int compare(OrderStatus a, OrderStatus b) {
 		return a.sortOrder <=> b.sortOrder
 	}
 	
 	static list() {
-		[ PENDING, PLACED, RECEIVED ]
+		[ PENDING, PLACED, PARTIALLY_RECEIVED, RECEIVED ]
 	}
 	
-	static OrderStatus getByName(String name) {
-		list().find( { it.name == name } )
-	}
+	String toString() { return name() }
 	
-	String toString() { return name }
 }

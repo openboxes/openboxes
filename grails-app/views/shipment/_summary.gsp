@@ -21,7 +21,7 @@
 							</g:if>
 							${format.metadata(obj:shipmentInstance?.shipmentType)} <warehouse:message code="shipping.shipment.label"/> <b>#${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}</b> 
 							&nbsp;|&nbsp; 
-							<warehouse:message code="${shipmentInstance?.status?.name}"/>
+							<format:metadata obj="${shipmentInstance?.status?.code}"/>
 							
 						</div>
 												

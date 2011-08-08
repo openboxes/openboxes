@@ -24,7 +24,7 @@
 						           		<label class="block"><warehouse:message code="default.type.label"/> </label> 
 						           		<g:select name="shipmentType"
 														from="${org.pih.warehouse.shipping.ShipmentType.list()}"
-														optionKey="id" optionValue="name" value="${shipmentType}" 
+														optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${shipmentType}" 
 														noSelection="['':warehouse.message(code:'default.all.label')]" />&nbsp;&nbsp;    
 									</td>
 						           	<td class="filter-list-item">
@@ -38,7 +38,7 @@
 							           	<label class="block"><warehouse:message code="default.status.label"/> </label> 
 							           	<g:select name="status" 
 							           					   from="${org.pih.warehouse.shipping.ShipmentStatusCode.list()}"
-							           					   optionKey="name" optionValue="${{warehouse.message(code:it.name)}}" value="${status}" 
+							           					   optionKey="name" optionValue="${{format.metadata(obj:it)}}" value="${status}" 
 							           					   noSelection="['':warehouse.message(code:'default.all.label')]" />&nbsp;&nbsp;	
 									</td>
 						           	<td class="filter-list-item">
@@ -119,7 +119,7 @@
 													<format:date obj="${shipmentInstance?.expectedShippingDate}"/>
 												</td>
 												<td>												
-													<warehouse:message code="${shipmentInstance?.status.name}"/>
+													<format:metadata obj="${shipmentInstance?.status.code}"/>
 													<g:if test="${shipmentInstance?.status.date}">
 													 - <format:date obj="${shipmentInstance?.status.date}"/>
 													 </g:if>									

@@ -64,8 +64,8 @@
 					    			<tbody>
 										<g:each var="entry" in="${incomingOrders}" status="i">	 
 											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-												<td>${entry?.key?.name?:warehouse.message(code:'default.pending.label')}</td>
-												<td style="text-align: center;"><g:link controller="order" action="list" params="['status':entry?.key?.name]">
+												<td>${format.metadata(obj:entry.key)}</td>
+												<td style="text-align: center;"><g:link controller="order" action="list" params="['status':entry?.key]">
 													${entry?.value?.size}</g:link></td>
 											</tr>	
 								    	</g:each>
@@ -106,8 +106,8 @@
 					    			<tbody>
 										<g:each var="entry" in="${outgoingShipmentsByStatus}" status="i">											
 											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-												<td><warehouse:message code="${entry.key.name}"/></td>
-												<td style="text-align: center;"><g:link controller="shipment" action="listShipping" params="['status':entry.key.name]">${entry.value.objectList.size}</g:link></td>
+												<td><format:metadata obj="${entry.key}"/></td>
+												<td style="text-align: center;"><g:link controller="shipment" action="listShipping" params="['status':entry.key]">${entry.value.objectList.size}</g:link></td>
 											</tr>	
 											
 								    	</g:each>
@@ -142,8 +142,8 @@
 					    			<tbody>
 										<g:each var="entry" in="${incomingShipmentsByStatus}" status="i">	 
 											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-												<td><warehouse:message code="${entry.key.name}"/></td>
-												<td style="text-align: center;"><g:link controller="shipment" action="listReceiving" params="['status':entry.key.name]">
+												<td><format:metadata obj="${entry.key}"/></td>
+												<td style="text-align: center;"><g:link controller="shipment" action="listReceiving" params="['status':entry.key]">
 													${entry.value.objectList.size}</g:link></td>
 											</tr>	
 								    	</g:each>

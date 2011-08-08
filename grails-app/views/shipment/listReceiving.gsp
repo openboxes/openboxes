@@ -15,12 +15,12 @@
 				<div class="message">${flash.message}</div>
             </g:if>
 
-			<h1>Shipments destined for ${session.warehouse.name}</h1>
+			<h1><warehouse:message code="receiving.shipmentsDestinedFor.label"/> ${session.warehouse.name}</h1>
 
 			 <g:form action="listReceiving" method="post">
            		<h3><warehouse:message code="default.type.label"/>:  <g:select name="shipmentType"
 								from="${org.pih.warehouse.shipping.ShipmentType.list()}"
-								optionKey="id" optionValue="name" value="${shipmentType}" 
+								optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${shipmentType}" 
 								noSelection="['':warehouse.message(code:'default.all.label')]" />&nbsp;&nbsp;    
            
            		<warehouse:message code="default.destination.label"/>:  <g:select name="origin" 
@@ -30,7 +30,7 @@
            								
            		<warehouse:message code="default.status.label"/>:  <g:select name="status" 
            					   from="${org.pih.warehouse.shipping.ShipmentStatusCode.list()}"
-           					   optionKey="name" optionValue="${{warehouse.message(code:it.name)}}" value="${status}" 
+           					   optionKey="name" optionValue="${{format.metadata(obj:it)}}" value="${status}" 
            					   noSelection="['':warehouse.message(code:'default.all.label')]" />&nbsp;&nbsp;	
            					   
            		<warehouse:message code="default.from.label"/>: <g:jqueryDatePicker id="statusStartDate" name="statusStartDate"
@@ -89,7 +89,7 @@
 									<g:formatDate format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT}" date="${shipmentInstance?.expectedDeliveryDate}"/>
 								</td>								
 								<td>												
-									<warehouse:message code="${shipmentInstance?.status.name}"/>
+									<format:metadata obj="${shipmentInstance?.status.code}"/>
 									<g:if test="${shipmentInstance?.status.date}">
 									 - <format:date obj="${shipmentInstance?.status.date}"/>
 									 </g:if>	

@@ -5,17 +5,16 @@ import org.pih.warehouse.shipping.ShipmentStatusCode;
 
 public enum RequestStatus {
 
-	NOT_YET_REQUESTED("request.status.notYetRequested.label",1),
-	REQUESTED("request.status.requested.label",2),
-	FULFILLED("request.status.fulfilled.label", 3),
-	SHIPPED("request.status.shipped.label", 4),
-	RECEIVED("request.status.received.label",5),
-	CANCELED("request.status.canceled.label", 6)
+	NOT_YET_REQUESTED(1),
+	REQUESTED(2),
+	FULFILLED(3),
+	SHIPPED(4),
+	RECEIVED(5),
+	CANCELED(6)
 	
-	String name
 	int sortOrder
 
-	RequestStatus(String name, int sortOrder) { [ this.name = name, this.sortOrder = sortOrder ] }
+	RequestStatus(int sortOrder) { [ this.sortOrder = sortOrder ] }
 	
 	static int compare(RequestStatus a, RequestStatus b) {
 		return a.sortOrder <=> b.sortOrder
@@ -25,9 +24,6 @@ public enum RequestStatus {
 		[ NOT_YET_REQUESTED, REQUESTED, FULFILLED, SHIPPED, RECEIVED ]
 	}
 	
-	static RequestStatus getByName(String name) {
-		list().find( { it.name == name } )
-	}
-	
-	String toString() { return name }
+	String toString() { return name() }
+
 }

@@ -2,14 +2,13 @@ package org.pih.warehouse.shipping
 
 public enum ShipmentStatusCode {
 
-	PENDING("shipping.pending.label",1),
-	SHIPPED("shipping.shipped.label",2),
-	RECEIVED("shipping.received.label",3)
+	PENDING(1),
+	SHIPPED(2),
+	RECEIVED(3)
 	
-	String name
 	int sortOrder
 
-	ShipmentStatusCode(String name, int sortOrder) { [ this.name = name, this.sortOrder = sortOrder ] }
+	ShipmentStatusCode(int sortOrder) { [ this.sortOrder = sortOrder ] }
 	
 	static int compare(ShipmentStatusCode a, ShipmentStatusCode b) {
 		return a.sortOrder <=> b.sortOrder
@@ -19,9 +18,8 @@ public enum ShipmentStatusCode {
 		[ PENDING, SHIPPED, RECEIVED ]
 	}
 	
-	static ShipmentStatusCode getByName(String name) {
-		list().find( { it.name == name } )
-	}
 	
-	String toString() { return name }
+	String getName() { return name() }
+	
+	String toString() { return name() }
 }

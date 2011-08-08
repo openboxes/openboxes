@@ -95,7 +95,17 @@ class FormatTagLib {
 	  */
 	 def metadata = { attrs ->
 		 if (attrs.obj != null) {
-			 out << localizationService.getLocalizedString(attrs.obj.name)
+			
+			 // first, handle any Enums
+			 if (attrs.obj instanceof Enum) {
+				 // by convention, the localized text for a Enum is stored in the message property enum.className.value  (ie enum.ShipmentStatusCode.PENDING)
+				 String className = attrs.obj.getClass().getSimpleName()		 
+				 out << warehouse.message(code:'enum.' + className + "." + attrs.obj)
+			 }
+			 else {
+				 // for all other objects, return the localized version of the name
+				 out << localizationService.getLocalizedString(attrs.obj.name)
+			 }
 		 }
 	 }
  }
