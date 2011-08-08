@@ -46,37 +46,41 @@
 				<table>
 					<tr class="prop">
 						<td class="name">
-							<label>Product Requested</label>
+							<label>Requested</label>
 						</td>
-						<td class="value">				
-							${requestItem.quantity} units of ${requestItem.product} <span class="fade">${requestItem.category}</span>
+						<td class="value">			
+						
+							<g:if test="${requestItem?.product }">
+								${requestItem?.product} 
+								<span class="fade">${requestItem?.product?.category}</span>					
+							</g:if>	
+							<g:elseif test="${requestItem?.category }">
+								${requestItem?.category} 
+							</g:elseif>
+							<g:else>
+								${requestItem?.description} 
+							</g:else>
+							(${requestItem?.quantity} units)
 						</td>
 					</tr>					
 					<tr class="prop">
 						<td class="name">
-							<label>Product Fulfilled</label>
+							<label>Fulfilled</label>
 						</td>
 						<td class="value">				
+							<g:if test="${product }">
+								${product?.name } <span class="fade">${product?.category}</span>						
+							</g:if>
+							<g:else>
+								${requestItem?.product?.name} <span class="fade">${requestItem?.product?.category}</span>
+							</g:else>
+							<br/>
 							<div class="buttons left">
-								<g:if test="${product }">
-									${product?.name } <span class="fade">${product.category}</span>						
-								</g:if>
-								<g:else>
-									${requestItem.product?.name} <span class="fade">${requestItem.product.category}</span>
-								</g:else>
-								<br/>
 								<g:autoSuggest id="product" name="product" jsonUrl="/warehouse/json/findProductByName" width="200" />
 								<g:submitButton name="changeProduct" value="${warehouse.message(code:'default.change.label')}"></g:submitButton>					
 							</div>
-						</td>
-					</tr>	
-					<tr class="prop">
-						<td class="name">
-							<label>Available inventory</label>
-						</td>
-						<td class="value">					
 						
-							<div style="height: 125px; overflow: auto">
+							<div style="height: 200px; overflow: auto">
 								<table border="0">
 									<tr class="odd">
 										<td>Lot Number</td>
@@ -91,6 +95,8 @@
 											
 											<tr class="${i%2?'odd':'even' }">	
 												<td>
+													<g:hiddenField name="product.id" value="${inventoryItem?.product?.id }"/>
+													<g:hiddenField name="inventoryItem.id" value="${inventoryItem?.id }"/>
 													${inventoryItem.lotNumber?:"none" }
 												</td>
 												<td>

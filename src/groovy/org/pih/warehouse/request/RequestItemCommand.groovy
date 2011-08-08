@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.list.LazyList;
 import org.pih.warehouse.core.Person;
+import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.shipping.ShipmentItem;
@@ -28,6 +29,7 @@ class RequestItemCommand  implements Serializable {
 	String lotNumber
 	Date expirationDate
 	Product productReceived
+	InventoryItem inventoryItem
 	Integer quantityReceived	
 		
 	static constraints = {

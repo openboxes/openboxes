@@ -35,10 +35,9 @@ class FulfillRequestWorkflowController {
 				}
 				
 				flow.requestCommand = requestCommand;
-				flow.requestInstance = requestCommand.request;
-				flow.requestItems = requestCommand.requestItems
-				
-				flow.requestItemList = requestCommand.request.requestItems as List
+				flow.requestInstance = requestCommand?.request;
+				flow.requestItems = requestCommand?.requestItems
+				flow.requestItemList = requestCommand?.request?.requestItems as List
 				
 				if (params.skipTo) {
 					if (params.skipTo == 'packRequestItems') return packRequestItems()
@@ -121,13 +120,11 @@ class FulfillRequestWorkflowController {
 			on("success").to "pickRequestItems"
 			on(Exception).to "handleError"
 		}
-		
-		
 		saveAndContinue {
-			action { RequestItemCommand command ->
+			action { RequestItemListCommand command ->
 				flash.message = "Fulfilled item "
 				log.info "fulfill item and continue: " + params
-				log.info "command " + command
+				log.info "fulfill items " + command.requestItems
 				[showDialog: Boolean.TRUE]
 			}
 			on("success").to "pickRequestItems"

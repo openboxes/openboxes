@@ -39,11 +39,11 @@
 												<tr class="odd prop">
 													<td class="center" colspan="3">
 														<img src="${createLinkTo(dir:'images/icons/silk',file:'cart.png')}" alt="requested" style="vertical-align: middle"/>
-														Items Requested
+														Requested
 													</td>
 													<td class="center" colspan="4" style="border-left: 1px solid lightgrey;">
 														<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="received" style="vertical-align: middle"/>
-														Items Fulfilled
+														Fulfilled
 													</td>
 												</tr>
 												<tr class="even">
