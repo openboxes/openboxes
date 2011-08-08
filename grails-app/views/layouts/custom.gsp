@@ -116,7 +116,7 @@
 								<ul>
 								    <g:if test="${session.user}">
 										<li>
-											Welcome, <b>${session?.user?.name}</b> 
+											<warehouse:message code="layout.welcome.label"/>, <b>${session?.user?.name}</b> 
 										</li>
 										<!-- 																	
 										<li>
@@ -131,7 +131,7 @@
 										<li>
 											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'user.png')}" style="vertical-align: middle" />
 											<g:link class="home" controller="user" action="show" id="${session.user.id}">
-												My Account
+												<warehouse:message code="layout.myAccount.label"/>
 											</g:link>	
 										</li>
 																	
@@ -218,7 +218,7 @@
 											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
 										</li>												
 										<li>
-											<g:link class="list" controller="auth" action="logout"><warehouse:message code="default.logout.label"  default="Sign Out"/></g:link>
+											<g:link class="list" controller="auth" action="logout"><warehouse:message code="default.logout.label"/></g:link>
 										</li>					
 										
 										<!-- 
@@ -229,9 +229,9 @@
 										 -->
 								    </g:if>
 								    <g:else test="${!session.user}">
-										<li>Not logged in</li>
-										<li><g:link class="list" controller="auth" action="signup"><warehouse:message code="default.signup.label" default="Signup"/></g:link></li>
-										<li><g:link class="list" controller="auth" action="login"><warehouse:message code="default.login.label" default="Login"/></g:link></li>
+										<li><warehouse:message code="layout.notLoggedIn.label"/></li>
+										<li><g:link class="list" controller="auth" action="signup"><warehouse:message code="default.signup.label"/></g:link></li>
+										<li><g:link class="list" controller="auth" action="login"><warehouse:message code="default.login.label"/></g:link></li>
 										<!-- 
 										  <li><g:link class="list" controller="user" action="register"><warehouse:message code="default.register.label" default="Register"/></g:link></li>
 										  <li><g:link class="list" controller="user" action="help"><warehouse:message code="default.help.label" default="Help"/></g:link></li>
@@ -341,11 +341,11 @@
 			<div id="footer">
 				<div style="line-height: 2em;">
 					&copy; 2010 Partners In Health&trade; <b>OpenBoxes</b> &nbsp;&nbsp; | &nbsp;&nbsp;
-					Environment: <b>${grails.util.GrailsUtil.environment}</b> &nbsp;&nbsp; | &nbsp;&nbsp;
-					Application Version: &nbsp;<b><g:meta name="app.version"/></b>&nbsp;&nbsp; | &nbsp;&nbsp;
-					Grails Version: &nbsp; <b><g:meta name="app.grails.version"></g:meta></b>&nbsp;&nbsp; | &nbsp;&nbsp;
-					Date: <b>${new Date() }</b>&nbsp;&nbsp; | &nbsp;&nbsp;
-					Locale: &nbsp;  	
+					<warehouse:message code="admin.environment.label"/>: <b>${grails.util.GrailsUtil.environment}</b> &nbsp;&nbsp; | &nbsp;&nbsp;
+					<warehouse:message code="admin.applicationVersion.label"/>: &nbsp;<b><g:meta name="app.version"/></b>&nbsp;&nbsp; | &nbsp;&nbsp;
+					<warehouse:message code="admin.grailsVersion.label"/>: &nbsp; <b><g:meta name="app.grails.version"></g:meta></b>&nbsp;&nbsp; | &nbsp;&nbsp;
+					<warehouse:message code="default.date.label"/>: <b>${new Date() }</b>&nbsp;&nbsp; | &nbsp;&nbsp;
+					<warehouse:message code="default.locale.label"/>: &nbsp;  	
 					<img src="${createLinkTo(dir: 'images/flags', file: 'us.png') }" style="vertical-align: middle;">
 					<g:if test="${session['org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'].toString() != 'en_US'}">			
 						<a href="${createLink(controller: 'dashboard', action: 'index', params: ['lang':'en_US'])}">English (US)</a> &nbsp;
@@ -361,6 +361,8 @@
 					<g:else>
 						<span>French</span>					
 					</g:else>
+					
+					<!-- 
 					&nbsp;
 					<img src="${createLinkTo(dir: 'images/flags', file: 'es.png') }" style="vertical-align: middle;">
 					<g:if test="${session['org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'].toString() != 'es'}">			
@@ -369,6 +371,8 @@
 					<g:else>
 						<span>Spanish</span>					
 					</g:else>
+					-->
+
 
 				</div>
 			</div>

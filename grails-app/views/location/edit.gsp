@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${warehouse.message(code: 'locations.label', default: 'Location')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'location.suppliersCustomers.label')}" />
         <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.edit.label" args="[entityName]" /></content>
@@ -44,7 +44,7 @@
 	                                   <g:select name="locationType.id"
 									          from="${org.pih.warehouse.core.LocationType.list().findAll { it.id != org.pih.warehouse.core.Constants.WAREHOUSE_LOCATION_TYPE_ID } }"
 									          value="${locationType?.id}"
-									          optionKey="id" optionValue="name"/>
+									          optionKey="id" optionValue="${{format.metadata(obj:it)}}"/>
 	                                </td>
 	                            </tr>
 	                           
@@ -53,7 +53,7 @@
 	                            	<td valign="top"></td>
 	                            	<td valign="top">
 	                            			<button type="submit">								
-												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'tick.png')}"/>&nbsp;Save
+												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'tick.png')}"/>&nbsp;${warehouse.message(code: 'default.button.save.label', default: 'Save')}
 											</button>
 											&nbsp;
 											<g:link action="delete" id="${locationInstance.id}">

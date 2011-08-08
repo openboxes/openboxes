@@ -5,9 +5,9 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'locations.label', default: 'Locations')}" />
         <g:set var="pageTitle" value="${warehouse.message(code: 'default.show.label' args="[entityName]")}" />
-        <title><warehouse:message code="default.show.label" args="[entityName]" /></title>
+        <title><warehouse:message code="location.suppliersCustomers.label" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><warehouse:message code="default.show.label" args="[entityName]" /></content>
+		<content tag="pageTitle">><warehouse:message code="location.suppliersCustomers.label" /></content>
     </head>
     <body>        
         <div class="body">
@@ -18,14 +18,13 @@
               
             <div class="dialog">
 				<span class="menuButton">
-           			<g:link action="edit" class="new">Add location</g:link>
+           			<g:link action="edit" class="new"><warehouse:message code="location.addNewSupplierCustomer.label" /></g:link>
 	           	</span>
            	</div>
             <div class="list">
                 <table>
                     <thead>
                         <tr>
-                        	<g:sortableColumn property="id" title="${warehouse.message(code: 'eventType.id.label', default: 'Id')}" />
                             <g:sortableColumn property="name" title="${warehouse.message(code: 'location.name.label', default: 'Name')}" />
                             <th><warehouse:message code="location.type.label" default="Type" /></th>
                         </tr>
@@ -36,7 +35,7 @@
 							<td>
 								<g:link action="edit" id="${locationInstance.id}">${fieldValue(bean: locationInstance, field: "name")}</g:link>
 							</td>                           
-                            <td>${fieldValue(bean: locationInstance, field: "locationType")}</td>                                                  
+                            <td><format:metadata obj="${locationInstance.locationType}"/></td>                                                  
 							<td class="center tenth"><g:link class="edit" action="edit" id="${locationInstance?.id}" >${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}</g:link></td>
 						</tr>
                     </g:each>
