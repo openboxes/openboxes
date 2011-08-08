@@ -14,38 +14,38 @@
 		<div class="action-menu-item">
 			<g:link controller="order" action="show" id="${orderInstance?.id}">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" />
-				&nbsp;${warehouse.message(code: 'order.view.label', default: 'View order details')} 
+				&nbsp;${warehouse.message(code: 'order.viewDetails.label')} 
 			</g:link>		
 		</div>
 		<div class="action-menu-item">
 			<g:link controller="order" action="addComment" id="${orderInstance?.id}">
 				<img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />
-				&nbsp;${warehouse.message(code: 'order.addComment.label', default: 'Add comment')} 
+				&nbsp;${warehouse.message(code: 'order.addComment.label')} 
 			</g:link>				
 		</div>		
 		<div class="action-menu-item">
 			<g:link controller="order" action="addDocument" id="${orderInstance?.id}">
 				<img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />
-				&nbsp;${warehouse.message(code: 'order.addDocument.label', default: 'Add document')} 
+				&nbsp;${warehouse.message(code: 'order.addDocument.label')} 
 			</g:link>				
 		</div>		
 		<div class="action-menu-item">
 			<g:link controller="receiveOrderWorkflow" action="receiveOrder" id="${orderInstance?.id}">
 				<img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />
-				&nbsp;${warehouse.message(code: 'order.receive.label', default: 'Receive order')} 
+				&nbsp;${warehouse.message(code: 'order.receiveOrder.label')} 
 			</g:link>				
 		</div>						
 		<div class="action-menu-item">
 			<g:link controller="order" action="withdraw" id="${orderInstance?.id}" onclick="alert('${warehouse.message(code: 'default.button.notSupported.message', default: 'This feature is not currently supported.')}'); return false;">
 				<img src="${resource(dir: 'images/icons/silk', file: 'cart_delete.png')}" />
-				&nbsp;${warehouse.message(code: 'order.cancel.label', default: 'Cancel order')} 
+				&nbsp;${warehouse.message(code: 'order.cancelOrder.label')} 
 			</g:link>				
 		</div>
 		<g:if test="${!hideDelete}">
 			<div class="action-menu-item">
 				<g:link controller="order" action="delete" id="${orderInstance?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
 					<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />
-					&nbsp;${warehouse.message(code: 'order.delete.label', default: 'Delete order')} 
+					&nbsp;${warehouse.message(code: 'order.deleteOrder.label')} 
 				</g:link>				
 			</div>
 		</g:if>

@@ -17,7 +17,7 @@
 		<g:else>
 			<div class="actions" style="min-width: 200px;">
 				<div class="action-menu-item">
-					Unknown state
+					<warehouse:message code="default.unknownState.label"/>
 				</div>
 			</div>
 		</g:else>

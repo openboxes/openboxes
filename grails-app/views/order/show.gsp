@@ -24,26 +24,26 @@
 	                    <tbody>
 	                        <tr class="prop">
 	                            <td valign="top" class="name">
-	                            	<label for='description'><warehouse:message code="order.description.label" default="Description" /></label>
+	                            	<label for='description'><warehouse:message code="default.description.label" /></label>
 	                            </td>
 	                            
 	                            <td valign="top" class="value">${fieldValue(bean: orderInstance, field: "description")}</td>
 	                            
 	                        </tr>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for='source'>Order from</label></td>
+								<td valign='top' class='name'><label for='source'><warehouse:message code="order.orderedFrom.label"/></label></td>
 								<td valign='top' class='value'>
 									${orderInstance?.origin?.name?.encodeAsHTML()}
 								</td>
 							</tr>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for="destination">Order for</label></td>
+								<td valign='top' class='name'><label for="destination"><warehouse:message code="order.orderedFor.label"/></label></td>
 								<td valign='top' class='value'>
 									${orderInstance?.destination?.name?.encodeAsHTML()}
 								</td>
 							</tr>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for='orderedBy'>Ordered by</label></td>
+								<td valign='top' class='name'><label for='orderedBy'><warehouse:message code="order.orderedBy.label"/></label></td>
 								<td valign='top'class='value'>
 									${orderInstance?.orderedBy?.name }
 								</td>
@@ -51,22 +51,22 @@
 							
 	                        
 							<tr class="prop">
-	                            <td valign="top" class="name"><label><warehouse:message code="order.items.label" default="Shipments" /></label></td>
+	                            <td valign="top" class="name"><label><warehouse:message code="order.shipments.label" /></label></td>
 	                            <td valign="top" class="value">	    
 	                            
 									<g:if test="${orderInstance?.shipments() }">
 										<table>
 											<thead>
 												<tr class="odd">
-													<th>Type</th>
-													<th>Name</th>
+													<th><warehouse:message code="default.type.label"/></th>
+													<th><warehouse:message code="default.name.label"/></th>
 												</tr>
 											</thead>									
 											<tbody>      
 												<g:each var="shipmentInstance" in="${orderInstance?.shipments()}" status="i">
 													<tr>
 														<td>
-															${shipmentInstance?.shipmentType?.name }
+															<format:metadata obj="${shipmentInstance?.shipmentType}"/>
 														</td>
 														<td>
 															<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id }">${shipmentInstance?.name }</g:link>
@@ -77,24 +77,24 @@
 	                        			</table>
 	                        		</g:if>
 									<g:else>
-										<span class="fade">No shipments</span>
+										<span class="fade"><warehouse:message code="order.noShipments.label"/></span>
 									</g:else>
 	                            	                        		
 	                        	</td>
 	                        </tr>	                        
 	                    
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><label for="comments"><warehouse:message code="order.comments.label" default="Comments" /></label></td>
+	                            <td valign="top" class="name"><label for="comments"><warehouse:message code="default.comments.label" /></label></td>
 	                            <td valign="top" class="value">
 									<g:if test="${orderInstance?.comments }">
 										<table>
 											<thead>
 												<tr class="odd">
-													<th>To</th>
-													<th>From</th>
-													<th>Comment</th>
-													<th>Date</th>
-													<th>Actions</th>
+													<th><warehouse:message code="default.to.label" /></th>
+													<th><warehouse:message code="default.from.label" /></th>
+													<th><warehouse:message code="default.comment.label" /></th>
+													<th><warehouse:message code="default.date.label" /></th>
+													<th><warehouse:message code="default.actions.label" /></th>
 												</tr>
 											</thead>									
 											<tbody>
@@ -127,7 +127,7 @@
 										</table>
 									</g:if>
 									<g:else>
-										<span class="fade">No comments</span>
+										<span class="fade"><warehouse:message code="default.noComments.label" /></span>
 									</g:else>
 	                            
 	                            </td>
@@ -135,26 +135,26 @@
 	                        </tr>
 	                        <tr class="prop">
 	                            <td valign="top" class="name">
-	                            	<label for="comments"><warehouse:message code="order.documents.label" default="Documents" /></label>
+	                            	<label for="comments"><warehouse:message code="documents.label" /></label>
 	                            </td>                            
 	                            <td valign="top" class="value">
 									<g:if test="${orderInstance?.documents }">
 										<table>
 											<thead>
 												<tr class="odd">
-													<th>Filename</th>
-													<th>Type</th>
-													<th>Description</th>
-													<th>Size</th>
-													<th>Last Updated</th>
-													<th>Actions</th>
+													<th><warehouse:message code="document.filename.label" /></th>
+													<th><warehouse:message code="document.type.label" /></th>
+													<th><warehouse:message code="default.description.label" /></th>
+													<th><warehouse:message code="document.size.label" /></th>
+													<th><warehouse:message code="default.lastUpdated.label" /></th>
+													<th><warehouse:message code="default.actions.label" /></th>
 												</tr>
 											</thead>									
 											<tbody>
 												<g:each var="documentInstance" in="${orderInstance?.documents}">
 													<tr>
 														<td>${documentInstance?.filename} (<g:link controller="document" action="download" id="${documentInstance.id}">download</g:link>)</td>
-														<td>${documentInstance?.documentType?.name}</td>
+														<td><format:metadata obj="${documentInstance?.documentType}"/></td>
 														<td>${documentInstance?.name}</td>
 														<td>${documentInstance?.size} bytes</td>
 														<td>${documentInstance?.lastUpdated}</td>
@@ -173,22 +173,22 @@
 										</table>
 									</g:if>
 									<g:else>
-										<span class="fade">No documents</span>
+										<span class="fade"><warehouse:message code="default.noDocuments.label" /></span>
 									</g:else>
 	                            
 	                            </td>
 	                        </tr>
 							<tr class="prop">
-	                            <td valign="top" class="name"><label><warehouse:message code="order.items.label" default="Items" /></label></td>
+	                            <td valign="top" class="name"><label><warehouse:message code="default.items.label" /></label></td>
 	                            <td valign="top" class="value">
 									<g:if test="${orderInstance?.orderItems }">
 										<table>
 											<thead>
 												<tr class="odd">
-													<th>Type</th>
-													<th>Product</th>
-													<th>Qty Ordered</th>
-													<th>Qty Fulfilled</th>
+													<th><warehouse:message code="default.type.label" /></th>
+													<th><warehouse:message code="product.label" /></th>
+													<th><warehouse:message code="order.qtyOrdered.label" /></th>
+													<th><warehouse:message code="order.qtyFulfilled.label" /></th>
 												</tr>
 											</thead>									
 											<tbody>
@@ -196,18 +196,18 @@
 													<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 														<td>
 															<g:if test="${orderItem?.product }">
-																Product
+																<warehouse:message code="product.label" />
 															</g:if>
 															<g:elseif test="${orderItem?.category }">
-																Category
+																<warehouse:message code="category.label" />
 															</g:elseif>							
 															<g:else>
-																Unclassified											
+																<warehouse:message code="default.unclassified.label" />										
 															</g:else>
 														</td>
 														<td>
 															<g:if test="${orderItem?.product }">
-																${orderItem?.product?.name}
+																<format:product product="${orderItem?.product}"/>
 															</g:if>
 															<g:else>
 																${orderItem?.description }
@@ -225,7 +225,7 @@
 										</table>
 									</g:if>
 									<g:else>
-										<span class="fade">No items</span>
+										<span class="fade"><warehouse:message code="default.noItems.label" /></span>
 									</g:else>
 	                            </td>
 	                        </tr>	                        

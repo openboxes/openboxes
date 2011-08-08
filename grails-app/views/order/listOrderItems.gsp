@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${warehouse.message(code: 'order.label', default: 'Order')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'order.orderItems.label')}" />
         <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.list.label" args="[entityName]" /></content>
@@ -23,13 +23,16 @@
 							<tr>
 								<th> </th>
 								<g:sortableColumn property="order"
-									title="${warehouse.message(code: 'orderItem.order.label', default: 'Order')}" />
+									title="${warehouse.message(code: 'order.label')}" />
 					
 								<g:sortableColumn property="description"
-									title="${warehouse.message(code: 'orderItem.description.label', default: 'Description')}" />
+									title="${warehouse.message(code: 'default.description.label')}" />
+									
+								<g:sortableColumn property="quantity"
+									title="${warehouse.message(code: 'default.qty.label')}" />
 									
 								<g:sortableColumn property="status"
-									title="${warehouse.message(code: 'orderItem.status.label', default: 'Status')}" />
+									title="${warehouse.message(code: 'default.status.label')}" />
 									
 							</tr>
 						</thead>
@@ -53,7 +56,7 @@
 											${fieldValue(bean: orderItem, field: "quantity")}
 										</td>
 										<td>
-											${(orderItem?.isCompletelyFulfilled())?"Complete":"Pending" }
+											${(orderItem?.isCompletelyFulfilled()) ? warehouse.message(code:'order.complete.label') : warehouse.message(code:'order.pending.label') }
 										</td>
 						
 									</tr>
@@ -63,7 +66,7 @@
 					</table>
 				</g:if>
 				<g:else>
-					There are no pending order items.
+					<warehouse:message code="order.noPendingItems.label"/>
 				</g:else>
 
 			</div>

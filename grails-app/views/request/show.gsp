@@ -126,7 +126,7 @@
 										</table>
 									</g:if>
 									<g:else>
-										<span class="fade"><warehouse:message code="default.noComments.message"/></span>
+										<span class="fade"><warehouse:message code="default.noComments.label"/></span>
 									</g:else>
 	                            
 	                            </td>

@@ -16,14 +16,14 @@
 								<g:render template="/order/actions" model="[orderInstance:orderInstance]"/> &nbsp;|&nbsp;
 							</g:if>
 							<span class="order-number">
-								Order #: <b>${orderInstance?.orderNumber}</b>  
+								<warehouse:message code="order.orderNumber.label"/>: <b>${orderInstance?.orderNumber}</b>  
 							</span>
 							<span class="fade">&nbsp;|&nbsp;</span> 
 							<span class="ordered-date">
-								Date ordered: <b><format:date obj="${orderInstance?.dateOrdered}"/></b>
+								<warehouse:message code="order.dateOrdered.label"/>: <b><format:date obj="${orderInstance?.dateOrdered}"/></b>
 							</span>
 							<span class="fade">&nbsp;|&nbsp;</span>
-							<span class="ordered-by">Ordered by: 
+							<span class="ordered-by"><warehouse:message code="order.orderedBy.label"/>: 
 								<g:if test="${orderInstance?.orderedBy }"><b>${orderInstance?.orderedBy?.name }</b></g:if>
 								
 								<g:if test="${orderInstance?.origin }">(${orderInstance?.destination?.name })</g:if>
@@ -39,13 +39,13 @@
 							<g:if test="${!orderInstance?.isCompletelyReceived() && orderInstance?.status != org.pih.warehouse.order.OrderStatus.PLACED }">
 								<g:form action="placeOrder">
 									<g:hiddenField name="id" value="${orderInstance?.id }"/>
-									<button>Place Order</button>
+									<button>${warehouse.message(code: 'order.placeOrder.label')}</button>
 								</g:form>
 							</g:if>
 							<g:elseif test="${!orderInstance?.isCompletelyReceived() && orderInstance?.status == org.pih.warehouse.order.OrderStatus.PLACED }">
 								<g:link controller="receiveOrderWorkflow" action="receiveOrder" id="${orderInstance?.id}">
 									<button>
-										${warehouse.message(code: 'order.receive.label', default: 'Receive order')}
+										${warehouse.message(code: 'order.receiveOrder.label')}
 									</button> 
 								</g:link>										
 							</g:elseif>
@@ -66,14 +66,14 @@
 									${orderInstance?.description }
 								</g:if>
 								<g:else>
-									Untitled order
+									<warehouse:message code="order.untitled.label"/>
 								</g:else>
 							</span>							
 						</div> 
 					</td>										
 					<td style="text-align: right;">
 						<div class="fade" style="font-weight: bold; font-size:1.5em;">
-							New
+							<warehouse:message code="default.new.label"/>
 						</div>
 					</td>
 				</tr>

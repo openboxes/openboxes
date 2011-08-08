@@ -6,25 +6,25 @@
 		<tr>
 			<th>Actions </th>
 			<g:sortableColumn property="description"
-				title="${warehouse.message(code: 'order.description.label', default: 'Description')}" />
+				title="${warehouse.message(code: 'default.description.label')}" />
 				
 			<g:if test="${orderType == 'incoming' }">
 				<g:sortableColumn property="origin"
-					title="${warehouse.message(code: 'order.origin.label', default: 'Origin')}" />
+					title="${warehouse.message(code: 'default.origin.label')}" />
 			</g:if>
 			<g:if test="${orderType == 'outgoing' }">
 				<g:sortableColumn property="destination"
-					title="${warehouse.message(code: 'order.destination.label', default: 'Destination')}" />
+					title="${warehouse.message(code: 'default.destination.label')}" />
 			</g:if>
 
 			<g:sortableColumn property="createdBy"
-				title="${warehouse.message(code: 'order.createdBy.label', default: 'Created by')}" />
+				title="${warehouse.message(code: 'default.createdBy.label')}" />
 			
 			<g:sortableColumn property="lastUpdated"
-				title="${warehouse.message(code: 'order.lastUpdated.label', default: 'Last updated')}" />
+				title="${warehouse.message(code: 'default.lastUpdated.label')}" />
 
 			<g:sortableColumn property="status"
-				title="${warehouse.message(code: 'order.status.label', default: 'Status')}" />
+				title="${warehouse.message(code: 'default.status.label')}" />
 				
 		</tr>
 	</thead>
