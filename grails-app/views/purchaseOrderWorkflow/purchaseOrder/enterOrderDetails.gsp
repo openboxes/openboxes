@@ -3,11 +3,11 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
-<title>Enter order details</title>
+<title><warehouse:message code="order.enterOrderDetails.label"/></title>
 </head>
 <body>
 	<div class="nav">
-		<span class="menuButton"><a href="${createLinkTo(dir:'')}">Home</a>
+		<span class="menuButton"><a href="${createLinkTo(dir:'')}"><warehouse:message code="default.home.label"/></a>
 		</span>
 	</div>
 	<div class="body">
@@ -37,26 +37,26 @@
 					<table>
 						<tbody>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for='description'>Description:</label>
+								<td valign='top' class='name'><label for='description'><warehouse:message code="default.description.label"/>:</label>
 								</td>
 								<td valign='top' class='value ${hasErrors(bean:order,field:'description','errors')}'>
 									<input type="text" name='description' value="${order?.description?.encodeAsHTML()}" size="30"/>
 								</td>
 							</tr>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for='source'>Order from:</label>
+								<td valign='top' class='name'><label for='source'><warehouse:message code="order.orderFrom.label"/>:</label>
 								</td>
 								<td valign='top' class='value ${hasErrors(bean:order,field:'origin','errors')}'>
 									<g:if test="${suppliers }">
 										<g:select name="origin.id" from="${suppliers?.sort()}" optionKey="id" value="${order?.origin?.id}" noSelection="['':'']"/>
 									</g:if>
 									<g:else>
-										<span class="fade">There are no suppliers</span> 
+										<span class="fade"><warehouse:message code="order.thereAreNoSuppliers.label"/></span> 
 									</g:else>
 								</td>
 							</tr>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for="destination">Order for:</label>
+								<td valign='top' class='name'><label for="destination"><warehouse:message code="order.orderFor.label"/>:</label>
 								</td>
 								<td valign='top' class='value ${hasErrors(bean:order,field:'destination','errors')}'>
 									<g:if test="${order.destination }">
@@ -71,7 +71,7 @@
 								</td>
 							</tr>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for='orderedBy'>Ordered by:</label></td>
+								<td valign='top' class='name'><label for='orderedBy'><warehouse:message code="order.orderedBy.label"/>:</label></td>
 								<td valign='top'
 									class='value ${hasErrors(bean:order,field:'orderedBy','errors')}'>
 									<g:select class="combobox" name="orderedBy.id" from="${org.pih.warehouse.core.Person.list().sort{it.lastName}}" optionKey="id" value="${order?.orderedBy?.id}" noSelection="['':'']"/>
@@ -79,7 +79,7 @@
 								</td>
 							</tr>
 							<tr class='prop'>
-								<td valign='top' class='name'><label for='dateOrdered'>Ordered on:</label></td>
+								<td valign='top' class='name'><label for='dateOrdered'><warehouse:message code="order.orderedOn.label"/>:</label></td>
 								<td valign='top'
 									class='value ${hasErrors(bean:order,field:'dateOrdered','errors')}'>								
 									<g:jqueryDatePicker 
@@ -95,11 +95,11 @@
 						</tbody>
 					</table>
 					<div class="buttons" style="border-top: 1px solid lightgrey;">
-						<g:submitButton name="next" value="Add Items"></g:submitButton> 
+						<g:submitButton name="next" value="${warehouse.message(code:'order.addItems.label')}"></g:submitButton> 
 						<%-- 
 						<g:submitButton name="finish" value="Save & Exit"></g:submitButton> 
 						--%>
-						<g:link action="purchaseOrder" event="cancel">Cancel</g:link>
+						<g:link action="purchaseOrder" event="cancel"><warehouse:message code="default.button.cancel.label"/></g:link>
 					</div>
 					
 					

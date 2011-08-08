@@ -2,7 +2,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
-<title>Add order items</title>
+<title><warehouse:message code="order.addOrderItems.label"/></title>
 </head>
 <body>
 	<div class="body">
@@ -26,7 +26,7 @@
 					<tr>
 						<td >
 							<div style="margin: 10px">
-								<p>There are ${(order?.orderItems)?order?.orderItems?.size():0 } items in this order.</p>
+								<p><warehouse:message code="order.itemsInOrder.message" args="[(order?.orderItems)?order?.orderItems?.size():0]"/></p>
 							</div>							
 						
 							
@@ -34,12 +34,12 @@
 								<table style="">
 									<thead>
 										<tr class="odd">
-											<th>Actions</th>
-											<g:sortableColumn property="quantity" title="Quantity" />
-											<g:sortableColumn property="name" title="Name" />
-											<g:sortableColumn property="type" title="Type" />
-											<g:sortableColumn class="right" property="unitPrice" title="Unit Price (USD)" />
-											<g:sortableColumn class="right" property="totalPrice" title="Total Price (USD)" />
+											<th><warehouse:message code="default.actions.label"/></th>
+											<g:sortableColumn property="quantity" title="${warehouse.message(code:'default.quantity.label')}" />
+											<g:sortableColumn property="name" title="${warehouse.message(code:'default.name.label')}" />
+											<g:sortableColumn property="type" title="${warehouse.message(code:'default.type.label')}" />
+											<g:sortableColumn class="right" property="unitPrice" title="${warehouse.message(code:'order.unitPrice.label')}" />
+											<g:sortableColumn class="right" property="totalPrice" title="${warehouse.message(code:'order.totalPrice.label')}" />
 										</tr>
 									</thead>
 									<tbody>
@@ -95,7 +95,7 @@
 							<div class="dialog">
 								<div class="tabs">
 									<ul>
-										<li><a href="#tabs-1">Add a product</a></li>
+										<li><a href="#tabs-1"><warehouse:message code="order.addAProduct.label"/></a></li>
 										<%--
 										<li><a href="#tabs-2">Category</a></li>
 										<li><a href="#tabs-3">Unclassified</a></li> 
@@ -108,7 +108,7 @@
 											<table>
 												<tbody>
 													<tr class='prop'>
-														<td valign='top' class='name'><label for='product.id'>Product:</label></td>
+														<td valign='top' class='name'><label for='product.id'><warehouse:message code="product.label"/>:</label></td>
 														<td valign='top' class='value' nowrap="nowrap">
 															<%-- 
 															<div class="ui-widget">
@@ -120,13 +120,13 @@
 														</td>
 													</tr>
 													<tr class='prop'>
-														<td valign='top' class='name'><label for='quantity'>Quantity:</label></td>
+														<td valign='top' class='name'><label for='quantity'><warehouse:message code="default.quantity.label"/>:</label></td>
 														<td valign='top' class='value'>
 															<input type="text" name='quantity' value="${orderItem?.quantity }" size="5" />
 														</td>
 													</tr>
 													<tr class='prop'>
-														<td valign='top' class='name'><label for='quantity'>Unit price:</label></td>
+														<td valign='top' class='name'><label for='quantity'><warehouse:message code="order.unitPrice.label"/>:</label></td>
 														<td valign='top' class='value'>
 															<input type="text" name='unitPrice' value="${orderItem?.unitPrice }" size="5" />
 														</td>
@@ -137,12 +137,12 @@
 															<div class="buttons">
 																<g:if test="${orderItem?.id }">
 																	<span class="formButton"> 
-																		<g:submitButton name="addItem" value="Update Item"></g:submitButton> 
+																		<g:submitButton name="addItem" value="${warehouse.message(code:'order.updateItem.label')}"></g:submitButton> 
 																	</span>
 																</g:if>
 																<g:else>
 																	<span class="formButton"> 
-																		<g:submitButton name="addItem" value="Add Item"></g:submitButton> 
+																		<g:submitButton name="addItem" value="${warehouse.message(code:'order.addItem.label')}"></g:submitButton> 
 																	</span>
 																</g:else>
 															</div>
@@ -226,12 +226,12 @@
 
 				<g:form action="purchaseOrder" autocomplete="false">
 					<div class="buttons" style="border-top: 1px solid lightgrey;">
-						<g:submitButton name="back" value="Back to Order Details"></g:submitButton>
-						<g:submitButton name="next" value="Continue to Order Summary"></g:submitButton>
+						<g:submitButton name="back" value="${warehouse.message(code:'order.backToOrderDetails.label')}"></g:submitButton>
+						<g:submitButton name="next" value="${warehouse.message(code:'order.continueToOrderSummary.label')}"></g:submitButton>
 						<%-- 
-						<g:submitButton name="finish" value="Save & Exit"></g:submitButton> 
+						<g:submitButton name="finish" value="${warehouse.message(code:'default.button.saveAndExit.label')}"></g:submitButton> 
 						--%>
-						<g:link action="purchaseOrder" event="cancel">Cancel</g:link>
+						<g:link action="purchaseOrder" event="cancel"><warehouse:message code="default.button.cancel.label"/></g:link>
 					</div>
 				</g:form>
 				
