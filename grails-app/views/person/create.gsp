@@ -5,9 +5,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'person.label', default: 'Person')}" />
-        <title><warehouse:message code="default.create.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.add.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><warehouse:message code="default.create.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.add.label" args="[entityName]" /></content>
     </head>
     <body>
         <div class="body">

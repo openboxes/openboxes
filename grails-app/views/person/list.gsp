@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${warehouse.message(code: 'person.label', default: 'Person')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'persons.label', default: 'Person')}" />
         <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.list.label" args="[entityName]" /></content>
@@ -18,24 +18,24 @@
             
 				<div>            	
 	            	<span class="menuButton">
-	            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="['person']"/></g:link>
+	            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'person.label').toLowerCase()]"/></g:link>
 	            	</span>
             	</div>
                 <table>
                     <thead>
                         <tr>
                         
-                            <g:sortableColumn property="id" title="${warehouse.message(code: 'person.id.label', default: 'Id')}" />
+                            <g:sortableColumn property="id" title="${warehouse.message(code: 'default.id.label')}" />
                         
-                            <g:sortableColumn property="type" title="${warehouse.message(code: 'person.type.label', default: 'Type')}" />
+                            <g:sortableColumn property="type" title="${warehouse.message(code: 'person.type.label')}" />
                                                     
-                            <g:sortableColumn property="firstName" title="${warehouse.message(code: 'person.firstName.label', default: 'First Name')}" />
+                            <g:sortableColumn property="firstName" title="${warehouse.message(code: 'person.firstName.label')}" />
                         
-                            <g:sortableColumn property="lastName" title="${warehouse.message(code: 'person.lastName.label', default: 'Last Name')}" />
+                            <g:sortableColumn property="lastName" title="${warehouse.message(code: 'person.lastName.label')}" />
                         
-                            <g:sortableColumn property="email" title="${warehouse.message(code: 'person.email.label', default: 'Email')}" />
+                            <g:sortableColumn property="email" title="${warehouse.message(code: 'person.email.label')}" />
                         
-                            <g:sortableColumn property="phoneNumber" title="${warehouse.message(code: 'person.phoneNumber.label', default: 'Phone Number')}" />
+                            <g:sortableColumn property="phoneNumber" title="${warehouse.message(code: 'person.phoneNumber.label')}" />
                         
                         </tr>
                     </thead>
@@ -45,7 +45,7 @@
                         
                             <td><g:link action="edit" id="${personInstance.id}">${fieldValue(bean: personInstance, field: "id")}</g:link></td>
 							<td>
-								${personInstance.class.simpleName} 
+								${warehouse.message(code: (personInstance.class.simpleName.toLowerCase() + '.label'))}
 							</td>                           
                         
                             <td>${fieldValue(bean: personInstance, field: "firstName")}</td>

@@ -70,14 +70,14 @@
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><warehouse:message code="person.dateCreated.label" default="Date Created" /></td>
+                            <td valign="top" class="name"><warehouse:message code="default.dateCreated.label" default="Date Created" /></td>
                             
                             <td valign="top" class="value"><format:datetime obj="${personInstance?.dateCreated}" /></td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><warehouse:message code="person.lastUpdated.label" default="Last Updated" /></td>
+                            <td valign="top" class="name"><warehouse:message code="default.lastUpdated.label" default="Last Updated" /></td>
                             
                             <td valign="top" class="value"><format:datetime obj="${personInstance?.lastUpdated}" /></td>
                             
