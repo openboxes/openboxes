@@ -122,7 +122,7 @@ class FulfillRequestWorkflowController {
 		}
 		saveAndContinue {
 			action { RequestItemListCommand command ->
-				flash.message = "Fulfilled item "
+				flash.message = ${warehouse.message(code: 'request.fulfilledItem.message')}
 				log.info "fulfill item and continue: " + params
 				log.info "fulfill items " + command.requestItems
 				[showDialog: Boolean.TRUE]
@@ -133,7 +133,7 @@ class FulfillRequestWorkflowController {
 		saveAndClose { 
 			action { 
 				log.info "fulfill item and close: " + params
-				flash.message = "Fulfilled item "
+				flash.message = ${warehouse.message(code: 'request.fulfilledItem.message')}
 				
 				[showDialog: Boolean.FALSE]
 			}

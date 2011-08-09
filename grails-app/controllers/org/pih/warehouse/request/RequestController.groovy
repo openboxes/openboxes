@@ -98,16 +98,16 @@ class RequestController {
 			if (requestInstance?.requestItems?.size() > 0) { 
 				requestInstance.status = RequestStatus.REQUESTED;
 				if (!requestInstance.hasErrors() && requestInstance.save(flush: true)) {
-					flash.message = "Request '${requestInstance?.description}' has been placed with warehouse ${requestInstance?.origin?.name}"
+					flash.message = "${warehouse.message(code: 'request.placedWithWarehouse.message', args: [requestInstance?.description,requestInstance?.origin?.name])}"
 					redirect(action: "show", id: requestInstance.id)
 				}
 				else {
-					flash.message = "There was an error while placing your request."
+					flash.message = "${warehouse.message(code: 'request.errorPlacingRequest.message')}"
 					render(view: "show", model: [requestInstance: requestInstance])
 				}
 			}
 			else { 
-				flash.message = "An request must contain at least one item before it can be placed with a vendor."
+				flash.message = "${warehouse.message(code: 'request.mustContainAtLeastOneItem.message')}"
 				redirect(action: "show", id: requestInstance.id)
 			}
 		}
@@ -439,7 +439,7 @@ class RequestController {
 				}*/
 			}
 			else { 
-				flash.message = "shipment item error(s)"
+				flash.message = "${warehouse.message(code: 'request.shipmentItemsError.label')}"
 				render(view: "fulfill", model: [requestItemInstance: requestItem, shipmentInstance: shipmentInstance])
 				return;
 			}
@@ -457,16 +457,16 @@ class RequestController {
 			if (requestInstance?.requestItems?.size() > 0) {
 				requestInstance.status = RequestStatus.FULFILLED;
 				if (!requestInstance.hasErrors() && requestInstance.save(flush: true)) {
-					flash.message = "Request '${requestInstance?.description}' has been placed with warehouse ${requestInstance?.origin?.name}"
+					flash.message = "${warehouse.message(code: 'request.placedWithWarehouse.message', args: [requestInstance?.description,requestInstance?.origin?.name])}"
 					redirect(action: "show", id: requestInstance.id)
 				}
 				else {
-					flash.message = "There was an error while placing your request."
+					flash.message = "${warehouse.message(code: 'request.errorPlacingRequest.message')}"
 					render(view: "show", model: [requestInstance: requestInstance])
 				}
 			}
 			else {
-				flash.message = "An request must contain at least one item before it can be placed with a vendor."
+				flash.message = "${warehouse.message(code: 'request.mustContainAtLeastOneItem.message')}"
 				redirect(action: "show", id: requestInstance.id)
 			}
 		}
