@@ -180,7 +180,7 @@
 			</li>
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="user" action="list"><warehouse:message code="user.label"/></g:link>
+					<g:link controller="user" action="list"><warehouse:message code="users.label"/></g:link>
 				</span>	
 			</li>
 			<!--  								

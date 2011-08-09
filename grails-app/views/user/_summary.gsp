@@ -31,15 +31,15 @@
 							<td style="text-align: right;">
 								<g:link action="toggleActivation" id="${userInstance?.id}">
 									<g:if test="${userInstance?.active}">
-										${warehouse.message(code: 'default.button.deactivate.label', default: 'De-activate')}
+										${warehouse.message(code: 'user.deactivate.label')}
 									</g:if>
 									<g:else>
-										${warehouse.message(code: 'default.button.activate.label', default: 'Activate')}
+										${warehouse.message(code: 'user.activate.label')}
 									</g:else>
 								</g:link>
 								&nbsp;							
 								<span style="font-size: 1.2em">
-									<b>${userInstance?.active?'Active':'Inactive'}</b>
+									<b>${userInstance?.active ? warehouse.message(code: 'user.active.label') : warehouse.message(code: 'user.inactive.label')}</b>
 									<g:if test="${userInstance?.active}">
 										<img class="photo" src="${resource(dir: 'images/icons/silk', file: 'status_online.png') }"
 		            						style="vertical-align: bottom;" />

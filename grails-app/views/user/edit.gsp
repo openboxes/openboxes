@@ -9,11 +9,7 @@
     </head>
     <body>
         <div class="body">
-        
-        	<div class="nav">
-        		<g:render template="nav"/>
-        	</div>        
-        
+      
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>
@@ -45,7 +41,7 @@
 	                        <tbody>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="username"><warehouse:message code="user.username.label" default="Username" /></label>
+	                                  <label for="username"><warehouse:message code="user.username.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
 	                                    <g:textField name="username" value="${userInstance?.username}" />
@@ -54,7 +50,7 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="firstName"><warehouse:message code="user.name.label" default="First name" /></label>
+	                                  <label for="firstName"><warehouse:message code="user.firstName.label"/></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'firstName', 'errors')}">
 	                                    <g:textField name="firstName" value="${userInstance?.firstName}" />
@@ -63,7 +59,7 @@
 	
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="lastName"><warehouse:message code="user.name.label" default="Last Name" /></label>
+	                                  <label for="lastName"><warehouse:message code="user.lastName.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'lastName', 'errors')}">
 	                                    <g:textField name="lastName" value="${userInstance?.lastName}" />
@@ -72,7 +68,7 @@
 	
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                    <label for="password"><warehouse:message code="user.password.label" default="Password" /></label>
+	                                    <label for="password"><warehouse:message code="user.password.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
 	                                    <g:passwordField name="password" value="${userInstance?.password}" />
@@ -81,7 +77,7 @@
 	
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                    <label for="password"><warehouse:message code="user.passwordConfirm.label" default="Password Confirm" /></label>
+	                                    <label for="password"><warehouse:message code="user.confirmPassword.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'passwordConfirm', 'errors')}">
 	                                    <g:passwordField name="passwordConfirm" value="" />
@@ -90,7 +86,7 @@
 	
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="email"><warehouse:message code="user.email.label" default="Email" /></label>
+	                                  <label for="email"><warehouse:message code="user.email.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'email', 'errors')}">
 	                                    <g:textField name="email" value="${userInstance?.email}" />
@@ -98,7 +94,7 @@
 	                            </tr>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="locale"><warehouse:message code="user.locale.label" default="Locale" /></label>
+	                                  <label for="locale"><warehouse:message code="default.locale.label"/></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'locale', 'errors')}">
 	                                    <g:select name="locale" from="${org.pih.warehouse.core.Constants.SUPPORTED_LOCALES}" optionValue="displayName" value="${userInstance?.locale}" noSelection="['':'']"/>
@@ -106,7 +102,7 @@
 	                            </tr>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="email"><warehouse:message code="user.email.label" default="Active" /></label>
+	                                  <label for="email"><warehouse:message code="user.active.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'active', 'errors')}">
 	                                    <g:checkBox name="active" value="${userInstance?.active}" />
@@ -114,7 +110,7 @@
 	                            </tr>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="email"><warehouse:message code="user.email.label" default="Warehouse" /></label>
+	                                  <label for="email"><warehouse:message code="warehouse.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'warehouse', 'errors')}">
 										<g:select name="warehouse.id" from="${org.pih.warehouse.inventory.Warehouse.list()?.sort()}" optionKey="id" value="${userInstance?.warehouse?.id}" noSelection="['':'']"/>

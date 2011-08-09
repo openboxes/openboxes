@@ -12,11 +12,6 @@
     <body>   
         <div class="body">
             
-        	<div class="nav">
-        		<g:render template="nav"/>
-        	</div>        
-            
-            
             <g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>
             </g:if>
@@ -36,25 +31,25 @@
 	                	</thead>
 	                    <tbody>
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><warehouse:message code="user.id.label" default="ID" /></td>                            
+	                            <td valign="top" class="name"><warehouse:message code="default.id.label"/></td>                            
 	                            <td valign="top" class="value">${fieldValue(bean: userInstance, field: "id")}</td>                            
 	                        </tr>
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><warehouse:message code="user.username.label" default="Username" /></td>                            
+	                            <td valign="top" class="name"><warehouse:message code="user.username.label" /></td>                            
 	                            <td valign="top" class="value">${fieldValue(bean: userInstance, field: "username")}</td>                            
 	                        </tr>
 	                    
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><warehouse:message code="user.name.label" default="Name" /></td>                            
+	                            <td valign="top" class="name"><warehouse:message code="default.name.label"/></td>                            
 	                            <td valign="top" class="value">${fieldValue(bean: userInstance, field: "name")}</td>                            
 	                        </tr>
 	        
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><warehouse:message code="user.email.label" default="Email" /></td>
+	                            <td valign="top" class="name"><warehouse:message code="user.email.label" /></td>
 	                            <td valign="top" class="value">${fieldValue(bean: userInstance, field: "email")}</td>
 	                        </tr>
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><warehouse:message code="user.locale.label" default="Locale" /></td>
+	                            <td valign="top" class="name"><warehouse:message code="default.locale.label" /></td>
 	                            <td valign="top" class="value">${fieldValue(bean: userInstance, field: "locale.displayName")}</td>
 	                        </tr>
 	                        
@@ -68,7 +63,7 @@
 	                        </tr>
 	                        -->
 	                        <tr class="prop">
-	                            <td valign="top" class="name"><warehouse:message code="user.photo.label" default="Profile Photo" /></td>                            
+	                            <td valign="top" class="name"><warehouse:message code="user.photo.label"/></td>                            
 	                            <td valign="top" class="value">
 	                            
 	                            	<table>
@@ -82,7 +77,7 @@
 												<g:form controller="user" method="post" action="uploadPhoto" enctype="multipart/form-data">
 													<input type="hidden" name="id" value="${userInstance.id}" />
 													<input type="file" name="photo"/>
-													<span class="buttons"><input class="positive" type="submit" value="Upload"/></span>
+													<span class="buttons"><input class="positive" type="submit" value="${warehouse.message(code:'default.button.upload.label')}"/></span>
 												</g:form>
 	                            			</td>
 	                            		</tr>

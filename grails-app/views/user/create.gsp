@@ -29,7 +29,7 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="username"><warehouse:message code="user.username.label" default="Username" /></label>
+                                    <label for="username"><warehouse:message code="user.username.label" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
                                     <g:textField name="username" value="${userInstance?.username}" />
@@ -38,7 +38,7 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="name"><warehouse:message code="user.name.label" default="First Name" /></label>
+                                    <label for="name"><warehouse:message code="user.firstName.label"/></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'firstName', 'errors')}">
                                     <g:textField name="firstName" value="${userInstance?.firstName}" />
@@ -47,7 +47,7 @@
 
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="name"><warehouse:message code="user.name.label" default="Last Name" /></label>
+                                    <label for="name"><warehouse:message code="user.lastName.label" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'lastName', 'errors')}">
                                     <g:textField name="lastName" value="${userInstance?.lastName}" />
@@ -56,7 +56,7 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="password"><warehouse:message code="user.password.label" default="Password" /></label>
+                                    <label for="password"><warehouse:message code="user.password.label"/></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
                                     <g:textField type="password" name="password" value="${userInstance?.password}" />
@@ -65,12 +65,21 @@
 			    
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                  <label for="email"><warehouse:message code="user.email.label" default="Email" /></label>
+                                  <label for="email"><warehouse:message code="user.email.label" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'email', 'errors')}">
                                     <g:textField name="email" value="${userInstance?.email}" />
                                 </td>
                             </tr>
+                            
+                             <tr class="prop">
+	                                <td valign="top" class="name">
+	                                  <label for="locale"><warehouse:message code="default.locale.label"/></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'locale', 'errors')}">
+	                                    <g:select name="locale" from="${org.pih.warehouse.core.Constants.SUPPORTED_LOCALES}" optionValue="displayName" value="${userInstance?.locale}" noSelection="['':'']"/>
+	                                </td>
+	                         </tr>
 
                         </tbody>
                     </table>

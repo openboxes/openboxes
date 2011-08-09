@@ -4,7 +4,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
-	<g:set var="entityName" value="${warehouse.message(code: 'user.label', default: 'User')}" />
+	<g:set var="entityName" value="${warehouse.message(code: 'users.label')}" />
 	<title><warehouse:message code="default.list.label" args="[entityName]" /></title>
 </head>
 <body>
@@ -15,20 +15,20 @@
 
             <div>
 				<span class="menuButton">
-           			<g:link controller="user" action="create" class="new">Add new user</g:link>
+           			<g:link controller="user" action="create" class="new"><warehouse:message code="user.addNewUser.label"/></g:link>
 	           	</span>
            	</div>
             <div class="list">
                 <table>
                     <thead>
                         <tr>
-                            <g:sortableColumn property="id" title="${warehouse.message(code: 'user.id.label', default: 'Id')}" />
-                            <g:sortableColumn property="username" title="${warehouse.message(code: 'user.username.label', default: 'Username')}" />
-                            <g:sortableColumn property="name" title="${warehouse.message(code: 'user.name.label', default: 'Name')}" />
-                            <g:sortableColumn property="email" title="${warehouse.message(code: 'user.email.label', default: 'Email')}" />
-                            <g:sortableColumn property="locale" title="${warehouse.message(code: 'user.locale.label', default: 'Locale')}" />
+                            <g:sortableColumn property="id" title="${warehouse.message(code: 'default.id.label')}" />
+                            <g:sortableColumn property="username" title="${warehouse.message(code: 'user.username.label')}" />
+                            <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" />
+                            <g:sortableColumn property="email" title="${warehouse.message(code: 'user.email.label')}" />
+                            <g:sortableColumn property="locale" title="${warehouse.message(code: 'default.locale.label')}" />
                         <!--      <g:sortableColumn property="email" title="${warehouse.message(code: 'user.role.label', default: 'Roles')}" />  -->
-                            <g:sortableColumn property="active" title="${warehouse.message(code: 'user.active.label', default: 'Active')}" />
+                            <g:sortableColumn property="active" title="${warehouse.message(code: 'user.active.label')}" />
                         </tr>
                     </thead>
                     <tbody>
@@ -41,8 +41,8 @@
                             <td>${fieldValue(bean: userInstance, field: "locale.displayName")}</td>
                    <!--          <td>${fieldValue(bean: userInstance, field: "roles")}</td>  -->
                             <td>
-                            	<g:if test="${userInstance?.active }">Y</g:if>
-                            	<g:else>N</g:else>
+                            	<g:if test="${userInstance?.active }"><warehouse:message code="default.yes.label"/></g:if>
+                            	<g:else><warehouse:message code="default.no.label"/></g:else>
                             </td>
                         </tr>
                     </g:each>
