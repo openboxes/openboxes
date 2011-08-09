@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
-<title>Confirm order receipt</title>
+<title><warehouse:message code="order.confirmOrderReceipt.label"/></title>
 <style>
 </style>
 </head>
@@ -48,20 +48,12 @@
 						<tbody>
 							<tr class='prop'>
 								<td valign='top' class='name'>
-									<label for='summary'>Summary</label>
+									<label for='summary'><warehouse:message code="default.summary.label"/></label>
 								</td>
 								<td valign='top'class='value'>
-									You are about to create a new shipment of type  
-									<b>${orderCommand?.shipmentType?.name}</b>
-									
-									being sent from 
-									<b>${orderCommand?.order?.origin?.name?.encodeAsHTML()}</b>
-									on 
-									<b><format:date obj="${orderCommand?.shippedOn}"/></b>
-									to be received by 
-									<b>${orderCommand?.order?.destination?.name?.encodeAsHTML()}</b>
-									on 
-									<b><format:date obj="${orderCommand?.deliveredOn}"/></b>
+									<warehouse:message code="order.youAreAboutToCreateANewShipment.message" 
+										args="[format.metadata(obj:orderCommand?.shipmentType), orderCommand?.order?.origin?.name?.encodeAsHTML(),
+										orderCommand?.order?.destination?.name?.encodeAsHTML(),format.date(obj:orderCommand?.deliveredOn)]"/>
 								</td>
 							</tr>
 							<%-- 
@@ -129,24 +121,24 @@
 												<tr class="even">
 													<th class="center" colspan="4">
 														<img src="${createLinkTo(dir:'images/icons/silk',file:'cart.png')}" alt="ordered" style="vertical-align: middle"/>
-														Items Ordered
+														<warehouse:message code="order.itemsOrdered.label"/>
 													</th>
 													<th class="center" colspan="4" style="border-left: 1px solid lightgrey;">
 														<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="received" style="vertical-align: middle"/>
-														Items Received
+														<warehouse:message code="order.itemsReceived.label"/>
 													</th>
 												</tr>
 												<tr class="even">
 													<td></td>
-													<td>Type</td>
-													<td>Description</td>
-													<td class="center">Ordered</td>										
-													<%-- <td class="center">Remaining</td>--%>	
-													<td style="border-left: 1px solid lightgrey;">Received</td>										
-													<td>Product Received</td>										
-													<td>Lot Number</td>		
+													<td><warehouse:message code="default.type.label"/></td>
+													<td><warehouse:message code="default.description.label"/></td>
+													<td class="center"><warehouse:message code="order.ordered.label"/></td>										
+													<%-- <td class="center"><warehouse:message code="order.remaining.label"/></td>--%>	
+													<td style="border-left: 1px solid lightgrey;"><warehouse:message code="order.received.label"/></td>										
+													<td><warehouse:message code="order.productReceived.label"/></td>										
+													<td><warehouse:message code="product.lotNumber.label"/></td>		
 													<%-- 								
-													<td>Actions</td>										
+													<td><warehouse:message code="default.actions.label"/></td>										
 													--%>
 												</tr>
 											</thead>									
@@ -198,7 +190,7 @@
 										</table>
 									</g:if>
 									<g:else>
-										<span class="fade">No items</span>
+										<span class="fade"><warehouse:message code="order.noItems.label"/></span>
 									</g:else>	
 	                            </td>
 	                        </tr>
@@ -206,9 +198,9 @@
 					</table>
 					<div class="buttons" style="border-top: 1px solid lightgrey;">
 						<span class="formButton"> 
-							<g:submitButton name="back" value="Back"></g:submitButton> 
-							<g:submitButton name="submit" value="Finish"></g:submitButton>
-							<g:link action="receiveOrder" event="cancel">Cancel</g:link>
+							<g:submitButton name="back" value="${warehouse.message(code:'default.button.back.label')}"></g:submitButton> 
+							<g:submitButton name="submit" value="${warehouse.message(code:'default.button.finish.label')}"></g:submitButton>
+							<g:link action="receiveOrder" event="cancel"><warehouse:message code="default.button.cancel.label"/></g:link>
 						</span>
 					</div>
 				</fieldset>

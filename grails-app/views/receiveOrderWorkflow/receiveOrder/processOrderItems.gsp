@@ -2,7 +2,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
-<title>Add order items</title>
+<title><warehouse:message code="order.addOrderItems.label"/></title>
 
 </head>
 <body>
@@ -33,7 +33,7 @@
 						<tr>
 							<td >
 								<div style="margin: 10px">
-									<p>There are ${(orderCommand?.orderItems) ? orderCommand?.orderItems?.size() : 0 } items in this order.</p>
+									<p><warehouse:message code="order.itemsInOrder.message" args="[(orderCommand?.orderItems) ? orderCommand?.orderItems?.size() : 0 ]"/></p>
 								</div>							
 						
 							
@@ -50,22 +50,22 @@
 												<tr class="even">
 													<th class="center" align="center" colspan="4">
 														<img src="${createLinkTo(dir:'images/icons/silk',file:'cart.png')}" alt="ordered" style="vertical-align: middle"/>
-														Items Ordered
+														<warehouse:message code="order.itemsOrdered.label"/>
 													</th>
 													<th class="center" align="center" colspan="4" style="border-left: 1px solid lightgrey;">
 														<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="received" style="vertical-align: middle"/>
-														Items Received
+														<warehouse:message code="order.itemsReceived.label"/>
 													</th>
 												</tr>
 												<tr class="even">
-													<td>Type</td>
-													<td>Description</td>
-													<td class="center">Ordered</td>										
-													<td class="center">Remaining</td>	
-													<td style="border-left: 1px solid lightgrey;">Received</td>										
-													<td width="250px">Product</td>										
-													<td width="100px">Lot Number</td>		
-													<td>Expires</td>
+													<td><warehouse:message code="default.type.label"/></td>
+													<td><warehouse:message code="default.description.label"/></td>
+													<td class="center"><warehouse:message code="order.ordered.label"/></td>										
+													<td class="center"><warehouse:message code="order.remaining.label"/></td>	
+													<td style="border-left: 1px solid lightgrey;"><warehouse:message code="order.received.label"/></td>										
+													<td width="250px"><warehouse:message code="product.label"/></td>										
+													<td width="100px"><warehouse:message code="product.lotNumber.label"/></td>		
+													<td><warehouse:message code="default.expires.label"/></td>
 												</tr>
 											</thead>									
 											<tbody>
@@ -102,7 +102,7 @@
 															</td>
 															<td>
 																<g:if test="${!orderItem?.orderItem?.isCompletelyFulfilled() }">
-																	<g:autoSuggest id="productReceived-${i }" name="orderItems[${i }].productReceived" jsonUrl="/warehouse/json/findProductByName" width="200" valueId="${orderItem?.productReceived?.id }" valueName="${orderItem?.productReceived?.name }"/>	
+																	<g:autoSuggest id="productReceived-${i }" name="orderItems[${i }].productReceived" jsonUrl="/warehouse/json/findProductByName" width="200" valueId="${orderItem?.productReceived?.id }" valueName="${format.product(product:orderItems[i].productReceived)}"/>	
 																</g:if>
 															</td>
 															<td>
@@ -163,7 +163,7 @@
 										</table>
 									</g:if>
 									<g:else>
-										<span class="fade">No items</span>
+										<span class="fade"><warehouse:message code="default.noItems.label"/></span>
 									</g:else>									
 								</div>
 
@@ -171,12 +171,12 @@
 						</tr>
 					</table>
 					<div class="buttons" style="border-top: 1px solid lightgrey;">
-						<g:submitButton name="back" value="Back"></g:submitButton>
-						<g:submitButton name="next" value="Next"></g:submitButton>
+						<g:submitButton name="back" value="${warehouse.message(code:'default.button.back.label')}"></g:submitButton>
+						<g:submitButton name="next" value="${warehouse.message(code:'default.button.next.label')}"></g:submitButton>
 						<%-- 
-						<g:submitButton name="finish" value="Save & Exit"></g:submitButton>								
+						<g:submitButton name="finish" value="${warehouse.message(code:'default.button.saveAndExit.label')}"></g:submitButton>								
 						--%>
-						<g:link action="receiveOrder" event="cancel">Cancel</g:link>
+						<g:link action="receiveOrder" event="cancel"><warehouse:message code="default.button.cancel.label"/></g:link>
 					</div>
 				</g:form>
 				

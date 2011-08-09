@@ -7,13 +7,13 @@
 	<table border="0" width="50%" style="border: 1px solid #lightgrey">
 		<tr>
 			<td class="center ${state.equals('enterShipmentDetails')?'selected':''}" >
-				<g:link action="receiveOrder" event="enterShipmentDetails">1. Enter shipment details</g:link>
+				<g:link action="receiveOrder" event="enterShipmentDetails">1. <warehouse:message code="order.enterShipmentDetails.label"/></g:link>
 			</td>
 			<td class="center ${state.equals('processOrderItems')?'selected':''}">
-				<g:link action="receiveOrder" event="processOrderItems">2. Select items to receive </g:link>
+				<g:link action="receiveOrder" event="processOrderItems">2. <warehouse:message code="order.selectItemsToReceive.label"/></g:link>
 			</td>
 			<td class="center ${state.equals('confirmOrderReceipt')?'selected':''}">
-				<g:link action="receiveOrder" event="confirmOrderReceipt">3. Mark order as received</g:link>				
+				<g:link action="receiveOrder" event="confirmOrderReceipt">3. <warehouse:message code="order.markOrderAsReceived.label"/></g:link>				
 			</td>
 		</tr>
 		<%-- Debugging information  

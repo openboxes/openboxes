@@ -2,7 +2,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
-<title>System Error</title>
+<title><warehouse:message code="default.systemError.label"/></title>
 
 </head>
 <body>
@@ -28,7 +28,7 @@
 				<g:render template="progressBar" model="['state':'']"/>		
 				<g:form action="receiveOrder" autocomplete="false">
 					
-					There was an error, please try again
+					<warehouse:message code="default.systemError.message"/>
 				</g:form>
 			</fieldset>
 		</div>

@@ -3,14 +3,14 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
-<title>Enter shipment details</title>
+<title><warehouse:message code="order.enterShipmentDetails.label"/></title>
 <style>
 	
 </style>
 </head>
 <body>
 	<div class="nav">
-		<span class="menuButton"><a href="${createLinkTo(dir:'')}">Home</a>
+		<span class="menuButton"><a href="${createLinkTo(dir:'')}"><warehouse:message code="default.home.label"/></a>
 		</span>
 	</div>
 	<div class="body">
@@ -36,16 +36,16 @@
 						
 							<tr class='prop'>
 								<td valign='top' class='name'>
-									<label for='orderedBy'>Shipment type</label>
+									<label for='orderedBy'><warehouse:message code="order.shipmentType.label"/>:</label>
 								</td>
 								<td valign='top'class='value'>
 									<g:select name="shipmentType.id" from="${org.pih.warehouse.shipping.ShipmentType.list()}" 
-										optionKey="id" optionValue="name" value="${orderCommand?.shipmentType?.id }" noSelection="['':'']" />
+										optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${orderCommand?.shipmentType?.id }" noSelection="['':'']" />
 								</td>
 							</tr>
 							<tr class='prop'>
 								<td valign='top' class='name'>
-									<label for='orderedBy'>Receipient</label>
+									<label for='orderedBy'><warehouse:message code="shipping.recipient.label"/>:</label>
 								</td>
 								<td valign='top'class='value'>
 									<div class="ui-widget">
@@ -56,7 +56,7 @@
 							</tr>
 							<tr class='prop'>
 								<td valign='top' class='name'>
-									<label for='shippedOn'>Shipped on</label>
+									<label for='shippedOn'><warehouse:message code="shipping.shippedOn.label"/>:</label>
 								</td>
 								<td valign='top'class='value'>									
 									<g:jqueryDatePicker 
@@ -70,7 +70,7 @@
 							</tr>								
 							<tr class='prop'>
 								<td valign='top' class='name'>
-									<label for='deliveredOn'>Delivered on</label>
+									<label for='deliveredOn'><warehouse:message code="shipping.deliveredOn.label"/>:</label>
 								</td>
 								<td valign='top'class='value'>
 									<g:jqueryDatePicker 
@@ -87,8 +87,8 @@
 					</table>
 					<div class="buttons" style="border-top: 1px solid lightgrey;">
 						<span class="formButton"> 
-							<g:submitButton name="next" value="Next"></g:submitButton> 
-							<g:link action="receiveOrder" event="cancel">Cancel</g:link>
+							<g:submitButton name="next" value="${warehouse.message(code:'default.button.next.label')}"></g:submitButton> 
+							<g:link action="receiveOrder" event="cancel"><warehouse:message code="default.button.cancel.label"/></g:link>
 						</span>
 					</div>
 					
