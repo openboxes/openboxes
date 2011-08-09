@@ -222,7 +222,7 @@ class ShipmentController {
 			if ("POST".equalsIgnoreCase(request.getMethod())) { 				
 				// make sure a shipping date has been specified and that is not the future
 				if (!params.actualShippingDate || Date.parse("MM/dd/yyyy", params.actualShippingDate) > new Date()) {
-					flash.message = "Please specify a valid shipping date. Shipping dates cannot be in the future."
+					flash.message = "${warehouse.message(code: 'shipping.specifyValidShipmentDate.message')}"
 					def shipmentWorkflow = shipmentService.getShipmentWorkflow(shipmentInstance)	
 					render(view: "sendShipment", model: [shipmentInstance: shipmentInstance, shipmentWorkflow: shipmentWorkflow])
 					return
@@ -559,7 +559,7 @@ class ShipmentController {
 		if (!product) { 			
 			product = new Product(name: params.selectedItem.name);			
 			if (!product.hasErrors() && product.save(flush: true)) {
-				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'container.label', default: 'Product'), product.id])}"
+				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product'), product.id])}"
 				//redirect(action: "editContents", id: shipment.id, params: ["container.id": container?.id])
 			}
 			else {
@@ -593,7 +593,7 @@ class ShipmentController {
 				container.addToShipmentItems(shipmentItem).save(flush:true);
 			}
 			else { 
-				flash.message = "Modified quantity of existing shipment item ${product.name} from ${oldQuantity} to ${newQuantity}"
+				flash.message = "${warehouse.message(code: 'shipping.modifiedQuantityOfExistingShipment.message', args: [format.product(product:product), oldQuantity, newQuantity])}"
 			}
 		}
 		
@@ -659,7 +659,7 @@ class ShipmentController {
 				redirect(action: "editContents", id: shipmentInstance.id, params: ["container.id" : params.containerId])
 			}
 			else {
-				flash.message = "Could not edit container"
+				flash.message = "${warehouse.message(code: 'shipping.couldNotEditContainer.message')}"
 				redirect(action: "showDetails", id: shipmentInstance.id, params: ["containerId" : params.containerId])
 				//render(view: "edit", model: [containerInstance: containerInstance])
 			}
@@ -739,7 +739,7 @@ class ShipmentController {
 			redirect(action: "listShipping")
 		}
 		if (!documentInstance) {
-			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Document'), params.documentId])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), params.documentId])}"
 			redirect(action: "showDetails", id: shipmentInstance?.id)
 		}
 		render(view: "addDocument", model: [shipmentInstance : shipmentInstance, documentInstance : documentInstance]);
@@ -824,7 +824,7 @@ class ShipmentController {
 		def comment = new Comment(comment: params.comment, sender: session.user, recipient: recipient)
 		if (shipmentInstance) { 
 			shipmentInstance.addToComments(comment).save(flush:true);
-			flash.message = "Added comment '${params.comment}'to shipment ${shipmentInstance.name}";
+			flash.message = "${warehouse.message(code: 'shipping.addedCommentToShipment.message', arg=[params.comment,shipmentInstance.name])}"
 		}
 		redirect(action: 'showDetails', id: params.shipmentId);
 	}
@@ -839,11 +839,11 @@ class ShipmentController {
 		if (item) {
 			item.quantity = Integer.parseInt(params.quantity);
 			item.save();
-			flash.message = "Deleted shipment item $params.id from container $container.name";
+			flash.message = "${warehouse.message(code: 'shipping.addedCommentToShipment.message', arg=[params.id, container.name])}"
 			redirect(action: 'editContents', id: shipmentId)
 		}
 		else {
-			flash.message = "Could not edit item $params.id from container";
+			flash.message = "${warehouse.message(code: 'shipping.couldNotEditItemFromContainer.message', arg=[params.id])}"
 			redirect(action: 'showDetails', id: shipmentId, params: [container.id, container.id])
 		}
 	}
@@ -855,10 +855,10 @@ class ShipmentController {
 		if (shipment && document) { 	    	
 			shipment.removeFromDocuments(document).save(flush:true);
 			document.delete();	    	    	
-			flash.message = "Deleted document $params.id from shipment";
+				flash.message = "${warehouse.message(code: 'shipping.deletedDocumentFromShipment.message', arg=[params.id])}"
 		}
 		else { 
-			flash.message = "Could not remove document $params.id from shipment";
+			flash.message = "${warehouse.message(code: 'shipping.couldNotRemoveDocumentFromShipment.message', arg=[params.id])}"
 		}		
 		redirect(action: 'showDetails', id: params.shipmentId)
 	}
@@ -869,10 +869,10 @@ class ShipmentController {
 		if (shipment && event && event.eventType?.eventCode != EventCode.CREATED) {   // not allowed to delete a "created" event
 			shipment.removeFromEvents(event).save();
 			event.delete();
-			flash.message = "Deleted event $params.id from shipment";
+			flash.message = "${warehouse.message(code: 'shipping.deletedEventFromShipment.message', arg=[params.id])}"
 		}
 		else {
-			flash.message = "Could not remove event $params.id from shipment";
+			flash.message = "${warehouse.message(code: 'shipping.couldNotRemoveEventFromShipment.message', arg=[params.id])}"
 		}
 		redirect(action: 'showDetails', id: params.shipmentId)
 	}
@@ -884,10 +884,10 @@ class ShipmentController {
 		if (shipment && container) {
 			container.delete();
 			//shipment.removeFromContainers(container).save(flush:true);
-			flash.message = "Deleted package $params.id from shipment";
+			flash.message = "${warehouse.message(code: 'shipping.deletedContainerFromShipment.message', arg=[params.id])}"
 		}
 		else {
-			flash.message = "Could not remove event $params.id from shipment";
+			flash.message = "${warehouse.message(code: 'shipping.couldNotRemoveContainerFromShipment.message', arg=[params.id])}"
 		}
 		
 		redirect(action: 'showDetails', id: params.shipmentId)
@@ -900,11 +900,11 @@ class ShipmentController {
 		if (item) {
 			container.removeFromShipmentItems(shipmentItem)
 			//item.delete();
-			flash.message = "Deleted shipment item $params.id from container $container.name";
+			flash.message = "${warehouse.message(code: 'shipping.deletedShipmentItemFromContainer.message', arg=[params.id,container.name])}"
 			redirect(action: 'showDetails', id: shipmentId)
 		}
 		else {
-			flash.message = "Could not remove item $params.id from container";
+			flash.message = "${warehouse.message(code: 'shipping.couldNotRemoveItemFromContainer.message', arg=[params.id])}"
 			redirect(action: 'showDetails', id: shipmentId)
 		}
 	}
@@ -915,11 +915,11 @@ class ShipmentController {
 		if (shipment && comment) {
 			shipment.removeFromComments(comment).save(flush:true);
 			comment.delete();
-			flash.message = "Deleted comment $comment from shipment $shipment.id";
+			flash.message = "${warehouse.message(code: 'shipping.deletedCommentFromShipment.message', arg=[comment4,params.shipmentId])}"
 			redirect(action: 'showDetails', id: params.shipmentId)
 		}
 		else {
-			flash.message = "Could not remove comment $params.id from shipment";
+			flash.message = "${warehouse.message(code: 'shipping.couldNotRemoveCommentFromShipment.message', arg=[params.id])}"
 			redirect(action: 'showDetails', id: params.shipmentId)
 		}
 	}
@@ -959,7 +959,7 @@ class ShipmentController {
 
 		// check for errors
 		if (eventInstance.hasErrors()) {
-			flash.message = "Unable to edit event ${eventInstance?.eventType?.name}"
+			flash.message = "${warehouse.message(code: 'shipping.unableToEditEvent.message', arg=[format.metadata(obj:eventInstance?.eventType)])}"
 			eventInstance?.errors.allErrors.each { 
 				log.error it
 			}
@@ -989,7 +989,7 @@ class ShipmentController {
 		def referenceNumber = new ReferenceNumber(params);
 		def shipment = Shipment.get(params.shipmentId);
 		shipment.addToReferenceNumbers(referenceNumber);
-		flash.message = "Added reference number";
+		flash.message = "${warehouse.message(code: 'shipping.addedReferenceNumber.message')}"
 		redirect(action: 'show', id: params.shipmentId)
 	}
 	
@@ -1097,10 +1097,10 @@ class ShipmentController {
 		try { 
 			boolean atLeastOneUpdate = shipmentService.addToShipment(command);
 			if (atLeastOneUpdate) { 
-				flash.message = "Shipment items have been added to shipment"
+				flash.message = "${warehouse.message(code: 'shipping.shipmentItemsHaveBeenAdded.message')}"
 			}
 			else { 
-				flash.message = "No shipment items have been updated"
+				flash.message = "${warehouse.message(code: 'shipping.noShipmentItemsHaveBeenUpdated.message')}"
 			}
 		} catch (ShipmentItemException e) { 
 			flash['errors'] = e.shipmentItem.errors

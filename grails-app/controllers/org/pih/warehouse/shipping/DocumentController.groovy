@@ -51,7 +51,7 @@ class DocumentController {
 		documentInstance.documentType = DocumentType.get(Long.parseLong(command.typeId))
 		
 		if (!documentInstance.hasErrors()) {
-			flash.message = "Successfully updated document information"	
+			flash.message = "${warehouse.message(code: 'document.succesfullyUpdatedDocument.message')}"
 			if (command.shipmentId) { 
 				redirect(controller: 'shipment', action: 'showDetails', id: command.shipmentId)
 			} 
@@ -87,7 +87,7 @@ class DocumentController {
 	   // file must not be empty and must be less than 10MB
 	   // FIXME The size limit needs to go somewhere
 	   if (file?.isEmpty()) {
-		   flash.message = "Document is too large (must be less than 1MB)";
+		  flash.message = "${warehouse.message(code: 'document.documentTooLarge.message')}"
 	   } 
 	   else if (file.size < 10*1024*1000) {		   
 		   log.info "Creating new document ";
@@ -106,21 +106,21 @@ class DocumentController {
 			   log.info "Saving document " + documentInstance;
 			   if (shipmentInstance) { 
 				   shipmentInstance.addToDocuments(documentInstance).save(flush:true)
-				   flash.message= "Successfully saved file to Shipment #" + shipmentInstance?.shipmentNumber			   
+				   flash.message = "${warehouse.message(code: 'document.successfullySavedToShipment.message', args=[shipmentInstance?.shipmentNumber])}"			   
 			   }
 			   else if (orderInstance) { 
 				   orderInstance.addToDocuments(documentInstance).save(flush:true)
-				   flash.message= "Successfully saved file to Order #" + orderInstance?.orderNumber
+				   flash.message = "${warehouse.message(code: 'document.successfullySavedToOrder.message', args=[orderInstance?.orderNumber])}"
 			   }
 			   else if (requestInstance) { 
 				   requestInstance.addToDocuments(documentInstance).save(flush:true)
-				   flash.message= "Successfully saved file to Request #" + requestInstance?.requestNumber
+				   flash.message = "${warehouse.message(code: 'document.successfullySavedToRequest.message', args=[requestInstance?.requestNumber])}"
 			   }
 		   }
 		   // If there are errors, we need to redisplay the document form
 		   else {
 			   log.info "Document did not save " + documentInstance.errors;
-			   flash.message = "Cannot save document " + documentInstance.errors;
+			   flash.message = "${warehouse.message(code: 'document.cannotSave.messagee', args=[documentInstance.errors])}"
 			   if (shipmentInstance) { 
 				   redirect(controller: "shipment", action: "addDocument", id: shipmentInstance.id,
 					   model: [shipmentInstance: shipmentInstance, documentInstance : documentInstance])
@@ -140,7 +140,7 @@ class DocumentController {
 	   }
 	   else {
 		   log.info "Document is too large"		   
-		   flash.message = "Document is too large (must be less than 1MB)";
+		   flash.message = "${warehouse.message(code: 'document.documentTooLarge.message')}"
 		   if (shipmentInstance) { 
 			   redirect(controller: 'shipment', action: 'showDetails', id: command.shipmentId)
 			   return;
