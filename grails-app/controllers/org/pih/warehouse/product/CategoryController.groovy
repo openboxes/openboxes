@@ -26,7 +26,7 @@ class CategoryController {
 		log.info child;
 		child.parentCategory = parent;
 		if (!child.hasErrors() && child.save(flush:true)) { 
-			flash.message = "Success"
+			flash.message = ${warehouse.message(code: 'default.success.message')}
 		}
 		redirect(action: "tree");
 		
@@ -59,7 +59,7 @@ class CategoryController {
 		}
 		
 		if (!categoryInstance.hasErrors() && categoryInstance.save()) {
-			flash.message = "Saved category ${categoryInstance?.name} successfully"
+			flash.message = ${warehouse.message(code: 'category.saved.message', arg: [format.category(category:categoryInstance)])}
 			redirect(action: "tree", params: params)
 		}
 		else {	

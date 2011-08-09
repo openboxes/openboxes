@@ -80,7 +80,7 @@ class ProductController {
 		}
 
 		if (!cmd.hasErrors()) { 
-			flash.message = "All products were saved successfully"
+			  flash.message = "${warehouse.message(code: 'product.allSavedSuccessfully.message')}"
 		}
 		else {
 			// reset the flash message in the case of two submits in a row
@@ -139,7 +139,7 @@ class ProductController {
 		def inventoryInstance = warehouseInstance?.inventory;
 		
 		if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'product.label', default: 'Product'), productInstance.name])}"
+            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product:productInstance)])}"
 			redirect(controller: "inventoryItem", action: "recordInventory", params: ['product.id':productInstance.id, 'inventory.id': inventoryInstance?.id])
             //redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id, params:params)
         }
@@ -217,7 +217,7 @@ class ProductController {
 			}
 			*/
             if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product'), productInstance.name])}"
+                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product:productInstance)])}"
                 redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id, params:params)
             }
             else {
