@@ -44,7 +44,7 @@ class InventoryItemController {
 					}
 				}
 				else { 
-					flash.message = "Please upload a non-empty file"
+					flash.message = "${warehouse.message(code: 'inventoryItem.emptyFile.message')}"
 				}
 			}
 			// Otherwise, we need to retrieve the file from the session 
@@ -63,10 +63,10 @@ class InventoryItemController {
 					inventoryService.prepareInventory(warehouse, cmd.filename, cmd.errors);
 
 				if (!inventoryMapList?.isEmpty) { 
-					flash.message = "Please ensure that there is data on 'Sheet1' of '" + localFile.getAbsolutePath() + "'."
+					flash.message = "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args:[localFile.getAbsolutePath()])}"
 				}
 				else { 
-					flash.message = "Data is ready to be imported.  Please review the data below and click the 'Import Now' button below to proceed."
+					flash.message = "${warehouse.message(code: 'inventoryItem.dataReadyToBeImported.message')}"
 				}
 					
 				// If there are no errors and the user requests to import the data, we should execute the import
@@ -74,7 +74,7 @@ class InventoryItemController {
 					inventoryService.importInventory(warehouse, inventoryMapList, cmd.errors);
 					
 					if (!cmd.errors.hasErrors()) {
-						flash.message = "Congratulations!  You have successfully imported inventory from '" + localFile.getAbsolutePath() + "'.";
+						flash.message = "${warehouse.message(code: 'inventoryItem.importSuccess.message', args:[localFile.getAbsolutePath()])}"
 						redirect(action: "importInventoryItems");
 						return;
 					}
@@ -84,7 +84,7 @@ class InventoryItemController {
 				render(view: "importInventoryItems", model: [ inventoryMapList : inventoryMapList, commandInstance: cmd]);
 			}		
 			else { 
-				flash.message = "Please upload a valid XLS file in order to start the import process"
+				flash.message = "${warehouse.message(code: 'inventoryItem.notValidXLSFile.message')}"
 			}
 			
 		}
@@ -311,7 +311,7 @@ class InventoryItemController {
 		
 	def createInventoryItem = {
 		
-		flash.message = "Please note that this page is temporary.  In the future, you will be able to create new inventory items through the 'Record Stock' page."; 
+		flash.message = "${warehouse.message(code: 'inventoryItem.temporaryCreateInventoryItem.message')}"
 		
 		def productInstance = Product.get(params?.product?.id)
 		def inventoryInstance = Inventory.get(params?.inventory?.id)
@@ -363,7 +363,7 @@ class InventoryItemController {
 			transactionInstance.addToTransactionEntries(transactionEntry);
 			
 			transactionInstance.save()
-			flash.message = "Saved inventory item " + inventoryItem.id + " within a new transaction " + transactionInstance.id
+			flash.message = "${warehouse.message(code: 'inventoryItem.savedItemWithinNewTransaction.message', args: [inventoryItem.id ,  transactionInstance.id])}"
 	
 		} else { 	
 			render(view: "createInventoryItem", model: [itemInstance: inventoryItem, inventoryInstance: inventoryInstance, inventoryItems: inventoryItems])
@@ -502,7 +502,7 @@ class InventoryItemController {
 	
 	def addToInventory = {
 		def product = Product.get( params.id )
-		render "${product.name} was added to inventory"
+		render warehouse.message(code: 'inventoryItem.productAddedToInventory.message', args: [product.name])
 		//return product as XML		
 	}	
 	/**
@@ -551,7 +551,7 @@ class InventoryItemController {
 			shipmentService.validateShipmentItem(shipmentItem)
 					
 			if(shipmentItem.hasErrors() || !shipmentItem.validate()) {
-				flash.message = "There was an error validating item to be added\n" ;
+				flash.message = "${warehouse.message(code: 'inventoryItem.errorValidatingItem.message')}\n"
 				shipmentItem.errors.each { flash.message += it }
 				
 			}
@@ -559,11 +559,11 @@ class InventoryItemController {
 			if (!shipmentItem.hasErrors()) { 
 				if (!shipmentInstance.addToShipmentItems(shipmentItem).save()) {
 					log.error("Sorry, unable to add new item to shipment.  Please try again.");
-					flash.message = "Unable to add new item to shipment";
+					flash.message = "${warehouse.message(code: 'inventoryItem.unableToAddItemToShipment.message')}"
 				}
 				else { 
-					def productDescription = productInstance?.name + (inventoryItem?.lotNumber) ? " #" + inventoryItem?.lotNumber : "";		
-					flash.message = "Added item " + productDescription + " to shipment " + shipmentInstance?.name;
+					def productDescription = format.product(product:productInstance) + (inventoryItem?.lotNumber) ? " #" + inventoryItem?.lotNumber : "";	
+					flash.message = "${warehouse.message(code: 'inventoryItem.addedItemToShipment.message', args: [productDescription,shipmentInstance?.name])}"
 				}
 			}
 
@@ -597,7 +597,7 @@ class InventoryItemController {
 			
 		}
 		else { 
-			flash.message = "error saving inventory levels<br/>" 
+			flash.message = "${warehouse.message(code: 'inventoryItem.errorSavingInventoryLevels.message')}<br/>" 
 			inventoryLevelInstance.errors.allErrors.each { 
 				flash.message += it + "<br/>";
 			}
@@ -667,12 +667,12 @@ class InventoryItemController {
 				transactionEntry.inventoryItem = inventoryItem;
 				if (!transactionEntry.hasErrors() &&
 					transactionInstance.addToTransactionEntries(transactionEntry).save(flush:true)) {
-					flash.message = "Saved transaction entry"
+					flash.message = "${warehouse.message(code: 'inventoryItem.savedTransactionEntry.label')}"
 				} 
 				else {
 					transactionInstance.errors.each { println it }
 					transactionEntry.errors.each { println it }
-					flash.message = "Unable to save transaction entry"
+						flash.message = "${warehouse.message(code: 'inventoryItem.inventoryItem.unableToSaveTransactionEntry.message.label')}"
 				}
 				
 				/*

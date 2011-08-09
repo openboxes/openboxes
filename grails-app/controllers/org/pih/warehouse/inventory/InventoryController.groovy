@@ -227,7 +227,7 @@ class InventoryController {
 				redirect(action: "browse", id: inventoryInstance.id)
 			}
 			else {
-				flash.message = "unable to create an inventory item"
+				flash.message = "${warehouse.message(code: 'inventory.unableToCreateItem.message')}"
 				//inventoryInstance.errors = itemInstance.errors;
 				//render(view: "browse", model: [inventoryInstance: inventoryInstance])
 			}			
@@ -482,11 +482,11 @@ class InventoryController {
 		}
 		
 		if (saved) {	
-			flash.message = "Transaction saved successfully"
+			flash.message = "${warehouse.message(code: 'inventory.transactionSaved.message')}"
 			redirect(action: "showTransaction", id: transactionInstance?.id);
 		}
 		else { 		
-			flash.message = "Unable to save transaction "
+			flash.message = "${warehouse.message(code: 'inventory.unableToSaveTransaction.message')}"
 			def model = [ 
 				transactionInstance : transactionInstance,
 				productInstanceMap: Product.list().groupBy { it.category },
@@ -505,7 +505,7 @@ class InventoryController {
 	def showTransaction = {
 		def transactionInstance = Transaction.get(params.id);
 		if (!transactionInstance) {
-			flash.message = "There was no transaction with ID " + params.id;
+			flash.message = "${warehouse.message(code: 'inventory.noTransactionWithId.message', args: [params.id])}"
 			transactionInstance = new Transaction();
 		}
 		
@@ -526,7 +526,7 @@ class InventoryController {
    def showTransactionDialog = {
 	   def transactionInstance = Transaction.get(params.id);
 	   if (!transactionInstance) {
-		   flash.message = "There was no transaction with ID " + params.id;
+		 	flash.message = "${warehouse.message(code: 'inventory.noTransactionWithId.message', args: [params.id])}"
 		   transactionInstance = new Transaction();
 	   }
 	   
@@ -552,13 +552,13 @@ class InventoryController {
 			transactionInstance?.confirmed = Boolean.FALSE;
 			transactionInstance?.confirmedBy = null;
 			transactionInstance?.dateConfirmed = null;
-			flash.message = "Transaction has been unconfirmed"
+					flash.message = "${warehouse.message(code: 'inventory.transactionHasBeenUnconfirmed.message')}"
 		}
 		else { 
 			transactionInstance?.confirmed = Boolean.TRUE;
 			transactionInstance?.confirmedBy = User.get(session?.user?.id);
 			transactionInstance?.dateConfirmed = new Date();
-			flash.message = "Transaction has been confirmed"
+			flash.message = "${warehouse.message(code: 'inventory.transactionHasBeenConfirmed.message')}"
 		}
 		redirect(action: "listAllTransactions")
 	}
@@ -670,7 +670,7 @@ class InventoryController {
 		}
 				
 		if (saved) {	
-			flash.message = "Transaction saved successfully"
+					flash.message = "${warehouse.message(code: 'inventory.transactionSaved.message')}"
 			redirect(action: "showTransaction", id: transactionInstance?.id);
 			return;
 		}
