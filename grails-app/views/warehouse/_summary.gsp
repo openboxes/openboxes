@@ -11,7 +11,7 @@
 		</td>
 		<td style="text-align: right;">
 			<div style="font-size: 1.2em">
-				<b>${warehouseInstance?.active?'Active':'Inactive'}</b>
+				<b>${warehouseInstance?.active ? warehouse.message(code:'warehouse.active.label') : warehouse.message(code:'warehouse.inactive.label')}</b>
 				<g:if test="${warehouseInstance?.active}">
 					<img class="photo" src="${resource(dir: 'images/icons/silk', file: 'tick.png') }"
          						style="vertical-align: bottom;" />

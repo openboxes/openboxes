@@ -5,9 +5,9 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'warehouses.label', default: 'Warehouses')}" />
         <g:set var="pageTitle" value="${warehouse.message(code: 'default.list.label' args="[entityName]")}" />
-        <title><warehouse:message code="default.show.label" args="[entityName]" /></title>
+        <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><warehouse:message code="default.show.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="default.list.label" args="[entityName]" /></content>
     </head>
     <body>        
         <div class="body">
@@ -18,18 +18,18 @@
               
             <div class="dialog">
 				<span class="menuButton">
-           			<a href="/warehouse/warehouse/edit" class="new">Add warehouse</a>
+           			<a href="/warehouse/warehouse/edit" class="new"><warehouse:message code="warehouse.addWarehouse.label"/></a>
 	           	</span>
            	</div>
             <div class="list">
                 <table>
                     <thead>
                         <tr>                        
-                            <g:sortableColumn property="name" title="${warehouse.message(code: 'warehouse.name.label', default: 'Name')}" />
-                            <th><warehouse:message code="warehouse.manager.label" default="Manager" /></th>
-                            <th class="center"><warehouse:message code="warehouse.active.label" default="Active?" /></th>
-                            <th class="center"><warehouse:message code="warehouse.local.label" default="Managed Locally?" /></th>
-                            <th class="center"><warehouse:message code="warehouse.edit.label" default="Edit" /></th>
+                            <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" />
+                            <th><warehouse:message code="warehouse.manager.label" /></th>
+                            <th class="center"><warehouse:message code="warehouse.active.label" /></th>
+                            <th class="center"><warehouse:message code="warehouse.local.label" /></th>
+                            <th class="center"><warehouse:message code="default.button.edit.label" /></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -39,8 +39,8 @@
 								<g:link action="edit" id="${warehouseInstance.id}">${fieldValue(bean: warehouseInstance, field: "name")}</g:link>
 							</td>
                             <td>${fieldValue(bean: warehouseInstance, field: "manager")}</td>                            
-                            <td class="center tenth">${warehouseInstance.active ? 'yes' : 'no'}</td>                            
-                            <td class="center tenth">${warehouseInstance.local ? 'yes' : 'no'}</td>                            
+                            <td class="center tenth">${warehouseInstance.active ? warehouse.message(code:'default.yes.label') : warehouse.message(code:'default.no.label')}</td>                            
+                            <td class="center tenth">${warehouseInstance.local ? warehouse.message(code:'default.yes.label') : warehouse.message(code:'default.no.label')}</td>                            
 							<td class="center tenth"><g:link class="edit" action="edit" id="${warehouseInstance?.id}" >${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}</g:link></td>
 						</tr>
                     </g:each>

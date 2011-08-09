@@ -474,7 +474,7 @@
 				accordion.accordion( "activate" , 0 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('product')}">
-				accordion.accordion( "activate" , 0 );
+				accordion.accordion( "activate" , 5 );
 			</g:elseif>
 		
 			$('.goto').click(function(){

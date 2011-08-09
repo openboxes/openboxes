@@ -14,10 +14,6 @@
     <body>
         <div class="body">
         
-        	<div class="nav">
-				<g:render template="nav"/>        	
-        	</div>
-        
             <g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>
             </g:if>
@@ -43,7 +39,7 @@
 	                        <tbody>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="name"><warehouse:message code="warehouse.name.label" default="Name" /></label>
+	                                  <label for="name"><warehouse:message code="default.name.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'name', 'errors')}">
 	                                    <g:textField name="name" value="${warehouseInstance?.name}" />
@@ -51,7 +47,7 @@
 	                            </tr>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="bgColor"><warehouse:message code="warehouse.bgColor.label" default="Background Color" /></label>
+	                                  <label for="bgColor"><warehouse:message code="warehouse.bgColor.label"/></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'bgColor', 'errors')}">
 	                                    
@@ -66,7 +62,7 @@
 	                            </tr>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="fgColor"><warehouse:message code="warehouse.fgColor.label" default="Foreground Color" /></label>
+	                                  <label for="fgColor"><warehouse:message code="warehouse.fgColor.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'fgColor', 'errors')}">
 	                                    <g:select name="fgColor" class="colorpicker" 
@@ -78,7 +74,7 @@
 	                            </tr>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="manager"><warehouse:message code="warehouse.manager.label" default="Manager" /></label>
+	                                  <label for="manager"><warehouse:message code="warehouse.manager.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'manager', 'errors')}">
 	                                    <g:select name="manager.id" from="${org.pih.warehouse.core.User.list()}" optionKey="id" value="${warehouseInstance?.manager?.id}"  />
@@ -99,7 +95,7 @@
 	                            
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="manager"><warehouse:message code="warehouse.manager.label" default="Managed Locally" /></label>
+	                                  <label for="manager"><warehouse:message code="warehouse.local.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'local', 'errors')}">
 	                                    <g:checkBox name="local" value="${warehouseInstance?.local}" />
@@ -107,7 +103,7 @@
 	                            </tr>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="manager"><warehouse:message code="warehouse.manager.label" default="Active" /></label>
+	                                  <label for="manager"><warehouse:message code="warehouse.active.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'active', 'errors')}">
 	                                    <g:checkBox name="active" value="${warehouseInstance?.active}" />
@@ -117,7 +113,7 @@
 	                            	<td valign="top"></td>
 	                            	<td valign="top">
 					                   <button type="submit">								
-											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'tick.png')}"/>&nbsp;Save
+											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'tick.png')}"/>&nbsp;<warehouse:message code="default.button.save.label"/>
 										</button>
 										&nbsp;
 										<g:link action="list">
