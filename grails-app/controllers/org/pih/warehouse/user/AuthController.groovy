@@ -25,7 +25,7 @@ class AuthController {
 	 */
 	def authorized = { 
 		if (session.user == null) { 
-        	flash.message = 'You are not authorized to access this page.  '
+        	flash.message = "${warehouse.message(code: 'auth.notAuthorized.message')}"
     		redirect(controller: 'auth', action: 'login');
     	}		
 	}
@@ -102,7 +102,7 @@ class AuthController {
 		if (userInstance) {
 			
 			if (!userInstance?.active) {
-				flash.message = "Your account request has been received and is under review by a system administrator. Please contact the system administrator if you have any questions or concerns."
+				flash.message = "${warehouse.message(code: 'auth.accountRequestUnderReview.message')}"	
 				redirect(controller: 'auth', action: 'login');
 				return;
 			}
@@ -133,15 +133,15 @@ class AuthController {
 				redirect(controller:'dashboard',action:'index')
 			}
 			else {
-				flash.message = "Incorrect password for user <b>${params.username}</b>"				
+				flash.message = "${warehouse.message(code: 'auth.incorrectPassword.label', args=[params.username])}"		
 				userInstance = new User(username:params['username'])				
 				userInstance.errors.rejectValue("version", "default.authentication.failure",
-					[warehouse.message(code: 'user.label', default: 'User')] as Object[], "Unable to authenticate user with the provided credentials.");
+					[warehouse.message(code: 'user.label', default: 'User')] as Object[], "${warehouse.message(code: 'auth.unableToAuthenticateUser.message')}");
 				render(view: "login", model: [userInstance: userInstance])
 			}
 		}
 		else {
-			flash.message = "User not found for username or email <b>${params.username}</b>"
+			flash.message = "${warehouse.message(code: 'auth.userNotFound.message', args=[params.username])}"	
 			redirect(action:login)
 		}
 	}
@@ -154,7 +154,7 @@ class AuthController {
 		def username = session.user.username;    	
 		session.user = null;
 		session.warehouse = null;
-		flash.message = "User ${username} was successfully logged out."
+		flash.message = "${warehouse.message(code: 'auth.logoutSuccess.message', args: [username])}"	
 		redirect(action:'login')
 	}    
 
@@ -190,8 +190,8 @@ class AuthController {
 					}
 					if (recipients) {
 						recipients.each {
-							def subject = "A new user account has been created";
-							def message = "Please sign-in to activate the account " + userInstance?.username + "."
+							def subject = "${warehouse.message(code: 'auth.email.newUserAccountCreated.message')}"
+							def message = "${warehouse.message(code: 'auth.email.pleaseSignInToActivate.message', args=[userInstance.username])}"
 							mailService.sendMail(subject, message, it.email);
 						}
 					}
@@ -199,8 +199,8 @@ class AuthController {
 				
 				// Send confirmation email to user 
 				if (userInstance.email) { 
-					def subject = "Your user account has been created";
-					def message = "Please wait for an administrator to activate your account." 
+					def subject = "${warehouse.message(code: 'auth.email.yourNewUserAccountCreated.message')}"
+					def message = "${warehouse.message(code: 'auth.waitForAdministratorToActivate.message')}"
 					mailService.sendMail(subject, message, userInstance.email);
 				}
 

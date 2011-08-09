@@ -708,9 +708,9 @@ class ShipmentController {
 				}    		
 				shipment.addToContainers(containerCopy).save(flush:true);
 			}
-			flash.message = "Copied package successfully";
+				flash.message = "${warehouse.message(code: 'shipping.copiedContainerSuccessfully.message')}"
 		} else { 
-			flash.message = "Unable to copy package";
+			flash.message = "${warehouse.message(code: 'shipping.unableToCopyPackage.message')}"
 		}
 		
 		redirect(action: 'showDetails', id: params.shipmentId)
