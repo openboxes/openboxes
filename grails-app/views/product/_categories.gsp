@@ -60,4 +60,4 @@
     </g:each>
 </div>
 
-<a href="#" onclick="addCategory();">Add another</a>
+<a href="#" onclick="addCategory();"><warehouse:message code="default.addAnother.label"/></a>

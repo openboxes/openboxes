@@ -7,7 +7,7 @@
  	<g:textField name='categoriesList[${i }].primary' value='${category?.primary}' />
  	--%>
  	<g:if test="${category }">
-	 	${category?.name }
+	 	<format:category category="${category}"/>
  		<g:hiddenField name='categoriesList[${i }].id' value="${category?.id }"/>
  	</g:if>
  	<g:else> 	

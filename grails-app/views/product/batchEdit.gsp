@@ -4,9 +4,8 @@
 	<head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${warehouse.message(code: 'product.label', default: 'Product')}" />
         
-        <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
+        <title><warehouse:message code="product.batchEdit.label" /></title>
 		
     </head>    
     <body>    
@@ -22,7 +21,7 @@
 
             <g:form action="batchEdit" method="post">
 				<div class="dialog" style="background-color: #f7f7f7; border: 1px solid lightgrey; padding: 10px;">
-					<label>Select a category of products to edit</label>            
+					<label><warehouse:message code="product.selectCategoryOfProductsToEdit.label"/></label>            
 					<select name="category.id">
 						<option value=""></option>
 						<g:render template="../category/selectOptions" model="[category:commandInstance?.rootCategory, selected:categoryInstance, level: 0]"/>
@@ -30,7 +29,7 @@
 					
 					<button type="submit" class="positive"><img
 						src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" style="vertical-align: middle;"
-						alt="Save" /> ${warehouse.message(code: 'default.button.find.label', default: 'Find')}
+						alt="Save" /> ${warehouse.message(code: 'default.button.find.label')}
 					</button>
 					          
 				</div> 
@@ -42,24 +41,24 @@
 		                <table>
 							<thead>                
 								<tr class="odd">
-									<th valign="top"><warehouse:message code="product.name.label" default="Product Description" /></th>
+									<th valign="top"><warehouse:message code="product.description.label" /></th>
 									<th valign="top">
-										<label for="name"><warehouse:message code="product.manufacturer.label" default="Manufacturer" /></th>
+										<label for="name"><warehouse:message code="product.manufacturer.label" /></th>
 									<th valign="top">
-										<label for="name"><warehouse:message code="product.manufacturerCode.label" default="Mfg Code" /></th>
+										<label for="name"><warehouse:message code="product.manufacturerCode.label" /></th>
 									<th valign="top">
-										<label for="name"><warehouse:message code="product.upc.label" default="UPC" /></th>
+										<label for="name"><warehouse:message code="product.upc.label" /></th>
 									<th valign="top">
-										<label for="name"><warehouse:message code="product.ndc.label" default="NDC" /></th>
+										<label for="name"><warehouse:message code="product.ndc.label" /></th>
 										
 									<th valign="top">
-										<label for="name"><warehouse:message code="product.unitOfMeasure.label" default="Unit of Measure" /></th>
+										<label for="name"><warehouse:message code="default.unitOfMeasure.label" /></th>
 									<th valign="top">
-										<label for="name"><warehouse:message code="product.productCode.label" default="Product Code" /></th>
+										<label for="name"><warehouse:message code="product.productCode.label"/></th>
 	                               <th valign="top">
-		                               	<warehouse:message code="product.primaryCategory.label" default="Primary Category" /></th>
+		                               	<warehouse:message code="product.primaryCategory.label" /></th>
 									<th valign="top">
-										<label for="name"><warehouse:message code="product.coldChain.label" default="Cold Chain" /></th>
+										<label for="name"><warehouse:message code="product.coldChain.label" /></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -155,7 +154,7 @@
 										</button>
 										&nbsp;
 										<g:link controller='inventory' action='browse' class="negative">
-											${warehouse.message(code: 'default.button.done.label', default: 'Done')}			
+											${warehouse.message(code: 'default.button.cancel.label')}			
 										</g:link>  
 									</td>
 								</tr>

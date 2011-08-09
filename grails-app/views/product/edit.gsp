@@ -11,8 +11,8 @@
 			<content tag="pageTitle"><warehouse:message code="default.edit.label" args="[entityName]" /></content>
 		</g:if>
 		<g:else>
-	        <title><warehouse:message code="default.create.label" args="[entityName]" /></title>
-			<content tag="pageTitle"><warehouse:message code="default.create.label" args="[entityName]" /></content>		
+	        <title><warehouse:message code="default.add.label" args="[entityName]" /></title>
+			<content tag="pageTitle"><warehouse:message code="default.add.label" args="[entityName]" /></content>		
 		</g:else>
 
 		<style>
@@ -46,7 +46,7 @@
 	                      <tbody>                
 							<tr class="prop">
 								<td valign="top" class="name"><label for="name"><warehouse:message
-									code="product.name.label" default="Description" /></label></td>
+									code="default.description.label" /></label></td>
 								<td valign="top"
 									class="value ${hasErrors(bean: productInstance, field: 'name', 'errors')}">
 								<g:textField name="name" value="${productInstance?.name}" size="40" />
@@ -54,7 +54,7 @@
 							</tr>
 							<tr class="prop">
                                 <td valign="top" class="name">
-                                  <label for="categories"><warehouse:message code="product.primaryCategory.label" default="Primary Category" /></label>
+                                  <label for="categories"><warehouse:message code="product.primaryCategory.label" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'category', 'errors')}">
                                 	<%-- <g:render template="../category/chooser"/>--%>
@@ -68,7 +68,7 @@
 							 
 							<tr class="prop">
 							   <td valign="top" class="name">
-							      <label for="categories"><warehouse:message code="product.categories.label" default="Other Categories" /></label>
+							      <label for="categories"><warehouse:message code="product.otherCategories.label" /></label>
 							   </td>
 							   <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'categories', 'errors')}">
 							       <g:render template="categories" model="['productInstance':productInstance]" />
@@ -77,7 +77,7 @@
 							
 							<tr class="prop">
 								<td valign="top" class="name"><label for="name"><warehouse:message
-									code="product.unitOfMeasure.label" default="Unit of Measure" /></label></td>
+									code="default.unitOfMeasure.label" /></label></td>
 								<td valign="top"
 									class="${hasErrors(bean: productInstance, field: 'unitOfMeasure', 'errors')}">
 								<g:textField name="unitOfMeasure" value="${productInstance?.unitOfMeasure}" size="15" />
@@ -85,7 +85,7 @@
 							</tr>								
 							<tr class="prop">
 								<td valign="top" class="name"><label for="manufacturer"><warehouse:message
-									code="product.manufacturer.label" default="Manufacturer" /></label></td>
+									code="product.manufacturer.label" /></label></td>
 								<td valign="top"
 									class="${hasErrors(bean: productInstance, field: 'manufacturer', 'errors')}">
 								<g:textField name="manufacturer" value="${productInstance?.manufacturer}" size="15" />
@@ -93,7 +93,7 @@
 							</tr>								
 							<tr class="prop">
 								<td valign="top" class="name"><label for="name"><warehouse:message
-									code="product.manufacturerCode.label" default="Manufacturer Code" /></label></td>
+									code="product.manufacturerCode.label"/></label></td>
 								<td valign="top"
 									class="${hasErrors(bean: productInstance, field: 'manufacturerCode', 'errors')}">
 								<g:textField name="manufacturerCode" value="${productInstance?.manufacturerCode}" size="15" />
@@ -101,7 +101,7 @@
 							</tr>								
 							<tr class="prop">
 								<td valign="top" class="name"><label for="upc"><warehouse:message
-									code="product.upc.label" default="UPC" /></label></td>
+									code="product.upc.label" /></label></td>
 								<td valign="top"
 									class="${hasErrors(bean: productInstance, field: 'upc', 'errors')}">
 								<g:textField name="upc" value="${productInstance?.upc}" size="15" />
@@ -109,15 +109,15 @@
 							</tr>								
 							<tr class="prop">
 								<td valign="top" class="name"><label for="ndc"><warehouse:message
-									code="product.ndc.label" default="NDC" /></label></td>
+									code="product.ndc.label" /></label></td>
 								<td valign="top"
 									class="${hasErrors(bean: productInstance, field: 'ndc', 'errors')}">
 								<g:textField name="ndc" value="${productInstance?.ndc}" size="15" />
 								</td>
 							</tr>								
 							<tr class="prop">
-								<td valign="top" class="name"><label for="name"><warehouse:message
-									code="product.coldChain.label" default="Cold Chain" /></label></td>
+								<td valign="top" class="name"><label for="coldChain"><warehouse:message
+									code="product.coldChain.label" /></label></td>
 								<td valign="top"
 									class=" ${hasErrors(bean: productInstance, field: 'coldChain', 'errors')}">
 								<g:checkBox name="coldChain" value="${productInstance?.coldChain}" />
@@ -146,7 +146,7 @@
 							<g:each var="attribute" in="${org.pih.warehouse.product.Attribute.list()}" status="status">
 								<tr class="prop">
 									<td valign="top" class="name"><label for="attributes">
-									${attribute.name }
+									<format:metadata obj="${attribute}"/>
 									</label> <g:hiddenField name="attributes[${status }].attribute.id"
 										value="${attribute?.id }" /></td>
 									<td valign="top" class="value">

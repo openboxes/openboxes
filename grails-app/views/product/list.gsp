@@ -4,7 +4,7 @@
    <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${warehouse.message(code: 'product.label', default: 'Product')}" />
+        <g:set var="entityName" value="${warehouse.message(code: 'products.label')}" />
         <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.list.label" args="[entityName]" /></content>
@@ -18,13 +18,13 @@
                 <table>
                     <thead>
                         <tr>                        
-                            <g:sortableColumn property="name" title="${warehouse.message(code: 'product.name.label', default: 'Name')}" />
+                            <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" />
                         </tr>
                     </thead>
                     <tbody>
                     <g:each in="${productInstanceList}" status="i" var="productInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
-							<td align="center"><g:link action="edit" id="${productInstance.id}">${fieldValue(bean: productInstance, field: "name")}</g:link></td>
+							<td align="center"><g:link action="edit" id="${productInstance.id}"><format:product product="${productInstance}"/></g:link></td>
                         </tr>
                     </g:each>
                     </tbody>

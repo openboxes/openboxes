@@ -5,6 +5,7 @@ class MessageTagLib {
 	static namespace = "warehouse"
 	
 	def message = { attr, body ->
-		out << "${g.message(code:attr.code, default: attr.default, args: attr.args, encodeAs: attr.encodeAs, error: attr.error, message: attr.message)}"
+		// note that we use the locale associated with the user here
+		out << "${g.message(code:attr.code, default: attr.default, args: attr.args, encodeAs: attr.encodeAs, error: attr.error, message: attr.message, locale: session?.user?.locale )}"
 	}
 }
