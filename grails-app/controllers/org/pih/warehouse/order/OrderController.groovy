@@ -86,16 +86,16 @@ class OrderController {
 			if (orderInstance?.orderItems?.size() > 0) { 
 				orderInstance.status = OrderStatus.PLACED;
 				if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
-					flash.message = "Order ${orderInstance?.description} has been placed with vendor ${orderInstance?.origin?.name}"
+					flash.message = "${warehouse.message(code: 'order.orderHasBeenPlacedWithVendor.message', args: [orderInstance?.description, orderInstance?.origin?.name])}"
 					redirect(action: "show", id: orderInstance.id)
 				}
 				else {
-					flash.message = "There was an error while placing your order."
+					flash.message = "${warehouse.message(code: 'order.errorPlacingOrder.message')}"
 					render(view: "show", model: [orderInstance: orderInstance])
 				}
 			}
 			else { 
-				flash.message = "An order must contain at least one item before it can be placed with a vendor."
+				flash.message = "${warehouse.message(code: 'order.order.mustContainAtLeastOneItem.message.message')}"
 				redirect(action: "show", id: orderInstance.id)
 			}
 		}
@@ -390,7 +390,7 @@ class OrderController {
 				}*/
 			}
 			else { 
-				flash.message = "shipment item error(s)"
+				flash.message = "${warehouse.message(code: 'order.shipmentItemErrors.message')}"
 				render(view: "fulfill", model: [orderItemInstance: orderItem, shipmentInstance: shipmentInstance])
 				return;
 			}
