@@ -12,7 +12,6 @@ class Constants {
 	static final String DEFAULT_MONTH_YEAR_DATE_FORMAT = "MMM yyyy"
 	
 	static final DateFormat DEFAULT_DATE_FORMATTER = new SimpleDateFormat(DEFAULT_DATE_FORMAT);	
-	static final Locale [] SUPPORTED_LOCALES = [new Locale('en'), new Locale('fr')]  
 
 	static final String DEFAULT_WEIGHT_UNITS = "lbs"
 	static final String DEFAULT_VOLUME_UNITS = "ft"

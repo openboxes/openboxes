@@ -24,8 +24,8 @@ class LocalizationService {
 			return value
 		}
 		
-		// fetch the locale of the current user
-		Locale locale = RequestContextHolder.currentRequestAttributes().getSession().user.locale
+		// fetch the locale of the current user; if there isn't one, use the default locale
+		Locale locale = RequestContextHolder.currentRequestAttributes().getSession().user?.locale ?: new Locale(grailsApplication.config.warehouse.defaultLocale)
 		
 		// split into the the various localized values
 		def values = value.split(delimiter)

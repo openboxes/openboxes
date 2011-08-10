@@ -269,3 +269,16 @@ grails.plugins.dynamicController.mixins = [
 	'com.burtbeckwith.grails.plugins.appinfo.PropertiesControllerMixin' : 'com.burtbeckwith.appinfo_test.AdminManageController',
 	'com.burtbeckwith.grails.plugins.appinfo.ScopesControllerMixin' :     'com.burtbeckwith.appinfo_test.AdminManageController'
  ]
+
+/**
+ * Warehouse Global Properties
+ */
+
+// default and supported locales
+warehouse.defaultLocale = 'en'
+warehouse.supportedLocales = ['en','fr']
+
+
+
+
+
