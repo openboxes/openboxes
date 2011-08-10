@@ -39,7 +39,6 @@
                             <td>${fieldValue(bean: userInstance, field: "name")}</td>
                             <td>${fieldValue(bean: userInstance, field: "email")}</td>
                             <td>${fieldValue(bean: userInstance, field: "locale.displayName")}</td>
-                   <!--          <td>${fieldValue(bean: userInstance, field: "roles")}</td>  -->
                             <td>
                             	<g:if test="${userInstance?.active }"><warehouse:message code="default.yes.label"/></g:if>
                             	<g:else><warehouse:message code="default.no.label"/></g:else>

@@ -23,7 +23,8 @@
 								<warehouse:message code="request.date.label"/>: <b><format:date obj="${requestInstance?.dateRequested}"/></b>
 							</span>
 							<span class="fade">&nbsp;|&nbsp;</span>
-							<span class="requested-by"<warehouse:message code="request.requestedBy.label"/>: 
+							<span class="requested-by">
+								<warehouse:message code="request.requestedBy.label"/>: 
 								<g:if test="${requestInstance?.requestedBy }"><b>${requestInstance?.requestedBy?.name }</b></g:if>
 								
 								<g:if test="${requestInstance?.origin }">(${requestInstance?.destination?.name })</g:if>

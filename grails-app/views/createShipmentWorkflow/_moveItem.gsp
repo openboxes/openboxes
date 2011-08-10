@@ -29,7 +29,7 @@
 									<tr>
 										<td>
 											<g:if test="${!itemToMove.container}">
-												<warehouse:message code="shipping.unpackedItems.label/>
+												<warehouse:message code="shipping.unpackedItems.label"/>
 											</g:if>
 											<g:if test="${itemToMove?.container?.parentContainer }">
 												${itemToMove?.container?.parentContainer?.name } &rsaquo;
