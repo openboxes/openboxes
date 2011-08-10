@@ -112,7 +112,7 @@ class ProductController {
 		
 		Attribute.list().each() {
 			String attVal = params["productAttributes." + it.id + ".value"];
-			if (attVal == "_other") {
+			if (attVal == "_other" || attVal == null || attVal == '') {
 				attVal = params["productAttributes." + it.id + ".otherValue"];
 			}
 			if (attVal) {
@@ -189,7 +189,7 @@ class ProductController {
 			
 			Attribute.list().each() {
 				String attVal = params["productAttributes." + it.id + ".value"]
-				if (attVal == "_other") {
+				if (attVal == "_other" || attVal == null || attVal == '') {
 					attVal = params["productAttributes." + it.id + ".otherValue"]
 				}
 				ProductAttribute existing = existingAtts.get(it.id)

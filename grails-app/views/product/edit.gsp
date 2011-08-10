@@ -149,7 +149,8 @@
 												</g:if>
 											</select>
 										</g:if>
-										<g:textField class="otherAttributeValue" style="${otherAttVal ? '' : 'display:none;'}" name="productAttributes.${attribute?.id}.otherValue" value="${otherAttVal ? productInstance?.attributes[status]?.value : ''}"/>
+										<g:set var="onlyOtherVal" value="${attribute.options.isEmpty() && attribute.allowOther}"/>
+										<g:textField class="otherAttributeValue" style="${otherAttVal || onlyOtherVal ? '' : 'display:none;'}" name="productAttributes.${attribute?.id}.otherValue" value="${otherAttVal || onlyOtherVal ? productInstance?.attributes[status]?.value : ''}"/>
 									</td>
 								</tr>
 							</g:each>

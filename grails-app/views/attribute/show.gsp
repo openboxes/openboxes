@@ -27,7 +27,7 @@
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="default.name.label" default="Name" /></td>
                             
-                            <td valign="top" class="value"><format:metadate obj="${attributeInstance}"/></td>
+                            <td valign="top" class="value"><format:metadata obj="${attributeInstance}"/></td>
                             
                         </tr>
                     
