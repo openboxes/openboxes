@@ -133,7 +133,7 @@ class AuthController {
 				redirect(controller:'dashboard',action:'index')
 			}
 			else {
-				flash.message = "${warehouse.message(code: 'auth.incorrectPassword.label', args=[params.username])}"		
+				flash.message = "${warehouse.message(code: 'auth.incorrectPassword.label', args: [params.username])}"		
 				userInstance = new User(username:params['username'])				
 				userInstance.errors.rejectValue("version", "default.authentication.failure",
 					[warehouse.message(code: 'user.label', default: 'User')] as Object[], "${warehouse.message(code: 'auth.unableToAuthenticateUser.message')}");
@@ -141,7 +141,7 @@ class AuthController {
 			}
 		}
 		else {
-			flash.message = "${warehouse.message(code: 'auth.userNotFound.message', args=[params.username])}"	
+			flash.message = "${warehouse.message(code: 'auth.userNotFound.message', args: [params.username])}"	
 			redirect(action:login)
 		}
 	}
