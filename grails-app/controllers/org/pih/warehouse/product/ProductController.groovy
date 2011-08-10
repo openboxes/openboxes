@@ -93,8 +93,6 @@ class ProductController {
 		render(view: "batchEdit", model: [commandInstance:cmd]);
 				
 	}
-	
-	
     
     def list = {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
@@ -106,24 +104,21 @@ class ProductController {
 		render(view: "edit", model: [productInstance : productInstance, rootCategory: productService.getRootCategory()])
 	}
 
-	
     def save = {		
-		def productInstance = new Product();	
-		/*
-		productInstance?.categories?.clear();
-		println "size: " + productInstance?.categories?.size()
-		params.each {
-			println ("category: " + it.key +  " starts with category_ " + it.key.startsWith("category_"))			
-			if (it.key.startsWith("category_")) {
-				def category = Category.get((it.key - "category_") as Integer);
-				log.info "adding " + category?.name
-				productInstance.addToCategories(category)
-			}
-		  }
-		*/
+		def productInstance = new Product();
 		productInstance.properties = params
 		
 		log.info("Categories " + productInstance?.categories);
+		
+		Attribute.list().each() {
+			String attVal = params["productAttributes." + it.id + ".value"];
+			if (attVal == "_other") {
+				attVal = params["productAttributes." + it.id + ".otherValue"];
+			}
+			if (attVal) {
+				productInstance.getAttributes().add(new ProductAttribute(new ProductAttribute(["attribute":it,"value":attVal])))
+			}
+		}
 		
 		// find the phones that are marked for deletion
 		def _toBeDeleted = productInstance.categories.findAll {(it?.deleted || (it == null))}
@@ -186,6 +181,31 @@ class ProductController {
                 }
             }
             productInstance.properties = params
+			
+			Map existingAtts = new HashMap();
+			productInstance.attributes.each() {
+				existingAtts.put(it.attribute.id, it)
+			}
+			
+			Attribute.list().each() {
+				String attVal = params["productAttributes." + it.id + ".value"]
+				if (attVal == "_other") {
+					attVal = params["productAttributes." + it.id + ".otherValue"]
+				}
+				ProductAttribute existing = existingAtts.get(it.id)
+				System.out.println("Att val: " + attVal)
+				if (attVal != null && attVal != '') {
+					if (!existing) {
+						existing = new ProductAttribute(["attribute":it])
+						productInstance.attributes.add(existing)
+					}
+					existing.value = attVal;
+				}
+				else {
+					System.out.println("Removing existing: " + existing)
+					productInstance.attributes.remove(existing)
+				}
+			}
 			
 			log.info("Categories " + productInstance?.categories);
 			

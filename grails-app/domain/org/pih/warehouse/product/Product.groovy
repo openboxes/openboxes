@@ -54,6 +54,7 @@ class Product implements Comparable, Serializable {
 	static mapping = {
 		cache true
 		categories joinTable: [name:'product_category', column: 'category_id', key: 'product_id']
+		attributes joinTable: [name:'product_attribute', column: 'attribute_id', key: 'product_id']
 	}
 		
     static constraints = {

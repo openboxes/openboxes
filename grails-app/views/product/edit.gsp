@@ -1,4 +1,3 @@
-
 <%@ page import="org.pih.warehouse.product.Product" %>
 <html>
 	<head>
@@ -122,51 +121,51 @@
 									class=" ${hasErrors(bean: productInstance, field: 'coldChain', 'errors')}">
 								<g:checkBox name="coldChain" value="${productInstance?.coldChain}" />
 								</td>
-							</tr>								
-							
-							<%--
-							<tr class="prop">
-                                <td valign="top" class="name">
-                                  <label for="categories"><warehouse:message code="product.otherCategories.label" default="Other Categories" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'categories', 'errors')}">
-                                	<ul>
-	                                	<g:each var="category" in="${productInstance?.categories}">
-											<li>${category?.name }</li>
-	                                	</g:each>
-	                                </ul>
-									<select name="categories.id" >
-										<g:render template="../category/selectOptions" model="[category:rootCategory, selected:[], level: 0]"/>
-									</select>	      
-									${productInstance?.categories }
-								</td>
-							</tr>	
-							 --%>
+							</tr>
 							 
 							<g:each var="attribute" in="${org.pih.warehouse.product.Attribute.list()}" status="status">
 								<tr class="prop">
-									<td valign="top" class="name"><label for="attributes">
-									<format:metadata obj="${attribute}"/>
-									</label> <g:hiddenField name="attributes[${status }].attribute.id"
-										value="${attribute?.id }" /></td>
+									<td valign="top" class="name">
+										<label for="attributes"><format:metadata obj="${attribute}"/></label>
+									</td>
 									<td valign="top" class="value">
-										<g:if test="${attribute.options }">
-											<g:select
-												name="attributes[${status }].value" from="${attribute?.options}"
-												value="${productInstance?.attributes ? productInstance?.attributes[status ]?.value : '' }" />
-												
-											<g:if test="${attribute.allowOther}">
-												<g:textField name="attributes[${status }].otherValue" value="" />
-											</g:if>
+										<g:set var="attributeFound" value="f"/>
+										<g:if test="${attribute.options}">
+											<select name="productAttributes.${attribute?.id}.value" class="attributeValueSelector">
+												<option value=""></option>
+												<g:each var="option" in="${attribute.options}" status="optionStatus">
+													<g:set var="selectedText" value=""/>
+													<g:if test="${productInstance?.attributes[status]?.value == option}">
+														<g:set var="selectedText" value=" selected"/>
+														<g:set var="attributeFound" value="t"/>
+													</g:if>
+													<option value="${option}"${selectedText}>${option}</option>
+												</g:each>
+												<g:set var="otherAttVal" value="${productInstance?.attributes[status]?.value != null && attributeFound == 'f'}"/>
+												<g:if test="${attribute.allowOther || otherAttVal}">
+													<option value="_other"<g:if test="${otherAttVal}"> selected</g:if>>
+														<g:message code="product.attribute.value.other" default="Other..." />
+													</option>
+												</g:if>
+											</select>
 										</g:if>
-										<g:else>
-											<g:textField name="attributes[${status }].value"
-												value="${productInstance?.attributes ? productInstance?.attributes[status ]?.value : '' }"/>
-										</g:else>
+										<g:textField class="otherAttributeValue" style="${otherAttVal ? '' : 'display:none;'}" name="productAttributes.${attribute?.id}.otherValue" value="${otherAttVal ? productInstance?.attributes[status]?.value : ''}"/>
 									</td>
 								</tr>
 							</g:each>
 							
+							<script type="text/javascript">
+								$(document).ready(function() {
+									$(".attributeValueSelector").change(function(event) {
+										if ($(this).val() == '_other') {
+											$(this).parent().find(".otherAttributeValue").show();
+										}
+										else {
+											$(this).parent().find(".otherAttributeValue").val('').hide();
+										}
+									});
+								});
+							</script>
 										
 							<tr class="prop">
 								<td valign="top" class="">
