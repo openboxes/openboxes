@@ -346,33 +346,11 @@
 					<warehouse:message code="admin.grailsVersion.label"/>: &nbsp; <b><g:meta name="app.grails.version"></g:meta></b>&nbsp;&nbsp; | &nbsp;&nbsp;
 					<warehouse:message code="default.date.label"/>: <b>${new Date() }</b>&nbsp;&nbsp; | &nbsp;&nbsp;
 					<warehouse:message code="default.locale.label"/>: &nbsp;  	
-					<img src="${createLinkTo(dir: 'images/flags', file: 'us.png') }" style="vertical-align: middle;">
-					<g:if test="${session['org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'].toString() != 'en_US'}">			
-						<a href="${createLink(controller: 'dashboard', action: 'index', params: ['lang':'en_US'])}">English (US)</a> &nbsp;
-					</g:if>
-					<g:else>
-						<span>English (US)</span>					
-					</g:else>
-					&nbsp;					
-					<img src="${createLinkTo(dir: 'images/flags', file: 'fr.png') }" style="vertical-align: middle;">
-					<g:if test="${session['org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'].toString() != 'fr'}">			
-						<a href="${createLink(controller: 'dashboard', action: 'index', params: ['lang':'fr'])}">French</a> &nbsp;
-					</g:if>
-					<g:else>
-						<span>French</span>					
-					</g:else>
 					
-					<!-- 
-					&nbsp;
-					<img src="${createLinkTo(dir: 'images/flags', file: 'es.png') }" style="vertical-align: middle;">
-					<g:if test="${session['org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'].toString() != 'es'}">			
-						<a href="${createLink(controller: 'dashboard', action: 'index', params: ['lang':'es'])}">Spanish</a> &nbsp;
-					</g:if>
-					<g:else>
-						<span>Spanish</span>					
-					</g:else>
-					-->
-
+					<!-- show all supported locales -->
+					<g:each in="${org.pih.warehouse.core.Constants.SUPPORTED_LOCALES}" var="locale">
+						<a href="${createLink(controller: 'user', action: 'updateAuthUserLocale', params: ['locale':locale])}">${locale?.displayName}</a> &nbsp;
+					</g:each>
 
 				</div>
 			</div>

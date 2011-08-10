@@ -161,6 +161,12 @@ class UserController {
 			
 			
             if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
+				
+				// if this is the current user, update reference to that user in the session
+				if (session.user.id == userInstance?.id) {
+					session.user = User.get(userInstance?.id)
+				}
+				
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label', default: 'User'), userInstance.id])}"
                 redirect(action: "show", id: userInstance.id)
             }
@@ -174,6 +180,41 @@ class UserController {
         }
     }
     
+	/**
+	 * Updates the locale of the default user
+	 * Used by the locale selectors in the footer
+	 */
+	
+	def updateAuthUserLocale = {
+		log.info "update auth user locale"
+		
+		// if no locale specified, do nothing
+		if (!params.locale) {
+			redirect(controller: "dashboard", action: "index")	
+		}		
+		
+		// convert the passed locale parameter to an actual locale
+		Locale locale = new Locale(params.locale)
+		
+		// if this isn't a valid locale, do nothing
+		if (!locale) {
+			redirect(controller: "dashboard", action: "index")
+		}
+		
+		// fetch an instance of authenticated user
+		def userInstance = User.get(session.user.id)
+		
+		// update the user locale & save
+		userInstance.locale = locale
+		userInstance.save(flush: true)
+		
+		// update the reference to the user in the session
+		session.user = User.get(userInstance.id)
+		
+		// redirect to the dashboard
+		redirect(controller: "dashboard", action: "index")
+	}
+	
     /**
      * Delete a user
      */
