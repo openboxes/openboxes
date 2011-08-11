@@ -4,8 +4,8 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'request.label', default: 'Request')}" />
         <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
-        <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.list.label" args="[entityName]" /></content>
+        
     </head>
     <body>
         <div class="body">

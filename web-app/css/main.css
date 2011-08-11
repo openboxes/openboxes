@@ -251,6 +251,10 @@ th.desc a {
     text-align: left;
     width: 90%;
 }
+/* allows table to be flush with its parent table cell */
+.prop .table { 
+	padding: 0px;
+}
 
 /* ACTION BUTTONS 
 

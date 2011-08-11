@@ -1,106 +1,108 @@
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
-<title>Enter shipment details</title>
-<style>
-	
-</style>
+<title>Pack request items</title>
+
 </head>
 <body>
-	<div class="nav">
-		<span class="menuButton"><a href="${createLinkTo(dir:'')}">Home</a>
-		</span>
-	</div>
 	<div class="body">
 		<g:if test="${flash.message}">
 			<div class="message">
 				${flash.message}
 			</div>
-		</g:if>
-		<g:hasErrors bean="${requestCommand}">
+		</g:if>	
+	
+		<g:hasErrors bean="${command}">
 			<div class="errors">
-				<g:renderErrors bean="${requestCommand}" as="list" />
+				<g:renderErrors bean="${command}" as="list" />
 			</div>
 		</g:hasErrors>
+				
 		<div class="dialog">
-			
-			<g:render template="progressBar" model="['state':'packRequestItems']"/>	
-			<br clear='all'/>
-			
-			<g:form action="fulfillRequest" method="post">
-				<g:hiddenField name="request.id" value="${requestCommand?.request?.id }"/>
-				<g:hiddenField name="dateRequested" value="${requestCommand?.dateRequested }"/>			
-			
-				<fieldset>
-					<g:render template="../request/summary" model="[requestInstance:request]"/>
+			<fieldset>
+				<g:render template="../request/summary" model="[requestInstance:command?.request]"/>				
+				<g:render template="progressBar" model="['state':'packRequestItems']"/>		
+				<g:form action="fulfillRequest" autocomplete="false">
 					<table>
-						<tbody>
+						<tr>
+							<td style="padding: 0; margin: 0;">
+								<div>
+									<g:if test="${command?.fulfillment?.fulfillmentItems }">																
+										<table id="shipmentItemsTable">
+											<tr>
+												<th>product</th>
+												<th>lotNumber</th>
+												<th>expirationDate</th>
+												<th class="center">requested</th>
+												<th class="center">picked</th>
+												<th class="center">packed</th>
+												<th class="left">actions</th>
+											</tr>
+											<g:each var="packItem" in="${command?.fulfillment?.fulfillmentItems }" status="i">
+												<tr class="${i%2?'even':'odd'}">
+													<td>
+														${packItem?.inventoryItem?.product?.name }
+													</td>
+													<td>
+														${packItem?.inventoryItem?.lotNumber }
+													</td>
+													<td>
+														${formatDate(date: packItem.inventoryItem?.expirationDate, format: org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT) }
+													</td>
+													<td class="center">
+														${packItem?.requestItem?.quantity }
+													</td>
+													<td class="center">
+														${packItem?.quantity }
+													</td>
+													<td class="center">
+														${packItem?.quantityPacked() }
+													</td>
+													<td>	
+														<%-- 
+														<g:if test="${packItem?.shipment }">
+															${packItem?.shipment }
+														</g:if>
+														<g:else>
+															<g:link action="fulfillRequest" event="showPackDialog" params="['requestItem.id':packItem?.requestItem?.id]">
+																<img src="${resource(dir: 'images/icons/silk', file: 'package.png') }"/>
+																<warehouse:message code="request.packItem.label"/>
+															</g:link>
+														</g:else>
+														--%>
+														<g:link action="fulfillRequest" event="showPackDialog" params="['fulfillmentItem.id':packItem?.id, 'requestItem.id':packItem?.requestItem?.id]">
+															<img src="${resource(dir: 'images/icons/silk', file: 'package.png') }"/>
+															<warehouse:message code="request.packItem.label"/>
+														</g:link>
+													</td>
+												</tr>
+											</g:each>
+										</table>
+									</g:if>
+								</div>
+							</td>		
+						</tr>
+						<tr class="prop">
+							<td>
+								<div class="buttons" style="border-top: 0px solid lightgrey;">
+									<g:submitButton name="back" value="Back"></g:submitButton>
+									<g:submitButton name="next" value="Next"></g:submitButton>
+									<g:link action="fulfillRequest" event="cancel">Cancel</g:link>
+								</div>
+							</td>
+						</tr>
 						
-							<tr class='prop'>
-								<td valign='top' class='name'>
-									<label for='requestedBy'>Shipment type</label>
-								</td>
-								<td valign='top'class='value'>
-									<g:select name="shipmentType.id" from="${org.pih.warehouse.shipping.ShipmentType.list()}" 
-										optionKey="id" optionValue="name" value="${requestCommand?.shipmentType?.id }" noSelection="['':'']" />
-								</td>
-							</tr>
-							<tr class='prop'>
-								<td valign='top' class='name'>
-									<label for='requestedBy'>Receipient</label>
-								</td>
-								<td valign='top'class='value'>
-									<div class="ui-widget">
-										<g:select class="combobox updateable" name="recipient.id" from="${org.pih.warehouse.core.Person.list()}" 
-											optionKey="id" optionValue="name" value="${requestCommand?.recipient?.id }" noSelection="['':'']" />
-									</div>									
-								</td>
-							</tr>
-							<tr class='prop'>
-								<td valign='top' class='name'>
-									<label for='shippedOn'>Shipped on</label>
-								</td>
-								<td valign='top'class='value'>									
-									<g:jqueryDatePicker 
-										id="shippedOn" 
-										name="shippedOn" 
-										class="updateable"
-										value="${requestCommand?.shippedOn }" 
-										format="MM/dd/yyyy"
-										showTrigger="false" />
-								</td>
-							</tr>								
-							<tr class='prop'>
-								<td valign='top' class='name'>
-									<label for='deliveredOn'>Delivered on</label>
-								</td>
-								<td valign='top'class='value'>
-									<g:jqueryDatePicker 
-										id="deliveredOn" 
-										name="deliveredOn" 
-										class="updateable"
-										value="${orderCommand?.deliveredOn }" 
-										format="MM/dd/yyyy"
-										showTrigger="false" />
-								</td>
-							</tr>									
-	
-						</tbody>
 					</table>
-					<div class="buttons" style="border-top: 1px solid lightgrey;">
-						<span class="formButton"> 
-							<g:submitButton name="next" value="Next"></g:submitButton> 
-							<g:link action="fulfillRequest" event="cancel">Cancel</g:link>
-						</span>
-					</div>
-					
-					
-				</fieldset>
-			</g:form>
+				</g:form>
+			</fieldset>
 		</div>
+		<g:if test="${showPackDialog}">
+			<g:render template="packItem" model="['requestItem':requestItem]"/>
+		</g:if>
 
-	</div>
+
+	</div>	  
+	
 </body>
 </html>

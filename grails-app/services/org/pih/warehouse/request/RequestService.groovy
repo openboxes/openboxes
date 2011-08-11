@@ -36,7 +36,8 @@ class RequestService {
 	 * @return
 	 */
 	List<Request> getOutgoingRequests(Location location) { 
-		return Request.findAllByOriginAndStatus(location, RequestStatus.REQUESTED)
+		//return Request.findAllByOriginAndStatus(location, RequestStatus.REQUESTED)
+		return Request.findAllByOrigin(location)	
 	}
 	
 	/**
@@ -82,7 +83,6 @@ class RequestService {
 	 * @return
 	 */
 	RequestItem getRequestItemAt(List requestItems, RequestItem requestItem, int direction) { 
-		log.info ("request item " + requestItem.class.name)
 		return requestItems[requestItems.indexOf(requestItem)+direction];	
 	}
 
@@ -120,6 +120,8 @@ class RequestService {
 			//requestItemCommand.quantityReceived = it.quantity
 			requestCommand?.requestItems << requestItemCommand
 		}
+		requestCommand.fulfillItems = new ArrayList();
+		
 		return requestCommand;
 	}
 	

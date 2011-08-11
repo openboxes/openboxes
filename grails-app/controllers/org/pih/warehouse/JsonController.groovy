@@ -41,6 +41,28 @@ class JsonController {
 		render quantity;
 	}
 	
+	def getContainers = { 
+		log.info("params: " + params);
+		def containers = []
+		def shipment = Shipment.get(params.id)
+		if (shipment) { 
+			containers = shipment.containers
+		}
+		else { 
+			containers = Container.list();
+		}
+		log.info("containers: " + containers)
+		render containers as JSON
+	}
+	
+	def searchProductByName = {
+		println params
+		def results = Product.findAllByNameIlike("%" + params.term + "%")
+		println "results >>>>>>>>>>>>>>>> " + results
+		
+		render(template:'searchResults', model:[searchResults:results])
+	}
+	
 	
 	def searchAll = { 
 		
@@ -421,7 +443,10 @@ class JsonController {
 		render data as JSON;
 	}
 	
+	
 	def findProductByName = {
+		
+		log.info(params)
 		
 		def dateFormat = new SimpleDateFormat(Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT);
 		
@@ -432,7 +457,7 @@ class JsonController {
 			// Match full name
 			products = Product.withCriteria { 
 				ilike("name", "%" + params.term + "%")	
-				maxResults( 15 )
+				//maxResults( 15 )
 			}
 			
 			// If no items found, we search by category, product type, name, upc
@@ -453,37 +478,33 @@ class JsonController {
 		// Add the search term to the list of items returned
 		products << [ value: params.term, label: params.term, valueText: params.term, desc: params.term ]
 		
-		if (!products) { 
+		//if (!products) { 
 			//items.add(new Product(name: "No matching products"))
 			//items.addAll(Product.list(params));		
-		}
+		//}
+		
 		def warehouse = Warehouse.get(params.warehouseId);
-		
-		
+		log.info ("warehouse: " + warehouse);
+		Map<InventoryItem, Integer> quantityMap =  
+			inventoryService.getQuantityForInventory(warehouse?.inventory)		
+			
 		// Convert from products to json objects 
 		if (products) {
 			// Make sure items are unique
 			products.unique();
 			products = products.collect() { product ->
-				
+				def productQuantity = 0;
 				// We need to check to make sure this is a valid product
 				def inventoryItems = []
 				if (product.id) { 
 					inventoryItems = InventoryItem.findAllByProduct(product);
 					inventoryItems = inventoryItems.collect() { inventoryItem ->
-						def quantity = 0;
-						def inventory = null;
-						if (warehouse) { 
-							try { 
-								inventory = Inventory.get(warehouse?.inventory?.id);
-								quantity = inventoryService.getQuantityForInventoryItem(inventoryItem, inventory);
-							} catch (Exception e) { 
-								log.error "Could not locate quantity for inventory item " + inventoryItem?.id + " and inventory " + inventory?.id, e
-							}
-						}
+						
+						// FIXME Getting the quantity from the inventory map does not work at the moment
+						def quantity = quantityMap[inventoryItem]?:0;
+						productQuantity += quantity;
 						
 						// Create inventory items object
-						log.info "quantity " + quantity;
 						if (quantity > 0) { 
 							[	
 								id: inventoryItem.id?:0, 
@@ -495,10 +516,10 @@ class JsonController {
 					}
 				}
 				
-				
 				// Convert product attributes to JSON object attributes
 				[	
 					product: product,
+					quantity: productQuantity,
 					value: product.id,
 					label: product.name,
 					valueText: product.name,

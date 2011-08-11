@@ -47,8 +47,9 @@ class AutoSuggestTagLib {
 							autoFill: true,
 							//scrollHeight: 300,
 							//define callback to format results
-							source: function(req, add){
-								\$.getJSON('${jsonUrl}', req, function(data) {
+							source: function(req, add){							
+		    					var currentWarehouseId = \$("#currentWarehouseId").val();
+								\$.getJSON('${jsonUrl}', { term: req.term, warehouseId: currentWarehouseId }, function(data) {
 									var items = [];
 									\$.each(data, function(i, item) {
 										items.push(item);

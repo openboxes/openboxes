@@ -26,8 +26,9 @@
 							<span class="requested-by">
 								<warehouse:message code="request.requestedBy.label"/>: 
 								<g:if test="${requestInstance?.requestedBy }"><b>${requestInstance?.requestedBy?.name }</b></g:if>
-								
-								<g:if test="${requestInstance?.origin }">(${requestInstance?.destination?.name })</g:if>
+								<%-- 
+								<g:if test="${requestInstance?.destination }">(${requestInstance?.destination?.name })</g:if>
+								--%>
 							</span>
 						</div>
 					</td>										

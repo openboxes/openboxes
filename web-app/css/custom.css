@@ -48,8 +48,8 @@ button {
 .autocomplete {
 	background-image: url('/warehouse/images/icons/silk/magnifier.png');
 	background-repeat: no-repeat;
-	background-position: center left;
-	padding-left: 20px;						
+	background-position: center right;
+	/*padding-left: 20px;*/
 }
 
 /* Action Menu Items */

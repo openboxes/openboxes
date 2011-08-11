@@ -338,14 +338,34 @@ class ShipmentService {
 		return shipmentItems;		
 	}
 	
+	/**
+	 * Get all shipments that are shipping to the given location.
+	 * 
+	 * @param location
+	 * @return
+	 */
 	List<Shipment> getIncomingShipments(Location location) {
 		def shipments = Shipment.withCriteria {
 			eq("destination", location)
-		}
-		
+		}		
 		return shipments.findAll { !it.wasReceived() }
 	}
+	
+	
+	/**
+	 * Get all shipments that are shipping from the given location.
+	 * 
+	 * @param location
+	 * @return
+	 */
+	List<Shipment> getOutgoingShipments(Location location) {
+		def shipments = Shipment.withCriteria {
+			eq("origin", location)
+		}		
+		return shipments.findAll { !it.hasShipped() }
+	}
 
+	
 
 	List<Shipment> getShipmentsByDestination(Location location) {
 		return Shipment.withCriteria { 

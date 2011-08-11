@@ -9,7 +9,7 @@ class DebugFilters {
 			}
 			after = { 
 				def timeInSeconds = (System.currentTimeMillis() - startTime) / 1000;
-				println("Response time: " + timeInSeconds + "s [${controllerName}.${actionName}] => "  + params);
+				//println("Response time: " + timeInSeconds + "s [${controllerName}.${actionName}] => "  + params);
 				startTime = null;				
 			}
 		}

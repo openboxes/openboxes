@@ -4,7 +4,9 @@
 <table>
 	<thead>
 		<tr>
-			<th> </th>
+			<th>
+				<warehouse:message code="default.actions.label"/>
+			</th>
 			<g:sortableColumn property="description"
 				title="${warehouse.message(code: 'default.description.label', default: 'Description')}" />
 				

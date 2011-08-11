@@ -62,23 +62,16 @@
         <wb-resource deploy-path="/" source-path="/liquibase-1.9.3.6-grails-app-migrations"/>
         <wb-resource deploy-path="/" source-path="/liquibase-1.9.3.6-src-java"/>
         <wb-resource deploy-path="/" source-path="/liquibase-1.9.3.6-src-groovy"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/barcode4j-0.2.1/grails-app/services"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/mail-1.0-SNAPSHOT/grails-app/services"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/mail-1.0-SNAPSHOT/grails-app/i18n"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/mail-1.0-SNAPSHOT/grails-app/taglib"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/mail-1.0-SNAPSHOT/grails-app/views"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/mail-1.0-SNAPSHOT/src/groovy"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/famfamfam-1.0.1/grails-app/taglib"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/grails-melody-1.6/src/groovy"/>
         <wb-resource deploy-path="/" source-path="/src/java"/>
-        <wb-resource deploy-path="/" source-path="/grails-app/utils"/>
-        <wb-resource deploy-path="/" source-path="/grails-app/migrations"/>
         <wb-resource deploy-path="/" source-path="/src/groovy"/>
         <wb-resource deploy-path="/" source-path="/grails-app/conf"/>
         <wb-resource deploy-path="/" source-path="/grails-app/controllers"/>
         <wb-resource deploy-path="/" source-path="/grails-app/domain"/>
+        <wb-resource deploy-path="/" source-path="/grails-app/migrations"/>
         <wb-resource deploy-path="/" source-path="/grails-app/services"/>
         <wb-resource deploy-path="/" source-path="/grails-app/taglib"/>
+        <wb-resource deploy-path="/" source-path="/grails-app/utils"/>
         <wb-resource deploy-path="/" source-path="/test/integration"/>
         <wb-resource deploy-path="/" source-path="/test/unit"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/app-info-0.4.3/grails-app/controllerMixins"/>
@@ -88,8 +81,7 @@
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/app-info-0.4.3/grails-app/views"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/app-info-0.4.3/src/groovy"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/app-info-0.4.3/src/java"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/bubbling-2.1.2/grails-app/taglib"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/bubbling-2.1.2/src/groovy"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/barcode4j-0.2.1/grails-app/services"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/constraints-0.5.1/grails-app/i18n"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/constraints-0.5.1/grails-app/utils"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/constraints-0.5.1/src/java"/>
@@ -99,6 +91,7 @@
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/dynamic-controller-0.2.1/src/java"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/excel-import-0.3/grails-app/i18n"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/excel-import-0.3/src/groovy"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/famfamfam-1.0.1/grails-app/taglib"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/google-visualization-0.4/grails-app/i18n"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/google-visualization-0.4/grails-app/taglib"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/google-visualization-0.4/grails-app/views"/>
@@ -107,6 +100,9 @@
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/grails-ui-1.2-SNAPSHOT/grails-app/services"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/grails-ui-1.2-SNAPSHOT/grails-app/taglib"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/grails-ui-1.2-SNAPSHOT/src/groovy"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/greenmail-1.2.2/grails-app/controllers"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/greenmail-1.2.2/grails-app/views"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/greenmail-1.2.2/src/groovy"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/jaxrs-0.4/grails-app/conf"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/jaxrs-0.4/grails-app/controllers"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/jaxrs-0.4/src/groovy"/>
@@ -134,6 +130,11 @@
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/liquibase-1.9.3.6/grails-app/migrations"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/liquibase-1.9.3.6/src/groovy"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/liquibase-1.9.3.6/src/java"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/mail-1.0-SNAPSHOT/grails-app/i18n"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/mail-1.0-SNAPSHOT/grails-app/services"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/mail-1.0-SNAPSHOT/grails-app/taglib"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/mail-1.0-SNAPSHOT/grails-app/views"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/mail-1.0-SNAPSHOT/src/groovy"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/pretty-time-0.3/grails-app/i18n"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/pretty-time-0.3/grails-app/taglib"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/pretty-time-0.3/src/groovy"/>
@@ -141,12 +142,15 @@
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/ui-performance-1.2.2/grails-app/taglib"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/ui-performance-1.2.2/src/groovy"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/ui-performance-1.2.2/src/java"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/spock-0.5-groovy-1.7-SNAPSHOT/src/java"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/yui-2.7.0.1/grails-app/i18n"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/yui-2.7.0.1/grails-app/taglib"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/yui-2.7.0.1/src/groovy"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/greenmail-1.2.2/grails-app/controllers"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/greenmail-1.2.2/grails-app/views"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/greenmail-1.2.2/src/groovy"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/spock-0.5-groovy-1.7-SNAPSHOT/src/java"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/release-1.0.0.M1/src/groovy"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/release-1.0.0.M1/src/java"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/svn-1.0.0.M1/grails-app/conf"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/svn-1.0.0.M1/src/groovy"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/bubbling-2.1.2/grails-app/taglib"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/bubbling-2.1.2/src/groovy"/>
     </wb-module>
 </project-modules>

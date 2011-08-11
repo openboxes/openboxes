@@ -26,7 +26,7 @@ class CreateRequestWorkflowController {
 				else {
 					def requestInstance = new Request();
 					requestInstance.requestedBy = Person.get(session.user.id)
-					requestInstance.status = RequestStatus.NOT_YET_REQUESTED;
+					requestInstance.status = RequestStatus.NOT_REQUESTED;
 					requestInstance.dateRequested = new Date();
 					def warehouse = Warehouse.get(session.warehouse.id)
 					requestInstance.destination = warehouse;

@@ -16,8 +16,7 @@ class RequestItem implements Serializable {
 	Product product
 	InventoryItem inventoryItem
 	Integer quantity
-	Float unitPrice
-	
+	Float unitPrice	
 	User requestedBy	// the person who actually requested the item
 	
 	
@@ -45,7 +44,8 @@ class RequestItem implements Serializable {
 	}
 
 	Integer quantityFulfilled() { 
-		return 0;
+		def fulfillmentItems = request.fulfillment.fulfillmentItems.findAll { it.requestItem == this }
+		return (fulfillmentItems) ? fulfillmentItems.sum { it.quantity } : 0;
 	}
 	
 	Integer quantityRemaining() { 

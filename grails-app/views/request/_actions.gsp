@@ -8,7 +8,7 @@
 		<g:if test="${requestInstance?.isRequested() }">
 			<g:render template="actionsRequested" model="[requestInstance:requestInstance]"/>
 		</g:if>
-		<g:elseif test="${requestInstance?.isNotYetRequested() }">
+		<g:elseif test="${requestInstance?.isNotRequested() }">
 			<g:render template="actionsNotYetRequested" model="[requestInstance:requestInstance]"/>
 		</g:elseif>
 		<g:else>

@@ -8,6 +8,7 @@ import org.pih.warehouse.core.EventType;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.User;
+import org.pih.warehouse.fulfillment.Fulfillment;
 import org.pih.warehouse.request.RequestStatus;
 
 class Request implements Serializable {
@@ -20,18 +21,16 @@ class Request implements Serializable {
 	Person recipient
 	Person requestedBy
 	Date dateRequested
-	
+	Fulfillment fulfillment;
 	
 	// Audit fields
 	Date dateCreated
 	Date lastUpdated
 
 	
-	static hasMany = [ requestItems : RequestItem, fulfillItems: RequestItem, comments : Comment, documents : Document, events : Event ]
+	static hasMany = [ requestItems : RequestItem, comments : Comment, documents : Document, events : Event ]
 	static mapping = {
-		table "`request`"
 		requestItems cascade: "all-delete-orphan"
-		fulfillItems cascade: "all-delete-orphan"
 		comments cascade: "all-delete-orphan"
 		documents cascade: "all-delete-orphan"
 		events cascade: "all-delete-orphan"
@@ -46,6 +45,7 @@ class Request implements Serializable {
 		recipient(nullable:true)
 		requestedBy(nullable:false)
 		dateRequested(nullable:true)
+		fulfillment(nullable:true)
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)
 	}	
@@ -57,8 +57,8 @@ class Request implements Serializable {
 		return "Not yet requested"
 	}
 	
-	Boolean isNotYetRequested() { 
-		return (status == null || RequestStatus.NOT_YET_REQUESTED)
+	Boolean isNotRequested() { 
+		return (status == null || RequestStatus.NOT_REQUESTED)
 	}
 	
 	Boolean isRequested() { 

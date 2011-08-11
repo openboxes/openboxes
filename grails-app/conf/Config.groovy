@@ -64,7 +64,13 @@ grails.enable.native2ascii = true
 grails.logging.jul.usebridge = true
 // packages to include in Spring bean scanning
 grails.spring.bean.packages = []
-grails.validateable.packages = ['org.pih.warehouse.inventory', 'org.pih.warehouse.order', 'org.pih.warehouse.shipment', 'org.pih.warehouse.request']
+grails.validateable.packages = [
+	'org.pih.warehouse.inventory', 
+	'org.pih.warehouse.fulfillment',
+	'org.pih.warehouse.order', 
+	'org.pih.warehouse.request',
+	'org.pih.warehouse.shipment',
+]
 
 /* Mail properties */
 mail.error.server = 'localhost'

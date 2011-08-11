@@ -39,7 +39,7 @@ class DashboardController {
 	}
 	
 	def chooseWarehouse = {
-		
+					
 		def warehouse = null;
 		if (params.id!='null') {			
 			warehouse = Location.get(params.id);

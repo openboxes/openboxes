@@ -33,40 +33,35 @@ class RequestCommand implements Serializable {
 	// This means that we might have more than one ReqeuestItemCommand per ReqeuestItem.
 	def requestItems = 
 		LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(RequestItemCommand.class));
-	
-	def fulfillItems = 
-		LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(RequestItemCommand.class));
-	
+		
 	static constraints = {
 		shipmentType(nullable:false)
 		recipient(nullable:false)
 		// Should ship on or before the day it's delivered
 		shippedOn(nullable:false, 
-			validator: { value, obj -> 		
-				//println "value: " + value		
-				//println "obj.deliveredOn: " + obj.deliveredOn
-				//println "new Date(): " + new Date()
-				if (!(value <= new Date())) { 
-					//println "value <= new Date(): " + (value <= new Date())
-					return ["invalid.mustOccurOnOrBeforeToday", value, new Date()]
-				}
-				// subtract a day from the shippedOn date in case the dates are the same
-				if (!obj.deliveredOn.after(value-1)) { 
-					//println "obj.deliveredOn.after(value-1): " + obj.deliveredOn.after(value-1)
-					return ["invalid.mustOccurOnOrBeforeDeliveredOn", value, obj.deliveredOn]
+			validator: { value, obj -> 	
+				println "value = " + value + ", object = " + object;	
+				if (value) { 
+					if (!(value <= new Date())) { 
+						return ["invalid.mustOccurOnOrBeforeToday", value, new Date()]
+					}
+					// subtract a day from the shippedOn date in case the dates are the same
+					if (!obj.deliveredOn.after(value-1)) { 
+						return ["invalid.mustOccurOnOrBeforeDeliveredOn", value, obj.deliveredOn]
+					}
 				}
 			}
 		)
 		deliveredOn(nullable:false, 
 			validator: { value, obj ->
-				//println "value: " + value
-				//println "new Date(): " + new Date()
-				if (!(value <= new Date()) ) { 
-					//println "value <= new Date(): " + (value <= new Date())					
-					return ["invalid.mustOccurOnOrBeforeToday", value, new Date()]
-				}
-				if (!(value).after(obj.shippedOn-1)) { 
-					return ["invalid.mustOccurOnOrAfterShippedOn", value, obj.shippedOn]
+				println "value = " + value + ", object = " + object;	
+				if (value) { 
+					if (!(value <= new Date()) ) { 
+						return ["invalid.mustOccurOnOrBeforeToday", value, new Date()]
+					}
+					if (!(value).after(obj.shippedOn-1)) { 
+						return ["invalid.mustOccurOnOrAfterShippedOn", value, obj.shippedOn]
+					}
 				}
 			}
 		)
@@ -74,9 +69,12 @@ class RequestCommand implements Serializable {
 		currentLocation(nullable:true)
 		origin(nullable:true)
 		destination(nullable:true)
-		dateReqeuested(nullable:true)
+		dateRequested(nullable:true)
 		requestedBy(nullable:true)
 	}
+	
+
+	
 	
 }
 
