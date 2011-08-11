@@ -3813,6 +3813,15 @@
             <column name="shipment_item_id"/>
         </createIndex>
     </changeSet>
+    
+    <changeSet author="jmiranda" id="1313074391957-32">
+		<update tableName="request">
+		    <column name="status" value="NOT_REQUESTED"/>
+		    <where>status='NOT_YET_REQUESTED'</where>
+		</update>    
+	</changeSet>
+    
+    
 </databaseChangeLog>
 
 
