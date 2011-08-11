@@ -55,12 +55,9 @@ class InventoryItemController {
 			if (localFile) {
 				log.info "Local xls file " + localFile.getAbsolutePath()
 				cmd.filename = localFile.getAbsolutePath()
-							
-				Warehouse warehouse = Warehouse.get(session.warehouse.id)
-				
-										
+					
 				inventoryMapList =
-					inventoryService.prepareInventory(warehouse, cmd.filename, cmd.errors);
+					inventoryService.prepareInventory(Warehouse.get(session.warehouse.id), cmd.filename, cmd.errors);
 
 				if (!inventoryMapList?.isEmpty) { 
 					flash.message = "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args:[localFile.getAbsolutePath()])}"
