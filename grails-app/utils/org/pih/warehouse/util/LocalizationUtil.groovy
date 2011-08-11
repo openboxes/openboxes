@@ -10,12 +10,17 @@ public class LocalizationUtil {
 	 */
 	static String getLocalizedString(String value, Locale locale) {
 		
+		// return blank string if no value
+		if (!value) {
+			return ""
+		}
+		
 		// split into the the various localized values
 		def values = value.split(delimiter)
 		
 		// if there aren't any values, return empty string
 		if (values.size() == 0) {
-			return "";
+			return ""
 		}
 		
 		// the default value is the first value in the list
