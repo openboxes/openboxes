@@ -2,7 +2,7 @@
 <table>
 	<g:each var="product" in="${searchResults}">
 		<tr>
-			<td>${product?.name }
+			<td><format:product product="${product}" /></td>
 		</tr>	
 	</g:each>
 </table>

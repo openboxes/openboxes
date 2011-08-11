@@ -24,7 +24,9 @@ import org.pih.warehouse.shipping.Shipment;
 
 class JsonController {
 
-	def inventoryService;
+	def inventoryService
+	
+	def localizationService
 	
 	def getQuantity = { 
 		log.info params
@@ -120,16 +122,19 @@ class JsonController {
 				tempItems.each { 
 					def quantity = quantitiesByInventoryItem[it]
 					quantity = (quantity) ?: 0
+					
+					def localizedName = localizationService.getLocalizedString(it.product.name)
+					
 					if (quantity > 0) { 
 						inventoryItems << [
 							id: it.id,
 							value: it.lotNumber,
-							label:  it.product.name + " --- Item: " + it.lotNumber + " --- Qty: " + quantity + " --- ",
+							label:  localizedName + " --- Item: " + it.lotNumber + " --- Qty: " + quantity + " --- ",
 							valueText: it.lotNumber,
 							lotNumber: it.lotNumber,
 							product: it.product.id,
 							productId: it.product.id,
-							productName: it.product.name,
+							productName: localizedName,
 							quantity: quantity,
 							expirationDate: it.expirationDate
 						]
@@ -171,12 +176,14 @@ class JsonController {
 			
 			if (items) {
 				items = items.collect() {
-					
 					def quantity = quantitiesByInventoryItem[it]
 					quantity = (quantity) ?: 0
+					
+					def localizedName = localizationService.getLocalizedString(it.product.name)
+					
 					[
 						value: it.lotNumber,
-						label:  it.product.name + " --- Item: " + it.lotNumber + " --- Qty: " + quantity + " --- ",
+						label:  localizedName + " --- Item: " + it.lotNumber + " --- Qty: " + quantity + " --- ",
 						valueText: it.lotNumber,
 						lotNumber: it.lotNumber,
 						expirationDate: it.expirationDate,
@@ -224,11 +231,14 @@ class JsonController {
 							]
 						
 						shipment.containers.each { 
+							
+							def localizedContainerName = localizationService.getLocalizedString(it.containerType.name)
+							
 							finalItems << [ 
 								value: it.id, 
 								type: "container", 
-								label: "    * " + shipment.name + " > " + it.containerType.name + " " + it.name, 
-								valueText: it.shipment.name + " &rsaquo; " + it.containerType.name + " " + it.name 
+								label: "    * " + shipment.name + " > " + localizedContainerName + " " + it.name, 
+								valueText: it.shipment.name + " &rsaquo; " + localizedContainerName + " " + it.name 
 							]
 						}
 					}					
@@ -259,10 +269,13 @@ class JsonController {
 			}
 			if (items) {
 				items = items.collect() {
-					[	value: it.name,
-						label: it.name,
-						valueText: it.name,
-						desc: it.name,
+					
+					def localizedName = localizationService.getLocalizedString(it.name)
+					
+					[	value: localizedName,
+						label: localizedName,
+						valueText: localizedName,
+						desc: localizedName,
 						icon: "none" 	]
 				}
 			}
@@ -282,10 +295,13 @@ class JsonController {
 			}
 			if (items) {
 				items = items.collect() {
+					
+					def localizedName = localizationService.getLocalizedString(it.name)
+					
 					[	value: it.id,
-						label: it.name,
-						valueText: it.name,
-						desc: it.name,
+						label: localizedName,
+						valueText: localizedName,
+						desc: localizedName,
 						icon: "none" 	]
 				}
 			}
@@ -516,13 +532,15 @@ class JsonController {
 					}
 				}
 				
+				def localizedName = localizationService.getLocalizedString(product.name)
+				
 				// Convert product attributes to JSON object attributes
 				[	
 					product: product,
 					quantity: productQuantity,
 					value: product.id,
-					label: product.name,
-					valueText: product.name,
+					label: localizedName,
+					valueText: localizedName,
 					desc: product.description,
 					inventoryItems: inventoryItems,
 					icon: "none"
@@ -584,7 +602,8 @@ class JsonController {
 			}
 			
 			items = items.collect() {
-				[id:it.id, name:it.name]
+				def localizedName = localizationService.getLocalizedString(it.name)
+				[id:it.id, name:localizedName]
 			}
 		}
 		def jsonItems = [result: items]
