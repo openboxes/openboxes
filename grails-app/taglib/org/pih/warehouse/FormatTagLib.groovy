@@ -1,19 +1,12 @@
 package org.pih.warehouse
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import org.pih.warehouse.core.Constants;
-
-import com.ocpsoft.pretty.time.PrettyTime;
+package org.pih.warehouse.util.LocalizationUtil
 
 class FormatTagLib {
 	
-	// TODO: why is this working? from what I read (though maybe it is outdate) this shouldn't be working
-	def localizationService
-	
 	static namespace = "format"
+	
+	Locale defaultLocale = new Locale(grailsApplication.config.warehouse.defaultLocale)
 	
 	/**
 	 * Formats a Date
@@ -74,7 +67,7 @@ class FormatTagLib {
 	 def product = { attrs ->		 
 	 	if (attrs.product != null) {
 			 // default format is to display the localized name of the product 
-			 out << localizationService.getLocalizedString(attrs.product.name)
+			 out << LocalizationUtil.getLocalizedString(attrs.product.name, locale: session?.user?.locale ?: defaultLocale)
 		 }
 		 // TODO: add more formats
 	 }
@@ -85,7 +78,7 @@ class FormatTagLib {
 	def category = { attrs ->
 		if (attrs.category != null) {
 			// default format is to display the localized name of the catergory
-			out << localizationService.getLocalizedString(attrs.category.name)
+			out << LocalizationUtil.getLocalizedString(attrs.product.name, locale: session?.user?.locale ?: defaultLocale)
 		}
 		// TODO: add more formats
 	}
@@ -104,7 +97,7 @@ class FormatTagLib {
 			 }
 			 else {
 				 // for all other objects, return the localized version of the name
-				 out << localizationService.getLocalizedString(attrs.obj.name)
+				 out << LocalizationUtil.getLocalizedString(attrs.product.name, locale: session?.user?.locale ?: defaultLocale)
 			 }
 		 }
 	 }
