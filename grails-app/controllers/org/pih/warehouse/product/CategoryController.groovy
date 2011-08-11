@@ -26,26 +26,10 @@ class CategoryController {
 		log.info child;
 		child.parentCategory = parent;
 		if (!child.hasErrors() && child.save(flush:true)) { 
-			flash.message = ${warehouse.message(code: 'default.success.message')}
+			flash.message = "${warehouse.message(code: 'default.success.message')}"
 		}
 		redirect(action: "tree");
-		
 	}
-	
-		
-	/*
-	def editCategory = { 
-		log.info params 
-		def categoryInstance = Category.get(params.id)
-		if (!categoryInstance) { 
-			flash.message = "Unable to locate category with ID ${params.id}" 
-		}
-		render(view: "editCategory", model: [rootCategory: productService.getRootCategory(), categoryInstance: categoryInstance ])		
-	}
-	
-	def createCategory = {
-		render(view: "createCategory", model: [rootCategory: productService.getRootCategory(), categoryInstance: new Category() ])
-	}*/
 
 	def saveCategory = { 		
 		log.info params;
@@ -65,7 +49,6 @@ class CategoryController {
 		else {	
 			render(view: "tree", model: [categoryInstance: categoryInstance, rootCategory : productService.getRootCategory()])
 		}
-		
 	}
 	
 	def deleteCategory = {
