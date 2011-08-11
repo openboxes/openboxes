@@ -167,7 +167,7 @@ class FulfillRequestWorkflowController {
 				def fulfillment = flow.command.fulfillment;
 				
 				log.info "fulfill item and continue: " + params				
-				flash.message = ${warehouse.message(code: 'request.fulfilledItem.message')}
+				flash.message = "${warehouse.message(code: 'request.fulfilledItem.message')}"
 				command.fulfillmentItems.each { 
 					log.info "fulfill item >>>>> requested item=" + it.requestItem + 
 						" qty=" + it.quantity + " inventory item=" + it.inventoryItem 
@@ -188,7 +188,7 @@ class FulfillRequestWorkflowController {
 		saveAndClose { 
 			action { 
 				log.info "fulfill item and close: " + params
-				flash.message = ${warehouse.message(code: 'request.fulfilledItem.message')}
+				flash.message = "${warehouse.message(code: 'request.fulfilledItem.message')}"
 				
 				[showDialog: Boolean.FALSE]
 			}

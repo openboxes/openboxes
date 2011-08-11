@@ -184,7 +184,7 @@ class DocumentController {
 
 		def document = Document.get(params.id)
         if (!document) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), params.id])}";
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), params.id])}"
 			redirect(controller: "shipment", action: "showDetails", id:document.getShipment().getId());    			
         }
         else {            
