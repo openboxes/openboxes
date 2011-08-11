@@ -64,7 +64,7 @@
 								<tr class="prop">
 									<td valign="top" class="name"><label><warehouse:message code="default.destination.label" /></td>
 									<td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'destination', 'errors')}">
-										<g:select name="destination.id" from="${org.pih.warehouse.core.Location.list().sort()}" optionKey="id" value="${shipmentInstance?.destination?.id}" style="width: 180px" />	
+										<g:select name="destination.id" from="${org.pih.warehouse.inventory.Warehouse.list().sort()}" optionKey="id" value="${shipmentInstance?.destination?.id}" style="width: 180px" />	
 									</td>
 								</tr>
 								
