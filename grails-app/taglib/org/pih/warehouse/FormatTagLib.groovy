@@ -1,6 +1,11 @@
 package org.pih.warehouse
 
-package org.pih.warehouse.util.LocalizationUtil
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.util.LocalizationUtil
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+
+
 
 class FormatTagLib {
 	
@@ -67,7 +72,7 @@ class FormatTagLib {
 	 def product = { attrs ->		 
 	 	if (attrs.product != null) {
 			 // default format is to display the localized name of the product 
-			 out << LocalizationUtil.getLocalizedString(attrs.product.name, locale: session?.user?.locale ?: defaultLocale)
+			 out << LocalizationUtil.getLocalizedString(attrs.product.name, session?.user?.locale ?: defaultLocale)
 		 }
 		 // TODO: add more formats
 	 }
@@ -78,7 +83,7 @@ class FormatTagLib {
 	def category = { attrs ->
 		if (attrs.category != null) {
 			// default format is to display the localized name of the catergory
-			out << LocalizationUtil.getLocalizedString(attrs.product.name, locale: session?.user?.locale ?: defaultLocale)
+			out << LocalizationUtil.getLocalizedString(attrs.category.name, session?.user?.locale ?: defaultLocale)
 		}
 		// TODO: add more formats
 	}
@@ -97,7 +102,7 @@ class FormatTagLib {
 			 }
 			 else {
 				 // for all other objects, return the localized version of the name
-				 out << LocalizationUtil.getLocalizedString(attrs.product.name, locale: session?.user?.locale ?: defaultLocale)
+				 out << LocalizationUtil.getLocalizedString(attrs.obj.name, session?.user?.locale ?: defaultLocale)
 			 }
 		 }
 	 }
