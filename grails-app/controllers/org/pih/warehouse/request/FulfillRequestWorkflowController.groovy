@@ -167,11 +167,11 @@ class FulfillRequestWorkflowController {
 				def fulfillment = flow.command.fulfillment;
 				
 				log.info "fulfill item and continue: " + params				
-				flash.message = "${warehouse.message(code: 'request.fulfilledItem.message')}"
+				def message = "${warehouse.message(code: 'request.fulfilledItem.message')}"
 				command.fulfillmentItems.each { 
 					log.info "fulfill item >>>>> requested item=" + it.requestItem + 
 						" qty=" + it.quantity + " inventory item=" + it.inventoryItem 
-						
+					
 					if (it.quantity > 0) { 
 						log.info "add item to fulfillment"
 						fulfillmentService.addToFulfillmentItems(fulfillment, it)
@@ -209,19 +209,7 @@ class FulfillRequestWorkflowController {
 		
 		packRequestItems {
 			on("back").to("pickRequestItems")			
-			on("next") { RequestCommand cmd ->
-				
-				/*
-				flow.requestCommand = cmd
-				if (flow.requestCommand.hasErrors()) {
-					return error() 	
-				}
-				log.info("setting request command for process request items " + flow.requestItems)
-				cmd.requestItems = flow.requestItems
-				*/
-				[requestCommand : cmd]
-							
-			}.to("confirmFulfillment")
+			on("next").to("confirmFulfillment")
 			
 			on("showPackDialog").to("showPackDialog")
 			on("saveAndContinuePackDialog").to("saveAndContinuePackDialog")
