@@ -18,12 +18,11 @@
 				<g:renderErrors bean="${command}" as="list" />
 			</div>
 		</g:hasErrors>
-				
-		<div class="dialog">
-			<fieldset>
-				<g:render template="../request/summary" model="[requestInstance:command?.request]"/>				
-				<g:render template="progressBar" model="['state':'pickRequestItems']"/>		
-				<g:form action="fulfillRequest" autocomplete="false">
+		<g:form action="fulfillRequest" autocomplete="false">
+			<div class="dialog">
+				<fieldset>
+					<g:render template="../request/summary" model="[requestInstance:command?.request]"/>				
+					<g:render template="progressBar" model="['state':'pickRequestItems']"/>						
 					<table>
 						<tr>
 							<td style="padding: 0; margin: 0;">														
@@ -122,9 +121,9 @@
 						</tr>
 						
 					</table>
-				</g:form>
-			</fieldset>
-		</div>
+				</fieldset>
+			</div>
+		</g:form>
 		<%-- 
 		<div id="dialog">
 			<div id="dialog-form">

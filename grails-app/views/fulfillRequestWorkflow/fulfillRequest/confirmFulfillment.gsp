@@ -148,22 +148,20 @@
 					</table>
 				</fieldset>
 			</div>				
-				
-				
 		</g:form>
 	</div>
 	
-		<script>
-			$(document).ready(function() {
-				jQuery.fn.alternateRowColors = function() {
-					$('tbody tr:odd', this).removeClass('odd').addClass('even');
-					$('tbody tr:even', this).removeClass('even').addClass('odd');
-					return this;
-				};				
+	<script>
+		$(document).ready(function() {
+			jQuery.fn.alternateRowColors = function() {
+				$('tbody tr:odd', this).removeClass('odd').addClass('even');
+				$('tbody tr:even', this).removeClass('even').addClass('odd');
+				return this;
+			};				
 
-				$("#requestItemsTable").alternateRowColors();
-		    	
-	    	});
-	    </script>	
+			$("#requestItemsTable").alternateRowColors();
+	    	
+    	});
+    </script>	
 </body>
 </html>
