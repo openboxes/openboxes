@@ -15,7 +15,7 @@
 					<span class="name"><warehouse:message code="product.units.label"/></span>
 				</td>
 				<td colspan="2">
-					<span class="value">${productInstance?.unitOfMeasure }</span>
+					<span class="value"><format:metadata obj="${productInstance?.unitOfMeasure}"/></span>
 				</td>
 			</tr>
 			<tr class="details odd">	
