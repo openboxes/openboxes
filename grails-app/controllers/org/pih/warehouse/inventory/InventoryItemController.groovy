@@ -68,7 +68,7 @@ class InventoryItemController {
 					
 				// If there are no errors and the user requests to import the data, we should execute the import
 				if (!cmd.errors.hasErrors() && params.importNow) {
-					inventoryService.importInventory(warehouse, inventoryMapList, cmd.errors);
+					inventoryService.importInventory(Warehouse.get(session.warehouse.id), inventoryMapList, cmd.errors);
 					
 					if (!cmd.errors.hasErrors()) {
 						flash.message = "${warehouse.message(code: 'inventoryItem.importSuccess.message', args:[localFile.getAbsolutePath()])}"
