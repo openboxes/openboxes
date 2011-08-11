@@ -588,6 +588,8 @@ class InventoryService implements ApplicationContextAware {
 	Integer getQuantityForInventoryItem(InventoryItem item, Inventory inventory) {
 		def transactionEntries = getTransactionEntriesByInventoryItemAndInventory(item, inventory)
 		def quantity = getQuantityByInventoryItemMap(transactionEntries)[item]
+		
+		log.info("quantity -> " + quantity)
 		return quantity ? quantity : 0;
 	}
 	

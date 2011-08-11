@@ -44,7 +44,7 @@ class RequestItem implements Serializable {
 	}
 
 	Integer quantityFulfilled() { 
-		def fulfillmentItems = request.fulfillment.fulfillmentItems.findAll { it.requestItem == this }
+		def fulfillmentItems = request?.fulfillment?.fulfillmentItems.findAll { it.requestItem == this }
 		return (fulfillmentItems) ? fulfillmentItems.sum { it.quantity } : 0;
 	}
 	
