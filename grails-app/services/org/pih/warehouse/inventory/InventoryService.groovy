@@ -244,7 +244,7 @@ class InventoryService implements ApplicationContextAware {
 		
 		def shipmentService = getShipmentService()
 		
-		// Get quantity for each item in inventory 
+		// Get quantity for each item in inventory TODO: Should only be doing this for the selected products for speed
 		def quantityOnHandMap = getQuantityByProductMap(commandInstance?.warehouseInstance?.inventory);
 		def quantityShippingMap = shipmentService.getShippingQuantityByProduct(commandInstance?.warehouseInstance);
 		def quantityReceivingMap = shipmentService.getReceivingQuantityByProduct(commandInstance?.warehouseInstance);
@@ -345,8 +345,22 @@ class InventoryService implements ApplicationContextAware {
 	   if (matchCategories && productFilters) {
 		   def searchProducts = Product.createCriteria().list() {
 			   and {
-				   productFilters.each {
-					   ilike("name", "%" + it + "%")
+				   or {
+					   and {
+						   productFilters.each {
+							   ilike("name", "%" + it + "%")
+						   }
+					   }
+					   and {
+						   productFilters.each {
+							   ilike("manufacturer", "%" + it + "%")
+						   }
+					   }
+					   and {
+						   productFilters.each {
+							   ilike("productCode", "%" + it + "%")
+						   }
+					   }
 				   }
 				   'in'("category", matchCategories)
 			   }
@@ -359,9 +373,21 @@ class InventoryService implements ApplicationContextAware {
 				   if (productFilters) {
 					   productFilters.each {
 						   String[] filterTerms = it.split("\\s+");
-						   and {
-							   filterTerms.each {
-								   ilike("name", "%" + it + "%")
+						   or {
+							   and {
+								   filterTerms.each {
+									   ilike("name", "%" + it + "%")
+								   }
+							   }
+							   and {
+								   filterTerms.each {
+									   ilike("manufacturer", "%" + it + "%")
+								   }
+							   }
+							   and {
+								   filterTerms.each {
+									   ilike("productCode", "%" + it + "%")
+								   }
 							   }
 						   }
 					   }
