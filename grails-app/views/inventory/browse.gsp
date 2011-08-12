@@ -32,7 +32,7 @@
 				border: 1px solid lightgrey; 
 			}
 			.checked { 
-				background-color: lightyellow; 
+				background-color: #FFCC66; 
 			} 
 			.checkbox { 
 				width: 50px; 
@@ -95,9 +95,9 @@
 								            					</tr>
 																<tr class="odd">
 																	<th style="width: 50px;"></th>
-																	<th style="width: 400px;"><warehouse:message code="default.description.label"/></th>
+																	<th style="width: 350px;"><warehouse:message code="default.description.label"/></th>
 																	<th style="width: 100px;"><warehouse:message code="product.manufacturer.label"/></th>
-																	<th style="width: 100px;"><warehouse:message code="product.code.label"/></th>
+																	<th style="width: 150px;"><warehouse:message code="product.code.label"/></th>
 																	<th style="text-align: center; border-left: 1px solid lightgrey; width: 50px;"><warehouse:message code="inventory.qtyin.label"/></th>
 																	<th style="text-align: center; border-right: 1px solid lightgrey; width: 50px;"><warehouse:message code="inventory.qtyout.label"/></th>
 																	<th style="text-align: center; width: 50px;"><warehouse:message code="default.qty.label"/></th>
@@ -109,10 +109,10 @@
 																	<g:set var="totalQuantity" value="${totalQuantity + (quantity?:0) }"/>
 																	<g:set var="cssClass" value="${quantity == 0 ? 'outofstock' : 'instock'  }"/>
 																	<tr class="${status%2==0?'even':'odd' } prop ${cssClass}">
-																		<td>
+																		<td class="middle center">
 																			<g:checkBox id="${inventoryItem?.product?.id }" name="productId" 
 																				class="checkbox" checked="${false }" 
-																					value="${inventoryItem?.product?.id }" />
+																					value="${inventoryItem?.product?.id }" style="padding: 0px; margin: 0px; vertical-align: middle;"/>
 																		</td>																
 																		<td class="checkable">
 																			<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]" fragment="inventory" style="z-index: 999">
