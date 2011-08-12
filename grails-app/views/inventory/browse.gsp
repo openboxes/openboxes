@@ -6,7 +6,7 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'inventory.label', default: 'Inventory')}" />
         <title><warehouse:message code="default.browse.label" args="[entityName]" /></title>    
-        
+        <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'scrolltable.css')}" type="text/css" media="screen, projection" />
 		<style>
 			.data td, .data th { 
 				vertical-align: middle; 
@@ -50,6 +50,9 @@
 				width: 50px; 
 				border: 1px solid black;
 			}
+			.scrollTable {
+				border-collapse:collapse;
+			}
 			
 		</style>        
     </head>    
@@ -68,7 +71,7 @@
 				<!-- Inventory Browser -->
 				<div>
 		        	<g:set var="varStatus" value="${0}"/>
-		        	<g:set var="totalProducts" value="${0}"/>        			
+		        	<g:set var="totalProducts" value="${0}"/>      			
 		         	<table style="border:none;">
 		         		<tr>
 		         			<td style="padding:0px; margin:0px;">
@@ -80,92 +83,85 @@
 			            		<g:if test="${commandInstance?.categoryToProductMap}">
 			            		
 						            <g:form controller="shipment" action="addToShipment">
-			            		
-				            			<div style="overflow: auto; padding: 0px; height: 400px; ">		
-											<g:each var="entry" in="${commandInstance?.categoryToProductMap}" status="i">	
-												<g:set var="totalQuantity" value="${0}"/>
-												<g:set var="categoryInventoryItems" value="${commandInstance?.categoryToProductMap[entry.key]}"/>
-												<div class="list">
-													<!-- Category Breadcrumb -->
-													<div class="categoryBreadcrumb">
-														<g:render template="../category/breadcrumb" model="[categoryInstance:entry.key]"/>
-													</div>
-							            			<table class="data" style="width: 100%;" border="0">         		
-							            				<thead>
-							            					<tr class="odd">
-							            						<th></th>
-							            						<th></th>
-							            						<th></th>
-							            						<th></th>
-							            		 				<th colspan="2" class="center"style="text-align: center; border-left: 1px solid lightgrey; border-right: 1px solid lightgrey;"><warehouse:message code="default.pending.label"/></th>
-							            						<th></th>
-							            					</tr>
-															<tr class="odd">
-																<th style="width: 50px;"></th>
-																<th style="width: 400px;"><warehouse:message code="default.description.label"/></th>
-																<th style="width: 100px;"><warehouse:message code="product.manufacturer.label"/></th>
-																<th style="width: 100px;"><warehouse:message code="product.code.label"/></th>
-																<th style="text-align: center; border-left: 1px solid lightgrey; width: 50px;"><warehouse:message code="inventory.qtyin.label"/></th>
-																<th style="text-align: center; border-right: 1px solid lightgrey; width: 50px;"><warehouse:message code="inventory.qtyout.label"/></th>
-																<th style="text-align: center; width: 50px;"><warehouse:message code="default.qty.label"/></th>
-															</tr>
-														</thead>
-														<tbody>
-															<g:each var="inventoryItem" in="${categoryInventoryItems}" status="status">
-																<g:set var="quantity" value="${inventoryItem?.quantityOnHand }"/>
-																<g:set var="totalQuantity" value="${totalQuantity + (quantity?:0) }"/>
-																<g:set var="cssClass" value="${quantity == 0 ? 'outofstock' : 'instock'  }"/>
-																<g:set var="totalProducts" value="${totalProducts + 1}"/>
-																
-																<tr class="${status%2==0?'even':'odd' } prop ${cssClass}">
-																	<td>
-																		<g:checkBox id="${inventoryItem?.product?.id }" name="productId" 
-																			class="checkbox" checked="${false }" 
-																				value="${inventoryItem?.product?.id }" />
-																	</td>																
-																	<td class="checkable">
-																		<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]" fragment="inventory" style="z-index: 999">
-																			<g:if test="${inventoryItem?.product?.name?.trim()}">
-																				<format:product product="${inventoryItem?.product}"/> 
-																			</g:if>
-																			<g:else>
-																				<warehouse:message code="product.untitled.label"/>
-																			</g:else>
-																		</g:link> 
-																	</td>
-																	<td class="checkable">
-																		${inventoryItem?.product?.manufacturer }
-																	</td>
-																	<td class="checkable">
-																		${inventoryItem?.product?.productCode }
-																	</td>
-																	<td class="checkable" style="text-align: center; border-left: 1px solid lightgrey;">
-																		${inventoryItem?.quantityToReceive?:0}
-																	</td>
-																	<td class="checkable" style="text-align: center; border-right: 1px solid lightgrey;">
-																		${inventoryItem?.quantityToShip?:0}
-																	</td>
-																	<td class="checkable" style="text-align: center;">
-																		<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
-																			${inventoryItem?.quantityOnHand?:0}
-																		</g:link>
-																	</td>
-																</tr>
-															</g:each>
-														</tbody>
-														<tfoot>										
-															<tr class="even prop">
-																<th style="text-align: left;" colspan="6">
-																</th>
-																<th style="text-align: center;">
-																	${totalQuantity}
-																</th>
-															</tr>
-														</tfoot>										
-													</table>
-												</div>
-											</g:each>
-										</div>			
+						            
+						                <table border="0" cellpadding="0" cellspacing="0" width="100%" class="scrollTable"> 
+											<thead class="fixedHeader"> 
+					           					<tr class="odd">
+													<th style="width: 50px; border: 1px solid #F7F7F7;"></th>
+													<th style="width: 600px; border: 1px solid #F7F7F7;"></th>
+													<th style="width: 200px; border: 1px solid #F7F7F7;"></th>
+													<th style="width: 100px; border-left: 1px solid #F7F7F7; border-right:1px solid lightgrey;"></th>
+					           		 				<th colspan="2" class="center" style="width:100px; text-align: center; border-left: 1px solid lightgrey; border-right: 1px solid lightgrey;"><warehouse:message code="default.pending.label"/></th>
+					           						<th style="width:50px; border: 1px solid #F7F7F7;"></th>
+					           					</tr>
+												<tr class="odd">
+													<th style="width: 50px; border: 1px solid #F7F7F7;"></th>
+													<th style="width: 600px; border: 1px solid #F7F7F7;"><warehouse:message code="default.description.label"/></th>
+													<th style="width: 200px; border: 1px solid #F7F7F7;"><warehouse:message code="product.manufacturer.label"/></th>
+													<th style="width: 100px; border-left: 1px solid #F7F7F7; border-right:1px solid lightgrey;"><warehouse:message code="product.code.label"/></th>
+													<th style="text-align: center; border-left: 1px solid lightgrey; width: 50px;"><warehouse:message code="inventory.qtyin.label"/></th>
+													<th style="text-align: center; border-right: 1px solid lightgrey; width: 50px;"><warehouse:message code="inventory.qtyout.label"/></th>
+													<th style="text-align: center; width: 50px; border: 1px solid #F7F7F7;"><warehouse:message code="default.qty.label"/></th>
+												</tr>
+											</thead> 
+											<tbody class="scrollContent"> 
+												<g:each var="entry" in="${commandInstance?.categoryToProductMap}" status="i">
+													<tr>
+														<td colspan="7">
+															<div class="categoryBreadcrumb">
+																<g:render template="../category/breadcrumb" model="[categoryInstance:entry.key]"/>
+															</div>
+														</td>
+													</tr>
+													<g:set var="totalQuantity" value="${0}"/>
+													<g:set var="categoryInventoryItems" value="${commandInstance?.categoryToProductMap[entry.key]}"/>
+													<g:each var="inventoryItem" in="${categoryInventoryItems}" status="status">
+														<g:set var="quantity" value="${inventoryItem?.quantityOnHand }"/>
+														<g:set var="totalQuantity" value="${totalQuantity + (quantity?:0) }"/>
+														<g:set var="totalProducts" value="${totalProducts + 1}"/>
+														
+														<tr class="${status%2==0?'even':'odd' } prop">
+															<td valign="middle" style="width: 50px;">
+																<g:checkBox id="${inventoryItem?.product?.id }" name="productId" 
+																	class="checkbox" style="top:0em;" checked="${false }" 
+																		value="${inventoryItem?.product?.id }" />
+															</td>																
+															<td class="checkable" style="width: 600px;">
+																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]" fragment="inventory" style="z-index: 999">
+																	<g:if test="${inventoryItem?.product?.name?.trim()}">
+																		<format:product product="${inventoryItem?.product}"/> 
+																	</g:if>
+																	<g:else>
+																		<warehouse:message code="product.untitled.label"/>
+																	</g:else>
+																</g:link> 
+															</td>
+															<td class="checkable" style="width: 200px;">
+																${inventoryItem?.product?.manufacturer }
+															</td>
+															<td class="checkable" style="width: 100px;">
+																${inventoryItem?.product?.productCode }
+															</td>
+															<td class="checkable" style="width:50px; text-align: center; border-left: 1px solid lightgrey;">
+																${inventoryItem?.quantityToReceive?:0}
+															</td>
+															<td class="checkable" style="width:50px; text-align: center; border-right: 1px solid lightgrey;">
+																${inventoryItem?.quantityToShip?:0}
+															</td>
+															<td class="checkable" style="width:50px; text-align: center;">
+																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
+																	${inventoryItem?.quantityOnHand?:0}
+																</g:link>
+															</td>
+														</tr>
+													</g:each>
+													<tr>
+														<th style="text-align: left;" colspan="6"></th>
+														<th style="text-align: center;">${totalQuantity}</th>
+													</tr>
+												</g:each>
+											</tbody> 
+										</table>		
 										<div class="center" style="padding: 10px;">
 											<button>
 												<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" style="vertical-align: middle;"/><warehouse:message code="shipping.addToShipments.label"/>
