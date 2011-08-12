@@ -5,7 +5,7 @@ import org.pih.warehouse.util.LocalizationUtil;
 
 class LocalizationUtilTest {
 
-	void testGetLocalizedValue() {
+	void testGetLocalizedString() {
 	
 		Locale locale = new Locale("en","US")
 	

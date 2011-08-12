@@ -4,7 +4,7 @@
 	});			
 </script>
 
-<div id="dlgMoveItem" title="Move Item" style="padding: 10px; display: none;" >
+<div id="dlgMoveItem" title="${warehouse.message(code:'shipping.moveItem.label')}" style="padding: 10px; display: none;" >
 	<g:if test="${itemToMove}">
 		<g:form name="moveItem" action="createShipment">
 			<table>

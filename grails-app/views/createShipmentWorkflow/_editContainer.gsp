@@ -3,7 +3,7 @@
 		$("#dlgEditContainer").dialog({ autoOpen: true, modal: true, width: '600px' });						
 	});
 </script>	   
-	<div id="dlgEditContainer" title="${container ? 'Edit ' + format.metadata(obj:container?.containerType).toLowerCase() : 'Add ' + format.metadata(obj:containerTypeToAdd).toLowerCase()}" style="padding: 10px; display: none;" >
+	<div id="dlgEditContainer" title="${container ? warehouse.message(code:'default.edit.label', args: [format.metadata(obj:container?.containerType).toLowerCase()]) : warehouse.message(code: 'default.add.label', args: [format.metadata(obj:containerTypeToAdd).toLowerCase()])}" style="padding: 10px; display: none;" >
 	
 
 	<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.Container" form="editContainer"/>

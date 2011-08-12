@@ -1,4 +1,4 @@
-<div id="dlgAddItem" title="Add an Item" style="padding: 10px; display: none;" >
+<div id="dlgAddItem" title="${warehouse.message(code:'shipping.addAnItem.label')}" style="padding: 10px; display: none;" >
 	
 	<g:render template="itemSearch" model="['containerId':addItemToContainerId]"/>		
 	

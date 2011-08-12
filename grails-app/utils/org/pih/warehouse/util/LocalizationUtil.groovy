@@ -8,31 +8,31 @@ public class LocalizationUtil {
 	/**
 	 * Returns the value associated with the passed locale
 	 */
-	static String getLocalizedString(String value, Locale locale) {
+	static String getLocalizedString(String str, Locale locale) {
 		
 		// return blank string if no value
-		if (!value) {
+		if (!str) {
 			return ""
 		}
 		
 		// split into the the various localized values
-		def values = value.split(delimiter)
+		def strings = str.split(delimiter)
 		
 		// if there aren't any values, return empty string
-		if (values.size() == 0) {
+		if (strings.size() == 0) {
 			return ""
 		}
 		
 		// the default value is the first value in the list
-		def defaultValue = values[0]
+		def defaultValue = strings[0]
 		
 		// if there is only one value, or if no locale has been specified, just return the default value
-		if (values.size() == 1 || locale == null) {
+		if (strings.size() == 1 || locale == null) {
 			return defaultValue
 		}
 		
 		// the other values are the potential localized values
-		def localizedValues = values[1..values.size()-1]
+		def localizedValues = strings[1..strings.size()-1]
 		
 		// see if we can find the user locale in the list of localized values
 		def localizedValue

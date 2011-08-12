@@ -89,11 +89,11 @@ class FormatTagLib {
 	}
 	 
 	 /**
-	  * Custom tag to display warehouse metadata
+	  * Custom tag to display warehouse metadata is a standard, localized manner
 	  */
 	 def metadata = { attrs ->
 		 if (attrs.obj != null) {
-			 // if this is a string, localize the string directly
+			 // handle String; localize the string directly
 			 if (attrs.obj instanceof String) {
 				 out << LocalizationUtil.getLocalizedString(attrs.obj, session?.user?.locale ?: defaultLocale)
 			 }

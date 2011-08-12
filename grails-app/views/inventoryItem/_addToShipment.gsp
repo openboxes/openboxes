@@ -10,7 +10,7 @@
 		<img src="${resource(dir: 'images/icons/silk', file: 'lorry_add.png')}"/>&nbsp;<warehouse:message code="shipping.addToShipment.label"/></a>
 </div>
 
-<div id="dlgAddToShipment-${itemInstance?.id}" title="Add to Shipment" style="padding: 10px; display: none; vertical-align: middle;" >	
+<div id="dlgAddToShipment-${itemInstance?.id}" title="${warehouse.message(code:'shipping.addToShipment.label')}" style="padding: 10px; display: none; vertical-align: middle;" >	
 
 	<g:if test="${commandInstance?.pendingShipmentList }">
 		<table>
