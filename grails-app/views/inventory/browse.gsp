@@ -82,7 +82,7 @@
 			         		<td style="padding: 0; margin: 0; vertical-align: middle;">
 			            		<g:if test="${commandInstance?.categoryToProductMap}">
 			            		
-						            <g:form controller="shipment" action="addToShipment">
+						            <g:form id="inventoryActionForm" controller="shipment" action="addToShipment">
 						            
 						                <table border="0" cellpadding="0" cellspacing="0" width="100%" class="scrollTable"> 
 											<thead class="fixedHeader"> 
@@ -162,10 +162,8 @@
 												</g:each>
 											</tbody> 
 										</table>		
-										<div class="center" style="padding: 10px;">
-											<button>
-												<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" style="vertical-align: middle;"/><warehouse:message code="shipping.addToShipments.label"/>
-											</button>
+										<div style="padding: 10px;">
+											<g:render template="./actions" model="[]"/>
 										</div>
 									</g:form>
 								</g:if>	    
