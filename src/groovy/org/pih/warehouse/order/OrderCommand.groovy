@@ -48,7 +48,7 @@ class OrderCommand implements Serializable {
 					return ["invalid.mustOccurOnOrBeforeToday", value, new Date()]
 				}
 				// subtract a day from the shippedOn date in case the dates are the same
-				if (!obj.deliveredOn.after(value-1)) { 
+				if (obj.deliveredOn && !obj.deliveredOn.after(value-1)) { 
 					//println "obj.deliveredOn.after(value-1): " + obj.deliveredOn.after(value-1)
 					return ["invalid.mustOccurOnOrBeforeDeliveredOn", value, obj.deliveredOn]
 				}
@@ -62,7 +62,7 @@ class OrderCommand implements Serializable {
 					//println "value <= new Date(): " + (value <= new Date())					
 					return ["invalid.mustOccurOnOrBeforeToday", value, new Date()]
 				}
-				if (!(value).after(obj.shippedOn-1)) { 
+				if (obj.shippedOn && !(value).after(obj.shippedOn-1)) { 
 					return ["invalid.mustOccurOnOrAfterShippedOn", value, obj.shippedOn]
 				}
 			}
