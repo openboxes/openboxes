@@ -13,7 +13,8 @@ import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.Warehouse;
 
 class InventoryController {
-    //def scaffold = Inventory		
+	
+    def productService;	
 	def inventoryService;
 	def shipmentService;
 	
@@ -26,65 +27,49 @@ class InventoryController {
 		[ warehouses : Warehouse.getAll() ]
 	}
 	
-	
 	/**
 	 * Allows a user to browse the inventory for a particular warehouse.  
 	 */
 	def browse = { InventoryCommand cmd ->
 		
-		log.info "Browse inventory " + cmd;
-		// Get the warehouse from the request parameter
+		// Get the current warehouse from either the request or the session
 		cmd.warehouseInstance = Warehouse.get(params?.warehouse?.id) 
-		cmd.categoryInstance = Category.get(params?.categoryId)
-		
-		// If it doesn't exist or if the parameter is null, get 
-		// warehouse from the session
-		if (!cmd.warehouseInstance) { 
+		if (!cmd.warehouseInstance) {
 			cmd.warehouseInstance = Warehouse.get(session?.warehouse?.id);
 		}
 		
-		// If the user entered a search term, add it to the session-bound search terms
-		if (cmd.searchTerms) {
-			// Initialize the array 
-			if (!session.inventorySearchTerms) {
-				session.inventorySearchTerms = []
-			}
-			
-			// Add all search terms to the user's session
-			if (!session.inventorySearchTerms.contains(cmd.searchTerms)) {
-				session.inventorySearchTerms << cmd.searchTerms
+		// Get the primary category from either the request or the session or as the first listed by default
+		List quickCategories = productService.getQuickCategories();
+		cmd.categoryInstance = Category.get(params?.categoryId)
+		if (!cmd.categoryInstance) {
+			cmd.categoryInstance = Category.get(session?.inventoryCategoryId);
+			if (!cmd.categoryInstance) {
+				cmd.categoryInstance = quickCategories.get(0);
 			}
 		}
+		session?.inventoryCategoryId = cmd.categoryInstance.id
 		
-		// Hydrate the category filters from the session, which allow us
-		// to get any attribute of a category without get a lazy init exception
-		// First remove any that are null, in the event that a Category was deleted
-		cmd.categoryFilters = []
-		if (session.inventoryCategoryFilters) {
-			for (Iterator iter = session.inventoryCategoryFilters.iterator(); iter.hasNext();) {
-				Category c = Category.get(iter.next());
-				if (c == null) {
-					iter.remove();
-				}
-				else {
-					cmd.categoryFilters << c;
-				}
-			}
-		}
-				
-		// Add session-bound search terms to command object 
-		cmd.searchTermFilters = []
-		if (session.inventorySearchTerms) { 
-			session.inventorySearchTerms.each {
-				cmd.searchTermFilters << it;
-			}
-		}
+		// Pre-populate the sub-category and search terms from the session
+		cmd.subcategoryInstance = Category.get(session?.inventorySubcategoryId);
+		cmd.searchTerms = session?.inventorySearchTerms;
 		cmd.showHiddenProducts = session?.showHiddenProducts;
 		
+		// If a new search is being performed, override the session-based terms from the request
+		if (request.getParameter("searchPerformed")) {
+			cmd.subcategoryInstance = Category.get(params?.subcategoryId);
+			session?.inventorySubcategoryId = cmd.subcategoryInstance?.id;
+			cmd.searchTerms = params.searchTerms
+			session?.inventorySearchTerms = cmd.searchTerms;
+			cmd.showHiddenProducts = params?.showHiddenProducts == "on";
+			session?.showHiddenProducts = cmd.showHiddenProducts;
+			cmd.showOutOfStockProducts = params?.showOutOfStockProducts == "on";
+			session?.showOutOfStockProducts = cmd.showOutOfStockProducts;
+		}
 		
+		// Pass this to populate the matching inventory items
 		inventoryService.browseInventory(cmd);
 
-		[ commandInstance: cmd ]
+		[ commandInstance: cmd, quickCategories: quickCategories ]
 	}
 	
 	

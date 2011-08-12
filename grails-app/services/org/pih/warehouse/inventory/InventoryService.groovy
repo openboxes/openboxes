@@ -183,28 +183,14 @@ class InventoryService implements ApplicationContextAware {
 				}
 				l.add(it);
 			}
+			for (entry in m) {
+				entry.value.sort { item1, item2 ->
+					item1?.product?.name <=> item2?.product?.name
+				}
+			}
 		}
 		return m
 	}
-	
-	/*
-	Map getInventoryMap(Collection inventoryProducts) { 
-		// Sort inventory items by quantity, then by product name
-		Map inventoryProductMap = new TreeMap();
-		if (inventoryProducts) {
-			inventoryProducts.each {
-				Category category = it.category ? it.category : new Category(name: "Unclassified")
-				List list = inventoryProductMap.get(category)
-				if (list == null) {
-					list = new ArrayList();
-					inventoryProductMap.put(category, list);
-				}
-				list.add(it);
-			}
-		}
-		return inventoryProductMap;
-	}*/
-			
 	
 	/**
 	 * Search inventory items by term or product Id
@@ -233,21 +219,17 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	InventoryCommand browseInventory(InventoryCommand commandInstance) { 
-		
+
 		// add an inventory to this warehouse if it doesn't exist
 		if (!commandInstance?.warehouseInstance?.inventory) {
 			addInventory(commandInstance.warehouseInstance)
 		}
 		
-		// Get all product types and set the default product type				
-		commandInstance.rootCategory = productService.getRootCategory();
-		commandInstance.inventoryInstance = commandInstance?.warehouseInstance?.inventory;
-		
 		// Get the selected category or use the root category
-		commandInstance.categoryInstance = commandInstance?.categoryInstance ?: commandInstance?.rootCategory;
+		commandInstance.categoryInstance = commandInstance?.categoryInstance ?: productService.getRootCategory();
 		
 		// Get current inventory for the given products
-		commandInstance.inventoryItems = getCurrentInventory(commandInstance);								
+		getCurrentInventory(commandInstance);								
 		
 		return commandInstance;
 	}
@@ -262,33 +244,32 @@ class InventoryService implements ApplicationContextAware {
 		
 		def shipmentService = getShipmentService()
 		
-		def inventoryItems = [];
-		
-		// Only used to count products on page
-		commandInstance.products = getProducts(commandInstance);
-		
 		// Get quantity for each item in inventory 
-		def quantityOnHandMap = getQuantityByProductMap(commandInstance?.inventoryInstance);
+		def quantityOnHandMap = getQuantityByProductMap(commandInstance?.warehouseInstance?.inventory);
 		def quantityShippingMap = shipmentService.getShippingQuantityByProduct(commandInstance?.warehouseInstance);
 		def quantityReceivingMap = shipmentService.getReceivingQuantityByProduct(commandInstance?.warehouseInstance);
 		
-		commandInstance?.products.each { product -> 
+		def products = [];
+		
+		getProducts(commandInstance).each { product -> 
 			def quantityOnHand = quantityOnHandMap[product] ?: 0;
 			def quantityToReceive = quantityReceivingMap[product] ?: 0;
 			def quantityToShip = quantityShippingMap[product] ?: 0;
 			
-			inventoryItems << new InventoryItemCommand(category: product.category, product: product, 
-				quantityOnHand: quantityOnHand, quantityToReceive: quantityToReceive, quantityToShip: quantityToShip );
-		}
-		
-		// Get inventory and sort by product name 
-		def inventoryProductMap = getProductMap(inventoryItems);
-		for (item in inventoryProductMap) {
-			item.value.sort { item1, item2 ->
-				item1?.product?.name <=> item2?.product?.name
+			if (commandInstance?.showOutOfStockProducts || (quantityOnHand + quantityToReceive + quantityToShip > 0)) {
+				products << new ProductCommand(
+					category: product.category, 
+					product: product, 
+					quantityOnHand: quantityOnHand, 
+					quantityToReceive: quantityToReceive, 
+					quantityToShip: quantityToShip 
+				);
 			}
 		}
-		return inventoryProductMap;
+		
+		commandInstance?.categoryToProductMap = getProductMap(products);
+
+		return commandInstance?.categoryToProductMap
 	}
 	
 	/**
@@ -313,10 +294,17 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	Set getProducts(def commandInstance) {
-		// Get any category filters that match search terms
+		List categoryFilters = new ArrayList();
+		if (commandInstance?.subcategoryInstance) {
+			categoryFilters.add(commandInstance?.subcategoryInstance);
+		}
+		else {
+			categoryFilters.add(commandInstance?.categoryInstance);
+		}
+		List searchTerms = (commandInstance?.searchTerms ? Arrays.asList(commandInstance?.searchTerms.split(" ")) : null);
 		def products = getProductsByAll(
-				commandInstance?.searchTermFilters,
-				commandInstance?.categoryFilters,
+				searchTerms,
+				categoryFilters,
 				commandInstance?.showHiddenProducts);
 
 
@@ -336,7 +324,7 @@ class InventoryService implements ApplicationContextAware {
 
 	   // Categories
 	   def matchCategories = getExplodedCategories(categoryFilters);
-	   log.info "matchCategories " + matchCategories
+	   log.debug "matchCategories " + matchCategories
 	   
 	   
 	   // Base product list
@@ -353,7 +341,7 @@ class InventoryService implements ApplicationContextAware {
 		   products = query.list()
 	   }
 	   
-	   log.info "base products " + products.size();
+	   log.debug "base products " + products.size();
 	   if (matchCategories && productFilters) {
 		   def searchProducts = Product.createCriteria().list() {
 			   and {
@@ -423,7 +411,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	Integer getQuantity(Warehouse warehouse, Product product, String lotNumber) {
-		log.info ("Get quantity for product " + product?.name + " lotNumber " + lotNumber + " at location " + warehouse?.name)
+		log.debug ("Get quantity for product " + product?.name + " lotNumber " + lotNumber + " at location " + warehouse?.name)
 		if (!warehouse) {
 			throw new RuntimeException("Your warehouse has not been initialized");
 		}
@@ -532,7 +520,8 @@ class InventoryService implements ApplicationContextAware {
 			quantityMapByProductAndInventoryItem[product].values().each {
 				quantityMap[product] += it
 			}
-		}                 	
+		}
+
 		return quantityMap
 	}
 	
@@ -589,7 +578,7 @@ class InventoryService implements ApplicationContextAware {
 		def transactionEntries = getTransactionEntriesByInventoryItemAndInventory(item, inventory)
 		def quantity = getQuantityByInventoryItemMap(transactionEntries)[item]
 		
-		log.info("quantity -> " + quantity)
+		log.debug("quantity -> " + quantity)
 		return quantity ? quantity : 0;
 	}
 	
@@ -699,7 +688,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	RecordInventoryCommand saveRecordInventoryCommand(RecordInventoryCommand cmd, Map params) { 
-		log.info "Saving record inventory command params: " + params
+		log.debug "Saving record inventory command params: " + params
 		
 		try { 
 			// Validation was done during bind, but let's do this just in case
@@ -780,7 +769,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	List getProductsBySearchTerms(List productFilters) { 
-		log.info "get products by search terms " + productFilters;
+		log.debug "get products by search terms " + productFilters;
 		
 		// Get products that match the search terms by name and category
 		def products = Product.createCriteria().list() { 
@@ -826,7 +815,7 @@ class InventoryService implements ApplicationContextAware {
 			products += inventoryItems*.product;
 		}
 		*/
-		log.info products
+		log.debug products
 		
 		return products;
 	}
@@ -929,24 +918,24 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	InventoryItem findInventoryItemByProductAndLotNumber(Product product, String lotNumber) {
-		log.info ("Find inventory item by product " + product?.id + " and lot number '" + lotNumber + "'" )
+		log.debug ("Find inventory item by product " + product?.id + " and lot number '" + lotNumber + "'" )
 		def inventoryItems = InventoryItem.createCriteria().list() {
 			and {
 				eq("product.id", product?.id)
 				if (lotNumber) { 
-					log.info "lot number is not null"
+					log.debug "lot number is not null"
 					eq("lotNumber", lotNumber)
 				}
 				else {  
 					or { 
-						log.info "lot number is null"
+						log.debug "lot number is null"
 						isNull("lotNumber")
 						eq("lotNumber", "")
 					}
 				}
 			}
 		}
-		log.info ("Returned inventory items " + inventoryItems);
+		log.debug ("Returned inventory items " + inventoryItems);
 		// If the list is non-empty, return the first item
 		if (inventoryItems) { 
 			return inventoryItems.get(0);
@@ -1152,7 +1141,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param shipmentInstance
 	 */
 	void createSendShipmentTransaction(Shipment shipmentInstance) { 
-		log.info "create send shipment transaction" 
+		log.debug "create send shipment transaction" 
 		
 		if (!shipmentInstance.origin.isWarehouse()) {
 			throw new RuntimeException ("Can't create send shipment transaction for origin that is not a warehouse")
@@ -1217,7 +1206,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	public List prepareInventory(Warehouse warehouse, String filename, Errors errors) { 
-		log.info "prepare inventory"
+		log.debug "prepare inventory"
 		Map CONFIG_CELL_MAP = [
 			sheet:'Sheet1', cellMap: [ ]
 		]
@@ -1266,7 +1255,7 @@ class InventoryService implements ApplicationContextAware {
 		
 		// Iterate over each row
 		inventoryMapList.each { Map importParams ->
-			//log.info "Inventory item " + importParams
+			//log.debug "Inventory item " + importParams
 			
 			def lotNumber = (importParams.lotNumber) ? String.valueOf(importParams.lotNumber) : null;
 			if (importParams?.lotNumber instanceof Double) {
@@ -1335,7 +1324,7 @@ class InventoryService implements ApplicationContextAware {
 						errors.addError(it);
 					}
 				}
-				log.info "Created new category " + category.name;
+				log.debug "Created new category " + category.name;
 			}
 			
 			// Create product if not exists
@@ -1357,7 +1346,7 @@ class InventoryService implements ApplicationContextAware {
 					errors.reject("Error saving product " + product?.name)
 					//throw new RuntimeException("Error saving product " + product?.name)
 				}
-				log.info "Created new product " + product.name;
+				log.debug "Created new product " + product.name;
 			}
 			
 			/*
@@ -1397,7 +1386,7 @@ class InventoryService implements ApplicationContextAware {
 			InventoryItem inventoryItem =
 				findInventoryItemByProductAndLotNumber(product, lotNumber);
 			
-			log.info("Inventory item " + inventoryItem)
+			log.debug("Inventory item " + inventoryItem)
 			// Create inventory item if not exists
 			if (!inventoryItem) {
 				inventoryItem = new InventoryItem()
@@ -1495,7 +1484,7 @@ class InventoryService implements ApplicationContextAware {
 							errors.addError(it);
 						}
 					}
-					log.info "Created new category " + category.name;
+					log.debug "Created new category " + category.name;
 				}
 				
 				
@@ -1514,7 +1503,7 @@ class InventoryService implements ApplicationContextAware {
 						errors.reject("Error saving product " + product?.name)
 						//throw new RuntimeException("Error saving product " + product?.name)
 					}
-					log.info "Created new product " + product.name;
+					log.debug "Created new product " + product.name;
 				}
 				
 				/*
@@ -1556,7 +1545,7 @@ class InventoryService implements ApplicationContextAware {
 					
 					
 				
-				log.info("Inventory item " + inventoryItem)
+				log.debug("Inventory item " + inventoryItem)
 				// Create inventory item if not exists
 				if (!inventoryItem) {
 					inventoryItem = new InventoryItem()
@@ -1564,8 +1553,8 @@ class InventoryService implements ApplicationContextAware {
 					inventoryItem.lotNumber = lotNumber;
 					inventoryItem.expirationDate = expirationDate;
 					if (inventoryItem.hasErrors() || !inventoryItem.save()) {				
-						log.info "Product " + product
-						log.info "Inventory item " + importParams.lotNumber;
+						log.debug "Product " + product
+						log.debug "Inventory item " + importParams.lotNumber;
 						inventoryItem.errors.allErrors.each {
 							log.error "ERROR " + it;
 							errors.addError(it);

@@ -2,41 +2,22 @@ package org.pih.warehouse.inventory
 
 class InventoryCommand {
 	
-	def inventoryItems;
-	def searchTerms;		// request-level search terms  
-	def warehouseInstance;	// warehouseInstance,
-	def inventoryInstance; 	// warehouseInstance.inventory,
-	def categoryInstance; 	// categoryInstance,
+	def warehouseInstance;						// warehouseInstance	
+	def searchTerms;							// request-level search terms  
+	def categoryInstance; 						// categoryInstance
+	def subcategoryInstance;					// child category to show within the categoryInstance
+	def showHiddenProducts = Boolean.FALSE;		// indicates whether hidden products for the warehouse should be included
+	def showOutOfStockProducts = Boolean.TRUE;	// indicates whether out of stock products for the warehouse should be included
 
-	def showHiddenProducts; 
-	def searchTermFilters 	// search filters loaded from the session
-	def categoryFilters; 	// category filters loaded from the session
-	//def productMap; 		// inventoryService.getProductMap(productList),
-	//def inventoryItemMap;	// inventoryService.getInventoryItemMap(warehouseInstance?.id),
-	def products;		// productList?.sort() { it.name },
-	def rootCategory;		// rootCategory
-	//def quantityMap;
-	//def shipmentList;		// pending shipments
+	def categoryToProductMap = {};				// all of the resulting ProductCommands above, organized by Category
 	
-	
-	static constraints = { 
-		products(nullable:true)
-		inventoryItems(nullable:true)
-		showHiddenProducts(nullable:true)
+	static constraints = {
 		warehouseInstance(nullable:true)
-		inventoryInstance(nullable:true)
+		searchTerms(nullable:true)
 		categoryInstance(nullable:true)
-		searchTermFilters(nullable:true)
-		categoryFilters(nullable:true)
-		//productMap(nullable:true)
-		//inventoryItemMap(nullable:true)
-		//productList(nullable:true)
-		//shipmentList(nullable:true)
-		rootCategory(nullable:true)		
-		//quantityMap(nullable:true)
+		subcategoryInstance(nullable:true)
+		showHiddenProducts(nullable:true)
+		showOutOfStockProducts(nullable:true)
+		categoryToProductMap(nullable:true)
 	}
-	
 }
-
-
-

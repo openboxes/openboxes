@@ -81,8 +81,18 @@ class Category implements Comparable, Serializable {
 		
 	}
 
+	int hashcode() {
+		if (this.id != null) {
+			return this.id.hashCode(); 
+		}
+		return super.hashCode();
+	}
 	
-
-
-	
+	boolean equals(Object o) {
+		if (o instanceof Category) {
+			Category that = (Category)o;
+			return this.id == that.id;
+		}
+		return false;
+	}
 }

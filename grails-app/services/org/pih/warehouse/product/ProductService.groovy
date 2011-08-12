@@ -1,21 +1,10 @@
 package org.pih.warehouse.product
 
 class ProductService {
+	
+	def grailsApplication
 
-	
-	/**
-	 * 
-	 * @return
-	 */
-	
 	Category getRootCategory() {
-		
-		//def rootCategory = Category.findByName("ROOT");
-		// OR 
-		//def rootCategory = new Category(name: "All Products");
-		//rootCategory.categories = Category.findAllByParentCategoryIsNull([sort: "name", order: "asc"]);
-
-		
 		def rootCategory;
 		def categories = Category.findAllByParentCategoryIsNull();
 		if (categories && categories.size() == 1) {
@@ -31,10 +20,26 @@ class ProductService {
 		return rootCategory;
 	}
 	
-	
 	List getCategoryTree() { 
 		return Category.list();		
 	}
 	
-	
+	List getQuickCategories() {
+		List quickCategories = new ArrayList();
+		String quickCategoryConfig = grailsApplication.config.inventoryBrowser.quickCategories;
+		if (quickCategoryConfig) {
+			quickCategoryConfig.split(",").each {
+				Category c = Category.findByName(it);
+				if (c != null) {
+					quickCategories.add();
+				}
+			};
+		}
+		Category.findAll().each {
+			if (it.parentCategory == null && !quickCategories.contains(it)) {
+				quickCategories.add(it);
+			}
+		}
+		return quickCategories;
+	}
 }

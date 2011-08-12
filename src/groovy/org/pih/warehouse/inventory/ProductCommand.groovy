@@ -3,9 +3,7 @@ package org.pih.warehouse.inventory
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.Category
 
-
-class InventoryItemCommand {
-	
+class ProductCommand {
 	
 	Category category
 	Product product 
@@ -21,6 +19,20 @@ class InventoryItemCommand {
 		quantityToReceive(nullable:true)
 	}
 	
+	int hashcode() {
+		if (product != null) {
+			return product.id.hashCode();
+		}
+		return super.hashCode();
+	}
+	
+	boolean equals(Object o) {
+		if (o instanceof ProductCommand) {
+			ProductCommand that = (ProductCommand)o;
+			return this.product.id == that.product.id;
+		}
+		return false;
+	}
 }
 
 

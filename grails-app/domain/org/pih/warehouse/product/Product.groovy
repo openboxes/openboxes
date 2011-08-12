@@ -106,5 +106,19 @@ class Product implements Comparable, Serializable {
 		return false
 	}
 	
+	int hashcode() {
+		if (this.id != null) {
+			return this.id.hashCode();
+		}
+		return super.hashCode();
+	}
+	
+	boolean equals(Object o) {
+		if (o instanceof Product) {
+			Product that = (Product)o;
+			return this.id == that.id;
+		}
+		return false;
+	}
 }
 
