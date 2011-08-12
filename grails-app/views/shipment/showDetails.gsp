@@ -56,11 +56,11 @@
 											</tr>
 											<tr style="height: 30px;">
 												<td valign="top">
-													<g:if test="${shipmentInstance?.expectedShippingDate && new Date().after(shipmentInstance?.expectedShippingDate) }">												
+													<g:if test="${shipmentInstance?.status.code in [org.pih.warehouse.shipping.ShipmentStatusCode.SHIPPED, org.pih.warehouse.shipping.ShipmentStatusCode.RECEIVED]}">												
 														<label><warehouse:message code="shipping.departed.label" /></label>
 													</g:if>
 													<g:else>
-														<label><warehouse:message code="shipping.departing.label "/></label>
+														<label><warehouse:message code="shipping.departing.label"/></label>
 													</g:else>
 												</td>
 												<td valign="top" >
@@ -76,7 +76,7 @@
 											</tr>
 											<tr style="height: 30px;">
 												<td valign="top">
-													<g:if test="${shipmentInstance?.expectedDeliveryDate && new Date().after(shipmentInstance?.expectedDeliveryDate) }">
+													<g:if test="${shipmentInstance?.status.code == org.pih.warehouse.shipping.ShipmentStatusCode.RECEIVED}">
 														<label><warehouse:message code="shipping.arrived.label" /></label>
 													</g:if>
 													<g:else>
