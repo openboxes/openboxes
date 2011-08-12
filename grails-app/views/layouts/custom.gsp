@@ -299,9 +299,9 @@
 									</g:if>
 									${session?.warehouse?.name} &nbsp;&rsaquo;&nbsp;
 								</g:if> 
-							    <g:set var="label1"><warehouse:message code="${params.controller }.label"/></g:set>
+							    <g:set var="label1"><warehouse:message code="breadcrumbs.${params.controller }.label"/></g:set>
 							    <g:set var="label2"><g:layoutTitle /></g:set>
-							    ${label1}
+							    ${label1?:params.controller}
 							    <g:if test="${label1 != label2}">
 									&nbsp;&rsaquo;&nbsp;								
 					    			${label2}
@@ -441,6 +441,9 @@
 				accordion.accordion( "activate" , 3 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('createRequestWorkflow')}">
+				accordion.accordion( "activate" , 2 );
+			</g:elseif>
+			<g:elseif test="${request.request.requestURL.toString().contains('fulfillRequestWorkflow')}">
 				accordion.accordion( "activate" , 2 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('request')}">

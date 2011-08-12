@@ -2,7 +2,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
-<title>Pack request items</title>
+<title><warehouse:message code="fulfillRequestWorkflow.packItems.label" default="Pack items"/></title>
 
 </head>
 <body>
@@ -31,13 +31,13 @@
 									<g:if test="${command?.fulfillment?.fulfillmentItems }">																
 										<table id="shipmentItemsTable">
 											<tr>
-												<th>product</th>
-												<th>lotNumber</th>
-												<th>expirationDate</th>
-												<th class="center">requested</th>
-												<th class="center">picked</th>
-												<th class="center">packed</th>
-												<th class="left">actions</th>
+												<th><warehouse:message code="product.label"/></th>
+												<th><warehouse:message code="inventoryItem.lotNumber.label"/></th>
+												<th><warehouse:message code="inventoryItem.lotNumber.label"/></th>
+												<th class="center"><warehouse:message code="requestItem.requested.label" default="Requested"/></th>
+												<th class="center"><warehouse:message code="fulfillmentItem.picked.label" default="Picked"/></th>
+												<th class="center"><warehouse:message code="fulfillmentItem.packed.label" default="Packed"/></th>
+												<th class="left"><warehouse:message code="default.actions.label" default="Actions"/></th>
 											</tr>
 											<g:each var="packItem" in="${command?.fulfillment?.fulfillmentItems }" status="i">
 												<tr class="${i%2?'even':'odd'}">
@@ -60,20 +60,9 @@
 														${packItem?.quantityPacked() }
 													</td>
 													<td>	
-														<%-- 
-														<g:if test="${packItem?.shipment }">
-															${packItem?.shipment }
-														</g:if>
-														<g:else>
-															<g:link action="fulfillRequest" event="showPackDialog" params="['requestItem.id':packItem?.requestItem?.id]">
-																<img src="${resource(dir: 'images/icons/silk', file: 'package.png') }"/>
-																<warehouse:message code="request.packItem.label"/>
-															</g:link>
-														</g:else>
-														--%>
 														<g:link action="fulfillRequest" event="showPackDialog" params="['fulfillmentItem.id':packItem?.id, 'requestItem.id':packItem?.requestItem?.id]">
 															<img src="${resource(dir: 'images/icons/silk', file: 'package.png') }"/>
-															<warehouse:message code="request.packItem.label"/>
+															<warehouse:message code="fulfillRequestWorkflow.packItem.label"/>
 														</g:link>
 													</td>
 												</tr>
@@ -86,9 +75,9 @@
 						<tr class="prop">
 							<td>
 								<div class="buttons" style="border-top: 0px solid lightgrey;">
-									<g:submitButton name="back" value="Back"></g:submitButton>
-									<g:submitButton name="next" value="Next"></g:submitButton>
-									<g:link action="fulfillRequest" event="cancel">Cancel</g:link>
+									<g:submitButton name="back" value="${warehouse.message(code: 'default.button.back.label')}"></g:submitButton>
+									<g:submitButton name="next" value="${warehouse.message(code: 'default.button.next.label')}"></g:submitButton>
+									<g:link action="fulfillRequest" event="cancel"><warehouse:message code="default.button.cancel.label"/></g:link>
 								</div>
 							</td>
 						</tr>
@@ -100,9 +89,6 @@
 		<g:if test="${showPackDialog}">
 			<g:render template="packItem" model="['requestItem':requestItem]"/>
 		</g:if>
-
-
 	</div>	  
-	
 </body>
 </html>

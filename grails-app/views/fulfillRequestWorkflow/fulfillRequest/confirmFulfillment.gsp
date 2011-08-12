@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
-<title>Confirm request receipt</title>
+<title><warehouse:message code="fulfillRequestWorkflow.markAsFulfilled.label" default="Mark as fulfilled"/></title>
 <style>
 </style>
 </head>
@@ -32,7 +32,8 @@
 									<label for='summary'>Summary</label>
 								</td>
 								<td valign='top'class='value'>
-									By selecting 'Finish' you will mark this request '${command?.request?.description }' as being fulfilled.
+									<warehouse:message code="fulfillRequestWorkflow.markAsFulfilled.message"/>
+									
 								</td>
 							</tr>
 							<tr class="prop">
@@ -48,13 +49,12 @@
 														<g:if test="${command?.fulfillment?.fulfillmentItems }">																
 															<table id="shipmentItemsTable">
 																<tr>
-																	<th>product</th>
-																	<th>lotNumber</th>
-																	<th>expirationDate</th>
-																	<th class="center">requested</th>
-																	<th class="center">picked</th>
-																	<th class="center">packed</th>
-																	<th class="left">actions</th>
+																	<th><warehouse:message code="product.label"/></th>
+																	<th><warehouse:message code="inventoryItem.lotNumber.label"/></th>
+																	<th><warehouse:message code="inventoryItem.expirationDate.label"/></th>
+																	<th class="center"><warehouse:message code="fulfillmentItem.requested.label"/></th>
+																	<th class="center"><warehouse:message code="fulfillmentItem.picked.label"/></th>
+																	<th class="center"><warehouse:message code="fulfillmentItem.packed.label"/></th>
 																</tr>
 																<g:set var="counter" value="${0 }"/>
 																<g:each var="packItem" in="${command?.fulfillment?.fulfillmentItems }" status="i">
@@ -69,30 +69,13 @@
 																			${formatDate(date: packItem.inventoryItem?.expirationDate, format: org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT) }
 																		</td>
 																		<td class="center">
-																			${packItem?.requestItem?.quantity }
+																			${packItem?.requestItem?.quantity?:0 }
 																		</td>
 																		<td class="center">
-																			${packItem?.quantity }
+																			${packItem?.quantity?:0 }
 																		</td>
 																		<td class="center">
-																			${packItem?.quantityPacked() }
-																		</td>
-																		<td>	
-																			<%-- 
-																			<g:if test="${packItem?.shipment }">
-																				${packItem?.shipment }
-																			</g:if>
-																			<g:else>
-																				<g:link action="fulfillRequest" event="showPackDialog" params="['requestItem.id':packItem?.requestItem?.id]">
-																					<img src="${resource(dir: 'images/icons/silk', file: 'package.png') }"/>
-																					<warehouse:message code="request.packItem.label"/>
-																				</g:link>
-																			</g:else>
-																			--%>
-																			<g:link action="fulfillRequest" event="showPackDialog" params="['fulfillmentItem.id':packItem?.id, 'requestItem.id':packItem?.requestItem?.id]">
-																				<img src="${resource(dir: 'images/icons/silk', file: 'package.png') }"/>
-																				<warehouse:message code="request.packItem.label"/>
-																			</g:link>
+																			${packItem?.quantityPacked()?:0 }
 																		</td>
 																	</tr>
 																</g:each>

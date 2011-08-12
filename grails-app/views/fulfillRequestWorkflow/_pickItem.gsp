@@ -48,31 +48,30 @@
 				<table>
 					<tr class="prop">
 						<td class="name">
-							<label>Requested</label>
+							<label><warehouse:message code="requestItem.requested.label"/></label>
 						</td>
 						<td class="value">			
 							<g:if test="${requestItem?.product }">
-								${requestItem?.product} 
-								<span class="fade">${requestItem?.product?.category}</span>					
+								<format:product product="${requestItem?.product}"/>
+								<span class="fade"><format:category category="${requestItem?.product?.category}"/></span>					
 							</g:if>	
 							<g:elseif test="${requestItem?.category }">
-								${requestItem?.category} 
+								<format:category category="${requestItem?.category}"/>
 							</g:elseif>
 							<g:else>
 								${requestItem?.description} 
 							</g:else>
-							(${requestItem?.quantity} units)
+							(${requestItem?.quantity} <warehouse:message code="default.units.label"/>)
 						</td>
 					</tr>					
 					<tr class="prop">
 						<td class="name">
-							<label>Fulfilled</label>
+							<label><warehouse:message code="fulfillmentItem.picked.label"/></label>
 						</td>
-						<td class="value">	
-						
+						<td class="value">							
 							<g:if test="${requestItem?.product }">
-								${requestItem?.product} 
-								<span class="fade">${requestItem?.product?.category}</span>					
+								<format:product product="${requestItem?.product}"/>
+								<span class="fade"><format:category category="${requestItem?.product?.category}"/></span>					
 							</g:if>	
 							<g:elseif test="${requestItem?.category }">
 								${requestItem?.category} 
@@ -80,16 +79,14 @@
 							<g:else>
 								${requestItem?.description} 
 							</g:else>
-							<span class="quantity">(${command?.quantityFulfilledByRequestItem(requestItem) } units)</span>
+							<span class="quantity">(${command?.quantityFulfilledByRequestItem(requestItem) } <warehouse:message code="default.units.label"/>)</span>
 						</td>
 					</tr>
 					<tr class="prop">
 						<td class="name">
-							<label>Available</label>
+							<label><warehouse:message code="fulfillmentItem.available.label"/></label>
 						</td>
 						<td class="value">			
-							
-							
 							<%-- 
 							<div id="searchbox">
 								Search: 
@@ -104,22 +101,22 @@
 							<div style="height: 200px; overflow: auto" id="fulfillProduct">
 							
 								<g:if test="${product }">
-									${product?.name } 
-									<span class="fade">${product?.category}</span>						
+									<format:product product="${product}"/>
+									<span class="fade"><format:category category="${product?.category}"/></span>						
 								</g:if>
 								<g:else>
-									${requestItem?.product?.name} 
-									<span class="fade">${requestItem?.product?.category}</span>
+									<format:product product="${requestItem?.product}"/>
+									<span class="fade"><format:category category="${requestItem?.product?.category}"/></span>
 								</g:else>
 								
-								<a href="javascript:void(0);" id="changeProductBtn">change</a>
+								<a href="javascript:void(0);" id="changeProductBtn"><warehouse:message code="fulfillRequestWorkflow.changeProduct.label"/></a>
 							
 								<table border="0">
 									<tr class="odd">
-										<td>Lot Number</td>
-										<td>Expires</td>
-										<td>On Hand Qty</td>
-										<td>Fulfill Qty</td>
+										<td><warehouse:message code="inventoryItem.lotNumber.label"/></td>
+										<td><warehouse:message code="inventoryItem.expires.label"/></td>
+										<td><warehouse:message code="inventoryItem.onHandQuantity.label"/></td>
+										<td><warehouse:message code="inventoryItem.fulfillQuantity.label"/></td>
 									</tr>
 									<g:if test="${inventoryItems }">
 										<g:each var="entry" in="${inventoryItems}" status="i">
@@ -130,10 +127,10 @@
 												<td>
 													<g:hiddenField name="fulfillmentItems[${i }].requestItem.id" value="${requestItem?.id }"/>
 													<g:hiddenField name="fulfillmentItems[${i }].inventoryItem.id" value="${inventoryItem?.id }"/>
-													${inventoryItem?.lotNumber?:"none" }
+													${inventoryItem?.lotNumber }
 												</td>
 												<td>
-													${inventoryItem?.expirationDate?:"never" }
+													${inventoryItem?.expirationDate }
 												</td>
 												<td>
 													${quantity }
@@ -147,7 +144,7 @@
 									<g:else>
 										<tr class="even">
 											<td colspan="4" class="center">
-												<b>${product?.name }</b> does not currently exist in the <b>${session?.warehouse?.name }</b> inventory.
+												<warehouse:message code="inventoryItem.notAvailable.message" args="[product?.name, session?.warehouse?.name]"/>
 											</td>
 										</tr>
 									</g:else>
@@ -155,7 +152,7 @@
 							</div>						
 							<div class="buttons left" id="changeProduct" style="display: none;">
 								<g:autoSuggest id="fulfillProduct" name="fulfillProduct" jsonUrl="/warehouse/json/findProductByName" width="200" />
-								<g:submitButton name="changeProduct" value="${warehouse.message(code:'default.search.label')}"></g:submitButton>					
+								<g:submitButton name="changeProduct" value="${warehouse.message(code:'default.button.search.label')}"></g:submitButton>					
 							</div>
 							
 						</td>

@@ -146,10 +146,6 @@
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/yui-2.7.0.1/grails-app/i18n"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/yui-2.7.0.1/grails-app/taglib"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/yui-2.7.0.1/src/groovy"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/release-1.0.0.M1/src/groovy"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/release-1.0.0.M1/src/java"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/svn-1.0.0.M1/grails-app/conf"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/svn-1.0.0.M1/src/groovy"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/bubbling-2.1.2/grails-app/taglib"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/bubbling-2.1.2/src/groovy"/>
     </wb-module>

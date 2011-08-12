@@ -2,7 +2,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
-<title>Add request items</title>
+<title><warehouse:message code="fulfillRequestWorkflow.pickItems.label" default="Pick items"/></title>
 
 </head>
 <body>
@@ -33,28 +33,28 @@
 												<tr class="odd prop">
 													<td class="center" colspan="4">
 														<img src="${createLinkTo(dir:'images/icons/silk',file:'cart.png')}" alt="requested" style="vertical-align: middle"/>
-														Requested
+														<warehouse:message code="fulfillRequestWorkflow.requisition.label" default="Requisition"/>
 													</td>
 													<td class="center" colspan="4" style="border-left: 1px solid lightgrey;">
 														<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="received" style="vertical-align: middle"/>
-														Fulfilled
+														<warehouse:message code="fulfillRequestWorkflow.fulfillment.label" default="Fulfillment"/>
+														
 													</td>
 												</tr>
 												<tr class="even">
-													<td>Description</td>
-													<td class="center">Requested</td>										
-													<td class="center">Fulfilled</td>										
-													<td>Actions</td>
+													<td><warehouse:message code="requestItem.description.label" default="Item"/></td>
+													<td class="center"><warehouse:message code="requestItem.quantity.label" default="Requested"/></td>										
+													<td class="center"><warehouse:message code="fulfillmentItem.quantity.label" default="Fulfilled"/></td>										
+													<td><warehouse:message code="default.action.label" default="Actions"/></td>
 													<%--<td class="center">Remaining</td> --%>	
-													<td class="center" style="width: 100px; border-left: 1px solid lightgrey;">Fulfilled</td>										
-													<td style="width: 250px">Product</td>										
-													<td style="width: 100px">Lot Number</td>
-													<td style="width: 100px">Expires</td>
+													<td class="center" style="width: 100px; border-left: 1px solid lightgrey;"><warehouse:message code="fulfillmentItem.quantity.label" default="Fulfilled"/></td>										
+													<td style="width: 250px"><warehouse:message code="product.label" default="Product"/></td>										
+													<td style="width: 100px"><warehouse:message code="inventoryItem.lotNumber.label" /></td>
+													<td style="width: 100px"><warehouse:message code="inventoryItem.expirationDate.label" /></td>
 												</tr>
 											</thead>									
 											<tbody>
 												<g:each var="requestItem" in="${command?.request?.requestItems }" status="i">
-													
 													<tr class="prop ${i%2?'even':'odd' }">
 														<td>
 															<g:if test="${requestItem.product }">
@@ -75,7 +75,7 @@
 														<td>
 															<g:link action="fulfillRequest" event="showPickDialog" params="['requestItem.id':requestItem?.id]">
 																<img src="${resource(dir: 'images/icons/silk', file: 'add.png') }"/>
-																<warehouse:message code="request.pickItem.label"/>
+																<warehouse:message code="fulfillRequestWorkflow.pickItem.label"/>
 															</g:link>
 														</td>
 														<td colspan="4" class="center" style="padding: 0px; border-left: 1px solid lightgrey;">
@@ -88,14 +88,13 @@
 																				${pickItem?.quantity }
 																			</td>
 																			<td style="width: 250px;" >
-																				${pickItem?.inventoryItem?.product?.name }
+																				<format:product product="${pickItem?.inventoryItem?.product}"/> 
 																			</td>
 																			<td style="width: 100px;">
 																				${pickItem?.inventoryItem?.lotNumber }
 																			</td>
 																			<td style="width: 100px;">
 																				${formatDate(date: pickItem?.inventoryItem?.expirationDate, format: org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT) }
-
 																			</td>
 																		</tr>
 																	</g:each>
@@ -113,9 +112,9 @@
 						<tr class="prop">
 							<td>
 								<div class="buttons" style="border-top: 0px solid lightgrey;">
-									<g:submitButton name="back" value="Back"></g:submitButton>
-									<g:submitButton name="next" value="Next"></g:submitButton>
-									<g:link action="fulfillRequest" event="cancel">Cancel</g:link>
+									<g:submitButton name="back" value="${warehouse.message(code: 'default.button.back.label')}"></g:submitButton>
+									<g:submitButton name="next" value="${warehouse.message(code: 'default.button.next.label')}"></g:submitButton>
+									<g:link action="fulfillRequest" event="cancel"><warehouse:message code="default.button.cancel.label"/></g:link>
 								</div>
 							</td>
 						</tr>

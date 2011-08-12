@@ -3,7 +3,7 @@
 		$("#pack-item-dialog").dialog({ autoOpen: true, modal: true, width: 800, height: 500 });				
 	});
 </script>	   
-<div id="pack-item-dialog" title="Pack item" style="padding: 10px; display: none;" >
+<div id="pack-item-dialog" title="${warehouse.message(code: 'fulfillRequestWorkflow.packItems.label') }" style="padding: 10px; display: none;" >
 	<%-- 
 	<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.Container" form="fulfillItem"/>
 	--%>
@@ -26,7 +26,7 @@
 				<table>
 					<tr class="prop">
 						<td class="name">
-							<label>Requested</label>
+							<label>${warehouse.message(code: 'fulfillmentItem.requested.label') }</label>
 						</td>
 						<td class="value">			
 							<g:if test="${requestItem?.product }">
@@ -39,12 +39,12 @@
 							<g:else>
 								${requestItem?.description} 
 							</g:else>
-							(${requestItem?.quantity} units)
+							(${requestItem?.quantity} ${warehouse.message(code: 'default.units.label') })
 						</td>
 					</tr>					
 					<tr class="prop">
 						<td class="name">
-							<label>Fulfilled</label>
+							<label>${warehouse.message(code: 'fulfillmentItem.picked.label') }</label>
 						</td>
 						<td class="value">	
 							<g:if test="${requestItem?.product }">
@@ -57,34 +57,34 @@
 							<g:else>
 								${requestItem?.description} 
 							</g:else>
-							(${command?.quantityFulfilledMap()[requestItem] } units)
+							(${command?.quantityFulfilledMap()[requestItem] } ${warehouse.message(code: 'default.units.label') })
 						</td>
 					</tr>
 					<tr class="prop">
 						<td class="name">
-							<label>Fulfillment Item</label>
+							<label>${warehouse.message(code: 'shipmentItem.label') }</label>
 						</td>
 						<td class="value">	
 							${fulfillmentItem?.inventoryItem?.product }
 							${fulfillmentItem?.inventoryItem?.lotNumber }
-							(${fulfillmentItem?.quantity } units)
+							(${fulfillmentItem?.quantity } ${warehouse.message(code: 'default.units.label') })
 							
 						</td>
 					</tr>
 					<tr class="prop">
 						<td class="name">
-							<label>Shipping</label>
+							<label>${warehouse.message(code: 'shipping.label') }</label>
 						</td>
-						<td class="value" style="padding: 0px;">	
-							<g:if test="${fulfillmentItem?.shipmentItems }">
+						<g:if test="${fulfillmentItem?.shipmentItems }">
+							<td class="value" style="padding: 0px;">	
 								<table>
 									<tr>
-										<th>shipment</th>
-										<th>container</th>
-										<th>product</th>
-										<th>lotnumber</th>
-										<th>expirationdate</th>
-										<th>quantity</th>
+										<th>${warehouse.message(code: 'shipment.label') }</th>
+										<th>${warehouse.message(code: 'container.label') }</th>
+										<th>${warehouse.message(code: 'product.label') }</th>
+										<th>${warehouse.message(code: 'inventoryItem.lotNumber.label') }</th>
+										<th>${warehouse.message(code: 'inventoryItem.expirationDate.label') }</th>
+										<th>${warehouse.message(code: 'inventoryItem.quantity.label') }</th>
 									</tr>
 									<g:each in="${fulfillmentItem?.shipmentItems }" var="shipmentItem">
 										<tr>
@@ -97,12 +97,14 @@
 										</tr>
 									</g:each>
 								</table>
-							</g:if>
-							<g:else>
-								<g:select optionKey="id" optionValue="${{it.name + ' to ' + it.origin.name + ' on ' + g.formatDate(date: it.expectedShippingDate, format: 'MMM dd')}}" 
-									name="shipment.id" id="shipment" from="${shipments}" noSelection="['':'-- Select a shipment --']"/>
-							</g:else>							
-						</td>
+							</td>
+						</g:if>
+						<g:else>
+							<td class="value">
+							<g:select optionKey="id" optionValue="${{it.name + ' to ' + it.origin.name + ' on ' + g.formatDate(date: it.expectedShippingDate, format: 'MMM dd')}}" 
+									name="shipment.id" id="shipment" from="${shipments}" noSelection="['':warehouse.message(code:'shipment.selectOne.label')]"/>
+							</td>
+						</g:else>							
 					</tr>
 					<%-- 
 					<tr class="prop">
@@ -183,8 +185,8 @@
 				</table>
 			</div>	
 			<div class="buttons">
-				<g:submitButton name="saveAndContinuePackDialog" value="${warehouse.message(code:'default.save.label')}"></g:submitButton>
-				<g:submitButton name="saveAndClosePackDialog" value="${warehouse.message(code:'default.close.label')}"></g:submitButton>
+				<g:submitButton name="saveAndContinuePackDialog" value="${warehouse.message(code:'default.button.save.label')}"></g:submitButton>
+				<g:submitButton name="saveAndClosePackDialog" value="${warehouse.message(code:'default.button.close.label')}"></g:submitButton>
 			</div>
 		</div>
 	</g:form>

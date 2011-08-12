@@ -175,7 +175,10 @@ class FulfillRequestWorkflowController {
 					if (it.quantity > 0) { 
 						log.info "add item to fulfillment"
 						fulfillmentService.addToFulfillmentItems(fulfillment, it)
-						message += "<li>Added " + it?.quantity + " units of " + it?.inventoryItem?.lotNumber + " toward the fulfillment of requested item " + it?.requestItem?.description + "</li>"
+						def args = [it?.quantity, it?.inventoryItem?.lotNumber, it?.requestItem?.description]
+						message += 
+							"${warehouse.message(code: 'request.fulfillItem.message', args: args)}"
+						
 					}
 				}
 				
@@ -268,7 +271,7 @@ class FulfillRequestWorkflowController {
 					shipment.addToShipmentItems(shipmentItem);
 					shipment.save(flush:true);
 					
-					flash.message = "Item has been packed into shipment " + shipment?.name
+					flash.message = "${warehouse.message(code: 'fulfillRequestWorkflow.saveAndContinuePack.message', args: [shipment?.name])}"
 					
 				}				
 				else { 
@@ -284,7 +287,6 @@ class FulfillRequestWorkflowController {
 		saveAndClosePackDialog {
 			action { FulfillmentCommand command ->
 				log.info "fulfill item and close: " + params
-				flash.message = "Fulfilled item "
 				
 				[showPackDialog: Boolean.FALSE]
 			}
@@ -304,7 +306,7 @@ class FulfillRequestWorkflowController {
 				def requestInstance = flow.command.request;
 				requestInstance.status = RequestStatus.FULFILLED;
 				requestInstance.save();
-				flash.message = "Request has been fulfilled successfully"
+				flash.message = "${warehouse.message(code: 'fulfillRequestWorkflow.confirmFulfillment.message')}"
 				
 			}.to("finish")
 			on("cancel").to("finish")

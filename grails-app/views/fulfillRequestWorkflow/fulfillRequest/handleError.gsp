@@ -32,11 +32,11 @@
 					
 									<h2>
 										<img src="${resource(dir: 'images/icons/silk', file: 'error.png')}" /> 
-										An error occurred while trying to process your request 
+										<warehouse:message code="fulfillRequestWorkflow.handleError.message"/>
 									</h2>
 									<div>
 										<g:if test="${rootCauseException?.message }">
-											${rootCauseException?.message }										
+											<b>${rootCauseException?.class.name }</b> ${rootCauseException?.message }										
 										</g:if>
 										<g:link controller="request" action="list">
 											${warehouse.message(code: 'request.returnToList.label', default: 'Return to request list')} 

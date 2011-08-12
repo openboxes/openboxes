@@ -32,7 +32,7 @@
 					<g:if test="${flash.message}">
 				    	<div class="message">${flash.message}</div>
 					</g:if>		
-					<h1><warehouse:message code="dashboard.chooseAWarehouse.label"/></h1>
+					<h1><warehouse:message code="dashboard.chooseWarehouse.label"/></h1>
 		    		<fieldset>
 						<table>
 							<tbody>						

@@ -4,7 +4,7 @@ class BreadcrumbTagLib {
 	
 	def breadcrumb = { attrs, body -> 
 	
-		def breadcrumb = "<a class=\"home\" href=\"${createLink(uri: '/home/index')}\">Home</a>";
+		def breadcrumb = "<a class=\"home\" href=\"${createLink(uri: '/home/index')}\">Home</a>" ;
 		
 		if (session.user) { 
 			breadcrumb += "&nbsp; &raquo; &nbsp;";

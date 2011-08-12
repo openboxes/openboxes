@@ -63,7 +63,7 @@
 						<div id="inventoryForm">		
 							<g:form action="saveRecordInventory" autocomplete="off">
 								
-									<h2> <warehouse:message code="inventory.recordCurrentInventory.label"/></h2>
+									<h2 class="fade"> <warehouse:message code="inventory.recordCurrentInventory.label"/></h2>
 									
 									<g:hiddenField name="product.id" value="${commandInstance.product?.id}"/>
 									<g:hiddenField name="inventory.id" value="${commandInstance?.inventory?.id}"/>
@@ -76,8 +76,8 @@
 									<div class="form-content">
 										<table id="inventoryItemsTable">
 											<thead>
-												<tr>
-													<td class="middle">
+												<tr class="odd">
+													<td class="middle" colspan="3">
 														<label><warehouse:message code="inventory.dateOfInventory.label"/></label>													
 														<g:jqueryDatePicker 
 															id="transactionDate" 
@@ -87,7 +87,7 @@
 															showTrigger="false" />						
 													
 													</td>
-													<td colspan="4" class="right middle">
+													<td colspan="2" class="right middle">
 														<button id="addAnother" type="button" class="positive">
 															<img src="${createLinkTo(dir:'images/icons/silk', file:'add.png') }"/>&nbsp;<warehouse:message code="inventory.addItem.label"/>
 														</button>
@@ -95,11 +95,11 @@
 													
 													</td>
 												</tr>
-												<tr class="prop odd">	
-													<th><warehouse:message code="default.lotSerialNo.label"/></th>
-													<th><warehouse:message code="default.expires.label"/></th>
-													<th style="text-align:center;"><warehouse:message code="inventory.oldQty.label"/></th>
-													<th style="text-align:center;"><warehouse:message code="inventory.newQty.label"/></th>
+												<tr class="prop even">	
+													<th style="width: 150px"><warehouse:message code="default.lotSerialNo.label"/></th>
+													<th style="width: 100px"><warehouse:message code="default.expires.label"/></th>
+													<th style="text-align:center; width: 100px;"><warehouse:message code="inventory.oldQty.label"/></th>
+													<th style="text-align:center; width: 100px;"><warehouse:message code="inventory.newQty.label"/></th>
 													<th><warehouse:message code="default.actions.label"/></th>
 												</tr>											
 											</thead>									
@@ -113,7 +113,7 @@
 													<g:each var="recordInventoryRow" in="${inventoryItems.sort { it.lotNumber }}" status="status">
 														<g:set var="styleClass" value="${params?.inventoryItem?.id && recordInventoryRow?.id == Integer.valueOf(params?.inventoryItem?.id) ? 'selected-row' : ''}"/>
 														
-														<tr class="${styleClass} ${status%2==0?'even':'odd'}">
+														<tr class="${styleClass} ${status%2==0?'even':'odd'} prop">
 															<td width="15%">
 																<%-- 
 																<g:textField name="recordInventoryRows[${status}].lotNumber" size="10" value="${recordInventoryRow?.lotNumber }"/>
@@ -156,9 +156,9 @@
 													</g:each>
 												</g:if>
 												<g:else>
-													<tr class="odd">
+													<tr id="emptyRow" class="odd prop">
 														<td colspan="5" style="text-align: center; min-height: 400px;">
-														<warehouse:message code="inventory.addNewInventoryItem.message"/>
+															<warehouse:message code="inventory.addNewInventoryItem.message"/>
 														</td>
 													</tr>
 													
@@ -166,7 +166,7 @@
 												
 											</tbody>
 											<tfoot>
-												<tr class="prop">
+												<tr class="prop" style="border-bottom: 1px solid lightgrey;">
 													<td colspan="5" style="text-align: center">
 														<button name="save" type="submit" class="positive">
 															<img src="${createLinkTo(dir:'images/icons/silk', file:'tick.png') }"/>&nbsp;<warehouse:message code="default.button.save.label"/>
@@ -204,7 +204,7 @@
 	}
 	
 	function getClass() {
-		return ($.inArray( this.data, inventory.InventoryItems ) % 2) ? "odd" : "even";
+		return ($.inArray( this.data, inventory.InventoryItems ) % 2) ? "even" : "odd";
 	}
 
 
@@ -314,6 +314,8 @@
 			// Add to the array of new inventory items
 			inventory.InventoryItems.push(inventoryItem);
 
+			$("#emptyRow").hide();
+
 			// Add a new row to the table
 			$("#newRowTemplate").tmpl(inventoryItem).appendTo('#inventoryItemsTable');		
 
@@ -413,16 +415,8 @@
 </script>
 
 <script id="newRowTemplate" type="x-jquery-tmpl">
-<tr id="row-{{= getIndex()}}" class="{{= getClass()}}">	
+<tr id="row-{{= getIndex()}}" class="{{= getClass()}} prop">	
 	<td width="15%">
-		<style>
-			.lotNumber { 
-				background-image: url('/warehouse/images/icons/silk/magnifier.png');
-				background-repeat: no-repeat;
-				background-position: center left;
-				padding-left: 20px;
-			}
-		</style>
 		<g:textField id="lotNumber-{{= getIndex()}}" name="recordInventoryRows[{{= getIndex()}}].lotNumber" value="{{= LotNumber}}" size="15"  /><br/>
 		<%--
 		<g:textField id="lotNumber-{{= getIndex()}}" class="lotNumber" name="lotNumber-{{= getIndex()}}" value="{{= LotNumber}}" size="15"  /><br/>

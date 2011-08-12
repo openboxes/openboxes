@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
-<title>Confirm request receipt</title>
+<title><warehouse:message code="fulfillRequestWorkflow.previewRequest.label" default="Preview request"/></title>
 <style>
 </style>
 </head>
@@ -22,12 +22,9 @@
 		
 		<g:form action="fulfillRequest" method="post">
 			<div class="dialog">
-			
-				
 				<fieldset>
 					<g:render template="../request/summary" model="[requestInstance:command?.request]"/>
 					<g:render template="progressBar" model="['state':'previewRequest']"/>		
-
 					<table>
 						<tbody>							
 							<tr class="prop">
@@ -40,9 +37,9 @@
 											<thead>
 												<tr class="odd">
 													<th></td>
-													<th>Type</th>
-													<th>Item Requested</th>
-													<th class="center">Qty</th>										
+													<th><warehouse:message code="requestItem.type.label" default="Type"/></th>
+													<th><warehouse:message code="requestItem.item.label" default="Item Requested"/></th>
+													<th class="center"><warehouse:message code="requestItem.quantity.label" default="Qty"/></th>										
 												</tr>
 											</thead>									
 											<tbody>
@@ -68,7 +65,7 @@
 										</table>
 									</g:if>
 									<g:else>
-										<span class="fade">No items</span>
+										<span class="fade"><warehouse:message code="requestItem.item.label" default="No items requested"/></span>
 									</g:else>	
 	                            </td>
 	                        </tr>
@@ -76,8 +73,8 @@
 	                        	<td colspan="2">
 									<div class="buttons">
 										<span class="formButton"> 
-											<g:submitButton name="next" value="Next"></g:submitButton>
-											<g:link action="fulfillRequest" event="cancel">Cancel</g:link>
+											<g:submitButton name="next" value="${warehouse.message(code: 'default.button.next.label')}"></g:submitButton>
+											<g:link action="fulfillRequest" event="cancel"><warehouse:message code="default.button.cancel.label"/></g:link>
 										</span>
 									</div>	                        	
 	                        	</td>
@@ -86,10 +83,7 @@
 					</table>
 				</fieldset>
 			</div>				
-				
-				
 		</g:form>
 	</div>
-	
 </body>
 </html>
