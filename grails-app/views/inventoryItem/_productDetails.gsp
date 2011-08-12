@@ -168,7 +168,7 @@
 							<span style="color: red"><warehouse:message code="product.noStock.label"/></span>
 						</g:if>
 						<g:elseif test="${totalQuantity <= inventoryLevelInstance?.minQuantity}">
-							<span style="color: yellow"><warehouse:message code="product.lowStock.label"/></span>
+							<span style="color: orange"><warehouse:message code="product.lowStock.label"/></span>
 						</g:elseif>
 						<g:elseif test="${totalQuantity <= inventoryLevelInstance?.reorderQuantity }">
 							<span style="color: orange;"><warehouse:message code="product.reorder.label"/></span>

@@ -131,17 +131,16 @@ class OrderService {
 				throw new ShipmentException(message: "Unable to save receipt ", shipment: shipmentInstance)
 			}
 			
-			// Once the order has been completely received, we set the status to RECEIVED
-			if (orderCommand?.order && orderCommand?.order?.isCompletelyReceived()) { 
-				orderCommand?.order.status = OrderStatus.RECEIVED;
-				saveOrder(orderCommand?.order);
-			}
+			saveOrder(orderCommand?.order);
 		}
 		return orderCommand;
 	}
 	
 	
 	Order saveOrder(Order order) { 		
+		// update the status of the order before saving
+		order.updateStatus()
+		
 		if (!order.hasErrors() && order.save()) {
 			return order;
 		}

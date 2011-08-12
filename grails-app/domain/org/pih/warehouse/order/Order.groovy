@@ -57,6 +57,27 @@ class Order implements Serializable {
 	
 	
 	/**
+	* Checks to see if this order has been received, or partially received, and 
+	* the update the status accordingly
+	* (Note that does not know how to set to the PLACED state; this must be
+	*  done manually)
+	*/
+	OrderStatus updateStatus() {
+	   
+	   if (orderItems?.size() > 0 && orderItems?.size() == orderItems?.findAll { it.isCompletelyFulfilled() }?.size()) {
+		   status = OrderStatus.RECEIVED
+	   }
+	   else if (orderItems?.size() > 0 && orderItems?.find { it.isPartiallyFulfilled() }) {
+		   status = OrderStatus.PARTIALLY_RECEIVED
+	   }
+	   else if (!status) {
+		   status = OrderStatus.PENDING
+	   }
+	   
+	   return status
+	}	
+   
+	/**
 	 * @return	a boolean indicating whether the order is pending
 	 */
 	Boolean isPending() { 
@@ -67,7 +88,18 @@ class Order implements Serializable {
 	 * @return	a boolean indicating whether the order has been placed
 	 */
 	Boolean isPlaced() { 
-		return (status == OrderStatus.PLACED)
+		return (status in [OrderStatus.PLACED, OrderStatus.PARTIALLY_RECEIVED, OrderStatus.RECEIVED])
+	}
+	
+	/**
+	* After an order is placed and before it is completed received, the order can
+	* be partially received.  This occurs when the order contains items that have
+	* been completely received and some that have not been completely received.
+	*
+	* @return
+	*/
+	Boolean isPartiallyReceived() {
+			return (status == OrderStatus.PARTIALLY_RECEIVED)
 	}
 	
 	/**
@@ -77,26 +109,6 @@ class Order implements Serializable {
 		return (status == OrderStatus.RECEIVED)
 	}
 	
-	
-	/**
-	 * After an order is placed and before it is completed received, the order can 
-	 * be partially received.  This occurs when the order contains items that have 
-	 * been completely received and some that have not been completely received.
-	 * 
-	 * @return
-	 */
-	Boolean isPartiallyReceived() { 
-		return (status == OrderStatus.PARTIALLY_RECEIVED)
-	}
-
-	/**
-	 * After an order has been placed, it will be in a state where it can be received.
-	 * 
-	 * @return	a boolean value indicating whether all items have been received entirely
-	 */
-	Boolean isCompletelyReceived() {
-		return orderItems?.size() == orderItems?.findAll { it.isCompletelyFulfilled() }?.size()
-	}
 	
 	String getOrderNumber() {
 		return (id) ? "V" + String.valueOf(id).padLeft(6, "0")  : "(New Request)";
