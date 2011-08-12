@@ -67,12 +67,15 @@
 								</td>
 								<td class="center">
 									${item?.quantityOnHand?:warehouse.message(code:'default.na.label')}
+									<g:hiddenField name="items[${i }].quantityOnHand" value="${item?.quantityOnHand }"/>
 								</td>
 								<td class="center">
 									${item?.quantityShipping?:warehouse.message(code:'default.na.label')}
+									<g:hiddenField name="items[${i }].quantityShipping" value="${item?.quantityShipping }"/>
 								</td>
 								<td class="center">
 									${item?.quantityReceiving?:warehouse.message(code:'default.na.label')}
+									<g:hiddenField name="items[${i }].quantityReceiving" value="${item?.quantityReceiving }"/>
 								</td>
 								<td style="border-left: 1px solid lightgrey;">
 								

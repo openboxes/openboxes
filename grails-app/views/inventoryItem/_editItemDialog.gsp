@@ -9,7 +9,7 @@
 		<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;<warehouse:message code="inventory.editItem.label"/>
 	</a>
 </div>
-<div id="dlgEditItem-${itemInstance?.id}" title="Edit Item" style="padding: 10px; display: none;" >	
+<div id="dlgEditItem-${itemInstance?.id}" title="${warehouse.message(code: 'inventory.editItem.label')}" style="padding: 10px; display: none;" >	
 	
 	<div class="dialog" style="padding: 10px;" >	
 		

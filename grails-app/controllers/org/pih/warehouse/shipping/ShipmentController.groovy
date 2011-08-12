@@ -1104,11 +1104,11 @@ class ShipmentController {
 			}
 		} catch (ShipmentItemException e) { 
 			flash['errors'] = e.shipmentItem.errors
-			redirect(action: "addToShipment", params:params)
+			render(view: "addToShipment", model: [commandInstance: command, shipments: shipmentService.getPendingShipments(Warehouse.get(session.warehouse.id))])
 			return;
 		} catch (ValidationException e) { 			
 			flash['errors'] = e.errors 
-			redirect(action: "addToShipment", params:params)
+			render(view: "addToShipment", model: [commandInstance: command, shipments: shipmentService.getPendingShipments(Warehouse.get(session.warehouse.id))])
 			return;
 		}
 		

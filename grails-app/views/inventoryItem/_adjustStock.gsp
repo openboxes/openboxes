@@ -12,7 +12,7 @@
 <g:link controller="inventoryItem" action="recordInventory" params="['product.id':commandInstance?.productInstance?.id,'inventory.id':commandInstance?.inventoryInstance?.id, 'inventoryItem.id':itemInstance?.id]">
 </g:link>
 
-<div id="dlgAdjustStock-${itemInstance?.id}" title="Adjust Stock" style="padding: 10px; display: none;" >	
+<div id="dlgAdjustStock-${itemInstance?.id}" title="${warehouse.message(code: 'inventory.adjustStock.label')}" style="padding: 10px; display: none;" >	
 	<table>
 		<tr>
 			<td>
