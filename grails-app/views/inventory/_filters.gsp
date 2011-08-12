@@ -18,7 +18,9 @@
 		<div style="padding-top:5px; margin:5px;"/>
 			<g:if test="${!commandInstance?.categoryInstance.categories.isEmpty()}">
 				<span>
-					<warehouse:message code="inventory.filterByCategory.label"/>:
+					<warehouse:message code="inventory.filterBy.label"/>:
+					&nbsp;&nbsp;
+					<warehouse:message code="inventory.filterBy.category"/>
 					<select id="subcategoryId" name="subcategoryId" >
 						<option value=""></option>
 						<g:render template="../category/selectOptions" model="[category:commandInstance?.categoryInstance, selected:commandInstance?.subcategoryInstance, level: 0]"/>								
@@ -26,7 +28,7 @@
 				</span>
 			</g:if>
 			<span>
-				<warehouse:message code="inventory.filterByKeyword.label"/>:
+				<warehouse:message code="inventory.filterBy.keyword"/>:
 				<g:textField name="searchTerms" value="${commandInstance.searchTerms}" size="24"/>						
 			</span>
 			<span style="padding-left:10px;">
