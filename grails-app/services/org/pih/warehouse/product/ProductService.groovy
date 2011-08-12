@@ -31,7 +31,7 @@ class ProductService {
 			quickCategoryConfig.split(",").each {
 				Category c = Category.findByName(it);
 				if (c != null) {
-					quickCategories.add();
+					quickCategories.add(c);
 				}
 			};
 		}
