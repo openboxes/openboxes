@@ -51,7 +51,7 @@
 								
 			<fieldset>		
 				<div style="padding: 10px;">
-					<h1><warehouse:message code="transactions.dailyTransactionsFor.label"/> ${session.warehouse.name} <span class="fade small">${formatDate(date: dateSelected, format: 'EEEEE, MMMMM dd yyyy') }</span></h1>
+					<h1><warehouse:message code="transaction.dailyTransactionsFor.label"/> ${session.warehouse.name} <span class="fade small">${formatDate(date: dateSelected, format: 'EEEEE, MMMMM dd yyyy') }</span></h1>
 				</div>
 				
 				<table>				

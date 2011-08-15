@@ -106,21 +106,21 @@ class DocumentController {
 			   log.info "Saving document " + documentInstance;
 			   if (shipmentInstance) { 
 				   shipmentInstance.addToDocuments(documentInstance).save(flush:true)
-				   flash.message = "${warehouse.message(code: 'document.successfullySavedToShipment.message', args=[shipmentInstance?.shipmentNumber])}"			   
+				   flash.message = "${warehouse.message(code: 'document.successfullySavedToShipment.message', args: [shipmentInstance?.shipmentNumber])}"			   
 			   }
 			   else if (orderInstance) { 
 				   orderInstance.addToDocuments(documentInstance).save(flush:true)
-				   flash.message = "${warehouse.message(code: 'document.successfullySavedToOrder.message', args=[orderInstance?.orderNumber])}"
+				   flash.message = "${warehouse.message(code: 'document.successfullySavedToOrder.message', args: [orderInstance?.orderNumber])}"
 			   }
 			   else if (requestInstance) { 
 				   requestInstance.addToDocuments(documentInstance).save(flush:true)
-				   flash.message = "${warehouse.message(code: 'document.successfullySavedToRequest.message', args=[requestInstance?.requestNumber])}"
+				   flash.message = "${warehouse.message(code: 'document.successfullySavedToRequest.message', args: [requestInstance?.requestNumber])}"
 			   }
 		   }
 		   // If there are errors, we need to redisplay the document form
 		   else {
 			   log.info "Document did not save " + documentInstance.errors;
-			   flash.message = "${warehouse.message(code: 'document.cannotSave.messagee', args=[documentInstance.errors])}"
+			   flash.message = "${warehouse.message(code: 'document.cannotSave.messagee', args: [documentInstance.errors])}"
 			   if (shipmentInstance) { 
 				   redirect(controller: "shipment", action: "addDocument", id: shipmentInstance.id,
 					   model: [shipmentInstance: shipmentInstance, documentInstance : documentInstance])

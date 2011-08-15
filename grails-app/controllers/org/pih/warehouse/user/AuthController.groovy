@@ -191,7 +191,7 @@ class AuthController {
 					if (recipients) {
 						recipients.each {
 							def subject = "${warehouse.message(code: 'auth.email.newUserAccountCreated.message')}"
-							def message = "${warehouse.message(code: 'auth.email.pleaseSignInToActivate.message', args=[userInstance.username])}"
+							def message = "${warehouse.message(code: 'auth.email.pleaseSignInToActivate.message', args: [userInstance.username])}"
 							mailService.sendMail(subject, message, it.email);
 						}
 					}

@@ -65,7 +65,7 @@
 														<img src="${createLinkTo(dir:'images',file:'icons/building.png')}" style="vertical-align: middle"/>
 													</g:else>
 													&nbsp;
-													<warehouse:message code="dashboard.managedRemotely.message" args="[warehouse.name]"/>/span>
+													<warehouse:message code="dashboard.managedRemotely.message" args="[warehouse.name]"/>
 												</g:else>
 											</div>												
 										</td>											
