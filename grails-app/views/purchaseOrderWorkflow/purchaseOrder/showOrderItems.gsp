@@ -24,7 +24,7 @@
 				<g:render template="/order/summary" model="[orderInstance:order]"/>
 				<table>
 					<tr>
-						<td >
+						<td style="padding: 0px;">
 							<div style="margin: 10px">
 								<p><warehouse:message code="order.itemsInOrder.message" args="[(order?.orderItems)?order?.orderItems?.size():0]"/></p>
 							</div>							
@@ -85,7 +85,7 @@
 								</table>
 							</div>
 						</td>
-						<td style="border-left: 1px solid lightgrey; height: 100%; width: 35%;">
+						<td style="border-left: 1px solid lightgrey; padding: 0px; height: 100%; width: 35%;">
 											
 							<g:hasErrors bean="${orderItem}">
 								<div class="errors">

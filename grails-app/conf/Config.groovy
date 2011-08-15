@@ -138,6 +138,7 @@ log4j = {
 	
 	
 	warn	'org.mortbay.log',
+		'org.codehaus.groovy.grails.web.pages',			// GSP		
 		'org.codehaus.groovy.grails.web.servlet',		// controllers
 		'org.codehaus.groovy.grails.web.sitemesh',		// layouts
 		'org.codehaus.groovy.grails.web.mapping.filter',	// URL mapping
@@ -150,7 +151,6 @@ log4j = {
 	
 	info	'org.liquibase', 	
 		'grails.app.controller',
-		'org.codehaus.groovy.grails.web.pages',			// GSP		
 		'com.mchange',
 		'org.springframework',
 		'org.hibernate',

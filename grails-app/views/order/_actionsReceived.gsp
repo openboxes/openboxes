@@ -4,7 +4,7 @@
 			<div class="action-menu-item">
 				<g:link controller="order" action="list">
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View orders" style="vertical-align: middle" />
-					&nbsp;${warehouse.message(code: 'orders.view.label', default: 'View orders')} 
+					&nbsp;${warehouse.message(code: 'order.list.label', default: 'View orders')} 
 				</g:link>
 			</div>
 			<div class="action-menu-item">
