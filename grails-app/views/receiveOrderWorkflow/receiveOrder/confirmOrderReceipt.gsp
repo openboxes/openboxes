@@ -143,48 +143,54 @@
 												</tr>
 											</thead>									
 											<tbody>
-												<g:each var="orderItem" in="${orderItems }" status="i">
-													<g:if test="${orderItem?.quantityReceived > 0}">
-														<tr class="">
-															<td>
-																<a name="orderItems${i }"></a>
-																
-																<g:hiddenField class="orderItemId" name="orderItems[${i }].orderItem.id" value="${orderItem?.orderItem?.id }"/>
-																<g:hiddenField name="orderItems[${i }].primary" value="${orderItem?.primary }"/>
-																<g:hiddenField name="orderItems[${i }].type" value="${orderItem?.type }"/>
-																<g:hiddenField name="orderItems[${i }].description" value="${orderItem?.description }"/>
-																<g:hiddenField name="orderItems[${i }].quantityOrdered" value="${orderItem?.quantityOrdered }"/>
-															</td>
-															<td>
-																${orderItem?.type }
-															</td>
-															<td>
-																${orderItem?.description }
-															</td>
-															<td class="center">
-																${orderItem?.quantityOrdered}
-															</td>
-															<%--
-															<td class="center">
-																 ${orderItem?.quantityOrdered - orderItem?.orderItem?.quantityFulfilled()}
-															</td>
-															--%>
-															<td class="center" style="border-left: 1px solid lightgrey;">															
-																${orderItem?.quantityReceived }
-															</td>
-															<td>
-																${orderItem?.productReceived?.name }
-															</td>
-															<td>
-																${orderItem?.lotNumber } 
-																<g:if test="${orderItem?.expirationDate }">
-																	<span class="fade">(expires
-																		<g:formatDate date="${orderItem?.expirationDate }" format="MMM yyyy"/>)
-																	</span>
-																</g:if>
-															</td>
-														</tr>
-													</g:if>
+											
+												<g:set var="i" value="${0 }"/>
+													<g:each var="entrymap" in="${orderItems?.groupBy { it?.orderItem } }">
+														<g:each var="orderItem" in="${entrymap.value}">
+													
+														<g:if test="${orderItem?.quantityReceived > 0}">
+															<tr class="">
+																<td>
+																	<a name="orderItems${i }"></a>
+																	
+																	<g:hiddenField class="orderItemId" name="orderItems[${i }].orderItem.id" value="${orderItem?.orderItem?.id }"/>
+																	<g:hiddenField name="orderItems[${i }].primary" value="${orderItem?.primary }"/>
+																	<g:hiddenField name="orderItems[${i }].type" value="${orderItem?.type }"/>
+																	<g:hiddenField name="orderItems[${i }].description" value="${orderItem?.description }"/>
+																	<g:hiddenField name="orderItems[${i }].quantityOrdered" value="${orderItem?.quantityOrdered }"/>
+																</td>
+																<td>
+																	${orderItem?.type }
+																</td>
+																<td>
+																	${orderItem?.description }
+																</td>
+																<td class="center">
+																	${orderItem?.quantityOrdered}
+																</td>
+																<%--
+																<td class="center">
+																	 ${orderItem?.quantityOrdered - orderItem?.orderItem?.quantityFulfilled()}
+																</td>
+																--%>
+																<td class="center" style="border-left: 1px solid lightgrey;">															
+																	${orderItem?.quantityReceived }
+																</td>
+																<td>
+																	${orderItem?.productReceived?.name }
+																</td>
+																<td>
+																	${orderItem?.lotNumber } 
+																	<g:if test="${orderItem?.expirationDate }">
+																		<span class="fade">(expires
+																			<g:formatDate date="${orderItem?.expirationDate }" format="MMM yyyy"/>)
+																		</span>
+																	</g:if>
+																</td>
+															</tr>
+														</g:if>
+														<g:set var="i" value="${i + 1}"/>
+													</g:each>
 												</g:each>
 											</tbody>
 										</table>
