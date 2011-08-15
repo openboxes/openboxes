@@ -30,7 +30,7 @@ class Request implements Serializable {
 	
 	static hasMany = [ requestItems : RequestItem, comments : Comment, documents : Document, events : Event ]
 	static mapping = {
-		requestItems cascade: "all-delete-orphan"
+		requestItems cascade: "all-delete-orphan", sort: "id"
 		comments cascade: "all-delete-orphan"
 		documents cascade: "all-delete-orphan"
 		events cascade: "all-delete-orphan"
