@@ -122,9 +122,9 @@ class InventoryItemController {
 		// populate the pending shipments
 		// TODO: move this into the service layer after we find a way to add shipping service to inventory service
 		// (that is, find a workaround to GRAILS-5080)
-		//commandInstance.pendingShipmentList = 
 		//	shipmentService.getPendingShipmentsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance)
-		//shipmentService.getPendingShipments(commandInstance.warehouseInstance);
+		commandInstance.pendingShipmentList = 
+			shipmentService.getPendingShipments(commandInstance.warehouseInstance);
 
 		def shipmentItems = 
 			shipmentService.getPendingShipmentItemsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance)
