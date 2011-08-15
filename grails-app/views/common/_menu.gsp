@@ -37,7 +37,7 @@
 			</li>
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="product" action="create"><warehouse:message code="product.create.label" /></g:link>
+					<g:link controller="product" action="create"><warehouse:message code="product.add.label"/></g:link>
 				</span>
 			</li>
 		</ul>
