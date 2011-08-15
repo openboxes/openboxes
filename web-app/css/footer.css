@@ -1,10 +1,6 @@
 /* Fix for footer creep 
 ----------------------------------------------------------*/
 
-#bd { 
-	margin-bottom: 50px;	/* add a little room between footer and end of content */
-}
-
 #ft {
 	/*background: #555;
 	color:#ddd;*/
