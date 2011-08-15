@@ -462,47 +462,23 @@ class JsonController {
 	
 	def findProductByName = {
 		
-		log.info(params)
-		
+		log.debug(params)
 		def dateFormat = new SimpleDateFormat(Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT);
-		
-		log.info params
 		def products = new TreeSet();
 		
 		if (params.term) {			
 			// Match full name
 			products = Product.withCriteria { 
-				ilike("name", "%" + params.term + "%")	
-				//maxResults( 15 )
+				ilike("name", "%" + params.term + "%")
 			}
-			
-			// If no items found, we search by category, product type, name, upc
-			/*
-			if (!products) { 
-				def terms = params.term.split(" ")
-				for (term in terms) {
-					products = Product.withCriteria {
-						or {
-							ilike("name", term + "%")							
-						}
-					}
-				}
-			}
-			*/
 		}
 		
 		// Add the search term to the list of items returned
-		products << [ value: params.term, label: params.term, valueText: params.term, desc: params.term ]
-		
-		//if (!products) { 
-			//items.add(new Product(name: "No matching products"))
-			//items.addAll(Product.list(params));		
-		//}
+		products << [ name: params.term ]
 		
 		def warehouse = Warehouse.get(params.warehouseId);
 		log.info ("warehouse: " + warehouse);
-		Map<InventoryItem, Integer> quantityMap =  
-			inventoryService.getQuantityForInventory(warehouse?.inventory)		
+		Map<InventoryItem, Integer> quantityMap = inventoryService.getQuantityForInventory(warehouse?.inventory)		
 			
 		// Convert from products to json objects 
 		if (products) {

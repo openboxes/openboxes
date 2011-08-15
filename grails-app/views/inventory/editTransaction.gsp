@@ -556,7 +556,7 @@
 	    		$('#productSearch').autocomplete( {
 		    		//selectFirst: true,
 					minLength: 2,
-					delay: 100,
+					delay: 500,
     				source: function(request, response) {
     					var currentWarehouseId = $("#currentWarehouseId").val();
     					$.getJSON('/warehouse/json/findProductByName', { term: request.term, warehouseId: currentWarehouseId }, function(data, status, xhr) {
@@ -598,19 +598,21 @@
     		    		if (ui.item.inventoryItems) { 
         		    		$('#product-details-lotNumbers').show();
         		    		$.each(ui.item.inventoryItems, function(index, value) { 
-	    		    			var lotNumber = value.lotNumber || "<span class='fade'><warehouse:message code="default.empty.label"/></span>";
-	    		    			var expirationDate = value.expirationDate;
-	    		    				    		    			
-	    		    			var existingLotNumber = 
-		    		    			"<tr>" + 
-		    		    			"<td><button onClick=\"addExistingItem('" + ui.item.product.id + "','" + value.lotNumber + "');\"><img src=\"${resource(dir: 'images/icons/silk', file: 'add.png')}\" style=\"vertical-align: middle;\"/></button></td>" + 
-		    		    			"<td>" + lotNumber + "</td>" + 
-	    		    				"<td>" + value.expirationDate + "</td>" + 
-	    		    				"<td>" + value.quantity + "</td>" + 
-	    		    				"<td></td>" + 
-	    		    				"</tr>";
-		    		    		
-								$("#product-details-lotNumbers > tbody:last").append($(existingLotNumber));	        		    		
+        		    			if (value) {
+		    		    			var lotNumber = value.lotNumber || "<span class='fade'><warehouse:message code="default.empty.label"/></span>";
+		    		    			var expirationDate = value.expirationDate;
+		    		    				    		    			
+		    		    			var existingLotNumber = 
+			    		    			"<tr>" + 
+			    		    			"<td><button onClick=\"addExistingItem('" + ui.item.product.id + "','" + value.lotNumber + "');\"><img src=\"${resource(dir: 'images/icons/silk', file: 'add.png')}\" style=\"vertical-align: middle;\"/></button></td>" + 
+			    		    			"<td>" + lotNumber + "</td>" + 
+		    		    				"<td>" + value.expirationDate + "</td>" + 
+		    		    				"<td>" + value.quantity + "</td>" + 
+		    		    				"<td></td>" + 
+		    		    				"</tr>";
+			    		    		
+									$("#product-details-lotNumbers > tbody:last").append($(existingLotNumber));
+								}	    		
 							});
 
     		    			var newLotNumber = 
