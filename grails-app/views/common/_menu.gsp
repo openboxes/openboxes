@@ -171,7 +171,7 @@
 				</span>
 			</li>
 		</ul>
-		<span class="menu-subheading"><warehouse:message code="person.label"/></span>
+		<span class="menu-subheading"><warehouse:message code="persons.label"/></span>
 		<ul>
 			<li class="">
 				<span class="menuButton">
