@@ -7,11 +7,10 @@
         
         <g:if test="${productInstance?.id}">
 	        <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
-			<content tag="pageTitle"><warehouse:message code="default.edit.label" args="[entityName]" /></content>
 		</g:if>
 		<g:else>
-	        <title><warehouse:message code="default.add.label" args="[entityName]" /></title>
-			<content tag="pageTitle"><warehouse:message code="default.add.label" args="[entityName]" /></content>		
+	        <title><warehouse:message code="product.add.label" /></title>	
+			<content tag="label1"><warehouse:message code="inventory.label"/></content>
 		</g:else>
 
 		<style>

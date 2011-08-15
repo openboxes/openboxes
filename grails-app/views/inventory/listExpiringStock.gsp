@@ -3,9 +3,8 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${warehouse.message(code: 'transaction.label', default: 'Transaction')}" />
         
-        <title>Expiring/expired stock</title>    
+        <title><warehouse:message code="inventory.expiringStock.label"/></title>    
     </head>    
 
 	<body>

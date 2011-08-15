@@ -4,10 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${warehouse.message(code: 'attribute.label', default: 'Attribute')}" />
-        <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
-        <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><warehouse:message code="default.list.label" args="[entityName]" /></content>
+        <title><warehouse:message code="attribute.label" /></title>
     </head>
     <body>
         <div class="body">

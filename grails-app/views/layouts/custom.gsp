@@ -299,9 +299,10 @@
 									</g:if>
 									${session?.warehouse?.name} &nbsp;&rsaquo;&nbsp;
 								</g:if> 
-							    <g:set var="label1"><warehouse:message code="breadcrumbs.${params.controller }.label"/></g:set>
-							    <g:set var="label2"><g:layoutTitle /></g:set>
-							    ${label1?:params.controller}
+								<!--  note that both breadcrumbs are overrideable by using the content tag is the view to set the value of label1 or label2 -->
+							    <g:set var="label1">${g.pageProperty(name: 'page.label1') ?: warehouse.message(code: "breadcrumbs." + params.controller + ".label")}</g:set>
+							    <g:set var="label2">${g.pageProperty(name: 'page.label2') ?: g.layoutTitle()}</g:set>
+							   		${label1 ?: params.controller}
 							    <g:if test="${label1 != label2}">
 									&nbsp;&rsaquo;&nbsp;								
 					    			${label2}
@@ -416,8 +417,8 @@
 			<g:elseif test="${request.request.requestURL.toString().contains('attribute')}">
 				accordion.accordion( "activate" , 5 );
 			</g:elseif>
-			<g:elseif test="${request.request.requestURL.toString().contains('product/batchEdit')}">
-				accordion.accordion( "activate" , 5 );
+			<g:elseif test="${request.request.requestURL.toString().contains('product/create')}">
+				accordion.accordion( "activate" , 0 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('person')}">
 				accordion.accordion( "activate" , 5 );

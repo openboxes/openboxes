@@ -1,13 +1,12 @@
-
 <%@ page import="org.pih.warehouse.product.Product" %>
 <html>
 <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'product.label', default: 'Product')}" />
-        <title><warehouse:message code="default.add.label" args="[entityName]" /></title>
+        <title><warehouse:message code="product.add.label"/></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle"><warehouse:message code="default.add.label" args="[entityName]" /></content>
+		<content tag="pageTitle"><warehouse:message code="product.add.label" /></content>
     </head>    
     <body>
     
@@ -31,7 +30,7 @@
 	                        <tbody>                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                    <label for="name"><warehouse:message code="product.name.label" default="Name" /></label>
+	                                    <label for="name">dfsaaaaaaaaaaaaaaaaaaaaaa<warehouse:message code="product.name.label" default="Name" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'name', 'errors')}">
 	                                    <g:textField name="name" value="${productInstance?.name}" />
