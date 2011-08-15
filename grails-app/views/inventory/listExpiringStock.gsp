@@ -83,7 +83,7 @@
 												<td>
 													<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
 														${inventoryItem?.product?.name } 
-														<span class="fade">${inventoryItem?.product?.category?.name } </span>
+														<span class="fade"><format:category category="${inventoryItem?.product?.category}"/> </span>
 													</g:link>
 													
 												</td>
@@ -117,10 +117,10 @@
 					                    <thead>
 					                        <tr>                           	
 						                        <%--<th width="2%">Actions</th> --%>
-												<th><warehouse:message code="inventory.item.label"/></th>
+												<th><warehouse:message code="default.item.label"/></th>
 												<th><warehouse:message code="inventory.lotNumber.label"/></th>
-												<th><warehouse:message code="inventory.expired.label"/></th>
-												<th class="center"><warehouse:message code="inventory.quantity.label"/></th>
+												<th><warehouse:message code="default.expired.label"/></th>
+												<th class="center"><warehouse:message code="default.quantity.label"/></th>
 					                        </tr>
 					                    </thead>
 					       	           	<tbody>			
@@ -131,7 +131,7 @@
 													<td>
 														<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
 															<format:product product="${inventoryItem?.product}"/>
-															<span class="fade">${inventoryItem?.product?.category?.name } </span>
+															<span class="fade"><format:category category="${inventoryItem?.product?.category}"/> </span>
 														</g:link>
 													</td>
 													<td>
