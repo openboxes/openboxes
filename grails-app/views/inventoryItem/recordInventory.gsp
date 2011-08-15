@@ -194,7 +194,7 @@
 	var inventory = { InventoryItems: [] };	
 
 	// We need to do this in order to make sure the index for new items is correct
-	<g:each var="row" in="${commandInstance?.recordInventoryRows.findAll{ it.newQuantity > 0 } }" status="status">
+	<g:each var="row" in="${commandInstance?.recordInventoryRows}" status="status">
 		var existingInventoryItem = { Id: '${row.id}', Type: '', ProductId: '', LotNumber: '${row.lotNumber}', ExpirationDate: '${row.expirationDate?:never}', Qty: 0 };	
 		inventory.InventoryItems.push(existingInventoryItem);
 	</g:each>

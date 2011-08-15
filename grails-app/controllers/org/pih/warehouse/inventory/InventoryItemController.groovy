@@ -187,7 +187,7 @@ class InventoryItemController {
 		//bindData(cmd.recordInventoryRows, params)
 		//bindData(cmd.recordInventoryRow, params)
 		
-		log.info ("Before saving record inventory")				
+		log.info ("Before saving record inventory " + params)				
 		inventoryService.saveRecordInventoryCommand(cmd, params)
 		if (!cmd.hasErrors()) { 
 			log.info ("No errors, show stock card")				

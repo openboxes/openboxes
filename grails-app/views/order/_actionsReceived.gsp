@@ -7,10 +7,10 @@
 					&nbsp;${warehouse.message(code: 'order.list.label', default: 'View orders')} 
 				</g:link>
 			</div>
-			<div class="action-menu-item">
-				<hr/>
-			</div>
 		</g:if>
+		<div class="action-menu-item">
+			<hr/>
+		</div>
 		<div class="action-menu-item">
 			<g:link controller="order" action="show" id="${orderInstance?.id}">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="Edit" style="vertical-align: middle" />
@@ -28,6 +28,9 @@
 				<img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />
 				&nbsp;${warehouse.message(code: 'order.addDocument.label')} 
 			</g:link>				
+		</div>
+		<div class="action-menu-item">
+			<hr/>
 		</div>
 		<g:if test="${!hideDelete}">	
 			<div class="action-menu-item">

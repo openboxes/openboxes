@@ -7,10 +7,10 @@
 					&nbsp;${warehouse.message(code: 'order.list.label')} 
 				</g:link>
 			</div>
-			<div class="action-menu-item">
-				<hr/>
-			</div>
 		</g:if>
+		<div class="action-menu-item">
+			<hr/>
+		</div>
 		<div class="action-menu-item">
 			<g:link controller="order" action="show" id="${orderInstance?.id}">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="Edit" style="vertical-align: middle" />
@@ -41,6 +41,9 @@
 				&nbsp;${warehouse.message(code: 'order.addDocument.label')} 
 			</g:link>				
 		</div>		
+		<div class="action-menu-item">
+			<hr/>
+		</div>
 		<div class="action-menu-item">
 			<g:link controller="order" action="placeOrder" id="${orderInstance?.id}">
 				<img src="${resource(dir: 'images/icons/silk', file: 'cart.png')}" />

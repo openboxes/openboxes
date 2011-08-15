@@ -113,7 +113,7 @@
 							<tr class="prop">
 	                            <td valign="top" class="name">
 	                            	<label for='orderItems'><warehouse:message code="order.items.label" default="Items" /></label></td>
-	                            <td valign="top" class="value">
+	                            <td valign="top" class="value" style="padding: 0px;">
 
 									<g:if test="${orderItems }">
 										<table id="orderItemsTable">

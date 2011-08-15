@@ -31,11 +31,12 @@
 				<g:form action="receiveOrder" autocomplete="false">
 					<table>
 						<tr>
-							<td >
+							<td style="padding: 0px;">
+								<%-- 
 								<div style="margin: 10px">
 									<p><warehouse:message code="order.itemsInOrder.message" args="[(orderCommand?.orderItems) ? orderCommand?.orderItems?.size() : 0 ]"/></p>
 								</div>							
-						
+								--%>
 							
 								<div style="min-height: 175px">
 									<g:hiddenField name="order.id" value="${orderCommand?.order?.id }"/>
