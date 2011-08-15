@@ -103,7 +103,7 @@
 															</td>
 															<td>
 																<g:if test="${!orderItem?.orderItem?.isCompletelyFulfilled() }">
-																	<g:autoSuggest id="productReceived-${i }" name="orderItems[${i }].productReceived" jsonUrl="/warehouse/json/findProductByName" width="200" valueId="${orderItem?.productReceived?.id }" valueName="${format.product(product:orderItems[i].productReceived)}"/>	
+																	<g:autoSuggest id="productReceived-${i }" name="orderItems[${i }].productReceived" jsonUrl="/warehouse/json/findProductByName" width="200" valueId="${orderItem?.productReceived?.id }" valueName="${format.product(product:orderItem?.productReceived)}"/>	
 																</g:if>
 															</td>
 															<td>
