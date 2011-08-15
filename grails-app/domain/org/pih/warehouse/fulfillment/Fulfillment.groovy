@@ -26,7 +26,7 @@ class Fulfillment implements Serializable {
 	static hasMany = [ fulfillmentItems : FulfillmentItem ]
 	
 	static mapping = {
-		fulfillmentItems cascade: "all-delete-orphan"
+		fulfillmentItems cascade: "all-delete-orphan", sort: "id"
 	}
 	
 	// Constraints

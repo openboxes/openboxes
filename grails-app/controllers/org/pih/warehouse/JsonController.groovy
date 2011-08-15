@@ -473,9 +473,6 @@ class JsonController {
 			}
 		}
 		
-		// Add the search term to the list of items returned
-		products << [ name: params.term ]
-		
 		def warehouse = Warehouse.get(params.warehouseId);
 		log.info ("warehouse: " + warehouse);
 		Map<InventoryItem, Integer> quantityMap = inventoryService.getQuantityForInventory(warehouse?.inventory)		
