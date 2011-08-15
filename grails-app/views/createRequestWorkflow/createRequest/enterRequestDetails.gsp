@@ -28,6 +28,9 @@
 				</div>
 			</g:hasErrors>
 		</g:each>
+		
+		<g:set var="requestingWarehouse" value="${requestInstance.destination?:session.warehouse}"/>
+		
 		<g:form action="createRequest" method="post">
 			<div class="dialog">
 			
@@ -48,56 +51,39 @@
 								<td valign='top' class='name'><label for='source'><warehouse:message code="request.from.label"/>:</label>
 								</td>
 								<td valign='top' class='value ${hasErrors(bean:requestInstance,field:'origin','errors')}'>
-									<g:select name="origin.id" from="${org.pih.warehouse.inventory.Warehouse.list()}" optionKey="id" value="${requestInstance?.origin?.id}" noSelection="['':'']"/>
+									<select name="origin.id">
+										<option value=""></option>
+										<g:each in="${org.pih.warehouse.inventory.Warehouse.list()}" var="w">
+											<g:if test="${requestInstance?.origin?.id == w.id || requestingWarehouse.id != w.id}">
+												<option value="${w.id}"<g:if test="${requestInstance?.origin?.id == w.id}"> selected</g:if>>
+													<format:metadata obj="${w}"/>
+												</option>
+											</g:if>
+										</g:each>
+									</select>
 								</td>
 							</tr>
 							<tr class='prop'>
 								<td valign='top' class='name'><label for="destination"><warehouse:message code="request.for.label"/>:</label>
 								</td>
 								<td valign='top' class='value ${hasErrors(bean:requestInstance,field:'destination','errors')}'>
-									<g:if test="${requestInstance.destination }">
-										${requestInstance?.destination?.name }
-										<g:hiddenField name="destination.id" value="${requestInstance?.destination?.id}"/>									
-									</g:if>
-									<g:else>
-										${session.warehouse?.name }
-										<g:hiddenField name="destination.id" value="${session.warehouse?.id}"/>									
-									</g:else>
+									<format:metadata obj="${requestingWarehouse}"/>
+									<g:hiddenField name="destination.id" value="${requestingWarehouse?.id}"/>
 								</td>
 							</tr>
 							<tr class='prop'>
 								<td valign='top' class='name'><label for='requestedBy'><warehouse:message code="request.requestedBy.label"/>:</label></td>
 								<td valign='top'
 									class='value ${hasErrors(bean:requestInstance,field:'requestedBy','errors')}'>
-									<%-- 
-									<g:select class="combobox" name="requestedBy.id" from="${org.pih.warehouse.core.Person.list().sort{it.lastName}}" optionKey="id" value="${request?.requestedBy?.id}" noSelection="['':'']"/>
-									--%>
 									${requestInstance?.requestedBy?.name}
 								</td>
 							</tr>
-							<%-- 
-							<tr class='prop'>
-								<td valign='top' class='name'><label for='dateOrdered'><warehouse:message code="request.orderedOn.label"/>:</label></td>
-								<td valign='top'
-									class='value ${hasErrors(bean:request,field:'dateOrdered','errors')}'>								
-									<g:jqueryDatePicker 
-										id="dateOrdered" 
-										name="dateOrdered" 
-										value="${request?.dateOrdered }" 
-										format="MM/dd/yyyy"
-										size="8"
-										showTrigger="false" />								
-								</td>
-							</tr>							
-							--%>
 						</tbody>
 					</table>
 					<div class="buttons" style="border-top: 1px solid lightgrey;">
 						<g:submitButton name="next" value="${warehouse.message(code:'default.button.next.label')}"></g:submitButton> 
 						<g:link action="createRequest" event="cancel"><warehouse:message code="default.button.cancel.label"/></g:link>
 					</div>
-					
-					
 				</fieldset>
 			</div>
 		</g:form>
