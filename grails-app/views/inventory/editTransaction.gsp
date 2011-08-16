@@ -513,8 +513,8 @@
 	    		 */
 	    		$(".quantity").livequery(function(){
 					$(this).change(function(event) {					
-						var index = $(this).parent().children(".index").val();
-						transaction.TransactionEntries[index].Quantity = $(this).val();						
+						var index = $(this).parent().prev().prev().children(".index").val();
+						transaction.TransactionEntries[index].Qty = $(this).val();	
 					});
 			    });
 
