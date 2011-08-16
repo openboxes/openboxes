@@ -22,4 +22,10 @@ class LocalizationUtilTest {
 		assert LocalizationUtil.getLocalizedString("Default Value|fr:French Value|es:Spanish Value", locale) == "Spanish Value"
 					
 	}	
+
+	void testGetDefaultString() {		
+		assert LocalizationUtil.getDefaultString("Default Value|fr:French Value|es:Spanish Value") == "Default Value"
+	}
 }
+
+

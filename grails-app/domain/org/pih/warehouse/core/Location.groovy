@@ -40,6 +40,6 @@ class Location implements Comparable, java.io.Serializable {
 	}
 	
 	Boolean isWarehouse() {
-		return locationType.id == LocationType.findByName("Warehouse").id
+		return locationType.id == LocationType.findById(Constants.WAREHOUSE_LOCATION_TYPE_ID).id
 	}
 }

@@ -92,19 +92,21 @@ class FormatTagLib {
 	  * Custom tag to display warehouse metadata is a standard, localized manner
 	  */
 	 def metadata = { attrs ->
+		 Locale locale = attrs.locale ?: session?.user?.locale ?: defaultLocale
+		 
 		 if (attrs.obj != null) {
 			 // handle String; localize the string directly
 			 if (attrs.obj instanceof String) {
-				 out << LocalizationUtil.getLocalizedString(attrs.obj, session?.user?.locale ?: defaultLocale)
+				 out << LocalizationUtil.getLocalizedString(attrs.obj,  locale)
 			 }
 			 // handle Enums; by convention, the localized text for a Enum is stored in the message property enum.className.value  (ie enum.ShipmentStatusCode.PENDING)
 			 else if (attrs.obj instanceof Enum) {
 				 String className = attrs.obj.getClass().getSimpleName()		 
-				 out << warehouse.message(code:'enum.' + className + "." + attrs.obj)
+				 out << warehouse.message(code:'enum.' + className + "." + attrs.obj, locale: locale)
 			 }
 			 // for all other objects, return the localized version of the name
 			 else {
-				 out << LocalizationUtil.getLocalizedString(attrs.obj.name, session?.user?.locale ?: defaultLocale)
+				 out << LocalizationUtil.getLocalizedString(attrs.obj.name, locale)
 			 }
 		 }
 	 }

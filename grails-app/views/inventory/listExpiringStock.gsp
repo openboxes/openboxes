@@ -116,7 +116,7 @@
 					                    <thead>
 					                        <tr>                           	
 						                        <%--<th width="2%">Actions</th> --%>
-												<th><warehouse:message code="default.item.label"/></th>
+												<th><warehouse:message code="item.label"/></th>
 												<th><warehouse:message code="inventory.lotNumber.label"/></th>
 												<th><warehouse:message code="default.expired.label"/></th>
 												<th class="center"><warehouse:message code="default.quantity.label"/></th>
