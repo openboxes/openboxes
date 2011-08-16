@@ -3814,13 +3814,164 @@
         </createIndex>
     </changeSet>
     
-    <changeSet author="jmiranda" id="1313074391957-32">
-		<update tableName="request">
-		    <column name="status" value="NOT_REQUESTED"/>
-		    <where>status='NOT_YET_REQUESTED'</where>
-		</update>    
+	<changeSet author="mgoodrich" id="18-Aug-2011">
+		<update tableName="event_type">
+		    <column name="name" value="Shipped|fr:Expédié"/>
+		    <where>event_code='SHIPPED'</where>
+		</update>
+		<update tableName="event_type">
+		    <column name="name" value="Received|fr:Reçu"/>
+		    <where>event_code='RECEIVED'</where>
+		</update>   
 	</changeSet>
     
+    <changeSet author="mgoodrich" id="18-Aug-2011-2">
+		<update tableName="location_type">
+		    <column name="name" value="Warehouse|fr:Entrepôt"/>
+		    <where>code='locationType.warehouse'</where> 
+		</update>
+		<update tableName="location_type">
+		    <column name="name" value="Depot|fr:Dépot"/>
+		    <where>code='locationType.depot'</where> 
+		</update>
+		<update tableName="location_type">
+		    <column name="name" value="Pharmacy|fr:Pharmacie"/>
+		    <where>code='locationType.pharmacy'</where> 
+		</update>
+		<update tableName="location_type">
+		    <column name="name" value="Supplier|fr:Fournisseurs"/>
+		    <where>code='locationType.supplier'</where> 
+		</update>
+	</changeSet>
+	
+	<changeSet author="mgoodrich" id="18-Aug-2011-3">
+		<update tableName="transaction_type">
+		    <column name="name" value="Consumption|fr:Consommation"/>
+		    <where>id='2'</where> 
+		</update>
+		<update tableName="transaction_type">
+		    <column name="name" value="Adjustment - Credit|fr:Ajustement - Crédit"/>
+		    <where>id='3'</where> 
+		</update>
+		<update tableName="transaction_type">
+		    <column name="name" value="Expired|fr:Espiré"/>
+		    <where>id='4'</where> 
+		</update>
+		<update tableName="transaction_type">
+		    <column name="name" value="Damaged|fr:Endommagé"/>
+		    <where>id='5'</where> 
+		</update>
+		<update tableName="transaction_type">
+		    <column name="name" value="Inventory|fr:Inventaire"/>
+		    <where>id='7'</where> 
+		</update>
+		<update tableName="transaction_type">
+		    <column name="name" value="Transfer In|fr:Transférer en"/>
+		    <where>id='8'</where> 
+		</update>
+		<update tableName="transaction_type">
+		    <column name="name" value="Transfer Out|fr:Transférer hors"/>
+		    <where>id='9'</where> 
+		</update>
+		<update tableName="transaction_type">
+		    <column name="name" value="Adjustment - Debit|fr:Ajustement - Débit"/>
+		    <where>id='10'</where> 
+		</update>
+		<update tableName="transaction_type">
+		    <column name="name" value="Product Inventory|fr:Inventaire de Produits"/>
+		    <where>id='11'</where> 
+		</update>
+	</changeSet>
+    
+     <changeSet author="mgoodrich" id="18-Aug-2011-4">
+		<update tableName="container_type">
+		    <column name="name" value="Container|fr:Conteneur"/>
+		    <where>id='1'</where> 
+		</update>
+		<update tableName="container_type">
+		    <column name="name" value="Pallet|fr:Palette"/>
+		    <where>id='2'</where> 
+		</update>
+		<update tableName="container_type">
+		    <column name="name" value="Suitcase|fr:Valise/Malette"/>
+		    <where>id='3'</where> 
+		</update>
+		<update tableName="container_type">
+		    <column name="name" value="Box|fr:Boite"/>
+		    <where>id='4'</where> 
+		</update>
+		<update tableName="container_type">
+		    <column name="name" value="Trunk|fr:Coffre"/>
+		    <where>id='5'</where> 
+		</update>
+		<update tableName="container_type">
+		    <column name="name" value="Item|fr:Element"/>
+		    <where>id='6'</where> 
+		</update>
+		<update tableName="container_type">
+		    <column name="name" value="Other|fr:Autre"/>
+		    <where>id='7'</where> 
+		</update>
+		<update tableName="container_type">
+		    <column name="name" value="Crate|fr:Caisse"/>
+		    <where>id='8'</where> 
+		</update>
+	</changeSet>
+	
+	<changeSet author="mgoodrich" id="18-Aug-2011-5">
+		<update tableName="document_type">
+		    <column name="name" value="Facture donnée par la ligne aérienne|fr:Conteneur"/>
+		    <where>id='1'</where> 
+		</update>
+		<update tableName="document_type">
+		    <column name="name" value="Bill of Lading|fr:Facture de la cargaison"/>
+		    <where>id='2'</where> 
+		</update>
+		<update tableName="document_type">
+		    <column name="name" value="Packing List|fr:Lisde de chargement"/>
+		    <where>id='3'</where> 
+		</update>
+		<update tableName="document_type">
+		    <column name="name" value="Certificate of Donation|fr:Certificat de don"/>
+		    <where>id='4'</where> 
+		</update>
+		<update tableName="document_type">
+		    <column name="name" value="Commercial Invoice|fr:Facture Commerciale"/>
+		    <where>id='5'</where> 
+		</update>
+		<update tableName="document_type">
+		    <column name="name" value="Material Safey Data Sheet|fr:Fiche signalétique"/>
+		    <where>id='6'</where> 
+		</update>
+		<update tableName="document_type">
+		    <column name="name" value="Certificate of Analysis|fr:Certificat d'analyse"/>
+		    <where>id='7'</where> 
+		</update>
+		<update tableName="document_type">
+		    <column name="name" value="Manifest|fr:Manifeste"/>
+		    <where>id='8'</where> 
+		</update>
+		<update tableName="document_type">
+		    <column name="name" value="Other|fr:Autre"/>
+		    <where>id='9'</where> 
+		</update>
+	</changeSet>
+	
+	<changeSet author="mgoodrich" id="18-Aug-2011-6">
+		<update tableName="shipment_type">
+		    <column name="name" value="Air|fr:Air"/>
+		    <where>id='1'</where>
+		</update>
+		<update tableName="shipment_type">
+		    <column name="name" value="Sea|fr:Mer"/>
+		    <where>id='2'</where>
+		</update>
+		<update tableName="shipment_type">
+		    <column name="name" value="Suitcase|fr:Valise/Malette"/>
+		    <where>id='4'</where>
+		</update>
+		
+	</changeSet>
     
 </databaseChangeLog>
 

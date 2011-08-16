@@ -113,11 +113,6 @@
 					<g:link controller="shipment" action="listReceiving"><warehouse:message code="receiving.list.label"  default="List receiving"/></g:link>
 				</span>		
 			</li>		
-			<li>
-				<span class="menuButton">
-				<!--  <g:link class="browse" class="bullet" controller="receipt" action="process"><warehouse:message code="receiving.process.label" default="Process Receipts"/></g:link>  -->
-				</span>
-			</li>		
 		</ul>										
 	</div>
 	<%-- 
