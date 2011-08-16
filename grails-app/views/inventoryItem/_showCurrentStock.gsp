@@ -23,7 +23,7 @@
 				<g:if test="${!commandInstance?.inventoryItemList}">
 					<tr class="even" style="min-height: 100px;">
 						<td colspan="5" style="text-align: center; vertical-align: middle">
-							<warehouse:message code="inventory.thereAreNoItemsCurrentlyInStock.message" args="[format.product(product:commandInstance?.productInstance)]"/>
+							<warehouse:message code="inventory.noItemsCurrentlyInStock.message" args="[format.product(product:commandInstance?.productInstance)]"/>
 						</td>
 					</tr>
 				</g:if>
