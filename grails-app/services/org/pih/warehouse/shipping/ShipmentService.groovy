@@ -212,7 +212,7 @@ class ShipmentService {
 		
 		/*
 		return Shipment.withCriteria { 				
-			eq("mostRecentEvent.eventType.id", EventType.findByName("Departed"))
+			eq("mostRecentEvent.eventType.id", EventType.findByName("Departed"))  // change this to reference by id if we reimplement this
 		}*/
 
 		/*		

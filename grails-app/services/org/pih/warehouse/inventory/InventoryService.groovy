@@ -74,7 +74,7 @@ class InventoryService implements ApplicationContextAware {
 	   	// otherwise, we need to create a new warehouse
 	   	else {
 	   		Warehouse warehouse = new Warehouse()
-	   		warehouse.locationType = LocationType.findByName('Warehouse')
+	   		warehouse.locationType = LocationType.findById(Constants.WAREHOUSE_LOCATION_TYPE_ID)
 	   		
 	   		return warehouse
 	   	}
@@ -1276,7 +1276,7 @@ class InventoryService implements ApplicationContextAware {
 		Date today = new Date()
 		today.clearTime()
 		def transactionInstance = new Transaction(transactionDate: today,
-			transactionType: TransactionType.findByName("Inventory"),
+			transactionType: TransactionType.findById(Constants.INVENTORY_TRANSACTION_TYPE_ID),
 			inventory: warehouse.inventory)
 		
 		// Iterate over each row
@@ -1467,7 +1467,7 @@ class InventoryService implements ApplicationContextAware {
 			Date today = new Date()
 			today.clearTime()
 			def transactionInstance = new Transaction(transactionDate: today,
-				transactionType: TransactionType.findByName("Inventory"),
+				transactionType: TransactionType.findById(Constants.INVENTORY_TRANSACTION_TYPE_ID),
 				inventory: warehouse.inventory)
 			
 			

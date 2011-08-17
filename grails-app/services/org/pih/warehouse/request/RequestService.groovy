@@ -3,6 +3,7 @@ package org.pih.warehouse.request
 import java.util.Date;
 import java.util.Set;
 
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.LocationType;
 import org.pih.warehouse.core.Person;
@@ -46,7 +47,7 @@ class RequestService {
 	 */
 	List<Location> getSuppliers() { 
 		def suppliers = []
-		LocationType supplierType = LocationType.findByName("Supplier");
+		LocationType supplierType = LocationType.findById(Constants.SUPPLIER_LOCATION_TYPE_ID);
 		if (supplierType) { 
 			suppliers = Location.findAllByLocationType(supplierType);
 		}

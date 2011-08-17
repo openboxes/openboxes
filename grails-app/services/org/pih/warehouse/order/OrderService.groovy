@@ -7,6 +7,7 @@ import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.LocationType;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.User;
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.order.cart.Cart;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.receiving.Receipt;
@@ -31,7 +32,7 @@ class OrderService {
 	
 	List<Location> getSuppliers() { 
 		def suppliers = []
-		LocationType supplierType = LocationType.findByName("Supplier");
+		LocationType supplierType = LocationType.findById(Constants.SUPPLIER_LOCATION_TYPE_ID);
 		if (supplierType) { 
 			suppliers = Location.findAllByLocationType(supplierType);
 		}

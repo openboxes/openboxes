@@ -1,6 +1,7 @@
 package org.pih.warehouse.shipping
 
 import org.apache.poi.hssf.record.formula.functions.NumericFunction.OneArg;
+import org.pih.warehouse.core.Constants;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.inventory.Warehouse;
 import org.pih.warehouse.product.Product;
@@ -328,7 +329,7 @@ class CreateShipmentWorkflowController {
 				else {
 					// if not, get the container that we are adding the box to
 					container = Container.get(params.container.id)
-					box = container.addNewContainer(ContainerType.findByName("Box"))
+					box = container.addNewContainer(ContainerType.findById(Constants.BOX_CONTAINER_TYPE_ID))
 				}
 				
     			bindData(box,params)
