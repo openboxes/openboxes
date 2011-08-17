@@ -49,7 +49,7 @@
 			<div class="action-menu-item">
 				<g:link controller="request" action="showPicklist" id="${requestInstance?.id}">
 					<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}" />
-					&nbsp;${warehouse.message(code: 'request.pick.label', default: 'Show pick list')} 
+					&nbsp;${warehouse.message(code: 'request.showPickList.label', default: 'Show pick list')} 
 				</g:link>				
 			</div>		
 		</g:if>

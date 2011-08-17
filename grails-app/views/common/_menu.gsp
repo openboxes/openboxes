@@ -144,7 +144,7 @@
 			</li>
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="product" action="batchEdit"><g:message code="default.batchEdit.label" args="[warehouse.message(code:'products.label')]" default="Batch Edit Products" /></g:link>
+					<g:link controller="product" action="batchEdit"><warehouse:message code="default.batchEdit.label" args="[warehouse.message(code:'products.label')]" default="Batch Edit Products" /></g:link>
 				</span>
 			</li>
 		</ul>

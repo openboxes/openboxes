@@ -33,11 +33,12 @@
 	                                    <label for="type"><warehouse:message code="person.type.label" default="Type" /></label>
 	                                </td>
 	                                <td valign="top" class="value">
-										${personInstance?.class?.simpleName} 
 										<g:if test="${personInstance?.class?.simpleName=='Person' }">
+											<warehouse:message code="person.label"/>
 											<g:link action="convertPersonToUser" id="${personInstance?.id }"><warehouse:message code="person.convertPersonToUser.label"/></g:link>
 										</g:if>
 										<g:elseif test="${personInstance?.class?.simpleName=='User' }">
+											<warehouse:message code="user.label"/>
 											<g:link action="convertUserToPerson" id="${personInstance?.id }"><warehouse:message code="person.convertUserToPerson.label"/></g:link>
 										</g:elseif>
 	                                </td>
