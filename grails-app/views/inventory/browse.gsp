@@ -28,10 +28,11 @@
 				padding: 5px; 
 				margin: 0px;
 				white-space:nowrap;
-				background-color:#D8D8D8;	
+				background-color: #F7F7F7; /*#D8D8D8*/	
 			}
 			.filter {
-				border: 1px solid black;
+				border: 1px solid lightgrey;
+				padding: 5px;
 				margin-left:10px;
 			}
 			.paddingRow {
@@ -82,8 +83,7 @@
 						<tr class="prop" style="border:1px dotted lightgrey;">
 			         		<td style="padding: 0; margin: 0; vertical-align: middle;">
 			            		<g:if test="${commandInstance?.categoryToProductMap}">
-			            		
-						            <g:form id="inventoryActionForm" controller="shipment" action="addToShipment">
+						            <g:form name="inventoryActionForm" controller="inventory" action="addTo">
 						            <div class="">
 						                <table border="0" cellpadding="0" cellspacing="0" class="scrollTable"> 
 											<thead class="fixedHeader"> 
@@ -163,9 +163,7 @@
 												</g:each>
 											</tbody> 
 										</table>		
-										<div style="padding: 10px; border-top: 1px dashed lightgrey;">
-											<g:render template="./actions" model="[]"/>
-										</div>
+										<g:render template="./actions" model="[]"/>
 									</g:form>
 								</g:if>	    
 			         		</td>
@@ -177,13 +175,12 @@
 		</div>
 		<script>
 			$(document).ready(function() {
-				$(".checkable a").click(function(e) {
-					e.stopPropagation();
+				$(".checkable a").click(function(event) {
+					event.stopPropagation();
 				});
 				$('.checkable').toggle(
 					function(event) {
 						$(this).parent().find('input').click();
-						console.log($(this).parent())
 						$(this).parent().addClass('checked');
 						return false;
 					},
@@ -193,6 +190,17 @@
 						return false;
 					}
 				);
+				$("#addToShipmentBtn").click(function(event) { 
+					var action = $("<input>").attr("type", "hidden").attr("name", "actionButton").val("addToShipment");
+					$('#inventoryActionForm').append($(action));
+					$("#inventoryActionForm").submit();					
+				});
+				$("#addToTransactionBtn").click(function(event) { 
+					var action = $("<input>").attr("type", "hidden").attr("name", "actionButton").val("addToTransaction");
+					$('#inventoryActionForm').append($(action));
+					$("#inventoryActionForm").submit();
+				});
+				
 			});	
 		</script>	
     </body>

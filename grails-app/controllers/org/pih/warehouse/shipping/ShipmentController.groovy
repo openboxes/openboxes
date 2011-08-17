@@ -1048,7 +1048,7 @@ class ShipmentController {
 	
 	
 	def addToShipment = { 
-		
+		log.info("addToShipment params " + params)
 		// Get product IDs and convert them to Long
 		def productIds = params.list('productId')		
 		productIds = productIds.collect { Long.valueOf(it); } 

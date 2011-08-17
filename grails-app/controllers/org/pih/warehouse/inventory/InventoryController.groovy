@@ -196,6 +196,26 @@ class InventoryController {
 		}
 	}
 	
+	
+	def addTo = {
+		log.info("Add to ... " + params)
+		
+		if (params.actionButton) { 
+			if (params.actionButton.equals("addToShipment")) { 
+				chain(controller: "shipment", action: "addToShipment", params: params)
+			}
+			else if (params.actionButton.equals("addToTransaction")) {
+				chain(controller: "inventory", action: "createTransaction", params: params)
+			}
+			else { 
+				flash.message = "${warehouse.message(code: 'action.not.found.message', args: [params.actionButton])}"
+			}
+		}
+		redirect(action: "browse");
+		
+	}
+	
+	
 	def addToInventory = {
 		def inventoryInstance = Inventory.get( params.id )
 		def productInstance = Product.get( params.product.id )
@@ -557,11 +577,19 @@ class InventoryController {
 			}
 		}
 		
+		// From show stock card page
 		if (params?.product?.id) { 
+			// 
 			def product = Product.get(params.product.id)
 			if (product) { 
 				productList << product.id;
 			}
+		}
+		
+		// From inventory browser
+		if (params.productId) { 
+			def productIds = params.list('productId')
+			productList = productIds.collect { Long.valueOf(it); }			
 		}
 		
 		if (productList) { 
