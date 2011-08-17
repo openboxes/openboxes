@@ -24,7 +24,9 @@ class InventoryItemController {
 
 	def inventoryService;
 	def shipmentService;
-
+	def requestService;
+	def orderService;
+	
 	def importInventoryItems = { ImportInventoryCommand cmd ->
 		def inventoryMapList = null;
 		if ("POST".equals(request.getMethod())) {			
@@ -136,7 +138,31 @@ class InventoryItemController {
 				shipmentMap.put(it, quantity)
 			}
 		}	
-		[ commandInstance: commandInstance, shipmentItems: shipmentItems, shipmentMap: shipmentMap ]
+		
+		def orderItems = 
+			orderService.getPendingOrderItemsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance);
+		def orderMap = orderItems.groupBy { it.order }
+		if (orderMap) {
+			orderMap.keySet().each {
+				def quantity = orderMap[it].sum() { it.quantity }
+				orderMap.put(it, quantity)
+			}
+		}
+		
+		def requestItems = 
+			requestService.getPendingRequestItemsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance)
+		def requestMap = requestItems.groupBy { it.request }
+		if (requestMap) {
+			requestMap.keySet().each {
+				def quantity = requestMap[it].sum() { it.quantity }
+				requestMap.put(it, quantity)
+			}
+		}
+	
+		
+			
+			
+		[ commandInstance: commandInstance, orderMap: orderMap, shipmentMap: shipmentMap, requestMap: requestMap ]
 	}
 
 	/**
@@ -417,7 +443,7 @@ class InventoryItemController {
 		
 		if (!inventoryLevelInstance.hasErrors() && inventoryLevelInstance.save()) { 
 			log.info ("save inventory level ")
-			flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'Inventory level'), inventoryLevelInstance.id])}"
+			flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'Inventory level')])}"
 		}
 		else { 
 			log.info ("render with errors")

@@ -1,6 +1,8 @@
 package org.pih.warehouse.request
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.pih.warehouse.core.Constants
@@ -8,6 +10,8 @@ import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.LocationType;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.User;
+import org.pih.warehouse.order.Order;
+import org.pih.warehouse.order.OrderItem;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.receiving.Receipt;
 import org.pih.warehouse.receiving.ReceiptItem;
@@ -27,7 +31,7 @@ class RequestService {
 	 * @return
 	 */
 	List<Request> getIncomingRequests(Location location) { 
-		return Request.findAllByDestination(location)
+		return Request.findAllByDestination(location).findAll { it.isPending() }
 	}
 
 	
@@ -38,7 +42,7 @@ class RequestService {
 	 */
 	List<Request> getOutgoingRequests(Location location) { 
 		//return Request.findAllByOriginAndStatus(location, RequestStatus.REQUESTED)
-		return Request.findAllByOrigin(location)	
+		return Request.findAllByOrigin(location).findAll { it.isPending() }	
 	}
 	
 	/**
@@ -215,4 +219,78 @@ class RequestService {
 		}
 	}
 	
+	/**
+	 *
+	 * @param location
+	 * @return
+	 */
+	List<Request> getPendingRequests(Location location) {
+		def requests = Request.withCriteria { 
+			or { 
+				eq("origin", location) 
+				eq("destination", location) 
+			}
+		}			
+		return requests.findAll { it.isPending() }
+	}
+	
+	
+	/**
+	 * 
+	 * @param location
+	 * @param product
+	 * @return
+	 */
+	List<RequestItem> getPendingRequestItemsWithProduct(Location location, Product product) { 
+		def requestItems = []
+		def requests = getPendingRequests(location);
+	
+		requests.each {
+			def requestItemList = it.requestItems.findAll { it.product == product }
+			requestItemList.each { requestItems << it; }
+		}
+	
+		return requestItems;
+	}
+
+	/**
+	 *
+	 * @param location
+	 * @return
+	 */
+	Map getIncomingQuantityByProduct(Location location) {
+		return getQuantityByProduct(getIncomingRequests(location))
+	}
+
+	/**
+	 *
+	 * @param location
+	 * @return
+	 */
+	Map getOutgoingQuantityByProduct(Location location) {
+		return getQuantityByProduct(getOutgoingRequests(location))
+	}
+	
+	/**
+	*
+	* @param shipments
+	* @return
+	*/
+	Map getQuantityByProduct(def requests) {
+		def quantityMap = [:]
+		requests.each { request ->
+			request.requestItems.each { requestItem ->
+				def product = requestItem.product
+				if (product) {
+					def quantity = quantityMap[product];
+					if (!quantity) quantity = 0;
+					quantity += requestItem.quantity;
+					quantityMap[product] = quantity
+				}
+			}
+		}
+		return quantityMap;
+	}
+	
+		
 }

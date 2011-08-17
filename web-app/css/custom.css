@@ -34,6 +34,12 @@ button {
 	height: 2em;
 }
 
+.box { 
+	border: 1px solid lightgrey;
+	
+}
+
+
 /* Added to fix an issue with being able to select actions from the action menu at the bottom of pages */
 .body { 
 	margin-bottom: 200px;

@@ -48,7 +48,7 @@
 													<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
 												</button>
 												<div class="actions">
-													<g:render template="showStockCardMenuItems" model="[commandInstance: commandInstance]"/>																				
+													<g:render template="showStockCardMenuItems" model="[product: commandInstance?.productInstance, inventory: commandInstance?.inventoryInstance]"/>																				
 												</div>
 											</span>				
 										</div>			
@@ -66,7 +66,7 @@
 							<tr>
 							
 								<!--  Product Details -->
-								<td style="width: 250px;" rowspan="3">
+								<td style="width: 250px;" rowspan="5">
 									<g:render template="productDetails" 
 										model="[productInstance:commandInstance?.productInstance, inventoryInstance:commandInstance?.inventoryInstance, 
 											inventoryLevelInstance: commandInstance?.inventoryLevelInstance, totalQuantity: commandInstance?.totalQuantity]"/>
@@ -84,7 +84,17 @@
 							</tr>
 							<tr>
 								<td>
-									<g:render template="showPendingTransactionLog"/>
+									<g:render template="showPendingShipmentLog"/>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<g:render template="showPendingOrderLog"/>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<g:render template="showPendingRequestLog"/>
 								</td>
 							</tr>
 						</table>

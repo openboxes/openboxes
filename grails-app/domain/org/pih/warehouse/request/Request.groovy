@@ -50,21 +50,34 @@ class Request implements Serializable {
 		lastUpdated(nullable:true)
 	}	
 	
-	String status() { 
-		if (status) { 
-			return status.name
-		} 
-		return "Not yet requested"
+	Boolean isPending() { 
+		return isNotRequested() || isRequested();
 	}
 	
 	Boolean isNotRequested() { 
-		return (status == null || RequestStatus.NOT_REQUESTED)
+		return (status == null || status == RequestStatus.NOT_REQUESTED)
 	}
 	
 	Boolean isRequested() { 
-		return (status == RequestStatus.REQUESTED )
+		return (status in [RequestStatus.REQUESTED, RequestStatus.OPEN])
+	}
+
+	Boolean isFulfilled() { 
+		return (status in [RequestStatus.FULFILLED, RequestStatus.SHIPPED, RequestStatus.RECEIVED])
 	}
 	
+	Boolean isShipped() {
+		return (status in [RequestStatus.SHIPPED, RequestStatus.RECEIVED])
+	}
+
+	Boolean isReceived() {
+		return (status in [RequestStatus.RECEIVED])
+	}
+
+	Boolean isCanceled() {
+		return (status in [RequestStatus.CANCELED])
+	}
+
 	String getRequestNumber() {
 		return (id) ? "R" + String.valueOf(id).padLeft(6, "0")  : "(new request)";
 	}

@@ -1,10 +1,8 @@
-<div>							
-	
+<div>	
 	<h2 class="fade"><warehouse:message code="transaction.pendingTransactionLog.label"/></h2>
-	<div style="text-align: center;">
+	<div style="text-align: center; border: 1px solid lightgrey;">
 		<g:form method="GET" action="showStockCard">
 			<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
-
 			<div class="list">
 				<table>
 					<thead>
@@ -44,8 +42,6 @@
 								<g:set var="shipment" value="${entry.key }"/>
 								<tr class="${(status%2==0)?'even':'odd' } prop">
 									<td style="width: 10%;" nowrap="nowrap">	
-									
-									
 										<g:if test="${shipment?.expectedShippingDate }">
 											<g:formatDate date="${shipment.expectedShippingDate }" format="dd/MMM/yyyy"/><br/>
 											<span class="fade">${prettyDateFormat(date: shipment.expectedShippingDate)}</span> 
@@ -64,6 +60,9 @@
 									</td>
 									<td style="text-align: center">
 										${shipmentMap[shipment] }
+									</td>
+									<td>
+										${shipment.status }
 									</td>
 								</tr>
 							</g:each>

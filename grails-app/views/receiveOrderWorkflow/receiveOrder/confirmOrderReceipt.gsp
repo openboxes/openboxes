@@ -37,13 +37,9 @@
 		
 		<g:form action="receiveOrder" method="post">
 			<div class="dialog">
-			
-			
 				<fieldset>
 					<g:render template="../order/summary" model="[orderInstance:order]"/>
 					<g:render template="progressBar" model="['state':'confirmOrderReceipt']"/>		
-
-
 					<table>
 						<tbody>
 							<tr class='prop'>

@@ -1,6 +1,3 @@
-<style>
-	.selected { background-color: #f7f7f7; } 
-</style>
 
 <div class="wizard-steps">
 	<div class="${state.equals('previewRequest')?'active-step':''}">

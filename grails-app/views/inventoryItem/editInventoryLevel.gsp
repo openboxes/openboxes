@@ -23,6 +23,30 @@
 					<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
 					<g:hiddenField name="product.id" value="${productInstance?.id}"/>
 					<fieldset>				
+					
+						<table>
+							<tbody>			
+								<tr>
+									<td style="width: 50px; vertical-align: middle;">
+										<div class="fade" style="font-size: 0.9em;">
+											<span class="action-menu">
+												<button class="action-btn">
+													<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle;"/>
+													<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
+												</button>
+												<div class="actions">
+													<g:render template="showStockCardMenuItems" model="[product: productInstance, inventory: inventoryInstance]"/>																				
+												</div>
+											</span>				
+										</div>			
+									</td>
+									<td style="vertical-align: middle;">
+										<h1><format:product product="${productInstance}"/></h1>
+									</td>
+								</tr>
+							</tbody>
+						</table>					
+						
 						<table>
 							<tr class="prop">
 								<td class="name"><label><warehouse:message code="inventory.label"/></label></td>

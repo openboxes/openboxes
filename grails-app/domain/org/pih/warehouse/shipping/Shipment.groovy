@@ -188,6 +188,11 @@ class Shipment implements Comparable, Serializable {
 		
 	}
 	
+	Boolean isPending() { 
+		return !this.hasShipped() && !this.wasReceived()
+	}
+	
+	
 	Boolean hasShipped() {
 		return events.any { it.eventType?.eventCode == EventCode.SHIPPED }
 	}

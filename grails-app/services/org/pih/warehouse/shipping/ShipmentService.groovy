@@ -345,10 +345,7 @@ class ShipmentService {
 	 * @return
 	 */
 	List<Shipment> getIncomingShipments(Location location) {
-		def shipments = Shipment.withCriteria {
-			eq("destination", location)
-		}		
-		return shipments.findAll { !it.wasReceived() }
+		return Shipment.withCriteria { eq("destination", location) }.findAll { it.isPending() }		
 	}
 	
 	
@@ -359,26 +356,43 @@ class ShipmentService {
 	 * @return
 	 */
 	List<Shipment> getOutgoingShipments(Location location) {
-		def shipments = Shipment.withCriteria {
-			eq("origin", location)
-		}		
-		return shipments.findAll { !it.hasShipped() }
+		return Shipment.withCriteria { eq("origin", location) }.findAll { it.isPending() } 		
 	}
 
 	
-
+	/**
+	 * 
+	 * @param location
+	 * @return
+	 */
 	List<Shipment> getShipmentsByDestination(Location location) {
 		return Shipment.withCriteria { 
 			eq("destination", location) 
 		}
 	}
 	
+	/**
+	 * 
+	 * @param location
+	 * @return
+	 */
 	List<Shipment> getShipmentsByOrigin(Location location) {
 		return Shipment.withCriteria { 
 			eq("origin", location);
 		}
 	}
 	
+	
+	/**
+	 * 
+	 * @param shipmentType
+	 * @param origin
+	 * @param destination
+	 * @param statusCode
+	 * @param statusStartDate
+	 * @param statusEndDate
+	 * @return
+	 */
 	List<Shipment> getShipments(ShipmentType shipmentType, Location origin, Location destination, ShipmentStatusCode statusCode, Date statusStartDate, Date statusEndDate) {
 		def shipments = Shipment.withCriteria {
 			and {
@@ -401,6 +415,8 @@ class ShipmentService {
 	
 	/**
 	 * Saves a shipment
+	 * 
+	 * @param shipment
 	 */
 	void saveShipment(Shipment shipment) {
 		shipment.save()
@@ -408,6 +424,8 @@ class ShipmentService {
 	
 	/**
 	 * Saves a container
+	 * 
+	 * @param container
 	 */
 	void saveContainer(Container container) {			
 		log.info("Container recipient " + container.recipient);	
@@ -421,6 +439,8 @@ class ShipmentService {
 	
 	/**
 	 * Saves an item
+	 * 
+	 * @param item
 	 */
 	void saveShipmentItem(ShipmentItem item) {
 		/*
@@ -434,6 +454,9 @@ class ShipmentService {
 	
 	/**
 	 * Saves an item
+	 * 
+	 * @param shipmentItem
+	 * @param shipment
 	 */
 	void addToShipmentItems(ShipmentItem shipmentItem, Shipment shipment) {
 		// Need to set the shipment here for validation purposes
@@ -447,6 +470,7 @@ class ShipmentService {
 	
 	/**
 	 * Validate the shipment item 	
+	 * 
 	 * @param shipmentItem
 	 * @return
 	 */
@@ -1006,9 +1030,8 @@ class ShipmentService {
 	* @param location
 	* @return
 	*/
-   Map getReceivingQuantityByProduct(Location location) {
-	   def shipments = getIncomingShipments(location)
-	   return getQuantityByProduct(shipments)
+   Map getIncomingQuantityByProduct(Location location) {
+	   return getQuantityByProduct(getIncomingShipments(location))
    }
    
    /**
@@ -1016,9 +1039,8 @@ class ShipmentService {
    * @param location
    * @return
    */
-  Map getShippingQuantityByProduct(Location location) {
-	  def shipments = getPendingShipments(location)
-	  return getQuantityByProduct(shipments)
+  Map getOutgoingQuantityByProduct(Location location) {
+	  return getQuantityByProduct(getOutgoingShipments(location))
   }
   
   /**
@@ -1027,8 +1049,7 @@ class ShipmentService {
    * @return
    */
    Map getQuantityByProduct(def shipments) { 	   
-	   def quantityMap = [:]
-	   
+	   def quantityMap = [:]	   
 	   shipments.each { shipment ->
 		   shipment.shipmentItems.each { shipmentItem ->
 			   def product = shipmentItem.product
@@ -1041,9 +1062,6 @@ class ShipmentService {
 		   }
 	   }
 	   return quantityMap;
-   }   	
-
-   
-   	
+   }
 	
 }

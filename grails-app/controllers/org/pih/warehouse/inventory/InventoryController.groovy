@@ -16,7 +16,6 @@ class InventoryController {
 	
     def productService;	
 	def inventoryService;
-	def shipmentService;
 	
 	def index = { 
 		redirect(action: "browse");

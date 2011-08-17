@@ -24,11 +24,11 @@
 			</div>
 		</g:hasErrors>
 				
-		<div class="dialog">
-			<fieldset>
-				<g:render template="../order/summary" model="[orderInstance:order]"/>
-				<g:render template="progressBar" model="['state':'processOrderItems']"/>		
-				<g:form action="receiveOrder" autocomplete="false">
+		<g:form action="receiveOrder" autocomplete="false">
+			<div class="dialog">
+				<fieldset>
+					<g:render template="../order/summary" model="[orderInstance:order]"/>
+					<g:render template="progressBar" model="['state':'processOrderItems']"/>		
 					<table>
 						<tr>
 							<td style="padding: 0px;">
@@ -38,7 +38,7 @@
 								</div>							
 								--%>
 							
-								<div style="min-height: 175px">
+								<div>
 									<g:hiddenField name="order.id" value="${orderCommand?.order?.id }"/>
 									<g:hiddenField name="shipmentType.id" value="${orderCommand?.shipmentType?.id }"/>
 									<g:hiddenField name="recipient.id" value="${orderCommand?.recipient?.id }"/>
@@ -161,6 +161,8 @@
 												</g:each>
 												
 											</tbody>
+													
+
 										</table>
 									</g:if>
 									<g:else>
@@ -179,12 +181,9 @@
 						--%>
 						<g:link action="receiveOrder" event="cancel"><warehouse:message code="default.button.cancel.label"/></g:link>
 					</div>
-				</g:form>
-				
-
-			</fieldset>
-		</div>
-
+				</fieldset>
+			</div>
+		</g:form>
 	</div>
 	<script>
 	var changed = false;

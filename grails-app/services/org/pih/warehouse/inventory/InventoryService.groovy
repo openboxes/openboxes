@@ -24,11 +24,11 @@ class InventoryService implements ApplicationContextAware {
 	
 	def sessionFactory
 	def productService
-
+	
 	ApplicationContext applicationContext
 	
 	boolean transactional = true
-	
+
 	/**
 	 * 
 	 * @return
@@ -36,8 +36,23 @@ class InventoryService implements ApplicationContextAware {
 	def getShipmentService() {
 		return applicationContext.getBean("shipmentService")
 	}
-   
-   
+
+	/**
+	 *
+	 * @return
+	 */
+	def getRequestService() {
+		return applicationContext.getBean("requestService")
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	def getOrderService() {
+		return applicationContext.getBean("orderService")
+	}
+
 	/**
 	 *
 	 * @return
@@ -45,6 +60,9 @@ class InventoryService implements ApplicationContextAware {
 	def getLocalizationService() {
 		return applicationContext.getBean("localizationService")
 	}
+	
+	
+	
 
 	/**
 	 * Gets all warehouses
@@ -242,19 +260,17 @@ class InventoryService implements ApplicationContextAware {
 	 */
 	Map getCurrentInventory(def commandInstance) { 
 		
-		def shipmentService = getShipmentService()
-		
 		// Get quantity for each item in inventory TODO: Should only be doing this for the selected products for speed
 		def quantityOnHandMap = getQuantityByProductMap(commandInstance?.warehouseInstance?.inventory);
-		def quantityShippingMap = shipmentService.getShippingQuantityByProduct(commandInstance?.warehouseInstance);
-		def quantityReceivingMap = shipmentService.getReceivingQuantityByProduct(commandInstance?.warehouseInstance);
+		def quantityOutgoingMap = getOutgoingQuantityByProduct(commandInstance?.warehouseInstance);
+		def quantityIncomingMap = getIncomingQuantityByProduct(commandInstance?.warehouseInstance);
 		
 		def products = [];
 		
 		getProducts(commandInstance).each { product -> 
 			def quantityOnHand = quantityOnHandMap[product] ?: 0;
-			def quantityToReceive = quantityReceivingMap[product] ?: 0;
-			def quantityToShip = quantityShippingMap[product] ?: 0;
+			def quantityToReceive = quantityIncomingMap[product] ?: 0;
+			def quantityToShip = quantityOutgoingMap[product] ?: 0;
 			
 			if (commandInstance?.showOutOfStockProducts || (quantityOnHand + quantityToReceive + quantityToShip > 0)) {
 				products << new ProductCommand(
@@ -271,6 +287,70 @@ class InventoryService implements ApplicationContextAware {
 
 		return commandInstance?.categoryToProductMap
 	}
+	
+	/**
+	 * Get the outgoing quantity for all products at the given location.
+	 * 
+	 * @param location
+	 * @return
+	 */
+	Map getOutgoingQuantityByProduct(Location location) { 
+		Map quantityByProduct = [:]
+		Map quantityShippedByProduct = getShipmentService().getOutgoingQuantityByProduct(location);		
+		Map quantityOrderedByProduct = getOrderService().getOutgoingQuantityByProduct(location)
+		Map quantityRequestedByProduct = getRequestService().getOutgoingQuantityByProduct(location)
+		quantityShippedByProduct.each { product, quantity ->
+			def productQuantity = quantityByProduct[product];
+			if (!productQuantity) productQuantity = 0;			
+			productQuantity += quantity?:0;
+			quantityByProduct[product] = productQuantity;
+		}
+		quantityOrderedByProduct.each { product, quantity ->
+			def productQuantity = quantityByProduct[product];
+			if (!productQuantity) productQuantity = 0;			
+			productQuantity += quantity?:0;
+			quantityByProduct[product] = productQuantity;
+		}
+		quantityRequestedByProduct.each { product, quantity ->
+			def productQuantity = quantityByProduct[product];
+			if (!productQuantity) productQuantity = 0;			
+			productQuantity += quantity?:0;
+			quantityByProduct[product] = productQuantity;
+		}
+		return quantityByProduct;
+	}
+
+	/**
+	 * Get the incoming quantity for all products at the given location.	
+	 * @param location
+	 * @return
+	 */
+	Map getIncomingQuantityByProduct(Location location) { 
+		Map quantityByProduct = [:]
+		Map quantityShippedByProduct = getShipmentService().getIncomingQuantityByProduct(location);		
+		Map quantityOrderedByProduct = getOrderService().getIncomingQuantityByProduct(location)
+		Map quantityRequestedByProduct = getRequestService().getIncomingQuantityByProduct(location)
+		quantityShippedByProduct.each { product, quantity ->
+			def productQuantity = quantityByProduct[product];
+			if (!productQuantity) productQuantity = 0;			
+			productQuantity += quantity?:0;
+			quantityByProduct[product] = productQuantity;
+		}
+		quantityOrderedByProduct.each { product, quantity ->
+			def productQuantity = quantityByProduct[product];
+			if (!productQuantity) productQuantity = 0;			
+			productQuantity += quantity?:0;
+			quantityByProduct[product] = productQuantity;
+		}
+		quantityRequestedByProduct.each { product, quantity ->
+			def productQuantity = quantityByProduct[product];
+			if (!productQuantity) productQuantity = 0;			
+			productQuantity += quantity?:0;
+			quantityByProduct[product] = productQuantity;
+		}
+		return quantityByProduct;
+	}
+	
 	
 	/**
 	 * 

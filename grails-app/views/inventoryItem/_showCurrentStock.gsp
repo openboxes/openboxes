@@ -6,7 +6,7 @@
 
 <div> 	
 	<h2 class="fade"><warehouse:message code="inventory.currentStock.label"/></h2>
-	<div id="inventoryView" style="text-align: left;" class="list">	
+	<div id="inventoryView" style="text-align: left; border: 1px solid lightgrey;" class="list">	
 		<table border="0" style="">
 			<thead>
 				<tr class="odd">
@@ -75,7 +75,7 @@
 								</g:if>
 								<span style="${styleClass}">${itemQuantity }</span> 
 															
-							</td>	
+							</td>
 							<g:hasErrors bean="${flash.itemInstance}">
 								<td>
 									<g:if test="${selected }">
@@ -93,11 +93,12 @@
 			</tbody>
 			<g:if test="${commandInstance?.inventoryItemList}">
 				<tfoot>
-					<tr class="prop" style="height: border: 0px;">
-						<td colspan="2" style="text-align: left; border: 0px;">
+					<tr class="prop odd" style="border-top: 1px solid lightgrey; border-bottom: 0px solid lightgrey">
+						<td></td>
+						<td colspan="2" class="left">
+							<label><warehouse:message code="inventory.onHandQuantity.label" default="On-hand quantity"/></label>
 						</td>
-						<td style="border: 0px;"></td>
-						<td style="text-align: center; vertical-align: middle; border: 0px;">
+						<td class="center">
 							<span style="font-size: 1em;"> 
 								<g:set var="styleClass" value="color: black;"/>																	
 								<g:if test="${commandInstance.totalQuantity < 0}">
@@ -108,7 +109,7 @@
 						</td>
 						<g:hasErrors bean="${flash.itemInstance}">
 							<td style="border: 0px;">
-							
+								&nbsp;
 							</td>
 						</g:hasErrors>
 					</tr>

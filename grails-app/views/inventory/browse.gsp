@@ -83,7 +83,7 @@
 			            		<g:if test="${commandInstance?.categoryToProductMap}">
 			            		
 						            <g:form id="inventoryActionForm" controller="shipment" action="addToShipment">
-						            
+						            <div class="">
 						                <table border="0" cellpadding="0" cellspacing="0" width="100%" class="scrollTable"> 
 											<thead class="fixedHeader"> 
 					           					<tr class="odd">
@@ -121,12 +121,12 @@
 														<g:set var="totalProducts" value="${totalProducts + 1}"/>
 														
 														<tr class="${status%2==0?'even':'odd' } prop">
-															<td valign="middle" style="width: 50px;">
+															<td class="middle" style="width: 50px;">
 																<g:checkBox id="${inventoryItem?.product?.id }" name="productId" 
 																	class="checkbox" style="top:0em;" checked="${false }" 
 																		value="${inventoryItem?.product?.id }" />
 															</td>																
-															<td class="checkable" style="width: 600px;">
+															<td class="checkable middle" style="width: 600px;">
 																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]" fragment="inventory" style="z-index: 999">
 																	<g:if test="${inventoryItem?.product?.name?.trim()}">
 																		<format:product product="${inventoryItem?.product}"/> 
@@ -136,19 +136,19 @@
 																	</g:else>
 																</g:link> 
 															</td>
-															<td class="checkable" style="width: 200px;">
+															<td class="checkable middle center" style="width: 200px;">
 																${inventoryItem?.product?.manufacturer }
 															</td>
-															<td class="checkable" style="width: 100px;">
+															<td class="checkable middle center" style="width: 100px;">
 																${inventoryItem?.product?.productCode }
 															</td>
-															<td class="checkable" style="width:50px; text-align: center; border-left: 1px solid lightgrey;">
+															<td class="checkable middle" style="width:50px; text-align: center; border-left: 1px solid lightgrey;">
 																${inventoryItem?.quantityToReceive?:0}
 															</td>
-															<td class="checkable" style="width:50px; text-align: center; border-right: 1px solid lightgrey;">
+															<td class="checkable middle" style="width:50px; text-align: center; border-right: 1px solid lightgrey;">
 																${inventoryItem?.quantityToShip?:0}
 															</td>
-															<td class="checkable" style="width:50px; text-align: center;">
+															<td class="checkable middle" style="width:50px; text-align: center;">
 																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
 																	${inventoryItem?.quantityOnHand?:0}
 																</g:link>

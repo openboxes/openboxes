@@ -1,6 +1,8 @@
 package org.pih.warehouse.order
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.pih.warehouse.core.Location;
@@ -22,14 +24,26 @@ class OrderService {
 	
 	def shipmentService;
 
+	/**
+	 * @param location
+	 * @return	a list of pending incoming order into the given location
+	 */
 	List<Order> getIncomingOrders(Location location) { 
-		return Order.findAllByDestination(location)
+		return Order.findAllByDestination(location).findAll { it.isPending() }
 	}
 
+	
+	/**
+	 * @param location
+	 * @return	a list of pending outgoing order from the given location
+	 */
 	List<Order> getOutgoingOrders(Location location) { 
-		return Order.findAllByOrigin(location)
+		return Order.findAllByOrigin(location).findAll { it.isPending() }
 	}
 	
+	/**
+	 * @return	a list of suppliers
+	 */
 	List<Location> getSuppliers() { 
 		def suppliers = []
 		LocationType supplierType = LocationType.findById(Constants.SUPPLIER_LOCATION_TYPE_ID);
@@ -40,6 +54,11 @@ class OrderService {
 		
 	}
 	
+	/**
+	 * @param id	an identifier for the order
+	 * @param recipientId
+	 * @return	an command object based on an order with the given  
+	 */
 	OrderCommand getOrder(Integer id, Integer recipientId) { 
 		def orderCommand = new OrderCommand();
 		
@@ -70,7 +89,11 @@ class OrderService {
 		return orderCommand;
 	}
 	
-		
+	/**
+	 * 
+	 * @param orderCommand
+	 * @return
+	 */
 	OrderCommand saveOrderShipment(OrderCommand orderCommand) { 
 		def shipmentInstance = new Shipment()
 		def shipments = orderCommand?.order?.shipments();
@@ -137,7 +160,11 @@ class OrderService {
 		return orderCommand;
 	}
 	
-	
+	/**
+	 * 
+	 * @param order
+	 * @return
+	 */	
 	Order saveOrder(Order order) { 		
 		// update the status of the order before saving
 		order.updateStatus()
@@ -148,6 +175,81 @@ class OrderService {
 		else {
 			throw new OrderException(message: "Unable to save order due to errors", order: order)
 		}
+	}
+	
+	/**
+	 *
+	 * @param location
+	 * @return
+	 */
+	List<Order> getPendingOrders(Location location) {
+		def orders = Order.withCriteria { 
+			or { 
+				eq("origin", location) 
+				eq("destination", location) 
+			}
+		}			
+		return orders; //.findAll { it.isPending() }
+	}
+
+	/**
+	 *
+	 * @param location
+	 * @param product
+	 * @return
+	 */
+	List<OrderItem> getPendingOrderItemsWithProduct(Location location, Product product) {
+		def orderItems = []
+		def orders = getPendingOrders(location);
+		log.info("orders " + orders)
+		orders.each {
+			def orderItemList = it.orderItems.findAll { it.product == product }
+			orderItemList.each { orderItems << it; }
+		}
+
+		return orderItems;
+	}
+	
+	
+	/**
+	 *
+	 * @param location
+	 * @return
+	 */
+	Map getIncomingQuantityByProduct(Location location) {
+		return getQuantityByProduct(getIncomingOrders(location))
+	}
+
+	/**
+	 * Returns a list of outgoing quantity per product given location.
+	 * @param location
+	 * @return
+	 */
+	Map getOutgoingQuantityByProduct(Location location) {
+		return getQuantityByProduct(getOutgoingOrders(location))
+	}
+  
+	
+	/**
+	 * Returns a map of order quantities per product given a list of orders.
+	 * 
+	 * @param orders
+	 * @return
+	 */
+	Map getQuantityByProduct(def orders) {
+		def quantityMap = [:]
+		orders.each { order ->
+			order.orderItems.each { orderItem ->
+				def product = orderItem.product
+				if (product) {
+					def quantity = quantityMap[product];
+					if (!quantity) quantity = 0;
+					quantity += orderItem.quantity;
+					quantityMap[product] = quantity
+				}
+			}
+		}
+		return quantityMap;
 	}
 	
 }

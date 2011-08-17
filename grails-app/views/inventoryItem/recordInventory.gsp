@@ -73,7 +73,7 @@
 										<g:hiddenField name="initialQuantity" value="0"/>							
 										<g:hiddenField name="inventoryItemType" value="${org.pih.warehouse.inventory.InventoryItemType.NON_SERIALIZED}"/>
 									 --%>			
-									<div class="form-content">
+									<div class="form-content" style="border: 1px solid lightgrey;">
 										<table id="inventoryItemsTable">
 											<thead>
 												<tr class="odd">
@@ -166,7 +166,7 @@
 												
 											</tbody>
 											<tfoot>
-												<tr class="prop" style="border-bottom: 1px solid lightgrey;">
+												<tr class="prop" >
 													<td colspan="5" style="text-align: center">
 														<button name="save" type="submit" class="positive">
 															<img src="${createLinkTo(dir:'images/icons/silk', file:'tick.png') }"/>&nbsp;<warehouse:message code="default.button.save.label"/>

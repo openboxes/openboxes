@@ -129,6 +129,10 @@ class CreateRequestWorkflowController {
 						requestItem.category = category
 					}
 				}
+				else { 
+					// FIXME Prevents an item from being add but does not provide a user-friendly error message 
+					return error();
+				}
 				
 				if (!requestItem.validate() || requestItem.hasErrors()) { 
 					flow.requestItem = requestItem
@@ -137,6 +141,7 @@ class CreateRequestWorkflowController {
 				
 				
 				flow.requestInstance.addToRequestItems(requestItem);
+				log.info ("Request item " + requestItem.description + " " + requestItem.product + " ")
 				if (!requestService.saveRequest(flow.requestInstance)) {
 					return error()
 				}
