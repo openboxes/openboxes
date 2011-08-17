@@ -30,7 +30,7 @@
 				<div id="chooseWarehouse">
 					
 					<g:if test="${flash.message}">
-				    	<div class="message">${flash.message}</div>
+				    	<div class="message">${warehouse.message(code:flash.message,default:flash.message)}</div>  <!-- we wrap this in a message tag since we can't call it directly from with the SecurityFilter -->
 					</g:if>		
 					<h1><warehouse:message code="dashboard.chooseWarehouse.label"/></h1>
 		    		<fieldset>

@@ -17,7 +17,7 @@
 				<g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}"> 						
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="Show Details" style="vertical-align: middle" />&nbsp;
 					<g:if test="${request.request.requestURL.toString().contains('showDetails')}"><warehouse:message code="shipping.showDetails.label"/></g:if>
-					<g:else>Show Details</g:else>
+					<g:else><warehouse:message code="shipping.showDetails.label"/></g:else>
 				</g:link>
 			</div>
 			<!-- you can only edit a shipment or it's packing list if you are at the origin warehouse, or if the origin is not a warehouse, and you are at the destination warehouse -->

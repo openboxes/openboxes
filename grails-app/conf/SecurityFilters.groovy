@@ -31,7 +31,7 @@ class SecurityFilters {
 				// When a user has an authenticated, we want to check if they have an active account
 				if (session?.user && !session?.user?.active) { 
 					session.user = null;
-					flash.message = "${warehouse.message(code: 'auth.accountRequestUnderReview.message')}"
+					flash.message = "auth.accountRequestUnderReview.message"
 					redirect(controller: 'auth', action:'login')
 					return false;
 				}
@@ -45,7 +45,7 @@ class SecurityFilters {
 
 						
 					if (session?.warehouseStillNotSelected) { 
-						flash.message = "${warehouse.message(code: 'warehouse.chooseWarehouseToManage.message')}"
+						flash.message = "warehouse.chooseWarehouseToManage.message"
 					}
 					
 					session.warehouseStillNotSelected = true;
