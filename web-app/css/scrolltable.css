@@ -85,21 +85,21 @@ html>body tbody.scrollContent {
 
 /* make TD elements pretty. Provide alternating classes for striping the table */
 /* http://www.alistapart.com/articles/zebratables/                             */
-tbody.scrollContent td, tbody.scrollContent tr.normalRow td {
+tbody.scrollContent td, tbody.scrollContent tr.odd td {
 	background: #FFF;
 	border-bottom: none;
 	border-left: none;
-	border-right: 1px solid #CCC;
-	border-top: 1px solid #DDD;
+	border-right: 0px solid #CCC;
+	border-top: 0px solid #DDD;
 	padding: 0px;
 }
 
-tbody.scrollContent tr.alternateRow td {
-	background: #EEE;
+tbody.scrollContent tr.even td {
+	background: #F7F7F7;
 	border-bottom: none;
 	border-left: none;
-	border-right: 1px solid #CCC;
-	border-top: 1px solid #DDD;
+	border-right: 0px solid #CCC;
+	border-top: 0px solid #DDD;
 	padding: 0px;
 }
 

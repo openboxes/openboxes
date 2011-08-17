@@ -75,7 +75,8 @@
 		         	<table style="border:none;">
 		         		<tr>
 		         			<td style="padding:0px; margin:0px;">
-		         				<g:render template="filters" model="[commandInstance:commandInstance, quickCategories:quickCategories]"/>						
+		         				<g:render template="filters" 
+		         					model="[commandInstance:commandInstance, quickCategories:quickCategories]"/>						
 		         			</td>
 		         		</tr>
 						<tr class="prop" style="border:1px dotted lightgrey;">
@@ -84,7 +85,7 @@
 			            		
 						            <g:form id="inventoryActionForm" controller="shipment" action="addToShipment">
 						            <div class="">
-						                <table border="0" cellpadding="0" cellspacing="0" width="100%" class="scrollTable"> 
+						                <table border="0" cellpadding="0" cellspacing="0" class="scrollTable"> 
 											<thead class="fixedHeader"> 
 					           					<tr class="odd">
 													<th style="width: 50px; border: 1px solid #F7F7F7;"></th>
@@ -162,7 +163,7 @@
 												</g:each>
 											</tbody> 
 										</table>		
-										<div style="padding: 10px;">
+										<div style="padding: 10px; border-top: 1px dashed lightgrey;">
 											<g:render template="./actions" model="[]"/>
 										</div>
 									</g:form>
@@ -177,11 +178,12 @@
 		<script>
 			$(document).ready(function() {
 				$(".checkable a").click(function(e) {
-					   e.stopPropagation();
+					e.stopPropagation();
 				});
 				$('.checkable').toggle(
 					function(event) {
 						$(this).parent().find('input').click();
+						console.log($(this).parent())
 						$(this).parent().addClass('checked');
 						return false;
 					},

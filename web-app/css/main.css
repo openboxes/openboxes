@@ -149,8 +149,8 @@ td.errors input {
 /* TABLES */
 
 table {
-    /*border: 1px solid #ccc;*/		/* jmiranda: removed because it's annoying to have to disabled the border */
-    width: 100%
+    /*border: 1px solid #ccc;*/		/* jmiranda: removed because it's annoying to have to disable the border */
+    width: 100%;
 }
 tr {
     border: 0;
