@@ -36,9 +36,9 @@ class JsonController {
 		def product = (params.productId) ? Product.get(params.productId as Integer) : null;
 		
 		log.info "find by lotnumber '" + lotNumber + "' and product '" + product + "'";
-		def item = inventoryService.findInventoryItemByProductAndLotNumber(product, lotNumber);
-		if (item) { 
-			quantity = inventoryService.getQuantityForInventoryItem(item, warehouse?.inventory)
+		def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(product, lotNumber);
+		if (inventoryItem) { 
+			quantity = inventoryService.getQuantityForInventoryItem(inventoryItem, warehouse?.inventory)
 		}
 		render quantity;
 	}
@@ -437,7 +437,7 @@ class JsonController {
 	def findInventoryItem = { 
 		log.info("params: " + params);
 		def product = Product.get(Integer.parseInt(params.productId));
-		def inventoryItem = inventoryService.findByProductAndLotNumber(product, params.lotNumber?:null);
+		def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(product, params.lotNumber?:null);
 		
 		// We need to pass the inventory.id param
 		//def inventory = Inventory.get(Integer.parseInt(params?.inventory?.id));
@@ -463,7 +463,7 @@ class JsonController {
 	def findProductByName = {
 		
 		log.debug(params)
-		def dateFormat = new SimpleDateFormat(Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT);
+		def dateFormat = new SimpleDateFormat(Constants.SHORT_MONTH_YEAR_DATE_FORMAT);
 		def products = new TreeSet();
 		
 		if (params.term) {			
@@ -475,8 +475,18 @@ class JsonController {
 		
 		def warehouse = Warehouse.get(params.warehouseId);
 		log.info ("warehouse: " + warehouse);
-		Map<InventoryItem, Integer> quantityMap = inventoryService.getQuantityForInventory(warehouse?.inventory)		
+		def quantityMap = 
+			inventoryService.getQuantityForInventory(warehouse?.inventory)		
 			
+		// FIXME Needed to create a new map with inventory item id as the index 
+		// in order to get the quantity below.  For some reason, the inventory item 
+		// object was getting toString()'d when used below as a key and therefore
+		// the keys were mismatched and the quantity was always null.
+		def idQuantityMap = [:]
+		quantityMap.keySet().each { 
+			idQuantityMap[it.id] = quantityMap[it]
+		}
+		
 		// Convert from products to json objects 
 		if (products) {
 			// Make sure items are unique
@@ -484,28 +494,30 @@ class JsonController {
 			products = products.collect() { product ->
 				def productQuantity = 0;
 				// We need to check to make sure this is a valid product
-				def inventoryItems = []
+				def inventoryItemList = []
 				if (product.id) { 
-					inventoryItems = InventoryItem.findAllByProduct(product);
-					inventoryItems = inventoryItems.collect() { inventoryItem ->
-						
+					def inventoryItems = InventoryItem.findAllByProduct(product);
+					inventoryItemList = inventoryItems.collect() { inventoryItem ->
 						// FIXME Getting the quantity from the inventory map does not work at the moment
-						def quantity = quantityMap[inventoryItem]?:0;
-						productQuantity += quantity;
+						def quantity = idQuantityMap[inventoryItem.id]?:0;
 						
 						// Create inventory items object
-						if (quantity > 0) { 
+						//if (quantity > 0) { 
 							[	
 								id: inventoryItem.id?:0, 
 								lotNumber: (inventoryItem?.lotNumber)?:"", 
 								expirationDate: (inventoryItem?.expirationDate) ? (dateFormat.format(inventoryItem?.expirationDate)) : "never", 
 								quantity: quantity
 							] 
-						}
+						//}
 					}
+					
+					// Sort using First-expiry, first out policy
+					inventoryItemList = inventoryItemList.sort { it?.expirationDate }
 				}
 				
 				def localizedName = localizationService.getLocalizedString(product.name)
+				
 				
 				// Convert product attributes to JSON object attributes
 				[	
@@ -515,7 +527,7 @@ class JsonController {
 					label: localizedName,
 					valueText: localizedName,
 					desc: product.description,
-					inventoryItems: inventoryItems,
+					inventoryItems: inventoryItemList,
 					icon: "none"
 				]
 			}

@@ -638,7 +638,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param entries
 	 * @return
 	 */
-	Map<InventoryItem, Integer> getQuantityByInventoryItemMap(List<TransactionEntry> entries) {
+	Map getQuantityByInventoryItemMap(List<TransactionEntry> entries) {
 		def quantityMap = [:]
 		                   
 		// first get the quantity and inventory item map
@@ -646,10 +646,12 @@ class InventoryService implements ApplicationContextAware {
 			getQuantityByProductAndInventoryItemMap(entries)
 		
 		// now collapse this down to be by product
-		quantityByProductAndInventoryItemMap.keySet().each {
-			def product = it
-			quantityByProductAndInventoryItemMap[product].keySet().each {
-				quantityMap[it] = quantityByProductAndInventoryItemMap[product][it]
+		quantityByProductAndInventoryItemMap.keySet().each { product ->
+			quantityByProductAndInventoryItemMap[product].keySet().each { inventoryItem ->
+				if (!quantityMap[inventoryItem]) { 
+					quantityMap[inventoryItem] = 0;
+				}
+				quantityMap[inventoryItem] += quantityByProductAndInventoryItemMap[product][inventoryItem]
 			}
 		}
 		return quantityMap

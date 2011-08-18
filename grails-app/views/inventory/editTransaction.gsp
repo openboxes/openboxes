@@ -18,12 +18,7 @@
         	.dialog form { width: 100%; } 
         	.header th { background-color: #525D76; color: white; } 
         </style>
-        
-
-		
-
     </head>    
-
     <body>
         <div class="body">
 
@@ -37,62 +32,71 @@
             </g:hasErrors>    
 
 			<div class="dialog" >
-			
-				<!-- Action menu -->
-				<div>
-					<span class="action-menu">
-						<button class="action-btn">
-							<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle;"/>
-							<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
-						</button>
-						<div class="actions">
-							<g:if test="${params?.product?.id }">
-								<div class="action-menu-item">
-									<g:link controller="inventoryItem" action="showStockCard" params="['product.id':params?.product?.id]">
-										<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_left.png')}"/>
-										${warehouse.message(code: 'transaction.backToStockCard.label', default: 'Back to stock card')}
-									</g:link>		
-								</div>	
-							</g:if>
-							<div class="action-menu-item">
-								<g:link controller="inventory" action="browse">
-									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_up.png')}"/>
-									${warehouse.message(code: 'transaction.backToInventory.label', default: 'Back to inventory')}
-								</g:link>			
-							</div>							
-
-							<div class="action-menu-item">
-								<g:link controller="inventory" action="listTransactions">
-									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_up.png')}"/>
-									${warehouse.message(code: 'transaction.back.label', default: 'Back to transactions')}
-								</g:link>			
-							</div>
-						</div>
-					</span>				
-				</div>			
-				<table style="height: 100%;">
-					<tr>
-						<td>							
-							<div class="left" >
-								<g:form action="saveNewTransaction">
-								
-									<fieldset>
-										
+				<fieldset>
+					<table style="height: 100%;">
+						<tr>
+							<td>			
+								<div class="summary">
+									<!-- Action menu -->
+									<span class="action-menu">
+										<button class="action-btn">
+											<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle;"/>
+											<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
+										</button>
+										<div class="actions">
+											<g:if test="${params?.product?.id }">
+												<div class="action-menu-item">
+													<g:link controller="inventoryItem" action="showStockCard" params="['product.id':params?.product?.id]">
+														<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_left.png')}"/>
+														${warehouse.message(code: 'transaction.backToStockCard.label', default: 'Back to stock card')}
+													</g:link>		
+												</div>	
+											</g:if>
+											<div class="action-menu-item">
+												<g:link controller="inventory" action="browse">
+													<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_up.png')}"/>
+													${warehouse.message(code: 'transaction.backToInventory.label', default: 'Back to inventory')}
+												</g:link>			
+											</div>							
+				
+											<div class="action-menu-item">
+												<g:link controller="inventory" action="listTransactions">
+													<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_up.png')}"/>
+													${warehouse.message(code: 'transaction.back.label', default: 'Back to transactions')}
+												</g:link>			
+											</div>
+										</div>
+									</span>
+									<span>
+										<g:if test="${transactionInstance?.id }">
+											${transactionInstance?.transactionNumber() }
+										</g:if>
+										<g:else>
+											<span class="fade">(new transaction)</span>
+										</g:else>
+									</span>
+								</div>					
+							</td>
+							
+							<td class="right">
+								<span>
+									<g:if test="${transactionInstance?.id }">
+										<warehouse:message code="enum.TransactionStatus.COMPLETE"/>
+									</g:if>
+									<g:else>
+										<warehouse:message code="enum.TransactionStatus.PENDING"/>
+									</g:else>
+								</span>
+							</td>
+						</tr>
+						<tr>
+							<td style="padding: 0px;">
+								<div class="left" >
+									<g:form action="saveNewTransaction">
 										<g:hiddenField name="id" value="${transactionInstance?.id}"/>
+										<g:hiddenField name="inventory.id" value="${warehouseInstance?.inventory?.id}"/>
 										<table class="striped">
-											<tr class="prop">
-												<td>
-													<label><warehouse:message code="transaction.transactionId.label"/></label>
-												</td>
-												<td>
-													<span class="value">
-														<g:if test="${transactionInstance?.id }">
-															${transactionInstance?.id }
-														</g:if>
-														<g:else><span class="fade">(new transaction)</span></g:else>
-													</span>
-												</td>
-											</tr>										
+											<%-- 
 											<tr class="prop">
 												<td>
 													<label><warehouse:message code="inventory.label"/></label>
@@ -104,6 +108,18 @@
 													</span>								
 												</td>
 											</tr>
+											--%>
+											<tr class="prop">
+												<td>
+													<label><warehouse:message code="transaction.date.label"/></label>
+												</td>
+												<td>
+													<span class="value">
+														<g:jqueryDatePicker id="transactionDate" name="transactionDate"
+																value="${transactionInstance?.transactionDate}" format="MM/dd/yyyy"/>
+													</span>								
+												</td>
+											</tr>											
 											<tr class="prop">
 												<td>
 													<label><warehouse:message code="transaction.type.label"/></label>
@@ -115,18 +131,8 @@
 							                       	</span>
 												</td>
 											</tr>
+
 											<tr class="prop">
-												<td>
-													<label><warehouse:message code="transaction.date.label"/></label>
-												</td>
-												<td>
-													<span class="value">
-														<g:jqueryDatePicker id="transactionDate" name="transactionDate"
-																value="${transactionInstance?.transactionDate}" format="MM/dd/yyyy"/>
-													</span>								
-												</td>
-											</tr>
-											<tr>
 												<td>
 													<label><warehouse:message code="default.from.label"/></label>
 												</td>
@@ -137,7 +143,7 @@
 						                       		</span>
 												</td>
 											</tr>
-											<tr>
+											<tr class="prop">
 												<td>
 													<label><warehouse:message code="default.to.label"/></label>
 												</td>
@@ -148,6 +154,7 @@
 													</span>
 												</td>
 											</tr>
+											<%-- 
 											<tr>
 												<td>
 													<label><warehouse:message code="transaction.numEntries.label"/></label>
@@ -158,100 +165,109 @@
 													</span>
 												</td>
 											</tr>
-										</table>
-									</fieldset>
-									<fieldset>
-										<div>
-											<table id="transaction-entries-table" border="0" style="margin: 0; padding: 0; border: 0px solid lightgrey; background-color: white;">
-												<thead>
-													<tr class="odd">
-														<th></th>
-														<th style="width: 60%"><warehouse:message code="product.label"/></th>
-														<th nowrap="true"><warehouse:message code="product.lotNumber.label"/></th>
-														<th nowrap="true"><warehouse:message code="default.expires.label"/></th>
-														<th><warehouse:message code="default.qty.label"/></th>
-														<th><warehouse:message code="default.actions.label"/></th>
-													</tr>
-												</thead>
-												
-												<tbody>
-													<tr class="empty">
-														<td colspan="6" style="text-align: center">
-															<span class="fade"><warehouse:message code="transaction.noItems.message"/></span>
-														
-														</td>
-													</tr>
-													<!--  dynamically populated -->
-												</tbody>
-											</table>
-										</div>							
-									</fieldset>
-									
-									<fieldset>
-										<div style="text-align: center; padding: 10px;" class="odd">
-											<button type="submit" name="save">								
-												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'tick.png')}"/>&nbsp;<warehouse:message code="default.button.save.label"/>&nbsp;
-											</button>
-											
-											<%-- 
-											&nbsp;
-											<button name="clear" class="clear">								
-												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png')}"/>&nbsp;Clear&nbsp;
-											</button>
 											--%>
-											<g:if test="${transactionInstance?.id }">
-												&nbsp;
-												<button name="_action_deleteTransaction" id="${transactionInstance?.id }" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-							    					<img src="${createLinkTo(dir:'images/icons/silk',file:'bin.png')}" alt="Delete" />
-													&nbsp;${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}&nbsp;
-												</button>							
-											</g:if>
-										</div>		
-									</fieldset>		
-								</g:form>
-							</div>
-						</td>
-						
-						<td style="border: 1px solid lightgrey; width: 25%; padding: 0px; margin: 0; height: 100%; background-color: #f7f7f7;">
+										
+										
+											<tr class="prop">
+												<td colspan="2" style="padding: 0px;">
+													<div>
+														<table id="transaction-entries-table" border="0" style="margin: 0; padding: 0; border: 0px solid lightgrey; background-color: white;">
+															<thead>
+																<tr class="odd">
+																	<th style="width: 60%"><warehouse:message code="product.label"/></th>
+																	<th nowrap="true"><warehouse:message code="product.lotNumber.label"/></th>
+																	<th nowrap="true"><warehouse:message code="default.expires.label"/></th>
+																	<th><warehouse:message code="default.qty.label"/></th>
+																	<th><warehouse:message code="default.actions.label"/></th>
+																</tr>
+															</thead>
+															
+															<tbody>
+																<tr class="empty">
+																	<td colspan="6" style="text-align: center">
+																		<span class="fade"><warehouse:message code="transaction.noItems.message"/></span>
+																	
+																	</td>
+																</tr>
+																<!--  dynamically populated -->
+															</tbody>
+															
+														</table>
+													</div>	
+												</td>
+											</tr>		
+											<tr class="prop">
+												<td colspan="6">
+													<div style="text-align: center;">
+														<button type="submit" name="save">								
+															<img src="${createLinkTo(dir: 'images/icons/silk', file: 'tick.png')}"/>&nbsp;<warehouse:message code="default.button.save.label"/>&nbsp;
+														</button>
+														
+														<%-- 
+														&nbsp;
+														<button name="clear" class="clear">								
+															<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png')}"/>&nbsp;Clear&nbsp;
+														</button>
+														--%>
+														<g:if test="${transactionInstance?.id }">
+															&nbsp;
+															<button name="_action_deleteTransaction" id="${transactionInstance?.id }" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+										    					<img src="${createLinkTo(dir:'images/icons/silk',file:'bin.png')}" alt="Delete" />
+																&nbsp;${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}&nbsp;
+															</button>							
+														</g:if>
+													</div>		
+												
+												
+												</td>
+											</tr>											
+											
+										</table>				
+									</g:form>
+								</div>
+							</td>
 							
-							<h3 style="padding: 10px;"><warehouse:message code="transaction.addAnItem.label"/></h3>
-							<input type="hidden" id="hiddenProductId" value=""/>
-							<input type="hidden" id="hiddenProductName" value=""/>
-							<div style="padding: 10px;">
-								<g:textField  id="productSearch" name="productSearch" value="${warehouse.message(code:'transaction.searchForProduct.label')}" size="25"/> 										
-							</div>				
-							<div id="product-details">
-								<table>
-									<tr class="prop">
-										<td><b><warehouse:message code="default.description.label"/></b></td>
-										<td><span id="product-details-name"></span></td>
-									</tr>
-									<tr class="prop">
-										<td><b><warehouse:message code="product.manufacturer.label"/></b></td>
-										<td><span id="product-details-manufacturer"></span></td>
-									</tr>
-									<tr class="prop">
-										<td colspan="2" style="padding: 0; margin: 0;">
-											<table id="product-details-lotNumbers">
-												<thead>
-													<tr class="odd">
-														<th></th>
-														<th><warehouse:message code="item.label"/></th>
-														<th><warehouse:message code="default.expires.label"/></th>
-														<th><warehouse:message code="default.qty.label"/></th>
-														<th></th>
-													</tr>
-												</thead>
-												<tbody>
-												</tbody>														
-											</table>
-										</td>
-									</tr>
-								</table>									
-							</div>
-						</td>
-					</tr>
-				</table>
+							<td style="width: 30%; padding: 0px; margin: 0; height: 100%; border-top: 1px solid lightgrey; border-left: 1px solid lightgrey; background-color: #f7f7f7;">
+								
+								<h3 style="padding: 10px;"><warehouse:message code="transaction.addAnItem.label"/></h3>
+								<input type="hidden" id="hiddenProductId" value=""/>
+								<input type="hidden" id="hiddenProductName" value=""/>
+								<div style="padding: 10px;">
+									<g:textField  id="productSearch" name="productSearch" value="${warehouse.message(code:'transaction.searchForProduct.label')}" size="25"/> 										
+								</div>				
+								<div id="product-details">
+									<table>
+										<tr class="prop">
+											<td><b><warehouse:message code="default.description.label"/></b></td>
+											<td><span id="product-details-name"></span></td>
+										</tr>
+										<tr class="prop">
+											<td><b><warehouse:message code="product.manufacturer.label"/></b></td>
+											<td><span id="product-details-manufacturer"></span></td>
+										</tr>
+										<tr class="prop">
+											<td colspan="2" style="padding: 0; margin: 0;">
+												<table id="product-details-lotNumbers">
+													<thead>
+														<tr class="odd">
+															<th></th>
+															<th><warehouse:message code="item.label"/></th>
+															<th><warehouse:message code="default.expires.label"/></th>
+															<th><warehouse:message code="default.qty.label"/></th>
+															<th></th>
+														</tr>
+													</thead>
+													<tbody>
+													</tbody>														
+												</table>
+											</td>
+										</tr>
+									</table>									
+								</div>
+							</td>
+						</tr>
+					</table>
+				</fieldset>
 			</div>
 		</div>
 
@@ -279,7 +295,7 @@
 							Qty: '${transactionEntry?.quantity}', 
 							ExpirationMonth: '<g:formatDate date="${transactionEntry?.inventoryItem?.expirationDate}" format="M"/>', 
 							ExpirationYear: '<g:formatDate date="${transactionEntry?.inventoryItem?.expirationDate}" format="yyyy"/>',
-							ExpirationDate: '<g:formatDate date="${transactionEntry?.inventoryItem?.expirationDate}" format="MMM yyyy"/>'
+							ExpirationDate: '<g:formatDate date="${transactionEntry?.inventoryItem?.expirationDate}" format="MM/yyyy"/>'
 						};
 						
 						transaction.TransactionEntries.push(entry);
@@ -621,6 +637,8 @@
 	    		    			"<td colspan=\"3\"><warehouse:message code="transaction.addNewLotSerialNumber.label"/></td>" + 
     		    				"<td></td>" + 
     		    				"</tr>";
+    		    				
+    		    			// Add lot number row
 							$("#product-details-lotNumbers > tbody:first").append($(newLotNumber));	        		    		
 	    		    		
 							
@@ -688,9 +706,6 @@
         <script id="existing-item-template" type="x-jquery-tmpl">						
 			<tr id="row-{{= Index }}">
 				<td>
-					<span class="fade">{{= Index }}</span>
-				</td>
-				<td>
 					<!-- Product ID: {{= ProductId}} --> 
 					
 					{{= ProductName}} 
@@ -737,9 +752,6 @@
 		
         <script id="new-item-template" type="x-jquery-tmpl">						
 			<tr id="row-{{= Index }}">
-				<td>
-					<span class="fade">{{= Index }}</span>
-				</td>
 				<td>
 					<!-- Product ID: {{= ProductId}}  -->
 					{{= ProductName}} 

@@ -30,9 +30,8 @@ class InventoryItem implements Serializable {
 	
 	//static transients = ['quantity']
 
-	// 
 	static mapping = {
-		cache true
+		//cache true
 	}
 	
 	// Notice the unique constraint on lotNumber/product
@@ -42,6 +41,4 @@ class InventoryItem implements Serializable {
 		expirationDate(nullable:true)
 		
     }
-	
-	
 }

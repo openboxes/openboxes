@@ -197,23 +197,7 @@ class InventoryController {
 	}
 	
 	
-	def addTo = {
-		log.info("Add to ... " + params)
-		
-		if (params.actionButton) { 
-			if (params.actionButton.equals("addToShipment")) { 
-				chain(controller: "shipment", action: "addToShipment", params: params)
-			}
-			else if (params.actionButton.equals("addToTransaction")) {
-				chain(controller: "inventory", action: "createTransaction", params: params)
-			}
-			else { 
-				flash.message = "${warehouse.message(code: 'action.not.found.message', args: [params.actionButton])}"
-			}
-		}
-		redirect(action: "browse");
-		
-	}
+
 	
 	
 	def addToInventory = {
@@ -589,11 +573,33 @@ class InventoryController {
 		redirect(action: "listAllTransactions")
 	}
 	
+	def addTo = {
+		log.info("Add to ... " + params)
+		
+		if (params.actionButton) {
+			if (params.actionButton.equals("addToShipment")) {
+				chain(controller: "shipment", action: "addToShipment", params: params)
+			}
+			else if (params.actionButton.equals("addToTransaction")) {
+				chain(controller: "inventory", action: "createTransaction", params: params)
+			}
+			else {
+				flash.message = "${warehouse.message(code: 'action.not.found.message', args: [params.actionButton])}"
+			}
+		}
+		redirect(action: "browse");
+		
+	}
+	
+	
 	def createTransaction = { 
 		
 		def transactionInstance = new Transaction();
 		def productList = [] 
+		
+		// From ?
 		if (flash.productList) { 
+			log.info("Using flash.productList");
 			flash.productList.each { 
 				productList << it;
 			}
@@ -601,7 +607,7 @@ class InventoryController {
 		
 		// From show stock card page
 		if (params?.product?.id) { 
-			// 
+			log.info("Using params.product.id");
 			def product = Product.get(params.product.id)
 			if (product) { 
 				productList << product.id;
@@ -610,6 +616,7 @@ class InventoryController {
 		
 		// From inventory browser
 		if (params.productId) { 
+			log.info("Using params.productId");
 			def productIds = params.list('productId')
 			productList = productIds.collect { Long.valueOf(it); }			
 		}

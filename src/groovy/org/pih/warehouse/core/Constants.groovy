@@ -10,6 +10,7 @@ class Constants {
 	static final String DEFAULT_DATE_TIME_FORMAT = "dd/MMM/yyyy HH:mm:ss z"
 	static final String DEFAULT_TIME_FORMAT = "HH:mm:ss z"
 	static final String DEFAULT_MONTH_YEAR_DATE_FORMAT = "MMM yyyy"
+	static final String SHORT_MONTH_YEAR_DATE_FORMAT = "MM/yyyy"
 	
 	static final DateFormat DEFAULT_DATE_FORMATTER = new SimpleDateFormat(DEFAULT_DATE_FORMAT);	
 
