@@ -22,6 +22,11 @@
 			</li>
 			<li>
 				<span class="menuButton">
+					<g:link controller="inventory" action="listLowStock"><warehouse:message code="inventory.lowStock.label"/></g:link> 
+				</span>
+			</li>
+			<li>
+				<span class="menuButton">
 					<g:link controller="inventory" action="listAllTransactions"><warehouse:message code="transaction.list.label"/></g:link> 
 				</span>
 			</li>

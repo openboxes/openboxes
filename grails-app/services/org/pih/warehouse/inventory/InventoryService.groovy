@@ -672,7 +672,37 @@ class InventoryService implements ApplicationContextAware {
 		}
 		return getQuantityByProductMap(transactionEntries)		
 	}
-		
+	
+	/**
+	* Gets a product-to-quantity maps for all products in the selected inventory
+	* whose quantity falls below a the minimum or reorder level
+	* (Note that items that are below the minimum level are excluded from
+	* the list of items below the reorder level)
+	*/
+   Map<String,Map<Product,Integer>> getProductsBelowMinimumAndReorderQuantities(Inventory inventoryInstance) {
+	   
+	   def inventoryLevels = getInventoryLevelsByInventory(inventoryInstance)
+		   
+	   Map<Product,Integer> reorderProductsQuantityMap = new HashMap<Product,Integer>()
+	   Map<Product,Integer> minimumProductsQuantityMap = new HashMap<Product,Integer>()
+	   
+	   for (level in inventoryLevels) {
+		   // getQuantityByInventory returns an Inventory Item to Quantity map, so we want to sum all the values in this map to get the total quantity
+		   def quantity = getQuantityByInventoryAndProduct(inventoryInstance, level.product)?.values().sum { it } ?: 0
+		   
+		   if (quantity <= level.minQuantity) {
+			   minimumProductsQuantityMap[level.product] = quantity
+		   }
+		   else if (quantity <= level.reorderQuantity) {
+			   reorderProductsQuantityMap[level.product] = quantity
+		   }
+		   
+	   }
+	  
+	   return [minimumProductsQuantityMap: minimumProductsQuantityMap, reorderProductsQuantityMap: reorderProductsQuantityMap]
+   } 
+
+  
 	/**
 	 * Gets the quantity of a specific inventory item at a specific inventory
 	 * 
@@ -1067,6 +1097,13 @@ class InventoryService implements ApplicationContextAware {
 		return inventoryItems;
 	}
 
+
+	/**
+	 * Get all the inventory levels associated with the given inventory
+	 */
+	List<InventoryLevel> getInventoryLevelsByInventory(Inventory inventoryInstance) {
+		return InventoryLevel.findAllByInventory(inventoryInstance)
+	}	
 	
 	/**
 	 * Get a single inventory level instance for the given product and inventory.

@@ -402,6 +402,28 @@ class InventoryController {
 			categorySelected: categorySelected, threshholdSelected: threshholdSelected, excludeExpired: excludeExpired]
 	}
 	
+	def listLowStock = {
+		def warehouse = Warehouse.get(session.warehouse.id)
+		def results = inventoryService.getProductsBelowMinimumAndReorderQuantities(warehouse.inventory)
+		
+		// Set of categories that we can filter by
+		def categories = [] as Set
+		categories.addAll(results['reorderProductsQuantityMap']?.keySet().collect { it.category })
+		categories.addAll(results['minimumProductsQuantityMap']?.keySet().collect { it.category })
+		categories = categories.findAll { it != null }
+		
+		// poor man's filter
+		def categorySelected = (params.category) ? Category.get(params.category as int) : null;
+		log.info "categorySelected: " + categorySelected
+		if (categorySelected) {
+			results['reorderProductsQuantityMap'] = results['reorderProductsQuantityMap'].findAll { it.key?.category == categorySelected }
+			results['minimumProductsQuantityMap'] = results['minimumProductsQuantityMap'].findAll { it.key?.category == categorySelected }
+		}
+		
+		[reorderProductsQuantityMap: results['reorderProductsQuantityMap'], minimumProductsQuantityMap: results['minimumProductsQuantityMap'], 
+			categories: categories, categorySelected: categorySelected]
+	}
+	
 	
 	
 	def listAllTransactions = {		

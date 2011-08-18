@@ -81,7 +81,7 @@
 												<tr class="${(counter++ % 2) == 0 ? 'odd' : 'even'}">            
 													<td>
 														<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
-															${inventoryItem?.product?.name } 
+															<format:product product="${inventoryItem?.product}"/> 
 															<span class="fade"><format:category category="${inventoryItem?.product?.category}"/> </span>
 														</g:link>
 														
@@ -120,7 +120,7 @@
 												<th><warehouse:message code="item.label"/></th>
 												<th><warehouse:message code="inventory.lotNumber.label"/></th>
 												<th><warehouse:message code="default.expired.label"/></th>
-												<th class="center"><warehouse:message code="default.quantity.label"/></th>
+												<th class="center"><warehouse:message code="default.qty.label"/></th>
 					                        </tr>
 					                    </thead>
 					       	           	<tbody>			
