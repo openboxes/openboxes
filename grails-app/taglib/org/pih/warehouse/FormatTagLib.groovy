@@ -68,33 +68,69 @@ class FormatTagLib {
 
 	 /**
 	  * Custom tag to display a product
+	  * 
+	  * Attributes:
+	  * product (required): the product to display 
+	  * locale (optional): the locale to localize for; if no locale is specified, the locale associated with the current user is used; 
+	  * 				   if no current user, the system default locale is used, (specified in grailsApplication.config.warehouse.defaultLocale); 
+	  * 				   if the locale attribute is specified, but set to "null", the "default" name is returned
+	  * 
+	  * Currently simply displays the localized name of the product
 	  */
 	 def product = { attrs ->		 
 	 	if (attrs.product != null) {
+			 // use the locale specified in the tag if it exists, otherwise use the user locale if it exists, otherwise use the system default locale
+			 // (note that we explicitly do a containsKey test because it is possible that the locale attribute has been specified but has been set to null--which means show the default locale)
+			 Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
+			 
 			 // default format is to display the localized name of the product 
-			 out << LocalizationUtil.getLocalizedString(attrs.product.name, session?.user?.locale ?: defaultLocale)
+			 out << LocalizationUtil.getLocalizedString(attrs.product.name, locale)
 		 }
 		 // TODO: add more formats
 	 }
 	 
 	 /**
 	 * Custom tag to display a category
+	 * 
+	 * Attributes:
+	 * category (required): the category to display 
+	 * locale (optional): the locale to localize for; if no locale is specified, the locale associated with the current user is used; 
+	 * 				      if no current user, the system default locale is used, (specified in grailsApplication.config.warehouse.defaultLocale); 
+	 * 				      if the locale attribute is specified, but set to "null", the "default" name is returned
+	 * 
+	 * Currently simply displays the localized name of the category
 	 */
 	def category = { attrs ->
 		if (attrs.category != null) {
+			// use the locale specified in the tag if it exists, otherwise use the user locale if it exists, otherwise use the system default locale
+			// (note that we explicitly do a containsKey test because it is possible that the locale attribute has been specified but has been set to null--which means show the default locale)
+			Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
+			
 			// default format is to display the localized name of the catergory
-			out << LocalizationUtil.getLocalizedString(attrs.category.name, session?.user?.locale ?: defaultLocale)
+			out << LocalizationUtil.getLocalizedString(attrs.category.name, locale)
 		}
 		// TODO: add more formats
 	}
 	 
 	 /**
 	  * Custom tag to display warehouse metadata is a standard, localized manner
+	  * 
+	  * Attributes:
+	  * obj (required): the object to localize--tag currently supports standard OpenBoxes objects, as well as Strings, and Enums
+	  * locale (optional): the locale to localize for; if no locale is specified, the locale associated with the current user is used; 
+	  * 				   if no current user, the system default locale is used, (specified in grailsApplication.config.warehouse.defaultLocale); 
+	  * 				   if the locale attribute is specified, but set to "null", the "default" name is returned
+	  * 
+	  * If the obj is a String, the tag assumes the string is in format "Default Value|fr:French Value|es:Spanish Value"
+	  * If the obj is an OpenBoxes object, the tag operates on the "name" property of the object, assuming it is a String in the format specified above
+	  * If the obj is an enum, the tag returns the localized message.properties code "enum.className.value" (ie enum.ShipmentStatusCode.PENDING) 					
 	  */
 	 def metadata = { attrs ->
-		 Locale locale = attrs.locale ?: session?.user?.locale ?: defaultLocale
-		 
 		 if (attrs.obj != null) {
+			 // use the locale specified in the tag if it exists, otherwise use the user locale if it exists, otherwise use the system default locale
+			 // (note that we explicitly do a containsKey test because it is possible that the locale attribute has been specified but has been set to null--which means show the default locale)
+			 Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
+			 
 			 // handle String; localize the string directly
 			 if (attrs.obj instanceof String) {
 				 out << LocalizationUtil.getLocalizedString(attrs.obj,  locale)

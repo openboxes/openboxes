@@ -7,6 +7,7 @@ public class LocalizationUtil {
 	
 	/**
 	 * Returns the value associated with the passed locale
+	 * If locale is null, returns the default value
 	 */
 	static String getLocalizedString(String str, Locale locale) {
 		
@@ -61,22 +62,6 @@ public class LocalizationUtil {
 	* Returns the default value for this string (which is just the first name in the pipe-delimited list)
 	*/
 	static String getDefaultString(String str) {
-		
-		// return blank string if no value
-		if (!str) {
-			return ""
-		}
-		
-		// split into the the various localized values
-		def strings = str.split(delimiter)
-		
-		// if there aren't any values, return empty string
-		if (strings.size() == 0) {
-			return ""
-		}
-		// otherwise, just return the first value
-		else {
-			return strings[0]
-		}
+		return getLocalizedString(str, null)
 	}
 }

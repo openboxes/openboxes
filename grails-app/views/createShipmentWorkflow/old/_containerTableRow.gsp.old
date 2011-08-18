@@ -1,6 +1,6 @@
 <tr class="" style="border: 1px solid lightgrey;">
 	<td style="vertical-align: middle;">
-		<img src="${createLinkTo(dir:'images/icons/shipmentType',file:containerInstance.containerType.name.toLowerCase() + '.jpg')}" style="vertical-align: middle"/>
+		<img src="${createLinkTo(dir:'images/icons/shipmentType',file:format.metadata(obj:containerInstance?.containerType, locale:null).toLowerCase() + '.jpg')}" style="vertical-align: middle"/>
 		<g:link action="createShipment" event="editContainer" params="[containerToEditId:containerInstance?.id]">
 			&nbsp;<span class="large">${containerInstance?.name}</span>
 		</g:link>
