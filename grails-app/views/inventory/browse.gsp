@@ -137,10 +137,10 @@
 																	</g:else>
 																</g:link> 
 															</td>
-															<td class="checkable middle center" style="width: 200px;">
+															<td class="checkable middle" style="width: 200px;">
 																${inventoryItem?.product?.manufacturer }
 															</td>
-															<td class="checkable middle center" style="width: 100px;">
+															<td class="checkable middle" style="width: 100px;">
 																${inventoryItem?.product?.productCode }
 															</td>
 															<td class="checkable middle" style="width:50px; text-align: center; border-left: 1px solid lightgrey;">
