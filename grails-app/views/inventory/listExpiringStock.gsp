@@ -27,7 +27,7 @@
 						           	<td class="filter-list-item">
 						           		<g:select name="category"
 														from="${categories}"
-														optionKey="id" optionValue="name" value="${categorySelected?.id}" 
+														optionKey="id" optionValue="${{format.category(category:it)}}" value="${categorySelected?.id}" 
 														noSelection="['':'--All--']" />   
 									</td>
 									<td>
