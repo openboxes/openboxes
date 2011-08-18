@@ -574,14 +574,26 @@ class InventoryController {
 	}
 	
 	def addTo = {
-		log.info("Add to ... " + params)
+		log.info("addTo params " + params)
 		
 		if (params.actionButton) {
 			if (params.actionButton.equals("addToShipment")) {
-				chain(controller: "shipment", action: "addToShipment", params: params)
+				redirect(controller: "shipment", action: "addToShipment", params: params)
+				return;
 			}
 			else if (params.actionButton.equals("addToTransaction")) {
-				chain(controller: "inventory", action: "createTransaction", params: params)
+				
+				// Process productId parameters from inventory browser
+				if (params.productId) {
+					log.info("Using params.productId");
+					def productIds = params.list('productId')
+					log.info("productIds " + productIds)
+					def productList = productIds.collect { Long.valueOf(it); }
+					flash.productList = productList;
+				}
+				
+				redirect(controller: "inventory", action: "createTransaction", params: params)
+				return;
 			}
 			else {
 				flash.message = "${warehouse.message(code: 'action.not.found.message', args: [params.actionButton])}"
@@ -593,11 +605,11 @@ class InventoryController {
 	
 	
 	def createTransaction = { 
-		
+		log.info("createTransaction params " + params)
 		def transactionInstance = new Transaction();
 		def productList = [] 
 		
-		// From ?
+		// From addTo action
 		if (flash.productList) { 
 			log.info("Using flash.productList");
 			flash.productList.each { 
@@ -614,20 +626,15 @@ class InventoryController {
 			}
 		}
 		
-		// From inventory browser
-		if (params.productId) { 
-			log.info("Using params.productId");
-			def productIds = params.list('productId')
-			productList = productIds.collect { Long.valueOf(it); }			
-		}
-		
 		if (productList) { 
 			productList.each { 
+				log.info("find product " + it)
 				def product = Product.get(it);
 				def warehouse = Warehouse.get(session.warehouse.id)
 				def inventory = Inventory.get(warehouse.inventory.id);
-				log.info ("inventory " + inventory)
-				def inventoryItems = inventoryService.getInventoryItemsByProductAndInventory(product, inventory);
+				log.info ("inventory=" + inventory + ", product=" + product)
+				//def inventoryItems = inventoryService.getInventoryItemsByProductAndInventory(product, inventory);
+				def inventoryItems = inventoryService.getInventoryItemsByProduct(product);
 				log.info "inventory items " + inventoryItems
 				inventoryItems.each { inventoryItem ->
 					def transactionEntry = new TransactionEntry(product: product, inventoryItem: inventoryItem, quantity: 0);
