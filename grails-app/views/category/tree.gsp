@@ -26,7 +26,7 @@
 		        		
 							<div style="padding:10px; text-align: right">
 								<span class="menuButton">
-				            		<g:link class="new" controller="category" action="tree" params="[addCategory:'addCategory']"><warehouse:message code="default.add.label" args="[entityName]"/></g:link>
+				            		<g:link class="new" controller="category" action="tree" params="[addCategory:'addCategory']"><warehouse:message code="default.add.label" args="[warehouse.message(code: 'category.label')]"/></g:link>
 				            	</span>										    	
 							</div>						
 		        		
