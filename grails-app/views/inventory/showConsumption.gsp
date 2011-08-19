@@ -3,7 +3,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         
-        <title><g:message code="inventory.expiringStock.label"/></title>    
+        <title><g:message code="inventory.consumption.label"/></title>    
     </head>    
 
 	<body>
@@ -11,6 +11,8 @@
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
+			
+			<%-- 
 			<table>
 				<tr>
             		<td style="border: 1px solid lightgrey; background-color: #f5f5f5;">
@@ -50,36 +52,47 @@
             		</td>
             	</tr>
 			</table>
-			<br/>
-			
+			--%>
 				
 			<table>
 				<tr>					
 					<td>
 						<label>
-							<img src="${resource(dir:'images/icons/silk',file:'error.png')}" style="vertical-align: middle"/> 
+							<img src="${resource(dir:'images/icons/silk',file:'cup.png')}" style="vertical-align: middle"/> 
 							<warehouse:message code="inventory.consumption.label"/>
 						</label>
+						<div class="message">
+							<warehouse:message code="inventory.consumption.message"/>
+						</div>
 						<div class="list box">
 							
 							<table>
 			                    <thead>
 			                        <tr>   
-										<th><warehouse:message code="item.label"/></th>
-										<th><warehouse:message code="inventory.lotNumber.label"/></th>
-										<th><warehouse:message code="inventory.expires.label"/></th>
-										<th class="center"><warehouse:message code="default.qty.label"/></th>
+										<th><warehouse:message code="category.label"/></th>
+										<th><warehouse:message code="product.label"/></th>
+										<th><warehouse:message code="inventory.consumeQuantity.label"/></th>
+										<th class="center"></th>
 			                        </tr>
 			                    </thead>
 			       	           	<tbody>			
-			       	     			<g:set var="counter" value="${0 }" />
-									<g:each var="transaction" in="${transactions}" status="i">           
-										<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
-											<td>
-												${transaction?.id }
-
-											</td>
-										</tr>						
+									<g:each var="entry" in="${productMap}" status="i">           
+										<tr class="prop">
+											<th colspan="3">${entry.key }</th>
+										</tr>
+										<g:each var="product" in="${entry.value}" status="j">
+											<tr class="${(j % 2) == 0 ? 'odd' : 'even'}">            
+												<td>
+													${product.category.name }
+												</td>
+												<td>
+													${product.name }
+												</td>
+												<td>
+													${consumptionMap[product] }
+												</td>
+											</tr>						
+										</g:each>
 									</g:each>
 								</tbody>
 							</table>				

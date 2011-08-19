@@ -158,10 +158,10 @@ class InventoryService implements ApplicationContextAware {
 	 * 	
 	 * @return
 	 */
-	List getConsumptionTransactions() { 
+	List getConsumptionTransactions(Date startDate, Date endDate) { 
 		def CONSUMPTION_TYPE = TransactionType.get(Constants.CONSUMPTION_TRANSACTION_TYPE_ID);
 		log.info("type " + CONSUMPTION_TYPE)
-		def transactions = Transaction.findAllByTransactionType(CONSUMPTION_TYPE)
+		def transactions = Transaction.findAllByTransactionTypeAndTransactionDateBetween(CONSUMPTION_TYPE, startDate, endDate)
 		return transactions;
 	}
 	

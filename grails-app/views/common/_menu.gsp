@@ -1,5 +1,4 @@
-<div id="leftnav-accordion-menu" class="accordion menu">
-	
+<div id="leftnav-accordion-menu" class="accordion menu">	
 	<h6 class="menu-heading">
 		<warehouse:message code="inventory.label"  default="Inventory"/>
 	</h6>
@@ -8,26 +7,6 @@
 			<li>
 				<span class="menuButton">
 					<g:link controller="inventory" action="browse"><warehouse:message code="inventory.browse.label"/></g:link>
-				</span>
-			</li>
-			<li>
-				<span class="menuButton">
-					<g:link controller="inventory" action="listDailyTransactions"><warehouse:message code="transaction.dailyTransactions.label"/></g:link> 
-				</span>
-			</li>
-			<li>
-				<span class="menuButton">
-					<g:link controller="inventory" action="listExpiringStock"><warehouse:message code="inventory.expiringStock.label"/></g:link> 
-				</span>
-			</li>
-			<li>
-				<span class="menuButton">
-					<g:link controller="inventory" action="listLowStock"><warehouse:message code="inventory.lowStock.label"/></g:link> 
-				</span>
-			</li>
-			<li>
-				<span class="menuButton">
-					<g:link controller="inventory" action="showConsumption"><warehouse:message code="inventory.consumption.label"/></g:link> 
 				</span>
 			</li>
 			<li>
@@ -91,8 +70,6 @@
 				</span>
 			</li>					
 		</ul>
-		
-						
 	</div>			
 	
 	
@@ -125,12 +102,33 @@
 			</li>		
 		</ul>										
 	</div>
-	<%-- 
 	<h6 class="menu-heading">
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'chart_bar.png')}" alt="Reports" style="vertical-align: middle"/> &nbsp; 
-		<warehouse:message code="settings.label" args="['Reports']" default="Reports"/>
+		<warehouse:message code="report.reports.label"/>
 	</h6>
-	--%>
+	<div class="menu-section">
+		<ul>
+			<li>
+				<span class="menuButton">
+					<g:link controller="inventory" action="listDailyTransactions"><warehouse:message code="transaction.dailyTransactions.label"/></g:link> 
+				</span>
+			</li>
+			<li>
+				<span class="menuButton">
+					<g:link controller="inventory" action="listExpiringStock"><warehouse:message code="inventory.expiringStock.label"/></g:link> 
+				</span>
+			</li>
+			<li>
+				<span class="menuButton">
+					<g:link controller="inventory" action="listLowStock"><warehouse:message code="inventory.lowStock.label"/></g:link> 
+				</span>
+			</li>
+			<li>
+				<span class="menuButton">
+					<g:link controller="inventory" action="showConsumption"><warehouse:message code="inventory.consumption.label"/></g:link> 
+				</span>
+			</li>
+		</ul>
+	</div>
 	<h6 class="menu-heading">
 		<warehouse:message code="administration.label"  default="Administration"/>
 	</h6>			

@@ -419,8 +419,29 @@ class InventoryController {
 	def showConsumption = { 
 		def today = new Date();
 		def warehouse = Warehouse.get(session.warehouse.id)
-		def transactions = inventoryService.getConsumptionTransactions();
-		[transactions: transactions ]
+		
+		// Get all transactions from the past week 
+		def transactions = inventoryService.getConsumptionTransactions(today-7, today);
+		def transactionEntries = []
+		transactions.each { transaction -> 
+			transaction.transactionEntries.each { transactionEntry -> 
+				transactionEntries << transactionEntry
+			}
+		}
+		
+		def consumptionMap = [:]
+		def transactionEntryMap = transactionEntries.groupBy { it.inventoryItem.product }		
+		transactionEntryMap.each { key, value ->
+			def consumed = value.sum { it.quantity }			
+			log.info("key="+key + ", consumed=" + consumed);
+			consumptionMap[key] = consumed;
+		}
+		def products = Product.list()
+		products = products.findAll { consumptionMap[it] > 0 } 
+		def productMap = products.groupBy { it.category };
+		
+		
+		[productMap:productMap, consumptionMap:consumptionMap ]
 	}
 
 	/**
@@ -434,8 +455,7 @@ class InventoryController {
 			inventoryItem.product = product
 			inventoryItem.lotNumber = null;
 			inventoryItem.expirationDate = null;
-			inventoryItem.save();			
-			//inventoryItem.delete();
+			inventoryItem.save();
 		}
 		redirect(controller: "inventory", action: "showProducts")
 	}
