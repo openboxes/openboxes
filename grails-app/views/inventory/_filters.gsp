@@ -6,7 +6,7 @@
 				<g:each var="quickCategory" in="${quickCategories}">
 					<td class="filter filterRow paddingRow"></td>
 					<td class="<g:if test="${commandInstance?.categoryInstance == quickCategory}">filterSelected </g:if>filter filterRow">
-						<a href="?categoryId=${quickCategory?.id}">
+						<a href="?categoryId=${quickCategory?.id}&resetSearch=true">
 							<format:category category="${quickCategory}"/>
 						</a>
 					</td>		

@@ -48,21 +48,28 @@ class InventoryController {
 		}
 		session?.inventoryCategoryId = cmd.categoryInstance.id
 		
+		// if we have arrived via a quick link tab, reset any subcategories or search terms in the session
+		if (params?.resetSearch) {
+			session?.inventorySubcategoryId = null
+			session?.inventorySearchTerms = null
+		}
+		
 		// Pre-populate the sub-category and search terms from the session
-		cmd.subcategoryInstance = Category.get(session?.inventorySubcategoryId);
-		cmd.searchTerms = session?.inventorySearchTerms;
-		cmd.showHiddenProducts = session?.showHiddenProducts;
+		cmd.subcategoryInstance = Category.get(session?.inventorySubcategoryId)
+		cmd.searchTerms = session?.inventorySearchTerms
+		cmd.showHiddenProducts = session?.showHiddenProducts
+		cmd.showOutOfStockProducts = session?.showOutOfStockProducts
 		
 		// If a new search is being performed, override the session-based terms from the request
 		if (request.getParameter("searchPerformed")) {
-			cmd.subcategoryInstance = Category.get(params?.subcategoryId);
-			session?.inventorySubcategoryId = cmd.subcategoryInstance?.id;
+			cmd.subcategoryInstance = Category.get(params?.subcategoryId)
+			session?.inventorySubcategoryId = cmd.subcategoryInstance?.id
 			cmd.searchTerms = params.searchTerms
-			session?.inventorySearchTerms = cmd.searchTerms;
-			cmd.showHiddenProducts = params?.showHiddenProducts == "on";
-			session?.showHiddenProducts = cmd.showHiddenProducts;
-			cmd.showOutOfStockProducts = params?.showOutOfStockProducts == "on";
-			session?.showOutOfStockProducts = cmd.showOutOfStockProducts;
+			session?.inventorySearchTerms = cmd.searchTerms
+			cmd.showHiddenProducts = params?.showHiddenProducts == "on"
+			session?.showHiddenProducts = cmd.showHiddenProducts
+			cmd.showOutOfStockProducts = params?.showOutOfStockProducts == "on"
+			session?.showOutOfStockProducts = cmd.showOutOfStockProducts
 		}
 		
 		// Pass this to populate the matching inventory items
