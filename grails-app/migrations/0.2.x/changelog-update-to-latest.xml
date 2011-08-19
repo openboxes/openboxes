@@ -3970,7 +3970,41 @@
 		    <column name="name" value="Suitcase|fr:Valise/Malette"/>
 		    <where>id='4'</where>
 		</update>
-		
+	</changeSet>
+	
+	<changeSet author="mgoodrich" id="19-Aug-2011-2">
+		<update tableName="reference_number_type">
+		    <column name="name" value="Purchase Order Number|fr:Nombre de commande"/>
+		    <where>id='1'</where>
+		</update>
+		<update tableName="reference_number_type">
+		    <column name="name" value="Customer name|fr:Nom du client"/>
+		    <where>id='2'</where>
+		</update>
+		<update tableName="reference_number_type">
+		    <column name="name" value="Internal Identifier|fr:Identificateur interne"/>
+		    <where>id='3'</where>
+		</update>
+		<update tableName="reference_number_type">
+		    <column name="name" value="Bill of Lading Number|fr:Nombre de connaissement"/>
+		    <where>id='4'</where>
+		</update>
+		<update tableName="reference_number_type">
+		    <column name="name" value="Air Waybill Number|fr:Nombre de lettre de transport aérien"/>
+		    <where>id='5'</where>
+		</update>
+		<update tableName="reference_number_type">
+		    <column name="name" value="Container Number|fr:Nombre de conteneur"/>
+		    <where>id='6'</where>
+		</update>
+		<update tableName="reference_number_type">
+		    <column name="name" value="Seal Number|fr:Nombre de sceau"/>
+		    <where>id='7'</where>
+		</update>
+		<update tableName="reference_number_type">
+		    <column name="name" value="Flight Number|fr:Nombre de vol"/>
+		    <where>id='8'</where>
+		</update>
 	</changeSet>
     
 </databaseChangeLog>

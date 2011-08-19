@@ -11,7 +11,7 @@ import org.pih.warehouse.core.Constants;
  * create a direct, immediate transfer, as opposed to transferring via a Shipment 
  * 
  * Use the following methods within InventorySevice to create, modify, and delete LocalTransfers:
- *  getLocalTrasnfer(Tranasction)
+ *  getLocalTransfer(Tranasction)
  *  isLocalTransfer(Transaction)
  *  isValidForLocalTransfer(Transaction)
  *  deleteLocalTransfer(Transaction)
