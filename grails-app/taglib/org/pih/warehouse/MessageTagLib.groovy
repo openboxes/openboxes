@@ -4,7 +4,7 @@ class MessageTagLib {
    
 	static namespace = "warehouse"
 	
-	Locale defaultLocale = new Locale(grailsApplication.config.warehouse.defaultLocale)
+	Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
 	
 	def message = { attrs, body ->
 		Locale l = attrs.locale  ?: session?.user?.locale ?: defaultLocale; 

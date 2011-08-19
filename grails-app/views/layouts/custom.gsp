@@ -349,11 +349,11 @@
 					<warehouse:message code="default.locale.label"/>: &nbsp;  	
 					
 					<!-- show all supported locales -->
-					<g:each in="${grailsApplication.config.warehouse.supportedLocales}" var="l">
+					<g:each in="${grailsApplication.config.locale.supportedLocales}" var="l">
 						<g:set var="locale" value="${new Locale(l)}"/>
 						<a href="${createLink(controller: 'user', action: 'updateAuthUserLocale', params: ['locale':locale])}">
 							<!-- fetch the display for locale based on the current locale -->
-							${locale?.getDisplayName(session?.user?.locale ?: new Locale(grailsApplication.config.warehouse.defaultLocale))}
+							${locale?.getDisplayName(session?.user?.locale ?: new Locale(grailsApplication.config.locale.defaultLocale))}
 						</a> &nbsp;
 					</g:each>
 

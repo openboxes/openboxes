@@ -281,8 +281,8 @@ grails.plugins.dynamicController.mixins = [
  */
 
 // default and supported locales
-warehouse.defaultLocale = 'en'
-warehouse.supportedLocales = ['en','fr']
+locale.defaultLocale = 'en'
+locale.supportedLocales = ['en','fr']
 
 
 
