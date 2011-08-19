@@ -90,16 +90,14 @@
 					           					<tr class="odd">
 													<th style="width: 50px; border: 1px solid #F7F7F7;"></th>
 													<th style="width: 600px; border: 1px solid #F7F7F7;"></th>
-													<th style="width: 200px; border: 1px solid #F7F7F7;"></th>
-													<th style="width: 100px; border-left: 1px solid #F7F7F7; border-right:1px solid lightgrey;"></th>
+													<th style="width: 200px; border-left: 1px solid #F7F7F7; border-right:1px solid lightgrey;"></th>
 					           		 				<th colspan="2" class="center" style="width:100px; text-align: center; border-left: 1px solid lightgrey; border-right: 1px solid lightgrey;"><warehouse:message code="default.pending.label"/></th>
 					           						<th style="width:50px; border: 1px solid #F7F7F7;"></th>
 					           					</tr>
 												<tr class="odd">
 													<th style="width: 50px; border: 1px solid #F7F7F7;"></th>
 													<th style="width: 600px; border: 1px solid #F7F7F7;"><warehouse:message code="default.description.label"/></th>
-													<th style="width: 200px; border: 1px solid #F7F7F7;"><warehouse:message code="product.manufacturer.label"/></th>
-													<th style="width: 100px; border-left: 1px solid #F7F7F7; border-right:1px solid lightgrey;"><warehouse:message code="product.code.label"/></th>
+													<th style="width: 200px; border-left: 1px solid #F7F7F7; border-right:1px solid lightgrey;"><warehouse:message code="product.manufacturer.label"/></th>
 													<th style="text-align: center; border-left: 1px solid lightgrey; width: 50px;"><warehouse:message code="inventory.qtyin.label"/></th>
 													<th style="text-align: center; border-right: 1px solid lightgrey; width: 50px;"><warehouse:message code="inventory.qtyout.label"/></th>
 													<th style="text-align: center; width: 50px; border: 1px solid #F7F7F7;"><warehouse:message code="default.qty.label"/></th>
@@ -140,9 +138,6 @@
 															<td class="checkable middle" style="width: 200px;">
 																${inventoryItem?.product?.manufacturer }
 															</td>
-															<td class="checkable middle" style="width: 100px;">
-																${inventoryItem?.product?.productCode }
-															</td>
 															<td class="checkable middle" style="width:50px; text-align: center; border-left: 1px solid lightgrey;">
 																${inventoryItem?.quantityToReceive?:0}
 															</td>
@@ -157,7 +152,7 @@
 														</tr>
 													</g:each>
 													<tr>
-														<th style="text-align: left;" colspan="6"></th>
+														<th style="text-align: left;" colspan="5"></th>
 														<th style="text-align: center;">${totalQuantity}</th>
 													</tr>
 												</g:each>
