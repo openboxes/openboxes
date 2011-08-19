@@ -20,6 +20,7 @@
 			            	<table >
 			            		<tr>
 			            			<th><warehouse:message code="category.label"/></th>
+			            			<th><warehouse:message code="inventory.showUnsupportedProducts.label"/></th>
 			            			<th>&nbsp;</th>
 			            		</tr>
 			            		<tr>
@@ -28,8 +29,11 @@
 														from="${categories}"
 														optionKey="id" optionValue="${{format.category(category:it)}}" value="${categorySelected?.id}" 
 														noSelection="['':'--All--']" />   
-									</td>				           	
-									<td class="filter-list-item" style="height: 100%; width:100%; vertical-align: bottom">
+									</td>			
+									 <td>	
+						           		<g:checkBox name="showUnsupportedProducts" value="${showUnsupportedProducts }" } />
+						           	</td>	           	
+									<td class="filter-list-item" style="height: 100%; width: 70%; vertical-align: bottom">
 										<button name="filter">
 											<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;<warehouse:message code="default.button.filter.label"/> </button>
 									</td>							           	

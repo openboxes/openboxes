@@ -395,7 +395,7 @@ class InventoryController {
 	
 	def listLowStock = {
 		def warehouse = Warehouse.get(session.warehouse.id)
-		def results = inventoryService.getProductsBelowMinimumAndReorderQuantities(warehouse.inventory)
+		def results = inventoryService.getProductsBelowMinimumAndReorderQuantities(warehouse.inventory, params.showUnsupportedProducts ? true : false)
 		
 		// Set of categories that we can filter by
 		def categories = [] as Set
@@ -412,7 +412,7 @@ class InventoryController {
 		}
 		
 		[reorderProductsQuantityMap: results['reorderProductsQuantityMap'], minimumProductsQuantityMap: results['minimumProductsQuantityMap'], 
-			categories: categories, categorySelected: categorySelected]
+			categories: categories, categorySelected: categorySelected, showUnsupportedProducts: params.showUnsupportedProducts]
 	}
 	
 	

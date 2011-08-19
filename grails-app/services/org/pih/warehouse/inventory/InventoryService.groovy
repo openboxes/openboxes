@@ -680,8 +680,10 @@ class InventoryService implements ApplicationContextAware {
 	* whose quantity falls below a the minimum or reorder level
 	* (Note that items that are below the minimum level are excluded from
 	* the list of items below the reorder level)
+	* 
+	* Set the includeUnsupported boolean to include unsupported items when compiling the product-to-quantity maps 
 	*/
-   Map<String,Map<Product,Integer>> getProductsBelowMinimumAndReorderQuantities(Inventory inventoryInstance) {
+   Map<String,Map<Product,Integer>> getProductsBelowMinimumAndReorderQuantities(Inventory inventoryInstance, Boolean includeUnsupported) {
 	   
 	   def inventoryLevels = getInventoryLevelsByInventory(inventoryInstance)
 		   
@@ -692,17 +694,31 @@ class InventoryService implements ApplicationContextAware {
 		   // getQuantityByInventory returns an Inventory Item to Quantity map, so we want to sum all the values in this map to get the total quantity
 		   def quantity = getQuantityByInventoryAndProduct(inventoryInstance, level.product)?.values().sum { it } ?: 0
 		   
-		   if (quantity <= level.minQuantity) {
-			   minimumProductsQuantityMap[level.product] = quantity
-		   }
-		   else if (quantity <= level.reorderQuantity) {
-			   reorderProductsQuantityMap[level.product] = quantity
+		   if (level.supported || includeUnsupported) {
+			   if (quantity <= level.minQuantity) {
+				   minimumProductsQuantityMap[level.product] = quantity
+			   }
+			   else if (quantity <= level.reorderQuantity) {
+				   reorderProductsQuantityMap[level.product] = quantity
+			   }
 		   }
 		   
 	   }
 	  
 	   return [minimumProductsQuantityMap: minimumProductsQuantityMap, reorderProductsQuantityMap: reorderProductsQuantityMap]
    } 
+   
+  /**
+	* Gets a product-to-quantity maps for all products in the selected inventory
+	* whose quantity falls below a the minimum or reorder level
+	* (Note that items that are below the minimum level are excluded from
+	* the list of items below the reorder level)
+	* 
+	* Excludes unsupported items
+	*/
+   Map<String,Map<Product,Integer>> getProductsBelowMinimumAndReorderQuantities(Inventory inventoryInstance) {
+		return getProductsBelowMinimumAndReorderQuantities(inventoryInstance, false)   
+   }
 
   
 	/**
