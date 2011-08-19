@@ -27,6 +27,11 @@
 			</li>
 			<li>
 				<span class="menuButton">
+					<g:link controller="inventory" action="showConsumption"><warehouse:message code="inventory.consumption.label"/></g:link> 
+				</span>
+			</li>
+			<li>
+				<span class="menuButton">
 					<g:link controller="inventory" action="listAllTransactions"><warehouse:message code="transaction.list.label"/></g:link> 
 				</span>
 			</li>

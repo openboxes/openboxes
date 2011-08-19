@@ -195,6 +195,11 @@
 					$('#inventoryActionForm').append($(action));
 					$("#inventoryActionForm").submit();
 				});
+				$("#addToTransactionBtn").click(function(event) { 
+					var action = $("<input>").attr("type", "hidden").attr("name", "actionButton").val("viewConsumption");
+					$('#inventoryActionForm').append($(action));
+					$("#inventoryActionForm").submit();
+				});
 				
 			});	
 		</script>	

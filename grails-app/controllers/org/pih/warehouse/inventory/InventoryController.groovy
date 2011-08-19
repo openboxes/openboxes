@@ -416,6 +416,37 @@ class InventoryController {
 	}
 	
 	
+	def showConsumption = { 
+		def today = new Date();
+		def warehouse = Warehouse.get(session.warehouse.id)
+		def transactions = inventoryService.getConsumptionTransactions();
+		[transactions: transactions ]
+	}
+
+	/**
+	 * Used to create default inventory items.
+	 * @return
+	 */
+	def createDefaultInventoryItems = { 
+		def products = inventoryService.findProductsWithoutEmptyLotNumber();
+		products.each { product -> 
+			def inventoryItem = new InventoryItem()
+			inventoryItem.product = product
+			inventoryItem.lotNumber = null;
+			inventoryItem.expirationDate = null;
+			inventoryItem.save();			
+			//inventoryItem.delete();
+		}
+		redirect(controller: "inventory", action: "showProducts")
+	}
+	
+		
+	def showProducts = { 
+		def products = inventoryService.findProductsWithoutEmptyLotNumber()
+		[ products : products ]
+		
+	}
+	
 	
 	def listAllTransactions = {		
 		
@@ -582,23 +613,27 @@ class InventoryController {
 	
 	def addTo = {
 		log.info("addTo params " + params)
-		
+
+		// Process productId parameters from inventory browser
+		if (params.productId) {
+			log.info("Using params.productId");
+			def productIds = params.list('productId')
+			log.info("productIds " + productIds)
+			def productList = productIds.collect { Long.valueOf(it); }
+			flash.productList = productList;
+		}
+
+		// Then redirect to the appropriate action 
 		if (params.actionButton) {
 			if (params.actionButton.equals("addToShipment")) {
 				redirect(controller: "shipment", action: "addToShipment", params: params)
 				return;
 			}
 			else if (params.actionButton.equals("addToTransaction")) {
-				
-				// Process productId parameters from inventory browser
-				if (params.productId) {
-					log.info("Using params.productId");
-					def productIds = params.list('productId')
-					log.info("productIds " + productIds)
-					def productList = productIds.collect { Long.valueOf(it); }
-					flash.productList = productList;
-				}
-				
+				redirect(controller: "inventory", action: "createTransaction", params: params)
+				return;
+			}
+			else if (params.actionButton.equals("showConsumption")) { 
 				redirect(controller: "inventory", action: "createTransaction", params: params)
 				return;
 			}

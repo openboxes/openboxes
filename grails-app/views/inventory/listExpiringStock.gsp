@@ -55,108 +55,107 @@
 			<br/>
 			
 				
-				<table>
-					<tr>					
-						<td>
+			<table>
+				<tr>					
+					<td>
+						<label>
+							<img src="${resource(dir:'images/icons/silk',file:'error.png')}" style="vertical-align: middle"/> 
+							<warehouse:message code="inventory.expiringStock.label"/>
+						</label>
+						<div class="list box">
+							
+							<table>
+			                    <thead>
+			                        <tr>   
+										<th><warehouse:message code="item.label"/></th>
+										<th><warehouse:message code="inventory.lotNumber.label"/></th>
+										<th><warehouse:message code="inventory.expires.label"/></th>
+										<th class="center"><warehouse:message code="default.qty.label"/></th>
+			                        </tr>
+			                    </thead>
+			       	           	<tbody>			
+			       	     			<g:set var="counter" value="${0 }" />
+									<g:each var="inventoryItem" in="${expiringStock}" status="i">           
+										<g:set var="quantity" value="${quantityMap[inventoryItem] }"/>
+										<g:if test="${quantity > 0 }">
+											<tr class="${(counter++ % 2) == 0 ? 'odd' : 'even'}">            
+												<td>
+													<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
+														<format:product product="${inventoryItem?.product}"/> 
+														<span class="fade"><format:category category="${inventoryItem?.product?.category}"/> </span>
+													</g:link>
+													
+												</td>
+												<td>
+													${inventoryItem?.lotNumber }
+												</td>
+												<td>
+													<g:formatDate date="${inventoryItem?.expirationDate}" format="MMM yyyy"/>
+													<%-- 
+													${prettyDateFormat(date: inventoryItem.expirationDate)}
+													--%>
+													
+												</td>
+												<td class="center">
+													${quantity }
+												</td>									
+											</tr>						
+										</g:if>					
+									</g:each>
+								</tbody>
+							</table>				
+						</div>
+						<br/><br/>
+						<g:if test="${!excludeExpired }">
 							<label>
-								<img src="${resource(dir:'images/icons/silk',file:'error.png')}" style="vertical-align: middle"/> 
-								<warehouse:message code="inventory.expiringStock.label"/>
+								<img src="${resource(dir:'images/icons/silk',file:'exclamation.png')}" style="vertical-align: middle"/> 
+								<warehouse:message code="inventory.expiredStock.label"/>
 							</label>
 							<div class="list box">
-								
+							
 								<table>
 				                    <thead>
-				                        <tr>   
+				                        <tr>                           	
+					                        <%--<th width="2%">Actions</th> --%>
 											<th><warehouse:message code="item.label"/></th>
 											<th><warehouse:message code="inventory.lotNumber.label"/></th>
-											<th><warehouse:message code="inventory.expires.label"/></th>
+											<th><warehouse:message code="default.expired.label"/></th>
 											<th class="center"><warehouse:message code="default.qty.label"/></th>
 				                        </tr>
 				                    </thead>
 				       	           	<tbody>			
-				       	     			<g:set var="counter" value="${0 }" />
-										<g:each var="inventoryItem" in="${expiringStock}" status="i">           
+					       	           	<g:set var="counter" value="${0 }" />	
+										<g:each var="inventoryItem" in="${expiredStock}" status="i">     
 											<g:set var="quantity" value="${quantityMap[inventoryItem] }"/>
-											<g:if test="${quantity > 0 }">
+											<g:if test="${quantity > 0 }">						
 												<tr class="${(counter++ % 2) == 0 ? 'odd' : 'even'}">            
 													<td>
 														<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
-															<format:product product="${inventoryItem?.product}"/> 
+															<format:product product="${inventoryItem?.product}"/>
 															<span class="fade"><format:category category="${inventoryItem?.product?.category}"/> </span>
 														</g:link>
-														
 													</td>
 													<td>
-														${inventoryItem?.lotNumber }
+														${inventoryItem.lotNumber }
 													</td>
 													<td>
-														<g:formatDate date="${inventoryItem?.expirationDate}" format="MMM yyyy"/>
-														<%-- 
 														${prettyDateFormat(date: inventoryItem.expirationDate)}
-														--%>
-														
 													</td>
 													<td class="center">
 														${quantity }
-													</td>									
-												</tr>						
-											</g:if>					
+													</td>
+												</tr>
+											</g:if>
 										</g:each>
 									</tbody>
-								</table>				
+								</table>
 							</div>
 							<br/><br/>
-							<g:if test="${!excludeExpired }">
-								<label>
-									<img src="${resource(dir:'images/icons/silk',file:'exclamation.png')}" style="vertical-align: middle"/> 
-									<warehouse:message code="inventory.expiredStock.label"/>
-								</label>
-								<div class="list box">
-								
-									<table>
-					                    <thead>
-					                        <tr>                           	
-						                        <%--<th width="2%">Actions</th> --%>
-												<th><warehouse:message code="item.label"/></th>
-												<th><warehouse:message code="inventory.lotNumber.label"/></th>
-												<th><warehouse:message code="default.expired.label"/></th>
-												<th class="center"><warehouse:message code="default.qty.label"/></th>
-					                        </tr>
-					                    </thead>
-					       	           	<tbody>			
-						       	           	<g:set var="counter" value="${0 }" />	
-											<g:each var="inventoryItem" in="${expiredStock}" status="i">     
-												<g:set var="quantity" value="${quantityMap[inventoryItem] }"/>
-												<g:if test="${quantity > 0 }">						
-													<tr class="${(counter++ % 2) == 0 ? 'odd' : 'even'}">            
-														<td>
-															<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
-																<format:product product="${inventoryItem?.product}"/>
-																<span class="fade"><format:category category="${inventoryItem?.product?.category}"/> </span>
-															</g:link>
-														</td>
-														<td>
-															${inventoryItem.lotNumber }
-														</td>
-														<td>
-															${prettyDateFormat(date: inventoryItem.expirationDate)}
-														</td>
-														<td class="center">
-															${quantity }
-														</td>
-													</tr>
-												</g:if>
-											</g:each>
-										</tbody>
-									</table>
-								</div>
-								<br/><br/>
-							</g:if>							
-							
-						</td>
-					</tr>			
-				</table>
-			</fieldset>		
+						</g:if>							
+						
+					</td>
+				</tr>			
+			</table>
 		</div>
 		
 	</body>

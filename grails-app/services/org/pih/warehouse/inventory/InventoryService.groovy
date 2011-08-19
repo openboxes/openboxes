@@ -153,7 +153,20 @@ class InventoryService implements ApplicationContextAware {
 	List<Transaction> getAllTransactions(Warehouse warehouse) {
 		return Transaction.withCriteria { eq("thisWarehouse", warehouse) }
 	}
+
+	/**
+	 * 	
+	 * @return
+	 */
+	List getConsumptionTransactions() { 
+		def CONSUMPTION_TYPE = TransactionType.get(Constants.CONSUMPTION_TRANSACTION_TYPE_ID);
+		log.info("type " + CONSUMPTION_TYPE)
+		def transactions = Transaction.findAllByTransactionType(CONSUMPTION_TYPE)
+		return transactions;
+	}
 	
+	
+		
 	/**
 	 * Gets the inventory associated with this warehouse;
 	 * if no inventory, create a new inventory
@@ -1063,7 +1076,37 @@ class InventoryService implements ApplicationContextAware {
 		return InventoryItem.findAllByProduct(productInstance)					
 		
 	}
+	
+	
+	/**
+	 * @return	a map of inventory items indexed by product
+	 */
+	Map getInventoryItems() { 
+		def inventoryItemMap = [:]		
+		Product.list().each { inventoryItemMap.put(it, []) }		
+		InventoryItem.list().each {
+			inventoryItemMap[it.product] << it
+		}
+		return inventoryItemMap;
+	}
 
+	
+	List<InventoryItem> findInventoryItemWithEmptyLotNumber() { 
+		return InventoryItem.createCriteria().list() {
+			or {
+				isNull("lotNumber")
+				eq("lotNumber", "")
+			}
+		}
+	}
+	
+	List<Product> findProductsWithoutEmptyLotNumber() { 
+		def products = Product.list();
+		def productsWithEmptyInventoryItem = findInventoryItemWithEmptyLotNumber()?.collect { it.product } ;
+		def productsWithoutEmptyInventoryItem = products - productsWithEmptyInventoryItem;
+		return productsWithoutEmptyInventoryItem;
+	}
+	
 	
 	/**
 	 * 
