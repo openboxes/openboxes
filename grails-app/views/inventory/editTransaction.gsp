@@ -177,6 +177,7 @@
 																	<th style="width: 60%"><warehouse:message code="product.label"/></th>
 																	<th nowrap="true"><warehouse:message code="product.lotNumber.label"/></th>
 																	<th nowrap="true"><warehouse:message code="default.expires.label"/></th>
+																	<th><warehouse:message code="inventory.onHandQuantity.label"/></th>
 																	<th><warehouse:message code="default.qty.label"/></th>
 																	<th><warehouse:message code="default.actions.label"/></th>
 																</tr>
@@ -184,7 +185,7 @@
 															
 															<tbody>
 																<tr class="empty">
-																	<td colspan="6" style="text-align: center">
+																	<td colspan="7" style="text-align: center">
 																		<span class="fade"><warehouse:message code="transaction.noItems.message"/></span>
 																	
 																	</td>
@@ -197,7 +198,7 @@
 												</td>
 											</tr>		
 											<tr class="prop">
-												<td colspan="6">
+												<td colspan="7">
 													<div style="text-align: center;">
 														<button type="submit" name="save">								
 															<img src="${createLinkTo(dir: 'images/icons/silk', file: 'tick.png')}"/>&nbsp;<warehouse:message code="default.button.save.label"/>&nbsp;
@@ -291,7 +292,8 @@
 							ProductId: '${transactionEntry?.inventoryItem?.product?.id}', 
 							ProductName: '${format.product(product:transactionEntry?.inventoryItem?.product)}', 
 							InventoryItemId: '${transactionEntry?.inventoryItem?.id}', 
-							LotNumber: '${transactionEntry?.inventoryItem?.lotNumber}', 
+							LotNumber: '${transactionEntry?.inventoryItem?.lotNumber}',
+							OnHandQty: '${quantityMap[transactionEntry?.inventoryItem]}',
 							Qty: '${transactionEntry?.quantity}', 
 							ExpirationMonth: '<g:formatDate date="${transactionEntry?.inventoryItem?.expirationDate}" format="M"/>', 
 							ExpirationYear: '<g:formatDate date="${transactionEntry?.inventoryItem?.expirationDate}" format="yyyy"/>',
@@ -377,7 +379,10 @@
 			function addNewItem(productId) { 
 				$.getJSON('/warehouse/json/findProduct', {id: productId}, function(data) {
     				var index = transaction.TransactionEntries.length;
-	    			var entry = { Id: '0', Index: index, ProductId: data.product.id, Template: '#new-item-template', ProductName: data.product.name, LotNumber: '', ExpirationDate: '', ExpirationMonth: '', ExpirationYear: '', Qty: 0 };
+	    			var entry = { Id: '0', Index: index, ProductId: data.product.id, 
+	    							Template: '#new-item-template', ProductName: data.product.name, 
+	    							LotNumber: '', ExpirationDate: '', ExpirationMonth: '', ExpirationYear: '', 
+	    							Qty: 0, OnHandQty: '' };
 					transaction.TransactionEntries.push(entry);	    			
 					renderTable();
 				}); 
@@ -385,11 +390,15 @@
 
 			
 
-			function addExistingItem(productId, lotNumber) {
+			function addExistingItem(productId, lotNumber, onHandQty) {
 				//alert("add existing item with product: " + product + ", lotNumber: " + lotNumber); 
 				$.getJSON('/warehouse/json/findInventoryItem', {productId: productId, lotNumber: lotNumber}, function(data) {
     				var index = transaction.TransactionEntries.length;
-	    			var entry = { Id: '0', Index: index, ProductId: data.product.id, Template: '#existing-item-template', InventoryItemId: data.inventoryItem.id, ProductName: data.product.name, LotNumber: data.inventoryItem.lotNumber, ExpirationDate: data.inventoryItem.expirationDate, ExpirationMonth: '', ExpirationYear: '', Qty: 0 };
+	    			var entry = { Id: '0', Index: index, ProductId: data.product.id, 
+	    							Template: '#existing-item-template', InventoryItemId: data.inventoryItem.id, 
+	    							ProductName: data.product.name, LotNumber: data.inventoryItem.lotNumber, 
+	    							ExpirationDate: data.inventoryItem.expirationDate, ExpirationMonth: '', ExpirationYear: '', 
+	    							Qty: 0, OnHandQty: onHandQty };
 	    			// for some reason, the following "exists" check does not work
 					//if (!$.inArray(entry, transaction.TransactionEntries)) { 	    			
 						transaction.TransactionEntries.push(entry);	    			
@@ -620,7 +629,7 @@
 		    		    				    		    			
 		    		    			var existingLotNumber = 
 			    		    			"<tr>" + 
-			    		    			"<td><button onClick=\"addExistingItem('" + ui.item.product.id + "','" + value.lotNumber + "');\"><img src=\"${resource(dir: 'images/icons/silk', file: 'add.png')}\" style=\"vertical-align: middle;\"/></button></td>" + 
+			    		    			"<td><button onClick=\"addExistingItem('" + ui.item.product.id + "','" + value.lotNumber + "','" + value.quantity + "');\"><img src=\"${resource(dir: 'images/icons/silk', file: 'add.png')}\" style=\"vertical-align: middle;\"/></button></td>" + 
 			    		    			"<td>" + lotNumber + "</td>" + 
 		    		    				"<td>" + value.expirationDate + "</td>" + 
 		    		    				"<td>" + value.quantity + "</td>" + 
@@ -737,6 +746,9 @@
 					<input type="hidden" id="expirationDate[{{= Index}}]_month" name="transactionEntries[{{= Index}}].inventoryItem.expirationDate_month"/>
 					<input type="hidden" id="expirationDate[{{= Index}}]_year" name="transactionEntries[{{= Index}}].inventoryItem.expirationDate_year"/>
 				</td>
+				<td class="center">
+					{{= OnHandQty}}
+				</td>
 				<td>
 					<g:textField class="quantity" name="transactionEntries[{{= Index}}].quantity" value="{{= Qty}}" size="3"/>
 				</td>
@@ -771,6 +783,9 @@
 				<td nowrap="true">
 					<g:datePicker id="expirationDate[{{= Index}}]" name="transactionEntries[{{= Index}}].inventoryItem.expirationDate" precision="month" default="none" noSelection="['':'']"
 						years="${(1900 + (new Date().year))..(1900+ (new Date() + (50 * 365)).year)}"/>					
+				</td>
+				<td class="center">
+					{{= OnHandQty}}
 				</td>
 				<td>
 					<g:textField class="quantity" name="transactionEntries[{{= Index}}].quantity" value="{{= Qty}}" size="3"/>

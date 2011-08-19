@@ -705,12 +705,15 @@ class InventoryController {
 			}
 		}
 		
+		def warehouseInstance = Warehouse.get(session?.warehouse?.id);
+		
 		def model = [
 			transactionInstance : transactionInstance,
 			productInstanceMap: Product.list().groupBy { it.category },
 			transactionTypeList: TransactionType.list(),
 			locationInstanceList: Location.list(),
-			warehouseInstance: Warehouse.get(session?.warehouse?.id) 
+			quantityMap: inventoryService.getQuantityForInventory(warehouseInstance?.inventory),
+			warehouseInstance: warehouseInstance
 		];
 		
 		render(view: "editTransaction", model: model);
@@ -785,12 +788,14 @@ class InventoryController {
 			return;
 		}
 		else { 		
+			def warehouseInstance = Warehouse.get(session?.warehouse?.id)
 			def model = [ 
 				transactionInstance : transactionInstance,
 				productInstanceMap: Product.list().groupBy { it.category },
 				transactionTypeList: TransactionType.list(),
 				locationInstanceList: Location.list(),
-				warehouseInstance: Warehouse.get(session?.warehouse?.id)
+				quantityMap: inventoryService.getQuantityForInventory(warehouseInstance?.inventory),
+				warehouseInstance: warehouseInstance
 			]
 			render(view: "editTransaction", model: model);
 		}		
@@ -800,13 +805,15 @@ class InventoryController {
 	def editTransaction = { 		
 		log.info "edit transaction: " + params
 		def transactionInstance = Transaction.get(params?.id)
-		
+		def warehouseInstance = Warehouse.get(session?.warehouse?.id);
 		def model = [ 
+			
 			transactionInstance: transactionInstance?:new Transaction(),
 			productInstanceMap: Product.list().groupBy { it?.category },
 			transactionTypeList: TransactionType.list(),
 			locationInstanceList: Location.list(),
-			warehouseInstance: Warehouse.get(session?.warehouse?.id) ]
+			quantityMap: inventoryService.getQuantityForInventory(warehouseInstance?.inventory),
+			warehouseInstance: warehouseInstance ]
 
 		render(view: "editTransaction", model: model)
 
