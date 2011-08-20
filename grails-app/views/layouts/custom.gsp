@@ -63,8 +63,8 @@
 	<!-- Grails Layout : write head element for page-->
 	<g:layoutHead />
 	
-	<g:if test="${session?.warehouse?.fgColor && session?.warehouse?.bgColor }">
-		<style>
+	<style>
+		<g:if test="${session?.warehouse?.fgColor && session?.warehouse?.bgColor }">
 			#hd {
 				padding: 0px;
 				margin: 0px; 
@@ -73,9 +73,11 @@
 			} 
 			#hd a { 
 				color: #${session.warehouse.fgColor}; 
-			}  	
-		</style>
-	</g:if>		
+			}  		
+		</g:if>		
+	
+		.warehouse { border: 0px solid #F5F5F5; padding: 5px; display: block; } 
+	</style>
 	
 </head>
 <body class="yui-skin-sam">
@@ -149,32 +151,22 @@
 													${session?.warehouse?.name }
 												</a>
 												
-												<div id="warehouse-menu" style="display: none; position: absolute; right: 50px; top: 38px;  
+												<div id="warehouse-menu" style="display: none; position: absolute; right: 80px; top: 38px;  
 													background-color: white; border: 1px solid black;">
 													<table>
 														<tbody>						
 															<g:each var="warehouse" in="${org.pih.warehouse.inventory.Warehouse.list()}" status="i">								
 																<tr class="prop">
-																	<td class="warehouse" nowrap="nowrap" style="padding: 0px;">
-																	
+																	<td nowrap="nowrap" style="padding: 0px; margin: 0px;">
 																		<g:if test="${warehouse?.fgColor && warehouse?.bgColor }">
 																			<style>
-																				#warehouse-${warehouse?.id} { border: 0px solid #F5F5F5; padding: 10px; display: block; } 
 																				#warehouse-${warehouse?.id} { background-color: #${warehouse.bgColor}; color: #${warehouse.fgColor}; } 
 																				#warehouse-${warehouse?.id} a { color: #${warehouse.fgColor}; }  	
 																			</style>				
 																		</g:if>					
-																	
 																		<div id="warehouse-${warehouse.id }" class="warehouse">												
 																			<g:if test="${warehouse.local}">
-																				<a class="home" href='${createLink(controller: "dashboard", action:"chooseWarehouse", id: warehouse.id)}' style="display: block;">
-																					<g:if test="${warehouse.logo}">	
-																						<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'warehouse', action:'viewLogo', id: warehouse.id)}" />
-																						<%--<img src="${warehouse.logo}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img>--%>
-																					</g:if>
-																					<g:else>
-																						<img src="${createLinkTo(dir:'images',file:'icons/building.png')}" style="vertical-align: middle"/>
-																					</g:else>
+																				<a href='${createLink(controller: "dashboard", action:"chooseWarehouse", id: warehouse.id)}' style="display: block; padding: 0px;">
 																					${warehouse.name} 
 																				</a> 
 																					
@@ -185,14 +177,6 @@
 																				--%>
 																			</g:if>
 																			<g:else>
-																				<g:if test="${warehouse.logo}">	
-																					<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'warehouse', action:'viewLogo', id: warehouse.id)}" />															
-																					<%--<img src="${warehouse.logo}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img>--%>
-																				</g:if>
-																				<g:else>
-																					<img src="${createLinkTo(dir:'images',file:'icons/building.png')}" style="vertical-align: middle"/>
-																				</g:else>
-																				&nbsp;
 																				<warehouse:message code="dashboard.managedRemotely.message" args="[warehouse.name]"/>
 																			</g:else>
 																		</div>												
