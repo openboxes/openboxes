@@ -129,6 +129,9 @@ class CreateRequestWorkflowController {
 						requestItem.category = category
 					}
 				}
+				else if (params?.description) { 
+					requestItem.description = params.description
+				}
 				else { 
 					// FIXME Prevents an item from being add but does not provide a user-friendly error message 
 					return error();
@@ -143,8 +146,11 @@ class CreateRequestWorkflowController {
 				flow.requestInstance.addToRequestItems(requestItem);
 				log.info ("Request item " + requestItem.description + " " + requestItem.product + " ")
 				if (!requestService.saveRequest(flow.requestInstance)) {
+					log.info("error")
 					return error()
 				}
+				
+				// Need to clear request item because we use this for editing items
 				flow.requestItem = null
 				
 			}.to("showRequestItems")
