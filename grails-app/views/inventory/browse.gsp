@@ -95,7 +95,9 @@
 					           						<th style="width:50px; border: 1px solid #F7F7F7;"></th>
 					           					</tr>
 												<tr class="odd">
-													<th style="width: 50px; border: 1px solid #F7F7F7;"></th>
+													<th style="width: 50px; border: 1px solid #F7F7F7; text-align:center;">
+														<input type="checkbox" id="toggleCheckbox">	
+													</th>
 													<th style="width: 600px; border: 1px solid #F7F7F7;"><warehouse:message code="default.description.label"/></th>
 													<th style="width: 200px; border-left: 1px solid #F7F7F7; border-right:1px solid lightgrey;"><warehouse:message code="product.manufacturer.label"/></th>
 													<th style="text-align: center; border-left: 1px solid lightgrey; width: 50px;"><warehouse:message code="inventory.qtyin.label"/></th>
@@ -195,12 +197,9 @@
 					$('#inventoryActionForm').append($(action));
 					$("#inventoryActionForm").submit();
 				});
-				$("#addToTransactionBtn").click(function(event) { 
-					var action = $("<input>").attr("type", "hidden").attr("name", "actionButton").val("viewConsumption");
-					$('#inventoryActionForm').append($(action));
-					$("#inventoryActionForm").submit();
+				$("#toggleCheckbox").click(function(event) {
+					$(".checkbox").attr("checked", $(this).attr("checked"));
 				});
-				
 			});	
 		</script>	
     </body>
