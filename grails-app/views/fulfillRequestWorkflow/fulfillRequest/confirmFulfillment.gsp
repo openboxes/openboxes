@@ -114,9 +114,9 @@
 											<tr class="prop">
 												<td>
 													<div class="buttons" style="border-top: 0px solid lightgrey;">
-														<g:submitButton name="back" value="Back"></g:submitButton>
-														<g:submitButton name="finish" value="Finish"></g:submitButton>
-														<g:link action="fulfillRequest" event="cancel">Cancel</g:link>
+														<g:submitButton name="back" value="${warehouse.message(code: 'default.button.back.label')}"></g:submitButton>
+														<g:submitButton name="finish" value="${warehouse.message(code: 'default.button.finish.label')}"></g:submitButton>
+														<g:link action="fulfillRequest" event="cancel"><warehouse:message code="default.button.cancel.label"/></g:link>
 													</div>
 												</td>
 											</tr>
