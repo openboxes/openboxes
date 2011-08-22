@@ -357,7 +357,8 @@ class InventoryController {
 		def expiredStock = InventoryItem.findAllByExpirationDateLessThan(today, [sort: 'expirationDate', order: 'desc']);
 		
 		// Stock expiring within the next 365 days
-		def expiringStock = InventoryItem.findAllByExpirationDateBetween(today+1, today+180, [sort: 'expirationDate', order: 'asc']);
+		def expiringStock = InventoryItem.findAllByExpirationDateBetween(today+1, today+365, [sort: 'expirationDate', order: 'asc']);
+		//def expiringStock = InventoryItem.list([sort: 'expirationDate', order: 'asc']);
 		
 		// Get the set of categories BEFORE we filter		
 		def categories = [] as Set
@@ -381,7 +382,7 @@ class InventoryController {
 		log.info "threshholdSelected: " + threshholdSelected
 		if (threshholdSelected) { 
 			expiredStock = expiredStock.findAll { item -> (item?.expirationDate - today) < threshholdSelected }
-			expiringStock = expiringStock.findAll { item -> (item?.expirationDate - today) <= threshholdSelected }
+			expiringStock = expiringStock.findAll { item -> (item?.expirationDate && (item?.expirationDate - today) <= threshholdSelected) }
 		}
 		
 		def warehouse = Warehouse.get(session.warehouse.id)		
