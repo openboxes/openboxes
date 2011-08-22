@@ -868,36 +868,39 @@ class InventoryService implements ApplicationContextAware {
 				
 				// Process each row added to the record inventory page
 				cmd.recordInventoryRows.each { row -> 					
-					// 1. Find an existing inventory item for the given lot number and product and description
-					def inventoryItem = 
-						findInventoryItemByProductAndLotNumber(cmd.product, row.lotNumber)
 					
-					// 2. If the inventory item doesn't exist, we create a new one
-					if (!inventoryItem) { 
-						inventoryItem = new InventoryItem();
-						inventoryItem.properties = row.properties
-						inventoryItem.product = cmd.product;
-						if (!inventoryItem.hasErrors() && inventoryItem.save()) { 										
-							
-						}
-						else {
-							// TODO Old error message = "Property [${error.getField()}] of [${inventoryItem.class.name}] with value [${error.getRejectedValue()}] is invalid"
-							inventoryItem.errors.allErrors.each { error->
-								cmd.errors.reject("inventoryItem.invalid",
-									[inventoryItem, error.getField(), error.getRejectedValue()] as Object[],
-									"[${error.getField()} ${error.getRejectedValue()}] - ${error.defaultMessage} ");
+					if (row) { 
+						// 1. Find an existing inventory item for the given lot number and product and description					
+						def inventoryItem = 
+							findInventoryItemByProductAndLotNumber(cmd.product, row.lotNumber)
+						
+						// 2. If the inventory item doesn't exist, we create a new one
+						if (!inventoryItem) { 
+							inventoryItem = new InventoryItem();
+							inventoryItem.properties = row.properties
+							inventoryItem.product = cmd.product;
+							if (!inventoryItem.hasErrors() && inventoryItem.save()) { 										
 								
 							}
-							// We need to fix these errors before we can move on
-							return cmd;
+							else {
+								// TODO Old error message = "Property [${error.getField()}] of [${inventoryItem.class.name}] with value [${error.getRejectedValue()}] is invalid"
+								inventoryItem.errors.allErrors.each { error->
+									cmd.errors.reject("inventoryItem.invalid",
+										[inventoryItem, error.getField(), error.getRejectedValue()] as Object[],
+										"[${error.getField()} ${error.getRejectedValue()}] - ${error.defaultMessage} ");
+									
+								}
+								// We need to fix these errors before we can move on
+								return cmd;
+							}
 						}
+						// 3. Create a new transaction entry (even if quantity didn't change)	
+						def transactionEntry = new TransactionEntry();
+						transactionEntry.properties = row.properties;
+						transactionEntry.quantity = row.newQuantity
+						transactionEntry.inventoryItem = inventoryItem;
+						transaction.addToTransactionEntries(transactionEntry);						
 					}
-					// 3. Create a new transaction entry (even if quantity didn't change)	
-					def transactionEntry = new TransactionEntry();
-					transactionEntry.properties = row.properties;
-					transactionEntry.quantity = row.newQuantity
-					transactionEntry.inventoryItem = inventoryItem;
-					transaction.addToTransactionEntries(transactionEntry);						
 				}		
 				
 				
