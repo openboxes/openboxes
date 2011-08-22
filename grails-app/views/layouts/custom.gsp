@@ -155,33 +155,35 @@
 													background-color: white; border: 1px solid black;">
 													<table>
 														<tbody>						
-															<g:each var="warehouse" in="${org.pih.warehouse.inventory.Warehouse.list()}" status="i">								
-																<tr class="prop">
-																	<td nowrap="nowrap" style="padding: 0px; margin: 0px;">
-																		<g:if test="${warehouse?.fgColor && warehouse?.bgColor }">
-																			<style>
-																				#warehouse-${warehouse?.id} { background-color: #${warehouse.bgColor}; color: #${warehouse.fgColor}; } 
-																				#warehouse-${warehouse?.id} a { color: #${warehouse.fgColor}; }  	
-																			</style>				
-																		</g:if>					
-																		<div id="warehouse-${warehouse.id }" class="warehouse">												
-																			<g:if test="${warehouse.local}">
-																				<a href='${createLink(controller: "dashboard", action:"chooseWarehouse", id: warehouse.id)}' style="display: block; padding: 0px;">
-																					${warehouse.name} 
-																				</a> 
-																					
-																				<%-- 
-																				<g:if test="${warehouse?.id == session?.user?.warehouse?.id }">
-																					<warehouse:message code="dashboard.youLastLoggednHereOn.message" args="[format.datetime(obj:session?.user?.lastLoginDate)]"/> 
+															<g:each var="warehouse" in="${org.pih.warehouse.inventory.Warehouse.list()}" status="i">	
+																<g:if test="${warehouse.active}">							
+																	<tr class="prop">
+																		<td nowrap="nowrap" style="padding: 0px; margin: 0px;">
+																			<g:if test="${warehouse?.fgColor && warehouse?.bgColor }">
+																				<style>
+																					#warehouse-${warehouse?.id} { background-color: #${warehouse.bgColor}; color: #${warehouse.fgColor}; } 
+																					#warehouse-${warehouse?.id} a { color: #${warehouse.fgColor}; }  	
+																				</style>				
+																			</g:if>					
+																			<div id="warehouse-${warehouse.id }" class="warehouse">												
+																				<g:if test="${warehouse.local}">
+																					<a href='${createLink(controller: "dashboard", action:"chooseWarehouse", id: warehouse.id)}' style="display: block; padding: 0px;">
+																						${warehouse.name} 
+																					</a> 
+																						
+																					<%-- 
+																					<g:if test="${warehouse?.id == session?.user?.warehouse?.id }">
+																						<warehouse:message code="dashboard.youLastLoggednHereOn.message" args="[format.datetime(obj:session?.user?.lastLoginDate)]"/> 
+																					</g:if>
+																					--%>
 																				</g:if>
-																				--%>
-																			</g:if>
-																			<g:else>
-																				<warehouse:message code="dashboard.managedRemotely.message" args="[warehouse.name]"/>
-																			</g:else>
-																		</div>												
-																	</td>											
-																</tr>																		
+																				<g:else>
+																					<warehouse:message code="dashboard.managedRemotely.message" args="[warehouse.name]"/>
+																				</g:else>
+																			</div>												
+																		</td>											
+																	</tr>
+																</g:if>																		
 															</g:each>																	
 														</tbody>					
 													</table>													
@@ -396,25 +398,25 @@
 			}).next().hide();
 			*/
 			<g:if test="${request.request.requestURL.toString().contains('category')}">
-				accordion.accordion( "activate" , 5 );
+				accordion.accordion( "activate" , 6 );
 			</g:if>
 			<g:elseif test="${request.request.requestURL.toString().contains('attribute')}">
-				accordion.accordion( "activate" , 5 );
+				accordion.accordion( "activate" , 6 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('product/create')}">
 				accordion.accordion( "activate" , 0 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('person')}">
-				accordion.accordion( "activate" , 5 );
+				accordion.accordion( "activate" , 6 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('user')}">
-				accordion.accordion( "activate" , 5 );
+				accordion.accordion( "activate" , 6 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('location')}">
-				accordion.accordion( "activate" , 5 );
+				accordion.accordion( "activate" , 6 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('warehouse/warehouse')}">
-				accordion.accordion( "activate" , 5 );
+				accordion.accordion( "activate" , 6 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('listReceiving')}">
 				accordion.accordion( "activate" , 4 );
@@ -444,7 +446,7 @@
 				accordion.accordion( "activate" , 0 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('product')}">
-				accordion.accordion( "activate" , 5 );
+				accordion.accordion( "activate" , 6 );
 			</g:elseif>
 		
 			$('.goto').click(function(){
