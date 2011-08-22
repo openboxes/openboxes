@@ -40,8 +40,8 @@ class RequestController {
         //[requestInstanceList: Request.list(params), requestInstanceTotal: Request.count()]
 		
 		def location = Location.get(session.warehouse.id)
-		def incomingRequests = requestService.getIncomingRequests(location)
-		def outgoingRequests = requestService.getOutgoingRequests(location)
+		def incomingRequests = Request.findAllByDestination(location)
+		def outgoingRequests = Request.findAllByOrigin(location)
 		
 		[incomingRequests : incomingRequests, outgoingRequests : outgoingRequests]
     }	
