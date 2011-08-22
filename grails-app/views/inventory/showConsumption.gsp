@@ -67,28 +67,23 @@
 						<div class="list box">
 							
 							<table>
-			                    <thead>
+			       	           	<tbody>			
 			                        <tr>   
 										<th><warehouse:message code="category.label"/></th>
 										<th><warehouse:message code="product.label"/></th>
-										<th><warehouse:message code="inventory.consumeQuantity.label"/></th>
-										<th class="center"></th>
+										<th class="center"><warehouse:message code="inventory.consumeQuantity.label"/></th>
 			                        </tr>
-			                    </thead>
-			       	           	<tbody>			
+			                        <g:set var="c" value="${0 }"/>
 									<g:each var="entry" in="${productMap}" status="i">           
-										<tr class="prop">
-											<th colspan="3">${entry.key }</th>
-										</tr>
 										<g:each var="product" in="${entry.value}" status="j">
-											<tr class="${(j % 2) == 0 ? 'odd' : 'even'}">            
+											<tr class="${(c++ % 2) == 0 ? 'odd' : 'even'}">            
 												<td>
 													${product.category.name }
 												</td>
 												<td>
 													${product.name }
 												</td>
-												<td>
+												<td class="center">
 													${consumptionMap[product] }
 												</td>
 											</tr>						
