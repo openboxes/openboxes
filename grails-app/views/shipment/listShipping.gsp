@@ -87,6 +87,7 @@
 				                            <th>${warehouse.message(code: 'default.destination.label')}</th>
 				                        	<th>${warehouse.message(code: 'shipping.expectedShippingDate.label')}</th>
 				                         	<th>${warehouse.message(code: 'default.status.label')}</th>
+				                         	<th>${warehouse.message(code: 'default.lastUpdated.label')}</th>
 				                        </tr>
 				                    </thead>
 				                   	<tbody>
@@ -123,6 +124,9 @@
 													<g:if test="${shipmentInstance?.status.date}">
 													 - <format:date obj="${shipmentInstance?.status.date}"/>
 													 </g:if>									
+												</td>
+												<td align="center">
+													<format:date obj="${shipmentInstance?.lastUpdated}"/>
 												</td>
 					                        </tr>
 										</g:each>                    		

@@ -494,13 +494,19 @@ class ShipmentController {
 		
 		// sort by event status, event date, and expecting shipping date
 		shipments = shipments.sort( { a, b -> 
+			def diff = a.lastUpdated <=> b.lastUpdated
+			/*
 			def diff = a.getStatus() <=> b.getStatus() 
-			if (diff == 0) {
-				diff = a.expectedShippingDate <=> b.expectedShippingDate
+			if (diff ==0) { 
+				diff = a.lastUpdated <=> b.lastUpdated
+				if (diff == 0) {
+					diff = a.expectedShippingDate <=> b.expectedShippingDate
+				}
 			}
+			*/
 			return diff
 		} )
-		
+		shipments = shipments.reverse();
 		[ shipments:shipments, shipmentType:shipmentType?.id, destination:destination?.id, status:statusCode?.name, 
 				statusStartDate:statusStartDate, statusEndDate:statusEndDate ]	
 	}	
