@@ -44,10 +44,10 @@
 												<tr class="even">
 													<td><warehouse:message code="requestItem.description.label" default="Item"/></td>
 													<td class="center"><warehouse:message code="requestItem.quantity.label" default="Requested"/></td>										
-													<td class="center"><warehouse:message code="fulfillmentItem.quantity.label" default="Fulfilled"/></td>										
+													<td class="center"><warehouse:message code="request.qtyFulfilled.label" default="Fulfilled"/></td>										
 													<td><warehouse:message code="default.action.label" default="Actions"/></td>
 													<%--<td class="center">Remaining</td> --%>	
-													<td class="center" style="width: 100px; border-left: 1px solid lightgrey;"><warehouse:message code="fulfillmentItem.quantity.label" default="Fulfilled"/></td>										
+													<td class="center" style="width: 100px; border-left: 1px solid lightgrey;"><warehouse:message code="request.qtyFulfilled.label" default="Fulfilled"/></td>										
 													<td style="width: 250px"><warehouse:message code="product.label" default="Product"/></td>										
 													<td style="width: 100px"><warehouse:message code="inventoryItem.lotNumber.label" /></td>
 													<td style="width: 100px"><warehouse:message code="inventoryItem.expirationDate.label" /></td>
