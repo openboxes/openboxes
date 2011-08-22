@@ -824,7 +824,7 @@ class ShipmentController {
 		def comment = new Comment(comment: params.comment, sender: session.user, recipient: recipient)
 		if (shipmentInstance) { 
 			shipmentInstance.addToComments(comment).save(flush:true);
-			flash.message = "${warehouse.message(code: 'shipping.addedCommentToShipment.message', arg=[params.comment,shipmentInstance.name])}"
+			flash.message = "${warehouse.message(code: 'shipping.addedCommentToShipment.message', args: [params.comment,shipmentInstance.name])}"
 		}
 		redirect(action: 'showDetails', id: params.shipmentId);
 	}
