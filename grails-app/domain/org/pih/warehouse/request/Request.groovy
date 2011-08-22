@@ -79,7 +79,7 @@ class Request implements Serializable {
 	}
 
 	String getRequestNumber() {
-		return (id) ? "R" + String.valueOf(id).padLeft(6, "0")  : "(new request)";
+		return (id) ? "R" + String.valueOf(id).padLeft(6, "0")  : "";
 	}
 	
 	

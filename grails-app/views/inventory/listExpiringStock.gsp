@@ -28,15 +28,16 @@
 						           		<g:select name="category"
 														from="${categories}"
 														optionKey="id" optionValue="${{format.category(category:it)}}" value="${categorySelected?.id}" 
-														noSelection="['':'--All--']" />   
+														noSelection="['': warehouse.message(code:'default.all.label')]" />   
 									</td>
 									<td>
 						           		<g:select name="threshhold"
-														from="['1':'one week', '14':'two weeks', '30':'one month', 
-															'60':'two months', '90':'three months',
-															'180': 'six months', '365':'one year']"
+														from="['1': warehouse.message(code:'default.week.oneWeek.label'), '14': warehouse.message(code:'default.week.twoWeeks.label'), 
+															   '30': warehouse.message(code:'default.month.oneMonth.label'), '60': warehouse.message(code:'default.month.twoMonths.label'), 
+															   '90': warehouse.message(code:'default.month.threeMonths.label'), '180': warehouse.message(code:'default.month.sixMonths.label'), 
+															   '365': warehouse.message(code:'default.year.oneYear.label')]"
 														optionKey="key" optionValue="value" value="${threshholdSelected}" 
-														noSelection="['':'--All--']" />  
+														noSelection="['': warehouse.message(code:'default.all.label')]" />   
 						           	</td>
 						           	<td>	
 						           		<g:checkBox name="excludeExpired" value="${excludeExpired }" } />
