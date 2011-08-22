@@ -26,8 +26,6 @@
 	                <div class="dialog">
 	                    <table>
 	                        <tbody>
-	                        
-	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                    <label for="type"><warehouse:message code="person.type.label" default="Type" /></label>
@@ -43,7 +41,6 @@
 										</g:elseif>
 	                                </td>
 	                            </tr>
-	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="firstName"><warehouse:message code="person.firstName.label" default="First Name" /></label>
@@ -52,7 +49,6 @@
 	                                    <g:textField name="firstName" value="${personInstance?.firstName}" />
 	                                </td>
 	                            </tr>
-	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="lastName"><warehouse:message code="person.lastName.label" default="Last Name" /></label>
