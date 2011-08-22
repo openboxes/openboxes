@@ -398,6 +398,11 @@ class InventoryController {
 		def warehouse = Warehouse.get(session.warehouse.id)
 		def results = inventoryService.getProductsBelowMinimumAndReorderQuantities(warehouse.inventory, params.showUnsupportedProducts ? true : false)
 		
+		Map inventoryLevelByProduct = new HashMap();
+		inventoryService.getInventoryLevelsByInventory(warehouse.inventory).each {
+			inventoryLevelByProduct.put(it.product, it);
+		}
+		
 		// Set of categories that we can filter by
 		def categories = [] as Set
 		categories.addAll(results['reorderProductsQuantityMap']?.keySet().collect { it.category })
@@ -413,7 +418,7 @@ class InventoryController {
 		}
 		
 		[reorderProductsQuantityMap: results['reorderProductsQuantityMap'], minimumProductsQuantityMap: results['minimumProductsQuantityMap'], 
-			categories: categories, categorySelected: categorySelected, showUnsupportedProducts: params.showUnsupportedProducts]
+			categories: categories, categorySelected: categorySelected, showUnsupportedProducts: params.showUnsupportedProducts, inventoryLevelByProduct: inventoryLevelByProduct]
 	}
 	
 	

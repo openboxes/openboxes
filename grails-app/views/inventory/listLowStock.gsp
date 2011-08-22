@@ -57,23 +57,30 @@
 							<table>
 			                    <thead>
 			                        <tr>   
-										<th><warehouse:message code="item.label"/></th>
-										<th class="center"><warehouse:message code="default.qty.label"/></th>
+										<th width="55%"><warehouse:message code="item.label"/></th>
+										<th class="center" width="15%"><warehouse:message code="default.qty.label"/></th>
+										<th class="center" width="15%"><warehouse:message code="inventory.reorderQuantity.label"/></th>
+										<th class="center" width="15%"><warehouse:message code="inventory.minimumQuantity.label"/></th>
 			                        </tr>
 			                    </thead>
 			       	           	<tbody>			
 			       	     			<g:set var="counter" value="${0 }" />
 									<g:each var="product" in="${minimumProductsQuantityMap?.keySet()}">           
 										<tr class="${(counter++ % 2) == 0 ? 'odd' : 'even'}">            
-											<td>
+											<td width="55%">
 												<g:link controller="inventoryItem" action="showStockCard" params="['product.id':product?.id]">
 													<format:product product="${product}"/> 
 													<span class="fade"><format:category category="${product?.category}"/> </span>
 												</g:link>
-												
 											</td>
-											<td class="center">
+											<td class="center" width="15%">
 												${minimumProductsQuantityMap[product]}
+											</td>
+											<td class="center" width="15%">
+												${inventoryLevelByProduct[product].reorderQuantity}
+											</td>
+											<td class="center" width="15%">
+												${inventoryLevelByProduct[product].minQuantity}
 											</td>									
 										</tr>						
 									</g:each>
@@ -97,24 +104,31 @@
 							<table>
 			                    <thead>
 			                        <tr>   
-										<th><warehouse:message code="item.label"/></th>
-										<th class="center"><warehouse:message code="default.qty.label"/></th>
+										<th width="55%"><warehouse:message code="item.label"/></th>
+										<th class="center" width="15%"><warehouse:message code="default.qty.label"/></th>
+										<th class="center" width="15%"><warehouse:message code="inventory.reorderQuantity.label"/></th>
+										<th class="center" width="15%"><warehouse:message code="inventory.minimumQuantity.label"/></th>					
 			                        </tr>
 			                    </thead>
 			       	           	<tbody>			
 			       	     			<g:set var="counter" value="${0 }" />
 									<g:each var="product" in="${reorderProductsQuantityMap?.keySet()}">           
 										<tr class="${(counter++ % 2) == 0 ? 'odd' : 'even'}">            
-											<td>
+											<td width="55%">
 												<g:link controller="inventoryItem" action="showStockCard" params="['product.id':product?.id]">
 													<format:product product="${product}"/> 
 													<span class="fade"><format:category category="${product?.category}"/> </span>
-												</g:link>
-												
+												</g:link>												
 											</td>
-											<td class="center">
+											<td class="center" width="15%">
 												${reorderProductsQuantityMap[product]}
-											</td>									
+											</td>
+											<td class="center" width="15%">
+												${inventoryLevelByProduct[product].reorderQuantity}
+											</td>
+											<td class="center" width="15%">
+												${inventoryLevelByProduct[product].minQuantity}
+											</td>							
 										</tr>						
 									</g:each>
 								</tbody>
