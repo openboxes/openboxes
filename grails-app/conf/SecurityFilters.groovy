@@ -31,7 +31,10 @@ class SecurityFilters {
 				// When a user has an authenticated, we want to check if they have an active account
 				if (session?.user && !session?.user?.active) { 
 					session.user = null;
-					flash.message = "auth.accountRequestUnderReview.message"
+					// FIXME cannot use warehouse tag lib here
+					// MissingPropertyException: No such property: warehouse for class: SecurityFilters
+					//flash.message = "${warehouse.message(code: 'auth.accountRequestUnderReview.message')}"
+					//flash.message = "auth.accountRequestUnderReview.message"
 					redirect(controller: 'auth', action:'login')
 					return false;
 				}
@@ -45,7 +48,10 @@ class SecurityFilters {
 
 						
 					if (session?.warehouseStillNotSelected) { 
-						flash.message = "warehouse.chooseWarehouseToManage.message"
+						// FIXME cannot use warehouse tag lib here
+						// MissingPropertyException: No such property: warehouse for class: SecurityFilters
+						//flash.message = "${warehouse.message(code: 'warehouse.chooseWarehouseToManage.message')}"
+						//flash.message = "warehouse.chooseWarehouseToManage.message"
 					}
 					
 					session.warehouseStillNotSelected = true;
