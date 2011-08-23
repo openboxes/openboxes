@@ -19,11 +19,6 @@
 					<g:link controller="inventory" action="editTransaction"><warehouse:message code="transaction.add.label"/></g:link> 				
 				</span>			
 			</li>
-			<li>
-				<span class="menuButton">
-					<g:link controller="inventoryItem" action="importInventoryItems"><warehouse:message code="inventory.import.label"/></g:link> 				
-				</span>			
-			</li>
 			<li class="">
 				<span class="menuButton">
 					<g:link controller="product" action="create"><warehouse:message code="product.add.label"/></g:link>
@@ -149,6 +144,11 @@
 				<span class="menuButton">
 					<g:link controller="category" action="tree"><warehouse:message code="category.productCategories.label"/></g:link>
 				</span>
+			</li>
+			<li>
+				<span class="menuButton">
+					<g:link controller="inventoryItem" action="importInventoryItems"><warehouse:message code="inventory.import.label"/></g:link> 				
+				</span>			
 			</li>
 			<li class="">
 				<span class="menuButton">
