@@ -9,16 +9,6 @@
 					<g:link controller="inventory" action="browse"><warehouse:message code="inventory.browse.label"/></g:link>
 				</span>
 			</li>
-			<li>
-				<span class="menuButton">
-					<g:link controller="inventory" action="listAllTransactions"><warehouse:message code="transaction.list.label"/></g:link> 
-				</span>
-			</li>
-			<li>
-				<span class="menuButton">
-					<g:link controller="inventory" action="editTransaction"><warehouse:message code="transaction.add.label"/></g:link> 				
-				</span>			
-			</li>
 			<li class="">
 				<span class="menuButton">
 					<g:link controller="product" action="create"><warehouse:message code="product.add.label"/></g:link>
@@ -128,6 +118,20 @@
 		<warehouse:message code="administration.label"  default="Administration"/>
 	</h6>			
 	<div class="menu-section">
+	
+		<span class="menu-subheading"><warehouse:message code="inventory.label"/></span>
+		<ul>			
+			<li>
+				<span class="menuButton">
+					<g:link controller="inventory" action="listAllTransactions"><warehouse:message code="transaction.list.label"/></g:link> 
+				</span>
+			</li>
+			<li>
+				<span class="menuButton">
+					<g:link controller="inventory" action="editTransaction"><warehouse:message code="transaction.add.label"/></g:link> 				
+				</span>			
+			</li>
+		</ul>	
 		<span class="menu-subheading"><warehouse:message code="products.label"/></span>
 		<ul>			
 			<li class="">
