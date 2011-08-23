@@ -1,10 +1,12 @@
 package org.pih.warehouse.shipping
 
 import org.apache.poi.hssf.record.formula.functions.NumericFunction.OneArg;
+import org.hibernate.exception.ConstraintViolationException;
 import org.pih.warehouse.core.Constants;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.inventory.Warehouse;
 import org.pih.warehouse.product.Product;
+import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException;
 
 import sun.util.logging.resources.logging;
 
@@ -201,6 +203,7 @@ class CreateShipmentWorkflowController {
 			on("deleteItem"){	
 				def item = ShipmentItem.get(params.item.id)
 				shipmentService.deleteShipmentItem(item)
+				
 			}.to("enterContainerDetails")
 			
 			on("addContainer") {
@@ -638,7 +641,7 @@ class CreateShipmentWorkflowController {
 	void bindReferenceNumbers(Shipment shipment, ShipmentWorkflow workflow, Map params) {
 		// need to manually bind the reference numbers
 		if (!shipment.referenceNumbers) {shipment.referenceNumbers = [] }
-		for (ReferenceNumberType type in workflow.referenceNumberTypes) {
+		for (ReferenceNumberType type in workflow?.referenceNumberTypes) {
 			
 			// find the reference number for this reference number type
 			ReferenceNumber referenceNumber = shipment.referenceNumbers.find( {it.referenceNumberType.id == type.id} )	
