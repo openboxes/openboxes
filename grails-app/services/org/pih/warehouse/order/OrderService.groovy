@@ -1,28 +1,39 @@
 package org.pih.warehouse.order
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.Date
+import java.util.List
+import java.util.Map
+import java.util.Set
 
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.core.LocationType;
-import org.pih.warehouse.core.Person;
-import org.pih.warehouse.core.User;
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.order.cart.Cart;
-import org.pih.warehouse.product.Product;
-import org.pih.warehouse.receiving.Receipt;
-import org.pih.warehouse.receiving.ReceiptItem;
-import org.pih.warehouse.shipping.Shipment;
-import org.pih.warehouse.shipping.ShipmentException;
-import org.pih.warehouse.shipping.ShipmentItem;
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationType
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.inventory.Warehouse
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.receiving.Receipt
+import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentException
+import org.pih.warehouse.shipping.ShipmentItem
 
 class OrderService {
 
 	boolean transactional = true
 	
 	def shipmentService;
+	
+	List<Order> getOrdersPlacedByWarehouse(Warehouse orderPlacedBy, Location orderPlacedWith, OrderStatus status, Date orderedFromDate, Date orderedToDate) {
+		def orders = Order.withCriteria {
+			and {
+				eq("destination", orderPlacedBy)
+				if (orderPlacedWith) { eq("origin", orderPlacedWith) }
+				if (status) { eq("status", status) }
+				if (orderedFromDate) { ge("dateOrdered", orderedFromDate) }
+				if (orderedToDate) { le("dateOrdered", orderedToDate) }
+			}
+		}
+		return orders
+   }
 
 	/**
 	 * @param location

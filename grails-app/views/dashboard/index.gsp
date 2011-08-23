@@ -65,8 +65,7 @@
 					    			<thead>
 					    				<tr class="">
 					    					<td colspan="2">
-					    						
-					    						<warehouse:message code="shipping.shippingFrom.label"/> ${session.warehouse.name }
+					    						<warehouse:message code="shipping.shipmentsFrom.label" args="[session.warehouse.name]"/>
 					    					</td>
 					    				</tr>
 					    			</thead>				    			

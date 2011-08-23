@@ -14,8 +14,8 @@
             	<tr>
             		<td style="border: 1px solid lightgrey; background-color: #f5f5f5;">
 			            <g:form action="list" method="post">
-			            	<g:if test="${incoming}"><g:hiddenField name="incoming" value="true"/></g:if>
-			            	<table >
+			            	<g:if test="${incoming}"><g:hiddenField name="type" value="incoming"/></g:if>
+			            	<table>
 			            		<tr>
 						           	<td class="filter-list-item">
 						           		<label class="block"><warehouse:message code="default.type.label"/> </label> 

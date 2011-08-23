@@ -6,6 +6,7 @@ import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Document;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
+import org.pih.warehouse.inventory.Warehouse;
 import org.pih.warehouse.shipping.DocumentCommand;
 import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.shipping.ShipmentItem;
@@ -19,31 +20,37 @@ class OrderController {
     }
 
     def list = {
-        //params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        //[orderInstanceList: Order.list(params), orderInstanceTotal: Order.count()]
 		
-		def location = Location.get(session.warehouse.id)
-		def incomingOrders = orderService.getIncomingOrders(location)
-		def outgoingOrders = orderService.getOutgoingOrders(location)
+		System.out.println("Params: " + params);
 		
-		[incomingOrders : incomingOrders, outgoingOrders : outgoingOrders]
+		def suppliers = orderService.getSuppliers().sort();
+
+		def destination = Warehouse.get(session.warehouse.id)
+		def origin = params.origin ? Location.get(params.origin) : null
+		def status = params.status ? Enum.valueOf(OrderStatus.class, params.status) : null
+		def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
+		def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
+				
+		def orders = orderService.getOrdersPlacedByWarehouse(destination, origin, status, statusStartDate, statusEndDate)
+		
+		// sort by order date
+		orders = orders.sort( { a, b ->
+			return b.dateOrdered <=> a.dateOrdered
+		} )
+
+		[ orders:orders, origin:origin?.id, destination:destination?.id,
+		  status:status, statusStartDate:statusStartDate, statusEndDate:statusEndDate,
+		  suppliers : suppliers
+		]
     }
 
 	def listOrderItems = { 
-		//def orderItems = orderService.getOrderItems()
-		def orderItems = OrderItem.getAll().findAll { !it.isCompletelyFulfilled() } ;
-		
+		def orderItems = OrderItem.getAll().findAll { !it.isCompletelyFulfilled() } ;		
 		return [orderItems : orderItems]		
 	}
 	
-	
     def create = {
 		redirect(controller: 'purchaseOrderWorkflow', action: 'index');
-		/*
-        def orderInstance = new Order()
-        orderInstance.properties = params
-        return [orderInstance: orderInstance]
-        */
     }
 
     def save = {
