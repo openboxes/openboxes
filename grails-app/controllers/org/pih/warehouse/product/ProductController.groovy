@@ -193,7 +193,6 @@ class ProductController {
 					attVal = params["productAttributes." + it.id + ".otherValue"]
 				}
 				ProductAttribute existing = existingAtts.get(it.id)
-				System.out.println("Att val: " + attVal)
 				if (attVal != null && attVal != '') {
 					if (!existing) {
 						existing = new ProductAttribute(["attribute":it])
@@ -202,7 +201,6 @@ class ProductController {
 					existing.value = attVal;
 				}
 				else {
-					System.out.println("Removing existing: " + existing)
 					productInstance.attributes.remove(existing)
 				}
 			}

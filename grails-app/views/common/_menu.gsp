@@ -23,12 +23,19 @@
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="order" action="list"><warehouse:message code="order.list.label" default="List orders "/></g:link>
+					<g:link controller="order" action="list"><warehouse:message code="order.list.label" default="List orders"/></g:link>
 				</span>
-			</li>									
+			</li>
+			<g:each in="${org.pih.warehouse.order.OrderStatus.list()}" var="orderStatus">
+				<li class="">
+					<span class="menuButton" style="padding-left:10px;">
+						<g:link controller="order" action="list" params="[status:orderStatus]"><format:metadata obj="${orderStatus}"/></g:link>
+					</span>
+				</li>			
+			</g:each>							
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="order" action="listOrderItems"><warehouse:message code="orderItem.list.label"  default="List order items "/></g:link>
+					<g:link controller="order" action="listOrderItems"><warehouse:message code="orderItem.list.label"  default="List order items"/></g:link>
 				</span>
 			</li>									
 			<li class="">

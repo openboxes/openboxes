@@ -21,8 +21,6 @@ class OrderController {
 
     def list = {
 		
-		System.out.println("Params: " + params);
-		
 		def suppliers = orderService.getSuppliers().sort();
 
 		def destination = Warehouse.get(session.warehouse.id)
