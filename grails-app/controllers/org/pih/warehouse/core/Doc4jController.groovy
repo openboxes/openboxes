@@ -69,7 +69,7 @@ class Doc4jController {
 		log.info ("filename " + filename )
 		response.setHeader("Content-disposition", "attachment; filename=" + filename);
 		response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-		documentService.generatePackingList(response.outputStream)
+		documentService.generatePackingList(response.outputStream, shipmentInstance)
 		//response.outputStream << tempFile.readBytes()
 		return;
 

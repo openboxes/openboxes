@@ -421,7 +421,7 @@ class DocumentService {
 
 	
 	
-	void generatePackingList(OutputStream outputStream) { 
+	void generatePackingList(OutputStream outputStream, Shipment shipmentInstance) { 
 		// TODO Move to PoiService
 		
 		try {
