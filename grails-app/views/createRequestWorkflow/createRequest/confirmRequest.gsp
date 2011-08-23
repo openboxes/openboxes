@@ -96,7 +96,7 @@
 															</g:else>
 														</td>
 														<td>
-															${requestItem?.description?.encodeAsHTML()}
+															<format:metadata obj="${requestItem.displayName()}"/>
 														</td>
 														<td>
 															${requestItem?.quantity}

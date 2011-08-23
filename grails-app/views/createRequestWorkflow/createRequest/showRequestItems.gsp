@@ -60,7 +60,7 @@
 													<g:hiddenField name="requestItems[${i }].quantity" value="${requestItem?.quantity }" size="5"/>
 												</td>
 												<td>
-													${requestItem?.description?.encodeAsHTML()}
+													<format:metadata obj="${requestItem.displayName()}"/>
 												</td>
 												<td>
 													${requestItem?.type }

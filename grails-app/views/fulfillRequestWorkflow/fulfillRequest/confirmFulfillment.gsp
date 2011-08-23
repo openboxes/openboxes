@@ -84,7 +84,7 @@
 																	<g:if test="${!fulfillmentItems }">
 																		<tr class="${counter++%2?'even':'odd' }">
 																			<td>
-																				${requestItem?.description }
+																				<format:metadata obj="${requestItem.displayName()}"/>
 																			</td>							
 																			<td>
 																				

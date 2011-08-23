@@ -51,16 +51,7 @@
 							<label><warehouse:message code="requestItem.requested.label"/></label>
 						</td>
 						<td class="value">			
-							<g:if test="${requestItem?.product }">
-								<format:product product="${requestItem?.product}"/>
-								<span class="fade"><format:category category="${requestItem?.product?.category}"/></span>					
-							</g:if>	
-							<g:elseif test="${requestItem?.category }">
-								<format:category category="${requestItem?.category}"/>
-							</g:elseif>
-							<g:else>
-								${requestItem?.description} 
-							</g:else>
+							<format:metadata obj="${requestItem.displayName()}"/>
 							(${requestItem?.quantity} <warehouse:message code="default.units.label"/>)
 						</td>
 					</tr>					
@@ -69,16 +60,7 @@
 							<label><warehouse:message code="fulfillmentItem.picked.label"/></label>
 						</td>
 						<td class="value">							
-							<g:if test="${requestItem?.product }">
-								<format:product product="${requestItem?.product}"/>
-								<span class="fade"><format:category category="${requestItem?.product?.category}"/></span>					
-							</g:if>	
-							<g:elseif test="${requestItem?.category }">
-								${requestItem?.category} 
-							</g:elseif>
-							<g:else>
-								${requestItem?.description} 
-							</g:else>
+							<format:metadata obj="${requestItem.displayName()}"/>
 							<span class="quantity">(${command?.quantityFulfilledByRequestItem(requestItem) } <warehouse:message code="default.units.label"/>)</span>
 						</td>
 					</tr>

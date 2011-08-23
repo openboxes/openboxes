@@ -208,12 +208,7 @@
 															</g:else>
 														</td>
 														<td>
-															<g:if test="${requestItem?.product }">
-																<format:product product="${requestItem?.product}"/>
-															</g:if>
-															<g:else>
-																${requestItem?.description }
-															</g:else>
+															<format:metadata obj="${requestItem.displayName()}"/>
 														</td>
 														<td>
 															${requestItem?.quantity}

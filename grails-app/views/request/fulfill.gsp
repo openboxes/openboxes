@@ -27,11 +27,10 @@
 		                    <tbody>
 		                        <g:each var="requestItem" in="${requestInstance?.requestItems }">
 									<tr class='prop'>
-										<td valign='top'class=''>
-											${requestItem.description }
-	
+										<td valign='top'>
+											<format:metadata obj="${requestItem.displayName()}"/>
 										</td>
-										<td valign='top'class=''>
+										<td valign='top'>
 											<div class="ui-widget">
 												<g:select class="combobox" name="shipment.id" from="${org.pih.warehouse.shipping.Shipment.list()}" 
 													optionKey="id" optionValue="name" value="" noSelection="['':'']" />

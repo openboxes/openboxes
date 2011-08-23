@@ -65,7 +65,7 @@
 		--%>
 		<g:form action="fulfillRequest" autocomplete="false">
 			<fieldset>
-				<legend>${requestItem?.description }</legend>
+				<legend><format:metadata obj="${requestItem.displayName()}"/></legend>
 				<div class="list">
 					<table border="0">
 						<tr class="odd">

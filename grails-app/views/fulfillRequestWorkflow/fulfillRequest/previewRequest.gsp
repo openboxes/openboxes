@@ -53,7 +53,7 @@
 																${requestItem?.type }
 															</td>
 															<td>
-																${requestItem?.description }
+																<format:metadata obj="${requestItem.displayName()}"/>
 															</td>
 															<td class="center">
 																${requestItem?.quantity}

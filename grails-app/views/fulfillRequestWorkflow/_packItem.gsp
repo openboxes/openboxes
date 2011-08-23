@@ -29,16 +29,7 @@
 							<label>${warehouse.message(code: 'fulfillmentItem.requested.label') }</label>
 						</td>
 						<td class="value">			
-							<g:if test="${requestItem?.product }">
-								${requestItem?.product} 
-								<span class="fade">${requestItem?.product?.category}</span>					
-							</g:if>	
-							<g:elseif test="${requestItem?.category }">
-								${requestItem?.category} 
-							</g:elseif>
-							<g:else>
-								${requestItem?.description} 
-							</g:else>
+							<format:metadata obj="${requestItem.displayName()}"/>
 							(${requestItem?.quantity} ${warehouse.message(code: 'default.units.label') })
 						</td>
 					</tr>					
@@ -47,16 +38,7 @@
 							<label>${warehouse.message(code: 'fulfillmentItem.picked.label') }</label>
 						</td>
 						<td class="value">	
-							<g:if test="${requestItem?.product }">
-								${requestItem?.product} 
-								<span class="fade">${requestItem?.product?.category}</span>					
-							</g:if>	
-							<g:elseif test="${requestItem?.category }">
-								${requestItem?.category} 
-							</g:elseif>
-							<g:else>
-								${requestItem?.description} 
-							</g:else>
+							<format:metadata obj="${requestItem.displayName()}"/>
 							(${command?.quantityFulfilledMap()[requestItem] } ${warehouse.message(code: 'default.units.label') })
 						</td>
 					</tr>

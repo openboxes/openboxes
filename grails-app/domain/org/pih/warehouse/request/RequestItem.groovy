@@ -42,6 +42,18 @@ class RequestItem implements Serializable {
 	String getType() { 
 		return (product)?"Product":(category)?"Category":"Unclassified"
 	}
+	
+	String displayName() {
+		if (product) {
+			return product.name;
+		}
+		else if (category) {
+			return category.name
+		}
+		else {
+			return description;
+		}
+	}
 
 	Integer quantityFulfilled() { 
 		def fulfillmentItems = request?.fulfillment?.fulfillmentItems.findAll { it.requestItem == this }

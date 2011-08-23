@@ -59,11 +59,11 @@
 														<td>
 															<g:if test="${requestItem.product }">
 																<g:link controller="inventoryItem" action="showStockCard" id="${requestItem?.product?.id }">
-																	${requestItem?.description }
+																	<format:metadata obj="${requestItem.displayName()}"/>
 																</g:link>
 															</g:if>
 															<g:else>
-																${requestItem?.description }
+																<format:metadata obj="${requestItem.displayName()}"/>
 															</g:else>																
 														</td>
 														<td class="center">															
