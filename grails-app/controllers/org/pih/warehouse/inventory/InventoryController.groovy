@@ -58,7 +58,7 @@ class InventoryController {
 		cmd.subcategoryInstance = Category.get(session?.inventorySubcategoryId)
 		cmd.searchTerms = session?.inventorySearchTerms
 		cmd.showHiddenProducts = session?.showHiddenProducts
-		cmd.showOutOfStockProducts = session?.showOutOfStockProducts
+		cmd.showOutOfStockProducts = session?.showOutOfStockProducts ?: true
 		
 		// If a new search is being performed, override the session-based terms from the request
 		if (request.getParameter("searchPerformed")) {
