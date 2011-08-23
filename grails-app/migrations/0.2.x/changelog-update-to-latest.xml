@@ -4006,6 +4006,24 @@
 		    <where>id='8'</where>
 		</update>
 	</changeSet>
+	
+	
+     <changeSet author="jmiranda" id="22-Aug-2011-1">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT count(*) FROM shipment_type WHERE name="Land|fr:Terrains" OR id=3]]>
+			</sqlCheck>
+		</preConditions>
+        <insert tableName="shipment_type">
+        	<column name="id" valueNumeric="3"/>
+        	<column name="name" value="Land|fr:Terrains"/>
+        	<column name="description" value=""/>
+        	<column name="sort_order" valueNumeric="3"/>
+            <column name="version" valueNumeric="0"/>
+			<column name="date_created" valueDate="2011-08-22"/>
+            <column name="last_updated" valueDate="2011-08-22"/>            
+        </insert>        
+     </changeSet>	
     
 </databaseChangeLog>
 
