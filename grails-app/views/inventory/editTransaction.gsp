@@ -382,7 +382,7 @@
 	    			var entry = { Id: '0', Index: index, ProductId: data.product.id, 
 	    							Template: '#new-item-template', ProductName: data.product.name, 
 	    							LotNumber: '', ExpirationDate: '', ExpirationMonth: '', ExpirationYear: '', 
-	    							Qty: 0, OnHandQty: '' };
+	    							Qty: '', OnHandQty: 'N/A' };
 					transaction.TransactionEntries.push(entry);	    			
 					renderTable();
 				}); 
@@ -398,7 +398,7 @@
 	    							Template: '#existing-item-template', InventoryItemId: data.inventoryItem.id, 
 	    							ProductName: data.product.name, LotNumber: data.inventoryItem.lotNumber, 
 	    							ExpirationDate: data.inventoryItem.expirationDate, ExpirationMonth: '', ExpirationYear: '', 
-	    							Qty: 0, OnHandQty: onHandQty };
+	    							Qty: '', OnHandQty: onHandQty };
 	    			// for some reason, the following "exists" check does not work
 					//if (!$.inArray(entry, transaction.TransactionEntries)) { 	    			
 						transaction.TransactionEntries.push(entry);	    			

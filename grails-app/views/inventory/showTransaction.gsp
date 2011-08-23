@@ -133,7 +133,7 @@
 							<table>
 								<g:if test="${transactionInstance?.id }">
 									<tr class="prop even">
-										<td colspan="2">
+										<td colspan="2" style="padding: 0px;">
 										
 											<table id="prodEntryTable" border="0" style="border: 0px solid #ccc;">
 												<tr>

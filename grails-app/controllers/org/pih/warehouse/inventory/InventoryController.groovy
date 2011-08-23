@@ -659,10 +659,11 @@ class InventoryController {
 				redirect(controller: "inventory", action: "createTransaction", params: params)
 				return;
 			}
+			/*
 			else if (params.actionButton.equals("showConsumption")) { 
 				redirect(controller: "inventory", action: "createTransaction", params: params)
 				return;
-			}
+			}*/
 			else {
 				flash.message = "${warehouse.message(code: 'action.not.found.message', args: [params.actionButton])}"
 			}
@@ -705,7 +706,7 @@ class InventoryController {
 				def inventoryItems = inventoryService.getInventoryItemsByProduct(product);
 				log.info "inventory items " + inventoryItems
 				inventoryItems.each { inventoryItem ->
-					def transactionEntry = new TransactionEntry(product: product, inventoryItem: inventoryItem, quantity: 0);
+					def transactionEntry = new TransactionEntry(product: product, inventoryItem: inventoryItem);
 					transactionInstance.addToTransactionEntries(transactionEntry);
 				}
 			}
@@ -749,8 +750,18 @@ class InventoryController {
 		
 		// Iterate over all transaction entries to reconcile the inventory item associated with each
 		log.info("Saving inventory items " + transactionInstance.transactionEntries*.inventoryItem);
-		transactionInstance?.transactionEntries.each { 
 		
+		// Get all transaction entries that have a positive quantity
+		transactionInstance?.transactionEntries = 
+			transactionInstance?.transactionEntries?.findAll { it.quantity && it.quantity != 0 } 
+		
+			
+		// Iterate over the transaction entries to make sure it has a valid inventory item 
+		transactionInstance?.transactionEntries.each { 
+			log.info "Saving transaction entry " + it + " " + it.quantity
+			// FIXME This is a bit of a hack.  We needed to be able to bind the product and lot number so 
+			// we bind that to an unsaved inventory item in the transaction entry.  Then we need to look it up
+			// just in case there's already an inventory item with that product and lot number 
 			def product = Product.get(it?.inventoryItem?.product?.id)
 			def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(product, it?.inventoryItem?.lotNumber)
 				
@@ -758,6 +769,14 @@ class InventoryController {
 				it.inventoryItem = inventoryItem;
 			}
 		 
+			// Make sure the user has not set a negative quantity 
+			// (the transaction type handles whether the quantity is a DEBIT/CREDIT transaction)
+			if (it?.quantity && it.quantity < 0) { 
+				log.info ("Making quantity positive " + it.quantity)
+				it.quantity = -(it.quantity);
+			}
+						
+			// We need to save the inventory item in case it's new or has been modified by the user
 			if (!it.inventoryItem.hasErrors() && it.inventoryItem.save()) { 
 				log.info("saved inventory item " + it.inventoryItem.id);
 			}
