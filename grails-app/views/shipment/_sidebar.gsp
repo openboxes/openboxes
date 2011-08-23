@@ -5,11 +5,20 @@
 			<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
 		</button>
 		<div class="actions">
-			<div class="action-menu-item">
-				<g:link controller="shipment" action="listShipping">
-					<img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_left.png')}" style="vertical-align: middle" />&nbsp;<warehouse:message code="shipping.listShipments.label"/>
-				</g:link>
-			</div>
+			<g:if test="${shipmentInstance?.origin?.id == session.warehouse.id}">
+				<div class="action-menu-item">
+					<g:link controller="shipment" action="list">
+						<img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_left.png')}" style="vertical-align: middle" />&nbsp;<warehouse:message code="shipping.listOutgoing.label"/>
+					</g:link>
+				</div>
+			</g:if>
+			<g:if test="${shipmentInstance?.destination?.id == session.warehouse.id}">
+				<div class="action-menu-item">
+					<g:link controller="shipment" action="list" params="[type: 'incoming']">
+						<img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_left.png')}" style="vertical-align: middle" />&nbsp;<warehouse:message code="shipping.listIncoming.label"/>
+					</g:link>
+				</div>
+			</g:if>
 			<div class="action-menu-item">
 				<hr/>
 			</div>

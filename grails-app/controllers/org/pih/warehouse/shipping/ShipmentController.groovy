@@ -176,7 +176,7 @@ class ShipmentController {
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
-			redirect(action: (params.type == "incoming") ? "listReceiving" : "listShipping")
+			redirect(action: "list", params:[type: params.type])
 		}
 		else {
 			def eventTypes =  org.pih.warehouse.core.EventType.list();
@@ -185,26 +185,12 @@ class ShipmentController {
 		}
 	}
 	
-	
-	/**
-	def showDetailsAlt = {
-		def shipmentInstance = Shipment.get(params.id)
-		if (!shipmentInstance) {
-			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
-			redirect(action: (params.type == "incoming") ? "listReceiving" : "listShipping")
-		}
-		else {
-			[shipmentInstance: shipmentInstance]
-		}
-	}
-	**/
-	
 	def editDetails = {
 		log.info params
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
-			redirect(action: (params.type == "incoming") ? "listReceiving" : "listShipping")
+			redirect(action: "list", params:[type: params.type])
 		}
 		else {
 			[shipmentInstance: shipmentInstance]
@@ -215,7 +201,7 @@ class ShipmentController {
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
-			redirect(action: (params.type == "incoming") ? "listReceiving" : "listShipping")
+			redirect(action: "list", params:[type: params.type])
 		}
 		else {
 			// handle a submit
@@ -282,7 +268,7 @@ class ShipmentController {
 		
 		if (!shipmentInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
-			redirect(action: "listReceiving")
+			redirect(action: "list", params:[type: 'incoming'])
 		}
 		else {			
 			if ("POST".equalsIgnoreCase(request.getMethod())) {			
@@ -334,7 +320,7 @@ class ShipmentController {
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
-			redirect(action: (params.type == "incoming") ? "listReceiving" : "listShipping")
+			redirect(action: "list", params:[type: params.type])
 		}
 		else {
 			[shipmentInstance: shipmentInstance]
@@ -345,13 +331,9 @@ class ShipmentController {
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
-			redirect(action: (params.type == "incoming") ? "listReceiving" : "listShipping")
+			redirect(action: "list", params:[type: params.type])
 		}
 		else {
-			//List<String[]> allElements = new ArrayList<String[]>();
-			//shipmentInstance.getAllShipmentItems().each { 
-			//	def row = it.name
-			//}
 			String query = """
 				select  
 					container.name,  
@@ -412,7 +394,7 @@ class ShipmentController {
 		
 		if (!shipmentInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
-			redirect(action: (params.type == "incoming") ? "listReceiving" : "listShipping")
+			redirect(action: "list", params:[type: params.type])
 		}
 		else {
 			
@@ -423,69 +405,12 @@ class ShipmentController {
 		}
 	}
 	
-	/**
-	def listShipments = { 		
-		[ shipments : shipmentService.getShipments() ]
-	}
-	**/
-	
-	def listReceiving = { 
-		def destination = Location.get(session.warehouse.id)
+	def list = {
+		
+		boolean incoming = params.type == "incoming"
+		def origin = incoming ? (params.origin ? Location.get(params.origin) : null) : Location.get(session.warehouse.id)
+		def destination = incoming ? Location.get(session.warehouse.id) : (params.destination ? Location.get(params.destination) : null)
 		def shipmentType = params.shipmentType ? ShipmentType.get(params.shipmentType) : null
-		def origin = params.origin ? Location.get(params.origin) : null
-		def statusCode = params.status ? Enum.valueOf(ShipmentStatusCode.class, params.status) : null
-		def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
-		def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
-					
-		def shipments = shipmentService.getShipments(shipmentType, origin, destination, statusCode, statusStartDate, statusEndDate)
-
-		// sort by status
-		shipments = shipments.sort( { a, b -> 
-			a.getStatus() <=> b.getStatus()
-		} )
-		
-		[ shipments:shipments, shipmentType:shipmentType?.id, origin:origin?.id, status:statusCode?.name, 
-				statusStartDate:statusStartDate, statusEndDate:statusEndDate ]
-	}
-	
-	
-	/**
-	def listShippingByDate = { 
-		def currentLocation = Location.get(session.warehouse.id);
-		
-		def outgoingShipments = params.sort ? shipmentService.getAllShipments(params.sort, params.order) : 
-		shipmentService.getAllShipments('expectedShippingDate','asc')  // probably could default on something better than this
-		
-		// filter by origin location
-		outgoingShipments = outgoingShipments.findAll( {it.origin == currentLocation
-		} )
-		
-		def formatter = new PrettyTime();		
-		def groupBy = (params.groupBy) ? params.groupBy : "lastUpdated";
-		
-		outgoingShipments = outgoingShipments.sort { it[groupBy]
-		}.reverse();
-		def shipmentInstanceMap = outgoingShipments.groupBy { it[groupBy] ? formatter.format(it[groupBy]) : "Empty"
-		}
-		render(view: "listShippingByDate", model: [ shipmentInstanceMap : shipmentInstanceMap ]);		
-	}
-	**/
-	
-	
-	def listShippingByType = {
-		def currentLocation = Location.get(session.warehouse.id);
-		def outgoingShipments = shipmentService.getShipmentsByOrigin(currentLocation);		
-		outgoingShipments = outgoingShipments.sort { it.lastUpdated
-		}.reverse();
-		def shipmentInstanceMap = outgoingShipments.groupBy { it.shipmentType
-		}
-		render (view: "listShippingByDate", model: [ shipmentInstanceMap : shipmentInstanceMap ]);
-	}
-	
-	def listShipping = {	
-		def origin = Location.get(session.warehouse.id)
-		def shipmentType = params.shipmentType ? ShipmentType.get(params.shipmentType) : null
-		def destination = params.destination ? Location.get(params.destination) : null
 		def statusCode = params.status ? Enum.valueOf(ShipmentStatusCode.class, params.status) : null
 		def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
 		def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
@@ -494,63 +419,13 @@ class ShipmentController {
 		
 		// sort by event status, event date, and expecting shipping date
 		shipments = shipments.sort( { a, b -> 
-			def diff = a.lastUpdated <=> b.lastUpdated
-			/*
-			def diff = a.getStatus() <=> b.getStatus() 
-			if (diff ==0) { 
-				diff = a.lastUpdated <=> b.lastUpdated
-				if (diff == 0) {
-					diff = a.expectedShippingDate <=> b.expectedShippingDate
-				}
-			}
-			*/
-			return diff
+			return b.lastUpdated <=> a.lastUpdated
 		} )
-		shipments = shipments.reverse();
-		[ shipments:shipments, shipmentType:shipmentType?.id, destination:destination?.id, status:statusCode?.name, 
-				statusStartDate:statusStartDate, statusEndDate:statusEndDate ]	
-	}	
-	
-	/**
-	def list = { 
-		def browseBy = params.id;
-		def currentLocation = Location.get(session.warehouse.id);    	
-		log.debug ("current location" + currentLocation.name)    	
-		def allShipments = shipmentService.getShipmentsByLocation(currentLocation);
-		def incomingShipments = shipmentService.getShipmentsByDestination(currentLocation);	
-		def outgoingShipments = shipmentService.getShipmentsByOrigin(currentLocation);			
-		def shipmentInstanceList = ("incoming".equals(browseBy)) ? incomingShipments : 
-		("outgoing".equals(browseBy)) ? outgoingShipments : allShipments;		
-		// Arrange shipments by status 
-		def shipmentListByStatus = new HashMap<String, ListCommand>();
-		allShipments.each {
-			def shipmentList = shipmentListByStatus[it.mostRecentStatus];
-			if (!shipmentList) {
-				shipmentList = new ListCommand(category: it.mostRecentStatus, color: "#ddd", 
-				sortOrder: 0, objectList: new ArrayList());
-			}
-			shipmentList.objectList.add(it);	
-			shipmentListByStatus.put(it.mostRecentStatus, shipmentList)
-		}
-		
-		// Get a count of shipments by status		 
-		// QUERY: select shipment_status.id, count(*) from shipment group by shipment_status.id 
-		
-		def criteria = Shipment.createCriteria()
-		def results = criteria {			
-			projections {
-				groupProperty("shipmentType")
-				count("shipmentType", "shipmentCount") //Implicit alias is created here !
-			}
-			//order 'myCount'
-		}			
-		
-		[ 	results : results, shipmentInstanceList : shipmentInstanceList,
-		shipmentInstanceTotal : allShipments.size(), shipmentListByStatus : shipmentListByStatus,
-		incomingShipmentCount : incomingShipments.size(), outgoingShipmentCount : outgoingShipments.size()
-		]
+
+		[ shipments:shipments, shipmentType:shipmentType?.id, origin:origin?.id, destination:destination?.id, 
+		  status:statusCode?.name, statusStartDate:statusStartDate, statusEndDate:statusEndDate, incoming: incoming 
+		]	
 	}
-	*/
 	
 	def saveItem = {     		
 		log.info params;    	
@@ -732,7 +607,7 @@ class ShipmentController {
 		}
 		if (!shipmentInstance) { 
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
-			redirect(action: "listShipping")
+			redirect(action: "list")
 		}
 		render(view: "addDocument", model: [shipmentInstance : shipmentInstance, documentInstance : documentInstance]);
 	}
@@ -742,7 +617,7 @@ class ShipmentController {
 		def documentInstance = Document.get(params?.documentId);
 		if (!shipmentInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.shipmentId])}"
-			redirect(action: "listShipping")
+			redirect(action: "list")
 		}
 		if (!documentInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), params.documentId])}"

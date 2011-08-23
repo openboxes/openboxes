@@ -398,28 +398,28 @@
 			}).next().hide();
 			*/
 			<g:if test="${request.request.requestURL.toString().contains('category')}">
-				accordion.accordion( "activate" , 6 );
+				accordion.accordion( "activate" , 5 );
 			</g:if>
+			<g:elseif test="${request.request.requestURL.toString().contains('Transaction')}">
+				accordion.accordion( "activate" , 5 );
+			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('attribute')}">
-				accordion.accordion( "activate" , 6 );
+				accordion.accordion( "activate" , 5 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('product/create')}">
 				accordion.accordion( "activate" , 0 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('person')}">
-				accordion.accordion( "activate" , 6 );
+				accordion.accordion( "activate" , 5 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('user')}">
-				accordion.accordion( "activate" , 6 );
+				accordion.accordion( "activate" , 5 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('location')}">
-				accordion.accordion( "activate" , 6 );
+				accordion.accordion( "activate" , 5 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('warehouse/warehouse')}">
-				accordion.accordion( "activate" , 6 );
-			</g:elseif>
-			<g:elseif test="${request.request.requestURL.toString().contains('listReceiving')}">
-				accordion.accordion( "activate" , 4 );
+				accordion.accordion( "activate" , 5 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('shipment')}">
 				accordion.accordion( "activate" , 3 );
@@ -446,7 +446,7 @@
 				accordion.accordion( "activate" , 0 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('product')}">
-				accordion.accordion( "activate" , 6 );
+				accordion.accordion( "activate" , 5 );
 			</g:elseif>
 		
 			$('.goto').click(function(){

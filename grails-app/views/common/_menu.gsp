@@ -65,26 +65,19 @@
 		<ul>
 			<li class="">
 				<span class="menuButton">
-					<g:link controller="shipment" action="listShipping"><warehouse:message code="shipping.list.label"  default="List shipments "/></g:link>
+					<g:link controller="shipment" action="list"><warehouse:message code="shipping.listOutgoing.label"  default="List outgoing shipments"/></g:link>
 				</span>
-			</li>									
+			</li>
+			<li class="">
+				<span class="menuButton">
+					<g:link controller="shipment" action="list" params="[type: 'incoming']"><warehouse:message code="shipping.listIncoming.label"  default="List incoming shipments"/></g:link>
+				</span>
+			</li>								
 			<li class="">
 				<span class="menuButton">
 					<g:link controller="createShipmentWorkflow" action="index"><warehouse:message code="shipping.add.label" default="Add a shipment"/></g:link>
 				</span>
 			</li>					
-		</ul>										
-	</div>
-	<h6 class="menu-heading">
-		<warehouse:message code="receiving.label"  default="Receiving"/>
-	</h6>
-	<div class="menu-section">
-		<ul>
-			<li class="">
-				<span class="menuButton">
-					<g:link controller="shipment" action="listReceiving"><warehouse:message code="receiving.list.label"  default="List receiving"/></g:link>
-				</span>		
-			</li>		
 		</ul>										
 	</div>
 	<h6 class="menu-heading">

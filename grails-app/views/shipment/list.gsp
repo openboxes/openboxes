@@ -1,12 +1,9 @@
-
 <html>
    <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${warehouse.message(code: 'shipment.label', default: 'Shipping')}" />
-        <title><warehouse:message code="shipping.shipmentsFrom.label"/> ${session.warehouse.name}</title>
-		<!-- Specify content to overload like global navigation links, page titles, etc. -->
-		
+        <g:set var="messagePrefix" value="${incoming ? 'shipping.shipmentsTo' : 'shipping.shipmentsFrom'}"/>
+        <title><warehouse:message code="${messagePrefix}.label" args="[session.warehouse.name]"/></title>
     </head>    
     <body>
         <div class="body">
@@ -16,8 +13,8 @@
 			<table>            	
             	<tr>
             		<td style="border: 1px solid lightgrey; background-color: #f5f5f5;">
-			            <g:form action="listShipping" method="post">
-			            
+			            <g:form action="list" method="post">
+			            	<g:if test="${incoming}"><g:hiddenField name="incoming" value="true"/></g:if>
 			            	<table >
 			            		<tr>
 						           	<td class="filter-list-item">
@@ -27,13 +24,24 @@
 														optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${shipmentType}" 
 														noSelection="['':warehouse.message(code:'default.all.label')]" />&nbsp;&nbsp;    
 									</td>
-						           	<td class="filter-list-item">
-							           	<label class="block"><warehouse:message code="default.destination.label"/>  </label>
-							           	<g:select name="destination" 
-							           							from="${org.pih.warehouse.core.Location.list().sort()}"
-							           							optionKey="id" optionValue="name" value="${destination}" 
-							           							noSelection="['':warehouse.message(code:'default.all.label')]" />&nbsp;&nbsp;
-									</td>
+									<g:if test="${incoming}">
+							           	<td class="filter-list-item">
+								           	<label class="block"><warehouse:message code="default.origin.label"/>  </label>
+								           	<g:select name="origin" 
+								           							from="${org.pih.warehouse.core.Location.list().sort()}"
+								           							optionKey="id" optionValue="name" value="${origin}" 
+								           							noSelection="['':warehouse.message(code:'default.all.label')]" />&nbsp;&nbsp;
+										</td>									
+									</g:if>
+									<g:else>
+							           	<td class="filter-list-item">
+								           	<label class="block"><warehouse:message code="default.destination.label"/>  </label>
+								           	<g:select name="destination" 
+								           							from="${org.pih.warehouse.core.Location.list().sort()}"
+								           							optionKey="id" optionValue="name" value="${destination}" 
+								           							noSelection="['':warehouse.message(code:'default.all.label')]" />&nbsp;&nbsp;
+										</td>
+									</g:else>
 						           	<td class="filter-list-item">
 							           	<label class="block"><warehouse:message code="default.status.label"/> </label> 
 							           	<g:select name="status" 
@@ -65,14 +73,9 @@
 					<td>            
 			            <g:if test="${shipments.size()==0}">
 			           		<div>
-			           			<g:if test="${shipmentType || destination || status || statusStartDate || statusEndDate}">
-			           				<warehouse:message code="shipping.noShipmentsMatchingConditions.message"/>	
-			           			</g:if>
-			           			<g:else>
-			           				<warehouse:message code="shipping.noShipmentsOriginatingAt.message"/> <b>${session.warehouse.name}</b>.
-			            		</g:else>
+			           			<warehouse:message code="shipping.noShipmentsMatchingConditions.message"/>
 			            		&nbsp;
-			            		<g:link controller="shipment" action="listShipping"><warehouse:message code="shipping.startOver.label"/></g:link>
+			            		<g:link controller="shipment" action="list"><warehouse:message code="shipping.startOver.label"/></g:link>
 			           		</div>
 			           	</g:if>
 			            
@@ -83,8 +86,13 @@
 				                        <tr class="odd">   
 				                         	<th>${warehouse.message(code: 'default.actions.label')}</th>
 				                        	<th>${warehouse.message(code: 'default.type.label')}</th>
-				                            <th>${warehouse.message(code: 'shipping.shipment.label')}</th>							
-				                            <th>${warehouse.message(code: 'default.destination.label')}</th>
+				                            <th>${warehouse.message(code: 'shipping.shipment.label')}</th>
+				                            <g:if test="${incoming}">
+				                           		<th>${warehouse.message(code: 'default.origin.label')}</th>
+				                            </g:if>
+				                            <g:else>
+				                            	<th>${warehouse.message(code: 'default.destination.label')}</th>
+				                            </g:else>						
 				                        	<th>${warehouse.message(code: 'shipping.expectedShippingDate.label')}</th>
 				                         	<th>${warehouse.message(code: 'default.status.label')}</th>
 				                         	<th>${warehouse.message(code: 'default.lastUpdated.label')}</th>
@@ -114,7 +122,12 @@
 													</g:link>				
 												</td>
 												<td align="center">
-													${fieldValue(bean: shipmentInstance, field: "destination.name")}
+													<g:if test="${incoming}">
+														${fieldValue(bean: shipmentInstance, field: "origin.name")}
+													</g:if>
+													<g:else>
+														${fieldValue(bean: shipmentInstance, field: "destination.name")}
+													</g:else>
 												</td>
 												<td align="center">
 													<format:date obj="${shipmentInstance?.expectedShippingDate}"/>

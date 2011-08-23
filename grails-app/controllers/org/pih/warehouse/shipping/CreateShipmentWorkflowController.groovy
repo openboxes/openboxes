@@ -633,7 +633,7 @@ class CreateShipmentWorkflowController {
     			redirect(controller:"shipment", action : "showDetails", params : [ "id" : flow.shipmentInstance.id ?: '' ])
     		}
     		else {
-    			redirect(controller:"shipment", action : "listShipping")
+    			redirect(controller:"shipment", action : "list")
     		}
     	}
     }
