@@ -1950,6 +1950,7 @@ class InventoryService implements ApplicationContextAware {
 			
 		// create the transaction entries based on the base transaction
 		baseTransaction.transactionEntries.each {		
+			/*
 			def inventoryItem = 
 				findInventoryItemByProductAndLotNumber(it.product, it.lotNumber)
 			
@@ -1959,12 +1960,13 @@ class InventoryService implements ApplicationContextAware {
 				if (inventoryItem.hasErrors() && !inventoryItem.save()) {
 					throw new RuntimeException("Unable to create inventory item $inventoryItem while creating local transfer")
 				}
-			}
+			}*/
+			
 			
 			// Create a new transaction entry
 			def transactionEntry = new TransactionEntry();
 			transactionEntry.quantity = it.quantity;
-			transactionEntry.inventoryItem = inventoryItem;
+			transactionEntry.inventoryItem = it.inventoryItem;
 			mirroredTransaction.addToTransactionEntries(transactionEntry);
 		}	
 		
