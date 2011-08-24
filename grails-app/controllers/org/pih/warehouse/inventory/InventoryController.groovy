@@ -1,6 +1,11 @@
+
 package org.pih.warehouse.inventory;
 
+import groovy.sql.Sql;
+
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import org.pih.warehouse.shipping.ShipmentStatusCode;
 import org.pih.warehouse.util.DateUtil;
@@ -12,8 +17,11 @@ import org.pih.warehouse.product.Product;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.Warehouse;
 
+import warehouse.Consumption;
+
 class InventoryController {
 	
+	def dataSource
     def productService;	
 	def inventoryService;
 	
@@ -420,9 +428,96 @@ class InventoryController {
 		[reorderProductsQuantityMap: results['reorderProductsQuantityMap'], minimumProductsQuantityMap: results['minimumProductsQuantityMap'], 
 			categories: categories, categorySelected: categorySelected, showUnsupportedProducts: params.showUnsupportedProducts, inventoryLevelByProduct: inventoryLevelByProduct]
 	}
+
 	
+	def showConsumption2 = { 
+		
+		//Sql sql = new Sql(dataSource)
+		//sql.executeInsert("select ")
+	}
+
+
+	class ConsumptionCommand {
+		String groupBy
+		Date startDate
+		Date endDate
+		
+		static constraints = {
+
+		}
+	}
 	
-	def showConsumption = { 
+	def showConsumption = { ConsumptionCommand command ->
+		
+		def consumptions = inventoryService.getConsumptionTransactionsBetween(command?.startDate, command?.endDate)
+		def consumptionMap = consumptions.groupBy { it.product };
+		
+		//def products = Product.list()
+		def products = consumptions*.product.unique();
+		//products = products.findAll { consumptionMap[it] > 0 }
+		def productMap = products.groupBy { it.category };
+		def dateFormat = new SimpleDateFormat("ddMMyyyy")
+		//def dateKeys = inventoryService.getConsumptionDateKeys()
+		def startDate = command?.startDate?:(new Date()-7)
+		def endDate = command?.endDate?:new Date()
+		
+		def calendar = Calendar.instance
+		def dateKeys = (startDate..endDate).collect { date ->
+			calendar.setTime(date);
+			[
+				date: date,
+				day: calendar.get(Calendar.DAY_OF_MONTH),
+				week: calendar.get(Calendar.WEEK_OF_YEAR),
+				month: calendar.get(Calendar.MONTH),
+				year: calendar.get(Calendar.YEAR),
+				key: dateFormat.format(date)
+			]
+		}.sort { it.date }
+		
+		
+		def groupBy = command?.groupBy;
+		log.info("groupBy = " + groupBy)
+		def daysBetween = (groupBy!="default") ? -1 : endDate - startDate
+		if (daysBetween > 365 || groupBy.equals("yearly")) {
+			groupBy = "yearly"
+			dateFormat = new SimpleDateFormat("yyyy")
+		}
+		else if ((daysBetween > 61 && daysBetween < 365) || groupBy.equals("monthly")) {
+			groupBy = "monthly"
+			dateFormat = new SimpleDateFormat("MMM")
+		}
+		else if (daysBetween > 14 && daysBetween < 60 || groupBy.equals("weekly")) {
+			groupBy = "weekly"
+			dateFormat = new SimpleDateFormat("'Week' w")
+		}
+		else if (daysBetween > 0 && daysBetween <= 14 || groupBy.equals("daily")) {
+			groupBy = "daily"
+			dateFormat = new SimpleDateFormat("MMM dd")
+		}
+		dateKeys = dateKeys.collect { dateFormat.format(it.date) }.unique()
+		
+		
+		log.info("consumption " + consumptionMap)
+		def consumptionProductDateMap = [:]
+		consumptions.each { 
+			def dateKey = it.product.id + "_" + dateFormat.format(it.transactionDate)
+			def quantity = consumptionProductDateMap[dateKey];
+			if (!quantity) quantity = 0;
+			quantity += it.quantity?:0
+			consumptionProductDateMap[dateKey] = quantity;
+			
+			def totalKey = it.product.id + "_Total"
+			def totalQuantity = consumptionProductDateMap[totalKey];
+			if (!totalQuantity) totalQuantity = 0;
+			totalQuantity += it.quantity?:0
+			consumptionProductDateMap[totalKey] = totalQuantity;
+
+		}
+		
+		
+		
+			
+		/*
 		def today = new Date();
 		def warehouse = Warehouse.get(session.warehouse.id)
 		
@@ -436,20 +531,65 @@ class InventoryController {
 		}
 		
 		def consumptionMap = [:]
+		log.info "Products " + products.size();
+				
 		def transactionEntryMap = transactionEntries.groupBy { it.inventoryItem.product }		
 		transactionEntryMap.each { key, value ->
 			def consumed = value.sum { it.quantity }			
-			log.info("key="+key + ", consumed=" + consumed);
+			log.info("key="+key + ", value = " + value + ", total consumed=" + consumed);
 			consumptionMap[key] = consumed;
 		}
-		def products = Product.list()
-		products = products.findAll { consumptionMap[it] > 0 } 
-		def productMap = products.groupBy { it.category };
+		*/
+
 		
+
+
 		
-		[productMap:productMap, consumptionMap:consumptionMap ]
+				
+		[
+			command: command,
+			productMap : productMap,
+			consumptionMap: consumptionMap,
+			consumptionProductDateMap: consumptionProductDateMap,
+			productKeys: products, 
+			results: inventoryService.getConsumptions(command?.startDate, command?.endDate, command?.groupBy),
+			dateKeys: dateKeys]
 	}
 
+	def refreshConsumptionData = { 
+		def consumptionType = TransactionType.get(2)		
+		def transactions = Transaction.findAllByTransactionType(consumptionType)
+
+		// Delete all consumption rows		
+		Consumption.executeUpdate("delete Consumption c")
+		
+		// Reset auto increment counter to 0
+		// ALTER TABLE consumption AUTO_INCREMENT=0
+		
+		transactions.each { xact ->
+			xact.transactionEntries.each { entry -> 
+				def consumption = new Consumption(
+					product: entry.inventoryItem.product, 
+					inventoryItem: entry.inventoryItem, 
+					quantity: entry.quantity,
+					transactionDate: entry.transaction.transactionDate,
+					location: entry.transaction.inventory.warehouse,
+					month: entry.transaction.transactionDate.month,
+					day: entry.transaction.transactionDate.day,
+					year: entry.transaction.transactionDate.year+1900);
+				
+				if (!consumption.hasErrors() && consumption.save()) { 
+					
+				}
+				else { 
+					flash.message = "error saving Consumption " + consumption.errors
+				}
+			}
+		}
+		redirect(controller: "inventory", action: "showConsumption")
+	}
+	
+	
 	/**
 	 * Used to create default inventory items.
 	 * @return

@@ -12,37 +12,47 @@
 				<div class="message">${flash.message}</div>
 			</g:if>
 			
-			<%-- 
 			<table>
 				<tr>
             		<td style="border: 1px solid lightgrey; background-color: #f5f5f5;">
-			            <g:form action="listExpiringStock" method="get">
-			            	<table >
+			            <g:form action="showConsumption" method="get">
+			            	<table style="display: inline">
 			            		<tr>
-			            			<th><warehouse:message code="category.label"/></th>
-			            			<th><warehouse:message code="inventory.expiresWithin.label"/></th>
-			            			<th><warehouse:message code="inventory.excludeExpired.label"/></th>
+			            			<th><warehouse:message code="consumption.startDate.label"/></th>
+			            			<th><warehouse:message code="consumption.endDate.label"/></th>
+			            			<th><warehouse:message code="consumption.groupBy.label"/></th>
+			            			<th></th>
 			            		</tr>
 			            		<tr>
-						           	<td class="filter-list-item">
-						           		<g:select name="category"
-														from="${categories}"
-														optionKey="id" optionValue="${{format.category(category:it)}}" value="${categorySelected?.id}" 
-														noSelection="['':'--All--']" />   
+						           	<td>
+										<g:jqueryDatePicker 
+											id="startDate" 
+											name="startDate" 
+											changeMonthAndYear="true"
+											value="${command?.startDate }" 
+											format="MM/dd/yyyy"
+											showTrigger="false" />
+
+									</td>
+						           	<td>
+							           	<g:jqueryDatePicker 
+											id="endDate" 
+											name="endDate" 
+											changeMonthAndYear="true"
+											value="${command?.endDate }" 
+											format="MM/dd/yyyy"
+											showTrigger="false" />
 									</td>
 									<td>
-						           		<g:select name="threshhold"
-														from="['1':'one week', '14':'two weeks', '30':'one month', 
-															'60':'two months', '90':'three months',
-															'180': 'six months', '365':'one year']"
-														optionKey="key" optionValue="value" value="${threshholdSelected}" 
-														noSelection="['':'--All--']" />  
+						           		<g:select name="groupBy"
+														from="[	'daily': warehouse.message(code:'consumption.daily.label'), 
+																'weekly': warehouse.message(code:'consumption.weekly.label'), 
+																'monthly': warehouse.message(code:'consumption.monthly.label'), 
+																'yearly': warehouse.message(code:'consumption.annually.label')]"
+														optionKey="key" optionValue="value" value="${command?.groupBy}" 
+														noSelection="['default': warehouse.message(code:'default.label')]" />   
 						           	</td>
-						           	<td>	
-						           		<g:checkBox name="excludeExpired" value="${excludeExpired }" } />
-						           	
-						           	</td>						           	
-									<td class="filter-list-item" style="height: 100%; vertical-align: bottom">
+									<td class="right" style="height: 100%; vertical-align: bottom">
 										<button name="filter">
 											<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;<warehouse:message code="default.button.filter.label"/> </button>
 									</td>							           	
@@ -52,50 +62,54 @@
             		</td>
             	</tr>
 			</table>
-			--%>
-				
-			<table>
-				<tr>					
-					<td>
-						<label>
-							<img src="${resource(dir:'images/icons/silk',file:'cup.png')}" style="vertical-align: middle"/> 
-							<warehouse:message code="inventory.consumption.label"/>
-						</label>
-						<div class="message">
-							<warehouse:message code="inventory.consumption.message"/>
-						</div>
-						<div class="list box">
-							
-							<table>
-			       	           	<tbody>			
-			                        <tr>   
-										<th><warehouse:message code="category.label"/></th>
-										<th><warehouse:message code="product.label"/></th>
-										<th class="center"><warehouse:message code="inventory.consumeQuantity.label"/></th>
-			                        </tr>
-			                        <g:set var="c" value="${0 }"/>
-									<g:each var="entry" in="${productMap}" status="i">           
-										<g:each var="product" in="${entry.value}" status="j">
-											<tr class="${(c++ % 2) == 0 ? 'odd' : 'even'}">            
-												<td>
-													${product.category.name }
-												</td>
-												<td>
-													${product.name }
-												</td>
-												<td class="center">
-													${consumptionMap[product] }
-												</td>
-											</tr>						
-										</g:each>
-									</g:each>
-								</tbody>
-							</table>				
-						</div>
-					</td>
-				</tr>			
-			</table>			
+			<br/>
+			<div class="box">
+				<table border="0">
+					<tr class="odd">
+						<th>Product</th>
+						<g:each var="dateKey" in="${dateKeys }">
+							<th class="center">${dateKey }</th>
+						</g:each>
+						<th class="center">Total</th>
+					</tr>
+					<g:each var="productKey" in="${productKeys }" status="i">
+						<tr class="${i%2?'odd':'even' }">
+							<td>
+								${productKey }							
+							</td>
+							<g:each var="dateKey" in="${dateKeys }">
+								<g:set var="qty" value="${consumptionProductDateMap.get(productKey.id + "_" + dateKey)}"/>
+								<td class="center">
+									${consumptionProductDateMap.get(productKey.id + "_" + dateKey)?:0}
+								</td>
+							</g:each>							
+							<th class="center" style="border-left: 1px solid lightgrey;">
+								${consumptionProductDateMap.get(productKey.id + "_Total")?:0}
+							</th>
+						</tr>
+					</g:each>
+					
+				</table>
+			</div>
+			<div class="right">
+				<img src="${resource(dir:'images/icons/silk',file:'arrow_refresh.png')}" style="vertical-align: middle"/> 				
+				<g:link controller="inventory" action="refreshConsumptionData">Refresh consumption data</g:link>
+			</div>
 		</div>
+		
+		<%-- 
+		<div>
+			<table>
+				<g:each var="result" in="${results }">
+					<g:each var="inner" in="${result }">
+						<tr>
+							<td>${inner } ${inner.class.name }</td>
+						</tr>
+					</g:each>
+				</g:each>
+			</table>
+		</div>
+		--%>
 		
 	</body>
 

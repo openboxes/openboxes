@@ -14,7 +14,8 @@ class DatePickerTagLib {
 		def size = attrs.size ?: "10"
 		def showOn = attrs.showOn ?: "both";
 		def showTrigger = Boolean.valueOf(attrs.showTrigger ?: "true");
-				
+		def changeMonthAndYear = attrs.changeMonthAndYear ?: "false";
+		
 		def value = attrs.value;
 		if (value) { 
 			if (value instanceof Date) {
@@ -39,6 +40,8 @@ class DatePickerTagLib {
 						dateFormat: 'dd/M/yy',
 						autoSize: ${autoSize},
 						showOn: '${showOn}',
+						changeMonth: ${changeMonthAndYear},
+						changeYear: ${changeMonthAndYear},
 						buttonImageOnly: true,
 						buttonImage: '/warehouse/images/icons/silk/calendar.png',
 						//buttonText: '...',

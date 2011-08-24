@@ -4025,6 +4025,29 @@
         </insert>        
      </changeSet>	
     
+    <changeSet author="jmiranda (generated)" id="1314195613593-1">
+		<preConditions onFail="MARK_RAN"><not><tableExists tableName="consumption" /></not></preConditions>
+        <createTable tableName="consumption">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="day" type="INT"/>
+            <column name="inventory_item_id" type="BIGINT"/>
+            <column name="month" type="INT"/>
+            <column name="product_id" type="BIGINT"/>
+            <column name="year" type="INT"/>
+            <column name="location_id" type="BIGINT"/>
+            <column name="transaction_date" type="DATETIME"/>
+            <column name="date_created" type="DATETIME"/>
+            <column name="last_updated" type="DATETIME"/>
+            <column name="quantity" type="INT"/>
+        </createTable>
+    </changeSet>
+    
+    
 </databaseChangeLog>
 
 

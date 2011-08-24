@@ -20,6 +20,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.validation.Errors;
 
+import warehouse.Consumption;
+
 class InventoryService implements ApplicationContextAware {
 	
 	def sessionFactory
@@ -1972,4 +1974,58 @@ class InventoryService implements ApplicationContextAware {
 		
 		return mirroredTransaction
 	}
+
+	/**
+	*
+	* @return
+	*/
+   def getConsumptionTransactionsBetween(Date startDate, Date endDate) {
+	   log.info ("startDate = " + startDate + " endDate = " + endDate)
+	   def criteria = Consumption.createCriteria()
+	   def results = criteria.list {
+		   if (startDate && endDate) {
+			   between('transactionDate',startDate, endDate)
+		   }
+	   }
+   
+	  return results
+   }
+
+	/**
+	 * 
+	 * @return
+	 */
+	def getConsumptions(Date startDate, Date endDate, String groupBy) { 
+		log.info ("startDate = " + startDate + " endDate = " + endDate)
+		def criteria = Consumption.createCriteria()
+		def results = criteria.list {
+			if (startDate && endDate) { 
+				between('transactionDate',startDate, endDate)
+			}
+			projections {
+				sum('quantity')
+				groupProperty('product')
+				groupProperty('transactionDate')
+			}
+		}
+	
+	   return results
+	}
+	
+		
+	/**
+	 * 	
+	 * @return
+	 */
+	def getConsumptionDateKeys() {
+		def monthsYears = Consumption.executeQuery("""select distinct 
+				day(transactionDate), 
+				week(transactionDate), 
+				month(transactionDate), 
+				year(transactionDate)
+			from Consumption order by year(transactionDate) desc, month(transactionDate) desc""")
+		return monthsYears?.collect() { [day: it[0], week: it[1], month: it[2], year: it[3] ] }
+	}
+
+	
 }
