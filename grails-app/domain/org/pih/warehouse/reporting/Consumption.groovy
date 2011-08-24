@@ -1,4 +1,4 @@
-package warehouse
+package org.pih.warehouse.reporting
 
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.inventory.InventoryItem;
