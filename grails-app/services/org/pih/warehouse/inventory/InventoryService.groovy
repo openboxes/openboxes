@@ -20,7 +20,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.validation.Errors;
 
-import warehouse.Consumption;
+import org.pih.warehouse.reporting.Consumption;
 
 class InventoryService implements ApplicationContextAware {
 	

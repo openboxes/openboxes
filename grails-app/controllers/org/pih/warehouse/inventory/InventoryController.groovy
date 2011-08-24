@@ -17,7 +17,7 @@ import org.pih.warehouse.product.Product;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.Warehouse;
 
-import warehouse.Consumption;
+import org.pih.warehouse.reporting.Consumption;
 
 class InventoryController {
 	
