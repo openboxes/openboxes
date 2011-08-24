@@ -282,9 +282,9 @@
 	        <g:if test="${transactionInstance?.transactionEntries }">
 	        	<g:set var="index" value="${0 }"/>
 		        <g:set var="transactionMap" value="${transactionInstance?.transactionEntries?.groupBy { it?.inventoryItem?.product?.name } }"/>
-				<g:each in="${transactionMap?.keySet()}" var="key" >
+				<g:each in="${transactionMap.sort()?.keySet()}" var="key" >
 					<g:set var="transactionEntries" value="${transactionMap?.get(key) }"/>
-					<g:each in="${transactionEntries }" var="transactionEntry" status="status">	        
+					<g:each in="${transactionEntries.sort { it.inventoryItem.expirationDate } }" var="transactionEntry" status="status">	        
 						var entry = { 
 							Id: '${transactionEntry?.id}', 
 							Index: ${index++}, 
