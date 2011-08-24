@@ -94,6 +94,18 @@
 			</g:each>
 			<li class="">
 				<span class="menuButton">
+					<g:link controller="createShipmentWorkflow" action="index"><warehouse:message code="shipping.add.label" default="Add a shipment"/></g:link>
+				</span>
+			</li>	
+		</ul>
+	</div>
+	<h6 class="menu-heading" >
+		<warehouse:message code="receiving.label"  default="Receiving"/>
+	</h6>
+	<div class="menu-section">
+		<ul>
+			<li class="">
+				<span class="menuButton">
 					<g:link controller="shipment" action="list" params="[type: 'incoming']"><warehouse:message code="shipping.listIncoming.label"  default="List incoming shipments"/></g:link>
 				</span>
 			</li>
@@ -105,12 +117,7 @@
 						</g:link>
 					</span>
 				</li>
-			</g:each>					
-			<li class="">
-				<span class="menuButton">
-					<g:link controller="createShipmentWorkflow" action="index"><warehouse:message code="shipping.add.label" default="Add a shipment"/></g:link>
-				</span>
-			</li>					
+			</g:each>									
 		</ul>										
 	</div>
 	<h6 class="menu-heading">
