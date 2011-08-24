@@ -790,7 +790,7 @@ class InventoryService implements ApplicationContextAware {
 		Set inventoryItems = getInventoryItemsByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);
 		cmd.inventoryItemList = inventoryItems as List
 		
-		cmd.inventoryItemList.sort { it.lotNumber }
+		cmd.inventoryItemList.sort { it.expirationDate }
 		
 		// Get transaction log for a particular product within an inventory
 		cmd.transactionEntryList = getTransactionEntriesByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);
