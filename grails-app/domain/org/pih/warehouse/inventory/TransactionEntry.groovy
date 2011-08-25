@@ -46,4 +46,19 @@ class TransactionEntry implements Comparable, Serializable {
 	int compareTo(obj) { 
 		transaction.compareTo(obj.transaction)
 	}
+	
+	int hashcode() {
+		if (this.id != null) {
+			return this.id.hashCode();
+		}
+		return super.hashCode();
+	}
+	
+	boolean equals(Object o) {
+		if (o instanceof TransactionEntry) {
+			TransactionEntry that = (TransactionEntry)o;
+			return this.id == that.id;
+		}
+		return false;
+	}
 }

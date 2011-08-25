@@ -6,6 +6,7 @@ import groovy.sql.Sql;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import org.pih.warehouse.shipping.ShipmentStatusCode;
 import org.pih.warehouse.util.DateUtil;
@@ -868,77 +869,114 @@ class InventoryController {
 	
 	
 	def saveNewTransaction = { 
+
 		log.info ("Save new transaction " + params);
 		
-		// Try to find an existing transaction
+		// Try to find an existing transaction and create a new one if needed
 		def transactionInstance = Transaction.get(params.id);
-		
-		
-		// If there are no transactions with that ID, we create a new one
-		if (!transactionInstance) { 
-			transactionInstance = new Transaction(params);
+		if (!transactionInstance) {
+			transactionInstance = new Transaction();
+			transactionInstance.inventory = Inventory.get(params.inventory.id);
+			transactionInstance.transactionEntries = new ArrayList();
+			log.info("This is a new transaction for Inventory: " + transactionInstance.inventory.id);
 		}
-		// Otherwise, we bind parameters to the existing transaction
 		else {
-			//bindData(transactionInstance, params, [exclude: ['transactionEntries']]);
-			//List transactionEntries = 
-			//	ListUtils.lazyList([], FactoryUtils.instantiateFactory(TransactionEntry.class))		
-			//bindData(transactionEntries, params, "entries");			
-			//log.info("bind transaction entries " + transactionEntries);	
-			transactionInstance.properties = params;
+			log.info("This is an existing transaction for Inventory: " + transactionInstance.inventory.id);
 		}
 		
-		// Iterate over all transaction entries to reconcile the inventory item associated with each
-		log.info("Saving inventory items " + transactionInstance.transactionEntries*.inventoryItem);
+		// Set properties on the transaction from the request
+		def dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+		transactionInstance.transactionDate = dateFormat.parse(params.transactionDate);
+		log.info("Setting transaction date to: " + transactionInstance.transactionDate);
 		
-		// Get all transaction entries that have a positive quantity
-		transactionInstance?.transactionEntries = 
-			transactionInstance?.transactionEntries?.findAll { it.quantity && it.quantity != 0 } 
+		transactionInstance.transactionType = TransactionType.get(params.transactionType.id);
+		log.info("Setting transaction type to: " + transactionInstance.transactionType);
 		
-			
-		// Iterate over the transaction entries to make sure it has a valid inventory item 
-		transactionInstance?.transactionEntries.each { 
-			log.info "Saving transaction entry " + it + " " + it.quantity
-			// FIXME This is a bit of a hack.  We needed to be able to bind the product and lot number so 
-			// we bind that to an unsaved inventory item in the transaction entry.  Then we need to look it up
-			// just in case there's already an inventory item with that product and lot number 
-			def product = Product.get(it?.inventoryItem?.product?.id)
-			def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(product, it?.inventoryItem?.lotNumber)
-				
-			if (inventoryItem) {
-				it.inventoryItem = inventoryItem;
-			}
-		 
-			// Make sure the user has not set a negative quantity 
-			// (the transaction type handles whether the quantity is a DEBIT/CREDIT transaction)
-			if (it?.quantity && it.quantity < 0) { 
-				log.info ("Making quantity positive " + it.quantity)
-				it.quantity = -(it.quantity);
-			}
-						
-			// We need to save the inventory item in case it's new or has been modified by the user
-			if (!it.inventoryItem.hasErrors() && it.inventoryItem.save()) { 
-				log.info("saved inventory item " + it.inventoryItem.id);
-			}
-			// FIXME this need to be reworked and tested
-			else { 
-				it.inventoryItem.errors.each { error ->
-					log.info "error with inventory item " + it.inventoryItem + " error = " + error
+		transactionInstance.source = params.source.id ? Location.get(params.source.id as Long) : null;
+		log.info("Setting source to: " + transactionInstance.source);
+		
+		transactionInstance.destination = params.destination.id ? Location.get(params.destination.id as Long) : null
+		log.info("Setting destination to: " + transactionInstance.destination);
+		
+		// Get a Map of existing transaction entries by id
+		Map<String, TransactionEntry> existingEntries = new HashMap<String, TransactionEntry>();
+		transactionInstance.transactionEntries.each {
+			existingEntries.put(it.id.toString(), it);
+		}
+		log.info("Got a Map of existing transaction entries of size: " + existingEntries.size());
+
+		// Update or remove any existing transaction entries as needed
+		String[] transactionEntryIds = params.transactionEntryId
+		log.info("Found: " + transactionEntryIds.length + " transaction entry ids in the request");
+		
+		for (int i=0; i<transactionEntryIds.length; i++) {
+			TransactionEntry entry = existingEntries.get(transactionEntryIds[i]);
+			Integer quantity = params.quantity[i] ? Integer.parseInt(params.quantity[i]) : null;
+			boolean markedForDelete = params.deleteEntry[i] == "true" || quantity == null;
+			log.info("Entry " + i + " is " + entry + " with quantity " + quantity + " and marked for delete = " + markedForDelete);
+			if (markedForDelete) {
+				if (entry) {
+					log.info("Removing from transaction entries");
+					transactionInstance.removeFromTransactionEntries(entry);
+					entry.delete();
 				}
-				transactionInstance.errors.rejectValue('inventoryItems', 'error', 'this is the default message')
 			}
-			
+			else {
+				// If the entry already exists, we are only updating the quantity
+				if (!entry) {
+					entry = new TransactionEntry();
+					entry.transaction = transactionInstance;
+					log.info("Creating a new new transaction entry");
+					if (params.inventoryItemId[i]) {
+						entry.inventoryItem = InventoryItem.get(params.inventoryItemId[i])
+						log.info("This entry has existing inventory item of " + entry.inventoryItem);
+					}
+					else {
+						log.info("This is a manually entered product/lot/expiration combination");
+						Product product = Product.get(params.productId[i]);
+						String lotNumber = params.lotNumber[i];
+						Date expirationDate = null;
+						String expYear = params.expirationDate_year[i];
+						String expMonth = params.expirationDate_month[i];
+						if (expYear && expMonth) {
+							Calendar c = Calendar.getInstance();
+							c.set(Calendar.YEAR, Integer.parseInt(expYear));
+							c.set(Calendar.MONTH, Integer.parseInt(expMonth));
+							c.set(Calendar.DATE, c.getActualMaximum(Calendar.DATE));
+							expirationDate = c.getTime();
+						}
+						log.info("Product: " + product + " lot: " + lotNumber + " expiration: " + expirationDate);
+						def existingItem = inventoryService.findInventoryItemByProductAndLotNumber(product, lotNumber)
+						if (!existingItem) {
+							log.info("This is a new item, so we will create it");
+							existingItem = new InventoryItem();
+							existingItem.product = product;
+							existingItem.lotNumber = lotNumber;
+							existingItem.expirationDate = expirationDate;
+							existingItem.save();
+						}
+						else {
+							log.info("This product/lot combination actually already exists, so we will use that one");
+						}
+						entry.inventoryItem = existingItem;
+					}
+					log.info("Adding this entry to the transaction");
+					transactionInstance.transactionEntries.add(entry);
+				}
+				log.info("Setting the quantity to " + quantity);
+				entry.quantity = quantity >= 0 ? quantity : -quantity;
+			}
 		}
 		
-		// either save as a local transfer, or a generic transaction
-		// (catch any exceptions so that we display "nice" error messages)
 		Boolean saved = null
 		if (!transactionInstance.hasErrors()) {
 			try {
 				if (inventoryService.isValidForLocalTransfer(transactionInstance)) {
+					log.info("Saving this as a local transfer");
 					saved = inventoryService.saveLocalTransfer(transactionInstance) 
 				}
 				else {
+					log.info("Saving this as a standard transaction");
 					saved = transactionInstance.save()
 				}
 			}
@@ -947,12 +985,14 @@ class InventoryController {
 			}
 		}
 				
-		if (saved) {	
-					flash.message = "${warehouse.message(code: 'inventory.transactionSaved.message')}"
+		if (saved) {
+			log.info("Save successful, redirecting to showTransaction page");
+			flash.message = "${warehouse.message(code: 'inventory.transactionSaved.message')}"
 			redirect(action: "showTransaction", id: transactionInstance?.id);
 			return;
 		}
-		else { 		
+		else {
+			log.info("Save unsuccessful, redirecting back to editTransaction page");
 			def warehouseInstance = Warehouse.get(session?.warehouse?.id)
 			def model = [ 
 				transactionInstance : transactionInstance,
