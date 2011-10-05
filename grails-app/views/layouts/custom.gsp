@@ -309,7 +309,7 @@
 	      		      	
 	      	<!-- YUI nav block that includes the local navigation menu -->
 	      	<div id="menu" role="navigation" class="yui-b">
-		  		<g:if test="${session?.user}">
+		  		<g:if test="${session?.user && session?.warehouse}">
 					<!-- Navigation Menu -->
 					<g:render template="/common/menu"/>
 					<%-- 			  		
