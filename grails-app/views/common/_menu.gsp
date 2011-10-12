@@ -32,6 +32,7 @@
 					<g:link controller="order" action="list"><warehouse:message code="order.list.label" default="List orders"/></g:link>
 				</span>
 			</li>
+			<%-- 
 			<g:each in="${org.pih.warehouse.order.Order.executeQuery('select o.status, count(*) from Order as o where o.destination = ? group by o.status', [session?.warehouse])}" var="orderStatusRow">
 				<li class="">
 					<span class="menuButton submenuItem">
@@ -40,7 +41,8 @@
 						</g:link>
 					</span>
 				</li>			
-			</g:each>							
+			</g:each>	
+			--%>						
 			<li class="">
 				<span class="menuButton">
 					<g:link controller="order" action="listOrderItems"><warehouse:message code="orderItem.list.label"  default="List order items"/></g:link>
@@ -83,6 +85,7 @@
 					<g:link controller="shipment" action="list"><warehouse:message code="shipping.listOutgoing.label"  default="List outgoing shipments"/></g:link>
 				</span>
 			</li>
+			<%-- 
 			<g:each in="${org.pih.warehouse.shipping.Shipment.findAllByOrigin(session?.warehouse).groupBy{it.status.code}.sort()}" var="statusRow">
 				<li class="">
 					<span class="menuButton submenuItem">
@@ -92,6 +95,7 @@
 					</span>
 				</li>
 			</g:each>
+			--%>
 			<li class="">
 				<span class="menuButton">
 					<g:link controller="createShipmentWorkflow" action="index"><warehouse:message code="shipping.add.label" default="Add a shipment"/></g:link>
@@ -109,6 +113,7 @@
 					<g:link controller="shipment" action="list" params="[type: 'incoming']"><warehouse:message code="shipping.listIncoming.label"  default="List incoming shipments"/></g:link>
 				</span>
 			</li>
+			<%-- 
 			<g:each in="${org.pih.warehouse.shipping.Shipment.findAllByDestination(session?.warehouse).groupBy{it.status.code}.sort()}" var="statusRow">
 				<li class="">
 					<span class="menuButton submenuItem">
@@ -117,7 +122,8 @@
 						</g:link>
 					</span>
 				</li>
-			</g:each>									
+			</g:each>	
+			--%>								
 		</ul>										
 	</div>
 	<h6 class="menu-heading">
