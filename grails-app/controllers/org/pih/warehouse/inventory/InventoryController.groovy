@@ -66,7 +66,8 @@ class InventoryController {
 		// Pre-populate the sub-category and search terms from the session
 		cmd.subcategoryInstance = Category.get(session?.inventorySubcategoryId)
 		cmd.searchTerms = session?.inventorySearchTerms
-		cmd.showHiddenProducts = session?.showHiddenProducts
+		cmd.showUnsupportedProducts = session?.showUnsupportedProducts
+		cmd.showNonInventoryProducts = session?.showNonInventoryProducts
 		cmd.showOutOfStockProducts = session?.showOutOfStockProducts ?: true
 		
 		// If a new search is being performed, override the session-based terms from the request
@@ -75,10 +76,13 @@ class InventoryController {
 			session?.inventorySubcategoryId = cmd.subcategoryInstance?.id
 			cmd.searchTerms = params.searchTerms
 			session?.inventorySearchTerms = cmd.searchTerms
-			cmd.showHiddenProducts = params?.showHiddenProducts == "on"
-			session?.showHiddenProducts = cmd.showHiddenProducts
+			cmd.showUnsupportedProducts = params?.showUnsupportedProducts == "on"
+			session?.showUnsupportedProducts = cmd.showUnsupportedProducts
 			cmd.showOutOfStockProducts = params?.showOutOfStockProducts == "on"
 			session?.showOutOfStockProducts = cmd.showOutOfStockProducts
+			cmd.showNonInventoryProducts = params?.showNonInventoryProducts == "on"
+			session?.showNonInventoryProducts = cmd.showNonInventoryProducts
+
 		}
 		
 		// Pass this to populate the matching inventory items
@@ -892,6 +896,9 @@ class InventoryController {
 		transactionInstance.transactionType = TransactionType.get(params.transactionType.id);
 		log.info("Setting transaction type to: " + transactionInstance.transactionType);
 		
+		transactionInstance.comment = params?.comment
+		log.info("Setting comment to: " + transactionInstance.comment);
+		
 		transactionInstance.source = params.source.id ? Location.get(params.source.id as Long) : null;
 		log.info("Setting source to: " + transactionInstance.source);
 		
@@ -1060,15 +1067,6 @@ class InventoryController {
 		redirect(action: browse);
 	}
 	
-	def showHiddenProducts = { 
-		if(!session.showHiddenProducts) { 
-			session.showHiddenProducts = true;
-		}
-		else { 
-			session.showHiddenProducts = !session.showHiddenProducts
-		}
-		redirect(action:browse)
-	}
 }
 
 
