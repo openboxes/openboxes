@@ -255,83 +255,9 @@ class InventoryItemController {
 			inventoryItemList: inventoryItemList,
 			transactionEntryList: transactionEntryList,
 			transactionEntryMap: transactionEntryList.groupBy { it.transaction } ]
-	}	
-	
-	def toggleSupported = { 
-		def inventoryLevel;
-		def productInstance = Product.get(params?.product?.id);
-		def inventoryInstance = Inventory.get(params?.inventory?.id);
-		if (productInstance && inventoryInstance) {
-			inventoryLevel = inventoryService.getInventoryLevelByProductAndInventory(productInstance, inventoryInstance)
-			if (!inventoryLevel) inventoryLevel = new InventoryLevel(params);
-			inventoryLevel.product = productInstance;
-			inventoryLevel.inventory = inventoryInstance;
-			inventoryLevel.supported = !inventoryLevel.supported;	
-			if (!inventoryLevel.hasErrors() && inventoryLevel.save()) { 
-				// 
-			}		
-			else { 
-				def errorMessage = "<ul>";
-				inventoryLevel.errors.allErrors.each {
-					errorMessage += "<li>" + it + "</li>";
-				}
-				errorMessage += "</ul>";
-				render errorMessage;
-			}
-		}
-		else { 
-			render "Could not find product or inventory."
-		}
-		
-		render (inventoryLevel.supported?"Yes":"No");
 	}
 	
-	
-	def updateQuantity = { 
-		log.info params;
-		try { 
-			def productInstance = Product.get(params?.product?.id);
-			def inventoryInstance = Inventory.get(params?.inventory?.id);
-			if (productInstance && inventoryInstance) { 
-				def successMessage = "";
-				def inventoryLevel = inventoryService.getInventoryLevelByProductAndInventory(productInstance, inventoryInstance)				
-				if (!inventoryLevel) inventoryLevel = new InventoryLevel(params);
-				inventoryLevel.product = productInstance;
-				inventoryLevel.inventory = inventoryInstance;
-				inventoryLevel.supported = Boolean.TRUE;
-				if (params.minQuantity) { 
-					successMessage = params.minQuantity; 
-					inventoryLevel.minQuantity = Integer.valueOf(params.minQuantity)
-				}
-				if (params.reorderQuantity) { 
-					successMessage = params.reorderQuantity;
-					inventoryLevel.reorderQuantity = Integer.valueOf(params.reorderQuantity)
-				}
-				
-				if (!inventoryLevel.hasErrors() && inventoryLevel.save()) { 
-					render successMessage;
-				}
-				else { 
-					def errorMessage = "<ul>";
-					inventoryLevel.errors.allErrors.each {
-						errorMessage += "<li>" + it + "</li>";
-					} 
-					errorMessage += "</ul>";					
-					render errorMessage;
-				}
-			}
-			else { 
-				render "Error: Could not find product or inventory!"
-			}
-		} 
-		catch (Exception e) { 
-			render "Error: " + e.getMessage();
-		}
-	}
-	
-	
-
-		
+			
 	def createInventoryItem = {
 		
 		flash.message = "${warehouse.message(code: 'inventoryItem.temporaryCreateInventoryItem.message')}"

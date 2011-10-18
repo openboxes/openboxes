@@ -61,19 +61,25 @@
 								</td>
 							</tr>
 							<tr class="prop">
-								<td class="name"><label><warehouse:message code="inventory.supported.label"/></label></td>
+								<td class="name"><label><warehouse:message code="inventoryLevel.status.label"/></label></td>
 								<td class="value">
-									<g:checkBox name="supported" value="${inventoryLevelInstance?.supported }"/>
+						           	<g:select name="status" 
+		           					   from="${org.pih.warehouse.inventory.InventoryStatus.list()}"
+		           					   optionValue="${{format.metadata(obj:it)}}" value="${inventoryLevelInstance.status}" 
+		           					   noSelection="['':warehouse.message(code:'inventoryLevel.chooseStatus.label')]" />&nbsp;&nbsp;	
+								
+								
+
 								</td>
 							</tr>
 							<tr class="prop">
-								<td class="name"><label><warehouse:message code="inventory.minimumQuantity.label"/></label></td>
+								<td class="name"><label><warehouse:message code="inventoryLevel.minimumQuantity.label"/></label></td>
 								<td class="value">
 									<g:textField name="minQuantity" value="${inventoryLevelInstance?.minQuantity }" size="3"/>
 								</td>
 							</tr>
 							<tr class="prop">
-								<td class="name"><label><warehouse:message code="inventory.reorderQuantity.label"/></label></td>
+								<td class="name"><label><warehouse:message code="inventoryLevel.reorderQuantity.label"/></label></td>
 								<td class="value">
 									<g:textField name="reorderQuantity" value="${inventoryLevelInstance?.reorderQuantity }" size="3"/>
 								</td>

@@ -59,8 +59,8 @@
 			                        <tr>   
 										<th width="55%"><warehouse:message code="item.label"/></th>
 										<th class="center" width="15%"><warehouse:message code="default.qty.label"/></th>
-										<th class="center" width="15%"><warehouse:message code="inventory.reorderQuantity.label"/></th>
-										<th class="center" width="15%"><warehouse:message code="inventory.minimumQuantity.label"/></th>
+										<th class="center" width="15%"><warehouse:message code="inventoryLevel.reorderQuantity.label"/></th>
+										<th class="center" width="15%"><warehouse:message code="inventoryLevel.minimumQuantity.label"/></th>
 			                        </tr>
 			                    </thead>
 			       	           	<tbody>			

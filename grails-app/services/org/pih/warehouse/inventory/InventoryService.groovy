@@ -432,7 +432,7 @@ class InventoryService implements ApplicationContextAware {
 	   }
 	   // Get all products that are managed
 	   else { 
-		   def query = session.createQuery("select product from InventoryLevel as inventoryLevel right outer join inventoryLevel.product as product where inventoryLevel.supported is null or inventoryLevel.supported = true")
+		   def query = session.createQuery("select product from InventoryLevel as inventoryLevel right outer join inventoryLevel.product as product where inventoryLevel.status is null or inventoryLevel.status = 'SUPPORTED'")
 		   products = query.list()
 	   }
 	   
@@ -709,7 +709,8 @@ class InventoryService implements ApplicationContextAware {
 		   // getQuantityByInventory returns an Inventory Item to Quantity map, so we want to sum all the values in this map to get the total quantity
 		   def quantity = getQuantityByInventoryAndProduct(inventoryInstance, level.product)?.values().sum { it } ?: 0
 		   
-		   if (level.supported || includeUnsupported) {
+		   // The product is supported or the user asks for unsupported products to be included  
+		   if (level.status == InventoryStatus.SUPPORTED || includeUnsupported) {
 			   if (quantity <= level.minQuantity) {
 				   minimumProductsQuantityMap[level.product] = quantity
 			   }

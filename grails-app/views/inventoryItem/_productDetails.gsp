@@ -1,3 +1,5 @@
+
+<%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
 <h2 class="fade"><warehouse:message code="product.details.label"/></h2>
 <div id="product-details" style="border: 1px solid lightgrey">
 	<table>
@@ -122,60 +124,37 @@
 <h2 class="fade"><warehouse:message code="product.status.label"/></h2>
 <div style="border: 1px solid lightgrey">
 	<table>
-		<tr class="details odd">
-			<td class="label left">
-				<span class="name"><warehouse:message code="product.supported.label"/></span>
-			</td>
-			<td>
-			<%-- 
-				<script>
-					$(document).ready(function() {
-						$('#toggleSupportedImage').click(function() {	
-							var image = $('#toggleSupportedImage');
-							var currImageSrc = image.attr("src");
-							var playImageSrc = "${createLinkTo(dir: 'images/icons/silk', file: 'control_play.png' )}";							
-							var stopImageSrc = "${createLinkTo(dir: 'images/icons/silk', file: 'control_stop.png' )}";							
-							var imageSrc = (currImageSrc == playImageSrc)?stopImageSrc:playImageSrc;							
-							image.attr("src",imageSrc);								
-						});
-					});
-				</script>
-			--%>			
-				<span id="supported" class="value">
-					<span id="supportedValue">
-						<g:if test="${inventoryLevelInstance}">
-							<g:if test="${inventoryLevelInstance?.supported}">
-								<warehouse:message code="default.yes.label"/>
-							</g:if>			
-							<g:else>										
-								<warehouse:message code="default.no.label"/>
-							</g:else>
-						</g:if>
-						<g:else>
-							<span class="fade"><warehouse:message code="default.na.label"/></span>
-						</g:else>
-					</span>
-				</span>
-			</td>
-		</tr>				
 		<tr class="details even">	
 			<td class="label left">
 				<span class="name"><warehouse:message code="default.status.label"/></span>
 			</td>
 			<td>
 				<span class="value">
-					<g:if test="${totalQuantity <= 0}">
-						<span style="color: red"><warehouse:message code="product.noStock.label"/></span>
-					</g:if>
-					<g:elseif test="${totalQuantity <= inventoryLevelInstance?.minQuantity}">
-						<span style="color: orange"><warehouse:message code="product.lowStock.label"/></span>
+				
+					<g:if test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED}">
+						<g:if test="${totalQuantity <= 0}">
+							<span style="color: red"><warehouse:message code="product.noStock.label"/></span>
+						</g:if>
+						<g:elseif test="${totalQuantity <= inventoryLevelInstance?.minQuantity}">
+							<span style="color: orange"><warehouse:message code="product.lowStock.label"/></span>
+						</g:elseif>
+						<g:elseif test="${totalQuantity <= inventoryLevelInstance?.reorderQuantity }">
+							<span style="color: orange;"><warehouse:message code="product.reorder.label"/></span>
+						</g:elseif>
+						<g:else>
+							<span style="color: green;"><warehouse:message code="product.inStock.label"/></span>
+						</g:else>
+					</g:if>			
+					<g:elseif test="${inventoryLevelInstance?.status == InventoryStatus.NOT_SUPPORTED}">
+						<warehouse:message code="enum.InventoryStatus.NOT_SUPPORTED"/>
 					</g:elseif>
-					<g:elseif test="${totalQuantity <= inventoryLevelInstance?.reorderQuantity }">
-						<span style="color: orange;"><warehouse:message code="product.reorder.label"/></span>
+					<g:elseif test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED_NON_INVENTORY}">
+						<warehouse:message code="enum.InventoryStatus.SUPPORTED_NON_INVENTORY"/>
 					</g:elseif>
 					<g:else>
-						<span style="color: green;"><warehouse:message code="product.inStock.label"/></span>
+						<warehouse:message code="enum.InventoryStatus.SUPPORTED"/>
 					</g:else>
+				
 				</span>
 			</td>
 		</tr>				
