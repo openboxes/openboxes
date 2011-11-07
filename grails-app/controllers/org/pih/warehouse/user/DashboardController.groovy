@@ -62,10 +62,10 @@ class DashboardController {
 			// Successfully logged in and selected a warehouse
 			//session.user = userInstance;
 			
-			//if (params?.targetUri) {
-			//	redirect(uri: params.targetUri);
-			//	return;
-			//}
+			if (params?.returnUrl) {
+				redirect(uri: params.returnUrl - request.contextPath);
+				return;
+			}
 			redirect(controller:'dashboard', action:'index')
 		}
 		else {	

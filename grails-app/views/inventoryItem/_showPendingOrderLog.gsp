@@ -1,10 +1,8 @@
 <div>	
-	<h2 class="fade"><warehouse:message code="order.pendingOrderLog.label"/></h2>
-	<div style="text-align: center; border: 1px solid lightgrey;">
+	<div style="text-align: center;">
 		<g:form method="GET" action="showStockCard">
 			<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
-
-			<div class="list">
+			<div>
 				<table>
 					<thead>
 						<tr class="odd prop">
@@ -34,7 +32,6 @@
 					</thead>
 					<!--  Order Log -->
 					<tbody>			
-						
 						<g:set var="anyPendingOrders" value="${false }"/>							
 						<g:each var="entry" in="${orderMap}" status="status">
 							<g:set var="order" value="${entry.key }"/>
@@ -72,7 +69,7 @@
 						<g:if test="${!anyPendingOrders }">
 							<tr>
 								<td colspan="7" class="even center" style="min-height: 100px;">		
-									<div class="fade">
+									<div class="fade padded">
 										<warehouse:message code="order.noPendingOrders.label"/>
 									</div>
 								</td>

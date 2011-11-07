@@ -1,12 +1,8 @@
 
- <style>
- .actions li { padding: 10px; } 
- </style>
-
-
+ 
 <div> 	
-	<h2 class="fade"><warehouse:message code="inventory.currentStock.label"/></h2>
-	<div id="inventoryView" style="text-align: left; border: 1px solid lightgrey;" class="list">	
+
+	<div id="inventoryView" style="text-align: left; border: 0px solid lightgrey;">	
 		<table border="0" style="">
 			<thead>
 				<tr class="odd">
@@ -20,13 +16,6 @@
 				</tr>											
 			</thead>
 			<tbody>
-				<g:if test="${!commandInstance?.inventoryItemList}">
-					<tr class="even" style="min-height: 100px;">
-						<td colspan="5" style="text-align: center; vertical-align: middle">
-							<warehouse:message code="inventory.noItemsCurrentlyInStock.message" args="[format.product(product:commandInstance?.productInstance)]"/>
-						</td>
-					</tr>
-				</g:if>
 				<g:set var="count" value="${0 }"/>
 				<g:each var="itemInstance" in="${commandInstance?.inventoryItemList }" status="status">	
 					<g:if test="${commandInstance.quantityByInventoryItemMap.get(itemInstance)}">		
@@ -46,7 +35,7 @@
 								<div class="action-menu">
 									<button class="action-btn">
 										<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle;"/>
-										&nbsp;<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
+										<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
 									</button>
 									<div class="actions">
 										<g:render template="editItemDialog" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]"/>
@@ -90,32 +79,39 @@
 						</tr>
 					</g:if>
 				</g:each>
-			</tbody>
-			<g:if test="${commandInstance?.inventoryItemList}">
-				<tfoot>
-					<tr class="prop odd" style="border-top: 1px solid lightgrey; border-bottom: 0px solid lightgrey">
-						<td></td>
-						<td colspan="2" class="left">
-							<label><warehouse:message code="inventory.onHandQuantity.label" default="On-hand quantity"/></label>
+				<g:unless test="${commandInstance?.totalQuantity != 0}">
+					<tr>
+						<td colspan="5">
+							<div class="padded center fade">
+								<warehouse:message code="inventory.noItemsCurrentlyInStock.message" args="[format.product(product:commandInstance?.productInstance)]"/>
+							</div>
 						</td>
-						<td class="center">
-							<span style="font-size: 1em;"> 
-								<g:set var="styleClass" value="color: black;"/>																	
-								<g:if test="${commandInstance.totalQuantity < 0}">
-									<g:set var="styleClass" value="color: red;"/>																	
-								</g:if>														
-								<span style="${styleClass }">${commandInstance.totalQuantity }</span> 
-							</span>
-						</td>
-						<g:hasErrors bean="${flash.itemInstance}">
-							<td style="border: 0px;">
-								&nbsp;
-							</td>
-						</g:hasErrors>
 					</tr>
-				</tfoot>
-			</g:if>
+				</g:unless>				
+			</tbody>
+			<tfoot>
+				<tr class="prop odd" style="border-top: 1px solid lightgrey; border-bottom: 0px solid lightgrey">
+					<td></td>
+					<td colspan="2" class="left">
+						<label><warehouse:message code="inventory.onHandQuantity.label" default="On-hand quantity"/></label>
+					</td>
+					<td class="center">
+						<span style="font-size: 1em;"> 
+							<g:set var="styleClass" value="color: black;"/>																	
+							<g:if test="${commandInstance.totalQuantity < 0}">
+								<g:set var="styleClass" value="color: red;"/>																	
+							</g:if>														
+							<span style="${styleClass }">${commandInstance.totalQuantity }</span> 
+						</span>
+					</td>
+					<g:hasErrors bean="${flash.itemInstance}">
+						<td style="border: 0px;">
+							&nbsp;
+						</td>
+					</g:hasErrors>
+				</tr>
+			</tfoot>
 		</table>										
+		
 	</div>	
-
 </div>

@@ -36,7 +36,18 @@ button {
 
 .box { 
 	border: 1px solid lightgrey;
+	margin: 1px;
 	
+}
+.padded { 
+	padding: 25px;	
+}
+.smpad { 
+	padding: 5px;
+}
+
+.hidden { 
+	display: none;
 }
 
 
@@ -588,6 +599,9 @@ div#dashboard li {
 	background-color: #eee;
 }
 
+.prop-multi { 
+	padding-left: 100px;
+}
 
 .prop { 
 	border-top: 1px dotted #ccc;	
@@ -670,3 +684,51 @@ text-align: left;
 background-color: #f7f7f7; 
 border: 1px solid #CCC; 
 }
+
+.data td, .data th { 
+	vertical-align: middle; 
+}
+.data th { 
+	border: 0px; 
+} 
+.categoryBreadcrumb { 			
+	font-weight: bold; 
+	padding: 10px;
+	text-align: left;
+}
+.clear-all { 
+	padding: 5px; 
+	margin-left: 20px;
+}
+.filterRow {
+	font-size: 13px;
+	padding: 5px; 
+	margin: 0px;
+	white-space:nowrap;
+	background-color: #F7F7F7; /*#D8D8D8*/	
+}
+.filter {
+	border: 1px solid lightgrey;
+	padding: 5px;
+	margin-left:10px;
+}
+.paddingRow {
+	padding:2px;
+	border-top:none; border-right:none; border-left:none;
+	background-color:white;
+}
+.filterSelected {
+	background-color:white;
+	border-bottom:none;
+}
+.checked { 
+	background-color: #FFCC66; 
+} 
+.checkbox { 
+	width: 50px; 
+	border: 1px solid black;
+}
+.scrollTable {
+	border-collapse:collapse;
+}
+

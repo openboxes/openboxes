@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.Constants
 
@@ -29,6 +30,8 @@ class Transaction implements Comparable, Serializable {
     Location destination					    		 
 	Date transactionDate	    		// Date entered into the warehouse
     TransactionType transactionType 	// Detailed transaction type (e.g. Order, Transfer, Stock Count)
+	String comment
+	
 	
 	// Auditing fields
 	Boolean confirmed = Boolean.FALSE;	// Transactions need to be confirmed by a supervisor
@@ -50,7 +53,7 @@ class Transaction implements Comparable, Serializable {
 		confirmed(nullable:true)
 		confirmedBy(nullable:true)
 		dateConfirmed(nullable:true)
-		
+		comment(nullable:true)
 		transactionDate(nullable:false, 
 			validator: { value -> value < new Date() })  // transaction date cannot be in the future
 		

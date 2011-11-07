@@ -1,9 +1,8 @@
 <div>	
-	<h2 class="fade"><warehouse:message code="request.pendingRequestLog.label"/></h2>
-	<div style="text-align: center; border: 1px solid lightgrey;">
+	<div style="text-align: center;">
 		<g:form method="GET" action="showStockCard">
 			<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
-			<div class="list">
+			<div>
 				<table>
 					<thead>
 						<tr class="odd prop">
@@ -70,7 +69,7 @@
 						<g:if test="${!anyPendingRequests }">
 							<tr>
 								<td colspan="7" class="even center">		
-									<div class="fade">
+									<div class="fade padded">
 										<warehouse:message code="request.noPendingRequests.label"/>
 									</div>
 								</td>

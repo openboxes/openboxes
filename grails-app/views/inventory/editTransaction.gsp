@@ -48,54 +48,77 @@
 												<div class="action-menu-item">
 													<g:link controller="inventoryItem" action="showStockCard" params="['product.id':params?.product?.id]">
 														<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_left.png')}"/>
-														${warehouse.message(code: 'transaction.backToStockCard.label', default: 'Back to stock card')}
+														${warehouse.message(code: 'transaction.backToStockCard.label', default: 'Back to Stock Card')}
 													</g:link>		
 												</div>	
 											</g:if>
 											<div class="action-menu-item">
 												<g:link controller="inventory" action="browse">
-													<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_up.png')}"/>
-													${warehouse.message(code: 'transaction.backToInventory.label', default: 'Back to inventory')}
+													<img src="${createLinkTo(dir: 'images/icons/silk', file: 'application_view_list.png')}"/>
+													${warehouse.message(code: 'transaction.backToInventory.label')}
 												</g:link>			
-											</div>							
-				
+											</div>
+											<%-- 				
 											<div class="action-menu-item">
 												<g:link controller="inventory" action="listTransactions">
 													<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_up.png')}"/>
-													${warehouse.message(code: 'transaction.back.label', default: 'Back to transactions')}
+													${warehouse.message(code: 'transaction.backToTransactions.label')}
 												</g:link>			
 											</div>
+											--%>
+											<g:if test="${transactionInstance?.id }">
+												<div class="action-menu-item">
+													<hr/>
+												</div>							
+												<div class="action-menu-item">											
+													<g:link controller="inventory" action="deleteTransaction" id="${transactionInstance?.id }" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+								    					<img src="${createLinkTo(dir:'images/icons/silk',file:'bin.png')}" alt="Delete" />
+														&nbsp;${warehouse.message(code: 'transaction.delete.label')}&nbsp;
+													</g:link>							
+												</div>
+											</g:if>
 										</div>
 									</span>
-									<span>
-										<g:if test="${transactionInstance?.id }">
-											${transactionInstance?.transactionNumber() }
-										</g:if>
-										<g:else>
-											<span class="fade">(new transaction)</span>
-										</g:else>
-									</span>
 								</div>					
-							</td>
-							
-							<td class="right">
-								<span>
-									<g:if test="${transactionInstance?.id }">
-										<warehouse:message code="enum.TransactionStatus.COMPLETE"/>
-									</g:if>
-									<g:else>
-										<warehouse:message code="enum.TransactionStatus.PENDING"/>
-									</g:else>
-								</span>
 							</td>
 						</tr>
 						<tr>
 							<td style="padding: 0px;">
 								<div class="left" >
-									<g:form action="saveNewTransaction">
+									<g:form action="saveTransaction">
 										<g:hiddenField name="id" value="${transactionInstance?.id}"/>
 										<g:hiddenField name="inventory.id" value="${warehouseInstance?.inventory?.id}"/>
-										<table class="striped">
+										<table>
+											<tr class="prop">
+												<td>
+													<label><warehouse:message code="transaction.transactionNumber.label"/></label>
+												</td>
+												<td>
+													<span class="value">
+														<g:if test="${transactionInstance?.id }">
+															${transactionInstance?.transactionNumber() }
+														</g:if>
+														<g:else>
+															<span class="fade">(new transaction)</span>
+														</g:else>
+													</span>
+												</td>
+											</tr>
+											<tr class="prop">
+												<td>
+													<label><warehouse:message code="transaction.status.label"/></label>
+												</td>												
+												<td>
+													<span class="value">
+														<g:if test="${transactionInstance?.id }">
+															<warehouse:message code="enum.TransactionStatus.COMPLETE"/>
+														</g:if>
+														<g:else>
+															<warehouse:message code="enum.TransactionStatus.PENDING"/>
+														</g:else>
+													</span>
+												</td>
+											</tr>
 											<tr class="prop">
 												<td>
 													<label><warehouse:message code="transaction.date.label"/></label>
@@ -132,6 +155,18 @@
 													</span>
 												</td>
 											</tr>
+											<tr class="prop">
+												<td>
+													<label><warehouse:message code="transaction.comment.label"/></label>
+												</td>
+												<td>
+													<span class="value">
+														<g:textArea cols="60" rows="5" name="comment" value="${transactionInstance?.comment }"></g:textArea>
+
+													</span>								
+												</td>
+											</tr>				
+
 
 											<tr class="prop">
 												<td colspan="2" style="padding: 0px;">
@@ -174,7 +209,7 @@
 							                                    		<span class="expirationLabel"></span>
 							                                    	</td>
 							                                    	<td style="white-space:nowrap;" class="onHandQtyLabel"></td>
-							                                    	<td style="white-space:nowrap;"><g:textField class="quantityField" name="quantity" value="" size="10"/></td>
+							                                    	<td style="white-space:nowrap;"><g:textField class="quantityField" name="quantity" value="" size="1"/></td>
 							                                    	<td style="white-space:nowrap;" class="actionsCell">
 							                                    		<button type="button" class="rowDeleteButton">
 							                                    			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png')}"/>
@@ -192,13 +227,6 @@
 														<button type="submit" name="save">								
 															<img src="${createLinkTo(dir: 'images/icons/silk', file: 'tick.png')}"/>&nbsp;<warehouse:message code="default.button.save.label"/>&nbsp;
 														</button>
-														<g:if test="${transactionInstance?.id }">
-															&nbsp;
-															<button name="_action_deleteTransaction" id="${transactionInstance?.id }" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-										    					<img src="${createLinkTo(dir:'images/icons/silk',file:'bin.png')}" alt="Delete" />
-																&nbsp;${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}&nbsp;
-															</button>							
-														</g:if>
 													</div>
 												</td>
 											</tr>
@@ -207,44 +235,7 @@
 								</div>
 							</td>
 							
-							<td style="width: 30%; padding: 0px; margin: 0; height: 100%; border-top: 1px solid lightgrey; border-left: 1px solid lightgrey; background-color: #f7f7f7;">
-								
-								<h3 style="padding: 10px;"><warehouse:message code="transaction.addAnItem.label"/></h3>
-								<input type="hidden" id="hiddenProductId" value=""/>
-								<input type="hidden" id="hiddenProductName" value=""/>
-								<div style="padding: 10px;">
-									<g:textField id="productSearch" name="productSearch" value="${warehouse.message(code:'transaction.searchForProduct.label')}" size="25"/> 										
-								</div>				
-								<div id="product-details" style="display:none;">
-									<table>
-										<tr class="prop">
-											<td><b><warehouse:message code="default.description.label"/></b></td>
-											<td><span id="product-details-name"></span></td>
-										</tr>
-										<tr class="prop">
-											<td><b><warehouse:message code="product.manufacturer.label"/></b></td>
-											<td><span id="product-details-manufacturer"></span></td>
-										</tr>
-										<tr class="prop">
-											<td colspan="2" style="padding: 0; margin: 0;">
-												<table id="product-details-lotNumbers">
-													<thead>
-														<tr class="odd">
-															<th></th>
-															<th><warehouse:message code="item.label"/></th>
-															<th><warehouse:message code="default.expires.label"/></th>
-															<th><warehouse:message code="default.qty.label"/></th>
-															<th></th>
-														</tr>
-													</thead>
-													<tbody>
-													</tbody>														
-												</table>
-											</td>
-										</tr>
-									</table>
-								</div>
-							</td>
+							
 						</tr>
 					</table>
 				</fieldset>

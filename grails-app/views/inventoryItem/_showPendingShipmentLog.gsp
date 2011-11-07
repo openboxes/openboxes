@@ -1,10 +1,8 @@
 <div>	
-	<h2 class="fade"><warehouse:message code="shipment.pendingShipmentLog.label"/></h2>
-	<div style="text-align: center; border: 1px solid lightgrey;">
+	<div style="text-align: center;">
 		<g:form method="GET" action="showStockCard">
 			<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
-
-			<div class="list">
+			<div>
 				<table>
 					<thead>
 						<tr class="odd prop">
@@ -71,7 +69,7 @@
 						<g:if test="${!anyPendingShipments }">
 							<tr>
 								<td colspan="7" class="even center">		
-									<div class="fade">
+									<div class="fade padded">
 										<warehouse:message code="shipment.noPendingShipments.label"/>
 									</div>
 								</td>

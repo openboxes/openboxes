@@ -51,6 +51,10 @@ class StockCardCommand {
 		return quantityByInventoryItemMap?.values() ? quantityByInventoryItemMap?.values().sum() : 0
 	}
 	
+	Map getAllTransactionLogMap() { 
+		return transactionEntryList.groupBy { it.transaction }
+	}
+	
 	/**
 	 * Filter the transaction entry list by date range and transaction type
 	 *
@@ -58,23 +62,28 @@ class StockCardCommand {
 	 *
 	 * @return
 	 */
-	Map getTransactionLogMap() {
+	Map getTransactionLogMap(Boolean enableFilter) {
+		
+		println "transaction entries " + transactionEntryList
 		def filteredTransactionLog = transactionEntryList;
-		if (startDate) {
-			filteredTransactionLog = filteredTransactionLog.findAll{it.transaction.transactionDate >= startDate}
-		}
 		
-		// Need to add +1 to endDate because date comparison includes time
-		// TODO Should set endDate to midnight of the date to be more accurate
-		if (endDate) {
-			filteredTransactionLog = filteredTransactionLog.findAll{it.transaction.transactionDate <= endDate+1}
+		if (enableFilter) { 
+			if (startDate) {
+				filteredTransactionLog = filteredTransactionLog.findAll{it.transaction.transactionDate >= startDate}
+			}
+			
+			// Need to add +1 to endDate because date comparison includes time
+			// TODO Should set endDate to midnight of the date to be more accurate
+			if (endDate) {
+				filteredTransactionLog = filteredTransactionLog.findAll{it.transaction.transactionDate <= endDate+1}
+			}
+			
+			// Filter by transaction type (0 = return all types)
+			if (transactionType && transactionType?.id != 0) {
+				filteredTransactionLog = filteredTransactionLog.findAll{it?.transaction?.transactionType?.id == transactionType?.id}
+			}
 		}
-		
-		// Filter by transaction type (0 = return all types)
-		if (transactionType && transactionType?.id != 0) {
-			filteredTransactionLog = filteredTransactionLog.findAll{it?.transaction?.transactionType?.id == transactionType?.id}
-		}
-		
+
 		return filteredTransactionLog.groupBy { it.transaction }
 	}
 	

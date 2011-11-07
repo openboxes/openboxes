@@ -52,7 +52,7 @@ class DatePickerTagLib {
 					
 					var dateValue = '${value}';
 					if (dateValue && dateValue != 'null') {
-						jQuery('#${name}-datepicker').datepicker('setDate', new Date('${value}'));
+						jQuery('#${id}-datepicker').datepicker('setDate', new Date('${value}'));
 					}
 				});
 			</script>
@@ -63,7 +63,7 @@ class DatePickerTagLib {
 			html += """
 			<style>
 			.ui-datepicker-trigger {
-				position: relative; left: -20px; top: -2px;
+				position: relative; left: -16px; top: -1px;
 			}
 			</style>
 			""";

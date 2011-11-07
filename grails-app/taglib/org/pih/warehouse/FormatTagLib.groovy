@@ -19,7 +19,7 @@ class FormatTagLib {
 	*/
 	def date = { attrs, body ->
 		if (attrs.obj != null) {
-			DateFormat df = new SimpleDateFormat(Constants.DEFAULT_DATE_FORMAT)
+			DateFormat df = new SimpleDateFormat((attrs.format)?:Constants.DEFAULT_DATE_FORMAT)
 			out << df.format(attrs.obj)
 		}
 	}

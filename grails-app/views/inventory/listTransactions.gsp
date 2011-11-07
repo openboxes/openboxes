@@ -14,8 +14,30 @@
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
-						
-			<div class="list">
+			
+			<table style="width:100%; border-collapse: collapse; border-color: black;">
+				<tr>
+					<td class="filter filterRow ${!transactionTypeSelected ? 'filterSelected' : '' }">
+						<g:link controller="inventory" action="listAllTransactions">
+							<warehouse:message code="default.all.label"/>
+						</g:link>
+					</td>
+					<g:each var="transactionType" in="${org.pih.warehouse.inventory.TransactionType.list()}">
+						<g:set var="numberOfTransactions" value="${transactionMap[transactionType?.id]?.size()?:0}"/> 
+						<g:if test="${numberOfTransactions > 0 }">
+							<td class="filter filterRow paddingRow"></td>
+							<td class="filter filterRow ${transactionType == transactionTypeSelected ? 'filterSelected' : '' }">
+								<g:link controller="inventory" action="listAllTransactions" params="['transactionType.id':transactionType?.id]">
+									<format:metadata obj="${transactionType }"/>
+									(${numberOfTransactions })
+								</g:link>
+							</td>		
+						</g:if>
+					</g:each>
+					<td class="filter filterRow paddingRow" style="width:100%">&nbsp;</td>
+				</tr>
+			</table>
+			<div class="box padded list">
 				<table>
                     <thead>
                         <tr>   
@@ -25,7 +47,6 @@
 							<th><warehouse:message code="inventory.label"/></th>
 							<th><warehouse:message code="default.source.label"/></th>
 							<th><warehouse:message code="default.destination.label"/></th>
-							<th><warehouse:message code="transaction.entries.label"/></th>
                         </tr>
                     </thead>
        	           	<tbody>			
@@ -45,10 +66,11 @@
 													<g:link action="showTransaction" id="${transactionInstance?.id }">
 														<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}" style="vertical-align: middle;"/>&nbsp;<warehouse:message code="transaction.view.label"/>
 													</g:link>
+													<%-- 
 													<g:link action="editTransaction" id="${transactionInstance?.id }">
 														<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" style="vertical-align: middle;"/>&nbsp;<warehouse:message code="transaction.edit.label"/>
 													</g:link>
-													
+													--%>
 												</div>
 											</div>
 										</span>				
@@ -67,9 +89,12 @@
 									${formatDate(date: transactionInstance?.transactionDate, format: 'dd-MMM-yyyy') }
 								</td>
 								<td>
-									<span class="${transactionInstance?.transactionType?.transactionCode?.name()?.toLowerCase()}">
-										<format:metadata obj="${transactionInstance?.transactionType}"/>
-									</span>
+									<g:link action="showTransaction" id="${transactionInstance?.id }">
+										<span class="${transactionInstance?.transactionType?.transactionCode?.name()?.toLowerCase()}">
+											<format:metadata obj="${transactionInstance?.transactionType}"/>
+										</span>
+										(${transactionInstance?.transactionEntries?.size() } items)
+									</g:link>
 								</td>
 								<td>
 									${transactionInstance?.inventory }
@@ -80,19 +105,14 @@
 								<td>
 									${transactionInstance?.destination?.name }
 								</td>
-								<td>
-									${transactionInstance?.transactionEntries?.size() }
-								</td>
 							</tr>
 						</g:each>
 					</tbody>
 				</table>
 			</div>
+			<div class="paginateButtons">
+				<g:paginate total="${transactionCount}" params="['transactionType.id':transactionTypeSelected?.id]"/>
+			</div>
 		</div>
-		<div class="paginateButtons">
-			<g:paginate total="${transactionCount}" />
-		</div>
-		
 	</body>
-
 </html>

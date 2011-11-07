@@ -15,7 +15,32 @@
 					<g:link controller="inventory" action="browse"><warehouse:message code="inventory.browse.label"/></g:link>
 				</span>
 			</li>
-			<li class="">
+			<li>
+				<span class="menuButton">
+					<g:link controller="inventory" action="listExpiredStock"><warehouse:message code="inventory.expiredStock.label"/></g:link> 
+				</span>
+			</li>
+			<li>
+				<span class="menuButton">
+					<g:link controller="inventory" action="listExpiringStock"><warehouse:message code="inventory.expiringStock.label"/></g:link> 
+				</span>
+			</li>
+			<li>
+				<span class="menuButton">
+					<g:link controller="inventory" action="listLowStock"><warehouse:message code="inventory.lowStock.label"/></g:link> 
+				</span>
+			</li>
+			<li>
+				<span class="menuButton">
+					<g:link controller="inventory" action="showConsumption"><warehouse:message code="inventory.consumption.label"/></g:link> 
+				</span>
+			</li>
+			<li>
+				<span class="menuButton">
+					<g:link controller="inventory" action="listDailyTransactions"><warehouse:message code="transaction.dailyTransactions.label"/></g:link> 
+				</span>
+			</li>
+			<li>
 				<span class="menuButton">
 					<g:link controller="product" action="create"><warehouse:message code="product.add.label"/></g:link>
 				</span>
@@ -125,33 +150,6 @@
 			</g:each>	
 			--%>								
 		</ul>										
-	</div>
-	<h6 class="menu-heading">
-		<warehouse:message code="report.reports.label"/>
-	</h6>
-	<div class="menu-section">
-		<ul>
-			<li>
-				<span class="menuButton">
-					<g:link controller="inventory" action="listDailyTransactions"><warehouse:message code="transaction.dailyTransactions.label"/></g:link> 
-				</span>
-			</li>
-			<li>
-				<span class="menuButton">
-					<g:link controller="inventory" action="listExpiringStock"><warehouse:message code="inventory.expiringStock.label"/></g:link> 
-				</span>
-			</li>
-			<li>
-				<span class="menuButton">
-					<g:link controller="inventory" action="listLowStock"><warehouse:message code="inventory.lowStock.label"/></g:link> 
-				</span>
-			</li>
-			<li>
-				<span class="menuButton">
-					<g:link controller="inventory" action="showConsumption"><warehouse:message code="inventory.consumption.label"/></g:link> 
-				</span>
-			</li>
-		</ul>
 	</div>
 	<h6 class="menu-heading">
 		<warehouse:message code="administration.label"  default="Administration"/>

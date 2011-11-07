@@ -1,6 +1,7 @@
 
 package org.pih.warehouse.inventory;
 
+import grails.validation.ValidationException;
 import groovy.sql.Sql;
 
 import java.text.SimpleDateFormat;
@@ -39,7 +40,7 @@ class InventoryController {
 	 * Allows a user to browse the inventory for a particular warehouse.  
 	 */
 	def browse = { InventoryCommand cmd ->
-		
+		log.info("Browse inventory " + params)
 		// Get the current warehouse from either the request or the session
 		cmd.warehouseInstance = Warehouse.get(params?.warehouse?.id) 
 		if (!cmd.warehouseInstance) {
@@ -361,22 +362,54 @@ class InventoryController {
 		[ transactions: transactions, transactionsByDate: transactionsByDate, dateSelected: dateSelected ]
 	}
 	
-	def listExpiringStock = { 
+	def listExpiredStock = { 
 		def today = new Date();
 		
-		def excludeExpired = params.excludeExpired as Boolean
-		
 		// Stock that has already expired
-		def expiredStock = InventoryItem.findAllByExpirationDateLessThan(today, [sort: 'expirationDate', order: 'desc']);
+		def expiredStock = InventoryItem.findAllByExpirationDateLessThan(today, 
+			[sort: 'expirationDate', order: 'desc']);
+
+		// Get the set of categories BEFORE we filter
+		def categories = [] as Set
 		
+		categories.addAll(expiredStock.collect { it.product.category })
+		log.info "categories: " + categories
+
+		categories = categories.findAll { it != null }
+		
+		// poor man's filter
+		def categorySelected = (params.category) ? Category.get(params.category as int) : null;
+		log.info "categorySelected: " + categorySelected
+		if (categorySelected) {
+			expiredStock = expiredStock.findAll { item -> item?.product?.category == categorySelected }
+		}
+		
+		// filter by threshhold
+		def threshholdSelected = (params.threshhold) ? params.threshhold as int : 0;
+		log.info "threshholdSelected: " + threshholdSelected
+		if (threshholdSelected) {
+			expiredStock = expiredStock.findAll { item -> (item?.expirationDate - today) < threshholdSelected }
+		}
+		
+		def warehouse = Warehouse.get(session.warehouse.id)
+		def quantityMap = inventoryService.getQuantityForInventory(warehouse.inventory)
+		
+		[inventoryItems: expiredStock, quantityMap: quantityMap, categories : categories,
+			categorySelected: categorySelected, threshholdSelected: threshholdSelected]
+		
+		
+	}
+	
+	
+	def listExpiringStock = { 
+		def today = new Date();
+						
 		// Stock expiring within the next 365 days
 		def expiringStock = InventoryItem.findAllByExpirationDateBetween(today+1, today+365, [sort: 'expirationDate', order: 'asc']);
 		//def expiringStock = InventoryItem.list([sort: 'expirationDate', order: 'asc']);
 		
 		// Get the set of categories BEFORE we filter		
-		def categories = [] as Set
-		
-		categories.addAll(expiredStock.collect { it.product.category })
+		def categories = [] as Set		
 		categories.addAll(expiringStock.collect { it.product.category })
 		log.info "categories: " + categories
 
@@ -386,7 +419,6 @@ class InventoryController {
 		def categorySelected = (params.category) ? Category.get(params.category as int) : null;
 		log.info "categorySelected: " + categorySelected
 		if (categorySelected) { 
-			expiredStock = expiredStock.findAll { item -> item?.product?.category == categorySelected } 
 			expiringStock = expiringStock.findAll { item -> item?.product?.category == categorySelected }
 		}
 		
@@ -394,17 +426,14 @@ class InventoryController {
 		def threshholdSelected = (params.threshhold) ? params.threshhold as int : 0;
 		log.info "threshholdSelected: " + threshholdSelected
 		if (threshholdSelected) { 
-			expiredStock = expiredStock.findAll { item -> (item?.expirationDate - today) < threshholdSelected }
 			expiringStock = expiringStock.findAll { item -> (item?.expirationDate && (item?.expirationDate - today) <= threshholdSelected) }
 		}
 		
 		def warehouse = Warehouse.get(session.warehouse.id)		
 		def quantityMap = inventoryService.getQuantityForInventory(warehouse.inventory)
 		
-		
-		
-		[expiredStock : expiredStock, expiringStock: expiringStock, quantityMap: quantityMap, categories : categories, 
-			categorySelected: categorySelected, threshholdSelected: threshholdSelected, excludeExpired: excludeExpired]
+		[inventoryItems: expiringStock, quantityMap: quantityMap, categories : categories, 
+			categorySelected: categorySelected, threshholdSelected: threshholdSelected]
 	}
 	
 	def listLowStock = {
@@ -628,11 +657,22 @@ class InventoryController {
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
 		params.sort = params?.sort ?: "transactionDate"
 		params.order = params?.order ?: "desc"
-		def transactions = Transaction.findAllByInventory(currentInventory, params);
-		def transactionCount = Transaction.countByInventory(currentInventory);
-		
-		
-		render(view: "listTransactions", model: [transactionInstanceList: transactions, transactionCount: transactionCount ])
+		def transactions = []
+		def transactionCount = 0;
+		def transactionType = TransactionType.get(params?.transactionType?.id)
+		if (transactionType) { 
+			transactions = Transaction.findAllByInventoryAndTransactionType(currentInventory, transactionType, params);			
+			transactionCount = Transaction.countByInventoryAndTransactionType(currentInventory, transactionType);
+		}
+		else { 
+			transactions = Transaction.findAllByInventory(currentInventory, params);
+			transactionCount = Transaction.countByInventory(currentInventory);
+		}
+		def transactionMap = Transaction.findAllByInventory(currentInventory).groupBy { it?.transactionType?.id } 
+		log.info(transactionMap.keySet())
+		render(view: "listTransactions", model: [transactionInstanceList: transactions, 
+			transactionCount: transactionCount, transactionTypeSelected: transactionType, 
+			transactionMap: transactionMap ])
 	}
 
 		
@@ -672,6 +712,8 @@ class InventoryController {
 		}
 	}
 	
+	
+	/*
 	def saveTransaction = {	
 		log.info "save transaction: " + params
 		def transactionInstance = Transaction.get(params.id);
@@ -716,7 +758,7 @@ class InventoryController {
 			render(view: "editTransaction", model: model);
 		}	
 	}
-
+	*/
 	
 	/**
 	 * Show the transaction.
@@ -761,9 +803,6 @@ class InventoryController {
 	   
    }
    
-   
-   
-
    	
 	def confirmTransaction = { 
 		def transactionInstance = Transaction.get(params?.id)
@@ -782,118 +821,274 @@ class InventoryController {
 		redirect(action: "listAllTransactions")
 	}
 	
-	def addTo = {
-		log.info("addTo params " + params)
-
-		// Process productId parameters from inventory browser
-		if (params.productId) {
-			log.info("Using params.productId");
-			def productIds = params.list('productId')
-			log.info("productIds " + productIds)
-			def productList = productIds.collect { Long.valueOf(it); }
-			flash.productList = productList;
-		}
-
-		// Then redirect to the appropriate action 
-		if (params.actionButton) {
-			if (params.actionButton.equals("addToShipment")) {
-				redirect(controller: "shipment", action: "addToShipment", params: params)
-				return;
-			}
-			else if (params.actionButton.equals("addToTransaction")) {
-				redirect(controller: "inventory", action: "createTransaction", params: params)
-				return;
-			}
-			/*
-			else if (params.actionButton.equals("showConsumption")) { 
-				redirect(controller: "inventory", action: "createTransaction", params: params)
-				return;
-			}*/
-			else {
-				flash.message = "${warehouse.message(code: 'action.not.found.message', args: [params.actionButton])}"
-			}
-		}
-		redirect(action: "browse");
-		
-	}
-	
 	
 	def createTransaction = { 
-		log.info("createTransaction params " + params)
-		def transactionInstance = new Transaction();
-		def productList = [] 
-		
-		// From addTo action
-		if (flash.productList) { 
-			log.info("Using flash.productList");
-			flash.productList.each { 
-				productList << it;
-			}
-		}
-		
-		// From show stock card page
-		if (params?.product?.id) { 
-			log.info("Using params.product.id");
-			def product = Product.get(params.product.id)
-			if (product) { 
-				productList << product.id;
-			}
-		}
-		
-		if (productList) { 
-			productList.each { 
-				log.info("find product " + it)
-				def product = Product.get(it);
-				def warehouse = Warehouse.get(session.warehouse.id)
-				def inventory = Inventory.get(warehouse.inventory.id);
-				log.info ("inventory=" + inventory + ", product=" + product)
-				//def inventoryItems = inventoryService.getInventoryItemsByProductAndInventory(product, inventory);
-				def inventoryItems = inventoryService.getInventoryItemsByProduct(product);
-				log.info "inventory items " + inventoryItems
-				inventoryItems.each { inventoryItem ->
-					def transactionEntry = new TransactionEntry(product: product, inventoryItem: inventoryItem);
-					transactionInstance.addToTransactionEntries(transactionEntry);
-				}
-			}
-		}
-		
+		log.info("createTransaction params " + params)		
 		def warehouseInstance = Warehouse.get(session?.warehouse?.id);
+		def transactionInstance = new Transaction(params);
+		//transactionInstance?.transactionDate = new Date();
+		//transactionInstance?.source = warehouseInstance
 		
-		def model = [
-			transactionInstance : transactionInstance,
-			productInstanceMap: Product.list().groupBy { it.category },
-			transactionTypeList: TransactionType.list(),
-			locationInstanceList: Location.list(),
-			quantityMap: inventoryService.getQuantityForInventory(warehouseInstance?.inventory),
-			warehouseInstance: warehouseInstance
-		];
+		if (!transactionInstance?.transactionType) { 
+			redirect(controller: "inventory", action: "browse")
+		}
 		
-		render(view: "editTransaction", model: model);
+		// Process productId parameters from inventory browser
+		def productList = [] 
+		if (params.product?.id) {
+			def productIds = params.list('product.id')
+			productList = productIds.collect { Long.valueOf(it); }
+		}
+		
+		def command = new TransactionCommand();
+		command.transactionInstance = transactionInstance
+		command.warehouseInstance = warehouseInstance
+
+		command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, productList);
+		command.quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory);
+		command.transactionTypeList = TransactionType.list();
+		command.locationList = Location.list();
+		
+		[command : command]
+		
+	}
+
+	
+	def saveInventoryAdjustment = { Transaction transaction, TransactionCommand command ->
+		log.info ("Saving stock transfer " + params)
+
+		def warehouseInstance = Warehouse.get(session?.warehouse?.id);
+		def quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory)
+		/*
+		// Validate transaction entries
+		transaction.transactionEntries.each {
+			def quantityOnHand = quantityMap[it.inventoryItem]
+			if (quantityOnHand < it.quantity || it.quantity == 0) {
+				transaction.errors.rejectValue("transactionEntries", "transactionEntry.quantity.invalid", [it?.inventoryItem?.lotNumber] as Object[], "")
+			}
+		}*/
+
+		// Check to see if there are errors, if not save the transaction
+		if (!transaction.hasErrors()) {
+			try {
+				// Validate the transaction object
+				if (!transaction.hasErrors() && transaction.validate()) {
+					transaction.save(failOnError: true)
+					flash.message = "Successfully saved transaction " + transaction.transactionNumber()
+					redirect(controller: "inventory", action: "browse")
+				}
+			} catch (ValidationException e) {
+				log.info ("caught validation exception " + e)
+			}
+		}
+
+		// After the attempt to save the transaction, there might be errors on the transaction
+		if (transaction.hasErrors()) {
+			log.info ("has errors" + transaction.errors)
+			
+			// Get the list of products that the user selected from the inventory browser
+			def productList = []
+			if (params.product?.id) {
+				def productIds = params.list('product.id')
+				productList = productIds.collect { Long.valueOf(it); }
+			}
+			
+			// Populate the command object and render the form view.
+			command.transactionInstance = transaction
+			command.warehouseInstance = warehouseInstance
+			command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, productList);
+			command.quantityMap = quantityMap;
+			command.transactionTypeList = TransactionType.list();
+			command.locationList = Location.list();
+			
+			render(view: "createTransaction", model: [command: command]);
+		}
+	}
+
+	
+	def saveIncomingTransfer = { TransactionCommand command ->
+
+		log.info(params)
+		def transactionInstance = command?.transactionInstance
+		def warehouseInstance = Warehouse.get(session?.warehouse?.id);
+		def quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory)
+
+		// We need to process each transaction entry to make sure that it has a valid inventory item (or we will create one if not)
+		command.transactionEntries.each { 
+			log.info(it.inventoryItem?.id + " " + it.product + " " + it.lotNumber + " " + it.expirationDate)
+			if (!it.inventoryItem) { 
+				// 1. Find an existing inventory item for the given lot number and product and description
+				log.info("Find inventory item " + it.product + " " + it.lotNumber)
+				def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(it.product, it.lotNumber)
+				log.info("Found inventory item? " + inventoryItem)
+				
+				// 2. If the inventory item doesn't exist, we create a new one
+				if (!inventoryItem) {
+					inventoryItem = new InventoryItem();
+					inventoryItem.lotNumber = it.lotNumber
+					inventoryItem.expirationDate = it.expirationDate
+					inventoryItem.product = it.product;
+					log.info("Save inventory item " + inventoryItem)
+					if (inventoryItem.hasErrors() || !inventoryItem.save()) {
+						inventoryItem.errors.allErrors.each { error->
+							command.errors.reject("inventoryItem.invalid",
+								[inventoryItem, error.getField(), error.getRejectedValue()] as Object[],
+								"[${error.getField()} ${error.getRejectedValue()}] - ${error.defaultMessage} ");
+							
+						}
+					}
+				}
+				it.inventoryItem = inventoryItem
+			}
+		}	
+		
+		// Now that all transaction entries in the command have inventory items, 
+		// we need to create a persistable transaction entry
+		command.transactionEntries.each {
+			def transactionEntry = new TransactionEntry()
+			transactionEntry.inventoryItem = it.inventoryItem
+			transactionEntry.quantity = it.quantity
+			
+			transactionInstance.addToTransactionEntries(transactionEntry)
+		}
+
+		// Check to see if there are errors, if not save the transaction
+		if (!transactionInstance.hasErrors()) {
+			try {
+				// Validate the transaction object
+				if (!transactionInstance.hasErrors() && transactionInstance.validate()) {
+					transactionInstance.save(failOnError: true)
+					flash.message = "Successfully saved transaction " + transactionInstance.transactionNumber()
+					redirect(controller: "inventory", action: "browse")
+				}
+			} catch (ValidationException e) {
+				log.info ("caught validation exception " + e)
+			}
+		}
+
+		// Should be true if we're here
+		if (transactionInstance.hasErrors()) {
+			log.info ("has errors" + transactionInstance.errors)
+		
+			// Get the list of products that the user selected from the inventory browser
+			def productList = []
+			if (params.product?.id) {
+				def productIds = params.list('product.id')
+				productList = productIds.collect { Long.valueOf(it); }
+			}
+			
+			// Populate the command object and render the form view.
+			//command.transactionInstance = transaction
+			command.warehouseInstance = warehouseInstance
+			command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, productList);
+			command.quantityMap = quantityMap;
+			command.transactionTypeList = TransactionType.list();
+			command.locationList = Location.list();
+			
+			render(view: "createTransaction", model: [command: command]);
+		}
 	}
 	
 	
-	def saveNewTransaction = { 
+	def saveOutgoingTransfer = { Transaction transaction, TransactionCommand command ->
+		log.info ("Saving stock transfer " + params)
 
-		log.info ("Save new transaction " + params);
+		def warehouseInstance = Warehouse.get(session?.warehouse?.id);
+		def quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory)
+		
+		// Validate transaction entries
+		log.info ("BEGINNING")
+		def transactionEntriesToRemove = []
+		transaction.transactionEntries.each {
+			log.info("transaction entry " + it.inventoryItem + " " + it.quantity);
+			def quantityOnHand = quantityMap[it.inventoryItem]
+			if (quantityOnHand < it.quantity) {
+				transaction.errors.rejectValue("transactionEntries", "transactionEntry.quantity.invalid", [it?.inventoryItem?.lotNumber] as Object[], "")
+			} 
+			
+			if (!it.quantity) { 
+				log.info ("remove " + it?.inventoryItem?.id + " from transaction entries")
+				transactionEntriesToRemove.add(it)
+			}
+		}
+
+		// Remove any transaction entries that are invalid
+		transactionEntriesToRemove.each {
+			log.info("REMOVE " + it.inventoryItem + " " + it.quantity);
+			transaction.transactionEntries.remove(it)
+		}
+		
+		log.info ("REMAINING")
+		transaction.transactionEntries.each {
+			log.info("transaction entry " + it.inventoryItem + " " + it.quantity);
+		}
+		// Check to see if there are errors, if not save the transaction 		
+		if (!transaction.hasErrors()) { 
+			try { 
+				// Validate the transaction object
+				if (!transaction.hasErrors() && transaction.validate()) { 
+					transaction.save(failOnError: true)				
+					flash.message = "Successfully saved transaction " + transaction.transactionNumber()
+					redirect(controller: "inventory", action: "browse")
+				} 
+			} catch (ValidationException e) { 
+				log.info ("caught validation exception " + e)
+			}
+		}
+
+		// After the attempt to save the transaction, there might be errors on the transaction		
+		if (transaction.hasErrors()) { 
+			log.info ("has errors" + transaction.errors)
+			
+			// Get the list of products that the user selected from the inventory browser
+			def productList = []
+			if (params.product?.id) {
+				def productIds = params.list('product.id')
+				productList = productIds.collect { Long.valueOf(it); }
+			}
+			
+			// Populate the command object and render the form view.
+			command.transactionInstance = transaction
+			command.warehouseInstance = warehouseInstance
+			command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, productList);
+			command.quantityMap = quantityMap;
+			command.transactionTypeList = TransactionType.list();
+			command.locationList = Location.list();
+			
+			render(view: "createTransaction", model: [command: command]);
+		}			
+	}
+	
+	
+	
+	
+	/**
+	 * Not used any longer (except maybe for editTransaction)
+	 */
+	def saveTransaction = { TransactionCommand command ->
+
+		log.info ("Save transaction " + params);
 		
 		// Try to find an existing transaction and create a new one if needed
 		def transactionInstance = Transaction.get(params.id);
 		if (!transactionInstance) {
-			transactionInstance = new Transaction();
+			transactionInstance = new Transaction(params);
 			transactionInstance.inventory = Inventory.get(params.inventory.id);
-			transactionInstance.transactionEntries = new ArrayList();
+			//transactionInstance.transactionEntries = new ArrayList();
 			log.info("This is a new transaction for Inventory: " + transactionInstance.inventory.id);
 		}
 		else {
 			log.info("This is an existing transaction for Inventory: " + transactionInstance.inventory.id);
+			transactionInstance.properties = params
 		}
 		
+		/*
 		// Set properties on the transaction from the request
 		def dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-		transactionInstance.transactionDate = dateFormat.parse(params.transactionDate);
+		transactionInstance.transactionDate = dateFormat.parse(params?.transactionDate);
 		log.info("Setting transaction date to: " + transactionInstance.transactionDate);
 		
-		transactionInstance.transactionType = TransactionType.get(params.transactionType.id);
+		transactionInstance.transactionType = TransactionType.get(params?.transactionType?.id);
 		log.info("Setting transaction type to: " + transactionInstance.transactionType);
 		
 		transactionInstance.comment = params?.comment
@@ -904,18 +1099,18 @@ class InventoryController {
 		
 		transactionInstance.destination = params.destination.id ? Location.get(params.destination.id as Long) : null
 		log.info("Setting destination to: " + transactionInstance.destination);
-		
+		*/
 		// Get a Map of existing transaction entries by id
 		Map<String, TransactionEntry> existingEntries = new HashMap<String, TransactionEntry>();
 		transactionInstance.transactionEntries.each {
 			existingEntries.put(it.id.toString(), it);
 		}
 		log.info("Got a Map of existing transaction entries of size: " + existingEntries.size());
-
+		
 		// Update or remove any existing transaction entries as needed
+		/*
 		String[] transactionEntryIds = params.transactionEntryId
 		log.info("Found: " + transactionEntryIds.length + " transaction entry ids in the request");
-		
 		for (int i=0; i<transactionEntryIds.length; i++) {
 			TransactionEntry entry = existingEntries.get(transactionEntryIds[i]);
 			Integer quantity = params.quantity[i] ? Integer.parseInt(params.quantity[i]) : null;
@@ -974,6 +1169,7 @@ class InventoryController {
 				entry.quantity = quantity >= 0 ? quantity : -quantity;
 			}
 		}
+		*/
 		
 		Boolean saved = null
 		if (!transactionInstance.hasErrors()) {
@@ -999,17 +1195,26 @@ class InventoryController {
 			return;
 		}
 		else {
-			log.info("Save unsuccessful, redirecting back to editTransaction page");
+			log.info("Save unsuccessful, render errors on createTransaction page");
+			
+			// Process productId parameters from inventory browser
+			def productList = []
+			log.info(params)
+			if (params.product?.id) {
+				def productIds = params.list('product.id')
+				productList = productIds.collect { Long.valueOf(it); }
+			}
 			def warehouseInstance = Warehouse.get(session?.warehouse?.id)
-			def model = [ 
+			def model = [
+				productInventoryItems: inventoryService.getInventoryItemsByProducts(warehouseInstance, productList),
+				quantityMap: inventoryService.getQuantityForInventory(warehouseInstance?.inventory),
 				transactionInstance : transactionInstance,
-				productInstanceMap: Product.list().groupBy { it.category },
 				transactionTypeList: TransactionType.list(),
 				locationInstanceList: Location.list(),
-				quantityMap: inventoryService.getQuantityForInventory(warehouseInstance?.inventory),
 				warehouseInstance: warehouseInstance
-			]
-			render(view: "editTransaction", model: model);
+			];
+			render(view: "createTransaction", model: model);
+
 		}		
 	}
 	

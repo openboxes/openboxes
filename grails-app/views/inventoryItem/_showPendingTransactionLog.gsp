@@ -1,5 +1,4 @@
 <div>	
-	<h2 class="fade"><warehouse:message code="transaction.pendingTransactionLog.label"/></h2>
 	<div style="text-align: center; border: 1px solid lightgrey;">
 		<g:form method="GET" action="showStockCard">
 			<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>

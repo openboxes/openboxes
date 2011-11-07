@@ -6,6 +6,7 @@
         <g:set var="entityName" value="${warehouse.message(code: 'transaction.label', default: 'Transaction')}" />
         
         <title><warehouse:message code="transaction.dailyTransactions.label"/></title>    
+        <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'scrolltable.css')}" type="text/css" media="screen, projection" />
     </head>    
 
 	<body>
@@ -58,24 +59,28 @@
 					<tr>
 						<td width="15%">
 							<div class="list">
-								<table>			
-									<tr>
-										<th class="odd"><warehouse:message code="default.dates.label"/></th>
-									</tr>
-										
-									<g:if test="${transactionsByDate }">		
-										<g:each var="entry" in="${transactionsByDate }" status="i">
-											<g:set var="dateParam" value="${formatDate(date: entry.key, format: org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT) }"/>
-											<g:set var="dateDisplay" value="${formatDate(date: entry.key, format: 'MMMMM dd') }"/>
-											<tr class="prop ${i%2?'odd':'even' }">
-												<td class="left">
-													<g:link action="listDailyTransactions" params="[date: dateParam]">
-														${dateDisplay } 
-													</g:link>
-													(${entry.value.size() })
-												</td>
-											</tr>
-										</g:each>
+								<table class="scrollTable">			
+									<thead class="fixedHeader">
+										<tr>
+											<th class="odd"><warehouse:message code="default.dates.label"/></th>
+										</tr>
+									</thead>
+									
+									<g:if test="${transactionsByDate }">
+										<tbody class="scrollContent">		
+											<g:each var="entry" in="${transactionsByDate }" status="i">
+												<g:set var="dateParam" value="${formatDate(date: entry.key, format: org.pih.warehouse.core.Constants.DEFAULT_DATE_FORMAT) }"/>
+												<g:set var="dateDisplay" value="${formatDate(date: entry.key, format: 'MMMMM dd') }"/>
+												<tr class="prop ${i%2?'odd':'even' }">
+													<td class="left">
+														<g:link action="listDailyTransactions" params="[date: dateParam]">
+															${dateDisplay } 
+														</g:link>
+														(${entry.value.size() })
+													</td>
+												</tr>
+											</g:each>
+										</tbody>
 									</g:if>
 									<g:else>
 										<warehouse:message code="transaction.noTransactions.label"/>

@@ -1,40 +1,42 @@
+<a name="transactionLog"></a>
 <div>							
-	
-	<h2 class="fade"><warehouse:message code="transaction.transactionLog.label"/></h2>
-	<div style="text-align: left; border: 1px solid lightgrey;">
-		<g:form method="GET" action="showStockCard">
+	<div>
+		<g:form method="GET" action="showStockCard" fragment="transactionLog">
 			<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
 
-				<!--  Filter -->
-				<div style="padding: 10px; ">
-					<g:jqueryDatePicker 
-						id="startDate" 
-						name="startDate" 
-						value="${commandInstance?.startDate }" 
-						format="MM/dd/yyyy"
-						size="8"
-						showTrigger="false" />
-					<warehouse:message code="default.to.label"/>
-					<g:jqueryDatePicker 
-						id="endDate" 
-						name="endDate" 
-						value="${commandInstance?.endDate }" 
-						format="MM/dd/yyyy"
-						size="8"
-						showTrigger="false" />
+			<!--  Filter -->
+			<div style="padding: 10px; margin:1px" class="odd box">
+				<warehouse:message code="transactionLog.from.label"/>
+				<g:jqueryDatePicker 
+					id="startDate" 
+					name="startDate" 
+					value="${commandInstance?.startDate }" 
+					format="MM/dd/yyyy"
+					size="8"
+					showTrigger="false" />
+				<warehouse:message code="transactionLog.to.label"/>
+				<g:jqueryDatePicker 
+					id="endDate" 
+					name="endDate" 
+					value="${commandInstance?.endDate }" 
+					format="MM/dd/yyyy"
+					size="8"
+					showTrigger="false" />
 
-					<g:select name="transactionType.id" 
-						from="${org.pih.warehouse.inventory.TransactionType.list()}" 
-						optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${commandInstance?.transactionType?.id }" 
-						noSelection="['0': warehouse.message(code:'default.all.label')]" /> 
+				<g:select name="transactionType.id" 
+					from="${org.pih.warehouse.inventory.TransactionType.list()}" 
+					optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${commandInstance?.transactionType?.id }" 
+					noSelection="['0': warehouse.message(code:'default.all.label')]" /> 
+			
+				<button  class="" name="filter">
+					<img src="${createLinkTo(dir: 'images/icons/silk', file: 'zoom.png' )}" style="vertical-align:middle"/>
+					&nbsp;<warehouse:message code="default.button.filter.label"/>
+				</button>
+
 				
-					<button  class="" name="filter">
-						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'zoom.png' )}" style="vertical-align:middle"/>
-						&nbsp;<warehouse:message code="default.button.filter.label"/>
-					</button>
-				</div>			
-	
-			<div class="list">
+			</div>			
+			<g:set var="enableFilter" value="${!params.disableFilter}"/>
+			<div class="box" style="margin: 1px;">
 				<table >
 					<thead>
 						<tr class="odd prop">
@@ -58,20 +60,24 @@
 					</thead>
 					<!--  Transaction Log -->
 					<tbody>			
-						<g:if test="${!commandInstance?.transactionLogMap }">
+						
+						<g:set var="transactionMap" value="${commandInstance?.getTransactionLogMap(enableFilter.toBoolean())}"/>
+						<g:if test="${!transactionMap }">
 							<tr>
-								<td colspan="5" class="even center" style="min-height: 100px;">		
-									<div class="fade" ><warehouse:message code="transaction.noTransactions.message" args="[format.metadata(obj:commandInstance?.transactionType),commandInstance?.startDate,commandInstance?.endDate]"/>
+								<td colspan="5" class="even center">		
+									<div class="fade padded">
+										<warehouse:message code="transaction.noTransactions.message" args="[format.metadata(obj:commandInstance?.transactionType),commandInstance?.startDate,commandInstance?.endDate]"/>
 									</div>
 								</td>
 							</tr>
 						</g:if>
 						<g:else>
-							<g:set var="totalQuantityChange" value="${0 }"/>							
-							<g:each var="transaction" in="${commandInstance?.transactionLogMap?.keySet().sort {it.transactionDate}.reverse() }" status="status">
+						
+							
+							<g:set var="totalQuantityChange" value="${0 }"/>		
+							<g:each var="transaction" in="${transactionMap?.keySet()?.sort {it.transactionDate}.reverse() }" status="status">
 								<tr class="transaction ${(status%2==0)?'even':'odd' } prop">
 									<td style="width: 10%; nowrap="nowrap">	
-									
 										<g:link controller="inventory" action="showTransaction" id="${transaction?.id }" params="['product.id':commandInstance?.productInstance?.id]">
 											<format:date obj="${transaction?.transactionDate}"/>																
 										</g:link>
@@ -85,19 +91,16 @@
 										${transaction?.source?.name }
 									</td>
 										<td>
-										${transaction?.destination?.name }
-									
+										${transaction?.destination?.name }									
 									</td>
 									<td style="text-align: center">
-									
 										<g:set var="quantityChange" value="${0 }"/>
-										<g:each var="transactionEntry" in="${commandInstance?.transactionLogMap?.get(transaction) }" status="status2">
+										<g:each var="transactionEntry" in="${commandInstance?.getTransactionLogMap(enableFilter.toBoolean())?.get(transaction) }" status="status2">
 											<g:set var="quantityChange" value="${transaction?.transactionEntries.findAll{it?.inventoryItem?.product == commandInstance?.productInstance}.quantity?.sum() }"/>
 										</g:each>
 										<span class="${transaction?.transactionType?.transactionCode?.name()?.toLowerCase()}">
 											${quantityChange }
 										</span>
-										
 									</td>
 								</tr>
 							</g:each>
@@ -120,3 +123,20 @@
 		</g:form>
 	</div>
 </div>
+<div class="left smpad">
+	Showing ${transactionMap?.keySet()?.size() } of ${commandInstance?.allTransactionLogMap?.keySet()?.size() }
+	<g:if test="${commandInstance?.allTransactionLogMap?.keySet()?.size() > transactionMap?.keySet()?.size()}">
+		&nbsp;|&nbsp;
+		<g:link controller="inventoryItem" action="showStockCard" id="${commandInstance?.productInstance?.id }" params="[disableFilter: true]" fragment="transactionLog">
+			<warehouse:message code="transactionLog.showAll.label"></warehouse:message>
+		</g:link>
+	</g:if>
+	<%-- 
+	<g:else>
+		<g:link controller="inventoryItem" action="showStockCard" id="${commandInstance?.productInstance?.id }" fragment="transactionLog">
+			<warehouse:message code="transactionLog.reset.label"></warehouse:message>
+		</g:link>
+	</g:else>
+	--%>	
+</div>
+	

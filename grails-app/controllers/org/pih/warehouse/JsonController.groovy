@@ -28,6 +28,15 @@ class JsonController {
 	
 	def localizationService
 	
+	def getInventoryItem = { 
+		log.info(params)
+		
+		def inventoryItem = InventoryItem.get(params.id)
+		
+		render inventoryItem as JSON;
+		
+	}
+	
 	def getQuantity = { 
 		log.info params
 		def quantity = 0

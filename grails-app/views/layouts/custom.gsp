@@ -18,6 +18,7 @@
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'form.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footer.css')}" type="text/css" media="screen, projection" />	
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'wizard.css')}" type="text/css" media="screen, projection" />
+	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.tableScroll/',file:'jquery.tablescroll.css')}" type="text/css" media="screen, projection" />
 	
 	<!-- Include javascript files -->
 	<g:javascript library="application"/>
@@ -40,6 +41,8 @@
 	<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.tmplPlus.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.livequery.min.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.hoverIntent.minified.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/jquery.tableScroll/', file:'jquery.tablescroll.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/jquery.watermark/', file:'jquery.watermark.min.js')}" type="text/javascript" ></script>
 	
  	<!-- Include Jquery Validation and Jquery Validation UI plugins -->
  	<jqval:resources />       
@@ -143,11 +146,20 @@
 												<warehouse:message code="layout.myAccount.label"/>
 											</g:link>	
 										</li>
+										<li>
+											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
+										</li>
+										<li>
+											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'application_view_tile.png')}" style="vertical-align: middle" />
+											<g:link class="home" controller="dashboard" action="index">
+												<warehouse:message code="dashboard.label"/>
+											</g:link>	
+										</li>
 																	
 										<g:if test="${session?.warehouse}">
 											<li>
 												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
-											</li>												
+											</li>
 										
 											<li>
 												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'building.png')}" style="vertical-align: middle" />
@@ -174,7 +186,7 @@
 																			</g:if>					
 																			<div id="warehouse-${warehouse.id }" class="warehouse">												
 																				<g:if test="${warehouse.local}">
-																					<a href='${createLink(controller: "dashboard", action:"chooseWarehouse", id: warehouse.id)}' style="display: block; padding: 0px;">
+																					<a href='${createLink(controller: "dashboard", action:"chooseWarehouse", id: warehouse.id, params: ['returnUrl':request.forwardURI])}' style="display: block; padding: 0px;">
 																						${warehouse.name} 
 																					</a> 
 																						
@@ -451,6 +463,12 @@
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('order')}">
 				accordion.accordion( "activate" , 1 );
+			</g:elseif>
+			<g:elseif test="${request.request.requestURL.toString().contains('inventory/list')}">
+				accordion.accordion( "activate" , 0 );
+			</g:elseif>
+			<g:elseif test="${request.request.requestURL.toString().contains('inventory/show')}">
+				accordion.accordion( "activate" , 0 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('inventory')}">
 				accordion.accordion( "activate" , 0 );

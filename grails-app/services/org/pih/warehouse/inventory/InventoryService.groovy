@@ -782,6 +782,13 @@ class InventoryService implements ApplicationContextAware {
 		return getQuantityByInventoryItemMap(transactionEntries);
 	}
 	
+	/**
+	 * Save an outgoing transfer transaction.
+	 */
+	
+	
+	
+	
 	
 	/**
 	 * Fetches and populates a StockCard Command object
@@ -801,8 +808,7 @@ class InventoryService implements ApplicationContextAware {
 		// Get current stock of a particular product within an inventory
 		// Using set to make sure we only return one object per inventory items
 		Set inventoryItems = getInventoryItemsByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);
-		cmd.inventoryItemList = inventoryItems as List
-		
+		cmd.inventoryItemList = inventoryItems as List		
 		cmd.inventoryItemList.sort { it.expirationDate }
 		
 		// Get transaction log for a particular product within an inventory
@@ -1091,6 +1097,23 @@ class InventoryService implements ApplicationContextAware {
 			throw new Exception("ProductNotFoundException")
 		return InventoryItem.findAllByProduct(productInstance)					
 		
+	}
+	
+	/**
+	 * @param productIds
+	 * @return 	a map of inventory items by product
+	 */
+	Map getInventoryItemsByProducts(Warehouse warehouse, List<Integer> productIds) { 
+		def inventoryItemMap = [:]
+		if (productIds) {
+			//def inventory = Inventory.get(warehouse?.inventory?.id);
+			productIds.each {
+				def product = Product.get(it);
+				//def inventoryItems = getInventoryItemsByProductAndInventory(product, inventory);
+				inventoryItemMap[product] = getInventoryItemsByProduct(product)
+			}
+		}
+		return inventoryItemMap;
 	}
 	
 	

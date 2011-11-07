@@ -1,0 +1,171 @@
+Changelog for Watermark plugin for jQuery
+Copyright © 2009-2011 Todd Northrop
+http://www.speednet.biz/
+
+Last updated March 22, 2011
+
+____________________________
+Version 3.1.3 (2011-03-22)
+	
+	Fixed Issue #53 - Implemented a work-around for a jQuery regression bug in 1.5.1 that does not properly identify input elements using an "input:text" selector in Firefox 3.6 when the input element does not include a type attribute.  (When a type attribute is not included, the input element supposed to be identified as a text type by default, but jQuery is not identifying it as such -- at least not in Firefox.)
+
+____________________________
+Version 3.1.2 (2011-03-16)
+	
+	Fixed Issue #51 - added tag names to selWatermarkAble and selWatermarkDefined per jQuery team recommendation. Also, the absence of the tag names seems to cause a script error in IE7 and lower with newer versions of jQuery (1.5+), so this change also fixes that new script error.
+
+____________________________
+Version 3.1.1 (2011-01-10)
+	
+	Fixed a regression bug that prevented non-native watermarks from working in password input boxes.
+
+____________________________
+Version 3.1 (2010-12-21)
+	
+	Enhanced the native jQuery .val() function to automatically ignore watermarks when getting or setting values. You no longer have to hide the watermark before getting the element value with .val() -- that is handled by the plugin. Just call $("#myElement").val() to get the underlying value. Also, the watermarks are handled automatically when .val() is used to set one or more element values, either showing or hiding the watermark and setting the correct CSS class name.
+	
+	Protects against re-defining an existing watermark object on the jQuery object. So even if source file is loaded more than once, the original object is not touched a second time. Also, all the other initialization logic is guaranteed to run one time only.
+	
+	Added a demonstration to the demo page to test the use of .val() (both getting and setting).
+
+____________________________
+Version 3.0.8 (2010-12-03)
+	
+	Replaced the plugin's :data() extension with an exact copy of the :data() extension from jQuery UI. This was done because of reports of conflicts with jQuery UI. The jQuery UI version of the :data() extension is far less-capable than the one formerly in the plugin, so I have retained the old code in a separate file you can find in the SVN repository, called "jquery.data.js".
+
+____________________________
+Version 3.0.7 (2010-12-03)
+	
+	Added an event listener for the beforeunload event that hides all watermarks. This is done mainly because WebKit browsers remember the watermark text during navigation and try to restore the watermark text after the user clicks the Back button. We can avoid this by hiding the text before the browser has a chance to save it. The regular unload event was tried, but it seems the browser saves the text before that event kicks off, because it didn't work.
+	
+	Added a new option -- $.watermark.options.hideBeforeUnload -- that can be set to false to disable the automatic hiding of watermarks during the beforeunload event.  It is a global option that determines the behavior of all watermarks on the current page.  The option is not evaluated until the beforeunload event takes place, so the option can be set at any point before that.  The default value for this option is true.
+	
+	Implemented a better test for native placeholder attribute support.
+	
+	Minor change to wrapper "scope" function to create a local variable for the window object.
+
+____________________________
+Version 3.0.6 (2010-06-21)
+	
+	Added multiple "sanity checks" throughout the code for potential unknown attribute values. This is in response to some reports of the plugin not functioning alongside some third party code and other rare situations. For example, should gracefully handle a situation when third party code unexpectedly modifies a DOM element containing a watermark. Naturally, there are limits to how much you can protect a developer from third party code interference.
+	
+	Removed .end() from fn.watermark() return value, which was making chaining impossible.
+	
+	Immediately return from fn.watermark() call if no elements are in the jQuery set - "best practice".
+
+____________________________
+Version 3.0.5 (2010-05-09)
+	
+	Changed the licensing model to dual-licensed under the MIT or GPL Version 2 licenses.
+	
+	Bug fix for ASP.NET validation control.
+
+____________________________
+Version 3.0.4 (2010-01-14)
+	
+	Worked around a breaking change in jQuery 1.4 in which the ":search" selector is no longer recognized.  Fixed by adding it back in to jQuery.
+
+____________________________
+Version 3.0.3 (2009-11-30)
+	
+	Solved Issue #9 (Form doesn't submit in Chrome when submitting programmatically) - This issue only manifested itself when native watermark support was turned off in Google Chrome, and the form was submitted programmatically [by calling form.submit()].  It happened because Google Chrome (and Google Chrome alone) makes the native form.submit function invisible to JavaScript, making the ability to hijack the seemingly non-existent function very difficult.  A creative solution was achieved (see the code if you're interested).
+	
+	Solved Issue #11 (ASP.NET ValidationGroup bug) - The issue occured because the original arguments were not being passed to the hijacked function (the ASP.NET client validation function).
+	
+	Fixed a potential, but unreported, issue that could arise if arguments (for some reason) were passed to the form.submit function.
+	
+____________________________
+Version 3.0.2 (2009-11-11)
+	
+	Solved Issue #7 (Resolving conflict with ASP.NET validators) - Added capability to hijack any number of JavaScript functions that, when called, first hide all watermarks and then call the originally-intended function. Initially, only the Page_ClientValidate is specified to be overridden. Others will be added if feedback dictates. If a function specified is not found on the page, the function name is ignored on that page.
+	
+	Solved Issue #8 (Error when there's no form on the page: this.form is null) - Added a test to ensure there is a form on the page before attempting to override the form submit function.
+	
+	The $.watermark.version property will properly return "3.0.2". The version number was not updated in the 3.0.1 release, and continued to report as 3.0.
+	
+	Added detection for the presence of watermark activity on a page so that hideAll() will not bother trying to do anything if there are no watermarks to hide. Also, calling hideAll() multiple times in succession will process the elements on the page only once.
+	
+	Switched from YUI Compressor to Microsoft Ajax Minifier for minification. The new Microsoft minifier produces more compact code than YUI, so even with the additional code, the overall size is not much bigger than the last release. (I have made a free online JavaScript compressor available with both Microsoft and YUI compression methods at http://www.lotterypost.com/js-compress.aspx.)
+
+____________________________
+Version 3.0.1 (2009-09-11)
+	
+	Solved Issue #5 (postback issue with ASP.NET DropDownList) - Fixed form submit bug with IE6 and IE7 that threw a JavaScript error when a form was submitted programmatically.
+	
+	Minor cosmetic change suggested on jQuery issues list (Text blink when setting specific class).  Reversed two lines so that class name is set before the watermark text is set.
+
+____________________________
+Version 3.0 (2009-09-10)
+	
+	The plugin gets another major version number boost due to significant improvements in areas not covered by any other watermark plugin for jQuery.  Several new features and bug fixes, including everything on the Issue list that could be verified.  (Issue list: http://code.google.com/p/jquery-watermark/issues/list)
+	
+	Solved Issue #1 - Integrate with WebKit browsers that support input tags with type="search".  (Issue list refers to Safari alone, but it turns out that Google Chrome also supports type="search" elements.)
+	
+	Solved Issue #4 - Dragging and dropping text now replaces the watermark.  This was the most significant change, and required several work-arounds due to a variety of browser glitches.
+	
+	Added support for native browser watermarks in WebKit browsers ("placeholder" attribute).  New "useNative" option in the plugin allows native browser watermark support to be enabled/disabled globally, or for individual watermarks.  When a watermark is created, the plugin detects if native browser support is available, and automatically uses it, as long as useNative is true.  Two good reasons to turn *off* native support is the lack of CSS class name support (native watermark/placeholder is always light gray), and native watermarks/placeholders in type="search" elements do not always work properly with drag-and-drop.  (Using the watermark plugin support (useNative:false) for type="search" elements *does* work properly with drag-and-drop.)  However, for typical non-styled watermark usage, native browser support is encouraged, by leaving useNative set to true.  (Default is true).
+	
+	New "$.watermark.options" object stores the default options for watermarks.  There are currently two properties of $.watermark.options: className and useNative.  (BREAKING CHANGE:  $.watermark.className has been eliminated, and replaced with $.watermark.options.className.)  The use of an object to store default options is is keeping with current jQuery techniques, and allows for future expansion in a much more flexible manner.
+	
+	New watermark calling signature - $( <selector> ).watermark( [text] , [options] );
+
+	Example: $("#myElement").watermark("Enter Username", {className: "inputspace", useNative: false});
+	
+	Plugin continues to support the use of a string value for the second argument, for backward compatibility.  If a string value is passed for the second argument, it is used as the className for the watermark, overriding the default value in $.watermark.options.className.
+	
+	"useNative" option can be either a boolean or a function.  If useNative is a function, then the function is evaluated for each element in the matched set, returning a boolean value specifying if native support is enabled for the element.  The function is passed one argument -- a jQuery object containing the element being tested as the only element in its matched set -- and the DOM element being tested is the object on which the function is invoked (the value of "this").
+	
+	Worked around jQuery/Chrome bug that would execute $(...).filter(...).each( fn ) twice for each element in the matched set.  (Fairly confident this is a jQuery bug of some type.)
+	
+	Fixed Chrome bug where password watermarks longer than 10 characters would cause the functionality to fail.
+	
+	Added $.watermark.version (string value).  Currently set to "3.0".
+	
+	Changed naming convention of files, removing the version number from the file name and folder name.  In real-world usage, it can be disruptive to try to implement a new version of the plugin if the file name includes the version number.  There are some who feel differently about this issue, and prefer the version number in the file name, but I prefer it removed.  It is easy to add back into the file name, if desired by the individual developer.
+	
+	KNOWN ISSUES:
+		
+		Opera support for drag-and-drop is terrible, even with version 10.  It basically supports it when it feels like it.
+		
+		WebKit native support for watermarks in Search elements (type="search") is poor with drag-and-drop.  Sometimes it works, but it almost never supports dragging between Search elements.  The demo page can be used to try it out and compare the functionality to the plugin's functionality.  With Search elements, you should probably set useNative to false.
+		
+		WebKit native support does not yet extend to textarea elements.  (Limitation of WebKit browsers.)
+	
+____________________________
+Version 2.0 (2009-06-02)
+	
+	The plugin gets a major version number boost due to the addition of textarea and password input elements as supported "watermarkable" elements, greatly enhancing the diversity of its usage.  Password element support is good for normal usage, but advanced scenarios such as programmatic changes to the value, should be avoided.
+	
+	Textarea watermarks can be multi-line by inserting a '\n' sequence at each line break.
+	
+	Improved IE focus bug fix so that it works for password elements too.
+	
+	Improved demo page and added new demonstrations for textarea and password input elements.
+
+____________________________
+Version 1.1.1 (2009-06-01)
+	
+	Fixed regression bug in last release that prevented some form submissions.
+	
+	Fixed focus bug on dynamically-changed watermarks.
+	
+	Improved demonstration page to test/demonstrate three different form submission methods, using three separate forms on the page. The QueryString can be examined to ensure that no watermarks were posted during form submission.
+	
+____________________________
+Version 1.1 (2009-06-01)
+	
+	Improved form submission by completely replacing built-in form submit function with our own function that first clears the watermarks, then submits the form.  In previous version programmatic form submission was not triggering the watermark clearing function.
+	
+	Handles situation where text box's maxLength is less than the length of the watermark string.
+	
+	Fixed IE bug the hides blinking cursor in some cases.
+	
+	Improved internal use of jQuery data collection by assigning string constants for key names in one place, rather than replying on hard-coded key names spread throughout the source file.
+	
+____________________________
+Version 1.0 (2009-05-31)
+	
+	Initial release.
+
+
+__
