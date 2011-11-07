@@ -38,8 +38,6 @@
 						&nbsp;<warehouse:message code="default.find.label"/>&nbsp;
 					</button>
 				</span>
-			</div>
-			<div>			
 				<span style="padding-left:10px;">
 					<g:checkBox name="showUnsupportedProducts" value="${commandInstance.showUnsupportedProducts}" size="24"/>	
 					<warehouse:message code="inventory.showUnsupportedProducts.label"/>					

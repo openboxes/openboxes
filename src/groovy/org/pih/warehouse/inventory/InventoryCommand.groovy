@@ -9,7 +9,6 @@ class InventoryCommand {
 	def showUnsupportedProducts = Boolean.FALSE;		// indicates whether unsupported products for the warehouse should be included
 	def showNonInventoryProducts = Boolean.FALSE;		// indicates whether non-inventory products for the warehouse should be included
 	def showOutOfStockProducts = Boolean.TRUE;			// indicates whether out of stock products for the warehouse should be included
-
 	def categoryToProductMap = {};						// all of the resulting ProductCommands above, organized by Category
 	
 	static constraints = {

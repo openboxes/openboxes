@@ -10,6 +10,7 @@ class ProductCommand {
 	Integer quantityOnHand = 0;
 	Integer quantityToShip = 0;
 	Integer quantityToReceive = 0;
+	InventoryLevel inventoryLevel
 	
 	static constraints = {
 		category(nullable: true) 
@@ -17,6 +18,7 @@ class ProductCommand {
 		quantityOnHand(nullable:true)
 		quantityToShip(nullable:true)
 		quantityToReceive(nullable:true)
+		inventoryLevel(nullable:true)
 	}
 	
 	int hashcode() {

@@ -79,6 +79,12 @@
 																		<warehouse:message code="product.untitled.label"/>
 																	</g:else>
 																</g:link> 
+																<g:if test="${inventoryItem?.inventoryLevel?.status != org.pih.warehouse.inventory.InventoryStatus.SUPPORTED }">
+																	<span class="fade">																
+																		<format:metadata obj="${inventoryItem?.inventoryLevel?.status }"/>
+																	</span>
+																</g:if>
+																															
 															</td>
 															<td class="checkable middle" style="width: 10%">
 																<span class="fade">
@@ -113,15 +119,6 @@
 													</tr>
 												</g:each>
 											</tbody> 
-											<tfoot>
-												<tr>
-													<td class="left">
-														<g:render template="./actions" model="[]"/>									
-													</td>
-													<td colspan="6">
-													</td>
-												</tr>
-											</tfoot>
 										</table>		
 									</form>
 								</g:if>	    
@@ -129,7 +126,11 @@
 			         	</tr>
 			        </table>
 				</div>
-				<warehouse:message code="inventory.showingProductsInCategories.label" args="[totalProducts,commandInstance?.categoryToProductMap?.keySet()?.size()]" />
+				<div>
+					<g:render template="./actions" model="[]"/>									
+					<warehouse:message code="inventory.showingProductsInCategories.label" args="[totalProducts,commandInstance?.categoryToProductMap?.keySet()?.size()]" />
+				
+				</div>
 			</div>
 		</div>
 		<script>

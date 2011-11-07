@@ -929,14 +929,15 @@ class ShipmentController {
 	
 	
 	def addToShipment = { 
-		log.info("addToShipment params " + params)
-		// Get product IDs and convert them to Long
-		def productIds = params.list('productId')		
-		productIds = productIds.collect { Long.valueOf(it); } 
 		
+		// Get product IDs and convert them to Long
+		def productIds = params.list('product.id')		
+		productIds = productIds.collect { Long.valueOf(it); } 
 		// Find all inventory items that match the selected products
+		def products = []
 		def inventoryItems = [] 
 		if (productIds) { 
+			products = Product.findAll("from Product as p where p.id in (:ids)", [ids:productIds])
 			inventoryItems = InventoryItem.findAll("from InventoryItem as i where i.product.id in (:ids)", [ids:productIds])
 		}
 
@@ -952,10 +953,8 @@ class ShipmentController {
 		def commandInstance = new ItemListCommand();
 		if (inventoryItems) { 
 			inventoryItems.each { inventoryItem ->
-				def quantityOnHand = quantityOnHandMap[inventoryItem]
-				
 				def item = new ItemCommand();
-				item.quantityOnHand = quantityOnHand
+				item.quantityOnHand = quantityOnHandMap[inventoryItem]
 				item.quantityShipping = quantityShippingMap[inventoryItem]
 				item.quantityReceiving = quantityReceivingMap[inventoryItem]
 				item.inventoryItem = inventoryItem 
@@ -968,7 +967,7 @@ class ShipmentController {
 		// Get all pending/outgoing shipments						
 		def shipments = shipmentService.getPendingShipments(warehouse);
 		
-		[shipments : shipments, commandInstance : commandInstance]
+		[shipments : shipments, products: products, commandInstance : commandInstance]
 	}
 	
 	

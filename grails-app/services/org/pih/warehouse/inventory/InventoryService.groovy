@@ -291,6 +291,7 @@ class InventoryService implements ApplicationContextAware {
 				products << new ProductCommand(
 					category: product.category, 
 					product: product, 
+					inventoryLevel: InventoryLevel.findByProduct(product),
 					quantityOnHand: quantityOnHand, 
 					quantityToReceive: quantityToReceive, 
 					quantityToShip: quantityToShip 
@@ -302,6 +303,9 @@ class InventoryService implements ApplicationContextAware {
 
 		return commandInstance?.categoryToProductMap
 	}
+	
+	Map getInventoryLevels
+	
 	
 	/**
 	 * Get the outgoing quantity for all products at the given location.
