@@ -4071,6 +4071,12 @@
         <dropColumn tableName="inventory_level" columnName="supported"/>
     </changeSet>	    
     
+    <changeSet author="jmiranda (generated)" id="1320688524312-1">
+        <addColumn tableName="transaction">
+            <column name="comment" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    
     
 </databaseChangeLog>
 
