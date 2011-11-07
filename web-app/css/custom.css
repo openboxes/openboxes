@@ -412,8 +412,24 @@ h2 {
 	margin-top: 10px;
 	margin-bottom: 5px;
 	font-size: 1.2em;
-	border-bottom: 1px solid #ddd;
+	border-bottom: 0px solid #ddd;
 }
+
+/*
+h2 {
+	margin-top: 10px;
+	margin-bottom: 5px;
+	font-size: 1.2em;
+	border-bottom: 1px solid #ddd;
+	border-top: 1px solid #ddd;
+	background-color: #EBF1F7;
+	font-size: 135%;
+	line-height: 2;
+	padding: 0 0 0 10px;
+}
+*/
+
+
 .title { 
 	font-size: 1.2em;	
 	font-weight: bold;

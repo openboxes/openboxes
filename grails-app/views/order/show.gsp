@@ -206,7 +206,9 @@
 														</td>
 														<td>
 															<g:if test="${orderItem?.product }">
-																<format:product product="${orderItem?.product}"/>
+																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':orderItem?.product?.id]">
+																	<format:product product="${orderItem?.product}"/> 
+																</g:link>																
 															</g:if>
 															<g:else>
 																${orderItem?.description }
