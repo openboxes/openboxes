@@ -344,6 +344,11 @@ class InventoryItemController {
 		
 		def productInstance = Product.get(params?.product?.id)
 		def inventoryInstance = Inventory.get(params?.inventory?.id)
+		if (!inventoryInstance) { 
+			def warehouse = Warehouse.get(session?.warehouse?.id);
+			inventoryInstance = warehouse.inventory
+		}
+		
 		def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, inventoryInstance)
 		if (!inventoryLevelInstance) { 
 			inventoryLevelInstance = new InventoryLevel();

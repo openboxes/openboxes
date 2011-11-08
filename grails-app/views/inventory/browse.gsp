@@ -60,7 +60,8 @@
 													<g:set var="totalQuantity" value="${0}"/>
 													<g:set var="categoryInventoryItems" value="${commandInstance?.categoryToProductMap[entry.key]}"/>
 													<g:each var="inventoryItem" in="${categoryInventoryItems}" status="status">
-														<g:set var="quantity" value="${inventoryItem?.quantityOnHand }"/>
+														<g:set var="supported" value="${!inventoryItem?.inventoryLevel?.status || inventoryItem?.inventoryLevel?.status == org.pih.warehouse.inventory.InventoryStatus.SUPPORTED }"/>													
+														<g:set var="quantity" value="${supported ? inventoryItem?.quantityOnHand : 0 }"/>
 														<g:set var="totalQuantity" value="${totalQuantity + (quantity?:0) }"/>
 														<g:set var="totalProducts" value="${totalProducts + 1}"/>
 														
@@ -79,7 +80,8 @@
 																		<warehouse:message code="product.untitled.label"/>
 																	</g:else>
 																</g:link> 
-																<g:if test="${inventoryItem?.inventoryLevel?.status != org.pih.warehouse.inventory.InventoryStatus.SUPPORTED }">
+																
+																<g:if test="${!supported }">																
 																	<span class="fade">																
 																		<format:metadata obj="${inventoryItem?.inventoryLevel?.status }"/>
 																	</span>
@@ -96,15 +98,30 @@
 															</td>
 															
 															<td class="checkable middle center" style="width: 5%; border-left: 1px solid lightgrey;">
-																${inventoryItem?.quantityToReceive?:0}
+																<g:if test="${supported }">																
+																	${inventoryItem?.quantityToReceive?:0}
+																</g:if>
+																<g:else>
+																	<span class="fade"><warehouse:message code="default.na.label"/></span>																
+																</g:else>
 															</td>
 															<td class="checkable middle center" style="width: 5%; border-right: 1px solid lightgrey;">
-																${inventoryItem?.quantityToShip?:0}
+																<g:if test="${supported }">																
+																	${inventoryItem?.quantityToShip?:0}
+																</g:if>
+																<g:else>
+																	<span class="fade"><warehouse:message code="default.na.label"/></span>																
+																</g:else>
 															</td>
 															<td class="checkable middle center" style="width: 5%;">
-																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
-																	${inventoryItem?.quantityOnHand?:0}
-																</g:link>
+																<g:if test="${supported }">																
+																	<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
+																		${inventoryItem?.quantityOnHand?:0}
+																	</g:link>
+																</g:if>
+																<g:else>
+																	<span class="fade"><warehouse:message code="default.na.label"/></span>																
+																</g:else>
 															</td>
 														</tr>
 													</g:each>

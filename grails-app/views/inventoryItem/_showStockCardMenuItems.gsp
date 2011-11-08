@@ -35,7 +35,7 @@
 </div>
 <div class="action-menu-item">					
 	<g:link controller="inventoryItem" action="editInventoryLevel" params="['product.id': product?.id, 'inventory.id':inventory?.id]">
-		<img src="${resource(dir: 'images/icons/silk', file: 'cog_edit.png')}"/>&nbsp;
+		<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}"/>&nbsp;
 		<warehouse:message code="product.editStatus.label"/>
 	</g:link>
 </div>
