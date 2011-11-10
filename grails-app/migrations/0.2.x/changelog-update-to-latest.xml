@@ -4072,11 +4072,60 @@
     </changeSet>	    
     
     <changeSet author="jmiranda (generated)" id="1320688524312-1">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="transaction" columnName="comment" /></not>
+		</preConditions>
         <addColumn tableName="transaction">
             <column name="comment" type="VARCHAR(255)"/>
         </addColumn>
     </changeSet>
     
+    <changeSet author="jmiranda (generated)" id="1320943767698-2">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="location_group" /></not>
+		</preConditions>
+        <createTable tableName="location_group">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1320943767698-3">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="location_supported_activities" /></not>
+		</preConditions>
+        <createTable tableName="location_supported_activities">
+            <column name="location_id" type="BIGINT"/>
+            <column name="supported_activities_string" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1320943767698-5">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="location_type_supported_activities" /></not>
+		</preConditions>
+        <createTable tableName="location_type_supported_activities">
+            <column name="location_type_id" type="BIGINT"/>
+            <column name="supported_activities_string" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1320943767698-6">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="location" columnName="location_group_id"/></not>
+		</preConditions>
+        <addColumn tableName="location">
+            <column name="location_group_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
     
 </databaseChangeLog>
 

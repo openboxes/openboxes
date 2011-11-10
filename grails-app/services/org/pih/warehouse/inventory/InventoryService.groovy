@@ -32,7 +32,6 @@ class InventoryService implements ApplicationContextAware {
 	boolean transactional = true
 
 	/**
-	 * 
 	 * @return
 	 */
 	def getShipmentService() {
@@ -40,7 +39,6 @@ class InventoryService implements ApplicationContextAware {
 	}
 
 	/**
-	 *
 	 * @return
 	 */
 	def getRequestService() {
@@ -48,7 +46,6 @@ class InventoryService implements ApplicationContextAware {
 	}
 
 	/**
-	 *
 	 * @return
 	 */
 	def getOrderService() {
@@ -110,6 +107,9 @@ class InventoryService implements ApplicationContextAware {
 		if (!warehouse.inventory) {
 			addInventory(warehouse)
 		}
+		
+		log.info (warehouse.supportedActivities)
+		
 		warehouse.save(flush:true)
 	}
 	

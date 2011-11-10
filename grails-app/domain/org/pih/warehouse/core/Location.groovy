@@ -11,14 +11,14 @@ class Location implements Comparable, java.io.Serializable {
 	Address address
 	String fgColor
 	String bgColor
+	LocationGroup locationGroup;
 	LocationType locationType	
 	Location parentLocation; 
-	
 	Date dateCreated;
 	Date lastUpdated;
 	
 	static belongsTo = [ parentLocation : Location ]
-	static hasMany = [ locations : Location ]
+	static hasMany = [ locations : Location, supportedActivities : String ]
 	
 	static constraints = {
 		name(nullable:false, blank: false, maxSize: 255)
@@ -37,6 +37,34 @@ class Location implements Comparable, java.io.Serializable {
 	
 	int compareTo(obj) { 
 		return name <=> obj?.name
+	}
+	
+	/**
+	 * Indicates whether the location supports the given activity.
+	 * 
+	 * @param activity	the given activity
+	 * @return	true if the activity is supported, false otherwise
+	 */
+	Boolean supportsActivity(ActivityCode activity) {
+		return supportsActivity(activity.id)
+	}
+
+	/**
+	 * Indicates whether the location supports the given activity.
+	 * 
+	 * @param activity	the given activity id
+	 * @return	true if the activity is supported, false otherwise
+	 */
+	Boolean supportsActivity(String activity) { 
+		boolean supportsActivity
+		if (supportedActivities) {
+			supportsActivity = supportedActivities?.contains(activity);
+		}
+		else {
+			supportsActivity = locationType?.supportedActivities?.contains(activity);
+		}
+		return supportsActivity;
+
 	}
 	
 	Boolean isWarehouse() {

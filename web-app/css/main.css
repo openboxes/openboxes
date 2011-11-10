@@ -88,8 +88,7 @@ input:focus, select:focus, textarea:focus {
 
 .menuButton {
     font-size: 10px;
-/*    padding: 0 5px;*/
-	padding: 0 5px;
+	padding: 10px 5px;
 }
 .menuButton a {
     /*color: #333;*/

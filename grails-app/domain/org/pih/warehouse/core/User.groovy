@@ -34,7 +34,6 @@ class User extends Person {
 		password(nullable: false, blank: false, minSize: 6, maxSize:255, validator: {password, obj ->
 			def passwordConfirm = obj.properties['passwordConfirm']
 			if(passwordConfirm == null) return true // skip matching password validation (only important when setting/resetting pass)
-			println "password: " + passwordConfirm + " " + password
 			passwordConfirm == password ? true : ['invalid.matchingpasswords']
 		})		
 		lastLoginDate(nullable:true)

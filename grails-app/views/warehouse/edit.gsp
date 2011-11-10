@@ -39,12 +39,63 @@
 	                        <tbody>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="name"><warehouse:message code="default.name.label" /></label>
+										<label for="name"><warehouse:message code="default.name.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'name', 'errors')}">
-	                                    <g:textField name="name" value="${warehouseInstance?.name}" />
+										<g:textField name="name" value="${warehouseInstance?.name}" />
 	                                </td>
 	                            </tr>
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
+										<label for="name"><warehouse:message code="location.locationType.label" /></label>
+		
+	                                </td>
+	                                <td valign="top" class="value">
+	                                	<g:select name="locationType.id" from="${org.pih.warehouse.core.LocationType.list()}" 
+	                                		optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${warehouseInstance?.locationType?.id}" noSelection="['':'']" />
+	                                		
+	                                	${warehouseInstance?.locationType?.supportedActivities }
+	                                </td>
+	                            </tr>
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
+	                                	<label for="manager"><warehouse:message code="warehouse.manager.label" /></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'manager', 'errors')}">
+	                                	<g:select name="manager.id" from="${org.pih.warehouse.core.User.list()}" optionKey="id" value="${warehouseInstance?.manager?.id}"  noSelection="['':'']" />
+	                                </td>
+	                            </tr>
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
+		                                <label for="manager"><warehouse:message code="warehouse.properties.label" /></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'local', 'errors')} ${hasErrors(bean: warehouseInstance, field: 'active', 'errors')}">
+										<g:checkBox name="local" value="${warehouseInstance?.local}" />
+										<warehouse:message code="warehouse.local.label" />
+
+										<g:checkBox name="active" value="${warehouseInstance?.active}" />
+										<warehouse:message code="warehouse.active.label" />
+	                                </td>
+	                            </tr>
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
+										<label for="name"><warehouse:message code="location.locationGroup.label" /></label>
+	                                </td>
+	                                <td valign="top" class="value">
+	                                	<g:select name="locationGroup.id" from="${org.pih.warehouse.core.LocationGroup.list()}" optionKey="id" value="${warehouseInstance?.locationGroup?.id}" noSelection="['':'']" />
+	                                </td>
+	                            </tr>	                            
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
+										<label for="name"><warehouse:message code="location.supportedActivities.label" /></label>
+	                                </td>
+	                                <td valign="top" class="value">
+	                                	<g:set var="activityList" value="${org.pih.warehouse.core.ActivityCode.list() }"/>
+	                                	<g:select name="supportedActivities" multiple="true" from="${activityList }" size="${activityList.size()+1 }" style="width: 150px" 
+	                                		optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${warehouseInstance?.supportedActivities}"
+	                                		noSelection="['':'']" />
+	                                </td>
+	                            </tr>	                            
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="bgColor"><warehouse:message code="warehouse.bgColor.label"/></label>
@@ -56,8 +107,6 @@
 	                                    	value="${warehouseInstance?.bgColor}" />
 	                                    
                                     	<span class="fade">${warehouseInstance?.bgColor }</span>
-	                              
-	                                    
 	                                </td>
 	                            </tr>
 	                            <tr class="prop">
@@ -70,14 +119,6 @@
 	                                    	value="${warehouseInstance?.fgColor}" />
 	                                    	
                                     	<span class="fade">${warehouseInstance?.fgColor }</span>
-	                                </td>
-	                            </tr>
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="manager"><warehouse:message code="warehouse.manager.label" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'manager', 'errors')}">
-	                                    <g:select name="manager.id" from="${org.pih.warehouse.core.User.list()}" optionKey="id" value="${warehouseInstance?.manager?.id}"  />
 	                                </td>
 	                            </tr>
 	                            
@@ -95,18 +136,8 @@
 	                            
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="manager"><warehouse:message code="warehouse.local.label" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'local', 'errors')}">
-	                                    <g:checkBox name="local" value="${warehouseInstance?.local}" />
-	                                </td>
-	                            </tr>
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="manager"><warehouse:message code="warehouse.active.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: warehouseInstance, field: 'active', 'errors')}">
-	                                    <g:checkBox name="active" value="${warehouseInstance?.active}" />
 	                                </td>
 	                            </tr>
 	                            <tr>

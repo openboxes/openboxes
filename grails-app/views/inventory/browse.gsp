@@ -36,28 +36,24 @@
 						                <table class="tableScroll"> 
 											<thead> 
 					           					<tr class="odd">
-													<th class="center">
+													<th rowspan="2" class="center middle">
 														<input type="checkbox" id="toggleCheckbox">	
 													</th>
-													<th><warehouse:message code="default.description.label"/></th>
-													<th><warehouse:message code="category.label"/></th>
-													<th style="border-left: 1px solid #F7F7F7; border-right:1px solid lightgrey;"><warehouse:message code="product.manufacturer.label"/></th>
+													<th rowspan="2" class="center middle"><warehouse:message code="category.label"/></th>
+													<th rowspan="2" class="middle"><warehouse:message code="default.description.label"/></th>
+													<th rowspan="2" class="center middle" style="border-left: 1px solid #F7F7F7; border-right:1px solid lightgrey;"><warehouse:message code="product.manufacturer.label"/></th>
 					           		 				<th colspan="2" class="center" style="border-left: 1px solid lightgrey; border-right: 1px solid lightgrey;"><warehouse:message code="default.pending.label"/></th>
-													<th class="center"><warehouse:message code="default.qty.label"/></th>
+													<th rowspan="2" class="center middle"><warehouse:message code="default.qty.label"/></th>
 					           					</tr>
 												<tr class="odd">
-													<th class="center"></th>
-													<th></th>
-													<th></th>
-													<th></th>
 													<th class="center" style="border-left: 1px solid lightgrey;"><warehouse:message code="inventory.qtyin.label"/></th>
 													<th class="center" style="border-right: 1px solid lightgrey;"><warehouse:message code="inventory.qtyout.label"/></th>
-													<th></th>
 												</tr>
 											</thead> 
 											<tbody> 
+												<g:set var="counter" value="${0 }"/>
 												<g:each var="entry" in="${commandInstance?.categoryToProductMap}" status="i">
-													<g:set var="totalQuantity" value="${0}"/>
+													<g:set var="totalQuantity" value="${0 }"/>
 													<g:set var="categoryInventoryItems" value="${commandInstance?.categoryToProductMap[entry.key]}"/>
 													<g:each var="inventoryItem" in="${categoryInventoryItems}" status="status">
 														<g:set var="supported" value="${!inventoryItem?.inventoryLevel?.status || inventoryItem?.inventoryLevel?.status == org.pih.warehouse.inventory.InventoryStatus.SUPPORTED }"/>													
@@ -65,12 +61,17 @@
 														<g:set var="totalQuantity" value="${totalQuantity + (quantity?:0) }"/>
 														<g:set var="totalProducts" value="${totalProducts + 1}"/>
 														
-														<tr class="${status%2==0?'even':'odd' } prop">
+														<tr class="${counter++%2==0?'even':'odd' } prop">
 															<td class="middle center" style="width: 1%">
 																<g:checkBox id="${inventoryItem?.product?.id }" name="product.id" 
 																	class="checkbox" style="top:0em;" checked="${false }" 
 																		value="${inventoryItem?.product?.id }" />
 															</td>																
+															<td class="checkable middle right" nowrap="nowrap" style="width: 1%;">
+																<span class="fade">
+																	<format:category category="${inventoryItem?.product?.category}"/> 
+																</span>
+															</td>
 															<td class="checkable middle" style="width: 25%">
 																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]" fragment="inventory" style="z-index: 999">
 																	<g:if test="${inventoryItem?.product?.name?.trim()}">
@@ -88,12 +89,7 @@
 																</g:if>
 																															
 															</td>
-															<td class="checkable middle" style="width: 10%">
-																<span class="fade">
-																	<format:category category="${inventoryItem?.product?.category}"/> 
-																</span>
-															</td>
-															<td class="checkable middle" style="width: 10%">
+															<td class="checkable middle center" style="width: 1%" nowrap="nowrap">
 																<span class="fade">${inventoryItem?.product?.manufacturer }</span>
 															</td>
 															
@@ -125,17 +121,29 @@
 															</td>
 														</tr>
 													</g:each>
-													<tr>
-														<th></th>
-														<th></th>
-														<th></th>
-														<th></th>
-														<th></th>
-														<th></th>
-														<th style="text-align: center;">${totalQuantity}</th>
+													<%-- 
+													<tr class="" style="border-top: 1px solid black">
+														<td></td>
+														<td></td>
+														<td></td>
+														<td></td>
+														<td></td>
+														<td></td>
+														<td style="text-align: center;">${totalQuantity}</td>
 													</tr>
+													--%>
 												</g:each>
-											</tbody> 
+											</tbody>
+											<tfoot>
+												<tr>
+													<td colspan="6">
+														<div>
+															<g:render template="./actions" model="[]"/>	&nbsp;
+															<warehouse:message code="inventory.showingProductsInCategories.label" args="[totalProducts,commandInstance?.categoryToProductMap?.keySet()?.size()]" />
+														</div>
+													</td>
+												</tr>
+											</tfoot> 
 										</table>		
 									</form>
 								</g:if>	    
@@ -143,17 +151,12 @@
 			         	</tr>
 			        </table>
 				</div>
-				<div>
-					<g:render template="./actions" model="[]"/>									
-					<warehouse:message code="inventory.showingProductsInCategories.label" args="[totalProducts,commandInstance?.categoryToProductMap?.keySet()?.size()]" />
-				
-				</div>
 			</div>
 		</div>
 		<script>
 			$(document).ready(function() {
 
-				$('.tableScroll').tableScroll({height:350});
+				$('.tableScroll').tableScroll({height:350, width: '99%'});
 				
 				$(".checkable a").click(function(event) {
 					event.stopPropagation();

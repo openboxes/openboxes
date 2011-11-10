@@ -4,9 +4,6 @@
 		<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
 	</button>
 	<div class="actions">
-		<div class="action-menu-item">
-			<label>Inventory</label>
-		</div>
 		<div class="action-menu-item">														
 			<a href="javascript:void(0);" class="actionButton" id="outgoingTransferBtn">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="${warehouse.message(code: 'inventory.outgoingTransfer.label') }" style="vertical-align: middle"/>
@@ -18,6 +15,9 @@
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="${warehouse.message(code: 'inventory.incomingTransfer.label') }" style="vertical-align: middle"/>
 				&nbsp;<warehouse:message code="inventory.incomingTransfer.label"/>
 			</a>
+		</div>
+		<div class="action-menu-item">
+			<hr/>
 		</div>
 		<div class="action-menu-item">														
 			<a href="javascript:void(0);" class="actionButton" id="inventoryAdjustmentBtn">
@@ -31,10 +31,6 @@
 				&nbsp;<warehouse:message code="inventory.inventoryDamaged.label"/>
 			</a>
 		</div>	
-		<div class="action-menu-item">
-			<hr/>
-			<label>Shipments</label>
-		</div>
 		<div class="action-menu-item">
 			<a href="javascript:void(0);" class="actionButton" id="addToShipmentBtn">
 				<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" alt="${warehouse.message(code: 'inventory.addToShipment.label') }"/>

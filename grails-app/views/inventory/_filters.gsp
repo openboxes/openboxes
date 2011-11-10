@@ -19,8 +19,10 @@
 			<div>
 				<g:if test="${!commandInstance?.categoryInstance.categories.isEmpty()}">
 					<span>
+						<%--
 						<warehouse:message code="inventory.filterBy.label"/>:
 						&nbsp;&nbsp;
+						 --%>
 						<warehouse:message code="inventory.filterBy.category"/>
 						<select id="subcategoryId" name="subcategoryId" >
 							<option value=""></option>

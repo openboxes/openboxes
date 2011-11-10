@@ -140,8 +140,10 @@ button {
 
 li.ui-menu-item { text-align: left; font-weight: bold; }
 h3 { 
-	font-size: 1.1em;
-	vertical-align: middle;
+	font-family: Georgia;
+	font-style: italic;
+	font-size: 14px;
+	vertical-align: bottom;
 	/*color: #008000;*//*green */
 } 
 h3.ui-state-active { background-color: #f7f7f7; }  /* #F8F7EF */
@@ -178,7 +180,7 @@ body {
 
 .widget-large { border: 1px solid lightgrey; height: 75px; margin: 5px; }
 .widget-small { border: 1px solid lightgrey;  margin: 5px; }    		
-.widget-header { background-color: #FFF; margin: 10px; font-weight: bold; font-size: 110%;} 
+.widget-header { background-color: #FFF; margin: 1px; font-weight: bold; font-size: 110%;} 
 .widget-content { margin: 10px; } 
 .widget-small .widget-content { float: left; width: 45%; font-size: 110%;} 
 
@@ -408,11 +410,11 @@ label.optional {
 }
 
 /* TODO figure out what this was meant for */
-h2 {
-	margin-top: 10px;
-	margin-bottom: 5px;
+h2 {	
 	font-size: 1.2em;
-	border-bottom: 0px solid #ddd;
+	background-color: #F7F7F7;
+	padding: 10px;
+	border-bottom: 1px solid #ddd;
 }
 
 /*
@@ -719,7 +721,7 @@ border: 1px solid #CCC;
 .filterRow {
 	font-size: 13px;
 	padding: 5px; 
-	margin: 0px;
+	margin: 5px;
 	white-space:nowrap;
 	background-color: #F7F7F7; /*#D8D8D8*/	
 }
@@ -728,6 +730,11 @@ border: 1px solid #CCC;
 	padding: 5px;
 	margin-left:10px;
 }
+.filter a { 
+	padding: 0 10px 0 10px;
+	margin: 10px;
+}
+
 .paddingRow {
 	padding:2px;
 	border-top:none; border-right:none; border-left:none;

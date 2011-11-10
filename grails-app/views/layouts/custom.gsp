@@ -19,7 +19,10 @@
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footer.css')}" type="text/css" media="screen, projection" />	
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'wizard.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.tableScroll/',file:'jquery.tablescroll.css')}" type="text/css" media="screen, projection" />
-	
+	<%-- 
+	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="screen, projection" />
+	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'example.css')}" type="text/css" media="screen, projection" />
+	--%>
 	<!-- Include javascript files -->
 	<g:javascript library="application"/>
 
@@ -43,6 +46,9 @@
 	<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.hoverIntent.minified.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.tableScroll/', file:'jquery.tablescroll.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.watermark/', file:'jquery.watermark.min.js')}" type="text/javascript" ></script>
+	<%-- 
+	<script src="${createLinkTo(dir:'js/jquery.megaMenu/', file:'jquery.megamenu.js')}" type="text/javascript" ></script>
+	--%>
 	
  	<!-- Include Jquery Validation and Jquery Validation UI plugins -->
  	<jqval:resources />       
@@ -251,42 +257,17 @@
 		    </div>		    
 		</div>
     </div>
-    <div id="doc3" class="yui-t7" style="clear: both;">
-		<!-- Populated using the 'pageTitle' property defined in the GSP file -->
-		<g:if test="${session.user}">
-			<h3>
-			    <div id="pageTitle">		
-			  	  <%-- 					    
-			    	<g:link controller="dashboard" action="index">
-				    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'house.png')}"/>
-			    	</g:link>
-				    &nbsp;&rsaquo;&nbsp;								
-					<g:if test="${session?.warehouse}">									
-						<g:if test="${session.warehouse.logo }">
-							<img class="photo" width="25" height="25" 
-								src="${createLink(controller:'warehouse', action:'viewLogo', id:session.warehouse.id)}" style="vertical-align: middle" />
-						</g:if>
-						${session?.warehouse?.name} &nbsp;&rsaquo;&nbsp;
-					</g:if>
-				    <warehouse:message code="${params.controller }.label"/>
-				    --%>
-				    
-				    <%-- 
-					&nbsp;&rsaquo;&nbsp;								
-					<g:if test="${pageProperty(name:'page.pageTitle')}"><b>${pageProperty(name:'page.pageTitle')}</b></g:if>
-					<g:else><b><g:layoutTitle /></b></g:else>
-					--%>
-				</div>
-			</h3>
-		</g:if>		
+    <%-- 
+    <div id="globalmenu">
+		<g:render template="/common/globalmenu"/>
 	</div>
+    --%>
     <div id="doc3" class="yui-t2">	    
 		<!-- 
 				Body includes the divs for the main body content and left navigation menu 
 			----------------------------------------------------------------------------------->
 		<!-- YUI "body" block that includes the main content for the page -->
 		<div id="bd" role="main">
-
 	    	<!-- YUI main Block including page title and content -->
 	      	<div id="yui-main">
 		    	<div id="content" class="yui-b">
@@ -294,7 +275,7 @@
 		    			<h3 class="page-title">
 						    <div>							    
 						    	<g:link controller="dashboard" action="index">
-							    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'house.png')}"/>
+							    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'house.png')}" style="vertical-align: bottom;"/>
 						    	</g:link>
 							    &nbsp;&rsaquo;&nbsp;								
 								<g:if test="${session?.warehouse}">									
@@ -322,22 +303,7 @@
 	      	<!-- YUI nav block that includes the local navigation menu -->
 	      	<div id="menu" role="navigation" class="yui-b">
 		  		<g:if test="${session?.user && session?.warehouse}">
-					<!-- Navigation Menu -->
-					<g:render template="/common/menu"/>
-					<%-- 			  		
-			  		<div id="navMenu" class="homePagePanel">
-			      		<div class="panelTop"><!-- used to dislay the bottom border of the navigation menu --></div>
-						<div class="panelBody">							
-							<h1><g:pageProperty name="page.menuTitle" /> Menu</h1>
-							<ul>
-								<li><span class="menuButton"><a class="dashboard" href="${createLink(uri: '/home/index')}">Dashboard</a></span></li>
-								<g:pageProperty name="page.localLinks" />
-							</ul>							
-							<br/><!-- this is added in order to get rid of whitespace in menu -->
-						</div>
-						<div class="panelBtm"><!-- used to dislay the bottom border of the navigation menu --></div>
-					</div>
-					--%>
+					<g:render template="/common/menu" />
 				</g:if>
 			</div>			 
 		</div>
@@ -366,7 +332,6 @@
 			</div>
 		</div>
 	</div>
-	
 	<script type="text/javascript">
 		$(function() { 
 
@@ -417,28 +382,34 @@
 			}).next().hide();
 			*/
 			<g:if test="${request.request.requestURL.toString().contains('category')}">
-				accordion.accordion( "activate" , 6 );
+				accordion.accordion( "activate" , 5 );
 			</g:if>
+			<g:elseif test="${request.request.requestURL.toString().contains('locationGroup')}">
+				accordion.accordion( "activate" , 5 );
+			</g:elseif>
+			<g:elseif test="${request.request.requestURL.toString().contains('locationType')}">
+				accordion.accordion( "activate" , 5 );
+			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('Transaction')}">
-				accordion.accordion( "activate" , 6 );
+				accordion.accordion( "activate" , 5 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('attribute')}">
-				accordion.accordion( "activate" , 6 );
+				accordion.accordion( "activate" , 5 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('product/create')}">
 				accordion.accordion( "activate" , 0 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('person')}">
-				accordion.accordion( "activate" , 6 );
+				accordion.accordion( "activate" , 5 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('user')}">
-				accordion.accordion( "activate" , 6 );
+				accordion.accordion( "activate" , 5 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('location')}">
-				accordion.accordion( "activate" , 6 );
+				accordion.accordion( "activate" , 5 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('warehouse/warehouse')}">
-				accordion.accordion( "activate" , 6 );
+				accordion.accordion( "activate" , 5 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('shipment') && request.request.queryString?.contains('incoming')}">
 				accordion.accordion( "activate" , 4 );
@@ -482,7 +453,19 @@
 			});	
 		});
 	</script>
-	
+    <script type="text/javascript">
+      jQuery(function(){
+        var SelfLocation = window.location.href.split('?');
+        switch (SelfLocation[1]) {
+          case "justify_right":
+            jQuery(".megamenu").megamenu({ 'justify':'right' });
+            break;
+          case "justify_left":
+          default:
+            jQuery(".megamenu").megamenu();
+        }
+      });
+    </script>	
 	
 </body>
 </html>

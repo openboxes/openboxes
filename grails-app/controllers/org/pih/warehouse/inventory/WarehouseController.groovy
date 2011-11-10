@@ -124,13 +124,15 @@ class WarehouseController {
 	}
 	
 	def update = {
+		
+		log.info(params)
+		
 		def warehouseInstance = inventoryService.getWarehouse(params.id ? params.id as Long : null)
 		
 		if (warehouseInstance) {
 			if (params.version) {
 				def version = params.version.toLong()
-				if (warehouseInstance.version > version) {
-					
+				if (warehouseInstance.version > version) {					
 					warehouseInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'warehouse.label', default: 'Warehouse')] as Object[], "Another user has updated this Warehouse while you were editing")
 					render(view: "edit", model: [warehouseInstance: warehouseInstance])
 					return

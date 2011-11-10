@@ -6,7 +6,7 @@ import org.pih.warehouse.core.RoleType;
 
 class UserController {
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    static allowedMethods = [save: "POST", update: "POST", delete: "GET"]
     def mailService;
 	
     /**
@@ -43,6 +43,10 @@ class UserController {
     def save = {
     	log.info "attempt to save the user; show form with validation errors on failure"
         def userInstance = new User(params)
+		
+		userInstance.password = params?.password?.encodeAsPassword();
+		userInstance.passwordConfirm = params?.passwordConfirm?.encodeAsPassword();
+
         if (userInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'user.label', default: 'User'), userInstance.id])}"
             redirect(action: "show", id: userInstance.id)
@@ -133,7 +137,7 @@ class UserController {
      * Update a user 
      */
     def update = {
-    	log.info "update user"
+		log.info(params)
         def userInstance = User.get(params.id)
         if (userInstance) {
             if (params.version) {
@@ -156,6 +160,7 @@ class UserController {
 			}
 			else { 
 				userInstance.properties = params	
+				// Needed to bypass the password == passwordConfirm validation
 				userInstance.passwordConfirm = userInstance.password 			
 			}
 			
@@ -219,6 +224,9 @@ class UserController {
      * Delete a user
      */
     def delete = {    	
+		
+		log.info(params)
+		
         def userInstance = User.get(params.id)
         if (userInstance) {			
 			if (userInstance?.id == session?.user?.id) { 
