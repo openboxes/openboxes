@@ -190,19 +190,9 @@
 																			</style>				
 																		</g:if>					
 																		<div id="warehouse-${warehouse.id }" class="warehouse">												
-																			<g:if test="${warehouse.local}">
-																				<a href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params: ['returnUrl':request.forwardURI])}' style="display: block; padding: 0px;">
-																					${warehouse.name} 
-																				</a> 
-																				<%-- 
-																				<g:if test="${warehouse?.id == session?.user?.warehouse?.id }">
-																					<warehouse:message code="dashboard.youLastLoggednHereOn.message" args="[format.datetime(obj:session?.user?.lastLoginDate)]"/> 
-																				</g:if>
-																				--%>
-																			</g:if>
-																			<g:else>
-																				<warehouse:message code="dashboard.managedRemotely.message" args="[warehouse.name]"/>
-																			</g:else>
+																			<a href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params: ['returnUrl':request.forwardURI])}' style="display: block; padding: 0px;">
+																				${warehouse.name} 
+																			</a> 
 																		</div>												
 																	</td>											
 																</tr>
