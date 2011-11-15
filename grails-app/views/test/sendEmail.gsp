@@ -14,7 +14,7 @@
 				${flash.message}		
 			</div>
 		</g:if>
-		<a href="/warehouse/test/sendEmail">Refresh</a>
+		<a href="${request.contextPath }/test/sendEmail">Refresh</a>
 		<g:form action="sendEmail" method="POST">
 			<fieldset>
 				<legend>Send Simple Email</legend>

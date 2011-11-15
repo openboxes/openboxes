@@ -384,7 +384,7 @@
 				// TODO Need to set the fields in newLotNumber and set them to 'disabled'
 				var readonlySpan = $(this).parent().siblings(".lotNumberReadonly");
 				
-				$.getJSON('/warehouse/json/getInventoryItem/' + value, function(data) {
+				$.getJSON('${request.contextPath}/json/getInventoryItem/' + value, function(data) {
 					var expMonth = '';
 					var expYear = '';
 					if (data.expirationDate) {

@@ -120,7 +120,7 @@ class TestController {
 					items = items.collect() {
 						[	value: it.id,
 							valueText: it.firstName + " " + it.lastName,
-							label: "<img src=\"/warehouse/user/viewPhoto/" + it.id + "\" width=\"24\" height=\"24\" style=\"vertical-align: bottom;\"\"/>&nbsp;" + it.firstName + " " + it.lastName,						
+							label: it.firstName + " " + it.lastName,						
 							desc: it.email, 
 							icon: it.photo]
 					}

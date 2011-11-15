@@ -77,7 +77,7 @@
 														$( this ).removeClass( "ui-state-highlight" );
 														var child = ui.draggable.attr("id");
 														var parent = $(this).attr("id");
-														var url = "/warehouse/category/move?child=" + child + "&newParent=" + parent;
+														var url = "${request.contextPath}/category/move?child=" + child + "&newParent=" + parent;
 														window.location.replace(url);
 													}
 												}

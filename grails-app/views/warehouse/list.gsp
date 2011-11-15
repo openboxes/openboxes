@@ -32,8 +32,13 @@
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>
+            <div class="dialog">
+				<span class="linkButton">
+           			<a href="${request.contextPath }/warehouse/edit" class="new"><warehouse:message code="warehouse.addLocation.label"/></a>
+	           	</span>
+           	</div>
               
-            <div class="">
+            <div class="" style="width: 99%">
                 <table>
                     <thead>
                         <tr style="height: 100px;">                        
@@ -96,11 +101,6 @@
 	                <g:paginate total="${warehouseInstanceTotal}" />
 	            </div>
 	        </g:if>
-            <div class="dialog">
-				<span class="menuButton">
-           			<a href="/warehouse/warehouse/edit" class="new"><warehouse:message code="warehouse.addLocation.label"/></a>
-	           	</span>
-           	</div>
         </div>
     </body>
 </html>

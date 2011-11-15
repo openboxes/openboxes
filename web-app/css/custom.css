@@ -5,6 +5,11 @@
 	margin:auto;
 }
 
+.ui-state-highlight { 
+	font-weight: bold; 
+	color: black; 
+}
+
 .buttons { 
 	text-align: right; 
 	padding: 10px; 
@@ -63,7 +68,7 @@ button {
 /* Autocomplete */
 
 .autocomplete {
-	background-image: url('/warehouse/images/icons/silk/magnifier.png');
+	background-image: url('${request.contextPath}/images/icons/silk/magnifier.png');
 	background-repeat: no-repeat;
 	background-position: center right;
 	/*padding-left: 20px;*/

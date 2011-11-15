@@ -37,7 +37,7 @@
 						<td valign="top" class="name"><label><warehouse:message code="product.label" /></label></td>                            
 						<td valign="top" class="value">
 							<%-- 
-							<g:autoSuggestEditable id="editItem-product-${itemInstance?.id}" name="product" jsonUrl="/warehouse/json/findProductByName" 
+							<g:autoSuggestEditable id="editItem-product-${itemInstance?.id}" name="product" jsonUrl="${request.contextPath }/json/findProductByName" 
 								size="20" valueId="${itemInstance?.product?.id }" valueName="${itemInstance?.product?.name }"/>	
 							--%>
 							
@@ -50,7 +50,7 @@
 					<tr class="prop">
 						<td valign="top" class="name"><label><warehouse:message code="product.lotNumber.label"/></label></td>                            
 						<td valign="top" class="value">
-							<g:autoSuggestEditable id="editItem-lotNumber-${itemInstance?.id}" name="lotNumber" jsonUrl="/warehouse/json/findLotsByName?productId=${itemInstance?.product?.id }" 
+							<g:autoSuggestEditable id="editItem-lotNumber-${itemInstance?.id}" name="lotNumber" jsonUrl="${request.contextPath }/json/findLotsByName?productId=${itemInstance?.product?.id }" 
 								size="20" valueId="${itemInstance?.lotNumber}" valueName="${itemInstance?.lotNumber}"/>							
 						</td>
 					</tr>

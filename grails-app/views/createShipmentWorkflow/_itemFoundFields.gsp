@@ -26,7 +26,7 @@
 				<tr class="prop">
 					<td valign="top" class="name"><label><warehouse:message code="shipping.recipient.label" /></label></td>                            
 					<td valign="top" class="value">
-						<g:autoSuggest name="recipient" jsonUrl="/warehouse/json/findPersonByName" 
+						<g:autoSuggest name="recipient" jsonUrl="${request.contextPath }/json/findPersonByName" 
 							width="200" valueId="" valueName=""/>	
 					</td>
 				</tr>				

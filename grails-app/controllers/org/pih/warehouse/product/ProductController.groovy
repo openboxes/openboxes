@@ -334,10 +334,10 @@ class ProductController {
 		   
 		   
 		   def uploadFile = request.getFile('csvFile');
-		   
+		   def uploadFilePath = "/tmp/${request.contextPath}/products/import/" + uploadFile.originalFilename
 		   // file must be less than 1MB
 		   if (!uploadFile?.empty) {
-			   File csvFile = new File("/tmp/warehouse/products/import/" + uploadFile.originalFilename);
+			   File csvFile = new File(uploadFilePath);
 			   csvFile.mkdirs()
 			   
 			   uploadFile.transferTo(csvFile);

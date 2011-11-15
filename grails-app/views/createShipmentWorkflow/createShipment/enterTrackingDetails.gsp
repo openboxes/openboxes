@@ -31,7 +31,7 @@
 										<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
 											code="shipping.traveler.label" /></label></td>
 										<td valign="top" style="width: 30%;">
-											<g:autoSuggest id="carrier" name="carrier" jsonUrl="/warehouse/json/findPersonByName" 
+											<g:autoSuggest id="carrier" name="carrier" jsonUrl="${request.contextPath }/json/findPersonByName" 
 												width="180" size="30"
 												valueId="${shipmentInstance?.carrier?.id}" 
 												valueName="${shipmentInstance?.carrier?.name}"/>		
@@ -43,7 +43,7 @@
 										<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
 											code="shipping.freightForwarder.label" /></label></td>
 										<td valign="top" style="width: 30%;">
-											<g:autoSuggest id="shipperInput" name="shipperInput" jsonUrl="/warehouse/json/findShipperByName" 
+											<g:autoSuggest id="shipperInput" name="shipperInput" jsonUrl="${request.contextPath }/json/findShipperByName" 
 												width="180" size="30"
 												valueId="${shipmentInstance?.shipmentMethod?.shipper?.id}" 
 												valueName="${shipmentInstance?.shipmentMethod?.shipper?.name}"/>	
@@ -57,7 +57,7 @@
 										<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
 											code="shipping.recipient.label" /></label></td>
 										<td valign="top" style="width: 30%;">
-											<g:autoSuggest id="recipient" name="recipient" jsonUrl="/warehouse/json/findPersonByName" 
+											<g:autoSuggest id="recipient" name="recipient" jsonUrl="${request.contextPath }/json/findPersonByName" 
 												width="180" size="30"
 												valueId="${shipmentInstance?.recipient?.id}" 
 												valueName="${shipmentInstance?.recipient?.name}"/>		

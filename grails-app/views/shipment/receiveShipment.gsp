@@ -39,7 +39,7 @@
 												<label><warehouse:message code="shipping.recipient.label" /></label>
 											</td>
 											<td class="value" style="width: 30%;">
-												<g:autoSuggest id="recipient" name="recipient" jsonUrl="/warehouse/json/findPersonByName"
+												<g:autoSuggest id="recipient" name="recipient" jsonUrl="${request.contextPath }/json/findPersonByName"
 													width="150"
 													valueId="${receiptInstance?.recipient?.id}"
 													valueName="${receiptInstance?.recipient?.email}"/>	

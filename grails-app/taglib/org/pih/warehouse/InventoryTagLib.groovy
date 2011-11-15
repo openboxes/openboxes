@@ -12,7 +12,7 @@ class InventoryTagLib {
 		def onSelectCallback = attrs.onSelectCallback;
 		def width = (attrs.width) ? attrs.width : "100px";
 		def minLength = (attrs.minLength) ? attrs.minLength : 1;
-		def searchUrl = (attrs.searchUrl) ? attrs.searchUrl : "/warehouse/json/findLotsByName";
+		def searchUrl = (attrs.searchUrl) ? attrs.searchUrl : "";
 		
 		def spanDisplay = "";
 		def suggestDisplay = "inline";

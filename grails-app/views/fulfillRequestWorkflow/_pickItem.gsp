@@ -133,7 +133,7 @@
 								</table>
 							</div>						
 							<div class="buttons left" id="changeProduct" style="display: none;">
-								<g:autoSuggest id="fulfillProduct" name="fulfillProduct" jsonUrl="/warehouse/json/findProductByName" width="200" />
+								<g:autoSuggest id="fulfillProduct" name="fulfillProduct" jsonUrl="${request.contextPath }/json/findProductByName" width="200" />
 								<g:submitButton name="changeProduct" value="${warehouse.message(code:'default.button.search.label')}"></g:submitButton>					
 							</div>
 							

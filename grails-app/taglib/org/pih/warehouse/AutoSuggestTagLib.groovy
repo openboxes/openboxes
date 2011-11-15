@@ -13,7 +13,7 @@ class AutoSuggestTagLib {
 		def valueName = (attrs.valueName)?attrs.valueName:"";
 		def width = (attrs.width) ? attrs.width : 200;
 		def minLength = (attrs.minLength) ? attrs.minLength : 1;
-		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "/warehouse/json/findPersonByName";
+		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "";
 
 		def showValue = (valueName && valueId) ? true : false;
 		//def spanDisplay = (showValue) ? "inline" : "none";

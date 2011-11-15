@@ -94,20 +94,29 @@ input:focus, select:focus, textarea:focus {
     /*color: #333;*/
     padding: 2px 3px;
 }
-.menuButton a.home {
+
+.linkButton {
+    color: #333;
+	font-size: 10px;
+	padding: 10px 5px;
+}
+.linkButton a {
+    padding: 2px 3px;
+    padding-left: 20px;
+}
+
+
+.linkButton a.home {
     background: url(../images/skin/house.png) center left no-repeat;
-    /*color: #333;*/
-    padding-left: 25px;
 }
-.menuButton a.list {
+.linkButton a.list {
     background: url(../images/skin/database_table.png) center left no-repeat;
-    /*color: #333;*/
-    padding-left: 25px;
 }
-.menuButton a.create {
+.linkButton a.create {
     background: url(../images/skin/database_add.png) center left no-repeat;
-    /*color: #333;*/
-    padding-left: 25px;
+}
+.linkButton a.new {
+    background: url(../images/skin/new.png) center left no-repeat;
 }
 
 
@@ -299,139 +308,139 @@ th.desc a {
 .menuButton a { 
 	padding-left: 15px;
 }
-.menuButton a.alert {
+.linkButton a.alert {
     background: url(../images/icons/silk/error.png) center left no-repeat;
 }
-.menuButton a.settings {
+.linkButton a.settings {
     background: url(../images/icons/settings.png) center left no-repeat;
 }
-.menuButton a.shipment {
+.linkButton a.shipment {
     background: url(../images/icons/truck.png) center left no-repeat;
 }
-.menuButton a.drugRoute {
+.linkButton a.drugRoute {
     background: url(../images/icons/silk/pill_go.png) center left no-repeat;
 }
-.menuButton a.drugClass {
+.linkButton a.drugClass {
     background: url(../images/icons/silk/pill.png) center left no-repeat;
 }
-.menuButton a.warehouse {
+.linkButton a.warehouse {
     background: url(../images/icons/silk/building.png) center left no-repeat;
 }
-.menuButton a.location {
+.linkButton a.location {
     background: url(../images/icons/silk/map.png) center left no-repeat;
 }
-.menuButton a.inventory {
+.linkButton a.inventory {
     background: url(../images/icons/stockbook.png) center left no-repeat;
 }
-.menuButton a.eventType {
+.linkButton a.eventType {
     background: url(../images/icons/silk/calendar.png) center left no-repeat;
 }
-.menuButton a.import {
+.linkButton a.import {
     background: url(../images/icons/silk/table_add.png) center left no-repeat;
 }
-.menuButton a.menu {
+.linkButton a.menu {
     background: url(../images/icons/document.png) center left no-repeat;
 }
-.menuButton a.account {
+.linkButton a.account {
     background: url(../images/icons/document.png) center left no-repeat;
 }
-.menuButton a.main {
+.linkButton a.main {
     background: url(../images/icons/document.png) center left no-repeat;
 }
-.menuButton a.auth {
+.linkButton a.auth {
     background: url(../images/icons/document.png) center left no-repeat;
 }
-.menuButton a.user {
+.linkButton a.user {
     background: url(../images/icons/user.png) center left no-repeat;
 }
-.menuButton a.role {
+.linkButton a.role {
     background: url(../images/icons/silk/shield.png) center left no-repeat;
 }
-.menuButton a.admins {
+.linkButton a.admins {
     background: url(../images/icons/users.png) center left no-repeat;
 }
-.menuButton a.group {
+.linkButton a.group {
     background: url(../images/icons/users.png) center left no-repeat;
 }
-.menuButton a.admin {
+.linkButton a.admin {
     background: url(../images/icons/profile.png) center left no-repeat;
 }
-.menuButton a.transaction {
+.linkButton a.transaction {
     background: url(../images/icons/document.png) center left no-repeat;
 }
-.menuButton a.stockcard {
+.linkButton a.stockcard {
     background: url(../images/icons/document.png) center left no-repeat;
 }
-.menuButton a.stockcardentry {
+.linkButton a.stockcardentry {
     background: url(../images/icons/document.png) center left no-repeat;
 }
-.menuButton a.country {
+.linkButton a.country {
     background: url(../images/icons/map.png) center left no-repeat;
 }
-.menuButton a.inventorylineitem {
+.linkButton a.inventorylineitem {
     background: url(../images/icons/package.png) center left no-repeat;
 }
-.menuButton a.product {
+.linkButton a.product {
     background: url(../images/icons/product.png) center left no-repeat;
 }
-.menuButton a.order {
+.linkButton a.order {
     background: url(../images/icons/order.png) center left no-repeat;
 }
-.menuButton a.transactionentry {
+.linkButton a.transactionentry {
     background: url(../images/icons/document.png) center left no-repeat;
 }
-.menuButton a.documentupload {
+.linkButton a.documentupload {
     background: url(../images/icons/document.png) center left no-repeat;
 }
-.menuButton a.building {
+.linkButton a.building {
     background: url(../images/icons/building.png) center left no-repeat;
 }
-.menuButton a.shipper {
+.linkButton a.shipper {
     background: url(../images/icons/silk/lorry.png) center left no-repeat;
 }
-.menuButton a.shipperService {
+.linkButton a.shipperService {
     background: url(../images/icons/silk/map.png) center left no-repeat;
 }
-.menuButton a.ups {
+.linkButton a.ups {
     background: url(../images/icons/ups.jpg) center left no-repeat;
 }
-.menuButton a.usps {
+.linkButton a.usps {
     background: url(../images/icons/usps.jpg) center left no-repeat;
 }
-.menuButton a.fedex {
+.linkButton a.fedex {
     background: url(../images/icons/fedex.jpg) center left no-repeat;
 }
-.menuButton a.browse {
+.linkButton a.browse {
     background: url(../images/icons/browse.png) center left no-repeat;
 }
-.menuButton a.dashboard {
+.linkButton a.dashboard {
     background: url(../images/icons/silk/application_view_tile.png) center left no-repeat;
 }
-.menuButton a.metadata {
+.linkButton a.metadata {
     background: url(../images/icons/wrench.png) center left no-repeat;
 }
-.menuButton a.bullet {
+.linkButton a.bullet {
     background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
 }
-.menuButton a.invalid {
+.linkButton a.invalid {
     background: url(../images/icons/silk/cross.png) center left no-repeat;
 }
-.menuButton a.new {
+.linkButton a.new {
     background: url(../images/icons/silk/add.png) center left no-repeat;
 }
-.menuButton a.edit {
+.linkButton a.edit {
     background: url(../images/icons/silk/pencil.png) center left no-repeat;
 }
-.menuButton a.browse {
+.linkButton a.browse {
     background: url(../images/icons/silk/magnifier.png) center left no-repeat;
 }
-.menuButton a.view {
+.linkButton a.view {
     background: url(../images/icons/silk/magnifier.png) center left no-repeat;
 }
-.menuButton a.delete {
+.linkButton a.delete {
     background: url(../images/icons/silk/delete.png) center left no-repeat;
 }
-.menuButton a.trash {
+.linkButton a.trash {
     background: url(../images/icons/silk/bin.png) center left no-repeat;
 }
 

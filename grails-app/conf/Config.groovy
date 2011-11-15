@@ -157,16 +157,16 @@ log4j = {
 		'org.springframework',
 		'org.hibernate',
 		'org.pih.warehouse',
+		'org.apache.http.headers',
+		'org.apache.ddlutils',
+		'org.apache.http.wire',
 		'grails.app',
 		'grails.app.bootstrap',
 		'grails.app.service',
 		'grails.app.task'
 		'BootStrap'
 
-	debug	'liquibase',
-		'org.apache.http.headers',
-		'org.apache.ddlutils',
-		'org.apache.http.wire'
+	debug	'liquibase'
 		
 	root {
 		error 'stdout', 'smtp'

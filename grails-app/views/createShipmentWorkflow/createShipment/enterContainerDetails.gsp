@@ -385,7 +385,7 @@
 						$( this ).removeClass( "ui-state-highlight" );
 						var itemId = ui.draggable.attr("id");
 						var moveTo = $(this).attr("id");
-						//var url = "/warehouse/category/moveItem?child=" + child + "&newParent=" + parent;
+						//var url = "${request.contextPath}/category/moveItem?child=" + child + "&newParent=" + parent;
 						//window.location.replace(url);
 						//moveItemToContainer(itemId, moveTo);
 						//$("#shipmentItemRow-" + itemId).hide();
@@ -427,13 +427,13 @@
 			}
 
 			function moveItemToContainer(item, container) { 
-				$.post('/warehouse/json/moveItemToContainer', 
+				$.post('${request.contextPath}/json/moveItemToContainer', 
 	                {item: item, container: container}, 
 		                function(data) {
 							// do nothing for now
 							//console(data);
                     		//var item = $("<li>");
-                    		//var link = $("<a>").attr("href", "/warehouse/person/show/" + data.id).html(data.firstName + " " + data.lastName);
+                    		//var link = $("<a>").attr("href", "${request.contextPath}/person/show/" + data.id).html(data.firstName + " " + data.lastName);
                     		//item.append(link);
                     		//$('#messages').append("new message");
                 		}, 'json');

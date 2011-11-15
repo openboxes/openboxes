@@ -58,7 +58,7 @@
 											</g:each>
 										</select>
 										<%--
-										<g:autoSuggestEditable id="shipment-${itemInstance?.id}" name="shipment" jsonUrl="/warehouse/json/findShipmentByName" 
+										<g:autoSuggestEditable id="shipment-${itemInstance?.id}" name="shipment" jsonUrl="${request.contextPath }/json/findShipmentByName" 
 											width="200" valueId="" valueName=""/>							
 										 --%>
 									</td>
@@ -74,7 +74,7 @@
 								<tr class="prop">
 									<td valign="top" class="name"><label><warehouse:message code="shipping.recipient.label"/></label></td>                            
 									<td valign="top" class="value">
-										<g:autoSuggestEditable id="recipient-${itemInstance?.id}" name="recipient" jsonUrl="/warehouse/json/findPersonByName" 
+										<g:autoSuggestEditable id="recipient-${itemInstance?.id}" name="recipient" jsonUrl="${request.contextPath }/json/findPersonByName" 
 											width="200" valueId="" valueName=""/>							
 									</td>
 								</tr>

@@ -103,7 +103,7 @@
 															</td>
 															<td>
 																<g:if test="${!orderItem?.orderItem?.isCompletelyFulfilled() }">
-																	<g:autoSuggest id="productReceived-${i }" name="orderItems[${i }].productReceived" jsonUrl="/warehouse/json/findProductByName" width="200" valueId="${orderItem?.productReceived?.id }" valueName="${format.product(product:orderItem?.productReceived)}"/>	
+																	<g:autoSuggest id="productReceived-${i }" name="orderItems[${i }].productReceived" jsonUrl="${request.contextPath }/json/findProductByName" width="200" valueId="${orderItem?.productReceived?.id }" valueName="${format.product(product:orderItem?.productReceived)}"/>	
 																</g:if>
 															</td>
 															<td>
@@ -313,7 +313,7 @@
 					autoFocus: true,
 					//define callback to format results
 					source: function(req, add){
-						$.getJSON('/warehouse/json/findProductByName', req, function(data) {
+						$.getJSON('${request.contextPath }/json/findProductByName', req, function(data) {
 							var items = [];
 							$.each(data, function(i, item) {
 								items.push(item);

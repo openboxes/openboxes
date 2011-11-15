@@ -287,7 +287,7 @@
 		// On page load, we get the other inventory items that were 
 		// This doesn't work because when we submit the 
 		/*
-		$.get('http://localhost:8080/warehouse/inventoryItem/getInventoryItems', { 'product.id': '8' }, function(data) {
+		$.get('http://localhost:8080${request.contextPath }/inventoryItem/getInventoryItems', { 'product.id': '8' }, function(data) {
 			$.each(data, function(index, value) { 
 				var inventoryItem =  
 					{ Id: value.id, Type: 'item', LotNumber: value.lotNumber, Description: value.description, 
@@ -341,7 +341,7 @@
 			
 			$(this).autocomplete( {
 				source: function(req, add){
-					$.getJSON('/warehouse/json/findLotsByName', req, function(data) {
+					$.getJSON('${request.contextPath }/json/findLotsByName', req, function(data) {
 						var items = [];
 						$.each(data, function(i, item) {
 							items.push(item);
@@ -395,7 +395,7 @@
 				buttonImageOnly: true, 
 				changeMonth: true,
 				changeYear: true,
-				buttonImage: '/warehouse/images/icons/silk/calendar.png',
+				buttonImage: '${request.contextPath }/images/icons/silk/calendar.png',
 			});								
 		});
 		
@@ -426,7 +426,7 @@
 	<td width="10%">
 		<style>
 			.expirationDate { 
-				background-image: url('/warehouse/images/icons/silk/calendar.png');
+				background-image: url('${request.contextPath }/images/icons/silk/calendar.png');
 				background-repeat: no-repeat;
 				background-position: center left;
 				padding-left: 20px;

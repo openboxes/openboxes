@@ -284,7 +284,7 @@
 			}
 
 			function addNewItem(productId) { 
-				$.getJSON('/warehouse/json/findProduct', {id: productId}, function(data) {
+				$.getJSON('${request.contextPath }/json/findProduct', {id: productId}, function(data) {
 	    			var entry = { 
 	    				EntryId: '', 
 	    				ProductId: data.product.id, 
@@ -300,7 +300,7 @@
 			}
 
 			function addExistingItem(productId, lotNumber, onHandQty) { 
-				$.getJSON('/warehouse/json/findInventoryItem', {productId: productId, lotNumber: lotNumber}, function(data) {
+				$.getJSON('${request.contextPath }/json/findInventoryItem', {productId: productId, lotNumber: lotNumber}, function(data) {
 					var expMonth = '';
 					var expYear = '';
 					if (data.inventoryItem.expirationDate) {
@@ -434,7 +434,7 @@
 					delay: 500,
     				source: function(request, response) {
     					var currentLocationId = $("#currentLocationId").val();
-    					$.getJSON('/warehouse/json/findProductByName', { term: request.term, warehouseId: currentLocationId }, function(data, status, xhr) {
+    					$.getJSON('${request.contextPath }/json/findProductByName', { term: request.term, warehouseId: currentLocationId }, function(data, status, xhr) {
     						var items = [];
     						$.each(data, function(i, item) { items.push(item); });
     						response(items);

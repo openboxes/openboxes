@@ -15,7 +15,7 @@ class AutoSuggestEditableTagLib {
 		def width = (attrs.width) ? attrs.width : 200;
 		def size = (attrs.size) ? attrs.size : 20;
 		def minLength = (attrs.minLength) ? attrs.minLength : 1;
-		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "/warehouse/json/findPersonByName";
+		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "";
 
 		def showValue = (valueName && valueId) ? true : false;
 		//def spanDisplay = (showValue) ? "inline" : "none";
@@ -26,7 +26,7 @@ class AutoSuggestEditableTagLib {
 			<div>
 				<style>
 					#${id}-suggest {
-						background-image: url('/warehouse/images/icons/silk/zoom.png'); background-repeat: no-repeat; background-position: center left;
+						background-image: url('${request.contextPath}/images/icons/silk/zoom.png'); background-repeat: no-repeat; background-position: center left;
 						padding: 5px; padding-left: 25px;
 					}
 					#${id}-span { padding: 5px; border: 1px solid lightgrey; background-color: #eee;}

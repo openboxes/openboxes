@@ -12,7 +12,7 @@ class AutoCompleteTagLib {
 		def valueName = (attrs.valueName)?attrs.valueName:"";
 		def width = (attrs.width) ? attrs.width : 200;
 		def minLength = (attrs.minLength) ? attrs.minLength : 1;
-		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "/warehouse/json/findPersonByName";
+		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "";
 
 		def showValue = (valueName && valueId) ? true : false;
 		//def spanDisplay = (showValue) ? "inline" : "none";
@@ -24,7 +24,7 @@ class AutoCompleteTagLib {
 			<div>
 				<style>
 					#${id}-suggest {
-						background-image: url('/warehouse/images/icons/silk/magnifier.png');
+						background-image: url('${request.contextPath}/images/icons/silk/magnifier.png');
 						background-repeat: no-repeat;
 						background-position: center left;
 						padding-left: 20px;

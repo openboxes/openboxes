@@ -5,7 +5,7 @@
 						<format:product product="${item?.product}"/>
 						<g:hiddenField id="productId" name="product.id" value="${item?.product?.id }"/>
 						<%-- 
-						<g:autoSuggest id="product" name="product" jsonUrl="/warehouse/json/findProductByName" 
+						<g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName" 
 							width="300" valueId="${item?.product?.id}" valueName="${format.product(product:item?.product}"/>	
 						<g:link controller="product" action="create" target="_blank"><span class="small"><warehouse:message code="product.add.label"/></span></g:link>											
 						--%>
@@ -15,7 +15,7 @@
 					<td valign="top" class="name"><label><warehouse:message code="default.lotSerialNo.label" /></label></td>                            
 					<td valign="top" class="value">
 						<%-- <g:textField id="lotNumber" name="lotNumber" width="200" value="${item?.lotNumber}"/>--%>
-						<g:autoSuggestString id="lotNumber" name="lotNumber" jsonUrl="/warehouse/json/findLotsByName?productId=${item?.product?.id }" 
+						<g:autoSuggestString id="lotNumber" name="lotNumber" jsonUrl="${request.contextPath }/json/findLotsByName?productId=${item?.product?.id }" 
 							width="200" value="${item?.lotNumber}"/> 
 						<!-- <g:link controller="inventory" action="createTransaction" target="_blank"><span class="small">Update Inventory</span></g:link> -->
 					</td>
@@ -38,7 +38,7 @@
 				<tr class="prop">
 					<td valign="top" class="name"><label><warehouse:message code="shipping.recipient.label"/></label></td>                            
 					<td valign="top" class="value">
-						<g:autoSuggest id="recipient" name="recipient" jsonUrl="/warehouse/json/findPersonByName" 
+						<g:autoSuggest id="recipient" name="recipient" jsonUrl="${request.contextPath }/json/findPersonByName" 
 							width="200" valueId="${item?.recipient?.id}" valueName="${item?.recipient?.name}"/>							
 					</td>
 				</tr>
@@ -104,7 +104,7 @@
 					function updateQuantityOnHand() { 
 						var productId = $("#productId").val();
 						var lotNumber = $("#lotNumber-suggest").val();				
-						$("#quantity-on-hand").load("/warehouse/json/getQuantity?productId=" + productId + "&lotNumber=" + lotNumber);
+						$("#quantity-on-hand").load("${request.contextPath }/json/getQuantity?productId=" + productId + "&lotNumber=" + lotNumber);
 					}
 				</script>
 

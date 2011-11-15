@@ -12,19 +12,21 @@ class SyncController {
 
 	
 	def index = {
+		
 		def remoteProducts = new ArrayList<Product>();
 		def http = new HTTPBuilder("http://ci.pih-emr.org:8080");
+		def path = "${request.contextPath}/api/products"
 		http.auth.basic("manager", "password")
 		http.request(Method.valueOf("GET"), JSON) {
-			uri.path = '/warehouse/api/products'
+			uri.path = path
 			response.success = { resp, json ->						
 				json.products.each { product ->					
 					try { 
-						log.info "Product JSON: " + product
+						//log.info "Product JSON: " + product
 						remoteProducts.add(JSONObject.toBean(product, Product.class));
 					} 
 					catch (JSONException e) {
-						log.error("Unable to pull products from remote server", e);
+						//log.error("Unable to pull products from remote server", e);
 						remoteProducts.add(JSONObject.toBean(product));
 					}
 			

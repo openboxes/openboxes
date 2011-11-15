@@ -43,7 +43,7 @@ class DatePickerTagLib {
 						changeMonth: ${changeMonthAndYear},
 						changeYear: ${changeMonthAndYear},
 						buttonImageOnly: true,
-						buttonImage: '/warehouse/images/icons/silk/calendar.png',
+						buttonImage: '${request.contextPath}/images/icons/silk/calendar.png',
 						//buttonText: '...',
 						//showButtonPanel: true,
 						//showOtherMonths: true,

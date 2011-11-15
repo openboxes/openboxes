@@ -106,7 +106,7 @@
 																<g:select class="combobox" name="product.id" from="${org.pih.warehouse.product.Product.list().sort{it.name}}" optionKey="id" value="" noSelection="['':'']" />
 															</div>
 															--%>
-															<g:autoSuggest id="product" name="product" jsonUrl="/warehouse/json/findProductByName" 
+															<g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath}/json/findProductByName" 
 																width="200" valueId="${requestItem?.product?.id }" valueName="${requestItem?.product?.name }"/>															
 														</td>
 													</tr>

@@ -8,7 +8,7 @@ class BreadcrumbTagLib {
 		
 		if (session.user) { 
 			breadcrumb += "&nbsp; &raquo; &nbsp;";
-			breadcrumb += "<a class=\"building\" href=\"${createLink(uri: '/warehouse/show/' + session.warehouse?.id)}\">${session.warehouse?.name}</a>"			
+			breadcrumb += "<a class=\"building\" href=\"${createLink(uri: '${request.contextPath}/show/' + session.warehouse?.id)}\">${session.warehouse?.name}</a>"			
 			def baseUrl = "/";
 			def currentUrl = baseUrl;
 			request.getServletPath().split("/").each {

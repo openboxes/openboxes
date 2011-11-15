@@ -1,6 +1,6 @@
 <div>
 	<input id="carrier-suggest" type="text" value="${shipmentInstance?.carrier?.firstName} ${shipmentInstance?.carrier?.lastName}">
-	<img id="carrier-icon" src="/warehouse/images/icons/search.png" style="vertical-align: middle;"/>
+	<img id="carrier-icon" src="${request.contextPath}/images/icons/search.png" style="vertical-align: middle;"/>
 	<input id="carrier-id" name="carrier.id" type="hidden" value="${shipmentInstance?.carrier?.id}"/>
 	<span id="carrier-name"></span>
 </div>
@@ -26,7 +26,7 @@
 			//define callback to format results
 			source: function(req, add){
 				//pass request to server
-				$.getJSON("/warehouse/test/searchByName", req, function(data) {
+				$.getJSON("${request.contextPath}/test/searchByName", req, function(data) {
 					var people = [];
 					$.each(data, function(i, item){
 						people.push(item);
@@ -42,7 +42,7 @@
 				$('#carrier-suggest').val(ui.item.label);
 				$('#carrier-name').html(ui.item.label);
 				$('#carrier-id').val(ui.item.value);
-				$('#carrier-icon').attr('src', '/warehouse/images/icons/silk/user.png');
+				$('#carrier-icon').attr('src', '${request.contextPath}/images/icons/silk/user.png');
 				$('#carrier-suggest').hide();
 				$('#carrier-name').show();
 				return false;

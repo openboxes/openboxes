@@ -17,7 +17,7 @@ class SelectTagLib {
 
 	def selectTransactionSource = { attrs,body ->
 		def currentLocation = Location.get(session.warehouse.id)
-		attrs.from = locationService.getTransactionSources(currentLocation).sort { it?.toLowercase()?.name };
+		attrs.from = locationService.getTransactionSources(currentLocation).sort { it?.name?.toLowerCase() };
 		attrs.optionKey = 'id'
 		attrs.optionValue = 'name'
 		out << g.select(attrs)
