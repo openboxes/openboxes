@@ -36,22 +36,19 @@
 									<g:if test="${warehouse.active}">						
 										<tr class="prop">
 											<td class="warehouse" nowrap="nowrap">
-												<div id="warehouse-${warehouse.id }" class="warehouse">												
-													<g:if test="${warehouse.local}">
-														<a class="home" href='${createLink(action:"chooseLocation", id: warehouse.id)}' style="display: block;">
-															<g:if test="${warehouse.logo}">	
-																<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'warehouse', action:'viewLogo', id: warehouse.id)}" />
-																<%--<img src="${warehouse.logo}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img>--%>
-															</g:if>
-															<g:else>
-																<img src="${createLinkTo(dir:'images',file:'icons/building.png')}" style="vertical-align: middle"/>
-															</g:else>
-															${warehouse.name} 
-														</a> 
-															
-														<g:if test="${warehouse?.id == session?.user?.warehouse?.id }">
-															<warehouse:message code="dashboard.youLastLoggednHereOn.message" args="[format.datetime(obj:session?.user?.lastLoginDate)]"/> 
+												<div id="warehouse-${warehouse.id }" class="warehouse">													
+													<a class="home" href='${createLink(action:"chooseLocation", id: warehouse.id)}' style="display: block;">
+														<g:if test="${warehouse.logo}">	
+															<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'warehouse', action:'viewLogo', id: warehouse.id)}" />
+															<%--<img src="${warehouse.logo}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img>--%>
 														</g:if>
+														<g:else>
+															<img src="${createLinkTo(dir:'images',file:'icons/building.png')}" style="vertical-align: middle"/>
+														</g:else>
+														${warehouse.name} 
+													</a> 
+													<g:if test="${warehouse?.id == session?.user?.warehouse?.id }">
+														<warehouse:message code="dashboard.youLastLoggednHereOn.message" args="[format.datetime(obj:session?.user?.lastLoginDate)]"/> 
 													</g:if>
 												</div>												
 											</td>											
