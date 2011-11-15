@@ -56,7 +56,10 @@
 									<td valign="top" class="name"><label><warehouse:message code="default.origin.label" /></label></td>
 									<td valign="top"
 										class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">								
-										<g:select name="origin.id" from="${org.pih.warehouse.core.Location.list().sort()}" optionKey="id" value="${shipmentInstance?.origin?.id ? shipmentInstance?.origin?.id : session.warehouse.id}" style="width: 180px" />							
+										<g:selectShipmentOrigin name="origin.id" 
+											optionKey="id" value="${shipmentInstance?.origin?.id ? shipmentInstance?.origin?.id : session.warehouse.id}" 
+											noSelection="['null':'']" 
+											style="width: 180px" />							
 										<br/>
 										<g:link controller="location" action="edit" target="_blank"><span class="small"><warehouse:message code="location.addNewLocation.label"/></span></g:link>							
 									</td>
@@ -64,7 +67,10 @@
 								<tr class="prop">
 									<td valign="top" class="name"><label><warehouse:message code="default.destination.label" /></td>
 									<td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'destination', 'errors')}">
-										<g:select name="destination.id" from="${org.pih.warehouse.inventory.Warehouse.list().sort()}" optionKey="id" value="${shipmentInstance?.destination?.id}" style="width: 180px" />	
+										<g:selectShipmentDestination name="destination.id" 
+											optionKey="id" value="${shipmentInstance?.destination?.id}" 
+											noSelection="['null':'']"
+											style="width: 180px" />	
 									</td>
 								</tr>
 								

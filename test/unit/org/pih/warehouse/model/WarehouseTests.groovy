@@ -2,7 +2,7 @@ package org.pih.warehouse.model
 
 import grails.test.*
 
-class WarehouseTests extends GrailsUnitTestCase {
+class LocationTests extends GrailsUnitTestCase {
     protected void setUp() {
         super.setUp()
     }

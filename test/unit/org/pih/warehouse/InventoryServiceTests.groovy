@@ -7,7 +7,7 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.LocalTransfer 
 import org.pih.warehouse.inventory.TransactionCode 
 import org.pih.warehouse.inventory.TransactionEntry 
-import org.pih.warehouse.inventory.Warehouse
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionType
@@ -21,7 +21,7 @@ class InventoryServiceTests extends BaseUnitTest {
 	}
 	
 	private void setUp_transactionEntryTests() {
-		def inventory = Warehouse.findByName("Boston Warehouse").inventory
+		def inventory = Location.findByName("Boston Location").inventory
 		
 		// create some transactions
 		def transaction = new Transaction(transactionType: TransactionType.get(7), transactionDate: new Date() - 5, inventory: inventory)
@@ -136,11 +136,11 @@ class InventoryServiceTests extends BaseUnitTest {
 	
 	private void setUp_localTransferTests () {
 		// create some test transactions
-		mockDomain(Transaction, [new Transaction(id: 10, transactionType: TransactionType.get(7), transactionDate: new Date(), inventory: Warehouse.findByName("Boston Warehouse").inventory),
-		new Transaction(id: 20, transactionType: TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID), transactionDate: new Date(), inventory: Warehouse.findByName("Boston Warehouse").inventory, source: Location.findByName("Acme Supply Company")),
-		new Transaction(id: 30, transactionType: TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID), transactionDate: new Date(), inventory: Warehouse.findByName("Boston Warehouse").inventory, destination: Location.findByName("Acme Supply Company")),
-		new Transaction(id: 40, transactionType: TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID), transactionDate: new Date(), inventory: Warehouse.findByName("Boston Warehouse").inventory, source: Warehouse.findByName("Haiti Warehouse")),
-		new Transaction(id: 50, transactionType: TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID), transactionDate: new Date(), inventory: Warehouse.findByName("Boston Warehouse").inventory, destination: Warehouse.findByName("Haiti Warehouse"))])
+		mockDomain(Transaction, [new Transaction(id: 10, transactionType: TransactionType.get(7), transactionDate: new Date(), inventory: Location.findByName("Boston Location").inventory),
+		new Transaction(id: 20, transactionType: TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID), transactionDate: new Date(), inventory: Location.findByName("Boston Location").inventory, source: Location.findByName("Acme Supply Company")),
+		new Transaction(id: 30, transactionType: TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID), transactionDate: new Date(), inventory: Location.findByName("Boston Location").inventory, destination: Location.findByName("Acme Supply Company")),
+		new Transaction(id: 40, transactionType: TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID), transactionDate: new Date(), inventory: Location.findByName("Boston Location").inventory, source: Location.findByName("Haiti Location")),
+		new Transaction(id: 50, transactionType: TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID), transactionDate: new Date(), inventory: Location.findByName("Boston Location").inventory, destination: Location.findByName("Haiti Location"))])
 		
 		// create the (empty) LocalTransfer domain
 		mockDomain(LocalTransfer)
@@ -170,7 +170,7 @@ class InventoryServiceTests extends BaseUnitTest {
 		
 		def inventoryService = new InventoryService()
 		
-		def warehouse = Warehouse.findByName("Boston Warehouse")
+		def warehouse = Location.findByName("Boston Location")
 		
 		assert warehouse.inventory != null
 		assert Transaction.get(40).inventory != null
@@ -186,9 +186,9 @@ class InventoryServiceTests extends BaseUnitTest {
 		assert localTransfer.destinationTransaction == Transaction.get(40)
 		def newTransaction = localTransfer.sourceTransaction
 		assert newTransaction.transactionType == TransactionType.get(9)
-		assert newTransaction.inventory == Warehouse.findByName("Haiti Warehouse").inventory
+		assert newTransaction.inventory == Location.findByName("Haiti Location").inventory
 		assert newTransaction.source == null
-		assert newTransaction.destination == Warehouse.findByName("Boston Warehouse")
+		assert newTransaction.destination == Location.findByName("Boston Location")
 		
 		// now try a local transaction based on a Transfer Out Transaction
 		inventoryService.saveLocalTransfer(Transaction.get(50))
@@ -201,8 +201,8 @@ class InventoryServiceTests extends BaseUnitTest {
 		assert localTransfer.sourceTransaction == Transaction.get(50)
 		newTransaction = localTransfer.destinationTransaction
 		assert newTransaction.transactionType == TransactionType.get(8)
-		assert newTransaction.inventory == Warehouse.findByName("Haiti Warehouse").inventory
-		assert newTransaction.source == Warehouse.findByName("Boston Warehouse")
+		assert newTransaction.inventory == Location.findByName("Haiti Location").inventory
+		assert newTransaction.source == Location.findByName("Boston Location")
 		assert newTransaction.destination == null
 		
 	}
@@ -218,8 +218,8 @@ class InventoryServiceTests extends BaseUnitTest {
 		inventoryService.saveLocalTransfer(baseTransaction)
 		
 		// now modify the base transaction
-		baseTransaction.inventory = Warehouse.findByName("Haiti Warehouse").inventory
-		baseTransaction.source = Warehouse.findByName("Boston Warehouse")
+		baseTransaction.inventory = Location.findByName("Haiti Location").inventory
+		baseTransaction.source = Location.findByName("Boston Location")
 		
 		// resave the local transfer
 		inventoryService.saveLocalTransfer(baseTransaction) 	
@@ -229,9 +229,9 @@ class InventoryServiceTests extends BaseUnitTest {
 		assert localTransfer.destinationTransaction == baseTransaction
 		def newTransaction = localTransfer.sourceTransaction
 		assert newTransaction.transactionType == TransactionType.get(9)
-		assert newTransaction.inventory == Warehouse.findByName("Boston Warehouse").inventory
+		assert newTransaction.inventory == Location.findByName("Boston Location").inventory
 		assert newTransaction.source == null
-		assert newTransaction.destination == Warehouse.findByName("Haiti Warehouse")
+		assert newTransaction.destination == Location.findByName("Haiti Location")
 	}
 	
 }

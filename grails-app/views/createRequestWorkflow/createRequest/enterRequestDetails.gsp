@@ -29,7 +29,7 @@
 			</g:hasErrors>
 		</g:each>
 		
-		<g:set var="requestingWarehouse" value="${requestInstance.destination?:session.warehouse}"/>
+		<g:set var="requestingLocation" value="${requestInstance.destination?:session.warehouse}"/>
 		
 		<g:form action="createRequest" method="post">
 			<div class="dialog">
@@ -51,24 +51,29 @@
 								<td valign='top' class='name'><label for='source'><warehouse:message code="request.from.label"/>:</label>
 								</td>
 								<td valign='top' class='value ${hasErrors(bean:requestInstance,field:'origin','errors')}'>
+									<g:selectRequestSupplier name="origin.id" 
+										optionKey="id" value="${requestInstance?.origin?.id}" noSelection="['null':'']"/>
+									
+									<%-- 
 									<select name="origin.id">
 										<option value=""></option>
-										<g:each in="${org.pih.warehouse.inventory.Warehouse.list()}" var="w">
-											<g:if test="${requestInstance?.origin?.id == w.id || requestingWarehouse.id != w.id}">
+										<g:each in="${org.pih.warehouse.core.Location.list()}" var="w">
+											<g:if test="${requestInstance?.origin?.id == w.id || requestingLocation.id != w.id}">
 												<option value="${w.id}"<g:if test="${requestInstance?.origin?.id == w.id}"> selected</g:if>>
 													<format:metadata obj="${w}"/>
 												</option>
 											</g:if>
 										</g:each>
 									</select>
+									--%>
 								</td>
 							</tr>
 							<tr class='prop'>
 								<td valign='top' class='name'><label for="destination"><warehouse:message code="request.for.label"/>:</label>
 								</td>
 								<td valign='top' class='value ${hasErrors(bean:requestInstance,field:'destination','errors')}'>
-									<format:metadata obj="${requestingWarehouse}"/>
-									<g:hiddenField name="destination.id" value="${requestingWarehouse?.id}"/>
+									<format:metadata obj="${requestingLocation}"/>
+									<g:hiddenField name="destination.id" value="${requestingLocation?.id}"/>
 								</td>
 							</tr>
 							<tr class='prop'>

@@ -3,7 +3,7 @@
 <html>
 <head>
 	<!-- Include default page title -->
-	<title><g:layoutTitle default="Your Warehouse App" /></title>
+	<title><g:layoutTitle default="Your Location App" /></title>
 
 	<script src="http://cdn.jquerytools.org/1.2.3/jquery.tools.min.js?select=full&debug=true"></script> 
 	
@@ -144,7 +144,7 @@
 		<!-- YUI "footer" block that includes footer information -->
 		<div id="ft" role="contentinfo">
 			<div id="footer">
-				&copy; 2010 <a href="http://www.pih.org">PIH</a>&trade; Warehouse &nbsp;&nbsp; | &nbsp;&nbsp;
+				&copy; 2010 <a href="http://www.pih.org">PIH</a>&trade; Location &nbsp;&nbsp; | &nbsp;&nbsp;
 				Application Version: <g:meta name="app.version"/>&nbsp;&nbsp; | &nbsp;&nbsp;
 				Grails Version: <g:meta name="app.grails.version"></g:meta>
 			</div>

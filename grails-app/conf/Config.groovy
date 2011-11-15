@@ -19,7 +19,7 @@ println "Using configuration locations ${grails.config.locations} ${GrailsUtil.e
 grails { 
 	mail { 
 		/**
-		 * By default we disable email, enable email using environment settings below or in your 
+		 * By default we enable email.  You can enable/disable email using environment settings below or in your 
 		 * ${user.home}/warehouse-config.properties file 
 		 */
 		enabled = true			
@@ -28,6 +28,8 @@ grails {
 		port = "25"
 	}
 }
+
+app.loginLocation.requiredActivities = ["MANAGE_INVENTORY"]
 
 grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
 grails.mime.use.accept.header = false
@@ -277,7 +279,7 @@ grails.plugins.dynamicController.mixins = [
  ]
 
 /**
- * Warehouse Global Properties
+ * Location Global Properties
  */
 
 // default and supported locales

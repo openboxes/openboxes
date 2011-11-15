@@ -26,5 +26,31 @@ class LocationType implements Serializable {
 		lastUpdated(display:false)
 	}
 	
+	static mapping = {
+		// Needs to be eagerly fetched because of Location.supportsActivity() method
+		supportedActivities lazy: false
+	}
+	
+	/**
+	* Indicates whether the location type supports the given activity.
+	*
+	* @param activity	the given activity
+	* @return	true if the activity is supported, false otherwise
+	*/
+   Boolean supports(ActivityCode activity) {
+	   return supports(activity.id)
+   }
+
+   /**
+	* Indicates whether the location type supports the given activity.
+	*
+	* @param activity	the given activity id
+	* @return	true if the activity is supported, false otherwise
+	*/
+   Boolean supports(String activity) {
+		return supportedActivities?.contains(activity);
+   }
+	
+	
 	String toString() { return "$name"; }
 }

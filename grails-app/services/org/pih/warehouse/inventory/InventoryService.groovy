@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat;
 import org.grails.plugins.excelimport.ExcelImportUtils;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.ProductAttribute;
@@ -67,20 +67,21 @@ class InventoryService implements ApplicationContextAware {
 	 * Gets all warehouses
 	 * @return
 	 */
-	List<Warehouse> getAllWarehouses() {
-		return Warehouse.list()
+	List<Location> getAllLocations() {
+		return Location.list()
 	}
     
 	/**
-	 * Returns the Warehouse specified by the passed id parameter; 
+	 * Returns the Location specified by the passed id parameter; 
 	 * if no parameter is specified, returns a new warehouse instance
 	 * 
 	 * @param warehouseId
 	 * @return
 	 */
-	Warehouse getWarehouse(Long warehouseId) {
+	/*
+	Location getLocation(Long warehouseId) {
 	   	if (warehouseId) {
-	   		Warehouse warehouse = Warehouse.get(warehouseId)
+	   		Location warehouse = Location.get(warehouseId)
 	   		if (!warehouse) {
 	   			throw new Exception("No warehouse found with warehouseId ${warehouseId}")
 	   		}
@@ -90,27 +91,29 @@ class InventoryService implements ApplicationContextAware {
 	   	}
 	   	// otherwise, we need to create a new warehouse
 	   	else {
-	   		Warehouse warehouse = new Warehouse()
+	   		Location warehouse = new Location()
 	   		warehouse.locationType = LocationType.findById(Constants.WAREHOUSE_LOCATION_TYPE_ID)
 	   		
 	   		return warehouse
 	   	}
     }
+    */
     
     /**
      * Saves the specified warehouse
 	 * 
 	 * @param warehouse
 	 */
-	void saveWarehouse(Warehouse warehouse) {
+	void saveLocation(Location warehouse) {
+		log.info ("saving warehouse " + warehouse)
+		log.info ("location type " + warehouse.locationType)
 		// make sure a warehouse has an inventory
 		if (!warehouse.inventory) {
 			addInventory(warehouse)
 		}
+		log.info warehouse.locationType
 		
-		log.info (warehouse.supportedActivities)
-		
-		warehouse.save(flush:true)
+		warehouse.save(failOnError: true)
 	}
 	
 	/**
@@ -142,9 +145,9 @@ class InventoryService implements ApplicationContextAware {
 	 * 
 	 * @param location
 	 */
-	void saveLocation(Location location) {
-		location.save(flush:true)
-	}
+	//void saveLocation(Location location) {
+	//	location.save(flush:true)
+	//}
     
 	/**
 	 * Gets all transactions associated with a warehouse
@@ -152,8 +155,8 @@ class InventoryService implements ApplicationContextAware {
 	 * @param warehouse
 	 * @return
 	 */
-	List<Transaction> getAllTransactions(Warehouse warehouse) {
-		return Transaction.withCriteria { eq("thisWarehouse", warehouse) }
+	List<Transaction> getAllTransactions(Location warehouse) {
+		return Transaction.withCriteria { eq("thisLocation", warehouse) }
 	}
 
 	/**
@@ -176,7 +179,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param warehouse
 	 * @return
 	 */
-	Inventory getInventory(Warehouse warehouse) {
+	Inventory getInventory(Location warehouse) {
 		Inventory inventory = Inventory.withCriteria { eq("warehouse", warehouse) }
 		return  inventory ?: addInventory(warehouse)
 	}
@@ -187,7 +190,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param warehouse
 	 * @return
 	 */
-	Inventory addInventory(Warehouse warehouse) {
+	Inventory addInventory(Location warehouse) {
 		if (!warehouse) {
 			throw new RuntimeException("No warehouse specified.")
 		}
@@ -196,7 +199,7 @@ class InventoryService implements ApplicationContextAware {
 		}
 		
 		warehouse.inventory = new Inventory([ 'warehouse' : warehouse ])
-		saveWarehouse(warehouse)
+		saveLocation(warehouse)
 		
 		return warehouse.inventory
 	}
@@ -545,13 +548,13 @@ class InventoryService implements ApplicationContextAware {
 	 * @param lotNumber
 	 * @return
 	 */
-	Integer getQuantity(Warehouse warehouse, Product product, String lotNumber) {
+	Integer getQuantity(Location warehouse, Product product, String lotNumber) {
 		log.debug ("Get quantity for product " + product?.name + " lotNumber " + lotNumber + " at location " + warehouse?.name)
 		if (!warehouse) {
 			throw new RuntimeException("Your warehouse has not been initialized");
 		}
 		else {
-			warehouse = Warehouse.get(warehouse?.id)
+			warehouse = Location.get(warehouse?.id)
 		}
 		def inventoryItem = findInventoryItemByProductAndLotNumber(product, lotNumber)
 		if (!inventoryItem) {
@@ -1107,7 +1110,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param productIds
 	 * @return 	a map of inventory items by product
 	 */
-	Map getInventoryItemsByProducts(Warehouse warehouse, List<Integer> productIds) { 
+	Map getInventoryItemsByProducts(Location warehouse, List<Integer> productIds) { 
 		def inventoryItemMap = [:]
 		if (productIds) {
 			//def inventory = Inventory.get(warehouse?.inventory?.id);
@@ -1299,7 +1302,7 @@ class InventoryService implements ApplicationContextAware {
     */
 	List getInventoryItemList(Long id) { 
 		def list = []
-		def warehouseInstance = Warehouse.get(id);
+		def warehouseInstance = Location.get(id);
 		def inventoryInstance = warehouseInstance?.inventory;
 		if (inventoryInstance) { 
 			def transactionEntries = getTransactionEntriesByInventory(inventoryInstance)
@@ -1324,7 +1327,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	Map getInventoryLevelMap(Long id) { 
-		//return Warehouse.get(id)?.inventory?.inventoryLevels?.groupBy { it.product } 
+		//return Location.get(id)?.inventory?.inventoryLevels?.groupBy { it.product } 
 		return new HashMap();
 	}
 
@@ -1452,7 +1455,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param errors
 	 * @return
 	 */
-	public List prepareInventory(Warehouse warehouse, String filename, Errors errors) { 
+	public List prepareInventory(Location warehouse, String filename, Errors errors) { 
 		log.debug "prepare inventory"
 		Map CONFIG_CELL_MAP = [
 			sheet:'Sheet1', cellMap: [ ]
@@ -1679,7 +1682,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param inventoryMapList
 	 * @param errors
 	 */
-	public void importInventory(Warehouse warehouse, List inventoryMapList, Errors errors) { 
+	public void importInventory(Location warehouse, List inventoryMapList, Errors errors) { 
 		
 		
 		try { 
@@ -1872,11 +1875,11 @@ class InventoryService implements ApplicationContextAware {
 	
 		// make sure we are operating only on locally managed warehouses
 		if (transaction?.source) {
-			if (!(transaction?.source instanceof Warehouse)) { return false }
+			if (!(transaction?.source instanceof Location)) { return false }
 			else if (!transaction?.source.local){ return false }
 		}
 		if (transaction?.destination) {
-			if (!(transaction?.destination instanceof Warehouse)) { return false }
+			if (!(transaction?.destination instanceof Location)) { return false }
 			else if (!transaction?.destination.local) { return false }
 		}
 		

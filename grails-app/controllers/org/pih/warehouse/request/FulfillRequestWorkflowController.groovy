@@ -10,7 +10,7 @@ import org.pih.warehouse.fulfillment.FulfillmentCommand;
 import org.pih.warehouse.fulfillment.FulfillmentItem;
 import org.pih.warehouse.fulfillment.FulfillmentStatus;
 import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.shipping.ReceiptException;
@@ -126,13 +126,13 @@ class FulfillRequestWorkflowController {
 				
 				// Get inventory items
 				def inventoryItems = [:]
-				def warehouse = Warehouse.get(session.warehouse.id);
+				def warehouse = Location.get(session.warehouse.id);
 				if (warehouse.inventory) {
 					inventoryItems =
 						inventoryService.getQuantityByInventoryAndProduct(warehouse.inventory, requestItem?.product);
 				}
 				else {
-					throw new RuntimeException("Warehouse does not have an associated inventory")
+					throw new RuntimeException("Location does not have an associated inventory")
 				}
 				
 				[	
@@ -152,7 +152,7 @@ class FulfillRequestWorkflowController {
 				def product = Product.get(params?.fulfillProduct.id) 
 				log.info("changed product to " + product)
 				
-				def warehouse = Warehouse.get(session.warehouse.id)
+				def warehouse = Location.get(session.warehouse.id)
 				def inventoryItems =
 					inventoryService.getQuantityByInventoryAndProduct(warehouse.inventory, product);
 				
@@ -232,7 +232,7 @@ class FulfillRequestWorkflowController {
 			action {
 				def fulfillmentItem = FulfillmentItem.get(params?.fulfillmentItem?.id)
 				def requestItem = RequestItem.get(params?.requestItem?.id)
-				def warehouse = Warehouse.get(session.warehouse.id)				
+				def warehouse = Location.get(session.warehouse.id)				
 				def shipments = shipmentService.getOutgoingShipments(warehouse);
 				log.info("shipments: " + shipments)
 

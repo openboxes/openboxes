@@ -2,7 +2,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <title>${warehouse.message(code: 'dashboard.chooseWarehouse.label', default: 'Choose a warehouse to manage')}</title>
+        <title>${warehouse.message(code: 'dashboard.chooseLocation.label', default: 'Choose a warehouse to manage')}</title>
     </head>
     <body>        
 		<style>
@@ -12,8 +12,8 @@
 			td.warehouse { padding: 0px; } 
 			
 			.warehouse { border: 0px solid #F5F5F5; padding: 10px; display: block; } 			
-			
-			<g:each var="warehouse" in="${warehouses}" status="i">								
+
+			<g:each var="warehouse" in="${session.loginLocations}" status="i">						
 				<g:if test="${warehouse?.fgColor && warehouse?.bgColor }">
 					#warehouse-${warehouse?.id} { background-color: #${warehouse.bgColor}; color: #${warehouse.fgColor}; } 
 					#warehouse-${warehouse?.id} a { color: #${warehouse.fgColor}; }  	
@@ -24,25 +24,21 @@
 
 		<div class="body">		
 	    	<div class="list">			
-	    		
-
-
-				<div id="chooseWarehouse">
-					
+				<div id="chooseLocation">
 					<g:if test="${flash.message}">
 				    	<div class="message">${warehouse.message(code:flash.message,default:flash.message)}</div>  <!-- we wrap this in a message tag since we can't call it directly from with the SecurityFilter -->
 					</g:if>		
-					<h1><warehouse:message code="dashboard.chooseWarehouse.label"/></h1>
+					<h1><warehouse:message code="dashboard.chooseLocation.label"/></h1>
 		    		<fieldset>
 						<table>
 							<tbody>						
-								<g:each var="warehouse" in="${warehouses}" status="i">
+								<g:each var="warehouse" in="${session.loginLocations}" status="i">
 									<g:if test="${warehouse.active}">						
 										<tr class="prop">
 											<td class="warehouse" nowrap="nowrap">
 												<div id="warehouse-${warehouse.id }" class="warehouse">												
 													<g:if test="${warehouse.local}">
-														<a class="home" href='${createLink(action:"chooseWarehouse", id: warehouse.id)}' style="display: block;">
+														<a class="home" href='${createLink(action:"chooseLocation", id: warehouse.id)}' style="display: block;">
 															<g:if test="${warehouse.logo}">	
 																<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'warehouse', action:'viewLogo', id: warehouse.id)}" />
 																<%--<img src="${warehouse.logo}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img>--%>
@@ -57,23 +53,11 @@
 															<warehouse:message code="dashboard.youLastLoggednHereOn.message" args="[format.datetime(obj:session?.user?.lastLoginDate)]"/> 
 														</g:if>
 													</g:if>
-													<g:else>
-														<g:if test="${warehouse.logo}">	
-															<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'warehouse', action:'viewLogo', id: warehouse.id)}" />															
-															<%--<img src="${warehouse.logo}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img>--%>
-														</g:if>
-														<g:else>
-															<img src="${createLinkTo(dir:'images',file:'icons/building.png')}" style="vertical-align: middle"/>
-														</g:else>
-														&nbsp;
-														<warehouse:message code="dashboard.managedRemotely.message" args="[warehouse.name]"/>
-													</g:else>
 												</div>												
 											</td>											
 										</tr>	
 									</g:if>																	
 								</g:each>							
-								
 							</tbody>					
 						</table>
 					</fieldset>

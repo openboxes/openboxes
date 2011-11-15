@@ -4,7 +4,7 @@ import org.pih.warehouse.core.Address;
 import org.pih.warehouse.core.Constants;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
-import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -28,7 +28,7 @@ class CreateRequestWorkflowController {
 					requestInstance.requestedBy = Person.get(session.user.id)
 					requestInstance.status = RequestStatus.NOT_REQUESTED;
 					requestInstance.dateRequested = new Date();
-					def warehouse = Warehouse.get(session.warehouse.id)
+					def warehouse = Location.get(session.warehouse.id)
 					requestInstance.destination = warehouse;
 					//requestInstance.description = "Request - " + Constants.DEFAULT_DATE_FORMATTER.format(requestInstance.dateRequested);
 					

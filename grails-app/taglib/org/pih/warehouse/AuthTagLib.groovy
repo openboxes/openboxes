@@ -1,6 +1,6 @@
 package org.pih.warehouse
 
-import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.core.Location;
 
 class AuthTagLib {
    	
@@ -12,14 +12,14 @@ class AuthTagLib {
 		//out << defaultTagLib.message.call(attrs)
 		def authorized = false;
 		
-		def warehouseInstance = Warehouse.get(session.warehouse.id)
+		def warehouseInstance = Location.get(session.warehouse.id)
 		
 		// Need to handle this case better
 		if (!warehouseInstance)
 			throw new Exception("Please choose a warehouse")
 
 		// Check if the activity attribute has any activities supported by the given warehouse
-		authorized = attrs?.activity?.any { warehouseInstance.supportsActivity(it) } 
+		authorized = attrs?.activity?.any { warehouseInstance.supports(it) } 
 				
 		if (authorized) { 
 			out << body{}

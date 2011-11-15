@@ -6,7 +6,7 @@ import org.junit.runner.Request;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.core.Location;
 
 import grails.converters.JSON;
 
@@ -130,7 +130,7 @@ class ProductController {
 			productInstance.categories.removeAll(_toBeDeleted)
 		}
 		
-		def warehouseInstance = Warehouse.get(session.warehouse.id);
+		def warehouseInstance = Location.get(session.warehouse.id);
 		def inventoryInstance = warehouseInstance?.inventory;
 		
 		if (!productInstance.hasErrors() && productInstance.save(flush: true)) {

@@ -5,7 +5,7 @@ class SecurityFilters {
 			before = {	
 				String [] controllersWithAuthUserNotRequired = "api,test".split(",");
 				String [] actionsWithAuthUserNotRequired = "login,handleLogin,signup,handleSignup,json".split(",");
-				String [] actionsWithWarehouseNotRequired = "login,logout,handleLogin,signup,handleSignup,chooseWarehouse,viewLogo,json".split(",");
+				String [] actionsWithLocationNotRequired = "login,logout,handleLogin,signup,handleSignup,chooseLocation,viewLogo,json".split(",");
 
 				// Not sure when this happens								
 				if (params.controller == null) {
@@ -41,7 +41,7 @@ class SecurityFilters {
 				
 				// When a user has not selected a warehouse and they are requesting an action that requires one, 
 				// we redirect to the choose warehouse page.
-				if (!session.warehouse && !(Arrays.asList(actionsWithWarehouseNotRequired).contains(actionName))) {						
+				if (!session.warehouse && !(Arrays.asList(actionsWithLocationNotRequired).contains(actionName))) {						
 					//def targetUri = (request.forwardURI - request.contextPath);
 					//if (request.queryString)
 					//	targetUri += "?" + request.queryString
@@ -50,13 +50,13 @@ class SecurityFilters {
 					if (session?.warehouseStillNotSelected) { 
 						// FIXME cannot use warehouse tag lib here
 						// MissingPropertyException: No such property: warehouse for class: SecurityFilters
-						//flash.message = "${warehouse.message(code: 'warehouse.chooseWarehouseToManage.message')}"
-						//flash.message = "warehouse.chooseWarehouseToManage.message"
+						//flash.message = "${warehouse.message(code: 'warehouse.chooseLocationToManage.message')}"
+						//flash.message = "warehouse.chooseLocationToManage.message"
 					}
 					
 					session.warehouseStillNotSelected = true;
-					//redirect(controller: 'dashboard', action: 'chooseWarehouse', params: ['targetUri': targetUri])
-					redirect(controller: 'dashboard', action: 'chooseWarehouse')
+					//redirect(controller: 'dashboard', action: 'chooseLocation', params: ['targetUri': targetUri])
+					redirect(controller: 'dashboard', action: 'chooseLocation')
 					return false;
 				}
 				

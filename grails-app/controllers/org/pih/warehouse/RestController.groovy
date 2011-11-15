@@ -4,11 +4,11 @@ import grails.converters.*
 
 class RestController {
 	def warehouses = {
-		render Warehouse.list() as XML
+		render Location.list() as XML
 	}
 	
 	def warehouse = {
-		render Warehouse.get(params.id) as XML
+		render Location.get(params.id) as XML
 	}
 	
 	
@@ -16,7 +16,7 @@ class RestController {
 	/* not working as expected -- causes segmentation fault */ 
 	 /* 
 	def warehouses = {
-		def list = Warehouse.list()
+		def list = Location.list()
 		render(contentType:"text/xml"){
 			warehouses {
 				for(w in list){

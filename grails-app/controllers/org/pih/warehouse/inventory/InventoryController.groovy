@@ -17,7 +17,7 @@ import org.pih.warehouse.core.User;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.inventory.Transaction;
-import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.core.Location;
 
 import org.pih.warehouse.reporting.Consumption;
 
@@ -33,7 +33,7 @@ class InventoryController {
 	
 	
 	def list = { 
-		[ warehouses : Warehouse.getAll() ]
+		[ warehouses : Location.getAll() ]
 	}
 	
 	/**
@@ -42,9 +42,9 @@ class InventoryController {
 	def browse = { InventoryCommand cmd ->
 		log.info("Browse inventory " + params)
 		// Get the current warehouse from either the request or the session
-		cmd.warehouseInstance = Warehouse.get(params?.warehouse?.id) 
+		cmd.warehouseInstance = Location.get(params?.warehouse?.id) 
 		if (!cmd.warehouseInstance) {
-			cmd.warehouseInstance = Warehouse.get(session?.warehouse?.id);
+			cmd.warehouseInstance = Location.get(session?.warehouse?.id);
 		}
 		
 		// Get the primary category from either the request or the session or as the first listed by default
@@ -153,9 +153,9 @@ class InventoryController {
 		} else {  
 			productInstance = Product.get(params?.product?.id)
 		}
-		def warehouseInstance = Warehouse.get(params?.warehouse?.id)
+		def warehouseInstance = Location.get(params?.warehouse?.id)
 		if (!warehouseInstance) {
-			warehouseInstance = Warehouse.get(session?.warehouse?.id);
+			warehouseInstance = Location.get(session?.warehouse?.id);
 		}
 		render(view: "enterStock", model: 
 			[warehouseInstance: warehouseInstance, transactionInstance : new Transaction(), productInstance: productInstance, inventoryItem: inventoryItem])
@@ -166,9 +166,9 @@ class InventoryController {
 	 * 
 	 */
 	def create = {
-		def warehouseInstance = Warehouse.get(params?.warehouse?.id)
+		def warehouseInstance = Location.get(params?.warehouse?.id)
 		if (!warehouseInstance) { 
-			warehouseInstance = Warehouse.get(session?.warehouse?.id);
+			warehouseInstance = Location.get(session?.warehouse?.id);
 		}
 		return [warehouseInstance: warehouseInstance]
 	}
@@ -178,9 +178,9 @@ class InventoryController {
 	 * 
 	 */
 	def save = {		
-		def warehouseInstance = Warehouse.get(params.warehouse?.id)
+		def warehouseInstance = Location.get(params.warehouse?.id)
 		if (!warehouseInstance) {
-			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'warehouse.label', default: 'Warehouse'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'warehouse.label', default: 'Location'), params.id])}"
 			redirect(action: "list")
 		} else {  
 			warehouseInstance.inventory = new Inventory(params);
@@ -391,7 +391,7 @@ class InventoryController {
 			expiredStock = expiredStock.findAll { item -> (item?.expirationDate - today) < threshholdSelected }
 		}
 		
-		def warehouse = Warehouse.get(session.warehouse.id)
+		def warehouse = Location.get(session.warehouse.id)
 		def quantityMap = inventoryService.getQuantityForInventory(warehouse.inventory)
 		
 		[inventoryItems: expiredStock, quantityMap: quantityMap, categories : categories,
@@ -429,7 +429,7 @@ class InventoryController {
 			expiringStock = expiringStock.findAll { item -> (item?.expirationDate && (item?.expirationDate - today) <= threshholdSelected) }
 		}
 		
-		def warehouse = Warehouse.get(session.warehouse.id)		
+		def warehouse = Location.get(session.warehouse.id)		
 		def quantityMap = inventoryService.getQuantityForInventory(warehouse.inventory)
 		
 		[inventoryItems: expiringStock, quantityMap: quantityMap, categories : categories, 
@@ -437,7 +437,7 @@ class InventoryController {
 	}
 	
 	def listLowStock = {
-		def warehouse = Warehouse.get(session.warehouse.id)
+		def warehouse = Location.get(session.warehouse.id)
 		def results = inventoryService.getProductsBelowMinimumAndReorderQuantities(warehouse.inventory, params.showUnsupportedProducts ? true : false)
 		
 		Map inventoryLevelByProduct = new HashMap();
@@ -553,7 +553,7 @@ class InventoryController {
 			
 		/*
 		def today = new Date();
-		def warehouse = Warehouse.get(session.warehouse.id)
+		def warehouse = Location.get(session.warehouse.id)
 		
 		// Get all transactions from the past week 
 		def transactions = inventoryService.getConsumptionTransactions(today-7, today);
@@ -650,7 +650,7 @@ class InventoryController {
 	
 	def listAllTransactions = {		
 		
-		// FIXME Using the dynamic finder Inventory.findByWarehouse() does not work for some reason
+		// FIXME Using the dynamic finder Inventory.findByLocation() does not work for some reason
 		def currentInventory = Inventory.list().find( {it.warehouse.id == session.warehouse.id} )
 		
 		// we are only showing transactions for the inventory associated with the current warehouse
@@ -753,7 +753,7 @@ class InventoryController {
 				productInstanceMap: Product.list().groupBy { it.category },
 				transactionTypeList: TransactionType.list(),
 				locationInstanceList: Location.list(),
-				warehouseInstance: Warehouse.get(session?.warehouse?.id)
+				warehouseInstance: Location.get(session?.warehouse?.id)
 			]
 			render(view: "editTransaction", model: model);
 		}	
@@ -775,7 +775,7 @@ class InventoryController {
 			productInstanceMap: Product.list().groupBy { it.category },
 			transactionTypeList: TransactionType.list(),
 			locationInstanceList: Location.list(),
-			warehouseInstance: Warehouse.get(session?.warehouse?.id)
+			warehouseInstance: Location.get(session?.warehouse?.id)
 		];
 		
 		render(view: "showTransaction", model: model);
@@ -796,7 +796,7 @@ class InventoryController {
 		   productInstanceMap: Product.list().groupBy { it.category },
 		   transactionTypeList: TransactionType.list(),
 		   locationInstanceList: Location.list(),
-		   warehouseInstance: Warehouse.get(session?.warehouse?.id)
+		   warehouseInstance: Location.get(session?.warehouse?.id)
 	   ];
 	   
 	   render(view: "showTransactionDialog", model: model);
@@ -824,7 +824,7 @@ class InventoryController {
 	
 	def createTransaction = { 
 		log.info("createTransaction params " + params)		
-		def warehouseInstance = Warehouse.get(session?.warehouse?.id);
+		def warehouseInstance = Location.get(session?.warehouse?.id);
 		def transactionInstance = new Transaction(params);
 		//transactionInstance?.transactionDate = new Date();
 		//transactionInstance?.source = warehouseInstance
@@ -857,7 +857,7 @@ class InventoryController {
 	def saveInventoryAdjustment = { Transaction transaction, TransactionCommand command ->
 		log.info ("Saving stock transfer " + params)
 
-		def warehouseInstance = Warehouse.get(session?.warehouse?.id);
+		def warehouseInstance = Location.get(session?.warehouse?.id);
 		def quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory)
 		/*
 		// Validate transaction entries
@@ -910,7 +910,7 @@ class InventoryController {
 
 		log.info(params)
 		def transactionInstance = command?.transactionInstance
-		def warehouseInstance = Warehouse.get(session?.warehouse?.id);
+		def warehouseInstance = Location.get(session?.warehouse?.id);
 		def quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory)
 
 		// We need to process each transaction entry to make sure that it has a valid inventory item (or we will create one if not)
@@ -993,7 +993,7 @@ class InventoryController {
 	def saveOutgoingTransfer = { Transaction transaction, TransactionCommand command ->
 		log.info ("Saving stock transfer " + params)
 
-		def warehouseInstance = Warehouse.get(session?.warehouse?.id);
+		def warehouseInstance = Location.get(session?.warehouse?.id);
 		def quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory)
 		
 		// Validate transaction entries
@@ -1204,7 +1204,7 @@ class InventoryController {
 				def productIds = params.list('product.id')
 				productList = productIds.collect { Long.valueOf(it); }
 			}
-			def warehouseInstance = Warehouse.get(session?.warehouse?.id)
+			def warehouseInstance = Location.get(session?.warehouse?.id)
 			def model = [
 				productInventoryItems: inventoryService.getInventoryItemsByProducts(warehouseInstance, productList),
 				quantityMap: inventoryService.getQuantityForInventory(warehouseInstance?.inventory),
@@ -1222,7 +1222,7 @@ class InventoryController {
 	def editTransaction = { 		
 		log.info "edit transaction: " + params
 		def transactionInstance = Transaction.get(params?.id)
-		def warehouseInstance = Warehouse.get(session?.warehouse?.id);
+		def warehouseInstance = Location.get(session?.warehouse?.id);
 		def model = [ 
 			
 			transactionInstance: transactionInstance?:new Transaction(),

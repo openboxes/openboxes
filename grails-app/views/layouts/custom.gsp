@@ -3,7 +3,7 @@
 <html>
 <head>
 	<!-- Include default page title -->
-	<title><g:layoutTitle default="Your Warehouse App" /></title>
+	<title><g:layoutTitle default="Your Location App" /></title>
 	<%--<link rel="stylesheet" href="http://yui.yahooapis.com/2.7.0/build/reset-fonts-grids/reset-fonts-grids.css" type="text/css"> --%>
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/yui/2.7.0/reset-fonts-grids',file:'reset-fonts-grids.css')}" type="text/css">
 	
@@ -97,7 +97,7 @@
 	
 </head>
 <body class="yui-skin-sam">
-	<input type="hidden" id="currentWarehouseId" value="${session?.warehouse?.id }"/>
+	<input type="hidden" id="currentLocationId" value="${session?.warehouse?.id }"/>
 	<%-- 
 	<div class="notification-container"></div>
 	
@@ -170,46 +170,52 @@
 											<li>
 												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'building.png')}" style="vertical-align: middle" />
 												<%-- 
-												<a class="home" href='${createLink(controller: "dashboard", action:"chooseWarehouse")}'></a>
+												<a class="home" href='${createLink(controller: "dashboard", action:"chooseLocation")}'></a>
 												--%>
 												<a href="javascript:void(0);" id="warehouse-switch">
 													${session?.warehouse?.name }
 												</a>
 												
 												<div id="warehouse-menu" style="display: none; position: absolute; right: 80px; top: 38px;  
-													background-color: white; border: 1px solid black;">
+													background-color: white; border: 1px solid black; min-width: 200px; z-index: 999">
 													<table>
-														<tbody>						
-															<g:each var="warehouse" in="${org.pih.warehouse.inventory.Warehouse.list()}" status="i">	
-																<g:if test="${warehouse.active}">							
-																	<tr class="prop">
-																		<td nowrap="nowrap" style="padding: 0px; margin: 0px;">
-																			<g:if test="${warehouse?.fgColor && warehouse?.bgColor }">
-																				<style>
-																					#warehouse-${warehouse?.id} { background-color: #${warehouse.bgColor}; color: #${warehouse.fgColor}; } 
-																					#warehouse-${warehouse?.id} a { color: #${warehouse.fgColor}; }  	
-																				</style>				
-																			</g:if>					
-																			<div id="warehouse-${warehouse.id }" class="warehouse">												
-																				<g:if test="${warehouse.local}">
-																					<a href='${createLink(controller: "dashboard", action:"chooseWarehouse", id: warehouse.id, params: ['returnUrl':request.forwardURI])}' style="display: block; padding: 0px;">
-																						${warehouse.name} 
-																					</a> 
-																						
-																					<%-- 
-																					<g:if test="${warehouse?.id == session?.user?.warehouse?.id }">
-																						<warehouse:message code="dashboard.youLastLoggednHereOn.message" args="[format.datetime(obj:session?.user?.lastLoginDate)]"/> 
-																					</g:if>
-																					--%>
+														<tbody>
+															<g:each var="warehouse" in="${session.loginLocations}" status="i">	
+																<tr class="prop">
+																	<td nowrap="nowrap" style="padding: 0">
+																		<g:if test="${warehouse?.fgColor && warehouse?.bgColor }">
+																			<style>
+																				#warehouse-${warehouse?.id} { background-color: #${warehouse.bgColor}; color: #${warehouse.fgColor}; } 
+																				#warehouse-${warehouse?.id} a { color: #${warehouse.fgColor}; }  	
+																			</style>				
+																		</g:if>					
+																		<div id="warehouse-${warehouse.id }" class="warehouse">												
+																			<g:if test="${warehouse.local}">
+																				<a href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params: ['returnUrl':request.forwardURI])}' style="display: block; padding: 0px;">
+																					${warehouse.name} 
+																				</a> 
+																				<%-- 
+																				<g:if test="${warehouse?.id == session?.user?.warehouse?.id }">
+																					<warehouse:message code="dashboard.youLastLoggednHereOn.message" args="[format.datetime(obj:session?.user?.lastLoginDate)]"/> 
 																				</g:if>
-																				<g:else>
-																					<warehouse:message code="dashboard.managedRemotely.message" args="[warehouse.name]"/>
-																				</g:else>
-																			</div>												
-																		</td>											
-																	</tr>
-																</g:if>																		
+																				--%>
+																			</g:if>
+																			<g:else>
+																				<warehouse:message code="dashboard.managedRemotely.message" args="[warehouse.name]"/>
+																			</g:else>
+																		</div>												
+																	</td>											
+																</tr>
 															</g:each>																	
+															<g:unless test="${session.loginLocations }">
+																<tr class="prop">
+																	<td nowrap="nowrap">
+																		<div style="color: black; background-color: white;">
+																			<warehouse:message code="dashboard.noWarehouse.message"/>
+																		</div>
+																	</td>
+																</tr>
+															</g:unless>
 														</tbody>					
 													</table>													
 												</div>

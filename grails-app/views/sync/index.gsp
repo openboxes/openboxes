@@ -1,5 +1,5 @@
 
-<%@ page import="org.pih.warehouse.inventory.Warehouse" %>
+<%@ page import="org.pih.warehouse.core.Location" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />

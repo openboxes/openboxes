@@ -13,7 +13,7 @@ import org.pih.warehouse.inventory.Inventory;
 import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.InventoryService;
 import org.pih.warehouse.inventory.TransactionEntry;
-import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.shipping.Container;
@@ -40,7 +40,7 @@ class JsonController {
 	def getQuantity = { 
 		log.info params
 		def quantity = 0
-		def warehouse = Warehouse.get(session.warehouse.id);
+		def warehouse = Location.get(session.warehouse.id);
 		def lotNumber = (params.lotNumber) ? (params.lotNumber) : "";
 		def product = (params.productId) ? Product.get(params.productId as Integer) : null;
 		
@@ -101,7 +101,7 @@ class JsonController {
 	def findInventoryItems = {
 		log.info params
 		def inventoryItems = []
-		def warehouse = Warehouse.get(session.warehouse.id);
+		def warehouse = Location.get(session.warehouse.id);
 		if (params.term) {
 			
 			// Improved the performance of the auto-suggest by moving 
@@ -180,7 +180,7 @@ class JsonController {
 				}
 			}
 			
-			def warehouse = Warehouse.get(session.warehouse.id);
+			def warehouse = Location.get(session.warehouse.id);
 			def quantitiesByInventoryItem = inventoryService.getQuantityForInventory(warehouse?.inventory)
 			
 			if (items) {
@@ -482,7 +482,7 @@ class JsonController {
 			}
 		}
 		
-		def warehouse = Warehouse.get(params.warehouseId);
+		def warehouse = Location.get(params.warehouseId);
 		log.info ("warehouse: " + warehouse);
 		def quantityMap = 
 			inventoryService.getQuantityForInventory(warehouse?.inventory)		
@@ -546,112 +546,11 @@ class JsonController {
 	}
 	
 
-	def findWarehouseByName = {
-		log.info params
-		def items = new TreeSet();
-		if (params.term) {
-			items = Warehouse.withCriteria {
-				or {
-					ilike("name", "%" +  params.term + "%")
-				}
-			}
-			if (items) {
-				items = items.collect() {
-					[	value: it.id,
-						valueText: it.name,
-						label: "<img src=\"/warehouse/warehouse/viewLogo/" + it.id + "\" width=\"24\" height=\"24\" style=\"vertical-align: bottom;\"\"/>&nbsp;" + it.name,
-						desc: it.name,
-						icon: "<img src=\"/warehouse/warehouse/viewLogo/" + it.id + "\" width=\"24\" height=\"24\" style=\"vertical-align: bottom;\"\"/>"]
-				}
-			}
-			/*
-			else {
-				def item =  [
-					value: 0,
-					valueText : params.term,
-					label: "Add a new warehouse for '" + params.term + "'?",
-					desc: params.term,
-					icon: "none"
-				];
-				items.add(item)
-			}*/
-		}
-		render items as JSON;
-	}
+	
 
-
-	def availableItems = {
-		log.debug params;
-		def items = null;
-		if (params.query) {
-			
-			//String [] parts = params.query.split(" ");
-			
-			//items = Product.findAllByNameLike("%${params.query}%", [max:10, offset:0, "ignore-case":true]);
-			items = Product.withCriteria {
-				or {
-					ilike("name", "%${params.query}%")
-					ilike("description", "%${params.query}%")
-				}
-			}
-			
-			items = items.collect() {
-				def localizedName = localizationService.getLocalizedString(it.name)
-				[id:it.id, name:localizedName]
-			}
-		}
-		def jsonItems = [result: items]
-		render jsonItems as JSON;
-	}
 		
 	
-	def availableContacts = {
-		def contacts = null;
-		if (params.query) {
-			contacts = Contact.withCriteria {
-				or {
-					ilike("name", "%${params.query}%")
-					ilike("email", "%${params.query}%")
-					ilike("phone", "%${params.query}%")
-					ilike("firstName", "%${params.query}%")
-					ilike("lastName", "%${params.query}%")
-				}
-			}
-			
-			contacts = contacts.collect() {
-				[id : it.id, name : it.name]
-			}
-		}
-		def jsonItems = [result: contacts]
-		render jsonItems as JSON;
-	}
 
-	def availableShipments = {
-		log.debug params;
-		def items = null;
-		if (params.query) {
-			items = Shipment.findAllByNameLike("%${params.query}%", [max:10, offset:0, "ignore-case":true]);
-			items = items.collect() {
-				[id:it.id, name:it.name]
-			}
-		}
-		def jsonItems = [result: items]
-		render jsonItems as JSON;
-	}
-	
-	/*
-	def savePerson = {	
-		log.info("save person" + params)	
-		def personInstance = new Person(params)
-		if (!personInstance.hasErrors() && personInstance.save(flush: true)) {
-			log.info("saved")
-			render personInstance as JSON;
-		}
-		else {
-			log.info("errors")
-			render("there was an error");
-		}
-	}*/
 	def savePerson = {
 		log.info("save person" + params)	
 		def personInstance = new Person(params)

@@ -47,12 +47,17 @@
 								<td valign='top' class='name'><label for='source'><warehouse:message code="order.orderFrom.label"/>:</label>
 								</td>
 								<td valign='top' class='value ${hasErrors(bean:order,field:'origin','errors')}'>
+									<%-- 
 									<g:if test="${suppliers }">
 										<g:select name="origin.id" from="${suppliers?.sort()}" optionKey="id" value="${order?.origin?.id}" noSelection="['':'']"/>
 									</g:if>
 									<g:else>
 										<span class="fade"><warehouse:message code="order.thereAreNoSuppliers.label"/></span> 
 									</g:else>
+									--%>
+									<g:selectOrderSupplier name="origin.id" 
+										optionKey="id" value="${order?.origin?.id}" noSelection="['null':'']"/>
+									
 								</td>
 							</tr>
 							<tr class='prop'>

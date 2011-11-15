@@ -7,7 +7,7 @@ import org.pih.warehouse.core.Document;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.core.Location;
 import org.pih.warehouse.shipping.DocumentCommand;
 import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.shipping.ShipmentItem;
@@ -98,7 +98,7 @@ class RequestController {
 			if (requestInstance?.requestItems?.size() > 0) { 
 				requestInstance.status = RequestStatus.REQUESTED;
 				if (!requestInstance.hasErrors() && requestInstance.save(flush: true)) {
-					flash.message = "${warehouse.message(code: 'request.placedWithWarehouse.message', args: [requestInstance?.description,requestInstance?.origin?.name])}"
+					flash.message = "${warehouse.message(code: 'request.placedWithLocation.message', args: [requestInstance?.description,requestInstance?.origin?.name])}"
 					redirect(action: "show", id: requestInstance.id)
 				}
 				else {
@@ -401,13 +401,13 @@ class RequestController {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
 		}
 		else {
-			def warehouse = Warehouse.get(session.warehouse.id);
+			def warehouse = Location.get(session.warehouse.id);
 			if (warehouse.inventory) { 
 				inventoryItems =
 					inventoryService.getQuantityByInventoryAndProduct(warehouse.inventory, requestItem.product);				
 			}
 			else { 
-				throw new RuntimeException("Warehouse does not have an associated inventory")
+				throw new RuntimeException("Location does not have an associated inventory")
 			}
 		}
 		return [requestItem: requestItem, inventoryItems: inventoryItems]
@@ -457,7 +457,7 @@ class RequestController {
 			if (requestInstance?.requestItems?.size() > 0) {
 				requestInstance.status = RequestStatus.FULFILLED;
 				if (!requestInstance.hasErrors() && requestInstance.save(flush: true)) {
-					flash.message = "${warehouse.message(code: 'request.placedWithWarehouse.message', args: [requestInstance?.description,requestInstance?.origin?.name])}"
+					flash.message = "${warehouse.message(code: 'request.placedWithLocation.message', args: [requestInstance?.description,requestInstance?.origin?.name])}"
 					redirect(action: "show", id: requestInstance.id)
 				}
 				else {

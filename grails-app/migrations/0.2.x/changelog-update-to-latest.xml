@@ -4125,8 +4125,56 @@
         <addColumn tableName="location">
             <column name="location_group_id" type="BIGINT"/>
         </addColumn>
+    </changeSet>    
+    <changeSet author="jmiranda (generated)" id="1320943767698-7">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="location" columnName="class"/>
+		</preConditions>
+    	<comment>Update location by removing unnecessary class column.</comment>
+		<dropColumn tableName="location" columnName="class"/>
+    </changeSet>    
+    <changeSet author="jmiranda (generated)" id="1320943767698-8">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+            	SELECT count(*) 
+            	FROM location_type 
+            	WHERE code = "locationType.pharmacy"
+            </sqlCheck>
+        </preConditions>
+	    <comment>Convert 'Pharmacy' to 'Dispensary'.</comment>
+	    <update tableName="location_type">
+            <column name="code" value="locationType.dispensary"/>
+            <column name="description" value="Dispensary"/>
+            <column name="last_updated" valueDate="2011-11-14"/>
+            <column name="name" value="Dispensary|fr:Dispensaire"/>
+            <where>code='locationType.pharmacy'</where>
+        </update>
+	</changeSet>
+    <changeSet author="jmiranda (generated)" id="1320943767698-9">
+    	<comment>Convert all locations of 'Warehouse' location type to 'Depot' location type.</comment>
+		<update tableName="location">
+			<column name="location_type_id" valueNumeric="2"/>
+			<where>location_type_id = 1</where>
+		</update>
     </changeSet>
-    
+    <changeSet author="jmiranda (generated)" id="1320943767698-10">
+    	<comment>Delete the supported activities for the 'Warehouse' location type.</comment>
+		<delete tableName="location_type_supported_activities">
+			<where>location_type_id = 1</where>
+		</delete>    
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1320943767698-11">
+    	<comment>Delete the 'Warehouse' location types.</comment>
+		<delete tableName="location_type">
+			<where>code='locationType.warehouse'</where>
+		</delete>    
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1320943767698-12">
+    	<comment>All location should be marked as active.</comment>
+		<update tableName="location">
+			<column name="active" valueBoolean="true"/>
+		</update>
+    </changeSet>
 </databaseChangeLog>
 
 

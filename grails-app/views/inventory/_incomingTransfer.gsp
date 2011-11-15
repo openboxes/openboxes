@@ -42,8 +42,14 @@
 				</td>
 				<td class="value">			
 					<span class="source">	
+						<%-- 
 						<g:select name="transactionInstance.source.id" from="${command?.locationList}" 
-							optionKey="id" optionValue="name" value="${command?.transactionInstance?.source?.id}" noSelection="['': '']" />
+							optionKey="id" optionValue="name" value="${command?.transactionInstance?.source?.id}" noSelection="['null': '']" />
+						--%>	
+						<g:selectTransactionSource name="transactionInstance.source.id" 
+							optionKey="id" optionValue="name" value="${command?.transactionInstance?.source?.id}" noSelection="['null': '']" />
+							
+							
 					</span>
 				</td>
 			</tr>

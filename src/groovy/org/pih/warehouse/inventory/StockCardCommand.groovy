@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.core.Location;
 import org.pih.warehouse.inventory.Inventory;
 import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.InventoryLevel;
@@ -18,7 +18,7 @@ class StockCardCommand {
 	
 	// Entire page
 	Product productInstance;
-	Warehouse warehouseInstance;
+	Location warehouseInstance;
 	Inventory inventoryInstance;
 	InventoryLevel inventoryLevelInstance;
 	

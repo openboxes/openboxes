@@ -1,5 +1,8 @@
 package org.pih.warehouse.inventory
 
+import grails.validation.ValidationException;
+
+import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Product;
 
 class WarehouseController {
@@ -22,24 +25,24 @@ class WarehouseController {
 	}
 	
 	/*
-	 stockCard: stockCardService.getStockCard(Warehouse.get(params.warehouse),
+	 stockCard: stockCardService.getStockCard(Location.get(params.warehouse),
 	 Product.get(params.product), fromDate, toDate)
 	 */
 	def showInventory = {
 		//Date fromDate = params.fromDate ?: new Date()
 		//Date toDate = params.toDate ?: new Date()
-		def warehouse = Warehouse.get(params.id)
+		def warehouse = Location.get(params.id)
 		//Inventory inventory = new Inventory();
 		//def inventory = inventoryService.getInventory(warehouseInstance)
 		// Create an inventory item for each product in the database
-		// TODO There should be a Warehouse->Products association
+		// TODO There should be a Location->Products association
 		Map<Product, Long> inventory = new HashMap<Product, Long>()
 		Product.getAll().each { inventory.put(it, 0l) }
 		
 		// Get all transaction entries
 		def entries = TransactionEntry.withCriteria {
 			createAlias("transaction", "t")
-			eq("t.thisWarehouse", warehouse)
+			eq("t.thisLocation", warehouse)
 		}
 		
 		log.debug "transaction entries $entries"
@@ -53,28 +56,6 @@ class WarehouseController {
 			inventory.put(entry?.inventoryItem?.product, quantityNow)
 		}
 		
-		// HOWTO Do SQL query "Select Product, Count(*) group from transactionEntry by Product""
-		/*
-		 def tagList = Post.withCriteria {
-		 createAlias("user", "u")
-		 createAlias("tags", "t")
-		 eq("u.userId", "glen")
-		 projections {
-		 groupProperty("t.name")
-		 count("t.id")
-		 }
-		 }*/
-		
-		
-		// The long way around
-		/*
-		 def transactionList = inventoryService.getAllTransactions(warehouseInstance);
-		 for (transaction in transactionList) {
-		 for(transactionEntry in transaction.transactionEntries) {
-		 }
-		 }
-		 */
-		
 		return [
 			warehouseInstance : warehouse,
 			inventory : inventory
@@ -83,7 +64,7 @@ class WarehouseController {
 	
 	
 	def showTransactions = {
-		def warehouseInstance = Warehouse.get(params.id)
+		def warehouseInstance = Location.get(params.id)
 		def transactionList = inventoryService.getAllTransactions(warehouseInstance);
 		
 		return [
@@ -97,14 +78,14 @@ class WarehouseController {
 	}
 	
 	def list = {
-		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-		[warehouseInstanceList: Warehouse.list(params), warehouseInstanceTotal: Warehouse.count()]
+		params.max = Math.min(params.max ? params.int('max') : 25, 100)
+		[warehouseInstanceList: Location.list(params), warehouseInstanceTotal: Location.count()]
 	}
 	
 	def show = {
-		def warehouseInstance = inventoryService.getWarehouse(params.id as Long)
+		def warehouseInstance = inventoryService.getLocation(params.id as Long)
 		if (!warehouseInstance?.id) {
-			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'warehouse.label', default: 'Warehouse'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'warehouse.label', default: 'Location'), params.id])}"
 			redirect(action: "list")
 		}
 		else {
@@ -113,9 +94,9 @@ class WarehouseController {
 	}
 	
 	def edit = {
-		def warehouseInstance = inventoryService.getWarehouse(params.id as Long)
+		def warehouseInstance = inventoryService.getLocation(params.id as Long)
 		if (!warehouseInstance) {
-			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'warehouse.label', default: 'Warehouse'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'warehouse.label', default: 'Location'), params.id])}"
 			redirect(action: "list")
 		}
 		else {
@@ -125,57 +106,58 @@ class WarehouseController {
 	
 	def update = {
 		
-		log.info(params)
-		
-		def warehouseInstance = inventoryService.getWarehouse(params.id ? params.id as Long : null)
+		def warehouseInstance = inventoryService.getLocation(params.id ? params.id as Long : null)
 		
 		if (warehouseInstance) {
 			if (params.version) {
 				def version = params.version.toLong()
 				if (warehouseInstance.version > version) {					
-					warehouseInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'warehouse.label', default: 'Warehouse')] as Object[], "Another user has updated this Warehouse while you were editing")
+					warehouseInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'warehouse.label', default: 'Location')] as Object[], "Another user has updated this Location while you were editing")
 					render(view: "edit", model: [warehouseInstance: warehouseInstance])
 					return
 				}
 			}
 			
-			warehouseInstance.properties = params
-					
+			warehouseInstance.properties = params			
+			
 			if (!warehouseInstance.hasErrors()) {
-				inventoryService.saveWarehouse(warehouseInstance);
 				
-				// Refresh the current warehouse to make sure the color changes take effect 
-				if (session.warehouse.id == warehouseInstance?.id) 
-					session.warehouse = Warehouse.get(warehouseInstance?.id);
-				
-				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'warehouse.label', default: 'Warehouse'), warehouseInstance.id])}"
-				redirect(action: "list", id: warehouseInstance.id)
+				try { 
+					inventoryService.saveLocation(warehouseInstance);
+					// Refresh the current warehouse to make sure the color changes take effect 
+					if (session.warehouse.id == warehouseInstance?.id) 
+						session.warehouse = Location.get(warehouseInstance?.id);					
+					flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'warehouse.label', default: 'Location'), warehouseInstance.id])}"
+					redirect(action: "list", id: warehouseInstance.id)
+				} catch (ValidationException e) { 
+					render(view: "edit", model: [warehouseInstance: warehouseInstance])
+				}
 			}
 			else {
 				render(view: "edit", model: [warehouseInstance: warehouseInstance])
 			}
 		}
 		else {
-			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'warehouse.label', default: 'Warehouse'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'warehouse.label', default: 'Location'), params.id])}"
 			redirect(action: "list")
 		}
 	}
 	
 	def delete = {
-		def warehouseInstance = Warehouse.get(params.id)
+		def warehouseInstance = Location.get(params.id)
 		if (warehouseInstance) {
 			try {
 				warehouseInstance.delete(flush: true)
-				flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'warehouse.label', default: 'Warehouse'), params.id])}"
+				flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'warehouse.label', default: 'Location'), params.id])}"
 				redirect(action: "list")
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
-				flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'warehouse.label', default: 'Warehouse'), params.id])}"
+				flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'warehouse.label', default: 'Location'), params.id])}"
 				redirect(action: "show", id: params.id)
 			}
 		}
 		else {
-			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'warehouse.label', default: 'Warehouse'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'warehouse.label', default: 'Location'), params.id])}"
 			redirect(action: "list")
 		}
 	}
@@ -185,7 +167,7 @@ class WarehouseController {
 	 * View warehouse logo 
 	 */
 	def viewLogo = { 
-		def warehouseInstance = Warehouse.get(params.id);		
+		def warehouseInstance = Location.get(params.id);		
 		if (warehouseInstance) { 
 			byte[] logo = warehouseInstance.logo 
 			if (logo) { 
@@ -197,14 +179,14 @@ class WarehouseController {
 
 	def uploadLogo = { 
 		
-		def warehouseInstance = Warehouse.get(params.id);		
+		def warehouseInstance = Location.get(params.id);		
 		if (warehouseInstance) { 
 			def logo = request.getFile("logo");
 			if (!logo?.empty && logo.size < 1024*1000) { // not empty AND less than 1MB
 				warehouseInstance.logo = logo.bytes;			
 		        if (!warehouseInstance.hasErrors()) {
 		        	inventoryService.save(warehouseInstance)
-		            flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'warehouse.label', default: 'Warehouse'), warehouseInstance.id])}"
+		            flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'warehouse.label', default: 'Location'), warehouseInstance.id])}"
 		        }
 		        else {
 					// there were errors, the photo was not saved
@@ -213,7 +195,7 @@ class WarehouseController {
             redirect(action: "show", id: warehouseInstance.id)
 		} 
 		else { 
-			"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'warehouse.label', default: 'Warehouse'), params.id])}"
+			"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'warehouse.label', default: 'Location'), params.id])}"
 		}
 	}
 

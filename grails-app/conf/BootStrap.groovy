@@ -21,7 +21,7 @@ import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.TransactionEntry;
 import org.pih.warehouse.inventory.TransactionType;
-import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Attribute;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
@@ -242,18 +242,18 @@ class BootStrap {
 			Address address3 = new Address(address: "12345 Main Street", address2: "Suite 401", city: "Tabarre", stateOrProvince: "", postalCode: "", country: "Haiti").save(flush:true);
 			Address address4 = new Address(address: "2482 Massachusetts Ave", address2: "", city: "Boston", stateOrProvince: "MA", postalCode: "02215", country: "United Status").save(flush:true);
 
-			Warehouse boston = new Warehouse(name: "Boston Headquarters", address: address1, manager: manager, logoUrl: "http://a3.twimg.com/profile_images/134665083/BOS_Red_Sox_normal.PNG").save(flush:true);
-			Warehouse miami = new Warehouse(name: "Miami Warehouse", address: address2, manager: manager, logoUrl: "http://pihemr.files.wordpress.com/2008/01/pih-hands.jpg").save(flush:true);
-			Warehouse tabarre = new Warehouse(name: "Tabarre Depot", address: address3, manager: manager, logoUrl: "http://pihemr.files.wordpress.com/2008/01/pih-hands.jpg").save(flush:true);
-			Warehouse acme = new Warehouse(name: "ACME Supply Company", address: address4, manager: manager, logoUrl: "http://pihemr.files.wordpress.com/2008/01/pih-hands.jpg").save(flush:true);
+			Location boston = new Location(name: "Boston Headquarters", address: address1, manager: manager, logoUrl: "http://a3.twimg.com/profile_images/134665083/BOS_Red_Sox_normal.PNG").save(flush:true);
+			Location miami = new Location(name: "Miami Location", address: address2, manager: manager, logoUrl: "http://pihemr.files.wordpress.com/2008/01/pih-hands.jpg").save(flush:true);
+			Location tabarre = new Location(name: "Tabarre Depot", address: address3, manager: manager, logoUrl: "http://pihemr.files.wordpress.com/2008/01/pih-hands.jpg").save(flush:true);
+			Location acme = new Location(name: "ACME Supply Company", address: address4, manager: manager, logoUrl: "http://pihemr.files.wordpress.com/2008/01/pih-hands.jpg").save(flush:true);
 		
 			//Inventory tabarreInventory = new Inventory(warehouse:tabarre, lastInventoryDate: new Date()).save(flush:true);		
-			//InventoryItem inventoryItem1 = new InventoryItem(product: advil, quantity: 100, reorderQuantity: 50, idealQuantity: 100, binLocation: "Warehouse Bin A1").save(flush:true);
-			//InventoryItem inventoryItem2 = new InventoryItem(product: tylenol, quantity: 200, reorderQuantity: 50, idealQuantity: 100, binLocation: "Warehouse Bin A1").save(flush:true);
+			//InventoryItem inventoryItem1 = new InventoryItem(product: advil, quantity: 100, reorderQuantity: 50, idealQuantity: 100, binLocation: "Location Bin A1").save(flush:true);
+			//InventoryItem inventoryItem2 = new InventoryItem(product: tylenol, quantity: 200, reorderQuantity: 50, idealQuantity: 100, binLocation: "Location Bin A1").save(flush:true);
 			//tabarreInventory.addToInventoryItems(inventoryItem1).save(flush:true, validate:false);
 			//tabarreInventory.addToInventoryItems(inventoryItem2).save(flush:true, validate:false);
 		
-			//Transaction transaction1 = new Transaction(transactionDate:new Date(), targetWarehouse:tabarre, transactionType:TRANSACTION_INCOMING); // removed .save(flush:true);
+			//Transaction transaction1 = new Transaction(transactionDate:new Date(), targetLocation:tabarre, transactionType:TRANSACTION_INCOMING); // removed .save(flush:true);
 			//TransactionEntry transactionEntry1 = new TransactionEntry(product: advil, quantityChange:50, confirmDate:new Date());
 			//tabarre.addToTransactions(transaction1).save();
 			//transaction1.addToTransactionEntries(transactionEntry1).save(flush:true, validate:false);

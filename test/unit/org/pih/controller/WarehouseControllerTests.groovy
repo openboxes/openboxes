@@ -2,7 +2,7 @@ package org.pih.controller
 
 import grails.test.*
 
-class WarehouseControllerTests extends ControllerUnitTestCase {
+class LocationControllerTests extends ControllerUnitTestCase {
     protected void setUp() {
         super.setUp()
     }

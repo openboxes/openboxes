@@ -9,7 +9,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.Person
-import org.pih.warehouse.inventory.Warehouse
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.shipping.Shipment
@@ -22,7 +22,7 @@ class OrderService {
 	
 	def shipmentService;
 	
-	List<Order> getOrdersPlacedByWarehouse(Warehouse orderPlacedBy, Location orderPlacedWith, OrderStatus status, Date orderedFromDate, Date orderedToDate) {
+	List<Order> getOrdersPlacedByLocation(Location orderPlacedBy, Location orderPlacedWith, OrderStatus status, Date orderedFromDate, Date orderedToDate) {
 		def orders = Order.withCriteria {
 			and {
 				eq("destination", orderPlacedBy)

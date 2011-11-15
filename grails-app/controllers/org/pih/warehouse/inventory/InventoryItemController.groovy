@@ -5,6 +5,7 @@ import java.util.Map;
 import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.ListUtils;
 import org.grails.plugins.excelimport.ExcelImportUtils;
+import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.product.Category;
@@ -59,7 +60,7 @@ class InventoryItemController {
 				cmd.filename = localFile.getAbsolutePath()
 					
 				inventoryMapList =
-					inventoryService.prepareInventory(Warehouse.get(session.warehouse.id), cmd.filename, cmd.errors);
+					inventoryService.prepareInventory(Location.get(session.warehouse.id), cmd.filename, cmd.errors);
 
 				if (!inventoryMapList?.isEmpty) { 
 					flash.message = "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args:[localFile.getAbsolutePath()])}"
@@ -70,7 +71,7 @@ class InventoryItemController {
 					
 				// If there are no errors and the user requests to import the data, we should execute the import
 				if (!cmd.errors.hasErrors() && params.importNow) {
-					inventoryService.importInventory(Warehouse.get(session.warehouse.id), inventoryMapList, cmd.errors);
+					inventoryService.importInventory(Location.get(session.warehouse.id), inventoryMapList, cmd.errors);
 					
 					if (!cmd.errors.hasErrors()) {
 						flash.message = "${warehouse.message(code: 'inventoryItem.importSuccess.message', args:[localFile.getAbsolutePath()])}"
@@ -116,7 +117,7 @@ class InventoryItemController {
 	 */
 	def showStockCard = { StockCardCommand cmd ->
 		// add the current warehouse to the command object
-		cmd.warehouseInstance = Warehouse.get(session?.warehouse?.id)
+		cmd.warehouseInstance = Location.get(session?.warehouse?.id)
 		
 		// now populate the rest of the commmand object
 		def commandInstance = inventoryService.getStockCardCommand(cmd, params)
@@ -170,7 +171,7 @@ class InventoryItemController {
 	 */
 	def showLotNumbers = { StockCardCommand cmd ->
 		// add the current warehouse to the command object
-		cmd.warehouseInstance = Warehouse.get(session?.warehouse?.id)
+		cmd.warehouseInstance = Location.get(session?.warehouse?.id)
 
 		// now populate the rest of the commmand object
 		def commandInstance = inventoryService.getStockCardCommand(cmd, params)
@@ -189,7 +190,7 @@ class InventoryItemController {
 		
 		
 		// We need to set the inventory instance in order to save an 'inventory' transaction
-		def warehouseInstance = Warehouse.get(session?.warehouse?.id)				
+		def warehouseInstance = Location.get(session?.warehouse?.id)				
 		def productInstance = cmd.product;
 		def inventoryInstance = warehouseInstance?.inventory;
 		
@@ -224,7 +225,7 @@ class InventoryItemController {
 		log.info ("User chose to validate or there are errors")
 		
 		//chain(action: "recordInventory", model: [commandInstance:cmd])
-		def warehouseInstance = Warehouse.get(session?.warehouse?.id)
+		def warehouseInstance = Location.get(session?.warehouse?.id)
 		def productInstance = cmd.product;
 		//def transactionEntryList = TransactionEntry.findAllByProduct(productInstance);
 		//def totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[productInstance] ?: 0
@@ -242,7 +243,7 @@ class InventoryItemController {
 	
 	def showTransactions = {
 		
-		def warehouseInstance = Warehouse.get(session?.warehouse?.id)
+		def warehouseInstance = Location.get(session?.warehouse?.id)
 		def productInstance = Product.get(params?.product?.id)
 		def inventoryInstance = warehouseInstance.inventory
 		def inventoryItemList = inventoryService.getInventoryItemsByProductAndInventory(productInstance, inventoryInstance)
@@ -303,7 +304,7 @@ class InventoryItemController {
 			transactionInstance.transactionDate = new Date();
 			transactionInstance.transactionDate.clearTime(); // we only want to store the date component
 			transactionInstance.transactionType = TransactionType.get(Constants.INVENTORY_TRANSACTION_TYPE_ID);
-			def warehouseInstance = Warehouse.get(session.warehouse.id);
+			def warehouseInstance = Location.get(session.warehouse.id);
 			transactionInstance.source = warehouseInstance;
 			transactionInstance.inventory = warehouseInstance.inventory;
 			
@@ -345,7 +346,7 @@ class InventoryItemController {
 		def productInstance = Product.get(params?.product?.id)
 		def inventoryInstance = Inventory.get(params?.inventory?.id)
 		if (!inventoryInstance) { 
-			def warehouse = Warehouse.get(session?.warehouse?.id);
+			def warehouse = Location.get(session?.warehouse?.id);
 			inventoryInstance = warehouse.inventory
 		}
 		

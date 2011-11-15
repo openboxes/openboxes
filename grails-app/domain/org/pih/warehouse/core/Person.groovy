@@ -2,7 +2,7 @@ package org.pih.warehouse.core
 
 import java.util.Date;
 
-import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.core.Location;
 
 
 class Person implements Comparable, Serializable {

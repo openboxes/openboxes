@@ -3,7 +3,7 @@ package org.pih.warehouse.user;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.shipping.Shipment;
-import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.core.Location;
 
 
 class DashboardController {
@@ -13,7 +13,7 @@ class DashboardController {
 	
     def index = {
 		if (!session.warehouse) {			
-			redirect(action: "chooseWarehouse")			
+			redirect(action: "chooseLocation")			
 		}
 		
 		Location location = Location.get(session?.warehouse?.id);
@@ -38,14 +38,21 @@ class DashboardController {
 		]
 	}
 	
-	def chooseWarehouse = {
+	def chooseLocation = {
 					
 		def warehouse = null;
-		if (params.id!='null') {			
+		
+		// If the user has selected a new location from the topnav bar, we need 
+		// to retrieve the location to make sure it exists
+		if (params.id != 'null') {			
 			warehouse = Location.get(params.id);
 		}
 
+		// If a warehouse has been selected
 		if (warehouse) {
+			
+			// Reset the locations displayed in the topnav
+			session.loginLocations = null
 			
 			// Save the warehouse selection to the session
 			session.warehouse = warehouse;
@@ -53,7 +60,7 @@ class DashboardController {
 			// Save the warehouse selection for "last logged into" information
 			if (session.user) { 
 				def userInstance = User.get(session.user.id);
-				userInstance.warehouse = warehouse;
+				//userInstance.warehouse = warehouse;
 				userInstance.lastLoginDate = new Date();
 				userInstance.save(flush:true);
 				session.user = userInstance;
@@ -69,8 +76,8 @@ class DashboardController {
 			redirect(controller:'dashboard', action:'index')
 		}
 		else {	
-			List warehouses = Warehouse.findAllWhere("active":true)
-			render(view: "chooseWarehouse", model: [warehouses: warehouses])
+			List warehouses = Location.findAllWhere("active":true)
+			render(view: "chooseLocation", model: [warehouses: warehouses])
 		}
 		
 	}

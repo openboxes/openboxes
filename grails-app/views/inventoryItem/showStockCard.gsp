@@ -76,7 +76,7 @@
 								<!--  Current Stock and Transaction Log -->
 								<td>
 									<g:if test="${commandInstance?.inventoryLevelInstance?.status == InventoryStatus.SUPPORTED }">
-													<h2 class="fade"><warehouse:message code="inventory.currentAndPendingStock.label"/></h2>
+										<h4 class="fade"><warehouse:message code="inventory.currentAndPendingStock.label"/></h4>
 										<table>
 											<tr>
 												<td style="padding: 0px;">
@@ -107,7 +107,7 @@
 									</g:if>
 									<g:elseif test="${commandInstance?.inventoryLevelInstance?.status == InventoryStatus.NOT_SUPPORTED }">
 										<div> 	
-											<h2 class="fade"><warehouse:message code="inventory.currentAndPendingStock.label"/></h2>
+											<h4 class="fade"><warehouse:message code="inventory.currentAndPendingStock.label"/></h4>
 											<div class="padded center box">
 												<span class="fade"><g:message code="enum.InventoryStatus.NOT_SUPPORTED"/></span>
 												<g:link controller="inventoryItem" action="editInventoryLevel" params="['product.id': commandInstance?.productInstance?.id, 'inventory.id':commandInstance?.inventoryInstance?.id]">
@@ -118,7 +118,7 @@
 									</g:elseif>								
 									<g:elseif test="${commandInstance?.inventoryLevelInstance?.status == InventoryStatus.SUPPORTED_NON_INVENTORY }">
 										<div> 	
-											<h2 class="fade"><warehouse:message code="inventory.currentAndPendingStock.label"/></h2>
+											<h4 class="fade"><warehouse:message code="inventory.currentAndPendingStock.label"/></h4>
 											<div class="padded center box">
 												<span class="fade"><g:message code="enum.InventoryStatus.SUPPORTED_NON_INVENTORY"/></span>
 												<g:link controller="inventoryItem" action="editInventoryLevel" params="['product.id': commandInstance?.productInstance?.id, 'inventory.id':commandInstance?.inventoryInstance?.id]">
@@ -126,9 +126,10 @@
 												</g:link>
 											</div>
 										</div>
-									</g:elseif>									
+									</g:elseif>		
+									<br/>							
 									<div>
-										<h2 class="fade"><warehouse:message code="transaction.transactionLog.label"/></h2>								
+										<h4 class="fade"><warehouse:message code="transaction.transactionLog.label"/></h4>								
 										<g:render template="showTransactionLog"/>
 									</div>
 								</td>

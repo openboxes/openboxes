@@ -6,7 +6,7 @@ import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Document;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
-import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.core.Location;
 import org.pih.warehouse.shipping.DocumentCommand;
 import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.shipping.ShipmentItem;
@@ -23,13 +23,13 @@ class OrderController {
 		
 		def suppliers = orderService.getSuppliers().sort();
 
-		def destination = Warehouse.get(session.warehouse.id)
+		def destination = Location.get(session.warehouse.id)
 		def origin = params.origin ? Location.get(params.origin) : null
 		def status = params.status ? Enum.valueOf(OrderStatus.class, params.status) : null
 		def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
 		def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
 				
-		def orders = orderService.getOrdersPlacedByWarehouse(destination, origin, status, statusStartDate, statusEndDate)
+		def orders = orderService.getOrdersPlacedByLocation(destination, origin, status, statusStartDate, statusEndDate)
 		
 		// sort by order date
 		orders = orders.sort( { a, b ->

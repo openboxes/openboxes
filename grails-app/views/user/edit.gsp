@@ -113,7 +113,7 @@
 	                                  <label for="email"><warehouse:message code="warehouse.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'warehouse', 'errors')}">
-										<g:select name="warehouse.id" from="${org.pih.warehouse.inventory.Warehouse.list()?.sort()}" optionKey="id" value="${userInstance?.warehouse?.id}" noSelection="['':'']"/>
+										<g:select name="warehouse.id" from="${org.pih.warehouse.core.Location.list()?.sort()}" optionKey="id" value="${userInstance?.warehouse?.id}" noSelection="['null':'']"/>
 	                                </td>
 	                            </tr>	                            	                            
 								<tr class="prop">
@@ -121,9 +121,11 @@
 				
 									</td>
 									<td valign="top">
-					                    <g:actionSubmit class="save" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" /></span>
-										&nbsp;
-										<g:link class="cancel" action="show" id="${warehouseInstance?.id }">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
+										<div class="buttons left">
+						                    <g:actionSubmit class="save" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" /></span>
+											&nbsp;
+											<g:link class="cancel" action="show" id="${userInstance?.id }">${warehouse.message(code: 'default.button.back.label', default: 'Back')}</g:link>
+										</div>
 									</td>
 								</tr>
 	                        </tbody>

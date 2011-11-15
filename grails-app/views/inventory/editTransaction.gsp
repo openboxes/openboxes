@@ -433,8 +433,8 @@
 					minLength: 2,
 					delay: 500,
     				source: function(request, response) {
-    					var currentWarehouseId = $("#currentWarehouseId").val();
-    					$.getJSON('/warehouse/json/findProductByName', { term: request.term, warehouseId: currentWarehouseId }, function(data, status, xhr) {
+    					var currentLocationId = $("#currentLocationId").val();
+    					$.getJSON('/warehouse/json/findProductByName', { term: request.term, warehouseId: currentLocationId }, function(data, status, xhr) {
     						var items = [];
     						$.each(data, function(i, item) { items.push(item); });
     						response(items);

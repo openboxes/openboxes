@@ -2,7 +2,7 @@ package org.pih.warehouse.core
 
 import java.util.Date;
 import org.pih.warehouse.core.Person;
-import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.core.Location;
 
 class User extends Person {
 
@@ -13,8 +13,8 @@ class User extends Person {
 	Locale locale;				// the user's locale
 
 	Date lastLoginDate;			// keep track of the user's last login
-	Warehouse warehouse;		// keep track of the user's last warehouse
-	//Boolean useSavedWarehouse		// indicates whether we should use this warehouse when user logs in 
+	Location warehouse;		// keep track of the user's last warehouse
+	//Boolean useSavedLocation		// indicates whether we should use this warehouse when user logs in 
 	User manager;				// the user's designated manager 
 
 	byte [] photo				// profile photo
@@ -37,7 +37,7 @@ class User extends Person {
 			passwordConfirm == password ? true : ['invalid.matchingpasswords']
 		})		
 		lastLoginDate(nullable:true)
-		//useSavedWarehouse(nullable:true)
+		//useSavedLocation(nullable:true)
 		warehouse(nullable:true)
 	}
 

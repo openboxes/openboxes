@@ -22,7 +22,7 @@ import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.receiving.Receipt;
 import org.pih.warehouse.receiving.ReceiptItem;
@@ -52,7 +52,7 @@ class ShipmentController {
 		}		
 		//return [shipmentInstance: shipmentInstance]
 		render(view: "create", model: [ shipmentInstance : shipmentInstance,
-		warehouses : Warehouse.list(), eventTypes : EventType.list()]);
+		warehouses : Location.list(), eventTypes : EventType.list()]);
 	}
 	
 	def save = {
@@ -72,7 +72,7 @@ class ShipmentController {
 		else {
 			//redirect(action: "create", model: [shipmentInstance: shipmentInstance], params: [type:params.type])
 			render(view: "create", model: [shipmentInstance : shipmentInstance,
-			warehouses : Warehouse.list(), eventTypes : EventType.list()]);
+			warehouses : Location.list(), eventTypes : EventType.list()]);
 		}
 	}
 	
@@ -942,7 +942,7 @@ class ShipmentController {
 		}
 
 		// Get quantities for all inventory items
-		def warehouse = Warehouse.get(session.warehouse.id)		
+		def warehouse = Location.get(session.warehouse.id)		
 		log.info("Quantity for warehouse: " + warehouse.name + " [" + warehouse.inventory + "]")
 		def quantityOnHandMap = inventoryService.getQuantityForInventory(warehouse.inventory)
 		def quantityShippingMap = shipmentService.getQuantityForShipping(warehouse)
@@ -984,11 +984,11 @@ class ShipmentController {
 			}
 		} catch (ShipmentItemException e) { 
 			flash['errors'] = e.shipmentItem.errors
-			render(view: "addToShipment", model: [commandInstance: command, shipments: shipmentService.getPendingShipments(Warehouse.get(session.warehouse.id))])
+			render(view: "addToShipment", model: [commandInstance: command, shipments: shipmentService.getPendingShipments(Location.get(session.warehouse.id))])
 			return;
 		} catch (ValidationException e) { 			
 			flash['errors'] = e.errors 
-			render(view: "addToShipment", model: [commandInstance: command, shipments: shipmentService.getPendingShipments(Warehouse.get(session.warehouse.id))])
+			render(view: "addToShipment", model: [commandInstance: command, shipments: shipmentService.getPendingShipments(Location.get(session.warehouse.id))])
 			return;
 		}
 		

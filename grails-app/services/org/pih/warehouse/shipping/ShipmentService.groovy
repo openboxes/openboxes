@@ -21,7 +21,7 @@ import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.TransactionEntry;
 import org.pih.warehouse.inventory.TransactionException;
 import org.pih.warehouse.inventory.TransactionType;
-import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.receiving.Receipt;
 import org.pih.warehouse.receiving.ReceiptItem;
@@ -475,7 +475,7 @@ class ShipmentService {
 	 * @return
 	 */
 	boolean validateShipmentItem(def shipmentItem) { 
-		def warehouse = Warehouse.get(shipmentItem?.shipment?.origin?.id);
+		def warehouse = Location.get(shipmentItem?.shipment?.origin?.id);
 		log.info("Validating shipment item at " + warehouse?.name )
 		def onHandQuantity = inventoryService.getQuantity(warehouse, shipmentItem.product, shipmentItem.lotNumber)
 		log.info("Checking shipment item quantity [" + shipmentItem.quantity + "] vs onhand quantity [" + onHandQuantity + "]");
@@ -692,7 +692,7 @@ class ShipmentService {
 				// Save updated shipment instance (adding an event and comment)
 				if (!shipmentInstance.hasErrors() && shipmentInstance.save()) { 
 					
-					// only need to create a transaction if the source is a Warehouse
+					// only need to create a transaction if the source is a Location
 					if (shipmentInstance.origin?.isWarehouse()) {
 						inventoryService.createSendShipmentTransaction(shipmentInstance)
 					}

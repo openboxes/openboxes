@@ -10,7 +10,7 @@ import java.text.SimpleDateFormat;
 import org.grails.plugins.excelimport.ExcelImportUtils;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.ProductAttribute;
@@ -33,7 +33,7 @@ class QuantityService {
 	//static scope = "session"
 	//static proxy = true
 	
-	//Warehouse warehouse
+	//Location warehouse
 	//InventoryService inventoryService
 	
 

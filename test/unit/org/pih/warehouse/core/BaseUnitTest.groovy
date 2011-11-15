@@ -6,7 +6,7 @@ import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem 
 import org.pih.warehouse.inventory.TransactionCode;
 import org.pih.warehouse.inventory.TransactionType 
-import org.pih.warehouse.inventory.Warehouse 
+import org.pih.warehouse.core.Location 
 import org.pih.warehouse.product.Product 
 
 
@@ -15,7 +15,7 @@ class BaseUnitTest extends GrailsUnitTestCase {
         super.setUp()
         
           // create some default location types
-        def warehouseLocationType = new LocationType(code: "locationType.warehouse", name: "Warehouse", description: "Warehouse")
+        def warehouseLocationType = new LocationType(code: "locationType.warehouse", name: "Location", description: "Location")
         def supplierLocationType= new LocationType(code: "locationType.supplier", name: "Supplier", description: "Supplier")
         mockDomain(LocationType, [ warehouseLocationType, supplierLocationType ])
 
@@ -24,17 +24,17 @@ class BaseUnitTest extends GrailsUnitTestCase {
         mockDomain(Location, [ acmeSupplyCompany ])
         
         // create some default warehouses and inventories
-        def bostonWarehouse = new Warehouse(name: "Boston Warehouse", locationType: warehouseLocationType)
-        def haitiWarehouse = new Warehouse(name: "Haiti Warehouse", locationType: warehouseLocationType)
+        def bostonLocation = new Location(name: "Boston Location", locationType: warehouseLocationType)
+        def haitiLocation = new Location(name: "Haiti Location", locationType: warehouseLocationType)
     
-        def bostonWarehouseInventory = new Inventory(warehouse: bostonWarehouse)
-        def haitiWarehouseInventory = new Inventory(warehouse: haitiWarehouse)
+        def bostonLocationInventory = new Inventory(warehouse: bostonLocation)
+        def haitiLocationInventory = new Inventory(warehouse: haitiLocation)
         
-        bostonWarehouse.inventory = bostonWarehouseInventory
-        haitiWarehouse.inventory = haitiWarehouseInventory
+        bostonLocation.inventory = bostonLocationInventory
+        haitiLocation.inventory = haitiLocationInventory
         
-        mockDomain(Warehouse, [ bostonWarehouse, haitiWarehouse ] )
-        mockDomain(Inventory, [ bostonWarehouseInventory, haitiWarehouseInventory ])
+        mockDomain(Location, [ bostonLocation, haitiLocation ] )
+        mockDomain(Inventory, [ bostonLocationInventory, haitiLocationInventory ])
        
         // create some default transaction types
         def consumptionTransactionType = new TransactionType(id: 2, name: "Consumption", transactionCode: TransactionCode.DEBIT)

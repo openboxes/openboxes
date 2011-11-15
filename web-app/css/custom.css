@@ -204,7 +204,7 @@ a:hover {
 	padding: 1px;	
 }
 
-#chooseWarehouse { 
+#chooseLocation { 
 	width:400px;
 	position: absolute;
 	top: 10%;
@@ -416,6 +416,10 @@ h2 {
 	padding: 10px;
 	border-bottom: 1px solid #ddd;
 }
+h4 { 
+	font-size: 1.2em;
+	padding: 10px;
+}
 
 /*
 h2 {
@@ -480,7 +484,7 @@ hr.space {background:#fff;color:#fff;}
  	
 #hd { 
     vertical-align: bottom;		
-	
+	border-bottom: 1px solid lightgrey;
 	background-color: white;
 	margin: 5px;	
 }

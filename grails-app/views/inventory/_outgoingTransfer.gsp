@@ -53,8 +53,13 @@
                    	<span id="destinationSection" class="prop-multi">
 						<label><warehouse:message code="default.to.label"/></label>
 						<span>
+							<%-- 
 							<g:select name="destination.id" from="${command?.locationList}" 
 	                       		optionKey="id" optionValue="name" value="${command?.transactionInstance?.destination?.id}" noSelection="['': '']" />
+							--%>
+							<g:selectTransactionDestination name="destination.id"
+								value="${command?.transactionInstance?.destination?.id}" noSelection="['null': '']"/>
+
 						</span>
 					</span>
 				</td>

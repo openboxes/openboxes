@@ -1,6 +1,6 @@
 
 <%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
-<h2 class="fade"><warehouse:message code="product.details.label"/></h2>
+<h4 class="fade"><warehouse:message code="product.details.label"/></h4>
 <div id="product-details" style="border: 1px solid lightgrey">
 	<table>
 		<tr class="details odd">	
@@ -121,7 +121,7 @@
 </div>
 
 <br/>
-<h2 class="fade"><warehouse:message code="product.status.label"/></h2>
+<h4 class="fade"><warehouse:message code="product.status.label"/></h4>
 <div style="border: 1px solid lightgrey">
 	<table>
 		<tr class="details even">	

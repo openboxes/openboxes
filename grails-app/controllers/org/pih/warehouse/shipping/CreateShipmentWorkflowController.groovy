@@ -4,7 +4,7 @@ import org.apache.poi.hssf.record.formula.functions.NumericFunction.OneArg;
 import org.hibernate.exception.ConstraintViolationException;
 import org.pih.warehouse.core.Constants;
 import org.pih.warehouse.core.User;
-import org.pih.warehouse.inventory.Warehouse;
+import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Product;
 import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException;
 

@@ -52,6 +52,10 @@
 	                            <td valign="top" class="name"><warehouse:message code="default.locale.label" /></td>
 	                            <td valign="top" class="value">${fieldValue(bean: userInstance, field: "locale.displayName")}</td>
 	                        </tr>
+	                        <tr class="prop">
+	                            <td valign="top" class="name"><warehouse:message code="user.warehouse.label" /></td>
+	                            <td valign="top" class="value">${fieldValue(bean: userInstance, field: "warehouse")}</td>
+	                        </tr>
 	                        
 	                        <!-- 
 	                        <tr class="prop">
@@ -84,6 +88,27 @@
 	                            	</table>
 								</td>
 							</tr>
+							<tr class="prop">
+								<td class="name">
+								
+								</td>
+								<td class="value">
+									<div class="buttons left">
+										<g:link class="edit" action="edit" id="${userInstance?.id}" >${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}</g:link>
+										<g:link class="delete" action="delete" id="${userInstance?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}</g:link>
+										<g:link action="toggleActivation" id="${userInstance?.id}">
+											<g:if test="${userInstance?.active}">
+												${warehouse.message(code: 'user.deactivate.label')}
+											</g:if>
+											<g:else>
+												${warehouse.message(code: 'user.activate.label')}
+											</g:else>
+										</g:link>
+									</div>
+
+								</td>
+							</tr>
+							
 							<!-- 
 							<tr class="prop">
 	                            <td valign="top" class="prop name"></td>

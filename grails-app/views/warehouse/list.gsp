@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.inventory.Warehouse" %>
+<%@ page import="org.pih.warehouse.core.Location" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -40,7 +40,6 @@
                             <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" class="bottom"/>
                             <th class="left bottom"><warehouse:message code="location.locationType.label" /></th>
                             <th class="left bottom"><warehouse:message code="location.locationGroup.label" /></th>
-                            <th class="bottom"><warehouse:message code="warehouse.manager.label" /></th>
                             <th class="bottom"><span class="vertical-text"><warehouse:message code="warehouse.active.label" /></span></th>
                             <th class="bottom"><span class="vertical-text"><warehouse:message code="warehouse.local.label" /></span></th>
                            	<g:each var="activity" in="${org.pih.warehouse.core.ActivityCode.list()}">
@@ -58,7 +57,6 @@
 							</td>
                             <td class="left"><format:metadata obj="${warehouseInstance?.locationType}"/></td>                            
                             <td class="left">${warehouseInstance?.locationGroup}</td>                            
-                            <td>${fieldValue(bean: warehouseInstance, field: "manager")}</td>                            
                             <td class="left middle">
                             	<g:if test="${warehouseInstance.active }">
 									<img class="middle" src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="${warehouse.message(code: 'default.yes.label') }" title="${warehouse.message(code: 'default.yes.label') }"/>               	
@@ -79,7 +77,7 @@
                             </td>           
                             <g:each var="activity" in="${org.pih.warehouse.core.ActivityCode.list()}">
                            		<td class="left middle">
-									<g:if test="${warehouseInstance?.supportsActivity(activity) }">
+									<g:if test="${warehouseInstance?.supports(activity) }">
 										<img class="middle" src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="${warehouse.message(code: 'default.yes.label') }" title="${warehouse.message(code: 'default.yes.label') }"/>               	
 	                            	</g:if>
 	                            	<g:else>
@@ -100,7 +98,7 @@
 	        </g:if>
             <div class="dialog">
 				<span class="menuButton">
-           			<a href="/warehouse/warehouse/edit" class="new"><warehouse:message code="warehouse.addWarehouse.label"/></a>
+           			<a href="/warehouse/warehouse/edit" class="new"><warehouse:message code="warehouse.addLocation.label"/></a>
 	           	</span>
            	</div>
         </div>

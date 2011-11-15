@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.inventory.Warehouse" %>
+<%@ page import="org.pih.warehouse.core.Location" %>
 <%@ page import="org.pih.warehouse.product.Product" %>
 <html>
     <head>
@@ -137,10 +137,6 @@
 											<tfoot>
 												<tr>
 													<td colspan="6">
-														<div>
-															<g:render template="./actions" model="[]"/>	&nbsp;
-															<warehouse:message code="inventory.showingProductsInCategories.label" args="[totalProducts,commandInstance?.categoryToProductMap?.keySet()?.size()]" />
-														</div>
 													</td>
 												</tr>
 											</tfoot> 
@@ -150,6 +146,10 @@
 			         		</td>
 			         	</tr>
 			        </table>
+				</div>
+				<div>
+					<g:render template="./actions" model="[]"/>	&nbsp;
+					<warehouse:message code="inventory.showingProductsInCategories.label" args="[totalProducts,commandInstance?.categoryToProductMap?.keySet()?.size()]" />
 				</div>
 			</div>
 		</div>
