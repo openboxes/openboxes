@@ -1,0 +1,132 @@
+/*
+  jQuery MegaMenu Plugin Examples CSS
+  Author: GeekTantra
+  Author URI: http://www.geektantra.com
+*/
+
+html, body {
+  height: 100%;
+}
+
+#Page {
+  width: 900px;
+  border-left: 1px solid #CCC;
+  border-right: 1px solid #CCC;
+  margin: auto;
+  border-collapse: collapse;
+  height: 100%;
+  -moz-box-shadow: 0px 0px 10px #888;
+  -webkit-box-shadow: 0px 0px 10px #888;
+}
+
+#Links {
+  padding: 15px;
+  font-size: 16px;
+  text-align: center;
+}
+
+h1 {
+  font-family: Georgia;
+  font-size: 22px;
+  color: #333;
+  margin: 0px;
+  padding: 20px 15px;
+}
+
+
+ul.megamenu {
+  background-image: url(./images/menu-background.gif);
+  background-repeat: repeat-x;
+  background-position: 0px 0px;
+}
+
+.mm-content-base {
+  background-color: #FFF;
+}
+
+a:link, a:visited {
+  color: #333;
+}
+
+a:hover {
+  color: #666;
+}
+
+
+h3 {
+  margin: 0px;
+  font-size: 16px;
+  padding: 5px 0px 2px;
+  font-family: Georgia;
+  font-style: italic;
+  border-bottom: 1px solid #CCC;
+  margin-bottom: 5px;
+}
+
+p, blockquote {
+  margin: 0px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+blockquote {
+  padding-left: 50px;
+}
+
+#tabular-content {
+  border-collapse: collapse;
+  border: 1px solid #265374;
+  font-size: 12px;
+  width: 480px;
+}
+
+#tabular-content td {
+  padding: 4px 5px;
+}
+
+#tabular-content th {
+  color: #FFF;
+  background: #254156;
+  padding: 5px;
+}
+
+#form-content {
+  margin: 0px;
+}
+#form-content fieldset {
+  border: 1px solid #CCC;
+  margin: 0px;
+  padding: 5px;
+}
+#form-content legend {
+  font-size: 11px;
+}
+#form-content .FieldLabel {
+  font-size: 11px;
+}
+
+#form-content .FieldItem {
+  margin-bottom: 5px;
+}
+
+#form-content .FieldItem input.Text {
+  width: 220px;
+  border: 1px solid #AAA;
+  outline: none;
+  padding: 5px;
+  font-size: 15px;
+}
+
+
+#list-content, #list-content ul {
+  margin: 0px;
+  padding-left: 20px;
+}
+#list-content li {
+  margin: 0px;
+  padding: 2px 0px;
+}
+
+#paragraph-content, #quote-content {
+  text-align: justify;
+}

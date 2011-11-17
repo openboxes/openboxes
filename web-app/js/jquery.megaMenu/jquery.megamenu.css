@@ -1,0 +1,85 @@
+/*
+  jQuery MegaMenu Plugin
+  Author: GeekTantra
+  Author URI: http://www.geektantra.com
+*/
+body {
+  font-family: "Arial";
+  font-size: 13px;
+  margin: 0px;
+}
+ul.megamenu {
+  background-color: #888;
+  border-top: 1px solid #888;
+  border-bottom: 1px solid #666;
+  margin: 0px auto;
+  padding: 5px 10px;
+  list-style: none;
+  display: none;
+}
+
+ul.megamenu li.mm-item {
+}
+
+ul.megamenu li {
+  margin: 0px;
+  padding: 0px;
+}
+
+ul.megamenu li.clear-fix {
+  float: none;
+  clear: both;
+  margin: 0px;
+  padding: 0px;
+  height: 0px;
+  font-size: 0px;
+  line-height: 0px;
+}
+
+ul.megamenu a.mm-item-link:link, ul.megamenu a.mm-item-link:visited {
+  position: relative;
+  display: inline-block;
+  color: #FFF;
+  padding: 8px 15px;
+  margin: 0px 3px 0px 0px;
+  text-decoration: none;
+  z-index: 10;
+  font-size: 14px;
+  border-top: 1px solid transparent;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+}
+*html ul.megamenu a.mm-item-link:link, *html ul.megamenu a.mm-item-link:visited {
+  border-color: pink;
+  filter: chroma(color=pink);
+}
+
+ul.megamenu a.mm-item-link-hover:link, ul.megamenu a.mm-item-link-hover:visited {
+  color: #444;
+  background: #FFF;
+  border-top: 1px solid #777;
+  border-left: 1px solid #777;
+  border-right: 1px solid #777;
+  -moz-border-radius: 3px 3px 0px 0px;
+  border-radius: 3px 3px 0px 0px;
+}
+
+ul.megamenu div.mm-item-content {
+  background: #FFF;
+  padding: 0px;
+  position: absolute;
+  border: 1px solid #777;
+  z-index: 9;
+}
+
+.mm-content-base {
+  background: #FFF;
+  position: relative;
+  z-index: 11;
+  padding: 10px;
+}
+.mm-js-shadow {
+  background: #555;
+  position: absolute;
+  z-index: 10;
+}
