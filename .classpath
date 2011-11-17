@@ -78,12 +78,17 @@
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" path=".link_to_grails_plugins/bubbling-2.1.2/grails-app/taglib">
+	<classpathentry excluding="BuildConfig.groovy|*DataSource.groovy|UrlMappings.groovy|Config.groovy|BootStrap.groovy|spring/resources.groovy" kind="src" path=".link_to_grails_plugins/bubbling-2.1.3/grails-app/conf">
 		<attributes>
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" path=".link_to_grails_plugins/bubbling-2.1.2/src/groovy">
+	<classpathentry kind="src" path=".link_to_grails_plugins/bubbling-2.1.3/grails-app/taglib">
+		<attributes>
+			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path=".link_to_grails_plugins/bubbling-2.1.3/src/groovy">
 		<attributes>
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
 		</attributes>
@@ -174,21 +179,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path=".link_to_grails_plugins/grails-ui-1.2-SNAPSHOT/src/groovy">
-		<attributes>
-			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path=".link_to_grails_plugins/greenmail-1.2.2/grails-app/controllers">
-		<attributes>
-			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path=".link_to_grails_plugins/greenmail-1.2.2/grails-app/views">
-		<attributes>
-			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path=".link_to_grails_plugins/greenmail-1.2.2/src/groovy">
 		<attributes>
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
 		</attributes>
@@ -368,12 +358,7 @@
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" path=".link_to_grails_plugins/spock-0.5-groovy-1.7-SNAPSHOT/src/java">
-		<attributes>
-			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path=".link_to_grails_plugins/tomcat-1.3.6/src/groovy">
+	<classpathentry kind="src" path=".link_to_grails_plugins/tomcat-1.3.7/src/groovy">
 		<attributes>
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
 		</attributes>
@@ -393,20 +378,20 @@
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" path=".link_to_grails_plugins/yui-2.7.0.1/grails-app/i18n">
+	<classpathentry excluding="BuildConfig.groovy|*DataSource.groovy|UrlMappings.groovy|Config.groovy|BootStrap.groovy|spring/resources.groovy" kind="src" path=".link_to_grails_plugins/yui-2.8.2.1/grails-app/conf">
 		<attributes>
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" path=".link_to_grails_plugins/yui-2.7.0.1/grails-app/taglib">
+	<classpathentry kind="src" path=".link_to_grails_plugins/yui-2.8.2.1/grails-app/taglib">
 		<attributes>
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" path=".link_to_grails_plugins/yui-2.7.0.1/src/groovy">
+	<classpathentry kind="src" path=".link_to_grails_plugins/yui-2.8.2.1/src/groovy">
 		<attributes>
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="output" path="web-app/WEB-INF/classes"/>
+	<classpathentry kind="output" path="target-eclipse/classes"/>
 </classpath>
