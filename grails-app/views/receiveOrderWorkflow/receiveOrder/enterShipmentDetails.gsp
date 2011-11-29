@@ -10,7 +10,7 @@
 </head>
 <body>
 	<div class="nav">
-		<span class="menuButton"><a href="${createLinkTo(dir:'')}"><warehouse:message code="default.home.label"/></a>
+		<span class="linkButton"><a href="${createLinkTo(dir:'')}"><warehouse:message code="default.home.label"/></a>
 		</span>
 	</div>
 	<div class="body">

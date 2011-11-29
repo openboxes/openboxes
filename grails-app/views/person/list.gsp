@@ -14,7 +14,7 @@
             <div class="list">
             
 				<div>            	
-	            	<span class="menuButton">
+	            	<span class="linkButton">
 	            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'person.label').toLowerCase()]"/></g:link>
 	            	</span>
             	</div>

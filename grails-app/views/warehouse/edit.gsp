@@ -84,7 +84,9 @@
 	                                <td valign="top" class="value">
 	                                	<g:select name="locationGroup.id" from="${org.pih.warehouse.core.LocationGroup.list()}" optionKey="id" value="${warehouseInstance?.locationGroup?.id}" noSelection="['':'']" />
 	                                </td>
-	                            </tr>	                            
+	                            </tr>	         
+	                            
+	                            <!--                     
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 										<label for="name"><warehouse:message code="location.supportedActivities.label" /></label>
@@ -95,7 +97,8 @@
 	                                		optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${warehouseInstance?.supportedActivities}"
 	                                		noSelection="['':'']" />
 	                                </td>
-	                            </tr>	                            
+	                            </tr>
+	                            -->	                            
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="bgColor"><warehouse:message code="warehouse.bgColor.label"/></label>

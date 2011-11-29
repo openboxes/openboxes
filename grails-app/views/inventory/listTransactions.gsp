@@ -19,7 +19,7 @@
 				<tr>
 					<td class="filter filterRow ${!transactionTypeSelected ? 'filterSelected' : '' }">
 						<g:link controller="inventory" action="listAllTransactions">
-							<warehouse:message code="default.all.label"/>
+							<warehouse:message code="transactionType.all.label"/>
 						</g:link>
 					</td>
 					<g:each var="transactionType" in="${org.pih.warehouse.inventory.TransactionType.list()}">
@@ -37,10 +37,10 @@
 					<td class="filter filterRow paddingRow" style="width:100%">&nbsp;</td>
 				</tr>
 			</table>
-			<div class="box padded list">
+			<div style="padding-top: 10px;">
 				<table>
                     <thead>
-                        <tr>   
+                        <tr class="odd">   
 							<th><warehouse:message code="default.actions.label"/></th>
 							<th><warehouse:message code="default.date.label"/></th>
 							<th><warehouse:message code="transaction.type.label"/></th>
@@ -51,7 +51,7 @@
                     </thead>
        	           	<tbody>			
 						<g:each var="transactionInstance" in="${transactionInstanceList}" status="i">           
-							<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
+							<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">            
 								<td align="center">
 									
 									<!-- Action menu -->
@@ -92,8 +92,8 @@
 									<g:link action="showTransaction" id="${transactionInstance?.id }">
 										<span class="${transactionInstance?.transactionType?.transactionCode?.name()?.toLowerCase()}">
 											<format:metadata obj="${transactionInstance?.transactionType}"/>
+											(${transactionInstance?.transactionEntries?.size() } items)
 										</span>
-										(${transactionInstance?.transactionEntries?.size() } items)
 									</g:link>
 								</td>
 								<td>

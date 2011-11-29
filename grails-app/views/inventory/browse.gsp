@@ -32,7 +32,7 @@
 						<tr class="prop" style="border:1px dotted lightgrey;">
 			         		<td style="padding: 0; margin: 0; vertical-align: middle;">
 			            		<g:if test="${commandInstance?.categoryToProductMap}">
-						            <form id="inventoryActionForm" name="inventoryActionForm" method="POST">
+						            <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
 						                <table class="tableScroll"> 
 											<thead> 
 					           					<tr class="odd">
@@ -121,25 +121,8 @@
 															</td>
 														</tr>
 													</g:each>
-													<%-- 
-													<tr class="" style="border-top: 1px solid black">
-														<td></td>
-														<td></td>
-														<td></td>
-														<td></td>
-														<td></td>
-														<td></td>
-														<td style="text-align: center;">${totalQuantity}</td>
-													</tr>
-													--%>
 												</g:each>
 											</tbody>
-											<tfoot>
-												<tr>
-													<td colspan="6">
-													</td>
-												</tr>
-											</tfoot> 
 										</table>		
 									</form>
 								</g:if>	    
@@ -147,7 +130,7 @@
 			         	</tr>
 			        </table>
 				</div>
-				<div>
+				<div style="padding: 10px;">
 					<g:render template="./actions" model="[]"/>	&nbsp;
 					<warehouse:message code="inventory.showingProductsInCategories.label" args="[totalProducts,commandInstance?.categoryToProductMap?.keySet()?.size()]" />
 				</div>

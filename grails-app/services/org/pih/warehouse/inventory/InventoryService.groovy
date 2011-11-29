@@ -32,29 +32,28 @@ class InventoryService implements ApplicationContextAware {
 	boolean transactional = true
 
 	/**
-	 * @return
+	 * @return shipment service
 	 */
 	def getShipmentService() {
 		return applicationContext.getBean("shipmentService")
 	}
 
 	/**
-	 * @return
+	 * @return request service
 	 */
 	def getRequestService() {
 		return applicationContext.getBean("requestService")
 	}
 
 	/**
-	 * @return
+	 * @return order service
 	 */
 	def getOrderService() {
 		return applicationContext.getBean("orderService")
 	}
 
 	/**
-	 *
-	 * @return
+	 * @return	localization service
 	 */
 	def getLocalizationService() {
 		return applicationContext.getBean("localizationService")
@@ -64,7 +63,8 @@ class InventoryService implements ApplicationContextAware {
 	
 
 	/**
-	 * Gets all warehouses
+	 * Gets all locations.
+	 * 
 	 * @return
 	 */
 	List<Location> getAllLocations() {
@@ -140,14 +140,6 @@ class InventoryService implements ApplicationContextAware {
 	   	}
     }
 	
-    /**
-     * Saves the specified location
-	 * 
-	 * @param location
-	 */
-	//void saveLocation(Location location) {
-	//	location.save(flush:true)
-	//}
     
 	/**
 	 * Gets all transactions associated with a warehouse
@@ -160,14 +152,13 @@ class InventoryService implements ApplicationContextAware {
 	}
 
 	/**
-	 * 	
-	 * @return
+	 * Get all consumption transactions between the given dates.	
+	 * 
+	 * @return	a list of consumption transactions 
 	 */
 	List getConsumptionTransactions(Date startDate, Date endDate) { 
 		def CONSUMPTION_TYPE = TransactionType.get(Constants.CONSUMPTION_TRANSACTION_TYPE_ID);
-		log.info("type " + CONSUMPTION_TYPE)
-		def transactions = Transaction.findAllByTransactionTypeAndTransactionDateBetween(CONSUMPTION_TYPE, startDate, endDate)
-		return transactions;
+		return Transaction.findAllByTransactionTypeAndTransactionDateBetween(CONSUMPTION_TYPE, startDate, endDate)
 	}
 	
 	
@@ -375,8 +366,9 @@ class InventoryService implements ApplicationContextAware {
 	
 	
 	/**
+	 * Get a map of quantity for each inventory item for the given inventory and product.
 	 * 
-	 * @param warehouse
+	 * @param inventory
 	 * @param product
 	 * @return
 	 */
@@ -391,6 +383,69 @@ class InventoryService implements ApplicationContextAware {
 	}
 		
 	/**
+	 * 
+	 * @param category
+	 * @param location
+	 * @return
+	 */
+	List getExpiredStock(Category category, Location location) { 
+		def today = new Date();
+		
+		// Stock that has already expired
+		def expiredStock = InventoryItem.findAllByExpirationDateLessThan(today, [sort: 'expirationDate', order: 'desc']);
+
+		log.info expiredStock
+		
+		def quantityMap = getQuantityForInventory(location.inventory)		
+		expiredStock = expiredStock.findAll { quantityMap[it] > 0 }
+		
+		// Get the set of categories BEFORE we filter
+		//def categories = [] as Set		
+		//categories.addAll(expiredStock.collect { it.product.category })
+		//categories = categories.findAll { it != null }
+
+		// poor man's filter
+		if (category) {
+			expiredStock = expiredStock.findAll { item -> item?.product?.category == category }
+		}
+		return expiredStock
+		
+	}
+	
+	/**
+	 * Get all inventory items that are expiring within the given threshhold.
+	 * 
+	 * @param category	the category filter
+	 * @param threshhold the threshhold filter
+	 * @return a list of inventory items
+	 */
+	List getExpiringStock(Category category, Location location, Integer threshhold) { 
+		def today = new Date();
+		
+		// Get all stock expiring ever (we'll filter later)
+		def expiringStock = InventoryItem.findAllByExpirationDateGreaterThan(today+1, [sort: 'expirationDate', order: 'asc']);
+		
+		
+		def quantityMap = getQuantityForInventory(location.inventory)
+		expiringStock = expiringStock.findAll { quantityMap[it] > 0 }
+
+		if (category) {
+			expiringStock = expiringStock.findAll { item -> item?.product?.category == category }
+		}
+		
+		if (threshhold) {
+			expiringStock = expiringStock.findAll { item -> (item?.expirationDate && (item?.expirationDate - today) <= threshhold) }
+		}
+		
+		return expiringStock
+	}
+	
+	
+	
+	
+	
+	/**
+	 * Get a set of products based on the filters in the given command object.
 	 * 
 	 * @param commandInstance
 	 * @return
@@ -770,6 +825,7 @@ class InventoryService implements ApplicationContextAware {
 	}
 	
 	/**
+	 * Get quantity for a given product.
 	 * 
 	 * @param product
 	 * @return
@@ -780,7 +836,8 @@ class InventoryService implements ApplicationContextAware {
 	
 
 	/**
-	 * 	
+	 * Get quantity for all available inventory items in the given inventory.
+	 * 
 	 * @param inventory
 	 * @return
 	 */
@@ -788,15 +845,8 @@ class InventoryService implements ApplicationContextAware {
 		def transactionEntries = getTransactionEntriesByInventory(inventory);
 		return getQuantityByInventoryItemMap(transactionEntries);
 	}
-	
-	/**
-	 * Save an outgoing transfer transaction.
-	 */
-	
-	
-	
-	
-	
+
+		
 	/**
 	 * Fetches and populates a StockCard Command object
 	 * 
@@ -1282,13 +1332,16 @@ class InventoryService implements ApplicationContextAware {
 	
    /**
     * Gets all transaction entries for a inventory item within an inventory
+    * 
+    * @param inventoryItem
+    * @param inventory
     */
-   List getTransactionEntriesByInventoryItemAndInventory(InventoryItem item, Inventory inventoryInstance) {
+   List getTransactionEntriesByInventoryItemAndInventory(InventoryItem inventoryItem, Inventory inventory) {
 	   return TransactionEntry.createCriteria().list() {
 		   and {
-			   eq("inventoryItem", item)
+			   eq("inventoryItem", inventoryItem)
 			    transaction {
-				   eq("inventory", inventoryInstance)
+				   eq("inventory", inventory)
 			   	}
 		   }
 	   }

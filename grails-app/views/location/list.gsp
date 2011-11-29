@@ -3,11 +3,28 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${warehouse.message(code: 'locations.label', default: 'Locations')}" />
-        <g:set var="pageTitle" value="${warehouse.message(code: 'default.show.label' args="[entityName]")}" />
-        <title><warehouse:message code="location.suppliersCustomers.label" /></title>
-        <!-- Specify content to overload like global navigation links, page titles, etc. -->
-		<content tag="pageTitle">><warehouse:message code="location.suppliersCustomers.label" /></content>
+        <title><warehouse:message code="locations.label" /></title>
+        <style>
+        	.vertical-text { 
+				color:#333;
+				border:0px solid red;
+				writing-mode:tb-rl;
+				-webkit-transform:rotate(-60deg);
+				-moz-transform:rotate(-60deg);
+				-o-transform: rotate(-60deg);
+				white-space:nowrap;
+				display:block;
+				bottom:0;
+				width:20px;
+				height:20px;
+				font-family: ‘Trebuchet MS’, Helvetica, sans-serif;
+				font-weight:normal;
+				
+        	}
+        	tr th { border-top: 0;}
+        	
+        </style>
+        
     </head>
     <body>        
         <div class="body">
@@ -15,33 +32,65 @@
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>
-              
             <div class="dialog">
-				<span class="menuButton">
-           			<g:link action="edit" class="new"><warehouse:message code="location.addNewSupplierCustomer.label" /></g:link>
+				<span class="linkButton">
+           			<a href="${request.contextPath }/location/edit" class="new"><warehouse:message code="location.addLocation.label"/></a>
 	           	</span>
            	</div>
-            <div class="list">
+              
+            <div class="" style="width: 99%">
                 <table>
                     <thead>
-                        <tr>
-                            <g:sortableColumn property="name" title="${warehouse.message(code: 'location.name.label', default: 'Name')}" />
-                            <th><warehouse:message code="location.type.label" default="Type" /></th>
+                        <tr style="height: 100px;">                        
+                            <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" class="bottom"/>
+                            <th class="left bottom"><warehouse:message code="location.locationType.label" /></th>
+                            <th class="left bottom"><warehouse:message code="location.locationGroup.label" /></th>
+                            <th class="bottom"><span class="vertical-text"><warehouse:message code="warehouse.active.label" /></span></th>
+                           	<g:each var="activity" in="${org.pih.warehouse.core.ActivityCode.list()}">
+                           		<th class="bottom">
+                           			<span class="vertical-text"><warehouse:message code="enum.ActivityCode.${activity}"/></span>
+                           		</th>
+                           	</g:each>
                         </tr>
                     </thead>
                     <tbody>
                     <g:each in="${locationInstanceList}" status="i" var="locationInstance">
-						<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+						<tr class="prop ${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td>
 								<g:link action="edit" id="${locationInstance.id}">${fieldValue(bean: locationInstance, field: "name")}</g:link>
-							</td>                           
-                            <td><format:metadata obj="${locationInstance.locationType}"/></td>                                                  
-							<td class="center tenth"><g:link class="edit" action="edit" id="${locationInstance?.id}" >${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}</g:link></td>
+							</td>
+                            <td class="left"><format:metadata obj="${locationInstance?.locationType}"/></td>                            
+                            <td class="left">${locationInstance?.locationGroup}</td>                            
+                            <td class="left middle">
+                            	<g:if test="${locationInstance.active }">
+									<img class="middle" src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="${warehouse.message(code: 'default.yes.label') }" title="${warehouse.message(code: 'default.yes.label') }"/>               	
+                            	</g:if>
+                            	<g:else>
+									<img class="middle" src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="${warehouse.message(code: 'default.no.label') }" title="${warehouse.message(code: 'default.no.label') }"/>               	
+                            	</g:else>
+
+                            </td>                            
+                            <g:each var="activity" in="${org.pih.warehouse.core.ActivityCode.list()}">
+                           		<td class="left middle">
+									<g:if test="${locationInstance?.supports(activity) }">
+										<img class="middle" src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="${warehouse.message(code: 'default.yes.label') }" title="${warehouse.message(code: 'default.yes.label') }"/>               	
+	                            	</g:if>
+	                            	<g:else>
+										<img class="middle" src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="${warehouse.message(code: 'default.no.label') }" title="${warehouse.message(code: 'default.no.label') }"/>               	
+	                            	</g:else>
+                           			
+                           		</td>
+                           	</g:each>
 						</tr>
                     </g:each>
                     </tbody>
                 </table>
             </div>
+            <g:if test="${locationInstanceTotal >= params.max }">            
+	            <div class="paginateButtons">
+	                <g:paginate total="${locationInstanceTotal}" />
+	            </div>
+	        </g:if>
         </div>
     </body>
 </html>

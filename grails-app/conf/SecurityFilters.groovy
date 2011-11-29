@@ -5,8 +5,8 @@ class SecurityFilters {
 			before = {	
 				String [] controllersWithAuthUserNotRequired = "api,test".split(",");
 				String [] actionsWithAuthUserNotRequired = "login,handleLogin,signup,handleSignup,json".split(",");
-				String [] actionsWithLocationNotRequired = "login,logout,handleLogin,signup,handleSignup,chooseLocation,viewLogo,json".split(",");
-
+				String [] actionsWithLocationNotRequired = "login,logout,handleLogin,signup,handleSignup,chooseLocation,json".split(",");
+				
 				// Not sure when this happens								
 				if (params.controller == null) {
 					redirect(controller: 'auth', action:'login')   

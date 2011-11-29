@@ -4175,6 +4175,84 @@
 			<column name="active" valueBoolean="true"/>
 		</update>
     </changeSet>
+    <changeSet author="jmiranda (generated)" id="1320943767698-13">
+    	<preConditions>
+    		<tableExists tableName="generic_type"/>
+    	</preConditions>
+    	<comment>Drop unused table.</comment>
+		<dropTable tableName="generic_type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1320943767698-14">
+    	<preConditions>
+    		<tableExists tableName="package_type"/>
+    	</preConditions>
+    	<comment>Drop unused table.</comment>
+		<dropTable tableName="package_type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1320943767698-15">
+    	<preConditions>
+    		<tableExists tableName="setting"/>
+    	</preConditions>
+    	<comment>Drop unused table.</comment>
+		<dropTable tableName="setting"/>
+    </changeSet>        
+    <changeSet author="jmiranda (generated)" id="1320943767698-16">
+    	<preConditions onFail="MARK_RAN">
+    		<columnExists tableName="location_type" columnName="code"/>
+    	</preConditions>
+    	<comment>Drop locationType.code as it is never used.</comment>
+    	<dropColumn tableName="location_type" columnName="code"/>
+    </changeSet>
+	<changeSet author="jmiranda" id="320943767698-17">
+		<insert tableName="location_type_supported_activities">
+			<column name="location_type_id">2</column>
+			<column name="supported_activities_string">MANAGE_INVENTORY</column>
+		</insert>
+		<insert tableName="location_type_supported_activities">
+			<column name="location_type_id">2</column>
+			<column name="supported_activities_string">PLACE_ORDER</column>
+		</insert>
+		<insert tableName="location_type_supported_activities">
+			<column name="location_type_id">2</column>
+			<column name="supported_activities_string">PLACE_REQUEST</column>
+		</insert>
+		<insert tableName="location_type_supported_activities">
+			<column name="location_type_id">2</column>
+			<column name="supported_activities_string">FULFILL_REQUEST</column>
+		</insert>
+		<insert tableName="location_type_supported_activities">
+			<column name="location_type_id">2</column>
+			<column name="supported_activities_string">SEND_STOCK</column>
+		</insert>
+		<insert tableName="location_type_supported_activities">
+			<column name="location_type_id">2</column>
+			<column name="supported_activities_string">RECEIVE_STOCK</column>
+		</insert>
+		<insert tableName="location_type_supported_activities">
+			<column name="location_type_id">2</column>
+			<column name="supported_activities_string">EXTERNAL</column>
+		</insert>
+		<insert tableName="location_type_supported_activities">
+			<column name="location_type_id">3</column>
+			<column name="supported_activities_string">SEND_STOCK</column>
+		</insert>
+		<insert tableName="location_type_supported_activities">
+			<column name="location_type_id">3</column>
+			<column name="supported_activities_string">RECEIVE_STOCK</column>
+		</insert>
+		<insert tableName="location_type_supported_activities">
+			<column name="location_type_id">4</column>
+			<column name="supported_activities_string">FULFILL_ORDER</column>
+		</insert>
+		<insert tableName="location_type_supported_activities">
+			<column name="location_type_id">4</column>
+			<column name="supported_activities_string">SEND_STOCK</column>
+		</insert>
+		<insert tableName="location_type_supported_activities">
+			<column name="location_type_id">4</column>
+			<column name="supported_activities_string">EXTERNAL</column>
+		</insert>
+	</changeSet>    
 </databaseChangeLog>
 
 

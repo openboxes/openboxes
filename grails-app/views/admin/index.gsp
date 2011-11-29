@@ -17,7 +17,7 @@
 						<g:each var="c" in="${grailsApplication.controllerClasses}">
 							<td>
 								<g:set var="controllerName"><%= c.getName().toLowerCase() %></g:set>
-								<span class="menuButton">						
+								<span class="linkButton">						
 									<li class="controller">
 										<a class="${c.name}" href="${createLink(uri: '/' + c.name)}"">${controllerName}</a>
 									</li>

@@ -46,6 +46,7 @@
 	<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.hoverIntent.minified.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.tableScroll/', file:'jquery.tablescroll.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.watermark/', file:'jquery.watermark.min.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/', file:'global.js')}" type="text/javascript" ></script>
 	<%-- 
 	<script src="${createLinkTo(dir:'js/jquery.megaMenu/', file:'jquery.megamenu.js')}" type="text/javascript" ></script>
 	--%>
@@ -143,26 +144,26 @@
 											
 										</li>
 										-->
-										<li>
-											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
-										</li>					
-										<li>
-											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'user.png')}" style="vertical-align: middle" />
-											<g:link class="home" controller="user" action="show" id="${session.user.id}">
-												<warehouse:message code="layout.myAccount.label"/>
-											</g:link>	
-										</li>
-										<li>
-											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
-										</li>
-										<li>
-											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'application_view_tile.png')}" style="vertical-align: middle" />
-											<g:link class="home" controller="dashboard" action="index">
-												<warehouse:message code="dashboard.label"/>
-											</g:link>	
-										</li>
-																	
 										<g:if test="${session?.warehouse}">
+											<li>
+												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
+											</li>					
+											<li>
+												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'user.png')}" style="vertical-align: middle" />
+												<g:link class="home" controller="user" action="show" id="${session.user.id}">
+													<warehouse:message code="layout.myAccount.label"/>
+												</g:link>	
+											</li>
+											<li>
+												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
+											</li>
+											<li>
+												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'application_view_tile.png')}" style="vertical-align: middle" />
+												<g:link class="home" controller="dashboard" action="index">
+													<warehouse:message code="dashboard.label"/>
+												</g:link>	
+											</li>
+																	
 											<li>
 												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
 											</li>
@@ -449,6 +450,7 @@
 			});	
 		});
 	</script>
+	<%--
     <script type="text/javascript">
       jQuery(function(){
         var SelfLocation = window.location.href.split('?');
@@ -462,6 +464,6 @@
         }
       });
     </script>	
-	
+	--%>	
 </body>
 </html>

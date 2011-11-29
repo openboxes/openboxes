@@ -63,7 +63,7 @@
 							<g:set var="status" value="${0 }"/>
 							<g:set var="itemsGroupedByProduct" value="${commandInstance?.items?.groupBy { it.product } }"/>
 							<g:each var="product" in="${products }" status="i">
-								<g:each var="item" in="${itemsGroupedByProduct[product] }" status="j">
+								<g:each var="item" in="${itemsGroupedByProduct[product]?.sort { it?.inventoryItem?.expirationDate } }" status="j">
 									<g:if test="${item?.quantityOnHand > 0 }">
 										<tr class="${i%2?'even':'odd' }">
 											<td>
@@ -135,19 +135,19 @@
 												</g:else>
 											</td>
 											<td class="center">
-												${item?.quantityShipping?:"<span class='fade'>0</span>"}
+												<span class="${item?.quantityShipping?'':'fade'}">${item?.quantityShipping?:0}</span>
 											</td>
 											<td class="center">
-												${item?.quantityReceiving?:"<span class='fade'>0</span>"}
+												<span class="${item?.quantityReceiving?'':'fade'}">${item?.quantityReceiving?:0}</span>
 											</td>
 											<td class="center">
-												${item?.quantityOnHand?:"<span class='fade'>0</span>"}
+												<span class="${item?.quantityOnHand?'':'fade'}">${item?.quantityOnHand?:0}</span>
 											</td>
 											<td class="center" style="border-left: 1px solid lightgrey;">
-
+												&nbsp;
 											</td>
 											<td class="center">										
-
+												&nbsp;
 											</td>
 										</tr>
 									</g:else>
@@ -168,9 +168,9 @@
 							<tr>
 								<td colspan="8" style="border-top: 1px solid lightgrey;">
 									<div class="center">
-										<button type="submit" ><img
-											src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
-											class="btn" alt="save" /><warehouse:message code="shipping.addToShipments.label"/></button>
+										<button type="submit"><img
+											src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}"
+											class="middle btn" alt="save" />&nbsp;<warehouse:message code="shipping.addToShipments.label"/></button>
 										&nbsp;
 										<g:link controller="inventory" action="browse" id="${shipmentInstance?.id}"><warehouse:message code="default.button.cancel.label"/></g:link>
 									</div>				

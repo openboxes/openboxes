@@ -1,5 +1,5 @@
 <!-- Add breadcrumb -->
-<span class="menuButton">
+<span class="linkButton">
 	<a class="home" href="${createLink(uri: '/home/index')}"><warehouse:message code="default.home.label"/></a>
 	&raquo;
 	<g:if test="${session?.warehouse}">

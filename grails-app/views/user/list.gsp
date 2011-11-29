@@ -13,7 +13,7 @@
 	        </g:if>
 
             <div>
-				<span class="menuButton">
+				<span class="linkButton">
            			<g:link controller="user" action="create" class="new"><warehouse:message code="user.addNewUser.label"/></g:link>
 	           	</span>
            	</div>
@@ -21,7 +21,6 @@
                 <table>
                     <thead>
                         <tr>
-                            <g:sortableColumn property="id" title="${warehouse.message(code: 'default.id.label')}" />
                             <g:sortableColumn property="username" title="${warehouse.message(code: 'user.username.label')}" />
                             <g:sortableColumn property="firstName" title="${warehouse.message(code: 'default.name.label')}" />
                             <g:sortableColumn property="email" title="${warehouse.message(code: 'user.email.label')}" />
@@ -33,7 +32,6 @@
                     <tbody>
                     <g:each in="${userInstanceList}" status="i" var="userInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                            <td>${fieldValue(bean: userInstance, field: "id")}</td>
                             <td><g:link action="show" id="${userInstance.id}">${fieldValue(bean: userInstance, field: "username")}</g:link></td>
                             <td>${fieldValue(bean: userInstance, field: "name")}</td>
                             <td>${fieldValue(bean: userInstance, field: "email")}</td>

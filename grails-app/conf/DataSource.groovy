@@ -21,7 +21,7 @@ environments {
 	development {
 		dataSource {	
 			// disable dbCreate when you create the initial database using '$ grails dev migrate'
-			dbCreate = "update" 	
+			//dbCreate = "update" 	
 			//dbCreate = "create-drop"			
 			url = "jdbc:mysql://localhost:3306/warehouse_dev?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
 		}
@@ -43,13 +43,5 @@ environments {
 			url = "jdbc:mysql://localhost:3306/warehouse_diff?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;sessionVariables=storage_engine=InnoDB"
 		}
 	}
-	demo {
-		dataSource {
-			// Used when starting a new version of the migrations changelog 
-			dbCreate = "create-drop"
-			url = "jdbc:mysql://localhost:3306/warehouse_demo?zeroDateTimeBehavior=convertToNull"
-		}
-	}
-
 	
 }

@@ -63,11 +63,11 @@ class LocationService {
 	}
 
 	List getOrderSuppliers(Location currentLocation) {
-		return getLocationsSupportingActivity(ActivityCode.PROCESS_ORDER) - currentLocation
+		return getLocationsSupportingActivity(ActivityCode.FULFILL_ORDER) - currentLocation
 	}
 
 	List getRequestSuppliers(Location currentLocation) {
-		return getLocationsSupportingActivity(ActivityCode.PROCESS_REQUEST) - currentLocation
+		return getLocationsSupportingActivity(ActivityCode.FULFILL_REQUEST) - currentLocation
 	}
 		
 	List getTransactionSources(Location currentLocation) { 
@@ -87,7 +87,7 @@ class LocationService {
 		locations = locations.findAll { it.supports(ActivityCode.RECEIVE_STOCK) }
 		
 		// Remove current location from list
-		locations = locations - currentLocation
+		locations = locations?.unique() - currentLocation
 
 		return locations
 		

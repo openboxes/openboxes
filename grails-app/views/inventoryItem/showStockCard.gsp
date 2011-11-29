@@ -32,7 +32,7 @@
 				</div>
 			</g:hasErrors>
 
-			<div class="dialog" style="min-height: 880px">
+			<div class="dialog" style="min-height: 880px;">
 			
 				<fieldset>
 				

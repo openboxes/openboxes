@@ -11,7 +11,8 @@ class SelectTagLib {
 		def currentLocation = Location.get(session.warehouse.id)
 		attrs.from = locationService.getTransactionDestinations(currentLocation).sort { it?.name?.toLowerCase() };
 		attrs.optionKey = 'id'		
-		attrs.optionValue = 'name'
+		//attrs.optionValue = 'name'
+		attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]"}
 		out << g.select(attrs)
 	}
 
@@ -19,7 +20,8 @@ class SelectTagLib {
 		def currentLocation = Location.get(session.warehouse.id)
 		attrs.from = locationService.getTransactionSources(currentLocation).sort { it?.name?.toLowerCase() };
 		attrs.optionKey = 'id'
-		attrs.optionValue = 'name'
+		//attrs.optionValue = 'name'
+		attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]"}
 		out << g.select(attrs)
 	}
 
@@ -27,7 +29,8 @@ class SelectTagLib {
 		def currentLocation = Location.get(session.warehouse.id)
 		attrs.from = locationService.getOrderSuppliers(currentLocation).sort { it?.name?.toLowerCase() };
 		attrs.optionKey = 'id'
-		attrs.optionValue = 'name'
+		//attrs.optionValue = 'name'
+		attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]"}
 		out << g.select(attrs)
 	}
 
@@ -35,7 +38,8 @@ class SelectTagLib {
 		def currentLocation = Location.get(session.warehouse.id)
 		attrs.from = locationService.getRequestSuppliers(currentLocation).sort { it?.name?.toLowerCase() };
 		attrs.optionKey = 'id'
-		attrs.optionValue = 'name'
+		//attrs.optionValue = 'name'
+		attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]"}
 		out << g.select(attrs)
 	}
 
@@ -43,7 +47,8 @@ class SelectTagLib {
 		def currentLocation = Location.get(session.warehouse.id)
 		attrs.from = locationService.getCustomers(currentLocation).sort { it?.name?.toLowerCase() };
 		attrs.optionKey = 'id'
-		attrs.optionValue = 'name'
+		//attrs.optionValue = 'name'
+		attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]"}
 		out << g.select(attrs)
 	}
 
@@ -51,7 +56,8 @@ class SelectTagLib {
 		def currentLocation = Location.get(session.warehouse.id)
 		attrs.from = locationService.getShipmentOrigins().sort { it?.name?.toLowerCase() };
 		attrs.optionKey = 'id'
-		attrs.optionValue = 'name'
+		//attrs.optionValue = 'name'
+		attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]"}
 		out << g.select(attrs)
 	}
 
@@ -59,7 +65,8 @@ class SelectTagLib {
 		def currentLocation = Location.get(session.warehouse.id)
 		attrs.from = locationService.getShipmentDestinations().sort { it?.name?.toLowerCase() } ;
 		attrs.optionKey = 'id'
-		attrs.optionValue = 'name'
+		//attrs.optionValue = 'name'
+		attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]"}
 		out << g.select(attrs)
 	}
 

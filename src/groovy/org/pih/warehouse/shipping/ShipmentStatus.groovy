@@ -4,9 +4,9 @@ import org.pih.warehouse.core.Location
 
 class ShipmentStatus implements Comparable {
 
-	ShipmentStatusCode code
 	Date date
 	Location location
+	ShipmentStatusCode code
 	
 	String getName() { return code.getName() }
 	

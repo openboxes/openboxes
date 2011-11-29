@@ -9,7 +9,6 @@ import java.util.Date;
 class LocationType implements Serializable {
 
 	String name
-	String code
 	String description
 	Integer sortOrder = 0;
 	Date dateCreated;
@@ -19,7 +18,6 @@ class LocationType implements Serializable {
 	
 	static constraints = { 
 		name(nullable:false, maxSize: 255)
-		code(nullable:false, maxSize: 255)
 		description(nullable:true, maxSize: 255)
 		sortOrder(nullable:true)		
 		dateCreated(display:false)

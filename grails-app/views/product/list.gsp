@@ -15,16 +15,25 @@
 				<div class="message">${flash.message}</div>
             </g:if>
             <div class="list">
+            
+				<div>            	
+	            	<span class="linkButton">
+	            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="['product']"/></g:link>
+	            	</span>
+            	</div>
+            
                 <table>
                     <thead>
                         <tr>                        
                             <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" />
+                            <g:sortableColumn property="category" title="${warehouse.message(code: 'category.label')}" />
                         </tr>
                     </thead>
                     <tbody>
                     <g:each in="${productInstanceList}" status="i" var="productInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
 							<td align="center"><g:link action="edit" id="${productInstance.id}"><format:product product="${productInstance}"/></g:link></td>
+							<td align="center"><format:category category="${productInstance?.category }"/></td>
                         </tr>
                     </g:each>
                     </tbody>

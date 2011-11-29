@@ -11,7 +11,7 @@
 }
 
 .buttons { 
-	text-align: right; 
+	text-align: center; 
 	padding: 10px; 
 }
 
@@ -206,7 +206,7 @@ a:hover {
 }
 
 #logo { 
-	padding: 1px;	
+	padding: 0px;	
 }
 
 #chooseLocation { 

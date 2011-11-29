@@ -23,7 +23,6 @@
 					<span class="value">
 						<g:textArea cols="80" rows="1" name="transactionInstance.comment" 
 							value="${command?.transactionInstance?.comment }"></g:textArea>
-
 					</span>								
 				</td>
 			</tr>				
@@ -40,7 +39,7 @@
 									<th><warehouse:message code="product.lotNumber.label"/></th>
 									<th><warehouse:message code="default.expires.label"/></th>
 									<th><warehouse:message code="inventory.onHandQuantity.label"/></th>
-									<th><warehouse:message code="inventory.expiredQuantity.label"/></th>
+									<th><warehouse:message code="inventory.consumedQuantity.label"/></th>
 									<th><warehouse:message code="default.actions.label"/></th>
 								</tr>
 							</thead>
@@ -59,22 +58,13 @@
 									<g:hiddenField name="product.id" value="${product?.id }"/>
 									
 									<%-- Display one row for every inventory item --%>
-									<g:each var="inventoryItem" in="${command?.productInventoryItems[product]?.sort { it.expirationDate } }">
-										
+									<g:each var="inventoryItem" in="${command?.productInventoryItems[product]?.sort { it.expirationDate } }">										
 										<g:hiddenField name="transactionEntries[${status }].inventoryItem.id" value="${inventoryItem?.id }"/>
 										<tr>
-											<td>
-												<format:product product="${product}"/>
-											</td>
-											<td>
-												${inventoryItem?.lotNumber }
-											</td>
-											<td>
-												<format:date obj="${inventoryItem?.expirationDate }" format="MMM yyyy"/>
-											</td>
-											<td>
-												${command?.quantityMap[inventoryItem]}
-											</td>
+											<td>${product?.name }</td>
+											<td>${inventoryItem?.lotNumber }</td>
+											<td><format:date obj="${inventoryItem?.expirationDate }" format="MMM yyyy"/></td>
+											<td>${command?.quantityMap[inventoryItem]}</td>
 											<td>
 												<g:if test="${command?.transactionInstance?.transactionEntries }">
 													<g:textField name="transactionEntries[${status }].quantity"
@@ -91,25 +81,6 @@
 										</tr>
 										<g:set var="status" value="${status+1 }"/>										
 									</g:each>
-									<g:unless test="${command?.productInventoryItems[product] }">
-										<tr>
-											<td>
-												<format:product product="product"/>
-											</td>
-											<td>
-												
-											</td>
-											<td>
-											
-											</td>
-											<td>
-												0
-											</td>
-											<td>
-												<input type="text" disabled="disabled" value="N/A" size="1"/>
-											</td>
-										</tr>
-									</g:unless>
 									
 								</g:each>
 							</tbody>

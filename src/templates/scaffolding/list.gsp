@@ -17,7 +17,7 @@
             <div class="list">
             
 				<div>            	
-	            	<span class="menuButton">
+	            	<span class="linkButton">
 	            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="['${domainClass.propertyName}']"/></g:link>
 	            	</span>
             	</div>

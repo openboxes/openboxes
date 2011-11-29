@@ -24,8 +24,8 @@
 		        			<legend><warehouse:message code="category.categories.label"/></legend>
 		        		
 		        		
-							<div style="padding:10px; text-align: right">
-								<span class="menuButton">
+							<div style="padding:10px; text-align: left">
+								<span class="linkButton">
 				            		<g:link class="new" controller="category" action="tree" params="[addCategory:'addCategory']"><warehouse:message code="default.add.label" args="[warehouse.message(code: 'category.label')]"/></g:link>
 				            	</span>										    	
 							</div>						

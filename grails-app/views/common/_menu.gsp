@@ -51,7 +51,7 @@
 		</div>
 	</g:authorize>
 	
-	<g:authorize activity="[ActivityCode.PLACE_ORDER,ActivityCode.PROCESS_ORDER]">	
+	<g:authorize activity="[ActivityCode.PLACE_ORDER,ActivityCode.FULFILL_ORDER]">	
 		<h6 class="menu-heading" >
 			<warehouse:message code="orders.label"  default="Orders"/>
 		</h6>
@@ -88,7 +88,7 @@
 	</g:authorize>
 	
 	
-	<g:authorize activity="[ActivityCode.PLACE_REQUEST,ActivityCode.PROCESS_REQUEST]">
+	<g:authorize activity="[ActivityCode.PLACE_REQUEST,ActivityCode.FULFILL_REQUEST]">
 		<h6 class="menu-heading" >
 			<warehouse:message code="requests.label"  default="Requests"/>
 		</h6>
@@ -222,12 +222,7 @@
 			</li>
 			<li>
 				<span class="menuButton">
-					<g:link controller="warehouse" action="list"><warehouse:message code="location.warehouses.label"/></g:link>
-				</span>
-			</li>
-			<li>
-				<span class="menuButton">
-					<g:link controller="location" action="list"><warehouse:message code="location.suppliersCustomers.label"/></g:link>
+					<g:link controller="location" action="list"><warehouse:message code="locations.label"/></g:link>
 				</span>
 			</li>
 			<li>

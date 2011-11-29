@@ -5,7 +5,7 @@
 .tablescroll_wrapper,
 .tablescroll_head,
 .tablescroll_foot
-{ border:1px solid #ccc; }
+{ border:0px solid #ccc; }
  
 .tablescroll td
 { padding:3px 5px; }

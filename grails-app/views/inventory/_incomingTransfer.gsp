@@ -1,68 +1,9 @@
 <div class="left">
-	<g:form action="saveIncomingTransfer">
+	<g:form action="saveCreditTransaction">
 		<g:hiddenField name="transactionInstance.id" value="${command?.transactionInstance?.id}"/>
 		<g:hiddenField name="transactionInstance.inventory.id" value="${command?.warehouseInstance?.inventory?.id}"/>
+		<g:hiddenField name="transactionInstance.transactionType.id" value="${command?.transactionInstance?.transactionType?.id }"/>
 		<table>
-			<tr class="prop">
-				<td class="name">
-					<label><warehouse:message code="transaction.status.label"/></label>
-				</td>
-				<td class="value">
-					<span>
-						<g:if test="${command?.transactionInstance?.id }">
-							<warehouse:message code="enum.TransactionStatus.COMPLETE"/>
-						</g:if>
-						<g:else>
-							<warehouse:message code="enum.TransactionStatus.PENDING"/>
-						</g:else>
-					</span>
-				</td>
-			</tr>
-			<tr class="prop">
-				<td class="name">
-					<label><warehouse:message code="transaction.type.label"/></label>
-				</td>
-				<td class="value">
-					<span >
-						<g:if test="${command?.transactionInstance?.transactionType }">
-							${format.metadata(obj:command?.transactionInstance?.transactionType)}
-							<g:hiddenField name="transactionInstance.transactionType.id" value="${command?.transactionInstance?.transactionType?.id }"/>
-							
-                       	</g:if>
-                       	<g:else>
-							<g:select id="transactionTypeSelector" name="transactionInstance.transactionType.id" from="${command?.transactionTypeList}" 
-	                       		optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${command?.transactionInstance.transactionType?.id}" noSelection="['': '']" />
-						</g:else>
-					</span>
-				</td>
-			</tr>
-			<tr class="prop">
-				<td class="name">
-					<label><warehouse:message code="default.from.label"/></label>
-				</td>
-				<td class="value">			
-					<span class="source">	
-						<%-- 
-						<g:select name="transactionInstance.source.id" from="${command?.locationList}" 
-							optionKey="id" optionValue="name" value="${command?.transactionInstance?.source?.id}" noSelection="['null': '']" />
-						--%>	
-						<g:selectTransactionSource name="transactionInstance.source.id" 
-							optionKey="id" optionValue="name" value="${command?.transactionInstance?.source?.id}" noSelection="['null': '']" />
-							
-							
-					</span>
-				</td>
-			</tr>
-			<tr class="prop">
-				<td class="name">
-					<label><warehouse:message code="default.to.label"/></label>
-				</td>
-				<td class="value">
-					<span class="destination">
-					${command?.warehouseInstance?.name }						
-					</span>
-				</td>
-			</tr>
 			<tr class="prop">
 				<td class="name">
 					<label><warehouse:message code="transaction.date.label"/></label>
@@ -74,6 +15,17 @@
 					</span>								
 				</td>
 			</tr>	
+			<tr class="prop">
+				<td class="name">
+					<label><warehouse:message code="default.from.label"/></label>
+				</td>
+				<td class="value">			
+
+					<g:selectTransactionSource name="transactionInstance.source.id" 
+						optionKey="id" optionValue="name" value="${command?.transactionInstance?.source?.id}" noSelection="['null': '']" />
+							
+				</td>
+			</tr>
 			<tr class="prop">
 				<td class="name">
 					<label><warehouse:message code="transaction.comment.label"/></label>
@@ -94,16 +46,18 @@
 				</td>
 				<td style="padding: 0px;">
 					<div class="transactionEntries">
-						<table id="myTable" ><!-- class="tableScroll" -->
+						<table id="incomingTransfer" ><!-- class="tableScroll" -->
 							<thead>
 								<tr class="odd">
-									<th width="30%"><warehouse:message code="product.label"/></th>
-									<th width="30%">
+									<th class="left">
+										<warehouse:message code="product.label"/>
+									</th>
+									<th>
 										<warehouse:message code="product.lotNumber.label"/> / 
 										<warehouse:message code="default.expires.label"/>
 									</th>
-									<th width="15%"><warehouse:message code="default.qty.label"/></th>
-									<th width="10%"><warehouse:message code="default.actions.label"/></th>
+									<th><warehouse:message code="default.qty.label"/></th>
+									<th><warehouse:message code="default.actions.label"/></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -114,60 +68,69 @@
 									<g:each var="transactionEntry" in="${command?.transactionEntries }" status="i">
 										<g:hiddenField name="product.id" value="${transactionEntry?.product?.id }"/>
 										<tr class="prop row">
-											<td>
+											<td class="left">
 												<span class="productName">
 													<format:product product="${transactionEntry?.product}"/>
 												</span>
 												<g:hiddenField name="transactionEntries[${i }].product.id" 
 													value="${transactionEntry?.product?.id}"/>
 											</td>
-											<td>
+											<td width="50%">
 												<g:set var="displayLotNumberEditor" value="${!transactionEntry?.inventoryItem && !transactionEntry?.lotNumber}"/>
 												<g:set var="displayLotNumberReadonly" value="${!displayLotNumberEditor}"/>
+
 												<span class="lotNumberSelector" style="${displayLotNumberReadonly || displayLotNumberEditor?'display:none;':''}">
 													<select class="inventoryItem" name="transactionEntries[${i }].inventoryItem.id">
 														<option value="-1"></option>
-														<g:each var="inventoryItem" in="${command?.productInventoryItems[transactionEntry?.product] }">
+														<g:each var="inventoryItem" in="${command?.productInventoryItems[transactionEntry?.product]?.sort { it.expirationDate } }">
 															<g:set var="selected" value="${transactionEntry?.inventoryItem==inventoryItem}"/>
 															<option value="${inventoryItem?.id }" ${selected?'selected=selected':'' }>
-																${inventoryItem?.lotNumber } 
-																(<warehouse:message code="default.expires.label"/> <format:date obj="${inventoryItem?.expirationDate }" format="MMM yyyy"/>)
+																${inventoryItem?.lotNumber ?: warehouse.message(code: 'inventory.noLotNumber.message') }
+																<g:if test="${inventoryItem?.expirationDate }"> 
+																	(<warehouse:message code="default.expires.label"/> 
+																		<format:date obj="${inventoryItem?.expirationDate }" format="MMM yyyy"/>)
+																</g:if>
 															</option>														
 														</g:each>
-														<option value="0">Enter a lot or serial number ...</option>
+														<option value="0">${warehouse.message(code: 'inventory.enterLotOrSerialNumber.label') }</option>
 													</select>
 												</span>
+
 												<span class="lotNumberEditor" style="${!displayLotNumberEditor?'display:none;':'' }">
-												
 													<g:textField class="lotNumber" name="transactionEntries[${i }].lotNumber" 
 														value="${transactionEntry?.lotNumber }"/>
 														
 													<g:datePicker name="transactionEntries[${i }].expirationDate" precision="month" noSelection="['':'']"
 														value="${transactionEntry?.expirationDate }" years="${(1900 + (new Date().year))..(1900+ (new Date() + (20 * 365)).year)}"/>											
 													
-													<img class="undo middle" src="${createLinkTo(dir:'images/icons/silk',file:'arrow_undo.png')}" title="${warehouse.message(code: 'cancel.label') }" alt="${warehouse.message(code: 'cancel.label') }"/>
+													<img class="undo middle" src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" title="${warehouse.message(code: 'cancel.label') }" alt="${warehouse.message(code: 'cancel.label') }"/>
 												</span>	
+												
 												<span class="lotNumberReadonly" style="${!displayLotNumberReadonly?'display:none;':'' }">
 													<g:if test="${transactionEntry?.inventoryItem }">
-														<span class="lotNumber">${transactionEntry?.inventoryItem?.lotNumber}</span>
-														<span class="expirationDate fade">
-															(<warehouse:message code="default.expires.label"/> <format:date obj="${transactionEntry?.inventoryItem?.expirationDate }" format="MMM yyyy"/>)
-														</span>
+														<span class="lotNumber">${transactionEntry?.inventoryItem?.lotNumber ?: warehouse.message(code: 'inventory.noLotNumber.message')}</span>
+														
+														<g:if test="${transactionEntry?.inventoryItem?.expirationDate }">
+															<span class="expirationDate fade">
+																(<warehouse:message code="default.expires.label"/> 
+																	<format:date obj="${transactionEntry?.inventoryItem?.expirationDate }" format="MMM yyyy"/>)
+															</span>
+														</g:if>
 													</g:if>
 													<g:else>
-														<span class="lotNumber">${transactionEntry?.lotNumber}</span> 
-														<span class="expirationDate fade">
-															(<warehouse:message code="default.expires.label"/> <format:date obj="${transactionEntry?.expirationDate }" format="MMM yyyy"/>)
-														</span>
+														<span class="lotNumber">${transactionEntry?.lotNumber ?: warehouse.message(code: 'inventory.noLotNumber.message')}</span>
+														<g:if test="${transactionEntry?.expirationDate }">  
+															<span class="expirationDate fade">
+																(<warehouse:message code="default.expires.label"/> 
+																	<format:date obj="${transactionEntry?.expirationDate }" format="MMM yyyy"/>)
+															</span>
+														</g:if>
 													</g:else>
-													<img class="undo middle" src="${createLinkTo(dir:'images/icons/silk',file:'arrow_undo.png')}" title="${warehouse.message(code: 'cancel.label') }" alt="${warehouse.message(code: 'undo.label') }"/>
+													<img class="undo middle" src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" title="${warehouse.message(code: 'cancel.label') }" alt="${warehouse.message(code: 'undo.label') }"/>
 												</span>	
-											
-											
 											</td>
 											<td>
 												<g:textField name="transactionEntries[${i }].quantity" size="1" autocomplete="off" value="${transactionEntry?.quantity }"/>
-												
 											</td>
 											<td>
 												<img class="add middle" src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="${warehouse.message(code: 'add.label') }"/>
@@ -186,13 +149,13 @@
 									</g:each>
 								</g:if>
 								<g:else>
-									<g:each var="product" in="${command?.productInventoryItems.keySet() }" status="i">
+									<g:each var="product" in="${command?.productInventoryItems?.keySet() }" status="i">
 										<%-- Hidden field used to keep track of the products that were selected --%>
 										<g:hiddenField name="product.id" value="${product?.id }"/>
 										
 										<%-- initial product rows --%>
 										<tr class="prop row">
-											<td>
+											<td class="left">
 												<span class="productName">
 													<format:product product="${product }"/>
 												</span>
@@ -201,19 +164,24 @@
 											<td>										
 												<g:set var="displayLotNumberEditor" value="${!command?.transactionEntries[i]?.inventoryItem && command?.transactionEntries[i]?.lotNumber}"/>
 												<g:set var="displayLotNumberReadonly" value="${command?.transactionEntries[i]?.inventoryItem}"/>
+												
 												<span class="lotNumberSelector" style="${displayLotNumberReadonly || displayLotNumberEditor?'display:none;':''}">
 													<select class="inventoryItem" name="transactionEntries[${i }].inventoryItem.id">
 														<option value="-1"></option>
-														<g:each var="inventoryItem" in="${command?.productInventoryItems[product] }">
+														<g:each var="inventoryItem" in="${command?.productInventoryItems[product]?.sort { it.expirationDate } }">
 															<g:set var="selected" value="${command?.transactionEntries[i]?.inventoryItem==inventoryItem}"/>
 															<option value="${inventoryItem?.id }" ${selected?'selected=selected':'' }>
-																${inventoryItem?.lotNumber } 
-																(<warehouse:message code="default.expires.label"/> <format:date obj="${inventoryItem?.expirationDate }" format="MMM yyyy"/>)
+																${inventoryItem?.lotNumber ?: warehouse.message(code: 'inventory.noLotNumber.message')} 
+																<g:if test="${inventoryItem?.expirationDate }"> 
+																	(<warehouse:message code="default.expires.label"/> 
+																		<format:date obj="${inventoryItem?.expirationDate }" format="MMM yyyy"/>)
+																</g:if>
 															</option>														
 														</g:each>
-														<option value="0">Enter a lot or serial number ...</option>
+														<option value="0">${warehouse.message(code: 'inventory.enterLotOrSerialNumber.label') }</option>
 													</select>
 												</span>
+												
 												<span class="lotNumberEditor" style="${!displayLotNumberEditor?'display:none;':'' }">
 													<g:textField class="lotNumber" name="transactionEntries[${i }].lotNumber" 
 														value="${command?.transactionEntries[i]?.lotNumber }"/>
@@ -221,16 +189,20 @@
 													<g:datePicker name="transactionEntries[${i }].expirationDate" precision="month" 
 														value="${command?.transactionEntries[i]?.expirationDate }" years="${(1900 + (new Date().year))..(1900+ (new Date() + (20 * 365)).year)}"/>											
 																										
-													<img class="undo middle" src="${createLinkTo(dir:'images/icons/silk',file:'arrow_undo.png')}" alt="${warehouse.message(code: 'cancel.label') }"/>
-													
+													<img class="undo middle" src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="${warehouse.message(code: 'cancel.label') }"/>
 												</span>	
+												
 												<span class="lotNumberReadonly" style="${!displayLotNumberReadonly?'display:none;':'' }">
 													<span class="lotNumber">${command?.transactionEntries[i]?.inventoryItem?.lotNumber}</span>
-													<span class="expirationDate fade">
-														(<warehouse:message code="default.expires.label"/>
-														<format:date obj="${command?.transactionEntries[i]?.inventoryItem?.expirationDate}" format="MMM yyyy"/>)
-													</span>
-													<img class="undo middle" src="${createLinkTo(dir:'images/icons/silk',file:'arrow_undo.png')}" alt="${warehouse.message(code: 'undo.label') }"/>
+													
+													${command?.transactionEntries[i]?.inventoryItem?.expirationDate}
+													<g:if test="${command?.transactionEntries[i]?.inventoryItem?.expirationDate }"> 
+														<span class="expirationDate fade">
+															(<warehouse:message code="default.expires.label"/>
+																<format:date obj="${command?.transactionEntries[i]?.inventoryItem?.expirationDate}" format="MMM yyyy"/>)
+														</span>
+													</g:if>
+													<img class="undo middle" src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="${warehouse.message(code: 'undo.label') }"/>
 												</span>	
 											</td>
 											<td>
@@ -243,20 +215,21 @@
 										</tr>
 									</g:each>
 								</g:else>
-									
 							</tbody>
-							
 						</table>
 					</div>	
 				</td>
 			</tr>		
 			<tr class="prop">
 				<td colspan="7">
-					<div style="text-align: center;">
+					<div class="center">
 						<button type="submit" name="save">								
-							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'tick.png')}"/>&nbsp;
-							<warehouse:message code="default.button.save.label"/>&nbsp;
+							<warehouse:message code="default.button.save.label"/>
 						</button>
+						&nbsp;
+						<g:link controller="inventory" action="browse">
+							${warehouse.message(code: 'default.button.back.label')}
+						</g:link>
 					</div>
 				</td>
 			</tr>
@@ -265,28 +238,7 @@
 </div>
 <script>
 	$(document).ready(function() {
-		
-		var alternateRowColors = function($table) {
-			//$('tbody tr:odd', $table).removeClass('even').addClass('odd');
-			//$('tbody tr:even', $table).removeClass('odd').addClass('even');
-		};	
-		
-		var renameRowFields = function($table) { 
-			var i = 0;
-			// Iterate over each row and change the name attribute of all input/select fields
-			$table.find("tr.row").each(function() { 
-				$(this).find("input,select").each(function() {
-				    var oldName = $(this).attr('name');
-				    var newName = oldName.replace(/(transactionEntries\[)(\d+)(\])/, function(f, p1, p2, p3) {
-				        return p1 + i + p3;
-				    });
-			        $(this).attr('name', newName);
-			        $(this).attr('id', newName);
-				});
-				i++;
-			});
-		}
-		
+				
 		var cloneRow = function($table, $tableRow) { 
 			// Replace all rows 
 			var newTableRow = $tableRow.clone().find("input,select").each(function() {
@@ -302,7 +254,7 @@
 			//newTableRow.find("img.add").remove();
 			
 			// Remove product name
-			newTableRow.find("span.productName").remove();
+			//newTableRow.find("span.productName").remove();
 			
 			// Show the lot number selector 
 			newTableRow.find(".lotNumberSelector").show().find(".inventoryItem").val("");
@@ -327,7 +279,7 @@
 		 * Initialize the table used to hold all transaction entries
 		 */			
 		//$('.tableScroll').tableScroll({height:300});
-		alternateRowColors("#myTable");
+		alternateRowColors("#incomingTransfer");
 		//numberRows("#myTable");
 
 
@@ -337,9 +289,9 @@
 		$("img.delete").livequery('click', function(event) { 
 			$(this).closest('tr').fadeTo(400, 0, function () { 
 		        $(this).remove();
+				alternateRowColors("#incomingTransfer");
+				renameRowFields($("#incomingTransfer"));
 		    });
-			//alternateRowColors("#myTable");
-			renameRowFields($("#myTable"));
 		    return false;
 		});			
 				
@@ -348,7 +300,8 @@
 		 * Add a new row to the table.
 		 */
 		$("img.add").livequery('click', function(event) {
-			cloneRow($("#myTable"), $(this).closest('tr'));			
+			cloneRow($("#incomingTransfer"), $(this).closest('tr'));			
+			alternateRowColors("#incomingTransfer");
 		});
 		
 		
@@ -385,21 +338,21 @@
 				var readonlySpan = $(this).parent().siblings(".lotNumberReadonly");
 				
 				$.getJSON('${request.contextPath}/json/getInventoryItem/' + value, function(data) {
+
+					var errorMessage = "${warehouse.message(code: 'inventory.noLotNumber.message')}"
+					readonlySpan.find(".lotNumber").text(data.lotNumber ? data.lotNumber : errorMessage);
+					
 					var expMonth = '';
 					var expYear = '';
 					if (data.expirationDate) {
 						var d = new Date(data.expirationDate);
 						expMonth = monthNamesShort[d.getMonth()];
-						expYear = d.getFullYear();
+						expYear = d.getFullYear()
 					}
-
-					readonlySpan.find(".lotNumber").text(data.lotNumber);
-					readonlySpan.find(".expirationDate").text("(${warehouse.message(code: 'default.expires.label')} " + expMonth + " " + expYear + ")");
 					
-					console.log(readonlySpan);
-					console.log(data);
-					console.log(data.expirationDate);
-					console.log(data.lotNumber);
+					if (expMonth && expYear) { 
+						readonlySpan.find(".expirationDate").text("(${warehouse.message(code: 'default.expires.label')} " + expMonth + " " + expYear + ")");
+					}					
 				});
 
 

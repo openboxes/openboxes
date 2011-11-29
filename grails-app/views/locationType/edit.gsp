@@ -35,16 +35,7 @@
 	                                    <g:textField name="name" value="${locationTypeInstance?.name}" />
 	                                </td>
 	                            </tr>
-	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                  <label for="code"><warehouse:message code="locationType.code.label" default="Code" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'code', 'errors')}">
-	                                    <g:textField name="code" value="${locationTypeInstance?.code}" />
-	                                </td>
-	                            </tr>
-	                        
+	                        	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="description"><warehouse:message code="locationType.description.label" default="Description" /></label>

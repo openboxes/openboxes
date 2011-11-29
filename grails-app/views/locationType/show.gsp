@@ -33,13 +33,6 @@
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><warehouse:message code="locationType.code.label" default="Code" /></td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean: locationTypeInstance, field: "code")}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="locationType.description.label" default="Description" /></td>
                             
                             <td valign="top" class="value">${fieldValue(bean: locationTypeInstance, field: "description")}</td>

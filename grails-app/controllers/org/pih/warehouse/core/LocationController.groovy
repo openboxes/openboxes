@@ -8,8 +8,9 @@ class LocationController {
 	 * Controllers for managing other locations (besides warehouses)
 	 */
 	
-	def list = {	
-		[locationInstanceList: Location.list(params).findAll { it.locationType.id != Constants.WAREHOUSE_LOCATION_TYPE_ID } ]
+	def list = {
+		params.max = Math.min(params.max ? params.int('max') : 25, 100)
+		[locationInstanceList: Location.list(params), locationInstanceTotal: Location.count()]
 	}
 	
 	def edit = {
