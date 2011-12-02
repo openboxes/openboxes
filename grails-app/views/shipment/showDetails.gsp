@@ -439,7 +439,7 @@
 												<g:set var="count" value="${0 }"/>
 												<g:set var="previousContainer"/>
 												
-												<g:set var="shipmentItems" value="${shipmentInstance.shipmentItems.sort{(it?.container?.parentContainer) ? it?.container?.parentContainer?.sortOrder : it?.container?.sortOrder} }"/>
+												<g:set var="shipmentItems" value="${shipmentInstance.shipmentItems.sort{(it?.container?.parentContainer) ? it?.container?.parentContainer?.name?.toLowerCase() : it?.container?.name?.toLowerCase() } }"/>
 												<g:each in="${shipmentItems}" var="item" status="i">
 													<g:set var="newContainer" value="${previousContainer != item?.container }"/>
 													<tr class="${(count++ % 2 == 0)?'odd':'even'}" >

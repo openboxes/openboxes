@@ -22,14 +22,14 @@
 				<div>
 		        	<g:set var="varStatus" value="${0}"/>
 		        	<g:set var="totalProducts" value="${0}"/>      			
-		         	<table style="border:none;">
+		         	<table>
 		         		<tr>
 		         			<td style="padding:0px; margin:0px;">
 		         				<g:render template="filters" 
 		         					model="[commandInstance:commandInstance, quickCategories:quickCategories]"/>						
 		         			</td>
 		         		</tr>
-						<tr class="prop" style="border:1px dotted lightgrey;">
+						<tr class="prop">
 			         		<td style="padding: 0; margin: 0; vertical-align: middle;">
 			            		<g:if test="${commandInstance?.categoryToProductMap}">
 						            <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
@@ -125,16 +125,29 @@
 													</g:each>
 												</g:each>
 											</tbody>
+											<tfoot>
+												<tr class="prop">
+													<td colspan="1" class=left>
+														<g:render template="./actions" model="[]"/>														
+													</td>			
+													<td colspan="6" class="left middle">
+														<warehouse:message code="inventory.showingProductsInCategories.label" args="[totalProducts,commandInstance?.categoryToProductMap?.keySet()?.size()]" />
+														<%-- 
+														(<g:each var="category" in="${commandInstance?.categoryToProductMap?.keySet()}">
+															<g:link controller="inventory" action="browse" params="['categoryId':category.id]">
+																<format:metadata obj="${category}"/>&nbsp;
+															</g:link>
+														</g:each>)
+														--%>
+													</td>
+												</tr>
+											</tfoot>
 										</table>		
 									</form>
 								</g:if>	    
 			         		</td>
 			         	</tr>
 			        </table>
-				</div>
-				<div style="padding: 10px;">
-					<g:render template="./actions" model="[]"/>	&nbsp;
-					<warehouse:message code="inventory.showingProductsInCategories.label" args="[totalProducts,commandInstance?.categoryToProductMap?.keySet()?.size()]" />
 				</div>
 			</div>
 		</div>
