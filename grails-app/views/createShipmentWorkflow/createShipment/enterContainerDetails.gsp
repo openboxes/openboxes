@@ -83,31 +83,35 @@
 									<thead>
 										<tr class="odd"><%-- --%>
 											<td colspan="2">
-												<h3><warehouse:message code="shipping.allShipmentContainers.label"/></h3>
+												<span class="action-menu" >
+													<button class="action-btn">
+														<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>							
+														<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
+													</button>
+													<div class="actions" style="position: absolute; z-index: 1; display: none;">
+														<g:render template="shipmentMenuItems"/>
+														<g:if test="${shipmentInstance?.containers?.findAll({!it.parentContainer})}">
+															<div class="action-menu-item">
+																<hr/>
+															</div>
+														</g:if>
+														<g:each var="containerInstance" in="${shipmentInstance?.containers?.findAll({!it.parentContainer})?.sort { it?.name?.toLowerCase()}}">
+															<div class="action-menu-item">														
+																<g:link action="createShipment" event="enterContainerDetails" params="['containerId':containerInstance?.id]" fragment="container-${containerInstance?.id }">
+																	<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="View" style="vertical-align: middle"/>
+																	&nbsp;${warehouse.message(code:'default.view.label', args: [containerInstance?.name] )}
+																</g:link>
+															</div>
+														</g:each>
+													</div>
+												</span>				
+												<label><warehouse:message code="shipping.allShipmentContainers.label"/></label>
 											</td>
 										</tr>
 										<tr class="odd">
 											<td colspan="2">
 												<div style="border: 0px;">
-													<span class="action-menu" >
-														<button class="action-btn">
-															<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>							
-															<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
-														</button>
-														<div class="actions" style="position: absolute; z-index: 1; display: none;">
-															<g:render template="shipmentMenuItems"/>
-															<%-- 
-															<g:each var="containerInstance" in="${shipmentInstance?.containers?.findAll({!it.parentContainer})?.sort()}">
-																<div class="action-menu-item">														
-																	<g:link action="createShipment" event="enterContainerDetails" params="['containerId':containerInstance?.id]" fragment="container-${containerInstance?.id }">
-																		<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="View" style="vertical-align: middle"/>&nbsp;${containerInstance?.name }
-																	</g:link>
-																</div>
-															</g:each>
-															--%>
-														</div>
-													</span>				
-								 					<span class="fade">&nbsp;|&nbsp; <warehouse:message code="shipping.totalWeight.label"/>:</span> 
+								 					<span class="fade"><warehouse:message code="shipping.totalWeight.label"/>:</span> 
 													<g:formatNumber format="#,##0.00" number="${shipmentInstance?.totalWeightInPounds() ? shipmentInstance?.totalWeightInPounds() : 0.00 }" /> <warehouse:message code="default.lbs.label"/>
 										 		</div>
 										 	</td>
@@ -130,8 +134,6 @@
 															<g:render template="containerMenuItems" model="[container:containerInstance]"/>
 														</div>
 													</span>
-												
-												
 													<g:link action="createShipment" event="enterContainerDetails"><warehouse:message code="shipping.unpackedItems.label"/></g:link>
 												</div>
 											</td>
@@ -215,7 +217,16 @@
 									<thead>	
 										<tr class="odd">
 											<td colspan="5">
-												<h3>
+												<span class="action-menu" >
+													<button class="action-btn">
+														<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>							
+														<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
+													</button>
+													<div class="actions" style="position: absolute; z-index: 1; display: none;">
+														<g:render template="containerMenuItems" model="[container:selectedContainer]"/>
+													</div>
+												</span>				
+												<label>
 													<g:if test="${selectedContainer}">								
 														<g:if test="${selectedContainer.parentContainer }">
 															${selectedContainer?.parentContainer?.name } &rsaquo;
@@ -225,23 +236,15 @@
 													<g:else>
 														<warehouse:message code="shipping.unpackedItems.label" />			 						
 													</g:else>
-												</h3>
+												</label>
+												
 											</td>
 										</tr>
 										<tr>
 											<td colspan="5" class="odd">
 								 				<div>
-													<span class="action-menu" >
-														<button class="action-btn">
-															<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>							
-															<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
-														</button>
-														<div class="actions" style="position: absolute; z-index: 1; display: none;">
-															<g:render template="containerMenuItems" model="[container:selectedContainer]"/>
-														</div>
-													</span>				
 													<span class="fade">
-										 				&nbsp;|&nbsp; <warehouse:message code="default.weight.label"/>: 
+										 				<warehouse:message code="default.weight.label"/>: 
 										 			</span>
 									 				<g:if test="${selectedContainer?.weight }">
 										 				<g:formatNumber format="#,##0.00" number="${selectedContainer?.weight }"/>
