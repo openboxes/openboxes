@@ -88,7 +88,7 @@
 										</tr>
 										<tr class="odd">
 											<td colspan="2">
-												<div style="border: 0px; ">
+												<div style="border: 0px;">
 													<span class="action-menu" >
 														<button class="action-btn">
 															<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>							
@@ -121,7 +121,7 @@
 										<tr class="${count++%2==0?'even':'odd' }">
 											<g:set var="styleClass" value="${selectedContainer == null ? 'selected' : 'not-selected' }"/>
 											<td class="droppable">
-												<div>
+												<div class="${styleClass }">
 													<span class="action-menu" >
 														<button class="action-btn">
 															<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
@@ -137,12 +137,12 @@
 											</td>
 										</tr>										
 										<g:if test="${shipmentInstance?.containers }">
-											<g:each var="containerInstance" in="${shipmentInstance?.containers?.findAll({!it.parentContainer})?.sort()}">
+											<g:each var="containerInstance" in="${shipmentInstance?.containers?.findAll({!it.parentContainer})?.sort { it?.name?.toLowerCase() }}">
 												<g:set var="styleClass" value="${containerInstance?.id == selectedContainer?.id ? 'selected' : 'not-selected' }"/>
 												<tr style="border: 0px solid lightgrey;" class="${count++%2==0?'even':'odd' }">
 													<td style="vertical-align: middle;" id="${containerInstance?.id }" class="droppable">													
 														<a name="container-${containerInstance.id }"></a>
-														<div>
+														<div class="${styleClass }">
 															<span class="action-menu" >
 																<button class="action-btn">
 																	<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
@@ -173,7 +173,7 @@
 													<tr class="${count++%2==0?'even':'odd' }">
 														<td class="droppable">
 															
-															<div style="margin-left: 25px;">
+															<div class="${styleClass }" style="margin-left: 25px;">
 																<span class="action-menu" >
 																	<button class="action-btn">
 																		<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
