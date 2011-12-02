@@ -248,6 +248,13 @@ label, input, td, th {
 	/*font-size: 10pt;*/
 }
 
+th { 
+	border-top: 0px;
+	border-bottom: 3px solid lightgrey;
+	background-color: white;
+}
+
+
 .toggle-button { 
 	cursor: hand;
 }
@@ -404,6 +411,7 @@ input.button {
 	font-size: 9pt;	
 }
 label { 
+	color: #666;
 	padding-right: 15px; 
 	font-weight: bold;
 }
@@ -763,4 +771,5 @@ border: 1px solid #CCC;
 .scrollTable {
 	border-collapse:collapse;
 }
+
 

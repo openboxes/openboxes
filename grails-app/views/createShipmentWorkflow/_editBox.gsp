@@ -3,7 +3,7 @@
 		$("#dlgEditBox").dialog({ autoOpen: true, modal: true, width: '600px' });				
 	});
 </script>	   
-	<div id="dlgEditBox" title="${warehouse.message(code:'shipping.editABox.message')}" style="padding: 10px; display: none;" >
+	<div id="dlgEditBox" title="${warehouse.message(code:'shipping.editBox.label')}" style="padding: 10px; display: none;" >
 
 
 	<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.Container" form="editBox"/>
@@ -23,18 +23,17 @@
 				</g:if>
 				<tr>
 					<td></td>
-					<td style="text-align: left;">
-						<div class="buttons">
+					<td>
+						<div class="buttons left">
 							<g:submitButton name="saveBox" value="${warehouse.message(code:'shipping.button.saveBox.label')}"></g:submitButton>
 							<g:if test="${boxToEdit}">
 								<g:submitButton name="deleteBox" value="${warehouse.message(code:'shipping.button.removeBox.label')}" onclick="return confirm('${warehouse.message(code:'shipping.confirm.deleteBox.message')}')"></g:submitButton>
 							</g:if>
 							<button name="cancelDialog" type="reset" onclick="$('#dlgEditBox').dialog('close');"><warehouse:message code="default.button.cancel.label"/></button>
 						</div>
-
-							<div class="buttons">
-								<g:submitButton name="addItemToBox" value="${warehouse.message(code:'shipping.addItemToBox.label')}"></g:submitButton>
-							</div>
+						<div class="buttons left">
+							<g:submitButton name="addItemToBox" value="${warehouse.message(code:'shipping.addItemToBox.label')}"></g:submitButton>
+						</div>
 	
 						
 						<!--  

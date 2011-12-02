@@ -86,19 +86,6 @@ class Shipment implements Comparable, Serializable {
 		//events joinTable:[name:'shipment_event', key:'shipment_id', column:'event_id']
 	}	
 
-	/*	
-	static mapping = {
-		containers sort: 'dateCreated', order: 'asc'
-		events sort: 'eventDate', order: 'desc'
-		documents sort: 'dateCreated', order: 'desc'
-		comments sort: 'dateCreated', order: 'desc'
-		
-		//events joinTable:[name:'shipment_event', key:'shipment_id', column:'event_id'], sort: 'eventDate', order: 'desc'
-		//documents joinTable:[name:'shipment_document', key:'shipment_id', column:'document_id'], sort: 'dateCreated', order: 'asc'	
-		//comments joinTable:[name:'shipment_comment', key:'shipment_id', column:'comment_id'], sort: 'dateCreated', order: 'desc'		
-	}
-	*/
-
 	// Constraints
 	static constraints = {
 		name(nullable:false, blank: false, maxSize: 255)

@@ -43,9 +43,9 @@
 					</td>
 				</tr>
 				<tr>
-					<td></td>
-					<td style="text-align: left;">
-						<div class="buttons">
+					<td class="name"></td>
+					<td>
+						<div class="buttons left">
 							<g:if test="${itemToEdit}">
 								<g:submitButton name="updateItem" value="${warehouse.message(code:'shipping.updateItem.label')}"></g:submitButton>
 								<g:submitButton name="deleteItem" value="${warehouse.message(code:'shipping.removeItem.label')}" onclick="return confirm('${warehouse.message(code:'shipping.confirm.deleteItem.message')}')"></g:submitButton>
@@ -56,7 +56,7 @@
 							<button name="cancelDialog" type="reset" onclick="$('#dlgEditItem').dialog('close');"><warehouse:message code="default.button.cancel.label"/></button>
 						</div>
 						<g:if test="${addItemToContainerId}">
-							<div class="buttons">
+							<div class="buttons left">
 								<g:submitButton name="addAnotherItem" value="${warehouse.message(code:'shipping.saveItemAndAddAnother.label')}"></g:submitButton>
 							</div>
 						</g:if>

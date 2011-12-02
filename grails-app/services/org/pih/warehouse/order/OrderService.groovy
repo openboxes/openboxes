@@ -7,6 +7,8 @@ import java.util.Set
 
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.EventType;
+import org.pih.warehouse.core.ListCommand;
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.Location
@@ -262,5 +264,31 @@ class OrderService {
 		}
 		return quantityMap;
 	}
+	
+	/**
+	*
+	* @param shipments
+	* @return
+	*/
+   Map<EventType, ListCommand> getOrdersByStatus(List orders) {
+	   def orderMap = new TreeMap<OrderStatus, ListCommand>();
+	   
+	   OrderStatus.list().each {
+		   orderMap[it] = [];
+	   }
+	   	   
+	   orders.each {
+		   def key = it.status;
+		   def orderList = orderMap[key];
+		   if (!orderList) {
+			   orderList = new ListCommand(category: key, objectList: new ArrayList());
+		   }
+		   orderList.objectList.add(it);
+		   orderMap.put(key, orderList)
+	   }
+	   return orderMap;
+   }
+
+	
 	
 }

@@ -10,7 +10,7 @@
 						<div>
 							<span class="order-title" style="font-size: 1.5em; font-weight: bold; line-height: 1em;">${orderInstance?.description}</span>							
 						</div> 
-						<div class="fade" style="font-size: 0.9em; line-height: 20px;">
+						<div>
 							<!-- Hide action menu menu if the user is in the shipment workflow -->						
 							<g:if test="${!params.execution  && !isAddingComment && !isAddingDocument }">
 								<g:render template="/order/actions" model="[orderInstance:orderInstance]"/> &nbsp;|&nbsp;

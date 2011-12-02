@@ -68,8 +68,8 @@
                             	<tr class="prop">
 		                        	<td valign="top"></td>
 		                        	<td valign="top">                        	
-						                <div class="buttons">
-						                    <g:actionSubmit class="save" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
+						                <div class="buttons left">
+						                    <g:actionSubmit class="save" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
 						                    <g:actionSubmit class="delete" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
 						                </div>
 		    						</td>                    	

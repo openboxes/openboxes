@@ -3,7 +3,14 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'requests.label', default: 'Requests').toLowerCase()}" />
-        <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
+        <title>
+			<g:if test="${params.requestType == 'INCOMING'}">            
+	        	<warehouse:message code="request.requestsPlacedWithYou.message"/>
+			</g:if>
+			<g:if test="${params.requestType == 'OUTGOING'}">            
+				<warehouse:message code="request.requestsPlacedByYou.message"/>
+			</g:if>
+		</title>
 		<content tag="pageTitle"><warehouse:message code="default.list.label" args="[entityName]" /></content>
         
     </head>
@@ -12,17 +19,13 @@
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
-            <div class="list">				
-				<div id="outgoingRequests" class="list">            
-	           		<h3><warehouse:message code="request.requestsPlacedWithYou.message"/> (${session.warehouse?.name })</h3>
-					<g:render template="list" model="[requestInstanceList:outgoingRequests,requestType:'outgoing']"/>
-				</div>				
-				<br/>
-				<div id="incomingRequests" class="list">            
-	            	<h3><warehouse:message code="request.requestsPlacedByYou.message"/> (${session.warehouse?.name })</h3>
-					<g:render template="list" model="[requestInstanceList:incomingRequests,requestType:'incoming']"/>
-				</div>
-				
+            <div class="list">		
+				<g:if test="${params.requestType == 'OUTGOING'}">            
+					<g:render template="list" model="[requestInstanceList:outgoingRequests,requestType:'OUTGOING']"/>
+				</g:if>
+				<g:if test="${params.requestType == 'INCOMING'}">            
+	            	<g:render template="list" model="[requestInstanceList:incomingRequests,requestType:'INCOMING']"/>
+				</g:if>
 			</div>
         </div>
     </body>

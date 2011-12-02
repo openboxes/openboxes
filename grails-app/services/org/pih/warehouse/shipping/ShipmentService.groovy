@@ -438,6 +438,63 @@ class ShipmentService {
 	}
 	
 	/**
+	 * Move a container and all of its children to the new shipment.
+	 * 
+	 * @param oldContainer
+	 * @param newShipment
+	 */
+	void moveContainers(Container oldContainer, Shipment newShipment) { 		
+		if (oldContainer.containers) { 			
+			//oldContainer.containers.each { 
+			//	moveContainer(it, newShipment)
+			//}
+			throw new UnsupportedOperationException();
+		}
+		moveContainer(oldContainer, newShipment)
+		
+		//throw new RuntimeException();
+	}
+	
+	/**
+	 * Move a container from one shipment to the given shipment.
+	 * 
+	 * @param container
+	 * @param shipment
+	 */
+	void moveContainer(Container oldContainer, Shipment newShipment) { 
+		
+		// Copy the container and add to the new shipment
+		def newContainer = oldContainer.copyContainer();		
+		newShipment.addToContainers(newContainer)
+		
+		// Copy each shipment item from one shipment to the other
+		def oldShipment = oldContainer.shipment;
+		oldContainer.shipmentItems.each {
+			def shipmentItem = new ShipmentItem();
+			shipmentItem.container = newContainer
+			shipmentItem.lotNumber = it.lotNumber
+			shipmentItem.expirationDate = it.expirationDate
+			shipmentItem.quantity = it.quantity
+			shipmentItem.product = it.product
+			shipmentItem.recipient = it.recipient
+			newShipment.addToShipmentItems(shipmentItem);
+			oldShipment.removeFromShipmentItems(it)
+			it.delete();
+		}		
+		newShipment.save(failOnError:true)
+		
+		// Remove old container from shipment
+		oldShipment.removeFromContainers(oldContainer);
+		oldContainer.delete();
+		
+		
+		
+		
+		
+	}
+	
+	
+	/**
 	 * Saves an item
 	 * 
 	 * @param item

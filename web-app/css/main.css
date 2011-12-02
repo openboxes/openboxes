@@ -212,7 +212,7 @@ th.desc a {
 .list th, .list td {
     /*border-left: 1px solid #ddd;*/
 }
-.list th:hover, .list tr:hover {
+.list tbody tr:hover {
     background: #b2d1ff; 
 }
 

@@ -66,8 +66,8 @@
 		                        <tr class="prop">
 		                        	<td valign="top"></td>
 		                        	<td valign="top">
-						                <div class="buttons">
-						                   <g:submitButton name="create" class="save" value="${warehouse.message(code: 'default.button.create.label', default: 'Create')}" />
+						                <div class="buttons left">
+						                   <g:submitButton name="create" class="save" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
 						                   
 						                   <g:link action="list">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
 						                   

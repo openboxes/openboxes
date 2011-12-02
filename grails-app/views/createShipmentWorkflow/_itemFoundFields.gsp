@@ -33,8 +33,8 @@
 				
 				<tr>
 					<td></td>
-					<td style="text-align: left;">
-						<div class="buttons">
+					<td>
+						<div class="buttons left">
 							<g:if test="${itemToEdit}">
 								<g:submitButton name="updateItem" value="${warehouse.message(code:'shipping.updateItem.label')}"></g:submitButton>
 								<g:submitButton name="deleteItem" value="${warehouse.message(code:'shipping.removeItem.label')}" onclick="return confirm('${warehouse.message(code:'shipping.confirm.deleteItem.message')}')"></g:submitButton>
@@ -42,12 +42,10 @@
 							<g:else>
 								<g:submitButton name="saveItem" value="${warehouse.message(code:'shipping.saveItem.label')}"></g:submitButton>
 							</g:else>
+							<g:if test="${addItemToContainerId}">
+								<g:submitButton name="addAnotherItem" value="${warehouse.message(code:'shipping.saveItemAndAddAnother.label')}"></g:submitButton>
+							</g:if>
 							<button name="cancelDialog" type="reset" onclick="$('.ui-dialog-titlebar-close').click();"><warehouse:message code="default.button.cancel.label"/></button>
 						</div>
-						<g:if test="${addItemToContainerId}">
-							<div class="buttons">
-								<g:submitButton name="addAnotherItem" value="${warehouse.message(code:'shipping.saveItemAndAddAnother.label')}"></g:submitButton>
-							</div>
-						</g:if>
 					</td>
 				</tr>

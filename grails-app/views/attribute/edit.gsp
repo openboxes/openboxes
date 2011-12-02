@@ -92,9 +92,9 @@
 	                            </tr>
 	                        	                        
                             	<tr class="prop">
-		                        	<td valign="top"></td>
-		                        	<td valign="top">                        	
-						                <div class="buttons">
+		                        	<td valign="top" class="name"></td>
+		                        	<td valign="top" class="value">            	
+						                <div class="buttons left">
 						                    <g:actionSubmit class="save" action="save" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
 						                    <g:actionSubmit class="delete" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
 						                </div>

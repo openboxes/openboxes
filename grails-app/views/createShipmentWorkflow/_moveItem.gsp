@@ -1,6 +1,6 @@
 <script type="text/javascript">
 	$(document).ready(function(){					
-		$("#dlgMoveItem").dialog({ autoOpen: true, modal: true, width: '800px'});	
+		$("#dlgMoveItem").dialog({ autoOpen: true, modal: true, width: '600px'});	
 	});			
 </script>
 
@@ -94,9 +94,8 @@
 						</td>
 					</tr>
 					<tr>
-						<td></td>
-						<td style="text-align: left;">
-							<div class="buttons">
+						<td colspan="2">
+							<div class="buttons center">
 								<g:submitButton name="moveItemToContainer" value="${warehouse.message(code:'default.button.move.label')}"></g:submitButton>
 								<button name="cancelDialog" type="reset" onclick="$('#dlgMoveItem').dialog('close');"><warehouse:message code="default.button.cancel.label"/></button>
 							</div>

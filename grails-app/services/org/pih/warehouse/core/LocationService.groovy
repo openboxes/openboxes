@@ -20,8 +20,8 @@ class LocationService {
 	}
 	
 	List getLoginLocations(Location currentLocation) { 
-		def requiredActivities = grailsApplication.config.app.loginLocation.requiredActivities
 		def locations = []
+		def requiredActivities = grailsApplication.config.app.loginLocation.requiredActivities
 		if (requiredActivities) { 
 			requiredActivities.each { activity ->
 				locations += getAllLocations()?.findAll { it.supports(activity) }

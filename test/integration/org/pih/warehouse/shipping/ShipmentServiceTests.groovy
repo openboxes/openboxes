@@ -10,7 +10,7 @@ class ShipmentServiceTests {
 
 	@Before
 	public void setUp() throws Exception {
-		def shipment = new Shipment(name: "Test Shipment").save();
+		def shipment = new Shipment(name: "Test Shipment").save(failOnError:true);
 	}
 
 	@Test 
@@ -18,7 +18,6 @@ class ShipmentServiceTests {
 		def shipment = Shipment.findByName("Test Shipment");
 		assertNotNull shipment;
 	}
-	
 	
 	@After
 	public void tearDown() throws Exception {	

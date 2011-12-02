@@ -109,19 +109,19 @@
 									</tr>	
 								</g:if>					
 		                    </tbody>
+		                    <tfoot>
+								<tr class="prop">
+									<td colspan="2" class="right">
+										<div class="buttons">
+											<button name="_eventId_back">&lsaquo; <warehouse:message code="default.button.back.label"/></button>	
+											<button name="_eventId_next"><warehouse:message code="default.button.next.label"/> &rsaquo;</button> 
+											<button name="_eventId_save"><warehouse:message code="default.button.saveAndExit.label"/></button>
+											<button name="_eventId_cancel"><warehouse:message code="default.button.cancel.label"/></button>						
+										</div>
+									</td>
+								</tr>		                    
+		                    </tfoot>
 	               		</table>
-					</div>
-					<div class="">
-						<table>
-							<tr>
-								<td width="100%" style="text-align: right;">
-									<button name="_eventId_back">&lsaquo; <warehouse:message code="default.button.back.label"/></button>	
-									<button name="_eventId_next"><warehouse:message code="default.button.next.label"/> &rsaquo;</button> 
-									<button name="_eventId_save"><warehouse:message code="default.button.saveAndExit.label"/></button>
-									<button name="_eventId_cancel"><warehouse:message code="default.button.cancel.label"/></button>						
-								</td>
-							</tr>
-						</table>
 					</div>
 				</fieldset>
 			</g:form>

@@ -35,14 +35,16 @@
 						            <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
 						                <table class="tableScroll"> 
 											<thead> 
-					           					<tr class="odd">
+					           					<tr>
 													<th rowspan="2" class="center middle">
 														<input type="checkbox" id="toggleCheckbox">	
 													</th>
 													<th rowspan="2" class="center middle"><warehouse:message code="category.label"/></th>
 													<th rowspan="2" class="middle"><warehouse:message code="default.description.label"/></th>
-													<th rowspan="2" class="center middle" style="border-left: 1px solid #F7F7F7; border-right:1px solid lightgrey;"><warehouse:message code="product.manufacturer.label"/></th>
-					           		 				<th colspan="2" class="center" style="border-left: 1px solid lightgrey; border-right: 1px solid lightgrey;"><warehouse:message code="default.pending.label"/></th>
+													<th rowspan="2" class="center middle" style="border-right:1px solid lightgrey;"><warehouse:message code="product.manufacturer.label"/></th>
+					           		 				<td colspan="2" class="center" style="background-color: white; border-left: 1px solid lightgrey; border-right: 1px solid lightgrey;">
+					           		 					<label><warehouse:message code="default.pending.label"/></label>
+					           		 				</td>
 													<th rowspan="2" class="center middle"><warehouse:message code="default.qty.label"/></th>
 					           					</tr>
 												<tr class="odd">

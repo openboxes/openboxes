@@ -25,6 +25,12 @@
 		</g:link> 	
 	</div>
 	<div class="action-menu-item">
+		<g:link action="createShipment" event="moveContainer" params="[containerToMoveId:container?.id]">
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'package_go.png')}" alt="Move this container" style="vertical-align: middle"/>&nbsp;
+			<warehouse:message code="shipping.moveThis.label"/> ${format.metadata(obj:container?.containerType).toLowerCase()  }
+		</g:link> 	
+	</div>
+	<div class="action-menu-item">
 		<g:link action="createShipment" event="deleteContainer" params="['container.id':container?.id]" onclick="return confirm('${warehouse.message(code:'shipping.confirm.deleteThis.message')} ${format.metadata(obj:selectedContainer?.containerType).toLowerCase()}?')">
 			<img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="Delete container" style="vertical-align: middle"/>&nbsp;
 			<warehouse:message code="shipping.deleteThis.label"/> ${format.metadata(obj:container?.containerType).toLowerCase()  }

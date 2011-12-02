@@ -157,7 +157,14 @@ class CreateShipmentWorkflowController {
 				// set the container we will to edit
 				flash.containerToEdit = Container.get(params.containerToEditId)
 			}.to("enterContainerDetails")
-			
+
+			on("moveContainer") {
+				// set the container we will to edit
+				def location = Location.get(session.warehouse.id)
+				flash.containerToMove = Container.get(params.containerToMoveId)
+				flash.shipments = shipmentService.getOutgoingShipments(location)
+			}.to("enterContainerDetails")
+
 			on("saveContainer").to("saveContainerAction")
 			
 			on("deleteContainer") {
@@ -241,7 +248,7 @@ class CreateShipmentWorkflowController {
 			}.to("saveItemAction")
 			
 			on("moveItemToContainer").to("moveItemAction")
-			
+			on("moveContainerToShipment").to("moveContainerAction")
 			/**
 			on("addAnotherBox") {
 				// this parameter triggers the "Add Box" dialog for the container to be opened on page reload
@@ -286,7 +293,7 @@ class CreateShipmentWorkflowController {
     			}
     			else {
     				shipmentService.saveContainer(container)
-    				
+					
     				// save a reference to this container if we need to clone it
     				if (flash.cloneQuantity) { flash.cloneContainer = container }
     				
@@ -294,10 +301,14 @@ class CreateShipmentWorkflowController {
     				if (flash.addItemToContainerId == -1) { flash.addItemToContainerId = container.id }
     				if (flash.addBoxToContainerId == -1) { flash.addBoxToContainerId = container.id }
     				
+					// used to refocus page with the appropriate container
+					flash.selectedContainer = container
+
     				valid()
     			}	
     		}
-    		
+			
+			
     		on("valid").to("cloneContainerAction")
     		on("invalid").to("enterContainerDetails")
     	}
@@ -355,6 +366,9 @@ class CreateShipmentWorkflowController {
 					
 					// assign the id of the box if needed
     				if (flash.addItemToContainerId == -1) { flash.addItemToContainerId = box.id }
+					
+					// used to refocus page with the appropriate container
+					flash.selectedContainer = box
 					
 				}
 				
@@ -463,6 +477,25 @@ class CreateShipmentWorkflowController {
 			on("valid").to("enterContainerDetails")
 			on("invalid").to("enterContainerDetails")
 		}
+		moveContainerAction {
+			action {				
+				// move an item to another container
+				log.info "Move container to another shipment " + params
+				def container = Container.get(params.container.id);
+				def shipment = Shipment.get(params.shipment.id)
+				
+				try { 
+					shipmentService.moveContainers(container, shipment)
+				} 
+				catch (UnsupportedOperationException e) { 
+					flash.message = "${warehouse.message(code: 'default.unsupportedOperation.message')}"
+					error()
+				}
+			}
+			on("success").to("enterContainerDetails")
+			on("error").to("enterContainerDetails")
+		}
+				
 		saveItemAction { 
 			action { 
 				try {

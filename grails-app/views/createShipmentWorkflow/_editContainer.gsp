@@ -21,18 +21,16 @@
 				<g:render template="containerFields" model="['container':container]"/>
 				<tr>
 					<td></td>
-					<td style="text-align: left;">
-						<div class="buttons">
+					<td>
+						<div class="buttons left">
 							<g:submitButton name="saveContainer" value="${warehouse.message(code:'shipping.save.label')} ${container ? format.metadata(obj:container?.containerType).toLowerCase() : format.metadata(obj:containerTypeToAdd).toLowerCase()}"></g:submitButton>
 							<g:if test="${container}">
 								<g:submitButton name="deleteContainer" value="${warehouse.message(code:'shipping.remove.label')} ${container ? format.metadata(obj:container?.containerType).toLowerCase() : format.metadata(obj:containerTypeToAdd).toLowerCase()}"  onclick="return confirm('${warehouse.message(code:'shipping.confirm.deleteThis.message')} ${container ? format.metadata(obj:container?.containerType).toLowerCase() : format.metadata(obj:containerTypeToAdd).toLowerCase()}?')"></g:submitButton>
 							</g:if>
 							<button name="cancelDialog" type="reset" onclick="$('#dlgEditContainer').dialog('close');"><warehouse:message code="default.button.cancel.label"/></button>
 						</div>
-						<div class="buttons">
+						<div class="buttons left">
 							<g:submitButton name="addBoxToContainer" value="${warehouse.message(code:'shipping.addBoxToThis.label')} ${container ? format.metadata(obj:container?.containerType).toLowerCase() : format.metadata(obj:containerTypeToAdd).toLowerCase()}"></g:submitButton>
-						</div>
-						<div class="buttons">
 							<g:submitButton name="addItemToContainer" value="${warehouse.message(code:'shipping.addItemToThis.label')} ${container ? format.metadata(obj:container?.containerType).toLowerCase() : format.metadata(obj:containerTypeToAdd).toLowerCase()}"></g:submitButton>
 						</div>
 						

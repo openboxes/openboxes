@@ -18,7 +18,7 @@
 							${shipmentInstance?.name}
 						</span>							
 					</div> 
-					<div class="fade" style="font-size: 0.9em; line-height: 20px;">
+					<div>
 
 						<!-- Hide action menu menu if the user is in the shipment workflow -->						
 						<g:if test="${!params.execution }">

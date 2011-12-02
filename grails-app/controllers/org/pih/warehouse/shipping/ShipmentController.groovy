@@ -407,7 +407,8 @@ class ShipmentController {
 	
 	def list = {
 		
-		boolean incoming = params.type == "incoming"
+		
+		boolean incoming = params.type == "INCOMING"
 		def origin = incoming ? (params.origin ? Location.get(params.origin) : null) : Location.get(session.warehouse.id)
 		def destination = incoming ? Location.get(session.warehouse.id) : (params.destination ? Location.get(params.destination) : null)
 		def shipmentType = params.shipmentType ? ShipmentType.get(params.shipmentType) : null

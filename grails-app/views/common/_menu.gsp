@@ -59,7 +59,7 @@
 			<ul>
 				<li>
 					<span class="menuButton">
-						<g:link controller="order" action="list"><warehouse:message code="order.list.label" default="List orders"/></g:link>
+						<g:link controller="order" action="list" params="[status:'PENDING']"><warehouse:message code="order.list.label" default="List orders"/></g:link>
 					</span>
 				</li>
 				<%-- 
@@ -96,7 +96,12 @@
 			<ul>
 				<li>
 					<span class="menuButton">
-						<g:link controller="request" action="list"><warehouse:message code="request.list.label"  default="List requests "/></g:link>
+						<g:link controller="request" action="list" params="[requestType:'INCOMING']"><warehouse:message code="request.listIncoming.label" /></g:link>
+					</span>
+				</li>						
+				<li>
+					<span class="menuButton">
+						<g:link controller="request" action="list" params="[requestType:'OUTGOING']"><warehouse:message code="request.listOutgoing.label" /></g:link>
 					</span>
 				</li>						
 				
@@ -117,7 +122,7 @@
 			<ul>
 				<li>
 					<span class="menuButton">
-						<g:link controller="shipment" action="list"><warehouse:message code="shipping.listOutgoing.label"  default="List outgoing shipments"/></g:link>
+						<g:link controller="shipment" action="list" params="[status:'PENDING']"><warehouse:message code="shipping.listOutgoing.label"  default="List outgoing shipments"/></g:link>
 					</span>
 				</li>
 				<%-- 
@@ -148,7 +153,7 @@
 			<ul>
 				<li>
 					<span class="menuButton">
-						<g:link controller="shipment" action="list" params="[type: 'incoming']"><warehouse:message code="shipping.listIncoming.label"  default="List incoming shipments"/></g:link>
+						<g:link controller="shipment" action="list" params="[type: 'incoming', status: 'PENDING']"><warehouse:message code="shipping.listIncoming.label"  default="List incoming shipments"/></g:link>
 					</span>
 				</li>
 				<%-- 

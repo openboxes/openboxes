@@ -24,8 +24,8 @@ class DashboardController {
 		def allOutgoingShipments = shipmentService.getShipmentsByOrigin(location)
 		def allIncomingShipments = shipmentService.getShipmentsByDestination(location)
 		
-		def outgoingOrders = orderService.getOutgoingOrders(location).groupBy { it?.status };
-		def incomingOrders = orderService.getIncomingOrders(location).groupBy { it?.status };
+		def outgoingOrders = orderService.getOutgoingOrders(location)
+		def incomingOrders = orderService.getIncomingOrders(location)
 		
 		[ 	outgoingShipments : recentOutgoingShipments, 
 			incomingShipments : recentIncomingShipments,
@@ -33,6 +33,8 @@ class DashboardController {
 			allIncomingShipments : allIncomingShipments,
 			outgoingOrders : outgoingOrders,
 			incomingOrders : incomingOrders,
+			outgoingOrdersByStatus: orderService.getOrdersByStatus(outgoingOrders),
+			incomingOrdersByStatus: orderService.getOrdersByStatus(incomingOrders),
 			outgoingShipmentsByStatus : shipmentService.getShipmentsByStatus(allOutgoingShipments),
 			incomingShipmentsByStatus : shipmentService.getShipmentsByStatus(allIncomingShipments)
 		]

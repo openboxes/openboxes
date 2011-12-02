@@ -137,21 +137,31 @@
 	                                </td>
 	                            </tr>
 	                            -->
+	                            <tr class="prop">
+	                            
+	                            	<td valign="top" class="name">
+	                            	
+	                            	</td>
+	                            	<td class="value">
+										<div class="buttons left">
+						                   <button type="submit">								
+												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'accept.png')}" class="top"/>
+												<warehouse:message code="default.button.save.label"/>
+											</button>
+											&nbsp;
+											<g:link action="list">
+												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'decline.png')}" class="middle"/>
+												${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}						
+											</g:link>			
+										</div>
+									</td>
+								</tr>
 	                            
 	                        </tbody>
 	                    </table>
 	                </div>
 	                
                 </fieldset>
-				<div class="buttons">
-                   <button type="submit">								
-						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'tick.png')}"/>&nbsp;<warehouse:message code="default.button.save.label"/>
-					</button>
-					&nbsp;
-					<g:link action="list">
-						${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}						
-					</g:link>			
-				</div>
             </g:form>
         </div>
 	    <script type="text/javascript">

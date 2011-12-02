@@ -10,8 +10,10 @@
 </g:if>
 <g:else>
 	<div class="action-menu-item">														
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="Delete item" style="vertical-align: middle"/>&nbsp;
-		<warehouse:message code="default.noActions.label"/>
+		<a href="javascript:void(0);">
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="" style="vertical-align: middle"/>&nbsp;
+			<warehouse:message code="shipping.noActions.label" args="${[format.metadata(obj:shipmentInstance?.shipmentType)]}"/>
+		</a>
 	</div>
 </g:else>							
 		

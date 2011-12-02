@@ -13,7 +13,7 @@
 					<div class="widget-header"><h2><warehouse:message code="order.summary.label" args="[session.warehouse.name]"/></h2></div>	    			
 	    			<div class="widget-content">	    					    			
 	    				<div id="receivingsummary">	
-		    				<g:if test="${!incomingOrders}">
+		    				<g:if test="${!incomingOrdersByStatus}">
    								<div style="text-align: left; padding: 10px;" class="fade">
    									(<warehouse:message code="order.noRecent.label"/>)
    								</div>
@@ -22,14 +22,14 @@
 					    		<table>
 					    			<thead>
 					    				<tr class="odd">
-					    					<th colspan="2" class="center">
+					    					<th colspan="2" class="left">
 												<warehouse:message code="order.ordersInto.label" args="[session.warehouse.name]"/>
 					    					</th>
 					    				</tr>
 					    			</thead>
 					    			<tbody>
-										<g:each var="entry" in="${incomingOrders}" status="i">	 
-											<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+										<g:each var="entry" in="${incomingOrdersByStatus}" status="i">	 
+											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 												<td>
 													<g:link controller="order" action="list" params="['status':entry?.key]">
 														${format.metadata(obj:entry.key)} 
@@ -37,18 +37,20 @@
 												</td>
 												<td style="text-align: center;">
 													<g:link controller="order" action="list" params="['status':entry?.key]">
-														${entry?.value?.size}
+														${entry.value.objectList.size}
 													</g:link>
 												</td>
 											</tr>	
 								    	</g:each>
 							    	</tbody>
 							    	<tfoot>
-								    	<tr class="odd" style="border-top: 1px solid lightgrey">
-								    		<th style="text-align: left;"><warehouse:message code="shipping.total.label"/></td>							    		
-								    		<th style="text-align: center;">
+								    	<tr style="border-top: 1px solid lightgrey">
+								    		<td style="text-align: left;">
+								    			<warehouse:message code="shipping.total.label"/>
+								    		</td>							    		
+								    		<td style="text-align: center;">
 								    			<g:link controller="order" action="list" params="">
-								    				${incomingOrders?.values()?.flatten()?.size()}
+								    				${incomingOrders.size()}
 								    			</g:link>
 								    		</td>
 								    	</tr>
@@ -74,14 +76,14 @@
 					    		<table>
 					    			<thead>
 					    				<tr class="odd">
-					    					<th colspan="2" class="center">
+					    					<th colspan="2" class="left">
 					    						<warehouse:message code="shipping.shipmentsFrom.label" args="[session.warehouse.name]"/>
 					    					</th>
 					    				</tr>
 					    			</thead>
 					    			<tbody>
 										<g:each var="entry" in="${outgoingShipmentsByStatus}" status="i">											
-											<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 												<td>
 													<g:link controller="shipment" action="list" params="['status':entry.key]">
 														<format:metadata obj="${entry.key}"/>
@@ -97,15 +99,15 @@
 								    	</g:each>
 							    	</tbody>
 							    	<tfoot>
-								    	<tr class="odd" style="border-top: 1px solid lightgrey">
-								    		<th style="text-align: left;">
+								    	<tr style="border-top: 1px solid lightgrey">
+								    		<td style="text-align: left;">
 								    			<warehouse:message code="shipping.total.label"/>
-								    		</th>
-								    		<th style="text-align: center;">
+								    		</td>
+								    		<td style="text-align: center;">
 								    			<g:link controller="shipment" action="list" params="">
 								    				${allOutgoingShipments.size()}
 									    		</g:link>
-									    	</th>
+									    	</td>
 								    	</tr>
 							    	</tfoot>
 						    	</table>
@@ -124,14 +126,14 @@
 					    		<table>
 					    			<thead>
 					    				<tr class="odd">
-					    					<th colspan="2" class="center">
+					    					<th colspan="2" class="left">
 												<warehouse:message code="shipping.shipmentsTo.label" args="[session.warehouse.name]"/> 													
 					    					</th>
 					    				</tr>
 					    			</thead>
 					    			<tbody>
 										<g:each var="entry" in="${incomingShipmentsByStatus}" status="i">	 
-											<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 												<td>
 													<g:link controller="shipment" action="list" params="[type: 'incoming', status: entry.key]">
 														<format:metadata obj="${entry.key}"/>
@@ -146,9 +148,13 @@
 								    	</g:each>
 							    	</tbody>
 							    	<tfoot>
-								    	<tr class="odd" style="border-top: 1px solid lightgrey">
-								    		<th style="text-align: left;"><warehouse:message code="shipping.total.label"/></td>							    		
-								    		<th style="text-align: center;"><g:link controller="shipment" action="list" params="[type: 'incoming']">${allIncomingShipments.size()}</g:link></td>
+								    	<tr style="border-top: 1px solid lightgrey">
+								    		<td style="text-align: left;">
+								    			<warehouse:message code="shipping.total.label"/>
+								    		</td>							    		
+								    		<td style="text-align: center;">
+								    			<g:link controller="shipment" action="list" params="[type: 'incoming']">${allIncomingShipments.size()}</g:link>
+								    		</td>
 								    	</tr>
 							    	</tfoot>
 						    	</table>
