@@ -419,7 +419,7 @@ class ShipmentService {
 	 * @param shipment
 	 */
 	void saveShipment(Shipment shipment) {
-		shipment.save()
+		shipment.save(flush:true)
 	}
 	
 	/**
@@ -427,7 +427,7 @@ class ShipmentService {
 	 * 
 	 * @param container
 	 */
-	void saveContainer(Container container) {			
+	void saveContainer(Container container) {	
 		log.info("Container recipient " + container.recipient);	
 		if (!container.recipient) { 			
 			container.recipient = (container?.parentContainer?.recipient)?:container.shipment.recipient;
@@ -444,12 +444,12 @@ class ShipmentService {
 	 * @param newShipment
 	 */
 	void moveContainers(Container oldContainer, Shipment newShipment) { 		
-		if (oldContainer.containers) { 			
+		//if (oldContainer.containers) { 			
 			//oldContainer.containers.each { 
 			//	moveContainer(it, newShipment)
 			//}
-			throw new UnsupportedOperationException();
-		}
+		//	throw new UnsupportedOperationException();
+		//}
 		moveContainer(oldContainer, newShipment)
 		
 		//throw new RuntimeException();
@@ -461,6 +461,7 @@ class ShipmentService {
 	 * @param container
 	 * @param shipment
 	 */
+	/*
 	void moveContainer(Container oldContainer, Shipment newShipment) { 
 		
 		// Copy the container and add to the new shipment
@@ -486,11 +487,36 @@ class ShipmentService {
 		// Remove old container from shipment
 		oldShipment.removeFromContainers(oldContainer);
 		oldContainer.delete();
+	}
+	*/
+	
+	void copyContainer(Container container, Shipment shipment) { 
 		
+	}
+	
+	
+	void moveContainer(Container container, Shipment newShipment) { 
 		
+		def oldShipment = container.shipment
 		
-		
-		
+		// Move all shipment items in the container
+		def shipmentItems = oldShipment.shipmentItems.findAll { it.container == container }
+		shipmentItems.each { item ->
+			newShipment.addToShipmentItems(item);
+		}
+
+		// Move all subcontainers and shipment items in the container
+		container?.containers?.each { box -> 
+			newShipment.addToContainers(box);
+			shipmentItems = oldShipment.shipmentItems.findAll { it.container == box }
+			shipmentItems.each { item -> 
+				newShipment.addToShipmentItems(item);
+			}
+		}
+				
+		newShipment.addToContainers(container);
+		saveShipment(newShipment)
+				
 	}
 	
 	

@@ -6,11 +6,6 @@ import org.pih.warehouse.core.Person;
 
 class Container implements Comparable, java.io.Serializable {
 
-	//def beforeDelete = {
-	//	shipment.removeFromContainers(this)
-	//}
-
-	
 	String name	
 	String containerNumber									// An official container number (if it exists)
 	String description										// Description of contents

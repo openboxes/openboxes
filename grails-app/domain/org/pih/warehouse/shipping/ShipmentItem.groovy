@@ -119,6 +119,7 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 	ShipmentItem cloneShipmentItem() {
 		return new ShipmentItem(
 			lotNumber: this.lotNumber, 
+			expirationDate: this.expirationDate,
 			product: this.product,
 			quantity: this.quantity,				
 			recipient: this.recipient,

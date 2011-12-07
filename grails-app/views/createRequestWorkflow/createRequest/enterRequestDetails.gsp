@@ -53,19 +53,6 @@
 								<td valign='top' class='value ${hasErrors(bean:requestInstance,field:'origin','errors')}'>
 									<g:selectRequestSupplier name="origin.id" 
 										optionKey="id" value="${requestInstance?.origin?.id}" noSelection="['null':'']"/>
-									
-									<%-- 
-									<select name="origin.id">
-										<option value=""></option>
-										<g:each in="${org.pih.warehouse.core.Location.list()}" var="w">
-											<g:if test="${requestInstance?.origin?.id == w.id || requestingLocation.id != w.id}">
-												<option value="${w.id}"<g:if test="${requestInstance?.origin?.id == w.id}"> selected</g:if>>
-													<format:metadata obj="${w}"/>
-												</option>
-											</g:if>
-										</g:each>
-									</select>
-									--%>
 								</td>
 							</tr>
 							<tr class='prop'>

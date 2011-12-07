@@ -125,7 +125,7 @@
 										<tr class="${count++%2==0?'even':'odd' }">
 											<g:set var="styleClass" value="${selectedContainer == null ? 'selected' : 'not-selected' }"/>
 											<td class="droppable">
-												<div class="${styleClass }">
+												<div>
 													<span class="action-menu" >
 														<button class="action-btn">
 															<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
@@ -134,7 +134,9 @@
 															<g:render template="containerMenuItems" model="[container:containerInstance]"/>
 														</div>
 													</span>
-													<g:link action="createShipment" event="enterContainerDetails"><warehouse:message code="shipping.unpackedItems.label"/></g:link>
+													<span class="${styleClass }">
+														<g:link action="createShipment" event="enterContainerDetails"><warehouse:message code="shipping.unpackedItems.label"/></g:link>
+													</span>
 												</div>
 											</td>
 										</tr>										
@@ -144,7 +146,7 @@
 												<tr style="border: 0px solid lightgrey;" class="${count++%2==0?'even':'odd' }">
 													<td style="vertical-align: middle;" id="${containerInstance?.id }" class="droppable">													
 														<a name="container-${containerInstance.id }"></a>
-														<div class="${styleClass }">
+														<div >
 															<span class="action-menu" >
 																<button class="action-btn">
 																	<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
@@ -153,16 +155,17 @@
 																	<g:render template="containerMenuItems" model="[container:containerInstance]"/>
 																</div>
 															</span>
-														
-															<g:if test="${containerInstance?.id == selectedContainer?.id }">
-																${containerInstance?.name}
-															</g:if>
-															<g:else>
-																<%-- fragment="container-${containerInstance?.id }"  --%>
-																<g:link action="createShipment" event="enterContainerDetails" params="['containerId':containerInstance?.id]">
+															<span class="${styleClass }">
+																<g:if test="${containerInstance?.id == selectedContainer?.id }">
 																	${containerInstance?.name}
-																</g:link>
-															</g:else>
+																</g:if>
+																<g:else>
+																	<%-- fragment="container-${containerInstance?.id }"  --%>
+																	<g:link action="createShipment" event="enterContainerDetails" params="['containerId':containerInstance?.id]">
+																		${containerInstance?.name}
+																	</g:link>
+																</g:else>
+															</span>
 															<span class="fade rounded">
 																(${containerInstance?.shipmentItems?.size() })
 															</span>
@@ -175,7 +178,7 @@
 													<tr class="${count++%2==0?'even':'odd' }">
 														<td class="droppable">
 															
-															<div class="${styleClass }" style="margin-left: 25px;">
+															<div style="margin-left: 25px;">
 																<span class="action-menu" >
 																	<button class="action-btn">
 																		<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
@@ -184,16 +187,18 @@
 																		<g:render template="containerMenuItems" model="[container:childContainerInstance]"/>
 																	</div>
 																</span>
-																<a name="container-${childContainerInstance.id }"></a>
-																<g:if test="${childContainerInstance?.id == selectedContainer?.id }">
-																	${childContainerInstance?.name}
-																</g:if>
-																<g:else>
-																	<%-- fragment="container-${childContainerInstance?.id }" --%>
-																	<g:link action="createShipment" event="enterContainerDetails" params="['containerId':childContainerInstance?.id]">
+																<span class="${styleClass }"> 
+																	<a name="container-${childContainerInstance.id }"></a>
+																	<g:if test="${childContainerInstance?.id == selectedContainer?.id }">
 																		${childContainerInstance?.name}
-																	</g:link>
-																</g:else>
+																	</g:if>
+																	<g:else>
+																		<%-- fragment="container-${childContainerInstance?.id }" --%>
+																		<g:link action="createShipment" event="enterContainerDetails" params="['containerId':childContainerInstance?.id]">
+																			${childContainerInstance?.name}
+																		</g:link>
+																	</g:else>
+																</span>
 																<span class="fade rounded">
 																	(${childContainerInstance?.shipmentItems?.size() })
 																</span>

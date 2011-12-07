@@ -162,7 +162,9 @@ class CreateShipmentWorkflowController {
 				// set the container we will to edit
 				def location = Location.get(session.warehouse.id)
 				flash.containerToMove = Container.get(params.containerToMoveId)
-				flash.shipments = shipmentService.getOutgoingShipments(location)
+				def shipments = shipmentService.getOutgoingShipments(location)
+				flash.shipments = shipments - flow.shipmentInstance 
+				
 			}.to("enterContainerDetails")
 
 			on("saveContainer").to("saveContainerAction")
@@ -318,7 +320,6 @@ class CreateShipmentWorkflowController {
     			
     			// see if we have to make copies of this container
     			if (flash.cloneQuantity && flash.cloneContainer) {
-    				def container
     				shipmentService.copyContainer(flash.cloneContainer, flash.cloneQuantity as Integer)
     			}
     		
@@ -482,15 +483,25 @@ class CreateShipmentWorkflowController {
 				// move an item to another container
 				log.info "Move container to another shipment " + params
 				def container = Container.get(params.container.id);
-				def shipment = Shipment.get(params.shipment.id)
+				def oldShipment = container.shipment
+				log.info "Old shipment " + oldShipment.id
+				def newShipment = Shipment.get(params.shipment.id)
 				
-				try { 
-					shipmentService.moveContainers(container, shipment)
+				try { 					
+					shipmentService.moveContainer(container, newShipment)
+					
+					// Shipment in the flow scope does not refresh automatically
+					flow.shipmentInstance.refresh()
+					
+					
 				} 
 				catch (UnsupportedOperationException e) { 
 					flash.message = "${warehouse.message(code: 'default.unsupportedOperation.message')}"
 					error()
 				}
+				log.info "Old shipment " + oldShipment.id
+				//flash.shipmentInstance = Shipment.get(oldShipment.id)
+				
 			}
 			on("success").to("enterContainerDetails")
 			on("error").to("enterContainerDetails")
