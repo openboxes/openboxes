@@ -7,7 +7,5 @@
 	<include file="0.2.x/changelog-initial-indexes.xml"/>
 	<include file="0.2.x/changelog-initial-data.xml"/>
 	<include file="0.2.x/changelog-update-to-latest.xml"/>
-	<!-- <include file="0.2.x/changelog-product-refactoring.xml"/> -->
 	
-
 </databaseChangeLog>

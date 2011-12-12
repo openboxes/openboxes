@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    
+    <!-- Most of the 0.3.x changes are in the 0.2.x/changelog-update-to-latest.xml 
+    	(starting at changeSet 1305747921161-1). -->
+    
+    
+    
+	<!-- Once this is uncommented, do not include any more changes in this file.
+		This will mark the final 0.3.x release. -->
+    <!--<changeSet author="DatabaseVersion" id="0.4.x" />-->
+    
+</databaseChangeLog>
+    

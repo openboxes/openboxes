@@ -4253,6 +4253,11 @@
 			<column name="supported_activities_string">EXTERNAL</column>
 		</insert>
 	</changeSet>    
+	
+    <!-- Do not include any more changes in this file -->
+    <changeSet author="DatabaseVersion" id="0.3.x" />
+    	
+	
 </databaseChangeLog>
 
 

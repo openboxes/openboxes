@@ -1,0 +1,3277 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<!-- Needs to be reviewed before used. -->
+
+    <changeSet author="jmiranda" id="disable-foreign-key-checks" runAlways="true" dbms="mysql">
+		<sql>SET FOREIGN_KEY_CHECKS=0</sql>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1323290650731-1">
+        <insert tableName="shipper_service">
+            <column name="id" valueNumeric="1"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="description" value="Same Day Delivery"/>
+            <column name="name" value="Same Day Air"/>
+            <column name="shipper_id" valueNumeric="1"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-2">
+        <insert tableName="shipper_service">
+            <column name="id" valueNumeric="2"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="description" value="Next Day Delivery"/>
+            <column name="name" value="Express Freight"/>
+            <column name="shipper_id" valueNumeric="1"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-3">
+        <insert tableName="shipper_service">
+            <column name="id" valueNumeric="3"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="description" value="3-5 Business Days"/>
+            <column name="name" value="Ground"/>
+            <column name="shipper_id" valueNumeric="1"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-4">
+        <insert tableName="shipper_service">
+            <column name="id" valueNumeric="4"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="description" value="Same Day Delivery"/>
+            <column name="name" value="Same Day Air"/>
+            <column name="shipper_id" valueNumeric="2"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-5">
+        <insert tableName="shipper_service">
+            <column name="id" valueNumeric="5"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="description" value="Next Day Delivery"/>
+            <column name="name" value="Express Freight"/>
+            <column name="shipper_id" valueNumeric="2"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-6">
+        <insert tableName="shipper_service">
+            <column name="id" valueNumeric="6"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="description" value="3-5 Business Days"/>
+            <column name="name" value="Ground"/>
+            <column name="shipper_id" valueNumeric="2"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-7">
+        <insert tableName="shipper_service">
+            <column name="id" valueNumeric="7"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="description" value="Same Day Delivery"/>
+            <column name="name" value="Same Day Air"/>
+            <column name="shipper_id" valueNumeric="3"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-8">
+        <insert tableName="shipper_service">
+            <column name="id" valueNumeric="8"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="description" value="Next Day Delivery"/>
+            <column name="name" value="Express Freight"/>
+            <column name="shipper_id" valueNumeric="3"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-9">
+        <insert tableName="shipper_service">
+            <column name="id" valueNumeric="9"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="description" value="3-5 Business Days"/>
+            <column name="name" value="Ground"/>
+            <column name="shipper_id" valueNumeric="3"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-10">
+        <insert tableName="shipper_service">
+            <column name="id" valueNumeric="10"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="description" value="3-5 Business Days"/>
+            <column name="name" value="Ground"/>
+            <column name="shipper_id" valueNumeric="4"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-11">
+        <insert tableName="shipper_service">
+            <column name="id" valueNumeric="11"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="description"/>
+            <column name="name" value="International Flight"/>
+            <column name="shipper_id" valueNumeric="5"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-12">
+        <insert tableName="document_type">
+            <column name="id" valueNumeric="1"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Facture donnée par la ligne aérienne|fr:Conteneur"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-13">
+        <insert tableName="document_type">
+            <column name="id" valueNumeric="2"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Bill of Lading|fr:Facture de la cargaison"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-14">
+        <insert tableName="document_type">
+            <column name="id" valueNumeric="3"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Packing List|fr:Lisde de chargement"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-15">
+        <insert tableName="document_type">
+            <column name="id" valueNumeric="4"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Certificate of Donation|fr:Certificat de don"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-16">
+        <insert tableName="document_type">
+            <column name="id" valueNumeric="5"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Commercial Invoice|fr:Facture Commerciale"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-17">
+        <insert tableName="document_type">
+            <column name="id" valueNumeric="6"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Material Safey Data Sheet|fr:Fiche signalétique"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-18">
+        <insert tableName="document_type">
+            <column name="id" valueNumeric="7"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Certificate of Analysis|fr:Certificat d'analyse"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-19">
+        <insert tableName="document_type">
+            <column name="id" valueNumeric="8"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Manifest|fr:Manifeste"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-20">
+        <insert tableName="document_type">
+            <column name="id" valueNumeric="9"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Other|fr:Autre"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-21">
+        <insert tableName="shipper">
+            <column name="id" valueNumeric="1"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="FedEx"/>
+            <column name="parameter_name"/>
+            <column name="tracking_format" value="999999999999"/>
+            <column name="tracking_url" value="http://www.fedex.com/Tracking?ascend_header=1&amp;clienttype=dotcom&amp;cntry_code=us&amp;language=english&amp;tracknumbers=%s"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-22">
+        <insert tableName="shipper">
+            <column name="id" valueNumeric="2"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="UPS"/>
+            <column name="parameter_name"/>
+            <column name="tracking_format" value="1Z9999W99999999999"/>
+            <column name="tracking_url" value="http://wwwapps.ups.com/WebTracking/processInputRequest?sort_by=status&amp;tracknums_displayed=1&amp;TypeOfInquiryNumber=T&amp;loc=en_US&amp;InquiryNumber1=%s&amp;track.x=0&amp;track.y=0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-23">
+        <insert tableName="shipper">
+            <column name="id" valueNumeric="3"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="DHL"/>
+            <column name="parameter_name" value="q"/>
+            <column name="tracking_format"/>
+            <column name="tracking_url" value="http://www.google.com/search?hl=en&amp;site=&amp;q="/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-24">
+        <insert tableName="shipper">
+            <column name="id" valueNumeric="4"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="USPS"/>
+            <column name="parameter_name" value="q"/>
+            <column name="tracking_format"/>
+            <column name="tracking_url" value="http://www.google.com/search?hl=en&amp;site=&amp;q="/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-25">
+        <insert tableName="shipper">
+            <column name="id" valueNumeric="5"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Courier"/>
+            <column name="parameter_name" value="q"/>
+            <column name="tracking_format"/>
+            <column name="tracking_url" value="http://www.google.com/search?hl=en&amp;site=&amp;q="/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-26">
+        <insert tableName="shipper">
+            <column name="id" valueNumeric="6"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-16"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-16"/>
+            <column name="name" value="Sea Freight "/>
+            <column name="parameter_name"/>
+            <column name="tracking_format"/>
+            <column name="tracking_url"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-27">
+        <insert tableName="shipper">
+            <column name="id" valueNumeric="7"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-04-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-04-25"/>
+            <column name="name" value="Amerijet"/>
+            <column name="parameter_name"/>
+            <column name="tracking_format"/>
+            <column name="tracking_url"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-28">
+        <insert tableName="shipper">
+            <column name="id" valueNumeric="8"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-04-27"/>
+            <column name="description" value="Air freight forwarder based in Boston, MA."/>
+            <column name="last_updated" valueDate="2011-04-27"/>
+            <column name="name" value="Pilot Air"/>
+            <column name="parameter_name"/>
+            <column name="tracking_format"/>
+            <column name="tracking_url"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-29">
+        <insert tableName="container_type">
+            <column name="id" valueNumeric="1"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Container|fr:Conteneur"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-30">
+        <insert tableName="container_type">
+            <column name="id" valueNumeric="2"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Pallet|fr:Palette"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-31">
+        <insert tableName="container_type">
+            <column name="id" valueNumeric="3"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Suitcase|fr:Valise/Malette"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-32">
+        <insert tableName="container_type">
+            <column name="id" valueNumeric="4"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Box|fr:Boite"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-33">
+        <insert tableName="container_type">
+            <column name="id" valueNumeric="5"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Trunk|fr:Coffre"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-34">
+        <insert tableName="container_type">
+            <column name="id" valueNumeric="6"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Item|fr:Element"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-35">
+        <insert tableName="container_type">
+            <column name="id" valueNumeric="7"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Other|fr:Autre"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-36">
+        <insert tableName="container_type">
+            <column name="id" valueNumeric="8"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-02-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-02-25"/>
+            <column name="name" value="Crate|fr:Caisse"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-37">
+        <insert tableName="reference_number_type">
+            <column name="id" valueNumeric="1"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description" value="Purchase Order Number"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Purchase Order Number|fr:Nombre de commande"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-38">
+        <insert tableName="reference_number_type">
+            <column name="id" valueNumeric="2"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description" value="Customer name"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Customer name|fr:Nom du client"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-39">
+        <insert tableName="reference_number_type">
+            <column name="id" valueNumeric="3"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description" value="Internal Identifier"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Internal Identifier|fr:Identificateur interne"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-40">
+        <insert tableName="reference_number_type">
+            <column name="id" valueNumeric="4"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description" value="Bill of Lading Number"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Bill of Lading Number|fr:Nombre de connaissement"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-41">
+        <insert tableName="reference_number_type">
+            <column name="id" valueNumeric="5"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-01"/>
+            <column name="description" value="Air Waybill Number"/>
+            <column name="last_updated" valueDate="2011-03-01"/>
+            <column name="name" value="Air Waybill Number|fr:Nombre de lettre de transport aérien"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-42">
+        <insert tableName="reference_number_type">
+            <column name="id" valueNumeric="6"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-01"/>
+            <column name="description" value="Container Number"/>
+            <column name="last_updated" valueDate="2011-03-01"/>
+            <column name="name" value="Container Number|fr:Nombre de conteneur"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-43">
+        <insert tableName="reference_number_type">
+            <column name="id" valueNumeric="7"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-01"/>
+            <column name="description" value="Seal Number"/>
+            <column name="last_updated" valueDate="2011-03-01"/>
+            <column name="name" value="Seal Number|fr:Nombre de sceau"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-44">
+        <insert tableName="reference_number_type">
+            <column name="id" valueNumeric="8"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-01"/>
+            <column name="description" value="Flight Number"/>
+            <column name="last_updated" valueDate="2011-03-01"/>
+            <column name="name" value="Flight Number|fr:Nombre de vol"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-45">
+        <insert tableName="location_type_supported_activities">
+            <column name="location_type_id" valueNumeric="2"/>
+            <column name="supported_activities_string" value="MANAGE_INVENTORY"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-46">
+        <insert tableName="location_type_supported_activities">
+            <column name="location_type_id" valueNumeric="2"/>
+            <column name="supported_activities_string" value="PLACE_ORDER"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-47">
+        <insert tableName="location_type_supported_activities">
+            <column name="location_type_id" valueNumeric="2"/>
+            <column name="supported_activities_string" value="PLACE_REQUEST"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-48">
+        <insert tableName="location_type_supported_activities">
+            <column name="location_type_id" valueNumeric="2"/>
+            <column name="supported_activities_string" value="FULFILL_REQUEST"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-49">
+        <insert tableName="location_type_supported_activities">
+            <column name="location_type_id" valueNumeric="2"/>
+            <column name="supported_activities_string" value="SEND_STOCK"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-50">
+        <insert tableName="location_type_supported_activities">
+            <column name="location_type_id" valueNumeric="2"/>
+            <column name="supported_activities_string" value="RECEIVE_STOCK"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-51">
+        <insert tableName="location_type_supported_activities">
+            <column name="location_type_id" valueNumeric="2"/>
+            <column name="supported_activities_string" value="EXTERNAL"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-52">
+        <insert tableName="location_type_supported_activities">
+            <column name="location_type_id" valueNumeric="3"/>
+            <column name="supported_activities_string" value="SEND_STOCK"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-53">
+        <insert tableName="location_type_supported_activities">
+            <column name="location_type_id" valueNumeric="3"/>
+            <column name="supported_activities_string" value="RECEIVE_STOCK"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-54">
+        <insert tableName="location_type_supported_activities">
+            <column name="location_type_id" valueNumeric="4"/>
+            <column name="supported_activities_string" value="FULFILL_ORDER"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-55">
+        <insert tableName="location_type_supported_activities">
+            <column name="location_type_id" valueNumeric="4"/>
+            <column name="supported_activities_string" value="SEND_STOCK"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-56">
+        <insert tableName="location_type_supported_activities">
+            <column name="location_type_id" valueNumeric="4"/>
+            <column name="supported_activities_string" value="EXTERNAL"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-57">
+        <insert tableName="role">
+            <column name="id" valueNumeric="1"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="description"/>
+            <column name="role_type" value="ROLE_ADMIN"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-58">
+        <insert tableName="role">
+            <column name="id" valueNumeric="2"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="description"/>
+            <column name="role_type" value="ROLE_MANAGER"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-59">
+        <insert tableName="role">
+            <column name="id" valueNumeric="3"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="description"/>
+            <column name="role_type" value="ROLE_USER"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-60">
+        <insert tableName="category">
+            <column name="id" valueNumeric="27"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-14"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-14"/>
+            <column name="name" value="ROOT"/>
+            <column name="parent_category_id"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-61">
+        <insert tableName="category">
+            <column name="id" valueNumeric="28"/>
+            <column name="version" valueNumeric="3"/>
+            <column name="date_created" valueDate="2011-03-14"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Surgical Supplies"/>
+            <column name="parent_category_id" valueNumeric="29"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-62">
+        <insert tableName="category">
+            <column name="id" valueNumeric="29"/>
+            <column name="version" valueNumeric="2"/>
+            <column name="date_created" valueDate="2011-03-14"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="MEDICAL SUPPLIES"/>
+            <column name="parent_category_id" valueNumeric="27"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-63">
+        <insert tableName="category">
+            <column name="id" valueNumeric="30"/>
+            <column name="version" valueNumeric="4"/>
+            <column name="date_created" valueDate="2011-03-14"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="MEDICINE"/>
+            <column name="parent_category_id" valueNumeric="27"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-64">
+        <insert tableName="category">
+            <column name="id" valueNumeric="31"/>
+            <column name="version" valueNumeric="2"/>
+            <column name="date_created" valueDate="2011-03-14"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="FOOD"/>
+            <column name="parent_category_id" valueNumeric="27"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-65">
+        <insert tableName="category">
+            <column name="id" valueNumeric="33"/>
+            <column name="version" valueNumeric="2"/>
+            <column name="date_created" valueDate="2011-03-14"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="EQUIPMENT"/>
+            <column name="parent_category_id" valueNumeric="27"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-66">
+        <insert tableName="category">
+            <column name="id" valueNumeric="36"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-14"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-14"/>
+            <column name="name" value="Anestheshia"/>
+            <column name="parent_category_id" valueNumeric="30"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-67">
+        <insert tableName="category">
+            <column name="id" valueNumeric="37"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-14"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-14"/>
+            <column name="name" value="ARVs"/>
+            <column name="parent_category_id" valueNumeric="30"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-68">
+        <insert tableName="category">
+            <column name="id" valueNumeric="38"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-14"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-14"/>
+            <column name="name" value="Cancer"/>
+            <column name="parent_category_id" valueNumeric="30"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-69">
+        <insert tableName="category">
+            <column name="id" valueNumeric="39"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-14"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-14"/>
+            <column name="name" value="Chronic Care"/>
+            <column name="parent_category_id" valueNumeric="30"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-70">
+        <insert tableName="category">
+            <column name="id" valueNumeric="40"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-14"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-14"/>
+            <column name="name" value="Pain"/>
+            <column name="parent_category_id" valueNumeric="30"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-71">
+        <insert tableName="category">
+            <column name="id" valueNumeric="41"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-14"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-14"/>
+            <column name="name" value="TB"/>
+            <column name="parent_category_id" valueNumeric="30"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-72">
+        <insert tableName="category">
+            <column name="id" valueNumeric="42"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-14"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="Infant Formula"/>
+            <column name="parent_category_id" valueNumeric="31"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-73">
+        <insert tableName="category">
+            <column name="id" valueNumeric="43"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-14"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Dental Supplies"/>
+            <column name="parent_category_id" valueNumeric="29"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-74">
+        <insert tableName="category">
+            <column name="id" valueNumeric="44"/>
+            <column name="version" valueNumeric="3"/>
+            <column name="date_created" valueDate="2011-03-14"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="Lab Supplies"/>
+            <column name="parent_category_id" valueNumeric="29"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-75">
+        <insert tableName="category">
+            <column name="id" valueNumeric="46"/>
+            <column name="version" valueNumeric="3"/>
+            <column name="date_created" valueDate="2011-03-14"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="OFFICE SUPPLIES"/>
+            <column name="parent_category_id" valueNumeric="27"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-76">
+        <insert tableName="category">
+            <column name="id" valueNumeric="47"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-14"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-14"/>
+            <column name="name" value="Furniture"/>
+            <column name="parent_category_id" valueNumeric="33"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-77">
+        <insert tableName="category">
+            <column name="id" valueNumeric="48"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-14"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="IT Equipment"/>
+            <column name="parent_category_id" valueNumeric="33"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-78">
+        <insert tableName="category">
+            <column name="id" valueNumeric="50"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-14"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Surgical Equipment"/>
+            <column name="parent_category_id" valueNumeric="33"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-79">
+        <insert tableName="category">
+            <column name="id" valueNumeric="51"/>
+            <column name="version" valueNumeric="2"/>
+            <column name="date_created" valueDate="2011-03-14"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="Medical Consumables"/>
+            <column name="parent_category_id" valueNumeric="29"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-80">
+        <insert tableName="category">
+            <column name="id" valueNumeric="52"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Thermometers"/>
+            <column name="parent_category_id" valueNumeric="51"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-81">
+        <insert tableName="category">
+            <column name="id" valueNumeric="53"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Uniscopes"/>
+            <column name="parent_category_id" valueNumeric="51"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-82">
+        <insert tableName="category">
+            <column name="id" valueNumeric="54"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Gauze"/>
+            <column name="parent_category_id" valueNumeric="51"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-83">
+        <insert tableName="category">
+            <column name="id" valueNumeric="55"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Bandages"/>
+            <column name="parent_category_id" valueNumeric="51"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-84">
+        <insert tableName="category">
+            <column name="id" valueNumeric="56"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Catheters"/>
+            <column name="parent_category_id" valueNumeric="51"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-85">
+        <insert tableName="category">
+            <column name="id" valueNumeric="57"/>
+            <column name="version" valueNumeric="3"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="IV supplies"/>
+            <column name="parent_category_id" valueNumeric="51"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-86">
+        <insert tableName="category">
+            <column name="id" valueNumeric="58"/>
+            <column name="version" valueNumeric="2"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="Drapes"/>
+            <column name="parent_category_id" valueNumeric="28"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-87">
+        <insert tableName="category">
+            <column name="id" valueNumeric="59"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Sterile water"/>
+            <column name="parent_category_id" valueNumeric="62"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-88">
+        <insert tableName="category">
+            <column name="id" valueNumeric="60"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Sodium chloride"/>
+            <column name="parent_category_id" valueNumeric="62"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-89">
+        <insert tableName="category">
+            <column name="id" valueNumeric="61"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Iodine"/>
+            <column name="parent_category_id" valueNumeric="62"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-90">
+        <insert tableName="category">
+            <column name="id" valueNumeric="62"/>
+            <column name="version" valueNumeric="2"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Fluids"/>
+            <column name="parent_category_id" valueNumeric="51"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-91">
+        <insert tableName="category">
+            <column name="id" valueNumeric="64"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Suction kits"/>
+            <column name="parent_category_id" valueNumeric="51"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-92">
+        <insert tableName="category">
+            <column name="id" valueNumeric="65"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Toilet tissue"/>
+            <column name="parent_category_id" valueNumeric="110"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-93">
+        <insert tableName="category">
+            <column name="id" valueNumeric="66"/>
+            <column name="version" valueNumeric="2"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="Waste bags"/>
+            <column name="parent_category_id" valueNumeric="123"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-94">
+        <insert tableName="category">
+            <column name="id" valueNumeric="67"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Bathroom supplies"/>
+            <column name="parent_category_id" valueNumeric="110"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-95">
+        <insert tableName="category">
+            <column name="id" valueNumeric="69"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Pens"/>
+            <column name="parent_category_id" valueNumeric="46"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-96">
+        <insert tableName="category">
+            <column name="id" valueNumeric="70"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Sponges"/>
+            <column name="parent_category_id" valueNumeric="110"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-97">
+        <insert tableName="category">
+            <column name="id" valueNumeric="71"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Masks"/>
+            <column name="parent_category_id" valueNumeric="51"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-98">
+        <insert tableName="category">
+            <column name="id" valueNumeric="72"/>
+            <column name="version" valueNumeric="2"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="Paper towels"/>
+            <column name="parent_category_id" valueNumeric="110"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-99">
+        <insert tableName="category">
+            <column name="id" valueNumeric="73"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Kitchen utensils"/>
+            <column name="parent_category_id" valueNumeric="112"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-100">
+        <insert tableName="category">
+            <column name="id" valueNumeric="74"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Facial tissue"/>
+            <column name="parent_category_id" valueNumeric="110"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-101">
+        <insert tableName="category">
+            <column name="id" valueNumeric="75"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Lotion"/>
+            <column name="parent_category_id" valueNumeric="110"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-102">
+        <insert tableName="category">
+            <column name="id" valueNumeric="76"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Cups"/>
+            <column name="parent_category_id" valueNumeric="112"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-103">
+        <insert tableName="category">
+            <column name="id" valueNumeric="77"/>
+            <column name="version" valueNumeric="2"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="Cleaning supplies"/>
+            <column name="parent_category_id" valueNumeric="123"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-104">
+        <insert tableName="category">
+            <column name="id" valueNumeric="78"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Gloves"/>
+            <column name="parent_category_id" valueNumeric="51"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-105">
+        <insert tableName="category">
+            <column name="id" valueNumeric="79"/>
+            <column name="version" valueNumeric="2"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="Syringes"/>
+            <column name="parent_category_id" valueNumeric="51"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-106">
+        <insert tableName="category">
+            <column name="id" valueNumeric="81"/>
+            <column name="version" valueNumeric="2"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="Tourniquets"/>
+            <column name="parent_category_id" valueNumeric="28"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-107">
+        <insert tableName="category">
+            <column name="id" valueNumeric="82"/>
+            <column name="version" valueNumeric="2"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="Medical Equipment"/>
+            <column name="parent_category_id" valueNumeric="33"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-108">
+        <insert tableName="category">
+            <column name="id" valueNumeric="83"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Nutritional Supplements"/>
+            <column name="parent_category_id" valueNumeric="31"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-109">
+        <insert tableName="category">
+            <column name="id" valueNumeric="84"/>
+            <column name="version" valueNumeric="3"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="ORS"/>
+            <column name="parent_category_id" valueNumeric="30"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-110">
+        <insert tableName="category">
+            <column name="id" valueNumeric="85"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Unclassified"/>
+            <column name="parent_category_id" valueNumeric="27"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-111">
+        <insert tableName="category">
+            <column name="id" valueNumeric="87"/>
+            <column name="version" valueNumeric="2"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="Radiology Supplies"/>
+            <column name="parent_category_id" valueNumeric="29"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-112">
+        <insert tableName="category">
+            <column name="id" valueNumeric="88"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Drains"/>
+            <column name="parent_category_id" valueNumeric="28"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-113">
+        <insert tableName="category">
+            <column name="id" valueNumeric="89"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Evacuators"/>
+            <column name="parent_category_id" valueNumeric="28"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-114">
+        <insert tableName="category">
+            <column name="id" valueNumeric="90"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Forceps"/>
+            <column name="parent_category_id" valueNumeric="28"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-115">
+        <insert tableName="category">
+            <column name="id" valueNumeric="91"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Gowns"/>
+            <column name="parent_category_id" valueNumeric="51"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-116">
+        <insert tableName="category">
+            <column name="id" valueNumeric="92"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Hemostats"/>
+            <column name="parent_category_id" valueNumeric="28"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-117">
+        <insert tableName="category">
+            <column name="id" valueNumeric="93"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Tracheal tubes"/>
+            <column name="parent_category_id" valueNumeric="51"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-118">
+        <insert tableName="category">
+            <column name="id" valueNumeric="94"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Laryngoscopes"/>
+            <column name="parent_category_id" valueNumeric="51"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-119">
+        <insert tableName="category">
+            <column name="id" valueNumeric="95"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Clamps"/>
+            <column name="parent_category_id" valueNumeric="28"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-120">
+        <insert tableName="category">
+            <column name="id" valueNumeric="96"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Scalpels"/>
+            <column name="parent_category_id" valueNumeric="28"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-121">
+        <insert tableName="category">
+            <column name="id" valueNumeric="97"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Procedure stands"/>
+            <column name="parent_category_id" valueNumeric="28"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-122">
+        <insert tableName="category">
+            <column name="id" valueNumeric="98"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Metal plates"/>
+            <column name="parent_category_id" valueNumeric="51"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-123">
+        <insert tableName="category">
+            <column name="id" valueNumeric="99"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Retractors"/>
+            <column name="parent_category_id" valueNumeric="28"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-124">
+        <insert tableName="category">
+            <column name="id" valueNumeric="101"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Splints"/>
+            <column name="parent_category_id" valueNumeric="51"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-125">
+        <insert tableName="category">
+            <column name="id" valueNumeric="102"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Sutures"/>
+            <column name="parent_category_id" valueNumeric="28"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-126">
+        <insert tableName="category">
+            <column name="id" valueNumeric="103"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Saws"/>
+            <column name="parent_category_id" valueNumeric="28"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-127">
+        <insert tableName="category">
+            <column name="id" valueNumeric="104"/>
+            <column name="version" valueNumeric="2"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Pumps"/>
+            <column name="parent_category_id" valueNumeric="28"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-128">
+        <insert tableName="category">
+            <column name="id" valueNumeric="105"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Sanitary Pads"/>
+            <column name="parent_category_id" valueNumeric="109"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-129">
+        <insert tableName="category">
+            <column name="id" valueNumeric="106"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Tampons"/>
+            <column name="parent_category_id" valueNumeric="109"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-130">
+        <insert tableName="category">
+            <column name="id" valueNumeric="107"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Maternity Supplies"/>
+            <column name="parent_category_id" valueNumeric="109"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-131">
+        <insert tableName="category">
+            <column name="id" valueNumeric="108"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Pap Smear Kits"/>
+            <column name="parent_category_id" valueNumeric="109"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-132">
+        <insert tableName="category">
+            <column name="id" valueNumeric="109"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="name" value="Women's Health Supplies"/>
+            <column name="parent_category_id" valueNumeric="29"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-133">
+        <insert tableName="category">
+            <column name="id" valueNumeric="110"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="Hygiene Supplies"/>
+            <column name="parent_category_id" valueNumeric="122"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-134">
+        <insert tableName="category">
+            <column name="id" valueNumeric="111"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="Orthopedic Supplies"/>
+            <column name="parent_category_id" valueNumeric="29"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-135">
+        <insert tableName="category">
+            <column name="id" valueNumeric="112"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="Kitchen Supplies"/>
+            <column name="parent_category_id" valueNumeric="122"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-136">
+        <insert tableName="category">
+            <column name="id" valueNumeric="113"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-19"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="Childrens Furniture"/>
+            <column name="parent_category_id" valueNumeric="33"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-137">
+        <insert tableName="category">
+            <column name="id" valueNumeric="115"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-22"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-22"/>
+            <column name="name" value="Shields"/>
+            <column name="parent_category_id" valueNumeric="71"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-138">
+        <insert tableName="category">
+            <column name="id" valueNumeric="116"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-22"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-22"/>
+            <column name="name" value="Caps"/>
+            <column name="parent_category_id" valueNumeric="51"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-139">
+        <insert tableName="category">
+            <column name="id" valueNumeric="118"/>
+            <column name="version" valueNumeric="3"/>
+            <column name="date_created" valueDate="2011-03-24"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-04-06"/>
+            <column name="name" value="Bedding"/>
+            <column name="parent_category_id" valueNumeric="122"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-140">
+        <insert tableName="category">
+            <column name="id" valueNumeric="119"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-28"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="Recreational Equipment"/>
+            <column name="parent_category_id" valueNumeric="33"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-141">
+        <insert tableName="category">
+            <column name="id" valueNumeric="120"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-28"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="Laboratory Equipment"/>
+            <column name="parent_category_id" valueNumeric="33"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-142">
+        <insert tableName="category">
+            <column name="id" valueNumeric="121"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-28"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="Food Packages"/>
+            <column name="parent_category_id" valueNumeric="31"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-143">
+        <insert tableName="category">
+            <column name="id" valueNumeric="122"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-28"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="HOSPITAL &amp; CLINIC SUPPLIES"/>
+            <column name="parent_category_id" valueNumeric="27"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-144">
+        <insert tableName="category">
+            <column name="id" valueNumeric="123"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-28"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="name" value="INFECTION CONTROL SUPPLIES"/>
+            <column name="parent_category_id" valueNumeric="27"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-145">
+        <insert tableName="category">
+            <column name="id" valueNumeric="124"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-29"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-29"/>
+            <column name="name" value="Building &amp; Maintenance Supplies"/>
+            <column name="parent_category_id" valueNumeric="122"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-146">
+        <insert tableName="category">
+            <column name="id" valueNumeric="125"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-29"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-29"/>
+            <column name="name" value="Surgical Sponges"/>
+            <column name="parent_category_id" valueNumeric="28"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-147">
+        <insert tableName="category">
+            <column name="id" valueNumeric="126"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-29"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-29"/>
+            <column name="name" value="Diagnostics"/>
+            <column name="parent_category_id" valueNumeric="29"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-148">
+        <insert tableName="category">
+            <column name="id" valueNumeric="128"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-31"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-31"/>
+            <column name="name" value="Scrubs"/>
+            <column name="parent_category_id" valueNumeric="51"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-149">
+        <insert tableName="category">
+            <column name="id" valueNumeric="130"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-04-01"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-05-03"/>
+            <column name="name" value="Shoe Covers"/>
+            <column name="parent_category_id" valueNumeric="51"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-150">
+        <insert tableName="category">
+            <column name="id" valueNumeric="131"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-04-04"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-04-04"/>
+            <column name="name" value="Diapers"/>
+            <column name="parent_category_id" valueNumeric="51"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-151">
+        <insert tableName="category">
+            <column name="id" valueNumeric="132"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-04-06"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-04-06"/>
+            <column name="name" value="Clothing/Uniforms"/>
+            <column name="parent_category_id" valueNumeric="122"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-152">
+        <insert tableName="category">
+            <column name="id" valueNumeric="133"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-04-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-04-25"/>
+            <column name="name" value="Ophthalmologic Supplies"/>
+            <column name="parent_category_id" valueNumeric="29"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-153">
+        <insert tableName="category">
+            <column name="id" valueNumeric="134"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-02"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-06-02"/>
+            <column name="name" value="TRAINING MATERIALS"/>
+            <column name="parent_category_id" valueNumeric="27"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-154">
+        <insert tableName="category">
+            <column name="id" valueNumeric="135"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-06-06"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-06-06"/>
+            <column name="name" value="Laptops"/>
+            <column name="parent_category_id" valueNumeric="48"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-155">
+        <insert tableName="category">
+            <column name="id" valueNumeric="136"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-06"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-06-06"/>
+            <column name="name" value="Computer Monitors"/>
+            <column name="parent_category_id" valueNumeric="48"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-156">
+        <insert tableName="category">
+            <column name="id" valueNumeric="137"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-06"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-06-06"/>
+            <column name="name" value="Desktops"/>
+            <column name="parent_category_id" valueNumeric="48"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-157">
+        <insert tableName="category">
+            <column name="id" valueNumeric="138"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-06"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-06-06"/>
+            <column name="name" value="Computer Supplies/Accessories"/>
+            <column name="parent_category_id" valueNumeric="48"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-158">
+        <insert tableName="category">
+            <column name="id" valueNumeric="139"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-06"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-06-06"/>
+            <column name="name" value="Printers/Copiers"/>
+            <column name="parent_category_id" valueNumeric="48"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-159">
+        <insert tableName="category">
+            <column name="id" valueNumeric="143"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-09"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-06-09"/>
+            <column name="name" value="Injectable"/>
+            <column name="parent_category_id" valueNumeric="30"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-160">
+        <insert tableName="category">
+            <column name="id" valueNumeric="144"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-21"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-06-21"/>
+            <column name="name" value="Books"/>
+            <column name="parent_category_id" valueNumeric="46"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-161">
+        <insert tableName="category">
+            <column name="id" valueNumeric="145"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-22"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-06-22"/>
+            <column name="name" value="Psychotherapeutic"/>
+            <column name="parent_category_id" valueNumeric="30"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-162">
+        <insert tableName="category">
+            <column name="id" valueNumeric="146"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-06-30"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-08-10"/>
+            <column name="name" value="1000 Jobs"/>
+            <column name="parent_category_id" valueNumeric="85"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-163">
+        <insert tableName="category">
+            <column name="id" valueNumeric="147"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-07-11"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-07-11"/>
+            <column name="name" value="Antibiotics"/>
+            <column name="parent_category_id" valueNumeric="30"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-164">
+        <insert tableName="category">
+            <column name="id" valueNumeric="148"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-07-15"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-07-15"/>
+            <column name="name" value="Oral"/>
+            <column name="parent_category_id" valueNumeric="30"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-165">
+        <insert tableName="category">
+            <column name="id" valueNumeric="149"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-11-09"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-11-09"/>
+            <column name="name" value="Communications Print Materials"/>
+            <column name="parent_category_id" valueNumeric="85"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-166">
+        <insert tableName="user_role">
+            <column name="user_id" valueNumeric="1"/>
+            <column name="role_id" valueNumeric="1"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-167">
+        <insert tableName="user_role">
+            <column name="user_id" valueNumeric="2"/>
+            <column name="role_id" valueNumeric="2"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-168">
+        <insert tableName="user_role">
+            <column name="user_id" valueNumeric="3"/>
+            <column name="role_id" valueNumeric="3"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-169">
+        <insert tableName="user_role">
+            <column name="user_id" valueNumeric="4"/>
+            <column name="role_id" valueNumeric="3"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-170">
+        <insert tableName="event_type">
+            <column name="id" valueNumeric="2"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-03"/>
+            <column name="description" value="Shipment has been shipped"/>
+            <column name="event_code" value="SHIPPED"/>
+            <column name="last_updated" valueDate="2011-03-03"/>
+            <column name="name" value="Shipped|fr:Expédié"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-171">
+        <insert tableName="event_type">
+            <column name="id" valueNumeric="3"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-03"/>
+            <column name="description" value="Shipment has been received"/>
+            <column name="event_code" value="RECEIVED"/>
+            <column name="last_updated" valueDate="2011-03-03"/>
+            <column name="name" value="Received|fr:Reçu"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-172">
+        <insert tableName="location_type">
+            <column name="id" valueNumeric="2"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-12-06"/>
+            <column name="description" value="Depot"/>
+            <column name="last_updated" valueDate="2010-12-06"/>
+            <column name="name" value="Depot|fr:Dépot"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-173">
+        <insert tableName="location_type">
+            <column name="id" valueNumeric="3"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-12-06"/>
+            <column name="description" value="Dispensary"/>
+            <column name="last_updated" valueDate="2011-11-14"/>
+            <column name="name" value="Dispensary|fr:Dispensaire"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-174">
+        <insert tableName="location_type">
+            <column name="id" valueNumeric="4"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-12-06"/>
+            <column name="description" value="Supplier"/>
+            <column name="last_updated" valueDate="2010-12-06"/>
+            <column name="name" value="Supplier|fr:Fournisseurs"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-175">
+        <insert tableName="shipment_workflow_container_type">
+            <column name="shipment_workflow_container_types_id" valueNumeric="1"/>
+            <column name="container_type_id" valueNumeric="2"/>
+            <column name="container_types_idx" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-176">
+        <insert tableName="shipment_workflow_container_type">
+            <column name="shipment_workflow_container_types_id" valueNumeric="1"/>
+            <column name="container_type_id" valueNumeric="8"/>
+            <column name="container_types_idx" valueNumeric="1"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-177">
+        <insert tableName="shipment_workflow_container_type">
+            <column name="shipment_workflow_container_types_id" valueNumeric="2"/>
+            <column name="container_type_id" valueNumeric="2"/>
+            <column name="container_types_idx" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-178">
+        <insert tableName="shipment_workflow_container_type">
+            <column name="shipment_workflow_container_types_id" valueNumeric="2"/>
+            <column name="container_type_id" valueNumeric="8"/>
+            <column name="container_types_idx" valueNumeric="1"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-179">
+        <insert tableName="shipment_workflow_container_type">
+            <column name="shipment_workflow_container_types_id" valueNumeric="3"/>
+            <column name="container_type_id" valueNumeric="3"/>
+            <column name="container_types_idx" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-180">
+        <insert tableName="user">
+            <column name="id" valueNumeric="1"/>
+            <column name="active" valueNumeric="1"/>
+            <column name="last_login_date"/>
+            <column name="manager_id"/>
+            <column name="password" value="password"/>
+            <column name="username" value="admin"/>
+            <column name="warehouse_id" valueNumeric="1"/>
+            <column name="photo"/>
+            <column name="locale"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-181">
+        <insert tableName="user">
+            <column name="id" valueNumeric="2"/>
+            <column name="active" valueNumeric="1"/>
+            <column name="last_login_date" valueDate="2011-09-23"/>
+            <column name="manager_id" valueNumeric="1"/>
+            <column name="password" value="password"/>
+            <column name="username" value="manager"/>
+            <column name="warehouse_id" valueNumeric="1"/>
+            <column name="photo"/>
+            <column name="locale"/>
+        </insert>
+    </changeSet>
+  
+    <changeSet author="jmiranda (generated)" id="1323290650731-190">
+        <insert tableName="shipment_workflow_reference_number_type">
+            <column name="shipment_workflow_reference_number_types_id" valueNumeric="1"/>
+            <column name="reference_number_type_id" valueNumeric="5"/>
+            <column name="reference_number_types_idx" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-191">
+        <insert tableName="shipment_workflow_reference_number_type">
+            <column name="shipment_workflow_reference_number_types_id" valueNumeric="1"/>
+            <column name="reference_number_type_id" valueNumeric="6"/>
+            <column name="reference_number_types_idx" valueNumeric="1"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-192">
+        <insert tableName="shipment_workflow_reference_number_type">
+            <column name="shipment_workflow_reference_number_types_id" valueNumeric="1"/>
+            <column name="reference_number_type_id" valueNumeric="7"/>
+            <column name="reference_number_types_idx" valueNumeric="2"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-193">
+        <insert tableName="shipment_workflow_reference_number_type">
+            <column name="shipment_workflow_reference_number_types_id" valueNumeric="2"/>
+            <column name="reference_number_type_id" valueNumeric="4"/>
+            <column name="reference_number_types_idx" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-194">
+        <insert tableName="shipment_workflow_reference_number_type">
+            <column name="shipment_workflow_reference_number_types_id" valueNumeric="2"/>
+            <column name="reference_number_type_id" valueNumeric="6"/>
+            <column name="reference_number_types_idx" valueNumeric="1"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-195">
+        <insert tableName="shipment_workflow_reference_number_type">
+            <column name="shipment_workflow_reference_number_types_id" valueNumeric="2"/>
+            <column name="reference_number_type_id" valueNumeric="7"/>
+            <column name="reference_number_types_idx" valueNumeric="2"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-196">
+        <insert tableName="shipment_workflow_reference_number_type">
+            <column name="shipment_workflow_reference_number_types_id" valueNumeric="3"/>
+            <column name="reference_number_type_id" valueNumeric="8"/>
+            <column name="reference_number_types_idx" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-197">
+        <insert tableName="person">
+            <column name="id" valueNumeric="1"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="email" value="admin@pih.org"/>
+            <column name="first_name" value="Miss"/>
+            <column name="last_name" value="Administrator"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-198">
+        <insert tableName="person">
+            <column name="id" valueNumeric="2"/>
+            <column name="version" valueNumeric="254"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="email" value="manager@pih.org"/>
+            <column name="first_name" value="Mister"/>
+            <column name="last_name" value="Manager"/>
+            <column name="last_updated" valueDate="2011-09-23"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-199">
+        <insert tableName="person">
+            <column name="id" valueNumeric="3"/>
+            <column name="version" valueNumeric="3"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="email" value="jmiranda@pih.org"/>
+            <column name="first_name" value="Justin"/>
+            <column name="last_name" value="Miranda"/>
+            <column name="last_updated" valueDate="2011-06-06"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-200">
+        <insert tableName="person">
+            <column name="id" valueNumeric="4"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="email" value="inactive@pih.org"/>
+            <column name="first_name" value="In"/>
+            <column name="last_name" value="Active"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-201">
+        <insert tableName="person">
+            <column name="id" valueNumeric="5"/>
+            <column name="version" valueNumeric="63"/>
+            <column name="date_created" valueDate="2011-03-14"/>
+            <column name="email" value="ewaters@pih.org"/>
+            <column name="first_name" value="Evan"/>
+            <column name="last_name" value="Waters"/>
+            <column name="last_updated" valueDate="2011-09-28"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-202">
+        <insert tableName="person">
+            <column name="id" valueNumeric="6"/>
+            <column name="version" valueNumeric="212"/>
+            <column name="date_created" valueDate="2011-03-14"/>
+            <column name="email" value="blakecampb@gmail.com"/>
+            <column name="first_name" value="Blake"/>
+            <column name="last_name" value="Campbell"/>
+            <column name="last_updated" valueDate="2011-10-06"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-203">
+        <insert tableName="person">
+            <column name="id" valueNumeric="7"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="email" value="pnevil2000@aol.com"/>
+            <column name="first_name" value="Patrice "/>
+            <column name="last_name" value="Nevil"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-204">
+        <insert tableName="person">
+            <column name="id" valueNumeric="8"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="email" value="Sauveur01@aol.com"/>
+            <column name="first_name" value="Marcel"/>
+            <column name="last_name" value="Sauveur"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-205">
+        <insert tableName="person">
+            <column name="id" valueNumeric="9"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="email" value="lounehaiti@aol.com"/>
+            <column name="first_name" value="Loune"/>
+            <column name="last_name" value="Viaud"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-206">
+        <insert tableName="person">
+            <column name="id" valueNumeric="10"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="email" value="youdy2@yahoo.com"/>
+            <column name="first_name" value="Youdy"/>
+            <column name="last_name" value="Gaston"/>
+            <column name="last_updated" valueDate="2011-03-18"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-207">
+        <insert tableName="person">
+            <column name="id" valueNumeric="11"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="email" value="cfabie507@yahoo.fr"/>
+            <column name="first_name" value="Fabiola"/>
+            <column name="last_name" value="Coqmar"/>
+            <column name="last_updated" valueDate="2011-04-05"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-208">
+        <insert tableName="person">
+            <column name="id" valueNumeric="12"/>
+            <column name="version" valueNumeric="199"/>
+            <column name="date_created" valueDate="2011-03-18"/>
+            <column name="email" value="chamon@pih.org"/>
+            <column name="first_name" value="Chris"/>
+            <column name="last_name" value="Hamon "/>
+            <column name="last_updated" valueDate="2011-10-04"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-209">
+        <insert tableName="person">
+            <column name="id" valueNumeric="13"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-21"/>
+            <column name="email" value="jlascher@pih.org"/>
+            <column name="first_name" value="Jonathan"/>
+            <column name="last_name" value="Lascher"/>
+            <column name="last_updated" valueDate="2011-03-21"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-210">
+        <insert tableName="person">
+            <column name="id" valueNumeric="14"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-28"/>
+            <column name="email" value="clerveaux2000@yahoo.fr"/>
+            <column name="first_name" value="Clerveaux"/>
+            <column name="last_name" value="Joseph"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-211">
+        <insert tableName="person">
+            <column name="id" valueNumeric="15"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-28"/>
+            <column name="email" value="alutz@pih.org"/>
+            <column name="first_name" value="Ali"/>
+            <column name="last_name" value="Lutz"/>
+            <column name="last_updated" valueDate="2011-03-28"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-212">
+        <insert tableName="person">
+            <column name="id" valueNumeric="16"/>
+            <column name="version" valueNumeric="2"/>
+            <column name="date_created" valueDate="2011-04-05"/>
+            <column name="email" value="ndemoss@pih.org"/>
+            <column name="first_name" value="Nicole"/>
+            <column name="last_name" value="DeMoss"/>
+            <column name="last_updated" valueDate="2011-06-02"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-213">
+        <insert tableName="person">
+            <column name="id" valueNumeric="17"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-04-05"/>
+            <column name="email" value="drapier@pih.org"/>
+            <column name="first_name" value="Donella"/>
+            <column name="last_name" value="Rapier"/>
+            <column name="last_updated" valueDate="2011-04-05"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-214">
+        <insert tableName="person">
+            <column name="id" valueNumeric="18"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-04-05"/>
+            <column name="email" value="mdas@pih.org"/>
+            <column name="first_name" value="Moeena"/>
+            <column name="last_name" value="Das"/>
+            <column name="last_updated" valueDate="2011-04-05"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-215">
+        <insert tableName="person">
+            <column name="id" valueNumeric="19"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-04-05"/>
+            <column name="email" value="canroby@yahoo.fr"/>
+            <column name="first_name" value="Lyvie"/>
+            <column name="last_name" value="Cantave"/>
+            <column name="last_updated" valueDate="2011-04-05"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-216">
+        <insert tableName="person">
+            <column name="id" valueNumeric="20"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-04-05"/>
+            <column name="email" value="jleonce@pih.org"/>
+            <column name="first_name" value="Jude"/>
+            <column name="last_name" value="Leonce"/>
+            <column name="last_updated" valueDate="2011-04-05"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-217">
+        <insert tableName="person">
+            <column name="id" valueNumeric="21"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-04-05"/>
+            <column name="email" value="florehaiti@aol.com"/>
+            <column name="first_name" value="Marie Flore"/>
+            <column name="last_name" value="Chipps"/>
+            <column name="last_updated" valueDate="2011-04-05"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-218">
+        <insert tableName="person">
+            <column name="id" valueNumeric="22"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-04-05"/>
+            <column name="email" value="chague@pih.org"/>
+            <column name="first_name" value="Christian"/>
+            <column name="last_name" value="Hague"/>
+            <column name="last_updated" valueDate="2011-04-05"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-219">
+        <insert tableName="person">
+            <column name="id" valueNumeric="23"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-04-05"/>
+            <column name="email" value="dwalton@pih.org"/>
+            <column name="first_name" value="David"/>
+            <column name="last_name" value="Walton"/>
+            <column name="last_updated" valueDate="2011-04-05"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-220">
+        <insert tableName="person">
+            <column name="id" valueNumeric="24"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-04-05"/>
+            <column name="email" value="awatson@pih.org"/>
+            <column name="first_name" value="Ariana"/>
+            <column name="last_name" value="Watson"/>
+            <column name="last_updated" valueDate="2011-04-05"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-221">
+        <insert tableName="person">
+            <column name="id" valueNumeric="25"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-04-05"/>
+            <column name="email" value="OAIBANA@PARTNERS.ORG"/>
+            <column name="first_name" value="Wunmi"/>
+            <column name="last_name" value="Aibana"/>
+            <column name="last_updated" valueDate="2011-04-05"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-222">
+        <insert tableName="person">
+            <column name="id" valueNumeric="26"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-04-05"/>
+            <column name="email" value="joanvw@pih.org"/>
+            <column name="first_name" value="Joan"/>
+            <column name="last_name" value="VanWassenhove"/>
+            <column name="last_updated" valueDate="2011-06-06"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-223">
+        <insert tableName="person">
+            <column name="id" valueNumeric="27"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-04-05"/>
+            <column name="email" value="Plancherinel@hotmail.com"/>
+            <column name="first_name" value="Plancher"/>
+            <column name="last_name" value="Inel"/>
+            <column name="last_updated" valueDate="2011-04-05"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-224">
+        <insert tableName="person">
+            <column name="id" valueNumeric="28"/>
+            <column name="version" valueNumeric="4"/>
+            <column name="date_created" valueDate="2011-04-05"/>
+            <column name="email" value="lgalinsky@pih.org"/>
+            <column name="first_name" value="Lauren"/>
+            <column name="last_name" value="Galinsky"/>
+            <column name="last_updated" valueDate="2011-11-16"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-225">
+        <insert tableName="person">
+            <column name="id" valueNumeric="29"/>
+            <column name="version" valueNumeric="12"/>
+            <column name="date_created" valueDate="2011-04-06"/>
+            <column name="email" value="mseaton@pih.org"/>
+            <column name="first_name" value="Michael"/>
+            <column name="last_name" value="Seaton"/>
+            <column name="last_updated" valueDate="2011-08-11"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-226">
+        <insert tableName="person">
+            <column name="id" valueNumeric="30"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-04-11"/>
+            <column name="email" value="mhebert@pih.org"/>
+            <column name="first_name" value="Michael"/>
+            <column name="last_name" value="Hebert"/>
+            <column name="last_updated" valueDate="2011-04-11"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-227">
+        <insert tableName="person">
+            <column name="id" valueNumeric="31"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-04-14"/>
+            <column name="email" value="shyppolite@pih.org"/>
+            <column name="first_name" value="Sybill "/>
+            <column name="last_name" value="Hyppolite"/>
+            <column name="last_updated" valueDate="2011-04-14"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-228">
+        <insert tableName="person">
+            <column name="id" valueNumeric="32"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-04-26"/>
+            <column name="email" value=" cljunior04@yahoo.fr"/>
+            <column name="first_name" value="Junior"/>
+            <column name="last_name" value="Clervilus"/>
+            <column name="last_updated" valueDate="2011-04-26"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-229">
+        <insert tableName="person">
+            <column name="id" valueNumeric="33"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-02"/>
+            <column name="email" value="jutech@pih.org"/>
+            <column name="first_name" value="Jenny"/>
+            <column name="last_name" value="Utech"/>
+            <column name="last_updated" valueDate="2011-06-02"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-230">
+        <insert tableName="person">
+            <column name="id" valueNumeric="34"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-02"/>
+            <column name="email" value="kthanel@pih.org"/>
+            <column name="first_name" value="Kate"/>
+            <column name="last_name" value="Thanel"/>
+            <column name="last_updated" valueDate="2011-06-02"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-231">
+        <insert tableName="person">
+            <column name="id" valueNumeric="35"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-02"/>
+            <column name="email" value="orobinson@pih.org"/>
+            <column name="first_name" value="Owen"/>
+            <column name="last_name" value="Robinson"/>
+            <column name="last_updated" valueDate="2011-06-02"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-232">
+        <insert tableName="person">
+            <column name="id" valueNumeric="36"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-02"/>
+            <column name="email" value="tconstan@pih.org"/>
+            <column name="first_name" value="Ted"/>
+            <column name="last_name" value="Constan"/>
+            <column name="last_updated" valueDate="2011-06-02"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-233">
+        <insert tableName="person">
+            <column name="id" valueNumeric="37"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-06"/>
+            <column name="email" value="kgreene@pih.org"/>
+            <column name="first_name" value="Kate"/>
+            <column name="last_name" value="Greene"/>
+            <column name="last_updated" valueDate="2011-06-06"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-234">
+        <insert tableName="person">
+            <column name="id" valueNumeric="38"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-06"/>
+            <column name="email" value="coswald@pih.org"/>
+            <column name="first_name" value="Cate"/>
+            <column name="last_name" value="Oswald"/>
+            <column name="last_updated" valueDate="2011-06-06"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-235">
+        <insert tableName="person">
+            <column name="id" valueNumeric="39"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-06-06"/>
+            <column name="email" value="maxhaiti@aol.com"/>
+            <column name="first_name" value="Maxi"/>
+            <column name="last_name" value="Raymonville"/>
+            <column name="last_updated" valueDate="2011-06-06"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-236">
+        <insert tableName="person">
+            <column name="id" valueNumeric="40"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2011-06-06"/>
+            <column name="email" value="odahl@pih.org"/>
+            <column name="first_name" value="Ophelia"/>
+            <column name="last_name" value="Dahl"/>
+            <column name="last_updated" valueDate="2011-06-06"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-237">
+        <insert tableName="person">
+            <column name="id" valueNumeric="41"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-06"/>
+            <column name="email" value="jmukherjee@pih.org"/>
+            <column name="first_name" value="Joia"/>
+            <column name="last_name" value="Mukherjee"/>
+            <column name="last_updated" valueDate="2011-06-06"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-238">
+        <insert tableName="person">
+            <column name="id" valueNumeric="42"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-06"/>
+            <column name="email" value="dupuyrony@hotmail.com"/>
+            <column name="first_name" value="Dupuy Rony"/>
+            <column name="last_name" value="Charles"/>
+            <column name="last_updated" valueDate="2011-06-06"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-239">
+        <insert tableName="person">
+            <column name="id" valueNumeric="43"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-06"/>
+            <column name="email" value="mcarbone@pih.org"/>
+            <column name="first_name" value="Megan "/>
+            <column name="last_name" value="Carbone"/>
+            <column name="last_updated" valueDate="2011-06-06"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-240">
+        <insert tableName="person">
+            <column name="id" valueNumeric="44"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-13"/>
+            <column name="email" value="knakashima@pih.org"/>
+            <column name="first_name" value="Koji"/>
+            <column name="last_name" value="Nakashima"/>
+            <column name="last_updated" valueDate="2011-06-13"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-241">
+        <insert tableName="person">
+            <column name="id" valueNumeric="45"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-13"/>
+            <column name="email" value="koas@pih.org"/>
+            <column name="first_name" value="Kathryn"/>
+            <column name="last_name" value="Oas"/>
+            <column name="last_updated" valueDate="2011-06-13"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-242">
+        <insert tableName="person">
+            <column name="id" valueNumeric="46"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-13"/>
+            <column name="email" value="bernardjohny@yahoo.fr"/>
+            <column name="first_name" value="Johny"/>
+            <column name="last_name" value="Bernard"/>
+            <column name="last_updated" valueDate="2011-06-13"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-243">
+        <insert tableName="person">
+            <column name="id" valueNumeric="47"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-13"/>
+            <column name="email" value="marcky45@gmail.com"/>
+            <column name="first_name" value="Saint Louis"/>
+            <column name="last_name" value="Mackinley"/>
+            <column name="last_updated" valueDate="2011-06-13"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-244">
+        <insert tableName="person">
+            <column name="id" valueNumeric="48"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-13"/>
+            <column name="email" value="betou26@yahoo.fr"/>
+            <column name="first_name" value="Betty"/>
+            <column name="last_name" value="Alexander"/>
+            <column name="last_updated" valueDate="2011-06-13"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-245">
+        <insert tableName="person">
+            <column name="id" valueNumeric="49"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-13"/>
+            <column name="email" value="flafontant25@yahoo.fr"/>
+            <column name="first_name" value="Fritz"/>
+            <column name="last_name" value="Lafontant"/>
+            <column name="last_updated" valueDate="2011-06-13"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-246">
+        <insert tableName="person">
+            <column name="id" valueNumeric="50"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-15"/>
+            <column name="email" value="cpalmazor@gmail.com"/>
+            <column name="first_name" value="Charles Patrick"/>
+            <column name="last_name" value="Almazor"/>
+            <column name="last_updated" valueDate="2011-06-15"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-247">
+        <insert tableName="person">
+            <column name="id" valueNumeric="51"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-15"/>
+            <column name="email" value="ruthdamuse@yahoo.fr"/>
+            <column name="first_name" value="Ruth"/>
+            <column name="last_name" value="Damuse"/>
+            <column name="last_updated" valueDate="2011-06-15"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-248">
+        <insert tableName="person">
+            <column name="id" valueNumeric="52"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-21"/>
+            <column name="email" value="jeanjeanroy@pih.org"/>
+            <column name="first_name" value="Jean Jean "/>
+            <column name="last_name" value="Roy Gracia"/>
+            <column name="last_updated" valueDate="2011-06-21"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-249">
+        <insert tableName="person">
+            <column name="id" valueNumeric="53"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-21"/>
+            <column name="email" value="jweigel@pih.org"/>
+            <column name="first_name" value="Jon"/>
+            <column name="last_name" value="Weigel"/>
+            <column name="last_updated" valueDate="2011-06-21"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-250">
+        <insert tableName="person">
+            <column name="id" valueNumeric="54"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-21"/>
+            <column name="email" value="duredaniel@gmail.com"/>
+            <column name="first_name" value="Daniel"/>
+            <column name="last_name" value="Dure"/>
+            <column name="last_updated" valueDate="2011-06-21"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-251">
+        <insert tableName="person">
+            <column name="id" valueNumeric="55"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-21"/>
+            <column name="email" value="ismaelesther@yahoo.fr"/>
+            <column name="first_name" value="Esther"/>
+            <column name="last_name" value="Ismael"/>
+            <column name="last_updated" valueDate="2011-06-21"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-252">
+        <insert tableName="person">
+            <column name="id" valueNumeric="56"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-06-21"/>
+            <column name="email" value="pretanvil@gmail.com"/>
+            <column name="first_name" value="Jean-Aine"/>
+            <column name="last_name" value="Pretanvil"/>
+            <column name="last_updated" valueDate="2011-06-21"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-253">
+        <insert tableName="person">
+            <column name="id" valueNumeric="57"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-07-05"/>
+            <column name="email" value="taya05.83@gmail.com"/>
+            <column name="first_name" value="Yvenie"/>
+            <column name="last_name" value="Taus Rose"/>
+            <column name="last_updated" valueDate="2011-07-05"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-254">
+        <insert tableName="person">
+            <column name="id" valueNumeric="58"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-07-05"/>
+            <column name="email" value="fierce96@gmail.com"/>
+            <column name="first_name" value="Jackie "/>
+            <column name="last_name" value="Williams"/>
+            <column name="last_updated" valueDate="2011-07-05"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-255">
+        <insert tableName="person">
+            <column name="id" valueNumeric="59"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-07-11"/>
+            <column name="email" value="rj.filsaime@gmail.com"/>
+            <column name="first_name" value="Reginald"/>
+            <column name="last_name" value="Fils Aime"/>
+            <column name="last_updated" valueDate="2011-07-11"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-256">
+        <insert tableName="person">
+            <column name="id" valueNumeric="60"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-07-25"/>
+            <column name="email" value="graciawilnes@yahoo.fr"/>
+            <column name="first_name" value="Wilnes"/>
+            <column name="last_name" value="Gracia"/>
+            <column name="last_updated" valueDate="2011-07-25"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-257">
+        <insert tableName="person">
+            <column name="id" valueNumeric="61"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-08-02"/>
+            <column name="email" value="jackotin20@yahoo.com"/>
+            <column name="first_name" value="Jackson"/>
+            <column name="last_name" value="Pierre"/>
+            <column name="last_updated" valueDate="2011-08-02"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-258">
+        <insert tableName="person">
+            <column name="id" valueNumeric="62"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-08-02"/>
+            <column name="email" value="migaph@yahoo.fr"/>
+            <column name="first_name" value="Phoebee"/>
+            <column name="last_name" value="Jovin"/>
+            <column name="last_updated" valueDate="2011-08-02"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-259">
+        <insert tableName="person">
+            <column name="id" valueNumeric="63"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-09-06"/>
+            <column name="email" value="crolle@partners.org"/>
+            <column name="first_name" value="Charlotte"/>
+            <column name="last_name" value="Rolle"/>
+            <column name="last_updated" valueDate="2011-09-06"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-260">
+        <insert tableName="person">
+            <column name="id" valueNumeric="64"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-09-06"/>
+            <column name="email" value="aelliot@pih.org"/>
+            <column name="first_name" value="Amy"/>
+            <column name="last_name" value="Elliot"/>
+            <column name="last_updated" valueDate="2011-09-06"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-261">
+        <insert tableName="person">
+            <column name="id" valueNumeric="65"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-09-06"/>
+            <column name="email" value="peliozin@pih.org"/>
+            <column name="first_name" value="Patricia "/>
+            <column name="last_name" value="Eloizin"/>
+            <column name="last_updated" valueDate="2011-09-06"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-262">
+        <insert tableName="person">
+            <column name="id" valueNumeric="66"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-09-06"/>
+            <column name="email" value="pnewman@partners.org"/>
+            <column name="first_name" value="Patrick "/>
+            <column name="last_name" value="Newman"/>
+            <column name="last_updated" valueDate="2011-09-06"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-263">
+        <insert tableName="person">
+            <column name="id" valueNumeric="67"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-09-06"/>
+            <column name="email" value="jpdon58@hotmail.com"/>
+            <column name="first_name" value="Jean Paul"/>
+            <column name="last_name" value="Joseph"/>
+            <column name="last_updated" valueDate="2011-09-06"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-264">
+        <insert tableName="person">
+            <column name="id" valueNumeric="68"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-09-06"/>
+            <column name="email" value="amayfield@partners.org"/>
+            <column name="first_name" value="Alisha"/>
+            <column name="last_name" value="Mayfield"/>
+            <column name="last_updated" valueDate="2011-09-06"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-265">
+        <insert tableName="person">
+            <column name="id" valueNumeric="69"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-09-06"/>
+            <column name="email" value="dmaru@partners.org"/>
+            <column name="first_name" value="Duncan"/>
+            <column name="last_name" value="Maru"/>
+            <column name="last_updated" valueDate="2011-09-06"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-266">
+        <insert tableName="person">
+            <column name="id" valueNumeric="70"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-09-06"/>
+            <column name="email" value="pelliot13@partners.org"/>
+            <column name="first_name" value="Patrick"/>
+            <column name="last_name" value="Elliot"/>
+            <column name="last_updated" valueDate="2011-09-06"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-267">
+        <insert tableName="person">
+            <column name="id" valueNumeric="71"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-09-06"/>
+            <column name="email" value="regibresil@yahoo.fr"/>
+            <column name="first_name" value="Reginald"/>
+            <column name="last_name" value="Chery"/>
+            <column name="last_updated" valueDate="2011-09-06"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-268">
+        <insert tableName="person">
+            <column name="id" valueNumeric="72"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-09-06"/>
+            <column name="email" value="romainjeanlouis@gmail.com"/>
+            <column name="first_name" value="Jean Louis"/>
+            <column name="last_name" value="Romain"/>
+            <column name="last_updated" valueDate="2011-09-06"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-269">
+        <insert tableName="person">
+            <column name="id" valueNumeric="73"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-09-06"/>
+            <column name="email" value="lspahn@pih.org"/>
+            <column name="first_name" value="Lauren"/>
+            <column name="last_name" value="Spahn"/>
+            <column name="last_updated" valueDate="2011-09-06"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-270">
+        <insert tableName="person">
+            <column name="id" valueNumeric="74"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-09-07"/>
+            <column name="email" value="cioan@pih.org"/>
+            <column name="first_name" value="Cosmin"/>
+            <column name="last_name" value="Ioan"/>
+            <column name="last_updated" valueDate="2011-09-07"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-271">
+        <insert tableName="person">
+            <column name="id" valueNumeric="75"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-09-07"/>
+            <column name="email" value="ewroe@partners.org"/>
+            <column name="first_name" value="Emily"/>
+            <column name="last_name" value="Wroe"/>
+            <column name="last_updated" valueDate="2011-09-07"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-272">
+        <insert tableName="person">
+            <column name="id" valueNumeric="76"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-11-09"/>
+            <column name="email" value="mpeckarsky@pih.org"/>
+            <column name="first_name" value="Matt"/>
+            <column name="last_name" value="Peckarsky"/>
+            <column name="last_updated" valueDate="2011-11-09"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-273">
+        <insert tableName="person">
+            <column name="id" valueNumeric="77"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-11-09"/>
+            <column name="email" value="mbrock@pih.org"/>
+            <column name="first_name" value="Megan"/>
+            <column name="last_name" value="Brock"/>
+            <column name="last_updated" valueDate="2011-11-09"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-274">
+        <insert tableName="person">
+            <column name="id" valueNumeric="78"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-11-09"/>
+            <column name="email" value="aschwartz@pih.org"/>
+            <column name="first_name" value="Amanda"/>
+            <column name="last_name" value="Schwartz"/>
+            <column name="last_updated" valueDate="2011-11-09"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-275">
+        <insert tableName="person">
+            <column name="id" valueNumeric="79"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-11-09"/>
+            <column name="email" value="balla1979@hotmail.com"/>
+            <column name="first_name" value="Billy"/>
+            <column name="last_name" value="Squitt"/>
+            <column name="last_updated" valueDate="2011-11-09"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-276">
+        <insert tableName="person">
+            <column name="id" valueNumeric="80"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-11-09"/>
+            <column name="email" value="jesshaiti@yahoo.com"/>
+            <column name="first_name" value="Jessye"/>
+            <column name="last_name" value="Bertrand"/>
+            <column name="last_updated" valueDate="2011-11-09"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-277">
+        <insert tableName="person">
+            <column name="id" valueNumeric="81"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-11-09"/>
+            <column name="email" value="chaydu@pih.org"/>
+            <column name="first_name" value="Christopher"/>
+            <column name="last_name" value="de Haydu"/>
+            <column name="last_updated" valueDate="2011-11-09"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-278">
+        <insert tableName="person">
+            <column name="id" valueNumeric="82"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-11-09"/>
+            <column name="email" value="clerveaux2000@hotmail.com"/>
+            <column name="first_name" value="Sara"/>
+            <column name="last_name" value="Gonzalez"/>
+            <column name="last_updated" valueDate="2011-11-09"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-279">
+        <insert tableName="person">
+            <column name="id" valueNumeric="83"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-11-09"/>
+            <column name="email" value="flucien@pih.org"/>
+            <column name="first_name" value="Frankie"/>
+            <column name="last_name" value="Lucien"/>
+            <column name="last_updated" valueDate="2011-11-09"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-280">
+        <insert tableName="person">
+            <column name="id" valueNumeric="84"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-11-09"/>
+            <column name="email" value="agaumnitz@pih.org"/>
+            <column name="first_name" value="Amber"/>
+            <column name="last_name" value="Gaumnitz"/>
+            <column name="last_updated" valueDate="2011-11-09"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-281">
+        <insert tableName="person">
+            <column name="id" valueNumeric="85"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-11-09"/>
+            <column name="email" value="chriscarpentermd@gmail.com"/>
+            <column name="first_name" value="Chris"/>
+            <column name="last_name" value="Carpenter"/>
+            <column name="last_updated" valueDate="2011-11-09"/>
+            <column name="phone_number"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-282">
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="2"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-11-08"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-11-08"/>
+            <column name="name" value="Consumption|fr:Consommation"/>
+            <column name="sort_order" valueNumeric="0"/>
+            <column name="transaction_code" value="DEBIT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-283">
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="3"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-11-08"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-11-08"/>
+            <column name="name" value="Adjustment - Credit|fr:Ajustement - Crédit"/>
+            <column name="sort_order" valueNumeric="0"/>
+            <column name="transaction_code" value="CREDIT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-284">
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="4"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-11-08"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-11-08"/>
+            <column name="name" value="Expired|fr:Espiré"/>
+            <column name="sort_order" valueNumeric="0"/>
+            <column name="transaction_code" value="DEBIT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-285">
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="5"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-11-08"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-11-08"/>
+            <column name="name" value="Damaged|fr:Endommagé"/>
+            <column name="sort_order" valueNumeric="0"/>
+            <column name="transaction_code" value="DEBIT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-286">
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="7"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2010-12-06"/>
+            <column name="description" value="Inventory"/>
+            <column name="last_updated" valueDate="2010-12-06"/>
+            <column name="name" value="Inventory|fr:Inventaire"/>
+            <column name="sort_order" valueNumeric="0"/>
+            <column name="transaction_code" value="INVENTORY"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-287">
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="8"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-17"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-17"/>
+            <column name="name" value="Transfer In|fr:Transférer en"/>
+            <column name="sort_order" valueNumeric="0"/>
+            <column name="transaction_code" value="CREDIT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-288">
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="9"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-03-17"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-03-17"/>
+            <column name="name" value="Transfer Out|fr:Transférer hors"/>
+            <column name="sort_order" valueNumeric="0"/>
+            <column name="transaction_code" value="DEBIT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-289">
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="10"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-04-05"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-04-05"/>
+            <column name="name" value="Adjustment - Debit|fr:Ajustement - Débit"/>
+            <column name="sort_order" valueNumeric="0"/>
+            <column name="transaction_code" value="DEBIT"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-290">
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="11"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-04-06"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2011-04-06"/>
+            <column name="name" value="Product Inventory|fr:Inventaire de Produits"/>
+            <column name="sort_order" valueNumeric="0"/>
+            <column name="transaction_code" value="PRODUCT_INVENTORY"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-291">
+        <insert tableName="shipment_type">
+            <column name="id" valueNumeric="1"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Air|fr:Air"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-292">
+        <insert tableName="shipment_type">
+            <column name="id" valueNumeric="2"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Sea|fr:Mer"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-293">
+        <insert tableName="shipment_type">
+            <column name="id" valueNumeric="3"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-08-22"/>
+            <column name="description" value=""/>
+            <column name="last_updated" valueDate="2011-08-22"/>
+            <column name="name" value="Land|fr:Terrains"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-294">
+        <insert tableName="shipment_type">
+            <column name="id" valueNumeric="4"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="name" value="Suitcase|fr:Valise/Malette"/>
+            <column name="sort_order" valueNumeric="4"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-295">
+        <insert tableName="shipment_workflow">
+            <column name="id" valueNumeric="1"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-02-28"/>
+            <column name="last_updated" valueDate="2011-02-28"/>
+            <column name="name" value="Air shipment workflow"/>
+            <column name="shipment_type_id" valueNumeric="1"/>
+            <column name="excluded_fields" value="carrier,recipient"/>
+            <column name="document_template"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-296">
+        <insert tableName="shipment_workflow">
+            <column name="id" valueNumeric="2"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-02-28"/>
+            <column name="last_updated" valueDate="2011-02-28"/>
+            <column name="name" value="Sea shipment workflow"/>
+            <column name="shipment_type_id" valueNumeric="2"/>
+            <column name="excluded_fields" value="carrier,recipient"/>
+            <column name="document_template"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-297">
+        <insert tableName="shipment_workflow">
+            <column name="id" valueNumeric="3"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-02-28"/>
+            <column name="last_updated" valueDate="2011-02-28"/>
+            <column name="name" value="Suitcase shipment workflow"/>
+            <column name="shipment_type_id" valueNumeric="4"/>
+            <column name="excluded_fields" value="shipmentMethod.shipper"/>
+            <column name="document_template" value="suitcaseLetter"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323290650731-298">
+        <insert tableName="location">
+            <column name="id" valueNumeric="1"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2011-02-28"/>
+            <column name="last_updated" valueDate="2011-02-28"/>
+            <column name="name" value="Default Location"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="local" valueBoolean="true"/>
+            <column name="bg_color" value="#FFFFFF"/>
+            <column name="fg_color" value="#000000"/>
+            <column name="location_type_id" value="2"/>
+            <column name="manager_id" value="1"/>
+            
+        </insert>
+    </changeSet>
+    
+    <changeSet author="jmiranda" id="enable-foreign-key-checks" runAlways="true" dbms="mysql">
+		<sql>SET FOREIGN_KEY_CHECKS=1</sql>
+    </changeSet>    
+    
+</databaseChangeLog>

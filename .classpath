@@ -29,7 +29,6 @@
 	<classpathentry kind="lib" path="lib/json-lib-2.3-jdk15.jar"/>
 	<classpathentry kind="lib" path="lib/xml-resolver-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/ezmorph-1.0.6.jar"/>
-	<classpathentry kind="lib" path="lib/liquibase-1.9.5.jar"/>
 	<classpathentry kind="lib" path="lib/ocpsoft-pretty-time-1.0.6.jar"/>
 	<classpathentry kind="lib" path="lib/geronimo-stax-api_1.0_spec-1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/xmlbeans-2.3.0.jar"/>
@@ -393,5 +392,6 @@
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/liquibase-1.9.5.jar"/>
 	<classpathentry kind="output" path="target-eclipse/classes"/>
 </classpath>

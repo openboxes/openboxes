@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+
+	<!-- These changes should only be run against a schema with database version = 0.4.x 
+		At the moment, this feature does not work as the onFail/onError feature has a bug
+		as of Liquibase 1.9.x.  Need to wait for a newer version of Liquibase (e.g. 2.0.x). -->		
+    <!--<preConditions onFail="WARN" onError="WARN">
+    	<sqlCheck expectedResult="0.4.x">
+   	        SELECT IFNULL(MAX(id),0) FROM DATABASECHANGELOG WHERE author='DatabaseVersion'	
+    	</sqlCheck>
+    </preConditions>-->
+	
+	<include file="0.4.x/changelog-update-to-latest.xml"/>
+
+</databaseChangeLog>
