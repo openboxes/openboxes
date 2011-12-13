@@ -8,6 +8,7 @@ import java.util.Date;
  */
 class ContainerType implements java.io.Serializable {
 
+	String id
 	String name
 	String description
 	Integer sortOrder = 0;
@@ -23,6 +24,7 @@ class ContainerType implements java.io.Serializable {
 	}	
 
 	static mapping = {
+		id generator: 'uuid'
 		sort "sortOrder"
 	}
 

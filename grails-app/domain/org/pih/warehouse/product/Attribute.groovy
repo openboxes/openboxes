@@ -9,6 +9,7 @@ import java.util.Date;
  */
 class Attribute {
 	
+	String id
 	String name 			// The name of the attribute (e.g. 'vitality')
 	Boolean allowOther		// If true, supports a free-text entry for value
 	List options;			// Valid coded option values for this attribute
@@ -17,7 +18,11 @@ class Attribute {
 	Date lastUpdated;
 
 	static hasMany = [options : String ];
-	
+
+	static mapping = {
+		id generator: 'uuid'
+	}	
+		
 	static constraints = { 
 		name(nullable:false, maxSize: 255)
 		dateCreated(display:false)

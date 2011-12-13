@@ -7,12 +7,13 @@ import java.util.Date;
  */
 class DocumentType implements Serializable {
 	
+	String id 
 	String name
 	String description
 	Integer sortOrder = 0;
 	Date dateCreated;
 	Date lastUpdated;
-		
+			
 	static constraints = { 
 		name(nullable:false, maxSize: 255)
 		description(nullable:true, maxSize: 255)
@@ -20,6 +21,7 @@ class DocumentType implements Serializable {
 	}
 	
 	static mapping = {
+		id generator: 'uuid'
 		sort "sortOrder"
 	}
 

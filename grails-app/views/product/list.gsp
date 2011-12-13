@@ -32,7 +32,11 @@
                     <tbody>
                     <g:each in="${productInstanceList}" status="i" var="productInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
-							<td align="center"><g:link action="edit" id="${productInstance.id}"><format:product product="${productInstance}"/></g:link></td>
+							<td align="center">
+								<g:link action="edit" id="${productInstance.id}">
+									<format:product product="${productInstance}"/>
+								</g:link>
+							</td>
 							<td align="center"><format:category category="${productInstance?.category }"/></td>
                         </tr>
                     </g:each>

@@ -7,6 +7,7 @@ import org.pih.warehouse.core.Location;
 
 class Person implements Comparable, Serializable {
     
+	String id;
 	String firstName;
 	String lastName;
 	String email;
@@ -17,6 +18,7 @@ class Person implements Comparable, Serializable {
 	static mapping = { 
 		tablePerHierarchy false
 		table 'person' 
+		id generator: 'uuid'
 	}
 
 	static transients = ["name"]

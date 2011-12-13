@@ -4,6 +4,7 @@ import org.pih.warehouse.product.Product;
 
 class TransactionEntry implements Comparable, Serializable {
 	
+	String id
     Integer quantity				
 	InventoryItem inventoryItem		// The inventory item being tracked
 	String comments					// 
@@ -11,9 +12,8 @@ class TransactionEntry implements Comparable, Serializable {
     static belongsTo = [ transaction : Transaction ]
 
 	static mapping = { 
-		cache true
+		id generator: 'uuid'		
 	}
-	
     static constraints = {		
 		inventoryItem(nullable:false)		
 		quantity(nullable:false, range: 0..2147483646)

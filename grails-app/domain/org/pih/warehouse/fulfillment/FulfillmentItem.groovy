@@ -8,6 +8,8 @@ import org.pih.warehouse.shipping.ShipmentItem;
 
 class FulfillmentItem implements Serializable {
 
+	String id
+	
 	// Attributes
 	Integer quantity
 	InventoryItem inventoryItem
@@ -16,6 +18,10 @@ class FulfillmentItem implements Serializable {
 	// Audit fields
 	Date dateCreated
 	Date lastUpdated
+	
+	static mapping = {
+		id generator: 'uuid'
+	}
 	
 	// Bi-directional associations
 	static belongsTo = [ fulfillment : Fulfillment ]

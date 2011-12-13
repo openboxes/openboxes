@@ -37,7 +37,7 @@
 										<div id="warehouse-${warehouse.id }" class="warehouse">													
 											<a class="home" href='${createLink(action:"chooseLocation", id: warehouse.id)}' style="display: block;">
 												<g:if test="${warehouse.logo}">	
-													<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'warehouse', action:'viewLogo', id: warehouse.id)}" />
+													<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'location', action:'viewLogo', id: warehouse.id)}" />
 													<%--<img src="${warehouse.logo}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img>--%>
 												</g:if>
 												<g:else>

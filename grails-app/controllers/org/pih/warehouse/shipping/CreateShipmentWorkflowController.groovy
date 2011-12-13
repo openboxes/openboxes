@@ -26,7 +26,7 @@ class CreateShipmentWorkflowController {
     			
     			// create a new shipment instance if we don't have one already
     			if (!flow.shipmentInstance) { 
-    				flow.shipmentInstance = shipmentService.getShipmentInstance(params.id as Long)
+    				flow.shipmentInstance = shipmentService.getShipmentInstance(params.id)
     				flow.shipmentWorkflow = shipmentService.getShipmentWorkflow(flow.shipmentInstance)
     			}
 				if (params.skipTo) { 
@@ -223,30 +223,30 @@ class CreateShipmentWorkflowController {
 			on("addBoxToContainer"){
 				// this parameter triggers the "Add Box" dialog for the container to be opened on page reload
 				// -1 means we need to assign the id of the newly created container to add box
-				flash.addBoxToContainerId = (params.container?.id) ? params.container.id as Integer : -1
+				flash.addBoxToContainerId = (params.container?.id) ? params.container.id : -1
 			}.to("saveContainerAction")
 			
 			on("addItemToContainer") {
 				// this parameter triggers the "Add Item" dialog for the container to be opened on page reload 
 				// -1 means we need to assign the id of the new container to add item
-				flash.addItemToContainerId = (params.container?.id) ? params.container.id as Integer : -1
+				flash.addItemToContainerId = (params.container?.id) ? params.container.id : -1
 			}.to("saveContainerAction")
 
 			on("addItemToShipment") {
 				// this parameter triggers the "Add Item" dialog for the container to be opened on page reload
 				// -1 means we need to assign the id of the new container to add item
-				flash.addItemToShipmentId = (params.container?.id) ? params.container.id as Integer : -1
+				flash.addItemToShipmentId = (params.container?.id) ? params.container.id : -1
 			}.to("enterContainerDetails")
 						
 			on("addItemToBox") {	
 				// this parameter triggers the "Add Item" dialog for the container to be opened on page reload
 				// -1 means we need to assign the id of the newly created box to to the item 
-				flash.addItemToContainerId = (params.box?.id) ? params.box.id as Integer : -1
+				flash.addItemToContainerId = (params.box?.id) ? params.box.id : -1
 			}.to("saveBoxAction")
 			
 			on("addAnotherItem") {
 				// this parameter triggers the "Add Item" dialog for the container to be opened on page reload
-				flash.addItemToContainerId = params.container.id as Integer
+				flash.addItemToContainerId = params.container.id
 			}.to("saveItemAction")
 			
 			on("moveItemToContainer").to("moveItemAction")

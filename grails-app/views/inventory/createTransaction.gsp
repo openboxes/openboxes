@@ -1,3 +1,5 @@
+<%@ page import="org.pih.warehouse.inventory.TransactionType" %>
+<%@ page import="org.pih.warehouse.core.Constants" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -24,22 +26,22 @@
 
 			<div class="dialog" >
 				<div>
-					<g:if test="${command?.transactionInstance?.transactionType?.id == 9 }">
+					<g:if test="${command?.transactionInstance?.transactionType?.id == Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID}">
 						<g:render template="outgoingTransfer"></g:render>
 					</g:if>
-					<g:elseif test="${command?.transactionInstance?.transactionType?.id == 8}">
+					<g:elseif test="${command?.transactionInstance?.transactionType?.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID}">
 						<g:render template="incomingTransfer"></g:render>
 					</g:elseif>
-					<g:elseif test="${command?.transactionInstance?.transactionType?.id == 7}">
+					<g:elseif test="${command?.transactionInstance?.transactionType?.id == Constants.INVENTORY_TRANSACTION_TYPE_ID}">
 						<g:render template="inventoryAdjustment"></g:render>
 					</g:elseif>
-					<g:elseif test="${command?.transactionInstance?.transactionType?.id == 4}">
+					<g:elseif test="${command?.transactionInstance?.transactionType?.id == Constants.EXPIRATION_TRANSACTION_TYPE_ID}">
 						<g:render template="inventoryExpired"></g:render>
 					</g:elseif>
-					<g:elseif test="${command?.transactionInstance?.transactionType?.id == 5}">
+					<g:elseif test="${command?.transactionInstance?.transactionType?.id == Constants.DAMAGE_TRANSACTION_TYPE_ID}">
 						<g:render template="inventoryDamaged"></g:render>
 					</g:elseif>
-					<g:elseif test="${command?.transactionInstance?.transactionType?.id == 2}">
+					<g:elseif test="${command?.transactionInstance?.transactionType?.id == Constants.CONSUMPTION_TRANSACTION_TYPE_ID}">
 						<g:render template="inventoryConsumed"></g:render>
 					</g:elseif>
 					<g:else>

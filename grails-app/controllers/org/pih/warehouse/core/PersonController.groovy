@@ -9,12 +9,12 @@ class PersonController {
 	
 		
 	def convertPersonToUser = { 	
-		userService.convertPersonToUser(Integer.valueOf(params.id))
+		userService.convertPersonToUser(params.id)
 		redirect(controller: "user", action: "edit", id: params.id)	
 	}
 
 	def convertUserToPerson = {
-		userService.convertUserToPerson(Integer.valueOf(params.id))
+		userService.convertUserToPerson(params.id)
 		redirect(controller: "person", action: "show", id: params.id)
 	}
 

@@ -702,7 +702,7 @@ class InventoryController {
 		def transactionInstance = new Transaction(params);
 		//transactionInstance?.transactionDate = new Date();
 		//transactionInstance?.source = warehouseInstance
-		
+		log.info("transactionType " + transactionInstance?.transactionType)
 		if (!transactionInstance?.transactionType) { 
 			flash.message = "Cannot create transaction for unknown transaction type";			
 			redirect(controller: "inventory", action: "browse")
@@ -711,13 +711,13 @@ class InventoryController {
 		// Process productId parameters from inventory browser
 		if (params.product?.id) {
 			def productIds = params.list('product.id')
-			def products = productIds.collect { Long.valueOf(it); }
+			def products = productIds.collect { String.valueOf(it); }
 			command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, products);
 		}
 		// If given a list of inventory items, we just return those inventory items
 		else if (params?.inventoryItem?.id) { 
 			def inventoryItemIds = params.list('inventoryItem.id')
-			def inventoryItems = inventoryItemIds.collect { InventoryItem.get(Long.valueOf(it)); }
+			def inventoryItems = inventoryItemIds.collect { InventoryItem.get(String.valueOf(it)); }
 			command?.productInventoryItems = inventoryItems.groupBy { it.product } 
 		}
 		
@@ -781,13 +781,13 @@ class InventoryController {
 			// Get the list of products that the user selected from the inventory browser			
 			if (params.product?.id) {
 				def productIds = params.list('product.id')
-				def products = productIds.collect { Long.valueOf(it); }
+				def products = productIds.collect { String.valueOf(it); }
 				command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, products);
 			}
 			// If given a list of inventory items, we just return those inventory items
 			else if (params?.inventoryItem?.id) {
 				def inventoryItemIds = params.list('inventoryItem.id')
-				def inventoryItems = inventoryItemIds.collect { InventoryItem.get(Long.valueOf(it)); }
+				def inventoryItems = inventoryItemIds.collect { InventoryItem.get(String.valueOf(it)); }
 				command?.productInventoryItems = inventoryItems.groupBy { it.product }
 			}
 	
@@ -855,13 +855,13 @@ class InventoryController {
 			// Get the list of products that the user selected from the inventory browser
 			if (params.product?.id) {
 				def productIds = params.list('product.id')
-				def products = productIds.collect { Long.valueOf(it); }
+				def products = productIds.collect { String.valueOf(it); }
 				command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, products);
 			}
 			// If given a list of inventory items, we just return those inventory items
 			else if (params?.inventoryItem?.id) {
 				def inventoryItemIds = params.list('inventoryItem.id')
-				def inventoryItems = inventoryItemIds.collect { InventoryItem.get(Long.valueOf(it)); }
+				def inventoryItems = inventoryItemIds.collect { InventoryItem.get(String.valueOf(it)); }
 				command?.productInventoryItems = inventoryItems.groupBy { it.product }
 			}
 	
@@ -956,13 +956,13 @@ class InventoryController {
 			// Get the list of products that the user selected from the inventory browser
 			if (params.product?.id) {
 				def productIds = params.list('product.id')
-				def products = productIds.collect { Long.valueOf(it); }
+				def products = productIds.collect { String.valueOf(it); }
 				command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, products);
 			}
 			// If given a list of inventory items, we just return those inventory items
 			else if (params?.inventoryItem?.id) {
 				def inventoryItemIds = params.list('inventoryItem.id')
-				def inventoryItems = inventoryItemIds.collect { InventoryItem.get(Long.valueOf(it)); }
+				def inventoryItems = inventoryItemIds.collect { InventoryItem.get(String.valueOf(it)); }
 				command?.productInventoryItems = inventoryItems.groupBy { it.product }
 			}
 			
@@ -1037,13 +1037,13 @@ class InventoryController {
 			// Get the list of products that the user selected from the inventory browser
 			if (params.product?.id) {
 				def productIds = params.list('product.id')
-				def products = productIds.collect { Long.valueOf(it); }
+				def products = productIds.collect { String.valueOf(it); }
 				command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, products);
 			}
 			// If given a list of inventory items, we just return those inventory items
 			else if (params?.inventoryItem?.id) {
 				def inventoryItemIds = params.list('inventoryItem.id')
-				def inventoryItems = inventoryItemIds.collect { InventoryItem.get(Long.valueOf(it)); }
+				def inventoryItems = inventoryItemIds.collect { InventoryItem.get(String.valueOf(it)); }
 				command?.productInventoryItems = inventoryItems.groupBy { it.product }
 			}
 			

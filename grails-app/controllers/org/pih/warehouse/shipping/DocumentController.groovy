@@ -48,7 +48,7 @@ class DocumentController {
 		// bind the command object to the document object ignoring the shipmentId and fileContents params (which can't change after creation)
 		bindData(documentInstance, command, ['shipmentId','orderId','fileContents'])
 		// manually update the document type
-		documentInstance.documentType = DocumentType.get(Long.parseLong(command.typeId))
+		documentInstance.documentType = DocumentType.get(command.typeId)
 		
 		if (!documentInstance.hasErrors()) {
 			flash.message = "${warehouse.message(code: 'document.succesfullyUpdatedDocument.message')}"
@@ -91,7 +91,7 @@ class DocumentController {
 	   } 
 	   else if (file.size < 10*1024*1000) {		   
 		   log.info "Creating new document ";
-		   def typeId = Long.parseLong(command?.typeId?:0)
+		   def typeId = command?.typeId?:"0"
 		   Document documentInstance = new Document( 
 			   size: file.size, 
 			   name: command.name,

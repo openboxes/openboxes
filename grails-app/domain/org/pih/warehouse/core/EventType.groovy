@@ -13,6 +13,7 @@ import org.pih.warehouse.core.EventCode;
  */
 class EventType implements Comparable, Serializable {
 
+	String id
 	String name
 	String description
 	Integer sortOrder = 0;
@@ -35,9 +36,10 @@ class EventType implements Comparable, Serializable {
 	}
 	
 	static mapping = {
+		id generator: 'uuid'
 		sort "sortOrder"
-	}
-	
+	}	
+
 	String getOptionValue() { 
 		return (description) ? description : name; 
 	}

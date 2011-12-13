@@ -32,7 +32,7 @@
 						<g:set var="quantity" value="${commandInstance.quantityByInventoryItemMap.get(itemInstance)}"/>		
 						<!-- only show items with quantities -->	
 						<g:set var="itemQuantity" value="${commandInstance.quantityByInventoryItemMap.get(itemInstance) }"/>
-						<g:set var="selected" value="${params?.inventoryItem?.id && (itemInstance.id == Integer.valueOf(params?.inventoryItem?.id)) }"/>
+						<g:set var="selected" value="${params?.inventoryItem?.id && (itemInstance.id == params?.inventoryItem?.id) }"/>
 						<g:set var="styleClass" value="${(count++%2==0)?'even':'odd' }"/>
 						<g:if test="${selected }">
 							<g:set var="styleClass" value="selected-row"/>

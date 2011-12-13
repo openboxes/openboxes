@@ -123,7 +123,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param locationId
 	 * @return
 	 */
-    Location getLocation(Long locationId) {
+    Location getLocation(String locationId) {
 	   	if (locationId) {
 	   		Location location = Location.get(locationId)
 	   		if (!location) {
@@ -140,6 +140,14 @@ class InventoryService implements ApplicationContextAware {
 	   	}
     }
 	
+    /**
+     * Saves the specified location
+	 * 
+	 * @param location
+	 */
+	//void saveLocation(Location location) {
+	//	location.save(flush:true)
+	//}
     
 	/**
 	 * Gets all transactions associated with a warehouse
@@ -297,10 +305,7 @@ class InventoryService implements ApplicationContextAware {
 
 		return commandInstance?.categoryToProductMap
 	}
-	
-	Map getInventoryLevels
-	
-	
+		
 	/**
 	 * Get the outgoing quantity for all products at the given location.
 	 * 
@@ -1346,43 +1351,7 @@ class InventoryService implements ApplicationContextAware {
 		   }
 	   }
    }
-		
    
-   /**
-    * 
-    * @param id
-    * @return
-    */
-	List getInventoryItemList(Long id) { 
-		def list = []
-		def warehouseInstance = Location.get(id);
-		def inventoryInstance = warehouseInstance?.inventory;
-		if (inventoryInstance) { 
-			def transactionEntries = getTransactionEntriesByInventory(inventoryInstance)
-			list = transactionEntries*.inventoryItem
-		}				
-		return list;
-	}	
-	
-	
-	/**
-	 * 
-	 * @param id
-	 * @return
-	 */
-	Map getInventoryItemMap(Long id) { 
-		return getInventoryItemList(id)?.groupBy { it.product } 
-	}
-
-	/**
-	 * 
-	 * @param id
-	 * @return
-	 */
-	Map getInventoryLevelMap(Long id) { 
-		//return Location.get(id)?.inventory?.inventoryLevels?.groupBy { it.product } 
-		return new HashMap();
-	}
 
 	/**
 	 * Adjusts the stock level by adding a new transaction entry with a 

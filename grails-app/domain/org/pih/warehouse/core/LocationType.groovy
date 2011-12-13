@@ -8,6 +8,7 @@ import java.util.Date;
  */
 class LocationType implements Serializable {
 
+	String id
 	String name
 	String description
 	Integer sortOrder = 0;
@@ -16,6 +17,12 @@ class LocationType implements Serializable {
 			
 	static hasMany = [ supportedActivities : String ]
 	
+	static mapping = {
+		id generator: 'uuid'
+		// Needs to be eagerly fetched because of Location.supportsActivity() method
+		supportedActivities lazy: false
+	}
+	
 	static constraints = { 
 		name(nullable:false, maxSize: 255)
 		description(nullable:true, maxSize: 255)
@@ -23,12 +30,7 @@ class LocationType implements Serializable {
 		dateCreated(display:false)
 		lastUpdated(display:false)
 	}
-	
-	static mapping = {
-		// Needs to be eagerly fetched because of Location.supportsActivity() method
-		supportedActivities lazy: false
-	}
-	
+		
 	/**
 	* Indicates whether the location type supports the given activity.
 	*

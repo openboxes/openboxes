@@ -930,10 +930,9 @@ class ShipmentController {
 	
 	
 	def addToShipment = { 
-		
 		// Get product IDs and convert them to Long
 		def productIds = params.list('product.id')		
-		productIds = productIds.collect { Long.valueOf(it); } 
+		productIds = productIds.collect { String.valueOf(it); } 
 		// Find all inventory items that match the selected products
 		def products = []
 		def inventoryItems = [] 

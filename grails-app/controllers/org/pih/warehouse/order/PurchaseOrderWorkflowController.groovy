@@ -21,7 +21,7 @@ class PurchaseOrderWorkflowController {
 				flow.suppliers = orderService.getSuppliers();
 				// create a new shipment instance if we don't have one already
 				if (params.id) {
-					flow.order = Order.get(params.id as Long)
+					flow.order = Order.get(params.id)
 				}
 				else {
 					def order = new Order();

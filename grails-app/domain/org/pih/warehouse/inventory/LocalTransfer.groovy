@@ -21,6 +21,9 @@ import org.pih.warehouse.core.Constants;
  * 	
  */
 class LocalTransfer {
+
+	String id	
+	
     // Core data elements
     Transaction sourceTransaction
     Transaction destinationTransaction
@@ -30,7 +33,7 @@ class LocalTransfer {
 	Date lastUpdated;
 		
     String toString() { return "source = ${sourceTransaction}, destination = ${destinationTransaction}" }
-	
+
     // Constraints
     static constraints = {
 		sourceTransaction(nullable:false, unique:true,
@@ -41,6 +44,7 @@ class LocalTransfer {
     }
     
 	static mapping = {
+		id generator: 'uuid'
 		sourceTransaction cascade: "all-delete-orphan"
 		destinationTransaction cascade: "all-delete-orphan"
 	}	

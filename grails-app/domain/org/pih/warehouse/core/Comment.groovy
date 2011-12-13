@@ -5,6 +5,7 @@ import org.pih.warehouse.core.User
 
 class Comment implements Serializable {
 
+	String id
 	String comment
 	User sender
 	User recipient
@@ -17,6 +18,9 @@ class Comment implements Serializable {
 	// Shipment (and other entities) should create a join table for comments.
 	//static belongsTo = [ shipment : Shipment ];
 	
+	static mapping = {
+		id generator: 'uuid'
+	}
 	
 	static constraints = {
 		comment(nullable:false, maxSize: 255)

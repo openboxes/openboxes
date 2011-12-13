@@ -4,6 +4,7 @@ import java.util.Date;
 
 class Address implements Serializable {
 	
+	String id
 	String address
 	String address2
 	String city
@@ -14,6 +15,11 @@ class Address implements Serializable {
 	// Audit fields
 	Date dateCreated;
 	Date lastUpdated;
+	
+	static mapping = {
+		id generator: 'uuid'
+	}
+	
 	
 	static constraints = {
 		address(nullable: true, maxSize: 255)

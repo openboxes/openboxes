@@ -39,7 +39,7 @@ environments {
 	diff {
 		dataSource {
 			// Used with the 'db-diff-incremental' script
-			dbCreate = "create-drop"
+			//dbCreate = "create-drop"
 			url = "jdbc:mysql://localhost:3306/warehouse_diff?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;sessionVariables=storage_engine=InnoDB"
 		}
 	}

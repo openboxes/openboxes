@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+
+	<!-- Generated automatically by the following SQL run from the MySQL command-line client.
+	
+			SET @counter := 0;
+			SELECT distinct concat('<changeSet author="jmiranda" failOnError="false" id="1321565252310-',@counter := @counter + 1,'"><dropForeignKeyConstraint baseTableName="', table_name, '" constraintName="', constraint_name, '"/></changeSet>') FROM KEY_COLUMN_USAGE WHERE constraint_schema = 'warehouse_dev' AND constraint_name != 'PRIMARY'
+			INTO OUTFILE '/tmp/results-dropfk.csv'
+			LINES TERMINATED BY '\n';	
+	-->
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-1"><dropForeignKeyConstraint baseTableName="category" constraintName="FK302BCFE619A2EF8"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-2"><dropForeignKeyConstraint baseTableName="comment" constraintName="FK38A5EE5FAF1302EB"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-3"><dropForeignKeyConstraint baseTableName="comment" constraintName="FK38A5EE5FF885F087"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-4"><dropForeignKeyConstraint baseTableName="container" constraintName="FKE7814C8117A6E251"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-5"><dropForeignKeyConstraint baseTableName="container" constraintName="FKE7814C813B5F6286"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-6"><dropForeignKeyConstraint baseTableName="container" constraintName="FKE7814C8144979D51"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-7"><dropForeignKeyConstraint baseTableName="container" constraintName="FKE7814C814B6A2E03"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-8"><dropForeignKeyConstraint baseTableName="document" constraintName="FK335CD11B6631D8CC"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-9"><dropForeignKeyConstraint baseTableName="event" constraintName="FK5C6729A3D970DB4"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-10"><dropForeignKeyConstraint baseTableName="event" constraintName="FK5C6729A4415A5B0"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-11"><dropForeignKeyConstraint baseTableName="inventory_item" constraintName="FKFE019416DED5FAE7"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-12"><dropForeignKeyConstraint baseTableName="inventory_level" constraintName="FKC254A2E172A2C5B4"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-13"><dropForeignKeyConstraint baseTableName="local_transfer" constraintName="FK7975323F4CC49445"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-14"><dropForeignKeyConstraint baseTableName="local_transfer" constraintName="FK7975323F57563498"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-15"><dropForeignKeyConstraint baseTableName="local_transfer" constraintName="fk_local_transfer_destination_transaction_transaction"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-16"><dropForeignKeyConstraint baseTableName="local_transfer" constraintName="fk_local_transfer_source_transaction_transaction"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-17"><dropForeignKeyConstraint baseTableName="location" constraintName="FK714F9FB528F75F00"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-18"><dropForeignKeyConstraint baseTableName="location" constraintName="FK714F9FB541E07A73"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-19"><dropForeignKeyConstraint baseTableName="location" constraintName="FK714F9FB561ED379F"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-20"><dropForeignKeyConstraint baseTableName="location" constraintName="FK714F9FB572A2C5B4"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-21"><dropForeignKeyConstraint baseTableName="location" constraintName="FK714F9FB57AF9A3C0"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-22"><dropForeignKeyConstraint baseTableName="product" constraintName="FKED8DCCEFEF4C770D"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-23"><dropForeignKeyConstraint baseTableName="product_attribute" constraintName="FK94A534C47B0D087"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-24"><dropForeignKeyConstraint baseTableName="product_attribute" constraintName="FK94A534CDED5FAE7"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-25"><dropForeignKeyConstraint baseTableName="product_category" constraintName="FKA0303E4EEF4C770D"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-26"><dropForeignKeyConstraint baseTableName="product_tags" constraintName="FK3C78DD69DED5FAE7"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-27"><dropForeignKeyConstraint baseTableName="receipt" constraintName="FK4082723844979D51"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-28"><dropForeignKeyConstraint baseTableName="receipt_item" constraintName="FKAE3064BA44979D51"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-29"><dropForeignKeyConstraint baseTableName="receipt_item" constraintName="FKAE3064BADED5FAE7"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-30"><dropForeignKeyConstraint baseTableName="receipt_item" constraintName="FKAE3064BAF7076438"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-31"><dropForeignKeyConstraint baseTableName="reference_number" constraintName="FKD790DEBD154F600"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-32"><dropForeignKeyConstraint baseTableName="shipment" constraintName="FKE139719A1E2B3CDC"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-33"><dropForeignKeyConstraint baseTableName="shipment" constraintName="FKE139719A294C1012"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-34"><dropForeignKeyConstraint baseTableName="shipment" constraintName="FKE139719A44979D51"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-35"><dropForeignKeyConstraint baseTableName="shipment" constraintName="FKE139719A49AB6B52"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-36"><dropForeignKeyConstraint baseTableName="shipment" constraintName="FKE139719AA28CC5FB"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-37"><dropForeignKeyConstraint baseTableName="shipment" constraintName="FKE139719ADBDEDAC4"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-38"><dropForeignKeyConstraint baseTableName="shipment" constraintName="FKE139719AF7076438"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-39"><dropForeignKeyConstraint baseTableName="shipment" constraintName="FKE139719AFF77FF9B"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-40"><dropForeignKeyConstraint baseTableName="shipment_comment" constraintName="FKC398CCBAC4A49BBF"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-41"><dropForeignKeyConstraint baseTableName="shipment_document" constraintName="FK6C5BE20C800AA15"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-42"><dropForeignKeyConstraint baseTableName="shipment_event" constraintName="FK6D032BB53B350242"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-43"><dropForeignKeyConstraint baseTableName="shipment_event" constraintName="FK6D032BB5786431F"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-44"><dropForeignKeyConstraint baseTableName="shipment_item" constraintName="FKDA3BB2983B5F6286"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-45"><dropForeignKeyConstraint baseTableName="shipment_item" constraintName="FKDA3BB29844979D51"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-46"><dropForeignKeyConstraint baseTableName="shipment_item" constraintName="FKDA3BB29849AB6B52"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-47"><dropForeignKeyConstraint baseTableName="shipment_item" constraintName="FKDA3BB2987400E88E"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-48"><dropForeignKeyConstraint baseTableName="shipment_item" constraintName="FKDA3BB298DED5FAE7"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-49"><dropForeignKeyConstraint baseTableName="shipment_method" constraintName="FK40203B26296B2CA3"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-50"><dropForeignKeyConstraint baseTableName="shipment_method" constraintName="FK40203B263896C98E"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-51"><dropForeignKeyConstraint baseTableName="shipment_reference_number" constraintName="FK312F6C292388BC5"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-52"><dropForeignKeyConstraint baseTableName="shipment_workflow" constraintName="shipment_type_id"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-53"><dropForeignKeyConstraint baseTableName="shipment_workflow" constraintName="FKD584C4C4FF77FF9B"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-54"><dropForeignKeyConstraint baseTableName="shipment_workflow_container_type" constraintName="FKDEF5AD1317A6E251"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-55"><dropForeignKeyConstraint baseTableName="shipment_workflow_reference_number_type" constraintName="FK4BB27241154F600"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-56"><dropForeignKeyConstraint baseTableName="shipper_service" constraintName="FKDF7559D73896C98E"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-57"><dropForeignKeyConstraint baseTableName="transaction" constraintName="FK7FA0D2DE1E2B3CDC"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-58"><dropForeignKeyConstraint baseTableName="transaction" constraintName="FK7FA0D2DE217F5972"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-59"><dropForeignKeyConstraint baseTableName="transaction" constraintName="FK7FA0D2DE3265A8A9"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-60"><dropForeignKeyConstraint baseTableName="transaction" constraintName="FK7FA0D2DE72A2C5B4"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-61"><dropForeignKeyConstraint baseTableName="transaction" constraintName="FK7FA0D2DE828481AF"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-62"><dropForeignKeyConstraint baseTableName="transaction" constraintName="FK7FA0D2DEB3FB7111"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-63"><dropForeignKeyConstraint baseTableName="transaction_entry" constraintName="FKABC21FD12EF4C7F4"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-64"><dropForeignKeyConstraint baseTableName="transaction_entry" constraintName="FKABC21FD1AA992CED"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-65"><dropForeignKeyConstraint baseTableName="user" constraintName="FK36EBCB1171F854"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-66"><dropForeignKeyConstraint baseTableName="user" constraintName="FK36EBCB41E07A73"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-67"><dropForeignKeyConstraint baseTableName="user_role" constraintName="FK143BF46AA462C195"/></changeSet>
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-68"><dropForeignKeyConstraint baseTableName="user_role" constraintName="FK143BF46AFF37FDB5"/></changeSet>	 
+	<!-- Added these manually in order to catch the last few FK constraints not caught by the SQL above. -->
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-137"><dropForeignKeyConstraint baseTableName="inventory_level" constraintName="FKC254A2E1DED5FAE7"/><rollback></rollback></changeSet>	 
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-138"><dropForeignKeyConstraint baseTableName="product_category" constraintName="FKA0303E4EDED5FAE7"/><rollback></rollback></changeSet>	 
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-139"><dropForeignKeyConstraint baseTableName="transaction" constraintName="FK7FA0D2DE10746729"/><rollback></rollback></changeSet>	 
+	<changeSet author="jmiranda" failOnError="false" id="1321565252310-140"><dropForeignKeyConstraint baseTableName="transaction" constraintName="FK7FA0D2DE74CDABFC"/><rollback></rollback></changeSet>	 
+</databaseChangeLog>

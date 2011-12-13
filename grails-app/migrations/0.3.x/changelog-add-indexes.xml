@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda (generated)" id="1323722127173-1">
+        <createIndex indexName="FK302BCFE619A2EF8" tableName="category" unique="false">
+            <column name="parent_category_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-2">
+        <createIndex indexName="FK38A5EE5FAF1302EB" tableName="comment" unique="false">
+            <column name="sender_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-3">
+        <createIndex indexName="FK38A5EE5FF885F087" tableName="comment" unique="false">
+            <column name="recipient_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-4">
+        <createIndex indexName="FKCD71F39B8ABEBD5" tableName="consumption" unique="false">
+            <column name="location_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-5">
+        <createIndex indexName="FKCD71F39BAA992CED" tableName="consumption" unique="false">
+            <column name="inventory_item_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-6">
+        <createIndex indexName="FKCD71F39BDED5FAE7" tableName="consumption" unique="false">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-7">
+        <createIndex indexName="FKE7814C8117A6E251" tableName="container" unique="false">
+            <column name="container_type_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-8">
+        <createIndex indexName="FKE7814C813B5F6286" tableName="container" unique="false">
+            <column name="shipment_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-9">
+        <createIndex indexName="FKE7814C8144979D51" tableName="container" unique="false">
+            <column name="recipient_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-10">
+        <createIndex indexName="FKE7814C814B6A2E03" tableName="container" unique="false">
+            <column name="parent_container_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-11">
+        <createIndex indexName="FK5C6729A4415A5B0" tableName="event" unique="false">
+            <column name="event_location_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-12">
+        <createIndex indexName="FKFE019416DED5FAE7" tableName="inventory_item" unique="false">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-13">
+        <createIndex indexName="product_id" tableName="inventory_item" unique="true">
+            <column name="product_id"/>
+            <column name="lot_number"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-14">
+        <createIndex indexName="FKC254A2E172A2C5B4" tableName="inventory_level" unique="false">
+            <column name="inventory_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-15">
+        <createIndex indexName="FK7975323F4CC49445" tableName="local_transfer" unique="false">
+            <column name="destination_transaction_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-16">
+        <createIndex indexName="FK7975323F57563498" tableName="local_transfer" unique="false">
+            <column name="source_transaction_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-17">
+        <createIndex indexName="FK714F9FB528F75F00" tableName="location" unique="false">
+            <column name="location_type_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-18">
+        <createIndex indexName="FK714F9FB541E07A73" tableName="location" unique="false">
+            <column name="manager_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-19">
+        <createIndex indexName="FK714F9FB572A2C5B4" tableName="location" unique="false">
+            <column name="inventory_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-20">
+        <createIndex indexName="FK714F9FB57AF9A3C0" tableName="location" unique="false">
+            <column name="parent_location_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-21">
+        <createIndex indexName="FKF58372688ABEBD5" tableName="location_supported_activities" unique="false">
+            <column name="location_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-22">
+        <createIndex indexName="FK7AFF67F928F75F00" tableName="location_type_supported_activities" unique="false">
+            <column name="location_type_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-23">
+        <createIndex indexName="FK74D92A693D2E628A" tableName="order_event" unique="false">
+            <column name="order_events_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-24">
+        <createIndex indexName="FK9475736BB06EC4FB" tableName="order_shipment" unique="false">
+            <column name="shipment_item_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-25">
+        <createIndex indexName="email" tableName="person" unique="true">
+            <column name="email"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-26">
+        <createIndex indexName="FKED8DCCEFEF4C770D" tableName="product" unique="false">
+            <column name="category_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-27">
+        <createIndex indexName="FK94A534CDED5FAE7" tableName="product_attribute" unique="false">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-28">
+        <createIndex indexName="FKA0303E4EEF4C770D" tableName="product_category" unique="false">
+            <column name="category_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-29">
+        <createIndex indexName="FK3C78DD69DED5FAE7" tableName="product_tags" unique="false">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-30">
+        <createIndex indexName="FK4082723844979D51" tableName="receipt" unique="false">
+            <column name="recipient_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-31">
+        <createIndex indexName="FKAE3064BA44979D51" tableName="receipt_item" unique="false">
+            <column name="recipient_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-32">
+        <createIndex indexName="FKAE3064BADED5FAE7" tableName="receipt_item" unique="false">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-33">
+        <createIndex indexName="FKAE3064BAF7076438" tableName="receipt_item" unique="false">
+            <column name="receipt_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-34">
+        <createIndex indexName="FKD790DEBD154F600" tableName="reference_number" unique="false">
+            <column name="reference_number_type_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-35">
+        <createIndex indexName="FKE139719A1E2B3CDC" tableName="shipment" unique="false">
+            <column name="destination_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-36">
+        <createIndex indexName="FKE139719A294C1012" tableName="shipment" unique="false">
+            <column name="carrier_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-37">
+        <createIndex indexName="FKE139719A44979D51" tableName="shipment" unique="false">
+            <column name="recipient_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-38">
+        <createIndex indexName="FKE139719A49AB6B52" tableName="shipment" unique="false">
+            <column name="donor_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-39">
+        <createIndex indexName="FKE139719ADBDEDAC4" tableName="shipment" unique="false">
+            <column name="origin_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-40">
+        <createIndex indexName="FKE139719AF7076438" tableName="shipment" unique="false">
+            <column name="receipt_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-41">
+        <createIndex indexName="FKE139719AFF77FF9B" tableName="shipment" unique="false">
+            <column name="shipment_type_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-42">
+        <createIndex indexName="FKC398CCBAC4A49BBF" tableName="shipment_comment" unique="false">
+            <column name="comment_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-43">
+        <createIndex indexName="FK6C5BE20C800AA15" tableName="shipment_document" unique="false">
+            <column name="document_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-44">
+        <createIndex indexName="FK6D032BB53B350242" tableName="shipment_event" unique="false">
+            <column name="shipment_events_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-45">
+        <createIndex indexName="FK6D032BB5786431F" tableName="shipment_event" unique="false">
+            <column name="event_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-46">
+        <createIndex indexName="FKDA3BB2983B5F6286" tableName="shipment_item" unique="false">
+            <column name="shipment_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-47">
+        <createIndex indexName="FKDA3BB29844979D51" tableName="shipment_item" unique="false">
+            <column name="recipient_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-48">
+        <createIndex indexName="FKDA3BB29849AB6B52" tableName="shipment_item" unique="false">
+            <column name="donor_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-49">
+        <createIndex indexName="FKDA3BB2987400E88E" tableName="shipment_item" unique="false">
+            <column name="container_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-50">
+        <createIndex indexName="FKDA3BB298DED5FAE7" tableName="shipment_item" unique="false">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-51">
+        <createIndex indexName="FK40203B263896C98E" tableName="shipment_method" unique="false">
+            <column name="shipper_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-52">
+        <createIndex indexName="FKD584C4C4FF77FF9B" tableName="shipment_workflow" unique="false">
+            <column name="shipment_type_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-53">
+        <createIndex indexName="shipment_type_id" tableName="shipment_workflow" unique="true">
+            <column name="shipment_type_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-54">
+        <createIndex indexName="FKDEF5AD1317A6E251" tableName="shipment_workflow_container_type" unique="false">
+            <column name="container_type_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-55">
+        <createIndex indexName="FK4BB27241154F600" tableName="shipment_workflow_reference_number_type" unique="false">
+            <column name="reference_number_type_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-56">
+        <createIndex indexName="FKDF7559D73896C98E" tableName="shipper_service" unique="false">
+            <column name="shipper_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-57">
+        <createIndex indexName="FK7FA0D2DE217F5972" tableName="transaction" unique="false">
+            <column name="created_by_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-58">
+        <createIndex indexName="FK7FA0D2DE3265A8A9" tableName="transaction" unique="false">
+            <column name="confirmed_by_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-59">
+        <createIndex indexName="FK7FA0D2DE72A2C5B4" tableName="transaction" unique="false">
+            <column name="inventory_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-60">
+        <createIndex indexName="FKABC21FD12EF4C7F4" tableName="transaction_entry" unique="false">
+            <column name="transaction_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-61">
+        <createIndex indexName="FKABC21FD1AA992CED" tableName="transaction_entry" unique="false">
+            <column name="inventory_item_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-62">
+        <createIndex indexName="FK36EBCB1F28CE07" tableName="user" unique="false">
+            <column name="warehouse_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-63">
+        <createIndex indexName="FK36EBCB41E07A73" tableName="user" unique="false">
+            <column name="manager_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-64">
+        <createIndex indexName="username" tableName="user" unique="true">
+            <column name="username"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1323722127173-65">
+        <createIndex indexName="FK143BF46AA462C195" tableName="user_role" unique="false">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+
+
+</databaseChangeLog>

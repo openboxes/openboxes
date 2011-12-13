@@ -6,6 +6,7 @@ import org.pih.warehouse.product.Product;
 
 class Consumption {
 
+	String id 
 	Product product
 	InventoryItem inventoryItem
 	Location location
@@ -18,6 +19,10 @@ class Consumption {
 	Date lastUpdated
 	Date dateCreated
 			
+	static mapping = {
+		id generator: 'uuid'
+	}
+	
     static constraints = {
     }
 }

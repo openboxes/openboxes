@@ -4,11 +4,16 @@ import java.util.Date;
 
 class Donor {
 	
+	String id
 	String name
 	String description
 	Date dateCreated;
 	Date lastUpdated;
 
+	static mapping = {
+		id generator: 'uuid'
+	}
+	
 	/*
 	static mapping = {
 		tablePerHierarchy false

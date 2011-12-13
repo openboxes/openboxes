@@ -15,6 +15,7 @@ import org.pih.warehouse.core.Location;
 */
 class Event implements Comparable, Serializable {
 	
+	String id
 	Date eventDate				// The date and time on which the Event occurred	
 	EventType eventType			// The type of the Event
 	Location eventLocation		// The Location at which the Event occurred
@@ -22,7 +23,13 @@ class Event implements Comparable, Serializable {
 	Date lastUpdated;
 	
 	//static belongsTo = [ shipment : Shipment ]
-						 
+	static mapping = {
+		id generator: 'uuid'
+	}
+	
+
+	
+					 
 	static constraints = {
 		eventDate(nullable:true)
 		eventType(nullable:true)

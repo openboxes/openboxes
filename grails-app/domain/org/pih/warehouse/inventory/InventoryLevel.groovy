@@ -6,6 +6,7 @@ import org.pih.warehouse.product.Product;
 
 class InventoryLevel {
 	
+	String id
 	InventoryStatus status = InventoryStatus.SUPPORTED;
 	//Boolean supported = Boolean.TRUE;
 	Product product;	
@@ -19,6 +20,10 @@ class InventoryLevel {
 	Date dateCreated;
 	Date lastUpdated;
 	
+	static mapping = {
+		id generator: 'uuid'
+	}
+
 	static belongsTo = [ inventory: Inventory ]
 	
 	static constraints = { 

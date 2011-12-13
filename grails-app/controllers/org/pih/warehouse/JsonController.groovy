@@ -42,7 +42,7 @@ class JsonController {
 		def quantity = 0
 		def warehouse = Location.get(session.warehouse.id);
 		def lotNumber = (params.lotNumber) ? (params.lotNumber) : "";
-		def product = (params.productId) ? Product.get(params.productId as Integer) : null;
+		def product = (params.productId) ? Product.get(params.productId) : null;
 		
 		log.info "find by lotnumber '" + lotNumber + "' and product '" + product + "'";
 		def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(product, lotNumber);
@@ -158,13 +158,7 @@ class JsonController {
 	def findLotsByName = { 
 		log.info params
 
-		// Constrain by product id if the productId param is passed in
-		def productId = null;		
-		try { 			
-			productId = new Long(params.productId);
-		} 
-		catch (NumberFormatException e) { /* ignore */ }
-		
+		// Constrain by product id if the productId param is passed in		
 		def items = new TreeSet();
 		if (params.term) {
 			def searchTerm = "%" + params.term + "%";
@@ -175,7 +169,7 @@ class JsonController {
 					}
 					// Search within the inventory items for a specific product
 					if (params?.productId) { 
-						eq("product.id", productId)
+						eq("product.id", params.productId)
 					}
 				}
 			}

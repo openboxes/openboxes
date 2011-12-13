@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<!-- SELECT * FROM COLUMNS where table_schema = 'warehouse_dev' and column_name = 'id' -->
+	<changeSet author="jmiranda" id="1321565252310-141">
+		<comment>Modify all primary key fields to be CHAR(30) to support UUID.</comment>
+		<modifyColumn tableName="address"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="attribute"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="category"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="comment"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="consumption"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="container"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="container_type"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="document"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="document_type"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="donor"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="event"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="event_type"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="fulfillment"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="fulfillment_item"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="inventory"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="inventory_item"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="inventory_level"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="local_transfer"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="location"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="location_group"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="location_type"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="order"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="order_item"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="order_shipment"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="person"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="product"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="product_attribute"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="receipt"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="receipt_item"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="reference_number"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="reference_number_type"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="request"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="request_item"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="request_shipment"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="role"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_item"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_method"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_type"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_workflow"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipper"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipper_service"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="transaction"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="transaction_entry"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="transaction_type"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="unit_of_measure"><column name="id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="user"><column name="id" type="CHAR(38)"></column></modifyColumn>
+	</changeSet>	
+</databaseChangeLog>

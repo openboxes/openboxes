@@ -20,6 +20,8 @@ import org.pih.warehouse.inventory.Transaction;
  */
 class InventoryItem implements Serializable {
 	
+	String id
+	
 	Product product;		    			// Product that we're tracking
 	String lotNumber;						// Lot information for a product  
 	Date expirationDate;
@@ -31,7 +33,7 @@ class InventoryItem implements Serializable {
 	//static transients = ['quantity']
 
 	static mapping = {
-		//cache true
+		id generator: 'uuid'
 	}
 	
 	// Notice the unique constraint on lotNumber/product

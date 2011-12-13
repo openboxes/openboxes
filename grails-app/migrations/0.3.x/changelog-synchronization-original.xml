@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+   	<!--  
+    	Drop all foreign key constraints and indices on all tables    	
+	-->    
+	<changeSet author="jmiranda" id="1321565252310-1">
+		<sql>
+			ALTER TABLE category DROP FOREIGN KEY FK302BCFE619A2EF8, DROP INDEX FK302BCFE619A2EF8;
+			ALTER TABLE comment DROP FOREIGN KEY FK38A5EE5FAF1302EB, DROP INDEX FK38A5EE5FAF1302EB;
+			ALTER TABLE comment DROP FOREIGN KEY FK38A5EE5FF885F087, DROP INDEX FK38A5EE5FF885F087;
+			ALTER TABLE container DROP FOREIGN KEY FKE7814C8117A6E251, DROP INDEX FKE7814C8117A6E251;
+			ALTER TABLE container DROP FOREIGN KEY FKE7814C813B5F6286, DROP INDEX FKE7814C813B5F6286;
+			ALTER TABLE container DROP FOREIGN KEY FKE7814C8144979D51, DROP INDEX FKE7814C8144979D51;
+			ALTER TABLE container DROP FOREIGN KEY FKE7814C814B6A2E03, DROP INDEX FKE7814C814B6A2E03;
+			ALTER TABLE document DROP FOREIGN KEY FK335CD11B6631D8CC, DROP INDEX FK335CD11B6631D8CC;
+			ALTER TABLE event DROP FOREIGN KEY FK5C6729A3D970DB4, DROP INDEX FK5C6729A3D970DB4;
+			ALTER TABLE event DROP FOREIGN KEY FK5C6729A4415A5B0, DROP INDEX FK5C6729A4415A5B0;		
+			ALTER TABLE inventory_item DROP FOREIGN KEY FKFE019416DED5FAE7, DROP INDEX FKFE019416DED5FAE7;
+			ALTER TABLE inventory_level DROP FOREIGN KEY FKC254A2E172A2C5B4, DROP INDEX FKC254A2E172A2C5B4;
+			ALTER TABLE location DROP FOREIGN KEY FK714F9FB528F75F00, DROP INDEX FK714F9FB528F75F00;		
+			ALTER TABLE location DROP FOREIGN KEY FK714F9FB541E07A73, DROP INDEX FK714F9FB541E07A73;
+			ALTER TABLE location DROP FOREIGN KEY FK714F9FB561ED379F, DROP INDEX FK714F9FB561ED379F;
+			ALTER TABLE location DROP FOREIGN KEY FK714F9FB572A2C5B4, DROP INDEX FK714F9FB572A2C5B4;
+			ALTER TABLE location DROP FOREIGN KEY FK714F9FB57AF9A3C0, DROP INDEX FK714F9FB57AF9A3C0;
+			ALTER TABLE product DROP FOREIGN KEY FKED8DCCEFEF4C770D, DROP INDEX FKED8DCCEFEF4C770D;
+			ALTER TABLE product_attribute DROP FOREIGN KEY FK94A534C47B0D087, DROP INDEX FK94A534C47B0D087;
+			ALTER TABLE product_attribute DROP FOREIGN KEY FK94A534CDED5FAE7, DROP INDEX FK94A534CDED5FAE7;
+			ALTER TABLE product_category DROP FOREIGN KEY FKA0303E4EEF4C770D, DROP INDEX FKA0303E4EEF4C770D;
+			ALTER TABLE product_tags DROP FOREIGN KEY FK3C78DD69DED5FAE7, DROP INDEX FK3C78DD69DED5FAE7;
+			ALTER TABLE receipt DROP FOREIGN KEY FK4082723844979D51, DROP INDEX FK4082723844979D51;
+			ALTER TABLE receipt_item DROP FOREIGN KEY FKAE3064BA44979D51, DROP INDEX FKAE3064BA44979D51;
+			ALTER TABLE receipt_item DROP FOREIGN KEY FKAE3064BADED5FAE7, DROP INDEX FKAE3064BADED5FAE7;
+			ALTER TABLE receipt_item DROP FOREIGN KEY FKAE3064BAF7076438, DROP INDEX FKAE3064BAF7076438;
+			ALTER TABLE reference_number DROP FOREIGN KEY FKD790DEBD154F600, DROP INDEX FKD790DEBD154F600;
+			ALTER TABLE shipment DROP FOREIGN KEY FKE139719A1E2B3CDC, DROP INDEX FKE139719A1E2B3CDC;
+			ALTER TABLE shipment DROP FOREIGN KEY FKE139719A294C1012, DROP INDEX FKE139719A294C1012;
+			ALTER TABLE shipment DROP FOREIGN KEY FKE139719A44979D51, DROP INDEX FKE139719A44979D51;
+			ALTER TABLE shipment DROP FOREIGN KEY FKE139719A49AB6B52, DROP INDEX FKE139719A49AB6B52;
+			ALTER TABLE shipment DROP FOREIGN KEY FKE139719AA28CC5FB, DROP INDEX FKE139719AA28CC5FB;
+			ALTER TABLE shipment DROP FOREIGN KEY FKE139719ADBDEDAC4, DROP INDEX FKE139719ADBDEDAC4;
+			ALTER TABLE shipment DROP FOREIGN KEY FKE139719AF7076438, DROP INDEX FKE139719AF7076438;
+			ALTER TABLE shipment DROP FOREIGN KEY FKE139719AFF77FF9B, DROP INDEX FKE139719AFF77FF9B;
+			ALTER TABLE shipment_comment DROP FOREIGN KEY FKC398CCBAC4A49BBF, DROP INDEX FKC398CCBAC4A49BBF;
+			ALTER TABLE shipment_document DROP FOREIGN KEY FK6C5BE20C800AA15, DROP INDEX FK6C5BE20C800AA15;
+			ALTER TABLE shipment_event DROP FOREIGN KEY FK6D032BB53B350242, DROP INDEX FK6D032BB53B350242;
+			ALTER TABLE shipment_event DROP FOREIGN KEY FK6D032BB5786431F, DROP INDEX FK6D032BB5786431F;
+			ALTER TABLE shipment_item DROP FOREIGN KEY FKDA3BB2983B5F6286, DROP INDEX FKDA3BB2983B5F6286;
+			ALTER TABLE shipment_item DROP FOREIGN KEY FKDA3BB29844979D51, DROP INDEX FKDA3BB29844979D51;
+			ALTER TABLE shipment_item DROP FOREIGN KEY FKDA3BB29849AB6B52, DROP INDEX FKDA3BB29849AB6B52;
+			ALTER TABLE shipment_item DROP FOREIGN KEY FKDA3BB2987400E88E, DROP INDEX FKDA3BB2987400E88E;
+			ALTER TABLE shipment_item DROP FOREIGN KEY FKDA3BB298DED5FAE7, DROP INDEX FKDA3BB298DED5FAE7;
+			ALTER TABLE shipment_method DROP FOREIGN KEY FK40203B26296B2CA3, DROP INDEX FK40203B26296B2CA3;
+			ALTER TABLE shipment_method DROP FOREIGN KEY FK40203B263896C98E, DROP INDEX FK40203B263896C98E;
+			ALTER TABLE shipment_reference_number DROP FOREIGN KEY FK312F6C292388BC5, DROP INDEX FK312F6C292388BC5;
+			ALTER TABLE shipment_workflow DROP FOREIGN KEY FKD584C4C4FF77FF9B, DROP INDEX FKD584C4C4FF77FF9B;
+			ALTER TABLE shipment_workflow DROP INDEX shipment_type_id;
+			ALTER TABLE shipment_workflow_container_type DROP FOREIGN KEY FKDEF5AD1317A6E251, DROP INDEX FKDEF5AD1317A6E251;
+			ALTER TABLE shipment_workflow_reference_number_type DROP FOREIGN KEY FK4BB27241154F600, DROP INDEX FK4BB27241154F600;
+			ALTER TABLE shipper_service DROP FOREIGN KEY FKDF7559D73896C98E, DROP INDEX FKDF7559D73896C98E;
+			ALTER TABLE transaction DROP FOREIGN KEY FK7FA0D2DE1E2B3CDC, DROP INDEX FK7FA0D2DE1E2B3CDC;
+			ALTER TABLE transaction DROP FOREIGN KEY FK7FA0D2DE217F5972, DROP INDEX FK7FA0D2DE217F5972;
+			ALTER TABLE transaction DROP FOREIGN KEY FK7FA0D2DE3265A8A9, DROP INDEX FK7FA0D2DE3265A8A9;
+			ALTER TABLE transaction DROP FOREIGN KEY FK7FA0D2DE72A2C5B4, DROP INDEX FK7FA0D2DE72A2C5B4;
+			ALTER TABLE transaction DROP FOREIGN KEY FK7FA0D2DE828481AF, DROP INDEX FK7FA0D2DE828481AF;
+			ALTER TABLE transaction DROP FOREIGN KEY FK7FA0D2DEB3FB7111, DROP INDEX FK7FA0D2DEB3FB7111;
+			ALTER TABLE transaction DROP INDEX FK7FA0D2DE10746729;
+			ALTER TABLE transaction DROP INDEX FK7FA0D2DE74CDABFC;
+			ALTER TABLE transaction_entry DROP FOREIGN KEY FKABC21FD12EF4C7F4, DROP INDEX FKABC21FD12EF4C7F4;
+			ALTER TABLE transaction_entry DROP FOREIGN KEY FKABC21FD1AA992CED, DROP INDEX FKABC21FD1AA992CED;
+			ALTER TABLE user DROP FOREIGN KEY FK36EBCB1171F854, DROP INDEX FK36EBCB1171F854;
+			ALTER TABLE user DROP FOREIGN KEY FK36EBCB41E07A73, DROP INDEX FK36EBCB41E07A73;
+			ALTER TABLE user_role DROP FOREIGN KEY FK143BF46AA462C195, DROP INDEX FK143BF46AA462C195;
+			ALTER TABLE user_role DROP FOREIGN KEY FK143BF46AFF37FDB5, DROP INDEX FK143BF46AFF37FDB5;
+			
+			
+			
+		</sql>		
+	</changeSet>
+	
+	<changeSet author="jmiranda" id="1321565252310-1a">
+		<comment></comment>
+		<sql>
+			ALTER TABLE local_transfer DROP FOREIGN KEY FK7975323F4CC49445;
+			ALTER TABLE local_transfer DROP FOREIGN KEY FK7975323F57563498;
+			ALTER TABLE local_transfer DROP FOREIGN KEY fk_local_transfer_destination_transaction_transaction;
+			ALTER TABLE local_transfer DROP FOREIGN KEY fk_local_transfer_source_transaction_transaction;
+			ALTER TABLE local_transfer DROP INDEX FK7975323F4CC49445;
+			ALTER TABLE local_transfer DROP INDEX FK7975323F57563498;		
+		</sql>
+	</changeSet>
+
+	<changeSet author="jmiranda" id="1321565252310-2">
+		<comment>Modify all primary key fields to be varchar(30) to support UUID.</comment>
+		<modifyColumn tableName="address"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="attribute"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="category"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="comment"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="consumption"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="container"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="container_type"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="document"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="document_type"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="donor"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="event"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="event_type"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="fulfillment"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="fulfillment_item"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="inventory"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="inventory_item"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="inventory_level"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="local_transfer"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="location"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="location_group"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="location_type"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="order"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="order_item"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="order_shipment"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="person"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="product"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="product_attribute"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="receipt"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="receipt_item"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="reference_number"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="reference_number_type"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="request"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="request_item"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="request_shipment"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="role"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_item"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_method"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_type"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_workflow"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipper"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipper_service"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="transaction"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="transaction_entry"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="transaction_type"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="unit_of_measure"><column name="id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="user"><column name="id" type="varchar(38)"></column></modifyColumn>
+	</changeSet>
+	
+	<changeSet author="jmiranda" id="1321565252310-3">
+		<comment>Modify all foreign key fields to be varchar(30) to support UUID.</comment>
+		<modifyColumn tableName="attribute_options"><column name="attribute_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="category"><column name="parent_category_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="comment"><column name="recipient_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="comment"><column name="sender_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="consumption"><column name="inventory_item_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="consumption"><column name="product_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="consumption"><column name="location_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="container"><column name="container_type_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="container"><column name="parent_container_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="container"><column name="recipient_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="container"><column name="shipment_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="document"><column name="document_type_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="event"><column name="event_location_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="event"><column name="event_type_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="fulfillment"><column name="fulfilled_by_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="fulfillment_item"><column name="fulfillment_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="fulfillment_item"><column name="inventory_item_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="fulfillment_item"><column name="request_item_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="fulfillment_item_shipment_item"><column name="fulfillment_item_shipment_items_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="fulfillment_item_shipment_item"><column name="shipment_item_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="inventory_item"><column name="product_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="inventory_level"><column name="inventory_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="inventory_level"><column name="product_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="local_transfer"><column name="source_transaction_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="local_transfer"><column name="destination_transaction_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="location"><column name="address_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="location"><column name="inventory_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="location"><column name="manager_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="location"><column name="location_type_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="location"><column name="parent_location_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="location"><column name="location_group_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="location_supported_activities"><column name="location_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="location_type_supported_activities"><column name="location_type_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="order"><column name="destination_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="order"><column name="ordered_by_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="order"><column name="origin_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="order"><column name="recipient_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="order_comment"><column name="order_comments_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="order_comment"><column name="comment_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="order_document"><column name="order_documents_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="order_document"><column name="document_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="order_event"><column name="order_events_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="order_event"><column name="event_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="order_item"><column name="category_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="order_item"><column name="inventory_item_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="order_item"><column name="order_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="order_item"><column name="product_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="order_item"><column name="requested_by_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="order_item_comment"><column name="order_item_comments_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="order_item_comment"><column name="comment_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="order_shipment"><column name="order_item_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="order_shipment"><column name="shipment_item_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="product"><column name="category_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="product"><column name="unit_of_measure_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="product_attribute"><column name="attribute_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="product_attribute"><column name="product_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="product_category"><column name="product_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="product_category"><column name="category_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="product_tags"><column name="product_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="receipt"><column name="recipient_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="receipt_item"><column name="comment_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="receipt_item"><column name="product_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="receipt_item"><column name="receipt_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="receipt_item"><column name="recipient_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="reference_number"><column name="reference_number_type_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="request"><column name="destination_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="request"><column name="origin_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="request"><column name="recipient_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="request"><column name="requested_by_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="request"><column name="fulfillment_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="request_comment"><column name="request_comments_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="request_comment"><column name="comment_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="request_document"><column name="request_documents_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="request_document"><column name="document_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="request_event"><column name="request_events_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="request_event"><column name="event_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="request_item"><column name="category_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="request_item"><column name="inventory_item_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="request_item"><column name="product_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="request_item"><column name="request_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="request_item"><column name="requested_by_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="request_shipment"><column name="request_item_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="request_shipment"><column name="shipment_item_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment"><column name="carrier_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment"><column name="destination_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment"><column name="donor_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment"><column name="origin_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment"><column name="recipient_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment"><column name="shipment_method_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment"><column name="shipment_type_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment"><column name="receipt_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_comment"><column name="shipment_comments_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_comment"><column name="comment_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_document"><column name="shipment_documents_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_document"><column name="document_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_event"><column name="shipment_events_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_event"><column name="event_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_item"><column name="container_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_item"><column name="donor_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_item"><column name="product_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_item"><column name="recipient_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_item"><column name="shipment_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_method"><column name="shipper_service_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_method"><column name="shipper_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_reference_number"><column name="shipment_reference_numbers_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_reference_number"><column name="reference_number_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_workflow"><column name="shipment_type_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_workflow_container_type"><column name="shipment_workflow_container_types_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_workflow_container_type"><column name="container_type_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_workflow_reference_number_type"><column name="shipment_workflow_reference_number_types_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipment_workflow_reference_number_type"><column name="reference_number_type_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="shipper_service"><column name="shipper_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="transaction"><column name="created_by_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="transaction"><column name="destination_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="transaction"><column name="inventory_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="transaction"><column name="source_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="transaction"><column name="transaction_type_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="transaction"><column name="confirmed_by_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="transaction_entry"><column name="inventory_item_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="transaction_entry"><column name="transaction_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="user"><column name="manager_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="user"><column name="warehouse_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="user_role"><column name="user_id" type="varchar(38)"></column></modifyColumn>
+		<modifyColumn tableName="user_role"><column name="role_id" type="varchar(38)"></column></modifyColumn>
+	</changeSet>	
+
+	<!-- 
+	<changeSet author="jmiranda" id="1321565252310-4">
+		<comment>Create a new index and foreign key constraint for every FK column.</comment>		
+		<sql>
+			alter table attribute_options add index FK_ADDME (attribute_id), add constraint FK_ADDME foreign key (attribute_id) references attribute (id);
+			alter table location add index FK_ADDME (location_group_id), add constraint FK_ADDME foreign key (location_group_id) references location_group (id);
+			alter table order_item_comment add index FK_ADDME (order_item_comments_id), add constraint FK_ADDME foreign key (order_item_comments_id) references REFERENCE_TABLE (id);
+			alter table order_item_comment add index FK_ADDME (comment_id), add constraint FK_ADDME foreign key (comment_id) references comment (id);
+			alter table product add index FK_ADDME (unit_of_measure_id), add constraint FK_ADDME foreign key (unit_of_measure_id) references unit_of_measure (id);
+			alter table product_category add index FK_ADDME (product_id), add constraint FK_ADDME foreign key (product_id) references product (id);
+			alter table receipt_item add index FK_ADDME (comment_id), add constraint FK_ADDME foreign key (comment_id) references comment (id);
+			alter table shipment_reference_number add index FK312F6C292388BC5 (shipment_reference_numbers_id), add constraint FK312F6C292388BC5 foreign key (shipment_reference_numbers_id) references shipment (id);
+			alter table shipment_workflow_container_type add index FKDEF5AD1317A6E251 (shipment_workflow_container_types_id), add constraint FKDEF5AD1317A6E251 foreign key (shipment_workflow_container_types_id) references shipment_workflow (id);
+			alter table shipment_workflow_reference_number_type add index FKDEF5AD1317A6E251 (shipment_workflow_reference_numbers_id), add constraint FKDEF5AD1317A6E251 foreign key (shipment_workflow_reference_numbers_id) references shipment_workflow (id);
+			alter table shipment_document add index FK6C5BE20C800AA15 (shipment_documents_id), add constraint FK6C5BE20C800AA15 foreign key (shipment_documents_id) references shipment (id);			
+			alter table shipment_comment add index FKC398CCBAC4A49BBF (shipment_comments_id), add constraint FKC398CCBAC4A49BBF foreign key (shipment_comments_id) references shipment (id);
+			
+			
+			
+			alter table category add index FK302BCFE619A2EF8 (parent_category_id), add constraint FK302BCFE619A2EF8 foreign key (parent_category_id) references category (id);
+			alter table comment add index FK38A5EE5FAF1302EB (sender_id), add constraint FK38A5EE5FAF1302EB foreign key (sender_id) references `user` (id);
+			alter table comment add index FK38A5EE5FF885F087 (recipient_id), add constraint FK38A5EE5FF885F087 foreign key (recipient_id) references `user` (id);
+			alter table consumption add index FKCD71F39B8ABEBD5 (location_id), add constraint FKCD71F39B8ABEBD5 foreign key (location_id) references location (id);
+			alter table consumption add index FKCD71F39BAA992CED (inventory_item_id), add constraint FKCD71F39BAA992CED foreign key (inventory_item_id) references inventory_item (id);
+			alter table consumption add index FKCD71F39BDED5FAE7 (product_id), add constraint FKCD71F39BDED5FAE7 foreign key (product_id) references product (id);
+			alter table container add index FKE7814C813B5F6286 (shipment_id), add constraint FKE7814C813B5F6286 foreign key (shipment_id) references shipment (id);
+			alter table container add index FKE7814C814B6A2E03 (parent_container_id), add constraint FKE7814C814B6A2E03 foreign key (parent_container_id) references container (id);
+			alter table container add index FKE7814C8117A6E251 (container_type_id), add constraint FKE7814C8117A6E251 foreign key (container_type_id) references container_type (id);
+			alter table container add index FKE7814C8144979D51 (recipient_id), add constraint FKE7814C8144979D51 foreign key (recipient_id) references person (id);
+			alter table document add index FK335CD11B6631D8CC (document_type_id), add constraint FK335CD11B6631D8CC foreign key (document_type_id) references document_type (id);
+			alter table event add index FK5C6729A4415A5B0 (event_location_id), add constraint FK5C6729A4415A5B0 foreign key (event_location_id) references location (id);
+			alter table event add index FK5C6729A3D970DB4 (event_type_id), add constraint FK5C6729A3D970DB4 foreign key (event_type_id) references event_type (id);
+			alter table fulfillment add index FK5A2551DEAC392B33 (fulfilled_by_id), add constraint FK5A2551DEAC392B33 foreign key (fulfilled_by_id) references person (id);
+			alter table fulfillment_item add index FKEDC55CD447EBE106 (request_item_id), add constraint FKEDC55CD447EBE106 foreign key (request_item_id) references request_item (id);
+			alter table fulfillment_item add index FKEDC55CD4AA992CED (inventory_item_id), add constraint FKEDC55CD4AA992CED foreign key (inventory_item_id) references inventory_item (id);
+			alter table fulfillment_item add index FKEDC55CD494567276 (fulfillment_id), add constraint FKEDC55CD494567276 foreign key (fulfillment_id) references fulfillment (id);
+			alter table fulfillment_item_shipment_item add index FKE071DE6DB06EC4FB (shipment_item_id), add constraint FKE071DE6DB06EC4FB foreign key (shipment_item_id) references shipment_item (id);
+			alter table fulfillment_item_shipment_item add index FKE071DE6DB42751E1 (fulfillment_item_shipment_items_id), add constraint FKE071DE6DB42751E1 foreign key (fulfillment_item_shipment_items_id) references fulfillment_item (id);
+			alter table inventory_item add index FKFE019416DED5FAE7 (product_id), add constraint FKFE019416DED5FAE7 foreign key (product_id) references product (id);
+			alter table inventory_level add index FKC254A2E1DED5FAE7 (product_id), add constraint FKC254A2E1DED5FAE7 foreign key (product_id) references product (id);
+			alter table inventory_level add index FKC254A2E172A2C5B4 (inventory_id), add constraint FKC254A2E172A2C5B4 foreign key (inventory_id) references inventory (id);
+			alter table local_transfer add index FK7975323F4CC49445 (destination_transaction_id), add constraint FK7975323F4CC49445 foreign key (destination_transaction_id) references transaction (id);
+			alter table local_transfer add index FK7975323F57563498 (source_transaction_id), add constraint FK7975323F57563498 foreign key (source_transaction_id) references transaction (id);
+			alter table location add index FK714F9FB57AF9A3C0 (parent_location_id), add constraint FK714F9FB57AF9A3C0 foreign key (parent_location_id) references location (id);
+			alter table location add index FK714F9FB561ED379F (address_id), add constraint FK714F9FB561ED379F foreign key (address_id) references address (id);
+			alter table location add index FK714F9FB528F75F00 (location_type_id), add constraint FK714F9FB528F75F00 foreign key (location_type_id) references location_type (id);
+			alter table location add index FK714F9FB541E07A73 (manager_id), add constraint FK714F9FB541E07A73 foreign key (manager_id) references `user` (id);
+			alter table location add index FK714F9FB572A2C5B4 (inventory_id), add constraint FK714F9FB572A2C5B4 foreign key (inventory_id) references inventory (id);
+			alter table `order` add index FK651874EAF6D8801 (ordered_by_id), add constraint FK651874EAF6D8801 foreign key (ordered_by_id) references person (id);
+			alter table `order` add index FK651874EDBDEDAC4 (origin_id), add constraint FK651874EDBDEDAC4 foreign key (origin_id) references location (id);
+			alter table `order` add index FK651874E44979D51 (recipient_id), add constraint FK651874E44979D51 foreign key (recipient_id) references person (id);
+			alter table `order` add index FK651874E1E2B3CDC (destination_id), add constraint FK651874E1E2B3CDC foreign key (destination_id) references location (id);
+			alter table order_comment add index FK2DE9EE6EB8839C0F (order_comments_id), add constraint FK2DE9EE6EB8839C0F foreign key (order_comments_id) references `order` (id);
+			alter table order_comment add index FK2DE9EE6EC4A49BBF (comment_id), add constraint FK2DE9EE6EC4A49BBF foreign key (comment_id) references comment (id);
+			alter table order_document add index FKE698D2ECC800AA15 (document_id), add constraint FKE698D2ECC800AA15 foreign key (document_id) references document (id);
+			alter table order_document add index FKE698D2ECFE10118D (order_documents_id), add constraint FKE698D2ECFE10118D foreign key (order_documents_id) references `order` (id);
+			alter table order_event add index FK74D92A69786431F (event_id), add constraint FK74D92A69786431F foreign key (event_id) references event (id);
+			alter table order_event add index FK74D92A693D2E628A (order_events_id), add constraint FK74D92A693D2E628A foreign key (order_events_id) references `order` (id);
+			alter table order_item add index FK2D110D64911E7578 (requested_by_id), add constraint FK2D110D64911E7578 foreign key (requested_by_id) references `user` (id);
+			alter table order_item add index FK2D110D64AA992CED (inventory_item_id), add constraint FK2D110D64AA992CED foreign key (inventory_item_id) references inventory_item (id);
+			alter table order_item add index FK2D110D64EF4C770D (category_id), add constraint FK2D110D64EF4C770D foreign key (category_id) references category (id);
+			alter table order_item add index FK2D110D64D08EDBE6 (order_id), add constraint FK2D110D64D08EDBE6 foreign key (order_id) references `order` (id);
+			alter table order_item add index FK2D110D64DED5FAE7 (product_id), add constraint FK2D110D64DED5FAE7 foreign key (product_id) references product (id);
+			alter table order_shipment add index FK9475736B3BE9D843 (order_item_id), add constraint FK9475736B3BE9D843 foreign key (order_item_id) references order_item (id);
+			alter table order_shipment add index FK9475736BB06EC4FB (shipment_item_id), add constraint FK9475736BB06EC4FB foreign key (shipment_item_id) references shipment_item (id);
+			alter table product add index FKED8DCCEFEF4C770D (category_id), add constraint FKED8DCCEFEF4C770D foreign key (category_id) references category (id);
+			alter table product_attribute add index FK94A534C47B0D087 (attribute_id), add constraint FK94A534C47B0D087 foreign key (attribute_id) references attribute (id);
+			alter table product_attribute add index FK94A534CDED5FAE7 (product_id), add constraint FK94A534CDED5FAE7 foreign key (product_id) references product (id);
+			alter table product_category add index FKA0303E4EEF4C770D (category_id), add constraint FKA0303E4EEF4C770D foreign key (category_id) references category (id);
+			alter table product_tags add index FK3C78DD69DED5FAE7 (product_id), add constraint FK3C78DD69DED5FAE7 foreign key (product_id) references product (id);
+			alter table receipt add index FK4082723844979D51 (recipient_id), add constraint FK4082723844979D51 foreign key (recipient_id) references person (id);
+			alter table receipt_item add index FKAE3064BAF7076438 (receipt_id), add constraint FKAE3064BAF7076438 foreign key (receipt_id) references receipt (id);
+			alter table receipt_item add index FKAE3064BA44979D51 (recipient_id), add constraint FKAE3064BA44979D51 foreign key (recipient_id) references person (id);
+			alter table receipt_item add index FKAE3064BADED5FAE7 (product_id), add constraint FKAE3064BADED5FAE7 foreign key (product_id) references product (id);
+			alter table reference_number add index FKD790DEBD154F600 (reference_number_type_id), add constraint FKD790DEBD154F600 foreign key (reference_number_type_id) references reference_number_type (id);
+			alter table request add index FK414EF28FDD302242 (requested_by_id), add constraint FK414EF28FDD302242 foreign key (requested_by_id) references person (id);
+			alter table request add index FK414EF28FDBDEDAC4 (origin_id), add constraint FK414EF28FDBDEDAC4 foreign key (origin_id) references location (id);
+			alter table request add index FK414EF28F44979D51 (recipient_id), add constraint FK414EF28F44979D51 foreign key (recipient_id) references person (id);
+			alter table request add index FK414EF28F94567276 (fulfillment_id), add constraint FK414EF28F94567276 foreign key (fulfillment_id) references fulfillment (id);
+			alter table request add index FK414EF28F1E2B3CDC (destination_id), add constraint FK414EF28F1E2B3CDC foreign key (destination_id) references location (id);
+			alter table request_comment add index FK5BAC88AF87AC2D52 (request_comments_id), add constraint FK5BAC88AF87AC2D52 foreign key (request_comments_id) references request (id);
+			alter table request_comment add index FK5BAC88AFC4A49BBF (comment_id), add constraint FK5BAC88AFC4A49BBF foreign key (comment_id) references comment (id);
+			alter table request_document add index FK712980CBC800AA15 (document_id), add constraint FK712980CBC800AA15 foreign key (document_id) references document (id);
+			alter table request_document add index FK712980CB2777B76E (request_documents_id), add constraint FK712980CB2777B76E foreign key (request_documents_id) references request (id);
+			alter table request_event add index FK674F60EA786431F (event_id), add constraint FK674F60EA786431F foreign key (event_id) references event (id);
+			alter table request_event add index FK674F60EAD962700D (request_events_id), add constraint FK674F60EAD962700D foreign key (request_events_id) references request (id);
+			alter table request_item add index FK4DA982C35DE21C87 (request_id), add constraint FK4DA982C35DE21C87 foreign key (request_id) references request (id);
+			alter table request_item add index FK4DA982C3911E7578 (requested_by_id), add constraint FK4DA982C3911E7578 foreign key (requested_by_id) references `user` (id);
+			alter table request_item add index FK4DA982C3AA992CED (inventory_item_id), add constraint FK4DA982C3AA992CED foreign key (inventory_item_id) references inventory_item (id);
+			alter table request_item add index FK4DA982C3EF4C770D (category_id), add constraint FK4DA982C3EF4C770D foreign key (category_id) references category (id);
+			alter table request_item add index FK4DA982C3DED5FAE7 (product_id), add constraint FK4DA982C3DED5FAE7 foreign key (product_id) references product (id);
+			alter table request_shipment add index FK1F06214AB06EC4FB (shipment_item_id), add constraint FK1F06214AB06EC4FB foreign key (shipment_item_id) references shipment_item (id);
+			alter table request_shipment add index FK1F06214A47EBE106 (request_item_id), add constraint FK1F06214A47EBE106 foreign key (request_item_id) references request_item (id);
+			alter table shipment add index FKE139719AA28CC5FB (shipment_method_id), add constraint FKE139719AA28CC5FB foreign key (shipment_method_id) references shipment_method (id);
+			alter table shipment add index FKE139719AF7076438 (receipt_id), add constraint FKE139719AF7076438 foreign key (receipt_id) references receipt (id);
+			alter table shipment add index FKE139719ADBDEDAC4 (origin_id), add constraint FKE139719ADBDEDAC4 foreign key (origin_id) references location (id);
+			alter table shipment add index FKE139719A49AB6B52 (donor_id), add constraint FKE139719A49AB6B52 foreign key (donor_id) references donor (id);
+			alter table shipment add index FKE139719A44979D51 (recipient_id), add constraint FKE139719A44979D51 foreign key (recipient_id) references person (id);
+			alter table shipment add index FKE139719A1E2B3CDC (destination_id), add constraint FKE139719A1E2B3CDC foreign key (destination_id) references location (id);
+			alter table shipment add index FKE139719A294C1012 (carrier_id), add constraint FKE139719A294C1012 foreign key (carrier_id) references person (id);
+			alter table shipment add index FKE139719AFF77FF9B (shipment_type_id), add constraint FKE139719AFF77FF9B foreign key (shipment_type_id) references shipment_type (id);
+			alter table shipment_comment add index FKC398CCBAC4A49BBF (comment_id), add constraint FKC398CCBAC4A49BBF foreign key (comment_id) references comment (id);
+			alter table shipment_document add index FK6C5BE20C800AA15 (document_id), add constraint FK6C5BE20C800AA15 foreign key (document_id) references document (id);
+			alter table shipment_event add index FK6D032BB53B350242 (shipment_events_id), add constraint FK6D032BB53B350242 foreign key (shipment_events_id) references shipment (id);
+			alter table shipment_event add index FK6D032BB5786431F (event_id), add constraint FK6D032BB5786431F foreign key (event_id) references event (id);
+			alter table shipment_item add index FKDA3BB2983B5F6286 (shipment_id), add constraint FKDA3BB2983B5F6286 foreign key (shipment_id) references shipment (id);
+			alter table shipment_item add index FKDA3BB29849AB6B52 (donor_id), add constraint FKDA3BB29849AB6B52 foreign key (donor_id) references donor (id);
+			alter table shipment_item add index FKDA3BB29844979D51 (recipient_id), add constraint FKDA3BB29844979D51 foreign key (recipient_id) references person (id);
+			alter table shipment_item add index FKDA3BB298DED5FAE7 (product_id), add constraint FKDA3BB298DED5FAE7 foreign key (product_id) references product (id);
+			alter table shipment_item add index FKDA3BB2987400E88E (container_id), add constraint FKDA3BB2987400E88E foreign key (container_id) references container (id);
+			alter table shipment_method add index FK40203B263896C98E (shipper_id), add constraint FK40203B263896C98E foreign key (shipper_id) references shipper (id);
+			alter table shipment_method add index FK40203B26296B2CA3 (shipper_service_id), add constraint FK40203B26296B2CA3 foreign key (shipper_service_id) references shipper_service (id);
+			alter table shipment_reference_number add index FK312F6C292388BC5 (reference_number_id), add constraint FK312F6C292388BC5 foreign key (reference_number_id) references reference_number (id);
+			alter table shipment_workflow add index FKD584C4C4FF77FF9B (shipment_type_id), add constraint FKD584C4C4FF77FF9B foreign key (shipment_type_id) references shipment_type (id);
+			alter table shipment_workflow_container_type add index FKDEF5AD1317A6E251 (container_type_id), add constraint FKDEF5AD1317A6E251 foreign key (container_type_id) references container_type (id);
+			alter table shipment_workflow_reference_number_type add index FK4BB27241154F600 (reference_number_type_id), add constraint FK4BB27241154F600 foreign key (reference_number_type_id) references reference_number_type (id);
+			alter table shipper_service add index FKDF7559D73896C98E (shipper_id), add constraint FKDF7559D73896C98E foreign key (shipper_id) references shipper (id);
+			alter table transaction add index FK7FA0D2DE828481AF (source_id), add constraint FK7FA0D2DE828481AF foreign key (source_id) references location (id);
+			alter table transaction add index FK7FA0D2DE1E2B3CDC (destination_id), add constraint FK7FA0D2DE1E2B3CDC foreign key (destination_id) references location (id);
+			alter table transaction add index FK7FA0D2DE217F5972 (created_by_id), add constraint FK7FA0D2DE217F5972 foreign key (created_by_id) references `user` (id);
+			alter table transaction add index FK7FA0D2DE3265A8A9 (confirmed_by_id), add constraint FK7FA0D2DE3265A8A9 foreign key (confirmed_by_id) references `user` (id);
+			alter table transaction add index FK7FA0D2DEB3FB7111 (transaction_type_id), add constraint FK7FA0D2DEB3FB7111 foreign key (transaction_type_id) references transaction_type (id);
+			alter table transaction add index FK7FA0D2DE72A2C5B4 (inventory_id), add constraint FK7FA0D2DE72A2C5B4 foreign key (inventory_id) references inventory (id);
+			alter table transaction_entry add index FKABC21FD1AA992CED (inventory_item_id), add constraint FKABC21FD1AA992CED foreign key (inventory_item_id) references inventory_item (id);
+			alter table transaction_entry add index FKABC21FD12EF4C7F4 (transaction_id), add constraint FKABC21FD12EF4C7F4 foreign key (transaction_id) references transaction (id);
+			alter table `user` add index FK36EBCB1171F854 (warehouse_id), add constraint FK36EBCB1171F854 foreign key (warehouse_id) references location (id);
+			alter table `user` add index FK36EBCB41E07A73 (manager_id), add constraint FK36EBCB41E07A73 foreign key (manager_id) references `user` (id);
+			alter table user_role add index FK143BF46AFF37FDB5 (role_id), add constraint FK143BF46AFF37FDB5 foreign key (role_id) references role (id);
+			alter table user_role add index FK143BF46AA462C195 (user_id), add constraint FK143BF46AA462C195 foreign key (user_id) references `user` (id);			
+		</sql>
+		
+	</changeSet>
+	 -->
+</databaseChangeLog>

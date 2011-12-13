@@ -4,6 +4,7 @@ import java.util.Date;
 
 class Shipper implements java.io.Serializable {
 	
+	String id
 	String name
 	String description	
 	String trackingUrl
@@ -14,9 +15,10 @@ class Shipper implements java.io.Serializable {
 
 	static hasMany = [ shipperServices : ShipperService ];
 	static mapping = {
+		id generator: 'uuid'
 		shipperServices joinTable: [name:'shipper_service', column: 'shipper_service_id', key: 'shipper_id']
 	}
-
+	
     static constraints = {
 		name(nullable:false, maxSize: 255)
 		description(nullable:true, maxSize: 255)		

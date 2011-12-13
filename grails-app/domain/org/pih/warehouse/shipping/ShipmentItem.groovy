@@ -13,7 +13,7 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 	//	container.removeFromShipmentItems(this)
 	//}
 
-	
+	String id
 	String lotNumber			// Loose coupling to the inventory lot 
 	Date expirationDate			
 	Product product		    	// Specific product that we're tracking
@@ -33,6 +33,10 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 	static belongsTo = [ shipment : Shipment ]
 	
 	static hasMany = [ orderShipments : OrderShipment ]
+	
+	static mapping = {
+		id generator: 'uuid'
+	}
 	
 	//static belongsTo = [ container : Container ] // + shipment : Shipment
 	static constraints = {

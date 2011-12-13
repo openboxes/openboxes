@@ -25,6 +25,8 @@ import org.pih.warehouse.shipping.ShipmentItem;
  */
 class Product implements Comparable, Serializable {
 	
+	String id
+	
 	// Base product information 
 	String name;							// Specific description for the product
 	String description;						// Not used at the moment
@@ -52,7 +54,7 @@ class Product implements Comparable, Serializable {
 	static hasMany = [ categories : Category, attributes : ProductAttribute, tags : String ]
 	
 	static mapping = {
-		cache true
+		id generator: 'uuid'
 		categories joinTable: [name:'product_category', column: 'category_id', key: 'product_id']
 		attributes joinTable: [name:'product_attribute', column: 'attribute_id', key: 'product_id']
 	}

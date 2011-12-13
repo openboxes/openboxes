@@ -26,17 +26,21 @@ class Constants {
 	static final ArrayList COLORS = ['FFFFFF','FFDFDF','FFBFBF','FF9F9F','FF7F7F','FF5F5F','FF3F3F','FF1F1F','FF0000','DF1F00','C33B00','A75700','8B7300','6F8F00','53AB00','37C700','1BE300','00FF00','00DF1F','00C33B','00A757','008B73','006F8F','0053AB','0037C7','001BE3','0000FF','0000df','0000c3','0000a7','00008b','00006f','000053','000037','00001b','000000' ];
 	      
 	// these are direct references to transaction types by primary key
-	static final int CONSUMPTION_TRANSACTION_TYPE_ID = 2
-	static final int INVENTORY_TRANSACTION_TYPE_ID = 7
-	static final int TRANSFER_IN_TRANSACTION_TYPE_ID = 8
-	static final int TRANSFER_OUT_TRANSACTION_TYPE_ID = 9
-	static final int PRODUCT_INVENTORY_TRANSACTION_TYPE_ID = 11
+	static final String CONSUMPTION_TRANSACTION_TYPE_ID = "2"
+	static final String ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID = "3"
+	static final String EXPIRATION_TRANSACTION_TYPE_ID = "4"
+	static final String DAMAGE_TRANSACTION_TYPE_ID = "5"
+	static final String INVENTORY_TRANSACTION_TYPE_ID = "7"
+	static final String TRANSFER_IN_TRANSACTION_TYPE_ID = "8"
+	static final String TRANSFER_OUT_TRANSACTION_TYPE_ID = "9"
+	static final String ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID = "10"
+	static final String PRODUCT_INVENTORY_TRANSACTION_TYPE_ID = "11"
 	
 	// direct references to locations by primary key
-	static final int WAREHOUSE_LOCATION_TYPE_ID = 1
-	static final int SUPPLIER_LOCATION_TYPE_ID = 4
+	static final String WAREHOUSE_LOCATION_TYPE_ID = "1"
+	static final String SUPPLIER_LOCATION_TYPE_ID = "4"
 	
 	// direct references to containers by primary key
-	static final int BOX_CONTAINER_TYPE_ID = 4	
+	static final String BOX_CONTAINER_TYPE_ID = "4"	
 	
 }

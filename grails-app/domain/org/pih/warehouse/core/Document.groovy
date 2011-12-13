@@ -11,6 +11,7 @@ import org.pih.warehouse.core.DocumentType;
  */
 class Document implements Serializable {
 
+	String id 
 	String name			// Document name (optional)
 	String filename			// Document filename
 	String extension 		// The extension of the file
@@ -26,6 +27,9 @@ class Document implements Serializable {
 	// Documents should exist on their own in case we want to tie them to other objects. 
 	// Shipment (and other entities) should create a join table for documents.	
 	//static belongsTo = [ shipment : Shipment ];
+	static mapping = {
+		id generator: 'uuid'
+	}
 	
 	static transients = ["size"]
 

@@ -4,7 +4,7 @@ import org.codehaus.groovy.grails.validation.Validateable;
 
 @Validateable
 class RecordInventoryRowCommand {
-	Integer id
+	String id
 	String lotNumber
 	Date expirationDate
 	String description;

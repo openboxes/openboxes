@@ -3,7 +3,7 @@
 <html>
 <head>
 	<!-- Include default page title -->
-	<title><g:layoutTitle default="Your Location App" /></title>
+	<title><g:layoutTitle default="OpenBoxes" /></title>
 	<%--<link rel="stylesheet" href="http://yui.yahooapis.com/2.7.0/build/reset-fonts-grids/reset-fonts-grids.css" type="text/css"> --%>
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/yui/2.7.0/reset-fonts-grids',file:'reset-fonts-grids.css')}" type="text/css">
 	
@@ -278,7 +278,7 @@
 								<g:if test="${session?.warehouse}">									
 									<g:if test="${session.warehouse.logo }">
 										<img class="photo" width="25" height="25" 
-											src="${createLink(controller:'warehouse', action:'viewLogo', id:session.warehouse.id)}" style="vertical-align: middle" />
+											src="${createLink(controller:'location', action:'viewLogo', id:session.warehouse.id)}" style="vertical-align: middle" />
 									</g:if>
 									${session?.warehouse?.name} &nbsp;&rsaquo;&nbsp;
 								</g:if> 

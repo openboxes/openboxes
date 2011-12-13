@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Constants;
 import org.pih.warehouse.core.Event;
@@ -25,6 +26,10 @@ import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.receiving.Receipt;
 import org.pih.warehouse.receiving.ReceiptItem;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException;
+
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
 class ShipmentService {
 
@@ -32,17 +37,6 @@ class ShipmentService {
 	def sessionFactory;
 	def inventoryService;
 	boolean transactional = true
-	
-	/**
-	* Returns the shipment referenced by the passed id parameter;
-	* if id is null, returns a new Shipment object
-	*
-	* @param shipmentId
-	* @return
-	*/
-   Shipment getShipmentInstance(String shipmentId) {
-	   return getShipmentInstance(shipmentId?.toLong(), null)
-   }
    
 	
 	/**
@@ -52,7 +46,7 @@ class ShipmentService {
 	 * @param shipmentId
 	 * @return
 	 */
-	Shipment getShipmentInstance(Long shipmentId) {
+	Shipment getShipmentInstance(String shipmentId) {
 		return getShipmentInstance(shipmentId, null)
 	}
 	
@@ -65,7 +59,7 @@ class ShipmentService {
 	 * @param shipmentType
 	 * @return
 	 */
-	Shipment getShipmentInstance(Long shipmentId, String shipmentType) {
+	Shipment getShipmentInstance(String shipmentId, String shipmentType) {
 		if (shipmentId) {
 			Shipment shipment = Shipment.get(shipmentId)
 			if (!shipment) {
@@ -133,7 +127,7 @@ class ShipmentService {
 	 * @param locationId
 	 * @return
 	 */
-	List<Shipment> getRecentOutgoingShipments(Long locationId) { 		
+	List<Shipment> getRecentOutgoingShipments(String locationId) { 		
 		Location location = Location.get(locationId);
 		//def upcomingShipments = Shipment.findAllByOriginAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30, 
 		//	[max:5, offset:2, sort:"expectedShippingDate", order:"desc"]);
@@ -170,7 +164,7 @@ class ShipmentService {
 	 * @param locationId
 	 * @return
 	 */
-	List<Shipment> getRecentIncomingShipments(Long locationId) { 		
+	List<Shipment> getRecentIncomingShipments(String locationId) { 		
 		Location location = Location.get(locationId);
 		//return Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30, 
 		return Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, null, null,
@@ -609,8 +603,25 @@ class ShipmentService {
 	 * @param item
 	 */
 	void deleteShipmentItem(ShipmentItem item) {
-		def shipment = item.shipment
-		shipment.removeFromShipmentItems(item)
+		
+		try { 				
+			def shipment = Shipment.get(item.shipment.id)
+			shipment.removeFromShipmentItems(item)
+			item.delete(flush:true)	
+		} catch (ConstraintViolationException e) { 
+			log.info("constraint violation " + e.message);
+			throw new RuntimeException(e);
+		} catch (HibernateOptimisticLockingFailureException e) { 
+			log.info("optimistic locking failure " + e.message);				
+			throw new RuntimeException(e);
+		} catch (MySQLIntegrityConstraintViolationException e) { 
+			log.info("mysql error " + e.message);		
+			throw new RuntimeException(e);
+		} catch (DataIntegrityViolationException e) { 
+			log.info("data integrity violation " + e.message);		
+			throw new RuntimeException(e);
+		}
+			
 	}
 	
 	/**

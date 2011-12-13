@@ -4,6 +4,7 @@ import java.util.Date;
 
 class Category implements Comparable, Serializable {
 
+	String id
 	String name
 	String description
 	Integer sortOrder = 0;
@@ -12,12 +13,13 @@ class Category implements Comparable, Serializable {
 	Date lastUpdated;
 	boolean deleted 
 	
-	
+
 	static hasMany = [ categories : Category ];
 	static mappedBy = [ categories : "parentCategory" ];
 	static belongsTo = [ parentCategory : Category ];
 	static transients = [ "parents", "children", "deleted", "products" ]
 	static mapping = {
+		id generator: 'uuid'
 		sort name:"desc"
 		categories sort:"name"
 	}

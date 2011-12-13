@@ -13,6 +13,7 @@ import org.pih.warehouse.request.RequestStatus;
 
 class Request implements Serializable {
 	
+	String id
 	RequestStatus status;
 	String description 		// a user-defined, searchable name for the order 
 	String requestNumber 	// an auto-generated shipment number
@@ -26,10 +27,10 @@ class Request implements Serializable {
 	// Audit fields
 	Date dateCreated
 	Date lastUpdated
-
 	
 	static hasMany = [ requestItems : RequestItem, comments : Comment, documents : Document, events : Event ]
 	static mapping = {
+		id generator: 'uuid'
 		requestItems cascade: "all-delete-orphan", sort: "id"
 		comments cascade: "all-delete-orphan"
 		documents cascade: "all-delete-orphan"

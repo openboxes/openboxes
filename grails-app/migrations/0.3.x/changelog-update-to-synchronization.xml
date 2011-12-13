@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+	<include file="0.3.x/changelog-drop-foreign-keys.xml"/>
+	<include file="0.3.x/changelog-drop-indexes.xml"/>
+	<include file="0.3.x/changelog-modify-primary-keys.xml"/>
+	<include file="0.3.x/changelog-modify-foreign-keys.xml"/>
+	<include file="0.3.x/changelog-add-indexes.xml"/>
+	<include file="0.3.x/changelog-add-foreign-keys.xml"/>
+</databaseChangeLog>

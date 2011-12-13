@@ -8,10 +8,15 @@ import java.util.Date;
  */
 class LocationGroup implements Serializable {
 
+	String id
 	String name
 
 	Date dateCreated;
 	Date lastUpdated;
+	
+	static mapping = {
+		id generator: 'uuid'
+	}
 	
 	static constraints = { 
 		name(nullable:true, maxSize: 255)

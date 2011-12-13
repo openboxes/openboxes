@@ -5,6 +5,7 @@ import org.pih.warehouse.inventory.TransactionCode
 
 class TransactionType implements Serializable {
 	
+	String id
 	String name
 	String description
 	Integer sortOrder = 0
@@ -22,7 +23,8 @@ class TransactionType implements Serializable {
 	}
 
 	static mapping = {
+		id generator: 'uuid'
 		sort "sortOrder"
 	}
-	
+
 }

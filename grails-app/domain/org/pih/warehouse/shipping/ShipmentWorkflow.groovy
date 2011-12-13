@@ -5,6 +5,7 @@ import java.util.Date;
 
 class ShipmentWorkflow implements Serializable {
 
+	String id
 	String name					// user-defined name of the workflow
 	ShipmentType shipmentType  	// the shipment type this workflow is associated with
 	String excludedFields   	// comma-delimited (with no spaces) list of Shipment fields to exclude in this workflow
@@ -21,7 +22,11 @@ class ShipmentWorkflow implements Serializable {
 	// Core association mappings
 	static hasMany = [ referenceNumberTypes : ReferenceNumberType,
 	                   containerTypes : ContainerType ]
-	                   
+	         
+	static mapping = {
+		id generator: 'uuid'
+	}
+	          
     static constraints = {
 		name(nullable:false, blank: false, maxSize: 255)
 		shipmentType(nullable:false, unique:true)  // for now, we are only allowing one workflow per shipment type, though we may want to change this

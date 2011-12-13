@@ -6,6 +6,7 @@ import org.pih.warehouse.core.Location;
 
 class User extends Person {
 
+	String id
 	Boolean active;				// default = false?
 	String username;			// email or username
 	String password;			// encrypted password
@@ -24,6 +25,7 @@ class User extends Person {
 	static mapping = {
 		table "`user`"
 		roles joinTable: [name:'user_role', column: 'role_id', key: 'user_id']
+		id generator: 'uuid'	
 	}
 	static transients = ["passwordConfirm"]
 	static constraints = {

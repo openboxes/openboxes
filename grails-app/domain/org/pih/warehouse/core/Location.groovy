@@ -8,6 +8,8 @@ import org.pih.warehouse.inventory.Inventory;
  * A location can be a customer, warehouse, or supplier.  
  */
 class Location implements Comparable, java.io.Serializable {
+	
+	String id
 	String name
 	byte [] logo				// logo
 	Address address
@@ -29,7 +31,7 @@ class Location implements Comparable, java.io.Serializable {
 	
 	static belongsTo = [ parentLocation : Location ]
 	static hasMany = [ locations : Location, supportedActivities : String, employees: User  ]
-	
+		
 	static constraints = {
 		name(nullable:false, blank: false, maxSize: 255)
 		address(nullable:true)
@@ -51,6 +53,7 @@ class Location implements Comparable, java.io.Serializable {
 	}
 	
 	static mapping = {
+		id generator: 'uuid'
 		// Needs to be eagerly fetched because of Location.supportsActivity() method
 		supportedActivities lazy: false
 		locationType lazy: false

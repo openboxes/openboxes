@@ -9,6 +9,7 @@ import java.util.Date;
  */
 class ReferenceNumberType implements Serializable {
 	
+	String id
 	String name
 	String description
 	Integer sortOrder = 0;
@@ -24,6 +25,7 @@ class ReferenceNumberType implements Serializable {
 	}	
 
 	static mapping = {
+		id generator: 'uuid'
 		sort "sortOrder"
 	}
 

@@ -11,6 +11,7 @@ import org.pih.warehouse.shipping.ShipmentItem;
 
 class RequestItem implements Serializable {
 	
+	String id
 	String description	
 	Category category
 	Product product
@@ -27,7 +28,11 @@ class RequestItem implements Serializable {
 	static transients = [ "type" ]
 	
 	static belongsTo = [ request : Request ]
-	
+
+	static mapping = {
+		id generator: 'uuid'
+	}
+		
     static constraints = {
     	description(nullable:true)
 		category(nullable:true)

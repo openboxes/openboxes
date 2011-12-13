@@ -11,6 +11,7 @@ import org.pih.warehouse.shipping.ShipmentItem;
 
 class OrderItem implements Serializable {
 	
+	String id
 	String description	
 	Category category
 	Product product
@@ -25,6 +26,10 @@ class OrderItem implements Serializable {
 	Date dateCreated
 	Date lastUpdated
 
+	static mapping = {
+		id generator: 'uuid'
+	}
+	
 	static transients = [ "orderItemType" ]
 	
 	static belongsTo = [ order : Order ]

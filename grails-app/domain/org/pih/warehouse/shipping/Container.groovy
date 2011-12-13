@@ -6,6 +6,7 @@ import org.pih.warehouse.core.Person;
 
 class Container implements Comparable, java.io.Serializable {
 
+	String id
 	String name	
 	String containerNumber									// An official container number (if it exists)
 	String description										// Description of contents
@@ -34,6 +35,7 @@ class Container implements Comparable, java.io.Serializable {
 
 	static transients = [ "optionValue", "shipmentItems" ]
 	static mapping = {
+		id generator: 'uuid'
 		containers cascade: "all-delete-orphan"
 	}
 		

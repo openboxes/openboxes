@@ -8,6 +8,7 @@ import org.pih.warehouse.shipping.Shipment;
 
 class Receipt implements Serializable {
 
+	String id
 	Date expectedDeliveryDate			 
 	Date actualDeliveryDate				 
 	Person recipient					
@@ -17,7 +18,10 @@ class Receipt implements Serializable {
 	static belongsTo = [ shipment : Shipment ]
 	static hasMany = [ receiptItems : ReceiptItem ]
 	
-	
+	static mapping = {
+		id generator: 'uuid'
+	}
+
 	// Constraints
 	static constraints = {
 		expectedDeliveryDate(nullable:true)

@@ -21,7 +21,7 @@ class CreateRequestWorkflowController {
 				log.info("Starting create request workflow " + params)
 				// create a new request instance if we don't have one already
 				if (params.id) {
-					flow.requestInstance = Request.get(params.id as Long)
+					flow.requestInstance = Request.get(params.id)
 				}
 				else {
 					def requestInstance = new Request();

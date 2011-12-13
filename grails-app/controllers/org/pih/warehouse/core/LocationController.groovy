@@ -14,7 +14,7 @@ class LocationController {
 	}
 	
 	def edit = {
-		def locationInstance = inventoryService.getLocation(params.id as Long)
+		def locationInstance = inventoryService.getLocation(params.id)
 		if (!locationInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
 			redirect(action: "list")
@@ -25,7 +25,7 @@ class LocationController {
 	}
 	
 	def update = {
-			def locationInstance = inventoryService.getLocation(params.id ? params.id as Long : null)
+			def locationInstance = inventoryService.getLocation(params.id)
 			
 			if (locationInstance) {
 				if (params.version) {
@@ -74,5 +74,41 @@ class LocationController {
 	            redirect(action: "edit", id: params.id)
 	        }
 		}
+		
+		
+		/**
+		* View warehouse logo
+		*/
+	   def viewLogo = {
+		   def warehouseInstance = Location.get(params.id);
+		   if (warehouseInstance) {
+			   byte[] logo = warehouseInstance.logo
+			   if (logo) {
+				   response.outputStream << logo
+			   }
+		   }
+	   }
+   
+   
+	   def uploadLogo = {		   
+		   def warehouseInstance = Location.get(params.id);
+		   if (warehouseInstance) {
+			   def logo = request.getFile("logo");
+			   if (!logo?.empty && logo.size < 1024*1000) { // not empty AND less than 1MB
+				   warehouseInstance.logo = logo.bytes;
+				   if (!warehouseInstance.hasErrors()) {
+					   inventoryService.save(warehouseInstance)
+					   flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'warehouse.label', default: 'Location'), warehouseInstance.id])}"
+				   }
+				   else {
+					   // there were errors, the photo was not saved
+				   }
+			   }
+			   redirect(action: "show", id: warehouseInstance.id)
+		   }
+		   else {
+			   "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'warehouse.label', default: 'Location'), params.id])}"
+		   }
+	   }
 	
 }

@@ -11,6 +11,7 @@ import org.pih.warehouse.core.User;
 
 class Order implements Serializable {
 	
+	String id
 	OrderStatus status 
 	String description 		// a user-defined, searchable name for the order 
 	String orderNumber 		// an auto-generated shipment number
@@ -24,10 +25,10 @@ class Order implements Serializable {
 	// Audit fields
 	Date dateCreated
 	Date lastUpdated
-
 	
 	static hasMany = [ orderItems : OrderItem, comments : Comment, documents : Document, events : Event ]
 	static mapping = {
+		id generator: 'uuid'
 		table "`order`"
 		orderItems cascade: "all-delete-orphan"
 		comments cascade: "all-delete-orphan"

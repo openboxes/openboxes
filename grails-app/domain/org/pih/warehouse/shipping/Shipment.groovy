@@ -15,6 +15,7 @@ import java.io.Serializable;
 
 class Shipment implements Comparable, Serializable {
 	
+	String id
 	String name 					// user-defined name of the shipment 
 	String shipmentNumber			// an auto-generated shipment number
 	Date expectedShippingDate		// the date the origin expects to ship the goods (required)
@@ -73,6 +74,7 @@ class Shipment implements Comparable, Serializable {
 	// use a SortedSet for events and have the Event class implement Comparable. 
 
 	static mapping = {
+		id generator: 'uuid'
 		additionalInformation type: "text"
 		events cascade: "all-delete-orphan"
 		comments cascade: "all-delete-orphan"

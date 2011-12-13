@@ -26,6 +26,7 @@ import org.pih.warehouse.core.Constants
  */
 class Transaction implements Comparable, Serializable {
 
+	String id
     Location source	    		
     Location destination					    		 
 	Date transactionDate	    		// Date entered into the warehouse
@@ -46,6 +47,11 @@ class Transaction implements Comparable, Serializable {
     static hasMany = [ transactionEntries : TransactionEntry ]
     static belongsTo = [ inventory : Inventory ]
 
+	static mapping = { 
+		id generator: 'uuid'
+	}
+	
+	
     // Constraints 
     static constraints = {
 	    transactionType(nullable:false)

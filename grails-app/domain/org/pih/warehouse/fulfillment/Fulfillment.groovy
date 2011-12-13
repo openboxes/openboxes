@@ -9,6 +9,8 @@ import org.pih.warehouse.request.Request;
 
 class Fulfillment implements Serializable {
 
+	String id
+	
 	// Attributes
 	FulfillmentStatus status;
 	//Request request;				// request [to be] fulfilled	
@@ -26,9 +28,10 @@ class Fulfillment implements Serializable {
 	static hasMany = [ fulfillmentItems : FulfillmentItem ]
 	
 	static mapping = {
+		id generator: 'uuid'
 		fulfillmentItems cascade: "all-delete-orphan", sort: "id"
 	}
-	
+
 	// Constraints
     static constraints = {
 		status(nullable:true)

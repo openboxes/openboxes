@@ -99,6 +99,17 @@ environments {
 		uiperformance.enabled = false
 		grails.mail.enabled = true
 	}
+	client {
+		grails.serverURL = "http://localhost:8080/${appName}";
+		uiperformance.enabled = false
+		grails.mail.enabled = true
+	}
+	root {
+		grails.serverURL = "http://localhost:8080/${appName}";
+		uiperformance.enabled = false
+		grails.mail.enabled = true
+	}
+	
 }
 
 
@@ -279,7 +290,7 @@ grails.plugins.dynamicController.mixins = [
  ]
 
 /**
- * Location Global Properties
+ * Global Properties
  */
 
 // default and supported locales

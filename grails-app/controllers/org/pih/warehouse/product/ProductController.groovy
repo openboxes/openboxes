@@ -228,7 +228,7 @@ class ProductController {
 				println ("category: " + it.key +  " starts with category_ " + it.key.startsWith("category_"))
 				
 				if (it.key.startsWith("category_")) {
-					def category = Category.get((it.key - "category_") as Integer);
+					def category = Category.get((it.key - "category_"));
 					log.info "adding " + category?.name
 					productInstance.addToCategories(category)
 				}

@@ -4,7 +4,7 @@
 		<td>
 			<g:if test="${locationInstance?.logo }">
 				<img class="photo" width="25" height="25" 
-					src="${createLink(controller:'warehouse', action:'viewLogo', id:locationInstance.id)}" style="vertical-align: bottom" />		            				
+					src="${createLink(controller:'location', action:'viewLogo', id:locationInstance.id)}" style="vertical-align: bottom" />		            				
 				&nbsp;
 			</g:if>
 			<span style="font-weight: bold; font-size: 2em">${fieldValue(bean: locationInstance, field: "name")}</span>

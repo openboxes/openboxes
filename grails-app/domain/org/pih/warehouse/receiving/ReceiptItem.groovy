@@ -9,6 +9,7 @@ import org.pih.warehouse.product.Product;
 
 class ReceiptItem implements Serializable {
 	
+	String id
 	Product product		    			// Specific product that we're tracking
 	String lotNumber					// Loose coupling to the inventory lot
 	Date expirationDate					// Date of expiration
@@ -21,6 +22,10 @@ class ReceiptItem implements Serializable {
 	
 	Date dateCreated;
 	Date lastUpdated;
+	
+	static mapping = {
+		id generator: 'uuid'
+	}
 	
 	static belongsTo = [ receipt : Receipt ]
 	static constraints = {

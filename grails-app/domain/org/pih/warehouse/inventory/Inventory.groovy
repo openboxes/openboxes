@@ -6,6 +6,8 @@ import org.pih.warehouse.core.Location;
 
 class Inventory implements java.io.Serializable {
 
+	String id
+	
     // Core data elements
     Location warehouse		// we could assume that a warehouse has an inventory
     
@@ -21,7 +23,7 @@ class Inventory implements java.io.Serializable {
     String toString() { return "${warehouse.name}"; }
 
 	static mapping = { 
-		cache true
+		id generator: 'uuid'
 	}
 	
     // Constraints

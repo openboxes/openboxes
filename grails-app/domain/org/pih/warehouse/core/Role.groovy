@@ -4,6 +4,7 @@ import java.util.Date;
 
 class Role implements Serializable {
 	
+	String id
 	RoleType roleType;
 	String description;
 
@@ -12,6 +13,11 @@ class Role implements Serializable {
 		description(nullable:true, 	maxSize:255)
 	}
 
+	static mapping = { 
+		id generator: 'uuid'
+	}
+	
+	
 	String toString() { return "${roleType.name}"; } 
 	
 }

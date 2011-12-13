@@ -10,6 +10,12 @@ import org.pih.warehouse.shipping.ShipmentItem;
 
 class RequestShipment implements Serializable {
 
+	String id
+	
 	static belongsTo = [shipmentItem: ShipmentItem, requestItem: RequestItem]
+	
+	static mapping = {
+		id generator: 'uuid'
+	}
 	
 }

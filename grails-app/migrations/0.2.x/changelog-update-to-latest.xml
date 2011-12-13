@@ -4195,7 +4195,7 @@
     	</preConditions>
     	<comment>Drop unused table.</comment>
 		<dropTable tableName="setting"/>
-    </changeSet>        
+    </changeSet>
     <changeSet author="jmiranda (generated)" id="1320943767698-16">
     	<preConditions onFail="MARK_RAN">
     		<columnExists tableName="location_type" columnName="code"/>

@@ -24,7 +24,8 @@ beans = {
 		user = CH.config.dataSource.username
 		password = CH.config.dataSource.password
 		driverClass = CH.config.dataSource.driverClassName
-		jdbcUrl = CH.config.dataSource.url
+		//jdbcUrl = "jdbc:mysql://localhost:3306/warehouse_dev?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
+		jdbcUrl = CH.config.dataSource.url 
 		//connection test settings
 		idleConnectionTestPeriod = 2 * 60 * 60 // 2 hours
 		initialPoolSize = 10
