@@ -399,11 +399,13 @@ class ShipmentService {
 		// now filter by event code and eventdate
 		shipments = shipments.findAll( { def status = it.getStatus()
 											if (statusCode && status.code != statusCode) { return false }
-											if (statusStartDate && status.date < statusStartDate) { return false }
-											if (statusEndDate && status.date >= statusEndDate.plus(1)) { return false }
+											//if (statusStartDate && status.date < statusStartDate) { return false }
+											//if (statusEndDate && status.date >= statusEndDate.plus(1)) { return false }
 											return true
-										} )
-										
+										} )		
+		
+		shipments = shipments.findAll() { (!statusStartDate || it.expectedShippingDate >= statusStartDate) && (!statusEndDate || it.expectedShippingDate <= statusEndDate) }
+			
 		return shipments
 	}
 	

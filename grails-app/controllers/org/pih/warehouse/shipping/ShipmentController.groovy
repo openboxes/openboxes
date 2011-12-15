@@ -408,14 +408,15 @@ class ShipmentController {
 	def list = {
 		
 		
-		boolean incoming = params.type == "INCOMING"
+		boolean incoming = params?.type?.toUpperCase() == "INCOMING"
 		def origin = incoming ? (params.origin ? Location.get(params.origin) : null) : Location.get(session.warehouse.id)
 		def destination = incoming ? Location.get(session.warehouse.id) : (params.destination ? Location.get(params.destination) : null)
 		def shipmentType = params.shipmentType ? ShipmentType.get(params.shipmentType) : null
 		def statusCode = params.status ? Enum.valueOf(ShipmentStatusCode.class, params.status) : null
 		def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
 		def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
-					
+		log.info statusStartDate
+		log.info statusEndDate
 		def shipments = shipmentService.getShipments(shipmentType, origin, destination, statusCode, statusStartDate, statusEndDate)
 		
 		// sort by event status, event date, and expecting shipping date

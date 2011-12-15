@@ -15,7 +15,7 @@ class DatePickerTagLib {
 		def showOn = attrs.showOn ?: "both";
 		def showTrigger = Boolean.valueOf(attrs.showTrigger ?: "true");
 		def changeMonthAndYear = attrs.changeMonthAndYear ?: "false";
-		
+		def showClear = attrs.showClear ?: "false"
 		def value = attrs.value;
 		if (value) { 
 			if (value instanceof Date) {
@@ -33,7 +33,13 @@ class DatePickerTagLib {
 			<input id='${id}' name='${name}' type='hidden'/>
 			<input id='${id}-datepicker' name='${name}-datepicker' type='text' class='date' size="${size}" />
 			<script type=\'text/javascript\'>
+
 				jQuery(document).ready(function() {
+
+					jQuery(".clear-date").click(function() {
+						jQuery('#${id}-datepicker').val('');
+					});
+
 					jQuery('#${id}-datepicker').datepicker({
 						altField: '#${id}',
 						altFormat: 'mm/dd/yy',
@@ -63,7 +69,7 @@ class DatePickerTagLib {
 			html += """
 			<style>
 			.ui-datepicker-trigger {
-				position: relative; left: -16px; top: -1px;
+				#position: relative; left: -16px; top: -1px;
 			}
 			</style>
 			""";

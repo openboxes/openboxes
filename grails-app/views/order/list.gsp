@@ -39,6 +39,9 @@
 
 								<g:jqueryDatePicker id="statusEndDate" name="statusEndDate"
 																	value="${statusEndDate}" format="MM/dd/yyyy"/>
+																	
+																	
+								<a href="javascript:void(0);" class="clear-dates"><warehouse:message code="default.clear.label"/></a>
 							</td>
 				           	<td class="filter-list-item">
 					           	<g:select name="status" 
@@ -94,5 +97,15 @@
 				</tbody>
 			</table>
         </div>
+		<script type="text/javascript">
+			$(function() { 		
+				$(".clear-dates").click(function() {
+					$('#statusStartDate-datepicker').val('');					
+					$('#statusEndDate-datepicker').val('');
+					$('#statusStartDate').val('');					
+					$('#statusEndDate').val('');
+				});			
+			});
+        </script>
     </body>
 </html>
