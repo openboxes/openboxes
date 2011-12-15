@@ -415,8 +415,6 @@ class ShipmentController {
 		def statusCode = params.status ? Enum.valueOf(ShipmentStatusCode.class, params.status) : null
 		def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
 		def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
-		log.info statusStartDate
-		log.info statusEndDate
 		def shipments = shipmentService.getShipments(shipmentType, origin, destination, statusCode, statusStartDate, statusEndDate)
 		
 		// sort by event status, event date, and expecting shipping date
