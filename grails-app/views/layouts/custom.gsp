@@ -126,7 +126,7 @@
 							    <a class="home" href="${createLink(uri: '/dashboard/index')}" style="text-decoration: none">						    	
 						    		<img src="${createLinkTo(dir:'images/icons/',file:'logo.gif')}" alt="Your Boxes. You're Welcome." 
 						    			style="vertical-align: absmiddle"/>
-						    			<span style="font-size: 2em; vertical-align: middle;">openBoxes</span>
+						    			<span style="font-size: 2em; vertical-align: middle;"><i>open</i>boxes</span>
 							    </a>
 							</div>
 					    </div>
