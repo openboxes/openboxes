@@ -71,34 +71,6 @@ class InventoryService implements ApplicationContextAware {
 		return Location.list()
 	}
     
-	/**
-	 * Returns the Location specified by the passed id parameter; 
-	 * if no parameter is specified, returns a new warehouse instance
-	 * 
-	 * @param warehouseId
-	 * @return
-	 */
-	/*
-	Location getLocation(Long warehouseId) {
-	   	if (warehouseId) {
-	   		Location warehouse = Location.get(warehouseId)
-	   		if (!warehouse) {
-	   			throw new Exception("No warehouse found with warehouseId ${warehouseId}")
-	   		}
-	   		else {
-	   			return warehouse
-	   		}
-	   	}
-	   	// otherwise, we need to create a new warehouse
-	   	else {
-	   		Location warehouse = new Location()
-	   		warehouse.locationType = LocationType.findById(Constants.WAREHOUSE_LOCATION_TYPE_ID)
-	   		
-	   		return warehouse
-	   	}
-    }
-    */
-    
     /**
      * Saves the specified warehouse
 	 * 

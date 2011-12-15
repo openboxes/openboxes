@@ -210,7 +210,7 @@ class JsonController {
 			items = Shipment.withCriteria {
 				or {
 					ilike("name", "%" + params.term + "%")
-					ilike("shipmentNumber", "%" + params.term + "%")
+					//ilike("shipmentNumber", "%" + params.term + "%")
 					destination {
 						ilike("name", params.term + "%")
 					}
@@ -227,8 +227,7 @@ class JsonController {
 					if (!shipment?.hasShipped() && !shipment?.hasArrived()) { 
 						finalItems << [ value: shipment.id,
 							type: "shipment", 
-							label: shipment.name + " [" + 
-							shipment.shipmentNumber + "] - " + shipment?.status,
+							label: shipment.name + " [" + shipment?.status + "]",
 							valueText: shipment.name, 
 							icon: ""
 							]
@@ -246,17 +245,6 @@ class JsonController {
 						}
 					}					
 				}
-				/*
-				items = items.collect() { shipment ->					
-					[
-						value: shipment.id,
-						label: shipment.name + " [" + shipment.shipmentNumber + "]",
-						valueText: shipment.name
-					]
-					
-					
-				}
-				*/
 			}
 		}
 		render finalItems as JSON;

@@ -27,6 +27,7 @@
 							<div id="details" class="section">
 								<table cellspacing="5" cellpadding="5">
 									<tbody>
+										<%-- 
 										<tr class="prop">
 											<td valign="top" class="name"><label><warehouse:message
 												code="shipping.shipmentNumber.label" /></label>
@@ -36,6 +37,7 @@
 												<span style="line-height: 1.5em">${shipmentInstance?.shipmentNumber}</span>
 											</td>
 										</tr>
+										--%>
 										<tr class="prop">
 											<td valign="middle" class="name"><label><warehouse:message
 												code="default.type.label" default="Type" /></label></td>

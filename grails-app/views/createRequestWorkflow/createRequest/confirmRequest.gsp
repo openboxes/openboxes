@@ -27,6 +27,7 @@
             				
 					<table>
 						<tbody>
+							<%-- 
 							<tr class='prop'>
 								<td valign='top' class='name'><label for='id'><warehouse:message code="request.orderNumber.label"/>:</label></td>
 								<td valign='top' class='value'>
@@ -38,6 +39,7 @@
 									</g:else>
 								</td>
 							</tr>
+							--%>
 							<tr class='prop'>
 								<td valign='top' class='name'><label for='description'><warehouse:message code="default.description.label"/>:</label></td>
 								<td valign='top' class='value'>

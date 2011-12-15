@@ -18,9 +18,6 @@
 		                    <thead>
 		                        <tr>   
 		                         	<th>${warehouse.message(code: 'default.actions.label')}</th>
-		                        	<th>
-						           		<label class="block"><warehouse:message code="default.type.label"/> </label> 
-		                        	</th>
 		                            <th>${warehouse.message(code: 'shipping.shipment.label')}</th>
 		                            <th>
 										<g:if test="${incoming}">
@@ -51,8 +48,6 @@
 											optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${shipmentType}" 
 											noSelection="['':warehouse.message(code:'default.all.label')]" /> 
 		                        	</td>
-		                            <td>
-									</td>
 		                            <td>
 										<g:if test="${incoming}">
 								           	<g:select name="origin" 
@@ -116,11 +111,9 @@
 													</div>
 												</div>	
 											</td>
-											<td width="3%" style="text-align: center">
+											<td class="left">
 												<img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + format.metadata(obj:shipmentInstance?.shipmentType, locale:null) + '.png')}"
 												alt="${format.metadata(obj:shipmentInstance?.shipmentType)}" style="vertical-align: middle; width: 24px; height: 24px;" />		
-											</td>										
-											<td>
 												<g:link action="showDetails" id="${shipmentInstance.id}">
 													${fieldValue(bean: shipmentInstance, field: "name")}
 												</g:link>				

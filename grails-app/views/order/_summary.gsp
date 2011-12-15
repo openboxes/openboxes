@@ -15,10 +15,12 @@
 							<g:if test="${!params.execution  && !isAddingComment && !isAddingDocument }">
 								<g:render template="/order/actions" model="[orderInstance:orderInstance]"/> &nbsp;|&nbsp;
 							</g:if>
+							<%--
 							<span class="order-number">
 								<warehouse:message code="order.orderNumber.label"/>: <b>${orderInstance?.orderNumber}</b>  
 							</span>
-							<span class="fade">&nbsp;|&nbsp;</span> 
+							<span class="fade">&nbsp;|&nbsp;</span>
+							 --%> 
 							<span class="ordered-date">
 								<warehouse:message code="order.dateOrdered.label"/>: <b><format:date obj="${orderInstance?.dateOrdered}"/></b>
 							</span>

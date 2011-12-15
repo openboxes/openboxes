@@ -106,15 +106,15 @@ class DocumentController {
 			   log.info "Saving document " + documentInstance;
 			   if (shipmentInstance) { 
 				   shipmentInstance.addToDocuments(documentInstance).save(flush:true)
-				   flash.message = "${warehouse.message(code: 'document.successfullySavedToShipment.message', args: [shipmentInstance?.shipmentNumber])}"			   
+				   flash.message = "${warehouse.message(code: 'document.successfullySavedToShipment.message', args: [shipmentInstance?.name])}"			   
 			   }
 			   else if (orderInstance) { 
 				   orderInstance.addToDocuments(documentInstance).save(flush:true)
-				   flash.message = "${warehouse.message(code: 'document.successfullySavedToOrder.message', args: [orderInstance?.orderNumber])}"
+				   flash.message = "${warehouse.message(code: 'document.successfullySavedToOrder.message', args: [orderInstance?.description])}"
 			   }
 			   else if (requestInstance) { 
 				   requestInstance.addToDocuments(documentInstance).save(flush:true)
-				   flash.message = "${warehouse.message(code: 'document.successfullySavedToRequest.message', args: [requestInstance?.requestNumber])}"
+				   flash.message = "${warehouse.message(code: 'document.successfullySavedToRequest.message', args: [requestInstance?.description])}"
 			   }
 		   }
 		   // If there are errors, we need to redisplay the document form
