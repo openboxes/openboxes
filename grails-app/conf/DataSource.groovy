@@ -43,5 +43,15 @@ environments {
 			url = "jdbc:mysql://localhost:3306/warehouse_diff?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;sessionVariables=storage_engine=InnoDB"
 		}
 	}
-	
+	root {
+		dataSource {
+			url = "jdbc:mysql://localhost:3306/warehouse_root?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;sessionVariables=storage_engine=InnoDB"
+		}
+	}
+	client {
+		dataSource {
+			url = "jdbc:mysql://localhost:3306/warehouse_client?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;sessionVariables=storage_engine=InnoDB"
+		}
+	}
+
 }
