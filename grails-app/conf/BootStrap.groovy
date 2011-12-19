@@ -58,7 +58,8 @@ class BootStrap {
 		// Migrating existing data to the new data model is still a work in progress, but you can 
 		// use the previous versions changelogs.  
 		//
-		if (GrailsUtil.environment == 'test' || GrailsUtil.environment == 'development') {
+		if (GrailsUtil.environment == 'test' || GrailsUtil.environment == 'development' || 
+			GrailsUtil.environment == 'client' || GrailsUtil.environment == 'root') {
 			log.info("\t\tRunning liquibase changelog(s) ...")
 			Liquibase liquibase = null
 			try {
