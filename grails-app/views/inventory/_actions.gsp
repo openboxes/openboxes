@@ -55,6 +55,15 @@
 		<div class="action-menu-item">
 			<hr/>
 		</div>
+
+		<div class="action-menu-item">														
+			<g:link controller="report" action="viewTransactionReport" params="['category.id':commandInstance?.categoryInstance?.id?:quickCategories[0]?.id]">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'report.png')}" alt="${warehouse.message(code: 'inventory.listTransactions.label') }" style="vertical-align: middle"/>
+				&nbsp;<warehouse:message code="report.viewTransactionReport.label"/>
+			</g:link>
+		</div>		
+
+
 		<div class="action-menu-item">														
 			<g:link controller="inventory" action="listAllTransactions">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="${warehouse.message(code: 'inventory.listTransactions.label') }" style="vertical-align: middle"/>

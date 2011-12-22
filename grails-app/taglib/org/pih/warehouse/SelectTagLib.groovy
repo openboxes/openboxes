@@ -6,7 +6,18 @@ import org.pih.warehouse.core.Location;
 class SelectTagLib {
 	
 	def locationService
-	
+
+	def selectLocation = { attrs,body ->
+		def currentLocation = Location.get(session.warehouse.id)
+		attrs.from = locationService.getAllLocations().sort { it?.name?.toLowerCase() };
+		attrs.optionKey = 'id'
+		//attrs.optionValue = 'name'
+		attrs.value = attrs.value ?: currentLocation?.id
+		attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]"}
+		out << g.select(attrs)
+	}
+
+		
 	def selectTransactionDestination = { attrs,body ->		
 		def currentLocation = Location.get(session.warehouse.id)
 		attrs.from = locationService.getTransactionDestinations(currentLocation).sort { it?.name?.toLowerCase() };

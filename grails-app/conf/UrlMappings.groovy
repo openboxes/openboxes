@@ -17,7 +17,7 @@ class UrlMappings {
 		//	action = [GET:"searchByFirstName"]
 		//}
 		"/"(controller:"home", action:"index")      
-		"500"(controller:"errors", action:"handleException")
+		//"500"(controller:"errors", action:"handleException")
 	}
 
 

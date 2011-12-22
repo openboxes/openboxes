@@ -190,6 +190,14 @@
 				</li>
 			</ul>	
 		</g:authorize>
+		<span class="menu-subheading"><warehouse:message code="report.label"/></span>
+		<ul>			
+			<li>
+				<span class="menuButton">
+					<g:link controller="report" action="viewTransactionReport"><warehouse:message code="report.viewTransactionReport.label"/></g:link>
+				</span>
+			</li>
+		</ul>
 		<span class="menu-subheading"><warehouse:message code="products.label"/></span>
 		<ul>			
 			<li>
