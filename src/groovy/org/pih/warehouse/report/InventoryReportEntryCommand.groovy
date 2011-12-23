@@ -11,6 +11,7 @@ class InventoryReportEntryCommand {
 
 	Product product;
 	Integer quantityInitial = 0;
+	Integer quantityRunning = 0;
 	Integer quantityFinal = 0;
 	
 	Integer quantityFound = 0;

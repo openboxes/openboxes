@@ -39,7 +39,7 @@
 									<th><warehouse:message code="product.lotNumber.label"/></th>
 									<th><warehouse:message code="default.expires.label"/></th>
 									<th><warehouse:message code="inventory.onHandQuantity.label"/></th>
-									<th><warehouse:message code="inventory.expiredQuantity.label"/></th>
+									<th><warehouse:message code="inventory.damaged.label"/></th>
 									<th><warehouse:message code="default.actions.label"/></th>
 								</tr>
 							</thead>

@@ -2061,6 +2061,205 @@ class InventoryService implements ApplicationContextAware {
 			from Consumption order by year(transactionDate) desc, month(transactionDate) desc""")
 		return monthsYears?.collect() { [day: it[0], week: it[1], month: it[2], year: it[3] ] }
 	}
+	
+	
+	/**
+	 * 
+	 * @param product
+	 * @param date
+	 * @return
+	 */
+	def getQuantity(Product product, Location location, Date date) { 
+		def quantity = 0;
+		def inventoryItems = InventoryItem.findAllByProduct(product)
+		inventoryItems.each { inventoryItem ->
+			quantity += getQuantity(inventoryItem, location, date);
+		}
+		return quantity;
+	} 
+	
+	
+	/**
+	 * 
+	 * @param product
+	 * @param date
+	 * @return
+	 */
+	def getProductQuantity(Product product, Location location, Date date) { 
+		return 0;
+	}
+	
+	/**
+	 * 
+	 * @param inventoryItem
+	 * @param date
+	 * @return
+	 */
+	def getQuantity(InventoryItem inventoryItem, Location location, Date date) { 
+		def quantity = 0;
+		
+		// Get the date of this inventory item's last 'inventory' transaction 
+		def lastInventoryTransactionEntry = getPreviousInventoryTransactionEntry(inventoryItem, location, date);
+		if (!lastInventoryTransactionEntry) {
+			lastInventoryTransactionEntry = getPreviousInventoryTransactionEntry(inventoryItem?.product, location, date);
+		}
+		
+		// Date of last inventory might be null if there's never been an inventory
+		def lastInventoryDate = lastInventoryTransactionEntry?.transaction?.transactionDate;
+		quantity = lastInventoryTransactionEntry?.quantity ?: 0
+
+		log.info ("Starting quantity = " + quantity)
+				
+		// Get all transactions for an inventory item from the last inventory 
+		// date until the given date 
+		def transactionEntries = getTransactionEntries(inventoryItem, location, lastInventoryDate, date)
+		adjustQuantity(quantity, transactionEntries)
+
+		log.info ("Ending quantity = " + quantity)
+				
+		return quantity;
+	}
+
+	
+	/**
+	 * 	
+	 * @param initialQuantity
+	 * @param transactionEntries
+	 * @return
+	 */
+	def adjustQuantity(Integer initialQuantity, List<Transaction> transactionEntries) { 
+		transactionEntries.each { transactionEntry ->
+			adjustQuantity(initialQuantity, transactionEntry)
+		}
+	}
+	
+	/**
+	 * 
+	 * @param initialQuantity
+	 * @param transactionEntry
+	 * @return
+	 */
+	def adjustQuantity(Integer initialQuantity, TransactionEntry transactionEntry) {		
+		def quantity = initialQuantity;
+		
+		def code = transactionEntry?.transaction?.transactionType?.transactionCode;		
+		if (code == TransactionCode.INVENTORY || code == TransactionCode.PRODUCT_INVENTORY) {
+			quantity = transactionEntry.quantity;
+		} 
+		else if (code == TransactionCode.DEBIT) {
+			quantity -= transactionEntry.quantity;
+		
+		} 
+		else if (code == TransactionCode.CREDIT) {
+			quantity += transactionEntry.quantity;
+		}
+		return quantity;		
+	}
+	
+	
+	/**
+	 * 
+	 * @param product
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 */
+	def getTransactionEntries(Product product, Location location, Date startDate, Date endDate) {
+		def criteria = TransactionEntry.createCriteria();
+		def transactionEntries = criteria.list {
+			inventoryItem {
+				eq("product", product)
+			}
+			transaction { 
+				if (startDate && endDate) {
+					between("transactionDate", startDate, endDate)
+				} 
+				else if (startDate) { 
+					ge("transactionDate", startDate)
+				}
+				else if (endDate) { 
+					le("transactionDate", endDate)
+				}
+				eq("inventory", location?.inventory)
+				order("transactionDate", "asc")
+			}
+		}
+		return transactionEntries;
+	}
+	
+	
+	
+	
+		
+	/**
+	 * 
+	 * @param inventoryItem
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 */
+	def getTransactionEntries(InventoryItem inventoryItem, Location location, Date startDate, Date endDate) { 
+		def criteria = TransactionEntry.createCriteria();
+		def transactionEntries = criteria.list {
+			eq("inventoryItem", inventoryItem)
+			transaction {
+				if (startDate && endDate) {
+					between("transactionDate", startDate, endDate)
+				} 
+				else if (startDate) { 
+					ge("transactionDate", startDate)
+				}
+				else if (endDate) { 
+					le("transactionDate", endDate)
+				}
+				eq("inventory", location?.inventory)
+				order("transactionDate", "asc")
+			}
+		}
+		return transactionEntries;
+	}
+	
+	
+	def getPreviousInventoryTransactionEntry(Product product, Location location, Date date) {
+		def transactionTypes = []
+		transactionTypes << TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
+		def criteria = TransactionEntry.createCriteria()
+		def transactionEntry = criteria.get { 
+			inventoryItem {
+				eq("product", product)
+			}
+			transaction {
+				'in'("transactionType", transactionTypes)		
+				eq("inventory", location?.inventory)
+				order('transactionDate', 'desc')				
+			}
+			maxResults(1)
+		}
+		return transactionEntry;
+	}
+	
+	/**
+	 * 
+	 * @param inventoryItem
+	 * @param date
+	 * @return
+	 */
+	def getPreviousInventoryTransactionEntry(InventoryItem inventoryItem, Location location, Date date) { 
+		def transactionTypes = []
+		transactionTypes << TransactionType.get(Constants.INVENTORY_TRANSACTION_TYPE_ID)		
+		def criteria = TransactionEntry.createCriteria()		
+		def transactionEntry = criteria.get {
+			eq("inventoryItem", inventoryItem)
+			transaction { 
+				'in'("transactionType", transactionTypes)		
+				eq("inventory", location?.inventory)				
+				order('transactionDate', 'desc')
+			}
+			maxResults(1)
+		}
+		return transactionEntry
+	}
+	
 
 	
 }
