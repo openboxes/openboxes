@@ -3,10 +3,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <title>${warehouse.message(code: 'dashboard.chooseLocation.label', default: 'Choose a warehouse to manage')}</title>
-    </head>
-    <body>        
-		<style>
-			
+		<style>			
 			#menu { display: none; } 
 			.page-title { display: none; } 
 			td.warehouse { padding: 0px; } 
@@ -19,9 +16,9 @@
 					#warehouse-${warehouse?.id} a { color: #${warehouse.fgColor}; }  	
 				</g:if>					
 			</g:each>			
-			
 		</style>
-
+    </head>
+    <body>        
 		<div class="body">		
 			<div id="chooseLocation">
 				<g:if test="${flash.message}">

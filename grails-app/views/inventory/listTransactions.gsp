@@ -15,32 +15,10 @@
 				<div class="message">${flash.message}</div>
 			</g:if>
 			
-			<table style="width:100%; border-collapse: collapse; border-color: black;">
-				<tr>
-					<td class="filter filterRow ${!transactionTypeSelected ? 'filterSelected' : '' }">
-						<g:link controller="inventory" action="listAllTransactions">
-							<warehouse:message code="transactionType.all.label"/>
-						</g:link>
-					</td>
-					<g:each var="transactionType" in="${org.pih.warehouse.inventory.TransactionType.list()}">
-						<g:set var="numberOfTransactions" value="${transactionMap[transactionType?.id]?.size()?:0}"/> 
-						<g:if test="${numberOfTransactions > 0 }">
-							<td class="filter filterRow paddingRow"></td>
-							<td class="filter filterRow ${transactionType == transactionTypeSelected ? 'filterSelected' : '' }">
-								<g:link controller="inventory" action="listAllTransactions" params="['transactionType.id':transactionType?.id]">
-									<format:metadata obj="${transactionType }"/>
-									(${numberOfTransactions })
-								</g:link>
-							</td>		
-						</g:if>
-					</g:each>
-					<td class="filter filterRow paddingRow" style="width:100%">&nbsp;</td>
-				</tr>
-			</table>
-			<div style="padding-top: 10px;">
+			<div >
 				<table>
                     <thead>
-                        <tr class="odd">   
+                        <tr class="even">   
 							<th><warehouse:message code="default.actions.label"/></th>
 							<th><warehouse:message code="default.date.label"/></th>
 							<th><warehouse:message code="transaction.type.label"/></th>
@@ -50,6 +28,33 @@
                         </tr>
                     </thead>
        	           	<tbody>			
+                        <tr class="odd">                        
+                        	<td></td>
+                        	<td></td>
+							<td>
+							
+								<form>
+									<select id="transactionTypeSelect" name="transactionType.id">
+										<option value="">
+											<warehouse:message code="transactionType.all.label"/>
+										</option>
+										<g:each var="transactionType" in="${org.pih.warehouse.inventory.TransactionType.list()}">
+											<g:set var="numberOfTransactions" value="${transactionMap[transactionType?.id]?.size()?:0}"/> 
+											<g:set var="selected" value="${transactionTypeSelected == transactionType }"/>
+											<g:if test="${numberOfTransactions > 0 }">
+												<option value="${transactionType?.id}" ${selected?'selected="selected"':'' }>
+													<format:metadata obj="${transactionType }"/>
+													(${numberOfTransactions })
+												
+											</g:if>
+										</g:each>
+									</select>
+								</form>
+							</td>
+							<td></td>
+							<td></td>
+                        	<td></td>							
+                        </tr>
 						<g:each var="transactionInstance" in="${transactionInstanceList}" status="i">           
 							<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">            
 								<td align="center">
@@ -114,5 +119,14 @@
 				<g:paginate total="${transactionCount}" params="['transactionType.id':transactionTypeSelected?.id]"/>
 			</div>
 		</div>
+		
+		<script>
+			$(document).ready(function() {			
+				$("#transactionTypeSelect").change(function() {
+				    $(this).closest("form").submit();
+				});
+			});
+		
+		</script>		
 	</body>
 </html>

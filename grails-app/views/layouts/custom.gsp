@@ -54,14 +54,14 @@
  	<!-- Include Jquery Validation and Jquery Validation UI plugins -->
  	<jqval:resources />       
     <jqvalui:resources />
-    
+
     <script type="text/javascript">
 		var monthNamesShort = [];
 		<g:each in="${1..12}" var="monthNum">
 			monthNamesShort[${monthNum-1}] = '<warehouse:message code="month.short.${monthNum}.label"/>';
 		</g:each>
     </script>
-	
+
 	<%--
 	<!-- Not using yet -->
 	<link href="${createLinkTo(dir:'js/jquery.jqGrid/css', file:'ui.jqgrid.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
@@ -79,26 +79,14 @@
 	
 	<!-- Grails Layout : write head element for page-->
 	<g:layoutHead />
+
+	<g:render template="/common/customCss"/>
 	
-	<style>
-		<g:if test="${session?.warehouse?.fgColor && session?.warehouse?.bgColor }">
-			#hd {
-				padding: 0px;
-				margin: 0px; 
-				background-color: #${session.warehouse.bgColor}; 
-				color: #${session.warehouse.fgColor}; 
-			} 
-			#hd a { 
-				color: #${session.warehouse.fgColor}; 
-			}  		
-		</g:if>		
-	
-		.warehouse { border: 0px solid #F5F5F5; padding: 5px; display: block; } 
-	</style>
 	
 </head>
 <body class="yui-skin-sam">
-	<input type="hidden" id="currentLocationId" value="${session?.warehouse?.id }"/>
+	<g:render template="/common/customVariables"/>
+	
 	<%-- 
 	<div class="notification-container"></div>
 	
@@ -300,7 +288,7 @@
 	      	<!-- YUI nav block that includes the local navigation menu -->
 	      	<div id="menu" role="navigation" class="yui-b">
 		  		<g:if test="${session?.user && session?.warehouse}">
-					<g:render template="/common/menu" />
+					<g:include controller="dashboard" action="menu"/>
 				</g:if>
 			</div>			 
 		</div>
@@ -378,7 +366,7 @@
 				return false;
 			}).next().hide();
 			*/
-			<g:if test="${request.request.requestURL.toString().contains('category')}">
+<g:if test="${request.request.requestURL.toString().contains('category')}">
 				accordion.accordion( "activate" , 5 );
 			</g:if>
 			<g:elseif test="${request.request.requestURL.toString().contains('locationGroup')}">
@@ -443,27 +431,12 @@
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('product')}">
 				accordion.accordion( "activate" , 6 );
-			</g:elseif>
+			</g:elseif>			
 		
 			$('.goto').click(function(){
 				var li = $(this).parent().closest(".menu-section");
 			});	
 		});
 	</script>
-	<%--
-    <script type="text/javascript">
-      jQuery(function(){
-        var SelfLocation = window.location.href.split('?');
-        switch (SelfLocation[1]) {
-          case "justify_right":
-            jQuery(".megamenu").megamenu({ 'justify':'right' });
-            break;
-          case "justify_left":
-          default:
-            jQuery(".megamenu").megamenu();
-        }
-      });
-    </script>	
-	--%>	
 </body>
 </html>

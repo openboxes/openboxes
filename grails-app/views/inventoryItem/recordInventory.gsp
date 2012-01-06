@@ -6,11 +6,11 @@
 <meta name="layout" content="custom" />
 <g:set var="entityName" value="${warehouse.message(code: 'inventory.label', default: 'inventory')}" />
 <title><warehouse:message code="inventory.record.label" args="[entityName]" default="Record Inventory"/></title>
+<style>
+	.selected-row { background-color: #ffffe0; } 
+</style>
 </head>
-
 <body>
-
-
 <div class="body">
 	<g:if test="${flash.message}">
 		<div class="message">
@@ -54,7 +54,7 @@
 			<br clear="all">	
 		
 	
-			<table border="0" >
+			<table>
 				<tr>
 					<td style="width: 250px;">
 						<g:render template="productDetails" model="[productInstance:commandInstance?.product, inventoryInstance: inventoryInstance, inventoryLevelInstance: inventoryLevelInstance, totalQuantity: totalQuantity]"/>
@@ -103,11 +103,7 @@
 													<th><warehouse:message code="default.actions.label"/></th>
 												</tr>											
 											</thead>									
-											<tbody>
-												<style>
-													.selected-row { background-color: #ffffe0; } 
-												</style>
-												
+											<tbody>												
 												<g:set var="inventoryItems" value="${commandInstance?.recordInventoryRows.findAll{it.oldQuantity != 0 || it.newQuantity != 0}}"/>	
 												<g:if test="${inventoryItems }">											
 													<g:each var="recordInventoryRow" in="${inventoryItems.sort { it.lotNumber }}" status="status">

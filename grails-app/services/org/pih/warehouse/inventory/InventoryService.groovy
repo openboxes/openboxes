@@ -730,15 +730,12 @@ class InventoryService implements ApplicationContextAware {
 	 * @param inventoryInstance
 	 * @return
 	 */
-	Map<Product,Integer>  getQuantityByProductMap(Inventory inventoryInstance) {                   
-		def transactionEntries = TransactionEntry.createCriteria().list { 
-			transaction { 
-				eq("inventory.id", inventoryInstance?.id)
-			}	
-		}
+	Map<Product,Integer>  getQuantityByProductMap(Inventory inventory) {                   
+		def transactionEntries = getTransactionEntriesByInventory(inventory);
 		return getQuantityByProductMap(transactionEntries)		
 	}
 	
+		
 	/**
 	* Gets a product-to-quantity maps for all products in the selected inventory
 	* whose quantity falls below a the minimum or reorder level
@@ -1260,12 +1257,14 @@ class InventoryService implements ApplicationContextAware {
 	 * @param inventoryInstance
 	 * @return
 	 */
-	List getTransactionEntriesByInventory(Inventory inventoryInstance) { 
-		return TransactionEntry.createCriteria().list() {
+	List getTransactionEntriesByInventory(Inventory inventory) { 
+		def criteria = TransactionEntry.createCriteria();
+		def transactionEntries = criteria.list {
 			transaction {
-				eq("inventory", inventoryInstance)
+				eq("inventory", inventory)
 			}
 		}
+		return transactionEntries;
 	}
 
 	
@@ -2148,7 +2147,6 @@ class InventoryService implements ApplicationContextAware {
 		} 
 		else if (code == TransactionCode.DEBIT) {
 			quantity -= transactionEntry.quantity;
-		
 		} 
 		else if (code == TransactionCode.CREDIT) {
 			quantity += transactionEntry.quantity;

@@ -4,6 +4,7 @@ class InitializationFilters {
 	def locationService
 	
 	def filters = {
+
 		sessionCheck(controller:'*', action:'*') {
 			before = {
 				try { 
@@ -23,5 +24,6 @@ class InitializationFilters {
 
 			}
 		}
+
 	}
 }

@@ -9,9 +9,9 @@ var alternateRowColors = function($table) {
 };	
 
 var renameRowFields = function(table) { 
-	var i = 0;
+	var i = -1;  // Need to start at -1 because otherwise the initial index is 1 (not sure why).
 	// Iterate over each row and change the name attribute of all input/select fields
-	table.find("tr.row").each(function() { 
+	table.find("tr").each(function() { 
 		$(this).find("input,select").each(function() {
 		    var oldName = $(this).attr('name');
 		    var newName = oldName.replace(/(transactionEntries\[)(\d+)(\])/, function(f, p1, p2, p3) {
@@ -19,7 +19,7 @@ var renameRowFields = function(table) {
 		    });
 	        $(this).attr('name', newName);
 	        $(this).attr('id', newName);
-			console.log(oldName + " -> " + newName);
+			//console.log(oldName + " -> " + newName);
 		});
 		i++;
 	});

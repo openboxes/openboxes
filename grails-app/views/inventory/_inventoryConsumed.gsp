@@ -32,7 +32,7 @@
 				</td>
 				<td style="padding: 0px;">
 					<div>
-						<table id="inventoryTable">
+						<table id="inventoryConsumedTable">
 							<thead>
 								<tr class="odd">
 									<th><warehouse:message code="product.label"/></th>
@@ -44,6 +44,7 @@
 								</tr>
 							</thead>
 							<tbody>
+							
 							
 								<g:set var="status" value="${0 }"/>
 								<g:unless test="${command?.productInventoryItems}">
@@ -59,27 +60,31 @@
 									
 									<%-- Display one row for every inventory item --%>
 									<g:each var="inventoryItem" in="${command?.productInventoryItems[product]?.sort { it.expirationDate } }">										
-										<g:hiddenField name="transactionEntries[${status }].inventoryItem.id" value="${inventoryItem?.id }"/>
-										<tr>
-											<td>${product?.name }</td>
-											<td>${inventoryItem?.lotNumber }</td>
-											<td><format:date obj="${inventoryItem?.expirationDate }" format="MMM yyyy"/></td>
-											<td>${command?.quantityMap[inventoryItem]}</td>
-											<td>
-												<g:if test="${command?.transactionInstance?.transactionEntries }">
-													<g:textField name="transactionEntries[${status }].quantity"
-														value="${command?.transactionInstance?.transactionEntries[status]?.quantity }" size="1" autocomplete="off" />
-												</g:if>
-												<g:else>
-													<g:textField name="transactionEntries[${status }].quantity"
-														value="${command?.quantityMap[inventoryItem] }" size="1" autocomplete="off" />
-												</g:else>
-											</td>
-											<td>
-												<img class="delete middle" src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="${warehouse.message(code: 'delete.label') }"/>	
-											</td>
-										</tr>
-										<g:set var="status" value="${status+1 }"/>										
+										
+										<g:set var="onHandQuantity" value="${command?.quantityMap[inventoryItem] ?: 0}"/>									
+										<g:if test="${onHandQuantity > 0}">
+											<tr>
+												<td>${product?.name }</td>
+												<td>${inventoryItem?.lotNumber }</td>
+												<td><format:date obj="${inventoryItem?.expirationDate }" format="MMM yyyy"/></td>
+												<td>${onHandQuantity}</td>
+												<td>
+													<g:hiddenField name="transactionEntries[${status }].inventoryItem.id" value="${inventoryItem?.id }"/>
+													<g:if test="${command?.transactionInstance?.transactionEntries }">
+														<g:textField name="transactionEntries[${status }].quantity"
+															value="${command?.transactionInstance?.transactionEntries[status]?.quantity }" size="1" autocomplete="off" />
+													</g:if>
+													<g:else>
+														<g:textField name="transactionEntries[${status }].quantity"
+															value="${command?.quantityMap[inventoryItem] }" size="1" autocomplete="off" />
+													</g:else>
+												</td>
+												<td>
+													<img class="delete middle" src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="${warehouse.message(code: 'delete.label') }"/>	
+												</td>
+											</tr>
+											<g:set var="status" value="${status+1 }"/>										
+										</g:if>
 									</g:each>
 									
 								</g:each>
@@ -131,7 +136,7 @@
 
 <script>
 	$(document).ready(function() {
-		alternateRowColors("#inventoryTable");
+		alternateRowColors("#inventoryConsumedTable");
 		
 		/**
 		 * Delete a row from the table.
@@ -139,8 +144,8 @@
 		$("img.delete").livequery('click', function(event) { 
 			$(this).closest('tr').fadeTo(400, 0, function () { 
 		        $(this).remove();
-				alternateRowColors("#inventoryTable");
-				renameRowFields($("#inventoryTable"));
+		        renameRowFields($("#inventoryConsumedTable"));
+		        alternateRowColors("#inventoryConsumedTable");				
 		    });
 		    return false;
 		});			

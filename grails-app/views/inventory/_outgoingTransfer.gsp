@@ -76,41 +76,43 @@
 									<%-- Display one row for every inventory item --%>
 									<g:each var="inventoryItem" in="${command?.productInventoryItems[product]?.sort { it.expirationDate } }">
 										<g:set var="onHandQuantity" value="${command?.quantityMap[inventoryItem] ?: 0}"/>
-										<tr class="row">
-											<td>
-												<span class="${onHandQuantity >0? '':'fade'}"><format:product product="${product }"/></span>
-											</td>
-											<td>
-												<span class="${onHandQuantity >0? '':'fade'}">${inventoryItem?.lotNumber }</span>
-											</td>
-											<td>
-												<span class="${onHandQuantity >0? '':'fade'}"><format:date obj="${inventoryItem?.expirationDate }"/></span>
-											</td>
-											<td>
-												<span class="${onHandQuantity >0? '':'fade'}">${onHandQuantity }</span>
-											</td>
-											<td>
-												<g:if test="${onHandQuantity > 0 }">
-													<g:hiddenField name="transactionEntries[${status }].inventoryItem.id" value="${inventoryItem?.id }"/>									
-													<g:if test="${command?.transactionInstance?.transactionEntries }">
-														<g:textField name="transactionEntries[${status }].quantity"
-															value="${command?.transactionInstance?.transactionEntries[status]?.quantity }" size="1" autocomplete="off" />
+										<g:if test="${onHandQuantity }">
+											<tr class="row">
+												<td>
+													<span class="${onHandQuantity >0? '':'fade'}"><format:product product="${product }"/></span>
+												</td>
+												<td>
+													<span class="${onHandQuantity >0? '':'fade'}">${inventoryItem?.lotNumber }</span>
+												</td>
+												<td>
+													<span class="${onHandQuantity >0? '':'fade'}"><format:date obj="${inventoryItem?.expirationDate }"/></span>
+												</td>
+												<td>
+													<span class="${onHandQuantity >0? '':'fade'}">${onHandQuantity }</span>
+												</td>
+												<td>
+													<g:if test="${onHandQuantity > 0 }">
+														<g:hiddenField name="transactionEntries[${status }].inventoryItem.id" value="${inventoryItem?.id }"/>									
+														<g:if test="${command?.transactionInstance?.transactionEntries }">
+															<g:textField name="transactionEntries[${status }].quantity"
+																value="${command?.transactionInstance?.transactionEntries[status]?.quantity }" size="1" autocomplete="off" />
+														</g:if>
+														<g:else>
+															<g:textField name="transactionEntries[${status }].quantity"
+																value="" size="1" autocomplete="off" />
+														</g:else>
+														<g:set var="status" value="${status+1 }"/>										
+														
 													</g:if>
 													<g:else>
-														<g:textField name="transactionEntries[${status }].quantity"
-															value="" size="1" autocomplete="off" />
+														<input type="text" class="fade" disabled="disabled" value="N/A" size="1"/>
 													</g:else>
-													<g:set var="status" value="${status+1 }"/>										
-													
-												</g:if>
-												<g:else>
-													<input type="text" class="fade" disabled="disabled" value="N/A" size="1"/>
-												</g:else>
-											</td>
-											<td class="center">
-												<img class="delete middle" src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="${warehouse.message(code: 'delete.label') }"/>	
-											</td>
-										</tr>
+												</td>
+												<td class="center">
+													<img class="delete middle" src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="${warehouse.message(code: 'delete.label') }"/>	
+												</td>
+											</tr>
+										</g:if>
 									</g:each>
 								</g:each>
 							</tbody>

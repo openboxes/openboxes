@@ -25,7 +25,7 @@
 							<g:hiddenField name="version" value="${shipmentInstance?.version}" />
 
 							<div id="details" class="section">
-								<table cellspacing="5" cellpadding="5">
+								<table>
 									<tbody>
 										<%-- 
 										<tr class="prop">

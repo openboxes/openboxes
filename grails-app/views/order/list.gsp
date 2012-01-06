@@ -11,7 +11,7 @@
 				<div class="message">${flash.message}</div>
             </g:if>
             
-         	<table border="0">
+         	<table>
             	<thead>
 					<tr>   
 						<th>${warehouse.message(code: 'default.actions.label')}</th>

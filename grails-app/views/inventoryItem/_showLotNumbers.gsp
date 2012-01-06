@@ -7,7 +7,7 @@
 <div> 	
 	<h2 class="fade"><warehouse:message code="inventory.currentLotNumbers.label"/></h2>
 	<div id="inventoryView" style="text-align: left;" class="list">	
-		<table border="0" style="">
+		<table>
 			<thead>
 				<tr class="odd">
 					<th class="left" style=""><warehouse:message code="default.actions.label"/></th>												

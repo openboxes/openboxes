@@ -3,7 +3,7 @@
 	
 		<g:set var="isAddingComment" value="${request.request.requestURL.toString().contains('addComment')}"/>
 		<g:set var="isAddingDocument" value="${request.request.requestURL.toString().contains('addDocument')}"/>
-		<table border="0">
+		<table>
 			<tbody>			
 				<tr>
 					<td>

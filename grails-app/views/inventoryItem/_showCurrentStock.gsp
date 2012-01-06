@@ -1,9 +1,6 @@
-
- 
 <div> 	
-
 	<div id="inventoryView" style="text-align: left; border: 0px solid lightgrey;">	
-		<table border="0" style="">
+		<table>
 			<thead>
 				<tr class="odd">
 					<th class="left" style=""><warehouse:message code="default.actions.label"/></th>												

@@ -1,0 +1,1 @@
+<input type="hidden" id="currentLocationId" value="${session?.warehouse?.id }"/>

@@ -3,9 +3,15 @@ class SecurityFilters {
 	def filters = {
 		loginCheck(controller:'*', action:'*') {
 			before = {	
+				
+				// This allows the left-nav menu to be 'included' in the page (allowing for dynamic content to be added) 
+				if(controllerName.equals("dashboard") && (actionName.equals("menu") || actionName.equals("megamenu"))) { 
+					return true
+				}				
+				
 				String [] controllersWithAuthUserNotRequired = "api,test".split(",");
-				String [] actionsWithAuthUserNotRequired = "login,handleLogin,signup,handleSignup,json".split(",");
-				String [] actionsWithLocationNotRequired = "login,logout,handleLogin,signup,handleSignup,chooseLocation,json".split(",");
+				String [] actionsWithAuthUserNotRequired = "test,login,handleLogin,signup,handleSignup,json".split(",");
+				String [] actionsWithLocationNotRequired = "test,login,logout,handleLogin,signup,handleSignup,chooseLocation,json".split(",");
 				
 				// Not sure when this happens								
 				if (params.controller == null) {
@@ -59,9 +65,9 @@ class SecurityFilters {
 					redirect(controller: 'dashboard', action: 'chooseLocation')
 					return false;
 				}
-				
 			}
 		}
+	
 		/*
 		shipmentAccess(controller:'shipment', action:'*') {
 			before = {

@@ -24,24 +24,16 @@ class RequestController {
         redirect(action: "list", params: params)
     }
 	
-	def menu = { 		
-		
-		log.info (params);
-		
-		def list = Request.list();
-		def menu = list.groupBy { it.status }  
-		
-		[menu: menu]
-	}
-	
 
     def list = {
         //params.max = Math.min(params.max ? params.int('max') : 10, 100)
         //[requestInstanceList: Request.list(params), requestInstanceTotal: Request.count()]
 		
 		def location = Location.get(session.warehouse.id)
-		def incomingRequests = Request.findAllByDestination(location)
-		def outgoingRequests = Request.findAllByOrigin(location)
+		def incomingRequests = params.status ? Request.findAllByDestinationAndStatus(location, params.status) :
+			Request.findAllByDestination(location)
+		def outgoingRequests = params.status ? Request.findAllByOriginAndStatus(location, params.status) :
+			Request.findAllByOrigin(location)
 		
 		[incomingRequests : incomingRequests, outgoingRequests : outgoingRequests]
     }	

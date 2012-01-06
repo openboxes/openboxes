@@ -810,7 +810,9 @@ class InventoryController {
 	 */
 	def saveDebitTransaction = { TransactionCommand command ->
 		log.info ("Saving debit transactions " + params)
-
+		
+		log.info("size: " + command?.transactionEntries?.size());
+			
 		def transaction = command?.transactionInstance;
 		def warehouseInstance = Location.get(session?.warehouse?.id);
 		def quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory)
@@ -824,7 +826,7 @@ class InventoryController {
 		}
 
 		// Check to see if there are errors, if not save the transaction
-		if (!transaction.hasErrors()) {
+		if (!transaction?.hasErrors()) {
 			try {
 				// Add validated transaction entries to the transaction we want to persist
 				command.transactionEntries.each {
@@ -837,7 +839,7 @@ class InventoryController {
 				}
 				
 				// Validate the transaction object
-				if (!transaction.hasErrors() && transaction.validate()) {
+				if (!transaction?.hasErrors() && transaction?.validate()) {
 					transaction.save(failOnError: true)
 					flash.message = "Successfully saved transaction " + transaction.transactionNumber()
 					//redirect(controller: "inventory", action: "browse")
@@ -849,7 +851,7 @@ class InventoryController {
 		}
 
 		// After the attempt to save the transaction, there might be errors on the transaction
-		if (transaction.hasErrors()) {
+		if (transaction?.hasErrors()) {
 			log.info ("has errors" + transaction.errors)
 			
 			// Get the list of products that the user selected from the inventory browser
