@@ -17,7 +17,6 @@ import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.InventoryService;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.TransactionEntry;
-import org.pih.warehouse.io.util.MyUserAgent;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
@@ -98,11 +97,10 @@ class ReportController {
 		[command : command]
 	}
 	
-	def downloadChecklistReport = {
-		
+	def downloadChecklistReport = {		
 		if (params.format == 'docx') { 
 			def tempFile = documentService.generateChecklistAsDocx()
-			def filename = "Checklist.docx"
+			def filename = "shipment-checklist.docx"
 			response.setHeader("Content-disposition", "attachment; filename=" + filename);
 			response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 			response.outputStream << tempFile.readBytes()
@@ -120,7 +118,6 @@ class ReportController {
 		else { 
 			throw new UnsupportedOperationException("Format '${params.format}' not supported")
 		}
-		return
 	}
 
 
