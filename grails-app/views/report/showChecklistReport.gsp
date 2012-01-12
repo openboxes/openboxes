@@ -10,7 +10,7 @@
         	th { border-bottom: 1px solid black; }
         	.title { text-align: center; padding: 5px; font-size: 3em; }
         	.subtitle { text-align: center; padding: 15px; font-size: 2em; }
-        	.underline { border-bottom: 1px dotted black; }
+        	.underline { border-bottom: 1px dashed black; }
         	.label { width: 15%; text-align: left; vertical-align: bottom; }
         	.value { font-weight: bold; width: 30%; }
         	.spacer { width: 10%; }
@@ -144,34 +144,29 @@
 					    		<table border="1">
 					    			<thead>
 					    				<tr>
-					    					<th></th>
-					    					<th></th>
-					    					<th></th>
-					    					<th></th>
-					    					<th></th>
-					    					<th colspan="2" class="center">
+					    					<th rowspan="2" class="center" class="bottom">
+					    						No.<!-- Number -->
+					    					</th>
+					    					<th rowspan="2" class="bottom">
+					    						Description produit<!-- Product description -->
+					    					</th>
+					    					<th rowspan="2" class="center bottom">
+						    					No lot<!-- Qty -->
+					    					</th>
+					    					<th rowspan="2" class="center bottom">
+					    						Exp<!-- Expiration date -->
+					    					</th>
+					    					<th rowspan="2" class="center bottom">
+					    						Qté en caisse<!-- Qty in case -->
+					    					</th>
+					    					<th colspan="2" class="center bottom">
 												Livré<!-- Delivered -->
 											</th>
-					    					<th colspan="2" class="center">
+					    					<th colspan="2" class="center bottom">
 						    					Reçu<!-- Received -->
 					    					</th>
 					    				</tr>
 					    				<tr>
-					    					<th rowspan="2">
-					    						No.<!-- Number -->
-					    					</th>
-					    					<th rowspan="2">
-					    						Description produit<!-- Product description -->
-					    					</th>
-					    					<th rowspan="2" class="center">
-						    					No lot<!-- Qty -->
-					    					</th>
-					    					<th rowspan="2" class="center">
-					    						Exp<!-- Expiration date -->
-					    					</th>
-					    					<th rowspan="2" class="center">
-					    						Qté en caisse<!-- Qty in case -->
-					    					</th>
 					    					<th class="center">
 						    					Qté caisse<!-- Box Qty -->
 					 						</th>

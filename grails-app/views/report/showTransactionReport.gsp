@@ -53,9 +53,9 @@
 			</div>
 	    	<div class="right" style="padding: 5px;">
 				<label>Export as</label>
-	   			<g:link target="_blank" controller="report" action="showTransactionReport" params="[print:'true','location.id':cmd.location?.id,'category.id':cmd.category.id,'startDate':params.startDate,'endDate':params.endDate]">HTML</g:link> 
+	   			<g:link target="_blank" controller="report" action="showTransactionReport" params="[print:'true','location.id':cmd.location?.id,'category.id':cmd?.category?.id,'startDate':params.startDate,'endDate':params.endDate]">HTML</g:link> 
 	   			&nbsp;|&nbsp;
-	   			<g:link target="_blank" controller="report" action="downloadTransactionReport" params="[url:request.forwardURI,'location.id':cmd.location?.id,'category.id':cmd.category.id,'startDate':params.startDate,'endDate':params.endDate]">PDF</g:link>
+	   			<g:link target="_blank" controller="report" action="downloadTransactionReport" params="[url:request.forwardURI,'location.id':cmd.location?.id,'category.id':cmd?.category?.id,'startDate':params.startDate,'endDate':params.endDate]">PDF</g:link>
 			</div>
 		</g:if>
 		<g:else>
