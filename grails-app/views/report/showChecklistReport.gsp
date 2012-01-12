@@ -4,9 +4,19 @@
         <meta name="layout" content="${params.print?'print':'custom' }" />
         <title><warehouse:message code="report.showChecklistReport.label" /></title>    
         <style>
+        	body, td, th, div { font-family: 'Times New Roman'; }
         	.filter { padding-right: 30px; border: 0; border-right: 1px solid lightgrey; }
-        	th { text-transform: uppercase; }
-        	.title { text-align: center; padding: 15px; }
+        	/*th { text-transform: uppercase; }*/
+        	th { border-bottom: 1px solid black; }
+        	.title { text-align: center; padding: 5px; font-size: 3em; }
+        	.subtitle { text-align: center; padding: 15px; font-size: 2em; }
+        	.underline { border-bottom: 1px dotted black; }
+        	.label { width: 15%; text-align: left; vertical-align: bottom; }
+        	.value { font-weight: bold; width: 30%; }
+        	.spacer { width: 10%; }
+        	td { padding: 10px; }
+        	table { margin-left: auto; margin-right: auto; }
+        	
         </style>
     </head>    
     <body>
@@ -72,137 +82,107 @@
 		</g:else>
 
 		<g:if test="${command?.shipment }">
-			<div class="form">
-				<div class="title">
-					Shipping Checklist Report
-				</div>		
-				<table>
-					<tr class="prop">				
-						<td class="name">
-							<label>Shipment:</label>
-						</td>
-						<td class="value">
-							${command?.shipment?.name }
+			<div>
+				<table border="0">
+					<tr>
+						<td colspan="5">
+							<div class="title">				
+								PIH / Zanmi Lasante
+							</div>								
+						</td>							
+					</tr>
+					<tr>
+						<td colspan="5">
+							<div class="subtitle">
+								Bordereau de livraison			
+							</div>							
 						</td>
 					</tr>
-					<tr class="prop">
-						<td class="name">
+					<tr>
+						<td colspan="5" style="margin: 0; padding: 0;">
+							<hr/>
 						</td>
-						<td class="center value">
-							<table style="width:0;">
-								<tr>
-									<td>
-										<g:checkBox name="received" class="middle"/> <label class="middle">Réception</label>
-									</td>
-									<td>
-										<g:checkBox name="received" class="middle"/> <label class="middle">Livraison</label>
-									</td>
-									<td>
-										<label class="middle">Containeur #:</label>
-										<span class="middle">…………………………………………………………………………</span>
-									</td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-					<tr class="prop">
-						<td class="name">
-						</td>				
-						<td class="value">
-							<div>
-								<table style="width:0;">
-									<tr>
-										<td>
-											<label>Le:</label>
-										</td>
-										<td>						
-											 ………/………/2012					
-										</td>
-									</tr>
-								</table>
-							</div>
-						</td>
-					</tr>
-					<tr class="prop">
-						<td class="name">
-						</td>
-						<td class="value">
-							<div>
-								<table style="width:0;">
-									<tr>
-										<td>
-											<label>Livré le:</label>
-										</td>
-										<td>
-											<span class="middle">…………………………………………………………………………</span>
-										</td>
-									</tr>
-									<tr>
-										<td>				
-											<label>Vérifié le:</label>
-										</td>
-										<td>
-											<span class="middle">…………………………………………………………………………</span>
-										</td>
-									</tr>
-									<tr>
-										<td>
-											<label>Par:</label>
-										</td>
-										<td>
-											<span class="middle">…………………………………………………………………………</span>
-										</td>
-									</tr>
-								</table>
-							</div>
-						</td>
-					</tr>
-					<tr class="prop">
-						<td class="name">
-
-						</td>
-						<td class="">
-							<label>Origine / Destination</label> 
-							<span class="middle">…………………………………………………………………………</span> 
-							<label class="middle">Plaque:</label> 
-							<span class="middle">…………………………………………………………………………</span>						
-						</td>					
 					</tr>					
-					
-					<tr class="prop">
-						<td class="name">
-							<label>Results</label>
+					<tr>				
+						<td class="label">
+							<label>Containeur #:</label>
 						</td>
-						<td class="value">
-					    	<div class="list">
+						<td class="value underline">
+							<span class="value">${command?.shipment?.name }</span>
+						</td>
+						<td class="spacer">
+						
+						</td>
+						<td class="label">
+							<label>Plaque:</label>
+						</td>
+						<td class="value underline">
+							<span class="value"></span>						
+						</td>
+					</tr>
+					<tr>
+						<td class="label">
+							<label>Origine:</label>				
+						</td>
+						<td class="value underline">
+							<span class="value">${command?.shipment?.origin?.name }</span>							
+						</td>
+						<td class="spacer">
+						
+						</td>
+						<td class="label">
+							<label>Destination:</label>
+						</td>
+						<td class="value underline">
+							<span class="value">${command?.shipment?.destination?.name }</span>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="5">
+							<div class="list">
 					   			<g:set var="status" value="${0 }"/>
-					    		<table>
+					    		<table border="1">
 					    			<thead>
-					    			
 					    				<tr>
-					    					<th>
-					    						No.
+					    					<th></th>
+					    					<th></th>
+					    					<th></th>
+					    					<th></th>
+					    					<th></th>
+					    					<th colspan="2" class="center">
+												Livré<!-- Delivered -->
+											</th>
+					    					<th colspan="2" class="center">
+						    					Reçu<!-- Received -->
 					    					</th>
-					    					<th>
-					    						Description produit
+					    				</tr>
+					    				<tr>
+					    					<th rowspan="2">
+					    						No.<!-- Number -->
 					    					</th>
-					    					<th>
-						    					No lot
+					    					<th rowspan="2">
+					    						Description produit<!-- Product description -->
 					    					</th>
-					    					<th>
-					    						Exp
+					    					<th rowspan="2" class="center">
+						    					No lot<!-- Qty -->
 					    					</th>
-					    					<th>
-					    						Q Rec
+					    					<th rowspan="2" class="center">
+					    						Exp<!-- Expiration date -->
 					    					</th>
-					    					<th>
-					    						Q Liv
+					    					<th rowspan="2" class="center">
+					    						Qté en caisse<!-- Qty in case -->
 					    					</th>
-					    					<th>
-					    						Utés
-					    					</th>	
-					    					<th>
-						    					Qté en caisse
+					    					<th class="center">
+						    					Qté caisse<!-- Box Qty -->
+					 						</th>
+					    					<th class="center">
+						    					Qté<!-- Qty -->
+					 						</th>
+					    					<th class="center">
+						    					Qté caisse<!-- Box Qty -->
+					 						</th>
+					    					<th class="center">
+						    					Qté<!-- Qty -->
 					 						</th>
 					    				</tr>
 					    			</thead>
@@ -211,7 +191,7 @@
 								    	<g:each var="checklistEntry" in="${command?.checklistReportEntryList }" status="i">
 											<tr>
 												<td>
-													${i }							
+													${i+1 }							
 												</td>
 												<td>	    	
 													${checklistEntry?.shipmentItem?.product?.name }
@@ -223,18 +203,20 @@
 													${checklistEntry?.shipmentItem?.expirationDate }
 												</td>							
 												<td>
-													${checklistEntry?.shipmentItem?.quantity }
+
 												</td>
 												<td>
-													${checklistEntry?.shipmentItem?.quantity }
+
 												</td>
 												<td>
 													
 												</td>
 												<td>
-													${checklistEntry?.shipmentItem?.quantity }
+
 												</td>
+												<td>
 												
+												</td>
 											</tr>
 										</g:each>
 									</tbody>
@@ -242,6 +224,75 @@
 							</div>
 						</td>
 					</tr>
+					<tr>
+						<td class="label">
+							<label>Préparé par:</label><!--  Prepared by -->
+						</td>
+						<td class="value underline">
+						
+						</td>
+						<td class="spacer">
+						
+						</td>						
+						<td class="label">
+							<label>Reçu par:</label><!-- Received by -->
+						</td>
+						<td class="value underline">
+						
+						</td>
+					</tr>
+					<tr>
+						<td class="label">
+							<label>Livré par:</label><!--  Delivered/supplied by -->
+						</td>
+						<td class="value underline">
+						
+						</td>
+						<td class="spacer">
+						
+						</td>						
+						<td class="label">
+							<label>Reçu le:</label><!-- Received on -->
+						</td>
+						<td class="value underline">
+						
+						</td>
+					</tr>
+					<tr>
+						<td class="label">
+							<label>Livré le:</label><!-- Delivered/supplied on -->
+						</td>
+						<td class="value underline">
+						
+						</td>
+						<td class="spacer">
+						
+						</td>						
+						<td class="label">
+							<label>Vérifié le:</label><!-- Verified on -->
+						</td>
+						<td class="value underline">
+						
+						</td>
+					</tr>
+					<tr>
+						<td class="label">
+							<label>Transporté:</label><!-- Carrier -->
+						</td>
+						<td class="value underline">
+						
+						</td>
+						<td class="spacer">
+						
+						</td>						
+						<td class="label">
+							<label>Vérifié par:</label><!-- Verified by -->
+						</td>
+						<td class="value underline">
+						
+						</td>
+					</tr>
+
 				</table>
 			</div>
 		</g:if>
