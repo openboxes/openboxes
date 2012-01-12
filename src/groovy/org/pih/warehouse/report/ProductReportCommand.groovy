@@ -11,22 +11,23 @@ import org.pih.warehouse.product.Category;
 
 class ProductReportCommand {
 
-	Integer quantityInitial
-	Integer quantityFinal
 	Product product
 	Location location;
 	Date startDate;
 	Date endDate;	
 	
+	Integer quantityInitial
+	Integer quantityFinal
+
 	List<InventoryItem> inventoryItems = []
 	List<ProductReportEntryCommand> productReportEntryList = []
 			
 	static constraints = {
-		quantityInitial(nullable:false)
-		quantityFinal(nullable:false)
 		product(nullable:false)
 		location(nullable:false)
 		startDate(nullable:true)
 		endDate(nullable:true)
+		quantityInitial(nullable:true)
+		quantityFinal(nullable:true)
 	}
 }

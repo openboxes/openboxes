@@ -805,7 +805,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	Integer getQuantityForProduct(Product product) { 
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 	
 
@@ -2061,13 +2061,76 @@ class InventoryService implements ApplicationContextAware {
 		return monthsYears?.collect() { [day: it[0], week: it[1], month: it[2], year: it[3] ] }
 	}
 	
+	/**
+	*
+	* @param product
+	* @param date
+	* @return
+	*/
+	def getProductQuantity(Product product, Location location, Date date) {
+		throw new UnsupportedOperationException(); 
+	}
+
+	/**
+	 * 
+	 */
+	def getQuantity(Product product, Location location, Date beforeDate) { 
+		def quantity = 0;
+		def transactionEntries = getTransactionEntriesBeforeDate(product, location, beforeDate)
+		log.info "get quantity > # transactions " + transactionEntries.size
+		quantity = adjustQuantity(quantity, transactionEntries)
+		log.info "get quantity " + quantity
+		return quantity;		
+	}
+	
+
+	/**
+	 * Get the initial quantity of a product for the given location and date.  
+	 * If the date is null, then we assume that the answer is 0.
+	 * 	
+	 * @param product
+	 * @param location
+	 * @param date
+	 * @return
+	 */
+	def getInitialQuantity(Product product, Location location, Date date) { 
+		def quantity = 0;
+		if (date) { 
+			quantity = getQuantity(product, location, date);
+		}
+		return quantity;
+	}
+	
 	
 	/**
+	 * Get the current quantity (as of the given date) or today's date if the 
+	 * given date is null.
+	 * 
+	 * @param product
+	 * @param location
+	 * @param date
+	 * @return
+	 */
+	def getCurrentQuantity(Product product, Location location, Date date) { 
+		def quantity = 0;
+		if (date) { 
+			quantity = getQuantity(product, location, date);
+		}
+		else { 
+			quantity = getQuantity(product, location, new Date());
+		}
+		return quantity;
+	}
+	
+	
+	
+	/**
+	 * Get the quantity of a particular product at the given location, 
+	 * on the given date.
 	 * 
 	 * @param product
 	 * @param date
 	 * @return
-	 */
 	def getQuantity(Product product, Location location, Date date) { 
 		def quantity = 0;
 		def inventoryItems = InventoryItem.findAllByProduct(product)
@@ -2076,29 +2139,24 @@ class InventoryService implements ApplicationContextAware {
 		}
 		return quantity;
 	} 
-	
-	
-	/**
-	 * 
-	 * @param product
-	 * @param date
-	 * @return
 	 */
-	def getProductQuantity(Product product, Location location, Date date) { 
-		return 0;
-	}
+	
+	
 	
 	/**
+	 * Get quantity for the given inventory item at the given location, on the 
+	 * given date.  
 	 * 
 	 * @param inventoryItem
 	 * @param date
 	 * @return
-	 */
 	def getQuantity(InventoryItem inventoryItem, Location location, Date date) { 
 		def quantity = 0;
 		
 		// Get the date of this inventory item's last 'inventory' transaction 
 		def lastInventoryTransactionEntry = getPreviousInventoryTransactionEntry(inventoryItem, location, date);
+		
+		// If there's no last inventory date for the item, we look for the last inventory date for the product
 		if (!lastInventoryTransactionEntry) {
 			lastInventoryTransactionEntry = getPreviousInventoryTransactionEntry(inventoryItem?.product, location, date);
 		}
@@ -2114,10 +2172,10 @@ class InventoryService implements ApplicationContextAware {
 		def transactionEntries = getTransactionEntries(inventoryItem, location, lastInventoryDate, date)
 		adjustQuantity(quantity, transactionEntries)
 
-		log.info ("Ending quantity = " + quantity)
-				
+		log.info ("Ending quantity = " + quantity)				
 		return quantity;
 	}
+	*/
 
 	
 	/**
@@ -2127,9 +2185,11 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	def adjustQuantity(Integer initialQuantity, List<Transaction> transactionEntries) { 
+		def quantity = initialQuantity;
 		transactionEntries.each { transactionEntry ->
-			adjustQuantity(initialQuantity, transactionEntry)
+			quantity = adjustQuantity(quantity, transactionEntry)
 		}
+		return quantity;
 	}
 	
 	/**
@@ -2169,12 +2229,16 @@ class InventoryService implements ApplicationContextAware {
 				eq("product", product)
 			}
 			transaction { 
+				
+				// All transactions between start date and end date
 				if (startDate && endDate) {
 					between("transactionDate", startDate, endDate)
 				} 
+				// All transactions after start date
 				else if (startDate) { 
 					ge("transactionDate", startDate)
-				}
+				}				
+				// All transactions before end date
 				else if (endDate) { 
 					le("transactionDate", endDate)
 				}
@@ -2185,7 +2249,34 @@ class InventoryService implements ApplicationContextAware {
 		return transactionEntries;
 	}
 	
-	
+	/**
+	*
+	* @param product
+	* @param startDate
+	* @param endDate
+	* @return
+	*/
+   def getTransactionEntriesBeforeDate(Product product, Location location, Date beforeDate) {
+	   def criteria = TransactionEntry.createCriteria();
+	   def transactionEntries = []
+	   
+	   if (beforeDate) { 
+		   transactionEntries = criteria.list {
+			   inventoryItem {
+				   eq("product", product)
+			   }
+			   transaction {			   
+				   // All transactions before given date
+				   lt("transactionDate", beforeDate)
+				   eq("inventory", location?.inventory)
+				   order("transactionDate", "asc")
+			   }
+		   }
+	   }
+	   return transactionEntries;
+   }
+
+		
 	
 	
 		
@@ -2218,6 +2309,15 @@ class InventoryService implements ApplicationContextAware {
 	}
 	
 	
+	
+	
+	/**
+	 * 
+	 * @param product
+	 * @param location
+	 * @param date
+	 * @return
+	 */
 	def getPreviousInventoryTransactionEntry(Product product, Location location, Date date) {
 		def transactionTypes = []
 		transactionTypes << TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)

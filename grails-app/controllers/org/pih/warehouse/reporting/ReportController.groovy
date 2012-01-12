@@ -2,6 +2,7 @@ package org.pih.warehouse.reporting
 
 
 import org.pih.warehouse.core.Constants;
+import org.xhtmlrenderer.pdf.ITextRenderer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -16,9 +17,11 @@ import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.InventoryService;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.TransactionEntry;
+import org.pih.warehouse.io.util.MyUserAgent;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
+import org.pih.warehouse.report.ChecklistReportCommand;
 import org.pih.warehouse.report.InventoryReportCommand;
 import org.pih.warehouse.report.InventoryReportEntryCommand;
 import org.pih.warehouse.report.ProductReportCommand;
@@ -31,125 +34,97 @@ import org.pih.warehouse.shipping.Shipment;
 
 class ReportController {
 	
+	def documentService
 	def inventoryService
+	def productService
+	def reportService
 	
-	
-	def viewProductReport = { ProductReportCommand command -> 	
+	def showProductReport = { ProductReportCommand command -> 	
 		
-		if (!command?.product) { 
-			throw new Exception("Unable to locate product " + params?.product?.id)
-		}
+		//if (!command?.product) { 
+		//	throw new Exception("Unable to locate product " + params?.product?.id)
+		//}
 		
-		command.inventoryItems = InventoryItem.findAllByProduct(command?.product)
-		command?.quantityInitial = inventoryService.getQuantity(command?.product, command?.location, command?.startDate)
-
-		def transactionEntries = inventoryService.getTransactionEntries(command?.product, command?.location, command?.startDate, command?.endDate)
-				
-		def quantity = command?.quantityInitial;
-		transactionEntries.each { transactionEntry ->
-			def productReportEntry = new ProductReportEntryCommand(transactionEntry: transactionEntry, balance: 0)
-			productReportEntry.balance = inventoryService.adjustQuantity(quantity, transactionEntry)
-			command.productReportEntryList << productReportEntry
-			
-			// Need to keep track of the running total so we can adjust the balance as we go
-			quantity = productReportEntry.balance
+		if (!command?.hasErrors()) {			
+			reportService.generateProductReport(command)
 		}
-		command.quantityFinal = quantity;
-				
+						
 		[command : command]
 		
 		
 	}
 	
-	def viewTransactionReport = { InventoryReportCommand cmd -> 
-		
-		def transactionEntries = TransactionEntry.list();
-		// 
-		// so each time you hit an inventory, you compare with the running total, 
-		// and add / subract to "adjustment" as appropriate.  then set the running 
-		// total to the new inventory and continue with the running total...
-		//
-		
-		//if (cmd.startDate) { 
-		//	def initialQuantityMap = inventoryService.getQuantityAsOf(cmd.startDate)
-		//}
-		
-		transactionEntries.each { 			
-			def product = it?.inventoryItem?.product
-			def transactionType = it?.transaction?.transactionType
-
-			// Filter by category, location, startDate, endDate (should move this to the service layer)			
-			if ((!cmd.category || cmd.category == product.category) && 
-				(!cmd.location || cmd.location.inventory == it.transaction.inventory) &&
-				(!cmd.startDate || it.transaction?.transactionDate?.after(cmd.startDate)) &&
-				(!cmd.endDate || it.transaction?.transactionDate?.before(cmd.endDate))) { 
 	
-				def inventoryReportEntry = cmd.inventoryReportEntryMap[product]
-				if (!inventoryReportEntry) { 
-					inventoryReportEntry = new InventoryReportEntryCommand(product: product);
-					cmd.inventoryReportEntryMap[product] = inventoryReportEntry				
-				}
-				
-				if (transactionType?.id == Constants.CONSUMPTION_TRANSACTION_TYPE_ID) {
-					inventoryReportEntry.quantityConsumed += it.quantity
-					inventoryReportEntry.quantityTotalOut += it.quantity
-				}
-				else if (transactionType?.id == Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID) {
-					inventoryReportEntry.quantityFound += it.quantity
-					inventoryReportEntry.quantityTotalIn += it.quantity
-
-				}
-				else if (transactionType?.id == Constants.EXPIRATION_TRANSACTION_TYPE_ID) {
-					inventoryReportEntry.quantityExpired += it.quantity				
-					inventoryReportEntry.quantityTotalOut += it.quantity
-				}
-				else if (transactionType?.id == Constants.DAMAGE_TRANSACTION_TYPE_ID) {
-					inventoryReportEntry.quantityDamaged += it.quantity
-					inventoryReportEntry.quantityTotalOut += it.quantity
-				}
-				else if (transactionType?.id == Constants.INVENTORY_TRANSACTION_TYPE_ID) {
-					
-				}
-				else if (transactionType?.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID) {
-					inventoryReportEntry.quantityTransferredIn += it.quantity
-					inventoryReportEntry.quantityTotalIn += it.quantity
-					
-				}
-				else if (transactionType?.id == Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) {
-					inventoryReportEntry.quantityTransferredOut += it.quantity				
-					inventoryReportEntry.quantityTotalOut += it.quantity
-				}
-				else if (transactionType?.id == Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID) {
-					inventoryReportEntry.quantityLost += it.quantity
-					inventoryReportEntry.quantityTotalOut += it.quantity
-				}
-				else if (transactionType?.id == Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID) {
-	
-				}				
-			}
+	def showTransactionReport = { InventoryReportCommand cmd -> 
+		
+		// We always need to initialize the root category 
+		cmd.rootCategory = productService.getRootCategory();
+		if (!cmd?.hasErrors()) { 			
+			reportService.generateTransactionReport(cmd);			
 		}
-		
-		/*
-		cmd.products.each { product ->
-			def inventoryItems = InventoryItem.findAllByProduct(product)
-			inventoryItems.each { inventoryItem ->				
-				def transactionEntry = inventoryService.getPreviousInventoryTransactionEntry(inventoryItem, cmd.startDate ?: new Date())
-				def lastInventoryDate = transactionEntry?.transaction?.transactionDate
-				if (!lastInventoryDate) {
-					transactionEntry = inventoryService.getPreviousInventoryTransaction(product, cmd.startDate ?: new Date())
-					lastInventoryDate = transactionEntry?.transaction?.transactionDate
-				}	
-					
-				log.info("Last inventory date for " + inventoryItem?.product + " " + inventoryItem?.lotNumber + ": "  + 
-					lastInventoryDate)
-				
-			}
-		}
-		*/
-		
-		
-		
 		[cmd : cmd]
 	}
 	
+	
+
+	def downloadTransactionReport = {		
+		def baseUri = request.scheme + "://" + request.serverName + ":" + request.serverPort
+		log.info "BaseUri is $baseUri"	
+		log.info("session ID: " + session.id)
+
+		// JSESSIONID is required because otherwise we get a 
+		def url = baseUri + params.url //+ ";JSESSIONID=" + session.getId()		
+		url += "?print=true" 
+		url += "&location.id=" + params.location.id
+		url += "&category.id=" + params.category.id
+		url += "&startDate=" + params.startDate
+		url += "&endDate=" + params.endDate
+		log.info "Fetching url $url"
+
+		response.setContentType("application/pdf")
+		//response.setHeader("Content-disposition", "attachment;") // removed filename=
+
+		reportService.generatePdf(url, response.getOutputStream())
+		//byte[] content = generatePdf(url)
+		//response.setContentLength(content.length)
+		//response.getOutputStream().write(content)
+	}
+	
+	def showChecklistReport = { ChecklistReportCommand command ->
+		command.rootCategory = productService.getRootCategory();
+		if (!command?.hasErrors()) {
+			reportService.generateChecklistReport(command);
+		}
+		[command : command]
+	}
+	
+	def downloadChecklistReport = {
+		
+		if (params.format == 'docx') { 
+			def tempFile = documentService.generateChecklistAsDocx()
+			def filename = "Checklist.docx"
+			response.setHeader("Content-disposition", "attachment; filename=" + filename);
+			response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+			response.outputStream << tempFile.readBytes()
+		} 
+		else if (params.format == 'pdf') { 
+			def baseUri = request.scheme + "://" + request.serverName + ":" + request.serverPort
+			def url = baseUri + params.url + ";jsessionid=" + session.getId()
+			url += "?print=true&orientation=portrait"
+			url += "&shipment.id=" + params.shipment.id
+			log.info "Fetching url $url"	
+			response.setContentType("application/pdf")
+			response.setHeader("Content-disposition", "attachment;") // removed filename=	
+			reportService.generatePdf(url, response.getOutputStream())
+		}
+		else { 
+			throw new UnsupportedOperationException("Format '${params.format}' not supported")
+		}
+		return
+	}
+
+
+	
+	
+		
 }

@@ -7,35 +7,28 @@ import org.apache.commons.collections.list.LazyList;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.Category;
+import org.pih.warehouse.shipping.Shipment;
 
-class InventoryReportCommand {
+class ChecklistReportCommand {
 
+	Shipment shipment;
 	Location location;
+	Date date;
 	Date startDate;
 	Date endDate;	
 	Category category;
 	Category rootCategory;
-	
-	Map<Product, InventoryReportEntryCommand> inventoryReportEntryMap = [:]
 
+	List<Shipment> shipments;
+	List<ChecklistReportEntryCommand> checklistReportEntryList = []	
+	Map<Product, ChecklistReportEntryCommand> checklistReportEntryMap = [:]
 
 	static constraints = {
-		location(nullable:false)
+		shipment(nullable:false)
+		location(nullable:true)
 		startDate(nullable:true)
 		endDate(nullable:true)
-		category(nullable:false)
-	}
-
-	def getProducts() {
-		return inventoryReportEntryMap.keySet()
-	}
-	
-	def getProducts(Category category) {
-		return getProductsByCategory()[category]
-	}
-	
-	def getProductsByCategory() {
-		return inventoryReportEntryMap?.keySet()?.groupBy { it.category }
+		category(nullable:true)
 	}
 	
 }

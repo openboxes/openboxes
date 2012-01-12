@@ -24,11 +24,23 @@ class InventoryReportEntryCommand {
 	Integer quantityExpired = 0;
 	Integer quantityLost = 0;
 	Integer quantityTotalOut = 0;
-		
-	Map<Location, Integer> quantityTransferredOutByLocation = [:]
 	
+	Integer quantityAdjusted = 0;
+		
+	Map<Location, Integer> quantityTransferredInByLocation = [:]
+	Map<Location, Integer> quantityTransferredOutByLocation = [:]
 	
 	
 	static constraints = {
 	}
+	
+	
+	Integer getQuantityTotalAdjusted() { 
+		return quantityFound - quantityLost;
+	}
+	
+	Integer getQuantityEnding() { 
+		return quantityTotalIn - quantityTotalOut + getQuantityTotalAdjusted()
+	}
+	
 }

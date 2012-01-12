@@ -1,11 +1,10 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
 	<!-- Include default page title -->
 	<title><g:layoutTitle default="OpenBoxes" /></title>
+	
 	<%--<link rel="stylesheet" href="http://yui.yahooapis.com/2.7.0/build/reset-fonts-grids/reset-fonts-grids.css" type="text/css"> --%>
-	<link rel="stylesheet" href="${createLinkTo(dir:'js/yui/2.7.0/reset-fonts-grids',file:'reset-fonts-grids.css')}" type="text/css">
+	<link rel="stylesheet" href="${createLinkTo(dir:'js/yui/2.7.0/reset-fonts-grids',file:'reset-fonts-grids.css')}" type="text/css"/>
 	
 	<!-- Include Favicon -->
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
@@ -63,12 +62,10 @@
     </script>
 
 	<%--
-	<!-- Not using yet -->
 	<link href="${createLinkTo(dir:'js/jquery.jqGrid/css', file:'ui.jqgrid.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
 	<script src="${createLinkTo(dir:'js/jquery.jqGrid/js', file:'jquery.jqGrid.min.js')}" type="text/javascript" ></script>
 	 --%>
 	<%--
-	<!-- Broken --> 
     <script type="text/javascript" src="${createLinkTo(dir:'js/jquery/', file:'fg.menu.js')}"></script>
     <link type="text/css" href="${createLinkTo(dir:'js/jquery/', file:'fg.menu.css')}" media="screen" rel="stylesheet" />	
 	--%>
@@ -248,9 +245,7 @@
 	</div>
     --%>
     <div id="doc3" class="yui-t2">	    
-		<!-- 
-				Body includes the divs for the main body content and left navigation menu 
-			----------------------------------------------------------------------------------->
+		<!-- Body includes the divs for the main body content and left navigation menu -->
 		<!-- YUI "body" block that includes the main content for the page -->
 		<div id="bd" role="main">
 	    	<!-- YUI main Block including page title and content -->

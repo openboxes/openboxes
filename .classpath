@@ -393,5 +393,8 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/liquibase-1.9.5.jar"/>
+	<classpathentry kind="lib" path="lib/core-renderer-minimal.jar"/>
+	<classpathentry kind="lib" path="lib/core-renderer.jar"/>
+	<classpathentry kind="lib" path="lib/iText-2.0.8.jar"/>
 	<classpathentry kind="output" path="target-eclipse/classes"/>
 </classpath>

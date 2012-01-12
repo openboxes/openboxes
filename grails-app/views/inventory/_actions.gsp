@@ -55,15 +55,18 @@
 		<div class="action-menu-item">
 			<hr/>
 		</div>
-
-		<div class="action-menu-item">														
-			<g:link controller="report" action="viewTransactionReport" params="['category.id':commandInstance?.categoryInstance?.id?:quickCategories[0]?.id]">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'report.png')}" alt="${warehouse.message(code: 'inventory.listTransactions.label') }" style="vertical-align: middle"/>
-				&nbsp;<warehouse:message code="report.viewTransactionReport.label"/>
-			</g:link>
+		<%-- Need to set defaults for the Transaction Report to generate a report.
+			This might cause problems with the other actions, so keep that in mind. 
+		<div class="action-menu-item">					
+			<g:hiddenField name="category.id" value="${commandInstance?.categoryInstance?.id?:quickCategories[0]?.id}"/>
+			<g:hiddenField name="location.id" value="${session?.warehouse?.id}"/>
+														
+			<a href="javascript:void(0);" class="actionButton" id="transactionReportBtn">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'report.png')}" alt="${warehouse.message(code: 'report.showTransactionReport.label') }" style="vertical-align: middle"/>
+				&nbsp;<warehouse:message code="report.showTransactionReport.label"/>
+			</a>
 		</div>		
-
-
+		--%>
 		<div class="action-menu-item">														
 			<g:link controller="inventory" action="listAllTransactions">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="${warehouse.message(code: 'inventory.listTransactions.label') }" style="vertical-align: middle"/>
@@ -106,6 +109,9 @@
 		});
 		$("#addToShipmentBtn").click(function(event) { 
 			$("#inventoryActionForm").attr("action", "${request.contextPath }/shipment/addToShipment").submit();
+		});
+		$("#transactionReportBtn").click(function(event) { 
+			$("#inventoryActionForm").attr("action", "${request.contextPath }/report/showTransactionReport").submit();
 		});
 
 	});

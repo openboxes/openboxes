@@ -6,9 +6,20 @@ import org.pih.warehouse.core.Location;
 class SelectTagLib {
 	
 	def locationService
-
+	def shipmentService
+	
+	def selectShipment = { attrs,body ->
+		def currentLocation = Location.get(session?.warehouse?.id)
+		attrs.from = shipmentService.getShipmentsByLocation(currentLocation).sort { it?.name?.toLowerCase() };
+		attrs.optionKey = 'id'
+		//attrs.optionValue = 'name'
+		attrs.value = attrs.value 
+		attrs.optionValue = { it.name }
+		out << g.select(attrs)
+	}
+	
 	def selectLocation = { attrs,body ->
-		def currentLocation = Location.get(session.warehouse.id)
+		def currentLocation = Location.get(session?.warehouse?.id)
 		attrs.from = locationService.getAllLocations().sort { it?.name?.toLowerCase() };
 		attrs.optionKey = 'id'
 		//attrs.optionValue = 'name'
@@ -19,7 +30,7 @@ class SelectTagLib {
 
 		
 	def selectTransactionDestination = { attrs,body ->		
-		def currentLocation = Location.get(session.warehouse.id)
+		def currentLocation = Location.get(session?.warehouse?.id)
 		attrs.from = locationService.getTransactionDestinations(currentLocation).sort { it?.name?.toLowerCase() };
 		attrs.optionKey = 'id'		
 		//attrs.optionValue = 'name'
@@ -28,7 +39,7 @@ class SelectTagLib {
 	}
 
 	def selectTransactionSource = { attrs,body ->
-		def currentLocation = Location.get(session.warehouse.id)
+		def currentLocation = Location.get(session?.warehouse?.id)
 		attrs.from = locationService.getTransactionSources(currentLocation).sort { it?.name?.toLowerCase() };
 		attrs.optionKey = 'id'
 		//attrs.optionValue = 'name'
@@ -37,7 +48,7 @@ class SelectTagLib {
 	}
 
 	def selectOrderSupplier = { attrs,body ->
-		def currentLocation = Location.get(session.warehouse.id)
+		def currentLocation = Location.get(session?.warehouse?.id)
 		attrs.from = locationService.getOrderSuppliers(currentLocation).sort { it?.name?.toLowerCase() };
 		attrs.optionKey = 'id'
 		//attrs.optionValue = 'name'
@@ -46,7 +57,7 @@ class SelectTagLib {
 	}
 
 	def selectRequestSupplier = { attrs,body ->
-		def currentLocation = Location.get(session.warehouse.id)
+		def currentLocation = Location.get(session?.warehouse?.id)
 		attrs.from = locationService.getRequestSuppliers(currentLocation).sort { it?.name?.toLowerCase() };
 		attrs.optionKey = 'id'
 		//attrs.optionValue = 'name'
@@ -55,7 +66,7 @@ class SelectTagLib {
 	}
 
 	def selectCustomer = { attrs,body ->
-		def currentLocation = Location.get(session.warehouse.id)
+		def currentLocation = Location.get(session?.warehouse?.id)
 		attrs.from = locationService.getCustomers(currentLocation).sort { it?.name?.toLowerCase() };
 		attrs.optionKey = 'id'
 		//attrs.optionValue = 'name'
@@ -64,7 +75,7 @@ class SelectTagLib {
 	}
 
 	def selectShipmentOrigin = { attrs,body ->
-		def currentLocation = Location.get(session.warehouse.id)
+		def currentLocation = Location.get(session?.warehouse?.id)
 		attrs.from = locationService.getShipmentOrigins().sort { it?.name?.toLowerCase() };
 		attrs.optionKey = 'id'
 		//attrs.optionValue = 'name'
@@ -73,7 +84,7 @@ class SelectTagLib {
 	}
 
 	def selectShipmentDestination = { attrs,body ->
-		def currentLocation = Location.get(session.warehouse.id)
+		def currentLocation = Location.get(session?.warehouse?.id)
 		attrs.from = locationService.getShipmentDestinations().sort { it?.name?.toLowerCase() } ;
 		attrs.optionKey = 'id'
 		//attrs.optionValue = 'name'

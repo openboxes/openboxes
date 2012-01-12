@@ -16,7 +16,6 @@ class Doc4jController {
 	def shipmentService 
 		
 	def downloadLetter = { 
-		
 		def shipmentInstance = Shipment.get(params.id);
 		
 		if (!shipmentInstance) { 
@@ -28,8 +27,6 @@ class Doc4jController {
 		response.setHeader("Content-disposition", "attachment; filename=" + filename);
 		response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 		response.outputStream << tempFile.readBytes()
-
-		
 	}
 
 	def downloadLetterAsPdf = { 	
@@ -49,7 +46,6 @@ class Doc4jController {
 		return;
 	}
 
-	
 	
 	/**
 	 * 

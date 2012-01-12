@@ -12,6 +12,7 @@ class DatePickerTagLib {
 		def name = attrs.name;
 		def autoSize = attrs.autoSize ?:(attrs.size)?"false":"true";
 		def size = attrs.size ?: "10"
+		def cssClass = attrs.cssClass ?: ""
 		def showOn = attrs.showOn ?: "both";
 		def showTrigger = Boolean.valueOf(attrs.showTrigger ?: "true");
 		def changeMonthAndYear = attrs.changeMonthAndYear ?: "false";
@@ -31,7 +32,7 @@ class DatePickerTagLib {
 
 		<span>
 			<input id='${id}' name='${name}' type='hidden'/>
-			<input id='${id}-datepicker' name='${name}-datepicker' type='text' class='date' size="${size}" />
+			<input id='${id}-datepicker' name='${name}-datepicker' type='text' class='date ${cssClass}' size="${size}" />
 			<script type=\'text/javascript\'>
 
 				jQuery(document).ready(function() {
@@ -56,6 +57,14 @@ class DatePickerTagLib {
 						//selectOtherMonths: true
 					});
 					
+					// If we reset the date, we need to reset the hidden form field as well.
+					jQuery('#${id}-datepicker').change(function() { 
+						if (this.value == '') { 
+							jQuery('#${id}').val('');
+						}
+					});
+
+					// Set the date value if one was provided
 					var dateValue = '${value}';
 					if (dateValue && dateValue != 'null') {
 						jQuery('#${id}-datepicker').datepicker('setDate', new Date('${value}'));

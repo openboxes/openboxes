@@ -67,44 +67,42 @@ class DocumentService {
 		return file
 	}
 	
-	
 	/**
-	 * 
+	 *
 	 * @param shipmentInstance
 	 * @return
 	 */
-	File generateLetterAsDocx(Shipment shipmentInstance) { 
+	File generateChecklistAsDocx() {
 		// Save document to temporary file
-		WordprocessingMLPackage wordMLPackage = generateLetter(shipmentInstance);
-		File tempFile = File.createTempFile(shipmentInstance?.name + " - Certificate of Donation", ".docx")
+		WordprocessingMLPackage wordMLPackage = generateChecklist();
+		File tempFile = File.createTempFile("Checklist", ".docx")
 		wordMLPackage.save(tempFile)
 		return tempFile;
 	}
-	
+   
 	/**
-	 * 
 	 * @param shipmentInstance
 	 * @return
 	 */
-	OutputStream generateLetterAsPdf(Shipment shipmentInstance) { 
-		WordprocessingMLPackage wordMLPackage = generateLetter(shipmentInstance);
-		return convertToPdf(wordMLPackage);				
+	OutputStream generateChecklistAsPdf() {
+		WordprocessingMLPackage wordMLPackage = generateChecklist();
+		return convertToPdf(wordMLPackage);
 	}
-	
-	
+
+
 	/**
-	 * Generate the 'Certificate of Donation' letter from a template.
-	 * 
-	 * @param shipmentInstance
+	 * Generate the Checklist from a template.
+	 *
+	 * @param 
 	 * @return
 	 */
-	WordprocessingMLPackage generateLetter(Shipment shipmentInstance) { 
-		
-		File template = findFile("templates/cod-pl-template.docx")
+	WordprocessingMLPackage generateChecklist() {
+
+		File template = findFile("templates/checklist-template.docx")
 		if (!template) {
-			throw new FileNotFoundException("templates/cod-pl-template.docx");
+			throw new FileNotFoundException("templates/checklist-template.docx");
 		}
-		
+
 		WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(template);
 
 		// 2. Fetch the document part
@@ -115,13 +113,106 @@ class DocumentService {
 		//xml --> string
 		def xml = XmlUtils.marshaltoString(wmlDocumentEl, true);
 		def mappings = new HashMap<String, String>();
-		
+
+		/*	   
+		 def formatter = new SimpleDateFormat("MMM dd, yyyy");
+		 def date = formatter.format(shipmentInstance.getExpectedShippingDate());
+		 mappings.put("date", date);
+		 String subtitle = "";
+		 if ("Sea".equals(shipmentInstance?.shipmentType?.name)) {
+		 ReferenceNumber containerNumber = shipmentInstance.getReferenceNumber("Container Number");
+		 if (containerNumber) {
+		 //mappings.put("containerNumber", containerNumber.identifier);
+		 subtitle = "Container #${containerNumber.identifier} ";
+		 }
+		 ReferenceNumber sealNumber = shipmentInstance.getReferenceNumber("Seal Number");
+		 if (sealNumber) {
+		 //mappings.put("sealNumber", sealNumber.identifier);
+		 subtitle += "Seal #${sealNumber.identifier}"
+		 }
+		 log.info("sea shipment " + subtitle)
+		 }
+		 else if ("Air".equals(shipmentInstance?.shipmentType?.name)) {
+		 subtitle = "Freight Forwarder ${shipmentInstance?.shipmentMethod?.shipper?.name}"
+		 log.info("air shipment " + subtitle)
+		 }
+		 mappings.put("subtitle", subtitle)
+		 def value = ""
+		 if (shipmentInstance?.statedValue) {
+		 def decimalFormatter = new DecimalFormat("\$###,###.00")
+		 value = decimalFormatter.format(shipmentInstance?.statedValue);
+		 }
+		 mappings.put("value", value)
+		 */
+
+		//valorize template
+		Object obj = XmlUtils.unmarshallFromTemplate(xml, mappings);
+
+		//change  JaxbElement
+		documentPart.setJaxbElement((Document) obj);
+
+		// Create a new table for the Packing List
+		//Tbl table = createTable(wordMLPackage, shipmentInstance, 3, 1200);
+
+		// Add table to document
+		//wordMLPackage.getMainDocumentPart().addObject(table);
+
+		return wordMLPackage;
+	}
+	
+	/**
+	 *
+	 * @param shipmentInstance
+	 * @return
+	 */
+	File generateLetterAsDocx(Shipment shipmentInstance) {
+		// Save document to temporary file
+		WordprocessingMLPackage wordMLPackage = generateLetter(shipmentInstance);
+		File tempFile = File.createTempFile(shipmentInstance?.name + " - Certificate of Donation", ".docx")
+		wordMLPackage.save(tempFile)
+		return tempFile;
+	}
+
+	/**
+	 * @param shipmentInstance
+	 * @return
+	 */
+	OutputStream generateLetterAsPdf(Shipment shipmentInstance) {
+		WordprocessingMLPackage wordMLPackage = generateLetter(shipmentInstance);
+		return convertToPdf(wordMLPackage);
+	}
+
+
+	/**
+	 * Generate the 'Certificate of Donation' letter from a template.
+	 * 
+	 * @param shipmentInstance
+	 * @return
+	 */
+	WordprocessingMLPackage generateLetter(Shipment shipmentInstance) {
+
+		File template = findFile("templates/cod-pl-template.docx")
+		if (!template) {
+			throw new FileNotFoundException("templates/cod-pl-template.docx");
+		}
+
+		WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(template);
+
+		// 2. Fetch the document part
+		MainDocumentPart documentPart = wordMLPackage.getMainDocumentPart();
+
+		Document wmlDocumentEl = (Document) documentPart.getJaxbElement();
+
+		//xml --> string
+		def xml = XmlUtils.marshaltoString(wmlDocumentEl, true);
+		def mappings = new HashMap<String, String>();
+
 		def formatter = new SimpleDateFormat("MMM dd, yyyy");
 		def date = formatter.format(shipmentInstance.getExpectedShippingDate());
-		mappings.put("date", date);		
+		mappings.put("date", date);
 
-		String subtitle = "";				
-		if ("Sea".equals(shipmentInstance?.shipmentType?.name)) { 
+		String subtitle = "";
+		if ("Sea".equals(shipmentInstance?.shipmentType?.name)) {
 			ReferenceNumber containerNumber = shipmentInstance.getReferenceNumber("Container Number");
 			if (containerNumber) {
 				//mappings.put("containerNumber", containerNumber.identifier);
@@ -134,26 +225,26 @@ class DocumentService {
 			}
 			log.info("sea shipment " + subtitle)
 		}
-		else if ("Air".equals(shipmentInstance?.shipmentType?.name)) { 
+		else if ("Air".equals(shipmentInstance?.shipmentType?.name)) {
 			subtitle = "Freight Forwarder ${shipmentInstance?.shipmentMethod?.shipper?.name}"
 			log.info("air shipment " + subtitle)
 		}
 		mappings.put("subtitle", subtitle)
-		
+
 		def value = ""
-		if (shipmentInstance?.statedValue) { 		
+		if (shipmentInstance?.statedValue) {
 			def decimalFormatter = new DecimalFormat("\$###,###.00")
 			value = decimalFormatter.format(shipmentInstance?.statedValue);
 		}
 		mappings.put("value", value)
-		
+
 		log.debug("mappings: " + mappings)
 		log.debug("xml before: " + xml)
 		//valorize template
 		Object obj = XmlUtils.unmarshallFromTemplate(xml, mappings);
 		log.debug("xml after: " + xml)
 		log.debug("mappings: " + mappings)
-		
+
 		//change  JaxbElement
 		documentPart.setJaxbElement((Document) obj);
 
@@ -163,7 +254,7 @@ class DocumentService {
 		// Add table to document
 		wordMLPackage.getMainDocumentPart().addObject(table);
 
-		return wordMLPackage;				
+		return wordMLPackage;
 	}
 	
 	/**

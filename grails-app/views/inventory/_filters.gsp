@@ -9,6 +9,9 @@
 						<a href="?categoryId=${quickCategory?.id}&resetSearch=true">
 							<format:category category="${quickCategory}"/>
 						</a>
+						<g:if test="${commandInstance?.categoryInstance == quickCategory}">
+							<g:render template="categoryActions" model="[commandInstance:commandInstance]"/>
+						</g:if>
 					</td>		
 				</g:each>
 				<td class="filter filterRow paddingRow" style="width:100%">&nbsp;</td>

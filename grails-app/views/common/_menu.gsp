@@ -194,7 +194,7 @@
 		<ul>			
 			<li>
 				<span class="menuButton">
-					<g:link controller="report" action="viewTransactionReport"><warehouse:message code="report.viewTransactionReport.label"/></g:link>
+					<g:link controller="report" action="showTransactionReport"><warehouse:message code="report.showTransactionReport.label"/></g:link>
 				</span>
 			</li>
 		</ul>

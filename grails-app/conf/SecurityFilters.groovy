@@ -4,11 +4,19 @@ class SecurityFilters {
 		loginCheck(controller:'*', action:'*') {
 			before = {	
 				
+				// Need to bypass security filter when generating a PDF report, otherwise the 
+				// generated PDF contains the login screen
+				//if (controllerName.equals("report") && (actionName.equals("showTransactionReport") || actionName.equals("showChecklistReport"))) { 
+				//	log.info ("User: " + session.user )
+				//	log.info ("Location: " + session.location)
+				//	return true;
+				//}
+				
 				// This allows the left-nav menu to be 'included' in the page (allowing for dynamic content to be added) 
 				if(controllerName.equals("dashboard") && (actionName.equals("menu") || actionName.equals("megamenu"))) { 
 					return true
-				}				
-				
+				}
+								
 				String [] controllersWithAuthUserNotRequired = "api,test".split(",");
 				String [] actionsWithAuthUserNotRequired = "test,login,handleLogin,signup,handleSignup,json".split(",");
 				String [] actionsWithLocationNotRequired = "test,login,logout,handleLogin,signup,handleSignup,chooseLocation,json".split(",");

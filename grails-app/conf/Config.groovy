@@ -10,7 +10,6 @@ grails.config.locations = [
 	//"file:${userHome}/.grails/${appName}-config.groovy",
 	"file:${userHome}/.grails/${appName}-config.properties"
 ]
-
 println "Using configuration locations ${grails.config.locations} ${GrailsUtil.environment}"
 
 // if(System.properties["${appName}.config.location"]) {
@@ -50,6 +49,7 @@ grails.mime.types = [ html: ['text/html','application/xhtml+xml'],
 grails.views.default.codec="none" // none, html, base64
 grails.views.gsp.encoding="UTF-8"
 grails.converters.encoding="UTF-8"
+grails.views.enable.jsessionid = true
 // enable Sitemesh preprocessing of GSP pages
 grails.views.gsp.sitemesh.preprocess = true
 // not sure what this does
@@ -174,10 +174,9 @@ log4j = {
 		'grails.app',
 		'grails.app.bootstrap',
 		'grails.app.service',
-		'grails.app.task'
-		'BootStrap'
-
-	debug	'liquibase'
+		'grails.app.task',
+		'BootStrap',
+		'liquibase'
 		
 	root {
 		error 'stdout', 'smtp'
