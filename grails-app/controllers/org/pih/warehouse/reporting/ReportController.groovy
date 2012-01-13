@@ -72,8 +72,9 @@ class ReportController {
 		log.info("session ID: " + session.id)
 
 		// JSESSIONID is required because otherwise we get a 
-		def url = baseUri + params.url //+ ";JSESSIONID=" + session.getId()		
+		def url = baseUri + params.url + ";jsessionid=" + session.getId()		
 		url += "?print=true" 
+		url += "&showTransferBreakdown=" + params.showTransferBreakdown
 		url += "&location.id=" + params.location.id
 		url += "&category.id=" + params.category.id
 		url += "&startDate=" + params.startDate
@@ -101,7 +102,7 @@ class ReportController {
 		if (params.format == 'docx') { 
 			def tempFile = documentService.generateChecklistAsDocx()
 			def filename = "shipment-checklist.docx"
-			response.setHeader("Content-disposition", "attachment; filename=" + filename);
+			//response.setHeader("Content-disposition", "attachment; filename=" + filename);
 			response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 			response.outputStream << tempFile.readBytes()
 		} 
@@ -112,7 +113,7 @@ class ReportController {
 			url += "&shipment.id=" + params.shipment.id
 			log.info "Fetching url $url"	
 			response.setContentType("application/pdf")
-			response.setHeader("Content-disposition", "attachment;") // removed filename=	
+			//response.setHeader("Content-disposition", "attachment;") // removed filename=	
 			reportService.generatePdf(url, response.getOutputStream())
 		}
 		else { 

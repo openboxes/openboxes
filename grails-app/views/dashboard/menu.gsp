@@ -189,6 +189,19 @@
 		<warehouse:message code="administration.label"  default="Administration"/>
 	</h6>			
 	<div class="menu-section">
+		<span class="menu-subheading"><warehouse:message code="report.label"/></span>
+		<ul>			
+			<li>
+				<span class="menuButton">
+					<g:link controller="report" action="showTransactionReport"><warehouse:message code="report.showTransactionReport.label"/></g:link>
+				</span>
+			</li>
+			<li>
+				<span class="menuButton">
+					<g:link controller="report" action="showChecklistReport"><warehouse:message code="report.showChecklistReport.label"/></g:link>
+				</span>
+			</li>
+		</ul>
 		<g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">	
 			<span class="menu-subheading"><warehouse:message code="inventory.label"/></span>
 			<ul>			
@@ -204,20 +217,6 @@
 				</li>
 			</ul>	
 		</g:authorize>
-		<span class="menu-subheading"><warehouse:message code="report.label"/></span>
-		<ul>			
-			<li>
-				<span class="menuButton">
-					<g:link controller="report" action="showTransactionReport"><warehouse:message code="report.showTransactionReport.label"/></g:link>
-				</span>
-			</li>
-			<li>
-				<span class="menuButton">
-					<g:link controller="report" action="showChecklistReport"><warehouse:message code="report.showChecklistReport.label"/></g:link>
-				</span>
-			</li>
-		</ul>
-		
 		<span class="menu-subheading"><warehouse:message code="products.label"/></span>
 		<ul>			
 			<li>

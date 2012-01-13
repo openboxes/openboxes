@@ -112,22 +112,28 @@ class ReportService implements ApplicationContextAware {
 				}
 				
 				if (transactionType?.id == Constants.CONSUMPTION_TRANSACTION_TYPE_ID) {
+					entry.quantityRunning += it.quantity
 					entry.quantityConsumed += it.quantity
 					entry.quantityTotalOut += it.quantity
 				}
 				else if (transactionType?.id == Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID) {
+					entry.quantityRunning += it.quantity
 					entry.quantityFound += it.quantity
+					entry.quantityAdjusted += it.quantity
 					//entry.quantityTotalIn += it.quantity
 				}
 				else if (transactionType?.id == Constants.EXPIRATION_TRANSACTION_TYPE_ID) {
+					entry.quantityRunning -= it.quantity
 					entry.quantityExpired += it.quantity
 					entry.quantityTotalOut += it.quantity
 				}
 				else if (transactionType?.id == Constants.DAMAGE_TRANSACTION_TYPE_ID) {
+					entry.quantityRunning -= it.quantity
 					entry.quantityDamaged += it.quantity
 					entry.quantityTotalOut += it.quantity
 				}
 				else if (transactionType?.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID) {
+					entry.quantityRunning += it.quantity
 					entry.quantityTransferredIn += it.quantity
 					entry.quantityTotalIn += it.quantity
 					if (!entry.quantityTransferredInByLocation[it.transaction.source]) { 
@@ -136,6 +142,7 @@ class ReportService implements ApplicationContextAware {
 					entry.quantityTransferredInByLocation[it.transaction.source] += it.quantity					
 				}
 				else if (transactionType?.id == Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) {
+					entry.quantityRunning -= it.quantity
 					entry.quantityTransferredOut += it.quantity
 					entry.quantityTotalOut += it.quantity
 					if (!entry.quantityTransferredOutByLocation[it.transaction.destination]) { 
@@ -144,14 +151,28 @@ class ReportService implements ApplicationContextAware {
 					entry.quantityTransferredOutByLocation[it.transaction.destination] += it.quantity					
 				}
 				else if (transactionType?.id == Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID) {
+					entry.quantityRunning -= it.quantity
 					entry.quantityLost += it.quantity
+					entry.quantityAdjusted -= it.quantity
 					entry.quantityTotalOut += it.quantity
 				}
 				else if (transactionType?.id == Constants.INVENTORY_TRANSACTION_TYPE_ID) {
-					
+					def diff = it.quantity - entry.quantityRunning
+					entry.quantityAdjusted += diff					
+					entry.quantityRunning = it.quantity;
+					if (diff > 0)
+						entry.quantityFound += diff;
+					else 
+						entry.quantityLost += diff	
 				}
 				else if (transactionType?.id == Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID) {
-	
+					def diff = it.quantity - entry.quantityRunning
+					entry.quantityAdjusted += diff
+					entry.quantityRunning = it.quantity;
+					if (diff > 0)
+						entry.quantityFound += diff;
+					else 
+						entry.quantityLost += diff	
 				}
 			}
 		}		

@@ -14,12 +14,12 @@
 	<style>
 		@page land { size:landscape; }
 		@page port { size:portrait; }
-		.landscape { page:land; }
+		.landscape { page:land; width: 24.7cm;  }
 		.portrait { page:port; }
 	</style>
 </head>
-<body style="width: 100%;">
-    <div class="${params.orientation?:'landscape'}" style="width: 100%;">
+<body >
+    <div class="${params.orientation?:'landscape'}" >
 		<g:layoutBody />
 	</div>	
 </body>

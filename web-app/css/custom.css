@@ -743,7 +743,7 @@ border: 1px solid #CCC;
 	background-color: #F7F7F7; /*#D8D8D8*/	
 }
 .filter {
-	border: 1px solid lightgrey;
+	border: 0px solid lightgrey;
 	padding: 5px;
 	margin-left:10px;
 }

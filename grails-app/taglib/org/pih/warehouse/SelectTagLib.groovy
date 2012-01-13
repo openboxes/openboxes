@@ -14,7 +14,7 @@ class SelectTagLib {
 		attrs.optionKey = 'id'
 		//attrs.optionValue = 'name'
 		attrs.value = attrs.value 
-		attrs.optionValue = { it.name }
+		attrs.optionValue = { it.name + " (" + it.origin.name + " to " + it.destination.name + ")"}
 		out << g.select(attrs)
 	}
 	

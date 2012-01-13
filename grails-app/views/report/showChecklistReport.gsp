@@ -3,8 +3,10 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="${params.print?'print':'custom' }" />
         <title><warehouse:message code="report.showChecklistReport.label" /></title>    
-        <style>
+        <style media="print">
         	body, td, th, div { font-family: 'Times New Roman'; }
+        </style>
+        <style>
         	.filter { padding-right: 30px; border: 0; border-right: 1px solid lightgrey; }
         	/*th { text-transform: uppercase; }*/
         	th { border-bottom: 1px solid black; }
@@ -59,16 +61,24 @@
 						</tr>	
 				    	<tr class="prop">
 				    		<td>
-								<label>Export as</label>
+								<label><warehouse:message code="report.exportAs.label"/></label>
 								<g:if test="${command?.shipment }">
-						   			<g:link target="_blank" controller="report" action="showChecklistReport" params="[print:'true','shipment.id':command?.shipment?.id]">HTML</g:link> 
+						   			<g:link target="_blank" controller="report" action="showChecklistReport" params="[print:'true','shipment.id':command?.shipment?.id]">
+						   				<warehouse:message code="report.exportAs.html.label"/>
+						   			</g:link> 
 						   			|
-						   			<g:link target="_blank" controller="report" action="downloadChecklistReport" params="[format:'pdf',url:request.forwardURI,'shipment.id':command?.shipment?.id]">PDF</g:link>
+						   			<g:link target="_blank" controller="report" action="downloadChecklistReport" params="[format:'pdf',url:request.forwardURI,'shipment.id':command?.shipment?.id]">
+						   				<warehouse:message code="report.exportAs.pdf.label"/>
+						   			</g:link>
+						   			<%-- 
 						   			|
-						   			<g:link target="_blank" controller="report" action="downloadChecklistReport" params="[format:'docx',url:request.forwardURI,'shipment.id':command?.shipment?.id]">DOCX</g:link>
+						   			<g:link target="_blank" controller="report" action="downloadChecklistReport" params="[format:'docx',url:request.forwardURI,'shipment.id':command?.shipment?.id]">
+						   				<warehouse:message code="report.exportAs.docx.label"/>
+						   			</g:link>
+						   			--%>
 						   		</g:if>
 						   		<g:else>
-						   			Please select a shipment from above.
+						   			<warehouse:message code="report.selectShipment.label"/>
 						   		</g:else>
 						   		
 					   		</td>
@@ -86,15 +96,16 @@
 				<table border="0">
 					<tr>
 						<td colspan="5">
-							<div class="title">				
-								PIH / Zanmi Lasante
+							<div class="title">			
+								<warehouse:message code="report.shippingReport.heading"/>	
+								
 							</div>								
 						</td>							
 					</tr>
 					<tr>
 						<td colspan="5">
 							<div class="subtitle">
-								Bordereau de livraison			
+								<warehouse:message code="report.shippingReport.title"/>	
 							</div>							
 						</td>
 					</tr>
@@ -105,16 +116,22 @@
 					</tr>					
 					<tr>				
 						<td class="label">
-							<label>Containeur #:</label>
+							<label>
+								<warehouse:message code="report.containerNumber.label"/>
+							</label>
 						</td>
 						<td class="value underline">
-							<span class="value">${command?.shipment?.name }</span>
+							<span class="value">
+								${command?.shipment?.name }
+							</span>
 						</td>
 						<td class="spacer">
 						
 						</td>
 						<td class="label">
-							<label>Plaque:</label>
+							<label>
+								<warehouse:message code="report.plate.label"/>
+							</label>
 						</td>
 						<td class="value underline">
 							<span class="value"></span>						
@@ -122,7 +139,9 @@
 					</tr>
 					<tr>
 						<td class="label">
-							<label>Origine:</label>				
+							<label>
+								<warehouse:message code="report.origin.label"/>
+							</label>				
 						</td>
 						<td class="value underline">
 							<span class="value">${command?.shipment?.origin?.name }</span>							
@@ -131,7 +150,9 @@
 						
 						</td>
 						<td class="label">
-							<label>Destination:</label>
+							<label>
+								<warehouse:message code="report.destination.label"/>
+							</label>
 						</td>
 						<td class="value underline">
 							<span class="value">${command?.shipment?.destination?.name }</span>
@@ -144,40 +165,40 @@
 					    		<table border="1">
 					    			<thead>
 					    				<tr>
-					    					<th rowspan="2" class="center" class="bottom">
-					    						No.<!-- Number -->
+					    					<th rowspan="2" class="center bottom">
+					    						<warehouse:message code="report.number.label"/><!-- No., Number -->
 					    					</th>
 					    					<th rowspan="2" class="bottom">
-					    						Description produit<!-- Product description -->
+					    						<warehouse:message code="report.productDescription.label"/><!-- Description produit, Product description -->
 					    					</th>
 					    					<th rowspan="2" class="center bottom">
-						    					No lot<!-- Qty -->
+						    					<warehouse:message code="report.lotNumber.label"/><!-- No lot, Lot Number -->
 					    					</th>
 					    					<th rowspan="2" class="center bottom">
-					    						Exp<!-- Expiration date -->
+					    						<warehouse:message code="report.expirationDate.label"/><!-- Exp, Expiration date -->
 					    					</th>
 					    					<th rowspan="2" class="center bottom">
-					    						Qté en caisse<!-- Qty in case -->
+					    						<warehouse:message code="report.quantityPerBox.label"/><!-- Qté en caisse, Qty in case -->
 					    					</th>
 					    					<th colspan="2" class="center bottom">
-												Livré<!-- Delivered -->
+												<warehouse:message code="report.quantityDelivered.label"/><!-- Livré, Delivered -->
 											</th>
 					    					<th colspan="2" class="center bottom">
-						    					Reçu<!-- Received -->
+						    					<warehouse:message code="report.quantityReceived.label"/><!-- Reçu, Received -->
 					    					</th>
 					    				</tr>
 					    				<tr>
 					    					<th class="center">
-						    					Qté caisse<!-- Box Qty -->
+						    					<warehouse:message code="report.quantityPerBox.label"/><!-- Qté caisse, Qty per box -->
 					 						</th>
 					    					<th class="center">
-						    					Qté<!-- Qty -->
+						    					<warehouse:message code="report.quantityTotal.label"/><!-- Qté, Qty -->
 					 						</th>
 					    					<th class="center">
-						    					Qté caisse<!-- Box Qty -->
+						    					<warehouse:message code="report.quantityPerBox.label"/><!-- Qté caisse, Qty per box -->
 					 						</th>
 					    					<th class="center">
-						    					Qté<!-- Qty -->
+						    					<warehouse:message code="report.quantityTotal.label"/><!-- Qté, Qty -->
 					 						</th>
 					    				</tr>
 					    			</thead>
@@ -188,14 +209,15 @@
 												<td>
 													${i+1 }							
 												</td>
-												<td>	    	
-													${checklistEntry?.shipmentItem?.product?.name }
+												<td>	   
+													<format:product product="${checklistEntry?.shipmentItem?.product}"/> 	
 												</td>
 												<td>
 													${checklistEntry?.shipmentItem?.lotNumber }
 												</td>							
 												<td>
-													${checklistEntry?.shipmentItem?.expirationDate }
+													<format:expirationDate obj="${checklistEntry?.shipmentItem?.expirationDate }"/>
+													
 												</td>							
 												<td>
 
@@ -204,13 +226,13 @@
 
 												</td>
 												<td>
-													
+													${checklistEntry?.shipmentItem?.quantity }
 												</td>
 												<td>
 
 												</td>
 												<td>
-												
+													${checklistEntry?.shipmentItem?.quantity }
 												</td>
 											</tr>
 										</g:each>
@@ -221,7 +243,7 @@
 					</tr>
 					<tr>
 						<td class="label">
-							<label>Préparé par:</label><!--  Prepared by -->
+							<label><warehouse:message code="report.preparedBy.label"/></label><!--  Préparé par, Prepared by -->
 						</td>
 						<td class="value underline">
 						
@@ -230,7 +252,7 @@
 						
 						</td>						
 						<td class="label">
-							<label>Reçu par:</label><!-- Received by -->
+							<label><warehouse:message code="report.receivedBy.label"/></label><!-- Reçu par, Received by -->
 						</td>
 						<td class="value underline">
 						
@@ -238,7 +260,7 @@
 					</tr>
 					<tr>
 						<td class="label">
-							<label>Livré par:</label><!--  Delivered/supplied by -->
+							<label><warehouse:message code="report.deliveredBy.label"/></label><!-- Livré par, Delivered/supplied by -->
 						</td>
 						<td class="value underline">
 						
@@ -247,7 +269,7 @@
 						
 						</td>						
 						<td class="label">
-							<label>Reçu le:</label><!-- Received on -->
+							<label><warehouse:message code="report.receivedOn.label"/></label><!-- Reçu le, Received on -->
 						</td>
 						<td class="value underline">
 						
@@ -255,7 +277,7 @@
 					</tr>
 					<tr>
 						<td class="label">
-							<label>Livré le:</label><!-- Delivered/supplied on -->
+							<label><warehouse:message code="report.deliveredOn.label"/></label><!-- Livré le, Delivered/supplied on -->
 						</td>
 						<td class="value underline">
 						
@@ -264,7 +286,7 @@
 						
 						</td>						
 						<td class="label">
-							<label>Vérifié le:</label><!-- Verified on -->
+							<label><warehouse:message code="report.verifiedOn.label"/></label><!-- Vérifié le, Verified on -->
 						</td>
 						<td class="value underline">
 						
@@ -272,7 +294,7 @@
 					</tr>
 					<tr>
 						<td class="label">
-							<label>Transporté:</label><!-- Carrier -->
+							<label><warehouse:message code="report.transportedBy.label"/></label><!-- Transporté, Carrier -->
 						</td>
 						<td class="value underline">
 						
@@ -281,7 +303,7 @@
 						
 						</td>						
 						<td class="label">
-							<label>Vérifié par:</label><!-- Verified by -->
+							<label><warehouse:message code="report.verifiedBy.label"/></label><!-- Vérifié par, Verified by -->
 						</td>
 						<td class="value underline">
 						
@@ -292,107 +314,6 @@
 			</div>
 		</g:if>
 		
-		<%--
-    	<div class="list">
-   			<g:set var="status" value="${0 }"/>
-	    	<g:each var="productEntry" in="${command?.productsByCategory }" status="i">
-	    		<g:set var="category" value="${productEntry.key }"/>
-	    		<div style="page-break-after: always">		    		
-			    	<table>
-			    		<thead>
-				    		<tr style="border-top: 1px solid lightgrey;">
-								<th class="left">								
-									${category?.parentCategory?.name?.encodeAsHTML() } /
-				    				${category?.name?.encodeAsHTML() }					    			
-					    			<g:if test="${!params.print }">
-						    			[<g:link controller="report" action="showTransactionReport" params="['location.id':command.location?.id,'category.id':category.id,'startDate':command.startDate,'endDate':command.endDate]" style="display: inline">show</g:link>]
-					    			</g:if>
-								</th>
-								<th class="center" style="border-right: 1px solid lightgrey">Start</th>
-								<g:each var="location" in="${transferInLocations }">
-									<th class="center">${location.name.substring(0,3) }</th>
-								</g:each>
-								<th class="center">Transfer In</th>	
-								<th class="center" style="border-right: 1px solid lightgrey">Total In</th>	
-								<g:each var="location" in="${transferOutLocations }">
-									<th class="center">${location.name.substring(0,3) }</th>
-								</g:each>
-								<th class="center">Transfer Out</th>
-								<th class="center">Expired</th>
-								<th class="center">Consumed</th>
-								<th class="center">Damaged</th>
-								<th class="center" style="border-right: 1px solid lightgrey">Total Out</th>
-								<th class="center nowrap">Found</th>	
-								<th class="center">Lost</th>
-								<th class="center" style="border-right: 1px solid lightgrey">Total Adjusted</th>
-								<th class="center">End</th>
-				    		</tr>
-				    	</thead>
-				    	<tbody>
-					    	<g:each var="product" in="${productEntry.value }" status="j">
-					    		<g:set var="entry" value="${command.inventoryReportEntryMap[product] }"/>
-								<tr class="${status++%2 ? 'even' : 'odd' }">
-									<td class="left">
-										<g:if test="${!params.print }">
-											<g:link controller="inventoryItem" action="showStockCard" params="['product.id':product?.id]" fragment="inventory">   	
-									    		${product?.name.encodeAsHTML() }
-								    		</g:link>
-											[<g:link controller="report" action="showProductReport" params="['product.id':product?.id,'location.id':session?.warehouse?.id,startDate:params.startDate,endDate:params.endDate]" fragment="inventory">details</g:link>]
-							    		</g:if>
-							    		<g:else>
-								    		${product?.name.encodeAsHTML() }
-							    		</g:else>
-						    		</td>
-									<td class="center" style="border-right: 1px solid lightgrey">	    	
-							    		<strong>${entry?.quantityInitial ?: 0}</strong>
-						    		</td>
-									<g:each var="location" in="${transferInLocations }">
-										<td class="center">${entry.quantityTransferredInByLocation[location]?:0}</td>
-									</g:each>
-									<td class="center">	    	
-							    		${entry?.quantityTransferredIn ?: 0}
-									</td>
-									<td class="center" style="border-right: 1px solid lightgrey">	    	
-							    		${entry?.quantityTotalIn ?: 0}
-									</td>
-									<g:each var="location" in="${transferOutLocations }">
-										<td class="center">${entry.quantityTransferredOutByLocation[location]?:0}</td>
-									</g:each>
-									<td class="center">	    	
-										${entry?.quantityTransferredOut ?: 0}
-									</td>
-									<td class="center">	    	
-							    		${entry?.quantityExpired ?: 0}
-									</td>
-									<td class="center">	    	
-							    		${entry?.quantityConsumed ?: 0}
-									</td>
-									<td class="center">	    	
-							    		${entry?.quantityDamaged ?: 0}
-									</td>
-									<td class="center" style="border-right: 1px solid lightgrey">
-										${entry?.quantityTotalOut ?: 0 }
-									</td>
-									<td class="center">	    	
-							    		${entry?.quantityFound ?: 0}
-									</td>
-									<td class="center">	    	
-							    		${entry?.quantityLost ?: 0}
-									</td>
-									<td class="center" style="border-right: 1px solid lightgrey">	    	
-							    		${entry?.quantityTotalAdjusted ?: 0}
-									</td>
-									<td class="center">	    	
-							    		<strong>${entry?.quantityFinal ?: 0}</strong>
-									</td>
-						    	</tr>
-					    	</g:each>
-						</tbody>
-					</table>
-				</div>
-			</g:each>
-    	</div>
-    	 --%>
 	    <script>
 			$(document).ready(function() {
 				$(".filter").change(function() { 

@@ -1262,6 +1262,8 @@ class InventoryService implements ApplicationContextAware {
 		def transactionEntries = criteria.list {
 			transaction {
 				eq("inventory", inventory)
+				order("transactionDate", "asc")
+				order("dateCreated", "asc")
 			}
 		}
 		return transactionEntries;
@@ -2228,8 +2230,7 @@ class InventoryService implements ApplicationContextAware {
 			inventoryItem {
 				eq("product", product)
 			}
-			transaction { 
-				
+			transaction { 				
 				// All transactions between start date and end date
 				if (startDate && endDate) {
 					between("transactionDate", startDate, endDate)
@@ -2244,6 +2245,7 @@ class InventoryService implements ApplicationContextAware {
 				}
 				eq("inventory", location?.inventory)
 				order("transactionDate", "asc")
+				order("dateCreated", "asc")
 			}
 		}
 		return transactionEntries;
@@ -2270,6 +2272,8 @@ class InventoryService implements ApplicationContextAware {
 				   lt("transactionDate", beforeDate)
 				   eq("inventory", location?.inventory)
 				   order("transactionDate", "asc")
+				   order("dateCreated", "asc")
+   
 			   }
 		   }
 	   }
@@ -2303,6 +2307,7 @@ class InventoryService implements ApplicationContextAware {
 				}
 				eq("inventory", location?.inventory)
 				order("transactionDate", "asc")
+				order("dateCreated", "asc")
 			}
 		}
 		return transactionEntries;
