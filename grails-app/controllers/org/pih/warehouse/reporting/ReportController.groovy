@@ -55,7 +55,6 @@ class ReportController {
 	
 	
 	def showTransactionReport = { InventoryReportCommand cmd -> 
-		
 		// We always need to initialize the root category 
 		cmd.rootCategory = productService.getRootCategory();
 		if (!cmd?.hasErrors()) { 			
@@ -64,14 +63,20 @@ class ReportController {
 		[cmd : cmd]
 	}
 	
+	def showShippingReport = { ChecklistReportCommand command ->
+		command.rootCategory = productService.getRootCategory();
+		if (!command?.hasErrors()) {
+			reportService.generateShippingReport(command);
+		}
+		[command : command]
+	}
+
 	
 
 	def downloadTransactionReport = {		
 		def baseUri = request.scheme + "://" + request.serverName + ":" + request.serverPort
-		log.info "BaseUri is $baseUri"	
-		log.info("session ID: " + session.id)
 
-		// JSESSIONID is required because otherwise we get a 
+		// JSESSIONID is required because otherwise the login page is rendered
 		def url = baseUri + params.url + ";jsessionid=" + session.getId()		
 		url += "?print=true" 
 		url += "&showTransferBreakdown=" + params.showTransferBreakdown
@@ -79,26 +84,21 @@ class ReportController {
 		url += "&category.id=" + params.category.id
 		url += "&startDate=" + params.startDate
 		url += "&endDate=" + params.endDate
-		log.info "Fetching url $url"
+		url += "&includeEntities=true" 
 
-		response.setContentType("application/pdf")
+		// Let the browser know what content type to expect
 		//response.setHeader("Content-disposition", "attachment;") // removed filename=
+		response.setContentType("application/pdf")
 
+		// Render pdf to the response output stream
+		log.info "BaseUri is $baseUri"	
+		log.info("Session ID: " + session.id)
+		log.info "Fetching url $url"
 		reportService.generatePdf(url, response.getOutputStream())
-		//byte[] content = generatePdf(url)
-		//response.setContentLength(content.length)
-		//response.getOutputStream().write(content)
 	}
 	
-	def showChecklistReport = { ChecklistReportCommand command ->
-		command.rootCategory = productService.getRootCategory();
-		if (!command?.hasErrors()) {
-			reportService.generateChecklistReport(command);
-		}
-		[command : command]
-	}
 	
-	def downloadChecklistReport = {		
+	def downloadShippingReport = {		
 		if (params.format == 'docx') { 
 			def tempFile = documentService.generateChecklistAsDocx()
 			def filename = "shipment-checklist.docx"
@@ -111,6 +111,7 @@ class ReportController {
 			def url = baseUri + params.url + ";jsessionid=" + session.getId()
 			url += "?print=true&orientation=portrait"
 			url += "&shipment.id=" + params.shipment.id
+			url += "&includeEntities=true" 
 			log.info "Fetching url $url"	
 			response.setContentType("application/pdf")
 			//response.setHeader("Content-disposition", "attachment;") // removed filename=	

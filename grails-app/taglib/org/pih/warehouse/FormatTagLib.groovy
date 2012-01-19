@@ -84,7 +84,7 @@ class FormatTagLib {
 			 Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
 			 
 			 // default format is to display the localized name of the product 
-			 out << LocalizationUtil.getLocalizedString(attrs.product.name, locale)
+			 out << LocalizationUtil.getLocalizedString(attrs.product.name.encodeAsHTML(), locale)
 		 }
 		 // TODO: add more formats
 	 }
@@ -107,7 +107,7 @@ class FormatTagLib {
 			Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
 			
 			// default format is to display the localized name of the catergory
-			out << LocalizationUtil.getLocalizedString(attrs.category.name, locale)
+			out << LocalizationUtil.getLocalizedString(attrs.category.name.encodeAsHTML(), locale)
 		}
 		// TODO: add more formats
 	}
@@ -133,7 +133,7 @@ class FormatTagLib {
 			 
 			 // handle String; localize the string directly
 			 if (attrs.obj instanceof String) {
-				 out << LocalizationUtil.getLocalizedString(attrs.obj,  locale)
+				 out << LocalizationUtil.getLocalizedString(attrs.obj.encodeAsHTML(),  locale)
 			 }
 			 // handle Enums; by convention, the localized text for a Enum is stored in the message property enum.className.value  (ie enum.ShipmentStatusCode.PENDING)
 			 else if (attrs.obj instanceof Enum) {
@@ -142,7 +142,7 @@ class FormatTagLib {
 			 }
 			 // for all other objects, return the localized version of the name
 			 else {
-				 out << LocalizationUtil.getLocalizedString(attrs.obj.name, locale)
+				 out << LocalizationUtil.getLocalizedString(attrs.obj.name.encodeAsHTML(), locale)
 			 }
 		 }
 	 }

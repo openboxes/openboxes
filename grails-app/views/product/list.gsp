@@ -16,11 +16,26 @@
             </g:if>
             <div class="list">
             
-				<div>            	
+				<div class="buttonBar">            	
+	            	<span class="linkButton">
+	            		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="['products']"/></g:link>
+	            	</span>
 	            	<span class="linkButton">
 	            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="['product']"/></g:link>
 	            	</span>
             	</div>
+            	
+	            <div class="dialog box">
+					<g:form action="list" method="get">
+						<label><warehouse:message code="product.search.label"/></label>            
+						<g:textField name="searchTerm" size="45"/>					
+						<button type="submit" class="positive"><img
+							src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" style="vertical-align: middle;"
+							alt="Save" /> ${warehouse.message(code: 'default.button.find.label')}
+						</button>		          
+					</g:form>
+				</div> 				
+				<br/>
             
                 <table>
                     <thead>

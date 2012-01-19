@@ -2079,9 +2079,7 @@ class InventoryService implements ApplicationContextAware {
 	def getQuantity(Product product, Location location, Date beforeDate) { 
 		def quantity = 0;
 		def transactionEntries = getTransactionEntriesBeforeDate(product, location, beforeDate)
-		log.info "get quantity > # transactions " + transactionEntries.size
 		quantity = adjustQuantity(quantity, transactionEntries)
-		log.info "get quantity " + quantity
 		return quantity;		
 	}
 	
@@ -2313,8 +2311,46 @@ class InventoryService implements ApplicationContextAware {
 		return transactionEntries;
 	}
 	
+	/**
+	 * 
+	 * @param location
+	 * @param category
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 */
+	def getTransactionEntries(Location location, Category category, Date startDate, Date endDate) {
+		def criteria = TransactionEntry.createCriteria();
+		def categories = []
+		categories << category
+		def matchCategories = getExplodedCategories(categories)
+		def transactionEntries = criteria.list {
+			if (category) {
+				inventoryItem { 
+					product { 
+						'in'("category", matchCategories)
+					}
+				}
+			}
+			transaction {
+				if (startDate && endDate) {
+					between("transactionDate", startDate, endDate)
+				}
+				else if (startDate) {
+					ge("transactionDate", startDate)
+				}
+				else if (endDate) {
+					le("transactionDate", endDate)
+				}
+				eq("inventory", location?.inventory)
+				order("transactionDate", "asc")
+				order("dateCreated", "asc")
+			}
+		}
+		return transactionEntries;
+		 
 	
-	
+	}
 	
 	/**
 	 * 
@@ -2362,7 +2398,5 @@ class InventoryService implements ApplicationContextAware {
 		}
 		return transactionEntry
 	}
-	
-
 	
 }

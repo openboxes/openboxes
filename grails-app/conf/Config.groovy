@@ -160,6 +160,9 @@ log4j = {
 		'org.codehaus.groovy.grails.plugins',			// plugins
 		'org.codehaus.groovy.grails.orm.hibernate', 		// hibernate integration
 		'org.docx4j',
+		'org.apache.http.headers',
+		'org.apache.ddlutils',
+		'org.apache.http.wire',
 		'net.sf.ehcache.hibernate'		
 	
 	info	'org.liquibase', 	
@@ -168,9 +171,6 @@ log4j = {
 		'org.springframework',
 		'org.hibernate',
 		'org.pih.warehouse',
-		'org.apache.http.headers',
-		'org.apache.ddlutils',
-		'org.apache.http.wire',
 		'grails.app',
 		'grails.app.bootstrap',
 		'grails.app.service',

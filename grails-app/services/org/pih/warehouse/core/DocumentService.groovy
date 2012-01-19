@@ -98,9 +98,9 @@ class DocumentService {
 	 */
 	WordprocessingMLPackage generateChecklist() {
 
-		File template = findFile("templates/checklist-template.docx")
+		File template = findFile("templates/receive-shipment-template.docx")
 		if (!template) {
-			throw new FileNotFoundException("templates/checklist-template.docx");
+			throw new FileNotFoundException("Could not find template");
 		}
 
 		WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(template);

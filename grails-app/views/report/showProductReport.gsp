@@ -4,12 +4,12 @@
         <meta name="layout" content="custom" />
         <title><warehouse:message code="report.showProductReport.label" /></title>    
         <style>
-        	.filter { padding-right: 30px; border: 0; border-right: 1px solid lightgrey; }
+        	.filter { }
         	th { text-transform: uppercase; }
+        	.product { font-weight: bold; }
         </style>
     </head>    
     <body>
-    
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
 		</g:if>
@@ -18,12 +18,17 @@
 				<g:renderErrors bean="${command}" as="list" />
 			</div>
 		</g:hasErrors>    
-		    
-		<div class="form" style="margin: 5px; padding: 5px; border-bottom: 1px solid lightgrey">
+		<div class="buttonBar">
+			<g:link class="list" controller="report" action="showTransactionReport" params="['location.id':command.location?.id,'category.id':command?.product?.category.id,'startDate':command.startDate,'endDate':command.endDate]">
+	    		&lsaquo; Back to Transaction Report
+	    	</g:link>
+	    </div>
+	    
+		<div class="form box">
 			<g:form controller="report" action="showProductReport" method="GET">
 				<span class="filter">
 					<label>Product</label>
-					<b>${command?.product?.name }</b>				
+					<span class="product"><format:product product="${command?.product }"/></span>
 					<g:hiddenField name="product.id" value="${command?.product?.id }" class="filter"/>
 				</span>
 				<span class="filter">
@@ -44,7 +49,7 @@
 			</g:form>		
 		
 		</div>
-    
+		
     	<div class="list">
 	    	<table>
 	    		<thead>
@@ -70,25 +75,31 @@
 		    			<g:set var="transactionEntry" value="${productReportEntry?.transactionEntry }"/>
 			    		<tr class="${i%2 ? 'even' : 'odd' }">
 			    			<td>
-			    				${transactionEntry?.transaction?.transactionDate }
+			    				<format:date obj="${transactionEntry?.transaction?.transactionDate }"/>
+			    				
 			    			</td>
 			    			<td>
-			    				${transactionEntry?.transaction?.transactionType?.name }
+			    				<format:metadata obj="${transactionEntry?.transaction?.transactionType}"/>
 			    			</td>
 			    			<td>
 			    				${transactionEntry?.inventoryItem?.lotNumber }
 			    			</td>
 			    			<td>
-			    				${transactionEntry?.inventoryItem?.expirationDate }
+			    				<format:expirationDate obj="${transactionEntry?.inventoryItem?.expirationDate }"/>
+			    				
 			    			</td>
 			    			<td class="center">
 				    			${transactionEntry?.transaction?.transactionType?.transactionCode }
 			    			</td>			    			
 			    			<td class="center">
-			    				${transactionEntry?.quantity }
+			    				<span class="${transactionEntry?.transaction?.transactionType?.transactionCode?.equals("DEBIT")?'debit':'credit' }">
+			    					${transactionEntry?.quantity }
+			    				</span>
 			    			</td>
 			    			<td class="center">
-								${productReportEntry?.balance }			    				
+			    				<span class="${productReportEntry?.balance>=0?'credit':'debit' }">
+									${productReportEntry?.balance }			    			
+								</span>	
 			    			</td>
 			    		</tr>
 			    	</g:each>
@@ -103,9 +114,6 @@
 					</tr>
 		    	</tbody>
 	    	</table>
-	    	<g:link controller="report" action="showTransactionReport" params="['location.id':command.location?.id,'category.id':command?.product?.category.id,'startDate':command.startDate,'endDate':command.endDate]">
-	    		back to Transaction Report
-	    	</g:link>
     	</div>
 	    <script>
 			$(document).ready(function() {

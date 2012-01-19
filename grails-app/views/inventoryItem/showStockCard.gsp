@@ -1,4 +1,3 @@
-
 <%@ page import="org.pih.warehouse.product.Product"%>
 <%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
 <html>

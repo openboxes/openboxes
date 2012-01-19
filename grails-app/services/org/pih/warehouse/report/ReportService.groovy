@@ -5,6 +5,14 @@ import java.util.Map;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.grails.plugins.excelimport.ExcelImportUtils;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.InventoryItem;
@@ -19,7 +27,10 @@ import org.pih.warehouse.core.LocationType;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.validation.Errors;
+import org.w3c.dom.Document;
 import org.xhtmlrenderer.pdf.ITextRenderer;
+import org.xhtmlrenderer.resource.FSEntityResolver;
+import org.xhtmlrenderer.resource.XMLResource;
 
 import org.pih.warehouse.reporting.Consumption;
 
@@ -36,7 +47,7 @@ class ReportService implements ApplicationContextAware {
 	boolean transactional = true
 	
 	
-	public void generateChecklistReport(ChecklistReportCommand command) {
+	public void generateShippingReport(ChecklistReportCommand command) {
 		command.shipment.shipmentItems.each { shipmentItem -> 
 			command.checklistReportEntryList << new ChecklistReportEntryCommand(shipmentItem: shipmentItem)
 		}
@@ -54,7 +65,6 @@ class ReportService implements ApplicationContextAware {
 		// Calculate quantity at each transaction entry point.
 		def quantity = command?.quantityInitial;
 		transactionEntries.each { transactionEntry ->
-			//log.info(transactionEntry)
 			def productReportEntry = new ProductReportEntryCommand(transactionEntry: transactionEntry, balance: 0)
 			productReportEntry.balance = inventoryService.adjustQuantity(quantity, transactionEntry)
 			command.productReportEntryList << productReportEntry
@@ -88,7 +98,7 @@ class ReportService implements ApplicationContextAware {
 		}
 		
 		// TODO Need to restrict by date and category 
-		def transactionEntries = inventoryService.getTransactionEntriesByInventory(command.location.inventory);
+		def transactionEntries = inventoryService.getTransactionEntries(command.location, command.category, command?.startDate, command?.endDate);
 		
 		// Iterate over the transaction entries for the given time period to tabulate totals.
 		// Each time we encounter an INVENTORY, compare that quantity with the running total,
@@ -98,82 +108,74 @@ class ReportService implements ApplicationContextAware {
 			def product = it?.inventoryItem?.product
 			def transactionType = it?.transaction?.transactionType
 
-			// TODO Move this filtering to the getTransactionEntries() service call above
-			// Filter by category, location, startDate, endDate (should move this to the service layer)
-			if ((!command.category || command.category == product.category) &&
-				(!command.location || command.location.inventory == it.transaction.inventory) &&
-				(!command.startDate || it.transaction?.transactionDate?.after(command.startDate)) &&
-				(!command.endDate || it.transaction?.transactionDate?.before(command.endDate))) {
-	
-				def entry = command.inventoryReportEntryMap[product]
-				if (!entry) {
-					entry = new InventoryReportEntryCommand(product: product);
-					command.inventoryReportEntryMap[product] = entry
+			def entry = command.inventoryReportEntryMap[product]
+			if (!entry) {
+				entry = new InventoryReportEntryCommand(product: product);
+				command.inventoryReportEntryMap[product] = entry
+			}
+			
+			if (transactionType?.id == Constants.CONSUMPTION_TRANSACTION_TYPE_ID) {
+				entry.quantityRunning += it.quantity
+				entry.quantityConsumed += it.quantity
+				entry.quantityTotalOut += it.quantity
+			}
+			else if (transactionType?.id == Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID) {
+				entry.quantityRunning += it.quantity
+				entry.quantityFound += it.quantity
+				entry.quantityAdjusted += it.quantity
+				//entry.quantityTotalIn += it.quantity
+			}
+			else if (transactionType?.id == Constants.EXPIRATION_TRANSACTION_TYPE_ID) {
+				entry.quantityRunning -= it.quantity
+				entry.quantityExpired += it.quantity
+				entry.quantityTotalOut += it.quantity
+			}
+			else if (transactionType?.id == Constants.DAMAGE_TRANSACTION_TYPE_ID) {
+				entry.quantityRunning -= it.quantity
+				entry.quantityDamaged += it.quantity
+				entry.quantityTotalOut += it.quantity
+			}
+			else if (transactionType?.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID) {
+				entry.quantityRunning += it.quantity
+				entry.quantityTransferredIn += it.quantity
+				entry.quantityTotalIn += it.quantity
+				if (!entry.quantityTransferredInByLocation[it.transaction.source]) { 
+					entry.quantityTransferredInByLocation[it.transaction.source] = 0
 				}
-				
-				if (transactionType?.id == Constants.CONSUMPTION_TRANSACTION_TYPE_ID) {
-					entry.quantityRunning += it.quantity
-					entry.quantityConsumed += it.quantity
-					entry.quantityTotalOut += it.quantity
+				entry.quantityTransferredInByLocation[it.transaction.source] += it.quantity					
+			}
+			else if (transactionType?.id == Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) {
+				entry.quantityRunning -= it.quantity
+				entry.quantityTransferredOut += it.quantity
+				entry.quantityTotalOut += it.quantity
+				if (!entry.quantityTransferredOutByLocation[it.transaction.destination]) { 
+					entry.quantityTransferredOutByLocation[it.transaction.destination] = 0;
 				}
-				else if (transactionType?.id == Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID) {
-					entry.quantityRunning += it.quantity
-					entry.quantityFound += it.quantity
-					entry.quantityAdjusted += it.quantity
-					//entry.quantityTotalIn += it.quantity
-				}
-				else if (transactionType?.id == Constants.EXPIRATION_TRANSACTION_TYPE_ID) {
-					entry.quantityRunning -= it.quantity
-					entry.quantityExpired += it.quantity
-					entry.quantityTotalOut += it.quantity
-				}
-				else if (transactionType?.id == Constants.DAMAGE_TRANSACTION_TYPE_ID) {
-					entry.quantityRunning -= it.quantity
-					entry.quantityDamaged += it.quantity
-					entry.quantityTotalOut += it.quantity
-				}
-				else if (transactionType?.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID) {
-					entry.quantityRunning += it.quantity
-					entry.quantityTransferredIn += it.quantity
-					entry.quantityTotalIn += it.quantity
-					if (!entry.quantityTransferredInByLocation[it.transaction.source]) { 
-						entry.quantityTransferredInByLocation[it.transaction.source] = 0
-					}
-					entry.quantityTransferredInByLocation[it.transaction.source] += it.quantity					
-				}
-				else if (transactionType?.id == Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) {
-					entry.quantityRunning -= it.quantity
-					entry.quantityTransferredOut += it.quantity
-					entry.quantityTotalOut += it.quantity
-					if (!entry.quantityTransferredOutByLocation[it.transaction.destination]) { 
-						entry.quantityTransferredOutByLocation[it.transaction.destination] = 0;
-					}
-					entry.quantityTransferredOutByLocation[it.transaction.destination] += it.quantity					
-				}
-				else if (transactionType?.id == Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID) {
-					entry.quantityRunning -= it.quantity
-					entry.quantityLost += it.quantity
-					entry.quantityAdjusted -= it.quantity
-					entry.quantityTotalOut += it.quantity
-				}
-				else if (transactionType?.id == Constants.INVENTORY_TRANSACTION_TYPE_ID) {
-					def diff = it.quantity - entry.quantityRunning
-					entry.quantityAdjusted += diff					
-					entry.quantityRunning = it.quantity;
-					if (diff > 0)
-						entry.quantityFound += diff;
-					else 
-						entry.quantityLost += diff	
-				}
-				else if (transactionType?.id == Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID) {
-					def diff = it.quantity - entry.quantityRunning
-					entry.quantityAdjusted += diff
-					entry.quantityRunning = it.quantity;
-					if (diff > 0)
-						entry.quantityFound += diff;
-					else 
-						entry.quantityLost += diff	
-				}
+				entry.quantityTransferredOutByLocation[it.transaction.destination] += it.quantity					
+			}
+			else if (transactionType?.id == Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID) {
+				entry.quantityRunning -= it.quantity
+				entry.quantityLost += it.quantity
+				entry.quantityAdjusted -= it.quantity
+				entry.quantityTotalOut += it.quantity
+			}
+			else if (transactionType?.id == Constants.INVENTORY_TRANSACTION_TYPE_ID) {
+				def diff = it.quantity - entry.quantityRunning
+				entry.quantityAdjusted += diff					
+				entry.quantityRunning = it.quantity;
+				if (diff > 0)
+					entry.quantityFound += diff;
+				else 
+					entry.quantityLost += diff	
+			}
+			else if (transactionType?.id == Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID) {
+				def diff = it.quantity - entry.quantityRunning
+				entry.quantityAdjusted += diff
+				entry.quantityRunning = it.quantity;
+				if (diff > 0)
+					entry.quantityFound += diff;
+				else 
+					entry.quantityLost += diff	
 			}
 		}		
 	}	
@@ -184,19 +186,76 @@ class ReportService implements ApplicationContextAware {
 	 * @param url
 	 * @param outputStream
 	 * @return
-	 */
-	private generatePdf(url, outputStream) {
+	private generatePdf(String url, OutputStream outputStream) {		
 		log.info "Generate pdf from page at URL " + url
-		//ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ITextRenderer renderer = new ITextRenderer();
-		renderer.setDocument(url);
-		//renderer.getSharedContext().setUserAgentCallback(new MyUserAgent());
+		Document document = getDocument(url);
+		renderer.setDocument(document, "");
 		renderer.layout();
 		renderer.createPDF(outputStream);
-		//byte [] b = baos.toByteArray();
-		//baos.close();
-		//log.info(b)
-		//return b;
+	}
+	 */
+	
+	private generatePdf(String url, OutputStream outputStream) { 
+		ITextRenderer renderer = new ITextRenderer();
+		renderer.setDocument(url);
+		renderer.layout();
+		renderer.createPDF(outputStream);
+	}
+		
+	
+	
+	private getDocument(String url) { 
+		Document document = null;
+		InputStream inputStream = null;
+		
+		try {
+			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+			documentBuilderFactory.setValidating(false);
+			
+			DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();			
+			
+			// Get source input stream
+			String xhtml = getHtmlContent(url)
+			
+			inputStream = new ByteArrayInputStream(xhtml.getBytes());
+			
+			// Use FS's local cached XML entities so we don't have to hit the web.
+			builder.setEntityResolver(FSEntityResolver.instance());
+			
+			// Parse input stream into document
+			document = builder.parse(inputStream);
+			
+			// Alternative approach 
+			//document = XMLResource.load(new ByteArrayInputStream(xhtml.getBytes())).getDocument();
+			
+			
+		} finally {
+			if (inputStream) inputStream.close();
+		}
+
+		return document;
+		
+	}
+	
+	
+	private getHtmlContent(String url) { 
+		
+		HttpClient httpclient = new DefaultHttpClient();
+		try {
+			HttpGet httpget = new HttpGet(url);
+			// Create a response handler
+			ResponseHandler<String> responseHandler = new BasicResponseHandler();
+			String responseBody = httpclient.execute(httpget, responseHandler);
+			return responseBody;
+			
+			
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			httpclient.getConnectionManager().shutdown();
+		}
 	}
 
 	

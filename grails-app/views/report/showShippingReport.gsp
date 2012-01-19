@@ -2,20 +2,20 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="${params.print?'print':'custom' }" />
-        <title><warehouse:message code="report.showChecklistReport.label" /></title>    
+        <title><warehouse:message code="report.showShippingReport.label" /></title>    
         <style media="print">
         	body, td, th, div { font-family: 'Times New Roman'; }
         </style>
         <style>
-        	.filter { padding-right: 30px; border: 0; border-right: 1px solid lightgrey; }
+        	.filter { padding-right: 30px; border-right: 1px solid lightgrey; }
         	/*th { text-transform: uppercase; }*/
-        	th { border-bottom: 1px solid black; }
         	.title { text-align: center; padding: 5px; font-size: 3em; }
         	.subtitle { text-align: center; padding: 15px; font-size: 2em; }
         	.underline { border-bottom: 1px dashed black; }
         	.label { width: 15%; text-align: left; vertical-align: bottom; }
         	.value { font-weight: bold; width: 30%; }
         	.spacer { width: 10%; }
+        	th { border-bottom: 1px solid black; }
         	td { padding: 10px; }
         	table { margin-left: auto; margin-right: auto; }
         	
@@ -31,8 +31,8 @@
 			</div>
 		</g:hasErrors>
 	   	<g:if test="${!params.print}">
-			<div class="form" >
-				<g:form controller="report" action="showChecklistReport" method="GET">
+			<div class="form box" >
+				<g:form controller="report" action="showShippingReport" method="GET">
 					<%-- 
 					<span class="filter">
 						<label>Location</label>
@@ -40,7 +40,7 @@
 					</span>	
 					--%>
 					<table>
-						<tr class="prop">
+						<tr>
 							<td>
 								<label>Shipment</label>
 								<g:selectShipment class="filter" name="shipment.id" noSelection="['null':'']" value="${command?.shipment?.id}"/>
@@ -63,16 +63,16 @@
 				    		<td>
 								<label><warehouse:message code="report.exportAs.label"/></label>
 								<g:if test="${command?.shipment }">
-						   			<g:link target="_blank" controller="report" action="showChecklistReport" params="[print:'true','shipment.id':command?.shipment?.id]">
+						   			<g:link target="_blank" controller="report" action="showShippingReport" params="[print:'true','shipment.id':command?.shipment?.id]">
 						   				<warehouse:message code="report.exportAs.html.label"/>
 						   			</g:link> 
 						   			|
-						   			<g:link target="_blank" controller="report" action="downloadChecklistReport" params="[format:'pdf',url:request.forwardURI,'shipment.id':command?.shipment?.id]">
+						   			<g:link target="_blank" controller="report" action="downloadShippingReport" params="[format:'pdf',url:request.forwardURI,'shipment.id':command?.shipment?.id]">
 						   				<warehouse:message code="report.exportAs.pdf.label"/>
 						   			</g:link>
 						   			<%-- 
 						   			|
-						   			<g:link target="_blank" controller="report" action="downloadChecklistReport" params="[format:'docx',url:request.forwardURI,'shipment.id':command?.shipment?.id]">
+						   			<g:link target="_blank" controller="report" action="downloadShippingReport" params="[format:'docx',url:request.forwardURI,'shipment.id':command?.shipment?.id]">
 						   				<warehouse:message code="report.exportAs.docx.label"/>
 						   			</g:link>
 						   			--%>

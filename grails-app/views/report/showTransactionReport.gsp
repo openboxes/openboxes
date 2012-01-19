@@ -7,6 +7,8 @@
         	.title { text-align: center; padding: 15px; }
         	.total { border-right: 1px solid lightgrey; border-left: 1px solid lightgrey; }
         	.parameters { width:30%; margin-left: auto; margin-right: auto;  }
+        	.filter { padding-right: 15px; }
+        	td.total { font-weight: bold; }
         </style>
     </head>    
     <body>
@@ -19,7 +21,7 @@
 			</div>
 		</g:hasErrors>
 	   	<g:if test="${!params.print}">
-			<div class="form" style="border-bottom: 1px solid lightgrey; border-top: 1px solid lightgrey; padding: 5px">
+			<div class="form box">
 				<g:form controller="report" action="showTransactionReport" method="GET">
 					<span class="filter">
 						<label>
@@ -94,7 +96,6 @@
 						</label>
 					</td>
 					<td>
-						<format:category category="${cmd?.category?.parentCategory}"/> &#155;
 						<format:category category="${cmd?.category}"/>					
 					</td>
 				</tr>
@@ -121,7 +122,6 @@
 			</table>
 		</g:else>
 
-
 		<g:set var="transferInLocations" value="${cmd?.inventoryReportEntryMap.values()*.quantityTransferredInByLocation*.keySet().flatten().unique()}"/>
 		<g:set var="transferOutLocations" value="${cmd?.inventoryReportEntryMap.values()*.quantityTransferredOutByLocation*.keySet().flatten().unique()}"/>
 		
@@ -129,20 +129,19 @@
    			<g:set var="status" value="${0 }"/>
 	    	<g:each var="productEntry" in="${cmd?.productsByCategory }" status="i">
 	    		<g:set var="category" value="${productEntry.key }"/>
-	    		<div style="page-break-after: always">		    		
+	    		<div>		    		
 			    	<table>
 			    		<thead>
 			    			<tr style="border-top: 1px solid lightgrey;">
-			    				<th rowspan="2" class="middle">
-									<format:category category="${cmd?.category?.parentCategory}"/> &#155;
-									<format:category category="${cmd?.category}"/>					
+			    				<th rowspan="2" class="bottom">
+									<format:category category="${category}"/>					
 					    			<g:if test="${!params.print }">
 						    			[<g:link controller="report" action="showTransactionReport" params="['location.id':cmd.location?.id,'category.id':category.id,'startDate':cmd.startDate,'endDate':cmd.endDate]" style="display: inline">
 											<warehouse:message code="report.showDetails.label"/>
 						    			</g:link>]
 					    			</g:if>
 			    				</th>
-			    				<th rowspan="2" class="center middle total">
+			    				<th rowspan="2" class="center bottom total">
 									<warehouse:message code="report.initialQuantity.label"/>
 			    				</th>
 			    				<td colspan="${(params.showTransferBreakdown) ? 1 + (transferInLocations?.size?:0) : 2}" class="center total">
@@ -160,7 +159,7 @@
 					    				<warehouse:message code="report.adjustedQuantity.label"/>
 									</label>
 								</td>	
-								<th rowspan="2" class="center middle total">
+								<th rowspan="2" class="center bottom total">
 									<warehouse:message code="report.finalQuantity.label"/>
 								</th>    				
 			    			</tr>
@@ -215,8 +214,8 @@
 				    	<tbody>
 					    	<g:each var="product" in="${productEntry.value }" status="j">
 					    		<g:set var="entry" value="${cmd.inventoryReportEntryMap[product] }"/>
-								<tr class="${status++%2 ? 'even' : 'odd' }">
-									<td class="left">
+								<tr class="${j%2 ? 'even' : 'odd' }">
+									<td class="left" style="width: 35%">
 										<g:if test="${!params.print }">
 											<g:link controller="inventoryItem" action="showStockCard" params="['product.id':product?.id]" fragment="inventory">   	
 												<format:product product="${product }"/>
@@ -232,62 +231,78 @@
 							    		</g:else>
 						    		</td>
 									<td class="center total">	    	
-							    		<strong>${entry?.quantityInitial ?: 0}</strong>
+							    		<span class="${(entry?.quantityInitial>=0)?'credit':'debit'}">
+							    			${entry?.quantityInitial ?: 0}
+							    		</span>
 						    		</td>
-						    		
 						    		<g:if test="${params.showTransferBreakdown }">
 										<g:each var="location" in="${transferInLocations }">
-											<td class="center">${entry.quantityTransferredInByLocation[location]?:0}</td>
+											<td class="center">
+												<span class="${(entry?.quantityTransferredInByLocation[location]>=0)?'credit':'debit'}">
+													${entry.quantityTransferredInByLocation[location]?:0}
+												</span>
+											</td>
 										</g:each>
 									</g:if>
 									<g:else>
 										<td class="center">	    	
-								    		${entry?.quantityTransferredIn ?: 0}
+								    		<span class="${(entry?.quantityTransferredIn>=0)?'credit':'debit'}">
+									    		${entry?.quantityTransferredIn ?: 0}
+									    	</span>
 										</td>
 									</g:else>
 									<td class="center total">	    	
-							    		${(entry?.quantityTotalIn!=0)?'+':''}${entry?.quantityTotalIn ?: 0}
+							    		<span class="${(entry?.quantityTotalIn>=0)?'credit':'debit'}">
+							    			${entry?.quantityTotalIn ?: 0}
+							    		</span>
 									</td>
 									
 						    		<g:if test="${params.showTransferBreakdown }">
 										<g:each var="location" in="${transferOutLocations }">
-											<td class="center">${entry.quantityTransferredOutByLocation[location]?:0}</td>
+											<td class="center">
+												<span class="${(entry?.quantityTransferredOutByLocation[location]>0)?'debit':'credit'}">
+													${entry.quantityTransferredOutByLocation[location]?:0}
+												</span>
+											</td>
 										</g:each>
 									</g:if>
 									<g:else>
 										<td class="center">	    	
-											${entry?.quantityTransferredOut ?: 0}
+											<span class="${(entry?.quantityTransferredOut>0)?'debit':'credit'}">
+												${entry?.quantityTransferredOut ?: 0}
+											</span>
 										</td>
 									</g:else>
 									<td class="center">	    	
-							    		${entry?.quantityExpired ?: 0}
+							    		<span class="${(entry?.quantityExpired>0)?'debit':'credit'}">${entry?.quantityExpired ?: 0}</span>
 									</td>
 									<td class="center">	    	
-							    		${entry?.quantityConsumed ?: 0}
+							    		<span class="${(entry?.quantityConsumed>0)?'debit':'credit'}">${entry?.quantityConsumed ?: 0}</span>
 									</td>
 									<td class="center">	    	
-							    		${entry?.quantityDamaged ?: 0}
+							    		<span class="${(entry?.quantityDamaged>0)?'debit':'credit'}">${entry?.quantityDamaged ?: 0}</span>
 									</td>
 									<td class="center total">
-										${(entry?.quantityTotalOut!=0)?'-':''}${entry?.quantityTotalOut ?: 0 }
+										<span class="${(entry?.quantityTotalOut>0)?'debit':'credit'}">${entry?.quantityTotalOut ?: 0 }</span>
 									</td>
 									<td class="center">	    	
-							    		${entry?.quantityFound ?: 0}
+							    		<span class="${(entry?.quantityFound>=0)?'credit':'debit'}">${entry?.quantityFound ?: 0}</span>
 									</td>
 									<td class="center">	    	
-							    		${entry?.quantityLost ?: 0}
+							    		<span class="${(entry?.quantityLost>=0)?'credit':'debit'}">${entry?.quantityLost ?: 0}</span>
 									</td>
 									<td class="center total">	    	
-							    		${(entry?.quantityAdjusted>0)?'+':'-'}${entry?.quantityAdjusted ?: 0}
+							    		<span class="${(entry?.quantityAdjusted>=0)?'credit':'debit'}">${entry?.quantityAdjusted ?: 0}</span>
 									</td>
 									<td class="center total">	    	
-							    		<strong>${entry?.quantityFinal ?: 0}</strong>
+							    		${entry?.quantityFinal ?: 0}
 									</td>
 						    	</tr>
 					    	</g:each>
 						</tbody>
 					</table>
 				</div>
+				<br/>
 			</g:each>
     	</div>
 	    <script>

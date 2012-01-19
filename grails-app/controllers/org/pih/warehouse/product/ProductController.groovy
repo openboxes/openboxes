@@ -95,8 +95,21 @@ class ProductController {
 	}
     
     def list = {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [productInstanceList: Product.list(params), productInstanceTotal: Product.count()]
+		def productInstanceList = []
+		def productInstanceTotal = 0;
+		
+        params.max = Math.min(params.max ? params.int('max') : 15, 100)
+		
+		if (params.searchTerm) { 
+			productInstanceList = Product.findAllByNameLike("%" + params.searchTerm + "%", params)
+			productInstanceTotal = Product.countByNameLike("%" + params.searchTerm + "%", params);
+		}
+		else { 
+			productInstanceList = Product.list(params)			
+			productInstanceTotal = Product.count()
+		}
+		
+        [productInstanceList: productInstanceList, productInstanceTotal: productInstanceTotal]
     }
 	
 	def create = { 

@@ -32,6 +32,13 @@
 	            </div>
             </g:hasErrors>
 
+			<div class="buttonBar">            	
+            	<span class="linkButton">
+            		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="['products']"/></g:link>
+            	</span>
+           	</div>
+
+
 			<g:set var="formAction"><g:if test="${productInstance?.id}">update</g:if><g:else>save</g:else></g:set>			
             <g:form action="${formAction}" method="post">
 				<g:hiddenField name="action" value="save"/>                					

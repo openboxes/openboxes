@@ -42,7 +42,8 @@ button {
 .box { 
 	border: 1px solid lightgrey;
 	margin: 1px;
-	
+	background-color: #f7f7f7; 
+	padding: 10px;
 }
 .padded { 
 	padding: 25px;	
@@ -57,8 +58,9 @@ button {
 
 
 /* Added to fix an issue with being able to select actions from the action menu at the bottom of pages */
-.body { 
-	margin-bottom: 200px;
+body { 
+	
+	padding-bottom: 200px;
 }
 
 .debit { 
@@ -402,17 +404,17 @@ input.button {
 	background-color: #F7F7F7;
 }
 .buttonBar { 
-	background-color: #F7F7F7;
+	background-color: white;
 	padding: 10px;
-	text-align: center;
+	text-align: left;
 }
 
 #resultSummary { 
 	font-size: 9pt;	
 }
 label { 
+	margin-right: 10px;
 	color: #666;
-	padding-right: 15px; 
 	font-weight: bold;
 }
 label.required { 
@@ -735,6 +737,7 @@ border: 1px solid #CCC;
 	padding: 5px; 
 	margin-left: 20px;
 }
+
 .filterRow {
 	font-size: 13px;
 	padding: 5px; 
@@ -742,13 +745,13 @@ border: 1px solid #CCC;
 	white-space:nowrap;
 	background-color: #F7F7F7; /*#D8D8D8*/	
 }
-.filter {
-	border: 0px solid lightgrey;
+.filterTab {
+	border: 1px solid lightgrey;
 	padding: 5px;
 	margin-left:10px;
 }
 
-.filter a { 
+.filterTab a { 
 	padding: 0 10px 0 10px;
 	margin: 10px;
 }
