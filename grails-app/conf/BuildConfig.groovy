@@ -38,7 +38,6 @@ grails.project.dependency.resolution = {
 		//ivySettings.setVariable("ivy.checksums", "")
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
 		//runtime 'org.docx4j:docx4j:2.7.0'
-		
         // runtime 'mysql:mysql-connector-java:5.1.5'
     }
 

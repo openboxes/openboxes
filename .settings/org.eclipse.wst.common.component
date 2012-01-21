@@ -145,5 +145,6 @@
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/yui-2.8.2.1/grails-app/conf"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/yui-2.8.2.1/grails-app/taglib"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/yui-2.8.2.1/src/groovy"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/executor-0.3/src/groovy"/>
     </wb-module>
 </project-modules>

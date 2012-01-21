@@ -37,6 +37,10 @@
 	<classpathentry kind="lib" path="lib/antlr-runtime-3.3.jar"/>
 	<classpathentry kind="lib" path="lib/docx4j-2.7.0.jar"/>
 	<classpathentry kind="lib" path="lib/stringtemplate-3.2.1.jar"/>
+	<classpathentry kind="lib" path="lib/liquibase-1.9.5.jar"/>
+	<classpathentry kind="lib" path="lib/core-renderer-minimal.jar"/>
+	<classpathentry kind="lib" path="lib/core-renderer.jar"/>
+	<classpathentry kind="lib" path="lib/iText-2.0.8.jar"/>
 	<classpathentry kind="src" path=".link_to_grails_plugins/app-info-0.4.3/grails-app/controllerMixins">
 		<attributes>
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
@@ -133,6 +137,11 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path=".link_to_grails_plugins/excel-import-0.3/src/groovy">
+		<attributes>
+			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path=".link_to_grails_plugins/executor-0.3/src/groovy">
 		<attributes>
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
 		</attributes>
@@ -392,9 +401,5 @@
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/liquibase-1.9.5.jar"/>
-	<classpathentry kind="lib" path="lib/core-renderer-minimal.jar"/>
-	<classpathentry kind="lib" path="lib/core-renderer.jar"/>
-	<classpathentry kind="lib" path="lib/iText-2.0.8.jar"/>
 	<classpathentry kind="output" path="target-eclipse/classes"/>
 </classpath>

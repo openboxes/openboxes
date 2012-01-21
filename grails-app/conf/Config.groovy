@@ -163,8 +163,8 @@ log4j = {
 		'org.apache.http.headers',
 		'org.apache.ddlutils',
 		'org.apache.http.wire',
-		'net.sf.ehcache.hibernate'		
-	
+		'net.sf.ehcache.hibernate'
+		
 	info	'org.liquibase', 	
 		'grails.app.controller',
 		'com.mchange',
