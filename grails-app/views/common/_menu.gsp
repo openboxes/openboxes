@@ -273,7 +273,7 @@
 		<ul>
 			<li>
 				<span class="menuButton">
-					<g:link controller="admin" action="checkSettings"><warehouse:message code="default.manage.label" args="[warehouse.message(code:'default.settings.label')]"/></g:link>
+					<g:link controller="admin" action="showSettings"><warehouse:message code="default.manage.label" args="[warehouse.message(code:'default.settings.label')]"/></g:link>
 				</span>		
 			</li>
 		</ul>
