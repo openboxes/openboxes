@@ -58,44 +58,45 @@ class BootStrap {
 		// Migrating existing data to the new data model is still a work in progress, but you can 
 		// use the previous versions changelogs.  
 		//
-		if (GrailsUtil.environment == 'test' || GrailsUtil.environment == 'development' || 
-			GrailsUtil.environment == 'client' || GrailsUtil.environment == 'root') {
-			log.info("\t\tRunning liquibase changelog(s) ...")
-			Liquibase liquibase = null
-			try {
-				def connection = dataSource.getConnection()
-				if (connection == null) {
-					throw new RuntimeException("Connection could not be created.");
-				}
-				//LiquibaseUtil.class.getClassLoader();
-				def classLoader = getClass().classLoader;
-				def fileOpener = classLoader.loadClass("org.liquibase.grails.GrailsFileOpener").getConstructor().newInstance()
+		//if (GrailsUtil.environment == 'test' || GrailsUtil.environment == 'development' || 
+			//GrailsUtil.environment == 'client' || GrailsUtil.environment == 'root') {
+		log.info("\t\tRunning liquibase changelog(s) ...")
+		Liquibase liquibase = null
+		try {
+			
+			def connection = dataSource.getConnection()
+			if (connection == null) {
+				throw new RuntimeException("Connection could not be created.");
+			}
+			//LiquibaseUtil.class.getClassLoader();
+			def classLoader = getClass().classLoader;
+			def fileOpener = classLoader.loadClass("org.liquibase.grails.GrailsFileOpener").getConstructor().newInstance()
 
-				//def fileOpener = new ClassLoaderFileOpener()
-				def database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
-				log.info("\t\tSetting default schema to " + connection.catalog)
-				log.info("\t\tProduct Version: " + database.databaseProductVersion)
-				log.info("\t\tDatabase Version: " + database.databaseMajorVersion + "." + database.databaseMinorVersion)
-				def ranChangeSets = database.getRanChangeSetList()
-				database.setDefaultSchemaName(connection.catalog)
-				
-				// If nothing has been created yet, let's create all new database objects with the install scripts
-				//if (!ranChangeSets) { 
-				//	liquibase = new Liquibase("install.xml", fileOpener, database);
-				//	liquibase.update(null)
-				//}
-				
-				// Run through the updates in the master changelog
-				liquibase = new Liquibase("changelog.xml", fileOpener, database);
-				liquibase.update(null)
-			}
-			finally {
-				if (liquibase && liquibase.database) {
-					liquibase.database.close()
-				}
-			}
-			log.info("\t\tFinished running liquibase changelog(s)!")
+			//def fileOpener = new ClassLoaderFileOpener()
+			def database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
+			log.info("\t\tSetting default schema to " + connection.catalog)
+			log.info("\t\tProduct Version: " + database.databaseProductVersion)
+			log.info("\t\tDatabase Version: " + database.databaseMajorVersion + "." + database.databaseMinorVersion)
+			def ranChangeSets = database.getRanChangeSetList()
+			database.setDefaultSchemaName(connection.catalog)
+			
+			// If nothing has been created yet, let's create all new database objects with the install scripts
+			//if (!ranChangeSets) { 
+			//	liquibase = new Liquibase("install.xml", fileOpener, database);
+			//	liquibase.update(null)
+			//}
+			
+			// Run through the updates in the master changelog
+			liquibase = new Liquibase("changelog.xml", fileOpener, database);
+			liquibase.update(null)
 		}
+		finally {
+			if (liquibase && liquibase.database) {
+				liquibase.database.close()
+			}
+		}
+		log.info("\t\tFinished running liquibase changelog(s)!")
+		
 		
 				
 		def destroy = {

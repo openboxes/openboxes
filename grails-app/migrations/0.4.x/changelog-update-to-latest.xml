@@ -21,6 +21,11 @@
 		</insert>
 	</changeSet>
 	<changeSet author="jmiranda" id="1327591155937-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT count(*) FROM shipment_workflow WHERE id = 4]]>
+			</sqlCheck>
+		</preConditions>
          <insert tableName="shipment_workflow">
         	<column name="id" valueNumeric="4"/>
         	<column name="name" value="Land shipment workflow"/>
@@ -31,6 +36,15 @@
         </insert>   
 	</changeSet>
 	<changeSet author="jmiranda" id="1327591155937-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				<![CDATA[
+					SELECT count(*) 
+					FROM shipment_workflow_reference_number_type 
+					WHERE shipment_workflow_reference_number_types_id=4 AND reference_number_type_id=9
+				]]>
+			</sqlCheck>
+		</preConditions>
 		<insert tableName="shipment_workflow_reference_number_type">
 			<column name="shipment_workflow_reference_number_types_id" valueNumeric="4" />
 			<column name="reference_number_type_id" valueNumeric="9" />
