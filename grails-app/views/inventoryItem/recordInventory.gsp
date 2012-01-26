@@ -63,7 +63,7 @@
 						<div id="inventoryForm">		
 							<g:form action="saveRecordInventory" autocomplete="off">
 								
-									<h2 class="fade"> <warehouse:message code="inventory.recordCurrentInventory.label"/></h2>
+									<h4> <warehouse:message code="inventory.recordCurrentInventory.label"/></h4>
 									
 									<g:hiddenField name="product.id" value="${commandInstance.product?.id}"/>
 									<g:hiddenField name="inventory.id" value="${commandInstance?.inventory?.id}"/>
