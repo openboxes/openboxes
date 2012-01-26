@@ -47,79 +47,75 @@
 									</td>	
 								</tr>
 					            <tr class="prop">
-					                <td valign="top" class="name">
+					                <td class="name">
 					                    <label for="firstName"><warehouse:message code="user.firstName.label" default="First Name" /></label>
 					                </td>
-					                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'firstName', 'errors')}">
+					                <td class="value ${hasErrors(bean: userInstance, field: 'firstName', 'errors')}">
 					                    <g:textField name="firstName" value="${userInstance?.firstName}" />
 					                </td>
 					            </tr>
 	
 					            <tr class="prop">
-					                <td valign="top" class="name">
+					                <td class="name">
 					                    <label for="lastName"><warehouse:message code="user.lastName.label" default="Last Name" /></label>
 					                </td>
-					                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'lastName', 'errors')}">
+					                <td class="value ${hasErrors(bean: userInstance, field: 'lastName', 'errors')}">
 					                    <g:textField name="lastName" value="${userInstance?.lastName}" />
 					                </td>
 					            </tr>
 
 					            <tr class="prop">
-					                <td valign="top" class="name">
+					                <td class="name">
 					                    <label for="email"><warehouse:message code="user.email.label" default="Email" /></label>
 					                </td>
-					                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'email', 'errors')}">
+					                <td class="value ${hasErrors(bean: userInstance, field: 'email', 'errors')}">
 					                    <g:textField name="email" value="${userInstance?.email}" />
 					                </td>
 					            </tr>
-					        
-								<tr class="prop">
-									<td colspan="2"><hr/></td>
-								</tr>
 						
 					            <tr class="prop">
-					                <td valign="top" class="name">
+					                <td class="name">
 					                    <label for="username"><warehouse:message code="user.username.label" default="Username" /></label>
 					                </td>
-					                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
+					                <td class="value ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
 					                    <g:textField name="username" value="${userInstance?.username}" />
 					                </td>
 					            </tr>
 
 	
 					            <tr class="prop">
-					                <td valign="top" class="name">
+					                <td class="name">
 					                    <label for="password"><warehouse:message code="user.password.label" default="Password" /></label>
 					                </td>
-					                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
+					                <td class="value ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
 					                    <g:passwordField name="password" value="${userInstance?.password}" />
 					                </td>
 					            </tr>
 						    
 					            <tr class="prop">
-					                <td valign="top" class="name">
+					                <td class="name">
 					                  <label for="passwordConfirm"><warehouse:message code="user.confirmPassword.label" default="Confirm Password" /></label>
 					                </td>
-					                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'passwordConfirm', 'errors')}">
+					                <td class="value ${hasErrors(bean: userInstance, field: 'passwordConfirm', 'errors')}">
 					                    <g:passwordField name="passwordConfirm" value="${userInstance?.passwordConfirm}" />
 					                </td>
 					            </tr>	
 	                            <tr class="prop">
-	                                <td valign="top" class="name">
+	                                <td class="name">
 	                                  <label for="locale"><warehouse:message code="default.locale.label"/></label>
 	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'locale', 'errors')}">
+	                                <td class="value ${hasErrors(bean: userInstance, field: 'locale', 'errors')}">
 	                                    <g:select name="locale" from="${ grailsApplication.config.locale.supportedLocales.collect{ new Locale(it) } }" optionValue="displayName" value="${userInstance?.locale}" noSelection="['':'']"/>
 	                                </td>
 	                            </tr>	
 								<tr class="prop">	
-									<td class=""></td>					
+									<td class="name"></td>					
 									<td valign="top" style="text-align: right">
 										<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt=""/> <warehouse:message code="auth.signup.label"/></button>					   
 									</td>
 								</tr>
 								<tr class="prop">
-									<td valign="top" class="" colspan="2">
+									<td class="name" colspan="2">
 										<div style="text-align: left">				
 											<warehouse:message code="auth.alreadyHaveAccount.text"/> <g:link class="list" controller="auth" action="login"><warehouse:message code="auth.login.label" default="Login"/></g:link>
 										</div>

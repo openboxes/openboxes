@@ -73,7 +73,7 @@
 			 	
 				<%-- Main content section --%>
 			 	<table>
-			 		<tr>
+			 		<tr class="prop">
 				 		<%-- Display the pallets & boxes in this shipment --%> 
 			 			<td valign="top" style="padding: 0px; margin: 0px; width: 250px; height: 100px; border-right: 1px solid lightgrey;" >
 							<div class="list" style="text-align: left; border: 0px solid lightgrey;">

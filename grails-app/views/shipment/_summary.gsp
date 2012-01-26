@@ -26,18 +26,24 @@
 						</span>							
 					</div>
 					<div>
-						<span class="shipmentType">
-							<warehouse:message code="shipping.shipmentType.label"/>:						
-							<label>${format.metadata(obj:shipmentInstance?.shipmentType)}</label> 
-						</span>
-						<span class="status">
-							<warehouse:message code="shipping.status.label"/>:
-							<label><format:metadata obj="${shipmentInstance?.status?.code}"/></label>
-						</span>
-						<span class="expectedShippingDate">
-							<warehouse:message code="shipping.expectedShippingDate.label"/>:						
-							<label><format:date obj="${shipmentInstance?.expectedShippingDate}"/></label> 
-						</span>
+						<g:if test="${shipmentInstance?.shipmentType }">
+							<span class="shipmentType">
+								<warehouse:message code="shipping.shipmentType.label"/>:						
+								<label>${format.metadata(obj:shipmentInstance?.shipmentType)}</label> 
+							</span>
+						</g:if>
+						<g:if test="${shipmentInstance?.status?.code }"
+							<span class="status">
+								<warehouse:message code="shipping.status.label"/>:
+								<label><format:metadata obj="${shipmentInstance?.status?.code}"/></label>
+							</span>
+						</g:if>
+						<g:if test="${shipmentInstance?.expectedShippingDate }">
+							<span class="expectedShippingDate">
+								<warehouse:message code="shipping.expectedShippingDate.label"/>:						
+								<label><format:date obj="${shipmentInstance?.expectedShippingDate}"/></label> 
+							</span>
+						</g:if>
 					</div>
 											
 						

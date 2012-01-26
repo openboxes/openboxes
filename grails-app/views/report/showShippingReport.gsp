@@ -134,7 +134,7 @@
 							</label>
 						</td>
 						<td class="value underline">
-							<span class="value"></span>						
+							<span class="value">${command?.shipment?.getReferenceNumber('License Plate Number')?.identifier }</span>						
 						</td>
 					</tr>
 					<tr>

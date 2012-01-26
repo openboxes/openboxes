@@ -1,7 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog
-    xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-    
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+ 
+	<changeSet author="jmiranda" id="1327591155937-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT count(*) FROM reference_number_type WHERE name="License Plate Number"]]>
+			</sqlCheck>
+		</preConditions>
+		<insert tableName="reference_number_type">
+			<column name="id" valueNumeric="9" />
+			<column name="name" value="License Plate Number" />
+			<column name="description" value="License Plate Number|fr:Plaque" />
+			<column name="sort_order" valueNumeric="0" />
+			<column name="version" valueNumeric="0" />
+			<column name="date_created" valueDate="2012-01-26" />
+			<column name="last_updated" valueDate="2012-01-26" />
+		</insert>
+	</changeSet>
+	<changeSet author="jmiranda" id="1327591155937-2">
+         <insert tableName="shipment_workflow">
+        	<column name="id" valueNumeric="4"/>
+        	<column name="name" value="Land shipment workflow"/>
+        	<column name="shipment_type_id" valueNumeric="3"/>
+            <column name="version" valueNumeric="0"/>
+			<column name="date_created" valueDate="2012-01-26"/>
+            <column name="last_updated" valueDate="2012-01-26"/>            
+        </insert>   
+	</changeSet>
+	<changeSet author="jmiranda" id="1327591155937-3">
+		<insert tableName="shipment_workflow_reference_number_type">
+			<column name="shipment_workflow_reference_number_types_id" valueNumeric="4" />
+			<column name="reference_number_type_id" valueNumeric="9" />
+			<column name="reference_number_types_idx" valueNumeric="0" />
+		</insert>	
+	</changeSet>
+
+
 </databaseChangeLog>
     
