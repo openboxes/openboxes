@@ -2,6 +2,7 @@ package org.pih.warehouse.admin
 
 import java.net.HttpURLConnection;
 import java.net.URLConnection;
+import java.util.concurrent.FutureTask;
 
 import javax.swing.text.html.HTML;
 
@@ -22,6 +23,58 @@ class AdminController {
     def plugins = { } 
     def status = { } 
     
+	def static LOCAL_TEMP_WEBARCHIVE_PATH = "warehouse.war"
+	
+	def showUpgrade = { UpgradeCommand command ->
+		log.info "show upgrade " + params
+		
+		[
+			command : session.command
+			//remoteFileSize: getRemoteFileSize(command?.remoteWebArchiveUrl),
+			//remoteFileLastModifiedDate: new Date(getRemoteFileLastModifiedDate(command?.remoteWebArchiveUrl)) 
+		]				
+	}
+	
+	
+	def download = { UpgradeCommand command ->
+		log.info "download " + params
+		if (command?.remoteWebArchiveUrl) {
+			session.command = command
+			session.command.future = null
+			session.command?.localWebArchive = new File("warehouse.war")								
+			flash.message = "Attempting to download '" + command?.remoteWebArchiveUrl + "' to '" + command?.localWebArchive?.absolutePath + "'"
+			session.command.future = callAsync {			
+				return doDownloadWar(command?.remoteWebArchiveUrl, command?.localWebArchive)
+			}
+		}
+		else {
+			flash.message = "Please enter valid web archive url";
+			
+		}
+		
+		chain(action: "showUpgrade", model: [command : command])
+		//redirect (action: "showUpgrade")
+	}
+	
+	
+	def deploy = { UpgradeCommand command -> 
+		log.info "deploy " + params
+		
+		session.command.localWebArchivePath = command.localWebArchivePath
+		command.localWebArchive = session.command.localWebArchive
+	
+		def source = session.command.localWebArchive		
+		def destination = new File(session.command.localWebArchivePath)		
+		def backup = new File(session.command.localWebArchive.absolutePath + ".backup")
+		log.info "Copying wbe archive to backup " + source.absolutePath + " to " + backup.absolutePath
+		backup.bytes = source.bytes
+		
+		log.info "Copying web archive to web container " + destination.absolutePath 
+		destination.bytes = source.bytes	
+		
+		chain(action: "showUpgrade", model: [command : command])
+		//redirect (view: "showUpgrade", model: [command: command])
+	}
 	
 	def showSettings = { 		
 		def externalConfigProperties = []
@@ -29,7 +82,6 @@ class AdminController {
 			// Hack to remove the file: protocol from the URL string
 			filename -= "file:"
 			def file = new File(filename)
-			
 			def inputStream = new FileInputStream(file)
 			def properties = new Properties()
 			properties.load(inputStream)
@@ -37,10 +89,6 @@ class AdminController {
 		}
 			
 		[	
-			applications: getApplications(),
-			warFile : new File("/tmp/warehouse.war"),
-			warSize: getFileSize(),
-			warLastModifiedDate: new Date(getFileLastModifiedDate()),
 			externalConfigProperties: externalConfigProperties,
 			systemProperties : System.properties,
 			env: GrailsUtil.environment,
@@ -50,24 +98,64 @@ class AdminController {
 			port: "${config.grails.mail.port}"
 		]
 	}
-	
-	def updateSettings = { 
 		
-	}
 	
-	
-	def updateWar = { 
-		log.info("Updating war file")
+	def downloadWar = { 
+		log.info params
+		log.info("Updating war file " + params)
+		def url = "http://ci.pih-emr.org/downloads/warehouse.war"
 		def future = callAsync {
-			log.info "Within call async"
-			return downloadWar() 
+			return doDownloadWar(url) 
 		}		
 		session.future = future		
 		redirect(action: "showSettings")
 	}
 	
+	def cancelUpdateWar = { 
+		log.info params
+		if (session.future) { 
+			session.future.cancel(true)
+			new File(LOCAL_TEMP_WEBARCHIVE_PATH).delete()
+		}
+		redirect(action: "showSettings")
+	}
+		
+	def deployWar = { UpgradeCommand -> 
+		log.info params
+		def source = session.command.localWebArchive
+		
+		def destination = new File(session.command.localWebArchivePath) 
+		
+		def backup = new File(session.command.localWebArchive.absolutePath + ".backup")
+		log.info "Backing up " + source.absolutePath + " to " + backup.absolutePath 
+		backup.bytes = source.bytes
+
+		//destination.bytes = source.bytes
+		
+		
+		redirect(action: "showSettings")
+	}
+
+	Integer doDownloadWar(String remoteUrl, File localFile) { 
+		try { 
+			log.info("Downloading war file " + remoteUrl + " .... ")
+			def outputStream = new BufferedOutputStream(new FileOutputStream(localFile))		
+			def url = new URL(remoteUrl)
+			outputStream << url.openStream()
+			outputStream.close();
+			log.info("... done downloading remote file " + remoteUrl + " to " + localFile.absolutePath)
+			//return file.absolutePath
+			return 0
+		} catch (Exception e) { 
+			log.error e
+			throw e;
+		}
+	}
 	
-	def reloadWar = { 
+	
+	
+	/*
+	def reloadWar = {
 		log.info("Reloading war file")
 		def future = callAsync {
 			log.info "Within call async"
@@ -75,52 +163,9 @@ class AdminController {
 		}
 		session.future = future
 		redirect(action: "showSettings")
-
 	}
 	
-	def cancelUpdateWar = { 
-		if (session.future) { 
-			session.future.cancel(true)
-			new File("/tmp/warehouse.war").delete()
-		}
-		redirect(action: "showSettings")
-	}
-	
-	def checkForUpdates = { 
-		
-		
-	}
-	
-	def deployWar = { 
-		
-		//FileUtil.copyFile(new File("/tmp/warehouse.war"),
-		//	new File("/var/lib/tomcat6/webapps/warehouse.war"))
-		def source = new File("/tmp/warehouse.war");
-		
-		def destination = new File("/var/lib/tomcat6/webapps/warehouse.war")
-		//def destination = new File("/tmp/warehouse2.war")
-		destination.bytes = source.bytes
-		
-		
-		redirect(action: "showSettings")
-	}
-	
-	
-	def downloadWar = { 
-		log.info("Downloading war file .... ")
-		def fileOutputStream = new FileOutputStream("/tmp/warehouse.war")
-		def outputStream = new BufferedOutputStream(fileOutputStream)
-		
-		def url = "http://ci.pih-emr.org/downloads/warehouse.war"
-		outputStream << new URL(url).openStream()
-		outputStream.close();
-		
-		
-		log.info("... done downloading war file!")
-		return "100";
-	}
-	
-	def reloadWar() { 
+	def doReloadWar() { 
 		def connection = null
 		try {
 			//Create connection
@@ -143,10 +188,10 @@ class AdminController {
 			}
 		}
 	}
+	*/
 	
-	
+	/*
 	def getApplications() { 
-
 		def applications = []		
 		def connection = null
 		try {
@@ -164,7 +209,7 @@ class AdminController {
 			}
 			
 		} catch (Exception e) {
-			log.error e
+			log.error "test"
 
 		} finally {
 
@@ -174,59 +219,69 @@ class AdminController {
 		}
 		return applications 
 	}
+	*/
 
-	def getFileSize() {
-		def contentLength = 0;
-		HttpURLConnection conn = null;
-		try {
-			def url = new URL("http://ci.pih-emr.org/downloads/warehouse.war")
-			conn = (HttpURLConnection) url.openConnection();
-			conn.setRequestMethod("HEAD");
-			conn.getInputStream();
-			return conn.getContentLength();
-		} catch (IOException e) {
-			return -1;
-		} finally {
-			conn.disconnect();
-		}
-	}
+
+
+}
+
+class UpgradeCommand {
 	
-	def getFileDate() {
-		def contentLength = 0;
-		HttpURLConnection conn = null;
-		try {
-			def url = new URL("http://ci.pih-emr.org/downloads/warehouse.war")
-			conn = (HttpURLConnection) url.openConnection();
-			conn.setRequestMethod("HEAD");
-			conn.getInputStream();
-			return conn.getDate();
-		} catch (IOException e) {
-			return -1;
-		} finally {
-			conn.disconnect();
-		}
+	FutureTask future	
+	File localWebArchive
+	String remoteWebArchiveUrl
+	String localWebArchivePath
 
+	static constraints = {
+		future(nullable:true)
+		localWebArchive(nullable:true)
+		remoteWebArchiveUrl(nullable: true)
+		localWebArchivePath(nullable: true)
 	}
 
-	def getFileLastModifiedDate() {
-		def contentLength = 0;
-		HttpURLConnection conn = null;
-		try {
-			def url = new URL("http://ci.pih-emr.org/downloads/warehouse.war")
-			conn = (HttpURLConnection) url.openConnection();
-			conn.setRequestMethod("HEAD");
-			conn.getInputStream();
-			return conn.getLastModified();
-		} catch (IOException e) {
-			return -1;
-		} finally {
-			conn.disconnect();
+	
+	Integer getRemoteFileSize() {
+		if (remoteWebArchiveUrl) { 
+			HttpURLConnection conn = null;
+			try {
+				conn = (HttpURLConnection) new URL(remoteWebArchiveUrl).openConnection();
+				conn.setRequestMethod("HEAD");
+				conn.getInputStream();
+				return conn.getContentLength();
+			} catch (IOException e) {
+				return -1;
+			} finally {
+				if (conn) conn.disconnect();
+			}
 		}
-
+		return -1;
 	}
-
-
+	
+	Date getRemoteFileLastModifiedDate() {
+		if (remoteWebArchiveUrl) { 
+			HttpURLConnection conn = null;
+			try {
+				conn = (HttpURLConnection) new URL(remoteWebArchiveUrl).openConnection();
+				conn.setRequestMethod("HEAD");
+				conn.getInputStream();
+				return new Date(conn.getLastModified());
+			} catch (IOException e) {
+				return null;
+			} finally {
+				if (conn) conn.disconnect();
+			}
+		}
+		return null;		
+	}
 	
 	
+	Float getProgressPercentage() { 
+		def remoteFileSize = getRemoteFileSize()
+		def localFileSize = localWebArchive?.size()
+		if (remoteFileSize > 0 && localFileSize > 0) { 
+			return (localFileSize / remoteFileSize) * 100
+		}
+		return -1;
+	}
 	
 }

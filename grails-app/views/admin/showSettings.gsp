@@ -1,4 +1,6 @@
-<%@ page import="org.pih.warehouse.core.Location" %>
+
+<%@ page import="org.pih.warehouse.core.User" %>
+<%@ page import="org.pih.warehouse.core.Role" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -13,39 +15,6 @@
 				<table>
 					<tr class="">
 						<td colspan="2">
-							<h1><warehouse:message code="tomcat.manager.label"/></h1>
-						</td>
-					</tr>
-					<tr class="prop">						
-						<td class="name">
-							<label><warehouse:message code="tomcat.applications.label"/></label>
-						</td>
-						<td class="value">
-							<table>
-								<g:each in="${applications }" var="application">
-									<tr class="prop">
-										<td>
-											${application[0] }
-										</td>
-										<td>							
-											${application[1] }
-										</td>
-										<td>							
-											${application[2] }
-										</td>
-										<td>							
-											${application[3] }
-										</td>
-										<td>							
-											${application[4] }
-										</td>
-									</tr>
-								</g:each>
-							</table>
-						</td>
-					</tr>
-					<tr class="">
-						<td colspan="2">
 							<h1><warehouse:message code="admin.generalSettings.header"/></h1>
 						</td>
 					</tr>
@@ -56,7 +25,7 @@
 							</label>
 						</td>
 						<td class="value">						
-							${grails.util.GrailsUtil.environment}
+							${grails.util.GrailsUtil.environment}							
 						</td>
 					</tr>													
 					<tr class="prop">							
@@ -66,36 +35,10 @@
 							</label>
 						</td>
 						<td class="value">						
-							<g:meta name="app.version"/> &nbsp;			
-							
-							<g:link controller="admin" action="reloadWar">[Reload]</g:link>
-										
-							<g:if test='${!session.future || session.future.isDone() || session.future.isCancelled()}'>
-								<g:link controller="admin" action="updateWar">[Download]</g:link>
-							</g:if>				
-							<g:else>
-								[Update] [<g:link controller="admin" action="cancelUpdateWar">Cancel</g:link>]
-							</g:else>
-							${warLastModifiedDate }
-							<script>
-								$(function() {
-									$( "#progressbar" ).progressbar({
-										value: ${(warFile.size() / warSize) * 100}
-									});
-								});
-							</script>
-							<div>
-								<div id="progressbar"></div>
-								${(warFile.size() / warSize) * 100}%
-								<g:if test="${session?.future?.isCancelled() }">
-									Download was canceled.
-								</g:if>
-								<g:elseif test="${session?.future?.isDone() }">
-									Download has been completed!!!				
-									[<g:link controller="admin" action="deployWar">Deploy</g:link>]
-								</g:elseif>
-							</div>
-							
+							<g:meta name="app.version"/> &nbsp;		
+							<g:if test="${User.get(session?.user?.id)?.roles?.contains(Role.findByRoleType('ROLE_ADMIN'))}">
+								<g:link controller="admin" action="showUpgrade"><warehouse:message code="application.upgrade.label"/></g:link>
+							</g:if>
 						</td>
 					</tr>													
 					<tr class="prop">							
