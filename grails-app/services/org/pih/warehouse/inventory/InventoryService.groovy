@@ -265,7 +265,7 @@ class InventoryService implements ApplicationContextAware {
 				products << new ProductCommand(
 					category: product.category, 
 					product: product, 
-					inventoryLevel: InventoryLevel.findByProduct(product),
+					inventoryLevel: InventoryLevel.findByProductAndInventory(product, commandInstance?.warehouseInstance?.inventory),
 					quantityOnHand: quantityOnHand, 
 					quantityToReceive: quantityToReceive, 
 					quantityToShip: quantityToShip 
@@ -1250,6 +1250,17 @@ class InventoryService implements ApplicationContextAware {
 		
 	}
 
+	/**
+	 * 
+	 * @param productList
+	 * @param inventoryInstance
+	 * @return
+	 */
+	Map<Product, InventoryLevel> getInventoryLevels(List<Product> productList, Location location) { 
+		def inventoryLevelList = getInventoryLevelsByInventory(location.inventory);
+		return inventoryLevelList.groupBy { it.product } 
+	}
+	
 	
 	/**
 	 * Get all transaction entries over all products/inventory items.
