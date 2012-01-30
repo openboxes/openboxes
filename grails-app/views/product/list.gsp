@@ -59,7 +59,7 @@
                 </table>
             </div>
             <div class="paginateButtons">
-                <g:paginate total="${productInstanceTotal}" />
+                <g:paginate total="${productInstanceTotal}" params="${params }" />
             </div>
         </div>
     </body>
