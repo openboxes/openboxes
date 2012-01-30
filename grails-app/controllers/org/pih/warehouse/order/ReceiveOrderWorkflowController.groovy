@@ -25,7 +25,7 @@ class ReceiveOrderWorkflowController {
 				// create a new shipment instance if we don't have one already
 				def orderCommand = new OrderCommand();
 				if (params.id) {
-					orderCommand = orderService.getOrder(params.id as int, session.user.id as int)
+					orderCommand = orderService.getOrder(params.id, session.user.id as int)
 				}
 				else {
 					flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
