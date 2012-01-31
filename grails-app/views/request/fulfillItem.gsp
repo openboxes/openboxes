@@ -80,10 +80,10 @@
 							
 							<tr class="${i%2?'odd':'even' }">	
 								<td>
-									${inventoryItem.lotNumber?:"none" }
+									${inventoryItem.lotNumber?:warehouse.message(code: 'default.none.label') }
 								</td>
 								<td>
-									${inventoryItem.expirationDate?:"${warehouse.message(code: 'default.never.label')}" }
+									${inventoryItem.expirationDate?:warehouse.message(code: 'default.never.label')}
 								</td>
 								<td>
 									${quantity }
@@ -96,7 +96,7 @@
 					</table>
 				</div>
 				<div class="center buttons">
-					<g:submitButton name="fullRequestItemRemote" value="Fulfill"></g:submitButton>
+					<g:submitButton name="fullRequestItemRemote" value="${warehouse.message(code: 'request.fulfill.label')}"></g:submitButton>
 				</div>
 			</fieldset>
 		</g:form>
