@@ -1,11 +1,7 @@
 <html>
 	<head>
     	<title>Test Email Service</title>
-    	<style>
-    		label { display: block; }
-    		div, fieldset { padding: 10px; }  
-    		
-    	</style>
+		<meta name="layout" content="custom"/>
 	</head> 
 	<body>
 	
@@ -14,25 +10,46 @@
 				${flash.message}		
 			</div>
 		</g:if>
-		<a href="${request.contextPath }/test/sendEmail">Refresh</a>
 		<g:form action="sendEmail" method="POST">
 			<fieldset>
 				<legend>Send Simple Email</legend>
-				<div> 
-					<label for="to">To:</label>
-					<g:textField name="to" size="30" />
-				</div>
-				<div>
-					<label for="subject">Subject:</label>
-					<g:textField name="subject" size="50" />		
-				</div>
-				<div>
-					<label for="htmlMsg">HTML Message:</label>
-					<g:textArea name="htmlMsg" cols="60" rows="5"/>			
-				</div>
-				<div>
-					<g:actionSubmit action="sendEmail" value="Send" />	
-				</div>
+				<table>
+					<tr class="prop">
+						<td class="name">
+							<label for="to">To:</label>
+						</td>
+						<td class="value">
+							<g:textField name="to" size="30" />
+						</td>
+					</tr> 
+					<tr class="prop">
+						<td class="name">
+							<label for="subject">Subject:</label>
+						</td>
+						<td class="value">
+							<g:textField name="subject" size="50" />	
+						</td>
+					</tr> 
+					<tr class="prop">
+						<td class="name">
+							<label for="htmlMsg">HTML Message:</label>
+						</td>
+						<td class="value">
+							<g:textArea name="htmlMsg" cols="60" rows="5"/>		
+						</td>
+					</tr> 
+					<tr class="prop">
+						<td></td>
+						<td>
+							<g:actionSubmit action="sendEmail" value="Send" />	&nbsp;
+							<a href="${request.contextPath }/test/sendEmail">Cancel</a>
+							
+						</td>
+					</tr>
+				</table>
+					
+					
+				
 			</fieldset>
 		</g:form>
 	</body> 

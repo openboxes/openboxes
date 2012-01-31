@@ -12,16 +12,18 @@
 	 		.ui-state-highlight { font-weight: bold; color: black; }  
 	 		.strikethrough { color: lightgrey; } 
 	 		.containers td { border-right: 0px solid lightgrey; }
+ 			
 	 		.selected { 
 	 			border-right: 0px; 
-				padding-left:20px;
-		 		background:transparent url('${resource(dir: 'images/icons/silk', file: 'bullet_yellow.png')}') center left no-repeat;
+				padding-left: 15px;
+		 		/*background:transparent url('${resource(dir: 'images/icons/silk', file: 'bullet_yellow.png')}') center left no-repeat;*/
 	 		}
 	 		.not-selected { 
 	 			border-right: 0px; 
-				padding-left:20px;
-		 		background:transparent url('${resource(dir: 'images/icons/silk', file: 'bullet_white.png')}') center left no-repeat;
+				padding-left: 15px;
+		 		/*background:transparent url('${resource(dir: 'images/icons/silk', file: 'bullet_white.png')}') center left no-repeat;*/
 	 		}
+	 		
 		</style>
 				
     </head>
@@ -69,7 +71,6 @@
 		 		<g:if test="${itemToMove }">
 		 			<g:render template="moveItem" model="['item':itemToMove]"/>
 		 		</g:if>
-			 	
 			 	
 				<%-- Main content section --%>
 			 	<table>
@@ -146,7 +147,7 @@
 												<tr style="border: 0px solid lightgrey;" class="${count++%2==0?'even':'odd' }">
 													<td style="vertical-align: middle;" id="${containerInstance?.id }" class="droppable">													
 														<a name="container-${containerInstance.id }"></a>
-														<div >
+														<div>
 															<span class="action-menu" >
 																<button class="action-btn">
 																	<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>

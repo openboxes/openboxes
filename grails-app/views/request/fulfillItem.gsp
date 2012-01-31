@@ -83,7 +83,7 @@
 									${inventoryItem.lotNumber?:"none" }
 								</td>
 								<td>
-									${inventoryItem.expirationDate?:"never" }
+									${inventoryItem.expirationDate?:"${warehouse.message(code: 'default.never.label')}" }
 								</td>
 								<td>
 									${quantity }

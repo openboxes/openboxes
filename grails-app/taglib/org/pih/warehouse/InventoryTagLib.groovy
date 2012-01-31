@@ -71,7 +71,7 @@ class InventoryTagLib {
 									\$('#${id}-date').html(ui.item.expirationDate);
 								}
 								else { 
-									\$('#${id}-date').html('<span class="fade">never</span>');								
+									\$('#${id}-date').html('<span class="fade">${warehouse.message(code: 'default.never.label')}</span>');								
 								}
 								\$('#lotNumberDate').val(ui.item.expirationDate);
 								\$('#${id}-suggest').focus();

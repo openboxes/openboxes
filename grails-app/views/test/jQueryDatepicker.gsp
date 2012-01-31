@@ -1,12 +1,7 @@
 <html>
   <head>
     <title>Simple JQuery Datepicker example</title>
-    <g:javascript library="jquery" />
-    <!-- Dynamically include jquery-ui resources -->
-    <!-- <jqui:resources components="datepicker" mode="normal" theme="ui-darkness" /> -->
-	<!-- Manually include jquery-ui resources -->
-	<link href="${createLinkTo(dir:'js/jquery.ui/css/cupertino', file:'jquery-ui-1.8.2.custom.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
-	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-ui-1.8.2.custom.min.js')}" type="text/javascript" ></script>
+	<meta name="layout" content="custom" />    	
 
 	<script type="text/javascript"> 
 		$(document).ready(function() { 
@@ -15,8 +10,11 @@
 	</script>
 	</head> 
 	<body>
+		
+		<g:render template="menu"/>
+		
 		<div>
-			<p>Between <input type="text" id="datepicker"> </p> 
+			<p>Date <input type="text" id="datepicker"> </p> 
 		</div>	
 	</body> 
 </html>

@@ -12,6 +12,10 @@ class TestController {
 	
 	def mailService;
 
+	def index = { 
+		
+	}
+	
 	/*
 	def testHttpBuilder =  {		
 		def http = new HTTPBuilder("http://localhost:8080/amazon")
@@ -26,7 +30,7 @@ class TestController {
 	def jQuery = {
 	}
 	
-	def jQueryTabs = {
+	def jqueryTabs = {
 	} 	
 	
 	def jQueryDatepicker = {

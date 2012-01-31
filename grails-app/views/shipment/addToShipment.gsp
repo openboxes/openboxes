@@ -84,7 +84,7 @@
 													<g:formatDate date="${item?.inventoryItem?.expirationDate }" format="MMM yyyy"/>								
 												</g:if>
 												<g:else>
-													<span class="fade">never</span>
+													<span class="fade">${warehouse.message(code: 'default.never.label')}</span>
 												</g:else>
 											</td>
 											<td class="center">
@@ -107,7 +107,7 @@
 											</td>
 											<td class="center middle" style="padding: 0">										
 												<g:select name="items[${status }].shipment.id" from="${shipments }" 
-													noSelection="${['null':'Select a shipment...']}" value="${item?.shipment?.id }"
+													noSelection="${['null':warehouse.message(code:'shipping.selectShipment.label')]}" value="${item?.shipment?.id }"
 													optionKey="id" optionValue="name" />
 												<g:set var="status" value="${status+1 }"/>
 											</td>
@@ -131,7 +131,7 @@
 													<g:formatDate date="${item?.inventoryItem?.expirationDate }" format="MMM yyyy"/>								
 												</g:if>
 												<g:else>
-													<span class="fade">never</span>
+													<span class="fade">${warehouse.message(code: 'default.never.label')}</span>
 												</g:else>
 											</td>
 											<td class="center">

@@ -261,6 +261,9 @@ class InventoryService implements ApplicationContextAware {
 			def quantityToReceive = quantityIncomingMap[product] ?: 0;
 			def quantityToShip = quantityOutgoingMap[product] ?: 0;
 			
+			def inventoryLevel = InventoryLevel.findByProductAndInventory(product, commandInstance?.warehouseInstance?.inventory)
+			//log.info "inventory level " + product?.name + ": " + inventoryLevel?.status
+			
 			if (commandInstance?.showOutOfStockProducts || (quantityOnHand + quantityToReceive + quantityToShip > 0)) {
 				products << new ProductCommand(
 					category: product.category, 
@@ -436,11 +439,14 @@ class InventoryService implements ApplicationContextAware {
 			categoryFilters.add(commandInstance?.categoryInstance);
 		}
 		List searchTerms = (commandInstance?.searchTerms ? Arrays.asList(commandInstance?.searchTerms.split(" ")) : null);
+		
+		log.info("get products: " + commandInstance?.warehouseInstance)
 		def products = getProductsByAll(
-				searchTerms,
-				categoryFilters,
-				commandInstance?.showUnsupportedProducts, 
-				commandInstance?.showNonInventoryProducts);
+			commandInstance?.warehouseInstance,
+			searchTerms,
+			categoryFilters,
+			commandInstance?.showUnsupportedProducts, 
+			commandInstance?.showNonInventoryProducts);
 
 
 		products = products?.sort() { it?.name };
@@ -453,7 +459,7 @@ class InventoryService implements ApplicationContextAware {
 	* @param categories
 	* @return
 	*/
-   List getProductsByAll(List productFilters, List categoryFilters, Boolean showUnsupportedProducts, Boolean showNonInventoryProducts) {
+   List getProductsByAll(Location location, List productFilters, List categoryFilters, Boolean showUnsupportedProducts, Boolean showNonInventoryProducts) {
 	   // Get products that match the search terms by name and category
 	   def categories = getCategoriesMatchingSearchTerms(productFilters)
 
@@ -466,26 +472,34 @@ class InventoryService implements ApplicationContextAware {
 	   def session = sessionFactory.getCurrentSession()
 	  
 	   // Get all products, including hidden ones 
-	   def products = []
-	   if (showUnsupportedProducts && showNonInventoryProducts) { 
-		   def query = session.createQuery("select product from InventoryLevel as inventoryLevel right outer join inventoryLevel.product as product where inventoryLevel.status is null or inventoryLevel.status = 'SUPPORTED' or inventoryLevel.status = 'NOT_SUPPORTED' or inventoryLevel.status = 'SUPPORTED_NON_INVENTORY'")
-		   products = query.list()
-	   }
-	   else if (showUnsupportedProducts) { 
-		   def query = session.createQuery("select product from InventoryLevel as inventoryLevel right outer join inventoryLevel.product as product where inventoryLevel.status is null or inventoryLevel.status = 'SUPPORTED' or inventoryLevel.status = 'NOT_SUPPORTED'")
-		   products = query.list()
-	   }
-	   else if (showNonInventoryProducts) { 
-		   def query = session.createQuery("select product from InventoryLevel as inventoryLevel right outer join inventoryLevel.product as product where inventoryLevel.status is null or inventoryLevel.status = 'SUPPORTED' or inventoryLevel.status = 'SUPPORTED_NON_INVENTORY'")
-		   products = query.list()
-	   }
-	   // Get all products that are managed
-	   else { 
-		   def query = session.createQuery("select product from InventoryLevel as inventoryLevel right outer join inventoryLevel.product as product where inventoryLevel.status is null or inventoryLevel.status = 'SUPPORTED'")
-		   products = query.list()
+	   def products = Product.list()
+	   //def unsupportedProducts = session.createQuery("select product from InventoryLevel as inventoryLevel right outer join inventoryLevel.product as product where (inventoryLevel.status is null or ((inventoryLevel.status = 'SUPPORTED' or inventoryLevel.status = 'NOT_SUPPORTED' or inventoryLevel.status = 'SUPPORTED_NON_INVENTORY') and inventoryLevel.inventory.id = :inventoryId").setParameter("inventoryId", location?.inventory?.id)
+	   //def nonInventoryProducts = 
+	   //def supportedProducts = 
+	   // Start with products that do not have a status
+	   //products.addAll(getSupportedProducts(location))
+	   
+	   println("show unsupported products " + showUnsupportedProducts)
+	   
+	   if (!showUnsupportedProducts) { 
+		   def statuses = []
+		   statuses << InventoryStatus.NOT_SUPPORTED
+		   def removeProducts = getProductsByStatuses(location, statuses)
+		   println "remove " + removeProducts.size() + " unsupported products"
+		   products.removeAll(removeProducts)
+		   
 	   }
 	   
-	   log.debug "base products " + products.size();
+	   println("show non inventory products " + showNonInventoryProducts)
+	   if (!showNonInventoryProducts) { 
+		   def statuses = []
+		   statuses << InventoryStatus.SUPPORTED_NON_INVENTORY
+		   def removeProducts = getProductsByStatuses(location, statuses)
+		   println "remove " + removeProducts.size() + " non-inventories products"
+		   products.removeAll(removeProducts)
+	   }
+	   
+	   log.info "base products " + products.size();
 	   if (matchCategories && productFilters) {
 		   def searchProducts = Product.createCriteria().list() {
 			   and {
@@ -557,6 +571,59 @@ class InventoryService implements ApplicationContextAware {
 		// }
 	   
 	   return products;
+   }
+   
+   
+   /**
+    * 
+    * @param location
+    * @return
+    */
+   List getSupportedProducts(Location location) { 
+	   def products = []
+	   products.addAll(getProductsWithoutInventoryLevel(location))
+	   log.info "Add all without inventory level " + products.size()
+	   products.addAll(getProductsByStatus(location, InventoryStatus.SUPPORTED))
+	   log.info "add all with status == supported " + products.size()
+	   return products
+   }
+   
+   
+   List getProductsWithoutInventoryLevel(Location location) { 
+	   def session = sessionFactory.getCurrentSession()
+	   def query = session.createSQLQuery(
+		   "select * from product left outer join\
+		   (select * from inventory_level where inventory_level.inventory_id = :inventoryId) as i\
+		   on product.id = i.product_id").addEntity(Product.class);
+	   def products = query.setString("inventoryId", location.inventory.id).list();	   
+	   
+	   return products
+   }
+   
+   List getProductsByStatuses(Location location, List statuses) { 
+	   log.info("get products by statuses: " + location)
+	   def session = sessionFactory.getCurrentSession()
+	   def products = session.createQuery("select product from InventoryLevel as inventoryLevel \
+		   right outer join inventoryLevel.product as product \
+           where inventoryLevel.status IN (:statuses) \
+		   and inventoryLevel.inventory.id = :inventoryId")
+		.setParameterList("statuses", statuses)
+		.setParameter("inventoryId", location?.inventory?.id)
+		.list()
+   		return products
+   }
+   
+   
+   List getProductsByStatus(Location location, InventoryStatus status) { 
+	   log.info("get products by status: " + location)
+	   def session = sessionFactory.getCurrentSession()
+	   return session.createQuery("select product from InventoryLevel as inventoryLevel \
+	   		right outer join inventoryLevel.product as product \
+	   		where inventoryLevel.status = :status \
+	   		and inventoryLevel.inventory.id = :inventoryId")
+	   .setParameter("status", status)
+	   .setParameter("inventoryId", location?.inventory?.id)
+	   .list()
    }
 
 	/**

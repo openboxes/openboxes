@@ -134,7 +134,7 @@
 	
 	<g:authorize activity="[ActivityCode.SEND_STOCK]">
 		<h6 class="menu-heading" >
-			<warehouse:message code="shipping.label"  default="Shipping"/>
+			<warehouse:message code="shipping.label" />
 		</h6>
 		<div class="menu-section">
 			<ul>
@@ -163,7 +163,7 @@
 	
 	<g:authorize activity="[ActivityCode.RECEIVE_STOCK]">		
 		<h6 class="menu-heading" >
-			<warehouse:message code="receiving.label"  default="Receiving"/>
+			<warehouse:message code="receiving.label" />
 		</h6>
 		<div class="menu-section">
 			<ul>

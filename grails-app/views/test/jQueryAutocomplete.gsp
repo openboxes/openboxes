@@ -1,14 +1,10 @@
 <html>
   <head>
-    <title>Simple JQuery Datepicker example</title>
-    <g:javascript library="jquery" />
-   
-	<!-- Manually include jquery-ui resources -->
-	<link href="${createLinkTo(dir:'js/jquery.ui/css/cupertino', file:'jquery-ui-1.8.2.custom.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
-	<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery-ui-1.8.2.custom.min.js')}" type="text/javascript" ></script>	
-	
+    <title>Simple JQuery Autocomplete example</title>   
+	<meta name="layout" content="custom" />	
 </head> 
 <body>
+	<g:render template="menu"/>
 	
 	<div>
 		<input id="person-id" type="hidden" name="person.id"/>

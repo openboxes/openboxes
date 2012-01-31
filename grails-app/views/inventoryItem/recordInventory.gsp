@@ -128,7 +128,7 @@
 																	<format:expirationDate obj="${recordInventoryRow?.expirationDate}"/>
 																</g:if>
 																<g:else>
-																	<span class="fade">never</span>
+																	<span class="fade">${warehouse.message(code: 'default.never.label')}</span>
 																</g:else>
 															</td>
 															<td width="10%" style="text-align: center; vertical-align: middle;">
@@ -191,7 +191,7 @@
 
 	// We need to do this in order to make sure the index for new items is correct
 	<g:each var="row" in="${commandInstance?.recordInventoryRows}" status="status">
-		var existingInventoryItem = { Id: '${row.id}', Type: '', ProductId: '', LotNumber: '${row.lotNumber}', ExpirationDate: '${row.expirationDate?:never}', Qty: 0 };	
+		var existingInventoryItem = { Id: '${row.id}', Type: '', ProductId: '', LotNumber: '${row.lotNumber}', ExpirationDate: '${row.expirationDate?:warehouse.message(code: 'default.never.label')}', Qty: 0 };	
 		inventory.InventoryItems.push(existingInventoryItem);
 	</g:each>
 
@@ -377,7 +377,7 @@
 						expirationDate.val(ui.item.expirationDate);						
 					}
 					else { 
-						expirationDate.val('never');
+						expirationDate.val('${warehouse.message(code: 'default.never.label')}');
 					}
 				}							  
 			});				

@@ -3,8 +3,7 @@
 		$("#dlgEditBox").dialog({ autoOpen: true, modal: true, width: '600px' });				
 	});
 </script>	   
-	<div id="dlgEditBox" title="${warehouse.message(code:'shipping.editBox.label')}" style="padding: 10px; display: none;" >
-
+	<div id="dlgEditBox" title="${boxtoEdit ? warehouse.message(code:'shipping.editBox.label') : warehouse.message(code:'shipping.addBox.label')}" style="padding: 10px; display: none;" >
 
 	<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.Container" form="editBox"/>
 	<g:form name="editBox" action="createShipment">

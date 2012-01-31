@@ -748,12 +748,12 @@ border: 1px solid #CCC;
 .filterTab {
 	border: 1px solid lightgrey;
 	padding: 5px;
-	margin-left:10px;
+	margin-left:5px;
 }
 
 .filterTab a { 
-	padding: 0 10px 0 10px;
-	margin: 10px;
+	padding: 0 2px 0 2px;
+	margin: 0px;
 }
 
 
