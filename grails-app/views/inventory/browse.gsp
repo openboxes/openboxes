@@ -25,6 +25,8 @@
 		         	<table>
 		         		<tr>
 		         			<td style="padding:0px; margin:0px;">
+		         				<g:render template="tabs" 
+		         					model="[commandInstance:commandInstance, quickCategories:quickCategories]"/>						
 		         				<g:render template="filters" 
 		         					model="[commandInstance:commandInstance, quickCategories:quickCategories]"/>						
 		         			</td>
@@ -83,13 +85,11 @@
 																		<warehouse:message code="product.untitled.label"/>
 																	</g:else>
 																</g:link> 
-																
-																<g:if test="${!supported }">																
+																<g:if test="${!supported }">
 																	<span class="fade">																
 																		<format:metadata obj="${inventoryItem?.inventoryLevel?.status }"/>
 																	</span>
-																</g:if>
-																															
+																</g:if>								
 															</td>
 															<td class="checkable middle center" style="width: 1%" nowrap="nowrap">
 																<span class="fade">${inventoryItem?.product?.manufacturer }</span>
