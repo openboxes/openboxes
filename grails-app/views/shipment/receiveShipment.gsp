@@ -7,6 +7,9 @@
 	<title><warehouse:message code="shipping.receiveShipment.label"/></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<content tag="pageTitle"><warehouse:message code="shipping.receiveShipment.label"/></content>
+	<style>
+		.top { border-top: 2px solid lightgrey; }
+	</style>
 </head>
 
 <body>
@@ -28,7 +31,6 @@
 				<td width="75%">
 					<fieldset>
 						<g:render template="summary" />
-						
 							<g:form action="receiveShipment" method="POST">
 								<g:hiddenField name="id" value="${shipmentInstance?.id}" />
 								<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />								
@@ -63,7 +65,6 @@
 												<td valign="top"
 													class=" ${hasErrors(bean: receiptInstance, field: 'receiptItem', 'errors')}"
 													nowrap="nowrap">
-													
 														<g:if test="${!receiptInstance.receiptItems}">
 															<warehouse:message code="shipping.noItemsToReceive.label" />
 														</g:if>			
@@ -71,28 +72,37 @@
 															<table>
 																<thead>
 																	<tr>
-																		<th colspan="2"></th>
-																		<th colspan="2" style="text-align: center;"><warehouse:message code="default.quantity.label" /></th>
-																		<th colspan="2"></th>
-																	</tr>
-																	<tr>
+																		<th style="text-align: left;"></th>
 																		<th style="text-align: left;"><warehouse:message code="default.item.label" /></th>
 																		<th style="text-align: center;"><warehouse:message code="default.lotSerialNo.label" /></th>
+																		<th style="text-align: center;"><warehouse:message code="inventoryItem.expirationDate.label" /></th>
 																		<th style="text-align: center;"><warehouse:message code="shipping.shipped.label" /></th>
 																		<th style="text-align: center;"><warehouse:message code="shipping.received.label" /></th>
 																		<th style="text-align: center;"><warehouse:message code="default.comment.label" /></th>
 																	</tr>
 																</thead>
 																<tbody>
-																	<g:each var="receiptItem" in="${receiptInstance.receiptItems}" status="i">															
-																		<tr class="prop ${(i % 2) == 0 ? 'odd' : 'even'}">
+																	<g:each var="shipmentItem" in="${shipmentItems }" status="i">
+																		<g:set var="receiptItem" value="${receiptItemMap[shipmentItem] }"/>
+																		<g:set var="inventoryItem" value="${inventoryItemMap[shipmentItem] }"/>
+																	
+																		<tr class="prop ${(i % 2) == 0 ? 'odd' : 'even'} ${lastContainer!=shipmentItem?.container?'top':'' }">
+																			<td style="text-align: left; vertical-align: middle;">
+																				<g:if test="${lastContainer!=shipmentItem?.container}">
+																					${shipmentItem?.container} 
+																				</g:if>
+																			</td>
 																			<td style="text-align: left; vertical-align: middle;">
 																				<g:hiddenField name="receiptItems[${i}].product.id" value="${receiptItem?.product?.id}"/>
-																			<format:product product="${receiptItem?.product}"/>
+																				<format:product product="${receiptItem?.product}"/>
 																			</td>
 																			<td style="text-align: center; vertical-align: middle;">
 																				<g:hiddenField name="receiptItems[${i}].lotNumber" value="${receiptItem?.lotNumber}"/>
-																				${receiptItem?.lotNumber}
+																				${receiptItem?.lotNumber} 
+																			</td>
+																			<td style="text-align: center; vertical-align: middle;">
+																				<format:expirationDate obj="${inventoryItem?.expirationDate }"/>
+																				
 																			</td>
 																			<td style="text-align: center; vertical-align: middle;">
 																				<g:hiddenField name="receiptItems[${i}].quantityShipped" value="${receiptItem?.quantityShipped}"/>																	
@@ -104,7 +114,10 @@
 																			<td style="text-align: center; vertical-align: middle;">
 																				<g:textField name="receiptItems[${i}].comment" value="${receiptItem?.comment}" size="10"/>
 																			</td>
-																		</tr>												
+																		</tr>	
+																		
+																		<g:set var="lastContainer" value="${shipmentItem?.container }"/>
+																													
 																	</g:each>														
 																</tbody>													
 															</table>

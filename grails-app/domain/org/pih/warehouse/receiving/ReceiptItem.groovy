@@ -6,6 +6,7 @@ import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.donation.Donor;
 import org.pih.warehouse.product.Product;
+import org.pih.warehouse.shipping.ShipmentItem;
 
 class ReceiptItem implements Serializable {
 	
@@ -19,6 +20,8 @@ class ReceiptItem implements Serializable {
 		
 	Person recipient 					// Recipient of an item	
 	String comment 						// Comment about the item quality 
+	
+	transient ShipmentItem shipmentItem
 	
 	Date dateCreated;
 	Date lastUpdated;

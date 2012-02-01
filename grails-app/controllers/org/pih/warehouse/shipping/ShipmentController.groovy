@@ -263,8 +263,11 @@ class ShipmentController {
 	
 	def receiveShipment = {
 		log.info "params: " + params
+		def receiptItemMap = [:] 
 		def receiptInstance
 		def shipmentInstance = Shipment.get(params.shipmentId)		
+		def shipmentItems = []
+		def inventoryItemMap = [:]
 		
 		if (!shipmentInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
@@ -295,25 +298,42 @@ class ShipmentController {
 				redirect(controller:"shipment", action : "showDetails", params : [ "id" : shipmentInstance.id ?: '' ])
 			}
 			else { 
+
 				if (shipmentInstance.receipt) {
 					receiptInstance = shipmentInstance.receipt
 				}
 				// If no existing receipt, instantiate the model class to be used 
 				else {
 					receiptInstance = new Receipt(recipient:shipmentInstance?.recipient);
-					receiptInstance.receiptItems = new HashSet()
+					receiptInstance.receiptItems = new ArrayList()
 				
-					shipmentInstance.shipmentItems.each {										
+					//shipmentItems = shipmentInstance.shipmentItems.sort{(it?.container?.parentContainer) ? it?.container?.parentContainer?.name?.toLowerCase() : it?.container?.name?.toLowerCase() }
+					shipmentItems = shipmentInstance.shipmentItems.sort{  it?.container?.sortOrder }
+					
+					shipmentItems.each {			
+						log.info it.container
+						log.info it.expirationDate
+						
+						
 						ReceiptItem receiptItem = new ReceiptItem(it.properties);
+						receiptItem.shipmentItem = it
 						receiptItem.setQuantityShipped (it.quantity);
 						receiptItem.setQuantityReceived (it.quantity);				
 						receiptItem.setLotNumber(it.lotNumber);
 						receiptInstance.receiptItems.add(receiptItem);           // use basic "add" method to avoid GORM because we don't want to persist yet
+					
+						inventoryItemMap[it] = inventoryService.findInventoryItemByProductAndLotNumber(it.product, it.lotNumber)
+						receiptItemMap[it] = receiptItem	
 					}	
 				}
 			}
 		}
-		render(view: "receiveShipment", model: [shipmentInstance: shipmentInstance, receiptInstance:receiptInstance])
+		render(view: "receiveShipment", model: [
+			shipmentInstance: shipmentInstance, 
+			receiptInstance:receiptInstance, 
+			receiptItemMap : receiptItemMap, 
+			shipmentItems : shipmentItems,
+			inventoryItemMap : inventoryItemMap])
 	}
 	
 	def showPackingList = { 

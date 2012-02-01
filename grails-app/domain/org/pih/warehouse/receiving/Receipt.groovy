@@ -14,7 +14,7 @@ class Receipt implements Serializable {
 	Person recipient					
 	Date dateCreated;
 	Date lastUpdated;
-	
+
 	static belongsTo = [ shipment : Shipment ]
 	static hasMany = [ receiptItems : ReceiptItem ]
 	
