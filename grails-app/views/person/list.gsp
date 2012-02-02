@@ -12,12 +12,27 @@
             	<div class="message">${flash.message}</div>
             </g:if>
             <div class="list">
-            
-				<div>            	
+
+				<div class="buttonBar">            	
+	            	<span class="linkButton">
+	            		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'persons.label').toLowerCase()]"/></g:link>
+	            	</span>
 	            	<span class="linkButton">
 	            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'person.label').toLowerCase()]"/></g:link>
 	            	</span>
             	</div>
+            
+	            <div class="dialog box">
+					<g:form action="list" method="get">
+						<label><warehouse:message code="person.search.label"/></label>            
+						<g:textField name="q" size="45"/>					
+						<button type="submit"><img
+							src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" style="vertical-align: middle;"
+							alt="Save" /> ${warehouse.message(code: 'default.button.find.label')}
+						</button>		          
+					</g:form>
+				</div> 				
+				<br/>
                 <table>
                     <thead>
                         <tr>

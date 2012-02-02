@@ -7,18 +7,19 @@ class UserService {
 	def dataSource
 	boolean transactional = true
 	
-	void convertPersonToUser(Integer personId) { 
+	void convertPersonToUser(String personId) { 
 		def user = User.get(personId) 
 		if (!user) { 
 			def person = Person.get(personId)
 			if (person) {
+				def encodedPassword = "password"?.encodeAsPassword()
 				Sql sql = new Sql(dataSource)
-				sql.execute('insert into user (id, username, password) values (?, ?, ?)', [person?.id, person?.email, 'password'])		
+				sql.execute('insert into user (id, username, password) values (?, ?, ?)', [person?.id, person?.email, encodedPassword])		
 			}
 		}
 	}
 
-	void convertUserToPerson(Integer personId) {
+	void convertUserToPerson(String personId) {
 		def person = Person.get(personId)
 		if (person) {
 			Sql sql = new Sql(dataSource)

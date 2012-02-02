@@ -21,6 +21,18 @@
 		        <g:renderErrors bean="${userInstance}" as="list" />
 		    </div>
             </g:hasErrors>
+            
+            
+			<div class="buttonBar">            	
+            	<span class="linkButton">
+            		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'users.label').toLowerCase()]"/></g:link>
+            	</span>
+            	<span class="linkButton">
+            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'user.label').toLowerCase()]"/></g:link>
+            	</span>
+           	</div>
+            
+            
             <g:form action="save" method="post" >
             	<fieldset>
                 <div class="dialog">
@@ -59,7 +71,7 @@
                                     <label for="password"><warehouse:message code="user.password.label"/></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
-                                    <g:textField type="password" name="password" value="${userInstance?.password}" />
+                                    <g:passwordField name="password" value="${userInstance?.password}" />
                                 </td>
                             </tr>
 			    
@@ -80,12 +92,18 @@
 	                                    <g:select name="locale" from="${ grailsApplication.config.locale.supportedLocales.collect{ new Locale(it) } }" optionValue="displayName" value="${userInstance?.locale}" noSelection="['':'']"/>
 	                                </td>
 	                         </tr>
+	                         <tr class="prop">
+	                         	<td valign="top" class="name">
+	                         	
+	                         	</td>
+	                         	<td valign="top" class="value">
+		                         	<button name="create" class="positive">${warehouse.message(code: 'default.button.save.label', default: 'Save')}</button>
+	                         	</td>
+	                         
+	                         </tr>
 
                         </tbody>
                     </table>
-                </div>
-                <div class="buttonBar">
-                    <button name="create" class="positive">${warehouse.message(code: 'default.button.save.label', default: 'Save')}</button>
                 </div>
                 </fieldset>
             </g:form>

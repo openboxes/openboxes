@@ -497,7 +497,7 @@ class JsonController {
 							[	
 								id: inventoryItem.id?:0, 
 								lotNumber: (inventoryItem?.lotNumber)?:"", 
-								expirationDate: (inventoryItem?.expirationDate) ? (dateFormat.format(inventoryItem?.expirationDate)) : "never", 
+								expirationDate: (inventoryItem?.expirationDate) ? (dateFormat.format(inventoryItem?.expirationDate)) : "${warehouse.message(code: 'default.never.label')}", 
 								quantity: quantity
 							] 
 						//}

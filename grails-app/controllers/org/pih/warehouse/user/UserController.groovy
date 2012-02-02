@@ -20,13 +20,27 @@ class UserController {
     /**
      * Show list of users
      */
-    def list = {
-    	log.info "show a list of users"
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [userInstanceList: User.list(params), userInstanceTotal: User.count()]
-    }
-
-    
+	def list = {
+		def userInstanceList = []
+		def userInstanceTotal = 0;
+		
+		params.max = Math.min(params.max ? params.int('max') : 15, 100)
+		
+		if (params.q) {
+			def term = "%" + params.q + "%"
+			userInstanceList = User.findAllByUsernameLike(term, params)
+			userInstanceTotal = User.countByUsernameLike(term, params);
+		}
+		else {
+			userInstanceList = User.list(params)
+			userInstanceTotal = User.count()
+		}
+		
+		[userInstanceList: userInstanceList, userInstanceTotal: userInstanceTotal]
+	}
+	
+	
+	
     /**
      * Create a user
      */
@@ -191,31 +205,36 @@ class UserController {
 	 */
 	
 	def updateAuthUserLocale = {
-		log.info "update auth user locale"
-		
-		// if no locale specified, do nothing
-		if (!params.locale) {
-			redirect(controller: "dashboard", action: "index")	
-		}		
-		
-		// convert the passed locale parameter to an actual locale
-		Locale locale = new Locale(params.locale)
-		
-		// if this isn't a valid locale, do nothing
-		if (!locale) {
-			redirect(controller: "dashboard", action: "index")
+		log.info "update auth user locale " + params
+		log.info params.locale == 'debug'
+		if (params.locale == 'debug') { 
+			session.useDebugLocale = true
 		}
-		
-		// fetch an instance of authenticated user
-		def userInstance = User.get(session.user.id)
-		
-		// update the user locale & save
-		userInstance.locale = locale
-		userInstance.save(flush: true)
-		
-		// update the reference to the user in the session
-		session.user = User.get(userInstance.id)
-		
+		else { 
+			session.useDebugLocale = false
+			// if no locale specified, do nothing
+			if (!params.locale) {
+				redirect(controller: "dashboard", action: "index")	
+			}		
+			
+			// convert the passed locale parameter to an actual locale
+			Locale locale = new Locale(params.locale)
+			
+			// if this isn't a valid locale, do nothing
+			if (!locale) {
+				redirect(controller: "dashboard", action: "index")
+			}
+			
+			// fetch an instance of authenticated user
+			def userInstance = User.get(session.user.id)
+			
+			// update the user locale & save
+			userInstance.locale = locale
+			userInstance.save(flush: true)
+			
+			// update the reference to the user in the session
+			session.user = User.get(userInstance.id)
+		}
 		// redirect to the dashboard
 		redirect(controller: "dashboard", action: "index")
 	}

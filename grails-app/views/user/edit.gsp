@@ -19,14 +19,9 @@
 				</div>
             </g:hasErrors>
             
-            
-            
             <g:form method="post" >
                 <g:hiddenField name="id" value="${userInstance?.id}" />
                 <g:hiddenField name="version" value="${userInstance?.version}" />
-                
-                
-				
 				<fieldset>                
 	                <div class="dialog">
 	                    <table>
@@ -102,10 +97,26 @@
 	                            </tr>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="email"><warehouse:message code="user.active.label" /></label>
+	                                  <label for="active"><warehouse:message code="user.active.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'active', 'errors')}">
 	                                    <g:checkBox name="active" value="${userInstance?.active}" />
+	                                </td>
+	                            </tr>
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
+	                                  <label for="roles"><warehouse:message code="user.roles.label" /></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'roles', 'errors')}">
+	                                    <g:select name="roles" from="${org.pih.warehouse.core.Role.list()?.sort({it.description})}" optionKey="id" value="${userInstance?.roles}" noSelection="['null':'']" multiple="true"/>
+	                                </td>
+	                            </tr>
+	                            <tr class="prop">
+	                                <td valign="top" class="name">
+	                                  <label for="rememberLastLocation"><warehouse:message code="user.rememberLastLocation.label" /></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'rememberLastLocation', 'errors')}">
+	                                    <g:checkBox name="rememberLastLocation" value="${userInstance?.rememberLastLocation}" />
 	                                </td>
 	                            </tr>
 	                            <tr class="prop">
