@@ -1,9 +1,27 @@
 
+import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.User
+
+
 class SecurityFilters {
+	
+	def authService 
 	def filters = {
 		loginCheck(controller:'*', action:'*') {
+			
+			afterView = {
+				// Clear out current user after rendering the view 
+				AuthService.currentUser.set(null)
+			}
 			before = {	
 				
+				// Set the current user (if there's on in the session)
+				if (session.user) { 
+					if (!AuthService.currentUser) {  
+						AuthService.currentUser = new ThreadLocal<User>()
+					}
+					AuthService.currentUser.set(User.get(session.user.id))
+				}
 				// Need to bypass security filter when generating a PDF report, otherwise the 
 				// generated PDF contains the login screen
 				//if (controllerName.equals("report") && (actionName.equals("showTransactionReport") || actionName.equals("showChecklistReport"))) { 

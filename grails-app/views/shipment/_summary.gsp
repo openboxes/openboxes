@@ -5,7 +5,7 @@
 				<td>
 					<div>
 						<g:if test="${!params.execution }">
-							<g:render template="../shipment/sidebar" />
+							<g:render template="../shipment/actions" />
 						</g:if>
 					</div> 
 				</td>

@@ -5,6 +5,7 @@ import java.util.Date;
 import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.donation.Donor;
+import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.shipping.ShipmentItem;
 
@@ -17,11 +18,12 @@ class ReceiptItem implements Serializable {
 
 	Integer quantityShipped				// Quantity that was shipped
 	Integer quantityReceived			// Quantity could be a class on its own
+	
+	ShipmentItem shipmentItem
+	InventoryItem inventoryItem
 		
 	Person recipient 					// Recipient of an item	
 	String comment 						// Comment about the item quality 
-	
-	transient ShipmentItem shipmentItem
 	
 	Date dateCreated;
 	Date lastUpdated;
@@ -35,6 +37,8 @@ class ReceiptItem implements Serializable {
 		product(nullable:false)
 		lotNumber(nullable:true, maxSize: 255)
 		expirationDate(nullable:true)
+		shipmentItem(nullable:true)
+		inventoryItem(nullable:true)
 		quantityShipped(range: 0..2147483646, nullable:false)
 		quantityReceived(range: 0..2147483646, nullable:false)		
 		recipient(nullable:true)

@@ -2,8 +2,10 @@ package org.pih.warehouse.inventory;
 
 import java.util.Date;
 
+import org.pih.warehouse.auth.AuthService;
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.Constants
@@ -26,10 +28,19 @@ import org.pih.warehouse.core.Constants
  */
 class Transaction implements Comparable, Serializable {
 
+	def beforeInsert = {
+		createdBy = AuthService.currentUser.get()
+	}
+	def beforeUpdate ={
+		//lastUpdatedBy = AuthService.currentUser.get
+	}
+	
 	String id
     Location source	    		
     Location destination					    		 
 	Date transactionDate	    		// Date entered into the warehouse
+	Shipment outgoingShipment			// Outgoing shipment associated with a transfer out transasction
+	Shipment incomingShipment			// Incoming shipment associated with a transfer in transasction
     TransactionType transactionType 	// Detailed transaction type (e.g. Order, Transfer, Stock Count)
 	String comment
 	
@@ -56,6 +67,8 @@ class Transaction implements Comparable, Serializable {
     static constraints = {
 	    transactionType(nullable:false)
 		createdBy(nullable:true)
+		outgoingShipment(nullable:true)
+		incomingShipment(nullable:true)
 		confirmed(nullable:true)
 		confirmedBy(nullable:true)
 		dateConfirmed(nullable:true)

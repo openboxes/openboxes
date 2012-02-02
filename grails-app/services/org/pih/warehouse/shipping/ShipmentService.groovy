@@ -977,6 +977,11 @@ class ShipmentService {
 						throw new TransactionException("Failed to receive shipment due to error while saving transaction", 
 							transaction: creditTransaction)
 					}
+					
+					shipmentInstance.addToIncomingTransactions(creditTransaction) 
+					
+					shipmentInstance.save();
+					
 				}
 			}
 			else {
@@ -1159,5 +1164,42 @@ class ShipmentService {
 	   }
 	   return quantityMap;
    }
+   
+   
+   
+	public void rollbackLastEvent(Shipment shipmentInstance) { 
+		
+		def eventInstance = shipmentInstance.mostRecentEvent
+		
+		if (!eventInstance) {
+			throw new RuntimeException("Cannot rollback shipment status because there are no recent events")
+		}
+
+		try {
+			
+			if (eventInstance?.eventType?.eventCode == EventCode.RECEIVED) {
+				if (shipmentInstance?.receipt) {
+					shipmentInstance?.receipt.delete()
+					shipmentInstance?.receipt = null
+				}
+				
+				def transactions = Transaction.findAllByIncomingShipment(shipmentInstance)
+				transactions.each { transactionInstance ->
+					if (transactionInstance) { 
+						shipmentInstance.removeFromIncomingTransactions(transactionInstance)
+						transactionInstance?.delete();					
+					}
+				}
+								
+				shipmentInstance.removeFromEvents(eventInstance)
+				eventInstance?.delete()
+				shipmentInstance?.save()
+				
+			}
+		} catch (Exception e) {
+			log.error("Error rolling back most recent event", e)
+			throw new RuntimeException("Error rolling back most recent event")
+		}
+	}   
 	
 }

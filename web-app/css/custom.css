@@ -28,6 +28,10 @@ button {
 .black-top { 
 	border-top: 1px solid black;
 }
+.capitalize { 
+	text-transform: capitalize;
+}
+
 .red { 
 	background-color: red;
 	color: white;
@@ -256,6 +260,11 @@ th {
 	background-color: white;
 }
 
+tfoot th, tfoot td { 
+	border-top: 2px solid lightgrey;
+	border-bottom: 0px;
+}
+
 
 .toggle-button { 
 	cursor: hand;
@@ -300,6 +309,12 @@ table#listOutgoing td {
 }
 
 table#listOutgoing th { 
+}
+
+table.small { 
+	/*width: 0%;*/
+	display: inline;
+	
 }
 
 

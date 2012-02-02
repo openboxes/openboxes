@@ -48,8 +48,9 @@
 											</td>
 										</tr>																						
 										<tr class="prop">
-											<td valign="top" class="name"><label><warehouse:message
-												code="shipping.deliveredOn.label"/></label></td>
+											<td valign="top" class="name">
+												<label><warehouse:message code="shipping.deliveredOn.label"/></label>
+											</td>
 											<td valign="top"
 												class=" ${hasErrors(bean: receiptInstance, field: 'actualDeliveryDate', 'errors')}"
 												nowrap="nowrap">
@@ -57,6 +58,15 @@
 														value="${receiptInstance?.actualDeliveryDate}" format="MM/dd/yyyy" />														
 											</td>
 										</tr>		
+														
+										<tr class="prop">
+				                            <td valign="top" class="name">
+				                            	<label><warehouse:message code="default.comment.label" /></label>
+				                            </td>                            
+				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'comment', 'errors')}">
+			                                    <g:textArea name="comment" cols="60" rows="3"/>
+			                                </td>
+				                        </tr>  	        
 										
 										<g:if test="${shipmentInstance?.destination.isWarehouse()}">					
 											<tr class="prop">
@@ -68,73 +78,67 @@
 														<g:if test="${!receiptInstance.receiptItems}">
 															<warehouse:message code="shipping.noItemsToReceive.label" />
 														</g:if>			
-														<g:else>										
-															<table>
-																<thead>
-																	<tr>
-																		<th style="text-align: left;"></th>
-																		<th style="text-align: left;"><warehouse:message code="default.item.label" /></th>
-																		<th style="text-align: center;"><warehouse:message code="default.lotSerialNo.label" /></th>
-																		<th style="text-align: center;"><warehouse:message code="inventoryItem.expirationDate.label" /></th>
-																		<th style="text-align: center;"><warehouse:message code="shipping.shipped.label" /></th>
-																		<th style="text-align: center;"><warehouse:message code="shipping.received.label" /></th>
-																		<th style="text-align: center;"><warehouse:message code="default.comment.label" /></th>
-																	</tr>
-																</thead>
-																<tbody>
-																	<g:each var="shipmentItem" in="${shipmentItems }" status="i">
-																		<g:set var="receiptItem" value="${receiptItemMap[shipmentItem] }"/>
-																		<g:set var="inventoryItem" value="${inventoryItemMap[shipmentItem] }"/>
-																	
-																		<tr class="prop ${(i % 2) == 0 ? 'odd' : 'even'} ${lastContainer!=shipmentItem?.container?'top':'' }">
-																			<td style="text-align: left; vertical-align: middle;">
-																				<g:if test="${lastContainer!=shipmentItem?.container}">
-																					${shipmentItem?.container} 
-																				</g:if>
-																			</td>
-																			<td style="text-align: left; vertical-align: middle;">
-																				<g:hiddenField name="receiptItems[${i}].product.id" value="${receiptItem?.product?.id}"/>
-																				<format:product product="${receiptItem?.product}"/>
-																			</td>
-																			<td style="text-align: center; vertical-align: middle;">
-																				<g:hiddenField name="receiptItems[${i}].lotNumber" value="${receiptItem?.lotNumber}"/>
-																				${receiptItem?.lotNumber} 
-																			</td>
-																			<td style="text-align: center; vertical-align: middle;">
-																				<format:expirationDate obj="${inventoryItem?.expirationDate }"/>
-																				
-																			</td>
-																			<td style="text-align: center; vertical-align: middle;">
-																				<g:hiddenField name="receiptItems[${i}].quantityShipped" value="${receiptItem?.quantityShipped}"/>																	
-																				${receiptItem?.quantityShipped}
-																			</td>
-																			<td style="text-align: center; vertical-align: middle;">
-																				<g:textField name="receiptItems[${i}].quantityReceived" value="${receiptItem?.quantityReceived}" size="3"/>
-																			</td>
-																			<td style="text-align: center; vertical-align: middle;">
-																				<g:textField name="receiptItems[${i}].comment" value="${receiptItem?.comment}" size="10"/>
-																			</td>
-																		</tr>	
+														<g:else>	
+															<div style="overflow: auto; height: 300px">									
+																<table>
+																	<thead>
+																		<tr>
+																			<th style="text-align: left;"></th>
+																			<th style="text-align: left;"><warehouse:message code="default.item.label" /></th>
+																			<th style="text-align: center;"><warehouse:message code="default.lotSerialNo.label" /></th>
+																			<th style="text-align: center;"><warehouse:message code="inventoryItem.expirationDate.label" /></th>
+																			<th style="text-align: center;"><warehouse:message code="shipping.shipped.label" /></th>
+																			<th style="text-align: center;"><warehouse:message code="shipping.received.label" /></th>
+																			<th style="text-align: center;"><warehouse:message code="default.comment.label" /></th>
+																		</tr>
+																	</thead>
+																	<tbody>
+																		<g:each var="receiptItem" in="${receiptInstance?.receiptItems?.sort { it?.shipmentItem?.container?.sortOrder } }" status="i">
 																		
-																		<g:set var="lastContainer" value="${shipmentItem?.container }"/>
-																													
-																	</g:each>														
-																</tbody>													
-															</table>
+																			<g:set var="shipmentItem" value="${receiptItem?.shipmentItem }"/>
+																			<g:set var="inventoryItem" value="${receiptItem?.inventoryItem }"/>
+																			<tr class="prop ${(i % 2) == 0 ? 'odd' : 'even'} ${lastContainer!=shipmentItem?.container?'top':'' }">
+																				<td style="text-align: left; vertical-align: middle;">
+																					<g:if test="${lastContainer!=shipmentItem?.container}">
+																						${shipmentItem?.container} 
+																					</g:if>
+																				</td>
+																				<td style="text-align: left; vertical-align: middle;">
+																					<g:hiddenField name="receiptItems[${i}].shipmentItem.id" value="${receiptItem?.shipmentItem?.id}"/>																	
+																					<g:hiddenField name="receiptItems[${i}].inventoryItem.id" value="${receiptItem?.inventoryItem?.id}"/>																	
+																					<g:hiddenField name="receiptItems[${i}].product.id" value="${receiptItem?.product?.id}"/>
+																					<format:product product="${receiptItem?.product}"/>
+																				</td>
+																				<td style="text-align: center; vertical-align: middle;">
+																					<g:hiddenField name="receiptItems[${i}].lotNumber" value="${receiptItem?.lotNumber}"/>
+																					${receiptItem?.lotNumber} 
+																				</td>
+																				<td style="text-align: center; vertical-align: middle;">
+																					<format:expirationDate obj="${inventoryItem?.expirationDate }"/>
+																					
+																				</td>
+																				<td style="text-align: center; vertical-align: middle;">
+																					<g:hiddenField name="receiptItems[${i}].quantityShipped" value="${receiptItem?.quantityShipped}"/>																	
+																					${receiptItem?.quantityShipped}
+																				</td>
+																				<td style="text-align: center; vertical-align: middle;">
+																					<g:textField name="receiptItems[${i}].quantityReceived" value="${receiptItem?.quantityReceived}" size="3"/>
+																				</td>
+																				<td style="text-align: center; vertical-align: middle;">
+																					<g:textField name="receiptItems[${i}].comment" value="${receiptItem?.comment}" size="10"/>
+																				</td>
+																			</tr>	
+																			
+																			<g:set var="lastContainer" value="${shipmentItem?.container }"/>
+																														
+																		</g:each>														
+																	</tbody>													
+																</table>
+															</div>
 														</g:else>
 												</td>
 											</tr>		
 										</g:if>									
-										
-										
-														
-										<tr class="prop">
-				                            <td valign="top" class="name"><label><warehouse:message code="default.comment.label" /></label></td>                            
-				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'comment', 'errors')}">
-			                                    <g:textArea name="comment" cols="60" rows="3"/>
-			                                </td>
-				                        </tr>  	        
-											
 											
 										<tr class="prop">
 											<td valign="top" class="name"></td>

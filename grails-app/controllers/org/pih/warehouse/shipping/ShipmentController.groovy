@@ -235,6 +235,12 @@ class ShipmentController {
 	}
 	
 	
+	def rollbackLastEvent = {
+		def shipmentInstance = Shipment.get(params.id)
+		shipmentService.rollbackLastEvent(shipmentInstance)
+		redirect(action: "showDetails", id: shipmentInstance?.id)
+	}
+	
 	def deleteShipment = {
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
@@ -283,7 +289,10 @@ class ShipmentController {
 				
 				// check for errors
 				if(receiptInstance.hasErrors() || !receiptInstance.validate()) {
-					render(view: "receiveShipment",  model: [shipmentInstance: shipmentInstance, receiptInstance:receiptInstance])
+						
+					render(view: "receiveShipment",  
+						model: [shipmentInstance: shipmentInstance, 
+							receiptInstance:receiptInstance ])
 					return
 				}
 				
@@ -305,35 +314,33 @@ class ShipmentController {
 				// If no existing receipt, instantiate the model class to be used 
 				else {
 					receiptInstance = new Receipt(recipient:shipmentInstance?.recipient);
-					receiptInstance.receiptItems = new ArrayList()
+					receiptInstance.receiptItems = new HashSet()
 				
-					//shipmentItems = shipmentInstance.shipmentItems.sort{(it?.container?.parentContainer) ? it?.container?.parentContainer?.name?.toLowerCase() : it?.container?.name?.toLowerCase() }
-					shipmentItems = shipmentInstance.shipmentItems.sort{  it?.container?.sortOrder }
-					
-					shipmentItems.each {			
-						log.info it.container
-						log.info it.expirationDate
+					shipmentItems = shipmentInstance.shipmentItems.sort{  it?.container?.sortOrder }					
+					shipmentItems.each { shipmentItem ->
 						
-						
-						ReceiptItem receiptItem = new ReceiptItem(it.properties);
-						receiptItem.shipmentItem = it
-						receiptItem.setQuantityShipped (it.quantity);
-						receiptItem.setQuantityReceived (it.quantity);				
-						receiptItem.setLotNumber(it.lotNumber);
-						receiptInstance.receiptItems.add(receiptItem);           // use basic "add" method to avoid GORM because we don't want to persist yet
-					
-						inventoryItemMap[it] = inventoryService.findInventoryItemByProductAndLotNumber(it.product, it.lotNumber)
-						receiptItemMap[it] = receiptItem	
+						def inventoryItem = 
+							inventoryService.findInventoryItemByProductAndLotNumber(shipmentItem.product, shipmentItem.lotNumber)
+
+						if (inventoryItem) { 
+							ReceiptItem receiptItem = new ReceiptItem(shipmentItem.properties);
+							receiptItem.quantityShipped = shipmentItem.quantity;
+							receiptItem.quantityReceived = shipmentItem.quantity;				
+							receiptItem.lotNumber = shipmentItem.lotNumber;
+							receiptItem.inventoryItem = inventoryItem
+							receiptItem.shipmentItem = shipmentItem
+							receiptInstance.receiptItems.add(receiptItem);           // use basic "add" method to avoid GORM because we don't want to persist yet
+						}
+						else { 
+							receiptInstance.errors.reject('inventoryItem', 'receipt.inventoryItem.invalid')
+						}
+
 					}	
 				}
 			}
 		}
 		render(view: "receiveShipment", model: [
-			shipmentInstance: shipmentInstance, 
-			receiptInstance:receiptInstance, 
-			receiptItemMap : receiptItemMap, 
-			shipmentItems : shipmentItems,
-			inventoryItemMap : inventoryItemMap])
+			shipmentInstance: shipmentInstance, receiptInstance:receiptInstance ])
 	}
 	
 	def showPackingList = { 
@@ -740,11 +747,11 @@ class ShipmentController {
 		if (item) {
 			item.quantity = Integer.parseInt(params.quantity);
 			item.save();
-			flash.message = "${warehouse.message(code: 'shipping.addedCommentToShipment.message', arg=[params.id, container.name])}"
+			flash.message = "${warehouse.message(code: 'shipping.addedCommentToShipment.message', args: [params.id, container.name])}"
 			redirect(action: 'editContents', id: shipmentId)
 		}
 		else {
-			flash.message = "${warehouse.message(code: 'shipping.couldNotEditItemFromContainer.message', arg=[params.id])}"
+			flash.message = "${warehouse.message(code: 'shipping.couldNotEditItemFromContainer.message', args: [params.id])}"
 			redirect(action: 'showDetails', id: shipmentId, params: [container.id, container.id])
 		}
 	}
@@ -756,10 +763,10 @@ class ShipmentController {
 		if (shipment && document) { 	    	
 			shipment.removeFromDocuments(document).save(flush:true);
 			document.delete();	    	    	
-				flash.message = "${warehouse.message(code: 'shipping.deletedDocumentFromShipment.message', arg=[params.id])}"
+				flash.message = "${warehouse.message(code: 'shipping.deletedDocumentFromShipment.message', args: [params.id])}"
 		}
 		else { 
-			flash.message = "${warehouse.message(code: 'shipping.couldNotRemoveDocumentFromShipment.message', arg=[params.id])}"
+			flash.message = "${warehouse.message(code: 'shipping.couldNotRemoveDocumentFromShipment.message', args: [params.id])}"
 		}		
 		redirect(action: 'showDetails', id: params.shipmentId)
 	}
@@ -770,10 +777,10 @@ class ShipmentController {
 		if (shipment && event && event.eventType?.eventCode != EventCode.CREATED) {   // not allowed to delete a "created" event
 			shipment.removeFromEvents(event).save();
 			event.delete();
-			flash.message = "${warehouse.message(code: 'shipping.deletedEventFromShipment.message', arg=[params.id])}"
+			flash.message = "${warehouse.message(code: 'shipping.deletedEventFromShipment.message', args: [params.id])}"
 		}
 		else {
-			flash.message = "${warehouse.message(code: 'shipping.couldNotRemoveEventFromShipment.message', arg=[params.id])}"
+			flash.message = "${warehouse.message(code: 'shipping.couldNotRemoveEventFromShipment.message', args: [params.id])}"
 		}
 		redirect(action: 'showDetails', id: params.shipmentId)
 	}
@@ -785,10 +792,10 @@ class ShipmentController {
 		if (shipment && container) {
 			container.delete();
 			//shipment.removeFromContainers(container).save(flush:true);
-			flash.message = "${warehouse.message(code: 'shipping.deletedContainerFromShipment.message', arg=[params.id])}"
+			flash.message = "${warehouse.message(code: 'shipping.deletedContainerFromShipment.message', args: [params.id])}"
 		}
 		else {
-			flash.message = "${warehouse.message(code: 'shipping.couldNotRemoveContainerFromShipment.message', arg=[params.id])}"
+			flash.message = "${warehouse.message(code: 'shipping.couldNotRemoveContainerFromShipment.message', args: [params.id])}"
 		}
 		
 		redirect(action: 'showDetails', id: params.shipmentId)
@@ -801,11 +808,11 @@ class ShipmentController {
 		if (item) {
 			container.removeFromShipmentItems(shipmentItem)
 			//item.delete();
-			flash.message = "${warehouse.message(code: 'shipping.deletedShipmentItemFromContainer.message', arg=[params.id,container.name])}"
+			flash.message = "${warehouse.message(code: 'shipping.deletedShipmentItemFromContainer.message', args: [params.id,container.name])}"
 			redirect(action: 'showDetails', id: shipmentId)
 		}
 		else {
-			flash.message = "${warehouse.message(code: 'shipping.couldNotRemoveItemFromContainer.message', arg=[params.id])}"
+			flash.message = "${warehouse.message(code: 'shipping.couldNotRemoveItemFromContainer.message', args: [params.id])}"
 			redirect(action: 'showDetails', id: shipmentId)
 		}
 	}
@@ -816,11 +823,11 @@ class ShipmentController {
 		if (shipment && comment) {
 			shipment.removeFromComments(comment).save(flush:true);
 			comment.delete();
-			flash.message = "${warehouse.message(code: 'shipping.deletedCommentFromShipment.message', arg=[comment4,params.shipmentId])}"
+			flash.message = "${warehouse.message(code: 'shipping.deletedCommentFromShipment.message', args: [comment,params.shipmentId])}"
 			redirect(action: 'showDetails', id: params.shipmentId)
 		}
 		else {
-			flash.message = "${warehouse.message(code: 'shipping.couldNotRemoveCommentFromShipment.message', arg=[params.id])}"
+			flash.message = "${warehouse.message(code: 'shipping.couldNotRemoveCommentFromShipment.message', args: [params.id])}"
 			redirect(action: 'showDetails', id: params.shipmentId)
 		}
 	}
@@ -860,7 +867,7 @@ class ShipmentController {
 
 		// check for errors
 		if (eventInstance.hasErrors()) {
-			flash.message = "${warehouse.message(code: 'shipping.unableToEditEvent.message', arg=[format.metadata(obj:eventInstance?.eventType)])}"
+			flash.message = "${warehouse.message(code: 'shipping.unableToEditEvent.message', args: [format.metadata(obj:eventInstance?.eventType)])}"
 			eventInstance?.errors.allErrors.each { 
 				log.error it
 			}

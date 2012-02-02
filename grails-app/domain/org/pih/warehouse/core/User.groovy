@@ -17,7 +17,7 @@ class User extends Person {
 	Location warehouse;		// keep track of the user's last warehouse
 	//Boolean useSavedLocation		// indicates whether we should use this warehouse when user logs in 
 	User manager;				// the user's designated manager 
-
+	Boolean rememberLastLocation	// indicates whether user would like for the system to remember where they last logged into
 	byte [] photo				// profile photo
 
 
@@ -38,6 +38,7 @@ class User extends Person {
 			if(passwordConfirm == null) return true // skip matching password validation (only important when setting/resetting pass)
 			passwordConfirm == password ? true : ['invalid.matchingpasswords']
 		})		
+		rememberLastLocation(nullable:true)
 		lastLoginDate(nullable:true)
 		//useSavedLocation(nullable:true)
 		warehouse(nullable:true)

@@ -34,64 +34,61 @@
 	                <g:renderErrors bean="${transactionInstance}" as="list" />
 	            </div>
             </g:hasErrors>    
-            
-            <div style="padding: 10px; ">
-				<span class="action-menu">
-					<button class="action-btn">
-						<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle;"/>
-						<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
-					</button>
-					<div class="actions">
-						<g:if test="${params?.product?.id }">
-							<div class="action-menu-item">
-								<g:link controller="inventoryItem" action="showStockCard" params="['product.id':params?.product?.id]">
-									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_left.png')}"/>
-									${warehouse.message(code: 'transaction.backToStockCard.label')}
-								</g:link>		
-							</div>	
-						</g:if>
-						<div class="action-menu-item">
-							<g:link controller="inventory" action="browse">
-								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'application_view_list.png')}"/>
-								${warehouse.message(code: 'transaction.backToInventory.label')}
-							</g:link>			
-						</div>							
-						<%-- 				
-						<div class="action-menu-item">
-							<g:link controller="inventory" action="listTransactions">
-								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_up.png')}"/>
-								${warehouse.message(code: 'transaction.backToTransactions.label')}
-							</g:link>			
-						</div>
-						--%>
-						<div class="action-menu-item">
-							<hr/>
-						</div>
-						<div class="action-menu-item">
-							<g:link controller="inventory" action="editTransaction" id="${transactionInstance?.id }">
-								<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" />
-							    &nbsp;${warehouse.message(code: 'transaction.edit.label')}&nbsp;        						
-							</g:link>
-						</div>
-						<div class="action-menu-item">
-							<g:link controller="inventory" action="deleteTransaction" id="${transactionInstance?.id }" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-		    					<img src="${createLinkTo(dir:'images/icons/silk',file:'bin.png')}" alt="Delete" />
-								&nbsp;${warehouse.message(code: 'transaction.delete.label')}&nbsp;
-							</g:link>				
-						</div>			
-						
-						
-						
-					</div>
-				</span>			
-			
-			</div>
+
 			<div class="dialog">
+			
+				<fieldset>
+					<div style="padding: 10px">
+						<span class="action-menu">
+							<button class="action-btn">
+								<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle;"/>
+								<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
+							</button>
+							<div class="actions">
+								<g:if test="${params?.product?.id }">
+									<div class="action-menu-item">
+										<g:link controller="inventoryItem" action="showStockCard" params="['product.id':params?.product?.id]">
+											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_left.png')}"/>
+											${warehouse.message(code: 'transaction.backToStockCard.label')}
+										</g:link>		
+									</div>	
+								</g:if>
+								<div class="action-menu-item">
+									<g:link controller="inventory" action="browse">
+										<img src="${createLinkTo(dir: 'images/icons/silk', file: 'application_view_list.png')}"/>
+										${warehouse.message(code: 'transaction.backToInventory.label')}
+									</g:link>			
+								</div>							
+								<%-- 				
+								<div class="action-menu-item">
+									<g:link controller="inventory" action="listTransactions">
+										<img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_up.png')}"/>
+										${warehouse.message(code: 'transaction.backToTransactions.label')}
+									</g:link>			
+								</div>
+								--%>
+								<div class="action-menu-item">
+									<hr/>
+								</div>
+								<div class="action-menu-item">
+									<g:link controller="inventory" action="editTransaction" id="${transactionInstance?.id }">
+										<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" />
+									    &nbsp;${warehouse.message(code: 'transaction.edit.label')}&nbsp;        						
+									</g:link>
+								</div>
+								<div class="action-menu-item">
+									<g:link controller="inventory" action="deleteTransaction" id="${transactionInstance?.id }" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+				    					<img src="${createLinkTo(dir:'images/icons/silk',file:'bin.png')}" alt="Delete" />
+										&nbsp;${warehouse.message(code: 'transaction.delete.label')}&nbsp;
+									</g:link>				
+								</div>			
+							</div>
+						</span>			
+					</div>
 			
 				<g:form>
 					<g:hiddenField name="id" value="${transactionInstance?.id}"/>
 					<g:hiddenField name="inventory.id" value="${transactionInstance?.inventory?.id}"/>
-						<fieldset>
 							<table>
 								<tr class="prop">
 									<td class="name">
@@ -116,6 +113,38 @@
 										</span>
 									</td>										
 								</tr>
+								<tr class="prop">
+									<td class="name">
+										<label><warehouse:message code="transaction.createdBy.label"/></label>
+									</td>
+									<td class="value">
+										${transactionInstance?.createdBy}
+									</td>										
+								</tr>
+								<g:if test="${transactionInstance?.outgoingShipment }">
+									<tr class="prop">
+										<td class="name">
+											<label><warehouse:message code="shipping.shipment.label"/></label>
+										</td>
+										<td class="value">
+											<g:link controller="shipment" action="showDetails" id="${transactionInstance?.outgoingShipment?.id }">
+												${transactionInstance?.outgoingShipment?.name} 
+											</g:link>
+										</td>										
+									</tr>
+								</g:if>
+								<g:if test="${transactionInstance?.incomingShipment }">
+									<tr class="prop">
+										<td class="name">
+											<label><warehouse:message code="shipping.shipment.label"/></label>
+										</td>
+										<td class="value">
+											<g:link controller="shipment" action="showDetails" id="${transactionInstance?.outgoingShipment?.id }">
+												${transactionInstance?.outgoingShipment?.name} 
+											</g:link>
+										</td>										
+									</tr>
+								</g:if>
 								<tr class="prop">
 									<td class="name">
 										<label><warehouse:message code="transaction.type.label"/></label>
@@ -170,48 +199,89 @@
 										<td class="name">
 											<label><warehouse:message code="transaction.transactionEntries.label"/></label>
 										</td>
-										<td style="padding: 0px;">
-											<table id="prodEntryTable" border="0" style="border: 0px solid #ccc;">
-												<tr class="odd">
-													<th><warehouse:message code="product.label"/></th>
-													<th><warehouse:message code="product.lotNumber.label"/></th>
-													<th><warehouse:message code="product.expirationDate.label"/></th>
-													<th><warehouse:message code="default.qty.label"/></th>
-													<th>&nbsp;</th>
-												</tr>
-												<g:if test="${transactionInstance?.transactionEntries }">
-													<g:each in="${transactionInstance?.transactionEntries.sort { it?.inventoryItem?.product?.name } }" var="transactionEntry" status="status">
-														<tr class="${(status%2==0)?'even':'odd'}">
-															<td style="text-align: left;">
-																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':transactionEntry?.inventoryItem?.product?.id]">
-																	<format:product product="${transactionEntry?.inventoryItem?.product}"/>
-																</g:link>
-															</td>										
-															<td>
-																${transactionEntry?.inventoryItem?.lotNumber }
-															</td>		
-															<td>
-																<format:expirationDate obj="${transactionEntry?.inventoryItem?.expirationDate}"/>															
-															</td>
-															<td>
-																${transactionEntry?.quantity}
-															</td>		
-															<td></td>
+										<td class="value">										
+												<table id="prodEntryTable">
+													<thead>
+														<tr>
+															<th><warehouse:message code="product.label"/></th>
+															<th style="text-align: center"><warehouse:message code="product.lotNumber.label"/></th>
+															<th style="text-align: center"><warehouse:message code="product.expirationDate.label"/></th>
+															<th style="text-align: center"><warehouse:message code="default.qty.label"/></th>
+															<th>&nbsp;</th>
 														</tr>
-													</g:each>
-												</g:if>
-												<g:else>
-													<tr>
-														<td colspan="6"><warehouse:message code="transaction.noEntries.message"/></td>
-													</tr>
-												</g:else>
-											</table>	
+													</thead>
+													<tbody>
+														<g:set var="transactionSum" value="${0 }"/>
+														<g:set var="transactionCount" value="${0 }"/>
+														<g:if test="${transactionInstance?.transactionEntries }">
+															<g:each in="${transactionInstance?.transactionEntries.sort { it?.inventoryItem?.product?.name } }" var="transactionEntry" status="status">														
+																<g:if test="${params?.showAll || !params?.product || transactionEntry?.inventoryItem?.product?.id == params?.product?.id}">
+																	<g:set var="transactionSum" value="${transactionSum + transactionEntry?.quantity}"/>
+																	<g:set var="transactionCount" value="${transactionCount+1 }"/>
+																	<tr class="${status%2?'odd':'even' }">
+																		<td style="text-align: left;">
+																			<g:link controller="inventoryItem" action="showStockCard" params="['product.id':transactionEntry?.inventoryItem?.product?.id]">
+																				<format:product product="${transactionEntry?.inventoryItem?.product}"/>
+																			</g:link>
+																		</td>										
+																		<td class="center">
+																			${transactionEntry?.inventoryItem?.lotNumber }
+																		</td>		
+																		<td class="center">
+																			<format:expirationDate obj="${transactionEntry?.inventoryItem?.expirationDate}"/>															
+																		</td>
+																		<td class="center">
+																			${transactionEntry?.quantity}
+																		</td>
+																		<g:if test="${params?.showAll || !params.product }">		
+																			<td class="center">
+																				<g:link controller="inventory" action="showTransaction" id="${transactionInstance.id}" params="['product.id':transactionEntry?.inventoryItem?.product?.id]">
+																					Show this product only
+																				</g:link>
+																			</td>
+																		</g:if>
+																		<g:else>
+																			<td></td>
+																		</g:else>
+																	</tr>
+																</g:if>
+															</g:each>
+														</g:if>
+														<g:else>
+															<tr>
+																<td colspan="5">
+																	<warehouse:message code="transaction.noEntries.message"/>
+																</td>
+															</tr>
+														</g:else>
+													</tbody>
+													<tfoot>
+														<tr>
+															<td colspan="2">
+																<g:if test="${transactionInstance?.transactionEntries?.size() > transactionCount }">
+																	<a href="?showAll=true">show all products</a>
+																</g:if>														
+															
+															</td>
+															<td class="right">
+																<label>Total</label>																
+															</td>															
+															<td class="center">
+																${transactionSum }																			
+															</td>			
+															<td>
+															
+															</td>											
+														</tr>
+													</tfoot>
+												</table>	
 										</td>
 									</tr>
 								</g:if>
 							</table>
-						</fieldset>	
-				</g:form>
+					</g:form>
+				</fieldset>
+											
 			</div>
 		</div>
     </body>

@@ -51,6 +51,66 @@
 			<column name="reference_number_types_idx" valueNumeric="0" />
 		</insert>	
 	</changeSet>
+	<changeSet author="jmiranda" id="1327591155937-4">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="transaction" columnName="incoming_shipment_id"/>
+			</not>
+		</preConditions>
+		<addColumn tableName="transaction">
+			<column name="incoming_shipment_id" type="char(38)"/>
+		</addColumn>	
+	</changeSet>
+	<changeSet author="jmiranda" id="1327591155937-5">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="transaction" columnName="outgoing_shipment_id"/>
+			</not>
+		</preConditions>
+		<addColumn tableName="transaction">
+			<column name="outgoing_shipment_id" type="char(38)"/>
+		</addColumn>	
+	</changeSet>
+	<changeSet author="jmiranda" id="1327591155937-6">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="receipt_item" columnName="shipment_item_id"/>
+			</not>
+		</preConditions>
+		<addColumn tableName="receipt_item">
+			<column name="shipment_item_id" type="char(38)"/>
+		</addColumn>	
+	</changeSet>
+	<changeSet author="jmiranda" id="1327591155937-7">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="receipt_item" columnName="inventory_item_id"/>
+			</not>
+		</preConditions>
+		<addColumn tableName="receipt_item">
+			<column name="inventory_item_id" type="char(38)"/>
+		</addColumn>	
+	</changeSet>
+	<changeSet author="jmiranda" id="1327591155937-8">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="user" columnName="remember_last_location"/>
+			</not>
+		</preConditions>
+		<addColumn tableName="user">
+			<column name="remember_last_location" type="BIT(1)"/>
+		</addColumn>	
+	</changeSet>
+	<changeSet author="jmiranda" id="1327591155937-9">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="shipment_item" columnName="inventory_item_id"/>
+			</not>
+		</preConditions>
+		<addColumn tableName="shipment_item">
+			<column name="inventory_item_id" type="char(38)"/>
+		</addColumn>	
+	</changeSet>
 
 
 </databaseChangeLog>

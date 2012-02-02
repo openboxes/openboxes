@@ -1,8 +1,12 @@
 package org.pih.warehouse.auth
 
+import org.pih.warehouse.core.User;
+
 class AuthService {
 	
 	boolean transactional = true
+	static ThreadLocal<User> currentUser = new ThreadLocal<User>();
+	
 	
 	/**
 	 * Determine whether user is authenticated.  

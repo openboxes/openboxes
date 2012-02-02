@@ -11,6 +11,8 @@ import org.pih.warehouse.core.Person;
 import org.pih.warehouse.receiving.Receipt;
 import org.pih.warehouse.shipping.ReferenceNumber;
 import org.pih.warehouse.donation.Donor;
+import org.pih.warehouse.inventory.Transaction;
+
 import java.io.Serializable;
 
 class Shipment implements Comparable, Serializable {
@@ -56,13 +58,18 @@ class Shipment implements Comparable, Serializable {
 		"actualShippingDate",
 		"actualDeliveryDate" ]
 	
+	static mappedBy = [outgoingTransactions: 'outgoingShipment',
+		incomingTransactions: 'incomingShipment']
+	
 	// Core association mappings
 	static hasMany = [events : Event,
 	                  comments : Comment,
 	                  containers : Container,
 	                  documents : Document, 	                  
 					  shipmentItems : ShipmentItem,
-	                  referenceNumbers : ReferenceNumber ]
+	                  referenceNumbers : ReferenceNumber,
+					  outgoingTransactions : Transaction,
+					  incomingTransactions : Transaction ]
 	
 
 	

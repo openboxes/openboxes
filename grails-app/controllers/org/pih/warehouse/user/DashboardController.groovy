@@ -80,6 +80,9 @@ class DashboardController {
 				def userInstance = User.get(session.user.id);
 				//userInstance.warehouse = warehouse;
 				userInstance.lastLoginDate = new Date();
+				if (userInstance.rememberLastLocation) { 
+					userInstance.warehouse = warehouse 
+				}
 				userInstance.save(flush:true);
 				session.user = userInstance;
 			}			

@@ -4,8 +4,10 @@ import java.util.Date;
 
 import org.pih.warehouse.order.OrderShipment;
 import org.pih.warehouse.product.Product;
+import org.pih.warehouse.receiving.ReceiptItem;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.donation.Donor;
+import org.pih.warehouse.inventory.InventoryItem;
 
 class ShipmentItem implements Comparable, java.io.Serializable {
 
@@ -22,7 +24,7 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 	Donor donor					// Organization that donated the goods
 	Date dateCreated;
 	Date lastUpdated;
-			
+	InventoryItem inventoryItem
 	Container container				// 
 	//PackageType packageType		// The type of packaging that this item is stored 
 									// within.  This is different from the container type  
@@ -33,6 +35,9 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 	static belongsTo = [ shipment : Shipment ]
 	
 	static hasMany = [ orderShipments : OrderShipment ]
+	
+	static hasOne = [receiptItem: ReceiptItem]
+	
 	
 	static mapping = {
 		id generator: 'uuid'
@@ -46,6 +51,7 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 		expirationDate(nullable:true)
 		quantity(min:0, blank:false, range: 0..2147483646)
 		recipient(nullable:true)
+		inventoryItem(nullable:true)
 		donor(nullable:true)
 	}
     
@@ -54,14 +60,17 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 		return orderShipments.collect{it.orderItem}
 	}
 
-	def quantityReceived() {
-		int ret = 0
-		shipment.receipt.receiptItems.each {
-			if (it.product == this.product && it.lotNumber == this.lotNumber) {
-				ret += it.quantityReceived
+	def totalQuantityReceived() {
+		int totalQuantityReceived = 0
+		// Should use inventory item instead of comparing product & lot number
+		if (shipment.receipt) { 
+			shipment.receipt.receiptItems.each {
+				if (it.product == this.product && it.lotNumber == this.lotNumber) {
+					totalQuantityReceived += it.quantityReceived
+				}
 			}
 		}
-		return ret
+		return totalQuantityReceived
 	}
 	
 	/*
