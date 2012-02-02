@@ -52,6 +52,7 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 		quantity(min:0, blank:false, range: 0..2147483646)
 		recipient(nullable:true)
 		inventoryItem(nullable:true)
+		receiptItem(nullable:true)
 		donor(nullable:true)
 	}
     

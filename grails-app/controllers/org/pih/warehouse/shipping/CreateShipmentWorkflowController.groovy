@@ -7,6 +7,7 @@ import org.pih.warehouse.core.User;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Product;
 import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException;
+import org.springframework.validation.Errors;
 
 import sun.util.logging.resources.logging;
 
@@ -556,7 +557,11 @@ class CreateShipmentWorkflowController {
 					//log.error("Error saving shipment item ", e)
 					// Need to instantiate an item instance (if it doesn't exist) so we can add errors to it
 					if (!flow.itemInstance) flow.itemInstance = new ShipmentItem();
-					flow.itemInstance.errors.reject(e.getMessage())
+					
+					// If there are no errors already (added from the save or
+					// validation method, then we should add the generic error message from the exception)
+					if (!flow.itemInstance.errors)
+						flow.itemInstance.errors.reject(e.getMessage())
 					invalid();
 				}
 			}

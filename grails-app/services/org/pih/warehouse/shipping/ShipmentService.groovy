@@ -415,7 +415,7 @@ class ShipmentService {
 	 * @param shipment
 	 */
 	void saveShipment(Shipment shipment) {
-		shipment.save(flush:true)
+		shipment.save(flush:true, failOnError:true)
 	}
 	
 	/**
@@ -554,12 +554,15 @@ class ShipmentService {
 	 * @return
 	 */
 	boolean validateShipmentItem(def shipmentItem) { 
-		def warehouse = Location.get(shipmentItem?.shipment?.origin?.id);
-		log.info("Validating shipment item at " + warehouse?.name )
-		def onHandQuantity = inventoryService.getQuantity(warehouse, shipmentItem.product, shipmentItem.lotNumber)
+		def location = Location.get(shipmentItem?.shipment?.origin?.id);
+		log.info("Validating shipment item at " + location?.name )
+		def onHandQuantity = inventoryService.getQuantity(location, shipmentItem.product, shipmentItem.lotNumber)
 		log.info("Checking shipment item quantity [" + shipmentItem.quantity + "] vs onhand quantity [" + onHandQuantity + "]");
+		if (!shipmentItem.validate()) { 
+			throw new ShipmentItemException(message: "shipmentItem.invalid", shipmentItem: shipmentItem)
+		}
+		
 		if (shipmentItem.quantity > onHandQuantity) { 
-			shipmentItem.errors.reject("shipmentItem.cannotExceedOnHandQuantity", "Quantity cannot exceed on-hand quantity");
 			throw new ShipmentItemException(message: "shipmentItem.cannotExceedOnHandQuantity", shipmentItem: shipmentItem)
 		}
 		return true;
