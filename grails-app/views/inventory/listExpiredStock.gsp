@@ -13,24 +13,21 @@
 				<div class="message">${flash.message}</div>
 			</g:if>
             <g:form action="listExpiredStock" method="get">
-            	<table id="expiredStockTable">
-            		<tr>
-            			<td>
-            				<span class="filter-list-item">
-	            				<label><warehouse:message code="category.label"/></label>            			
-				           		<g:select name="category"
-												from="${categories}"
-												optionKey="id" optionValue="${{format.category(category:it)}}" value="${categorySelected?.id}" 
-												noSelection="['': warehouse.message(code:'default.all.label')]" />   
-							</span>
-							<span class="filter-list-item">
-								<button name="filter">
-									<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;<warehouse:message code="default.button.filter.label"/> 
-								</button>
-							</span>
-						</td>							           	
-					</tr>
-				</table>
+				<div class="box">
+          			<span class="filter-list-item">
+           				<label><warehouse:message code="category.label"/></label>            			
+		           		<g:select name="category"
+										from="${categories}"
+										optionKey="id" optionValue="${{format.category(category:it)}}" value="${categorySelected?.id}" 
+										noSelection="['': warehouse.message(code:'default.all.label')]" />   
+					</span>
+					<span class="filter-list-item">
+						<button name="filter">
+							<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;<warehouse:message code="default.button.filter.label"/> 
+						</button>
+					</span>
+				</div>
+
             </g:form>
 			<table>
 				<tr>					

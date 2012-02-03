@@ -86,18 +86,9 @@ input:focus, select:focus, textarea:focus {
     padding: 7px 12px;
 }
 
-.menuButton {
-    font-size: 10px;
-	padding: 10px 5px;
-}
-.menuButton a {
-    /*color: #333;*/
-    padding: 2px 3px;
-}
 
 .linkButton {
     color: #333;
-	font-size: 10px;
 	padding: 10px 5px;
 }
 .linkButton a {

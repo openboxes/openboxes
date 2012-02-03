@@ -386,20 +386,15 @@ input.button {
 	border: 0px;
 	margin: 0px;
 }
+
 .menu .menu-section ul li { 
-    /*display: block;*/
-    
-    padding: 0px 0px 2px 0px;
-    cursor: pointer;
+    /*display: block;
+   padding: 0px 0px 2px 0px;
+    cursor: pointer;*/
 }
-/*
 .menu .menuSection a { 
 	font-weight: none;
 	text-decoration: none;
-}
-.menu .menuSection a:hover { 	
-	text-decoration: none;
-	font-weight: none;
 }
 .menu .menuSection a:hover { 
 	text-decoration: underline;
@@ -409,8 +404,12 @@ input.button {
 	text-decoration: none;
 	font-weight: none;
 }
-*/
-	
+.ui-widget-content a { 
+	color: #666;
+}
+.ui-widget-content a:hover { 
+	text-decoration: underline; 
+}
 
 .nav { 
 	margin: 0px;

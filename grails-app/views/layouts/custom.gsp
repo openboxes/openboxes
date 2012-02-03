@@ -18,7 +18,9 @@
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'form.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footer.css')}" type="text/css" media="screen, projection" />	
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'wizard.css')}" type="text/css" media="screen, projection" />
+	<%-- 
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.tableScroll/',file:'jquery.tablescroll.css')}" type="text/css" media="screen, projection" />
+	--%>
 	<%-- 
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'example.css')}" type="text/css" media="screen, projection" />
@@ -95,161 +97,14 @@
 	</g:if>
  	--%>
  	
-    <div id="doc3" class="yui-t7">
-		<!-- Spinner gets displayed when AJAX is invoked -->
-		<div id="spinner" class="spinner" style="display:none;">
-		    <img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" />
-		</div>
-		<!-- Header "hd" includes includes logo, global navigation -->
-		<div id="hd" role="banner">
-		    
-		    <!-- Block which includes the logo and login banner -->
-		    <div class="yui-b">
-				<div class="yui-gf">				
-					<div id="banner">
-					    <div id="bannerLeft" class="yui-u first" >
-							<div class="logo" >
-							    <a class="home" href="${createLink(uri: '/dashboard/index')}" style="text-decoration: none">						    	
-						    		<img src="${createLinkTo(dir:'images/icons/',file:'logo.gif')}" alt="Your Boxes. You're Welcome." 
-						    			style="vertical-align: absmiddle"/>
-						    			<span style="font-size: 2em; vertical-align: middle;"><i>open</i>boxes</span>
-							    </a>
-							</div>
-					    </div>
-					    <div id="bannerRight" class="yui-u" >
-					    	<div id="loggedIn">
-								<ul>
-								    <g:if test="${session.user}">
-										<li>
-											<warehouse:message code="layout.welcome.label"/>, <b>${session?.user?.name}</b> 
-										</li>
-										<!-- 																	
-										<li>
-											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cart.png')}" style="vertical-align: middle" />
-											<g:link controller="cart" action="list">Cart <span style="color: orange; font-weight: bold;">${session?.cart ? session?.cart?.items?.size() : '0'}</span></g:link>
-											
-										</li>
-										-->
-										<g:if test="${session?.warehouse}">
-											<li>
-												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
-											</li>					
-											<li>
-												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'user.png')}" style="vertical-align: middle" />
-												<g:link class="home" controller="user" action="show" id="${session.user.id}">
-													<warehouse:message code="layout.myAccount.label"/>
-												</g:link>	
-											</li>
-											<li>
-												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
-											</li>
-											<li>
-												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'application_view_tile.png')}" style="vertical-align: middle" />
-												<g:link class="home" controller="dashboard" action="index">
-													<warehouse:message code="dashboard.label"/>
-												</g:link>	
-											</li>
-																	
-											<li>
-												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
-											</li>
-										
-											<li>
-												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'building.png')}" style="vertical-align: middle" />
-												<%-- 
-												<a class="home" href='${createLink(controller: "dashboard", action:"chooseLocation")}'></a>
-												--%>
-												<a href="javascript:void(0);" id="warehouse-switch">
-													${session?.warehouse?.name }
-												</a>
-												
-												<div id="warehouse-menu" style="display: none; position: absolute; right: 80px; top: 38px;  
-													background-color: white; border: 1px solid black; min-width: 200px; z-index: 999">
-													<table>
-														<tbody>
-															<g:each var="warehouse" in="${session.loginLocations}" status="i">	
-																<tr class="prop">
-																	<td nowrap="nowrap" style="padding: 0">
-																		<g:if test="${warehouse?.fgColor && warehouse?.bgColor }">
-																			<style>
-																				#warehouse-${warehouse?.id} { background-color: #${warehouse.bgColor}; color: #${warehouse.fgColor}; } 
-																				#warehouse-${warehouse?.id} a { color: #${warehouse.fgColor}; }  	
-																			</style>				
-																		</g:if>					
-																		<div id="warehouse-${warehouse.id }" class="warehouse">												
-																			<a href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params: ['returnUrl':request.forwardURI])}' style="display: block; padding: 0px;">
-																				${warehouse.name} 
-																			</a> 
-																		</div>												
-																	</td>											
-																</tr>
-															</g:each>																	
-															<g:unless test="${session.loginLocations }">
-																<tr class="prop">
-																	<td nowrap="nowrap">
-																		<div style="color: black; background-color: white;">
-																			<warehouse:message code="dashboard.noWarehouse.message"/>
-																		</div>
-																	</td>
-																</tr>
-															</g:unless>
-														</tbody>					
-													</table>													
-												</div>
-											</li>
-										</g:if>
-										
-										<%--
-										<li>
-											<div style="display: inline">
-												<g:render template="../common/searchGlobal"/>
-											</div>
-										</li>
-										--%>
-										
-										
-										<li>
-											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
-										</li>												
-										<li>
-											<g:link class="list" controller="auth" action="logout"><warehouse:message code="default.logout.label"/></g:link>
-										</li>					
-										
-										<!-- 
-										 <li><g:link class="list" controller="user" action="preferences"><warehouse:message code="default.preferences.label"  default="Preferences"/></g:link></li>
-										 -->										 
-										<!-- 
-										 <li><input type="text" value="search" name="q" style="color: #aaa; font-weight: bold;" disabled=disabled /></li>
-										 -->
-								    </g:if>
-								    <g:else test="${!session.user}">
-										<li><warehouse:message code="layout.notLoggedIn.label"/></li>
-										<li><g:link class="list" controller="auth" action="signup"><warehouse:message code="default.signup.label"/></g:link></li>
-										<li><g:link class="list" controller="auth" action="login"><warehouse:message code="default.login.label"/></g:link></li>
-										<!-- 
-										  <li><g:link class="list" controller="user" action="register"><warehouse:message code="default.register.label" default="Register"/></g:link></li>
-										  <li><g:link class="list" controller="user" action="help"><warehouse:message code="default.help.label" default="Help"/></g:link></li>
-										 -->
-										 
-								    </g:else>
-								</ul>
-							</div>					
-					    </div>
-					</div>
-				</div>
-		    </div>		    
-		</div>
-    </div>
-    <%-- 
-    <div id="globalmenu">
-		<g:render template="/common/globalmenu"/>
+	<!-- Header "hd" includes includes logo, global navigation -->
+	<div id="hd" role="banner">
+	    <g:render template="/common/header"/>		    
 	</div>
-    --%>
-    <div id="doc3" class="yui-t2">	    
-		<!-- Body includes the divs for the main body content and left navigation menu -->
-		<!-- YUI "body" block that includes the main content for the page -->
-		<div id="bd" role="main">
-	    	<!-- YUI main Block including page title and content -->
+	<!-- Body includes the divs for the main body content and left navigation menu -->
+		
+	<div id="bd" role="main">
+	    <div id="doc3" class="yui-t3">		    	
 	      	<div id="yui-main">
 		    	<div id="content" class="yui-b">
 		    		<g:if test="${session.user}">
@@ -282,45 +137,28 @@
 	      	</div>
 	      		      	
 	      	<!-- YUI nav block that includes the local navigation menu -->
-	      	<div id="menu" role="navigation" class="yui-b">
+	      	<div id="menu" class="yui-b">
 		  		<g:if test="${session?.user && session?.warehouse}">
 					<g:include controller="dashboard" action="menu"/>
 				</g:if>
 			</div>			 
 		</div>
+	</div>
 
-		<!-- YUI "footer" block that includes footer information -->
-		<div id="ft" role="contentinfo">
-			<div id="footer">
-				<div style="line-height: 2em;">
-					&copy; 2012 Partners In Health&trade; <b>OpenBoxes</b> &nbsp;&nbsp; | &nbsp;&nbsp;
-					<warehouse:message code="application.environment.label"/>: <b>${grails.util.GrailsUtil.environment}</b> &nbsp;&nbsp; | &nbsp;&nbsp;
-					<warehouse:message code="application.version.label"/>: &nbsp;<b><g:meta name="app.version"/></b>&nbsp;&nbsp; | &nbsp;&nbsp; 
-					<warehouse:message code="application.buildNumber.label"/>: <b><g:meta name="app.buildNumber"/></b>&nbsp;&nbsp; | &nbsp;&nbsp;
-					<warehouse:message code="application.buildDate.label"/>: <b><g:meta name="app.buildDate"/></b>&nbsp;&nbsp; | &nbsp;&nbsp;
-					<warehouse:message code="application.revisionNumber.label"/>: <b><g:meta name="app.revisionNumber"/></b>&nbsp;&nbsp; | &nbsp;&nbsp;					
-					<warehouse:message code="application.grailsVersion.label"/>: &nbsp; <b><g:meta name="app.grails.version"></g:meta></b>&nbsp;&nbsp; | &nbsp;&nbsp;
-					<%-- <warehouse:message code="default.date.label"/>: <b>${new Date() }</b>&nbsp;&nbsp; | &nbsp;&nbsp;--%>
-					<warehouse:message code="default.locale.label"/>: &nbsp;  	
-					
-					<!-- show all supported locales -->
-					<g:each in="${grailsApplication.config.locale.supportedLocales}" var="l">
-						<g:set var="locale" value="${new Locale(l)}"/>
-						<a href="${createLink(controller: 'user', action: 'updateAuthUserLocale', params: ['locale':locale])}">
-							<!-- fetch the display for locale based on the current locale -->
-							${locale?.getDisplayName(session?.user?.locale ?: new Locale(grailsApplication.config.locale.defaultLocale))}
-						</a> &nbsp;
-					</g:each>
-
-				</div>
-			</div>
-		</div>
+	<!-- YUI "footer" block that includes footer information -->
+	<div id="ft" role="contentinfo">
+		<g:render template="/common/footer" />
 	</div>
 	<script type="text/javascript">
 		$(function() { 
 
 			$("#warehouse-switch").click(function() {
-				$("#warehouse-menu").toggle();
+				//$("#warehouse-menu").toggle();
+				$("#warehouseMenu").dialog({ 
+					autoOpen: true, 
+					modal: true, 
+					width: '400px'
+				});
 			});
 			
 			function show() {

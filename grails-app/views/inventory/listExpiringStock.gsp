@@ -14,33 +14,29 @@
 				<div class="message">${flash.message}</div>
 			</g:if>
             <g:form action="listExpiringStock" method="get">
-            	<table>
-            		<tr>
-			           	<td>
-			           		<span class="filter-list-item">
-	            				<label><warehouse:message code="category.label"/></label>
-				           		<g:select name="category"
-												from="${categories}"
-												optionKey="id" optionValue="${{format.category(category:it)}}" value="${categorySelected?.id}" 
-												noSelection="['': warehouse.message(code:'default.all.label')]" />   
-							</span>
-							<span class="filter-list-item">
-	            				<label><warehouse:message code="inventory.expiresWithin.label"/></label>
-				           		<g:select name="threshhold"
-									from="['1': warehouse.message(code:'default.week.oneWeek.label'), '14': warehouse.message(code:'default.week.twoWeeks.label'), 
-										   '30': warehouse.message(code:'default.month.oneMonth.label'), '60': warehouse.message(code:'default.month.twoMonths.label'), 
-										   '90': warehouse.message(code:'default.month.threeMonths.label'), '180': warehouse.message(code:'default.month.sixMonths.label'), 
-										   '365': warehouse.message(code:'default.year.oneYear.label'), '730': warehouse.message(code:'default.year.twoYear.label'), '1825': warehouse.message(code:'default.year.fiveYear.label')]"
-									optionKey="key" optionValue="value" value="${threshholdSelected}" 
-									noSelection="['': warehouse.message(code:'default.all.label')]" />   
-				           	</span>
-				           	<span class="filter-list-item">
-								<button name="filter">
-									<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;<warehouse:message code="default.button.filter.label"/> </button>
-							</span>
-						</td>							           	
-					</tr>
-				</table>
+				<div class="dialog box">
+	           		<span class="filter-list-item">
+           				<label><warehouse:message code="category.label"/></label>
+		           		<g:select name="category"
+										from="${categories}"
+										optionKey="id" optionValue="${{format.category(category:it)}}" value="${categorySelected?.id}" 
+										noSelection="['': warehouse.message(code:'default.all.label')]" />   
+					</span>
+					<span class="filter-list-item">
+           				<label><warehouse:message code="inventory.expiresWithin.label"/></label>
+		           		<g:select name="threshhold"
+							from="['1': warehouse.message(code:'default.week.oneWeek.label'), '14': warehouse.message(code:'default.week.twoWeeks.label'), 
+								   '30': warehouse.message(code:'default.month.oneMonth.label'), '60': warehouse.message(code:'default.month.twoMonths.label'), 
+								   '90': warehouse.message(code:'default.month.threeMonths.label'), '180': warehouse.message(code:'default.month.sixMonths.label'), 
+								   '365': warehouse.message(code:'default.year.oneYear.label'), '730': warehouse.message(code:'default.year.twoYear.label'), '1825': warehouse.message(code:'default.year.fiveYear.label')]"
+							optionKey="key" optionValue="value" value="${threshholdSelected}" 
+							noSelection="['': warehouse.message(code:'default.all.label')]" />   
+		           	</span>
+		           	<span class="filter-list-item">
+						<button name="filter">
+							<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;<warehouse:message code="default.button.filter.label"/> </button>
+					</span>
+				</div>
             </g:form>            
 			<table>
 				<tr>					
