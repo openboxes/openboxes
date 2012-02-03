@@ -756,10 +756,16 @@ class InventoryController {
 			try {
 				// Add validated transaction entries to the transaction we want to persist
 				command.transactionEntries.each {
+					
+					// FIXME Need to do some validation at this point
+					//def onHandQuantity = quantityMap[it.inventoryItem]					
+					// If the quantity changes, we record a new transaction entry
+					//if (it.quantity != onHandQuantity) { 
 					def transactionEntry = new TransactionEntry()
 					transactionEntry.inventoryItem = it.inventoryItem
 					transactionEntry.quantity = it.quantity
 					transaction.addToTransactionEntries(transactionEntry)
+					//}
 				}
 				
 				// Validate the transaction object
@@ -893,10 +899,10 @@ class InventoryController {
 		def quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory)
 
 		
-		// Quantity cannot be greater than on hand quantity
+		// Quantity cannot be less than 0 or else it would be in a debit transaction
 		command.transactionEntries.each {
 			if (it.quantity < 0) {
-				transaction.errors.rejectValue("transactionEntries", "transactionEntry.quantity.invalid", [it?.inventoryItem?.lotNumber] as Object[], "")
+				transactionInstance.errors.rejectValue("transactionEntries", "transactionEntry.quantity.invalid", [it?.inventoryItem?.lotNumber] as Object[], "")
 			}
 		}
 
