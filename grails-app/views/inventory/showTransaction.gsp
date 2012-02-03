@@ -139,8 +139,8 @@
 											<label><warehouse:message code="shipping.shipment.label"/></label>
 										</td>
 										<td class="value">
-											<g:link controller="shipment" action="showDetails" id="${transactionInstance?.outgoingShipment?.id }">
-												${transactionInstance?.outgoingShipment?.name} 
+											<g:link controller="shipment" action="showDetails" id="${transactionInstance?.incomingShipment?.id }">
+												${transactionInstance?.incomingShipment?.name} 
 											</g:link>
 										</td>										
 									</tr>

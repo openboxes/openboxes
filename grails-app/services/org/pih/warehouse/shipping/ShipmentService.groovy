@@ -966,6 +966,7 @@ class ShipmentService {
 						transactionEntry.quantity = it.quantityReceived;
 						transactionEntry.inventoryItem = inventoryItem;
 						creditTransaction.addToTransactionEntries(transactionEntry);
+						//creditTransaction.incomingShipment = shipmentInstance
 					}
 					
 					// TODO: had to comment out these flash.message because they were throwing a no-such
