@@ -18,18 +18,19 @@
             
 				<div class="buttonBar">            	
 	            	<span class="linkButton">
-	            		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="['products']"/></g:link>
+	            		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'product.label').toLowerCase()]"/></g:link>
 	            	</span>
 	            	<span class="linkButton">
-	            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="['product']"/></g:link>
+	            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'product.label').toLowerCase()]"/></g:link>
 	            	</span>
+	            	
             	</div>
             	
 	            <div class="dialog box">
 					<g:form action="list" method="get">
 						<label><warehouse:message code="product.search.label"/></label>            
-						<g:textField name="searchTerm" size="45"/>					
-						<button type="submit" class="positive"><img
+						<g:textField name="q" size="45"/>					
+						<button type="submit"><img
 							src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" style="vertical-align: middle;"
 							alt="Save" /> ${warehouse.message(code: 'default.button.find.label')}
 						</button>		          

@@ -28,67 +28,7 @@ class InventoryItemController {
 	def requestService;
 	def orderService;
 	
-	def importInventoryItems = { ImportInventoryCommand cmd ->
-		def inventoryMapList = null;
-		if ("POST".equals(request.getMethod())) {			
-			File localFile = null;
-			if (request instanceof DefaultMultipartHttpServletRequest) { 
-				def uploadFile = request.getFile('xlsFile');
-				if (!uploadFile?.empty) {
-					try { 
-						localFile = new File("uploads/" + uploadFile.originalFilename);
-						localFile.mkdirs()				
-						uploadFile.transferTo(localFile);
-						session.localFile = localFile;
-						//flash.message = "File uploaded successfully"
-						
-					} catch (Exception e) { 
-						throw new RuntimeException(e);
-					}
-				}
-				else { 
-					flash.message = "${warehouse.message(code: 'inventoryItem.emptyFile.message')}"
-				}
-			}
-			// Otherwise, we need to retrieve the file from the session 
-			else { 
-				localFile = session.localFile
-			}
-			
-			if (localFile) {
-				log.info "Local xls file " + localFile.getAbsolutePath()
-				cmd.filename = localFile.getAbsolutePath()
-					
-				inventoryMapList =
-					inventoryService.prepareInventory(Location.get(session.warehouse.id), cmd.filename, cmd.errors);
 
-				if (!inventoryMapList?.isEmpty) { 
-					flash.message = "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args:[localFile.getAbsolutePath()])}"
-				}
-				else { 
-					flash.message = "${warehouse.message(code: 'inventoryItem.dataReadyToBeImported.message')}"
-				}
-					
-				// If there are no errors and the user requests to import the data, we should execute the import
-				if (!cmd.errors.hasErrors() && params.importNow) {
-					inventoryService.importInventory(Location.get(session.warehouse.id), inventoryMapList, cmd.errors);
-					
-					if (!cmd.errors.hasErrors()) {
-						flash.message = "${warehouse.message(code: 'inventoryItem.importSuccess.message', args:[localFile.getAbsolutePath()])}"
-						redirect(action: "importInventoryItems");
-						return;
-					}
-				}
-
-				
-				render(view: "importInventoryItems", model: [ inventoryMapList : inventoryMapList, commandInstance: cmd]);
-			}		
-			else { 
-				flash.message = "${warehouse.message(code: 'inventoryItem.notValidXLSFile.message')}"
-			}
-			
-		}
-	}	
 	
 	/**
 	 * 
@@ -658,23 +598,5 @@ class InventoryItemController {
 		render(view:'editItemDialog', model: [itemInstance: itemInstance]);
 	}
 
-}
-
-
-class ImportInventoryCommand { 
-	
-	def filename
-	def importFile
-	def transactionInstance
-	def warehouseInstance
-	def inventoryInstance
-	def products
-	def transactionEntries
-	def categories
-	def inventoryItems
-	
-	static constraints = {
-		
-	}
 }
 

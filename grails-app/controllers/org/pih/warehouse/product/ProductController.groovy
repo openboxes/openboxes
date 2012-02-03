@@ -10,8 +10,6 @@ import org.pih.warehouse.core.Location;
 
 import grails.converters.JSON;
 
-import au.com.bytecode.opencsv.CSVReader;
-
 class ProductController {
 
 	def inventoryService;
@@ -29,10 +27,13 @@ class ProductController {
 	 */
 	def batchEdit = { BatchEditCommand cmd -> 
 		
+		def location = Location.get(session.warehouse.id)
+		
 		log.info "Batch edit: " + params
 		def categoryInstance = Category.get(params?.category?.id)		
 		if (categoryInstance) { 			
 			cmd.productInstanceList = Product.findAllByCategory(categoryInstance)
+			//cmd.inventoryLevelMap = inventoryService.getInventoryLevels(cmd.productInstanceList, location)
 		}
 		else { 
 			//flash.message = "Only displaying first 100 products.  Please select a category."
@@ -50,6 +51,7 @@ class ProductController {
 		[ commandInstance : cmd, categoryInstance: categoryInstance ]
 		
 	}
+	
 	
 	def batchSave = { BatchEditCommand cmd ->
 		
@@ -100,9 +102,9 @@ class ProductController {
 		
         params.max = Math.min(params.max ? params.int('max') : 15, 100)
 		
-		if (params.searchTerm) { 
-			productInstanceList = Product.findAllByNameLike("%" + params.searchTerm + "%", params)
-			productInstanceTotal = Product.countByNameLike("%" + params.searchTerm + "%", params);
+		if (params.q) { 
+			productInstanceList = Product.findAllByNameLike("%" + params.q + "%", params)
+			productInstanceTotal = Product.countByNameLike("%" + params.q + "%", params);
 		}
 		else { 
 			productInstanceList = Product.list(params)			
@@ -301,158 +303,7 @@ class ProductController {
 		redirect(controller: "product", action: "importProducts")	
 	}
 	
-	/**
-	* Import contents of CSV file
-	*/
-   def importProducts = {
-	   
-	   if ("GET".equals(request.getMethod())) {
-		   render(view: "uploadProducts");
-	   }
-	   else if ("POST".equals(request.getMethod())) {
-		   log.info "POST request"
-		   if (!session.products) {
-			   log.info "GET request"
-			   
-			   flash.message = "Please upload a CSV file with valid products";
-		   }
-		   else {			   
-			   
-			   if (!session.dosageForms && !session.productTypes) { 
-				   session.products.each() {					   
-					   def productInstance = new Product(	name: it.name, 
-															productCode: it.productCode);						
-						productInstance.save(failOnError:true);
-					};
-				   // import
-				   flash.message = "Products imported successfully"
-				   redirect(controller: "inventoryItem", action: "browse")
-			   }			   								   
-			   else { 
-				   flash.message = "Please import dependencies first"
-				   redirect(controller: "product", action: "importProducts")				   
-			   }
-		   }
-	   }
-   }
 
-
-	   
-   /**
-	* Upload and process CSV file
-	*/
-   def uploadProducts = {
-	   
-	   if ("POST".equals(request.getMethod())) {
-		   
-		   
-		   def uploadFile = request.getFile('csvFile');
-		   def uploadFilePath = "/tmp/${request.contextPath}/products/import/" + uploadFile.originalFilename
-		   // file must be less than 1MB
-		   if (!uploadFile?.empty) {
-			   File csvFile = new File(uploadFilePath);
-			   csvFile.mkdirs()
-			   
-			   uploadFile.transferTo(csvFile);
-			   
-			   
-			   //def sql = Sql.newInstance("jdbc:mysql://localhost:3306/mydb", "user", "pswd", "com.mysql.jdbc.Driver")
-			   //def people = sql.dataSet("PERSON")
-			   List<Product> products = new ArrayList<Product>();
-			   
-			   /*
-			   csvFile.splitEachLine(",") { fields ->
-				   log.info("field0: " + fields[0])
-				   log.info("field1: " + fields[1])
-				   log.info("field2: " + fields[2])
-				   
-				   products.add(
-					   new ProductCommand(
-						   id: fields[0],
-						   ean: fields[1],
-						   name: fields[2],
-						   description: fields[3],
-						   productType: fields[4]));
-			   }*/
-
-			   
-				// Process CSV file
-				def columns;
-				def productTypes = new HashSet<String>();
-				def categories = []
-				def unitOfMeasures = []
-				def dosageForms = new HashSet<String>();
-				
-				
-				CSVReader csvReader = new CSVReader(new FileReader(csvFile.getAbsolutePath()), (char) ',', (char) '\"', 1);
-				while ((columns = csvReader.readNext()) != null) {
-					
-					// 0 => type
-					// 1 => productType
-					// 2 => productCode
-					// 3 => name
-					// 4 => frenchName
-					// 5 => dosageStrength
-					// 6 => unitOfMeasure
-					// 7 => dosageForm
-					
-					def productInstance = new Product();
-					productInstance.productCode = columns[2]
-					productInstance.name = columns[3]
-					productInstance.frenchName = columns[4]
-					productInstance.dosageStrength = columns[5]
-					productInstance.dosageUnit = columns[6]
-					
-					/*
-					def productTypeValue = columns[1];
-					if (productTypeValue && !productTypeValue.equals("") && !productTypeValue.equals("null")) { 
-						def productType = ProductType.findByName(productTypeValue);
-						if (!productType) { 
-							productInstance.productType = new ProductType(name: productTypeValue, code: productTypeValue);						
-							productTypes.add(productTypeValue);
-						}else { 
-							productInstance.productType = productType
-						}
-					}					
-					
-					def dosageFormValue = columns[7];
-					if (dosageFormValue && !dosageFormValue.equals("") && !dosageFormValue.equals("null")) { 					
-						def dosageForm = DosageForm.findByName(dosageFormValue);					
-						if (!dosageForm) { 
-							productInstance.dosageForm = new DosageForm(name: dosageFormValue, code: dosageFormValue)
-							dosageForms.add(dosageFormValue);
-						}
-						else { 
-							productInstance.dosageForm = dosageForm
-						}
-					}
-					*/
-					
-											
-					products.add(productInstance);
-
-			   }
-			   
-			   
-			   
-			   session.products = products;
-			   //session.categories = categories;
-			   session.productTypes = productTypes;
-			   session.dosageForms = dosageForms;
-			   
-			   if (dosageForms || productTypes) { 
-				   flash.message = "Please import all dependencies first"
-				   render(view: "importProducts", model: [productTypes: productTypes, dosageForms: dosageForms]);
-			   }
-			   else { 
-				   render(view: "importProducts", model: [products:products]);				   
-			   }
-		   }
-		   else {
-			   flash.message = "Please upload a non-empty CSV file";
-		   }
-	   }
-   }
 	
 	
 }

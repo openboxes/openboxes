@@ -16,7 +16,7 @@ eventRunAppStart = {
 	metadata.'app.revisionNumber' = revisionNumber.toString()
 	metadata.'app.buildDate' = new java.text.SimpleDateFormat("dd MMM yyyy hh:mm:ss a").format(new java.util.Date());
 	metadata.'app.buildNumber' = buildNumber.toString()
-	metadata.persist()	
+	//metadata.persist()	
 }
 
 eventCreateWarStart = { warName, stagingDir ->
