@@ -144,7 +144,7 @@
 							<g:if test="${shipmentInstance?.incomingTransactions }">
 								<tr class="prop">
 									<td valign="top" class="name"><label>
-										<img src="${createLinkTo(dir:'images/icons/silk',file:'tag.png')}" alt="tag" style="vertical-align: middle"/>
+										<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="tag" style="vertical-align: middle"/>
 										<warehouse:message code="shipping.transactions.label"/></label>
 									</td>
 									<td valign="top" class="value">
@@ -157,6 +157,38 @@
 											</thead>
 											<tbody>	
 												<g:each var="transaction" in="${shipmentInstance?.incomingTransactions}" status="i">							
+													<tr class="${i % 2 ? 'even' : 'odd' }">								
+														<td>
+															<g:link controller="inventory" action="showTransaction" id="${transaction?.id }">
+																<format:metadata obj="${transaction?.transactionType}"/>
+															</g:link>
+														</td>
+														<td>
+															<format:datetime obj="${transaction?.transactionDate }"/>
+														</td>
+													</tr>
+												</g:each>
+											</tbody>
+										</table>
+									</td>										
+								</tr>							
+							</g:if>
+							<g:if test="${shipmentInstance?.outgoingTransactions }">
+								<tr class="prop">
+									<td valign="top" class="name"><label>
+										<img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="tag" style="vertical-align: middle"/>
+										<warehouse:message code="shipping.transactions.label"/></label>
+									</td>
+									<td valign="top" class="value">
+										<table>
+											<thead>
+												<tr>
+													<th width="10%"><warehouse:message code="transaction.type.label"/></th>
+													<th width="15%"><warehouse:message code="transaction.date.label"/></th>																	
+												</tr>
+											</thead>
+											<tbody>	
+												<g:each var="transaction" in="${shipmentInstance?.outgoingTransactions}" status="i">							
 													<tr class="${i % 2 ? 'even' : 'odd' }">								
 														<td>
 															<g:link controller="inventory" action="showTransaction" id="${transaction?.id }">

@@ -6,8 +6,10 @@
 	});
 </script>	
 <div class="action-menu-item">
-	<a id="btnAdjustStock-${itemInstance?.id}">
-		<img src="${resource(dir: 'images/icons/silk', file: 'book_open.png')}"/>&nbsp;<warehouse:message code="inventory.adjustStock.label"/></a>
+	<a  href="javascript:void(0);" id="btnAdjustStock-${itemInstance?.id}">
+		<img src="${resource(dir: 'images/icons/silk', file: 'book_open.png')}"/>&nbsp;
+		<warehouse:message code="inventory.adjustStock.label"/>
+	</a>
 </div>
 <g:link controller="inventoryItem" action="recordInventory" params="['product.id':commandInstance?.productInstance?.id,'inventory.id':commandInstance?.inventoryInstance?.id, 'inventoryItem.id':itemInstance?.id]">
 </g:link>

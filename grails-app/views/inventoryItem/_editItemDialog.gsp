@@ -5,8 +5,9 @@
 	});
 </script>	   
 <div class="action-menu-item">
-	<a id="btnEditItem-${itemInstance?.id}">
-		<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;<warehouse:message code="inventory.editItem.label"/>
+	<a href="javascript:void(0);" id="btnEditItem-${itemInstance?.id}">
+		<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
+		<warehouse:message code="inventory.editItem.label"/>
 	</a>
 </div>
 <div id="dlgEditItem-${itemInstance?.id}" title="${warehouse.message(code: 'inventory.editItem.label')}" style="padding: 10px; display: none;" >	
@@ -50,8 +51,11 @@
 					<tr class="prop">
 						<td valign="top" class="name"><label><warehouse:message code="product.lotNumber.label"/></label></td>                            
 						<td valign="top" class="value">
+							<g:textField name="lotNumber" value="${itemInstance?.lotNumber}"/>
+							<%-- 
 							<g:autoSuggestEditable id="editItem-lotNumber-${itemInstance?.id}" name="lotNumber" jsonUrl="${request.contextPath }/json/findLotsByName?productId=${itemInstance?.product?.id }" 
 								size="20" valueId="${itemInstance?.lotNumber}" valueName="${itemInstance?.lotNumber}"/>							
+							--%>
 						</td>
 					</tr>
 					<tr class="prop">

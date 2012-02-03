@@ -6,8 +6,10 @@
 	});
 </script>	   
 <div class="action-menu-item">
-	<a id="btnAddToShipment-${itemInstance?.id}">
-		<img src="${resource(dir: 'images/icons/silk', file: 'lorry_add.png')}"/>&nbsp;<warehouse:message code="shipping.addToShipment.label"/></a>
+	<a  href="javascript:void(0);" id="btnAddToShipment-${itemInstance?.id}">
+		<img src="${resource(dir: 'images/icons/silk', file: 'lorry_add.png')}"/>&nbsp;
+		<warehouse:message code="shipping.addToShipment.label"/>
+	</a>
 </div>
 
 <div id="dlgAddToShipment-${itemInstance?.id}" title="${warehouse.message(code:'shipping.addToShipment.label')}" style="padding: 10px; display: none; vertical-align: middle;" >	

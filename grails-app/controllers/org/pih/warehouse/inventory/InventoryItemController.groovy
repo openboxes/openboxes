@@ -352,7 +352,7 @@ class InventoryItemController {
 		
 		log.info "Params " + params;
 		def itemInstance = InventoryItem.get(params.id)
-		def productInstance = InventoryItem.get(params?.product?.id)
+		def productInstance = Product.get(params?.product?.id)
 		def inventoryInstance = Inventory.get(params?.inventory?.id)
 		if (itemInstance) {
 			if (params.version) {
@@ -367,12 +367,13 @@ class InventoryItemController {
 			itemInstance.properties = params
 			
 			// FIXME Temporary hack to handle a chnaged values for these two fields
-			itemInstance.lotNumber = params?.lotNumber?.name
+			itemInstance.lotNumber = params?.lotNumber
 			
 			if (!itemInstance.hasErrors() && itemInstance.save(flush: true)) {
 				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"
 			}
 			else {
+				log.info "There were errors trying to save inventory item " + itemInstance?.errors
 				//flash.message = "There were errors"
 			}
 		}
