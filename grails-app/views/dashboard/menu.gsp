@@ -158,11 +158,13 @@
 						</span>
 					</li>
 				</g:each>	
+				<%-- 
 				<li>
 					<span class="menuButton">
 						<g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'INCOMING']"><warehouse:message code="shipping.createIncomingShipment.label"/></g:link>
 					</span> 
-				</li>	
+				</li>
+				--%>	
 			</ul>										
 		</div>
 	</g:authorize>	
