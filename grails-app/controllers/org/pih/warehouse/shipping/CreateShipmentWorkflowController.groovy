@@ -16,6 +16,8 @@ class CreateShipmentWorkflowController {
 	ShipmentService shipmentService
 	
     def index = { 
+		log.info "CreateShipmentWorkflowController.index() -> " + params
+		flash.type = params.type
     	redirect(action:'createShipment')
     }
     
@@ -24,7 +26,6 @@ class CreateShipmentWorkflowController {
     	start {
     		action {
     			log.info("Starting shipment workflow " + params)
-    			
     			// create a new shipment instance if we don't have one already
     			if (!flow.shipmentInstance) { 
     				flow.shipmentInstance = shipmentService.getShipmentInstance(params.id)
@@ -140,7 +141,9 @@ class CreateShipmentWorkflowController {
     		}.to("enterTrackingDetails")
     		
 			on("enterContainerDetails") { 
-				log.info ("enter container details " + params)
+				log.info ("Enter container details " + params)
+				
+				
 				[ selectedContainer : Container.get(params?.containerId)]
 			}.to("enterContainerDetails")
 			
@@ -262,7 +265,7 @@ class CreateShipmentWorkflowController {
 			// for the top-level links
     		on("enterShipmentDetails").to("enterShipmentDetails")
 			on("enterTrackingDetails").to("enterTrackingDetails")
-			on("enterContainerDetails").to("enterContainerDetails")
+			//on("enterContainerDetails").to("enterContainerDetails")
 			on("reviewShipment").to("reviewShipment")
 			on("sendShipment").to("sendShipment")
     	}

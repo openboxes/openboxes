@@ -7,15 +7,14 @@
     </head>
     <body>
         <div class="body">
-           <g:if test="${message}">
-                 <div class="message">${message}</div>
-           </g:if>   
+			<g:if test="${message}">
+				<div class="message">${message}</div>
+			</g:if>   
 			<g:hasErrors bean="${shipmentInstance}">
 	            <div class="errors">
 	                <g:renderErrors bean="${shipmentInstance}" as="list" />
 	            </div>				
 			</g:hasErrors>
-
 			
            	<g:form action="createShipment" method="post">
 				<g:hiddenField name="id" value="${shipmentInstance?.id}"/>
@@ -57,7 +56,8 @@
 									<td valign="top"
 										class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">								
 										<g:selectShipmentOrigin name="origin.id" 
-											optionKey="id" value="${shipmentInstance?.origin?.id ? shipmentInstance?.origin?.id : session.warehouse.id}" 
+											optionKey="id" 
+											value="${shipmentInstance?.origin?.id ? shipmentInstance?.origin?.id : params.type == 'OUTGOING' ? session.warehouse.id : ''}" 
 											noSelection="['null':'']" 
 											style="width: 180px" />							
 										<br/>
@@ -68,7 +68,7 @@
 									<td valign="top" class="name"><label><warehouse:message code="default.destination.label" /></td>
 									<td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'destination', 'errors')}">
 										<g:selectShipmentDestination name="destination.id" 
-											optionKey="id" value="${shipmentInstance?.destination?.id}" 
+											optionKey="id" value="${shipmentInstance?.destination?.id ? shipmentInstance?.destination?.id : (params.type == 'INCOMING') ? session.warehouse.id : ''}" 
 											noSelection="['null':'']"
 											style="width: 180px" />	
 									</td>
@@ -101,12 +101,12 @@
 		                    </tbody>
 		                    <tfoot>
 		                    	<tr class="prop">
-		                    		<td colspan="2">
+		                    		<td colspan="2" class="right">
 										<div class="buttons">
-											<button type="submit" name="_eventId_back" disabled>&lsaquo; <warehouse:message code="default.button.back.label"/></button>	
-											<button type="submit" name="_eventId_next"><warehouse:message code="default.button.next.label"/> &rsaquo;</button> 
-											<button type="submit" name="_eventId_save"><warehouse:message code="default.button.saveAndExit.label"/></button>
-											<button type="submit" name="_eventId_cancel"><warehouse:message code="default.button.cancel.label"/></button>						
+											<button name="_eventId_back" disabled>&lsaquo; <warehouse:message code="default.button.back.label"/></button>	
+											<button name="_eventId_next"><warehouse:message code="default.button.next.label"/> &rsaquo;</button> 
+											<button name="_eventId_save"><warehouse:message code="default.button.saveAndExit.label"/></button>
+											<button name="_eventId_cancel"><warehouse:message code="default.button.cancel.label"/></button>						
 										</div>
 									</td>	                    	
 		                    	</tr>

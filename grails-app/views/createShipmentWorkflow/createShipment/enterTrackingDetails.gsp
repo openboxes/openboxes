@@ -7,15 +7,15 @@
     </head>
     <body>
         <div class="body">
-        
         	<g:if test="${message}">
 				<div class="message">${message}</div>
 			</g:if> 
 			
 			<g:hasErrors bean="${shipmentInstance}">
-				<div class="errors"><g:renderErrors bean="${shipmentInstance}" as="list" /></div>
+				<div class="errors">
+					<g:renderErrors bean="${shipmentInstance}" as="list" />
+				</div>
 			</g:hasErrors> 
-			
 			
 			<g:form action="createShipment" method="post">
 				<g:hiddenField name="id" value="${shipmentInstance?.id}"/>

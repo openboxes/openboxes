@@ -6,8 +6,6 @@
 		     
 <script>
 	$(document).ready(function() {
-
-		
 		$("#dlgAddItem").dialog({ 
 			autoOpen: true, 
 			modal: true, 

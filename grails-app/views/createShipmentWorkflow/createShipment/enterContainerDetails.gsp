@@ -72,15 +72,15 @@
 		 			<g:render template="moveItem" model="['item':itemToMove]"/>
 		 		</g:if>
 			 	
+			 	<!-- Hack used to get the shipment to refresh ${shipmentInstance?.refresh() }-->
 				<%-- Main content section --%>
 			 	<table>
 			 		<tr class="prop">
 				 		<%-- Display the pallets & boxes in this shipment --%> 
 			 			<td valign="top" style="padding: 0px; margin: 0px; width: 250px; height: 100px; border-right: 1px solid lightgrey;" >
-							<div class="list" style="text-align: left; border: 0px solid lightgrey;">
+							<div class="list" >
 								<g:set var="count" value="${0 }"/>	
-															
-								<table style="border: 0px" border="0">	
+								<table class="sortable" data-update-url="${createLink(controller:'json', action:'sortContainers')}">	
 									<thead>
 										<tr class="odd"><%-- --%>
 											<td colspan="2">
@@ -96,7 +96,7 @@
 																<hr/>
 															</div>
 														</g:if>
-														<g:each var="containerInstance" in="${shipmentInstance?.containers?.findAll({!it.parentContainer})?.sort { it?.name?.toLowerCase()}}">
+														<g:each var="containerInstance" in="${shipmentInstance?.containers?.findAll({!it.parentContainer})?.sort { it?.sortOrder }}">
 															<div class="action-menu-item">														
 																<g:link action="createShipment" event="enterContainerDetails" params="['containerId':containerInstance?.id]" fragment="container-${containerInstance?.id }">
 																	<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="View" style="vertical-align: middle"/>
@@ -106,23 +106,15 @@
 														</g:each>
 													</div>
 												</span>				
-												<label><warehouse:message code="shipping.allShipmentContainers.label"/></label>
-											</td>
-										</tr>
-										<tr class="odd">
-											<td colspan="2">
-												<div style="border: 0px;">
+												<span >
 								 					<span class="fade"><warehouse:message code="shipping.totalWeight.label"/>:</span> 
 													<g:formatNumber format="#,##0.00" number="${shipmentInstance?.totalWeightInPounds() ? shipmentInstance?.totalWeightInPounds() : 0.00 }" /> <warehouse:message code="default.lbs.label"/>
-										 		</div>
-										 	</td>
-										</tr>
-										<tr class="${count++%2==0?'odd':'even' }">
-											<th><warehouse:message code="container.label"/></th>
+										 		</span>
+												
+											</td>
 										</tr>
 									</thead>
 									<tbody>
-										
 										<tr class="${count++%2==0?'even':'odd' }">
 											<g:set var="styleClass" value="${selectedContainer == null ? 'selected' : 'not-selected' }"/>
 											<td class="droppable">
@@ -142,9 +134,9 @@
 											</td>
 										</tr>										
 										<g:if test="${shipmentInstance?.containers }">
-											<g:each var="containerInstance" in="${shipmentInstance?.containers?.findAll({!it.parentContainer})?.sort { it?.name?.toLowerCase() }}">
+											<g:each var="containerInstance" in="${shipmentInstance?.containers?.findAll({!it.parentContainer})?.sort { it?.sortOrder }}">
 												<g:set var="styleClass" value="${containerInstance?.id == selectedContainer?.id ? 'selected' : 'not-selected' }"/>
-												<tr style="border: 0px solid lightgrey;" class="${count++%2==0?'even':'odd' }">
+												<tr id="container_${containerInstance?.id }" >
 													<td style="vertical-align: middle;" id="${containerInstance?.id }" class="droppable">													
 														<a name="container-${containerInstance.id }"></a>
 														<div>
@@ -158,7 +150,7 @@
 															</span>
 															<span class="${styleClass }">
 																<g:if test="${containerInstance?.id == selectedContainer?.id }">
-																	${containerInstance?.name}
+																	${containerInstance?.name} 
 																</g:if>
 																<g:else>
 																	<%-- fragment="container-${containerInstance?.id }"  --%>
@@ -243,12 +235,7 @@
 														<warehouse:message code="shipping.unpackedItems.label" />			 						
 													</g:else>
 												</label>
-												
-											</td>
-										</tr>
-										<tr>
-											<td colspan="5" class="odd">
-								 				<div>
+								 				<span>
 													<span class="fade">
 										 				<warehouse:message code="default.weight.label"/>: 
 										 			</span>
@@ -285,7 +272,7 @@
 													<g:else>
 														<warehouse:message code="default.none.label"/>
 													</g:else>
-												</div>
+												</span>
 											</td>
 										</tr>
 									</thead>
@@ -387,6 +374,21 @@
 		<script>
 			
 			$(document).ready(function() {
+			
+				$(".sortable tbody").sortable({
+				    //handle : '.handle', 
+				    axis : "y",
+				    update : function() { 
+						var updateUrl = "${createLink(controller:'json', action:'sortContainers') }";						
+						//var updateUrl = $(this).data('update-url')
+						var sortOrder = $(this).sortable('serialize'); 
+						console.log(updateUrl);
+						console.log(sortOrder);					
+						$.post(updateUrl, sortOrder);
+						
+				    } 				
+				});
+			
 				//$( ".draggable" ).draggable();
 				//$('.selectable').selectable();
 				$('.draggable').draggable(

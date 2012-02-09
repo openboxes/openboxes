@@ -74,6 +74,19 @@ class JsonController {
 		render(template:'searchResults', model:[searchResults:results])
 	}
 	
+	def sortContainers = { 
+		def container 
+		params.get("container[]").eachWithIndex { id, index ->
+			container = Container.get(id)
+			container.sortOrder = index 
+			container.save(flush:true);
+			println ("container " + container.name + " saved at index " + index)
+		}
+		
+		render(text: "", contentType: "text/plain")
+		
+	}
+	
 	
 	def searchAll = { 
 		
