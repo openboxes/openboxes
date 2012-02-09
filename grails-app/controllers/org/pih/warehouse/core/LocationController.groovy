@@ -9,8 +9,22 @@ class LocationController {
 	 */
 	
 	def list = {
-		params.max = Math.min(params.max ? params.int('max') : 25, 100)
-		[locationInstanceList: Location.list(params), locationInstanceTotal: Location.count()]
+		def locationInstanceList = []
+		def locationInstanceTotal = 0;
+		
+		params.max = Math.min(params.max ? params.int('max') : 10, 100)
+		
+		if (params.q) {
+			locationInstanceList = Location.findAllByNameLike("%" + params.q + "%", params)
+			locationInstanceTotal = Location.countByNameLike("%" + params.q + "%", params);
+		}
+		else {
+			locationInstanceList = Location.list(params)
+			locationInstanceTotal = Location.count()
+		}
+
+		
+		[locationInstanceList: locationInstanceList, locationInstanceTotal: locationInstanceTotal]
 	}
 	
 	def edit = {

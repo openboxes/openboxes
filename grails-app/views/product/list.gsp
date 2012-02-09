@@ -3,7 +3,7 @@
 <html>
    <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="layout" content="custom" />
+        <meta name="layout" content="custom"/>
         <g:set var="entityName" value="${warehouse.message(code: 'products.label')}" />
         <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
@@ -29,7 +29,7 @@
 	            <div class="dialog box">
 					<g:form action="list" method="get">
 						<label><warehouse:message code="product.search.label"/></label>            
-						<g:textField name="q" size="45"/>					
+						<g:textField name="q" size="45" value="${params.q }"/>					
 						<button type="submit"><img
 							src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" style="vertical-align: middle;"
 							alt="Save" /> ${warehouse.message(code: 'default.button.find.label')}
@@ -42,20 +42,30 @@
                     <thead>
                         <tr>                        
                             <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" />
+                            <g:sortableColumn property="manufacturer" title="${warehouse.message(code: 'product.manufacturer.label')}" />  
+                            <g:sortableColumn property="manufacturerCode" title="${warehouse.message(code: 'product.manufacturerCode.label')}" />  
                             <g:sortableColumn property="category" title="${warehouse.message(code: 'category.label')}" />
                         </tr>
                     </thead>
                     <tbody>
-                    <g:each in="${productInstanceList}" status="i" var="productInstance">
-                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
-							<td align="center">
-								<g:link action="edit" id="${productInstance.id}">
-									<format:product product="${productInstance}"/>
-								</g:link>
-							</td>
-							<td align="center"><format:category category="${productInstance?.category }"/></td>
-                        </tr>
-                    </g:each>
+	                    <g:each in="${productInstanceList}" status="i" var="productInstance">
+	                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">            
+								<td align="center">
+									<g:link action="edit" id="${productInstance.id}">
+										<format:product product="${productInstance}"/>
+									</g:link>
+								</td>
+								<td align="center">
+									${productInstance?.manufacturer }
+								</td>
+								<td align="center">
+									${productInstance?.manufacturerCode }
+								</td>
+								<td align="center">
+									<format:category category="${productInstance?.category }"/>
+								</td>
+	                        </tr>
+	                    </g:each>
                     </tbody>
                 </table>
             </div>

@@ -38,16 +38,16 @@
             	</span>
            	</div>
 
+			<div class="dialog">
 
-			<g:set var="formAction"><g:if test="${productInstance?.id}">update</g:if><g:else>save</g:else></g:set>			
-            <g:form action="${formAction}" method="post">
-				<g:hiddenField name="action" value="save"/>                					
-                <g:hiddenField name="id" value="${productInstance?.id}" />
-                <g:hiddenField name="version" value="${productInstance?.version}" />
-            	<g:hiddenField name="categoryId" value="${params?.category?.id }"/><!--  So we know which category to show on browse page after submit -->
-					<div class="dialog">
-					
-		                <table style="display: inline;">
+				<g:set var="formAction"><g:if test="${productInstance?.id}">update</g:if><g:else>save</g:else></g:set>			
+	            <g:form action="${formAction}" method="post">
+					<g:hiddenField name="action" value="save"/>                					
+	                <g:hiddenField name="id" value="${productInstance?.id}" />
+	                <g:hiddenField name="version" value="${productInstance?.version}" />
+	            	<g:hiddenField name="categoryId" value="${params?.category?.id }"/><!--  So we know which category to show on browse page after submit -->
+					<fieldset>					
+		                <table>
 	                      <tbody>                
 							<tr class="prop">
 								<td valign="top" class="name"><label for="name"><warehouse:message
@@ -197,9 +197,11 @@
 				
 						</tbody>
 					</table>
-				</div>
+				</fieldset>
 			</g:form>
-        </div>
-        <g:render template='category' model="['category':null,'i':'_clone','hidden':true]"/>
-    </body>
+		</div>
+	</div>
+	
+	<g:render template='category' model="['category':null,'i':'_clone','hidden':true]"/>
+</body>
 </html>

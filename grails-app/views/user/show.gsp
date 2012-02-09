@@ -28,7 +28,9 @@
 				<table>
 					<thead>
 						<tr>
-							<td colspan="2"><g:render template="summary" /></td>
+							<td colspan="2">
+								<g:render template="summary" />
+							</td>
 						</tr>
 					</thead>
 					<tbody>
@@ -64,10 +66,10 @@
 						</tr>
 						<tr class="prop">
 							<td valign="top" class="name"><warehouse:message
-									code="user.warehouse.label" /></td>
+									code="user.roles.label" default="Roles" /></td>
 							<td valign="top" class="value">
-								<g:if test="${userInstance?.warehouse}">
-									${fieldValue(bean: userInstance, field: "warehouse")}
+								<g:if test="${userInstance?.roles}">
+									${fieldValue(bean: userInstance, field: "roles")}
 								</g:if> 
 								<g:else>
 									<span class="fade">
@@ -77,11 +79,26 @@
 							</td>
 						</tr>
 						<tr class="prop">
-							<td valign="top" class="name"><warehouse:message
-									code="user.roles.label" default="Roles" /></td>
+							<td valign="top" class="name">
+								<warehouse:message code="user.rememberLastLocation.label" />
+							</td>
 							<td valign="top" class="value">
-								<g:if test="${userInstance?.roles}">
-									${fieldValue(bean: userInstance, field: "roles")}
+								<g:if test="${userInstance.rememberLastLocation }">
+									${userInstance.rememberLastLocation}
+								</g:if>
+								<g:else>
+									<span class="fade">
+										<warehouse:message code="default.none.label" />
+									</span>
+								</g:else>
+							</td>
+						</tr>
+						<tr class="prop">
+							<td valign="top" class="name"><warehouse:message
+									code="user.warehouse.label" /></td>
+							<td valign="top" class="value">
+								<g:if test="${userInstance?.warehouse}">
+									${fieldValue(bean: userInstance, field: "warehouse")}
 								</g:if> 
 								<g:else>
 									<span class="fade">
@@ -107,20 +124,35 @@
 						</tr>
 						<tr class="prop">
 							<td valign="top" class="name">
-								<warehouse:message code="user.rememberLastLocation.label" />
+								<warehouse:message code="default.dateCreated.label" />
 							</td>
 							<td valign="top" class="value">
-								<g:if test="${userInstance.rememberLastLocation }">
-									${userInstance.rememberLastLocation}
+								<g:if test="${userInstance.dateCreated }">
+									<format:datetime obj="${userInstance.dateCreated}"></format:datetime>
 								</g:if>
 								<g:else>
 									<span class="fade">
-										<warehouse:message code="default.none.label" />
+										<warehouse:message code="default.never.label" />
 									</span>
 								</g:else>
 							</td>
 						</tr>
-
+						<tr class="prop">
+							<td valign="top" class="name">
+								<warehouse:message code="default.lastUpdated.label" />
+							</td>
+							<td valign="top" class="value">
+								<g:if test="${userInstance.lastUpdated }">
+									<format:datetime obj="${userInstance.lastUpdated}"></format:datetime>
+								</g:if>
+								<g:else>
+									<span class="fade">
+										<warehouse:message code="default.never.label" />
+									</span>
+								</g:else>
+							</td>
+						</tr>
+						<%-- 
 						<tr class="prop">
 							<td valign="top" class="name"><warehouse:message
 									code="user.photo.label" /></td>
@@ -144,30 +176,7 @@
 								</table>
 							</td>
 						</tr>
-						<tr class="prop">
-							<td class="name"></td>
-							<td class="value">
-								<div class="buttons left">
-									<g:link class="edit" action="edit" id="${userInstance?.id}">
-										${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}
-									</g:link>
-									<g:link class="delete" action="delete" id="${userInstance?.id}"
-										onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-										${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}
-									</g:link>
-									<g:link action="toggleActivation" id="${userInstance?.id}">
-										<g:if test="${userInstance?.active}">
-											${warehouse.message(code: 'user.deactivate.label')}
-										</g:if>
-										<g:else>
-											${warehouse.message(code: 'user.activate.label')}
-										</g:else>
-									</g:link>
-								</div>
-
-							</td>
-						</tr>
-
+						--%>
 						<!-- 
 							<tr class="prop">
 	                            <td valign="top" class="prop name"></td>

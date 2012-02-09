@@ -22,6 +22,18 @@
 	                <g:renderErrors bean="${locationInstance}" as="list" />
 	            </div>
             </g:hasErrors>
+            
+			<div class="buttonBar">            	
+            	<span class="linkButton">
+            		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'location.label').toLowerCase()]"/></g:link>
+            	</span>
+            	<span class="linkButton">
+            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'location.label').toLowerCase()]"/></g:link>
+            	</span>
+            	
+           	</div>
+            
+            
             <g:form method="post" action="update">
             	<fieldset>
             		

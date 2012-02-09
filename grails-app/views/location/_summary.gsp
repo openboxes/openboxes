@@ -7,19 +7,19 @@
 					src="${createLink(controller:'location', action:'viewLogo', id:locationInstance.id)}" style="vertical-align: bottom" />		            				
 				&nbsp;
 			</g:if>
-			<span style="font-weight: bold; font-size: 2em">${fieldValue(bean: locationInstance, field: "name")}</span>
+			<span style="font-weight: bold; font-size: 2em">
+				${fieldValue(bean: locationInstance, field: "name")}
+			</span>
 		</td>
 		<td style="text-align: right;">
 			<div style="font-size: 1.2em">
-				<b>${locationInstance?.active ? warehouse.message(code:'warehouse.active.label') : warehouse.message(code:'warehouse.inactive.label')}</b>
 				<g:if test="${locationInstance?.active}">
-					<img class="photo" src="${resource(dir: 'images/icons/silk', file: 'tick.png') }"
-         						style="vertical-align: bottom;" />
+					<img class="photo" src="${resource(dir: 'images/icons/silk', file: 'accept.png') }" class="middle" />
 				</g:if>
 				<g:else>
-   					<img class="photo" src="${resource(dir: 'images/icons/silk', file: 'stop.png') }"
-   						style="vertical-align: bottom;" />
+   					<img class="photo" src="${resource(dir: 'images/icons/silk', file: 'decline.png') }" class="middle" />
 				</g:else>
+				<label class="middle">${locationInstance?.active ? warehouse.message(code:'warehouse.active.label') : warehouse.message(code:'warehouse.inactive.label')}</label>
 			</div>
 		
 		</td>

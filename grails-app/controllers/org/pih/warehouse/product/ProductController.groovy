@@ -100,7 +100,7 @@ class ProductController {
 		def productInstanceList = []
 		def productInstanceTotal = 0;
 		
-        params.max = Math.min(params.max ? params.int('max') : 15, 100)
+        params.max = Math.min(params.max ? params.int('max') : 12, 100)
 		
 		if (params.q) { 
 			productInstanceList = Product.findAllByNameLike("%" + params.q + "%", params)

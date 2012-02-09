@@ -32,14 +32,30 @@
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>
-            <div class="dialog">
-				<span class="linkButton">
-           			<a href="${request.contextPath }/location/edit" class="new"><warehouse:message code="location.addLocation.label"/></a>
-	           	</span>
-           	</div>
-              
-            <div class="" style="width: 99%">
-                <table>
+           	
+           	<div class="list">           	
+				<div class="buttonBar">            	
+	            	<span class="linkButton">
+	            		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'location.label').toLowerCase()]"/></g:link>
+	            	</span>
+	            	<span class="linkButton">
+	            		<g:link class="new" action="edit"><warehouse:message code="default.add.label" args="[warehouse.message(code:'location.label').toLowerCase()]"/></g:link>
+	            	</span>	            	
+	           	</div>
+	           	
+	            <div class="dialog box">
+					<g:form action="list" method="get">
+						<label><warehouse:message code="location.search.label"/></label>            
+						<g:textField name="q" size="45" value="${params.q }"/>					
+						<button type="submit"><img
+							src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" style="vertical-align: middle;"
+							alt="Save" /> ${warehouse.message(code: 'default.button.find.label')}
+						</button>		          
+					</g:form>
+				</div> 				
+				<br/>
+	           		             
+                <table style="border: 1px solid lightgrey;">
                     <thead>
                         <tr style="height: 100px;">                        
                             <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" class="bottom"/>
