@@ -159,20 +159,19 @@
 				{ 
 					method: 'get', // method; get or post 
 					data: '', // array of values to be passed to the page - e.g. {name: "John", greeting: "hello"} 
-					minTimeout: 1000, // starting value for the timeout in milliseconds 
+					minTimeout: 5000, // starting value for the timeout in milliseconds 
 					maxTimeout: 60000, // maximum length of time between requests 
 					multiplier: 2, // the amount to expand the timeout by if the response hasn't changed (up to maxTimeout) 
 					type: 'json', // response type - text, xml, json, etc. See $.ajax config options 
-					maxCalls: 0, // maximum number of calls. 0 = no limit. 
+					maxCalls: 10, // maximum number of calls. 0 = no limit. 
 					autoStop: 0 // automatically stop requests after this many returns of the same data. 0 = disabled. 
 				}, 
 				function(remoteData, success, xhr, handle) { 
-					if (remoteData) {
+					if (remoteData != '') {
 						for (var i = 0; i < remoteData.length; i++) {
 							$('#status').text(remoteData[i].comment);
 						}
-						$('#status').addClass("notice");
-						
+						$('#status').addClass("notice");						
 					}
 				}
 			);
