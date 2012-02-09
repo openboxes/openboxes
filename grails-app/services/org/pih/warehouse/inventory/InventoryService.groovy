@@ -78,13 +78,13 @@ class InventoryService implements ApplicationContextAware {
 	 * @param warehouse
 	 */
 	void saveLocation(Location warehouse) {
-		log.info ("saving warehouse " + warehouse)
-		log.info ("location type " + warehouse.locationType)
+		log.debug ("saving warehouse " + warehouse)
+		log.debug ("location type " + warehouse.locationType)
 		// make sure a warehouse has an inventory
 		if (!warehouse.inventory) {
 			addInventory(warehouse)
 		}
-		log.info warehouse.locationType
+		log.debug warehouse.locationType
 		
 		warehouse.save(failOnError: true)
 	}
@@ -233,11 +233,18 @@ class InventoryService implements ApplicationContextAware {
 			addInventory(commandInstance.warehouseInstance)
 		}
 		
+		def rootCategory = productService?.getRootCategory();
+		
 		// Get the selected category or use the root category
 		commandInstance.categoryInstance = commandInstance?.categoryInstance ?: productService.getRootCategory();
 		
 		// Get current inventory for the given products
-		getCurrentInventory(commandInstance);								
+		if (commandInstance?.categoryInstance != rootCategory || commandInstance?.searchPerformed) {  
+			getCurrentInventory(commandInstance);								
+		}
+		else { 
+			commandInstance?.categoryToProductMap = [:]
+		}
 		
 		return commandInstance;
 	}
@@ -263,7 +270,7 @@ class InventoryService implements ApplicationContextAware {
 			def quantityToShip = quantityOutgoingMap[product] ?: 0;
 			
 			def inventoryLevel = InventoryLevel.findByProductAndInventory(product, commandInstance?.warehouseInstance?.inventory)
-			//log.info "inventory level " + product?.name + ": " + inventoryLevel?.status
+			//log.debug "inventory level " + product?.name + ": " + inventoryLevel?.status
 			
 			if (commandInstance?.showOutOfStockProducts || (quantityOnHand + quantityToReceive + quantityToShip > 0)) {
 				products << new ProductCommand(
@@ -375,7 +382,7 @@ class InventoryService implements ApplicationContextAware {
 		// Stock that has already expired
 		def expiredStock = InventoryItem.findAllByExpirationDateLessThan(today, [sort: 'expirationDate', order: 'desc']);
 
-		log.info expiredStock
+		log.debug expiredStock
 		
 		def quantityMap = getQuantityForInventory(location.inventory)		
 		expiredStock = expiredStock.findAll { quantityMap[it] > 0 }
@@ -441,7 +448,7 @@ class InventoryService implements ApplicationContextAware {
 		}
 		List searchTerms = (commandInstance?.searchTerms ? Arrays.asList(commandInstance?.searchTerms.split(" ")) : null);
 		
-		log.info("get products: " + commandInstance?.warehouseInstance)
+		log.debug("get products: " + commandInstance?.warehouseInstance)
 		def products = getProductsByAll(
 			commandInstance?.warehouseInstance,
 			searchTerms,
@@ -480,27 +487,27 @@ class InventoryService implements ApplicationContextAware {
 	   // Start with products that do not have a status
 	   //products.addAll(getSupportedProducts(location))
 	   
-	   println("show unsupported products " + showUnsupportedProducts)
+	   log.debug("show unsupported products " + showUnsupportedProducts)
 	   
 	   if (!showUnsupportedProducts) { 
 		   def statuses = []
 		   statuses << InventoryStatus.NOT_SUPPORTED
 		   def removeProducts = getProductsByStatuses(location, statuses)
-		   println "remove " + removeProducts.size() + " unsupported products"
+		   log.debug "remove " + removeProducts.size() + " unsupported products"
 		   products.removeAll(removeProducts)
 		   
 	   }
 	   
-	   println("show non inventory products " + showNonInventoryProducts)
+	   log.debug("show non inventory products " + showNonInventoryProducts)
 	   if (!showNonInventoryProducts) { 
 		   def statuses = []
 		   statuses << InventoryStatus.SUPPORTED_NON_INVENTORY
 		   def removeProducts = getProductsByStatuses(location, statuses)
-		   println "remove " + removeProducts.size() + " non-inventories products"
+		   log.debug "remove " + removeProducts.size() + " non-inventories products"
 		   products.removeAll(removeProducts)
 	   }
 	   
-	   log.info "base products " + products.size();
+	   log.debug "base products " + products.size();
 	   if (matchCategories && productFilters) {
 		   def searchProducts = Product.createCriteria().list() {
 			   and {
@@ -583,9 +590,9 @@ class InventoryService implements ApplicationContextAware {
    List getSupportedProducts(Location location) { 
 	   def products = []
 	   products.addAll(getProductsWithoutInventoryLevel(location))
-	   log.info "Add all without inventory level " + products.size()
+	   log.debug "Add all without inventory level " + products.size()
 	   products.addAll(getProductsByStatus(location, InventoryStatus.SUPPORTED))
-	   log.info "add all with status == supported " + products.size()
+	   log.debug "add all with status == supported " + products.size()
 	   return products
    }
    
@@ -602,7 +609,7 @@ class InventoryService implements ApplicationContextAware {
    }
    
    List getProductsByStatuses(Location location, List statuses) { 
-	   log.info("get products by statuses: " + location)
+	   log.debug("get products by statuses: " + location)
 	   def session = sessionFactory.getCurrentSession()
 	   def products = session.createQuery("select product from InventoryLevel as inventoryLevel \
 		   right outer join inventoryLevel.product as product \
@@ -616,7 +623,7 @@ class InventoryService implements ApplicationContextAware {
    
    
    List getProductsByStatus(Location location, InventoryStatus status) { 
-	   log.info("get products by status: " + location)
+	   log.debug("get products by status: " + location)
 	   def session = sessionFactory.getCurrentSession()
 	   return session.createQuery("select product from InventoryLevel as inventoryLevel \
 	   		right outer join inventoryLevel.product as product \
@@ -1477,6 +1484,7 @@ class InventoryService implements ApplicationContextAware {
 			debitTransaction.transactionType = TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)
 			debitTransaction.source = null
 			debitTransaction.destination = shipmentInstance?.destination.isWarehouse() ? shipmentInstance?.destination : null
+			//debitTransaction.destination = shipmentInstance?.destination
 			debitTransaction.inventory = shipmentInstance?.origin?.inventory ?: addInventory(shipmentInstance.origin)
 			debitTransaction.transactionDate = shipmentInstance.getActualShippingDate()
 		
@@ -1503,7 +1511,7 @@ class InventoryService implements ApplicationContextAware {
 					}
 				}
 				
-				// Create a new transaction entry
+				// Create a new transaction entry for each shipment item
 				def transactionEntry = new TransactionEntry();
 				transactionEntry.quantity = it.quantity;
 				transactionEntry.inventoryItem = inventoryItem;
@@ -1511,7 +1519,8 @@ class InventoryService implements ApplicationContextAware {
 			}
 		
 			if (!debitTransaction.save()) {
-				throw new RuntimeException("Failed to save 'Send Shipment' transaction");
+				log.error debitTransaction.errors
+				throw new RuntimeException("Failed to save 'Send Shipment' transaction", debitTransaction);
 			}
 		} catch (Exception e) { 
 			log.error("error occrred while creating transaction ", e);
@@ -1706,7 +1715,7 @@ class InventoryService implements ApplicationContextAware {
 	* @return
 	*/
    def getConsumptionTransactionsBetween(Date startDate, Date endDate) {
-	   log.info ("startDate = " + startDate + " endDate = " + endDate)
+	   log.debug ("startDate = " + startDate + " endDate = " + endDate)
 	   def criteria = Consumption.createCriteria()
 	   def results = criteria.list {
 		   if (startDate && endDate) {
@@ -1722,7 +1731,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	def getConsumptions(Date startDate, Date endDate, String groupBy) { 
-		log.info ("startDate = " + startDate + " endDate = " + endDate)
+		log.debug ("startDate = " + startDate + " endDate = " + endDate)
 		def criteria = Consumption.createCriteria()
 		def results = criteria.list {
 			if (startDate && endDate) { 
@@ -1855,14 +1864,14 @@ class InventoryService implements ApplicationContextAware {
 		def lastInventoryDate = lastInventoryTransactionEntry?.transaction?.transactionDate;
 		quantity = lastInventoryTransactionEntry?.quantity ?: 0
 
-		log.info ("Starting quantity = " + quantity)
+		log.debug ("Starting quantity = " + quantity)
 				
 		// Get all transactions for an inventory item from the last inventory 
 		// date until the given date 
 		def transactionEntries = getTransactionEntries(inventoryItem, location, lastInventoryDate, date)
 		adjustQuantity(quantity, transactionEntries)
 
-		log.info ("Ending quantity = " + quantity)				
+		log.debug ("Ending quantity = " + quantity)				
 		return quantity;
 	}
 	*/

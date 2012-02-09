@@ -57,40 +57,39 @@
 									<a href="javascript:void(0);" id="warehouse-switch">
 										${session?.warehouse?.name }
 									</a>
-									
-
-									
-									<span id="warehouseMenu" title="${warehouse.message(code:'warehouse.chooseLocationToManage.message')}" style="display: none; width: 500px; height: 500px;">
-										<table>
-											<tbody>
-												<g:each var="warehouse" in="${session.loginLocations}" status="i">	
-													<tr class="prop">
-														<td nowrap="nowrap" class="center" style="padding: 0">
-															<g:if test="${warehouse?.fgColor && warehouse?.bgColor }">
-																<style>
-																	#warehouse-${warehouse?.id} { background-color: #${warehouse.bgColor}; color: #${warehouse.fgColor}; } 
-																	#warehouse-${warehouse?.id} a { color: #${warehouse.fgColor}; }  	
-																</style>				
-															</g:if>					
-															<div id="warehouse-${warehouse.id }" class="warehouse button">												
-																<a href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params: ['returnUrl':request.forwardURI])}' style="display: block; padding: 0px;">
-																	${warehouse.name}
-																</a> 
-															</div>												
-														</td>											
-													</tr>
-												</g:each>																	
-												<g:unless test="${session.loginLocations }">
-													<tr class="prop">
-														<td nowrap="nowrap">
-															<div style="color: black; background-color: white;">
-																<warehouse:message code="dashboard.noWarehouse.message"/>
-															</div>
-														</td>
-													</tr>
-												</g:unless>
-											</tbody>					
-										</table>													
+									<span id="warehouseMenu" title="${warehouse.message(code:'warehouse.chooseLocationToManage.message')}" style="display: none;">
+										<div style="height: 200px; overflow: auto;">
+											<table>
+												<tbody>
+													<g:each var="warehouse" in="${session.loginLocations}" status="i">	
+														<tr class="prop">
+															<td nowrap="nowrap" class="center" style="padding: 0">
+																<g:if test="${warehouse?.fgColor && warehouse?.bgColor }">
+																	<style>
+																		#warehouse-${warehouse?.id} { background-color: #${warehouse.bgColor}; color: #${warehouse.fgColor}; } 
+																		#warehouse-${warehouse?.id} a { color: #${warehouse.fgColor}; }  	
+																	</style>				
+																</g:if>					
+																<div id="warehouse-${warehouse.id }" class="warehouse button">												
+																	<a href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params: ['returnUrl':request.forwardURI])}' style="display: block; padding: 0px;">
+																		${warehouse.name}
+																	</a> 
+																</div>												
+															</td>											
+														</tr>
+													</g:each>																	
+													<g:unless test="${session.loginLocations }">
+														<tr class="prop">
+															<td nowrap="nowrap">
+																<div style="color: black; background-color: white;">
+																	<warehouse:message code="dashboard.noWarehouse.message"/>
+																</div>
+															</td>
+														</tr>
+													</g:unless>
+												</tbody>					
+											</table>	
+										</div>												
 									</span>
 								</li>
 							</g:if>
@@ -98,6 +97,7 @@
 								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_white.png')}" style="vertical-align: middle" />
 							</li>												
 							<li>
+								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'door_out.png')}" style="vertical-align: middle" />
 								<g:link class="list" controller="auth" action="logout"><warehouse:message code="default.logout.label"/></g:link>
 							</li>					
 							

@@ -6,9 +6,14 @@ class MessageTagLib {
 	
 	Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
 	
-	def message = { attrs, body ->
-		attrs.locale = attrs.locale ?: session?.user?.locale ?: defaultLocale;
-		def defaultTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ValidationTagLib')
-		out << defaultTagLib.message.call(attrs)
+	def message = { attrs, body ->		
+		if (session.useDebugLocale) { 
+			out << attrs.code
+		}
+		else { 
+			attrs.locale = attrs.locale ?: session?.user?.locale ?: defaultLocale;
+			def defaultTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ValidationTagLib')
+			out << defaultTagLib.message.call(attrs)
+		}		
 	}
 }

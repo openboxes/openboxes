@@ -10,6 +10,8 @@ class InventoryCommand {
 	def showNonInventoryProducts = Boolean.FALSE;		// indicates whether non-inventory products for the warehouse should be included
 	def showOutOfStockProducts = Boolean.TRUE;			// indicates whether out of stock products for the warehouse should be included
 	def categoryToProductMap = {};						// all of the resulting ProductCommands above, organized by Category
+	Boolean searchPerformed = Boolean.FALSE
+	
 	
 	static constraints = {
 		warehouseInstance(nullable:true)
@@ -20,5 +22,6 @@ class InventoryCommand {
 		showNonInventoryProducts(nullable:true)
 		showOutOfStockProducts(nullable:true)
 		categoryToProductMap(nullable:true)
+		searchPerformed(nullable:true)
 	}
 }

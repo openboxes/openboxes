@@ -85,7 +85,22 @@ class UserController {
             [userInstance: userInstance]
         }
     }
-    
+
+	/**
+	* Show a user
+	*/
+   def changePhoto = {
+	   log.info "change photo for given user"
+	   def userInstance = User.get(params.id)
+	   if (!userInstance) {
+		   flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
+		   redirect(action: "list")
+	   }
+	   else {
+		   [userInstance: userInstance]
+	   }
+   }
+
     /**
      * Show user preferences.
      */
@@ -142,6 +157,10 @@ class UserController {
 						mailService.sendMail(subject, message, it.email);
 					}
 				}
+			}
+			else { 
+				render(view: "edit", model: [userInstance: userInstance])
+				return;
 			}
 		}
 		redirect(action: "show", id: userInstance.id)
@@ -208,6 +227,7 @@ class UserController {
 		log.info "update auth user locale " + params
 		log.info params.locale == 'debug'
 		if (params.locale == 'debug') { 
+			session.user.locale = new Locale(params.locale)
 			session.useDebugLocale = true
 		}
 		else { 
@@ -235,6 +255,14 @@ class UserController {
 			// update the reference to the user in the session
 			session.user = User.get(userInstance.id)
 		}
+		
+		log.info "Redirecting to " + params?.returnUrl
+		if (params?.returnUrl) {
+			redirect(uri: params.returnUrl - request.contextPath);
+			return;
+		}
+
+		
 		// redirect to the dashboard
 		redirect(controller: "dashboard", action: "index")
 	}
@@ -296,7 +324,8 @@ class UserController {
 		            flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label', default: 'User'), userInstance.id])}"
 		        }
 		        else {
-					// there were errors, the photo was not saved
+					render(view: "uploadPhoto", model: [userInstance: userInstance])
+					return
 		        }
 			}
             redirect(action: "show", id: userInstance.id)

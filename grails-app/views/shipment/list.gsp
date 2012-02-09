@@ -18,7 +18,7 @@
 		                    <thead>
 		                        <tr>   
 		                         	<th>${warehouse.message(code: 'default.actions.label')}</th>
-		                            <th>${warehouse.message(code: 'shipping.shipment.label')}</th>
+		                            <th colspan="2">${warehouse.message(code: 'shipping.shipment.label')}</th>
 		                            <th>
 										<g:if test="${incoming}">
 								           	<label class="block"><warehouse:message code="default.origin.label"/></label>
@@ -42,7 +42,7 @@
 		                        <tr class="odd">   
 		                         	<td>
 		                         	</td>
-		                        	<td>
+		                        	<td colspan="2">
 						           		<g:select name="shipmentType"
 											from="${org.pih.warehouse.shipping.ShipmentType.list()}"
 											optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${shipmentType}" 
@@ -116,6 +116,8 @@
 											<td class="left">
 												<img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + format.metadata(obj:shipmentInstance?.shipmentType, locale:null) + '.png')}"
 												alt="${format.metadata(obj:shipmentInstance?.shipmentType)}" style="vertical-align: middle; width: 24px; height: 24px;" />		
+											</td>											
+											<td class="left">
 												<g:link action="showDetails" id="${shipmentInstance.id}">
 													${fieldValue(bean: shipmentInstance, field: "name")}
 												</g:link>				

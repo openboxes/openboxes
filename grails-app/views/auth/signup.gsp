@@ -110,8 +110,8 @@
 	                            </tr>	
 								<tr class="prop">	
 									<td class="name"></td>					
-									<td valign="top" style="text-align: right">
-										<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt=""/> <warehouse:message code="auth.signup.label"/></button>					   
+									<td valign="top">
+										<button type="submit" class="positive"><img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" alt=""/> <warehouse:message code="auth.signup.label"/></button>					   
 									</td>
 								</tr>
 								<tr class="prop">

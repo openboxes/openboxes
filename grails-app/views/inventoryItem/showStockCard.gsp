@@ -85,6 +85,9 @@
 															<li><a href="#tabs-2"><warehouse:message code="request.pendingRequestLog.label"/></a></li>
 															<li><a href="#tabs-3"><warehouse:message code="order.pendingOrderLog.label"/></a></li>
 															<li><a href="#tabs-4"><warehouse:message code="shipment.pendingShipmentLog.label"/></a></li>
+															<%-- 
+															<li><a href="#tabs-5"><warehouse:message code="inventory.currentLotNumbers.label"/></a></li>
+															--%>
 														</ul>		
 														<div id="tabs-1" style="padding: 0px;">										
 															<g:render template="showCurrentStock"/>
@@ -98,6 +101,11 @@
 														<div id="tabs-4" style="padding: 0px;">
 															<g:render template="showPendingShipmentLog"/>
 														</div>
+														<%-- 
+														<div id="tabs-5" style="padding: 0px;">
+															<g:render template="showLotNumbers"/>
+														</div>
+														--%>
 
 													</div>
 												</td>

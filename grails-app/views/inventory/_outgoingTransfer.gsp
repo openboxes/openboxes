@@ -17,7 +17,7 @@
 			</tr>	
 			<tr class="prop">
 				<td class="name">
-					<label><warehouse:message code="default.to.label"/></label>
+					<label><warehouse:message code="transaction.destination.label"/></label>
 				</td>
 				<td class="value">
 					<span>
@@ -79,16 +79,24 @@
 										<g:if test="${onHandQuantity }">
 											<tr class="row">
 												<td>
-													<span class="${onHandQuantity >0? '':'fade'}"><format:product product="${product }"/></span>
+													<span class="${onHandQuantity >0? '':'fade'}">
+														<format:product product="${product }"/>
+													</span>
 												</td>
 												<td>
-													<span class="${onHandQuantity >0? '':'fade'}">${inventoryItem?.lotNumber }</span>
+													<span class="${onHandQuantity >0? '':'fade'}">
+														${inventoryItem?.lotNumber }
+													</span>
 												</td>
 												<td>
-													<span class="${onHandQuantity >0? '':'fade'}"><format:date obj="${inventoryItem?.expirationDate }"/></span>
+													<span class="${onHandQuantity >0? '':'fade'}">
+														<format:date obj="${inventoryItem?.expirationDate }"/>
+													</span>
 												</td>
 												<td>
-													<span class="${onHandQuantity >0? '':'fade'}">${onHandQuantity }</span>
+													<span class="${onHandQuantity >0? '':'fade'}">
+														${onHandQuantity }
+													</span>
 												</td>
 												<td>
 													<g:if test="${onHandQuantity > 0 }">

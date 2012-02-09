@@ -7,32 +7,33 @@
 			<!--  Filter -->
 			<div style="padding: 10px; margin:1px" class="odd box">
 				<warehouse:message code="transactionLog.from.label"/>
-				<g:jqueryDatePicker 
-					id="startDate" 
-					name="startDate" 
-					value="${commandInstance?.startDate }" 
-					format="MM/dd/yyyy"
-					size="8"
-					showTrigger="false" />
-				<warehouse:message code="transactionLog.to.label"/>
-				<g:jqueryDatePicker 
-					id="endDate" 
-					name="endDate" 
-					value="${commandInstance?.endDate }" 
-					format="MM/dd/yyyy"
-					size="8"
-					showTrigger="false" />
-
-				<g:select name="transactionType.id" 
-					from="${org.pih.warehouse.inventory.TransactionType.list()}" 
-					optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${commandInstance?.transactionType?.id }" 
-					noSelection="['0': warehouse.message(code:'default.all.label')]" /> 
-			
-				<button  class="" name="filter">
-					<img src="${createLinkTo(dir: 'images/icons/silk', file: 'zoom.png' )}" style="vertical-align:middle"/>
-					&nbsp;<warehouse:message code="default.button.filter.label"/>
-				</button>
-
+				<div>
+					<g:jqueryDatePicker 
+						id="startDate" 
+						name="startDate" 
+						value="${commandInstance?.startDate }" 
+						format="MM/dd/yyyy"
+						size="8"
+						showTrigger="false" />
+					<warehouse:message code="transactionLog.to.label"/>
+					<g:jqueryDatePicker 
+						id="endDate" 
+						name="endDate" 
+						value="${commandInstance?.endDate }" 
+						format="MM/dd/yyyy"
+						size="8"
+						showTrigger="false" />
+	
+					<g:select name="transactionType.id" 
+						from="${org.pih.warehouse.inventory.TransactionType.list()}" 
+						optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${commandInstance?.transactionType?.id }" 
+						noSelection="['0': warehouse.message(code:'default.all.label')]" /> 
+				
+					<button  class="" name="filter">
+						<img src="${createLinkTo(dir: 'images/icons/silk', file: 'zoom.png' )}" style="vertical-align:middle"/>
+						&nbsp;<warehouse:message code="default.button.filter.label"/>
+					</button>
+				</div>
 				
 			</div>			
 			<g:set var="enableFilter" value="${!params.disableFilter}"/>

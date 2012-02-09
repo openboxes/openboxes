@@ -21,10 +21,9 @@
 	<%-- 
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.tableScroll/',file:'jquery.tablescroll.css')}" type="text/css" media="screen, projection" />
 	--%>
-	<%-- 
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'example.css')}" type="text/css" media="screen, projection" />
-	--%>
+
 	<!-- Include javascript files -->
 	<g:javascript library="application"/>
 
@@ -49,9 +48,8 @@
 	<script src="${createLinkTo(dir:'js/jquery.tableScroll/', file:'jquery.tablescroll.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.watermark/', file:'jquery.watermark.min.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/', file:'global.js')}" type="text/javascript" ></script>
-	<%-- 
 	<script src="${createLinkTo(dir:'js/jquery.megaMenu/', file:'jquery.megamenu.js')}" type="text/javascript" ></script>
-	--%>
+
 	
  	<!-- Include Jquery Validation and Jquery Validation UI plugins -->
  	<jqval:resources />       
@@ -100,11 +98,12 @@
 	<!-- Header "hd" includes includes logo, global navigation -->
 	<div id="hd" role="banner">
 	    <g:render template="/common/header"/>		    
+	    <g:render template="/common/megaMenu"/>
 	</div>
 	<!-- Body includes the divs for the main body content and left navigation menu -->
 		
 	<div id="bd" role="main">
-	    <div id="doc3" class="yui-t3">		    	
+	    <div id="doc2" >		    	
 	      	<div id="yui-main">
 		    	<div id="content" class="yui-b">
 		    		<g:if test="${session.user}">
@@ -136,12 +135,7 @@
 				</div>
 	      	</div>
 	      		      	
-	      	<!-- YUI nav block that includes the local navigation menu -->
-	      	<div id="menu" class="yui-b">
-		  		<g:if test="${session?.user && session?.warehouse}">
-					<g:include controller="dashboard" action="menu"/>
-				</g:if>
-			</div>			 
+	      	 
 		</div>
 	</div>
 
@@ -152,70 +146,48 @@
 	<script type="text/javascript">
 		$(function() { 
 
+			$(".megamenu").megamenu();
+			
 			$("#warehouse-switch").click(function() {
 				//$("#warehouse-menu").toggle();
 				$("#warehouseMenu").dialog({ 
 					autoOpen: true, 
 					modal: true, 
-					width: '500'
+					width: '400px'
 				});
 			});
-
-			function showActions() {
+			
+			function show() {
 				//$(this).children(".actions").show();
 			}
 			
-			function hideActions() { 
+			function hide() { 
 				$(this).children(".actions").hide();
 			}
-
-			/* This is used to remove the action menu when the */
+			
 			$(".action-menu").hoverIntent({
 				sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
 				interval: 5,   // number = milliseconds for onMouseOver polling interval
-				over: showActions,     // function = onMouseOver callback (required)
+				over: show,     // function = onMouseOver callback (required)
 				timeout: 100,   // number = milliseconds delay before onMouseOut
-				out: hideActions       // function = onMouseOut callback (required)
+				out: hide       // function = onMouseOut callback (required)
 			});  
 			
 			// Create an action button that toggles the action menu on click
 			//button({ text: false, icons: {primary:'ui-icon-gear',secondary:'ui-icon-triangle-1-s'} }).
-			/*
 			$(".action-btn").click(function(event) {
 				$(this).parent().children(".actions").toggle();
 				event.preventDefault();
 			});
-			*/
-			/*			
-			$(".action-btn").button({ text: false, icons: {primary:'ui-icon-gear',secondary:'ui-icon-triangle-1-s'} });
-			*/
-			$(".action-btn").click(function(event) {
-				//show the menu directly over the placeholder
-				var actions = $(this).parent().children(".actions");
-
-				// Need to toggle before setting the position 
-				actions.toggle();
-
-				// Set the position for the actions menu
-			    actions.position({
-					my: "left top",
-					at: "left bottom",				  
-					of: $(this).closest(".action-btn"),
-					//offset: "0 0"
-					collision: "flip"
-				});
-				
-				// To prevent the action button from POST'ing to the server
-				event.preventDefault();
-			});
-				
+	
+			
 			var accordion = 
 				$('#leftnav-accordion-menu').accordion({
 					active: true, 
 					navigation: true, 
 					autoHeight: false, 
 					//alwaysOpen: true,
-					clearStyle: true, 
+					//clearStyle: false, 
 					//collapsible: false,
 					//fillSpace: true,
 					event: "click"  

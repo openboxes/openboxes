@@ -1,4 +1,4 @@
-
+<%@ page import="org.pih.warehouse.core.RoleType" %>
 <%@ page import="org.pih.warehouse.core.User" %>
 <%@ page import="org.pih.warehouse.core.Role" %>
 <html>
@@ -98,7 +98,29 @@
 							</label>
 						</td>
 						<td class="value">						
-							${session?.user?.locale}
+							<g:each in="${grailsApplication.config.locale.supportedLocales}" var="l">
+								<g:set var="locale" value="${new Locale(l)}"/>
+								<g:if test="${session?.user?.locale==locale}">
+									${locale?.getDisplayName(session?.user?.locale ?: new Locale(grailsApplication.config.locale.defaultLocale))}
+								</g:if>
+								<g:else>
+									<a href="${createLink(controller: 'user', action: 'updateAuthUserLocale', params: ['locale':locale,'returnUrl':request.forwardURI])}">
+										<!-- fetch the display for locale based on the current locale -->
+										${locale?.getDisplayName(session?.user?.locale ?: new Locale(grailsApplication.config.locale.defaultLocale))}
+									</a>
+								</g:else>
+								&nbsp;|&nbsp;
+							</g:each>
+							<g:isInRole roles="[RoleType.ROLE_ADMIN,RoleType.ROLE_USER]">
+								<g:if test="${session?.user?.locale==new Locale('debug')}">
+									Debug
+								</g:if>
+								<g:else>
+									<a href="${createLink(controller: 'user', action: 'updateAuthUserLocale', params: ['locale':'debug','returnUrl':request.forwardURI])}">
+										Debug
+									</a>
+								</g:else>
+							</g:isInRole>
 						</td>					
 					<tr>
 					<tr class="prop">

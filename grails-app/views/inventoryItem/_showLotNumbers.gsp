@@ -1,11 +1,4 @@
-
- <style>
- 
- </style>
-
-
 <div> 	
-	<h2 class="fade"><warehouse:message code="inventory.currentLotNumbers.label"/></h2>
 	<div id="inventoryView" style="text-align: left;" class="list">	
 		<table>
 			<thead>
@@ -65,7 +58,7 @@
 									<format:expirationDate obj="${itemInstance?.expirationDate}"/>
 								</g:if>
 								<g:else>
-									<span class="fade"><warehouse:message code="default.never.message"/></span>
+									<span class="fade"><warehouse:message code="default.never.label"/></span>
 								</g:else>
 							</td>
 							<td class="top center">

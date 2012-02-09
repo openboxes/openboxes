@@ -62,9 +62,9 @@ button {
 
 
 /* Added to fix an issue with being able to select actions from the action menu at the bottom of pages */
+/* Fixed the action menu (when menu runs off page). */
 body { 
-	
-	padding-bottom: 200px;
+	padding-bottom: 50px;
 }
 
 .debit { 
@@ -81,7 +81,6 @@ body {
 }
 
 /* Action Menu Items */
-
 .actions .action-menu-item { 
 	border: 0px solid black;
 	margin: 0px;
@@ -94,6 +93,7 @@ body {
 .actions .action-menu-item a:hover { 
 	display: block; 
 	background-color: lightgrey;
+	padding: 5px;
 	text-decoration: none;
 }
 
@@ -189,7 +189,7 @@ body {
 	padding-right: 15px;
 }
 
-.widget-large { border: 1px solid lightgrey; height: 75px; margin: 5px; }
+.widget-large { border: 1px solid lightgrey; margin: 5px; }
 .widget-small { border: 1px solid lightgrey;  margin: 5px; }    		
 .widget-header { background-color: #FFF; margin: 1px; font-weight: bold; font-size: 110%;} 
 .widget-content { margin: 10px; } 
@@ -790,5 +790,8 @@ border: 1px solid #CCC;
 .scrollTable {
 	border-collapse:collapse;
 }
-
+.searchable { 
+	font-size: 16px;
+	
+}
 

@@ -3,6 +3,7 @@
 <h4 class="fade"><warehouse:message code="product.details.label"/></h4>
 <div id="product-details" style="border: 1px solid lightgrey">
 	<table>
+		<%-- 
 		<tr class="details odd">	
 			<td class="left label">
 				<span class="name"><warehouse:message code="default.name.label"/></span>
@@ -11,6 +12,51 @@
 				<span class="value"><format:product product="${productInstance}"/></span>
 			</td>
 		</tr>
+		--%>
+		<tr class="details even">	
+			<td class="label left">
+				<span class="name"><warehouse:message code="default.status.label"/></span>
+			</td>
+			<td>
+				<span class="value">
+				
+					<g:if test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED}">
+						<g:if test="${totalQuantity <= 0}">
+							<span style="color: red"><warehouse:message code="product.noStock.label"/></span>
+						</g:if>
+						<g:elseif test="${totalQuantity <= inventoryLevelInstance?.minQuantity}">
+							<span style="color: orange"><warehouse:message code="product.lowStock.label"/></span>
+						</g:elseif>
+						<g:elseif test="${totalQuantity <= inventoryLevelInstance?.reorderQuantity }">
+							<span style="color: orange;"><warehouse:message code="product.reorder.label"/></span>
+						</g:elseif>
+						<g:else>
+							<span style="color: green;"><warehouse:message code="product.inStock.label"/></span>
+						</g:else>
+					</g:if>			
+					<g:elseif test="${inventoryLevelInstance?.status == InventoryStatus.NOT_SUPPORTED}">
+						<warehouse:message code="enum.InventoryStatus.NOT_SUPPORTED"/>
+					</g:elseif>
+					<g:elseif test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED_NON_INVENTORY}">
+						<warehouse:message code="enum.InventoryStatus.SUPPORTED_NON_INVENTORY"/>
+					</g:elseif>
+					<g:else>
+						<warehouse:message code="enum.InventoryStatus.SUPPORTED"/>
+					</g:else>
+				
+				</span>
+			</td>
+		</tr>				
+		<tr class="details odd">	
+			<td class="label left">
+				<span class="name"><warehouse:message code="product.onHandQuantity.label"/></span>
+			</td>
+			<td>
+				<span class="value">
+					<b>${totalQuantity }</b></span>
+			</td>
+		</tr>			
+			
 		<tr class="details even">	
 			<td class="left label">
 				<span class="name"><warehouse:message code="product.units.label"/></span>
@@ -35,7 +81,7 @@
 			</td>
 		</tr>
 		
-		<tr class="details even">	
+		<tr class="details even prop">	
 			<td class="left label">
 				<span class="name"><warehouse:message code="product.manufacturer.label"/></span>
 			</td>
@@ -67,7 +113,7 @@
 			</td>
 		</tr>
 		
-		<tr class="details even">	
+		<tr class="details even prop">	
 			<td class="left label">
 				<span class="name"><warehouse:message code="product.upc.label"/></span>
 			</td>
@@ -117,59 +163,7 @@
 				</td>
 			</tr>													
 		</g:each>
-	</table>
-</div>
-
-<br/>
-<h4 class="fade"><warehouse:message code="product.status.label"/></h4>
-<div style="border: 1px solid lightgrey">
-	<table>
-		<tr class="details even">	
-			<td class="label left">
-				<span class="name"><warehouse:message code="default.status.label"/></span>
-			</td>
-			<td>
-				<span class="value">
-				
-					<g:if test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED}">
-						<g:if test="${totalQuantity <= 0}">
-							<span style="color: red"><warehouse:message code="product.noStock.label"/></span>
-						</g:if>
-						<g:elseif test="${totalQuantity <= inventoryLevelInstance?.minQuantity}">
-							<span style="color: orange"><warehouse:message code="product.lowStock.label"/></span>
-						</g:elseif>
-						<g:elseif test="${totalQuantity <= inventoryLevelInstance?.reorderQuantity }">
-							<span style="color: orange;"><warehouse:message code="product.reorder.label"/></span>
-						</g:elseif>
-						<g:else>
-							<span style="color: green;"><warehouse:message code="product.inStock.label"/></span>
-						</g:else>
-					</g:if>			
-					<g:elseif test="${inventoryLevelInstance?.status == InventoryStatus.NOT_SUPPORTED}">
-						<warehouse:message code="enum.InventoryStatus.NOT_SUPPORTED"/>
-					</g:elseif>
-					<g:elseif test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED_NON_INVENTORY}">
-						<warehouse:message code="enum.InventoryStatus.SUPPORTED_NON_INVENTORY"/>
-					</g:elseif>
-					<g:else>
-						<warehouse:message code="enum.InventoryStatus.SUPPORTED"/>
-					</g:else>
-				
-				</span>
-			</td>
-		</tr>				
-	
-		<tr class="details odd">	
-			<td class="label left">
-				<span class="name"><warehouse:message code="product.onHandQuantity.label"/></span>
-			</td>
-			<td>
-				<span class="value">
-					<b>${totalQuantity }</b></span>
-			</td>
-		</tr>			
-	
-		<tr class="details even">
+		<tr class="details odd prop">
 			<td class="label left">
 				<span class="name"><warehouse:message code="product.minLevel.label"/></span>
 			</td>
@@ -187,7 +181,7 @@
 				</span>
 			</td>				
 		</tr>
-		<tr class="details odd">
+		<tr class="details even">
 			<td class="label left">
 				<span class="name"><warehouse:message code="product.reorderLevel.label"/></span>
 			</td>

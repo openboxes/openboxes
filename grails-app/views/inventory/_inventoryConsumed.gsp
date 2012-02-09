@@ -44,8 +44,6 @@
 								</tr>
 							</thead>
 							<tbody>
-							
-							
 								<g:set var="status" value="${0 }"/>
 								<g:unless test="${command?.productInventoryItems}">
 									<tr>
@@ -59,12 +57,13 @@
 									<g:hiddenField name="product.id" value="${product?.id }"/>
 									
 									<%-- Display one row for every inventory item --%>
-									<g:each var="inventoryItem" in="${command?.productInventoryItems[product]?.sort { it.expirationDate } }">										
-										
+									<g:each var="inventoryItem" in="${command?.productInventoryItems[product]?.sort { it.expirationDate } }">
 										<g:set var="onHandQuantity" value="${command?.quantityMap[inventoryItem] ?: 0}"/>									
 										<g:if test="${onHandQuantity > 0}">
 											<tr>
-												<td>${product?.name }</td>
+												<td>
+													<format:product product="${product }"/>
+												</td>
 												<td>${inventoryItem?.lotNumber }</td>
 												<td><format:date obj="${inventoryItem?.expirationDate }" format="MMM yyyy"/></td>
 												<td>${onHandQuantity}</td>
@@ -85,8 +84,7 @@
 											</tr>
 											<g:set var="status" value="${status+1 }"/>										
 										</g:if>
-									</g:each>
-									
+									</g:each>									
 								</g:each>
 							</tbody>
 							<%-- 

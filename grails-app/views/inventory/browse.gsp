@@ -33,118 +33,131 @@
 		         		</tr>
 						<tr class="prop">
 			         		<td style="padding: 0; margin: 0; vertical-align: middle;">
-			            		<g:if test="${commandInstance?.categoryToProductMap}">
-						            <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
-						                <table class="tableScroll"> 
-											<thead> 
-					           					<tr>
-													<th rowspan="2" class="center middle">
-														<input type="checkbox" id="toggleCheckbox">	
-													</th>
-													<th rowspan="2" class="center middle"><warehouse:message code="category.label"/></th>
-													<th rowspan="2" class="middle"><warehouse:message code="default.description.label"/></th>
-													<th rowspan="2" class="center middle" style="border-right:1px solid lightgrey;"><warehouse:message code="product.manufacturer.label"/></th>
-					           		 				<td colspan="2" class="center" style="background-color: white; border-left: 1px solid lightgrey; border-right: 1px solid lightgrey;">
-					           		 					<label><warehouse:message code="default.pending.label"/></label>
-					           		 				</td>
-													<th rowspan="2" class="center middle"><warehouse:message code="default.qty.label"/></th>
-					           					</tr>
-												<tr class="odd">
-													<th class="center" style="border-left: 1px solid lightgrey;"><warehouse:message code="inventory.qtyin.label"/></th>
-													<th class="center" style="border-right: 1px solid lightgrey;"><warehouse:message code="inventory.qtyout.label"/></th>
-												</tr>
-											</thead> 
-											<tbody> 
-												<g:set var="counter" value="${0 }"/>
-												<g:each var="entry" in="${commandInstance?.categoryToProductMap}" status="i">
-													<g:set var="totalQuantity" value="${0 }"/>
-													<g:set var="categoryInventoryItems" value="${commandInstance?.categoryToProductMap[entry.key]}"/>
-													<g:each var="inventoryItem" in="${categoryInventoryItems}" status="status">
-														<g:set var="supported" value="${!inventoryItem?.inventoryLevel?.status || inventoryItem?.inventoryLevel?.status == org.pih.warehouse.inventory.InventoryStatus.SUPPORTED }"/>													
-														<g:set var="quantity" value="${supported ? inventoryItem?.quantityOnHand : 0 }"/>
-														<g:set var="totalQuantity" value="${totalQuantity + (quantity?:0) }"/>
-														<g:set var="totalProducts" value="${totalProducts + 1}"/>
-														
-														<tr class="${counter++%2==0?'even':'odd' } prop">
-															<td class="middle center" style="width: 1%">
-																<g:checkBox id="${inventoryItem?.product?.id }" name="product.id" 
-																	class="checkbox" style="top:0em;" checked="${false }" 
-																		value="${inventoryItem?.product?.id }" />
-															</td>																
-															<td class="checkable middle right" nowrap="nowrap" style="width: 1%;">
-																<span class="fade">
-																	<format:category category="${inventoryItem?.product?.category}"/> 
-																</span>
-															</td>
-															<td class="checkable middle" style="width: 25%">
-																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]" fragment="inventory" style="z-index: 999">
-																	<g:if test="${inventoryItem?.product?.name?.trim()}">
-																		<format:product product="${inventoryItem?.product}"/> 
+					            <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
+					                <fieldset>
+							                <table class="tableScroll"> 
+					            		<g:if test="${commandInstance?.categoryToProductMap}">
+												<thead> 
+						           					<tr>
+														<th rowspan="2" class="center middle">
+															<input type="checkbox" id="toggleCheckbox">	
+														</th>
+														<th rowspan="2" class="center middle"><warehouse:message code="category.label"/></th>
+														<th rowspan="2" class="middle"><warehouse:message code="default.description.label"/></th>
+														<th rowspan="2" class="center middle" style="border-right:1px solid lightgrey;"><warehouse:message code="product.manufacturer.label"/></th>
+						           		 				<td colspan="2" class="center" style="background-color: white; border-left: 1px solid lightgrey; border-right: 1px solid lightgrey;">
+						           		 					<label><warehouse:message code="default.pending.label"/></label>
+						           		 				</td>
+														<th rowspan="2" class="center middle"><warehouse:message code="default.qty.label"/></th>
+						           					</tr>
+													<tr class="odd">
+														<th class="center" style="border-left: 1px solid lightgrey;"><warehouse:message code="inventory.qtyin.label"/></th>
+														<th class="center" style="border-right: 1px solid lightgrey;"><warehouse:message code="inventory.qtyout.label"/></th>
+													</tr>
+												</thead> 
+												<tbody> 
+													<g:set var="counter" value="${0 }"/>
+													<g:each var="entry" in="${commandInstance?.categoryToProductMap}" status="i">
+														<g:set var="totalQuantity" value="${0 }"/>
+														<g:set var="categoryInventoryItems" value="${commandInstance?.categoryToProductMap[entry.key]}"/>
+														<g:each var="inventoryItem" in="${categoryInventoryItems}" status="status">
+															<g:set var="supported" value="${!inventoryItem?.inventoryLevel?.status || inventoryItem?.inventoryLevel?.status == org.pih.warehouse.inventory.InventoryStatus.SUPPORTED }"/>													
+															<g:set var="quantity" value="${supported ? inventoryItem?.quantityOnHand : 0 }"/>
+															<g:set var="totalQuantity" value="${totalQuantity + (quantity?:0) }"/>
+															<g:set var="totalProducts" value="${totalProducts + 1}"/>
+															
+															<tr class="${counter++%2==0?'even':'odd' } prop">
+																<td class="middle center" style="width: 1%">
+																	<g:checkBox id="${inventoryItem?.product?.id }" name="product.id" 
+																		class="checkbox" style="top:0em;" checked="${false }" 
+																			value="${inventoryItem?.product?.id }" />
+																</td>																
+																<td class="checkable middle right" nowrap="nowrap" style="width: 1%;">
+																	<span class="fade">
+																		<format:category category="${inventoryItem?.product?.category}"/> 
+																	</span>
+																</td>
+																<td class="checkable middle" style="width: 25%">
+																	<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]" fragment="inventory" style="z-index: 999">
+																		<g:if test="${inventoryItem?.product?.name?.trim()}">
+																			<format:product product="${inventoryItem?.product}"/> 
+																		</g:if>
+																		<g:else>
+																			<warehouse:message code="product.untitled.label"/>
+																		</g:else>
+																	</g:link> 
+																	<g:if test="${!supported }">
+																		<span class="fade">																
+																			<format:metadata obj="${inventoryItem?.inventoryLevel?.status }"/>
+																		</span>
+																	</g:if>								
+																</td>
+																<td class="checkable middle center" style="width: 1%" nowrap="nowrap">
+																	<span class="fade">${inventoryItem?.product?.manufacturer }</span>
+																</td>
+																
+																<td class="checkable middle center" style="width: 5%; border-left: 1px solid lightgrey;">
+																	<g:if test="${supported }">																
+																		${inventoryItem?.quantityToReceive?:0}
 																	</g:if>
 																	<g:else>
-																		<warehouse:message code="product.untitled.label"/>
+																		<span class="fade"><warehouse:message code="default.na.label"/></span>																
 																	</g:else>
-																</g:link> 
-																<g:if test="${!supported }">
-																	<span class="fade">																
-																		<format:metadata obj="${inventoryItem?.inventoryLevel?.status }"/>
-																	</span>
-																</g:if>								
-															</td>
-															<td class="checkable middle center" style="width: 1%" nowrap="nowrap">
-																<span class="fade">${inventoryItem?.product?.manufacturer }</span>
-															</td>
-															
-															<td class="checkable middle center" style="width: 5%; border-left: 1px solid lightgrey;">
-																<g:if test="${supported }">																
-																	${inventoryItem?.quantityToReceive?:0}
-																</g:if>
-																<g:else>
-																	<span class="fade"><warehouse:message code="default.na.label"/></span>																
-																</g:else>
-															</td>
-															<td class="checkable middle center" style="width: 5%; border-right: 1px solid lightgrey;">
-																<g:if test="${supported }">																
-																	${inventoryItem?.quantityToShip?:0}
-																</g:if>
-																<g:else>
-																	<span class="fade"><warehouse:message code="default.na.label"/></span>																
-																</g:else>
-															</td>
-															<td class="checkable middle center" style="width: 5%;">
-																<g:if test="${supported }">																
-																	<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
-																		${inventoryItem?.quantityOnHand?:0}
-																	</g:link>
-																</g:if>
-																<g:else>
-																	<span class="fade"><warehouse:message code="default.na.label"/></span>																
-																</g:else>
-															</td>
-														</tr>
+																</td>
+																<td class="checkable middle center" style="width: 5%; border-right: 1px solid lightgrey;">
+																	<g:if test="${supported }">																
+																		${inventoryItem?.quantityToShip?:0}
+																	</g:if>
+																	<g:else>
+																		<span class="fade"><warehouse:message code="default.na.label"/></span>																
+																	</g:else>
+																</td>
+																<td class="checkable middle center" style="width: 5%;">
+																	<g:if test="${supported }">																
+																		<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
+																			${inventoryItem?.quantityOnHand?:0}
+																		</g:link>
+																	</g:if>
+																	<g:else>
+																		<span class="fade"><warehouse:message code="default.na.label"/></span>																
+																	</g:else>
+																</td>
+															</tr>
+														</g:each>
 													</g:each>
-												</g:each>
-											</tbody>
-											<tfoot>
-												<tr class="prop">
-													<td colspan="1" class=left>
-														<g:render template="./actions" model="[]"/>														
-													</td>			
-													<td colspan="6" class="left middle">
-														<warehouse:message code="inventory.showingProductsInCategories.label" args="[totalProducts,commandInstance?.categoryToProductMap?.keySet()?.size()]" />
-														<%-- 
-														(<g:each var="category" in="${commandInstance?.categoryToProductMap?.keySet()}">
-															<g:link controller="inventory" action="browse" params="['categoryId':category.id]">
-																<format:metadata obj="${category}"/>&nbsp;
-															</g:link>
-														</g:each>)
-														--%>
-													</td>
-												</tr>
-											</tfoot>
-										</table>		
-									</form>
-								</g:if>	    
+												</tbody>
+												<tfoot>
+													<tr>
+														<td colspan="1" class="center middle">
+															<div class="left">
+																<g:render template="./actions" model="[]"/>
+															</div>
+														</td>			
+														<td colspan="6" class="left middle">
+															<warehouse:message code="inventory.showingProductsInCategories.label" args="[totalProducts,commandInstance?.categoryToProductMap?.keySet()?.size()]" />
+															<%-- 
+															(<g:each var="category" in="${commandInstance?.categoryToProductMap?.keySet()}">
+																<g:link controller="inventory" action="browse" params="['categoryId':category.id]">
+																	<format:metadata obj="${category}"/>&nbsp;
+																</g:link>
+															</g:each>)
+															--%>
+														</td>
+													</tr>
+												</tfoot>
+										</g:if>	    
+										<g:else>
+												<tbody>
+													<tr>
+														<td class="middle center">
+															<warehouse:message code="inventory.searchNoMatch.message" args="[commandInstance?.searchTerms?:'',format.metadata(obj:commandInstance?.categoryInstance)]"/>
+														</td>
+													</tr>
+												</tbody>
+										</g:else>
+										</table>
+									</fieldset>	
+								</form>									
 			         		</td>
 			         	</tr>
 			        </table>
@@ -154,7 +167,7 @@
 		<script>
 			$(document).ready(function() {
 
-				$('.tableScroll').tableScroll({height:350, width: '99%'});
+				$('.tableScroll').tableScroll({height:'250', width: '99%'});
 				
 				$(".checkable a").click(function(event) {
 					event.stopPropagation();

@@ -1,5 +1,6 @@
 package org.pih.warehouse.inventory
 
+import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Product;
 
 class InventoryLevelController {
@@ -62,8 +63,7 @@ class InventoryLevelController {
         if (inventoryLevelInstance) {
             if (params.version) {
                 def version = params.version.toLong()
-                if (inventoryLevelInstance.version > version) {
-                    
+                if (inventoryLevelInstance.version > version) {                    
                     inventoryLevelInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel')] as Object[], "Another user has updated this InventoryLevel while you were editing")
                     render(view: "edit", model: [inventoryLevelInstance: inventoryLevelInstance])
                     return
@@ -102,4 +102,60 @@ class InventoryLevelController {
             redirect(action: "list")
         }
     }
+	
+	
+	def markAsSupported = { 
+		log.info "Mark as supported " + params	
+		def productIds = params.product.id
+		def location = Location.get(session.warehouse.id)
+		productIds.each {
+			def product = Product.get(it)
+			markAs(product, location.inventory, InventoryStatus.SUPPORTED)
+		}		
+		flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code:'products.label')])}"		
+		redirect(controller: "inventory", action: "browse")
+	}
+
+	def markAsNotSupported = {
+		log.info "Mark as not supported " + params
+		def productIds = params.product.id
+		def location = Location.get(session.warehouse.id)
+		productIds.each {
+			def product = Product.get(it)
+			markAs(product, location.inventory, InventoryStatus.NOT_SUPPORTED)
+		}
+		flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code:'products.label')])}"
+		redirect(controller: "inventory", action: "browse")
+	}
+
+	def markAsNonInventoried = {
+		log.info "Mark as non-inventoried " + params
+		def productIds = params.product.id
+		def location = Location.get(session.warehouse.id)
+		productIds.each {
+			def product = Product.get(it)
+			markAs(product, location.inventory, InventoryStatus.SUPPORTED_NON_INVENTORY)
+		}
+		flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code:'products.label')])}"
+		redirect(controller: "inventory", action: "browse")
+	}
+
+	
+	def markAs(Product product, Inventory inventory, InventoryStatus inventoryStatus) { 		
+		def inventoryLevel = InventoryLevel.findByProductAndInventory(product, inventory)
+		// Add a new inventory level
+		if (!inventoryLevel) {
+			inventoryLevel = new InventoryLevel(product: product, status: inventoryStatus)
+			inventory.addToConfiguredProducts(inventoryLevel)
+			inventory.save()
+		}
+		// update existing inventory level
+		else {
+			inventoryLevel.status = inventoryStatus
+			inventoryLevel.save()
+		}
+
+		
+	}
+		
 }

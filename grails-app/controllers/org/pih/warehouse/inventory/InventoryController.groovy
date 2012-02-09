@@ -40,7 +40,7 @@ class InventoryController {
 	 * Allows a user to browse the inventory for a particular warehouse.  
 	 */
 	def browse = { InventoryCommand cmd ->
-		log.info("Browse inventory " + params)
+		log.debug("Browse inventory " + params)
 		// Get the current warehouse from either the request or the session
 		cmd.warehouseInstance = Location.get(params?.warehouse?.id) 
 		if (!cmd.warehouseInstance) {
@@ -333,7 +333,7 @@ class InventoryController {
 		
 		// poor man's filter
 		def categorySelected = (params.category) ? Category.get(params.category as int) : null;
-		log.info "categorySelected: " + categorySelected
+		log.debug "categorySelected: " + categorySelected
 		if (categorySelected) {
 			results['reorderProductsQuantityMap'] = results['reorderProductsQuantityMap'].findAll { it.key?.category == categorySelected }
 			results['minimumProductsQuantityMap'] = results['minimumProductsQuantityMap'].findAll { it.key?.category == categorySelected }
@@ -383,7 +383,7 @@ class InventoryController {
 		
 		
 		def groupBy = command?.groupBy;
-		log.info("groupBy = " + groupBy)
+		log.debug("groupBy = " + groupBy)
 		def daysBetween = (groupBy!="default") ? -1 : endDate - startDate
 		if (daysBetween > 365 || groupBy.equals("yearly")) {
 			groupBy = "yearly"
@@ -404,7 +404,7 @@ class InventoryController {
 		dateKeys = dateKeys.collect { dateFormat.format(it.date) }.unique()
 		
 		
-		log.info("consumption " + consumptionMap)
+		log.debug("consumption " + consumptionMap)
 		def consumptionProductDateMap = [:]
 		consumptions.each { 
 			def dateKey = it.product.id + "_" + dateFormat.format(it.transactionDate)
@@ -438,12 +438,12 @@ class InventoryController {
 		}
 		
 		def consumptionMap = [:]
-		log.info "Products " + products.size();
+		log.debug "Products " + products.size();
 				
 		def transactionEntryMap = transactionEntries.groupBy { it.inventoryItem.product }		
 		transactionEntryMap.each { key, value ->
 			def consumed = value.sum { it.quantity }			
-			log.info("key="+key + ", value = " + value + ", total consumed=" + consumed);
+			log.debug("key="+key + ", value = " + value + ", total consumed=" + consumed);
 			consumptionMap[key] = consumed;
 		}
 		*/
@@ -542,7 +542,7 @@ class InventoryController {
 			transactionCount = Transaction.countByInventory(currentInventory);
 		}
 		def transactionMap = Transaction.findAllByInventory(currentInventory).groupBy { it?.transactionType?.id } 
-		log.info(transactionMap.keySet())
+		log.debug(transactionMap.keySet())
 		render(view: "listTransactions", model: [transactionInstanceList: transactions, 
 			transactionCount: transactionCount, transactionTypeSelected: transactionType, 
 			transactionMap: transactionMap ])
@@ -588,7 +588,7 @@ class InventoryController {
 	
 	/*
 	def saveTransaction = {	
-		log.info "save transaction: " + params
+		log.debug "save transaction: " + params
 		def transactionInstance = Transaction.get(params.id);
 		def inventoryInstance = Inventory.get(params.inventory.id);
 		
@@ -696,13 +696,13 @@ class InventoryController {
 	
 	
 	def createTransaction = { 
-		log.info("createTransaction params " + params)		
+		log.debug("createTransaction params " + params)		
 		def command = new TransactionCommand();
 		def warehouseInstance = Location.get(session?.warehouse?.id);
 		def transactionInstance = new Transaction(params);
 		//transactionInstance?.transactionDate = new Date();
 		//transactionInstance?.source = warehouseInstance
-		log.info("transactionType " + transactionInstance?.transactionType)
+		log.debug("transactionType " + transactionInstance?.transactionType)
 		if (!transactionInstance?.transactionType) { 
 			flash.message = "Cannot create transaction for unknown transaction type";			
 			redirect(controller: "inventory", action: "browse")
@@ -738,7 +738,7 @@ class InventoryController {
 	 * Save a transaction that sets the current inventory level for stock.
 	 */
 	def saveInventoryTransaction = { TransactionCommand command ->
-		log.info ("Saving inventory adjustment " + params)
+		log.debug ("Saving inventory adjustment " + params)
 
 		def transaction = command?.transactionInstance;
 		def warehouseInstance = Location.get(session?.warehouse?.id);
@@ -776,13 +776,13 @@ class InventoryController {
 					redirect(controller: "inventory", action: "showTransaction", id: transaction?.id)
 				}
 			} catch (ValidationException e) {
-				log.info ("caught validation exception " + e)
+				log.debug ("caught validation exception " + e)
 			}
 		}
 
 		// After the attempt to save the transaction, there might be errors on the transaction
 		if (transaction.hasErrors()) {
-			log.info ("has errors" + transaction.errors)
+			log.debug ("has errors" + transaction.errors)
 			
 			// Get the list of products that the user selected from the inventory browser			
 			if (params.product?.id) {
@@ -815,9 +815,9 @@ class InventoryController {
 	 * TRANSFER_OUT, CONSUMED, DAMAGED, EXPIRED
 	 */
 	def saveDebitTransaction = { TransactionCommand command ->
-		log.info ("Saving debit transactions " + params)
+		log.debug ("Saving debit transactions " + params)
 		
-		log.info("size: " + command?.transactionEntries?.size());
+		log.debug("size: " + command?.transactionEntries?.size());
 			
 		def transaction = command?.transactionInstance;
 		def warehouseInstance = Location.get(session?.warehouse?.id);
@@ -852,13 +852,13 @@ class InventoryController {
 					redirect(controller: "inventory", action: "showTransaction", id: transaction?.id)
 				}
 			} catch (ValidationException e) {
-				log.info ("caught validation exception " + e)
+				log.debug ("caught validation exception " + e)
 			}
 		}
 
 		// After the attempt to save the transaction, there might be errors on the transaction
 		if (transaction?.hasErrors()) {
-			log.info ("has errors" + transaction.errors)
+			log.debug ("has errors" + transaction.errors)
 			
 			// Get the list of products that the user selected from the inventory browser
 			if (params.product?.id) {
@@ -893,7 +893,7 @@ class InventoryController {
 	 */
 	def saveCreditTransaction = { TransactionCommand command ->
 
-		log.info("Saving credit transaction: " + params)
+		log.debug("Saving credit transaction: " + params)
 		def transactionInstance = command?.transactionInstance
 		def warehouseInstance = Location.get(session?.warehouse?.id);
 		def quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory)
@@ -908,12 +908,12 @@ class InventoryController {
 
 		// We need to process each transaction entry to make sure that it has a valid inventory item (or we will create one if not)
 		command.transactionEntries.each { 
-			log.info(it?.inventoryItem?.id + " " + it.product + " " + it.lotNumber + " " + it.expirationDate)
+			log.debug(it?.inventoryItem?.id + " " + it.product + " " + it.lotNumber + " " + it.expirationDate)
 			if (!it.inventoryItem) { 
 				// Find an existing inventory item for the given lot number and product and description
-				log.info("Find inventory item " + it.product + " " + it.lotNumber)
+				log.debug("Find inventory item " + it.product + " " + it.lotNumber)
 				def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(it.product, it.lotNumber)
-				log.info("Found inventory item? " + inventoryItem)
+				log.debug("Found inventory item? " + inventoryItem)
 				
 				// If the inventory item doesn't exist, we create a new one
 				if (!inventoryItem) {
@@ -921,7 +921,7 @@ class InventoryController {
 					inventoryItem.lotNumber = it.lotNumber
 					inventoryItem.expirationDate = (it.lotNumber) ? it.expirationDate : null
 					inventoryItem.product = it.product;
-					log.info("Save inventory item " + inventoryItem)
+					log.debug("Save inventory item " + inventoryItem)
 					if (inventoryItem.hasErrors() || !inventoryItem.save()) {
 						inventoryItem.errors.allErrors.each { error->
 							command.errors.reject("inventoryItem.invalid",
@@ -953,13 +953,13 @@ class InventoryController {
 					redirect(controller: "inventory", action: "showTransaction", id: transactionInstance?.id)
 				}
 			} catch (ValidationException e) {
-				log.info ("caught validation exception " + e)
+				log.debug ("caught validation exception " + e)
 			}
 		}
 
 		// Should be true if a validation exception was thrown 
 		if (transactionInstance.hasErrors()) {
-			log.info ("has errors" + transactionInstance.errors)
+			log.debug ("has errors" + transactionInstance.errors)
 		
 			// Get the list of products that the user selected from the inventory browser
 			if (params.product?.id) {
@@ -991,16 +991,16 @@ class InventoryController {
 	 * Not used at the moment.  
 	 */
 	def saveOutgoingTransfer = { Transaction transaction, TransactionCommand command ->
-		log.info ("Saving stock transfer " + params)
+		log.debug ("Saving stock transfer " + params)
 
 		def warehouseInstance = Location.get(session?.warehouse?.id);
 		def quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory)
 		
 		// Validate transaction entries
-		log.info ("BEGINNING")
+		log.debug ("BEGINNING")
 		def transactionEntriesToRemove = []
 		transaction.transactionEntries.each {
-			log.info("transaction entry " + it.inventoryItem + " " + it.quantity);
+			log.debug("transaction entry " + it.inventoryItem + " " + it.quantity);
 			def quantityOnHand = quantityMap[it.inventoryItem]
 			if (quantityOnHand < it.quantity) {
 				transaction.errors.rejectValue("transactionEntries", "transactionEntry.quantity.invalid", 
@@ -1008,20 +1008,20 @@ class InventoryController {
 			} 
 			
 			if (!it.quantity) { 
-				log.info ("remove " + it?.inventoryItem?.id + " from transaction entries")
+				log.debug ("remove " + it?.inventoryItem?.id + " from transaction entries")
 				transactionEntriesToRemove.add(it)
 			}
 		}
 
 		// Remove any transaction entries that are invalid
 		transactionEntriesToRemove.each {
-			log.info("REMOVE " + it.inventoryItem + " " + it.quantity);
+			log.debug("REMOVE " + it.inventoryItem + " " + it.quantity);
 			transaction.transactionEntries.remove(it)
 		}
 		
-		log.info ("REMAINING")
+		log.debug ("REMAINING")
 		transaction.transactionEntries.each {
-			log.info("transaction entry " + it.inventoryItem + " " + it.quantity);
+			log.debug("transaction entry " + it.inventoryItem + " " + it.quantity);
 		}
 		// Check to see if there are errors, if not save the transaction 		
 		if (!transaction.hasErrors()) { 
@@ -1034,13 +1034,13 @@ class InventoryController {
 					redirect(controller: "inventory", action: "showTransaction", id: transaction?.id)					
 				} 
 			} catch (ValidationException e) { 
-				log.info ("caught validation exception " + e)
+				log.debug ("caught validation exception " + e)
 			}
 		}
 
 		// After the attempt to save the transaction, there might be errors on the transaction		
 		if (transaction.hasErrors()) { 
-			log.info ("has errors" + transaction.errors)
+			log.debug ("has errors" + transaction.errors)
 			
 			// Get the list of products that the user selected from the inventory browser
 			if (params.product?.id) {
@@ -1069,7 +1069,7 @@ class InventoryController {
 	
 	
 	def editTransaction = { 		
-		log.info "edit transaction: " + params
+		log.debug "edit transaction: " + params
 		def transactionInstance = Transaction.get(params?.id)
 		def warehouseInstance = Location.get(session?.warehouse?.id);
 		def model = [ 

@@ -141,10 +141,60 @@
 									</table>
 								</td>
 							</tr>
+
+							<g:if test="${!shipmentWorkflow?.isExcluded('carrier')}">  
+								<tr class="prop">
+									<td valign="top" class="name">
+										<img src="${createLinkTo(dir:'images/icons/silk',file:'user.png')}" alt="comments" style="vertical-align: middle"/>
+										<label><warehouse:message code="shipping.traveler.label" /></label></td>
+									<td valign="top" >
+										<g:if test="${shipmentInstance?.carrier}">
+											${fieldValue(bean: shipmentInstance, field: "carrier.firstName")}
+											${fieldValue(bean: shipmentInstance, field: "carrier.lastName")}
+										</g:if>												
+									</td>
+								</tr>
+							</g:if>
+											
+	
+							<g:if test="${!shipmentWorkflow?.isExcluded('additionalInformation') && shipmentInstance?.additionalInformation}">
+								<tr class="prop">
+									<td valign="top" class="name">
+										<img src="${createLinkTo(dir:'images/icons/silk',file:'comment.png')}" alt="comments" style="vertical-align: middle"/>
+										<label><warehouse:message code="default.comments.label" /></label><br/>
+									</td>
+									<td valign="top" class="">
+										<g:if test="${shipmentInstance.additionalInformation}">
+											${shipmentInstance.additionalInformation}<br/>
+										</g:if>
+									</td>
+									<td>
+										&nbsp;
+									</td>
+								</tr>
+							</g:if>
+						
+					
+							
+							<g:if test="${shipmentWorkflow?.documentTemplate}">
+								<tr class="prop">
+									<td valign="top" class="name">
+										<label><warehouse:message code="shipping.templates.label" /></label><br/>
+									</td>
+									<td valign="top" class="">
+											<a href="${createLink(controller: "shipment", action: "generateDocuments", id: shipmentInstance.id)}">
+											<button><warehouse:message code="shipping.generateDocuments.label" args="[format.metadata(obj:shipmentWorkflow.shipmentType)]"/></button></a>
+									</td>
+									<td>
+										&nbsp;
+									</td>
+								</tr>
+							</g:if>							
+
 							<g:if test="${shipmentInstance?.incomingTransactions }">
 								<tr class="prop">
 									<td valign="top" class="name"><label>
-										<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="tag" style="vertical-align: middle"/>
+										<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="add" style="vertical-align: middle"/>
 										<warehouse:message code="shipping.transactions.label"/></label>
 									</td>
 									<td valign="top" class="value">
@@ -176,7 +226,7 @@
 							<g:if test="${shipmentInstance?.outgoingTransactions }">
 								<tr class="prop">
 									<td valign="top" class="name"><label>
-										<img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="tag" style="vertical-align: middle"/>
+										<img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="delete" style="vertical-align: middle"/>
 										<warehouse:message code="shipping.transactions.label"/></label>
 									</td>
 									<td valign="top" class="value">
@@ -205,9 +255,10 @@
 									</td>										
 								</tr>							
 							</g:if>
+							
 							<tr class="prop">
 								<td valign="top" class="name"><label>
-									<img src="${createLinkTo(dir:'images/icons/silk',file:'tag.png')}" alt="tag" style="vertical-align: middle"/>
+									<img src="${createLinkTo(dir:'images/icons/silk',file:'tag_blue.png')}" alt="tag" style="vertical-align: middle"/>
 									<warehouse:message code="shipping.referenceNumbers.label"/></label>
 								</td>
 								<td valign="top" class="value">
@@ -278,53 +329,7 @@
 								</tr>
 							</g:if>
 							--%>
-							<g:if test="${!shipmentWorkflow?.isExcluded('carrier')}">  
-								<tr class="prop">
-									<td valign="top" class="name"><label><warehouse:message
-										code="shipping.traveler.label" /></label></td>
-									<td valign="top" >
-										<g:if test="${shipmentInstance?.carrier}">
-											${fieldValue(bean: shipmentInstance, field: "carrier.firstName")}
-											${fieldValue(bean: shipmentInstance, field: "carrier.lastName")}
-										</g:if>												
-									</td>
-								</tr>
-							</g:if>
-											
-	
-							<g:if test="${!shipmentWorkflow?.isExcluded('additionalInformation') && shipmentInstance?.additionalInformation}">
-								<tr class="prop">
-									<td valign="top" class="name">
-										<img src="${createLinkTo(dir:'images/icons/silk',file:'comment.png')}" alt="comments" style="vertical-align: middle"/>
-										<label><warehouse:message code="default.comments.label" /></label><br/>
-									</td>
-									<td valign="top" class="">
-										<g:if test="${shipmentInstance.additionalInformation}">
-											${shipmentInstance.additionalInformation}<br/>
-										</g:if>
-									</td>
-									<td>
-										&nbsp;
-									</td>
-								</tr>
-							</g:if>
-						
-					
-							
-							<g:if test="${shipmentWorkflow?.documentTemplate}">
-								<tr class="prop">
-									<td valign="top" class="name">
-										<label><warehouse:message code="shipping.templates.label" /></label><br/>
-									</td>
-									<td valign="top" class="">
-											<a href="${createLink(controller: "shipment", action: "generateDocuments", id: shipmentInstance.id)}">
-											<button><warehouse:message code="shipping.generateDocuments.label" args="[format.metadata(obj:shipmentWorkflow.shipmentType)]"/></button></a>
-									</td>
-									<td>
-										&nbsp;
-									</td>
-								</tr>
-							</g:if>
+
 							<g:if test="${shipmentInstance.documents}">
 								<tr class="prop">
 									<td class="name">

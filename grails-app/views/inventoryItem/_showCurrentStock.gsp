@@ -108,7 +108,6 @@
 					</g:hasErrors>
 				</tr>
 			</tfoot>
-		</table>										
-		
+		</table>
 	</div>	
 </div>

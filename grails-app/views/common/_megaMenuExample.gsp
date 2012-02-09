@@ -1,6 +1,6 @@
 <!--Example MegaMenu Starts-->
 <ul class="megamenu">
-	<li><a href="javascript:void(0)">Tabular Content</a>
+	<li><a href="javascript:void(0)"><warehouse:message code="inventory.label" /></a>
 		<div style="width: 500px;">
 			<h3>Tabular Content Example</h3>
 			<table border="1" cellpadding="0" cellspacing="0"
@@ -37,7 +37,7 @@
 				</tr>
 			</table>
 		</div></li>
-	<li><a href="javascript:void(0)">Form Content</a>
+	<li><a href="javascript:void(0)"><warehouse:message code="orders.label"  default="Orders"/></a>
 		<div style="width: 265px;">
 			<h3>Form Content Example</h3>
 			<form action="#" method="get" id="form-content">
@@ -57,7 +57,7 @@
 				</fieldset>
 			</form>
 		</div></li>
-	<li><a href="javascript:void(0)">List Content</a>
+	<li><a href="javascript:void(0)"><warehouse:message code="requests.label"  default="Requests"/></a>
 		<div style="width: 300px;">
 			<ul id="list-content">
 				<li>Point 1 is the first point
@@ -82,7 +82,7 @@
 				<li>Point 4 is the lone fourth point without any children</li>
 			</ul>
 		</div></li>
-	<li><a href="javascript:void(0)">Paragraph Content</a>
+	<li><a href="javascript:void(0)"><warehouse:message code="shipping.label" /></a>
 		<div style="width: 520px;">
 			<p id="paragraph-content">Lorem ipsum dolor sit amet,
 				consectetur adipisicing elit, sed do eiusmod tempor incididunt ut
@@ -97,9 +97,9 @@
 				aperiam, eaque ipsa quae ab illo inventore veritatis et quasi
 				architecto beatae vitae dicta sunt explicabo.</blockquote>
 		</div></li>
-	<li><a href="javascript:void(0)">One Liner</a>
+	<li><a href="javascript:void(0)"><warehouse:message code="receiving.label" /></a>
 		<div style="width: 500px;">See how the position of the menu
 			gets adjusted to stay within the outer bounds.</div></li>
-	<li><a href="javascript:void(0)">Menu Less Menu</a></li>
+	<li><a href="javascript:void(0)"><warehouse:message code="report.label" /></a></li>
 </ul>
 <!--MegaMenu Ends-->

@@ -27,6 +27,10 @@ class TestController {
 		
 	}*/	
 	
+	def jQueryButton = { 
+		
+	}
+	
 	def jQuery = {
 	}
 	

@@ -48,7 +48,7 @@
 													<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
 												</button>
 												<div class="actions">
-													<g:render template="showStockCardMenuItems" model="[product: commandInstance?.productInstance, inventory: commandInstance?.inventory]"/>																				
+													<g:render template="showStockCardMenuItems" model="[product: commandInstance?.productInstance, inventory: commandInstance?.inventoryInstance]"/>																				
 												</div>
 											</span>				
 										</div>			

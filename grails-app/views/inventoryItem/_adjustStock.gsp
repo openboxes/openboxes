@@ -29,7 +29,6 @@
 								<td valign="top" class="name"><label><warehouse:message code="product.label"/></label></td>                            
 								<td valign="top" class="value">
 									<format:product product="${commandInstance?.productInstance}"/> 
-									<g:if test="${itemInstance?.lotNumber }">&rsaquo; ${itemInstance?.lotNumber }</g:if>
 								</td>
 							</tr>
 							<tr class="prop">
@@ -62,7 +61,7 @@
 							<tr class="prop">
 								<td valign="top" class="name"><label><warehouse:message code="inventory.newQuantity.label" /></label></td>                            
 								<td valign="top" class="value">
-									<g:textField id="newQuantity" name="newQuantity" size="3" value="${itemQuantity }" />
+									<g:textField id="newQuantity" name="newQuantity" size="6" value="${itemQuantity }" />
 								</td>
 							</tr>  	        
 							<tr>

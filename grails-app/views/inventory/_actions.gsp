@@ -14,6 +14,12 @@
 			<hr/>
 		</div>
 		<div class="action-menu-item">														
+			<a href="javascript:void(0);" class="actionButton" id="incomingTransferBtn">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="${warehouse.message(code: 'inventory.incomingTransfer.label') }" style="vertical-align: middle"/>
+				&nbsp;<warehouse:message code="inventory.incomingTransfer.label"/>
+			</a>
+		</div>
+		<div class="action-menu-item">														
 			<a href="javascript:void(0);" class="actionButton" id="outgoingTransferBtn">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="${warehouse.message(code: 'inventory.outgoingTransfer.label') }" style="vertical-align: middle"/>
 				&nbsp;<warehouse:message code="inventory.outgoingTransfer.label"/>
@@ -29,12 +35,6 @@
 			<hr/>
 		</div>
 		<div class="action-menu-item">														
-			<a href="javascript:void(0);" class="actionButton" id="incomingTransferBtn">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="${warehouse.message(code: 'inventory.incomingTransfer.label') }" style="vertical-align: middle"/>
-				&nbsp;<warehouse:message code="inventory.incomingTransfer.label"/>
-			</a>
-		</div>
-		<div class="action-menu-item">														
 			<a href="javascript:void(0);" class="actionButton" id="inventoryConsumedBtn">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'cup.png')}" alt="${warehouse.message(code: 'inventory.inventoryConsumed.label') }" style="vertical-align: middle"/>
 				&nbsp;<warehouse:message code="inventory.inventoryConsumed.label"/>
@@ -42,20 +42,43 @@
 		</div>	
 		<div class="action-menu-item">														
 			<a href="javascript:void(0);" class="actionButton" id="inventoryDamagedBtn">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="${warehouse.message(code: 'inventory.inventoryDamaged.label') }" style="vertical-align: middle"/>
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'error.png')}" alt="${warehouse.message(code: 'inventory.inventoryDamaged.label') }" style="vertical-align: middle"/>
 				&nbsp;<warehouse:message code="inventory.inventoryDamaged.label"/>
 			</a>
 		</div>	
 		<div class="action-menu-item">														
 			<a href="javascript:void(0);" class="actionButton" id="inventoryExpiredBtn">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'hourglass.png')}" alt="${warehouse.message(code: 'inventory.inventoryExpired.label') }" style="vertical-align: middle"/>
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'clock.png')}" alt="${warehouse.message(code: 'inventory.inventoryExpired.label') }" style="vertical-align: middle"/>
 				&nbsp;<warehouse:message code="inventory.inventoryExpired.label"/>
 			</a>
 		</div>	
 		<div class="action-menu-item">
 			<hr/>
 		</div>
-		<%-- Need to set defaults for the Transaction Report to generate a report.
+		<div class="action-menu-item">														
+			<a href="javascript:void(0);" class="actionButton" id="markAsSupported">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" alt="${warehouse.message(code: 'inventory.markAsSupported.label') }" style="vertical-align: middle"/>
+				&nbsp;<warehouse:message code="inventory.markAsSupported.label"/>
+			</a>
+		</div>	
+		<div class="action-menu-item">														
+			<a href="javascript:void(0);" class="actionButton" id="markAsNonInventoried">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="${warehouse.message(code: 'inventory.markAsNonInventoried.label') }" style="vertical-align: middle"/>
+				&nbsp;<warehouse:message code="inventory.markAsNonInventoried.label"/>
+			</a>
+		</div>	
+		<div class="action-menu-item">														
+			<a href="javascript:void(0);" class="actionButton" id="markAsNotSupported">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="${warehouse.message(code: 'inventory.markAsNotSupported.label') }" style="vertical-align: middle"/>
+				&nbsp;<warehouse:message code="inventory.markAsNotSupported.label"/>
+			</a>
+		</div>	
+		<div class="action-menu-item">
+			<hr/>
+		</div>
+		
+		
+		<!-- Need to set defaults for the Transaction Report to generate a report.
 			This might cause problems with the other actions, so keep that in mind. 
 		<div class="action-menu-item">					
 			<g:hiddenField name="category.id" value="${commandInstance?.categoryInstance?.id?:quickCategories[0]?.id}"/>
@@ -66,7 +89,7 @@
 				&nbsp;<warehouse:message code="report.showTransactionReport.label"/>
 			</a>
 		</div>		
-		--%>
+		-->
 		<div class="action-menu-item">														
 			<g:link controller="inventory" action="listAllTransactions">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="${warehouse.message(code: 'inventory.listTransactions.label') }" style="vertical-align: middle"/>
@@ -75,6 +98,7 @@
 		</div>		
 	</div>
 </span>
+
 
 <script>
 	$(document).ready(function() {
@@ -112,6 +136,15 @@
 		});
 		$("#transactionReportBtn").click(function(event) { 
 			$("#inventoryActionForm").attr("action", "${request.contextPath }/report/showTransactionReport").submit();
+		});
+		$("#markAsSupported").click(function(event) { 
+			$("#inventoryActionForm").attr("action", "${request.contextPath }/inventoryLevel/markAsSupported").submit();
+		});
+		$("#markAsNotSupported").click(function(event) { 
+			$("#inventoryActionForm").attr("action", "${request.contextPath }/inventoryLevel/markAsNotSupported").submit();
+		});
+		$("#markAsNonInventoried").click(function(event) { 
+			$("#inventoryActionForm").attr("action", "${request.contextPath }/inventoryLevel/markAsNonInventoried").submit();
 		});
 
 	});

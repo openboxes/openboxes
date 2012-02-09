@@ -138,8 +138,8 @@ class ShipmentService {
 			and { 
 				eq("origin", location)
 				or {
-					between("expectedShippingDate",null,null)
-					//between("expectedShippingDate",now-5,now+30)
+					//between("expectedShippingDate",null,null)
+					between("expectedShippingDate",now-5,now+30)
 					isNull("expectedShippingDate")
 				}
 			}
@@ -167,7 +167,7 @@ class ShipmentService {
 	List<Shipment> getRecentIncomingShipments(String locationId) { 		
 		Location location = Location.get(locationId);
 		//return Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30, 
-		return Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, null, null,
+		return Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30,
 			[max:10, offset:2, sort:"expectedShippingDate", order:"desc"]);
 	}
 	
@@ -981,9 +981,9 @@ class ShipmentService {
 						throw new TransactionException("Failed to receive shipment due to error while saving transaction", 
 							transaction: creditTransaction)
 					}
-					
+
+					// Associate the incoming transaction with the shipment					
 					shipmentInstance.addToIncomingTransactions(creditTransaction) 
-					
 					shipmentInstance.save();
 					
 				}
@@ -1197,9 +1197,23 @@ class ShipmentService {
 								
 				shipmentInstance.removeFromEvents(eventInstance)
 				eventInstance?.delete()
-				shipmentInstance?.save()
-				
+				shipmentInstance?.save()				
 			}
+			else if (eventInstance?.eventType?.eventCode == EventCode.SHIPPED) { 
+				def transactions = Transaction.findAllByOutgoingShipment(shipmentInstance)
+				transactions.each { transactionInstance -> 
+					if (transactionInstance) {
+						shipmentInstance.removeFromOutgoingTransactions(transactionInstance)
+						transactionInstance?.delete();
+					}
+				}
+				
+				shipmentInstance.removeFromEvents(eventInstance)
+				eventInstance.delete()
+				shipmentInstance.save()				
+			}
+			
+			
 		} catch (Exception e) {
 			log.error("Error rolling back most recent event", e)
 			throw new RuntimeException("Error rolling back most recent event")
