@@ -53,7 +53,8 @@ class InventoryController {
 		if (!cmd.categoryInstance) {
 			cmd.categoryInstance = Category.get(session?.inventoryCategoryId);
 			if (!cmd.categoryInstance) {
-				cmd.categoryInstance = quickCategories.get(0);
+				cmd.categoryInstance = productService.getRootCategory() 
+				//cmd.categoryInstance =  quickCategories.get(0);
 			}
 		}
 		session?.inventoryCategoryId = cmd.categoryInstance.id
