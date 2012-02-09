@@ -1,6 +1,9 @@
 package org.pih.warehouse.user;
 
 import org.pih.warehouse.core.Location;
+import grails.converters.JSON;
+
+import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.order.Order;
 import org.pih.warehouse.receiving.Receipt;
@@ -76,6 +79,19 @@ class DashboardController {
 			activityList : activityList
 		]
 	}
+	
+	def status = { 
+		def admin = User.get(1)
+		def comments = Comment.findAllBySenderAndRecipient(admin, admin) 
+		
+		def results = comments.collect {
+			if (it.dateSent > new Date()) { 
+				[ id: it.id, comment: warehouse.message(code:it.comment, args: [format.datetime(obj: it.dateSent)]), dateSent: it.dateSent ]
+			}
+		}
+		render results as JSON
+	}
+	
 	
 	def menu = { 
 		def incomingShipments = Shipment.findAllByDestination(session?.warehouse).groupBy{it.status.code}.sort()

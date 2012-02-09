@@ -48,6 +48,7 @@
 	<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.hoverIntent.minified.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.tableScroll/', file:'jquery.tablescroll.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.watermark/', file:'jquery.watermark.min.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/jquery.periodicalupdater/', file:'jquery.periodicalupdater.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/', file:'global.js')}" type="text/javascript" ></script>
 	<%-- 
 	<script src="${createLinkTo(dir:'js/jquery.megaMenu/', file:'jquery.megamenu.js')}" type="text/javascript" ></script>
@@ -88,7 +89,6 @@
 	<g:render template="/common/customVariables"/>
 	
 	<%-- 
-	<div class="notification-container"></div>
 	
 	<g:if test="${flash.message}">	
 		<div id="notify-container" style="display: hidden;">
@@ -101,13 +101,16 @@
 	<div id="hd" role="banner">
 	    <g:render template="/common/header"/>		    
 	</div>
+	
+	
+	
 	<!-- Body includes the divs for the main body content and left navigation menu -->
 		
 	<div id="bd" role="main">
 	    <div id="doc3" class="yui-t3">		    	
 	      	<div id="yui-main">
 		    	<div id="content" class="yui-b">
-		    		<g:if test="${session.user}">
+		    		<g:if test="${session.user}">		    		
 		    			<h3 class="page-title">
 						    <div>							    
 						    	<g:link controller="dashboard" action="index">
@@ -131,6 +134,7 @@
 					    		</g:if>
 			    			</div>
 		    			</h3>
+			    		<div id="status"></div>
 		    		</g:if>
 					<g:layoutBody />
 				</div>
@@ -150,8 +154,30 @@
 		<g:render template="/common/footer" />
 	</div>
 	<script type="text/javascript">
-		$(function() { 
+		$(function() { 				
+			var handler = $.PeriodicalUpdater('/warehouse/dashboard/status', 
+				{ 
+					method: 'get', // method; get or post 
+					data: '', // array of values to be passed to the page - e.g. {name: "John", greeting: "hello"} 
+					minTimeout: 1000, // starting value for the timeout in milliseconds 
+					maxTimeout: 60000, // maximum length of time between requests 
+					multiplier: 2, // the amount to expand the timeout by if the response hasn't changed (up to maxTimeout) 
+					type: 'json', // response type - text, xml, json, etc. See $.ajax config options 
+					maxCalls: 0, // maximum number of calls. 0 = no limit. 
+					autoStop: 0 // automatically stop requests after this many returns of the same data. 0 = disabled. 
+				}, 
+				function(remoteData, success, xhr, handle) { 
+					if (remoteData) {
+						for (var i = 0; i < remoteData.length; i++) {
+							$('#status').text(remoteData[i].comment);
+						}
+						$('#status').addClass("notice");
+						
+					}
+				}
+			);
 
+				
 			$("#warehouse-switch").click(function() {
 				//$("#warehouse-menu").toggle();
 				$("#warehouseMenu").dialog({ 
@@ -298,6 +324,9 @@
 				var li = $(this).parent().closest(".menu-section");
 			});	
 		});
+
+
+
 	</script>
 </body>
 </html>
