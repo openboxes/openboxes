@@ -22,6 +22,7 @@ import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.inventory.InventoryItem;
+import org.pih.warehouse.inventory.TransactionException;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.receiving.Receipt;
@@ -198,7 +199,10 @@ class ShipmentController {
 	}
 	
 	def sendShipment = {
+		def transactionInstance 
 		def shipmentInstance = Shipment.get(params.id)
+		def shipmentWorkflow = shipmentService.getShipmentWorkflow(params.id)
+
 		if (!shipmentInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
 			redirect(action: "list", params:[type: params.type])
@@ -208,8 +212,7 @@ class ShipmentController {
 			if ("POST".equalsIgnoreCase(request.getMethod())) { 				
 				// make sure a shipping date has been specified and that is not the future
 				if (!params.actualShippingDate || Date.parse("MM/dd/yyyy", params.actualShippingDate) > new Date()) {
-					flash.message = "${warehouse.message(code: 'shipping.specifyValidShipmentDate.message')}"
-					def shipmentWorkflow = shipmentService.getShipmentWorkflow(shipmentInstance)	
+					flash.message = "${warehouse.message(code: 'shipping.specifyValidShipmentDate.message')}"	
 					render(view: "sendShipment", model: [shipmentInstance: shipmentInstance, shipmentWorkflow: shipmentWorkflow])
 					return
 				}
@@ -217,19 +220,26 @@ class ShipmentController {
 				// create the list of email recipients
 				def emailRecipients = new HashSet()				
 				params.emailRecipientId?.each ( { emailRecipients = emailRecipients + Person.get(it) } )
-				
-				// send the shipment
-				shipmentService.sendShipment(shipmentInstance, params.comment, session.user, session.warehouse, 
-												Date.parse("MM/dd/yyyy", params.actualShippingDate), emailRecipients);
-				
-				if (!shipmentInstance.hasErrors()) { 
+				try { 
+					// send the shipment
+					shipmentService.sendShipment(shipmentInstance, params.comment, session.user, session.warehouse, 
+													Date.parse("MM/dd/yyyy", params.actualShippingDate), emailRecipients);
+				}
+				catch (TransactionException e) { 
+					transactionInstance = e.transaction
+					shipmentInstance = Shipment.get(params.id)
+					shipmentWorkflow = shipmentService.getShipmentWorkflow(params.id)
+					render(view: "sendShipment", model: [shipmentInstance: shipmentInstance, shipmentWorkflow: shipmentWorkflow, transactionInstance: transactionInstance])
+					return;
+				}
+								
+				if (!shipmentInstance?.hasErrors() && !transactionInstance?.hasErrors()) { 
 					flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 					redirect(action: "showDetails", id: shipmentInstance?.id)
 				}
 			}
-			
+
 			// populate the model and render the page
-			def shipmentWorkflow = shipmentService.getShipmentWorkflow(shipmentInstance)
 			render(view: "sendShipment", model: [shipmentInstance: shipmentInstance, shipmentWorkflow: shipmentWorkflow])
 		}
 	}

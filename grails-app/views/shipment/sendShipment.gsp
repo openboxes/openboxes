@@ -24,6 +24,11 @@
 				<g:renderErrors bean="${shipmentInstance}" as="list" />
 			</div>
 		</g:hasErrors>	
+		<g:hasErrors bean="${transactionInstance}">
+			<div class="errors">
+				<g:renderErrors bean="${transactionInstance}" as="list" />
+			</div>
+		</g:hasErrors>	
 
 		<div class="dialog">
 			<fieldset>
@@ -117,7 +122,7 @@
 													<input type="checkbox" checked="true" name="emailRecipientId" value="${shipmentInstance?.carrier?.id}"/>
 													<!--  <img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>  -->
 												</td>
-												<td><warehouse:message code="shippping.traveler.label"/></td>
+												<td><warehouse:message code="shipping.traveler.label"/></td>
 												<td>${shipmentInstance?.carrier?.name }  &nbsp;<br/> <span class="fade">${shipmentInstance?.carrier?.email}</span></td>
 											</tr>
 										</g:if>
@@ -128,7 +133,7 @@
 													<input type="checkbox" checked="true" name="emailRecipientId" value="${shipmentInstance?.recipient?.id}"/>
 													<!--  <img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>  -->
 														</td>
-												<td><warehouse:message code="shippping.recipient.label"/></td>
+												<td><warehouse:message code="shipping.recipient.label"/></td>
 												<td>${shipmentInstance?.recipient?.name }  &nbsp;<br/> <span class="fade">${shipmentInstance?.recipient?.email}</span></td>
 											</tr>
 										</g:if>

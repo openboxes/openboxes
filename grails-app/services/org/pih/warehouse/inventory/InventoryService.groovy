@@ -1475,7 +1475,7 @@ class InventoryService implements ApplicationContextAware {
 		log.debug "create send shipment transaction" 
 		
 		if (!shipmentInstance.origin.isWarehouse()) {
-			throw new RuntimeException ("Can't create send shipment transaction for origin that is not a warehouse")
+			throw new RuntimeException ("Can't create send shipment transaction for origin that is not a depot")
 		}
 		
 		try { 
@@ -1483,8 +1483,8 @@ class InventoryService implements ApplicationContextAware {
 			Transaction debitTransaction = new Transaction();
 			debitTransaction.transactionType = TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)
 			debitTransaction.source = null
-			debitTransaction.destination = shipmentInstance?.destination.isWarehouse() ? shipmentInstance?.destination : null
-			//debitTransaction.destination = shipmentInstance?.destination
+			//debitTransaction.destination = shipmentInstance?.destination.isWarehouse() ? shipmentInstance?.destination : null
+			debitTransaction.destination = shipmentInstance?.destination
 			debitTransaction.inventory = shipmentInstance?.origin?.inventory ?: addInventory(shipmentInstance.origin)
 			debitTransaction.transactionDate = shipmentInstance.getActualShippingDate()
 		
@@ -1519,11 +1519,11 @@ class InventoryService implements ApplicationContextAware {
 			}
 		
 			if (!debitTransaction.save()) {
-				log.error debitTransaction.errors
-				throw new RuntimeException("Failed to save 'Send Shipment' transaction", debitTransaction);
+				log.info debitTransaction.errors
+				throw new TransactionException(message: "An error occurred while saving ${debitTransaction?.transactionType?.transactionCode} transaction", transaction: debitTransaction);
 			}
 		} catch (Exception e) { 
-			log.error("error occrred while creating transaction ", e);
+			log.error("An error occrred while creating transaction ", e);
 			throw e
 			//shipmentInstance.errors.reject("shipment.invalid", e.message);  // this doesn't seem to working properly
 		}

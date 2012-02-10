@@ -1027,7 +1027,19 @@ class ShipmentService {
 		return receiptInstance;
 	}
 	
-	
+	/**
+	 * Fetches shipment workflow associated with a shipment of the 
+	 * given shipmentId.
+	 * 
+	 * @param shipmentId
+	 * @return
+	 */
+	ShipmentWorkflow getShipmentWorkflow(String shipmentId) {
+		def shipment = Shipment.get(shipmentId)		
+		if (!shipment?.shipmentType) { return null }
+		return ShipmentWorkflow.findByShipmentType(shipment.shipmentType)
+	}
+
 	
 	/**
 	 * Fetches the shipment workflow associated with this shipment
