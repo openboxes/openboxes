@@ -48,6 +48,9 @@
 								${warehouse.message(code: 'default.type.label')}
 							</th>
 							<th>
+								${warehouse.message(code: 'shipment.label')}
+							</th>
+							<th>
 								${warehouse.message(code: 'transaction.source.label')}
 							</th>
 							<th>
@@ -73,8 +76,6 @@
 							</tr>
 						</g:if>
 						<g:else>
-						
-							
 							<g:set var="totalQuantityChange" value="${0 }"/>		
 							<g:each var="transaction" in="${transactionMap?.keySet()?.sort {it.transactionDate}.reverse() }" status="status">
 								<tr class="transaction ${(status%2==0)?'even':'odd' } prop">
@@ -89,9 +90,21 @@
 										</span>
 									</td>
 									<td>
+										<g:if test="${transaction?.incomingShipment }">
+											<g:link controller="shipment" action="showDetails" id="${transaction?.incomingShipment?.id }">
+												${transaction.incomingShipment?.name }
+											</g:link>
+										</g:if>
+										<g:elseif test="${transaction?.outgoingShipment }">
+											<g:link controller="shipment" action="showDetails" id="${transaction?.outgoingShipment?.id }">
+												${transaction.outgoingShipment?.name }
+											</g:link>
+										</g:elseif>
+									</td>
+									<td>
 										${transaction?.source?.name }
 									</td>
-										<td>
+									<td>
 										${transaction?.destination?.name }									
 									</td>
 									<td style="text-align: center">
