@@ -176,7 +176,6 @@
 				}
 			);
 
-				
 			$("#warehouse-switch").click(function() {
 				//$("#warehouse-menu").toggle();
 				$("#warehouseMenu").dialog({ 

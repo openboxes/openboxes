@@ -32,6 +32,13 @@
 		 				</tr>
 		 			</g:each>
 	 			</g:each>
+	 			<g:unless test="${activityList }">
+					<tr>
+						<td>
+							<warehouse:message code="dashboard.noActivityFound.message"/>
+						</td>
+					</tr>	 			
+	 			</g:unless>
 	 			
 			</table>			
 		</div>
