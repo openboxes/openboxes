@@ -16,6 +16,11 @@
 	            </div>				
 			</g:hasErrors>
 			
+	 		<g:if test="${addLocation}">
+	 			<g:render template="addLocation" model="['locationInstance':locationInstance]"/>
+	 		</g:if>
+			
+			
            	<g:form action="createShipment" method="post">
 				<g:hiddenField name="id" value="${shipmentInstance?.id}"/>
 				<fieldset>
@@ -55,22 +60,25 @@
 									<td valign="top" class="name"><label><warehouse:message code="default.origin.label" /></label></td>
 									<td valign="top"
 										class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">								
-										<g:selectShipmentOrigin name="origin.id" 
+										<g:selectShipmentOrigin name="origin.id" class="combobox"
 											optionKey="id" 
 											value="${shipmentInstance?.origin?.id ? shipmentInstance?.origin?.id : params.type == 'OUTGOING' ? session.warehouse.id : ''}" 
-											noSelection="['null':'']" 
-											style="width: 180px" />							
-										<br/>
-										<g:link controller="location" action="edit" target="_blank"><span class="small"><warehouse:message code="location.addNewLocation.label"/></span></g:link>							
+											noSelection="['null':'']" />							
+											
+										<g:link action="createShipment" event="addLocation" params="[target:'origin']">
+											<img src="${createLinkTo(dir:'images/icons/silk',file:'building_add.png')}" alt="Add a location" class="middle"/>	
+										</g:link>		
 									</td>
 								</tr>
 								<tr class="prop">
 									<td valign="top" class="name"><label><warehouse:message code="default.destination.label" /></td>
 									<td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'destination', 'errors')}">
-										<g:selectShipmentDestination name="destination.id" 
+										<g:selectShipmentDestination class="combobox" name="destination.id" 
 											optionKey="id" value="${shipmentInstance?.destination?.id ? shipmentInstance?.destination?.id : (params.type == 'INCOMING') ? session.warehouse.id : ''}" 
-											noSelection="['null':'']"
-											style="width: 180px" />	
+											noSelection="['null':'']" />	
+										<g:link action="createShipment" event="addLocation" params="[target:'origin']">
+											<img src="${createLinkTo(dir:'images/icons/silk',file:'building_add.png')}" alt="Add a location" class="middle"/>	
+										</g:link>		
 									</td>
 								</tr>
 								

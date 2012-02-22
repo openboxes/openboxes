@@ -54,13 +54,23 @@ class ReportController {
 	}
 	
 	
-	def showTransactionReport = { InventoryReportCommand cmd -> 
+	def showTransactionReport = { 
+		
+		InventoryReportCommand command = new InventoryReportCommand();
+		command.rootCategory = productService.getRootCategory();
+		
+		
+		[command : command ]
+	}
+	
+	
+	def generateTransactionReport = { InventoryReportCommand command -> 
 		// We always need to initialize the root category 
-		cmd.rootCategory = productService.getRootCategory();
-		if (!cmd?.hasErrors()) { 			
-			reportService.generateTransactionReport(cmd);			
+		command.rootCategory = productService.getRootCategory();
+		if (!command?.hasErrors()) { 			
+			reportService.generateTransactionReport(command);			
 		}
-		[cmd : cmd]
+		render(view: 'showTransactionReport', model: [command : command])
 	}
 	
 	def showShippingReport = { ChecklistReportCommand command ->

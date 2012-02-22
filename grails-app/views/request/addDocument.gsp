@@ -32,7 +32,7 @@
 						<tbody>
 							<tr class="prop">
 								<td valign="top" class="name"><label><warehouse:message
-									code="document.selectAFile.label"/></label>
+									code="document.selectFile.label"/></label>
 								</td>
 								<td valign="top"
 									class="value ${hasErrors(bean: documentInstance, field: 'fileContents', 'errors')}">
@@ -60,7 +60,7 @@
 								<td valign="top"
 									class="value ${hasErrors(bean: documentInstance, field: 'documentType', 'errors')}">
 												<g:select name="typeId" from="${org.pih.warehouse.core.DocumentType.list()}" value="${documentInstance?.documentType?.id}" 
-													noSelection="['0': warehouse.message(code:'document.chooseADocumentType.label')]" optionKey="id" optionValue="${{format.metadata(obj:it)}}"/>
+													noSelection="['0': warehouse.message(code:'document.chooseDocumentType.label')]" optionKey="id" optionValue="${{format.metadata(obj:it)}}"/>
 								</td>
 							</tr>
 							<tr class="prop">

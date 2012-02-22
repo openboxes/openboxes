@@ -19,6 +19,17 @@
 	                <g:renderErrors bean="${personInstance}" as="list" />
 	            </div>
             </g:hasErrors>
+
+			<div class="buttonBar">            	
+            	<span class="linkButton">
+            		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'persons.label').toLowerCase()]"/></g:link>
+            	</span>
+            	<span class="linkButton">
+            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'person.label').toLowerCase()]"/></g:link>
+            	</span>
+           	</div>
+
+
             <g:form action="save" method="post" >
             	<fieldset>
 	                <div class="dialog">
@@ -62,11 +73,11 @@
 	                        
 	                        
 		                        <tr class="prop">
-		                        	<td valign="top"></td>
-		                        	<td valign="top">
-						                <div class="buttons">
+		                        	<td valign="top" class="name"></td>
+		                        	<td valign="top" clsas="value left">
+						                <div class="left">
 						                   <g:submitButton name="create" class="save" value="${warehouse.message(code: 'default.button.create.label', default: 'Create')}" />
-						                   
+						                   &nbsp;
 						                   <g:link action="list">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
 						                   
 						                </div>                        	

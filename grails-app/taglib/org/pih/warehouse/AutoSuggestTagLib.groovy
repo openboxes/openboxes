@@ -11,7 +11,7 @@ class AutoSuggestTagLib {
 		def name = attrs.name
 		def valueId = (attrs.valueId)?attrs.valueId:"";
 		def valueName = (attrs.valueName)?attrs.valueName:"";
-		def width = (attrs.width) ? attrs.width : 200;
+		def width = (attrs.width) ? attrs.width : '300px';
 		def minLength = (attrs.minLength) ? attrs.minLength : 1;
 		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "";
 
@@ -37,7 +37,9 @@ class AutoSuggestTagLib {
 						\$("#${id}-span").click(function() {
 							return false;
 						});
-						  \$("#${id}-suggest").autocomplete({
+						//\$("#${id}-suggest").css('width', '300px');
+
+						\$("#${id}-suggest").autocomplete({
 							width: ${width},
 							minLength: ${minLength},
 							dataType: 'json',

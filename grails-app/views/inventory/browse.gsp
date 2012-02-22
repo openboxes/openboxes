@@ -35,8 +35,8 @@
 			         		<td style="padding: 0; margin: 0; vertical-align: middle;">
 					            <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
 					                <fieldset>
-							                <table class="tableScroll"> 
-					            		<g:if test="${commandInstance?.categoryToProductMap}">
+						                <table class="tableScroll"> 
+					            			<g:if test="${commandInstance?.categoryToProductMap}">
 												<thead> 
 						           					<tr>
 														<th rowspan="2" class="center middle">
@@ -145,16 +145,16 @@
 														</td>
 													</tr>
 												</tfoot>
-										</g:if>	    
-										<g:else>
-												<tbody>
+											</g:if>	    
+											<g:else>
+												<tbody style="min-height: 100px;">
 													<tr>
 														<td class="middle center">
 															<warehouse:message code="inventory.searchNoMatch.message" args="[commandInstance?.searchTerms?:'',format.metadata(obj:commandInstance?.categoryInstance)]"/>
 														</td>
 													</tr>
 												</tbody>
-										</g:else>
+											</g:else>
 										</table>
 									</fieldset>	
 								</form>									

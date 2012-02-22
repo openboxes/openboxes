@@ -7,6 +7,24 @@ class UserService {
 	def dataSource
 	boolean transactional = true
 	
+	def findUsers(String term) { 
+		
+	}
+	
+	def findPersons(String terms, Map params) { 		
+		def criteria = Person.createCriteria()
+		def results = criteria.list (params) {
+			or { 
+				like("firstName", terms)
+				like("lastName", terms)
+				like("email", terms)
+			}
+			order("lastName", "desc")
+		}
+		
+	}
+	
+	
 	void convertPersonToUser(String personId) { 
 		def user = User.get(personId) 
 		if (!user) { 

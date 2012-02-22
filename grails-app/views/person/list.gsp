@@ -35,16 +35,11 @@
 				<br/>
                 <table>
                     <thead>
-                        <tr>
-                        
-                            <g:sortableColumn property="id" title="${warehouse.message(code: 'default.id.label')}" />
-                        
+                        <tr>                                                    
                             <g:sortableColumn property="type" title="${warehouse.message(code: 'person.type.label')}" />
-                                                    
-                            <g:sortableColumn property="firstName" title="${warehouse.message(code: 'person.firstName.label')}" />
-                        
-                            <g:sortableColumn property="lastName" title="${warehouse.message(code: 'person.lastName.label')}" />
-                        
+                            
+                            <g:sortableColumn property="lastName" title="${warehouse.message(code: 'person.name.label')}" />
+                                                                        
                             <g:sortableColumn property="email" title="${warehouse.message(code: 'person.email.label')}" />
                         
                             <g:sortableColumn property="phoneNumber" title="${warehouse.message(code: 'person.phoneNumber.label')}" />
@@ -55,14 +50,16 @@
                     <g:each in="${personInstanceList}" status="i" var="personInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                         
-                            <td><g:link action="edit" id="${personInstance.id}">${fieldValue(bean: personInstance, field: "id")}</g:link></td>
 							<td>
 								${warehouse.message(code: (personInstance.class.simpleName.toLowerCase() + '.label'))}
 							</td>                           
                         
-                            <td>${fieldValue(bean: personInstance, field: "firstName")}</td>
-                        
-                            <td>${fieldValue(bean: personInstance, field: "lastName")}</td>
+                            <td>
+								<g:link action="edit" id="${personInstance.id}">
+                            		${fieldValue(bean: personInstance, field: "firstName")}
+                        			${fieldValue(bean: personInstance, field: "lastName")}
+                        		</g:link>
+                        	</td>
                         
                             <td>${fieldValue(bean: personInstance, field: "email")}</td>
                         

@@ -3,6 +3,7 @@ package org.pih.warehouse.shipping
 import org.apache.poi.hssf.record.formula.functions.NumericFunction.OneArg;
 import org.hibernate.exception.ConstraintViolationException;
 import org.pih.warehouse.core.Constants;
+import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Product;
@@ -74,7 +75,17 @@ class CreateShipmentWorkflowController {
     		
     		on("cancel").to("finish")
     		
-    		// for the top-level links
+			on("addLocation") {
+				flash.addLocation = true
+				log.info("locationInstance.hashCode " + flash.locationInstance?.hashCode())
+				if (!flash.locationInstance) {
+					flash.locationInstance = new Location();
+				}
+			}.to("enterShipmentDetails")
+			on("saveLocation").to("saveLocationAction")
+
+			
+			// for the top-level links
     		on("enterShipmentDetails").to("enterShipmentDetails")
 			on("enterTrackingDetails").to("enterTrackingDetails")
 			on("enterContainerDetails").to("enterContainerDetails")
@@ -121,7 +132,25 @@ class CreateShipmentWorkflowController {
     			}	
     			
     		}.to("finish")
-    		
+						
+			on("addPerson") {
+				flash.addPerson = true
+				if (!flash.personInstance) { 
+					flash.personInstance = new Person();
+				}
+			}.to("enterTrackingDetails")
+			
+			on("addShipper") {
+				flash.addShipper = true				
+				if (!flash.shipperInstance) { 
+					flash.shipperInstance = new Shipper()
+				}
+			}.to("enterTrackingDetails")
+			
+
+			on("savePerson").to("savePersonAction")
+			on("saveShipper").to("saveShipperAction")
+			
     		on("cancel").to("finish")
     		
     		// for the top-level links
@@ -142,8 +171,6 @@ class CreateShipmentWorkflowController {
     		
 			on("enterContainerDetails") { 
 				log.info ("Enter container details " + params)
-				
-				
 				[ selectedContainer : Container.get(params?.containerId)]
 			}.to("enterContainerDetails")
 			
@@ -211,6 +238,7 @@ class CreateShipmentWorkflowController {
 			}.to("enterContainerDetails")
 
 			on("saveItem").to("saveItemAction")
+			
 			on("updateItem").to("updateItemAction")
 			
 			on("deleteItem"){	
@@ -319,20 +347,142 @@ class CreateShipmentWorkflowController {
     		on("invalid").to("enterContainerDetails")
     	}
     	
-     	cloneContainerAction {
-    		action {
-    			
-    			// see if we have to make copies of this container
-    			if (flash.cloneQuantity && flash.cloneContainer) {
-    				shipmentService.copyContainer(flash.cloneContainer, flash.cloneQuantity as Integer)
-    			}
-    		
-    			valid()
-    		}
-    		
-    		on("valid").to("enterContainerDetails")
-    	}
-    
+		cloneContainerAction {
+			action {
+
+				// see if we have to make copies of this container
+				if (flash.cloneQuantity && flash.cloneContainer) {
+					shipmentService.copyContainer(flash.cloneContainer, flash.cloneQuantity as Integer)
+				}
+
+				valid()
+			}
+
+			on("valid").to("enterContainerDetails")
+		}
+		saveLocationAction { 
+			 action { 
+				 def locationInstance
+				 log.info "saveLocationAction: " + params				 
+				 if (flash.locationInstance) { 
+					 locationInstance.properties = params 
+				 }
+				 else { 
+					 locationInstance = new Location(params)					 
+				 }
+				 
+				 //flash.locationInstance = locationInstance;
+				 
+				 def locations = Location.findAll(locationInstance);
+				 flash.message 
+				 log.info "saveLocationAction: found " + locations?.size() + " locations"  
+				 if (locations) { 
+					 flash.message = "${warehouse.message(code:'location.alreadyExists.message', args:[locationInstance.name])}"
+					 invalid()
+				 }
+				 else {		
+					 
+					 if (locationInstance.save(flush:true) && !locationInstance.hasErrors()) {  
+						 log.info "saved location " + locationInstance + " with id " + locationInstance?.id
+						 flash.message = "${warehouse.message(code:'location.created.message', args:[locationInstance.name])}"
+						 valid()
+					 }
+					 else { 							 
+						 log.info "invalid location " + locationInstance.errors
+						 flash.message = "${warehouse.message(code:'location.invalid.message', args:[locationInstance.name])}"
+						 flash.addLocation = true
+						 flash.locationInstance = locationInstance
+						 invalid()				 
+					 }
+				 }
+			 }
+			 on("valid").to("enterShipmentDetails")
+			 on("invalid").to("enterShipmentDetails")
+			 
+		 }
+		 savePersonAction {
+			 action {
+				 log.info "savePersonAction: " + params
+				 
+				 def personInstance = new Person(params)
+				 flash.personInstance = personInstance;
+				 
+				 def persons = Person.findAll(personInstance);
+				 flash.message
+				 log.info "savePersonAction: found " + persons?.size() + " persons"
+				 if (persons) {
+					 flash.message = "${warehouse.message(code:'person.alreadyExists.message', args:[personInstance.firstName, personInstance.lastName])}"
+					 invalid()
+				 }
+				 else {
+					 log.info "validate person"
+					 if (!personInstance.validate()) {
+						 log.info "invalid person " + personInstance.errors
+						 flash.message = "${warehouse.message(code:'person.invalid.message', args:[personInstance.firstName, personInstance.lastName])}"
+						 invalid()
+					 }
+					 else {
+						 
+						 if (personInstance.save(flush:true) && !personInstance.hasErrors()) {
+							 log.info "saved person " + personInstance + " with id " + personInstance?.id
+							 flash.message = "${warehouse.message(code:'person.created.message', args:[personInstance.firstName, personInstance.lastName])}"
+							 valid()
+						 }
+						 else {
+							 log.info "invalid person " + personInstance.errors
+							 flash.message = "${warehouse.message(code:'person.invalid.message', args:[personInstance.firstName, personInstance.lastName])}"
+							 invalid()
+						 }
+					 }
+				 }
+				 
+			 }
+			 on("valid").to("enterTrackingDetails")
+			 on("invalid").to("enterTrackingDetails")
+			 
+		 }
+		 saveShipperAction {
+			 action {
+				 log.info "saveShipperAction: " + params
+				 
+				 def shipperInstance = new Shipper(params)
+				 flash.shipperInstance = shipperInstance;
+				 
+				 def shippers = Shipper.findAll(shipperInstance);
+				 flash.message
+				 log.info "saveShipperAction: found " + shippers?.size() + " persons"
+				 if (shippers) {
+					 flash.message = "${warehouse.message(code:'shipper.alreadyExists.message', args:[shipperInstance?.name])}"
+					 invalid()
+				 }
+				 else {
+					 log.info "validate shipper"
+					 if (!shipperInstance.validate()) {
+						 log.info "invalid person " + shipperInstance.errors
+						 flash.message = "${warehouse.message(code:'shipper.invalid.message', args:[shipperInstance?.name])}"
+						 invalid()
+					 }
+					 else {
+						 
+						 if (shipperInstance.save(flush:true) && !shipperInstance.hasErrors()) {
+							 log.info "saved shipper " + shipperInstance + " with id " + shipperInstance?.id
+							 flash.message = "${warehouse.message(code:'shipper.created.message', args:[shipperInstance?.name])}"
+							 valid()
+						 }
+						 else {
+							 log.info "invalid shipper " + shipperInstance.errors
+							 flash.message = "${warehouse.message(code:'shipper.invalid.message', args:[shipperInstance?.name])}"
+							 invalid()
+						 }
+					 }
+				 }
+				 
+			 }
+			 on("valid").to("enterTrackingDetails")
+			 on("invalid").to("enterTrackingDetails")
+			 
+		 }
+		     
      	
     	saveBoxAction {
     		action {

@@ -31,116 +31,107 @@
 				<div id="details" class="section">
 					<table>
 						<tbody>
-							<tr class="prop">
-								<td valign="top" class="name"><label><warehouse:message
-									code="shipping.details.label"/></label>
-								</td>
-								<td valign="top" class="value">
-									<table>
-										<tbody>								
-											<tr>
-												<td valign="top">
-													<label><warehouse:message code="default.status.label" /></label>
-												</td>
-												<td valign="top">
-													<format:metadata obj="${shipmentInstance?.status.code}"/>
-													<span class="fade">
-														<g:if test="${shipmentInstance?.status?.location}">
-															<warehouse:message code="default.by.label"/> ${shipmentInstance?.status.location}
-														</g:if>
-														<g:if test="${shipmentInstance?.status?.date}">
-															<warehouse:message code="default.on.label"/> <format:date obj="${shipmentInstance?.status.date}"/>
-														</g:if>
-													</span>
-												</td>
-											</tr>
-											<tr>
-												<td valign="top">
-													<g:if test="${shipmentInstance?.status.code in [org.pih.warehouse.shipping.ShipmentStatusCode.SHIPPED, org.pih.warehouse.shipping.ShipmentStatusCode.RECEIVED]}">												
-														<label><warehouse:message code="shipping.departed.label" /></label>
-													</g:if>
-													<g:else>
-														<label><warehouse:message code="shipping.departing.label"/></label>
-													</g:else>
-												</td>
-												<td valign="top" >
-													<span>
-														${fieldValue(bean: shipmentInstance, field: "origin.name")}									
-													</span>
-													<span class="fade">
-														<g:if test="${shipmentInstance.expectedShippingDate && !shipmentInstance.hasShipped()}">
-															<format:date obj="${shipmentInstance?.expectedShippingDate}"/>
-														</g:if>
-													</span>											
-												</td>
-											</tr>
-											<tr>
-												<td valign="top">
-													<g:if test="${shipmentInstance?.status.code == org.pih.warehouse.shipping.ShipmentStatusCode.RECEIVED}">
-														<label><warehouse:message code="shipping.arrived.label" /></label>
-													</g:if>
-													<g:else>
-														<label><warehouse:message code="shipping.arriving.label" /></label>
-													</g:else>
-												</td>
-												<td>
-													<span>
-														${fieldValue(bean: shipmentInstance, field: "destination.name")}
-													</span>											
-													<span class="fade">
-														<g:if test="${shipmentInstance.expectedDeliveryDate && !shipmentInstance?.wasReceived()}">
-															<format:date obj="${shipmentInstance?.expectedDeliveryDate}"/>
-														</g:if>
-													</span>											
-												</td>
-											</tr>
-											<tr>
-												<td valign="top"><label>
-													<warehouse:message
-														code="shipping.totalWeight.label" /></label>
-												</td>
-												<td valign="top" class="value">
-													<g:formatNumber format="#,##0.00" number="${shipmentInstance?.totalWeightInPounds() ? shipmentInstance?.totalWeightInPounds() : 0.00 }" />
-													<warehouse:message code="default.lbs.label"/>
-												</td>												
-											</tr>
-											<g:if test="${!shipmentWorkflow?.isExcluded('totalValue')||!shipmentWorkflow?.isExcluded('statedValue')}">
-												<g:if test="${!shipmentWorkflow?.isExcluded('totalValue')}">
-													<tr>
-														<td valign="top">
-															<label><warehouse:message code="shipping.totalValue.label" /></label><br/>
-														</td>
-														<td valign="top" >
-															<g:if test="${shipmentInstance.totalValue}">
-																$<g:formatNumber format="#,##0.00" number="${shipmentInstance.totalValue}" /><br/>
-															</g:if>
-															<g:else>
-																<span class="fade"><warehouse:message code="default.na.label"/></span>
-															</g:else>
-														</td>
-													</tr>	
+								<tr class="prop">
+									<td valign="top" class="name">
+										<label><warehouse:message code="default.status.label" /></label>
+									</td>
+									<td valign="top">
+										<format:metadata obj="${shipmentInstance?.status.code}"/>
+										<span class="fade">
+											<g:if test="${shipmentInstance?.status?.location}">
+												<warehouse:message code="default.by.label"/> ${shipmentInstance?.status.location}
+											</g:if>
+											<g:if test="${shipmentInstance?.status?.date}">
+												<warehouse:message code="default.on.label"/> <format:date obj="${shipmentInstance?.status.date}"/>
+											</g:if>
+										</span>
+									</td>
+								</tr>
+								<tr class="prop">
+									<td valign="top" class="name">
+										<g:if test="${shipmentInstance?.status.code in [org.pih.warehouse.shipping.ShipmentStatusCode.SHIPPED, org.pih.warehouse.shipping.ShipmentStatusCode.RECEIVED]}">												
+											<label><warehouse:message code="shipping.departed.label" /></label>
+										</g:if>
+										<g:else>
+											<label><warehouse:message code="shipping.departing.label"/></label>
+										</g:else>
+									</td>
+									<td valign="top" >
+										<span>
+											${fieldValue(bean: shipmentInstance, field: "origin.name")}									
+										</span>
+										<span class="fade">
+											<g:if test="${shipmentInstance.expectedShippingDate && !shipmentInstance.hasShipped()}">
+												<format:date obj="${shipmentInstance?.expectedShippingDate}"/>
+											</g:if>
+										</span>											
+									</td>
+								</tr>
+								<tr class="prop">
+									<td valign="top" class="name">
+										<g:if test="${shipmentInstance?.status.code == org.pih.warehouse.shipping.ShipmentStatusCode.RECEIVED}">
+											<label><warehouse:message code="shipping.arrived.label" /></label>
+										</g:if>
+										<g:else>
+											<label><warehouse:message code="shipping.arriving.label" /></label>
+										</g:else>
+									</td>
+									<td>
+										<span>
+											${fieldValue(bean: shipmentInstance, field: "destination.name")}
+										</span>											
+										<span class="fade">
+											<g:if test="${shipmentInstance.expectedDeliveryDate && !shipmentInstance?.wasReceived()}">
+												<format:date obj="${shipmentInstance?.expectedDeliveryDate}"/>
+											</g:if>
+										</span>											
+									</td>
+								</tr>
+								<tr class="prop">
+									<td valign="top" class="name">
+
+										<label><warehouse:message
+											code="shipping.totalWeight.label" /></label>
+									</td>
+									<td valign="top" class="value">
+										<g:formatNumber format="#,##0.00" number="${shipmentInstance?.totalWeightInPounds() ? shipmentInstance?.totalWeightInPounds() : 0.00 }" />
+										<warehouse:message code="default.lbs.label"/>
+									</td>												
+								</tr>
+								<g:if test="${!shipmentWorkflow?.isExcluded('totalValue')||!shipmentWorkflow?.isExcluded('statedValue')}">
+									<g:if test="${!shipmentWorkflow?.isExcluded('totalValue')}">
+										<tr class="prop">
+											<td valign="top" class="name">
+												<label><warehouse:message code="shipping.totalValue.label" /></label><br/>
+											</td>
+											<td valign="top" >
+												<g:if test="${shipmentInstance.totalValue}">
+													$<g:formatNumber format="#,##0.00" number="${shipmentInstance.totalValue}" /><br/>
 												</g:if>
-												
-												<g:if test="${!shipmentWorkflow?.isExcluded('statedValue')}">
-													<tr>
-														<td valign="top">
-															<label><warehouse:message code="shipping.statedValue.label" /></label><br/>
-														</td>
-														<td valign="top">
-															<g:if test="${shipmentInstance.statedValue}">
-																$<g:formatNumber format="#,##0.00" number="${shipmentInstance.statedValue}" /><br/>
-															</g:if>
-															<g:else>
-																<span class="fade"><warehouse:message code="default.na.label"/></span>
-															</g:else>
-														</td>
-													</tr>
-												</g:if>		
-											</g:if>										
-										</tbody>
-									</table>
-								</td>
-							</tr>
+												<g:else>
+													<span class="fade"><warehouse:message code="default.na.label"/></span>
+												</g:else>
+											</td>
+										</tr>	
+									</g:if>
+									
+									<g:if test="${!shipmentWorkflow?.isExcluded('statedValue')}">
+										<tr class="prop">
+											<td valign="top" class="name">
+												<label><warehouse:message code="shipping.statedValue.label" /></label><br/>
+											</td>
+											<td valign="top">
+												<g:if test="${shipmentInstance.statedValue}">
+													$<g:formatNumber format="#,##0.00" number="${shipmentInstance.statedValue}" /><br/>
+												</g:if>
+												<g:else>
+													<span class="fade"><warehouse:message code="default.na.label"/></span>
+												</g:else>
+											</td>
+										</tr>
+									</g:if>		
+								</g:if>										
+							</tbody>
 
 							<g:if test="${!shipmentWorkflow?.isExcluded('carrier')}">  
 								<tr class="prop">
@@ -372,7 +363,7 @@
 																	${document?.filename}
 																</g:link> 
 																<span class="fade">
-																${document?.documentType?.name}	
+																	<format:metadata obj="${document?.documentType}"/>
 																</span>
 															</td>
 															<td>
@@ -507,23 +498,23 @@
 													<g:set var="newContainer" value="${previousContainer != shipmentItem?.container }"/>
 													<tr class="${(count++ % 2 == 0)?'odd':'even'}" >
 														<g:if test="${newContainer}">
-															<td nowrap="nowrap" class="newContainer">
+															<td class="newContainer">
 																<%-- <img src="${createLinkTo(dir: 'images/icons/silk', file: 'package.png')}" style="vertical-align: middle"/>&nbsp;--%>
 																<g:if test="${shipmentItem?.container?.parentContainer}">${shipmentItem?.container?.parentContainer?.name } &rsaquo;</g:if>
 																<g:if test="${shipmentItem?.container?.name }">${shipmentItem?.container?.name }</g:if>
 																<g:else><warehouse:message code="shipping.unpacked.label"/></g:else>
 																<span class="fade">
 													 				<g:if test="${shipmentItem?.container?.weight || shipmentItem?.container?.width || shipmentItem?.container?.length || shipmentItem?.container?.height}">
-														 				( 
 														 				<g:if test="${shipmentItem?.container?.weight}">
-														 					${shipmentItem?.container?.weight} ${shipmentItem?.container?.weightUnits}, 
+														 					${shipmentItem?.container?.weight} ${shipmentItem?.container?.weightUnits}
 														 				</g:if>
-																		${shipmentItem?.container.height ?: '?'} ${shipmentItem?.container?.volumeUnits}
-																		x
-																		${shipmentItem?.container.width ?: '?'} ${shipmentItem?.container?.volumeUnits}
-																		x
-																		${shipmentItem?.container.length ?: '?'} ${shipmentItem?.container?.volumeUnits}
-																		)
+														 				<g:if test="${shipmentItem?.container?.height && shipmentItem?.container?.width && shipmentItem?.container?.length }">
+																			${shipmentItem?.container.height} ${shipmentItem?.container?.volumeUnits}
+																			x
+																			${shipmentItem?.container.width} ${shipmentItem?.container?.volumeUnits}
+																			x
+																			${shipmentItem?.container.length} ${shipmentItem?.container?.volumeUnits}
+																		</g:if>
 																	</g:if>
 																</span>	
 															</td>
@@ -531,18 +522,18 @@
 														<g:else>
 															<td></td>
 														</g:else>														
-														<td class="${newContainer?'newContainer':''}" width="100%">
+														<td class="${newContainer?'newContainer':''}">
 															<g:link controller="inventoryItem" action="showStockCard" id="${shipmentItem?.product?.id}">
 																<format:product product="${shipmentItem?.product}"/>
 															</g:link>
 														</td>
-														<td class="${newContainer?'newContainer':''}" style="white-space:nowrap;">
+														<td class="${newContainer?'newContainer':''}">
 															${shipmentItem?.lotNumber}
 														</td>
-														<td class="${newContainer?'newContainer':''}" style="white-space:nowrap;">
+														<td class="${newContainer?'newContainer':''}">
 															<g:formatDate date="${shipmentItem?.expirationDate}" format="MMM yyyy"/>
 														</td>
-														<td class="${newContainer?'newContainer':''}" style="white-space:nowrap;">
+														<td class="${newContainer?'newContainer':''}">
 															${shipmentItem?.quantity}
 														</td>
 														<g:if test="${shipmentInstance?.wasReceived()}">

@@ -28,8 +28,8 @@ class UserController {
 		
 		if (params.q) {
 			def term = "%" + params.q + "%"
-			userInstanceList = User.findAllByUsernameLike(term, params)
-			userInstanceTotal = User.countByUsernameLike(term, params);
+			userInstanceList = User.findAllByUsernameLikeOrEmailLike(term, term, params)
+			userInstanceTotal = User.countByUsernameLikeOrEmailLike(term, term, params);
 		}
 		else {
 			userInstanceList = User.list(params)

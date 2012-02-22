@@ -55,13 +55,6 @@
 			<a href="${createLink(controller: "shipment", action: "addComment", id: shipmentInstance.id)}">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'note_add.png')}" alt="Add Note" style="vertical-align: middle"/>&nbsp;<warehouse:message code="shipping.addNote.label"/></a>													
 		</div>
-		<g:isInRole roles="[RoleType.ROLE_ADMIN]">
-			<div class="action-menu-item">
-				<g:link controller="shipment" action="rollbackLastEvent" id="${shipmentInstance?.id }">
-					<img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_undo.png')}" alt="Rollback Last Event" style="vertical-align: middle"/>&nbsp;	
-					<warehouse:message code="shipping.rollbackLastEvent.label"/></g:link> 
-			</div>
-		</g:isInRole>
 		<div class="action-menu-item">
 			<hr/>
 		</div>
@@ -125,7 +118,7 @@
 
 			<div class="action-menu-item">
 				<g:if test="${shipmentInstance.hasShipped() && !shipmentInstance.wasReceived()}">
-					<g:link controller="shipment" action="receiveShipment" params="${ [shipmentId : shipmentInstance.id] }">
+					<g:link controller="shipment" action="receiveShipment" id="${shipmentInstance.id}">
 						<img src="${createLinkTo(dir:'images/icons',file:'handtruck.png')}" alt="Receive Shipment" style="vertical-align: middle" />&nbsp;
 						<g:if test="${request.request.requestURL.toString().contains('receiveShipment')}">
 							<warehouse:message code="shipping.receiveShipment.label"/>
@@ -150,6 +143,14 @@
 				</g:else>
 			</div>
 		</g:if>
+		<g:if test="${shipmentInstance?.hasShipped() && !shipmentInstance.wasReceived()}">
+			<div class="action-menu-item">															
+				<g:link controller="shipment" action="markAsReceived" id="${shipmentInstance?.id }">													
+					<img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" 
+						alt="Mark as received" style="vertical-align: middle"/>&nbsp;<warehouse:message code="shipping.markAsReceived.label"/>
+				</g:link>
+			</div>
+		</g:if>
 		<g:if test="${session?.warehouse?.id == shipmentInstance?.origin?.id ||
 			(!(shipmentInstance?.origin?.isWarehouse()) && session?.warehouse?.id == shipmentInstance?.destination?.id)}">	
 			<div class="action-menu-item">		
@@ -161,5 +162,12 @@
 				</g:link>				
 			</div>
 		</g:if>
+		<g:isInRole roles="[RoleType.ROLE_ADMIN]">
+			<div class="action-menu-item">
+				<g:link controller="shipment" action="rollbackLastEvent" id="${shipmentInstance?.id }">
+					<img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_undo.png')}" alt="Rollback Last Event" style="vertical-align: middle"/>&nbsp;	
+					<warehouse:message code="shipping.rollbackLastEvent.label"/></g:link> 
+			</div>
+		</g:isInRole>
 	</div>
 </span>

@@ -6,10 +6,12 @@ import grails.converters.JSON;
 import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.order.Order;
+import org.pih.warehouse.product.Product;
 import org.pih.warehouse.receiving.Receipt;
 import org.pih.warehouse.request.Request;
 import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.core.Location;
+import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.Transaction;
 
 
@@ -48,8 +50,29 @@ class DashboardController {
 				lastUpdated: it.lastUpdated, 
 				shipment: it)
 		}
+		def products = Product.executeQuery( "select distinct p from Product p where p.lastUpdated >= :lastUpdated", [lastUpdated:new Date()-10, max:10, offset:5] );
+		products.each { 
+			activityList << new DashboardActivityCommand(
+				type: "package",
+				label: "Product '<a href='${createLink(controller: 'product', action: 'show', id: it.id)}'>${it.name}</a>' was updated",
+				url: "${createLink(controller: 'product', action: 'show', id: it.id)}",
+				dateCreated: it.dateCreated,
+				lastUpdated: it.lastUpdated,
+				product: it)
+		}
 		
-		def users = User.executeQuery( "select distinct u from User u where u.lastUpdated >= :lastUpdated", [lastUpdated:new Date()-30, max:10, offset:5] );
+		def transactions = Transaction.executeQuery("select distinct t from Transaction t where t.lastUpdated >= :lastUpdated", [lastUpdated:new Date()-10, max:10, offset:5] );
+		transactions.each { 
+			activityList << new DashboardActivityCommand(
+				type: "table",
+				label: "Transaction '<a href='${createLink(controller: 'transaction', action: 'show', id: it.id)}'>${it.id}</a>' was updated",
+				url: "${createLink(controller: 'transaction', action: 'show', id: it.id)}",
+				dateCreated: it.dateCreated,
+				lastUpdated: it.lastUpdated,
+				transaction: it)
+		}
+		
+		def users = User.executeQuery( "select distinct u from User u where u.lastUpdated >= :lastUpdated", [lastUpdated:new Date()-10, max:10, offset:5] );
 		users.each { 
 			activityList << new DashboardActivityCommand(
 				type: "user",
@@ -181,10 +204,14 @@ class DashboardActivityCommand {
 	String label
 	String type	
 	String url
+	
+	User user
 	Shipment shipment
 	Receipt receipt
+	Product product
 	Transaction transaction
-	User user
+	InventoryItem inventoryItem
+	
 	Date lastUpdated
 	Date dateCreated
 	

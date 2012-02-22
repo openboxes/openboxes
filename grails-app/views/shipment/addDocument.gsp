@@ -57,7 +57,7 @@
 							</tr>
 							<tr class="prop">
 								<td valign="top" class="name"><label><warehouse:message
-									code="document.selectAFile.label" /></label>
+									code="document.selectFile.label" /></label>
 								</td>
 								<td valign="top"
 									class="value ${hasErrors(bean: documentInstance, field: 'fileContents', 'errors')}">

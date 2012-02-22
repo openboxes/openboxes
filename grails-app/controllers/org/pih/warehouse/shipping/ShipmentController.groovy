@@ -40,7 +40,36 @@ class ShipmentController {
 	
 	def dataSource
 	def sessionFactory
+
 	
+	def list = {
+		boolean incoming = params?.type?.toUpperCase() == "INCOMING"
+		def origin = incoming ? (params.origin ? Location.get(params.origin) : null) : Location.get(session.warehouse.id)
+		def destination = incoming ? Location.get(session.warehouse.id) : (params.destination ? Location.get(params.destination) : null)
+		def shipmentType = params.shipmentType ? ShipmentType.get(params.shipmentType) : null
+		def statusCode = params.status ? Enum.valueOf(ShipmentStatusCode.class, params.status) : null
+		def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
+		def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
+		def shipments = shipmentService.getShipments(shipmentType, origin, destination, statusCode, statusStartDate, statusEndDate)
+		
+		// sort by event status, event date, and expecting shipping date
+		shipments = shipments.sort( { a, b ->
+			return b.lastUpdated <=> a.lastUpdated
+		} )
+
+		[ 
+			shipments:shipments, 
+			shipmentType:shipmentType?.id, 
+			origin:origin?.id, 
+			destination:destination?.id,
+			status:statusCode?.name, 
+			statusStartDate:statusStartDate, 
+			statusEndDate:statusEndDate, 
+			incoming: incoming
+		]
+	}
+	
+
 	def create = {
 		def shipmentInstance = new Shipment()
 		shipmentInstance.properties = params
@@ -277,11 +306,23 @@ class ShipmentController {
 		[shipmentInstance:shipmentInstance]
 	}
 	
+	def markAsReceived = { 		
+		def shipmentInstance = Shipment.get(params.id)
+		
+		// actually process the receipt
+		shipmentService.markAsReceived(shipmentInstance, session.warehouse);		
+		if (!shipmentInstance.hasErrors()) {
+			flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
+		}
+		redirect(controller:"shipment", action : "showDetails", id: shipmentInstance.id)
+	}
+	
+	
 	def receiveShipment = {
 		log.info "params: " + params
 		def receiptItemMap = [:] 
 		def receiptInstance
-		def shipmentInstance = Shipment.get(params.shipmentId)		
+		def shipmentInstance = Shipment.get(params.id)		
 		def shipmentItems = []
 		def inventoryItemMap = [:]
 		
@@ -289,7 +330,9 @@ class ShipmentController {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
 			redirect(action: "list", params:[type: 'incoming'])
 		}
-		else {			
+		else {		
+			
+			// Process receive shipment form	
 			if ("POST".equalsIgnoreCase(request.getMethod())) {			
 				receiptInstance = new Receipt(params)
 				
@@ -316,6 +359,8 @@ class ShipmentController {
 				}
 				redirect(controller:"shipment", action : "showDetails", params : [ "id" : shipmentInstance.id ?: '' ])
 			}
+			
+			// Display form 
 			else { 
 
 				if (shipmentInstance.receipt) {
@@ -440,28 +485,6 @@ class ShipmentController {
 			}
 			[shipmentInstance: shipmentInstance, containerInstance: containerInstance]
 		}
-	}
-	
-	def list = {
-		
-		
-		boolean incoming = params?.type?.toUpperCase() == "INCOMING"
-		def origin = incoming ? (params.origin ? Location.get(params.origin) : null) : Location.get(session.warehouse.id)
-		def destination = incoming ? Location.get(session.warehouse.id) : (params.destination ? Location.get(params.destination) : null)
-		def shipmentType = params.shipmentType ? ShipmentType.get(params.shipmentType) : null
-		def statusCode = params.status ? Enum.valueOf(ShipmentStatusCode.class, params.status) : null
-		def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
-		def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
-		def shipments = shipmentService.getShipments(shipmentType, origin, destination, statusCode, statusStartDate, statusEndDate)
-		
-		// sort by event status, event date, and expecting shipping date
-		shipments = shipments.sort( { a, b -> 
-			return b.lastUpdated <=> a.lastUpdated
-		} )
-
-		[ shipments:shipments, shipmentType:shipmentType?.id, origin:origin?.id, destination:destination?.id, 
-		  status:statusCode?.name, statusStartDate:statusStartDate, statusEndDate:statusEndDate, incoming: incoming 
-		]	
 	}
 	
 	def saveItem = {     		

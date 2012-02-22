@@ -13,7 +13,7 @@
 				</tr>											
 			</thead>
 			<tbody>
-				<g:if test="${!commandInstance?.inventoryItemList}">
+				<g:if test="${!commandInstance?.lotNumberList}">
 					<tr class="even" style="min-height: 100px;">
 						<td colspan="5" style="text-align: center; vertical-align: middle">
 							<warehouse:message code="inventory.noItemsCurrentlyInStock.message" args="[format.product(product:commandInstance?.productInstance)]"/>
@@ -21,7 +21,7 @@
 					</tr>
 				</g:if>
 				<g:set var="count" value="${0 }"/>
-				<g:each var="itemInstance" in="${commandInstance?.inventoryItemList }" status="status">	
+				<g:each var="itemInstance" in="${commandInstance?.lotNumberList }" status="status">	
 						<g:set var="quantity" value="${commandInstance.quantityByInventoryItemMap.get(itemInstance)}"/>		
 						<!-- only show items with quantities -->	
 						<g:set var="itemQuantity" value="${commandInstance.quantityByInventoryItemMap.get(itemInstance) }"/>

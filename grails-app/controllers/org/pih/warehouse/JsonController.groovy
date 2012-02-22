@@ -380,7 +380,7 @@ class JsonController {
 						label: it.name,
 						valueText: it.name,
 						desc: it.description,
-						icon: "none"]
+						icon: ""]
 				}
 			}
 		}
@@ -412,22 +412,21 @@ class JsonController {
 						[	value: it.id,
 							valueText: it.name,
 							label:  "" + it.firstName + " " + it.lastName + " " +  it.email + " ",
-							desc: (it?.email) ? it.email : "no email",
+							desc: (it?.email) ? it.email : "",
 						]
 					}
 				}
-				/*
 				else {
 					def item =  [
-						value: null,
-						valueText : params.term,
-						label: "Add new person '" + params.term + "'?",
+						value: "null",
+						valueText : params.term,						
+						label: "${warehouse.message(code: 'person.doesNotExist.message', args: [params.term])}",
 						desc: params.term,
-						icon: "none"
+						icon: ""
 					];
 					items.add(item)
 				}
-				*/
+				
 				
 			}
 		} catch (Exception e) {
@@ -455,7 +454,7 @@ class JsonController {
 		def product = Product.get(params.id)
 		def data = []
 		if (!product) { 
-			data = [ status: false, message: "Error attempting to locate product " + params.id ]
+			data = [ status: false, message: "Error attempting to find product with ID " + params.id ]
 		}
 		else { 
 			data = [ status: true, product: product]

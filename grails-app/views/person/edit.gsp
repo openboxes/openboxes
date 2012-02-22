@@ -19,6 +19,16 @@
 	                <g:renderErrors bean="${personInstance}" as="list" />
 	            </div>
             </g:hasErrors>
+
+			<div class="buttonBar">            	
+            	<span class="linkButton">
+            		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'persons.label').toLowerCase()]"/></g:link>
+            	</span>
+            	<span class="linkButton">
+            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'person.label').toLowerCase()]"/></g:link>
+            	</span>
+           	</div>
+
             <g:form method="post" >
             	<fieldset>
 	                <g:hiddenField name="id" value="${personInstance?.id}" />
@@ -77,11 +87,15 @@
 	                            </tr>
 	                        	                        
                             	<tr class="prop">
-		                        	<td valign="top"></td>
-		                        	<td valign="top">                        	
-						                <div class="buttons">
-						                    <g:actionSubmit class="save" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
+		                        	<td valign="top" class="name"></td>
+		                        	<td valign="top" class="value">                        	
+						                <div class="left">
+						                    <g:actionSubmit class="save" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Update')}" />
+						                   &nbsp;
 						                    <g:actionSubmit class="delete" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+						                   &nbsp;
+						                   <g:link action="list">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
+						                    
 						                </div>
 		    						</td>                    	
 	                        	</tr>	                        

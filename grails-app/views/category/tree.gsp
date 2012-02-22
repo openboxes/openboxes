@@ -14,22 +14,24 @@
 			<g:hasErrors bean="${categoryInstance}">
 				<div class="errors"><g:renderErrors bean="${categoryInstance}" as="list" /></div>
 			</g:hasErrors>            
+
+
+			<div class="buttonBar">            	
+            	<span class="linkButton">
+					<g:link class="list" controller="category" action="tree"><warehouse:message code="default.list.label" args="[warehouse.message(code: 'category.label')]"/></g:link>
+            	</span>										    	
+            	<span class="linkButton">
+					<g:link class="new" controller="category" action="tree" params="[addCategory:'addCategory']"><warehouse:message code="default.add.label" args="[warehouse.message(code: 'category.label')]"/></g:link>
+            	</span>										    	
+			</div>						
+
             
             <div class="dialog" >        
 		        <table>
 		        	<tr>
 		        		<td>
 		        		
-		        		<fieldset>
-		        			<legend><warehouse:message code="category.categories.label"/></legend>
-		        		
-		        		
-							<div style="padding:10px; text-align: left">
-								<span class="linkButton">
-				            		<g:link class="new" controller="category" action="tree" params="[addCategory:'addCategory']"><warehouse:message code="default.add.label" args="[warehouse.message(code: 'category.label')]"/></g:link>
-				            	</span>										    	
-							</div>						
-		        		
+		        		<fieldset>		        		
 		           			<div>
 								<style>
 									.category-tree ul { margin-left: 2em; } 
@@ -85,20 +87,19 @@
 										});
 								</script>
 				            </div>
-				            
 				            </fieldset>
-				            
 						</td>
 						<td>
 							<g:if test="${categoryInstance }">
 								<g:form action="saveCategory">
 									<g:hiddenField name="id" value="${categoryInstance?.id }"/>
 				           			<fieldset>
-				           				<legend><warehouse:message code="category.editCategory.label"/></legend>
 				           				<table>
 				           					<tr class="prop odd">
-				           						<td class="value">
+				           						<td class="name">
 				           							<label><warehouse:message code="category.parent.label"/></label>
+												</td>
+												<td class="value">
 			           								<select name="parentCategory.id">
 			           									<option value="null"><warehouse:message code="category.chooseACategory.label"/></option>
 			           									<g:render template="selectOptions" model="[category:rootCategory, selected:categoryInstance?.parentCategory, level: 0]"/>
@@ -106,14 +107,20 @@
 			           							</td>
 			           						</tr>
 			           						<tr class="prop even">
-			           							<td class="value">
+
+
+			           							<td class="name">
 			           								<label><warehouse:message code="default.name.label"/></label>
+												</td>
+												<td class="value">
 							           				<g:textField name="name" value="${categoryInstance?.name }"/>
 				           						</td>
 				           					</tr>
 				           					<tr class="prop odd">
-				           						<td class="value">
+				           						<td class="name">
 				           							<label><warehouse:message code="category.children.label"/></label>
+												</td>
+												<td class="value">
 						           					<g:if test="${categoryInstance?.categories }">
 					           							<table>			           							
 						           							<g:each var="child" in="${categoryInstance?.categories }" status="status">
@@ -128,8 +135,10 @@
 				           						</td>
 				           					</tr>
 				           					<tr class="prop even">
-				           						<td class="value">
+				           						<td class="name">
 					           						<label><warehouse:message code="category.products.label"/></label>
+												</td>
+												<td class="value">
 						           					<g:if test="${categoryInstance?.products }">
 					           							<table>			           							
 						           							<g:each var="product" in="${categoryInstance?.products }" status="status">
@@ -160,12 +169,13 @@
 		           				<g:if test="${params.addCategory=='addCategory' }">					           			
 									<g:form action="save" method="post" >
 						            	<fieldset>
-					           				<legend><warehouse:message code="category.createCategory.label"/></legend>
 						                    <table>
 						                        <tbody>
 													<tr class="prop">
-														<td>
+														<td class="name">
 															<label for="name" class="desc"><warehouse:message code="category.parent.label" default="Parent" /></label>
+														</td>
+														<td class="value">
 															<select name="parentCategory.id" style="display: inline">
 																<option value="null"></option>
 																<g:render template="selectOptions" model="[category:rootCategory, level: 1, selected: categoryInstance]"/>
@@ -173,8 +183,10 @@
 														</td>
 													</tr>
 													<tr class="prop">
-														<td valign="top" class="value ${hasErrors(bean: categoryInstance, field: 'name', 'errors')}">
+														<td valign="top" class="name ${hasErrors(bean: categoryInstance, field: 'name', 'errors')}">
 															<label for="name" class="desc"><warehouse:message code="default.name.label" default="Name" /></label>
+														</td>
+														<td class="value">
 															<g:textField name="name" value="${categoryInstance?.name}" />
 														</td>
 													</tr>

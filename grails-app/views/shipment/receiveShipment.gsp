@@ -31,7 +31,6 @@
 				<g:render template="summary" />
 					<g:form action="receiveShipment" method="POST">
 						<g:hiddenField name="id" value="${shipmentInstance?.id}" />
-						<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />								
 						<table>
 							<tbody>
 								<tr class="prop">

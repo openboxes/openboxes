@@ -12,7 +12,6 @@
 	
 	<!-- Include Main CSS -->
 	<!-- TODO Apparently there's a slight distinction between these two ... need to figure out what that distinction is -->
-	<%--<link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" />--%>
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'menu.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'form.css')}" type="text/css" media="screen, projection" />
@@ -234,7 +233,7 @@
 			});
 				
 			var accordion = 
-				$('#leftnav-accordion-menu').accordion({
+				$('.accordion').accordion({
 					active: true, 
 					navigation: true, 
 					autoHeight: false, 
@@ -243,14 +242,8 @@
 					//collapsible: false,
 					//fillSpace: true,
 					event: "click"  
-				});
-			
-			/*
-			$('.accordion h6').click(function() {
-				$(this).next().toggle();
-				return false;
-			}).next().hide();
-			*/
+				});			
+
 			<g:if test="${request.request.requestURL.toString().contains('category')}">
 				accordion.accordion( "activate" , 5 );
 			</g:if>

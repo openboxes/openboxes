@@ -30,13 +30,13 @@
 }
 /* = DEFAULT STEPS
 ----------------------------*/
-.wizard-steps a {
+.wizard-steps a {	
     position:relative;
     display:block;
     width:auto;
     height:24px;
     margin-right: 18px;
-    padding:0px 10px 0px 3px;
+    padding:0px 10px 0px 10px;
     float: left;
     font-size:11px;
     line-height:24px;

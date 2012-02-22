@@ -49,10 +49,12 @@ ul {
     padding-left: 5px;
 }*/
 
-input, select, textarea {
+input, select, textarea, button {
+    /*
     background-color: #fcfcfc;
     border: 1px solid #ccc;
-    /*font: 11px "lucida grande", verdana, arial, helvetica, sans-serif;*/
+    font: 11px "lucida grande", verdana, arial, helvetica, sans-serif;
+    */
     margin: 2px 0;
     padding: 2px 4px;
 }
@@ -67,7 +69,8 @@ textarea {
 }
 
 input:focus, select:focus, textarea:focus {
-    border: 1px solid #b2d1ff;
+    /*border: 1px solid #b2d1ff;*/
+    /* Causing buttons to change background color ?? when in focus  */
 }
 
 .body {
@@ -126,8 +129,9 @@ div.errors {
     border: 1px solid red;
     color: #cc0000;
     margin: 10px 0 5px 0;
-    padding: 0px 0 5px 0;
+    padding: 5px 0 5px 0;
 }
+
 div.errors ul {
     list-style: none;
     padding: 0;

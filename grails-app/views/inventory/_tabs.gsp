@@ -8,11 +8,6 @@
 						<a href="?categoryId=${quickCategory?.id}&resetSearch=true">
 							<span style="text-transform: lowercase"><format:category category="${quickCategory}"/></span>
 						</a>
-						<%-- 
-						<g:if test="${commandInstance?.categoryInstance == quickCategory}">
-							<g:render template="categoryActions" model="[commandInstance:commandInstance]"/>
-						</g:if>
-						--%>
 					</td>		
 				</g:each>
 				<td class="filterTab filterRow paddingRow" style="width:100%">&nbsp;</td>

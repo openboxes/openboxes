@@ -23,6 +23,7 @@ class StockCardCommand {
 	InventoryLevel inventoryLevelInstance;
 	
 	// Current stock section
+	List<InventoryItem> lotNumberList
 	List<InventoryItem> inventoryItemList;
 	List<TransactionEntry> transactionEntryList;
 	List<Shipment> pendingShipmentList;

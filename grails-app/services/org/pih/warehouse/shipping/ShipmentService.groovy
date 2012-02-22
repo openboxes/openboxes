@@ -882,7 +882,18 @@ class ShipmentService {
 	}
 	
 	
-	
+	void markAsReceived(Shipment shipment, Location location) { 
+		try { 
+			// Add a Received event to the shipment
+			createShipmentEvent(shipment, new Date(), EventCode.RECEIVED, location);
+											
+			// Save updated shipment instance
+			shipment.save();
+			
+		} catch (Exception e) { 
+			throw new ShipmentException();
+		}
+	}
 	
 	/**
 	 * 

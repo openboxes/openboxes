@@ -112,6 +112,14 @@
 		</addColumn>	
 	</changeSet>
 
+	<changeSet author="jmiranda" id="1327591155937-10">
+		<preConditions onFail="MARK_RAN">
+			<indexExists indexName="email"/>
+		</preConditions>
+		<dropUniqueConstraint tableName="person" constraintName="email"/>
+	</changeSet>
+
+
 
 </databaseChangeLog>
     

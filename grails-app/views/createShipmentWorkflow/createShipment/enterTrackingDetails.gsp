@@ -17,9 +17,18 @@
 				</div>
 			</g:hasErrors> 
 			
+	 		<g:if test="${addPerson}">
+	 			<g:render template="addPerson" model="['personInstance':personInstance]"/>
+	 		</g:if>
+	 		<g:if test="${addShipper}">
+	 			<g:render template="addShipper" model="['shipperInstance':shipperInstance]"/>
+	 		</g:if>
+			
+			
 			<g:form action="createShipment" method="post">
 				<g:hiddenField name="id" value="${shipmentInstance?.id}"/>
-				<fieldset>
+				<fieldset>				
+				
 					<g:render template="../shipment/summary" />	
 					<g:render template="flowHeader" model="['currentState':'Tracking']"/>
 					
@@ -32,9 +41,14 @@
 											code="shipping.traveler.label" /></label></td>
 										<td valign="top" style="width: 30%;">
 											<g:autoSuggest id="carrier" name="carrier" jsonUrl="${request.contextPath }/json/findPersonByName" 
-												width="180" size="30"
+												width="300"
 												valueId="${shipmentInstance?.carrier?.id}" 
 												valueName="${shipmentInstance?.carrier?.name}"/>		
+												
+											<g:link action="createShipment" event="addPerson" params="[target:'carrier']">
+												<img src="${createLinkTo(dir:'images/icons/silk',file:'user_add.png')}" alt="Add a person" class="middle"/>
+											</g:link>
+												
 										</td>
 									</tr>
 								</g:if>	
@@ -43,12 +57,24 @@
 										<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
 											code="shipping.freightForwarder.label" /></label></td>
 										<td valign="top" style="width: 30%;">
+										
+											<g:selectShipper id="shipperInput" 
+												name="shipperInput.id" class="combobox" value="${shipmentInstance?.shipmentMethod?.shipper?.id }" noSelection="['null':'']"/>
+											
+											<%-- 
 											<g:autoSuggest id="shipperInput" name="shipperInput" jsonUrl="${request.contextPath }/json/findShipperByName" 
-												width="180" size="30"
+												width="300"
 												valueId="${shipmentInstance?.shipmentMethod?.shipper?.id}" 
-												valueName="${shipmentInstance?.shipmentMethod?.shipper?.name}"/>	
-												<br/>
-												<g:link controller="shipper" action="create" target="_blank"><span class="small"><warehouse:message code="shipping.addNewFreightForwarder.label"/></span></g:link>	
+												valueName="${shipmentInstance?.shipmentMethod?.shipper?.name}"/>
+											--%>
+											<g:link action="createShipment" event="addShipper" params="[target:'shipper']">
+												<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry_add.png')}" alt="Add a shipper" class="middle"/>
+											</g:link>	
+											<%-- 
+											<g:link controller="shipper" action="create" target="_blank">
+												<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry_add.png')}" alt="Add a shipper" class="middle"/>
+											</g:link>
+											--%>	
 										</td>
 									</tr>
 								</g:if>
@@ -58,9 +84,13 @@
 											code="shipping.recipient.label" /></label></td>
 										<td valign="top" style="width: 30%;">
 											<g:autoSuggest id="recipient" name="recipient" jsonUrl="${request.contextPath }/json/findPersonByName" 
-												width="180" size="30"
+												width="300"
 												valueId="${shipmentInstance?.recipient?.id}" 
 												valueName="${shipmentInstance?.recipient?.name}"/>		
+												
+											<g:link action="createShipment" event="addPerson" params="[target:'recipient']">
+												<img src="${createLinkTo(dir:'images/icons/silk',file:'user_add.png')}" alt="Add a person" class="middle"/>
+											</g:link>
 										</td>
 									</tr>
 								</g:if>
@@ -104,7 +134,7 @@
 										<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
 											code="default.comments.label"/></label></td>
 										<td valign="top" style="width: 30%;">
-											<g:textArea name="additionalInformation" value="${shipmentInstance?.additionalInformation}" cols="30" rows="2"/>
+											<g:textArea name="additionalInformation" value="${shipmentInstance?.additionalInformation}" cols="80" rows="3"/>
 										</td>
 									</tr>	
 								</g:if>					

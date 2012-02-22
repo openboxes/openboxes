@@ -15,61 +15,65 @@
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
 		</g:if>
-		<g:hasErrors bean="${cmd}">
+		<g:hasErrors bean="${command}">
 			<div class="errors">
-				<g:renderErrors bean="${cmd}" as="list" />
+				<g:renderErrors bean="${command}" as="list" />
 			</div>
 		</g:hasErrors>
 	   	<g:if test="${!params.print}">
 			<div class="form box">
-				<g:form controller="report" action="showTransactionReport" method="GET">
-					<span class="filter">
-						<label>
-							<warehouse:message code="report.category.label"/>
-						</label>
-						<select id="category.id" name="category.id" class="filter">
-							<option value=""></option>
-							<g:render template="../category/selectOptions" model="[category:cmd.rootCategory, selected:cmd.category, level: 0]"/>								
-						</select>							
-					</span>
-					<span class="filter">
-						<label>
-							<warehouse:message code="report.location.label"/>
-						</label>
-						<g:selectLocation class="filter" name="location.id" noSelection="['null':'']" value="${cmd?.location?.id}"/>
-					</span>	
-					<span class="filter">
-						<label>
-							<warehouse:message code="report.startDate.label"/>
-						</label>
-						<g:jqueryDatePicker class="filter" id="startDate" name="startDate" value="${cmd?.startDate }" format="MM/dd/yyyy"/>
-					</span>					
-					<span class="filter">
-						<label>
-							<warehouse:message code="report.endDate.label"/>
-						</label>
-						<g:jqueryDatePicker class="filter" id="endDate" name="endDate" value="${cmd?.endDate }" format="MM/dd/yyyy"/>
-					</span>
-					<span class="filter">
-						<g:checkBox name="showTransferBreakdown" value="${params?.showTransferBreakdown}" class="filter"/>
-						<label>
-							<warehouse:message code="report.showTransferBreakdown.label"/>
-						</label>
-					</span>
-					<span class="filter">
-						<button type="submit" class="btn">
-							<warehouse:message code="report.runReport.label"/>
-						</button>
-					</span>
+				<g:form controller="report" action="generateTransactionReport" method="GET">
+					<div>
+						<span class="filter">
+							<label>
+								<warehouse:message code="report.category.label"/>
+							</label>
+							<select id="category.id" name="category.id" class="filter">
+								<option value=""></option>
+								<g:render template="../category/selectOptions" model="[category:command.rootCategory, selected:command.category, level: 0]"/>								
+							</select>							
+						</span>
+						<span class="filter">
+							<label>
+								<warehouse:message code="report.location.label"/>
+							</label>
+							<g:selectLocation class="filter" name="location.id" noSelection="['null':'']" groupBy="locationType" value="${command?.location?.id}"/>
+						</span>	
+					</div>
+					<div>
+						<span class="filter">
+							<label>
+								<warehouse:message code="report.startDate.label"/>
+							</label>
+							<g:jqueryDatePicker class="filter" id="startDate" name="startDate" value="${command?.startDate }" format="MM/dd/yyyy"/>
+						</span>					
+						<span class="filter">
+							<label>
+								<warehouse:message code="report.endDate.label"/>
+							</label>
+							<g:jqueryDatePicker class="filter" id="endDate" name="endDate" value="${command?.endDate }" format="MM/dd/yyyy"/>
+						</span>
+						<span class="filter">
+							<g:checkBox name="showTransferBreakdown" value="${params?.showTransferBreakdown}" class="filter"/>
+							<label>
+								<warehouse:message code="report.showTransferBreakdown.label"/>
+							</label>
+						</span>
+						<span class="filter">
+							<button type="submit" class="btn">
+								<warehouse:message code="report.runReport.label"/>
+							</button>
+						</span>
+					</div>
 				</g:form>				
 			</div>
 	    	<div class="left" style="padding: 5px;">
 				<label><warehouse:message code="report.exportAs.label"/></label>
-	   			<g:link target="_blank" controller="report" action="showTransactionReport" params="[print:'true','location.id':cmd.location?.id,'category.id':cmd?.category?.id,'startDate':params.startDate,'endDate':params.endDate,'showTransferBreakdown':params.showTransferBreakdown]">
+	   			<g:link target="_blank" controller="report" action="showTransactionReport" params="[print:'true','location.id':command.location?.id,'category.id':command?.category?.id,'startDate':params.startDate,'endDate':params.endDate,'showTransferBreakdown':params.showTransferBreakdown]">
 	   				<warehouse:message code="report.exportAs.html.label"/>
 	   			</g:link> 
 	   			&nbsp;|&nbsp;
-	   			<g:link target="_blank" controller="report" action="downloadTransactionReport" params="[url:request.forwardURI,'location.id':cmd.location?.id,'category.id':cmd?.category?.id,'startDate':params.startDate,'endDate':params.endDate,'showTransferBreakdown':params.showTransferBreakdown]">
+	   			<g:link target="_blank" controller="report" action="downloadTransactionReport" params="[url:request.forwardURI,'location.id':command.location?.id,'category.id':command?.category?.id,'startDate':params.startDate,'endDate':params.endDate,'showTransferBreakdown':params.showTransferBreakdown]">
 	   				<warehouse:message code="report.exportAs.pdf.label"/>
 	   			</g:link>
 			</div>
@@ -86,7 +90,7 @@
 						</label>
 					</td>
 					<td>
-						${cmd?.location?.name }
+						${command?.location?.name }
 					</td>
 				</tr>
 				<tr>
@@ -96,7 +100,7 @@
 						</label>
 					</td>
 					<td>
-						<format:category category="${cmd?.category}"/>					
+						<format:category category="${command?.category}"/>					
 					</td>
 				</tr>
 				<tr>
@@ -106,7 +110,7 @@
 						</label>
 					</td>
 					<td>
-						${format.date(obj:cmd?.startDate)}
+						${format.date(obj:command?.startDate)}
 					</td>
 				</tr>
 				<tr>
@@ -116,18 +120,18 @@
 						</label>
 					</td>
 					<td>
-						${format.date(obj:cmd?.endDate)}
+						${format.date(obj:command?.endDate)}
 					</td>
 				</tr>
 			</table>
 		</g:else>
 
-		<g:set var="transferInLocations" value="${cmd?.inventoryReportEntryMap.values()*.quantityTransferredInByLocation*.keySet().flatten().unique()}"/>
-		<g:set var="transferOutLocations" value="${cmd?.inventoryReportEntryMap.values()*.quantityTransferredOutByLocation*.keySet().flatten().unique()}"/>
+		<g:set var="transferInLocations" value="${command?.inventoryReportEntryMap.values()*.quantityTransferredInByLocation*.keySet().flatten().unique()}"/>
+		<g:set var="transferOutLocations" value="${command?.inventoryReportEntryMap.values()*.quantityTransferredOutByLocation*.keySet().flatten().unique()}"/>
 		
     	<div class="list">
    			<g:set var="status" value="${0 }"/>
-	    	<g:each var="productEntry" in="${cmd?.productsByCategory }" status="i">
+	    	<g:each var="productEntry" in="${command?.productsByCategory }" status="i">
 	    		<g:set var="category" value="${productEntry.key }"/>
 	    		<div>		    		
 			    	<table>
@@ -136,7 +140,7 @@
 			    				<th rowspan="2" class="bottom">
 									<format:category category="${category}"/>					
 					    			<g:if test="${!params.print }">
-						    			[<g:link controller="report" action="showTransactionReport" params="['location.id':cmd.location?.id,'category.id':category.id,'startDate':cmd.startDate,'endDate':cmd.endDate]" style="display: inline">
+						    			[<g:link controller="report" action="showTransactionReport" params="['location.id':command.location?.id,'category.id':category.id,'startDate':command.startDate,'endDate':command.endDate]" style="display: inline">
 											<warehouse:message code="report.showDetails.label"/>
 						    			</g:link>]
 					    			</g:if>
@@ -213,7 +217,7 @@
 				    	</thead>
 				    	<tbody>
 					    	<g:each var="product" in="${productEntry.value }" status="j">
-					    		<g:set var="entry" value="${cmd.inventoryReportEntryMap[product] }"/>
+					    		<g:set var="entry" value="${command.inventoryReportEntryMap[product] }"/>
 								<tr class="${j%2 ? 'even' : 'odd' }">
 									<td class="left" style="width: 35%">
 										<g:if test="${!params.print }">
@@ -305,6 +309,8 @@
 				<br/>
 			</g:each>
     	</div>
+    	
+    	<%--
 	    <script>
 			$(document).ready(function() {
 				$(".filter").change(function() { 
@@ -312,5 +318,6 @@
 				});
 			});
 	    </script>
+	    --%>
     </body>
 </html>

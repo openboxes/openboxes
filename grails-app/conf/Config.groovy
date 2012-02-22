@@ -171,6 +171,7 @@ log4j = {
 		'org.springframework',
 		'org.hibernate',
 		'org.pih.warehouse',
+		'org.apache.cxf',
 		'grails.app',
 		'grails.app.bootstrap',
 		'grails.app.service',
@@ -200,7 +201,7 @@ jqueryValidationUi {
 	
 	qTip {
 		packed = true
-	  classes = 'ui-tooltip-red ui-tooltip-shadow ui-tooltip-rounded'  
+		classes = 'ui-tooltip-red ui-tooltip-shadow ui-tooltip-rounded'  
 	}
 	
 	/*

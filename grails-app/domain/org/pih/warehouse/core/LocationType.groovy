@@ -1,12 +1,13 @@
 package org.pih.warehouse.core
 
 import java.util.Date;
+import org.springframework.context.i18n.LocaleContextHolder as LCH
 
 /**
  * Represents the type of a Location
  * 
  */
-class LocationType implements Serializable {
+class LocationType implements Comparable, Serializable {
 
 	String id
 	String name
@@ -53,4 +54,12 @@ class LocationType implements Serializable {
 	
 	
 	String toString() { return "$name"; }
+
+  
+		
+	
+	int compareTo(obj) {
+		return description <=> obj?.description
+	}
+	
 }

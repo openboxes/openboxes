@@ -27,7 +27,7 @@ class Person implements Comparable, Serializable {
 		name(display:false)
 		firstName(blank:false, maxSize: 255)	
 		lastName(blank:false, maxSize: 255)	
-		email(blank:false, email:true, unique:true, maxSize: 255)
+		email(nullable:true, email:true, maxSize: 255)
 		phoneNumber(nullable:true, maxSize: 255)
 		dateCreated(display:false)
 		lastUpdated(display:false)

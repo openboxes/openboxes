@@ -917,6 +917,8 @@ class InventoryService implements ApplicationContextAware {
 		cmd.inventoryItemList = inventoryItems as List		
 		cmd.inventoryItemList.sort { it.expirationDate }
 		
+		cmd.lotNumberList = getInventoryItemsByProduct(cmd.productInstance) as List
+		
 		// Get transaction log for a particular product within an inventory
 		cmd.transactionEntryList = getTransactionEntriesByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);
 		cmd.transactionEntriesByInventoryItemMap = cmd.transactionEntryList.groupBy { it.inventoryItem }
@@ -1299,7 +1301,7 @@ class InventoryService implements ApplicationContextAware {
 		transactionEntries.each { 
 			inventoryItems << it.inventoryItem;
 		}
-		inventoryItems.sort { it.lotNumber } 
+		inventoryItems = inventoryItems.sort { it.expirationDate }.sort { it.lotNumber }  
 		return inventoryItems;
 	}
 
