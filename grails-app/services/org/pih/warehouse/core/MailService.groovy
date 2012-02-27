@@ -26,7 +26,7 @@ class MailService {
 			try { 
 				//SimpleEmail is the class which will do all the hard work for you				
 				SimpleEmail email = new SimpleEmail()
-				email.setHostName(host)
+				email.setHostName(host)				
 				to.each { 
 					email.addTo(it)
 				}

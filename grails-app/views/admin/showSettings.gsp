@@ -124,6 +124,16 @@
 						</td>					
 					<tr>
 					<tr class="prop">
+						<td class="name">
+							<label><warehouse:message code="application.defaultCharset.label"/></label>
+						</td>
+						<td>
+							${java.nio.charset.Charset.defaultCharset()}
+						</td>
+					</tr>
+
+
+					<tr class="prop">
 						<td colspan="2">
 							<h1><warehouse:message code="admin.emailSettings.header"/></h1>	
 						</td>

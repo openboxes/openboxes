@@ -40,7 +40,7 @@
 				</g:else>
 			</g:link>
 		</div>
-		<g:isInRole roles="[org.pih.warehouse.core.RoleType.ROLE_MANAGER]">
+		<g:isInRole roles="[org.pih.warehouse.core.RoleType.ROLE_ADMIN]">
 			<div class="action-menu-item">
 				<g:link action="sendTestEmail" id="${userInstance?.id }">
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'email.png')}" class="middle"/>&nbsp;
