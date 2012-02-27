@@ -20,7 +20,6 @@
 									&nbsp; 					
 			 						<span class='fade'>${format.date(obj:activity.lastUpdated,format:'dd MMM hh:mm a')}</span>
 			 						${activity.label } 
-			 						[<a href="${activity.url}">details</a>]
 		 						</span>
 		 					</td>
 		 				</tr>

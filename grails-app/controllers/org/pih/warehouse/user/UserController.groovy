@@ -17,6 +17,7 @@ class UserController {
         redirect(action: "list", params: params)
     }
 
+	
     /**
      * Show list of users
      */
@@ -39,7 +40,28 @@ class UserController {
 		[userInstanceList: userInstanceList, userInstanceTotal: userInstanceTotal]
 	}
 	
-	
+	def sendTestEmail = {
+		def userInstance = User.get(params.id)
+		if (!userInstance) {
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
+			redirect(action: "list")
+		}
+		else {
+			
+			try { 
+				def subject = "${warehouse.message(code:'system.testEmailSubject.label')}"
+				def body = "${warehouse.message(code:'system.testEmailBody.label')}"
+					
+				mailService.sendMail(subject, body, userInstance?.email)
+				flash.message = "Email successfully sent to " + userInstance?.email
+				
+			} catch (Exception e) { 
+				flash.message = "Error sending email " + e.message
+			}
+		}
+		redirect(action: "show", id: userInstance?.id)
+	}
+
 	
     /**
      * Create a user
@@ -75,7 +97,6 @@ class UserController {
      * Show a user
      */
     def show = {
-    	log.info "show user"
         def userInstance = User.get(params.id)
         if (!userInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"

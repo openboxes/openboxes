@@ -48,20 +48,20 @@
 						</tr>							
 							
 			    	</tbody>
-			    	<%-- 
-			    	<tfoot>
+					<tfoot>
 				    	<tr style="border-top: 1px solid lightgrey">
 				    		<td style="text-align: left;">
-				    			<warehouse:message code="shipping.total.label"/>
+				    			<span class="fade"><warehouse:message code="shipping.total.label"/></span>
 				    		</td>
 				    		<td style="text-align: right;">
 				    			<g:link controller="shipment" action="list" params="[type:'outgoing']">
-				    				${allOutgoingShipments.size()}
+				    				${allIncomingShipments.size()}
 					    		</g:link>
 					    	</td>
 				    	</tr>
 			    	</tfoot>
-			    	--%>
+			    	
+
 		    	</table>
 			</g:else>
 		</div>
@@ -105,7 +105,19 @@
 							</td>
 						</tr>	
 					</tbody>			
-				</table>
+			    	<tfoot>
+				    	<tr style="border-top: 1px solid lightgrey">
+				    		<td style="text-align: left;">
+				    			<span class="fade"><warehouse:message code="shipping.total.label"/></span>
+				    		</td>
+				    		<td style="text-align: right;">
+				    			<g:link controller="shipment" action="list" params="[type:'outgoing']">
+				    				${allOutgoingShipments.size()}
+					    		</g:link>
+					    	</td>
+				    	</tr>
+			    	</tfoot>
+			    </table>
 		    </g:else>
 		</div>
 	</div>	

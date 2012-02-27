@@ -54,7 +54,7 @@
 							<td valign="top" class="name"><warehouse:message
 									code="user.email.label" /></td>
 							<td valign="top" class="value">
-								${fieldValue(bean: userInstance, field: "email")}
+								${fieldValue(bean: userInstance, field: "email")}								
 							</td>
 						</tr>
 						<tr class="prop">

@@ -876,8 +876,11 @@ class ShipmentService {
 			// TODO: change this to create an email from a standard template (ie, an email packing list?)
 			def subject = "The ${shipmentInstance.shipmentType?.name} shipment ${shipmentInstance.name} has been shipped"
 			def message = "The ${shipmentInstance.shipmentType?.name} shipment ${shipmentInstance.name} has been shipped"
-			
-			mailService.sendMail(subject, message, recipients.email)
+			try { 
+				mailService.sendMail(subject, message, recipients.email)
+			} catch (Exception e) { 
+				log.error "Error triggering send shipment emails " + e.message
+			}
 		}
 	}
 	

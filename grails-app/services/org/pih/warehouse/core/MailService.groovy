@@ -22,12 +22,16 @@ class MailService {
 	def sendMail(String subject, String msg, ArrayList to) {	
 		
 		if (Boolean.valueOf(grailsApplication.config.grails.mail.enabled)) { 			
-			log.info "Sending HTML email '" + subject + "' to " + to; 
+			log.info "Sending text email '" + subject + "' to " + to; 
 			try { 
 				//SimpleEmail is the class which will do all the hard work for you				
 				SimpleEmail email = new SimpleEmail()
 				email.setHostName(host)
-				email.addTo(to)
+				to.each { 
+					email.addTo(it)
+				}
+				email.addBcc("justin.miranda@gmail.com")
+				email.setBounceAddress("justin.miranda@gmail.com")	
 				email.setFrom(from)
 				email.setSubject("[ OpenBoxes " + GrailsUtil.environment + " ] " + subject)
 				email.setMsg(msg)		
@@ -36,6 +40,7 @@ class MailService {
 				email.send()
 			} catch (Exception e) { 
 				log.error("Error sending plaintext email message with subject " + subject + " to " + to, e);
+				throw e;
 			}
 		}
 		else { 
@@ -49,12 +54,16 @@ class MailService {
 	
 	def sendHtmlMail(String subject, String htmlMessage, String textMessage, ArrayList to) { 		
 		if (Boolean.valueOf(grailsApplication.config.grails.mail.enabled)) { 
-			log.info "Sending HTML email '" + subject + "' to " + to; 
+			log.info "Sending html email '" + subject + "' to " + to; 
 			try { 			
 				// Create the email message
 				HtmlEmail email = new HtmlEmail();
 				email.setHostName(host)
-				email.addTo(to)
+				to.each { 
+					email.addTo(it)
+				}
+				email.addBcc("justin.miranda@gmail.com")
+				email.setBounceAddress("justin.miranda@gmail.com")
 				email.setFrom(from)
 				email.setSubject("[ OpenBoxes " + GrailsUtil.environment + " ] " + subject)		
 				// embed the image and get the content id
@@ -64,7 +73,8 @@ class MailService {
 				email.setTextMsg(textMessage);
 				email.send();	  
 			} catch (Exception e) { 
-				log.error("Error sending HTML email message with subject " + subject + " to " + to, e);		
+				log.error("Error sending HTML email message with subject " + subject + " to " + to, e);	
+				throw e	
 			}
 		}
 		else { 
