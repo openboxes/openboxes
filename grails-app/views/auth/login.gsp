@@ -86,6 +86,8 @@
 										
 									</td>	
 								</tr>
+							</tbody>
+							<tfoot>
 								<tr class="" style="background-color: #eee;">
 									<td valign="top" class="name" colspan="2">
 										<div style="text-align: left">				
@@ -93,7 +95,8 @@
 										</div>
 									</td>
 								</tr>
-							</tbody>
+							
+							</tfoot>
 						</table>
 					</fieldset>
 				</div>

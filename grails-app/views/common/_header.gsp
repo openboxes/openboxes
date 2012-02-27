@@ -5,7 +5,7 @@
 		    <div id="bannerLeft" class="yui-u first" >
 				<div class="logo" >
 				    <a class="home" href="${createLink(uri: '/dashboard/index')}" style="text-decoration: none">						    	
-			    		<img src="${createLinkTo(dir:'images/icons/',file:'logo.gif')}" alt="Your Boxes. You're Welcome." 
+			    		<img src="${createLinkTo(dir:'images/icons/',file:'logo.gif')}" title="Your Boxes. You're Welcome." 
 			    			style="vertical-align: absmiddle"/>
 			    			<span style="font-size: 2em; vertical-align: middle;">openboxes</span>
 				    </a>

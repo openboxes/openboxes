@@ -19,29 +19,29 @@
 	    				</tr>
 	    			</thead>
 	    			<tbody>
-	    				<g:set var="statusPending" value="${ShipmentStatusCode.PENDING}"/>
-	    				<g:set var="statusShipped" value="${ShipmentStatusCode.SHIPPED}"/>
-	    				<g:set var="statusReceived" value="${ShipmentStatusCode.RECEIVED}"/>
-						<g:set var="shipmentsPending" value="${outgoingShipmentsByStatus[statusPending] }"/>			
-						<g:set var="shipmentsShipped" value="${outgoingShipmentsByStatus[statusShipped] }"/>			
-						<g:set var="shipmentsEnroute" value="${incomingShipmentsByStatus[statusShipped] }"/>			
-	    				<g:set var="shipmentsReceived" value="${incomingShipmentsByStatus[statusReceived] }"/>
+	    				<g:set var="pending" value="${ShipmentStatusCode.PENDING}"/>
+	    				<g:set var="shipped" value="${ShipmentStatusCode.SHIPPED}"/>
+	    				<g:set var="received" value="${ShipmentStatusCode.RECEIVED}"/>
+						<g:set var="shipmentsPending" value="${outgoingShipmentsByStatus[pending] }"/>			
+						<g:set var="shipmentsShipped" value="${outgoingShipmentsByStatus[shipped] }"/>			
+						<g:set var="shipmentsEnroute" value="${incomingShipmentsByStatus[shipped] }"/>			
+	    				<g:set var="shipmentsReceived" value="${incomingShipmentsByStatus[received] }"/>
 						<tr>
 							<td>
-								Enroute to ${session?.warehouse?.name }
+								${warehouse.message(code: 'dashboard.incoming.shipped.label', args: [session.warehouse.name]) }							
 							</td>
 							<td style="text-align: right;">
-								<g:link controller="shipment" action="list" params="['type':'incoming','status':statusShipped]">
+								<g:link controller="shipment" action="list" params="['type':'incoming','status':shipped]">
 									${shipmentsEnroute.objectList.size}
 								</g:link>
 							</td>
 						</tr>				
 						<tr>
 							<td>
-								Received by ${session?.warehouse?.name }
+								${warehouse.message(code: 'dashboard.incoming.received.label', args: [session.warehouse.name]) }							
 							</td>
 							<td style="text-align: right;">
-								<g:link controller="shipment" action="list" params="['type':'incoming','status':statusReceived]">
+								<g:link controller="shipment" action="list" params="['type':'incoming','status':received]">
 									${shipmentsReceived.objectList.size}
 								</g:link>
 							</td>
@@ -86,20 +86,20 @@
 	    			<tbody>
 						<tr>
 							<td>
-								Pending at ${session?.warehouse?.name } 
+								${warehouse.message(code: 'dashboard.outgoing.pending.label', args: [session.warehouse.name]) }							
 							</td>
 							<td style="text-align: right;">
-								<g:link controller="shipment" action="list" params="['type':'outgoing','status':statusPending]">
+								<g:link controller="shipment" action="list" params="['type':'outgoing','status':pending]">
 									${shipmentsPending.objectList.size}
 								</g:link>
 							</td>
 						</tr>	
 						<tr>
 							<td>
-								Shipped from ${session?.warehouse?.name } 
+								${warehouse.message(code: 'dashboard.outgoing.shipped.label', args: [session.warehouse.name]) }							
 							</td>
 							<td style="text-align: right;">
-								<g:link controller="shipment" action="list" params="['type':'outgoing','status':statusShipped]">
+								<g:link controller="shipment" action="list" params="['type':'outgoing','status':shipped]">
 									${shipmentsShipped.objectList.size}
 								</g:link>
 							</td>

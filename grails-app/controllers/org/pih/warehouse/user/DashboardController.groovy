@@ -33,40 +33,58 @@ class DashboardController {
 		def allIncomingShipments = shipmentService.getShipmentsByDestination(location)
 		def activityList = []
 		recentOutgoingShipments.each { 
+			def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
+			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
+			activityType = "${warehouse.message(code: activityType)}"
+			
 			activityList << new DashboardActivityCommand(
 				type: "lorry",
-				label: "Shipment <a href='${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}'>'${it.name}'</a> was updated", 
-				url: "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}",
+				label: "${warehouse.message(code:'dashboard.activity.shipment.label', args: [link, it.name, activityType])}", 
+				url: link,
 				dateCreated: it.dateCreated, 
 				lastUpdated: it.lastUpdated, 
 				shipment: it)
 		}
-		recentIncomingShipments.each {
+		recentIncomingShipments.each {			
+			def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
+			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
+			activityType = "${warehouse.message(code: activityType)}"
+
 			activityList << new DashboardActivityCommand(
 				type: "lorry",
-				label: "Shipment <a href='${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}'>'${it.name}'</a> was updated", 
-				url: "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}",
+				label:  "${warehouse.message(code:'dashboard.activity.shipment.label', args: [link, it.name, activityType])}",
+				url: link,
 				dateCreated: it.dateCreated, 
 				lastUpdated: it.lastUpdated, 
 				shipment: it)
 		}
 		def products = Product.executeQuery( "select distinct p from Product p where p.lastUpdated >= :lastUpdated", [lastUpdated:new Date()-10, max:10, offset:5] );
 		products.each { 
+			def link = "${createLink(controller: 'product', action: 'show', id: it.id)}"
+			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
+			activityType = "${warehouse.message(code: activityType)}"
+			
 			activityList << new DashboardActivityCommand(
 				type: "package",
-				label: "Product '<a href='${createLink(controller: 'product', action: 'show', id: it.id)}'>${it.name}</a>' was updated",
-				url: "${createLink(controller: 'product', action: 'show', id: it.id)}",
+				label: "${warehouse.message(code:'dashboard.activity.product.label', args: [link, it.label(), activityType])}",
+				url: link,
 				dateCreated: it.dateCreated,
 				lastUpdated: it.lastUpdated,
 				product: it)
 		}
 		
-		def transactions = Transaction.executeQuery("select distinct t from Transaction t where t.lastUpdated >= :lastUpdated", [lastUpdated:new Date()-10, max:10, offset:5] );
+		def transactions = Transaction.executeQuery("select distinct t from Transaction t where t.lastUpdated >= :lastUpdated and \
+			t.inventory = :inventory", ['lastUpdated':new Date()-10, 'inventory':location.inventory, max:10, offset:5] );
+		
 		transactions.each { 
+			def link = "${createLink(controller: 'inventory', action: 'showTransaction', id: it.id)}"
+			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
+			activityType = "${warehouse.message(code: activityType)}"
+			
 			activityList << new DashboardActivityCommand(
 				type: "table",
-				label: "Transaction '<a href='${createLink(controller: 'transaction', action: 'show', id: it.id)}'>${it.id}</a>' was updated",
-				url: "${createLink(controller: 'transaction', action: 'show', id: it.id)}",
+				label: "${warehouse.message(code:'dashboard.activity.transaction.label', args: [link, it.label(), activityType])}",
+				url: link,
 				dateCreated: it.dateCreated,
 				lastUpdated: it.lastUpdated,
 				transaction: it)
@@ -74,10 +92,15 @@ class DashboardController {
 		
 		def users = User.executeQuery( "select distinct u from User u where u.lastUpdated >= :lastUpdated", [lastUpdated:new Date()-10, max:10, offset:5] );
 		users.each { 
+			def link = "${createLink(controller: 'user', action: 'show', id: it.id)}"
+			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
+			activityType = "${warehouse.message(code: activityType)}"
+
+			
 			activityList << new DashboardActivityCommand(
 				type: "user",
-				label: "User '<a href='${createLink(controller: 'user', action: 'show', id: it.id)}'>${it.username}</a>' was updated",
-				url: "${createLink(controller: 'user', action: 'show', id: it.id)}",
+				label: "${warehouse.message(code:'dashboard.activity.user.label', args: [link, it.username, activityType])}",				
+				url: link,
 				dateCreated: it.dateCreated,
 				lastUpdated: it.lastUpdated,
 				user: it)

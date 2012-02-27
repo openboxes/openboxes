@@ -15,6 +15,16 @@ class LocalizationService {
 	def grailsApplication
 	
 	
+	String formatMetadata(Object object) {
+		def format = grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')	
+		return format.metadata(obj: object)
+	}
+	
+	String formatDate(Date date) { 
+		def format = grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
+		return format.date(obj: date)
+	}
+	
 	/**
 	 * Localizes the passed string value based on the current locale
 	 */
