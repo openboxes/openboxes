@@ -169,8 +169,7 @@
 												<g:each var="childContainerInstance" in="${shipmentInstance?.containers?.findAll { it.parentContainer == containerInstance}?.sort() }">
 													<g:set var="styleClass" value="${childContainerInstance?.id == selectedContainer?.id ? 'selected' : 'not-selected' }"/>
 													<tr class="${count++%2==0?'even':'odd' }">
-														<td class="droppable">
-															
+														<td class="droppable">									
 															<div style="margin-left: 25px;">
 																<span class="action-menu" >
 																	<button class="action-btn">
@@ -296,6 +295,9 @@
 												<tr id="shipmentItemRow-${itemInstance?.id }" class="${count++%2==0?'odd':'even' }">
 													<td nowrap="nowrap" width="3%">
 														<div>
+															<span id="${itemInstance?.id }" class="draggable">
+																<img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_nsew.png')}" alt="Item" style="vertical-align: middle"/>
+															</span>
 															<span class="action-menu">
 																<button class="action-btn">
 																	<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
@@ -314,11 +316,6 @@
 															<g:link controller="inventoryItem" action="showStockCard" params="['product.id':itemInstance?.product?.id]">
 																<format:product product="${itemInstance?.product}"/> 
 															</g:link>
-															<%-- 
-															<span id="${itemInstance?.id }" class="draggable">
-																<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" alt="Item" style="vertical-align: middle"/>
-															</span>
-															--%>
 														</div>
 													</td>
 													<td>

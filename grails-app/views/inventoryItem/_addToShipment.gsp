@@ -1,16 +1,11 @@
 
 <script type="text/javascript">
 	$(document).ready(function(){
-		$("#btnAddToShipment-${itemInstance?.id}").click(function() { $("#dlgAddToShipment-${itemInstance?.id}").dialog('open'); });									
 		$("#dlgAddToShipment-${itemInstance?.id}").dialog({ autoOpen: false, modal: true, width: '600px' });				
+		$("#btnAddToShipment-${itemInstance?.id}").click(function() { $("#dlgAddToShipment-${itemInstance?.id}").dialog('open'); });									
+		$("#btnAddClose-${itemInstance?.id}").click(function() { $("#dlgAddToShipment-${itemInstance?.id}").dialog('close'); });									
 	});
 </script>	   
-<div class="action-menu-item">
-	<a  href="javascript:void(0);" id="btnAddToShipment-${itemInstance?.id}">
-		<img src="${resource(dir: 'images/icons/silk', file: 'lorry_add.png')}"/>&nbsp;
-		<warehouse:message code="shipping.addToShipment.label"/>
-	</a>
-</div>
 
 <div id="dlgAddToShipment-${itemInstance?.id}" title="${warehouse.message(code:'shipping.addToShipment.label')}" style="padding: 10px; display: none; vertical-align: middle;" >	
 
@@ -80,15 +75,21 @@
 											width="200" valueId="" valueName=""/>							
 									</td>
 								</tr>
+							</tbody>
+							<tfoot>
 								<tr>
-									<td></td>
-									<td style="text-align: left;">
-										<button type="submit" name="addItem" class="right">
+									<td colspan="2" class="middle center">
+										<button type="submit" name="addItem" class="middle">
 											<img src="${resource(dir: 'images/icons/silk', file: 'lorry_add.png')}"/> <warehouse:message code="shipping.addToShipment.label"/>
 										</button>
+										&nbsp;
+										<a href="javascript:void();" id="btnAddClose-${itemInstance?.id }">
+											<warehouse:message code="default.button.cancel.label"/>
+										</a>
+										
 									</td>
 								</tr>
-							</tbody>
+							</tfoot>
 						</table>
 					</g:form>				
 				</td>

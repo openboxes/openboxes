@@ -1,10 +1,9 @@
 <span class="action-menu">
 	<button class="action-btn">
 		<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>							
-		<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
 	</button>
-	<div class="actions">
-		<div class="action-menu-item">														
+	<div class="actions left">
+		<div class="action-menu-item left">														
 			<a href="javascript:void(0);" class="actionButton" id="inventoryAdjustedBtn">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'box.png')}" alt="${warehouse.message(code: 'inventory.inventoryAdjusted.label') }" style="vertical-align: middle"/>
 				&nbsp;<warehouse:message code="inventory.inventoryAdjusted.label"/>
@@ -57,19 +56,19 @@
 		</div>
 		<div class="action-menu-item">														
 			<a href="javascript:void(0);" class="actionButton" id="markAsSupported">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" alt="${warehouse.message(code: 'inventory.markAsSupported.label') }" style="vertical-align: middle"/>
+				<img src="${createLinkTo(dir:'images/icons/inventoryStatus',file:'supported.png')}" alt="${warehouse.message(code: 'inventory.markAsSupported.label') }" style="vertical-align: middle"/>
 				&nbsp;<warehouse:message code="inventory.markAsSupported.label"/>
 			</a>
 		</div>	
 		<div class="action-menu-item">														
 			<a href="javascript:void(0);" class="actionButton" id="markAsNonInventoried">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="${warehouse.message(code: 'inventory.markAsNonInventoried.label') }" style="vertical-align: middle"/>
+				<img src="${createLinkTo(dir:'images/icons/inventoryStatus',file:'supported_non_inventory.png')}" alt="${warehouse.message(code: 'inventory.markAsNonInventoried.label') }" style="vertical-align: middle"/>
 				&nbsp;<warehouse:message code="inventory.markAsNonInventoried.label"/>
 			</a>
 		</div>	
 		<div class="action-menu-item">														
 			<a href="javascript:void(0);" class="actionButton" id="markAsNotSupported">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="${warehouse.message(code: 'inventory.markAsNotSupported.label') }" style="vertical-align: middle"/>
+				<img src="${createLinkTo(dir:'images/icons/inventoryStatus',file:'not_supported.png')}" alt="${warehouse.message(code: 'inventory.markAsNotSupported.label') }" style="vertical-align: middle"/>
 				&nbsp;<warehouse:message code="inventory.markAsNotSupported.label"/>
 			</a>
 		</div>	

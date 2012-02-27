@@ -587,7 +587,6 @@ class InventoryController {
 	}
 	
 	
-	/*
 	def saveTransaction = {	
 		log.debug "save transaction: " + params
 		def transactionInstance = Transaction.get(params.id);
@@ -612,13 +611,13 @@ class InventoryController {
 				}
 			}
 			catch (Exception e) {
-				log.error("Unabled to save transaction ", e);
+				log.error("Unable to save transaction ", e);
 			}
 		}
 		
 		if (saved) {	
 			flash.message = "${warehouse.message(code: 'inventory.transactionSaved.message')}"
-			redirect(action: "showTransaction", id: transactionInstance?.id);
+			redirect(action: "editTransaction", id: transactionInstance?.id);
 		}
 		else { 		
 			flash.message = "${warehouse.message(code: 'inventory.unableToSaveTransaction.message')}"
@@ -632,7 +631,7 @@ class InventoryController {
 			render(view: "editTransaction", model: model);
 		}	
 	}
-	*/
+	
 	
 	/**
 	 * Show the transaction.
@@ -1073,8 +1072,10 @@ class InventoryController {
 		log.debug "edit transaction: " + params
 		def transactionInstance = Transaction.get(params?.id)
 		def warehouseInstance = Location.get(session?.warehouse?.id);
+		def products = Product.list();
+		def inventoryItems = InventoryItem.findAllByProductInList(products)
 		def model = [ 
-			
+			inventoryItemsMap: inventoryItems.groupBy { it.product } ,
 			transactionInstance: transactionInstance?:new Transaction(),
 			productInstanceMap: Product.list().groupBy { it?.category },
 			transactionTypeList: TransactionType.list(),

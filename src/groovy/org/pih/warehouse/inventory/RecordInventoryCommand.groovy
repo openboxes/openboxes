@@ -9,9 +9,10 @@ import org.codehaus.groovy.grails.validation.Validateable
 
 class RecordInventoryCommand {
 	
-	Product product;
-	Inventory inventory;
-	InventoryLevel inventoryLevel
+	Product productInstance;
+	Inventory inventoryInstance;
+	InventoryLevel inventoryLevelInstance
+	Integer totalQuantity
 	Date transactionDate = new Date()
 	RecordInventoryRowCommand recordInventoryRow;
 	List<RecordInventoryRowCommand> recordInventoryRows =
@@ -20,9 +21,10 @@ class RecordInventoryCommand {
 		// new ListUtils.lazyList(new ArrayList(),{new RecordInventoryRowCommand()} as Factory)
 	
 	static constraints = {
-		product(nullable:false)
-		inventory(nullable:false) 
-		inventoryLevel(nullable:true)
+		productInstance(nullable:false)
+		inventoryInstance(nullable:false) 
+		inventoryLevelInstance(nullable:true)
+		totalQuantity(nullable:true)
 		transactionDate(nullable:false)		
 		recordInventoryRows(validator: { val, obj, errors -> 
 			def errorsFound = false;

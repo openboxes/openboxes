@@ -2,14 +2,9 @@
 	$(document).ready(function(){
 		$("#btnEditItem-${itemInstance?.id}").click(function() { $("#dlgEditItem-${itemInstance?.id}").dialog('open'); });									
 		$("#dlgEditItem-${itemInstance?.id}").dialog({ autoOpen: false, modal: true, width: '600px' });			
+		$("#btnEditClose-${itemInstance?.id}").click( function() { $("#dlgEditItem-${itemInstance?.id}").dialog('close'); });	
 	});
 </script>	   
-<div class="action-menu-item">
-	<a href="javascript:void(0);" id="btnEditItem-${itemInstance?.id}">
-		<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
-		<warehouse:message code="inventory.editItem.label"/>
-	</a>
-</div>
 <div id="dlgEditItem-${itemInstance?.id}" title="${warehouse.message(code: 'inventory.editItem.label')}" style="padding: 10px; display: none;" >	
 	
 	<div class="dialog" style="padding: 10px;" >	
@@ -64,15 +59,20 @@
 							<g:datePicker name="expirationDate" value="" precision="month" default="none" value="${itemInstance?.expirationDate }" noSelection="['':'']"/>
 						</td>
 					</tr>
-					<tr>
-						<td></td>
-						<td style="text-align: left;">								
-							<button type="submit" name="addItem">
-								<img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}"/> <warehouse:message code="default.button.save.label"/>
-							</button>
-						</td>
-					</tr>
 				</tbody>
+				<tfoot>
+					<tr>
+						<td colspan="2" class="center">
+							<button type="submit" name="addItem">
+								<img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/> <warehouse:message code="default.button.save.label"/>
+							</button>
+							&nbsp;
+							<a href="javascript:void();" id="btnEditClose-${itemInstance?.id }">
+								<warehouse:message code="default.button.cancel.label"/>
+							</a>
+						</td>
+					</tr>	
+				</tfoot>			
 			</table>
 		</g:form>				
 

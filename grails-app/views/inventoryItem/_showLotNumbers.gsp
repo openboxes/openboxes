@@ -1,27 +1,28 @@
-<div> 	
-	<div id="inventoryView" style="text-align: left;" class="list">	
-		<table>
-			<thead>
-				<tr class="odd">
-					<th class="left" style=""><warehouse:message code="default.actions.label"/></th>												
-					<th><warehouse:message code="default.lotSerialNo.label"/></th>
-					<th><warehouse:message code="default.expires.label"/></th>
-					<th class="center middle" ><warehouse:message code="default.qty.label"/></th>
-					<g:hasErrors bean="${flash.itemInstance}">													
-						<th></th>
-					</g:hasErrors>
-				</tr>											
-			</thead>
-			<tbody>
-				<g:if test="${!commandInstance?.lotNumberList}">
-					<tr class="even" style="min-height: 100px;">
-						<td colspan="5" style="text-align: center; vertical-align: middle">
-							<warehouse:message code="inventory.noItemsCurrentlyInStock.message" args="[format.product(product:commandInstance?.productInstance)]"/>
-						</td>
-					</tr>
-				</g:if>
-				<g:set var="count" value="${0 }"/>
-				<g:each var="itemInstance" in="${commandInstance?.lotNumberList }" status="status">	
+<fieldset>
+	<div id="showLotNumbers" class="list">	
+		<g:form controller="inventoryItem" action="create">	
+			<table>
+				<thead>
+					<tr class="odd">
+						<th class="left" style=""><warehouse:message code="default.actions.label"/></th>												
+						<th><warehouse:message code="default.lotSerialNo.label"/></th>
+						<th><warehouse:message code="default.expires.label"/></th>
+						<th class="center middle" ><warehouse:message code="default.qty.label"/></th>
+						<g:hasErrors bean="${flash.itemInstance}">													
+							<th></th>
+						</g:hasErrors>
+					</tr>											
+				</thead>
+				<tbody>
+					<g:if test="${!commandInstance?.lotNumberList}">
+						<tr class="even" style="min-height: 100px;">
+							<td colspan="5" style="text-align: center; vertical-align: middle">
+								<warehouse:message code="inventory.noItemsCurrentlyInStock.message" args="[format.product(product:commandInstance?.productInstance)]"/>
+							</td>
+						</tr>
+					</g:if>
+					<g:set var="count" value="${0 }"/>
+					<g:each var="itemInstance" in="${commandInstance?.lotNumberList }" status="status">	
 						<g:set var="quantity" value="${commandInstance.quantityByInventoryItemMap.get(itemInstance)}"/>		
 						<!-- only show items with quantities -->	
 						<g:set var="itemQuantity" value="${commandInstance.quantityByInventoryItemMap.get(itemInstance) }"/>
@@ -30,7 +31,7 @@
 						<g:if test="${selected }">
 							<g:set var="styleClass" value="selected-row"/>
 						</g:if>
-						
+							
 						<style>
 							.selected-row { background-color: lightyellow; } 
 						</style>			
@@ -39,18 +40,33 @@
 								<div class="action-menu">
 									<button class="action-btn">
 										<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle;"/>
-										&nbsp;<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
+										<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
 									</button>
 									<div class="actions">
 										<g:render template="editItemDialog" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]"/>
 										<g:render template="adjustStock" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />
 										<g:render template="addToShipment" model="[itemInstance:itemInstance, itemQuantity: itemQuantity]" />
+										<div class="action-menu-item">					
+											<g:link controller="inventoryItem" action="showLotNumbers" params="['product.id':commandInstance?.productInstance?.id,'inventoryItem.id':itemInstance?.id]">
+												<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;
+												<warehouse:message code="inventoryItem.show.label"/>
+											</g:link>
+										</div>
+										
+										<div class="action-menu-item">					
+											<g:link controller="inventoryItem" action="delete" id="${itemInstance?.id}">
+												<img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>&nbsp;
+												<warehouse:message code="inventoryItem.delete.label"/>
+											</g:link>
+										</div>
 									</div>
 								</div>
 							</td>															
 							<td class="top">
-								${itemInstance?.lotNumber?:'<span class="fade"><warehouse:message code="default.none.message"/></span>' }
 								<g:link action="show" controller="inventoryItem" id="${itemInstance?.id }">
+								</g:link>
+								<g:link controller="inventoryItem" action="showLotNumbers" params="['product.id':commandInstance?.productInstance?.id,'inventoryItem.id':itemInstance?.id]">
+									${itemInstance?.lotNumber?:'<span class="fade"><warehouse:message code="default.none.message"/></span>' }							
 								</g:link>
 							</td>														
 							<td class="top">
@@ -81,33 +97,96 @@
 								</td>
 							</g:hasErrors>	
 						</tr>
-
-				</g:each>
-			</tbody>
-			<g:if test="${commandInstance?.inventoryItemList}">
-				<tfoot>
-					<tr class="prop" style="height: border: 0px;">
-						<td colspan="2" style="text-align: left; border: 0px;">
+						
+						
+						<g:if test="${inventoryItem == itemInstance }">
+							<tr>
+								<td colspan="5" style="padding: 0px; margin: 0px">
+									<div class="box" style="padding: 0px; margin: 0px">
+										<table>
+											<thead>
+												<tr>
+													<th>
+														${warehouse.message(code: 'transaction.transactionType.label') }
+													</th>
+													<th>
+														${warehouse.message(code: 'transaction.transactionDate.label') }
+													</th>
+													<th>
+														${warehouse.message(code: 'default.quantity.label') }
+													</th>
+													<th>
+														${warehouse.message(code: 'default.dateCreated.label') }
+													</th>
+												</tr>
+											</thead>
+											<tbody>											
+												<g:each var="transactionEntry" in="${transactionEntries }" status="j">
+													<tr class="${j%2?'even':'odd' }">
+														<td>
+															<format:date obj="${transactionEntry.transaction?.transactionDate}"/>
+														</td>
+														<td>
+															<g:link controller="inventory" action="editTransaction" id="${transactionEntry?.transaction?.id }">
+																<format:metadata obj="${transactionEntry.transaction?.transactionType }"/>
+															</g:link>
+														</td>
+														<td>
+															${transactionEntry?.quantity }
+														</td>						
+														<td>
+															${transactionEntry?.transaction?.dateCreated }
+														</td>						
+													</tr>
+												</g:each>
+											</tbody>
+										</table>
+									</div>
+								</td>
+							</tr>
+						</g:if>						
+						
+					</g:each>
+					<tr>
+						<td class="middle center">
+							<img src="${resource(dir: 'images/icons/silk', file: 'new.png')}" style="vertical-align: middle;"/>
 						</td>
-						<td style="border: 0px;"></td>
-						<td style="text-align: center; vertical-align: middle; border: 0px;">
-							<span style="font-size: 1em;"> 
-								<g:set var="styleClass" value="color: black;"/>																	
-								<g:if test="${commandInstance.totalQuantity < 0}">
-									<g:set var="styleClass" value="color: red;"/>																	
-								</g:if>														
-								<span style="${styleClass }">${commandInstance.totalQuantity }</span> 
-							</span>
+						<td>
+							<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
+							<g:textField name="lotNumber"/>
+							<g:datePicker name="expirationDate" precision="month" noSelection="['null':'']" value=""/>						
+							<button class="button">
+								<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" style="vertical-align: middle;"/>
+								<warehouse:message code="default.button.save.label"/>
+							</button>						
 						</td>
-						<g:hasErrors bean="${flash.itemInstance}">
-							<td style="border: 0px;">
-							
-							</td>
-						</g:hasErrors>
 					</tr>
-				</tfoot>
-			</g:if>
-		</table>										
+				</tbody>
+				<g:if test="${commandInstance?.lotNumberList}">
+					<tfoot>
+						<tr>
+							<td colspan="2" style="">
+							</td>
+							<td></td>
+							<td style="text-align: center; vertical-align: middle;">
+								<span style="font-size: 1em;"> 
+									<g:set var="styleClass" value="color: black;"/>																	
+									<g:if test="${commandInstance.totalQuantity < 0}">
+										<g:set var="styleClass" value="color: red;"/>																	
+									</g:if>														
+									<span style="${styleClass }">${commandInstance.totalQuantity }</span> 
+								</span>
+							</td>
+							<g:hasErrors bean="${flash.itemInstance}">
+								<td style="border: 0px;">
+								
+								</td>
+							</g:hasErrors>
+						</tr>
+					</tfoot>
+				</g:if>
+			</table>			
+		</g:form>							
 	</div>	
 
-</div>
+</fieldset>

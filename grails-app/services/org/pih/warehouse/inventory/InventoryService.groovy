@@ -917,7 +917,8 @@ class InventoryService implements ApplicationContextAware {
 		cmd.inventoryItemList = inventoryItems as List		
 		cmd.inventoryItemList.sort { it.expirationDate }
 		
-		cmd.lotNumberList = getInventoryItemsByProduct(cmd.productInstance) as List
+		// Get all lot numbers for a given product
+		cmd.lotNumberList = getInventoryItemsByProduct(cmd?.productInstance) as List
 		
 		// Get transaction log for a particular product within an inventory
 		cmd.transactionEntryList = getTransactionEntriesByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);
@@ -946,14 +947,14 @@ class InventoryService implements ApplicationContextAware {
 		commandInstance.transactionDate = new Date()
 		commandInstance.transactionDate.clearTime()
 		
-		if (!commandInstance?.product) { 
+		if (!commandInstance?.productInstance) { 
 			commandInstance.errors.reject("error.product.invalid","Product does not exist");
 		}
 		else { 			
 			commandInstance.recordInventoryRow = new RecordInventoryRowCommand();
 			
 			// get all transaction entries for this product at this inventory
-			def transactionEntryList = getTransactionEntriesByProductAndInventory(commandInstance?.product, commandInstance?.inventory)
+			def transactionEntryList = getTransactionEntriesByProductAndInventory(commandInstance?.productInstance, commandInstance?.inventoryInstance)
 			// create a map of inventory item quantities from this
 			def quantityByInventoryItemMap = getQuantityByInventoryItemMap(transactionEntryList)
 			                                                                                       		
@@ -987,10 +988,10 @@ class InventoryService implements ApplicationContextAware {
 		try { 
 			// Validation was done during bind, but let's do this just in case
 			if (cmd.validate()) { 
-				def inventoryItems = getInventoryItemsByProductAndInventory(cmd.product, cmd.inventory)
+				def inventoryItems = getInventoryItemsByProductAndInventory(cmd.productInstance, cmd.inventoryInstance)
 				// Create a new transaction
 				def transaction = new Transaction(cmd.properties)
-				
+				transaction.inventory = cmd.inventoryInstance
 				transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
 				
 				// Process each row added to the record inventory page
@@ -999,13 +1000,13 @@ class InventoryService implements ApplicationContextAware {
 					if (row) { 
 						// 1. Find an existing inventory item for the given lot number and product and description					
 						def inventoryItem = 
-							findInventoryItemByProductAndLotNumber(cmd.product, row.lotNumber)
+							findInventoryItemByProductAndLotNumber(cmd.productInstance, row.lotNumber)
 						
 						// 2. If the inventory item doesn't exist, we create a new one
 						if (!inventoryItem) { 
 							inventoryItem = new InventoryItem();
 							inventoryItem.properties = row.properties
-							inventoryItem.product = cmd.product;
+							inventoryItem.product = cmd.productInstance;
 							if (!inventoryItem.hasErrors() && inventoryItem.save()) { 										
 								
 							}

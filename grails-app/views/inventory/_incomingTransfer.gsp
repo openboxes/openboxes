@@ -186,7 +186,7 @@
 													<g:textField class="lotNumber" name="transactionEntries[${i }].lotNumber" 
 														value="${command?.transactionEntries[i]?.lotNumber }"/>
 														
-													<g:datePicker name="transactionEntries[${i }].expirationDate" precision="month" 
+													<g:datePicker name="transactionEntries[${i }].expirationDate" precision="month" noSelection="['':'']"
 														value="${command?.transactionEntries[i]?.expirationDate }" years="${(1900 + (new Date().year))..(1900+ (new Date() + (20 * 365)).year)}"/>											
 																										
 													<img class="undo middle" src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="${warehouse.message(code: 'cancel.label') }"/>

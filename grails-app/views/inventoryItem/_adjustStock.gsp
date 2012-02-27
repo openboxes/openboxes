@@ -1,16 +1,11 @@
 
 <script type="text/javascript">
 	$(document).ready(function(){
-		$("#btnAdjustStock-${itemInstance?.id}").click(function() { $("#dlgAdjustStock-${itemInstance?.id}").dialog('open'); });									
 		$("#dlgAdjustStock-${itemInstance?.id}").dialog({ autoOpen: false, modal: true, width: '500px' });				
+		$("#btnAdjustStock-${itemInstance?.id}").click(function() { $("#dlgAdjustStock-${itemInstance?.id}").dialog('open'); });									
+		$("#btnAdjustClose-${itemInstance?.id}").click(function() { $("#dlgAdjustStock-${itemInstance?.id}").dialog('close'); });									
 	});
 </script>	
-<div class="action-menu-item">
-	<a  href="javascript:void(0);" id="btnAdjustStock-${itemInstance?.id}">
-		<img src="${resource(dir: 'images/icons/silk', file: 'book_open.png')}"/>&nbsp;
-		<warehouse:message code="inventory.adjustStock.label"/>
-	</a>
-</div>
 <g:link controller="inventoryItem" action="recordInventory" params="['product.id':commandInstance?.productInstance?.id,'inventory.id':commandInstance?.inventoryInstance?.id, 'inventoryItem.id':itemInstance?.id]">
 </g:link>
 
@@ -64,15 +59,20 @@
 									<g:textField id="newQuantity" name="newQuantity" size="6" value="${itemQuantity }" />
 								</td>
 							</tr>  	        
+						</tbody>
+						<tfoot>
 							<tr>
-								<td></td>
-								<td style="text-align: left;">
+								<td colspan="2" class="center">
 									<button>
-										<img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}"/> <warehouse:message code="inventory.adjustStock.label"/>
+										<img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/> <warehouse:message code="inventory.adjustStock.label"/>
 									</button>
+									&nbsp;
+									<a href="javascript:void();" id="btnAdjustClose-${itemInstance?.id }" class="middle">
+										<warehouse:message code="default.button.cancel.label"/>
+									</a>
 								</td>
 							</tr>
-						</tbody>
+						</tfoot>						
 					</table>
 				</g:form>				
 			</td>

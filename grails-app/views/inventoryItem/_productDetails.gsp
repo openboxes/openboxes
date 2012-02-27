@@ -1,6 +1,5 @@
 
 <%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
-<h4 class="fade"><warehouse:message code="product.details.label"/></h4>
 <div id="product-details" style="border: 1px solid lightgrey">
 	<table>
 		<%-- 
@@ -18,8 +17,7 @@
 				<span class="name"><warehouse:message code="default.status.label"/></span>
 			</td>
 			<td>
-				<span class="value">
-				
+				<span class="value">				
 					<g:if test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED}">
 						<g:if test="${totalQuantity <= 0}">
 							<span style="color: red"><warehouse:message code="product.noStock.label"/></span>
@@ -81,7 +79,7 @@
 			</td>
 		</tr>
 		
-		<tr class="details even prop">	
+		<tr class="details even">	
 			<td class="left label">
 				<span class="name"><warehouse:message code="product.manufacturer.label"/></span>
 			</td>
@@ -113,7 +111,7 @@
 			</td>
 		</tr>
 		
-		<tr class="details even prop">	
+		<tr class="details even">	
 			<td class="left label">
 				<span class="name"><warehouse:message code="product.upc.label"/></span>
 			</td>
@@ -163,7 +161,7 @@
 				</td>
 			</tr>													
 		</g:each>
-		<tr class="details odd prop">
+		<tr class="details odd">
 			<td class="label left">
 				<span class="name"><warehouse:message code="product.minLevel.label"/></span>
 			</td>
@@ -200,6 +198,5 @@
 		</tr>				
 	</table>
 </div>
-
 
 

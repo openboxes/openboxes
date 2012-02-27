@@ -7,8 +7,10 @@
 </style>
 <div id="leftnav-accordion-menu" class="accordion menu">	
 	<g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
-		<h6 class="menu-heading">
-			<warehouse:message code="inventory.label"  default="Inventory"/>
+		<h6>
+			<a href="#inventory" name="inventory" class="menu-heading">
+				<warehouse:message code="inventory.label"  default="Inventory"/>
+			</a>
 		</h6>
 		<div class="menu-section">									
 			<ul>
@@ -27,8 +29,10 @@
 	</g:authorize>
 	
 	<g:authorize activity="[ActivityCode.PLACE_ORDER,ActivityCode.FULFILL_ORDER]">	
-		<h6 class="menu-heading" >
-			<warehouse:message code="orders.label"  default="Orders"/>
+		<h6>
+			<a href="#orders" name="orders" class="menu-heading">
+				<warehouse:message code="orders.label"  default="Orders"/>
+			</a>
 		</h6>
 		<div class="menu-section">
 			<ul>
@@ -55,7 +59,9 @@
 				--%>									
 				<li>
 					<span class="menuButton">
-						<g:link controller="purchaseOrderWorkflow" action="index"><warehouse:message code="order.create.label" default="Add incoming order"/></g:link>
+						<g:link controller="purchaseOrderWorkflow" action="index">
+							<warehouse:message code="order.create.label" default="Add incoming order"/>
+						</g:link>
 					</span>
 				</li>					
 			</ul>										
@@ -64,8 +70,10 @@
 	
 	
 	<g:authorize activity="[ActivityCode.PLACE_REQUEST,ActivityCode.FULFILL_REQUEST]">
-		<h6 class="menu-heading" >
-			<warehouse:message code="requests.label"  default="Requests"/>
+		<h6>
+			<a href="#requests" name="requests" class="menu-heading">
+				<warehouse:message code="requests.label"  default="Requests"/>
+			</a>
 		</h6>
 		<div class="menu-section">
 			<ul>
@@ -77,7 +85,6 @@
 				<g:each in="${incomingRequests}" var="status">
 					<li>
 						<span class="menuButton submenuItem">
-						
 							<g:link controller="request" action="list" params="[requestType:'INCOMING',status:status.key]">
 								<format:metadata obj="${status.key}"/> (${status.value.size()})
 							</g:link>
@@ -110,14 +117,16 @@
 	</g:authorize>
 	
 	<g:authorize activity="[ActivityCode.SEND_STOCK]">
-		<h6 class="menu-heading" >
-			<warehouse:message code="shipping.label" />
+		<h6>
+			<a href="#shipping" name="shipping" class="menu-heading">
+				<warehouse:message code="shipping.label" />
+			</a>
 		</h6>
 		<div class="menu-section">
 			<ul>
 				<li>
 					<span class="menuButton">
-						<g:link controller="shipment" action="list" params="[status:'PENDING']"><warehouse:message code="shipping.listOutgoing.label"  default="List outgoing shipments"/></g:link>
+						<g:link controller="shipment" action="list" params="[type:'outgoing']"><warehouse:message code="shipping.listOutgoing.label"  default="List outgoing shipments"/></g:link>
 					</span>
 				</li>
 				<g:each in="${outgoingShipments}" var="statusRow">
@@ -139,14 +148,16 @@
 	</g:authorize>
 	
 	<g:authorize activity="[ActivityCode.RECEIVE_STOCK]">		
-		<h6 class="menu-heading" >
-			<warehouse:message code="receiving.label" />
+		<h6>
+			<a href="#receiving" name="receiving" class="menu-heading" >
+				<warehouse:message code="receiving.label" />
+			</a>
 		</h6>
 		<div class="menu-section">
 			<ul>
 				<li>
 					<span class="menuButton">
-						<g:link controller="shipment" action="list" params="[type: 'incoming', status: 'SHIPPED']"><warehouse:message code="shipping.listIncoming.label"  default="List incoming shipments"/></g:link>
+						<g:link controller="shipment" action="list" params="[type: 'incoming']"><warehouse:message code="shipping.listIncoming.label"  default="List incoming shipments"/></g:link>
 					</span>
 				</li>
 				<g:each in="${incomingShipments}" var="statusRow">
@@ -167,9 +178,11 @@
 				--%>	
 			</ul>										
 		</div>
-	</g:authorize>	
-	<h6 class="menu-heading" >
-		<warehouse:message code="report.label" />
+	</g:authorize>
+	<h6>	
+		<a href="#reporting" name="reporting" class="menu-heading" >
+			<warehouse:message code="report.label" />
+		</a>
 	</h6>
 	<div class="menu-section">
 		<ul>			
@@ -210,9 +223,10 @@
 			</li>
 		</ul>
 	</div>
-		
-	<h6 class="menu-heading">
-		<warehouse:message code="administration.label"  default="Administration"/>
+	<h6>
+		<a href="#administration" name="administration" class="menu-heading">
+			<warehouse:message code="administration.label"  default="Administration"/>
+		</a>
 	</h6>			
 	<div class="menu-section">
 		<span class="menu-subheading"><warehouse:message code="default.general.label"/></span>

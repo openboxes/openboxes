@@ -23,8 +23,10 @@
 							<th><warehouse:message code="default.date.label"/></th>
 							<th><warehouse:message code="transaction.type.label"/></th>
 							<th><warehouse:message code="inventory.label"/></th>
-							<th><warehouse:message code="default.source.label"/></th>
-							<th><warehouse:message code="default.destination.label"/></th>
+							<th class="center">
+								<warehouse:message code="default.source.label"/> / 
+								<warehouse:message code="default.destination.label"/>
+							</th>
                         </tr>
                     </thead>
        	           	<tbody>			
@@ -51,7 +53,6 @@
 									</select>
 								</form>
 							</td>
-							<td></td>
 							<td></td>
                         	<td></td>							
                         </tr>
@@ -104,10 +105,8 @@
 								<td>
 									${transactionInstance?.inventory }
 								</td>
-								<td>
+								<td class="center">
 									${transactionInstance?.source?.name }
-								</td>
-								<td>
 									${transactionInstance?.destination?.name }
 								</td>
 							</tr>

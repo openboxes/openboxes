@@ -1,7 +1,8 @@
-<a name="transactionLog"></a>
+<%@ page import="org.pih.warehouse.product.Product"%>
+<%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
 <div>							
 	<div>
-		<g:form method="GET" action="showStockCard" fragment="transactionLog">
+		<g:form method="GET" action="showTransactionLog">
 			<g:hiddenField name="product.id" value="${commandInstance?.productInstance?.id }"/>
 
 			<!--  Filter -->
@@ -37,7 +38,7 @@
 				
 			</div>			
 			<g:set var="enableFilter" value="${!params.disableFilter}"/>
-			<div class="box" style="margin: 1px;">
+			<div class="box" style="padding: 0px;margin: 0px;">
 				<table >
 					<thead>
 						<tr class="odd prop">
@@ -51,9 +52,7 @@
 								${warehouse.message(code: 'shipment.label')}
 							</th>
 							<th>
-								${warehouse.message(code: 'transaction.source.label')}
-							</th>
-							<th>
+								${warehouse.message(code: 'transaction.source.label')} /
 								${warehouse.message(code: 'transaction.destination.label')}
 							</th>
 							<th style="text-align: center">
@@ -68,7 +67,7 @@
 						<g:set var="transactionMap" value="${commandInstance?.getTransactionLogMap(enableFilter.toBoolean())}"/>
 						<g:if test="${!transactionMap }">
 							<tr>
-								<td colspan="5" class="even center">		
+								<td colspan="6" class="even center">		
 									<div class="fade padded">
 										<warehouse:message code="transaction.noTransactions.message" args="[format.metadata(obj:commandInstance?.transactionType),commandInstance?.startDate,commandInstance?.endDate]"/>
 									</div>
@@ -80,13 +79,13 @@
 							<g:each var="transaction" in="${transactionMap?.keySet()?.sort {it.transactionDate}.reverse() }" status="status">
 								<tr class="transaction ${(status%2==0)?'even':'odd' } prop">
 									<td style="width: 10%; nowrap="nowrap">	
-										<g:link controller="inventory" action="showTransaction" id="${transaction?.id }" params="['product.id':commandInstance?.productInstance?.id]">
 											<format:date obj="${transaction?.transactionDate}"/>																
-										</g:link>
 									</td>
 									<td>
 										<span class="${transaction?.transactionType?.transactionCode?.name()?.toLowerCase()}">
-											<format:metadata obj="${transaction?.transactionType}"/>
+											<g:link controller="inventory" action="showTransaction" id="${transaction?.id }" params="['product.id':commandInstance?.productInstance?.id]">
+												<format:metadata obj="${transaction?.transactionType}"/>
+											</g:link>
 										</span>
 									</td>
 									<td>
@@ -102,10 +101,12 @@
 										</g:elseif>
 									</td>
 									<td>
-										${transaction?.source?.name }
-									</td>
-									<td>
-										${transaction?.destination?.name }									
+										<g:if test="${transaction?.source }">
+											${transaction?.source?.name }
+										</g:if>
+										<g:elseif test="${transaction?.destination }">
+											${transaction?.destination?.name }
+										</g:elseif>
 									</td>
 									<td style="text-align: center">
 										<g:set var="quantityChange" value="${0 }"/>
@@ -141,7 +142,7 @@
 	Showing ${transactionMap?.keySet()?.size() } of ${commandInstance?.allTransactionLogMap?.keySet()?.size() }
 	<g:if test="${commandInstance?.allTransactionLogMap?.keySet()?.size() > transactionMap?.keySet()?.size()}">
 		&nbsp;|&nbsp;
-		<g:link controller="inventoryItem" action="showStockCard" id="${commandInstance?.productInstance?.id }" params="[disableFilter: true]" fragment="transactionLog">
+		<g:link controller="inventoryItem" action="showTransactionLog" id="${commandInstance?.productInstance?.id }" params="[disableFilter: true]">
 			<warehouse:message code="transactionLog.showAll.label"></warehouse:message>
 		</g:link>
 	</g:if>
