@@ -23,9 +23,11 @@
 	    				<g:set var="shipped" value="${ShipmentStatusCode.SHIPPED}"/>
 	    				<g:set var="received" value="${ShipmentStatusCode.RECEIVED}"/>
 						<g:set var="shipmentsPending" value="${outgoingShipmentsByStatus[pending] }"/>			
-						<g:set var="shipmentsShipped" value="${outgoingShipmentsByStatus[shipped] }"/>			
+						<g:set var="shipmentsShipped" value="${outgoingShipmentsByStatus[shipped] }"/>		
 						<g:set var="shipmentsEnroute" value="${incomingShipmentsByStatus[shipped] }"/>			
 	    				<g:set var="shipmentsReceived" value="${incomingShipmentsByStatus[received] }"/>
+						<g:set var="outgoingShipmentsTotal" value="${shipmentsPending.objectList.size + shipmentsShipped.objectList.size }"/>	
+						<g:set var="incomingShipmentsTotal" value="${shipmentsEnroute.objectList.size + shipmentsReceived.objectList.size }"/>	
 						<tr>
 							<td>
 								${warehouse.message(code: 'dashboard.incoming.shipped.label', args: [session.warehouse.name]) }							
@@ -55,7 +57,7 @@
 				    		</td>
 				    		<td style="text-align: right;">
 				    			<g:link controller="shipment" action="list" params="[type:'outgoing']">
-				    				${allIncomingShipments.size()}
+				    				${incomingShipmentsTotal}
 					    		</g:link>
 					    	</td>
 				    	</tr>
@@ -112,7 +114,7 @@
 				    		</td>
 				    		<td style="text-align: right;">
 				    			<g:link controller="shipment" action="list" params="[type:'outgoing']">
-				    				${allOutgoingShipments.size()}
+				    				${outgoingShipmentsTotal}
 					    		</g:link>
 					    	</td>
 				    	</tr>
