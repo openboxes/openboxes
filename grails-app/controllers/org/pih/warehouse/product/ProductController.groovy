@@ -150,7 +150,7 @@ class ProductController {
 		
 		if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product:productInstance)])}"
-			redirect(controller: "inventoryItem", action: "recordInventory", params: ['product.id':productInstance.id, 'inventory.id': inventoryInstance?.id])
+			redirect(controller: "inventoryItem", action: "showRecordInventory", params: ['productInstance.id':productInstance.id, 'inventoryInstance.id': inventoryInstance?.id])
             //redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id, params:params)
         }
         else {

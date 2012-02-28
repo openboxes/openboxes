@@ -6,7 +6,7 @@
 		$("#btnAdjustClose-${itemInstance?.id}").click(function() { $("#dlgAdjustStock-${itemInstance?.id}").dialog('close'); });									
 	});
 </script>	
-<g:link controller="inventoryItem" action="recordInventory" params="['product.id':commandInstance?.productInstance?.id,'inventory.id':commandInstance?.inventoryInstance?.id, 'inventoryItem.id':itemInstance?.id]">
+<g:link controller="inventoryItem" action="showRecordInventory" params="['productInstance.id':commandInstance?.productInstance?.id,'inventoryInstance.id':commandInstance?.inventoryInstance?.id, 'inventoryItem.id':itemInstance?.id]">
 </g:link>
 
 <div id="dlgAdjustStock-${itemInstance?.id}" title="${warehouse.message(code: 'inventory.adjustStock.label')}" style="padding: 10px; display: none;" >	

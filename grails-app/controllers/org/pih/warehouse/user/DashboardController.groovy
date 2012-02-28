@@ -66,7 +66,7 @@ class DashboardController {
 			
 			activityList << new DashboardActivityCommand(
 				type: "package",
-				label: "${warehouse.message(code:'dashboard.activity.product.label', args: [link, it.label(), activityType])}",
+				label: "${warehouse.message(code:'dashboard.activity.product.label', args: [link, it.name, activityType])}",
 				url: link,
 				dateCreated: it.dateCreated,
 				lastUpdated: it.lastUpdated,
