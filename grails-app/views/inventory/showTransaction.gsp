@@ -134,7 +134,7 @@
 								</td>
 								<td>
 									<span class="value">
-										${warehouseInstance?.name }
+										<format:metadata obj="${transactionInstance?.inventory?.warehouse }"/>
 									</span>								
 								</td>										
 							</tr>

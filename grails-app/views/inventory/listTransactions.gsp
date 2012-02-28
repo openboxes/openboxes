@@ -27,6 +27,9 @@
 								<warehouse:message code="default.source.label"/> / 
 								<warehouse:message code="default.destination.label"/>
 							</th>
+							<th class="center">
+								<warehouse:message code="default.createdBy.label"/>
+							</th>
                         </tr>
                     </thead>
        	           	<tbody>			
@@ -54,7 +57,8 @@
 								</form>
 							</td>
 							<td></td>
-                        	<td></td>							
+                        	<td></td>	
+                        	<td></td>						
                         </tr>
 						<g:each var="transactionInstance" in="${transactionInstanceList}" status="i">           
 							<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">            
@@ -108,6 +112,9 @@
 								<td class="center">
 									${transactionInstance?.source?.name }
 									${transactionInstance?.destination?.name }
+								</td>
+								<td class="center">
+									${transactionInstance?.createdBy?.name }
 								</td>
 							</tr>
 						</g:each>

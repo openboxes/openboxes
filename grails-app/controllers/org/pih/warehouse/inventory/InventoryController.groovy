@@ -603,12 +603,12 @@ class InventoryController {
 		Boolean saved = null
 		if (!transactionInstance.hasErrors()) {
 			try {
-				if (inventoryService.isValidForLocalTransfer(transactionInstance)) {
-					saved = inventoryService.saveLocalTransfer(transactionInstance) 
-				}
-				else {
-					saved = transactionInstance.save(flush:true)
-				}
+				//if (inventoryService.isValidForLocalTransfer(transactionInstance)) {
+				//	saved = inventoryService.saveLocalTransfer(transactionInstance) 
+				//}
+				//else {
+				saved = transactionInstance.save(flush:true)
+				//}
 			}
 			catch (Exception e) {
 				log.error("Unable to save transaction ", e);
