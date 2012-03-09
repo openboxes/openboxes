@@ -431,7 +431,7 @@
 								<tr class="prop">
 									<td class="name">
 										<img src="${createLinkTo(dir:'images/icons/silk',file:'calendar.png')}" alt="events" style="vertical-align: middle"/>
-										<label>Events</label>
+										<label><warehouse:message code="events.label"/></label>
 									</td>
 									<td class="value" colspan="3">
 										<div>

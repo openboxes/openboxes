@@ -12,16 +12,14 @@
 	 		.ui-state-highlight { font-weight: bold; color: black; }  
 	 		.strikethrough { color: lightgrey; } 
 	 		.containers td { border-right: 0px solid lightgrey; }
- 			
+ 			.sortable tr.container { cursor: move; }
 	 		.selected { 
 	 			border-right: 0px; 
 				padding-left: 15px;
-		 		/*background:transparent url('${resource(dir: 'images/icons/silk', file: 'bullet_yellow.png')}') center left no-repeat;*/
 	 		}
 	 		.not-selected { 
 	 			border-right: 0px; 
 				padding-left: 15px;
-		 		/*background:transparent url('${resource(dir: 'images/icons/silk', file: 'bullet_white.png')}') center left no-repeat;*/
 	 		}
 	 		
 		</style>
@@ -77,13 +75,33 @@
 			 	<table>
 			 		<tr class="prop">
 				 		<%-- Display the pallets & boxes in this shipment --%> 
-			 			<td valign="top" style="padding: 0px; margin: 0px; width: 250px; height: 100px; border-right: 1px solid lightgrey;" >
+			 			<td valign="top" style="padding: 0px; margin: 0px; width: 250px; min-height: 100px; border-right: 1px solid lightgrey;" >
 							<div class="list" >
 								<g:set var="count" value="${0 }"/>	
 								<table class="sortable" data-update-url="${createLink(controller:'json', action:'sortContainers')}">	
 									<thead>
-										<tr class="odd"><%-- --%>
-											<td colspan="2">
+										<%-- 
+										<tr>
+											<td>
+												<table>
+													<tr>
+														<td class="left">
+															<img src="${resource(dir: 'images/icons/silk', file: 'resultset_previous.png')}" class="middle"/>
+														</td>
+														<td class="center">
+															${selectedContainer?selectedContainer.name:warehouse.message(code:'shipping.unpackedItems.label') }
+														</td>
+														<td class="right">														
+															<img src="${resource(dir: 'images/icons/silk', file: 'resultset_next.png')}" class="middle"/>
+														</td>
+													</tr>
+												</table>
+											
+											</td>
+										</tr>
+										--%>
+										<tr class="odd">
+											<td>
 												<span class="action-menu" >
 													<button class="action-btn">
 														<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>							
@@ -96,25 +114,35 @@
 																<hr/>
 															</div>
 														</g:if>
-														<g:each var="containerInstance" in="${shipmentInstance?.containers?.findAll({!it.parentContainer})?.sort { it?.sortOrder }}">
-															<div class="action-menu-item">														
-																<g:link action="createShipment" event="enterContainerDetails" params="['containerId':containerInstance?.id]" fragment="container-${containerInstance?.id }">
-																	<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="View" style="vertical-align: middle"/>
-																	&nbsp;${warehouse.message(code:'default.view.label', args: [containerInstance?.name] )}
-																</g:link>
-															</div>
-														</g:each>
 													</div>
 												</span>				
 												<span >
 								 					<span class="fade"><warehouse:message code="shipping.totalWeight.label"/>:</span> 
 													<g:formatNumber format="#,##0.00" number="${shipmentInstance?.totalWeightInPounds() ? shipmentInstance?.totalWeightInPounds() : 0.00 }" /> <warehouse:message code="default.lbs.label"/>
 										 		</span>
+											</td>
+											<td class="right middle">
+												<g:set var="containerList" value="${new ArrayList(shipmentInstance?.containers)}" />
+												<g:if test="${containerList }">
+													<span>
+														<button>
+															<g:link class="button" action="createShipment" event="enterContainerDetails" params="['containerId':selectedContainer?.id,'direction':'-1']">
+																<img src="${resource(dir: 'images/icons/silk', file: 'resultset_previous.png')}" class="middle"/>
+															</g:link>
+														</button>
+														<%-- 
+														${containerList.indexOf(selectedContainer)+1} of ${containerList.size() }
+														--%>
+														<button>
+															<g:link action="createShipment" event="enterContainerDetails" params="['containerId':selectedContainer?.id,'direction':'1']">
+																<img src="${resource(dir: 'images/icons/silk', file: 'resultset_next.png')}" class="middle"/>
+															</g:link>
+														</button>
+													</span>
+												</g:if>
 												
 											</td>
 										</tr>
-									</thead>
-									<tbody>
 										<tr class="${count++%2==0?'even':'odd' }">
 											<g:set var="styleClass" value="${selectedContainer == null ? 'selected' : 'not-selected' }"/>
 											<td class="droppable">
@@ -128,16 +156,20 @@
 														</div>
 													</span>
 													<span class="${styleClass }">
-														<g:link action="createShipment" event="enterContainerDetails"><warehouse:message code="shipping.unpackedItems.label"/></g:link>
+														<g:link action="createShipment" event="enterContainerDetails">
+															<warehouse:message code="shipping.unpackedItems.label"/>
+														</g:link>
 													</span>
 												</div>
 											</td>
-										</tr>										
+										</tr>	
+									</thead>
+									<tbody>									
 										<g:if test="${shipmentInstance?.containers }">
 											<g:each var="containerInstance" in="${shipmentInstance?.containers?.findAll({!it.parentContainer})?.sort { it?.sortOrder }}">
 												<g:set var="styleClass" value="${containerInstance?.id == selectedContainer?.id ? 'selected' : 'not-selected' }"/>
-												<tr id="container_${containerInstance?.id }" >
-													<td style="vertical-align: middle;" id="${containerInstance?.id }" class="droppable">													
+												<tr id="container_${containerInstance?.id }" class="container">
+													<td style="vertical-align: middle;" id="${containerInstance?.id }" class="droppable" colspan="2">													
 														<a name="container-${containerInstance.id }"></a>
 														<div>
 															<span class="action-menu" >
@@ -161,6 +193,7 @@
 															</span>
 															<span class="fade rounded">
 																(${containerInstance?.shipmentItems?.size() })
+																${containerInstance?.sortOrder }
 															</span>
 														</div>
 													</td>
@@ -169,7 +202,7 @@
 												<g:each var="childContainerInstance" in="${shipmentInstance?.containers?.findAll { it.parentContainer == containerInstance}?.sort() }">
 													<g:set var="styleClass" value="${childContainerInstance?.id == selectedContainer?.id ? 'selected' : 'not-selected' }"/>
 													<tr class="${count++%2==0?'even':'odd' }">
-														<td class="droppable">									
+														<td class="droppable" colspan="2">									
 															<div style="margin-left: 25px;">
 																<span class="action-menu" >
 																	<button class="action-btn">
@@ -191,9 +224,6 @@
 																		</g:link>
 																	</g:else>
 																</span>
-																<span class="fade rounded">
-																	(${childContainerInstance?.shipmentItems?.size() })
-																</span>
 															</div>
 														</td>
 													</tr>
@@ -210,30 +240,37 @@
 			 			<td valign="top" style="padding: 0; margin: 0">
 							<div class="list">
 								<g:set var="count" value="${0 }"/>	
-								<table style="height: 100%">
+								<table >
 									<thead>	
 										<tr class="odd">
-											<td colspan="5">
-												<span class="action-menu" >
+											<td class="middle" style="width: 50px">
+												<span class="action-menu center">
 													<button class="action-btn">
 														<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>							
 														<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
 													</button>
-													<div class="actions" style="position: absolute; z-index: 1; display: none;">
+													<div class="actions left" style="position: absolute; z-index: 1; display: none;">
 														<g:render template="containerMenuItems" model="[container:selectedContainer]"/>
 													</div>
-												</span>				
-												<label>
+												</span>
+											</td>
+											<td>			
+
+												<span class="title">
 													<g:if test="${selectedContainer}">								
 														<g:if test="${selectedContainer.parentContainer }">
 															${selectedContainer?.parentContainer?.name } &rsaquo;
 														</g:if>						
-									 					${selectedContainer?.name }				 					
+									 					${selectedContainer?.name }		 					
 													</g:if>			 			
 													<g:else>
 														<warehouse:message code="shipping.unpackedItems.label" />			 						
 													</g:else>
-												</label>
+												</span>
+												&nbsp;
+												
+												
+												<br/>
 								 				<span>
 													<span class="fade">
 										 				<warehouse:message code="default.weight.label"/>: 
@@ -273,11 +310,12 @@
 													</g:else>
 												</span>
 											</td>
+											
 										</tr>
 									</thead>
 								</table>
 							</div>
-							<div class="list">
+							<div class="list" style="min-height: 200px;">
 								<table>
 									<thead>
 										<tr>
@@ -288,16 +326,18 @@
 											<th><warehouse:message code="shipping.recipients.label"/></th>
 										</tr>
 									</thead>									
-									<tbody>
+									<tbody  >
 										<g:set var="shipmentItems" value="${shipmentInstance?.shipmentItems?.findAll({it.container?.id == selectedContainer?.id})}"/>
 										<g:if test="${shipmentItems }">
 											<g:each var="itemInstance" in="${shipmentItems?.sort()}">		
 												<tr id="shipmentItemRow-${itemInstance?.id }" class="${count++%2==0?'odd':'even' }">
 													<td nowrap="nowrap" width="3%">
 														<div>
+															<%-- 
 															<span id="${itemInstance?.id }" class="draggable">
 																<img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_nsew.png')}" alt="Item" style="vertical-align: middle"/>
 															</span>
+															--%>
 															<span class="action-menu">
 																<button class="action-btn">
 																	<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
@@ -327,25 +367,16 @@
 												</tr>
 											</g:each>
 										</g:if>
-									
+										<g:unless test="${shipmentItems }">
+											<tr class="none">
+												<td colspan="5">
+													<div class="middle center">
+														<warehouse:message code="shipment.noShipmentItems.message"/>
+													</div>												
+												</td>
+											</tr>
+										</g:unless>
 									</tbody>
-									<%-- 
-									<tfoot>
-										<tr style="border-top: 1px solid lightgrey">
-											<td>
-												<span class="action-menu">
-													<button class="action-btn">
-														<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>
-														<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
-													</button>
-													<div class="actions" style="position: absolute; z-index: 1; display: none;">
-														<g:render template="containerMenuItems" model="[container:selectedContainer]"/>
-													</div>
-												</span>
-											</td>
-										</tr>
-									</tfoot>
-									--%>
 								</table>								
 							</div>			 			
 			 			</td>
@@ -377,12 +408,8 @@
 				    axis : "y",
 				    update : function() { 
 						var updateUrl = "${createLink(controller:'json', action:'sortContainers') }";						
-						//var updateUrl = $(this).data('update-url')
 						var sortOrder = $(this).sortable('serialize'); 
-						console.log(updateUrl);
-						console.log(sortOrder);					
 						$.post(updateUrl, sortOrder);
-						
 				    } 				
 				});
 			

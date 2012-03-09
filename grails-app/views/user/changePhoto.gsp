@@ -33,21 +33,11 @@
 						<tbody>
 							<tr class="prop">
 								<td valign="top" class="name"><warehouse:message
-										code="user.photo.label" /></td>
-								<td valign="top" class="value">
-	
-									<table>
-										<tr>
-											<td><g:if test="${userInstance.photo}">
-													<img class="photo"
-														src="${createLink(controller:'user', action:'viewPhoto', id:userInstance.id)}" />
-												</g:if></td>
-											<td>
-												<input type="hidden" name="id" value="${userInstance.id}" />
-												<input type="file" name="photo" />
-											</td>
-										</tr>
-									</table>
+										code="user.photo.label" />
+								</td>
+								<td>
+									<input type="hidden" name="id" value="${userInstance.id}" />
+									<input type="file" name="photo" />
 								</td>
 							</tr>
 							<tr class="prop">

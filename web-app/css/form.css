@@ -23,18 +23,21 @@ legend span {
 -------------------------------------------------------------- */
 
 input[type=text],
+input[type=password],
 input.text, input.large, 
 textarea, select { 
   background-color:#fff; 
   border:1px solid #bbb; 
 }
 input[type=text]:focus, 
+input[type=password]:focus,
 input.text:focus, input.large:focus, 
 textarea:focus, select:focus { 
   border-color:#666; 
 }
 
 input[type=text], 
+input[type=password],
 input.text, input.large,
 textarea, select {
   margin:0;
@@ -84,7 +87,8 @@ select, input, textarea {
   	-webkit-box-shadow: 5px 5px 5px #ccc;
   	box-shadow: 5px 5px 5px #ccc;	
 }
-*/	
+*/
+
 
 
 

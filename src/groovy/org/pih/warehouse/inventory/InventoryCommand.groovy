@@ -6,6 +6,8 @@ class InventoryCommand {
 	def searchTerms;									// request-level search terms  
 	def categoryInstance; 								// categoryInstance
 	def subcategoryInstance;							// child category to show within the categoryInstance
+	
+	def showHiddenProducts = Boolean.FALSE;				// indicates whether to display hidden products
 	def showUnsupportedProducts = Boolean.FALSE;		// indicates whether unsupported products for the warehouse should be included
 	def showNonInventoryProducts = Boolean.FALSE;		// indicates whether non-inventory products for the warehouse should be included
 	def showOutOfStockProducts = Boolean.TRUE;			// indicates whether out of stock products for the warehouse should be included
@@ -18,6 +20,7 @@ class InventoryCommand {
 		searchTerms(nullable:true)
 		categoryInstance(nullable:true)
 		subcategoryInstance(nullable:true)
+		showHiddenProducts(nullable:true)
 		showUnsupportedProducts(nullable:true)
 		showNonInventoryProducts(nullable:true)
 		showOutOfStockProducts(nullable:true)

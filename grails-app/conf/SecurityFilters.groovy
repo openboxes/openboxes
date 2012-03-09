@@ -36,8 +36,8 @@ class SecurityFilters {
 				}
 								
 				String [] controllersWithAuthUserNotRequired = "api,test".split(",");
-				String [] actionsWithAuthUserNotRequired = "test,login,handleLogin,signup,handleSignup,json".split(",");
-				String [] actionsWithLocationNotRequired = "test,login,logout,handleLogin,signup,handleSignup,chooseLocation,json".split(",");
+				String [] actionsWithAuthUserNotRequired = "test,login,handleLogin,signup,handleSignup,json,updateAuthUserLocale".split(",");
+				String [] actionsWithLocationNotRequired = "test,login,logout,handleLogin,signup,handleSignup,chooseLocation,json,updateAuthUserLocale".split(",");
 				
 				// Not sure when this happens								
 				if (params.controller == null) {
@@ -55,8 +55,8 @@ class SecurityFilters {
 					def targetUri = (request.forwardURI - request.contextPath);
 					if (request.queryString) 
 						targetUri += "?" + request.queryString
-
-					redirect(controller: 'auth', action:'login', params: ['targetUri': targetUri])
+					session.targetUri = targetUri
+					redirect(controller: 'auth', action:'login')
 					return false;
 				}
 					

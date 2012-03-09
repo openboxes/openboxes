@@ -10,6 +10,7 @@ import org.pih.warehouse.product.Product;
 import org.pih.warehouse.receiving.Receipt;
 import org.pih.warehouse.request.Request;
 import org.pih.warehouse.shipping.Shipment;
+import org.pih.warehouse.util.LocalizationUtil;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.Transaction;
@@ -20,7 +21,9 @@ class DashboardController {
 	def orderService
 	def shipmentService;
 	def productService 
-    def index = {
+    
+	
+	def index = {
 		if (!session.warehouse) {			
 			redirect(action: "chooseLocation")			
 		}
@@ -58,9 +61,9 @@ class DashboardController {
 				lastUpdated: it.lastUpdated, 
 				shipment: it)
 		}
-		def products = Product.executeQuery( "select distinct p from Product p where p.lastUpdated >= :lastUpdated", [lastUpdated:new Date()-10, max:10, offset:5] );
+		def products = Product.executeQuery( "select distinct p from Product p where p.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-15, max:10, offset:5] );
 		products.each { 
-			def link = "${createLink(controller: 'product', action: 'show', id: it.id)}"
+			def link = "${createLink(controller: 'inventoryItem', action: 'showStockCard', params:['product.id': it.id])}"
 			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
 			activityType = "${warehouse.message(code: activityType)}"
 			
@@ -80,17 +83,17 @@ class DashboardController {
 			def link = "${createLink(controller: 'inventory', action: 'showTransaction', id: it.id)}"
 			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
 			activityType = "${warehouse.message(code: activityType)}"
-			
+			def label = LocalizationUtil.getLocalizedString(it)
 			activityList << new DashboardActivityCommand(
 				type: "table",
-				label: "${warehouse.message(code:'dashboard.activity.transaction.label', args: [link, it.label(), activityType])}",
+				label: "${warehouse.message(code:'dashboard.activity.transaction.label', args: [link, label, activityType])}",
 				url: link,
 				dateCreated: it.dateCreated,
 				lastUpdated: it.lastUpdated,
 				transaction: it)
 		}
 		
-		def users = User.executeQuery( "select distinct u from User u where u.lastUpdated >= :lastUpdated", [lastUpdated:new Date()-10, max:10, offset:5] );
+		def users = User.executeQuery( "select distinct u from User u where u.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-15, max:10, offset:5] );
 		users.each { 
 			def link = "${createLink(controller: 'user', action: 'show', id: it.id)}"
 			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
@@ -137,6 +140,7 @@ class DashboardController {
 		}
 		render results as JSON
 	}
+	
 	
 	
 	def menu = { 
@@ -196,11 +200,17 @@ class DashboardController {
 			}			
 			
 			// Successfully logged in and selected a warehouse
-			//session.user = userInstance;
-			
-			if (params?.returnUrl) {
-				redirect(uri: params.returnUrl - request.contextPath);
-				return;
+			// Try to redirect to the previous action before session timeout
+			if (session.targetUri || params.targetUri) {
+				if (params.targetUri) { 
+					redirect(uri: params.targetUri);
+					return;
+				}
+				else if (session.targetUri) {
+					redirect(uri: session.targetUri)
+					return;
+				}					
+				//session.remove("targetUri")
 			}
 			redirect(controller:'dashboard', action:'index')
 		}

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Set;
 
 import grails.converters.JSON
 import grails.validation.ValidationException;
@@ -37,6 +38,7 @@ class ShipmentController {
 	def scaffold = Shipment
 	def shipmentService
 	def inventoryService;
+	def mailService
 	
 	def dataSource
 	def sessionFactory
@@ -252,7 +254,9 @@ class ShipmentController {
 				try { 
 					// send the shipment
 					shipmentService.sendShipment(shipmentInstance, params.comment, session.user, session.warehouse, 
-													Date.parse("MM/dd/yyyy", params.actualShippingDate), emailRecipients);
+													Date.parse("MM/dd/yyyy", params.actualShippingDate));
+												
+					triggerSendShipmentEmails(shipmentInstance, session.user, emailRecipients)
 				}
 				catch (TransactionException e) { 
 					transactionInstance = e.transaction
@@ -273,6 +277,34 @@ class ShipmentController {
 		}
 	}
 	
+	
+	/**
+	*
+	* @param shipmentInstance
+	* @param userInstance
+	* @param recipients
+	*/
+   void triggerSendShipmentEmails(Shipment shipmentInstance, User userInstance, Set<Person> recipients) {
+	   log.info "Trigger send shipment emails"
+	   if (!shipmentInstance.hasErrors() && recipients) {
+
+		   // add the current user to the list of email recipients
+		   recipients = recipients + userInstance
+		   
+		   log.info("Mailing shipment emails to ${recipients.name}")
+		   def shipmentName = "${shipmentInstance.name}"
+		   def shipmentType = "${format.metadata(obj:shipmentInstance.shipmentType)}"
+		   // TODO: change this to create an email from a standard template (ie, an email packing list?)
+		   def subject = "${warehouse.message(code:'shipment.hasBeenShipped.message',args:[shipmentType, shipmentName])}"
+		   def body = g.render(template:"/email/shipmentShipped", model:[shipmentInstance:shipmentInstance])
+		   def to = recipients?.collect { it.email }?.unique()
+		   try {
+			   mailService.sendHtmlMail(subject, body.toString(), to)
+		   } catch (Exception e) {
+			   log.error "Error triggering send shipment emails " + e.message
+		   }
+	   }
+   }
 	
 	def rollbackLastEvent = {
 		def shipmentInstance = Shipment.get(params.id)

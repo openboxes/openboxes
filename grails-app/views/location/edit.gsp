@@ -162,8 +162,7 @@
 											</button>
 											&nbsp;
 											<g:link action="list">
-												<img src="${createLinkTo(dir: 'images/icons/silk', file: 'decline.png')}" class="middle"/>
-												${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}						
+												${warehouse.message(code: 'default.button.cancel.label')}						
 											</g:link>			
 										</div>
 									</td>

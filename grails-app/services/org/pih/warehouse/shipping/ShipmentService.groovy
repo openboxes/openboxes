@@ -766,8 +766,8 @@ class ShipmentService {
 	 * @param shipDate
 	 * @param emailRecipients
 	 */
-	void sendShipment(Shipment shipmentInstance, String comment, User userInstance, Location locationInstance, Date shipDate, Set<Person> emailRecipients) { 
-
+	void sendShipment(Shipment shipmentInstance, String comment, User userInstance, Location locationInstance, Date shipDate) { 
+		log.info "Send shipment ${shipmentInstance?.name}"
 		try { 
 			if (!shipDate || shipDate > new Date()) {
 				shipmentInstance.errors.reject("shipment.invalid.invalidShipDate", "Shipping date [" + shipDate + "] must occur on or before today.") 
@@ -791,15 +791,16 @@ class ShipmentService {
 				// Save updated shipment instance (adding an event and comment)
 				if (!shipmentInstance.hasErrors() && shipmentInstance.save()) { 
 					
-					// only need to create a transaction if the source is a Location
+					// TODO only need to create a transaction if the source is a Location - (think about this)
 					if (shipmentInstance.origin?.isWarehouse()) {
 						inventoryService.createSendShipmentTransaction(shipmentInstance)
 					}
-					triggerSendShipmentEmails(shipmentInstance, userInstance, emailRecipients)
+					//triggerSendShipmentEmails(shipmentInstance, userInstance, emailRecipients)
 				}
 				else { 
 					throw new ShipmentException(message: "Failed to send shipment due to errors ", shipment: shipmentInstance)
 				}
+				
 			}
 			
 			// Shipment has errors or it has already shipped or ship date is 
@@ -858,31 +859,7 @@ class ShipmentService {
 	}
 	
 	
-	/**
-	 * 
-	 * @param shipmentInstance
-	 * @param userInstance
-	 * @param recipients
-	 */
-	void triggerSendShipmentEmails(Shipment shipmentInstance, User userInstance, Set<Person> recipients) { 
-	
-		if (!shipmentInstance.hasErrors() && recipients) {
 
-			// add the current user to the list of email recipients
-			recipients = recipients + userInstance
-			
-			log.info("Mailing shipment emails to ${recipients.name}")
-			
-			// TODO: change this to create an email from a standard template (ie, an email packing list?)
-			def subject = "The ${shipmentInstance.shipmentType?.name} shipment ${shipmentInstance.name} has been shipped"
-			def message = "The ${shipmentInstance.shipmentType?.name} shipment ${shipmentInstance.name} has been shipped"
-			try { 
-				mailService.sendMail(subject, message, recipients.email)
-			} catch (Exception e) { 
-				log.error "Error triggering send shipment emails " + e.message
-			}
-		}
-	}
 	
 	
 	void markAsReceived(Shipment shipment, Location location) { 

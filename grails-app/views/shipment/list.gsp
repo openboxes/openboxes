@@ -136,21 +136,32 @@
 											</g:else>
 										</td>
 										
-										<td>				
+										<td>			
+											<g:set var="today" value="${new Date() }"/>	
 											<format:metadata obj="${shipmentInstance?.status.code}"/>
 											<g:if test="${shipmentInstance?.status.date}">
 												- 
+												<g:if test="${shipmentInstance?.status?.date?.equals(today) }">
+													<warehouse:message code="default.today.label"/>
+												</g:if>
+												<g:else>
+													<g:prettyDateFormat date="${shipmentInstance?.status.date}"/>
+												</g:else>
 												<%-- 
 												<format:date obj="${shipmentInstance?.status.date}"/>
 												--%>
-												<g:prettyDateFormat date="${shipmentInstance?.status.date}"/>
 											</g:if>									
 											<g:else>
 												- Expected to ship 
 												<%-- 
 												<format:date obj="${shipmentInstance?.expectedShippingDate}"/>
 												--%>
-												<g:prettyDateFormat date="${shipmentInstance?.expectedShippingDate}"/>
+												<g:if test="${shipmentInstance?.expectedShippingDate?.equals(today) }">
+													<warehouse:message code="default.today.label"/>
+												</g:if>
+												<g:else>
+													<g:prettyDateFormat date="${shipmentInstance?.expectedShippingDate}"/>
+												</g:else>
 											</g:else>
 										</td>
 										<td align="center">

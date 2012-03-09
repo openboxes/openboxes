@@ -7,7 +7,12 @@
 		<content tag="pageTitle">${warehouse.message(code: 'default.dashboard.label', default: 'Dashboard')}</content>
     </head>
     <body>        
-		<div class="body">				
+		<div class="body">		
+		
+			<g:if test="${flash.message}">
+	            <div class="message">${flash.message}</div>
+            </g:if>		
+				
 	    	<div id="dashboard">
 	    		
 				<g:render template="inventorySummary"/>

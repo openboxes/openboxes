@@ -52,6 +52,7 @@ class Shipment implements Comparable, Serializable {
 	
 	static transients = [ 
 		"allShipmentItems",
+		"unpackedShipmentItems",
 		"containersByType", 
 		"mostRecentEvent", 
 		"status",
@@ -149,19 +150,28 @@ class Shipment implements Comparable, Serializable {
 	 * @return
 	 */
 	
-	List<ShipmentItem> getAllShipmentItems() { 		
-		List<ShipmentItem> allShipmentItems = new ArrayList<ShipmentItem>();		
+	Collection<ShipmentItem> getAllShipmentItems() { 		
+		List<ShipmentItem> shipmentItems = new ArrayList<ShipmentItem>();	
+		
+		for (shipmentItem in unpackedShipmentItems) { 
+			shipmentItems.add(shipmentItem)
+		}
+			
 		for (container in containers) {
-			for (item in container?.shipmentItems) { 
-				allShipmentItems.add(item);				
+			for (shipmentItem in container?.shipmentItems) { 
+				shipmentItems.add(shipmentItem);				
 			}
 			for (childContainer in container?.containers) { 
-				for (childItem in childContainer?.shipmentItems) { 
-					allShipmentItems.add(childItem);
+				for (shipmentItem in childContainer?.shipmentItems) { 
+					shipmentItems.add(shipmentItem);
 				}
 			}
 		}
-		return allShipmentItems;		
+		return shipmentItems;		
+	}
+	
+	Collection<ShipmentItem> getUnpackedShipmentItems() { 
+		return shipmentItems.findAll { !it.container }  
 	}
 	
 	String getShipmentNumber() {

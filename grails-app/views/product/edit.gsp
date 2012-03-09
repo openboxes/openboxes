@@ -34,7 +34,7 @@
 
 			<div class="buttonBar">            	
             	<span class="linkButton">
-            		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="['products']"/></g:link>
+            		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'products.label').toLowerCase()]"/></g:link>
             	</span>
            	</div>
 

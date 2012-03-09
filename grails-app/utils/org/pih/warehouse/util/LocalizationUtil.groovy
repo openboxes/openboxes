@@ -1,10 +1,25 @@
 package org.pih.warehouse.util
 
+import org.codehaus.groovy.grails.commons.ApplicationHolder;
+import org.pih.warehouse.inventory.Transaction;
+
 public class LocalizationUtil {
 
 	static final def delimiter = '\\|'
 	static final def localeDelimiter = ':'
 	
+	static localizationService = ApplicationHolder.application.mainContext.getBean("localizationService")
+	
+	static String getLocalizedString(Transaction transaction) {
+		String label = "";
+		label += localizationService.formatMetadata(transaction?.transactionType)
+		label += (transaction?.inventory) ? " - " + localizationService.formatMetadata(transaction?.inventory) : ""
+		//label += (destination) ? " - " + localizationService.formatMetadata(destination) : ""
+		//label += (source) ? " - " + localizationService.formatMetadata(source) : ""
+		label += (transaction?.transactionDate) ? " - " + localizationService.formatDate(transaction?.transactionDate) : ""
+		return label
+	}
+
 	/**
 	 * Returns the value associated with the passed locale
 	 * If locale is null, returns the default value

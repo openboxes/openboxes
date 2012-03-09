@@ -15,7 +15,7 @@
             
 				<div>            	
 	            	<span class="linkButton">
-	            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="['shipper']"/></g:link>
+	            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'shipper.label').toLowerCase()]"/></g:link>
 	            	</span>
             	</div>
                 <table>

@@ -125,8 +125,9 @@ class AuthController {
 						session.warehouse = userInstance.warehouse
 					}
 					
-					if (params?.targetUri) {
-						redirect(uri: params.targetUri);
+					if (session?.targetUri) {
+						redirect(uri: session.targetUri);
+						//session.removeAttribute("targetUri")
 						return;
 					}
 				}
@@ -153,6 +154,7 @@ class AuthController {
 	def logout = { 
 		def username = session.user.username;    	
 		session.user = null;
+		session.locale = null;
 		session.warehouse = null;
 		flash.message = "${warehouse.message(code: 'auth.logoutSuccess.message', args: [username])}"	
 		redirect(action:'login')
@@ -190,23 +192,23 @@ class AuthController {
 					}
 					if (recipients) {
 						recipients.each {
-							def subject = "${warehouse.message(code: 'auth.email.newUserAccountCreated.message')}"
-							def message = "${warehouse.message(code: 'auth.email.pleaseSignInToActivate.message', args: [userInstance.username])}"
-							mailService.sendMail(subject, message, it.email);
+							def subject = "${warehouse.message(code: 'email.userAccountCreated.message', args: [userInstance.username])}"							
+							def body = g.render(template:"/email/userAccountCreated", model:[userInstance:userInstance])
+							mailService.sendHtmlMail(subject, body.toString(), it.email);
 						}
 					}
 				}
 				
 				// Send confirmation email to user 
 				if (userInstance.email) { 
-					def subject = "${warehouse.message(code: 'auth.email.yourNewUserAccountCreated.message')}"
-					def message = "${warehouse.message(code: 'auth.waitForAdministratorToActivate.message')}"
-					mailService.sendMail(subject, message, userInstance.email);
+					def subject = "${warehouse.message(code: 'email.userAccountConfirmed.message')}"
+					def body = g.render(template:"/email/userAccountConfirmed", model:[userInstance:userInstance])
+					mailService.sendHtmlMail(subject, body.toString(), userInstance.email);
 				}
 
 				
-				flash.message = "${warehouse.message(code: 'default.create.message', args: [warehouse.message(code: 'user.label', default: 'User'), userInstance.id])}"
-				redirect(controller:'dashboard', action:'index')
+				flash.message = "${warehouse.message(code: 'default.create.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
+				redirect(action:login)
 			}			
 			else { 
 				// Reset the password to what the user entered

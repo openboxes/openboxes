@@ -68,6 +68,7 @@ class InventoryController {
 		// Pre-populate the sub-category and search terms from the session
 		cmd.subcategoryInstance = Category.get(session?.inventorySubcategoryId)
 		cmd.searchTerms = session?.inventorySearchTerms
+		cmd.showHiddenProducts = session?.showHiddenProducts
 		cmd.showUnsupportedProducts = session?.showUnsupportedProducts
 		cmd.showNonInventoryProducts = session?.showNonInventoryProducts
 		cmd.showOutOfStockProducts = session?.showOutOfStockProducts ?: true
@@ -76,12 +77,19 @@ class InventoryController {
 		if (request.getParameter("searchPerformed")) {
 			cmd.subcategoryInstance = Category.get(params?.subcategoryId)
 			session?.inventorySubcategoryId = cmd.subcategoryInstance?.id
+			
 			cmd.searchTerms = params.searchTerms
 			session?.inventorySearchTerms = cmd.searchTerms
+			
+			cmd.showHiddenProducts = params?.showHiddenProducts == "on"
+			session?.showHiddenProducts = cmd.showHiddenProducts
+
 			cmd.showUnsupportedProducts = params?.showUnsupportedProducts == "on"
 			session?.showUnsupportedProducts = cmd.showUnsupportedProducts
+
 			cmd.showOutOfStockProducts = params?.showOutOfStockProducts == "on"
 			session?.showOutOfStockProducts = cmd.showOutOfStockProducts
+			
 			cmd.showNonInventoryProducts = params?.showNonInventoryProducts == "on"
 			session?.showNonInventoryProducts = cmd.showNonInventoryProducts
 

@@ -55,14 +55,21 @@
 									<td class="name"></td>
 									<td class="value">
 										<warehouse:message code="shipping.confirm.deleteShipment.message"/>
-										<div class="buttons">
+									</td>
+									
+								</tr>
+								<tr class="prop">
+									<td class="name"></td>
+									<td class="value left">								
+										<div>
 											<button type="submit" class="positive"><img
-											src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
+											src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}"
 											 /> <warehouse:message code="default.button.delete.label"/></button>
 											
+											&nbsp;
 											<g:link controller="shipment" action="showDetails" id="${shipmentInstance.id}">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}"
-												 /> <warehouse:message code="default.button.cancel.label"/></g:link>
+												<warehouse:message code="default.button.cancel.label"/>
+											</g:link>
 											
 										</div>
 										

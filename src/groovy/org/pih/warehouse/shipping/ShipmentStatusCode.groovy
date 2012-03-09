@@ -2,6 +2,7 @@ package org.pih.warehouse.shipping
 
 public enum ShipmentStatusCode {
 
+	CREATED(0),
 	PENDING(1),
 	SHIPPED(2),
 	RECEIVED(3)
@@ -15,7 +16,7 @@ public enum ShipmentStatusCode {
 	}
 	
 	static list() {
-		[ PENDING, SHIPPED, RECEIVED ]
+		[ CREATED, PENDING, SHIPPED, RECEIVED ]
 	}
 	
 	

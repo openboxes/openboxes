@@ -35,7 +35,6 @@ class Transaction implements Comparable, Serializable {
 		//lastUpdatedBy = AuthService.currentUser.get
 	}
 	
-	def localizationService
 	String id
     Location source	    		
     Location destination					    		 
@@ -99,17 +98,7 @@ class Transaction implements Comparable, Serializable {
 	String transactionNumber() {
 		return (id) ? "T" + String.valueOf(id).padLeft(6, "0")  : "(new transaction)";
 	}
-	
-	String label() { 
-		String label = "";
-		label += localizationService.formatMetadata(transactionType)		
-		label += (inventory) ? " - " + localizationService.formatMetadata(inventory) : ""
-		//label += (destination) ? " - " + localizationService.formatMetadata(destination) : ""
-		//label += (source) ? " - " + localizationService.formatMetadata(source) : ""
-		label += (transactionDate) ? " - " + localizationService.formatDate(transactionDate) : ""
-		return label
-	}
-	
+		
     
     /**
 	 * Sort by transaction date, and then by date created

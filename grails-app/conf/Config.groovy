@@ -16,13 +16,12 @@ println "Using configuration locations ${grails.config.locations} ${GrailsUtil.e
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
 // }
 grails { 
-	mail { 
-		/**
-		 * By default we enable email.  You can enable/disable email using environment settings below or in your 
-		 * ${user.home}/warehouse-config.properties file 
-		 */
+	mail { 		
+		// By default we enable email.  You can enable/disable email using environment settings below or in your 
+		// ${user.home}/warehouse-config.properties file 
 		enabled = true			
-		from = "info@openboxes.com"
+		from = "openboxes@pih.org"
+		prefix = "[OpenBoxes]"
 		host = "localhost"
 		port = "25"
 	}
@@ -77,9 +76,9 @@ grails.validateable.packages = [
 /* Mail properties */
 mail.error.server = 'localhost'
 mail.error.port = 25
-mail.error.from = 'error@openboxes.com'
+mail.error.from = 'openboxes@pih.org'
 mail.error.to = 'jmiranda@pih.org'
-mail.error.subject = '[Application Error][' + GrailsUtil.environment + ']'
+mail.error.subject = '[OpenBoxes][' + GrailsUtil.environment + '] ERROR'
 mail.error.debug = false
 
 // set per-environment serverURL stem for creating absolute links
@@ -171,14 +170,15 @@ log4j = {
 		'org.springframework',
 		'org.hibernate',
 		'org.pih.warehouse',
-		'org.apache.cxf',
 		'grails.app',
 		'grails.app.bootstrap',
 		'grails.app.service',
 		'grails.app.task',
 		'BootStrap',
 		'liquibase'
-		
+
+	debug 	'org.apache.cxf'		
+	
 	root {
 		error 'stdout', 'smtp'
 		additivity = true

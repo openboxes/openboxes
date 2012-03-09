@@ -171,7 +171,18 @@ class CreateShipmentWorkflowController {
     		
 			on("enterContainerDetails") { 
 				log.info ("Enter container details " + params)
-				[ selectedContainer : Container.get(params?.containerId)]
+				def selectedContainer = Container.get(params?.containerId)
+				if (params.direction) { 
+					def containerList = new ArrayList(flow.shipmentInstance.containers)
+					def sortOrder = selectedContainer ? selectedContainer.sortOrder : -1
+					
+					def index = (sortOrder + Integer.parseInt(params.direction))
+					log.info "current = " + sortOrder + ", nextIndex " + index
+					selectedContainer = containerList.find { it.sortOrder == index }
+				}
+				flow?.shipmentInstance?.refresh()
+				
+				[ selectedContainer : selectedContainer ]
 			}.to("enterContainerDetails")
 			
     		on("next") {

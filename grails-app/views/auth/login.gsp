@@ -26,7 +26,6 @@
 			<g:hiddenField id="browserTimezone" name="browserTimezone" />
 			  
 		    <div class="dialog">
-
 				<div id="loginForm">
 					<g:hasErrors bean="${userInstance}">
 					   <div class="errors">
@@ -42,11 +41,9 @@
 					<fieldset> 			
 						<legend>							
 							<div id="logo">
-								<a class="home" href="${createLink(uri: '/dashboard/index')}" style="text-decoration: none">						    	
-						    		<img src="${createLinkTo(dir:'images/icons/',file:'logo.gif')}" alt="Your Boxes. You're Welcome." 
-						    			class="middle"/>
-						    			<span style="font-size: 2em; vertical-align: middle;"><warehouse:message code="default.openboxes"/></span>
-							    </a>					
+					    		<img src="${createLinkTo(dir:'images/icons/',file:'logo.gif')}" alt="Your Boxes. You're Welcome." 
+					    			class="middle"/>
+				    			<span class="middle title" style="font-size: 2em; color: #666; vertical-align: middle;"><warehouse:message code="default.openboxes.label"/></span>
 							</div>	
 						</legend>
 						<table>
@@ -58,19 +55,19 @@
 									</td>	
 								</tr>
 								<tr class="">
-									<td class="right middle">
+									<td class="right top">
 										<label for="email" class="loginField"><warehouse:message code="user.username.label" default="Username" /></label>
 									</td>
 									<td class="left middle" ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
-										<g:textField class="loginField" id="usernameField" name="username" value="${userInstance?.username}" size="25" />
+										<g:textField class="loginField text" id="usernameField" name="username" value="${userInstance?.username}" size="35" />
 									</td>
 								</tr>
 								<tr class="">
-									<td class="right middle">
+									<td class="right top">
 										<label for="password" class="loginField"><warehouse:message code="user.password.label" default="Password" /></label>
 									</td>
 									<td class="left middle" ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
-										<g:passwordField class="loginField" name="password" value="${userInstance?.password}" size="25" />
+										<g:passwordField class="loginField text" name="password" value="${userInstance?.password}" size="35" />
 									</td>
 								</tr>
 								<tr class="">

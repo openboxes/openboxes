@@ -66,7 +66,9 @@
 			<div class="box">
 				<table border="0">
 					<tr class="odd">
-						<th>Product</th>
+						<th>
+							<warehouse:message code="product.label"/>
+						</th>
 						<g:each var="dateKey" in="${dateKeys }">
 							<th class="center">${dateKey }</th>
 						</g:each>
@@ -93,7 +95,9 @@
 			</div>
 			<div class="right">
 				<img src="${resource(dir:'images/icons/silk',file:'arrow_refresh.png')}" style="vertical-align: middle"/> 				
-				<g:link controller="inventory" action="refreshConsumptionData">Refresh consumption data</g:link>
+				<g:link controller="inventory" action="refreshConsumptionData">
+					<warehouse:message code="consumption.refreshData.label"/>
+				</g:link>
 			</div>
 		</div>
 		

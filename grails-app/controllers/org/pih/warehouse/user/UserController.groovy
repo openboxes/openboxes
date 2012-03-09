@@ -3,11 +3,19 @@ package org.pih.warehouse.user;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.core.Role;
 import org.pih.warehouse.core.RoleType;
+import java.awt.Image as AWTImage
+import java.awt.image.BufferedImage
+import javax.swing.ImageIcon
+import javax.imageio.ImageIO as IIO
+import java.awt.Graphics2D
+
+
 
 class UserController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "GET"]
     def mailService;
+	def userService
 	
     /**
      * Show index page - just a redirect to the list page.
@@ -50,9 +58,9 @@ class UserController {
 			
 			try { 
 				def subject = "${warehouse.message(code:'system.testEmailSubject.label')}"
-				def body = "${warehouse.message(code:'system.testEmailBody.label')}"
+				def body = g.render(template:"/email/userCanReceiveEmail", model:[userInstance:userInstance])
 					
-				mailService.sendMail(subject, body, userInstance?.email)
+				mailService.sendHtmlMail(subject, body, userInstance?.email)
 				flash.message = "Email successfully sent to " + userInstance?.email
 				
 			} catch (Exception e) { 
@@ -108,19 +116,32 @@ class UserController {
     }
 
 	/**
-	* Show a user
-	*/
-   def changePhoto = {
-	   log.info "change photo for given user"
-	   def userInstance = User.get(params.id)
-	   if (!userInstance) {
-		   flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
-		   redirect(action: "list")
-	   }
-	   else {
-		   [userInstance: userInstance]
-	   }
-   }
+	 * Allow user to change their avatar/photo.
+	 */
+	def changePhoto = {
+		log.info "change photo for given user"
+		def userInstance = User.get(params.id)
+		if (!userInstance) {
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
+			redirect(action: "list")
+		}
+		else {
+			[userInstance: userInstance]
+		}
+	}
+	
+	def cropPhoto = { 
+		log.info "change photo for given user"
+		def userInstance = User.get(params.id)
+		if (!userInstance) {
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
+			redirect(action: "list")
+		}
+		else {
+			[userInstance: userInstance]
+		}
+	}
+	
 
     /**
      * Show user preferences.
@@ -155,29 +176,8 @@ class UserController {
 		else {			
 			userInstance.active = !userInstance.active;
 			if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
-				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label', default: 'User'), userInstance.id])}"
-				
-				// FIXME Refactor (place code in service layer)
-				// Send notification emails to all administrators
-				def recipients = [ ];
-				def roleAdmin = Role.findByRoleType(RoleType.ROLE_ADMIN)
-				if (roleAdmin) {
-					def criteria = User.createCriteria()
-					recipients = criteria.list {
-						roles { 
-							eq("id", roleAdmin.id)
-						}
-					}
-				}
-				recipients << userInstance;
-				if (recipients) {
-					recipients.each {
-						println "Sending email to " + it.email;
-						def subject = "User account has been " + (userInstance?.active ? "activated" : "de-activated");
-						def message = "User account " + userInstance?.username + " has been " + (userInstance?.active ? "activated" : "de-activated");
-						mailService.sendMail(subject, message, it.email);
-					}
-				}
+				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label', default: 'User'), userInstance.id])}"				
+				sendUserStatusChanged(userInstance)
 			}
 			else { 
 				render(view: "edit", model: [userInstance: userInstance])
@@ -245,10 +245,18 @@ class UserController {
 	 */
 	
 	def updateAuthUserLocale = {
+		
 		log.info "update auth user locale " + params
 		log.info params.locale == 'debug'
 		if (params.locale == 'debug') { 
-			session.user.locale = new Locale(params.locale)
+			//def locale = new Locale(params.locale)
+			//if (session.user) { 
+			//	session.user.locale = locale;
+			//	session.locale = null				
+			//}
+			//else { 
+			//	session.locale = locale;
+			//}
 			session.useDebugLocale = true
 		}
 		else { 
@@ -267,19 +275,25 @@ class UserController {
 			}
 			
 			// fetch an instance of authenticated user
-			def userInstance = User.get(session.user.id)
+			def userInstance = User.get(session?.user?.id)
+			if (userInstance) {
+				userInstance.locale = locale
+				userInstance.save(flush: true)
+
+				session.locale = null				
+				// update the reference to the user in the session
+				session.user = User.get(userInstance.id)
+			}	
 			
-			// update the user locale & save
-			userInstance.locale = locale
-			userInstance.save(flush: true)
-			
-			// update the reference to the user in the session
-			session.user = User.get(userInstance.id)
+			// when user is anonymous (not logged in)
+			else { 		 
+				session.locale = locale			
+			}
 		}
 		
-		log.info "Redirecting to " + params?.returnUrl
-		if (params?.returnUrl) {
-			redirect(uri: params.returnUrl - request.contextPath);
+		log.info "Redirecting to " + params?.targetUri
+		if (params?.targetUri) {
+			redirect(uri: params.targetUri);
 			return;
 		}
 
@@ -329,32 +343,158 @@ class UserController {
 			response.outputStream << image
 		} 
 		else { 
-			"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
+			"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
 		}
 	} 
 
+	
+	def viewThumb = { 
+		def width = params.width ?: 128
+		def height = params.height ?: 128
+		
+		def userInstance = User.get(params.id);
+		if (userInstance) {
+			byte[] bytes = userInstance.photo
+			resize(bytes, response.outputStream, width, height)
+		}
+		else { 
+			"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
+		}
+	}
 
 	def uploadPhoto = { 
 		
 		def userInstance = User.get(params.id);		
 		if (userInstance) { 
 			def photo = request.getFile("photo");
+			
+			// List of OK mime-types
+			def okcontents = [
+				'image/png',
+				'image/jpeg',
+				'image/gif'
+			]
+			
+			if (! okcontents.contains(photo.getContentType())) {
+				log.info "Photo is not correct type"
+				flash.message = "Photo must be one of: ${okcontents}"
+				render(view: "changePhoto", model: [userInstance: userInstance])
+				return;
+			}
+			
 			if (!photo?.empty && photo.size < 1024*1000) { // not empty AND less than 1MB
 				userInstance.photo = photo.bytes;			
 		        if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
-		            flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label', default: 'User'), userInstance.id])}"
+		            flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
+					sendUserPhotoChanged(userInstance)
 		        }
 		        else {
+		            flash.message = "${warehouse.message(code: 'default.not.updated.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
 					render(view: "uploadPhoto", model: [userInstance: userInstance])
 					return
 		        }
 			}
+			else { 
+	            flash.message = "${warehouse.message(code: 'user.photoTooLarge.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
+				
+			}
             redirect(action: "show", id: userInstance.id)
 		} 
 		else { 
-			"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
+			"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
 		}
 	}
 
+	
+	/**
+	 * 
+	 * @param userInstance
+	 * @return
+	 */
+	def sendUserStatusChanged(User userInstance) {		
+		try { 
+			// Send notification emails to all administrators
+			def users = userService.findUsersByRoleType(RoleType.ROLE_ADMIN)
+			users << userInstance;
+			
+			def recipients = users.collect { it.email }
+			def subject = "${warehouse.message(code:'email.userAccountChanged.message',args:[userInstance?.email])}";
+			def body = "${g.render(template:'/email/userAccountActivated',model:[userInstance:userInstance])}"
+			mailService.sendHtmlMail(subject, body.toString(), recipients);
+			flash.message = "${warehouse.message(code:'email.sent.message',args:[userInstance.email])}"
+		} 
+		catch (Exception e) { 
+			flash.message = "${warehouse.message(code:'email.notSent.message',args:[userInstance.email])}: ${e.message}"
+		}
+		
+	}
+	
+	
+	/**
+	 * 
+	 * @param userInstance
+	 * @return
+	 */
+	def sendUserPhotoChanged(User userInstance) {
+		try {
+			def subject = "${warehouse.message(code:'email.userPhotoChanged.message',args:[userInstance?.email])}";
+			def body = "${g.render(template:'/email/userPhotoChanged',model:[userInstance:userInstance])}"
+			mailService.sendHtmlMailWithAttachment(userInstance, subject, body.toString(), userInstance.photo, "photo.png", "image/png");
+			flash.message = "${warehouse.message(code:'email.sent.message',args:[userInstance.email])}"
+		} 
+		catch (Exception e) { 
+			flash.message = "${warehouse.message(code:'email.notSent.message',args:[userInstance.email])}: ${e.message}"
+		}		
+	}
+
+	/**
+	 * Grails 'mail' way to send an email
+	 * 
+	 * @param userInstance
+	 * @return
+	 */
+	def sendUserConfirmed(User userInstance) {
+		
+		try {
+			sendMail {
+				to "${userInstance.email}"
+				subject	"${warehouse.message(code:'email.userConfirmed.message',args:[userInstance.username])}"
+				html "${g.render(template:"/email/userConfirmed", model:[userInstance:userInstance])}"
+			}
+			flash.message = "${warehouse.message(code:'email.sent.message',args:[userInstance.email])}: ${e.message}"
+			//flash.message = “Confirmation email sent to ${userInstance.emailAddress}”
+		} catch(Exception e) {
+			log.error "Problem sending email $e.message", e
+			flash.message = "${warehouse.message(code:'email.notSent.message',args:[userInstance.email])}: ${e.message}"
+		}
+	}
+		
+	static resize = { bytes, out, maxW, maxH ->
+		AWTImage ai = new ImageIcon(bytes).image
+		int width = ai.getWidth( null )
+		int height = ai.getHeight( null )
+	
+		def limits = 300..2000
+		assert limits.contains( width ) && limits.contains( height ) : 'Picture is either too small or too big!'
+	
+		float aspectRatio = width / height 
+		float requiredAspectRatio = maxW / maxH
+	
+		int dstW = 0
+		int dstH = 0
+		if (requiredAspectRatio < aspectRatio) {
+			dstW = maxW 
+			dstH = Math.round( maxW / aspectRatio)
+		} else {
+			dstH = maxH 
+			dstW = Math.round(maxH * aspectRatio)
+		}
+	
+		BufferedImage bi = new BufferedImage(dstW, dstH,   BufferedImage.TYPE_INT_RGB)
+		Graphics2D g2d = bi.createGraphics() 
+		g2d.drawImage(ai, 0, 0, dstW, dstH, null, null)
+	
+		IIO.write( bi, 'JPEG', out )
+	}
     
 }

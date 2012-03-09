@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
 <g:set var="entityName"
-	value="${warehouse.message(code: 'locationType.label', default: 'LocationType')}" />
+	value="${warehouse.message(code: 'locationType.label')}" />
 <title><warehouse:message code="default.list.label"
 		args="[entityName]" /></title>
 <!-- Specify content to overload like global navigation links, page titles, etc. -->
@@ -24,7 +24,7 @@
 			<div>
 				<span class="linkButton"> <g:link class="new" action="create">
 						<warehouse:message code="default.add.label"
-							args="['locationType']" />
+							args="[warehouse.message(code: 'locationType.label')]" />
 					</g:link>
 				</span>
 			</div>
@@ -33,19 +33,19 @@
 					<tr>
 
 						<g:sortableColumn property="id"
-							title="${warehouse.message(code: 'locationType.id.label', default: 'Id')}" />
+							title="${warehouse.message(code: 'default.id.label')}" />
 
 						<g:sortableColumn property="name"
-							title="${warehouse.message(code: 'locationType.name.label', default: 'Name')}" />
+							title="${warehouse.message(code: 'default.name.label')}" />
 
 						<g:sortableColumn property="description"
-							title="${warehouse.message(code: 'locationType.description.label', default: 'Description')}" />
+							title="${warehouse.message(code: 'default.description.label')}" />
 
 						<g:sortableColumn property="sortOrder"
-							title="${warehouse.message(code: 'locationType.sortOrder.label', default: 'Sort Order')}" />
+							title="${warehouse.message(code: 'default.sortOrder.label')}" />
 
 						<g:sortableColumn property="dateCreated"
-							title="${warehouse.message(code: 'locationType.dateCreated.label', default: 'Date Created')}" />
+							title="${warehouse.message(code: 'default.dateCreated.label')}" />
 
 					</tr>
 				</thead>

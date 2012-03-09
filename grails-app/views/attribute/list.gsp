@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <title><warehouse:message code="attribute.label" /></title>
+        <title><warehouse:message code="default.add.label" args="[warehouse.message(code:'attribute.label').toLowerCase()]"/></title>
     </head>
     <body>
         <div class="body">
@@ -15,16 +15,16 @@
             
 				<div>            	
 	            	<span class="linkButton">
-	            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="[entityName]"/></g:link>
+	            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'attribute.label').toLowerCase()]"/></g:link>
 	            	</span>
             	</div>
                 <table>
                     <thead>
                         <tr>
-                            <g:sortableColumn property="id" title="${warehouse.message(code: 'default.id.label', default: 'Id')}" />
-                            <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label', default: 'Name')}" />
-                            <g:sortableColumn property="options" title="${warehouse.message(code: 'attribute.options.label', default: 'Options')}" />
-                            <g:sortableColumn property="allowOther" title="${warehouse.message(code: 'attribute.allowOther.label', default: 'Allow Other')}" />
+                            <g:sortableColumn property="id" title="${warehouse.message(code: 'default.id.label')}" />
+                            <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" />
+                            <g:sortableColumn property="options" title="${warehouse.message(code: 'attribute.options.label')}" />
+                            <g:sortableColumn property="allowOther" title="${warehouse.message(code: 'attribute.allowOther.label')}" />
                         </tr>
                     </thead>
                     <tbody>

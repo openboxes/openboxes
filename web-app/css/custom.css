@@ -794,3 +794,20 @@ border: 1px solid #CCC;
 	
 }
 
+img.photo {
+  width: 36px;
+  height: 36px;
+}
+img.photo_medium {
+  width: 6em;
+  height: 7.5em;
+}
+img.photo_small {
+  width: 4em;
+  height: 5em;
+}
+
+img.photo_tiny {
+  width: 16px;
+  height: 16px;
+}

@@ -154,28 +154,38 @@
 		<g:render template="/common/footer" />
 	</div>
 	<script type="text/javascript">
-		$(function() { 				
-			var handler = $.PeriodicalUpdater('/warehouse/dashboard/status', 
-				{ 
-					method: 'get', // method; get or post 
-					data: '', // array of values to be passed to the page - e.g. {name: "John", greeting: "hello"} 
-					minTimeout: 5000, // starting value for the timeout in milliseconds 
-					maxTimeout: 60000, // maximum length of time between requests 
-					multiplier: 2, // the amount to expand the timeout by if the response hasn't changed (up to maxTimeout) 
-					type: 'json', // response type - text, xml, json, etc. See $.ajax config options 
-					maxCalls: 10, // maximum number of calls. 0 = no limit. 
-					autoStop: 0 // automatically stop requests after this many returns of the same data. 0 = disabled. 
-				}, 
-				function(remoteData, success, xhr, handle) { 
-					if (remoteData != '') {
-						for (var i = 0; i < remoteData.length; i++) {
-							$('#status').text(remoteData[i].comment);
-						}
-						$('#status').addClass("notice");						
-					}
-				}
-			);
 
+		$(function() { 		
+			<g:if test="${session.useDebugLocale}">
+				$('.copy').click(function(event) {				
+					var copyText = $(this).siblings('.text').text();				
+					alert(copyText);
+					event.preventDefault();
+				});
+			</g:if>
+			
+			<g:if test="${session.user && session.warehouse}">
+				var handler = $.PeriodicalUpdater('/warehouse/dashboard/status', 
+					{ 
+						method: 'get', // method; get or post 
+						data: '', // array of values to be passed to the page - e.g. {name: "John", greeting: "hello"} 
+						minTimeout: 5000, // starting value for the timeout in milliseconds 
+						maxTimeout: 60000, // maximum length of time between requests 
+						multiplier: 2, // the amount to expand the timeout by if the response hasn't changed (up to maxTimeout) 
+						type: 'json', // response type - text, xml, json, etc. See $.ajax config options 
+						maxCalls: 10, // maximum number of calls. 0 = no limit. 
+						autoStop: 0 // automatically stop requests after this many returns of the same data. 0 = disabled. 
+					}, 
+					function(remoteData, success, xhr, handle) { 
+						if (remoteData != '') {
+							for (var i = 0; i < remoteData.length; i++) {
+								$('#status').text(remoteData[i].comment);
+							}
+							$('#status').addClass("notice");						
+						}
+					}
+				);
+			</g:if>
 			$("#warehouse-switch").click(function() {
 				//$("#warehouse-menu").toggle();
 				$("#warehouseMenu").dialog({ 
@@ -267,13 +277,13 @@
 				accordion.accordion( "activate" , 6 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('user')}">
-				accordion.accordion( "activate" , 5 );
+				accordion.accordion( "activate" , 6 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('location')}">
-				accordion.accordion( "activate" , 5 );
+				accordion.accordion( "activate" , 6 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('warehouse/warehouse')}">
-				accordion.accordion( "activate" , 5 );
+				accordion.accordion( "activate" , 6 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('shipment') && request.request.queryString?.contains('incoming')}">
 				accordion.accordion( "activate" , 4 );

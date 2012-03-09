@@ -453,8 +453,7 @@ class InventoryService implements ApplicationContextAware {
 			commandInstance?.warehouseInstance,
 			searchTerms,
 			categoryFilters,
-			commandInstance?.showUnsupportedProducts, 
-			commandInstance?.showNonInventoryProducts);
+			commandInstance?.showHiddenProducts);
 
 
 		products = products?.sort() { it?.name };
@@ -467,7 +466,7 @@ class InventoryService implements ApplicationContextAware {
 	* @param categories
 	* @return
 	*/
-   List getProductsByAll(Location location, List productFilters, List categoryFilters, Boolean showUnsupportedProducts, Boolean showNonInventoryProducts) {
+   List getProductsByAll(Location location, List productFilters, List categoryFilters, Boolean showHiddenProducts) {
 	   // Get products that match the search terms by name and category
 	   def categories = getCategoriesMatchingSearchTerms(productFilters)
 
@@ -480,33 +479,18 @@ class InventoryService implements ApplicationContextAware {
 	   def session = sessionFactory.getCurrentSession()
 	  
 	   // Get all products, including hidden ones 
-	   def products = Product.list()
-	   //def unsupportedProducts = session.createQuery("select product from InventoryLevel as inventoryLevel right outer join inventoryLevel.product as product where (inventoryLevel.status is null or ((inventoryLevel.status = 'SUPPORTED' or inventoryLevel.status = 'NOT_SUPPORTED' or inventoryLevel.status = 'SUPPORTED_NON_INVENTORY') and inventoryLevel.inventory.id = :inventoryId").setParameter("inventoryId", location?.inventory?.id)
-	   //def nonInventoryProducts = 
-	   //def supportedProducts = 
-	   // Start with products that do not have a status
-	   //products.addAll(getSupportedProducts(location))
-	   
-	   log.debug("show unsupported products " + showUnsupportedProducts)
-	   
-	   if (!showUnsupportedProducts) { 
+	   def products = Product.list()	   
+	   if (!showHiddenProducts) { 
 		   def statuses = []
 		   statuses << InventoryStatus.NOT_SUPPORTED
-		   def removeProducts = getProductsByStatuses(location, statuses)
-		   log.debug "remove " + removeProducts.size() + " unsupported products"
+		   statuses << InventoryStatus.SUPPORTED_NON_INVENTORY
+		   
+		   def removeProducts = getProductsByLocationAndStatuses(location, statuses)
+		   log.debug "remove " + removeProducts.size() + " hidden products"
 		   products.removeAll(removeProducts)
 		   
 	   }
-	   
-	   log.debug("show non inventory products " + showNonInventoryProducts)
-	   if (!showNonInventoryProducts) { 
-		   def statuses = []
-		   statuses << InventoryStatus.SUPPORTED_NON_INVENTORY
-		   def removeProducts = getProductsByStatuses(location, statuses)
-		   log.debug "remove " + removeProducts.size() + " non-inventories products"
-		   products.removeAll(removeProducts)
-	   }
-	   
+	   	   
 	   log.debug "base products " + products.size();
 	   if (matchCategories && productFilters) {
 		   def searchProducts = Product.createCriteria().list() {
@@ -591,7 +575,7 @@ class InventoryService implements ApplicationContextAware {
 	   def products = []
 	   products.addAll(getProductsWithoutInventoryLevel(location))
 	   log.debug "Add all without inventory level " + products.size()
-	   products.addAll(getProductsByStatus(location, InventoryStatus.SUPPORTED))
+	   products.addAll(getProductsByLocationAndStatus(location, InventoryStatus.SUPPORTED))
 	   log.debug "add all with status == supported " + products.size()
 	   return products
    }
@@ -608,7 +592,7 @@ class InventoryService implements ApplicationContextAware {
 	   return products
    }
    
-   List getProductsByStatuses(Location location, List statuses) { 
+   List getProductsByLocationAndStatuses(Location location, List statuses) { 
 	   log.debug("get products by statuses: " + location)
 	   def session = sessionFactory.getCurrentSession()
 	   def products = session.createQuery("select product from InventoryLevel as inventoryLevel \
@@ -622,16 +606,17 @@ class InventoryService implements ApplicationContextAware {
    }
    
    
-   List getProductsByStatus(Location location, InventoryStatus status) { 
+   List getProductsByLocationAndStatus(Location location, InventoryStatus status) { 
 	   log.debug("get products by status: " + location)
 	   def session = sessionFactory.getCurrentSession()
-	   return session.createQuery("select product from InventoryLevel as inventoryLevel \
+	   def products = session.createQuery("select product from InventoryLevel as inventoryLevel \
 	   		right outer join inventoryLevel.product as product \
 	   		where inventoryLevel.status = :status \
 	   		and inventoryLevel.inventory.id = :inventoryId")
 	   .setParameter("status", status)
 	   .setParameter("inventoryId", location?.inventory?.id)
 	   .list()
+	   return products
    }
 
 	/**
@@ -1520,11 +1505,16 @@ class InventoryService implements ApplicationContextAware {
 				transactionEntry.inventoryItem = inventoryItem;
 				debitTransaction.addToTransactionEntries(transactionEntry);
 			}
-		
+					
 			if (!debitTransaction.save()) {
 				log.info debitTransaction.errors
 				throw new TransactionException(message: "An error occurred while saving ${debitTransaction?.transactionType?.transactionCode} transaction", transaction: debitTransaction);
 			}
+			
+			// Associate the incoming transaction with the shipment
+			shipmentInstance.addToOutgoingTransactions(debitTransaction)
+			shipmentInstance.save();
+
 		} catch (Exception e) { 
 			log.error("An error occrred while creating transaction ", e);
 			throw e

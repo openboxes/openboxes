@@ -21,13 +21,30 @@
 	  			margin:3px;
 	  			font-family:courier;
 	  		}
+	  		.dialog { 
+	  			display: none;
+	  		}
 	  </style>
   </head>
 
   <body>
-
+  
+  	<div class="center error" style="padding: 10px;">
+		<button class="open-dialog">
+			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bug_add.png')}" style="vertical-align: middle" />&nbsp;
+			<warehouse:message code="default.reportAsBug.label"/>
+			&nbsp;
+		</button>
+		&nbsp;
+		<button class="go-back">
+			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'application_go.png')}" style="vertical-align: middle" />&nbsp;
+			<warehouse:message code="default.ignoreError.label"/>
+			&nbsp;
+		</button>	
+	</div>  
+  
+  
     <h2>Error Details</h2>
-
   	<div class="message">
 		<strong>Error ${request.'javax.servlet.error.status_code'}:</strong> ${request.'javax.servlet.error.message'.encodeAsHTML()}<br/>
 		<strong>Servlet:</strong> ${request.'javax.servlet.error.servlet_name'}<br/>
@@ -51,5 +68,92 @@
 	      <pre><g:each in="${exception.stackTraceLines}">${it.encodeAsHTML()}<br/></g:each></pre>
 	    </div>
 	</g:if>
+	<g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
+	<div class="dialog" title="Report Error - ${targetUri }">
+		<g:form controller="errors" action="processError">
+			<g:hiddenField id="dom" name="dom" value=""/>
+			<g:hiddenField name="targetUri" value="${targetUri}"/>
+			<g:hiddenField name="request.statusCode" value="${request.'javax.servlet.error.status_code'}"/>
+			<g:hiddenField name="request.errorMessage" value="${request.'javax.servlet.error.message'.encodeAsHTML()}"/>
+			<g:hiddenField name="exception.message" value="${exception.message?.encodeAsHTML()}"/>
+			<g:hiddenField name="exception.class" value="${exception.className}"/>
+			<g:hiddenField name="exception.date" value="${new Date() }"/>
+			<table>
+				<%-- 
+				<tr class="prop">
+					<td class="name">
+						<label>To</label>
+					</td>
+					<td class="value">
+						jmiranda@pih.org
+					</td>
+				</tr>
+				<tr class="prop">
+					<td class="name">
+						<label>Cc</label>
+					</td>
+					<td class="value">
+						<g:textField size="100" name="cc" value="${session?.user?.email }"/>
+						<span class="fade">
+							<warehouse:message code="default.separateMultipleAddresses.message"></warehouse:message>
+						</span>
+					</td>
+				</tr>
+				--%>
+				<tr class="prop">
+					<td class="name">
+						<label>Subject</label>
+					</td>
+					<td class="value">
+						${request.'javax.servlet.error.message'.encodeAsHTML()}
+					</td>
+				</tr>
+				<tr class="prop">
+					<td class="name">
+						<label><warehouse:message code="default.comment.label"/></label>
+					</td>
+					<td class="value">
+						<g:textArea name="comments" cols="100" rows="5"></g:textArea>
+					</td>
+				</tr>
+				<tr class="prop">
+					<td class="name"></td>			
+					<td class="value">
+						<button>							
+							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'email_go.png')}" style="vertical-align: middle" />&nbsp;
+							<warehouse:message code="default.submitBugReport.label"/> &nbsp;
+						</button>	
+						&nbsp;
+						<a href="javascript:void(0);" class="close-dialog">
+							<warehouse:message code="default.button.close.label"/>
+						</a>
+					</td>
+				</tr>
+			</table>
+		</g:form>
+	</div>
+	
+	<script>
+
+		$(".go-back").click(function() { 
+			parent.history.back();
+	        return false;
+		});
+		$(".open-dialog").click(function() {
+			var dom = document.getElementsByTagName('html')[0].innerHTML;
+			dom = "<html>" + dom + "</html>"
+			$("#dom").val(dom);
+			
+			$(".dialog").dialog({ 
+				autoOpen: true, 
+				modal: true, 
+				width: '800px'
+			});
+		});
+		$(".close-dialog").click(function() { 
+			$(".dialog").dialog("close"); 
+		});
+
+	</script>
   </body>
 </html>

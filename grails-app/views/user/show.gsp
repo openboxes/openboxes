@@ -1,15 +1,11 @@
-
 <%@ page import="org.pih.warehouse.core.User"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
-<g:set var="entityName"
-	value="${warehouse.message(code: 'user.label', default: 'User')}" />
-<title><warehouse:message code="default.show.label"
-		args="[entityName]" /></title>
-<content tag="pageTitle">
-<warehouse:message code="default.show.label" args="[entityName]" /></content>
+<g:set var="entityName" value="${warehouse.message(code: 'user.label', default: 'User')}" />
+<title><warehouse:message code="default.show.label" args="[entityName]" /></title>
+<content tag="pageTitle"><warehouse:message code="default.show.label" args="[entityName]" /></content>
 
 </head>
 <body>

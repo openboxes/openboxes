@@ -10,6 +10,15 @@
 		--%>
 		<div id="activity-summary" style="max-height: 150px; overflow: auto;">	
 			<table>
+				<thead>
+		 			<tr>
+		 				<td>	
+		 					<span class="fade">		 					
+				 				<warehouse:message code="dashboard.showRecentActivity.message" args="[activityList?.size()]"/>
+			 				</span>
+		 				</td>
+		 			</tr>
+		 		</thead>
 				<tbody>
 					<g:set var="status" value="${0 }"/>
 		 			<g:each var="activity" in="${activityList }" status="i">
@@ -33,19 +42,6 @@
 		 			</g:unless>
 		 		</tbody>	 			
 			</table>			
-		</div>
-		<div>
-			<table>
-				<tfoot>
-		 			<tr>
-		 				<td>	
-		 					<span class="fade">		 					
-				 				<warehouse:message code="dashboard.showRecentActivity.message" args="[activityList?.size()]"/>
-			 				</span>
-		 				</td>
-		 			</tr>
-		 		</tfoot>
-			</table>
 		</div>
 	</div>
 </div>	

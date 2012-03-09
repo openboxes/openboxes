@@ -42,7 +42,9 @@
 					<table>
 						<tr>
 							<td>
-								<label>Shipment</label>
+								<label>
+									<warehouse:message code="shipment.label"/>
+								</label>
 								<g:selectShipment class="filter" name="shipment.id" noSelection="['null':'']" value="${command?.shipment?.id}"/>
 							</td>
 							<%-- 
@@ -95,25 +97,28 @@
 			<div>
 				<table border="0">
 					<tr>
-						<td colspan="5">
+						<td class="left">
+							<img src="${createLinkTo(dir:'images/icons/logos/',file:'pih_logo.jpg')}"  width="34" height="50"/>
+						</td>
+						<td class="center">
 							<div class="title">			
 								<warehouse:message code="report.shippingReport.heading"/>	
-								
 							</div>								
-						</td>							
-					</tr>
-					<tr>
-						<td colspan="5">
+							<div class="subtitle">
+								${session?.warehouse?.name }
+							</div>
 							<div class="subtitle">
 								<warehouse:message code="report.shippingReport.title"/>	
 							</div>							
-						</td>
+						</td>			
+						<td class="right">
+							<img src="${createLinkTo(dir:'images/icons/logos/',file:'pih_logo.jpg')}" width="34" height="50" />
+						</td>				
 					</tr>
-					<tr>
-						<td colspan="5" style="margin: 0; padding: 0;">
-							<hr/>
-						</td>
-					</tr>					
+				</table>
+				<hr/>
+				
+				<table>
 					<tr>				
 						<td class="label">
 							<label>
@@ -177,9 +182,11 @@
 					    					<th rowspan="2" class="center bottom">
 					    						<warehouse:message code="report.expirationDate.label"/><!-- Exp, Expiration date -->
 					    					</th>
+					    					<%-- 
 					    					<th rowspan="2" class="center bottom">
 					    						<warehouse:message code="report.quantityPerBox.label"/><!-- Qté en caisse, Qty in case -->
 					    					</th>
+					    					--%>
 					    					<th colspan="2" class="center bottom">
 												<warehouse:message code="report.quantityDelivered.label"/><!-- Livré, Delivered -->
 											</th>
@@ -218,20 +225,22 @@
 												<td>
 													<format:expirationDate obj="${checklistEntry?.shipmentItem?.expirationDate }"/>
 													
-												</td>							
+												</td>	
+												<%-- 						
 												<td>
 
 												</td>
+												--%>
 												<td>
 
 												</td>
-												<td>
+												<td class="center">
 													${checklistEntry?.shipmentItem?.quantity }
 												</td>
 												<td>
 
 												</td>
-												<td>
+												<td class="center">
 													${checklistEntry?.shipmentItem?.quantity }
 												</td>
 											</tr>

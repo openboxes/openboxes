@@ -38,6 +38,12 @@
 			</div>
 			<div id="searchOptions">
 				<span style="padding-left:10px;">
+					<g:checkBox name="showHiddenProducts" value="${commandInstance.showHiddenProducts}"/>	
+					<warehouse:message code="inventory.showHiddenProducts.label"/>					
+				</span>
+
+				<%-- 			
+				<span style="padding-left:10px;">
 					<g:checkBox name="showUnsupportedProducts" value="${commandInstance.showUnsupportedProducts}" size="24"/>	
 					<warehouse:message code="inventory.showUnsupportedProducts.label"/>					
 				</span>
@@ -45,6 +51,7 @@
 					<g:checkBox name="showNonInventoryProducts" value="${commandInstance.showNonInventoryProducts}" size="24"/>	
 					<warehouse:message code="inventory.showNonInventoryProducts.label"/>					
 				</span>
+				--%>
 				<span style="padding-left:10px;">
 					<g:checkBox name="showOutOfStockProducts" value="${commandInstance.showOutOfStockProducts}" size="24"/>	
 					<warehouse:message code="inventory.showOutOfStockProducts.label"/>					

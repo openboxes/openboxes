@@ -44,7 +44,20 @@ class UserService {
 			sql.execute('delete from user where id = ?', [personId])
 		}
 	}
-
-
+	
+	def findUsersByRoleType(RoleType roleType) { 
+		def users = []
+		def roleAdmin = Role.findByRoleType(RoleType.ROLE_ADMIN)
+		if (roleAdmin) {
+			def criteria = User.createCriteria()
+			users = criteria.list {
+				roles {
+					eq("id", roleAdmin.id)
+				}
+			}
+		}
+		return users;		
+	}
+	
 
 }

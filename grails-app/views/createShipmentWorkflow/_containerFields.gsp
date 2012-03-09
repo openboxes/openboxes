@@ -1,6 +1,6 @@
 <tr class="prop">
 	<td valign="top" class="name">
-		<label><warehouse:message code="default.name.label"/></label>
+		<label><warehouse:message code="container.name.label"/></label>
 	</td>                            
 	<td valign="top" class="value">
 		<g:textField id="name" name="name" size="50" value="${container ? container?.name : box?.name}"/> 

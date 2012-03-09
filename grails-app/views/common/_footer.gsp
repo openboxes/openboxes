@@ -10,18 +10,22 @@
 		<%-- <warehouse:message code="default.date.label"/>: <b>${new Date() }</b>&nbsp;&nbsp; | &nbsp;&nbsp;--%>
 		<warehouse:message code="default.locale.label"/>: &nbsp;  	
 		<!-- show all supported locales -->
+		<g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
 		<g:each in="${grailsApplication.config.locale.supportedLocales}" var="l">
 			<g:set var="locale" value="${new Locale(l)}"/>
-			<a href="${createLink(controller: 'user', action: 'updateAuthUserLocale', params: ['locale':locale,'returnUrl':request.forwardURI])}">
+			<g:set var="selected" value="${locale == session?.user?.locale || locale == session?.locale }"/>
+			<a class="${selected?'selected':''}" href="${createLink(controller: 'user', action: 'updateAuthUserLocale', 
+				params: ['locale':locale,'targetUri':targetUri])}">
 				<!-- fetch the display for locale based on the current locale -->
 				${locale?.getDisplayName(session?.user?.locale ?: new Locale(grailsApplication.config.locale.defaultLocale))}
 			</a> &nbsp;
 		</g:each>
 		<g:isInRole roles="[RoleType.ROLE_ADMIN,RoleType.ROLE_USER]">
-			<a href="${createLink(controller: 'user', action: 'updateAuthUserLocale', params: ['locale':'debug','returnUrl':request.forwardURI])}">
-				Debug
+			<a href="${createLink(controller: 'user', action: 'updateAuthUserLocale', 
+				params: ['locale':'debug','targetUri':targetUri])}">
+				(<warehouse:message code="admin.debug.label"/>)
 			</a>
-		</g:isInRole>
+		</g:isInRole>		
 		<%-- 
 		&nbsp;&nbsp; | &nbsp;&nbsp;
 		<warehouse:message code="default.layout.label"/>: &nbsp; 

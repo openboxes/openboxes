@@ -27,14 +27,15 @@
 						<g:render template="summary"/>
 						<table style="padding: 0px; margin: 0px;">
 							<tbody>
-								<tr style="height: 30px;">
-									<th><warehouse:message code="shipping.package.label"/></th>
-									<th><warehouse:message code="shipping.dimensions.label"/></th>
-									<th><warehouse:message code="default.weight.label"/></th>
-									<th><warehouse:message code="default.item.label"/></th>
-									<th><warehouse:message code="default.lotSerialNo.label"/></th>										
-								</tr>				
-								
+								<thead>
+									<tr>
+										<th><warehouse:message code="container.name.label"/></th>
+										<th><warehouse:message code="shipping.dimensions.label"/></th>
+										<th><warehouse:message code="default.weight.label"/></th>
+										<th><warehouse:message code="default.item.label"/></th>
+										<th><warehouse:message code="default.lotSerialNo.label"/></th>										
+									</tr>				
+								</thead>								
 								<g:set var="counter" value="${0 }"/>
 								<g:findAll var="item" in="${shipmentInstance?.shipmentItems}" expr="${!it.container}" status="itemStatus">
 									<tr class="${(counter++ % 2) == 0 ? 'odd' : 'even'}">

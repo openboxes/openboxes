@@ -104,7 +104,7 @@ input:focus, select:focus, textarea:focus {
     background: url(../images/skin/house.png) center left no-repeat;
 }
 .linkButton a.list {
-    background: url(../images/skin/database_table.png) center left no-repeat;
+    background: url(../images/icons/silk/table.png) center left no-repeat;
 }
 .linkButton a.create {
     background: url(../images/skin/database_add.png) center left no-repeat;
@@ -211,6 +211,10 @@ th.desc a {
     background: #b2d1ff; 
 }
 
+.list tbody tr.none:hover { 
+	background: none;
+}
+
 
 
 /* PAGINATION */
@@ -304,7 +308,13 @@ th.desc a {
 	padding-left: 15px;
 }
 .linkButton a.alert {
+    background: url(../images/icons/silk/alert.png) center left no-repeat;
+}
+.linkButton a.error {
     background: url(../images/icons/silk/error.png) center left no-repeat;
+}
+.linkButton a.email {
+    background: url(../images/icons/silk/email.png) center left no-repeat;
 }
 .linkButton a.settings {
     background: url(../images/icons/settings.png) center left no-repeat;

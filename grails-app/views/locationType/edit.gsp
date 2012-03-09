@@ -29,7 +29,7 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="name"><warehouse:message code="locationType.name.label" default="Name" /></label>
+	                                  <label for="name"><warehouse:message code="default.name.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'name', 'errors')}">
 	                                    <g:textField name="name" value="${locationTypeInstance?.name}" />
@@ -38,7 +38,7 @@
 	                        	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="description"><warehouse:message code="locationType.description.label" default="Description" /></label>
+	                                  <label for="description"><warehouse:message code="default.description.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'description', 'errors')}">
 	                                    <g:textField name="description" value="${locationTypeInstance?.description}" />
@@ -47,7 +47,7 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="sortOrder"><warehouse:message code="locationType.sortOrder.label" default="Sort Order" /></label>
+	                                  <label for="sortOrder"><warehouse:message code="default.sortOrder.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'sortOrder', 'errors')}">
 	                                    <g:textField name="sortOrder" value="${fieldValue(bean: locationTypeInstance, field: 'sortOrder')}" />
@@ -56,11 +56,11 @@
 	                        
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-										<label for="supportedActivities"><warehouse:message code="location.supportedActivities.label" /></label>
+										<label for="supportedActivities"><warehouse:message code="locationType.supportedActivities.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'supportedActivities', 'errors')}">
 	                                	<g:set var="activityList" value="${org.pih.warehouse.core.ActivityCode.list() }"/>
-	                                	<g:select name="supportedActivities" multiple="true" from="${activityList }" size="${activityList.size() }" style="width: 150px" 
+	                                	<g:select name="supportedActivities" multiple="true" from="${activityList }" size="${activityList.size() }" style="width: 300px" 
 	                                		optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${locationTypeInstance?.supportedActivities}" />
 	                                </td>
 	                            </tr>	                            
