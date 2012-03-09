@@ -8,15 +8,19 @@ public class LocalizationUtil {
 	static final def delimiter = '\\|'
 	static final def localeDelimiter = ':'
 	
-	static localizationService = ApplicationHolder.application.mainContext.getBean("localizationService")
+	static localizationService = ApplicationHolder?.application?.mainContext?.getBean("localizationService")
 	
 	static String getLocalizedString(Transaction transaction) {
 		String label = "";
-		label += localizationService.formatMetadata(transaction?.transactionType)
-		label += (transaction?.inventory) ? " - " + localizationService.formatMetadata(transaction?.inventory) : ""
-		//label += (destination) ? " - " + localizationService.formatMetadata(destination) : ""
-		//label += (source) ? " - " + localizationService.formatMetadata(source) : ""
-		label += (transaction?.transactionDate) ? " - " + localizationService.formatDate(transaction?.transactionDate) : ""
+		if (localizationService) { 
+			label += localizationService.formatMetadata(transaction?.transactionType)
+			label += (transaction?.inventory) ? " - " + localizationService.formatMetadata(transaction?.inventory) : ""
+			//label += (destination) ? " - " + localizationService.formatMetadata(destination) : ""
+			//label += (source) ? " - " + localizationService.formatMetadata(source) : ""
+			label += (transaction?.transactionDate) ? " - " + localizationService.formatDate(transaction?.transactionDate) : ""
+		} else { 
+			label += transaction?.transactionNumber()
+		}
 		return label
 	}
 
