@@ -122,8 +122,8 @@ class AutoSuggestEditableTagLib {
 							},
 							/* Callback triggered when the autosuggest box value is changed */
 							change: function(event, ui) {
-								if (console.log)
-								  console.log("changed value " + ui.item.valueText);
+								//if (console.log)
+								//  console.log("changed value " + ui.item.valueText);
 								//console.log("changed " + ui.item)
 								//\$('#${id}-id').val(0);
 								//\$('#${id}-suggest').val(ui.item.valueText);

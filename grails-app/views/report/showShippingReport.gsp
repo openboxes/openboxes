@@ -177,6 +177,9 @@
 					    						<warehouse:message code="report.productDescription.label"/><!-- Description produit, Product description -->
 					    					</th>
 					    					<th rowspan="2" class="center bottom">
+						    					<warehouse:message code="report.container.label"/>
+					    					</th>
+					    					<th rowspan="2" class="center bottom">
 						    					<warehouse:message code="report.lotNumber.label"/><!-- No lot, Lot Number -->
 					    					</th>
 					    					<th rowspan="2" class="center bottom">
@@ -215,6 +218,14 @@
 											<tr>
 												<td>
 													${i+1 }							
+												</td>
+												<td>	   
+													<g:if test="${checklistEntry?.shipmentItem?.container }">
+														${checklistEntry?.shipmentItem?.container?.name} 	
+													</g:if>
+													<g:else>
+														<warehouse:message code="shipping.unpacked.label"/>
+													</g:else>
 												</td>
 												<td>	   
 													<format:product product="${checklistEntry?.shipmentItem?.product}"/> 	

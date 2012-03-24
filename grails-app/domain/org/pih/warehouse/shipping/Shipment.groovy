@@ -207,6 +207,38 @@ class Shipment implements Comparable, Serializable {
 		return events.any { it.eventType?.eventCode == EventCode.RECEIVED }
 	}
 	
+	/*
+	Boolean isIncoming(Location currentLocation) { 
+		//return destination?.id == currentLocation?.id
+		return true;
+	}
+	
+	Boolean isOutgoing(Location currentLocation) { 
+		//return origin?.id == currentLocation?.id
+		return false;
+	}
+	
+	Boolean isIncomingOrOutgoing(Location currentLocation) { 
+		return isIncoming(currentLocation) || isOutgoing(currentLocation)
+	}
+	
+	Boolean isDeleteAllowed(Location currentLocation) { 
+		return isIncomingOrOutgoing(currentLocation)
+	}
+	
+	Boolean isEditAllowed(Location currentLocation) { 
+		return isIncomingOrOutgoing(currentLocation)
+	}
+	*/
+	
+	Boolean isReceiveAllowed() { 
+		return hasShipped() && !wasReceived()
+	}
+	
+	Boolean isSendAllowed() { 
+		return !hasShipped() && !wasReceived()
+	}
+	
 	ReferenceNumber getReferenceNumber(String typeName) { 
 		def referenceNumberType = ReferenceNumberType.findByName(typeName);
 		if (referenceNumberType) { 
@@ -268,7 +300,7 @@ class Shipment implements Comparable, Serializable {
 	 * Adds a new container to the shipment of the specified type
 	 */
 	Container addNewContainer (ContainerType containerType) {
-		def sortOrder = (this.containers) ? this.containers.size()+1 : 1
+		def sortOrder = (this.containers) ? this.containers.size() : 0
 		
 		def container = new Container(
 			containerType: containerType, 

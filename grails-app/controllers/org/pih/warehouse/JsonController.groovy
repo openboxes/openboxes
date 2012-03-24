@@ -40,16 +40,16 @@ class JsonController {
 	def getQuantity = { 
 		log.info params
 		def quantity = 0
-		def warehouse = Location.get(session.warehouse.id);
+		def location = Location.get(session.warehouse.id);
 		def lotNumber = (params.lotNumber) ? (params.lotNumber) : "";
 		def product = (params.productId) ? Product.get(params.productId) : null;
 		
-		log.info "find by lotnumber '" + lotNumber + "' and product '" + product + "'";
 		def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(product, lotNumber);
 		if (inventoryItem) { 
-			quantity = inventoryService.getQuantityForInventoryItem(inventoryItem, warehouse?.inventory)
+			quantity = inventoryService.getQuantityForInventoryItem(inventoryItem, location?.inventory)
 		}
-		render quantity;
+		log.info "quantity by lotnumber '" + lotNumber + "' and product '" + product + "' = " + quantity;
+		render quantity ?: "N/A";
 	}
 	
 	def getContainers = { 
@@ -75,6 +75,7 @@ class JsonController {
 	}
 	
 	def sortContainers = { 
+		
 		def container 
 		params.get("container[]").eachWithIndex { id, index ->
 			container = Container.get(id)
@@ -82,7 +83,8 @@ class JsonController {
 			container.save(flush:true);
 			println ("container " + container.name + " saved at index " + index)
 		}
-		
+		container.shipment.refresh()
+				
 		render(text: "", contentType: "text/plain")
 		
 	}
@@ -114,14 +116,13 @@ class JsonController {
 	def findInventoryItems = {
 		log.info params
 		def inventoryItems = []
-		def warehouse = Location.get(session.warehouse.id);
+		def location = Location.get(session.warehouse.id);
 		if (params.term) {
-			
 			// Improved the performance of the auto-suggest by moving 
 			def tempItems = inventoryService.findInventoryItems(params.term, params.productId)
 			
 			// Get a map of quantities for all items in inventory
-			def quantitiesByInventoryItem = inventoryService.getQuantityForInventory(warehouse?.inventory)
+			def quantitiesByInventoryItem = inventoryService.getQuantityForInventory(location?.inventory)
 			
 			if (tempItems) {
 				/*
@@ -160,10 +161,18 @@ class JsonController {
 							quantity: quantity,
 							expirationDate: it.expirationDate
 						]
-					}					
+					}	
 				}
 			}
 		}
+		if (inventoryItems.size() == 0) { 
+			def message = "${warehouse.message(code:'inventory.noItemsFound.message', args: [params.term])}"
+			inventoryItems << [id: 'null', value: message]			
+		}
+		else { 
+			inventoryItems.sort { it.productName }
+		}
+		
 		render inventoryItems as JSON;
 	}
 	
@@ -465,7 +474,7 @@ class JsonController {
 	
 	def findProductByName = {
 		
-		log.debug(params)
+		log.info(params)
 		def dateFormat = new SimpleDateFormat(Constants.SHORT_MONTH_YEAR_DATE_FORMAT);
 		def products = new TreeSet();
 		
@@ -476,10 +485,10 @@ class JsonController {
 			}
 		}
 		
-		def warehouse = Location.get(params.warehouseId);
-		log.info ("warehouse: " + warehouse);
+		def location = Location.get(params.warehouseId);
+		log.info ("warehouse: " + location);
 		def quantityMap = 
-			inventoryService.getQuantityForInventory(warehouse?.inventory)		
+			inventoryService.getQuantityForInventory(location?.inventory)		
 			
 		// FIXME Needed to create a new map with inventory item id as the index 
 		// in order to get the quantity below.  For some reason, the inventory item 
@@ -509,7 +518,9 @@ class JsonController {
 							[	
 								id: inventoryItem.id?:0, 
 								lotNumber: (inventoryItem?.lotNumber)?:"", 
-								expirationDate: (inventoryItem?.expirationDate) ? (dateFormat.format(inventoryItem?.expirationDate)) : "${warehouse.message(code: 'default.never.label')}", 
+								expirationDate: (inventoryItem?.expirationDate) ? 
+									(dateFormat.format(inventoryItem?.expirationDate)) : 
+									"${warehouse.message(code: 'default.never.label')}", 
 								quantity: quantity
 							] 
 						//}
@@ -525,6 +536,7 @@ class JsonController {
 				// Convert product attributes to JSON object attributes
 				[	
 					product: product,
+					category: product?.category,
 					quantity: productQuantity,
 					value: product.id,
 					label: localizedName,
@@ -535,7 +547,12 @@ class JsonController {
 				]
 			}
 		}
+		
+		if (products.size() == 0) { 
+			products << [ value: null, label: warehouse.message(code:'product.noProductsFound.message')]
+		}
 
+		log.info "Returning " + products.size() + " results for search " + params.term
 		render products as JSON;
 	}
 	

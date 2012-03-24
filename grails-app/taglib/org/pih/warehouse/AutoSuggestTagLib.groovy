@@ -14,6 +14,7 @@ class AutoSuggestTagLib {
 		def width = (attrs.width) ? attrs.width : '300px';
 		def minLength = (attrs.minLength) ? attrs.minLength : 1;
 		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "";
+		def styleClass = (attrs.styleClass) ?: ""
 
 		def showValue = (valueName && valueId) ? true : false;
 		//def spanDisplay = (showValue) ? "inline" : "none";
@@ -24,7 +25,7 @@ class AutoSuggestTagLib {
 		def html = """
 				<span id="${id}-span" class="span" style="text-align: left; display: ${spanDisplay};">${valueName}</span>
 				<input id="${id}-value" class="value" type="hidden" name="${name}.id" value="${valueId}"/>
-				<input id="${id}-suggest" class="autocomplete" type="text" name="${name}.name" value="${valueName}" style="width: ${width}px; display: ${suggestDisplay};">
+				<input id="${id}-suggest" class="autocomplete ${styleClass}" type="text" name="${name}.name" value="${valueName}" style="width: ${width}px; display: ${suggestDisplay};">
 				
 				<script language="javascript">
 					\$(document).ready(function() {
@@ -65,8 +66,8 @@ class AutoSuggestTagLib {
 							change: function(event, ui) {
 								// If the user does not select a value, we remove the value
 								if (!ui.item) { 
-									\$(this).prev().val("");
-									\$(this).val("");
+									\$(this).prev().val("null");  // set the user.id to null
+									\$(this).val("");				// set the value in the textbox to empty string
 								}
 								return false;
 							},

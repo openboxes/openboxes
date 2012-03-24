@@ -16,9 +16,6 @@
 		</div>
 	</g:if>
 	<div class="action-menu-item">
-		<hr/>
-	</div>
-	<div class="action-menu-item">
 		<g:link action="createShipment" event="editContainer" params="[containerToEditId:container?.id]">
 			<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit this container" style="vertical-align: middle"/>&nbsp;
 			<warehouse:message code="shipping.editThis.label"/> ${format.metadata(obj:container?.containerType).toLowerCase()  }

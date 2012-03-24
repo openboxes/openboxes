@@ -31,14 +31,14 @@ textarea, select {
 }
 input[type=text]:focus, 
 input[type=password]:focus,
-input.text:focus, input.large:focus, 
+input.text:focus, input.large:focus, span.large:focus,
 textarea:focus, select:focus { 
   border-color:#666; 
 }
 
 input[type=text], 
 input[type=password],
-input.text, input.large,
+input.text, input.large, span.large,
 textarea, select {
   margin:0;
 }
@@ -49,7 +49,7 @@ input[type=submit] {
 	height: 200px;	
 }*/
 
-input.text, input.large   { padding:5px; }
+input.text, input.large, span.large   { padding:5px; }
 textarea      { padding:5px; }
 
 input[type=checkbox], input[type=radio], 

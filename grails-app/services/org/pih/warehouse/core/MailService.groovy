@@ -24,11 +24,6 @@ class MailService {
 	def sendMail(String subject, String msg, String to) {
 		sendMail(subject, msg, [to])
 	}
-	
-	def sendHtmlMail(String subject, String htmlMessage, String to) {
-		sendHtmlMail(subject, htmlMessage, [to])
-	}
-	
 	def sendMail(String subject, String msg, Collection to) {	
 		log.info("Is email enabled? '" + grailsApplication.config.grails.mail.enabled + "'")
 		log.info(Boolean.valueOf(grailsApplication.config.grails.mail.enabled))
@@ -50,6 +45,12 @@ class MailService {
 				throw e;
 			}
 		}
+	}
+	
+	
+	
+	def sendHtmlMail(String subject, String htmlMessage, String to) {
+		sendHtmlMail(subject, htmlMessage, [to])
 	}
 	
 	def sendHtmlMail(String subject, String body, Collection to) { 	
@@ -76,16 +77,30 @@ class MailService {
 		}
 	}
 
+	
+	
+	def sendHtmlMailWithAttachment(String to, String subject, String body, byte [] bytes, String name, String mimeType) {
+		def toList = new ArrayList();
+		toList.add(to)
+		sendHtmlMailWithAttachment(toList, subject, body, bytes, name, mimeType)
+	}
+
 	def sendHtmlMailWithAttachment(User userInstance, String subject, String body, byte [] bytes, String name, String mimeType) { 
-		
-		log.info ("Sending email with attachment " + userInstance?.email)
+		sendHtmlMailWithAttachment(userInstance?.email, subject, body, bytes, name, mimeType)
+	}	
+
+
+	def sendHtmlMailWithAttachment(Collection toList, String subject, String body, byte [] bytes, String name, String mimeType) { 
+		log.info ("Sending email with attachment " + toList)
 		if (Boolean.valueOf(grailsApplication.config.grails.mail.enabled)) {
 			try {
 				// Create the email message
 				HtmlEmail email = new HtmlEmail();
 				email.setHostName(host);
 				email.setFrom(from);
-				email.addTo(userInstance?.email, userInstance?.name)
+				toList.each { to ->
+					email.addTo(to)
+				}
 				email.setSubject("${prefix} " + subject);
 				email.setHtmlMsg(body);
 				email.setTextMsg(subject);

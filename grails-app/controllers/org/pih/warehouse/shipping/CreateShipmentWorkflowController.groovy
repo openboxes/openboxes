@@ -180,7 +180,6 @@ class CreateShipmentWorkflowController {
 					log.info "current = " + sortOrder + ", nextIndex " + index
 					selectedContainer = containerList.find { it.sortOrder == index }
 				}
-				flow?.shipmentInstance?.refresh()
 				
 				[ selectedContainer : selectedContainer ]
 			}.to("enterContainerDetails")
@@ -337,7 +336,8 @@ class CreateShipmentWorkflowController {
 					invalid()
     			}
     			else {
-    				shipmentService.saveContainer(container)
+					log.info "# containers: " + flow?.shipmentInstance?.containers?.size()
+					shipmentService.saveContainer(container)
 					
     				// save a reference to this container if we need to clone it
     				if (flash.cloneQuantity) { flash.cloneContainer = container }
@@ -385,7 +385,7 @@ class CreateShipmentWorkflowController {
 				 //flash.locationInstance = locationInstance;
 				 
 				 def locations = Location.findAll(locationInstance);
-				 flash.message 
+				 //flash.message 
 				 log.info "saveLocationAction: found " + locations?.size() + " locations"  
 				 if (locations) { 
 					 flash.message = "${warehouse.message(code:'location.alreadyExists.message', args:[locationInstance.name])}"
@@ -682,7 +682,7 @@ class CreateShipmentWorkflowController {
 						
 					// Try to find an existing shipment item
 					def product = Product.get(params?.product?.id)
-					container = Container.get(params.container?.id)
+					container = Container.get(params?.container?.id)
 					def itemFound = new ShipmentItem(lotNumber: params?.lotNumber, product: product, container: container)
 					shipmentItem = shipmentService.findShipmentItem(itemFound)
 					if (shipmentItem) {
@@ -697,7 +697,8 @@ class CreateShipmentWorkflowController {
 					//shipmentItem.shipment = flow.shipmentInstance
 					
 					// Bind the parameters to the item instance
-					bindData(shipmentItem, params, ['product.name','recipient.name'])  // blacklisting names so that we don't change product name or recipient name here!
+					// blacklisting names so that we don't change product name or recipient name here!
+					bindData(shipmentItem, params, ['product.name','recipient.name'])  
 						
 					// If a recipient is not specified, we should
 					if (!shipmentItem?.recipient) {
@@ -709,16 +710,20 @@ class CreateShipmentWorkflowController {
 					
 					// Validate shipment item
 					shipmentItem.shipment = flow.shipmentInstance;
-					if (shipmentService.validateShipmentItem(shipmentItem)) {
-						log.info ("saving new shipment item")
+					
+					// Add shipment item if this is an incoming shipment (bypass on-hand quantity check)
+					if (flow?.shipmentInstance?.destination?.id == session?.warehouse?.id || shipmentService.validateShipmentItem(shipmentItem)) {
+						log.info ("saving new shipment item with container " + container )
 						// Need to validate shipment item before adding it to the shipment
 						flow.shipmentInstance.addToShipmentItems(shipmentItem);
 						shipmentService.saveShipment(flow.shipmentInstance)
+						log.info "Saved item " + shipmentItem.id
+						log.info(shipmentItem.properties)
 						valid()
 					}
 
-				} catch (RuntimeException e) {
-					//log.error("Error saving shipment item ", e)
+				} catch (RuntimeException e) {					
+					log.error("Error saving shipment item ", e)
 					// Need to instantiate an item instance (if it doesn't exist) so we can add errors to it
 					if (!flow.itemInstance) flow.itemInstance = new ShipmentItem();
 					
@@ -749,7 +754,7 @@ class CreateShipmentWorkflowController {
 					
 					// Validate shipment item
 					shipmentItem.shipment = flow.shipmentInstance;
-					if (shipmentService.validateShipmentItem(shipmentItem)) {
+					if (flow?.shipmentInstance?.destination?.id == session?.warehouse?.id || shipmentService.validateShipmentItem(shipmentItem)) {
 						if (!shipmentItem.id) { 
 							log.info ("saving new shipment item")
 							// Need to validate shipment item before adding it to the shipment
@@ -764,7 +769,7 @@ class CreateShipmentWorkflowController {
 					}
 
 				} catch (RuntimeException e) {
-					//log.error("Error saving shipment item ", e)
+					log.error("Error saving shipment item ", e)
 					// Need to instantiate an item instance (if it doesn't exist) so we can add errors to it
 					if (!flow.itemInstance) flow.itemInstance = new ShipmentItem();
 					flow.itemInstance.errors.reject(e.getMessage())

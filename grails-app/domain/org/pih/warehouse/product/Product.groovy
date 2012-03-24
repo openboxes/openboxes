@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.list.LazyList;
+import org.pih.warehouse.core.Document;
 import org.pih.warehouse.core.UnitOfMeasure;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.inventory.InventoryItem;
@@ -51,12 +52,14 @@ class Product implements Comparable, Serializable {
 	
 	static transients = ["rootCategory"];
 	
-	static hasMany = [ categories : Category, attributes : ProductAttribute, tags : String ]
+	static hasMany = [ categories : Category, attributes : ProductAttribute, tags : String, documents : Document ]
 	
 	static mapping = {
 		id generator: 'uuid'
 		categories joinTable: [name:'product_category', column: 'category_id', key: 'product_id']
 		attributes joinTable: [name:'product_attribute', column: 'attribute_id', key: 'product_id']
+		documents joinTable: [name:'product_document', column: 'document_id', key: 'product_id']
+		
 	}
 		
     static constraints = {

@@ -13,7 +13,7 @@ class AutoSuggestStringTagLib {
 		def width = (attrs.width) ? attrs.width : 200;
 		def minLength = (attrs.minLength) ? attrs.minLength : 1;
 		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "";
-
+		def styleClass = (attrs.styleClass)?:"";
 		def showValue = (value) ? true : false;
 		//def spanDisplay = (showValue) ? "inline" : "none";
 		//def suggestDisplay = (showValue) ? "none" : "inline";
@@ -32,7 +32,7 @@ class AutoSuggestStringTagLib {
 				</style>
 				
 				<input id="${id}" type="hidden" name="${name}" value="${value}"/>
-				<input id="${id}-suggest" type="text" name="${name}.autoSuggest" value="${value}" style="width: ${width}px; display: ${suggestDisplay};">
+				<input id="${id}-suggest" type="text" class="${styleClass}" name="${name}.autoSuggest" value="${value}" style="width: ${width}px; display: ${suggestDisplay};">
 				
 				
 				<script>

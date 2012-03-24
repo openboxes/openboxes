@@ -22,18 +22,7 @@
 	                <g:renderErrors bean="${locationInstance}" as="list" />
 	            </div>
             </g:hasErrors>
-            
-			<div class="buttonBar">            	
-            	<span class="linkButton">
-            		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'location.label').toLowerCase()]"/></g:link>
-            	</span>
-            	<span class="linkButton">
-            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'location.label').toLowerCase()]"/></g:link>
-            	</span>
-            	
-           	</div>
-            
-            
+                        
             <g:form method="post" action="update">
             	<fieldset>
             		
@@ -90,16 +79,17 @@
 		                                <label for="manager"><warehouse:message code="warehouse.properties.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value${hasErrors(bean: locationInstance, field: 'active', 'errors')}">
-										<g:checkBox name="active" value="${locationInstance?.active}" />
-										<warehouse:message code="warehouse.active.label" />
-										
-										<g:checkBox name="local" value="${locationInstance?.local}" />
-										<warehouse:message code="warehouse.local.label" />
-										
+										<div>
+											<g:checkBox name="active" value="${locationInstance?.active}" />
+											<warehouse:message code="warehouse.active.label" />
+										</div>										
+										<div>
+											<g:checkBox name="local" value="${locationInstance?.local}" />
+											<warehouse:message code="warehouse.local.label" />
+										</div>
 	                                </td>
 	                            </tr>
 	                            
-	                            <!--                     
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 										<label for="name"><warehouse:message code="location.supportedActivities.label" /></label>
@@ -107,11 +97,11 @@
 	                                <td valign="top" class="value">
 	                                	<g:set var="activityList" value="${org.pih.warehouse.core.ActivityCode.list() }"/>
 	                                	<g:select name="supportedActivities" multiple="true" from="${activityList }" size="${activityList.size()+1 }" style="width: 150px" 
-	                                		optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${locationInstance?.supportedActivities}"
-	                                		noSelection="['':'']" />
+	                                		optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${locationInstance?.supportedActivities?:locationInstance?.locationType?.supportedActivities}"
+	                                		noSelection="['':warehouse.message(code:'location.useDefaultActivities.label')]" />
+	                                	
 	                                </td>
 	                            </tr>
-	                            -->	                            
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="bgColor"><warehouse:message code="warehouse.bgColor.label"/></label>

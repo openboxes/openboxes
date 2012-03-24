@@ -7,22 +7,22 @@ import org.pih.warehouse.core.User;
 class AuthTagLib {
    	
 	//Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
-	def isInRole = { attrs, body ->
+	def isUserInRole = { attrs, body ->
 		
-		def isInRole = false;
+		def isUserInRole = false;
 		def roles = attrs.roles
 		def userInstance = User.get(session?.user?.id)
 		
 		if (!userInstance || !userInstance?.roles) { 
-			isInRole = false;
+			isUserInRole = false;
 		}
 		else { 
 			// FIXME We need to check to see if the currently logged in user has any of the given roles
 			log.debug "attrs: " + attrs?.roles 
-			isInRole = userInstance?.roles.any { attrs.roles.contains(it.roleType) }
+			isUserInRole = userInstance?.roles.any { attrs.roles.contains(it.roleType) }
 		}
 				  
-		if (isInRole) { 
+		if (isUserInRole) { 
 			out << body{}
 		}
 		

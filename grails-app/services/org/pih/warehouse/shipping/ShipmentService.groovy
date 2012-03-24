@@ -430,6 +430,16 @@ class ShipmentService {
 			log.info("Set recipient to " + container.recipient);	
 		}
 		log.info("Set recipient to " + container.recipient);	
+		
+		// Set the sort order
+		log.info("Container sort order " + container.sortOrder)
+		log.info("Container #: " + container?.shipment?.containers?.size())
+		//if (!container.sortOrder) {
+		//	def index = container?.shipment?.containers?.size() ?: 0
+		//	container.sortOrder = index - 1
+		//}
+
+		
 		container.save()
 	}
 	
@@ -446,9 +456,7 @@ class ShipmentService {
 			//}
 		//	throw new UnsupportedOperationException();
 		//}
-		moveContainer(oldContainer, newShipment)
-		
-		//throw new RuntimeException();
+		moveContainer(oldContainer, newShipment)		
 	}
 	
 	/**
@@ -1061,7 +1069,7 @@ class ShipmentService {
 			def criteria = new ShipmentItem(shipment: it.shipment, product: it.product, lotNumber: it.lotNumber);
 			def shipmentItem = findShipmentItem(criteria)
 			
-			// Only add a shipment item for rows that have been 
+			// Only add a shipment item for rows that have a quantity greater than 0
 			if (it.quantity > 0) {
 				
 				if (!it.shipment) { 

@@ -27,15 +27,16 @@
 			  
 		    <div class="dialog">
 				<div id="loginForm">
+				
+					<g:if test="${flash.message}">
+					    <div class="message">${flash.message}</div>
+					</g:if>				
+				
 					<g:hasErrors bean="${userInstance}">
 					   <div class="errors">
 					       <g:renderErrors bean="${userInstance}" as="list" />
 					   </div>
 					</g:hasErrors>		
-					
-					<g:if test="${flash.message}">
-					    <div class="message">${flash.message}</div>
-					</g:if>				
 					
 					
 					<fieldset> 			
@@ -55,7 +56,7 @@
 									</td>	
 								</tr>
 								<tr class="">
-									<td class="right top">
+									<td class="right middle">
 										<label for="email" class="loginField"><warehouse:message code="user.username.label" default="Username" /></label>
 									</td>
 									<td class="left middle" ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
@@ -63,7 +64,7 @@
 									</td>
 								</tr>
 								<tr class="">
-									<td class="right top">
+									<td class="right middle">
 										<label for="password" class="loginField"><warehouse:message code="user.password.label" default="Password" /></label>
 									</td>
 									<td class="left middle" ${hasErrors(bean: userInstance, field: 'password', 'errors')}">

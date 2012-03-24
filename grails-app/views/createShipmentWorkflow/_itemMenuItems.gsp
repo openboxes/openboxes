@@ -17,10 +17,19 @@
 			<warehouse:message code="shipping.removeItem.label"/>
 		</g:link>	
 	</div>
+	<div class="action-menu-item">														
+		<hr/>
+	</div>
+	<div class="action-menu-item">														
+		<g:link controller="inventoryItem" action="showStockCard" params="['product.id':itemInstance?.product?.id]">
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'clipboard.png')}" alt="Show stock card" style="vertical-align: middle"/>&nbsp;
+			<warehouse:message code="inventory.showStockCard.label"/>
+		</g:link>
+	</div>
 </g:if>						
 <g:else>
 	<div class="action-menu-item">														
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="No Actions" style="vertical-align: middle"/>&nbsp;
+		<img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="No Actions" style="vertical-align: middle"/>&nbsp;
 		<warehouse:message code="default.noActions.label"/>
 	</div>
 </g:else>							

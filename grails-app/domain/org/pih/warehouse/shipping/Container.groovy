@@ -115,7 +115,7 @@ class Container implements Comparable, java.io.Serializable {
 	 * Adds a new container to this container of the specified type
 	 */
 	Container addNewContainer (ContainerType containerType) {
-		def sortOrder = (this.containers) ? this.containers.size()+1 : 1
+		def sortOrder = (this.containers) ? this.containers.size() : 0
 		
 		def container = new Container(
 			containerType: containerType, 

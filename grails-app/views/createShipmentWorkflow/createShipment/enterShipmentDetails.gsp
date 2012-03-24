@@ -43,7 +43,9 @@
 												<g:select
 													name="shipmentType.id"
 													from="${org.pih.warehouse.shipping.ShipmentType.list()}"
-													optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${shipmentInstance?.shipmentType?.id}" />								
+													noSelection="['null':'']"
+													optionKey="id" optionValue="${{format.metadata(obj:it)}}" 
+													value="${shipmentInstance?.shipmentType?.id}" />
 											</g:else>
 										</td>
 									</tr>

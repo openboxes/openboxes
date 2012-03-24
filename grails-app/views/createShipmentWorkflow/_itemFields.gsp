@@ -16,7 +16,7 @@
 					<td valign="top" class="value">
 						<%-- <g:textField id="lotNumber" name="lotNumber" width="200" value="${item?.lotNumber}"/>--%>
 						<g:autoSuggestString id="lotNumber" name="lotNumber" jsonUrl="${request.contextPath }/json/findLotsByName?productId=${item?.product?.id }" 
-							width="200" value="${item?.lotNumber}"/> 
+							width="200" value="${item?.lotNumber}" styleClass="text"/> 
 						<!-- <g:link controller="inventory" action="createTransaction" target="_blank"><span class="small">Update Inventory</span></g:link> -->
 					</td>
 				</tr>
@@ -32,14 +32,14 @@
 				<tr class="prop">
 					<td valign="top" class="name"><label><warehouse:message code="default.quantity.label" /></label></td>                            
 					<td valign="top" class="value">
-						<g:textField id="quantity" name="quantity" value="${item?.quantity}" size="5" /> 
+						<g:textField id="quantity" name="quantity" value="${item?.quantity}" size="5" class="text" /> 
 					</td>
 				</tr>  	        
 				<tr class="prop">
 					<td valign="top" class="name"><label><warehouse:message code="shipping.recipient.label"/></label></td>                            
 					<td valign="top" class="value">
 						<g:autoSuggest id="recipient" name="recipient" jsonUrl="${request.contextPath }/json/findPersonByName" 
-							width="200" valueId="${item?.recipient?.id}" valueName="${item?.recipient?.name}"/>							
+							width="200" valueId="${item?.recipient?.id}" valueName="${item?.recipient?.name}" styleClass="text"/>							
 					</td>
 				</tr>
 				<tr>
@@ -47,8 +47,11 @@
 					<td>
 						<div class="buttons left">
 							<g:if test="${itemToEdit}">
-								<g:submitButton name="updateItem" value="${warehouse.message(code:'shipping.updateItem.label')}"></g:submitButton>
+								<g:submitButton name="updateItem" value="${warehouse.message(code:'shipping.saveItem.label')}"></g:submitButton>
+								
+								<%-- 
 								<g:submitButton name="deleteItem" value="${warehouse.message(code:'shipping.removeItem.label')}" onclick="return confirm('${warehouse.message(code:'shipping.confirm.deleteItem.message')}')"></g:submitButton>
+								--%>
 							</g:if>
 							<g:else>
 								<g:submitButton name="saveItem" value="${warehouse.message(code:'shipping.saveItem.label')}"></g:submitButton>

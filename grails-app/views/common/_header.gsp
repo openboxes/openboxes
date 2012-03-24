@@ -12,8 +12,8 @@
 				    </a>
 				</div>
 		    </div>
-		    <div id="bannerRight" class="yui-u" >
-		    	<div id="loggedIn">
+		    <div id="bannerRight" class="yui-u">
+		    	<div id="loggedIn" >
 					<ul>
 					    <g:if test="${session.user}">
 							<li>

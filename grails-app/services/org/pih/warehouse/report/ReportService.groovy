@@ -196,7 +196,8 @@ class ReportService implements ApplicationContextAware {
 	}
 	 */
 	
-	private generatePdf(String url, OutputStream outputStream) { 
+	void generatePdf(String url, OutputStream outputStream) { 
+		log.info "Generate PDF for URL " + url
 		ITextRenderer renderer = new ITextRenderer();
 		renderer.setDocument(url);
 		renderer.layout();

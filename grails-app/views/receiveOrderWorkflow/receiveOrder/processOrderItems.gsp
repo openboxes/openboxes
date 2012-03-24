@@ -326,7 +326,7 @@
 					},
 					change: function(event, ui) {
 						if (!ui.item) { 
-							$(this).prev().val("");
+							$(this).prev().val("null");
 							$(this).val("");
 						}						
 						return false;

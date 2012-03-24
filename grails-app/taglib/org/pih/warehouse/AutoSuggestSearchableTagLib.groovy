@@ -8,6 +8,7 @@ class AutoSuggestSearchableTagLib {
 	def autoSuggestSearchable = { attrs, body ->
 		def id = (attrs.id) ? attrs.id : "autoSuggest_" + (new Random()).nextInt()
 		def name = attrs.name
+		def styleClass = attrs.styleClass
 		def valueId = (attrs.valueId)?:"";
 		def valueName = (attrs.valueName)?:"";
 		def width = (attrs.width) ?: 200;
@@ -21,7 +22,7 @@ class AutoSuggestSearchableTagLib {
 		def suggestDisplay = "inline";
 		
 		def html = """
-			<div>
+			<span>
 				<style>
 					#${id}-suggest {
 						background-image: url('${request.contextPath}/images/icons/silk/magnifier.png');
@@ -33,7 +34,7 @@ class AutoSuggestSearchableTagLib {
 				</style>
 				
 				<input id="${id}-suggest" type="text" name="${name}.name" 
-					value="${valueName}" style="width: ${width}px; display: ${suggestDisplay};"> 	
+					value="${valueName}" style="width: ${width}px; display: ${suggestDisplay};" class="${styleClass}"> 	
 				
 				<script>
 					\$(document).ready(function() {
@@ -64,17 +65,19 @@ class AutoSuggestSearchableTagLib {
 					        	return false;
 					        },
 							select: function(event, ui) {
-								// text display
+								// set text display
 								\$("#lotNumber-text").html(ui.item.lotNumber);
 								\$("#product-text").html(ui.item.productName);
 								\$("#quantity-text").html(ui.item.quantity);
-								
-								// product hidden values
+
+								// set hidden values
 								\$("#productId").val(ui.item.productId);
 								\$("#lotNumber-suggest").val(ui.item.lotNumber);
 								//\$("#quantity").val(ui.item.quantity);
-								updateQuantityOnHand();								
-								//
+
+								// Update on hand quantity
+								updateQuantityOnHand();			
+
 								\$("#itemFoundForm").show();
 								\$("#itemSearchForm").hide();
 								\$("#quantity").focus();
@@ -84,7 +87,7 @@ class AutoSuggestSearchableTagLib {
 					});
 					
 				</script>
-			</div>		
+			</span>		
 		""";
 			
 		

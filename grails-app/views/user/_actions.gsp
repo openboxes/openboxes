@@ -47,14 +47,14 @@
 				</g:link>
 			</div>
 			--%>
-		<g:isInRole roles="[org.pih.warehouse.core.RoleType.ROLE_ADMIN]">
+		<g:isUserInRole roles="[org.pih.warehouse.core.RoleType.ROLE_ADMIN]">
 			<div class="action-menu-item">
 				<g:link action="sendTestEmail" id="${userInstance?.id }">
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'email.png')}" class="middle"/>&nbsp;
 					<warehouse:message code="user.sendTestEmail.label"/>									
 				</g:link>
 			</div>
-		</g:isInRole>
+		</g:isUserInRole>
 		<div class="action-menu-item">
 			<g:link action="toggleActivation" id="${userInstance?.id}">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'user_delete.png')}" class="middle"/>&nbsp;

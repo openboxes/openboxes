@@ -1,6 +1,7 @@
 package org.pih.warehouse.util
 
 import org.codehaus.groovy.grails.commons.ApplicationHolder;
+import org.pih.warehouse.core.LocalizationService;
 import org.pih.warehouse.inventory.Transaction;
 
 public class LocalizationUtil {
@@ -8,10 +9,13 @@ public class LocalizationUtil {
 	static final def delimiter = '\\|'
 	static final def localeDelimiter = ':'
 	
-	static localizationService = ApplicationHolder?.application?.mainContext?.getBean("localizationService")
+	static LocalizationService getLocalizationService() { 
+		return ApplicationHolder?.application?.mainContext?.getBean("localizationService")
+	}
 	
 	static String getLocalizedString(Transaction transaction) {
 		String label = "";
+		def localizationService = getLocalizationService()
 		if (localizationService) { 
 			label += localizationService.formatMetadata(transaction?.transactionType)
 			label += (transaction?.inventory) ? " - " + localizationService.formatMetadata(transaction?.inventory) : ""

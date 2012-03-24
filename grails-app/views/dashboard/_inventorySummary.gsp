@@ -13,6 +13,7 @@
 							<span>
 								<label><warehouse:message code="inventory.filterBy.keyword"/>:</label>
 								<g:textField name="searchTerms" value="" size="40" value="${params.searchTerms }"/>						
+								
 							</span>
 							<g:hiddenField name="resetSearch" value="true"/>							
 							<g:hiddenField name="category.id" value="${rootCategory.id }"/>							

@@ -12,4 +12,14 @@
 		</g:if>		
 	
 		.warehouse { border: 0px solid #F5F5F5; padding: 5px; display: block; } 
+		
+		/* Autocomplete */
+		.autocomplete {
+			background-image: url('${request.contextPath}/images/icons/silk/magnifier.png');
+			background-repeat: no-repeat;
+			background-position: center right;
+			/*padding-left: 20px;*/
+		}
+
+		
 	</style>

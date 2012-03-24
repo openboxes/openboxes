@@ -2,6 +2,7 @@ package org.pih.warehouse.user
 
 import grails.util.GrailsUtil;
 
+import org.apache.commons.mail.EmailException;
 import org.pih.warehouse.core.RoleType;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.core.Role;
@@ -34,61 +35,13 @@ class AuthController {
      * Allows user to log into the system.
      */
     def login = {			
-		//"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
+
 	}
 	
 	
     /** 
      * Performs the authentication logic.
      */
-	
-	/*
-    def handleAuthentication = {
-		log.debug "doLogin"		
-    		def userInstance = User.findWhere(username:params['email'], password:params['password'])
-					
-		// Successfully logged in
-		if (userInstance) {		
-			
-			if (!userInstance?.active) { 
-				flash.message = "Your account is currently inactive."
-				redirect(controller: 'auth', action: 'login');
-				return;
-			}
-			
-			// Need to fetch the manager and roles
-			def warehouse = userInstance?.warehouse?.name;
-			def managerUsername = userInstance?.manager?.username;
-			def roles = userInstance?.roles;
-
-			session.user = userInstance;		
-			session.warehouse = userInstance.warehouse
-			
-			
-			if (params?.targetUri) { 
-				redirect(uri: params.targetUri);
-				return;
-			}
-			redirect(controller:'dashboard',action:'index')
-    		
-		}
-		// Invalid username or password
-		else {
-			
-		    log.info "user does $params.username not exist or password $params.password is incorrect";
-		    //flash.message = "Unable to authenticate user with the provided credentials."
-	
-			userInstance = new User(username:params['username'], password:params['password'])
-
-		    //userInstance = new User();
-		    userInstance.errors.rejectValue("version", "default.authentication.failure",
-		    	[warehouse.message(code: 'user.label', default: 'User')] as Object[], "Unable to authenticate user with the provided credentials.");
-	
-		    render(view: "login", model: [userInstance: userInstance])
-		}
-    }
-	*/
-	
 	def handleLogin = {
 		def userInstance = User.findByUsernameOrEmail(params.username, params.username)
 		
@@ -180,35 +133,36 @@ class AuthController {
 			// Create account 
 			if (!userInstance.hasErrors() && userInstance.save(flush: true)) {				
 				session.user = userInstance;				
-				
-				def recipients = [ ];
-				def roleAdmin = Role.findByRoleType(RoleType.ROLE_ADMIN)
-				if (roleAdmin) {
-					def criteria = User.createCriteria()
-					recipients = criteria.list {
-						roles {
-							eq("id", roleAdmin.id)
+				try {
+					def recipients = [ ];
+					def roleAdmin = Role.findByRoleType(RoleType.ROLE_ADMIN)
+					if (roleAdmin) {
+						def criteria = User.createCriteria()
+						recipients = criteria.list {
+							roles {
+								eq("id", roleAdmin.id)
+							}
 						}
-					}
-					if (recipients) {
-						recipients.each {
+						if (recipients) {							
+							def to = recipients?.collect { it.email }?.unique()							
 							def subject = "${warehouse.message(code: 'email.userAccountCreated.message', args: [userInstance.username])}"							
 							def body = g.render(template:"/email/userAccountCreated", model:[userInstance:userInstance])
-							mailService.sendHtmlMail(subject, body.toString(), it.email);
+							mailService.sendHtmlMail(subject, body.toString(), to);							
 						}
 					}
+				
+					// Send confirmation email to user 
+					if (userInstance.email) { 
+						def subject = "${warehouse.message(code: 'email.userAccountConfirmed.message')}"
+						def body = g.render(template:"/email/userAccountConfirmed", model:[userInstance:userInstance])
+						mailService.sendHtmlMail(subject, body.toString(), userInstance.email);
+					}
+				} catch (EmailException e) { 
+					log.error("Unable to send emails: " + e.message)
 				}
 				
-				// Send confirmation email to user 
-				if (userInstance.email) { 
-					def subject = "${warehouse.message(code: 'email.userAccountConfirmed.message')}"
-					def body = g.render(template:"/email/userAccountConfirmed", model:[userInstance:userInstance])
-					mailService.sendHtmlMail(subject, body.toString(), userInstance.email);
-				}
-
-				
-				flash.message = "${warehouse.message(code: 'default.create.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
-				redirect(action:login)
+				flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'user.label'), userInstance.username])}"
+				redirect(action:"login")
 			}			
 			else { 
 				// Reset the password to what the user entered

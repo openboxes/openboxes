@@ -51,7 +51,7 @@ class UserController {
 	def sendTestEmail = {
 		def userInstance = User.get(params.id)
 		if (!userInstance) {
-			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
 			redirect(action: "list")
 		}
 		else {
@@ -92,7 +92,7 @@ class UserController {
 		userInstance.passwordConfirm = params?.passwordConfirm?.encodeAsPassword();
 
         if (userInstance.save(flush: true)) {
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'user.label', default: 'User'), userInstance.id])}"
+            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
             redirect(action: "show", id: userInstance.id)
         }
         else {
@@ -107,7 +107,7 @@ class UserController {
     def show = {
         def userInstance = User.get(params.id)
         if (!userInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
             redirect(action: "list")
         }
         else {
@@ -122,7 +122,7 @@ class UserController {
 		log.info "change photo for given user"
 		def userInstance = User.get(params.id)
 		if (!userInstance) {
-			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
 			redirect(action: "list")
 		}
 		else {
@@ -134,7 +134,7 @@ class UserController {
 		log.info "change photo for given user"
 		def userInstance = User.get(params.id)
 		if (!userInstance) {
-			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
 			redirect(action: "list")
 		}
 		else {
@@ -159,7 +159,7 @@ class UserController {
     	log.info "edit user"
         def userInstance = User.get(params.id)
         if (!userInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
             redirect(action: "list")
         }
         else {
@@ -171,12 +171,12 @@ class UserController {
 	def toggleActivation = { 
 		def userInstance = User.get(params.id)
 		if (!userInstance) {
-			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
 		}
 		else {			
 			userInstance.active = !userInstance.active;
 			if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
-				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label', default: 'User'), userInstance.id])}"				
+				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"				
 				sendUserStatusChanged(userInstance)
 			}
 			else { 
@@ -197,7 +197,7 @@ class UserController {
             if (params.version) {
                 def version = params.version.toLong()
                 if (userInstance.version > version) {
-                    userInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'user.label', default: 'User')] as Object[], "Another user has updated this User while you were editing")
+                    userInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'user.label')] as Object[], "Another user has updated this User while you were editing")
                     render(view: "edit", model: [userInstance: userInstance])
                     return
                 }
@@ -226,7 +226,7 @@ class UserController {
 					session.user = User.get(userInstance?.id)
 				}
 				
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label', default: 'User'), userInstance.id])}"
+                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
                 redirect(action: "show", id: userInstance.id)
             }
             else {
@@ -234,7 +234,7 @@ class UserController {
             }
         }
         else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
             redirect(action: "list")
         }
     }
@@ -312,23 +312,23 @@ class UserController {
         def userInstance = User.get(params.id)
         if (userInstance) {			
 			if (userInstance?.id == session?.user?.id) { 
-				flash.message = "${warehouse.message(code: 'default.cannot.delete.self.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
+				flash.message = "${warehouse.message(code: 'default.cannot.delete.self.message', args: [warehouse.message(code: 'user.label'), params.id])}"
 				redirect(action: "show", id: params.id)
 			}
 			else { 			
 	            try {
 	                userInstance.delete(flush: true)
-	                flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
+	                flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'user.label'), params.id])}"
 	                redirect(action: "list")
 	            }
 	            catch (org.springframework.dao.DataIntegrityViolationException e) {
-	                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
+	                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'user.label'), params.id])}"
 	                redirect(action: "show", id: params.id)
 	            }
 			}
         }
         else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label', default: 'User'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
             redirect(action: "list")
         }
     }

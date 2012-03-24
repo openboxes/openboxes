@@ -19,6 +19,11 @@ class LocationService {
 		return getLoginLocations(null)
 	}
 	
+	
+	List getLoginLocations(Integer currentLocationId) { 
+		return getLoginLocations(Location.get(currentLocationId))
+	}
+	
 	List getLoginLocations(Location currentLocation) { 
 		def locations = []
 		def requiredActivities = grailsApplication.config.app.loginLocation.requiredActivities

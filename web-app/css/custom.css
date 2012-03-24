@@ -18,9 +18,11 @@ label.error {
 	padding: 10px; 
 }
 
-button { 
-	padding: 1px;
+button.action-btn, button.previous, button.next { 
+	padding: 0px;
 }
+
+
 
 .action-btn { 
 	margin: 1px;
@@ -72,15 +74,6 @@ body {
 
 .debit { 
 	color: red; 
-}
-
-/* Autocomplete */
-
-.autocomplete {
-	background-image: url('${request.contextPath}/images/icons/silk/magnifier.png');
-	background-repeat: no-repeat;
-	background-position: center right;
-	/*padding-left: 20px;*/
 }
 
 /* Action Menu Items */
@@ -439,6 +432,9 @@ label.required {
 }
 label.optional { 
 	color: #AAA;
+}
+label.clear { 
+	display: block;
 }
 
 /* TODO figure out what this was meant for */

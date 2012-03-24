@@ -285,7 +285,7 @@
 			<g:elseif test="${request.request.requestURL.toString().contains('warehouse/warehouse')}">
 				accordion.accordion( "activate" , 6 );
 			</g:elseif>
-			<g:elseif test="${request.request.requestURL.toString().contains('shipment') && request.request.queryString?.contains('incoming')}">
+			<g:elseif test="${(request.request.requestURL.toString().contains('shipment') && request.request.queryString?.contains('incoming'))}" >
 				accordion.accordion( "activate" , 4 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('shipment')}">
