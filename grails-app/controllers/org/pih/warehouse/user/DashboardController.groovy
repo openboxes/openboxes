@@ -37,7 +37,7 @@ class DashboardController {
 		
 		def activityList = []
 		def shipments = Product.executeQuery( "select distinct s from Shipment s where s.lastUpdated >= :lastUpdated and \
-			(s.origin = :origin or s.destination = :destination)", ['lastUpdated':new Date()-15, 'origin':location, 'destination':location] );
+			(s.origin = :origin or s.destination = :destination)", ['lastUpdated':new Date()-7, 'origin':location, 'destination':location] );
 		shipments.each { 
 			def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
 			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
@@ -51,7 +51,7 @@ class DashboardController {
 				shipment: it)
 		}
 		
-		def products = Product.executeQuery( "select distinct p from Product p where p.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-15] );
+		def products = Product.executeQuery( "select distinct p from Product p where p.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-7] );
 		products.each { 
 			def link = "${createLink(controller: 'inventoryItem', action: 'showStockCard', params:['product.id': it.id])}"
 			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
@@ -67,7 +67,7 @@ class DashboardController {
 		}
 		
 		def transactions = Transaction.executeQuery("select distinct t from Transaction t where t.lastUpdated >= :lastUpdated and \
-			t.inventory = :inventory", ['lastUpdated':new Date()-15, 'inventory':location.inventory] );
+			t.inventory = :inventory", ['lastUpdated':new Date()-7, 'inventory':location.inventory] );
 		
 		transactions.each { 
 			def link = "${createLink(controller: 'inventory', action: 'showTransaction', id: it.id)}"
@@ -83,7 +83,7 @@ class DashboardController {
 				transaction: it)
 		}
 		
-		def users = User.executeQuery( "select distinct u from User u where u.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-15] );
+		def users = User.executeQuery( "select distinct u from User u where u.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-7] );
 		users.each { 
 			def link = "${createLink(controller: 'user', action: 'show', id: it.id)}"
 			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
