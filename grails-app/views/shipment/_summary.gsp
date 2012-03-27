@@ -38,12 +38,36 @@
 								<label><format:metadata obj="${shipmentInstance?.status?.code}"/></label>
 							</span>
 						</g:if>
-						<g:if test="${shipmentInstance?.expectedShippingDate }">
-							<span class="expectedShippingDate">
-								<warehouse:message code="shipping.expectedShippingDate.label"/>:						
-								<label><format:date obj="${shipmentInstance?.expectedShippingDate}"/></label> 
-							</span>
+						<g:if test="${!shipmentInstance?.hasShipped() }">
+							<g:if test="${shipmentInstance?.expectedShippingDate }">
+								<span class="expectedShippingDate">
+									<warehouse:message code="shipping.expectedShippingDate.label"/>:						
+									<label><format:date obj="${shipmentInstance?.expectedShippingDate}"/></label> 
+								</span>
+							</g:if>
 						</g:if>
+						<g:else>
+							<span class="actualShippingDate">
+								<warehouse:message code="shipping.actualShippingDate.label"/>:						
+								<label><format:date obj="${shipmentInstance?.actualShippingDate}"/></label> 
+							</span>
+						</g:else>
+						<g:if test="${!shipmentInstance?.wasReceived() }">
+							<g:if test="${shipmentInstance?.expectedDeliveryDate }">
+								<span class="expectedDeliveryDate">
+									<warehouse:message code="shipping.expectedDeliveryDate.label"/>:						
+									<label>
+										<format:date obj="${shipmentInstance?.expectedDeliveryDate}"/>
+									</label> 
+								</span>
+							</g:if>
+						</g:if>
+						<g:else>
+							<span class="actualDeliveryDate">
+								<warehouse:message code="shipping.actualDeliveryDate.label"/>:						
+								<label><format:date obj="${shipmentInstance?.actualDeliveryDate}"/></label> 
+							</span>
+						</g:else>
 					</div>
 											
 						

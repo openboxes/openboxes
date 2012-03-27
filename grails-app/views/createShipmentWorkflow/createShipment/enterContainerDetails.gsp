@@ -121,22 +121,54 @@
 										<table class="sortable" data-update-url="${createLink(controller:'json', action:'sortContainers')}">	
 											<thead>
 												<tr>
-													<th class="left middle">
+													<td colspan="3" class="center">
+														<span class="title">
+															<warehouse:message code="containers.label"/>
+														</span>
+													</td>
+												</tr>
+
+												<tr class="prop">
+													<td class="left middle">
 														<g:link class="button" action="createShipment" event="enterContainerDetails" params="['containerId':selectedContainer?.id,'direction':'-1']">
 															<img src="${resource(dir: 'images/icons/silk', file: 'resultset_previous.png')}" class="middle"/>
 														</g:link>
-													</th>
-													<th class="center middle">														
+													</td>
+													<td class="center middle">														
 														${containerList?.indexOf(selectedContainer)+1} of ${containerList?.size() }
-													</th>
-													<th class="right middle">
+													</td>
+													<td class="right middle">
 														<g:link action="createShipment" event="enterContainerDetails" params="['containerId':selectedContainer?.id,'direction':'1']">
 															<img src="${resource(dir: 'images/icons/silk', file: 'resultset_next.png')}" class="middle"/>
 														</g:link>
-													</th>
-												</tr>											
+													</td>
+												</tr>															
+											
+												<tr class="prop odd">
+													<td colspan="3" class="middle">	
+								 						<table>
+								 							<tr>
+								 								<td>
+											 						<label><warehouse:message code="shipment.numItems.label"/></label> 
+											 					</td>
+											 					<td>
+																	${shipmentInstance?.shipmentItems?.size() }
+																</td>
+															</tr>
+															<tr>
+																<td>
+											 						<label><warehouse:message code="shipping.totalWeight.label"/></label>
+											 					</td>
+											 					<td>
+																	<g:formatNumber format="#,##0.00" number="${shipmentInstance?.totalWeightInPounds() ? shipmentInstance?.totalWeightInPounds() : 0.00 }" /> <warehouse:message code="default.lbs.label"/>
+																</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+																			
 												<g:set var="styleClass" value="${selectedContainer == null ? 'selected' : 'not-selected' }"/>
-												<tr class="${count++%2==0?'odd':'even' } ${styleClass }">
+												<tr class="${count++%2==0?'odd':'even' } ${styleClass } prop">
 													<td class="left " >
 														<span class="action-menu" >
 															<button class="action-btn">
@@ -208,7 +240,7 @@
 																			</g:link>
 																		</g:else>
 																	</span>
-																	${containerInstance?.sortOrder }
+																	<!-- Container Sort Order: ${containerInstance?.sortOrder } -->
 																</div>
 															</td>
 															<td class="containerName"></td> 
@@ -246,25 +278,6 @@
 													</g:each>
 												</g:if>
 											</tbody>
-											<tfoot>												
-												<tr>
-													<td class="middle">
-														<img src="${resource(dir: 'images/icons/silk', file: 'sum.png')}" style="vertical-align: middle"/>
-													</td>
-													<td colspan="2" class="middle">	
-									 					<span class="fade">
-									 						<div>
-									 						<warehouse:message code="shipment.numItems.label"/>: 
-															${shipmentInstance?.shipmentItems?.size() }
-															</div>
-															<div>
-									 						<warehouse:message code="shipping.totalWeight.label"/>: 
-															<g:formatNumber format="#,##0.00" number="${shipmentInstance?.totalWeightInPounds() ? shipmentInstance?.totalWeightInPounds() : 0.00 }" /> <warehouse:message code="default.lbs.label"/>
-															</div>
-														</span>
-													</td>
-												</tr>
-											</tfoot>
 										</table>
 									</div>			 			
 					 			</td>

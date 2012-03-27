@@ -28,7 +28,6 @@ class Shipment implements Comparable, Serializable {
 	Float weight											// weight of container
 	String weightUnits  = Constants.DEFAULT_WEIGHT_UNITS	// standard weight unit: kg, lb
 	
-	
 	// Audit fields
 	Date dateCreated
 	Date lastUpdated
@@ -93,6 +92,7 @@ class Shipment implements Comparable, Serializable {
 		referenceNumbers cascade: "all-delete-orphan"
 		receipt casade: "all-delete-orphan"
 		containers sort: 'sortOrder', order: 'asc'
+		//shipmentItems sort: 'lotNumber', order: 'asc'
 		//events joinTable:[name:'shipment_event', key:'shipment_id', column:'event_id']
 	}	
 

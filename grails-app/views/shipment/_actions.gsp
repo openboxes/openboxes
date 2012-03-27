@@ -60,7 +60,6 @@
 					<warehouse:message code="shipping.editPackingList.label"/></g:link>					
 			</div>
 		</g:if>		
-		
 		<div class="action-menu-item">
 			<g:link controller="shipment" action="showPackingList" id="${shipmentInstance.id}">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'text_list_bullets.png')}" alt="View Packing List" style="vertical-align: middle"/>&nbsp;

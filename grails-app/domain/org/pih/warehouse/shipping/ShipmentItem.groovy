@@ -92,6 +92,14 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 	 * and finally by id. 
 	 */
 	int compareTo(obj) { 
+		def sortOrder = 
+			container?.sortOrder <=> obj?.container?.sortOrder ?:
+				product?.name <=> obj?.product.name ?: 
+					lotNumber <=> obj?.lotNumber ?:
+						quantity <=> obj?.quantity ?:
+							id <=> obj?.id
+		return sortOrder;
+		/*
 		if (!product?.name && obj?.product?.name) {
 			return -1
 		}
@@ -128,6 +136,7 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 				}
 			}
 		}
+		*/
 	}
 	
 	ShipmentItem cloneShipmentItem() {

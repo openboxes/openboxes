@@ -7,7 +7,8 @@
         	body, td, th, div { font-family: 'Times New Roman'; }
         </style>
         <style>
-        	.filter { padding-right: 30px; border-right: 1px solid lightgrey; }
+			table { -fs-table-paginate: paginate; }			
+			.filter { padding-right: 30px; border-right: 1px solid lightgrey; }
         	/*th { text-transform: uppercase; }*/
         	.title { text-align: center; padding: 5px; font-size: 3em; }
         	.subtitle { text-align: center; padding: 15px; font-size: 2em; }
@@ -16,7 +17,7 @@
         	.value { font-weight: bold; width: 30%; }
         	.spacer { width: 10%; }
         	th { border-bottom: 1px solid black; }
-        	td { padding: 10px; }
+        	td { padding: 5px; }
         	table { margin-left: auto; margin-right: auto; }
         	
         </style>
@@ -105,10 +106,12 @@
 								<warehouse:message code="report.shippingReport.heading"/>	
 							</div>								
 							<div class="subtitle">
-								${session?.warehouse?.name }
-							</div>
-							<div class="subtitle">
-								<warehouse:message code="report.shippingReport.title"/>	
+								<div style="line-height: 24px">
+									${session?.warehouse?.name }
+								</div>
+								<div style="line-height: 24px">
+									<warehouse:message code="report.shippingReport.title"/>	
+								</div>
 							</div>							
 						</td>			
 						<td class="right">
@@ -173,11 +176,11 @@
 					    					<th rowspan="2" class="center bottom">
 					    						<warehouse:message code="report.number.label"/><!-- No., Number -->
 					    					</th>
+					    					<th rowspan="2" class="center bottom">
+						    					<warehouse:message code="shipping.container.label"/>
+					    					</th>
 					    					<th rowspan="2" class="bottom">
 					    						<warehouse:message code="report.productDescription.label"/><!-- Description produit, Product description -->
-					    					</th>
-					    					<th rowspan="2" class="center bottom">
-						    					<warehouse:message code="report.container.label"/>
 					    					</th>
 					    					<th rowspan="2" class="center bottom">
 						    					<warehouse:message code="report.lotNumber.label"/><!-- No lot, Lot Number -->
@@ -214,18 +217,24 @@
 					    			</thead>
 					    		
 					    			<tbody>
+					    			
+									    <g:set var="previousContainer"/>
+										<g:set var="shipmentItemsByContainer" value="${command?.checklistReportEntryList?.groupBy { it?.shipmentItem?.container } }"/>
 								    	<g:each var="checklistEntry" in="${command?.checklistReportEntryList }" status="i">
-											<tr>
-												<td>
+										    <g:set var="rowspan" value="${shipmentItemsByContainer[checklistEntry?.shipmentItem?.container]}"/>
+											<tr class="noborder">
+												<td class="center">
 													${i+1 }							
 												</td>
-												<td>	   
-													<g:if test="${checklistEntry?.shipmentItem?.container }">
-														${checklistEntry?.shipmentItem?.container?.name} 	
+												<td class="center" rowspan="${rowspan }">	
+													<g:if test="${checklistEntry?.shipmentItem?.container != previousContainer }">
+														<g:if test="${checklistEntry?.shipmentItem?.container }">
+															${checklistEntry?.shipmentItem?.container?.name} 	
+														</g:if>
+														<g:else>
+															<warehouse:message code="shipping.unpacked.label"/>
+														</g:else>
 													</g:if>
-													<g:else>
-														<warehouse:message code="shipping.unpacked.label"/>
-													</g:else>
 												</td>
 												<td>	   
 													<format:product product="${checklistEntry?.shipmentItem?.product}"/> 	
@@ -255,6 +264,7 @@
 													${checklistEntry?.shipmentItem?.quantity }
 												</td>
 											</tr>
+								    		<g:set var="previousContainer" value="${checklistEntry?.shipmentItem?.container}"/>
 										</g:each>
 									</tbody>
 								</table>

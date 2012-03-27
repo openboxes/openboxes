@@ -739,12 +739,12 @@ class DocumentService {
 			row.getCell(6).setCellStyle(tableHeaderLeftStyle);
 
 			def previousContainer = "", initialRowIndex = 0, finalRowIndex = 0;
-			shipmentInstance.shipmentItems.sort { it?.container?.sortOrder }. each { itemInstance ->
+			shipmentInstance.shipmentItems.sort(). each { itemInstance ->
 				log.debug "Adding item  to packing list " + itemInstance?.product?.name + " -> " + itemInstance?.container?.name
 				row = sheet.createRow((short)counter++);
 				
 				if (previousContainer != itemInstance?.container?.name) { 
-					row.createCell(0).setCellValue(itemInstance?.container?.name);
+					row.createCell(0).setCellValue(itemInstance?.container?.name?:getMessageTagLib().message(code:'shipping.unpacked.label').toString());
 					row.getCell(0).setCellStyle(tableDataCenterStyle);
 					// If we're at a place in the XLS file where we want to merge cells (e.g. the packing list)
 					// Then we merge rows when the container name is different from the previous container name
