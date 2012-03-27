@@ -3171,8 +3171,8 @@
 		<dropColumn tableName="transaction_entry" columnName="lot_number"/>
 	</changeSet>
 	
-	<changeSet author="jmiranda" id="2011-04-13-1-1">
-		<preConditions onFail="MARK_RAN">
+	<changeSet author="jmiranda" id="2011-04-13-1-1" failOnError="false">
+		<preConditions onFail="MARK_RAN" >
 			<indexExists indexName="FKABC21FD1DED5FAE7"/>
 		</preConditions>
 		<sql>
