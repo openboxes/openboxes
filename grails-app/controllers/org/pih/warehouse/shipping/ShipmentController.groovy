@@ -232,6 +232,7 @@ class ShipmentController {
 	
 	def sendShipment = {
 		def transactionInstance 
+		def userInstance = User.get(session.user.id)
 		def shipmentInstance = Shipment.get(params.id)
 		def shipmentWorkflow = shipmentService.getShipmentWorkflow(params.id)
 
@@ -254,10 +255,9 @@ class ShipmentController {
 				params.emailRecipientId?.each ( { emailRecipients = emailRecipients + Person.get(it) } )
 				try { 
 					// send the shipment
-					//shipmentService.sendShipment(shipmentInstance, params.comment, session.user, session.warehouse, 
-					//								Date.parse("MM/dd/yyyy", params.actualShippingDate));
-												
-					triggerSendShipmentEmails(shipmentInstance, session.user, emailRecipients)
+					shipmentService.sendShipment(shipmentInstance, params.comment, session.user, session.warehouse, 
+													Date.parse("MM/dd/yyyy", params.actualShippingDate));
+					triggerSendShipmentEmails(shipmentInstance, userInstance, emailRecipients)
 				}
 				catch (TransactionException e) { 
 					transactionInstance = e.transaction

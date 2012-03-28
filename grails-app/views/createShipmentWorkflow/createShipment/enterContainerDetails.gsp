@@ -240,7 +240,6 @@
 																			</g:link>
 																		</g:else>
 																	</span>
-																	<!-- Container Sort Order: ${containerInstance?.sortOrder } -->
 																</div>
 															</td>
 															<td class="containerName"></td> 
@@ -421,7 +420,7 @@
 											</g:if>
 											<g:unless test="${shipmentItems }">
 												<tr class="none">
-													<td colspan="5">
+													<td colspan="6" class="middle center" style="height: 150px;">
 														<div class="middle center">
 															<span class="fade">
 																<warehouse:message code="shipment.noShipmentItems.message"/>

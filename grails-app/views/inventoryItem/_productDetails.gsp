@@ -1,12 +1,9 @@
 
 <%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
-<style>
-	.even { background-color: #f7f7f7; }
-</style>
 <div id="product-details" style="border: 1px solid lightgrey">
 	<table>
 		<thead>
-			<tr class="odd" style="background-color: #eee; border-bottom: 3px solid lightgrey; ">
+			<tr class="even" style="background-color: #eee; border-bottom: 3px solid lightgrey; ">
 				<td class="center" colspan="2">
 					<label>${warehouse.message(code: 'product.details.label') }</label>
 				</td>
@@ -14,7 +11,7 @@
 		</thead>
 		<tbody>
 			<%-- 
-			<tr class="details odd">	
+			<tr class="details even">	
 				<td class="left label">
 					<span class="name"><warehouse:message code="default.name.label"/></span>
 				</td>
@@ -22,7 +19,7 @@
 					<span class="value"><format:product product="${productInstance}"/></span>
 				</td>
 			</tr>
-			<tr class="odd">
+			<tr class="even">
 				<td colspan="2" class="middle center">
 					<img src="${resource(dir: 'images/', file: 'Advil_200mg_Caplets.jpg')}" width="100" height="140" class="zoom"/>
 					<script type="text/javascript">
@@ -45,7 +42,7 @@
 			</tr>
 			--%>
 			
-			<tr class="details even">	
+			<tr class="details odd">	
 				<td class="label left">
 					<span class="name"><warehouse:message code="default.status.label"/></span>
 				</td>
@@ -78,7 +75,7 @@
 					</span>
 				</td>
 			</tr>				
-			<tr class="details odd">	
+			<tr class="details even">	
 				<td class="label left">
 					<span class="name"><warehouse:message code="product.onHandQuantity.label"/></span>
 				</td>
@@ -88,7 +85,7 @@
 				</td>
 			</tr>			
 				
-			<tr class="details even">	
+			<tr class="details odd">	
 				<td class="left label">
 					<span class="name"><warehouse:message code="product.units.label"/></span>
 				</td>
@@ -96,7 +93,7 @@
 					<span class="value"><format:metadata obj="${productInstance?.unitOfMeasure}"/></span>
 				</td>
 			</tr>
-			<tr class="details odd">	
+			<tr class="details even">	
 				<td class="left label">
 					<span class="name"><warehouse:message code="category.label"/></span>
 				</td>
@@ -112,7 +109,7 @@
 				</td>
 			</tr>
 			
-			<tr class="details even">	
+			<tr class="details odd">	
 				<td class="left label">
 					<span class="name"><warehouse:message code="product.manufacturer.label"/></span>
 				</td>
@@ -128,7 +125,7 @@
 				</td>
 			</tr>
 			
-			<tr class="details odd">	
+			<tr class="details even">	
 				<td class="left label">
 					<span class="name"><warehouse:message code="product.manufacturerCode.label"/></span>
 				</td>
@@ -144,7 +141,7 @@
 				</td>
 			</tr>
 			
-			<tr class="details even">	
+			<tr class="details odd">	
 				<td class="left label">
 					<span class="name"><warehouse:message code="product.upc.label"/></span>
 				</td>
@@ -160,7 +157,7 @@
 				</td>
 			</tr>
 			
-			<tr class="details odd">	
+			<tr class="details even">	
 				<td class="left label">
 					<span class="name"><warehouse:message code="product.ndc.label"/></span>
 				</td>
@@ -176,7 +173,7 @@
 				</td>
 			</tr>
 			
-			<tr class="details even">	
+			<tr class="details odd">	
 				<td class="left label">
 					<span class="name"><warehouse:message code="product.coldChain.label"/></span>
 				</td>
@@ -185,7 +182,7 @@
 				</td>
 			</tr>
 			<g:each var="productAttribute" in="${productInstance?.attributes}" status="status">
-				<tr class="${status%2==0?'odd':'even' }">
+				<tr class="${status%2==0?'even':'odd' }">
 					<td class="label left">
 						<span class="name"><format:metadata obj="${productAttribute?.attribute}"/></span>
 					</td>
@@ -194,7 +191,7 @@
 					</td>
 				</tr>													
 			</g:each>
-			<tr class="details odd">
+			<tr class="details even">
 				<td class="label left">
 					<span class="name"><warehouse:message code="product.minLevel.label"/></span>
 				</td>
@@ -212,7 +209,7 @@
 					</span>
 				</td>				
 			</tr>
-			<tr class="details even">
+			<tr class="details odd">
 				<td class="label left">
 					<span class="name"><warehouse:message code="product.reorderLevel.label"/></span>
 				</td>

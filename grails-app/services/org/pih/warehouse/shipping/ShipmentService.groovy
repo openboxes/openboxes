@@ -803,7 +803,6 @@ class ShipmentService {
 					if (shipmentInstance.origin?.isWarehouse()) {
 						inventoryService.createSendShipmentTransaction(shipmentInstance)
 					}
-					//triggerSendShipmentEmails(shipmentInstance, userInstance, emailRecipients)
 				}
 				else { 
 					throw new ShipmentException(message: "Failed to send shipment due to errors ", shipment: shipmentInstance)
