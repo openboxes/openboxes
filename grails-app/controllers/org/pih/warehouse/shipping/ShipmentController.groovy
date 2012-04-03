@@ -257,7 +257,7 @@ class ShipmentController {
 					// send the shipment
 					shipmentService.sendShipment(shipmentInstance, params.comment, session.user, session.warehouse, 
 													Date.parse("MM/dd/yyyy", params.actualShippingDate));
-					triggerSendShipmentEmails(shipmentInstance, userInstance, emailRecipients)
+					//triggerSendShipmentEmails(shipmentInstance, userInstance, emailRecipients)
 				}
 				catch (TransactionException e) { 
 					transactionInstance = e.transaction
@@ -279,45 +279,7 @@ class ShipmentController {
 	}
 	
 	
-	/**
-	*
-	* @param shipmentInstance
-	* @param userInstance
-	* @param recipients
-	*/
-   void triggerSendShipmentEmails(Shipment shipmentInstance, User userInstance, Set<Person> recipients) {
-	   log.info "Trigger send shipment emails"
-	   if (!shipmentInstance.hasErrors() && recipients) {
 
-		   // add the current user to the list of email recipients
-		   recipients = recipients + userInstance
-		   
-		   log.info("Mailing shipment emails to ${recipients.name}")
-		   def shipmentName = "${shipmentInstance.name}"
-		   def shipmentType = "${format.metadata(obj:shipmentInstance.shipmentType)}"
-		   // TODO: change this to create an email from a standard template (ie, an email packing list?)
-		   def subject = "${warehouse.message(code:'shipment.hasBeenShipped.message',args:[shipmentType, shipmentName])}"
-		   def body = g.render(template:"/email/shipmentShipped", model:[shipmentInstance:shipmentInstance])
-		   def to = recipients?.collect { it.email }?.unique()
-		   
-		   // Generate PDF based on the packing list report
-		   def url = "${createLink(controller:'report', action: 'showShippingReport', absolute: true)}"
-		   url += ";jsessionid=" + session.getId()
-		   url += "?print=true&orientation=portrait&format=pdf"
-		   url += "&shipment.id=" + shipmentInstance.id
-		   url += "&includeEntities=true"		   
-		   //def url = "http://localhost:8080/warehouse/report/showShippingReport;jsessionid=D31A0CB3B73EFF4261C53B98F7D7562A?print=true&orientation=portrait&shipment.id=ff80818135f08caa0135f08dc7140001&includeEntities=true"
-		   def baos = new ByteArrayOutputStream(); 		  
-		   reportService.generatePdf(url, baos)
-		   
-		   try {
-			   //mailService.sendHtmlMail(subject, body.toString(), to)
-			   mailService.sendHtmlMailWithAttachment(to, subject, body.toString(), baos.toByteArray(), "packing-list.pdf", "application/pdf")
-		   } catch (Exception e) {
-			   log.error "Error triggering send shipment emails " + e.message
-		   }
-	   }
-   }
 	
 	def rollbackLastEvent = {
 		def shipmentInstance = Shipment.get(params.id)

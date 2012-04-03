@@ -8,8 +8,8 @@
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<content tag="pageTitle"><warehouse:message code="default.show.label" args="[entityName]" /></content>
 	<style>
-		.container { border-right: 1px solid lightgrey; background-color: f7f7f7; }
-		.newContainer { border-top: 1px solid lightgrey }
+		.container { border-right: 2px solid lightgrey; background-color: f7f7f7; }
+		.newContainer { border-top: 2px solid lightgrey }
 	</style>
 </head>
 
@@ -36,6 +36,7 @@
 									</td>
 									<td valign="top">
 										<format:metadata obj="${shipmentInstance?.status.code}"/>
+										<%-- 
 										<span>
 											<g:if test="${shipmentInstance?.status?.location}">
 												<span>-</span>
@@ -47,6 +48,7 @@
 												<span><format:date obj="${shipmentInstance?.status.date}"/></span>
 											</g:if>
 										</span>
+										--%>
 									</td>
 								</tr>
 								<tr class="prop">
@@ -59,14 +61,16 @@
 										</g:else>
 									</td>
 									<td valign="top" >
-										<span>
+										<span class="location">
 											${fieldValue(bean: shipmentInstance, field: "origin.name")}									
 										</span>
+										<%-- 
 										<span class="fade">
 											<g:if test="${shipmentInstance.expectedShippingDate && !shipmentInstance.hasShipped()}">
 												- <format:date obj="${shipmentInstance?.expectedShippingDate}"/>
 											</g:if>
-										</span>											
+										</span>
+										--%>											
 									</td>
 								</tr>
 								<tr class="prop">
@@ -81,12 +85,14 @@
 									<td>
 										<span>
 											${fieldValue(bean: shipmentInstance, field: "destination.name")}
-										</span>											
+										</span>					
+										<%-- 						
 										<span class="fade">
 											<g:if test="${shipmentInstance.expectedDeliveryDate && !shipmentInstance?.wasReceived()}">
 												- <format:date obj="${shipmentInstance?.expectedDeliveryDate}"/>
 											</g:if>
-										</span>											
+										</span>
+										--%>											
 									</td>
 								</tr>
 								<tr class="prop">
@@ -515,7 +521,7 @@
 													<g:set var="newContainer" value="${previousContainer != shipmentItem?.container }"/>
 													<tr class="${(count++ % 2 == 0)?'odd':'even'} ${newContainer?'newContainer':''}">
 														<g:if test="${newContainer }">
-															<td class="container middle center" rowspan="${rowspan }">
+															<td class="container top left" style="width: 25%" rowspan="${rowspan }">
 																<%-- <img src="${createLinkTo(dir: 'images/icons/silk', file: 'package.png')}" style="vertical-align: middle"/>&nbsp;--%>
 																<label>
 																	<g:if test="${shipmentItem?.container?.parentContainer}">${shipmentItem?.container?.parentContainer?.name } &rsaquo;</g:if>

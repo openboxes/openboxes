@@ -6,6 +6,11 @@
 	<title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<content tag="pageTitle"><warehouse:message code="shipping.packingList.label"/></content>
+	
+	<style>
+		.container { border-right: 1px solid lightgrey; background-color: f7f7f7; }
+		.newContainer { border-top: 1px solid lightgrey }
+	</style>	
 </head>
 
 <body>
@@ -25,131 +30,91 @@
 				<td>
 					<fieldset>						
 						<g:render template="summary"/>
-						<table style="padding: 0px; margin: 0px;">
-							<tbody>
-								<thead>
+						<g:if test="${shipmentInstance.shipmentItems}">
+							<g:set var="shipmentItemsByContainer" value="${shipmentInstance?.shipmentItems?.groupBy { it.container } }"/>
+							<div id="items" class="section">											
+								<table>		
 									<tr>
-										<th><warehouse:message code="container.name.label"/></th>
-										<th><warehouse:message code="shipping.dimensions.label"/></th>
-										<th><warehouse:message code="default.weight.label"/></th>
-										<th><warehouse:message code="default.item.label"/></th>
-										<th><warehouse:message code="default.lotSerialNo.label"/></th>										
-									</tr>				
-								</thead>								
-								<g:set var="counter" value="${0 }"/>
-								<g:findAll var="item" in="${shipmentInstance?.shipmentItems}" expr="${!it.container}" status="itemStatus">
-									<tr class="${(counter++ % 2) == 0 ? 'odd' : 'even'}">
-										<td width="10%">
-											<b>Unpacked items</b>
-										</td>																
-										<td width="10%">
-										</td>
-										<td width="10%">
-											
-										</td>
-										<td width="20%"><format:product product="${item?.product}"/> (${item?.quantity})</td>
-										<td width="10%">${item?.lotNumber}</td>
-									</tr>																			
-								</g:findAll>	
-								
-								
-								<g:each var="container" in="${shipmentInstance.containers}" status="containerStatus">
-									<g:if test="${!container.shipmentItems}">
-										<tr class="${(counter++ % 2) == 0 ? 'odd' : 'even'}">
-											<td width="10%">
-												<b><format:metadata obj="${container?.containerType}"/>-${container?.name}</b>
-											</td>																
-											<td width="10%">
-												<g:if test="${container?.height && container?.width && container?.length}">	
-													${container?.height} x ${container?.width} x ${container?.length}
-												</g:if>
-												<g:else>
-													&nbsp;
-												</g:else>
-											</td>
-											<td width="10%">
-												<g:if test="${container?.weight }">
-													${container?.weight} ${container?.weightUnits}
-												</g:if>
-											</td>
-											<td width="20%">(empty)</td>
-											<td width="10%">&nbsp;</td>
-										</tr>																	
-									</g:if>
-									<g:each var="item" in="${container.shipmentItems}" status="itemStatus">
-										<tr class="${(counter++ % 2) == 0 ? 'odd' : 'even'}">
-											<td width="10%">
-												<b><format:metadata obj="${container?.containerType}"/> ${container?.name}</b>
-											</td>																
-											<td width="10%">
-												<g:if test="${container?.height && container?.width && container?.length}">	
-													${container?.height} x ${container?.width} x ${container?.length}
-												</g:if>
-												<g:else>&nbsp;</g:else>
-											</td>
-											<td width="10%">
-												<g:if test="${container?.weight }">
-													${container?.weight} ${container?.weightUnits}
-												</g:if>
-											</td>
-											<td width="20%"><format:product product="${item?.product}"/> (${item?.quantity})</td>
-											<td width="10%">${item?.lotNumber}</td>
-										</tr>																			
-									</g:each>	
-									<g:each var="innerContainer" in="${container.containers}" status="innerContainerStatus">
-										<g:if test="${!innerContainer.shipmentItems}">
-											<tr class="${(counter++ % 2) == 0 ? 'odd' : 'even'}">
-												<td width="10%">
-													<b><format:metadata obj="${innerContainer?.containerType}"/>-${container?.name}</b>
-												</td>																
-												<td width="10%">
-													<g:if test="${innerContainer?.height && innerContainer?.width && innerContainer?.length}">	
-														${innerContainer?.height} x ${innerContainer?.width} x ${innerContainer?.length}
-													</g:if>
-													<g:else>
-														&nbsp;
-													</g:else>
-												</td>
-												<td width="10%">
-													<g:if test="${innerContainer?.weight }">
-														${innerContainer?.weight} ${innerContainer?.weightUnits}
-													</g:if>
-												</td>
-												<td width="20%">(empty)</td>
-												<td width="10%">&nbsp;</td>
-											</tr>																	
+										<th><warehouse:message code="shipping.container.label"/></th>
+										<th><warehouse:message code="product.label"/></th>
+										<th class="center"><warehouse:message code="default.lotSerialNo.label"/></th>
+										<th class="center"><warehouse:message code="default.expires.label"/></th>
+										<th class="center"><warehouse:message code="shipping.shipped.label"/></th>
+										<g:if test="${shipmentInstance?.wasReceived()}">
+											<th class="center"><warehouse:message code="shipping.received.label"/></th>
+											<th class="center"><warehouse:message code="shipping.totalReceived.label"/></th>
 										</g:if>
-										<g:each var="innerItem" in="${innerContainer.shipmentItems}" status="innerItemStatus">
-											<tr class="${(counter++ % 2) == 0 ? 'odd' : 'even'}">
-												<td width="10%">
-													<b><format:metadata obj="${innerContainer?.containerType}"/> ${innerContainer?.name}</b>
-												</td>																
-												<td width="10%">
-													<g:if test="${innerContainer?.height && innerContainer?.width && innerContainer?.length}">	
-														${innerContainer?.height} x ${innerContainer?.width} x ${innerContainer?.length}
-													</g:if>
-													<g:else>&nbsp;</g:else>
+										<th><warehouse:message code="shipping.recipient.label"/></th>
+									</tr>
+									<g:set var="count" value="${0 }"/>
+									<g:set var="previousContainer"/>
+									<g:set var="shipmentItems" value="${shipmentInstance.shipmentItems.sort()}"/>
+									<g:each var="shipmentItem" in="${shipmentItems}" status="i">
+										<g:set var="rowspan" value="${shipmentItemsByContainer[shipmentItem?.container]?.size() }"/>												
+										<g:set var="newContainer" value="${previousContainer != shipmentItem?.container }"/>
+										<tr class="${(count++ % 2 == 0)?'odd':'even'} ${newContainer?'newContainer':''}">
+											<g:if test="${newContainer }">
+												<td class="container top left" rowspan="${rowspan }">
+													<%-- <img src="${createLinkTo(dir: 'images/icons/silk', file: 'package.png')}" style="vertical-align: middle"/>&nbsp;--%>
+													<label>
+														<g:if test="${shipmentItem?.container?.parentContainer}">${shipmentItem?.container?.parentContainer?.name } &rsaquo;</g:if>
+														<g:if test="${shipmentItem?.container?.name }">${shipmentItem?.container?.name }</g:if>
+														<g:else><warehouse:message code="shipping.unpacked.label"/></g:else>
+													</label>
+													<br/>
+													<span class="fade">
+										 				<g:if test="${shipmentItem?.container?.weight || shipmentItem?.container?.width || shipmentItem?.container?.length || shipmentItem?.container?.height}">
+											 				<g:if test="${shipmentItem?.container?.weight}">
+											 					${shipmentItem?.container?.weight} ${shipmentItem?.container?.weightUnits}
+											 				</g:if>
+											 				<g:if test="${shipmentItem?.container?.height && shipmentItem?.container?.width && shipmentItem?.container?.length }">
+																${shipmentItem?.container.height} ${shipmentItem?.container?.volumeUnits}
+																x
+																${shipmentItem?.container.width} ${shipmentItem?.container?.volumeUnits}
+																x
+																${shipmentItem?.container.length} ${shipmentItem?.container?.volumeUnits}
+															</g:if>
+														</g:if>
+													</span>	
 												</td>
-												<td width="10%">
-													<g:if test="${innerContainer?.weight }">
-														${innerContainer?.weight} ${innerContainer?.weightUnits}
-													</g:if>
+											</g:if>												
+																								
+											<td>
+												<g:link controller="inventoryItem" action="showStockCard" id="${shipmentItem?.product?.id}">
+													<format:product product="${shipmentItem?.product}"/>
+												</g:link>
+											</td>
+											<td class="center">
+												${shipmentItem?.lotNumber}
+											</td>
+											<td class="center">
+												<g:formatDate date="${shipmentItem?.expirationDate}" format="MMM yyyy"/>
+											</td>
+											<td class="center">
+												${shipmentItem?.quantity}
+											</td>
+											<g:if test="${shipmentInstance?.wasReceived()}">
+												<g:set var="totalQtyReceived" value="${shipmentItem?.totalQuantityReceived()}"/>
+												<td style="white-space:nowrap;${shipmentItem?.receiptItem?.quantityReceived != shipmentItem?.quantity ? ' color:red;' : ''}">
+													${shipmentItem?.receiptItem?.quantityReceived }
 												</td>
-												<td width="20%"><format:product product="${innerItem?.product}"/> (${innerItem?.quantity})</td>
-												<td width="10%">${innerItem?.lotNumber}</td>
-											</tr>																			
-										</g:each>										
-									</g:each>							
-								</g:each>		
-							</tbody>
-						</table>
-						<%-- 
-						<div style="text-align: right; padding: 10px;">
-							<g:link controller="shipment" action="downloadPackingList" id="${shipmentInstance.id}" ><img 
-							src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}" 
-							alt="Export Packing List" style="vertical-align: middle"/> Download</g:link>		
-						</div>
-						--%>														
+												<td>
+													<g:set var="totalQuantityReceived" value="${0 }"/>
+													<g:findAll in="${shipmentItem?.shipment?.receipt?.receiptItems}" expr="it.product == shipmentItem?.product && it.lotNumber == shipmentItem?.lotNumber">
+														<g:set var="totalQuantityReceived" value="${totalQuantityReceived += it.quantityReceived }"/>
+													</g:findAll> 
+													${totalQuantityReceived }
+												</td>
+											</g:if>														
+											<td>
+												${shipmentItem?.recipient?.name}
+											</td>
+										</tr>
+										<g:set var="previousContainer" value="${shipmentItem.container }"/>
+									</g:each>
+								</table>							
+							</div>
+						</g:if>							
 					</fieldset>		
 				</td>
 			</tr>

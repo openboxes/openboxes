@@ -775,6 +775,20 @@ class ShipmentService {
 	 * @param emailRecipients
 	 */
 	void sendShipment(Shipment shipmentInstance, String comment, User userInstance, Location locationInstance, Date shipDate) { 
+		sendShipment(shipmentInstance, comment, userInstance, locationInstance, shipDate, true);
+	}
+	
+	/**
+	 * 
+	 * @param shipmentInstance
+	 * @param comment
+	 * @param userInstance
+	 * @param locationInstance
+	 * @param shipDate
+	 * @param emailRecipients
+	 * @param debitStockOnSend
+	 */
+	void sendShipment(Shipment shipmentInstance, String comment, User userInstance, Location locationInstance, Date shipDate, Boolean debitStockOnSend) { 
 		log.info "Send shipment ${shipmentInstance?.name}"
 		try { 
 			if (!shipDate || shipDate > new Date()) {
@@ -799,8 +813,8 @@ class ShipmentService {
 				// Save updated shipment instance (adding an event and comment)
 				if (!shipmentInstance.hasErrors() && shipmentInstance.save()) { 
 					
-					// TODO only need to create a transaction if the source is a Location - (think about this)
-					if (shipmentInstance.origin?.isWarehouse()) {
+					// TODO only need to create a transaction if the source is a depot - (we need to think about this)
+					if (shipmentInstance.origin?.isWarehouse() && debitStockOnSend) {
 						inventoryService.createSendShipmentTransaction(shipmentInstance)
 					}
 				}

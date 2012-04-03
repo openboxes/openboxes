@@ -1,12 +1,17 @@
 package org.pih.warehouse.shipping
 
+import java.util.Set;
+
 import org.apache.poi.hssf.record.formula.functions.NumericFunction.OneArg;
 import org.hibernate.exception.ConstraintViolationException;
 import org.pih.warehouse.core.Constants;
+import org.pih.warehouse.core.MailService;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.core.Location;
+import org.pih.warehouse.inventory.TransactionException;
 import org.pih.warehouse.product.Product;
+import org.pih.warehouse.report.ReportService;
 import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException;
 import org.springframework.validation.Errors;
 
@@ -14,6 +19,8 @@ import sun.util.logging.resources.logging;
 
 class CreateShipmentWorkflowController {
 	
+	MailService mailService
+	ReportService reportService
 	ShipmentService shipmentService
 	
     def index = { 
@@ -39,12 +46,16 @@ class CreateShipmentWorkflowController {
 						return enterShipmentDetails()
 					else if (params.skipTo == 'Tracking')
 						return enterTrackingDetails()
-					
+					else if (params.skipTo == 'Sending')
+						return sendShipment()
 				}
     			return success()
     		}
     		on("success").to("enterShipmentDetails")
+			on("enterShipmentDetails").to("enterShipmentDetails")
+			on("enterTrackingDetails").to("enterTrackingDetails")
 			on("enterContainerDetails").to("enterContainerDetails")
+			on("sendShipment").to("sendShipment")
     	}
     		
     	enterShipmentDetails {
@@ -186,7 +197,7 @@ class CreateShipmentWorkflowController {
 			
     		on("next") {
 				shipmentService.saveShipment(flow.shipmentInstance)	
-			}.to("showDetails")
+			}.to("sendShipment")	// formerly showDetails
 			
 			on("save") {
 				shipmentService.saveShipment(flow.shipmentInstance)	
@@ -307,7 +318,93 @@ class CreateShipmentWorkflowController {
 			on("reviewShipment").to("reviewShipment")
 			on("sendShipment").to("sendShipment")
     	}
-    	
+		
+		sendShipment {
+						
+			// All transition buttons on the bottom of the page
+			on("back") {
+
+			}.to("enterContainerDetails")
+			
+			on("next").to("sendShipmentAction")
+				
+			on("save") {
+				shipmentService.saveShipment(flow.shipmentInstance)
+			}.to("finish")
+
+			on("cancel").to("finish")
+			on("success").to("finish")
+			
+			// Top-level navigation transitions
+			on("enterShipmentDetails").to("enterShipmentDetails")
+			on("enterTrackingDetails").to("enterTrackingDetails")
+			on("enterContainerDetails").to("enterContainerDetails")
+			//on("sendShipment").to("sendShipment")
+			
+			
+		}
+		
+		sendShipmentAction { 
+			action { SendShipmentCommand command ->
+				
+				flow.command = command
+				
+				if (!command.validate()) {
+					log.info("validated command and there are errors")
+					return error();
+				}
+
+				
+				def transactionInstance
+				def userInstance = User.get(session.user.id)
+				def shipmentInstance = Shipment.get(params.id)
+				def shipmentWorkflow = shipmentService.getShipmentWorkflow(params.id)
+		
+				// This probably shouldn't occur, but we can leave it for now
+				if (!shipmentInstance) {
+					flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+					redirect(action: "list", params:[type: params.type])
+				}
+				else {
+					// handle a submit
+					if ("POST".equalsIgnoreCase(request.getMethod())) {						
+						// create the list of email recipients
+						def emailRecipients = new HashSet()
+						params.emailRecipientId?.each ( { emailRecipients = emailRecipients + Person.get(it) } )
+						try {
+							// send the shipment
+							shipmentService.sendShipment(shipmentInstance, command.comments, session.user, session.warehouse,
+															command.actualShippingDate, command.debitStockOnSend);
+							triggerSendShipmentEmails(shipmentInstance, userInstance, emailRecipients)
+						}
+						catch (TransactionException e) {
+							command.transaction = e.transaction
+							//shipmentInstance = Shipment.get(params.id)
+							//shipmentWorkflow = shipmentService.getShipmentWorkflow(params.id)
+							return error()
+						}
+										
+						if (!shipmentInstance?.hasErrors() && !transactionInstance?.hasErrors()) {
+							//flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
+							//redirect(controller: 'shipment', action: "showDetails", id: shipmentInstance?.id)
+							command.shipment = shipmentInstance
+							command.transaction = transactionInstance
+							return success()
+							
+						}
+						else { 
+							return error();
+						}
+					}
+				}				
+			}
+			
+			on("success").to("finish")
+			on("error").to("sendShipment")
+			
+		}
+		
+		
     	saveContainerAction {
     		action {
 				log.info("Save container " + params)
@@ -900,4 +997,45 @@ class CreateShipmentWorkflowController {
 			shipment.shipmentMethod = null   
 		}		
 	}
+	
+	/**
+	 *
+	 * @param shipmentInstance
+	 * @param userInstance
+	 * @param recipients
+	 */
+	void triggerSendShipmentEmails(Shipment shipmentInstance, User userInstance, Set<Person> recipients) {
+	   log.info "Trigger send shipment emails"
+	   if (!shipmentInstance.hasErrors() && recipients) {
+
+		   // add the current user to the list of email recipients
+		   recipients = recipients + userInstance
+		   
+		   log.info("Mailing shipment emails to ${recipients.name}")
+		   def shipmentName = "${shipmentInstance.name}"
+		   def shipmentType = "${format.metadata(obj:shipmentInstance.shipmentType)}"
+		   // TODO: change this to create an email from a standard template (ie, an email packing list?)
+		   def subject = "${warehouse.message(code:'shipment.hasBeenShipped.message',args:[shipmentType, shipmentName])}"
+		   def body = g.render(template:"/email/shipmentShipped", model:[shipmentInstance:shipmentInstance])
+		   def to = recipients?.collect { it.email }?.unique()
+		   
+		   // Generate PDF based on the packing list report
+		   def url = "${createLink(controller:'report', action: 'showShippingReport', absolute: true)}"
+		   url += ";jsessionid=" + session.getId()
+		   url += "?print=true&orientation=portrait&format=pdf"
+		   url += "&shipment.id=" + shipmentInstance.id
+		   url += "&includeEntities=true"
+		   //def url = "http://localhost:8080/warehouse/report/showShippingReport;jsessionid=D31A0CB3B73EFF4261C53B98F7D7562A?print=true&orientation=portrait&shipment.id=ff80818135f08caa0135f08dc7140001&includeEntities=true"
+		   def baos = new ByteArrayOutputStream();
+		   reportService.generatePdf(url, baos)
+		   
+		   try {
+			   //mailService.sendHtmlMail(subject, body.toString(), to)
+			   mailService.sendHtmlMailWithAttachment(to, subject, body.toString(), baos.toByteArray(), "packing-list.pdf", "application/pdf")
+		   } catch (Exception e) {
+			   log.error "Error triggering send shipment emails " + e.message
+		   }
+	   }
+   }
+	
 }

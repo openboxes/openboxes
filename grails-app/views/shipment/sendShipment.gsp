@@ -143,9 +143,10 @@
 										<br/>
 										--%>
 										<warehouse:message code="shipping.willBeDebited.message" args="[shipmentInstance?.origin?.name]"/>											
-										<g:if test="${shipmentInstance.shipmentItems}">
+										<g:if test="${shipmentInstance.shipmentItems.sort()}">
 											<table style="display: inline" id="debitShipmentItems">
 												<tr>
+													<th></th>
 													<th></th>
 													<th><warehouse:message code="default.item.label"/></th>
 													<th><warehouse:message code="default.quantity.label"/></th>
@@ -154,6 +155,9 @@
 													<tr class="${status % 2 ? 'even' : 'odd' }">
 														<td>
 															<img src="${createLinkTo(dir:'images/icons/silk',file: 'delete.png')}" style="vertical-align: middle"/>
+														</td>
+														<td>
+															${item?.container?.name }
 														</td>
 														<td>
 															<format:product product="${item?.product}"/> ${item?.lotNumber }
@@ -220,24 +224,26 @@
 												</td>
 											</tr>
 										</g:if>
-										
-										<g:each var="recipient" in="${shipmentInstance.allShipmentItems.recipient }">
-											<g:if test="${recipient?.id != shipmentInstance?.recipient?.id}">
-												<tr class="prop odd">
-													<td>
-														<input type="checkbox" checked="true" name="emailRecipientId" value="${recipient?.id}"/>
-														<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/> 
-													</td>
-													<td>
-														<warehouse:message code="shipping.recipient.label"/>
-													</td>
-													<td>							
-														${recipient?.name } &nbsp;
-														<span class="fade">${recipient?.email}</span>				
-													</td>
-												</tr>
-											</g:if>						
-										</g:each>
+										<g:set var="recipients" value="${shipmentInstance.allShipmentItems.recipient }"/>
+										<g:if test="${recipients }">
+											<g:each var="recipient" in="${shipmentInstance.allShipmentItems.recipient }">
+												<g:if test="${recipient?.id != shipmentInstance?.recipient?.id}">
+													<tr class="prop odd">
+														<td>
+															<input type="checkbox" checked="true" name="emailRecipientId" value="${recipient?.id}"/>
+															<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/> 
+														</td>
+														<td>
+															<warehouse:message code="shipping.recipient.label"/>
+														</td>
+														<td>							
+															${recipient?.name } &nbsp;
+															<span class="fade">${recipient?.email}</span>				
+														</td>
+													</tr>
+												</g:if>						
+											</g:each>
+										</g:if>
 									</table>
 								</td>							
 							</tr>
