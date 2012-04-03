@@ -131,7 +131,7 @@ class ProductController {
 				attVal = params["productAttributes." + it.id + ".otherValue"];
 			}
 			if (attVal) {
-				productInstance.getAttributes().add(new ProductAttribute(new ProductAttribute(["attribute":it,"value":attVal])))
+				productInstance.getAttributes().add(new ProductAttribute(["attribute":it,"value":attVal]))
 			}
 		}
 		
