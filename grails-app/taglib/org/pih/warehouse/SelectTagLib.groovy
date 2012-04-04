@@ -37,7 +37,12 @@ class SelectTagLib {
 		//attrs.optionValue = 'name'
 		attrs.groupBy = 'locationType'
 		attrs.value = attrs.value ?: currentLocation?.id
-		attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]"}
+		if (attrs.groupBy) { 
+			attrs.optionValue = { it.name }
+		}
+		else { 
+			attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]"}
+		}
 		out << (attrs.groupBy ? g.selectWithOptGroup(attrs) : g.select(attrs))
 	}
 

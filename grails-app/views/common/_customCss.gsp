@@ -10,7 +10,6 @@
 				color: #${session.warehouse.fgColor}; 
 			}  		
 		</g:if>		
-	
 		.warehouse { border: 0px solid #F5F5F5; padding: 5px; display: block; } 
 		
 		/* Autocomplete */

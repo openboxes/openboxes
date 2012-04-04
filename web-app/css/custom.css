@@ -74,9 +74,29 @@ body {
 	padding-bottom: 50px;
 }
 
-.debit { 
-	color: red; 
+.total { 
+	/*background-color: #f7f7f7;*/	
 }
+.start { 
+	border-right: 3px solid lightgrey;	
+}
+.end { 
+	border-left: 3px solid lightgrey;
+}
+
+
+
+.debit { 
+	/*color: blue;*/ 
+}
+
+.debit:before { 
+	content: '(' 
+}
+.debit:after { 
+	content: ')' 
+}
+
 
 /* Action Menu Items */
 .actions .action-menu-item { 

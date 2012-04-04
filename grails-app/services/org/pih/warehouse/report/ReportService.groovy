@@ -14,8 +14,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.grails.plugins.excelimport.ExcelImportUtils;
+import org.pih.warehouse.inventory.Inventory;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.InventoryItem;
+import org.pih.warehouse.inventory.TransactionEntry;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.Category;
@@ -79,104 +81,172 @@ class ReportService implements ApplicationContextAware {
 	}
 	
 	
+	TransactionEntry getEarliestTransactionEntry(Product product, Inventory inventory) { 
+		def list = TransactionEntry.createCriteria().list() {
+			and { 
+				inventoryItem {
+					eq("product.id", product?.id)
+				}
+				transaction {
+					eq("inventory", inventory)
+					order("transactionDate", "asc")
+					order("dateCreated", "asc")
+				}
+			}
+			maxResults(1)
+		}
+		
+		return list[0]
+	}
+	
+	TransactionEntry getLatestTransactionEntry(Product product, Inventory inventory) { 
+		def list = TransactionEntry.createCriteria().list() {
+			and {
+				inventoryItem {
+					eq("product.id", product?.id)
+				}
+				transaction {
+					eq("inventory", inventory)
+					order("transactionDate", "desc")
+					order("dateCreated", "desc")
+				}
+			}
+			maxResults(1)
+		}
+		return list[0]
+	}
+	
 	/**
 	 * 
 	 * @param command
 	 */
 	public void generateTransactionReport(InventoryReportCommand command) { 
 		
-		def categories = []
-		categories << command.category
-		
-		// Initialize the report map to reference all products to be displayed
-		def products = inventoryService.getProductsByCategories(categories)
+		def products = 
+			//inventoryService.getProductsByNestedCategory(command.category)
+			(command?.includeChildren) ? inventoryService.getProductsByNestedCategory(command.category) : 
+				inventoryService.getProductsByCategory(command.category) 
+				
+		if (command?.showEntireHistory) { 
+			command.startDate = getEarliestTransactionEntry(command?.product, command?.location?.inventory)?.transaction?.transactionDate
+			command.endDate = getLatestTransactionEntry(command?.product, command?.location?.inventory)?.transaction?.transactionDate
+		}
+				
+		log.info "Products (" + products.size() + ") -> " + products
+		// Initialize the report map to reference all products to be displayed		 
 		products.each { product ->
-			def entry = command.inventoryReportEntryMap[product];
-			if (!entry) entry = new InventoryReportEntryCommand(product: product);
-			entry.quantityInitial = inventoryService.getInitialQuantity(product, command?.location, command?.startDate)
-			entry.quantityFinal = inventoryService.getCurrentQuantity(product, command?.location, command?.endDate);
-			command.inventoryReportEntryMap[product] = entry;
+			def productEntry = command.entries[product];
+			if (!productEntry) {
+				productEntry = new InventoryReportEntryCommand(product: product);
+				command.entries[product] = productEntry
+			}
+			productEntry.quantityInitial = inventoryService.getInitialQuantity(product, command?.location, command?.startDate)
+			productEntry.quantityFinal = inventoryService.getCurrentQuantity(product, command?.location, command?.endDate);
+
+			// Initialize the product map to reference all inventory items for that product
+			def inventoryItems = inventoryService.getInventoryItemsByProduct(product)
+			inventoryItems?.each { inventoryItem ->				
+				//log.info "inventory item -> " + inventoryItem
+				def inventoryItemEntry = productEntry?.entries[inventoryItem];
+				if (!inventoryItemEntry) { 
+					inventoryItemEntry = new InventoryReportEntryCommand(product: product, inventoryItem: inventoryItem);
+					productEntry.entries[inventoryItem] = inventoryItemEntry;
+				}
+				inventoryItemEntry.quantityInitial = inventoryService.getInitialQuantity(inventoryItem, command?.location, command?.startDate)
+				inventoryItemEntry.quantityFinal = inventoryService.getCurrentQuantity(inventoryItem, command?.location, command?.endDate);
+				
+			}
 		}
 		
 		// TODO Need to restrict by date and category 
 		def transactionEntries = inventoryService.getTransactionEntries(command.location, command.category, command?.startDate, command?.endDate);
 		
+		
+		log.info "transactionEntries (" + transactionEntries.size() + ") -> " + transactionEntries
 		// Iterate over the transaction entries for the given time period to tabulate totals.
 		// Each time we encounter an INVENTORY, compare that quantity with the running total,
 		// and add / subract to "adjustment" as appropriate.  Then set the running
 		// total to the new inventory and continue with the running total...
 		transactionEntries.each {
-			def product = it?.inventoryItem?.product
+			def inventoryItem = it?.inventoryItem
 			def transactionType = it?.transaction?.transactionType
-
-			def entry = command.inventoryReportEntryMap[product]
-			if (!entry) {
-				entry = new InventoryReportEntryCommand(product: product);
-				command.inventoryReportEntryMap[product] = entry
-			}
 			
-			if (transactionType?.id == Constants.CONSUMPTION_TRANSACTION_TYPE_ID) {
-				entry.quantityRunning += it.quantity
-				entry.quantityConsumed += it.quantity
-				entry.quantityTotalOut += it.quantity
-			}
-			else if (transactionType?.id == Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID) {
-				entry.quantityRunning += it.quantity
-				entry.quantityFound += it.quantity
-				entry.quantityAdjusted += it.quantity
-				//entry.quantityTotalIn += it.quantity
-			}
-			else if (transactionType?.id == Constants.EXPIRATION_TRANSACTION_TYPE_ID) {
-				entry.quantityRunning -= it.quantity
-				entry.quantityExpired += it.quantity
-				entry.quantityTotalOut += it.quantity
-			}
-			else if (transactionType?.id == Constants.DAMAGE_TRANSACTION_TYPE_ID) {
-				entry.quantityRunning -= it.quantity
-				entry.quantityDamaged += it.quantity
-				entry.quantityTotalOut += it.quantity
-			}
-			else if (transactionType?.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID) {
-				entry.quantityRunning += it.quantity
-				entry.quantityTransferredIn += it.quantity
-				entry.quantityTotalIn += it.quantity
-				if (!entry.quantityTransferredInByLocation[it.transaction.source]) { 
-					entry.quantityTransferredInByLocation[it.transaction.source] = 0
+			log.info "transactionEntry -> " + it.transaction.transactionType.name + " = " + it.quantity
+			
+			def productEntry = command.entries[inventoryItem.product]
+			if (productEntry) { 
+				def inventoryItemEntry = productEntry.entries[inventoryItem];		
+						
+				if (inventoryItemEntry) {					
+					if (transactionType?.id == Constants.CONSUMPTION_TRANSACTION_TYPE_ID) {
+						inventoryItemEntry.quantityRunning += it.quantity
+						inventoryItemEntry.quantityConsumed += it.quantity
+						inventoryItemEntry.quantityTotalOut += it.quantity
+					}
+					else if (transactionType?.id == Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID) {
+						inventoryItemEntry.quantityRunning += it.quantity
+						inventoryItemEntry.quantityFound += it.quantity
+						inventoryItemEntry.quantityAdjusted += it.quantity
+						//entry.quantityTotalIn += it.quantity
+					}
+					else if (transactionType?.id == Constants.EXPIRATION_TRANSACTION_TYPE_ID) {
+						inventoryItemEntry.quantityRunning -= it.quantity
+						inventoryItemEntry.quantityExpired += it.quantity
+						inventoryItemEntry.quantityTotalOut += it.quantity
+					}
+					else if (transactionType?.id == Constants.DAMAGE_TRANSACTION_TYPE_ID) {
+						inventoryItemEntry.quantityRunning -= it.quantity
+						inventoryItemEntry.quantityDamaged += it.quantity
+						inventoryItemEntry.quantityTotalOut += it.quantity
+					}
+					else if (transactionType?.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID) {
+						inventoryItemEntry.quantityRunning += it.quantity
+						inventoryItemEntry.quantityTransferredIn += it.quantity
+						inventoryItemEntry.quantityTotalIn += it.quantity
+						if (!inventoryItemEntry.quantityTransferredInByLocation[it.transaction.source]) { 
+							inventoryItemEntry.quantityTransferredInByLocation[it.transaction.source] = 0
+						}
+						inventoryItemEntry.quantityTransferredInByLocation[it.transaction.source] += it.quantity					
+					}
+					else if (transactionType?.id == Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) {
+						inventoryItemEntry.quantityRunning -= it.quantity
+						inventoryItemEntry.quantityTransferredOut += it.quantity
+						inventoryItemEntry.quantityTotalOut += it.quantity
+						if (!inventoryItemEntry.quantityTransferredOutByLocation[it.transaction.destination]) { 
+							inventoryItemEntry.quantityTransferredOutByLocation[it.transaction.destination] = 0;
+						}
+						inventoryItemEntry.quantityTransferredOutByLocation[it.transaction.destination] += it.quantity					
+					}
+					else if (transactionType?.id == Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID) {
+						inventoryItemEntry.quantityRunning -= it.quantity
+						inventoryItemEntry.quantityLost += it.quantity
+						inventoryItemEntry.quantityAdjusted -= it.quantity
+						inventoryItemEntry.quantityTotalOut += it.quantity
+					}
+					else if (transactionType?.id == Constants.INVENTORY_TRANSACTION_TYPE_ID) {
+						def diff = it.quantity - inventoryItemEntry.quantityRunning
+						inventoryItemEntry.quantityAdjusted += diff					
+						inventoryItemEntry.quantityRunning = it.quantity;
+						if (diff > 0)
+							inventoryItemEntry.quantityFound += diff;
+						else 
+							inventoryItemEntry.quantityLost += diff	
+					}
+					else if (transactionType?.id == Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID) {
+						def diff = it.quantity - inventoryItemEntry.quantityRunning
+						inventoryItemEntry.quantityAdjusted += diff
+						inventoryItemEntry.quantityRunning = it.quantity;
+						if (diff > 0)
+							inventoryItemEntry.quantityFound += diff;
+						else 
+							inventoryItemEntry.quantityLost += diff	
+					}
+					
+					// Add transaction entry
+					def balance = inventoryItemEntry.quantityRunning
+					inventoryItemEntry.transactionEntries << new ProductReportEntryCommand(transactionEntry: it, balance: balance)
+					
 				}
-				entry.quantityTransferredInByLocation[it.transaction.source] += it.quantity					
-			}
-			else if (transactionType?.id == Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) {
-				entry.quantityRunning -= it.quantity
-				entry.quantityTransferredOut += it.quantity
-				entry.quantityTotalOut += it.quantity
-				if (!entry.quantityTransferredOutByLocation[it.transaction.destination]) { 
-					entry.quantityTransferredOutByLocation[it.transaction.destination] = 0;
-				}
-				entry.quantityTransferredOutByLocation[it.transaction.destination] += it.quantity					
-			}
-			else if (transactionType?.id == Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID) {
-				entry.quantityRunning -= it.quantity
-				entry.quantityLost += it.quantity
-				entry.quantityAdjusted -= it.quantity
-				entry.quantityTotalOut += it.quantity
-			}
-			else if (transactionType?.id == Constants.INVENTORY_TRANSACTION_TYPE_ID) {
-				def diff = it.quantity - entry.quantityRunning
-				entry.quantityAdjusted += diff					
-				entry.quantityRunning = it.quantity;
-				if (diff > 0)
-					entry.quantityFound += diff;
-				else 
-					entry.quantityLost += diff	
-			}
-			else if (transactionType?.id == Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID) {
-				def diff = it.quantity - entry.quantityRunning
-				entry.quantityAdjusted += diff
-				entry.quantityRunning = it.quantity;
-				if (diff > 0)
-					entry.quantityFound += diff;
-				else 
-					entry.quantityLost += diff	
 			}
 		}		
 	}	

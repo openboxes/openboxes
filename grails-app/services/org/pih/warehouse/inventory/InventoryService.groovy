@@ -1104,6 +1104,18 @@ class InventoryService implements ApplicationContextAware {
 	}
 	
 	/**
+	 * Returns a category and all of its children.
+	 * 
+	 * @param category
+	 * @return
+	List getExplodedCategories(Category category) { 
+		def categories = []
+		categories << category
+		return getExplodedCategories(categories)
+	}
+	 */
+	
+	/**
 	 * Returns a list of categories and their children, given an initial set of 
 	 * categories.  This function should probably be recursive so that we traverse 
 	 * the entire category tree. 
@@ -1141,6 +1153,20 @@ class InventoryService implements ApplicationContextAware {
 		}
 		return getExplodedCategories(categories);		
 	}
+
+	/**
+	 * Get all products for the given category.
+	 * 	
+	 * @param category
+	 * @return
+	 */
+	List getProductsByCategory(Category category) {
+		def products = Product.createCriteria().list() {
+			eq("category", category)
+		}
+		return products;
+	}
+
 	
 	/**
 	 * Returns a list of products by category.  
@@ -1149,7 +1175,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param params
 	 * @return
 	 */
-	List getProductsByCategories(List categories) { 
+	List getProductsByNestedCategories(List categories) { 
 		def products = []
 		
 		def matchCategories = getExplodedCategories(categories);
@@ -1168,19 +1194,21 @@ class InventoryService implements ApplicationContextAware {
 	 * @param category
 	 * @return
 	 */
-	List getProductsByCategory(Category category) { 
+	List getProductsByNestedCategory(Category category) { 
 		def products = [];
 		if (category) { 
-			def categories = (category?.children)?category.children:[];
+			def categories = (category?.children)?:[];
 			categories << category;
 			if (categories) {
+				log.info("get products by nested category: " + category + " -> " + categories)
+				
 				products = Product.createCriteria().list() {
 					'in'("category", categories)
 				}
 			}
 		}
 		return products;
-	}
+	}	
 	
 	/**
 	 * @param productId
@@ -1359,6 +1387,8 @@ class InventoryService implements ApplicationContextAware {
 				}
 				transaction {
 					eq("inventory", inventoryInstance)
+					order("transactionDate", "asc")
+					order("dateCreated", "asc")
 				}
 			}
 		}
@@ -1775,6 +1805,14 @@ class InventoryService implements ApplicationContextAware {
 		return quantity;		
 	}
 	
+	
+	def getQuantity(InventoryItem inventoryItem, Location location, Date beforeDate) { 
+		def quantity = 0;
+		def transactionEntries = getTransactionEntriesBeforeDate(inventoryItem, location, beforeDate)
+		quantity = adjustQuantity(quantity, transactionEntries)
+		return quantity
+	}
+	
 
 	/**
 	 * Get the initial quantity of a product for the given location and date.  
@@ -1786,11 +1824,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	def getInitialQuantity(Product product, Location location, Date date) { 
-		def quantity = 0;
-		if (date) { 
-			quantity = getQuantity(product, location, date);
-		}
-		return quantity;
+		return getQuantity(product, location, date?:new Date());
 	}
 	
 	
@@ -1803,18 +1837,33 @@ class InventoryService implements ApplicationContextAware {
 	 * @param date
 	 * @return
 	 */
-	def getCurrentQuantity(Product product, Location location, Date date) { 
-		def quantity = 0;
-		if (date) { 
-			quantity = getQuantity(product, location, date);
-		}
-		else { 
-			quantity = getQuantity(product, location, new Date());
-		}
-		return quantity;
+	def getCurrentQuantity(Product product, Location location, Date date) { 		
+		return getQuantity(product, location, date?:new Date());
 	}
 	
+	/**
+	* Get the initial quantity of a product for the given location and date.
+	* If the date is null, then we assume that the answer is 0.
+	*
+	* @param product
+	* @param location
+	* @param date
+	* @return
+	*/
+   def getInitialQuantity(InventoryItem inventoryItem, Location location, Date date) {
+	   return getQuantity(inventoryItem, location, date?:new Date());
+   }
 	
+	/**
+	 * 
+	 * @param inventoryItem
+	 * @param location
+	 * @param date
+	 * @return
+	 */
+	def getCurrentQuantity(InventoryItem inventoryItem, Location location, Date date) { 
+		return getQuantity(inventoryItem, location, date?:new Date())
+	}
 	
 	/**
 	 * Get the quantity of a particular product at the given location, 
@@ -1948,29 +1997,54 @@ class InventoryService implements ApplicationContextAware {
 	* @param endDate
 	* @return
 	*/
-   def getTransactionEntriesBeforeDate(Product product, Location location, Date beforeDate) {
-	   def criteria = TransactionEntry.createCriteria();
+   def getTransactionEntriesBeforeDate(InventoryItem inventoryItem, Location location, Date beforeDate) {	   
 	   def transactionEntries = []
-	   
-	   if (beforeDate) { 
+	   if (beforeDate) {
+		   def criteria = TransactionEntry.createCriteria();
 		   transactionEntries = criteria.list {
-			   inventoryItem {
-				   eq("product", product)
-			   }
-			   transaction {			   
-				   // All transactions before given date
-				   lt("transactionDate", beforeDate)
-				   eq("inventory", location?.inventory)
-				   order("transactionDate", "asc")
-				   order("dateCreated", "asc")
-   
+			   and { 
+				   eq("inventoryItem", inventoryItem)
+				   transaction {
+					   // All transactions before given date
+					   lt("transactionDate", beforeDate)
+					   eq("inventory", location?.inventory)
+					   order("transactionDate", "asc")
+					   order("dateCreated", "asc")	
+				   }
 			   }
 		   }
 	   }
 	   return transactionEntries;
    }
+	
+	/**
+	 *
+	 * @param product
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 */
+	def getTransactionEntriesBeforeDate(Product product, Location location, Date beforeDate) {
+		def criteria = TransactionEntry.createCriteria();
+		def transactionEntries = []
 
-		
+		if (beforeDate) {
+			transactionEntries = criteria.list {
+				inventoryItem { eq("product", product) }
+				transaction {
+					// All transactions before given date
+					lt("transactionDate", beforeDate)
+					eq("inventory", location?.inventory)
+					order("transactionDate", "asc")
+					order("dateCreated", "asc")
+
+				}
+			}
+		}
+		return transactionEntries;
+	}
+
+
 	
 	
 		
@@ -2012,15 +2086,19 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	def getTransactionEntries(Location location, Category category, Date startDate, Date endDate) {
-		def criteria = TransactionEntry.createCriteria();
 		def categories = []
 		categories << category
 		def matchCategories = getExplodedCategories(categories)
+		return getTransactionEntries(location, matchCategories, startDate, endDate)
+				
+	}
+	def getTransactionEntries(Location location, List categories, Date startDate, Date endDate) {
+		def criteria = TransactionEntry.createCriteria();
 		def transactionEntries = criteria.list {
-			if (category) {
+			if (categories) {
 				inventoryItem { 
 					product { 
-						'in'("category", matchCategories)
+						'in'("category", categories)
 					}
 				}
 			}

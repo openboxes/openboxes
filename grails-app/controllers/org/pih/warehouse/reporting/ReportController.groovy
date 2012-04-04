@@ -81,6 +81,14 @@ class ReportController {
 		[command : command]
 	}
 
+	def showPaginatedPackingListReport = { ChecklistReportCommand command ->
+		command.rootCategory = productService.getRootCategory();
+		if (!command?.hasErrors()) {
+			reportService.generateShippingReport(command);
+		}
+		[command : command]
+	}
+	
 	
 
 	def downloadTransactionReport = {		
@@ -106,7 +114,6 @@ class ReportController {
 		log.info "Fetching url $url"
 		reportService.generatePdf(url, response.getOutputStream())
 	}
-	
 	
 	def downloadShippingReport = {		
 		if (params.format == 'docx') { 
