@@ -128,9 +128,16 @@ class ReportService implements ApplicationContextAware {
 				inventoryService.getProductsByCategory(command.category) 
 				
 		if (command?.showEntireHistory) { 
-			command.startDate = getEarliestTransactionEntry(command?.product, command?.location?.inventory)?.transaction?.transactionDate
-			command.endDate = getLatestTransactionEntry(command?.product, command?.location?.inventory)?.transaction?.transactionDate
+			def earliestDate = getEarliestTransactionEntry(command?.product, command?.location?.inventory)?.transaction?.transactionDate			
+			//def latestDate = getLatestTransactionEntry(command?.product, command?.location?.inventory)?.transaction?.transactionDate
+			command.startDate = earliestDate?:command.startDate
+			command.endDate = new Date() + 1
 		}
+		
+		// 
+		//command.startDate = command.startDate?:new Date()
+		//command.endDate = command.endDate?:new Date()
+		
 				
 		log.info "Products (" + products.size() + ") -> " + products
 		// Initialize the report map to reference all products to be displayed		 
@@ -140,8 +147,8 @@ class ReportService implements ApplicationContextAware {
 				productEntry = new InventoryReportEntryCommand(product: product);
 				command.entries[product] = productEntry
 			}
-			productEntry.quantityInitial = inventoryService.getInitialQuantity(product, command?.location, command?.startDate)
-			productEntry.quantityFinal = inventoryService.getCurrentQuantity(product, command?.location, command?.endDate);
+			productEntry.quantityInitial = inventoryService.getInitialQuantity(product, command?.location, command?.startDate?:null)
+			productEntry.quantityFinal = inventoryService.getCurrentQuantity(product, command?.location, command?.endDate?:new Date());
 
 			// Initialize the product map to reference all inventory items for that product
 			def inventoryItems = inventoryService.getInventoryItemsByProduct(product)
@@ -152,8 +159,12 @@ class ReportService implements ApplicationContextAware {
 					inventoryItemEntry = new InventoryReportEntryCommand(product: product, inventoryItem: inventoryItem);
 					productEntry.entries[inventoryItem] = inventoryItemEntry;
 				}
-				inventoryItemEntry.quantityInitial = inventoryService.getInitialQuantity(inventoryItem, command?.location, command?.startDate)
-				inventoryItemEntry.quantityFinal = inventoryService.getCurrentQuantity(inventoryItem, command?.location, command?.endDate);
+				inventoryItemEntry.quantityInitial = inventoryService.getQuantity(inventoryItem, command.location, command.startDate?:null)
+				inventoryItemEntry.quantityFinal = inventoryService.getQuantity(inventoryItem, command.location, command.endDate?:new Date())
+				inventoryItemEntry.quantityRunning = inventoryItemEntry.quantityInitial
+				
+				//inventoryItemEntry.quantityInitial = inventoryService.getInitialQuantity(inventoryItem, command?.location, command?.startDate)
+				//inventoryItemEntry.quantityFinal = inventoryService.getCurrentQuantity(inventoryItem, command?.location, command?.endDate);
 				
 			}
 		}
@@ -177,7 +188,9 @@ class ReportService implements ApplicationContextAware {
 			if (productEntry) { 
 				def inventoryItemEntry = productEntry.entries[inventoryItem];		
 						
+				
 				if (inventoryItemEntry) {					
+					
 					if (transactionType?.id == Constants.CONSUMPTION_TRANSACTION_TYPE_ID) {
 						inventoryItemEntry.quantityRunning += it.quantity
 						inventoryItemEntry.quantityConsumed += it.quantity
@@ -187,7 +200,7 @@ class ReportService implements ApplicationContextAware {
 						inventoryItemEntry.quantityRunning += it.quantity
 						inventoryItemEntry.quantityFound += it.quantity
 						inventoryItemEntry.quantityAdjusted += it.quantity
-						//entry.quantityTotalIn += it.quantity
+						inventoryItemEntry.quantityTotalIn += it.quantity
 					}
 					else if (transactionType?.id == Constants.EXPIRATION_TRANSACTION_TYPE_ID) {
 						inventoryItemEntry.quantityRunning -= it.quantity
@@ -227,19 +240,27 @@ class ReportService implements ApplicationContextAware {
 						def diff = it.quantity - inventoryItemEntry.quantityRunning
 						inventoryItemEntry.quantityAdjusted += diff					
 						inventoryItemEntry.quantityRunning = it.quantity;
-						if (diff > 0)
+						if (diff > 0) { 
 							inventoryItemEntry.quantityFound += diff;
-						else 
+							inventoryItemEntry.quantityTotalIn += diff
+						}
+						else {  
 							inventoryItemEntry.quantityLost += diff	
+							inventoryItemEntry.quantityTotalOut += diff
+						}
 					}
 					else if (transactionType?.id == Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID) {
 						def diff = it.quantity - inventoryItemEntry.quantityRunning
 						inventoryItemEntry.quantityAdjusted += diff
 						inventoryItemEntry.quantityRunning = it.quantity;
-						if (diff > 0)
+						if (diff > 0) { 
 							inventoryItemEntry.quantityFound += diff;
-						else 
+							inventoryItemEntry.quantityTotalIn += diff
+						}
+						else {  
 							inventoryItemEntry.quantityLost += diff	
+							inventoryItemEntry.quantityTotalOut += diff
+						}
 					}
 					
 					// Add transaction entry

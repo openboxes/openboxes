@@ -73,7 +73,27 @@ class InventoryReportEntryCommand {
 			totals.quantityLost += it.quantityLost
 			totals.quantityRunning += it.quantityRunning
 			totals.quantityTotalIn += it.quantityTotalIn
-			totals.quantityTotalOut += it.quantityTotalOut				
+			totals.quantityTotalOut += it.quantityTotalOut		
+			
+			it?.quantityTransferredInByLocation?.each { key, value->
+				println "transfer in -> " + key + " = " + value 
+				println totals
+				println totals.quantityTransferredOutByLocation
+				if (!totals.quantityTransferredInByLocation[key]) { 
+					totals.quantityTransferredInByLocation[key] = 0;
+				}
+				totals.quantityTransferredInByLocation[key] += value
+			}
+			it?.quantityTransferredOutByLocation?.each { key, value->
+				println "transfer out -> " + key + " = " + value 
+				println totals
+				println totals.quantityTransferredOutByLocation
+				if (!totals.quantityTransferredOutByLocation[key]) {
+					totals.quantityTransferredOutByLocation[key] = 0;
+				}
+				totals.quantityTransferredOutByLocation[key] += value
+			}
+
 		}
 		return totals;
 	}	

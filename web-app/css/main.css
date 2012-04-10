@@ -214,6 +214,9 @@ th.desc a {
 .list tbody tr.none:hover { 
 	background: none;
 }
+.list tbody tr.unhighlight:hover { 
+	background: none;
+}
 
 
 

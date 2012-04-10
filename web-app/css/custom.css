@@ -91,12 +91,14 @@ body {
 }
 
 .debit:before { 
-	content: '(' 
+	content: '(';
 }
 .debit:after { 
-	content: ')' 
+	content: ')';
 }
-
+.nowrap { 
+	white-space: nowrap;
+}
 
 /* Action Menu Items */
 .actions .action-menu-item { 
@@ -716,6 +718,8 @@ span.left { width: 10%;  float: left; text-align: center; }
 .action-menu-item { margin: 0px; padding: 3px; }
 .filter-list-item { margin: 10px;  } 
 .document-list-item { margin: 1px; }
+
+.details { cursor: pointer; position: absolute; z-index:999; background-color: white; border: 1px solid lightgrey; padding: 10px; display: none; } 
 
 .selected { 
 	font-weight: bold;		

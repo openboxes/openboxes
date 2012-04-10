@@ -96,7 +96,7 @@
 
 		<g:if test="${command?.shipment }">
 			<div>
-				<table border="0">
+				<table>
 					<tr>
 						<td class="left">
 							<img src="${createLinkTo(dir:'images/icons/logos/',file:'pih_logo.jpg')}"  width="34" height="50"/>

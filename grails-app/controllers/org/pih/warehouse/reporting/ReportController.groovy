@@ -102,6 +102,8 @@ class ReportController {
 		url += "&category.id=" + params.category.id
 		url += "&startDate=" + params.startDate
 		url += "&endDate=" + params.endDate
+		url += "&pageBreak=" + params.pageBreak
+		url += "&includeChildren=" + params.includeChildren
 		url += "&includeEntities=true" 
 
 		// Let the browser know what content type to expect

@@ -25,13 +25,13 @@ class InventoryReportCommand {
 
 
 	static constraints = {
-		showEntireHistory(nullable:true)
 		product(nullable:true)
 		location(nullable:false)
 		startDate(nullable:true)
 		endDate(nullable:true)
 		category(nullable:false)
 		includeChildren(nullable:true)
+		showEntireHistory(nullable:true)
 	}
 	
 	

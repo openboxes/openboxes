@@ -23,10 +23,17 @@
 	<g:layoutHead />
 	<g:render template="/common/customCss"/>
 	<style>
+		@page { margin: .25in; }
 		@page land { size:landscape; }
 		@page port { size:portrait; }
-		.landscape { page:land; width: 24.7cm;  }
+		.landscape { page:land; width: 26.7cm;  }
 		.portrait { page:port; }
+		.report { -fs-table-paginate: paginate;  }		
+		.report .total { border-right: 1px solid black; }
+		.report th { border-bottom: 1px solid black; }
+		<g:if test='${params.pageBreak}'>
+			.report { page-break-after: always; }
+		</g:if>		
 	</style>
 </head>
 <body >
