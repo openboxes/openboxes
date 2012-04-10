@@ -602,10 +602,8 @@
 					$(".details").hide();
 				});
 				
-				$(".show-details").mouseout(function(event) {
-					$(this).parent().children(".details").hide()
-				});
-				$(".show-details").mouseover(function(event) {
+				
+				$(".show-details").click(function(event) {
 					//show the menu directly over the placeholder
 					var details = $(this).parent().children(".details");
 
