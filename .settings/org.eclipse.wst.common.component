@@ -82,15 +82,10 @@
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/app-info-0.4.3/src/groovy"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/app-info-0.4.3/src/java"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/barcode4j-0.2.1/grails-app/services"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/constraints-0.5.1/grails-app/i18n"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/constraints-0.5.1/grails-app/utils"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/constraints-0.5.1/src/java"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/csv-0.1/src/groovy"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/dynamic-controller-0.2.1/grails-app/controllers"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/dynamic-controller-0.2.1/src/groovy"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/dynamic-controller-0.2.1/src/java"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/excel-import-0.3/grails-app/i18n"/>
-        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/excel-import-0.3/src/groovy"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/famfamfam-1.0.1/grails-app/taglib"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/google-visualization-0.4/grails-app/i18n"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/google-visualization-0.4/grails-app/taglib"/>

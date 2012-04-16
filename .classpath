@@ -12,17 +12,10 @@
 	<classpathentry kind="src" path="test/integration"/>
 	<classpathentry kind="src" path="test/unit"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="com.springsource.sts.grails.core.CLASSPATH_CONTAINER"/>
 	<classpathentry kind="con" path="GROOVY_SUPPORT"/>
 	<classpathentry kind="lib" path="lib/http-builder-0.5.0-20100405.192442-18.jar"/>
 	<classpathentry kind="lib" path="lib/opencsv-2.2.jar"/>
-	<classpathentry kind="lib" path="lib/poi-3.6-20091214.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.7-bin.jar"/>
-	<classpathentry kind="lib" path="lib/poi-contrib-3.6-20091214.jar"/>
-	<classpathentry kind="lib" path="lib/poi-examples-3.6-20091214.jar"/>
-	<classpathentry kind="lib" path="lib/poi-ooxml-3.6-20091214.jar"/>
-	<classpathentry kind="lib" path="lib/poi-ooxml-schemas-3.6-20091214.jar"/>
-	<classpathentry kind="lib" path="lib/poi-scratchpad-3.6-20091214.jar"/>
 	<classpathentry kind="lib" path="lib/commons-email-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/mail.jar"/>
 	<classpathentry kind="lib" path="lib/c3p0-0.9.1.2.jar"/>
@@ -416,5 +409,6 @@
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="con" path="com.springsource.sts.grails.core.CLASSPATH_CONTAINER"/>
 	<classpathentry kind="output" path="target-eclipse/classes"/>
 </classpath>
