@@ -53,7 +53,60 @@
 					<g:form>
 						<g:hiddenField name="id" value="${transactionInstance?.id}"/>
 						<g:hiddenField name="inventory.id" value="${transactionInstance?.inventory?.id}"/>
+						
+						
 						<table>
+							<tr class="prop">
+								<td class="name">
+									<label><warehouse:message code="transaction.type.label"/></label>
+								</td>
+								<td>
+									<span class="value ${transactionInstance?.transactionType?.transactionCode?.name()?.toLowerCase()}">
+										<format:metadata obj="${transactionInstance?.transactionType}"/>
+									</span>
+									<g:if test="${transactionInstance?.source }">
+										<span>
+											<warehouse:message code="default.from.label"/>
+											${transactionInstance?.source?.name }	
+										</span>
+									</g:if>
+									
+									<g:if test="${transactionInstance?.destination }">
+										<span>
+											<warehouse:message code="default.to.label"/>
+											${transactionInstance?.destination?.name }	
+										</span>
+									</g:if>	
+								</td>	
+							</tr>
+							<g:if test="${transactionInstance?.outgoingShipment }">
+								<tr class="prop">
+									<td class="name">
+										<label><warehouse:message code="shipping.shipment.label"/></label>
+									</td>
+									<td class="value">
+										<g:link controller="shipment" action="showDetails" id="${transactionInstance?.outgoingShipment?.id }">
+											${transactionInstance?.outgoingShipment?.name} 
+											<img src="${createLinkTo(dir:'images/icons/silk',file:'link.png')}" alt="${warehouse.message(code: 'transaction.showSingleProduct.label') }" style="vertical-align: middle"/>
+										</g:link>
+									</td>										
+								</tr>
+							</g:if>
+							<g:if test="${transactionInstance?.incomingShipment }">
+								<tr class="prop">
+									<td class="name">
+										<label><warehouse:message code="shipping.shipment.label"/></label>
+									</td>
+									<td class="value">
+										<g:link controller="shipment" action="showDetails" id="${transactionInstance?.incomingShipment?.id }">
+											${transactionInstance?.incomingShipment?.name} 
+											<img src="${createLinkTo(dir:'images/icons/silk',file:'link.png')}" alt="${warehouse.message(code: 'transaction.showSingleProduct.label') }" style="vertical-align: middle"/>
+										</g:link>
+									</td>										
+								</tr>
+							</g:if>
+							
+							
 							<tr class="prop">
 								<td class="name">
 									<label><warehouse:message code="transaction.transactionNumber.label"/></label>
@@ -76,57 +129,6 @@
 										<format:date obj="${transactionInstance?.transactionDate}"/>
 									</span>
 								</td>										
-							</tr>
-							<g:if test="${transactionInstance?.outgoingShipment }">
-								<tr class="prop">
-									<td class="name">
-										<label><warehouse:message code="shipping.shipment.label"/></label>
-									</td>
-									<td class="value">
-										<g:link controller="shipment" action="showDetails" id="${transactionInstance?.outgoingShipment?.id }">
-											${transactionInstance?.outgoingShipment?.name} 
-										</g:link>
-									</td>										
-								</tr>
-							</g:if>
-							<g:if test="${transactionInstance?.incomingShipment }">
-								<tr class="prop">
-									<td class="name">
-										<label><warehouse:message code="shipping.shipment.label"/></label>
-									</td>
-									<td class="value">
-										<g:link controller="shipment" action="showDetails" id="${transactionInstance?.incomingShipment?.id }">
-											${transactionInstance?.incomingShipment?.name} 
-										</g:link>
-									</td>										
-								</tr>
-							</g:if>
-							<tr class="prop">
-								<td class="name">
-									<label><warehouse:message code="transaction.type.label"/></label>
-								</td>
-								<td>
-									<span class="value ${transactionInstance?.transactionType?.transactionCode?.name()?.toLowerCase()}">
-										<format:metadata obj="${transactionInstance?.transactionType}"/>
-									</span>
-									<g:if test="${transactionInstance?.source }">
-										<span id="sourceSection" class="prop-multi">
-											<label><warehouse:message code="default.from.label"/></label>
-											<span>
-												${transactionInstance?.source?.name }	
-											</span>
-										</span>									
-									</g:if>
-									
-									<g:if test="${transactionInstance?.destination }">
-										<span id="destinationSection" class="prop-multi">
-											<label><warehouse:message code="default.to.label"/></label>
-											<span>
-												${transactionInstance?.destination?.name }	
-											</span>
-										</span>
-									</g:if>	
-								</td>	
 							</tr>
 							<tr id="inventory" class="prop">
 								<td class="name">
@@ -199,14 +201,19 @@
 															<g:set var="transactionCount" value="${transactionCount+1 }"/>
 															<tr class="${status%2?'odd':'even' }">
 																<td style="text-align: left;">
-																	<g:link controller="inventoryItem" action="showStockCard" params="['product.id':transactionEntry?.inventoryItem?.product?.id]">
-																		<format:product product="${transactionEntry?.inventoryItem?.product}"/>
-																	</g:link>
 																	<g:if test="${params?.showAll || !params.product }">		
 																		<g:link controller="inventory" action="showTransaction" id="${transactionInstance.id}" params="['product.id':transactionEntry?.inventoryItem?.product?.id]">
 																			<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="${warehouse.message(code: 'transaction.showSingleProduct.label') }" style="vertical-align: middle"/>
 																		</g:link>
 																	</g:if>
+
+																	<g:link controller="inventoryItem" action="showStockCard" params="['product.id':transactionEntry?.inventoryItem?.product?.id]">
+																		<format:product product="${transactionEntry?.inventoryItem?.product}"/>
+																		<img src="${createLinkTo(dir:'images/icons/silk',file:'link.png')}" alt="${warehouse.message(code: 'transaction.showSingleProduct.label') }" style="vertical-align: middle"/>
+																	</g:link>
+																			
+																			
+																			
 																	
 																</td>										
 																<td class="center">

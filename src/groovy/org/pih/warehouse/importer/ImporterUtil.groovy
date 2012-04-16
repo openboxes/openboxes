@@ -5,13 +5,21 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.codehaus.groovy.grails.commons.ApplicationHolder;
 import org.pih.warehouse.product.Category;
 import org.springframework.validation.Errors;
 
 class ImporterUtil {
 
-	static DateFormat EXCEL_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd")
 	
+
+	static DateFormat EXCEL_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd")
+
+	
+	static getProductService() { 
+		return ApplicationHolder.getApplication().getMainContext().getBean("productService")
+	}
+		
 	/**
 	 *
 	 * @param categoryName
@@ -22,11 +30,14 @@ class ImporterUtil {
 		def category = Category.findByName(categoryName);
 		if (!category) {
 			//category = new Category(name: importParams.category, parentCategory: parentCategory);
-			category = new Category(name: categoryName);
+			category = new Category(name: categoryName, parentCategory: getProductService().getRootCategory());
 			if (!category.validate()) {
 				category.errors.allErrors.each {
 					errors.addError(it);
 				}
+			}
+			else { 
+				category.save(failOnError: true)
 			}
 			//log.debug "Created new category " + category.name;
 		}

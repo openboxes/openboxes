@@ -72,6 +72,7 @@
 	<div class="dialog" title="Report Error - ${targetUri }">
 		<g:form controller="errors" action="processError">
 			<g:hiddenField id="dom" name="dom" value=""/>
+			<g:hiddenField name="reportedBy" value="${session?.user?.username}"/>
 			<g:hiddenField name="targetUri" value="${targetUri}"/>
 			<g:hiddenField name="request.statusCode" value="${request.'javax.servlet.error.status_code'}"/>
 			<g:hiddenField name="request.errorMessage" value="${request.'javax.servlet.error.message'.encodeAsHTML()}"/>
@@ -102,7 +103,7 @@
 				--%>
 				<tr class="prop">
 					<td class="name">
-						<label>Subject</label>
+						<label><warehouse:message code="default.subject.label"/></label>
 					</td>
 					<td class="value">
 						${request.'javax.servlet.error.message'.encodeAsHTML()}
@@ -110,23 +111,47 @@
 				</tr>
 				<tr class="prop">
 					<td class="name">
+						<label><warehouse:message code="default.reportedBy.label"/></label>
+					</td>
+					<td class="value">
+						${session?.user?.name }
+						&nbsp;
+						<span class="fade">${session?.user?.email }</span>
+					</td>
+				</tr>
+				<tr class="prop">
+				
+					<td class="name">
+					
+					</td>
+					<td class="value">
+						<div>
+							<g:checkBox name="ccMe" value="${true }" />&nbsp;
+							<warehouse:message code="default.reportCcMe.label" />						
+						
+						</div>
+					</td>
+				</tr>
+				<tr class="prop">
+					<td class="name">
 						<label><warehouse:message code="default.comment.label"/></label>
 					</td>
 					<td class="value">
-						<g:textArea name="comments" cols="100" rows="5"></g:textArea>
+						<g:textArea name="comments" cols="60" rows="5"></g:textArea>
 					</td>
 				</tr>
 				<tr class="prop">
 					<td class="name"></td>			
 					<td class="value">
 						<button>							
-							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'email_go.png')}" style="vertical-align: middle" />&nbsp;
-							<warehouse:message code="default.submitBugReport.label"/> &nbsp;
+							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'email_go.png')}" style="vertical-align: middle" />
+							<warehouse:message code="default.submitBugReport.label"/>
 						</button>	
 						&nbsp;
-						<a href="javascript:void(0);" class="close-dialog">
+						<button class="close-dialog">
+							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'decline.png')}" style="vertical-align: middle" />
 							<warehouse:message code="default.button.close.label"/>
-						</a>
+						</button>
 					</td>
 				</tr>
 			</table>
@@ -147,10 +172,11 @@
 			$(".dialog").dialog({ 
 				autoOpen: true, 
 				modal: true, 
-				width: '800px'
+				width: 600
 			});
 		});
-		$(".close-dialog").click(function() { 
+		$(".close-dialog").click(function(event) {
+			event.preventDefault(); 
 			$(".dialog").dialog("close"); 
 		});
 

@@ -236,7 +236,12 @@
 			</li>
 			<li>
 				<span class="menuButton">
-					<g:link controller="batch" action="importData"><warehouse:message code="default.import.label" args="[warehouse.message(code:'default.data.label')]"/></g:link> 				
+					<g:link controller="batch" action="importData" params="[type:'product']"><warehouse:message code="default.import.label" args="[warehouse.message(code:'products.label')]"/></g:link> 				
+				</span>			
+			</li>
+			<li>
+				<span class="menuButton">
+					<g:link controller="batch" action="importData" params="[type:'inventory']"><warehouse:message code="default.import.label" args="[warehouse.message(code:'inventory.label')]"/></g:link> 				
 				</span>			
 			</li>
 		</ul>
@@ -265,12 +270,12 @@
 			</li>
 			<li>
 				<span class="menuButton">
-					<g:link controller="attribute" action="list"><warehouse:message code="attribute.label"/></g:link>
+					<g:link controller="attribute" action="list"><warehouse:message code="attributes.label"/></g:link>
 				</span>
 			</li>
 			<li>
 				<span class="menuButton">
-					<g:link controller="category" action="tree"><warehouse:message code="category.productCategories.label"/></g:link>
+					<g:link controller="category" action="tree"><warehouse:message code="categories.label"/></g:link>
 				</span>
 			</li>
 			<li>

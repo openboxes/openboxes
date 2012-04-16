@@ -173,8 +173,13 @@ li.ui-menu-item { text-align: left; font-weight: bold; }
 h3 { 
 	font-family: Georgia;
 	font-style: italic;
-	font-size: 14px;
+	font-size: 16px;
 	vertical-align: bottom;
+	padding: 5px 0px 2px;
+	margin: 0px;
+	margin-bottom: 5px;
+	border-bottom: 1px solid #CCC;
+
 	/*color: #008000;*//*green */
 } 
 h3.ui-state-active { background-color: #f7f7f7; }  /* #F8F7EF */

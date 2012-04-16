@@ -16,26 +16,33 @@
 					${flash.message}
 				</div>
 			</g:if> 
-			<g:if test="${commandInstance?.data}">
-				<div class="message">
-					<warehouse:message code="inventory.thereAreRowsIn.message" args="[commandInstance.data.size(), commandInstance.filename]" />
-				</div>
-			</g:if>
 			<g:hasErrors bean="${commandInstance}">
 				<div class="errors"><g:renderErrors bean="${commandInstance}" as="list" /></div>
 			</g:hasErrors>
 
-			<div class="dialog">
-				<g:render template="uploadFileForm"/>
-			</div>
-						
+			<g:if test="${!commandInstance?.data}">
+				<div class="dialog">
+					<g:render template="uploadFileForm"/>
+				</div>
+			</g:if>
 			<g:if test="${commandInstance?.data}">
 				<div class="list">
+				
+					<g:if test="${commandInstance?.data}">
+						<div class="notice">
+							<warehouse:message code="inventory.thereAreRowsIn.message" 
+								args="[commandInstance.data.size(), commandInstance.filename, 
+									commandInstance?.products?.size(), commandInstance?.inventoryItems?.size(), 
+									commandInstance?.categories?.size()]" />
+						</div>
+					</g:if>
+				
 					<fieldset>
 						<div style="overflow: auto; height: 300px; ">
 							<table >		
 								<thead>
 									<tr>
+										<th></th>
 										<g:each var="column" in="${commandInstance?.columnMap?.columnMap }">
 											<th><warehouse:message code="import.${column.value}.label"/></th>
 										</g:each>
@@ -44,6 +51,7 @@
 								<tbody>							
 									<g:each var="row" in="${commandInstance?.data }" status="status">
 										<tr class="${status%2?'even':'odd' }">		
+											<td>${status+1 }</td>
 											<g:each var="column" in="${commandInstance?.columnMap?.columnMap }">
 												<td>${row[column.value] }</td>
 											</g:each>
@@ -65,11 +73,17 @@
 					<g:if test="${!commandInstance.errors.hasErrors()}">
 						<div style="text-align: center; display: inline">
 							<g:form controller="batch" action="importData" method="POST"> 
-								<button type="submit" name="importNow" value="true"><img src="${createLinkTo(dir:'images/icons/silk',file:'disk.png')}" alt="Import Now" /> 
-									&nbsp;${warehouse.message(code: 'default.button.import.label', default: 'Import Now')}</button>
+							
+								<input name="location.id" type="hidden" value="${session.warehouse.id }"/>
+								<input name="type" type="hidden" value="${params.type }"/>							
+							
+								<button type="submit" name="importNow" value="true"><img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" /> 
+									${warehouse.message(code: 'default.button.import.label')}&nbsp;</button>
 									
 								&nbsp;
-								<a href="${createLink(controller: "batch", action: "importData")}" class="negative"><warehouse:message code="default.button.clear.label"/></a>
+								<a href="${createLink(controller: "batch", action: "importData", params: params)}" class="negative">
+									<warehouse:message code="default.button.cancel.label"/>
+								</a>
 									
 							</g:form>			
 						</div>

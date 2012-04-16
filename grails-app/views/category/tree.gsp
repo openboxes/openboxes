@@ -28,69 +28,9 @@
             
             <div class="dialog" >        
 		        <table>
-		        	<tr>
-		        		<td>
-		        		
-		        		<fieldset>		        		
-		           			<div>
-								<style>
-									.category-tree ul { margin-left: 2em; } 
-									.category-tree li { background-color: #f7f7f7;
-									border: 1px dashed lightgrey; padding: .5em; margin: .5em;}
-								</style>
-								
-								<%-- Display the category tree from the ROOT node --%>
-								<g:render template="tree" model="[category:rootCategory, level: 0]"/>
-							
-							
-								<script>
-									$(function() {
-										//$( ".draggable" ).draggable();
-							
-										$('li.draggable').draggable(
-												{
-													revert		: true,
-													autoSize		: false,
-													ghosting			: false,
-													onStop		: function()
-													{
-														$('li.droppable').each(
-															function()
-															{
-																this.expanded = false;
-															}
-														);
-													}
-												}
-											);
-							
-										$('li.droppable').droppable(
-												{
-													accept: 'li.draggable',
-													tolerance: 'intersect',
-													over: function(event, ui) { 
-														$( this ).addClass( "ui-state-highlight" );
-													},
-													out: function(event, ui) { 
-														$( this ).removeClass( "ui-state-highlight" );
-													},
-													drop: function( event, ui ) {
-														ui.draggable.hide();
-														$( this ).removeClass( "ui-state-highlight" );
-														var child = ui.draggable.attr("id");
-														var parent = $(this).attr("id");
-														var url = "${request.contextPath}/category/move?child=" + child + "&newParent=" + parent;
-														window.location.replace(url);
-													}
-												}
-											);
-										});
-								</script>
-				            </div>
-				            </fieldset>
-						</td>
-						<td>
-							<g:if test="${categoryInstance }">
+					<g:if test="${categoryInstance }">
+						<tr>
+							<td>
 								<g:form action="saveCategory">
 									<g:hiddenField name="id" value="${categoryInstance?.id }"/>
 				           			<fieldset>
@@ -164,8 +104,12 @@
 				           				</table>
 				           			</fieldset>
 		           				</g:form>	
-		           			</g:if>									
-		           			<g:else>
+							</td>
+						</tr>		           				
+           			</g:if>									
+           			<g:else>
+           				<tr>
+           					<td>
 		           				<g:if test="${params.addCategory=='addCategory' }">					           			
 									<g:form action="save" method="post" >
 						            	<fieldset>
@@ -203,9 +147,74 @@
 
 						            </g:form>	
 						    	</g:if>	
-						    	
-		           			</g:else>
+
+							</td>
+						</tr>
 						
+						    	
+           			</g:else>		        	
+		        
+		        
+		        	<tr>
+		        		<td>
+		        		
+			        		<fieldset>		        		
+			           			<div>
+									<style>
+										.category-tree ul { margin-left: 2em; } 
+										.category-tree li { background-color: #f7f7f7;
+										border: 1px dashed lightgrey; padding: .5em; margin: .5em;}
+									</style>
+									
+									<%-- Display the category tree from the ROOT node --%>
+									<g:render template="tree" model="[category:rootCategory, level: 0]"/>
+								
+								
+									<script>
+										$(function() {
+											//$( ".draggable" ).draggable();
+								
+											$('li.draggable').draggable(
+													{
+														revert		: true,
+														autoSize		: false,
+														ghosting			: false,
+														onStop		: function()
+														{
+															$('li.droppable').each(
+																function()
+																{
+																	this.expanded = false;
+																}
+															);
+														}
+													}
+												);
+								
+											$('li.droppable').droppable(
+													{
+														accept: 'li.draggable',
+														tolerance: 'intersect',
+														over: function(event, ui) { 
+															$( this ).addClass( "ui-state-highlight" );
+														},
+														out: function(event, ui) { 
+															$( this ).removeClass( "ui-state-highlight" );
+														},
+														drop: function( event, ui ) {
+															ui.draggable.hide();
+															$( this ).removeClass( "ui-state-highlight" );
+															var child = ui.draggable.attr("id");
+															var parent = $(this).attr("id");
+															var url = "${request.contextPath}/category/move?child=" + child + "&newParent=" + parent;
+															window.location.replace(url);
+														}
+													}
+												);
+											});
+									</script>
+					            </div>
+							</fieldset>
 						</td>
 		        	</tr>
 		        </table>								            

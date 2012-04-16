@@ -97,12 +97,13 @@ class ReportController {
 		// JSESSIONID is required because otherwise the login page is rendered
 		def url = baseUri + params.url + ";jsessionid=" + session.getId()		
 		url += "?print=true" 
-		url += "&showTransferBreakdown=" + params.showTransferBreakdown
 		url += "&location.id=" + params.location.id
 		url += "&category.id=" + params.category.id
 		url += "&startDate=" + params.startDate
 		url += "&endDate=" + params.endDate
-		url += "&pageBreak=" + params.pageBreak
+		url += "&showTransferBreakdown=" + params.showTransferBreakdown
+		url += "&hideInactiveProducts=" + params.hideInactiveProducts
+		url += "&insertPageBreakBetweenCategories=" + params.insertPageBreakBetweenCategories
 		url += "&includeChildren=" + params.includeChildren
 		url += "&includeEntities=true" 
 

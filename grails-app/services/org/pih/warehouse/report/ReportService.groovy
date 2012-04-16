@@ -137,40 +137,46 @@ class ReportService implements ApplicationContextAware {
 		// 
 		//command.startDate = command.startDate?:new Date()
 		//command.endDate = command.endDate?:new Date()
-		
+		// TODO Need to restrict by date and category
+		def transactionEntries = inventoryService.getTransactionEntries(command.location, command.category, command?.startDate, command?.endDate);
+		def transactionEntriesByProduct = transactionEntries.groupBy { it?.inventoryItem?.product }
+
 				
 		log.info "Products (" + products.size() + ") -> " + products
 		// Initialize the report map to reference all products to be displayed		 
 		products.each { product ->
-			def productEntry = command.entries[product];
-			if (!productEntry) {
-				productEntry = new InventoryReportEntryCommand(product: product);
-				command.entries[product] = productEntry
-			}
-			productEntry.quantityInitial = inventoryService.getInitialQuantity(product, command?.location, command?.startDate?:null)
-			productEntry.quantityFinal = inventoryService.getCurrentQuantity(product, command?.location, command?.endDate?:new Date());
-
-			// Initialize the product map to reference all inventory items for that product
-			def inventoryItems = inventoryService.getInventoryItemsByProduct(product)
-			inventoryItems?.each { inventoryItem ->				
-				//log.info "inventory item -> " + inventoryItem
-				def inventoryItemEntry = productEntry?.entries[inventoryItem];
-				if (!inventoryItemEntry) { 
-					inventoryItemEntry = new InventoryReportEntryCommand(product: product, inventoryItem: inventoryItem);
-					productEntry.entries[inventoryItem] = inventoryItemEntry;
+			
+			def productTransactionEntries = transactionEntriesByProduct[product]
+			def includeProduct = (command?.hideInactiveProducts && productTransactionEntries || !command?.hideInactiveProducts)
+				
+			if (includeProduct) { 
+				def productEntry = command.entries[product];
+				if (!productEntry) {
+					productEntry = new InventoryReportEntryCommand(product: product);
+					command.entries[product] = productEntry
 				}
-				inventoryItemEntry.quantityInitial = inventoryService.getQuantity(inventoryItem, command.location, command.startDate?:null)
-				inventoryItemEntry.quantityFinal = inventoryService.getQuantity(inventoryItem, command.location, command.endDate?:new Date())
-				inventoryItemEntry.quantityRunning = inventoryItemEntry.quantityInitial
-				
-				//inventoryItemEntry.quantityInitial = inventoryService.getInitialQuantity(inventoryItem, command?.location, command?.startDate)
-				//inventoryItemEntry.quantityFinal = inventoryService.getCurrentQuantity(inventoryItem, command?.location, command?.endDate);
-				
+				productEntry.quantityInitial = inventoryService.getInitialQuantity(product, command?.location, command?.startDate?:null)
+				productEntry.quantityFinal = inventoryService.getCurrentQuantity(product, command?.location, command?.endDate?:new Date());
+	
+				// Initialize the product map to reference all inventory items for that product
+				def inventoryItems = inventoryService.getInventoryItemsByProduct(product)
+				inventoryItems?.each { inventoryItem ->				
+					//log.info "inventory item -> " + inventoryItem
+					def inventoryItemEntry = productEntry?.entries[inventoryItem];
+					if (!inventoryItemEntry) { 
+						inventoryItemEntry = new InventoryReportEntryCommand(product: product, inventoryItem: inventoryItem);
+						productEntry.entries[inventoryItem] = inventoryItemEntry;
+					}
+					inventoryItemEntry.quantityInitial = inventoryService.getQuantity(inventoryItem, command.location, command.startDate?:null)
+					inventoryItemEntry.quantityFinal = inventoryService.getQuantity(inventoryItem, command.location, command.endDate?:new Date())
+					inventoryItemEntry.quantityRunning = inventoryItemEntry.quantityInitial
+					
+					//inventoryItemEntry.quantityInitial = inventoryService.getInitialQuantity(inventoryItem, command?.location, command?.startDate)
+					//inventoryItemEntry.quantityFinal = inventoryService.getCurrentQuantity(inventoryItem, command?.location, command?.endDate);
+					
+				}
 			}
 		}
-		
-		// TODO Need to restrict by date and category 
-		def transactionEntries = inventoryService.getTransactionEntries(command.location, command.category, command?.startDate, command?.endDate);
 		
 		
 		log.info "transactionEntries (" + transactionEntries.size() + ") -> " + transactionEntries

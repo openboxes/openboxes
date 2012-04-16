@@ -3,6 +3,7 @@ package org.pih.warehouse.core;
 class ErrorsController {
 
 	def mailService
+	def userService
 	
 	def handleException = { 
 		log.info("handle exception" + params)
@@ -11,13 +12,22 @@ class ErrorsController {
 	
 	def processError = { 
 		log.info "process error " + params
-		def recipient = "jmiranda@pih.org"
-		def userInstance = User.findByEmail(recipient);		
+		def toList = []
+
+		def adminUsers = userService.findUsersByRoleType(RoleType.ROLE_ADMIN);	
+		adminUsers.each { admin ->
+			toList << admin?.email
+		}
+		
+		def reportedBy = User.findByUsername(params.reportedBy)
+		if (params.ccMe && reportedBy) { 
+			toList << reportedBy?.email
+		}		
+		
 		def subject = "${warehouse.message(code: 'email.errorReportSubject.message')}"
 		def body = "${g.render(template:'/email/errorReport', params:params)}"
-		mailService.sendHtmlMailWithAttachment(userInstance, subject, body.toString(), params?.dom?.bytes, "error.html","text/html");
-		//mailService.sendHtmlMail(subject, body, recipient)
-		flash.message = "${warehouse.message(code: 'email.errorReportSuccess.message', args: [recipient])}"
+		mailService.sendHtmlMailWithAttachment(toList, [], subject, body.toString(), params?.dom?.bytes, "error.html","text/html");
+		flash.message = "${warehouse.message(code: 'email.errorReportSuccess.message', args: [toList])}"
 		redirect(controller: "dashboard", action: "index")
 	}
 	

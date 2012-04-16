@@ -10,39 +10,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<%-- 
-			<tr class="details even">	
-				<td class="left label">
-					<span class="name"><warehouse:message code="default.name.label"/></span>
-				</td>
-				<td colspan="2">
-					<span class="value"><format:product product="${productInstance}"/></span>
-				</td>
-			</tr>
-			<tr class="even">
-				<td colspan="2" class="middle center">
-					<img src="${resource(dir: 'images/', file: 'Advil_200mg_Caplets.jpg')}" width="100" height="140" class="zoom"/>
-					<script type="text/javascript">
-						$(function() { 				
-							$('.zoom').click(function(){
-								$("#product-photo").dialog({ 
-									autoOpen: true, 
-									modal: true,
-									width: '450',
-									height: '650'
-								});										
-							});
-						});
-							
-					</script>
-					<div style="display:none;" id="product-photo" class="center middle">
-						<img src="${resource(dir: 'images/', file: 'Advil_200mg_Caplets.jpg')}" height="600" width="400"/>
-					</div>				
-				</td>
-			</tr>
-			--%>
-			
-			<tr class="details odd">	
+			<tr class="odd">	
 				<td class="label left">
 					<span class="name"><warehouse:message code="default.status.label"/></span>
 				</td>
@@ -75,7 +43,7 @@
 					</span>
 				</td>
 			</tr>				
-			<tr class="details even">	
+			<tr class="even">	
 				<td class="label left">
 					<span class="name"><warehouse:message code="product.onHandQuantity.label"/></span>
 				</td>
@@ -85,7 +53,7 @@
 				</td>
 			</tr>			
 				
-			<tr class="details odd">	
+			<tr class="odd">	
 				<td class="left label">
 					<span class="name"><warehouse:message code="product.units.label"/></span>
 				</td>
@@ -93,7 +61,7 @@
 					<span class="value"><format:metadata obj="${productInstance?.unitOfMeasure}"/></span>
 				</td>
 			</tr>
-			<tr class="details even">	
+			<tr class="even">	
 				<td class="left label">
 					<span class="name"><warehouse:message code="category.label"/></span>
 				</td>
@@ -109,7 +77,7 @@
 				</td>
 			</tr>
 			
-			<tr class="details odd">	
+			<tr class="odd">	
 				<td class="left label">
 					<span class="name"><warehouse:message code="product.manufacturer.label"/></span>
 				</td>
@@ -125,7 +93,7 @@
 				</td>
 			</tr>
 			
-			<tr class="details even">	
+			<tr class="even">	
 				<td class="left label">
 					<span class="name"><warehouse:message code="product.manufacturerCode.label"/></span>
 				</td>
@@ -141,7 +109,7 @@
 				</td>
 			</tr>
 			
-			<tr class="details odd">	
+			<tr class="odd">	
 				<td class="left label">
 					<span class="name"><warehouse:message code="product.upc.label"/></span>
 				</td>
@@ -157,7 +125,7 @@
 				</td>
 			</tr>
 			
-			<tr class="details even">	
+			<tr class="even">	
 				<td class="left label">
 					<span class="name"><warehouse:message code="product.ndc.label"/></span>
 				</td>
@@ -173,7 +141,7 @@
 				</td>
 			</tr>
 			
-			<tr class="details odd">	
+			<tr class="odd">	
 				<td class="left label">
 					<span class="name"><warehouse:message code="product.coldChain.label"/></span>
 				</td>
@@ -191,7 +159,7 @@
 					</td>
 				</tr>													
 			</g:each>
-			<tr class="details even">
+			<tr class="even">
 				<td class="label left">
 					<span class="name"><warehouse:message code="product.minLevel.label"/></span>
 				</td>
@@ -209,7 +177,7 @@
 					</span>
 				</td>				
 			</tr>
-			<tr class="details odd">
+			<tr class="odd">
 				<td class="label left">
 					<span class="name"><warehouse:message code="product.reorderLevel.label"/></span>
 				</td>

@@ -18,10 +18,9 @@
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footer.css')}" type="text/css" media="screen, projection" />	
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'wizard.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.tableScroll/',file:'jquery.tablescroll.css')}" type="text/css" media="screen, projection" />
-	<%-- 
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'example.css')}" type="text/css" media="screen, projection" />
-	--%>
+
 	<!-- Include javascript files -->
 	<g:javascript library="application"/>
 
@@ -50,9 +49,7 @@
 	<script src="${createLinkTo(dir:'js/jquery.periodicalupdater/', file:'jquery.periodicalupdater.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.flot/', file:'jquery.flot.js')}" type="text/javascript"></script>
 	<script src="${createLinkTo(dir:'js/', file:'global.js')}" type="text/javascript" ></script>
-	<%-- 
 	<script src="${createLinkTo(dir:'js/jquery.megaMenu/', file:'jquery.megamenu.js')}" type="text/javascript" ></script>
-	--%>
 	
  	<!-- Include Jquery Validation and Jquery Validation UI plugins -->
  	<jqval:resources />       
@@ -211,6 +208,7 @@
 				timeout: 100,   // number = milliseconds delay before onMouseOut
 				out: hideActions       // function = onMouseOut callback (required)
 			});  
+
 			
 			// Create an action button that toggles the action menu on click
 			//button({ text: false, icons: {primary:'ui-icon-gear',secondary:'ui-icon-triangle-1-s'} }).
@@ -242,7 +240,7 @@
 				// To prevent the action button from POST'ing to the server
 				event.preventDefault();
 			});
-				
+			
 			var accordion = 
 				$('.accordion').accordion({
 					active: true, 
@@ -319,6 +317,9 @@
 				accordion.accordion( "activate" , 0 );
 			</g:elseif>
 			<g:elseif test="${request.request.requestURL.toString().contains('product')}">
+				accordion.accordion( "activate" , 6 );
+			</g:elseif>			
+			<g:elseif test="${request.request.requestURL.toString().contains('batch')}">
 				accordion.accordion( "activate" , 6 );
 			</g:elseif>			
 		

@@ -25,6 +25,7 @@ html, body {
   text-align: center;
 }
 
+/*
 h1 {
   font-family: Georgia;
   font-size: 22px;
@@ -32,10 +33,11 @@ h1 {
   margin: 0px;
   padding: 20px 15px;
 }
+*/
 
 
 ul.megamenu {
-  background-image: url(./images/menu-background.gif);
+  background-image: url(../images/menu-background.gif);
   background-repeat: repeat-x;
   background-position: 0px 0px;
 }
@@ -44,6 +46,7 @@ ul.megamenu {
   background-color: #FFF;
 }
 
+/*
 a:link, a:visited {
   color: #333;
 }
@@ -62,6 +65,8 @@ h3 {
   border-bottom: 1px solid #CCC;
   margin-bottom: 5px;
 }
+*/
+
 
 p, blockquote {
   margin: 0px;

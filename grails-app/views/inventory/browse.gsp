@@ -27,11 +27,9 @@
 				<!-- Inventory Browser -->
 				<div>
 		        	<g:set var="varStatus" value="${0}"/>
-		        	<g:set var="totalProducts" value="${0}"/>      			
-		         				<g:render template="tabs" 
-		         					model="[commandInstance:commandInstance, quickCategories:quickCategories]"/>						
-		         				<g:render template="filters" 
-		         					model="[commandInstance:commandInstance, quickCategories:quickCategories]"/>						
+		        	<g:set var="totalProducts" value="${0}"/> 							        	
+       				<g:render template="tabs" model="[commandInstance:commandInstance, quickCategories:quickCategories]"/>						
+       				<g:render template="filters" model="[commandInstance:commandInstance, quickCategories:quickCategories]"/>						
 		         	<table>
 						<tr class="prop">
 			         		<td style="padding: 0; margin: 0; vertical-align: middle;">
@@ -152,7 +150,7 @@
 											<g:else>
 												<tbody >
 													<tr>
-														<td class="middle center" style="height: 100px;">
+														<td class="middle center" style="height: 200px;">
 															<warehouse:message code="inventory.searchNoMatch.message" args="[commandInstance?.searchTerms?:'',format.metadata(obj:commandInstance?.categoryInstance)]"/>
 														</td>
 													</tr>
@@ -186,6 +184,9 @@
 						return false;
 					}
 				);
+
+				
+				$(".megamenu").megamenu();
 				
 				$("#toggleCheckbox").click(function(event) {
 					$(".checkbox").attr("checked", $(this).attr("checked"));

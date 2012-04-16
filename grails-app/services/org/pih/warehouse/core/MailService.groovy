@@ -89,8 +89,11 @@ class MailService {
 		sendHtmlMailWithAttachment(userInstance?.email, subject, body, bytes, name, mimeType)
 	}	
 
-
-	def sendHtmlMailWithAttachment(Collection toList, String subject, String body, byte [] bytes, String name, String mimeType) { 
+	def sendHtmlMailWithAttachment(Collection toList, String subject, String body, byte [] bytes, String name, String mimeType) {
+		sendHtmlMailWithAttachment(toList, [], subject, body, bytes, name, mimeType)		
+	}
+		
+	def sendHtmlMailWithAttachment(Collection toList, Collection ccList, String subject, String body, byte [] bytes, String name, String mimeType) { 
 		log.info ("Sending email with attachment " + toList)
 		if (Boolean.valueOf(grailsApplication.config.grails.mail.enabled)) {
 			try {
@@ -100,6 +103,11 @@ class MailService {
 				email.setFrom(from);
 				toList.each { to ->
 					email.addTo(to)
+				}
+				if (ccList) { 
+					ccList.each { cc -> 
+						email.addCc(cc)
+					}
 				}
 				email.setSubject("${prefix} " + subject);
 				email.setHtmlMsg(body);

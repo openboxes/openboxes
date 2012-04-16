@@ -36,12 +36,14 @@
 					<warehouse:message code="product.editStatus.label"/>
 				</g:link>
 			</div>
+			<%-- 
 			<div class="action-menu-item">					
 				<g:link controller="product" action="addPhoto" id="${product?.id }">
 					<img src="${resource(dir: 'images/icons/silk', file: 'photo_add.png')}"/>&nbsp;
 					<warehouse:message code="product.addPhoto.label"/>
 				</g:link>
 			</div>
+			--%>
 			<div class="action-menu-item">
 				<hr/>
 			</div>

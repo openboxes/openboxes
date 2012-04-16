@@ -4,12 +4,12 @@
 	<table>	
 		<g:each var="entry" in="${params }">
 			<tr>			
-				<td style="vertical-align: top;">
-					${entry.key }				
-				</td>
-				<td style="vertical-align: top;">
+				<td>
 					<g:if test="${entry.key != 'dom' }">				
-						${entry.value }
+						<b>${entry.key }</b>
+						<div>
+							${entry.value ?: warehouse.message(code: 'default.none.label') }
+						</div>
 					</g:if>
 				</td>
 			</tr>

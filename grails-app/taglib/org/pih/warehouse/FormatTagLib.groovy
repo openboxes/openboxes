@@ -101,13 +101,13 @@ class FormatTagLib {
 	 * Currently simply displays the localized name of the category
 	 */
 	def category = { attrs ->
-		if (attrs.category != null) {
+		if (attrs.category) {
 			// use the locale specified in the tag if it exists, otherwise use the user locale if it exists, otherwise use the system default locale
 			// (note that we explicitly do a containsKey test because it is possible that the locale attribute has been specified but has been set to null--which means show the default locale)
 			Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
 			
 			// default format is to display the localized name of the catergory
-			out << LocalizationUtil.getLocalizedString(attrs.category.name.encodeAsHTML(), locale)
+			out << LocalizationUtil.getLocalizedString(attrs?.category?.name?.encodeAsHTML(), locale)
 		}
 		// TODO: add more formats
 	}

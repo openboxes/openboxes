@@ -1,5 +1,7 @@
 package org.pih.warehouse.inventory;
 
+import grails.validation.ValidationException;
+
 import java.util.Map;
 
 import java.text.ParseException;
@@ -1300,6 +1302,33 @@ class InventoryService implements ApplicationContextAware {
 		}
 		return null;
 	}
+	/**
+	 * TODO Need to finish this method. 
+	 * 
+	 * @param product
+	 * @param lotNumber
+	 * @param expirationDate
+	 * @return
+	 */
+	InventoryItem findOrCreateInventoryItem(Product product, String lotNumber, Date expirationDate) { 
+		def inventoryItem =
+			findInventoryItemByProductAndLotNumber(product, lotNumber);
+	
+		// If the inventory item doesn't exist, we create a new one
+		if (!inventoryItem) {
+			inventoryItem = new InventoryItem();
+			inventoryItem.lotNumber = lotNumber
+			inventoryItem.expirationDate = expirationDate;
+			inventoryItem.product = product
+			inventoryItem.save()			
+		}
+			
+		
+		return inventoryItem 
+
+	}
+	
+	
 	 
 	
 	/**
@@ -2168,13 +2197,21 @@ class InventoryService implements ApplicationContextAware {
 		}
 		return transactionEntry
 	}
-	public void validateData(ImportDataCommand command) {
+	
+	public void validateData(ImportDataCommand command) { 
+		processData(command);
+	}
+	
+	
+	public void processData(ImportDataCommand command) {
 		Date today = new Date()
 		today.clearTime()
 		def transactionInstance = new Transaction(transactionDate: today,
 				transactionType: TransactionType.findById(Constants.INVENTORY_TRANSACTION_TYPE_ID),
 				inventory: command?.location?.inventory)
 
+		command.transaction = transactionInstance
+		
 		// Iterate over each row and validate values
 		command?.data?.each { Map params ->
 			//log.debug "Inventory item " + importParams
@@ -2194,11 +2231,16 @@ class InventoryService implements ApplicationContextAware {
 						category:category,
 						manufacturer:params.manufacturer,
 						manufacturerCode:params.manufacturerCode,
-						unitOfMeasure:params.unitOfMeasure);
+						unitOfMeasure:params.unitOfMeasure,
+						coldChain:Boolean.valueOf(params.coldChain));
 
 				if (!product.validate()) {
-					command.errors.reject("Error saving product " + product?.name)
-					//throw new RuntimeException("Error saving product " + product?.name)
+					product.errors.allErrors.each {
+						command.errors.addError(it);
+					}
+				}
+				else { 
+					command.products << product
 				}
 				log.debug "Created new product " + product.name;
 			}
@@ -2218,6 +2260,9 @@ class InventoryService implements ApplicationContextAware {
 					inventoryItem.errors.allErrors.each {
 						command.errors.addError(it);
 					}
+				}
+				else { 
+					command.inventoryItems << inventoryItem
 				}
 			}
 
@@ -2312,6 +2357,8 @@ class InventoryService implements ApplicationContextAware {
 		   // Iterate over each row
 		   command?.data?.each { Map params ->
 
+			   println params 
+			   
 			   def lotNumber = (params.lotNumber) ? String.valueOf(params.lotNumber) : null;
 			   def quantity = (params.quantity)?:0;
 
@@ -2321,11 +2368,15 @@ class InventoryService implements ApplicationContextAware {
 			   def upc = (params.upc) ? String.valueOf(params.upc) : null;
 			   def ndc = (params.ndc) ? String.valueOf(params.ndc) : null;
 
-			   def expirationDate = parseDate(params.expirationDate);
+			   def expirationDate = ImporterUtil.parseDate(params.expirationDate, command.errors);
 
-			   def category = findOrCreateCategory(params.category)
-
-			   // Create product if not exists
+			   def category = ImporterUtil.findOrCreateCategory(params.category, command.errors)
+			   category.save();
+			   if (!category) { 
+				   throw new ValidationException("error finding/creating category")
+			   }
+			   log.info "Creating product " + params.productDescription + " under category " + category 
+ 			   // Create product if not exists
 			   Product product = Product.findByName(params.productDescription);
 			   if (!product) {
 				   product = new Product(
@@ -2335,10 +2386,12 @@ class InventoryService implements ApplicationContextAware {
 					   category:category,
 					   manufacturer:manufacturer,
 					   manufacturerCode:manufacturerCode,
-					   unitOfMeasure:unitOfMeasure);
+					   unitOfMeasure:unitOfMeasure,
+					   coldChain:Boolean.valueOf(params.coldChain));
 
-				   if (!product.save()) {
-					   errors.reject("Error saving product " + product?.name)
+				   if (product.hasErrors() || !product.save()) {
+					   command.errors.reject("Error saving product " + product?.name)
+					   
 				   }
 				   log.debug "Created new product " + product.name;
 			   }
@@ -2346,7 +2399,7 @@ class InventoryService implements ApplicationContextAware {
 
 			   // Find the inventory item by product and lotNumber and description
 			   InventoryItem inventoryItem =
-					   inventoryService.findInventoryItemByProductAndLotNumber(product, lotNumber);
+					   findInventoryItemByProductAndLotNumber(product, lotNumber);
 
 			   log.debug("Inventory item " + inventoryItem)
 			   // Create inventory item if not exists
@@ -2356,11 +2409,9 @@ class InventoryService implements ApplicationContextAware {
 				   inventoryItem.lotNumber = lotNumber;
 				   inventoryItem.expirationDate = expirationDate;
 				   if (inventoryItem.hasErrors() || !inventoryItem.save()) {
-					   log.debug "Product " + product
-					   log.debug "Inventory item " + params.lotNumber;
 					   inventoryItem.errors.allErrors.each {
 						   log.error "ERROR " + it;
-						   errors.addError(it);
+						   command.errors.addError(it);
 					   }
 				   }
 			   }
@@ -2375,10 +2426,11 @@ class InventoryService implements ApplicationContextAware {
 		   }
 
 
-		   if (!errors.hasErrors()) {
+		   // Only save the transaction if there are transaction entries and there are no errors
+		   if (transactionInstance?.transactionEntries && !command.hasErrors()) {
 			   if (!transactionInstance.save()) {
 				   transactionInstance.errors.allErrors.each {
-					   errors.addError(it);
+					   command.errors.addError(it);
 				   }
 			   }
 		   }

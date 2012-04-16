@@ -13,13 +13,17 @@ import org.pih.warehouse.product.Category;
 class InventoryReportCommand {
 
 	Product product
-	Boolean includeChildren
-	Boolean showEntireHistory
 	Location location;
 	Date startDate;
 	Date endDate;	
 	Category category;
 	Category rootCategory;
+	
+	Boolean includeChildren
+	Boolean hideInactiveProducts
+	Boolean showEntireHistory
+	Boolean showTransferBreakdown
+	Boolean insertPageBreakBetweenCategories
 	
 	Map<Product, InventoryReportEntryCommand> entries = [:]
 
@@ -32,6 +36,9 @@ class InventoryReportCommand {
 		category(nullable:false)
 		includeChildren(nullable:true)
 		showEntireHistory(nullable:true)
+		showTransferBreakdown(nullable:true)
+		hideInactiveProducts(nullable:true)
+		insertPageBreakBetweenCategories(nullable:true)
 	}
 	
 	

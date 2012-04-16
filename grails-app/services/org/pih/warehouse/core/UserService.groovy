@@ -47,12 +47,12 @@ class UserService {
 	
 	def findUsersByRoleType(RoleType roleType) { 
 		def users = []
-		def roleAdmin = Role.findByRoleType(RoleType.ROLE_ADMIN)
-		if (roleAdmin) {
+		def role = Role.findByRoleType(roleType)
+		if (role) {
 			def criteria = User.createCriteria()
 			users = criteria.list {
 				roles {
-					eq("id", roleAdmin.id)
+					eq("id", role.id)
 				}
 			}
 		}

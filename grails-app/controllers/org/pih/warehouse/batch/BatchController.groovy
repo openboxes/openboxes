@@ -1,5 +1,6 @@
 package org.pih.warehouse.batch
 
+import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.importer.ImportDataCommand;
 import org.pih.warehouse.importer.InventoryExcelImporter;
@@ -17,6 +18,10 @@ class BatchController {
 	def index = { }
 
 	def importData = { ImportDataCommand command ->
+		
+		log.info params 
+		log.info command.location
+		
 		def dataMapList = null;
 		if ("POST".equals(request.getMethod())) {
 			File localFile = null;
@@ -43,44 +48,53 @@ class BatchController {
 				localFile = session.localFile
 			}
 
-			
-			if (!command?.type) { 
-				command.errors.reject("Please select a type")
-			}
+			def dataImporter
+			//if (!command?.type) { 
+			//	command.errors.reject("${warehouse.message(code: 'importDataCommand.type.invalid')}")
+			//}
 			
 			if (localFile) {
 				log.info "Local xls file " + localFile.getAbsolutePath()
 				command.importFile = localFile
 				command.filename = localFile.getAbsolutePath()
 				command.location = Location.get(session.warehouse.id)
-				
-				// Need to choose the right importer 
-				def dataImporter = null
-				log.info command.type
-				if (command.type == "inventory")
-					dataImporter = new InventoryExcelImporter(command?.filename);
-				else if (command.type == "product")
-					dataImporter = new ProductExcelImporter(command?.filename)
-				else 
-					throw new RuntimeException("Unable to import data using unknown importer")
-
-				// Get data from importer (should be done as a separate step 'processData' or within 'validateData')
-				command.data = dataImporter.data
-				
-				// Validate data using importer (might change data)
-				dataImporter.validateData(command);
-				//command.data = dataImporter.data
-				command.columnMap = dataImporter.columnMap
-				
-				if (!command?.data?.isEmpty) {
-					flash.message = "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args:[localFile.getAbsolutePath()])}"
+				try { 
+					// Need to choose the right importer 
+					log.info command.type
+					if (command.type == "inventory")
+						dataImporter = new InventoryExcelImporter(command?.filename);
+					else if (command.type == "product")
+						dataImporter = new ProductExcelImporter(command?.filename)
+					//else 
+					//	throw new RuntimeException("Unable to import data using unknown importer")
 				}
-				else {
-					flash.message = "${warehouse.message(code: 'inventoryItem.dataReadyToBeImported.message')}"
+				catch (OfficeXmlFileException e) { 
+					command.errors.reject("importFile", e.message)
+				}
+				
+				if (dataImporter) { 
+					// Get data from importer (should be done as a separate step 'processData' or within 'validateData')
+					command.data = dataImporter.data
+					
+					// Validate data using importer (might change data)
+					dataImporter.validateData(command);
+					
+					//command.data = dataImporter.data
+					command.columnMap = dataImporter.columnMap
+					
+				}
+				else { 
+					
+				}
+				if (command?.data?.isEmpty()) {
+					//flash.message = "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args:[localFile.getAbsolutePath()])}"
+					//command.reject ...
+					command.errors.reject("importFile", "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args:[localFile.getAbsolutePath()])}")
 				}
 
+				
 				// If there are no errors and the user requests to import the data, we should execute the import
-				if (!command.errors.hasErrors() && params.importNow) {
+				if (!command.hasErrors() && params.importNow) {
 					
 					dataImporter.importData(command)
 					
@@ -89,6 +103,9 @@ class BatchController {
 						redirect(action: "importData");
 						return;
 					}
+				}
+				else if (!command.hasErrors()) { 
+					flash.message = "${warehouse.message(code: 'inventoryItem.dataReadyToBeImported.message')}"
 				}
 
 

@@ -38,9 +38,11 @@ class InventoryExcelImporter extends AbstractExcelImporter {
 			'E':'manufacturerCode',
 			'F':'upc',
 			'G':'ndc',
-			'H':'lotNumber',
-			'I':'expirationDate',
-			'J':'quantity'
+			'H':'coldChain',
+			'I':'lotNumber',
+			'J':'expirationDate',
+			'K':'quantity'
+			
 		]
 	]
 
@@ -53,9 +55,11 @@ class InventoryExcelImporter extends AbstractExcelImporter {
 		manufacturerCode:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
 		upc:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
 		ndc:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+		coldChain:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
 		lotNumber:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
 		expirationDate:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-		quantity:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null])
+		quantity:([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue:null])
+		
 	]
 
 

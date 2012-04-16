@@ -24,80 +24,79 @@
 			<g:if test="${!params.print}">
 				<tr>
 					<td>
-						<g:if test="${!command?.product }">
-					    	<div class="right" style="padding: 5px;">
-								<label><warehouse:message code="report.exportAs.label"/></label>
-					   			<g:link target="_blank" controller="report" action="generateTransactionReport" params="[print:'true','location.id':command.location?.id,'category.id':command?.category?.id,'startDate':params.startDate,'endDate':params.endDate,'showTransferBreakdown':params.showTransferBreakdown,'includeChildren':command?.includeChildren]">
-					   				<warehouse:message code="report.exportAs.html.label"/>
-					   			</g:link> 
-					   			&nbsp;|&nbsp;
-					   			<g:link target="_blank" controller="report" action="downloadTransactionReport" params="[url:request.forwardURI,'location.id':command.location?.id,'category.id':command?.category?.id,'startDate':params.startDate,'endDate':params.endDate,'showTransferBreakdown':params.showTransferBreakdown,'includeChildren':command?.includeChildren,'pageBreak':params?.pageBreak]">
-					   				<warehouse:message code="report.exportAs.pdf.label"/>
-					   			</g:link>
-							</div>
-						</g:if>					
-						<div id="parametersBox" class="box">
+						<div class="">
+							<span style="border: 1px solid lightgrey; background-color: #f7f7f7; padding: 5px; margin: 5px; width: 100px;">
+								<a id="hideParameters" class="toggleParameters" href="javascript:void(0);">
+									<img src="${createLinkTo(dir:'images/icons/silk',file:'section_expanded.png')}" class="middle"/>
+								</a>
+								<a id="showParameters" class="toggleParameters" href="javascript:void(0);">
+									<img src="${createLinkTo(dir:'images/icons/silk',file:'section_collapsed.png')}" class="middle"/>
+								</a>
+							</span>
+						</div>
+						<div id="parameters" class="box">
 							<g:form controller="report" action="generateTransactionReport" method="GET">
 								<table>
-									<tr>
-										<g:if test="${command?.product }">
-											<td>
+									<g:if test="${command?.product }">
+										<tr>
+											<td class="right">
 												<label>
 													<warehouse:message code="report.product.label"/>
 												</label>
 											</td>
-										</g:if>
-										<td>
+											<td>										
+												<format:product product="${command?.product }"/>
+												<g:hiddenField name="product.id" value="${command?.product?.id }"/>
+											</td>
+										</tr>
+									</g:if>
+									<tr>
+										<td class="right">
 											<label>
 												<warehouse:message code="report.location.label"/>
 											</label>
 										</td>
-										<td>
+										<td>										
+											<g:selectLocation class="filter" name="location.id" noSelection="['null':'']" maxChars="75" groupBy="locationType" value="${command?.location?.id}"/>
+										</td>
+									</tr>
+									<tr>
+										<td class="right">
 											<label>
 												<warehouse:message code="report.category.label"/>
 											</label>
 										</td>
-										
-									</tr>
-									<tr>
-										<g:if test="${command?.product }">
-											<td class="value">
-												<format:product product="${command?.product }"/>
-												<g:hiddenField name="product.id" value="${command?.product?.id }"/>
-											</td>
-										</g:if>
-										<td>
-											<g:selectLocation class="filter" name="location.id" noSelection="['null':'']" maxChars="75" groupBy="locationType" value="${command?.location?.id}"/>
-										</td>
-										<td>
+										<td>										
 											<select id="category.id" name="category.id" class="filter">
 												<option value=""></option>
 												<g:render template="../category/selectOptions" model="[category:command.rootCategory, selected:command.category, level: 0]"/>								
 											</select>							
 										</td>
 									</tr>
-									
 									<tr>
-										<td>
+										<td class="right">
 											<label>
 												<warehouse:message code="report.dateRange.label"/>
 											</label>
-										
 										</td>
-										<td>
-											<label><warehouse:message code="report.options.label"/></label>
-										</td>
-									</tr>
-									<tr>
-										<td>
+										<td>										
 											<g:jqueryDatePicker class="filter" id="startDate" name="startDate" value="${command?.startDate }" format="MM/dd/yyyy"/>
 											-
 											<g:jqueryDatePicker class="filter" id="endDate" name="endDate" value="${command?.endDate }" format="MM/dd/yyyy"/>
 											
 										</td>
+									</tr>
+									<tr>
+										<td class="right">
+											<label><warehouse:message code="report.options.label"/></label>
+										</td>
 										<td>
 											<div>
-												<g:checkBox name="showTransferBreakdown" value="${params?.showTransferBreakdown}" class="filter"/>										
+												<g:checkBox name="hideInactiveProducts" value="${command?.hideInactiveProducts}" />										
+												<warehouse:message code="report.hideInactiveProducts.label"/>
+											</div>
+											<div>
+												<g:checkBox name="showTransferBreakdown" value="${command?.showTransferBreakdown}" />										
 												<warehouse:message code="report.showTransferBreakdown.label"/>
 											</div>
 											<div>
@@ -105,14 +104,15 @@
 												<warehouse:message code="report.includeChildren.label"/>
 											</div>
 											<div>
-												<g:checkBox name="pageBreak" value="${params?.pageBreak }"/>
-												<warehouse:message code="report.pageBreak.label"/>
+												<g:checkBox name="insertPageBreakBetweenCategories" value="${command?.insertPageBreakBetweenCategories }"/>
+												<warehouse:message code="report.insertPageBreakBetweenCategories.label"/>
 											</div>
 
 										</td>
 									</tr>
 									<tr>
-										<td colspan="2" class="left">
+										<td></td>
+										<td class="left">
 											<button type="submit" class="btn">
 												<warehouse:message code="report.runReport.label"/>
 											</button>
@@ -120,8 +120,7 @@
 										</td>
 									</tr>
 								</table>
-
-							</g:form>				
+							</g:form>		
 						</div>				
 					</td>
 				</tr>
@@ -165,9 +164,26 @@
 				</table>
 			</g:else>			
 			--%>	
+							
+			
 			<tr>
 				<td>
 				
+				
+			
+					<g:if test="${!command?.product }">
+				    	<div class="right" style="padding: 5px;">
+							<label><warehouse:message code="report.exportAs.label"/></label>
+				   			<g:link target="_blank" controller="report" action="generateTransactionReport" params="[print:'true','location.id':command.location?.id,'category.id':command?.category?.id,'startDate':params.startDate,'endDate':params.endDate,'showTransferBreakdown':command.showTransferBreakdown,'includeChildren':command?.includeChildren,'hideInactiveProducts':command?.hideInactiveProducts]">
+				   				<warehouse:message code="report.exportAs.html.label"/>
+				   			</g:link> 
+				   			&nbsp;|&nbsp;
+				   			<g:link target="_blank" controller="report" action="downloadTransactionReport" params="[url:request.forwardURI,'location.id':command.location?.id,'category.id':command?.category?.id,'startDate':params.startDate,'endDate':params.endDate,'showTransferBreakdown':command.showTransferBreakdown,'includeChildren':command?.includeChildren,'hideInactiveProducts':command?.hideInactiveProducts,'insertPageBreakBetweenCategories':command?.insertPageBreakBetweenCategories]">
+				   				<warehouse:message code="report.exportAs.pdf.label"/>
+				   			</g:link>
+						</div>
+					</g:if>					
+					
 					<g:if test="${command.product }">
 					
 						
@@ -292,7 +308,7 @@
 								    			</label>
 								    			<g:if test="${!params.print}">
 								    				&nbsp;
-													<g:link controller="report" action="generateTransactionReport" params="['location.id':command?.location?.id,'category.id':category?.id,'startDate':format.date(obj:command.startDate,format:'MM/dd/yyyy'),'endDate':format.date(obj:command.endDate,format:'MM/dd/yyyy'),'includeChildren':false]" style="display: inline">
+													<g:link controller="report" action="generateTransactionReport" params="['location.id':command?.location?.id,'category.id':category?.id,'startDate':format.date(obj:command.startDate,format:'MM/dd/yyyy'),'endDate':format.date(obj:command.endDate,format:'MM/dd/yyyy'),'includeChildren':false,'insertPageBreakBetweenCategories':command?.insertPageBreakBetweenCategories,'showTransferBreakdown':command?.showTransferBreakdown,'hideInactiveProducts':command?.hideInactiveProducts]" style="display: inline">
 														<warehouse:message code="report.showThisCategoryOnly.label"/>
 									    			</g:link>
 								    			</g:if>
@@ -318,12 +334,12 @@
 							    				<th rowspan="2" class="center bottom total start">
 													<warehouse:message code="report.initialQuantity.label"/>
 							    				</th>							    				
-							    				<td colspan="${(params.showTransferBreakdown) ? 3 + (transferInLocations?.size?:0) : 3}" class="center total">
+							    				<td colspan="${(command.showTransferBreakdown) ? 3 + (transferInLocations?.size?:0) : 3}" class="center total">
 							    					<label>
 							    						<warehouse:message code="report.incomingQuantity.label"/>
 							    					</label>
 							    				</td>
-							    				<td colspan="${(params.showTransferBreakdown) ? 6 + (transferOutLocations?.size?:0) : 6}" class="center total">
+							    				<td colspan="${(command.showTransferBreakdown) ? 6 + (transferOutLocations?.size?:0) : 6}" class="center total">
 								    				<label>
 								    					<warehouse:message code="report.outgoingQuantity.label"/>
 								    				</label>
@@ -337,7 +353,7 @@
 												<th class="right">
 													<warehouse:message code="report.incomingTransferQuantity.label"/>
 												</th>
-												<g:if test="${params.showTransferBreakdown }">
+												<g:if test="${command.showTransferBreakdown }">
 													<g:each var="location" in="${transferInLocations }">
 														<th class="right bottom">${location.name.substring(0,3) }</th>
 													</g:each>
@@ -351,7 +367,7 @@
 												<th class="right">
 													<warehouse:message code="report.outgoingTransferQuantity.label"/>
 												</th>
-												<g:if test="${params.showTransferBreakdown }">
+												<g:if test="${command.showTransferBreakdown }">
 													<g:each var="location" in="${transferOutLocations }">
 														<th class="right">${location.name.substring(0,3) }</th>
 													</g:each>
@@ -401,7 +417,7 @@
 											    		<span class="${(entry?.quantityTransferredIn>=0)?'credit':'debit'}">
 												    		${entry?.quantityTransferredIn ?: 0}
 												    	</span>
-												    	<g:if test="${params.showTransferBreakdown && !params.print }">														
+												    	<g:if test="${command.showTransferBreakdown && !params.print }">														
 												    		<img src="${createLinkTo(dir:'images/icons/silk',file:'magnifier.png')}" class="show-details middle"/>
 												    		<div class="hidden details">
 												    			<g:if test="${entry.quantityTransferredInByLocation }">
@@ -469,7 +485,7 @@
 											    		</span>
 													</td>
 													
-										    		<g:if test="${params.showTransferBreakdown }">
+										    		<g:if test="${command.showTransferBreakdown }">
 														<g:each var="location" in="${transferOutLocations }">
 															<td class="center nowrap">
 																<span class="${(entry?.quantityTransferredOutByLocation[location]>0)?'debit':'credit'}">${entry.quantityTransferredOutByLocation[location]?:0}</span>
@@ -478,7 +494,7 @@
 													</g:if>
 													<td class="right nowrap">	    	
 														<span class="${(entry?.quantityTransferredOut>0)?'debit':'credit'}">${entry?.quantityTransferredOut?:0}</span>
-												    	<g:if test="${params.showTransferBreakdown && !params.print }">														
+												    	<g:if test="${command.showTransferBreakdown && !params.print }">														
 												    		<img src="${createLinkTo(dir:'images/icons/silk',file:'magnifier.png')}" class="show-details middle"/>
 												    		<div class="hidden details">
 												    			<g:if test="${entry.quantityTransferredOutByLocation }">
@@ -632,8 +648,39 @@
 					out: hideDetails       // function = onMouseOut callback (required)
 				});  
 
+			    // Open / Close Panel According to Cookie //    
+			    if ($.cookie('panel') == 'open'){    
+			        $('#parameters').slideDown('fast'); // Show on Page Load / Refresh with Animation
+			        $('#parameters').show(); // Show on Page Load / Refresh without Animation
+			        $("#hideParameters").show();
+			        $("#showParameters").hide();
+			    } else {
+			        $('#parameters').slideUp('fast'); // Hide on Page Load / Refresh with Animation
+			        $('#parameters').hide(); // Hide on Page Load / Refresh without Animation
+			        $("#hideParameters").hide();
+			        $("#showParameters").show();
+			    }
+
+				function toggleParameters() { 
+					$('#parameters').slideToggle('fast', function(){
+			            if ($(this).is(':hidden')) {
+			                $.cookie('panel', 'closed');
+			            } else {
+			                $.cookie('panel', 'open');
+			            }
+			        });
+				}
+				
+			    
+			    // Toggle Panel and Set Cookie //
+			    $('.toggleParameters').click(function(){        
+			        toggleParameters();
+			        $(".toggleParameters").toggle();
+			        
+			    });
 				
 			});
+
 	    </script>
 
     </body>

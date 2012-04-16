@@ -31,7 +31,7 @@
 		.report { -fs-table-paginate: paginate;  }		
 		.report .total { border-right: 1px solid black; }
 		.report th { border-bottom: 1px solid black; }
-		<g:if test='${params.pageBreak}'>
+		<g:if test='${params.insertPageBreakBetweenCategories}'>
 			.report { page-break-after: always; }
 		</g:if>		
 	</style>
