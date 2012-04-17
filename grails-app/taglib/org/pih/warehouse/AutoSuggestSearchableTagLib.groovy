@@ -69,10 +69,12 @@ class AutoSuggestSearchableTagLib {
 								\$("#lotNumber-text").html(ui.item.lotNumber);
 								\$("#product-text").html(ui.item.productName);
 								\$("#quantity-text").html(ui.item.quantity);
+								\$("#expirationDate-text").html(ui.item.expirationDate);
 
 								// set hidden values
 								\$("#productId").val(ui.item.productId);
 								\$("#lotNumber-suggest").val(ui.item.lotNumber);
+								\$("#inventoryItemId").val(ui.item.id)
 								//\$("#quantity").val(ui.item.quantity);
 
 								// Update on hand quantity

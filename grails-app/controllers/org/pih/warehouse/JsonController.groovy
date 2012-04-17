@@ -46,7 +46,7 @@ class JsonController {
 		
 		def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(product, lotNumber);
 		if (inventoryItem) { 
-			quantity = inventoryService.getQuantityForInventoryItem(inventoryItem, location?.inventory)
+			quantity = inventoryService.getQuantity(location?.inventory, inventoryItem)
 		}
 		log.info "quantity by lotnumber '" + lotNumber + "' and product '" + product + "' = " + quantity;
 		render quantity ?: "N/A";
@@ -200,24 +200,22 @@ class JsonController {
 			def quantitiesByInventoryItem = inventoryService.getQuantityForInventory(warehouse?.inventory)
 			
 			if (items) {
-				items = items.collect() {
-					def quantity = quantitiesByInventoryItem[it]
+				items = items.collect() { item ->
+					def quantity = quantitiesByInventoryItem[item]
 					quantity = (quantity) ?: 0
 					
 					def localizedName = localizationService.getLocalizedString(it.product.name)
 					
 					[
-						value: it.lotNumber,
-						label:  localizedName + " --- Item: " + it.lotNumber + " --- Qty: " + quantity + " --- ",
-						valueText: it.lotNumber,
-						lotNumber: it.lotNumber,
-						expirationDate: it.expirationDate,
-						id: it.id
+						id: item.id,
+						value: item.lotNumber,
+						label:  localizedName + " --- Item: " + item.lotNumber + " --- Qty: " + quantity + " --- ",
+						valueText: item.lotNumber,
+						lotNumber: item.lotNumber,
+						expirationDate: item.expirationDate
 					]
 				}
 			}
-			// Add the user-entered lot number to the list 
-			//items << [ value: params.term, label: params.term, valueText: params.term, lotNumber: params.term ]
 		}
 		render items as JSON;
 	}
@@ -453,7 +451,7 @@ class JsonController {
 		
 		// We need to pass the inventory.id param
 		//def inventory = Inventory.get(Integer.parseInt(params?.inventory?.id));
-		//def quantity = getQuantityForInventoryItem(inventoryItem, inventory);
+		//def quantity = getQuantity(inventory, inventoryItem);
 		def data = [ status: true, inventoryItem: inventoryItem, product: product, quantity: 0 ];
 		render data  as JSON
 	}

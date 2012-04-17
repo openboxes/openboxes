@@ -257,7 +257,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param commandInstance
 	 * @return
 	 */
-	Map getCurrentInventory(def commandInstance) { 
+	Map getCurrentInventory(InventoryCommand commandInstance) { 
 		
 		// Get quantity for each item in inventory TODO: Should only be doing this for the selected products for speed
 		def quantityOnHandMap = getQuantityByProductMap(commandInstance?.warehouseInstance?.inventory);
@@ -642,20 +642,21 @@ class InventoryService implements ApplicationContextAware {
 	 * @param lotNumber
 	 * @return
 	 */
-	Integer getQuantity(Location warehouse, Product product, String lotNumber) {
-		log.debug ("Get quantity for product " + product?.name + " lotNumber " + lotNumber + " at location " + warehouse?.name)
-		if (!warehouse) {
+	Integer getQuantity(Location location, Product product, String lotNumber) {
+		
+		log.info ("Get quantity for product " + product?.name + " lotNumber " + lotNumber + " at location " + location?.name)
+		if (!location) {
 			throw new RuntimeException("Your warehouse has not been initialized");
 		}
 		else {
-			warehouse = Location.get(warehouse?.id)
+			location = Location.get(location?.id)
 		}
 		def inventoryItem = findInventoryItemByProductAndLotNumber(product, lotNumber)
 		if (!inventoryItem) {
 			throw new RuntimeException("There's no inventory item for product " + product?.name + " lot number " + lotNumber)
 		}
 		
-		return getQuantityForInventoryItem(inventoryItem, warehouse.inventory)
+		return getQuantity(location.inventory, inventoryItem)
 	}
 	
 	/**
@@ -779,7 +780,7 @@ class InventoryService implements ApplicationContextAware {
 				}
 				quantityMap[inventoryItem] += quantityByProductAndInventoryItemMap[product][inventoryItem]
 			}
-		}
+		}		
 		return quantityMap
 	}
 	
@@ -844,6 +845,10 @@ class InventoryService implements ApplicationContextAware {
 		return getProductsBelowMinimumAndReorderQuantities(inventoryInstance, false)   
    }
 
+	Integer getAvailableQuantity(Inventory inventory, InventoryItem inventoryItem) {
+		
+	}
+
   
 	/**
 	 * Gets the quantity of a specific inventory item at a specific inventory
@@ -852,12 +857,20 @@ class InventoryService implements ApplicationContextAware {
 	 * @param inventory
 	 * @return
 	 */
-	Integer getQuantityForInventoryItem(InventoryItem item, Inventory inventory) {
-		def transactionEntries = getTransactionEntriesByInventoryItemAndInventory(item, inventory)
-		def quantity = getQuantityByInventoryItemMap(transactionEntries)[item]
-		
-		log.debug("quantity -> " + quantity)
-		return quantity ? quantity : 0;
+	Integer getQuantity(Inventory inventory, InventoryItem inventoryItem) {
+		log.info "inventory = " + inventory + ", inventory item = " + inventoryItem
+		def transactionEntries = getTransactionEntriesByInventoryItemAndInventory(inventoryItem, inventory)
+		def quantityMap = getQuantityByInventoryItemMap(transactionEntries)
+
+		// inventoryItem -> org.pih.warehouse.inventory.InventoryItem_$$_javassist_10
+		println "inventoryItem -> " + inventoryItem.class
+
+		// FIXME was running into an issue where a proxy object was being used to represent the inventory item
+		// so the map.get() method was returning null.  So we needed to fully load the inventory item using 
+		// the GORM get method. 
+		inventoryItem = InventoryItem.get(inventoryItem.id)				
+		Integer quantity = quantityMap[inventoryItem]				
+		return quantity ?: 0;
 	}
 	
 	/**
@@ -866,13 +879,13 @@ class InventoryService implements ApplicationContextAware {
 	 * @param product
 	 * @return
 	 */
-	Integer getQuantityForProduct(Product product) { 
+	Integer getQuantity(Product product) { 
 		throw new UnsupportedOperationException();
 	}
 	
 
 	/**
-	 * Get quantity for all available inventory items in the given inventory.
+	 * Get a map of quantity values for all available inventory items in the given inventory.
 	 * 
 	 * @param inventory
 	 * @return
@@ -1272,10 +1285,23 @@ class InventoryService implements ApplicationContextAware {
 	
 	
 	/**
+	 * Finds inventory item for the given product and lot number.
 	 * 
 	 * @param product
 	 * @param lotNumber
 	 * @return
+	 */
+	InventoryItem findInventoryItem(Product product, String lotNumber) { 
+		return findInventoryItemByProductAndLotNumber(product, lotNumber);
+	}
+	
+	
+	/**
+	 * Finds the inventory item for the given product and lot number.
+	 * 
+	 * @param product	the product of the desired inventory item
+	 * @param lotNumber	the lot number of the desired inventory item
+	 * @return	a single inventory item
 	 */
 	InventoryItem findInventoryItemByProductAndLotNumber(Product product, String lotNumber) {
 		log.debug ("Find inventory item by product " + product?.id + " and lot number '" + lotNumber + "'" )
@@ -1302,6 +1328,18 @@ class InventoryService implements ApplicationContextAware {
 		}
 		return null;
 	}
+	
+	
+	/**
+	 * Uses an inventory item that is bound at the controller.
+	 * 
+	 * @param inventoryItem
+	 * @return
+	 */
+	InventoryItem findOrCreateInventoryItem(InventoryItem inventoryItem) { 
+		return findOrCreateInventoryItem(inventoryItem.product, inventoryItem.lotNumber, inventoryItem.expirationDate)
+	}
+	
 	/**
 	 * TODO Need to finish this method. 
 	 * 

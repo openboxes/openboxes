@@ -561,9 +561,9 @@ class ShipmentService {
 	 * @param shipmentItem
 	 * @return
 	 */
-	boolean validateShipmentItem(def shipmentItem) { 
+	boolean validateShipmentItem(ShipmentItem shipmentItem) { 
 		def location = Location.get(shipmentItem?.shipment?.origin?.id);
-		log.info("Validating shipment item at " + location?.name )
+		log.info("Validating shipment item at " + location?.name + " for product " + shipmentItem.product + " and lot number " + shipmentItem.lotNumber)
 		def onHandQuantity = inventoryService.getQuantity(location, shipmentItem.product, shipmentItem.lotNumber)
 		log.info("Checking shipment item quantity [" + shipmentItem.quantity + "] vs onhand quantity [" + onHandQuantity + "]");
 		if (!shipmentItem.validate()) { 
@@ -571,7 +571,7 @@ class ShipmentService {
 		}
 		
 		if (shipmentItem.quantity > onHandQuantity) { 
-			throw new ShipmentItemException(message: "shipmentItem.cannotExceedOnHandQuantity", shipmentItem: shipmentItem)
+			throw new ShipmentItemException(message: "shipmentItem.quantity.cannotExceedOnHandQuantity", shipmentItem: shipmentItem)
 		}
 		return true;
 	}
@@ -714,17 +714,28 @@ class ShipmentService {
 	} 
 	
 	
+	
+	public ShipmentItem findOrCreateShipmentItem(Shipment shipment, Container container, Product product, String lotNumber) {
+		return findOrCreateShipmentItem(new ShipmentItem(shipment: shipment, container: container, product: product, lotNumber: lotNumber))		
+	}
+
+	public ShipmentItem findOrCreateShipmentItem(ShipmentItem shipmentItemToFind) {
+		def shipmentItem = findShipmentItem(shipmentItemToFind)
+		if (!shipmentItem) {
+			shipmentItem.save()
+		}
+		return shipmentItem
+	}
+
+	
 	/**
 	 * 
 	 * @param itemToFind
 	 * @return
 	 */
-	public ShipmentItem findShipmentItem(ShipmentItem itemToFind) { 
-		def shipmentItem = null;
-		log.info("find shipment item by " + itemToFind.shipment + " > " + itemToFind.container + " > " + itemToFind.product + " > " + itemToFind.lotNumber )
-		
+	public ShipmentItem findShipmentItem(ShipmentItem itemToFind) { 		
 		def criteria = ShipmentItem.createCriteria()
-		shipmentItem = criteria.get {
+		def shipmentItem = criteria.get {
 			and { 
 				eq("shipment", itemToFind.shipment)
 				if (itemToFind.container) { 
@@ -748,6 +759,7 @@ class ShipmentService {
 		}
 		return shipmentItem;
 	}
+	
 	
 	
 	/**
@@ -896,6 +908,18 @@ class ShipmentService {
 		}
 	}
 	
+	
+	/**
+	 * 
+	 * @param command
+	 */
+	void receiveShipment(command) { 
+		if (!command.validate()) {
+			throw new ValidationException("Receive shipment is not valid", command.errors)
+		}
+	}
+		
+	
 	/**
 	 * 
 	 * @param shipmentInstance
@@ -903,7 +927,7 @@ class ShipmentService {
 	 * @param user
 	 * @param location
 	 */
-	void receiveShipment(Shipment shipmentInstance, String comment, User user, Location location) { 
+	void receiveShipment(Shipment shipmentInstance, String comment, User user, Location location, Boolean creditStockOnReceipt) { 
 		
 		//try {
 			
@@ -938,7 +962,7 @@ class ShipmentService {
 				shipmentInstance.save();
 			
 				// only need to create a transaction if the destination is a warehouse
-				if (shipmentInstance.destination?.isWarehouse()) {
+				if (shipmentInstance.destination?.isWarehouse() && creditStockOnReceipt) {
 				
 					// Create a new transaction for incoming items
 					Transaction creditTransaction = new Transaction()
@@ -948,29 +972,19 @@ class ShipmentService {
 					creditTransaction.inventory = shipmentInstance?.destination?.inventory ?: inventoryService.addInventory(shipmentInstance.destination)
 					creditTransaction.transactionDate = shipmentInstance.getActualDeliveryDate()
 					
+					// 
 					shipmentInstance.receipt.receiptItems.each {
 						def inventoryItem = 
-							inventoryService.findInventoryItemByProductAndLotNumber(it.product, it.lotNumber);
+							inventoryService.findOrCreateInventoryItem(it.product, it.lotNumber, it.expirationDate)							
 						
-						// If the inventory item doesn't exist, we create a new one
-						if (!inventoryItem) {
-							inventoryItem = new InventoryItem();
-							inventoryItem.lotNumber = it.lotNumber
-							inventoryItem.expirationDate = it.expirationDate;
-							inventoryItem.product = it.product
-							if (!inventoryItem.hasErrors() && inventoryItem.save()) {
-								// at this point we've saved the inventory item successfully
+						if (inventoryItem.hasErrors()) { 							
+							inventoryItem.errors.allErrors.each { error->
+								def errorObj = [inventoryItem, error.getField(), error.getRejectedValue()] as Object[]
+								shipmentInstance.errors.reject("inventoryItem.invalid",
+									errorObj, "[${error.getField()} ${error.getRejectedValue()}] - ${error.defaultMessage} ");
 							}
-							else {
-								//
-								inventoryItem.errors.allErrors.each { error->
-									def errorObj = [inventoryItem, error.getField(), error.getRejectedValue()] as Object[]
-									shipmentInstance.errors.reject("inventoryItem.invalid",
-										errorObj, "[${error.getField()} ${error.getRejectedValue()}] - ${error.defaultMessage} ");
-								}
-								throw new ShipmentException("Failed to receive shipment while saving inventory item ",
-									shipment: shipmentInstance)
-							}
+							throw new ShipmentException("Failed to receive shipment while saving inventory item ",
+								shipment: shipmentInstance)
 						}
 						
 						// Create a new transaction entry
@@ -1137,7 +1151,7 @@ class ShipmentService {
 	 * @param shipments
 	 * @return
 	 */
-	Map getQuantityByInventoryItem(def shipments) { 		
+	Map getQuantityByInventoryItem(List<Shipment> shipments) { 		
 		def quantityMap = [:]
 		shipments.each { shipment ->
 			shipment.shipmentItems.each { shipmentItem ->

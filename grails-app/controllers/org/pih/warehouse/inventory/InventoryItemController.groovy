@@ -467,6 +467,7 @@ class InventoryItemController {
 		
 		def shipmentItem = new ShipmentItem(
 			product: productInstance,
+			inventoryItem: inventoryItem,
 			quantity: params.quantity,
 			recipient: personInstance,
 			lotNumber: inventoryItem.lotNumber?:'',

@@ -12,19 +12,30 @@
 					</td>
 				</tr>
 				<tr class="prop">
-					<td valign="top" class="name"><label><warehouse:message code="default.lotSerialNo.label" /></label></td>                            
+					<td valign="top" class="name"><label><warehouse:message code="inventoryItem.lotNumber.label" /></label></td>                            
 					<td valign="top" class="value">
 						<%-- <g:textField id="lotNumber" name="lotNumber" width="200" value="${item?.lotNumber}"/>--%>
+						<%-- 
 						<g:autoSuggestString id="lotNumber" name="lotNumber" jsonUrl="${request.contextPath }/json/findLotsByName?productId=${item?.product?.id }" 
 							width="200" value="${item?.lotNumber}" styleClass="text"/> 
-						<!-- <g:link controller="inventory" action="createTransaction" target="_blank"><span class="small">Update Inventory</span></g:link> -->
+						--%>
+						${item?.lotNumber }
+						<g:hiddenField id="lotNumber" name="lotNumber" value="${item?.lotNumber }"/>
 					</td>
 				</tr>
 				<tr class="prop">
-					<td valign="top" class="name"><label><warehouse:message code="shipping.availableQuantity.label" /></label></td>                            
+					<td valign="top" class="name">
+						<label><warehouse:message code="inventoryItem.expirationDate.label" /></label>
+					</td>                            
+					<td valign="top" class="value">
+						${item?.expirationDate?:warehouse.message(code:'default.never.label')}
+					</td>
+				</tr>
+				<tr class="prop">
+					<td valign="top" class="name"><label><warehouse:message code="inventory.onHandQuantity.label" /></label></td>                            
 					<td valign="top" class="value">
 						<span id="quantity-on-hand"></span>
-						<img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}" style="vertical-align: middle;" class="refresh"/>
+						<img src="${resource(dir: 'images/icons/silk', file: 'reload.png')}" style="vertical-align: middle;" class="refresh"/>
 					</td>
 				</tr>  	        
 				
@@ -106,7 +117,7 @@
 					
 					function updateQuantityOnHand() { 
 						var productId = $("#productId").val();
-						var lotNumber = $("#lotNumber-suggest").val();				
+						var lotNumber = $("#lotNumber").val();				
 						$("#quantity-on-hand").load("${request.contextPath }/json/getQuantity?productId=" + productId + "&lotNumber=" + lotNumber);
 					}
 				</script>

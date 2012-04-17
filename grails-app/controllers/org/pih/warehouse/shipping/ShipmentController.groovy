@@ -3,6 +3,7 @@ package org.pih.warehouse.shipping;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -23,6 +24,7 @@ import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.inventory.InventoryItem;
+import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.TransactionException;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Product;
@@ -325,80 +327,81 @@ class ShipmentController {
 	}
 	
 	
-	def receiveShipment = {
+	def receiveShipment = { ReceiveShipmentCommand command -> 
 		log.info "params: " + params
-		def receiptItemMap = [:] 
+		
+		 
 		def receiptInstance
 		def shipmentInstance = Shipment.get(params.id)		
 		def shipmentItems = []
-		def inventoryItemMap = [:]
+		
 		
 		if (!shipmentInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
 			redirect(action: "list", params:[type: 'incoming'])
+			return
 		}
-		else {		
+				
 			
-			// Process receive shipment form	
-			if ("POST".equalsIgnoreCase(request.getMethod())) {			
-				receiptInstance = new Receipt(params)
-				
-				// associate the receipt with the shipment
-				shipmentInstance.receipt = receiptInstance
-				receiptInstance.shipment = shipmentInstance
-				
-				// check for errors
-				if(receiptInstance.hasErrors() || !receiptInstance.validate()) {
-						
-					render(view: "receiveShipment",  
-						model: [shipmentInstance: shipmentInstance, 
-							receiptInstance:receiptInstance ])
-					return
-				}
-				
-				// actually process the receipt
-				shipmentService.receiveShipment(shipmentInstance, params.comment, session.user, session.warehouse);
-				
-				if (!shipmentInstance.hasErrors()) {
-					flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
-					redirect(action: "showDetails", id: shipmentInstance?.id)
-					return
-				}
-				redirect(controller:"shipment", action : "showDetails", params : [ "id" : shipmentInstance.id ?: '' ])
+		// Process receive shipment form	
+		if ("POST".equalsIgnoreCase(request.getMethod())) {			
+			receiptInstance = new Receipt(params)
+			
+			// associate the receipt with the shipment
+			shipmentInstance.receipt = receiptInstance
+			receiptInstance.shipment = shipmentInstance
+			
+			// check for errors
+			if(receiptInstance.hasErrors() || !receiptInstance.validate()) {					
+				render(view: "receiveShipment", model: [shipmentInstance: shipmentInstance, receiptInstance:receiptInstance ])
+				return
 			}
+			def creditStockOnReceipt = params.creditStockOnReceipt=='yes'
+			// actually process the receipt
+			shipmentService.receiveShipment(shipmentInstance, params.comment, session.user, session.warehouse, creditStockOnReceipt);
 			
-			// Display form 
-			else { 
+			if (!shipmentInstance.hasErrors()) {
+				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
+				redirect(action: "showDetails", id: shipmentInstance?.id)
+				return
+			}
+			redirect(controller:"shipment", action : "showDetails", params : [ "id" : shipmentInstance.id ?: '' ])
+		}
+		
+		// Display form 
+		else { 
 
-				if (shipmentInstance.receipt) {
-					receiptInstance = shipmentInstance.receipt
-				}
-				// If no existing receipt, instantiate the model class to be used 
-				else {
-					receiptInstance = new Receipt(recipient:shipmentInstance?.recipient);
-					receiptInstance.receiptItems = new HashSet()
-				
-					shipmentItems = shipmentInstance.shipmentItems.sort{  it?.container?.sortOrder }					
-					shipmentItems.each { shipmentItem ->
+			if (shipmentInstance.receipt) {
+				receiptInstance = shipmentInstance.receipt
+			}
+			// If no existing receipt, instantiate the model class to be used 
+			else {
+				receiptInstance = new Receipt(recipient:shipmentInstance?.recipient);
+				receiptInstance.receiptItems = new HashSet()
+			
+				shipmentItems = shipmentInstance.shipmentItems.sort{  it?.container?.sortOrder }					
+				shipmentItems.each { shipmentItem ->
+					
+					def inventoryItem = 
+						//inventoryService.findInventoryItemByProductAndLotNumber(shipmentItem.product, shipmentItem.lotNumber)
+						inventoryService.findOrCreateInventoryItem(shipmentItem.product, shipmentItem.lotNumber, shipmentItem.expirationDate)
+					
+					if (inventoryItem) { 
+						ReceiptItem receiptItem = new ReceiptItem(shipmentItem.properties);
+						receiptItem.quantityShipped = shipmentItem.quantity;
+						receiptItem.quantityReceived = shipmentItem.quantity;				
+						receiptItem.lotNumber = shipmentItem.lotNumber;
+						receiptItem.inventoryItem = inventoryItem
+						receiptItem.shipmentItem = shipmentItem
+						// use basic "add" method to avoid GORM because we don't want to persist yet
+						receiptInstance.receiptItems.add(receiptItem);           
 						
-						def inventoryItem = 
-							inventoryService.findInventoryItemByProductAndLotNumber(shipmentItem.product, shipmentItem.lotNumber)
+					}
+					else { 
+						receiptInstance.errors.reject('inventoryItem', 'receipt.inventoryItem.invalid')
+					}
 
-						if (inventoryItem) { 
-							ReceiptItem receiptItem = new ReceiptItem(shipmentItem.properties);
-							receiptItem.quantityShipped = shipmentItem.quantity;
-							receiptItem.quantityReceived = shipmentItem.quantity;				
-							receiptItem.lotNumber = shipmentItem.lotNumber;
-							receiptItem.inventoryItem = inventoryItem
-							receiptItem.shipmentItem = shipmentItem
-							receiptInstance.receiptItems.add(receiptItem);           // use basic "add" method to avoid GORM because we don't want to persist yet
-						}
-						else { 
-							receiptInstance.errors.reject('inventoryItem', 'receipt.inventoryItem.invalid')
-						}
-
-					}	
-				}
+				}	
 			}
 		}
 		render(view: "receiveShipment", model: [
@@ -1065,7 +1068,27 @@ class ShipmentController {
 	
 }
 
-
+class ReceiveShipmentCommand implements Serializable {
+	
+	String comments
+	Person recipient
+	Receipt receipt
+	Shipment shipment
+	Transaction transaction
+	Boolean creditStockOnReceive = true
+	Date actualDeliveryDate
+	
+	static constraints = {
+		receipt(nullable:true)
+		shipment(nullable:false, validator: { value, obj -> obj.shipment.hasShipped() && !obj.shipment.wasReceived() })
+		transaction(nullable:true)
+		recipient(nullable:false)
+		comments(nullable:true)
+		creditStockOnReceive(nullable:false)
+		actualDeliveryDate(nullable:false) //validator: { value, obj-> value > new Date()}
+	}
+	
+}
 
 
 

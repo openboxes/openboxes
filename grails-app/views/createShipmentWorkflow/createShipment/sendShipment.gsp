@@ -100,24 +100,23 @@
 									<td valign="middle"
 										class=" ${hasErrors(bean: shipmentInstance, field: 'actualShippingDate', 'errors')}"
 										nowrap="nowrap">
-											<div>							
-												<label>
-													<warehouse:message code="shipping.expectedShippingDate.label" />:
-												</label>
-												<span>
-													<format:date obj="${shipmentInstance?.expectedShippingDate}"
-														format="dd/MMM/yyyy"/>
-												</span>
-											</div>
-											<br/>
-											<div>
-												<label>
-													<warehouse:message code="shipping.actualShippingDate.label" />:
-												</label>
-												<g:jqueryDatePicker id="actualShippingDate" name="actualShippingDate"
-													value="${command?.actualShippingDate}" format="MM/dd/yyyy"/>
-											</div>
-										
+										<div>
+											<label>
+												<warehouse:message code="shipping.actualShippingDate.label" />:
+											</label>
+											<g:jqueryDatePicker id="actualShippingDate" name="actualShippingDate"
+												value="${command?.actualShippingDate}" format="MM/dd/yyyy"/>
+										</div>
+										<br/>
+										<div>							
+											<label>
+												<warehouse:message code="shipping.expectedShippingDate.label" />:
+											</label>
+											<span>
+												<format:date obj="${shipmentInstance?.expectedShippingDate}"
+													format="dd/MMM/yyyy"/>
+											</span>
+										</div>
 										
 									</td>
 								</tr>											

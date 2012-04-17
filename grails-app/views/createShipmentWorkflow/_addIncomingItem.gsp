@@ -28,9 +28,6 @@
 						<th>		
 							<warehouse:message code="product.label"/>
 						</th>
-						<th class="center">
-							<warehouse:message code="product.onHandQuantity.label"/>
-						</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -159,7 +156,6 @@
 		    	"<td class='center'><button class=\"choose\">Choose</button></td>" +
 		    	"<td>" + rowdata.category.name + "</td>" +
 		    	"<td>" + rowdata.label + "</td>" +
-		    	"<td class='center'>" + rowdata.quantity + "</td>" +
 	    	"</tr>";
 	}
 

@@ -145,7 +145,7 @@
 													<warehouse:message code="default.today.label"/>
 												</g:if>
 												<g:else>
-													<g:prettyDateFormat date="${shipmentInstance?.status.date}"/>
+													<g:prettyDateFormat date="${shipmentInstance?.status?.date}"/>
 												</g:else>
 												<%-- 
 												<format:date obj="${shipmentInstance?.status.date}"/>
@@ -164,8 +164,7 @@
 												</g:else>
 											</g:else>
 										</td>
-										<td align="center">
-											
+										<td align="center">											
 											<format:date obj="${shipmentInstance?.lastUpdated}"/>
 										</td>
 			                        </tr>

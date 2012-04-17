@@ -2,19 +2,39 @@
 				<g:hiddenField id="containerId" name="container.id" value="${containerId?:'' }" />
 				
 				<tr class="prop">
-					<td valign="top" class="name"><label><warehouse:message code="product.label" default="Product" /></label></td>                            
+					<td valign="top" class="name">
+						<label><warehouse:message code="product.label" default="Product" /></label>
+					</td>                            
 					<td valign="top" class="value">
 						<span id="product-text"></span>
 						<g:hiddenField id="productId" name="product.id" value="" />
-						<span id="lotNumber-text"></span>
-						<g:hiddenField id="lotNumber-suggest" name="lotNumber" value="" />
 					</td>
 				</tr>
 				<tr class="prop">
-					<td valign="top" class="name"><label><warehouse:message code="shipping.availableQuantity.label" /></label></td>                            
+					<td valign="top" class="name">
+						<label><warehouse:message code="inventoryItem.lotNumber.label" /></label>
+					</td>                            
+					<td valign="top" class="value">
+						<span id="lotNumber-text"></span>
+						<g:hiddenField id="lotNumber-suggest" name="lotNumber" value="" />
+						<g:hiddenField id="inventoryItemId" name="inventoryItem.id" value="" />
+					</td>
+				</tr>				
+				<tr class="prop">
+					<td valign="top" class="name">
+						<label><warehouse:message code="inventoryItem.expirationDate.label" /></label>
+					</td>                            
+					<td valign="top" class="value">
+						<span id="expirationDate-text"></span>
+					</td>
+				</tr>				
+				<tr class="prop">
+					<td valign="top" class="name">
+						<label><warehouse:message code="shipping.availableQuantity.label" /></label>
+					</td>                            
 					<td valign="top" class="value">
 						<span id="quantity-on-hand"></span>
-						<img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}" style="vertical-align: middle;" class="refresh"/>
+						<img src="${resource(dir: 'images/icons/silk', file: 'reload.png')}" style="vertical-align: middle;" class="refresh"/>
 					</td>
 				</tr>  	        
 				<tr class="prop">

@@ -40,7 +40,10 @@ class InventoryItem implements Serializable {
     static constraints = {
 		product(nullable:false)
 		lotNumber(nullable:true, unique:['product'], maxSize:255)
-		expirationDate(nullable:true)
-		
+		expirationDate(nullable:true)	
     }
+	
+	
+	String toString() { return "${id}:${product}:${lotNumber}"; }
+	
 }

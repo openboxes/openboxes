@@ -30,6 +30,7 @@
  			*/
 	 		.selected { 
 	 			/*background-color: lightgrey;*/
+	 			background-color: lightyellow;
 	 			color: red;
 	 		}
 	 		.not-selected { 
@@ -55,6 +56,7 @@
 					<g:renderErrors bean="${containerInstance}" as="list" />
 				</div>				
 			</g:hasErrors> 
+			
 			<g:hasErrors bean="${itemInstance}">
 				<div class="errors">
 					<g:renderErrors bean="${itemInstance}" as="list" />
@@ -135,7 +137,7 @@
 														</g:link>
 													</td>
 													<td class="center middle">														
-														${containerList?.indexOf(selectedContainer)+1} of ${containerList?.size() }
+														${containerList?.indexOf(selectedContainer)+2} of ${containerList?.size()+1 }
 													</td>
 													<td class="right middle">
 														<g:link action="createShipment" event="enterContainerDetails" params="['containerId':selectedContainer?.id,'direction':'1']">
@@ -375,45 +377,45 @@
 												<th class="middle"><warehouse:message code="shipping.recipients.label"/></th>
 											</tr>
 										</thead>									
-										<tbody  >
+										<tbody>
 											<g:set var="shipmentItems" value="${shipmentInstance?.shipmentItems?.findAll({it.container?.id == selectedContainer?.id})}"/>
 											<g:if test="${shipmentItems }">
-												<g:each var="itemInstance" in="${shipmentItems?.sort()}">		
-													<tr id="shipmentItemRow-${itemInstance?.id }" class="${count++%2==0?'odd':'even' }">
+												<g:each var="shipmentItem" in="${shipmentItems?.sort()}">		
+													<tr id="shipmentItemRow-${shipmentItem?.id }" class="${count++%2==0?'odd':'even' }">
 														<td nowrap="nowrap" width="3%">
 															<span class="action-menu">
 																<button class="action-btn">
 																	<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
 																</button>
 																<div class="actions">
-																	<g:render template="itemMenuItems" model="[itemInstance:itemInstance]"/>
+																	<g:render template="itemMenuItems" model="[itemInstance:shipmentItem]"/>
 																</div>
 															</span>		
 															<%-- 						
-															<span id="${itemInstance?.id }" class="draggable">
+															<span id="${shipmentItem?.id }" class="draggable">
 																<img src="${createLinkTo(dir:'images/icons/silk',file:'package_go.png')}" class="middle"/>
 															</span>
 															--%>
 														</td>
 														<td class="center middle">
-															${itemInstance?.quantity}
+															${shipmentItem?.quantity}															
 														</td>
 														<td class="middle">
 															<div>
-																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':itemInstance?.product?.id]">
-																	<format:product product="${itemInstance?.product}"/> 
+																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':shipmentItem?.product?.id]">
+																	<format:product product="${shipmentItem?.product}"/> 
 																</g:link>
 															</div>
 														</td>
 														<td class="center middle">
-															${itemInstance?.lotNumber}
+															${shipmentItem?.lotNumber}
 														</td>
 														<td class="center middle">
-															<format:date obj="${itemInstance?.expirationDate}" format="MMM yyyy"/>
+															<format:date obj="${shipmentItem?.expirationDate}" format="MMM yyyy"/>
 															
 														</td>
 														<td class="left middle">
-															${itemInstance?.recipient?.name}
+															${shipmentItem?.recipient?.name}
 														</td>
 													</tr>
 												</g:each>
