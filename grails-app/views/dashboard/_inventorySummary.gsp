@@ -10,19 +10,18 @@
 				<g:form method="GET" controller="inventory" action="browse">
 					<div class="">
 						<div>
-							<span>
-								<label><warehouse:message code="inventory.filterBy.keyword"/>:</label>
-								<g:textField name="searchTerms" value="" size="40" value="${params.searchTerms }"/>						
+							<label><warehouse:message code="inventory.filterBy.keyword"/>:</label>
+							<div>
+								<g:textField name="searchTerms" size="60" value="${params.searchTerms }"/>						
+								<g:hiddenField name="resetSearch" value="true"/>							
+								<g:hiddenField name="category.id" value="${rootCategory.id }"/>							
 								
-							</span>
-							<g:hiddenField name="resetSearch" value="true"/>							
-							<g:hiddenField name="category.id" value="${rootCategory.id }"/>							
-							<span style="padding-left:10px;">
-								<button type="submit" class="" name="searchPerformed" value="true">
-									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'find.png' )}" class="middle"/>
-									&nbsp;<warehouse:message code="default.find.label"/>&nbsp;
-								</button>
-							</span>
+									<button type="submit" class="" name="searchPerformed" value="true">
+										<img src="${createLinkTo(dir: 'images/icons/silk', file: 'find.png' )}" class="middle"/>
+										&nbsp;<warehouse:message code="default.find.label"/>&nbsp;
+									</button>
+								
+							</div>
 						</div>
 					</div>
 				</g:form>

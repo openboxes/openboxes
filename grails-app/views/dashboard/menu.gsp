@@ -204,11 +204,13 @@
 					<g:link controller="inventory" action="listExpiringStock"><warehouse:message code="inventory.expiringStock.label"/></g:link> 
 				</span>
 			</li>
+			<%-- 
 			<li>
 				<span class="menuButton">
 					<g:link controller="inventory" action="listLowStock"><warehouse:message code="inventory.lowStock.label"/></g:link> 
 				</span>
 			</li>
+			--%>
 			<li>
 				<span class="menuButton">
 					<g:link controller="inventory" action="showConsumption"><warehouse:message code="inventory.consumption.label"/></g:link> 

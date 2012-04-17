@@ -6,11 +6,11 @@
 	</content>
 	
 	<content tag="heading">	
+		<warehouse:message code="inventory.record.label"/>
+		&rsaquo;
 		<span class="fade">
 			<format:product product="${commandInstance?.productInstance}"/>
 		</span>
-		&rsaquo;
-		<warehouse:message code="inventory.record.label"/>
 	</content>
 
 	<content tag="content">

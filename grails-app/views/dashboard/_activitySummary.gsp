@@ -1,40 +1,38 @@
 <div class="widget-large">
 	<div class="widget-header">
-		<h2><warehouse:message code="dashboard.activity.label" args="[session.warehouse.name]"/></h2>
+		<h2>
+			<warehouse:message code="dashboard.activity.label" args="[session.warehouse.name]"/>
+			&rsaquo;
+			<span class="fade">		 					
+				<warehouse:message code="dashboard.showRecentActivity.message" args="[activityList?.size()]"/>
+			</span>
+		
+		</h2>
 	</div>	    			
-	<div class="widget-content">	    					    			
+	<div class="widget-content" style="padding: 0; margin: 0">	    					    			
 		<%-- 	
 		<div style="padding: 10px">
 			There are ${activityList.size() } recent activities.		
 		</div>
 		--%>
-		<div id="activity-summary" style="max-height: 150px; overflow: auto;">	
+		<div id="activity-summary" style="max-height: 500px; overflow: auto; padding: 0px;">	
 			<table>
-				<thead>
-		 			<tr>
-		 				<td>	
-		 					<span class="fade">		 					
-				 				<warehouse:message code="dashboard.showRecentActivity.message" args="[activityList?.size()]"/>
-			 				</span>
-		 				</td>
-		 			</tr>
-		 		</thead>
 				<tbody>
 					<g:set var="status" value="${0 }"/>
 		 			<g:each var="activity" in="${activityList }" status="i">
-		 				<tr class="${status++%2?'even':'odd' }">
+		 				<tr class="${status++%2?'odd':'even' } prop">
 		 					<td>
-		 						<span>										
-									<img src="${createLinkTo(dir:'images/icons/silk',file: activity.type + '.png')}" class="middle"/> 
-									&nbsp; 					
-			 						<span class='fade'>${format.date(obj:activity.lastUpdated,format:'dd MMM hh:mm a')}</span>
-			 						${activity.label } 
-		 						</span>
+								<img src="${createLinkTo(dir:'images/icons/silk',file: activity.type + '.png')}" class="middle"/> 
+							</td>
+							<td>
+		 						<div>${activity.label }</div> 
+		 						<span class='fade'>${format.date(obj:activity.lastUpdated,format:'dd MMM hh:mm a')}</span>
+		 					
 		 					</td>
 		 				</tr>
 		 			</g:each>
 		 			<g:unless test="${activityList }">
-						<tr>
+						<tr class="prop">
 							<td>
 								<warehouse:message code="dashboard.noActivityFound.message"/>
 							</td>

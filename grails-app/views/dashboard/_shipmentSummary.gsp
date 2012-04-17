@@ -3,8 +3,13 @@
 
 
 <div class="widget-small">
-	<div class="widget-header"><h2><warehouse:message code="shipping.summary.label" args="[session.warehouse.name]"/></h2></div>
-	<div class="widget-content">
+	<div class="widget-header">
+		<h2><warehouse:message code="shipping.label"/>
+		&rsaquo;
+		<span class="fade">${session.warehouse.name}</span>
+		</h2>
+	</div>
+	<div class="widget-content" style="padding:0; margin:0">
 		<div id="shippingsummary">
 			<g:if test="${!outgoingShipmentsByStatus}">
 				<div style="text-align: left; padding: 10px;" class="fade">
@@ -27,7 +32,7 @@
 	    		<table>
 	    			
 	    			<tbody>
-						<tr class="odd">
+						<tr class="even">
 							<td>
 								${warehouse.message(code: 'dashboard.incoming.shipped.label', args: [session.warehouse.name]) }							
 							</td>
@@ -37,7 +42,7 @@
 								</g:link>
 							</td>
 						</tr>				
-						<tr>
+						<tr class="odd prop">
 							<td>
 								${warehouse.message(code: 'dashboard.incoming.received.label', args: [session.warehouse.name]) }							
 							</td>
@@ -47,7 +52,7 @@
 								</g:link>
 							</td>
 						</tr>		
-						<tr class="odd">
+						<tr class="even prop">
 							<td>
 								${warehouse.message(code: 'dashboard.outgoing.pending.label', args: [session.warehouse.name]) }							
 							</td>
@@ -57,7 +62,7 @@
 								</g:link>
 							</td>
 						</tr>	
-						<tr>
+						<tr class="odd prop">
 							<td>
 								${warehouse.message(code: 'dashboard.outgoing.shipped.label', args: [session.warehouse.name]) }							
 							</td>
@@ -67,8 +72,6 @@
 								</g:link>
 							</td>
 						</tr>	
-											
-							
 			    	</tbody>
 		    	</table>
 

@@ -159,6 +159,8 @@
 					</td>
 				</tr>													
 			</g:each>
+			
+			<%-- 
 			<tr class="even">
 				<td class="label left">
 					<span class="name"><warehouse:message code="product.minLevel.label"/></span>
@@ -194,6 +196,7 @@
 					</span>
 				</td>
 			</tr>		
+			--%>
 		</tbody>		
 	</table>
 </div>

@@ -15,16 +15,25 @@
 				
 	    	<div id="dashboard">
 	    		
-				<g:render template="inventorySummary"/>
-				
-				<g:if test='${activityList }'>
-					<g:render template="activitySummary"/>
-				</g:if>
-				<g:render template="shipmentSummary"/>
-				
-				<%-- 
-				<g:render template="orderSummary"/>
-				--%>
+	    		<table>
+	    			<tr>
+	    				<td>
+							<g:render template="inventorySummary"/>
+							
+							<g:render template="shipmentSummary"/>
+							
+							<%-- 
+							<g:render template="orderSummary"/>
+							--%>
+						</td>
+						<td>
+							<g:if test='${activityList }'>
+								<g:render template="activitySummary"/>
+							</g:if>
+						
+						</td>
+					</tr>
+				</table>
 	    	</div>
 		</div>
     </body>

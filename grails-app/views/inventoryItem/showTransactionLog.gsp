@@ -5,11 +5,11 @@
 	</content>
 	
 	<content tag="heading">	
+		<warehouse:message code="transaction.transactionLog.label"/>
+		&rsaquo;
 		<span class="fade">
 			<format:product product="${commandInstance?.productInstance}"/>
 		</span>
-		&rsaquo;
-		<warehouse:message code="transaction.transactionLog.label"/>
 	</content>
 
 	<content tag="content">
