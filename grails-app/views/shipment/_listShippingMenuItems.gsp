@@ -52,6 +52,7 @@
 		</g:else>
 	</div>
 </g:if>
+<%-- 
 <g:if test="${shipmentInstance?.hasShipped() && !shipmentInstance.wasReceived() }">
 	<div class="action-menu-item">															
 		<g:link controller="shipment" action="markAsReceived" id="${shipmentInstance?.id }">													
@@ -60,7 +61,7 @@
 		</g:link>
 	</div>
 </g:if>
-
+--%>
 <%-- 
 <div class="action-menu-item">
 	<g:link controller="shipment" action="showPackingList" id="${shipmentInstance.id}" > 

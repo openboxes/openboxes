@@ -157,12 +157,14 @@
 			</div>
 		</g:if>
 		<g:if test="${shipmentInstance?.origin?.id == session?.warehouse?.id || shipmentInstance?.destination?.id == session?.warehouse?.id}">
+			<%-- 
 			<div class="action-menu-item">															
 				<g:link controller="shipment" action="markAsReceived" id="${shipmentInstance?.id }">													
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" 
 						alt="Mark as received" class="middle"/>&nbsp;<warehouse:message code="shipping.markAsReceived.label"/>
 				</g:link>
 			</div>
+			--%>
 			<g:isUserInRole roles="[RoleType.ROLE_ADMIN]">
 				<div class="action-menu-item">
 					<g:link controller="shipment" action="rollbackLastEvent" id="${shipmentInstance?.id }">
