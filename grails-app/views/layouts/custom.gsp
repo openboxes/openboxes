@@ -98,51 +98,60 @@
 	<div id="hd" role="banner">
 	    <g:render template="/common/header"/>		    
 	</div>
-	
-	
+	<g:if test="${session?.user && session?.warehouse}">
+		<div id="megamenu">    
+			<%-- 
+		    <g:render template="/common/megaMenu"/>
+		   	--%>
+			<g:include controller="dashboard" action="megamenu"/>		    
+		</div>
+	</g:if>	    
+  	<g:if test="${session.user}">
+ 		<div class="breadcrumb">
+   			<h3 class="page-title">
+			    <div>							    
+			    	<g:link controller="dashboard" action="index">
+				    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'house.png')}" style="vertical-align: bottom;"/>
+			    	</g:link>
+				    &nbsp;&rsaquo;&nbsp;								
+					<g:if test="${session?.warehouse}">									
+						<g:if test="${session.warehouse.logo }">
+							<img class="photo" width="25" height="25" 
+								src="${createLink(controller:'location', action:'viewLogo', id:session.warehouse.id)}" style="vertical-align: middle" />
+						</g:if>
+						${session?.warehouse?.name} &nbsp;&rsaquo;&nbsp;
+					</g:if> 
+					<!--  note that both breadcrumbs are overrideable by using the content tag is the view to set the value of label1 or label2 -->
+				    <g:set var="label1">${g.pageProperty(name: 'page.label1') ?: warehouse.message(code: "breadcrumbs." + params.controller + ".label")}</g:set>
+				    <g:set var="label2">${g.pageProperty(name: 'page.label2') ?: g.layoutTitle()}</g:set>
+				   		${label1 ?: params.controller}
+				    <g:if test="${label1 != label2}">
+						&nbsp;&rsaquo;&nbsp;								
+		    			${label2}
+		    		</g:if>
+    			</div>
+   			</h3>
+   		</div>
+  	</g:if>
 	
 	<!-- Body includes the divs for the main body content and left navigation menu -->
 		
 	<div id="bd" role="main">
-	    <div id="doc3" class="yui-t3">		    	
+	    <div id="doc3"><!--class="yui-t3"-->		    	
 	      	<div id="yui-main">
 		    	<div id="content" class="yui-b">
-		    		<g:if test="${session.user}">		    		
-		    			<h3 class="page-title">
-						    <div>							    
-						    	<g:link controller="dashboard" action="index">
-							    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'house.png')}" style="vertical-align: bottom;"/>
-						    	</g:link>
-							    &nbsp;&rsaquo;&nbsp;								
-								<g:if test="${session?.warehouse}">									
-									<g:if test="${session.warehouse.logo }">
-										<img class="photo" width="25" height="25" 
-											src="${createLink(controller:'location', action:'viewLogo', id:session.warehouse.id)}" style="vertical-align: middle" />
-									</g:if>
-									${session?.warehouse?.name} &nbsp;&rsaquo;&nbsp;
-								</g:if> 
-								<!--  note that both breadcrumbs are overrideable by using the content tag is the view to set the value of label1 or label2 -->
-							    <g:set var="label1">${g.pageProperty(name: 'page.label1') ?: warehouse.message(code: "breadcrumbs." + params.controller + ".label")}</g:set>
-							    <g:set var="label2">${g.pageProperty(name: 'page.label2') ?: g.layoutTitle()}</g:set>
-							   		${label1 ?: params.controller}
-							    <g:if test="${label1 != label2}">
-									&nbsp;&rsaquo;&nbsp;								
-					    			${label2}
-					    		</g:if>
-			    			</div>
-		    			</h3>
-			    		<div id="status"></div>
-		    		</g:if>
 					<g:layoutBody />
 				</div>
 	      	</div>
 	      		      	
 	      	<!-- YUI nav block that includes the local navigation menu -->
+	      	<%-- 
 	      	<div id="menu" class="yui-b">
 		  		<g:if test="${session?.user && session?.warehouse}">
 					<g:include controller="dashboard" action="menu"/>
 				</g:if>
-			</div>			 
+			</div>
+			--%>			 
 		</div>
 	</div>
 
@@ -153,6 +162,9 @@
 	<script type="text/javascript">
 
 		$(function() { 		
+		
+			$(".megamenu").megamenu();
+		
 			<g:if test="${session.useDebugLocale}">
 				$('.copy').click(function(event) {				
 					var copyText = $(this).siblings('.text').text();				

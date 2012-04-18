@@ -22,7 +22,8 @@
 </div>
 --%>
 
-<div id="megamenu">	
+<%-- 
+<div>	
 	<ul class="megamenu">
 		<g:each var="quickCategory" in="${quickCategories}">
 			<li>
@@ -64,8 +65,6 @@
 		<li>
 			${categoryInstance }
 		</li>
-		
-		
 	</ul>
 </div>					        	
-
+--%>

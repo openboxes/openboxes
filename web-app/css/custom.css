@@ -67,13 +67,6 @@ button.action-btn, button.previous, button.next {
 	display: none;
 }
 
-
-/* Added to fix an issue with being able to select actions from the action menu at the bottom of pages */
-/* Fixed the action menu (when menu runs off page). */
-body { 
-	padding-bottom: 50px;
-}
-
 .total { 
 	/*background-color: #f7f7f7;*/	
 }
@@ -188,11 +181,19 @@ h3.ui-state-active { background-color: #f7f7f7; }  /* #F8F7EF */
 	
 }
 
+/* Added to fix an issue with being able to select actions from the action menu at the bottom of pages */
+/* Fixed the action menu (when menu runs off page). */
 
 body { 
 	text-align: left; 
-	
+	padding-bottom: 50px;
+	font-family: "Lucida Grande", arial, verdana;	
 }
+
+.body { 
+	padding: 15px;
+}	
+
 #dashboard { 
 	margin: 0px; 	
 }
@@ -220,10 +221,6 @@ body {
 
 img { 
 	vertical-align: middle;
-}
-
-body { 
-	font-family: "Lucida Grande", arial, verdana;
 }
 
 a:hover { 
@@ -543,12 +540,6 @@ hr.space {background:#fff;color:#fff;}
 	margin: 5px;	
 }
 
-.page-title {
-	margin-top: 10px;
-}
-
-
-
 #banner { 
 	
 }
@@ -588,8 +579,21 @@ ul.treeList li ul li {
 /* breadcrumb 
 -------------------------------------------------------------*/
 .breadcrumb { 
-	margin: 10px;	
+	margin:  10px 0 0 15px;	
 }
+
+/* megamenu 
+-------------------------------------------------------------*/
+.megamenu a:hover { 
+	text-decoration: underline;
+}
+        	
+ul.megamenu {
+	padding: 0;
+}
+
+
+
 
 
 /* not sure if these are needed any longer, so we should look into getting rid of these 
@@ -835,3 +839,5 @@ img.photo_tiny {
   width: 16px;
   height: 16px;
 }
+
+

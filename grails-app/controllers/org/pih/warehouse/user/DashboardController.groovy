@@ -131,6 +131,22 @@ class DashboardController {
 		render results as JSON
 	}
 	
+	def megamenu = {
+		def incomingShipments = Shipment.findAllByDestination(session?.warehouse).groupBy{it.status.code}.sort()
+		def outgoingShipments = Shipment.findAllByOrigin(session?.warehouse).groupBy{it.status.code}.sort();
+		def incomingOrders = Order.executeQuery('select o.status, count(*) from Order as o where o.destination = ? group by o.status', [session?.warehouse])
+		def incomingRequests = Request.findAllByDestination(session?.warehouse).groupBy{it.status}.sort()
+		def outgoingRequests = Request.findAllByOrigin(session?.warehouse).groupBy{it.status}.sort()
+		
+		[incomingShipments: incomingShipments,
+			outgoingShipments: outgoingShipments,
+			incomingOrders: incomingOrders,
+			incomingRequests: incomingRequests,
+			outgoingRequests: outgoingRequests,
+			quickCategories:productService.getQuickCategories()]
+
+		
+	}
 	
 	
 	def menu = { 

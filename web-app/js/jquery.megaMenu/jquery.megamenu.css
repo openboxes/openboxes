@@ -79,7 +79,6 @@ ul.megamenu div.mm-item-content {
   padding: 10px;
 }
 .mm-js-shadow {
-  background: #555;
   position: absolute;
   z-index: 10;
 }

@@ -6,12 +6,6 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'inventory.label', default: 'Inventory')}" />
         <title><warehouse:message code="default.browse.label" args="[entityName]" /></title>    
-        <style>
-        	.megamenu a:hover { 
-	        	text-decoration: underline;
-        	}
-        </style>
-        
     </head>    
     <body>
         <div class="body">

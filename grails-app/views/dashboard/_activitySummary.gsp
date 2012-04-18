@@ -15,7 +15,7 @@
 			There are ${activityList.size() } recent activities.		
 		</div>
 		--%>
-		<div id="activity-summary" style="max-height: 500px; overflow: auto; padding: 0px;">	
+		<div id="activity-summary" style="max-height: 300px; overflow: auto; padding: 0px;">	
 			<table>
 				<tbody>
 					<g:set var="status" value="${0 }"/>

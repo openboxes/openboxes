@@ -24,6 +24,7 @@
 			<g:if test="${!params.print}">
 				<tr>
 					<td>
+						<%-- 
 						<div class="">
 							<span style="border: 1px solid lightgrey; background-color: #f7f7f7; padding: 5px; margin: 5px; width: 100px;">
 								<a id="hideParameters" class="toggleParameters" href="javascript:void(0);">
@@ -34,6 +35,7 @@
 								</a>
 							</span>
 						</div>
+						--%>
 						<div id="parameters" class="box">
 							<g:form controller="report" action="generateTransactionReport" method="GET">
 								<table>
@@ -649,6 +651,7 @@
 				});  
 
 			    // Open / Close Panel According to Cookie //    
+			    /*
 			    if ($.cookie('panel') == 'open'){    
 			        $('#parameters').slideDown('fast'); // Show on Page Load / Refresh with Animation
 			        $('#parameters').show(); // Show on Page Load / Refresh without Animation
@@ -660,7 +663,7 @@
 			        $("#hideParameters").hide();
 			        $("#showParameters").show();
 			    }
-
+				*/
 				function toggleParameters() { 
 					$('#parameters').slideToggle('fast', function(){
 			            if ($(this).is(':hidden')) {
