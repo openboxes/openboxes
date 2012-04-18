@@ -41,6 +41,7 @@
                             <g:sortableColumn property="email" title="${warehouse.message(code: 'user.email.label')}" />
                             <g:sortableColumn property="locale" title="${warehouse.message(code: 'default.locale.label')}" />
                         <!--      <g:sortableColumn property="email" title="${warehouse.message(code: 'user.role.label', default: 'Roles')}" />  -->
+                            <g:sortableColumn property="role" title="${warehouse.message(code: 'user.role.label')}" />
                             <g:sortableColumn property="active" title="${warehouse.message(code: 'user.active.label')}" />
                         </tr>
                     </thead>
@@ -51,6 +52,7 @@
                             <td>${fieldValue(bean: userInstance, field: "name")}</td>
                             <td>${fieldValue(bean: userInstance, field: "email")}</td>
                             <td>${fieldValue(bean: userInstance, field: "locale.displayName")}</td>
+                            <td>${fieldValue(bean: userInstance, field: "roles")}</td>
                             <td>
                             	<g:if test="${userInstance?.active }"><warehouse:message code="default.yes.label"/></g:if>
                             	<g:else><warehouse:message code="default.no.label"/></g:else>

@@ -7,14 +7,18 @@ import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.core.Location;
+import org.pih.warehouse.core.RoleType;
+import org.pih.warehouse.core.User;
 
 import grails.converters.JSON;
 
 class ProductController {
 
-	def inventoryService;
+	def userService;
+	def mailService;
 	def productService;
-
+	def inventoryService;
+	
     static allowedMethods = [save: "POST", update: "POST"];    
 	
 	
@@ -149,7 +153,8 @@ class ProductController {
 		def inventoryInstance = warehouseInstance?.inventory;
 		
 		if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product:productInstance)])}"
+            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product:productInstance)])}"			
+			sendProductCreated(productInstance)
 			redirect(controller: "inventoryItem", action: "showRecordInventory", params: ['productInstance.id':productInstance.id, 'inventoryInstance.id': inventoryInstance?.id])
             //redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id, params:params)
         }
@@ -303,6 +308,30 @@ class ProductController {
 		redirect(controller: "product", action: "importProducts")	
 	}
 	
+	
+	/**
+	*
+	* @param userInstance
+	* @return
+	*/	
+   def sendProductCreated(Product product) {
+	   def adminList = []
+	   try {
+		   adminList = userService.findUsersByRoleType(RoleType.ROLE_ADMIN).collect { it.email } 
+		   if (adminList) { 
+			   def subject = "${warehouse.message(code:'email.productCreated.message',args:[product?.name])}";
+			   def body = "${g.render(template:'/email/productCreated',model:[product:product])}"
+			   mailService.sendHtmlMail(subject, body.toString(), adminList);
+			   flash.message = "${warehouse.message(code:'email.sent.message',args:[adminList])}"
+		   }
+		   else { 
+		   }
+	   }
+	   catch (Exception e) {
+		   log.error("Error sending product created email")
+		   flash.message = "${warehouse.message(code:'email.notSent.message',args:[adminList])}: ${e.message}"
+	   }
+   }
 
 	
 	

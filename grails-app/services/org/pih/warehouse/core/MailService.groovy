@@ -18,27 +18,32 @@ class MailService {
 	def prefix = "${config.grails.mail.prefix}" //[OpenBoxes
 	def from = "${config.grails.mail.from}" // openboxes@pih.org
 	def host= "${config.grails.mail.host}" // localhost
+	def bcc = "${config.grails.mail.bcc}" // chamon@pih.org,jmiranda@pih.org
 	def port = Integer.parseInt ("${config.grails.mail.port}") // 23; 
 	
+	
+	def isMailEnabled() {  
+		return Boolean.valueOf(grailsApplication.config.grails.mail.enabled)			
+	}
 	
 	def sendMail(String subject, String msg, String to) {
 		sendMail(subject, msg, [to])
 	}
-	def sendMail(String subject, String msg, Collection to) {	
-		log.info("Is email enabled? '" + grailsApplication.config.grails.mail.enabled + "'")
-		log.info(Boolean.valueOf(grailsApplication.config.grails.mail.enabled))
-		if (Boolean.valueOf(grailsApplication.config.grails.mail.enabled)) { 			
+	def sendMail(String subject, String msg, Collection to) {
+		//def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)			
+		if (isMailEnabled()) { 			
 			log.info "Sending text email '" + subject + "' to " + to; 
 			try { 
 				//SimpleEmail is the class which will do all the hard work for you				
 				SimpleEmail email = new SimpleEmail()
 				email.setHostName(host)				
-				to.each {
-					email.addTo(it)
+				to.each { email.addTo(it) }
+				if (bcc) { 
+					bcc.split(",").each { email.addBcc(it) }				
 				}
 				email.setFrom(from)
 				email.setSubject("${prefix} " + subject)
-				email.setMsg(msg)				
+				email.setMsg(msg)		
 				email.send()
 			} catch (Exception e) { 
 				log.error("Error sending plaintext email message with subject " + subject + " to " + to, e);
@@ -54,17 +59,17 @@ class MailService {
 	}
 	
 	def sendHtmlMail(String subject, String body, Collection to) { 	
-		log.info("Is email enabled? '" + grailsApplication.config.grails.mail.enabled + "'")
-		log.info(Boolean.valueOf(grailsApplication.config.grails.mail.enabled))
-		if (Boolean.valueOf(grailsApplication.config.grails.mail.enabled)) { 
+		//def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)			
+		if (isMailEnabled()) { 		
 			log.info "Sending html email '" + subject + "' to " + to; 
 			try { 			
 				// Create the email message
 				HtmlEmail email = new HtmlEmail();
 				email.setHostName(host)
-				to.each { 
-					email.addTo(it)
-				}
+				to.each { email.addTo(it) }
+				if (bcc) { 
+					bcc.split(",").each { email.addBcc(it) }
+				}				
 				email.setFrom(from)
 				email.setSubject("${prefix} " + subject)		
 				email.setHtmlMsg(body);
@@ -95,20 +100,22 @@ class MailService {
 		
 	def sendHtmlMailWithAttachment(Collection toList, Collection ccList, String subject, String body, byte [] bytes, String name, String mimeType) { 
 		log.info ("Sending email with attachment " + toList)
-		if (Boolean.valueOf(grailsApplication.config.grails.mail.enabled)) {
+		
+		//def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)
+		if (isMailEnabled()) {
 			try {
 				// Create the email message
 				HtmlEmail email = new HtmlEmail();
 				email.setHostName(host);
 				email.setFrom(from);
-				toList.each { to ->
-					email.addTo(to)
-				}
+				toList.each { to -> email.addTo(to) }
 				if (ccList) { 
-					ccList.each { cc -> 
-						email.addCc(cc)
-					}
+					ccList.each { cc -> email.addCc(cc) }
 				}
+				if (bcc) {
+					bcc.split(",").each { email.addBcc(it) }				
+				}
+				
 				email.setSubject("${prefix} " + subject);
 				email.setHtmlMsg(body);
 				email.setTextMsg(subject);
@@ -135,10 +142,15 @@ class MailService {
 	}	
 	
 	def sendAlertMail(String subject, Throwable throwable) {
-		if (grailsApplication.config.grails.mail.enabled) {
+		
+		//def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)
+		if (isMailEnabled()) {
 			log.info "Sending HTML email '" + subject;
 			try {
 				HtmlEmail email = new HtmlEmail();
+				if (bcc) {
+					bcc.split(",").each { email.addBcc(it) }
+				}
 				email.setSubject("${prefix} " + subject)
 				// add more information to email
 				email.send();

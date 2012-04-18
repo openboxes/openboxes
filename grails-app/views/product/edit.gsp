@@ -13,11 +13,7 @@
 			<content tag="label1"><warehouse:message code="inventory.label"/></content>
 		</g:else>
 
-		<style>
-			.category-div { 
-				padding: 5px;
-				}
-		</style>
+	
 
     </head>    
     <body>    
@@ -59,23 +55,15 @@
 							</tr>
 							<tr class="prop">
                                 <td valign="top" class="name">
-                                  <label for="categories"><warehouse:message code="product.primaryCategory.label" /></label>
+                                  <label for="categories"><warehouse:message code="categories.label" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'category', 'errors')}">
                                 	<%-- <g:render template="../category/chooser"/>--%>
                                 	
 									<select name="category.id">
-										<option value=""></option>
+										<option value="null"></option>
 										<g:render template="../category/selectOptions" model="[category:rootCategory, selected:productInstance?.category, level: 0]"/>
 									</select>	
-								</td>
-							</tr>	
-							 
-							<tr class="prop">
-							   <td valign="top" class="name">
-							      <label for="categories"><warehouse:message code="product.otherCategories.label" /></label>
-							   </td>
-							   <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'categories', 'errors')}">
 							       <g:render template="categories" model="['productInstance':productInstance]" />
 							   </td>
 							</tr>					
@@ -179,14 +167,14 @@
 								</td>
 								<td>
 									<button type="submit" class="positive"><img
-										src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
+										src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}"
 										alt="Save" /> ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
 									</button>
 									&nbsp;
 									<!-- we only can delete products that 1) exist, and 2) dont have associated transaction entries or shipment items -->
 									<g:if test="${productInstance.id && !productInstance.hasAssociatedTransactionEntriesOrShipmentItems()}">
 									<g:link action="delete" id="${productInstance.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"> 
-							                <button type="button" class="negative"><img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="Delete" /> ${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}</button></g:link>
+							                <button type="button" class="negative"><img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="Delete" /> ${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}</button></g:link>
 									</g:if>
 									&nbsp;
 									<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="negative">			

@@ -7,8 +7,8 @@
         <g:set var="entityName" value="${warehouse.message(code: 'inventory.label', default: 'Inventory')}" />
         <title><warehouse:message code="default.browse.label" args="[entityName]" /></title>    
         <style>
-        	.tableScrollContainer { 
-	        	
+        	.megamenu a:hover { 
+	        	text-decoration: underline;
         	}
         </style>
         

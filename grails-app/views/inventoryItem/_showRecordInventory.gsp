@@ -8,7 +8,7 @@
 			<table id="inventoryItemsTable">
 				<thead>
 					<tr class="odd">
-						<td class="middle" colspan="5">
+						<td class="middle" colspan="4">
 							<label><warehouse:message code="inventory.dateOfInventory.label"/></label>													
 							<g:jqueryDatePicker 
 								id="transactionDate" 
@@ -16,6 +16,12 @@
 								value="${commandInstance?.transactionDate}" 
 								format="MM/dd/yyyy"
 								showTrigger="false" />						
+						
+						</td>
+						<td class="right">
+							<button id="addAnother" type="button" class="positive">
+								<img src="${createLinkTo(dir:'images/icons/silk', file:'add.png') }"/>&nbsp;<warehouse:message code="default.button.add.label"/>&nbsp;
+							</button>
 						
 						</td>
 					</tr>
@@ -79,17 +85,14 @@
 				</tbody>
 				<tfoot>
 					<tr>
-						<td colspan="5" style="text-align: center">
+						<td colspan="5" class="center">
 							<button name="save" type="submit" class="positive">
 								<img src="${createLinkTo(dir:'images/icons/silk', file:'accept.png') }"/>&nbsp;<warehouse:message code="default.button.save.label"/>&nbsp;
 							</button>
 							&nbsp;
-							<button id="addAnother" type="button" class="positive">
-								<img src="${createLinkTo(dir:'images/icons/silk', file:'add.png') }"/>&nbsp;<warehouse:message code="default.button.add.label"/>&nbsp;
-							</button>
-							&nbsp;
 							<g:link controller="inventoryItem" action="showStockCard" 
 								params="['product.id':commandInstance.productInstance?.id]" class="negative"><warehouse:message code="default.button.cancel.label"/></g:link>
+						
 						</td>
 					</tr>
 				</tfoot>
@@ -352,7 +355,7 @@
 			id="newQuantity-{{= getIndex()}}" class="newQuantity" name="recordInventoryRows[{{= getIndex()}}].newQuantity" size="3" value="{{= Qty}}" onFocus="this.select();" onClick="this.select();"/>
 
 	</td>	
-	<td width="5%" style="text-align: left;">
+	<td width="5%" style="text-align: center;">
 		<%--
 			<button id="buttonUp-{{= getIndex()}}" class="buttonUp">
 				<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_up.png') }"/>
