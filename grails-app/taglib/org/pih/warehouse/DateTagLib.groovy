@@ -29,8 +29,15 @@ class DateTagLib {
 	
 	def prettyDateFormat = { attrs, body ->
 		def date = (attrs.date)?:new Date();
-		def prettyTime = new PrettyTime();
-		out << 	prettyTime.format(date);
+		def p = new PrettyTime();
+		
+		def now = new Date() 
+		if (now - date < 1) { 
+			out << "${warehouse.message(code:'default.today.label')}"
+		}
+		else { 
+			out << 	p.format(date);
+		}
 	}
 		
 }
