@@ -9,9 +9,9 @@
 	}
 </style>
 <ul class="megamenu">
-	<li>
-		<a href="javascript:void(0)"><warehouse:message code="inventory.label" /></a>
-		<g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
+	<g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
+		<li>
+			<a href="javascript:void(0)"><warehouse:message code="inventory.label" /></a>
 			<div>							
 				<table>
 					<tr>
@@ -78,13 +78,12 @@
 					</tr>
 				</table>				
 			</div>
-			
-		</g:authorize>
+		</li>
+	</g:authorize>
 	
-	</li>
-	<li>
-		<a href="javascript:void(0)"><warehouse:message code="orders.label"/></a>
-		<g:authorize activity="[ActivityCode.PLACE_ORDER,ActivityCode.FULFILL_ORDER]">	
+	<g:authorize activity="[ActivityCode.PLACE_ORDER,ActivityCode.FULFILL_ORDER]">	
+		<li>
+			<a href="javascript:void(0)"><warehouse:message code="orders.label"/></a>
 			<div>
 				<table>
 					<tr>
@@ -124,13 +123,11 @@
 								
 				</table>										
 			</div>
-		</g:authorize>
-	</li>
-	<li>
-		<a href="javascript:void(0)"><warehouse:message code="requests.label"/></a>
-		
-		<g:authorize activity="[ActivityCode.PLACE_REQUEST,ActivityCode.FULFILL_REQUEST]">
-			
+		</li>
+	</g:authorize>
+	<g:authorize activity="[ActivityCode.PLACE_REQUEST,ActivityCode.FULFILL_REQUEST]">
+		<li>
+			<a href="javascript:void(0)"><warehouse:message code="requests.label"/></a>
 			<div>
 				<table>
 					<tr>
@@ -181,12 +178,12 @@
 					
 				</table>
 			</div>			
-		</g:authorize>		
-		
+		</li>
+	</g:authorize>		
 	</li>
-	<li>
-		<a href="javascript:void(0)"><warehouse:message code="shipping.label" /></a>
-		<g:authorize activity="[ActivityCode.SEND_STOCK]">
+	<g:authorize activity="[ActivityCode.SEND_STOCK]">
+		<li>
+			<a href="javascript:void(0)"><warehouse:message code="shipping.label" /></a>
 			<div>
 				<table>
 					<tr>
@@ -217,12 +214,11 @@
 					</tr>
 				</table>
 			</div>
-		</g:authorize>		
-		
-	</li>
-	<li>
-		<a href="javascript:void(0)"><warehouse:message code="receiving.label" /></a>
-		<g:authorize activity="[ActivityCode.RECEIVE_STOCK]">		
+		</li>
+	</g:authorize>		
+	<g:authorize activity="[ActivityCode.RECEIVE_STOCK]">		
+		<li>
+			<a href="javascript:void(0)"><warehouse:message code="receiving.label" /></a>
 			<div>
 				<table>
 					<tr>
@@ -252,9 +248,9 @@
 					</tr>
 				</table>
 			</div>
-		</g:authorize>		
-	</li>		
-
+		</li>		
+	</g:authorize>		
+	
 	<li>
 		<a href="javascript:void(0)"><warehouse:message code="report.label" /></a>
 		<div>
