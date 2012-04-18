@@ -2,7 +2,7 @@
 	.tab-container { overflow: auto; }
 </style>
 
-<%-- 
+
 <div style="padding-top:0px;" class="tab-container">
 	<g:form method="GET" controller="inventory" action="browse">
 		<table style="width:100%; border-collapse: collapse; border-color: black;">
@@ -20,7 +20,7 @@
 		</table>
 	</g:form>
 </div>
---%>
+
 
 <%-- 
 <div>	

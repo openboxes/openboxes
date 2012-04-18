@@ -39,9 +39,9 @@
 													<table>
 														<tr>
 															<td>
-																<a class="menu-heading" href="?categoryId=${quickCategory?.id}&resetSearch=true">
-																	<h1><format:category category="${quickCategory}"/></h1>
-																</a>
+																<g:link controller="inventory" action="browse" params="[categoryId:quickCategory.id,resetSearch:true]">
+																	<b><format:category category="${quickCategory}"/></b>
+																</g:link>
 															</td>
 														</tr>
 														<tr>
@@ -52,9 +52,9 @@
 																			<g:each var="childCategory" in="${quickCategory.categories}">
 																				<tr>
 																					<td>
-																						<a href="?categoryId=${childCategory?.id}&resetSearch=true">
+																						<g:link controller="inventory" action="browse" params="[categoryId:childCategory.id,resetSearch:true]">
 																							<format:category category="${childCategory}"/>
-																						</a>
+																						</g:link>
 																						
 																					</td>
 																				</tr>																				

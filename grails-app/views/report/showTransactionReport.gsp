@@ -21,9 +21,9 @@
 		</g:hasErrors>
 		
 		<table>
-			<g:if test="${!params.print}">
-				<tr>
-					<td>
+			<tr>
+				<g:if test="${!params.print}">
+					<td style="width: 250px;">
 						<%-- 
 						<div class="">
 							<span style="border: 1px solid lightgrey; background-color: #f7f7f7; padding: 5px; margin: 5px; width: 100px;">
@@ -41,11 +41,13 @@
 								<table>
 									<g:if test="${command?.product }">
 										<tr>
-											<td class="right">
+											<td>
 												<label>
 													<warehouse:message code="report.product.label"/>
 												</label>
 											</td>
+										</tr>
+										<tr>
 											<td>										
 												<format:product product="${command?.product }"/>
 												<g:hiddenField name="product.id" value="${command?.product?.id }"/>
@@ -53,21 +55,25 @@
 										</tr>
 									</g:if>
 									<tr>
-										<td class="right">
+										<td>
 											<label>
 												<warehouse:message code="report.location.label"/>
 											</label>
 										</td>
+									</tr>
+									<tr>
 										<td>										
 											<g:selectLocation class="filter" name="location.id" noSelection="['null':'']" maxChars="75" groupBy="locationType" value="${command?.location?.id}"/>
 										</td>
 									</tr>
 									<tr>
-										<td class="right">
+										<td>
 											<label>
 												<warehouse:message code="report.category.label"/>
 											</label>
 										</td>
+									</tr>
+									<tr>
 										<td>										
 											<select id="category.id" name="category.id" class="filter">
 												<option value=""></option>
@@ -76,11 +82,13 @@
 										</td>
 									</tr>
 									<tr>
-										<td class="right">
+										<td>
 											<label>
 												<warehouse:message code="report.dateRange.label"/>
 											</label>
 										</td>
+									</tr>
+									<tr>
 										<td>										
 											<g:jqueryDatePicker class="filter" id="startDate" name="startDate" value="${command?.startDate }" format="MM/dd/yyyy"/>
 											-
@@ -89,9 +97,12 @@
 										</td>
 									</tr>
 									<tr>
-										<td class="right">
+										<td>
 											<label><warehouse:message code="report.options.label"/></label>
 										</td>
+									</tr>
+									<tr>
+										
 										<td>
 											<div>
 												<g:checkBox name="hideInactiveProducts" value="${command?.hideInactiveProducts}" />										
@@ -113,20 +124,31 @@
 										</td>
 									</tr>
 									<tr>
-										<td></td>
 										<td class="left">
 											<button type="submit" class="btn">
 												<warehouse:message code="report.runReport.label"/>
 											</button>
-
+											
 										</td>
 									</tr>
 								</table>
 							</g:form>		
-						</div>				
+						</div>			
+						<g:if test="${!command?.product }">
+					    	<div style="padding: 5px;">
+								<label><warehouse:message code="report.exportAs.label"/></label>
+					   			<g:link target="_blank" controller="report" action="generateTransactionReport" params="[print:'true','location.id':command.location?.id,'category.id':command?.category?.id,'startDate':params.startDate,'endDate':params.endDate,'showTransferBreakdown':command.showTransferBreakdown,'includeChildren':command?.includeChildren,'hideInactiveProducts':command?.hideInactiveProducts]">
+					   				<warehouse:message code="report.exportAs.html.label"/>
+					   			</g:link> 
+					   			&nbsp;|&nbsp;
+					   			<g:link target="_blank" controller="report" action="downloadTransactionReport" params="[url:request.forwardURI,'location.id':command.location?.id,'category.id':command?.category?.id,'startDate':params.startDate,'endDate':params.endDate,'showTransferBreakdown':command.showTransferBreakdown,'includeChildren':command?.includeChildren,'hideInactiveProducts':command?.hideInactiveProducts,'insertPageBreakBetweenCategories':command?.insertPageBreakBetweenCategories]">
+					   				<warehouse:message code="report.exportAs.pdf.label"/>
+					   			</g:link>
+							</div>
+						</g:if>	
 					</td>
-				</tr>
-			</g:if>
+				</g:if>
+
 			<%-- 
 			<g:else>
 				<div class="title">	
@@ -168,27 +190,8 @@
 			--%>	
 							
 			
-			<tr>
 				<td>
-				
-				
-			
-					<g:if test="${!command?.product }">
-				    	<div class="right" style="padding: 5px;">
-							<label><warehouse:message code="report.exportAs.label"/></label>
-				   			<g:link target="_blank" controller="report" action="generateTransactionReport" params="[print:'true','location.id':command.location?.id,'category.id':command?.category?.id,'startDate':params.startDate,'endDate':params.endDate,'showTransferBreakdown':command.showTransferBreakdown,'includeChildren':command?.includeChildren,'hideInactiveProducts':command?.hideInactiveProducts]">
-				   				<warehouse:message code="report.exportAs.html.label"/>
-				   			</g:link> 
-				   			&nbsp;|&nbsp;
-				   			<g:link target="_blank" controller="report" action="downloadTransactionReport" params="[url:request.forwardURI,'location.id':command.location?.id,'category.id':command?.category?.id,'startDate':params.startDate,'endDate':params.endDate,'showTransferBreakdown':command.showTransferBreakdown,'includeChildren':command?.includeChildren,'hideInactiveProducts':command?.hideInactiveProducts,'insertPageBreakBetweenCategories':command?.insertPageBreakBetweenCategories]">
-				   				<warehouse:message code="report.exportAs.pdf.label"/>
-				   			</g:link>
-						</div>
-					</g:if>					
-					
 					<g:if test="${command.product }">
-					
-						
 						<style>
 							.debit:before { content: '-'; }
 							.debit:after { content: ''; }
@@ -197,8 +200,6 @@
 							.product_inventory { font-weight: bold; }
 							.inventory { font-weight: bold; }
 						</style>
-					
-					
 						<g:set var="i" value='${0 }'/>
 						<g:each var="entry" in="${command?.entries }">
 							<g:if test="${command?.product == entry?.value?.product}">									
