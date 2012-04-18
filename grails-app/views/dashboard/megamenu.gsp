@@ -92,15 +92,21 @@
 							<g:link controller="order" action="list" params="[status:'PENDING']"><warehouse:message code="order.list.label"/></g:link>
 						</td>
 					</tr>
-					<g:each in="${incomingOrders}" var="orderStatusRow">
-						<tr>
-							<td>
-								<g:link controller="order" action="list" params="[status:orderStatusRow[0]]">
-									<format:metadata obj="${orderStatusRow[0]}"/> (${orderStatusRow[1]})
-								</g:link>
-							</td>
-						</tr>
-					</g:each>
+					<tr>
+						<td>
+							<table>
+								<g:each in="${incomingOrders}" var="orderStatusRow">
+									<tr>
+										<td>
+											<g:link controller="order" action="list" params="[status:orderStatusRow[0]]">
+												<format:metadata obj="${orderStatusRow[0]}"/> (${orderStatusRow[1]})
+											</g:link>
+										</td>
+									</tr>
+								</g:each>
+							</table>
+						</td>
+					</tr>
 					<tr>	
 						<td>
 							<g:link controller="purchaseOrderWorkflow" action="index">
@@ -130,6 +136,10 @@
 					<tr>
 						<td>
 							<g:link controller="request" action="list" params="[requestType:'INCOMING']"><warehouse:message code="request.listIncoming.label" /></g:link>
+						</td>
+					</tr>
+					<tr>	
+						<td>
 							<table>
 								<g:each in="${incomingRequests}" var="status">
 									<tr>								
@@ -146,6 +156,10 @@
 					<tr>
 						<td>
 							<g:link controller="request" action="list" params="[requestType:'OUTGOING']"><warehouse:message code="request.listOutgoing.label" /></g:link>
+						</td>
+					</tr>
+					<tr>
+						<td>
 							<table>
 								<g:each in="${outgoingRequests}" var="status">
 									<tr>
@@ -178,6 +192,10 @@
 					<tr>
 						<td>
 							<g:link controller="shipment" action="list" params="[type:'outgoing']"><warehouse:message code="shipping.listOutgoing.label"  default="List outgoing shipments"/></g:link>
+						</td>
+					</tr>
+					<tr>
+						<td>
 							<table>
 								<g:each in="${outgoingShipments}" var="statusRow">
 									<tr>
@@ -210,6 +228,10 @@
 					<tr>
 						<td>
 							<g:link controller="shipment" action="list" params="[type: 'incoming']"><warehouse:message code="shipping.listIncoming.label"  default="List incoming shipments"/></g:link>
+						</td>
+					</tr>
+					<tr>
+						<td>
 							<table>
 								<g:each in="${incomingShipments}" var="statusRow">
 									<tr>

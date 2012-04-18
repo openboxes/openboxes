@@ -108,8 +108,9 @@
 	</g:if>	    
   	<g:if test="${session.user}">
  		<div class="breadcrumb">
-   			<h3 class="page-title">
-			    <div>							    
+   			
+	    	<h1>${g.pageProperty(name: 'page.label2') ?: g.layoutTitle()}</h1>	
+			    	<%-- 				    
 			    	<g:link controller="dashboard" action="index">
 				    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'house.png')}" style="vertical-align: bottom;"/>
 			    	</g:link>
@@ -129,8 +130,7 @@
 						&nbsp;&rsaquo;&nbsp;								
 		    			${label2}
 		    		</g:if>
-    			</div>
-   			</h3>
+		    		--%>
    		</div>
   	</g:if>
 	
