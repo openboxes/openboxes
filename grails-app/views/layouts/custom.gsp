@@ -17,9 +17,8 @@
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'form.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footer.css')}" type="text/css" media="screen, projection" />	
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'wizard.css')}" type="text/css" media="screen, projection" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.tableScroll/',file:'jquery.tablescroll.css')}" type="text/css" media="screen, projection" />
+	
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="screen, projection" />
-	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'example.css')}" type="text/css" media="screen, projection" />
 
 	<!-- Include javascript files -->
 	<g:javascript library="application"/>
@@ -108,8 +107,9 @@
 	</g:if>	    
   	<g:if test="${session.user}">
  		<div class="breadcrumb">
-   			
-	    	<h1>${g.pageProperty(name: 'page.label2') ?: g.layoutTitle()}</h1>	
+   			<g:if test="${session?.user && session?.warehouse}">
+	    		<h1>${g.pageProperty(name: 'page.label2') ?: g.layoutTitle()}</h1>	
+	    	</g:if>
 			    	<%-- 				    
 			    	<g:link controller="dashboard" action="index">
 				    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'house.png')}" style="vertical-align: bottom;"/>

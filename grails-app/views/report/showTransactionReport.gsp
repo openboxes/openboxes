@@ -204,17 +204,13 @@
 						<g:each var="entry" in="${command?.entries }">
 							<g:if test="${command?.product == entry?.value?.product}">									
 								<div class="box">
-									<table ">
+									<table>
 										<tr>
 								    		<td>
-												<h1>
+												<h1 style="display:inline;">
 													${entry.key }&nbsp;
 													<span class="circle">${entry.value.entries*.value.quantityRunning.sum() }</span>
 												</h1>
-								    		</td>
-								    	</tr>
-								    	<tr>
-								    		<td>
 												<g:link controller="report" action="generateTransactionReport" params="['location.id':command?.location?.id,'category.id':command?.category.id,'startDate':format.date(obj:command.startDate,format:'MM/dd/yyyy'),'endDate':format.date(obj:command.endDate,format:'MM/dd/yyyy'),'includeChildren':params.includeChildren]" style="display: inline">
 													<warehouse:message code="report.backToInventoryReport.label"/>
 								    			</g:link>	
@@ -256,40 +252,51 @@
 												</th>
 											</tr>
 										</thead>
-										<tbody>
-											<tr>
-												<td><format:date obj="${command?.startDate}"/></td>
-												<td><warehouse:message code="report.initialQuantity.label"/></td>
-												<td></td>
-												<td class="center">${itemEntry?.value?.quantityInitial }</td>
-											</tr>
-											<g:each var="row" in="${itemEntry.value.transactionEntries}">
-												<g:set var="transactionTypeCode" value="${row?.transactionEntry?.transaction?.transactionType?.transactionCode?.toString()?.toLowerCase()}"/>
-												<tr class="${i++%2?'odd':'even' }">
-													<td>
-														<format:date obj="${row.transactionEntry?.transaction?.transactionDate}"/>
-													</td>										
-													<td>
-														<g:link controller="inventory" action="showTransaction" id="${row?.transactionEntry?.transaction?.id }">
-															<format:metadata obj="${row.transactionEntry?.transaction?.transactionType}"/>
-														</g:link>
-													</td>										
-													<td class="center">
-														<span class="${transactionTypeCode}">${row.transactionEntry?.quantity }</span>
+										<g:if test="${itemEntry.value.transactionEntries}">
+											<tbody>
+												<tr>
+													<td><format:date obj="${command?.startDate}"/></td>
+													<td><warehouse:message code="report.initialQuantity.label"/></td>
+													<td></td>
+													<td class="center">${itemEntry?.value?.quantityInitial }</td>
+												</tr>
+												<g:each var="row" in="${itemEntry.value.transactionEntries}">
+													<g:set var="transactionTypeCode" value="${row?.transactionEntry?.transaction?.transactionType?.transactionCode?.toString()?.toLowerCase()}"/>
+													<tr class="${i++%2?'odd':'even' }">
+														<td>
+															<format:date obj="${row.transactionEntry?.transaction?.transactionDate}"/>
+														</td>										
+														<td>
+															<g:link controller="inventory" action="showTransaction" id="${row?.transactionEntry?.transaction?.id }">
+																<format:metadata obj="${row.transactionEntry?.transaction?.transactionType}"/>
+															</g:link>
+														</td>										
+														<td class="center">
+															<span class="${transactionTypeCode}">${row.transactionEntry?.quantity }</span>
+														</td>
+														<td class="center">${row.balance }</td>
+													</tr>								
+												</g:each>
+												
+											</tbody>
+											<tfoot>
+												<tr>
+													<td><format:date obj="${command?.endDate}"/></td>
+													<td><warehouse:message code="report.finalQuantity.label"/></td>
+													<td></td>
+													<td class="center">${itemEntry?.value?.quantityFinal }</td>
+												</tr>
+											</tfoot>
+										</g:if>
+										<g:else>
+											<tbody>
+												<tr>
+													<td colspan="5">
+														<warehouse:message code="transaction.noTransactions.label"/>
 													</td>
-													<td class="center">${row.balance }</td>
-												</tr>								
-											</g:each>
-											
-										</tbody>
-										<tfoot>
-											<tr>
-												<td><format:date obj="${command?.endDate}"/></td>
-												<td><warehouse:message code="report.finalQuantity.label"/></td>
-												<td></td>
-												<td class="center">${itemEntry?.value?.quantityFinal }</td>
-											</tr>
-										</tfoot>
+												</tr>
+											</tbody>										
+										</g:else>
 									</table>
 									<br/>
 								</g:each>
@@ -301,21 +308,22 @@
 				   			<g:set var="status" value="${0 }"/>
 					    	<g:each var="productEntry" in="${command?.productsByCategory }" status="i">
 					    		<g:set var="category" value="${productEntry.key }"/>
-				    			<h2>
+					    		
+								<div class="box">					    		
+								
 									<table>
 										<tr>
-											<td>
-												<label>
-													${command?.location?.name } &rsaquo;
+											<td class="left">
+											
+												<h1 style="display:inline;">
 													<format:category category="${category}"/>	
-								    			</label>
+									    		</h1>
 								    			<g:if test="${!params.print}">
 								    				&nbsp;
 													<g:link controller="report" action="generateTransactionReport" params="['location.id':command?.location?.id,'category.id':category?.id,'startDate':format.date(obj:command.startDate,format:'MM/dd/yyyy'),'endDate':format.date(obj:command.endDate,format:'MM/dd/yyyy'),'includeChildren':false,'insertPageBreakBetweenCategories':command?.insertPageBreakBetweenCategories,'showTransferBreakdown':command?.showTransferBreakdown,'hideInactiveProducts':command?.hideInactiveProducts]" style="display: inline">
 														<warehouse:message code="report.showThisCategoryOnly.label"/>
 									    			</g:link>
 								    			</g:if>
-											
 											</td>
 											<td class="right">
 												<span class="fade">	
@@ -324,9 +332,8 @@
 											</td>
 										</tr>
 									</table>
+								</div>
 									
-														    			
-				    			</h2>
     							<div class="list">
 							    	<table class="report">
 							    		<thead>

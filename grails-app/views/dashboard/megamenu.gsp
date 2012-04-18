@@ -34,42 +34,40 @@
 								<table>
 									<tr>
 										<g:each var="quickCategory" in="${quickCategories}">
-											<g:if test="${quickCategory.parentCategory }">									
-												<td>
-													<table>
-														<tr>
-															<td>
-																<g:link controller="inventory" action="browse" params="[categoryId:quickCategory.id,resetSearch:true]">
-																	<b><format:category category="${quickCategory}"/></b>
-																</g:link>
-															</td>
-														</tr>
-														<tr>
-															<td>
-																<div class="menu-section">
-																	<g:if test="${quickCategory.categories}">
-																		<table>							
-																			<g:each var="childCategory" in="${quickCategory.categories}">
-																				<tr>
-																					<td>
-																						<g:link controller="inventory" action="browse" params="[categoryId:childCategory.id,resetSearch:true]">
-																							<format:category category="${childCategory}"/>
-																						</g:link>
-																						
-																					</td>
-																				</tr>																				
-																			</g:each>	
-																		</table>
-																	</g:if>
-																	<g:else>
-																		<warehouse:message code="default.none.label"></warehouse:message>
-																	</g:else>
-																</div>
-															</td>
-														</tr>
-													</table>
-												</td>
-											</g:if>
+											<td>
+												<table>
+													<tr>
+														<td>
+															<g:link controller="inventory" action="browse" params="[categoryId:quickCategory.id,resetSearch:true]">
+																<b><format:category category="${quickCategory}"/></b>
+															</g:link>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<div class="menu-section">
+																<g:if test="${quickCategory.categories}">
+																	<table>							
+																		<g:each var="childCategory" in="${quickCategory.categories}">
+																			<tr>
+																				<td>
+																					<g:link controller="inventory" action="browse" params="[categoryId:childCategory.id,resetSearch:true]">
+																						<format:category category="${childCategory}"/>
+																					</g:link>
+																					
+																				</td>
+																			</tr>																				
+																		</g:each>	
+																	</table>
+																</g:if>
+																<g:else>
+																	<warehouse:message code="default.none.label"></warehouse:message>
+																</g:else>
+															</div>
+														</td>
+													</tr>
+												</table>
+											</td>
 										</g:each>	
 									</tr>
 								</table>
