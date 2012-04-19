@@ -163,7 +163,7 @@
 
 		$(function() { 		
 		
-			$(".megamenu").megamenu();
+			$(".megamenu").megamenu({'show_method':'simple', 'hide_method': 'simple'});
 		
 			<g:if test="${session.useDebugLocale}">
 				$('.copy').click(function(event) {				

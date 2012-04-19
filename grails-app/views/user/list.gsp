@@ -41,7 +41,7 @@
                             <g:sortableColumn property="email" title="${warehouse.message(code: 'user.email.label')}" />
                             <g:sortableColumn property="locale" title="${warehouse.message(code: 'default.locale.label')}" />
                         <!--      <g:sortableColumn property="email" title="${warehouse.message(code: 'user.role.label', default: 'Roles')}" />  -->
-                            <g:sortableColumn property="role" title="${warehouse.message(code: 'user.role.label')}" />
+                            <g:sortableColumn property="role" title="${warehouse.message(code: 'user.roles.label')}" />
                             <g:sortableColumn property="active" title="${warehouse.message(code: 'user.active.label')}" />
                         </tr>
                     </thead>
