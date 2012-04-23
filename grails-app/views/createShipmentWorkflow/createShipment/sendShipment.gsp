@@ -29,8 +29,8 @@
 				
 					<g:render template="../shipment/summary" />	
 					<g:render template="flowHeader" model="['currentState':'Send']"/>
-					<g:set var="recipients" value="${shipmentInstance.allShipmentItems.findAll { it.recipient } }"/>
-					<g:set var="includeNotifications" value="${recipients && !shipmentWorkflow?.isExcluded('carrier') && shipmentInstance?.carrier && !shipmentWorkflow?.isExcluded('recipient') && shipmentInstance?.recipient}"/>
+					<g:set var="shipmentItemsWithRecipient" value="${shipmentInstance.allShipmentItems.findAll { it.recipient } }"/>
+					<g:set var="includeNotifications" value="${shipmentItemsWithRecipient || (!shipmentWorkflow?.isExcluded('carrier') && shipmentInstance?.carrier) || (!shipmentWorkflow?.isExcluded('recipient') && shipmentInstance?.recipient)}"/>
 					
 					<div class="dialog">
 						<table>
@@ -276,23 +276,23 @@
 												</g:if>
 												
 												
-												<g:if test="${recipients }">
-													<g:each var="recipient" in="${recipients }">
-														<g:if test="${recipient?.id != shipmentInstance?.recipient?.id}">
-															<tr class="prop odd">
-																<td>
-																	<input type="checkbox" checked="true" name="emailRecipientId" value="${recipient?.id}"/>
-																	<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/> 
-																</td>
-																<td>
-																	<warehouse:message code="shipping.recipient.label"/>
-																</td>
-																<td>							
-																	${recipient?.name } &nbsp;
-																	<span class="fade">${recipient?.email}</span>				
-																</td>
-															</tr>
-														</g:if>						
+												<g:if test="${shipmentItemsWithRecipient }">
+													<g:set var="recipients" value="${shipmentItemsWithRecipient?.collect{it.recipient}.unique()}"/>
+													<g:each var="recipient" in="${recipients}">
+														
+														<tr class="prop odd">
+															<td>
+																<input type="checkbox" checked="true" name="emailRecipientId" value="${recipient?.id}"/>
+																<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/> 
+															</td>
+															<td>
+																<warehouse:message code="shipping.recipient.label"/>
+															</td>
+															<td>							
+																${recipient?.name } &nbsp;
+																<span class="fade">${recipient?.email}</span>				
+															</td>
+														</tr>
 													</g:each>
 												</g:if>
 											</table>			
