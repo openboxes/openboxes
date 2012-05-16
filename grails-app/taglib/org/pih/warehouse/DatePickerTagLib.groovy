@@ -28,6 +28,9 @@ class DatePickerTagLib {
 		def changeMonthAndYear = attrs.changeMonthAndYear ?: "false";
 		def showClear = attrs.showClear ?: "false"
 		def value = attrs.value;
+		def readOnly = attrs.readOnly ?: false
+		
+		
 		if (value) { 
 			if (value instanceof Date) {
 				value = (attrs.format && attrs.value) ? new SimpleDateFormat(attrs.format).format(attrs.value) : ""
@@ -42,7 +45,7 @@ class DatePickerTagLib {
 
 		<span>
 			<input id='${id}' name='${name}' type='hidden'/>
-			<input id='${id}-datepicker' name='${name}-datepicker' type='text' class='date ${cssClass}' size="${size}" />
+			<input id='${id}-datepicker' name='${name}-datepicker' type='text' class='date ${cssClass}' size="${size}" ${readOnly?"readonly='readonly'":""}/>
 			<script type=\'text/javascript\'>
 
 				jQuery(document).ready(function() {

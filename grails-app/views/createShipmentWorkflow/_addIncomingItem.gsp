@@ -88,7 +88,8 @@
 						<td valign="top" class="value">
 							<g:jqueryDatePicker id="expirationDate" name="expirationDate" 
 								value="${item?.expirationDate }" 
-								format="MM/dd/yyyy"
+								format="MM/dd/yyyy" 
+								readOnly="true"
 								cssClass="text"/>
 							<%-- 
 							<g:datePicker name="expirationDate" default="none" precision="day"
