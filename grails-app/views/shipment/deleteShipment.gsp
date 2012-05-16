@@ -44,7 +44,7 @@
 								</tr>							
 								<tr class="prop">
 									<td valign="top" class="name"><label><warehouse:message
-										code="default.name.label" default="Name" /></label>
+										code="shipping.name.label" default="Name" /></label>
 									</td>
 									<td colspan="3" valign="top"
 										class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">

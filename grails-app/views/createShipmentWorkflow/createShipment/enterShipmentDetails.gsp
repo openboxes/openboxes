@@ -52,7 +52,7 @@
 								</g:if>
 								<tr class='prop'>
 									<td valign='top' class='name'>
-										<label for='name'><warehouse:message code="default.name.label"/></label>
+										<label for='name'><warehouse:message code="shipping.name.label"/></label>
 									</td>
 									<td valign='top' class='value ${hasErrors(bean:shipmentInstance,field:'name','errors')}'>
 										<input type="text" name='name' value="${shipmentInstance?.name?.encodeAsHTML()}" size="40"/>
