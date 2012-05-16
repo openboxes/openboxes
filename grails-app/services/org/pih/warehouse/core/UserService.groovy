@@ -7,6 +7,16 @@ class UserService {
 	def dataSource
 	boolean transactional = true
 	
+	User getUser(String id) { 
+		return User.get(id)
+	}
+	
+	Boolean isUserInRole(String userId, Collection roles) { 
+		User userInstance = getUser(userId)
+		return userInstance?.roles.any { roles.contains(it.roleType) }
+	}
+	
+	
 	def findUsers(String term) { 
 		
 	}

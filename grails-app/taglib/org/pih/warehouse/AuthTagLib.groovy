@@ -6,35 +6,60 @@ import org.pih.warehouse.core.User;
 
 class AuthTagLib {
    	
+	def userService
+	
+	def isUserInRole = { attrs, body ->		
+		def isUserInRole = userService.isUserInRole(session?.user?.id, attrs.roles)
+		if (isUserInRole)
+			out << body()
+	}
+	
+	def isUserNotInRole = { attrs, body -> 
+		def isUserInRole = userService.isUserInRole(session?.user?.id, attrs.roles)		
+		if (!isUserInRole)
+			out << body()		
+	}
+	
 	//Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
+	/*
 	def isUserInRole = { attrs, body ->	
 		def user = User.get(session?.user?.id)		
-		def isUserInRole = getIsUserInAnyRoles(user, attrs.roles)				  
-		if (isUserInRole) { 
-			out << body()
-		}		
-	}
-	
-	
-	def isUserNotInRole = { attrs, body ->
-		def user = User.get(session?.user?.id)
-		def isUserInRole = getIsUserInAnyRoles(user, attrs.roles)				
-		if (!isUserInRole) {
-			out << body()
-		}
-	}
-	
-	
-	Boolean getIsUserInAnyRoles(User user, Collection roles) { 
-		Boolean isUserInRole;
+		
+		//def isUserInRole = getIsUserInAnyRoles(user, attrs.roles)				  
+		def isUserInRole = false;
 		if (!user || !user?.roles) {
 			isUserInRole = false;
 		}
 		else {
-			isUserInRole = user?.roles.any { roles.contains(it.roleType) }
+			isUserInRole = user?.roles?.any { attrs.roles.contains(it.roleType) }
 		}
-		return isUserInRole;
+		
+		if (isUserInRole) { 
+			out << body()
+		}		
 	}
+	*/
+	
+	/*
+	def isUserNotInRole = { attrs, body ->
+		def user = User.get(session?.user?.id)
+		//def isUserInRole = getIsUserInAnyRoles(user, attrs.roles)			
+		def isUserInRole = false;
+		if (!user || !user?.roles) {
+			isUserInRole = false;
+		}
+		else {
+			isUserInRole = user?.roles?.any { attrs.roles.contains(it.roleType) }
+		}
+
+		if (!isUserInRole) {
+			out << body()
+		}
+	}
+	*/
+	
+	
+	
 	
 	
 	
