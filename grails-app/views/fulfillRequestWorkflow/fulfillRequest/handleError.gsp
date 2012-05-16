@@ -34,10 +34,12 @@
 										<img src="${resource(dir: 'images/icons/silk', file: 'error.png')}" /> 
 										<warehouse:message code="fulfillRequestWorkflow.handleError.message"/>
 									</h2>
-									<div>
+									<div class="error">
 										<g:if test="${rootCauseException?.message }">
 											<b>${rootCauseException?.class.name }</b> ${rootCauseException?.message }										
 										</g:if>
+									</div>
+									<div class="box">
 										<g:link controller="request" action="list">
 											${warehouse.message(code: 'request.returnToList.label', default: 'Return to request list')} 
 										</g:link>																			

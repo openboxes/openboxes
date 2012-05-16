@@ -30,7 +30,7 @@ class FulfillmentService {
 	 * @param fulfilledById
 	 * @return
 	 */
-	FulfillmentCommand getFulfillment(Integer id, Integer fulfilledById) {
+	FulfillmentCommand getFulfillment(String id, String fulfilledById) {
 		def command = new FulfillmentCommand();
 
 		// Make sure that the request we are trying to fulfill actually exists		

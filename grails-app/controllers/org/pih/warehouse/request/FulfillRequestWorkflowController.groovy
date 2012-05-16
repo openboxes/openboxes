@@ -35,7 +35,7 @@ class FulfillRequestWorkflowController {
 				def command = new FulfillmentCommand();
 				if (params.id) {
 					command = 
-						fulfillmentService.getFulfillment(params.id as int, session.user.id as int)
+						fulfillmentService.getFulfillment(params.id, session.user.id)
 				}
 				else {
 					flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
