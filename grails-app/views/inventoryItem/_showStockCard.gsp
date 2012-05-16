@@ -7,8 +7,10 @@
 				<div id="transactionLogTabs" class="tabs">												
 					<ul>
 						<li><a href="#tabs-1"><warehouse:message code="inventory.currentStock.label"/></a></li>
+						<%-- 
 						<li><a href="#tabs-2"><warehouse:message code="request.pendingRequestLog.label"/></a></li>
 						<li><a href="#tabs-3"><warehouse:message code="order.pendingOrderLog.label"/></a></li>
+						--%>
 						<li><a href="#tabs-4"><warehouse:message code="shipment.pendingShipmentLog.label"/></a></li>
 						<%-- 
 						<li><a href="#tabs-5"><warehouse:message code="inventory.currentLotNumbers.label"/></a></li>
@@ -17,12 +19,14 @@
 					<div id="tabs-1" style="padding: 0px;">										
 						<g:render template="showCurrentStock"/>
 					</div>
+					<%-- 
 					<div id="tabs-2" style="padding: 0px;">
 						<g:render template="showPendingRequestLog"/>
 					</div>
 					<div id="tabs-3" style="padding: 0px;">
 						<g:render template="showPendingOrderLog"/>
 					</div>
+					--%>
 					<div id="tabs-4" style="padding: 0px;">
 						<g:render template="showPendingShipmentLog"/>
 					</div>
