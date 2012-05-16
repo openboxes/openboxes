@@ -9,9 +9,16 @@
 	}
 </style>
 <ul class="megamenu">
+	<li>
+		<g:link controller="dashboard" action="index">
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'house.png')}" class="middle"/>
+		</g:link>
+	</li>
 	<g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
 		<li>
-			<a href="javascript:void(0)"><warehouse:message code="inventory.label" /></a>
+			<g:link controller="inventory" action="browse">
+				<warehouse:message code="inventory.label" />
+			</g:link>
 			<div>							
 				<table>
 					<tr>
@@ -24,7 +31,10 @@
 								</tr>
 								<tr>
 									<td>
-										<g:link controller="product" action="create"><warehouse:message code="product.add.label"/></g:link>
+										<g:link controller="product" action="create">
+											<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" class="middle"/>
+											<warehouse:message code="product.add.label"/>
+										</g:link>
 									</td>					
 								</tr>
 							</table>
@@ -81,7 +91,9 @@
 	
 	<g:authorize activity="[ActivityCode.PLACE_ORDER,ActivityCode.FULFILL_ORDER]">	
 		<li>
-			<a href="javascript:void(0)"><warehouse:message code="orders.label"/></a>
+			<g:link controller="order" action="list">			
+				<warehouse:message code="orders.label"/>
+			</g:link>
 			<div>
 				<table>
 					<tr>
@@ -125,7 +137,9 @@
 	</g:authorize>
 	<g:authorize activity="[ActivityCode.PLACE_REQUEST,ActivityCode.FULFILL_REQUEST]">
 		<li>
-			<a href="javascript:void(0)"><warehouse:message code="requests.label"/></a>
+			<g:link controller="request" action="list">
+				<warehouse:message code="requests.label"/>
+			</g:link>
 			<div>
 				<table>
 					<tr>
@@ -181,7 +195,9 @@
 	</li>
 	<g:authorize activity="[ActivityCode.SEND_STOCK]">
 		<li>
-			<a href="javascript:void(0)"><warehouse:message code="shipping.label" /></a>
+			<g:link controller="shipment" action="list" params="[type:'outgoing']">
+				<warehouse:message code="shipping.label" />
+			</g:link>
 			<div>
 				<table>
 					<tr>
@@ -216,7 +232,9 @@
 	</g:authorize>		
 	<g:authorize activity="[ActivityCode.RECEIVE_STOCK]">		
 		<li>
-			<a href="javascript:void(0)"><warehouse:message code="receiving.label" /></a>
+			<g:link controller="shipment" action="list" params="[type: 'incoming']">
+				<warehouse:message code="receiving.label" />
+			</g:link>
 			<div>
 				<table>
 					<tr>
