@@ -7,26 +7,37 @@ import org.pih.warehouse.core.User;
 class AuthTagLib {
    	
 	//Locale defaultLocale = new Locale(grailsApplication.config.locale.defaultLocale)
-	def isUserInRole = { attrs, body ->
-		
-		def isUserInRole = false;
-		def roles = attrs.roles
-		def userInstance = User.get(session?.user?.id)
-		
-		if (!userInstance || !userInstance?.roles) { 
+	def isUserInRole = { attrs, body ->	
+		def user = User.get(session?.user?.id)		
+		def isUserInRole = getIsUserInAnyRoles(user, attrs.roles)				  
+		if (isUserInRole) { 
+			out << body()
+		}		
+	}
+	
+	
+	def isUserNotInRole = { attrs, body ->
+		def user = User.get(session?.user?.id)
+		def isUserInRole = getIsUserInAnyRoles(user, attrs.roles)				
+		if (!isUserInRole) {
+			out << body()
+		}
+	}
+	
+	
+	Boolean getIsUserInAnyRoles(User user, Collection roles) { 
+		Boolean isUserInRole;
+		if (!user || !user?.roles) {
 			isUserInRole = false;
 		}
-		else { 
-			// FIXME We need to check to see if the currently logged in user has any of the given roles
-			log.debug "attrs: " + attrs?.roles 
-			isUserInRole = userInstance?.roles.any { attrs.roles.contains(it.roleType) }
+		else {
+			isUserInRole = user?.roles.any { roles.contains(it.roleType) }
 		}
-				  
-		if (isUserInRole) { 
-			out << body{}
-		}
-		
+		return isUserInRole;
 	}
+	
+	
+	
 	def authorize = { attrs, body ->
 		//attrs.locale = attrs.locale ?: session?.user?.locale ?: defaultLocale;
 		//def defaultTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ValidationTagLib')
@@ -45,6 +56,5 @@ class AuthTagLib {
 		if (authorized) { 
 			out << body{}
 		}
-		
 	}
 }

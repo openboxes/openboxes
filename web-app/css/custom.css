@@ -24,6 +24,13 @@ button.action-btn, button.previous, button.next {
 	padding: 0px;
 }
 
+.button { 
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	padding: 15px;
+	margin: 5px;	
+	border: 1px solid lightgrey;
+}
 
 
 .action-btn { 

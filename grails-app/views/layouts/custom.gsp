@@ -110,27 +110,27 @@
    			<g:if test="${session?.user && session?.warehouse}">
 	    		<h1>${g.pageProperty(name: 'page.label2') ?: g.layoutTitle()}</h1>	
 	    	</g:if>
-			    	<%-- 				    
-			    	<g:link controller="dashboard" action="index">
-				    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'house.png')}" style="vertical-align: bottom;"/>
-			    	</g:link>
-				    &nbsp;&rsaquo;&nbsp;								
-					<g:if test="${session?.warehouse}">									
-						<g:if test="${session.warehouse.logo }">
-							<img class="photo" width="25" height="25" 
-								src="${createLink(controller:'location', action:'viewLogo', id:session.warehouse.id)}" style="vertical-align: middle" />
-						</g:if>
-						${session?.warehouse?.name} &nbsp;&rsaquo;&nbsp;
-					</g:if> 
-					<!--  note that both breadcrumbs are overrideable by using the content tag is the view to set the value of label1 or label2 -->
-				    <g:set var="label1">${g.pageProperty(name: 'page.label1') ?: warehouse.message(code: "breadcrumbs." + params.controller + ".label")}</g:set>
-				    <g:set var="label2">${g.pageProperty(name: 'page.label2') ?: g.layoutTitle()}</g:set>
-				   		${label1 ?: params.controller}
-				    <g:if test="${label1 != label2}">
-						&nbsp;&rsaquo;&nbsp;								
-		    			${label2}
-		    		</g:if>
-		    		--%>
+	    	<%-- 				    
+		    	<g:link controller="dashboard" action="index">
+			    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'house.png')}" style="vertical-align: bottom;"/>
+		    	</g:link>
+			    &nbsp;&rsaquo;&nbsp;								
+				<g:if test="${session?.warehouse}">									
+					<g:if test="${session.warehouse.logo }">
+						<img class="photo" width="25" height="25" 
+							src="${createLink(controller:'location', action:'viewLogo', id:session.warehouse.id)}" style="vertical-align: middle" />
+					</g:if>
+					${session?.warehouse?.name} &nbsp;&rsaquo;&nbsp;
+				</g:if> 
+				<!--  note that both breadcrumbs are overrideable by using the content tag is the view to set the value of label1 or label2 -->
+			    <g:set var="label1">${g.pageProperty(name: 'page.label1') ?: warehouse.message(code: "breadcrumbs." + params.controller + ".label")}</g:set>
+			    <g:set var="label2">${g.pageProperty(name: 'page.label2') ?: g.layoutTitle()}</g:set>
+			   		${label1 ?: params.controller}
+			    <g:if test="${label1 != label2}">
+					&nbsp;&rsaquo;&nbsp;								
+	    			${label2}
+	    		</g:if>
+    		--%>
    		</div>
   	</g:if>
 	
