@@ -356,7 +356,10 @@ class ShipmentController {
 				render(view: "receiveShipment", model: [shipmentInstance: shipmentInstance, receiptInstance:receiptInstance ])
 				return
 			}
-			def creditStockOnReceipt = params.creditStockOnReceipt=='yes'
+			
+			// For now, we'll always credit stock on receipt of shipment
+			//def creditStockOnReceipt = params.creditStockOnReceipt=='yes'
+			def creditStockOnReceipt = true
 			// actually process the receipt
 			shipmentService.receiveShipment(shipmentInstance, params.comment, session.user, session.warehouse, creditStockOnReceipt);
 			

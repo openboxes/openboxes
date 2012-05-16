@@ -87,14 +87,15 @@
 										<td valign="top"
 											class=" ${hasErrors(bean: receiptInstance, field: 'receiptItem', 'errors')}"
 											nowrap="nowrap">
-											
+											<%-- 
 											<label><warehouse:message
 											code="shipping.receiveItems.label" /></label>
-											
+											--%>
 											<g:if test="${!receiptInstance.receiptItems}">
 												<warehouse:message code="shipping.noItemsToReceive.label" />
 											</g:if>			
-											<g:else>												
+											<g:else>
+												<%-- 												
 												<div>
 													<g:radio name="creditStockOnReceipt" value="no" checked="${params.creditStockOnReceipt=='no' }" />											
 													<warehouse:message code="shipping.willNotBeCredited.message" 
@@ -105,11 +106,7 @@
 													<warehouse:message code="shipping.creditStockOnReceipt.label" 
 														args="[shipmentInstance?.destination?.name]"/>											
 												</div>
-											</td>
-										</tr>
-										<tr class="prop">
-											<td valign="top" class="name"></td>	
-											<td>
+												--%>
 												<div id="creditShipmentItems" style="overflow: auto; height: 300px" class="">									
 													<table>
 														<thead>
