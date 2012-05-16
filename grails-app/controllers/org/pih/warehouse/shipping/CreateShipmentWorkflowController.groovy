@@ -317,7 +317,7 @@ class CreateShipmentWorkflowController {
 			// for the top-level links
     		on("enterShipmentDetails").to("enterShipmentDetails")
 			on("enterTrackingDetails").to("enterTrackingDetails")
-			//on("enterContainerDetails").to("enterContainerDetails")
+			on("enterContainerDetails").to("enterContainerDetails")
 			on("reviewShipment").to("reviewShipment")
 			on("sendShipment").to("sendShipment")
     	}
@@ -342,7 +342,7 @@ class CreateShipmentWorkflowController {
 			on("enterShipmentDetails").to("enterShipmentDetails")
 			on("enterTrackingDetails").to("enterTrackingDetails")
 			on("enterContainerDetails").to("enterContainerDetails")
-			//on("sendShipment").to("sendShipment")
+			on("sendShipment").to("sendShipment")
 			
 			
 		}
