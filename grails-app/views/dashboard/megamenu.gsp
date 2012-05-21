@@ -32,7 +32,6 @@
 								<tr>
 									<td>
 										<g:link controller="product" action="create">
-											<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" class="middle"/>
 											<warehouse:message code="product.add.label"/>
 										</g:link>
 									</td>					

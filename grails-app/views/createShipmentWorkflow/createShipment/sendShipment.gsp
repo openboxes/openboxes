@@ -94,32 +94,28 @@
 								<tr class="prop">
 									<td valign="top" class="name">
 										<label>
-											<warehouse:message code="shipping.shippingDate.label" />
+											<warehouse:message code="shipping.expectedShippingDate.label" />:
+										</label>
+									</td>
+									<td class="">
+										<format:date obj="${shipmentInstance?.expectedShippingDate}"
+											format="dd/MMM/yyyy"/>
+									</td>
+								</tr>
+								<tr class="prop">
+									<td valign="top" class="name">
+										<label>
+											<warehouse:message code="shipping.actualShippingDate.label" />:
 										</label>
 									</td>
 									<td valign="middle"
 										class=" ${hasErrors(bean: shipmentInstance, field: 'actualShippingDate', 'errors')}"
 										nowrap="nowrap">
-										<div>
-											<label>
-												<warehouse:message code="shipping.actualShippingDate.label" />:
-											</label>
-											<g:jqueryDatePicker id="actualShippingDate" name="actualShippingDate"
-												value="${command?.actualShippingDate}" format="MM/dd/yyyy"/>
-										</div>
-										<br/>
-										<div>							
-											<label>
-												<warehouse:message code="shipping.expectedShippingDate.label" />:
-											</label>
-											<span>
-												<format:date obj="${shipmentInstance?.expectedShippingDate}"
-													format="dd/MMM/yyyy"/>
-											</span>
-										</div>
-										
+										<g:jqueryDatePicker id="actualShippingDate" name="actualShippingDate"
+											value="${command?.actualShippingDate}" format="MM/dd/yyyy"/>										
 									</td>
 								</tr>											
+																	
 								
 								
 								<%-- 								
@@ -164,18 +160,19 @@
 										</td>
 										<td valign="top" class="value">
 											<g:if test="${shipmentInstance.shipmentItems}">
+												<%--
 												<div>												
 													<g:checkBox name="debitStockOnSend" value="${command ? command.debitStockOnSend : true}"/>
 													&nbsp;
 													<warehouse:message code="shipping.debitStockOnSend.message" args="[shipmentInstance?.origin?.name]"/>											
 												</div>
 												<br/>
-												
+												 --%>
 												
 												<div id="debitShipmentItems" class="${!command || command?.debitStockOnSend ? '' : 'hidden'  }">
 													<warehouse:message code="shipping.willBeDebited.message" args="[shipmentInstance?.origin?.name]"/>
 													
-													<div style="overflow: auto; height: 300px; border: 1px solid lightgrey;">
+													<div style="overflow: auto; max-height: 300px; border: 1px solid lightgrey;">
 														<table>
 															<tr>
 																<th><warehouse:message code="container.label"/></th>
@@ -222,6 +219,7 @@
 										
 										
 											<warehouse:message code="shipping.notificationEmailsWillBeSentOut.message"/>
+											<%-- 
 											<div>												
 												<g:checkBox name="debitStockOnSend" value="${command ? command.debitStockOnSend : true}"/>
 												&nbsp;
@@ -229,14 +227,13 @@
 											</div>
 											<br/>
 										
-											<%-- 
 											<span>
 												<g:checkBox name="notify" checked="true"/>
 												<warehouse:message code="shipping.notifications.message"/>
 											</span>
 											--%>								
 											<warehouse:message code="shipping.notifications.message"/>
-											<table style="display: inline" id="notifyRecipients">	
+											<table style="border: 1px solid lightgrey;" id="notifyRecipients">	
 												<tr>
 													<th></th>
 													<th><warehouse:message code="default.role.label"/></th>

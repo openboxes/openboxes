@@ -956,7 +956,6 @@ class CreateShipmentWorkflowController {
 	 * @param recipients
 	 */
 	void triggerSendShipmentEmails(Shipment shipmentInstance, User userInstance, Set<Person> recipients) {
-	   log.info "Trigger send shipment emails"
 	   if (!shipmentInstance.hasErrors() && recipients) {
 
 		   // add the current user to the list of email recipients
@@ -971,6 +970,7 @@ class CreateShipmentWorkflowController {
 		   def to = recipients?.collect { it.email }?.unique()
 		   
 		   // Generate PDF based on the packing list report
+		   /*
 		   def url = "${createLink(controller:'report', action: 'showShippingReport', absolute: true)}"
 		   url += ";jsessionid=" + session.getId()
 		   url += "?print=true&orientation=portrait&format=pdf"
@@ -979,10 +979,11 @@ class CreateShipmentWorkflowController {
 		   //def url = "http://localhost:8080/warehouse/report/showShippingReport;jsessionid=D31A0CB3B73EFF4261C53B98F7D7562A?print=true&orientation=portrait&shipment.id=ff80818135f08caa0135f08dc7140001&includeEntities=true"
 		   def baos = new ByteArrayOutputStream();
 		   reportService.generatePdf(url, baos)
-		   
+		   */
 		   try {
-			   //mailService.sendHtmlMail(subject, body.toString(), to)
-			   mailService.sendHtmlMailWithAttachment(to, subject, body.toString(), baos.toByteArray(), "packing-list.pdf", "application/pdf")
+			   mailService.sendHtmlMail(subject, body.toString(), to)
+			   //mailService.sendHtmlMailWithAttachment(to, subject, body.toString(), baos.toByteArray(), "packing-list.pdf", "application/pdf")
+
 		   } catch (Exception e) {
 			   log.error "Error triggering send shipment emails " + e.message
 		   }

@@ -1,5 +1,7 @@
 package org.pih.warehouse.report;
 
+import groovy.xml.SAXBuilder;
+
 import java.util.Map;
 
 import java.text.ParseException;
@@ -14,6 +16,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.grails.plugins.excelimport.ExcelImportUtils;
+import org.jdom.output.DOMOutputter;
 import org.pih.warehouse.inventory.Inventory;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.InventoryItem;
@@ -33,6 +36,8 @@ import org.w3c.dom.Document;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 import org.xhtmlrenderer.resource.FSEntityResolver;
 import org.xhtmlrenderer.resource.XMLResource;
+import org.xhtmlrenderer.simple.extend.XhtmlCssOnlyNamespaceHandler;
+import org.xml.sax.EntityResolver;
 
 import org.pih.warehouse.reporting.Consumption;
 
@@ -296,12 +301,48 @@ class ReportService implements ApplicationContextAware {
 	
 	void generatePdf(String url, OutputStream outputStream) { 
 		log.info "Generate PDF for URL " + url
+		try { 
+			ITextRenderer renderer = new ITextRenderer();
+			renderer.setDocument(url);
+			renderer.layout();
+			renderer.createPDF(outputStream);
+		} catch (Exception e) { 
+			log.error("Cannot generate pdf due to error " + e.message)
+		}
+	}
+	
+	/*
+	void generatePdf(String url, OutputStream outputStream) { 
+		SAXBuilder sb = new SAXBuilder();
+		// This is needed to avoid a Connection timeout on the DTD
+		EntityResolver er = sb.getEntityResolver();
+		if (er == null) {
+			sb.setEntityResolver(FSEntityResolver.instance());
+		}
+		DOMOutputter outputter = new DOMOutputter();
+		org.jdom.Document html = sb.build(new File(inputFileName));
+		org.w3c.dom.Document htmlDoc = outputter.output(html);
+
+		//OutputStream os = new FileOutputStream(outputFileName);
+		//String url = new File(inputFileName).toURI().toURL().toString();
+		
 		ITextRenderer renderer = new ITextRenderer();
-		renderer.setDocument(url);
+		renderer.setDocument(htmlDoc, url, new XhtmlCssOnlyNamespaceHandler());
 		renderer.layout();
 		renderer.createPDF(outputStream);
+		outputStream.close();		
 	}
-		
+	*/
+	
+	/*	
+	def downloadFile(url) {
+		def file = new FileOutputStream(url.tokenize("/")[-1])
+		def out = new BufferedOutputStream(file)
+		out << new URL(url).openStream()
+		out.close()
+	}*/
+	
+
 	
 	
 	private getDocument(String url) { 
