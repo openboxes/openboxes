@@ -6,7 +6,15 @@ eventWarStart = {
 }
 
 eventRunAppStart = { 	
-	def revisionNumber = 'svn info'.execute().in.readLines()[4][10..-1]	
+	println "Setting build date, build number, and revision number ..."
+	//def revisionNumber = 'svn info'.execute().in.readLines()[4][10..-1]
+	def revisionNumber = 0 
+	try { 
+		revisionNumber = 'svn info'.execute().in.readLines()[4][10..-1]	
+	} catch (Exception e) {
+		println 'Error executing svn info ' + e.message
+	}
+	
 	def buildNumber = metadata.'app.buildNumber'
 	if (!buildNumber) buildNumber = 1
 	
@@ -20,7 +28,15 @@ eventRunAppStart = {
 }
 
 eventCreateWarStart = { warName, stagingDir ->
-	def revisionNumber = 'svn info'.execute().in.readLines()[4][10..-1]
+	println "Setting build date, build number, and revision number ..."
+	//def revisionNumber = 'svn info'.execute().in.readLines()[4][10..-1]
+	def revisionNumber = 0
+	try {
+		revisionNumber = 'svn info'.execute().in.readLines()[4][10..-1]
+	} catch (Exception e) { 
+		println 'Error executing svn info ' + e.message
+	}
+
 	def buildNumber = System.getProperty("build.number", metadata.'app.buildNumber')
 	println("Setting BUILD_NUMBER to " + buildNumber)
 	println("Setting SVN revision number " + revisionNumber)
