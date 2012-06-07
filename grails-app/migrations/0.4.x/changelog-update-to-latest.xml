@@ -131,7 +131,12 @@
             <column name="document_id" type="BIGINT"/>
 		</createTable>
 	</changeSet>
-
+	
+	<changeSet author="jmiranda" id="1321565252310-142">
+		<comment>Oops.  These fields should be CHAR(38) in order to support UUID.</comment>
+		<modifyColumn tableName="product_document"><column name="product_id" type="CHAR(38)"></column></modifyColumn>
+		<modifyColumn tableName="product_document"><column name="document_id" type="CHAR(38)"></column></modifyColumn>
+	</changeSet>
 
 </databaseChangeLog>
     
