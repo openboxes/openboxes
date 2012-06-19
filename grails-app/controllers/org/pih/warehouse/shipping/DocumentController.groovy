@@ -10,11 +10,12 @@ import org.springframework.web.multipart.MultipartFile;
  * Command object 
  */
 class DocumentCommand {
-   String typeId
    String name
+   String typeId
+   String orderId
+   String productId
    String requestId
    String shipmentId
-   String orderId
    String documentNumber
    MultipartFile fileContents
 }

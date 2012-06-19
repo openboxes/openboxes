@@ -6,9 +6,7 @@
 	</content>
 	
 	<content tag="heading">	
-		<warehouse:message code="inventory.currentAndPendingStock.label"/>	
-		&rsaquo;
-		<span class="fade"><format:product product="${commandInstance?.productInstance}"/></span>
+		<format:product product="${commandInstance?.productInstance}"/>
 	</content>
 
 	<content tag="content">

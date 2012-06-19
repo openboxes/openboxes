@@ -69,7 +69,7 @@
 	    </div>
 	</g:if>
 	<g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
-	<div class="dialog" title="Report Error - ${targetUri }">
+	<div class="dialog" title="Error Report">
 		<g:form controller="errors" action="processError">
 			<g:hiddenField id="dom" name="dom" value=""/>
 			<g:hiddenField name="reportedBy" value="${session?.user?.username}"/>
@@ -134,10 +134,13 @@
 				</tr>
 				<tr class="prop">
 					<td class="name">
-						<label><warehouse:message code="default.comment.label"/></label>
+						<label><warehouse:message code="default.stepsToReproduce.label"/></label>
 					</td>
 					<td class="value">
 						<g:textArea name="comments" cols="60" rows="5"></g:textArea>
+						<span class="fade">
+							<warehouse:message code="default.stepsToReproduceHint.label"/>
+						</span>
 					</td>
 				</tr>
 				<tr class="prop">

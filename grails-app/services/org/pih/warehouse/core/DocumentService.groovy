@@ -41,6 +41,7 @@ import org.docx4j.wml.TcPr
 import org.docx4j.wml.Text
 import org.docx4j.wml.Tr
 import org.docx4j.wml.TrPr
+import org.groovydev.SimpleImageBuilder;
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment
 
@@ -57,6 +58,46 @@ class DocumentService {
 
 	private getFormatTagLib() {
 		return grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
+	}
+
+	
+	public File writeImage(org.pih.warehouse.core.Document document, String filename) { 
+		File file
+		try { 
+			file = new File(document.filename)
+			FileOutputStream fos = new FileOutputStream(file);
+			fos << document?.fileContents
+			fos.close()
+		} catch (Exception e) { 
+			log.error("Error occurred while writing file " + document.filename)
+		}
+		return file;
+	}
+	
+	
+	public void scaleImage(org.pih.warehouse.core.Document document, OutputStream outputStream, String width, String height) {
+		File file
+		FileInputStream fileInputStream
+		try { 
+			file = writeImage(document, document.filename)
+			def extension = document.extension ?: document.filename.substring(document.filename.lastIndexOf(".")+1)
+			println "Fit scale image " + document.filename + " (" + width + ", " + height + "), format=" + extension
+			fileInputStream = new FileInputStream(file)			
+			def builder = new SimpleImageBuilder()
+			def result = builder.
+				image(stream: fileInputStream) {
+					fit(width: width, height: height) {
+						save(stream: outputStream, format: extension?.toLowerCase())
+					}
+				}
+			//}
+		} catch (Exception e) { 
+			log.error("Error scaling image " + document?.filename + ": " + e.message)
+			e.printStackTrace();
+		} finally { 
+			fileInputStream?.close();
+			file?.delete();
+		}
 	}
 
 	/**

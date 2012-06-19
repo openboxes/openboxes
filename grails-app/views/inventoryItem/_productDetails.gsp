@@ -2,15 +2,14 @@
 <%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
 <div id="product-details" style="border: 1px solid lightgrey">
 	<table>
-		<thead>
-			<tr class="even" style="background-color: #eee; border-bottom: 3px solid lightgrey; ">
-				<td class="center" colspan="2">
-					<label>${warehouse.message(code: 'product.details.label') }</label>
+		<tbody>
+			
+			<tr class="odd">
+				<td colspan="2">
+					<label>${warehouse.message(code: 'product.status.label') }</label>
 				</td>
 			</tr>
-		</thead>
-		<tbody>
-			<tr class="odd">	
+			<tr class="even">	
 				<td class="label left">
 					<span class="name"><warehouse:message code="default.status.label"/></span>
 				</td>
@@ -53,12 +52,10 @@
 				</td>
 			</tr>			
 				
-			<tr class="odd">	
-				<td class="left label">
-					<span class="name"><warehouse:message code="product.units.label"/></span>
-				</td>
+				
+			<tr class="odd prop">
 				<td colspan="2">
-					<span class="value"><format:metadata obj="${productInstance?.unitOfMeasure}"/></span>
+					<label>${warehouse.message(code: 'product.details.label') }</label>
 				</td>
 			</tr>
 			<tr class="even">	
@@ -76,8 +73,23 @@
 					</span>
 				</td>
 			</tr>
+			<tr class="even">	
+				<td class="left label">
+					<span class="name"><warehouse:message code="product.units.label"/></span>
+				</td>
+				<td colspan="2">
+					<span class="value">
+						<g:if test="${productInstance?.unitOfMeasure }">
+							<format:metadata obj="${productInstance?.unitOfMeasure}"/>
+						</g:if>
+						<g:else>
+							<span class="fade"><warehouse:message code="default.none.label"/></span>
+						</g:else>
+					</span>
+				</td>
+			</tr>
 			
-			<tr class="odd">	
+			<tr class="even">	
 				<td class="left label">
 					<span class="name"><warehouse:message code="product.manufacturer.label"/></span>
 				</td>
@@ -108,40 +120,41 @@
 					</span>
 				</td>
 			</tr>
-			
-			<tr class="odd">	
-				<td class="left label">
-					<span class="name"><warehouse:message code="product.upc.label"/></span>
-				</td>
-				<td>
-					<span class="value">
-						<g:if test="${productInstance?.upc }">
-							${productInstance?.upc }
-						</g:if>
-						<g:else>
-							<span class="fade"><warehouse:message code="default.none.label"/></span>
-						</g:else>
-					</span>
-				</td>
-			</tr>
-			
+			<g:if test="${productInstance?.upc }">
+				<tr class="even">	
+					<td class="left label">
+						<span class="name"><warehouse:message code="product.upc.label"/></span>
+					</td>
+					<td>
+						<span class="value">
+							<g:if test="${productInstance?.upc }">
+								${productInstance?.upc }
+							</g:if>
+							<g:else>
+								<span class="fade"><warehouse:message code="default.none.label"/></span>
+							</g:else>
+						</span>
+					</td>
+				</tr>
+			</g:if>			
+			<g:if test="${productInstance?.upc }">
+				<tr class="even">	
+					<td class="left label">
+						<span class="name"><warehouse:message code="product.ndc.label"/></span>
+					</td>
+					<td>
+						<span class="value">
+							<g:if test="${productInstance?.ndc }">
+								${productInstance?.ndc }
+							</g:if>
+							<g:else>
+								<span class="fade"><warehouse:message code="default.none.label"/></span>
+							</g:else>
+						</span>
+					</td>
+				</tr>
+			</g:if>			
 			<tr class="even">	
-				<td class="left label">
-					<span class="name"><warehouse:message code="product.ndc.label"/></span>
-				</td>
-				<td>
-					<span class="value">
-						<g:if test="${productInstance?.ndc }">
-							${productInstance?.ndc }
-						</g:if>
-						<g:else>
-							<span class="fade"><warehouse:message code="default.none.label"/></span>
-						</g:else>
-					</span>
-				</td>
-			</tr>
-			
-			<tr class="odd">	
 				<td class="left label">
 					<span class="name"><warehouse:message code="product.coldChain.label"/></span>
 				</td>
@@ -149,8 +162,9 @@
 					<span class="value">${productInstance?.coldChain ? warehouse.message(code:'default.yes.label') : warehouse.message(code:'default.no.label') }</span>
 				</td>
 			</tr>
-			<g:each var="productAttribute" in="${productInstance?.attributes}" status="status">
-				<tr class="${status%2==0?'even':'odd' }">
+			<g:set var="status" value="${0 }"/>
+			<g:each var="productAttribute" in="${productInstance?.attributes}">
+				<tr class="even">
 					<td class="label left">
 						<span class="name"><format:metadata obj="${productAttribute?.attribute}"/></span>
 					</td>
@@ -161,7 +175,7 @@
 			</g:each>
 			
 			<%-- 
-			<tr class="even">
+			<tr class="odd">
 				<td class="label left">
 					<span class="name"><warehouse:message code="product.minLevel.label"/></span>
 				</td>
@@ -179,7 +193,7 @@
 					</span>
 				</td>				
 			</tr>
-			<tr class="odd">
+			<tr class="even">
 				<td class="label left">
 					<span class="name"><warehouse:message code="product.reorderLevel.label"/></span>
 				</td>
@@ -197,8 +211,39 @@
 				</td>
 			</tr>		
 			--%>
+			<tr class="odd prop">
+				<td class="label left" colspan="2">
+					<span class="name">
+						<label><warehouse:message code="product.images.label"></warehouse:message></label>
+					</span>
+				</td>
+			</tr>
+			
+			<tr class="even">
+				<td colspan="2" class="center middle">
+					<g:each var="document" in="${productInstance?.images}" status="i">
+						<a class="open-dialog" href="javascript:openDialog('#dialog-${document.id }', '#img-${document.id }');">
+							<img src="${createLink(controller:'product', action:'viewThumbnail', id:document.id)}" 
+								class="middle" style="padding: 2px; margin: 2px; border: 1px solid lightgrey;" />		
+						</a>
+						
+						<div id="dialog-${document.id }" title="${document.filename }" style="display:none;" class="dialog center">
+							<div>
+								<img id="img-${document.id }" src="${createLink(controller:'product', action:'viewImage', id:document.id, params:['width':'300','height':'300'])}" 
+		           							class="middle image" style="border: 1px solid lightgrey" />
+							</div>
+							<g:link controller="document" action="download" id="${document.id}">Download</g:link>
+						</div>						
+					</g:each>
+				</td>			
+			</tr>													
 		</tbody>		
 	</table>
 </div>
+<script>
+	function openDialog(dialogId, imgId) { 
+		$(dialogId).dialog({autoOpen: true, modal: true, width: 500, height: 360});
+	}
+</script>
 
 

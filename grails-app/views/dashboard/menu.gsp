@@ -4,6 +4,10 @@
 	.submenuItem {
 		padding-left:15px;
 	}
+	
+	.menu-subheading { 
+		padding: 15px;
+	}
 </style>
 <div id="leftnav-accordion-menu" class="accordion menu">	
 	<g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
@@ -17,6 +21,11 @@
 				<li>
 					<span class="menuButton">
 						<g:link controller="inventory" action="browse"><warehouse:message code="inventory.browse.label"/></g:link>
+					</span>
+				</li>
+				<li>
+					<span class="menuButton">
+						<g:link controller="product" action="list"><warehouse:message code="products.label"/></g:link>
 					</span>
 				</li>
 				<li>

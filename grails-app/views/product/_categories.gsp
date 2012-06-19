@@ -36,7 +36,7 @@
     //bind click event on delete buttons using jquery live
     $('.del-category').live('click', function() {
         //find the parent div
-        var prnt = $(this).parents(".category-div");
+        var prnt = $(this).parents(".category-selector");
         //find the deleted hidden input
         var delInput = prnt.find("input[id$=deleted]");
         //check if this is still not persisted
@@ -59,5 +59,7 @@
         <g:render template='category' model="['category':category,'i':i,'hidden':false]"/>
     </g:each>
 </div>
-
-<a href="#" onclick="addCategory();"><warehouse:message code="default.addAnother.label"/></a>
+<div class="left">
+	<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" />
+	<a href="#" onclick="addCategory();" class="middle"><warehouse:message code="product.addAnotherCategory.label"/></a>
+</div>

@@ -27,11 +27,14 @@ button.action-btn, button.previous, button.next {
 .button { 
 	-moz-border-radius: 5px;
 	border-radius: 5px;
-	padding: 15px;
+	padding: 2px;
 	margin: 5px;	
-	border: 1px solid lightgrey;
+	border: 1px solid #aaa;
 }
-
+.category-selector { 
+	padding: 1px;
+	
+}
 
 .action-btn { 
 	margin: 1px;
@@ -198,7 +201,7 @@ body {
 }
 
 #content { 
-	padding: 10px 15px 15px 15px;
+	padding: 5px 35px 15px 15px;
 }	
 
 #dashboard { 

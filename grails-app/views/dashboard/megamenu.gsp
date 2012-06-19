@@ -6,6 +6,8 @@
 	}
 	.menu-subheading { 
 		font-weight: bold;
+		padding-bottom: 5px;
+		display: block;
 	}
 </style>
 <ul class="megamenu">
@@ -27,6 +29,11 @@
 								<tr>
 									<td>
 										<g:link controller="inventory" action="browse"><warehouse:message code="inventory.browse.label"/></g:link>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<g:link controller="product" action="list"><warehouse:message code="inventory.showAllProducts.label"/></g:link>
 									</td>
 								</tr>
 								<tr>

@@ -214,7 +214,6 @@ class OrderService {
 	List<OrderItem> getPendingOrderItemsWithProduct(Location location, Product product) {
 		def orderItems = []
 		def orders = getPendingOrders(location);
-		log.info("orders " + orders)
 		orders.each {
 			def orderItemList = it.orderItems.findAll { it.product == product }
 			orderItemList.each { orderItems << it; }

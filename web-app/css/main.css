@@ -113,6 +113,11 @@ input:focus, select:focus, textarea:focus {
     background: url(../images/skin/new.png) center left no-repeat;
 }
 
+.linkButton a.showStockCard {
+	background: url(../images/icons/stockbook.png) center left no-repeat;
+}
+
+
 
 /* MESSAGES AND ERRORS */
 

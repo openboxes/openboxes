@@ -1,6 +1,7 @@
 package org.pih.warehouse.product
 
 import java.util.Date;
+import java.util.Collection;
 
 import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.list.LazyList;
@@ -50,7 +51,7 @@ class Product implements Comparable, Serializable {
 	Date dateCreated;
 	Date lastUpdated;
 	
-	static transients = ["rootCategory"];
+	static transients = ["rootCategory", "images"];
 	
 	static hasMany = [ categories : Category, attributes : ProductAttribute, tags : String, documents : Document ]
 	
@@ -86,6 +87,10 @@ class Product implements Comparable, Serializable {
 		Category rootCategory = new Category();
 		rootCategory.categories = this.categories;
 		return rootCategory;
+	}
+	
+	Collection getImages() { 
+		return documents?.findAll { it.contentType.startsWith("image") }
 	}
 	
 	String toString() { return "$name"; }

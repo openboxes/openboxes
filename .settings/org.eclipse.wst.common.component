@@ -144,5 +144,8 @@
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/ws-client-1.0/grails-app/services"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/springcache-1.1.2/src/java"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/xmlrpc-0.1/src/groovy"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/constraints-0.6.0/grails-app/i18n"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/constraints-0.6.0/grails-app/utils"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/constraints-0.6.0/src/java"/>
     </wb-module>
 </project-modules>

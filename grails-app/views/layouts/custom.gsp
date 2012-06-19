@@ -49,6 +49,12 @@
 	<script src="${createLinkTo(dir:'js/jquery.flot/', file:'jquery.flot.js')}" type="text/javascript"></script>
 	<script src="${createLinkTo(dir:'js/', file:'global.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.megaMenu/', file:'jquery.megamenu.js')}" type="text/javascript" ></script>
+
+	<!-- File upload 
+	<script src="${createLinkTo(dir:'js/jquery.fileupload/', file:'jquery.fileupload.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/jquery.fileupload/', file:'jquery.iframe-transport.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/jquery.fileupload/vendor/', file:'jquery.ui.widget.js')}" type="text/javascript" ></script>
+	-->
 	
  	<!-- Include Jquery Validation and Jquery Validation UI plugins -->
  	<jqval:resources />       
@@ -93,9 +99,6 @@
 	</div>
 	<g:if test="${session?.user && session?.warehouse}">
 		<div id="megamenu">    
-			<%-- 
-		    <g:render template="/common/megaMenu"/>
-		   	--%>
 			<g:include controller="dashboard" action="megamenu"/>		    
 		</div>
 	</g:if>	    

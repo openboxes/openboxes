@@ -1,7 +1,7 @@
 eclipse.preferences.version=1
 encoding//.link_to_grails_plugins/app-info-0.4.3/grails-app/i18n/appInfoThreadsInfo.properties=UTF-8
 encoding//.link_to_grails_plugins/app-info-0.4.3/grails-app/i18n/appInfoThreadsInfo_en.properties=UTF-8
-encoding//.link_to_grails_plugins/constraints-0.5.1/grails-app/i18n/messages.properties=UTF-8
+encoding//.link_to_grails_plugins/constraints-0.6.0/grails-app/i18n/messages.properties=UTF-8
 encoding//.link_to_grails_plugins/excel-import-0.3/grails-app/i18n/messages.properties=UTF-8
 encoding//.link_to_grails_plugins/google-visualization-0.4/grails-app/i18n/messages.properties=UTF-8
 encoding//.link_to_grails_plugins/jquery-1.4.4.1/grails-app/i18n/messages.properties=UTF-8
@@ -16,6 +16,8 @@ encoding//grails-app/i18n/archive/messages_es.properties=UTF-8
 encoding//grails-app/i18n/menuOptions.properties=UTF-8
 encoding//grails-app/i18n/menus.properties=UTF-8
 encoding//grails-app/i18n/messages.properties=UTF-8
+encoding//grails-app/i18n/messages.properties~=UTF-8
 encoding//grails-app/i18n/messages_fr.properties=UTF-8
+encoding//grails-app/i18n/messages_fr.properties~=UTF-8
 encoding//grails-app/i18n/settings.properties=UTF-8
 encoding//grails-app/i18n/shiro.properties=UTF-8

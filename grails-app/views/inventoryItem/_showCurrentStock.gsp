@@ -11,7 +11,7 @@
 				</g:hasErrors>
 			</tr>											
 		</thead>
-		<tbody>
+		<tbody  >
 			<g:set var="count" value="${0 }"/>
 			<g:each var="itemInstance" in="${commandInstance?.inventoryItemList }" status="status">	
 				<g:if test="${commandInstance.quantityByInventoryItemMap.get(itemInstance)}">		
