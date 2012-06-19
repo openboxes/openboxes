@@ -495,7 +495,7 @@ class ProductController {
    def viewThumbnail = {
 	   def documentInstance = Document.get(params.id);
 	   if (documentInstance) {
-		   documentService.scaleImage(documentInstance, response.outputStream, '', '100px')
+		   documentService.scaleImage(documentInstance, response.outputStream, '100px', '100px')
 		   //byte[] bytes = documentInstance.fileContents
 		   //resize(bytes, response.outputStream, width, height)
 	   }
