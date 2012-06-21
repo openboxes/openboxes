@@ -22,11 +22,13 @@ class CategoryTagLib {
 		}
 	}
 	
+	
 	def selectCategory = { attrs ->
 		out << "<select multiple=\"true\" size=\"5\" name='" + attrs.name + "'>";
 		displayCategorySelect(attrs['rootNode'], 0);
 		out << "</select>";
 	}
+	
 	
 	def displayCategorySelect = { node, depth ->
 		if (node) {

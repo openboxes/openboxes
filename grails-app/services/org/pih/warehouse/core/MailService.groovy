@@ -1,5 +1,7 @@
 package org.pih.warehouse.core;
 
+import javax.mail.internet.InternetAddress;
+
 import grails.util.GrailsUtil;
 
 import org.apache.commons.mail.ByteArrayDataSource;
@@ -19,16 +21,52 @@ class MailService {
 	def from = "${config.grails.mail.from}" // openboxes@pih.org
 	def host= "${config.grails.mail.host}" // localhost
 	def bcc = "${config.grails.mail.bcc}" // chamon@pih.org,jmiranda@pih.org
-	def port = Integer.parseInt ("${config.grails.mail.port}") // 23; 
+	def port = Integer.parseInt ("${config.grails.mail.port}") // 23; 	
 	
+	/**
+	 * 
+	 * @return
+	 */
+	def Collection getBccAddresses() { 
+		def bccList = []
+		def bccMap = grailsApplication.config.grails.mail.bcc;
+		if (bccMap) { 
+			bccMap.each { key, value ->
+				bccList << new InternetAddress(value)
+			}
+		}		
+		return bccList;
+	}	
 	
+	/**
+	 * 
+	 * @return
+	 */
 	def isMailEnabled() {  
-		return Boolean.valueOf(grailsApplication.config.grails.mail.enabled)			
+		def isMailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)			
+		log.info (isMailEnabled ? "Mail is enabled" : "Mail is disabled") 
+		return isMailEnabled
+		
 	}
 	
+	/**
+	 * 
+	 * @param subject
+	 * @param msg
+	 * @param to
+	 * @return
+	 */
 	def sendMail(String subject, String msg, String to) {
 		sendMail(subject, msg, [to])
 	}
+	
+	/**
+	 * 
+	 * @param subject
+	 * @param msg
+	 * @param to
+	 * @return
+	 */
 	def sendMail(String subject, String msg, Collection to) {
 		//def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)			
 		if (isMailEnabled()) { 			
@@ -37,10 +75,10 @@ class MailService {
 				//SimpleEmail is the class which will do all the hard work for you				
 				SimpleEmail email = new SimpleEmail()
 				email.setHostName(host)				
-				to.each { email.addTo(it) }
-				if (bcc) { 
-					bcc.split(",").each { email.addBcc(it) }				
+				to.each { 
+					email.addTo(it) 
 				}
+				
 				email.setFrom(from)
 				email.setSubject("${prefix} " + subject)
 				email.setMsg(msg)		
@@ -54,11 +92,44 @@ class MailService {
 	
 	
 	
-	def sendHtmlMail(String subject, String htmlMessage, String to) {
-		sendHtmlMail(subject, htmlMessage, [to])
+	/**
+	 * Send html email 
+	 * 
+	 * @param subject
+	 * @param htmlMessage
+	 * @param to
+	 * @return
+	 */	
+	def sendHtmlMail(String subject, String htmlMessage, String [] to) { 
+		println "Sending email to array " + to
+		sendHtmlMail(subject, htmlMessage, to)
+		
 	}
 	
+	
+	/**
+	 * 
+	 * @param subject
+	 * @param htmlMessage
+	 * @param to
+	 * @return
+	 */
+	def sendHtmlMail(String subject, String htmlMessage, String to) {
+		println "Sending email to string '" + to + "'"
+		sendHtmlMail(subject, htmlMessage, to)
+	}
+	
+	
+	/**
+	 * 
+	 * @param subject
+	 * @param body
+	 * @param to
+	 * @return
+	 */
 	def sendHtmlMail(String subject, String body, Collection to) { 	
+		println "Sending email to collection " + to
+		println "${config.grails.mail.bcc}"
 		//def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)			
 		if (isMailEnabled()) { 		
 			log.info "Sending html email '" + subject + "' to " + to; 
@@ -66,10 +137,9 @@ class MailService {
 				// Create the email message
 				HtmlEmail email = new HtmlEmail();
 				email.setHostName(host)
-				to.each { email.addTo(it) }
-				if (bcc) { 
-					bcc.split(",").each { email.addBcc(it) }
-				}				
+				to.each { 
+					email.addTo(it) 
+				}
 				email.setFrom(from)
 				email.setSubject("${prefix} " + subject)		
 				email.setHtmlMsg(body);
@@ -83,21 +153,62 @@ class MailService {
 	}
 
 	
-	
+	/**
+	 * 
+	 * @param to
+	 * @param subject
+	 * @param body
+	 * @param bytes
+	 * @param name
+	 * @param mimeType
+	 * @return
+	 */
 	def sendHtmlMailWithAttachment(String to, String subject, String body, byte [] bytes, String name, String mimeType) {
 		def toList = new ArrayList();
 		toList.add(to)
 		sendHtmlMailWithAttachment(toList, subject, body, bytes, name, mimeType)
 	}
 
+	/**
+	 * 
+	 * @param userInstance
+	 * @param subject
+	 * @param body
+	 * @param bytes
+	 * @param name
+	 * @param mimeType
+	 * @return
+	 */
 	def sendHtmlMailWithAttachment(User userInstance, String subject, String body, byte [] bytes, String name, String mimeType) { 
 		sendHtmlMailWithAttachment(userInstance?.email, subject, body, bytes, name, mimeType)
 	}	
 
+	/**
+	 * 
+	 * @param toList
+	 * @param subject
+	 * @param body
+	 * @param bytes
+	 * @param name
+	 * @param mimeType
+	 * @return
+	 */
 	def sendHtmlMailWithAttachment(Collection toList, String subject, String body, byte [] bytes, String name, String mimeType) {
 		sendHtmlMailWithAttachment(toList, [], subject, body, bytes, name, mimeType)		
 	}
 		
+	
+	/**
+	 * 
+	 * @param toList
+	 * @param ccList
+	 * @param subject
+	 * @param body
+	 * @param bytes
+	 * @param name
+	 * @param mimeType
+	 * @return
+	 */
 	def sendHtmlMailWithAttachment(Collection toList, Collection ccList, String subject, String body, byte [] bytes, String name, String mimeType) { 
 		log.info ("Sending email with attachment " + toList)
 		
@@ -111,11 +222,7 @@ class MailService {
 				toList.each { to -> email.addTo(to) }
 				if (ccList) { 
 					ccList.each { cc -> email.addCc(cc) }
-				}
-				if (bcc) {
-					bcc.split(",").each { email.addBcc(it) }				
-				}
-				
+				}				
 				email.setSubject("${prefix} " + subject);
 				email.setHtmlMsg(body);
 				email.setTextMsg(subject);
@@ -141,6 +248,12 @@ class MailService {
 		}
 	}	
 	
+	/**
+	 * 
+	 * @param subject
+	 * @param throwable
+	 * @return
+	 */
 	def sendAlertMail(String subject, Throwable throwable) {
 		
 		//def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)

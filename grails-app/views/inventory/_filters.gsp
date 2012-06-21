@@ -9,26 +9,21 @@
 						
 						</td>
 					</tr>
-					<tr>
-						<td>
-							<g:textField name="searchTerms" value="${commandInstance.searchTerms}" size="40"/>
-						</td>
-					</tr>
 					<g:if test="${!commandInstance?.categoryInstance.categories.isEmpty()}">
 						<tr>
 							<td>
-								<label><warehouse:message code="inventory.withinCategory.label"/></label>						
-							</td>					
-						</tr>
-						<tr>
-							<td>
-								<select id="subcategoryId" name="subcategoryId" >
+								<select id="subcategoryId" name="subcategoryId" class="text">
 									<option value=""></option>
 									<g:render template="../category/selectOptions" model="[category:commandInstance?.categoryInstance, selected:commandInstance?.subcategoryInstance, level: 0]"/>								
 								</select>
 							</td>
 						</tr>					
 					</g:if>
+					<tr>
+						<td>
+							<g:textField name="searchTerms" value="${commandInstance.searchTerms}" class="text medium" size="40"/>
+						</td>
+					</tr>
 					<tr>
 						<td>
 							<div>

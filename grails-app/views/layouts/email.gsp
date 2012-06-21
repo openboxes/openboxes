@@ -5,6 +5,9 @@
 	<g:layoutHead/>
 </head>
 <body>
+	<h1><g:layoutTitle/></h1>
+	<g:layoutBody />
+	<%-- 
 	<div style="padding: 10px; border: 1px solid lightgrey">
 		<div class="header">
 			<g:render template="/email/header"/>
@@ -17,5 +20,6 @@
 			<g:render template="/email/footer"/>
 		</div>
 	</div>
+	--%>
 </body>
 </html>

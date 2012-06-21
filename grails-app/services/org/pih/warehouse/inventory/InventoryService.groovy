@@ -15,6 +15,7 @@ import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.ProductAttribute;
+import org.pih.warehouse.product.ProductGroup;
 import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.core.Constants 
 import org.pih.warehouse.core.Location
@@ -181,25 +182,27 @@ class InventoryService implements ApplicationContextAware {
 	/**
 	 * @return a Sorted Map from product primary category to List of products
 	 */
-	Map getProductMap(Collection products) {
-		Map m = new TreeMap();
-		if (products) {
-			products.each {
-				Category c = it.category ? it.category : new Category(name: "Unclassified")
-				List l = m.get(c)
-				if (l == null) {
-					l = new ArrayList();
-					m.put(c, l);
+	Map getProductMap(Collection inventoryItems) {
+		
+		Map map = new TreeMap();
+		if (inventoryItems) {
+			inventoryItems.each {
+				Category category = it.category ? it.category : new Category(name: "Unclassified")
+				List list = map.get(category)
+				if (list == null) {
+					list = new ArrayList();
+					map.put(category, list);
 				}
-				l.add(it);
+				list.add(it);
 			}
-			for (entry in m) {
+			for (entry in map) {
 				entry.value.sort { item1, item2 ->
-					item1?.product?.name <=> item2?.product?.name
+					//item1?.product?.name <=> item2?.product?.name
+					item1?.description <=> item2?.description
 				}
 			}
 		}
-		return m
+		return map
 	}
 	
 	/**
@@ -234,10 +237,9 @@ class InventoryService implements ApplicationContextAware {
 		if (!commandInstance?.warehouseInstance?.inventory) {
 			addInventory(commandInstance.warehouseInstance)
 		}
-		
-		def rootCategory = productService?.getRootCategory();
-		
+				
 		// Get the selected category or use the root category
+		def rootCategory = productService?.getRootCategory();
 		commandInstance.categoryInstance = commandInstance?.categoryInstance ?: productService.getRootCategory();
 		
 		// Get current inventory for the given products
@@ -264,33 +266,207 @@ class InventoryService implements ApplicationContextAware {
 		def quantityOutgoingMap = getOutgoingQuantityByProduct(commandInstance?.warehouseInstance);
 		def quantityIncomingMap = getIncomingQuantityByProduct(commandInstance?.warehouseInstance);
 		
-		def products = [];
-		
+		def inventoryItemCommands = [];		
 		getProducts(commandInstance).each { product -> 
-			def quantityOnHand = quantityOnHandMap[product] ?: 0;
-			def quantityToReceive = quantityIncomingMap[product] ?: 0;
-			def quantityToShip = quantityOutgoingMap[product] ?: 0;
-			
-			def inventoryLevel = InventoryLevel.findByProductAndInventory(product, commandInstance?.warehouseInstance?.inventory)
-			//log.debug "inventory level " + product?.name + ": " + inventoryLevel?.status
-			
-			if (commandInstance?.showOutOfStockProducts || (quantityOnHand + quantityToReceive + quantityToShip > 0)) {
-				products << new ProductCommand(
-					category: product.category, 
-					product: product, 
-					inventoryLevel: InventoryLevel.findByProductAndInventory(product, commandInstance?.warehouseInstance?.inventory),
-					quantityOnHand: quantityOnHand, 
-					quantityToReceive: quantityToReceive, 
-					quantityToShip: quantityToShip 
-				);
-			}
+			inventoryItemCommands << getInventoryItemCommand(product, 
+				commandInstance?.warehouseInstance?.inventory, 
+				quantityOnHandMap[product] ?: 0,
+				quantityIncomingMap[product] ?: 0,
+				quantityOutgoingMap[product] ?: 0,
+				commandInstance?.showOutOfStockProducts)
 		}
 		
-		commandInstance?.categoryToProductMap = getProductMap(products);
+		
+		def productGroups = getProductGroups(commandInstance);
+		log.info "product groups " + productGroups
+		productGroups.each { productGroup ->			
+			def inventoryItemCommand = getInventoryItemCommand(productGroup, commandInstance?.warehouseInstance.inventory, commandInstance.showOutOfStockProducts)			
+			inventoryItemCommand.inventoryItems = new ArrayList();
+			productGroup.products.each { product ->
+				inventoryItemCommand.quantityOnHand += quantityOnHandMap[product] ?: 0
+				inventoryItemCommand.quantityToReceive += quantityIncomingMap[product] ?: 0
+				inventoryItemCommand.quantityToShip += quantityOutgoingMap[product] ?: 0
+				inventoryItemCommand.inventoryItems << getInventoryItemCommand(product, commandInstance?.warehouseInstance.inventory, 
+					quantityOnHandMap[product] ?: 0,
+					quantityIncomingMap[product] ?: 0,
+					quantityOutgoingMap[product] ?: 0,
+					commandInstance.showOutOfStockProducts)
+				
+				// Remove all products in the product group from the main productd list
+				inventoryItemCommands.removeAll { it.product == product } 
+			}	
+			inventoryItemCommands << inventoryItemCommand
+			
+			
+		}
+		
+		commandInstance?.categoryToProductMap = getProductMap(inventoryItemCommands);
 
 		return commandInstance?.categoryToProductMap
 	}
 		
+	
+	InventoryItemCommand getInventoryItemCommand(Product product, Inventory inventory, Integer quantityOnHand, Integer quantityToReceive, Integer quantityToShip, Boolean showOutOfStockProducts) { 
+		InventoryItemCommand inventoryItemCommand = new InventoryItemCommand();		
+		def inventoryLevel = InventoryLevel.findByProductAndInventory(product, inventory)		
+		if (showOutOfStockProducts || (quantityOnHand + quantityToReceive + quantityToShip > 0)) {
+			inventoryItemCommand.description = product.name
+			inventoryItemCommand.category = product.category
+			inventoryItemCommand.product = product
+			inventoryItemCommand.inventoryLevel = inventoryLevel
+			inventoryItemCommand.quantityOnHand = quantityOnHand
+			inventoryItemCommand.quantityToReceive = quantityToReceive
+			inventoryItemCommand.quantityToShip = quantityToShip
+		}
+		return inventoryItemCommand
+	}
+	
+	InventoryItemCommand getInventoryItemCommand(ProductGroup productGroup, Inventory inventory, Boolean showOutOfStockProducts) { 
+		InventoryItemCommand inventoryItemCommand = new InventoryItemCommand();
+		inventoryItemCommand.description = productGroup.description
+		inventoryItemCommand.productGroup = productGroup
+		inventoryItemCommand.category = productGroup.category
+		//inventoryItemCommand.quantityOnHand = 1
+		//inventoryItemCommand.quantityToReceive = 0
+		//inventoryItemCommand.quantityToShip = 0		
+		
+		return inventoryItemCommand
+	}
+	
+	
+	Set<ProductGroup> getProductGroups(InventoryCommand inventoryCommand) { 
+		List categoryFilters = new ArrayList();
+		if (inventoryCommand?.subcategoryInstance) {
+			categoryFilters.add(inventoryCommand?.subcategoryInstance);
+		}
+		else {
+			categoryFilters.add(inventoryCommand?.categoryInstance);
+		}
+		
+		List searchTerms = (inventoryCommand?.searchTerms ? Arrays.asList(inventoryCommand?.searchTerms.split(" ")) : null);
+		
+		log.debug("get products: " + inventoryCommand?.warehouseInstance)
+		def productGroups = getProductGroups(inventoryCommand?.warehouseInstance, searchTerms, categoryFilters,
+			inventoryCommand?.showHiddenProducts);
+		log.info "Product groups " + productGroups
+		productGroups = productGroups?.sort() { it?.description };
+		return productGroups;
+	}
+	
+	/**
+	 * Get all product groups for the given location, searchTerms, categories. 
+	 * @param location
+	 * @param searchTerms
+	 * @param categoryFilters
+	 * @param showHiddenProducts
+	 * @return
+	 */
+	Set<ProductGroup> getProductGroups(Location location, List searchTerms, List categoryFilters, Boolean showHiddenProducts) { 
+		def productGroups = ProductGroup.list()
+		productGroups = productGroups.intersect(getProductGroups(searchTerms, categoryFilters))
+		/*		
+		// Get products that match the search terms by name and category
+		def categories = getCategoriesMatchingSearchTerms(searchTerms)
+ 		
+		// Categories
+		def matchCategories = getExplodedCategories(categoryFilters);
+		log.debug "matchCategories " + matchCategories
+		
+		
+		// Get all products, including hidden ones
+		
+		if (!showHiddenProducts) {
+			def statuses = []
+			statuses << InventoryStatus.NOT_SUPPORTED
+			statuses << InventoryStatus.SUPPORTED_NON_INVENTORY
+			
+			def removeProducts = getProductsByLocationAndStatuses(location, statuses)
+			log.debug "remove " + removeProducts.size() + " hidden products"
+			products.removeAll(removeProducts)
+			
+		}
+			   
+		log.debug "base products " + products.size();
+		if (matchCategories && searchTerms) {
+			def searchProducts = ProductGroup.createCriteria().list() {
+				and {
+					or {
+						searchTerms.each {
+							ilike("description", "%" + it + "%")
+						}
+					}
+					'in'("category", matchCategories)
+				}
+			}
+			products = products.intersect(searchProducts);
+		}
+		else {
+			def searchProducts = ProductGroup.createCriteria().list() {
+				or {
+					if (searchTerms) {
+						searchTerms.each {
+							String[] filterTerms = it.split("\\s+");
+							or {
+								and {
+									filterTerms.each {
+										ilike("description", "%" + it + "%")
+									}
+								}
+								and {
+									filterTerms.each {
+										ilike("manufacturer", "%" + it + "%")
+									}
+								}
+								and {
+									filterTerms.each {
+										ilike("productCode", "%" + it + "%")
+									}
+								}
+							}
+						}
+					}
+					if (matchCategories) {
+						'in'("category", matchCategories)
+					}
+					if (categories) {
+						'in'("category", categories)
+					}
+				}
+			}
+			products = products.intersect(searchProducts);
+		}
+		
+		// now localize to only match products for the current locale
+		// TODO: this would also have to handle the category filtering
+		//  products = products.findAll { product ->
+		//  def localizedProductName = getLocalizationService().getLocalizedString(product.name);  // TODO: obviously, this would have to use the actual locale
+		// return productFilters.any {
+		//   localizedProductName.contains(it)  // TODO: this would also have to be case insensitive
+		// }
+		// }
+		*/
+		return productGroups;
+	}
+	
+	
+	List getProductGroups(List searchTerms, List categories) { 
+		def productGroups = ProductGroup.createCriteria().list() {
+			or {
+				if (searchTerms) {
+					and { 
+						searchTerms.each { searchTerm ->
+							ilike("description", "%" + searchTerm + "%")
+						}
+					}
+				}
+				if (categories) {
+					'in'("category", categories)
+				}
+			}
+		}
+		return productGroups
+	}
+	
 	/**
 	 * Get the outgoing quantity for all products at the given location.
 	 * 
@@ -429,18 +605,14 @@ class InventoryService implements ApplicationContextAware {
 		
 		return expiringStock
 	}
-	
-	
-	
-	
-	
+		
 	/**
 	 * Get a set of products based on the filters in the given command object.
 	 * 
 	 * @param commandInstance
 	 * @return
 	 */
-	Set getProducts(def commandInstance) {
+	Set<Product> getProducts(InventoryCommand commandInstance) {
 		List categoryFilters = new ArrayList();
 		if (commandInstance?.subcategoryInstance) {
 			categoryFilters.add(commandInstance?.subcategoryInstance);
@@ -448,13 +620,11 @@ class InventoryService implements ApplicationContextAware {
 		else {
 			categoryFilters.add(commandInstance?.categoryInstance);
 		}
+		
 		List searchTerms = (commandInstance?.searchTerms ? Arrays.asList(commandInstance?.searchTerms.split(" ")) : null);
 		
 		log.debug("get products: " + commandInstance?.warehouseInstance)
-		def products = getProductsByAll(
-			commandInstance?.warehouseInstance,
-			searchTerms,
-			categoryFilters,
+		def products = getProducts(commandInstance?.warehouseInstance, searchTerms, categoryFilters, 
 			commandInstance?.showHiddenProducts);
 
 
@@ -463,98 +633,67 @@ class InventoryService implements ApplicationContextAware {
 	}
 
 
-   /**
-	* @param searchTerms
-	* @param categories
-	* @return
-	*/
-   List getProductsByAll(Location location, List productFilters, List categoryFilters, Boolean showHiddenProducts) {
-	   // Get products that match the search terms by name and category
-	   def categories = getCategoriesMatchingSearchTerms(productFilters)
+	/**
+	 * @param searchTerms
+	 * @param categories
+	 * @return
+	 */
+	List<Product> getProducts(Location location, List searchTerms, List categoryFilters, Boolean showHiddenProducts) {
+		// Get all products, including hidden ones
+		def products = Product.list()
 
-	   // Categories
-	   def matchCategories = getExplodedCategories(categoryFilters);
-	   log.debug "matchCategories " + matchCategories
-	   
-	   
-	   // Base product list
-	   def session = sessionFactory.getCurrentSession()
-	  
-	   // Get all products, including hidden ones 
-	   def products = Product.list()	   
-	   if (!showHiddenProducts) { 
-		   def statuses = []
-		   statuses << InventoryStatus.NOT_SUPPORTED
-		   statuses << InventoryStatus.SUPPORTED_NON_INVENTORY
-		   
-		   def removeProducts = getProductsByLocationAndStatuses(location, statuses)
-		   log.debug "remove " + removeProducts.size() + " hidden products"
-		   products.removeAll(removeProducts)
-		   
-	   }
-	   	   
-	   log.debug "base products " + products.size();
-	   if (matchCategories && productFilters) {
-		   def searchProducts = Product.createCriteria().list() {
-			   and {
-				   or {
-					   and {
-						   productFilters.each {
-							   ilike("name", "%" + it + "%")
-						   }
-					   }
-					   and {
-						   productFilters.each {
-							   ilike("manufacturer", "%" + it + "%")
-						   }
-					   }
-					   and {
-						   productFilters.each {
-							   ilike("productCode", "%" + it + "%")
-						   }
-					   }
-				   }
-				   'in'("category", matchCategories)
-			   }
-		   }
-		   products = products.intersect(searchProducts);
-	   }
-	   else {
-		   def searchProducts = Product.createCriteria().list() {
-			   or {
-				   if (productFilters) {
-					   productFilters.each {
-						   String[] filterTerms = it.split("\\s+");
-						   or {
-							   and {
-								   filterTerms.each {
-									   ilike("name", "%" + it + "%")
-								   }
-							   }
-							   and {
-								   filterTerms.each {
-									   ilike("manufacturer", "%" + it + "%")
-								   }
-							   }
-							   and {
-								   filterTerms.each {
-									   ilike("productCode", "%" + it + "%")
-								   }
-							   }
-						   }
-					   }
-				   }
-				   if (matchCategories) {
-					   'in'("category", matchCategories)
-				   }
-				   if (categories) {
-					   'in'("category", categories)
-				   }
-			   }
-		   }
-		   products = products.intersect(searchProducts);
-	   }
-	   
+		// Categories - Childrens Furniture
+		def matchCategories = getExplodedCategories(categoryFilters)
+		log.info "Matched categories " + matchCategories
+		log.info "Search terms: " + searchTerms
+
+		def searchResults = Product.createCriteria().list() {
+			or {
+				and {
+					searchTerms.each {
+						ilike("name", "%" + it + "%")
+					}
+				}
+				and {
+					searchTerms.each {
+						ilike("manufacturer", "%" + it + "%")
+					}
+				}
+				and {
+					searchTerms.each {
+						ilike("productCode", "%" + it + "%")
+					}
+				}
+			}
+			if (matchCategories) {
+				'in'("category", matchCategories)
+			}
+		}
+		searchResults = products.intersect(searchResults);
+
+		// Get all products that fall under the categories that match the search terms
+		// e.g. if i search for "laptop" and Laptops is a category, we'll show all
+		// products under Laptops, whether or not the product matches "laptop"
+		/*
+		 if (searchTerms) {
+		 matchCategories.each  { matchCategory ->
+		 def categories = getCategoriesMatchingSearchTerms(searchTerms, matchCategory)
+		 categories.each { category ->
+		 categoryFilters.add(category)
+		 }
+		 }
+		 log.info "Categories: " + categoryFilters
+		 // Search for products that are within the categories matched by the search terms
+		 def categoryProductResults = getProductsByCategories(categoryFilters)
+		 categoryProductResults = products.intersect(categoryProductResults);
+		 searchResults.addAll(categoryProductResults)
+		 }
+		 */
+
+		if (!showHiddenProducts) {
+			searchResults.removeAll(getHiddenProducts())
+		}
+
 		// now localize to only match products for the current locale
 		// TODO: this would also have to handle the category filtering
 		//  products = products.findAll { product ->
@@ -563,10 +702,19 @@ class InventoryService implements ApplicationContextAware {
 		//   localizedProductName.contains(it)  // TODO: this would also have to be case insensitive
 		// }
 		// }
-	   
-	   return products;
-   }
+		return searchResults;
+	}
    
+   /**
+    * Return a list of products that are marked as NON_SUPPORTED or NON_INVENTORIED 
+    * at the given location.
+    * 
+    * @param location
+    * @return
+    */
+   List getHiddenProducts(Location location) { 
+	   return getProductsByLocationAndStatuses(location, [InventoryStatus.NOT_SUPPORTED, InventoryStatus.SUPPORTED_NON_INVENTORY])   	
+   }
    
    /**
     * 
@@ -1066,17 +1214,17 @@ class InventoryService implements ApplicationContextAware {
 	 * @param searchTerms
 	 * @return
 	 */
-	List getProductsBySearchTerms(List productFilters) { 
-		log.debug "get products by search terms " + productFilters;
+	List getProductsBySearchTerms(List searchTerms) { 
+		log.debug "get products by search terms " + searchTerms;
 		
 		// Get products that match the search terms by name and category
 		def products = Product.createCriteria().list() { 
-			if (productFilters) {
+			if (searchTerms) {
 				or { 
-					productFilters.each { 
+					searchTerms.each { 
 						ilike("name", "%" + it + "%")				
 					}	
-					productFilters.each {
+					searchTerms.each {
 						category {
 							ilike("name", "%" + it + "%")
 						}
@@ -1153,6 +1301,7 @@ class InventoryService implements ApplicationContextAware {
 	
 
 	/**
+	 * Return a list of categories that match the given search terms.
 	 * 
 	 * @param searchTerms
 	 * @return
@@ -1160,15 +1309,45 @@ class InventoryService implements ApplicationContextAware {
 	List getCategoriesMatchingSearchTerms(List searchTerms) { 
 		def categories = []
 		if (searchTerms) { 
+			
 			categories = Category.createCriteria().list() { 
-				searchTerms.each { 
-					ilike("name", it)
+				or { 
+					searchTerms.each { searchTerm ->
+						ilike("name", "%" + searchTerm + "%")
+					}
 				}
 			}
 		}
-		return getExplodedCategories(categories);		
+		return getExplodedCategories(categories)
+		//return categories;		
 	}
 
+	/**
+	 * Return a list of categories that match the given search terms and 
+	 * are located under any of the given categories.
+	 * 
+	 * @param searchTerms
+	 * @param categories
+	 * @return
+	 */
+	List getCategoriesMatchingSearchTerms(List searchTerms, Category category) {
+		log.info("find categories matching search terms " + searchTerms + " under " + category)
+		//def categories = []
+		// Start by getting all categories that match and then iterate over
+		// each and check to see if one of its ancestors is in the given 
+		// list of ancestors
+		def categoriesMatching = getCategoriesMatchingSearchTerms(searchTerms);
+		log.info "Categories matching " + categoriesMatching;
+		
+		def children = category.children.findAll { child -> 
+			categoriesMatching.contains(child)
+		}
+		log.info("Found " + children)
+		return children
+
+	}
+
+	
 	/**
 	 * Get all products for the given category.
 	 * 	
@@ -1180,6 +1359,18 @@ class InventoryService implements ApplicationContextAware {
 			eq("category", category)
 		}
 		return products;
+	}
+	
+	/**
+	 * Get all products for the given categories.
+	 * 
+	 * @param categories
+	 * @return
+	 */
+	List<Product> getProductsByCategories(List categories) { 
+		return Product.createCriteria().list() {
+			'in'("category", categories)
+		}
 	}
 
 	

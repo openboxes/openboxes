@@ -456,6 +456,9 @@ class JsonController {
 		render data  as JSON
 	}
 	
+	
+
+	
 	def findProduct = { 
 		log.info (params);
 		def product = Product.get(params.id)
@@ -472,7 +475,7 @@ class JsonController {
 	
 	def findProductByName = {
 		
-		log.info(params)
+		log.info("find products by name " + params)
 		def dateFormat = new SimpleDateFormat(Constants.SHORT_MONTH_YEAR_DATE_FORMAT);
 		def products = new TreeSet();
 		

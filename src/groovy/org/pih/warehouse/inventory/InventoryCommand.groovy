@@ -7,6 +7,12 @@ class InventoryCommand {
 	def categoryInstance; 								// categoryInstance
 	def subcategoryInstance;							// child category to show within the categoryInstance
 	
+	// InventoryItemCommand objects
+	def inventoryItems
+	
+	// Product groups
+	def productGroups
+	
 	def showHiddenProducts = Boolean.FALSE;				// indicates whether to display hidden products
 	def showUnsupportedProducts = Boolean.FALSE;		// indicates whether unsupported products for the warehouse should be included
 	def showNonInventoryProducts = Boolean.FALSE;		// indicates whether non-inventory products for the warehouse should be included
@@ -25,6 +31,8 @@ class InventoryCommand {
 		showNonInventoryProducts(nullable:true)
 		showOutOfStockProducts(nullable:true)
 		categoryToProductMap(nullable:true)
+		inventoryItems(nullable:true)
+		productGroups(nullable:true)
 		searchPerformed(nullable:true)
 	}
 }

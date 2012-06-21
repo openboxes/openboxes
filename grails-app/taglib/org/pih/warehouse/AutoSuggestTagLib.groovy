@@ -5,6 +5,26 @@ import org.pih.warehouse.core.Person;
 
 class AutoSuggestTagLib {
 		
+	
+	def autoSuggest_v2 = { attrs, body ->
+		attrs.id = (attrs.id) ? attrs.id : "autoSuggest_" + (new Random()).nextInt()
+		attrs.name = attrs.name
+		attrs.valueId = (attrs.valueId)?attrs.valueId:"";
+		attrs.valueName = (attrs.valueName)?attrs.valueName:"";
+		attrs.width = (attrs.width) ? attrs.width : '300px';
+		attrs.minLength = (attrs.minLength) ? attrs.minLength : 1;
+		attrs.jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "";
+		attrs.styleClass = (attrs.styleClass) ?: ""
+
+		attrs.showValue = (attrs.valueName && attrs.valueId) ? true : false;
+		//def spanDisplay = (showValue) ? "inline" : "none";
+		//def suggestDisplay = (showValue) ? "none" : "inline";
+		attrs.spanDisplay = "none";
+		attrs.suggestDisplay = "inline";
+				
+		out << g.render(template: '/taglib/autoSuggest_v2', model: [attrs:attrs]);
+	}
+	
 
 	def autoSuggest = { attrs, body ->
 		def id = (attrs.id) ? attrs.id : "autoSuggest_" + (new Random()).nextInt()

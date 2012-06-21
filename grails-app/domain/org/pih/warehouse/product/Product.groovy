@@ -3,10 +3,7 @@ package org.pih.warehouse.product
 import java.util.Date;
 import java.util.Collection;
 
-import org.apache.commons.collections.FactoryUtils;
-import org.apache.commons.collections.list.LazyList;
 import org.pih.warehouse.core.Document;
-import org.pih.warehouse.core.UnitOfMeasure;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.TransactionEntry;

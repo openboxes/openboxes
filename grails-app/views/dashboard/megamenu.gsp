@@ -38,9 +38,12 @@
 								</tr>
 								<tr>
 									<td>
-										<g:link controller="product" action="create">
-											<warehouse:message code="product.add.label"/>
-										</g:link>
+										<g:link controller="product" action="list"><warehouse:message code="product.list.label"/></g:link>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<g:link controller="product" action="create"><warehouse:message code="product.add.label"/></g:link>
 									</td>					
 								</tr>
 							</table>
@@ -367,6 +370,11 @@
 							<tr>
 								<td>
 									<g:link controller="product" action="list"><warehouse:message code="products.label"/></g:link>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<g:link controller="productGroup" action="list"><warehouse:message code="productGroup.list.label"/></g:link>
 								</td>
 							</tr>
 							<tr>

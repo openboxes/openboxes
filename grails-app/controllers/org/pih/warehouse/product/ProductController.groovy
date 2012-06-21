@@ -27,8 +27,8 @@ import javax.swing.ImageIcon
 import javax.imageio.ImageIO as IIO
 import java.awt.Graphics2D
 import java.io.ByteArrayOutputStream;
-
-
+import com.google.zxing.BarcodeFormat;
+import java.net.URLEncoder;
 
 import grails.converters.JSON;
 
@@ -39,6 +39,7 @@ class ProductController {
 	def productService;
 	def documentService;
 	def inventoryService;
+	def barcodeService
 
 	static allowedMethods = [save: "POST", update: "POST"];
 
@@ -197,7 +198,7 @@ class ProductController {
 
 		if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
 			flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product:productInstance)])}"
-			sendProductCreated(productInstance)
+			sendProductCreatedEmail(productInstance)
 			redirect(controller: "inventoryItem", action: "showRecordInventory", params: ['productInstance.id':productInstance.id, 'inventoryInstance.id': inventoryInstance?.id])
 			//redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id, params:params)
 		}
@@ -229,18 +230,14 @@ class ProductController {
 	}
 
 	def update = {
-
-		log.info "update called with params " + params
+		log.info "Update called with params " + params
 		def productInstance = Product.get(params.id)
-		log.info " " + productInstance.class.simpleName
 
 		if (productInstance) {
 			if (params.version) {
 				def version = params.version.toLong()
 				if (productInstance.version > version) {
-					productInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [
-						warehouse.message(code: 'product.label', default: 'Product')]
-					as Object[], "Another user has updated this Product while you were editing")
+                    productInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'product.label', default: 'Product')] as Object[], "Another user has updated this Product while you were editing")
 					render(view: "edit", model: [productInstance: productInstance])
 					return
 				}
@@ -282,11 +279,6 @@ class ProductController {
 				productInstance.categories.removeAll(_toBeDeleted)
 			}
 
-			//update my indexes
-			//productInstance.categories.eachWithIndex(){cat, i ->
-			//	cat.index = i
-			//}
-
 			/*
 			 productInstance?.categories?.clear();		
 			 params.each {
@@ -316,7 +308,7 @@ class ProductController {
 		def productInstance = Product.get(params.id)
 		if (productInstance && !productInstance.hasAssociatedTransactionEntriesOrShipmentItems()) {
 			try {
-				// first we need to delete any inventory items associated with this transaction
+				// first we need to delete any inventory items associated with this product
 				def items = InventoryItem.findAllByProduct(productInstance)
 				items.each { it.delete(flush:true) }
 
@@ -358,11 +350,12 @@ class ProductController {
 	 * @param userInstance
 	 * @return
 	 */	
-	def sendProductCreated(Product product) {
+   def sendProductCreatedEmail(Product product) {
 		def adminList = []
 		try {
 			adminList = userService.findUsersByRoleType(RoleType.ROLE_ADMIN).collect { it.email }
 			if (adminList) {
+			   println adminList.class
 				def subject = "${warehouse.message(code:'email.productCreated.message',args:[product?.name])}";
 				def body = "${g.render(template:'/email/productCreated',model:[product:product])}"
 				mailService.sendHtmlMail(subject, body.toString(), adminList);
@@ -372,14 +365,32 @@ class ProductController {
 			}
 		}
 		catch (Exception e) {
-			log.error("Error sending product created email")
+		   log.error("Error sending 'Product Created' email")
 			flash.message = "${warehouse.message(code:'email.notSent.message',args:[adminList])}: ${e.message}"
 		}
 	}
 
 
 
-
+	def search = { 
+		log.info "search " + params
+		if (params.q) { 
+			def products = productService.findProducts(URLEncoder.encode(params.q))
+			[ products : products ]
+		}
+	}
+	
+	
+	def barcode = { 
+		BarcodeFormat format = BarcodeFormat.valueOf(params.format)
+		File file = File.createTempFile("barcode-", ".png")
+		barcodeService.renderImageToFile(file, params.data, 100, 50, format)
+		response.contentType = "image/png"
+		response.outputStream << file.bytes
+		file.delete()
+	}	   
+   
+   
 	/**
 	 * Upload a document to a product.
 	 */
@@ -589,7 +600,7 @@ class ProductController {
    
 	   IIO.write( bi, 'JPEG', out )
    }
-
+		
 }
 
 

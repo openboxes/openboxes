@@ -95,7 +95,7 @@
 							<div class="dialog">
 								<div class="tabs">
 									<ul>
-										<li><a href="#tabs-1"><warehouse:message code="order.addAProduct.label"/></a></li>
+										<li><a href="#tabs-1"><warehouse:message code="order.addProduct.label"/></a></li>
 										<%--
 										<li><a href="#tabs-2">Category</a></li>
 										<li><a href="#tabs-3">Unclassified</a></li> 

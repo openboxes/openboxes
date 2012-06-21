@@ -137,6 +137,61 @@
 		<modifyColumn tableName="product_document"><column name="product_id" type="CHAR(38)"></column></modifyColumn>
 		<modifyColumn tableName="product_document"><column name="document_id" type="CHAR(38)"></column></modifyColumn>
 	</changeSet>
-
+	<changeSet author="jmiranda" id="1327591155937-12">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="product_group"/>
+			</not>
+		</preConditions>
+		<createTable tableName="product_group">
+            <column name="id" type="CHAR(38)"/>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>            
+            
+		</createTable>
+	</changeSet>
+		
+	<changeSet author="jmiranda" id="1327591155937-13">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="product_group_product"/>
+			</not>
+		</preConditions>
+		<createTable tableName="product_group_product">
+            <column name="product_group_id" type="CHAR(38)"/>
+            <column name="product_id" type="CHAR(38)"/>
+		</createTable>
+	</changeSet>
+	
+	<changeSet author="jmiranda" id="1327591155937-14">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="product_group" columnName="category_id"/>
+			</not>
+		</preConditions>
+		<addColumn tableName="product_group">
+			<column name="category_id" type="CHAR(38)"/>
+		</addColumn>	
+	</changeSet>
+		
+	<changeSet author="jmiranda" id="1327591155937-15">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="product_group_product" columnName="products_idx"/>
+			</not>
+		</preConditions>
+        <addColumn tableName="product_group_product">
+            <column name="products_idx" type="INT"/>
+        </addColumn>
+	</changeSet>		
+	
 </databaseChangeLog>
     

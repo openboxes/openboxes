@@ -62,9 +62,25 @@
 											code="default.description.label" /></label></td>
 										<td valign="top"
 											class="value ${hasErrors(bean: productInstance, field: 'name', 'errors')}">
-										<g:textField name="name" value="${productInstance?.name}" size="40" />
+										<g:textField name="name" value="${productInstance?.name}" size="80" class="medium text" />									
 										</td>
 									</tr>
+									
+									<%-- 
+									<tr class="prop">
+										<td valign="top" class="name"></td>
+										<td valign="top" class="value">
+											<g:autoSuggest_v2 id="product" 
+												name="product" 
+												jsonUrl="${request.contextPath }/json/findProductByName" 
+												styleClass="medium text"
+												size="60"
+												valueId="${productInstance?.id }" 
+												valueName="${productInstance?.name }"/>		
+										</td>
+									</tr>
+									--%>							
+									
 									<tr class="prop">
 		                                <td valign="top" class="name">
 		                                  <label for="categories"><warehouse:message code="categories.label" /></label>
@@ -86,7 +102,7 @@
 											code="default.unitOfMeasure.label" /></label></td>
 										<td valign="top"
 											class="${hasErrors(bean: productInstance, field: 'unitOfMeasure', 'errors')}">
-										<g:textField name="unitOfMeasure" value="${productInstance?.unitOfMeasure}" size="15" />
+											<g:textField name="unitOfMeasure" value="${productInstance?.unitOfMeasure}" size="15" class="medium text"/>
 										</td>
 									</tr>								
 									<tr class="prop">
@@ -94,38 +110,34 @@
 											code="product.manufacturer.label" /></label></td>
 										<td valign="top"
 											class="${hasErrors(bean: productInstance, field: 'manufacturer', 'errors')}">
-										<g:textField name="manufacturer" value="${productInstance?.manufacturer}" size="40" />
+											<g:textField name="manufacturer" value="${productInstance?.manufacturer}" size="40" class="medium text"/>
 										</td>
 									</tr>								
 									<tr class="prop">
 										<td valign="top" class="name"><label for="name"><warehouse:message
 											code="product.manufacturerCode.label"/></label></td>
-										<td valign="top"
-											class="${hasErrors(bean: productInstance, field: 'manufacturerCode', 'errors')}">
-										<g:textField name="manufacturerCode" value="${productInstance?.manufacturerCode}" size="15" />
+										<td valign="top" class="${hasErrors(bean: productInstance, field: 'manufacturerCode', 'errors')}">
+											<g:textField name="manufacturerCode" value="${productInstance?.manufacturerCode}" size="15" class="medium text"/>
 										</td>
 									</tr>								
 									<tr class="prop">
 										<td valign="top" class="name"><label for="upc"><warehouse:message
 											code="product.upc.label" /></label></td>
-										<td valign="top"
-											class="${hasErrors(bean: productInstance, field: 'upc', 'errors')}">
-										<g:textField name="upc" value="${productInstance?.upc}" size="15" />
+										<td valign="top" class="${hasErrors(bean: productInstance, field: 'upc', 'errors')}">
+											<g:textField name="upc" value="${productInstance?.upc}" size="15" class="medium text"/>
 										</td>
 									</tr>								
 									<tr class="prop">
 										<td valign="top" class="name"><label for="ndc"><warehouse:message
 											code="product.ndc.label" /></label></td>
-										<td valign="top"
-											class="${hasErrors(bean: productInstance, field: 'ndc', 'errors')}">
-										<g:textField name="ndc" value="${productInstance?.ndc}" size="15" />
+										<td valign="top" class="${hasErrors(bean: productInstance, field: 'ndc', 'errors')}">
+											<g:textField name="ndc" value="${productInstance?.ndc}" size="15" class="medium text"/>
 										</td>
 									</tr>								
 									<tr class="prop">
 										<td valign="top" class="name"><label for="coldChain"><warehouse:message
 											code="product.coldChain.label" /></label></td>
-										<td valign="top"
-											class=" ${hasErrors(bean: productInstance, field: 'coldChain', 'errors')}">
+										<td valign="top" class=" ${hasErrors(bean: productInstance, field: 'coldChain', 'errors')}">
 										<g:checkBox name="coldChain" value="${productInstance?.coldChain}" />
 										</td>
 									</tr>
