@@ -470,6 +470,40 @@ class ProductController {
 		}
 	}
 	
+	
+	def importProducts = { 
+		
+		def file = new File("/home/jmiranda/Dropbox/OpenBoxes/Product Databases/HIBCC/UPNDownload.txt")
+		def count=0, MAXSIZE=10
+		def rows = []
+		try {
+			def line = ""
+			file.withReader { reader ->
+				while ((line = reader.readLine()) != null) {
+					//rows << line[0..19].trim()					
+					rows << [
+						upn: line[0..19],
+						supplier:  line[20..54]
+					]
+					
+					if (++count > MAXSIZE) throw new RuntimeException('File too large!')
+				}
+			}
+			
+			render "success"
+			
+		} catch (RuntimeException e) {
+			log.error(e.message)
+			//render "error " + e.message + "<br/>" + rows			
+		}
+
+		render rows;
+		//render rows;
+		
+		//assert names[0].first == 'JOHN'
+		//assert names[1].age == 456
+	}
+	
 	/**
 	* View user's profile photo
 	*/
@@ -484,7 +518,7 @@ class ProductController {
 		   println documentInstance.contentType
 		   resize(bytes, response.outputStream, params.width as int, params.height as int)
 		   //response.outputStream << bytes
-		    */
+		   */
 	   }
 	   else {
 		   "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label'), params.id])}"
