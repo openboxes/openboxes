@@ -34,6 +34,7 @@
 </head>
 <body>
 	<div class="body">
+	
 		<g:if test="${flash.message}">
 			<div class="message">
 				${flash.message}
@@ -63,12 +64,32 @@
 							<tr class="prop">
 								<td valign="top" class="name"><label for="category"><warehouse:message
 											code="productGroup.category.label" default="Category" /></label></td>
-								<td valign="top" class="value">
+								<td valign="top" class="value ${hasErrors(bean: productGroupInstance, field: 'category', 'errors')}">
 									<g:selectCategory_v2
 										id="category.id" name="category.id"
 										value="${productGroupInstance?.category?.id }"/>
 								</td>
 							</tr>
+							<g:if test="${productGroupInstance?.products }">
+								<tr class="prop">
+									<td valign="top" class="name">
+										<label for="products"><warehouse:message
+												code="productGroup.products.label" default="Products" /></label>
+									</td>
+									<td class="value ${hasErrors(bean: productGroupInstance, field: 'products', 'errors')}">
+										<table>
+											<g:each var="product" in="${productGroupInstance?.products }">
+												<tr>
+													<td>
+														<g:hiddenField name="product.id" value="${product.id }"/>
+														${product?.name }
+													</td>
+												</tr>																					
+											</g:each>
+										</table>
+									</td>
+								</tr>
+							</g:if>
 							
 							
 							<%-- 

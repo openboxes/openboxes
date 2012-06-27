@@ -94,7 +94,7 @@
 					</tr>
 				</g:if>
 			</g:each>
-			<g:unless test="${commandInstance?.totalQuantity != 0}">
+			<g:unless test="${commandInstance?.inventoryItemList }">
 				<tr>
 					<td colspan="5">
 						<div class="padded center fade">

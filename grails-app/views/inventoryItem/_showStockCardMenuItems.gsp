@@ -49,7 +49,7 @@
 		</g:link>
 	</div>
 	<div class="action-menu-item">					
-		<g:link controller="inventoryItem" action="showTransactionLog" params="['product.id': product?.id]">
+		<g:link controller="inventoryItem" action="showTransactionLog" params="['product.id': product?.id, 'disableFilter':true]">
 			<img src="${resource(dir: 'images/icons/silk', file: 'table.png')}"/>&nbsp;
 			<warehouse:message code="inventory.showTransactionLog.label"/>
 		</g:link>

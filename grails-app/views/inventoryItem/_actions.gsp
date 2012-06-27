@@ -13,7 +13,7 @@
 				</div>
 			</g:if>
 			<div class="action-menu-item">					
-				<g:link controller="inventoryItem" action="showTransactionLog" params="['product.id': product?.id]">
+				<g:link controller="inventoryItem" action="showTransactionLog" params="['product.id': product?.id, 'disableFilter':true]">
 					<img src="${resource(dir: 'images/icons/silk', file: 'clock.png')}"/>&nbsp;
 					<warehouse:message code="inventory.showTransactionLog.label"/>
 				</g:link>
@@ -44,12 +44,14 @@
 					<warehouse:message code="product.edit.label"/>
 				</g:link>
 			</div>
+			<%-- 
 			<div class="action-menu-item">					
 				<g:link controller="inventoryItem" action="editInventoryLevel" params="['product.id': product?.id, 'inventory.id':inventory?.id]">
 					<img src="${resource(dir: 'images/icons/silk', file: 'heart.png')}"/>&nbsp;
 					<warehouse:message code="product.editStatus.label"/>
 				</g:link>
 			</div>
+			--%>
 			<%-- 
 			<div class="action-menu-item">					
 				<g:link controller="product" action="addPhoto" id="${product?.id }">

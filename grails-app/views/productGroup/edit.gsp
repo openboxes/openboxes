@@ -45,7 +45,7 @@
 				<g:renderErrors bean="${productGroupInstance}" as="list" />
 			</div>
 		</g:hasErrors>
-		<g:form method="post" action="edit">
+		<g:form method="post" action="update">
 			<fieldset>
 				<g:hiddenField name="id" value="${productGroupInstance?.id}" />
 				<g:hiddenField name="version"
@@ -97,7 +97,6 @@
 											code="productGroup.products.label" default="Products" /></label></td>
 								<td valign="top"
 									class="value ${hasErrors(bean: productGroupInstance, field: 'products', 'errors')}">
-									
 									<g:selectProducts 
 										id="products"
 										name="product.id" 

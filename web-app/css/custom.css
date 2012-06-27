@@ -66,6 +66,12 @@ button.action-btn, button.previous, button.next {
 	background-color: #f7f7f7; 
 	padding: 10px;
 }
+.box-slim { 
+	border: 1px solid lightgrey;
+	margin: 1px;
+	
+}
+
 .padded { 
 	padding: 25px;	
 }
@@ -295,7 +301,7 @@ tfoot th, tfoot td {
 }
 
 
-.toggle-button { 
+.toggle-button, .expandable { 
 	cursor: hand;
 }
 .toggleable { 

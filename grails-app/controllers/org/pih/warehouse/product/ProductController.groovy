@@ -13,6 +13,7 @@ import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.DocumentCommand;
 import org.pih.warehouse.inventory.InventoryItem;
+import org.pih.warehouse.inventory.InventoryLevel;
 import org.pih.warehouse.core.Document;
 import org.pih.warehouse.core.DocumentType;
 import org.pih.warehouse.core.Location;
@@ -220,12 +221,20 @@ class ProductController {
 
 	def edit = {
 		def productInstance = Product.get(params.id)
+		def location = Location.get(session?.warehouse?.id);
 		if (!productInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
 			redirect(controller: "inventoryItem", action: "browse")
 		}
 		else {
-			return [productInstance: productInstance, rootCategory: productService.getRootCategory()]
+			
+			def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, location.inventory)
+			if (!inventoryLevelInstance) {
+				inventoryLevelInstance = new InventoryLevel();
+			}
+	
+			
+			return [productInstance: productInstance, rootCategory: productService.getRootCategory(), inventoryInstance: location.inventory, inventoryLevelInstance:inventoryLevelInstance]
 		}
 	}
 

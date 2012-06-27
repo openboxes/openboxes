@@ -1,9 +1,8 @@
 
 <%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
-<div id="product-details" style="border: 1px solid lightgrey">
+<div id="product-details" class="box-slim">
 	<table>
 		<tbody>
-			
 			<tr class="odd">
 				<td colspan="2">
 					<label>${warehouse.message(code: 'product.status.label') }</label>
@@ -71,6 +70,18 @@
 							<span class="fade"><warehouse:message code="default.none.label"/></span>
 						</g:else>
 					</span>
+				</td>
+			</tr>
+			<tr class="even">	
+				<td class="label left">
+					<span class="name"><warehouse:message code="productGroup.label"/></span>
+				</td>
+				<td>
+					<g:each var="productGroup" in="${productInstance?.productGroups }">
+						<g:link controller="productGroup" action="edit" id="${productGroup.id }">
+						${productGroup?.description }
+						</g:link>
+					</g:each>			
 				</td>
 			</tr>
 			<tr class="even">	
@@ -211,32 +222,34 @@
 				</td>
 			</tr>		
 			--%>
-			<tr class="odd prop">
-				<td class="label left" colspan="2">
-					<span class="name">
-						<label><warehouse:message code="product.images.label"></warehouse:message></label>
-					</span>
-				</td>
-			</tr>
-			
-			<tr class="even">
-				<td colspan="2" class="center middle">
-					<g:each var="document" in="${productInstance?.images}" status="i">
-						<a class="open-dialog" href="javascript:openDialog('#dialog-${document.id }', '#img-${document.id }');">
-							<img src="${createLink(controller:'product', action:'viewThumbnail', id:document.id)}" 
-								class="middle" style="padding: 2px; margin: 2px; border: 1px solid lightgrey;" />		
-						</a>
-						
-						<div id="dialog-${document.id }" title="${document.filename }" style="display:none;" class="dialog center">
-							<div>
-								<img id="img-${document.id }" src="${createLink(controller:'product', action:'viewImage', id:document.id, params:['width':'300','height':'300'])}" 
-		           							class="middle image" style="border: 1px solid lightgrey" />
-							</div>
-							<g:link controller="document" action="download" id="${document.id}">Download</g:link>
-						</div>						
-					</g:each>
-				</td>			
-			</tr>													
+			<g:if test="${productInstance?.images}">
+				<tr class="odd prop">
+					<td class="label left" colspan="2">
+						<span class="name">
+							<label><warehouse:message code="product.images.label"></warehouse:message></label>
+						</span>
+					</td>
+				</tr>
+				
+				<tr class="even">
+					<td colspan="2" class="center middle">
+						<g:each var="document" in="${productInstance?.images}" status="i">
+							<a class="open-dialog" href="javascript:openDialog('#dialog-${document.id }', '#img-${document.id }');">
+								<img src="${createLink(controller:'product', action:'viewThumbnail', id:document.id)}" 
+									class="middle" style="padding: 2px; margin: 2px; border: 1px solid lightgrey;" />		
+							</a>
+							
+							<div id="dialog-${document.id }" title="${document.filename }" style="display:none;" class="dialog center">
+								<div>
+									<img id="img-${document.id }" src="${createLink(controller:'product', action:'viewImage', id:document.id, params:['width':'300','height':'300'])}" 
+			           							class="middle image" style="border: 1px solid lightgrey" />
+								</div>
+								<g:link controller="document" action="download" id="${document.id}">Download</g:link>
+							</div>						
+						</g:each>
+					</td>			
+				</tr>													
+			</g:if>
 		</tbody>		
 	</table>
 </div>

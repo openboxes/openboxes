@@ -77,9 +77,5 @@
 
 			</g:else>
 		</div>
-	</div>	    	
-		    	
-		
-	<br clear="all"/>
-	
+	</div>	
 </div>

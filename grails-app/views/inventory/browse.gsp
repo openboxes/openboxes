@@ -64,10 +64,10 @@
 										                <table class="tableScroll" border="0"> 
 															<thead> 
 									           					<tr>
-																	<th class="center middle">
+																	<th class="center middle" style="width: 1%">
 																		<input type="checkbox" id="toggleCheckbox">	
 																	</th>
-																	<th class="middle">
+																	<th class="middle" style="width: 1%">
 																		
 																	</th>
 																	<th class="middle">
@@ -135,8 +135,8 @@
 															<g:else>
 																<tbody>
 																	<tr>
-																		<td colspan="7" class="middle center">
-																			<div style="height: 200px">
+																		<td colspan="7" class="even center">
+																			<div class="fade padded">
 																				<warehouse:message code="inventory.searchNoMatch.message" args="[commandInstance?.searchTerms?:'',format.metadata(obj:commandInstance?.categoryInstance)]"/>
 																			</div>
 																		</td>
@@ -145,10 +145,10 @@
 															</g:else>
 															<tfoot>
 																<tr>
-																	<td colspan="2" class="left middle">
+																	<td colspan="3" class="left middle">
 																		<g:render template="./actions" model="[]"/>
 																	</td>			
-																	<td colspan="2" class="middle ">
+																	<td colspan="1" class="middle ">
 																	</td>
 																	<td colspan="3" class="right middle">
 																		<%-- 
@@ -169,18 +169,6 @@
 						         		</td>
 						         	</tr>
 						        </table>
-								<div style="padding: 5px" class="right">
-									
-									<label>Key:</label>
-									<img src="${createLinkTo(dir:'images/icons/silk',file:'flag_green.png')}" alt="${warehouse.message(code: 'inventory.markAsSupported.label') }" style="vertical-align: middle"/>
-									&nbsp;<warehouse:message code="enum.InventoryStatus.SUPPORTED"/>
-									&nbsp;
-									<img src="${createLinkTo(dir:'images/icons/silk',file:'flag_orange.png')}" alt="${warehouse.message(code: 'inventory.markAsNonInventoried.label') }" style="vertical-align: middle"/>
-									&nbsp;<warehouse:message code="enum.InventoryStatus.SUPPORTED_NON_INVENTORY"/>
-									&nbsp;
-									<img src="${createLinkTo(dir:'images/icons/silk',file:'flag_red.png')}" alt="${warehouse.message(code: 'inventory.markAsNotSupported.label') }" style="vertical-align: middle"/>
-									&nbsp;<warehouse:message code="enum.InventoryStatus.NOT_SUPPORTED"/>																	
-								</div>
 							</td>
 						</tr>
 					</table>						        

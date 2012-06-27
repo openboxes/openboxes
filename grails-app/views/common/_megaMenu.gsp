@@ -8,6 +8,7 @@
 		font-weight: bold;
 	}
 </style>
+<span class="left">
 <ul class="megamenu">
 	<li>
 		<a href="javascript:void(0)"><warehouse:message code="inventory.label" /></a>
@@ -406,4 +407,5 @@
 	</li>
 <div>	
 </ul>
+</span>
 <!--MegaMenu Ends-->

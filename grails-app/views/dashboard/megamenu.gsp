@@ -374,7 +374,7 @@
 							</tr>
 							<tr>
 								<td>
-									<g:link controller="productGroup" action="list"><warehouse:message code="productGroup.list.label"/></g:link>
+									<g:link controller="productGroup" action="list"><warehouse:message code="productGroups.label"/></g:link>
 								</td>
 							</tr>
 							<tr>

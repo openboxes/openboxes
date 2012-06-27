@@ -87,7 +87,6 @@
 									<td class="value">
 										<g:link controller="shipment" action="showDetails" id="${transactionInstance?.outgoingShipment?.id }">
 											${transactionInstance?.outgoingShipment?.name} 
-											<img src="${createLinkTo(dir:'images/icons/silk',file:'link.png')}" alt="${warehouse.message(code: 'transaction.showSingleProduct.label') }" style="vertical-align: middle"/>
 										</g:link>
 									</td>										
 								</tr>
@@ -100,7 +99,6 @@
 									<td class="value">
 										<g:link controller="shipment" action="showDetails" id="${transactionInstance?.incomingShipment?.id }">
 											${transactionInstance?.incomingShipment?.name} 
-											<img src="${createLinkTo(dir:'images/icons/silk',file:'link.png')}" alt="${warehouse.message(code: 'transaction.showSingleProduct.label') }" style="vertical-align: middle"/>
 										</g:link>
 									</td>										
 								</tr>
@@ -181,7 +179,7 @@
 									<td class="name">
 										<label><warehouse:message code="transaction.transactionEntries.label"/></label>
 									</td>
-									<td class="value" style="padding:0;">									
+									<td class="value">									
 										<table id="prodEntryTable">
 											<thead>
 												<tr>
@@ -206,10 +204,17 @@
 																			<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="${warehouse.message(code: 'transaction.showSingleProduct.label') }" style="vertical-align: middle"/>
 																		</g:link>
 																	</g:if>
+																	<g:else>
+																		<g:if test="${transactionInstance?.transactionEntries?.size() > transactionCount || params?.product?.id }">
+																			<a href="?showAll=true">																			
+																				<img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="${warehouse.message(code: 'transaction.showAllProducts.label') }" style="vertical-align: middle"/>
+																			</a>
+																		</g:if>														
+																	
+																	</g:else>
 
 																	<g:link controller="inventoryItem" action="showStockCard" params="['product.id':transactionEntry?.inventoryItem?.product?.id]">
-																		<format:product product="${transactionEntry?.inventoryItem?.product}"/>
-																		<img src="${createLinkTo(dir:'images/icons/silk',file:'link.png')}" alt="${warehouse.message(code: 'transaction.showSingleProduct.label') }" style="vertical-align: middle"/>
+																		<format:product product="${transactionEntry?.inventoryItem?.product}"/>																		
 																	</g:link>
 																			
 																			
@@ -240,9 +245,6 @@
 											<tfoot>
 												<tr>
 													<td colspan="2">
-														<g:if test="${transactionInstance?.transactionEntries?.size() > transactionCount || params?.product?.id }">
-															<a href="?showAll=true">${warehouse.message(code: 'transaction.showAllProducts.label') }</a>
-														</g:if>														
 													
 													</td>
 													<td class="right">

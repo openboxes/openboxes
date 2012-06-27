@@ -45,10 +45,11 @@
 
 				<div class="tabs">
 					<ul>
-						<li><a href="#tabs-1"><warehouse:message code="product.details.label"/></a></li>
-						<li><a href="#tabs-2"><warehouse:message code="product.documents.label"/></a></li>
+						<li><a href="#tabs-details"><warehouse:message code="product.details.label"/></a></li>
+						<li><a href="#tabs-status"><warehouse:message code="product.status.label"/></a></li>						
+						<li><a href="#tabs-documents"><warehouse:message code="product.documents.label"/></a></li>
 					</ul>		
-					<div id="tabs-1" style="padding: 0px;">	
+					<div id="tabs-details" style="padding: 10px;">	
 						<g:set var="formAction"><g:if test="${productInstance?.id}">update</g:if><g:else>save</g:else></g:set>			
 			            <g:form action="${formAction}" method="post">
 							<g:hiddenField name="action" value="save"/>                					
@@ -212,7 +213,81 @@
 							</table>
 					</g:form>
 				</div>
-				<div id="tabs-2" style="padding: 0px;">					
+					<div id="tabs-status" style="padding: 10px;">
+						<g:if test="${productInstance?.id }">
+				            <g:if test="${flash.message}">
+				            	<div class="message">${flash.message}</div>
+				            </g:if>
+				            <g:hasErrors bean="${inventoryLevelInstance}">
+					            <div class="errors">
+					                <g:renderErrors bean="${inventoryLevelInstance}" as="list" />
+					            </div>
+				            </g:hasErrors>
+							<div class="dialog">
+								<g:form controller="inventoryItem" action="updateInventoryLevel">
+									<g:hiddenField name="id" value="${inventoryLevelInstance?.id}"/>
+									<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
+									<g:hiddenField name="product.id" value="${productInstance?.id}"/>
+									<fieldset>						
+										<table>
+											<tr class="prop">
+												<td class="name"><label><warehouse:message code="inventory.label"/></label></td>
+												<td class="value">
+													${inventoryInstance?.warehouse?.name }
+												</td>
+											</tr>
+											<g:if test="${productInstance }">
+											<tr class="prop">
+												<td class="name"><label><warehouse:message code="product.label"/></label></td>
+												<td class="value">
+													<format:product product="${productInstance}" />
+												</td>
+											</tr>
+											</g:if>
+											<tr class="prop">
+												<td class="name"><label><warehouse:message code="inventoryLevel.status.label"/></label></td>
+												<td class="value">
+										           	<g:select name="status" 
+						           					   from="${org.pih.warehouse.inventory.InventoryStatus.list()}"
+						           					   optionValue="${{format.metadata(obj:it)}}" value="${inventoryLevelInstance.status}" 
+						           					   noSelection="['':warehouse.message(code:'inventoryLevel.chooseStatus.label')]" />&nbsp;&nbsp;	
+												</td>
+											</tr>
+											<tr class="prop">
+												<td class="name"><label><warehouse:message code="inventoryLevel.minimumQuantity.label"/></label></td>
+												<td class="value">
+													<g:textField name="minQuantity" value="${inventoryLevelInstance?.minQuantity }" size="5" class="text"/>
+												</td>
+											</tr>
+											<tr class="prop">
+												<td class="name"><label><warehouse:message code="inventoryLevel.reorderQuantity.label"/></label></td>
+												<td class="value">
+													<g:textField name="reorderQuantity" value="${inventoryLevelInstance?.reorderQuantity }" size="5" class="text"/>
+												</td>
+											</tr>
+											<tr class="prop">
+												<td></td>
+												<td>
+												
+													<button type="submit" class="positive"><img
+														src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
+														alt="Save" /> ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
+													</button>
+													&nbsp;
+													<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="negative">			
+														${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}			
+													</g:link>  
+												
+												</td>
+											</tr>
+										</table>			
+									</fieldset>
+								</g:form>			
+							</div>
+					</g:if>
+							
+				</div>
+				<div id="tabs-documents" style="padding: 10px;">					
 					<!-- process an upload or save depending on whether we are adding a new doc or modifying a previous one -->					
 					<g:uploadForm controller="product" action="upload">
 						<g:hiddenField name="product.id" value="${productInstance?.id}" />

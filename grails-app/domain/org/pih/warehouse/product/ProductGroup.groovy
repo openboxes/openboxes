@@ -18,16 +18,19 @@ class ProductGroup implements Comparable, Serializable {
 	Date dateCreated;
 	Date lastUpdated;
 
+	static belongsTo = Product
 	static hasMany = [ products : Product ]
-	
 	static mapping = {
 		id generator: 'uuid'
-		products joinTable: [name:'product_group_product', column: 'product_group_id', key: 'product_id']
+		products joinTable: [name:'product_group_product', column: 'product_group_id', key: 'product_id']		
 	}
 		
 	
 	static constraints = {
 		description(nullable:false, blank: false, maxSize: 255)
+		products validator: { products, productGroup -> 
+			return products.every {  productGroup.category == it.category }
+		}
 	}
 
 	String toString() { return "$description"; }

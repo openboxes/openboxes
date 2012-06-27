@@ -112,8 +112,12 @@ class ProductService {
 	
 	
 	List<Product> getProducts(String [] ids) { 
-		def products = Product.createCriteria().list() {
-			'in'("id", ids)
+		
+		def products = []
+		if (ids) { 
+			products = Product.createCriteria().list() {
+				'in'("id", ids)
+			}
 		}
 		return products
 	}

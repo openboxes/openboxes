@@ -10,9 +10,9 @@
 				<g:form method="GET" controller="inventory" action="browse">
 					<div class="">
 						<div>
-							<label><warehouse:message code="inventory.filterBy.keyword"/>:</label>
 							<div>
-								<g:textField name="searchTerms" size="60" value="${params.searchTerms }" class="text medium"/>						
+								<g:textField id="dashboardSearchBox" name="searchTerms" size="60" value="${params.searchTerms }" 
+									class="text medium"/>						
 								<g:hiddenField name="resetSearch" value="true"/>							
 								<g:hiddenField name="category.id" value="${rootCategory.id }"/>							
 								
@@ -26,8 +26,12 @@
 					</div>
 				</g:form>
 			</div>
-			 			
- 			
 		</div>
 	</div>
-</div>	
+</div>
+	<script>
+		$(document).ready(function() {
+			$("#dashboardSearchBox").watermark("${warehouse.message(code:'inventory.filterBy.keyword')}");
+		});
+	</script>
+	

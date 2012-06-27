@@ -100,7 +100,7 @@
 	    <g:render template="/common/header"/>		    
 	</div>
 	<g:if test="${session?.user && session?.warehouse}">
-		<div id="megamenu">    
+		<div id="megamenu" class="left">    
 			<g:include controller="dashboard" action="megamenu"/>		    
 		</div>
 	</g:if>	    

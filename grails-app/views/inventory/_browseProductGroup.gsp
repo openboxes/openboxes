@@ -12,7 +12,9 @@
 		--%>
 	</td>
 	<td class="middle">
+		<span id="${inventoryItem?.productGroup?.id }" class="expandable">
 		${inventoryItem?.productGroup?.description } (${inventoryItem?.productGroup?.products?.size() })		
+		</span>
 		<%--
 		${inventoryItem?.productGroup?.products }
 		--%>

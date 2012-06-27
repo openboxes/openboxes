@@ -31,6 +31,12 @@
 				&nbsp;<warehouse:message code="inventory.addToShipment.label"/>
 			</a>
 		</div>		
+		<div class="action-menu-item">														
+			<a href="javascript:void(0);" class="actionButton" id="addToProductGroupBtn">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="${warehouse.message(code: 'productGroup.addProducts.label') }" style="vertical-align: middle"/>
+				&nbsp;<warehouse:message code="productGroup.addProducts.label"/>
+			</a>
+		</div>	
 		<div class="action-menu-item">
 			<hr/>
 		</div>
@@ -133,6 +139,9 @@
 		});
 		$("#addToShipmentBtn").click(function(event) { 
 			$("#inventoryActionForm").attr("action", "${request.contextPath }/shipment/addToShipment").submit();
+		});
+		$("#addToProductGroupBtn").click(function(event) { 
+			$("#inventoryActionForm").attr("action", "${request.contextPath }/productGroup/addToProductGroup").submit();
 		});
 		$("#transactionReportBtn").click(function(event) { 
 			$("#inventoryActionForm").attr("action", "${request.contextPath }/report/showTransactionReport").submit();

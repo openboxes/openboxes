@@ -2,7 +2,7 @@ package org.pih.warehouse.product
 
 class ProductGroupController {
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    //static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
 	def productService 
 	
@@ -23,7 +23,9 @@ class ProductGroupController {
 
     def save = {
         def productGroupInstance = new ProductGroup(params)
-        if (productGroupInstance.save(flush: true)) {
+		productGroupInstance.products = productService.getProducts(params['product.id'])
+		
+		if (productGroupInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), productGroupInstance.id])}"
             redirect(action: "edit", id: productGroupInstance.id)
         }
@@ -58,6 +60,45 @@ class ProductGroupController {
         }
     }
 
+	def addProducts = { 
+	
+		def productGroupInstance = ProductGroup.get(params.id)
+		if (productGroupInstance) {
+			if (params.version) {
+				def version = params.version.toLong()
+				if (productGroupInstance.version > version) {
+					
+					productGroupInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'productGroup.label', default: 'ProductGroup')] as Object[], "Another user has updated this ProductGroup while you were editing")
+					render(view: "edit", model: [productGroupInstance: productGroupInstance])
+					return
+				}
+			}
+			productGroupInstance.properties = params
+			
+			log.info("Products to add " + params['product.id'])
+			
+			log.info("Products before " + productGroupInstance.products)
+			
+			def products = productService.getProducts(params['product.id'])
+			productGroupInstance.products += products
+
+			log.info("Products after " + productGroupInstance.products)
+			
+			if (!productGroupInstance.hasErrors() && productGroupInstance.save(flush: true)) {
+				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), productGroupInstance.id])}"
+				redirect(action: "edit", id: productGroupInstance.id)
+			}
+			else {
+				render(view: "edit", model: [productGroupInstance: productGroupInstance])
+			}
+		}
+		else {
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), params.id])}"
+			redirect(action: "list")
+		}
+			
+	}
+	
     def update = {
 		
 		log.info "Update product group " + params 
@@ -82,11 +123,10 @@ class ProductGroupController {
 			productGroupInstance.products = productService.getProducts(params['product.id'])
 			log.info "Products after: " + productGroupInstance.products
 			
-			
-            
+			            
             if (!productGroupInstance.hasErrors() && productGroupInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), productGroupInstance.id])}"
-                redirect(action: "list", id: productGroupInstance.id)
+                redirect(action: "edit", id: productGroupInstance.id)
             }
             else {
                 render(view: "edit", model: [productGroupInstance: productGroupInstance])
@@ -116,4 +156,27 @@ class ProductGroupController {
             redirect(action: "list")
         }
     }
+	
+	def addToProductGroup = { 
+		def productGroupInstance = new ProductGroup()
+		productGroupInstance.properties = params
+		productGroupInstance.products = productService.getProducts(params['product.id'])
+		
+		def categories = productGroupInstance.products.collect { 
+			it.category
+		}
+		
+		categories = categories.unique();
+	
+		if (categories.size() > 1) { 
+			//throw new Exception("Product group must contain products from a single category")
+			productGroupInstance.errors.rejectValue("category", "Product group must contain products from a single category")			
+			flash.message = "Please return to the <a href='javascript:history.go(-1)'>Inventory Browser</a> to choose products from a single category."
+		}
+		productGroupInstance.category = categories.get(0)
+		
+
+		render(view: "create", model: [productGroupInstance: productGroupInstance])
+	}
+	
 }

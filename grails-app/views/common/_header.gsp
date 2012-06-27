@@ -17,12 +17,21 @@
 		    	<div id="loggedIn" >
 					<ul>
 					    <g:if test="${session.user}">
-							<li>
-								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'user.png')}" style="vertical-align: middle" />
-								<g:link class="home" controller="user" action="show" id="${session.user.id}">
+					    	<g:if test="${session?.warehouse}">
+								<li>
+									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'user.png')}" class="middle" />
+									<g:link class="home" controller="user" action="show" id="${session.user.id}">
+										${session?.user?.name} 
+									</g:link>
+								</li>
+							</g:if>
+							<g:else>
+								<li>
+									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'user.png')}" class="middle" />
 									${session?.user?.name} 
-								</g:link>
-							</li>
+								</li>
+							
+							</g:else>
 							<!-- 																	
 							<li>
 								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cart.png')}" style="vertical-align: middle" />
@@ -78,7 +87,7 @@
 								</li>
 														
 								<li>
-								&nbsp;|&nbsp;
+									&nbsp;|&nbsp;
 								</li>
 							
 								<li>
@@ -136,7 +145,7 @@
 							 <li><input type="text" value="search" name="q" style="color: #aaa; font-weight: bold;" disabled=disabled /></li>
 							 -->
 					    </g:if>
-					    <g:else test="${!session.user}">
+					    <g:elseif test="${!session.user}">
 							<li><warehouse:message code="layout.notLoggedIn.label"/></li>
 							<li>&nbsp;|&nbsp;</li>
 							<li><g:link class="list" controller="auth" action="signup"><warehouse:message code="default.signup.label"/></g:link></li>
@@ -147,7 +156,13 @@
 							  <li><g:link class="list" controller="user" action="help"><warehouse:message code="default.help.label" default="Help"/></g:link></li>
 							 -->
 							 
-					    </g:else>
+					    </g:elseif>
+						<g:if test="${session?.warehouse}">
+							<li>&nbsp;|&nbsp;</li>							
+						    <li>
+						    	<g:globalSearch name="searchTerms"></g:globalSearch>
+						    </li>
+						</g:if>
 					</ul>
 				</div>					
 		    </div>
