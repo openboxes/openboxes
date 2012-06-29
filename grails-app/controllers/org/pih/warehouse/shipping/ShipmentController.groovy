@@ -1002,66 +1002,58 @@ class ShipmentController {
 	
 	
 	def addToShipment = { 
-		// Get product IDs and convert them to Long
+
+		// Get product IDs and convert them to String
 		def productIds = params.list('product.id')		
-		productIds = productIds.collect { String.valueOf(it); } 
-		// Find all inventory items that match the selected products
-		def products = []
-		def inventoryItems = [] 
-		if (productIds) { 
-			products = Product.findAll("from Product as p where p.id in (:ids)", [ids:productIds])
-			inventoryItems = InventoryItem.findAll("from InventoryItem as i where i.product.id in (:ids)", [ids:productIds])
-		}
-
-		// Get quantities for all inventory items
-		def warehouse = Location.get(session.warehouse.id)		
-		log.info("Quantity for warehouse: " + warehouse.name + " [" + warehouse.inventory + "]")
-		def quantityOnHandMap = inventoryService.getQuantityForInventory(warehouse.inventory)
-		def quantityShippingMap = shipmentService.getQuantityForShipping(warehouse)
-		def quantityReceivingMap = shipmentService.getQuantityForReceiving(warehouse)
+		productIds = productIds.collect { String.valueOf(it); }
+		 
+		Location location = Location.get(session.warehouse.id)
+		def commandInstance = shipmentService.getAddToShipmentCommand(productIds, location)
 		
-				
-		// Create command objects for each item
-		def commandInstance = new ItemListCommand();
-		if (inventoryItems) { 
-			inventoryItems.each { inventoryItem ->
-				def item = new ItemCommand();
-				item.quantityOnHand = quantityOnHandMap[inventoryItem]
-				item.quantityShipping = quantityShippingMap[inventoryItem]
-				item.quantityReceiving = quantityReceivingMap[inventoryItem]
-				item.inventoryItem = inventoryItem 
-				item.product = inventoryItem?.product
-				item.lotNumber = inventoryItem?.lotNumber
-				commandInstance.items << item;
-			}
-		}
-
-		// Get all pending/outgoing shipments						
-		def shipments = shipmentService.getPendingShipments(warehouse);
-		
-		[shipments : shipments, products: products, commandInstance : commandInstance]
+		[commandInstance : commandInstance]
 	}
 	
 	
 	def addToShipmentPost = { ItemListCommand command -> 
-		log.info(params);
-		log.info("Command items " + command?.class?.name + " " + command?.items?.size());
-		try { 
-			boolean atLeastOneUpdate = shipmentService.addToShipment(command);
-			if (atLeastOneUpdate) { 
-				flash.message = "${warehouse.message(code: 'shipping.shipmentItemsHaveBeenAdded.message')}"
-			}
-			else { 
-				flash.message = "${warehouse.message(code: 'shipping.noShipmentItemsHaveBeenUpdated.message')}"
-			}
-		} catch (ShipmentItemException e) { 
-			flash['errors'] = e.shipmentItem.errors
-			render(view: "addToShipment", model: [commandInstance: command, shipments: shipmentService.getPendingShipments(Location.get(session.warehouse.id))])
+		
+		println "add to shipment post " + params.shipmentContainerKey
+		
+		if (!params?.shipmentContainerKey) { 
+			command.errors.rejectValue("items", "addToShipment.container.invalid")
+			render(view: "addToShipment", model: [commandInstance: command])
 			return;
-		} catch (ValidationException e) { 			
-			flash['errors'] = e.errors 
-			render(view: "addToShipment", model: [commandInstance: command, shipments: shipmentService.getPendingShipments(Location.get(session.warehouse.id))])
-			return;
+		}		
+		
+		def shipmentContainer = params?.shipmentContainerKey?.split(":")
+		if (shipmentContainer) { 
+
+			def shipment = Shipment.get(shipmentContainer[0])
+			def container = Container.get(shipmentContainer[1])
+			
+		   command.items.each {
+			   it.shipment = shipment
+			   it.container = container
+		   }
+	
+			try { 
+				boolean atLeastOneUpdate = shipmentService.addToShipment(command);
+				if (atLeastOneUpdate) { 
+					flash.message = "${warehouse.message(code: 'shipping.shipmentItemsHaveBeenAdded.message')}"
+					redirect(controller:"createShipmentWorkflow", action: "createShipment", id: shipment.id, params: ["skipTo":"Packing","container.id":container.id])
+					return;
+				}
+				else { 
+					flash.message = "${warehouse.message(code: 'shipping.noShipmentItemsHaveBeenUpdated.message')}"
+				}
+			} catch (ShipmentItemException e) { 
+				flash['errors'] = e.shipmentItem.errors
+				render(view: "addToShipment", model: [commandInstance: command])
+				return;
+			} catch (ValidationException e) { 			
+				flash['errors'] = e.errors 
+				render(view: "addToShipment", model: [commandInstance: command])
+				return;
+			}
 		}
 		
 		redirect(controller: "inventory", action: "browse")	

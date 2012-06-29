@@ -2,6 +2,7 @@ package org.pih.warehouse
 
 import org.pih.warehouse.core.ActivityCode;
 import org.pih.warehouse.core.Location;
+import org.pih.warehouse.shipping.Container;
 import org.pih.warehouse.shipping.Shipper;
 import org.springframework.beans.SimpleTypeConverter;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU
@@ -25,10 +26,18 @@ class SelectTagLib {
 		attrs.from = shipmentService.getShipmentsByLocation(currentLocation).sort { it?.name?.toLowerCase() };
 		attrs.optionKey = 'id'
 		//attrs.optionValue = 'name'
-		attrs.value = attrs.value 
+		//attrs.value = attrs.value 
 		attrs.optionValue = { it.name + " (" + it.origin.name + " to " + it.destination.name + ")"}
 		out << g.select(attrs)
 	}
+	
+	def selectContainer = { attrs, body ->
+		def currentLocation = Location.get(session?.warehouse?.id)
+		attrs.from = shipmentService.getPendingShipments(currentLocation)
+		out << render(template: '/taglib/selectContainer', model: [attrs:attrs])
+		
+	}
+	
 	
 	def selectLocation = { attrs,body ->
 		def currentLocation = Location.get(session?.warehouse?.id)

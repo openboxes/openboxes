@@ -4,6 +4,12 @@
 			<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" class="middle"/>
 		</button>
 		<div class="actions left">
+			<div class="action-menu-item">					
+				<g:link controller="product" action="edit" id="${product?.id }">
+					<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
+					<warehouse:message code="product.edit.label"/>
+				</g:link>
+			</div>
 			<g:if test="${actionName != 'showStockCard' }">
 				<div class="action-menu-item">					
 					<g:link controller="inventoryItem" action="showStockCard" params="['product.id': product?.id]">
@@ -14,7 +20,7 @@
 			</g:if>
 			<div class="action-menu-item">					
 				<g:link controller="inventoryItem" action="showTransactionLog" params="['product.id': product?.id, 'disableFilter':true]">
-					<img src="${resource(dir: 'images/icons/silk', file: 'clock.png')}"/>&nbsp;
+					<img src="${resource(dir: 'images/icons/silk', file: 'book_previous.png')}"/>&nbsp;
 					<warehouse:message code="inventory.showTransactionLog.label"/>
 				</g:link>
 			</div>
@@ -26,7 +32,7 @@
 			</div>
 			<div class="action-menu-item">					
 				<g:link controller="inventoryItem" action="showRecordInventory" params="['productInstance.id': product?.id,'inventoryInstance.id':inventory?.id]">
-					<img src="${resource(dir: 'images/icons/silk', file: 'clipboard.png')}"/>&nbsp;
+					<img src="${resource(dir: 'images/icons/silk', file: 'book_edit.png')}"/>&nbsp;
 					<warehouse:message code="inventory.record.label"/>
 				</g:link>
 			</div>
@@ -37,13 +43,7 @@
 					<warehouse:message code="transaction.addNewTransaction.label"/>
 				</g:link>
 			</div>
-			--%>				
-			<div class="action-menu-item">					
-				<g:link controller="product" action="edit" id="${product?.id }">
-					<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
-					<warehouse:message code="product.edit.label"/>
-				</g:link>
-			</div>
+			--%>
 			<%-- 
 			<div class="action-menu-item">					
 				<g:link controller="inventoryItem" action="editInventoryLevel" params="['product.id': product?.id, 'inventory.id':inventory?.id]">

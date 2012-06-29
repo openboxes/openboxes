@@ -4,7 +4,7 @@
 
 <div class="widget-small">
 	<div class="widget-header">
-		<h2><warehouse:message code="shipping.label"/>
+		<h2><warehouse:message code="receiving.label"/>
 		&rsaquo;
 		<span class="fade">${session.warehouse.name}</span>
 		</h2>
@@ -21,9 +21,9 @@
   				<g:set var="pending" value="${ShipmentStatusCode.PENDING}"/>
   				<g:set var="shipped" value="${ShipmentStatusCode.SHIPPED}"/>
   				<g:set var="received" value="${ShipmentStatusCode.RECEIVED}"/>
-				<g:set var="shipmentsPending" value="${outgoingShipmentsByStatus[pending] }"/>			
-				<g:set var="shipmentsShipped" value="${outgoingShipmentsByStatus[shipped] }"/>		
-				<g:set var="outgoingShipmentsTotal" value="${shipmentsPending.objectList.size + shipmentsShipped.objectList.size }"/>	
+				<g:set var="shipmentsEnroute" value="${incomingShipmentsByStatus[shipped] }"/>			
+  				<g:set var="shipmentsReceived" value="${incomingShipmentsByStatus[received] }"/>
+				<g:set var="incomingShipmentsTotal" value="${shipmentsEnroute.objectList.size + shipmentsReceived.objectList.size }"/>	
 
 					
 	    		<table>
@@ -31,24 +31,24 @@
 	    			<tbody>
 						<tr class="even">
 							<td>
-								${warehouse.message(code: 'dashboard.outgoing.pending.label', args: [session.warehouse.name]) }							
+								${warehouse.message(code: 'dashboard.incoming.shipped.label', args: [session.warehouse.name]) }							
 							</td>
-							<td style="text-align: right;">
-								<g:link controller="shipment" action="list" params="['type':'outgoing','status':pending]">
-									${shipmentsPending.objectList.size}
+							<td class="right">
+								<g:link controller="shipment" action="list" params="['type':'incoming','status':shipped]">
+									${shipmentsEnroute.objectList.size}
 								</g:link>
 							</td>
-						</tr>	
+						</tr>				
 						<tr class="odd prop">
 							<td>
-								${warehouse.message(code: 'dashboard.outgoing.shipped.label', args: [session.warehouse.name]) }							
+								${warehouse.message(code: 'dashboard.incoming.received.label', args: [session.warehouse.name]) }							
 							</td>
-							<td style="text-align: right;">
-								<g:link controller="shipment" action="list" params="['type':'outgoing','status':shipped]">
-									${shipmentsShipped.objectList.size}
+							<td class="right">
+								<g:link controller="shipment" action="list" params="['type':'incoming','status':received]">
+									${shipmentsReceived.objectList.size}
 								</g:link>
 							</td>
-						</tr>	
+						</tr>							
 			    	</tbody>
 			    	<tfoot>
 						<tr class="even prop">
@@ -56,10 +56,11 @@
 								<warehouse:message code="default.total.label"/>
 							</th>
 							<th class="right">
-								${outgoingShipmentsTotal }
+								${incomingShipmentsTotal }
 							</th>
 						</tr>
 			    	</tfoot>
+			    	
 		    	</table>
 
 			</g:else>

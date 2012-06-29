@@ -62,7 +62,7 @@
 									<td valign="top" class="name"><label><warehouse:message code="default.origin.label" /></label></td>
 									<td valign="top"
 										class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">								
-										<g:selectShipmentOrigin name="origin.id" class="combobox"
+										<g:selectShipmentOrigin name="origin.id" class="comboBox"
 											optionKey="id" 
 											value="${shipmentInstance?.origin?.id ? shipmentInstance?.origin?.id : params.type == 'OUTGOING' ? session.warehouse.id : ''}" 
 											noSelection="['null':'']" />							
@@ -75,7 +75,7 @@
 								<tr class="prop">
 									<td valign="top" class="name"><label><warehouse:message code="default.destination.label" /></td>
 									<td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'destination', 'errors')}">
-										<g:selectShipmentDestination class="combobox" name="destination.id" 
+										<g:selectShipmentDestination class="comboBox" name="destination.id" 
 											optionKey="id" value="${shipmentInstance?.destination?.id ? shipmentInstance?.destination?.id : (params.type == 'INCOMING') ? session.warehouse.id : ''}" 
 											noSelection="['null':'']" />	
 										<g:link action="createShipment" event="addLocation" params="[target:'origin']">

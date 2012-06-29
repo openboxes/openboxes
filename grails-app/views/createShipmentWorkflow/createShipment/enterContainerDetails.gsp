@@ -123,51 +123,40 @@
 										<table class="sortable" data-update-url="${createLink(controller:'json', action:'sortContainers')}">	
 											<thead>
 												<tr>
-													<td colspan="3" class="center">
-														<span class="title">
+													<td colspan="3" class="left">
+														<span class="action-menu" >
+															<button class="action-btn">
+																<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
+															</button>
+															<div class="actions left">
+																<g:render template="shipmentMenuItems"/>
+																
+															</div>
+														</span>
+														&nbsp;
+														<span class="title middle">
 															<warehouse:message code="containers.label"/>
 														</span>
 													</td>
 												</tr>
 
 												<tr class="prop">
-													<td class="left middle">
-														<g:link class="button" action="createShipment" event="enterContainerDetails" params="['containerId':selectedContainer?.id,'direction':'-1']">
+													<th class="left middle">
+														<g:link action="createShipment" event="enterContainerDetails" params="['containerId':selectedContainer?.id,'direction':'-1']">
 															<img src="${resource(dir: 'images/icons/silk', file: 'resultset_previous.png')}" class="middle"/>
 														</g:link>
-													</td>
-													<td class="center middle">														
+													</th>
+													<th class="center middle">														
 														${containerList?.indexOf(selectedContainer)+2} of ${containerList?.size()+1 }
-													</td>
-													<td class="right middle">
+													</th>
+													<th class="right middle">
 														<g:link action="createShipment" event="enterContainerDetails" params="['containerId':selectedContainer?.id,'direction':'1']">
 															<img src="${resource(dir: 'images/icons/silk', file: 'resultset_next.png')}" class="middle"/>
 														</g:link>
-													</td>
+													</th>
 												</tr>															
 											
-												<tr class="prop odd">
-													<td colspan="3" class="middle">	
-								 						<table>
-								 							<tr>
-								 								<td>
-											 						<label><warehouse:message code="shipment.numItems.label"/></label> 
-											 					</td>
-											 					<td>
-																	${shipmentInstance?.shipmentItems?.size() }
-																</td>
-															</tr>
-															<tr>
-																<td>
-											 						<label><warehouse:message code="shipping.totalWeight.label"/></label>
-											 					</td>
-											 					<td>
-																	<g:formatNumber format="#,##0.00" number="${shipmentInstance?.totalWeightInPounds() ? shipmentInstance?.totalWeightInPounds() : 0.00 }" /> <warehouse:message code="default.lbs.label"/>
-																</td>
-															</tr>
-														</table>
-													</td>
-												</tr>
+												
 																			
 												<g:set var="styleClass" value="${selectedContainer == null ? 'selected' : 'not-selected' }"/>
 												<tr class="${count++%2==0?'odd':'even' } ${styleClass } prop">
@@ -295,18 +284,13 @@
 													<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
 												</button>
 												<div class="actions">
-													<g:render template="containerMenuItems" model="[container:selectedContainer]"/>
-													<div class="action-menu-item">
-														<hr/>
-													</div>
-													<g:render template="shipmentMenuItems"/>
-													
+													<g:render template="containerMenuItems" model="[container:selectedContainer]"/>													
 												</div>
 											</span>	
 										</td>
 										<td class="middle">
 								
-											<span class="title middle">
+											<div class="title middle">
 												<g:if test="${selectedContainer}">								
 													<g:if test="${selectedContainer.parentContainer }">
 														${selectedContainer?.parentContainer?.name } &rsaquo;
@@ -316,51 +300,11 @@
 												<g:else>
 													<warehouse:message code="shipping.unpackedItems.label" />			 						
 												</g:else>
-											</span>
+											</div>
 											<g:if test="${selectedContainer}">	
-													<span class="fade">
-										 				<warehouse:message code="shipment.numItems.label"/>: 
-										 			</span>
-								 					<span>
-								 						${selectedContainer?.shipmentItems?.size() }
-								 					</span>
-								 					&nbsp;|&nbsp; 
-													<span class="fade">
-										 				<warehouse:message code="default.weight.label"/>: 
-										 			</span>
-									 				<g:if test="${selectedContainer?.weight }">
-										 				<g:formatNumber format="#,##0.00" number="${selectedContainer?.weight }"/>
-										 				 ${selectedContainer?.weightUnits}
-									 				</g:if>
-									 				<g:else>
-										 				<g:formatNumber format="#,##0.00" number="${selectedContainer?.totalWeightInPounds() ? selectedContainer?.totalWeightInPounds() : 0.00 }" /> 
-										 				 <warehouse:message code="default.lbs.label"/>
-									 				</g:else>
-									 				&nbsp;|&nbsp; 
-													<span class="fade">
-										 				<warehouse:message code="shipping.dimensions.label"/>:
-										 			</span>
-								 					<g:if test="${selectedContainer?.width ||  selectedContainer?.length || selectedContainer?.height}">
-														
-														${selectedContainer.height == null ? '?' : selectedContainer.height} ${selectedContainer?.volumeUnits}
-														x
-														${selectedContainer.width == null ? '?' : selectedContainer.width} ${selectedContainer?.volumeUnits}
-														x
-														${selectedContainer.length == null ? '?' : selectedContainer.length} ${selectedContainer?.volumeUnits}
-													</g:if>
-													<g:else>
-														<warehouse:message code="default.none.label"/>
-													</g:else>
-													
-													<span class="fade">
-														&nbsp;|&nbsp; <warehouse:message code="shipping.recipient.label"/>:
-													</span>
-								 					<g:if test="${selectedContainer?.recipient }">
-														${selectedContainer?.recipient?.name }	
-													</g:if>
-													<g:else>
-														<warehouse:message code="default.none.label"/>
-													</g:else>
+											
+												<g:render template="/container/summary" model="[container:selectedContainer]"/>
+									 				
 											</g:if>								
 										</td>
 									</tr>
@@ -368,7 +312,7 @@
 								<div class="list">
 									<table>
 										<thead>
-											<tr style="height: 31px;" class="prop">
+											<tr class="prop">
 												<th class="middle"><!--<warehouse:message code="default.actions.label"/>--></th>
 												<th class="center middle"><warehouse:message code="default.qty.label"/></th>
 												<th class="middle"><warehouse:message code="default.item.label"/></th>

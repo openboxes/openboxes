@@ -1,3 +1,4 @@
+
 <div style="padding: 10px;">
 	<table style="width: 0%">
 		<tbody>			
@@ -68,9 +69,20 @@
 								<label><format:date obj="${shipmentInstance?.actualDeliveryDate}"/></label> 
 							</span>
 						</g:else>
-					</div>
-											
+
+						<span>		
+	 						<warehouse:message code="shipment.numItems.label"/>:
+							<label>${shipmentInstance?.shipmentItems?.size() }</label>
+						</span>
+
+						<span>
+	 						<warehouse:message code="shipping.totalWeight.label"/>:
+							<label>
+								<g:formatNumber format="#,##0.00" number="${shipmentInstance?.totalWeightInPounds() ? shipmentInstance?.totalWeightInPounds() : 0.00 }" /> <warehouse:message code="default.lbs.label"/>
+							</label>
+						</span>
 						
+					</div>
 				</td>	
 									
 				<td style="text-align: right;">

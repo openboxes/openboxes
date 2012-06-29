@@ -107,7 +107,7 @@
 														args="[shipmentInstance?.destination?.name]"/>											
 												</div>
 												--%>
-												<div id="creditShipmentItems" style="overflow: auto; height: 300px" class="">									
+												<div id="creditShipmentItems" style="overflow: auto;" class="">									
 													<table>
 														<thead>
 															<tr>

@@ -1082,18 +1082,53 @@ class ShipmentService {
 	
 	/**
 	 * 
-	 * @param command
+	 * @param productIds
+	 * @param location
+	 * @return
 	 */
+	ItemListCommand getAddToShipmentCommand(List<String> productIds, Location location) { 
+		// Find all inventory items that match the selected products
+		def products = []
+		def inventoryItems = []
+		if (productIds) {
+			products = Product.findAll("from Product as p where p.id in (:ids)", [ids:productIds])
+			inventoryItems = InventoryItem.findAll("from InventoryItem as i where i.product.id in (:ids)", [ids:productIds])
+		}
+
+		// Get quantities for all inventory items
+		def quantityOnHandMap = inventoryService.getQuantityForInventory(location.inventory)
+		def quantityShippingMap = getQuantityForShipping(location)
+		def quantityReceivingMap = getQuantityForReceiving(location)
+		
+				
+		// Create command objects for each item
+		def commandInstance = new ItemListCommand();
+		if (inventoryItems) {
+			inventoryItems.each { inventoryItem ->
+				def item = new ItemCommand();
+				item.quantityOnHand = quantityOnHandMap[inventoryItem]
+				item.quantityShipping = quantityShippingMap[inventoryItem]
+				item.quantityReceiving = quantityReceivingMap[inventoryItem]
+				item.inventoryItem = inventoryItem
+				item.product = inventoryItem?.product
+				item.lotNumber = inventoryItem?.lotNumber
+				commandInstance.items << item;
+			}
+		}
+		
+		return commandInstance
+	}
+	
+   
+
+	
 	Boolean addToShipment(ItemListCommand command) { 	
 			
 		def atLeastOneUpdate = false;
 		
 		command.items.each {
-			log.info "Adding item with lotNumber=" + it?.lotNumber + " product=" + it?.product?.name + " and  qty=" + it.quantity +
-				" to shipment=" + it?.shipment?.id
-			
 			// Check if shipment item already exists
-			def criteria = new ShipmentItem(shipment: it.shipment, product: it.product, lotNumber: it.lotNumber);
+			def criteria = new ShipmentItem(shipment: it.shipment, container: it.container, product: it.product, lotNumber: it.lotNumber);
 			def shipmentItem = findShipmentItem(criteria)
 			
 			// Only add a shipment item for rows that have a quantity greater than 0
@@ -1117,11 +1152,15 @@ class ShipmentService {
 				}
 				else {
 					log.info("Creating new shipment item ...");
-					shipmentItem = new ShipmentItem(shipment: it.shipment, product: it.product, lotNumber: it.lotNumber, quantity: it.quantity);					
+					shipmentItem = new ShipmentItem(shipment: it.shipment, container: it.container, product: it.product, lotNumber: it.lotNumber, quantity: it.quantity);					
 					addToShipmentItems(shipmentItem, it.shipment);
 				}
 				atLeastOneUpdate = true;
 			}
+			log.info "Adding item with lotNumber=" + it?.lotNumber + " product=" + it?.product?.name + " and  qty=" + it?.quantity +
+			" to shipment=" + it.shipment + " into container=" + it.container
+		
+
 		}
 		return atLeastOneUpdate
 	}	

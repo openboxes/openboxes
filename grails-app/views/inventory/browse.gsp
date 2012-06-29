@@ -42,23 +42,34 @@
 								           								            
 											<div class="tabs">
 												<ul>
-													<li>
-														<a href="#tabs-1">
-															Results for 
-															<g:if test="${commandInstance?.searchTerms }">
-																<b>${commandInstance.searchTerms }</b>															
-															</g:if>
-															<g:else>
-																<b>all products</b>
-															</g:else>
-															<g:if test="${commandInstance?.subcategoryInstance }"> 
-																in <b><format:category category="${commandInstance?.subcategoryInstance}"/></b>
-															</g:if>
-															(${commandInstance?.categoryToProductMap?.values()?.flatten()?.size()} products)
+														<li>
+															<a href="#tabs-1">
 															
-														</a>
-													</li>
+																<g:if test="${params.searchPerformed }">												
+																	Results for 
+																	<g:if test="${commandInstance?.searchTerms }">
+																		<b>${commandInstance.searchTerms }</b>															
+																	</g:if>
+																	<g:else>
+																		<b>all products</b>
+																	</g:else>
+																	<g:if test="${commandInstance?.subcategoryInstance }"> 
+																		in <b><format:category category="${commandInstance?.subcategoryInstance}"/></b>
+																	</g:if>
+																	(${commandInstance?.categoryToProductMap?.values()?.flatten()?.size()} products)
+																</g:if>													
+																<g:else>
+																	&nbsp;
+																</g:else>
+																
+															</a>
+														</li>
+
 												</ul>		
+												<div id="tabs-recent" style="padding: 0px">
+												
+												
+												</div>
 												<div id="tabs-1" style="padding: 0px;">	
 										            <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
 										                <table class="tableScroll" border="0"> 
@@ -137,7 +148,9 @@
 																	<tr>
 																		<td colspan="7" class="even center">
 																			<div class="fade padded">
-																				<warehouse:message code="inventory.searchNoMatch.message" args="[commandInstance?.searchTerms?:'',format.metadata(obj:commandInstance?.categoryInstance)]"/>
+																				<g:if test="${params.searchPerformed }">
+																					<warehouse:message code="inventory.searchNoMatch.message" args="[commandInstance?.searchTerms?:'',format.metadata(obj:commandInstance?.categoryInstance)]"/>
+																				</g:if>
 																			</div>
 																		</td>
 																	</tr>

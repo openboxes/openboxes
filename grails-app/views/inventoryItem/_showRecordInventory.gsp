@@ -19,9 +19,6 @@
 						
 						</td>
 						<td class="right">
-							<button id="addAnother" type="button" class="positive">
-								<img src="${createLinkTo(dir:'images/icons/silk', file:'add.png') }"/>&nbsp;<warehouse:message code="default.button.add.label"/>&nbsp;
-							</button>
 						
 						</td>
 					</tr>
@@ -76,7 +73,9 @@
 					<g:else>
 						<tr id="emptyRow">
 							<td colspan="5" style="text-align: center; min-height: 400px;">
-								<warehouse:message code="inventory.addNewInventoryItem.message"/>
+								<div class="padded fade">
+									<warehouse:message code="inventory.addNewInventoryItem.message"/>
+								</div>
 							</td>
 						</tr>
 						
@@ -86,6 +85,13 @@
 				<tfoot>
 					<tr>
 						<td colspan="5" class="center">
+						
+							<button id="addAnother" type="button" class="positive">
+								<img src="${createLinkTo(dir:'images/icons/silk', file:'add.png') }"/>&nbsp;<warehouse:message code="default.button.add.label"/>&nbsp;
+							</button>
+							&nbsp;
+						
+						
 							<button name="save" type="submit" class="positive">
 								<img src="${createLinkTo(dir:'images/icons/silk', file:'accept.png') }"/>&nbsp;<warehouse:message code="default.button.save.label"/>&nbsp;
 							</button>

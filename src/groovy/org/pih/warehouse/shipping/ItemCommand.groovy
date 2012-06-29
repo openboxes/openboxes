@@ -9,6 +9,7 @@ class ItemCommand implements Serializable {
 	String lotNumber
 	InventoryItem inventoryItem
 	Shipment shipment
+	Container container
 	ShipmentItem shipmentItem
 	Integer quantity
 	Integer quantityOnHand
@@ -21,6 +22,7 @@ class ItemCommand implements Serializable {
 		lotNumber(nullable:true)
 		inventoryItem(nullable:true)
 		shipment(nullable:true)
+		container(nullable:true)
 		shipmentItem(nullable:true)
 		quantity(nullable:true)
 		quantityOnHand(nullable:true)

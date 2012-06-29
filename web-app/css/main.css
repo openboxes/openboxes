@@ -113,8 +113,8 @@ input:focus, select:focus, textarea:focus {
     background: url(../images/skin/new.png) center left no-repeat;
 }
 
-.linkButton a.showStockCard {
-	background: url(../images/icons/stockbook.png) center left no-repeat;
+.linkButton a.stockCard {
+	background: url(../images/icons/silk/book.png) center left no-repeat;
 }
 
 
@@ -382,10 +382,7 @@ th.desc a {
     background: url(../images/icons/document.png) center left no-repeat;
 }
 .linkButton a.stockcard {
-    background: url(../images/icons/document.png) center left no-repeat;
-}
-.linkButton a.stockcardentry {
-    background: url(../images/icons/document.png) center left no-repeat;
+    background: url(../images/icons/silk/book_open.png) center left no-repeat;
 }
 .linkButton a.country {
     background: url(../images/icons/map.png) center left no-repeat;

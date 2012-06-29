@@ -26,43 +26,41 @@
 		</g:hasErrors>
 
 		<div class="dialog">		
-			<fieldset>			
-				<div>
-					<table>
-						<tbody>			
-							<tr>
-								<td style="width: 50px; text-align:center;">
-									<g:render template="../inventoryItem/actions" 
-										model="[product:commandInstance?.productInstance,
-											inventory:commandInstance?.inventoryInstance]"/>
-								</td>
-								<td class="middle">
-									<h1>
-										<g:pageProperty name="page.heading"/>						
-									</h1>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-			
-					<!-- Content -->
-					<table>				
+			<fieldset>
+				<table>
+					<tbody>			
 						<tr>
-						
-							<!--  Product Details -->
-							<td style="width: 250px;">
-								<g:render template="productDetails" 
-									model="[productInstance:commandInstance?.productInstance, 
-										inventoryInstance:commandInstance?.inventoryInstance, 
-										inventoryLevelInstance: commandInstance?.inventoryLevelInstance, 
-										totalQuantity: commandInstance?.totalQuantity]"/>
+							<td style="width: 50px; text-align:center;">
+								<g:render template="../inventoryItem/actions" 
+									model="[product:commandInstance?.productInstance,
+										inventory:commandInstance?.inventoryInstance]"/>
 							</td>
-							<td>
-								<g:pageProperty name="page.content"/>	
+							<td class="middle">
+								<h1>
+									<g:pageProperty name="page.heading"/>						
+								</h1>
 							</td>
 						</tr>
-					</table>
-				</div>
+					</tbody>
+				</table>
+				
+				<!-- Content -->
+				<table>				
+					<tr>
+					
+						<!--  Product Details -->
+						<td style="width: 250px;">
+							<g:render template="productDetails" 
+								model="[productInstance:commandInstance?.productInstance, 
+									inventoryInstance:commandInstance?.inventoryInstance, 
+									inventoryLevelInstance: commandInstance?.inventoryLevelInstance, 
+									totalQuantity: commandInstance?.totalQuantity]"/>
+						</td>
+						<td>
+							<g:pageProperty name="page.content"/>	
+						</td>
+					</tr>
+				</table>
 			</fieldset>
 		</div>
 	</div>

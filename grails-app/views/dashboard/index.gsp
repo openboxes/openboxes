@@ -21,6 +21,7 @@
 							<g:render template="inventorySummary"/>
 							
 							<g:render template="shipmentSummary"/>
+							<g:render template="receiptSummary"/>
 							
 							<%-- 
 							<g:render template="orderSummary"/>

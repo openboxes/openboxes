@@ -11,11 +11,6 @@
 	}
 </style>
 <ul class="megamenu">
-	<li>
-		<g:link controller="dashboard" action="index">
-			<img src="${createLinkTo(dir:'images/icons/silk',file:'house.png')}" class="middle"/>
-		</g:link>
-	</li>
 	<g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
 		<li>
 			<g:link controller="inventory" action="browse">

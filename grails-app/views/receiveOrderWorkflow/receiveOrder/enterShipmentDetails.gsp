@@ -49,7 +49,7 @@
 								</td>
 								<td valign='top'class='value'>
 									<div class="ui-widget">
-										<g:select class="combobox updateable" name="recipient.id" from="${org.pih.warehouse.core.Person.list()}" 
+										<g:select class="comboBox updateable" name="recipient.id" from="${org.pih.warehouse.core.Person.list()}" 
 											optionKey="id" optionValue="name" value="${orderCommand?.recipient?.id }" noSelection="['':'']" />
 									</div>									
 								</td>

@@ -59,7 +59,7 @@
 										<td valign="top" style="width: 30%;">
 										
 											<g:selectShipper id="shipperInput" 
-												name="shipperInput.id" class="combobox" value="${shipmentInstance?.shipmentMethod?.shipper?.id }" noSelection="['null':'']"/>
+												name="shipperInput.id" class="comboBox" value="${shipmentInstance?.shipmentMethod?.shipper?.id }" noSelection="['null':'']"/>
 											
 											<%-- 
 											<g:autoSuggest id="shipperInput" name="shipperInput" jsonUrl="${request.contextPath }/json/findShipperByName" 
