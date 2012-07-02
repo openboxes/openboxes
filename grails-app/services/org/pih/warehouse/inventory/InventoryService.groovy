@@ -267,18 +267,21 @@ class InventoryService implements ApplicationContextAware {
 		def quantityIncomingMap = getIncomingQuantityByProduct(commandInstance?.warehouseInstance);
 		
 		def inventoryItemCommands = [];		
-		getProducts(commandInstance).each { product -> 
-			inventoryItemCommands << getInventoryItemCommand(product, 
-				commandInstance?.warehouseInstance?.inventory, 
-				quantityOnHandMap[product] ?: 0,
-				quantityIncomingMap[product] ?: 0,
-				quantityOutgoingMap[product] ?: 0,
-				commandInstance?.showOutOfStockProducts)
+		def products = getProducts(commandInstance)
+		products.each { product -> 
+			def quantityOnHand = quantityOnHandMap[product] ?: 0
+			def quantityToReceive = quantityIncomingMap[product] ?: 0
+			def quantityToShip = quantityOutgoingMap[product] ?: 0
+			if (commandInstance?.showOutOfStockProducts || (quantityOnHand + quantityToReceive + quantityToShip > 0)) {
+				inventoryItemCommands << getInventoryItemCommand(product, 
+					commandInstance?.warehouseInstance?.inventory, 
+					quantityOnHand, quantityToReceive, quantityToShip,					
+					commandInstance?.showOutOfStockProducts)
+			}
 		}
 		
 		
 		def productGroups = getProductGroups(commandInstance);
-		log.info "product groups " + productGroups
 		productGroups.each { productGroup ->			
 			def inventoryItemCommand = getInventoryItemCommand(productGroup, commandInstance?.warehouseInstance.inventory, commandInstance.showOutOfStockProducts)			
 			inventoryItemCommand.inventoryItems = new ArrayList();
@@ -296,10 +299,7 @@ class InventoryService implements ApplicationContextAware {
 				inventoryItemCommands.removeAll { it.product == product } 
 			}	
 			inventoryItemCommands << inventoryItemCommand
-			
-			
 		}
-		
 		commandInstance?.categoryToProductMap = getProductMap(inventoryItemCommands);
 
 		return commandInstance?.categoryToProductMap
@@ -308,16 +308,14 @@ class InventoryService implements ApplicationContextAware {
 	
 	InventoryItemCommand getInventoryItemCommand(Product product, Inventory inventory, Integer quantityOnHand, Integer quantityToReceive, Integer quantityToShip, Boolean showOutOfStockProducts) { 
 		InventoryItemCommand inventoryItemCommand = new InventoryItemCommand();		
-		def inventoryLevel = InventoryLevel.findByProductAndInventory(product, inventory)		
-		if (showOutOfStockProducts || (quantityOnHand + quantityToReceive + quantityToShip > 0)) {
-			inventoryItemCommand.description = product.name
-			inventoryItemCommand.category = product.category
-			inventoryItemCommand.product = product
-			inventoryItemCommand.inventoryLevel = inventoryLevel
-			inventoryItemCommand.quantityOnHand = quantityOnHand
-			inventoryItemCommand.quantityToReceive = quantityToReceive
-			inventoryItemCommand.quantityToShip = quantityToShip
-		}
+		def inventoryLevel = InventoryLevel.findByProductAndInventory(product, inventory)				
+		inventoryItemCommand.description = product.name
+		inventoryItemCommand.category = product.category
+		inventoryItemCommand.product = product
+		inventoryItemCommand.inventoryLevel = inventoryLevel
+		inventoryItemCommand.quantityOnHand = quantityOnHand
+		inventoryItemCommand.quantityToReceive = quantityToReceive
+		inventoryItemCommand.quantityToShip = quantityToShip		
 		return inventoryItemCommand
 	}
 	
@@ -334,6 +332,11 @@ class InventoryService implements ApplicationContextAware {
 	}
 	
 	
+	/**
+	 * 
+	 * @param inventoryCommand
+	 * @return
+	 */
 	Set<ProductGroup> getProductGroups(InventoryCommand inventoryCommand) { 
 		List categoryFilters = new ArrayList();
 		if (inventoryCommand?.subcategoryInstance) {
@@ -345,10 +348,9 @@ class InventoryService implements ApplicationContextAware {
 		
 		List searchTerms = (inventoryCommand?.searchTerms ? Arrays.asList(inventoryCommand?.searchTerms.split(" ")) : null);
 		
-		log.debug("get products: " + inventoryCommand?.warehouseInstance)
 		def productGroups = getProductGroups(inventoryCommand?.warehouseInstance, searchTerms, categoryFilters,
 			inventoryCommand?.showHiddenProducts);
-		log.info "Product groups " + productGroups
+
 		productGroups = productGroups?.sort() { it?.description };
 		return productGroups;
 	}
