@@ -12,7 +12,7 @@
 							<label><warehouse:message code="inventory.dateOfInventory.label"/></label>													
 							<g:jqueryDatePicker 
 								id="transactionDate" 
-								name="transactionDate" 
+								name="transactionDate"
 								value="${commandInstance?.transactionDate}" 
 								format="MM/dd/yyyy"
 								showTrigger="false" />						
@@ -23,11 +23,11 @@
 						</td>
 					</tr>
 					<tr class="even">	
-						<th><warehouse:message code="default.lotSerialNo.label"/></th>
-						<th><warehouse:message code="default.expires.label"/></th>
-						<th class="center"><warehouse:message code="inventory.oldQty.label"/></th>
-						<th class="center"><warehouse:message code="inventory.newQty.label"/></th>
-						<th class="center"><warehouse:message code="default.actions.label"/></th>
+						<th width="30%"><warehouse:message code="default.lotSerialNo.label"/></th>
+						<th width="20%"><warehouse:message code="default.expires.label"/></th>
+						<th class="center" width="10%"><warehouse:message code="inventory.oldQty.label"/></th>
+						<th class="center" width="10%"><warehouse:message code="inventory.newQty.label"/></th>
+						<th class="left" width="30%"><warehouse:message code="default.actions.label"/></th>
 					</tr>											
 				</thead>									
 				<tbody>												
@@ -62,10 +62,10 @@
 									<g:hiddenField name="recordInventoryRows[${status}].oldQuantity" value="${recordInventoryRow?.oldQuantity }"/>
 								</td>	
 								<td class="middle center">
-									<g:textField style="text-align: center;" id="newQuantity-${status }" class="newQuantity" name="recordInventoryRows[${status }].newQuantity" size="3" value="${recordInventoryRow?.newQuantity }" onFocus="this.select();" onClick="this.select();"/>
+									<g:textField id="newQuantity-${status }" class="newQuantity text right" name="recordInventoryRows[${status }].newQuantity" size="5" value="${recordInventoryRow?.newQuantity }" onFocus="this.select();" onClick="this.select();"/>
 								</td>
-								<td>
-								
+								<td class="middle left">
+									<img class="addAnother" src="${createLinkTo(dir:'images/icons/silk', file:'add.png') }"/>								
 								</td>
 							</tr>
 						</g:each>
@@ -83,15 +83,8 @@
 					
 				</tbody>
 				<tfoot>
-					<tr>
-						<td colspan="5" class="center">
-						
-							<button id="addAnother" type="button" class="positive">
-								<img src="${createLinkTo(dir:'images/icons/silk', file:'add.png') }"/>&nbsp;<warehouse:message code="default.button.add.label"/>&nbsp;
-							</button>
-							&nbsp;
-						
-						
+					<tr class="odd">
+						<td colspan="5" class="middle center">
 							<button name="save" type="submit" class="positive">
 								<img src="${createLinkTo(dir:'images/icons/silk', file:'accept.png') }"/>&nbsp;<warehouse:message code="default.button.save.label"/>&nbsp;
 							</button>
@@ -122,7 +115,7 @@
 	}
 	
 	function getClass() {
-		return ($.inArray( this.data, inventory.InventoryItems ) % 2) ? "odd" : "even";
+		return ($.inArray( this.data, inventory.InventoryItems ) % 2) ? "even" : "odd";
 	}
 
 
@@ -224,25 +217,26 @@
 
 	$(document).ready(function() {
 
-		$('#addAnother').focus();		
-		$('#addAnother').click(function(event) { 
-			event.preventDefault();
-			var inventoryItem = {Qty: 0};
-			// Add to the array of new inventory items
-			inventory.InventoryItems.push(inventoryItem);
-
-			$("#emptyRow").hide();
-
-			// Add a new row to the table
-			$("#newRowTemplate").tmpl(inventoryItem).appendTo('#inventoryItemsTable');		
-			//$("#inventoryItemsTable tbody tr:even").addClass("even");
-			//$("#inventoryItemsTable tbody tr:odd").addClass("odd");
-
-			
-			$('#inventoryItemsTable tbody tr:last').find('.lotNumber').focus();
-					
+		//$('.addAnother').focus();		
+		$('.addAnother').livequery(function() { 
+			$(this).click(function(event) { 
+				event.preventDefault();
+				var inventoryItem = {Qty: 0};
+				// Add to the array of new inventory items
+				inventory.InventoryItems.push(inventoryItem);
+	
+				$("#emptyRow").hide();
+	
+				// Add a new row to the table
+				$("#newRowTemplate").tmpl(inventoryItem).appendTo('#inventoryItemsTable');		
+				//$("#inventoryItemsTable tbody tr:even").addClass("even");
+				//$("#inventoryItemsTable tbody tr:odd").addClass("odd");
+	
+				
+				$('#inventoryItemsTable tbody tr:last').find('.lotNumber').focus();
+						
+			});
 		});
-
 
 		//$('.newQuantity').livequery(function() { 
 		//	$(this).blur(function() { $('#addAnother').focus();	});
@@ -333,7 +327,7 @@
 <script id="newRowTemplate" type="x-jquery-tmpl">
 <tr id="row-{{= getIndex()}}" class="{{= getClass()}}">	
 	<td width="15%">
-		<g:textField id="lotNumber-{{= getIndex()}}" name="recordInventoryRows[{{= getIndex()}}].lotNumber" value="{{= LotNumber}}" size="15"  /><br/>
+		<g:textField id="lotNumber-{{= getIndex()}}" class="text" name="recordInventoryRows[{{= getIndex()}}].lotNumber" value="{{= LotNumber}}" size="25" /><br/>
 		<%--
 		<g:textField id="lotNumber-{{= getIndex()}}" class="lotNumber" name="lotNumber-{{= getIndex()}}" value="{{= LotNumber}}" size="15"  /><br/>
 		<g:hiddenField id="lotNumberValue-{{= getIndex()}}" class="lotNumberValue" name="recordInventoryRows[{{= getIndex()}}].lotNumber" value="{{= LotNumber}}" size="10"  />
@@ -357,11 +351,11 @@
 		<g:hiddenField id="oldQuantity-{{= getIndex()}}" class="oldQuantity" name="recordInventoryRows[{{= getIndex()}}].oldQuantity" value="{{= Qty}}"/>
 	</td>	
 	<td width="10%" style="text-align: center; vertical-align: middle;">
-		<g:textField style="text-align: center;"  
-			id="newQuantity-{{= getIndex()}}" class="newQuantity" name="recordInventoryRows[{{= getIndex()}}].newQuantity" size="3" value="{{= Qty}}" onFocus="this.select();" onClick="this.select();"/>
+		<g:textField  
+			id="newQuantity-{{= getIndex()}}" class="newQuantity right text" name="recordInventoryRows[{{= getIndex()}}].newQuantity" size="5" value="{{= Qty}}" onFocus="this.select();" onClick="this.select();"/>
 
 	</td>	
-	<td width="5%" style="text-align: center;">
+	<td width="5%" class="left">
 		<%--
 			<button id="buttonUp-{{= getIndex()}}" class="buttonUp">
 				<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_up.png') }"/>
@@ -370,6 +364,7 @@
 				<img src="${createLinkTo(dir: 'images/icons/silk', file: 'bullet_arrow_down.png') }"/>
 			</button>
 		--%>
+		<img class="addAnother" src="${createLinkTo(dir:'images/icons/silk', file:'add.png') }"/>&nbsp;
 		<a href="#" onclick="removeRow({{= getIndex()}});"><img src="${createLinkTo(dir:'images/icons/silk', file:'delete.png')}"/></a>
 		<g:hiddenField name="recordInventoryRows[{{= getIndex()}}].id" value="{{= Id}}" size="1" />
 	</td>
