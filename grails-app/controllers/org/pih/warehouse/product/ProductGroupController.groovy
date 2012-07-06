@@ -124,10 +124,7 @@ class ProductGroupController {
 				return
 			}
 			
-			log.info(params['product.id'])
-			
 			productGroupInstance.products = productService.getProducts(params['product.id'])
-			log.info "Products after: " + productGroupInstance.products
 			
             if (!productGroupInstance.hasErrors() && productGroupInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), productGroupInstance.id])}"
