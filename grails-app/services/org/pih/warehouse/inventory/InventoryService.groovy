@@ -1065,7 +1065,7 @@ class InventoryService implements ApplicationContextAware {
 		// Using set to make sure we only return one object per inventory items
 		Set inventoryItems = getInventoryItemsByProductAndInventory(cmd.productInstance, cmd.inventoryInstance);
 		cmd.inventoryItemList = inventoryItems as List		
-		cmd.inventoryItemList.sort { it.expirationDate }
+		cmd.inventoryItemList?.sort { it.expirationDate }?.sort{ it.lotNumber } 
 		
 		// Get all lot numbers for a given product
 		cmd.lotNumberList = getInventoryItemsByProduct(cmd?.productInstance) as List
@@ -1120,7 +1120,9 @@ class InventoryService implements ApplicationContextAware {
 				inventoryItemRow.newQuantity = quantity
 				commandInstance.recordInventoryRows.add(inventoryItemRow)
 			}
+			
 		}
+		println "wtf?"
 		return commandInstance
 	}
 		

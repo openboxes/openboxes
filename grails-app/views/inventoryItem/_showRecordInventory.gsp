@@ -33,7 +33,7 @@
 				<tbody>												
 					<g:set var="inventoryItems" value="${commandInstance?.recordInventoryRows.findAll{it.oldQuantity != 0 || it.newQuantity != 0}}"/>	
 					<g:if test="${inventoryItems }">											
-						<g:each var="recordInventoryRow" in="${inventoryItems.sort { it.lotNumber }}" status="status">
+						<g:each var="recordInventoryRow" in="${inventoryItems?.sort { it.expirationDate }?.sort { it.lotNumber } }" status="status">
 							<g:set var="styleClass" value="${params?.inventoryItem?.id && recordInventoryRow?.id == params?.inventoryItem?.id ? 'selected-row' : ''}"/>
 							<tr class="${styleClass} ${status%2==0?'even':'odd'}">
 								<td>
