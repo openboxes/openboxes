@@ -28,16 +28,6 @@
 								</tr>
 								<tr>
 									<td>
-										<g:link controller="product" action="list"><warehouse:message code="inventory.showAllProducts.label"/></g:link>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<g:link controller="product" action="list"><warehouse:message code="product.list.label"/></g:link>
-									</td>
-								</tr>
-								<tr>
-									<td>
 										<g:link controller="product" action="create"><warehouse:message code="product.add.label"/></g:link>
 									</td>					
 								</tr>

@@ -1122,7 +1122,6 @@ class InventoryService implements ApplicationContextAware {
 			}
 			
 		}
-		println "wtf?"
 		return commandInstance
 	}
 		

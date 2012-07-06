@@ -1029,17 +1029,26 @@ class ShipmentController {
 
 			def shipment = Shipment.get(shipmentContainer[0])
 			def container = Container.get(shipmentContainer[1])
-			
+
+			if (!shipment) { 
+				command.errors.rejectValue("items", "addToShipment.container.invalid")
+				render(view: "addToShipment", model: [commandInstance: command])
+				return;
+			}
+						
 		   command.items.each {
 			   it.shipment = shipment
 			   it.container = container
 		   }
 	
+
 			try { 
 				boolean atLeastOneUpdate = shipmentService.addToShipment(command);
 				if (atLeastOneUpdate) { 
 					flash.message = "${warehouse.message(code: 'shipping.shipmentItemsHaveBeenAdded.message')}"
-					redirect(controller:"createShipmentWorkflow", action: "createShipment", id: shipment.id, params: ["skipTo":"Packing","container.id":container.id])
+					redirect(controller:"createShipmentWorkflow", action: "createShipment", 
+						id: shipment.id, params: ["skipTo":"Packing","containerId":container.id])
+					
 					return;
 				}
 				else { 

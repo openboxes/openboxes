@@ -62,28 +62,36 @@
 					<span class="name"><warehouse:message code="category.label"/></span>
 				</td>
 				<td>
-					<span class="value">
+					<div class="value">
 						<g:if test="${productInstance?.category?.name }">
 							<format:category category="${productInstance?.category}"/>
 						</g:if>
 						<g:else>
 							<span class="fade"><warehouse:message code="default.none.label"/></span>
 						</g:else>
-					</span>
+					</div>
+					<g:each var="category" in="${productInstance?.categories }">						
+						<div>
+							<format:category category="${category}"/>
+						</div>
+					</g:each>
+					
 				</td>
 			</tr>
-			<tr class="even">	
-				<td class="label left">
-					<span class="name"><warehouse:message code="productGroup.label"/></span>
-				</td>
-				<td>
-					<g:each var="productGroup" in="${productInstance?.productGroups }">
-						<g:link controller="productGroup" action="edit" id="${productGroup.id }">
-						${productGroup?.description }
-						</g:link>
-					</g:each>			
-				</td>
-			</tr>
+			<g:if test="${productInstance?.productGroups }">
+				<tr class="even">	
+					<td class="label left">
+						<span class="name"><warehouse:message code="productGroup.label"/></span>
+					</td>
+					<td>
+						<g:each var="productGroup" in="${productInstance?.productGroups }">
+							<g:link controller="productGroup" action="edit" id="${productGroup.id }">
+							${productGroup?.description }
+							</g:link>
+						</g:each>			
+					</td>
+				</tr>
+			</g:if>
 			<tr class="even">	
 				<td class="left label">
 					<span class="name"><warehouse:message code="product.units.label"/></span>

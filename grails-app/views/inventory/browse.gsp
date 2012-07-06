@@ -130,7 +130,7 @@
 																			tr.productGroupProduct { }
 																			tr.productGroupProducts { }
 																		</style>
-																		<g:each var="inventoryItem" in="${categoryInventoryItems}" status="status">																			
+																		<g:each var="inventoryItem" in="${categoryInventoryItems}" status="status">		
 																			<g:if test="${inventoryItem.product }">
 																				<g:render template="browseProduct" model="[counter:counter,inventoryItem:inventoryItem,cssClass:'product']"/>
 																			</g:if>
