@@ -856,4 +856,7 @@ img.photo_tiny {
   height: 16px;
 }
 
+.readonly { 
+	color: grey;
+}
 

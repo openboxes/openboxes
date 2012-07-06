@@ -62,10 +62,10 @@
 										</td>
 										<td>
 											<g:if test="${itemToMove.container}">
-												<g:textField id="newQuantity-0" class="updateQuantity" name="quantity-0" size="3" value="0"></g:textField>
+												<g:textField id="newQuantity-0" class="updateQuantity" name="quantity-0" size="8" value="0"></g:textField>
 											</g:if>
 											<g:else>
-												<g:textField id="currentQuantity" class="currentQuantity" name="quantity-0" size="3" readonly="readonly" value="${itemToMove?.quantity}"></g:textField>
+												<g:textField id="currentQuantity" class="currentQuantity readonly" name="quantity-0" size="8" readonly="readonly" value="${itemToMove?.quantity}"></g:textField>
 											</g:else>
 										</td>
 									</tr>
@@ -79,10 +79,10 @@
 											</td>
 											<td>
 												<g:if test="${containerTo != itemToMove.container}">
-													<g:textField id="newQuantity-${containerTo?.id}" class="updateQuantity" name="quantity-${containerTo?.id}" size="3" value="0"></g:textField>
+													<g:textField id="newQuantity-${containerTo?.id}" class="updateQuantity" name="quantity-${containerTo?.id}" size="8" value="0"></g:textField>
 												</g:if>
 												<g:else>
-													<g:textField id="currentQuantity" class="currentQuantity" name="quantity-${containerTo?.id}" size="3" readonly="readonly" value="${itemToMove?.quantity}"></g:textField>
+													<g:textField id="currentQuantity" class="currentQuantity readonly" name="quantity-${containerTo?.id}" size="8" readonly="readonly" value="${itemToMove?.quantity}"></g:textField>
 												</g:else>
 											</td>
 										</tr>									
@@ -90,7 +90,7 @@
 								</table>
 								
 							</div>
-							<g:hiddenField id="totalQuantity" class="totalQuantity" name="totalQuantity" size="3" disabled="true" value="${itemToMove?.quantity}"/>
+							<g:hiddenField id="totalQuantity" class="totalQuantity" name="totalQuantity" disabled="true" value="${itemToMove?.quantity}"/>
 						</td>
 					</tr>
 					<tr>
