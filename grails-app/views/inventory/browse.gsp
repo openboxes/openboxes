@@ -8,7 +8,7 @@
         <title>
         	<warehouse:message code="default.browse.label" args="[entityName]" /> 
         	&rsaquo;
-        	${commandInstance?.categoryInstance }
+        	<format:category category="${commandInstance?.categoryInstance}"/>
         </title>    
     </head>    
     <body>

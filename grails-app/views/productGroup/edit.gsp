@@ -99,24 +99,14 @@
 								<td valign="top" class="name"><label for="category"><warehouse:message
 											code="productGroup.category.label" default="Category" /></label></td>
 								<td valign="top" class="value">
-
+									<%-- 
 									<g:selectCategoryMcDropdown id="category" name="category.id" 
 										value="${productGroupInstance?.category?.id}"/>									
-
-
-									<%-- 
-									<input type="text" id="category" name="category.id" value="${productGroupInstance?.category?.id }" class="medium text" />									
-									<ul id="categoryMenu" class="mcdropdown_menu">									
-										<g:selectCategory_v2
-											name="category.id"
-											value="${productGroupInstance?.category?.id }"/>
-									</ul>
-									<script>
-										$(document).ready(function() {			
-											$("#category").mcDropdown("#categoryMenu"); 
-										});		
-									</script>	
 									--%>
+									<g:hiddenField name="oldCategory.id" value="${productGroupInstance?.category?.id }"/>
+									<g:categorySelect id="category" name="category.id" 
+										value="${productGroupInstance?.category?.id}"/>									
+
 								</td>									
 							</tr>
 							<tr class="prop">
@@ -164,5 +154,13 @@
 			</fieldset>
 		</g:form>
 	</div>
+<script>
+	$(document).ready(function() {			
+		$("#category").change(function() {
+		    $(this).closest("form").submit();
+		});
+	});		
+</script>	
+	
 </body>
 </html>

@@ -119,11 +119,6 @@ class SelectTagLib {
 		out << g.select(attrs)
 	}
 	
-	
-	
-	
-	
-	
 
 	/**
 	 * Generic select widget using optgroup.

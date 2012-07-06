@@ -117,13 +117,18 @@ class ProductGroupController {
             }
 			productGroupInstance.properties = params
 			
-			log.info(params['product.id'])
+			// The user changed the category, so we want to redisplay the form with no products
+			if (params?.oldCategory?.id != productGroupInstance?.category?.id) { 
+				productGroupInstance.products = []
+				render(view: "edit", model: [productGroupInstance: productGroupInstance])
+				return
+			}
 			
+			log.info(params['product.id'])
 			
 			productGroupInstance.products = productService.getProducts(params['product.id'])
 			log.info "Products after: " + productGroupInstance.products
 			
-			            
             if (!productGroupInstance.hasErrors() && productGroupInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), productGroupInstance.id])}"
                 redirect(action: "edit", id: productGroupInstance.id)
