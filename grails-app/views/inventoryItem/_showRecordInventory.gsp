@@ -72,9 +72,10 @@
 					</g:if>
 					<g:else>
 						<tr id="emptyRow">
-							<td colspan="5" style="text-align: center; min-height: 400px;">
-								<div class="padded fade">
+							<td colspan="5" style="text-align: center;">
+								<div class="fade">
 									<warehouse:message code="inventory.addNewInventoryItem.message"/>
+									<img class="addAnother" src="${createLinkTo(dir:'images/icons/silk', file:'add.png') }"/>								
 								</div>
 							</td>
 						</tr>
@@ -213,6 +214,10 @@
 
 	function removeRow(index) { 
 		$('#row-' + index).remove();
+		var rows = $("#inventoryItemsTable tbody tr");
+		if (rows.length <= 1) { 
+			$("#emptyRow").show();
+		}
 	}
 
 	$(document).ready(function() {
