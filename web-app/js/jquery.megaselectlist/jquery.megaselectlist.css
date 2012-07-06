@@ -1,0 +1,49 @@
+/* Recommended styles */
+        
+                .megaselectlistcolumn {
+                        width: 31%;
+                        margin: 0 1%;
+                        float: left;
+                }
+                
+                .megaselectlist .currentitem {
+                        padding: 0;
+                        border: 0.1em dotted Green;
+                        color: Black;
+                }
+        
+                /* Optional styles */
+                
+                .megaselectlist {
+                        background-color: #F5F5F5;
+                        border: 1px solid Silver;
+                }
+                
+                .megaselectlistcolumn > h2 {
+                        font-size: 1em;
+                        background-color: #ECECEC;
+                        text-align: center;
+                        padding: 2px 0;
+                        margin: 0;
+                }
+                
+                .megaselectlist > p {
+                        margin: 0.2em;
+                }
+                
+                .megaselectlistcolumn > ul {
+                        padding-left: 1em;
+                        margin: 0;
+                        color: Gray;
+                }
+                
+                .megaselectlistcolumn > ul > li {
+                        cursor: pointer;
+                        padding: 0.1em;
+                        font-size: small;
+                }
+                
+                .megaselectlistcolumn > ul > li:hover {
+                        background-color: #ECECEC;
+                        color: Black;
+                }

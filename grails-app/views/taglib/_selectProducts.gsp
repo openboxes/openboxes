@@ -3,20 +3,25 @@
 	<tr>
 		<td style="width: 50%;">
 			<g:set var="selectedProducts" value="${attrs.value }"/>
+			
 			<h2>Selected (${selectedProducts.size() })</h2>
-			<div class="" style="overflow: auto; mix-height: 100px; height: 233px;">
-				<table>
+			<div class="" style="overflow: auto; height: 233px;">
+				<table id="selectedProducts" class="products">
+					<thead>
+						<tr class="prop">
+							<th class="middle center"><input type="checkbox" class="checkAll" checked="checked"> </th>
+							<th><warehouse:message code="products.label"/></th>
+						</tr>
+					</thead>
 					<tbody>
 						<g:each var="product" in="${selectedProducts }" status="i">
 							<tr class="prop ${i%2?'even':'odd' }">
 								<td width="1%">
-									<g:checkBox name="${attrs.name }" value="${product.id }" checked="${attrs.value.contains(product) }"></g:checkBox>
+									<g:checkBox name="${attrs.name }" value="${product.id }" class="selectedProduct"
+										checked="${attrs.value.contains(product) }"></g:checkBox>
 								</td>
 								<td>
-									${product.name }
-									<span class="fade">
-										${product.manufacturer }
-									</span>
+									${product.name } <span class="fade">${product.manufacturer }</span>
 								</td>
 							</tr>
 						</g:each>
@@ -28,13 +33,21 @@
 		<td>
 		
 			<g:set var="availableProducts" value="${attrs.products.findAll { !attrs.value.contains(it) }}"/>
+			
 			<h2>Available (${availableProducts.size() })</h2>
-			<div style="padding: 10px;" class="odd">
-				<g:textField id="productFilter" name="productFilter" value="" size="40" class="medium text"/>
-			</div>
-		
-			<div class="" style="overflow: auto; mix-height: 100px; height: 200px;">
-				<table id="data">
+			<div class="" style="overflow: auto; height: 233px;">
+				<table id="availableProducts" class="products">				
+					<thead>
+						<tr class="prop">
+							<th class="middle center">
+								<input type="checkbox" class="checkAll" />
+							</th>
+							<th class="middle">
+								<g:textField id="productFilter" name="productFilter" value="" size="40" 
+									class="medium text"/>
+							</th>
+						</tr>
+					</thead>				
 					<tbody>
 						<g:each var="product" in="${availableProducts }" status="i">
 							<tr class="prop ${i%2?'odd':'even' }">
@@ -44,7 +57,9 @@
 										<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" />
 									</g:link>
 									--%>
-									<g:checkBox class="product-checkbox" name="${attrs.name }" value="${product.id }" checked="${attrs.value.contains(product) }"></g:checkBox>
+									<g:checkBox class="availableProduct" 
+										name="${attrs.name }" value="${product.id }" 
+										checked="${attrs.value.contains(product) }"></g:checkBox>
 								</td>
 								<td>
 									${product.name }
@@ -79,14 +94,29 @@
 	    
 
 	$(document).ready(function() {			
-		zebraRows('#data tbody tr:odd', 'odd');
+		zebraRows('#availableProducts tbody tr:odd', 'odd');
 
+		/*
+		$(".checkAll").click(function(){
+			if($(this).attr('checked')) { 
+				$('.availableCheckbox').attr('checked','checked');
+			}
+			else { 
+				$('.availableCheckbox').removeAttr('checked');
+			}
+		});
+		*/
+
+		// Check all checkboxes under the same DIV element
+		$('.checkAll').click(function () {
+			$(this).parents('div:eq(0)').find(':checkbox').attr('checked', this.checked);		
+		});
 
 		$("#productFilter").watermark("${warehouse.message(code:'product.filterProducts.label')}");	
 		
-		$("#category\\.id").change(function() {
-			$(this).closest("form").submit();
-		});
+		//$("#category").change(function() {
+		//	$(this).closest("form").submit();
+		//});
 
 		//$('#demotable').tableFilter();
 		//default each row to visible
@@ -99,11 +129,11 @@
 
 			    //we want each row to be visible because if nothing
 			    //is entered then all rows are matched.
-				$('#data tbody tr').removeClass('visible').show().addClass('visible');
+				$('#availableProducts tbody tr').removeClass('visible').show().addClass('visible');
 			}
 			//if there is text, lets filter
 			else {
-				filter('#data tbody tr', $(this).val(), '|');  // '|' or '&'
+				filter('#availableProducts tbody tr', $(this).val(), '|');  // '|' or '&'
 			}
 			//reapply zebra rows
 			$('.visible td').removeClass('odd');

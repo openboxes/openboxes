@@ -59,7 +59,7 @@
         <g:render template='category' model="['category':category,'i':i,'hidden':false]"/>
     </g:each>
 </div>
-<div class="left">
+<div style="padding: 5px;">
 	<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" />
 	<a href="#" onclick="addCategory();" class="middle"><warehouse:message code="product.addAnotherCategory.label"/></a>
 </div>

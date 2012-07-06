@@ -45,12 +45,25 @@
 				<g:renderErrors bean="${productGroupInstance}" as="list" />
 			</div>
 		</g:hasErrors>
+		<div class="buttonBar">            	
+           	<span class="linkButton">
+           		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
+           	</span>
+           	<span class="linkButton">
+           		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
+           	</span>
+		</div>
 		<g:form method="post" action="update">
+		
+		
 			<fieldset>
 				<g:hiddenField name="id" value="${productGroupInstance?.id}" />
 				<g:hiddenField name="version"
 					value="${productGroupInstance?.version}" />
 				<div class="dialog">
+					
+				
+				
 					<table>
 						<tbody>
 							<tr class="prop">
@@ -86,11 +99,25 @@
 								<td valign="top" class="name"><label for="category"><warehouse:message
 											code="productGroup.category.label" default="Category" /></label></td>
 								<td valign="top" class="value">
-								
-									<g:selectCategory_v2
-										id="category.id" name="category.id"
-										value="${productGroupInstance?.category?.id }"/>
-									
+
+									<g:selectCategoryMcDropdown id="category" name="category.id" 
+										value="${productGroupInstance?.category?.id}"/>									
+
+
+									<%-- 
+									<input type="text" id="category" name="category.id" value="${productGroupInstance?.category?.id }" class="medium text" />									
+									<ul id="categoryMenu" class="mcdropdown_menu">									
+										<g:selectCategory_v2
+											name="category.id"
+											value="${productGroupInstance?.category?.id }"/>
+									</ul>
+									<script>
+										$(document).ready(function() {			
+											$("#category").mcDropdown("#categoryMenu"); 
+										});		
+									</script>	
+									--%>
+								</td>									
 							</tr>
 							<tr class="prop">
 								<td valign="top" class="name"><label for="products"><warehouse:message

@@ -44,15 +44,16 @@
 								<td valign='top' class='name'><label for='description'><warehouse:message code="default.description.label"/>:</label>
 								</td>
 								<td valign='top' class='value ${hasErrors(bean:request,field:'description','errors')}'>
-									<input type="text" name='description' value="${requestInstance?.description?.encodeAsHTML()}" size="30"/>
+									<input type="text" name='description' class="text" value="${requestInstance?.description?.encodeAsHTML()}" size="60"/>
 								</td>
 							</tr>
 							<tr class='prop'>
 								<td valign='top' class='name'><label for='source'><warehouse:message code="request.from.label"/>:</label>
 								</td>
 								<td valign='top' class='value ${hasErrors(bean:requestInstance,field:'origin','errors')}'>
-									<g:selectRequestSupplier name="origin.id" 
-										optionKey="id" value="${requestInstance?.origin?.id}" noSelection="['null':'']"/>
+									<g:selectRequestSupplier name="origin.id" class="comboBox text"
+										optionKey="id" value="${requestInstance?.origin?.id}" 
+										noSelection="['null':'...']"/>
 								</td>
 							</tr>
 							<tr class='prop'>
@@ -74,6 +75,8 @@
 					</table>
 					<div class="buttons" style="border-top: 1px solid lightgrey;">
 						<g:submitButton name="next" value="${warehouse.message(code:'default.button.next.label')}"></g:submitButton> 
+						&nbsp;
+						
 						<g:link action="createRequest" event="cancel"><warehouse:message code="default.button.cancel.label"/></g:link>
 					</div>
 				</fieldset>

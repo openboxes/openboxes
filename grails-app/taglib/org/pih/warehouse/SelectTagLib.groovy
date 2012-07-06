@@ -118,8 +118,16 @@ class SelectTagLib {
 		attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]"}
 		out << g.select(attrs)
 	}
+	
+	
+	
+	
+	
+	
 
-
+	/**
+	 * Generic select widget using optgroup.
+	 */
     def selectWithOptGroup = {attrs ->
         def messageSource = grailsAttributes.getApplicationContext().getBean("messageSource")
         def locale = RCU.getLocale(request)

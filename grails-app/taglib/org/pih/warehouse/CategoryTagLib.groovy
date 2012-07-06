@@ -22,24 +22,33 @@ class CategoryTagLib {
 		}
 	}
 	
+	def selectCategoryWithChosen = { attrs -> 
+		out << """
+			<select multiple="true" data-placeholder="${attrs.noSelection.value}" name="${attrs.name}" style="${attrs.style}" value="${attrs.value}" class='${attrs.class}'>
+		"""
+		displayCategoryOptions(attrs['rootNode'], attrs.value, 0);
+		out << "</select>";
+	}
 	
 	def selectCategory = { attrs ->
-		out << "<select multiple=\"true\" size=\"5\" name='" + attrs.name + "'>";
-		displayCategorySelect(attrs['rootNode'], 0);
+		out << "<select multiple=\"true\" name='" + attrs.name + "' class='"+ attrs.cssClass +"'>";
+		displayCategoryOptions(attrs['rootNode'], attrs.value, 0);
 		out << "</select>";
 	}
 	
 	
-	def displayCategorySelect = { node, depth ->
+	
+	def displayCategoryOptions = { node, value, depth ->
 		if (node) {
 			if (node.id) {
-				out << "<option value=\"" + node?.id + "\">" + includeIndent(depth) + node?.name + "</option>";
+				println value?.id + " == " + node?.id
+				def selected = (value == node)
+				out << """<option value="${node?.id}" ${selected?"selected":""}>${includeIndent(depth) + node?.name}</option>"""
 			}
 			if (node.categories) {
-
 				//out << includeIndent(depth)
 				node.categories.each { 
-					displayCategorySelect(it, depth+1);
+					displayCategoryOptions(it, value, depth+1);
 				}
 			}
 		}

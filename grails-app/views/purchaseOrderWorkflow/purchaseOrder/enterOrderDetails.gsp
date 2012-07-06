@@ -79,7 +79,7 @@
 								<td valign='top' class='name'><label for='orderedBy'><warehouse:message code="order.orderedBy.label"/>:</label></td>
 								<td valign='top'
 									class='value ${hasErrors(bean:order,field:'orderedBy','errors')}'>
-									<g:select class="combobox" name="orderedBy.id" from="${org.pih.warehouse.core.Person.list().sort{it.lastName}}" optionKey="id" value="${order?.orderedBy?.id}" noSelection="['':'']"/>
+									<g:select class="comboBox" name="orderedBy.id" from="${org.pih.warehouse.core.Person.list().sort{it.lastName}}" optionKey="id" value="${order?.orderedBy?.id}" noSelection="['':'']"/>
 	
 								</td>
 							</tr>

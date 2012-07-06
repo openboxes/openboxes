@@ -16,9 +16,9 @@
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'menu.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'form.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footer.css')}" type="text/css" media="screen, projection" />	
-	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'wizard.css')}" type="text/css" media="screen, projection" />
-	
+	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'wizard.css')}" type="text/css" media="screen, projection" />	
 	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="screen, projection" />
+	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.mcdropdown/css',file:'jquery.mcdropdown.css')}" type="text/css" media="screen, projection" />
 
 	<!-- Include javascript files -->
 	<g:javascript library="application"/>
@@ -56,8 +56,12 @@
 	<script src="${createLinkTo(dir:'js/jquery.fileupload/', file:'jquery.iframe-transport.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.fileupload/vendor/', file:'jquery.ui.widget.js')}" type="text/javascript" ></script>
 	-->
+	<script src="http://jquery-option-tree.googlecode.com/files/jquery.optionTree.js" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/jquery.mcdropdown/', file:'jquery.mcdropdown.js')}" type="text/javascript" ></script>
+
+
+
 		
-	
  	<!-- Include Jquery Validation and Jquery Validation UI plugins -->
  	<jqval:resources />       
     <jqvalui:resources />

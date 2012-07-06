@@ -14,13 +14,18 @@
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
-            <div class="list">
             
-				<div>            	
-	            	<span class="linkButton">
-	            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="['productGroup']"/></g:link>
-	            	</span>
-            	</div>
+            
+			<div class="buttonBar">            	
+            	<span class="linkButton">
+            		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
+            	</span>
+            	<span class="linkButton">
+            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
+            	</span>
+           	</div>
+            
+            <div class="list">
                 <table>
                     <thead>
                         <tr>
@@ -60,6 +65,8 @@
             <div class="paginateButtons">
                 <g:paginate total="${productGroupInstanceTotal}" />
             </div>
+        
         </div>
+        
     </body>
 </html>

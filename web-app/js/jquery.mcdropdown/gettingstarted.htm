@@ -1,0 +1,423 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<title>Giva Labs - mcDropdown jQuery Plug-in | Giva</title>
+
+	<link type="text/css" href="./css/docs.css" rel="stylesheet" media="all" />
+	<link type="text/css" href="./css/jquery.mcdropdown.min.css" rel="stylesheet" media="all" />
+
+	<!---// load jQuery from the GoogleAPIs CDN //--->
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+
+	<script type="text/javascript" src="./lib/jquery.mcdropdown.min.js"></script>
+	<script type="text/javascript" src="./lib/jquery.bgiframe.js"></script>
+
+	<script type="text/javascript">
+	<!--//
+	// on DOM ready
+	$(document).ready(function (){
+		$("#current_rev").html("v"+$.mcDropdown.version);
+		$("#category").mcDropdown("#categorymenu");
+	});
+	//-->
+	</script>
+</head>
+
+<body>
+
+			<h1 class="secttl">Giva Labs </h1>
+			<h2 class="sectag">mcDropdown jQuery Plug-in <span id="current_rev"></span></h2>
+			<h3 id="requirements">Requirements</h3>
+			<p>In order to use the mcDropdown plug-in, you need the following: </p>
+			<ul class="bullet">
+				<li class="bullet">jQuery v1.2.6 (or higher)*</li>
+				<li class="bullet">jquery.mcdropdown.js Plug-in</li>
+				<li class="bullet">jquery.bgiframe.js Plug-in (Optional; for fixing overlay issues in IE6)</li>
+			</ul>
+			<blockquote>
+				*
+				This plug-in may work with older versions of jQuery in the 1.2 family. If you try using this with an older version of jQuery, you will need to include the jquery.dimensions.js plug-in (as of jQuery v1.2.6 the jquery.dimensions.js
+				plug-in is included in the jQuery core.)</blockquote>
+
+			<h3 id="usage">Usage</h3>
+			<p>The mcDropdown plug-in has two main methods of being invoked. The first method creates a new instance of the widget on an existing element:</p>
+			<pre><code class="js">$(&quot;#mcdropdown&quot;).mcDropdown(list<em>, [options]</em>);</code></pre>
+			<blockquote>
+				<strong>NOTE:</strong>
+				The initial element that you apply the plug-in to is destroyed and replaced with a new input element with the same id attribute.
+				While the mcDropdown() method does not destroy the jQuery chain, it does effectively return a
+				"dirty" reference (since the original element no longer exists.) Because of this, you'll want to
+				make sure that the mcDropdown() method is the last call in your chain. Also, if you plan on caching
+				a reference to the element, you will need to create the cached instance <em>after</em> you initiated
+				the widget.			</blockquote>
+			<h4 id="arguments">Arguments</h4>
+			<dl>
+				<dt>list</dt>
+				<dd>
+					<p>This argument is <em><strong>required</strong></em>  and must point to an unordered list element. The list argument can be any one of the following:</p>
+					<ul class="bullet">
+						<li class="bullet">A jQuery selector to an unordered list (&lt;ul&gt;) element</li>
+						<li class="bullet">A jQuery object containing the unordered list</li>
+						<li class="bullet">An unordered list DOM element</li>
+					</ul>
+					<p>This should be a reference to a single list element.</p>
+				</dd>
+				<dt>options</dt>
+				<dd>
+					<p>This argument is <em><strong>optional</strong></em> and allows you to customize the settings used for each instance of the plug-in. For a list of all available options, see the <a href="#options">Options</a> section.</p>
+				</dd>
+			</dl>
+			<p>The second method of invoking the mcDropdown() plug-in is to return a reference to an existing instance of the mcDropdown() widget. So, once we have initiated an instance of the mcDropdown widget, we can do the following:</p>
+			<pre><code class="js">var dd = $(&quot;#mcdropdown&quot;).mcDropdown();</code></pre>
+			<p>Now that we have a reference to the widget, we can invoke any of the public methods available.</p>
+			<h4 id="methods">Public Methods</h4>
+			<dl class="methods">
+				<dt>dd.getValue()</dt>
+				<dd>
+					<p>Returns an array [value, label] containing the value stored in the hidden &lt;input /&gt; element and the label currently being displayed to the user. </p>
+				</dd>
+				<dt>dd.setValue(value)</dt>
+				<dd>
+					<p>Sets the instance of the mcDropdown widget to a specific value. The value passed should correspond the a valid list item (&lt;li&gt;) value.</p>
+				</dd>
+				<dt>dd.openMenu()</dt>
+				<dd>
+					<p>Programmatically opens the menu.</p>
+				</dd>
+				<dt>dd.closeMenu()</dt>
+				<dd>
+					<p>Programmatically closes the menu. (<strong>NOTE:</strong> Any click the user makes onscreen will also close the menu.)</p>
+				</dd>
+				<dt>dd.focus()</dt>
+				<dd>
+					<p>Calls the focus() event for the text input element.</p>
+				</dd>
+				<dt>dd.disable(boolean)</dt>
+				<dd>
+					<p>This method will either enabled (false) or disable (true) the dropdown widget. When the widget is disabled, the user
+					can not change the value via the UI.</p>
+				</dd>
+			</dl>
+			<h4 id="options">Options</h4>
+			<p>There are a number of options available for customizing the look and feel of the mcDropdown widget.</p>
+<pre><code class="js">{
+         minRows: 8                   // specify the minimum rows before creating a new column
+       , maxRows: 25                  // specify the maximum rows in a column
+       , targetColumnSize: 2          // specify the default target column size (it will attempt to create
+                                      // this many columns by default, unless the min/max row rules are not being met)
+       , openFx: "slideDown"          // the fx to use for showing the root menu
+       , openSpeed: 250               // the speed of the openFx
+       , closeFx: "slideUp"           // the fx to use for hiding the root menu
+       , closeSpeed: 250              // the speed of the closeFx
+       , hoverOverDelay: 200          // the delay before opening a submenu
+       , hoverOutDelay: 0             // the delay before closing a submenu
+       , showFx: "show"               // the fx to use when showing a submenu
+       , showSpeed: 0                 // the speed of the showFx
+       , hideFx: "hide"               // the fx to use when closing a submenu
+       , hideSpeed: 0                 // the speed of the hideFx
+       , dropShadow: true             // determine whether drop shadows should be shown on the submenus
+       , autoHeight: true             // always uses the lineHeight options (much faster than calculating height)
+       , lineHeight: 19               // the base height of each list item (li) this is normally calculated
+                                      // automatically, but in some cases the value can not be determined and
+                                      // you will need to set it manually
+       , screenPadding: 10            // the padding to use around the border of the screen -- this is used
+                                      // to make sure items stay on the screen
+       , allowParentSelect: false     // determines if parent items are allowed to be selected (by default
+                                      // only end nodes can be selected)
+       , delim: ":"                   // the delimited to use when showing the display string (must be single character)
+       , showACOnEmptyFocus: false    // show the autocomplete box on focus when input is empty
+       , valueAttr: "rel"             // the attribute that contains the value to use in the hidden field
+       , click: null                  // callback that occurs when the user clicks on a menu item
+       , select: null                 // callback that occurs when a value is selected
+       , init: null                   // callback that occurs when the control is fully initialized
+}</code></pre>
+			<h4 id="keyboard_usage">Keyboard Usage</h4>
+			<ul class="bullet">
+				<li class="bullet">Place the cursor in the text box and start typing, only characters that are exact matches will be registered</li>
+				<li class="bullet">If the value you want is selected, press any of the following keys to either select the value or go to the next level of the tree: [ENTER], [TAB], [RIGHT ARROW] or [:] (or the character you set for the <em>delim</em> option.)</li>
+				<li class="bullet">To delete the last typed character, press [BACKSPACE]</li>
+				<li class="bullet">To go back to the parent node, press [LEFT ARROW]</li>
+				<li class="bullet">Press [UP ARROW] or [DOWN ARROW] to cycle through valid options</li>
+				<li class="bullet">If you do not leave the field before getting to the end node in the tree, the input element will automatically be filled in the first end node match it finds</li>
+			</ul>
+			<h3 id="getting_started">Getting Started</h3>
+			<p>The first thing we need to do is to load the required JavaScript libraries and the CSS stylesheet used by the widget:</p>
+<pre><code class="html">&lt;script type=&quot;text/javascript&quot; src=&quot;./lib/jquery-1.2.6.min.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;./lib/jquery.mcdropdown.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;./lib/jquery.bgiframe.js&quot;&gt;&lt;/script&gt;
+
+&lt;!---// load the mcDropdown CSS stylesheet //---&gt;
+&lt;link type=&quot;text/css&quot; href=&quot;./css/jquery.mcdropdown.css&quot; rel=&quot;stylesheet&quot; media=&quot;all&quot; /&gt;</code></pre>
+			<p>Before you can invoke an instance of the mcDropdown widget, you must have an unordered list element—which is used as your menu. If you have ever used the &quot;suckerfish&quot; technique, then setting up the list element is very straight forward. One of the key features of this widget is its ability to display hierarchical data structures that are very deep. However, for this example we will keep the HTML simple and straightforward. The default CSS stylesheet Giva provides expect that all unordered lists being used as menus will have a class of &quot;mcdropdown_menu.&quot; If you choose to use a different class name, make sure to update the CSS file accordingly. </p>
+			<pre><code class="html">&lt;ul id=&quot;categorymenu&quot; class=&quot;mcdropdown_menu&quot;&gt;
+	&lt;li rel=&quot;1&quot;&gt;
+		Arts &amp;amp; Humanities
+		&lt;ul&gt;
+			&lt;li rel=&quot;2&quot;&gt;
+				Photography
+				&lt;ul&gt;
+					&lt;li rel=&quot;3&quot;&gt;
+						3D
+					&lt;/li&gt;
+					&lt;li rel=&quot;4&quot;&gt;
+						Digital
+					&lt;/li&gt;
+				&lt;/ul&gt;
+			&lt;/li&gt;
+			&lt;li rel=&quot;5&quot;&gt;
+				History
+			&lt;/li&gt;
+			&lt;li rel=&quot;6&quot;&gt;
+							Literature
+			&lt;/li&gt;
+		&lt;/ul&gt;
+	&lt;/li&gt;
+	&lt;li rel=&quot;7&quot;&gt;
+		Business &amp;amp; Economy
+	&lt;/li&gt;
+	&lt;li rel=&quot;8&quot;&gt;
+		Computers &amp;amp; Internet
+	&lt;/li&gt;
+	&lt;li rel=&quot;9&quot;&gt;
+		Education
+	&lt;/li&gt;
+	&lt;li rel=&quot;11&quot;&gt;
+		Entertainment
+		&lt;ul&gt;
+			&lt;li rel=&quot;12&quot;&gt;
+				Movies
+			&lt;/li&gt;
+			&lt;li rel=&quot;13&quot;&gt;
+				TV Shows
+			&lt;/li&gt;
+			&lt;li rel=&quot;14&quot;&gt;
+				Music
+			&lt;/li&gt;
+			&lt;li rel=&quot;15&quot;&gt;
+				Humor
+			&lt;/li&gt;
+		&lt;/ul&gt;
+	&lt;/li&gt;
+	&lt;li rel=&quot;10&quot;&gt;
+		Health
+	&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+
+			<p>Notice how each of the &lt;li&gt; elements contains the &quot;rel&quot; attribute? This is used to define the unique &quot;value&quot; for each item. This allows you to display whatever text you want to the user, but store a value that corresponds to a unique identifier. When a user selects an item from the menu, it is this value that is placed in a hidden &lt;input /&gt; element and therefore passed back to the server when the form is submitted. If you wish to use a different attribute to store your value, you can use the <em>valueAttr</em> option to change this to any attribute you want. </p>
+			<p>Now that the list element has been created, you need to create a DOM element that  will become the widget:</p>
+			<pre><code class="html">&lt;input type=&quot;text&quot; name=&quot;category&quot; id=&quot;category&quot; value=&quot;&quot; /&gt;</code></pre>
+			<p>You can invoke the mcDropdown() plug-in on any block display element (like a &lt;div&gt;,) but by binding it to a text input element you will enable the keyboard entry feature. </p>
+			<p>The next step is to actually create an instance of the mcDropdown widget. You want to make sure to initialize the widget after all the necessary DOM elements are available, which makes the document.ready event a great place to initialize the widget. </p>
+<pre><code class="html">&lt;script type=&quot;text/javascript&quot;&gt;
+$(document).ready(function (){
+	$("#category").mcDropdown("#categorymenu");
+});
+&lt;/script&gt;</code></pre>
+			<p>Now let us take a look at what the code above produced.</p>
+			<h3 id="example">Example</h3>
+			<!--// start example code //-->
+			<p>
+				Please select a category:<br />
+				<input type="text" name="category" id="category" value="" />
+			</p>
+			
+			<blockquote>
+				<strong>NOTE:</strong> Safari/Webkit has a <a href="http://blog.pengoworks.com/index.cfm/2008/3/17/Safari-CSS-hover-and-Adjacent-Sibling-Selector-Bug" target="_new">bug 
+				in CSS engine when using the :hover psuedo class with the adajacent sibling selector</a>. If you notice
+				weird artifacts after mousing over elements, it's related to this CSS bug.
+			</blockquote>
+
+			<ul id="categorymenu" class="mcdropdown_menu">
+				<li rel="1">
+					Arts &amp; Humanities
+					<ul>
+						<li rel="2">
+							Photography
+							<ul>
+								<li rel="3">
+									3D								</li>
+								<li rel="4">
+									Digital								</li>
+							</ul>
+						</li>
+						<li rel="5">
+							History						</li>
+						<li rel="6">
+							Literature						</li>
+					</ul>
+				</li>
+				<li rel="7">
+					Business &amp; Economy				</li>
+				<li rel="8">
+					Computers &amp; Internet				</li>
+				<li rel="9">
+					Education				</li>
+				<li rel="11">
+					Entertainment
+					<ul>
+						<li rel="12">
+							Movies						</li>
+						<li rel="13">
+							TV Shows						</li>
+						<li rel="14">
+							Music						</li>
+						<li rel="15">
+							Humor						</li>
+					</ul>
+				</li>
+				<li rel="10">
+					Health				</li>
+			</ul>
+			<!--// end example code //-->
+
+			<p>Click the icon to the right of the text box in order to see the widget in action. If you place the widget at the bottom of the viewport, you will notice that the widget automatically scrolls the page so that the entire menu appears on the screen. This is designed to reduce user frustration by making sure the user can actually use the control. No scrolling will take place if the widget can already display itself onscreen. </p>
+			<p>Another key usability feature the mcDropdown widget offers is keyboard entry. If you place the cursor inside the text box you can now use the keyboard to select an item. If an item is already selected, you will notice that placing focus on the input element causes the last child item to be automatically pre-selected. This allows for quickly changing the selected item if an incorrect value was entered. </p>
+			<p>We designed the keyboard entry so that only options found in the unordered list element can be selected. To accomplish this task, each keystroke is monitored and only allow valid characters are actually registered by the widget. </p>
+			<p>Also, as the user types a list of all possible matches will appear in the autocomplete list. This list is narrowed to only include exact matches. There's no need for a user to type the complete item name either, once the item the user wants is selected, they can either press [TAB], [ENTER], [RIGHT ARROW] or the [:] (which is the defined label delimiter) to select the list item. The user will then either be presented with any child items or they will move to the next position in the form. </p>
+			<p>Users can also use the [UP ARROW] and [DOWN ARROW] keys to select options that appear in the autocomplete list. See the <a href="#keyboard_usage">Keyboard Usage</a> section for more information. </p>
+
+			<h3 id="support">Support</h3>
+			<p>This source code is provided as-is. At this time Giva is not offering direct support for this product. If you are in need of assistance,  post your question to one of the <a href="http://docs.jquery.com/Discussion">jQuery Mailing Lists</a>. Members of the Giva development team actively participate on the jQuery Mailing lists, so if we see your question we will try our best to respond.</p>
+
+			<h3 id="license">License</h3>
+			<pre>Copyright 2011 Giva, Inc. (<a href="http://www.givainc.com/labs/">http://www.givainc.com/labs/</a>) 
+
+Licensed under the Apache License, Version 2.0 (the "License"); 
+you may not use this file except in compliance with the License. 
+You may obtain a copy of the License at 
+	<a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">http://www.apache.org/licenses/LICENSE-2.0</a> 
+
+Unless required by applicable law or agreed to in writing, software 
+distributed under the License is distributed on an "AS IS" BASIS, 
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+See the License for the specific language governing permissions and 
+limitations under the License.</pre>
+
+			<h3 id="revision">Revisions</h3>
+			<dl class="revisions">
+				<dt>v1.3.1 (2011-07-26)</dt>
+				<dd>
+					<ul>
+						<li>Fixed support for jQuery v1.6.2</li>
+					</ul>
+				</dd>
+				<dt>v1.3.0 (2011-04-11)</dt>
+				<dd>
+					<ul>
+						<li>Fixed issue with blur event firing multiple times when using keyboard entry</li>
+						<li>Added ability to embed HTML into the LI item (courtesy of Denis Cabasson)</li>
+					</ul>
+				</dd>
+				<dt>v1.2.10 (2009-10-29)</dt>
+				<dd>
+					<ul>
+						<li>Fixed capability issues with jQuery v1.3.1 and newer</li>
+						<li>Fixed some CSS issues and reduced duplicate classes</li>
+						<li>Fixed showACOnEmptyFocus behavior</li>
+						<li>Fixed IE6 bgIframe behavior with small lists (now uses outerHeight())</li>
+						<li>Fixed IE with using the mouse to put focus in the field (cause by input element having a transparent background)</li>
+					</ul>
+				</dd>
+				<dt>v1.2.08 (2009-10-24)</dt>
+				<dd>
+					<ul>
+						<li>Removed the code to re-size sub-menus based on parent menu size, &lt;li /&gt; now rely on CSS to set a min-width</li>
+					</ul>
+				</dd>
+				<dt>v1.2.07 (2008-09-04)</dt>
+				<dd>
+					<ul>
+						<li>Fixed bug in which children menus would not always show correctly if the list element is in an element whose display style is set to "none". The list is now moved to the &lt;body/&gt; tag so that the width and visibility is controlled. (<strong>NOTE:</strong> If for some reason the &lt;body/&gt; tag is set to "display: none" on page load, you'll want to initialize the mcDropdown plug-in after the &lt;body/&gt; tag becomes visible.)</li>
+						<li>Dropped v1.2x naming and moved to v1.2.## format.</li>
+					</ul>
+				</dd>
+				<dt>v1.2g (2008-08-18)</dt>
+				<dd>
+					<ul>
+						<li>Fixed bug where cursor in input fields under the mcDropdown would disappear (due to the autocomplete div being hidden)</li>
+					</ul>
+				</dd>
+				<dt>v1.2f (2008-08-01)</dt>
+				<dd>
+					<ul>
+						<li>Fixed bug where clicking on parent item caused JS error if autocomplete dropdown had not been displayed</li>
+						<li>Added Mozilla & KHTML styles to prevent text selection in CSS file (ul.mcdropdown_menu rule)</li>
+					</ul>
+				</dd>
+				<dt>v1.2e (2008-07-28)</dt>
+				<dd>
+					<ul>
+						<li>Fixed scrollIntoView for when the dropdown is within a parent element with a relative position</li>
+						<li>Added "autoHeight" option setting this to false will force the use of the lineHeight setting which can really speed up the display of menus</li>
+						<li>Fixed scrollIntoView behavior when autocomplete list is hidden (it no longer scrolls to show the hidden list)</li>
+					</ul>
+				</dd>
+				<dt>v1.2d (2008-07-15)</dt>
+				<dd>
+					<ul>
+						<li>Added disable() method</li>
+						<li>Added .mcdropdownDisabled CSS classes to support disabled fields</li>
+						<li>Added "background-color: transparent;" to "div.mcdropdown input" CSS rule</li>
+						<li>Added "outline: 0;" to "div.mcdropdown a" CSS rule</li>
+					</ul>
+				</dd>
+				<dt>v1.2c (2008-07-14)</dt>
+				<dd>
+					<ul>
+						<li>Fixed code so NOR input is correctly sized if even if it's in an element that's not visible during initialization.</li>
+					</ul>
+				</dd>
+				<dt>v1.2b (2008-07-02)</dt>
+				<dd>
+					<ul>
+						<li>Fixed code so that menu runs inside of an element with relative positioning.</li>
+						<li>Fixed autocomplete box so that it properly shows up.</li>
+					</ul>
+				</dd>
+				<dt>v1.2a (2008-06-30)</dt>
+				<dd>
+					<ul>
+						<li>Fixed showACOnEmptyFocus so that tabbing to a field with a value doesn't quickly 
+						show the autocomplete box if it doesn't belong (this was caused by the scrollIntoView() call
+						in showMatches()</li>
+					</ul>
+				</dd>
+				<dt>v1.2 (2008-06-26)</dt>
+				<dd>
+					<ul>
+						<li>Added focus() method</li>
+						<li>Fixed autocomplete list from showing dropdown when go back levels in FF3</li>
+						<li>Fixed autocomplete list corruption in when go back levels after using mouse</li>
+						<li>Added tabindex="-1" to the dropdown arrow (so it shouldn't recieve focus on tabbing)</li>
+						<li>Fixed tabbing behavior so hitting [TAB] should go to the next element in the tabindex</li>
+						<li>Autocomplete no longer shows (by default) if the input is empty and recieves focus (use the setting.showACOnEmptyFocus to control this behavior)</li>
+						<li>Added setting.showACOnEmptyFocus (used for controlling whether the autocomplete list shows on focus if list is empty; default = false)</li>
+						<li>Fixed noConflict() bug (where $ wasn't being properly scoped)</li>
+					</ul>
+				</dd>
+				<dt>v1.1a (2008-06-22)</dt>
+				<dd>
+					<ul>
+						<li>Fixed Safari v3 keyboard support</li>
+						<li>Added mouse support for keyboard autocomplete box</li>
+					</ul>
+				</dd>
+				<dt>v1.1 (2008-06-19)</dt>
+				<dd>
+					<ul>
+						<li>Fixed mouse behavior. Menus should now always close after mousing off a menu option.</li>
+					</ul>
+				</dd>
+				<dt>v1.0 (2008-06-18)</dt>
+				<dd>
+					<ul>
+						<li>Initial release</li>
+					</ul>
+				</dd>
+			</dl>
+
+</body>
+
+</html>

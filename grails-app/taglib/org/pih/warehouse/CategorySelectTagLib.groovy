@@ -8,17 +8,25 @@ class CategorySelectTagLib {
 	def productService
 	def inventoryService
 	
+	def selectCategoryMcDropdown = { attrs->
+		out << render(template:"../taglib/selectCategoryMcDropDown", model:[attrs:attrs])
+	}
+	
+	
 	def selectCategory_v2 = { attrs ->		
-		log.info "attrs.id: " + attrs.id
-		log.info "attrs.name: " + attrs.name
-		log.info "attrs.value: " + attrs.value
-		attrs.from = productService.getCategoryTree()
+		if (!attrs.from) { 
+			attrs.from = productService.getRootCategory()
+			attrs.depth = 0;
+		}
+		
 		attrs.optionKey = 'id'
 		attrs.noSelection = ['null':'-Choose a category-']
 
 		attrs.value = attrs.value
 		attrs.optionValue = { it.name }
-		out << g.select(attrs)
+		//out << g.select(attrs)
+		
+		out << render(template:"../taglib/selectCategories", model:[attrs:attrs])
 		
 	}
 	

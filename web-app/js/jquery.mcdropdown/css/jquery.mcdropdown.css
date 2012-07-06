@@ -1,0 +1,301 @@
+/* 
+	styles for the psuedo-select box 
+*/
+div.mcdropdown {
+	position: absolute;
+	border: 1px solid #8e9daa;
+	padding: 1px;
+	display: -moz-inline-block;
+	display: inline-block;
+	width: 408px;
+	height: 14px;
+	padding: 2px;
+}
+
+/* style either the input or div where the plug-in is attached to */
+div.mcdropdown input, 
+div.mcdropdown div {
+	position: absolute;
+	background-color: #fff;
+	left: 0;
+	top: 0;
+	width: 98%;
+	border: 0;
+	padding: 2px 0 0 3px;
+	font: 11px Arial, Helvetica, sans-serif;
+}
+
+div.mcdropdown a {
+	position: absolute;
+	right: 1px;
+	top: 1px;
+	background: transparent url(../images/mcdropdown/mcdd_select_button_sprite.gif) no-repeat top left;
+	display: -moz-inline-block;
+	display: inline-block;
+	height: 16px;
+	width: 15px;
+	text-decoration: none;
+	font-size: 0pt;
+	z-index: 2;
+	outline: 0;
+}
+
+div.mcdropdown a:hover, div.mcdropdown a:focus {
+	background-position: 0% -16px;
+}
+
+div.mcdropdown a:active {
+	background-position: 0% -32px;
+	outline: none; /* hide dotted outline in Firefox */
+}
+
+div.mcdropdownDisabled {
+	background-color: #e1e0e0;
+	filter:alpha(opacity=75);
+	-moz-opacity: 0.75;
+	opacity: 0.75;
+	-khtml-user-select: none;
+	-o-user-select: none;
+	-moz-user-select: none;
+	-moz-user-focus: ignore; 
+	-moz-user-input: disabled; 
+}
+
+div.mcdropdownDisabled input {
+	cursor: default;
+}
+
+div.mcdropdownDisabled a:hover, div.mcdropdownDisabled a:focus {
+	background-position: 0 0;
+	cursor: default;
+}
+
+/* 
+	styles for the dropdown menu 
+*/
+ul.mcdropdown_menu {
+	display: none;
+	margin: 0px;
+	padding: 0px;
+	list-style-type: none;
+	/* float so we can calculate the size of the columns */
+	float: left;
+	clear: both;
+	z-index: 10000;
+	-khtml-user-select: none;
+	-o-user-select: none;
+	-moz-user-select: none;
+	-moz-user-focus: ignore; 
+	-moz-user-input: disabled; 
+}
+
+ul.mcdropdown_menu ul {
+	display: none;
+	font: 11px Arial, Helvetica, sans-serif;
+	/* float so we can calculate the size of the columns */
+/*
+	float: left;
+*/
+}
+
+/* -- Sub-Menus -- */
+ul.mcdropdown_menu ul {
+	position: absolute;
+	list-style-type: none;
+	margin: 0px;
+	margin-left: 30px;
+	padding: 0px;
+	z-index: 10000;
+}
+ul.mcdropdown_menu ul li {
+	margin: 0px;
+	min-width: 150px;
+	_width: 150px; /* ie6 min-width hack */
+}
+
+
+/* color schema */
+ul.mcdropdown_menu {
+/*
+	height: 19px;
+*/
+	height: auto;
+	background-color: #e1e0e0;
+	padding: 5px 5px;
+	/* define font here for IE6 */
+	font: 11px Arial, Helvetica, sans-serif;
+}
+
+ul.mcdropdown_menu li {
+	padding: 2px 20px 2px 6px;
+}
+
+/* we don't use "ul.mcdropdown_menu > li" here so that IE6 knows how to style the root level */
+ul.mcdropdown_menu li.mc_root {
+	cursor: pointer;
+	white-space: nowrap;
+	color: #666;
+	border-top: 1px solid #fff;
+	padding: 2px 20px 2px 6px;
+	margin: 0 10px;
+}
+
+ul.mcdropdown_menu > li.mc_endcol {
+	border-bottom: 1px solid #fff;
+}
+
+/* this is for IE6 only */
+ul.mcdropdown_menu li.mc_hover {
+	background-color: #ccc !important;
+}
+
+ul.mcdropdown_menu > li:hover {
+	border-top: 1px solid #999;
+	background-color: #999 !important;
+	color: #fff;
+}
+
+ul.mcdropdown_menu > li:hover.mc_endcol {
+	border-bottom: 1px solid #999;
+}
+
+ul.mcdropdown_menu > li:hover + li:not(.mc_firstrow) {
+	border-top: 1px solid #999;
+}
+
+ul.mcdropdown_menu li.mc_parent {
+	padding-right: 20px !important;
+	background: url(../images/mcdropdown/mcdd_icon_normal.gif) no-repeat 100% 50%;
+}
+
+ul.mcdropdown_menu li:hover.mc_parent {
+	background: #999 url(../images/mcdropdown/mcdd_icon_hover.gif) no-repeat 100% 50% !important;
+	color: #fff !important;
+}
+
+ul.mcdropdown_menu ul {
+	background: #f0f0f0;
+	/* add a slight border for better visualization of deep menus */
+	border: 1px solid #d0d0d0;
+	padding-bottom: 10px;
+	/* IE 6/7 will bleed through the background color if we don't set the visibility to hidden */
+	visibility: hidden;
+}
+
+ul.mcdropdown_menu ul li {
+	background: #f0f0f0;
+	padding-left: 16px !important;
+	border-top: 1px solid #fff;
+	color: #666;
+	white-space: nowrap;
+}
+
+ul.mcdropdown_menu ul li.mc_firstrow {
+	border-top: 1px solid #f0f0f0;
+}
+
+ul.mcdropdown_menu ul li.mc_endcol {
+	border-bottom: 1px solid #fff;
+}
+
+ul.mcdropdown_menu ul li:hover {
+	background-color: #d6d6d6;
+	border-top: 1px solid #dedede;
+	color: #666;
+}
+
+ul.mcdropdown_menu ul li.mc_endcol:hover {
+	border-bottom: 1px solid #dedede;
+}
+
+ul.mcdropdown_menu ul li:hover + li:not(.mc_firstrow) {
+	border-top: 1px solid #dedede;
+}
+
+/*
+ * drop down shadows
+ */
+div.mcdropdown_shadow {
+	display: none;
+	position: absolute;
+	margin: 3px 0 0 3px;
+	/* for IE6, we use just a square transparent image */
+	background: #000;
+	filter :alpha(opacity=33);
+}
+
+/* ie6 ignores this selector */
+html>body div.mcdropdown_shadow {
+	/* let's use a transparent PNG */
+	margin: 5px 0 0 5px;
+	padding: 5px 0 0 5px;
+	background: transparent url(../images/mcdropdown/shadow.png) right bottom no-repeat !important;
+	/* remove the filter for IE7 */
+	filter: none;
+}
+
+/* 
+ * styles for the dropdown menu 
+ */
+/* autocomplete styles */
+ul.mcdropdown_autocomplete {
+	display: block;
+  position: absolute;
+	height: auto;
+	max-height: 210px;
+  overflow-x: hidden;
+	overflow-y: auto;
+  clear: both;
+	padding: 5px 10px;
+	background-color: #e1e0e0;
+	z-index: 10000;
+
+	margin: 0px;
+	list-style-type: none;
+	width: 392px;
+	font: 11px Arial, Helvetica, sans-serif;
+}
+
+ul.mcdropdown_autocomplete ul {
+	display: none;
+	list-style-type: none;
+	margin: 0px;
+	padding: 0px;
+}
+ul.mcdropdown_autocomplete ul li {
+	margin: 0px;
+}
+
+ul.mcdropdown_autocomplete li {
+  display: block;
+	font: 11px Arial, Helvetica, sans-serif;
+	cursor: pointer;
+	white-space: nowrap;
+	color: #666;
+	border-top: 1px solid #fff;
+	padding: 2px 26px 2px 6px;
+}
+
+ul.mcdropdown_autocomplete li.mc_endcol {
+	border-bottom: 1px solid #fff;
+}
+
+ul.mcdropdown_autocomplete li.mc_parent {
+	padding-right: 20px !important;
+	background: url(../images/mcdropdown/mcdd_icon_normal.gif) no-repeat 100% 50%;
+}
+
+ul.mcdropdown_autocomplete li.mc_hover {
+	border-top: 1px solid #999;
+	background-color: #999 !important;
+	color: #fff;
+}
+
+ul.mcdropdown_autocomplete li.mc_hover_parent {
+	background: #999 url(../images/mcdropdown/mcdd_icon_hover.gif) no-repeat 100% 50% !important;
+	color: #fff !important;
+}
+
+
+
+

@@ -96,13 +96,12 @@ class BootStrap {
 			}
 		}
 		log.info("\t\tFinished running liquibase changelog(s)!")
-		
+	}		
 		
 				
-		def destroy = {
-			
-		}
+	def destroy = {
 		
 	}
+		
 	
 }

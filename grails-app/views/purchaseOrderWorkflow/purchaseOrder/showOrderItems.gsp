@@ -112,7 +112,7 @@
 														<td valign='top' class='value' nowrap="nowrap">
 															<%-- 
 															<div class="ui-widget">
-																<g:select class="combobox" name="product.id" from="${org.pih.warehouse.product.Product.list().sort{it.name}}" optionKey="id" value="" noSelection="['':'']" />
+																<g:select class="comboBox" name="product.id" from="${org.pih.warehouse.product.Product.list().sort{it.name}}" optionKey="id" value="" noSelection="['':'']" />
 															</div>
 															--%>
 															<g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName" 
@@ -163,7 +163,7 @@
 														</td>
 														<td valign='top' class='value'>													
 															<div class="ui-widget"> 
-																<g:select class="combobox" name="category.id" from="${org.pih.warehouse.product.Category.list().sort()}" optionKey="id" value="" noSelection="['':'']" />
+																<g:select class="comboBox" name="category.id" from="${org.pih.warehouse.product.Category.list().sort()}" optionKey="id" value="" noSelection="['':'']" />
 															</div>
 														</td>
 													</tr>

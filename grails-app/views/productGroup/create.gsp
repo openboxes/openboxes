@@ -45,9 +45,22 @@
 				<g:renderErrors bean="${productGroupInstance}" as="list" />
 			</div>
 		</g:hasErrors>
+
+		<div class="buttonBar">            	
+           	<span class="linkButton">
+           		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
+           	</span>
+           	<span class="linkButton">
+           		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
+           	</span>
+       	</div>
+
 		<g:form action="save" method="post">
 			<fieldset>
 				<div class="dialog">
+				
+				
+					
 					<table>
 						<tbody>
 
@@ -65,9 +78,8 @@
 								<td valign="top" class="name"><label for="category"><warehouse:message
 											code="productGroup.category.label" default="Category" /></label></td>
 								<td valign="top" class="value ${hasErrors(bean: productGroupInstance, field: 'category', 'errors')}">
-									<g:selectCategory_v2
-										id="category.id" name="category.id"
-										value="${productGroupInstance?.category?.id }"/>
+									<g:selectCategoryMcDropdown id="category" name="category.id" 
+										value="${productGroupInstance?.category?.id } />
 								</td>
 							</tr>
 							<g:if test="${productGroupInstance?.products }">
@@ -136,7 +148,7 @@
 	
 <script>
 	$(document).ready(function() {			
-		$("#category\\.id").change(function() {
+		$("#category").change(function() {
 		    $(this).closest("form").submit();
 		});
 	});		

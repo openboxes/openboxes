@@ -45,22 +45,19 @@
 														<li>
 															<a href="#tabs-1">
 															
-																<g:if test="${params.searchPerformed }">												
-																	Results for 
+																	<format:category category="${commandInstance?.categoryInstance}"/>
+																	<g:if test="${commandInstance?.subcategoryInstance }"> 
+																		&nbsp;&rsaquo;&nbsp;
+																		<format:category category="${commandInstance?.subcategoryInstance}"/>
+																	</g:if>
+																	&nbsp;&rsaquo;&nbsp;
 																	<g:if test="${commandInstance?.searchTerms }">
-																		<b>${commandInstance.searchTerms }</b>															
+																		${commandInstance.searchTerms }															
 																	</g:if>
 																	<g:else>
-																		<b>all products</b>
+																		${warehouse.message(code: 'products.all.label') }
 																	</g:else>
-																	<g:if test="${commandInstance?.subcategoryInstance }"> 
-																		in <b><format:category category="${commandInstance?.subcategoryInstance}"/></b>
-																	</g:if>
 																	(${commandInstance?.categoryToProductMap?.values()?.flatten()?.size()} products)
-																</g:if>													
-																<g:else>
-																	&nbsp;
-																</g:else>
 																
 															</a>
 														</li>

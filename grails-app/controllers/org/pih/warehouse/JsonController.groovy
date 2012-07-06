@@ -25,8 +25,14 @@ import org.pih.warehouse.shipping.Shipment;
 class JsonController {
 
 	def inventoryService
-	
+	def productService
 	def localizationService
+	
+	def uploadFiles = { 
+		log.info "Upload files " 
+		render ""
+		
+	}
 	
 	def getInventoryItem = { 
 		log.info(params)
@@ -36,6 +42,14 @@ class JsonController {
 		render inventoryItem as JSON;
 		
 	}
+	
+	def getCategories = { 
+		def categories = []
+		def rootCategory = productService.getRootCategory();
+		categories << rootCategory
+		render categories as grails.converters.deep.JSON
+	}
+	
 	
 	def getQuantity = { 
 		log.info params

@@ -35,7 +35,7 @@
             		</g:link>
             	</span>
             	<span class="linkButton">
-            		<g:link class="showStockCard" controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">
+            		<g:link class="stockCard" controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">
             			<warehouse:message code="inventory.showStockCard.label" />
             		</g:link>
             	</span>
@@ -84,20 +84,41 @@
 									
 									<tr class="prop">
 		                                <td valign="top" class="name">
-		                                  <label for="categories"><warehouse:message code="categories.label" /></label>
+		                                  <label for="categories"><warehouse:message code="product.primaryCategory.label" /></label>
 		                                </td>
 		                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'category', 'errors')}">
-		                                	<%-- <g:render template="../category/chooser"/>--%>
+											<%-- 
+											<g:selectCategoryMcDropdown id="category" name="category.id" 
+												value="${productInstance?.category?.id}"/>									
+											--%>
+
 		                                	 <div class="category">
 												<select name="category.id">
 													<option value="null"></option>
 													<g:render template="../category/selectOptions" model="[category:rootCategory, selected:productInstance?.category, level: 0]"/>
 												</select>	
 									       	</div>
-									       	<g:render template="categories" model="['productInstance':productInstance]" />
 									   </td>
-									</tr>					
-									
+									</tr>			
+									<tr class="prop">
+		                                <td valign="top" class="name">
+		                                  <label for="categories"><warehouse:message code="product.otherCategories.label" /></label>
+		                                </td>
+										<td valign="top" class="value">									
+									       	<g:render template="categories" model="['productInstance':productInstance]" />
+										</td>
+									</tr>
+										
+									<%-- 
+									<tr class="prop">
+		                                <td valign="top" class="name">
+		                                  <label for="categories"><warehouse:message code="categories.label" /></label>
+		                                </td>
+		                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'category', 'errors')}">
+											<g:chooseCategory name="category.id" product="${productInstance}"/>
+										</td>
+									</tr>
+									--%>
 									<tr class="prop">
 										<td valign="top" class="name"><label for="name"><warehouse:message
 											code="default.unitOfMeasure.label" /></label></td>
@@ -199,13 +220,20 @@
 											&nbsp;
 											<!-- we only can delete products that 1) exist, and 2) dont have associated transaction entries or shipment items -->
 											<g:if test="${productInstance.id && !productInstance.hasAssociatedTransactionEntriesOrShipmentItems()}">
-											<g:link action="delete" id="${productInstance.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"> 
-									                <button type="button" class="negative"><img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="Delete" /> ${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}</button></g:link>
+												<g:link action="delete" id="${productInstance.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"> 
+										                <button type="button" class="negative"><img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="Delete" /> ${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}</button></g:link>
 											</g:if>
 											&nbsp;
-											<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="negative">			
-												${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}			
-											</g:link>  
+											<g:if test="${productInstance?.id }">
+												<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="negative">			
+													${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
+												</g:link>  
+											</g:if>
+											<g:else>
+												<g:link controller="inventory" action="browse"  class="negative">
+													${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
+												</g:link>
+											</g:else>
 										</td>
 									</tr>
 						
@@ -305,10 +333,10 @@
 												<th>
 												</th>
 												<th>
-													<warehouse:message code="document.contentType.label"/>
+													<warehouse:message code="document.filename.label"/>
 												</th>
 												<th>
-													<warehouse:message code="document.filename.label"/>
+													<warehouse:message code="document.contentType.label"/>
 												</th>
 											</tr>
 										</thead>
@@ -321,17 +349,19 @@
 														</g:link>												
 													</td>
 													<td>
-														${document.contentType }
+														${document.filename }
 													</td>	
 													<td>
-														${document.filename }
+														${document.contentType }
 													</td>	
 												</tr>						
 											</g:each>
 											<g:unless test="${productInstance?.documents }">
 												<tr>
-													<td colspan="3" class="left">
-														<warehouse:message code="product.hasNoDocuments.message"/>
+													<td colspan="3">
+														<div class="padded fade center">													
+															<warehouse:message code="product.hasNoDocuments.message"/>
+														</div>
 													</td>
 												</tr>
 											</g:unless>
@@ -366,7 +396,6 @@
 		</div>
 	</div>
 	<g:render template='category' model="['category':null,'i':'_clone','hidden':true]"/>
-
 
 	<script type="text/javascript">
     	$(document).ready(function() {

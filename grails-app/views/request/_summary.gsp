@@ -21,6 +21,11 @@
 							</span>
 							<span class="fade">&nbsp;|&nbsp;</span> 
 							--%>
+							<span class="status">
+								${warehouse.message(code: 'default.status.label') }:
+								<b><format:metadata obj="${requestInstance?.status}"/></b>						
+							</span>
+							<span class="fade">&nbsp;|&nbsp;</span>
 							<span class="requested-date">
 								<warehouse:message code="request.date.label"/>: <b><format:date obj="${requestInstance?.dateRequested}"/></b>
 							</span>
@@ -35,11 +40,6 @@
 						</div>
 					</td>										
 					<td style="text-align: right;">
-						<div class="fade" style="font-weight: bold; font-size:1.5em;">
-							<format:metadata obj="${requestInstance?.status}"/>
-						</div>
-						<br/>
-						
 						<%--
 						<g:if test="${!params.execution && !isAddingComment && !isAddingDocument}">						
 							<g:if test="${!requestInstance?.isComplete() && requestInstance?.status != org.pih.warehouse.request.OrderStatus.PLACED }">
