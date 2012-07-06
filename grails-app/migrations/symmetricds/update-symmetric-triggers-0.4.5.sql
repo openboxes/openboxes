@@ -1,0 +1,9 @@
+insert into sym_trigger (trigger_id,source_table_name,channel_id,sync_on_incoming_batch,last_update_time,create_time) values('product_document_trigger','product_document','system_channel', 1, current_timestamp, current_timestamp);
+insert into sym_trigger_router (trigger_id,router_id,initial_load_order,last_update_time,create_time) values('product_document_trigger','root_client_router', 100, current_timestamp, current_timestamp);
+insert into sym_trigger_router (trigger_id,router_id,initial_load_order,last_update_time,create_time) values('product_document_trigger','client_root_router', 100, current_timestamp, current_timestamp);
+insert into sym_trigger (trigger_id,source_table_name,channel_id,sync_on_incoming_batch,last_update_time,create_time) values('product_group_trigger','product_group','system_channel', 1, current_timestamp, current_timestamp);
+insert into sym_trigger_router (trigger_id,router_id,initial_load_order,last_update_time,create_time) values('product_group_trigger','root_client_router', 100, current_timestamp, current_timestamp);
+insert into sym_trigger_router (trigger_id,router_id,initial_load_order,last_update_time,create_time) values('product_group_trigger','client_root_router', 100, current_timestamp, current_timestamp);
+insert into sym_trigger (trigger_id,source_table_name,channel_id,sync_on_incoming_batch,last_update_time,create_time) values('product_group_product_trigger','product_group_product','system_channel', 1, current_timestamp, current_timestamp);
+insert into sym_trigger_router (trigger_id,router_id,initial_load_order,last_update_time,create_time) values('product_group_product_trigger','root_client_router', 100, current_timestamp, current_timestamp);
+insert into sym_trigger_router (trigger_id,router_id,initial_load_order,last_update_time,create_time) values('product_group_product_trigger','client_root_router', 100, current_timestamp, current_timestamp);
