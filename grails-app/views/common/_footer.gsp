@@ -31,6 +31,6 @@
 		<warehouse:message code="default.layout.label"/>: &nbsp; 
 		<g:link controller="dashboard" action="chooseLayout" params="['layout':'custom']">custom</g:link>&nbsp;
 		<g:link controller="dashboard" action="chooseLayout" params="['layout':'mega']">mobile</g:link>		
-		--%>
+		--%>		
 	</div>
 </div>

@@ -9,7 +9,6 @@
 			<span class="fade">(${productCount })</span>
 		</g:if>
 	</option>
-
 	<g:each var="childCategory" in="${category.categories }">	
 		<g:render template="../category/selectOptions" model="${['category': childCategory, 'level': level, 'selected': selected]}"/>
 	</g:each>

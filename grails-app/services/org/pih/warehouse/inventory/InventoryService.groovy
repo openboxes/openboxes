@@ -646,9 +646,6 @@ class InventoryService implements ApplicationContextAware {
 
 		// Categories - Childrens Furniture
 		def matchCategories = getExplodedCategories(categoryFilters)
-		log.info "Matched categories " + matchCategories
-		log.info "Search terms: " + searchTerms
-
 		def searchResults = Product.createCriteria().list() {
 			or {
 				and {

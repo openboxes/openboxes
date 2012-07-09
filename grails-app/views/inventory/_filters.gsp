@@ -11,6 +11,7 @@
 				<g:if test="${!commandInstance?.categoryInstance.categories.isEmpty()}">
 					<tr>
 						<td>
+							<format:category category="${commandInstance?.categoryInstance }"/>
 							<select id="subcategoryId" name="subcategoryId" class="text">
 								<option value=""></option>
 								<g:render template="../category/selectOptions" model="[category:commandInstance?.categoryInstance, selected:commandInstance?.subcategoryInstance, level: 0]"/>								
@@ -18,6 +19,15 @@
 						</td>
 					</tr>					
 				</g:if>
+				<g:else>				
+					<tr>
+						<td>
+							<warehouse:message code="category.label"/> :
+							<format:category category="${commandInstance?.categoryInstance }"/>
+							
+						</td>
+					</tr>
+				</g:else>
 				<tr>
 					<td>
 						<g:textField name="searchTerms" value="${commandInstance.searchTerms}" class="text medium" size="40"/>

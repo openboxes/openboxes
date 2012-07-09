@@ -356,14 +356,18 @@
 			monthNamesShort[${monthNum-1}] = '<warehouse:message code="month.short.${monthNum}.label"/>';
 		</g:each>
     </script>    
-	<script type="text/javascript">
-	  var uvOptions = {};
-	  (function() {
-	    var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
-	    uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/gMxKSy5iKCBPkbBzs8Q.js';
-	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
-	  })();
-	</script>    
+    
+    <%-- Disable feedback widget if grails.feedback.enabled is set to false --%>
+    <g:if test="${new Boolean(grailsApplication.config.grails.feedback.enabled?:'true') }">
+		<script type="text/javascript">
+		  var uvOptions = {};
+		  (function() {
+		    var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+		    uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/gMxKSy5iKCBPkbBzs8Q.js';
+		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+		  })();
+		</script>    
+	</g:if>
 	
 </body>
 </html>

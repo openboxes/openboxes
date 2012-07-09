@@ -78,10 +78,17 @@
 								<td valign="top" class="name"><label for="category"><warehouse:message
 											code="productGroup.category.label" default="Category" /></label></td>
 								<td valign="top" class="value ${hasErrors(bean: productGroupInstance, field: 'category', 'errors')}">
+									<%-- Show category if coming from Inventory Browser --%>									
+									<g:if test="${productGroupInstance?.category }">
+							        	<format:category category="${productGroupInstance?.category }"/>
+										<g:hiddenField id="category" name="category.id" 
+											value="${productGroupInstance?.category?.id }" />
+									</g:if>
+									<g:else>
+										<g:categorySelect id="category" name="category.id" 
+											value="${productGroupInstance?.category?.id}"/>									
+									</g:else>
 									
-						        	<format:category category="${productGroupInstance?.category }"/>
-									<g:hiddenField id="category" name="category.id" 
-										value="${productGroupInstance?.category?.id }" />
 								</td>
 							</tr>
 							<g:if test="${productGroupInstance?.products }">
