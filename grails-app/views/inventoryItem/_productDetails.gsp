@@ -156,7 +156,7 @@
 					</td>
 				</tr>
 			</g:if>			
-			<g:if test="${productInstance?.upc }">
+			<g:if test="${productInstance?.ndc }">
 				<tr class="even">	
 					<td class="left label">
 						<span class="name"><warehouse:message code="product.ndc.label"/></span>

@@ -181,7 +181,7 @@
 			<column name="category_id" type="CHAR(38)"/>
 		</addColumn>	
 	</changeSet>
-		
+									 
 	<changeSet author="jmiranda" id="1327591155937-15">
 		<preConditions onFail="MARK_RAN">
 			<not>
@@ -193,5 +193,48 @@
         </addColumn>
 	</changeSet>		
 	
+	
+	<changeSet author="jmiranda" id="1343076976138-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="transaction" columnName="updated_by_id"/>
+			</not>
+		</preConditions>
+	    <addColumn tableName="transaction">    
+            <column name="updated_by_id" type="CHAR(38)" />
+	    </addColumn>
+    </changeSet>
+		
+	<changeSet author="jmiranda" id="1343076976138-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="product" columnName="created_by_id"/>
+			</not>
+		</preConditions>
+	    <addColumn tableName="product">    
+            <column name="created_by_id" type="CHAR(38)"/>
+	    </addColumn>
+    </changeSet>
+	<changeSet author="jmiranda" id="1343076976138-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="product" columnName="updated_by_id"/>
+			</not>
+		</preConditions>
+	    <addColumn tableName="product">    
+            <column name="updated_by_id" type="CHAR(38)"/>
+	    </addColumn>
+    </changeSet>
+
+	<changeSet author="jmiranda" id="1343076976138-4">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="comment" columnName="comment"/>
+		</preConditions>
+		<modifyColumn tableName="comment">
+		    <column name="comment" type="TEXT"></column>		    
+		</modifyColumn>
+    </changeSet>
+			
+		
 </databaseChangeLog>
     

@@ -32,7 +32,7 @@ class Transaction implements Comparable, Serializable {
 		createdBy = AuthService.currentUser.get()
 	}
 	def beforeUpdate ={
-		//lastUpdatedBy = AuthService.currentUser.get
+		updatedBy = AuthService.currentUser.get()
 	}
 	
 	String id
@@ -48,11 +48,13 @@ class Transaction implements Comparable, Serializable {
 	// Auditing fields
 	Boolean confirmed = Boolean.FALSE;	// Transactions need to be confirmed by a supervisor
 	User confirmedBy
-	User createdBy
-	Date dateCreated
-	Date lastUpdated
 	Date dateConfirmed
 	List transactionEntries;
+	
+	User createdBy
+	User updatedBy
+	Date dateCreated
+	Date lastUpdated
 	
     // Association mapping
     static hasMany = [ transactionEntries : TransactionEntry ]
@@ -69,6 +71,7 @@ class Transaction implements Comparable, Serializable {
     static constraints = {
 	    transactionType(nullable:false)
 		createdBy(nullable:true)
+		updatedBy(nullable:true)
 		outgoingShipment(nullable:true)
 		incomingShipment(nullable:true)
 		confirmed(nullable:true)

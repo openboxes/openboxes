@@ -425,21 +425,30 @@
 											<table>
 												<tbody>
 													<tr>
-														<th width="40%"><warehouse:message code="shipping.note.label"/></th>
-														<th width="15%"><warehouse:message code="default.date.label"/></th>																	
-														<th width="10%"></th>
+																															
+														<th><warehouse:message code="comment.sender.label"/></th>
+														<th colspan="2"><warehouse:message code="comment.label"/></th>
+														
 													</tr>
 													<g:each in="${shipmentInstance.comments}" var="comment" status="i">
-														<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-															<td><i>"${comment?.comment}"</i> -<b>${comment?.sender?.username}</b></td>																	
+														<tr class="${(i % 2) == 0 ? 'odd' : 'even'} newContainer" >
+															<td width="25%" class="container">
+																
+																${comment?.sender?.name} wrote:
+																
+															</td>
 															<td>
-																<format:date obj="${comment?.dateCreated}"/> &nbsp; 
-															</td>																		
-															<td style="text-align: right">
+																<p>
+																${comment?.comment}
+																</p>
+																<br/>																
+																<format:datetime obj="${comment?.dateCreated}"/> 
+															</td>
+															<td>
 																<g:link class="remove" action="deleteComment" id="${comment?.id}" params="[shipmentId:shipmentInstance.id]" onclick="return confirm('${warehouse.message(code:'shipping.confirm.deleteNote.message')}')">
 																	<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" style="vertical-align: middle"/>
 																</g:link>	
-															</td>
+															</td>																	
 														</tr>
 													</g:each>	
 												</tbody>

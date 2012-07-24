@@ -5,7 +5,9 @@ import java.util.Collection;
 
 import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.list.LazyList;
+import org.pih.warehouse.auth.AuthService;
 import org.pih.warehouse.core.Document;
+import org.pih.warehouse.core.User;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.TransactionEntry;
@@ -25,6 +27,16 @@ import org.pih.warehouse.shipping.ShipmentItem;
  * as 20 mg tablets).  
  */
 class Product implements Comparable, Serializable {
+	
+	def beforeInsert = {
+		createdBy = AuthService.currentUser.get()
+		println "before insert " + updatedBy
+	}
+	def beforeUpdate ={
+		updatedBy = AuthService.currentUser.get()
+		println "before update " + updatedBy
+	}
+
 	
 	String id
 	
@@ -49,6 +61,9 @@ class Product implements Comparable, Serializable {
 	// Auditing
 	Date dateCreated;
 	Date lastUpdated;
+	User createdBy
+	User updatedBy
+	
 		
 	static transients = ["rootCategory", "images"];
 	
@@ -74,6 +89,9 @@ class Product implements Comparable, Serializable {
 		ndc(nullable:true, maxSize: 255)
 		manufacturer(nullable:true, maxSize: 255)
 		manufacturerCode(nullable:true, maxSize: 255)
+		
+		createdBy(nullable:true)
+		updatedBy(nullable:true)
 
     }
 	
