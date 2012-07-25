@@ -29,10 +29,11 @@
  			}
  			*/
 	 		.selected { 
-	 			/*background-color: lightgrey;*/
 	 			background-color: lightyellow;
-	 			color: red;
+	 			color: blue;
+	 			font-size: 14px;	 			
 	 		}
+	 		.selected { }
 	 		.not-selected { 
 		 		border-right: 0px solid lightgrey;
 	 		}
@@ -113,32 +114,68 @@
 				<%-- Main content section --%>
 				<g:set var="containerList" value="${shipmentInstance?.containers?new ArrayList(shipmentInstance?.containers):shipmentInstance?.containers}" />
 				<table>
-			 		<tbody>			 		
-				 		<tr class="prop">
+					<thead>
+			 			<tr >
+			 			
+			 				<td colspan="2">							
+								<g:set var="count" value="${0 }"/>	
+								<table style="border: 1px solid lightgrey">
+									<tr>
+										<td style="width: 20px;">
+											<span class="action-menu" >
+												<button class="action-btn">
+													<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
+												</button>
+												<div class="actions">
+													<g:render template="containerMenuItems" model="[container:selectedContainer]"/>													
+													<g:render template="shipmentMenuItems" />													
+													
+												</div>
+											</span>	
+										</td>
+										<td class="middle">
+											
+											<span class="middle title">
+												<warehouse:message code="containers.label"/>
+												&rsaquo;
+											</span>
+											<span class="middle title">
+												<g:if test="${selectedContainer}">								
+													<g:if test="${selectedContainer.parentContainer }">
+														${selectedContainer?.parentContainer?.name } &rsaquo;
+													</g:if>				
+								 					${selectedContainer?.name }		 					
+												</g:if>
+												<g:else>
+													<warehouse:message code="shipping.unpackedItems.label" />			 						
+												</g:else>
+											</span>
+											
+											<g:if test="${selectedContainer}">	
+												<div class="">										
+													<g:render template="/container/summary" model="[container:selectedContainer]"/>
+									 			</div>	
+											</g:if>								
+										</td>
+									</tr>
+								</table>								
+								
+											 				
+			 				</td>
+			 			</tr>
+					
+					</thead>
+			 		<tbody>		
+			 			 		
+				 		<tr class="">
 					 		<%-- Display the pallets & boxes in this shipment --%> 
 							<g:if test="${containerList }">
-					 			<td valign="top" style="padding: 0px; margin: 0px; width: 250px; border-right: 1px solid lightgrey;" >
+					 			<td valign="top" style="width: 250px; border-right: 0px solid lightgrey;" >
 									<div class="list" >
 										<g:set var="count" value="${0 }"/>	
-										<table class="sortable" data-update-url="${createLink(controller:'json', action:'sortContainers')}">	
+										<table class="sortable" data-update-url="${createLink(controller:'json', action:'sortContainers')}" style="border: 1px solid lightgrey">	
 											<thead>
-												<tr>
-													<td colspan="3" class="left">
-														<span class="action-menu" >
-															<button class="action-btn">
-																<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
-															</button>
-															<div class="actions left">
-																<g:render template="shipmentMenuItems"/>
-																
-															</div>
-														</span>
-														&nbsp;
-														<span class="title middle">
-															<warehouse:message code="containers.label"/>
-														</span>
-													</td>
-												</tr>
+												
 
 												<tr class="prop">
 													<th class="left middle">
@@ -166,30 +203,21 @@
 																<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
 															</button>
 															<div class="actions left">
-																<g:render template="containerMenuItems" model="[container:containerInstance]"/>
+																<g:render template="containerMenuItems" model="[container:containerInstance]"/>																
+																<g:render template="shipmentMenuItems"/>
 															</div>
 														</span>
 													</td>
 													<td class="droppable middle">
 														<span>
-															<g:if test="${!selectedContainer }">
+															<g:link action="createShipment" event="enterContainerDetails" style="display: block;"> 
 																<warehouse:message code="shipping.unpackedItems.label"/>
 																<span class="fade">
 																	&nbsp;&rsaquo;&nbsp;
 																	<g:set var="unpackedShipmentItems" value="${shipmentInstance?.shipmentItems?.findAll({it.container == null})}"/>
 																	<warehouse:message code="shipment.numShipmentItems.label" args="[unpackedShipmentItems?.size()]"/>																	
 																</span>																	
-															</g:if>	
-															<g:else>													
-																<g:link action="createShipment" event="enterContainerDetails" style="display: block;"> 
-																	<warehouse:message code="shipping.unpackedItems.label"/>
-																	<span class="fade">
-																		&nbsp;&rsaquo;&nbsp;
-																		<g:set var="unpackedShipmentItems" value="${shipmentInstance?.shipmentItems?.findAll({it.container == null})}"/>
-																		<warehouse:message code="shipment.numShipmentItems.label" args="[unpackedShipmentItems?.size()]"/>																	
-																	</span>																	
-																</g:link>
-															</g:else>
+															</g:link>
 														</span>
 													</td>
 													<td></td>
@@ -274,43 +302,9 @@
 							</g:if>
 				 			
 				 			<%-- Display the contents of the currently selected container --%>			 			
-				 			<td valign="top" style="padding: 0; margin: 0">
-								<g:set var="count" value="${0 }"/>	
-								<table>
-									<tr>
-										<td style="width: 20px;">
-											<span class="action-menu" >
-												<button class="action-btn">
-													<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
-												</button>
-												<div class="actions">
-													<g:render template="containerMenuItems" model="[container:selectedContainer]"/>													
-												</div>
-											</span>	
-										</td>
-										<td class="middle">
-								
-											<div class="title middle">
-												<g:if test="${selectedContainer}">								
-													<g:if test="${selectedContainer.parentContainer }">
-														${selectedContainer?.parentContainer?.name } &rsaquo;
-													</g:if>				
-								 					${selectedContainer?.name }		 					
-												</g:if>
-												<g:else>
-													<warehouse:message code="shipping.unpackedItems.label" />			 						
-												</g:else>
-											</div>
-											<g:if test="${selectedContainer}">	
-											
-												<g:render template="/container/summary" model="[container:selectedContainer]"/>
-									 				
-											</g:if>								
-										</td>
-									</tr>
-								</table>									
+				 			<td valign="top" >									
 								<div class="list">
-									<table>
+									<table class="box">
 										<thead>
 											<tr class="prop">
 												<th class="middle"><!--<warehouse:message code="default.actions.label"/>--></th>
