@@ -28,13 +28,10 @@
 				background-position: right;  				
  			}
  			*/
-	 		.selected { 
-	 			background-color: lightyellow;
-	 			color: blue;
-	 			font-size: 14px;	 			
-	 		}
-	 		.selected { }
-	 		.not-selected { 
+	 		tr.selected { 
+	 			background-color: lightblue;
+	 		}	 		
+	 		tr.not-selected { 
 		 		border-right: 0px solid lightgrey;
 	 		}
 	 		
@@ -115,11 +112,11 @@
 				<g:set var="containerList" value="${shipmentInstance?.containers?new ArrayList(shipmentInstance?.containers):shipmentInstance?.containers}" />
 				<table>
 					<thead>
-			 			<tr >
+			 			<tr class="prop">
 			 			
 			 				<td colspan="2">							
 								<g:set var="count" value="${0 }"/>	
-								<table style="border: 1px solid lightgrey">
+								<table style="border: 0px solid lightgrey">
 									<tr>
 										<td style="width: 20px;">
 											<span class="action-menu" >
@@ -171,13 +168,11 @@
 					 		<%-- Display the pallets & boxes in this shipment --%> 
 							<g:if test="${containerList }">
 					 			<td valign="top" style="width: 250px; border-right: 0px solid lightgrey;" >
-									<div class="list" >
+									<div class="box" >
 										<g:set var="count" value="${0 }"/>	
-										<table class="sortable" data-update-url="${createLink(controller:'json', action:'sortContainers')}" style="border: 1px solid lightgrey">	
+										<table class="sortable" data-update-url="${createLink(controller:'json', action:'sortContainers')}">	
 											<thead>
-												
-
-												<tr class="prop">
+												<tr class="">
 													<th class="left middle">
 														<g:link action="createShipment" event="enterContainerDetails" params="['containerId':selectedContainer?.id,'direction':'-1']">
 															<img src="${resource(dir: 'images/icons/silk', file: 'resultset_previous.png')}" class="middle"/>
@@ -303,10 +298,10 @@
 				 			
 				 			<%-- Display the contents of the currently selected container --%>			 			
 				 			<td valign="top" >									
-								<div class="list">
-									<table class="box">
+								<div class="list box">
+									<table  >
 										<thead>
-											<tr class="prop">
+											<tr class="">
 												<th class="middle"><!--<warehouse:message code="default.actions.label"/>--></th>
 												<th class="center middle"><warehouse:message code="default.qty.label"/></th>
 												<th class="middle"><warehouse:message code="default.item.label"/></th>

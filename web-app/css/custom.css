@@ -63,8 +63,13 @@ button.action-btn, button.previous, button.next {
 .box { 
 	border: 1px solid lightgrey;
 	margin: 1px;
-	background-color: #f7f7f7; 
-	padding: 10px;
+	background-color: #fcfcfc;
+	/*
+	background-color: #f7f7f7;*/
+	/*background-color: white;*/ 
+	padding: 7px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
 }
 .box-slim { 
 	border: 1px solid lightgrey;
