@@ -9,30 +9,19 @@
 	         .ui-autocomplete { height: 250px; overflow-y: scroll; overflow-x: hidden;}
 	 		.draggable { cursor: move; } 
 	 		.droppable { /*padding: 10px; border: 0px dashed lightgrey;*/ } 
+	 		.sortable { }
 	 		.ui-state-highlight { font-weight: bold; color: black; }  
 	 		.strikethrough { color: lightgrey; } 
-	 		.containers td { border-right: 0px solid lightgrey; }
- 			.sortable tr.container { 
- 				cursor: move; 
- 			}
 
- 			.sortable tr.container td.containerName { 				
- 				background-image: url("${resource(dir: 'images/icons/', file: 'sortable.png')}");
-				background-repeat: no-repeat;				
-				background-position: right;  				
- 			}
- 			/*
- 			td.unpackedItems { 				
- 				background-image: url('${resource(dir: "images/icons", file: "draggable_off2.png")}');
-				background-repeat: no-repeat;				
-				background-position: right;  				
- 			}
- 			*/
 	 		tr.selected { 
-	 			background-color: lightblue;
+	 			background-color: #ffffcc;
+	 			border-top: 1px solid lightgrey;
+	 			border-bottom: 1px solid lightgrey;
+	 			/*background-color: lightblue;*/
 	 		}	 		
 	 		tr.not-selected { 
-		 		border-right: 0px solid lightgrey;
+	 			border-top: 1px solid lightgrey;
+	 			border-bottom: 1px solid lightgrey;
 	 		}
 	 		
 		</style>
@@ -178,7 +167,7 @@
 															<img src="${resource(dir: 'images/icons/silk', file: 'resultset_previous.png')}" class="middle"/>
 														</g:link>
 													</th>
-													<th class="center middle">														
+													<th colspan="2" class="center middle">														
 														${containerList?.indexOf(selectedContainer)+2} of ${containerList?.size()+1 }
 													</th>
 													<th class="right middle">
@@ -188,10 +177,11 @@
 													</th>
 												</tr>															
 											
-												
+											</thead>
+											<tbody>
 																			
 												<g:set var="styleClass" value="${selectedContainer == null ? 'selected' : 'not-selected' }"/>
-												<tr class="${count++%2==0?'odd':'even' } ${styleClass } prop">
+												<tr class="droppable ${count++%2==0?'odd':'even' } ${styleClass }" container="null">
 													<td class="left " >
 														<span class="action-menu" >
 															<button class="action-btn">
@@ -203,26 +193,27 @@
 															</div>
 														</span>
 													</td>
-													<td class="droppable middle">
-														<span>
+													<td class="middle">
+														<div>
 															<g:link action="createShipment" event="enterContainerDetails" style="display: block;"> 
 																<warehouse:message code="shipping.unpackedItems.label"/>
-																<span class="fade">
-																	&nbsp;&rsaquo;&nbsp;
-																	<g:set var="unpackedShipmentItems" value="${shipmentInstance?.shipmentItems?.findAll({it.container == null})}"/>
-																	<warehouse:message code="shipment.numShipmentItems.label" args="[unpackedShipmentItems?.size()]"/>																	
-																</span>																	
 															</g:link>
-														</span>
+														</div>
 													</td>
-													<td></td>
+													<td class="middle center">
+														<div class="numberCircle">
+															<g:set var="unpackedShipmentItems" value="${shipmentInstance?.shipmentItems?.findAll({it.container == null})}"/>
+											        		${unpackedShipmentItems?.size() }
+											        	</div> 
+													</td>
+													<td class="right">	
+														<span class="sorthandle"></span>
+													</td> 
 												</tr>											
-											</thead>
-											<tbody>					
 												<g:if test="${shipmentInstance?.containers }">
 													<g:each var="containerInstance" in="${shipmentInstance?.containers?.findAll({!it.parentContainer})?.sort { it?.sortOrder }}">
 														<g:set var="styleClass" value="${containerInstance?.id == selectedContainer?.id ? 'selected' : 'not-selected' }"/>
-														<tr id="container_${containerInstance?.id }" class="${styleClass } container prop ${count++%2==0?'odd':'even' }">
+														<tr id="container_${containerInstance?.id }" class="droppable ${styleClass } ${count++%2==0?'odd':'even' } connectable" container="${containerInstance?.id }">
 															<td class="left">
 																<span class="action-menu">
 																	<button class="action-btn">
@@ -233,37 +224,34 @@
 																	</div>
 																</span>
 															</td>
-															<td style="vertical-align: middle;" id="${containerInstance?.id }" class="left droppable">													
+															<td style="vertical-align: middle;" id="${containerInstance?.id }" class="left">													
 																<a name="container-${containerInstance.id }"></a>
-																<div>
-																	<span>
-																		<g:if test="${containerInstance?.id == selectedContainer?.id }">
-																			${containerInstance?.name} 
-																			<span class="fade">
-																				&nbsp;&rsaquo;&nbsp;														
-																				<warehouse:message code="shipment.numShipmentItems.label" args="[containerInstance?.shipmentItems?.size()]"/>																				
-																			</span>
-																		</g:if>
-																		<g:else>
-																			<g:link action="createShipment" event="enterContainerDetails" params="['containerId':containerInstance?.id]" style="display: block;">
-																				${containerInstance?.name}
-																				<span class="fade">
-																					&nbsp;&rsaquo;&nbsp;
-																					<warehouse:message code="shipment.numShipmentItems.label" args="[containerInstance?.shipmentItems?.size()]"/>
-																				</span>
-																			</g:link>
-																		</g:else>
-																	</span>
-																</div>
+																<span>
+																	<g:if test="${containerInstance?.id == selectedContainer?.id }">
+																		${containerInstance?.name} 
+																	</g:if>
+																	<g:else>
+																		<g:link action="createShipment" event="enterContainerDetails" params="['containerId':containerInstance?.id]" style="display: block;">
+																			${containerInstance?.name}
+																		</g:link>
+																	</g:else>
+																</span>
 															</td>
-															<td class="containerName"></td> 
+															<td class="middle right">
+													        	<div class="numberCircle">
+													        		${containerInstance?.shipmentItems?.size() }
+													        	</div> 
+															</td>
+															<td class="right">	
+																<span class="sorthandle"></span>
+															</td> 
 														</tr>
 														
 														<g:each var="childContainerInstance" in="${shipmentInstance?.containers?.findAll { it.parentContainer == containerInstance}?.sort() }">
 															<g:set var="styleClass" value="${childContainerInstance?.id == selectedContainer?.id ? 'selected' : 'not-selected' }"/>
 															<tr class="${count++%2==0?'even':'odd' }">
-																<td class="droppable">									
-																	<div style="margin-left: 30px;">
+																<td>									
+																	<div style="margin-left: 30px;" class="droppable">
 																		<span class="action-menu" >
 																			<button class="action-btn">
 																				<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
@@ -298,12 +286,13 @@
 				 			
 				 			<%-- Display the contents of the currently selected container --%>			 			
 				 			<td valign="top" >									
-								<div class="list box">
+								<div class="box">
 									<table  >
 										<thead>
-											<tr class="">
-												<th class="middle"><!--<warehouse:message code="default.actions.label"/>--></th>
-												<th class="center middle"><warehouse:message code="default.qty.label"/></th>
+											<tr>
+												<th class="middle"></th>
+												<th class="middle"><warehouse:message code="default.actions.label"/></th>
+												<th class="left middle"><warehouse:message code="default.qty.label"/></th>
 												<th class="middle"><warehouse:message code="default.item.label"/></th>
 												<th class="center middle"><warehouse:message code="default.lotSerialNo.label"/></th>
 												<th class="center middle"><warehouse:message code="inventoryItem.expirationDate.label"/></th>
@@ -315,6 +304,8 @@
 											<g:if test="${shipmentItems }">
 												<g:each var="shipmentItem" in="${shipmentItems?.sort()}">		
 													<tr id="shipmentItemRow-${shipmentItem?.id }" class="${count++%2==0?'odd':'even' }">
+														<td class="middle center" width="1%">
+														</td>
 														<td nowrap="nowrap" width="3%">
 															<span class="action-menu">
 																<button class="action-btn">
@@ -330,8 +321,12 @@
 															</span>
 															--%>
 														</td>
-														<td class="center middle">
-															${shipmentItem?.quantity}															
+														<td class="left middle">
+															<span class="draggable draghandle" shipmentItem="${shipmentItem?.id }">
+																<img src="${resource(dir: 'images/icons/silk', file: 'arrow_out.png')}" class="middle"/>
+																&nbsp;
+																${shipmentItem?.quantity} ${shipmentItem?.product?.unitOfMeasure?:"each"}
+															</span>													
 														</td>
 														<td class="middle">
 															<div>
@@ -386,49 +381,45 @@
 			 		</tfoot>			 		
 			 	</table>
 			</fieldset>
-        </div>
+        </div>        
         
         
+        
+        <%--
         <g:render template="/createShipmentWorkflow/moveDraggableItem"/>
-        
+		--%>        
 		<script>
-			
 			$(document).ready(function() {
-			
-			
+				
 				$(".sortable tbody").sortable({
-				    //handle : '.handle', 
-				    axis : "y",
-				    helper: "clone",
-				    placeholder: "ui-state-highlight",
+				    handle : '.sorthandle', 
+				    //axis : "y",
+				    //helper: "clone",
+				    //forcePlaceholderSize: true,
+				    //placeholder: "ui-state-highlight",
+					//connectWith: ".connectable",				    
 				    update : function() { 
 						var updateUrl = "${createLink(controller:'json', action:'sortContainers') }";						
 						var sortOrder = $(this).sortable('serialize'); 
 						$.post(updateUrl, sortOrder);
-						$(".sortable tbody tr").removeClass("odd").removeClass("even").filter(":odd").addClass("odd");
-				    } 				
+						$(".sortable tbody tr").removeClass("odd").removeClass("even").filter(":odd").addClass("odd")
+							.filter(":even").addClass("even");
+				    }
 				});
 			
 			
-				//$( ".draggable" ).draggable();
 				//$('.selectable').selectable();
-				$('.draggable').draggable(
-					{
-						revert		: true,
-						zIndex		: 2700,
-						autoSize	: true,
-						ghosting	: true,
-						onStop		: function()
-						{
-							$('.droppable').each(
-								function()
-								{
-									this.expanded = false;
-								}
-							);
-						}
-					}
-				);
+				$('.draggable').draggable({
+					handle		: ".draghandle",
+					helper		: "clone",
+					//helper		: function( event ) { return $("<div class='ui-widget-header'>I'm a custom helper</div>"); },
+					revert		: true,
+					zIndex		: 2700,
+					autoSize	: true,
+					ghosting	: true,
+					onStart		: function ( event ) { alert("started") },
+					onStop		: function() { $('.droppable').each(function() { this.expanded = false; }); }				
+				});
 	
 				$('.droppable').droppable( {
 					accept: '.draggable',
@@ -441,26 +432,33 @@
 						$( this ).removeClass( "ui-state-highlight" );
 					},
 					drop: function( event, ui ) {
-						//alert(ui.draggable.attr("id"));		
-						
-								
-						$("#dlgMoveDraggableItem").dialog({ autoOpen: true, modal: true, width: '600px'});	
-						
+						//alert("dropped");
+						//ui.draggable.hide();
+						ui.draggable.addClass( "strikethrough" );
+						$( this ).removeClass( "ui-state-highlight" );
+						var shipmentItem = ui.draggable.attr("shipmentItem");
+						var container = $(this).attr("container");
+						$("#shipmentItemRow-" + shipmentItem).hide();
+						moveShipmentItemToContainer(shipmentItem, container);
+						window.location.reload();
+						//alert("Move item " + shipmentItem + " to container " + container);
+						/*								
 						//ui.draggable.hide();
 						//ui.draggable.addClass( "strikethrough" );
 						//$( this ).removeClass( "ui-state-highlight" );
-						//var itemId = ui.draggable.attr("id");
+						
 						//var moveTo = $(this).attr("id");
 						
 						//var url = "${request.contextPath}/category/moveItem?child=" + child + "&newParent=" + parent;
 						//window.location.replace(url);
 						//moveItemToContainer(itemId, moveTo);
 						//$("#shipmentItemRow-" + itemId).hide();						
+						*/
 					}
 				});
 				
 						
-				$(".updateQuantity").change(changeQuantity);					
+				//$(".updateQuantity").change(changeQuantity);					
 				
 			});
 		
@@ -492,9 +490,9 @@
 	            return updateQuantity;
 			}
 
-			function moveItemToContainer(item, container) { 
-				$.post('${request.contextPath}/json/moveItemToContainer', 
-	                {item: item, container: container}, 
+			function moveShipmentItemToContainer(shipmentItem, container) { 
+				$.post('${request.contextPath}/json/moveShipmentItemToContainer', 
+	                {shipmentItem: shipmentItem, container: container}, 
 		                function(data) {
 							// do nothing for now
 							//console(data);

@@ -147,5 +147,9 @@
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/constraints-0.6.0/grails-app/i18n"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/constraints-0.6.0/grails-app/utils"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/constraints-0.6.0/src/java"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/image-builder-0.2/src/groovy"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/json-rest-api-1.0.11/grails-app/conf"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/json-rest-api-1.0.11/grails-app/controllers"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/json-rest-api-1.0.11/src/groovy"/>
     </wb-module>
 </project-modules>

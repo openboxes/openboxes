@@ -24,6 +24,18 @@ button.action-btn, button.previous, button.next {
 	padding: 0px;
 }
 
+.sorthandle {
+	background-image:url(../images/grippy.png);
+	cursor:move;
+	display:inline-block;
+	height:100%;
+	margin-bottom:-6px;
+	min-height:24px;
+	width:8px;
+}
+
+
+
 .button { 
 	-moz-border-radius: 5px;
 	border-radius: 5px;
@@ -153,6 +165,23 @@ button.action-btn, button.previous, button.next {
 .currentState > .circle { background-color: blue; }
 .currentState > .circle a { font-weight: bold; }  
 
+.numberCircle {
+    -webkit-border-radius: 999px;
+    -moz-border-radius: 999px;
+    border-radius: 999px;
+    behavior: url(PIE.htc);
+
+    width: 12px;
+    height: 12px;
+    padding: 4px;
+
+    background: lightyellow;
+    border: 1px solid #666;
+    color: #666;
+    text-align: center;
+
+    font: 10px Arial, sans-serif
+}
 
 
 /* Product Details box */
@@ -297,7 +326,7 @@ label, input, td, th {
 th { 
 	border-top: 0px;
 	border-bottom: 3px solid lightgrey;
-	background-color: white;
+	/*background-color: white;*/
 }
 
 tfoot th, tfoot td { 
