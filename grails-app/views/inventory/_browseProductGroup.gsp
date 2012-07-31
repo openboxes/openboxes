@@ -5,7 +5,7 @@
 					value="${inventoryItem?.productGroup?.id }" disabled="true"/>
 	</td>																
 	<td class="center middle">
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'magnifier.png')}" id="${inventoryItem?.productGroup?.id }" class="expandable" alt="" class="middle"/>
+		<img src="${createLinkTo(dir:'images/icons/silk',file:'application_cascade.png')}" id="${inventoryItem?.productGroup?.id }" class="expandable" alt="" class="middle"/>
 		<%-- 
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="" class="middle"/>
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_toggle_minus.png')}" alt="" class="middle"/>
