@@ -2,6 +2,7 @@ import org.pih.warehouse.core.Location
 
 class InitializationFilters {
 	def locationService
+	def productService
 	
 	def filters = {
 
@@ -9,13 +10,18 @@ class InitializationFilters {
 			before = {
 				try { 
 					Location currentLocation = Location.get(session?.warehouse?.id)
-					session.loginLocations = locationService.getLoginLocations(currentLocation)
+					session.loginLocations = locationService.getLoginLocations(currentLocation)					
 				} catch (Exception e) { 
 					// Only happens when location service is unavailable 	
 					log.error "Error retrieving login-able locations: " + e.message
 					//session.loginLocations = []
 				}
+				
 				// Make sure all session variables are initialized
+				if (!session.rootCategory) { 
+					session.rootCategory = productService.getRootCategory()
+				} 
+				
 				if (!session.inventoryCategoryFilters)
 					session.inventoryCategoryFilters = []; 
 					

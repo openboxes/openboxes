@@ -26,7 +26,6 @@
 		</g:hasErrors>
 
 		<div class="dialog">		
-			<fieldset>
 				<table>
 					<tbody>			
 						<tr>
@@ -61,7 +60,7 @@
 						</td>
 					</tr>
 				</table>
-			</fieldset>
+
 		</div>
 	</div>
 	<script>

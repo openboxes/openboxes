@@ -6,8 +6,11 @@ class ErrorsController {
 	def userService
 	
 	def handleException = { 
-		log.info("handle exception" + params)
 		render(view: "/error")
+	}
+	
+	def handleNotFound = { 
+		render(view:"/errors/notFound")
 	}
 	
 	def processError = { 

@@ -18,9 +18,13 @@
 			</div>
 		</g:if>
 		<div class="error">
-			<warehouse:message code="access.accessDenied.message" args="[actionName,session.user.username,session.user.manager]"/>
 		</div>
 		
+		
+		<h1>Access Denied</h1>
+		<div class="box middle center">
+			<img src="${createLinkTo(dir:'images/icons',file:'logo.png')}" class="home"/>
+		</div>
 		
 		
 		

@@ -109,17 +109,44 @@
 		</div>
 	</g:if>	    
   	<g:if test="${session.user}">
- 		<div class="breadcrumb">
+ 		<div>
  		
-   			<g:if test="${session?.user && session?.warehouse}">
-				<g:link controller="dashboard" action="index">
-					<img src="${createLinkTo(dir:'images/icons/silk',file:'house.png')}" class="middle"/>
-				</g:link>
-				&nbsp;
-				&rsaquo; 		
-				&nbsp;
-	    		<h1 style="display:inline" class="middle">${g.pageProperty(name: 'page.label2') ?: g.layoutTitle()}</h1>	
-	    	</g:if>
+   			
+	   			<ul class="breadcrumb">
+	   				<li>
+						<g:link controller="dashboard" action="index">
+							<img src="${createLinkTo(dir:'images/icons/silk',file:'house.png')}" class="home"/>
+						</g:link>
+					</li>
+					<g:if test="${session?.user && session?.warehouse}">
+						<li>
+							<a href="javascript:void(0);" class="warehouse-switch">
+								${session?.warehouse?.name }
+							</a>
+						</li>
+			    	</g:if>
+					<g:if test="${controllerName }">
+						<li>
+							<g:link controller="${controllerName }" action="index">
+								${controllerName.capitalize() }
+							</g:link>
+						</li>
+					</g:if>
+					<g:if test="${actionName }">
+						<li>
+							<a href="">
+								${actionName.capitalize() }
+							</a>
+			    		</li>
+		    		</g:if>
+		    		<g:if test="${g.pageProperty(name: 'page.label2') ?: g.layoutTitle() }">
+			    		<li>
+			    			<a href="">
+					    		${g.pageProperty(name: 'page.label2') ?: g.layoutTitle()} 	
+			    			</a>
+			    		</li>
+		    		</g:if>
+	    		</ul>
 	    	<%-- 				    
 		    	<g:link controller="dashboard" action="index">
 			    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'house.png')}" style="vertical-align: bottom;"/>
@@ -141,8 +168,15 @@
 	    			${label2}
 	    		</g:if>
     		--%>
+  	
    		</div>
   	</g:if>
+	<div class="pageTitle">
+		<g:if test="${session?.user && session?.warehouse}">
+			<h1>${g.pageProperty(name: 'page.label2') ?: g.layoutTitle()}</h1>	
+    	</g:if>
+	</div>  	
+  	
 	
 	<!-- Body includes the divs for the main body content and left navigation menu -->
 		
@@ -205,7 +239,7 @@
 					}
 				);
 			</g:if>
-			$("#warehouse-switch").click(function() {
+			$(".warehouse-switch").click(function() {
 				//$("#warehouse-menu").toggle();
 				$("#warehouseMenu").dialog({ 
 					autoOpen: true, 

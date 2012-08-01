@@ -285,11 +285,11 @@ a:hover {
 }
 
 #chooseLocation { 
-	width:400px;
+	width: 600px;
 	position: absolute;
-	top: 10%;
+	top: 100px;
 	left: 50%;
-	margin-left: -200px;
+	margin-left: -300px;
 }
 
 #loginForm { 
@@ -584,10 +584,12 @@ hr.space {background:#fff;color:#fff;}
 	so I was using absolute positioning at one point (might be gone now)  */
  	
 #hd { 
-    vertical-align: bottom;		
-	border-bottom: 1px solid lightgrey;
-	background-color: white;
+	vertical-align: bottom;		
 	margin: 5px;	
+	/*
+    border-bottom: 1px solid lightgrey;
+	background-color: white;
+	*/
 }
 
 #banner { 
@@ -626,10 +628,83 @@ ul.treeList li ul li {
     margin: 0 0px;
 }
 
+.pageTitle { 
+	margin:  10px 0 0 15px;	
+}
+
 /* breadcrumb 
 -------------------------------------------------------------*/
-.breadcrumb { 
-	margin:  10px 0 0 15px;	
+.breadcrumb {
+    font: 11px Arial, Helvetica, sans-serif;
+    background-image:url('../images/bc_bg.png'); 
+    background-repeat:repeat-x;
+    height:30px;
+    line-height:30px;
+    color:#9b9b9b;
+    border-bottom:solid 1px #cacaca;
+    width:100%;
+    overflow:hidden;
+    margin:0px;
+    padding:0px;
+}
+
+.breadcrumb li {
+    list-style-type:none;
+    float:left;
+    padding-left:10px;
+}
+
+.breadcrumb a {
+    height:30px;
+    display:block;
+    background-image:url('../images/bc_separator.png'); 
+    background-repeat:no-repeat; 
+    background-position:right;
+    padding-right: 15px;
+    text-decoration: none;
+    color:#454545;
+}
+
+.home {
+    border: none;
+    margin: 8px 0px;
+}
+
+.breadcrumb a:hover {
+    /*color:#35acc5;*/
+    text-decoration: underline;
+}
+
+
+/* Bubble with an isoceles triangle
+------------------------------------------ */
+
+.triangle-isosceles {
+   position:relative;
+   padding:15px;
+   margin:1em 0 3em;
+   color:#000;
+   background:#f3961c;
+
+   /* css3 */
+   -moz-border-radius:10px;
+   -webkit-border-radius:10px;
+   border-radius:10px;
+   background:-moz-linear-gradient(top, #f9d835, #f3961c);
+   background:linear-gradient(top, #f9d835, #f3961c);
+}
+
+/* creates triangle */
+.triangle-isosceles:after {
+   content:"";
+   display:block; /* reduce the damage in FF3.0 */
+   position:absolute;
+   bottom:-15px;
+   left:50px;
+   width:0;
+   border-width:15px 15px 0;
+   border-style:solid;
+   border-color:#f3961c transparent;
 }
 
 /* megamenu 
@@ -780,7 +855,7 @@ span.left { width: 10%;  float: left; text-align: center; }
 .selected { 
 	font-weight: bold;		
 }
-
+select{ padding: 3px; }
 .tabSelected { 
 text-align: center;
 background-color: white; 

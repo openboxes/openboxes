@@ -6,7 +6,8 @@
 		    <div id="bannerLeft" class="yui-u first" >
 				<div class="logo" >
 				    <a class="home" href="${createLink(uri: '/dashboard/index')}" style="text-decoration: none">						    	
-			    		<img src="${createLinkTo(dir:'images/icons/',file:'logo.gif')}" title="${warehouse.message(code:'default.tagline.label') }" class="middle"/>
+			    		<img src="${createLinkTo(dir:'images/icons/',file:'logo24.png')}" title="${warehouse.message(code:'default.tagline.label') }" class="middle"/>
+			    		&nbsp;
 		    			<span style="font-size: 2em; vertical-align: middle;" class="title">
 							<warehouse:message code="default.openboxes.label"/>
 						</span>
@@ -95,7 +96,7 @@
 									<%-- 
 									<a class="home" href='${createLink(controller: "dashboard", action:"chooseLocation")}'></a>
 									--%>
-									<a href="javascript:void(0);" id="warehouse-switch">
+									<a href="javascript:void(0);" class="warehouse-switch">
 										${session?.warehouse?.name }
 									</a>
 									<span id="warehouseMenu" title="${warehouse.message(code:'warehouse.chooseLocationToManage.message')}" style="display: none;">

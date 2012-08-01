@@ -1,21 +1,30 @@
 <span>
 	<g:form method="GET" controller="inventory" action="browse" style="display: inline;">
-		<g:textField id="${attrs.id}" class="${attrs.cssClass}" type="text" name="searchTerms" size="${attrs.size}"
+		<g:textField id="${attrs.id}" name="searchTerms" class="${attrs.cssClass}" type="text" size="${attrs.size}"
 			value="${attrs.value}" style="width: ${attrs.width}px; display: ${attrs.display};"/> 	
-			
 		<g:hiddenField name="resetSearch" value="${true }"/>							
-		<g:hiddenField name="category.id" value="${rootCategory?.id }"/>	
+		<g:hiddenField name="categoryId" value="${session?.rootCategory?.id }"/>	
 		<g:hiddenField name="searchPerformed" value="${true }"/>
 		<g:hiddenField name="showHiddenProducts" value="on"/>
 		<g:hiddenField name="showOutOfStockProducts" value="on"/>
-												
+		<%-- 
+		<span class="" style="background-color:white; color: #333; padding: 0; margin: 0;">
+			${session.rootCategory }
+		</span>
+		<select name="categoryId" class="hidden">
+			<option value="${session.rootCategory?.id }">${session.rootCategory?.name }</option>
+			<g:each var="category" in="${session?.rootCategory?.categories }">
+				<option value="${category.id }">${category.name }</option>
+			</g:each>
+		</select>
+		--%>									
 	</g:form>
 </span>
 	
 	
 	<script>
 		$(document).ready(function() {
-			$("#${attrs.id}").watermark("${warehouse.message(code:'default.search.label')}");
+			$("#${attrs.id}").watermark("${warehouse.message(code:'inventory.search.label')}");
 	      	$("#${attrs.id}").autocomplete( { 
 	      		source: function(req, resp) {
 			  		$.getJSON('${attrs.jsonUrl}', req, function(data) {

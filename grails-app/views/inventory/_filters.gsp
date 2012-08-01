@@ -5,13 +5,16 @@
 				<tr>
 					<td>					
 						<label><warehouse:message code="inventory.filterBy.label"></warehouse:message></label>
+						
+						<g:link controller="inventory" action="browse" params="[categoryId:session?.rootCategory?.id,resetSearch:true]">reset</g:link>
+						
 					</td>
 				</tr>				
 			
 				<g:if test="${!commandInstance?.categoryInstance.categories.isEmpty()}">
 					<tr>
 						<td>
-							<format:category category="${commandInstance?.categoryInstance }"/>
+							
 							<select id="subcategoryId" name="subcategoryId" class="text">
 								<option value=""></option>
 								<g:render template="../category/selectOptions" model="[category:commandInstance?.categoryInstance, selected:commandInstance?.subcategoryInstance, level: 0]"/>								
@@ -22,7 +25,6 @@
 				<g:else>				
 					<tr>
 						<td>
-							<warehouse:message code="category.label"/> :
 							<format:category category="${commandInstance?.categoryInstance }"/>
 							
 						</td>

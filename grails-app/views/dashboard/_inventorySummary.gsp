@@ -14,12 +14,14 @@
 								<g:textField id="dashboardSearchBox" name="searchTerms" size="60" value="${params.searchTerms }" 
 									class="text medium"/>						
 								<g:hiddenField name="resetSearch" value="true"/>							
-								<g:hiddenField name="category.id" value="${rootCategory.id }"/>							
+								<g:hiddenField name="categoryId" value="${rootCategory.id }"/>							
+								<g:hiddenField name="showHiddenProducts" value="on"/>
+								<g:hiddenField name="showOutOfStockProducts" value="on"/>
 								
-									<button type="submit" class="" name="searchPerformed" value="true">
-										<img src="${createLinkTo(dir: 'images/icons/silk', file: 'find.png' )}" class="middle"/>
-										&nbsp;<warehouse:message code="default.find.label"/>&nbsp;
-									</button>
+								<button type="submit" class="" name="searchPerformed" value="true">
+									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'find.png' )}" class="middle"/>
+									&nbsp;<warehouse:message code="default.find.label"/>&nbsp;
+								</button>
 								
 							</div>
 						</div>
