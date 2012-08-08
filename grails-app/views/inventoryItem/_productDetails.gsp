@@ -64,7 +64,9 @@
 				<td>
 					<div class="value">
 						<g:if test="${productInstance?.category?.name }">
-							<format:category category="${productInstance?.category}"/>
+							<g:link controller="inventory" action="browse" params="[subcategoryId:productInstance?.category?.id,showHiddenProducts:'on',showOutOfStockProducts:'on',searchPerformed:true]">
+								<format:category category="${productInstance?.category}"/>
+							</g:link>
 						</g:if>
 						<g:else>
 							<span class="fade"><warehouse:message code="default.none.label"/></span>
@@ -72,7 +74,9 @@
 					</div>
 					<g:each var="category" in="${productInstance?.categories }">						
 						<div>
-							<format:category category="${category}"/>
+							<g:link controller="inventory" action="browse" params="[subcategoryId:category?.id,showHiddenProducts:true,showOutOfStockProducts:true,searchPerformed:true]">
+								<format:category category="${category}"/>
+							</g:link>
 						</div>
 					</g:each>
 					

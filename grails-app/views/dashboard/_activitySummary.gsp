@@ -21,7 +21,7 @@
 					<g:set var="status" value="${0 }"/>
 		 			<g:each var="activity" in="${activityList }" status="i">
 		 				<tr class="${status++%2?'odd':'even' } prop">
-		 					<td>
+		 					<td class="center">
 								<img src="${createLinkTo(dir:'images/icons/silk',file: activity.type + '.png')}" class="middle"/> 
 							</td>
 							<td>

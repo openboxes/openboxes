@@ -9,6 +9,7 @@ public enum UnitOfMeasureType {
 	CURRENCY('Currency'),	
 	LENGTH('Length'),
 	MASS('Mass'),
+	PACKAGE('Package'),
 	QUANTITY('Quantity'),
 	VOLUME('Volume');
 	
@@ -17,7 +18,7 @@ public enum UnitOfMeasureType {
 	UnitOfMeasureType(String name) { this.name = name; }
 
 	static list() {
-		[ AREA, CURRENCY, LENGTH, MASS, QUANTITY, VOLUME]
+		[ AREA, CURRENCY, LENGTH, MASS, PACKAGE, QUANTITY, VOLUME]
 	}
 }
 

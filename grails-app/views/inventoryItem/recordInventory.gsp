@@ -12,11 +12,7 @@
 	--%>
 	
 	<content tag="title">	
-		<span class="fade">
-			<format:product product="${commandInstance?.productInstance}"/>
-		</span>
-		&rsaquo;
-		<warehouse:message code="inventory.recordInventory.label"/>
+		<format:product product="${commandInstance?.productInstance}"/>
 	</content>
 
 	<content tag="content">

@@ -4,7 +4,7 @@
 			<table style="width: 10%">
 				<tr>
 					<td>					
-						<label><warehouse:message code="inventory.filterBy.label"></warehouse:message></label>
+						<label><warehouse:message code="inventory.filterByProduct.label"></warehouse:message></label>
 						
 						<g:link controller="inventory" action="browse" params="[categoryId:session?.rootCategory?.id,resetSearch:true]">reset</g:link>
 						
@@ -37,14 +37,17 @@
 				</tr>
 				<tr>
 					<td>
-						<div>
-							<g:checkBox name="showHiddenProducts" value="${commandInstance.showHiddenProducts}"/>	
-							<warehouse:message code="inventory.showHiddenProducts.label"/>					
+						<label><warehouse:message code="inventory.filterByStatus.label"></warehouse:message></label>
+						<div style="padding: 10px;">
+							<div>
+								<g:checkBox name="showHiddenProducts" value="${commandInstance.showHiddenProducts}"/>	
+								<warehouse:message code="inventory.showHiddenProducts.label"/>					
+							</div>
+							<div>
+								<g:checkBox name="showOutOfStockProducts" value="${commandInstance.showOutOfStockProducts}" size="24"/>	
+								<warehouse:message code="inventory.showOutOfStockProducts.label"/>
+							</div>					
 						</div>
-						<div>
-							<g:checkBox name="showOutOfStockProducts" value="${commandInstance.showOutOfStockProducts}" size="24"/>	
-							<warehouse:message code="inventory.showOutOfStockProducts.label"/>
-						</div>					
 					</td>				
 				</tr>
 				<tr>
@@ -58,24 +61,22 @@
 				<tr class="prop">
 					<td>
 						<label><warehouse:message code="inventory.filterKey.label"></warehouse:message></label>	
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'flag_green.png')}" alt="${warehouse.message(code: 'inventory.markAsSupported.label') }" style="vertical-align: middle"/>
-						&nbsp;<warehouse:message code="enum.InventoryStatus.SUPPORTED"/>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'flag_orange.png')}" alt="${warehouse.message(code: 'inventory.markAsNonInventoried.label') }" style="vertical-align: middle"/>
-						&nbsp;<warehouse:message code="enum.InventoryStatus.SUPPORTED_NON_INVENTORY"/>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'flag_red.png')}" alt="${warehouse.message(code: 'inventory.markAsNotSupported.label') }" style="vertical-align: middle"/>
-						&nbsp;<warehouse:message code="enum.InventoryStatus.NOT_SUPPORTED"/>																	
+						<div style="padding: 10px;">						
+							<div>
+								<img src="${createLinkTo(dir:'images/icons/silk',file:'flag_green.png')}" alt="${warehouse.message(code: 'inventory.markAsSupported.label') }" style="vertical-align: middle"/>
+								&nbsp;<warehouse:message code="enum.InventoryStatus.SUPPORTED"/>
+							</div>
+							<div>
+		
+								<img src="${createLinkTo(dir:'images/icons/silk',file:'flag_orange.png')}" alt="${warehouse.message(code: 'inventory.markAsNonInventoried.label') }" style="vertical-align: middle"/>
+								&nbsp;<warehouse:message code="enum.InventoryStatus.SUPPORTED_NON_INVENTORY"/>
+							</div>
+							<div>
+							
+								<img src="${createLinkTo(dir:'images/icons/silk',file:'flag_red.png')}" alt="${warehouse.message(code: 'inventory.markAsNotSupported.label') }" style="vertical-align: middle"/>
+								&nbsp;<warehouse:message code="enum.InventoryStatus.NOT_SUPPORTED"/>																	
+							</div>
+						</div>
 					</td>
 				</tr>
 			</table>

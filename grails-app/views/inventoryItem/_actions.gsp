@@ -3,7 +3,7 @@
 			<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" class="middle"/>
 			<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" class="middle"/>
 		</button>
-		<div class="actions left">
+		<div class="actions">
 			<div class="action-menu-item">					
 				<g:link controller="product" action="edit" id="${product?.id }">
 					<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;

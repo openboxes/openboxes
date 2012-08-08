@@ -21,7 +21,7 @@
 		<h1><warehouse:message code="notFound.label" default="Page Not Found"/></h1>
 		<div>
 			<div class="triangle-isosceles">
-				We can't find the page you're looking for. 
+				Apologies, but we can't find the page you're looking for. 
 			</div>
 			<div style="padding-left: 45px;">
 				<img src="${createLinkTo(dir:'images/icons',file:'logo.png')}"/>

@@ -110,44 +110,50 @@
 	</g:if>	    
   	<g:if test="${session.user}">
  		<div>
- 		
-   			
-	   			<ul class="breadcrumb">
-	   				<li>
-						<g:link controller="dashboard" action="index">
-							<img src="${createLinkTo(dir:'images/icons/silk',file:'house.png')}" class="home"/>
+   			<ul class="breadcrumb">
+   				<li>
+					<g:link controller="dashboard" action="index">
+						<img src="${createLinkTo(dir:'images/icons/silk',file:'house.png')}" class="home"/>
+					</g:link>
+				</li>
+				<g:if test="${session?.user && session?.warehouse}">
+					<li>
+						<a href="javascript:void(0);" class="warehouse-switch">
+							${session?.warehouse?.name }
+						</a>
+					</li>
+		    	</g:if>
+				<g:if test="${controllerName }">
+					<li>
+						<g:link controller="${controllerName }" action="index">
+							<warehouse:message code="${controllerName + '.' + actionName + '.label'}" />
 						</g:link>
 					</li>
-					<g:if test="${session?.user && session?.warehouse}">
-						<li>
-							<a href="javascript:void(0);" class="warehouse-switch">
-								${session?.warehouse?.name }
-							</a>
-						</li>
-			    	</g:if>
-					<g:if test="${controllerName }">
-						<li>
-							<g:link controller="${controllerName }" action="index">
-								${controllerName.capitalize() }
-							</g:link>
-						</li>
-					</g:if>
-					<g:if test="${actionName }">
-						<li>
-							<a href="">
-								${actionName.capitalize() }
-							</a>
-			    		</li>
-		    		</g:if>
-		    		<g:if test="${g.pageProperty(name: 'page.label2') ?: g.layoutTitle() }">
-			    		<li>
-			    			<a href="">
-					    		${g.pageProperty(name: 'page.label2') ?: g.layoutTitle()} 	
-			    			</a>
-			    		</li>
-		    		</g:if>
-	    		</ul>
-	    	<%-- 				    
+				</g:if>
+				<%-- 
+				<g:if test="${actionName }">
+					<li>
+						<a href="">
+							${actionName.capitalize() }
+						</a>
+		    		</li>
+	    		</g:if>
+	    		--%>
+
+	    		<g:if test="${g.layoutTitle() }">
+		    		<li>
+		    			<a href="">
+		    				<%-- 
+				    		${g.pageProperty(name: 'page.label2') ?: g.layoutTitle()} 	
+				    		--%>
+				    		${g.layoutTitle()}
+		    			</a>
+		    		</li>
+	    		</g:if>
+
+    		</ul>
+    		
+    		<%-- 				    
 		    	<g:link controller="dashboard" action="index">
 			    	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'house.png')}" style="vertical-align: bottom;"/>
 		    	</g:link>
@@ -171,12 +177,23 @@
   	
    		</div>
   	</g:if>
-	<div class="pageTitle">
-		<g:if test="${session?.user && session?.warehouse}">
-			<h1>${g.pageProperty(name: 'page.label2') ?: g.layoutTitle()}</h1>	
-    	</g:if>
+  	<%-- 
+  	<div class="page-actions">
+  		${g.pageProperty(name: 'page.actions')}
+  	</div>
+  	--%>
+  	<%--
+  	<div class="page-header">
+	  	<div class="page-actions">
+	  		${g.pageProperty(name: 'page.actions')}
+	  	</div>
+	  	<div class="page-title">
+			<g:if test="${session?.user && session?.warehouse}">
+				<h1>${g.pageProperty(name: 'page.label2') ?: g.layoutTitle()}</h1>	
+		   	</g:if>
+	   	</div>
 	</div>  	
-  	
+  	 --%>
 	
 	<!-- Body includes the divs for the main body content and left navigation menu -->
 		

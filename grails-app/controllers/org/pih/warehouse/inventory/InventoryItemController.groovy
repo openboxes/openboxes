@@ -98,7 +98,7 @@ class InventoryItemController {
 			}
 		}
 	
-		
+		session.lastProduct = commandInstance.productInstance
 			
 			
 		[ commandInstance: commandInstance, orderMap: orderMap, shipmentMap: shipmentMap, requestMap: requestMap ]

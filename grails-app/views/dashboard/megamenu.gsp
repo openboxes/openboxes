@@ -14,27 +14,14 @@
 	<g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
 		<li>
 			<g:link controller="inventory" action="browse">
-				<warehouse:message code="inventory.label" />
+				<warehouse:message code="inventory.label" />&nbsp;
 			</g:link>
 			<div>							
 				<table>
 					<tr>
-						<td style="${quickCategories ? 'border-right: 2px solid black;':''}">
-							<table>
-								<tr>
-									<td>
-										<g:link controller="inventory" action="browse"><warehouse:message code="inventory.browse.label"/></g:link>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<g:link controller="product" action="create"><warehouse:message code="product.add.label"/></g:link>
-									</td>					
-								</tr>
-							</table>
-						</td>
-						<td>
-							<g:if test='${quickCategories }'>	
+						<g:if test='${quickCategories }'>	
+							<td colspan="2">
+								<h2>Quick categories</h2>
 								<table>
 									<tr>
 										<g:each var="quickCategory" in="${quickCategories}">
@@ -43,30 +30,29 @@
 													<tr>
 														<td>
 															<g:link controller="inventory" action="browse" params="[categoryId:quickCategory.id,resetSearch:true]">
-																<b><format:category category="${quickCategory}"/></b>
+																<label><format:category category="${quickCategory}"/></label>
 															</g:link>
 														</td>
 													</tr>
 													<tr>
 														<td>
 															<div class="menu-section">
-																<g:if test="${quickCategory.categories}">
-																	<table>							
+																<ul>							
+																	<g:if test="${quickCategory.categories}">
 																		<g:each var="childCategory" in="${quickCategory.categories}">
-																			<tr>
-																				<td>
-																					<g:link controller="inventory" action="browse" params="[categoryId:childCategory.id,resetSearch:true]">
-																						<format:category category="${childCategory}"/>
-																					</g:link>
-																					
-																				</td>
-																			</tr>																				
+																			<li>
+																				<g:link controller="inventory" action="browse" params="[categoryId:childCategory.id,resetSearch:true]">
+																					<format:category category="${childCategory}"/>
+																				</g:link>
+																			</li>																				
 																		</g:each>	
-																	</table>
-																</g:if>
-																<g:else>
-																	<warehouse:message code="default.none.label"></warehouse:message>
-																</g:else>
+																	</g:if>
+																	<g:else>
+																		<li>
+																			<warehouse:message code="default.none.label"></warehouse:message>
+																		</li>
+																	</g:else>
+																</ul>
 															</div>
 														</td>
 													</tr>
@@ -75,7 +61,38 @@
 										</g:each>	
 									</tr>
 								</table>
-							</g:if>	
+							</td>
+						</g:if>						
+					</tr>				
+					<tr>
+						<td>
+							<h2>Actions</h2>
+							<div class="buttonsBar">
+								<div class="linkButton">
+									<g:link controller="inventory" action="browse" class="browse"><warehouse:message code="inventory.browse.label"/></g:link>
+								</div>
+								<div class="linkButton">
+									<g:link controller="product" action="create" class="create"><warehouse:message code="product.create.label"/></g:link>
+								</div>
+								<div class="linkButton">
+									<g:link controller="createProductFromTemplate" action="index" class="create"><warehouse:message code="product.createFromTemplate.label"/></g:link>
+								</div>
+								<div class="linkButton">
+									<g:link controller="createProduct" action="index" class="create"><warehouse:message code="product.createFromExternal.label"/></g:link>
+								</div>
+							</ul>
+						</td>
+						<td>
+							<g:if test="${session.lastProduct }" >
+								<h2>Recently viewed</h2>
+								<div class="buttonsBar">
+									<div class="linkButton">
+										<g:link controller="inventoryItem" action="showStockCard" id="${session.lastProduct.id }" class="product">
+											${session.lastProduct.name }</g:link>						
+										<span class="fade">edited <g:formatDate date="${session.lastProduct.lastUpdated }" format="MMM dd hh:mma"/></span>					
+									</div>
+								</ul>
+							</g:if>
 						</td>
 					</tr>
 				</table>				
@@ -101,6 +118,8 @@
 								<g:each in="${incomingOrders}" var="orderStatusRow">
 									<tr>
 										<td>
+										
+										
 											<g:link controller="order" action="list" params="[status:orderStatusRow[0]]">
 												<format:metadata obj="${orderStatusRow[0]}"/> (${orderStatusRow[1]})
 											</g:link>
@@ -262,7 +281,9 @@
 	</g:authorize>		
 	
 	<li>
-		<a href="javascript:void(0)"><warehouse:message code="report.label" /></a>
+		<a href="javascript:void(0)">
+			<warehouse:message code="report.label" />
+		</a>
 		<div>
 			<table>			
 				<tr>
@@ -307,7 +328,9 @@
 		
 	</li>
 	<li>
-		<a href="javascript:void(0)"><warehouse:message code="admin.label" /></a>	
+		<a href="javascript:void(0)">
+			<warehouse:message code="admin.label" />
+		</a>	
 		<div>
 			<table>
 				<tr>
@@ -335,18 +358,20 @@
 					
 						<g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">	
 							<span class="menu-subheading"><warehouse:message code="inventory.label"/></span>
-							<table>			
-								<tr>
-									<td>
-										<g:link controller="inventory" action="listAllTransactions"><warehouse:message code="transaction.list.label"/></g:link> 
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<g:link controller="inventory" action="editTransaction"><warehouse:message code="transaction.add.label"/></g:link> 				
-									</td>			
-								</tr>
-							</table>	
+							<div class="buttonBar">
+								<div class="linkButton">
+									<g:link controller="inventory" action="listAllTransactions" class="list"><warehouse:message code="transaction.list.label"/></g:link> 
+								</div>										
+								<div class="linkButton">
+									<g:link controller="inventory" action="editTransaction" class="create"><warehouse:message code="transaction.add.label"/></g:link> 				
+								</div>										
+								<div class="linkButton">
+									<g:link controller="unitOfMeasure" action="list" class="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'unitOfMeasure.label')]"/></g:link> 				
+								</div>										
+								<div class="linkButton">
+									<g:link controller="unitOfMeasureClass" action="list" class="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'unitOfMeasureClass.label')]"/></g:link> 				
+								</div>										
+							</div>
 						</g:authorize>				
 					</td>
 					<td>

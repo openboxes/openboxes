@@ -4,7 +4,7 @@ import java.util.Date;
 
 import org.pih.warehouse.auth.AuthService;
 
-class UnitOfMeasure {
+class UnitOfMeasureClass {
 
 	def beforeInsert = {
 		createdBy = AuthService.currentUser.get()
@@ -12,12 +12,14 @@ class UnitOfMeasure {
 	def beforeUpdate ={
 		updatedBy = AuthService.currentUser.get()
 	}
-	
+
 	String id
-	String name					// unit of measure name (cubic millimeters)
-	String code					// abbreviation (e.g. mm3)
-	String description			// description of unit of measure (optional)
-	UnitOfMeasureClass uomClass
+	String name					// area, volume, length, weight, currency
+	String code					
+	String description 
+	Boolean active
+	UnitOfMeasureType type
+	UnitOfMeasure baseUom
 	
 	// Auditing
 	Date dateCreated;
@@ -30,14 +32,17 @@ class UnitOfMeasure {
 	}
 	
 	static constraints = { 
-		name(nullable:false, maxSize:255)
-		code(nullable:false, maxSize:255)
-		description(nullable:true, maxSize:255)
-		uomClass(nullable:true)
+		name(nullable:false)
+		code(nullable:false)
+		description(nullable:true)
+		active(nullable:true)
+		type(nullable:false)
+		baseUom(nullable:true)
 		
 		createdBy(nullable:true)
 		updatedBy(nullable:true)
 	}
 	
-	String toString() { return name } 
+	String toString() { return name }
+	
 }

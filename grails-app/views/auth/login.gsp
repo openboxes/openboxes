@@ -42,9 +42,8 @@
 					<fieldset> 			
 						<legend>							
 							<div id="logo">
-					    		<img src="${createLinkTo(dir:'images/icons/',file:'logo.gif')}" alt="Your Boxes. You're Welcome." 
-					    			class="middle"/>
-				    			<span class="middle title" style="font-size: 2em; color: #666; vertical-align: middle;"><warehouse:message code="default.openboxes.label"/></span>
+						    	<img src="${createLinkTo(dir:'images/icons/',file:'logo24.png')}" title="${warehouse.message(code:'default.tagline.label') }" class="middle"/>&nbsp;
+								<span class="middle title" style="font-size: 2em; color: #666; vertical-align: middle;"><warehouse:message code="default.openboxes.label"/></span>
 							</div>	
 						</legend>
 						<table>

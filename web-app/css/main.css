@@ -113,12 +113,6 @@ input:focus, select:focus, textarea:focus {
     background: url(../images/skin/new.png) center left no-repeat;
 }
 
-.linkButton a.stockCard {
-	background: url(../images/icons/silk/book.png) center left no-repeat;
-}
-
-
-
 /* MESSAGES AND ERRORS */
 
 .message {
@@ -381,8 +375,11 @@ th.desc a {
 .linkButton a.transaction {
     background: url(../images/icons/document.png) center left no-repeat;
 }
-.linkButton a.stockcard {
-    background: url(../images/icons/silk/book_open.png) center left no-repeat;
+.linkButton a.stockCard {
+	background: url(../images/icons/silk/book.png) center left no-repeat;
+}
+.linkButton a.recordInventory {
+	background: url(../images/icons/silk/book_add.png) center left no-repeat;
 }
 .linkButton a.country {
     background: url(../images/icons/map.png) center left no-repeat;

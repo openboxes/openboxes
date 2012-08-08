@@ -71,7 +71,6 @@ class ProductController {
 	}
 	*/
 	
-	
 	/** 
 	 * Perform a bulk update of 
 	 */
@@ -348,7 +347,42 @@ class ProductController {
 			redirect(action: "edit", id: params.id)
 		}
 	}
+	
+	
+	def removePackage = { 
+		def packageInstance = ProductPackage.get(params.id)
+		def productInstance = packageInstance.product
+		log.info "" + packageInstance.product
+		productInstance.removeFromPackages(packageInstance)
+		packageInstance.delete()
+		productInstance.save();
+		flash.message = "Product package has been deleted"
+		redirect(action: "edit", id: productInstance.id)
+	}
 
+	def savePackage = { 
+		
+		println "savePackage: " + params
+		def productInstance = Product.get(params.id)		
+		def packageInstance = new ProductPackage(params)
+		productInstance.addToPackages(packageInstance)
+		
+		if (!productInstance.hasErrors() && productInstance.save(flush: true) ) {
+			flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'package.label', default: 'Product'), packageInstance.name])}"			
+			redirect(action: "edit", id: productInstance?.id)
+		}
+		else {
+			def location = Location.get(session.warehouse.id)
+			def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, location.inventory)
+			if (!inventoryLevelInstance) {
+				inventoryLevelInstance = new InventoryLevel();
+			}
+			
+			render(view: "edit", model: [productInstance: productInstance, inventoryLevelInstance: inventoryLevelInstance, packageInstance: packageInstance, rootCategory: productService.getRootCategory()])
+		}
+	}
+	
+	
 	/**
 	 * 
 	 */

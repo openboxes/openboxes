@@ -5,6 +5,10 @@ grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir	= "target/test-reports"
 //grails.project.war.file = "target/${appName}-${appVersion}.war"
 
+// Sample plugin (override request functionality)
+//grails.plugin.location.'openboxes-request' = "../openboxes-request"
+
+
 grails.project.dependency.resolution = {
 	// inherit Grails' default dependencies
 	inherits( "global" ) {

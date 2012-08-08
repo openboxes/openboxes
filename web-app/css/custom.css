@@ -565,6 +565,23 @@ h2 {
 	*/
 }
 
+.page-header { 
+	margin: 10px 0px 0px 25px;
+	vertical-align: middle;
+
+}
+
+.page-actions { 
+	vertical-align: middle;
+	float: left;
+	width: 55px;
+}
+
+.page-title { 
+	margin-left: 15px;
+}
+
+
 .section { 	
 	/*
 	padding-left: 10px; 
@@ -969,3 +986,22 @@ img.photo_tiny {
 	color: grey;
 }
 
+.template-image { 
+	text-align: center
+}
+
+.template-name { 
+	text-align: center;
+	font-size: 13px;
+}
+
+
+.template-form div { 
+	padding: 5px;
+}
+
+.template-form label { 
+	display: inline-block;
+    width: 150px;	
+	text-align: right;
+}

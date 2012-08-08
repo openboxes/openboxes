@@ -57,6 +57,10 @@ input.checkbox, input.radio {
   position:relative; top:.25em; 
 }
 
+input[readonly="readonly"] {
+    background-color: lightgrey;
+}
+
 form.inline { line-height:3; }
 form.inline p { margin-bottom:0; }
 

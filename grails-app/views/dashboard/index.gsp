@@ -30,8 +30,7 @@
 						<td>
 							<g:if test='${activityList }'>
 								<g:render template="activitySummary"/>
-							</g:if>
-						
+							</g:if>						
 						</td>
 					</tr>
 				</table>

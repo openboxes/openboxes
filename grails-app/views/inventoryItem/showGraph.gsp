@@ -1,11 +1,11 @@
 <g:applyLayout name="stockCard">
 
 	<content tag="title">	
-		<warehouse:message code="inventory.showConsumption.label"/>
+		<format:product product="${commandInstance?.productInstance}"/>
 	</content>
 
 	<content tag="heading">	
-		<format:product product="${commandInstance?.productInstance}"/>
+		<warehouse:message code="inventory.showConsumption.label"/>
 	</content>
 
 	<content tag="content">

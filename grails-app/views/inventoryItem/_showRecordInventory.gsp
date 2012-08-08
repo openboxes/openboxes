@@ -4,24 +4,19 @@
 		<g:hiddenField name="productInstance.id" value="${commandInstance.productInstance?.id}"/>
 		<g:hiddenField name="inventoryInstance.id" value="${commandInstance?.inventoryInstance?.id}"/>
 
+			
+		<div class="middle" style="padding: 5px;">
+			<label><warehouse:message code="inventory.dateOfInventory.label"/></label>													
+			<g:jqueryDatePicker 
+				id="transactionDate" 
+				name="transactionDate"
+				value="${commandInstance?.transactionDate}" 
+				format="MM/dd/yyyy"
+				showTrigger="false" />						
+		</div>
 		<div class="form-content" style="border: 1px solid lightgrey;">
 			<table id="inventoryItemsTable">
-				<thead>
-					<tr class="odd">
-						<td class="middle" colspan="4">
-							<label><warehouse:message code="inventory.dateOfInventory.label"/></label>													
-							<g:jqueryDatePicker 
-								id="transactionDate" 
-								name="transactionDate"
-								value="${commandInstance?.transactionDate}" 
-								format="MM/dd/yyyy"
-								showTrigger="false" />						
-						
-						</td>
-						<td class="right">
-						
-						</td>
-					</tr>
+				<thead>					
 					<tr class="even">	
 						<th width="30%"><warehouse:message code="default.lotSerialNo.label"/></th>
 						<th width="20%"><warehouse:message code="default.expires.label"/></th>
@@ -35,7 +30,7 @@
 					<g:if test="${inventoryItems }">											
 						<g:each var="recordInventoryRow" in="${inventoryItems?.sort { it.expirationDate }?.sort { it.lotNumber } }" status="status">
 							<g:set var="styleClass" value="${params?.inventoryItem?.id && recordInventoryRow?.id == params?.inventoryItem?.id ? 'selected-row' : ''}"/>
-							<tr class="${styleClass} ${status%2==0?'even':'odd'}">
+							<tr class="${styleClass} ${status%2==0?'odd':'even'}">
 								<td>
 									<%-- 
 									<g:textField name="recordInventoryRows[${status}].lotNumber" size="10" value="${recordInventoryRow?.lotNumber }"/>
@@ -83,21 +78,18 @@
 					</g:else>
 					
 				</tbody>
-				<tfoot>
-					<tr class="odd">
-						<td colspan="5" class="middle center">
-							<button name="save" type="submit" class="positive">
-								<img src="${createLinkTo(dir:'images/icons/silk', file:'accept.png') }"/>&nbsp;<warehouse:message code="default.button.save.label"/>&nbsp;
-							</button>
-							&nbsp;
-							<g:link controller="inventoryItem" action="showStockCard" 
-								params="['product.id':commandInstance.productInstance?.id]" class="negative"><warehouse:message code="default.button.cancel.label"/></g:link>
-						
-						</td>
-					</tr>
-				</tfoot>
 			</table>
 		</div>												
+		<div class="center buttons">		
+			<button name="save" type="submit" class="positive">
+				<img src="${createLinkTo(dir:'images/icons/silk', file:'accept.png') }"/>&nbsp;<warehouse:message code="default.button.save.label"/>&nbsp;
+			</button>
+			&nbsp;
+			<g:link controller="inventoryItem" action="showStockCard" 
+				params="['product.id':commandInstance.productInstance?.id]" class="negative"><warehouse:message code="default.button.cancel.label"/></g:link>
+		
+		</div>
+		
 	</g:form>
 </div>
 

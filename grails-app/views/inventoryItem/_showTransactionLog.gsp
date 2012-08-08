@@ -14,7 +14,7 @@
 						</td>
 					</tr>
 					<tr class="even"> 
-						<td class="middle center">
+						<td class="middle left">
 							<g:jqueryDatePicker 
 								id="startDate" 
 								name="startDate" 

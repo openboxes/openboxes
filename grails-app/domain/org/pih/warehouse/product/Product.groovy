@@ -7,6 +7,7 @@ import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.list.LazyList;
 import org.pih.warehouse.auth.AuthService;
 import org.pih.warehouse.core.Document;
+import org.pih.warehouse.core.UnitOfMeasure;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.inventory.InventoryItem;
@@ -30,17 +31,13 @@ class Product implements Comparable, Serializable {
 	
 	def beforeInsert = {
 		createdBy = AuthService.currentUser.get()
-		println "before insert " + updatedBy
 	}
 	def beforeUpdate ={
 		updatedBy = AuthService.currentUser.get()
-		println "before update " + updatedBy
 	}
 
-	
-	String id
-	
 	// Base product information 
+	String id	
 	String name;							// Specific description for the product
 	String description;						// Not used at the moment
 	String productCode 						// Internal product code identifier
@@ -52,6 +49,9 @@ class Product implements Comparable, Serializable {
 	String manufacturer		// Manufacturer
 	String manufacturerCode // Manufacturer product (e.g. catalog code)
 	String unitOfMeasure	// each, pill, bottle, box
+
+	UnitOfMeasure defaultUom
+	//Integer uomQuantity 
 	
 	// Associations 
 	Category category;						// primary category
@@ -67,7 +67,13 @@ class Product implements Comparable, Serializable {
 		
 	static transients = ["rootCategory", "images"];
 	
-	static hasMany = [ categories : Category, attributes : ProductAttribute, tags : String, documents : Document, productGroups: ProductGroup ]	
+	static hasMany = [ 
+		categories : Category, 
+		attributes : ProductAttribute, 
+		tags : String, 
+		documents : Document, 
+		productGroups: ProductGroup, 
+		packages : ProductPackage ]	
 	
 	static mapping = {
 		id generator: 'uuid'
@@ -85,6 +91,7 @@ class Product implements Comparable, Serializable {
 		category(nullable:false)
 		coldChain(nullable:true)
 		
+		defaultUom(nullable:true)
 		upc(nullable:true, maxSize: 255)
 		ndc(nullable:true, maxSize: 255)
 		manufacturer(nullable:true, maxSize: 255)

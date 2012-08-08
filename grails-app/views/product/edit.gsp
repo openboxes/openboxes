@@ -27,27 +27,20 @@
 	                <g:renderErrors bean="${productInstance}" as="list" />
 	            </div>
             </g:hasErrors>
-
-			<div class="buttonBar">            	
-            	<span class="linkButton">
-            		<g:link class="list" action="list">
-            			<warehouse:message code="default.list.label" args="[warehouse.message(code:'products.label').toLowerCase()]"/>
-            		</g:link>
-            	</span>
-            	<span class="linkButton">
-            		<g:link class="stockCard" controller="inventoryItem" action="showStockCard" params="['product.id':productInstance?.id]">
-            			<warehouse:message code="inventory.showStockCard.label" />
-            		</g:link>
-            	</span>
-           	</div>
-
-			<div class="dialog">
-
+            
+			<g:render template="summary" model="[productInstance:productInstance]"/>
+	
+			
+			<div style="padding: 10px">
 				<div class="tabs">
 					<ul>
 						<li><a href="#tabs-details"><warehouse:message code="product.details.label"/></a></li>
-						<li><a href="#tabs-status"><warehouse:message code="product.status.label"/></a></li>						
-						<li><a href="#tabs-documents"><warehouse:message code="product.documents.label"/></a></li>
+						<%-- Only show these tabs if the product has been created --%>
+						<g:if test="${productInstance?.id }">
+							<li><a href="#tabs-packages"><warehouse:message code="packages.label"/></a></li>
+							<li><a href="#tabs-status"><warehouse:message code="product.status.label"/></a></li>						
+							<li><a href="#tabs-documents"><warehouse:message code="product.documents.label"/></a></li>
+						</g:if>
 					</ul>		
 					<div id="tabs-details" style="padding: 10px;">	
 						<g:set var="formAction"><g:if test="${productInstance?.id}">update</g:if><g:else>save</g:else></g:set>			
@@ -63,7 +56,7 @@
 											code="default.description.label" /></label></td>
 										<td valign="top"
 											class="value ${hasErrors(bean: productInstance, field: 'name', 'errors')}">
-										<g:textField name="name" value="${productInstance?.name}" size="80" class="medium text" />									
+											<g:textField name="name" value="${productInstance?.name}" size="80" class="medium text" />									
 										</td>
 									</tr>
 									
@@ -160,7 +153,7 @@
 										<td valign="top" class="name"><label for="coldChain"><warehouse:message
 											code="product.coldChain.label" /></label></td>
 										<td valign="top" class=" ${hasErrors(bean: productInstance, field: 'coldChain', 'errors')}">
-										<g:checkBox name="coldChain" value="${productInstance?.coldChain}" />
+											<g:checkBox name="coldChain" value="${productInstance?.coldChain}" />
 										</td>
 									</tr>
 									 
@@ -239,10 +232,11 @@
 						
 								</tbody>
 							</table>
-					</g:form>
-				</div>
-					<div id="tabs-status" style="padding: 10px;">
-						<g:if test="${productInstance?.id }">
+						</g:form>
+					</div>
+					<%-- Only show these tabs if the product has been created --%>
+					<g:if test="${productInstance?.id }">					
+						<div id="tabs-status" style="padding: 10px;">						
 				            <g:if test="${flash.message}">
 				            	<div class="message">${flash.message}</div>
 				            </g:if>
@@ -251,163 +245,453 @@
 					                <g:renderErrors bean="${inventoryLevelInstance}" as="list" />
 					            </div>
 				            </g:hasErrors>
-							<div class="dialog">
-								<g:form controller="inventoryItem" action="updateInventoryLevel">
-									<g:hiddenField name="id" value="${inventoryLevelInstance?.id}"/>
-									<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
-									<g:hiddenField name="product.id" value="${productInstance?.id}"/>
-									<fieldset>						
-										<table>
-											<tr class="prop">
-												<td class="name"><label><warehouse:message code="inventory.label"/></label></td>
-												<td class="value">
-													${inventoryInstance?.warehouse?.name }
-												</td>
-											</tr>
-											<g:if test="${productInstance }">
+							
+							<g:form controller="inventoryItem" action="updateInventoryLevel">
+								<g:hiddenField name="id" value="${inventoryLevelInstance?.id}"/>
+								<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
+								<g:hiddenField name="product.id" value="${productInstance?.id}"/>
+								<fieldset>						
+									<table>
+										<tr class="prop">
+											<td class="name"><label><warehouse:message code="inventory.label"/></label></td>
+											<td class="value">
+												${inventoryInstance?.warehouse?.name }
+											</td>
+										</tr>
+										<g:if test="${productInstance }">
 											<tr class="prop">
 												<td class="name"><label><warehouse:message code="product.label"/></label></td>
 												<td class="value">
 													<format:product product="${productInstance}" />
 												</td>
 											</tr>
-											</g:if>
-											<tr class="prop">
-												<td class="name"><label><warehouse:message code="inventoryLevel.status.label"/></label></td>
-												<td class="value">
-										           	<g:select name="status" 
-						           					   from="${org.pih.warehouse.inventory.InventoryStatus.list()}"
-						           					   optionValue="${{format.metadata(obj:it)}}" value="${inventoryLevelInstance.status}" 
-						           					   noSelection="['':warehouse.message(code:'inventoryLevel.chooseStatus.label')]" />&nbsp;&nbsp;	
-												</td>
-											</tr>
-											<tr class="prop">
-												<td class="name"><label><warehouse:message code="inventoryLevel.minimumQuantity.label"/></label></td>
-												<td class="value">
-													<g:textField name="minQuantity" value="${inventoryLevelInstance?.minQuantity }" size="5" class="text"/>
-												</td>
-											</tr>
-											<tr class="prop">
-												<td class="name"><label><warehouse:message code="inventoryLevel.reorderQuantity.label"/></label></td>
-												<td class="value">
-													<g:textField name="reorderQuantity" value="${inventoryLevelInstance?.reorderQuantity }" size="5" class="text"/>
-												</td>
-											</tr>
-											<tr class="prop">
-												<td></td>
+										</g:if>
+										<tr class="prop">
+											<td class="name"><label><warehouse:message code="inventoryLevel.status.label"/></label></td>
+											<td class="value">
+									           	<g:select name="status" 
+					           					   from="${org.pih.warehouse.inventory.InventoryStatus.list()}"
+					           					   optionValue="${{format.metadata(obj:it)}}" value="${inventoryLevelInstance.status}" 
+					           					   noSelection="['':warehouse.message(code:'inventoryLevel.chooseStatus.label')]" />&nbsp;&nbsp;	
+											</td>
+										</tr>
+										<tr class="prop">
+											<td class="name"><label><warehouse:message code="inventoryLevel.minimumQuantity.label"/></label></td>
+											<td class="value">
+												<g:textField name="minQuantity" value="${inventoryLevelInstance?.minQuantity }" size="5" class="text"/>
+											</td>
+										</tr>
+										<tr class="prop">
+											<td class="name"><label><warehouse:message code="inventoryLevel.reorderQuantity.label"/></label></td>
+											<td class="value">
+												<g:textField name="reorderQuantity" value="${inventoryLevelInstance?.reorderQuantity }" size="5" class="text"/>
+											</td>
+										</tr>
+										<tr class="prop">
+											<td></td>
+											<td>
+											
+												<button type="submit" class="positive"><img
+													src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
+													alt="Save" /> ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
+												</button>
+												&nbsp;
+												<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="negative">			
+													${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}			
+												</g:link>  
+											
+											</td>
+										</tr>
+									</table>			
+								</fieldset>
+							</g:form>			
+						</div>
+					
+						<div id="tabs-documents" style="padding: 10px;">					
+							<!-- process an upload or save depending on whether we are adding a new doc or modifying a previous one -->					
+							<g:uploadForm controller="product" action="upload">
+								<g:hiddenField name="product.id" value="${productInstance?.id}" />
+								<g:hiddenField name="document.id" value="${documentInstance?.id}" />
+								<table>
+									<tr class="prop">
+										<td valign="top" class="name"><label for="documents"><warehouse:message
+													code="documents.label" /></label></td>
+										<td valign="top"
+											class="value">
+											
+											<table>
+												<thead>
+													<tr>
+														<th>
+															<!-- Delete -->
+														</th>
+														<th>
+															<warehouse:message code="document.filename.label"/>
+														</th>
+														<th>
+															<warehouse:message code="document.contentType.label"/>
+														</th>
+													</tr>
+												</thead>
+												<tbody>
+													<g:each var="document" in="${productInstance?.documents }">
+														<tr>
+															<td>
+																<g:link action="deleteDocument" id="${document?.id}" params="['product.id':productInstance?.id]" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+																	<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" />
+																</g:link>												
+															</td>
+															<td>
+																${document.filename }
+															</td>	
+															<td>
+																${document.contentType }
+															</td>	
+														</tr>						
+													</g:each>
+													<g:unless test="${productInstance?.documents }">
+														<tr>
+															<td colspan="3">
+																<div class="padded fade center">													
+																	<warehouse:message code="product.hasNoDocuments.message"/>
+																</div>
+															</td>
+														</tr>
+													</g:unless>
+												</tbody>									
+											</table>
+										</td>
+									</tr>
+									<tr class="prop">
+										<td valign="top" class="name"><label><warehouse:message
+											code="document.selectFile.label" /></label>
+										</td>
+										<td valign="top" class="value">
+											<input name="fileContents" type="file" />
+											&nbsp;
+											<!-- show upload or save depending on whether we are adding a new doc or modifying a previous one -->
+											<button type="submit" class="positive"><img
+												src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}"
+															alt="save" />${documentInstance?.id ? warehouse.message(code:'default.button.save.label') : warehouse.message(code:'default.button.upload.label')}</button>
+										</td>
+									</tr>						
+								</table>
+							</g:uploadForm>
+						</div>
+						
+						
+						<div id="tabs-packages" style="padding: 10px;">						
+				            <%-- <g:if test="${flash.message}">
+				            	<div class="message">${flash.message}</div>
+				            </g:if>
+				            
+				            <g:hasErrors bean="${inventoryLevelInstance}">
+					            <div class="errors">
+					                <g:renderErrors bean="${inventoryLevelInstance}" as="list" />
+					            </div>
+				            </g:hasErrors>
+							--%>
+							
+							<div class="buttonBar">            	
+								<span class="linkButton">
+									<%--
+									<g:link class="create" controller="productPackage" action="create">Add product package</g:link>							
+									 --%>
+									<a href="javascript:void(0);" class="open-dialog create" dialog-id="package-dialog"><warehouse:message code="package.add.label"/></a>
+								</span>
+				            	<span class="linkButton">											
+									<a href="javascript:void(0);" class="open-dialog create" dialog-id="uom-dialog">Add UoM</a>
+								</span>
+								<%-- 
+								<span class="linkButton">
+									<a href="javascript:void(0);" class="open-dialog create" dialog-id="uom-class-dialog">Add UoM Class</a>
+								</span>
+								--%>
+							</div>
+							<div class="box">
+								<table>
+									<thead>
+										<tr>
+											<th>
+												<warehouse:message code="default.actions.label"/>
+											</th>
+											<th>
+												<warehouse:message code="package.gtin.label"/>
+											</th>
+											<th>
+												<warehouse:message code="package.description.label"/>
+											</th>
+											<th>
+												<warehouse:message code="package.quantity.label"/>
+											</th>
+											<th>
+												<warehouse:message code="package.uom.label"/>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<g:each var="pkg" in="${productInstance.packages }">
+											<tr>
 												<td>
 												
-													<button type="submit" class="positive"><img
-														src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
-														alt="Save" /> ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
-													</button>
-													&nbsp;
-													<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="negative">			
-														${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}			
-													</g:link>  
+													<span class="action-menu">
+														<button class="action-btn">
+															<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>							
+															<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>							
+														</button>
+														<div class="actions">
+															<div class="action-menu-item">													
+																<g:link controller="product" action="removePackage" id="${pkg.id }" params="['product.id':productInstance.id]" class="actionBtn">	
+																	<img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}"/>
+																	&nbsp;<warehouse:message code="default.delete.label" args="[warehouse.message(code:'package.label')]"/>
+																</g:link>
+															</div>	
+														</div>
+													</span>												
+												</td>											
+												<td>
+													${pkg.gtin }
+												</td>
+												<td>
+													${pkg.uom } / ${pkg.quantity } ${warehouse.message(code: 'default.units.label') }
+												</td>
 												
+												<td>
+													<g:formatNumber number="${pkg.quantity}" format="###,##0" />
+												</td>
+												<td>
+													${pkg.uom }
 												</td>
 											</tr>
-										</table>			
-									</fieldset>
-								</g:form>			
-							</div>
-					</g:if>
-							
-				</div>
-				<div id="tabs-documents" style="padding: 10px;">					
-					<!-- process an upload or save depending on whether we are adding a new doc or modifying a previous one -->					
-					<g:uploadForm controller="product" action="upload">
-						<g:hiddenField name="product.id" value="${productInstance?.id}" />
-						<g:hiddenField name="document.id" value="${documentInstance?.id}" />
-						<table>
-							<tr class="prop">
-								<td valign="top" class="name"><label for="documents"><warehouse:message
-											code="documents.label" /></label></td>
-								<td valign="top"
-									class="value">
-									
-									<table>
-										<thead>
+										</g:each>
+										<g:unless test="${productInstance?.packages }">
 											<tr>
-												<th>
-												</th>
-												<th>
-													<warehouse:message code="document.filename.label"/>
-												</th>
-												<th>
-													<warehouse:message code="document.contentType.label"/>
-												</th>
+												<td colspan="6">
+													<warehouse:message code="package.packageNotFound.message"/>
+												</td>
 											</tr>
-										</thead>
-										<tbody>
-											<g:each var="document" in="${productInstance?.documents }">
-												<tr>
-													<td>
-														<g:link action="deleteDocument" id="${document?.id}" params="['product.id':productInstance?.id]" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-															<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" />
-														</g:link>												
-													</td>
-													<td>
-														${document.filename }
-													</td>	
-													<td>
-														${document.contentType }
-													</td>	
-												</tr>						
-											</g:each>
-											<g:unless test="${productInstance?.documents }">
-												<tr>
-													<td colspan="3">
-														<div class="padded fade center">													
-															<warehouse:message code="product.hasNoDocuments.message"/>
-														</div>
-													</td>
-												</tr>
-											</g:unless>
-										</tbody>									
-									</table>
-									
-									
-								</td>
-							</tr>
+										</g:unless>
+										
+									</tbody>
+								</table>
+							
+							</div>
+						</div>
+						<div id="uom-class-dialog" class="dialog hidden" title="Add a unit of measure class">
+							<g:form controller="unitOfMeasureClass" action="save" method="post">
+
+								<table>
+		                            <tr class="prop">
+		                                <td valign="top" class="name">
+		                                    <label for="code">Type</label>
+		                                </td>
+		                                <td valign="top" class="value ">
+											<g:select name="type" from="${org.pih.warehouse.core.UnitOfMeasureType.list() }" value="${packageInstance?.uom }" noSelection="['null':'']"></g:select>
+		                                    <span class="fade"></span>
+		                                </td>
+		                            </tr>
+								
+		                            <tr class="prop">
+		                                <td valign="top" class="name">
+		                                    <label for="code">Code</label>
+		                                </td>
+		                                <td valign="top" class="value ">
+		                                    <g:textField name="code" size="10" class="medium text" />
+		                                    <span class="fade"></span>
+		                                </td>
+		                            </tr>
+									<tr class="prop">
+		                                <td valign="top" class="name">
+		                                    <label for="name">Name</label>
+		                                </td>
+		                                <td valign="top" class="value ">
+		                                    <g:textField name="name" size="40" class="medium text" />
+		                                    <span class="fade"></span>
+		                                </td>
+		                            </tr>
+		                        
+	                            </table>
+								<div class="buttons">
+				                   <input type="submit" name="create" class="save" value="Create" id="create" />						                   
+				                   <a href="#" class="close-dialog" dialog-id="uom-class-dialog">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</a>
+				                </div>   	                            
+		           
+
 						
-							<tr class="prop">
-								<td valign="top" class="name"><label><warehouse:message
-									code="document.selectFile.label" /></label>
-								</td>
-								<td valign="top" class="value">
-									<input name="fileContents" type="file" />
-									&nbsp;
-									<!-- show upload or save depending on whether we are adding a new doc or modifying a previous one -->
+							</g:form>						
+						</div>
+							
+						<div id="uom-dialog" class="dialog hidden" title="Add a unit of measure">
+						
+							<g:form controller="unitOfMeasure" action="save" method="post">
+								<table>
+		                            <tr class="prop">
+		                                <td valign="top" class="name">
+		                                    <label for="uomClass">Uom Class</label>
+		                                </td>
+		                                <td valign="top" class="value ">		                                
+											<g:select name="uomClass.id" from="${org.pih.warehouse.core.UnitOfMeasureClass.list() }" optionValue="name" optionKey="id" value="${pacakageInstance?.uom }" noSelection="['null':'']"></g:select>		                                
+											<span class="linkButton">
+												<a href="javascript:void(0);" class="open-dialog create" dialog-id="uom-class-dialog">Add UoM Class</a>
+											</span>
+		                                </td>
+		                            </tr>				                        
+		                            <tr class="prop">
+		                                <td valign="top" class="name">
+		                                    <label for="code">Code</label>
+		                                </td>
+		                                <td valign="top" class="value ">
+		                                    <g:textField name="code" size="10" class="medium text" />
+		                                </td>
+		                            </tr>
+									<tr class="prop">
+		                                <td valign="top" class="name">
+		                                    <label for="name">Name</label>
+		                                </td>
+		                                <td valign="top" class="value ">
+		                                    <g:textField name="name" size="40" class="medium text" />
+		                                </td>
+		                            </tr>
+		                        
+		                            <tr class="prop">
+		                                <td valign="top" class="name">
+		                                    <label for="description">Description</label>
+		                                </td>
+		                                <td valign="top" class="value ">
+											<g:textField name="description" size="40" class="medium text" />		                                    
+		                                </td>
+		                            </tr>
+		                        
+		                      	</table>
+		                      	
+								<div class="buttons">
+				                   <input type="submit" name="create" class="save" value="Create" id="create" />						                   
+				                   <a href="#" class="close-dialog" dialog-id="uom-dialog">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</a>
+				                </div>   		                      	
+		                	</g:form>				
+						</div>
+							
+						<div id="package-dialog" class="dialog hidden" title="${warehouse.message(code:'package.add.label') }">
+							<g:form controller="product" action="savePackage" method="post">
+								<g:hiddenField name="id" value="${productInstance?.id}"/>							
+								<table>
+									<tbody>						
+										<g:if test="${productInstance }">
+											<tr class="prop">
+												<td class="name"><label><warehouse:message code="product.label"/></label></td>
+												<td class="value">
+													<format:product product="${productInstance}" />
+												</td>
+											</tr>
+										</g:if>
+										<tr class="prop">
+											<td class="name">
+												<label>
+													<warehouse:message code="package.gtin.label"/>
+												</label>
+											</td>
+											<td class="value">
+												<g:textField name="gtin" value="${packageInstance?.gtin }" class="medium text"/>
+											</td>
+										</tr>		
+										<%-- 
+										<tr class="prop">
+											<td class="name">
+												<label>
+													<warehouse:message code="package.quantity.label"/>
+												</label>
+											</td>
+											<td class="value">
+												<g:textField name="quantity" value="${packageInstance?.quantity }" size="5" class="medium text"/>
+											</td>
+										</tr>
+										--%>	
+										<tr class="prop">
+											<td class="name">
+												<label>
+													<warehouse:message code="package.uom.label"/>
+												</label>
+											</td>
+											<td class="value middle">
+												<div class="middle">
+													1 
+													<g:select name="uom.id" from="${org.pih.warehouse.core.UnitOfMeasure.list() }" optionValue="name" optionKey="id" value="${pacakageInstance?.uom }" noSelection="['null':'']"></g:select>
+													= 
+													<g:textField name="quantity" value="${packageInstance?.quantity }" size="10" class="medium text"/>
+												${productInstance?.unitOfMeasure }	
+												</div>
+											</td>
+										</tr>		
+										<%-- 										
+										<tr class="prop">
+											<td class="name">
+												<label>
+													<warehouse:message code="package.name.label"/>
+												</label>
+											</td>
+											<td class="value">
+												<g:textField name="name" value="${packageInstance?.name }" class="medium text"/>
+											</td>
+										</tr>	
+										<tr class="prop">
+											<td class="name">
+												<label>
+													<warehouse:message code="package.description.label"/>
+												</label>
+											</td>
+											<td class="value">
+												<g:textField name="description" value="${packageInstance?.description }" class="medium text"/>
+											</td>
+										</tr>	
+										--%>
+										
+										
+																														
+									</tbody>
+								</table>
+								<div class="buttons">
 									<button type="submit" class="positive"><img
-										src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}"
-													alt="save" />${documentInstance?.id ? warehouse.message(code:'default.button.save.label') : warehouse.message(code:'default.button.upload.label')}</button>
-								</td>
-							</tr>						
-						</table>
-					</g:uploadForm>
-				</div>
+										src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
+										alt="Save" /> ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
+									</button>
+									&nbsp;
+									
+									<a href="#" class="close-dialog" dialog-id="package-dialog">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</a>
+									
+												
+								</div>
+							</g:form>
+						</div>						
+					</g:if>			
+				</div>	
 			</div>
-						
-
-
-
 		</div>
-	</div>
-	<g:render template='category' model="['category':null,'i':'_clone','hidden':true]"/>
+		<g:render template='category' model="['category':null,'i':'_clone','hidden':true]"/>
+	
+		<script type="text/javascript">
+	    	$(document).ready(function() {
+		    	$(".tabs").tabs(
+	    			{
+	    				cookie: {
+	    					// store cookie for a day, without, it would be a session cookie
+	    					expires: 1
+	    				}
+	    			}
+				); 
 
-	<script type="text/javascript">
-    	$(document).ready(function() {
-	    	$(".tabs").tabs(
-    			{
-    				cookie: {
-    					// store cookie for a day, without, it would be a session cookie
-    					expires: 1
-    				}
-    			}
-			); 
-	    });
-       </script>
-</body>
+				$(".dialog").dialog({ autoOpen: false, modal: true, width: '600px'});	
+
+				$(".open-dialog").click(function() { 
+					var id = $(this).attr("dialog-id");
+					$("#"+id).dialog('open');
+				});
+				$(".close-dialog").click(function() { 
+					var id = $(this).attr("dialog-id");
+					$("#"+id).dialog('close');
+				});
+				
+			});
+		</script> 				
+		
+	</body>
 </html>
