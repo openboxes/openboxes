@@ -7,18 +7,8 @@
     </head>
     <body>
     	<div class="body">
-    	
-			<g:if test="${message}">
-				<div class="message">${message}</div>
-			</g:if>
-			<g:hasErrors bean="${command}">
-				<div class="errors">
-					<g:renderErrors bean="${command}" as="list" />
-				</div>				
-			</g:hasErrors> 			
-			
-			
-			<g:render template="header"/>
+    
+			<g:render template="header" model="['currentState':'complete']"/>
 						 	
 			<g:form action="create" method="post" >
 				<div class="dialog">

@@ -40,6 +40,7 @@ class CreateProductController {
     	}
     		
     	search {
+			//on("error").to("error")
 			on("search") { ProductSearchCommand search ->
 				log.info("search: " + params)
 				if (search.hasErrors()) { 
@@ -56,12 +57,16 @@ class CreateProductController {
 							
 				[ search : search ]
 				
-			}.to("search")
+			}.to("results")
 			on("search").to("search")
 			on("back").to("start")
 			on("cancel").to("finish")	
     	}
+		error { 
+			
+		}
 		results { 
+			//on("error").to("error")
 			on("search") { ProductSearchCommand search ->
 				log.info("results: " + params)				
 				if (search.hasErrors()) { 
@@ -74,9 +79,10 @@ class CreateProductController {
 					//flow.localResults = productService.findProducts(searchTerms)
 					//flow.googleResults = productService.findGoogleProducts(search?.searchTerms)
 				//}				
-				//if (search.searchTerms) { 
+				if (search.searchTerms) { 
 					productService.findGoogleProducts(search)
-				//}
+				}
+				
 				[search:search]
 				
 			}.to("results")
@@ -97,8 +103,8 @@ class CreateProductController {
 					}
 					
 				}
-				
-				[ product : product ]
+				flow.product = product
+				//[ product : product ]
 			}.to("verify")
 			on("verify").to("verify")
 			on("search").to("search")
@@ -128,16 +134,28 @@ class CreateProductController {
 			on("cancel").to("finish")
 		}
 		verify { 
-			on("next") { ProductDetailsCommand product -> 
+			//on("error").to("error")
+			on("next") { ProductDetailsCommand command -> 
+				log.info("VERIFY: next")
 				
-				if (product.hasErrors()) {
+				log.info("flow.product.category: " + flow.product.category)
+				log.info("flow.product.description: " + flow.product.description)
+				log.info("flow.product.title: " + flow.product.title)
+				log.info("flow.product.gtin: " + flow.product.gtin)
+				log.info("command.category: " + command.category)
+				log.info("command.description: " + command.description)
+				log.info("command.title: " + command.title)
+				log.info("command.gtin: " + command.gtin)
+
+				
+				flow.product = command
+				if (flow.product.hasErrors()) {
 					flash.message = "Validation exception"
-					flow.product = product
 					return error();
 				}
 				
 				//bindData(flow.product, command)
-				[product : product]
+				//[product : product]
 			}.to("create")
 			on("search").to("search")
 			on("results").to("results")
@@ -145,47 +163,38 @@ class CreateProductController {
 			on("cancel").to("finish")
 		}
 		create { 
-			on("next"){ ProductDetailsCommand product ->
+			on("next"){ 
+
+				Product productInstance = new Product()
+				productInstance.category = flow.product.category
+				productInstance.name = flow.product.title
+				productInstance.description = flow.product.description
+				productInstance.upc = flow.product.gtin
 				
-				if (product.hasErrors()) {
-					flash.message = "Validation exception"
-					flow.product = product
-					return error();
+				if(!productInstance.hasErrors() && productInstance.save(flush: true)){	
+					flash.message = "${message(code: 'success.adding.product')}"
+					log.info("Saved product " + productInstance?.name + " with ID " + productInstance?.id )
+					flow.productInstance = productInstance
+					//return success()
+				}
+				else {
+					log.info ("Validation errors " + productInstance.errors)
+					flow.product.errors = productInstance.errors
+					return error()
 				}
 				
-				//bindData(flow.product, command)
-				[product : product]
-				
-			}.to("complete")
+			}.to("finish")
 			on("search").to("search")
 			on("results").to("results")
 			on("back").to("verify")
 			on("cancel").to("finish")
 
 		}
-		complete { 
-			on("next") { 
-				//if (!flow.product.save()) { 
-				//	flash.message = "Couldn't save product"
-				//	return error()
-				//}				
-			}.to("finish")
-			
-			on("search").to("search")
-			on("results").to("results")
-			on("back").to("details")
-			on("cancel").to("finish")
-			on(Exception).to("error")
 		
-		}
 		finish { 			
-			
-			//flow.product = null
-			//flow.search = null
-			//flow.googleResults = null
-			//flow.localResults = null
-			
-			redirect(controller: "createProduct", action: "index")
+			// redirect to product edit page
+			redirect(controller: "product", action: "edit", id: flow.productInstance.id)
+			//redirect(controller: "createProduct", action: "index")
 		}
     }
 }

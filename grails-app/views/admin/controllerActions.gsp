@@ -10,28 +10,13 @@
     <body>        
 		<div id="settings" role="main" class="yui-gb">
 			<!-- the first child of a Grid needs the "first" class -->
-			<div class="yui-u first">
-				<table class="box">
-					<tr>
-						<g:set var="status" value="${1 }"/>
-						<g:each var="c" in="${grailsApplication.controllerClasses.sort { it.fullName } }">
-							<td>
-								<g:set var="controllerName"><%= c.getName().toLowerCase() %></g:set>
-								<span class="linkButton">						
-									<li class="controller">
-										<a class="${c.name}" href="${createLink(uri: '/' + c.logicalPropertyName)}"">${c.fullName}</a>
-									</li>
-								</span>
-
-							</td>
-							<g:if test="${status++ % 2 == 0}"></tr><tr></g:if>
+				<div class="box">
+					<ul>							
+						<g:each in="${actionNames }" var="action">
+							<li>${action }</li>
 						</g:each>
-					</tr>
-					<tr>
-						<td></td>
-					</tr>
-				</table>								  
-			</div>	
+					</ul>
+				</div>
 		</div>
     </body>
 </html>

@@ -42,10 +42,11 @@
 				
 						
 				<h3>
-				
+					Google Results ::
 					<g:set var="endIndex" value="${(search.startIndex > search.totalResults) ? search?.startIndex + search?.itemsPerPage : search.totalResults}"/>
+					
 					<span class="fade">Showing ${search?.startIndex } - ${endIndex } of 
-						${search.totalResults } results for</span> "${search.searchTerms }"				
+						${search.totalResults } results for</span> ${search.searchTerms }				
 				</h3>
 				
 				<style>
@@ -63,6 +64,7 @@
 					.gallery ul li:hover { background-color: #fafafa; border: 1px solid blue; }
 					
 				</style>
+				
 				
 				<g:hiddenField name="startIndex" value="${search?.startIndex}"/>
 				<div class="navigation box center">

@@ -123,6 +123,7 @@
 						</a>
 					</li>
 		    	</g:if>
+				<%-- 
 				<g:if test="${controllerName }">
 					<li>
 						<g:link controller="${controllerName }" action="index">
@@ -130,7 +131,6 @@
 						</g:link>
 					</li>
 				</g:if>
-				<%-- 
 				<g:if test="${actionName }">
 					<li>
 						<a href="">
@@ -142,11 +142,8 @@
 
 	    		<g:if test="${g.layoutTitle() }">
 		    		<li>
-		    			<a href="">
-		    				<%-- 
-				    		${g.pageProperty(name: 'page.label2') ?: g.layoutTitle()} 	
-				    		--%>
-				    		${g.layoutTitle()}
+		    			<a href="#">
+			    		${g.layoutTitle()}
 		    			</a>
 		    		</li>
 	    		</g:if>
@@ -235,7 +232,7 @@
 			</g:if>
 			
 			<g:if test="${session.user && session.warehouse}">
-				var handler = $.PeriodicalUpdater('/warehouse/dashboard/status', 
+				var handler = $.PeriodicalUpdater('/${request.contextPath}/dashboard/status', 
 					{ 
 						method: 'get', // method; get or post 
 						data: '', // array of values to be passed to the page - e.g. {name: "John", greeting: "hello"} 

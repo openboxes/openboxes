@@ -7,37 +7,32 @@
     </head>
     <body>
     	<div class="body">
-    	
-			<g:if test="${message}">
-				<div class="message">${message}</div>
-			</g:if>
-			<g:hasErrors bean="${command}">
-				<div class="errors">
-					<g:renderErrors bean="${command}" as="list" />
-				</div>				
-			</g:hasErrors> 				
-			
+   		
 			<g:render template="header" model="['currentState':'verify']"/>
 			
 			<g:form action="create" method="post" >
-				<div class="dialog">
+				<div class="dialog box">
 
 					<table>
 						<tbody>
-						
+							<tr class="prop">
+								<td class="name">
+									<label class="clear">Google ID</label>
+								</td>
+								<td class="value">
+									${product.googleId }
+								</td>
+							</tr>								
 							<tr class="prop">	
 								<td class="name">
 									<label><warehouse:message code="category.label"/></label>
 								</td>
 								<td class="value">
 									<div class="value">
-										<g:if test="${product?.category?.name }">
-											<format:category category="${product?.category}"/>
-										</g:if>
-										<g:else>
-											<span class="fade"><warehouse:message code="default.none.label"/></span>
-										</g:else>
+										<g:categorySelect cssClass="comboBox" id="category.id" name="category.id" includeSpaces="${false}" value="${product?.category?.id }"/>
 									</div>
+									
+									${product?.category?.id }
 								</td>
 							</tr>						
 							
@@ -81,7 +76,7 @@
 									<ul>
 										<g:each in="${product.gtins }" var="gtin">
 											<li>										
-												<g:textField name="gtin" value="${product.gtin }" class="text" size="80"/>
+												<g:textField name="gtin" value="${gtin }" class="text" size="80"/>
 											</li>
 										</g:each>
 									</ul>
@@ -101,14 +96,9 @@
 								</td>
 							</tr>
 							--%>										
-							<tr class="prop">
-								<td class="name">
-									<label class="clear">Google ID</label>
-								</td>
-								<td class="value">
-									${product.googleId }
-								</td>
-							</tr>		
+							
+							
+							<%-- 	
 							<tr class="prop">
 								<td class="name">
 									<label class="clear">Images:</label>
@@ -119,6 +109,7 @@
 									</g:each>
 								</td>
 							</tr>		
+							--%>
 						</tbody>								
 					</table>			
 				</div>			
@@ -139,7 +130,7 @@
         </div>
         
         
-        
+        <g:comboBox/>
 		<script>			
 			//$(document).ready(function() {
 			//});

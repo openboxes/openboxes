@@ -9,26 +9,26 @@
 		<g:select name="application" from="${product.constraints.application.inList}" 
           value="${product.application}" class="required"/>
 	</div>
-	<div class="">	
+	<div>	
 		<label for="latex">Latex Free?</label>
 		<g:select name="latex" from="${product.constraints.latex.inList}" 
           value="${product.latex}" class="required"/>
 		
 	</div>		
-	<div class="">	
+	<div>	
 		<label for="powder">Powdered?</label>
 		<g:select name="powder" from="${product.constraints.powder.inList}" 
           value="${product.powder}" class="required"/>
 		
 
 	</div>		
-	<div class="">	
+	<div>	
 		<label for="sterility">Sterility?</label>
 		<g:select name="sterility" from="${product.constraints.sterility.inList}" 
           value="${product.sterility}" class="required"/>
 		
 	</div>		
-	<div class="">	
+	<div>	
 		<label for="material">Material?</label>
 		<g:select name="material" from="${product.constraints.material.inList}" 
           value="${product.material}" class="required"/>

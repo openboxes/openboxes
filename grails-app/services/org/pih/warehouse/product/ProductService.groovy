@@ -8,10 +8,34 @@ import groovy.xml.Namespace;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.importer.ImportDataCommand;
 
+import com.amazon.advertising.api.sample.SignedRequestsHelper;
+
 class ProductService {
 	
 	def grailsApplication
 	
+	private static final String ENDPOINT = "ecs.amazonaws.com";
+	private static final String AWS_SECRET_KEY = "put your secret key here";
+	private static final String AWS_ACCESS_KEY_ID = "put your access key here";
+	
+	def findAmazonProducts() { 
+		SignedRequestsHelper helper = SignedRequestsHelper.getInstance(ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_KEY);
+		
+	    String requestUrl = null;
+	    String title = null;
+	
+	    Map params = new HashMap();
+	    params.put("Service", "AWSECommerceService");
+	    params.put("Version", "2009-03-31");
+	    params.put("Operation", "ItemLookup");
+	    params.put("ItemId", asin);
+	    params.put("ResponseGroup", "Small,Medium");
+	
+	    requestUrl = helper.sign(params);
+	
+	    def xml = new URL(requestUrl).text
+	    return new XmlSlurper().parseText(xml)
+	}
 	
 	/**
 	 * Examples 
@@ -25,7 +49,7 @@ class ProductService {
 	 * http://www.searchupc.com/default.aspx?q=048001006812
 	 * 
 	 * Google Product Search
-	 * https://www.googleapis.com/shopping/search/v1/public/products?key=AIzaSyCAEGyY6QpPbm3DiHmtx6qIZ_P40FnF3vk&country=US&q=${q}&alt=atom&crowdBy=brand:1
+	 * https://www.googleapis.com/shopping/search/v1/public/products?key=AIzaSyCAEGyY6QpPbm3DiHmtx6qIZ_P40FnF3vk&country=US&q=${q}&alt=scp&crowdBy=brand:1
 	 * 
 	 * @param q
 	 * @return
@@ -66,7 +90,7 @@ class ProductService {
 				//	d.any{entry -> item."dc:date".text() =~ entry.key} && a.any{entry -> item.tags.text() =~ entry
 				//}
 	
-				//println "XML = \n" + xml
+				println "XML = \n" + xml
 				
 				def feed = new XmlParser(false, true).parseText(xml)
 				
@@ -78,20 +102,20 @@ class ProductService {
 				search.startIndex = Integer.valueOf(feed[openSearch.startIndex].text())
 				search.itemsPerPage = Integer.valueOf(feed[openSearch.itemsPerPage].text())
 				
+
 				feed.entry.each { entry ->
 
 					//println entry
 					def product = new ProductDetailsCommand()
 					
 					product.link = entry[ns.product][ns.link].text()
-					//product.title = entry.title.text()
 					product.author = entry.author.name.text()
 					
 					
-					entry.link.each { link ->
-						
+					entry.link.each { link ->						
 						product.links[link.'@rel'] = link.'@href'
 					}
+					//println "categories: " + entry[ns.product][ns.categories][ns.category]
 					
 					product.id = entry.id.text()
 					product.googleId = entry[ns.product][ns.googleId].text()
@@ -104,6 +128,7 @@ class ProductService {
 					// HACK iterates over all images, but only keeps the last one
 					// Need to add these to product->documents 
 					//def imageLinks = ""
+					product.gtin = entry[ns.product][ns.gtin].text()
 					entry[ns.product][ns.gtins][ns.gtin].each { gtin ->						
 						product.gtins << gtin.text()
 					}
@@ -111,9 +136,9 @@ class ProductService {
 						product.images << image.'@link'
 					}
 					
+					
 					search.results << product
 				}
-	
 				/*
 				def root = new XmlSlurper().parseText(xml).
 					declareNamespace(s: "http://www.google.com/shopping/api/schemas/2010")

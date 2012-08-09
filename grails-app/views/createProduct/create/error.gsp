@@ -6,14 +6,15 @@
 </head>
 <body>
 	<div class="body">
-		<g:if test="${message}">
-			<div class="message">
-				${message}
-			</div>
-		</g:if>
+		
+		<g:render template="header" model="['currentState':'error']"/>
+				
 		<g:form action="create">
-			<div class="dialog">
-				<p>Sorry, but the system has reported an unrecoverable error.</p>
+			<div class="dialog box">
+				<p>
+					
+					Sorry, but the system has reported an unrecoverable error.
+				</p>
 			</div>
 			<div class="buttons center">
 				<g:submitButton class="confirm" name="confirm" value="OK" />

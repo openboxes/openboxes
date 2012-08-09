@@ -18,8 +18,26 @@ class AdminController {
 	def mailService;
 	def grailsApplication
 	def config = ConfigurationHolder.config
+	def index = { }
+    def controllerActions = { 
+			
+		List actionNames = []
+		grailsApplication.controllerClasses.sort { it.logicalPropertyName }.each { controller ->
+			
+			controller.reference.propertyDescriptors.each { pd ->
+				def closure = controller.getPropertyOrStaticPropertyOrFieldValue(pd.name, Closure)
+				if (closure) {
+					if (pd.name != 'beforeInterceptor' && pd.name != 'afterInterceptor') {
+						actionNames << controller.logicalPropertyName + "." + pd.name + ".label = " + pd.name
+					}
+				}
+			}
+			println "$controller.clazz.simpleName: $actionNames"
+		}
+		
+		[actionNames:actionNames]
+	}
 	
-    def index = { }
     def plugins = { } 
     def status = { } 
     

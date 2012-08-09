@@ -33,7 +33,7 @@
 </div>
 	<script>
 		$(document).ready(function() {
-			$("#dashboardSearchBox").watermark("${warehouse.message(code:'inventory.filterBy.keyword')}");
+			$("#dashboardSearchBox").watermark("${warehouse.message(code:'inventory.filterByKeyword.label')}");
 		});
 	</script>
 	

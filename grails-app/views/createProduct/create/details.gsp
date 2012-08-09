@@ -2,23 +2,15 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
-<title><warehouse:message code="default.create.label"
-		args="['Product']" /> - Enter Product Details</title>
+<title>Enter Product Details</title>
 </head>
 <body>
 	<div class="body">
-		<g:if test="${message}">
-			<div class="message">
-				${message}
-			</div>
-		</g:if>
-		<g:hasErrors bean="${command}">
-			<div class="errors">
-				<g:renderErrors bean="${command}" as="list" />
-			</div>
-		</g:hasErrors>
+
+		<g:render template="header" model="['currentState':'verify']"/>
+
 		<g:form action="create">
-			<div class="dialog">
+			<div class="dialog box">
 				<table>
 					<tbody>
 						<tr class="prop">

@@ -13,8 +13,10 @@ class ProductDetailsCommand implements Serializable {
 	String title
 	String description
 	String content
+	
 	String unitOfMeasure = "ea"
-	Integer packageCount = 1
+	Integer packageSize = 1
+	String packageUnit
 	String packageName
 	
 	Date creationTime
@@ -45,7 +47,9 @@ class ProductDetailsCommand implements Serializable {
 		content(nullable:true)
 		
 		unitOfMeasure(nullable:true)
-		quantity(nullable:true)
+		packageSize(nullable:true)
+		packageUnit(nullable:true)
+		packageName(nullable:true)
 		
 		creationTime(nullable:true)
 		modificationTime(nullable:true)

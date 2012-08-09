@@ -7,20 +7,11 @@
     </head>
     <body>
     	<div class="body">
-    	
-			<g:if test="${message}">
-				<div class="message">${message}</div>
-			</g:if>
-			<g:hasErrors bean="${command}">
-				<div class="errors">
-					<g:renderErrors bean="${command}" as="list" />
-				</div>				
-			</g:hasErrors> 			
 			
 			<g:render template="header" model="['currentState':'confirm']"/>			
 						 	
 			<g:form action="create" method="post" >
-				<div class="dialog">
+				<div class="dialog box">
 					<table>
 						<tbody>
 							<tr class="prop">
@@ -49,14 +40,6 @@
 							</tr>										
 							<tr class="prop">
 								<td class="name">
-									<label class="clear">Source:</label>
-								</td>
-								<td class="value">
-									<a href="${product.link }" target="_blank">${product.author }</a>
-								</td>
-							</tr>										
-							<tr class="prop">
-								<td class="name">
 									<label class="clear">Brand:</label>												
 								</td>
 								<td class="value">
@@ -68,27 +51,10 @@
 									<label class="clear">GTIN(s):</label>												
 								</td>
 								<td class="value">
-									<ul>
-										<g:each in="${product.gtins }" var="gtin">
-											<li>${gtin }</li>
-										</g:each>
-									</ul>
+									${product.gtin }
 								</td>
-							</tr>		
-							<%-- 								
-							<tr class="">
-								<td class="name">
-									<label class="clear">Link(s):</label>												
-								</td>
-								<td class="value">
-									<g:each in="${product.links }" var="link">
-										<div>
-											<a target="_blank" href="${link.value }">${link.value }</a>
-										</div>
-									</g:each>
-								</td>
-							</tr>
-							--%>										
+							</tr>							
+							<%-- 
 							<tr class="prop">
 								<td class="name">
 									<label class="clear">Google ID</label>
@@ -96,7 +62,8 @@
 								<td class="value">
 									${product.googleId }
 								</td>
-							</tr>		
+							</tr>
+							--%>		
 						</tbody>								
 					</table>				
 				</div>			

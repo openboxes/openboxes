@@ -19,6 +19,37 @@
 			<div>							
 				<table>
 					<tr>
+						<td>
+							<h2>Actions</h2>
+							<div class="buttonsBar">
+								<div class="linkButton">
+									<g:link controller="inventory" action="browse" class="browse"><warehouse:message code="inventory.browse.label"/></g:link>
+								</div>
+								<div class="linkButton">
+									<g:link controller="product" action="create" class="create"><warehouse:message code="product.create.label"/></g:link>
+								</div>
+								<div class="linkButton">
+									<g:link controller="createProductFromTemplate" action="index" class="create"><warehouse:message code="product.createFromTemplate.label"/></g:link>
+								</div>
+								<div class="linkButton">
+									<g:link controller="createProduct" action="index" class="create"><warehouse:message code="product.createFromExternal.label"/></g:link>
+								</div>
+							</ul>
+						</td>
+						<td>
+							<g:if test="${session.lastProduct }" >
+								<h2>Recently viewed</h2>
+								<div class="buttonsBar">
+									<div class="linkButton">
+										<g:link controller="inventoryItem" action="showStockCard" id="${session.lastProduct.id }" class="product">
+											${session.lastProduct.name }</g:link>						
+										<span class="fade">edited <g:formatDate date="${session.lastProduct.lastUpdated }" format="MMM dd hh:mma"/></span>					
+									</div>
+								</ul>
+							</g:if>
+						</td>					
+					<tr>
+					<tr>
 						<g:if test='${quickCategories }'>	
 							<td colspan="2">
 								<h2>Quick categories</h2>
@@ -63,37 +94,6 @@
 								</table>
 							</td>
 						</g:if>						
-					</tr>				
-					<tr>
-						<td>
-							<h2>Actions</h2>
-							<div class="buttonsBar">
-								<div class="linkButton">
-									<g:link controller="inventory" action="browse" class="browse"><warehouse:message code="inventory.browse.label"/></g:link>
-								</div>
-								<div class="linkButton">
-									<g:link controller="product" action="create" class="create"><warehouse:message code="product.create.label"/></g:link>
-								</div>
-								<div class="linkButton">
-									<g:link controller="createProductFromTemplate" action="index" class="create"><warehouse:message code="product.createFromTemplate.label"/></g:link>
-								</div>
-								<div class="linkButton">
-									<g:link controller="createProduct" action="index" class="create"><warehouse:message code="product.createFromExternal.label"/></g:link>
-								</div>
-							</ul>
-						</td>
-						<td>
-							<g:if test="${session.lastProduct }" >
-								<h2>Recently viewed</h2>
-								<div class="buttonsBar">
-									<div class="linkButton">
-										<g:link controller="inventoryItem" action="showStockCard" id="${session.lastProduct.id }" class="product">
-											${session.lastProduct.name }</g:link>						
-										<span class="fade">edited <g:formatDate date="${session.lastProduct.lastUpdated }" format="MMM dd hh:mma"/></span>					
-									</div>
-								</ul>
-							</g:if>
-						</td>
 					</tr>
 				</table>				
 			</div>
