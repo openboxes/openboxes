@@ -51,7 +51,7 @@
 					<tr>
 					<tr>
 						<g:if test='${quickCategories }'>	
-							<td colspan="2">
+							<td colspan="${session.lastProduct ? '2':'1' }">
 								<h2>Quick categories</h2>
 								<table>
 									<tr>

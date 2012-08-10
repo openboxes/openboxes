@@ -1,39 +1,6 @@
-import grails.util.GrailsUtil;
 import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
-import java.util.Date;
 import javax.sql.DataSource;
-import org.pih.warehouse.core.Address;
-import org.pih.warehouse.core.Comment;
-import org.pih.warehouse.core.DataType;
-import org.pih.warehouse.core.Document;
-import org.pih.warehouse.core.DocumentType;
-import org.pih.warehouse.core.Event;
-import org.pih.warehouse.core.EventType;
-import org.pih.warehouse.core.Role;
-import org.pih.warehouse.core.RoleType;
-import org.pih.warehouse.core.User;
-import org.pih.warehouse.donation.Donor;
-import org.pih.warehouse.inventory.Inventory;
-import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.inventory.Transaction;
-import org.pih.warehouse.inventory.TransactionEntry;
-import org.pih.warehouse.inventory.TransactionType;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.product.Attribute;
-import org.pih.warehouse.product.Category;
-import org.pih.warehouse.product.Product;
-import org.pih.warehouse.product.ProductAttribute;
-import org.pih.warehouse.shipping.Container;
-import org.pih.warehouse.shipping.ContainerType;
-import org.pih.warehouse.shipping.ReferenceNumberType;
-import org.pih.warehouse.shipping.ReferenceNumber;
-import org.pih.warehouse.shipping.Shipment;
-import org.pih.warehouse.shipping.ShipmentItem;
-import org.pih.warehouse.shipping.ShipmentType;
-import org.pih.warehouse.shipping.ShipmentMethod;
-import org.pih.warehouse.shipping.Shipper;
-import org.pih.warehouse.shipping.ShipperService;
 
 class BootStrap {
 

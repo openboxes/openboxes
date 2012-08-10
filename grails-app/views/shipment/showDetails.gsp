@@ -567,7 +567,7 @@
 															<g:formatDate date="${shipmentItem?.expirationDate}" format="MMM yyyy"/>
 														</td>
 														<td class="center">
-															${shipmentItem?.quantity}
+															<g:formatNumber number="${shipmentItem?.quantity}" format="###,##0" />
 														</td>
 														<g:if test="${shipmentInstance?.wasReceived()}">
 															<g:set var="totalQtyReceived" value="${shipmentItem?.totalQuantityReceived()}"/>

@@ -4,20 +4,21 @@
 		<g:hiddenField name="productInstance.id" value="${commandInstance.productInstance?.id}"/>
 		<g:hiddenField name="inventoryInstance.id" value="${commandInstance?.inventoryInstance?.id}"/>
 
+
+		<div class="form-content box">
 			
-		<div class="middle" style="padding: 5px;">
-			<label><warehouse:message code="inventory.dateOfInventory.label"/></label>													
-			<g:jqueryDatePicker 
-				id="transactionDate" 
-				name="transactionDate"
-				value="${commandInstance?.transactionDate}" 
-				format="MM/dd/yyyy"
-				showTrigger="false" />						
-		</div>
-		<div class="form-content" style="border: 1px solid lightgrey;">
+			<div class="middle left" style="padding: 10px;">
+				<label><warehouse:message code="inventory.dateOfInventory.label"/></label>													
+				<g:jqueryDatePicker 
+					id="transactionDate" 
+					name="transactionDate"
+					value="${commandInstance?.transactionDate}" 
+					format="MM/dd/yyyy"
+					showTrigger="false" />						
+			</div>
 			<table id="inventoryItemsTable">
 				<thead>					
-					<tr class="even">	
+					<tr class="odd">	
 						<th width="30%"><warehouse:message code="default.lotSerialNo.label"/></th>
 						<th width="20%"><warehouse:message code="default.expires.label"/></th>
 						<th class="center" width="10%"><warehouse:message code="inventory.oldQty.label"/></th>
@@ -57,7 +58,7 @@
 									<g:hiddenField name="recordInventoryRows[${status}].oldQuantity" value="${recordInventoryRow?.oldQuantity }"/>
 								</td>	
 								<td class="middle center">
-									<g:textField id="newQuantity-${status }" class="newQuantity text right" name="recordInventoryRows[${status }].newQuantity" size="5" value="${recordInventoryRow?.newQuantity }" onFocus="this.select();" onClick="this.select();"/>
+									<g:textField id="newQuantity-${status }" class="newQuantity text center" name="recordInventoryRows[${status }].newQuantity" size="8" value="${recordInventoryRow?.newQuantity }" onFocus="this.select();" onClick="this.select();"/>
 								</td>
 								<td class="middle left">
 									<img class="addAnother" src="${createLinkTo(dir:'images/icons/silk', file:'add.png') }"/>								
@@ -335,12 +336,12 @@
 			.expirationDate { 
 				background-image: url('${request.contextPath }/images/icons/silk/calendar.png');
 				background-repeat: no-repeat;
-				background-position: center left;
-				padding-left: 20px;
+				background-position: center right;
+				
 			}
 		</style>
 		<g:hiddenField id="expirationDate{{= getIndex()}}-hidden" name="recordInventoryRows[{{= getIndex()}}].expirationDate" value="{{= ExpirationDate}}"/>	
-		<g:textField id="expirationDate{{= getIndex()}}" class="expirationDate" name="recordInventoryRows[{{= getIndex()}}].expirationDate-text" value="{{= ExpirationDate}}" size="10" />
+		<g:textField id="expirationDate{{= getIndex()}}" class="expirationDate date text" name="recordInventoryRows[{{= getIndex()}}].expirationDate-text" value="{{= ExpirationDate}}" size="10" />
 		
 	</td>
 	<td width="10%" style="text-align: center; vertical-align: middle;">
@@ -349,7 +350,7 @@
 	</td>	
 	<td width="10%" style="text-align: center; vertical-align: middle;">
 		<g:textField  
-			id="newQuantity-{{= getIndex()}}" class="newQuantity right text" name="recordInventoryRows[{{= getIndex()}}].newQuantity" size="5" value="{{= Qty}}" onFocus="this.select();" onClick="this.select();"/>
+			id="newQuantity-{{= getIndex()}}" class="newQuantity center text" name="recordInventoryRows[{{= getIndex()}}].newQuantity" size="8" value="{{= Qty}}" onFocus="this.select();" onClick="this.select();"/>
 
 	</td>	
 	<td width="5%" class="left">

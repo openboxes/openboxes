@@ -1087,7 +1087,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param params
 	 * @return
 	 */
-	RecordInventoryCommand getRecordInventoryCommand(RecordInventoryCommand commandInstance, Map params) { 		
+	void populateRecordInventoryCommand(RecordInventoryCommand commandInstance, Map params) { 		
 		log.debug "Params " + params;
 		
 		// set the default transaction date to today
@@ -1119,7 +1119,7 @@ class InventoryService implements ApplicationContextAware {
 			}
 			
 		}
-		return commandInstance
+		//return commandInstance
 	}
 		
 	

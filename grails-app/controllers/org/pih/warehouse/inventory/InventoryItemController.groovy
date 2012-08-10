@@ -151,14 +151,16 @@ class InventoryItemController {
 	/**
 	 * Display the Record Inventory form for the product 
 	 */
-	def showRecordInventory = { RecordInventoryCommand cmd -> 
-		def commandInstance = inventoryService.getRecordInventoryCommand(cmd, params)
+	def showRecordInventory = { RecordInventoryCommand commandInstance -> 
 		
 		// We need to set the inventory instance in order to save an 'inventory' transaction
-		def warehouseInstance = Location.get(session?.warehouse?.id)				
-		commandInstance.inventoryInstance = warehouseInstance?.inventory;		
+		if (!commandInstance.inventoryInstance) { 
+			def warehouseInstance = Location.get(session?.warehouse?.id)				
+			commandInstance.inventoryInstance = warehouseInstance?.inventory;		
+		}
+		inventoryService.populateRecordInventoryCommand(commandInstance, params)
 		
-		def productInstance = cmd.productInstance;
+		def productInstance = commandInstance.productInstance;
 		def transactionEntryList = inventoryService.getTransactionEntriesByProductAndInventory(productInstance, commandInstance?.inventoryInstance);
 		
 		// Get the inventory warning level for the given product and inventory 

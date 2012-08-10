@@ -40,7 +40,7 @@
 				<tr class="prop">
 					<td valign="top" class="name"><label><warehouse:message code="default.quantity.label" /></label></td>                            
 					<td valign="top" class="value">
-						<g:textField id="quantity" name="quantity" value="" size="5" /> 
+						<g:textField id="quantity" name="quantity" value="" size="10" /> 
 					</td>
 				</tr>  	        
 				<tr class="prop">

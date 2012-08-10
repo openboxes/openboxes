@@ -25,4 +25,12 @@ var renameRowFields = function(table) {
 	});
 }
 
+$.fn.quantity = function(){ 
+	alert("test");
+    return this.each(function(){ 
+        $(this).text( $(this).text().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") ); 
+    })
+}
+
+
 

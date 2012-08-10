@@ -5,10 +5,10 @@
 			<g:set var="selectedProducts" value="${attrs.value }"/>
 			
 			<h2>Selected (${selectedProducts.size() })</h2>
-			<div class="" style="overflow: auto; height: 233px;">
+			<div class="box" style="overflow: auto; height: 233px;">
 				<table id="selectedProducts" class="products">
 					<thead>
-						<tr class="prop">
+						<tr class="">
 							<th class="middle center"><input type="checkbox" class="checkAll" checked="checked"> </th>
 							<th><warehouse:message code="products.label"/></th>
 						</tr>
@@ -35,10 +35,10 @@
 			<g:set var="availableProducts" value="${attrs.products.findAll { !attrs.value.contains(it) }}"/>
 			
 			<h2>Available (${availableProducts.size() })</h2>
-			<div class="" style="overflow: auto; height: 233px;">
+			<div class="box" style="overflow: auto; height: 233px;">
 				<table id="availableProducts" class="products">				
 					<thead>
-						<tr class="prop">
+						<tr class="">
 							<th class="middle center">
 								<input type="checkbox" class="checkAll" />
 							</th>

@@ -22,7 +22,7 @@ class RecordInventoryCommand {
 	
 	static constraints = {
 		productInstance(nullable:false)
-		inventoryInstance(nullable:false) 
+		inventoryInstance(nullable:true) 
 		inventoryLevelInstance(nullable:true)
 		totalQuantity(nullable:true)
 		transactionDate(nullable:false)		

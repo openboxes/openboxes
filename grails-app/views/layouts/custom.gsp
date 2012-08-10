@@ -47,7 +47,7 @@
 	<script src="${createLinkTo(dir:'js/jquery.watermark/', file:'jquery.watermark.min.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.periodicalupdater/', file:'jquery.periodicalupdater.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.flot/', file:'jquery.flot.js')}" type="text/javascript"></script>
-	<script src="${createLinkTo(dir:'js/', file:'global.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/', file:'global.js')}" type="text/javascript" ></script>	
 	<script src="${createLinkTo(dir:'js/jquery.megaMenu/', file:'jquery.megamenu.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.expand/', file:'expand.js')}" type="text/javascript" ></script>
 	
@@ -142,9 +142,7 @@
 
 	    		<g:if test="${g.layoutTitle() }">
 		    		<li>
-		    			<a href="#">
-			    		${g.layoutTitle()}
-		    			</a>
+		    			<a href="#">${g.layoutTitle()}</a>
 		    		</li>
 	    		</g:if>
 

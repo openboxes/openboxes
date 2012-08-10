@@ -1,7 +1,7 @@
 
 <%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
-<div id="product-details" class="box-slim">
-	<table>
+<div id="product-details">
+	<table class="box">
 		<tbody>
 			<tr class="odd">
 				<td colspan="2">
@@ -47,12 +47,15 @@
 				</td>
 				<td>
 					<span class="value">
-						<b>${totalQuantity }</b></span>
+						<b>${g.formatNumber(number: totalQuantity, format: '###,###,###') }</b></span>
 				</td>
-			</tr>			
-				
-				
-			<tr class="odd prop">
+			</tr>	
+		</tbody>		
+	</table>
+	<br/>
+	<table class="box">
+		<tbody>				
+			<tr class="odd">
 				<td colspan="2">
 					<label>${warehouse.message(code: 'product.details.label') }</label>
 				</td>
@@ -62,7 +65,7 @@
 					<span class="name"><warehouse:message code="category.label"/></span>
 				</td>
 				<td>
-					<div class="value">
+					<span class="value">
 						<g:if test="${productInstance?.category?.name }">
 							<g:link controller="inventory" action="browse" params="[subcategoryId:productInstance?.category?.id,showHiddenProducts:'on',showOutOfStockProducts:'on',searchPerformed:true]">
 								<format:category category="${productInstance?.category}"/>
@@ -100,7 +103,7 @@
 				<td class="left label">
 					<span class="name"><warehouse:message code="product.units.label"/></span>
 				</td>
-				<td colspan="2">
+				<td>
 					<span class="value">
 						<g:if test="${productInstance?.unitOfMeasure }">
 							<format:metadata obj="${productInstance?.unitOfMeasure}"/>
@@ -234,7 +237,13 @@
 				</td>
 			</tr>		
 			--%>
-			<g:if test="${productInstance?.images}">
+		</tbody>
+	</table>
+	<g:if test="${productInstance?.images}">
+		<br/>
+		<table class="box">
+			<tbody>			
+			
 				<tr class="odd prop">
 					<td class="label left" colspan="2">
 						<span class="name">
@@ -261,9 +270,10 @@
 						</g:each>
 					</td>			
 				</tr>													
-			</g:if>
-		</tbody>		
-	</table>
+			</tbody>		
+		</table>
+	</g:if>
+		
 </div>
 <script>
 	function openDialog(dialogId, imgId) { 

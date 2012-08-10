@@ -14,7 +14,9 @@ label.error {
 	font-weight: bold; 
 	color: black; 
 }
-
+.ui-datepicker-trigger {
+	position: relative; left: -16px; top: -1px;
+}
 .buttons { 
 	text-align: center; 
 	padding: 10px; 
@@ -88,6 +90,17 @@ button.action-btn, button.previous, button.next {
 	margin: 1px;
 	
 }
+
+.wizard-box { 
+	border: 1px solid lightgrey;
+	margin: 1px;
+	background-color: white;
+	padding: 7px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	height: 25px;
+}
+
 
 .padded { 
 	padding: 25px;	

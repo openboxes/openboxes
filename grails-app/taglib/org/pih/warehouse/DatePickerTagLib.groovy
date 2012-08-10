@@ -45,7 +45,7 @@ class DatePickerTagLib {
 
 		<span>
 			<input id='${id}' name='${name}' type='hidden'/>
-			<input id='${id}-datepicker' name='${name}-datepicker' type='text' class='date ${cssClass}' size="${size}" ${readOnly?"readonly='readonly'":""}/>
+			<input id='${id}-datepicker' name='${name}-datepicker' type='text' class='${cssClass} text' size="${size}" ${readOnly?"readonly='readonly'":""}/>
 			<script type=\'text/javascript\'>
 
 				jQuery(document).ready(function() {
@@ -90,9 +90,9 @@ class DatePickerTagLib {
 		if (showTrigger) {
 			html += """
 			<style>
-			.ui-datepicker-trigger {
-				#position: relative; left: -16px; top: -1px;
-			}
+				.ui-datepicker-trigger {
+					#position: relative; left: -16px; top: -1px;
+				}
 			</style>
 			""";
 		}
