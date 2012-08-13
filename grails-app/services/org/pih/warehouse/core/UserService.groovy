@@ -17,6 +17,22 @@ class UserService {
 	}
 	
 	
+	boolean isUserInAdminRole(User u) {
+		def user = User.get(u.id)
+		return user.roles.any { it.roleType == RoleType.ROLE_ADMIN }
+	}
+	
+	boolean isUserInUserRole(User u) {
+		def user = User.get(u.id)
+		return user.roles.any { it.roleType == RoleType.ROLE_USER }
+	}
+	
+	boolean isUserInManagerRole(User u) {
+		def user = User.get(u.id)
+		return user.roles.any { it.roleType == RoleType.ROLE_MANAGER }
+	}
+	
+	
 	def findUsers(String term) { 
 		
 	}

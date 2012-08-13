@@ -3,74 +3,87 @@
 	<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}"
 		alt="Show Shipment" style="vertical-align: middle" />&nbsp;<warehouse:message code="shipping.showDetails.label"/></g:link>
 </div>
-<!-- you can only edit a shipment or its packing list if you are at the origin warehouse, or if the origin is not a warehouse, and you are at the destination warehouse -->
-<g:if test="${(session?.warehouse?.id == shipmentInstance?.origin?.id) || (!shipmentInstance?.origin?.isWarehouse() && session?.warehouse?.id == shipmentInstance?.destination?.id)}">				
-	<div class="action-menu-item">
-		<g:link controller="createShipmentWorkflow" action="createShipment" id="${shipmentInstance.id}">
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}"
-			alt="Edit shipment" style="vertical-align: middle" />&nbsp;<warehouse:message code="shipping.editShipment.label"/></g:link>
-	</div>
-</g:if>
-<g:if test="${(session?.warehouse?.id == shipmentInstance?.origin?.id) || (!shipmentInstance?.origin?.isWarehouse() && session?.warehouse?.id == shipmentInstance?.destination?.id)}">				
-	<div class="action-menu-item">															
-		<g:link controller="createShipmentWorkflow" action="createShipment" event="enterContainerDetails" id="${shipmentInstance?.id }" params="[skipTo:'Packing']">													
-			<img src="${createLinkTo(dir:'images/icons/silk',file:'text_list_bullets.png')}" 
-				alt="Edit Packing List" style="vertical-align: middle"/>&nbsp;<warehouse:message code="shipping.editPackingList.label"/>
-		</g:link>
-	</div>
-</g:if>
 
-<g:if test="${shipmentInstance?.origin?.id == session?.warehouse?.id || shipmentInstance?.destination?.id == session?.warehouse?.id }">
-	<div class="action-menu-item">		
-		<g:if test="${shipmentInstance?.isSendAllowed()}">
-			<g:link controller="createShipmentWorkflow" action="createShipment" event="sendShipment" id="${shipmentInstance.id}" params="[skipTo:'Sending']">
-				<img src="${createLinkTo(dir:'images/icons',file:'truck.png')}" class="middle" />&nbsp; 
-				<warehouse:message code="shipping.sendShipment.label"/>
+<g:isUserInRole roles="[org.pih.warehouse.core.RoleType.ROLE_ADMIN]">
+	<g:if test="${shipmentInstance.hasShipped()}">
+		<div class="action-menu-item">
+			<g:link controller="createShipmentWorkflow" action="createShipment" id="${shipmentInstance.id}">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" class="middle" />&nbsp; 
+				<g:if test="${request.request.requestURL.toString().contains('createShipment')}"><warehouse:message code="shipping.editShipment.label"/></g:if>
+				<g:else><warehouse:message code="shipping.editShipment.label"/></g:else>
 			</g:link>
-			<%-- old link 
-			<g:link controller="shipment" action="sendShipment" id="${shipmentInstance.id}">
-				<img src="${createLinkTo(dir:'images/icons',file:'truck.png')}" class="middle" />&nbsp; 
-				<warehouse:message code="shipping.sendShipment.label"/>
-			</g:link>		
-			--%>		
-		</g:if>
-		<g:else>
-			<g:set var="message" value="Shipment cannot be sent yet"/>
-			<g:if test="${shipmentInstance?.hasShipped() }">
-				<g:set var="message" value="Shipment has already been shipped!"/>
-			</g:if>
-			<g:elseif test="${shipmentInstance?.wasReceived() }">
-				<g:set var="message" value="Shipment has already been received!"/>							
-			</g:elseif>
-		
-			<a href="javascript:void(0);" onclick="alert('${message}')">
-				<img src="${createLinkTo(dir:'images/icons',file:'truck.png')}" class="middle" />&nbsp; 					
-				<span class="fade">
+		</div>
+	</g:if>
+</g:isUserInRole>
+<g:if test="${!shipmentInstance.hasShipped() }">
+	<!-- you can only edit a shipment or its packing list if you are at the origin warehouse, or if the origin is not a warehouse, and you are at the destination warehouse -->
+	<g:if test="${(session?.warehouse?.id == shipmentInstance?.origin?.id) || (!shipmentInstance?.origin?.isWarehouse() && session?.warehouse?.id == shipmentInstance?.destination?.id)}">				
+		<div class="action-menu-item">
+			<g:link controller="createShipmentWorkflow" action="createShipment" id="${shipmentInstance.id}">
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}"
+				alt="Edit shipment" style="vertical-align: middle" />&nbsp;<warehouse:message code="shipping.editShipment.label"/></g:link>
+		</div>
+	</g:if>
+	<g:if test="${(session?.warehouse?.id == shipmentInstance?.origin?.id) || (!shipmentInstance?.origin?.isWarehouse() && session?.warehouse?.id == shipmentInstance?.destination?.id)}">				
+		<div class="action-menu-item">															
+			<g:link controller="createShipmentWorkflow" action="createShipment" event="enterContainerDetails" id="${shipmentInstance?.id }" params="[skipTo:'Packing']">													
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'text_list_bullets.png')}" 
+					alt="Edit Packing List" style="vertical-align: middle"/>&nbsp;<warehouse:message code="shipping.editPackingList.label"/>
+			</g:link>
+		</div>
+	</g:if>
+	
+	<g:if test="${shipmentInstance?.origin?.id == session?.warehouse?.id || shipmentInstance?.destination?.id == session?.warehouse?.id }">
+		<div class="action-menu-item">		
+			<g:if test="${shipmentInstance?.isSendAllowed()}">
+				<g:link controller="createShipmentWorkflow" action="createShipment" event="sendShipment" id="${shipmentInstance.id}" params="[skipTo:'Sending']">
+					<img src="${createLinkTo(dir:'images/icons',file:'truck.png')}" class="middle" />&nbsp; 
 					<warehouse:message code="shipping.sendShipment.label"/>
-				</span>
-			</a>
-		</g:else>
+				</g:link>
+				<%-- old link 
+				<g:link controller="shipment" action="sendShipment" id="${shipmentInstance.id}">
+					<img src="${createLinkTo(dir:'images/icons',file:'truck.png')}" class="middle" />&nbsp; 
+					<warehouse:message code="shipping.sendShipment.label"/>
+				</g:link>		
+				--%>		
+			</g:if>
+			<g:else>
+				<g:set var="message" value="Shipment cannot be sent yet"/>
+				<g:if test="${shipmentInstance?.hasShipped() }">
+					<g:set var="message" value="Shipment has already been shipped!"/>
+				</g:if>
+				<g:elseif test="${shipmentInstance?.wasReceived() }">
+					<g:set var="message" value="Shipment has already been received!"/>							
+				</g:elseif>
+			
+				<a href="javascript:void(0);" onclick="alert('${message}')">
+					<img src="${createLinkTo(dir:'images/icons',file:'truck.png')}" class="middle" />&nbsp; 					
+					<span class="fade">
+						<warehouse:message code="shipping.sendShipment.label"/>
+					</span>
+				</a>
+			</g:else>
+		</div>
+	</g:if>
+	<%-- 
+	<g:if test="${shipmentInstance?.hasShipped() && !shipmentInstance.wasReceived() }">
+		<div class="action-menu-item">															
+			<g:link controller="shipment" action="markAsReceived" id="${shipmentInstance?.id }">													
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" 
+					alt="Mark as received" style="vertical-align: middle"/>&nbsp;<warehouse:message code="shipping.markAsReceived.label"/>
+			</g:link>
+		</div>
+	</g:if>
+	--%>
+	<%-- 
+	<div class="action-menu-item">
+		<g:link controller="shipment" action="showPackingList" id="${shipmentInstance.id}" > 
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" 
+				alt="View Packing List" style="vertical-align: middle"/>&nbsp;<warehouse:message code="shipping.viewPackingList.label"/>
+		</g:link>		
 	</div>
+	--%>
 </g:if>
-<%-- 
-<g:if test="${shipmentInstance?.hasShipped() && !shipmentInstance.wasReceived() }">
-	<div class="action-menu-item">															
-		<g:link controller="shipment" action="markAsReceived" id="${shipmentInstance?.id }">													
-			<img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" 
-				alt="Mark as received" style="vertical-align: middle"/>&nbsp;<warehouse:message code="shipping.markAsReceived.label"/>
-		</g:link>
-	</div>
-</g:if>
---%>
-<%-- 
-<div class="action-menu-item">
-	<g:link controller="shipment" action="showPackingList" id="${shipmentInstance.id}" > 
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}" 
-			alt="View Packing List" style="vertical-align: middle"/>&nbsp;<warehouse:message code="shipping.viewPackingList.label"/>
-	</g:link>		
-</div>
---%>
-
 <g:each in="${shipmentInstance.documents}" var="document" status="j">
 	<div class="action-menu-item">
 		<g:link controller="document" action="download" id="${document.id}">

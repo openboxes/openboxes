@@ -24,7 +24,7 @@
 	</td>
 	<td class="checkable middle center" style="width: 7%; border-left: 1px solid lightgrey;">
 		<g:if test="${inventoryItem?.supported }">																
-			${inventoryItem?.quantityToReceive?:0}
+			<g:formatNumber number="${inventoryItem?.quantityToReceive?:0}"/>
 		</g:if>
 		<g:else>
 			<span class="fade"><warehouse:message code="default.na.label"/></span>																
@@ -32,7 +32,7 @@
 	</td>
 	<td class="checkable middle center" style="width: 7%; border-right: 1px solid lightgrey;">
 		<g:if test="${inventoryItem?.supported }">																
-			${inventoryItem?.quantityToShip?:0}
+			<g:formatNumber number="${inventoryItem?.quantityToShip?:0}"/>
 		</g:if>
 		<g:else>
 			<span class="fade"><warehouse:message code="default.na.label"/></span>																
@@ -41,7 +41,7 @@
 	<td class="checkable middle center" style="width: 7%;">
 		<g:if test="${inventoryItem?.supported }">																
 			<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
-				${inventoryItem?.quantityOnHand?:0}
+				<g:formatNumber number="${inventoryItem?.quantityOnHand?:0}"/>
 			</g:link>
 		</g:if>
 		<g:else>

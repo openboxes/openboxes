@@ -20,7 +20,6 @@
 				<table>
 					<tr>
 						<td>
-							<h2>Actions</h2>
 							<div class="buttonsBar">
 								<div class="linkButton">
 									<g:link controller="inventory" action="browse" class="browse"><warehouse:message code="inventory.browse.label"/></g:link>
@@ -34,7 +33,7 @@
 								<div class="linkButton">
 									<g:link controller="createProduct" action="index" class="create"><warehouse:message code="product.createFromExternal.label"/></g:link>
 								</div>
-							</ul>
+							</div>
 						</td>
 						<td>
 							<g:if test="${session.lastProduct }" >
@@ -45,7 +44,7 @@
 											${session.lastProduct.name }</g:link>						
 										<span class="fade">edited <g:formatDate date="${session.lastProduct.lastUpdated }" format="MMM dd hh:mma"/></span>					
 									</div>
-								</ul>
+								</div>
 							</g:if>
 						</td>					
 					<tr>
@@ -102,49 +101,49 @@
 	
 	<g:authorize activity="[ActivityCode.PLACE_ORDER,ActivityCode.FULFILL_ORDER]">	
 		<li>
-			<g:link controller="order" action="list">			
+			<g:link controller="order" action="list" class="list">			
 				<warehouse:message code="orders.label"/>
 			</g:link>
+			
 			<div>
 				<table>
 					<tr>
-						<td>
-							<g:link controller="order" action="list" params="[status:'PENDING']"><warehouse:message code="order.list.label"/></g:link>
+						<td>			
+			
+							<div class="buttonsBar">
+								<div class="linkButton">
+									<g:link controller="order" action="list" params="[status:'PENDING']" class="list"><warehouse:message code="order.list.label"/></g:link>
+								</div>
+								<div class="linkButton">
+									<table>
+										<g:each in="${incomingOrders}" var="orderStatusRow">
+											<tr>
+												<td>
+													<g:link controller="order" action="list" params="[status:orderStatusRow[0]]" class="${orderStatusRow[0] }">
+														<format:metadata obj="${orderStatusRow[0]}"/> (${orderStatusRow[1]})
+													</g:link>
+												</td>
+											</tr>
+										</g:each>
+									</table>
+								</div>
+								<div class="linkButton">							
+									<g:link controller="purchaseOrderWorkflow" action="index" class="create">
+										<warehouse:message code="order.create.label"/>
+									</g:link>
+								</div>										
+									<%-- 
+									<li>
+										<span>
+											<g:link controller="order" action="listOrderItems"><warehouse:message code="orderItem.list.label"  default="List order items"/></g:link>
+										</span>
+									</li>
+									--%>									
+												
+							</div>
 						</td>
 					</tr>
-					<tr>
-						<td>
-							<table>
-								<g:each in="${incomingOrders}" var="orderStatusRow">
-									<tr>
-										<td>
-										
-										
-											<g:link controller="order" action="list" params="[status:orderStatusRow[0]]">
-												<format:metadata obj="${orderStatusRow[0]}"/> (${orderStatusRow[1]})
-											</g:link>
-										</td>
-									</tr>
-								</g:each>
-							</table>
-						</td>
-					</tr>
-					<tr>	
-						<td>
-							<g:link controller="purchaseOrderWorkflow" action="index">
-								<warehouse:message code="order.create.label"/>
-							</g:link>
-						</td>								
-					</tr>
-					<%-- 
-					<li>
-						<span>
-							<g:link controller="order" action="listOrderItems"><warehouse:message code="orderItem.list.label"  default="List order items"/></g:link>
-						</span>
-					</li>
-					--%>									
-								
-				</table>										
+				</table>
 			</div>
 		</li>
 	</g:authorize>
@@ -157,55 +156,52 @@
 				<table>
 					<tr>
 						<td>
-							<g:link controller="request" action="list" params="[requestType:'INCOMING']"><warehouse:message code="request.listIncoming.label" /></g:link>
+						
+							<div class="buttonsBar">
+								<div class="linkButton">
+									<g:link controller="request" action="list" params="[requestType:'INCOMING']" class="list"><warehouse:message code="request.listIncoming.label" /></g:link>
+								</div>
+								<div class="linkButton">
+									<table>
+										<g:each in="${incomingRequests}" var="status">
+											<tr>								
+												<td>
+													<g:link controller="request" action="list" class="${status.key }" params="[requestType:'INCOMING',status:status.key]">
+														<format:metadata obj="${status.key}"/> (${status.value.size()})
+													</g:link>
+												</td>
+											</tr>
+										</g:each>
+									</table>				
+								</div>
+							</div>
+							<div class="linkButton">
+								<g:link controller="request" action="list" params="[requestType:'OUTGOING']" class="list"><warehouse:message code="request.listOutgoing.label" /></g:link>
+							</div>
+							<div class="linkButton">
+								<table>
+									<g:each in="${outgoingRequests}" var="status">
+										<tr>
+											<td>
+												<g:link controller="request" action="list" params="[requestType:'OUTGOING',status:status.key]" class="${status.key }">
+													<format:metadata obj="${status.key}"/> (${status.value.size()})
+												</g:link>
+											</td>
+										</tr>
+									</g:each>
+								</table>	
+							</div>
+							<div class="linkButton">
+								<g:link controller="createRequestWorkflow" action="index" class="create"><warehouse:message code="request.create.label" default="Add new request"/></g:link>
+							</div>
 						</td>
 					</tr>
-					<tr>	
-						<td>
-							<table>
-								<g:each in="${incomingRequests}" var="status">
-									<tr>								
-										<td>
-											<g:link controller="request" action="list" params="[requestType:'INCOMING',status:status.key]">
-												<format:metadata obj="${status.key}"/> (${status.value.size()})
-											</g:link>
-										</td>
-									</tr>
-								</g:each>
-							</table>				
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<g:link controller="request" action="list" params="[requestType:'OUTGOING']"><warehouse:message code="request.listOutgoing.label" /></g:link>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<table>
-								<g:each in="${outgoingRequests}" var="status">
-									<tr>
-										<td>
-											<g:link controller="request" action="list" params="[requestType:'OUTGOING',status:status.key]">
-												<format:metadata obj="${status.key}"/> (${status.value.size()})
-											</g:link>
-										</td>
-									</tr>
-								</g:each>
-							</table>	
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<g:link controller="createRequestWorkflow" action="index"><warehouse:message code="request.create.label" default="Add new request"/></g:link>
-						</td>					
-					</tr>				
-					
 				</table>
 			</div>			
 		</li>
 	</g:authorize>		
 	</li>
+	
 	<g:authorize activity="[ActivityCode.SEND_STOCK]">
 		<li>
 			<g:link controller="shipment" action="list" params="[type:'outgoing']">
@@ -215,28 +211,29 @@
 				<table>
 					<tr>
 						<td>
-							<g:link controller="shipment" action="list" params="[type:'outgoing']"><warehouse:message code="shipping.listOutgoing.label"  default="List outgoing shipments"/></g:link>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<table>
-								<g:each in="${outgoingShipments}" var="statusRow">
-									<tr>
-										<td>
-											<g:link controller="shipment" action="list" params="[status:statusRow.key]">
-												<format:metadata obj="${statusRow.key}"/> (${statusRow.value.size()})
-											</g:link>
-										</td>
-									</tr>
-								</g:each>
-							</table>
 						
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'OUTGOING']"><warehouse:message code="shipping.createOutgoingShipment.label"/></g:link>
+							<div class="buttonsBar">
+								<div class="linkButton">
+									<g:link controller="shipment" action="list" params="[type:'outgoing']" class="list"><warehouse:message code="shipping.listOutgoing.label"  default="List outgoing shipments"/></g:link>
+								</div>					
+						
+								<div class="linkButton">
+									<table>
+										<g:each in="${outgoingShipments}" var="statusRow">
+											<tr>
+												<td>
+													<g:link controller="shipment" action="list" params="[status:statusRow.key]" class="${statusRow.key }">
+														<format:metadata obj="${statusRow.key}"/> (${statusRow.value.size()})
+													</g:link>
+												</td>
+											</tr>
+										</g:each>
+									</table>
+								</div>
+								<div class="linkButton">					
+									<g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'OUTGOING']" class="create"><warehouse:message code="shipping.createOutgoingShipment.label"/></g:link>
+								</div>	
+							</div>
 						</td>	
 					</tr>
 				</table>
@@ -252,28 +249,28 @@
 				<table>
 					<tr>
 						<td>
-							<g:link controller="shipment" action="list" params="[type: 'incoming']"><warehouse:message code="shipping.listIncoming.label"  default="List incoming shipments"/></g:link>
+							<div class="buttonsBar">
+								<div class="linkButton">
+									<g:link controller="shipment" action="list" params="[type: 'incoming']" class="list"><warehouse:message code="shipping.listIncoming.label"  default="List incoming shipments"/></g:link>
+								</div>
+								<div class="linkButton">
+									<table>
+										<g:each in="${incomingShipments}" var="statusRow">
+											<tr>
+												<td>
+													<g:link controller="shipment" action="list" params="[type: 'incoming', status:statusRow.key]" class="${statusRow.key }">
+														<format:metadata obj="${statusRow.key}"/> (${statusRow.value.size()})
+													</g:link>
+												</td>
+											</tr>
+										</g:each>					
+									</table>
+								</div>
+							</div>
+							<div class="linkButton">						
+								<g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'INCOMING']" class="create"><warehouse:message code="shipping.createIncomingShipment.label"/></g:link>
+							</div>							
 						</td>
-					</tr>
-					<tr>
-						<td>
-							<table>
-								<g:each in="${incomingShipments}" var="statusRow">
-									<tr>
-										<td>
-											<g:link controller="shipment" action="list" params="[type: 'incoming', status:statusRow.key]">
-												<format:metadata obj="${statusRow.key}"/> (${statusRow.value.size()})
-											</g:link>
-										</td>
-									</tr>
-								</g:each>					
-							</table>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'INCOMING']"><warehouse:message code="shipping.createIncomingShipment.label"/></g:link>
-						</td> 
 					</tr>
 				</table>
 			</div>
@@ -288,39 +285,31 @@
 			<table>			
 				<tr>
 					<td>
-						<g:link controller="report" action="showTransactionReport"><warehouse:message code="report.showTransactionReport.label"/></g:link>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<g:link controller="report" action="showShippingReport"><warehouse:message code="report.showShippingReport.label"/></g:link>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<g:link controller="inventory" action="listExpiredStock"><warehouse:message code="inventory.expiredStock.label"/></g:link> 
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<g:link controller="inventory" action="listExpiringStock"><warehouse:message code="inventory.expiringStock.label"/></g:link> 
-					</td>
-				</tr>
-				<tr>
-					<%-- 
-					<td>
-						<g:link controller="inventory" action="listLowStock"><warehouse:message code="inventory.lowStock.label"/></g:link> 
-					</td>
-					--%>
-				</tr>
-				<tr>
-					<td>
-						<g:link controller="inventory" action="showConsumption"><warehouse:message code="inventory.consumption.label"/></g:link> 
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<g:link controller="inventory" action="listDailyTransactions"><warehouse:message code="transaction.dailyTransactions.label"/></g:link> 
+						<div class="buttonsBar">
+							<div class="linkButton">
+								<g:link controller="report" action="showTransactionReport" class="report_inventory"><warehouse:message code="report.showTransactionReport.label"/></g:link>							
+							</div>
+							<div class="linkButton">
+								<g:link controller="report" action="showShippingReport" class="report_shipping"><warehouse:message code="report.showShippingReport.label"/></g:link>
+							</div>
+							<div class="linkButton">
+								<g:link controller="inventory" action="listExpiredStock" class="report_expired"><warehouse:message code="inventory.expiredStock.label"/></g:link> 
+							</div>
+							<div class="linkButton">
+								<g:link controller="inventory" action="listExpiringStock" class="report_expiring"><warehouse:message code="inventory.expiringStock.label"/></g:link> 
+							</div>
+							<%-- 
+								<div class="linkButton">
+									<g:link controller="inventory" action="listLowStock" class="report"><warehouse:message code="inventory.lowStock.label"/></g:link> 
+								</div>
+							--%>				
+							<div class="linkButton">
+								<g:link controller="inventory" action="showConsumption" class="report_consumption"><warehouse:message code="inventory.consumption.label"/></g:link> 
+							</div>
+							<div class="linkButton">
+								<g:link controller="inventory" action="listDailyTransactions" class="report_transactions"><warehouse:message code="transaction.dailyTransactions.label"/></g:link> 
+							</div>
+						</div>					
 					</td>
 				</tr>
 			</table>
@@ -334,27 +323,26 @@
 		<div>
 			<table>
 				<tr>
-					<td>
+					<td class="left top">
 						<span class="menu-subheading"><warehouse:message code="default.general.label"/></span>
-						<table>
-							<tr>
-								<td>
-									<g:link controller="admin" action="showSettings"><warehouse:message code="default.manage.label" args="[warehouse.message(code:'default.settings.label')]"/></g:link>
-								</td>		
-							</tr>
-							<tr>
-								<td>
-									<g:link controller="batch" action="importData" params="[type:'product']"><warehouse:message code="default.import.label" args="[warehouse.message(code:'products.label')]"/></g:link> 				
-								</td>			
-							</tr>
-							<tr>
-								<td>
-									<g:link controller="batch" action="importData" params="[type:'inventory']"><warehouse:message code="default.import.label" args="[warehouse.message(code:'inventory.label')]"/></g:link> 				
-								</td>			
-							</tr>
-						</table>				
+						<div class="buttonsBar">
+							<div class="linkButton">
+								<g:link controller="admin" action="showSettings" class="settings"><warehouse:message code="default.manage.label" args="[warehouse.message(code:'default.settings.label')]"/></g:link>
+							</div>
+							<div class="linkButton">
+								<g:link controller="batch" action="importData" params="[type:'product']" class="product"><warehouse:message code="default.import.label" args="[warehouse.message(code:'products.label')]"/></g:link> 
+							</div>
+							<div class="linkButton">
+								<g:link controller="batch" action="importData" params="[type:'inventory']" class="inventory"><warehouse:message code="default.import.label" args="[warehouse.message(code:'inventory.label')]"/></g:link> 				
+							</div>
+							<div class="linkButton">									
+								<g:link controller="product" action="batchEdit" class="edit"><warehouse:message code="product.batchEdit.label" /></g:link>
+							</div>
+							
+						</div>
+										
 					</td>
-					<td>
+					<td class="center top">
 					
 						<g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">	
 							<span class="menu-subheading"><warehouse:message code="inventory.label"/></span>
@@ -374,88 +362,57 @@
 							</div>
 						</g:authorize>				
 					</td>
-					<td>
+					<td class="center top">
 						<span class="menu-subheading"><warehouse:message code="products.label"/></span>
-						<table>			
-							<tr>
-								<td>
-									<g:link controller="product" action="list"><warehouse:message code="products.label"/></g:link>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<g:link controller="productGroup" action="list"><warehouse:message code="productGroups.label"/></g:link>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<g:link controller="attribute" action="list"><warehouse:message code="attributes.label"/></g:link>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<g:link controller="category" action="tree"><warehouse:message code="categories.label"/></g:link>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<g:link controller="product" action="batchEdit"><warehouse:message code="product.batchEdit.label" /></g:link>
-								</td>
-							</tr>
-						</table>				
+						<div class="buttonBar">
+							<div class="linkButton">									
+								<g:link controller="product" action="list" class="list"><warehouse:message code="products.label"/></g:link>
+							</div>
+							<div class="linkButton">									
+								<g:link controller="productGroup" action="list" class="list"><warehouse:message code="productGroups.label"/></g:link>
+							</div>
+							<div class="linkButton">									
+								<g:link controller="attribute" action="list" class="list"><warehouse:message code="attributes.label"/></g:link>
+							</div>
+							<div class="linkButton">									
+								<g:link controller="category" action="tree" class="list"><warehouse:message code="categories.label"/></g:link>
+							</div>
+						</div>
+						
 					</td>
-					<td>
+				</tr>
+				<tr>
+					<td class="center top">
 						<span class="menu-subheading"><warehouse:message code="locations.label"/></span>
-						<table>
-							<tr>
-								<td>
-									<g:link controller="locationGroup" action="list"><warehouse:message code="location.sites.label"/></g:link>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<g:link controller="location" action="list"><warehouse:message code="locations.label"/></g:link>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<g:link controller="shipper" action="list"><warehouse:message code="location.shippers.label"/></g:link>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<g:link controller="locationType" action="list"><warehouse:message code="location.locationTypes.label"/></g:link>
-								</td>
-							</tr>
-						</table>				
+						<div class="buttonBar">
+							<div class="linkButton">									
+								<g:link controller="locationGroup" action="list" class="site"><warehouse:message code="location.sites.label"/></g:link>
+							</div>
+							<div class="linkButton">									
+								<g:link controller="location" action="list" class="location"><warehouse:message code="locations.label"/></g:link>
+							</div>
+							<div class="linkButton">									
+								<g:link controller="shipper" action="list" class="shipper"><warehouse:message code="location.shippers.label"/></g:link>
+							</div>
+							<div class="linkButton">									
+								<g:link controller="locationType" action="list" class="locationType"><warehouse:message code="location.locationTypes.label"/></g:link>
+							</div>
+						</div>
 					</td>
-					<td>
-					
+					<td class="center top">
 						<span class="menu-subheading"><warehouse:message code="persons.label"/></span>
-						<table>
-							<tr>
-								<td>
-									<g:link controller="person" action="list"><warehouse:message code="person.list.label"/></g:link>
-								</td>		
-							</tr>
-							<tr>
-								<td>
-									<g:link controller="user" action="list"><warehouse:message code="users.label"/></g:link>
-								</td>	
-							</tr>
-							<!--  								
-							<tr>
-								<td>
-									<g:link controller="role" action="list"><warehouse:message code="default.manage.label" args="['roles']"/></g:link>
-								</td>		
-							</tr>
-							-->
-						</table>				
+						<div class="buttonBar">
+							<div class="linkButton">									
+								<g:link controller="person" action="list" class="people"><warehouse:message code="person.list.label"/></g:link>
+							</div>
+							<div class="linkButton">									
+								<g:link controller="user" action="list" class="user"><warehouse:message code="users.label"/></g:link>
+							</div>
+						</div>		
 					</td>
 				</tr>
 			</table>
 		</div>
 	</li>
-<div>	
 </ul>
 <!--MegaMenu Ends-->

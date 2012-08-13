@@ -24,7 +24,7 @@
 						</span>
 						--%>
 					</div>
-					<div class="product-status"
+					<div class="product-status">
 						<%-- 
 						<g:if test="${productInstance?.status?.code }"
 							<span class="status">
@@ -63,8 +63,6 @@
 							</span>
 						</g:else>
 						--%>
-						
-						
 					</div>
 				</td>	
 									

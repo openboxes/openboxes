@@ -3,7 +3,7 @@
     <head>
          <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
          <meta name="layout" content="custom" />
-         <title>Choose product template</title>  
+         <title><warehouse:message code="createProductFromTemplate.label"/></title>  
          <style>
 			.gallery {background:'white'; overflow:hidden;}
 			.gallery ul {list-style:none; margin:0; padding:0; margin-left:-1em; margin-top:-1em;}
@@ -29,6 +29,7 @@
 							</div>		
 							<div class="template-name">Gloves</div>						
 						</li>
+						<%-- 
 						<li>
 							<div class="template-image">
 								<g:link controller="createProductFromTemplate" action="create" event="next" params="[templateName:'masks']">
@@ -45,8 +46,17 @@
 							</div>		
 							<div class="template-name">Medicine</div>						
 						</li>
-							
-							
+						
+						
+						<li>
+							<div class="template-image">
+								<g:link controller="createProductFromTemplate" action="create" event="next" params="[templateName:'new']">
+									<img src="${createLinkTo(dir:'images/productTemplates',file:'new.png')}" height="128" width="128"/>
+								</g:link>
+							</div>		
+							<div class="template-name">New template</div>						
+						</li>							
+						--%>
 					</ul>			
 				
 				

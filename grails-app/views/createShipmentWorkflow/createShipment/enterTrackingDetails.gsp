@@ -27,133 +27,127 @@
 			
 			<g:form action="createShipment" method="post">
 				<g:hiddenField name="id" value="${shipmentInstance?.id}"/>
-				<fieldset>				
+				<g:render template="../shipment/summary" />	
+				<g:render template="flowHeader" model="['currentState':'Tracking']"/>
 				
-					<g:render template="../shipment/summary" />	
-					<g:render template="flowHeader" model="['currentState':'Tracking']"/>
-					
-					<div class="dialog">
-						<table>
-		                    <tbody>			
-		                    	<g:if test="${!shipmentWorkflow?.isExcluded('carrier')}">  
-									<tr class="prop">
-										<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
-											code="shipping.traveler.label" /></label></td>
-										<td valign="top" style="width: 30%;">
-											<g:autoSuggest id="carrier" name="carrier" jsonUrl="${request.contextPath }/json/findPersonByName" 
-												width="300"
-												valueId="${shipmentInstance?.carrier?.id}" 
-												valueName="${shipmentInstance?.carrier?.name}"/>		
-												
-											<g:link action="createShipment" event="addPerson" params="[target:'carrier']">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'user_add.png')}" alt="Add a person" class="middle"/>
-											</g:link>
-												
-										</td>
-									</tr>
-								</g:if>	
-								<g:if test="${!shipmentWorkflow?.isExcluded('shipmentMethod.shipper')}">
-									<tr class="prop">
-										<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
-											code="shipping.freightForwarder.label" /></label></td>
-										<td valign="top" style="width: 30%;">
-										
-											<g:selectShipper id="shipperInput" 
-												name="shipperInput.id" class="comboBox" value="${shipmentInstance?.shipmentMethod?.shipper?.id }" noSelection="['null':'']"/>
-											
-											<%-- 
-											<g:autoSuggest id="shipperInput" name="shipperInput" jsonUrl="${request.contextPath }/json/findShipperByName" 
-												width="300"
-												valueId="${shipmentInstance?.shipmentMethod?.shipper?.id}" 
-												valueName="${shipmentInstance?.shipmentMethod?.shipper?.name}"/>
-											--%>
-											<g:link action="createShipment" event="addShipper" params="[target:'shipper']">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry_add.png')}" alt="Add a shipper" class="middle"/>
-											</g:link>	
-											<%-- 
-											<g:link controller="shipper" action="create" target="_blank">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry_add.png')}" alt="Add a shipper" class="middle"/>
-											</g:link>
-											--%>	
-										</td>
-									</tr>
-								</g:if>
-								<g:if test="${!shipmentWorkflow?.isExcluded('recipient')}">
-									<tr class="prop">
-										<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
-											code="shipping.recipient.label" /></label></td>
-										<td valign="top" style="width: 30%;">
-											<g:autoSuggest id="recipient" name="recipient" jsonUrl="${request.contextPath }/json/findPersonByName" 
-												width="300"
-												valueId="${shipmentInstance?.recipient?.id}" 
-												valueName="${shipmentInstance?.recipient?.name}"/>		
-												
-											<g:link action="createShipment" event="addPerson" params="[target:'recipient']">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'user_add.png')}" alt="Add a person" class="middle"/>
-											</g:link>
-										</td>
-									</tr>
-								</g:if>
-								
-								<!-- list all the reference numbers valid for this workflow -->
-								<g:each var="referenceNumberType" in="${shipmentWorkflow?.referenceNumberTypes}">
-									<tr class="prop">
-										<td valign="top" class="name" style="width: 10%;"><label><format:metadata obj="${referenceNumberType}" /></label></td>
-										<td valign="top" style="width: 30%;">
-											<g:textField name="referenceNumbersInput.${referenceNumberType?.id}" size="10" value="${shipmentInstance?.referenceNumbers?.find({it.referenceNumberType.id == referenceNumberType.id})?.identifier}" /> 
-										</td>
-									</tr>
-								</g:each>
-												
-								<g:if test="${!shipmentWorkflow?.isExcluded('statedValue')}">									
-									<tr class="prop">
-										<td valign="top" class="name"><label><warehouse:message
-											code="shipping.statedValue.label" /></label></td>
-										<td valign="top"
-											class=" ${hasErrors(bean: shipmentInstance, field: 'statedValue', 'errors')}"
-											nowrap="nowrap">
-												<g:textField name="statedValue" value="${formatNumber(format: '##,##0.00', number: shipmentInstance.statedValue)}" size="10"/> 
-												<span class="fade"><warehouse:message code="shipping.statedValueExplanation.message"/></span>
-										</td>
-									</tr>	
-								</g:if>			
-								<g:if test="${!shipmentWorkflow?.isExcluded('totalValue')}">									
-									<tr class="prop">
-										<td valign="top" class="name"><label><warehouse:message
-											code="shipping.totalValue.label" /></label></td>
-										<td valign="top"
-											class=" ${hasErrors(bean: shipmentInstance, field: 'totalValue', 'errors')}"
-											nowrap="nowrap">
-												<g:textField name="totalValue" value="${formatNumber(format: '##,##0.00', number: shipmentInstance.totalValue)}" size="10"/> 
-												<span class="fade"><warehouse:message code="shipping.totalValueExplanation.message"/></span>
-										</td>
-									</tr>	
-								</g:if>			
-								<g:if test="${!shipmentWorkflow?.isExcluded('additionalInformation')}">
-									<tr class="prop">
-										<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
-											code="default.comments.label"/></label></td>
-										<td valign="top" style="width: 30%;">
-											<g:textArea name="additionalInformation" value="${shipmentInstance?.additionalInformation}" cols="80" rows="3"/>
-										</td>
-									</tr>	
-								</g:if>					
-		                    </tbody>
-		                    <tfoot>
+				<div class="dialog box">
+					<table>
+	                    <tbody>		
+	              
+	                    	
+	                    	<g:if test="${!shipmentWorkflow?.isExcluded('carrier')}">  
 								<tr class="prop">
-									<td colspan="2" class="right">
-										<div class="buttons">
-											<button name="_eventId_back">&lsaquo; <warehouse:message code="default.button.back.label"/></button>	
-											<button name="_eventId_next"><warehouse:message code="default.button.next.label"/> &rsaquo;</button> 
-											<button name="_eventId_save"><warehouse:message code="default.button.saveAndExit.label"/></button>
-											<button name="_eventId_cancel"><warehouse:message code="default.button.cancel.label"/></button>						
-										</div>
+									<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
+										code="shipping.traveler.label" /></label></td>
+									<td valign="top" style="width: 30%;">
+										<g:autoSuggest id="carrier" name="carrier" jsonUrl="${request.contextPath }/json/findPersonByName" 
+											width="300"
+											valueId="${shipmentInstance?.carrier?.id}" 
+											valueName="${shipmentInstance?.carrier?.name}"/>		
+											
+										<g:link action="createShipment" event="addPerson" params="[target:'carrier']">
+											<img src="${createLinkTo(dir:'images/icons/silk',file:'user_add.png')}" alt="Add a person" class="middle"/>
+										</g:link>
+											
 									</td>
-								</tr>		                    
-		                    </tfoot>
-	               		</table>
-					</div>
-				</fieldset>
+								</tr>
+							</g:if>	
+							<g:if test="${!shipmentWorkflow?.isExcluded('shipmentMethod.shipper')}">
+								<tr class="prop">
+									<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
+										code="shipping.freightForwarder.label" /></label></td>
+									<td valign="top" style="width: 30%;">
+									
+										<g:selectShipper id="shipperInput" 
+											name="shipperInput.id" class="comboBox" value="${shipmentInstance?.shipmentMethod?.shipper?.id }" noSelection="['null':'']"/>
+										
+										<%-- 
+										<g:autoSuggest id="shipperInput" name="shipperInput" jsonUrl="${request.contextPath }/json/findShipperByName" 
+											width="300"
+											valueId="${shipmentInstance?.shipmentMethod?.shipper?.id}" 
+											valueName="${shipmentInstance?.shipmentMethod?.shipper?.name}"/>
+										--%>
+										<g:link action="createShipment" event="addShipper" params="[target:'shipper']">
+											<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry_add.png')}" alt="Add a shipper" class="middle"/>
+										</g:link>	
+										<%-- 
+										<g:link controller="shipper" action="create" target="_blank">
+											<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry_add.png')}" alt="Add a shipper" class="middle"/>
+										</g:link>
+										--%>	
+									</td>
+								</tr>
+							</g:if>
+							<g:if test="${!shipmentWorkflow?.isExcluded('recipient')}">
+								<tr class="prop">
+									<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
+										code="shipping.recipient.label" /></label></td>
+									<td valign="top" style="width: 30%;">
+										<g:autoSuggest id="recipient" name="recipient" jsonUrl="${request.contextPath }/json/findPersonByName" 
+											width="300"
+											valueId="${shipmentInstance?.recipient?.id}" 
+											valueName="${shipmentInstance?.recipient?.name}"/>		
+											
+										<g:link action="createShipment" event="addPerson" params="[target:'recipient']">
+											<img src="${createLinkTo(dir:'images/icons/silk',file:'user_add.png')}" alt="Add a person" class="middle"/>
+										</g:link>
+									</td>
+								</tr>
+							</g:if>
+							
+							<!-- list all the reference numbers valid for this workflow -->
+							<g:each var="referenceNumberType" in="${shipmentWorkflow?.referenceNumberTypes}">
+								<tr class="prop">
+									<td valign="top" class="name" style="width: 10%;"><label><format:metadata obj="${referenceNumberType}" /></label></td>
+									<td valign="top" style="width: 30%;">
+										<g:textField name="referenceNumbersInput.${referenceNumberType?.id}" size="10" value="${shipmentInstance?.referenceNumbers?.find({it.referenceNumberType.id == referenceNumberType.id})?.identifier}" /> 
+									</td>
+								</tr>
+							</g:each>
+											
+							<g:if test="${!shipmentWorkflow?.isExcluded('statedValue')}">									
+								<tr class="prop">
+									<td valign="top" class="name"><label><warehouse:message
+										code="shipping.statedValue.label" /></label></td>
+									<td valign="top"
+										class=" ${hasErrors(bean: shipmentInstance, field: 'statedValue', 'errors')}"
+										nowrap="nowrap">
+											<g:textField name="statedValue" value="${formatNumber(format: '##,##0.00', number: shipmentInstance.statedValue)}" size="10"/> 
+											<span class="fade"><warehouse:message code="shipping.statedValueExplanation.message"/></span>
+									</td>
+								</tr>	
+							</g:if>			
+							<g:if test="${!shipmentWorkflow?.isExcluded('totalValue')}">									
+								<tr class="prop">
+									<td valign="top" class="name"><label><warehouse:message
+										code="shipping.totalValue.label" /></label></td>
+									<td valign="top"
+										class=" ${hasErrors(bean: shipmentInstance, field: 'totalValue', 'errors')}"
+										nowrap="nowrap">
+											<g:textField name="totalValue" value="${formatNumber(format: '##,##0.00', number: shipmentInstance.totalValue)}" size="10"/> 
+											<span class="fade"><warehouse:message code="shipping.totalValueExplanation.message"/></span>
+									</td>
+								</tr>	
+							</g:if>			
+							<g:if test="${!shipmentWorkflow?.isExcluded('additionalInformation')}">
+								<tr class="prop">
+									<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
+										code="default.comments.label"/></label></td>
+									<td valign="top" style="width: 30%;">
+										<g:textArea name="additionalInformation" value="${shipmentInstance?.additionalInformation}" cols="80" rows="3"/>
+									</td>
+								</tr>	
+							</g:if>					
+	                    </tbody>
+               		</table>
+				</div>
+				<div class="buttons">
+					<button name="_eventId_back">&lsaquo; <warehouse:message code="default.button.back.label"/></button>	
+					<button name="_eventId_next"><warehouse:message code="default.button.next.label"/> &rsaquo;</button> 
+					<button name="_eventId_save"><warehouse:message code="default.button.saveAndExit.label"/></button>
+					<button name="_eventId_cancel"><warehouse:message code="default.button.cancel.label"/></button>						
+				</div>
+				
 			</g:form>
 		</div>
 	</body>

@@ -34,14 +34,14 @@
 		<div class="${currentState.equals("verify")?'active-step':''}">
 			<%--<g:link action="create" event="verify"><warehouse:message code="product.choose.label" default="Verify product"/></g:link> --%>
 			<a href="#">
-				<img src="${createLinkTo(dir: 'images/icons/silk', file: 'accept.png' )}" class="middle"/>&nbsp;
+				<img src="${createLinkTo(dir: 'images/icons/silk', file: 'accept.png' )}" class="middle" />&nbsp;
 				<warehouse:message code="product.choose.label" default="Verify product"/></a>
 			
 		</div>
 		<div class="${currentState.equals("confirm")?'active-step':''}">
 			<%--<g:link action="create" event="confirm"><warehouse:message code="product.create.label" default="Confirmation"/></g:link> --%>
 			<a href="#">
-				<img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png' )}" class="middle"/>&nbsp;
+				<img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png' )}" class="middle" />&nbsp;
 				<warehouse:message code="product.create.label" default="Confirmation"/></a>
 		</div>
 	</div>

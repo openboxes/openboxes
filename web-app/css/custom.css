@@ -78,13 +78,19 @@ button.action-btn, button.previous, button.next {
 	border: 1px solid lightgrey;
 	margin: 1px;
 	background-color: #fcfcfc;
-	/*
-	background-color: #f7f7f7;*/
-	/*background-color: white;*/ 
 	padding: 7px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
 }
+.box-white { 
+	border: 1px solid lightgrey;
+	margin: 1px;
+	background-color: white;
+	padding: 7px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
 .box-slim { 
 	border: 1px solid lightgrey;
 	margin: 1px;
@@ -154,6 +160,13 @@ button.action-btn, button.previous, button.next {
 	background-color: lightgrey;
 	padding: 5px;
 	text-decoration: none;
+}
+
+.linkButton a:hover { 
+	display: block; 
+	background-color: lightgrey;
+	padding: 5px;
+	text-decoration: underline;
 }
 
 
@@ -280,8 +293,8 @@ body {
 .widget-header { background-color: #FFF; margin: 1px; font-weight: bold; font-size: 110%;} 
 .widget-content { margin: 10px; } 
 .widget-small .widget-content {  font-size: 110%;} 
-
-
+.widget-content tr { height: 30px; }
+.widget-content td,th { vertical-align: middle; }
 img { 
 	vertical-align: middle;
 }
@@ -1018,3 +1031,96 @@ img.photo_tiny {
     width: 150px;	
 	text-align: right;
 }
+
+
+/**
+ * jquery tabs
+.ui-tabs { position: relative; padding: .2em; zoom: 1; }
+.ui-tabs .ui-tabs-nav { margin: 0; padding: .2em .2em 0; }
+.ui-tabs .ui-tabs-nav li { list-style: none; float: left; position: relative; top: 1px; margin: 0 .2em 1px 0; border-bottom: 0 !important; padding: 0; white-space: nowrap; }
+.ui-tabs .ui-tabs-nav li a { float: left; padding: .5em 1em; text-decoration: none; }
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected { margin-bottom: 0; padding-bottom: 1px; }
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected a, .ui-tabs .ui-tabs-nav li.ui-state-disabled a, .ui-tabs .ui-tabs-nav li.ui-state-processing a { cursor: text; }
+.ui-tabs .ui-tabs-nav li a, .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a { cursor: pointer; }
+.ui-tabs .ui-tabs-panel { display: block; border-width: 0; padding: 1em 1.4em; background: none; }
+.ui-tabs .ui-tabs-hide { display: none !important; }
+ */
+ 
+
+#transactionLogTabs {
+	background: transparent;
+	border: none;
+}
+#transactionLogTabs .ui-widget-header {
+	background: transparent;
+	border: none;
+	border-bottom: 1px solid #c0c0c0;
+	-moz-border-radius: 0px;
+	-webkit-border-radius: 0px;
+	border-radius: 0px;
+}
+/*
+#transactionLogTabs .ui-state-default {
+	background: transparent;
+	border: none;
+}
+#transactionLogTabs .ui-state-active {
+	background: transparent url(../images/ui-tabs-arrow.png) no-repeat bottom center;
+	border: none;
+}
+*/
+.tabs .ui-state-default a {
+	color: #c0c0c0;
+}
+.tabs .ui-state-active a {
+	color: #459E00;
+}
+
+.tabs {
+	background: transparent;
+	border: none;
+}
+
+
+.tabs .ui-widget-header {
+	background: transparent;
+	border: none;
+	border-bottom: 1px solid #c0c0c0;
+	-moz-border-radius: 0px;
+	-webkit-border-radius: 0px;
+	border-radius: 0px;
+}
+/*
+.tabs .ui-state-default {
+	background: transparent;
+	border: none;
+}
+.tabs .ui-state-active {
+	background: transparent url(../images/ui-tabs-arrow.png) no-repeat bottom center;
+	border: none;
+}
+*/
+.tabs .ui-state-default a {
+	color: #c0c0c0;
+}
+.tabs .ui-state-active a {
+	color: #459E00;
+	
+}
+
+.tabs .list, .tabs .tableScroll { 
+	border-bottom: 1px solid lightgrey;
+	
+}
+
+/* Image in Text Box */
+.globalSearch {
+	vertical-align: middle;
+	background:#FFFFFF url(../images/icons/silk/magnifier.png) no-repeat 4px 4px;
+	padding:4px 4px 4px 24px;
+	border:1px solid #CCCCCC;
+	width:230px;
+	height:24px;
+}
+
+

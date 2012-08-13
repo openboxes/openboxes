@@ -22,9 +22,11 @@
 		<div class="body">		
 			<div id="chooseLocation">
 				<g:if test="${flash.message}">
-			    	<div class="message">${warehouse.message(code:flash.message,default:flash.message)}</div>  <!-- we wrap this in a message tag since we can't call it directly from with the SecurityFilter -->
+			    	<div class="message">${warehouse.message(code:flash.message,default:flash.message)}</div>  
+			    	<!-- we wrap this in a message tag since we can't call it directly from with the SecurityFilter -->
 				</g:if>		
-				<h1><warehouse:message code="dashboard.chooseLocation.label"/></h1>
+				
+				<h1>Choose your location</h1>
     			<div style="height: 300px; width: 600px; overflow: auto;" class="box">
 					<g:each var="warehouse" in="${session.loginLocations}" status="i">
 						<div id="warehouse-${warehouse.id }" class="warehouse button center" style="float: left; border: 1px solid lightgrey;">													

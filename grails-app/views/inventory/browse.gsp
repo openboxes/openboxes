@@ -40,31 +40,27 @@
 								           								            
 											<div class="tabs">
 												<ul>
-														<li>
-															<a href="#tabs-1">
+													<li>
+														<a href="#tabs-1">
+														
+															<format:category category="${commandInstance?.categoryInstance}"/>
+															<g:if test="${commandInstance?.subcategoryInstance }"> 
+																&nbsp;&rsaquo;&nbsp;
+																<format:category category="${commandInstance?.subcategoryInstance}"/>
+															</g:if>
+															&nbsp;&rsaquo;&nbsp;
+															<g:if test="${commandInstance?.searchTerms }">
+																${commandInstance.searchTerms }															
+															</g:if>
+															<g:else>
+																${warehouse.message(code: 'products.all.label') }
+															</g:else>
+															(${commandInstance?.categoryToProductMap?.values()?.flatten()?.size()} products)
 															
-																	<format:category category="${commandInstance?.categoryInstance}"/>
-																	<g:if test="${commandInstance?.subcategoryInstance }"> 
-																		&nbsp;&rsaquo;&nbsp;
-																		<format:category category="${commandInstance?.subcategoryInstance}"/>
-																	</g:if>
-																	&nbsp;&rsaquo;&nbsp;
-																	<g:if test="${commandInstance?.searchTerms }">
-																		${commandInstance.searchTerms }															
-																	</g:if>
-																	<g:else>
-																		${warehouse.message(code: 'products.all.label') }
-																	</g:else>
-																	(${commandInstance?.categoryToProductMap?.values()?.flatten()?.size()} products)
-																
-															</a>
-														</li>
+														</a>
+													</li>
 
 												</ul>		
-												<div id="tabs-recent" style="padding: 0px">
-												
-												
-												</div>
 												<div id="tabs-1" style="padding: 0px;">	
 										            <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
 										                <table class="tableScroll" border="0"> 

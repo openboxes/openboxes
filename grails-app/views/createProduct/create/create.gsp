@@ -3,7 +3,7 @@
     <head>
          <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
          <meta name="layout" content="custom" />
-         <title>Review product details</title>  
+         <title><warehouse:message code="createProduct.label"/></title>  
     </head>
     <body>
     	<div class="body">

@@ -3,7 +3,7 @@
     <head>
          <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
          <meta name="layout" content="custom" />
-         <title>Edit Product Details</title>  
+         <title><warehouse:message code="createProduct.label"/></title>  
     </head>
     <body>
     	<div class="body">
@@ -29,10 +29,8 @@
 								</td>
 								<td class="value">
 									<div class="value">
-										<g:categorySelect cssClass="comboBox" id="category.id" name="category.id" includeSpaces="${false}" value="${product?.category?.id }"/>
+										<g:categorySelect cssClass="comboBox" id="category.id" name="category.id" excludeSpaces="false" value="${product?.category?.id }"/>
 									</div>
-									
-									${product?.category?.id }
 								</td>
 							</tr>						
 							

@@ -25,14 +25,13 @@
 			<g:form action="createShipment" method="post">
 				<g:hiddenField name="id" value="${shipmentInstance?.id}"/>
 				<g:hiddenField name="shipment.id" value="${shipmentInstance?.id}"/>
-				<fieldset>				
 				
 					<g:render template="../shipment/summary" />	
 					<g:render template="flowHeader" model="['currentState':'Send']"/>
 					<g:set var="shipmentItemsWithRecipient" value="${shipmentInstance.allShipmentItems.findAll { it.recipient } }"/>
 					<g:set var="includeNotifications" value="${shipmentItemsWithRecipient || (!shipmentWorkflow?.isExcluded('carrier') && shipmentInstance?.carrier) || (!shipmentWorkflow?.isExcluded('recipient') && shipmentInstance?.recipient)}"/>
 					
-					<div class="dialog">
+					<div class="dialog box">
 						<table>
 							<tbody>
 								<tr class="prop">
@@ -311,21 +310,15 @@
 		                        </tr>  	        
 							</tbody>
 							
-		                    <tfoot>
-								<tr class="prop">
-									<td colspan="2" class="right">
-										<div class="buttons">
-											<button name="_eventId_back">&lsaquo; <warehouse:message code="default.button.back.label"/></button>	
-											<button name="_eventId_next"><warehouse:message code="default.button.next.label"/> &rsaquo;</button> 
-											<button name="_eventId_save"><warehouse:message code="default.button.saveAndExit.label"/></button>
-											<button name="_eventId_cancel"><warehouse:message code="default.button.cancel.label"/></button>						
-										</div>
-									</td>
-								</tr>		                    
-		                    </tfoot>
 	               		</table>
 					</div>
-				</fieldset>
+					<div class="buttons">
+						<button name="_eventId_back">&lsaquo; <warehouse:message code="default.button.back.label"/></button>	
+						<button name="_eventId_next"><warehouse:message code="default.button.next.label"/> &rsaquo;</button> 
+						<button name="_eventId_save"><warehouse:message code="default.button.saveAndExit.label"/></button>
+						<button name="_eventId_cancel"><warehouse:message code="default.button.cancel.label"/></button>						
+					</div>
+				
 			</g:form>
 		</div>
 		<script type="text/javascript">

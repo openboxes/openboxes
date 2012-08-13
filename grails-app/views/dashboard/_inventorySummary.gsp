@@ -10,7 +10,7 @@
 				<g:form method="GET" controller="inventory" action="browse">
 					<div class="center">
 							<g:textField id="dashboardSearchBox" name="searchTerms" size="60" value="${params.searchTerms }" 
-								class="text medium"/>						
+								class="globalSearch"/>						
 							<g:hiddenField name="resetSearch" value="true"/>							
 							<g:hiddenField name="categoryId" value="${rootCategory.id }"/>							
 							<g:hiddenField name="showHiddenProducts" value="on"/>

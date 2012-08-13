@@ -60,10 +60,10 @@ class CategorySelectTagLib {
 	def categorySelect = { attrs ->		
 		def selectedCategory = Category.get(attrs.value as int)
 		def rootCategory = productService.getRootCategory();
-		def includeSpaces = attrs?.includeSpaces 
+		def excludeSpaces = attrs?.excludeSpaces 
 		
 		out << "<select class='" + attrs.cssClass + "' id='" + attrs.id + "' name='" + attrs.name + "'>";
-		out << render(template:"../category/selectOptions", model:[category:rootCategory, selected:selectedCategory, level: 0, includeSpaces:includeSpaces])		
+		out << render(template:"../category/selectOptions", model:[category:rootCategory, selected:selectedCategory, level: 0, excludeSpaces:excludeSpaces])		
 		out << "</select>"
 	}
 	

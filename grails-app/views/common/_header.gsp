@@ -20,7 +20,8 @@
 					    <g:if test="${session.user}">
 					    	<g:if test="${session?.warehouse}">
 								<li>
-									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'user.png')}" class="middle" />
+								
+									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'user.png')}" class="middle" title="User" />									
 									<g:link class="home" controller="user" action="show" id="${session.user.id}">
 										${session?.user?.name} 
 									</g:link>
@@ -161,7 +162,7 @@
 						<g:if test="${session?.warehouse}">
 							<li>&nbsp;|&nbsp;</li>							
 						    <li>
-						    	<g:globalSearch name="searchTerms"></g:globalSearch>
+						    	<g:globalSearch cssClass="globalSearch" name="searchTerms"></g:globalSearch>
 						    </li>
 						</g:if>
 					</ul>

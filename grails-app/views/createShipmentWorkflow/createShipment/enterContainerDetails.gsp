@@ -49,9 +49,10 @@
 					<g:renderErrors bean="${itemInstance}" as="list" />
 				</div>				
 			</g:hasErrors> 			         
-			<fieldset>
+			<div>
 				<g:render template="../shipment/summary" />	
-				<g:render template="flowHeader" model="['currentState':'Pack']"/>		
+ 				<g:render template="flowHeader" model="['currentState':'Pack']"/>	
+					
 		 		
 		 		<!-- figure out what dialog box, if any, we need to render -->
 		 		<g:if test="${containerToEdit || containerTypeToAdd}">
@@ -100,63 +101,11 @@
 				<%-- Main content section --%>
 				<g:set var="containerList" value="${shipmentInstance?.containers?new ArrayList(shipmentInstance?.containers):shipmentInstance?.containers}" />
 				<table>
-					<thead>
-			 			<tr class="prop">
-			 			
-			 				<td colspan="2">							
-								<g:set var="count" value="${0 }"/>	
-								<table style="border: 0px solid lightgrey">
-									<tr>
-										<td style="width: 20px;">
-											<span class="action-menu" >
-												<button class="action-btn">
-													<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
-												</button>
-												<div class="actions">
-													<g:render template="containerMenuItems" model="[container:selectedContainer]"/>													
-													<g:render template="shipmentMenuItems" />													
-													
-												</div>
-											</span>	
-										</td>
-										<td class="middle">
-											
-											<span class="middle title">
-												<warehouse:message code="containers.label"/>
-												&rsaquo;
-											</span>
-											<span class="middle title">
-												<g:if test="${selectedContainer}">								
-													<g:if test="${selectedContainer.parentContainer }">
-														${selectedContainer?.parentContainer?.name } &rsaquo;
-													</g:if>				
-								 					${selectedContainer?.name }		 					
-												</g:if>
-												<g:else>
-													<warehouse:message code="shipping.unpackedItems.label" />			 						
-												</g:else>
-											</span>
-											
-											<g:if test="${selectedContainer}">	
-												<div class="">										
-													<g:render template="/container/summary" model="[container:selectedContainer]"/>
-									 			</div>	
-											</g:if>								
-										</td>
-									</tr>
-								</table>								
-								
-											 				
-			 				</td>
-			 			</tr>
-					
-					</thead>
 			 		<tbody>		
-			 			 		
 				 		<tr class="">
 					 		<%-- Display the pallets & boxes in this shipment --%> 
 							<g:if test="${containerList }">
-					 			<td valign="top" style="width: 250px; border-right: 0px solid lightgrey;" >
+					 			<td valign="top" style="width: 250px; border-right: 0px solid lightgrey; padding: 0px;">
 									<div class="box" >
 										<g:set var="count" value="${0 }"/>	
 										<table class="sortable" data-update-url="${createLink(controller:'json', action:'sortContainers')}">	
@@ -285,8 +234,49 @@
 							</g:if>
 				 			
 				 			<%-- Display the contents of the currently selected container --%>			 			
-				 			<td valign="top" >									
+				 			<td valign="top" style="padding: 0px;">		
 								<div class="box">
+									<table style="border: 0px solid lightgrey">
+										<tr>
+											<td style="width: 20px;">
+												<span class="action-menu" >
+													<button class="action-btn">
+														<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
+													</button>
+													<div class="actions">
+														<g:render template="containerMenuItems" model="[container:selectedContainer]"/>													
+														<g:render template="shipmentMenuItems" />													
+														
+													</div>
+												</span>	
+											</td>
+											<td class="middle">
+												
+												<span class="middle title">
+													<warehouse:message code="containers.label"/>
+													&rsaquo;
+												</span>
+												<span class="middle title">
+													<g:if test="${selectedContainer}">								
+														<g:if test="${selectedContainer.parentContainer }">
+															${selectedContainer?.parentContainer?.name } &rsaquo;
+														</g:if>				
+									 					${selectedContainer?.name }		 					
+													</g:if>
+													<g:else>
+														<warehouse:message code="shipping.unpackedItems.label" />			 						
+													</g:else>
+												</span>
+												
+												<g:if test="${selectedContainer}">	
+													<div class="">										
+														<g:render template="/container/summary" model="[container:selectedContainer]"/>
+										 			</div>	
+												</g:if>								
+											</td>
+										</tr>
+									</table>									
+								
 									<table  >
 										<thead>
 											<tr>
@@ -365,22 +355,16 @@
 				 			</td>
 				 		</tr>
 				 	</tbody>
-                    <tfoot>
-                    	<tr class="prop">
-                    		<td colspan="2">
-								<div class="buttons">
-									<g:form action="createShipment" method="post" >
-										<button name="_eventId_back">&lsaquo; <warehouse:message code="default.button.back.label"/></button>	
-										<button name="_eventId_next"><warehouse:message code="default.button.next.label"/> &rsaquo;</button> 
-										<button name="_eventId_save"><warehouse:message code="default.button.saveAndExit.label"/></button>
-										<button name="_eventId_cancel"><warehouse:message code="default.button.cancel.label"/></button>					
-						            </g:form>
-			 					</div>
-			 				</td>
-			 			</tr>
-			 		</tfoot>			 		
 			 	</table>
-			</fieldset>
+			</div>
+			<div class="buttons">
+				<g:form action="createShipment" method="post" >
+					<button name="_eventId_back">&lsaquo; <warehouse:message code="default.button.back.label"/></button>	
+					<button name="_eventId_next"><warehouse:message code="default.button.next.label"/> &rsaquo;</button> 
+					<button name="_eventId_save"><warehouse:message code="default.button.saveAndExit.label"/></button>
+					<button name="_eventId_cancel"><warehouse:message code="default.button.cancel.label"/></button>					
+	            </g:form>
+			</div>
         </div>        
         
         

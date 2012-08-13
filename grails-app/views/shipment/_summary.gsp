@@ -1,5 +1,4 @@
 
-<div style="padding: 10px;">
 	<table style="width: 0%">
 		<tbody>			
 			<tr>
@@ -10,7 +9,7 @@
 						</g:if>
 					</div> 
 				</td>
-				<td style="width: 24px; vertical-align: middle;">				
+				<td style="width: 20px; vertical-align: middle;">				
 					<g:if test="${shipmentInstance?.shipmentType }">
 						<img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + format.metadata(obj:shipmentInstance?.shipmentType, locale:null) + '.png')}"
 							alt="${format.metadata(obj:shipmentInstance?.shipmentType)}" style="vertical-align: middle; width: 24px; height: 24px;" />					
@@ -99,4 +98,4 @@
 			</tr>
 		</tbody>
 	</table>
-</div>
+

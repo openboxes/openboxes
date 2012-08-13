@@ -25,9 +25,8 @@
 		</g:hasErrors>	
 			
 		<div class="dialog">
-			<fieldset>
 				<g:render template="summary"/>						
-				<div id="details" class="section">
+				<div id="details" class="box">
 					<table>
 						<tbody>
 								<tr class="prop">
@@ -597,7 +596,6 @@
 						</tbody>
 					</table>
 				</div>
-			</fieldset>
 		</div>
 	</div>
 </body>

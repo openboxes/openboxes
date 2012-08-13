@@ -14,7 +14,7 @@
 	</div>
 </g:if>
 
-<div class="box" style="height: 25px; display: block;">
+<div class="box-white" style="height: 25px; display: block;">
 	<div class="wizard-steps"> 
 		<div class="${currentState.equals("chooseTemplate")?'active-step':''}">
 			<g:link action="create" event="chooseTemplate"><warehouse:message code="productCreateFromTemplate.chooseTemplate.label" default="Choose template"/></g:link>

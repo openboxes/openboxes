@@ -34,40 +34,55 @@
 				</g:link>
 			</div>
 		</g:if>
-		<!-- you can only edit a shipment or it's packing list if you are at the origin warehouse, or if the origin is not a warehouse, and you are at the destination warehouse -->
-		<g:if test="${shipmentInstance?.origin?.id == session?.warehouse?.id || shipmentInstance?.destination?.id == session?.warehouse?.id}">				
+		
+		<g:if test="${shipmentInstance.hasShipped()}">
+			<g:isUserInRole roles="[org.pih.warehouse.core.RoleType.ROLE_ADMIN]">
+				<div class="action-menu-item">
+					<g:link controller="createShipmentWorkflow" action="createShipment" id="${shipmentInstance.id}">
+						<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" class="middle" />&nbsp; 
+						<g:if test="${request.request.requestURL.toString().contains('createShipment')}"><warehouse:message code="shipping.editShipment.label"/></g:if>
+						<g:else><warehouse:message code="shipping.editShipment.label"/></g:else>
+					</g:link>
+				</div>
+			</g:isUserInRole>
+		</g:if>
+		
+		<g:if test="${!shipmentInstance.hasShipped()}">
+			<!-- you can only edit a shipment or it's packing list if you are at the origin warehouse, or if the origin is not a warehouse, and you are at the destination warehouse -->
+			<g:if test="${shipmentInstance?.origin?.id == session?.warehouse?.id || shipmentInstance?.destination?.id == session?.warehouse?.id}">				
+				<div class="action-menu-item">
+					<g:link controller="createShipmentWorkflow" action="createShipment" id="${shipmentInstance.id}">
+						<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" class="middle" />&nbsp; 
+						<g:if test="${request.request.requestURL.toString().contains('createShipment')}"><warehouse:message code="shipping.editShipment.label"/></g:if>
+						<g:else><warehouse:message code="shipping.editShipment.label"/></g:else>
+					</g:link>
+				</div>
+				<%-- 
+				<div class="action-menu-item">
+					<g:link controller="shipment" action="showPackingList" id="${shipmentInstance.id}">
+						<img src="${createLinkTo(dir:'images/icons/silk',file:'text_list_bullets.png')}" class="middle"/>&nbsp;
+						<warehouse:message code="shipping.viewPackingList.label"/>
+					</g:link>		
+				</div>
+				--%>
+				<div class="action-menu-item">
+					<g:link controller="createShipmentWorkflow" action="createShipment" event="enterContainerDetails"  id="${shipmentInstance?.id }" params="[skipTo:'Packing']">
+						<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" class="middle"/>&nbsp;
+						<warehouse:message code="shipping.editPackingList.label"/></g:link>					
+				</div>
+				<div class="action-menu-item">		
+					<a href="${createLink(controller: "shipment", action: "addDocument", id: shipmentInstance.id)}">
+						<img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" class="middle"/>&nbsp;<warehouse:message code="shipping.uploadADocument.label"/></a>
+				</div>
+				<div class="action-menu-item">
+					<a href="${createLink(controller: "shipment", action: "addComment", id: shipmentInstance.id)}">
+						<img src="${createLinkTo(dir:'images/icons/silk',file:'note_add.png')}" class="middle"/>&nbsp;<warehouse:message code="shipping.addNote.label"/></a>													
+				</div>
+			</g:if>		
 			<div class="action-menu-item">
-				<g:link controller="createShipmentWorkflow" action="createShipment" id="${shipmentInstance.id}">
-					<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_edit.png')}" class="middle" />&nbsp; 
-					<g:if test="${request.request.requestURL.toString().contains('createShipment')}"><warehouse:message code="shipping.editShipment.label"/></g:if>
-					<g:else><warehouse:message code="shipping.editShipment.label"/></g:else>
-				</g:link>
+				<hr/>
 			</div>
-			<%-- 
-			<div class="action-menu-item">
-				<g:link controller="shipment" action="showPackingList" id="${shipmentInstance.id}">
-					<img src="${createLinkTo(dir:'images/icons/silk',file:'text_list_bullets.png')}" class="middle"/>&nbsp;
-					<warehouse:message code="shipping.viewPackingList.label"/>
-				</g:link>		
-			</div>
-			--%>
-			<div class="action-menu-item">
-				<g:link controller="createShipmentWorkflow" action="createShipment" event="enterContainerDetails"  id="${shipmentInstance?.id }" params="[skipTo:'Packing']">
-					<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" class="middle"/>&nbsp;
-					<warehouse:message code="shipping.editPackingList.label"/></g:link>					
-			</div>
-			<div class="action-menu-item">		
-				<a href="${createLink(controller: "shipment", action: "addDocument", id: shipmentInstance.id)}">
-					<img src="${createLinkTo(dir:'images/icons/silk',file:'page_add.png')}" class="middle"/>&nbsp;<warehouse:message code="shipping.uploadADocument.label"/></a>
-			</div>
-			<div class="action-menu-item">
-				<a href="${createLink(controller: "shipment", action: "addComment", id: shipmentInstance.id)}">
-					<img src="${createLinkTo(dir:'images/icons/silk',file:'note_add.png')}" class="middle"/>&nbsp;<warehouse:message code="shipping.addNote.label"/></a>													
-			</div>
-		</g:if>		
-		<div class="action-menu-item">
-			<hr/>
-		</div>
+		</g:if>
 		<div class="action-menu-item">
 			<g:set var="url" value="${createLink(controller:'report',action:'showShippingReport',params:['shipment.id',shipmentInstance?.id]) }"/>
    			<g:link target="_blank" controller="report" action="downloadShippingReport" params="[format:'pdf',url:url,'shipment.id':shipmentInstance?.id]">
@@ -124,7 +139,7 @@
 					</g:elseif>
 				
 					<a href="javascript:void(0);" onclick="alert('${message}')">
-						<img src="${createLinkTo(dir:'images/icons',file:'truck.png')}" class="middle" />&nbsp; 					
+						<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" class="middle" />&nbsp; 
 						<span class="fade">
 							<warehouse:message code="shipping.sendShipment.label"/>
 						</span>
@@ -137,7 +152,7 @@
 			<div class="action-menu-item">
 				<g:if test="${shipmentInstance?.isReceiveAllowed()}">
 					<g:link controller="shipment" action="receiveShipment" id="${shipmentInstance.id}">
-						<img src="${createLinkTo(dir:'images/icons',file:'handtruck.png')}" alt="Receive Shipment" class="middle" />&nbsp;
+						<img src="${createLinkTo(dir:'images/icons/silk',file:'box.png')}" alt="Receive Shipment" class="middle" />&nbsp;
 						<warehouse:message code="shipping.receiveShipment.label"/>
 					</g:link>				
 				</g:if>

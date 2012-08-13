@@ -30,8 +30,13 @@
 	    			
 	    			<tbody>
 						<tr class="even">
+							<td class="center">
+								<img src="${createLinkTo(dir:'images/icons/silk/lorry.png')}" class="middle"/>
+							</td>
 							<td>
-								${warehouse.message(code: 'dashboard.outgoing.pending.label', args: [session.warehouse.name]) }							
+								<g:link controller="shipment" action="list" params="['type':'outgoing','status':pending]">
+									${warehouse.message(code: 'dashboard.outgoing.pending.label', args: [session.warehouse.name]) }							
+								</g:link>
 							</td>
 							<td style="text-align: right;">
 								<g:link controller="shipment" action="list" params="['type':'outgoing','status':pending]">
@@ -40,8 +45,14 @@
 							</td>
 						</tr>	
 						<tr class="odd prop">
+							<td class="center">
+								<img src="${createLinkTo(dir:'images/icons/silk/lorry_start.png')}" class="middle"/>
+							</td>
+						
 							<td>
-								${warehouse.message(code: 'dashboard.outgoing.shipped.label', args: [session.warehouse.name]) }							
+								<g:link controller="shipment" action="list" params="['type':'outgoing','status':shipped]">
+									${warehouse.message(code: 'dashboard.outgoing.shipped.label', args: [session.warehouse.name]) }							
+								</g:link>
 							</td>
 							<td style="text-align: right;">
 								<g:link controller="shipment" action="list" params="['type':'outgoing','status':shipped]">
@@ -52,6 +63,7 @@
 			    	</tbody>
 			    	<tfoot>
 						<tr class="even prop">
+							<th></th>
 							<th>
 								<warehouse:message code="default.total.label"/>
 							</th>

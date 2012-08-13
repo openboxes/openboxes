@@ -120,7 +120,6 @@
 						<td><g:set var="today" value="${new Date() }" /> <format:metadata
 								obj="${shipmentInstance?.status.code}" /> <g:if
 								test="${shipmentInstance?.status.date}">
-							- 
 							<g:if test="${shipmentInstance?.status?.date?.equals(today) }">
 									<warehouse:message code="default.today.label" />
 								</g:if>
