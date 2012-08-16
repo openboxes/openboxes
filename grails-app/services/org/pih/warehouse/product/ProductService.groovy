@@ -10,6 +10,18 @@ import org.pih.warehouse.importer.ImportDataCommand;
 
 import com.amazon.advertising.api.sample.SignedRequestsHelper;
 
+
+/**
+ * Keys
+ * 
+ * HIPAASpace.com: 6BB8325D3C4F42AEBDC8F9584CA85C8D79815FA7F6194AD79793BF512981E84B
+ * Google: AIzaSyCAEGyY6QpPbm3DiHmtx6qIZ_P40FnF3vk
+ * Amazon:
+ * RXNorm(http://rxnav.nlm.nih.gov/REST/): bff71b0439e75797f6af27b220eefe7b9b0b989d
+ * 
+ * @author jmiranda
+ *
+ */
 class ProductService {
 	
 	def grailsApplication
@@ -37,6 +49,67 @@ class ProductService {
 	    return new XmlSlurper().parseText(xml)
 	}
 	
+	def getNdcProduct(q) { 
+		String urlString = "http://www.HIPAASpace.com/api/ndc/getcode?q=${q.encodeAsURL()}&rt=xml&token=6BB8325D3C4F42AEBDC8F9584CA85C8D79815FA7F6194AD79793BF512981E84B"
+		return getNdcResults(urlString)
+	}
+	/**
+	 * 
+	 */
+	def findNdcProducts(search) {
+		String q = search.searchTerms?:"";
+		String urlString = "http://www.HIPAASpace.com/api/ndc/search?q=${q.encodeAsURL()}&rt=xml&token=6BB8325D3C4F42AEBDC8F9584CA85C8D79815FA7F6194AD79793BF512981E84B"
+		return getNdcResults(urlString)
+	}
+
+	def getNdcResults(urlString) { 
+		try {
+			println "URL " + urlString
+			def url = new URL(urlString)
+			def connection = url.openConnection()
+			if(connection.responseCode == 200){
+				def xml = connection.content.text
+				//println xml
+				
+				return processNdcProducts(xml)
+				
+				//search.results << product
+			}
+		} catch (Exception e) {
+			log.error("Error trying to get products from NDC API ", e);
+			throw e
+		}
+		return []
+	}
+		
+	def processNdcProducts(xml) { 
+		def results = []
+		def ndcList = new XmlParser(false, true).parseText(xml)
+		ndcList.NDC.each { ndc ->
+			
+			if (ndc.NDCCode) { 
+				println "NDC: " + ndc
+				def product = new ProductDetailsCommand()
+				product.title = ndc.PackageDescription.text()
+				product.ndcCode = ndc.NDCCode
+				product.productType = ndc.ProductTypeName.text()
+				product.packageDescription = ndc.PackageDescription.text()
+				product.ndcCode = ndc.NDCCode.text()
+				product.productNdcCode = ndc.ProductNDC.text()
+				product.labelerName = ndc.LabelerName.text()
+				product.strengthNumber = ndc.StrengthNumber.text()
+				product.strengthUnit = ndc.StrengthUnit.text()
+				product.pharmClasses = ndc.PharmClasses.text()
+				product.dosageForm = ndc.DosageFormName.text()
+				product.route = ndc.RouteName.text()
+				product.proprietaryName = ndc.ProprietaryName.text()
+				product.nonProprietaryName = ndc.NonProprietaryName.text()
+				results << product
+			}
+		}
+		return results;
+	}
+	
 	/**
 	 * Examples 
 	 * 
@@ -55,7 +128,7 @@ class ProductService {
 	 * @return
 	 */
 	def findGoogleProducts(search) {
-		
+		def products = new ArrayList();
 		int startIndex = search.startIndex;
 		String q = search.searchTerms; 
 		boolean spellingEnabled = search.spellingEnabled
@@ -70,9 +143,6 @@ class ProductService {
 		}
 		def url = new URL(urlString)
 		def connection = url.openConnection()
-
-		def products = new ArrayList();
-
 		println "Query string = " + q + " startIndex " + startIndex
 		println "URL " + urlString
 		try { 
