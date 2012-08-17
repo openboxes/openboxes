@@ -45,14 +45,30 @@ class Product implements Comparable, Serializable {
 	
 	// New fields that need to be reviewed
 	String upc				// Universal product code
-	String ndc				// National drug code
 	String manufacturer		// Manufacturer
 	String manufacturerCode // Manufacturer product (e.g. catalog code)
 	String unitOfMeasure	// each, pill, bottle, box
-
 	UnitOfMeasure defaultUom
 	//Integer uomQuantity 
+
+	// NDC attributes
+	String ndc				
+	// Figure out how we want to handle multiple names 
+	/*
+	String genericName				// same as the non-proprietary name
+	String proprietaryName			// a brand name or trademark under which a proprietary product is marketed
+	String nonProprietaryName		// a short name coined for a drug or 
+									// chemical not subject to proprietary (trademark) 
+									// rights and recommended or recognized by an official body
+	String pharmacyEquivalentName	// PEN a shortened name for a drug or combination of drugs; 
+									// when used for a combination of drugs, the term usually 
+									// consists of the prefix co- plus an abbreviation for each 
+									// drug in the combination.
+	*/
 	
+	//String route
+	//String dosageForm
+		
 	// Associations 
 	Category category;						// primary category
 	List attributes = new ArrayList();		// custom attributes
@@ -96,6 +112,9 @@ class Product implements Comparable, Serializable {
 		ndc(nullable:true, maxSize: 255)
 		manufacturer(nullable:true, maxSize: 255)
 		manufacturerCode(nullable:true, maxSize: 255)
+		
+		//route(nullable:true)
+		//dosageForm(nullable:true)
 		
 		createdBy(nullable:true)
 		updatedBy(nullable:true)

@@ -13,7 +13,7 @@ class ProductDetailsCommand implements Serializable {
 	String title
 	String description
 	String content	
-	String unitOfMeasure = "ea"
+	String unitOfMeasure 
 	Integer packageSize = 1
 	String packageUnit
 	String packageName
@@ -85,5 +85,13 @@ class ProductDetailsCommand implements Serializable {
 		proprietaryName(nullable:true)
 		nonProprietaryName(nullable:true)
 			
+	}
+	
+	String getStrength() { 
+		return "${strengthNumber} ${strengthUnit}"
+	}
+	
+	String getDrugName() { 
+		return "${nonProprietaryName }, ${route }, ${dosageForm }"
 	}
 }

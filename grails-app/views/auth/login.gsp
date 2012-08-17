@@ -55,7 +55,7 @@
 										</td>
 										--%>
 										<td class="center middle" ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
-											<g:textField class="loginField text" id="username" name="username" value="${userInstance?.username}" size="35" />
+											<g:textField class="text" id="username" name="username" value="${userInstance?.username}" size="35" />
 										</td>
 									</tr>
 									<tr>
@@ -65,7 +65,7 @@
 										</td>
 										 --%>
 										<td class="center middle" ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
-											<g:passwordField class="loginField text" id="password" name="password" value="${userInstance?.password}" size="35" />
+											<g:passwordField class="text" id="password" name="password" value="${userInstance?.password}" size="35" />
 										</td>
 									</tr>
 									<tr>

@@ -12,14 +12,51 @@ class RxNormController {
 		redirect(action: "list")
 	}
 	
+	def lookupDisplayNames = { 
+		//[terms:productService.findRxNormDisplayNames()]
+	}
+	
+	
 	def lookupProducts = { ProductSearchCommand search ->
 		println "lookupProducts: " + params 
-		search.results = productService.getNdcProduct(search.searchTerms)
-		println search.results.ndcCode
-		if (!search.results) { 
-			search.results = productService.findNdcProducts(search)
+		if (search.searchTerms) { 
+			search.results = productService.getNdcProduct(search.searchTerms)
+			println search.results.ndcCode
+			if (!search.results) { 
+				println "getCode -> no results "
+				search.results = productService.findNdcProducts(search)
+			}
 		}
 		[search:search]
+	}
+	
+	def createProduct = { 
+		def results = productService.getNdcProduct(params.id)
+		if (!results) { 
+			def search = new ProductSearchCommand();
+			flash.message = "No results"
+			render (view: "lookupProducts", model:[search:search])
+		}
+		else { 
+			def product = results[0]			
+			render (view: "createProduct", model:[product:product])
+		}		
+	}
+	
+	def saveProduct = { 
+		println "save product: " + params
+		
+		def product = new Product(params)
+		if (!product.hasErrors() && product.save(flush:true)) { 
+			println "Saved product"
+			flash.message = "Successfully created new product for '${product.name}'"
+		}
+		else { 
+			println "Errors " + product.errors
+			flash.message = "There was an error creating a new product for '${product.name}'"			
+		}
+		
+		redirect(action: "lookupProducts")
 	}
 	
 	

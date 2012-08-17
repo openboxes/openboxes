@@ -34,6 +34,38 @@ class JsonController {
 		
 	}
 	
+	def findRxNormDisplayNames = { 
+		println params
+		def results = []
+		try {
+			def url = new URL("http://rxnav.nlm.nih.gov/REST/displaynames")
+			def connection = url.openConnection()
+			if (connection.responseCode == 200) {
+				def xml = connection.content.text
+				def list = new XmlParser(false, true).parseText(xml)
+				for (item in list.displayTermsList.term) {
+					//println "item: " + item
+					if (item.text().startsWith(params.term)) { 
+						results << item.text()
+					}
+					
+				}
+				
+				if (results.size() > 10) {
+					def remaining = results.size() - 10
+					results = results.subList(0,10)
+					results << "There are " + remaining + " more items"
+				}
+
+			}
+		} catch (Exception e) {
+			log.error("Error trying to get products from NDC API ", e);
+			throw e
+		}
+		render results as JSON;
+	}
+	
+	
 	def getInventoryItem = { 
 		log.info(params)
 		

@@ -50,7 +50,7 @@ class ProductService {
 	}
 	
 	def getNdcProduct(q) { 
-		String urlString = "http://www.HIPAASpace.com/api/ndc/getcode?q=${q.encodeAsURL()}&rt=xml&token=6BB8325D3C4F42AEBDC8F9584CA85C8D79815FA7F6194AD79793BF512981E84B"
+		String urlString = "http://www.HIPAASpace.com/api/ndc/getcode?q=${q?.encodeAsURL()}&rt=xml&token=6BB8325D3C4F42AEBDC8F9584CA85C8D79815FA7F6194AD79793BF512981E84B"
 		return getNdcResults(urlString)
 	}
 	/**
@@ -58,7 +58,7 @@ class ProductService {
 	 */
 	def findNdcProducts(search) {
 		String q = search.searchTerms?:"";
-		String urlString = "http://www.HIPAASpace.com/api/ndc/search?q=${q.encodeAsURL()}&rt=xml&token=6BB8325D3C4F42AEBDC8F9584CA85C8D79815FA7F6194AD79793BF512981E84B"
+		String urlString = "http://www.HIPAASpace.com/api/ndc/search?q=${q?.encodeAsURL()}&rt=xml&token=6BB8325D3C4F42AEBDC8F9584CA85C8D79815FA7F6194AD79793BF512981E84B"
 		return getNdcResults(urlString)
 	}
 
@@ -79,7 +79,6 @@ class ProductService {
 			log.error("Error trying to get products from NDC API ", e);
 			throw e
 		}
-		return []
 	}
 		
 	def processNdcProducts(xml) { 
@@ -108,6 +107,43 @@ class ProductService {
 			}
 		}
 		return results;
+	}
+	
+	
+	/**
+	 *	<rxnormdata>
+	 * 		<displayTermsList>
+	 * 			<term></term>
+	 * 		</displayTermsList>
+	 * 	</rxnormdata>	
+	 * @return
+	 */
+	
+	def findRxNormDisplayNames() { 
+		String url = "http://rxnav.nlm.nih.gov/REST/displaynames"
+		return processXml(url, "displayTermsList.term")		
+	}
+	
+	def processXml(urlString, itemName) {
+		try {
+			def results = []
+			println "URL " + urlString
+			def url = new URL(urlString)
+			def connection = url.openConnection()
+			if (connection.responseCode == 200) {
+				def xml = connection.content.text
+				
+				def list = new XmlParser(false, true).parseText(xml)
+				for (item in list.displayTermsList.term) { 
+					println "item: " + item.class.name
+					results << item.text()
+				}
+				return results
+			}
+		} catch (Exception e) {
+			log.error("Error trying to get products from NDC API ", e);
+			throw e
+		}
 	}
 	
 	/**

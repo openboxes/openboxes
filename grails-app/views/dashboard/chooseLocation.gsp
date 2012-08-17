@@ -7,7 +7,8 @@
 			#menu { display: none; } 
 			.page-title { display: none; } 
 			td.warehouse { padding: 0px; } 
-			
+			#hd { display: none; }  
+			.breadcrumb { display: none; }
 			.warehouse { padding: 10px; width: 175px; background-color: #fcfcfc; color: #333 } 			
 			.warehouse a:hover { text-decoration: underline; }
 			<g:each var="warehouse" in="${session.loginLocations}" status="i">						
