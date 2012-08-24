@@ -15,10 +15,7 @@
             </g:if>
             <div class="dialog">
             
-            	<fieldset>
             		<g:render template="summary" model="[requestInstance:requestInstance]"/>
-            	
-            	
 	                <table>
 	                    <tbody>
 	                        <tr class="prop">
@@ -26,7 +23,7 @@
 	                            	<label for='description'><warehouse:message code="default.description.label" default="Description" /></label>
 	                            </td>
 	                            
-	                            <td valign="top" class="value">${fieldValue(bean: requestInstance, field: "description")}</td>
+	                            <td valign="top" class="value">${fieldValue(bean: requestInstance, field: "name")}</td>
 	                            
 	                        </tr>
 							<tr class='prop'>
@@ -39,6 +36,19 @@
 								<td valign='top' class='name'><label for="destination"><warehouse:message code="request.requestFor.label"/></label></td>
 								<td valign='top' class='value'>
 									${requestInstance?.destination?.name?.encodeAsHTML()}
+								</td>
+							</tr>
+							<tr class='prop'>
+								<td valign='top' class='name'><label for="recipientProgram"><warehouse:message code="request.recipientProgram.label"/></label></td>
+								<td valign='top' class='value'>
+									${requestInstance?.recipientProgram }
+								</td>
+							</tr>
+							
+							<tr class='prop'>
+								<td valign='top' class='name'><label for="recipient"><warehouse:message code="request.recipient.label"/></label></td>
+								<td valign='top' class='value'>
+									${requestInstance?.recipient?.name}
 								</td>
 							</tr>
 							<tr class='prop'>
@@ -200,6 +210,9 @@
 															<g:if test="${requestItem?.product }">
 																<warehouse:message code="product.label"/>
 															</g:if>
+															<g:elseif test="${requestItem?.productGroup }">
+																<warehouse:message code="productGroup.label"/>
+															</g:elseif>							
 															<g:elseif test="${requestItem?.category }">
 																<warehouse:message code="category.label"/>
 															</g:elseif>							
@@ -226,10 +239,8 @@
 									</g:else>
 	                            </td>
 	                        </tr>	                        
-	                    
 	                    </tbody>
 	                </table>
-               </fieldset>
             </div>
         </div>
     </body>

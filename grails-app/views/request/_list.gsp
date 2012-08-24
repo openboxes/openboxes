@@ -1,6 +1,3 @@
-
-
-
 <table>
 	<thead>
 		<tr>
@@ -33,14 +30,14 @@
 	<tbody>
 	
 	
-        <g:unless test="${requestInstanceList}">
-           	<tr class="prop">
+        <g:unless test="${requests}">
+           	<tr class="prop odd">
            		<td colspan="6" class="center">
            			<warehouse:message code="request.noRequestsMatchingCriteria.message"/>
 	           	</td>
 			</tr>     
 		</g:unless>	
-		<g:each in="${requestInstanceList}" status="i" var="requestInstance">
+		<g:each in="${requests}" status="i" var="requestInstance">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 				<td>			
 					<g:render template="/request/actions" model="[requestInstance:requestInstance]"/> 
@@ -50,7 +47,7 @@
 				</td>
 				<td>
 					<g:link action="show" id="${requestInstance.id}">
-						${fieldValue(bean: requestInstance, field: "description")}
+						${fieldValue(bean: requestInstance, field: "name")}
 					</g:link>
 				</td>
 				<g:if test="${requestType == 'INCOMING' }">

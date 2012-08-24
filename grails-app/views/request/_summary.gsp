@@ -1,4 +1,4 @@
-<div style="padding: 10px; border-bottom: 1px solid lightgrey;">
+<div>
 	<g:if test="${requestInstance?.id}">
 	
 		<g:set var="isAddingComment" value="${request.request.requestURL.toString().contains('addComment')}"/>
@@ -8,10 +8,10 @@
 				<tr>
 					<td>
 						<div>
-							<span class="request-title" style="font-size: 1.5em; font-weight: bold; line-height: 1em;">${requestInstance?.description}</span>							
+							<span class="title">${requestInstance?.name}</span>							
 						</div> 
 						<div class="fade" style="font-size: 0.9em; line-height: 20px;">
-							<!-- Hide action menu menu if the user is in the shipment workflow -->						
+							<!-- Hide action menu menu if the user is in the shipment workflow -->	
 							<g:if test="${!params.execution  && !isAddingComment && !isAddingDocument }">
 								<g:render template="/request/actions" model="[requestInstance:requestInstance]"/> &nbsp;|&nbsp;
 							</g:if>
@@ -28,6 +28,11 @@
 							<span class="fade">&nbsp;|&nbsp;</span>
 							<span class="requested-date">
 								<warehouse:message code="request.date.label"/>: <b><format:date obj="${requestInstance?.dateRequested}"/></b>
+							</span>
+							<span class="fade">&nbsp;|&nbsp;</span>
+							<span class="request-items">
+								<warehouse:message code="request.requestItems.label"/>: 
+								<b>${requestInstance?.requestItems?.size()}</b>
 							</span>
 							<span class="fade">&nbsp;|&nbsp;</span>
 							<span class="requested-by">
@@ -68,20 +73,18 @@
 				<tr>
 					<td>
 						<div>
-							<span style="font-size: 1.5em; font-weight: bold; line-height: 1em;">
-								<g:if test="${requestInstance?.description}">
-									${requestInstance?.description }
+							<span class="title">
+								<g:if test="${requestInstance?.name}">
+									${requestInstance?.name }
 								</g:if>
 								<g:else>
-									<warehouse:message code="request.untitledRequest.message"/>
+									<warehouse:message code="request.new.label"/>
 								</g:else>
 							</span>							
 						</div> 
 					</td>										
 					<td style="text-align: right;">
-						<div class="fade" style="font-weight: bold; font-size:1.5em;">
-							<warehouse:message code="request.new.label"/>
-						</div>
+						
 					</td>
 				</tr>
 			</tbody>

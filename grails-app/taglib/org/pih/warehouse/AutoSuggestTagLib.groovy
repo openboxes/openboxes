@@ -15,6 +15,7 @@ class AutoSuggestTagLib {
 		attrs.minLength = (attrs.minLength) ? attrs.minLength : 1;
 		attrs.jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "";
 		attrs.styleClass = (attrs.styleClass) ?: ""
+		attrs.placeholder = attrs.placeholder ?: ""
 
 		attrs.showValue = (attrs.valueName && attrs.valueId) ? true : false;
 		//def spanDisplay = (showValue) ? "inline" : "none";
@@ -35,7 +36,8 @@ class AutoSuggestTagLib {
 		def minLength = (attrs.minLength) ? attrs.minLength : 1;
 		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "";
 		def styleClass = (attrs.styleClass) ?: ""
-
+		def placeholder = attrs.placeholder ?: ""
+		
 		def showValue = (valueName && valueId) ? true : false;
 		//def spanDisplay = (showValue) ? "inline" : "none";
 		//def suggestDisplay = (showValue) ? "none" : "inline";
@@ -45,7 +47,9 @@ class AutoSuggestTagLib {
 		def html = """
 				<span id="${id}-span" class="span" style="text-align: left; display: ${spanDisplay};">${valueName}</span>
 				<input id="${id}-value" class="value" type="hidden" name="${name}.id" value="${valueId}"/>
-				<input id="${id}-suggest" class="autocomplete ${styleClass}" type="text" name="${name}.name" value="${valueName}" style="width: ${width}px; display: ${suggestDisplay};">
+				<input id="${id}-suggest" type="text"
+					class="autocomplete ${styleClass}" name="${name}.name" placeholder="${placeholder}" value="${valueName}" 
+					style="width: ${width}px; display: ${suggestDisplay};">
 				
 				<script language="javascript">
 					\$(document).ready(function() {
@@ -61,14 +65,9 @@ class AutoSuggestTagLib {
 						//\$("#${id}-suggest").css('width', '300px');
 
 						\$("#${id}-suggest").autocomplete({
-							width: ${width},
-							minLength: ${minLength},
+							delay: ${attrs.delay?:300},
+							minLength: ${minLength?:1},
 							dataType: 'json',
-							highlight: true,
-							//selectFirst: true,
-							scroll: true,
-							autoFill: true,
-							//scrollHeight: 300,
 							//define callback to format results
 							source: function(req, add){							
 		    					var currentLocationId = \$("#currentLocationId").val();

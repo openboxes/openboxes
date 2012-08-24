@@ -9,6 +9,7 @@ class ProductGroup implements Comparable, Serializable {
 
 	// Base product information
 	String id
+	String name
 	String description	
 	Category category 
 	
@@ -27,6 +28,7 @@ class ProductGroup implements Comparable, Serializable {
 		
 	
 	static constraints = {
+		name(nullable:true)
 		description(nullable:false, blank: false, maxSize: 255)
 		products validator: { products, productGroup -> 
 			return products.every {  productGroup.category == it.category }

@@ -26,11 +26,14 @@ class InventoryItem implements Serializable {
 	String lotNumber;						// Lot information for a product  
 	Date expirationDate;
 	
+	Integer quantityOnHand
+	Integer quantityAvailableToPromise
+	
 	// Auditing
 	Date dateCreated;
 	Date lastUpdated;
 	
-	//static transients = ['quantity']
+	static transients = ['quantityOnHand', 'quantityAvailableToPromise', 'grailsApplication']
 
 	static mapping = {
 		id generator: 'uuid'
@@ -42,7 +45,7 @@ class InventoryItem implements Serializable {
 		lotNumber(nullable:true, unique:['product'], maxSize:255)
 		expirationDate(nullable:true)	
     }
-	
+		
 	
 	String toString() { return "${id}:${product}:${lotNumber}"; }
 	

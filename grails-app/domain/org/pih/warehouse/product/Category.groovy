@@ -38,8 +38,9 @@ class Category implements Comparable, Serializable {
 	/**
 	 * Sort by name
 	 */
-	int compareTo(obj) { 
-		this.getHierarchyAsString("|") <=> obj.getHierarchyAsString("|")
+	int compareTo(obj) {
+		println ("compareTo(obj)") 
+		this.getHierarchyAsString(">") <=> obj.getHierarchyAsString(">")
 	}
 	
 	String getHierarchyAsString(String separator) {
@@ -47,6 +48,9 @@ class Category implements Comparable, Serializable {
 		getParents().each {
 			s += it.name + separator
 		}
+		
+		println "s: " + s
+		
 		return s;
 	}
 	

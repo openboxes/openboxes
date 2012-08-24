@@ -112,27 +112,73 @@ input:focus, select:focus, textarea:focus {
 .linkButton a.new {
     background: url(../images/skin/new.png) center left no-repeat;
 }
-.linkButton a.NOT_REQUESTED {
-    background: url(../images/icons/silk/delete.png) center left no-repeat;
+
+.linkButton a.ALL {
+    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
 }
 .linkButton a.NEW {
-    background: url(../images/icons/silk/new.png) center left no-repeat;
+    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
 }
-.linkButton a.REQUESTED {
-    background: url(../images/icons/silk/accepted.png) center left no-repeat;
+.linkButton a.OPEN {
+    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
 }
-.linkButton a.PENDING {
-    background: url(../images/icons/silk/flag_yellow.png) center left no-repeat;
+.linkButton a.FULFILLED {
+    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
 }
-.linkButton a.PLACED {
-    background: url(../images/icons/silk/hourglass.png) center left no-repeat;
+.linkButton a.CANCELED {
+    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
 }
-.linkButton a.RECEIVED {
-    background: url(../images/icons/silk/accept.png) center left no-repeat;
+
+.linkButton a.order-status-PENDING {
+    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
 }
-.linkButton a.SHIPPED {
-    background: url(../images/icons/silk/lorry_go.png) center left no-repeat;
+.linkButton a.order-status-PLACED {
+    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
 }
+.linkButton a.order-status-RECEIVED {
+    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
+}
+
+.linkButton a.request-status-NEW {
+    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
+}
+.linkButton a.request-status-REQUESTED {
+    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
+}
+.linkButton a.request-status-PENDING {
+    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
+}
+.linkButton a.request-status-PICKED {
+    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
+}
+.linkButton a.request-status-OPEN {
+    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
+}
+.linkButton a.request-status-FULFILLED {
+    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
+}
+.linkButton a.request-status-CANCELED {
+    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
+}
+.linkButton a.request-status-PLACED {
+    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
+}
+.linkButton a.request-status-RECEIVED {
+    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
+}
+.linkButton a.request-status-SHIPPED {
+    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
+}
+.linkButton a.shipment-status-PENDING {
+    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
+}
+.linkButton a.shipment-status-SHIPPED {
+    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
+}
+.linkButton a.shipment-status-RECEIVED {
+    background: url(../images/icons/silk/bullet_white.png) center left no-repeat;
+}
+
 
 .linkButton a.report_expiring {
     background: url(../images/icons/silk/chart_pie.png) center left no-repeat;

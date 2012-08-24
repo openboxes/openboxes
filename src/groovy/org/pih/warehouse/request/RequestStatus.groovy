@@ -5,13 +5,14 @@ import org.pih.warehouse.shipping.ShipmentStatusCode;
 
 public enum RequestStatus {
 
-	NOT_REQUESTED(1),
+	NEW(1),
 	REQUESTED(2),
 	OPEN(3),
-	FULFILLED(4),
-	SHIPPED(5),
-	RECEIVED(6),
-	CANCELED(7)
+	PICKED(4),
+	FULFILLED(5),
+	SHIPPED(6),
+	RECEIVED(7),
+	CANCELED(8)
 	
 	int sortOrder
 
@@ -22,7 +23,7 @@ public enum RequestStatus {
 	}
 	
 	static list() {
-		[ NOT_REQUESTED, REQUESTED, OPEN, FULFILLED, SHIPPED, RECEIVED, CANCELED ]
+		[ NEW, REQUESTED, OPEN, PICKED, FULFILLED, SHIPPED, RECEIVED, CANCELED ]
 	}
 	
 	String toString() { return name() }

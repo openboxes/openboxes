@@ -1,5 +1,6 @@
 package org.pih.warehouse.request
 
+import org.pih.warehouse.auth.AuthService;
 import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Document;
 import org.pih.warehouse.core.Event;
@@ -13,20 +14,40 @@ import org.pih.warehouse.request.RequestStatus;
 
 class Request implements Serializable {
 	
+	def beforeInsert = {
+		createdBy = AuthService.currentUser.get()
+	}
+	def beforeUpdate ={
+		updatedBy = AuthService.currentUser.get()
+	}
+	
 	String id
-	RequestStatus status;
+	String name
 	String description 		// a user-defined, searchable name for the order 
-	String requestNumber 	// an auto-generated shipment number
+	String requestNumber 	// an auto-generated reference number
+	
+	
+	RequestStatus status;
 	Location origin			// the vendor
 	Location destination 	// the customer location 
-	Person recipient
+	
 	Person requestedBy
+	Person recipient
+	String recipientProgram	
+	
+	
+	
 	Date dateRequested
+	Date dateValidFrom 
+	Date dateValidTo
+	
 	Fulfillment fulfillment;
 	
 	// Audit fields
 	Date dateCreated
 	Date lastUpdated
+	User createdBy
+	User updatedBy
 	
 	static hasMany = [ requestItems : RequestItem, comments : Comment, documents : Document, events : Event ]
 	static mapping = {
@@ -38,8 +59,9 @@ class Request implements Serializable {
 	}
 	
 	static constraints = { 
-		status(nullable:true)
-		description(nullable:false, blank: false, maxSize: 255)
+		status(nullable:true)		
+		name(nullable:true)
+		description(nullable:true)
 		requestNumber(nullable:true, maxSize: 255)
 		origin(nullable:false)
 		destination(nullable:false)
@@ -49,14 +71,18 @@ class Request implements Serializable {
 		fulfillment(nullable:true)
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)
+		dateValidFrom(nullable:true)
+		dateValidTo(nullable:true)
+		createdBy(nullable:true)
+		updatedBy(nullable:true)
 	}	
 	
 	Boolean isPending() { 
-		return isNotRequested() || isRequested();
+		return isNew() || isRequested();
 	}
 	
-	Boolean isNotRequested() { 
-		return (status == null || status == RequestStatus.NOT_REQUESTED)
+	Boolean isNew() { 
+		return (status == null || status == RequestStatus.NEW)
 	}
 	
 	Boolean isRequested() { 
@@ -80,7 +106,8 @@ class Request implements Serializable {
 	}
 
 	String getRequestNumber() {
-		return (id) ? "R" + String.valueOf(id).padLeft(6, "0")  : "";
+		//return (id) ? "R" + String.valueOf(id).padLeft(6, "0")  : "";
+		return id
 	}
 	
 	

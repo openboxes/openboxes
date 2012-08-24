@@ -83,15 +83,26 @@ class SelectTagLib {
 		out << g.select(attrs)
 	}
 
-	def selectRequestSupplier = { attrs,body ->
+	def selectRequestOrigin = { attrs,body ->
 		def currentLocation = Location.get(session?.warehouse?.id)
-		attrs.from = locationService.getRequestSuppliers(currentLocation).sort { it?.name?.toLowerCase() };
+		attrs.from = locationService.getRequestOrigins(currentLocation).sort { it?.name?.toLowerCase() };
 		attrs.optionKey = 'id'
+		attrs.placeholder = attrs.placeholder
+		
 		//attrs.optionValue = 'name'
 		attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]"}
 		out << g.select(attrs)
 	}
 
+	def selectRequestDestination = { attrs,body ->
+		def currentLocation = Location.get(session?.warehouse?.id)
+		attrs.from = locationService.getRequestDestinations(currentLocation).sort { it?.name?.toLowerCase() };
+		attrs.optionKey = 'id'
+		//attrs.optionValue = 'name'
+		attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]"}
+		out << g.select(attrs)
+	}
+	
 	def selectCustomer = { attrs,body ->
 		def currentLocation = Location.get(session?.warehouse?.id)
 		attrs.from = locationService.getCustomers(currentLocation).sort { it?.name?.toLowerCase() };

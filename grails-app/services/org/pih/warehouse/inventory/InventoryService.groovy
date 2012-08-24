@@ -225,6 +225,23 @@ class InventoryService implements ApplicationContextAware {
 		return items;
 	}
 	
+	List findInventoryItemsByProduct(Product product) { 
+		return InventoryItem.withCriteria {
+			eq("product", product)
+			order("expirationDate", "asc")
+		}
+	}
+	List findInventoryItemsByProducts(List<Product> products) {
+		def inventoryItems = []
+		if (products) { 
+			inventoryItems = InventoryItem.withCriteria {
+				'in'("product", products)
+				order("expirationDate", "asc")
+			}
+		}
+		return inventoryItems;
+	}
+
 	
 	/**
 	 * 
@@ -681,7 +698,7 @@ class InventoryService implements ApplicationContextAware {
 		 categoryFilters.add(category)
 		 }
 		 }
-		 log.info "Categories: " + categoryFilters
+		 log.debug "Categories: " + categoryFilters
 		 // Search for products that are within the categories matched by the search terms
 		 def categoryProductResults = getProductsByCategories(categoryFilters)
 		 categoryProductResults = products.intersect(categoryProductResults);
@@ -791,7 +808,7 @@ class InventoryService implements ApplicationContextAware {
 	 */
 	Integer getQuantity(Location location, Product product, String lotNumber) {
 		
-		log.info ("Get quantity for product " + product?.name + " lotNumber " + lotNumber + " at location " + location?.name)
+		log.debug ("Get quantity for product " + product?.name + " lotNumber " + lotNumber + " at location " + location?.name)
 		if (!location) {
 			throw new RuntimeException("Your warehouse has not been initialized");
 		}
@@ -1005,12 +1022,12 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	Integer getQuantity(Inventory inventory, InventoryItem inventoryItem) {
-		log.info "inventory = " + inventory + ", inventory item = " + inventoryItem
+		log.debug "inventory = " + inventory + ", inventory item = " + inventoryItem
 		def transactionEntries = getTransactionEntriesByInventoryItemAndInventory(inventoryItem, inventory)
 		def quantityMap = getQuantityByInventoryItemMap(transactionEntries)
 
 		// inventoryItem -> org.pih.warehouse.inventory.InventoryItem_$$_javassist_10
-		println "inventoryItem -> " + inventoryItem.class
+		log.debug "inventoryItem -> " + inventoryItem.class
 
 		// FIXME was running into an issue where a proxy object was being used to represent the inventory item
 		// so the map.get() method was returning null.  So we needed to fully load the inventory item using 
@@ -1331,18 +1348,18 @@ class InventoryService implements ApplicationContextAware {
 	 * @return
 	 */
 	List getCategoriesMatchingSearchTerms(List searchTerms, Category category) {
-		log.info("find categories matching search terms " + searchTerms + " under " + category)
+		log.debug("find categories matching search terms " + searchTerms + " under " + category)
 		//def categories = []
 		// Start by getting all categories that match and then iterate over
 		// each and check to see if one of its ancestors is in the given 
 		// list of ancestors
 		def categoriesMatching = getCategoriesMatchingSearchTerms(searchTerms);
-		log.info "Categories matching " + categoriesMatching;
+		log.debug "Categories matching " + categoriesMatching;
 		
 		def children = category.children.findAll { child -> 
 			categoriesMatching.contains(child)
 		}
-		log.info("Found " + children)
+		log.debug("Found " + children)
 		return children
 
 	}
@@ -1406,7 +1423,7 @@ class InventoryService implements ApplicationContextAware {
 			def categories = (category?.children)?:[];
 			categories << category;
 			if (categories) {
-				log.info("get products by nested category: " + category + " -> " + categories)
+				log.debug("get products by nested category: " + category + " -> " + categories)
 				
 				products = Product.createCriteria().list() {
 					'in'("category", categories)
@@ -1795,7 +1812,7 @@ class InventoryService implements ApplicationContextAware {
 			}
 					
 			if (!debitTransaction.save()) {
-				log.info debitTransaction.errors
+				log.debug "debit transaction errors " + debitTransaction.errors
 				throw new TransactionException(message: "An error occurred while saving ${debitTransaction?.transactionType?.transactionCode} transaction", transaction: debitTransaction);
 			}
 			
@@ -2604,7 +2621,7 @@ class InventoryService implements ApplicationContextAware {
 			   if (!category) { 
 				   throw new ValidationException("error finding/creating category")
 			   }
-			   log.info "Creating product " + params.productDescription + " under category " + category 
+			   log.debug "Creating product " + params.productDescription + " under category " + category 
  			   // Create product if not exists
 			   Product product = Product.findByName(params.productDescription);
 			   if (!product) {

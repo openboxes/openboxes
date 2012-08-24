@@ -16,6 +16,8 @@ import org.pih.warehouse.inventory.TransactionEntry;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
+import org.pih.warehouse.product.ProductGroup;
+import org.pih.warehouse.request.Request;
 import org.pih.warehouse.shipping.Container;
 import org.pih.warehouse.shipping.ShipmentItem;
 import org.pih.warehouse.shipping.Shipper;
@@ -32,6 +34,39 @@ class JsonController {
 		log.info "Upload files " 
 		render ""
 		
+	}
+	
+	def findPrograms = { 
+		println "find programs " + params
+		def searchTerm = params.term + "%";
+		def c = Request.createCriteria()
+		
+		def names = c.list {
+			projections {
+				property "recipientProgram"
+			}
+			ilike("recipientProgram", searchTerm)
+		}
+		// Try again 
+		if (names.isEmpty()) { 
+			searchTerm = "%" + params.term + "%";
+			c = Request.createCriteria()
+			names = c.list {
+				projections {
+					property "recipientProgram"
+				}
+				ilike("recipientProgram", searchTerm)
+			}
+		}
+			
+		if (names.isEmpty()) { 			
+			names = []
+			names << params.term 
+			//[ value: params.term, label: params.term]
+		}		
+		
+		def results = names.collect { [ value: it, label: it ] }		
+		render results as JSON;
 	}
 	
 	def findRxNormDisplayNames = { 
@@ -604,7 +639,58 @@ class JsonController {
 	}
 	
 
-	
+	def findRequestItems = {
+		
+		log.info("find request items by name " + params)
+		
+		//def items = new TreeSet();
+		def items = []
+		if (params.term) {
+			// Match full name
+			def products = Product.withCriteria {
+				ilike("name", "%" + params.term + "%")
+			}
+			items.addAll(products)
+
+			def productGroups = ProductGroup.withCriteria {
+				ilike("description", "%" + params.term + "%")
+			}
+			productGroups.each { items << [id: it.id, name: it.description, class: it.class] }
+			//items.addAll(productGroups)
+
+			
+			def categories = Category.withCriteria { 
+				ilike("name", "%" + params.term + "%")
+			}
+			items.addAll(categories)
+			
+		}
+		
+		// Convert from products to json objects
+		if (items) {
+			// Make sure items are unique
+			//items.unique();
+			items = items.collect() { item ->
+				def type = item.class.simpleName
+				def localizedName = localizationService.getLocalizedString(item.name)
+				// Convert product attributes to JSON object attributes
+				[
+					value: type + ":" + item.id,
+					type: type,
+					label: localizedName + "(" + type + ")",
+					valueText: localizedName,
+				]
+			}
+		}
+		
+		if (items.size() == 0) {
+			items << [ value: null, label: warehouse.message(code:'product.noProductsFound.message')]
+			//items << [value: null, label: params.term]
+		}
+
+		log.info "Returning " + items.size() + " results for search " + params.term
+		render items as JSON;
+	}
 
 		
 	

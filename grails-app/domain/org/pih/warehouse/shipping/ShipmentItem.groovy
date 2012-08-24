@@ -61,6 +61,20 @@ class ShipmentItem implements Comparable, java.io.Serializable {
 		return orderShipments.collect{it.orderItem}
 	}
 
+	
+	def totalQuantityShipped() {
+		int totalQuantityShipped = 0
+		// Should use inventory item instead of comparing product & lot number
+		if (shipment.shipmentItems) {
+			shipment.shipmentItems.each {
+				if (it.product == this.product && it.lotNumber == this.lotNumber) {
+					totalQuantityShipped += it.quantity
+				}
+			}
+		}
+		return totalQuantityShipped
+	}
+
 	def totalQuantityReceived() {
 		int totalQuantityReceived = 0
 		// Should use inventory item instead of comparing product & lot number

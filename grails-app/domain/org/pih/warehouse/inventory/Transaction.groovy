@@ -99,7 +99,7 @@ class Transaction implements Comparable, Serializable {
     }
 	
 	String transactionNumber() {
-		return (id) ? "T" + String.valueOf(id).padLeft(6, "0")  : "(new transaction)";
+		return (id) ? String.valueOf(id).padLeft(6, "0")  : "(new transaction)";
 	}
 		
     

@@ -141,6 +141,11 @@ button.action-btn, button.previous, button.next {
 .debit:after { 
 	content: ')';
 }
+
+.transaction-type-debit { }
+.transaction-type-credit { }
+
+
 .nowrap { 
 	white-space: nowrap;
 }

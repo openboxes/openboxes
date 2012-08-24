@@ -94,8 +94,8 @@
 			$("#username").focus(); // Focus on the first text input field in the page
 			var timezone = jzTimezoneDetector.determine_timezone().timezone; // Now you have an instance of the TimeZone object.
 			$("#browserTimezone").val(timezone.olson_tz); // Set the user timezone offset as a hidden input
-			$("#username").watermark("${warehouse.message(code:'user.username.label')}");			
-			$("#password").watermark("${warehouse.message(code:'user.password.label')}");
+			$("#username").watermark("${warehouse.message(code:'login.username.label')}");			
+			$("#password").watermark("${warehouse.message(code:'login.password.label')}");
 			$("#username").focus();			
 			
 		});	

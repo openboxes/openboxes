@@ -71,10 +71,14 @@ class LocationService {
 		return getLocationsSupportingActivity(ActivityCode.FULFILL_ORDER) - currentLocation
 	}
 
-	List getRequestSuppliers(Location currentLocation) {
-		return getLocationsSupportingActivity(ActivityCode.FULFILL_REQUEST) - currentLocation
+	List getRequestOrigins(Location currentLocation) {
+		return getLocationsSupportingActivity(ActivityCode.FULFILL_REQUEST)// - currentLocation
 	}
-		
+
+	List getRequestDestinations(Location currentLocation) {
+		return getLocationsSupportingActivity(ActivityCode.FULFILL_REQUEST)// - currentLocation
+	}
+
 	List getTransactionSources(Location currentLocation) { 
 		return getLocationsSupportingActivity(ActivityCode.SEND_STOCK) - currentLocation
 	}

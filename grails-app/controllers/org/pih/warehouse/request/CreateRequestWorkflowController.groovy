@@ -5,13 +5,17 @@ import org.pih.warehouse.core.Constants;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.Location;
+import org.pih.warehouse.picklist.Picklist;
+import org.pih.warehouse.picklist.PicklistItem;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
+import org.pih.warehouse.product.ProductGroup;
 import org.springframework.dao.DataIntegrityViolationException;
 
 class CreateRequestWorkflowController {
 
 	def requestService;
+	def inventoryService
 	
 	def index = { redirect(action:"createRequest") }
 	def createRequestFlow = {		
@@ -25,11 +29,11 @@ class CreateRequestWorkflowController {
 				}
 				else {
 					def requestInstance = new Request();
-					requestInstance.requestedBy = Person.get(session.user.id)
-					requestInstance.status = RequestStatus.NOT_REQUESTED;
+					requestInstance.createdBy = Person.get(session.user.id)
+					requestInstance.status = RequestStatus.NEW;
 					requestInstance.dateRequested = new Date();
 					def warehouse = Location.get(session.warehouse.id)
-					requestInstance.destination = warehouse;
+					//requestInstance.destination = warehouse;
 					//requestInstance.description = "Request - " + Constants.DEFAULT_DATE_FORMATTER.format(requestInstance.dateRequested);
 					
 					flow.requestInstance = requestInstance;
@@ -38,7 +42,7 @@ class CreateRequestWorkflowController {
 				
 				if (params.skipTo) {
 					if (params.skipTo == 'details') return success()
-					else if (params.skipTo == 'items') return showRequestItems()
+					else if (params.skipTo == 'items') return addRequestItems()
 					//else if (params.skipTo == 'confirm') return confirmRequest()
 					
 				}
@@ -46,7 +50,7 @@ class CreateRequestWorkflowController {
 				return success()
 			}
 			on("success").to("enterRequestDetails")
-			on("showRequestItems").to("showRequestItems")
+			on("addRequestItems").to("addRequestItems")
 			//on("confirmRequest").to("confirmRequest")			
 		}
 		
@@ -56,20 +60,29 @@ class CreateRequestWorkflowController {
 				
 				flow.requestInstance.properties = params
 				try {
+					
+					//flow.requestInstance.name = 
+					//println "${warehouse.message(code:'request.name.label')} - " + flow?.requestInstance?.destination + " - " + flow?.requestInstance?.dateRequested 
+					def dateRequested = "${g.formatDate(date: flow?.requestInstance?.dateRequested, format: 'dd MMM yyyy')}";
+					if (!flow?.requestInstance?.name) {
+						flow?.requestInstance?.name = "${warehouse.message(code: 'request.name.label', args:[flow?.requestInstance?.destination, dateRequested])}"
+					}
 					if (!requestService.saveRequest(flow.requestInstance)) {
+						println requestInstance.errors
 						return error()
 					}
 				} catch (Exception e) {
+					log.error(e)
 					return error()
 				}
 				
-			}.to("showRequestItems")
+			}.to("addRequestItems")
 			on("cancel").to("cancel")
 			on("finish").to("finish")
 		}
 
 		
-		showRequestItems {
+		addRequestItems {
 			on("back") { 
 				log.info "saving items " + params
 				flow.requestInstance.properties = params
@@ -86,58 +99,73 @@ class CreateRequestWorkflowController {
 					flow.requestInstance.removeFromRequestItems(requestItem);
 					requestItem.delete();
 				}
-			}.to("showRequestItems")
+			}.to("addRequestItems")
 			
 			on("editItem") { 
 				def requestItem = RequestItem.get(params.id)
 				if (requestItem) { 
 					flow.requestItem = requestItem;
 				}
-			}.to("showRequestItems")
+			}.to("addRequestItems")
+			
 			
 			on("addItem") {
 				log.info "adding an item " + params
 				if(!flow.requestInstance.requestItems) flow.requestInstance.requestItems = [] as HashSet
 				
 				def requestItem = RequestItem.get(params?.requestItem?.id)
-				if (requestItem) { 
+				if (requestItem) { 					
 					requestItem.properties = params
 				} 
 				else { 
 					requestItem = new RequestItem(params);
 				}				
 				
-				requestItem.requestedBy = Person.get(session.user.id)
+				if (!requestItem.quantity) { requestItem.quantity = 1; }				
+				if (!requestItem.requestedBy) { requestItem.requestedBy = Person.get(session.user.id) }
 				
-				if (params?.product?.id && params?.category?.id) { 
-					log.info("error with product and category")
-					requestItem.errors.rejectValue("product.id", "Please choose a product OR a category OR enter a description")
-					flow.requestItem = requestItem
-					return error()
-				}				
-				else if (params?.product?.id) { 
-					def product = Product.get(params?.product?.id)
-					if (product) { 
-						requestItem.description = product.name
-						requestItem.category = product.category
+				if (params.item.id) { 
+					println params
+					def values = params.item.id.split(":")
+					def type = values[0]
+					def id = values[1]
+					if (type=="Product") { 
+						def product = Product.get(id)
+						if (product) {
+							requestItem.product = product
+							requestItem.description = product.name
+							//requestItem.category = product.category
+						}
+					} 
+					else if (type=="Category") { 
+						def category = Category.get(id)
+						if (category) {
+							requestItem.category = category
+							requestItem.description = category.name
+						}
 					}
-				}
-				else if (params?.category?.id) { 
-					def category = Category.get(params?.category?.id) 
-					if (category) {
-						requestItem.description = category.name
-						requestItem.category = category
-					}
-				}
-				else if (params?.description) { 
-					requestItem.description = params.description
-				}
+					else if (type=="ProductGroup") { 
+						def productGroup = ProductGroup.get(id)
+						if (productGroup) { 
+							requestItem.productGroup = productGroup
+							requestItem.description = productGroup.description
+							//requestItem.category = productGroup.category
+						}
+						// not supported yet
+					} 
+				}		
+				else if (params.item.name) { 
+					requestItem.description = params.item.name					
+				}		
 				else { 
-					// FIXME Prevents an item from being add but does not provide a user-friendly error message 
+					// FIXME Prevents an item from being added but does not provide a user-friendly error message 
+					flash.message = "Error"
 					return error();
 				}
 				
+
 				if (!requestItem.validate() || requestItem.hasErrors()) { 
+					flash.message = "Validation error"
 					flow.requestItem = requestItem
 					return error();
 				}
@@ -153,26 +181,119 @@ class CreateRequestWorkflowController {
 				// Need to clear request item because we use this for editing items
 				flow.requestItem = null
 				
-			}.to("showRequestItems")
-			
-			
+			}.to("addRequestItems")
 			
 			on("next") {
-				log.info "confirm request " + params
+				log.info "picklist " + params
+				def location = Location.get(session.warehouse.id)
+				
+				flow.quantityOnHandMap = inventoryService.getQuantityByProductMap(location.inventory);
+				//flow.quantityOutgoingMap = inventoryService.getOutgoingQuantityByProduct(location);
+				//flow.quantityIncomingMap = inventoryService.getIncomingQuantityByProduct(location);
+				
 				flow.requestInstance.properties = params
 				
-				log.info("request " + flow.requestInstance)
-			
-
-					
-			}.to("finish")
+				
+				
+			}.to("mapRequestItems")
 
 			on("cancel").to("cancel")
 			on("finish").to("enterRequestDetails")
-			on("error").to("showRequestItems")
+			on("error").to("addRequestItems")
 		}
 		
 		
+		mapRequestItems {
+			on("back") {
+				
+			}.to("addRequestItems")
+			
+			on("next") {
+				log.info "pickRequestItems " + params
+				def requestInstance = new Request(params);
+				
+				flow.requestInstance.properties = params
+				
+				flow.requestInstance.requestItems.each { requestItem ->
+					println "requestItem " + requestItem.displayName() + " " + requestItem.product
+				}
+				//requestInstance.properties = params
+				//flow.requestInstance.properties = params
+
+			}.to("pickRequestItems")
+
+		}
+		pickRequestItems {
+			on("mapRequestItem") {
+				
+			}.to("mapRequestItems")
+
+			on("back") {
+				
+			}.to("addRequestItems")
+			
+			on("next") {
+				log.info "confirm " + params
+				flow.requestInstance.properties = params
+
+			}.to("showPicklist")
+			
+			on("deletePicklistItem") {
+				log.info "Delete pick list item " + params
+				
+				PicklistItem picklistItem = PicklistItem.get(params.picklistItem.id)
+				def picklist = picklistItem.picklist;				
+				picklist.removeFromPicklistItems(picklistItem)
+				picklistItem.delete()
+				picklist.save(flush:true)
+				
+				[picklistInstance:picklist]
+			}.to("pickRequestItems")
+			
+			on("pickRequestItem") {
+				log.info "Pick request item " + params
+				
+				def picklistInstance = Picklist.findByRequest(flow.requestInstance) 
+				if (!picklistInstance) { 
+					picklistInstance = new Picklist();
+					picklistInstance.request = flow.requestInstance
+					picklistInstance.picker = Person.get(session.user.id)
+					picklistInstance.datePicked = new Date();
+				}
+				PicklistItem picklistItem = new PicklistItem(params)
+				println picklistItem.requestItem.id + " " + picklistItem.inventoryItem + " " + picklistItem.quantity + " " 				
+				
+
+				def location = Location.get(session.warehouse.id)
+				def quantityOnHand = inventoryService.getQuantity(location.inventory, picklistItem.inventoryItem)
+				if (picklistItem.quantity > quantityOnHand) { 
+					picklistInstance.errors.reject("picklistItem.quantity.invalid","Quantity to pick must be less than quantity on hand.");
+				}
+				else { 
+					picklistInstance.addToPicklistItems(picklistItem)
+					picklistInstance.save(flush:true)
+				}
+				[picklistInstance:picklistInstance]
+				
+			}.to("pickRequestItems")
+
+		}
+		
+		showPicklist { 
+			on("next") { 
+				log.info "confirm " + params
+				flow.requestInstance.properties = params
+
+			}.to("fulfillRequest")
+		}
+		fulfillRequest { 
+			on("next") { 
+				log.info "confirm request " + params
+				flow.requestInstance.properties = params
+
+				
+			}.to("finish")
+		}
 		
 		finish {
 			

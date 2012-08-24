@@ -7,6 +7,10 @@ class AutoSuggestStringTagLib {
 		
 
 	def autoSuggestString = { attrs, body ->
+		out << g.render(template: '/taglib/autoSuggestString', model: [attrs:attrs]);
+	}
+	
+	def autoSuggestString_v1 = { attrs, body ->
 		def id = (attrs.id) ? attrs.id : "autoSuggest_" + (new Random()).nextInt()
 		def name = attrs.name
 		def value = (attrs.value)?attrs.value:"";
@@ -21,7 +25,7 @@ class AutoSuggestStringTagLib {
 		def suggestDisplay = "inline";
 		
 		def html = """
-			<div>
+			<span>
 				<style>
 					#${id}-suggest {
 						background-image: url('${request.contextPath}/images/icons/silk/magnifier.png');
