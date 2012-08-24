@@ -15,10 +15,12 @@ class PicklistTagLib {
 		if (attrs.requestItem.product) { 
 			attrs.product = attrs.requestItem.product
 			attrs.inventoryItems = inventoryService.findInventoryItemsByProduct(attrs.product)
-			attrs.inventoryItem = attrs.inventoryItems.find { it.expirationDate != null }
 			attrs.inventoryItems.each { 
 				it.quantityOnHand = inventoryService.getQuantity(location.inventory, it)
+				it.quantityAvailableToPromise = inventoryService.getQuantityAvailableToPromise(location.inventory, it)
 			}
+			attrs.inventoryItems = attrs.inventoryItems.findAll { it.quantityOnHand > 0 } 
+			attrs.inventoryItem = attrs.inventoryItems.find { it?.expirationDate?.after(new Date()) }
 			
 		}
 		else if (attrs.requestItem.category) { 

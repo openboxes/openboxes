@@ -81,7 +81,7 @@ class DocumentService {
 		try { 
 			file = writeImage(document, document.filename)
 			def extension = document.extension ?: document.filename.substring(document.filename.lastIndexOf(".")+1)
-			println "Fit scale image " + document.filename + " (" + width + ", " + height + "), format=" + extension
+			log.debug "Fit scale image " + document.filename + " (" + width + ", " + height + "), format=" + extension
 			fileInputStream = new FileInputStream(file)			
 			def builder = new SimpleImageBuilder()
 			def result = builder.

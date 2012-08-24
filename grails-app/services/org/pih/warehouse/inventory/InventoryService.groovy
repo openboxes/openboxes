@@ -12,11 +12,13 @@ import org.pih.warehouse.importer.ImporterUtil;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.core.Location;
+import org.pih.warehouse.picklist.PicklistItem;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.ProductAttribute;
 import org.pih.warehouse.product.ProductGroup;
 import org.pih.warehouse.shipping.Shipment;
+import org.pih.warehouse.shipping.ShipmentItem;
 import org.pih.warehouse.core.Constants 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType;
@@ -1036,6 +1038,22 @@ class InventoryService implements ApplicationContextAware {
 		Integer quantity = quantityMap[inventoryItem]				
 		return quantity ?: 0;
 	}
+	
+	Integer getQuantityAvailableToPromise(Inventory inventory, InventoryItem inventoryItem) { 
+		def quantityOnHand = getQuantity(inventory, inventoryItem)
+		/*
+		def shipmentItems = ShipmentItem.findAllByInventoryItem(inventoryItem)
+		shipmentItems.findAll { (it?.shipment?.origin == inventory?.warehouse) && it?.shipment?.isPending() }
+		def quantityShipping = shipmentItems.sum { it.quantity } 
+		def picklistItems = PicklistItem.findAllByInventoryItem(inventoryItem)
+		picklistItems.findAll { it?.picklist?.request?.origin == inventory?.warehouse }
+		def quantityPicked = picklistItems.sum { it.quantity } 
+		*/
+		
+		
+		return quantityOnHand;	
+	}
+	
 	
 	/**
 	 * Get quantity for a given product.

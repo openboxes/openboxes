@@ -2,8 +2,8 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="custom" />
-<title><warehouse:message code="request.showPicklistItems.label"/></title>
+<meta name="layout" content="${params?.print?'print':'custom' }" />
+<title><warehouse:message code="request.showPicklist.label"/></title>
 </head>
 <body>
 	<div class="body">
@@ -18,206 +18,134 @@
 			</div>
 		</g:hasErrors>
 		
+		<g:if test="${!params?.print }">
+			<div class="right">
+				<g:link action="createRequest" event="showPicklist" params="[print:true]" target="_blank">
+					<img src="${createLinkTo(dir:'images/icons/silk',file: 'printer.png')}"/>
+					<warehouse:message code="createRequestWorkflow.showPicklist.label" default="Print picklist"/>
+				</g:link>
+			</div>
+		</g:if>
+
 		<div class="dialog">
 			<g:render template="/request/summary" model="[requestInstance:requestInstance]"/>
+			<g:if test="${!params?.print }">
 			<g:render template="header" model="['state':'showPicklist']"/>
-			<table>
-				<tr>
-					<td >						
-					
-						<div class="center" style="padding: 10px;">
-							<g:form action="createRequest" method="post">
-								<g:hiddenField name="request.id" value="${requestInstance?.id }"></g:hiddenField>
-								<input type="text" id="add-item-quantity" name='quantity' value="${requestItem?.quantity }" size="5" class="text" placeholder="${warehouse.message(code:'default.quantity.label')}"/>
-								<g:autoSuggest id="item" name="item" jsonUrl="${request.contextPath}/json/findRequestItems" 
-									width="400" styleClass="text" valueId="" valueName=""
-									placeholder="${warehouse.message(code:'request.addItem.label')}" />															
-							
-								<g:submitButton name="addItem" value="${warehouse.message(code:'default.button.addItem.label')}"></g:submitButton>
-							</g:form>		
-						</div>
-						
-						<div>
-							<table>
-								<thead>
-									<tr class="odd">
-										<th class="right">${warehouse.message(code:'default.quantity.label')}</th>
-										<th>${warehouse.message(code:'default.item.label')}</th>
-										<th class="right">${warehouse.message(code:'default.quantity.label')}</th>
-										<th>${warehouse.message(code:'default.item.label')}</th>
-									</tr>
-								</thead>
-								<tbody>
-									<g:set var="i" value="${0 }"/>
-									<g:each var="requestItem" in="${requestInstance?.requestItems}">
-										<tr class="${(i++ % 2) == 0 ? 'even' : 'odd'}">
-											<g:hiddenField name="requestItems[${i }].request.id" value="${requestItem?.request?.id }" size="5"/>
-											<td class="right">
-												${requestItem?.quantity }
-												<g:hiddenField name="requestItems[${i }].quantity" value="${requestItem?.quantity }" size="5"/>
-											</td>
-											<td>
-												<span class="fade">${requestItem.type}</span>
-												<format:metadata obj="${requestItem.displayName()}"/>
-												<g:if test="${requestItem?.product }">
-													(${requestItem?.product?.unitOfMeasure })
-												</g:if>
-											</td>
-											
-										</tr>
-									</g:each>
-								</tbody>								
-							</table>
-						</div>
-					</td>
-					<%-- 
-					<td style="border-left: 1px solid lightgrey; height: 100%; width: 35%;">
-										
-						<g:hasErrors bean="${requestItem}">
-							<div class="errors">
-								<g:renderErrors bean="${requestItem}" as="list" />
-							</div>
-						</g:hasErrors>														
-						<div class="dialog">
-							<div class="tabs">
-								<ul>
-									<li><a href="#Product"><warehouse:message code="product.label"/></a></li>
-									<li><a href="#Category"><warehouse:message code="category.label"/></a></li>
-									<li><a href="#Unclassified"><warehouse:message code="default.unclassified.label"/></a></li> 
-								</ul>
-								<div id="Product">
-									<g:form action="createRequest" method="post">
-										<g:hiddenField name="request.id" value="${requestInstance?.id }"></g:hiddenField>
-										<g:hiddenField name="requestItem.id" value="${requestItem?.id }"></g:hiddenField>
-										<g:hiddenField id="selectedTab" name="selectedTab" value="${requestItem?.type }"></g:hiddenField>
-										<table>
-											<tbody>
-												<tr class='prop'>
-													<td valign='top' class='name'><label for='quantity'><warehouse:message code="default.quantity.label"/>:</label></td>
-													<td valign='top' class='value'>
-														<input type="text" name='quantity' value="${requestItem?.quantity }" size="5" />
-													</td>
-												</tr>
-												<tr class='prop'>
-													<td valign='top' class='name'><label for='product.id'><warehouse:message code="product.label"/>:</label></td>
-													<td valign='top' class='value' nowrap="nowrap">
-														<g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath}/json/findProductByName" 
-															width="200" valueId="${requestItem?.product?.id }" valueName="${requestItem?.product?.name }"/>															
-													</td>
-												</tr>
-												<tr>
-													<td valign="top" class="value" colspan="2">
-													
-														<div class="buttons">
-															<g:if test="${requestItem?.id }">
-																<span class="formButton"> 
-																	<g:submitButton name="addItem" value="${warehouse.message(code:'default.button.updateItem.label')}"></g:submitButton> 
-																</span>
-															</g:if>
-															<g:else>
-																<span class="formButton"> 
-																	<g:submitButton name="addItem" value="${warehouse.message(code:'default.button.addItem.label')}"></g:submitButton> 
-																</span>
-															</g:else>
-														</div>
-													</td>
-												</tr>
-											</tbody>
-										</table>
-									</g:form>
-								</div>
-								<div id="Category">
-									<g:form action="createRequest" method="post">
-										<g:hiddenField name="request.id" value="${requestInstance?.id }"></g:hiddenField>
-										<table>
-											<tbody>
-												<tr class='prop'>
-													<td valign='top' class='name'><label for='quantity'><warehouse:message code="default.quantity.label"/>:</label></td>
-													<td valign='top' class='value'>
-														<input type="text" name='quantity' value="${requestItem?.quantity }" size="5" />
-													</td>
-												</tr>
-												<tr class='prop'>
-													<td valign='top' class='name'><label for='source'><warehouse:message code="category.label"/>:</label>
-													</td>
-													<td valign='top' class='value'>													
-														<div class="ui-widget"> 
-															<g:categorySelect id="category" name="category.id" value="${requestItem?.category?.id }" />
-														</div>
-													</td>
-												</tr>
-												<tr>
-													<td valign="top" colspan="2">
-														<div class="buttons">
-															<span class="formButton"> 
-																<g:submitButton name="addItem" value="${warehouse.message(code:'default.button.addItem.label')}"></g:submitButton> 
-															</span>
-														</div>
-													</td>
-												</tr>
-											</tbody>
-										</table>
-									</g:form>	
-								</div>
-								<div id="Unclassified">
-									<g:form action="createRequest" method="post">
-										<g:hiddenField name="request.id" value="${requestInstance?.id }"></g:hiddenField>
-										<table>
-											<tbody>
-												<tr class='prop'>
-													<td valign='top' class='name'><label for='quantity'><warehouse:message code="default.quantity.label"/>:</label></td>
-													<td valign='top' class='value'>
-														<input type="text" name='quantity' value="${requestItem?.quantity }" size="5" />
-													</td>
-												</tr>
-												<tr class='prop'>
-													<td valign='top' class='name'><label for='description'><warehouse:message code="default.description.label"/>:</label>
-													</td>
-													<td valign='top' class='value'>
-														<input type="text" name='description' value="" size="30" />
-													</td>
-												</tr>
-												<tr>
-													<td valign="top" class="value" colspan="2">
-														<div class="buttons">
-															<span class="formButton"> 
-																<g:submitButton name="addItem" value="${warehouse.message(code:'default.button.addItem.label')}"></g:submitButton> 
-															</span>
-														</div>
-													</td>
-												</tr>
-											</tbody>
-										</table>
-									</g:form>							
-								</div>
-							</div>								
-						</div>
-					</td>		
-					--%>	
-				</tr>
-			</table>
-
-			<g:form action="createRequest" autocomplete="false">
-				<div class="buttons" style="border-top: 1px solid lightgrey;">
-					<g:submitButton name="back" value="${warehouse.message(code:'default.button.back.label')}"></g:submitButton>
-					<g:submitButton name="next" value="${warehouse.message(code:'default.button.next.label')}"></g:submitButton>
-					<g:link action="createRequest" event="cancel"><warehouse:message code="default.button.cancel.label"/></g:link>
-				</div>
-			</g:form>
+			</g:if>
+			<div>
+				<table border="${params?.print?'1':'0' }">
+					<thead>
+						<tr class="odd">
+							<th></th>
+							<th>${warehouse.message(code:'default.item.label')}</th>
+							<th>${warehouse.message(code:'inventoryItem.lotNumber.label')}</th>
+							<th>${warehouse.message(code:'inventoryItem.expirationDate.label')}</th>
+							<th class="center">${warehouse.message(code:'inventory.quantity.label')}</th>
+							<th class="center">${warehouse.message(code:'picklist.quantityToPick.label')}</th>
+							<g:if test="${params?.print }">
+							<th width="20%">Comments</th>
+							</g:if>
+						</tr>
+					</thead>
+					<tbody>
+						<g:each var="picklistItem" in="${picklist?.picklistItems}" status="i">
+							<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+								<g:hiddenField name="picklistItems[${i }].id" value="${picklistItem?.id }" size="5"/>
+								<td>
+									<g:if test="${picklistItem?.inventoryItem?.product?.images }">
+										<g:each var="document" in="${picklistItem?.inventoryItem?.product?.images}" status="j">
+											<g:if test="${j==0 }">
+												<a class="open-dialog" href="javascript:openDialog('#dialog-${document.id }', '#img-${document.id }');">
+													<img src="${createLink(controller:'product', action:'viewThumbnail', id:document.id)}" 
+														class="middle" style="padding: 2px; margin: 2px; border: 1px solid lightgrey;" />		
+												</a>
+												
+												<div id="dialog-${document.id }" title="${document.filename }" style="display:none;" class="dialog center">
+													<div>
+														<img id="img-${document.id }" src="${createLink(controller:'product', action:'viewImage', id:document.id, params:['width':'300','height':'300'])}" 
+								           							class="middle image" style="border: 1px solid lightgrey" />
+													</div>
+													<g:link controller="document" action="download" id="${document.id}">Download</g:link>
+												</div>		
+											</g:if>				
+										</g:each>								
+									</g:if>
+								</td>
+								<td>
+									<g:link controller="inventoryItem" action="showStockCard" id="${picklistItem?.inventoryItem?.product?.id }" target="_blank">
+										${picklistItem?.inventoryItem?.product}
+									</g:link>									
+								</td>
+								<td class="center">
+									${picklistItem?.inventoryItem?.lotNumber?.toUpperCase()}
+								
+								</td>
+								<td class="center">
+									<g:formatDate date="${picklistItem?.inventoryItem?.expirationDate}" format="MMMMM yyyy"/>
+								
+								</td>
+								<td class="center">
+									${picklistItem?.inventoryItem?.quantityOnHand}
+									${picklistItem?.inventoryItem?.product?.unitOfMeasure}
+								</td>
+								<td class="center">
+									${picklistItem?.quantity}
+									${picklistItem?.inventoryItem?.product?.unitOfMeasure}
+								</td>
+								<g:if test="${params?.print }">
+									<td>
+										<g:textArea name="fake" cols="30" rows="5"></g:textArea>
+									</td>
+								</g:if>							
+							</tr>
+						</g:each>
+					</tbody>								
+				</table>
+			</div>
+			
+			<g:if test="${!params?.print }">
+				<g:form action="createRequest" autocomplete="false">
+					<div class="buttons" style="border-top: 1px solid lightgrey;">
+						<g:submitButton name="back" value="${warehouse.message(code:'default.button.back.label')}"></g:submitButton>
+						<g:submitButton name="next" value="${warehouse.message(code:'default.button.next.label')}"></g:submitButton>
+						<g:link action="createRequest" event="cancel"><warehouse:message code="default.button.cancel.label"/></g:link>
+					</div>
+				</g:form>
+			</g:if>
 				
 
 		</div>
 
 	</div>
 	
-        <script>
 
-			$(document).ready(function(){
+        
+<script>
+	function openDialog(dialogId, imgId) { 
+		$(dialogId).dialog({autoOpen: true, modal: true, width: 500, height: 360});
+	}
 
-				$("#add-item-quantity").focus();
-                
-            });
-        </script>
+	
+</script>
+
+<g:if test="${params?.print }">
+<script>
+function init() {
+	window.print();
+	/*
+	var objBrowse = window.navigator;
+	if (objBrowse.appName == “Opera” || objBrowse.appName == “Netscape”) {
+		setTimeout(‘window.print()’, 1000);
+	} else {
+		window.print();
+	}
+	*/
+}
+window.onload = init;
+</script>
+</g:if>
+
+        
 
 </body>
 </html>

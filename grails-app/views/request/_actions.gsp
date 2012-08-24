@@ -11,10 +11,19 @@
 		<g:elseif test="${requestInstance?.isNew() }">
 			<g:render template="actionsNotYetRequested" model="[requestInstance:requestInstance]"/>
 		</g:elseif>
+		<g:elseif test="${requestInstance.isPending() }">
+			<g:render template="actionsRequested" model="[requestInstance:requestInstance]"/>
+		</g:elseif>
+		<g:elseif test="${requestInstance.isFulfilled() }">
+			<g:render template="actionsRequested" model="[requestInstance:requestInstance]"/>
+		</g:elseif>
+		<g:elseif test="${requestInstance.status == org.pih.warehouse.request.RequestStatus.PICKED }">
+			<g:render template="actionsRequested" model="[requestInstance:requestInstance]"/>
+		</g:elseif>
 		<g:else>
-			<div class="actions" style="min-width: 200px;">
-				<div class="action-menu-item">
-					Unknown state
+			<div class="actions" style="min-width: 300px;">
+				<div class="action-menu-item center">
+					<a href="#">No actions available for ${requestInstance?.status }</a>
 				</div>
 			</div>
 		</g:else>

@@ -26,7 +26,7 @@
 	<g:select name="inventoryItem.id" 
 		from="${attrs.inventoryItems }" 
 		optionKey="id" 
-		optionValue="${{it.lotNumber + ' [expires: ' + it.expirationDate + '] - ' + 'QoH: ' + it.quantityOnHand}}"
+		optionValue="${{'LOT ' + it.lotNumber.toUpperCase() + (!it?.expirationDate?' | Never expires':it?.expirationDate?.before(new Date())?' | EXPIRED: '+it.expirationDate:' | Expires: '+it.expirationDate) + ' | QoH: ' + it.quantityOnHand + ' | ATP: ' + it.quantityAvailableToPromise}}"
 		value="${attrs?.inventoryItem?.id }"/>
 
 	<g:submitButton name="pickRequestItem" value="${warehouse.message(code:'request.pick.label', default:'Pick')}"></g:submitButton>

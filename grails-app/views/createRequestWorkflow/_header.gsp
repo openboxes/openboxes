@@ -28,12 +28,21 @@
 		<div class="${state.equals("pickRequestItems")?'active-step':''}">
 			<g:link action="createRequest" event="pickRequestItems">4. <warehouse:message code="createRequestWorkflow.pickRequestItems.label" default="Pick items"/></g:link>
 		</div>
-		<div class="${state.equals("printPicklist")?'active-step':''}">
-			<g:link action="createRequest" event="printPicklist">5. <warehouse:message code="createRequestWorkflow.printPicklist.label" default="Print picklist"/></g:link>
+		<div class="${state.equals("showPicklist")?'active-step':''}">
+			<g:link action="createRequest" event="showPicklist">5. <warehouse:message code="createRequestWorkflow.showPicklist.label" default="Print picklist"/></g:link>
 		</div>
 		<div class="${state.equals("confirmPicklist")?'active-step':''}">
 			<g:link action="createRequest" event="confirmPicklist">6. <warehouse:message code="createRequestWorkflow.confirmPicklist.label" default="Confirm picklist"/></g:link>
 		</div>
 	</div>	
 </div>
+<script>
+$(document).ready(function(){
+	$(".wizard-steps a").click(function(event) { 
+		alert("WARNING: These links are not active yet.  Please use the navigation buttons at the bottom of the page in the meantime.");
+		event.preventDefault();
+	});
+});
+
+</script>
 

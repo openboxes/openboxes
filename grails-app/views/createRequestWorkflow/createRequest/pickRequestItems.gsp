@@ -78,28 +78,49 @@
 										<g:set var="picklistItems" value="${requestItem.getPicklistItems() }"/>
 										<g:set var="quantityPicked" value="${picklistItems?.sum { it.quantity }?:0 }"/>
 										<g:set var="quantityRemaining" value="${requestItem.quantity - quantityPicked }"/>
-										<div>
+										<g:if test="${requestItem.status == 'tick' }">
+											<g:set var="status" value="success"/>
+										</g:if>
+										<g:elseif test="${requestItem.status == 'flag_yellow' }">
+											<g:set var="status" value="notice"/>
+										</g:elseif>
+										<g:elseif test="${requestItem.status == 'flag_red' }">
+											<g:set var="status" value="error"/>
+										</g:elseif>
+										
+										<div class="${status }">
 											<g:if test="${requestItem.status }">
-												<img src="${createLinkTo(dir:'images/icons/silk',file: requestItem.status + '.png')}"/>
+												<img src="${createLinkTo(dir:'images/icons/silk',file: requestItem?.status + '.png')}"/>
 											</g:if>
-											Need ${quantityRemaining } more.
+											<g:if test="${quantityRemaining >= 0 }">
+												<span class="quantityRemaining">Need ${quantityRemaining } more.</span>
+											</g:if>
+											<g:if test="${quantityRemaining < 0 }">
+												<span class="quantityRemaining">Please remove ${-quantityRemaining } items.</span>
+											</g:if>
 										</div>
 										<ul>
 											<g:each var="picklistItem" in="${picklistItems }">
 												<li>
 													<div class="box">
+														<span style="float: right">											
+														<g:link action="createRequest" event="deletePicklistItem" params="['picklistItem.id':picklistItem?.id]">
+															<img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}" class="middle"/> 
+														</g:link>
+														</span>
 														<div>
-															<label>${picklistItem?.inventoryItem?.lotNumber }</label>  
+															<label>${picklistItem?.inventoryItem?.product?.name }</label>  
 														</div>
 														<div>
-															Expires: <g:formatDate date="${picklistItem.inventoryItem.expirationDate }" format="MMM yy"/>
+															Lot: ${picklistItem?.inventoryItem?.lotNumber?.toUpperCase() }  
+														</div>
+														<div>
+															Exp: <g:formatDate date="${picklistItem.inventoryItem.expirationDate }" format="MMM yy"/>
 														</div>
 														<div>
 															Qty: ${picklistItem?.quantity } ${picklistItem?.inventoryItem?.product?.unitOfMeasure?:"each" }
-														</div>													
-														<g:link action="createRequest" event="deletePicklistItem" params="['picklistItem.id':picklistItem?.id]">
-															<img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}" class="middle"/> Remove 
-														</g:link>
+														</div>		
+														
 													</div>													
 												</li>
 											</g:each>
@@ -148,15 +169,6 @@
 		</div>
 
 	</div>
-	
-        <script>
-
-			$(document).ready(function(){
-
-
-                
-            });
-        </script>
 
 </body>
 </html>

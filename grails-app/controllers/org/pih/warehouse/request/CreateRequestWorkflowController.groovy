@@ -79,6 +79,14 @@ class CreateRequestWorkflowController {
 			}.to("addRequestItems")
 			on("cancel").to("cancel")
 			on("finish").to("finish")
+			
+			
+			//on("enterRequestDetails").to("enterRequestDetails")
+			//on("addRequestItems").to("addRequestItems")
+			//on("mapRequestItems").to("mapRequestItems")
+			//on("pickRequestItems").to("pickRequestItems")
+			//on("showPicklist").to("showPicklist")
+			//on("confirmRequest").to("confirmRequest")
 		}
 
 		
@@ -232,11 +240,6 @@ class CreateRequestWorkflowController {
 				
 			}.to("addRequestItems")
 			
-			on("next") {
-				log.info "confirm " + params
-				flow.requestInstance.properties = params
-
-			}.to("showPicklist")
 			
 			on("deletePicklistItem") {
 				log.info "Delete pick list item " + params
@@ -265,7 +268,7 @@ class CreateRequestWorkflowController {
 				
 
 				def location = Location.get(session.warehouse.id)
-				def quantityOnHand = inventoryService.getQuantity(location.inventory, picklistItem.inventoryItem)
+				def quantityOnHand = inventoryService.getQuantity(location.inventory, picklistItem.inventoryItem)				
 				if (picklistItem.quantity > quantityOnHand) { 
 					picklistInstance.errors.reject("picklistItem.quantity.invalid","Quantity to pick must be less than quantity on hand.");
 				}
@@ -276,46 +279,62 @@ class CreateRequestWorkflowController {
 				[picklistInstance:picklistInstance]
 				
 			}.to("pickRequestItems")
+			
+			
+			on("next") {
+				log.info "confirm " + params
+				//flow.requestInstance.properties = params
+				def picklist = Picklist.findByRequest(flow.requestInstance)
+				[picklist : picklist]
+
+			}.to("showPicklist")
+			
 
 		}
 		
 		showPicklist { 
+			on("back").to("pickRequestItems")
+			on("showPicklist").to("showPicklist")
 			on("next") { 
 				log.info "confirm " + params
-				flow.requestInstance.properties = params
+				def picklist = Picklist.findByRequest(flow.requestInstance)
+				[picklist : picklist]
 
-			}.to("fulfillRequest")
+			}.to("confirmRequest")
 		}
-		fulfillRequest { 
-			on("next") { 
+		confirmRequest { 
+			on("back").to("showPicklist")
+			
+			
+			on("save") {	
+				println "\nSAVE picklist " + params
+				//def picklist = Picklist.get(params.id)				
+				
+				def picklist = new Picklist();
+				picklist.properties = params
+				
+				picklist.picklistItems.each { 
+					println it.inventoryItem.id  +  " " + it.quantity + " " + it.comment
+					
+				}
+				picklist.save();
+				
+				[picklist:picklist]
+								
+			}.to("confirmRequest")
+			
+			
+			on("finish") {
 				log.info "confirm request " + params
-				flow.requestInstance.properties = params
-
+				//flow.requestInstance.properties = params
+				flow.requestInstance.status = RequestStatus.PICKED
+				flow.requestInstance.save();
 				
 			}.to("finish")
 		}
 		
 		finish {
-			
-			action {
-				log.info("Finishing workflow, save request object " + flow.requestInstance)
-				def request = flow.requestInstance;
-
-				try {
-					
-					if (!requestService.saveRequest(flow.requestInstance)) {
-						return error()
-					}
-					else { 
-						return success()
-					} 
-					
-				} catch (DataIntegrityViolationException e) {
-					log.info ("data integrity exception")
-					return error();
-				}
-			}
-			on("success").to("showRequest")
+			redirect(controller:"request", action : "show", params : [ "id" : flow.requestInstance.id ?: '' ])			
 		}
 		cancel { 
 			redirect(controller:"request", action: "list")

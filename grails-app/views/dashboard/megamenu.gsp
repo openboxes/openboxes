@@ -138,7 +138,7 @@
 							<div class="buttonsBar">
 								<div class="linkButton">
 									<g:link controller="request" action="list" params="[requestType:'INCOMING']" class="list">
-										<warehouse:message code="request.listIncoming.label" />
+										<warehouse:message code="request.listIncoming.label" /> (${incomingRequests?.values()?.flatten()?.size()?:0 })
 									</g:link>
 								</div>
 								<g:each in="${org.pih.warehouse.request.RequestStatus.list() }" var="status">
@@ -152,9 +152,11 @@
 							</div>
 						</td>
 						<td>			
+						
+							
 							<div class="linkButton">
 								<g:link controller="request" action="list" params="[requestType:'OUTGOING']" class="list">
-									<warehouse:message code="request.listOutgoing.label" />
+									<warehouse:message code="request.listOutgoing.label" /> (${outgoingRequests?.values()?.flatten()?.size()?:0 })
 								</g:link>
 							</div>
 							

@@ -572,5 +572,36 @@
 		</createTable>
 	</changeSet>		
 	
+	<changeSet author="jmiranda" id="1345507725073-12">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="picklist_item" columnName="status"/>
+			</not>
+		</preConditions>
+		<addColumn tableName="picklist_item">
+			<column name="status" type="VARCHAR(255)"/>
+		</addColumn>	
+	</changeSet>    	
+	<changeSet author="jmiranda" id="1345507725073-13">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="picklist_item" columnName="reason_code"/>
+			</not>
+		</preConditions>
+		<addColumn tableName="picklist_item">
+			<column name="reason_code" type="VARCHAR(255)"/>
+		</addColumn>	
+	</changeSet>    	
+	<changeSet author="jmiranda" id="1345507725073-14">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="picklist_item" columnName="comment"/>
+			</not>
+		</preConditions>
+		<addColumn tableName="picklist_item">
+			<column name="comment" type="VARCHAR(255)"/>
+		</addColumn>	
+	</changeSet>    			
+	
 	
 </databaseChangeLog>

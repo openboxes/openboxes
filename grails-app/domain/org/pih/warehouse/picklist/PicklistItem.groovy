@@ -18,6 +18,10 @@ class PicklistItem implements Serializable {
 	InventoryItem inventoryItem
 	Integer quantity
 	
+	String status
+	String reasonCode
+	String comment
+	
 	// Audit fields
 	Date dateCreated
 	Date lastUpdated
@@ -33,6 +37,9 @@ class PicklistItem implements Serializable {
 		inventoryItem(nullable:true)
 		requestItem(nullable:true)
 		quantity(nullable:false)
+		status(nullable:true)
+		reasonCode(nullable:true)
+		comment(nullable:true)
 		
 	}			
 		
