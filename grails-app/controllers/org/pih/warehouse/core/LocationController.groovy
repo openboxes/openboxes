@@ -1,5 +1,10 @@
 package org.pih.warehouse.core;
 
+import org.pih.warehouse.inventory.Transaction;
+import org.pih.warehouse.order.Order;
+import org.pih.warehouse.request.Request;
+import org.pih.warehouse.shipping.Shipment;
+
 class LocationController {
 	
 	def inventoryService
@@ -25,6 +30,17 @@ class LocationController {
 
 		
 		[locationInstanceList: locationInstanceList, locationInstanceTotal: locationInstanceTotal]
+	}
+	
+	def show = { 
+		def locationInstance = inventoryService.getLocation(params.id)
+		if (!locationInstance) {
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
+			redirect(action: "list")
+		}
+		else {
+			return [locationInstance: locationInstance]
+		}
 	}
 	
 	def edit = {
@@ -125,4 +141,43 @@ class LocationController {
 		   }
 	   }
 	
+	   
+	   def deleteTransaction = { 
+		   def transaction = Transaction.get(params.id)
+		   transaction.delete();
+		   flash.message = "Transaction deleted"
+		   redirect(action: "show", id: params.location.id);
+	   }
+	   def deleteShipment = {
+		   def shipment = Shipment.get(params.id)
+		   shipment.delete();
+		   flash.message = "Shipment deleted"
+		   redirect(action: "show", id: params.location.id);
+	   }
+	   def deleteOrder = {
+		   def order = Order.get(params.id)
+		   order.delete();
+		   flash.message = "Order deleted"
+		   redirect(action: "show", id: params.location.id);
+	   }
+	   def deleteRequest = {
+		   def requestInstance = Request.get(params.id)
+		   requestInstance.delete();
+		   flash.message = "Request deleted"
+		   redirect(action: "show", id: params.location.id);
+	   }
+	   def deleteEvent = {
+		   def event = Event.get(params.id)
+		   event.delete();
+		   flash.message = "Event deleted"
+		   redirect(action: "show", id: params.location.id);
+	   }
+	   def deleteUser = {
+		   def user = User.get(params.id)
+		   user.delete();
+		   flash.message = "User deleted"
+		   redirect(action: "show", id: params.location.id);
+	   }
+
+
 }

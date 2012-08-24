@@ -3,6 +3,10 @@ package org.pih.warehouse.core
 import java.util.Date;
 
 import org.pih.warehouse.inventory.Inventory;
+import org.pih.warehouse.inventory.Transaction;
+import org.pih.warehouse.order.Order;
+import org.pih.warehouse.request.Request;
+import org.pih.warehouse.shipping.Shipment;
 
 /**
  * A location can be a customer, warehouse, or supplier.  
@@ -59,6 +63,14 @@ class Location implements Comparable, java.io.Serializable {
 		locationType lazy: false
 	}
 	
+	static transients = ["transactions", "events", "shipments", "requests", "orders" ]
+	
+	List getTransactions() { return Transaction.findAllByDestinationOrSource(this,this) }
+	List getEvents() { return Event.findAllByEventLocation(this) }
+	List getShipments() { return Shipment.findAllByOriginOrDestination(this,this) }
+	List getRequests() { return Request.findAllByOriginOrDestination(this,this) }
+	List getOrders() { return Order.findAllByOriginOrDestination(this,this) } 
+	List getUsers() { return User.findAllByWarehouse(this) }
 	
 	String toString() { return this.name } 
 	

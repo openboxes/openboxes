@@ -73,7 +73,7 @@
                     <g:each in="${locationInstanceList}" status="i" var="locationInstance">
 						<tr class="prop ${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td>
-								<g:link action="edit" id="${locationInstance.id}">${fieldValue(bean: locationInstance, field: "name")}</g:link>
+								<g:link action="show" id="${locationInstance.id}">${fieldValue(bean: locationInstance, field: "name")}</g:link>
 							</td>
                             <td class="left"><format:metadata obj="${locationInstance?.locationType}"/></td>                            
                             <td class="left">${locationInstance?.locationGroup}</td>                            

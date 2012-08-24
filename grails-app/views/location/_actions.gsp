@@ -15,7 +15,6 @@
 		<div class="action-menu-item">
 			<hr />
 		</div>
-		<%-- 
 		<g:if test="${params.action!='show'}">
 			<div class="action-menu-item">
 				<g:link class="edit" action="show" id="${locationInstance?.id}">
@@ -24,7 +23,6 @@
 				</g:link>
 			</div>
 		</g:if>
-		--%>		
 		<g:if test="${params.action!='edit'}">
 			<div class="action-menu-item">
 				<g:link class="edit" action="edit" id="${locationInstance?.id}">
