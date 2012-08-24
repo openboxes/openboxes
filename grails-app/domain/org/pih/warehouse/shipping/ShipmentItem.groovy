@@ -9,7 +9,7 @@ import org.pih.warehouse.core.Person;
 import org.pih.warehouse.donation.Donor;
 import org.pih.warehouse.inventory.InventoryItem;
 
-class ShipmentItem implements Comparable, java.io.Serializable {
+class ShipmentItem implements Comparable, Serializable {
 
 	//def beforeDelete = {
 	//	container.removeFromShipmentItems(this)

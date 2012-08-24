@@ -9,7 +9,7 @@ import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.shipping.ShipmentItem;
 
-class ReceiptItem implements Serializable {
+class ReceiptItem implements Comparable, Serializable {
 	
 	String id
 	Product product		    			// Specific product that we're tracking
@@ -45,6 +45,13 @@ class ReceiptItem implements Serializable {
 		comment(nullable:true, maxSize: 255)
 	}
 	
-	int compareTo(obj) { product.name.compareTo(obj.product.name) }
+	//int compareTo(obj) { product.name.compareTo(obj.product.name) }
+	
+	/**
+	* Sorts receipt items in the same order as shipment items.
+	*/
+   int compareTo(obj) {
+	   return shipmentItem <=> obj.shipmentItem
+	}
 	
 }
