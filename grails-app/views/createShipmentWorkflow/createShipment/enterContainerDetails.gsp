@@ -292,8 +292,9 @@
 										<tbody>
 											<g:set var="shipmentItems" value="${shipmentInstance?.shipmentItems?.findAll({it.container?.id == selectedContainer?.id})}"/>
 											<g:if test="${shipmentItems }">
+												<g:set var="count" value="${0 }"/>
 												<g:each var="shipmentItem" in="${shipmentItems?.sort()}">		
-													<tr id="shipmentItemRow-${shipmentItem?.id }" class="${count++%2==0?'odd':'even' }">
+													<tr id="shipmentItemRow-${shipmentItem?.id }" class="${(count++%2)?'odd':'even' }">
 														<td class="middle center" width="1%">
 														</td>
 														<td nowrap="nowrap" width="3%">
