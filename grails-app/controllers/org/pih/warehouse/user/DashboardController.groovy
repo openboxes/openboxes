@@ -24,7 +24,8 @@ class DashboardController {
     
 	
 	def index = {
-		if (!session.warehouse) {			
+		if (!session.warehouse) {		
+			println "redirect to chooseLocation"	
 			redirect(action: "chooseLocation")			
 		}
 		
@@ -207,17 +208,14 @@ class DashboardController {
 			
 			// Successfully logged in and selected a warehouse
 			// Try to redirect to the previous action before session timeout
+			/*
 			if (session.targetUri || params.targetUri) {
-				if (params.targetUri) { 
-					redirect(uri: params.targetUri);
+				def targetUri = params.targetUri ?: session.targetUri 
+				if (targetUri && !targetUri.contains("chooseLocation")) { 
+					redirect(uri: targetUri);
 					return;
 				}
-				else if (session.targetUri) {
-					redirect(uri: session.targetUri)
-					return;
-				}					
-				//session.remove("targetUri")
-			}
+			}*/
 			redirect(controller:'dashboard', action:'index')
 		}
 		else {	

@@ -37,19 +37,27 @@
 
 			<div class="dialog">
 			
-				<fieldset>					
-					<table class="summary">
-						<tr>
-							<td class="left middle" style="width: 50px;">
-								<!-- Action menu -->
-								<g:render template="../transaction/actions"/>
-							</td>
-							<td class="middle">
-								<g:render template="../transaction/summary"/>
-							</td>
-						</tr>
-					</table>
-										
+								
+				<table class="summary">
+					<tr>
+						<td class="left middle" style="width: 50px;">
+							<!-- Action menu -->
+							<g:render template="../transaction/actions"/>
+						</td>
+						<td class="middle">
+							<g:render template="../transaction/summary"/>
+						</td>
+					</tr>
+				</table>
+									
+				<div class="tabs">
+					<ul>
+						<li><a href="#tabs-1"><warehouse:message code="transaction.details.label"/></a></li>
+						<li><a href="#tabs-2"><warehouse:message code="transaction.transactionEntries.label"/></a></li>
+					</ul>		
+					<div id="tabs-1">										
+									
+									
 					<g:form>
 						<g:hiddenField name="id" value="${transactionInstance?.id}"/>
 						<g:hiddenField name="inventory.id" value="${transactionInstance?.inventory?.id}"/>
@@ -61,22 +69,18 @@
 									<label><warehouse:message code="transaction.type.label"/></label>
 								</td>
 								<td>
-									<span class="value ${transactionInstance?.transactionType?.transactionCode?.name()?.toLowerCase()}">
+									<span class="value transaction-type-${transactionInstance?.transactionType?.transactionCode?.name()?.toLowerCase()}">
 										<format:metadata obj="${transactionInstance?.transactionType}"/>
-									</span>
-									<g:if test="${transactionInstance?.source }">
-										<span>
+										<g:if test="${transactionInstance?.source }">
 											<warehouse:message code="default.from.label"/>
 											${transactionInstance?.source?.name }	
-										</span>
-									</g:if>
-									
-									<g:if test="${transactionInstance?.destination }">
-										<span>
+										</g:if>
+										<g:if test="${transactionInstance?.destination }">
 											<warehouse:message code="default.to.label"/>
 											${transactionInstance?.destination?.name }	
-										</span>
-									</g:if>	
+										</g:if>	
+									</span>
+										
 								</td>	
 							</tr>
 							<g:if test="${transactionInstance?.outgoingShipment }">
@@ -174,96 +178,119 @@
 									<format:datetime obj="${transactionInstance?.lastUpdated}"/>
 								</td>										
 							</tr>
-							<g:if test="${transactionInstance?.id }">
-								<tr class="prop">
-									<td class="name">
-										<label><warehouse:message code="transaction.transactionEntries.label"/></label>
-									</td>
-									<td class="value">									
-										<table id="prodEntryTable">
-											<thead>
-												<tr>
-													<th><warehouse:message code="product.label"/></th>
-													<th style="text-align: center"><warehouse:message code="product.lotNumber.label"/></th>
-													<th style="text-align: center"><warehouse:message code="product.expirationDate.label"/></th>
-													<th style="text-align: center"><warehouse:message code="default.qty.label"/></th>
-												</tr>
-											</thead>
-											<tbody>
-												<g:set var="transactionSum" value="${0 }"/>
-												<g:set var="transactionCount" value="${0 }"/>
-												<g:if test="${transactionInstance?.transactionEntries }">
-													<g:each in="${transactionInstance?.transactionEntries.sort { it?.inventoryItem?.product?.name } }" var="transactionEntry" status="status">														
-														<g:if test="${params?.showAll || !params?.product || transactionEntry?.inventoryItem?.product?.id == params?.product?.id}">
-															<g:set var="transactionSum" value="${transactionSum + transactionEntry?.quantity}"/>
-															<g:set var="transactionCount" value="${transactionCount+1 }"/>
-															<tr class="${status%2?'odd':'even' }">
-																<td style="text-align: left;">
-																	<g:if test="${params?.showAll || !params.product }">		
-																		<g:link controller="inventory" action="showTransaction" id="${transactionInstance.id}" params="['product.id':transactionEntry?.inventoryItem?.product?.id]">
-																			<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="${warehouse.message(code: 'transaction.showSingleProduct.label') }" style="vertical-align: middle"/>
-																		</g:link>
-																	</g:if>
-																	<g:else>
-																		<g:if test="${transactionInstance?.transactionEntries?.size() > transactionCount || params?.product?.id }">
-																			<a href="?showAll=true">																			
-																				<img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="${warehouse.message(code: 'transaction.showAllProducts.label') }" style="vertical-align: middle"/>
-																			</a>
-																		</g:if>														
-																	
-																	</g:else>
-
-																	<g:link controller="inventoryItem" action="showStockCard" params="['product.id':transactionEntry?.inventoryItem?.product?.id]">
-																		<format:product product="${transactionEntry?.inventoryItem?.product}"/>																		
-																	</g:link>
-																			
-																			
-																			
-																	
-																</td>										
-																<td class="center">
-																	${transactionEntry?.inventoryItem?.lotNumber }
-																</td>		
-																<td class="center">
-																	<format:expirationDate obj="${transactionEntry?.inventoryItem?.expirationDate}"/>															
-																</td>
-																<td class="center">
-																	${transactionEntry?.quantity}
-																</td>
-															</tr>
-														</g:if>
-													</g:each>
-												</g:if>
-												<g:else>
-													<tr>
-														<td colspan="4">
-															<warehouse:message code="transaction.noEntries.message"/>
-														</td>
-													</tr>
-												</g:else>
-											</tbody>
-											<tfoot>
-												<tr>
-													<td colspan="2">
-													
-													</td>
-													<td class="right">
-														<label>Total</label>																
-													</td>															
-													<td class="center">
-														${transactionSum }																			
-													</td>			
-												</tr>
-											</tfoot>
-										</table>	
-									</td>
-								</tr>
-							</g:if>
+							
 						</table>
 					</g:form>
-				</fieldset>
+				</div>				
+				<div id="tabs-2">
+				
+					<g:form>
+						<g:hiddenField name="id" value="${transactionInstance?.id}"/>
+						<g:hiddenField name="inventory.id" value="${transactionInstance?.inventory?.id}"/>
 										
+						
+							<g:if test="${transactionInstance?.id }">
+								<table id="prodEntryTable">
+									<thead>
+										<tr>
+											<th><warehouse:message code="product.label"/></th>
+											<th style="text-align: center"><warehouse:message code="product.lotNumber.label"/></th>
+											<th style="text-align: center"><warehouse:message code="product.expirationDate.label"/></th>
+											<th style="text-align: center"><warehouse:message code="default.qty.label"/></th>
+										</tr>
+									</thead>
+									<tbody>
+										<g:set var="transactionSum" value="${0 }"/>
+										<g:set var="transactionCount" value="${0 }"/>
+										<g:if test="${transactionInstance?.transactionEntries }">
+											<g:each in="${transactionInstance?.transactionEntries.sort { it?.inventoryItem?.product?.name } }" var="transactionEntry" status="status">														
+												<g:if test="${params?.showAll || !params?.product || transactionEntry?.inventoryItem?.product?.id == params?.product?.id}">
+													<g:set var="transactionSum" value="${transactionSum + transactionEntry?.quantity}"/>
+													<g:set var="transactionCount" value="${transactionCount+1 }"/>
+													<tr class="${status%2?'odd':'even' }">
+														<td style="text-align: left;">
+															<%-- 
+															<g:if test="${params?.showAll || !params.product }">		
+																<g:link controller="inventory" action="showTransaction" id="${transactionInstance.id}" params="['product.id':transactionEntry?.inventoryItem?.product?.id]">
+																	<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="${warehouse.message(code: 'transaction.showSingleProduct.label') }" style="vertical-align: middle"/>
+																</g:link>
+															</g:if>
+															<g:else>
+																<g:if test="${transactionInstance?.transactionEntries?.size() > transactionCount || params?.product?.id }">
+																	<a href="?showAll=true">																			
+																		<img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="${warehouse.message(code: 'transaction.showAllProducts.label') }" style="vertical-align: middle"/>
+																	</a>
+																</g:if>														
+															</g:else>
+															--%>	
+															<g:link controller="inventoryItem" action="showStockCard" params="['product.id':transactionEntry?.inventoryItem?.product?.id]">
+																<format:product product="${transactionEntry?.inventoryItem?.product}"/>																		
+															</g:link>
+																	
+																	
+																	
+															
+														</td>										
+														<td class="center">
+															${transactionEntry?.inventoryItem?.lotNumber }
+														</td>		
+														<td class="center">
+															<format:expirationDate obj="${transactionEntry?.inventoryItem?.expirationDate}"/>															
+														</td>
+														<td class="center">
+															${transactionEntry?.quantity}
+														</td>
+													</tr>
+												</g:if>
+											</g:each>
+											<g:if test="${transactionInstance?.transactionEntries?.size() > transactionCount || params?.product?.id }">
+												<tr>
+													<td>
+														<a href="?showAll=true">show all</a>
+													</td>
+												</tr>
+											</g:if>
+											
+										</g:if>
+										<g:else>
+											<tr>
+												<td colspan="4">
+													<warehouse:message code="transaction.noEntries.message"/>
+												</td>
+											</tr>
+										</g:else>
+									</tbody>
+									<tfoot>
+										<tr>
+											<td colspan="2">
+											
+											</td>
+											<td class="right">
+												<label>Total</label>																
+											</td>															
+											<td class="center">
+												${transactionSum }																			
+											</td>			
+										</tr>
+									</tfoot>
+								</table>	
+							</g:if>		
+					</g:form>
+				</div>					
 			</div>
 		</div>
+		<script type="text/javascript">
+	    	$(document).ready(function() {
+		    	$(".tabs").tabs(
+	    			{
+	    				cookie: {
+	    					// store cookie for a day, without, it would be a session cookie
+	    					expires: 1
+	    				}
+	    			}
+				); 
+		    });
+        </script>		
+		
     </body>
 </html>
