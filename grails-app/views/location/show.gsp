@@ -1,4 +1,4 @@
-
+<%@ page import="org.pih.warehouse.core.RoleType" %>
 <%@ page import="org.pih.warehouse.core.Location" %>
 <html>
     <head>
@@ -33,118 +33,120 @@
 							<warehouse:message code="location.label"/>
 						</a>
 					</li>
-					<li>
-						<a href="#tabs-transactions">
-							<warehouse:message code="transactions.label"/>
-						</a>
-					</li>
-					<li>
-						<a href="#tabs-shipments">
-							<warehouse:message code="shipments.label"/>
-						</a>
-					</li>
-					<li>
-						<a href="#tabs-requests">
-							<warehouse:message code="requests.label"/>																	
-						</a>
-					</li>
-					<li>
-						<a href="#tabs-orders">
-							<warehouse:message code="orders.label"/>																	
-						</a>
-					</li>
-					<li>
-						<a href="#tabs-events">
-							<warehouse:message code="events.label"/>
-						</a>
-					</li>
-					<li>
-						<a href="#tabs-users">
-							<warehouse:message code="users.label"/>																	
-						</a>
-					</li>
-					
+					<g:isUserInRole roles="[RoleType.ROLE_ADMIN]">
+						<li>
+							<a href="#tabs-transactions">
+								<warehouse:message code="transactions.label"/>
+							</a>
+						</li>
+						<li>
+							<a href="#tabs-shipments">
+								<warehouse:message code="shipments.label"/>
+							</a>
+						</li>
+						<li>
+							<a href="#tabs-requests">
+								<warehouse:message code="requests.label"/>																	
+							</a>
+						</li>
+						<li>
+							<a href="#tabs-orders">
+								<warehouse:message code="orders.label"/>																	
+							</a>
+						</li>
+						<li>
+							<a href="#tabs-events">
+								<warehouse:message code="events.label"/>
+							</a>
+						</li>
+						<li>
+							<a href="#tabs-users">
+								<warehouse:message code="users.label"/>																	
+							</a>
+						</li>
+					</g:isUserInRole>
 				</ul>		
-				
-				<div id="tabs-transactions">	
-					<table>
-						<g:each var="transaction" in="${locationInstance?.transactions }">
-							<tr>
-								<td>${transaction.id }</td>
-								<td>${transaction }</td>
-								<td><g:link controller="inventory" action="showTransaction" id="${transaction.id }">show</g:link></td>
-								<td><g:link controller="inventory" action="editTransaction" id="${transaction.id }">edit</g:link></td>
-								<td><g:link controller="location" action="deleteTransaction" id="${transaction.id }" params="['location.id':locationInstance?.id]" fragment="tabs-transactions">delete</g:link></td>
-							</tr>
-						</g:each>
-					</table>
-				</div>
-				<div id="tabs-shipments">	
-					<table>
-						<g:each var="shipment" in="${locationInstance?.shipments }">
-							<tr>
-								<td>${shipment.id }</td>
-								<td>${shipment }</td>
-								<td><g:link controller="shipment" action="showDetails" id="${shipment.id }">show</g:link></td>
-								<td><g:link controller="shipment" action="edit" id="${shipment.id }">edit</g:link></td>
-								<td><g:link controller="location" action="deleteShipment" id="${shipment.id }" params="['location.id':locationInstance?.id]" fragment="tabs-shipments">delete</g:link></td>
-							</tr>
-						</g:each>
-					</table>
-				</div>
-				<div id="tabs-events">	
-					<table>
-						<g:each var="event" in="${locationInstance?.events }">
-							<tr>
-								<td>${event.id }</td>
-								<td>${event }</td>
-								<td><g:link controller="event" action="show" id="${event.id }">show</g:link></td>
-								<td><g:link controller="event" action="edit" id="${event.id }">edit</g:link></td>
-								<td><g:link controller="location" action="deleteEvent" id="${event.id }" params="['location.id':locationInstance?.id]" fragment="tabs-events">delete</g:link></td>
-							</tr>
-						</g:each>
-					</table>
-				</div>
-				<div id="tabs-requests">	
-					<table>
-						<g:each var="requestInstance" in="${locationInstance?.requests }">
-							<tr>
-								<td>${requestInstance.id }</td>
-								<td>${requestInstance }</td>
-								<td><g:link controller="request" action="show" id="${requestInstance.id }">show</g:link></td>
-								<td><g:link controller="request" action="edit" id="${requestInstance.id }">edit</g:link></td>
-								<td><g:link controller="location" action="deleteRequest" id="${requestInstance.id }" params="['location.id':locationInstance?.id]" fragment="tabs-requests">delete</g:link></td>
-							</tr>
-						</g:each>
-					</table>
-				</div>
-				<div id="tabs-orders">	
-					<table>
-						<g:each var="order" in="${locationInstance?.orders }">
-							<tr>
-								<td>${order.id }</td>
-								<td>${order }</td>
-								<td><g:link controller="order" action="show" id="${order.id }">show</g:link></td>
-								<td><g:link controller="order" action="edit" id="${order.id }">edit</g:link></td>
-								<td><g:link controller="location" action="deleteOrder" id="${order.id }" params="['location.id':locationInstance?.id]" fragment="tabs-orders">delete</g:link></td>
-							</tr>
-						</g:each>
-					</table>
-				</div>
-				<div id="tabs-users">	
-					<table>
-						<g:each var="user" in="${locationInstance?.users }">
-							<tr>
-								<td>${user.id }</td>
-								<td>${user }</td>
-								<td><g:link controller="user" action="show" id="${user.id }">show</g:link></td>
-								<td><g:link controller="user" action="edit" id="${user.id }">edit</g:link></td>
-								<td><g:link controller="location" action="deleteUser" id="${user.id }" params="['location.id':locationInstance?.id]" fragment="tabs-users">delete</g:link></td>
-							</tr>
-						</g:each>
-					</table>
-
-				</div>				
+				<g:isUserInRole roles="[RoleType.ROLE_ADMIN]">
+					<div id="tabs-transactions">	
+						<table>
+							<g:each var="transaction" in="${locationInstance?.transactions }">
+								<tr>
+									<td>${transaction.id }</td>
+									<td>${transaction }</td>
+									<td><g:link controller="inventory" action="showTransaction" id="${transaction.id }">show</g:link></td>
+									<td><g:link controller="inventory" action="editTransaction" id="${transaction.id }">edit</g:link></td>
+									<td><g:link controller="location" action="deleteTransaction" id="${transaction.id }" params="['location.id':locationInstance?.id]" fragment="tabs-transactions">delete</g:link></td>
+								</tr>
+							</g:each>
+						</table>
+					</div>
+					<div id="tabs-shipments">	
+						<table>
+							<g:each var="shipment" in="${locationInstance?.shipments }">
+								<tr>
+									<td>${shipment.id }</td>
+									<td>${shipment }</td>
+									<td><g:link controller="shipment" action="showDetails" id="${shipment.id }">show</g:link></td>
+									<td><g:link controller="shipment" action="edit" id="${shipment.id }">edit</g:link></td>
+									<td><g:link controller="location" action="deleteShipment" id="${shipment.id }" params="['location.id':locationInstance?.id]" fragment="tabs-shipments">delete</g:link></td>
+								</tr>
+							</g:each>
+						</table>
+					</div>
+					<div id="tabs-events">	
+						<table>
+							<g:each var="event" in="${locationInstance?.events }">
+								<tr>
+									<td>${event.id }</td>
+									<td>${event }</td>
+									<td><g:link controller="event" action="show" id="${event.id }">show</g:link></td>
+									<td><g:link controller="event" action="edit" id="${event.id }">edit</g:link></td>
+									<td><g:link controller="location" action="deleteEvent" id="${event.id }" params="['location.id':locationInstance?.id]" fragment="tabs-events">delete</g:link></td>
+								</tr>
+							</g:each>
+						</table>
+					</div>
+					<div id="tabs-requests">	
+						<table>
+							<g:each var="requestInstance" in="${locationInstance?.requests }">
+								<tr>
+									<td>${requestInstance.id }</td>
+									<td>${requestInstance }</td>
+									<td><g:link controller="request" action="show" id="${requestInstance.id }">show</g:link></td>
+									<td><g:link controller="request" action="edit" id="${requestInstance.id }">edit</g:link></td>
+									<td><g:link controller="location" action="deleteRequest" id="${requestInstance.id }" params="['location.id':locationInstance?.id]" fragment="tabs-requests">delete</g:link></td>
+								</tr>
+							</g:each>
+						</table>
+					</div>
+					<div id="tabs-orders">	
+						<table>
+							<g:each var="order" in="${locationInstance?.orders }">
+								<tr>
+									<td>${order.id }</td>
+									<td>${order }</td>
+									<td><g:link controller="order" action="show" id="${order.id }">show</g:link></td>
+									<td><g:link controller="order" action="edit" id="${order.id }">edit</g:link></td>
+									<td><g:link controller="location" action="deleteOrder" id="${order.id }" params="['location.id':locationInstance?.id]" fragment="tabs-orders">delete</g:link></td>
+								</tr>
+							</g:each>
+						</table>
+					</div>
+					<div id="tabs-users">	
+						<table>
+							<g:each var="user" in="${locationInstance?.users }">
+								<tr>
+									<td>${user.id }</td>
+									<td>${user }</td>
+									<td><g:link controller="user" action="show" id="${user.id }">show</g:link></td>
+									<td><g:link controller="user" action="edit" id="${user.id }">edit</g:link></td>
+									<td><g:link controller="location" action="deleteUser" id="${user.id }" params="['location.id':locationInstance?.id]" fragment="tabs-users">delete</g:link></td>
+								</tr>
+							</g:each>
+						</table>
+	
+					</div>				
+				</g:isUserInRole>
 				<div id="tabs-details">			   			
 		            <g:form method="post" action="update">
 		                <g:hiddenField name="id" value="${locationInstance?.id}" />

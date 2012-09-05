@@ -208,14 +208,17 @@ class DashboardController {
 			
 			// Successfully logged in and selected a warehouse
 			// Try to redirect to the previous action before session timeout
-			/*
 			if (session.targetUri || params.targetUri) {
+				log.info("session.targetUri: " + session.targetUri)
+				log.info("params.targetUri: " + params.targetUri)
 				def targetUri = params.targetUri ?: session.targetUri 
+				log.info("Redirecting to " + targetUri);
 				if (targetUri && !targetUri.contains("chooseLocation")) { 
 					redirect(uri: targetUri);
 					return;
 				}
-			}*/
+			}
+			log.info("Redirecting to dashboard");
 			redirect(controller:'dashboard', action:'index')
 		}
 		else {	
