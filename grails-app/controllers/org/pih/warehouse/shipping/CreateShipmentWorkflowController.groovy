@@ -960,14 +960,14 @@ class CreateShipmentWorkflowController {
 
 		   // add the current user to the list of email recipients
 		   recipients = recipients + userInstance
-		   
+		   log.info(createShipmentFlow)
 		   log.info("Mailing shipment emails to ${recipients.name}")
 		   def shipmentName = "${shipmentInstance.name}"
 		   def shipmentType = "${format.metadata(obj:shipmentInstance.shipmentType)}"
 		   // TODO: change this to create an email from a standard template (ie, an email packing list?)
 		   def subject = "${warehouse.message(code:'shipment.hasBeenShipped.message',args:[shipmentType, shipmentName])}"
 		   def body = g.render(template:"/email/shipmentShipped", model:[shipmentInstance:shipmentInstance])
-		   def to = recipients?.collect { it.email }?.unique()
+		   def to = recipients?.collect { it?.email }?.unique()
 		   
 		   // Generate PDF based on the packing list report
 		   /*
