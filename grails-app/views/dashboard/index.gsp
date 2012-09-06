@@ -27,7 +27,7 @@
 							<g:render template="orderSummary"/>
 							--%>
 						</td>
-						<td>
+						<td width="40%">
 							<g:if test='${activityList }'>
 								<g:render template="activitySummary"/>
 							</g:if>						

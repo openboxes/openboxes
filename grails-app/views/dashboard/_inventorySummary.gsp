@@ -8,8 +8,8 @@
  			
 			<div style="padding-top:0px;">
 				<g:form method="GET" controller="inventory" action="browse">
-					<div class="center">
-							<g:textField id="dashboardSearchBox" name="searchTerms" size="60" value="${params.searchTerms }" 
+					<div class="left">
+							<g:textField id="dashboardSearchBox" name="searchTerms" style="width: 60%" value="${params.searchTerms }" 
 								class="globalSearch"/>						
 							<g:hiddenField name="resetSearch" value="true"/>							
 							<g:hiddenField name="categoryId" value="${rootCategory.id }"/>							

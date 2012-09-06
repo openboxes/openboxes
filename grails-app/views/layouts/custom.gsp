@@ -228,29 +228,38 @@
 					event.preventDefault();
 				});
 			</g:if>
-			
-			<g:if test="${session.user && session.warehouse}">
-				var handler = $.PeriodicalUpdater('${request.contextPath}/dashboard/status', 
-					{ 
-						method: 'get', // method; get or post 
-						data: '', // array of values to be passed to the page - e.g. {name: "John", greeting: "hello"} 
-						minTimeout: 5000, // starting value for the timeout in milliseconds 
-						maxTimeout: 60000, // maximum length of time between requests 
-						multiplier: 2, // the amount to expand the timeout by if the response hasn't changed (up to maxTimeout) 
-						type: 'json', // response type - text, xml, json, etc. See $.ajax config options 
-						maxCalls: 10, // maximum number of calls. 0 = no limit. 
-						autoStop: 0 // automatically stop requests after this many returns of the same data. 0 = disabled. 
-					}, 
-					function(remoteData, success, xhr, handle) { 
-						if (remoteData != '') {
-							for (var i = 0; i < remoteData.length; i++) {
-								$('#status').text(remoteData[i].comment);
+
+			<%-- Commented the automatic status message updater because it's not an ideal solution and isn't currently used --%> 
+			<%--
+			<g:if test="${new Boolean(grailsApplication.config.grails.statusUpdate.enabled?:'true') }">
+				<g:if test="${session.user && session.warehouse}">
+				
+					// Creates an AJAX update thread that calls back to the server to see if there are any alerts 
+					// or status updates that need to be broadcast to all users
+					var handler = $.PeriodicalUpdater('${request.contextPath}/dashboard/status', 
+						{ 
+							method: 'get', // method; get or post 
+							data: '', // array of values to be passed to the page - e.g. {name: "John", greeting: "hello"} 
+							minTimeout: 5000, // starting value for the timeout in milliseconds 
+							maxTimeout: 60000, // maximum length of time between requests 
+							multiplier: 2, // the amount to expand the timeout by if the response hasn't changed (up to maxTimeout) 
+							type: 'json', // response type - text, xml, json, etc. See $.ajax config options 
+							maxCalls: 10, // maximum number of calls. 0 = no limit. 
+							autoStop: 0 // automatically stop requests after this many returns of the same data. 0 = disabled. 
+						}, 
+						function(remoteData, success, xhr, handle) { 
+							if (remoteData != '') {
+								for (var i = 0; i < remoteData.length; i++) {
+									$('#status').text(remoteData[i].comment);
+								}
+								$('#status').addClass("notice");						
 							}
-							$('#status').addClass("notice");						
 						}
-					}
-				);
+					);
+				</g:if>
 			</g:if>
+			--%>
+			
 			$(".warehouse-switch").click(function() {
 				//$("#warehouse-menu").toggle();
 				$("#warehouseMenu").dialog({ 
@@ -403,7 +412,7 @@
 		</g:each>
     </script>    
     
-    <%-- Disable feedback widget if grails.feedback.enabled is set to false --%>
+    <%-- Disable feedback widget if grails.feedback.enabled is set to false --%>   
     <g:if test="${new Boolean(grailsApplication.config.grails.feedback.enabled?:'true') }">
 		<script type="text/javascript">
 		  var uvOptions = {};
@@ -414,6 +423,5 @@
 		  })();
 		</script>    
 	</g:if>
-	
 </body>
 </html>

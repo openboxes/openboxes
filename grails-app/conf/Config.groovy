@@ -130,14 +130,15 @@ log4j = {
 	// Example of changing the log pattern for the default console    
 	appenders {
 		//console name:'stdout', layout:pattern(conversionPattern: '%p - %C{1}.%M(%L) |%d{ISO8601}| %m%n')		
-		console name:'stdout', layout:pattern(conversionPattern: '%p %d{ISO8601} %c{4} %m%n')		
+		//console name:'stdout', layout:pattern(conversionPattern: '%p %d{ISO8601} %c{4} %m%n')		
+		console name:'stdout', layout:pattern(conversionPattern: '%p %X{sessionId} %d{ISO8601} [%c{1}] %m%n')
 		
 		appender new SMTPAppender(
 			name: 'smtp', 
 			to: mail.error.to, 
 			from: mail.error.from,
 			subject: mail.error.subject, 
-			threshold: Level.FATAL,
+			threshold: Level.ERROR,
 			SMTPHost: mail.error.server, 
 			SMTPUsername: mail.error.username,
 			SMTPDebug: mail.error.debug.toString(), 
