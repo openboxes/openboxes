@@ -28,8 +28,9 @@
 	            </div>
             </g:hasErrors>
             
-			<g:render template="summary" model="[productInstance:productInstance]"/>
-	
+   			<g:if test="${productInstance?.id }">         
+				<g:render template="summary" model="[productInstance:productInstance]"/>
+			</g:if>
 			
 			<div style="padding: 10px">
 				<div class="tabs">

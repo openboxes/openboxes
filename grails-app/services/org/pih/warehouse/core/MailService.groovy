@@ -43,7 +43,8 @@ class MailService {
 	 * @return
 	 */
 	def isMailEnabled() {  
-		def isMailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)			
+		log.info "grailsApplication.config.grails.mail.enabled '" + grailsApplication.config.grails.mail.enabled + "'"
+		def isMailEnabled = Boolean.valueOf(grailsApplication.config?.grails?.mail?.enabled?.trim())			
 		log.info (isMailEnabled ? "Mail is enabled" : "Mail is disabled") 
 		return isMailEnabled
 		
@@ -101,7 +102,7 @@ class MailService {
 	 * @return
 	 */	
 	def sendHtmlMail(String subject, String htmlMessage, String [] to) { 
-		println "Sending email to array " + to
+		log.debug "Sending email to array " + to
 		sendHtmlMail(subject, htmlMessage, to)
 		
 	}
@@ -115,7 +116,7 @@ class MailService {
 	 * @return
 	 */
 	def sendHtmlMail(String subject, String htmlMessage, String to) {
-		println "Sending email to string '" + to + "'"
+		log.debug "Sending email to '" + to + "'"
 		sendHtmlMail(subject, htmlMessage, to)
 	}
 	
@@ -128,7 +129,7 @@ class MailService {
 	 * @return
 	 */
 	def sendHtmlMail(String subject, String body, Collection to) { 	
-		println "Sending email to collection " + to
+		log.debug "Sending email to " + to
 		println "${config.grails.mail.bcc}"
 		//def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)			
 		if (isMailEnabled()) { 		

@@ -1,7 +1,7 @@
-<div style="padding: 3px;">
+<div >
 	<table style="width: 0%">
-		<tbody>			
-			<tr>
+		<tbody>
+			<tr>						
 				<td class="top">
 					<g:render template="../product/actions" model="[productInstance:productInstance]" />
 				</td>

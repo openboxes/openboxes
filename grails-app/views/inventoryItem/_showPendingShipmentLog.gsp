@@ -5,7 +5,7 @@
 			<div>
 				<table>
 					<thead>
-						<tr class="odd prop">
+						<tr>
 							<th style="width: 10%;">
 								${warehouse.message(code: 'default.date.label')}
 							</th>

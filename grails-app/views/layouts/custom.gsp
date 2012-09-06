@@ -229,8 +229,7 @@
 				});
 			</g:if>
 
-			<%-- Commented the automatic status message updater because it's not an ideal solution and isn't currently used --%> 
-			<%--
+			<%-- Automatic status message updater because it's not an ideal solution and isn't currently used --%> 
 			<g:if test="${new Boolean(grailsApplication.config.grails.statusUpdate.enabled?:'true') }">
 				<g:if test="${session.user && session.warehouse}">
 				
@@ -258,7 +257,6 @@
 					);
 				</g:if>
 			</g:if>
-			--%>
 			
 			$(".warehouse-switch").click(function() {
 				//$("#warehouse-menu").toggle();
@@ -317,92 +315,6 @@
 				// To prevent the action button from POST'ing to the server
 				event.preventDefault();
 			});
-			
-			var accordion = 
-				$('.accordion').accordion({
-					active: true, 
-					navigation: true, 
-					autoHeight: false, 
-					//alwaysOpen: true,
-					clearStyle: true, 
-					//collapsible: false,
-					//fillSpace: true,
-					event: "click"  
-				});			
-
-			<g:if test="${request.request.requestURL.toString().contains('category')}">
-				accordion.accordion( "activate" , 6 );
-			</g:if>
-			<g:elseif test="${request.request.requestURL.toString().contains('locationGroup')}">
-				accordion.accordion( "activate" , 6 );
-			</g:elseif>
-			<g:elseif test="${request.request.requestURL.toString().contains('locationType')}">
-				accordion.accordion( "activate" , 6 );
-			</g:elseif>
-			<g:elseif test="${request.request.requestURL.toString().contains('Transaction')}">
-				accordion.accordion( "activate" , 6 );
-			</g:elseif>
-			<g:elseif test="${request.request.requestURL.toString().contains('attribute')}">
-				accordion.accordion( "activate" , 6 );
-			</g:elseif>
-			<g:elseif test="${request.request.requestURL.toString().contains('product/create')}">
-				accordion.accordion( "activate" , 0 );
-			</g:elseif>
-			<g:elseif test="${request.request.requestURL.toString().contains('person')}">
-				accordion.accordion( "activate" , 6 );
-			</g:elseif>
-			<g:elseif test="${request.request.requestURL.toString().contains('user')}">
-				accordion.accordion( "activate" , 6 );
-			</g:elseif>
-			<g:elseif test="${request.request.requestURL.toString().contains('location')}">
-				accordion.accordion( "activate" , 6 );
-			</g:elseif>
-			<g:elseif test="${request.request.requestURL.toString().contains('warehouse/warehouse')}">
-				accordion.accordion( "activate" , 6 );
-			</g:elseif>
-			<g:elseif test="${(request.request.requestURL.toString().contains('shipment') && request.request.queryString?.contains('incoming'))}" >
-				accordion.accordion( "activate" , 4 );
-			</g:elseif>
-			<g:elseif test="${request.request.requestURL.toString().contains('shipment')}">
-				accordion.accordion( "activate" , 3 );
-			</g:elseif>
-			<g:elseif test="${request.request.requestURL.toString().contains('createShipmentWorkflow')}">
-				accordion.accordion( "activate" , 3 );
-			</g:elseif>
-			<g:elseif test="${request.request.requestURL.toString().contains('createRequestWorkflow')}">
-				accordion.accordion( "activate" , 2 );
-			</g:elseif>
-			<g:elseif test="${request.request.requestURL.toString().contains('fulfillRequestWorkflow')}">
-				accordion.accordion( "activate" , 2 );
-			</g:elseif>
-			<g:elseif test="${request.request.requestURL.toString().contains('request')}">
-				accordion.accordion( "activate" , 2 );
-			</g:elseif>
-			<g:elseif test="${request.request.requestURL.toString().contains('purchaseOrderWorkflow')}">
-				accordion.accordion( "activate" , 1 );
-			</g:elseif>
-			<g:elseif test="${request.request.requestURL.toString().contains('order')}">
-				accordion.accordion( "activate" , 1 );
-			</g:elseif>
-			<g:elseif test="${request.request.requestURL.toString().contains('inventory/list')}">
-				accordion.accordion( "activate" , 0 );
-			</g:elseif>
-			<g:elseif test="${request.request.requestURL.toString().contains('inventory/show')}">
-				accordion.accordion( "activate" , 0 );
-			</g:elseif>
-			<g:elseif test="${request.request.requestURL.toString().contains('inventory')}">
-				accordion.accordion( "activate" , 0 );
-			</g:elseif>
-			<g:elseif test="${request.request.requestURL.toString().contains('product')}">
-				accordion.accordion( "activate" , 6 );
-			</g:elseif>			
-			<g:elseif test="${request.request.requestURL.toString().contains('batch')}">
-				accordion.accordion( "activate" , 6 );
-			</g:elseif>			
-		
-			$('.goto').click(function(){
-				var li = $(this).parent().closest(".menu-section");
-			});	
 		});
 	</script>
     <script type="text/javascript">

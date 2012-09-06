@@ -16,7 +16,7 @@ import com.amazon.advertising.api.sample.SignedRequestsHelper;
  * 
  * HIPAASpace.com: 6BB8325D3C4F42AEBDC8F9584CA85C8D79815FA7F6194AD79793BF512981E84B
  * Google: AIzaSyCAEGyY6QpPbm3DiHmtx6qIZ_P40FnF3vk
- * Amazon:
+ * Amazon: AKIAIURBRRWNL27USFDQ, eQb+QZSGDJxiWdGHjJkdVyBQI4qBnc8lKmPFyYIS
  * RXNorm(http://rxnav.nlm.nih.gov/REST/): bff71b0439e75797f6af27b220eefe7b9b0b989d
  * 
  * @author jmiranda

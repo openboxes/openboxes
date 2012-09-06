@@ -1,6 +1,6 @@
 <table>
 	<thead>
-		<tr class="odd">
+		<tr>
 			<th class="left" style=""><warehouse:message code="default.actions.label"/></th>												
 			<th><warehouse:message code="default.lotSerialNo.label"/></th>
 			<th><warehouse:message code="default.expires.label"/></th>
@@ -17,7 +17,7 @@
 				<!-- only show items with quantities -->	
 				<g:set var="itemQuantity" value="${commandInstance.quantityByInventoryItemMap.get(itemInstance) }"/>
 				<g:set var="selected" value="${params?.inventoryItem?.id && (itemInstance.id == params?.inventoryItem?.id) }"/>
-				<g:set var="styleClass" value="${(count++%2==0)?'even':'odd' }"/>
+				<g:set var="styleClass" value="${(count++%2==0)?'odd':'even' }"/>
 				<g:if test="${selected }">
 					<g:set var="styleClass" value="selected-row"/>
 				</g:if>
@@ -104,7 +104,7 @@
 		</g:unless>				
 	</tbody>
 	<tfoot>
-		<tr class="prop odd" style="border-top: 1px solid lightgrey; border-bottom: 0px solid lightgrey">
+		<tr class="prop" style="border-top: 1px solid lightgrey; border-bottom: 0px solid lightgrey">
 			<td colspan="3" class="left">
 				<label><warehouse:message code="inventory.onHandQuantity.label" default="On-hand quantity"/></label>
 			</td>

@@ -10,7 +10,9 @@ grails.config.locations = [
 	//"file:${userHome}/.grails/${appName}-config.groovy",
 	"file:${userHome}/.grails/${appName}-config.properties"
 ]
-println "Using configuration locations ${grails.config.locations} ${GrailsUtil.environment}"
+println "Using configuration locations ${grails.config.locations} [${GrailsUtil.environment}]"
+
+grails.exceptionresolver.params.exclude = ['password', 'passwordConfirm']
 
 // if(System.properties["${appName}.config.location"]) {
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
