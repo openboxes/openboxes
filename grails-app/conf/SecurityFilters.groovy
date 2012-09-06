@@ -35,7 +35,7 @@ class SecurityFilters {
 					return true
 				}
 								
-				String [] controllersWithAuthUserNotRequired = "api,test".split(",");
+				String [] controllersWithAuthUserNotRequired = "api,rxNorm,test".split(",");
 				String [] actionsWithAuthUserNotRequired = "test,login,handleLogin,signup,handleSignup,json,updateAuthUserLocale".split(",");
 				String [] actionsWithLocationNotRequired = "test,login,logout,handleLogin,signup,handleSignup,chooseLocation,json,updateAuthUserLocale".split(",");
 				
@@ -55,7 +55,15 @@ class SecurityFilters {
 					def targetUri = (request.forwardURI - request.contextPath);
 					if (request.queryString) 
 						targetUri += "?" + request.queryString
-					session.targetUri = targetUri
+						
+					// Prevent user from being redirected to invalid pages
+					if (!targetUri.contains("/dashboard/status") && !targetUri.contains("logout")) { 					
+						log.info "Request requires authentication, saving targetUri = " + targetUri
+						session.targetUri = targetUri
+					}
+					else { 
+						log.info "Not saving targetUri " + targetUri
+					}
 					redirect(controller: 'auth', action:'login')
 					return false;
 				}
@@ -87,6 +95,7 @@ class SecurityFilters {
 					}
 					
 					session.warehouseStillNotSelected = true;
+					log.info "Warehouse has not been selected, redirect to chooseLocation"
 					//redirect(controller: 'dashboard', action: 'chooseLocation', params: ['targetUri': targetUri])
 					redirect(controller: 'dashboard', action: 'chooseLocation')
 					return false;
