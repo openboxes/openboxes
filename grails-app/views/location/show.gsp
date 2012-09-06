@@ -72,6 +72,7 @@
 							<tr>
 								<th>Actions</th>							
 								<th>Id</th>
+								<th>Date</th>
 								<th>Type</th>
 								<th>Inventory</th>
 								<th>Source</th>
@@ -83,6 +84,7 @@
 										<g:render template="../transaction/actions" model="[transactionInstance:transaction]"/>
 									</td>
 									<td>${transaction.id }</td>
+									<td>${transaction.transactionDate }</td>
 									<td>${transaction.transactionType?.name }</td>
 									<td>${transaction.inventory }</td>
 									<td>${transaction.source }</td>
@@ -104,6 +106,8 @@
 								<th>Actions</th>							
 								<th>Id</th>
 								<th>Type</th>
+								<th>Status</th>
+								<th>Date</th>
 								<th>Source</th>
 								<th>Destination</th>
 							</tr>						
@@ -114,6 +118,13 @@
 									</td>
 									<td>${shipment.id }</td>
 									<td>${shipment.shipmentType?.name }</td>
+									<td>
+										<format:metadata obj="${shipment?.status?.code}"/>
+										<g:prettyDateFormat date="${shipment?.status?.date}" />
+									</td>
+									<td>
+										${shipment?.status?.date}
+									</td>
 									<td>${shipment.origin }</td>
 									<td>${shipment.destination }</td>
 								</tr>
