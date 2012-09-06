@@ -27,7 +27,7 @@ class BootStrap {
 		//
 		//if (GrailsUtil.environment == 'test' || GrailsUtil.environment == 'development' || 
 			//GrailsUtil.environment == 'client' || GrailsUtil.environment == 'root') {
-		log.info("\t\tRunning liquibase changelog(s) ...")
+		log.info("Running liquibase changelog(s) ...")
 		Liquibase liquibase = null
 		try {
 			
@@ -41,9 +41,9 @@ class BootStrap {
 
 			//def fileOpener = new ClassLoaderFileOpener()
 			def database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
-			log.info("\t\tSetting default schema to " + connection.catalog)
-			log.info("\t\tProduct Version: " + database.databaseProductVersion)
-			log.info("\t\tDatabase Version: " + database.databaseMajorVersion + "." + database.databaseMinorVersion)
+			log.info("Setting default schema to " + connection.catalog)
+			log.info("Product Version: " + database.databaseProductVersion)
+			log.info("Database Version: " + database.databaseMajorVersion + "." + database.databaseMinorVersion)
 			def ranChangeSets = database.getRanChangeSetList()
 			database.setDefaultSchemaName(connection.catalog)
 			
@@ -62,7 +62,7 @@ class BootStrap {
 				liquibase.database.close()
 			}
 		}
-		log.info("\t\tFinished running liquibase changelog(s)!")
+		log.info("Finished running liquibase changelog(s)!")
 	}		
 		
 				
