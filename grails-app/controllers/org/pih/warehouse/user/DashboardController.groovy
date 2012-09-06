@@ -25,7 +25,7 @@ class DashboardController {
 	
 	def index = {
 		if (!session.warehouse) {		
-			println "redirect to chooseLocation"	
+			log.info "Location not selected, redirect to chooseLocation"	
 			redirect(action: "chooseLocation")			
 		}
 		
