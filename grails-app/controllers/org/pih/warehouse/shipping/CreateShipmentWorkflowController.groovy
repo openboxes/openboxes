@@ -349,6 +349,7 @@ class CreateShipmentWorkflowController {
 		
 		sendShipmentAction { 
 			action { SendShipmentCommand command ->
+				println "Send shipment " + params
 				
 				flow.command = command
 				
@@ -373,7 +374,15 @@ class CreateShipmentWorkflowController {
 					if ("POST".equalsIgnoreCase(request.getMethod())) {						
 						// create the list of email recipients
 						def emailRecipients = new HashSet()
-						params.emailRecipientId?.each ( { emailRecipients = emailRecipients + Person.get(it) } )
+						if (params.emailRecipientId) { 
+						params.emailRecipientId?.each {
+								def recipient = Person.get(it)
+								if (recipient && recipient.email) {  
+									emailRecipients.add(recipient)  
+								}
+							}
+						}
+						
 						try {
 							// send the shipment
 							shipmentService.sendShipment(shipmentInstance, command.comments, session.user, session.warehouse,
@@ -959,8 +968,11 @@ class CreateShipmentWorkflowController {
 	   if (!shipmentInstance.hasErrors() && recipients) {
 
 		   // add the current user to the list of email recipients
-		   recipients = recipients + userInstance
-		   log.info(createShipmentFlow)
+		   if (userInstance) { 
+			   recipients.add(userInstance)
+		   }
+		   
+		   log.info("Create shipment flow " + createShipmentFlow)
 		   log.info("Mailing shipment emails to ${recipients.name}")
 		   def shipmentName = "${shipmentInstance.name}"
 		   def shipmentType = "${format.metadata(obj:shipmentInstance.shipmentType)}"
