@@ -146,7 +146,7 @@ log4j = {
 			SMTPDebug: mail.error.debug.toString(), 
 			SMTPPassword: mail.error.password,
 			layout: pattern(conversionPattern:
-			   '%d{[ dd.MM.yyyy HH:mm:ss.SSS]} [%t] %n%-5p %n%c %n%C %n %x %n %m%n'))
+			   '%d{[dd.MM.yyyy HH:mm:ss.SSS]} [%t] %n%-5p %X{sessionId} %n%c %n%C %n %x %n %m%n'))
 	}
 			
 	error	'org.hibernate.engine.StatefulPersistenceContext.ProxyWarnLog'
