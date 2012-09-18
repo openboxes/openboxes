@@ -67,23 +67,25 @@ class DashboardController {
 				product: it)
 		}
 		
-		def transactions = Transaction.executeQuery("select distinct t from Transaction t where t.lastUpdated >= :lastUpdated and \
-			t.inventory = :inventory", ['lastUpdated':new Date()-7, 'inventory':location.inventory] );
-		
-		transactions.each { 
-			def link = "${createLink(controller: 'inventory', action: 'showTransaction', id: it.id)}"
-			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
-			activityType = "${warehouse.message(code: activityType)}"
-			def label = LocalizationUtil.getLocalizedString(it)
-			activityList << new DashboardActivityCommand(
-				type: "table",
-				label: "${warehouse.message(code:'dashboard.activity.transaction.label', args: [link, label, activityType])}",
-				url: link,
-				dateCreated: it.dateCreated,
-				lastUpdated: it.lastUpdated,
-				transaction: it)
+		if (!location?.inventory) { 
+			def transactions = Transaction.executeQuery("select distinct t from Transaction t where t.lastUpdated >= :lastUpdated and \
+				t.inventory = :inventory", ['lastUpdated':new Date()-7, 'inventory':location?.inventory] );
+			
+			transactions.each { 
+				def link = "${createLink(controller: 'inventory', action: 'showTransaction', id: it.id)}"
+				def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
+				activityType = "${warehouse.message(code: activityType)}"
+				def label = LocalizationUtil.getLocalizedString(it)
+				activityList << new DashboardActivityCommand(
+					type: "table",
+					label: "${warehouse.message(code:'dashboard.activity.transaction.label', args: [link, label, activityType])}",
+					url: link,
+					dateCreated: it.dateCreated,
+					lastUpdated: it.lastUpdated,
+					transaction: it)
+			}
 		}
-		
+				
 		def users = User.executeQuery( "select distinct u from User u where u.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-7] );
 		users.each { 
 			def link = "${createLink(controller: 'user', action: 'show', id: it.id)}"
