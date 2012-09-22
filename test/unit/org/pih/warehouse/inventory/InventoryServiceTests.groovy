@@ -1,4 +1,4 @@
-package org.pih.warehouse
+package org.pih.warehouse.inventory
 
 import org.pih.warehouse.core.BaseUnitTest 
 import org.pih.warehouse.core.Constants 

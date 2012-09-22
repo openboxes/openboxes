@@ -1,8 +1,8 @@
-package org.pih.warehouse
+package org.pih.warehouse.inventory
 
 import grails.test.*
 
-class ProductPackageTests extends GrailsUnitTestCase {
+class TransactionControllerTests extends ControllerUnitTestCase {
     protected void setUp() {
         super.setUp()
     }

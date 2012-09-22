@@ -1,8 +1,8 @@
-package org.pih.warehouse
+package org.pih.warehouse.core
 
 import grails.test.*
 
-class TransactionEventTests extends GrailsUnitTestCase {
+class LocationTests extends GrailsUnitTestCase {
     protected void setUp() {
         super.setUp()
     }
