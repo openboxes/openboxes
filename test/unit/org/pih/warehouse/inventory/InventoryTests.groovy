@@ -12,6 +12,6 @@ class InventoryTests extends GrailsUnitTestCase {
     }
 
     void testSomething() {
-
+		fail "Not yet implemented"
     }
 }
