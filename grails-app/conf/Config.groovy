@@ -302,6 +302,7 @@ locale.defaultLocale = 'en'
 locale.supportedLocales = ['en','fr']
 
 
+//coverage { enabledByDefault = true }
 
 
 
