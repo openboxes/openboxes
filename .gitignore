@@ -1,0 +1,7 @@
+.idea
+target
+*.iml
+web-app/WEB-INF/
+stacktrace.log
+target-eclipse/
+classes/
