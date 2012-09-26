@@ -58,7 +58,7 @@ grails.views.javascript.library="jquery"
 // scaffolding templates configuration
 grails.scaffolding.templates.domainSuffix = 'Instance'
 // Set to true if BootStrap.groovy is failing to add all sample data 
-grails.gorm.failOnError = true
+grails.gorm.failOnError = false
 // Set to false to use the new Grails 1.2 JSONBuilder in the render method
 grails.json.legacy.builder = false
 // enabled native2ascii conversion of i18n properties files

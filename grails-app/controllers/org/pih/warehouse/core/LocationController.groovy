@@ -13,6 +13,10 @@ class LocationController {
 	 * Controllers for managing other locations (besides warehouses)
 	 */
 	
+	def index = { 
+		redirect(action: "list")
+	}
+	
 	def list = {
 		def locationInstanceList = []
 		def locationInstanceTotal = 0;

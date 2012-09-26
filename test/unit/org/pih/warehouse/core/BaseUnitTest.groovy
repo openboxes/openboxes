@@ -15,13 +15,12 @@ class BaseUnitTest extends GrailsUnitTestCase {
         super.setUp()
         
           // create some default location types
-        def warehouseLocationType = new LocationType(code: "locationType.warehouse", name: "Location", description: "Location")
-        def supplierLocationType= new LocationType(code: "locationType.supplier", name: "Supplier", description: "Supplier")
+        def warehouseLocationType = new LocationType(name: "Location", description: "Location")
+        def supplierLocationType= new LocationType(name: "Supplier", description: "Supplier")
         mockDomain(LocationType, [ warehouseLocationType, supplierLocationType ])
 
         // create a default location
         def acmeSupplyCompany = new Location(name: "Acme Supply Company", locationType: supplierLocationType) 
-        mockDomain(Location, [ acmeSupplyCompany ])
         
         // create some default warehouses and inventories
         def bostonLocation = new Location(name: "Boston Location", locationType: warehouseLocationType)
@@ -33,8 +32,8 @@ class BaseUnitTest extends GrailsUnitTestCase {
         bostonLocation.inventory = bostonLocationInventory
         haitiLocation.inventory = haitiLocationInventory
         
-        mockDomain(Location, [ bostonLocation, haitiLocation ] )
-        mockDomain(Inventory, [ bostonLocationInventory, haitiLocationInventory ])
+        mockDomain(Location, [ bostonLocation, haitiLocation, acmeSupplyCompany ] )
+        //mockDomain(Inventory, [ bostonLocationInventory, haitiLocationInventory ])
        
         // create some default transaction types
         def consumptionTransactionType = new TransactionType(id: 2, name: "Consumption", transactionCode: TransactionCode.DEBIT)

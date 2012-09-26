@@ -151,5 +151,6 @@
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/json-rest-api-1.0.11/grails-app/conf"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/json-rest-api-1.0.11/grails-app/controllers"/>
         <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/json-rest-api-1.0.11/src/groovy"/>
+        <wb-resource deploy-path="/" source-path="/.link_to_grails_plugins/code-coverage-1.2.5/grails-app/i18n"/>
     </wb-module>
 </project-modules>
