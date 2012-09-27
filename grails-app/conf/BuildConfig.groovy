@@ -19,10 +19,10 @@ grails.project.dependency.resolution = {
 	repositories {
 		grailsPlugins()
 		grailsHome()
+		grailsCentral()
 
-
-		mavenLocal()
-		mavenCentral()
+		//mavenLocal()
+		//mavenCentral()
 
 		// Details from docx4j Getting Started Guide at http://dev.plutext.org/svn/docx4j/trunk/docx4j/docs/Docx4j_GettingStarted.html
 		//mavenRepo "http://dev.plutext.org/svn/docx4j/trunk/docx4j/m2"
@@ -68,9 +68,7 @@ grails.project.dependency.resolution = {
 		compile ":springcache:1.1.2"
 		compile ":tomcat:1.3.7"
 		compile ":ui-performance:1.2.2"
-		compile ":webflow:1.3.5"
-		compile ":ws-client:1.0"
-		compile ":xmlrpc:0.1"
+		compile ":webflow:1.3.5"		
 		compile ":yui:2.8.2.1"
 		*/
 		

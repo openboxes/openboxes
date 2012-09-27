@@ -61,9 +61,10 @@ class AdminController {
 			session.command.future = null
 			session.command?.localWebArchive = new File("warehouse.war")								
 			flash.message = "Attempting to download '" + command?.remoteWebArchiveUrl + "' to '" + command?.localWebArchive?.absolutePath + "'"
-			session.command.future = callAsync {			
-				return doDownloadWar(command?.remoteWebArchiveUrl, command?.localWebArchive)
-			}
+			// Requires executor plugin
+			//session.command.future = callAsync {			
+			//	return doDownloadWar(command?.remoteWebArchiveUrl, command?.localWebArchive)
+			//}
 		}
 		else {
 			flash.message = "Please enter valid web archive url";
@@ -97,13 +98,17 @@ class AdminController {
 	def showSettings = { 		
 		def externalConfigProperties = []
 		grailsApplication.config.grails.config.locations.each { filename ->			
-			// Hack to remove the file: protocol from the URL string
-			filename -= "file:"
-			def file = new File(filename)
-			def inputStream = new FileInputStream(file)
-			def properties = new Properties()
-			properties.load(inputStream)
-			externalConfigProperties << properties
+			try { 
+				// Hack to remove the file: protocol from the URL string
+				filename -= "file:"
+				def file = new File(filename)
+				def inputStream = new FileInputStream(file)
+				def properties = new Properties()
+				properties.load(inputStream)
+				externalConfigProperties << properties
+			} catch (FileNotFoundException e) { 
+				log.warn("Properties file not found: " + e.message)
+			}
 		}
 			
 		[	
@@ -122,10 +127,12 @@ class AdminController {
 		log.info params
 		log.info("Updating war file " + params)
 		def url = "http://ci.pih-emr.org/downloads/warehouse.war"
-		def future = callAsync {
-			return doDownloadWar(url) 
-		}		
-		session.future = future		
+		
+		// Requires executor plugin
+		//def future = callAsync {
+		//	return doDownloadWar(url) 
+		//}		
+		//session.future = future		
 		redirect(action: "showSettings")
 	}
 	

@@ -16,7 +16,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.grails.plugins.excelimport.ExcelImportUtils;
-import org.jdom.output.DOMOutputter;
 import org.pih.warehouse.inventory.Inventory;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.InventoryItem;

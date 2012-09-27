@@ -115,15 +115,6 @@ environments {
 
 
 // log4j configuration
-/*
- log4j = {
- root {
- error()
- additivity = true
- }
- debug 'grails.app'
- }*/
-
 log4j = {
 	
 	System.setProperty 'mail.smtp.port', mail.error.port.toString()
@@ -282,27 +273,12 @@ grails.gorm.default.mapping = {
 	"user-type" type: org.joda.time.contrib.hibernate.PersistentPeriod, class: org.joda.time.Period
 }
 
-grails.plugins.dynamicController.mixins = [
-	'com.burtbeckwith.grails.plugins.appinfo.IndexControllerMixin':       'com.burtbeckwith.appinfo_test.AdminManageController',
-	'com.burtbeckwith.grails.plugins.appinfo.HibernateControllerMixin':   'com.burtbeckwith.appinfo_test.AdminManageController',
-	'com.burtbeckwith.grails.plugins.appinfo.Log4jControllerMixin' :      'com.burtbeckwith.appinfo_test.AdminManageController',
-	'com.burtbeckwith.grails.plugins.appinfo.SpringControllerMixin' :     'com.burtbeckwith.appinfo_test.AdminManageController',
-	'com.burtbeckwith.grails.plugins.appinfo.MemoryControllerMixin' :     'com.burtbeckwith.appinfo_test.AdminManageController',
-	'com.burtbeckwith.grails.plugins.appinfo.PropertiesControllerMixin' : 'com.burtbeckwith.appinfo_test.AdminManageController',
-	'com.burtbeckwith.grails.plugins.appinfo.ScopesControllerMixin' :     'com.burtbeckwith.appinfo_test.AdminManageController',
-	'com.burtbeckwith.grails.plugins.appinfo.ThreadsControllerMixin' :    'com.burtbeckwith.appinfo_test.AdminManageController'
- ]
 
 /**
  * Global Properties
  */
-
 // default and supported locales
 locale.defaultLocale = 'en'
 locale.supportedLocales = ['en','fr']
-
-
-//coverage { enabledByDefault = true }
-
 
 

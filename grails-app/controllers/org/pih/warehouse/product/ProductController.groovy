@@ -20,8 +20,6 @@ import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.RoleType;
 import org.pih.warehouse.core.User;
 import org.springframework.web.multipart.MultipartFile;
-import redstone.xmlrpc.XmlRpcClient;
-import redstone.xmlrpc.XmlRpcStruct;
 import java.awt.Image as AWTImage
 import java.awt.image.BufferedImage
 import javax.swing.ImageIcon
@@ -48,28 +46,6 @@ class ProductController {
 	def index = {
 		redirect(action: "list", params: params)
 	}
-
-	/*
-	def lookupUpc = { 
-		
-		String text = "";
-		try
-		{
-			def array = { "001292131021" }
-			XmlRpcClient client  = new XmlRpcClient( "http://www.upcdatabase.com/rpc", false);
-			XmlRpcStruct result  = (XmlRpcStruct)client.invoke( "lookupUPC", array);
-			HashMap      results = (HashMap)result;
-	
-			if (
-				results.size()>0 &&
-				results.get("message").toString().equalsIgnoreCase("Database entry found"))
-			{
-				text = results.get("description").toString()+" "+results.get("size").toString();
-			}
-		}
-		catch (Exception e) { }		
-	}
-	*/
 	
 	/** 
 	 * Perform a bulk update of 
