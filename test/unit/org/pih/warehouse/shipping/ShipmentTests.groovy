@@ -1,8 +1,9 @@
 package org.pih.warehouse.shipping
 
+
 import grails.test.*
-import org.pih.warehouse.core.*
-import org.pih.warehouse.shipping.*
+import org.pih.warehouse.core.Location;
+import org.pih.warehouse.core.LocationType;
 
 class ShipmentTests extends GrailsUnitTestCase {
     protected void setUp() {

@@ -1,6 +1,6 @@
 package org.pih.warehouse.inventory
 
-import org.pih.warehouse.core.BaseUnitTest 
+import org.pih.warehouse.core.BaseIntegrationTest;
 import org.pih.warehouse.core.Constants 
 import org.pih.warehouse.core.Location 
 import org.pih.warehouse.inventory.InventoryItem 
@@ -14,7 +14,7 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product 
 
 
-class InventoryServiceTests extends BaseUnitTest {
+class InventoryServiceTests extends BaseIntegrationTest {
 	protected void setUp() {
 		super.setUp()
 		mockLogging(InventoryService)

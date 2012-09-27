@@ -10,7 +10,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product 
 
 
-class BaseUnitTest extends GrailsUnitTestCase {
+class BaseIntegrationTest extends GrailsUnitTestCase {
 	protected void setUp() {
         super.setUp()
         
