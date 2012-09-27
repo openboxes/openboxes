@@ -1,17 +1,9 @@
 package org.pih.warehouse.inventory
 
-import org.pih.warehouse.core.BaseIntegrationTest;
-import org.pih.warehouse.core.Constants 
-import org.pih.warehouse.core.Location 
-import org.pih.warehouse.inventory.InventoryItem 
-import org.pih.warehouse.inventory.LocalTransfer 
-import org.pih.warehouse.inventory.TransactionCode 
-import org.pih.warehouse.inventory.TransactionEntry 
+import org.pih.warehouse.core.BaseIntegrationTest
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.inventory.InventoryService
-import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.inventory.TransactionType
-import org.pih.warehouse.product.Product 
+import org.pih.warehouse.product.Product
+
 
 
 class InventoryServiceTests extends BaseIntegrationTest {

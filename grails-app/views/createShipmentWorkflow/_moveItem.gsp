@@ -1,7 +1,15 @@
 <script type="text/javascript">
 	$(document).ready(function(){					
-		$("#dlgMoveItem").dialog({ autoOpen: true, modal: true, width: '600px'});	
-	});			
+		$("#dlgMoveItem").dialog({ autoOpen: true, modal: true, width: '600px'});
+
+        $(".updateQuantity").blur( function() {
+            var total = parseInt($(totalItemQuantity).text());
+            $(".updateQuantity").each(function() {
+                total -= parseInt($(this).val());
+            });
+            $(currentQuantity).val(total);
+        });
+	});
 </script>
 
 <div id="dlgMoveItem" title="${warehouse.message(code:'shipping.moveItem.label')}" style="padding: 10px; display: none;" >
@@ -37,7 +45,7 @@
 											${itemToMove?.container?.name }
 										</td>
 										<td>
-											${itemToMove?.quantity}
+                                            <div id="totalItemQuantity">${itemToMove?.quantity}</div>
 										</td>									
 									</tr>
 								</table>

@@ -1,22 +1,14 @@
 package org.pih.warehouse.shipping;
 
-import grails.validation.ValidationException;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
+import grails.validation.ValidationException
 import org.hibernate.exception.ConstraintViolationException;
 import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Constants;
 import org.pih.warehouse.core.Event;
 import org.pih.warehouse.core.EventCode;
-import org.pih.warehouse.core.EventType;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.core.ListCommand;
-import org.pih.warehouse.core.Person;
-import org.pih.warehouse.core.User;
-import org.pih.warehouse.donation.Donor;
+import org.pih.warehouse.core.EventType
+import org.pih.warehouse.core.ListCommand
+import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.inventory.TransactionEntry;
@@ -702,6 +694,7 @@ class ShipmentService {
 	
 	public ShipmentItem copyShipmentItem(ShipmentItem itemToCopy) {
 		def shipmentItem = new ShipmentItem();
+        shipmentItem.inventoryItem = itemToCopy.inventoryItem
 		shipmentItem.lotNumber = itemToCopy.lotNumber
 		shipmentItem.expirationDate = itemToCopy.expirationDate
 		shipmentItem.product = itemToCopy.product
@@ -711,58 +704,29 @@ class ShipmentService {
 		shipmentItem.shipment =  itemToCopy.shipment
 		shipmentItem.donor =  itemToCopy.donor
 		return shipmentItem;
-	} 
-	
-	
-	
-	public ShipmentItem findOrCreateShipmentItem(Shipment shipment, Container container, Product product, String lotNumber) {
-		return findOrCreateShipmentItem(new ShipmentItem(shipment: shipment, container: container, product: product, lotNumber: lotNumber))		
 	}
 
-	public ShipmentItem findOrCreateShipmentItem(ShipmentItem shipmentItemToFind) {
-		def shipmentItem = findShipmentItem(shipmentItemToFind)
-		if (!shipmentItem) {
-			shipmentItem.save()
-		}
-		return shipmentItem
-	}
+    ShipmentItem findShipmentItem(Shipment shipment,
+                                  Container container,
+                                  Product product,
+                                  String lotNumber) {
+        return shipment.shipmentItems.find { it.container == container &&
+                it.product == product &&
+                it.lotNumber == lotNumber }
+    }
 
-	
-	/**
-	 * 
-	 * @param itemToFind
-	 * @return
-	 */
-	public ShipmentItem findShipmentItem(ShipmentItem itemToFind) { 		
-		def criteria = ShipmentItem.createCriteria()
-		def shipmentItem = criteria.get {
-			and { 
-				eq("shipment", itemToFind.shipment)
-				if (itemToFind.container) { 
-					eq("container", itemToFind.container)
-				}
-				else { 
-					isNull("container")
-				}
-				eq("product", itemToFind.product)
-				if (itemToFind.lotNumber) { 
-					eq("lotNumber", itemToFind.lotNumber)
-				}
-				else { 
-					or { 
-						isNull("lotNumber")
-						eq("lotNumber", "")
-					}
-				}
-			}
-			maxResults(1)
-		}
-		return shipmentItem;
-	}
-	
-	
-	
-	/**
+    ShipmentItem findShipmentItem(Shipment shipment,
+                                  Container container,
+                                  Product product,
+                                  String lotNumber,
+                                  InventoryItem inventoryItem) {
+        return shipment.shipmentItems.find { it.container == container &&
+                it.product == product &&
+                it.lotNumber == lotNumber &&
+                it.inventoryItem == inventoryItem }
+    }
+
+    /**
 	 * Get a list of shipments.
 	 * 
 	 * @param location
@@ -1128,9 +1092,8 @@ class ShipmentService {
 		
 		command.items.each {
 			// Check if shipment item already exists
-			def criteria = new ShipmentItem(shipment: it.shipment, container: it.container, product: it.product, lotNumber: it.lotNumber);
-			def shipmentItem = findShipmentItem(criteria)
-			
+			def shipmentItem = findShipmentItem(it.shipment, it.container, it.product, it.lotNumber)
+
 			// Only add a shipment item for rows that have a quantity greater than 0
 			if (it.quantity > 0) {
 				
@@ -1295,6 +1258,43 @@ class ShipmentService {
 			log.error("Error rolling back most recent event", e)
 			throw new RuntimeException("Error rolling back most recent event")
 		}
-	}   
-	
+	}
+
+    boolean moveItem(ShipmentItem itemToMove, Map<String, Integer> containerIdToQuantityMap) {
+        def totalQuantity = 0;
+        containerIdToQuantityMap.each { String k, Integer v ->
+            totalQuantity += v;
+        }
+
+        if( totalQuantity > itemToMove.quantity )
+            return false;
+
+        def shipment = itemToMove.shipment;
+        containerIdToQuantityMap.each { String containerId, int quantity ->
+            def container = Container.get(containerId)
+
+            def existingItem = findShipmentItem(itemToMove.shipment,
+                    container,
+                    itemToMove.product,
+                    itemToMove.lotNumber,
+                    itemToMove.inventoryItem);
+
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                def shipmentItem = copyShipmentItem(itemToMove);
+                shipmentItem.container = container;
+                shipmentItem.quantity = quantity;
+                shipment.addToShipmentItems(shipmentItem);
+            }
+
+            itemToMove.quantity -= quantity
+            if(itemToMove.quantity == 0) {
+                shipment.removeFromShipmentItems(itemToMove);
+            }
+        }
+
+        return true;
+    }
+
 }

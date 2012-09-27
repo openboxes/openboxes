@@ -1,9 +1,5 @@
 package org.pih.warehouse.shipping
 
-import java.util.Set;
-
-import org.apache.poi.hssf.record.formula.functions.NumericFunction.OneArg;
-import org.hibernate.exception.ConstraintViolationException;
 import org.pih.warehouse.core.Constants;
 import org.pih.warehouse.core.MailService;
 import org.pih.warehouse.core.Person;
@@ -11,13 +7,8 @@ import org.pih.warehouse.core.User;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.InventoryService;
-import org.pih.warehouse.inventory.TransactionException;
-import org.pih.warehouse.product.Product;
-import org.pih.warehouse.report.ReportService;
-import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException;
-import org.springframework.validation.Errors;
-
-import sun.util.logging.resources.logging;
+import org.pih.warehouse.inventory.TransactionException
+import org.pih.warehouse.report.ReportService
 
 class CreateShipmentWorkflowController {
 	
@@ -656,101 +647,32 @@ class CreateShipmentWorkflowController {
 		
 		moveItemAction {
 			action {
-				
+
 				// move an item to another container
 				log.info "Move item to container " + params
-			
-				def item = ShipmentItem.get(params.item.id);				
-				def itemContainer = item.container;
-				def shipment = flow.shipmentInstance;
-				
-				if (item && shipment) { 
-					def containerIds = shipment.containers.collect { it.id }
-					
-					// Need to add id = 0 for the 'unpacked items' container
-					containerIds << 0;		
-					
-					// Iterate over the container ids and add the appropriate amount of units to each			
-					containerIds.each { id -> 
-						
-						// Container from which we're moving items to/from
-						def container = Container.get(id);
-						
-						log.info("container " + container)
-						
-						// Determine the quantity to add/assign
-						def quantity = params["quantity-" + id] 
-						quantity = quantity ? quantity as Integer : 0
-						log.info "quantity[" + id + "] = " + quantity;
-						
-						def itemToFind = new ShipmentItem(shipment: item.shipment, 
-							container: container, 
-							product: item.product, 
-							lotNumber: item.lotNumber,
-							inventoryItem: item.inventoryItem);
-						def shipmentItem = shipmentService.findShipmentItem(itemToFind);
-						
-						// Found existing shipment item
-						if (shipmentItem) { 
-							// There's a shipment item that was loaded in the hibernate session above, 
-							// so we need to merge so we don't run into an issue where that instance
-							// is saved after we persist this shipment item (e.g overwriting the 
-							// new quantity with the old quantity)
-							//shipmentItem = shipmentItem.merge();
-							
-							log.info ("Found shipment item" + shipmentItem)
-							// Quantity should be added to all containers except the one you're editing
-							// For example, if I move 4 units from container 1 to container 2, I should 
-							// add 4 units to container 2, and set the quantity of container 1 to 
-							// it's former quantity - 4.  The subtraction is handled in the UI, so we 
-							// just need to set the value to the quantity passed in as a parameter.
-							if (shipmentItem.container != itemContainer) { 
-								log.info("Adding quantity = " + quantity + " to shipment item " + shipmentItem);
-								shipmentItem.quantity += quantity;
-							}							
-							else { 
-								log.info("Setting quantity = " + quantity + " for shipment item " + shipmentItem);
-								shipmentItem.quantity = quantity;
-							}
-							
-							// For items that no longer have any quantity, we want to remove them from their container
-							if (shipmentItem.quantity == 0) { 
-								shipment.removeFromShipmentItems(shipmentItem);
-								//shipment.save();
-							}
-						}
-						// New shipment item
-						else { 
-							if (quantity > 0) { 
-								log.info("Creating new shipment item ")
-								shipmentItem = shipmentService.copyShipmentItem(item);
-								shipmentItem.shipment = shipment;
-								shipmentItem.container = container;
-								shipmentItem.quantity = quantity;
-								shipment.addToShipmentItems(shipmentItem);
-								
-							}
-						}
-						
-						// PIMS-1005 We need to flush the session or else the new quantity for the item we're 
-						// moving will get overwritten by the old quantity (and I have no idea WHY!?!?!?!)
-						if (!shipment.hasErrors() && shipment.save(flush:true)) { 
-							//log.info("Saved shipment item " + shipmentItem + " with quantity " + shipmentItem.quantity);
-						} 
-						else { 
-							throw new RuntimeException("shipment has errors " + shipmentItem.errors)
-						}
-						
-						flow.shipmentInstance.save();
 
-					}
-				}
-				else { 
-					invalid();
-				}
+                def shipment = flow.shipmentInstance
+                def item = shipment.shipmentItems.find {it.id == params.item.id };
 
-				
-				valid()
+                if (item) {
+                    def destinations = makeDestinationMap(item, params)
+
+                    if (shipmentService.moveItem(item, destinations)) {
+
+						if (!shipment.hasErrors() ) {
+                            shipment.save(flush:true)
+						} else {
+							throw new RuntimeException("shipment has errors " + shipment.errors)
+						}
+
+                        valid()
+                    } else {
+                        invalid()
+                    }
+                }
+                else {
+                    invalid()
+                }
 			}
 			
 			on("valid").to("enterContainerDetails")
@@ -912,8 +834,10 @@ class CreateShipmentWorkflowController {
     		}
     	}
     }
-	
-	void bindReferenceNumbers(Shipment shipment, ShipmentWorkflow workflow, Map params) {
+
+
+
+    void bindReferenceNumbers(Shipment shipment, ShipmentWorkflow workflow, Map params) {
 		// need to manually bind the reference numbers
 		if (!shipment.referenceNumbers) {shipment.referenceNumbers = [] }
 		for (ReferenceNumberType type in workflow?.referenceNumberTypes) {
@@ -1001,5 +925,26 @@ class CreateShipmentWorkflowController {
 		   }
 	   }
    }
+
+    static protected Map makeDestinationMap(ShipmentItem item, Map params) {
+
+        def shipment = item.shipment;
+        def containerIds = shipment.containers.collect { it.id }
+        if(item.container) {
+            containerIds.remove(item.container.id)
+            containerIds << "0";
+        }
+
+        def destinations = [:]
+        containerIds.each { containerId ->
+            def quantityFromForm = params["quantity-" + containerId]
+            def quantity = quantityFromForm ? quantityFromForm as Integer : 0
+
+            if (quantity > 0) {
+                destinations[containerId] = quantity;
+            }
+        }
+        return destinations
+    }
 	
 }
