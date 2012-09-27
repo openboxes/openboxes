@@ -71,7 +71,10 @@ grails.project.dependency.resolution = {
 		compile ":webflow:1.3.5"		
 		compile ":yui:2.8.2.1"
 		*/
-		
+	test(":spock:0.6") {
+        exclude "spock-grails-support"
+   }
+  test ":geb:0.6.3"
 	}
 	
 	dependencies {
@@ -89,6 +92,11 @@ grails.project.dependency.resolution = {
 		//runtime ('xerces:xercesImpl:2.8.1'){ excludes "xml-apis" }
 		//runtime ('net.sourceforge.nekohtml:nekohtml:1.9.16') { excludes "xercesImpl" }
 		
-	}
+test "org.spockframework:spock-grails-support:0.6-groovy-1.7"
+test "org.codehaus.geb:geb-spock:0.6.3"
+test 'org.seleniumhq.selenium:selenium-firefox-driver:2.25.0'
+test 'org.seleniumhq.selenium:selenium-chrome-driver:2.25.0'
+test 'org.seleniumhq.selenium:selenium-ie-driver:2.25.0'
+ }
 
 }
