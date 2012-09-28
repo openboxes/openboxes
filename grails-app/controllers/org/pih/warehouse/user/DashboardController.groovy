@@ -67,7 +67,8 @@ class DashboardController {
 				product: it)
 		}
 		
-		if (!location?.inventory) { 
+		// If the current location has an inventory, add recent transactions associated with that location to the activity list
+		if (location?.inventory) { 
 			def transactions = Transaction.executeQuery("select distinct t from Transaction t where t.lastUpdated >= :lastUpdated and \
 				t.inventory = :inventory", ['lastUpdated':new Date()-7, 'inventory':location?.inventory] );
 			
