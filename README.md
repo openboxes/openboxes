@@ -1,4 +1,4 @@
-openboxes
+OpenBoxes
 =========
 
 ### License
