@@ -912,7 +912,7 @@ class CreateShipmentWorkflowController {
 		   url += "?print=true&orientation=portrait&format=pdf"
 		   url += "&shipment.id=" + shipmentInstance.id
 		   url += "&includeEntities=true"
-		   //def url = "http://localhost:8080/warehouse/report/showShippingReport;jsessionid=D31A0CB3B73EFF4261C53B98F7D7562A?print=true&orientation=portrait&shipment.id=ff80818135f08caa0135f08dc7140001&includeEntities=true"
+		   //def url = "http://localhost:8080/openboxes/report/showShippingReport;jsessionid=D31A0CB3B73EFF4261C53B98F7D7562A?print=true&orientation=portrait&shipment.id=ff80818135f08caa0135f08dc7140001&includeEntities=true"
 		   def baos = new ByteArrayOutputStream();
 		   reportService.generatePdf(url, baos)
 		   */

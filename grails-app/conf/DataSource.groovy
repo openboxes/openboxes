@@ -22,34 +22,34 @@ environments {
 			// disable dbCreate when you create the initial database using '$ grails dev migrate'
 			//dbCreate = "update" 	
 			//dbCreate = "create-drop"			
-			url = "jdbc:mysql://localhost:3306/warehouse_dev?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
+			url = "jdbc:mysql://localhost:3306/openboxes_dev?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
 		}
 	}
 	test {
 		dataSource {			
-			url = "jdbc:mysql://localhost:3306/warehouse_test?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;sessionVariables=storage_engine=InnoDB"
+			url = "jdbc:mysql://localhost:3306/openboxes_test?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;sessionVariables=storage_engine=InnoDB"
 		}
 	}
 	production {
 		dataSource {
-			url = "jdbc:mysql://localhost:3306/warehouse_prod?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;sessionVariables=storage_engine=InnoDB"
+			url = "jdbc:mysql://localhost:3306/openboxes?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;sessionVariables=storage_engine=InnoDB"
 		}
 	}
 	diff {
 		dataSource {
 			// Used with the 'db-diff-incremental' script
 			//dbCreate = "create-drop"
-			url = "jdbc:mysql://localhost:3306/warehouse_diff?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;sessionVariables=storage_engine=InnoDB"
+			url = "jdbc:mysql://localhost:3306/openboxes_diff?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;sessionVariables=storage_engine=InnoDB"
 		}
 	}
 	root {
 		dataSource {
-			url = "jdbc:mysql://localhost:3306/warehouse_root?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;sessionVariables=storage_engine=InnoDB"
+			url = "jdbc:mysql://localhost:3306/openboxes_root?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;sessionVariables=storage_engine=InnoDB"
 		}
 	}
 	client {
 		dataSource {
-			url = "jdbc:mysql://localhost:3306/warehouse_client?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;sessionVariables=storage_engine=InnoDB"
+			url = "jdbc:mysql://localhost:3306/openboxes_client?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;sessionVariables=storage_engine=InnoDB"
 		}
 	}
 

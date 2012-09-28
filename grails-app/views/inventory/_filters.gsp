@@ -4,7 +4,7 @@
 			<table style="width: 10%">
 				<tr>
 					<td>					
-						<label><warehouse:message code="inventory.filterByProduct.label"></warehouse:message></label>
+						<label><warehouse:message code="inventory.filterByProduct.label"/></label>
 						
 						<g:link controller="inventory" action="browse" params="[categoryId:session?.rootCategory?.id,resetSearch:true]">reset</g:link>
 						
@@ -37,7 +37,7 @@
 				</tr>
 				<tr>
 					<td>
-						<label><warehouse:message code="inventory.filterByStatus.label"></warehouse:message></label>
+						<label><warehouse:message code="inventory.filterByStatus.label"/></label>
 						<div style="padding: 10px;">
 							<div>
 								<g:checkBox name="showHiddenProducts" value="${commandInstance.showHiddenProducts}"/>	
@@ -60,7 +60,7 @@
 				</tr>
 				<tr class="prop">
 					<td>
-						<label><warehouse:message code="inventory.filterKey.label"></warehouse:message></label>	
+						<label><warehouse:message code="inventory.filterKey.label"/></label>	
 						<div style="padding: 10px;">						
 							<div>
 								<img src="${createLinkTo(dir:'images/icons/silk',file:'flag_green.png')}" alt="${warehouse.message(code: 'inventory.markAsSupported.label') }" style="vertical-align: middle"/>

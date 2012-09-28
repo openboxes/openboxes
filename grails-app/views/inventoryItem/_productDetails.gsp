@@ -247,7 +247,7 @@
 				<tr class="odd prop">
 					<td class="label left" colspan="2">
 						<span class="name">
-							<label><warehouse:message code="product.images.label"></warehouse:message></label>
+							<label><warehouse:message code="product.images.label"/></label>
 						</span>
 					</td>
 				</tr>

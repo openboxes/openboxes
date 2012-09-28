@@ -1,13 +1,4 @@
 eclipse.preferences.version=1
-encoding//.link_to_grails_plugins/code-coverage-1.2.5/grails-app/i18n/messages.properties=UTF-8
-encoding//.link_to_grails_plugins/constraints-0.6.0/grails-app/i18n/messages.properties=UTF-8
-encoding//.link_to_grails_plugins/excel-import-0.3/grails-app/i18n/messages.properties=UTF-8
-encoding//.link_to_grails_plugins/jquery-ui-1.8.7/grails-app/i18n/messages.properties=UTF-8
-encoding//.link_to_grails_plugins/jquery-validation-ui-1.1.1/grails-app/i18n/messages.properties=UTF-8
-encoding//.link_to_grails_plugins/liquibase-1.9.3.6/grails-app/i18n/messages.properties=UTF-8
-encoding//.link_to_grails_plugins/mail-1.0-SNAPSHOT/grails-app/i18n/messages.properties=UTF-8
-encoding//.link_to_grails_plugins/mail-1.0-SNAPSHOT/grails-app/i18n/messages_fr.properties=UTF-8
-encoding//.link_to_grails_plugins/pretty-time-0.3/grails-app/i18n/messages.properties=UTF-8
 encoding//grails-app/i18n/archive=UTF-8
 encoding//grails-app/i18n/archive/messages_es.properties=UTF-8
 encoding//grails-app/i18n/menuOptions.properties=UTF-8

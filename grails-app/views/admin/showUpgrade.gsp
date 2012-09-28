@@ -40,7 +40,7 @@
 										<g:message code="upgrade.download.label"/> &nbsp;
 									</button>												
 									<br/>
-									<span class="fade">(e.g. http://ci.pih-emr.org/downloads/warehouse.war)</span>
+									<span class="fade">(e.g. http://ci.pih-emr.org/downloads/openboxes.war)</span>
 								</td>
 							</tr>
 							<tr class="prop">
@@ -135,7 +135,7 @@
 										</g:else>		
 									</g:if>									
 									<br/>
-									<span class="fade">(e.g. file:///var/lib/tomcat6/webapps/warehouse.war)</span>
+									<span class="fade">(e.g. file:///var/lib/tomcat6/webapps/openboxes.war)</span>
 								</td>
 							</tr>
 							<tr>

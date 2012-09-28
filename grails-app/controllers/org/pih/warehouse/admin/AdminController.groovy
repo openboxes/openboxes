@@ -126,7 +126,7 @@ class AdminController {
 	def downloadWar = { 
 		log.info params
 		log.info("Updating war file " + params)
-		def url = "http://ci.pih-emr.org/downloads/warehouse.war"
+		def url = "http://ci.pih-emr.org/downloads/openboxes.war"
 		
 		// Requires executor plugin
 		//def future = callAsync {
@@ -194,7 +194,7 @@ class AdminController {
 		def connection = null
 		try {
 			//Create connection
-			def url = new URL("http://localhost:8180/manager/reload?path=/warehouse");
+			def url = new URL("http://localhost:8180/manager/reload?path=/openboxes");
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("GET");
 			BASE64Encoder enc = new sun.misc.BASE64Encoder();

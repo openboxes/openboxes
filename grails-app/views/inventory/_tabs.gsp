@@ -57,7 +57,7 @@
 						</table>
 					</g:if>
 					<g:else>
-						<warehouse:message code="default.none.label"></warehouse:message>
+						<warehouse:message code="default.none.label"/>
 					</g:else>
 				</div>	
 			</li>

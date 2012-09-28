@@ -1,16 +1,16 @@
 #!/bin/bash 
-cd warehouse
+cd openboxes
 svn update
 grails clean
 grails upgrade --non-interactive
-grails prod war target/warehouse.war --non-interactive
-line=$(jar -tvf target/warehouse.war | grep 'changelog.xml')
+grails prod war target/openboxes.war --non-interactive
+line=$(jar -tvf target/openboxes.war | grep 'changelog.xml')
 if [ $? -eq 1 ]
 then
-	echo "Cannot deploy warehouse.war because changelog.xml is missing"
+	echo "Cannot deploy openboxes.war because changelog.xml is missing"
 else 
 	#echo "Backup mysql database"
-	mysql -u warehouse -p warehouse_prod > warehouse_prod.backup.sql
+	mysql -u openboxes -p openboxes > openboxes.backup.sql
 
 	#echo "Stop SymmetricDS"
 	#sudo service sym_service stop
@@ -19,10 +19,10 @@ else
 	sudo service tomcat6 stop
 
 	echo "Undeploying existing application"
-	sudo rm -rf /usr/local/tomcat6/webapps/warehouse*
+	sudo rm -rf /usr/local/tomcat6/webapps/openboxes*
 
 	echo "Copy warehouse.war to Tomcat webapps directory"
-	sudo cp target/warehouse.war /usr/local/tomcat6/webapps/warehouse.war
+	sudo cp target/openboxes.war /usr/local/tomcat6/webapps/openboxes.war
 
 	echo "Start Tomcat instance"
 	sudo service tomcat6 start

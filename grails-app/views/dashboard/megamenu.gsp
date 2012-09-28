@@ -80,7 +80,7 @@
 																	</g:if>
 																	<g:else>
 																		<li>
-																			<warehouse:message code="default.none.label"></warehouse:message>
+																			<warehouse:message code="default.none.label"/>
 																		</li>
 																	</g:else>
 																</ul>

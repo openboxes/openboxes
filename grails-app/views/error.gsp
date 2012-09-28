@@ -97,7 +97,7 @@
 					<td class="value">
 						<g:textField size="100" name="cc" value="${session?.user?.email }"/>
 						<span class="fade">
-							<warehouse:message code="default.separateMultipleAddresses.message"></warehouse:message>
+							<warehouse:message code="default.separateMultipleAddresses.message"/>
 						</span>
 					</td>
 				</tr>

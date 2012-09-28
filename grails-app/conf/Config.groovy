@@ -20,7 +20,7 @@ grails.exceptionresolver.params.exclude = ['password', 'passwordConfirm']
 grails { 
 	mail { 		
 		// By default we enable email.  You can enable/disable email using environment settings below or in your 
-		// ${user.home}/warehouse-config.properties file 
+		// ${user.home}/openboxes-config.properties file 
 		enabled = true			
 		from = "openboxes@pih.org"
 		prefix = "[OpenBoxes]"

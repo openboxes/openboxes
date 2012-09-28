@@ -156,13 +156,13 @@
 	<g:if test="${commandInstance?.allTransactionLogMap?.keySet()?.size() > transactionMap?.keySet()?.size()}">
 		&nbsp;|&nbsp;
 		<g:link controller="inventoryItem" action="showTransactionLog" id="${commandInstance?.productInstance?.id }" params="[disableFilter: true]">
-			<warehouse:message code="transactionLog.showAll.label"></warehouse:message>
+			<warehouse:message code="transactionLog.showAll.label"/>
 		</g:link>
 	</g:if>
 	<%-- 
 	<g:else>
 		<g:link controller="inventoryItem" action="showStockCard" id="${commandInstance?.productInstance?.id }" fragment="transactionLog">
-			<warehouse:message code="transactionLog.reset.label"></warehouse:message>
+			<warehouse:message code="transactionLog.reset.label"/>
 		</g:link>
 	</g:else>
 	--%>	

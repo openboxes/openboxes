@@ -239,16 +239,16 @@
 										<thead>
 											<tr class="${i++%2?'odd':'even' }">
 												<th>
-													<warehouse:message code="report.transactionDate.label"></warehouse:message>
+													<warehouse:message code="report.transactionDate.label"/>
 												</th>
 												<th>
-													<warehouse:message code="report.transactionType.label"></warehouse:message>
+													<warehouse:message code="report.transactionType.label"/>
 												</th>
 												<th class="center">
-													<warehouse:message code="report.quantityChange.label"></warehouse:message>
+													<warehouse:message code="report.quantityChange.label"/>
 												</th>
 												<th class="center">
-													<warehouse:message code="report.quantityBalance.label"></warehouse:message>
+													<warehouse:message code="report.quantityBalance.label"/>
 												</th>
 											</tr>
 										</thead>
@@ -447,10 +447,10 @@
 													    				<thead>
 													    					<tr>
 													    						<th>
-													    							<warehouse:message code="default.from.label"></warehouse:message>
+													    							<warehouse:message code="default.from.label"/>
 													    						</th>
 													    						<th class="right">
-													    							<warehouse:message code="default.qty.label"></warehouse:message>
+													    							<warehouse:message code="default.qty.label"/>
 													    						</th>
 													    					</tr>
 													    				</thead>
@@ -526,10 +526,10 @@
 													    				<thead>
 													    					<tr>
 													    						<th>
-													    							<warehouse:message code="default.to.label"></warehouse:message>
+													    							<warehouse:message code="default.to.label"/>
 													    						</th>
 													    						<th class="right">
-													    							<warehouse:message code="default.qty.label"></warehouse:message>
+													    							<warehouse:message code="default.qty.label"/>
 													    						</th>
 													    					</tr>
 													    				</thead>
