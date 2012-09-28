@@ -21,8 +21,8 @@ grails.project.dependency.resolution = {
 		grailsHome()
 		grailsCentral()
 
-		//mavenLocal()
-		//mavenCentral()
+		mavenLocal()
+		mavenCentral()
 
 		// Details from docx4j Getting Started Guide at http://dev.plutext.org/svn/docx4j/trunk/docx4j/docs/Docx4j_GettingStarted.html
 		//mavenRepo "http://dev.plutext.org/svn/docx4j/trunk/docx4j/m2"
@@ -38,44 +38,6 @@ grails.project.dependency.resolution = {
 		//mavenRepo "http://download.java.net/maven/2/"
 		//mavenRepo "http://repository.jboss.com/maven2/"
 	}
-	plugins { 
-		/*
-		compile ":mail:1.0"
-		compile ":csv:0.3.1"
-		compile ":rest:0.7"
-		compile ":app-info:0.4.3"
-		compile ":barcode4j:0.2.1"
-		compile ":bubbling:2.1.3"
-		compile ":codenarc:0.17"
-		compile ":constraints:0.6.0"
-		compile ":dynamic-controller:0.2.1"
-		compile ":excel-import:0.3"
-		compile ":executor:0.3"
-		compile ":famfamfam:1.0.1"
-		compile ":google-visualization:0.4"
-		compile ":grails-ui:1.2.3"
-		compile ":hibernate:1.3.7"
-		compile ":image-builder:0.2"
-		compile ":jaxrs:0.4"
-		compile ":joda-time:1.4"
-		compile ":jquery:1.4.4.1"
-		compile ":jquery-ui:1.8.7"
-		compile ":jquery-validation:1.9"
-		compile ":jquery-validation-ui:1.3"
-		compile ":json-rest-api:1.0.11"
-		compile ":liquibase:1.9.3.6"
-		compile ":pretty-time:0.3"
-		compile ":springcache:1.1.2"
-		compile ":tomcat:1.3.7"
-		compile ":ui-performance:1.2.2"
-		compile ":webflow:1.3.5"		
-		compile ":yui:2.8.2.1"
-		*/
-	test(":spock:0.6") {
-        exclude "spock-grails-support"
-   }
-  test ":geb:0.6.3"
-	}
 	
 	dependencies {
 		//ivySettings.setVariable("ivy.checksums", "")
@@ -88,15 +50,57 @@ grails.project.dependency.resolution = {
 
 		//build ('org.codehaus.groovy:http-builder:0.5.0-SNAPSHOT'){ excludes "junit", "xml-apis", "xercesImpl" }
 		//runtime ('xerces:xercesImpl:2.8.1'){ excludes "xml-apis" }
-		
+
 		//runtime ('xerces:xercesImpl:2.8.1'){ excludes "xml-apis" }
 		//runtime ('net.sourceforge.nekohtml:nekohtml:1.9.16') { excludes "xercesImpl" }
-		
-test "org.spockframework:spock-grails-support:0.6-groovy-1.7"
-test "org.codehaus.geb:geb-spock:0.6.3"
-test 'org.seleniumhq.selenium:selenium-firefox-driver:2.25.0'
-test 'org.seleniumhq.selenium:selenium-chrome-driver:2.25.0'
-test 'org.seleniumhq.selenium:selenium-ie-driver:2.25.0'
- }
+
+		test "org.spockframework:spock-grails-support:0.6-groovy-1.7"
+		test "org.codehaus.geb:geb-spock:0.6.3"
+		test 'org.seleniumhq.selenium:selenium-firefox-driver:2.25.0'
+		test 'org.seleniumhq.selenium:selenium-chrome-driver:2.25.0'
+		test 'org.seleniumhq.selenium:selenium-ie-driver:2.25.0'
+	}
+	plugins {
+		/*
+		 compile ":mail:1.0"
+		 compile ":csv:0.3.1"
+		 compile ":rest:0.7"
+		 compile ":app-info:0.4.3"
+		 compile ":barcode4j:0.2.1"
+		 compile ":bubbling:2.1.3"
+		 compile ":codenarc:0.17"
+		 compile ":constraints:0.6.0"
+		 compile ":dynamic-controller:0.2.1"
+		 compile ":excel-import:0.3"
+		 compile ":executor:0.3"
+		 compile ":famfamfam:1.0.1"
+		 compile ":google-visualization:0.4"
+		 compile ":grails-ui:1.2.3"
+		 compile ":hibernate:1.3.7"
+		 compile ":image-builder:0.2"
+		 compile ":jaxrs:0.4"
+		 compile ":joda-time:1.4"
+		 compile ":jquery:1.4.4.1"
+		 compile ":jquery-ui:1.8.7"
+		 compile ":jquery-validation:1.9"
+		 compile ":jquery-validation-ui:1.3"
+		 compile ":json-rest-api:1.0.11"
+		 compile ":liquibase:1.9.3.6"
+		 compile ":pretty-time:0.3"
+		 compile ":springcache:1.1.2"
+		 compile ":tomcat:1.3.7"
+		 compile ":ui-performance:1.2.2"
+		 compile ":webflow:1.3.5"		
+		 compile ":yui:2.8.2.1"
+		 */
+		test(":spock:0.6") { 
+			exclude "spock-grails-support" 
+		}
+		//compile (":joda-time:1.1") { exclude "spock" }
+		//compile (":webflow:1.3.5") { exclude "spock" }
+		test ":geb:0.6.3"
+	}
+
+
 
 }
