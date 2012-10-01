@@ -5,8 +5,7 @@ grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir	= "target/test-reports"
 //grails.project.war.file = "target/${appName}-${appVersion}.war"
 
-// Sample plugin (override request functionality)
-//grails.plugin.location.'openboxes-request' = "../openboxes-request"
+grails.plugin.location.spock='spock/'
 
 
 grails.project.dependency.resolution = {
@@ -54,13 +53,26 @@ grails.project.dependency.resolution = {
 		//runtime ('xerces:xercesImpl:2.8.1'){ excludes "xml-apis" }
 		//runtime ('net.sourceforge.nekohtml:nekohtml:1.9.16') { excludes "xercesImpl" }
 
-		test "org.spockframework:spock-grails-support:0.6-groovy-1.7"
 		test "org.codehaus.geb:geb-spock:0.6.3"
 		test 'org.seleniumhq.selenium:selenium-firefox-driver:2.25.0'
 		test 'org.seleniumhq.selenium:selenium-chrome-driver:2.25.0'
 		test 'org.seleniumhq.selenium:selenium-ie-driver:2.25.0'
 	}
 	plugins {
+
+        runtime( ':constraints:0.6.0' )
+        runtime( ':jquery-validation:1.7.3' ) {
+            excludes ([ name: 'constraints'])
+        }
+        runtime( ':jquery-validation-ui:1.1.1' ) {
+            excludes ([ name: 'constraints'])
+        }
+        /* spock from the grails repo doesn't work with grails 1.3
+           we've included our own build of it.
+        test(name:'spock', version:'0.6')
+        */
+        test (name:'geb', version:'0.6.3')
+
 		/*
 		 compile ":mail:1.0"
 		 compile ":csv:0.3.1"
@@ -93,12 +105,11 @@ grails.project.dependency.resolution = {
 		 compile ":webflow:1.3.5"		
 		 compile ":yui:2.8.2.1"
 		 */
-		test(":spock:0.6") { 
-			exclude "spock-grails-support" 
-		}
+
+		//test(":spock:0.6")
 		//compile (":joda-time:1.1") { exclude "spock" }
 		//compile (":webflow:1.3.5") { exclude "spock" }
-		test ":geb:0.6.3"
+
 	}
 
 
