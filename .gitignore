@@ -13,3 +13,7 @@ stacktrace.log
 target
 target-eclipse/
 web-app/WEB-INF/
+.classpath
+.settings
+.project
+
