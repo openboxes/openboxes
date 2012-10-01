@@ -39,7 +39,7 @@ grails.project.dependency.resolution = {
 
   dependencies {
     if (!isSpockBuild) {
-      compile("org.spockframework:spock-grails-support:${spockVersion}")
+      compile("org.spockframework:spock-grails-support:${spockVersion}") { excludes 'groovy-all', "hamcrest-core", 'junit-dep' }
     }
   }
 

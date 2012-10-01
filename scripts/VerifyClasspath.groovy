@@ -21,7 +21,7 @@ target('verifyClasspath': '''Check the classpath for duplicate classes''') {
     ant.mkdir(dir:jarsDir)
 
     dependencies.each { File jar ->
-        ant.copy(todir: jarsDir, file: jar.absolutePath )
+        ant.copy(todir: jarsDir, file: jar.absolutePath, verbose: true )
     }
 
     ant.taskdef(name:"report", classname:"org.jboss.tattletale.ant.ReportTask")
@@ -31,7 +31,7 @@ target('verifyClasspath': '''Check the classpath for duplicate classes''') {
     ant.delete(dir:reportDir)
     ant.mkdir(dir:reportDir)
 
-    ant.report(source: jarsDir, destination: reportDir, reports: "multiplejarspackage")
+    ant.report(source: jarsDir, destination: reportDir, reports: "multiplejars")
 
 }
 
