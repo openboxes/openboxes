@@ -9,36 +9,9 @@
 **/ 
 package org.pih.warehouse.reporting
 
-
-import org.pih.warehouse.core.Constants;
-import org.xhtmlrenderer.pdf.ITextRenderer;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
-import grails.converters.*;
-
-import org.pih.warehouse.core.Constants;
-import org.pih.warehouse.core.DialogForm;
-import org.pih.warehouse.core.Person;
-import org.pih.warehouse.core.UnitOfMeasure;
-import org.pih.warehouse.inventory.Inventory;
-import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.inventory.InventoryService;
-import org.pih.warehouse.inventory.Transaction;
-import org.pih.warehouse.inventory.TransactionEntry;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.product.Category;
-import org.pih.warehouse.product.Product;
-import org.pih.warehouse.report.ChecklistReportCommand;
-import org.pih.warehouse.report.InventoryReportCommand;
-import org.pih.warehouse.report.InventoryReportEntryCommand;
-import org.pih.warehouse.report.ProductReportCommand;
-import org.pih.warehouse.report.ProductReportEntryCommand;
-import org.pih.warehouse.shipping.Container;
-import org.pih.warehouse.shipping.ShipmentItem;
-import org.pih.warehouse.shipping.Shipper;
-import org.pih.warehouse.shipping.ShipperService;
-import org.pih.warehouse.shipping.Shipment;
+import org.pih.warehouse.report.ChecklistReportCommand
+import org.pih.warehouse.report.InventoryReportCommand
+import org.pih.warehouse.report.ProductReportCommand
 
 class ReportController {
 	

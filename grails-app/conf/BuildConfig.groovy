@@ -50,7 +50,6 @@ grails.project.dependency.resolution = {
 	dependencies {
 		//ivySettings.setVariable("ivy.checksums", "")
 		// specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-		//runtime 'org.docx4j:docx4j:2.7.0'
 		// runtime 'mysql:mysql-connector-java:5.1.5'
 
 		//runtime ('xerces:xercesImpl:2.8.1'){ excludes "xml-apis" }
@@ -62,10 +61,21 @@ grails.project.dependency.resolution = {
 		//runtime ('xerces:xercesImpl:2.8.1'){ excludes "xml-apis" }
 		//runtime ('net.sourceforge.nekohtml:nekohtml:1.9.16') { excludes "xercesImpl" }
 
-		test "org.codehaus.geb:geb-spock:0.6.3"
+        compile 'org.docx4j:docx4j:2.8.1'
+        compile 'c3p0:c3p0:0.9.1.2'
+        compile 'mysql:mysql-connector-java:5.1.5'
+
+        compile 'com.google.zxing:javase:2.0'
+        compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.5.2') { excludes "xercesImpl" }
+        compile 'org.apache.commons:commons-email:1.2'
+
+
+        test "org.codehaus.geb:geb-spock:0.6.3"
 		test 'org.seleniumhq.selenium:selenium-firefox-driver:2.25.0'
 		test 'org.seleniumhq.selenium:selenium-chrome-driver:2.25.0'
 		test 'org.seleniumhq.selenium:selenium-ie-driver:2.25.0'
+
+        build ('org.jboss.tattletale:tattletale-ant:1.2.0.Beta2')  { excludes "ant", "javassist" }
 	}
 	plugins {
 

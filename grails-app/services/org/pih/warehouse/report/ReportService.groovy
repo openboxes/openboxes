@@ -7,51 +7,24 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.report;
+package org.pih.warehouse.report
 
-import groovy.xml.SAXBuilder;
-
-import java.util.Map;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.grails.plugins.excelimport.ExcelImportUtils;
-import org.pih.warehouse.inventory.Inventory;
-import org.pih.warehouse.inventory.Transaction;
-import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.inventory.TransactionEntry;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.product.Product;
-import org.pih.warehouse.product.Category;
-import org.pih.warehouse.product.ProductAttribute;
-import org.pih.warehouse.shipping.Shipment;
-import org.pih.warehouse.core.Constants 
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.LocationType;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.validation.Errors;
-import org.w3c.dom.Document;
-import org.xhtmlrenderer.pdf.ITextRenderer;
-import org.xhtmlrenderer.resource.FSEntityResolver;
-import org.xhtmlrenderer.resource.XMLResource;
-import org.xhtmlrenderer.simple.extend.XhtmlCssOnlyNamespaceHandler;
-import org.xml.sax.EntityResolver;
-
-import org.pih.warehouse.reporting.Consumption;
+import org.apache.http.client.HttpClient
+import org.apache.http.client.ResponseHandler
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.impl.client.BasicResponseHandler
+import org.apache.http.impl.client.DefaultHttpClient
+import org.docx4j.org.xhtmlrenderer.pdf.ITextRenderer
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.product.Product
+import org.springframework.context.ApplicationContext
+import org.springframework.context.ApplicationContextAware
 
 class ReportService implements ApplicationContextAware {
 	
-	def sessionFactory
 	def productService
 	def inventoryService
 	def shipmentService
@@ -60,17 +33,14 @@ class ReportService implements ApplicationContextAware {
 	ApplicationContext applicationContext
 	
 	boolean transactional = true
-	
-	
+
 	public void generateShippingReport(ChecklistReportCommand command) {		
 		def shipmentItems = command?.shipment?.shipmentItems?.sort()
 		shipmentItems.each { shipmentItem -> 
 			command.checklistReportEntryList << new ChecklistReportEntryCommand(shipmentItem: shipmentItem)
 		}
-	
 	}
-	
-	
+
 	public void generateProductReport(ProductReportCommand command) { 
 		
 		command.inventoryItems = InventoryItem.findAllByProduct(command?.product)
@@ -90,10 +60,8 @@ class ReportService implements ApplicationContextAware {
 		}
 		//command.quantityFinal = quantity;
 		command.quantityFinal = inventoryService.getCurrentQuantity(command?.product, command?.location, command?.endDate)
-
 	}
-	
-	
+
 	TransactionEntry getEarliestTransactionEntry(Product product, Inventory inventory) { 
 		def list = TransactionEntry.createCriteria().list() {
 			and { 
@@ -289,24 +257,8 @@ class ReportService implements ApplicationContextAware {
 				}
 			}
 		}		
-	}	
-	
-	/**
-	 * Generate a PDF of the page at the given URL and write to the given output stream.
-	 * 
-	 * @param url
-	 * @param outputStream
-	 * @return
-	private generatePdf(String url, OutputStream outputStream) {		
-		log.info "Generate pdf from page at URL " + url
-		ITextRenderer renderer = new ITextRenderer();
-		Document document = getDocument(url);
-		renderer.setDocument(document, "");
-		renderer.layout();
-		renderer.createPDF(outputStream);
 	}
-	 */
-	
+
 	void generatePdf(String url, OutputStream outputStream) { 
 		log.info "Generate PDF for URL " + url
 		try { 
@@ -318,75 +270,7 @@ class ReportService implements ApplicationContextAware {
 			log.error("Cannot generate pdf due to error " + e.message)
 		}
 	}
-	
-	/*
-	void generatePdf(String url, OutputStream outputStream) { 
-		SAXBuilder sb = new SAXBuilder();
-		// This is needed to avoid a Connection timeout on the DTD
-		EntityResolver er = sb.getEntityResolver();
-		if (er == null) {
-			sb.setEntityResolver(FSEntityResolver.instance());
-		}
-		DOMOutputter outputter = new DOMOutputter();
-		org.jdom.Document html = sb.build(new File(inputFileName));
-		org.w3c.dom.Document htmlDoc = outputter.output(html);
 
-		//OutputStream os = new FileOutputStream(outputFileName);
-		//String url = new File(inputFileName).toURI().toURL().toString();
-		
-		ITextRenderer renderer = new ITextRenderer();
-		renderer.setDocument(htmlDoc, url, new XhtmlCssOnlyNamespaceHandler());
-		renderer.layout();
-		renderer.createPDF(outputStream);
-		outputStream.close();		
-	}
-	*/
-	
-	/*	
-	def downloadFile(url) {
-		def file = new FileOutputStream(url.tokenize("/")[-1])
-		def out = new BufferedOutputStream(file)
-		out << new URL(url).openStream()
-		out.close()
-	}*/
-	
-
-	
-	
-	private getDocument(String url) { 
-		Document document = null;
-		InputStream inputStream = null;
-		
-		try {
-			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-			documentBuilderFactory.setValidating(false);
-			
-			DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();			
-			
-			// Get source input stream
-			String xhtml = getHtmlContent(url)
-			
-			inputStream = new ByteArrayInputStream(xhtml.getBytes());
-			
-			// Use FS's local cached XML entities so we don't have to hit the web.
-			builder.setEntityResolver(FSEntityResolver.instance());
-			
-			// Parse input stream into document
-			document = builder.parse(inputStream);
-			
-			// Alternative approach 
-			//document = XMLResource.load(new ByteArrayInputStream(xhtml.getBytes())).getDocument();
-			
-			
-		} finally {
-			if (inputStream) inputStream.close();
-		}
-
-		return document;
-		
-	}
-	
-	
 	private getHtmlContent(String url) { 
 		
 		HttpClient httpclient = new DefaultHttpClient();
