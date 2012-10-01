@@ -9,6 +9,7 @@
 <script>
 $(function() { 		
 	$("#name").focus();
+});
 </script>
 <tr class="prop">
 	<td valign="top" class="name">
