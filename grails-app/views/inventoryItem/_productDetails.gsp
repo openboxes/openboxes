@@ -103,7 +103,7 @@
 				<td class="left label">
 					<span class="name"><warehouse:message code="product.units.label"/></span>
 				</td>
-				<td>
+				<td id="unitOfMeasure">
 					<span class="value">
 						<g:if test="${productInstance?.unitOfMeasure }">
 							<format:metadata obj="${productInstance?.unitOfMeasure}"/>
@@ -119,7 +119,7 @@
 				<td class="left label">
 					<span class="name"><warehouse:message code="product.manufacturer.label"/></span>
 				</td>
-				<td>
+				<td id="manufacturer">
 					<span class="value">
 						<g:if test="${productInstance?.manufacturer }">
 							${productInstance?.manufacturer }
@@ -135,7 +135,7 @@
 				<td class="left label">
 					<span class="name"><warehouse:message code="product.manufacturerCode.label"/></span>
 				</td>
-				<td>
+				<td id="manufacturerCode">
 					<span class="value">
 						<g:if test="${productInstance?.manufacturerCode }">
 							${productInstance?.manufacturerCode }

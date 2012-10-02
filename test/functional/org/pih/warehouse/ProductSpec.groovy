@@ -16,6 +16,9 @@ class ProductSpec extends GebReportingSpec{
         when:
             productDescription.value(product_name)
             productCategory.value("2") //supplies
+            unitOfMeasure.value("pill")
+            manufacturer.value("Xemon")
+            manufacturerCode.value("ABC")
 
         and:
             saveButton.click()
@@ -23,7 +26,11 @@ class ProductSpec extends GebReportingSpec{
             at InventoryPage
             productName == product_name
             productCategory.contains("Supplies")
+            unitOfMeasure == "pill"
+            manufacturer == "Xemon"
+            manufacturerCode == "ABC"
+
     }
 
-     def product_name = "test" + UUID.randomUUID().toString()[0..5]
+     def product_name = "TestProd" + UUID.randomUUID().toString()[0..5]
 }
