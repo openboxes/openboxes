@@ -69,7 +69,7 @@ class CreateProductController {
 			}.to("results")
 			on("search").to("search")
 			on("back").to("start")
-			on("cancel").to("finish")	
+			on("cancel").to("cancel")
     	}
 		error { 
 			
@@ -140,7 +140,7 @@ class CreateProductController {
 				[ search : search ]
 			}.to("results")
 
-			on("cancel").to("finish")
+			on("cancel").to("cancel")
 		}
 		verify { 
 			//on("error").to("error")
@@ -169,7 +169,7 @@ class CreateProductController {
 			on("search").to("search")
 			on("results").to("results")
 			on("back").to("results")
-			on("cancel").to("finish")
+			on("cancel").to("cancel")
 		}
 		create { 
 			on("next"){ 
@@ -196,7 +196,7 @@ class CreateProductController {
 			on("search").to("search")
 			on("results").to("results")
 			on("back").to("verify")
-			on("cancel").to("finish")
+			on("cancel").to("cancel")
 
 		}
 		
@@ -205,6 +205,11 @@ class CreateProductController {
 			redirect(controller: "product", action: "edit", id: flow.productInstance.id)
 			//redirect(controller: "createProduct", action: "index")
 		}
+
+        cancel {
+            //redirect to inventory browse page on cancel
+            redirect(controller: "inventory", action:"browse")
+        }
     }
 }
 
