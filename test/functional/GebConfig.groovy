@@ -8,7 +8,8 @@
 * You must not remove this notice, or any other, from this software.
 **/ 
 
- import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.firefox.FirefoxDriver
 
-  driver = { new FirefoxDriver() }
+
+driver = { new FirefoxDriver() }
 

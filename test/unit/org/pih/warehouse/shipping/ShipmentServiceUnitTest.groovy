@@ -101,6 +101,27 @@ class ShipmentServiceUnitTest extends GrailsUnitTestCase {
         mockDomain(ShipmentItem, allShipmentItems)
     }
 
+    public void test_moveItem_shouldMoveWithNoDestination() {
+        def quantityInContainerOne = shipmentItemContainerOneProductALotABC.quantity
+
+        def service = new ShipmentService()
+        def returnValue = service.moveItem(shipmentItemContainerOneProductALotABC, [:]);
+
+        assertTrue("moveItem should return true", returnValue)
+
+        Set<ShipmentItem> matchingItems = shipment.shipmentItems.findAll {
+            it.product == productA &&
+            it.inventoryItem == inventoryItemProductALotABC
+        }
+
+        assertEquals(1, matchingItems.findAll { it.container == containerOne }.size())
+
+        def containerOneItem = matchingItems.find { it.container == containerOne }
+
+        assertEquals(quantityInContainerOne, containerOneItem.quantity);
+    }
+
+
     public void test_moveItem_shouldMoveItemFromContainerToContainer() {
 
         // Move all of containerOne's productA/lot ABC to containerTwo which contains none
@@ -122,7 +143,6 @@ class ShipmentServiceUnitTest extends GrailsUnitTestCase {
         def containerTwoItem = matchingItems.find { it.container == containerTwo }
 
         assertEquals(quantityInContainerOne, containerTwoItem.quantity);
-        assertEquals(containerTwo, containerTwoItem.container);
     }
 
     public void test_moveItem_shouldIncrementQuantityWhenSameInventoryItemIsThere() {
