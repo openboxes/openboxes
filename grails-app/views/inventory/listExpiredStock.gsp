@@ -33,7 +33,7 @@
 				<tr>					
 					<td style="padding: 0px">
 						<div class="">
-				            <form id="inventoryActionForm" name="inventoryActionForm" method="POST">
+				            <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
 								<table class="tableScroll">
 				                    <thead>
 				                        <tr class="odd">   
