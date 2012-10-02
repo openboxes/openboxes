@@ -149,7 +149,8 @@ log4j = {
 			   '%d{[dd.MM.yyyy HH:mm:ss.SSS]} [%t] %n%-5p %X{sessionId} %n%c %n%C %n %x %n %m%n'))
 	}
 			
-	error	'org.hibernate.engine.StatefulPersistenceContext.ProxyWarnLog'
+	error	'org.hibernate.engine.StatefulPersistenceContext.ProxyWarnLog',
+            'org.hibernate.impl.SessionFactoryObjectFactory'  // We get some annoying stack trace when cleaning this class up after functional tests
 	
 	
 	warn	'org.mortbay.log',
