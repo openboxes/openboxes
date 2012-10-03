@@ -33,9 +33,8 @@
 				<div class="dialog box">
 					<table>
 	                    <tbody>		
-	              
-	                    	
-	                    	<g:if test="${!shipmentWorkflow?.isExcluded('carrier')}">  
+
+	                    	<g:if test="${!shipmentWorkflow?.isExcluded('carrier')}">
 								<tr class="prop">
 									<td valign="top" class="name" style="width: 10%;"><label><warehouse:message
 										code="shipping.traveler.label" /></label></td>
@@ -61,20 +60,9 @@
 										<g:selectShipper id="shipperInput" 
 											name="shipperInput.id" class="comboBox" value="${shipmentInstance?.shipmentMethod?.shipper?.id }" noSelection="['null':'']"/>
 										
-										<%-- 
-										<g:autoSuggest id="shipperInput" name="shipperInput" jsonUrl="${request.contextPath }/json/findShipperByName" 
-											width="300"
-											valueId="${shipmentInstance?.shipmentMethod?.shipper?.id}" 
-											valueName="${shipmentInstance?.shipmentMethod?.shipper?.name}"/>
-										--%>
 										<g:link action="createShipment" event="addShipper" params="[target:'shipper']">
 											<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry_add.png')}" alt="Add a shipper" class="middle"/>
 										</g:link>	
-										<%-- 
-										<g:link controller="shipper" action="create" target="_blank">
-											<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry_add.png')}" alt="Add a shipper" class="middle"/>
-										</g:link>
-										--%>	
 									</td>
 								</tr>
 							</g:if>

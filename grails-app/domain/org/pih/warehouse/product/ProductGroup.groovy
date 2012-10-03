@@ -50,13 +50,15 @@ class ProductGroup implements Comparable, Serializable {
 		this.description <=> obj.description
 	}
 
-	int hashcode() {
+    @Override
+	int hashCode() {
 		if (this.id != null) {
 			return this.id.hashCode();
 		}
 		return super.hashCode();
 	}
 
+    @Override
 	boolean equals(Object o) {
 		if (o instanceof ProductGroup) {
 			ProductGroup that = (ProductGroup)o;

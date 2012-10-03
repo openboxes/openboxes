@@ -16,9 +16,7 @@
 				<g:renderErrors bean="${order}" as="list" />
 			</div>
 		</g:hasErrors>
-		
-		
-		
+
 		<div class="dialog">
 			<fieldset>
 				<g:render template="/order/summary" model="[orderInstance:order]"/>
@@ -28,8 +26,7 @@
 							<div style="margin: 10px">
 								<p><warehouse:message code="order.itemsInOrder.message" args="[(order?.orderItems)?order?.orderItems?.size():0]"/></p>
 							</div>							
-						
-							
+
 							<div style="max-height: 300px; overflow-y: auto;">
 								<table style="">
 									<thead>
@@ -86,7 +83,6 @@
 							</div>
 						</td>
 						<td style="border-left: 1px solid lightgrey; padding: 0px; height: 100%; width: 35%;">
-											
 							<g:hasErrors bean="${orderItem}">
 								<div class="errors">
 									<g:renderErrors bean="${orderItem}" as="list" />
@@ -96,10 +92,6 @@
 								<div class="tabs">
 									<ul>
 										<li><a href="#tabs-1"><warehouse:message code="order.addProduct.label"/></a></li>
-										<%--
-										<li><a href="#tabs-2">Category</a></li>
-										<li><a href="#tabs-3">Unclassified</a></li> 
-										--%>
 									</ul>
 									<div id="tabs-1">
 										<g:form action="purchaseOrder" method="post">
@@ -108,27 +100,22 @@
 											<table>
 												<tbody>
 													<tr class='prop'>
-														<td valign='top' class='name'><label for='product.id'><warehouse:message code="product.label"/>:</label></td>
+														<td valign='top' class='name'><label for='product'><warehouse:message code="product.label"/>:</label></td>
 														<td valign='top' class='value' nowrap="nowrap">
-															<%-- 
-															<div class="ui-widget">
-																<g:select class="comboBox" name="product.id" from="${org.pih.warehouse.product.Product.list().sort{it.name}}" optionKey="id" value="" noSelection="['':'']" />
-															</div>
-															--%>
-															<g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName" 
+															<g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName"
 																width="200" valueId="${orderItem?.product?.id }" valueName="${orderItem?.product?.name }"/>															
 														</td>
 													</tr>
 													<tr class='prop'>
 														<td valign='top' class='name'><label for='quantity'><warehouse:message code="default.quantity.label"/>:</label></td>
 														<td valign='top' class='value'>
-															<input type="text" name='quantity' value="${orderItem?.quantity }" size="5" />
+															<input type="text" id=quantity name='quantity' value="${orderItem?.quantity }" size="5" />
 														</td>
 													</tr>
 													<tr class='prop'>
-														<td valign='top' class='name'><label for='quantity'><warehouse:message code="order.unitPrice.label"/>:</label></td>
+														<td valign='top' class='name'><label for='unitPrice'><warehouse:message code="order.unitPrice.label"/>:</label></td>
 														<td valign='top' class='value'>
-															<input type="text" name='unitPrice' value="${orderItem?.unitPrice }" size="5" />
+															<input type="text" id="unitPrice" name='unitPrice' value="${orderItem?.unitPrice }" size="5" />
 														</td>
 													</tr>
 													<tr>
@@ -152,85 +139,16 @@
 											</table>
 										</g:form>
 									</div>
-									<%--
-									<div id="tabs-2">
-										<g:form action="purchaseOrder" method="post">
-											<g:hiddenField name="order.id" value="${order?.id }"></g:hiddenField>
-											<table>
-												<tbody>
-													<tr class='prop'>
-														<td valign='top' class='name'><label for='source'>Category:</label>
-														</td>
-														<td valign='top' class='value'>													
-															<div class="ui-widget"> 
-																<g:select class="comboBox" name="category.id" from="${org.pih.warehouse.product.Category.list().sort()}" optionKey="id" value="" noSelection="['':'']" />
-															</div>
-														</td>
-													</tr>
-													<tr class='prop'>
-														<td valign='top' class='name'><label for='quantity'>Quantity:</label></td>
-														<td valign='top' class='value'>
-															<input type="text" name='quantity' value="${orderItem?.quantity }" size="5" />
-														</td>
-													</tr>
-													<tr>
-														<td valign="top" colspan="2">
-															<div class="buttons">
-																<span class="formButton"> 
-																	<g:submitButton name="addItem" value="Add Item"></g:submitButton> 
-																</span>
-															</div>
-														</td>
-													</tr>
-												</tbody>
-											</table>
-										</g:form>	
-									</div>
-									<div id="tabs-3">
-										<g:form action="purchaseOrder" method="post">
-											<g:hiddenField name="order.id" value="${order?.id }"></g:hiddenField>
-											<table>
-												<tbody>
-													<tr class='prop'>
-														<td valign='top' class='name'><label for='description'>Description:</label>
-														</td>
-														<td valign='top' class='value'>
-															<input type="text" name='description' value="" size="30" />
-														</td>
-													</tr>
-													<tr class='prop'>
-														<td valign='top' class='name'><label for='quantity'>Quantity:</label></td>
-														<td valign='top' class='value'>
-															<input type="text" name='quantity' value="${orderItem?.quantity }" size="5" />
-														</td>
-													</tr>
-													<tr>
-														<td valign="top" class="value" colspan="2">
-															<div class="buttons">
-																<span class="formButton"> 
-																	<g:submitButton name="addItem" value="Add Item"></g:submitButton> 
-																</span>
-															</div>
-														</td>
-													</tr>
-												</tbody>
-											</table>
-										</g:form>							
-									</div>
-									 --%>
-								</div>								
+								</div>
 							</div>
 						</td>			
 					</tr>
 				</table>
 
-				<g:form action="purchaseOrder" autocomplete="false">
+				<g:form action="purchaseOrder" autocomplete="off">
 					<div class="buttons" style="border-top: 1px solid lightgrey;">
 						<g:submitButton name="back" value="${warehouse.message(code:'order.backToOrderDetails.label')}"></g:submitButton>
 						<g:submitButton name="next" value="${warehouse.message(code:'order.continueToOrderSummary.label')}"></g:submitButton>
-						<%-- 
-						<g:submitButton name="finish" value="${warehouse.message(code:'default.button.saveAndExit.label')}"></g:submitButton> 
-						--%>
 						<g:link action="purchaseOrder" event="cancel"><warehouse:message code="default.button.cancel.label"/></g:link>
 					</div>
 				</g:form>
@@ -241,35 +159,27 @@
 
 	</div>
 	<g:comboBox />
-        <script type="text/javascript">
-            $( function()
-            {
-                var cookieName, $tabs, stickyTab;
+    <script type="text/javascript">
+        $( function()
+        {
+            var cookieName, $tabs, stickyTab;
 
-                cookieName = 'stickyTab';
-                $tabs = $( '.tabs' );
+            cookieName = 'stickyTab';
+            $tabs = $( '.tabs' );
 
-                $tabs.tabs( {
-                    select: function( e, ui )
-                    {
-                        $.cookies.set( cookieName, ui.index );
-                    }
-                } );
-
-                stickyTab = $.cookies.get( cookieName );
-                if( ! isNaN( stickyTab )  )
+            $tabs.tabs( {
+                select: function( e, ui )
                 {
-                    $tabs.tabs( 'select', stickyTab );
+                    $.cookies.set( cookieName, ui.index );
                 }
             } );
-        </script>
-        <%--
-        <script>
-		$(function() {
-			$( ".tabs" ).tabs();
-		});
-	</script>
- --%>
 
+            stickyTab = $.cookies.get( cookieName );
+            if( ! isNaN( stickyTab )  )
+            {
+                $tabs.tabs( 'select', stickyTab );
+            }
+        } );
+    </script>
 </body>
 </html>

@@ -7,10 +7,6 @@
 					<tr>
 						<td>
 							<g:textField name="productSearch" class="text autocomplete" style="width: 550px" autocomplete="off"/>
-							<%-- 
-							<g:autoSuggest name="product" jsonUrl="${request.contextPath }/json/findProductByName" 
-								width="300" valueId="" valueName="" styleClass="text"/>	
-							--%>
 						</td>
 					</tr>
 				</tbody>
@@ -71,14 +67,7 @@
 							<label><warehouse:message code="default.lotSerialNo.label" /></label>
 						</td>                            
 						<td valign="top" class="value">
-						
 							<g:textField name="lotNumber" class="text" value="${item?.lotNumber }"/>
-							<%-- 
-							<g:autoSuggestString id="lotNumber" name="lotNumber" 
-								jsonUrl="${request.contextPath }/json/findLotsByName?productId=" 
-								styleClass="text"
-								width="200" value="${item?.lotNumber}"/> 
-								--%>
 						</td>
 					</tr>
 					<tr class="prop">
@@ -91,11 +80,6 @@
 								format="MM/dd/yyyy" 
 								readOnly="true"
 								cssClass="text"/>
-							<%-- 
-							<g:datePicker name="expirationDate" default="none" precision="day"
-								value="${item?.expirationDate }" noSelection="['null':'']"
-								years="${(1900 + (new Date().year))..(1900+ (new Date() + (20 * 365)).year)}" />
-								--%>
 						</td>
 					</tr>
 					<tr class="prop">
@@ -121,10 +105,6 @@
 							<div class="left">
 								<g:if test="${item}">
 									<g:submitButton name="updateItem" value="${warehouse.message(code:'shipping.saveItem.label')}"/>
-									<%-- 
-									<g:submitButton name="deleteItem" value="${warehouse.message(code:'shipping.removeItem.label')}" 
-										onclick="return confirm('${warehouse.message(code:'shipping.confirm.deleteItem.message')}')"/>
-									--%>
 								</g:if>
 								<g:else>
 									<g:submitButton name="saveItem" value="${warehouse.message(code:'shipping.saveItem.label')}"/>
@@ -177,11 +157,6 @@
 					success: function(data, textStatus, jqXHR){
 						$("#results > tbody").find("tr").remove();
 						$.each(data, function(){
-							//var row = $(rowBuilder(this));
-							//$.data(row, "mydata", this);
-							//$(row).data("mydata", this);
-							//alert(this);
-							//row.appendTo("#results > tbody");
 							$(rowBuilder(this)).data("mydata",this).appendTo("#results > tbody");
 						});					
 						$("#results tr").removeClass("odd").filter(":odd").addClass("odd");

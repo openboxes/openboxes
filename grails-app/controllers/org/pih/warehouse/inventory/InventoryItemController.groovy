@@ -182,17 +182,7 @@ class InventoryItemController {
 	}
 	
 	def saveRecordInventory = { RecordInventoryCommand cmd ->
-		//flash.message = "Trying to save a record inventory command object";		
-		// The cmd.newRow object is not being bound correctly, so we need to use two command objects
-		//cmd.recordInventoryRow = recordInventoryRow;
-
-		//def ric = new RecordInventoryCommand()
-		//cmd.recordInventoryRow = cmd2
-		//bindData(ric, params)
-		//bindData(cmd.recordInventoryRows, params)
-		//bindData(cmd.recordInventoryRow, params)
-		
-		log.info ("Before saving record inventory " + params)				
+		log.info ("Before saving record inventory " + params)
 		inventoryService.saveRecordInventoryCommand(cmd, params)
 		if (!cmd.hasErrors()) { 
 			log.info ("No errors, show stock card")				
@@ -217,10 +207,6 @@ class InventoryItemController {
 		render(view: "showRecordInventory", model: [ commandInstance : cmd ])
 	}
 
-	
-	
-
-	
 	def showTransactions = {
 		
 		def warehouseInstance = Location.get(session?.warehouse?.id)

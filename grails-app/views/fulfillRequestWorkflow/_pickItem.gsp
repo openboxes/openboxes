@@ -4,10 +4,7 @@
 	});
 </script>	   
 <div id="pick-item-dialog" title="Pick item" style="padding: 10px; display: none;" >
-	<%-- 
-	<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.Container" form="fulfillItem"/>
-	--%>
-	
+
 	<a href="top"></a>
 	
 	<g:if test="${message}">
@@ -15,32 +12,6 @@
 			${message}
 		</div>
 	</g:if>	
-	<%-- 
-	<div class="head" >
-		<table>
-			<tr>
-				<td class="left">
-					<g:if test="${previousRequestItem }">
-						<g:link action="fulfillRequest" event="showPickDialog" params="['requestItem.id':requestItem?.id, 'direction':'previous']">
-							<img src="${resource(dir: 'images/icons/silk', file: 'arrow_left.png') }" style="vertical-align: middle;"/>
-							<warehouse:message code="requestItem.previous.label"/>
-						</g:link>
-						<span class="fade">${previousRequestItem?.description }</span>
-					</g:if>
-				</td>
-				<td class="right">
-					<g:if test="${nextRequestItem }">
-						<span class="fade">${nextRequestItem?.description }</span>
-						<g:link action="fulfillRequest" event="showPickDialog" params="['requestItem.id':requestItem?.id, 'direction':'next']">						
-							<warehouse:message code="requestItem.next.label"/>
-							<img src="${resource(dir: 'images/icons/silk', file: 'arrow_right.png') }" style="vertical-align: middle"/>
-						</g:link>
-					</g:if>
-				</td>			
-			</tr>		
-		</table>		
-	</div>	
-	--%>
 	<g:form name="fulfillItem" action="fulfillRequest">
 		<g:hiddenField name="fulfillment.request.id" value="${requestItem?.request?.id }"/>
 		<div class="dialog">
@@ -69,17 +40,6 @@
 							<label><warehouse:message code="fulfillmentItem.available.label"/></label>
 						</td>
 						<td class="value">			
-							<%-- 
-							<div id="searchbox">
-								Search: 
-								<!--  oncomplete="showSpinner(false);" onloading="showSpinner(true);" -->
-								<g:remoteField name="search" paramName="term" update="searchResults" url="[controller:'json', action:'searchProductByName']">
-								</g:remoteField>
-							</div>
-							<div id="searchResults">
-								Results:
-							</div>
-							--%>
 							<div style="height: 200px; overflow: auto" id="fulfillProduct">
 							
 								<g:if test="${product }">

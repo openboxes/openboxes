@@ -4,21 +4,11 @@
 					<td valign="top" class="value">
 						<format:product product="${item?.product}"/>
 						<g:hiddenField id="productId" name="product.id" value="${item?.product?.id }"/>
-						<%-- 
-						<g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName" 
-							width="300" valueId="${item?.product?.id}" valueName="${format.product(product:item?.product}"/>	
-						<g:link controller="product" action="create" target="_blank"><span class="small"><warehouse:message code="product.add.label"/></span></g:link>											
-						--%>
 					</td>
 				</tr>
 				<tr class="prop">
 					<td valign="top" class="name"><label><warehouse:message code="inventoryItem.lotNumber.label" /></label></td>                            
 					<td valign="top" class="value">
-						<%-- <g:textField id="lotNumber" name="lotNumber" width="200" value="${item?.lotNumber}"/>--%>
-						<%-- 
-						<g:autoSuggestString id="lotNumber" name="lotNumber" jsonUrl="${request.contextPath }/json/findLotsByName?productId=${item?.product?.id }" 
-							width="200" value="${item?.lotNumber}" styleClass="text"/> 
-						--%>
 						${item?.lotNumber }
 						<g:hiddenField id="lotNumber" name="lotNumber" value="${item?.lotNumber }"/>
 					</td>
@@ -38,8 +28,7 @@
 						<img src="${resource(dir: 'images/icons/silk', file: 'reload.png')}" style="vertical-align: middle;" class="refresh"/>
 					</td>
 				</tr>  	        
-				
-				
+
 				<tr class="prop">
 					<td valign="top" class="name"><label><warehouse:message code="default.quantity.label" /></label></td>                            
 					<td valign="top" class="value">
@@ -59,10 +48,6 @@
 						<div class="buttons left">
 							<g:if test="${itemToEdit}">
 								<g:submitButton name="updateItem" value="${warehouse.message(code:'shipping.saveItem.label')}"></g:submitButton>
-								
-								<%-- 
-								<g:submitButton name="deleteItem" value="${warehouse.message(code:'shipping.removeItem.label')}" onclick="return confirm('${warehouse.message(code:'shipping.confirm.deleteItem.message')}')"></g:submitButton>
-								--%>
 							</g:if>
 							<g:else>
 								<g:submitButton name="saveItem" value="${warehouse.message(code:'shipping.saveItem.label')}"></g:submitButton>
@@ -84,7 +69,6 @@
 							$("#quantity-on-hand").html("refreshing ...");
 							updateQuantityOnHand();
 						});
-
 
 						$("#quantity").livequery(function(){
 							$(this).blur(function(event) {					

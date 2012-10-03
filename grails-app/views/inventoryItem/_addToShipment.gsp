@@ -54,10 +54,6 @@
 												</optgroup>
 											</g:each>
 										</select>
-										<%--
-										<g:autoSuggestEditable id="shipment-${itemInstance?.id}" name="shipment" jsonUrl="${request.contextPath }/json/findShipmentByName" 
-											width="200" valueId="" valueName=""/>							
-										 --%>
 									</td>
 								</tr>
 								<tr class="prop">

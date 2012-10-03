@@ -167,14 +167,16 @@ class Product implements Comparable, Serializable {
 		if (ShipmentItem.findByProduct(this)) { return true }
 		return false
 	}
-	
-	int hashcode() {
+
+    @Override
+	int hashCode() {
 		if (this.id != null) {
 			return this.id.hashCode();
 		}
 		return super.hashCode();
 	}
-	
+
+    @Override
 	boolean equals(Object o) {
 		if (o instanceof Product) {
 			Product that = (Product)o;

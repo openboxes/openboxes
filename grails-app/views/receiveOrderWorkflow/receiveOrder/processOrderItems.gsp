@@ -24,7 +24,7 @@
 			</div>
 		</g:hasErrors>
 				
-		<g:form action="receiveOrder" autocomplete="false">
+		<g:form action="receiveOrder" autocomplete="off">
 			<div class="dialog">
 				<fieldset>
 					<g:render template="../order/summary" model="[orderInstance:order]"/>
@@ -32,12 +32,6 @@
 					<table>
 						<tr>
 							<td style="padding: 0px;">
-								<%-- 
-								<div style="margin: 10px">
-									<p><warehouse:message code="order.itemsInOrder.message" args="[(orderCommand?.orderItems) ? orderCommand?.orderItems?.size() : 0 ]"/></p>
-								</div>							
-								--%>
-							
 								<div>
 									<g:hiddenField name="order.id" value="${orderCommand?.order?.id }"/>
 									<g:hiddenField name="shipmentType.id" value="${orderCommand?.shipmentType?.id }"/>
@@ -123,39 +117,8 @@
 																		<input type="image" src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="add" class="btnAdd" style="vertical-align: middle"/>
 																	</span>
 																</g:if>
-																<%-- 
-																<g:link controller="order" action="addOrderShipment" id="${orderCommand?.order?.id }" params="[index: i]" class="checkable" fragment="orderItems${i }">
-																	<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="add" style="vertical-align: middle"/>
-																</g:link>
-																&nbsp;
-																<g:if test="${!orderItem?.primary }">
-																	<g:link controller="order" action="removeOrderShipment" id="${orderItem?.orderItem?.id }" params="[index: i]" class="checkable" fragment="orderItems${i }">
-																		<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="tag" style="vertical-align: middle"/>
-																	</g:link>
-																</g:if> 
-																--%>
 															</td>
 														</tr>
-														<%-- 
-														<g:each in="${orderItem?.orderItem?.shipmentItems()}" var="shipmentItem">
-															<tr class="shipmentItem">
-																<td colspan="5">
-																</td>
-																<td class="center" style="border-left: 1px solid lightgrey;">
-																
-																	${shipmentItem?.quantity }
-																</td>
-																<td>
-																	${shipmentItem?.product?.name }
-																</td>
-																<td class="center">
-																	${shipmentItem?.lotNumber }
-																</td>
-																<td>																
-																</td>		
-															</tr>												
-														</g:each>
-														--%>
 														<g:set var="i" value="${i+1 }"/>
 													</g:each>
 												</g:each>
@@ -188,7 +151,6 @@
 	<script>
 	var changed = false;
 	var currentIndex = $("#orderItemsTable tbody tr.orderItem").length;
-
 
 	function selectCombo(comboBoxElem, value) {
 		if (comboBoxElem != null) {
@@ -224,10 +186,6 @@
  		  				OrderItemId: orderItemId.val(), Template: '#new-item-template' };
 		currentRow.after($(item.Template).tmpl(item));	
 		$("#orderItemsTable").alternateRowColors();
-		//var productSelect = $("#productReceived-" + index);
-		//console.log(productSelect);
-		//selectCombo(productSelect, productId );
-		
 	});
 
 	$(document).ready(function() {
@@ -291,17 +249,6 @@
 	</script>    	  
 	<script language="javascript">
 		$(document).ready(function() {
-			/*
-			$(".autocomplete").live({
-				click: function() {
-					$(this).trigger("focus");
-				},
-				blur: function() {
-					var text = $(this).val();
-				}				
-			});
-			*/
-
 			$(".autocomplete").livequery(function() {
 				$(this).autocomplete({
 					width: '200px',
@@ -343,6 +290,5 @@
 		});
 	</script>	
 	  
-	
 </body>
 </html>
