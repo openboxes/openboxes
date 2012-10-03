@@ -35,7 +35,7 @@
 	</div>
 </g:if>				
 <g:else>
-	<div class="action-menu-item">
+	<div class="action-menu-item"  id="addItemToUnpackedItems">
 		<g:link action="createShipment" event="addItemToShipment">
 			<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add an item" style="vertical-align: middle"/>&nbsp;
 			<warehouse:message code="shipping.addAnItemToUnpackedItems.label"/>
