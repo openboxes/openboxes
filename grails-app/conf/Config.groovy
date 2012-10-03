@@ -8,6 +8,7 @@
 * You must not remove this notice, or any other, from this software.
 **/ 
 import grails.util.GrailsUtil
+import org.apache.log4j.AsyncAppender
 import org.apache.log4j.Level
 import org.apache.log4j.net.SMTPAppender
 
@@ -127,6 +128,8 @@ environments {
 log4j = {
 	
 	System.setProperty 'mail.smtp.port', mail.error.port.toString()
+    System.setProperty 'mail.smtp.connectiontimeout', "5000"
+    System.setProperty 'mail.smtp.timeout', "5000"
 	System.setProperty 'mail.smtp.starttls.enable', mail.error.starttls.toString()
 	
 	// Example of changing the log pattern for the default console    
@@ -134,19 +137,28 @@ log4j = {
 		//console name:'stdout', layout:pattern(conversionPattern: '%p - %C{1}.%M(%L) |%d{ISO8601}| %m%n')		
 		//console name:'stdout', layout:pattern(conversionPattern: '%p %d{ISO8601} %c{4} %m%n')		
 		console name:'stdout', layout:pattern(conversionPattern: '%p %X{sessionId} %d{ISO8601} [%c{1}] %m%n')
-		
-		appender new SMTPAppender(
-			name: 'smtp', 
-			to: mail.error.to, 
-			from: mail.error.from,
-			subject: mail.error.subject, 
-			threshold: Level.ERROR,
-			SMTPHost: mail.error.server, 
-			SMTPUsername: mail.error.username,
-			SMTPDebug: mail.error.debug.toString(), 
-			SMTPPassword: mail.error.password,
-			layout: pattern(conversionPattern:
-			   '%d{[dd.MM.yyyy HH:mm:ss.SSS]} [%t] %n%-5p %X{sessionId} %n%c %n%C %n %x %n %m%n'))
+
+        def smtpAppender = new SMTPAppender(
+                name: 'smtp',
+                to: mail.error.to,
+                from: mail.error.from,
+                subject: mail.error.subject,
+                threshold: Level.ERROR,
+                SMTPHost: mail.error.server,
+                SMTPUsername: mail.error.username,
+                SMTPDebug: mail.error.debug.toString(),
+                SMTPPassword: mail.error.password,
+                layout: pattern(conversionPattern:
+                        '%d{[dd.MM.yyyy HH:mm:ss.SSS]} [%t] %n%-5p %X{sessionId} %n%c %n%C %n %x %n %m%n'))
+        appender smtpAppender
+
+        def asyncAppender = new AsyncAppender(
+                name: 'async',
+                bufferSize: 500,
+        )
+        asyncAppender.addAppender(smtpAppender)
+        appender asyncAppender
+
 	}
 			
 	error	'org.hibernate.engine.StatefulPersistenceContext.ProxyWarnLog',
@@ -184,7 +196,7 @@ log4j = {
 	debug 	'org.apache.cxf'		
 	
 	root {
-		error 'stdout', 'smtp'
+		error 'stdout', 'async'
 		additivity = true
 	 }
 			
