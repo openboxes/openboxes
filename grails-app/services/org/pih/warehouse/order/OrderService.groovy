@@ -155,14 +155,12 @@ class OrderService {
 			log.info("Errors with shipment " + shipmentInstance?.errors)
 			throw new ShipmentException(message: "Validation errors on shipment ", shipment: shipmentInstance)
 		}
-		
-		
-		
+
 		// Send shipment, receive shipment, and add 
 		if (shipmentInstance) { 
 			// Send shipment 
 			log.info "Sending shipment " + shipmentInstance?.name
-			shipmentService.sendShipment(shipmentInstance, "", orderCommand?.currentUser, orderCommand?.currentLocation, orderCommand?.shippedOn, [] as Set);
+			shipmentService.sendShipment(shipmentInstance, "", orderCommand?.currentUser, orderCommand?.currentLocation, orderCommand?.shippedOn);
 						
 			// Receive shipment
 			log.info "Receiving shipment " + shipmentInstance?.name
@@ -171,7 +169,7 @@ class OrderService {
 			// FIXME 
 			// receiptInstance.validate() && !receiptInstance.hasErrors()
 			if (!receiptInstance.hasErrors() && receiptInstance.save()) { 
-				shipmentService.receiveShipment(shipmentInstance, "", orderCommand?.currentUser, orderCommand?.currentLocation);
+				shipmentService.receiveShipment(shipmentInstance, "", orderCommand?.currentUser, orderCommand?.currentLocation, true);
 			}
 			else { 
 				throw new ShipmentException(message: "Unable to save receipt ", shipment: shipmentInstance)
