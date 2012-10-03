@@ -3,6 +3,8 @@ package org.pih.warehouse.pages
 import geb.Page
 import testutils.Settings
 
+import org.pih.warehouse.modules.AddItemToShipmentModule
+
 class EditPackingListPage extends Page{
     static url = {Settings.BaseUrl + "/createShipmentWorkflow/createShipment"}
     static at = { title == "Add shipment items"}
@@ -12,6 +14,6 @@ class EditPackingListPage extends Page{
         addItemToUnpackedItemsLink{$("div.addItemToUnpackedItems a")}
         addPalletToShipmentLink{$("div.addPalletToShipment a")}
         addCrateToShipmentLink{$"div.addCrateToShipment a"}
-
+        addItemToShipment{module AddItemToShipmentModule}
     }
 }

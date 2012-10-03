@@ -4,10 +4,12 @@ import geb.Page
 import testutils.Settings
 
 class SendShipmentPage extends  Page{
-      static url = {Settings.BaseUrl + "/createShipmentWorkflow/createShipment"}
-    static at = { title == "find the right title"}
+    static url = {Settings.BaseUrl + "/createShipmentWorkflow/createShipment"}
+    static at = { title == "Send Shipment"}
     static content = {
-        //saveButton(to: SendShipmentPage){$("button", name:"_eventId_save")}
+        nextButton(to: ViewShipmentPage){$("button", name:"_eventId_next")}
+        actualShippingDate{$("input",name:"actualShippingDate")}
+
 
     }
 }

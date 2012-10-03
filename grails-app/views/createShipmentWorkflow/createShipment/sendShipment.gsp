@@ -3,7 +3,7 @@
     <head>
          <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
          <meta name="layout" content="custom" />
-         <title><warehouse:message code="shipping.enterTrackingDetails.label"/></title>         
+         <title><warehouse:message code="shipping.sendShipment.label"/></title>
          <style>
          	.top-border { border-top: 2px solid lightgrey; }
          	.right-border { border-right: 2px solid lightgrey; }
