@@ -35,7 +35,7 @@ class DbHelper {
         user
     }
 
-    static InventoryItem CreateProductInInventory(String productName, int quantity) {
+    static InventoryItem CreateProductInInventory(productName, quantity) {
         Product product = new Product()
         product.name = productName
         product.category = Category.findByName("Medicines")

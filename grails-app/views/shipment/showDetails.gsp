@@ -33,7 +33,7 @@
 									<td valign="top" class="name">
 										<label><warehouse:message code="default.status.label" /></label>
 									</td>
-									<td valign="top">
+									<td valign="top" id="shipmentStatus">
 										<format:metadata obj="${shipmentInstance?.status.code}"/>
 										<%-- 
 										<span>
@@ -60,7 +60,7 @@
 										</g:else>
 									</td>
 									<td valign="top" >
-										<span class="location">
+										<span class="location" id="shipmentOrigin">
 											${fieldValue(bean: shipmentInstance, field: "origin.name")}									
 										</span>
 										<%-- 
@@ -82,7 +82,7 @@
 										</g:else>
 									</td>
 									<td>
-										<span>
+										<span  id="shipmentDestination">
 											${fieldValue(bean: shipmentInstance, field: "destination.name")}
 										</span>					
 										<%-- 						
@@ -530,25 +530,25 @@
 												<g:each var="shipmentItem" in="${shipmentItems}" status="i">
 													<g:set var="rowspan" value="${shipmentItemsByContainer[shipmentItem?.container]?.size() }"/>												
 													<g:set var="newContainer" value="${previousContainer != shipmentItem?.container }"/>
-													<tr class="${(count++ % 2 == 0)?'odd':'even'} ${newContainer?'newContainer':''}">
+													<tr class="${(count++ % 2 == 0)?'odd':'even'} ${newContainer?'newContainer':''} shipmentItem">
 														<g:if test="${newContainer }">
 															<td class="container top left" style="width: 25%" rowspan="${rowspan }">
 																<g:render template="container" model="[container:shipmentItem?.container]"/>
 															</td>
 														</g:if>												
 																											
-														<td>
+														<td class="product">
 															<g:link controller="inventoryItem" action="showStockCard" id="${shipmentItem?.product?.id}">
 																<format:product product="${shipmentItem?.product}"/>
 															</g:link>
 														</td>
-														<td class="center">
+														<td class="center lotNumber">
 															${shipmentItem?.inventoryItem?.lotNumber}
 														</td>
-														<td class="center">
+														<td class="center expirationDate">
 															<g:formatDate date="${shipmentItem?.inventoryItem?.expirationDate}" format="MMM yyyy"/>
 														</td>
-														<td class="center">
+														<td class="center quantity">
 															<g:formatNumber number="${shipmentItem?.quantity}" format="###,##0" />
 														</td>
 														<g:if test="${shipmentInstance?.wasReceived()}">
@@ -565,7 +565,7 @@
 														<td class="center">
 															${shipmentItem?.recipient?.name}
 														</td>
-														<td class="left">
+														<td class="left" >
 															${shipmentItem?.receiptItem?.comment}
 														</td>
 														

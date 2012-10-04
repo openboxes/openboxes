@@ -1,5 +1,5 @@
 
-	<table style="width: 0%">
+	<table style="width: 0%" id="shipmentSummary">
 		<tbody>			
 			<tr>
 				<td>
@@ -32,7 +32,7 @@
 								<label>${format.metadata(obj:shipmentInstance?.shipmentType)}</label> 
 							</span>
 						</g:if>
-						<g:if test="${shipmentInstance?.status?.code }"
+						<g:if test="${shipmentInstance?.status?.code }">
 							<span class="status">
 								<warehouse:message code="shipping.status.label"/>:
 								<label><format:metadata obj="${shipmentInstance?.status?.code}"/></label>
