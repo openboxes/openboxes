@@ -45,6 +45,7 @@ grails.project.dependency.resolution = {
 
         test "org.codehaus.geb:geb-spock:0.6.3"
 		test 'org.seleniumhq.selenium:selenium-firefox-driver:2.25.0'
+//        test 'org.seleniumhq.selenium:selenium-htmlunit-driver:2.25.0'
 		test 'org.seleniumhq.selenium:selenium-chrome-driver:2.25.0'
 		test 'org.seleniumhq.selenium:selenium-ie-driver:2.25.0'
         test 'org.seleniumhq.selenium:selenium-support:2.25.0'

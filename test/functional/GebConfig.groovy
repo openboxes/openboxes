@@ -13,3 +13,6 @@ import org.openqa.selenium.firefox.FirefoxDriver
 
 driver = { new FirefoxDriver() }
 
+//import org.openqa.selenium.htmlunit.HtmlUnitDriver
+//driver = { new HtmlUnitDriver(true)}
+
