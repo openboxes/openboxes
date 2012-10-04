@@ -1026,8 +1026,8 @@ class ShipmentController {
 	def addToShipmentPost = { ItemListCommand command -> 
 		
 		println "add to shipment post " + params.shipmentContainerKey
-		
-		if (!params?.shipmentContainerKey) { 
+
+		if (!params?.shipmentContainerKey) {
 			command.errors.rejectValue("items", "addToShipment.container.invalid")
 			render(view: "addToShipment", model: [commandInstance: command])
 			return;
@@ -1049,15 +1049,13 @@ class ShipmentController {
 			   it.shipment = shipment
 			   it.container = container
 		   }
-	
 
 			try { 
 				boolean atLeastOneUpdate = shipmentService.addToShipment(command);
 				if (atLeastOneUpdate) { 
-					flash.message = "${warehouse.message(code: 'shipping.shipmentItemsHaveBeenAdded.message')}"
-					redirect(controller:"createShipmentWorkflow", action: "createShipment", 
-						id: shipment.id, params: ["skipTo":"Packing","containerId":container.id])
-					
+				    flash.message = "${warehouse.message(code: 'shipping.shipmentItemsHaveBeenAdded.message')}"
+                    redirect(controller:"createShipmentWorkflow", action: "createShipment",
+                            id: shipment.id, params: ["skipTo":"Packing", "containerId":container?.id])
 					return;
 				}
 				else { 
@@ -1074,11 +1072,8 @@ class ShipmentController {
 			}
 		}
 		
-		redirect(controller: "inventory", action: "browse")	
-		
+		redirect(controller: "inventory", action: "browse")
 	}
-	
-	
 }
 
 class ReceiveShipmentCommand implements Serializable {
