@@ -114,7 +114,7 @@
 					<g:if test="${commandInstance.totalQuantity < 0}">
 						<g:set var="styleClass" value="color: red;"/>																	
 					</g:if>														
-					<span style="${styleClass }">${g.formatNumber(number: commandInstance.totalQuantity, format: '###,###,###') }</span> 
+					<span style="${styleClass }" id="totalQuantity">${g.formatNumber(number: commandInstance.totalQuantity, format: '###,###,###') }</span>
 				</span>
 			</td>
 			<g:hasErrors bean="${flash.itemInstance}">

@@ -4,11 +4,12 @@ import geb.spock.GebReportingSpec
 import testutils.PageNavigator
 import org.pih.warehouse.pages.ProductPage
 import org.pih.warehouse.pages.InventoryPage
+import org.pih.warehouse.pages.ShowStockCardPage
 
 
 
 class ProductSpec extends GebReportingSpec{
-    def "should create a new product"(){
+    def "should create a new product and a inventory item"(){
         given:
             PageNavigator.UserLoginedAsManagerForBoston()
         and:
@@ -22,7 +23,7 @@ class ProductSpec extends GebReportingSpec{
 
         and:
             saveButton.click()
-        then:
+        and:
             at InventoryPage
             productName == product_name
             productCategory.contains("Supplies")
@@ -30,6 +31,19 @@ class ProductSpec extends GebReportingSpec{
             manufacturer == "Xemon"
             manufacturerCode == "ABC"
 
+        and:
+            lotNumber.value("47")
+            expires.click()
+            datePicker.tomorrow.click()
+            newQuantity.click()
+            newQuantity.value(7963)
+            //Thread.sleep(10000)
+            saveInventoryItem.click()
+
+        then:
+           at ShowStockCardPage
+           totalQuantity == "7,963"
+           productName == product_name
     }
 
      def product_name = "TestProd" + UUID.randomUUID().toString()[0..5]

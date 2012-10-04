@@ -82,7 +82,7 @@
 			
 		</div>												
 		<div class="center buttons">		
-			<button name="save" type="submit" class="positive">
+			<button name="save" type="submit" class="positive" id="saveInventoryItem">
 				<img src="${createLinkTo(dir:'images/icons/silk', file:'accept.png') }"/>&nbsp;<warehouse:message code="default.button.save.label"/>&nbsp;
 			</button>
 			&nbsp;
@@ -219,7 +219,7 @@
 				buttonImageOnly: true, 
 				changeMonth: true,
 				changeYear: true,
-				buttonImage: '${request.contextPath }/images/icons/silk/calendar.png',
+				buttonImage: '${request.contextPath }/images/icons/silk/calendar.png'
 			});								
 		});
 		
