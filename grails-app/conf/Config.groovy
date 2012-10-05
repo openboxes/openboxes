@@ -163,9 +163,10 @@ log4j = {
 	}
 			
 	error	'org.hibernate.engine.StatefulPersistenceContext.ProxyWarnLog',
-            'org.hibernate.impl.SessionFactoryObjectFactory'  // We get some annoying stack trace when cleaning this class up after functional tests
-	
-	
+            'org.hibernate.impl.SessionFactoryObjectFactory',  // We get some annoying stack trace when cleaning this class up after functional tests
+            'com.gargoylesoftware.htmlunit.DefaultCssErrorHandler',
+            'com.gargoylesoftware.htmlunit.IncorrectnessListenerImpl'
+
 	warn	'org.mortbay.log',
 		'org.codehaus.groovy.grails.web.pages',			// GSP		
 		'org.codehaus.groovy.grails.web.servlet',		// controllers
@@ -192,9 +193,12 @@ log4j = {
 		'grails.app.service',
 		'grails.app.task',
 		'BootStrap',
-		'liquibase'
+		'liquibase',
+         'com.gargoylesoftware.htmlunit'
 
-	debug 	'org.apache.cxf'		
+	debug 	'org.apache.cxf',
+            //'org.apache.http.wire',          // shows traffic between htmlunit and server
+            //'com.gargoylesoftware.htmlunit'
 	
 	root {
 		error 'stdout', 'async'

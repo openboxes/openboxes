@@ -9,10 +9,15 @@
 **/ 
 
 import org.openqa.selenium.firefox.FirefoxDriver
-
-
 driver = { new FirefoxDriver() }
 
 //import org.openqa.selenium.htmlunit.HtmlUnitDriver
-//driver = { new HtmlUnitDriver(true)}
-
+//import org.openqa.selenium.remote.DesiredCapabilities
+//
+//driver = {
+//    def capabilities = DesiredCapabilities.htmlUnit()
+//    capabilities.javascriptEnabled = true
+//    capabilities.browserName = "firefox"
+//    return new HtmlUnitDriver(capabilities)
+//}
+//
