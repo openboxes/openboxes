@@ -138,27 +138,28 @@ log4j = {
 		//console name:'stdout', layout:pattern(conversionPattern: '%p %d{ISO8601} %c{4} %m%n')		
 		console name:'stdout', layout:pattern(conversionPattern: '%p %X{sessionId} %d{ISO8601} [%c{1}] %m%n')
 
-        def smtpAppender = new SMTPAppender(
-                name: 'smtp',
-                to: mail.error.to,
-                from: mail.error.from,
-                subject: mail.error.subject,
-                threshold: Level.ERROR,
-                SMTPHost: mail.error.server,
-                SMTPUsername: mail.error.username,
-                SMTPDebug: mail.error.debug.toString(),
-                SMTPPassword: mail.error.password,
-                layout: pattern(conversionPattern:
-                        '%d{[dd.MM.yyyy HH:mm:ss.SSS]} [%t] %n%-5p %X{sessionId} %n%c %n%C %n %x %n %m%n'))
-        appender smtpAppender
+        if (Boolean.parseBoolean(grails.mail.enabled)) {
+            def smtpAppender = new SMTPAppender(
+                    name: 'smtp',
+                    to: mail.error.to,
+                    from: mail.error.from,
+                    subject: mail.error.subject,
+                    threshold: Level.ERROR,
+                    SMTPHost: mail.error.server,
+                    SMTPUsername: mail.error.username,
+                    SMTPDebug: mail.error.debug.toString(),
+                    SMTPPassword: mail.error.password,
+                    layout: pattern(conversionPattern:
+                            '%d{[dd.MM.yyyy HH:mm:ss.SSS]} [%t] %n%-5p %X{sessionId} %n%c %n%C %n %x %n %m%n'))
+            appender smtpAppender
 
-        def asyncAppender = new AsyncAppender(
-                name: 'async',
-                bufferSize: 500,
-        )
-        asyncAppender.addAppender(smtpAppender)
-        appender asyncAppender
-
+            def asyncAppender = new AsyncAppender(
+                    name: 'async',
+                    bufferSize: 500,
+            )
+            asyncAppender.addAppender(smtpAppender)
+            appender asyncAppender
+        }
 	}
 			
 	error	'org.hibernate.engine.StatefulPersistenceContext.ProxyWarnLog',
