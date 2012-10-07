@@ -55,10 +55,10 @@ class ShipmentItem implements Comparable, Serializable {
 	//static belongsTo = [ container : Container ] // + shipment : Shipment
 	static constraints = {
 		container(nullable:true)
-		product(blank:false, nullable:false)  // TODO: this doesn't seem to prevent the product field from being empty
+		product(nullable:false)  // TODO: this doesn't seem to prevent the product field from being empty
 		lotNumber(nullable:true, maxSize: 255)
 		expirationDate(nullable:true)
-		quantity(min:0, blank:false, range: 0..2147483646)
+		quantity(min:0, range: 0..2147483646)
 		recipient(nullable:true)
 		inventoryItem(nullable:true)
 		receiptItem(nullable:true)

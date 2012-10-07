@@ -41,8 +41,8 @@ class ShipmentWorkflow implements Serializable {
 		shipmentType(nullable:false, unique:true)  // for now, we are only allowing one workflow per shipment type, though we may want to change this
 		excludedFields(nullable:true, maxSize: 255)
 		documentTemplate(nullable:true, maxSize: 255)
-		dateCreated(blank:true)
-		lastUpdated(blank:true)
+		dateCreated(nullable:true)
+		lastUpdated(nullable:true)
 		
 		// a shipment workflow can't have two identical reference number types
 		referenceNumberTypes ( validator: { referenceNumberTypes ->
