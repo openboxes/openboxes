@@ -42,7 +42,8 @@ grails.project.dependency.resolution = {
         compile 'com.google.zxing:javase:2.0'
         compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.5.2') { excludes "xercesImpl", "groovy",  "commons-lang", "commons-codec" }
         compile 'org.apache.commons:commons-email:1.2'
-
+		compile 'net.sourceforge.openutils:openutils-log4j:2.0.5'
+		
         test "org.codehaus.geb:geb-spock:0.6.3"
 		test 'org.seleniumhq.selenium:selenium-firefox-driver:2.25.0'
         test ('net.sourceforge.htmlunit:htmlunit:2.10') { excludes "xml-apis" }
@@ -52,8 +53,6 @@ grails.project.dependency.resolution = {
         test 'org.seleniumhq.selenium:selenium-support:2.25.0'
 	}
 	plugins {
-
-
         runtime( ':constraints:0.6.0' )
         runtime( ':jquery-validation:1.7.3' ) {
             excludes ([ name: 'constraints'])
@@ -73,10 +72,5 @@ grails.project.dependency.resolution = {
         runtime (':hibernate:1.3.7') { excludes 'antlr' }
 
         test (name:'geb', version:'0.6.3')
-
-
 	}
-
-
-
 }
