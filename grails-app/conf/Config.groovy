@@ -7,17 +7,20 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
+import it.openutils.log4j.AlternateSMTPAppender;
 import grails.util.GrailsUtil
 import org.apache.log4j.AsyncAppender
 import org.apache.log4j.Level
 import org.apache.log4j.net.SMTPAppender
+import org.pih.warehouse.log4j.net.DynamicSubjectSMTPAppender
+
 
 // Locations to search for config files that get merged into the main config
 // config files can either be Java properties files or ConfigSlurper scripts
 grails.config.locations = [ 
 	//"classpath:${appName}-config.groovy",
 	//"classpath:${appName}-config.properties",
-	//"file:${userHome}/.grails/${appName}-config.groovy",
+	"file:${userHome}/.grails/${appName}-config.groovy",
 	"file:${userHome}/.grails/${appName}-config.properties"
 ]
 println "Using configuration locations ${grails.config.locations} [${GrailsUtil.environment}]"
@@ -85,12 +88,12 @@ grails.validateable.packages = [
 	'org.pih.warehouse.shipment',
 ]
 
-/* Mail properties */
+/* Default settings for emails sent through the SMTP appender  */
 mail.error.server = 'localhost'
 mail.error.port = 25
 mail.error.from = 'openboxes@pih.org'
 mail.error.to = 'jmiranda@pih.org'
-mail.error.subject = '[OpenBoxes][' + GrailsUtil.environment + '] ERROR'
+mail.error.subject = '[OpenBoxes]['+GrailsUtil.environment+']'
 mail.error.debug = false
 
 // set per-environment serverURL stem for creating absolute links
@@ -99,6 +102,7 @@ environments {
 		grails.serverURL = "http://localhost:8080/${appName}";
 		uiperformance.enabled = false
 		grails.mail.enabled = false
+		mail.error.debug = true
 	}
 	test {  
 		grails.serverURL = "http://localhost:8080/${appName}"  
@@ -130,7 +134,9 @@ log4j = {
 	System.setProperty 'mail.smtp.port', mail.error.port.toString()
     System.setProperty 'mail.smtp.connectiontimeout', "5000"
     System.setProperty 'mail.smtp.timeout', "5000"
-	System.setProperty 'mail.smtp.starttls.enable', mail.error.starttls.toString()
+	
+    if (mail.error.starttls)
+		System.setProperty 'mail.smtp.starttls.enable', mail.error.starttls.toString()
 	
 	// Example of changing the log pattern for the default console    
 	appenders {
@@ -138,20 +144,66 @@ log4j = {
 		//console name:'stdout', layout:pattern(conversionPattern: '%p %d{ISO8601} %c{4} %m%n')		
 		console name:'stdout', layout:pattern(conversionPattern: '%p %X{sessionId} %d{ISO8601} [%c{1}] %m%n')
 
-        if (Boolean.parseBoolean(grails.mail.enabled)) {
-            def smtpAppender = new SMTPAppender(
-                    name: 'smtp',
-                    to: mail.error.to,
-                    from: mail.error.from,
-                    subject: mail.error.subject,
-                    threshold: Level.ERROR,
-                    SMTPHost: mail.error.server,
-                    SMTPUsername: mail.error.username,
-                    SMTPDebug: mail.error.debug.toString(),
-                    SMTPPassword: mail.error.password,
-                    layout: pattern(conversionPattern:
-                            '%d{[dd.MM.yyyy HH:mm:ss.SSS]} [%t] %n%-5p %X{sessionId} %n%c %n%C %n %x %n %m%n'))
-            appender smtpAppender
+		println "grails.mail.enabled: '${grails.mail.enabled.toString()}'"
+		println "mail.error.server: '${mail.error.server}'"
+		println "mail.error.username: '${mail.error.username}'"
+		println "mail.error.password: '${mail.error.password}'"
+
+        if (Boolean.parseBoolean(grails.mail.enabled.toString())) {
+	       
+			
+	        def smtpAppender
+
+			// The 'alternate' appender is the best, but only works on localhost w/o authentication 
+			if ("alternate".equals(mail.error.appender)&&"localhost".equals(mail.error.server)) {
+				smtpAppender = new AlternateSMTPAppender(
+					name: 'smtp',
+					to: mail.error.to,
+					from: mail.error.from,
+					subject: mail.error.subject + " %m (alternate)",
+					threshold: Level.ERROR,				
+					//SMTPHost: mail.error.server,
+					layout: pattern(conversionPattern:
+					        '%d{[dd.MM.yyyy HH:mm:ss.SSS]}[%t] %nUser: %X{sessionId}%nClass: %c%nMessage: %m%n'))
+			}
+			// The 'dynamic' appender allows configurable subject with authenticated mail (e.g. gmail)
+			else if ("dynamic".equals(mail.error.appender)) { 
+				smtpAppender = new DynamicSubjectSMTPAppender(
+					name: 'smtp',
+					to: mail.error.to,
+					from: mail.error.from,
+					subject: mail.error.subject + " %m (dynamic)",
+					threshold: Level.ERROR,				
+					//SMTPHost: mail.error.server,
+					//SMTPUsername: mail.error.username,
+					//SMTPPassword: mail.error.password,
+					//SMTPDebug: mail.error.debug,
+					layout: pattern(conversionPattern:
+					        '%d{[dd.MM.yyyy HH:mm:ss.SSS]}[%t] %nUser: %X{sessionId}%nClass: %c%nMessage: %m%n'))
+			}			
+			// Default SMTP error appender does not allow configurable subject line 
+			else { 				
+				smtpAppender = new SMTPAppender(
+					name: 'smtp',
+					to: mail.error.to,
+					from: mail.error.from,
+					subject: mail.error.subject + " An error occurred ${new Date()} (default)",
+					threshold: Level.ERROR,
+					//SMTPHost: mail.error.server,
+					//SMTPUsername: mail.error.username,
+					//SMTPDebug: mail.error.debug,
+					//SMTPPassword: mail.error.password,
+					layout: pattern(conversionPattern:
+					        '%d{[dd.MM.yyyy HH:mm:ss.SSS]} [%t] %n%-5p %X{sessionId} %n%c %n%C %n %x %n %m%n'))
+				
+			} 
+			if (mail.error.server) smtpAppender.SMTPHost = mail.error.server
+			if (mail.error.username) smtpAppender.SMTPUsername = mail.error.username
+			if (mail.error.password) smtpAppender.SMTPPassword = mail.error.password
+			if (mail.error.debug) smtpAppender.SMTPDebug = mail.error.debug
+			
+			println smtpAppender.class.name
+        	appender smtpAppender
 
             def asyncAppender = new AsyncAppender(
                     name: 'async',
@@ -161,50 +213,51 @@ log4j = {
             appender asyncAppender
         }
 	}
+	
+	root {
+		error 'stdout', 'async'
+		additivity = false
+	}
 			
+	// We get some annoying stack trace when cleaning this class up after functional tests
 	error	'org.hibernate.engine.StatefulPersistenceContext.ProxyWarnLog',
-            'org.hibernate.impl.SessionFactoryObjectFactory',  // We get some annoying stack trace when cleaning this class up after functional tests
+            'org.hibernate.impl.SessionFactoryObjectFactory',  
             'com.gargoylesoftware.htmlunit.DefaultCssErrorHandler',
             'com.gargoylesoftware.htmlunit.IncorrectnessListenerImpl'
 
 	warn	'org.mortbay.log',
-		'org.codehaus.groovy.grails.web.pages',			// GSP		
-		'org.codehaus.groovy.grails.web.servlet',		// controllers
-		'org.codehaus.groovy.grails.web.sitemesh',		// layouts
-		'org.codehaus.groovy.grails.web.mapping.filter',	// URL mapping
-		'org.codehaus.groovy.grails.web.mapping', 		// URL mapping
-		'org.codehaus.groovy.grails.commons', 			// core / classloading
-		'org.codehaus.groovy.grails.plugins',			// plugins
-		'org.codehaus.groovy.grails.orm.hibernate', 		// hibernate integration
-		'org.docx4j',
-		'org.apache.http.headers',
-		'org.apache.ddlutils',
-		'org.apache.http.wire',
-		'net.sf.ehcache.hibernate'
+			'org.codehaus.groovy.grails.web.pages',			// GSP		
+			'org.codehaus.groovy.grails.web.servlet',		// controllers
+			'org.codehaus.groovy.grails.web.sitemesh',		// layouts
+			'org.codehaus.groovy.grails.web.mapping.filter',	// URL mapping
+			'org.codehaus.groovy.grails.web.mapping', 		// URL mapping
+			'org.codehaus.groovy.grails.commons', 			// core / classloading
+			'org.codehaus.groovy.grails.plugins',			// plugins
+			'org.codehaus.groovy.grails.orm.hibernate', 		// hibernate integration
+			'org.docx4j',
+			'org.apache.http.headers',
+			'org.apache.ddlutils',
+			'org.apache.http.wire',
+			'net.sf.ehcache.hibernate'
 		
 	info	'org.liquibase', 	
-		'grails.app.controller',
-		'com.mchange',
-		'org.springframework',
-		'org.hibernate',
-		'org.pih.warehouse',
-		'grails.app',
-		'grails.app.bootstrap',
-		'grails.app.service',
-		'grails.app.task',
-		'BootStrap',
-		'liquibase',
-         'com.gargoylesoftware.htmlunit'
+			'grails.app.controller',
+			'com.mchange',
+			'org.springframework',
+			'org.hibernate',
+			'org.pih.warehouse',
+			'grails.app',
+			'grails.app.bootstrap',
+			'grails.app.service',
+			'grails.app.task',
+			'BootStrap',
+			'liquibase',
+			'com.gargoylesoftware.htmlunit'
 
-	debug 	'org.apache.cxf',
+	debug 	'org.apache.cxf'
             //'org.apache.http.wire',          // shows traffic between htmlunit and server
             //'com.gargoylesoftware.htmlunit'
-	
-	root {
-		error 'stdout', 'async'
-		additivity = true
-	 }
-			
+
 }
 
 // Added by the JQuery Validation plugin:
