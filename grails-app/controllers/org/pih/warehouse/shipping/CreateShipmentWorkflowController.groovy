@@ -374,15 +374,16 @@ class CreateShipmentWorkflowController {
 					if ("POST".equalsIgnoreCase(request.getMethod())) {						
 						// create the list of email recipients
 						def emailRecipients = new HashSet()
-						if (params.emailRecipientId) { 
-						params.emailRecipientId?.each {
-								def recipient = Person.get(it)
-								if (recipient && recipient.email) {  
-									emailRecipients.add(recipient)  
-								}
+						if (params.emailRecipientId) {
+							def recipientIds = params.list("emailRecipientId")
+							recipientIds.each { recipientId ->
+								def recipient = Person.get(recipientId)
+								if (recipient && recipient.email)
+									emailRecipients.add(recipient)
 							}
+							println "Recipients: " + emailRecipients
 						}
-						
+										
 						try {
 							// send the shipment
 							shipmentService.sendShipment(shipmentInstance, command.comments, session.user, session.warehouse,
