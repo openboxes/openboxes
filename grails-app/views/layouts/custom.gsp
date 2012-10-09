@@ -44,7 +44,11 @@
 	<script src="${createLinkTo(dir:'js/jquery.livesearch/', file:'jquery.livesearch.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.hoverIntent/', file:'jquery.hoverIntent.minified.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.tableScroll/', file:'jquery.tablescroll.js')}" type="text/javascript" ></script>
-	<script src="${createLinkTo(dir:'js/jquery.watermark/', file:'jquery.watermark.min.js')}" type="text/javascript" ></script>
+
+    <g:if test="${System.getenv().get('headless') != 'true'}">
+	    <script src="${createLinkTo(dir:'js/jquery.watermark/', file:'jquery.watermark.min.js')}" type="text/javascript" ></script>
+    </g:if>
+
 	<script src="${createLinkTo(dir:'js/jquery.periodicalupdater/', file:'jquery.periodicalupdater.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.flot/', file:'jquery.flot.js')}" type="text/javascript"></script>
 	<script src="${createLinkTo(dir:'js/', file:'global.js')}" type="text/javascript" ></script>	
@@ -329,6 +333,9 @@
 		<script type="text/javascript">
 		  var uvOptions = {};
 		  (function() {
+
+            $.fn.watermark = $.fn.watermark || function(text,options){}   //headless drive will get error for wartermark, stub it.
+
 		    var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
 		    uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/gMxKSy5iKCBPkbBzs8Q.js';
 		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);

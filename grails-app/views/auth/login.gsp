@@ -94,12 +94,8 @@
 
 			var timezone = jzTimezoneDetector.determine_timezone().timezone; // Now you have an instance of the TimeZone object.
 			$("#browserTimezone").val(timezone.olson_tz); // Set the user timezone offset as a hidden input
-            <g:if test="${System.getenv().get('headless') != 'true'}">
-                $("#username").watermark("${warehouse.message(code:'login.username.label')}");
-		        $("#password").watermark("${warehouse.message(code:'login.password.label')}");
-            </g:if>
-
-
+            $("#username").watermark("${warehouse.message(code:'login.username.label')}");
+		    $("#password").watermark("${warehouse.message(code:'login.password.label')}");
 			$("#username").focus();
 
 		});
