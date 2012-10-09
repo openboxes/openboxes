@@ -8,8 +8,8 @@ class LocationPage extends  Page{
     static url = Settings.baseUrl + "/dashboard/chooseLocation"
     static at = { title == "Choose a location"}
     static content ={
-        boston(to: DashboardPage) { $("div#warehouse-1 a")}
-        miami(to: DashboardPage) { $("div#warehouse-2 a")}
-        tabarre(to: DashboardPage) { $("div#warehouse-3 a")}
+        boston(to: DashboardPage) { $("#warehouse-1-link")}
+        miami(to: DashboardPage) { $("#warehouse-2-link")}
+        tabarre(to: DashboardPage) { $("#warehouse-3-link")}
     }
 }

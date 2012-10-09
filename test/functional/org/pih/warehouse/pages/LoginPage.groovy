@@ -18,7 +18,9 @@ class LoginPage extends Page{
     static at = { title == "Login"}
     static content ={
         loginForm { $("form")}
-        submitButton(to: LocationPage) { $("button", type:"submit")}
+        userName {$("#username")}
+        password {$("#password")}
+        submitButton(to: LocationPage) { $("#loginButton")}
     }
 
 }

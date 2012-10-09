@@ -9,15 +9,22 @@
 **/ 
 
 import org.openqa.selenium.firefox.FirefoxDriver
-driver = { new FirefoxDriver() }
 
-//import org.openqa.selenium.htmlunit.HtmlUnitDriver
-//import org.openqa.selenium.remote.DesiredCapabilities
-//
-//driver = {
-//    def capabilities = DesiredCapabilities.htmlUnit()
-//    capabilities.javascriptEnabled = true
-//    capabilities.browserName = "firefox"
-//    return new HtmlUnitDriver(capabilities)
-//}
-//
+
+import org.openqa.selenium.htmlunit.HtmlUnitDriver
+import org.openqa.selenium.remote.DesiredCapabilities
+
+
+driver = {
+    def env = System.getenv()
+    if(env["headless"]) {
+        def capabilities = DesiredCapabilities.firefox()
+        capabilities.javascriptEnabled = true
+        return  new HtmlUnitDriver(capabilities)
+    }
+    return new FirefoxDriver()
+}
+
+
+reportsDir = "target/geb-reports"
+

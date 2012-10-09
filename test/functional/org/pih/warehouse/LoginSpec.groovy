@@ -19,15 +19,15 @@ class LoginSpec extends  GebReportingSpec{
     def "should log in to the system if right user name and password is provided"(){
         given:
             to LoginPage
+            report("LoginPage")
         when:
-            loginForm.with{
-                username = "manager"
-                password = "password"
-            }
+            userName.value("manager")
+            password.value("password")
         and:
             submitButton.click()
         and:
             at LocationPage
+            report("LocationPage")
         and:
             boston.click()
         then:

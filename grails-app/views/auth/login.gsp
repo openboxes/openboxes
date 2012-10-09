@@ -54,7 +54,7 @@
 											<label for="email" class="loginField"><warehouse:message code="user.username.label" default="Username" /></label>
 										</td>
 										--%>
-										<td class="center middle" ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
+										<td class="center middle ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
 											<g:textField class="text" id="username" name="username" value="${userInstance?.username}" size="35" />
 										</td>
 									</tr>
@@ -64,13 +64,13 @@
 											<label for="password" class="loginField"><warehouse:message code="user.password.label" default="Password" /></label>
 										</td>
 										 --%>
-										<td class="center middle" ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
+										<td class="center middle ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
 											<g:passwordField class="text" id="password" name="password" value="${userInstance?.password}" size="35" />
 										</td>
 									</tr>
 									<tr>
 										<td colspan="2" class="middle center">
-											<button type="submit" class="positive big">	
+											<button type="submit" class="positive big" id="loginButton">
 												<img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" class="middle"/>&nbsp;						
 												<g:message code="auth.login.label"/> &nbsp;
 											</button>												

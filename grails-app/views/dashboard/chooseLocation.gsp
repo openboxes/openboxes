@@ -30,8 +30,8 @@
 				<h1>Choose your location</h1>
     			<div style="height: 300px; width: 600px; overflow: auto;" class="box">
 					<g:each var="warehouse" in="${session.loginLocations}" status="i">
-						<div id="warehouse-${warehouse.id }" class="warehouse button center" style="float: left; border: 1px solid lightgrey;">													
-							<a href='${createLink(action:"chooseLocation", id: warehouse.id)}' style="display: block;">
+						<div id="warehouse-${warehouse.id}" class="warehouse button center" style="float: left; border: 1px solid lightgrey;">
+							<a id="warehouse-${warehouse.id}-link" href='${createLink(action:"chooseLocation", id: warehouse.id)}' style="display: block;">
 								<g:if test="${warehouse.logo}">	
 									<img class="logo" width="16" height="16" style="vertical-align: middle;" src="${createLink(controller:'location', action:'viewLogo', id: warehouse.id)}" />
 									<%--<img src="${warehouse.logo}" width="24" height="24" style="vertical-align: middle; padding: 5px;"></img>--%>
