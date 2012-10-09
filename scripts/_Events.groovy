@@ -58,3 +58,7 @@ eventCreateWarStart = { warName, stagingDir ->
 		entry(key:"app.buildDate", value:new java.text.SimpleDateFormat("dd MMM yyyy hh:mm:ss a").format(new java.util.Date()))
 	}
 }
+
+eventCompileStart = {
+    ant.delete(dir:"${basedir}/target/geb-reports")
+}

@@ -45,9 +45,11 @@
 	<script src="${createLinkTo(dir:'js/jquery.hoverIntent/', file:'jquery.hoverIntent.minified.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.tableScroll/', file:'jquery.tablescroll.js')}" type="text/javascript" ></script>
 
-    <g:if test="${System.getenv().get('headless') == null || System.getenv().get('headless') == 'false' }">
-	    <script src="${createLinkTo(dir:'js/jquery.watermark/', file:'jquery.watermark.min.js')}" type="text/javascript" ></script>
-    </g:if>
+    <g:if test="${System.getenv().get('headless') == 'true'}" env="test"> <!--headless drive throw error when using watermark-->
+	</g:if>
+    <g:else>
+        <script src="${createLinkTo(dir:'js/jquery.watermark/', file:'jquery.watermark.min.js')}" type="text/javascript" ></script>
+    </g:else>
 
 	<script src="${createLinkTo(dir:'js/jquery.periodicalupdater/', file:'jquery.periodicalupdater.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.flot/', file:'jquery.flot.js')}" type="text/javascript"></script>
