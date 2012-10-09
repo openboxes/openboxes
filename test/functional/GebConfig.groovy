@@ -17,7 +17,7 @@ import org.openqa.selenium.remote.DesiredCapabilities
 
 driver = {
     def env = System.getenv()
-    if(env["headless"]) {
+    if(env["headless"] == 'true') {
         def capabilities = DesiredCapabilities.firefox()
         capabilities.javascriptEnabled = true
         return  new HtmlUnitDriver(capabilities)
