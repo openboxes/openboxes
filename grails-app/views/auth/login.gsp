@@ -91,14 +91,18 @@
 	
 	<script type="text/javascript"> 	
 		$(document).ready(function() {
-			$("#username").focus(); // Focus on the first text input field in the page
+
 			var timezone = jzTimezoneDetector.determine_timezone().timezone; // Now you have an instance of the TimeZone object.
 			$("#browserTimezone").val(timezone.olson_tz); // Set the user timezone offset as a hidden input
-			$("#username").watermark("${warehouse.message(code:'login.username.label')}");			
-			$("#password").watermark("${warehouse.message(code:'login.password.label')}");
-			$("#username").focus();			
-			
-		});	
+            <g:if test="${System.getenv().get('headless') != 'true'}">
+                $("#username").watermark("${warehouse.message(code:'login.username.label')}");
+		        $("#password").watermark("${warehouse.message(code:'login.password.label')}");
+            </g:if>
+
+
+			$("#username").focus();
+
+		});
 	</script>	
 </body>
 </html>
