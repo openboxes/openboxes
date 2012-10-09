@@ -45,7 +45,7 @@
 	<script src="${createLinkTo(dir:'js/jquery.hoverIntent/', file:'jquery.hoverIntent.minified.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.tableScroll/', file:'jquery.tablescroll.js')}" type="text/javascript" ></script>
 
-    <g:if test="${System.getenv().get('headless') != 'true'}">
+    <g:if test="${System.getenv().get('headless') == null || System.getenv().get('headless') == 'false' }">
 	    <script src="${createLinkTo(dir:'js/jquery.watermark/', file:'jquery.watermark.min.js')}" type="text/javascript" ></script>
     </g:if>
 
@@ -334,7 +334,7 @@
 		  var uvOptions = {};
 		  (function() {
 
-            $.fn.watermark = $.fn.watermark || function(text,options){}   //headless drive will get error for wartermark, stub it.
+            $.fn.watermark = $.fn.watermark || function(text,options){} //for headless driver stub the problematic watermark
 
 		    var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
 		    uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/gMxKSy5iKCBPkbBzs8Q.js';
