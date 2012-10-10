@@ -31,13 +31,13 @@ class UserTests extends GrailsUnitTestCase {
 
 		
 	void testNullable_shouldPassWhenNullableErrorsDetected() {
-		def testUser = new User()
-		assertFalse testUser.validate()
-		assertEquals "nullable", testUser.errors["username"]
-		assertEquals "nullable", testUser.errors["password"]	
-		assertEquals "nullable", testUser.errors["firstName"]
-		assertEquals "nullable", testUser.errors["lastName"]
-		assertEquals "nullable", testUser.errors["locale"]
+		def user = new User()
+		assertFalse user.validate()
+		assertEquals "nullable", user.errors["username"]
+		assertEquals "nullable", user.errors["password"]	
+		assertEquals "nullable", user.errors["firstName"]
+		assertEquals "nullable", user.errors["lastName"]
+		assertEquals "nullable", user.errors["locale"]
 	}
 
 	void testUnique_shouldFailWhenUsernameIsNotUnique() {

@@ -16,6 +16,7 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.TransactionCode;
 import org.pih.warehouse.inventory.TransactionType 
 import org.pih.warehouse.core.Location 
+import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product 
 
 
@@ -23,6 +24,8 @@ class BaseUnitTest extends GrailsUnitTestCase {
 	protected void setUp() {
         super.setUp()
         
+		
+
           // create some default location types
         def warehouseLocationType = new LocationType(name: "Location", description: "Location")
         def supplierLocationType= new LocationType(name: "Supplier", description: "Supplier")
@@ -52,9 +55,13 @@ class BaseUnitTest extends GrailsUnitTestCase {
         def transferOutTransactionType = new TransactionType(id: Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID, name: "Transfer Out", transactionCode: TransactionCode.DEBIT)
         mockDomain(TransactionType, [ consumptionTransactionType, productInventoryTransactionType, inventoryTransactionType, transferInTransactionType, transferOutTransactionType ])
         
+		
+		def category = new Category(id: "1", name: "Pain Medication")
+		mockDomain(Category, [category])
+		
         // create some products
-        def aspirin = new Product(name: "Aspirin")
-        def tylenol = new Product(name:"Tylenol")
+        def aspirin = new Product(name: "Aspirin", category: category)
+        def tylenol = new Product(name:"Tylenol", category: category)
         mockDomain(Product, [aspirin, tylenol])
         
         // create some inventory items
