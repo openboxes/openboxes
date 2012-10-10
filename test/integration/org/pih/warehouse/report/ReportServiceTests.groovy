@@ -10,7 +10,7 @@
 
 //spring cannot build the service , commented out the test so far by Peter
 
-
+//
 //package org.pih.warehouse.report;
 //
 //import static org.junit.Assert.*;
@@ -22,11 +22,12 @@
 //import org.pih.warehouse.core.Location;
 //import org.pih.warehouse.core.LocationType;
 //import org.pih.warehouse.product.Category;
-//import org.pih.warehouse.product.Product;
+//import org.pih.warehouse.product.Product
+//import org.pih.warehouse.core.BaseIntegrationTest;
 //
-//class ReportServiceTests extends GroovyTestCase {
+//class ReportServiceTests extends BaseIntegrationTest {
 //
-//    def reportService;
+//    //def reportService;
 //
 //	protected void setUp() {
 //		super.setUp()
@@ -39,13 +40,12 @@
 //		def command = new InventoryReportCommand();
 //		command.startDate = new Date() - 180;
 //		command.endDate = new Date()
-//		command.category = Category.get(123)
+//		command.category = Category.findByName("Supplies")
 //		//command.categoryOnly = true
-//		command.location = Location.get(3)
-//		assertEquals(command.category.name, "INFECTION CONTROL SUPPLIES")
+//		command.location = bostonLocation
 //
 //
-//		reportService.generateTransactionReport(command);
+//		new ReportService().generateTransactionReport(command);
 //
 //		println command
 //

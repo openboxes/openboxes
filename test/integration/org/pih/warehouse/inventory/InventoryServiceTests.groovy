@@ -149,73 +149,73 @@ class InventoryServiceTests extends BaseIntegrationTest {
         assert inventoryService.isValidForLocalTransfer(transaction5) == true
     }
 
-    //	void test_saveLocalTransfer_shouldCreateNewLocalTransfer() {
-    //		setUp_localTransferTests()
-    //
-    //		def inventoryService = new InventoryService()
-    //
-    //		def warehouse = Location.findByName("Boston Location")
-    //
-    //		assert warehouse.inventory != null
-    //		assert Transaction.get(40).inventory != null
-    //
-    //		// save a local transaction based on a Transfer In Transaction
-    //		inventoryService.saveLocalTransfer(Transaction.get(40))
-    //
-    //		// confirm that this transaction is now associated with a local transfer
-    //		assert inventoryService.isLocalTransfer(Transaction.get(40)) == true
-    //		def localTransfer = inventoryService.getLocalTransfer(Transaction.get(40))
-    //
-    //		// confirm that the local transfer has the appropriate source and destination transaction
-    //		assert localTransfer.destinationTransaction == Transaction.get(40)
-    //		def newTransaction = localTransfer.sourceTransaction
-    //		assert newTransaction.transactionType == TransactionType.get(9)
-    //		assert newTransaction.inventory == Location.findByName("Haiti Location").inventory
-    //		assert newTransaction.source == null
-    //		assert newTransaction.destination == Location.findByName("Boston Location")
-    //
-    //		// now try a local transaction based on a Transfer Out Transaction
-    //		inventoryService.saveLocalTransfer(Transaction.get(50))
-    //
-    //		// confirm that this transaction is now associated with a local transfer
-    //		assert inventoryService.isLocalTransfer(Transaction.get(50)) == true
-    //		localTransfer = inventoryService.getLocalTransfer(Transaction.get(50))
-    //
-    //		// confirm that the local transfer has the appropriate source and destination transaction
-    //		assert localTransfer.sourceTransaction == Transaction.get(50)
-    //		newTransaction = localTransfer.destinationTransaction
-    //		assert newTransaction.transactionType == TransactionType.get(8)
-    //		assert newTransaction.inventory == Location.findByName("Haiti Location").inventory
-    //		assert newTransaction.source == Location.findByName("Boston Location")
-    //		assert newTransaction.destination == null
-    //
-    //	}
-    //
-    //	void test_saveLocalTransfer_shouldEditExistingLocalTransfer() {
-    //		setUp_localTransferTests()
-    //
-    //		def inventoryService = new InventoryService()
-    //
-    //		def baseTransaction = Transaction.get(40)
-    //
-    //		// first create a local transfer
-    //		inventoryService.saveLocalTransfer(baseTransaction)
-    //
-    //		// now modify the base transaction
-    //		baseTransaction.inventory = Location.findByName("Haiti Location").inventory
-    //		baseTransaction.source = Location.findByName("Boston Location")
-    //
-    //		// resave the local transfer
-    //		inventoryService.saveLocalTransfer(baseTransaction)
-    //
-    //		// now check that the local transfer transactions have been updated accordingly
-    //		def localTransfer = inventoryService.getLocalTransfer(baseTransaction)
-    //		assert localTransfer.destinationTransaction == baseTransaction
-    //		def newTransaction = localTransfer.sourceTransaction
-    //		assert newTransaction.transactionType == TransactionType.get(9)
-    //		assert newTransaction.inventory == Location.findByName("Boston Location").inventory
-    //		assert newTransaction.source == null
-    //		assert newTransaction.destination == Location.findByName("Haiti Location")
-    //	}
+    	void test_saveLocalTransfer_shouldCreateNewLocalTransfer() {
+    		setUp_localTransferTests()
+
+    		def inventoryService = new InventoryService()
+
+    		def warehouse = bostonLocation
+
+    		assert warehouse.inventory != null
+    		assert transaction4.inventory != null
+
+    		// save a local transaction based on a Transfer In Transaction
+    		inventoryService.saveLocalTransfer(transaction4)
+
+    		// confirm that this transaction is now associated with a local transfer
+    		assert inventoryService.isLocalTransfer(transaction4) == true
+    		def localTransfer = inventoryService.getLocalTransfer(transaction4)
+
+    		// confirm that the local transfer has the appropriate source and destination transaction
+    		assert localTransfer.destinationTransaction == transaction4
+    		def newTransaction = localTransfer.sourceTransaction
+    		assert newTransaction.transactionType ==  transactionType_transferOut
+    		assert newTransaction.inventory == haitiInventory
+    		assert newTransaction.source == null
+    		assert newTransaction.destination == bostonLocation
+
+    		// now try a local transaction based on a Transfer Out Transaction
+    		inventoryService.saveLocalTransfer(transaction5)
+
+    		// confirm that this transaction is now associated with a local transfer
+    		assert inventoryService.isLocalTransfer(transaction5) == true
+    		localTransfer = inventoryService.getLocalTransfer(transaction5)
+
+    		// confirm that the local transfer has the appropriate source and destination transaction
+    		assert localTransfer.sourceTransaction == transaction5
+    		newTransaction = localTransfer.destinationTransaction
+    		assert newTransaction.transactionType == transactionType_transferIn
+    		assert newTransaction.inventory == haitiInventory
+    		assert newTransaction.source == bostonLocation
+    		assert newTransaction.destination == null
+
+    	}
+
+    	void test_saveLocalTransfer_shouldEditExistingLocalTransfer() {
+    		setUp_localTransferTests()
+
+    		def inventoryService = new InventoryService()
+
+    		def baseTransaction = transaction4
+
+    		// first create a local transfer
+    		inventoryService.saveLocalTransfer(baseTransaction)
+
+    		// now modify the base transaction
+    		baseTransaction.inventory = haitiInventory
+    		baseTransaction.source = bostonLocation
+
+    		// resave the local transfer
+    		inventoryService.saveLocalTransfer(baseTransaction)
+
+    		// now check that the local transfer transactions have been updated accordingly
+    		def localTransfer = inventoryService.getLocalTransfer(baseTransaction)
+    		assert localTransfer.destinationTransaction == baseTransaction
+    		def newTransaction = localTransfer.sourceTransaction
+    		assert newTransaction.transactionType == transactionType_transferOut
+    		assert newTransaction.inventory == bostonInventory
+    		assert newTransaction.source == null
+    		assert newTransaction.destination == haitiLocation
+    	}
 
 }
