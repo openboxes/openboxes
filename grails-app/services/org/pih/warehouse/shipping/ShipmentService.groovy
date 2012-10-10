@@ -518,7 +518,7 @@ class ShipmentService {
 				newShipment.addToShipmentItems(item);
 			}
 		}
-				
+
 		newShipment.addToContainers(container);
 		saveShipment(newShipment)
 				

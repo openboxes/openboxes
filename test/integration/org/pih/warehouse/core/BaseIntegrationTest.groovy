@@ -1,81 +1,92 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/ 
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ * */
 package org.pih.warehouse.core
 
-import grails.test.*
+import org.pih.warehouse.inventory.TransactionType
 
-import org.pih.warehouse.inventory.Inventory 
-import org.pih.warehouse.inventory.InventoryItem 
-import org.pih.warehouse.inventory.TransactionCode;
-import org.pih.warehouse.inventory.TransactionType 
-import org.pih.warehouse.core.Location 
-import org.pih.warehouse.product.Product 
+class BaseIntegrationTest extends GroovyTestCase {
 
+    protected def transactionType_consumptionDebit
+    protected def  transactionType_inventory
+    protected def  transactionType_productInventory
+    protected def  transactionType_transferIn
+    protected def  transactionType_transferOut
+    protected def  bostonLocation
+    protected def  haitiLocation
+    protected def  warehouseLocationType
+    protected def  supplierLocationType
+    protected def  acmeLocation
+    protected def  bostonInventory
+    protected def  haitiInventory
+    protected def  aspirinProduct
+    protected def  tylenolProduct
+    protected def  aspirinItem1
+    protected def  aspirinItem2
+    protected def tylenolItem
 
-class BaseIntegrationTest extends GrailsUnitTestCase {
-	protected void setUp() {
+    protected void setUp() {
         super.setUp()
-        
-          // create some default location types
-        def warehouseLocationType = new LocationType(code: "locationType.warehouse", name: "Location", description: "Location")
-        def supplierLocationType= new LocationType(code: "locationType.supplier", name: "Supplier", description: "Supplier")
-        mockDomain(LocationType, [ warehouseLocationType, supplierLocationType ])
+        warehouseLocationType = LocationType.get(Constants.WAREHOUSE_LOCATION_TYPE_ID)
+        supplierLocationType = LocationType.get(Constants.SUPPLIER_LOCATION_TYPE_ID)
 
-        // create a default location
-        def acmeSupplyCompany = new Location(name: "Acme Supply Company", locationType: supplierLocationType) 
-        mockDomain(Location, [ acmeSupplyCompany ])
-        
+        // get or create a default location
+        acmeLocation = DbHelper.creatLocationIfNotExist("Acme Supply Company", supplierLocationType)
+
         // create some default warehouses and inventories
-        def bostonLocation = new Location(name: "Boston Location", locationType: warehouseLocationType)
-        def haitiLocation = new Location(name: "Haiti Location", locationType: warehouseLocationType)
-    
-        def bostonLocationInventory = new Inventory(warehouse: bostonLocation)
-        def haitiLocationInventory = new Inventory(warehouse: haitiLocation)
-        
-        bostonLocation.inventory = bostonLocationInventory
-        haitiLocation.inventory = haitiLocationInventory
-        
-        mockDomain(Location, [ bostonLocation, haitiLocation ] )
-        mockDomain(Inventory, [ bostonLocationInventory, haitiLocationInventory ])
-       
+        bostonLocation = DbHelper.creatLocationIfNotExist("Boston Location", warehouseLocationType)
+        haitiLocation = DbHelper.creatLocationIfNotExist("Haiti Location", warehouseLocationType)
+
+        bostonInventory = DbHelper.createInventory(bostonLocation)
+        haitiInventory = DbHelper.createInventory(haitiLocation)
+
         // create some default transaction types
-        def consumptionTransactionType = new TransactionType(id: 2, name: "Consumption", transactionCode: TransactionCode.DEBIT)
-        def inventoryTransactionType = new TransactionType(id: 7, name: "Inventory", transactionCode: TransactionCode.INVENTORY)
-        def productInventoryTransactionType = new TransactionType(id: 11, name: "Product Inventory", transactionCode: TransactionCode.PRODUCT_INVENTORY)
-        def transferInTransactionType = new TransactionType(id: Constants.TRANSFER_IN_TRANSACTION_TYPE_ID, name: "Transfer In", transactionCode: TransactionCode.CREDIT)
-        def transferOutTransactionType = new TransactionType(id: Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID, name: "Transfer Out", transactionCode: TransactionCode.DEBIT)
-        mockDomain(TransactionType, [ consumptionTransactionType, productInventoryTransactionType, inventoryTransactionType, transferInTransactionType, transferOutTransactionType ])
-        
+        transactionType_consumptionDebit = TransactionType.get(Constants.CONSUMPTION_TRANSACTION_TYPE_ID) //id:2
+        transactionType_inventory = TransactionType.get(Constants.INVENTORY_TRANSACTION_TYPE_ID) //id:7
+        transactionType_productInventory = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)  //id:11
+        transactionType_transferIn =  TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID) //id:8
+        transactionType_transferOut =  TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) //id:9
+
         // create some products
-        def aspirin = new Product(name: "Aspirin")
-        def tylenol = new Product(name:"Tylenol")
-        mockDomain(Product, [aspirin, tylenol])
-        
+        aspirinProduct = DbHelper.creatProductIfNotExist("Aspirin" + UUID.randomUUID().toString()[0..5])
+        tylenolProduct = DbHelper.creatProductIfNotExist("Tylenol" + UUID.randomUUID().toString()[0..5])
+
         // create some inventory items
-        def aspirinLot1 = new InventoryItem(product: aspirin, lotNumber: "1")
-        def aspirinLot2 = new InventoryItem(product: aspirin, lotNumber: "2")
-        def tylenolLot1 = new InventoryItem(product: tylenol, lotNumber: "1")
-        mockDomain(InventoryItem, [aspirinLot1, aspirinLot2, tylenolLot1])
-  
+        aspirinItem1 = DbHelper.createInventoryItem(aspirinProduct, "1")
+        aspirinItem2 = DbHelper.createInventoryItem(aspirinProduct, "2")
+        tylenolItem = DbHelper.createInventoryItem(tylenolProduct, "1")
     }
 
-    protected void tearDown() {
-        super.tearDown()
+
+
+    void testDataHasBeenInitialized() {
+
+        assert transactionType_consumptionDebit.id != null
+        assert transactionType_inventory.id != null
+        assert transactionType_productInventory.id != null
+        assert transactionType_transferIn.id != null
+        assert transactionType_transferOut.id != null
+
+
+        assert bostonLocation.id != null
+        assert haitiLocation.id != null
+        assert warehouseLocationType.id != null
+        assert supplierLocationType.id != null
+        assert acmeLocation.id != null
+        assert bostonInventory.id != null
+        assert haitiInventory.id != null
+        assert aspirinProduct.id != null
+        assert tylenolProduct.id != null
+        assert aspirinItem1.id != null
+        assert aspirinItem2.id != null
+        assert tylenolItem.id != null
+
     }
-	
-	void testDataHasBeenInitialized() {
-		assertEquals 2, LocationType.list().size()
-		assertEquals 3, Location.list().size()
-		assertEquals 5, TransactionType.list().size()
-		assertEquals 2, Product.list().size()
-		assertEquals 3, InventoryItem.list().size()		
-	}
-	
+
 }

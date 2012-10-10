@@ -46,7 +46,7 @@ class Constants {
 	static final String PRODUCT_INVENTORY_TRANSACTION_TYPE_ID = "11"
 	
 	// direct references to locations by primary key
-	static final String WAREHOUSE_LOCATION_TYPE_ID = "1"
+	static final String WAREHOUSE_LOCATION_TYPE_ID = "2"
 	static final String SUPPLIER_LOCATION_TYPE_ID = "4"
 	
 	// direct references to containers by primary key

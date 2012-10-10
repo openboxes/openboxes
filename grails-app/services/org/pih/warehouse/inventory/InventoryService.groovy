@@ -1889,17 +1889,21 @@ class InventoryService implements ApplicationContextAware {
 		// make sure that the transaction is of a valid type
 		if (transaction?.transactionType?.id != Constants.TRANSFER_IN_TRANSACTION_TYPE_ID  &&
 				transaction?.transactionType?.id != Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) {
-			return false
+         	return false
 		}
 	
 		// make sure we are operating only on locally managed warehouses
 		if (transaction?.source) {
-			if (!(transaction?.source instanceof Location)) { return false }
-			else if (!transaction?.source.local){ return false }
+			if (!(transaction?.source instanceof Location)) {   //todo: should use source.isWarehouse()? hibernate always set source to a location
+                return false }
+			else if (!transaction?.source.local){
+                return false }
 		}
 		if (transaction?.destination) {
-			if (!(transaction?.destination instanceof Location)) { return false }
-			else if (!transaction?.destination.local) { return false }
+			if (!(transaction?.destination instanceof Location)) { //todo: should use destination.isWarehouse()? hibernate always set destination to a location
+                return false }
+			else if (!transaction?.destination.local) {
+                return false }
 		}
 		
 		return true

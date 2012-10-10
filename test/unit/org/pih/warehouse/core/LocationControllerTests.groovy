@@ -63,7 +63,7 @@ class LocationControllerTests extends ControllerUnitTestCase {
 		//assertTrue location.validate()
 
 		def inventoryControl = mockFor(InventoryService)
-		inventoryControl.demand.getLocation(1..1) { locationId -> Location.get(locationId) }
+		inventoryControl.demand.creatLocationIfNotExist(1..1) { locationId -> Location.get(locationId) }
 
 		// 	Initialise the service and test the target method.
 		this.controller.inventoryService = inventoryControl.createMock()

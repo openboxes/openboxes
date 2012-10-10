@@ -7,20 +7,20 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.fulfillment
-
-import grails.test.*
-
-class FulfillmentServiceTests extends GrailsUnitTestCase {
-    protected void setUp() {
-        super.setUp()
-    }
-
-    protected void tearDown() {
-        super.tearDown()
-    }
-
-    void testSomething() {
-
-    }
-}
+//package org.pih.warehouse.fulfillment
+//
+//import grails.test.*
+//
+//class FulfillmentServiceTests extends GroovyTestCase {
+//    protected void setUp() {
+//        super.setUp()
+//    }
+//
+//    protected void tearDown() {
+//        super.tearDown()
+//    }
+//
+//    void testSomething() {
+//
+//    }
+//}
