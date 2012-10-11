@@ -56,11 +56,11 @@ class BootStrap {
 			def ranChangeSets = database.getRanChangeSetList()
 			database.setDefaultSchemaName(connection.catalog)
 			
-			// If nothing has been created yet, let's create all new database objects with the install scripts
-			//if (!ranChangeSets) { 
-			//	liquibase = new Liquibase("install.xml", fileOpener, database);
-			//	liquibase.update(null)
-			//}
+			//If nothing has been created yet, let's create all new database objects with the install scripts
+			if (!ranChangeSets) {
+				liquibase = new Liquibase("install/install.xml", fileOpener, database);
+				liquibase.update(null)
+			}
 			
 			// Run through the updates in the master changelog
 			liquibase = new Liquibase("changelog.xml", fileOpener, database);
