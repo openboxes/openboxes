@@ -8,33 +8,31 @@
 * You must not remove this notice, or any other, from this software.
 **/
 
+
+
+package org.pih.warehouse.report;
+
+import static org.junit.Assert.*;
+
+import grails.test.*
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.pih.warehouse.core.Location;
+import org.pih.warehouse.core.LocationType;
+import org.pih.warehouse.product.Category;
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.core.BaseIntegrationTest
+import org.pih.warehouse.core.DbHelper;
+
+class ReportServiceTests extends GroovyTestCase {
+
+    //def reportService;
+
+  void testSomething(){
+  }
 //spring cannot build the service , commented out the test so far by Peter
 
-//
-//package org.pih.warehouse.report;
-//
-//import static org.junit.Assert.*;
-//
-//import grails.test.*
-//import org.junit.After;
-//import org.junit.Before;
-//import org.junit.Test;
-//import org.pih.warehouse.core.Location;
-//import org.pih.warehouse.core.LocationType;
-//import org.pih.warehouse.product.Category;
-//import org.pih.warehouse.product.Product
-//import org.pih.warehouse.core.BaseIntegrationTest;
-//
-//class ReportServiceTests extends BaseIntegrationTest {
-//
-//    //def reportService;
-//
-//	protected void setUp() {
-//		super.setUp()
-//	}
-//
-//
-//
 //	void testGenerateTransactionReport() {
 //		println("Running 'Transaction Report' ... ")
 //		def command = new InventoryReportCommand();
@@ -42,7 +40,7 @@
 //		command.endDate = new Date()
 //		command.category = Category.findByName("Supplies")
 //		//command.categoryOnly = true
-//		command.location = bostonLocation
+//		command.location = DbHelper.creatLocationIfNotExist("Boston Location", warehouseLocationType)
 //
 //
 //		new ReportService().generateTransactionReport(command);
@@ -51,5 +49,5 @@
 //
 //
 //	}
-//}
+}
 
