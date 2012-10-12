@@ -34,14 +34,14 @@
 					</td>										
 					<td style="text-align: right;">
 						<div class="fade" style="font-weight: bold; font-size:1.5em;">
-							<format:metadata obj="${orderInstance?.status}"/>
+							<p name="status"><format:metadata obj="${orderInstance?.status}"/></p>
 						</div>
 						<br/>
 						<g:if test="${!params.execution && !isAddingComment && !isAddingDocument}">						
 							<g:if test="${!orderInstance?.isPlaced()}">
 								<g:form action="placeOrder">
 									<g:hiddenField name="id" value="${orderInstance?.id }"/>
-									<button>${warehouse.message(code: 'order.placeOrder.label')}</button>
+									<button name="placeOrder">${warehouse.message(code: 'order.placeOrder.label')}</button>
 								</g:form>
 							</g:if>
 							<g:elseif test="${!orderInstance?.isReceived() && orderInstance?.isPlaced() }">

@@ -24,7 +24,7 @@
 					<tr>
 						<td style="padding: 0px;">
 							<div style="margin: 10px">
-								<p><warehouse:message code="order.itemsInOrder.message" args="[(order?.orderItems)?order?.orderItems?.size():0]"/></p>
+								<p name="numItemInOrder"><warehouse:message code="order.itemsInOrder.message" args="[(order?.orderItems)?order?.orderItems?.size():0]"/></p>
 							</div>							
 
 							<div style="max-height: 300px; overflow-y: auto;">

@@ -140,6 +140,9 @@ log4j = {
 	
 	// Example of changing the log pattern for the default console    
 	appenders {
+		//console name:'stdout', layout:pattern(conversionPattern: '%p - %C{1}.%M(%L) |%d{ISO8601}| %m%n')
+		//console name:'stdout', layout:pattern(conversionPattern: '%p %d{ISO8601} %c{4} %m%n')
+		//console name:'stdout', layout:pattern(conversionPattern: '%p %X{sessionId} %d{ISO8601} [%c{1}] %m%n')
 
 		//println "grails.mail.enabled: '${grails.mail.enabled.toString()}'"
 		//println "mail.error.server: '${mail.error.server}'"

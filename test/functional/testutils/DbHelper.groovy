@@ -11,6 +11,7 @@ package testutils
 
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.inventory.InventoryItem
@@ -35,6 +36,19 @@ class DbHelper {
         user
     }
 
+    static Location CreateSupplierIfRequired() {
+        def loc = Location.findByName("Test Supplier")
+        if(!loc)
+            loc = new Location()
+        loc.version = 1
+        loc.dateCreated = new Date()
+        loc.lastUpdated = new Date()
+        loc.name = "Test Supplier"
+        loc.locationType = LocationType.findByDescription("Supplier") // Supplier
+        loc.save(flush: true)
+        loc
+    }
+
     static InventoryItem CreateProductInInventory(productName, quantity) {
         Product product = new Product()
         product.name = productName
@@ -50,7 +64,6 @@ class DbHelper {
         item.save(flush:true)
 
         Location boston =  Location.findByName("Boston Headquarters");
-
 
         Transaction transaction = new Transaction()
         transaction.transactionDate = new Date()
