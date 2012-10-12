@@ -25,7 +25,7 @@
 					<span class="filter-list-item">
            				<label><warehouse:message code="inventory.expiresWithin.label"/></label>
 		           		<g:select name="threshhold"
-							from="['1': warehouse.message(code:'default.week.oneWeek.label'), '14': warehouse.message(code:'default.week.twoWeeks.label'), 
+							from="['7': warehouse.message(code:'default.week.oneWeek.label'), '14': warehouse.message(code:'default.week.twoWeeks.label'),
 								   '30': warehouse.message(code:'default.month.oneMonth.label'), '60': warehouse.message(code:'default.month.twoMonths.label'), 
 								   '90': warehouse.message(code:'default.month.threeMonths.label'), '180': warehouse.message(code:'default.month.sixMonths.label'), 
 								   '365': warehouse.message(code:'default.year.oneYear.label'), '730': warehouse.message(code:'default.year.twoYear.label'), '1825': warehouse.message(code:'default.year.fiveYear.label')]"
