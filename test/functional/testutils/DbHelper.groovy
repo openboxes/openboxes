@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package testutils
 
 import org.pih.warehouse.core.User
@@ -49,7 +49,7 @@ class DbHelper {
         loc
     }
 
-    static InventoryItem CreateProductInInventory(productName, quantity) {
+    static InventoryItem CreateProductInInventory(productName, quantity, expirationDate = new Date().plus(30)) {
         Product product = new Product()
         product.name = productName
         product.category = Category.findByName("Medicines")
@@ -60,7 +60,7 @@ class DbHelper {
         InventoryItem item = new InventoryItem()
         item.product = product
         item.lotNumber = "lot57"
-        item.expirationDate =  new Date().plus(30)
+        item.expirationDate = expirationDate
         item.save(flush:true)
 
         Location boston =  Location.findByName("Boston Headquarters");
