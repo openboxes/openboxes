@@ -1,5 +1,7 @@
 package org.pih.warehouse.core
 
+import grails.validation.ValidationException;
+
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
@@ -8,8 +10,6 @@ import org.pih.warehouse.inventory.InventoryItem
 
 
 class DbHelper {
-
-
 
     static Location creatLocationIfNotExist(def name, def locationType){
         def existingOne = Location.findByName(name)
@@ -27,13 +27,18 @@ class DbHelper {
         inventory
     }
 
+	static Category createCategoryIfNotExists(name) { 
+		def category = Category.findByName(name)
+		if (category) return category
+		category = new Category(name: name).save();
+		category
+	}
 
-
-     static Product creatProductIfNotExist(def name){
+	static Product creatProductIfNotExist(def name){
         def existingOne = Product.findByName(name)
         if(existingOne) return existingOne
         def newOne = new Product(name:name)
-        newOne.category = Category.findByName("Medicines")
+        newOne.category = createCategoryIfNotExists("Medicines")
         newOne.save(flush:true)
         newOne
     }

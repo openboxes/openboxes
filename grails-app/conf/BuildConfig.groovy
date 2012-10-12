@@ -72,5 +72,6 @@ grails.project.dependency.resolution = {
         runtime (':hibernate:1.3.7') { excludes 'antlr' }
 
         test (name:'geb', version:'0.6.3')
+		
 	}
 }

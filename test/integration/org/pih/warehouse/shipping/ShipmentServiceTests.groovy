@@ -11,12 +11,16 @@ package org.pih.warehouse.shipping;
 
 import static org.junit.Assert.*;
 
+import grails.converters.deep.JSON;
 import grails.test.*
+import grails.validation.ValidationException;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.LocationType;
+import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
 
@@ -53,13 +57,17 @@ class ShipmentServiceTests extends GroovyTestCase {
 		shipment2.origin = Location.findByName("Origin")
 		shipment2.destination = Location.findByName("Destination")
 		shipment2.save(flush:true);
-
 		
+		def shipmentItem1 = new ShipmentItem()
+		shipmentItem1.product = Product.findByName("Product")
+		shipmentItem1.inventoryItem = InventoryItem.findByLotNumberAndProduct("ABC123", Product.findByName("Product"))
+		shipmentItem1.quantity = 100
+		shipmentItem1.save(flush:true)
 	}
 
 
 
-	void testSaveShipment() {	
+	void test_saveShipment_shouldSaveShipment() {	
 		def shipment3 = new Shipment();
 		shipment3.name = "New Shipment 3"
 		shipment3.expectedDeliveryDate = new Date();
@@ -68,10 +76,9 @@ class ShipmentServiceTests extends GroovyTestCase {
 		shipment3.origin = Location.findByName("Origin")
 		shipment3.destination = Location.findByName("Destination")
 		
-		shipment3.save(failOnError: true)
-		//shipmentService.saveShipment(shipment)
-		assertNotNull shipment3.id;
-		
+		//shipment3.save(failOnError: true)
+		shipmentService.saveShipment(shipment3)
+		assertNotNull shipment3.id;		
 		assertNotNull Shipment.findByName("New Shipment 3");
 		
 	}
@@ -79,7 +86,7 @@ class ShipmentServiceTests extends GroovyTestCase {
 	/**
 	 * Add a container to a shipment.
 	 */
-	void testAddContainersToShipment() { 	
+	void test_addToContainers_shouldAddContainerToShipment() { 	
 		def shipment = Shipment.findByName("New Shipment 1")
 		assertNotNull shipment
 
@@ -94,7 +101,7 @@ class ShipmentServiceTests extends GroovyTestCase {
 	/**
 	 * Add a shipment item to a shipment.
 	 */
-	void testAddShipmentItemsToShipment() {
+	void test_addShipmentItems_shouldAddShipmentItemToShipment() {
 		def shipment = Shipment.findByName("New Shipment 1")
 
 		def pallet1 = new Container(name: "Pallet 1", containerType: ContainerType.findByName("Pallet"))
@@ -113,39 +120,86 @@ class ShipmentServiceTests extends GroovyTestCase {
 	/**
 	 * Move a container to another shipment.
 	 */
-	void testMoveContainerToShipment() {
+	void test_moveContainer_shouldMoveContainerToShipment() {
 		def shipment1 = Shipment.findByName("New Shipment 1")
-		
-		def pallet1 = new Container(name: "Pallet 1", containerType: ContainerType.findByName("Pallet"))
+		def shipment2 = Shipment.findByName("New Shipment 2")
+		def pallet1 = new Container(id: "1", name: "Pallet 1", containerType: ContainerType.findByName("Pallet"))
 		shipment1.addToContainers(pallet1);
 		shipment1.save(flush:true)
-
-		def shipment2 = Shipment.findByName("New Shipment 2")				
-		assertNotNull shipment2 
-		assertEquals 1, shipment1.containers.size()
-		assertNull shipment2.containers		
 		
+	
+		// Preconditions
+		assertNotNull "Shipment should exist", shipment2 
+		assertEquals "Should have 1 container", 1, shipment1.containers.size()
+		assertNull "Should have 0 containers", shipment2.containers
+
+		printContainer("Before move", pallet1)
+		printShipment("Before move", shipment1)
+		printShipment("Before move", shipment2)
+		
+		// Do the actual move of the container
 		shipmentService.moveContainer(pallet1, shipment2)
 
-		def testShipment2 = Shipment.findByName("New Shipment 2")
-		assertEquals 1, testShipment2.containers.size()		
+		printContainer("After move", pallet1)
+		printShipment("After move", shipment1)
+		printShipment("After move", shipment2)
 
 		def testPallet = Container.findByName("Pallet 1")
-		assertEquals testShipment2, testPallet.shipment
+		assertEquals shipment2, pallet1.shipment
 				
 		// Assertion fails because the moveContainer method simply changes the 
 		// ShipmentItem.container and Container.parentContainer references 
 		//def testShipment1 = Shipment.findByName("New Shipment 1")
 		//assertEquals 0, testShipment1.containers.size()
 		
+		// Postconditions		
+		assertEquals "Should have 0 containers", 0, shipment1?.containers?.size()?:0
+		assertEquals "Should have 1 containers", 1, shipment2?.containers?.size()?:0	
+		assertEquals "Pallet shipment should equal Shipment 2", shipment2, Container.findByName("Pallet 1").shipment
 	}
+
 	
+	void test_moveContainer_shouldMoveContainerWithShipmentItemsToShipment() { 
+		def shipment1 = Shipment.findByName("New Shipment 1")
+		def shipment2 = Shipment.findByName("New Shipment 2")
+		def pallet1 = new Container(name: "Pallet 1", containerType: ContainerType.findByName("Pallet"))
+		shipment1.addToContainers(pallet1);
+		shipment1.save(flush:true)
+
+		def shipmentItem = new ShipmentItem(product: Product.findByName("Product"), quantity: 1, container: pallet1)
+		shipment1.addToShipmentItems(shipmentItem)
+		shipment1.save(flush:true)
+		
+		assertEquals "Should have 1 shipment items", 1, shipment1?.shipmentItems?.size()?:0
+		assertEquals "Should have 0 shipment items", 0, shipment2?.shipmentItems?.size()?:0
+		assertEquals "Pallet1 should have 1 shipment items", 1, Container.findByName("Pallet 1")?.shipmentItems?.size()?:0
+		assertEquals "Pallet1's shipment should equal Shipment 1", shipment1, Container.findByName("Pallet 1")?.shipment
+
+		printShipment("Before Move", shipment1)
+		printShipment("Before Move", shipment2)
+		printShipmentItem("Before Move", shipmentItem)
+
+		shipmentService.moveContainer(pallet1, shipment2)
+
+		printShipment("After Move", shipment1)
+		printShipment("After Move", shipment2)
+		
+		// Postconditions
+		assertEquals "Should have 0 shipment items", 0, shipment1?.shipmentItems?.size()?:0
+		assertEquals "Should have 1 shipment items", 1, shipment2?.shipmentItems?.size()?:0
+		assertEquals "Pallet1 should container 1 shipment items", 1, Container.findByName("Pallet 1")?.shipmentItems?.size()?:0
+		assertEquals "Pallet shipment should equal Shipment 2", shipment2, Container.findByName("Pallet 1")?.shipment
+
+		
+
+	}
+		
 	/**
 	* Move a container to another shipment.
 	*/
-   void testMoveContainerWithContainersToShipment() {
+   void test_moveContainer_shouldMoveChildContainersToShipment() {
 	   def shipment1 = Shipment.findByName("New Shipment 1")
-	   
+	   def shipment2 = Shipment.findByName("New Shipment 2")	   
 	   def pallet1 = new Container(name: "Pallet 1", containerType: ContainerType.findByName("Pallet"))
 	   shipment1.addToContainers(pallet1);
 	   shipment1.save(flush:true)
@@ -153,30 +207,30 @@ class ShipmentServiceTests extends GroovyTestCase {
 	   def box1 = pallet1.addNewContainer(ContainerType.findByName("Box"))
 	   box1.name = "Box 1"
 	   pallet1.addToContainers(box1)	   
-	   shipmentService.saveContainer(pallet1)
+	   //shipmentService.saveContainer(pallet1)
 	   
 	   
 	   def shipmentItem1 = new ShipmentItem(product: Product.findByName("Product"), quantity: 1, container: box1)
-	   shipment1.addToShipmentItems(shipmentItem1).save()
+	   shipment1.addToShipmentItems(shipmentItem1)
+	   shipment1.save()
 	   	   
-	   def shipment2 = Shipment.findByName("New Shipment 2")	   
-	   shipmentService.moveContainer(pallet1, shipment2)
+	   assertEquals "Box should contain 1 shipment item", 1, box1?.getShipmentItems()?.size()?:0
+	   assertEquals "Pallet's shipment should be shipment 1", shipment1, pallet1.shipment
+	   assertEquals "Pallet's shipment should contain 1 shipment item ", 1, pallet1.shipment?.shipmentItems?.size()?:0
 	   
-	   def testPallet = Container.findByName("Pallet 1")	   
-	   assertEquals testPallet.shipment, shipment2
-	   assertEquals testPallet.containers.size(), 1
-	   assertNotNull testPallet.containers.find { it.name == "Box 1" }
-	   assertEquals testPallet.shipment.shipmentItems.size(), 1
-	  
-	   def testBox = Container.findByName("Box 1")
-	   assertNotNull testBox
-	   assertEquals testBox.shipmentItems.size(), 1
+	   shouldFail (ValidationException) {
+		   shipmentService.moveContainer(pallet1, shipment2)
+	   }
+	   
+	   //printShipment("After move container", shipment2)
+	   
+	   assertEquals "Pallet's shipment should still be shipment 1", shipment1, Container.findByName("Pallet 1").shipment
    }
 
    /**
     * 
     */
-   void testCascadeDeleteContainer() {
+   void test_deleteShipment_shouldCascadeDeleteContainers() {
 	   def shipment1 = Shipment.findByName("New Shipment 1")	   
 	   def pallet1 = new Container(name: "Pallet 1", containerType: ContainerType.findByName("Pallet"))	   
 	   def shipmentItem1 = new ShipmentItem(product: Product.findByName("Product"), quantity: 1, container: pallet1)
@@ -189,11 +243,119 @@ class ShipmentServiceTests extends GroovyTestCase {
 	   assertEquals 1, testShipment.shipmentItems.size()
 	   assertEquals 1, testShipment.containers.size()
 	   assertEquals 1, testShipment.containers.toArray()[0].shipmentItems.size()
-	     
+	   def numberOfShipmentsBeforeDelete = Shipment.count()
+	   def numberOfContainersBeforeDelete = Container.count()	   
+	   shipmentService.deleteShipment(testShipment)
 	   
+	   def deletedShipment = Shipment.findByName("New Shipment 1")
 	   
+	   assertNull "Should be null", deletedShipment
+	   assertEquals "Should be equal to # of shipments before delete minus 1", numberOfShipmentsBeforeDelete-1, Shipment.count()
+	   assertEquals "Should be equal to # of containers before delete minus 1", numberOfContainersBeforeDelete-1, Container.count()
 	   
    }
-	
+   
+   void test_deleteShipment_shouldCascadeDeleteShipmentItems() {
+	   def shipment1 = Shipment.findByName("New Shipment 1")
+	   def pallet1 = new Container(name: "Pallet 1", containerType: ContainerType.findByName("Pallet"))
+	   def shipmentItem1 = new ShipmentItem(product: Product.findByName("Product"), quantity: 1, container: pallet1)
+	   shipment1.addToShipmentItems(shipmentItem1)
+	   shipment1.addToContainers(pallet1);
+	   shipment1.save(flush:true)
+
+	   def testShipment = Shipment.findByName("New Shipment 1")
+	   assertEquals 1, testShipment.shipmentItems.size()
+	   assertEquals 1, testShipment.containers.size()
+	   assertEquals 1, testShipment.containers.toArray()[0].shipmentItems.size()
+	   
+	   def numberOfShipmentItemsBeforeDelete = ShipmentItem.count()
+	   def numberOfShipmentsBeforeDelete = Shipment.count()
+	   
+	   shipmentService.deleteShipment(testShipment)
+	   
+	   assertEquals numberOfShipmentsBeforeDelete-1, Shipment.count()
+	   assertEquals numberOfShipmentItemsBeforeDelete-1, ShipmentItem.count()
+	   
+   }
+
+   /**
+    * @TODO Should be moved to  
+    */
+   void test_deleteContainer_shouldDeleteContainerButNotShipmentItems() {
+	   def shipment1 = Shipment.findByName("New Shipment 1")
+	   def pallet1 = new Container(name: "Pallet 1", containerType: ContainerType.findByName("Pallet"))
+	   def shipmentItem1 = new ShipmentItem(product: Product.findByName("Product"), quantity: 1, container: pallet1)
+	   shipment1.addToShipmentItems(shipmentItem1)
+	   shipment1.addToContainers(pallet1);
+	   shipment1.save(flush:true)
+
+	   def shipmentBefore = Shipment.findByName("New Shipment 1")
+	   assertEquals 1, shipmentBefore.shipmentItems.size()
+	   assertEquals 1, shipmentBefore.containers.size()
+	   assertEquals 1, shipmentBefore.containers.toArray()[0].shipmentItems.size()
+	   def numberOfShipmentItemsBeforeDelete = ShipmentItem.count()
+	   def numberOfContainersBeforeDelete = Container.count()
+	    
+	   shipmentService.deleteContainer(pallet1)
+	   	   
+	   def shipmentAfter = Shipment.findByName("New Shipment 1")
+	   assertEquals 1, shipmentAfter.shipmentItems.size()
+	   assertEquals "Should be equal to # of shipment items before delete", numberOfShipmentItemsBeforeDelete, ShipmentItem.count()
+	   assertEquals "Should be equal to # of containers before delete minus 1", numberOfContainersBeforeDelete-1, Container.count()
+	   
+   }
+
+   void test_deleteShipmentItem_shouldDeleteShipmentItemFromShipment() {
+	   def shipment = Shipment.findByName("New Shipment 1")
+	   //def pallet1 = new Container(name: "Pallet 1", containerType: ContainerType.findByName("Pallet"))
+	   def shipmentItem1 = new ShipmentItem(product: Product.findByName("Product"), quantity: 1)
+	   shipment.addToShipmentItems(shipmentItem1)	      
+	   assertEquals "Should be equal to 1", 1, shipment?.shipmentItems?.size()?:0
+	   shipmentService.deleteShipmentItem(shipmentItem1)	   
+	   assertEquals "Should be equal to 0", 0, shipment?.shipmentItems?.size()?:0
+   }
+   
+   
+   void test_deleteShipmentItem_shouldDeleteShipmentItemWithContainerFromShipment() {
+	   def shipment = Shipment.findByName("New Shipment 1")
+	   def pallet1 = new Container(name: "Pallet 1", containerType: ContainerType.findByName("Pallet"))
+	   shipment.addToContainers(pallet1)
+	   shipment.save(flush:true)
+	   
+	   def shipmentItem1 = new ShipmentItem(product: Product.findByName("Product"), quantity: 1, container: pallet1)
+	   shipment.addToShipmentItems(shipmentItem1)
+	   shipment.save(flush:true)
+	   
+	   def shipmentItemCount = ShipmentItem.count()
+	   assertEquals "Should be equal to 1", 1, shipment?.shipmentItems?.size()?:0
+	   shipmentService.deleteShipmentItem(shipmentItem1)
+	   assertEquals "Should be equal to 0", 0, shipment?.shipmentItems?.size()?:0
+	   assertEquals "Should be equal to 0", 0, Container.findByName("Pallet 1")?.getShipmentItems()?.size()?:0
+	   assertEquals "Should be equal to 1", shipmentItemCount-1, ShipmentItem.count()
+   }
+      
+ 
+   	
+   void printShipment(text, shipment) { 
+	   println "===================== ${text} :: ${shipment.name} [${shipment.class.name}] ====================="
+	   println shipment as JSON
+	   shipment.shipmentItems.each { 
+		   printShipmentItem(text, it)
+	   }
+	   println "---------------------------------------------------"
+   }
+   
+   void printContainer(text, container) {
+	   println "----------------- ${text} :: ${container.name} [${container.class.name}] --------------------"
+	   println container as JSON	   
+	   println "---------------------------------------------------"
+   }
+   
+   void printShipmentItem(text, shipmentItem) {
+	   println "----------------- ${text} :: ${shipmentItem.id} [${shipmentItem.class.name}] --------------------"
+	   println shipmentItem as JSON
+	   println "---------------------------------------------------"
+   }
+
 }
 

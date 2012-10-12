@@ -65,15 +65,12 @@ class BaseIntegrationTest extends GroovyTestCase {
 
 
 
-    void testDataHasBeenInitialized() {
-
+    void test_setUp_shouldHaveBeenInitialized() {
         assert transactionType_consumptionDebit.id != null
         assert transactionType_inventory.id != null
         assert transactionType_productInventory.id != null
         assert transactionType_transferIn.id != null
         assert transactionType_transferOut.id != null
-
-
         assert bostonLocation.id != null
         assert haitiLocation.id != null
         assert warehouseLocationType.id != null

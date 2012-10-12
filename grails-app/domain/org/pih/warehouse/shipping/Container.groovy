@@ -32,20 +32,20 @@ class Container implements Comparable, java.io.Serializable {
 	
 	ContainerType containerType			// Type of container
 	ContainerStatus containerStatus		// Status of the container (open, closed)
-	
+	Container parentContainer
 	//Shipment shipment
 	//Container parentContainer			// the "containing" container
 	//SortedSet containers				// Child containers (in combination with mapping, helps to order containers)
 
 	// Added parentContainer to belongsTo in order to allow automatic cascade-delete of children when deleting a container
-	static belongsTo = [ shipment : Shipment, parentContainer : Container ];
+	static belongsTo = [ shipment : Shipment ];
 	static hasMany = [ containers : Container];
 
 
 	static transients = [ "optionValue", "shipmentItems" ]
 	static mapping = {
 		id generator: 'uuid'
-		containers cascade: "all-delete-orphan"
+		//containers cascade: "all-delete-orphan"
 	}
 		
 	// Constraints

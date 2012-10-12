@@ -141,10 +141,10 @@ log4j = {
 	// Example of changing the log pattern for the default console    
 	appenders {
 
-		println "grails.mail.enabled: '${grails.mail.enabled.toString()}'"
-		println "mail.error.server: '${mail.error.server}'"
-		println "mail.error.username: '${mail.error.username}'"
-		println "mail.error.password: '${mail.error.password}'"
+		//println "grails.mail.enabled: '${grails.mail.enabled.toString()}'"
+		//println "mail.error.server: '${mail.error.server}'"
+		//println "mail.error.username: '${mail.error.username}'"
+		//println "mail.error.password: '${mail.error.password}'"
 
         if (Boolean.parseBoolean(grails.mail.enabled.toString())) {
 	       
@@ -356,6 +356,6 @@ grails.gorm.default.mapping = {
  */
 // default and supported locales
 locale.defaultLocale = 'en'
-locale.supportedLocales = ['en','fr']
+locale.supportedLocales = ['en','fr','sp']
 
 

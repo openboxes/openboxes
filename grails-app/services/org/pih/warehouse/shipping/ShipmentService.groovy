@@ -425,22 +425,9 @@ class ShipmentService {
 	 * @param container
 	 */
 	void saveContainer(Container container) {	
-		log.info("Container recipient " + container.recipient);	
 		if (!container.recipient) { 			
 			container.recipient = (container?.parentContainer?.recipient)?:container.shipment.recipient;
-			log.info("Set recipient to " + container.recipient);	
 		}
-		log.info("Set recipient to " + container.recipient);	
-		
-		// Set the sort order
-		log.info("Container sort order " + container.sortOrder)
-		log.info("Container #: " + container?.shipment?.containers?.size())
-		//if (!container.sortOrder) {
-		//	def index = container?.shipment?.containers?.size() ?: 0
-		//	container.sortOrder = index - 1
-		//}
-
-		
 		container.save()
 	}
 	
@@ -495,14 +482,78 @@ class ShipmentService {
 	}
 	*/
 	
-	void copyContainer(Container container, Shipment shipment) { 
+	
+	/**
+	 * @param container the container to be moved
+	 * @param shipmentTo the shipment to which the container will be moved
+	 */
+	void moveContainer(Container container, Shipment shipmentTo) { 		
 		
+		if (container.containers) { 
+			throw new ValidationException("Cannot move a container with child containers", container.errors)
+		}
+				
+		def shipmentFrom = container.shipment
+		shipmentFrom.removeFromContainers(container)
+		shipmentTo.addToContainers(container)
+
+		def shipmentItems = ShipmentItem.findAllByContainer(container)
+		println "Shipment items " + shipmentItems?.size()
+		shipmentItems.each { shipmentItem ->
+			shipmentFrom.removeFromShipmentItems(shipmentItem)
+			shipmentTo.addToShipmentItems(shipmentItem)
+		}
+		
+
+		/*
+		def previousShipment = container.shipment;
+		shipment.addToContainers(container)
+		//container.shipment = shipment
+		container.containers.each { child ->
+			//child.shipment = shipment
+			container.addToContainers(child)
+		}
+		shipment.save()
+		previousShipment.save()
+		//container.refresh()
+		//previousShipment.refresh()
+		 */
 	}
 	
+	/*
+	void moveContainer(Container container, Shipment shipment) { 
+		// Get a copy of the container to be moved		
+		def newContainer = container.copyContainer()
+		
+		// Move all children containers
+		container.containers.each { childContainer ->
+			newContainer.addToContainers(childContainer)
+			childContainer.shipment = shipment
+			childContainer.parentContainer.shipment = shipment
+		}
+
+		
+		// 
+		//newContainer.containers.each { childContainer ->
+		//}
+		
+		// Remove the container from the existing shipment
+		def shipmentOld = container.shipment
+		shipmentOld.removeFromContainers(container)
+		saveShipment(shipmentOld)
+		
+		// Add the cloned container to the new shipment
+		shipment.addToContainers(newContainer)
+		
+		saveShipment(shipment)
+	}
+	*/
 	
+	/*
 	void moveContainer(Container container, Shipment newShipment) { 
 		
 		def oldShipment = container.shipment
+		
 		
 		// Move all shipment items in the container
 		def shipmentItems = oldShipment.shipmentItems.findAll { it.container == container }
@@ -510,7 +561,7 @@ class ShipmentService {
 			newShipment.addToShipmentItems(item);
 		}
 
-		// Move all subcontainers and shipment items in the container
+		// Move all subcontainers and shipment items in the subcontainer
 		container?.containers?.each { box -> 
 			newShipment.addToContainers(box);
 			shipmentItems = oldShipment.shipmentItems.findAll { it.container == box }
@@ -520,22 +571,32 @@ class ShipmentService {
 		}
 
 		newShipment.addToContainers(container);
+		container.shipment = newShipment
 		saveShipment(newShipment)
-				
+		
+		oldShipment.removeFromContainers(container)
+		saveShipment(oldShipment)
+		//container.shipment = newShipment
+		//container.save(true)
+		//container.shipment = newShipment;		
+		//newShipment.addToContainers(container);
+		//saveShipment(newShipment)
+		//oldShipment.removeFromContainers(container);
+		//saveShipment(oldShipment)		
 	}
-	
+	*/
 	
 	/**
 	 * Saves an item
 	 * 
 	 * @param item
 	 */
-	void saveShipmentItem(ShipmentItem item) {
+	void saveShipmentItem(ShipmentItem shipmentItem) {
 		/*
 		if (!item.recipient) { 
 			item.recipient = (item?.container?.recipient)?:(item?.shipment?.recipient);
 		}*/
-		item.save()
+		shipmentItem.save()
 	}
 	
 	
@@ -579,13 +640,25 @@ class ShipmentService {
 	
 	
 	/**
-	 * Deletes a container
+	 * Deletes a shipment and all of its related objects
+	 * 
+	 * @param shipment
+	 */
+	void deleteShipment(Shipment shipment) { 
+		shipment.delete()
+	}
+	
+	/**
+	 * Deletes a container, but leaves all shipment items 
 	 * 
 	 * @param container
 	 */
 	void deleteContainer(Container container) {
+
 		// nothing to do if null
 		if (!container) { return }
+		
+		def shipment = container.shipment
 		
 		// first we need recursively call method to handle deleting all the child containers
 		def childContainers = container.containers.collect { it }   // make a copy to avoid concurrent modification
@@ -594,8 +667,9 @@ class ShipmentService {
 		}
 		
 		// remove all items in the container from the parent shipment
-		container.getShipmentItems().each { 
-			container.shipment.removeFromShipmentItems(it).save() 
+		container.getShipmentItems().each { shipmentItem ->
+			//shipment.removeFromShipmentItems(it)
+			shipmentItem.container = null
 		}
 		
 		// NOTE: I'm using the standard "remove" set method here instead of the removeFrom Grails
@@ -603,39 +677,25 @@ class ShipmentService {
 		// the fact that a container can be associated with both a shipment and another container
 		
 		// remove the container from its parent
-		container.parentContainer?.containers?.remove(container)
+		//container.parentContainer?.removeFromContainers(container)
 					
 		// remove the container itself from the parent shipment
-		container.shipment.containers.remove(container)
+		shipment.removeFromContainers(container)
 		
-		container.shipment.save()
+		//container.shipment.save()
+		container.delete()
 	}
+	
 	
 	/**
 	 * Deletes a shipment item
 	 * 
 	 * @param item
 	 */
-	void deleteShipmentItem(ShipmentItem item) {
-		
-		try { 				
-			def shipment = Shipment.get(item.shipment.id)
-			shipment.removeFromShipmentItems(item)
-			item.delete(flush:true)	
-		} catch (ConstraintViolationException e) { 
-			log.info("constraint violation " + e.message);
-			throw new RuntimeException(e);
-		} catch (HibernateOptimisticLockingFailureException e) { 
-			log.info("optimistic locking failure " + e.message);				
-			throw new RuntimeException(e);
-		} catch (MySQLIntegrityConstraintViolationException e) { 
-			log.info("mysql error " + e.message);		
-			throw new RuntimeException(e);
-		} catch (DataIntegrityViolationException e) { 
-			log.info("data integrity violation " + e.message);		
-			throw new RuntimeException(e);
-		}
-			
+	void deleteShipmentItem(ShipmentItem shipmentItem) {		
+		def shipment = Shipment.get(shipmentItem.shipment.id)
+		shipment.removeFromShipmentItems(shipmentItem)
+		shipmentItem.delete(flush:true)				
 	}
 	
 	/**
@@ -749,6 +809,7 @@ class ShipmentService {
 		}
 		return shipmentList;		
 	}
+	
 	
 	/**
 	 * 
