@@ -13,6 +13,8 @@ import org.pih.warehouse.pages.ViewShipmentPage
 class ShipmentSpec extends GebReportingSpec{
 
     def "should send a sea shipment from Boston to Miami"(){
+        def product_name = "TestProd" + UUID.randomUUID().toString()[0..5]
+        def shipment_name = product_name + "_shipment"
         given:
             def inventory_item = DbHelper.CreateProductInInventory(product_name, 5000)
             PageNavigator.UserLoginedAsManagerForBoston()
@@ -56,6 +58,5 @@ class ShipmentSpec extends GebReportingSpec{
             quantity == "200"
     }
 
-   def product_name = "TestProd" + UUID.randomUUID().toString()[0..5]
-   def shipment_name = product_name + "_shipment"
+
 }
