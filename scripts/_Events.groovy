@@ -26,7 +26,7 @@ private determineGitRevisionNumber = {
 eventWarStart = {
 	log.info "Copying liquibase changelogs ..."
 	ant.copy(todir:"${basedir}/target/classes", failonerror:true, overwrite:true) {
-		fileset(dir:"${basedir}/grails-app/migrations", includes:"**/*.xml")
+		fileset(dir:"${basedir}/grails-app/migrations", includes:"**/*")
 	}
 }
 
