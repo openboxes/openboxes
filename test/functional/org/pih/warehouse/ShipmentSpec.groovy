@@ -11,6 +11,7 @@ import org.pih.warehouse.pages.ViewShipmentPage
 
 
 class ShipmentSpec extends GebReportingSpec{
+
     def "should send a sea shipment from Boston to Miami"(){
         given:
             def inventory_item = DbHelper.CreateProductInInventory(product_name, 5000)

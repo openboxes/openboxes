@@ -6,7 +6,7 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'inventory.label', default: 'Inventory')}" />
         <title>
-        	<format:category category="${commandInstance?.categoryInstance}"/>
+        	Browse inventory
         </title>    
     </head>    
     <body>
