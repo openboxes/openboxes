@@ -43,7 +43,7 @@ class ProductSpec extends GebReportingSpec{
         then:
           // at ShowStockCardPage  //not sure why it fails under headless
            totalQuantity == "7,963"
-           productName == product_name
+           stockProductName == product_name
     }
 
      def product_name = "TestProd" + UUID.randomUUID().toString()[0..5]
