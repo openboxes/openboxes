@@ -20,6 +20,7 @@ import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.auth.AuthService
 
 
 class DbHelper {
@@ -50,18 +51,28 @@ class DbHelper {
     }
 
     static InventoryItem CreateProductInInventory(productName, quantity, expirationDate = new Date().plus(30)) {
+
+        println "try to create product ${productName}"
+
         Product product = new Product()
         product.name = productName
         product.category = Category.findByName("Medicines")
         product.manufacturer = "TWTest"
         product.manufacturerCode ="TestABC"
-        product.save(flush:true)
+        if(!product.save(flush:true)){
+            product.errors.each{println(it)}
+
+        }
+
 
         InventoryItem item = new InventoryItem()
         item.product = product
         item.lotNumber = "lot57"
         item.expirationDate = expirationDate
-        item.save(flush:true)
+        if(!item.save(flush:true)){
+            item.errors.each{println(it)}
+        }
+
 
         Location boston =  Location.findByName("Boston Headquarters");
 
@@ -70,13 +81,17 @@ class DbHelper {
         transaction.inventory = boston.inventory
 	    transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
 
+
         TransactionEntry transactionEntry = new TransactionEntry()
         transactionEntry.quantity = quantity
 		transactionEntry.inventoryItem = item
 
-        transaction.addToTransactionEntries(transactionEntry)
-        transaction.save(flush:true)
 
-        item
+        println "saving transaction..."
+        transaction.addToTransactionEntries(transactionEntry)
+        if(!transaction.save(flush:true)){
+            transaction.errors.each{println(it)}
+        }
+        return item
     }
 }
