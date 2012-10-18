@@ -1,12 +1,13 @@
 package org.pih.warehouse.pages
 
 import geb.Page
-import testutils.Settings
+
 
 import org.pih.warehouse.modules.AddItemToShipmentModule
+import testutils.TestFixture
 
 class EditPackingListPage extends Page{
-    static url = Settings.baseUrl + "/createShipmentWorkflow/createShipment"
+    static url = TestFixture.baseUrl + "/createShipmentWorkflow/createShipment"
     static at = { title == "Add shipment items"}
     static content = {
         nextButton(to: SendShipmentPage){$("button", name:"_eventId_next")}

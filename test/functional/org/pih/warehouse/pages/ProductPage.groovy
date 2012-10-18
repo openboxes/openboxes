@@ -1,10 +1,11 @@
 package org.pih.warehouse.pages
 
 import geb.Page
-import testutils.Settings
+import testutils.TestFixture
+
 
 class ProductPage extends Page{
-    static url = Settings.baseUrl + "/product/create"
+    static url = TestFixture.baseUrl + "/product/create"
     static at = { title == "Add new product"}
     static content ={
         productDescription { $("#tabs-details form input", name:"name") }

@@ -2,7 +2,7 @@ package org.pih.warehouse
 
 import geb.spock.GebReportingSpec
 import testutils.TestFixture
-import testutils.PageNavigator
+
 import org.pih.warehouse.pages.EnterShipmentDetailsPage
 import org.pih.warehouse.pages.EnterTrackingDetailsPage
 import org.pih.warehouse.pages.EditPackingListPage
@@ -17,7 +17,7 @@ class ShipmentSpec extends GebReportingSpec{
         def shipment_name = product_name + "_shipment"
 
         given:
-            PageNavigator.UserLoginedAsManagerForBoston()
+            TestFixture.UserLoginedAsManagerForBoston()
             TestFixture.CreateProductInInventory(product_name, 5000)
             to EnterShipmentDetailsPage
         when:

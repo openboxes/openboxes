@@ -1,10 +1,11 @@
 package org.pih.warehouse.pages
 
 import geb.Page
-import testutils.Settings
+import testutils.TestFixture
+
 
 class EnterTrackingDetailsPage extends Page{
-    static url = Settings.baseUrl + "/createShipmentWorkflow/createShipment"
+    static url = TestFixture.baseUrl + "/createShipmentWorkflow/createShipment"
     static at = { title == "Enter tracking details"}
     static content = {
         nextButton(to: EditPackingListPage){$("button", name:"_eventId_next")}

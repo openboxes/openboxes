@@ -2,10 +2,11 @@
 package org.pih.warehouse.pages
 
 import geb.Page
-import testutils.Settings
+import testutils.TestFixture
+
 
 class LocationPage extends  Page{
-    static url = Settings.baseUrl + "/dashboard/chooseLocation"
+    static url = TestFixture.baseUrl + "/dashboard/chooseLocation"
     static at = { title == "Choose a location"}
     static content ={
         boston(to: DashboardPage) { $("#warehouse-1-link")}

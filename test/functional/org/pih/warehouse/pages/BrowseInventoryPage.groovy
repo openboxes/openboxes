@@ -1,10 +1,11 @@
 package org.pih.warehouse.pages
 
 import geb.Page
-import testutils.Settings
+import testutils.TestFixture
+
 
 class BrowseInventoryPage extends Page {
-    static url = Settings.baseUrl + "/inventory/browse"
+    static url = TestFixture.baseUrl + "/inventory/browse"
     static at = { title == "Browse inventory"}
     static content ={
         selectProductCategory { $("select[name='subcategoryId']") }

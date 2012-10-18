@@ -26,18 +26,18 @@
 	                            	<label for='description'><warehouse:message code="default.description.label" /></label>
 	                            </td>
 	                            
-	                            <td valign="top" class="value">${fieldValue(bean: orderInstance, field: "description")}</td>
+	                            <td valign="top" class="value" id="order-description">${fieldValue(bean: orderInstance, field: "description")}</td>
 	                            
 	                        </tr>
 							<tr class='prop'>
 								<td valign='top' class='name'><label for='source'><warehouse:message code="order.orderedFrom.label"/></label></td>
-								<td valign='top' class='value'>
+								<td valign='top' class='value' id="order-origin">
 									${orderInstance?.origin?.name?.encodeAsHTML()}
 								</td>
 							</tr>
 							<tr class='prop'>
 								<td valign='top' class='name'><label for="destination"><warehouse:message code="order.orderedFor.label"/></label></td>
-								<td valign='top' class='value'>
+								<td valign='top' class='value' id="order-destination">
 									${orderInstance?.destination?.name?.encodeAsHTML()}
 								</td>
 							</tr>
@@ -192,7 +192,7 @@
 											</thead>									
 											<tbody>
 												<g:each var="orderItem" in="${orderInstance?.orderItems}" status="i">
-													<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+													<tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'}">
 														<td>
 															<g:if test="${orderItem?.product }">
 																<warehouse:message code="product.label" />
@@ -204,7 +204,7 @@
 																<warehouse:message code="default.unclassified.label" />										
 															</g:else>
 														</td>
-														<td>
+														<td class="order-item-product">
 															<g:if test="${orderItem?.product }">
 																<g:link controller="inventoryItem" action="showStockCard" params="['product.id':orderItem?.product?.id]">
 																	<format:product product="${orderItem?.product}"/> 
@@ -214,10 +214,10 @@
 																${orderItem?.description }
 															</g:else>
 														</td>
-														<td>
+														<td class="order-item-quantity">
 															${orderItem?.quantity}
 														</td>
-														<td>
+														<td class="order-item-fullfilled">
 															${orderItem?.quantityFulfilled()}
 														</td>
 													</tr>

@@ -1,11 +1,12 @@
 package org.pih.warehouse.pages
 
 import geb.Page
-import testutils.Settings
+import testutils.TestFixture
+
 
 
 class ViewShipmentPage extends Page{
-    static url = Settings.baseUrl + "/shipment/showDetails"
+    static url = TestFixture.baseUrl + "/shipment/showDetails"
     static at = { title == "View shipment"}
     static content ={
        shipmentName{$("#shipmentSummary span.title").text().trim()}

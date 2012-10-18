@@ -1,10 +1,11 @@
 package org.pih.warehouse.pages
 
 import geb.Page
-import testutils.Settings
+import testutils.TestFixture
+
 
 class EnterOrderDetailsPage extends Page {
-    static url = Settings.baseUrl + "/purchaseOrderWorkflow/purchaseOrder"
+    static url = TestFixture.baseUrl + "/purchaseOrderWorkflow/purchaseOrder"
     static at = { title == "Enter order details"}
     static content ={
         purchaseOrderDescription { $("input[name='description']") }

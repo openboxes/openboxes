@@ -1,17 +1,18 @@
 package org.pih.warehouse
 
 import geb.spock.GebReportingSpec
-import testutils.PageNavigator
+
 import org.pih.warehouse.pages.ProductPage
 import org.pih.warehouse.pages.InventoryPage
 import org.pih.warehouse.pages.ShowStockCardPage
+import testutils.TestFixture
 
 
 
 class ProductSpec extends GebReportingSpec{
     def "should create a new product and a inventory item"(){
         given:
-            PageNavigator.UserLoginedAsManagerForBoston()
+            TestFixture.UserLoginedAsManagerForBoston()
         and:
             to ProductPage
         when:

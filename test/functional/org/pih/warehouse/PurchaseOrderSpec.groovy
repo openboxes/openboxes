@@ -7,7 +7,7 @@ import org.pih.warehouse.pages.EnterOrderDetailsPage
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import testutils.TestFixture
-import testutils.PageNavigator
+
 
 class PurchaseOrderSpec extends GebReportingSpec {
     def "should create a new purchase order and add items"(){
@@ -15,7 +15,7 @@ class PurchaseOrderSpec extends GebReportingSpec {
         def orderDescription = "TestOrder" + UUID.randomUUID().toString()[0..5]
         given:
             def location = TestFixture.CreateSupplierIfRequired()
-            PageNavigator.UserLoginedAsManagerForBoston()
+            TestFixture.UserLoginedAsManagerForBoston()
             TestFixture.CreateProductInInventory(productName, 50)
         and:
             to EnterOrderDetailsPage
@@ -34,10 +34,7 @@ class PurchaseOrderSpec extends GebReportingSpec {
         and:
             at AddOrderItemsPage
             numItemInOrder.text() == "There are 1 items in this order."
-        //todo: verify by UI
-//            def po_id = Order.executeQuery("select id from Order o order by o.dateCreated")[0]
-//            def po_item = OrderItem.executeQuery("select product.id from OrderItem oi where oi.order.id = ?", po_id)[0]
-//            po_item == product.id
+
         and:
             nextButton.click()
         then:
@@ -46,6 +43,9 @@ class PurchaseOrderSpec extends GebReportingSpec {
             placeOrderButton.click()
         then:
             at OrderSummaryPage
-            orderStatus.text() == "Placed"
+            orderStatus == "Placed"
+            description == orderDescription
+            productInfirstItem == productName
+            quantityInfirstItem == "10"
     }
 }

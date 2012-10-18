@@ -5,8 +5,27 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.pages.ProductPage
 import org.pih.warehouse.pages.InventoryPage
 import geb.Browser
+import org.pih.warehouse.pages.LocationPage
+import org.pih.warehouse.pages.LoginPage
 
 class TestFixture{
+
+    static  baseUrl = "/openboxes"
+
+      static def UserLoginedAsManagerForBoston(){
+          Browser.drive {
+            to LoginPage
+            loginForm.with{
+                username = "manager"
+                password = "password"
+            }
+            submitButton.click()
+
+            at LocationPage
+
+            boston.click()
+          }
+    }
 
     static Location CreateSupplierIfRequired() {
         def loc = Location.findByName("Test Supplier")

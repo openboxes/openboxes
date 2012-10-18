@@ -10,10 +10,11 @@
 package org.pih.warehouse.pages
 
 import geb.Page
-import testutils.Settings
+import testutils.TestFixture
+
 
 class DashboardPage extends Page{
-    static url = Settings.baseUrl + "dashboard/index"
+    static url = TestFixture.baseUrl + "dashboard/index"
     static at = { title == "Dashboard"}
     static content = {
 

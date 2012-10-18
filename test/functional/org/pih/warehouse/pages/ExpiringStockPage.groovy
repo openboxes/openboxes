@@ -1,10 +1,11 @@
 package org.pih.warehouse.pages
 
 import geb.Page
-import testutils.Settings
+import testutils.TestFixture
+
 
 class ExpiringStockPage extends Page {
-    static url = Settings.baseUrl + "/inventory/listExpiringStock"
+    static url = TestFixture.baseUrl + "/inventory/listExpiringStock"
     static at = { title == "Expiring stock"}
     static content = {
         category { $("select", name:"category") }

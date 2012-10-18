@@ -1,11 +1,12 @@
 package org.pih.warehouse.pages
 
 import geb.Page
-import testutils.Settings
+
 import org.pih.warehouse.modules.DatePickerModule
+import testutils.TestFixture
 
 class InventoryPage extends Page{
-    static url = Settings.baseUrl + "/inventoryItem/showRecordInventory"
+    static url = TestFixture.baseUrl + "/inventoryItem/showRecordInventory"
     static at = { title == "Record inventory"}
     static content ={
         productName { $("div.title").text().trim() }

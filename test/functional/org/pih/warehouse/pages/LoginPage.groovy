@@ -10,11 +10,12 @@
 package org.pih.warehouse.pages
 
 import geb.Page
+import testutils.TestFixture
 
-import testutils.Settings
+
 
 class LoginPage extends Page{
-    static url = Settings.baseUrl + "/auth/login"
+    static url = TestFixture.baseUrl + "/auth/login"
     static at = { title == "Login"}
     static content ={
         loginForm { $("form")}

@@ -4,13 +4,14 @@ import geb.spock.GebReportingSpec
 import org.pih.warehouse.pages.BrowseInventoryPage
 import org.pih.warehouse.pages.InventoryPage
 import org.pih.warehouse.pages.ShowStockCardPage
-import testutils.PageNavigator
+import testutils.TestFixture
+
 
 class RecordInventorySpec extends GebReportingSpec {
 
     def "should create new inventory item for existing product"() {
         given:
-            PageNavigator.UserLoginedAsManagerForBoston()
+            TestFixture.UserLoginedAsManagerForBoston()
         and:
             to BrowseInventoryPage
         when:

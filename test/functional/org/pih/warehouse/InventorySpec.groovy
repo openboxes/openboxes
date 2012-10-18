@@ -4,13 +4,13 @@ import geb.spock.GebReportingSpec
 import org.pih.warehouse.pages.ExpiredStockPage
 import org.pih.warehouse.pages.ExpiringStockPage
 import testutils.TestFixture
-import testutils.PageNavigator
+
 
 class InventorySpec extends GebReportingSpec {
     def "should show stock expiring within one week"() {
         def product_name = "TestProd" + UUID.randomUUID().toString()[0..5]
         given:
-            PageNavigator.UserLoginedAsManagerForBoston()
+            TestFixture.UserLoginedAsManagerForBoston()
             TestFixture.CreateProductInInventory(product_name, 5000, new Date().plus(5))
             to ExpiringStockPage
         when:
@@ -24,7 +24,7 @@ class InventorySpec extends GebReportingSpec {
     def "should show stock expiring within 6 months"() {
         def product_name = "TestProd" + UUID.randomUUID().toString()[0..5]
         given:
-            PageNavigator.UserLoginedAsManagerForBoston()
+            TestFixture.UserLoginedAsManagerForBoston()
             TestFixture.CreateProductInInventory(product_name, 5000, new Date().plus(20))
             to ExpiringStockPage
         when:
@@ -38,7 +38,7 @@ class InventorySpec extends GebReportingSpec {
     def "should be able to filter by category"() {
         def product_name = "TestProd" + UUID.randomUUID().toString()[0..5]
         given:
-            PageNavigator.UserLoginedAsManagerForBoston()
+            TestFixture.UserLoginedAsManagerForBoston()
             TestFixture.CreateProductInInventory(product_name, 5000, new Date().plus(20))
             to ExpiringStockPage
         when:
@@ -52,7 +52,7 @@ class InventorySpec extends GebReportingSpec {
     def "should show expired stock"() {
         def product_name = "TestProd" + UUID.randomUUID().toString()[0..5]
         given:
-            PageNavigator.UserLoginedAsManagerForBoston()
+            TestFixture.UserLoginedAsManagerForBoston()
             TestFixture.CreateProductInInventory(product_name, 5000, new Date().minus(1))
             to ExpiredStockPage
         when:
