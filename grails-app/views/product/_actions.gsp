@@ -1,5 +1,5 @@
 <span class="action-menu">
-	<button name="actionButtonDropDown" class="action-btn">
+	<button name="actionButtonDropDown" class="action-btn" id="product-action">
 		<img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>
 		<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
 	</button>

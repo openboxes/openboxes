@@ -1,5 +1,5 @@
 <div >
-	<table style="width: 0%">
+	<table style="width: 0%" id="product-summary">
 		<tbody>
 			<tr>						
 				<td class="top">
