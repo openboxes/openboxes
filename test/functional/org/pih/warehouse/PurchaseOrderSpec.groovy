@@ -14,7 +14,6 @@ class PurchaseOrderSpec extends GebReportingSpec {
     def "should create a new purchase order and add items then receive the order and verify its status has changed"(){
         def productName =  "TestProd" + UUID.randomUUID().toString()[0..5]
         def orderDescription = "TestOrder" + UUID.randomUUID().toString()[0..5]
-        def testDate = new Date().minus(1)
         given:
             TestFixture.UserLoginedAsManagerForBoston()
             def location = TestFixture.CreateSupplierIfRequired()
