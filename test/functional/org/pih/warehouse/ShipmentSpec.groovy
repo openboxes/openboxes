@@ -23,7 +23,7 @@ class ShipmentSpec extends GebReportingSpec{
         when:
             at EnterShipmentDetailsPage
             shipmentType.value("Sea")
-            name.value(shipment_name)
+            shipmentName.value(shipment_name)
             origin.value("Boston Headquarters [Depot]")
             destination.value("Miami Warehouse [Depot]")
             expectedShippingDate.click()
@@ -58,6 +58,7 @@ class ShipmentSpec extends GebReportingSpec{
             quantity == "200"
     }
 
+
     def "should be able to send a suitcase from Boston to Miami"() {
         def product_name = "TestProd" + UUID.randomUUID().toString()[0..5]
         def shipment_name = product_name + "_shipment"
@@ -69,7 +70,7 @@ class ShipmentSpec extends GebReportingSpec{
         when:
             at EnterShipmentDetailsPage
             shipmentType.value("Suitcase")
-            name.value(shipment_name)
+            shipmentName.value(shipment_name)
             origin.value("Boston Headquarters [Depot]")
             destination.value("Miami Warehouse [Depot]")
             expectedShippingDate.click()
@@ -111,5 +112,21 @@ class ShipmentSpec extends GebReportingSpec{
             shipmentDestination == "Miami Warehouse"
             product == product_name
             quantity == "200"
+    }
+
+    def "view pending shipments"(){
+        def product_name = "TestProd" + UUID.randomUUID().toString()[0..5]
+        def shipment_name = product_name + "_shipment"
+        given:
+            TestFixture.UserLoginedAsManagerForBoston()
+            TestFixture.CreateProductInInventory(product_name, 5000)
+            TestFixture.CreatePendingShipment(product_name, shipment_name, 20)
+        when:
+            at ViewShipmentPage
+        then:
+            shipmentName == shipment_name
+            status == "Pending"
+            product == product_name
+            quantity == "20"
     }
 }

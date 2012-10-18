@@ -10,6 +10,7 @@ class EditPackingListPage extends Page{
     static at = { title == "Add shipment items"}
     static content = {
         nextButton(to: SendShipmentPage){$("button", name:"_eventId_next")}
+        saveAndExitButton(to:ViewShipmentPage){$("button", name:"_eventId_save")}
         actionButton{$("button.action-btn")}
         addItemToUnpackedItemsLink(wait:true){$("div#addItemToUnpackedItems a")}
         addPalletToShipmentLink(wait:true){$("div#addPalletToShipment a")}

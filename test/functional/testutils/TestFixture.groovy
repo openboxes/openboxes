@@ -7,6 +7,10 @@ import org.pih.warehouse.pages.InventoryPage
 import geb.Browser
 import org.pih.warehouse.pages.LocationPage
 import org.pih.warehouse.pages.LoginPage
+import org.pih.warehouse.pages.EnterShipmentDetailsPage
+import org.pih.warehouse.pages.EnterTrackingDetailsPage
+import org.pih.warehouse.pages.EditPackingListPage
+import org.pih.warehouse.pages.ViewShipmentPage
 
 class TestFixture{
 
@@ -62,6 +66,34 @@ class TestFixture{
             newQuantity.value(7963)
 
             saveInventoryItem.click()
+
+        }
+    }
+
+      static void CreatePendingShipment(product_name, shipment_name, quantity) {
+        Browser.drive {
+            to EnterShipmentDetailsPage
+            shipmentType.value("Sea")
+            shipmentName.value(shipment_name)
+            origin.value("Boston Headquarters [Depot]")
+            destination.value("Miami Warehouse [Depot]")
+            expectedShippingDate.click()
+            datePicker.today.click()
+            expectedArrivalDate.click()
+            datePicker.tomorrow.click()
+            nextButton.click()
+
+            at EnterTrackingDetailsPage
+            nextButton.click()
+        and:
+            at EditPackingListPage
+            addItemToUnpackedItems()
+            addItemToShipment.searchInventoryItem.searchCriteral.value(product_name)
+            addItemToShipment.searchInventoryItem.firstSuggestion.click()
+            addItemToShipment.quantity.value(quantity)
+            addItemToShipment.saveButton.click()
+            saveAndExitButton.click()
+            at ViewShipmentPage
 
         }
     }

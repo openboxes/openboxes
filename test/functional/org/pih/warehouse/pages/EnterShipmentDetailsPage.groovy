@@ -12,7 +12,7 @@ class EnterShipmentDetailsPage extends Page{
     static content = {
         nextButton(to: EnterTrackingDetailsPage){$("button", name:"_eventId_next")}
         shipmentType { $("select", name:"shipmentType.id") }
-        name{ $("input", name:"name")}
+        shipmentName{ $("input", name:"name")}
         origin{ $("select", name:"origin.id")}
         destination {$("select", name:"destination.id")}
         expectedShippingDate {$("input#expectedShippingDate-datepicker")}
