@@ -91,7 +91,7 @@ class ShipmentSpec extends GebReportingSpec{
             addSuitcaseToShipment.caseLength.value(2)
             addSuitcaseToShipment.addItemButton.click()
 
-            addItemToUnpackedItems()
+
             addItemToShipment.searchInventoryItem.searchCriteral.value(product_name)
             addItemToShipment.searchInventoryItem.firstSuggestion.click()
             addItemToShipment.quantity.value(200)
