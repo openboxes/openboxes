@@ -11,6 +11,7 @@ import org.pih.warehouse.pages.CreateEnterShipmentDetailsPage
 import org.pih.warehouse.pages.EnterTrackingDetailsPage
 import org.pih.warehouse.pages.EditPackingListPage
 import org.pih.warehouse.pages.ViewShipmentPage
+import org.pih.warehouse.pages.CreateLocationPage
 
 class TestFixture{
 
@@ -31,17 +32,20 @@ class TestFixture{
           }
     }
 
+    static String TestSupplierName = "Test Supplier"
     static Location CreateSupplierIfRequired() {
-        def loc = Location.findByName("Test Supplier")
-        if(!loc)
-            loc = new Location()
-        loc.version = 1
-        loc.dateCreated = new Date()
-        loc.lastUpdated = new Date()
-        loc.name = "Test Supplier"
-        loc.locationType = LocationType.findByDescription("Supplier") // Supplier
-        loc.save(flush: true)
-        loc
+        def loc = Location.findByName(TestSupplierName)
+        if(loc) return loc
+
+
+        Browser.drive {
+            to CreateLocationPage
+            locationName.value(TestSupplierName)
+            locationType.value("4") //supplier
+            supportActivities.value("")
+            saveButton.click()
+        }
+        return Location.findByName(TestSupplierName)
     }
 
     static void CreateProductInInventory(productName, quantity, expirationDate = new Date().plus(30)) {

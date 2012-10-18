@@ -16,8 +16,8 @@ class PurchaseOrderSpec extends GebReportingSpec {
         def orderDescription = "TestOrder" + UUID.randomUUID().toString()[0..5]
         def testDate = new Date().minus(1)
         given:
-            def location = TestFixture.CreateSupplierIfRequired()
             TestFixture.UserLoginedAsManagerForBoston()
+            def location = TestFixture.CreateSupplierIfRequired()
             TestFixture.CreateProductInInventory(productName, 50)
         and:
             to EnterOrderDetailsPage
