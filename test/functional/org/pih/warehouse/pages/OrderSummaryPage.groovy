@@ -10,6 +10,8 @@ class OrderSummaryPage extends Page {
     static content ={
         orderStatus { $("[name='status']").text() }
         placeOrderButton(to: OrderSummaryPage) { $("button", name:"placeOrder")}
+        orderActionButton { $("button", class:"action-btn") }
+        receiverOrderActionButton { $("[name='receiveOrderLink']") }
         description { $("#order-description").text()}
         origin { $("#order-origin").text()}
         destination { $("#order-destination").text()}

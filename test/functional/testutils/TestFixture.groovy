@@ -7,7 +7,7 @@ import org.pih.warehouse.pages.InventoryPage
 import geb.Browser
 import org.pih.warehouse.pages.LocationPage
 import org.pih.warehouse.pages.LoginPage
-import org.pih.warehouse.pages.EnterShipmentDetailsPage
+import org.pih.warehouse.pages.CreateEnterShipmentDetailsPage
 import org.pih.warehouse.pages.EnterTrackingDetailsPage
 import org.pih.warehouse.pages.EditPackingListPage
 import org.pih.warehouse.pages.ViewShipmentPage
@@ -72,7 +72,7 @@ class TestFixture{
 
       static void CreatePendingShipment(product_name, shipment_name, quantity) {
         Browser.drive {
-            to EnterShipmentDetailsPage
+            to CreateEnterShipmentDetailsPage
             shipmentType.value("Sea")
             shipmentName.value(shipment_name)
             origin.value("Boston Headquarters [Depot]")

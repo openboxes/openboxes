@@ -6,7 +6,7 @@ import org.pih.warehouse.modules.DatePickerModule
 import testutils.TestFixture
 
 
-class EnterShipmentDetailsPage extends Page{
+class CreateEnterShipmentDetailsPage extends Page{
     static url = TestFixture.baseUrl + "/createShipmentWorkflow/createShipment?type=OUTGOING"
     static at = { title == "Enter shipment details"}
     static content = {

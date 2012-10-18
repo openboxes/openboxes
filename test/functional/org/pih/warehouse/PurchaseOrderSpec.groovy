@@ -4,15 +4,17 @@ import geb.spock.GebReportingSpec
 import org.pih.warehouse.pages.AddOrderItemsPage
 import org.pih.warehouse.pages.OrderSummaryPage
 import org.pih.warehouse.pages.EnterOrderDetailsPage
-import org.pih.warehouse.order.Order
-import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.pages.ReceiveEnterShipmentDetailsPage
+import org.pih.warehouse.pages.ReceiveOrderConfirmPage
+import org.pih.warehouse.pages.ReceiveOrderItemsPage
 import testutils.TestFixture
 
 
 class PurchaseOrderSpec extends GebReportingSpec {
-    def "should create a new purchase order and add items"(){
+    def "should create a new purchase order and add items then receive the order and verify its status has changed"(){
         def productName =  "TestProd" + UUID.randomUUID().toString()[0..5]
         def orderDescription = "TestOrder" + UUID.randomUUID().toString()[0..5]
+        def testDate = new Date().minus(1)
         given:
             def location = TestFixture.CreateSupplierIfRequired()
             TestFixture.UserLoginedAsManagerForBoston()
@@ -34,7 +36,6 @@ class PurchaseOrderSpec extends GebReportingSpec {
         and:
             at AddOrderItemsPage
             numItemInOrder.text() == "There are 1 items in this order."
-
         and:
             nextButton.click()
         then:
@@ -47,5 +48,33 @@ class PurchaseOrderSpec extends GebReportingSpec {
             description == orderDescription
             productInfirstItem == productName
             quantityInfirstItem == "10"
+        and:
+            orderActionButton.click()
+            receiverOrderActionButton.click()
+        and:
+            at ReceiveEnterShipmentDetailsPage
+            shipmentType.value("2") //Sea shipment
+            shippedOnDate.click()
+            datePicker.yesterday.click()
+            deliveredOnDate.click()
+            datePicker.yesterday.click()
+            receiveOrderNextButton.click()
+        and:
+            at ReceiveOrderItemsPage
+            receiveItemQuantity.value(10)
+            receiveItemLotNumber.value("ABCD")
+            receiveItemNextButton.click()
+        and:
+            at ReceiveOrderConfirmPage
+            receiveItemFinishButton.click()
+        then:
+            at OrderSummaryPage
+            orderStatus == "Received"
+            description == orderDescription
+            productInfirstItem == productName
+            quantityInfirstItem == "10"
+
+
     }
+
 }

@@ -3,7 +3,7 @@ package org.pih.warehouse
 import geb.spock.GebReportingSpec
 import testutils.TestFixture
 
-import org.pih.warehouse.pages.EnterShipmentDetailsPage
+import org.pih.warehouse.pages.CreateEnterShipmentDetailsPage
 import org.pih.warehouse.pages.EnterTrackingDetailsPage
 import org.pih.warehouse.pages.EditPackingListPage
 import org.pih.warehouse.pages.SendShipmentPage
@@ -19,9 +19,9 @@ class ShipmentSpec extends GebReportingSpec{
         given:
             TestFixture.UserLoginedAsManagerForBoston()
             TestFixture.CreateProductInInventory(product_name, 5000)
-            to EnterShipmentDetailsPage
+            to CreateEnterShipmentDetailsPage
         when:
-            at EnterShipmentDetailsPage
+            at CreateEnterShipmentDetailsPage
             shipmentType.value("Sea")
             shipmentName.value(shipment_name)
             origin.value("Boston Headquarters [Depot]")
@@ -66,9 +66,9 @@ class ShipmentSpec extends GebReportingSpec{
         given:
             TestFixture.UserLoginedAsManagerForBoston()
             TestFixture.CreateProductInInventory(product_name, 5000)
-            to EnterShipmentDetailsPage
+            to CreateEnterShipmentDetailsPage
         when:
-            at EnterShipmentDetailsPage
+            at CreateEnterShipmentDetailsPage
             shipmentType.value("Suitcase")
             shipmentName.value(shipment_name)
             origin.value("Boston Headquarters [Depot]")

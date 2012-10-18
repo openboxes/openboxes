@@ -33,7 +33,7 @@
 			<hr/>
 		</div>
 		<div class="action-menu-item">
-			<g:link controller="receiveOrderWorkflow" action="receiveOrder" id="${orderInstance?.id}">
+			<g:link name="receiveOrderLink" controller="receiveOrderWorkflow" action="receiveOrder" id="${orderInstance?.id}">
 				<img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />
 				&nbsp;${warehouse.message(code: 'order.receiveOrder.label')} 
 			</g:link>				
