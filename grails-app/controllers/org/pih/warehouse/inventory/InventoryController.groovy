@@ -362,15 +362,7 @@ class InventoryController {
 	}
 
 
-	class ConsumptionCommand {
-		String groupBy
-		Date startDate
-		Date endDate
-		
-		static constraints = {
 
-		}
-	}
 	
 	def showConsumption = { ConsumptionCommand command ->
 		
@@ -1141,5 +1133,15 @@ class InventoryController {
 	}
 	
 }
+
+class ConsumptionCommand {
+		String groupBy
+		Date startDate
+		Date endDate
+
+		static constraints = {
+
+		}
+	}
 
 
