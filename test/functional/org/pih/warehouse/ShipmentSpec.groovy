@@ -55,9 +55,61 @@ class ShipmentSpec extends GebReportingSpec{
             shipmentOrigin == "Boston Headquarters"
             shipmentDestination == "Miami Warehouse"
             product == product_name
-
             quantity == "200"
     }
 
+    def "should be able to send a suitcase from Boston to Miami"() {
+        def product_name = "TestProd" + UUID.randomUUID().toString()[0..5]
+        def shipment_name = product_name + "_shipment"
 
+        given:
+            TestFixture.UserLoginedAsManagerForBoston()
+            TestFixture.CreateProductInInventory(product_name, 5000)
+            to EnterShipmentDetailsPage
+        when:
+            at EnterShipmentDetailsPage
+            shipmentType.value("Suitcase")
+            name.value(shipment_name)
+            origin.value("Boston Headquarters [Depot]")
+            destination.value("Miami Warehouse [Depot]")
+            expectedShippingDate.click()
+            datePicker.today.click()
+            expectedArrivalDate.click()
+            datePicker.tomorrow.click()
+            nextButton.click()
+        and:
+            at EnterTrackingDetailsPage
+            nextButton.click()
+        and:
+            at EditPackingListPage
+            addSuitcaseToShipment()
+            addSuitcaseToShipment.packingUnit.value("suitcase")
+            addSuitcaseToShipment.weight.value(30)
+            addSuitcaseToShipment.caseHeight.value(1)
+            addSuitcaseToShipment.caseWidth.value(1.5)
+            addSuitcaseToShipment.caseLength.value(2)
+            addSuitcaseToShipment.addItemButton.click()
+
+            addItemToUnpackedItems()
+            addItemToShipment.searchInventoryItem.searchCriteral.value(product_name)
+            addItemToShipment.searchInventoryItem.firstSuggestion.click()
+            addItemToShipment.quantity.value(200)
+            addItemToShipment.saveButton.click()
+
+            nextButton.click()
+        and:
+            at SendShipmentPage
+            actualShippingDate.click()
+            datePicker.today.click()
+            nextButton.click()
+        then:
+            at ViewShipmentPage
+            shipmentName == shipment_name
+            status == "Shipped"
+            type == "Suitcase"
+            shipmentOrigin == "Boston Headquarters"
+            shipmentDestination == "Miami Warehouse"
+            product == product_name
+            quantity == "200"
+    }
 }
