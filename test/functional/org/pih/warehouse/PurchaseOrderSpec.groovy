@@ -11,20 +11,23 @@ import testutils.PageNavigator
 
 class PurchaseOrderSpec extends GebReportingSpec {
     def "should create a new purchase order and add items"(){
+        def productName =  "TestProd" + UUID.randomUUID().toString()[0..5]
+        def orderDescription = "TestOrder" + UUID.randomUUID().toString()[0..5]
         given:
             def location = TestFixture.CreateSupplierIfRequired()
             PageNavigator.UserLoginedAsManagerForBoston()
+            TestFixture.CreateProductInInventory(productName, 50)
         and:
             to EnterOrderDetailsPage
         when:
-            purchaseOrderDescription.value("TestingPurchaseOrder")
+            purchaseOrderDescription.value(orderDescription)
             purchaseOrderOrigin.value(location.id)
         and:
             addItemsButton.click()
         and:
             at AddOrderItemsPage
-            TestFixture.CreateProductInInventory("Tylenol", 50)
-            inputProductName.value("Tylenol")
+
+            inputProduct(productName)
             inputQuantity.value(10)
         and:
             addButton.click()
