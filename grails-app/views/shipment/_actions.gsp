@@ -151,7 +151,7 @@
 		<g:if test="${shipmentInstance?.origin?.id == session?.warehouse?.id || shipmentInstance?.destination?.id == session?.warehouse?.id}">
 			<div class="action-menu-item">
 				<g:if test="${shipmentInstance?.isReceiveAllowed()}">
-					<g:link controller="shipment" action="receiveShipment" id="${shipmentInstance.id}">
+					<g:link controller="shipment" action="receiveShipment" id="${shipmentInstance.id}" name="receiveShipmentLink">
 						<img src="${createLinkTo(dir:'images/icons/silk',file:'box.png')}" alt="Receive Shipment" class="middle" />&nbsp;
 						<warehouse:message code="shipping.receiveShipment.label"/>
 					</g:link>				
