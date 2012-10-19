@@ -1,6 +1,7 @@
 package org.pih.warehouse
 
 import geb.spock.GebReportingSpec
+import org.pih.warehouse.pages.ReceiveShipmentPage
 import testutils.TestFixture
 
 import org.pih.warehouse.pages.CreateEnterShipmentDetailsPage
@@ -81,6 +82,7 @@ class ShipmentSpec extends GebReportingSpec{
             nextButton.click()
         and:
             at EditPackingListPage
+
             addSuitcase(unit:"box", weight:30, height:1, width:1.5, length:2)
             addItem(product_name, 200)
             nextButton.click()
@@ -106,10 +108,34 @@ class ShipmentSpec extends GebReportingSpec{
         given:
             TestFixture.UserLoginedAsManagerForBoston()
             TestFixture.CreateProductInInventory(product_name, 5000)
+            status == "Pending"
             TestFixture.CreatePendingShipment(product_name, shipment_name, 20)
         when:
             to ShipmentListPage
         then:
             pendingItems.contains(shipment_name)
+
+    }
+
+    def "should be able to receive a shipment from Miami"() {
+        def product_name = "TestProd" + UUID.randomUUID().toString()[0..5]
+        def shipment_name = product_name + "_shipment"
+
+        given:
+            TestFixture.UserLoginedAsManagerForBoston()
+            TestFixture.CreateProductInInventory(product_name, 5000)
+            TestFixture.SendShipment(shipment_name, product_name, "Miami Warehouse [Depot]", "Boston Headquarters [Depot]")
+        when:
+            at ViewShipmentPage
+            actionButton.click()
+            receiveShipmentLink.click()
+        and:
+            at ReceiveShipmentPage
+            deliveredOnDate.click()
+            datePicker.today.click()
+            saveButton.click()
+        then:
+            at ViewShipmentPage
+            status == "Received"
     }
 }

@@ -2,6 +2,7 @@ package org.pih.warehouse.pages
 
 import geb.Page
 import org.pih.warehouse.modules.AddItemToShipmentModule
+import org.pih.warehouse.modules.AddIncomingItemToShipmentModule
 import org.pih.warehouse.modules.AddSuitcaseToShipmentModule
 import testutils.TestFixture
 
@@ -17,6 +18,7 @@ class EditPackingListPage extends Page{
         addCrateToShipmentLink(wait:true){$"div#addCrateToShipment a"}
         addSuitcaseToShipmentLink(wait:true){$("div#addSuitcaseToShipment a")}
         addItemToShipment{module AddItemToShipmentModule}
+        addIncomingItemToShipment{module AddIncomingItemToShipmentModule}
         addSuitcaseToShipment{module AddSuitcaseToShipmentModule}
     }
 

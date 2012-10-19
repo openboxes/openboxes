@@ -1,17 +1,20 @@
 package testutils
 
-import org.pih.warehouse.core.LocationType
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.pages.ProductPage
-import org.pih.warehouse.pages.InventoryPage
 import geb.Browser
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.pages.InventoryPage
 import org.pih.warehouse.pages.LocationPage
 import org.pih.warehouse.pages.LoginPage
 import org.pih.warehouse.pages.CreateEnterShipmentDetailsPage
 import org.pih.warehouse.pages.EnterTrackingDetailsPage
 import org.pih.warehouse.pages.EditPackingListPage
+import org.pih.warehouse.pages.ProductPage
+import org.pih.warehouse.pages.SendShipmentPage
 import org.pih.warehouse.pages.ViewShipmentPage
 import org.pih.warehouse.pages.CreateLocationPage
+
+
+
 
 class TestFixture{
 
@@ -74,7 +77,7 @@ class TestFixture{
         }
     }
 
-      static void CreatePendingShipment(product_name, shipment_name, quantity) {
+    static void CreatePendingShipment(product_name, shipment_name, quantity) {
         Browser.drive {
             to CreateEnterShipmentDetailsPage
             shipmentType.value("Sea")
@@ -89,13 +92,46 @@ class TestFixture{
 
             at EnterTrackingDetailsPage
             nextButton.click()
-        and:
+            and:
             at EditPackingListPage
             addUnpackedItems()
             addItem(product_name, quantity)
             saveAndExitButton.click()
             at ViewShipmentPage
 
+        }
+    }
+
+    static void SendShipment(shipment_name, product_name, shipmentOrigin, shipmentDestination) {
+        Browser.drive {
+            to CreateEnterShipmentDetailsPage
+            shipmentType.value("Land")
+            shipmentName.value(shipment_name)
+            origin.value(shipmentOrigin)
+            destination.value(shipmentDestination)
+            expectedShippingDate.click()
+            datePicker.today.click()
+            expectedArrivalDate.click()
+            datePicker.tomorrow.click()
+            nextButton.click()
+
+            at EnterTrackingDetailsPage
+            nextButton.click()
+
+            at EditPackingListPage
+            addItemToUnpackedItems()
+            addIncomingItemToShipment.searchIncomingInventoryItem.findProduct(product_name)
+            addIncomingItemToShipment.quantity.value(200)
+            addIncomingItemToShipment.saveButton.click()
+            nextButton.click()
+
+            at SendShipmentPage
+            actualShippingDate.click()
+            datePicker.today.click()
+            nextButton.click()
+
+            at ViewShipmentPage
+            assert shipmentName == shipment_name && status == "Shipped"
         }
     }
 
