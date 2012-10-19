@@ -8,6 +8,7 @@ import org.pih.warehouse.pages.EnterTrackingDetailsPage
 import org.pih.warehouse.pages.EditPackingListPage
 import org.pih.warehouse.pages.SendShipmentPage
 import org.pih.warehouse.pages.ViewShipmentPage
+import org.pih.warehouse.pages.ShipmentListPage
 
 
 class ShipmentSpec extends GebReportingSpec{
@@ -36,11 +37,8 @@ class ShipmentSpec extends GebReportingSpec{
             nextButton.click()
         and:
             at EditPackingListPage
-            addItemToUnpackedItems()
-            addItemToShipment.searchInventoryItem.searchCriteral.value(product_name)
-            addItemToShipment.searchInventoryItem.firstSuggestion.click()
-            addItemToShipment.quantity.value(200)
-            addItemToShipment.saveButton.click()
+            addUnpackedItems()
+            addItem(product_name, 200)
             nextButton.click()
         and:
             at SendShipmentPage
@@ -83,20 +81,8 @@ class ShipmentSpec extends GebReportingSpec{
             nextButton.click()
         and:
             at EditPackingListPage
-            addSuitcaseToShipment()
-            addSuitcaseToShipment.packingUnit.value("suitcase")
-            addSuitcaseToShipment.weight.value(30)
-            addSuitcaseToShipment.caseHeight.value(1)
-            addSuitcaseToShipment.caseWidth.value(1.5)
-            addSuitcaseToShipment.caseLength.value(2)
-            addSuitcaseToShipment.addItemButton.click()
-
-
-            addItemToShipment.searchInventoryItem.searchCriteral.value(product_name)
-            addItemToShipment.searchInventoryItem.firstSuggestion.click()
-            addItemToShipment.quantity.value(200)
-            addItemToShipment.saveButton.click()
-
+            addSuitcase(unit:"box", weight:30, height:1, width:1.5, length:2)
+            addItem(product_name, 200)
             nextButton.click()
         and:
             at SendShipmentPage
@@ -122,11 +108,8 @@ class ShipmentSpec extends GebReportingSpec{
             TestFixture.CreateProductInInventory(product_name, 5000)
             TestFixture.CreatePendingShipment(product_name, shipment_name, 20)
         when:
-            at ViewShipmentPage
+            to ShipmentListPage
         then:
-            shipmentName == shipment_name
-            status == "Pending"
-            product == product_name
-            quantity == "20"
+            pendingItems.contains(shipment_name)
     }
 }

@@ -107,7 +107,7 @@
 							src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + format.metadata(obj:shipmentInstance?.shipmentType, locale:null) + '.png')}"
 							alt="${format.metadata(obj:shipmentInstance?.shipmentType)}"
 							style="vertical-align: middle; width: 24px; height: 24px;" /></td>
-						<td class="left"><g:link action="showDetails"
+						<td class="left shipment-name"><g:link action="showDetails"
 								id="${shipmentInstance.id}">
 								${fieldValue(bean: shipmentInstance, field: "name")}
 							</g:link></td>

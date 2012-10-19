@@ -91,11 +91,8 @@ class TestFixture{
             nextButton.click()
         and:
             at EditPackingListPage
-            addItemToUnpackedItems()
-            addItemToShipment.searchInventoryItem.searchCriteral.value(product_name)
-            addItemToShipment.searchInventoryItem.firstSuggestion.click()
-            addItemToShipment.quantity.value(quantity)
-            addItemToShipment.saveButton.click()
+            addUnpackedItems()
+            addItem(product_name, quantity)
             saveAndExitButton.click()
             at ViewShipmentPage
 

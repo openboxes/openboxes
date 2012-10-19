@@ -20,13 +20,28 @@ class EditPackingListPage extends Page{
         addSuitcaseToShipment{module AddSuitcaseToShipmentModule}
     }
 
-    def addItemToUnpackedItems(){
+    def addItem(product_name, quantity){
+        addItemToShipment.searchInventoryItem.searchCriteral.value(product_name)
+        addItemToShipment.searchInventoryItem.firstSuggestion.click()
+        addItemToShipment.quantity.value(quantity)
+        addItemToShipment.saveButton.click()
+    }
+
+    def addUnpackedItems(){
         actionButton.click()
         addItemToUnpackedItemsLink.click()
     }
 
-    def addSuitcaseToShipment() {
+    def addSuitcase(specs) {
         actionButton.click()
         addSuitcaseToShipmentLink.click()
+        addSuitcaseToShipment.packingUnit.value(specs.unit)
+        addSuitcaseToShipment.weight.value(specs.weight)
+        addSuitcaseToShipment.caseHeight.value(specs.height)
+        addSuitcaseToShipment.caseWidth.value(specs.width)
+        addSuitcaseToShipment.caseLength.value(specs.length)
+        addSuitcaseToShipment.addItemButton.click()
     }
+
+
 }

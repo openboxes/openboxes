@@ -11,6 +11,7 @@ import testutils.TestFixture
 
 class ProductSpec extends GebReportingSpec{
     def "should create a new product and a inventory item"(){
+        def product_name = "TestProd" + UUID.randomUUID().toString()[0..5]
         given:
             TestFixture.UserLoginedAsManagerForBoston()
         and:
@@ -38,7 +39,6 @@ class ProductSpec extends GebReportingSpec{
             datePicker.tomorrow.click()
             newQuantity.click()
             newQuantity.value(7963)
-            //Thread.sleep(10000)
             saveInventoryItem.click()
 
         then:
@@ -47,5 +47,5 @@ class ProductSpec extends GebReportingSpec{
            stockProductName == product_name
     }
 
-     def product_name = "TestProd" + UUID.randomUUID().toString()[0..5]
+
 }
