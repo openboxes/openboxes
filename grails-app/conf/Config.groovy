@@ -359,6 +359,6 @@ grails.gorm.default.mapping = {
  */
 // default and supported locales
 locale.defaultLocale = 'en'
-locale.supportedLocales = ['en','fr','sp']
+locale.supportedLocales = ['en','fr','es']
 
 
