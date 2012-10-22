@@ -12,25 +12,26 @@
 				</tbody>
 			</table>
 			<br/>
-			<table id="results" style="display: none;">
-				<thead>
-					<tr>
-						<th class="center">
-						
-						</th>
-						<th>		
-							<warehouse:message code="category.label"/>
-						</th>
-						<th>		
-							<warehouse:message code="product.label"/>
-						</th>
-					</tr>
-				</thead>
-				<tbody>
-					<%-- Gets populated after user enters search terms. --%>
-				</tbody>
-			</table>
+
 		</g:form>
+        <table id="results" style="display: none;">
+            <thead>
+            <tr>
+                <th class="center">
+
+                </th>
+                <th>
+                    <warehouse:message code="category.label"/>
+                </th>
+                <th>
+                    <warehouse:message code="product.label"/>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <%-- Gets populated after user enters search terms. --%>
+            </tbody>
+        </table>
 	</div>	
 
 
@@ -135,8 +136,8 @@
 	function rowBuilder(rowdata) {
 	    return "<tr id='" + rowdata.value + "'>" + 
 		    	"<td class='center'><button class=\"choose\">Choose</button></td>" +
-		    	"<td>" + rowdata.category.name + "</td>" +
-		    	"<td>" + rowdata.label + "</td>" +
+		    	"<td class='category'>" + rowdata.category.name + "</td>" +
+		    	"<td class='label'>" + rowdata.label + "</td>" +
 	    	"</tr>";
 	}
 
@@ -157,7 +158,7 @@
 					success: function(data, textStatus, jqXHR){
 						$("#results > tbody").find("tr").remove();
 						$.each(data, function(){
-							$(rowBuilder(this)).data("mydata",this).appendTo("#results > tbody");
+							$(rowBuilder(this)).appendTo("#results > tbody");
 						});					
 						$("#results tr").removeClass("odd").filter(":odd").addClass("odd");
 						$("#results").show();
@@ -175,12 +176,10 @@
 			$("#editItemForm").toggle();
 		}); 
 		
-		$("button.choose").livequery('click', function(event) { 
-			event.preventDefault();
+		$("button.choose").live('click', function(event) {
 			var row = $(this).closest("tr");
-			var data = $(row).data("mydata");
-			$("#hiddenProduct").val(data.value);
-			var displayProduct = "<span class='fade'>" + data.category.name + " &rsaquo;</span> " + data.label 
+			$("#hiddenProduct").val(row.attr('id'));
+			var displayProduct = "<span class='fade'>" + row.find('.category').text() + " &rsaquo;</span> " + row.find('.label').text()
 			$("#displayProduct").html(displayProduct);
 			$("#searchItemForm").toggle();
 			$("#editItemForm").toggle();

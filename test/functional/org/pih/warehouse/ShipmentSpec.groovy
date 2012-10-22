@@ -108,7 +108,6 @@ class ShipmentSpec extends GebReportingSpec{
         given:
             TestFixture.UserLoginedAsManagerForBoston()
             TestFixture.CreateProductInInventory(product_name, 5000)
-            status == "Pending"
             TestFixture.CreatePendingShipment(product_name, shipment_name, 20)
         when:
             to ShipmentListPage

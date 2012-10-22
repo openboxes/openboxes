@@ -29,6 +29,12 @@ class EditPackingListPage extends Page{
         addItemToShipment.saveButton.click()
     }
 
+    def addIncomingItem(product_name, quantity){
+        addIncomingItemToShipment.searchIncomingInventoryItem.findProduct(product_name)
+        addIncomingItemToShipment.quantity.value(quantity)
+        addIncomingItemToShipment.saveButton.click()
+    }
+
     def addUnpackedItems(){
         actionButton.click()
         addItemToUnpackedItemsLink.click()

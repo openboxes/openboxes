@@ -119,10 +119,8 @@ class TestFixture{
             nextButton.click()
 
             at EditPackingListPage
-            addItemToUnpackedItems()
-            addIncomingItemToShipment.searchIncomingInventoryItem.findProduct(product_name)
-            addIncomingItemToShipment.quantity.value(200)
-            addIncomingItemToShipment.saveButton.click()
+            addUnpackedItems()
+            addIncomingItem(product_name, 200)
             nextButton.click()
 
             at SendShipmentPage

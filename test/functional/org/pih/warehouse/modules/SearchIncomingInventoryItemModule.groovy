@@ -4,7 +4,7 @@ import geb.Module
 
 class SearchIncomingInventoryItemModule extends Module {
     static content = {
-        searchCriteria(wait: true) {$("input", name: "productSearch")}
+        searchCriteria(wait: true) {$("input#productSearch")}
         firstSuggestion(wait: true) {$("table#results button.choose").first()}
     }
 
