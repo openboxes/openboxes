@@ -10,6 +10,7 @@ class SearchIncomingInventoryItemModule extends Module {
 
     def findProduct(product_name) {
         searchCriteria.value(product_name)
+        waitFor{ $("#results td.label")}.first().text() == product_name
         firstSuggestion.click()
     }
 }

@@ -24,6 +24,7 @@ class EditPackingListPage extends Page{
 
     def addItem(product_name, quantity){
         addItemToShipment.searchInventoryItem.searchCriteral.value(product_name)
+        waitFor{$("ul.ui-autocomplete li.ui-menu-item a")}.first().text().contains(product_name) == true
         addItemToShipment.searchInventoryItem.firstSuggestion.click()
         addItemToShipment.quantity.value(quantity)
         addItemToShipment.saveButton.click()

@@ -149,26 +149,29 @@
 			height: 300
 		});	
 
-		$(".autocomplete").keyup(function(event, ui) {
-			var value = $(this).val();
-			if (value && value.length > 2) { 
-				$.ajax({
-					url: "${request.contextPath }/json/findProductByName",
-					data: "term=" + value + "&warehouseId=" + $("#currentLocationId").val(),
-					success: function(data, textStatus, jqXHR){
-						$("#results > tbody").find("tr").remove();
-						$.each(data, function(){
-							$(rowBuilder(this)).appendTo("#results > tbody");
-						});					
-						$("#results tr").removeClass("odd").filter(":odd").addClass("odd");
-						$("#results").show();
-					}
-				});
-			}
-			else { 
-				$("#results > tbody").find("tr").remove();
-				$("#results").hide();
-			}
+		$("#searchItemForm input.autocomplete").keyup(function(event, ui) {
+            var searchable = $(this);
+            setTimeout(function(){
+                var value = searchable.val();
+                if (value && value.length > 2) {
+                    $.ajax({
+                        url: "${request.contextPath }/json/findProductByName",
+                        data: "term=" + value + "&warehouseId=" + $("#currentLocationId").val(),
+                        success: function(data, textStatus, jqXHR){
+                            $("#results > tbody").find("tr").remove();
+                            $.each(data, function(){
+                                $(rowBuilder(this)).appendTo("#results > tbody");
+                            });
+                            $("#results tr").removeClass("odd").filter(":odd").addClass("odd");
+                            $("#results").show();
+                        }
+                    });
+                }
+                else {
+                    $("#results > tbody").find("tr").remove();
+                    $("#results").hide();
+                }
+            },300);//set 300ms delay to prevent each key stroke firing search
 		});
 
 		$(".back").click(function(event) { 
