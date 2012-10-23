@@ -30,4 +30,5 @@ driver = {
 
 
 reportsDir = "target/geb-reports"
+autoClearCookies = false
 

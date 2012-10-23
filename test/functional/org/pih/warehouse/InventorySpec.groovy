@@ -10,58 +10,54 @@ import org.pih.warehouse.pages.BrowseInventoryPage
 
 
 class InventorySpec extends GebReportingSpec {
-    def "should show stock expiring within one week"() {
-        def product_name = "TestProd" + UUID.randomUUID().toString()[0..5]
+    def "should show stock expiring"() {
         given:
             TestFixture.UserLoginedAsManagerForBoston()
-            TestFixture.CreateProductInInventory(product_name, 5000, new Date().plus(5))
             to ExpiringStockPage
         when:
             at ExpiringStockPage
             threshhold.value("one week")
             filter.click()
         then:
-            expiringStockList.contains(product_name)
-    }
-
-    def "should show stock expiring within 6 months"() {
-        def product_name = "TestProd" + UUID.randomUUID().toString()[0..5]
-        given:
-            TestFixture.UserLoginedAsManagerForBoston()
-            TestFixture.CreateProductInInventory(product_name, 5000, new Date().plus(20))
-            to ExpiringStockPage
+            expiringStockList.contains(TestFixture.Advil200mg)
+            !expiringStockList.contains(TestFixture.Tylenol325mg)
         when:
-            at ExpiringStockPage
             threshhold.value("six months")
             filter.click()
         then:
-            expiringStockList.contains(product_name)
+            expiringStockList.contains(TestFixture.Advil200mg)
+            expiringStockList.contains(TestFixture.Tylenol325mg)
+            !expiringStockList.contains(TestFixture.GeneralPainReliever)
+
     }
 
+
+
     def "should be able to filter by category"() {
-        def product_name = "TestProd" + UUID.randomUUID().toString()[0..5]
         given:
             TestFixture.UserLoginedAsManagerForBoston()
-            TestFixture.CreateProductInInventory(product_name, 5000, new Date().plus(20))
             to ExpiringStockPage
         when:
             at ExpiringStockPage
             category.value("Supplies")
             filter.click()
         then:
-            expiringStockList.contains(product_name)
+            expiringStockList.contains(TestFixture.MacBookPro8G)
+            !expiringStockList.contains(TestFixture.PrintPaperA4)
+            !expiringStockList.contains(TestFixture.Advil200mg)
     }
 
     def "should show expired stock"() {
-        def product_name = "TestProd" + UUID.randomUUID().toString()[0..5]
         given:
             TestFixture.UserLoginedAsManagerForBoston()
-            TestFixture.CreateProductInInventory(product_name, 5000, new Date().minus(1))
             to ExpiredStockPage
         when:
             at ExpiredStockPage
         then:
-            expiredStockList.contains(product_name)
+            expiredStockList.contains(TestFixture.SimilacAdvanceLowiron400g)
+            expiredStockList.contains(TestFixture.GSimilacAdvanceIron365g)
+            !expiredStockList.contains(TestFixture.Advil200mg)
+            !expiredStockList.contains(TestFixture.MacBookPro8G)
     }
 
       def "should create new inventory item for existing product"() {

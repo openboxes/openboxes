@@ -13,6 +13,7 @@ import geb.spock.GebReportingSpec
 import org.pih.warehouse.pages.LoginPage
 import org.pih.warehouse.pages.LocationPage
 import org.pih.warehouse.pages.DashboardPage
+import testutils.TestFixture
 
 class LoginSpec extends  GebReportingSpec{
 
@@ -30,6 +31,7 @@ class LoginSpec extends  GebReportingSpec{
             boston.click()
         then:
             at DashboardPage
+            TestFixture.bostonManagerLogined()
 
     }
 

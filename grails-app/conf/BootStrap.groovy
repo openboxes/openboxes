@@ -95,6 +95,7 @@ class BootStrap {
 
     static String TestFixure = "Test-Fixture"
 
+
     def insertTestFixture(){
         if(Environment.current != Environment.DEVELOPMENT && Environment.current != Environment.TEST)
             return
@@ -107,17 +108,17 @@ class BootStrap {
 
         assert medicines != null
         assert suppliers != null
-
-        def testData = [
+        def  testData = [
          ['expiration':new Date().plus(3), 'quantity':10000, 'product':  new Product(category: medicines, name: "Advil 200mg", manufacturer:"ABC", productCode:"00001",manufacturerCode:"9001" )]
         ,['expiration':new Date().plus(20), 'quantity':10000, 'product': new Product(category: medicines, name: "Tylenol 325mg", manufacturer:"MedicalGait", productCode:"00002",manufacturerCode:"9002" )]
         ,['expiration':new Date().plus(120), 'quantity':10000, 'product': new Product(category: medicines, name: "Aspirin 20mg", manufacturer:"ABC", productCode:"00003",manufacturerCode:"9001" ) ]
         ,['expiration':new Date().plus(200), 'quantity':10000, 'product': new Product(category: medicines, name: "General Pain Reliever", manufacturer:"MedicalGait", productCode:"00004",manufacturerCode:"9002" )]
-        ,['expiration':new Date().plus(300), 'quantity':10000, 'product': new Product(category: medicines, name: "Similac Advance low iron 400g", manufacturer:"ABC", productCode:"00005",manufacturerCode:"9001" )]
-        ,['expiration':new Date().plus(600), 'quantity':10000, 'product' : new Product(category: medicines, name: "Similac Advance + iron 365g", manufacturer:"MedicalGait", productCode:"00006",manufacturerCode:"9002" ) ]
-        ,['expiration':null, 'quantity':10000, 'product':new Product(category: suppliers, name: "MacBook Pro 8G", manufacturer:"Apple", productCode:"00007",manufacturerCode:"9003" ) ]
+        ,['expiration':new Date().minus(1), 'quantity':10000, 'product': new Product(category: medicines, name: "Similac Advance low iron 400g", manufacturer:"ABC", productCode:"00005",manufacturerCode:"9001" )]
+        ,['expiration':new Date().minus(30), 'quantity':10000, 'product' : new Product(category: medicines, name: "Similac Advance + iron 365g", manufacturer:"MedicalGait", productCode:"00006",manufacturerCode:"9002" ) ]
+        ,['expiration':new Date().plus(1000), 'quantity':10000, 'product':new Product(category: suppliers, name: "MacBook Pro 8G", manufacturer:"Apple", productCode:"00007",manufacturerCode:"9003" ) ]
         ,['expiration':null, 'quantity':10000, 'product': new Product(category: suppliers, name: "Print Paper A4", manufacturer:"DSC", productCode:"00008",manufacturerCode:"9004" )]
                 ]
+
 
         if(Environment.current == Environment.TEST)
            deleteTestFixture(testData)

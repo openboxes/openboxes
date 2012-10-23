@@ -12,27 +12,48 @@ import org.pih.warehouse.pages.ProductPage
 import org.pih.warehouse.pages.SendShipmentPage
 import org.pih.warehouse.pages.ViewShipmentPage
 import org.pih.warehouse.pages.CreateLocationPage
+import org.pih.warehouse.product.Product
 
 
 
 
 class TestFixture{
 
-    static  baseUrl = "/openboxes"
+    final  static  String baseUrl = "/openboxes"
+    final  static  String Advil200mg = "Advil 200mg"  //expiring in 3 days
+    final  static  String Tylenol325mg = "Tylenol 325mg"  //expiring in 20 days
+    final  static  String Aspirin20mg = "Aspirin 20mg"   //expiring in 120 days
+    final  static  String GeneralPainReliever = "General Pain Reliever"  //expiring in 200days
+    final  static  String SimilacAdvanceLowiron400g = "Similac Advance low iron 400g"  //expired yesterday
+    final  static  String GSimilacAdvanceIron365g = "Similac Advance + iron 365g" //expired 30 days ago
+    final  static  String MacBookPro8G = "MacBook Pro 8G"  //expiring in 1000 days
+    final  static  String PrintPaperA4 = "Print Paper A4"  //no expiration date
 
-      static def UserLoginedAsManagerForBoston(){
-          Browser.drive {
-            to LoginPage
-            loginForm.with{
-                username = "manager"
-                password = "password"
-            }
-            submitButton.click()
+    static String currentUser = null
 
-            at LocationPage
 
-            boston.click()
-          }
+    static def bostonManagerLogined(){
+      currentUser = "BostonManager"
+    }
+
+    static def UserLoginedAsManagerForBoston(){
+        if(currentUser == "BostonManager") return
+
+        Browser.drive {
+        to LoginPage
+        loginForm.with{
+            username = "manager"
+            password = "password"
+        }
+        submitButton.click()
+
+        at LocationPage
+
+        boston.click()
+
+        currentUser = "BostonManager"
+
+        }
     }
 
     static String TestSupplierName = "Test Supplier"
@@ -132,5 +153,7 @@ class TestFixture{
             assert shipmentName == shipment_name && status == "Shipped"
         }
     }
+
+
 
 }
