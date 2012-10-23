@@ -49,6 +49,14 @@ class EditPackingListPage extends Page{
 
     }
 
+    def addCrate(crate){
+        actionButton.click()
+        addCrateToShipmentLink.click()
+        addContainerToShipment.addContainer(crate)
+        addContainerToShipment.addItemButton.click()
+
+    }
+
     def addSuitcase(suitcase) {
         actionButton.click()
         addSuitcaseToShipmentLink.click()

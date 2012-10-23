@@ -20,7 +20,6 @@ class ShipmentSpec extends GebReportingSpec{
         def shipment_name = "Testshipment" + UUID.randomUUID().toString()[0..5]
         given:
             TestFixture.UserLoginedAsManagerForBoston()
-            TestFixture.CreateProductInInventory(product1, 5000)
             to CreateEnterShipmentDetailsPage
         when:
             at CreateEnterShipmentDetailsPage
@@ -60,6 +59,46 @@ class ShipmentSpec extends GebReportingSpec{
             verifyShipmentItemExist(product2,"100", "mypallet", "40.0 lbs 21.0 ft | 10.0 ft | 27.0 ft")
     }
 
+    def "should send an air shipment from Boston to Miami"(){
+        def product1 = TestFixture.Aspirin20mg
+        def shipment_name = "Testshipment" + UUID.randomUUID().toString()[0..5]
+        given:
+            TestFixture.UserLoginedAsManagerForBoston()
+            to CreateEnterShipmentDetailsPage
+        when:
+            at CreateEnterShipmentDetailsPage
+            shipmentType.value("Air")
+            shipmentName.value(shipment_name)
+            origin.value("Boston Headquarters [Depot]")
+            destination.value("Miami Warehouse [Depot]")
+            expectedShippingDate.click()
+            datePicker.today.click()
+            expectedArrivalDate.click()
+            datePicker.tomorrow.click()
+            nextButton.click()
+        and:
+            at EnterTrackingDetailsPage
+            nextButton.click()
+        and:
+            at EditPackingListPage
+            addCrate(unit:"myCrate", weight:46, height:21, width:12, length:27)
+            addItem(product1, 100)
+            nextButton.click()
+        and:
+            at SendShipmentPage
+            actualShippingDate.click()
+            datePicker.today.click()
+            nextButton.click()
+        then:
+            at ViewShipmentPage
+            shipmentName ==  shipment_name
+            status == "Shipped"
+            type == "Air"
+            shipmentOrigin == "Boston Headquarters"
+            shipmentDestination == "Miami Warehouse"
+            verifyShipmentItemExist(product1,"100", "myCrate", "46.0 lbs 21.0 ft | 12.0 ft | 27.0 ft")
+    }
+
 
     def "should be able to send a suitcase from Boston to Miami"() {
         def product_name = TestFixture.MacBookPro8G
@@ -67,7 +106,6 @@ class ShipmentSpec extends GebReportingSpec{
 
         given:
             TestFixture.UserLoginedAsManagerForBoston()
-            TestFixture.CreateProductInInventory(product_name, 5000)
             to CreateEnterShipmentDetailsPage
         when:
             at CreateEnterShipmentDetailsPage
@@ -110,7 +148,6 @@ class ShipmentSpec extends GebReportingSpec{
         def shipment_name = "Testshipment" + UUID.randomUUID().toString()[0..5]
         given:
             TestFixture.UserLoginedAsManagerForBoston()
-            TestFixture.CreateProductInInventory(product_name, 5000)
             TestFixture.CreatePendingShipment(product_name, shipment_name, 20)
         when:
             to ShipmentListPage
@@ -125,7 +162,6 @@ class ShipmentSpec extends GebReportingSpec{
 
         given:
             TestFixture.UserLoginedAsManagerForBoston()
-            TestFixture.CreateProductInInventory(product_name, 5000)
             TestFixture.SendShipment(shipment_name, product_name, "Miami Warehouse [Depot]", "Boston Headquarters [Depot]")
         when:
             at ViewShipmentPage
