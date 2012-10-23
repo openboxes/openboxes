@@ -60,8 +60,33 @@ class PurchaseOrderSpec extends GebReportingSpec {
             receiveOrderNextButton.click()
         and:
             at ReceiveOrderItemsPage
-            receiveItemQuantity.value(10)
+            receiveItemQuantity.value(5)
             receiveItemLotNumber.value("ABCD")
+            receiveItemNextButton.click()
+        and:
+            at ReceiveOrderConfirmPage
+            receiveItemFinishButton.click()
+        then:
+            at OrderSummaryPage
+            orderStatus == "Partially Received"
+            description == orderDescription
+            productInfirstItem == productName
+            quantityInfirstItem == "10"
+        and:
+            orderActionButton.click()
+            receiverOrderActionButton.click()
+        and:
+            at ReceiveEnterShipmentDetailsPage
+            shipmentType.value("2") //Sea shipment
+            shippedOnDate.click()
+            datePicker.yesterday.click()
+            deliveredOnDate.click()
+            datePicker.yesterday.click()
+            receiveOrderNextButton.click()
+        and:
+            at ReceiveOrderItemsPage
+            receiveItemQuantity.value(5)
+            receiveItemLotNumber.value("EFDG")
             receiveItemNextButton.click()
         and:
             at ReceiveOrderConfirmPage
