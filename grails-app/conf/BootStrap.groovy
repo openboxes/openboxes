@@ -18,7 +18,8 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.core.User;
+import org.pih.warehouse.core.User
+
 
 class BootStrap {
 
@@ -93,62 +94,80 @@ class BootStrap {
 
 
     static String TestFixure = "Test-Fixture"
+
     def insertTestFixture(){
         if(Environment.current != Environment.DEVELOPMENT && Environment.current != Environment.TEST)
             return
 
         log.info("Setup test fixture...")
-         Location boston =  Location.findByName("Boston Headquarters");
-        def user = User.get(2)  //todo: create new test users
-        user.warehouse = boston
-        user.save()
+
 
         def medicines = Category.findByName("Medicines")
         def suppliers = Category.findByName("Supplies")
 
+        assert medicines != null
+        assert suppliers != null
+
         def inventoryItemInfos = [
-         ['expiration':new Date().plus(3), 'quantity':10000, 'product':  new Product(category: medicines, name: "Advil 200mg", manufacturer:"ABC", product_code:"00001",manufacturer_code:"9001" )]
-        ,['expiration':new Date().plus(20), 'quantity':10000, 'product': new Product(category: medicines, name: "Tylenol 325mg", manufacturer:"MedicalGait", product_code:"00002",manufacturer_code:"9002" )]
-        ,['expiration':new Date().plus(120), 'quantity':10000, 'product': new Product(category: medicines, name: "Aspirin 20mg", manufacturer:"ABC", product_code:"00003",manufacturer_code:"9001" ) ]
-        ,['expiration':new Date().plus(200), 'quantity':10000, 'product': new Product(category: medicines, name: "General Pain Reliever", manufacturer:"MedicalGait", product_code:"00004",manufacturer_code:"9002" )]
-        ,['expiration':new Date().plus(300), 'quantity':10000, 'product': new Product(category: medicines, name: "Similac Advance low iron 400g", manufacturer:"ABC", product_code:"00005",manufacturer_code:"9001" )]
-        ,['expiration':new Date().plus(600), 'quantity':10000, 'product' : new Product(category: medicines, name: "Similac Advance + iron 365g", manufacturer:"MedicalGait", product_code:"00006",manufacturer_code:"9002" ) ]
-        ,['expiration':null, 'quantity':10000, 'product':new Product(category: suppliers, name: "MacBook Pro 8G", manufacturer:"Apple", product_code:"00007",manufacturer_code:"9003" ) ]
-        ,['expiration':null, 'quantity':10000, 'product': new Product(category: suppliers, name: "Print Paper A4", manufacturer:"DSC", product_code:"00008",manufacturer_code:"9004" )]
+         ['expiration':new Date().plus(3), 'quantity':10000, 'product':  new Product(category: medicines, name: "Advil 200mg", manufacturer:"ABC", productCode:"00001",manufacturerCode:"9001" )]
+        ,['expiration':new Date().plus(20), 'quantity':10000, 'product': new Product(category: medicines, name: "Tylenol 325mg", manufacturer:"MedicalGait", productCode:"00002",manufacturerCode:"9002" )]
+        ,['expiration':new Date().plus(120), 'quantity':10000, 'product': new Product(category: medicines, name: "Aspirin 20mg", manufacturer:"ABC", productCode:"00003",manufacturerCode:"9001" ) ]
+        ,['expiration':new Date().plus(200), 'quantity':10000, 'product': new Product(category: medicines, name: "General Pain Reliever", manufacturer:"MedicalGait", productCode:"00004",manufacturerCode:"9002" )]
+        ,['expiration':new Date().plus(300), 'quantity':10000, 'product': new Product(category: medicines, name: "Similac Advance low iron 400g", manufacturer:"ABC", productCode:"00005",manufacturerCode:"9001" )]
+        ,['expiration':new Date().plus(600), 'quantity':10000, 'product' : new Product(category: medicines, name: "Similac Advance + iron 365g", manufacturer:"MedicalGait", productCode:"00006",manufacturerCode:"9002" ) ]
+        ,['expiration':null, 'quantity':10000, 'product':new Product(category: suppliers, name: "MacBook Pro 8G", manufacturer:"Apple", productCode:"00007",manufacturerCode:"9003" ) ]
+        ,['expiration':null, 'quantity':10000, 'product': new Product(category: suppliers, name: "Print Paper A4", manufacturer:"DSC", productCode:"00008",manufacturerCode:"9004" )]
                 ]
 
 
-        for(inventoryItemInfo in inventoryItemInfos){
-            def product = Product.findByName(inventoryItemInfo.product.name)
-            if(product){
-                def inventoryItems = InventoryItem.findByProduct(product)
-                for(item in inventoryItems){
-                    for(entry in TransactionEntry.findByInventoryItem(item)){ entry.delete() }
-                    item.delete()
-                }
-                product.delete()
-            }
-             //delete all transaction inserted by test fixture before
-            Transaction.findByComment(TestFixure).each{ it.delete()}
+        inventoryItemInfos.each {recreateProductAndInventoryItem(it) }
 
-            inventoryItemInfo.product.save()
-            addInventoryItem(inventoryItemInfo.product,inventoryItemInfo.expiration, inventoryItemInfo.quantity, boston.inventory)
-        }
+
+         //delete all transaction inserted by test fixture before
+        if(Environment.current == Environment.TEST)
+            Transaction.findByComment(TestFixure).each { it.delete()}
 
     }
 
-    def addInventoryItem(product, expirationDate, quantity, inventory){
+    private def recreateProductAndInventoryItem(def inventoryItemInfo) {
+        def product = Product.findByName(inventoryItemInfo.product.name)
+
+        if(product){
+            if(Environment.current == Environment.TEST)
+                deleteProductAndInventoryItems(product)
+                addInventoryItem(inventoryItemInfo.product, inventoryItemInfo.expiration, inventoryItemInfo.quantity)
+        }else{
+           addInventoryItem(inventoryItemInfo.product, inventoryItemInfo.expiration, inventoryItemInfo.quantity)
+        }
+
+
+    }
+
+    private def deleteProductAndInventoryItems(Product product) {
+        def inventoryItems = InventoryItem.findByProduct(product)
+        for (item in inventoryItems) {
+            for (entry in TransactionEntry.findByInventoryItem(item)) { entry.delete() }
+            item.delete()
+        }
+        product.delete()
+    }
+
+    private def addInventoryItem(product, expirationDate, quantity){
+        assert product.save()
         InventoryItem item = new InventoryItem()
         item.product = product
         item.lotNumber = "lot57"
         item.expirationDate = expirationDate
-        item.save()
+        assert item.save()
+
+        Location boston =  Location.findByName("Boston Headquarters");
+        assert boston != null
 
         Transaction transaction = new Transaction()
         transaction.createdBy = User.get(2)
         transaction.comment = TestFixure
         transaction.transactionDate = new Date()
-        transaction.inventory = inventory
+        transaction.inventory = boston.inventory
 	    transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
 
         TransactionEntry transactionEntry = new TransactionEntry()
@@ -156,7 +175,7 @@ class BootStrap {
 		transactionEntry.inventoryItem = item
 
         transaction.addToTransactionEntries(transactionEntry)
-        transaction.save()
+        assert transaction.save()
     }
 		
 	
