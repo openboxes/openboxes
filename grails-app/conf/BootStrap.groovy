@@ -108,7 +108,7 @@ class BootStrap {
         assert medicines != null
         assert suppliers != null
 
-        def inventoryItemInfos = [
+        def testData = [
          ['expiration':new Date().plus(3), 'quantity':10000, 'product':  new Product(category: medicines, name: "Advil 200mg", manufacturer:"ABC", productCode:"00001",manufacturerCode:"9001" )]
         ,['expiration':new Date().plus(20), 'quantity':10000, 'product': new Product(category: medicines, name: "Tylenol 325mg", manufacturer:"MedicalGait", productCode:"00002",manufacturerCode:"9002" )]
         ,['expiration':new Date().plus(120), 'quantity':10000, 'product': new Product(category: medicines, name: "Aspirin 20mg", manufacturer:"ABC", productCode:"00003",manufacturerCode:"9001" ) ]
@@ -119,31 +119,25 @@ class BootStrap {
         ,['expiration':null, 'quantity':10000, 'product': new Product(category: suppliers, name: "Print Paper A4", manufacturer:"DSC", productCode:"00008",manufacturerCode:"9004" )]
                 ]
 
-
-        inventoryItemInfos.each {recreateProductAndInventoryItem(it) }
-
-
-         //delete all transaction inserted by test fixture before
         if(Environment.current == Environment.TEST)
-            Transaction.findByComment(TestFixure).each { it.delete()}
+           deleteTestFixture(testData)
+
+        createTestFixtureIfNotExist(testData)
 
     }
 
-    private def recreateProductAndInventoryItem(def inventoryItemInfo) {
+    def deleteTestFixture(List<Map<String, Object>> testData) {
+        testData.each {deleteProductAndInventoryItems(it)}
+        Transaction.findByComment(TestFixure).each { it.delete()}
+    }
+
+    def createTestFixtureIfNotExist(List<Map<String, Object>> testData) {
+        testData.each{ addProductAndInventoryItemIfNotExist(it)}
+    }
+
+    private def deleteProductAndInventoryItems(Map<String, Object> inventoryItemInfo) {
         def product = Product.findByName(inventoryItemInfo.product.name)
-
-        if(product){
-            if(Environment.current == Environment.TEST)
-                deleteProductAndInventoryItems(product)
-                addInventoryItem(inventoryItemInfo.product, inventoryItemInfo.expiration, inventoryItemInfo.quantity)
-        }else{
-           addInventoryItem(inventoryItemInfo.product, inventoryItemInfo.expiration, inventoryItemInfo.quantity)
-        }
-
-
-    }
-
-    private def deleteProductAndInventoryItems(Product product) {
+        if(!product) return
         def inventoryItems = InventoryItem.findByProduct(product)
         for (item in inventoryItems) {
             for (entry in TransactionEntry.findByInventoryItem(item)) { entry.delete() }
@@ -152,13 +146,24 @@ class BootStrap {
         product.delete()
     }
 
+     private def addProductAndInventoryItemIfNotExist(Map<String, Object> inventoryItemInfo) {
+
+        def product = Product.findByName(inventoryItemInfo.product.name)
+
+        if(!product){
+           inventoryItemInfo.product.save(failOnError:true)
+           addInventoryItem(inventoryItemInfo.product, inventoryItemInfo.expiration, inventoryItemInfo.quantity)
+        }
+    }
+
+
     private def addInventoryItem(product, expirationDate, quantity){
-        assert product.save()
+
         InventoryItem item = new InventoryItem()
         item.product = product
         item.lotNumber = "lot57"
         item.expirationDate = expirationDate
-        assert item.save()
+        item.save(failOnError:true)
 
         Location boston =  Location.findByName("Boston Headquarters");
         assert boston != null
@@ -175,7 +180,7 @@ class BootStrap {
 		transactionEntry.inventoryItem = item
 
         transaction.addToTransactionEntries(transactionEntry)
-        assert transaction.save()
+        transaction.save(failOnError:true)
     }
 		
 	
