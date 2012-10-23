@@ -43,7 +43,6 @@ class InventorySpec extends GebReportingSpec {
             filter.click()
         then:
             expiringStockList.contains(TestFixture.MacBookPro8G)
-            !expiringStockList.contains(TestFixture.PrintPaperA4)
             !expiringStockList.contains(TestFixture.Advil200mg)
     }
 
