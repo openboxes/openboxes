@@ -19,4 +19,13 @@ class ViewShipmentPage extends Page {
         actionButton {$("button.action-btn")}
         receiveShipmentLink(to: ReceiveShipmentPage) {$("div.action-menu-item a", name: "receiveShipmentLink")}
     }
+
+    def verifyShipmentItemExist(product, quantity, container_unit, container_details=""){
+        def row = $(".shipmentItem").find{it.find(".product", text:contains(product))}
+        assert row != null
+        assert row.find(".quantity", text:contains(quantity))
+        assert row.find(".container", text:contains(container_unit) )
+        assert row.find(".container", text:contains(container_details))
+        true
+    }
 }

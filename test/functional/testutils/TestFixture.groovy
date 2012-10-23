@@ -25,7 +25,7 @@ class TestFixture{
     final  static  String Aspirin20mg = "Aspirin 20mg"   //expiring in 120 days
     final  static  String GeneralPainReliever = "General Pain Reliever"  //expiring in 200days
     final  static  String SimilacAdvanceLowiron400g = "Similac Advance low iron 400g"  //expired yesterday
-    final  static  String GSimilacAdvanceIron365g = "Similac Advance + iron 365g" //expired 30 days ago
+    final  static  String SimilacAdvanceIron365g = "Similac Advance + iron 365g" //expired 30 days ago
     final  static  String MacBookPro8G = "MacBook Pro 8G"  //expiring in 1000 days
     final  static  String PrintPaperA4 = "Print Paper A4"  //no expiration date
 

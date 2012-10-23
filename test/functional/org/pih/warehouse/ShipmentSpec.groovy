@@ -15,12 +15,12 @@ import org.pih.warehouse.pages.ShipmentListPage
 class ShipmentSpec extends GebReportingSpec{
 
     def "should send a sea shipment from Boston to Miami"(){
-        def product_name = "TestProd" + UUID.randomUUID().toString()[0..5]
-        def shipment_name = product_name + "_shipment"
-
+        def product1 = TestFixture.Aspirin20mg
+        def product2 = TestFixture.Tylenol325mg
+        def shipment_name = "Testshipment" + UUID.randomUUID().toString()[0..5]
         given:
             TestFixture.UserLoginedAsManagerForBoston()
-            TestFixture.CreateProductInInventory(product_name, 5000)
+            TestFixture.CreateProductInInventory(product1, 5000)
             to CreateEnterShipmentDetailsPage
         when:
             at CreateEnterShipmentDetailsPage
@@ -39,7 +39,10 @@ class ShipmentSpec extends GebReportingSpec{
         and:
             at EditPackingListPage
             addUnpackedItems()
-            addItem(product_name, 200)
+            addItem(product1, 200)
+        and:
+            addPallet(unit:"mypallet", weight:40, height:21, width:10, length:27)
+            addItem(product2, 100)
             nextButton.click()
         and:
             at SendShipmentPage
@@ -53,14 +56,14 @@ class ShipmentSpec extends GebReportingSpec{
             type == "Sea"
             shipmentOrigin == "Boston Headquarters"
             shipmentDestination == "Miami Warehouse"
-            product == product_name
-            quantity == "200"
+            verifyShipmentItemExist(product1,"200", "Unpacked")
+            verifyShipmentItemExist(product2,"100", "mypallet", "40.0 lbs 21.0 ft | 10.0 ft | 27.0 ft")
     }
 
 
     def "should be able to send a suitcase from Boston to Miami"() {
-        def product_name = "TestProd" + UUID.randomUUID().toString()[0..5]
-        def shipment_name = product_name + "_shipment"
+        def product_name = TestFixture.MacBookPro8G
+        def shipment_name = "Testshipment" + UUID.randomUUID().toString()[0..5]
 
         given:
             TestFixture.UserLoginedAsManagerForBoston()
@@ -103,8 +106,8 @@ class ShipmentSpec extends GebReportingSpec{
     }
 
     def "view pending shipments"(){
-        def product_name = "TestProd" + UUID.randomUUID().toString()[0..5]
-        def shipment_name = product_name + "_shipment"
+        def product_name = TestFixture.PrintPaperA4
+        def shipment_name = "Testshipment" + UUID.randomUUID().toString()[0..5]
         given:
             TestFixture.UserLoginedAsManagerForBoston()
             TestFixture.CreateProductInInventory(product_name, 5000)
@@ -117,8 +120,8 @@ class ShipmentSpec extends GebReportingSpec{
     }
 
     def "should be able to receive a shipment from Miami"() {
-        def product_name = "TestProd" + UUID.randomUUID().toString()[0..5]
-        def shipment_name = product_name + "_shipment"
+        def product_name = TestFixture.Tylenol325mg
+        def shipment_name = "Testshipment" + UUID.randomUUID().toString()[0..5]
 
         given:
             TestFixture.UserLoginedAsManagerForBoston()

@@ -3,7 +3,7 @@ package org.pih.warehouse.pages
 import geb.Page
 import org.pih.warehouse.modules.AddItemToShipmentModule
 import org.pih.warehouse.modules.AddIncomingItemToShipmentModule
-import org.pih.warehouse.modules.AddSuitcaseToShipmentModule
+import org.pih.warehouse.modules.AddContainerToShipmentModule
 import testutils.TestFixture
 
 class EditPackingListPage extends Page{
@@ -19,7 +19,7 @@ class EditPackingListPage extends Page{
         addSuitcaseToShipmentLink(wait:true){$("div#addSuitcaseToShipment a")}
         addItemToShipment{module AddItemToShipmentModule}
         addIncomingItemToShipment{module AddIncomingItemToShipmentModule}
-        addSuitcaseToShipment{module AddSuitcaseToShipmentModule}
+        addContainerToShipment{module AddContainerToShipmentModule}
     }
 
     def addItem(product_name, quantity){
@@ -41,15 +41,19 @@ class EditPackingListPage extends Page{
         addItemToUnpackedItemsLink.click()
     }
 
-    def addSuitcase(specs) {
+    def addPallet(pallet){
+        actionButton.click()
+        addPalletToShipmentLink.click()
+        addContainerToShipment.addContainer(pallet)
+        addContainerToShipment.addItemButton.click()
+
+    }
+
+    def addSuitcase(suitcase) {
         actionButton.click()
         addSuitcaseToShipmentLink.click()
-        addSuitcaseToShipment.packingUnit.value(specs.unit)
-        addSuitcaseToShipment.weight.value(specs.weight)
-        addSuitcaseToShipment.caseHeight.value(specs.height)
-        addSuitcaseToShipment.caseWidth.value(specs.width)
-        addSuitcaseToShipment.caseLength.value(specs.length)
-        addSuitcaseToShipment.addItemButton.click()
+        addContainerToShipment.addContainer(suitcase)
+        addContainerToShipment.addItemButton.click()
     }
 
 

@@ -2,7 +2,7 @@ package org.pih.warehouse.modules
 
 import geb.Module
 
-class AddSuitcaseToShipmentModule extends Module {
+class AddContainerToShipmentModule extends Module {
     static content = {
         packingUnit {$("input", id: "name")}
         weight {$("input", id: "weight")}
@@ -12,5 +12,13 @@ class AddSuitcaseToShipmentModule extends Module {
         recipient {$("input", id: "recipient-suggest")}
         saveButton {$("input", id: "_eventId_saveContainer")}
         addItemButton {$("input", id: "_eventId_addItemToContainer")}
+    }
+
+    def addContainer(container){
+        packingUnit.value(container.unit)
+        weight.value(container.weight)
+        caseHeight.value(container.height)
+        caseWidth.value(container.width)
+        caseLength.value(container.length)
     }
 }

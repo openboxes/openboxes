@@ -19,6 +19,7 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.core.User
+import org.pih.warehouse.shipping.ShipmentItem
 
 
 class BootStrap {
@@ -76,8 +77,7 @@ class BootStrap {
 			liquibase = new Liquibase("changelog.xml", fileOpener, database);
 			liquibase.update(null)
 
-            //insert test fixture
-            insertTestFixture()
+
 		}
 		finally {
 			if (liquibase && liquibase.database) {
@@ -85,6 +85,8 @@ class BootStrap {
 			}
 		}
 		log.info("Finished running liquibase changelog(s)!")
+
+        insertTestFixture()
 	}		
 		
 				
@@ -97,7 +99,8 @@ class BootStrap {
 
 
     def insertTestFixture(){
-        if(Environment.current != Environment.DEVELOPMENT && Environment.current != Environment.TEST)
+//        if(Environment.current != Environment.DEVELOPMENT && Environment.current != Environment.TEST)
+        if( Environment.current != Environment.TEST)
             return
 
         log.info("Setup test fixture...")
@@ -124,7 +127,7 @@ class BootStrap {
            deleteTestFixture(testData)
 
         createTestFixtureIfNotExist(testData)
-
+        log.info("Created test fixture.")
     }
 
     def deleteTestFixture(List<Map<String, Object>> testData) {
@@ -139,12 +142,22 @@ class BootStrap {
     private def deleteProductAndInventoryItems(Map<String, Object> inventoryItemInfo) {
         def product = Product.findByName(inventoryItemInfo.product.name)
         if(!product) return
-        def inventoryItems = InventoryItem.findByProduct(product)
-        for (item in inventoryItems) {
-            for (entry in TransactionEntry.findByInventoryItem(item)) { entry.delete() }
-            item.delete()
+        def shipmentItems = ShipmentItem.findAllByProduct(product)
+
+        for(shipmentItem in shipmentItems){
+            shipmentItem.delete(failOnError:true, flush:true)
         }
-        product.delete()
+
+        def inventoryItems = InventoryItem.findAllByProduct(product)
+        for (item in inventoryItems) {
+            for (entry in TransactionEntry.findAllByInventoryItem(item)) {
+                log.info( "deleteing transaction entry:" + entry.id)
+                entry.delete(failOnError:true, flush:true)
+            }
+            log.info( "deleteing inventory item:" + item.id)
+            item.delete(failOnError:true,flush:true)
+        }
+        product.delete(failOnError:true, flush:true)
     }
 
      private def addProductAndInventoryItemIfNotExist(Map<String, Object> inventoryItemInfo) {
@@ -152,7 +165,7 @@ class BootStrap {
         def product = Product.findByName(inventoryItemInfo.product.name)
 
         if(!product){
-           inventoryItemInfo.product.save(failOnError:true)
+           inventoryItemInfo.product.save(failOnError:true,flush:true)
            addInventoryItem(inventoryItemInfo.product, inventoryItemInfo.expiration, inventoryItemInfo.quantity)
         }
     }
@@ -164,7 +177,7 @@ class BootStrap {
         item.product = product
         item.lotNumber = "lot57"
         item.expirationDate = expirationDate
-        item.save(failOnError:true)
+        item.save(failOnError:true, flush:true)
 
         Location boston =  Location.findByName("Boston Headquarters");
         assert boston != null
@@ -181,7 +194,7 @@ class BootStrap {
 		transactionEntry.inventoryItem = item
 
         transaction.addToTransactionEntries(transactionEntry)
-        transaction.save(failOnError:true)
+        transaction.save(failOnError:true, flush:true)
     }
 		
 	

@@ -55,7 +55,7 @@ class InventorySpec extends GebReportingSpec {
             at ExpiredStockPage
         then:
             expiredStockList.contains(TestFixture.SimilacAdvanceLowiron400g)
-            expiredStockList.contains(TestFixture.GSimilacAdvanceIron365g)
+            expiredStockList.contains(TestFixture.SimilacAdvanceIron365g)
             !expiredStockList.contains(TestFixture.Advil200mg)
             !expiredStockList.contains(TestFixture.MacBookPro8G)
     }
