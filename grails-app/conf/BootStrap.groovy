@@ -9,7 +9,9 @@
 **/ 
 import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
-import javax.sql.DataSource;
+import javax.sql.DataSource
+import grails.util.Environment;
+import org.pih.warehouse.product.*;
 
 class BootStrap {
 
@@ -65,6 +67,9 @@ class BootStrap {
 			// Run through the updates in the master changelog
 			liquibase = new Liquibase("changelog.xml", fileOpener, database);
 			liquibase.update(null)
+
+            //insert test fixture
+            insertTestFixture()
 		}
 		finally {
 			if (liquibase && liquibase.database) {
@@ -78,6 +83,32 @@ class BootStrap {
 	def destroy = {
 		
 	}
+
+    def insertTestFixture(){
+        if(Environment.current != Environment.DEVELOPMENT && Environment.current != Environment.TEST)
+            return
+
+        log.info("Setup test fixture...")
+        def medicines = Category.findByName("Medicines")
+        def suppliers = Category.findByName("Supplies")
+        def products = [
+          new Product(category: medicines, name: "Advil 200mg", manufacturer:"ABC", product_code:"00001",manufacturer_code:"9001" )
+        , new Product(category: medicines, name: "Tylenol 325mg", manufacturer:"MedicalGait", product_code:"00002",manufacturer_code:"9002" )
+        , new Product(category: medicines, name: "Aspirin 20mg", manufacturer:"ABC", product_code:"00003",manufacturer_code:"9001" )
+        , new Product(category: medicines, name: "General Pain Reliever", manufacturer:"MedicalGait", product_code:"00004",manufacturer_code:"9002" )
+        , new Product(category: medicines, name: "Similac Advance low iron 400g", manufacturer:"ABC", product_code:"00005",manufacturer_code:"9001" )
+        , new Product(category: medicines, name: "Similac Advance + iron 365g", manufacturer:"MedicalGait", product_code:"00006",manufacturer_code:"9002" )
+        , new Product(category: suppliers, name: "MacBook Pro 8G", manufacturer:"Apple", product_code:"00007",manufacturer_code:"9003" )
+        , new Product(category: suppliers, name: "Print Paper A4", manufacturer:"DSC", product_code:"00008",manufacturer_code:"9004" )
+                ]
+
+        products.each{
+            def oldOne = Product.findByName(it.name)
+            if(oldOne) oldOne.delete()
+            it.save()
+        }
+
+    }
 		
 	
 }
