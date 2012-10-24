@@ -9,23 +9,17 @@
 **/ 
 package org.pih.warehouse.inventory;
 
-import java.util.Map;
 
-import org.apache.commons.collections.FactoryUtils;
-import org.apache.commons.collections.ListUtils;
-import org.grails.plugins.excelimport.ExcelImportUtils;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
-import org.pih.warehouse.core.User;
-import org.pih.warehouse.product.Category;
+
+
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.shipping.Container;
 import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.shipping.ShipmentItem;
 import org.pih.warehouse.shipping.ShipmentItemException;
-import org.pih.warehouse.inventory.TransactionType;
-import org.pih.warehouse.inventory.StockCardCommand
-import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
+
 
 import grails.converters.*
 import grails.validation.ValidationException;
@@ -34,7 +28,7 @@ class InventoryItemController {
 
 	def inventoryService;
 	def shipmentService;
-	def requestService;
+	def requisitionService;
 	def orderService;
 	
 	/**
@@ -98,8 +92,8 @@ class InventoryItemController {
 		}
 		
 		def requestItems = 
-			requestService.getPendingRequestItemsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance)
-		def requestMap = requestItems.groupBy { it.request }
+			requisitionService.getPendingRequestItemsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance)
+		def requestMap = requestItems.groupBy { it.requisition }
 		if (requestMap) {
 			requestMap.keySet().each {
 				def quantity = requestMap[it].sum() { it.quantity }

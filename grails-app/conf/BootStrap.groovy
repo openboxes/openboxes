@@ -99,8 +99,7 @@ class BootStrap {
 
 
     def insertTestFixture(){
-//        if(Environment.current != Environment.DEVELOPMENT && Environment.current != Environment.TEST)
-        if( Environment.current != Environment.TEST)
+        if(Environment.current != Environment.DEVELOPMENT && Environment.current != Environment.TEST)
             return
 
         log.info("Setup test fixture...")
@@ -151,10 +150,9 @@ class BootStrap {
         def inventoryItems = InventoryItem.findAllByProduct(product)
         for (item in inventoryItems) {
             for (entry in TransactionEntry.findAllByInventoryItem(item)) {
-                log.info( "deleteing transaction entry:" + entry.id)
                 entry.delete(failOnError:true, flush:true)
             }
-            log.info( "deleteing inventory item:" + item.id)
+
             item.delete(failOnError:true,flush:true)
         }
         product.delete(failOnError:true, flush:true)

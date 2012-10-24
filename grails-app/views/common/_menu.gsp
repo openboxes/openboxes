@@ -96,12 +96,12 @@
 			<ul>
 				<li>
 					<span class="menuButton">
-						<g:link controller="request" action="list" params="[requestType:'INCOMING']"><warehouse:message code="request.listIncoming.label" /></g:link>
+						<g:link controller="requisition" action="list" params="[requestType:'INCOMING']"><warehouse:message code="request.listIncoming.label" /></g:link>
 					</span>
 				</li>						
 				<li>
 					<span class="menuButton">
-						<g:link controller="request" action="list" params="[requestType:'OUTGOING']"><warehouse:message code="request.listOutgoing.label" /></g:link>
+						<g:link controller="requisition" action="list" params="[requestType:'OUTGOING']"><warehouse:message code="request.listOutgoing.label" /></g:link>
 					</span>
 				</li>						
 				

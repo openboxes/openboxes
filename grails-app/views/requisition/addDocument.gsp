@@ -80,7 +80,7 @@
 										<button type="submit" class="positive">
 											<img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" />${documentInstance?.id ? warehouse.message(code:'default.button.save.label') : warehouse.message(code:'default.button.upload.label')}
 										</button>
-										<g:link controller="request" action="show" id="${requestInstance?.id}" class="negative">
+										<g:link controller="requisition" action="show" id="${requestInstance?.id}" class="negative">
 											<img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="Cancel" /> <warehouse:message
 									code="default.button.cancel.label" /> </g:link>
 									</div>				

@@ -7,18 +7,12 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.request
-
-import java.util.List;
+package org.pih.warehouse.requisition
 
 import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.list.LazyList;
 import org.codehaus.groovy.grails.validation.Validateable;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.core.Person;
-import org.pih.warehouse.shipping.Shipment;
-import org.pih.warehouse.shipping.ShipmentItem;
-import org.pih.warehouse.shipping.ShipmentType;
+
 
 @Validateable
 class RequestItemListCommand implements Serializable {
@@ -26,7 +20,7 @@ class RequestItemListCommand implements Serializable {
 	// Not the actual order items, but rather all the line items on the receive order page.  
 	// This means that we might have more than one OrderItemCommand per OrderItem.
 	def requestItems = 
-		LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(RequestItemCommand.class));
+		LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(RequisitionItemCommand.class));
 	
 	static constraints = {
 		requestItems(validator: { val, obj, errors ->

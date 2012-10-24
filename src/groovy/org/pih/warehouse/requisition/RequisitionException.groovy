@@ -7,9 +7,9 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.request
+package org.pih.warehouse.requisition
 
-class RequestException extends RuntimeException {
+class RequisitionException extends RuntimeException {
 	String message
-	Request request	
+	Requisition requisition
 }

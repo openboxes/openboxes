@@ -133,12 +133,12 @@
 				<table>
 					<tr>
 						<td>
-							<g:link controller="request" action="list" params="[requestType:'INCOMING']"><warehouse:message code="request.listIncoming.label" /></g:link>
+							<g:link controller="requisition" action="list" params="[requestType:'INCOMING']"><warehouse:message code="request.listIncoming.label" /></g:link>
 							<table>
 								<g:each in="${incomingRequests}" var="status">
 									<tr>								
 										<td>
-											<g:link controller="request" action="list" params="[requestType:'INCOMING',status:status.key]">
+											<g:link controller="requisition" action="list" params="[requestType:'INCOMING',status:status.key]">
 												<format:metadata obj="${status.key}"/> (${status.value.size()})
 											</g:link>
 										</td>
@@ -149,12 +149,12 @@
 					</tr>
 					<tr>
 						<td>
-							<g:link controller="request" action="list" params="[requestType:'OUTGOING']"><warehouse:message code="request.listOutgoing.label" /></g:link>
+							<g:link controller="requisition" action="list" params="[requestType:'OUTGOING']"><warehouse:message code="request.listOutgoing.label" /></g:link>
 							<table>
 								<g:each in="${outgoingRequests}" var="status">
 									<tr>
 										<td>
-											<g:link controller="request" action="list" params="[requestType:'OUTGOING',status:status.key]">
+											<g:link controller="requisition" action="list" params="[requestType:'OUTGOING',status:status.key]">
 												<format:metadata obj="${status.key}"/> (${status.value.size()})
 											</g:link>
 										</td>

@@ -9,12 +9,10 @@
 **/ 
 package org.pih.warehouse.fulfillment
 
-import java.util.Date;
-
-import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
-import org.pih.warehouse.fulfillment.FulfillmentStatus;
-import org.pih.warehouse.request.Request;
+
+
+import org.pih.warehouse.requisition.Requisition;
 
 class Fulfillment implements Serializable {
 
@@ -31,7 +29,7 @@ class Fulfillment implements Serializable {
 	Date lastUpdated
 
 	// Bi-directional Associations	
-	static belongsTo = [ request : Request ]
+	static belongsTo = [ request : Requisition ]
 	
 	// One-to-many associations 
 	static hasMany = [ fulfillmentItems : FulfillmentItem ]

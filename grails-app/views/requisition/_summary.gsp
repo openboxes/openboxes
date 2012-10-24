@@ -13,7 +13,7 @@
 						<div class="fade" style="font-size: 0.9em; line-height: 20px;">
 							<!-- Hide action menu menu if the user is in the shipment workflow -->	
 							<g:if test="${!params.execution  && !isAddingComment && !isAddingDocument }">
-								<g:render template="/request/actions" model="[requestInstance:requestInstance]"/> &nbsp;|&nbsp;
+								<g:render template="/requisition/actions" model="[requestInstance:requestInstance]"/> &nbsp;|&nbsp;
 							</g:if>
 							<%-- 
 							<span class="request-number">

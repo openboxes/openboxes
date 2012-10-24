@@ -40,7 +40,7 @@
 		<g:each in="${requests}" status="i" var="requestInstance">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 				<td>			
-					<g:render template="/request/actions" model="[requestInstance:requestInstance]"/> 
+					<g:render template="/requisition/actions" model="[requestInstance:requestInstance]"/>
 				</td>
 				<td>
 					<format:metadata obj="${requestInstance?.status}"/>

@@ -40,7 +40,7 @@
 										</g:if>
 									</div>
 									<div class="box">
-										<g:link controller="request" action="list">
+										<g:link controller="requisition" action="list">
 											${warehouse.message(code: 'request.returnToList.label', default: 'Return to request list')} 
 										</g:link>																			
 									</div>

@@ -9,12 +9,10 @@
 **/ 
 package org.pih.warehouse.core
 
-import java.util.Date;
-
 import org.pih.warehouse.inventory.Inventory;
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.order.Order;
-import org.pih.warehouse.request.Request;
+import org.pih.warehouse.requisition.Requisition;
 import org.pih.warehouse.shipping.Shipment;
 
 /**
@@ -77,7 +75,7 @@ class Location implements Comparable, java.io.Serializable {
 	List getTransactions() { return Transaction.findAllByDestinationOrSource(this,this) }
 	List getEvents() { return Event.findAllByEventLocation(this) }
 	List getShipments() { return Shipment.findAllByOriginOrDestination(this,this) }
-	List getRequests() { return Request.findAllByOriginOrDestination(this,this) }
+	List getRequests() { return Requisition.findAllByOriginOrDestination(this,this) }
 	List getOrders() { return Order.findAllByOriginOrDestination(this,this) } 
 	List getUsers() { return User.findAllByWarehouse(this) }
 	

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+     <changeSet author="PZ DM" id="1295640983194-01">
+        <dropTable tableName="request_event"/>
+    </changeSet>
+    <changeSet author="PZ DM" id="1295640983194-02">
+        <dropTable tableName="request_comment"/>
+    </changeSet>
+    <changeSet author="PZ DM" id="1295640983194-03">
+        <dropTable tableName="request_document"/>
+    </changeSet>
+    <changeSet author="PZ DM" id="1295640983194-04">
+        <dropTable tableName="request_shipment"/>
+    </changeSet>
+     <changeSet author="PZ DM" id="1295640983194-04b">
+    	<sql>
+            alter table `fulfillment_item` drop foreign key `FKEDC55CD447EBE106`;
+        </sql>
+    </changeSet>
+     <changeSet author="PZ DM" id="1295640983194-04c">
+    	<sql>
+             drop index `FKEDC55CD447EBE106` on `fulfillment_item`;
+        </sql>
+    </changeSet>
+
+     <changeSet author="PZ DM" id="1295640983194-05">
+        <dropTable tableName="request_item"/>
+    </changeSet>
+     <changeSet author="PZ DM" id="1295640983194-06">
+        <dropTable tableName="request"/>
+    </changeSet>
+    <changeSet author="PZ DM" id="1295640983194-07">
+    	<sql>
+			CREATE TABLE `requisition` (
+  `id` char(38) NOT NULL DEFAULT '',
+  `version` bigint(20) NOT NULL,
+  `date_created` datetime DEFAULT NULL,
+  `date_requested` datetime DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `destination_id` char(38) DEFAULT NULL,
+  `last_updated` datetime DEFAULT NULL,
+  `origin_id` char(38) DEFAULT NULL,
+  `recipient_id` char(38) DEFAULT NULL,
+  `request_number` varchar(255) DEFAULT NULL,
+  `requested_by_id` char(38) DEFAULT NULL,
+  `status` varchar(255) DEFAULT NULL,
+  `fulfillment_id` char(38) DEFAULT NULL,
+  `created_by_id` char(38) DEFAULT NULL,
+  `updated_by_id` char(38) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `date_valid_from` datetime DEFAULT NULL,
+  `date_valid_to` datetime DEFAULT NULL,
+  `recipient_program` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK414EF28F1E2B3CDC` (`destination_id`),
+  KEY `FK414EF28F44979D51` (`recipient_id`),
+  KEY `FK414EF28F94567276` (`fulfillment_id`),
+  KEY `FK414EF28FDBDEDAC4` (`origin_id`),
+  KEY `FK414EF28FDD302242` (`requested_by_id`),
+  CONSTRAINT `FK414EF28F1E2B3CDC` FOREIGN KEY (`destination_id`) REFERENCES `location` (`id`),
+  CONSTRAINT `FK414EF28F44979D51` FOREIGN KEY (`recipient_id`) REFERENCES `person` (`id`),
+  CONSTRAINT `FK414EF28F94567276` FOREIGN KEY (`fulfillment_id`) REFERENCES `fulfillment` (`id`),
+  CONSTRAINT `FK414EF28FDBDEDAC4` FOREIGN KEY (`origin_id`) REFERENCES `location` (`id`),
+  CONSTRAINT `FK414EF28FDD302242` FOREIGN KEY (`requested_by_id`) REFERENCES `person` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    	</sql>
+    </changeSet>
+    <changeSet author="PZ DM" id="1295640983194-08">
+        <sql>
+            CREATE TABLE `requisition_item` (
+  `id` char(38) NOT NULL DEFAULT '',
+  `version` bigint(20) NOT NULL,
+  `category_id` char(38) DEFAULT NULL,
+  `date_created` datetime NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `inventory_item_id` char(38) DEFAULT NULL,
+  `last_updated` datetime NOT NULL,
+  `product_id` char(38) DEFAULT NULL,
+  `quantity` int(11) NOT NULL,
+  `requisition_id` char(38) DEFAULT NULL,
+  `requested_by_id` char(38) DEFAULT NULL,
+  `unit_price` float(12,0) DEFAULT NULL,
+  `product_group_id` char(38) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK4DA982C35DE21C87` (`requisition_id`),
+  KEY `FK4DA982C3911E7578` (`requested_by_id`),
+  KEY `FK4DA982C3AA992CED` (`inventory_item_id`),
+  KEY `FK4DA982C3DED5FAE7` (`product_id`),
+  KEY `FK4DA982C3EF4C770D` (`category_id`),
+  CONSTRAINT `FK4DA982C35DE21C87` FOREIGN KEY (`requisition_id`) REFERENCES `requisition` (`id`),
+  CONSTRAINT `FK4DA982C3911E7578` FOREIGN KEY (`requested_by_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `FK4DA982C3AA992CED` FOREIGN KEY (`inventory_item_id`) REFERENCES `inventory_item` (`id`),
+  CONSTRAINT `FK4DA982C3DED5FAE7` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`),
+  CONSTRAINT `FK4DA982C3EF4C770D` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    	</sql>
+    </changeSet>
+     <changeSet author="PZ DM" id="1295640983194-09">
+    	<sql>
+            alter table `fulfillment_item` change `request_item_id` `requisition_item_id` char(38) DEFAULT NULL;
+        </sql>
+    </changeSet>
+     <changeSet author="PZ DM" id="1295640983194-10">
+    	<sql>
+            alter table `fulfillment_item` add index FKEDC55CD447EBE106 (requisition_item_id), add constraint FKEDC55CD447EBE106 foreign key (requisition_item_id) references requisition_item (id);
+        </sql>
+    </changeSet>
+</databaseChangeLog>

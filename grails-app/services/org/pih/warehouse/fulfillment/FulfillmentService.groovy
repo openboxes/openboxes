@@ -10,9 +10,8 @@
 package org.pih.warehouse.fulfillment
 
 import org.pih.warehouse.core.Person;
-import org.pih.warehouse.request.Request;
-import org.pih.warehouse.request.RequestCommand;
-import org.pih.warehouse.request.RequestItemCommand;
+import org.pih.warehouse.requisition.Requisition;
+
 
 class FulfillmentService {
 
@@ -43,7 +42,7 @@ class FulfillmentService {
 		def command = new FulfillmentCommand();
 
 		// Make sure that the request we are trying to fulfill actually exists		
-		def requestInstance = Request.get(id)
+		def requestInstance = Requisition.get(id)
 		if (!requestInstance)
 			throw new Exception("Unable to proceed with fulfillment without a valid request ");
 					

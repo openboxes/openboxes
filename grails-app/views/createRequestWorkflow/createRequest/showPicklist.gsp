@@ -28,7 +28,7 @@
 		</g:if>
 
 		<div class="dialog">
-			<g:render template="/request/summary" model="[requestInstance:requestInstance]"/>
+			<g:render template="/requisition/summary" model="[requestInstance:requestInstance]"/>
 			<g:if test="${!params?.print }">
 			<g:render template="header" model="['state':'showPicklist']"/>
 			</g:if>

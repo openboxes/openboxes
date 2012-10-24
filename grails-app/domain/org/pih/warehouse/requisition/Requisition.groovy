@@ -7,21 +7,21 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.request
+package org.pih.warehouse.requisition
 
 import org.pih.warehouse.auth.AuthService;
 import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Document;
 import org.pih.warehouse.core.Event;
-import org.pih.warehouse.core.EventCode;
-import org.pih.warehouse.core.EventType;
+
+
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.fulfillment.Fulfillment;
-import org.pih.warehouse.request.RequestStatus;
 
-class Request implements Serializable {
+
+class Requisition implements Serializable {
 	
 	def beforeInsert = {
 		createdBy = AuthService.currentUser.get()
@@ -58,7 +58,7 @@ class Request implements Serializable {
 	User createdBy
 	User updatedBy
 	
-	static hasMany = [ requestItems : RequestItem, comments : Comment, documents : Document, events : Event ]
+	static hasMany = [ requestItems : RequisitionItem, comments : Comment, documents : Document, events : Event ]
 	static mapping = {
 		id generator: 'uuid'
 		requestItems cascade: "all-delete-orphan", sort: "id"

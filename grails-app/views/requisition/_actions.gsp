@@ -17,7 +17,7 @@
 		<g:elseif test="${requestInstance.isFulfilled() }">
 			<g:render template="actionsRequested" model="[requestInstance:requestInstance]"/>
 		</g:elseif>
-		<g:elseif test="${requestInstance.status == org.pih.warehouse.request.RequestStatus.PICKED }">
+		<g:elseif test="${requestInstance.status == org.pih.warehouse.requisition.RequisitionStatus.PICKED }">
 			<g:render template="actionsRequested" model="[requestInstance:requestInstance]"/>
 		</g:elseif>
 		<g:else>

@@ -7,9 +7,7 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.request
-
-import java.util.List;
+package org.pih.warehouse.requisition
 
 import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.list.LazyList;
@@ -17,12 +15,14 @@ import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.shipping.Shipment;
-import org.pih.warehouse.shipping.ShipmentItem;
-import org.pih.warehouse.shipping.ShipmentType;
 
-class RequestCommand implements Serializable {
 
-	Request request
+import org.pih.warehouse.shipping.ShipmentType
+import org.pih.warehouse.requisition.Requisition;
+
+class RequistionCommand implements Serializable {
+
+	Requisition requisition
 	Person recipient
 	Date shippedOn
 	Date deliveredOn
@@ -41,7 +41,7 @@ class RequestCommand implements Serializable {
 	// Not the actual request items, but rather all the line items on the receive order page.  
 	// This means that we might have more than one ReqeuestItemCommand per ReqeuestItem.
 	def requestItems = 
-		LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(RequestItemCommand.class));
+		LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(org.pih.warehouse.requisition.RequestItemCommand.class));
 		
 	static constraints = {
 		shipmentType(nullable:false)

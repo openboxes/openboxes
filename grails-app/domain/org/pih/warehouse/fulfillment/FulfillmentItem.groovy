@@ -9,10 +9,8 @@
 **/ 
 package org.pih.warehouse.fulfillment
 
-import java.util.Date;
-
 import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.request.RequestItem;
+import org.pih.warehouse.requisition.RequisitionItem;
 import org.pih.warehouse.shipping.ShipmentItem;
 
 class FulfillmentItem implements Serializable {
@@ -22,7 +20,7 @@ class FulfillmentItem implements Serializable {
 	// Attributes
 	Integer quantity
 	InventoryItem inventoryItem
-	RequestItem requestItem 			
+	RequisitionItem requestItem
 	
 	// Audit fields
 	Date dateCreated

@@ -10,17 +10,14 @@
 package org.pih.warehouse.picklist
 
 import org.pih.warehouse.auth.AuthService;
-import org.pih.warehouse.core.Comment;
-import org.pih.warehouse.core.Document;
-import org.pih.warehouse.core.Event;
-import org.pih.warehouse.core.EventCode;
-import org.pih.warehouse.core.EventType;
-import org.pih.warehouse.core.Location;
+
+
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.User;
-import org.pih.warehouse.fulfillment.Fulfillment;
-import org.pih.warehouse.request.Request;
-import org.pih.warehouse.request.RequestStatus;
+
+
+import org.pih.warehouse.requisition.Requisition;
+
 
 class Picklist implements Serializable {
 	
@@ -35,7 +32,7 @@ class Picklist implements Serializable {
 	String name
 	String description 		// a user-defined, searchable name for the order 
 	
-	Request request 		
+	Requisition request
 	Person picker
 	Date datePicked
 	

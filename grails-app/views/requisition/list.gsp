@@ -36,7 +36,7 @@
 			<g:set var="requestMap" value="${requests.groupBy { it.status }}"/>
 			<div class="tabs">
 				<ul>
-					<g:each var="status" in="${org.pih.warehouse.request.RequestStatus.list() }">
+					<g:each var="status" in="${org.pih.warehouse.requisition.RequisitionStatus.list() }">
 						<li>
 							<a href="#${format.metadata(obj: status) }">
 								<format:metadata obj="${status }"/>
@@ -45,7 +45,7 @@
 						</li>
 					</g:each>
 				</ul>		
-				<g:each var="status" in="${org.pih.warehouse.request.RequestStatus.list() }">
+				<g:each var="status" in="${org.pih.warehouse.requisition.RequisitionStatus.list() }">
 					<div id="${format.metadata(obj: status) }">	            	
 						<g:render template="list" model="[requestType: requestType, requests:requestMap[status]]"/>
 					</div>

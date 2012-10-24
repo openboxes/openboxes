@@ -11,7 +11,7 @@ package org.pih.warehouse.core;
 
 import org.pih.warehouse.inventory.Transaction;
 import org.pih.warehouse.order.Order;
-import org.pih.warehouse.request.Request;
+import org.pih.warehouse.requisition.Requisition;
 import org.pih.warehouse.shipping.Shipment;
 
 class LocationController {
@@ -174,7 +174,7 @@ class LocationController {
 		   redirect(action: "show", id: params.location.id);
 	   }
 	   def deleteRequest = {
-		   def requestInstance = Request.get(params.id)
+		   def requestInstance = Requisition.get(params.id)
 		   requestInstance.delete();
 		   flash.message = "Request deleted"
 		   redirect(action: "show", id: params.location.id);

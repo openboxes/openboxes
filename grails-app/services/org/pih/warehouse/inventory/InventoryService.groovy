@@ -56,8 +56,8 @@ class InventoryService implements ApplicationContextAware {
 	/**
 	 * @return request service
 	 */
-	def getRequestService() {
-		return applicationContext.getBean("requestService")
+	def getrequisitionService() {
+		return applicationContext.getBean("requisitionService")
 	}
 
 	/**
@@ -507,7 +507,7 @@ class InventoryService implements ApplicationContextAware {
 		Map quantityByProduct = [:]
 		Map quantityShippedByProduct = getShipmentService().getOutgoingQuantityByProduct(location);		
 		Map quantityOrderedByProduct = getOrderService().getOutgoingQuantityByProduct(location)
-		Map quantityRequestedByProduct = getRequestService().getOutgoingQuantityByProduct(location)
+		//Map quantityRequestedByProduct = getrequisitionService().getOutgoingQuantityByProduct(location)
 		quantityShippedByProduct.each { product, quantity ->
 			def productQuantity = quantityByProduct[product];
 			if (!productQuantity) productQuantity = 0;			
@@ -520,12 +520,12 @@ class InventoryService implements ApplicationContextAware {
 			productQuantity += quantity?:0;
 			quantityByProduct[product] = productQuantity;
 		}
-		quantityRequestedByProduct.each { product, quantity ->
-			def productQuantity = quantityByProduct[product];
-			if (!productQuantity) productQuantity = 0;			
-			productQuantity += quantity?:0;
-			quantityByProduct[product] = productQuantity;
-		}
+//		quantityRequestedByProduct.each { product, quantity ->
+//			def productQuantity = quantityByProduct[product];
+//			if (!productQuantity) productQuantity = 0;
+//			productQuantity += quantity?:0;
+//			quantityByProduct[product] = productQuantity;
+//		}
 		return quantityByProduct;
 	}
 
@@ -538,7 +538,7 @@ class InventoryService implements ApplicationContextAware {
 		Map quantityByProduct = [:]
 		Map quantityShippedByProduct = getShipmentService().getIncomingQuantityByProduct(location);		
 		Map quantityOrderedByProduct = getOrderService().getIncomingQuantityByProduct(location)
-		Map quantityRequestedByProduct = getRequestService().getIncomingQuantityByProduct(location)
+		//Map quantityRequestedByProduct = getrequisitionService().getIncomingQuantityByProduct(location)
 		quantityShippedByProduct.each { product, quantity ->
 			def productQuantity = quantityByProduct[product];
 			if (!productQuantity) productQuantity = 0;			
@@ -551,12 +551,12 @@ class InventoryService implements ApplicationContextAware {
 			productQuantity += quantity?:0;
 			quantityByProduct[product] = productQuantity;
 		}
-		quantityRequestedByProduct.each { product, quantity ->
-			def productQuantity = quantityByProduct[product];
-			if (!productQuantity) productQuantity = 0;			
-			productQuantity += quantity?:0;
-			quantityByProduct[product] = productQuantity;
-		}
+//		quantityRequestedByProduct.each { product, quantity ->
+//			def productQuantity = quantityByProduct[product];
+//			if (!productQuantity) productQuantity = 0;
+//			productQuantity += quantity?:0;
+//			quantityByProduct[product] = productQuantity;
+//		}
 		return quantityByProduct;
 	}
 	

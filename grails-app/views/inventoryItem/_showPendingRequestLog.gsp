@@ -44,7 +44,7 @@
 										</g:if>
 									</td>
 									<td>
-										<g:link controller="request" action="show" id="${requestInstance?.id }">
+										<g:link controller="requisition" action="show" id="${requestInstance?.id }">
 											${requestInstance?.description }
 										</g:link>
 									</td>

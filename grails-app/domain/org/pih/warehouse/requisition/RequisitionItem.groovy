@@ -7,21 +7,19 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.request
+package org.pih.warehouse.requisition
 
-import java.util.Date;
-import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Person;
-import org.pih.warehouse.core.User;
+
+
 import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.picklist.PicklistItem;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.ProductGroup;
-import org.pih.warehouse.shipping.Shipment;
-import org.pih.warehouse.shipping.ShipmentItem;
 
-class RequestItem implements Serializable {
+
+class RequisitionItem implements Serializable {
 	
 	String id
 	String description	
@@ -40,7 +38,7 @@ class RequestItem implements Serializable {
 
 	static transients = [ "type", "status" ]
 	
-	static belongsTo = [ request : Request ]
+	static belongsTo = [ requisition: Requisition ]
 
 	static mapping = {
 		id generator: 'uuid'
@@ -91,7 +89,7 @@ class RequestItem implements Serializable {
 	}
 
 	Integer quantityFulfilled() { 
-		def fulfillmentItems = request?.fulfillment?.fulfillmentItems.findAll { it.requestItem == this }
+		def fulfillmentItems = requisition?.fulfillment?.fulfillmentItems.findAll { it.requestItem == this }
 		return (fulfillmentItems) ? fulfillmentItems.sum { it.quantity } : 0;
 	}
 	

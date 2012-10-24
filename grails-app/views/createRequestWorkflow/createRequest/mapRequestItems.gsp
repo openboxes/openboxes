@@ -19,7 +19,7 @@
 		</g:hasErrors>
 		
 		<div class="dialog">
-			<g:render template="/request/summary" model="[requestInstance:requestInstance]"/>
+			<g:render template="/requisition/summary" model="[requestInstance:requestInstance]"/>
 			<g:render template="header" model="['state':'mapRequestItems']"/>
 			<g:form action="createRequest" autocomplete="false">
 				<div>

@@ -7,24 +7,19 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.request
-
-import java.util.Date;
+package org.pih.warehouse.requisition
 
 import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Document;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.core.Person;
-import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.shipping.DocumentCommand;
-import org.pih.warehouse.shipping.Shipment;
-import org.pih.warehouse.shipping.ShipmentItem;
 
-class RequestController {
+
+import org.pih.warehouse.core.Location;
+
+
+class RequisitionController {
 	
 	
-	def requestService
+	def requisitionService
     def inventoryService
 	
 	static allowedMethods = [save: "POST", update: "POST"]
@@ -39,17 +34,17 @@ class RequestController {
         //[requestInstanceList: Request.list(params), requestInstanceTotal: Request.count()]
 		
 		def location = Location.get(session.warehouse.id)
-		def incomingRequests = params.status ? Request.findAllByDestinationAndStatus(location, params.status) :
-			Request.findAllByDestination(location)
-		def outgoingRequests = params.status ? Request.findAllByOriginAndStatus(location, params.status) :
-			Request.findAllByOrigin(location)
+		def incomingRequests = params.status ? Requisition.findAllByDestinationAndStatus(location, params.status) :
+			Requisition.findAllByDestination(location)
+		def outgoingRequests = params.status ? Requisition.findAllByOriginAndStatus(location, params.status) :
+			Requisition.findAllByOrigin(location)
 		
 		[incomingRequests : incomingRequests, outgoingRequests : outgoingRequests]
     }	
 
 	def listRequestItems = { 
-		//def requestItems = requestService.getRequestItems()
-		def requestItems = RequestItem.getAll().findAll { !it.isComplete() } ;
+		//def requestItems = requisitionService.getRequestItems()
+		def requestItems = RequisitionItem.getAll().findAll { !it.isComplete() } ;
 		
 		return [requestItems : requestItems]		
 	}
@@ -60,7 +55,7 @@ class RequestController {
     }
 
     def save = {
-        def requestInstance = new Request(params)
+        def requestInstance = new Requisition(params)
         if (requestInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'request.label', default: 'Request'), requestInstance.id])}"
             redirect(action: "list", id: requestInstance.id)
@@ -71,7 +66,7 @@ class RequestController {
     }
 	
     def show = {
-        def requestInstance = Request.get(params.id)
+        def requestInstance = Requisition.get(params.id)
         if (!requestInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
             redirect(action: "list")
@@ -82,7 +77,7 @@ class RequestController {
     }
 
     def edit = {
-        def requestInstance = Request.get(params.id)
+        def requestInstance = Requisition.get(params.id)
         if (!requestInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
             redirect(action: "list")
@@ -93,7 +88,7 @@ class RequestController {
     }
 
 	def place = { 
-		def requestInstance = Request.get(params.id)
+		def requestInstance = Requisition.get(params.id)
 		if (requestInstance) {
 			
 			if (requestInstance?.requestItems?.size() > 0) { 
@@ -122,7 +117,7 @@ class RequestController {
 	
 	
     def update = {
-        def requestInstance = Request.get(params.id)
+        def requestInstance = Requisition.get(params.id)
         if (requestInstance) {
             if (params.version) {
                 def version = params.version.toLong()
@@ -152,7 +147,7 @@ class RequestController {
 	
 	
     def delete = {
-        def requestInstance = Request.get(params.id)
+        def requestInstance = Requisition.get(params.id)
         if (requestInstance) {
             try {
                 requestInstance.delete(flush: true)
@@ -174,7 +169,7 @@ class RequestController {
 
 	
 	def addComment = { 
-        def requestInstance = Request.get(params?.id)
+        def requestInstance = Requisition.get(params?.id)
         if (!requestInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
             redirect(action: "list")
@@ -185,7 +180,7 @@ class RequestController {
 	}
 	
 	def editComment = {
-		def requestInstance = Request.get(params?.request?.id)
+		def requestInstance = Requisition.get(params?.requisition?.id)
 		if (!requestInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
 			redirect(action: "list")
@@ -201,9 +196,9 @@ class RequestController {
 	}
 	
 	def deleteComment = { 
-		def requestInstance = Request.get(params.request.id)
+		def requestInstance = Requisition.get(params.requisition.id)
 		if (!requestInstance) {
-			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.request.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.requisition.id])}"
 			redirect(action: "list")
 		}
 		else {
@@ -228,7 +223,7 @@ class RequestController {
 	def saveComment = { 
 		log.info(params)
 		
-		def requestInstance = Request.get(params?.request?.id)
+		def requestInstance = Requisition.get(params?.requisition?.id)
 		if (requestInstance) { 
 			def commentInstance = Comment.get(params?.id)
 			if (commentInstance) { 
@@ -261,7 +256,7 @@ class RequestController {
 	}
 
 	def addDocument = {
-		def requestInstance = Request.get(params.id)
+		def requestInstance = Requisition.get(params.id)
 		if (!requestInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
 			redirect(action: "list")
@@ -272,7 +267,7 @@ class RequestController {
 	}
 	
 	def editDocument = {
-		def requestInstance = Request.get(params?.request?.id)
+		def requestInstance = Requisition.get(params?.requisition?.id)
 		if (!requestInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
 			redirect(action: "list")
@@ -288,9 +283,9 @@ class RequestController {
 	}
 	
 	def deleteDocument = {
-		def requestInstance = Request.get(params.request.id)
+		def requestInstance = Requisition.get(params.requisition.id)
 		if (!requestInstance) {
-			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.request.id])}"
+			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.requisition.id])}"
 			redirect(action: "list")
 		}
 		else {
@@ -313,8 +308,8 @@ class RequestController {
 	}
 	
 	def receive = {		
-		def requestCommand = requestService.getRequest(params.id as int, session.user.id as int)
-		if (!requestCommand.request) {
+		def requestCommand = requisitionService.getRequest(params.id as int, session.user.id as int)
+		if (!requestCommand.requisition) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
 			redirect(action: "list")
 		}
@@ -323,16 +318,16 @@ class RequestController {
 		}
 	}
 	
-	def saveRequestShipment = { RequestCommand command ->	
+	def saveRequestShipment = { RequistionCommand command ->
 		bindData(command, params)		
-		def requestInstance = Request.get(params?.request?.id);
-		command.request = requestInstance;
+		def requestInstance = Requisition.get(params?.requisition?.id);
+		command.requisition = requestInstance;
 		
-		requestService.saveRequestShipment(command)
+		requisitionService.saveRequestShipment(command)
 		
 		// If the shipment was saved, let's redirect back to the request received page
 		if (!command?.shipment?.hasErrors() && command?.shipment?.id) {
-			redirect(controller: "request", action: "receive", id: params?.request?.id)
+			redirect(controller: "requisition", action: "receive", id: params?.requisition?.id)
 		}
 		
 		// Otherwise, we want to display the errors, so we need to render the page.
@@ -340,16 +335,16 @@ class RequestController {
 	}
 
 	def addRequestShipment = {  
-		def requestCommand = requestService.getRequest(params.id as int, session.user.id as int)
+		def requestCommand = requisitionService.getRequest(params.id as int, session.user.id as int)
 		int index = Integer.valueOf(params?.index)
 		def requestItemToCopy = requestCommand?.requestItems[index]
 		if (requestItemToCopy) { 
-			def requestItemToAdd = new RequestItemCommand();
+			def requestItemToAdd = new RequisitionItemCommand();
 			requestItemToAdd.setPrimary(false)
 			requestItemToAdd.setType(requestItemToCopy.type)
 			requestItemToAdd.setDescription(requestItemToCopy.description)
 			requestItemToAdd.setLotNumber(requestItemToCopy.lotNumber);
-			requestItemToAdd.setRequestItem(requestItemToCopy.requestItem)
+			requestItemToAdd.setRequisitionItem(requestItemToCopy.requisitionItem)
 			requestItemToAdd.setProductReceived(requestItemToCopy.productReceived)
 			requestItemToAdd.setQuantityRequested(requestItemToCopy.quantityRequested)
 			
@@ -370,7 +365,7 @@ class RequestController {
 	}
 	
 	def showPicklist = { 
-		def requestInstance = Request.get(params.id)
+		def requestInstance = Requisition.get(params.id)
 		if (!requestInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
 			redirect(action: "list")
@@ -382,7 +377,7 @@ class RequestController {
 		
 
 	def fulfill = {
-		def requestInstance = Request.get(params.id)
+		def requestInstance = Requisition.get(params.id)
 		if (!requestInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
 			redirect(action: "list")
@@ -397,7 +392,7 @@ class RequestController {
 		log.info "fulfillItem " + params
 		
 		def inventoryItems = [:] 
-		def requestItem = RequestItem.get(params.id)
+		def requestItem = RequisitionItem.get(params.id)
 		if (!requestItem) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
 		}
@@ -416,45 +411,45 @@ class RequestController {
 	
 
 
-		
-	def addRequestItemToShipment = { 
-		
-		def requestInstance = Request.get(params?.id)
-		def requestItem = RequestItem.get(params?.requestItem?.id)
-		def shipmentInstance = Shipment.get(params?.shipment?.id)
-		
-		if (requestItem) { 
-			def shipmentItem = new ShipmentItem(requestItem.properties)
-			shipmentInstance.addToShipmentItems(shipmentItem);
-			if (!shipmentInstance.hasErrors() && shipmentInstance?.save(flush:true)) { 
-				
-				def requestShipment = RequestShipment.link(requestItem, shipmentItem);
-				/*
-				if (!requestShipment.hasErrors() && requestShipment.save(flush:true)) { 
-					flash.message = "success"
-				}
-				else { 
-					flash.message = "request shipment error(s)"
-					render(view: "fulfill", model: [requestShipment: requestShipment, requestItemInstance: requestItem, shipmentInstance: shipmentInstance])
-					return;
-				}*/
-			}
-			else { 
-				flash.message = "${warehouse.message(code: 'request.shipmentItemsError.label')}"
-				render(view: "fulfill", model: [requestItemInstance: requestItem, shipmentInstance: shipmentInstance])
-				return;
-			}
-		}
-		
-		redirect(action: "fulfill", id: requestInstance?.id)
-		
-	}
+//
+//	def addRequestItemToShipment = {
+//
+//		def requestInstance = Request.get(params?.id)
+//		def requestItem = RequestItem.get(params?.requestItem?.id)
+//		def shipmentInstance = Shipment.get(params?.shipment?.id)
+//
+//		if (requestItem) {
+//			def shipmentItem = new ShipmentItem(requestItem.properties)
+//			shipmentInstance.addToShipmentItems(shipmentItem);
+//			if (!shipmentInstance.hasErrors() && shipmentInstance?.save(flush:true)) {
+//
+//				def requestShipment = RequestShipment.link(requestItem, shipmentItem);
+//				/*
+//				if (!requestShipment.hasErrors() && requestShipment.save(flush:true)) {
+//					flash.message = "success"
+//				}
+//				else {
+//					flash.message = "request shipment error(s)"
+//					render(view: "fulfill", model: [requestShipment: requestShipment, requestItemInstance: requestItem, shipmentInstance: shipmentInstance])
+//					return;
+//				}*/
+//			}
+//			else {
+//				flash.message = "${warehouse.message(code: 'request.shipmentItemsError.label')}"
+//				render(view: "fulfill", model: [requestItemInstance: requestItem, shipmentInstance: shipmentInstance])
+//				return;
+//			}
+//		}
+//
+//		redirect(action: "fulfill", id: requestInstance?.id)
+//
+//	}
 
 	
 	def fulfillPost = {
-		def requestInstance = Request.get(params.id)
+		def requestInstance = Requisition.get(params.id)
 		if (requestInstance) {
-			
+
 			if (requestInstance?.requestItems?.size() > 0) {
 				requestInstance.status = RequestStatus.FULFILLED;
 				if (!requestInstance.hasErrors() && requestInstance.save(flush: true)) {
@@ -473,12 +468,12 @@ class RequestController {
 		}
 		else {
 			redirect("show", id: requestInstance?.id)
-			
+
 		}
-				
+
 	}
 
-	
-	
-		
+
+
+
 }

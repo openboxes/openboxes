@@ -88,13 +88,13 @@
 			<ul>
 				<li>
 					<span class="menuButton">
-						<g:link controller="request" action="list" params="[requestType:'INCOMING']"><warehouse:message code="request.listIncoming.label" /></g:link>
+						<g:link controller="requisition" action="list" params="[requestType:'INCOMING']"><warehouse:message code="request.listIncoming.label" /></g:link>
 					</span>
 				</li>				
 				<g:each in="${incomingRequests}" var="status">
 					<li>
 						<span class="menuButton submenuItem">
-							<g:link controller="request" action="list" params="[requestType:'INCOMING',status:status.key]">
+							<g:link controller="requisition" action="list" params="[requestType:'INCOMING',status:status.key]">
 								<format:metadata obj="${status.key}"/> (${status.value.size()})
 							</g:link>
 						</span>
@@ -102,13 +102,13 @@
 				</g:each>				
 				<li>
 					<span class="menuButton">
-						<g:link controller="request" action="list" params="[requestType:'OUTGOING']"><warehouse:message code="request.listOutgoing.label" /></g:link>
+						<g:link controller="requisition" action="list" params="[requestType:'OUTGOING']"><warehouse:message code="request.listOutgoing.label" /></g:link>
 					</span>
 				</li>						
 				<g:each in="${outgoingRequests}" var="status">
 					<li>
 						<span class="menuButton submenuItem">
-							<g:link controller="request" action="list" params="[requestType:'OUTGOING',status:status.key]">
+							<g:link controller="requisition" action="list" params="[requestType:'OUTGOING',status:status.key]">
 								<format:metadata obj="${status.key}"/> (${status.value.size()})
 							</g:link>
 						</span>

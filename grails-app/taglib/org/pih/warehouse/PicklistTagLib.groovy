@@ -21,8 +21,8 @@ class PicklistTagLib {
 		
 		def location = Location.get(session.warehouse.id)
 		attrs.products = []
-		if (attrs.requestItem.product) { 
-			attrs.product = attrs.requestItem.product
+		if (attrs.requisitionItem.product) {
+			attrs.product = attrs.requisitionItem.product
 			attrs.inventoryItems = inventoryService.findInventoryItemsByProduct(attrs.product)
 			attrs.inventoryItems.each { 
 				it.quantityOnHand = inventoryService.getQuantity(location.inventory, it)
@@ -32,12 +32,12 @@ class PicklistTagLib {
 			attrs.inventoryItem = attrs.inventoryItems.find { it?.expirationDate?.after(new Date()) }
 			
 		}
-		else if (attrs.requestItem.category) { 
-			attrs.products = attrs.requestItem.category.products
+		else if (attrs.requisitionItem.category) {
+			attrs.products = attrs.requisitionItem.category.products
 			attrs.inventoryItems = inventoryService.findInventoryItemsByProducts(attrs.products)
 		}
-		else if (attrs.requestItem.productGroup) {
-			attrs.products = attrs.requestItem.productGroup.products			
+		else if (attrs.requisitionItem.productGroup) {
+			attrs.products = attrs.requisitionItem.productGroup.products
 			attrs.inventoryItems = inventoryService.findInventoryItemsByProducts(attrs.products)
 		}
 		
@@ -48,19 +48,19 @@ class PicklistTagLib {
 	
 	def mapRequestItem = { attrs, body ->
 		attrs.products = []
-		if (attrs.requestItem.product) {
-			attrs.product = attrs.requestItem.product
+		if (attrs.requisitionItem.product) {
+			attrs.product = attrs.requisitionItem.product
 			println "product " + attrs.product
 			attrs.inventoryItems = inventoryService.findInventoryItemsByProduct(attrs.product)
 			attrs.inventoryItem = attrs.inventoryItems.find { it.expirationDate != null }
 		}
-		else if (attrs.requestItem.category) {
-			attrs.products = attrs.requestItem.category.products
+		else if (attrs.requisitionItem.category) {
+			attrs.products = attrs.requisitionItem.category.products
 			println "products " + attrs.products
 			attrs.inventoryItems = inventoryService.findInventoryItemsByProducts(attrs.products)
 		}
-		else if (attrs.requestItem.productGroup) {
-			attrs.products = attrs.requestItem.productGroup.products
+		else if (attrs.requisitionItem.productGroup) {
+			attrs.products = attrs.requisitionItem.productGroup.products
 			println "products " + attrs.products
 			attrs.inventoryItems = inventoryService.findInventoryItemsByProducts(attrs.products)
 		}

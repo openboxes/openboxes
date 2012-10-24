@@ -126,7 +126,7 @@
 	</g:authorize>
 	<g:authorize activity="[ActivityCode.PLACE_REQUEST,ActivityCode.FULFILL_REQUEST]">
 		<li>
-			<g:link controller="request" action="list">
+			<g:link controller="requisition" action="list">
 				<warehouse:message code="requests.label"/>
 			</g:link>
 			<div>
@@ -137,14 +137,14 @@
 							
 							<div class="buttonsBar">
 								<div class="linkButton">
-									<g:link controller="request" action="list" params="[requestType:'INCOMING']" class="list">
+									<g:link controller="requisition" action="list" params="[requestType:'INCOMING']" class="list">
 										<warehouse:message code="request.listIncoming.label" /> (${incomingRequests?.values()?.flatten()?.size()?:0 })
 									</g:link>
 								</div>
-								<g:each in="${org.pih.warehouse.request.RequestStatus.list() }" var="status">
+								<g:each in="${org.pih.warehouse.requisition.RequestStatus.list() }" var="status">
 									<div class="linkButton">							
 										<g:set var="statusName" value="${warehouse.message(code:'enum.RequestStatus.' + status)}"/>
-										<g:link controller="request" action="list" class="request-status-${status }" params="[requestType:'INCOMING',status:status]" fragment="${statusName}">
+										<g:link controller="requisition" action="list" class="request-status-${status }" params="[requestType:'INCOMING',status:status]" fragment="${statusName}">
 											<format:metadata obj="${status}"/> (${incomingRequests[status]?.size()?:0})
 										</g:link>
 									</div>
@@ -155,15 +155,15 @@
 						
 							
 							<div class="linkButton">
-								<g:link controller="request" action="list" params="[requestType:'OUTGOING']" class="list">
+								<g:link controller="requisition" action="list" params="[requestType:'OUTGOING']" class="list">
 									<warehouse:message code="request.listOutgoing.label" /> (${outgoingRequests?.values()?.flatten()?.size()?:0 })
 								</g:link>
 							</div>
 							
-							<g:each in="${org.pih.warehouse.request.RequestStatus.list() }" var="status">
+							<g:each in="${org.pih.warehouse.requisition.RequestStatus.list() }" var="status">
 								<g:set var="statusName" value="${warehouse.message(code:'enum.RequestStatus.' + status)}"/>
 								<div class="linkButton">							
-									<g:link controller="request" action="list" class="request-status-${status }" params="[requestType:'OUTGOING',status:status]" fragment="${statusName }>
+									<g:link controller="requisition" action="list" class="request-status-${status }" params="[requestType:'OUTGOING',status:status]" fragment="${statusName }>
 										<format:metadata obj="${status}"/> (${outgoingRequests[status]?.size()?:0 })
 									</g:link>
 								</div>

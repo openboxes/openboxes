@@ -11,7 +11,7 @@ package org.pih.warehouse.shipping;
 
 import org.pih.warehouse.core.Document;
 import org.pih.warehouse.order.Order;
-import org.pih.warehouse.request.Request;
+import org.pih.warehouse.requisition.Requisition;
 import org.pih.warehouse.core.DocumentType;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -90,7 +90,7 @@ class DocumentController {
 	   def file = command.fileContents;	   
 	   def shipmentInstance = Shipment.get(command.shipmentId);	   
 	   def orderInstance = Order.get(command.orderId);	   
-	   def requestInstance = Request.get(command.requestId);
+	   def requestInstance = Requisition.get(command.requestId);
 	   
 	   log.info "multipart file: " + file.originalFilename + " " + file.contentType + " " + file.size + " " 
 	   
@@ -141,7 +141,7 @@ class DocumentController {
 				   return;
 			   }
 			   else if (requestInstance) { 
-				   redirect(controller: "request", action: "addDocument", id: requestInstance.id,
+				   redirect(controller: "requisition", action: "addDocument", id: requestInstance.id,
 					   model: [requestInstance: requestInstance, documentInstance : documentInstance])
 				   return;
 
@@ -160,7 +160,7 @@ class DocumentController {
 			   return;
 		   }
 		   else if (requestInstance) { 
-			   redirect(controller: 'request', action: 'show', id: command.requestId)
+			   redirect(controller: 'requisition', action: 'show', id: command.requestId)
 			   return;
 	
 		   }
@@ -178,7 +178,7 @@ class DocumentController {
 		   return;
 	   }
 	   else if (requestInstance) { 
-		   redirect(controller: 'request', action: 'show', id: command.requestId)
+		   redirect(controller: 'requisition', action: 'show', id: command.requestId)
 		   return;
 
 	   }

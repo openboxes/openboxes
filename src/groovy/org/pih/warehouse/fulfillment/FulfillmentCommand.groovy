@@ -9,23 +9,16 @@
 **/ 
 package org.pih.warehouse.fulfillment
 
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.list.LazyList;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.core.Person;
-import org.pih.warehouse.core.User;
-import org.pih.warehouse.request.Request;
-import org.pih.warehouse.request.RequestItem;
-import org.pih.warehouse.shipping.Shipment;
-import org.pih.warehouse.shipping.ShipmentItem;
-import org.pih.warehouse.shipping.ShipmentType;
+
+
+import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionItem;
 
 class FulfillmentCommand implements Serializable {
 
-	Request request					// original request
+	Requisition request					// original request
 	Fulfillment fulfillment	
 	
 	def fulfillmentItems =
@@ -51,7 +44,7 @@ class FulfillmentCommand implements Serializable {
     * @param requestItem
     * @return
     */
-   List fulfillmentItems(RequestItem requestItem) { 
+   List fulfillmentItems(RequisitionItem requestItem) {
 	   def fulfillmentItemsMap = fulfillmentItemsMap();
 	   if (fulfillmentItemsMap) {
 		   return fulfillmentItemsMap.get(requestItem)
@@ -79,7 +72,7 @@ class FulfillmentCommand implements Serializable {
 	 * @param requestItem
 	 * @return
 	 */
-	Integer quantityFulfilledByRequestItem(RequestItem requestItem) { 
+	Integer quantityFulfilledByRequestItem(RequisitionItem requestItem) {
 		def quantity = quantityFulfilledMap()[requestItem]
 		return quantity ?: 0;
 	}

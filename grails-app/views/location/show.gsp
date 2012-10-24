@@ -154,8 +154,8 @@
 								<tr>
 									<td>${requestInstance.id }</td>
 									<td>${requestInstance }</td>
-									<td><g:link controller="request" action="show" id="${requestInstance.id }">show</g:link></td>
-									<td><g:link controller="request" action="edit" id="${requestInstance.id }">edit</g:link></td>
+									<td><g:link controller="requisition" action="show" id="${requestInstance.id }">show</g:link></td>
+									<td><g:link controller="requisition" action="edit" id="${requestInstance.id }">edit</g:link></td>
 									<td><g:link controller="location" action="deleteRequest" id="${requestInstance.id }" 
 										onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
 										params="['location.id':locationInstance?.id]" fragment="tabs-requests">delete</g:link></td>

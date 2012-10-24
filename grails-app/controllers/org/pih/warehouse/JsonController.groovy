@@ -19,7 +19,7 @@ import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.ProductGroup;
-import org.pih.warehouse.request.Request;
+import org.pih.warehouse.requisition.Requisition;
 import org.pih.warehouse.shipping.Container;
 import org.pih.warehouse.shipping.ShipmentItem;
 
@@ -31,7 +31,7 @@ class JsonController {
 	def findPrograms = {
 		println "find programs " + params
 		def searchTerm = params.term + "%";
-		def c = Request.createCriteria()
+		def c = Requisition.createCriteria()
 		
 		def names = c.list {
 			projections {
@@ -42,7 +42,7 @@ class JsonController {
 		// Try again 
 		if (names.isEmpty()) { 
 			searchTerm = "%" + params.term + "%";
-			c = Request.createCriteria()
+			c = Requisition.createCriteria()
 			names = c.list {
 				projections {
 					property "recipientProgram"
