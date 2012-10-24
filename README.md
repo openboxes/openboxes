@@ -60,5 +60,5 @@ You must not remove this notice, or any other, from this software.
 * start application
 
          grails run-app
-*  open firefox/chrome http://localhost:8080/warehouse
+*  open firefox/chrome http://localhost:8080/openboxes
 login with username/password (manager : password)
