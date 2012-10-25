@@ -20,7 +20,7 @@ import org.pih.warehouse.shipping.Shipment;
 import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.requisition.Requisition;
 
-class RequistionCommand implements Serializable {
+class RequisitionCommand implements Serializable {
 
 	Requisition requisition
 	Person recipient

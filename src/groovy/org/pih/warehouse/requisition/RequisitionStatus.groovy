@@ -12,7 +12,7 @@ package org.pih.warehouse.requisition
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.shipping.ShipmentStatusCode;
 
-public enum RequestStatus {
+public enum RequisitionStatus {
 
 	NEW(1),
 	REQUESTED(2),
@@ -25,9 +25,9 @@ public enum RequestStatus {
 	
 	int sortOrder
 
-	RequestStatus(int sortOrder) { [ this.sortOrder = sortOrder ] }
+	RequisitionStatus(int sortOrder) { [ this.sortOrder = sortOrder ] }
 	
-	static int compare(RequestStatus a, RequestStatus b) {
+	static int compare(RequisitionStatus a, RequisitionStatus b) {
 		return a.sortOrder <=> b.sortOrder
 	}
 	

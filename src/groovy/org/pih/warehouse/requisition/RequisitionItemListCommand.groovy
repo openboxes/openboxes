@@ -15,7 +15,7 @@ import org.codehaus.groovy.grails.validation.Validateable;
 
 
 @Validateable
-class RequestItemListCommand implements Serializable {
+class RequisitionItemListCommand implements Serializable {
 		
 	// Not the actual order items, but rather all the line items on the receive order page.  
 	// This means that we might have more than one OrderItemCommand per OrderItem.
