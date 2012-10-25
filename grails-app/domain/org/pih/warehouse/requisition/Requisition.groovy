@@ -84,6 +84,7 @@ class Requisition implements Serializable {
 		dateValidTo(nullable:true)
 		createdBy(nullable:true)
 		updatedBy(nullable:true)
+        recipientProgram(nullable:true)
 	}	
 	
 	Boolean isPending() { 

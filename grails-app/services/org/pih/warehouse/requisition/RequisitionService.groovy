@@ -291,6 +291,9 @@ class RequisitionService {
 		}
 		return quantityMap;
 	}
-	
-		
+
+
+    void save(Requisition requisition) {
+        requisition.save()
+    }
 }
