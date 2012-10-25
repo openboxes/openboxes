@@ -97,8 +97,8 @@ class RequisitionService {
 	 * @param recipientId
 	 * @return
 	 */
-	RequistionCommand getRequest(Integer id, Integer recipientId) {
-		def requestCommand = new RequistionCommand();
+	RequisitionCommand getRequest(Integer id, Integer recipientId) {
+		def requestCommand = new RequisitionCommand();
 		
 		def requestInstance = Requisition.get(id)
 		if (!requestInstance)
@@ -134,7 +134,7 @@ class RequisitionService {
 	 * @param requestCommand
 	 * @return
 	 */
-	RequistionCommand saveRequestShipment(RequistionCommand requestCommand) {
+	RequisitionCommand saveRequestShipment(RequisitionCommand requestCommand) {
 //		def shipmentInstance = new Shipment()
 //		def shipments = requestCommand?.request?.shipments();
 //		def numberOfShipments = (shipments) ? shipments?.size() + 1 : 1;
@@ -210,7 +210,7 @@ class RequisitionService {
 	 * @param request
 	 * @return
 	 */
-	Requisition saveRequest(Requisition request) {
+	Requisition saveRequest(Requisition requestwar) {
 		if (!request.hasErrors() && request.save()) {
 			return request;
 		}

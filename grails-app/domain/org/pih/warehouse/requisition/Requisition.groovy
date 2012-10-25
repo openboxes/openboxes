@@ -36,7 +36,7 @@ class Requisition implements Serializable {
 	String requestNumber 	// an auto-generated reference number
 	
 	
-	RequestStatus status;
+	RequisitionStatus status;
 	Location origin			// the vendor
 	Location destination 	// the customer location 
 	
