@@ -12,7 +12,6 @@ class EditPackingListPage extends Page{
     static content = {
         nextButton(to: SendShipmentPage){$("button", name:"_eventId_next")}
         saveAndExitButton(to:ViewShipmentPage){$("button", name:"_eventId_save")}
-        actionButton{$("button.action-btn")}
         addItemToUnpackedItemsLink(wait:true){$("div#addItemToUnpackedItems a")}
         addPalletToShipmentLink(wait:true){$("div#addPalletToShipment a")}
         addCrateToShipmentLink(wait:true){$"div#addCrateToShipment a"}
@@ -37,12 +36,12 @@ class EditPackingListPage extends Page{
     }
 
     def addUnpackedItems(){
-        actionButton.click()
+        clickPackingAction()
         addItemToUnpackedItemsLink.click()
     }
 
     def addPallet(pallet){
-        actionButton.click()
+        clickPackingAction()
         addPalletToShipmentLink.click()
         addContainerToShipment.addContainer(pallet)
         addContainerToShipment.addItemButton.click()
@@ -50,7 +49,7 @@ class EditPackingListPage extends Page{
     }
 
     def addCrate(crate){
-        actionButton.click()
+        clickPackingAction()
         addCrateToShipmentLink.click()
         addContainerToShipment.addContainer(crate)
         addContainerToShipment.addItemButton.click()
@@ -58,10 +57,14 @@ class EditPackingListPage extends Page{
     }
 
     def addSuitcase(suitcase) {
-        actionButton.click()
+        clickPackingAction()
         addSuitcaseToShipmentLink.click()
         addContainerToShipment.addContainer(suitcase)
         addContainerToShipment.addItemButton.click()
+    }
+
+    def clickPackingAction(){
+        waitFor{$("button.action-btn")}.click() //do not put into content because it will show/hide multiple times
     }
 
 

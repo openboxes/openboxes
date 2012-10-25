@@ -183,7 +183,7 @@ class BootStrap {
         Transaction transaction = new Transaction()
         transaction.createdBy = User.get(2)
         transaction.comment = TestFixure
-        transaction.transactionDate = new Date()
+        transaction.transactionDate = new Date().minus(1)
         transaction.inventory = boston.inventory
 	    transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
 
