@@ -7,9 +7,9 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
     void testSaveRequisition(){
 
         def requisitionMock = mockFor(Requisition)
-        requisitionMock.demand.save{}
+        requisitionMock.demand.save{ true }
         def service = new RequisitionService()
-        service.save(requisitionMock.createMock())
+        assert service.save(requisitionMock.createMock())
 
         requisitionMock.verify()
     }

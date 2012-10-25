@@ -51,18 +51,21 @@ class RequisitionController {
 	
 	
     def create = {
-		redirect(controller: 'createRequestWorkflow', action: 'index');
+
+        def requisition = new Requisition(params)
+        return [requisition: requisition]
+
+		//redirect(controller: 'createRequestWorkflow', action: 'index');
     }
 
     def save = {
-        def requestInstance = new Requisition(params)
-        if (requestInstance.save(flush: true)) {
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'request.label', default: 'Request'), requestInstance.id])}"
-            redirect(action: "list", id: requestInstance.id)
-        }
-        else {
-            render(view: "create", model: [requestInstance: requestInstance])
-        }
+        def requisition = new Requisition(params)
+        if (requisitionService.save(requisition))
+            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), requisition.id])}"
+
+
+        render(view: "create", model: [requisition: requisition])
+
     }
 	
     def show = {

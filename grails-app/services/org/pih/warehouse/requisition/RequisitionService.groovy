@@ -293,7 +293,7 @@ class RequisitionService {
 	}
 
 
-    void save(Requisition requisition) {
+    boolean save(Requisition requisition) {
         requisition.save()
     }
 }
