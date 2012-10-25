@@ -14,9 +14,9 @@ import org.pih.warehouse.core.Person
  */
 class RequisitionControllerTests extends ControllerUnitTestCase{
 
-    void testCreate(){
+    void testEdit(){
         controller.params.name = "peter"
-        def model =  controller.create()
+        def model =  controller.edit()
 
         assert model.requisition.name == "peter"
     }
@@ -50,7 +50,7 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         assert model.requisition.destination.id == location.id
         assert model.requisition.requestedBy.id == person.id
 
-        assert renderArgs.view == "create"
+        assert renderArgs.view == "edit"
         assert controller.flash.message == "created"
 
 

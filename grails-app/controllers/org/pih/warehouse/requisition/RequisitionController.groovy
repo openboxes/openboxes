@@ -50,12 +50,10 @@ class RequisitionController {
 	}
 	
 	
-    def create = {
+    def edit = {
 
         def requisition = new Requisition(params)
-        return [requisition: requisition]
-
-		//redirect(controller: 'createRequestWorkflow', action: 'index');
+        return [requisition: requisition];
     }
 
     def save = {
@@ -64,7 +62,7 @@ class RequisitionController {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), requisition.id])}"
 
 
-        render(view: "create", model: [requisition: requisition])
+        render(view: "edit", model: [requisition: requisition])
 
     }
 	
@@ -79,16 +77,6 @@ class RequisitionController {
         }
     }
 
-    def edit = {
-        def requestInstance = Requisition.get(params.id)
-        if (!requestInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
-            redirect(action: "list")
-        }
-        else {
-            return [requestInstance: requestInstance]
-        }
-    }
 
 	def place = { 
 		def requestInstance = Requisition.get(params.id)
