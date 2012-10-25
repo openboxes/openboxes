@@ -318,7 +318,7 @@ class RequisitionController {
 		}
 	}
 	
-	def saveRequestShipment = { RequistionCommand command ->
+	def saveRequestShipment = { RequisitionCommand command ->
 		bindData(command, params)		
 		def requestInstance = Requisition.get(params?.requisition?.id);
 		command.requisition = requestInstance;
