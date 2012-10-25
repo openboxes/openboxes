@@ -40,7 +40,7 @@ class RequisitionService {
 	 * @return
 	 */
 	List<Requisition> getOutgoingRequests(Location location) {
-		//return Request.findAllByOriginAndStatus(location, RequestStatus.REQUESTED)
+		//return Request.findAllByOriginAndStatus(location, RequisitionStatus.REQUESTED)
 		return Requisition.findAllByOrigin(location).findAll { it.isPending() }
 	}
 	
@@ -197,7 +197,7 @@ class RequisitionService {
 //
 //			// Once the request has been completely received, we set the status to RECEIVED
 //			if (requestCommand?.request && requestCommand?.request?.isComplete()) {
-//				requestCommand?.request.status = RequestStatus.RECEIVED;
+//				requestCommand?.request.status = RequisitionStatus.RECEIVED;
 //				saveRequest(requestCommand?.request);
 //			}
 //		}

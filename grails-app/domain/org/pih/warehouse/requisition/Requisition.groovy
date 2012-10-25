@@ -91,27 +91,27 @@ class Requisition implements Serializable {
 	}
 	
 	Boolean isNew() { 
-		return (status == null || status == RequestStatus.NEW)
+		return (status == null || status == RequisitionStatus.NEW)
 	}
 	
 	Boolean isRequested() { 
-		return (status in [RequestStatus.REQUESTED, RequestStatus.OPEN])
+		return (status in [RequisitionStatus.REQUESTED, RequisitionStatus.OPEN])
 	}
 
 	Boolean isFulfilled() { 
-		return (status in [RequestStatus.FULFILLED, RequestStatus.SHIPPED, RequestStatus.RECEIVED])
+		return (status in [RequisitionStatus.FULFILLED, RequisitionStatus.SHIPPED, RequisitionStatus.RECEIVED])
 	}
 	
 	Boolean isShipped() {
-		return (status in [RequestStatus.SHIPPED, RequestStatus.RECEIVED])
+		return (status in [RequisitionStatus.SHIPPED, RequisitionStatus.RECEIVED])
 	}
 
 	Boolean isReceived() {
-		return (status in [RequestStatus.RECEIVED])
+		return (status in [RequisitionStatus.RECEIVED])
 	}
 
 	Boolean isCanceled() {
-		return (status in [RequestStatus.CANCELED])
+		return (status in [RequisitionStatus.CANCELED])
 	}
 
 	String getRequestNumber() {

@@ -92,7 +92,7 @@ class RequisitionController {
 		if (requestInstance) {
 			
 			if (requestInstance?.requestItems?.size() > 0) { 
-				requestInstance.status = RequestStatus.REQUESTED;
+				requestInstance.status = RequisitionStatus.REQUESTED;
 				if (!requestInstance.hasErrors() && requestInstance.save(flush: true)) {
 					flash.message = "${warehouse.message(code: 'request.placedWithLocation.message', args: [requestInstance?.description,requestInstance?.origin?.name])}"
 					redirect(action: "show", id: requestInstance.id)
@@ -451,7 +451,7 @@ class RequisitionController {
 		if (requestInstance) {
 
 			if (requestInstance?.requestItems?.size() > 0) {
-				requestInstance.status = RequestStatus.FULFILLED;
+				requestInstance.status = RequisitionStatus.FULFILLED;
 				if (!requestInstance.hasErrors() && requestInstance.save(flush: true)) {
 					flash.message = "${warehouse.message(code: 'request.placedWithLocation.message', args: [requestInstance?.description,requestInstance?.origin?.name])}"
 					redirect(action: "show", id: requestInstance.id)

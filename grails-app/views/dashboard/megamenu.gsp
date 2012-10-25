@@ -141,9 +141,9 @@
 										<warehouse:message code="request.listIncoming.label" /> (${incomingRequests?.values()?.flatten()?.size()?:0 })
 									</g:link>
 								</div>
-								<g:each in="${org.pih.warehouse.requisition.RequestStatus.list() }" var="status">
+								<g:each in="${org.pih.warehouse.requisition.RequisitionStatus.list() }" var="status">
 									<div class="linkButton">							
-										<g:set var="statusName" value="${warehouse.message(code:'enum.RequestStatus.' + status)}"/>
+										<g:set var="statusName" value="${warehouse.message(code:'enum.RequisitionStatus.' + status)}"/>
 										<g:link controller="requisition" action="list" class="request-status-${status }" params="[requestType:'INCOMING',status:status]" fragment="${statusName}">
 											<format:metadata obj="${status}"/> (${incomingRequests[status]?.size()?:0})
 										</g:link>
@@ -160,8 +160,8 @@
 								</g:link>
 							</div>
 							
-							<g:each in="${org.pih.warehouse.requisition.RequestStatus.list() }" var="status">
-								<g:set var="statusName" value="${warehouse.message(code:'enum.RequestStatus.' + status)}"/>
+							<g:each in="${org.pih.warehouse.requisition.RequisitionStatus.list() }" var="status">
+								<g:set var="statusName" value="${warehouse.message(code:'enum.RequisitionStatus.' + status)}"/>
 								<div class="linkButton">							
 									<g:link controller="requisition" action="list" class="request-status-${status }" params="[requestType:'OUTGOING',status:status]" fragment="${statusName }>
 										<format:metadata obj="${status}"/> (${outgoingRequests[status]?.size()?:0 })
