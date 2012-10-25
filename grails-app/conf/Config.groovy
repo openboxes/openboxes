@@ -218,7 +218,9 @@ log4j = {
 		error 'async'
 		additivity = false
 	}
-			
+
+	fatal	'com.gargoylesoftware.htmlunit.javascript.StrictErrorReporter'
+
 	// We get some annoying stack trace when cleaning this class up after functional tests
 	error	'org.hibernate.engine.StatefulPersistenceContext.ProxyWarnLog',
             'org.hibernate.impl.SessionFactoryObjectFactory',  
