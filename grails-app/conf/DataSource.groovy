@@ -44,6 +44,11 @@ environments {
 			url = "jdbc:mysql://localhost:3306/openboxes?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;sessionVariables=storage_engine=InnoDB"
 		}
 	}
+	qa {
+		dataSource {
+			url = "jdbc:mysql://localhost:3306/openboxes?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;sessionVariables=storage_engine=InnoDB"
+		}
+	}
 	diff {
 		dataSource {
 			// Used with the 'db-diff-incremental' script
