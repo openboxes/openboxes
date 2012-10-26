@@ -3,108 +3,173 @@
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
      <changeSet author="PZ DM" id="1295640983194-01">
+         <preConditions onFail="MARK_RAN">
+			<tableExists tableName="request_event" />
+		</preConditions>
         <dropTable tableName="request_event"/>
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-02">
+        <preConditions onFail="MARK_RAN">
+			<tableExists tableName="request_comment" />
+		</preConditions>
         <dropTable tableName="request_comment"/>
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-03">
+        <preConditions onFail="MARK_RAN">
+			<tableExists tableName="request_document" />
+		</preConditions>
         <dropTable tableName="request_document"/>
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-04">
+        <preConditions onFail="MARK_RAN">
+			<tableExists tableName="request_shipment" />
+		</preConditions>
         <dropTable tableName="request_shipment"/>
     </changeSet>
      <changeSet author="PZ DM" id="1295640983194-04b">
-    	<sql>
-            alter table `fulfillment_item` drop foreign key `FKEDC55CD447EBE106`;
-        </sql>
+        <validCheckSum>8c2aedd41a27c9626174e0f6f7dac793</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+			<foreignKeyConstraintExists
+				foreignKeyName="FKEDC55CD447EBE106" />
+		</preConditions>
+        <dropForeignKeyConstraint baseTableName="fulfillment_item" constraintName="FKEDC55CD447EBE106"/>
     </changeSet>
      <changeSet author="PZ DM" id="1295640983194-04c">
-    	<sql>
-             drop index `FKEDC55CD447EBE106` on `fulfillment_item`;
-        </sql>
+        <validCheckSum>5e566ff3c1677aa55127e206c8b112</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+			<indexExists indexName="FKEDC55CD447EBE106" />
+		</preConditions>
+        <dropIndex indexName="FKEDC55CD447EBE106" tableName="fulfillment_item"/>
     </changeSet>
 
      <changeSet author="PZ DM" id="1295640983194-05">
+        <preConditions onFail="MARK_RAN">
+			<tableExists tableName="request_item" />
+		</preConditions>
         <dropTable tableName="request_item"/>
     </changeSet>
      <changeSet author="PZ DM" id="1295640983194-06">
+         <preConditions onFail="MARK_RAN">
+			<tableExists tableName="request" />
+		</preConditions>
         <dropTable tableName="request"/>
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-07">
-    	<sql>
-			CREATE TABLE `requisition` (
-  `id` char(38) NOT NULL DEFAULT '',
-  `version` bigint(20) NOT NULL,
-  `date_created` datetime DEFAULT NULL,
-  `date_requested` datetime DEFAULT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  `destination_id` char(38) DEFAULT NULL,
-  `last_updated` datetime DEFAULT NULL,
-  `origin_id` char(38) DEFAULT NULL,
-  `recipient_id` char(38) DEFAULT NULL,
-  `request_number` varchar(255) DEFAULT NULL,
-  `requested_by_id` char(38) DEFAULT NULL,
-  `status` varchar(255) DEFAULT NULL,
-  `fulfillment_id` char(38) DEFAULT NULL,
-  `created_by_id` char(38) DEFAULT NULL,
-  `updated_by_id` char(38) DEFAULT NULL,
-  `name` varchar(255) DEFAULT NULL,
-  `date_valid_from` datetime DEFAULT NULL,
-  `date_valid_to` datetime DEFAULT NULL,
-  `recipient_program` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `FK414EF28F1E2B3CDC` (`destination_id`),
-  KEY `FK414EF28F44979D51` (`recipient_id`),
-  KEY `FK414EF28F94567276` (`fulfillment_id`),
-  KEY `FK414EF28FDBDEDAC4` (`origin_id`),
-  KEY `FK414EF28FDD302242` (`requested_by_id`),
-  CONSTRAINT `FK414EF28F1E2B3CDC` FOREIGN KEY (`destination_id`) REFERENCES `location` (`id`),
-  CONSTRAINT `FK414EF28F44979D51` FOREIGN KEY (`recipient_id`) REFERENCES `person` (`id`),
-  CONSTRAINT `FK414EF28F94567276` FOREIGN KEY (`fulfillment_id`) REFERENCES `fulfillment` (`id`),
-  CONSTRAINT `FK414EF28FDBDEDAC4` FOREIGN KEY (`origin_id`) REFERENCES `location` (`id`),
-  CONSTRAINT `FK414EF28FDD302242` FOREIGN KEY (`requested_by_id`) REFERENCES `person` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-    	</sql>
+         <validCheckSum>f98628bffe379a73be1a91531ec1566</validCheckSum>
+         <createTable tableName="requisition">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME"/>
+            <column name="date_requested" type="DATETIME"/>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="destination_id" type="CHAR(38)"/>
+            <column name="last_updated" type="DATETIME"/>
+            <column name="origin_id" type="CHAR(38)"/>
+            <column name="recipient_id" type="CHAR(38)"/>
+            <column name="request_number" type="VARCHAR(255)"/>
+            <column name="requested_by_id" type="CHAR(38)"/>
+            <column name="status" type="VARCHAR(255)"/>
+            <column name="fulfillment_id" type="CHAR(38)"/>
+            <column name="created_by_id" type="CHAR(38)"/>
+            <column name="updated_by_id" type="CHAR(38)"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="date_valid_from" type="DATETIME"/>
+            <column name="date_valid_to" type="DATETIME"/>
+            <column name="recipient_program" type="VARCHAR(255)"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="destination_id" baseTableName="requisition"
+                                 constraintName="FK414EF28F1E2B3CDC" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="location"/>
+
+
+        <addForeignKeyConstraint baseColumnNames="fulfillment_id" baseTableName="requisition"
+                                 constraintName="FK414EF28F94567276" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="fulfillment"/>
+
+        <addForeignKeyConstraint baseColumnNames="origin_id" baseTableName="requisition"
+                                 constraintName="FK414EF28FDBDEDAC4" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="location"/>
+
+        <addForeignKeyConstraint baseColumnNames="recipient_id" baseTableName="requisition"
+                                 constraintName="FK414EF28F44979D51" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="person"/>
+
+        <addForeignKeyConstraint baseColumnNames="requested_by_id" baseTableName="requisition"
+                                 constraintName="FK414EF28FDD302242" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="person"/>
+
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-08">
+        <validCheckSum>7693a3cd585f29d0f5a6324faf5eec</validCheckSum>
+        <createTable tableName="requisition_item">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_id" type="CHAR(38)"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="inventory_item_id" type="CHAR(38)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product_id" type="CHAR(38)"/>
+            <column name="quantity" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="requisition_id" type="CHAR(38)"/>
+            <column name="requested_by_id" type="CHAR(38)"/>
+            <column name="unit_price" type="FLOAT(12,0)"/>
+            <column name="product_group_id" type="CHAR(38)"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="category_id" baseTableName="requisition_item"
+                                 constraintName="FK4DA982C3EF4C770D" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="category"/>
+
+        <addForeignKeyConstraint baseColumnNames="inventory_item_id" baseTableName="requisition_item"
+                                 constraintName="FK4DA982C3AA992CED" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="inventory_item"/>
+
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="requisition_item"
+                                 constraintName="FK4DA982C3DED5FAE7" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="product"/>
+
+        <addForeignKeyConstraint baseColumnNames="requested_by_id" baseTableName="requisition_item"
+                                 constraintName="FK4DA982C3911E7578" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="user"/>
+
+        <addForeignKeyConstraint baseColumnNames="requisition_id" baseTableName="requisition_item"
+                                 constraintName="FK4DA982C35DE21C87" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="requisition"/>
+
+    </changeSet>
+     <changeSet author="adminuser (generated)" id="1295640983194-08b" dbms="mysql">
         <sql>
-            CREATE TABLE `requisition_item` (
-  `id` char(38) NOT NULL DEFAULT '',
-  `version` bigint(20) NOT NULL,
-  `category_id` char(38) DEFAULT NULL,
-  `date_created` datetime NOT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  `inventory_item_id` char(38) DEFAULT NULL,
-  `last_updated` datetime NOT NULL,
-  `product_id` char(38) DEFAULT NULL,
-  `quantity` int(11) NOT NULL,
-  `requisition_id` char(38) DEFAULT NULL,
-  `requested_by_id` char(38) DEFAULT NULL,
-  `unit_price` float(12,0) DEFAULT NULL,
-  `product_group_id` char(38) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `FK4DA982C35DE21C87` (`requisition_id`),
-  KEY `FK4DA982C3911E7578` (`requested_by_id`),
-  KEY `FK4DA982C3AA992CED` (`inventory_item_id`),
-  KEY `FK4DA982C3DED5FAE7` (`product_id`),
-  KEY `FK4DA982C3EF4C770D` (`category_id`),
-  CONSTRAINT `FK4DA982C35DE21C87` FOREIGN KEY (`requisition_id`) REFERENCES `requisition` (`id`),
-  CONSTRAINT `FK4DA982C3911E7578` FOREIGN KEY (`requested_by_id`) REFERENCES `user` (`id`),
-  CONSTRAINT `FK4DA982C3AA992CED` FOREIGN KEY (`inventory_item_id`) REFERENCES `inventory_item` (`id`),
-  CONSTRAINT `FK4DA982C3DED5FAE7` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`),
-  CONSTRAINT `FK4DA982C3EF4C770D` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-    	</sql>
+            ALTER TABLE `requisition`                 ENGINE=InnoDB;
+            ALTER TABLE `requisition_item`            ENGINE=InnoDB;
+        </sql>
     </changeSet>
      <changeSet author="PZ DM" id="1295640983194-09">
-    	<sql>
-            alter table `fulfillment_item` change `request_item_id` `requisition_item_id` char(38) DEFAULT NULL;
-        </sql>
+         <validCheckSum>f31e24b92574a8d3878374cc97c86</validCheckSum>
+         <renameColumn tableName="fulfillment_item"
+    oldColumnName="request_item_id" newColumnName="requisition_item_id" columnDataType="CHAR(38)"/>
     </changeSet>
      <changeSet author="PZ DM" id="1295640983194-10">
-    	<sql>
-            alter table `fulfillment_item` add index FKEDC55CD447EBE106 (requisition_item_id), add constraint FKEDC55CD447EBE106 foreign key (requisition_item_id) references requisition_item (id);
-        </sql>
+       <validCheckSum>56a770ee8f7e38d45ff7b4581138ecb4</validCheckSum>
+        <addForeignKeyConstraint baseColumnNames="requisition_item_id"
+            baseTableName="fulfillment_item" constraintName="FKEDC55CD447EBE106"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="requisition_item"/>
     </changeSet>
+
 </databaseChangeLog>

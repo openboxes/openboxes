@@ -1,0 +1,710 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="adminuser (generated)" id="1351254275228-75">
+        <createIndex indexName="product_id" tableName="inventory_item" unique="true">
+            <column name="product_id"/>
+            <column name="lot_number"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-76">
+        <createIndex indexName="FKB5A4FE84C4A49BBF"
+            tableName="order_item_comment" unique="false">
+            <column name="comment_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-77">
+        <createIndex indexName="FKA0303E4EDED5FAE7"
+            tableName="product_category" unique="false">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-78">
+        <createIndex indexName="username" tableName="user" unique="true">
+            <column name="username"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-79">
+        <addForeignKeyConstraint baseColumnNames="parent_category_id"
+            baseTableName="category" constraintName="FK302BCFE619A2EF8"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="category"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-80">
+        <addForeignKeyConstraint baseColumnNames="recipient_id"
+            baseTableName="comment" constraintName="FK38A5EE5FF885F087"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-81">
+        <addForeignKeyConstraint baseColumnNames="sender_id"
+            baseTableName="comment" constraintName="FK38A5EE5FAF1302EB"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-82">
+        <addForeignKeyConstraint baseColumnNames="inventory_item_id"
+            baseTableName="consumption"
+            constraintName="FKCD71F39BAA992CED" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="inventory_item"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-83">
+        <addForeignKeyConstraint baseColumnNames="location_id"
+            baseTableName="consumption"
+            constraintName="FKCD71F39B8ABEBD5" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-84">
+        <addForeignKeyConstraint baseColumnNames="product_id"
+            baseTableName="consumption"
+            constraintName="FKCD71F39BDED5FAE7" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-85">
+        <addForeignKeyConstraint baseColumnNames="container_type_id"
+            baseTableName="container"
+            constraintName="FKE7814C8117A6E251" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="container_type"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-86">
+        <addForeignKeyConstraint baseColumnNames="parent_container_id"
+            baseTableName="container"
+            constraintName="FKE7814C814B6A2E03" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="container"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-87">
+        <addForeignKeyConstraint baseColumnNames="recipient_id"
+            baseTableName="container"
+            constraintName="FKE7814C8144979D51" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-88">
+        <addForeignKeyConstraint baseColumnNames="shipment_id"
+            baseTableName="container"
+            constraintName="FKE7814C813B5F6286" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="shipment"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-89">
+        <addForeignKeyConstraint baseColumnNames="document_type_id"
+            baseTableName="document" constraintName="FK335CD11B6631D8CC"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="document_type"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-90">
+        <addForeignKeyConstraint baseColumnNames="event_location_id"
+            baseTableName="event" constraintName="FK5C6729A4415A5B0"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-91">
+        <addForeignKeyConstraint baseColumnNames="event_type_id"
+            baseTableName="event" constraintName="FK5C6729A3D970DB4"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="event_type"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-92">
+        <addForeignKeyConstraint baseColumnNames="fulfilled_by_id"
+            baseTableName="fulfillment"
+            constraintName="FK5A2551DEAC392B33" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-93">
+        <addForeignKeyConstraint baseColumnNames="fulfillment_id"
+            baseTableName="fulfillment_item"
+            constraintName="FKEDC55CD494567276" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="fulfillment"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-94">
+        <addForeignKeyConstraint baseColumnNames="inventory_item_id"
+            baseTableName="fulfillment_item"
+            constraintName="FKEDC55CD4AA992CED" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="inventory_item"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-95">
+        <addForeignKeyConstraint baseColumnNames="request_item_id"
+            baseTableName="fulfillment_item"
+            constraintName="FKEDC55CD447EBE106" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="request_item"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-96">
+        <addForeignKeyConstraint
+            baseColumnNames="fulfillment_item_shipment_items_id"
+            baseTableName="fulfillment_item_shipment_item"
+            constraintName="FKE071DE6DB42751E1" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="fulfillment_item"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-97">
+        <addForeignKeyConstraint baseColumnNames="shipment_item_id"
+            baseTableName="fulfillment_item_shipment_item"
+            constraintName="FKE071DE6DB06EC4FB" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="shipment_item"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-98">
+        <addForeignKeyConstraint baseColumnNames="product_id"
+            baseTableName="inventory_item"
+            constraintName="FKFE019416DED5FAE7" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-99">
+        <addForeignKeyConstraint baseColumnNames="inventory_id"
+            baseTableName="inventory_level"
+            constraintName="FKC254A2E172A2C5B4" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="inventory"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-100">
+        <addForeignKeyConstraint baseColumnNames="product_id"
+            baseTableName="inventory_level"
+            constraintName="FKC254A2E1DED5FAE7" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-101">
+        <addForeignKeyConstraint
+            baseColumnNames="destination_transaction_id"
+            baseTableName="local_transfer"
+            constraintName="FK7975323F4CC49445" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="transaction"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-102">
+        <addForeignKeyConstraint baseColumnNames="source_transaction_id"
+            baseTableName="local_transfer"
+            constraintName="FK7975323F57563498" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="transaction"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-103">
+        <addForeignKeyConstraint baseColumnNames="address_id"
+            baseTableName="location" constraintName="FK714F9FB561ED379F"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="address"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-104">
+        <addForeignKeyConstraint baseColumnNames="inventory_id"
+            baseTableName="location" constraintName="FK714F9FB572A2C5B4"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="inventory"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-105">
+        <addForeignKeyConstraint baseColumnNames="location_group_id"
+            baseTableName="location" constraintName="FK714F9FB53BB36E94"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="location_group"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-106">
+        <addForeignKeyConstraint baseColumnNames="location_type_id"
+            baseTableName="location" constraintName="FK714F9FB528F75F00"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="location_type"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-107">
+        <addForeignKeyConstraint baseColumnNames="manager_id"
+            baseTableName="location" constraintName="FK714F9FB541E07A73"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-108">
+        <addForeignKeyConstraint baseColumnNames="parent_location_id"
+            baseTableName="location" constraintName="FK714F9FB57AF9A3C0"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-109">
+        <addForeignKeyConstraint baseColumnNames="location_id"
+            baseTableName="location_supported_activities"
+            constraintName="FKF58372688ABEBD5" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-110">
+        <addForeignKeyConstraint baseColumnNames="location_type_id"
+            baseTableName="location_type_supported_activities"
+            constraintName="FK7AFF67F928F75F00" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="location_type"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-111">
+        <addForeignKeyConstraint baseColumnNames="destination_id"
+            baseTableName="order" constraintName="FK651874E1E2B3CDC"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-112">
+        <addForeignKeyConstraint baseColumnNames="ordered_by_id"
+            baseTableName="order" constraintName="FK651874EAF6D8801"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-113">
+        <addForeignKeyConstraint baseColumnNames="origin_id"
+            baseTableName="order" constraintName="FK651874EDBDEDAC4"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-114">
+        <addForeignKeyConstraint baseColumnNames="recipient_id"
+            baseTableName="order" constraintName="FK651874E44979D51"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-115">
+        <addForeignKeyConstraint baseColumnNames="comment_id"
+            baseTableName="order_comment"
+            constraintName="FK2DE9EE6EC4A49BBF" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="comment"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-116">
+        <addForeignKeyConstraint baseColumnNames="order_comments_id"
+            baseTableName="order_comment"
+            constraintName="FK2DE9EE6EB8839C0F" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="order"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-117">
+        <addForeignKeyConstraint baseColumnNames="document_id"
+            baseTableName="order_document"
+            constraintName="FKE698D2ECC800AA15" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="document"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-118">
+        <addForeignKeyConstraint baseColumnNames="order_documents_id"
+            baseTableName="order_document"
+            constraintName="FKE698D2ECFE10118D" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="order"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-119">
+        <addForeignKeyConstraint baseColumnNames="event_id"
+            baseTableName="order_event"
+            constraintName="FK74D92A69786431F" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="event"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-120">
+        <addForeignKeyConstraint baseColumnNames="order_events_id"
+            baseTableName="order_event"
+            constraintName="FK74D92A693D2E628A" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="order"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-121">
+        <addForeignKeyConstraint baseColumnNames="category_id"
+            baseTableName="order_item"
+            constraintName="FK2D110D64EF4C770D" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="category"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-122">
+        <addForeignKeyConstraint baseColumnNames="inventory_item_id"
+            baseTableName="order_item"
+            constraintName="FK2D110D64AA992CED" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="inventory_item"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-123">
+        <addForeignKeyConstraint baseColumnNames="order_id"
+            baseTableName="order_item"
+            constraintName="FK2D110D64D08EDBE6" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="order"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-124">
+        <addForeignKeyConstraint baseColumnNames="product_id"
+            baseTableName="order_item"
+            constraintName="FK2D110D64DED5FAE7" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-125">
+        <addForeignKeyConstraint baseColumnNames="requested_by_id"
+            baseTableName="order_item"
+            constraintName="FK2D110D64911E7578" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-126">
+        <addForeignKeyConstraint baseColumnNames="order_item_id"
+            baseTableName="order_shipment"
+            constraintName="FK9475736B3BE9D843" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="order_item"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-127">
+        <addForeignKeyConstraint baseColumnNames="shipment_item_id"
+            baseTableName="order_shipment"
+            constraintName="FK9475736BB06EC4FB" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="shipment_item"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-128">
+        <addForeignKeyConstraint baseColumnNames="category_id"
+            baseTableName="product" constraintName="FKED8DCCEFEF4C770D"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="category"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-129">
+        <addForeignKeyConstraint baseColumnNames="attribute_id"
+            baseTableName="product_attribute"
+            constraintName="FK94A534C47B0D087" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="attribute"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-130">
+        <addForeignKeyConstraint baseColumnNames="product_id"
+            baseTableName="product_attribute"
+            constraintName="FK94A534CDED5FAE7" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-131">
+        <addForeignKeyConstraint baseColumnNames="category_id"
+            baseTableName="product_category"
+            constraintName="FKA0303E4EEF4C770D" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="category"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-132">
+        <addForeignKeyConstraint baseColumnNames="product_id"
+            baseTableName="product_tags"
+            constraintName="FK3C78DD69DED5FAE7" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-133">
+        <addForeignKeyConstraint baseColumnNames="recipient_id"
+            baseTableName="receipt" constraintName="FK4082723844979D51"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-134">
+        <addForeignKeyConstraint baseColumnNames="product_id"
+            baseTableName="receipt_item"
+            constraintName="FKAE3064BADED5FAE7" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-135">
+        <addForeignKeyConstraint baseColumnNames="receipt_id"
+            baseTableName="receipt_item"
+            constraintName="FKAE3064BAF7076438" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="receipt"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-136">
+        <addForeignKeyConstraint baseColumnNames="recipient_id"
+            baseTableName="receipt_item"
+            constraintName="FKAE3064BA44979D51" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-137">
+        <addForeignKeyConstraint
+            baseColumnNames="reference_number_type_id"
+            baseTableName="reference_number"
+            constraintName="FKD790DEBD154F600" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="reference_number_type"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-138">
+        <addForeignKeyConstraint baseColumnNames="destination_id"
+            baseTableName="request" constraintName="FK414EF28F1E2B3CDC"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-139">
+        <addForeignKeyConstraint baseColumnNames="fulfillment_id"
+            baseTableName="request" constraintName="FK414EF28F94567276"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="fulfillment"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-140">
+        <addForeignKeyConstraint baseColumnNames="origin_id"
+            baseTableName="request" constraintName="FK414EF28FDBDEDAC4"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-141">
+        <addForeignKeyConstraint baseColumnNames="recipient_id"
+            baseTableName="request" constraintName="FK414EF28F44979D51"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-142">
+        <addForeignKeyConstraint baseColumnNames="requested_by_id"
+            baseTableName="request" constraintName="FK414EF28FDD302242"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-143">
+        <addForeignKeyConstraint baseColumnNames="comment_id"
+            baseTableName="request_comment"
+            constraintName="FK5BAC88AFC4A49BBF" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="comment"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-144">
+        <addForeignKeyConstraint baseColumnNames="request_comments_id"
+            baseTableName="request_comment"
+            constraintName="FK5BAC88AF87AC2D52" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="request"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-145">
+        <addForeignKeyConstraint baseColumnNames="document_id"
+            baseTableName="request_document"
+            constraintName="FK712980CBC800AA15" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="document"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-146">
+        <addForeignKeyConstraint baseColumnNames="request_documents_id"
+            baseTableName="request_document"
+            constraintName="FK712980CB2777B76E" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="request"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-147">
+        <addForeignKeyConstraint baseColumnNames="event_id"
+            baseTableName="request_event"
+            constraintName="FK674F60EA786431F" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="event"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-148">
+        <addForeignKeyConstraint baseColumnNames="request_events_id"
+            baseTableName="request_event"
+            constraintName="FK674F60EAD962700D" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="request"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-149">
+        <addForeignKeyConstraint baseColumnNames="category_id"
+            baseTableName="request_item"
+            constraintName="FK4DA982C3EF4C770D" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="category"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-150">
+        <addForeignKeyConstraint baseColumnNames="inventory_item_id"
+            baseTableName="request_item"
+            constraintName="FK4DA982C3AA992CED" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="inventory_item"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-151">
+        <addForeignKeyConstraint baseColumnNames="product_id"
+            baseTableName="request_item"
+            constraintName="FK4DA982C3DED5FAE7" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-152">
+        <addForeignKeyConstraint baseColumnNames="request_id"
+            baseTableName="request_item"
+            constraintName="FK4DA982C35DE21C87" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="request"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-153">
+        <addForeignKeyConstraint baseColumnNames="requested_by_id"
+            baseTableName="request_item"
+            constraintName="FK4DA982C3911E7578" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-154">
+        <addForeignKeyConstraint baseColumnNames="request_item_id"
+            baseTableName="request_shipment"
+            constraintName="FK1F06214A47EBE106" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="request_item"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-155">
+        <addForeignKeyConstraint baseColumnNames="shipment_item_id"
+            baseTableName="request_shipment"
+            constraintName="FK1F06214AB06EC4FB" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="shipment_item"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-156">
+        <addForeignKeyConstraint baseColumnNames="carrier_id"
+            baseTableName="shipment" constraintName="FKE139719A294C1012"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-157">
+        <addForeignKeyConstraint baseColumnNames="destination_id"
+            baseTableName="shipment" constraintName="FKE139719A1E2B3CDC"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-158">
+        <addForeignKeyConstraint baseColumnNames="donor_id"
+            baseTableName="shipment" constraintName="FKE139719A49AB6B52"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="donor"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-159">
+        <addForeignKeyConstraint baseColumnNames="origin_id"
+            baseTableName="shipment" constraintName="FKE139719ADBDEDAC4"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-160">
+        <addForeignKeyConstraint baseColumnNames="receipt_id"
+            baseTableName="shipment" constraintName="FKE139719AF7076438"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="receipt"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-161">
+        <addForeignKeyConstraint baseColumnNames="recipient_id"
+            baseTableName="shipment" constraintName="FKE139719A44979D51"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-162">
+        <addForeignKeyConstraint baseColumnNames="shipment_method_id"
+            baseTableName="shipment" constraintName="FKE139719AA28CC5FB"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="shipment_method"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-163">
+        <addForeignKeyConstraint baseColumnNames="shipment_type_id"
+            baseTableName="shipment" constraintName="FKE139719AFF77FF9B"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="shipment_type"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-164">
+        <addForeignKeyConstraint baseColumnNames="comment_id"
+            baseTableName="shipment_comment"
+            constraintName="FKC398CCBAC4A49BBF" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="comment"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-165">
+        <addForeignKeyConstraint baseColumnNames="document_id"
+            baseTableName="shipment_document"
+            constraintName="FK6C5BE20C800AA15" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="document"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-166">
+        <addForeignKeyConstraint baseColumnNames="event_id"
+            baseTableName="shipment_event"
+            constraintName="FK6D032BB5786431F" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="event"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-167">
+        <addForeignKeyConstraint baseColumnNames="shipment_events_id"
+            baseTableName="shipment_event"
+            constraintName="FK6D032BB53B350242" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="shipment"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-168">
+        <addForeignKeyConstraint baseColumnNames="container_id"
+            baseTableName="shipment_item"
+            constraintName="FKDA3BB2987400E88E" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="container"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-169">
+        <addForeignKeyConstraint baseColumnNames="donor_id"
+            baseTableName="shipment_item"
+            constraintName="FKDA3BB29849AB6B52" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="donor"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-170">
+        <addForeignKeyConstraint baseColumnNames="product_id"
+            baseTableName="shipment_item"
+            constraintName="FKDA3BB298DED5FAE7" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-171">
+        <addForeignKeyConstraint baseColumnNames="recipient_id"
+            baseTableName="shipment_item"
+            constraintName="FKDA3BB29844979D51" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-172">
+        <addForeignKeyConstraint baseColumnNames="shipment_id"
+            baseTableName="shipment_item"
+            constraintName="FKDA3BB2983B5F6286" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="shipment"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-173">
+        <addForeignKeyConstraint baseColumnNames="shipper_id"
+            baseTableName="shipment_method"
+            constraintName="FK40203B263896C98E" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="shipper"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-174">
+        <addForeignKeyConstraint baseColumnNames="shipper_service_id"
+            baseTableName="shipment_method"
+            constraintName="FK40203B26296B2CA3" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="shipper_service"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-175">
+        <addForeignKeyConstraint baseColumnNames="reference_number_id"
+            baseTableName="shipment_reference_number"
+            constraintName="FK312F6C292388BC5" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="reference_number"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-176">
+        <addForeignKeyConstraint baseColumnNames="shipment_type_id"
+            baseTableName="shipment_workflow"
+            constraintName="FKD584C4C4FF77FF9B" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="shipment_type"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-177">
+        <addForeignKeyConstraint baseColumnNames="container_type_id"
+            baseTableName="shipment_workflow_container_type"
+            constraintName="FKDEF5AD1317A6E251" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="container_type"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-178">
+        <addForeignKeyConstraint
+            baseColumnNames="reference_number_type_id"
+            baseTableName="shipment_workflow_reference_number_type"
+            constraintName="FK4BB27241154F600" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="reference_number_type"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-179">
+        <addForeignKeyConstraint baseColumnNames="shipper_id"
+            baseTableName="shipper_service"
+            constraintName="FKDF7559D73896C98E" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="shipper"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-180">
+        <addForeignKeyConstraint baseColumnNames="confirmed_by_id"
+            baseTableName="transaction"
+            constraintName="FK7FA0D2DE3265A8A9" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-181">
+        <addForeignKeyConstraint baseColumnNames="created_by_id"
+            baseTableName="transaction"
+            constraintName="FK7FA0D2DE217F5972" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-182">
+        <addForeignKeyConstraint baseColumnNames="destination_id"
+            baseTableName="transaction"
+            constraintName="FK7FA0D2DE1E2B3CDC" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-183">
+        <addForeignKeyConstraint baseColumnNames="inventory_id"
+            baseTableName="transaction"
+            constraintName="FK7FA0D2DE72A2C5B4" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="inventory"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-184">
+        <addForeignKeyConstraint baseColumnNames="source_id"
+            baseTableName="transaction"
+            constraintName="FK7FA0D2DE828481AF" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-185">
+        <addForeignKeyConstraint baseColumnNames="transaction_type_id"
+            baseTableName="transaction"
+            constraintName="FK7FA0D2DEB3FB7111" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="transaction_type"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-186">
+        <addForeignKeyConstraint baseColumnNames="inventory_item_id"
+            baseTableName="transaction_entry"
+            constraintName="FKABC21FD1AA992CED" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="inventory_item"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-187">
+        <addForeignKeyConstraint baseColumnNames="transaction_id"
+            baseTableName="transaction_entry"
+            constraintName="FKABC21FD12EF4C7F4" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="transaction"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-188">
+        <addForeignKeyConstraint baseColumnNames="manager_id"
+            baseTableName="user" constraintName="FK36EBCB41E07A73"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-189">
+        <addForeignKeyConstraint baseColumnNames="warehouse_id"
+            baseTableName="user" constraintName="FK36EBCB1F28CE07"
+            deferrable="false" initiallyDeferred="false"
+            referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-190">
+        <addForeignKeyConstraint baseColumnNames="role_id"
+            baseTableName="user_role"
+            constraintName="FK143BF46AFF37FDB5" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="role"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-191">
+        <addForeignKeyConstraint baseColumnNames="user_id"
+            baseTableName="user_role"
+            constraintName="FK143BF46AA462C195" deferrable="false"
+            initiallyDeferred="false" referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+</databaseChangeLog>

@@ -21,7 +21,16 @@ class ViewShipmentPage extends Page {
     }
 
     def verifyShipmentItemExist(product, quantity, container_unit, container_details=""){
-        def row = $(".shipmentItem").find{it.find(".product", text:contains(product))}
+        def items = waitFor{$(".shipmentItem")}
+        def row
+        for(itemRow in items){
+          if(itemRow.find(".product", text:contains(product)))
+          {
+            row = itemRow
+            break
+          }
+        }
+        //def row = $(".shipmentItem").find{it.find(".product", text:contains(product))}
         assert row != null
         assert row.find(".quantity", text:contains(quantity))
         assert row.find(".container", text:contains(container_unit) )

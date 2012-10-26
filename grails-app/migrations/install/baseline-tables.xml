@@ -1,0 +1,1329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="adminuser (generated)" id="1351254275228-1">
+        <createTable tableName="address">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address2" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="city" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="country" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="postal_code" type="VARCHAR(255)"/>
+            <column name="state_or_province" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-2">
+        <createTable tableName="attribute">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="allow_other" type="BIT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-3">
+        <createTable tableName="attribute_options">
+            <column name="attribute_id" type="CHAR(38)"/>
+            <column name="options_string" type="VARCHAR(255)"/>
+            <column name="options_idx" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-4">
+        <createTable tableName="category">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_category_id" type="CHAR(38)"/>
+            <column name="sort_order" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-5">
+        <createTable tableName="comment">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="comment" type="TEXT"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_read" type="DATETIME"/>
+            <column name="date_sent" type="DATETIME"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_id" type="CHAR(38)"/>
+            <column name="sender_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-6">
+        <createTable tableName="consumption">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="day" type="INT"/>
+            <column name="inventory_item_id" type="CHAR(38)"/>
+            <column name="month" type="INT"/>
+            <column name="product_id" type="CHAR(38)"/>
+            <column name="year" type="INT"/>
+            <column name="location_id" type="CHAR(38)"/>
+            <column name="transaction_date" type="DATETIME"/>
+            <column name="date_created" type="DATETIME"/>
+            <column name="last_updated" type="DATETIME"/>
+            <column name="quantity" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-7">
+        <createTable tableName="container">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="container_number" type="VARCHAR(255)"/>
+            <column name="container_type_id" type="CHAR(38)"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="height" type="FLOAT(12,3)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="length" type="FLOAT(12,3)"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="parent_container_id" type="CHAR(38)"/>
+            <column name="recipient_id" type="CHAR(38)"/>
+            <column name="shipment_id" type="CHAR(38)"/>
+            <column name="volume_units" type="VARCHAR(255)"/>
+            <column name="weight" type="FLOAT(12,3)"/>
+            <column name="weight_units" type="VARCHAR(255)"/>
+            <column name="width" type="FLOAT(12,3)"/>
+            <column name="container_status" type="VARCHAR(255)"/>
+            <column name="sort_order" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-8">
+        <createTable tableName="container_type">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-9">
+        <createTable tableName="document">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content_type" type="VARCHAR(255)"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="document_number" type="VARCHAR(255)"/>
+            <column name="document_type_id" type="CHAR(38)"/>
+            <column name="extension" type="VARCHAR(255)"/>
+            <column name="file_contents" type="MEDIUMBLOB"/>
+            <column name="file_uri" type="TINYBLOB"/>
+            <column name="filename" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-10">
+        <createTable tableName="document_type">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-11">
+        <createTable tableName="donor">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME"/>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-12">
+        <createTable tableName="event">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="event_date" type="DATETIME"/>
+            <column name="event_location_id" type="CHAR(38)"/>
+            <column name="event_type_id" type="CHAR(38)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-13">
+        <createTable tableName="event_type">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="event_code" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-14">
+        <createTable tableName="fulfillment">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_fulfilled" type="DATETIME"/>
+            <column name="fulfilled_by_id" type="CHAR(38)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-15">
+        <createTable tableName="fulfillment_item">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fulfillment_id" type="CHAR(38)"/>
+            <column name="inventory_item_id" type="CHAR(38)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity" type="INT"/>
+            <column name="request_item_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-16">
+        <createTable tableName="fulfillment_item_shipment_item">
+            <column name="fulfillment_item_shipment_items_id" type="CHAR(38)"/>
+            <column name="shipment_item_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-17">
+        <createTable tableName="inventory">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_inventory_date" type="DATETIME"/>
+            <column name="date_created" type="DATETIME"/>
+            <column name="last_updated" type="DATETIME"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-18">
+        <createTable tableName="inventory_item">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lot_number" type="VARCHAR(255)"/>
+            <column name="product_id" type="CHAR(38)"/>
+            <column name="expiration_date" type="DATETIME"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-19">
+        <createTable tableName="inventory_level">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="inventory_id" type="CHAR(38)"/>
+            <column name="min_quantity" type="INT"/>
+            <column name="product_id" type="CHAR(38)"/>
+            <column name="reorder_quantity" type="INT"/>
+            <column name="date_created" type="DATETIME"/>
+            <column name="last_updated" type="DATETIME"/>
+            <column name="status" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-20">
+        <createTable tableName="local_transfer">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="source_transaction_id" type="CHAR(38)"/>
+            <column name="destination_transaction_id" type="CHAR(38)"/>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-21">
+        <createTable tableName="location">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address_id" type="CHAR(38)"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="logo_url" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="inventory_id" type="CHAR(38)"/>
+            <column name="manager_id" type="CHAR(38)"/>
+            <column name="logo" type="MEDIUMBLOB"/>
+            <column name="managed_locally" type="BIT"/>
+            <column name="active" type="BIT"/>
+            <column name="location_type_id" type="CHAR(38)"/>
+            <column name="parent_location_id" type="CHAR(38)"/>
+            <column name="local" type="BIT"/>
+            <column name="bg_color" type="VARCHAR(255)"/>
+            <column name="fg_color" type="VARCHAR(255)"/>
+            <column name="location_group_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-22">
+        <createTable tableName="location_group">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-23">
+        <createTable tableName="location_supported_activities">
+            <column name="location_id" type="CHAR(38)"/>
+            <column name="supported_activities_string" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-24">
+        <createTable tableName="location_type">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-25">
+        <createTable tableName="location_type_supported_activities">
+            <column name="location_type_id" type="CHAR(38)"/>
+            <column name="supported_activities_string" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-26">
+        <createTable tableName="order">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME"/>
+            <column name="date_ordered" type="VARCHAR(255)"/>
+            <column name="description" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="destination_id" type="CHAR(38)"/>
+            <column name="last_updated" type="DATETIME"/>
+            <column name="order_number" type="VARCHAR(255)"/>
+            <column name="ordered_by_id" type="CHAR(38)"/>
+            <column name="origin_id" type="CHAR(38)"/>
+            <column name="recipient_id" type="CHAR(38)"/>
+            <column name="status" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-27">
+        <createTable tableName="order_comment">
+            <column name="order_comments_id" type="CHAR(38)"/>
+            <column name="comment_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-28">
+        <createTable tableName="order_document">
+            <column name="order_documents_id" type="CHAR(38)"/>
+            <column name="document_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-29">
+        <createTable tableName="order_event">
+            <column name="order_events_id" type="CHAR(38)"/>
+            <column name="event_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-30">
+        <createTable tableName="order_item">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_id" type="CHAR(38)"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="inventory_item_id" type="CHAR(38)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="order_id" type="CHAR(38)"/>
+            <column name="product_id" type="CHAR(38)"/>
+            <column name="quantity" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="requested_by_id" type="CHAR(38)"/>
+            <column name="unit_price" type="FLOAT(12,0)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-31">
+        <createTable tableName="order_item_comment">
+            <column name="order_item_comments_id" type="CHAR(38)"/>
+            <column name="comment_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-32">
+        <createTable tableName="order_shipment">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="order_item_id" type="CHAR(38)"/>
+            <column name="shipment_item_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-33">
+        <createTable tableName="person">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="first_name" type="VARCHAR(255)"/>
+            <column name="last_name" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone_number" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-34">
+        <createTable tableName="picklist">
+            <column name="id" type="CHAR(38)"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="request_id" type="CHAR(38)"/>
+            <column name="picker_id" type="CHAR(38)"/>
+            <column name="date_picked" type="DATETIME"/>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by_id" type="CHAR(38)"/>
+            <column name="updated_by_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-35">
+        <createTable tableName="picklist_item">
+            <column name="id" type="CHAR(38)"/>
+            <column name="quantity" type="INT"/>
+            <column name="picklist_id" type="CHAR(38)"/>
+            <column name="request_item_id" type="CHAR(38)"/>
+            <column name="inventory_item_id" type="CHAR(38)"/>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by_id" type="CHAR(38)"/>
+            <column name="updated_by_id" type="CHAR(38)"/>
+            <column name="status" type="VARCHAR(255)"/>
+            <column name="reason_code" type="VARCHAR(255)"/>
+            <column name="comment" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-36">
+        <createTable tableName="product">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_id" type="CHAR(38)"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product_code" type="VARCHAR(255)"/>
+            <column name="unit_of_measure_id" type="CHAR(38)"/>
+            <column name="cold_chain" type="BIT"/>
+            <column name="manufacturer" type="VARCHAR(255)"/>
+            <column name="manufacturer_code" type="VARCHAR(255)"/>
+            <column name="ndc" type="VARCHAR(255)"/>
+            <column name="upc" type="VARCHAR(255)"/>
+            <column name="unit_of_measure" type="VARCHAR(255)"/>
+            <column name="created_by_id" type="CHAR(38)"/>
+            <column name="updated_by_id" type="CHAR(38)"/>
+            <column name="default_uom_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-37">
+        <createTable tableName="product_attribute">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attribute_id" type="CHAR(38)"/>
+            <column name="product_id" type="CHAR(38)"/>
+            <column name="attributes_idx" type="INT"/>
+            <column name="value" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-38">
+        <createTable tableName="product_category">
+            <column name="product_id" type="CHAR(38)"/>
+            <column name="category_id" type="CHAR(38)"/>
+            <column name="categories_idx" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-39">
+        <createTable tableName="product_document">
+            <column name="product_id" type="CHAR(38)"/>
+            <column name="document_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-40">
+        <createTable tableName="product_group">
+            <column name="id" type="CHAR(38)"/>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_id" type="CHAR(38)"/>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-41">
+        <createTable tableName="product_group_product">
+            <column name="product_group_id" type="CHAR(38)"/>
+            <column name="product_id" type="CHAR(38)"/>
+            <column name="products_idx" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-42">
+        <createTable tableName="product_package">
+            <column name="id" type="CHAR(38)"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="gtin" type="VARCHAR(255)"/>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="uom_id" type="CHAR(38)"/>
+            <column name="product_id" type="CHAR(38)"/>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by_id" type="CHAR(38)"/>
+            <column name="updated_by_id" type="CHAR(38)"/>
+            <column name="quantity" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-43">
+        <createTable tableName="product_tags">
+            <column name="product_id" type="CHAR(38)"/>
+            <column name="tags_string" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-44">
+        <createTable tableName="receipt">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="actual_delivery_date" type="DATETIME"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expected_delivery_date" type="DATETIME"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-45">
+        <createTable tableName="receipt_item">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="comment_id" type="CHAR(38)"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expiration_date" type="DATETIME"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lot_number" type="VARCHAR(255)"/>
+            <column name="product_id" type="CHAR(38)"/>
+            <column name="quantity_shipped" type="INT"/>
+            <column name="quantity_received" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="receipt_id" type="CHAR(38)"/>
+            <column name="recipient_id" type="CHAR(38)"/>
+            <column name="comment" type="VARCHAR(255)"/>
+            <column name="shipment_item_id" type="CHAR(38)"/>
+            <column name="inventory_item_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-46">
+        <createTable tableName="reference_number">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="identifier" type="VARCHAR(255)"/>
+            <column name="reference_number_type_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-47">
+        <createTable tableName="reference_number_type">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-48">
+        <createTable tableName="request">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME"/>
+            <column name="date_requested" type="DATETIME"/>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="destination_id" type="CHAR(38)"/>
+            <column name="last_updated" type="DATETIME"/>
+            <column name="origin_id" type="CHAR(38)"/>
+            <column name="recipient_id" type="CHAR(38)"/>
+            <column name="request_number" type="VARCHAR(255)"/>
+            <column name="requested_by_id" type="CHAR(38)"/>
+            <column name="status" type="VARCHAR(255)"/>
+            <column name="fulfillment_id" type="CHAR(38)"/>
+            <column name="created_by_id" type="CHAR(38)"/>
+            <column name="updated_by_id" type="CHAR(38)"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="date_valid_from" type="DATETIME"/>
+            <column name="date_valid_to" type="DATETIME"/>
+            <column name="recipient_program" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-49">
+        <createTable tableName="request_comment">
+            <column name="request_comments_id" type="CHAR(38)"/>
+            <column name="comment_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-50">
+        <createTable tableName="request_document">
+            <column name="request_documents_id" type="CHAR(38)"/>
+            <column name="document_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-51">
+        <createTable tableName="request_event">
+            <column name="request_events_id" type="CHAR(38)"/>
+            <column name="event_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-52">
+        <createTable tableName="request_item">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_id" type="CHAR(38)"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="inventory_item_id" type="CHAR(38)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product_id" type="CHAR(38)"/>
+            <column name="quantity" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="request_id" type="CHAR(38)"/>
+            <column name="requested_by_id" type="CHAR(38)"/>
+            <column name="unit_price" type="FLOAT(12,0)"/>
+            <column name="product_group_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-53">
+        <createTable tableName="request_shipment">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="request_item_id" type="CHAR(38)"/>
+            <column name="shipment_item_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-54">
+        <createTable tableName="role">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="role_type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-55">
+        <createTable tableName="shipment">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="carrier_id" type="CHAR(38)"/>
+            <column name="date_created" type="DATETIME"/>
+            <column name="destination_id" type="CHAR(38)"/>
+            <column name="donor_id" type="CHAR(38)"/>
+            <column name="expected_delivery_date" type="DATETIME"/>
+            <column name="expected_shipping_date" type="DATETIME"/>
+            <column name="last_updated" type="DATETIME"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="origin_id" type="CHAR(38)"/>
+            <column name="recipient_id" type="CHAR(38)"/>
+            <column name="shipment_method_id" type="CHAR(38)"/>
+            <column name="shipment_number" type="VARCHAR(255)"/>
+            <column name="shipment_type_id" type="CHAR(38)"/>
+            <column name="total_value" type="FLOAT(12,2)"/>
+            <column name="additional_information" type="LONGTEXT"/>
+            <column name="receipt_id" type="CHAR(38)"/>
+            <column name="stated_value" type="FLOAT(12,2)"/>
+            <column name="weight" type="FLOAT(12,0)"/>
+            <column name="weight_units" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-56">
+        <createTable tableName="shipment_comment">
+            <column name="shipment_comments_id" type="CHAR(38)"/>
+            <column name="comment_id" type="CHAR(38)"/>
+            <column name="comments_idx" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-57">
+        <createTable tableName="shipment_document">
+            <column name="shipment_documents_id" type="CHAR(38)"/>
+            <column name="document_id" type="CHAR(38)"/>
+            <column name="documents_idx" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-58">
+        <createTable tableName="shipment_event">
+            <column name="shipment_events_id" type="CHAR(38)"/>
+            <column name="event_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-59">
+        <createTable tableName="shipment_item">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="container_id" type="CHAR(38)"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="donor_id" type="CHAR(38)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lot_number" type="VARCHAR(255)"/>
+            <column name="product_id" type="CHAR(38)"/>
+            <column name="quantity" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_id" type="CHAR(38)"/>
+            <column name="shipment_items_idx" type="INT"/>
+            <column name="shipment_id" type="CHAR(38)"/>
+            <column name="expiration_date" type="DATETIME"/>
+            <column name="inventory_item_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-60">
+        <createTable tableName="shipment_method">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipper_service_id" type="CHAR(38)"/>
+            <column name="tracking_number" type="VARCHAR(255)"/>
+            <column name="shipper_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-61">
+        <createTable tableName="shipment_reference_number">
+            <column name="shipment_reference_numbers_id" type="CHAR(38)"/>
+            <column name="reference_number_id" type="CHAR(38)"/>
+            <column name="reference_numbers_idx" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-62">
+        <createTable tableName="shipment_type">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-63">
+        <createTable tableName="shipment_workflow">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_type_id" type="CHAR(38)"/>
+            <column name="excluded_fields" type="VARCHAR(255)"/>
+            <column name="document_template" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-64">
+        <createTable tableName="shipment_workflow_container_type">
+            <column name="shipment_workflow_container_types_id" type="CHAR(38)"/>
+            <column name="container_type_id" type="CHAR(38)"/>
+            <column name="container_types_idx" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-65">
+        <createTable tableName="shipment_workflow_reference_number_type">
+            <column name="shipment_workflow_reference_number_types_id" type="CHAR(38)"/>
+            <column name="reference_number_type_id" type="CHAR(38)"/>
+            <column name="reference_number_types_idx" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-66">
+        <createTable tableName="shipper">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME"/>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parameter_name" type="VARCHAR(255)"/>
+            <column name="tracking_format" type="VARCHAR(255)"/>
+            <column name="tracking_url" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-67">
+        <createTable tableName="shipper_service">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="shipper_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-68">
+        <createTable tableName="transaction">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by_id" type="CHAR(38)"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="destination_id" type="CHAR(38)"/>
+            <column name="inventory_id" type="CHAR(38)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source_id" type="CHAR(38)"/>
+            <column name="transaction_date" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_type_id" type="CHAR(38)"/>
+            <column name="confirmed" type="BIT"/>
+            <column name="confirmed_by_id" type="CHAR(38)"/>
+            <column name="date_confirmed" type="DATETIME"/>
+            <column name="comment" type="VARCHAR(255)"/>
+            <column name="incoming_shipment_id" type="CHAR(38)"/>
+            <column name="outgoing_shipment_id" type="CHAR(38)"/>
+            <column name="updated_by_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-69">
+        <createTable tableName="transaction_entry">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="inventory_item_id" type="CHAR(38)"/>
+            <column name="quantity" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_id" type="CHAR(38)"/>
+            <column name="comments" type="VARCHAR(255)"/>
+            <column name="transaction_entries_idx" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-70">
+        <createTable tableName="transaction_type">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT"/>
+            <column name="transaction_code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-71">
+        <createTable tableName="unit_of_measure">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="uom_class_id" type="CHAR(38)"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by_id" type="CHAR(38)"/>
+            <column name="updated_by_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-72">
+        <createTable tableName="unit_of_measure_class">
+            <column name="id" type="CHAR(38)"/>
+            <column defaultValueBoolean="true" name="active" type="BIT"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="code" type="VARCHAR(255)"/>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="base_uom_id" type="CHAR(38)"/>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(255)"/>
+            <column name="created_by_id" type="CHAR(38)"/>
+            <column name="updated_by_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-73">
+        <createTable tableName="user">
+            <column defaultValue="" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="active" type="BIT"/>
+            <column name="last_login_date" type="DATETIME"/>
+            <column name="manager_id" type="CHAR(38)"/>
+            <column name="password" type="VARCHAR(255)"/>
+            <column name="username" type="VARCHAR(255)"/>
+            <column name="warehouse_id" type="CHAR(38)"/>
+            <column name="photo" type="MEDIUMBLOB"/>
+            <column name="locale" type="VARCHAR(255)"/>
+            <column name="remember_last_location" type="BIT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-74">
+        <createTable tableName="user_role">
+            <column name="user_id" type="CHAR(38)"/>
+            <column name="role_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351254275228-74b" dbms="mysql">
+        	<sql>
+            ALTER TABLE `DATABASECHANGELOG`                 ENGINE=InnoDB;
+            ALTER TABLE `DATABASECHANGELOGLOCK`             ENGINE=InnoDB;
+            ALTER TABLE `address`                           ENGINE=InnoDB;
+            ALTER TABLE `attribute`                         ENGINE=InnoDB;
+            ALTER TABLE `attribute_options`                 ENGINE=InnoDB;
+            ALTER TABLE `category`                          ENGINE=InnoDB;
+            ALTER TABLE `comment`                           ENGINE=InnoDB;
+            ALTER TABLE `consumption`                       ENGINE=InnoDB;
+            ALTER TABLE `container`                         ENGINE=InnoDB;
+            ALTER TABLE `container_type`                    ENGINE=InnoDB;
+            ALTER TABLE `document`                          ENGINE=InnoDB;
+            ALTER TABLE `document_type`                     ENGINE=InnoDB;
+            ALTER TABLE `donor`                             ENGINE=InnoDB;
+            ALTER TABLE `event`                             ENGINE=InnoDB;
+            ALTER TABLE `event_type`                        ENGINE=InnoDB;
+            ALTER TABLE `fulfillment`                       ENGINE=InnoDB;
+            ALTER TABLE `fulfillment_item`                  ENGINE=InnoDB;
+            ALTER TABLE `fulfillment_item_shipment_item`    ENGINE=InnoDB;
+            ALTER TABLE `inventory`                         ENGINE=InnoDB;
+            ALTER TABLE `inventory_item`                    ENGINE=InnoDB;
+            ALTER TABLE `inventory_level`                   ENGINE=InnoDB;
+            ALTER TABLE `local_transfer`                    ENGINE=InnoDB;
+            ALTER TABLE `location`                          ENGINE=InnoDB;
+            ALTER TABLE `location_group`                    ENGINE=InnoDB;
+            ALTER TABLE `location_supported_activities`     ENGINE=InnoDB;
+            ALTER TABLE `location_type`                     ENGINE=InnoDB;
+            ALTER TABLE `location_type_supported_activities` ENGINE=InnoDB;
+            ALTER TABLE `order`                             ENGINE=InnoDB;
+            ALTER TABLE `order_comment`                     ENGINE=InnoDB;
+            ALTER TABLE `order_document`                    ENGINE=InnoDB;
+            ALTER TABLE `order_event`                       ENGINE=InnoDB;
+            ALTER TABLE `order_item`                        ENGINE=InnoDB;
+            ALTER TABLE `order_item_comment`                ENGINE=InnoDB;
+            ALTER TABLE `order_shipment`                    ENGINE=InnoDB;
+            ALTER TABLE `person`                            ENGINE=InnoDB;
+            ALTER TABLE `picklist`                          ENGINE=InnoDB;
+            ALTER TABLE `picklist_item`                     ENGINE=InnoDB;
+            ALTER TABLE `product`                           ENGINE=InnoDB;
+            ALTER TABLE `product_attribute`                 ENGINE=InnoDB;
+            ALTER TABLE `product_category`                  ENGINE=InnoDB;
+            ALTER TABLE `product_document`                  ENGINE=InnoDB;
+            ALTER TABLE `product_group`                     ENGINE=InnoDB;
+            ALTER TABLE `product_group_product`             ENGINE=InnoDB;
+            ALTER TABLE `product_package`                   ENGINE=InnoDB;
+            ALTER TABLE `product_tags`                      ENGINE=InnoDB;
+            ALTER TABLE `receipt`                           ENGINE=InnoDB;
+            ALTER TABLE `receipt_item`                      ENGINE=InnoDB;
+            ALTER TABLE `reference_number`                  ENGINE=InnoDB;
+            ALTER TABLE `reference_number_type`             ENGINE=InnoDB;
+            ALTER TABLE `request`                           ENGINE=InnoDB;
+            ALTER TABLE `request_comment`                   ENGINE=InnoDB;
+            ALTER TABLE `request_document`                  ENGINE=InnoDB;
+            ALTER TABLE `request_event`                     ENGINE=InnoDB;
+            ALTER TABLE `request_item`                      ENGINE=InnoDB;
+            ALTER TABLE `request_shipment`                  ENGINE=InnoDB;
+            ALTER TABLE `role`                              ENGINE=InnoDB;
+            ALTER TABLE `shipment`                          ENGINE=InnoDB;
+            ALTER TABLE `shipment_comment`                  ENGINE=InnoDB;
+            ALTER TABLE `shipment_document`                ENGINE=InnoDB;
+            ALTER TABLE `shipment_event`                    ENGINE=InnoDB;
+            ALTER TABLE `shipment_item`                     ENGINE=InnoDB;
+            ALTER TABLE `shipment_method`                   ENGINE=InnoDB;
+            ALTER TABLE `shipment_reference_number`         ENGINE=InnoDB;
+            ALTER TABLE `shipment_type`                     ENGINE=InnoDB;
+            ALTER TABLE `shipment_workflow`                 ENGINE=InnoDB;
+            ALTER TABLE `shipment_workflow_container_type`  ENGINE=InnoDB;
+            ALTER TABLE `shipment_workflow_reference_number_type` ENGINE=InnoDB;
+            ALTER TABLE `shipper`                           ENGINE=InnoDB;
+            ALTER TABLE `shipper_service`                   ENGINE=InnoDB;
+            ALTER TABLE `transaction`                       ENGINE=InnoDB;
+            ALTER TABLE `transaction_entry`                 ENGINE=InnoDB;
+            ALTER TABLE `transaction_type`                  ENGINE=InnoDB;
+            ALTER TABLE `unit_of_measure`                   ENGINE=InnoDB;
+            ALTER TABLE `unit_of_measure_class`             ENGINE=InnoDB;
+            ALTER TABLE `user`                              ENGINE=InnoDB;
+            ALTER TABLE `user_role`
+		</sql>
+    </changeSet>
+</databaseChangeLog>
