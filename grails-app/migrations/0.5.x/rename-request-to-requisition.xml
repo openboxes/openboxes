@@ -1,62 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
-    xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-     <changeSet author="PZ DM" id="1295640983194-01">
-         <preConditions onFail="MARK_RAN">
-			<tableExists tableName="request_event" />
-		</preConditions>
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="PZ DM" id="1295640983194-01">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="request_event"/>
+        </preConditions>
         <dropTable tableName="request_event"/>
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-02">
         <preConditions onFail="MARK_RAN">
-			<tableExists tableName="request_comment" />
-		</preConditions>
+            <tableExists tableName="request_comment"/>
+        </preConditions>
         <dropTable tableName="request_comment"/>
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-03">
         <preConditions onFail="MARK_RAN">
-			<tableExists tableName="request_document" />
-		</preConditions>
+            <tableExists tableName="request_document"/>
+        </preConditions>
         <dropTable tableName="request_document"/>
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-04">
         <preConditions onFail="MARK_RAN">
-			<tableExists tableName="request_shipment" />
-		</preConditions>
+            <tableExists tableName="request_shipment"/>
+        </preConditions>
         <dropTable tableName="request_shipment"/>
     </changeSet>
-     <changeSet author="PZ DM" id="1295640983194-04b">
+    <changeSet author="PZ DM" id="1295640983194-04b">
         <validCheckSum>8c2aedd41a27c9626174e0f6f7dac793</validCheckSum>
         <preConditions onFail="MARK_RAN">
-			<foreignKeyConstraintExists
-				foreignKeyName="FKEDC55CD447EBE106" />
-		</preConditions>
+            <foreignKeyConstraintExists
+                    foreignKeyName="FKEDC55CD447EBE106"/>
+        </preConditions>
         <dropForeignKeyConstraint baseTableName="fulfillment_item" constraintName="FKEDC55CD447EBE106"/>
     </changeSet>
-     <changeSet author="PZ DM" id="1295640983194-04c">
+    <changeSet author="PZ DM" id="1295640983194-04c">
         <validCheckSum>5e566ff3c1677aa55127e206c8b112</validCheckSum>
         <preConditions onFail="MARK_RAN">
-			<indexExists indexName="FKEDC55CD447EBE106" />
-		</preConditions>
+            <indexExists indexName="FKEDC55CD447EBE106"/>
+        </preConditions>
         <dropIndex indexName="FKEDC55CD447EBE106" tableName="fulfillment_item"/>
     </changeSet>
 
-     <changeSet author="PZ DM" id="1295640983194-05">
+    <changeSet author="PZ DM" id="1295640983194-05">
         <preConditions onFail="MARK_RAN">
-			<tableExists tableName="request_item" />
-		</preConditions>
+            <tableExists tableName="request_item"/>
+        </preConditions>
         <dropTable tableName="request_item"/>
     </changeSet>
-     <changeSet author="PZ DM" id="1295640983194-06">
-         <preConditions onFail="MARK_RAN">
-			<tableExists tableName="request" />
-		</preConditions>
+    <changeSet author="PZ DM" id="1295640983194-06">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="request"/>
+        </preConditions>
         <dropTable tableName="request"/>
     </changeSet>
     <changeSet author="PZ DM" id="1295640983194-07">
-         <validCheckSum>f98628bffe379a73be1a91531ec1566</validCheckSum>
-         <createTable tableName="requisition">
+        <validCheckSum>da93143b848014974bdd11821be753c1</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="requisition"/>
+            </not>
+        </preConditions>
+        <createTable tableName="requisition">
             <column defaultValue="" name="id" type="CHAR(38)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -81,31 +87,16 @@
             <column name="date_valid_to" type="DATETIME"/>
             <column name="recipient_program" type="VARCHAR(255)"/>
         </createTable>
-
-        <addForeignKeyConstraint baseColumnNames="destination_id" baseTableName="requisition"
-                                 constraintName="FK414EF28F1E2B3CDC" deferrable="false" initiallyDeferred="false"
-                                 referencedColumnNames="id" referencedTableName="location"/>
-
-
-        <addForeignKeyConstraint baseColumnNames="fulfillment_id" baseTableName="requisition"
-                                 constraintName="FK414EF28F94567276" deferrable="false" initiallyDeferred="false"
-                                 referencedColumnNames="id" referencedTableName="fulfillment"/>
-
-        <addForeignKeyConstraint baseColumnNames="origin_id" baseTableName="requisition"
-                                 constraintName="FK414EF28FDBDEDAC4" deferrable="false" initiallyDeferred="false"
-                                 referencedColumnNames="id" referencedTableName="location"/>
-
-        <addForeignKeyConstraint baseColumnNames="recipient_id" baseTableName="requisition"
-                                 constraintName="FK414EF28F44979D51" deferrable="false" initiallyDeferred="false"
-                                 referencedColumnNames="id" referencedTableName="person"/>
-
-        <addForeignKeyConstraint baseColumnNames="requested_by_id" baseTableName="requisition"
-                                 constraintName="FK414EF28FDD302242" deferrable="false" initiallyDeferred="false"
-                                 referencedColumnNames="id" referencedTableName="person"/>
-
     </changeSet>
+
+
     <changeSet author="PZ DM" id="1295640983194-08">
-        <validCheckSum>7693a3cd585f29d0f5a6324faf5eec</validCheckSum>
+        <validCheckSum>21daa6d83b862c149264c3c6aa92b0aa</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="requisition_item"/>
+            </not>
+        </preConditions>
         <createTable tableName="requisition_item">
             <column defaultValue="" name="id" type="CHAR(38)">
                 <constraints nullable="false" primaryKey="true"/>
@@ -131,45 +122,130 @@
             <column name="unit_price" type="FLOAT(12,0)"/>
             <column name="product_group_id" type="CHAR(38)"/>
         </createTable>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1295640983194-08b" dbms="mysql">
+        <validCheckSum>46c42d96ab2cd2a8f51e711626ec26a</validCheckSum>
+        <sql>
+            ALTER TABLE `requisition` ENGINE=InnoDB;
+            ALTER TABLE `requisition_item` ENGINE=InnoDB;
+        </sql>
+    </changeSet>
 
+    <changeSet author="PZ DM" id="1295640983194-09">
+        <validCheckSum>f31e24b92574a8d3878374cc97c86</validCheckSum>
+        <renameColumn tableName="fulfillment_item"
+                      oldColumnName="request_item_id" newColumnName="requisition_item_id" columnDataType="CHAR(38)"/>
+    </changeSet>
+    <changeSet author="PZ DM" id="1295640983194-10">
+        <validCheckSum>56a770ee8f7e38d45ff7b4581138ecb4</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+             <not>
+                <foreignKeyConstraintExists  foreignKeyName="FKEDC55CD447EBE106"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="requisition_item_id"
+                                 baseTableName="fulfillment_item" constraintName="FKEDC55CD447EBE106"
+                                 deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="requisition_item"/>
+    </changeSet>
+    <changeSet author="PZ DM" id="1295640983194-11">
+         <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists  foreignKeyName="FK414EF28F1E2B3CDC"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="destination_id" baseTableName="requisition"
+                                 constraintName="FK414EF28F1E2B3CDC" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="location"/>    </changeSet>
+    <changeSet author="PZ DM" id="1295640983194-12">
+         <preConditions onFail="MARK_RAN">
+             <not>
+                <foreignKeyConstraintExists  foreignKeyName="FK414EF28F94567276"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="fulfillment_id" baseTableName="requisition"
+                                 constraintName="FK414EF28F94567276" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="fulfillment"/>
+    </changeSet>
+    <changeSet author="PZ DM" id="1295640983194-13">
+         <preConditions onFail="MARK_RAN">
+             <not>
+                <foreignKeyConstraintExists  foreignKeyName="FK414EF28FDBDEDAC4"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="origin_id" baseTableName="requisition"
+                                 constraintName="FK414EF28FDBDEDAC4" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="PZ DM" id="1295640983194-14">
+         <preConditions onFail="MARK_RAN">
+             <not>
+                <foreignKeyConstraintExists  foreignKeyName="FK414EF28F44979D51"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="recipient_id" baseTableName="requisition"
+                                 constraintName="FK414EF28F44979D51" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="PZ DM" id="1295640983194-15">
+         <preConditions onFail="MARK_RAN">
+             <not>
+                <foreignKeyConstraintExists  foreignKeyName="FK414EF28FDD302242"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="requested_by_id" baseTableName="requisition"
+                                 constraintName="FK414EF28FDD302242" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="PZ DM" id="1295640983194-16">
+         <preConditions onFail="MARK_RAN">
+             <not>
+                <foreignKeyConstraintExists  foreignKeyName="FK4DA982C3EF4C770D"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="category_id" baseTableName="requisition_item"
                                  constraintName="FK4DA982C3EF4C770D" deferrable="false" initiallyDeferred="false"
                                  referencedColumnNames="id" referencedTableName="category"/>
-
+    </changeSet>
+    <changeSet author="PZ DM" id="1295640983194-17">
+         <preConditions onFail="MARK_RAN">
+             <not>
+                <foreignKeyConstraintExists  foreignKeyName="FK4DA982C3AA992CED"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="inventory_item_id" baseTableName="requisition_item"
                                  constraintName="FK4DA982C3AA992CED" deferrable="false" initiallyDeferred="false"
                                  referencedColumnNames="id" referencedTableName="inventory_item"/>
-
+    </changeSet>
+    <changeSet author="PZ DM" id="1295640983194-18">
+         <preConditions onFail="MARK_RAN">
+             <not>
+                <foreignKeyConstraintExists  foreignKeyName="FK4DA982C3DED5FAE7"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="requisition_item"
                                  constraintName="FK4DA982C3DED5FAE7" deferrable="false" initiallyDeferred="false"
                                  referencedColumnNames="id" referencedTableName="product"/>
-
+    </changeSet>
+    <changeSet author="PZ DM" id="1295640983194-19">
+         <preConditions onFail="MARK_RAN">
+             <not>
+                <foreignKeyConstraintExists  foreignKeyName="FK4DA982C3911E7578"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="requested_by_id" baseTableName="requisition_item"
                                  constraintName="FK4DA982C3911E7578" deferrable="false" initiallyDeferred="false"
                                  referencedColumnNames="id" referencedTableName="user"/>
-
+    </changeSet>
+    <changeSet author="PZ DM" id="1295640983194-20">
+         <preConditions onFail="MARK_RAN">
+             <not>
+                <foreignKeyConstraintExists  foreignKeyName="FK4DA982C35DE21C87"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="requisition_id" baseTableName="requisition_item"
                                  constraintName="FK4DA982C35DE21C87" deferrable="false" initiallyDeferred="false"
                                  referencedColumnNames="id" referencedTableName="requisition"/>
 
     </changeSet>
-     <changeSet author="adminuser (generated)" id="1295640983194-08b" dbms="mysql">
-        <sql>
-            ALTER TABLE `requisition`                 ENGINE=InnoDB;
-            ALTER TABLE `requisition_item`            ENGINE=InnoDB;
-        </sql>
-    </changeSet>
-     <changeSet author="PZ DM" id="1295640983194-09">
-         <validCheckSum>f31e24b92574a8d3878374cc97c86</validCheckSum>
-         <renameColumn tableName="fulfillment_item"
-    oldColumnName="request_item_id" newColumnName="requisition_item_id" columnDataType="CHAR(38)"/>
-    </changeSet>
-     <changeSet author="PZ DM" id="1295640983194-10">
-       <validCheckSum>56a770ee8f7e38d45ff7b4581138ecb4</validCheckSum>
-        <addForeignKeyConstraint baseColumnNames="requisition_item_id"
-            baseTableName="fulfillment_item" constraintName="FKEDC55CD447EBE106"
-            deferrable="false" initiallyDeferred="false"
-            referencedColumnNames="id" referencedTableName="requisition_item"/>
-    </changeSet>
-
 </databaseChangeLog>
