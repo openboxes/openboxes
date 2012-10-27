@@ -4,7 +4,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-   <changeSet author="adminuser (generated)" id="" dbms="mysql">
+   <changeSet author="jmiranda" id="1351380063409" dbms="mysql">
         <sql>
 			ALTER TABLE `consumption` ENGINE=InnoDB;
 			ALTER TABLE `fulfillment` ENGINE=InnoDB;
@@ -26,7 +26,7 @@
 			ALTER TABLE `product_group` ENGINE=InnoDB;
 			ALTER TABLE `product_group_product` ENGINE=InnoDB;
 			ALTER TABLE `product_package` ENGINE=InnoDB;
-			ALTER TABLE `unit_of_measure_class`;        
+			ALTER TABLE `unit_of_measure_class` ENGINE=InnoDB;        
 		</sql>
     </changeSet>
     
