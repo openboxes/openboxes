@@ -123,14 +123,7 @@
             <column name="product_group_id" type="CHAR(38)"/>
         </createTable>
     </changeSet>
-    <changeSet author="adminuser (generated)" id="1295640983194-08b" dbms="mysql">
-        <validCheckSum>46c42d96ab2cd2a8f51e711626ec26a</validCheckSum>
-        <sql>
-            ALTER TABLE `requisition` ENGINE=InnoDB;
-            ALTER TABLE `requisition_item` ENGINE=InnoDB;
-        </sql>
-    </changeSet>
-
+    
     <changeSet author="PZ DM" id="1295640983194-09">
         <validCheckSum>f31e24b92574a8d3878374cc97c86</validCheckSum>
         <renameColumn tableName="fulfillment_item"

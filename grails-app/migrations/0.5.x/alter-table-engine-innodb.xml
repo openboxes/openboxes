@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+   <changeSet author="adminuser (generated)" id="" dbms="mysql">
+        <sql>
+			ALTER TABLE `consumption` ENGINE=InnoDB;
+			ALTER TABLE `fulfillment` ENGINE=InnoDB;
+			ALTER TABLE `fulfillment_item` ENGINE=InnoDB;
+			ALTER TABLE `fulfillment_item_shipment_item` ENGINE=InnoDB;
+			ALTER TABLE `location_group` ENGINE=InnoDB;
+			ALTER TABLE `location_supported_activities` ENGINE=InnoDB;
+			ALTER TABLE `location_type_supported_activities` ENGINE=InnoDB;
+			ALTER TABLE `order` ENGINE=InnoDB;
+			ALTER TABLE `order_comment` ENGINE=InnoDB;
+			ALTER TABLE `order_document` ENGINE=InnoDB;
+			ALTER TABLE `order_event` ENGINE=InnoDB;
+			ALTER TABLE `order_item` ENGINE=InnoDB;
+			ALTER TABLE `order_item_comment` ENGINE=InnoDB;
+			ALTER TABLE `order_shipment` ENGINE=InnoDB;
+			ALTER TABLE `picklist` ENGINE=InnoDB;
+			ALTER TABLE `picklist_item` ENGINE=InnoDB;
+			ALTER TABLE `product_document` ENGINE=InnoDB;
+			ALTER TABLE `product_group` ENGINE=InnoDB;
+			ALTER TABLE `product_group_product` ENGINE=InnoDB;
+			ALTER TABLE `product_package` ENGINE=InnoDB;
+			ALTER TABLE `unit_of_measure_class`;        
+		</sql>
+    </changeSet>
+    
+</databaseChangeLog>
