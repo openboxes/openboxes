@@ -127,7 +127,7 @@
     <changeSet author="PZ DM" id="1295640983194-09">
         <validCheckSum>f31e24b92574a8d3878374cc97c86</validCheckSum>
         <preConditions>
-        	<columnExists tableName="fulfillment_item" columnName="request_item"/>
+        	<columnExists tableName="fulfillment_item" columnName="request_item_id"/>
         </preConditions>
         <renameColumn tableName="fulfillment_item"
                       oldColumnName="request_item_id" newColumnName="requisition_item_id" columnDataType="CHAR(38)"/>
