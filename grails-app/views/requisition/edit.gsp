@@ -30,15 +30,7 @@
                         <tbody>
                             <tr class="prop">
                                 <td valign="top" class="name">
-									<label for="name"><warehouse:message code="default.name.label" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: requisition, field: 'name', 'errors')}">
-									<g:textField name="name" value="${requisition?.name}" />
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td valign="top" class="name">
-									<label for="origin.id"><warehouse:message code="requisition.origin.label" /></label>
+									<label for="origin.id"><warehouse:message code="requisition.depot.label" /></label>
 
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
@@ -47,26 +39,36 @@
 
                                 </td>
                             </tr>
+
                             <tr class="prop">
                                 <td valign="top" class="name">
-									<label for="destination.id"><warehouse:message code="requisition.destination.label" /></label>
-
+									<label for="recipientProgram"><warehouse:message code="requisition.program.label" /></label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean: requisition, field: 'destination', 'errors')}">
-                                	<g:select name="destination.id" from="${org.pih.warehouse.core.Location.list()}"
-                                		optionKey="id" optionValue="name" value="${requisition?.destination?.id}" noSelection="['null':'']" />
 
+                                <td valign="top" class="value ${hasErrors(bean: requisition, field: 'recipientProgram', 'errors')}">
+                                    <g:autoSuggestString id="recipientProgram" name="recipientProgram" class="text" placeholder="Program"
+                                                         jsonUrl="${request.contextPath }/json/findPrograms"
+                                                         value="${requisition?.recipientProgram}" label="${requisition?.recipientProgram}"/>
                                 </td>
                             </tr>
 
+
                            <tr class="prop">
                                 <td valign="top" class="name">
-									<label for="requestedBy.id"><warehouse:message code="requisition.requestedBy.label" /></label>
+									<label for="requestedBy"><warehouse:message code="requisition.requestedBy.label" /></label>
 
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: requisition, field: 'requestedBy', 'errors')}">
-                                	<g:select name="requestedBy.id" from="${org.pih.warehouse.core.Person.list()}"
-                                		optionKey="id" optionValue="name" value="${requisition?.requestedBy?.id}" noSelection="['null':'']" />
+                                    %{--<g:autoSuggest id="requestedBy" name="requestedBy" jsonUrl="${request.contextPath }/json/findPersonByName"--}%
+                                                        %{--class="text"--}%
+                                                        %{--placeholder="Requested by"--}%
+
+                                                        %{--value="${requisition?.requestedBy?.name}" label="${requisition?.requestedBy?.name}" />--}%
+                                    <g:autoSuggest id="requestedBy" name="requestedBy" jsonUrl="${request.contextPath }/json/findPersonByName"
+								styleClass="text"
+								placeholder="Requested by"
+								valueId="${requisition?.requestedBy?.id}"
+								valueName="${requisition?.requestedBy?.name}"/>
 
                                 </td>
                             </tr>
@@ -75,7 +77,7 @@
                                 <td valign="top" class="name"><label><warehouse:message code="requisition.dateRequested.label"/></label></td>
                                 <td class="value ${hasErrors(bean: requisition, field: 'dateRequested', 'errors')}">
                                     <g:jqueryDatePicker id="dateRequested" name="dateRequested"
-                                        value="${requisition?.dateRequested}" format="MM/dd/yyyy" maxDate="${new Date()}"/>
+                                        value="${requisition.dateRequested ? requisition.dateRequested : new Date()}" format="MM/dd/yyyy" maxDate="${new Date()}"/>
                                 </td>
                             </tr>
                         
@@ -83,7 +85,16 @@
                                 <td valign="top" class="name"><label><warehouse:message code="requisition.requestedDeliveryDate.label"/></label></td>
                                 <td class="value ${hasErrors(bean: requisition, field: 'requestedDeliveryDate', 'errors')}">
                                     <g:jqueryDatePicker id="requestedDeliveryDate" name="requestedDeliveryDate"
-                                        value="${requisition?.requestedDeliveryDate}" format="MM/dd/yyyy" minDate="${new Date().plus(1)}"/>
+                                        value="${requisition.requestedDeliveryDate ? requisition.requestedDeliveryDate : new Date().plus(1)}" format="MM/dd/yyyy" minDate="${new Date().plus(1)}"/>
+                                </td>
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">
+									<label for="name"><warehouse:message code="default.description.label" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: requisition, field: 'name', 'errors')}">
+									<label id="name" name="name" value=" "></label>
                                 </td>
                             </tr>
 

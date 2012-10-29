@@ -165,7 +165,7 @@
 					</tr>
 					<tr>
 						<td>
-							<g:link controller="createRequestWorkflow" action="index"><warehouse:message code="request.create.label" default="Add new request"/></g:link>
+							<g:link controller="requisition" action="edit"><warehouse:message code="requisition.create.label" default="Add new request"/></g:link>
 						</td>					
 					</tr>				
 					

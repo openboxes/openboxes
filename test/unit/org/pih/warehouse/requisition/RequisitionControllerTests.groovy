@@ -1,3 +1,5 @@
+
+
 package org.pih.warehouse.requisition
 
 import grails.test.ControllerUnitTestCase
@@ -32,7 +34,8 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         controller.requisitionService = requisitionServiceMock.createMock()
 
         def location = new Location(id:"1234")
-        mockDomain(Location, [location])
+        def myLocation = new Location(id:"001")
+        mockDomain(Location, [location, myLocation])
 
         def person = new Person(id:"1234adb")
         mockDomain(Person, [person])
@@ -41,13 +44,14 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         controller.params.origin = [id: location.id]
         controller.params.destination = [id:location.id]
         controller.params.requestedBy = [id:person.id]
+        controller.session.warehouse = myLocation
 
         controller.save()
         def model = renderArgs.model
 
         assert model.requisition.name == "testRequisition"
         assert model.requisition.origin.id == location.id
-        assert model.requisition.destination.id == location.id
+        assert model.requisition.destination.id == myLocation.id
         assert model.requisition.requestedBy.id == person.id
 
         assert renderArgs.view == "edit"

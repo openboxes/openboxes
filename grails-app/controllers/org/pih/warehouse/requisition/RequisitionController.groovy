@@ -58,6 +58,7 @@ class RequisitionController {
 
     def save = {
         def requisition = new Requisition(params)
+        requisition.destination = Location.get(session.warehouse.id)
         if (requisitionService.save(requisition))
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), requisition.id])}"
 
