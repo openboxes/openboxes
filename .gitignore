@@ -17,7 +17,7 @@ web-app/WEB-INF/
 .settings
 .project
 .DS_Store
-
 openboxes.ipr
 /cobertura.ser
 /.link_to_grails_plugins
+out/

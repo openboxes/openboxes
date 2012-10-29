@@ -47,6 +47,7 @@ class Requisition implements Serializable {
 	
 	
 	Date dateRequested
+    Date requestedDeliveryDate
 	Date dateValidFrom 
 	Date dateValidTo
 	
@@ -76,7 +77,14 @@ class Requisition implements Serializable {
 		destination(nullable:false)
 		recipient(nullable:true)
 		requestedBy(nullable:false)
-		dateRequested(nullable:true)
+		dateRequested(nullable:false,
+                validator: { value -> value <= new Date()})
+        requestedDeliveryDate(nullable:false,
+                validator: { value ->
+                    def tomorrow = new Date().plus(1)
+                    tomorrow.clearTime()
+                    return value >= tomorrow
+                })
 		fulfillment(nullable:true)
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)
@@ -85,6 +93,7 @@ class Requisition implements Serializable {
 		createdBy(nullable:true)
 		updatedBy(nullable:true)
         recipientProgram(nullable:true)
+
 	}	
 	
 	Boolean isPending() { 

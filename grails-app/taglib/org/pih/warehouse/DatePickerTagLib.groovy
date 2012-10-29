@@ -38,6 +38,9 @@ class DatePickerTagLib {
 		def showClear = attrs.showClear ?: "false"
 		def value = attrs.value;
 		def readOnly = attrs.readOnly ?: false
+        def minDate = attrs.minDate ? "new Date('${attrs.minDate}')": null
+        def maxDate = attrs.maxDate ? "new Date('${attrs.maxDate}')": null
+
 		
 		
 		if (value) { 
@@ -73,6 +76,8 @@ class DatePickerTagLib {
 						changeYear: ${changeMonthAndYear},
 						buttonImageOnly: true,
 						buttonImage: '${request.contextPath}/images/icons/silk/calendar.png',
+						minDate: ${minDate},
+						maxDate: ${maxDate}
 						//buttonText: '...',
 						//showButtonPanel: true,
 						//showOtherMonths: true,

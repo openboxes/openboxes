@@ -41,7 +41,7 @@
 									<label for="origin.id"><warehouse:message code="requisition.origin.label" /></label>
 
                                 </td>
-                                <td valign="top" class="value">
+                                <td valign="top" class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
                                 	<g:select name="origin.id" from="${org.pih.warehouse.core.Location.list()}"
                                 		optionKey="id" optionValue="name" value="${requisition?.origin?.id}" noSelection="['null':'']" />
 
@@ -52,7 +52,7 @@
 									<label for="destination.id"><warehouse:message code="requisition.destination.label" /></label>
 
                                 </td>
-                                <td valign="top" class="value">
+                                <td valign="top" class="value ${hasErrors(bean: requisition, field: 'destination', 'errors')}">
                                 	<g:select name="destination.id" from="${org.pih.warehouse.core.Location.list()}"
                                 		optionKey="id" optionValue="name" value="${requisition?.destination?.id}" noSelection="['null':'']" />
 
@@ -64,10 +64,26 @@
 									<label for="requestedBy.id"><warehouse:message code="requisition.requestedBy.label" /></label>
 
                                 </td>
-                                <td valign="top" class="value">
+                                <td valign="top" class="value ${hasErrors(bean: requisition, field: 'requestedBy', 'errors')}">
                                 	<g:select name="requestedBy.id" from="${org.pih.warehouse.core.Person.list()}"
                                 		optionKey="id" optionValue="name" value="${requisition?.requestedBy?.id}" noSelection="['null':'']" />
 
+                                </td>
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name"><label><warehouse:message code="requisition.dateRequested.label"/></label></td>
+                                <td class="value ${hasErrors(bean: requisition, field: 'dateRequested', 'errors')}">
+                                    <g:jqueryDatePicker id="dateRequested" name="dateRequested"
+                                        value="${requisition?.dateRequested}" format="MM/dd/yyyy" maxDate="${new Date()}"/>
+                                </td>
+                            </tr>
+                        
+                            <tr class="prop">
+                                <td valign="top" class="name"><label><warehouse:message code="requisition.requestedDeliveryDate.label"/></label></td>
+                                <td class="value ${hasErrors(bean: requisition, field: 'requestedDeliveryDate', 'errors')}">
+                                    <g:jqueryDatePicker id="requestedDeliveryDate" name="requestedDeliveryDate"
+                                        value="${requisition?.requestedDeliveryDate}" format="MM/dd/yyyy" minDate="${new Date().plus(1)}"/>
                                 </td>
                             </tr>
 

@@ -10,10 +10,10 @@ class RequisitionIntegrationTests extends GroovyTestCase {
 
         def location = Location.list().first()
         def person = Person.list().first()
-        def requisition = new Requisition(name:'testRequisition', origin: location, destination: location, requestedBy: person)
+        def requisition = new Requisition(name:'testRequisition', origin: location, destination: location, requestedBy: person, dateRequested: new Date(), requestedDeliveryDate: new Date().plus(1))
 
-//        requisition.validate()
-//        requisition.errors.each{ println(it)}
+        requisition.validate()
+        requisition.errors.each{ println(it)}
 
         assert requisition.save(flush:true)
 
