@@ -37,7 +37,12 @@ environments {
 	test {
 		dataSource {			
 			url = "jdbc:mysql://localhost:3306/openboxes_test?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
-		}
+//            driverClassName = "org.hsqldb.jdbcDriver"
+//            username = "sa"
+//            password = ""
+//            dbCreate = "create-drop"
+//            url = "jdbc:hsqldb:mem:openboxes_test"
+        }
 	}
 	production {
 		dataSource {
