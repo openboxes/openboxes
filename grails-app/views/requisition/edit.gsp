@@ -1,4 +1,5 @@
 
+
 <%@ page import="org.pih.warehouse.requisition.Requisition" %>
 <html>
     <head>
@@ -20,6 +21,17 @@
 	                <g:renderErrors bean="${requisition}" as="list" />
 	            </div>
             </g:hasErrors>
+
+            <div id="requisition-header">
+                <div class="title"><warehouse:message code="requisition.label" /></div>
+                <g:if test="${requisition.lastUpdated}">
+                      <div class="time-stamp fade"><g:formatDate date="${requisition.lastUpdated }" format="dd/MMM/yyyy hh:mm a"/></div>
+                </g:if>
+                <div class="status fade">${requisition.status.toString()}</div>
+            </div>
+
+
+
 
 
             <g:form method="post" action="save">

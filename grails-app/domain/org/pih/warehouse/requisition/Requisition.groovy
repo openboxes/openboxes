@@ -22,6 +22,8 @@ import org.pih.warehouse.fulfillment.Fulfillment;
 
 
 class Requisition implements Serializable {
+
+
 	
 	def beforeInsert = {
 		createdBy = AuthService.currentUser.get()
@@ -36,7 +38,9 @@ class Requisition implements Serializable {
 	String requestNumber 	// an auto-generated reference number
 	
 	
-	RequisitionStatus status = RequisitionStatus.NEW
+
+	RequisitionStatus status = RequisitionStatus.NEW;
+
 	Location origin			// the vendor
 	Location destination 	// the customer location 
 	

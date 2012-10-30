@@ -552,3 +552,22 @@ th.desc a {
     background: url(../images/icons/silk/bin.png) center left no-repeat;
 }
 
+#requisition-header{
+    padding: 0.5em;
+    margin-left: 0.5em;
+    margin-bottom: 2.0em
+}
+
+#requisition-header .title {
+    font-size: 1.5em;
+    font-weight: bold;
+    line-height: 1em;
+    float: left;
+}
+
+#requisition-header .status, #requisition-header .time-stamp{
+    float: right;
+    font-size: 1.0em;
+    margin-left: 1.5em;
+}
+

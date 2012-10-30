@@ -44,7 +44,7 @@ class AutoSuggestTagLib {
 		def width = (attrs.width) ? attrs.width : '300px';
 		def minLength = (attrs.minLength) ? attrs.minLength : 1;
 		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "";
-		def styleClass = "autocomplete (attrs.styleClass) ?: ''"
+		def styleClass = "autocomplete ${(attrs.styleClass) ?: ''}"
 		def placeholder = attrs.placeholder ?: ""
 		
 		def showValue = (valueName && valueId) ? true : false;
