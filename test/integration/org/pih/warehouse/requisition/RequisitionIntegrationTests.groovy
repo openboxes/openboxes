@@ -39,6 +39,9 @@ class RequisitionIntegrationTests extends GroovyTestCase {
 
         def product = Product.findByName("Advil 200mg")
         def item = new RequisitionItem(product: product, quantity: 10, requisition: requisition)
+        assert item.substitutable == false
+        item.validate()
+        item.errors.each{ println(it)}
         assert item.save(flush:true)
 
     }

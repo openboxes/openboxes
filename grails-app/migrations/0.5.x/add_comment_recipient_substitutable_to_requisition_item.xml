@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="adminuser (generated)" id="1351628122698-1">
+        <addColumn tableName="requisition_item">
+            <column name="comment" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351628122698-2">
+        <addColumn tableName="requisition_item">
+            <column name="recipient_id" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351628122698-3">
+        <addColumn tableName="requisition_item">
+            <column name="substitutable" type="BIT">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351628122698-4">
+        <addNotNullConstraint columnDataType="CHAR(38)" columnName="product_id" defaultNullValue=""
+                              tableName="requisition_item"/>
+    </changeSet>
+    <changeSet author="adminuser (generated)" id="1351628122698-5">
+        <addForeignKeyConstraint baseColumnNames="recipient_id" baseTableName="requisition_item"
+                                 constraintName="requisition_item_ibfk_1" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+</databaseChangeLog>

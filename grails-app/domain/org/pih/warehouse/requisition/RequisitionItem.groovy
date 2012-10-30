@@ -56,6 +56,8 @@ class RequisitionItem implements Serializable {
 		quantity(nullable:false, min:1)
 		unitPrice(nullable:true)
         substitutable(nullable:false)
+        comment(nullable:true)
+        recipient(nullable:true)
 	}
 
 	

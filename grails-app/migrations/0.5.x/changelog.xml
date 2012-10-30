@@ -6,5 +6,7 @@
 	<include file="0.5.x/alter-table-engine-innodb.xml"/>
 	<include file="0.5.x/rename-request-to-requisition.xml"/>
 	<include file="0.5.x/add-requested_delivery_date-to-requisition.xml"/>
+	<include file="0.5.x/add_comment_recipient_substitutable_to_requisition_item.xml"/>
+
 
 </databaseChangeLog>
