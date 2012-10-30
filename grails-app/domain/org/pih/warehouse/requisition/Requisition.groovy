@@ -63,7 +63,7 @@ class Requisition implements Serializable {
 	User createdBy
 	User updatedBy
 	
-	static hasMany = [ requestItems : RequisitionItem, comments : Comment, documents : Document, events : Event ]
+	static hasMany = [ requisitionItems: RequisitionItem, comments : Comment, documents : Document, events : Event ]
 	static mapping = {
 		id generator: 'uuid'
 		requestItems cascade: "all-delete-orphan", sort: "id"

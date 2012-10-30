@@ -25,7 +25,7 @@
 	            		<g:render template="summary" model="[requestInstance:requestInstance]"/>
 		                <table>
 		                    <tbody>
-		                        <g:each var="requestItem" in="${requestInstance?.requestItems }">
+		                        <g:each var="requestItem" in="${requestInstance?.requisitionItems }">
 									<tr class='prop'>
 										<td valign='top'>
 											<format:metadata obj="${requestItem.displayName()}"/>

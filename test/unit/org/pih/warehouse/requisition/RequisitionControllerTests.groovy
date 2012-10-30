@@ -6,6 +6,8 @@ import grails.test.ControllerUnitTestCase
 import org.springframework.mock.web.MockHttpServletResponse
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.product.Product
+import grails.converters.JSON
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,7 +32,7 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         controller.metaClass.warehouse = stubMessager;
 
         def requisitionServiceMock = mockFor(RequisitionService)
-        requisitionServiceMock.demand.save { requisition -> requisition.id = "6677" }
+        requisitionServiceMock.demand.saveRequisition { requisition -> requisition.id = "6677" }
         controller.requisitionService = requisitionServiceMock.createMock()
 
         def location = new Location(id:"1234")
@@ -61,23 +63,71 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         requisitionServiceMock.verify()
     }
 
-//    def testSaveItem() {
-//        def requisitionServiceMock = mockFor(RequisitionService)
-//        requisitionServiceMock.demand.saveRequestItems {  }
-//        controller.requisitionService = requisitionServiceMock.createMock()
-//
-//        controller.params.requisitionItem.description = "testRequisitionItem"
-//        controller.params.requisitionItem.quantity = 50
-//
-//        controller.saveRequestItems()
-//
-//        def model = renderArgs.model
-//
-//        assert model.requisitionItems.description == "testRequisitionItem"
-//        assert model.requisitionItems.quantity == 50
-//        assert renderArgs.view == "edit"
-//
-//    }
+    def testSaveItemSucceeded() {
+
+        def product = new Product(id:"product1")
+        mockDomain(Product, [product])
+
+        def requisition = new Requisition(id:"requisition1")
+        mockDomain(Requisition, [requisition])
+
+        def person = new Person(id:"person1")
+        mockDomain(Person, [person])
+
+        def requisitionServiceMock = mockFor(RequisitionService)
+        requisitionServiceMock.demand.saveRequisitionItem { requisitionItem -> requisitionItem.id = "abc3344" }
+        controller.requisitionService = requisitionServiceMock.createMock()
+
+        controller.params.requisition = [id:requisition.id]
+        controller.params.product = [id:product.id]
+        controller.params.substitutable = true
+        controller.params.recipient = [id:person.id]
+        controller.params.comment = "testRequisitionItem"
+        controller.params.quantity = 50
+
+        controller.saveRequisitionItem()
+
+        def jsonResponse = JSON.parse(controller.response.contentAsString)
+
+        assert jsonResponse.requisitionItem.id == "abc3344"
+        assert jsonResponse.success == true
+
+    }
+
+    def testSaveItemFailed() {
+        mockForConstraintsTests(RequisitionItem)
+        def product = new Product(id:"product1")
+        mockDomain(Product, [product])
+
+        def requisition = new Requisition(id:"requisition1")
+        mockDomain(Requisition, [requisition])
+
+        def person = new Person(id:"person1")
+        mockDomain(Person, [person])
+
+        def requisitionServiceMock = mockFor(RequisitionService)
+        def bindedItem;
+        requisitionServiceMock.demand.saveRequisitionItem { requisitionItem ->
+            bindedItem = requisitionItem
+            requisitionItem.validate() }
+        controller.requisitionService = requisitionServiceMock.createMock()
+
+
+        controller.saveRequisitionItem()
+
+        def jsonResponse = JSON.parse(controller.response.contentAsString)
+
+
+        assert jsonResponse.success == false
+        def firstError = jsonResponse.errors.first()
+        assert firstError.field
+        assert firstError.defaultMessage
+        assert firstError.arguments
+
+
+
+
+    }
 
 
 }

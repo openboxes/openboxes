@@ -24,7 +24,7 @@
 							<tr class="prop">
 	                            <td valign="top" class="name"><label><warehouse:message code="request.items.label" default="Items" /></label></td>
 	                            <td valign="top" class="value">
-									<g:if test="${requestInstance?.requestItems }">
+									<g:if test="${requestInstance?.requisitionItems }">
 										<table>
 											<thead>
 												<tr class="odd">
@@ -35,7 +35,7 @@
 												</tr>
 											</thead>									
 											<tbody>
-												<g:each var="requestItem" in="${requestInstance?.requestItems}" status="i">
+												<g:each var="requestItem" in="${requestInstance?.requisitionItems}" status="i">
 													<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 														<td>
 															<g:if test="${requestItem?.product }">

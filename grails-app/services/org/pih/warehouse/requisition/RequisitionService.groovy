@@ -16,8 +16,6 @@ import org.pih.warehouse.core.Person;
 
 
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.requisition.RequisitionItem;
-
 
 class RequisitionService {
 
@@ -114,7 +112,7 @@ class RequisitionService {
 		requestCommand.requestedBy = Person.get(requestInstance?.requestedBy?.id)
 		requestCommand.dateRequested = requestInstance?.dateRequested
 		requestCommand.requisition = requestInstance;
-		requestInstance?.requestItems?.each {
+		requestInstance?.requisitionItems?.each {
 			def requestItemCommand = new RequisitionItemCommand();
 			requestItemCommand.primary = true;
 			requestItemCommand.requisitionItem = it
@@ -294,11 +292,11 @@ class RequisitionService {
 	}
 
 
-    boolean save(Requisition requisition) {
+    boolean saveRequisition(Requisition requisition) {
         requisition.save()
     }
 
-//    boolean saveRequestItem(RequisitionItem requisitionItem) {
-//        requisitionItem.save()
-//    }
+    boolean saveRequisitionItem(RequisitionItem requisitionItem) {
+        requisitionItem.save()
+    }
 }

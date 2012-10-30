@@ -30,7 +30,9 @@ class RequisitionItem implements Serializable {
 	Integer quantity
 	Float unitPrice	
 	Person requestedBy	// the person who actually requested the item
-	
+	Boolean substitutable = false
+    Person recipient
+    String comment
 	
 	// Audit fields
 	Date dateCreated
@@ -47,12 +49,13 @@ class RequisitionItem implements Serializable {
     static constraints = {
     	description(nullable:true)
 		category(nullable:true)
-		product(nullable:true)
+		product(nullable:false)
 		productGroup(nullable:true)
 		inventoryItem(nullable:true)
 		requestedBy(nullable:true)
 		quantity(nullable:false, min:1)
 		unitPrice(nullable:true)
+        substitutable(nullable:false)
 	}
 
 	
