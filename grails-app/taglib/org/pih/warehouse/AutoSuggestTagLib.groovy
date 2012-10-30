@@ -44,7 +44,7 @@ class AutoSuggestTagLib {
 		def width = (attrs.width) ? attrs.width : '300px';
 		def minLength = (attrs.minLength) ? attrs.minLength : 1;
 		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "";
-		def styleClass = (attrs.styleClass) ?: ""
+		def styleClass = "autocomplete (attrs.styleClass) ?: ''"
 		def placeholder = attrs.placeholder ?: ""
 		
 		def showValue = (valueName && valueId) ? true : false;
@@ -52,6 +52,7 @@ class AutoSuggestTagLib {
 		//def suggestDisplay = (showValue) ? "none" : "inline";
 		def spanDisplay = "none";
 		def suggestDisplay = "inline";
+
 		
 		def html = """
 				<span id="${id}-span" class="span" style="text-align: left; display: ${spanDisplay};">${valueName}</span>
@@ -104,6 +105,7 @@ class AutoSuggestTagLib {
 									\$(this).prev().val(ui.item.value);
 									\$(this).val(ui.item.valueText);
 								}
+								\$("#${id}-suggest").trigger("selected");
 								return false;
 							}
 						});

@@ -44,6 +44,11 @@
 				return false;
 			}
 			*/
+
+            select: function(event, ur){
+               \$("#autosuggest-${attrs.id}").trigger('selected');
+                return false;
+            }
 		});
 	});
 </script>

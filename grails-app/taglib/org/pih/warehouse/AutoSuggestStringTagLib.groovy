@@ -87,6 +87,7 @@ class AutoSuggestStringTagLib {
 								//alert("selected " + ui.item.value + " " + ui.item.valueText);
 								\$('#${id}').val(ui.item.value);
 								\$('#${id}-suggest').val(ui.item.valueText);
+								\$('#${id}-suggest').trigger('selected');
 								return false;
 							}
 						});
