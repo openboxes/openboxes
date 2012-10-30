@@ -62,10 +62,16 @@ class RequisitionController {
         if (requisitionService.save(requisition))
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), requisition.id])}"
 
-
         render(view: "edit", model: [requisition: requisition])
-
     }
+
+//    def saveRequestItem = {
+//        def requisitionItem = new RequisitionItem(params)
+//        if (requisitionService.saveRequestItems(requisitionItem))
+//            flash.message = "saved"
+//
+//        render(view: "edit", model: [requisitionItem: requisitionItem])
+//    }
 	
     def show = {
         def requestInstance = Requisition.get(params.id)

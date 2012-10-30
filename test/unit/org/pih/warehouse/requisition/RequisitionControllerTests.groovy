@@ -61,5 +61,23 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         requisitionServiceMock.verify()
     }
 
+//    def testSaveItem() {
+//        def requisitionServiceMock = mockFor(RequisitionService)
+//        requisitionServiceMock.demand.saveRequestItems {  }
+//        controller.requisitionService = requisitionServiceMock.createMock()
+//
+//        controller.params.requisitionItem.description = "testRequisitionItem"
+//        controller.params.requisitionItem.quantity = 50
+//
+//        controller.saveRequestItems()
+//
+//        def model = renderArgs.model
+//
+//        assert model.requisitionItems.description == "testRequisitionItem"
+//        assert model.requisitionItems.quantity == 50
+//        assert renderArgs.view == "edit"
+//
+//    }
+
 
 }

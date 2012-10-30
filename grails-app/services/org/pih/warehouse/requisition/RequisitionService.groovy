@@ -15,7 +15,8 @@ import org.pih.warehouse.core.LocationType;
 import org.pih.warehouse.core.Person;
 
 
-import org.pih.warehouse.product.Product;
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.requisition.RequisitionItem;
 
 
 class RequisitionService {
@@ -296,4 +297,8 @@ class RequisitionService {
     boolean save(Requisition requisition) {
         requisition.save()
     }
+
+//    boolean saveRequestItem(RequisitionItem requisitionItem) {
+//        requisitionItem.save()
+//    }
 }
