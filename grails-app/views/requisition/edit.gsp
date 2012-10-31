@@ -91,7 +91,7 @@
                                 <td valign="top" class="name"><label><warehouse:message code="requisition.dateRequested.label"/></label></td>
                                 <td class="value ${hasErrors(bean: requisition, field: 'dateRequested', 'errors')}">
                                     <g:jqueryDatePicker id="dateRequested" name="dateRequested"
-                                        value="${requisition.dateRequested ?: new Date()}" format="MM/dd/yyyy" maxDate="${new Date()}"/>
+                                        value="${requisition.dateRequested}" format="MM/dd/yyyy" maxDate="${new Date()}"/>
                                 </td>
                             </tr>
                         
@@ -99,7 +99,7 @@
                                 <td valign="top" class="name"><label><warehouse:message code="requisition.requestedDeliveryDate.label"/></label></td>
                                 <td class="value ${hasErrors(bean: requisition, field: 'requestedDeliveryDate', 'errors')}">
                                     <g:jqueryDatePicker id="requestedDeliveryDate" name="requestedDeliveryDate"
-                                        value="${requisition.requestedDeliveryDate ?: new Date().plus(1)}" format="MM/dd/yyyy" minDate="${new Date().plus(1)}"/>
+                                        value="${requisition.requestedDeliveryDate}" format="MM/dd/yyyy" minDate="${new Date().plus(1)}"/>
                                 </td>
                             </tr>
 
