@@ -105,7 +105,7 @@ class AuthController {
 		}
 		else {
 			flash.message = "${warehouse.message(code: 'auth.userNotFound.message', args: [params.username])}"	
-			redirect(action:login)
+			redirect(action:'login')
 		}
 	}
 	
@@ -132,8 +132,9 @@ class AuthController {
 	 * Handle account registration.
 	 */
 	def handleSignup = { 		
-		if ("POST".equalsIgnoreCase(request.getMethod())) { 
-			def userInstance = new User();
+		
+		def userInstance = new User();
+		if ("POST".equalsIgnoreCase(request.getMethod())) { 			
 			userInstance.properties = params
 			userInstance.password = params.password.encodeAsPassword();
 			userInstance.passwordConfirm = params.passwordConfirm.encodeAsPassword();			
@@ -142,6 +143,7 @@ class AuthController {
 			// Create account 
 			if (!userInstance.hasErrors() && userInstance.save(flush: true)) {				
 				session.user = userInstance;				
+				
 				try {
 					def recipients = [ ];
 					def roleAdmin = Role.findByRoleType(RoleType.ROLE_ADMIN)
@@ -152,6 +154,8 @@ class AuthController {
 								eq("id", roleAdmin.id)
 							}
 						}
+						
+						// Send email to administrators
 						if (recipients) {							
 							def to = recipients?.collect { it.email }?.unique()							
 							def subject = "${warehouse.message(code: 'email.userAccountCreated.message', args: [userInstance.username])}"							
@@ -162,7 +166,7 @@ class AuthController {
 				
 					// Send confirmation email to user 
 					if (userInstance.email) { 
-						def subject = "${warehouse.message(code: 'email.userAccountConfirmed.message')}"
+						def subject = "${warehouse.message(code: 'email.userAccountConfirmed.message', args: [userInstance.email])}"
 						def body = g.render(template:"/email/userAccountConfirmed", model:[userInstance:userInstance])
 						mailService.sendHtmlMail(subject, body.toString(), userInstance.email);
 					}
@@ -170,8 +174,6 @@ class AuthController {
 					log.error("Unable to send emails: " + e.message)
 				}
 				
-				flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'user.label'), userInstance.username])}"
-				redirect(action:"login")
 			}			
 			else { 
 				// Reset the password to what the user entered
@@ -181,6 +183,11 @@ class AuthController {
 				render(view: "signup", model: [userInstance : userInstance]);
 			}
 		}		
+		
+		// FIXME For some reason, flash.message does not get displayed on redirect
+		//flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'user.label'), userInstance.email])}"
+		redirect(action:"login")
+
 	}
 
 }

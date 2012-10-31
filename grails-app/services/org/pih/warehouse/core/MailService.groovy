@@ -126,7 +126,7 @@ class MailService {
 	 */
 	def sendHtmlMail(String subject, String htmlMessage, String to) {
 		log.debug "Sending email to '" + to + "'"
-		sendHtmlMail(subject, htmlMessage, to)
+		sendHtmlMail(subject, htmlMessage, [to])
 	}
 	
 	
@@ -139,7 +139,6 @@ class MailService {
 	 */
 	def sendHtmlMail(String subject, String body, Collection to) { 	
 		log.debug "Sending email to " + to
-		println "${config.grails.mail.bcc}"
 		//def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)			
 		if (isMailEnabled()) { 		
 			log.info "Sending html email '" + subject + "' to " + to; 

@@ -22,10 +22,9 @@
 			  
 		    <div class="dialog">
 				<div id="loginForm">
-				
 					<g:if test="${flash.message}">
 					    <div class="message">${flash.message}</div>
-					</g:if>				
+					</g:if>	
 				
 					<g:hasErrors bean="${userInstance}">
 					   <div class="errors">
