@@ -172,5 +172,5 @@ class Container implements Comparable, java.io.Serializable {
 			return 0.0
 		}
 	}	
-		
+
 }

@@ -32,9 +32,9 @@ class ViewShipmentPage extends Page {
         }
         //def row = $(".shipmentItem").find{it.find(".product", text:contains(product))}
         assert row != null
-        assert row.find(".quantity", text:contains(quantity))
-        assert row.find(".container", text:contains(container_unit) )
-        assert row.find(".container", text:contains(container_details))
+        assert row.find(".quantity").text().trim().contains(quantity)
+        assert row.find(".container").text().trim().contains(container_unit)
+        assert row.find(".container").text().trim().contains(container_details)
         true
     }
 }
