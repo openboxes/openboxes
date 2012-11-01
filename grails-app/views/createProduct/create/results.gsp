@@ -8,9 +8,6 @@
     <body>
     	<div class="body">
     	
-			<g:if test="${message}">
-				<div class="message">${message}</div>
-			</g:if>
 			<g:hasErrors bean="${search}">
 				<div class="errors">
 					<g:renderErrors bean="${search}" as="list" />

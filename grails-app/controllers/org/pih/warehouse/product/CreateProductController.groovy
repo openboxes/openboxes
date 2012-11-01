@@ -12,6 +12,7 @@ package org.pih.warehouse.product
 import java.util.Set;
 
 import org.hibernate.exception.ConstraintViolationException;
+import org.pih.warehouse.core.ApiException;
 import org.pih.warehouse.core.Constants;
 import org.pih.warehouse.core.MailService;
 import org.pih.warehouse.core.Person;
@@ -57,9 +58,12 @@ class CreateProductController {
 					flow.search = search
 					return error();
 				}				
-				
-				productService.findGoogleProducts(search)
-				
+				try { 
+					productService.findGoogleProducts(search)
+				} catch (ApiException e) { 
+					flash.message = e.message
+					return error();
+				}
 				//def searchTerms = search?.searchTerms?.split(" ").toList()
 				//flow.localResults = productService.findProducts(searchTerms)
 				//flow.googleResults = productService.findGoogleProducts(search?.searchTerms)
@@ -89,7 +93,12 @@ class CreateProductController {
 					//flow.googleResults = productService.findGoogleProducts(search?.searchTerms)
 				//}				
 				if (search.searchTerms) { 
-					productService.findGoogleProducts(search)
+					try { 
+						productService.findGoogleProducts(search)
+					} catch (ApiException e) { 
+						flash.message = e.message
+						return error();
+					}
 				}
 				
 				[search:search]
@@ -126,7 +135,13 @@ class CreateProductController {
 					//def searchTerms = search?.searchTerms?.split(" ")?.toList()
 					search?.startIndex -= 25
 					//flow.googleResults = productService.findGoogleProducts(search?.searchTerms, search?.startIndex, true)
-					productService.findGoogleProducts(search)
+					try { 
+						productService.findGoogleProducts(search)
+					} catch (ApiException e) { 
+						//flash.message = e.message
+						return error();
+					
+					}
 				}
 				[search : search]
 			}.to("results")
@@ -135,7 +150,12 @@ class CreateProductController {
 					//def searchTerms = search?.searchTerms?.split(" ")?.toList()
 					search?.startIndex += 25
 					//flow.googleResults = productService.findGoogleProducts(search?.searchTerms, search?.startIndex, true)
-					productService.findGoogleProducts(search)
+					try { 
+						productService.findGoogleProducts(search)
+					} catch (ApiException e) { 
+						//flash.message = e.message
+						return error();
+					}
 				}
 				[ search : search ]
 			}.to("results")

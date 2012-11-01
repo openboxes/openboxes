@@ -54,10 +54,18 @@
 			                      <tbody>                
 									<tr class="prop">
 										<td valign="top" class="name"><label for="name"><warehouse:message
-											code="default.description.label" /></label></td>
+											code="product.title.label" /></label></td>
 										<td valign="top"
 											class="value ${hasErrors(bean: productInstance, field: 'name', 'errors')}">
 											<g:textField name="name" value="${productInstance?.name}" size="80" class="medium text" />									
+										</td>
+									</tr>
+									<tr class="prop">
+										<td valign="top" class="name"><label for="description"><warehouse:message
+											code="product.description.label" /></label></td>
+										<td valign="top"
+											class="value ${hasErrors(bean: productInstance, field: 'description', 'errors')}">
+											<g:textArea name="description" value="${productInstance?.description}" class="medium text" cols="80" rows="6"/>									
 										</td>
 									</tr>
 									

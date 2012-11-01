@@ -110,7 +110,7 @@ class Product implements Comparable, Serializable {
 		
     static constraints = {
 		name(nullable:false, blank: false, maxSize: 255)
-		description(nullable:true, maxSize: 255)
+		description(nullable:true)
 		productCode(nullable:true, maxSize: 255)
 		unitOfMeasure(nullable:true, maxSize: 255)
 		category(nullable:false)

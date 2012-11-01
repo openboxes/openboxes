@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.product
 
+
 import java.io.ExpiringCache.Entry;
 import java.util.List;
 
@@ -16,17 +17,11 @@ import groovy.xml.Namespace;
 
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.importer.ImportDataCommand;
-
-import com.amazon.advertising.api.sample.SignedRequestsHelper;
+import org.pih.warehouse.core.ApiException;
 
 
 /**
  * Keys
- * 
- * HIPAASpace.com: 6BB8325D3C4F42AEBDC8F9584CA85C8D79815FA7F6194AD79793BF512981E84B
- * Google: AIzaSyCAEGyY6QpPbm3DiHmtx6qIZ_P40FnF3vk
- * Amazon: AKIAIURBRRWNL27USFDQ, eQb+QZSGDJxiWdGHjJkdVyBQI4qBnc8lKmPFyYIS
- * RXNorm(http://rxnav.nlm.nih.gov/REST/): bff71b0439e75797f6af27b220eefe7b9b0b989d
  * 
  * @author jmiranda
  *
@@ -35,46 +30,30 @@ class ProductService {
 	
 	def grailsApplication
 	
-	private static final String ENDPOINT = "ecs.amazonaws.com";
-	private static final String AWS_SECRET_KEY = "put your secret key here";
-	private static final String AWS_ACCESS_KEY_ID = "put your access key here";
-	
-	def findAmazonProducts() { 
-		SignedRequestsHelper helper = SignedRequestsHelper.getInstance(ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_KEY);
-		
-	    String requestUrl = null;
-	    String title = null;
-	
-	    Map params = new HashMap();
-	    params.put("Service", "AWSECommerceService");
-	    params.put("Version", "2009-03-31");
-	    params.put("Operation", "ItemLookup");
-	    params.put("ItemId", asin);
-	    params.put("ResponseGroup", "Small,Medium");
-	
-	    requestUrl = helper.sign(params);
-	
-	    def xml = new URL(requestUrl).text
-	    return new XmlSlurper().parseText(xml)
+	/**
+	 * 	
+	 * @param query
+	 * @return
+	 */
+	def getNdcProduct(query) { 
+		return getNdcResults("getcode", query)
 	}
 	
-	def getNdcProduct(q) { 
-		String urlString = "http://www.HIPAASpace.com/api/ndc/getcode?q=${q?.encodeAsURL()}&rt=xml&token=6BB8325D3C4F42AEBDC8F9584CA85C8D79815FA7F6194AD79793BF512981E84B"
-		return getNdcResults(urlString)
-	}
 	/**
 	 * 
 	 */
 	def findNdcProducts(search) {
-		String q = search.searchTerms?:"";
-		String urlString = "http://www.HIPAASpace.com/api/ndc/search?q=${q?.encodeAsURL()}&rt=xml&token=6BB8325D3C4F42AEBDC8F9584CA85C8D79815FA7F6194AD79793BF512981E84B"
-		return getNdcResults(urlString)
+		String query = search.searchTerms?:"";
+		return getNdcResults("search", query)
 	}
 
-	def getNdcResults(urlString) { 
+	def getNdcResults(operation, q) { 
+		def hipaaspaceApiKey = grailsApplication.config.hipaaspace.api.key
+		if (!hipaaspaceApiKey) {
+			throw new ApiException(message: "Your administrator must specify Hipaaspace.com API key (hipaaspace.api.key) in configuration file (openboxes-config.properties).  Sign up at <a href='http://www.hipaaspace.com/myaccount/login.aspx?ReturnUrl=%2fmyaccount%2fdefault.aspx' target='_blank'>hipaaspace.com</a>.")
+		}		
 		try {
-			println "URL " + urlString
-			def url = new URL(urlString)
+			def url = new URL("http://www.HIPAASpace.com/api/ndc/search?q=${q?.encodeAsURL()}&rt=xml&key=${hipaaspaceApiKey}")
 			def connection = url.openConnection()
 			if(connection.responseCode == 200){
 				def xml = connection.content.text
@@ -86,7 +65,7 @@ class ProductService {
 			}
 		} catch (Exception e) {
 			log.error("Error trying to get products from NDC API ", e);
-			throw e
+			throw new ApiException(message: "Unable to query NDC database: " + e.message)
 		}
 	}
 		
@@ -156,30 +135,22 @@ class ProductService {
 	}
 	
 	/**
-	 * Examples 
-	 * 
-	 * RxNorm
-	 * 
-	 * UPC Database
-	 * http://www.upcdatabase.com/item/048001006812
-	 * 
-	 * Search UPC
-	 * http://www.searchupc.com/default.aspx?q=048001006812
-	 * 
-	 * Google Product Search
-	 * https://www.googleapis.com/shopping/search/v1/public/products?key=AIzaSyCAEGyY6QpPbm3DiHmtx6qIZ_P40FnF3vk&country=US&q=${q}&alt=scp&crowdBy=brand:1
-	 * 
 	 * @param q
 	 * @return
 	 */
 	def findGoogleProducts(search) {
+		
+		def googleProductSearchKey = grailsApplication.config.google.api.key
+		if (!googleProductSearchKey) { 
+			throw new ApiException(message: "Your administrator must specify Google API key (google.api.key) in configuration file (openboxes-config.properties).  For more information, see Google's <a href='https://developers.google.com/shopping-search/v1/getting_started#getting-started' target='_blank'>Getting Started</a> guide")
+		}
 		def products = new ArrayList();
 		int startIndex = search.startIndex;
 		String q = search.searchTerms; 
 		boolean spellingEnabled = search.spellingEnabled
 		 
 		def urlString = "https://www.googleapis.com/shopping/search/v1/public/products?" + 
-			"key=AIzaSyCAEGyY6QpPbm3DiHmtx6qIZ_P40FnF3vk&country=US&q=${q.encodeAsURL()}&alt=atom&crowdBy=brand:1";
+			"key=${googleProductSearchKey}&country=US&q=${q.encodeAsURL()}&alt=atom&crowdBy=brand:1";
 		if (startIndex > 0) { 			
 			urlString += "&startIndex=" + startIndex
 		}
@@ -188,113 +159,56 @@ class ProductService {
 		}
 		def url = new URL(urlString)
 		def connection = url.openConnection()
-		println "Query string = " + q + " startIndex " + startIndex
-		println "URL " + urlString
-		try { 
-			if(connection.responseCode == 200){
-				def xml = connection.content.text			
-				//  <feed gd:kind="shopping#products" 
-				// gd:etag="&quot;s_TKVMJ0f6e67wg989LFuFzazq0/0m3WlwDtAy5plGxzl-bgZJM-ufI&quot;" 
-				// xmlns="http://www.w3.org/2005/Atom" 
-				// xmlns:gd="http://schemas.google.com/g/2005" 
-				// xmlns:openSearch="http://a9.com/-/spec/opensearchrss/1.0/" 
-				// xmlns:s="http://www.google.com/shopping/api/schemas/2010">
-	
-				//def root = new XmlSlurper().parseText(blog).declareNamespace(dc: "http://purl.org/dc/elements/1.1/");
-				//root.channel.item.findAll { item ->
-				//	d.any{entry -> item."dc:date".text() =~ entry.key} && a.any{entry -> item.tags.text() =~ entry
-				//}
-	
-				println "XML = \n" + xml
-				
-				def feed = new XmlParser(false, true).parseText(xml)
-				
-				def ns = new Namespace("http://www.google.com/shopping/api/schemas/2010", "s")
-				def openSearch = new Namespace("http://a9.com/-/spec/opensearchrss/1.0/", "openSearch")
-				
-				
-				search.totalResults = Integer.valueOf(feed[openSearch.totalResults].text())
-				search.startIndex = Integer.valueOf(feed[openSearch.startIndex].text())
-				search.itemsPerPage = Integer.valueOf(feed[openSearch.itemsPerPage].text())
-				
+		if(connection.responseCode == 200){
+			def xml = connection.content.text			
+			def feed = new XmlParser(false, true).parseText(xml)
+			
+			def ns = new Namespace("http://www.google.com/shopping/api/schemas/2010", "s")
+			def openSearch = new Namespace("http://a9.com/-/spec/opensearchrss/1.0/", "openSearch")
 
-				feed.entry.each { entry ->
+			search.totalResults = Integer.valueOf(feed[openSearch.totalResults].text())
+			search.startIndex = Integer.valueOf(feed[openSearch.startIndex].text())
+			search.itemsPerPage = Integer.valueOf(feed[openSearch.itemsPerPage].text())
+			
+			feed.entry.each { entry ->
 
-					//println entry
-					def product = new ProductDetailsCommand()
-					
-					product.link = entry[ns.product][ns.link].text()
-					product.author = entry.author.name.text()
-					
-					
-					entry.link.each { link ->						
-						product.links[link.'@rel'] = link.'@href'
-					}
-					//println "categories: " + entry[ns.product][ns.categories][ns.category]
-					
-					product.id = entry.id.text()
-					product.googleId = entry[ns.product][ns.googleId].text()
-					// <a href='${productUrl}'></a>
-					//product.category = getRootCategory();
-					product.title = entry[ns.product][ns.title].text()
-					product.description = entry[ns.product][ns.description].text()
-					product.brand = entry[ns.product][ns.brand].text()
-					//product.gtins << entry[ns.product][ns.gtin].text()
-					// HACK iterates over all images, but only keeps the last one
-					// Need to add these to product->documents 
-					//def imageLinks = ""
-					product.gtin = entry[ns.product][ns.gtin].text()
-					entry[ns.product][ns.gtins][ns.gtin].each { gtin ->						
-						product.gtins << gtin.text()
-					}
-					entry[ns.product][ns.images][ns.image].each { image ->
-						product.images << image.'@link'
-					}
-					
-					
-					search.results << product
-				}
-				/*
-				def root = new XmlSlurper().parseText(xml).
-					declareNamespace(s: "http://www.google.com/shopping/api/schemas/2010")
+				def product = new ProductDetailsCommand()
 				
-				root.entry.each { entry ->
-					def product = new Product()
-					product.name = entry.title
-					println " * " + product.name
-					product.description = entry."s:product"."s:description".text()
-					def link = entry."s:product"."s:link".text()
-					product.description += "<br/><a href='" + link + "'>click here</a>" 
-					product.manufacturer= entry."s:product"."s:brand".text()
-					product.upc = entry."s:product"."s:gtin".text()
-					product.manufacturer += " (" + entry."s:product"."s:author"."s:name".text() + ")"
-					//println "\timages -> " + entry["s:product"]["s:images"]
-					//entry["s:product"]["s:images"].each { image ->
-					//	println "\timage -> " + image
-					//}
-					
-					
-					product.category = getRootCategory();
-					products << product
-					//result.name = geonames.geoname.name as String
-					//result.lat = geonames.geoname.lat as String
-					//result.lng = geonames.geoname.lng as String
-					//result.state = geonames.geoname.adminCode1 as String
-					//result.country = geonames.geoname.countryCode as String
-				}
-				*/
+				product.link = entry[ns.product][ns.link].text()
+				product.author = entry.author.name.text()
 				
-			}
-			else{
-				log.error(url)
-				log.error(connection.responseCode)
-				log.error(connection.responseMessage)
-				throw new Exception(connection.responseMessage)
-			}		
-		} catch (Exception e) { 
-			log.error("Error trying to get products from Google API ", e);
-		
+				
+				entry.link.each { link ->						
+					product.links[link.'@rel'] = link.'@href'
+				}
+				//println "categories: " + entry[ns.product][ns.categories][ns.category]
+				
+				product.id = entry.id.text()
+				product.googleId = entry[ns.product][ns.googleId].text()
+				product.title = entry[ns.product][ns.title].text()
+				product.description = entry[ns.product][ns.description].text()
+				product.brand = entry[ns.product][ns.brand].text()
+				//product.gtins << entry[ns.product][ns.gtin].text()
+				// HACK iterates over all images, but only keeps the last one
+				// Need to add these to product->documents 
+				//def imageLinks = ""
+				product.gtin = entry[ns.product][ns.gtin].text()
+				entry[ns.product][ns.gtins][ns.gtin].each { gtin ->						
+					product.gtins << gtin.text()
+				}
+				entry[ns.product][ns.images][ns.image].each { image ->
+					product.images << image.'@link'
+				}
+				search.results << product
+			}			
 		}
+		else {			
+			log.info("URL: " + url)
+			log.info("Response Code: " + connection.responseCode)
+			log.info("Response Message: " + connection.responseMessage)
+			//log.info("Response: " + connection.content)
+			throw new ApiException("Unable to connect to Google Product Search API using connection URL [" + urlString + "]: " + connection.responseMessage)
+		}		
 		
 	}
 	

@@ -19,7 +19,7 @@
 			</div>
 		</g:if>
 		<h1><warehouse:message code="notFound.label" default="Page Not Found"/></h1>
-		<div>
+		<div style="width: 25%;">
 			<div class="triangle-isosceles">
 				Apologies, but we can't find the page you're looking for. 
 			</div>
