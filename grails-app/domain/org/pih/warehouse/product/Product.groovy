@@ -105,7 +105,7 @@ class Product implements Comparable, Serializable {
 		categories joinTable: [name:'product_category', column: 'category_id', key: 'product_id']
 		attributes joinTable: [name:'product_attribute', column: 'attribute_id', key: 'product_id']
 		documents joinTable: [name:'product_document', column: 'document_id', key: 'product_id']
-		productGroups joinTable: [name:'product_group_product', column: 'product_group_id', key: 'product_group_id']		
+		productGroups joinTable: [name:'product_group_product', column: 'product_group_id', key: 'product_id']
 	}
 		
     static constraints = {

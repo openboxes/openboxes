@@ -22,7 +22,7 @@ class ProductGroup implements Comparable, Serializable {
 	String description	
 	Category category 
 	
-	List products
+	//List products
 	
 	// Auditing
 	Date dateCreated;
@@ -32,7 +32,7 @@ class ProductGroup implements Comparable, Serializable {
 	static hasMany = [ products : Product ]
 	static mapping = {
 		id generator: 'uuid'
-		products joinTable: [name:'product_group_product', column: 'product_group_id', key: 'product_id']		
+		products joinTable: [name:'product_group_product', column: 'product_id', key: 'product_group_id']
 	}
 		
 	

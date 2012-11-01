@@ -973,7 +973,7 @@
             <column name="manager_id" value="1"/>
             <column name="password" value="password"/>
             <column name="username" value="manager"/>
-            <column name="warehouse_id" value="4"/>
+            <column name="warehouse_id" value="1"/>
             <column name="photo"/>
             <column name="locale"/>
             <column name="remember_last_location"/>

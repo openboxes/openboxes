@@ -22,6 +22,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.shipping.ShipmentItem
 
 
+
 class BootStrap {
 
 	DataSource dataSource;
@@ -111,18 +112,18 @@ class BootStrap {
         assert medicines != null
         assert suppliers != null
         def  testData = [
-         ['expiration':new Date().plus(3), 'quantity':10000, 'product':  new Product(category: medicines, name: "Advil 200mg", manufacturer:"ABC", productCode:"00001",manufacturerCode:"9001" )]
-        ,['expiration':new Date().plus(20), 'quantity':10000, 'product': new Product(category: medicines, name: "Tylenol 325mg", manufacturer:"MedicalGait", productCode:"00002",manufacturerCode:"9002" )]
-        ,['expiration':new Date().plus(120), 'quantity':10000, 'product': new Product(category: medicines, name: "Aspirin 20mg", manufacturer:"ABC", productCode:"00003",manufacturerCode:"9001" ) ]
-        ,['expiration':new Date().plus(200), 'quantity':10000, 'product': new Product(category: medicines, name: "General Pain Reliever", manufacturer:"MedicalGait", productCode:"00004",manufacturerCode:"9002" )]
-        ,['expiration':new Date().minus(1), 'quantity':10000, 'product': new Product(category: medicines, name: "Similac Advance low iron 400g", manufacturer:"ABC", productCode:"00005",manufacturerCode:"9001" )]
-        ,['expiration':new Date().minus(30), 'quantity':10000, 'product' : new Product(category: medicines, name: "Similac Advance + iron 365g", manufacturer:"MedicalGait", productCode:"00006",manufacturerCode:"9002" ) ]
-        ,['expiration':new Date().plus(1000), 'quantity':10000, 'product':new Product(category: suppliers, name: "MacBook Pro 8G", manufacturer:"Apple", productCode:"00007",manufacturerCode:"9003" ) ]
-        ,['expiration':null, 'quantity':10000, 'product': new Product(category: suppliers, name: "Print Paper A4", manufacturer:"DSC", productCode:"00008",manufacturerCode:"9004" )]
+         ['expiration':new Date().plus(3), 'productGroup':'PainKiller','quantity':10000, 'product':  new Product(category: medicines, name: "Advil 200mg", manufacturer:"ABC", productCode:"00001",manufacturerCode:"9001" )]
+        ,['expiration':new Date().plus(20),'productGroup':'PainKiller', 'quantity':10000, 'product': new Product(category: medicines, name: "Tylenol 325mg", manufacturer:"MedicalGait", productCode:"00002",manufacturerCode:"9002" )]
+        ,['expiration':new Date().plus(120),'productGroup':'PainKiller', 'quantity':10000, 'product': new Product(category: medicines, name: "Aspirin 20mg", manufacturer:"ABC", productCode:"00003",manufacturerCode:"9001" ) ]
+        ,['expiration':new Date().plus(200),'productGroup':'PainKiller', 'quantity':10000, 'product': new Product(category: medicines, name: "General Pain Reliever", manufacturer:"MedicalGait", productCode:"00004",manufacturerCode:"9002" )]
+        ,['expiration':new Date().minus(1),'productGroup':'Iron', 'quantity':10000, 'product': new Product(category: medicines, name: "Similac Advance low iron 400g", manufacturer:"ABC", productCode:"00005",manufacturerCode:"9001" )]
+        ,['expiration':new Date().minus(30),'productGroup':'Iron', 'quantity':10000, 'product' : new Product(category: medicines, name: "Similac Advance + iron 365g", manufacturer:"MedicalGait", productCode:"00006",manufacturerCode:"9002" ) ]
+        ,['expiration':new Date().plus(1000), 'productGroup':'Laptop','quantity':10000, 'product':new Product(category: suppliers, name: "MacBook Pro 8G", manufacturer:"Apple", productCode:"00007",manufacturerCode:"9003" ) ]
+        ,['expiration':null, 'productGroup':'Paper','quantity':10000, 'product': new Product(category: suppliers, name: "Print Paper A4", manufacturer:"DSC", productCode:"00008",manufacturerCode:"9004" )]
                 ]
 
 
-        if(Environment.current == Environment.TEST)
+       if(Environment.current == Environment.TEST)
            deleteTestFixture(testData)
 
         createTestFixtureIfNotExist(testData)
@@ -156,16 +157,28 @@ class BootStrap {
             item.delete(failOnError:true,flush:true)
         }
         product.delete(failOnError:true, flush:true)
+
     }
 
      private def addProductAndInventoryItemIfNotExist(Map<String, Object> inventoryItemInfo) {
 
+        def productGroup = ProductGroup.findByDescription(inventoryItemInfo.productGroup)
+        if(!productGroup){
+            productGroup = new ProductGroup(description: inventoryItemInfo.productGroup)
+            productGroup.category = inventoryItemInfo.product.category
+            productGroup.save(failOnError:true,flush:true)
+        }
         def product = Product.findByName(inventoryItemInfo.product.name)
 
         if(!product){
-           inventoryItemInfo.product.save(failOnError:true,flush:true)
-           addInventoryItem(inventoryItemInfo.product, inventoryItemInfo.expiration, inventoryItemInfo.quantity)
+           product = inventoryItemInfo.product
+           product.save(failOnError:true,flush:true)
+           productGroup.addToProducts(product)
+           productGroup.save(failOnError:true,flush:true)
+           addInventoryItem(product, inventoryItemInfo.expiration, inventoryItemInfo.quantity)
         }
+
+
     }
 
 
