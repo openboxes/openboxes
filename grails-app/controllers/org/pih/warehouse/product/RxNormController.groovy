@@ -89,7 +89,7 @@ class RxNormController {
 		
 		def rxnormApiKey = grailsApplication.config.rxnorm.api.key
 		if (!rxnormApiKey) {
-			throw new ApiException(message: "Your administrator must specify RxNorm API key (rxnorm.api.key) in configuration file (openboxes-config.properties).  Sign up at <a href='http://www.hipaaspace.com/myaccount/login.aspx?ReturnUrl=%2fmyaccount%2fdefault.aspx' target='_blank'>hipaaspace.com</a>.")
+			throw new ApiException(message: "Your administrator must specify RxNorm API key (rxnorm.api.key) in configuration file (openboxes-config.properties).  For more information, please go to <a href='http://rxnav.nlm.nih.gov/' target='_blank'>rxnav.nlm.nih.gov</a>.")
 		}
 
 		client.request(GET) {
