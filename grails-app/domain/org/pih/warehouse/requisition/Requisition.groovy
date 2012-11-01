@@ -50,8 +50,8 @@ class Requisition implements Serializable {
 	
 	
 	
-	Date dateRequested
-    Date requestedDeliveryDate
+	Date dateRequested  = new Date()
+    Date requestedDeliveryDate = new Date().plus(1)
 	Date dateValidFrom 
 	Date dateValidTo
 	

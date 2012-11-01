@@ -30,7 +30,7 @@ class ShipmentSpec extends GebReportingSpec{
             expectedShippingDate.click()
             datePicker.today.click()
             expectedArrivalDate.click()
-            datePicker.tomorrow.click()
+            datePicker.pickDate(new Date().plus(1))
             nextButton.click()
         and:
             at EnterTrackingDetailsPage
@@ -74,7 +74,7 @@ class ShipmentSpec extends GebReportingSpec{
             expectedShippingDate.click()
             datePicker.today.click()
             expectedArrivalDate.click()
-            datePicker.tomorrow.click()
+            datePicker.pickDate(new Date().plus(1))
             nextButton.click()
         and:
             at EnterTrackingDetailsPage
@@ -116,7 +116,7 @@ class ShipmentSpec extends GebReportingSpec{
             expectedShippingDate.click()
             datePicker.today.click()
             expectedArrivalDate.click()
-            datePicker.tomorrow.click()
+            datePicker.pickDate(new Date().plus(1))
             nextButton.click()
         and:
             at EnterTrackingDetailsPage

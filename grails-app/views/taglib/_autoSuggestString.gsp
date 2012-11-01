@@ -46,7 +46,7 @@
 			*/
 
             select: function(event, ur){
-               \$("#autosuggest-${attrs.id}").trigger('selected');
+                $("#autosuggest-${attrs.id}").trigger('selected');
                 return false;
             }
 		});

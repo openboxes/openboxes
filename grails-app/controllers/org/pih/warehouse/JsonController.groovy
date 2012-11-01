@@ -414,4 +414,51 @@ class JsonController {
 		}
 		render shipmentItem as JSON
 	}
+
+    def searchProduct = {
+        log.debug "Search products and product groups contains:" + params.term
+
+        def groupsWithNameMatched = ProductGroup.findAllByDescriptionIlike ("%" + params.term + "%")
+        def productsWithNameMatched = Product.findAllByNameIlike ("%" + params.term + "%")
+        def groupsFromProductNameMatched = []
+        def productWithoutAnyGroups = []
+        productsWithNameMatched.each{ product ->
+            if(product.productGroups.any{mygroup -> groupsWithNameMatched.contains(mygroup) || groupsFromProductNameMatched.contains(mygroup)})
+              return
+            if(!product.productGroups || product.productGroups.size() == 0 )
+                productWithoutAnyGroups.add(product)
+            else
+                groupsFromProductNameMatched.addAll(product.productGroups)
+        }
+
+        def jsonGroupsWithNameMatched = groupsWithNameMatched.collect() { group ->
+            [
+                id: group.id, name: group.description, type: "ProductGroup",
+                products:group.products.collect { product ->
+                                                    [id: product.id, name: product.name]
+                                                }.sort{it.name}
+            ]
+        }
+
+        def jsonGroupsFromProductNameMatched = groupsFromProductNameMatched.collect() { group ->
+            [
+                id: group.id, name: group.description, type: "ProductGroup",
+                products: group.products.findAll{p ->
+                    productsWithNameMatched.contains(p)}.collect{product ->
+                                                      [ id: product.id, name: product.name]
+                                                 }.sort{it.name}
+            ]
+        }
+
+        def jsonProductWithoutAnyGroups = productWithoutAnyGroups.collect() { product ->
+            [id:product.id, name:product.name, type:"Product"]
+        }
+
+        def list = []
+        list.addAll(jsonGroupsWithNameMatched)
+        list.addAll(jsonGroupsFromProductNameMatched)
+        list.addAll(jsonProductWithoutAnyGroups)
+
+        render list.sort{it.name} as JSON
+    }
 }
