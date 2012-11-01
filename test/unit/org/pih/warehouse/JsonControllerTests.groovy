@@ -9,9 +9,6 @@ import grails.converters.JSON
 
 class JsonControllerTests extends ControllerUnitTestCase {
 
-
-
-
     void testSearchProductByName() {
         def group1 = new ProductGroup(id: "group1", description: "painkiller")
         def group2 = new ProductGroup(id: "group2", description: "painLight")
@@ -31,13 +28,35 @@ class JsonControllerTests extends ControllerUnitTestCase {
         product21.addToProductGroups(group2)
         product22.addToProductGroups(group2)
 
-       def expectedResults =  '[{"id":"product3","name":"gookiller","type":"Product"},{"id":"group2","name":"painLight","type":"ProductGroup","products":[{"id":"product21","name":"foo killer"}]},{"id":"group1","name":"painkiller","type":"ProductGroup","products":[{"id":"product12","name":"boo killer"},{"id":"product11","name":"sophin 2500mg"}]}]'
 
         controller.params.term = "killer"
         controller.searchProduct()
         def jsonResponse = controller.response.contentAsString
+        def jsonResult = JSON.parse(jsonResponse)
 
-        assert jsonResponse == expectedResults
+        //result should be sorted by group name and then product name
+        assert jsonResult[0].value == product3.id
+        assert jsonResult[1].value == group2.id
+        assert jsonResult[2].value == product21.id
+        assert jsonResult[3].value == group1.id
+        assert jsonResult[4].value == product12.id
+        assert jsonResult[5].value == product11.id
+
+        //result should contain label
+        assert jsonResult[0].label == product3.name
+        assert jsonResult[1].label == group2.description
+        assert jsonResult[2].label == product21.name
+        assert jsonResult[3].label == group1.description
+        assert jsonResult[4].label == product12.name
+        assert jsonResult[5].label == product11.name
+        
+        //result should contain type
+        assert jsonResult[0].type == "Product"
+        assert jsonResult[1].type == "ProductGroup"
+        assert jsonResult[2].type == "Product"
+        assert jsonResult[3].type == "ProductGroup"
+        assert jsonResult[4].type == "Product"
+        assert jsonResult[5].type == "Product"
 
     }
 }
