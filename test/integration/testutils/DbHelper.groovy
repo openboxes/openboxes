@@ -1,4 +1,4 @@
-package org.pih.warehouse.core
+package testutils
 
 import grails.validation.ValidationException;
 
@@ -7,6 +7,7 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.core.Location
 
 
 class DbHelper {

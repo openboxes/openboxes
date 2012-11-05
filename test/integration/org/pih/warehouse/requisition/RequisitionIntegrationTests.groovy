@@ -1,6 +1,6 @@
 package org.pih.warehouse.requisition
 
-import org.pih.warehouse.core.BaseIntegrationTest
+
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.product.Product

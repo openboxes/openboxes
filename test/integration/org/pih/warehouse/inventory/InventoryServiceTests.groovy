@@ -9,24 +9,73 @@
  * */
 package org.pih.warehouse.inventory
 
-import org.pih.warehouse.core.BaseIntegrationTest
 
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationType
+import testutils.DbHelper
 
 
 
-class InventoryServiceTests extends BaseIntegrationTest {
-
+class InventoryServiceTests extends GroovyTestCase {
+    protected def transactionType_consumptionDebit
+    protected def  transactionType_inventory
+    protected def  transactionType_productInventory
+    protected def  transactionType_transferIn
+    protected def  transactionType_transferOut
+    protected def  bostonLocation
+    protected def  haitiLocation
+    protected def  warehouseLocationType
+    protected def  supplierLocationType
+    protected def  acmeLocation
+    protected def  bostonInventory
+    protected def  haitiInventory
+    protected def  aspirinProduct
+    protected def  tylenolProduct
+    protected def  aspirinItem1
+    protected def  aspirinItem2
+    protected def tylenolItem
     def transaction1
     def transaction2
     def transaction3
     def transaction4
     def transaction5
 
-    void setUp_transactionEntryTests() {
+    private void basicTestFixture(){
+        warehouseLocationType = LocationType.get(Constants.WAREHOUSE_LOCATION_TYPE_ID)
+        supplierLocationType = LocationType.get(Constants.SUPPLIER_LOCATION_TYPE_ID)
 
+        // get or create a default location
+        acmeLocation = DbHelper.creatLocationIfNotExist("Acme Supply Company", supplierLocationType)
+
+        // create some default warehouses and inventories
+        bostonLocation = DbHelper.creatLocationIfNotExist("Boston Location", warehouseLocationType)
+        haitiLocation = DbHelper.creatLocationIfNotExist("Haiti Location", warehouseLocationType)
+
+        bostonInventory = DbHelper.createInventory(bostonLocation)
+        haitiInventory = DbHelper.createInventory(haitiLocation)
+
+        // create some default transaction types
+        transactionType_consumptionDebit = TransactionType.get(Constants.CONSUMPTION_TRANSACTION_TYPE_ID) //id:2
+        transactionType_inventory = TransactionType.get(Constants.INVENTORY_TRANSACTION_TYPE_ID) //id:7
+        transactionType_productInventory = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)  //id:11
+        transactionType_transferIn =  TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID) //id:8
+        transactionType_transferOut =  TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) //id:9
+
+        // create some products
+        aspirinProduct = DbHelper.creatProductIfNotExist("Aspirin" + UUID.randomUUID().toString()[0..5])
+        tylenolProduct = DbHelper.creatProductIfNotExist("Tylenol" + UUID.randomUUID().toString()[0..5])
+
+        // create some inventory items
+        aspirinItem1 = DbHelper.createInventoryItem(aspirinProduct, "1")
+        aspirinItem2 = DbHelper.createInventoryItem(aspirinProduct, "2")
+        tylenolItem = DbHelper.createInventoryItem(tylenolProduct, "1")
+    }
+
+    private void transactionEntryTestFixture() {
+
+        basicTestFixture()
         // create some transactions
         transaction1 = new Transaction(transactionType: transactionType_inventory,
                 transactionDate: new Date() - 5, inventory: bostonInventory)
@@ -76,10 +125,26 @@ class InventoryServiceTests extends BaseIntegrationTest {
         assert transaction5.id != null
     }
 
+    private void localTransferTestFixture() {
+        basicTestFixture()
+
+        transaction1 = new Transaction(transactionType: transactionType_inventory,
+                transactionDate: new Date(), inventory: bostonInventory)
+        transaction2 = new Transaction(transactionType: transactionType_transferIn,
+                transactionDate: new Date(), inventory: bostonInventory, source: "sourceString")
+        transaction3 = new Transaction(transactionType: transactionType_transferOut,
+                transactionDate: new Date(), inventory: bostonInventory, destination: acmeLocation)
+        transaction4 = new Transaction(transactionType: transactionType_transferIn,
+                transactionDate: new Date(), inventory: bostonInventory, source: haitiLocation)
+        transaction5 = new Transaction(transactionType: transactionType_transferOut,
+                transactionDate: new Date(), inventory: bostonInventory, destination: haitiLocation)
+
+
+    }
 
     void test_getQuantityByProductMap() {
 
-        setUp_transactionEntryTests()
+        transactionEntryTestFixture()
 
         def inventoryService = new InventoryService()
 
@@ -92,7 +157,7 @@ class InventoryServiceTests extends BaseIntegrationTest {
 
     void test_getQuantityByInventoryItemMap() {
 
-        setUp_transactionEntryTests()
+        transactionEntryTestFixture()
 
         def inventoryService = new InventoryService()
 
@@ -106,34 +171,10 @@ class InventoryServiceTests extends BaseIntegrationTest {
     }
 
 
-    private void setUp_localTransferTests() {
-        // create some test transactions
 
-        transaction1 = new Transaction(transactionType: transactionType_inventory,
-                transactionDate: new Date(), inventory: bostonInventory)
-        transaction2 = new Transaction(transactionType: transactionType_transferIn,
-                transactionDate: new Date(), inventory: bostonInventory, source: "sourceString")
-        transaction3 = new Transaction(transactionType: transactionType_transferOut,
-                transactionDate: new Date(), inventory: bostonInventory, destination: acmeLocation)
-        transaction4 = new Transaction(transactionType: transactionType_transferIn,
-                transactionDate: new Date(), inventory: bostonInventory, source: haitiLocation)
-        transaction5 = new Transaction(transactionType: transactionType_transferOut,
-                transactionDate: new Date(), inventory: bostonInventory, destination: haitiLocation)
-
-//		mockDomain(Transaction, [new Transaction(id: 10, transactionType: TransactionType.get(7), transactionDate: new Date(), inventory: Location.findByName("Boston Location").inventory),
-        //		new Transaction(id: 20, transactionType: TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID), transactionDate: new Date(), inventory: Location.findByName("Boston Location").inventory, source: Location.findByName("Acme Supply Company")),
-        //		new Transaction(id: 30, transactionType: TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID), transactionDate: new Date(), inventory: Location.findByName("Boston Location").inventory, destination: Location.findByName("Acme Supply Company")),
-        //		new Transaction(id: 40, transactionType: TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID), transactionDate: new Date(), inventory: Location.findByName("Boston Location").inventory, source: Location.findByName("Haiti Location")),
-        //		new Transaction(id: 50, transactionType: TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID), transactionDate: new Date(), inventory: Location.findByName("Boston Location").inventory, destination: Location.findByName("Haiti Location"))])
-        //
-        //		// create the (empty) LocalTransfer domain
-        //		mockDomain(LocalTransfer)
-
-
-    }
 
     void test_isValidForLocalTransfer_shouldCheckIfTransactionSupportsLocalTransfer() {
-        setUp_localTransferTests()
+        localTransferTestFixture()
 
         def inventoryService = new InventoryService()
 
@@ -150,7 +191,7 @@ class InventoryServiceTests extends BaseIntegrationTest {
     }
 
     	void test_saveLocalTransfer_shouldCreateNewLocalTransfer() {
-    		setUp_localTransferTests()
+            localTransferTestFixture()
 
     		def inventoryService = new InventoryService()
 
@@ -192,7 +233,7 @@ class InventoryServiceTests extends BaseIntegrationTest {
     	}
 
     	void test_saveLocalTransfer_shouldEditExistingLocalTransfer() {
-    		setUp_localTransferTests()
+            localTransferTestFixture()
 
     		def inventoryService = new InventoryService()
 

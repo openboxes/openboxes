@@ -12,18 +12,6 @@
 
 package org.pih.warehouse.report;
 
-import static org.junit.Assert.*;
-
-import grails.test.*
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.core.LocationType;
-import org.pih.warehouse.product.Category;
-import org.pih.warehouse.product.Product
-import org.pih.warehouse.core.BaseIntegrationTest
-import org.pih.warehouse.core.DbHelper;
 
 class ReportServiceTests extends GroovyTestCase {
 
