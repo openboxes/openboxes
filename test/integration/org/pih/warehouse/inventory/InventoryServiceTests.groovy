@@ -154,6 +154,22 @@ class InventoryServiceTests extends GroovyTestCase {
         assert map[tylenolProduct] == 25
     }
 
+    //todo: getQuantity is broken now, need to know why
+    void xtest_getQuantityByInventoryItem(){
+        transactionEntryTestFixture()
+        def inventoryService = new InventoryService()
+        assert inventoryService.getQuantity(bostonInventory,aspirinItem1 ) == 94
+        assert inventoryService.getQuantity(bostonInventory,aspirinItem2 ) == 3
+        assert inventoryService.getQuantity(bostonInventory,tylenolItem ) == 25
+    }
+
+    void test_calculateQuantityByProduct(){
+        transactionEntryTestFixture()
+        def inventoryService = new InventoryService()
+        assert inventoryService.calculateQuantityForProduct(aspirinProduct, bostonLocation) == 97
+        assert inventoryService.calculateQuantityForProduct(tylenolProduct, bostonLocation) == 25
+    }
+
 
     void test_getQuantityByInventoryItemMap() {
 
