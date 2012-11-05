@@ -168,13 +168,15 @@ class BootStrap {
             productGroup.category = inventoryItemInfo.product.category
             productGroup.save(failOnError:true,flush:true)
         }
-        def product = Product.findByName(inventoryItemInfo.product.name)
+        Product product = Product.findByName(inventoryItemInfo.product.name)
 
         if(!product){
            product = inventoryItemInfo.product
            product.save(failOnError:true,flush:true)
            productGroup.addToProducts(product)
            productGroup.save(failOnError:true,flush:true)
+           product.addToProductGroups(productGroup)
+           product.save(failOnError:true,flush:true)
            addInventoryItem(product, inventoryItemInfo.expiration, inventoryItemInfo.quantity)
         }
 

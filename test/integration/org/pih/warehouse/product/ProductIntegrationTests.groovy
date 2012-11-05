@@ -4,14 +4,17 @@ class ProductIntegrationTests extends GroovyTestCase{
     void testSaveProductProductGroup(){
         def suppliers = Category.findByName("Supplies")
         def name = "Test" + UUID.randomUUID().toString()[0..5]
-
-        def product = new Product(name: name, category: suppliers)
-        assert product.save(flush:true, failOnError:true)
         def group = new ProductGroup(description: name + "group", category: suppliers)
+        assert group.save(flush:true, failOnError:true)
+        def product = new Product(name: name, category: suppliers)
+        product.addToProductGroups(group)
+        assert product.save(flush:true, failOnError:true)
+
         group.addToProducts(product)
         assert group.save(flush:true, failOnError:true)
+        assert product.productGroups.contains(group)
+        assert group.products.contains(product)
 
-        assert group.products.size() > 0
 
     }
 

@@ -18,11 +18,10 @@ class SearchProductTagLib {
 		def valueId = (attrs.valueId)?attrs.valueId:"";
 		def valueName = (attrs.valueName)?attrs.valueName:"";
 		def width = (attrs.width) ? attrs.width : '300px';
-		def minLength = (attrs.minLength) ? attrs.minLength : 1;
 		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "";
 		def styleClass = attrs.styleClass ?: ''
 		def placeholder = attrs.placeholder ?: ""
-
+        def minLength = (attrs.minLength) ?: 1
 
 		def spanDisplay = "none";
 		def suggestDisplay = "inline";
@@ -50,7 +49,7 @@ class SearchProductTagLib {
 
 						\$("#${id}-suggest").autocomplete({
 							delay: ${attrs.delay?:300},
-							minLength: ${minLength?:1},
+							minLength: ${minLength},
 							dataType: 'json',
 							//define callback to format results
 							source: function(req, add){
@@ -77,12 +76,21 @@ class SearchProductTagLib {
 							select: function(event, ui) {
 								if (ui.item) {
 									\$(this).prev().val(ui.item.value);
-									\$(this).val(ui.item.valueText);
+									\$(this).val(ui.item.label);
 								}
 								\$("#${id}-suggest").trigger("selected");
 								return false;
 							}
-						});
+						})
+						.data("autocomplete" )._renderItem = function( ul, item ) {
+						    var li = \$("<li>").data("item.autocomplete", item );
+                            if(item.type == 'Product')
+                                li.append("<a>" + item.label + "</a>" );
+                            else
+                                li.append("<span class='product-group'>" + item.label + "</span>" );;
+                            li.appendTo(ul);
+                            return li;
+                        };
 					});
 				</script>
 		""";
