@@ -2718,6 +2718,10 @@ class InventoryService implements ApplicationContextAware {
 	   }
 
    }
+
+  public int calculateQuantityForProduct(Product product, Location location){
+      return 0;
+  }
 	
 	
 	
