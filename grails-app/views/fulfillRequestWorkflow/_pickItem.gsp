@@ -19,7 +19,7 @@
 				<table>
 					<tr class="prop">
 						<td class="name">
-							<label><warehouse:message code="requestItem.requested.label"/></label>
+							<label><warehouse:message code="requisitionItem.requested.label"/></label>
 						</td>
 						<td class="value">			
 							<format:metadata obj="${requestItem.displayName()}"/>

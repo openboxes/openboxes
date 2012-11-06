@@ -60,15 +60,18 @@ class RequisitionController {
     def save = {
         def requisition = new Requisition(params)
         requisition.destination = Location.get(session.warehouse.id)
-        if (requisitionService.saveRequisition(requisition))
+        if (requisitionService.saveRequisition(requisition)) {
             flash.message = "${warehouse.message(code: 'default.saved.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), requisition.id])}"
+        }else{
+            requisition?.requisitionItems?.each { it.validate()}
+        }
 
         render(view: "edit", model: [requisition: requisition])
     }
 
     def saveRequisitionItem = {
         def json
-        def requisitionItem = new RequisitionItem(params)
+            def requisitionItem = new RequisitionItem(params)
         if (requisitionService.saveRequisitionItem(requisitionItem)) {
             json = [
                     success: true,

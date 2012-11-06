@@ -37,9 +37,9 @@
 											<thead>
 												<tr class="odd">
 													<th></td>
-													<th><warehouse:message code="requestItem.type.label" default="Type"/></th>
-													<th><warehouse:message code="requestItem.item.label" default="Item Requested"/></th>
-													<th class="center"><warehouse:message code="requestItem.quantity.label" default="Qty"/></th>										
+													<th><warehouse:message code="requisitionItem.type.label" default="Type"/></th>
+													<th><warehouse:message code="requisitionItem.item.label" default="Item Requested"/></th>
+													<th class="center"><warehouse:message code="requisitionItem.quantity.label" default="Qty"/></th>
 												</tr>
 											</thead>									
 											<tbody>
@@ -65,7 +65,7 @@
 										</table>
 									</g:if>
 									<g:else>
-										<span class="fade"><warehouse:message code="requestItem.item.label" default="No items requested"/></span>
+										<span class="fade"><warehouse:message code="requisitionItem.item.label" default="No items requested"/></span>
 									</g:else>	
 	                            </td>
 	                        </tr>

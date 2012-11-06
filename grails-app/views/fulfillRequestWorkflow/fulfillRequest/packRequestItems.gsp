@@ -34,7 +34,7 @@
 												<th><warehouse:message code="product.label"/></th>
 												<th><warehouse:message code="inventoryItem.lotNumber.label"/></th>
 												<th><warehouse:message code="inventoryItem.lotNumber.label"/></th>
-												<th class="center"><warehouse:message code="requestItem.requested.label" default="Requested"/></th>
+												<th class="center"><warehouse:message code="requisitionItem.requested.label" default="Requested"/></th>
 												<th class="center"><warehouse:message code="fulfillmentItem.picked.label" default="Picked"/></th>
 												<th class="center"><warehouse:message code="fulfillmentItem.packed.label" default="Packed"/></th>
 												<th class="left"><warehouse:message code="default.actions.label" default="Actions"/></th>

@@ -571,8 +571,14 @@ th.desc a {
     margin-left: 1.5em;
 }
 
+
 /*requisition item search auto complete*/
 .ui-autocomplete span.product-group{
     font-style: italic;
+}
+
+.list-header {
+    padding-left: 10px;
+
 }
 

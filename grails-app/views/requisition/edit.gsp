@@ -12,7 +12,7 @@
     </head>
     <body>
         <div class="body">
-
+            <jqvalui:renderValidationScript for="org.pih.warehouse.requisition.RequisitionItem" form="requisitionForm"/>
             <g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>
             </g:if>
@@ -34,18 +34,18 @@
 
 
 
-            <g:form method="post" action="save">
+            <g:form id="requisitionForm" method="post" action="save">
                 <g:hiddenField name="id" value="${requisition?.id}" />
                 <g:hiddenField name="version" value="${requisition?.version}" />
                 <div class="dialog">
-                    <table>
+                    <table id="requisition">
                         <tbody>
                             <tr class="prop">
                                 <td valign="top" class="name">
 									<label for="origin.id"><warehouse:message code="requisition.depot.label" /></label>
 
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}" id="depot">
+                                <td colspan="5" valign="top" class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}" id="depot">
                                 	<g:select name="origin.id" from="${org.pih.warehouse.core.Location.list()}"
                                 		optionKey="id" optionValue="name" value="${requisition?.origin?.id}" noSelection="['null':'']" />
 
@@ -57,7 +57,7 @@
 									<label for="recipientProgram"><warehouse:message code="requisition.program.label" /></label>
                                 </td>
 
-                                <td valign="top" class="value ${hasErrors(bean: requisition, field: 'recipientProgram', 'errors')}">
+                                <td colspan="5" valign="top" class="value ${hasErrors(bean: requisition, field: 'recipientProgram', 'errors')}">
                                     <g:autoSuggestString id="recipientProgram" name="recipientProgram" placeholder="Program"
                                                          jsonUrl="${request.contextPath }/json/findPrograms"
                                                          class="text"
@@ -71,7 +71,7 @@
 									<label for="requestedBy"><warehouse:message code="requisition.requestedBy.label" /></label>
 
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean: requisition, field: 'requestedBy', 'errors')}">
+                                <td colspan="5" valign="top" class="value ${hasErrors(bean: requisition, field: 'requestedBy', 'errors')}">
                                     %{--<g:autoSuggest id="requestedBy" name="requestedBy" jsonUrl="${request.contextPath }/json/findPersonByName"--}%
                                                         %{--class="text"--}%
                                                         %{--placeholder="Requested by"--}%
@@ -89,7 +89,7 @@
 
                             <tr class="prop">
                                 <td valign="top" class="name"><label><warehouse:message code="requisition.dateRequested.label"/></label></td>
-                                <td class="value ${hasErrors(bean: requisition, field: 'dateRequested', 'errors')}">
+                                <td colspan="5" class="value ${hasErrors(bean: requisition, field: 'dateRequested', 'errors')}">
                                     <g:jqueryDatePicker id="dateRequested" name="dateRequested"
                                         value="${requisition.dateRequested}" format="MM/dd/yyyy" maxDate="${new Date()}"/>
                                 </td>
@@ -97,7 +97,7 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name"><label><warehouse:message code="requisition.requestedDeliveryDate.label"/></label></td>
-                                <td class="value ${hasErrors(bean: requisition, field: 'requestedDeliveryDate', 'errors')}">
+                                <td colspan="5" class="value ${hasErrors(bean: requisition, field: 'requestedDeliveryDate', 'errors')}">
                                     <g:jqueryDatePicker id="requestedDeliveryDate" name="requestedDeliveryDate"
                                         value="${requisition.requestedDeliveryDate}" format="MM/dd/yyyy" minDate="${new Date().plus(1)}"/>
                                 </td>
@@ -107,21 +107,24 @@
                                 <td valign="top" class="name">
 									<label for="name"><warehouse:message code="default.description.label" /></label>
                                 </td>
-                                <td valign="top">
+                                <td valign="top" colspan="5">
 									<input type="hidden" id="name" name="name" size="80" value="${requisition.name}"/>
 									<label id="description" name="name">${requisition.name}</label>
                                 </td>
                             </tr>
 
+                            <g:if test="${requisition.id}">
+                                <g:render template="items" model="[requisition:requisition]"/>
+                            </g:if>
 
                             <tr class="prop">
 
-                            	<td valign="top" class="name">
+                            	<td valign="top">
 
                             	</td>
-                            	<td>
-									<div class="buttons left">
-					                   <button type="submit">
+                            	<td colspan="5">
+									<div class="buttons right">
+					                    <button type="submit">
 											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'accept.png')}" class="top"/>
 											<warehouse:message code="default.button.save.label"/>
 										</button>
@@ -155,6 +158,55 @@
                 };
                 $(".value").change(updateDescription);
                 $(".autocomplete").bind('selected', updateDescription);
+
+
+
+                $("#addItemButton").click(function() {
+                    var clonedRow = $(".requisitionItem:last").clone().html();
+                    var newIndex = $(".requisitionItem").length;
+                    clonedRow = clonedRow.replace(/\[\d\]/g, "[" + newIndex + "]");
+                    clonedRow = clonedRow.replace(/-\d-/g, "-" + newIndex + "-");
+                    var appendRow = $('<tr class="requisitionItem">' + clonedRow + '</tr>');
+                    appendRow.find(".order-index").val(newIndex);
+
+                    $(".requisitionItem:last").after(appendRow);
+                });
+
+                function deleteRow(currentNode){
+                    $(currentNode).parent().parent().parent().remove();
+                }
+
+                %{--$('.requisitionItem').live('focusout', function() {--}%
+                    %{--var recipient = $(this).find('[name="recipient"]');--}%
+
+                    %{--$.ajax({--}%
+                        %{--type: "POST",--}%
+                        %{--url: "${g.createLink(controller:'requisition',action:'saveRequisitionItem')}",--}%
+                        %{--data: {--}%
+                            %{--'recipient': recipient.val(),--}%
+                            %{--'substitutable': $('.substitutable').is("checked")--}%
+                        %{--},--}%
+                        %{--dataType: "json",--}%
+                        %{--success: function(jsonData) {--}%
+                            %{--if(jsonData.success) {--}%
+
+                            %{--} else {--}%
+
+                            %{--}--}%
+                        %{--}--}%
+                    %{--});--}%
+                %{--});--}%
+
+//                $('.deleteRequisitionItem').live('click',function() {
+//                    var rowLength = $('.requisitionItem').length;
+//
+//                    if(rowLength > 1){
+//                        deleteRow(this);
+//                    } else {
+//                        $("#requisition tbody > tr:last").prev('tr').prev('tr').after(appendRow);
+//                        deleteRow(this);
+//                    }
+//                });
 
             });
         </script>

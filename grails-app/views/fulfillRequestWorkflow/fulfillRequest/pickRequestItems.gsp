@@ -42,8 +42,8 @@
 													</td>
 												</tr>
 												<tr class="even">
-													<td><warehouse:message code="requestItem.description.label" default="Item"/></td>
-													<td class="center"><warehouse:message code="requestItem.quantity.label" default="Requested"/></td>										
+													<td><warehouse:message code="requisitionItem.description.label" default="Item"/></td>
+													<td class="center"><warehouse:message code="requisitionItem.quantity.label" default="Requested"/></td>
 													<td class="center"><warehouse:message code="request.qtyFulfilled.label" default="Fulfilled"/></td>										
 													<td><warehouse:message code="default.action.label" default="Actions"/></td>
 													<%--<td class="center">Remaining</td> --%>	

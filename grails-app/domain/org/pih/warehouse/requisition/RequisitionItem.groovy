@@ -31,8 +31,9 @@ class RequisitionItem implements Serializable {
 	Float unitPrice	
 	Person requestedBy	// the person who actually requested the item
 	Boolean substitutable = false
-    Person recipient
+    String recipient
     String comment
+    Integer orderIndex
 	
 	// Audit fields
 	Date dateCreated
@@ -58,6 +59,7 @@ class RequisitionItem implements Serializable {
         substitutable(nullable:false)
         comment(nullable:true)
         recipient(nullable:true)
+        orderIndex(nullable: true)
 	}
 
 	
