@@ -84,10 +84,12 @@ class SearchProductTagLib {
 						})
 						.data("autocomplete" )._renderItem = function( ul, item ) {
 						    var li = \$("<li>").data("item.autocomplete", item );
-                            if(item.type == 'Product')
-                                li.append("<a>" + item.label + "</a>" );
-                            else
-                                li.append("<span class='product-group'>" + item.label + "</span>" );;
+                            if(item.type == 'Product'){
+                                var text = item.quantity == null ? item.label : item.label + " QTY: " + item.quantity;
+                                li.append("<a>" + text + "</a>" );
+                            }else{
+                                li.append("<span class='product-group'>" + item.label + "</span>" );
+                            }
                             li.appendTo(ul);
                             return li;
                         };
