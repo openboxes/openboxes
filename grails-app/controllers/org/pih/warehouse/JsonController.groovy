@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import grails.converters.*;
 import org.pih.warehouse.core.Constants;
 import org.pih.warehouse.core.Person;
+import org.pih.warehouse.core.Tag;
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.product.Category;
@@ -28,6 +29,23 @@ class JsonController {
 	def inventoryService
 	def productService
 	def localizationService
+	
+	def findTags = { 
+		println "find tags " + params
+		
+		def searchTerm = "%" + params.term + "%";
+		def c = Tag.createCriteria()
+		def tags = c.list {
+			projections {
+				property "tag"
+			}
+			ilike("tag", searchTerm)
+		}
+		
+		def results = tags.unique().collect { [ value: it, label: it ] }
+		render results as JSON;
+	}
+	
 	
 	def findPrograms = {
 		println "find programs " + params

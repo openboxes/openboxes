@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+	
+	<changeSet author="jmiranda (generated)" id="1351894117346-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="product_tag"/>
+			</not>
+		</preConditions>
+		<createTable tableName="product_tag">
+			<column name="product_id" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="tag_id" type="VARCHAR(255)" />
+		</createTable>
+	</changeSet>
+	
+	<changeSet author="jmiranda (generated)" id="1351894117346-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="tag"/>
+			</not>
+		</preConditions>
+		<createTable tableName="tag">
+			<column name="id" type="VARCHAR(255)">
+				<constraints nullable="false" primaryKey="true" />
+			</column>
+			<column name="version" type="BIGINT">
+				<constraints nullable="false" />
+			</column>
+			<column name="created_by_id" type="VARCHAR(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="date_created" type="DATETIME">
+				<constraints nullable="false" />
+			</column>
+			<column name="last_updated" type="DATETIME">
+				<constraints nullable="false" />
+			</column>
+			<column name="tag" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="updated_by_id" type="VARCHAR(255)">
+				<constraints nullable="true" />
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="jmiranda (generated)" id="1351894117346-3">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="product_tags"/>
+		</preConditions>
+		<dropTable tableName="product_tags"/>
+	</changeSet>
+	
+	
+</databaseChangeLog>

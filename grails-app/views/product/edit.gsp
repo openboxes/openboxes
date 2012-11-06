@@ -13,12 +13,12 @@
 			<content tag="label1"><warehouse:message code="inventory.label"/></content>
 		</g:else>
 
-	
+		<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.tagsinput/',file:'jquery.tagsinput.css')}" type="text/css" media="screen, projection" />
+		<script src="${createLinkTo(dir:'js/jquery.tagsinput/', file:'jquery.tagsinput.js')}" type="text/javascript" ></script>
 
     </head>    
     <body>        
         <div class="body">
-
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
@@ -53,6 +53,25 @@
 				                <table>
 			                      <tbody>                
 									<tr class="prop">
+		                                <td valign="top" class="name">
+		                                  <label for="categories"><warehouse:message code="product.primaryCategory.label" /></label>
+		                                </td>
+		                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'category', 'errors')}">
+											<%-- 
+											<g:selectCategoryMcDropdown id="category" name="category.id" 
+												value="${productInstance?.category?.id}"/>									
+											--%>
+
+		                                	 <div class="category">
+												<select name="category.id">
+													<option value="null"></option>
+													<g:render template="../category/selectOptions" model="[category:rootCategory, selected:productInstance?.category, level: 0]"/>
+												</select>	
+									       	</div>
+									   </td>
+									</tr>
+									
+									<tr class="prop">
 										<td valign="top" class="name"><label for="name"><warehouse:message
 											code="product.title.label" /></label></td>
 										<td valign="top"
@@ -84,30 +103,36 @@
 									</tr>
 									--%>							
 									
-									<tr class="prop">
-		                                <td valign="top" class="name">
-		                                  <label for="categories"><warehouse:message code="product.primaryCategory.label" /></label>
-		                                </td>
-		                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'category', 'errors')}">
-											<%-- 
-											<g:selectCategoryMcDropdown id="category" name="category.id" 
-												value="${productInstance?.category?.id}"/>									
-											--%>
-
-		                                	 <div class="category">
-												<select name="category.id">
-													<option value="null"></option>
-													<g:render template="../category/selectOptions" model="[category:rootCategory, selected:productInstance?.category, level: 0]"/>
-												</select>	
-									       	</div>
-									   </td>
-									</tr>			
+												
+									<%-- 
 									<tr class="prop">
 		                                <td valign="top" class="name">
 		                                  <label for="categories"><warehouse:message code="product.otherCategories.label" /></label>
 		                                </td>
 										<td valign="top" class="value">									
 									       	<g:render template="categories" model="['productInstance':productInstance]" />
+										</td>
+									</tr>
+									--%>
+									<tr class="prop">
+		                                <td valign="top" class="name">
+		                                  <label for="categories"><warehouse:message code="product.tags.label" /></label>
+		                                </td>
+										<td valign="top" class="value">									
+									       	<%-- 
+									       	<g:render template="tags" model="['productInstance':productInstance]" />
+									       	--%>
+									       	
+									       	<g:textField id="tags1" class="tags" name="tagsToBeAdded" value="${productInstance?.tagsToString() }"/>
+											<script>
+												$(function() { 
+													$('#tags1').tagsInput({
+														'autocomplete_url':'${createLink(controller: 'json', action: 'findTags')}',
+														'width': 'auto',
+														'removeWithBackspace' : true,
+													}); 
+												});
+											</script>
 										</td>
 									</tr>
 										

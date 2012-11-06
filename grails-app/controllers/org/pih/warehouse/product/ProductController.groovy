@@ -27,6 +27,7 @@ import org.pih.warehouse.core.Document;
 import org.pih.warehouse.core.DocumentType;
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.RoleType;
+import org.pih.warehouse.core.Tag;
 import org.pih.warehouse.core.User;
 import org.springframework.web.multipart.MultipartFile;
 import java.awt.Image as AWTImage
@@ -157,7 +158,7 @@ class ProductController {
 		productInstance.properties = params
 
 		log.info("Categories " + productInstance?.categories);
-
+		
 		Attribute.list().each() {
 			String attVal = params["productAttributes." + it.id + ".value"];
 			if (attVal == "_other" || attVal == null || attVal == '') {
@@ -241,7 +242,17 @@ class ProductController {
 			productInstance.attributes.each() {
 				existingAtts.put(it.attribute.id, it)
 			}
-
+			
+			try { 
+				if (params.tagsToBeAdded) {
+					productInstance.tags.clear()
+					params.tagsToBeAdded.split(",").each { tagText ->
+						productInstance.addToTags(new Tag(tag:tagText))
+					}
+				}
+			} catch (Exception e) { 
+				log.error("Error occurred: " + e.message)
+			}
 			Attribute.list().each() {
 				String attVal = params["productAttributes." + it.id + ".value"]
 				if (attVal == "_other" || attVal == null || attVal == '') {
@@ -272,6 +283,8 @@ class ProductController {
 				productInstance.categories.removeAll(_toBeDeleted)
 			}
 
+			
+			
 			/*
 			 productInstance?.categories?.clear();		
 			 params.each {
@@ -285,7 +298,7 @@ class ProductController {
 			 */
 			if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
 				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product:productInstance)])}"
-				redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id, params:params)
+				redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
 			}
 			else {
 				

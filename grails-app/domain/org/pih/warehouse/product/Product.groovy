@@ -16,6 +16,7 @@ import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.list.LazyList;
 import org.pih.warehouse.auth.AuthService;
 import org.pih.warehouse.core.Document;
+import org.pih.warehouse.core.Tag;
 import org.pih.warehouse.core.UnitOfMeasure;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.product.Category;
@@ -95,13 +96,14 @@ class Product implements Comparable, Serializable {
 	static hasMany = [ 
 		categories : Category, 
 		attributes : ProductAttribute, 
-		tags : String, 
+		tags : Tag, 
 		documents : Document, 
 		productGroups: ProductGroup, 
 		packages : ProductPackage ]	
 	
 	static mapping = {
 		id generator: 'uuid'
+		tags joinTable: [name:'product_tag', column: 'tag_id', key: 'product_id'], cascade: 'all-delete-orphan'
 		categories joinTable: [name:'product_category', column: 'category_id', key: 'product_id']
 		attributes joinTable: [name:'product_attribute', column: 'attribute_id', key: 'product_id']
 		documents joinTable: [name:'product_document', column: 'document_id', key: 'product_id']
@@ -153,6 +155,17 @@ class Product implements Comparable, Serializable {
 	int compareTo(obj) {
 		this.name <=> obj.name
 	}
+	
+	String tagsToString() { 
+		if (tags) { 
+			return tags.collect { it.tag }.join(",")
+		}
+		else { 
+			return null
+		}
+		
+	}
+	
 	
 	/**
 	 * Some utility methods

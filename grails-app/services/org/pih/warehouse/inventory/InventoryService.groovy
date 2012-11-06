@@ -6,11 +6,11 @@
  * By using this software in any fashion, you are agreeing to be bound by
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
- * */
+ **/
 package org.pih.warehouse.inventory;
 
 import grails.validation.ValidationException;
-
+import org.pih.warehouse.product.Category;
 
 import java.text.SimpleDateFormat;
 
@@ -53,7 +53,7 @@ class InventoryService implements ApplicationContextAware {
     /**
      * @return request service
      */
-    def getrequisitionService() {
+    def getRequisitionService() {
         return applicationContext.getBean("requisitionService")
     }
 
@@ -263,7 +263,7 @@ class InventoryService implements ApplicationContextAware {
         commandInstance.categoryInstance = commandInstance?.categoryInstance ?: productService.getRootCategory();
 
         // Get current inventory for the given products
-        if (commandInstance?.categoryInstance != rootCategory || commandInstance?.searchPerformed) {
+        if (commandInstance?.categoryInstance != rootCategory || commandInstance?.searchPerformed || commandInstance.tag) {
             getCurrentInventory(commandInstance);
         }
         else {
@@ -497,7 +497,7 @@ class InventoryService implements ApplicationContextAware {
         Map quantityByProduct = [:]
         Map quantityShippedByProduct = getShipmentService().getOutgoingQuantityByProduct(location);
         Map quantityOrderedByProduct = getOrderService().getOutgoingQuantityByProduct(location)
-        //Map quantityRequestedByProduct = getrequisitionService().getOutgoingQuantityByProduct(location)
+        //Map quantityRequestedByProduct = getRequisitionService().getOutgoingQuantityByProduct(location)
         quantityShippedByProduct.each { product, quantity ->
             def productQuantity = quantityByProduct[product];
             if (!productQuantity) productQuantity = 0;
@@ -528,7 +528,7 @@ class InventoryService implements ApplicationContextAware {
         Map quantityByProduct = [:]
         Map quantityShippedByProduct = getShipmentService().getIncomingQuantityByProduct(location);
         Map quantityOrderedByProduct = getOrderService().getIncomingQuantityByProduct(location)
-        //Map quantityRequestedByProduct = getrequisitionService().getIncomingQuantityByProduct(location)
+        //Map quantityRequestedByProduct = getRequisitionService().getIncomingQuantityByProduct(location)
         quantityShippedByProduct.each { product, quantity ->
             def productQuantity = quantityByProduct[product];
             if (!productQuantity) productQuantity = 0;
@@ -568,7 +568,8 @@ class InventoryService implements ApplicationContextAware {
     }
 
     /**
-     *
+     * Get all expired inventory items for the given category and location.
+     * 
      * @param category
      * @param location
      * @return
@@ -589,7 +590,7 @@ class InventoryService implements ApplicationContextAware {
         //categories.addAll(expiredStock.collect { it.product.category })
         //categories = categories.findAll { it != null }
 
-        // poor man's filter
+        // FIXME poor man's filter
         if (category) {
             expiredStock = expiredStock.findAll { item -> item?.product?.category == category }
         }
@@ -598,7 +599,7 @@ class InventoryService implements ApplicationContextAware {
     }
 
     /**
-     * Get all inventory items that are expiring within the given threshhold.
+     * Get all inventory items that are expiring within the given threshold.
      *
      * @param category the category filter
      * @param threshhold the threshhold filter
@@ -631,82 +632,48 @@ class InventoryService implements ApplicationContextAware {
      * @param commandInstance
      * @return
      */
-    Set<Product> getProducts(InventoryCommand commandInstance) {
-        List categoryFilters = new ArrayList();
-        if (commandInstance?.subcategoryInstance) {
-            categoryFilters.add(commandInstance?.subcategoryInstance);
+    Set<Product> getProducts(InventoryCommand command) {
+        List categories = new ArrayList();
+        if (command?.subcategoryInstance) {
+            categories.add(command?.subcategoryInstance);
         }
         else {
-            categoryFilters.add(commandInstance?.categoryInstance);
+            categories.add(command?.categoryInstance);
         }
 
-        List searchTerms = (commandInstance?.searchTerms ? Arrays.asList(commandInstance?.searchTerms.split(" ")) : null);
+        List searchTerms = (command?.searchTerms ? Arrays.asList(command?.searchTerms.split(" ")) : null);
 
-        log.debug("get products: " + commandInstance?.warehouseInstance)
-        def products = getProducts(commandInstance?.warehouseInstance, searchTerms, categoryFilters,
-                commandInstance?.showHiddenProducts);
+        log.debug("get products: " + command?.warehouseInstance)
+        //def products = getProducts(commandInstance?.warehouseInstance, searchTerms, categoryFilters,
+        //        commandInstance?.showHiddenProducts);
 
+		log.info "command.tag  = " + command.tag
+		def products = []
+		if (command.tag) {
+			products = getProductsByTags(command.tag)
+		} else {
+			products = getProducts(command?.warehouseInstance, searchTerms, categories, command?.showHiddenProducts);
+		}
+			
 
         products = products?.sort() { it?.name };
         return products;
     }
-
+	
     /**
      * @param searchTerms
      * @param categories
      * @return
      */
-    List<Product> getProducts(Location location, List searchTerms, List categoryFilters, Boolean showHiddenProducts) {
+    List<Product> getProducts(Location location, List terms, List categories, Boolean showHiddenProducts) {
         // Get all products, including hidden ones
         def products = Product.list()
-
-        // Categories - Childrens Furniture
-        def matchCategories = getExplodedCategories(categoryFilters)
-        def searchResults = Product.createCriteria().list() {
-            or {
-                and {
-                    searchTerms.each {
-                        ilike("name", "%" + it + "%")
-                    }
-                }
-                and {
-                    searchTerms.each {
-                        ilike("manufacturer", "%" + it + "%")
-                    }
-                }
-                and {
-                    searchTerms.each {
-                        ilike("productCode", "%" + it + "%")
-                    }
-                }
-            }
-            if (matchCategories) {
-                'in'("category", matchCategories)
-            }
-        }
-        searchResults = products.intersect(searchResults);
-
-        // Get all products that fall under the categories that match the search terms
-        // e.g. if i search for "laptop" and Laptops is a category, we'll show all
-        // products under Laptops, whether or not the product matches "laptop"
-        /*
-           if (searchTerms) {
-           matchCategories.each  { matchCategory ->
-           def categories = getCategoriesMatchingSearchTerms(searchTerms, matchCategory)
-           categories.each { category ->
-           categoryFilters.add(category)
-           }
-           }
-           log.debug "Categories: " + categoryFilters
-           // Search for products that are within the categories matched by the search terms
-           def categoryProductResults = getProductsByCategories(categoryFilters)
-           categoryProductResults = products.intersect(categoryProductResults);
-           searchResults.addAll(categoryProductResults)
-           }
-           */
+        def matchCategories = getExplodedCategories(categories)
+        def results = getProductsByTermsAndCategories(terms, matchCategories)
+        results = products.intersect(results);
 
         if (!showHiddenProducts) {
-            searchResults.removeAll(getHiddenProducts())
+            results.removeAll(getHiddenProducts(location))
         }
 
         // now localize to only match products for the current locale
@@ -717,8 +684,104 @@ class InventoryService implements ApplicationContextAware {
         //   localizedProductName.contains(it)  // TODO: this would also have to be case insensitive
         // }
         // }
-        return searchResults;
+        return results;
     }
+	
+	/**
+	 * Get all products matching the given terms and categories.
+	 * 
+	 * @param terms
+	 * @param categories
+	 * @return
+	 */
+	List<Product> getProductsByTermsAndCategories(terms, categories) { 
+		return Product.createCriteria().list() {
+			or {
+				and {
+					terms.each { term ->
+						ilike("name", "%" + term + "%")
+					}
+				}
+				and {
+					terms.each { term ->
+						ilike("manufacturer", "%" + term + "%")
+					}
+				}
+				and {
+					terms.each { term ->
+						ilike("manufacturerCode", "%" + term + "%")
+					}
+				}
+				and {
+					terms.each { term ->
+						ilike("productCode", "%" + term + "%")
+					}
+				}
+			}
+			if (categories) {
+				'in'("category", categories)
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	List<Category> getCategoriesByTerms(terms) { 
+		return Category.createCriteria().list() {
+			or {
+				terms.each { term ->
+					ilike("name", "%" + term + "%")
+				}
+			}
+		}		
+	}
+	
+	/**
+	 * Get all products that fall under the given categories.
+	 * 
+	 * @return
+	 */
+	List<Product> getProductsUnderCategories(categories) { 
+		
+		// Get all products that fall under the categories that exactly match the search terms
+		// e.g. if i search for "laptop" and Laptops is a category, we'll show all
+		// products under Laptops, whether or not the product matches "laptop"
+		
+		return getProductsByCategories(categories);
+	}
+	
+	
+	/**
+	 * Get all products that have the given tags.
+	 * 
+	 * @param inputTags
+	 * @return
+	 */
+	def getProductsByTags(List inputTags) {
+		println "Get products by tags: " + inputTags
+		def products = Product.withCriteria {
+			tags {
+				'in'('tag', inputTags)
+			}
+		}
+		return products
+	}
+	
+	/**
+	 * Get all products that have the given tag.
+	 * 
+	 * @param tag
+	 * @return
+	 */
+	def getProductsByTag(String tag) {
+		def products = Product.withCriteria {
+			tags {
+				eq('tag', tag)
+			}
+		}
+		return products
+	}
 
     /**
      * Return a list of products that are marked as NON_SUPPORTED or NON_INVENTORIED
@@ -845,6 +908,9 @@ class InventoryService implements ApplicationContextAware {
             def item = it.inventoryItem
             def transaction = it.transaction
 
+			println "======================>> [" + transaction.transactionDate + "] " + 
+				transaction.transactionType.transactionCode + " " + it.inventoryItem.product + " " + it.inventoryItem.lotNumber + " " + it.quantity
+			
             // first see if this is an entry we can skip (because we've already reach a product inventory transaction
             // for this product, or a inventory transaction for this inventory item)
             if (!(reachedProductInventoryTransaction[item.product] && reachedProductInventoryTransaction[item.product] != transaction) &&
@@ -1004,8 +1070,14 @@ class InventoryService implements ApplicationContextAware {
         return getProductsBelowMinimumAndReorderQuantities(inventoryInstance, false)
     }
 
+	/**
+	 * Gets 
+	 * @param inventory
+	 * @param inventoryItem
+	 * @return
+	 */
     Integer getAvailableQuantity(Inventory inventory, InventoryItem inventoryItem) {
-
+		throw new UnsupportedOperationException();
     }
 
     /**
@@ -1021,7 +1093,7 @@ class InventoryService implements ApplicationContextAware {
         def quantityMap = getQuantityByInventoryItemMap(transactionEntries)
 
         // inventoryItem -> org.pih.warehouse.inventory.InventoryItem_$$_javassist_10
-        log.debug "inventoryItem -> " + inventoryItem.class
+        //log.debug "inventoryItem -> " + inventoryItem.class
 
         // FIXME was running into an issue where a proxy object was being used to represent the inventory item
         // so the map.get() method was returning null.  So we needed to fully load the inventory item using

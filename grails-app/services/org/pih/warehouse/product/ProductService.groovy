@@ -16,6 +16,7 @@ import java.util.List;
 import groovy.xml.Namespace;
 
 import org.pih.warehouse.core.Location;
+import org.pih.warehouse.core.Tag;
 import org.pih.warehouse.importer.ImportDataCommand;
 import org.pih.warehouse.core.ApiException;
 
@@ -30,6 +31,11 @@ class ProductService {
 	
 	def grailsApplication
 	
+	
+	def getAllTags() { 
+		return Tag.list().collect { it.tag }.unique()		
+	}
+	
 	/**
 	 * 	
 	 * @param query
@@ -43,8 +49,7 @@ class ProductService {
 	 * 
 	 */
 	def findNdcProducts(search) {
-		String query = search.searchTerms?:"";
-		return getNdcResults("search", query)
+		return getNdcResults("search", search.searchTerms?:"")
 	}
 
 	def getNdcResults(operation, q) { 

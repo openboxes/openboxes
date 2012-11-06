@@ -86,11 +86,13 @@ class Category implements Comparable, Serializable {
 		return categories ? categories*.children.flatten() + categories : []
 	}
 	
+	// FIXME We should move this method out of Category.  It's used primarily in the _selectOptions.gsp, 
+	// but there's probably a better solution.
 	def getProducts() { 
 		try {  
 			return Product.findAllByCategory(this);
 		} catch (Exception e) { 
-			log.info("Error getting products for category " + this.id  + " - " + this.name)
+			//log.info("Error getting products for category " + this.id  + " - " + this.name)
 			return null;	
 		}
 		

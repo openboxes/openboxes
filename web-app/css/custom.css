@@ -1128,4 +1128,5 @@ img.photo_tiny {
 	height:24px;
 }
 
-
+span.tag { border: 1px solid #a5d24a; -moz-border-radius:2px; -webkit-border-radius:2px; display: block; float: left; padding: 5px; text-decoration:none; background: #cde69c; color: #638421; margin-right: 5px; margin-bottom:5px;font-family: helvetica;  font-size:13px;}
+span.tag a { font-weight: none; color: #82ad2b; text-decoration:none; font-size: 11px;  } 

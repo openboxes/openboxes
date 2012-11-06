@@ -18,33 +18,29 @@
 	            <div class="errors">
 	                <g:renderErrors bean="${commandInstance}" as="list" />
 	            </div>
-            </g:hasErrors>            
+            </g:hasErrors>   
+            
+            
 			<div>
 				<!-- Inventory Browser -->
 				<div>
 		        	<g:set var="varStatus" value="${0}"/>
 		        	<g:set var="totalProducts" value="${0}"/> 							        	
-
 					<table>
 						<tr>
 							<td style="width: 250px;">
 			       				<g:render template="filters" model="[commandInstance:commandInstance, quickCategories:quickCategories]"/>						
 							</td>
 							<td>
-								<%-- 
-			       				<g:render template="tabs" model="[commandInstance:commandInstance, quickCategories:quickCategories]"/>						
-			       				--%>
 					         	<table>
 									<tr>
 						         		<td style="padding: 0; margin: 0; vertical-align: middle;">
-								           								            
 											<div class="tabs">
 												<ul>
 													<li>
 														<a href="#tabs-1">
-														
 															<format:category category="${commandInstance?.categoryInstance}"/>
-															<g:if test="${commandInstance?.subcategoryInstance }"> 
+															<g:if test="${commandInstance?.subcategoryInstance && commandInstance?.subcategoryInstance != commandInstance?.categoryInstance}"> 
 																&nbsp;&rsaquo;&nbsp;
 																<format:category category="${commandInstance?.subcategoryInstance}"/>
 															</g:if>
@@ -56,10 +52,8 @@
 																${warehouse.message(code: 'products.all.label') }
 															</g:else>
 															(${commandInstance?.categoryToProductMap?.values()?.flatten()?.size()} products)
-															
 														</a>
 													</li>
-
 												</ul>		
 												<div id="tabs-1" style="padding: 0px;">	
 										            <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
@@ -73,7 +67,7 @@
 																		
 																	</th>
 																	<th class="middle">
-																		<warehouse:message code="default.description.label"/>
+																		<warehouse:message code="product.name.label"/>
 																	</th>
 																	<th class="center middle" style="width: 10%;">
 																		<warehouse:message code="product.manufacturer.label"/>
@@ -121,7 +115,7 @@
 																			tr.productGroupProduct { }
 																			tr.productGroupProducts { }
 																		</style>
-																		<g:each var="inventoryItem" in="${categoryInventoryItems}" status="status">		
+																		<g:each var="inventoryItem" in="${categoryInventoryItems}" status="status">
 																			<g:if test="${inventoryItem.product }">
 																				<g:render template="browseProduct" model="[counter:counter,inventoryItem:inventoryItem,cssClass:'product']"/>
 																			</g:if>

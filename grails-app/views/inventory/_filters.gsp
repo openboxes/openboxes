@@ -1,20 +1,17 @@
 <div style="padding-top:0px;">
 	<g:form method="GET" controller="inventory" action="browse">
 		<div class="box">
-			<table style="width: 10%">
+			<table style="width: 25%">
 				<tr>
 					<td>					
 						<label><warehouse:message code="inventory.filterByProduct.label"/></label>
-						
 						<g:link controller="inventory" action="browse" params="[categoryId:session?.rootCategory?.id,resetSearch:true]">reset</g:link>
-						
 					</td>
 				</tr>				
 			
 				<g:if test="${!commandInstance?.categoryInstance.categories.isEmpty()}">
 					<tr>
-						<td>
-							
+						<td>							
 							<select id="subcategoryId" name="subcategoryId" class="text">
 								<option value=""></option>
 								<g:render template="../category/selectOptions" model="[category:commandInstance?.categoryInstance, selected:commandInstance?.subcategoryInstance, level: 0]"/>								
@@ -26,18 +23,13 @@
 					<tr>
 						<td>
 							<format:category category="${commandInstance?.categoryInstance }"/>
-							
 						</td>
 					</tr>
 				</g:else>
 				<tr>
 					<td>
-						<g:textField name="searchTerms" value="${commandInstance.searchTerms}" class="text medium" size="40"/>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<label><warehouse:message code="inventory.filterByStatus.label"/></label>
+						<g:textField name="searchTerms" value="${commandInstance.searchTerms}" placeholder="${warehouse.message(code:'inventory.searchTerms.label')}" class="text medium" size="40"/>
+						
 						<div style="padding: 10px;">
 							<div>
 								<g:checkBox name="showHiddenProducts" value="${commandInstance.showHiddenProducts}"/>	
@@ -48,16 +40,34 @@
 								<warehouse:message code="inventory.showOutOfStockProducts.label"/>
 							</div>					
 						</div>
-					</td>				
-				</tr>
+						<div class="right">
+							<button type="submit" class="" name="searchPerformed" value="true">
+								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'find.png' )}" class="middle"/>
+								&nbsp;<warehouse:message code="default.find.label"/>&nbsp;
+							</button>
+						</div>
+					</td>
+				</tr>			
+				<tr class="prop">
+					<td>					
+						<label><warehouse:message code="inventory.filterByTag.label"/></label>
+						<%-- 
+						<g:link controller="inventory" action="browse" params="[categoryId:session?.rootCategory?.id,resetSearch:true]">reset</g:link>
+						--%>
+					</td>
+				</tr>			
 				<tr>
-					<td class="right">
-						<button type="submit" class="" name="searchPerformed" value="true">
-							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'find.png' )}" class="middle"/>
-							&nbsp;<warehouse:message code="default.find.label"/>&nbsp;
-						</button>
+					<td>
+						<div class="tags">
+							<g:each in="${tags }" var="tag">
+								<span class="tag">
+									<g:link controller="inventory" action="browse" params="['tag':tag]">${tag }</g:link>
+								</span>
+							</g:each>
+						</div>
 					</td>
 				</tr>
+				
 				<tr class="prop">
 					<td>
 						<label><warehouse:message code="inventory.filterKey.label"/></label>	

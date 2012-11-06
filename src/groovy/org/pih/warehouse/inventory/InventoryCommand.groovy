@@ -29,6 +29,8 @@ class InventoryCommand {
 	def categoryToProductMap = {};						// all of the resulting ProductCommands above, organized by Category
 	Boolean searchPerformed = Boolean.FALSE
 	
+	// Tags
+	List tag
 	
 	static constraints = {
 		warehouseInstance(nullable:true)

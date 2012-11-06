@@ -3,8 +3,7 @@
 		<g:checkBox id="${inventoryItem?.product?.id }" name="product.id" 
 			class="checkbox" style="top:0em;" checked="${false }" 
 				value="${inventoryItem?.product?.id }" />
-	</td>																
-	
+	</td>	
 	<td class="checkable center middle">
 		<img src="${resource(dir: 'images/icons/inventoryStatus', file: inventoryItem?.inventoryLevel?.status?.name()?.toLowerCase() + '.png')}" 
 			alt="${inventoryItem?.inventoryLevel?.status?.name() }" title="${inventoryItem?.inventoryLevel?.status?.name() }" style="vertical-align: middle;"/>
@@ -18,6 +17,7 @@
 				<warehouse:message code="product.untitled.label"/>
 			</g:else>
 		</g:link> 
+		<g:render template="../product/tags" model="[tags:inventoryItem?.product?.tags]"/>
 	</td>
 	<td class="checkable middle center" style="width: 20%">
 		<span class="fade">${inventoryItem?.product?.manufacturer }</span>
