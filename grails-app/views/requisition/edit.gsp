@@ -167,6 +167,8 @@
                     clonedRow = clonedRow.replace(/\[\d\]/g, "[" + newIndex + "]");
                     clonedRow = clonedRow.replace(/-\d-/g, "-" + newIndex + "-");
                     var appendRow = $('<tr class="requisitionItem">' + clonedRow + '</tr>');
+                    appendRow.find("input").val("");
+                    appendRow.find("input").removeAttr("checked");
                     appendRow.find(".order-index").val(newIndex);
 
                     $(".requisitionItem:last").after(appendRow);

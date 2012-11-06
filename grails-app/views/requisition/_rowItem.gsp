@@ -2,7 +2,7 @@
 <td class='value ${hasErrors(bean:requisitionItem,field:'product','errors')}'>
     <g:searchProduct id="requisitionItems-${rowIndex}--product" name="requisitionItems[${rowIndex}].product" jsonUrl="${request.contextPath }/json/searchProduct"
                    styleClass="text"
-                   placeholder="Product/Product Group"
+                   placeholder="${warehouse.message(code:'requisition.addItem.label')}"
                    valueId="${requisitionItem?.product?.id}"
                    valueName="${requisitionItem?.product?.name}"/>
 </td>

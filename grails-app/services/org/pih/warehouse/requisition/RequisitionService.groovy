@@ -293,10 +293,9 @@ class RequisitionService {
 
 
     boolean saveRequisition(Requisition requisition) {
+
+
         requisition.save()
     }
 
-    boolean saveRequisitionItem(RequisitionItem requisitionItem) {
-        requisitionItem.save()
-    }
 }
