@@ -8,11 +8,7 @@ import org.pih.warehouse.requisition.RequisitionService
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.core.Location
 
-class InventoryServiceStub{ //use stub because mockFor do not support multiple demands well
-   def calculateQuantityForProduct(product, location){
-       product.name + "_quantity"
-   }
-}
+
 
 class JsonControllerTests extends ControllerUnitTestCase {
 
@@ -37,8 +33,15 @@ class JsonControllerTests extends ControllerUnitTestCase {
         product21.addToProductGroups(group2)
         product22.addToProductGroups(group2)
 
-
-        controller.inventoryService =  new InventoryServiceStub()
+        def inventoryServiceMock = mockFor(InventoryService)
+        def quantities = [:]
+        quantities[product11] = 1100
+        quantities[product12] = 1200
+        quantities[product21] = 2100
+        quantities[product22] = 2200
+        quantities[product3] = 3000
+        inventoryServiceMock.demand.getProductsQuantityForInventory{inventory -> quantities}
+        controller.inventoryService =  inventoryServiceMock.createMock()
         controller.session.warehouse = location
         controller.params.term = "killer"
         controller.searchProduct()
@@ -70,12 +73,12 @@ class JsonControllerTests extends ControllerUnitTestCase {
         assert jsonResult[5].type == "Product"
 
         //result should contain quantity
-        assert jsonResult[0].quantity == product3.name + "_quantity"
+        assert jsonResult[0].quantity == 3000
         assert jsonResult[1].quantity == null
-        assert jsonResult[2].quantity == product21.name + "_quantity"
+        assert jsonResult[2].quantity == 2100
         assert jsonResult[3].quantity == null
-        assert jsonResult[4].quantity == product12.name + "_quantity"
-        assert jsonResult[5].quantity == product11.name + "_quantity"
+        assert jsonResult[4].quantity == 1200
+        assert jsonResult[5].quantity == 1100
 
     }
 }

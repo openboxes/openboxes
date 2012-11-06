@@ -2662,15 +2662,13 @@ class InventoryService implements ApplicationContextAware {
 
     }
 
-    public int calculateQuantityForProduct(Product product, Location location) {
-        //InventoryItem.findAllByProduct(product).inject(0, {sum, item -> sum + getQuantity(location.inventory, item)})
+    public Map<Product, Integer> getProductsQuantityForInventory(Inventory inventory) {
         def transactionEntries = TransactionEntry.createCriteria().list() {
             transaction {
-                eq("inventory", location.inventory)
+                eq("inventory", inventory)
             }
         }
-        def map = getQuantityByProductMap(transactionEntries)
-        map[product] ?: 0
+        getQuantityByProductMap(transactionEntries)
     }
 
 }

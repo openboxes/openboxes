@@ -423,22 +423,23 @@ class JsonController {
         def groupsFromProductNameMatched = []
         def productWithoutAnyGroups = []
         def result = []
+        def quantities = inventoryService.getProductsQuantityForInventory(location.inventory)
         buildGroupsFromProductNameMatched(productsWithNameMatched, productWithoutAnyGroups,
                 groupsWithNameMatched, groupsFromProductNameMatched)
 
         groupsWithNameMatched.each { group ->
             result.add(getProductGroupItem(group))
-            result.addAll(group.products.collect { product -> getProductItem(product, group, location)})
+            result.addAll(group.products.collect { product -> getProductItem(product, group, quantities)})
         }
 
         groupsFromProductNameMatched.each{ group ->
             result.add(getProductGroupItem(group))
             result.addAll(group.products.findAll{p ->productsWithNameMatched.contains(p)}
-                        .collect { product -> getProductItem(product, group, location)})
+                        .collect { product -> getProductItem(product, group, quantities)})
         }
 
-       result.addAll(productWithoutAnyGroups.collect { product -> getProductItem(product, null, location)})
-       //println result
+       result.addAll(productWithoutAnyGroups.collect { product -> getProductItem(product, null, quantities)})
+       println result
        render result.sort{"${it.group}${it.label}"} as JSON
     }
 
@@ -446,8 +447,8 @@ class JsonController {
         [value: group.id, label: group.description, type: "ProductGroup", group: ""]
     }
 
-    private def getProductItem(Product product, ProductGroup group, Location location) {
-        [value: product.id, label: product.name, type: "Product", group: group?.description, quantity: inventoryService.calculateQuantityForProduct(product, location)]
+    private def getProductItem(Product product, ProductGroup group,Map<Product, Integer> quantities) {
+        [value: product.id, label: product.name, type: "Product", group: group?.description, quantity: quantities[product]]
     }
 
 
