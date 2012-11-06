@@ -14,6 +14,9 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
+import org.pih.warehouse.core.Tag;
+import org.pih.warehouse.core.User;
+
 import testutils.DbHelper
 
 
@@ -141,6 +144,22 @@ class InventoryServiceTests extends GroovyTestCase {
 
 
     }
+	
+	
+	private void productTagTestFixture() {		
+		basicTestFixture()
+		User user = User.get(1)
+		assertNotNull user 
+		println user
+		aspirinProduct.addToTags(new Tag(tag: "thistag"))
+		aspirinProduct.save(flush:true, failOnError:true)
+		tylenolProduct.addToTags(new Tag(tag: "thattag"))
+		tylenolProduct.save(flush:true, failOnError:true)
+		assertEquals 1, aspirinProduct.tags.size()
+		assertEquals 1, tylenolProduct.tags.size()
+		assertEquals 2, Tag.list().size()
+		
+	}
 
     void test_getQuantityByProductMap() {
 
@@ -158,9 +177,9 @@ class InventoryServiceTests extends GroovyTestCase {
     void xtest_getQuantityByInventoryItem(){
         transactionEntryTestFixture()
         def inventoryService = new InventoryService()
-        assert inventoryService.getQuantity(bostonInventory,aspirinItem1 ) == 94
-        assert inventoryService.getQuantity(bostonInventory,aspirinItem2 ) == 3
-        assert inventoryService.getQuantity(bostonInventory,tylenolItem ) == 25
+        assert inventoryService.getQuantity(bostonInventory, aspirinItem1) == 94
+        assert inventoryService.getQuantity(bostonInventory, aspirinItem2) == 3
+        assert inventoryService.getQuantity(bostonInventory, tylenolItem) == 25
     }
 
     void test_getProductsQuantityForInventory(){
@@ -275,5 +294,28 @@ class InventoryServiceTests extends GroovyTestCase {
     		assert newTransaction.source == null
     		assert newTransaction.destination == haitiLocation
     	}
+		
+		
+		
+		void test_getProductsByTags() { 
+			productTagTestFixture()
+			def inventoryService = new InventoryService()
+			def tags = new ArrayList()
+			tags.add("thistag") 
+			tags.add("thattag")
+			
+			def results = inventoryService.getProductsByTags(tags)
+			assertEquals 2, results.size()
+		}
 
+		
+		void test_getProductsByTag() { 
+			productTagTestFixture()
+			def tags = Tag.list()
+			assertEquals 2, tags.size()
+			
+			def inventoryService = new InventoryService()
+			def results = inventoryService.getProductsByTag("thistag")
+			assertEquals 1, results.size()
+		}
 }
