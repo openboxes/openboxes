@@ -23,7 +23,7 @@
             </g:hasErrors>
 
             <div id="requisition-header">
-                <div class="title"><warehouse:message code="requisition.label" /></div>
+                <div class="title" id="description">${requisition.name ?: warehouse.message(code: 'requisition.label', default: 'Requisition')}</div>
                 <g:if test="${requisition.lastUpdated}">
                       <div class="time-stamp fade"><g:formatDate date="${requisition.lastUpdated }" format="dd/MMM/yyyy hh:mm a"/></div>
                 </g:if>
@@ -33,16 +33,18 @@
             <g:form name="requisitionForm" method="post" action="save">
                 <g:hiddenField name="id" value="${requisition?.id}" />
                 <g:hiddenField name="version" value="${requisition?.version}" />
+                <input type="hidden" id="name" name="name" size="80" value="${requisition.name}"/>
+
                 <div class="dialog">
                     <table id="requisition">
                         <tbody>
                             <tr class="prop">
                                 <td valign="top" class="name">
-									<label for="origin.id"><warehouse:message code="requisition.depot.label" /></label>
+									<label for="origin.id"><warehouse:message code="requisition.requestingDepot.label" /></label>
 
                                 </td>
                                 <td colspan="5" valign="top" class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}" id="depot">
-                                	<g:select name="origin.id" from="${org.pih.warehouse.core.Location.list()}"
+                                	<g:select name="origin.id" from="${depots}"
                                 		optionKey="id" optionValue="name" value="${requisition?.origin?.id}" noSelection="['null':'']" />
 
                                 </td>
@@ -99,15 +101,7 @@
                                 </td>
                             </tr>
 
-                            <tr class="prop">
-                                <td valign="top" class="name">
-									<label for="name"><warehouse:message code="default.description.label" /></label>
-                                </td>
-                                <td valign="top" colspan="5">
-									<input type="hidden" id="name" name="name" size="80" value="${requisition.name}"/>
-									<label id="description" name="name">${requisition.name}</label>
-                                </td>
-                            </tr>
+
 
                             <g:if test="${requisition.id}">
                                 <g:render template="items" model="[requisition:requisition]"/>

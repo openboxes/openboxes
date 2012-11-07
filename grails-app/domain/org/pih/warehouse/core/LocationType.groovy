@@ -58,7 +58,7 @@ class LocationType implements Comparable, Serializable {
 	* @return	true if the activity is supported, false otherwise
 	*/
    Boolean supports(String activity) {
-		return supportedActivities?.contains(activity);
+		return supportedActivities?.any {a -> activity == a.toString() };
    }
 	
 	

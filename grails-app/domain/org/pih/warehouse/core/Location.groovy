@@ -104,7 +104,7 @@ class Location implements Comparable, java.io.Serializable {
 	Boolean supports(String activity) { 
 		boolean supportsActivity = false
 		if (supportedActivities) {
-			supportsActivity = supportedActivities?.contains(activity);
+			supportsActivity = supportedActivities?.any{a -> activity == a.toString()};
 		}
 		else {
 			supportsActivity = locationType?.supports(activity)

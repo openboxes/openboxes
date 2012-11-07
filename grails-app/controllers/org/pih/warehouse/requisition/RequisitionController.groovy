@@ -54,7 +54,12 @@ class RequisitionController {
     def edit = {
         def requisition = Requisition.get(params.id) ?: new Requisition()
         requisition.properties = params
-        return [requisition: requisition];
+        def depots = getDepots()
+        return [requisition: requisition, depots:depots];
+    }
+
+    private List<Location> getDepots() {
+        Location.list().findAll {location -> location.id != session.warehouse.id && location.isWarehouse()}
     }
 
     def save = {
@@ -66,8 +71,8 @@ class RequisitionController {
         }else{
             requisition?.requisitionItems?.each { it.validate()}
         }
-
-        render(view: "edit", model: [requisition: requisition])
+        def depots = getDepots()
+        render(view: "edit", model: [requisition: requisition, depots:depots])
     }
 
 

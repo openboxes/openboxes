@@ -12,25 +12,29 @@ package org.pih.warehouse.core
 import grails.test.*
 
 class LocationTests extends GrailsUnitTestCase {
+    def location1
+    def location2
+    def location3
     protected void setUp() {
         super.setUp()
-		def depot = new LocationType(name: "Depot")
-		def location1 = new Location(name: "Boston", locationType: depot)
-		def location2 = new Location(name: "Miami", locationType: depot)
-				
-		mockDomain(LocationType, [depot])
-		mockDomain(Location, [location1, location2])
+		def depot = new LocationType(name: "Depot", supportedActivities: [ActivityCode.MANAGE_INVENTORY])
+		def supplier = new LocationType(name: "Supplier")
+		location1 = new Location(name: "Boston", locationType: depot, supportedActivities: [ActivityCode.MANAGE_INVENTORY])
+		location2 = new Location(name: "Miami", locationType: depot)
+	    location3 = new Location(name: "supplier", locationType: supplier, supportedActivities: [ActivityCode.RECEIVE_STOCK])
+
+		mockDomain(LocationType, [depot, supplier])
+		mockDomain(Location, [location1, location2, location3])
     }
 
-    protected void tearDown() {
-        super.tearDown()
+    void test_supports() {
+
+        assert location1.supports(ActivityCode.MANAGE_INVENTORY)
+        assert location2.supports(ActivityCode.MANAGE_INVENTORY)
+        assert !location3.supports(ActivityCode.MANAGE_INVENTORY)
+
     }
 
-    void test_shouldHaveLocations() {
-		println Location.list()
-		assertEquals 2, Location.list().size()		
-    }
-	
 	void test_shouldSaveLocation() {
 		def location = new Location(name: "Default location", locationType: new LocationType(name: "Depot"))
 		
