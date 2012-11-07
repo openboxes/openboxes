@@ -30,11 +30,7 @@
                 <div class="status fade">${requisition.status.toString()}</div>
             </div>
 
-
-
-
-
-            <g:form id="requisitionForm" method="post" action="save">
+            <g:form name="requisitionForm" method="post" action="save">
                 <g:hiddenField name="id" value="${requisition?.id}" />
                 <g:hiddenField name="version" value="${requisition?.version}" />
                 <div class="dialog">
