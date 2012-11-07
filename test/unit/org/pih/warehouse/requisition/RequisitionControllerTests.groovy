@@ -20,9 +20,19 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
 
     void testEdit(){
         controller.params.name = "peter"
+        mockDomain(Requisition, [])
         def model =  controller.edit()
-
         assert model.requisition.name == "peter"
+    }
+    void testEditExistingRequisition(){
+        def requisition = new Requisition(id: "1234", name: "jim", recipientProgram:"abc")
+        mockDomain(Requisition, [requisition])
+        controller.params.name = "peter"
+        controller.params.id = "1234"
+        def model =  controller.edit()
+        assert model.requisition.id == "1234"
+        assert model.requisition.name == "peter"
+        assert model.requisition.recipientProgram == "abc"
     }
 
     void testSave() {
@@ -38,14 +48,15 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         def location = new Location(id:"1234")
         def myLocation = new Location(id:"001")
         mockDomain(Location, [location, myLocation])
+        mockDomain(Requisition, [])
 
         def person = new Person(id:"1234adb")
         mockDomain(Person, [person])
 
         controller.params.name = "testRequisition"
-        controller.params.origin = [id: location.id]
-        controller.params.destination = [id:location.id]
-        controller.params.requestedBy = [id:person.id]
+        controller.params.origin = location
+        controller.params.destination = myLocation
+        controller.params.requestedBy = person
         controller.session.warehouse = myLocation
 
         controller.save()
@@ -63,71 +74,6 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         requisitionServiceMock.verify()
     }
 
-    def testSaveItemSucceeded() {
-
-        def product = new Product(id:"product1")
-        mockDomain(Product, [product])
-
-        def requisition = new Requisition(id:"requisition1")
-        mockDomain(Requisition, [requisition])
-
-        def person = new Person(id:"person1")
-        mockDomain(Person, [person])
-
-        def requisitionServiceMock = mockFor(RequisitionService)
-        requisitionServiceMock.demand.saveRequisitionItem { requisitionItem -> requisitionItem.id = "abc3344" }
-        controller.requisitionService = requisitionServiceMock.createMock()
-
-        controller.params.requisition = [id:requisition.id]
-        controller.params.product = [id:product.id]
-        controller.params.substitutable = true
-        controller.params.recipient = [id:person.id]
-        controller.params.comment = "testRequisitionItem"
-        controller.params.quantity = 50
-
-        controller.saveRequisitionItem()
-
-        def jsonResponse = JSON.parse(controller.response.contentAsString)
-
-        assert jsonResponse.requisitionItem.id == "abc3344"
-        assert jsonResponse.success == true
-
-    }
-
-    def testSaveItemFailed() {
-        mockForConstraintsTests(RequisitionItem)
-        def product = new Product(id:"product1")
-        mockDomain(Product, [product])
-
-        def requisition = new Requisition(id:"requisition1")
-        mockDomain(Requisition, [requisition])
-
-        def person = new Person(id:"person1")
-        mockDomain(Person, [person])
-
-        def requisitionServiceMock = mockFor(RequisitionService)
-        def bindedItem;
-        requisitionServiceMock.demand.saveRequisitionItem { requisitionItem ->
-            bindedItem = requisitionItem
-            requisitionItem.validate() }
-        controller.requisitionService = requisitionServiceMock.createMock()
-
-
-        controller.saveRequisitionItem()
-
-        def jsonResponse = JSON.parse(controller.response.contentAsString)
-
-
-        assert jsonResponse.success == false
-        def firstError = jsonResponse.errors.first()
-        assert firstError.field
-        assert firstError.defaultMessage
-        assert firstError.arguments
-
-
-
-
-    }
 
 
 }

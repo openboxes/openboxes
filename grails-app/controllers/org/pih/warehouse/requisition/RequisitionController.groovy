@@ -52,13 +52,14 @@ class RequisitionController {
 
 
     def edit = {
-
-        def requisition = new Requisition(params)
+        def requisition = Requisition.get(params.id) ?: new Requisition()
+        requisition.properties = params
         return [requisition: requisition];
     }
 
     def save = {
-        def requisition = new Requisition(params)
+        def requisition = Requisition.get(params.id) ?: new Requisition()
+        requisition.properties = params
         requisition.destination = Location.get(session.warehouse.id)
         if (requisitionService.saveRequisition(requisition)) {
             flash.message = "${warehouse.message(code: 'default.saved.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), requisition.id])}"
@@ -69,25 +70,7 @@ class RequisitionController {
         render(view: "edit", model: [requisition: requisition])
     }
 
-    def saveRequisitionItem = {
-        def json
-            def requisitionItem = new RequisitionItem(params)
-        if (requisitionService.saveRequisitionItem(requisitionItem)) {
-            json = [
-                    success: true,
-                    requisitionItem: [
-                            id: requisitionItem.id
-                    ]]
 
-        } else {
-            json = [
-                    success: false,
-                    errors: requisitionItem.errors.allErrors
-            ]
-
-        }
-        render json as JSON
-    }
 
     def show = {
         def requestInstance = Requisition.get(params.id)
