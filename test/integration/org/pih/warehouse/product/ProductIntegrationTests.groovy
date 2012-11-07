@@ -24,6 +24,8 @@ class ProductIntegrationTests extends GroovyTestCase{
        def group = ProductGroup.findByDescription("PainKiller")
         def products = group.products
         assert products.any{p -> p.name == "Advil 200mg"}
+        assert products.any{p -> p.name == "Tylenol 325mg"}
+
     }
 
     void testGetProductGroup(){

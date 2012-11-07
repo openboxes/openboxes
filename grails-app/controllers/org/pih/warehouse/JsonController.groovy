@@ -437,18 +437,20 @@ class JsonController {
         log.debug "Search products and product groups contains:" + params.term
         def location = Location.get(session.warehouse.id);
         def groupsWithNameMatched = ProductGroup.findAllByDescriptionIlike ("%" + params.term + "%")
-        def productsWithNameMatched = Product.findAllByNameIlike ("%" + params.term + "%")
+
         def groupsFromProductNameMatched = []
         def productWithoutAnyGroups = []
         def result = []
         def quantities = inventoryService.getProductsQuantityForInventory(location.inventory)
-        buildGroupsFromProductNameMatched(productsWithNameMatched, productWithoutAnyGroups,
-                groupsWithNameMatched, groupsFromProductNameMatched)
-
         groupsWithNameMatched.each { group ->
             result.add(getProductGroupItem(group))
             result.addAll(group.products.collect { product -> getProductItem(product, group, quantities)})
         }
+        def productsWithNameMatched = Product.findAllByNameIlike ("%" + params.term + "%")
+        buildGroupsFromProductNameMatched(productsWithNameMatched, productWithoutAnyGroups,
+                groupsWithNameMatched, groupsFromProductNameMatched)
+
+
 
         groupsFromProductNameMatched.each{ group ->
             result.add(getProductGroupItem(group))
@@ -466,7 +468,7 @@ class JsonController {
     }
 
     private def getProductItem(Product product, ProductGroup group,Map<Product, Integer> quantities) {
-        [value: product.id, label: product.name, type: "Product", group: group?.description, quantity: quantities[product]]
+        [value: product.id, label: product.name, type: "Product", group: group?.description ?: "", quantity: quantities[product]]
     }
 
 

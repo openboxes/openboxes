@@ -80,5 +80,13 @@ class JsonControllerTests extends ControllerUnitTestCase {
         assert jsonResult[4].quantity == 1200
         assert jsonResult[5].quantity == 1100
 
+        //result should contain group
+        assert jsonResult[0].group == ""
+        assert jsonResult[1].group == ""
+        assert jsonResult[2].group == group2.description
+        assert jsonResult[3].group == ""
+        assert jsonResult[4].group == group1.description
+        assert jsonResult[5].group == group1.description
+
     }
 }
