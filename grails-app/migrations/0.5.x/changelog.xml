@@ -10,5 +10,6 @@
 	<include file="0.5.x/modify-column-product-description.xml"/>
 	<include file="0.5.x/add-order_index-to-requisition_item.xml"/>
 	<include file="0.5.x/add-product-tag.xml"/>
-
+	<include file="0.5.x/add-requisition-item-idx.xml"/>
+	
 </databaseChangeLog>

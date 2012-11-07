@@ -66,6 +66,7 @@ class RequisitionController {
         def requisition = Requisition.get(params.id) ?: new Requisition()
         requisition.properties = params
         requisition.destination = Location.get(session.warehouse.id)
+		
         if (requisitionService.saveRequisition(requisition)) {
             flash.message = "${warehouse.message(code: 'default.saved.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), requisition.id])}"
         }else{
@@ -94,7 +95,7 @@ class RequisitionController {
         if (requestInstance) {
 
             if (requestInstance?.requisitionItems?.size() > 0) {
-                requestInstance.status = RequisitionStatus.REQUESTED;
+                requestInstance.status = RequisitionStatus.PLACED;
                 if (!requestInstance.hasErrors() && requestInstance.save(flush: true)) {
                     flash.message = "${warehouse.message(code: 'request.placedWithLocation.message', args: [requestInstance?.description, requestInstance?.origin?.name])}"
                     redirect(action: "show", id: requestInstance.id)

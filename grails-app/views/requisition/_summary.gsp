@@ -32,7 +32,7 @@
 							<span class="fade">&nbsp;|&nbsp;</span>
 							<span class="request-items">
 								<warehouse:message code="request.requestItems.label"/>: 
-								<b>${requestInstance?.requestItems?.size()}</b>
+								<b>${requestInstance?.requisitionItems?.size()}</b>
 							</span>
 							<span class="fade">&nbsp;|&nbsp;</span>
 							<span class="requested-by">

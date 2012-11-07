@@ -18,7 +18,9 @@
 				<g:sortableColumn property="destination"
 					title="${warehouse.message(code: 'default.destination.label', default: 'Destination')}" />
 			</g:if>
-
+			<th>
+				<warehouse:message code="requisition.requisitionItems"/>
+			</th>
 			<g:sortableColumn property="createdBy"
 				title="${warehouse.message(code: 'default.createdBy.label', default: 'Created by')}" />
 			
@@ -33,7 +35,7 @@
         <g:unless test="${requests}">
            	<tr class="prop odd">
            		<td colspan="6" class="center">
-           			<warehouse:message code="request.noRequestsMatchingCriteria.message"/>
+           			<warehouse:message code="requisition.noRequisitionsMatchingCriteria.message"/>
 	           	</td>
 			</tr>     
 		</g:unless>	
@@ -46,7 +48,7 @@
 					<format:metadata obj="${requestInstance?.status}"/>
 				</td>
 				<td>
-					<g:link action="show" id="${requestInstance.id}">
+					<g:link action="edit" id="${requestInstance.id}">
 						${fieldValue(bean: requestInstance, field: "name")}
 					</g:link>
 				</td>
@@ -61,6 +63,7 @@
 					</td>
 				</g:if>
 
+				<td>${requestInstance?.requisitionItems?.size() }</td>
 				<td>${requestInstance.requestedBy}</td>
 
 				<td><format:datetime obj="${requestInstance.lastUpdated}" /></td>

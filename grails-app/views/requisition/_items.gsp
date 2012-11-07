@@ -1,6 +1,6 @@
 <tr class="prop">
     <th valign="top" class="name">
-
+ 		
     </th>
     <th class="list-header">
         ${warehouse.message(code: 'requisitionItem.item.label')}
@@ -21,8 +21,8 @@
         ${warehouse.message(code: 'requisitionItem.delete.label')}
     </th>
 </tr>
-<g:each var="requisitionItem" in="${requisition.requisitionItems?.sort{it.orderIndex}}" status="i">
-    <tr class="requisitionItem">
+<g:each var="requisitionItem" in="${requisition.requisitionItems}" status="i">
+    <tr id="requisitionItemRow-${i }" class="requisitionItem ${i%2?'even':'odd' }">
         <g:render template="rowItem" model="[requisition: requisition, requisitionItem:requisitionItem, rowIndex:requisitionItem.orderIndex]"/>
     </tr>
 </g:each>
@@ -31,13 +31,3 @@
         <g:render template="rowItem" model="[requisition: requisition, rowIndex: 0]" />
     </tr>
 </g:if>
-
-<tr>
-    <td></td>
-    <td>
-        <button type="button" id="addItemButton" name="addItemButton">
-            <img src="${createLinkTo(dir: 'images/icons/silk', file: 'accept.png')}" class="top"/>
-            <warehouse:message code="requisitionItem.addrow.label"/>
-        </button>
-    </td>
-</tr>

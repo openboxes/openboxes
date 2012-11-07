@@ -130,11 +130,6 @@
 				<warehouse:message code="requests.label"/>
 			</g:link>
 			<div>
-				<table>
-					<tr>
-						<td>					
-						
-							
 							<div class="buttonsBar">
 								<div class="linkButton">
 									<g:link controller="requisition" action="list" params="[requestType:'INCOMING']" class="list">
@@ -150,8 +145,6 @@
 									%{--</div>--}%
 								%{--</g:each>--}%
 							</div>
-						</td>
-						<td>			
 						
 							
 							<div class="linkButton">
@@ -169,16 +162,13 @@
 								%{--</div>--}%
 							%{--</g:each>							--}%
 							
-						</td>
-						<td>
+
 							<div class="linkButton">
 								<g:link controller="requisition" action="edit" class="create">
 									<warehouse:message code="requisition.create.label" />
 								</g:link>
 							</div>
-						</td>
-					</tr>
-				</table>
+
 			</div>
 		</li>
 	</g:authorize>		

@@ -5,7 +5,7 @@
 			<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
 		</button>
 		
-		<g:if test="${requestInstance?.isRequested() }">
+		<g:if test="${requestInstance?.isOpen() }">
 			<g:render template="actionsRequested" model="[requestInstance:requestInstance]"/>
 		</g:if>
 		<g:elseif test="${requestInstance?.isNew() }">

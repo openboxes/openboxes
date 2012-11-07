@@ -39,7 +39,7 @@ class Requisition implements Serializable {
 	
 	
 
-	RequisitionStatus status = RequisitionStatus.NEW;
+	RequisitionStatus status = RequisitionStatus.CREATED;
 
 	Location origin			// the vendor
 	Location destination 	// the customer location 
@@ -48,7 +48,7 @@ class Requisition implements Serializable {
 	Person recipient
 	String recipientProgram	
 	
-	
+	List requisitionItems
 	
 	Date dateRequested  = new Date()
     Date requestedDeliveryDate = new Date().plus(1)
@@ -68,7 +68,7 @@ class Requisition implements Serializable {
 	static hasMany = [ requisitionItems: RequisitionItem ]
 	static mapping = {
 		id generator: 'uuid'
-		requestItems cascade: "all-delete-orphan", sort: "id"
+		requisitionItems cascade: "all-delete-orphan", sort: "id"
 		comments cascade: "all-delete-orphan"
 		documents cascade: "all-delete-orphan"
 		events cascade: "all-delete-orphan"
@@ -107,11 +107,11 @@ class Requisition implements Serializable {
 	}
 	
 	Boolean isNew() { 
-		return (status == null || status == RequisitionStatus.NEW)
+		return (status == null || status == RequisitionStatus.CREATED)
 	}
 	
-	Boolean isRequested() { 
-		return (status in [RequisitionStatus.REQUESTED, RequisitionStatus.OPEN])
+	Boolean isOpen() { 
+		return (status in [RequisitionStatus.OPEN])
 	}
 
 	Boolean isFulfilled() { 

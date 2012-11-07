@@ -28,6 +28,8 @@
                       <div class="time-stamp fade"><g:formatDate date="${requisition.lastUpdated }" format="dd/MMM/yyyy hh:mm a"/></div>
                 </g:if>
                 <div class="status fade">${requisition.status.toString()}</div>
+                
+                ${requisition?.requisitionItems?.size() }
             </div>
 
             <g:form name="requisitionForm" method="post" action="save">
@@ -110,9 +112,18 @@
                             <tr class="prop">
 
                             	<td valign="top">
+									
 
                             	</td>
-                            	<td colspan="5">
+                            	<td>
+                            		<div class="buttons left">
+		                            	<button type="button" id="addItemButton" name="addItemButton">
+								            <img src="${createLinkTo(dir: 'images/icons/silk', file: 'accept.png')}" class="top"/>
+								            <warehouse:message code="requisitionItem.addrow.label"/>
+								        </button>
+								    </div>
+							    </td>
+							    <td colspan="4">
 									<div class="buttons right">
 					                    <button type="submit">
 											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'accept.png')}" class="top"/>
@@ -152,15 +163,17 @@
 
 
                 $("#addItemButton").click(function() {
-                    var clonedRow = $(".requisitionItem:last").clone().html();
+                    var clonedRow = $(".requisitionItem:first").clone().html();
                     var newIndex = $(".requisitionItem").length;
                     clonedRow = clonedRow.replace(/\[\d\]/g, "[" + newIndex + "]");
                     clonedRow = clonedRow.replace(/-\d-/g, "-" + newIndex + "-");
-                    var appendRow = $('<tr class="requisitionItem">' + clonedRow + '</tr>');
+                    var cssClass = (newIndex % 2) ? "even" : "odd";
+                    var appendRow = $('<tr class="requisitionItem ' + cssClass + '">' + clonedRow + '</tr>');
+                    
+					// Reset all input fields
                     appendRow.find("input").val("");
                     appendRow.find("input").removeAttr("checked");
                     appendRow.find(".order-index").val(newIndex);
-
                     $(".requisitionItem:last").after(appendRow);
                 });
 
@@ -168,6 +181,8 @@
                     $(currentNode).parent().parent().parent().remove();
                 }
 
+				
+                
                 %{--$('.requisitionItem').live('focusout', function() {--}%
                     %{--var recipient = $(this).find('[name="recipient"]');--}%
 
