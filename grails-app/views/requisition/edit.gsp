@@ -106,7 +106,7 @@
 
 
                             <g:if test="${requisition.id}">
-                                <g:render template="items" model="[requisition:requisition]"/>
+                                <g:render template="items" model="[requisition:requisition, requisitionItems: requisitionItems]"/>
                             </g:if>
 
                             <tr class="prop">

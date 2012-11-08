@@ -117,6 +117,13 @@ class RequisitionItem implements Serializable {
 	def totalPrice() { 
 		return ( quantity ? quantity : 0.0 ) * ( unitPrice ? unitPrice : 0.0 );
 	}
-			
-		
+
+
+    boolean checkIsEmpty() {
+     (id == null || id == "") && quantity == null && product == null && substitutable == false && (comment == null || comment == "") && (recipient == null || recipient == "")
+    }
+
+    String toString(){
+        "id:${id} product:${product} quantity:${quantity} substitutable:${substitutable} comment:${comment} recipient:${recipient}"
+    }
 }

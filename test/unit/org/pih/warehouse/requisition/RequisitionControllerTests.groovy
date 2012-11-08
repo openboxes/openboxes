@@ -9,15 +9,15 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.product.Product
 import grails.converters.JSON
 import org.pih.warehouse.core.ActivityCode
+import testutils.MockBindDataMixin
 
-/**
- * Created by IntelliJ IDEA.
- * User: adminuser
- * Date: 10/25/12
- * Time: 1:30 PM
- * To change this template use File | Settings | File Templates.
- */
+@Mixin(MockBindDataMixin)
 class RequisitionControllerTests extends ControllerUnitTestCase{
+
+    protected void setUp(){
+        super.setUp()
+        mockBindData()
+    }
 
     void testEdit(){
         def location1 = new Location(id:"1234", supportedActivities: [ActivityCode.MANAGE_INVENTORY])
@@ -50,11 +50,13 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
     void testSave() {
 
         def stubMessager = new Expando()
-        stubMessager.message = { args -> return "created" }
+        stubMessager.message = { args -> return "saved" }
         controller.metaClass.warehouse = stubMessager;
-
+        def requisitionItemsToSave
         def requisitionServiceMock = mockFor(RequisitionService)
-        requisitionServiceMock.demand.saveRequisition { requisition -> requisition.id = "6677" }
+        requisitionServiceMock.demand.saveRequisition { requisition ->
+            requisitionItemsToSave = requisition.requisitionItems?.collect{it}
+        }
         controller.requisitionService = requisitionServiceMock.createMock()
 
         def location1 = new Location(id:"1234", supportedActivities: [ActivityCode.MANAGE_INVENTORY])
@@ -66,11 +68,21 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         def person = new Person(id:"1234adb")
         mockDomain(Person, [person])
 
+        def requisition = new Requisition(id: "abcd")
+        mockDomain(Requisition, [requisition])
+
+        def requisitionItem1 = new RequisitionItem(orderIndex: 0)
+        def requisitionItem2 = new RequisitionItem(orderIndex: 1, quantity: 500, product: new Product())
+        mockDomain(RequisitionItem, [])
+
         controller.params.name = "testRequisition"
+        controller.params.id = requisition.id
         controller.params.origin = location1
         controller.params.destination = myLocation
         controller.params.requestedBy = person
         controller.session.warehouse = myLocation
+        controller.params["requisitionItems[0]"] = requisitionItem1
+        controller.params["requisitionItems[1]"] = requisitionItem2
 
         controller.save()
         def model = renderArgs.model
@@ -79,13 +91,21 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         assert model.requisition.origin.id == location1.id
         assert model.requisition.destination.id == myLocation.id
         assert model.requisition.requestedBy.id == person.id
+        assert requisitionItem1.orderIndex != null
+        assert model.requisition.requisitionItems.size() == 1
+        assert model.requisitionItems.size() == 2
+        assert model.requisitionItems.any{ it.orderIndex == requisitionItem1.orderIndex}
+        assert model.requisitionItems.any{it.orderIndex == requisitionItem2.orderIndex}
 
+        assert requisitionItemsToSave.size() == 1
+        assert !requisitionItemsToSave.any{ it.orderIndex == requisitionItem1.orderIndex}
+        assert requisitionItemsToSave.any{it.orderIndex == requisitionItem2.orderIndex}
         assert model.depots.contains(location1)
         assert !model.depots.contains(location2)
         assert !model.depots.contains(myLocation)
 
         assert renderArgs.view == "edit"
-        assert controller.flash.message == "created"
+        assert controller.flash.message == "saved"
 
 
         requisitionServiceMock.verify()

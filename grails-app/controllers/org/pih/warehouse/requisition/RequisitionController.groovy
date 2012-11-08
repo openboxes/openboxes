@@ -13,8 +13,9 @@ import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Document;
 
 
+
 import org.pih.warehouse.core.Location
-import grails.converters.JSON;
+
 
 
 class RequisitionController {
@@ -53,7 +54,7 @@ class RequisitionController {
 
     def edit = {
         def requisition = Requisition.get(params.id) ?: new Requisition()
-        requisition.properties = params
+        bindData(requisition, params)
         def depots = getDepots()
         return [requisition: requisition, depots:depots];
     }
@@ -63,8 +64,14 @@ class RequisitionController {
     }
 
     def save = {
-        def requisition = Requisition.get(params.id) ?: new Requisition()
-        requisition.properties = params
+        Requisition requisition = Requisition.get(params.id) ?: new Requisition()
+
+        bindData(requisition, params)
+
+        def emptyRequisitionItems = requisition.requisitionItems?.findAll{ it.checkIsEmpty()} ?: []
+        emptyRequisitionItems?.each{requisition.removeFromRequisitionItems(it)}
+
+        requisition.requisitionItems?.each{println "item to save: ${it}"}
         requisition.destination = Location.get(session.warehouse.id)
 		
         if (requisitionService.saveRequisition(requisition)) {
@@ -73,9 +80,11 @@ class RequisitionController {
             requisition?.requisitionItems?.each { it.validate()}
         }
         def depots = getDepots()
-        render(view: "edit", model: [requisition: requisition, depots:depots])
+        def requisitionItems = requisition.requisitionItems?.collect{it} ?: []
+        requisitionItems.addAll(emptyRequisitionItems)
+        requisitionItems.each{println "item to render: ${it}"}
+        render(view: "edit", model: [requisition: requisition, depots:depots, requisitionItems: requisitionItems.sort{ it.orderIndex}])
     }
-
 
 
     def show = {
