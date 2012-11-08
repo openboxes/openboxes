@@ -91,6 +91,39 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         requisitionServiceMock.verify()
     }
 
+    void testDelete() {
+
+        def location1 = new Location(id:"1234", supportedActivities: [ActivityCode.MANAGE_INVENTORY])
+        def location2 = new Location(id:"1235", supportedActivities: ["supplier"])
+        mockDomain(Location, [location1, location2])
+
+        def person = new Person(id:"1234adb")
+        mockDomain(Person, [person])
+
+        def stubMessager = new Expando()
+        stubMessager.message = { args -> return "deleted" }
+        controller.metaClass.warehouse = stubMessager;
+
+        def requisitionServiceMock = mockFor(RequisitionService)
+        requisitionServiceMock.demand.deleteRequisition { true }
+        controller.requisitionService = requisitionServiceMock.createMock()
+
+        def requisition = new Requisition(id: "1234", name: "jim", origin: location1, destination: location2, requestedBy:person, dateRequested: new Date(), requestedDeliveryDate: new Date().plus(1) )
+        mockDomain(Requisition, [requisition])
+        int oldSize = Requisition.count()
+
+        controller.params.id = "1234"
+        controller.delete()
+
+        requisitionServiceMock.verify()
+        assert redirectArgs.action == "list"
+        assert controller.flash.message == "deleted"
+
+        //This is a bad test because hibernate remembers the object even though it has been deleted. The domain does not refresh.
+        //assertEquals oldSize - 1, Requisition.count()
+
+    }
+
 
 
 }

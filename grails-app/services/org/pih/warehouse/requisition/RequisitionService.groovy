@@ -298,4 +298,8 @@ class RequisitionService {
         requisition.save()
     }
 
+    boolean deleteRequisition(Requisition requisition) {
+        requisition.delete(flush: true)
+    }
+
 }

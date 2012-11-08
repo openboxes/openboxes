@@ -146,30 +146,24 @@ class RequisitionController {
         }
     }
 
-
-
-
     def delete = {
-        def requestInstance = Requisition.get(params.id)
-        if (requestInstance) {
+        def requisition = Requisition.get(params.id)
+        if (requisition) {
             try {
-                requestInstance.delete(flush: true)
-                flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
+                requisitionService.deleteRequisition(requisition)
+                flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
                 redirect(action: "list")
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
-                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
+                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
                 redirect(action: "list", id: params.id)
             }
         }
         else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
             redirect(action: "list")
         }
     }
-
-
-
 
     def addComment = {
         def requestInstance = Requisition.get(params?.id)
