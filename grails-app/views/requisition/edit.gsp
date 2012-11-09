@@ -12,7 +12,6 @@
     </head>
     <body>
         <div class="body">
-            <jqvalui:renderValidationScript for="org.pih.warehouse.requisition.RequisitionItem" form="requisitionForm"/>
             <g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>
             </g:if>
@@ -106,7 +105,39 @@
 
 
                             <g:if test="${requisition.id}">
-                                <g:render template="items" model="[requisition:requisition, requisitionItems: requisitionItems]"/>
+                                <tr class="prop">
+                                    <th valign="top" class="name">
+
+                                    </th>
+                                    <th class="list-header">
+                                        ${warehouse.message(code: 'requisitionItem.item.label')}
+                                    </th>
+                                    <th class="center">
+                                        ${warehouse.message(code: 'requisitionItem.quantity.label')}
+                                    </th>
+                                    <th class="center">
+                                        ${warehouse.message(code: 'requisitionItem.substitutable.label')}
+                                    </th>
+                                    <th class="list-header">
+                                        ${warehouse.message(code: 'requisitionItem.recipient.label')}
+                                    </th>
+                                    <th class="list-header">
+                                        ${warehouse.message(code: 'requisitionItem.comment.label')}
+                                    </th>
+                                    <th class="list-header center">
+                                        ${warehouse.message(code: 'requisitionItem.delete.label')}
+                                    </th>
+                                </tr>
+                                <g:each var="requisitionItem" in="${requisition.requisitionItems}" status="i">
+                                    <tr id="requisitionItemRow-${i }" class="requisitionItem ${i%2?'even':'odd' }">
+                                        <g:render template="editItem" model="[requisition: requisition, requisitionItem:requisitionItem, rowIndex:requisitionItem.orderIndex]"/>
+                                    </tr>
+                                </g:each>
+                                <g:if test="${requisition.requisitionItems == null || requisition.requisitionItems?.size() == 0}">
+                                    <tr class="requisitionItem">
+                                        <g:render template="editItem" model="[requisition: requisition, rowIndex: 0]" />
+                                    </tr>
+                                </g:if>
                             </g:if>
 
                             <tr class="prop">
@@ -131,6 +162,7 @@
                                                 </g:link>
                                             </button>
                                         </g:isUserInRole>
+                                        &nbsp;
 					                    <button type="submit">
 											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'accept.png')}" class="top"/>
                                             <g:link action="save" id="${requisition.id}">
@@ -141,6 +173,13 @@
 										<g:link action="list">
 											${warehouse.message(code: 'default.button.cancel.label')}
 										</g:link>
+                                        &nbsp;
+                                        <g:link action="process" id="${requisition.id}">
+                                            <button type="submit">
+                                                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'next-green.png')}" class="top"/>
+                                                <warehouse:message code="default.button.next.label"/>
+                                            </button>
+                                        </g:link>
 									</div>
 								</td>
 							</tr>

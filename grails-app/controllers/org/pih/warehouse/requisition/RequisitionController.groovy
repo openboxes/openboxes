@@ -86,6 +86,10 @@ class RequisitionController {
         render(view: "edit", model: [requisition: requisition, depots:depots, requisitionItems: requisitionItems.sort{ it.orderIndex}])
     }
 
+    def process = {
+        def requisition = Requisition.get(params?.id)
+        return [requisition: requisition];
+    }
 
     def show = {
         def requestInstance = Requisition.get(params.id)
