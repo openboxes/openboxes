@@ -1,7 +1,8 @@
 <%-- 
 <input id="value-${attrs.id}" class="value" type="hidden" name="${attrs.id}" value="${attrs.value}"/>
 --%>
-<input id="autosuggest-${attrs.id}" 
+<input id="autosuggest-${attrs.id}"
+    data-bind="${attrs.dataBind ?: ''}"
 	type="text" size="${attrs.size }" 
 	class="autocomplete ${attrs.class}" 
 	placeholder="${attrs.placeholder }"

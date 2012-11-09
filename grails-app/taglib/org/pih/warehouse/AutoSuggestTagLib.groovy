@@ -52,11 +52,11 @@ class AutoSuggestTagLib {
 		//def suggestDisplay = (showValue) ? "none" : "inline";
 		def spanDisplay = "none";
 		def suggestDisplay = "inline";
-
+        def dataBind = attrs.dataBind ? "data-bind='${attrs.dataBind}'" : ""
 		
 		def html = """
 				<span id="${id}-span" class="span" style="text-align: left; display: ${spanDisplay};">${valueName}</span>
-				<input id="${id}-value" class="value" type="hidden" name="${name}.id" value="${valueId}"/>
+				<input id="${id}-value" class="value" type="hidden" name="${name}.id" value="${valueId}" ${dataBind }/>
 				<input id="${id}-suggest" type="text"
 					class="autocomplete ${styleClass}" name="${name}.name" placeholder="${placeholder}" value="${valueName}" 
 					style="width: ${width}px; display: ${suggestDisplay};">
@@ -95,14 +95,14 @@ class AutoSuggestTagLib {
 							change: function(event, ui) {
 								// If the user does not select a value, we remove the value
 								if (!ui.item) { 
-									\$(this).prev().val("null");  // set the user.id to null
+									\$(this).prev().val("null").trigger("change");
 									\$(this).val("");				// set the value in the textbox to empty string
 								}
 								return false;
 							},
 							select: function(event, ui) {
 								if (ui.item) { 
-									\$(this).prev().val(ui.item.value);
+									\$(this).prev().val(ui.item.value).trigger("change");;
 									\$(this).val(ui.item.valueText);
 								}
 								\$("#${id}-suggest").trigger("selected");

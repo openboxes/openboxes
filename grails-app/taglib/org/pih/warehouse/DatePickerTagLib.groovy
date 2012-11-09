@@ -40,7 +40,7 @@ class DatePickerTagLib {
 		def readOnly = attrs.readOnly ?: false
         def minDate = attrs.minDate ? "new Date('${attrs.minDate}')": null
         def maxDate = attrs.maxDate ? "new Date('${attrs.maxDate}')": null
-
+        def dataBind = attrs.dataBind ? "data-bind='${attrs.dataBind}'" : ""
 		
 		
 		if (value) { 
@@ -56,7 +56,7 @@ class DatePickerTagLib {
 		def html = """
 
 		<span>
-			<input id='${id}' name='${name}' type='hidden'/>
+			<input id='${id}' name='${name}' type='hidden' ${dataBind}/>
 			<input id='${id}-datepicker' name='${name}-datepicker' type='text' class='${cssClass} text' size="${size}" ${readOnly?"readonly='readonly'":""}/>
 			<script type=\'text/javascript\'>
 
@@ -82,6 +82,7 @@ class DatePickerTagLib {
 						//showButtonPanel: true,
 						//showOtherMonths: true,
 						//selectOtherMonths: true
+
 					});
 					
 					// If we reset the date, we need to reset the hidden form field as well.
@@ -90,8 +91,9 @@ class DatePickerTagLib {
 					        var d = \$.datepicker.parseDate('dd/M/yy', this.value);
                         } catch(err) {
                             jQuery('#${id}-datepicker').val('');
-                            jQuery('#${id}').val('');
+                            jQuery('#${id}').trigger('change');
                         }
+
 					});
 
 					// Set the date value if one was provided

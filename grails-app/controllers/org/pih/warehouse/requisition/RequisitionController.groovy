@@ -15,6 +15,7 @@ import org.pih.warehouse.core.Document;
 
 
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
 
 
 
@@ -51,12 +52,15 @@ class RequisitionController {
         return [requestItems: requestItems]
     }
 
+    def create = {
+        return [depots: getDepots()]
+    }
 
     def edit = {
         def requisition = Requisition.get(params.id) ?: new Requisition()
         bindData(requisition, params)
         def depots = getDepots()
-        return [requisition: requisition, depots:depots];
+        return [requisition: requisition, depots: depots];
     }
 
     private List<Location> getDepots() {
@@ -64,27 +68,41 @@ class RequisitionController {
     }
 
     def save = {
-        Requisition requisition = Requisition.get(params.id) ?: new Requisition()
-
+        println params
+        def requisition = Requisition.get(params.id) ?: new Requisition()
         bindData(requisition, params)
-
-        def emptyRequisitionItems = requisition.requisitionItems?.findAll{ it.checkIsEmpty()} ?: []
-        emptyRequisitionItems?.each{requisition.removeFromRequisitionItems(it)}
-
-        requisition.requisitionItems?.each{println "item to save: ${it}"}
+        requisition.requestedBy = Person.get(params.requestedById)
+        requisition.origin = Location.get(params.originId)
         requisition.destination = Location.get(session.warehouse.id)
-		
+        def json;
         if (requisitionService.saveRequisition(requisition)) {
-            flash.message = "${warehouse.message(code: 'default.saved.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), requisition.id])}"
-        }else{
-            requisition?.requisitionItems?.each { it.validate()}
+            json = [success: true, id: requisition.id, version: requisition.version, updated: requisition.lastUpdated]
         }
-        def depots = getDepots()
-        def requisitionItems = requisition.requisitionItems?.collect{it} ?: []
-        requisitionItems.addAll(emptyRequisitionItems)
-        requisitionItems.each{println "item to render: ${it}"}
-        render(view: "edit", model: [requisition: requisition, depots:depots, requisitionItems: requisitionItems.sort{ it.orderIndex}])
+        else {
+            json = [success: false, errors: requisition.errors]
+        }
+        render(contentType: "text/json") {json}
     }
+//        Requisition requisition = Requisition.get(params.id) ?: new Requisition()
+//
+//        bindData(requisition, params)
+//
+//        def emptyRequisitionItems = requisition.requisitionItems?.findAll{ it.checkIsEmpty()} ?: []
+//        emptyRequisitionItems?.each{requisition.removeFromRequisitionItems(it)}
+//
+//        requisition.requisitionItems?.each{println "item to save: ${it}"}
+//        requisition.destination = Location.get(session.warehouse.id)
+//
+//        if (requisitionService.saveRequisition(requisition)) {
+//            flash.message = "${warehouse.message(code: 'default.saved.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), requisition.id])}"
+//        }else{
+//            requisition?.requisitionItems?.each { it.validate()}
+//        }
+//        def depots = getDepots()
+//        def requisitionItems = requisition.requisitionItems?.collect{it} ?: []
+//        requisitionItems.addAll(emptyRequisitionItems)
+//        requisitionItems.each{println "item to render: ${it}"}
+//        render(view: "edit", model: [requisition: requisition, depots:depots, requisitionItems: requisitionItems.sort{ it.orderIndex}])
 
     def process = {
         def requisition = Requisition.get(params?.id)
@@ -419,38 +437,38 @@ class RequisitionController {
     }
 
 //
-    //	def addRequestItemToShipment = {
-    //
-    //		def requestInstance = Request.get(params?.id)
-    //		def requestItem = RequestItem.get(params?.requestItem?.id)
-    //		def shipmentInstance = Shipment.get(params?.shipment?.id)
-    //
-    //		if (requestItem) {
-    //			def shipmentItem = new ShipmentItem(requestItem.properties)
-    //			shipmentInstance.addToShipmentItems(shipmentItem);
-    //			if (!shipmentInstance.hasErrors() && shipmentInstance?.save(flush:true)) {
-    //
-    //				def requestShipment = RequestShipment.link(requestItem, shipmentItem);
-    //				/*
-    //				if (!requestShipment.hasErrors() && requestShipment.save(flush:true)) {
-    //					flash.message = "success"
-    //				}
-    //				else {
-    //					flash.message = "request shipment error(s)"
-    //					render(view: "fulfill", model: [requestShipment: requestShipment, requestItemInstance: requestItem, shipmentInstance: shipmentInstance])
-    //					return;
-    //				}*/
-    //			}
-    //			else {
-    //				flash.message = "${warehouse.message(code: 'request.shipmentItemsError.label')}"
-    //				render(view: "fulfill", model: [requestItemInstance: requestItem, shipmentInstance: shipmentInstance])
-    //				return;
-    //			}
-    //		}
-    //
-    //		redirect(action: "fulfill", id: requestInstance?.id)
-    //
-    //	}
+//	def addRequestItemToShipment = {
+//
+//		def requestInstance = Request.get(params?.id)
+//		def requestItem = RequestItem.get(params?.requestItem?.id)
+//		def shipmentInstance = Shipment.get(params?.shipment?.id)
+//
+//		if (requestItem) {
+//			def shipmentItem = new ShipmentItem(requestItem.properties)
+//			shipmentInstance.addToShipmentItems(shipmentItem);
+//			if (!shipmentInstance.hasErrors() && shipmentInstance?.save(flush:true)) {
+//
+//				def requestShipment = RequestShipment.link(requestItem, shipmentItem);
+//				/*
+//				if (!requestShipment.hasErrors() && requestShipment.save(flush:true)) {
+//					flash.message = "success"
+//				}
+//				else {
+//					flash.message = "request shipment error(s)"
+//					render(view: "fulfill", model: [requestShipment: requestShipment, requestItemInstance: requestItem, shipmentInstance: shipmentInstance])
+//					return;
+//				}*/
+//			}
+//			else {
+//				flash.message = "${warehouse.message(code: 'request.shipmentItemsError.label')}"
+//				render(view: "fulfill", model: [requestItemInstance: requestItem, shipmentInstance: shipmentInstance])
+//				return;
+//			}
+//		}
+//
+//		redirect(action: "fulfill", id: requestInstance?.id)
+//
+//	}
 
 
     def fulfillPost = {
