@@ -65,8 +65,8 @@
 
     var today = $.datepicker.formatDate("dd/M/yy", new Date());
     var tomorrow = $.datepicker.formatDate("dd/M/yy", new Date(new Date().getTime() + 24*60*60*1000));
-    var requisition = new Requisition("", 0, today, tomorrow, "", "");
-    var viewModel = new ViewModel(requisition);
+    var requisition = new warehouse.Requisition("", 0, today, tomorrow, "", "");
+    var viewModel = new warehouse.ViewModel(requisition);
     ko.applyBindings(viewModel); // This makes Knockout get to work
 
     $(".date-picker").each(function(index, element){
