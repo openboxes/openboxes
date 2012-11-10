@@ -13,7 +13,7 @@
 <g:form name="requisitionForm" method="post" action="save" data-bind='submit: save'>
     <div>
     <label for="origin.id">requesting depot:</label>
-    <g:select name="origin.id" from="${depots}"   data-bind='value: requisition.originId'
+    <g:select name="origin.id" from="${depots}"   data-bind="value: requisition.origin_id"
               optionKey="id" optionValue="name" value="${requisition?.origin?.id}" noSelection="['null':'']" />
     </div>
     <div>
@@ -31,7 +31,7 @@
     <div>
         <label>requested by:</label>
         <g:autoSuggest id="requestedBy" name="requestedBy"
-                       dataBind = 'value: requisition.requestedById'
+                       dataBind="value: requisition.requestedBy_id"
                        jsonUrl="${request.contextPath }/json/findPersonByName"
                        styleClass="text"
                        placeholder="Requested by"
@@ -59,6 +59,42 @@
     <p>Requested by: <span data-bind='text: requisition.requestedBy'></span> </p>
     <p>program: <span data-bind='text: requisition.program'></span> </p>
 </div>
+<script type="text/javascript">
+  $(function(){
 
+
+    var today = $.datepicker.formatDate("dd/M/yy", new Date());
+    var tomorrow = $.datepicker.formatDate("dd/M/yy", new Date(new Date().getTime() + 24*60*60*1000));
+    var requisition = new Requisition("", 0, today, tomorrow, "", "");
+    var viewModel = new ViewModel(requisition);
+    ko.applyBindings(viewModel); // This makes Knockout get to work
+
+    $(".date-picker").each(function(index, element){
+
+       var item =  $(element);
+       var minDate= item.attr("min-date");
+       var maxDate = item.attr("max-date");
+
+       item.datepicker({
+           minDate: minDate && new Date(minDate),
+           maxDate: maxDate && new Date(maxDate), dateFormat:'dd/M/yy',
+           buttonImageOnly: true,
+           buttonImage: '${request.contextPath}/images/icons/silk/calendar.png'
+       });
+
+    });
+
+    $('.date-picker').change(function() {
+        var picker = $(this);
+        try {
+            var d = $.datepicker.parseDate('dd/M/yy', picker.val());
+        } catch(err) {
+            picker.val('').trigger("change");
+        }
+    });
+
+
+});
+</script>
 </body>
 </html>

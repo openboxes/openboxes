@@ -68,11 +68,8 @@ class RequisitionController {
     }
 
     def save = {
-        println params
         def requisition = Requisition.get(params.id) ?: new Requisition()
         bindData(requisition, params)
-        requisition.requestedBy = Person.get(params.requestedById)
-        requisition.origin = Location.get(params.originId)
         requisition.destination = Location.get(session.warehouse.id)
         def json;
         if (requisitionService.saveRequisition(requisition)) {
