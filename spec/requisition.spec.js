@@ -1,29 +1,8 @@
-ko = {
-  observable: function(data){
-    return data;
-  },
-  toJS: function(data){
-    return data;
-  }
-}
-JSON = {
-  stringify:function(data){ return "";}
-}
-console = {
-  log: function(text){}
-}
 var ajaxOptions;
-jQuery = {
-  ajax: function(options){
+jQuery.ajax = function(options){
     ajaxOptions = options;
-  },
-  datepicker:{
-    formatDate:function(pattern, date){return date;}
   }
-}
-$ = jQuery;
 
-var warehouse = require('../web-app/js/requisition');
 describe('requisition view model', function(){
   it('should save data to server', function(){
     var id = "1234";
