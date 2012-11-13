@@ -25,8 +25,6 @@
             <div class="time-stamp fade"><g:formatDate date="${requisition.lastUpdated }" format="dd/MMM/yyyy hh:mm a"/></div>
         </g:if>
         <div class="status fade">${requisition.status.toString()}</div>
-
-        ${requisition?.requisitionItems?.size() }
     </div>
 
     <g:form name="requisitionForm" method="post" action="save">

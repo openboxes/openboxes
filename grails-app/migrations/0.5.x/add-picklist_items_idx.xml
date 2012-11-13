@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="Stephen (generated)" id="1352830406838-1">
+        <addColumn tableName="picklist_item">
+            <column name="picklist_item_idx" type="INT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="Stephen (generated)" id="1352832480258-1">
+        <addColumn tableName="picklist_item">
+            <column name="requisition_item_id" type="CHAR(38)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="Stephen (generated)" id="1352832480258-2">
+        <addNotNullConstraint columnDataType="CHAR(38)" columnName="id" defaultNullValue="" tableName="picklist"/>
+    </changeSet>
+    <changeSet author="Stephen (generated)" id="1352832480258-3">
+        <addNotNullConstraint columnDataType="CHAR(38)" columnName="id" defaultNullValue="" tableName="picklist_item"/>
+    </changeSet>
+    <changeSet author="Stephen (generated)" id="1352832480258-4">
+        <addPrimaryKey columnNames="id" tableName="picklist"/>
+    </changeSet>
+    <changeSet author="Stephen (generated)" id="1352832480258-5">
+        <addPrimaryKey columnNames="id" tableName="picklist_item"/>
+    </changeSet>
+    <changeSet author="Stephen (generated)" id="1352832480258-6">
+        <addForeignKeyConstraint baseColumnNames="created_by_id" baseTableName="picklist_item" constraintName="picklist_item_ibfk_3" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="Stephen (generated)" id="1352832480258-7">
+        <addForeignKeyConstraint baseColumnNames="inventory_item_id" baseTableName="picklist_item" constraintName="picklist_item_ibfk_5" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="inventory_item"/>
+    </changeSet>
+    <changeSet author="Stephen (generated)" id="1352832480258-8">
+        <addForeignKeyConstraint baseColumnNames="picklist_id" baseTableName="picklist_item" constraintName="picklist_item_ibfk_2" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="picklist"/>
+    </changeSet>
+    <changeSet author="Stephen (generated)" id="1352832480258-9">
+        <addForeignKeyConstraint baseColumnNames="requisition_item_id" baseTableName="picklist_item" constraintName="picklist_item_ibfk_1" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="requisition_item"/>
+    </changeSet>
+    <changeSet author="Stephen (generated)" id="1352832480258-10">
+        <addForeignKeyConstraint baseColumnNames="updated_by_id" baseTableName="picklist_item" constraintName="picklist_item_ibfk_4" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="Stephen (generated)" id="1352832480258-11">
+        <dropColumn columnName="request_item_id" tableName="picklist_item"/>
+    </changeSet>
+</databaseChangeLog>

@@ -102,7 +102,6 @@ class RequisitionController {
         }
     }
 
-
     def place = {
         def requestInstance = Requisition.get(params.id)
         if (requestInstance) {

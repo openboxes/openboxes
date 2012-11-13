@@ -582,3 +582,24 @@ th.desc a {
 
 }
 
+.Complete {
+    background: url(../images/icons/silk/bullet_green.png) right no-repeat;
+    width: 16px;
+    text-align: right;
+    height: 16px;
+}
+
+.Incomplete {
+    background: url(../images/icons/silk/asterisk_red.png) right no-repeat;
+    width: 16px;
+    text-align: right;
+    height: 16px;
+}
+
+.PartiallyComplete {
+    background: url(../images/icons/silk/asterisk_yellow.png) right no-repeat;
+    width: 16px;
+    text-align: right;
+    height: 16px;
+}
+

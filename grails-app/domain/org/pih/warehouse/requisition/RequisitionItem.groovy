@@ -27,24 +27,29 @@ class RequisitionItem implements Serializable {
 	Product product
 	ProductGroup productGroup
 	InventoryItem inventoryItem
-	Integer quantity
+	Integer quantity = 1
 	Float unitPrice	
 	Person requestedBy	// the person who actually requested the item
 	Boolean substitutable = false
     String recipient
     String comment
     Integer orderIndex
+
+    List picklistItems = []
 	
 	// Audit fields
 	Date dateCreated
 	Date lastUpdated
 
-	static transients = [ "type", "status" ]
+	static transients = [ "type", "status", "quantityPicked", "quantityRemaining", "existingInventoryItems" ]
 	
 	static belongsTo = [ requisition: Requisition ]
 
+    static hasMany = [ picklistItems: PicklistItem ]
+
 	static mapping = {
 		id generator: 'uuid'
+        picklistItems cascade: "all-delete-orphan", sort: "id"
 	}
 		
     static constraints = {
@@ -62,20 +67,30 @@ class RequisitionItem implements Serializable {
         orderIndex(nullable: true)
 	}
 
-	
 	String getStatus() { 
-		def picklistItems = getPicklistItems();
-		def quantityPicked = picklistItems.sum { it.quantity } 
-		if (quantityPicked == quantity) return "tick"
-		else if (quantityPicked < quantity) return "flag_yellow"
-		else if (quantityPicked > quantity) return "flag_red"
-		return "grey"
+		def quantityPicked = getQuantityPicked()
+		if (quantityPicked >= quantity) return "Complete"
+        if (quantityPicked > 0) return "PartiallyComplete"
+        return "Incomplete"
 	}
-	
-	List getPicklistItems() { 
-		return PicklistItem.findAllByRequestItem(this)
-	}
-	
+
+    Integer getQuantityPicked() {
+        return picklistItems.sum(0) { it.quantity }
+    }
+
+    Integer getQuantityRemaining() {
+        return (quantity ?: 0) - quantityPicked
+    }
+
+    InventoryItem[] getExistingInventoryItems() {
+        return InventoryItem.findAll { it.product == product }
+    }
+
+//
+//	List getPicklistItems() {
+//		return PicklistItem.findAllByRequestItem(this)
+//	}
+//
 	String getType() { 
 		return (product)?"Product":(productGroup)?"ProductGroup":(category)?"Category":""
 	}
@@ -113,17 +128,18 @@ class RequisitionItem implements Serializable {
 		return quantityRemaining() > 0;
 	}
 	
-	
-	def totalPrice() { 
+	def totalPrice() {
 		return ( quantity ? quantity : 0.0 ) * ( unitPrice ? unitPrice : 0.0 );
 	}
 
 
     boolean checkIsEmpty() {
-     (id == null || id == "") && quantity == null && product == null && substitutable == false && (comment == null || comment == "") && (recipient == null || recipient == "")
+     (id == null || id == "") && quantity == 1 && product == null && substitutable == false && (comment == null || comment == "") && (recipient == null || recipient == "")
     }
 
     String toString(){
         "id:${id} product:${product} quantity:${quantity} substitutable:${substitutable} comment:${comment} recipient:${recipient}"
     }
+
+
 }

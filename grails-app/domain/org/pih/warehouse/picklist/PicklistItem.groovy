@@ -18,7 +18,7 @@ import org.pih.warehouse.requisition.RequisitionItem;
 class PicklistItem implements Serializable {
 	
 	String id	
-	RequisitionItem requestItem
+	RequisitionItem requisitionItem
 	InventoryItem inventoryItem
 	Integer quantity
 	
@@ -31,7 +31,7 @@ class PicklistItem implements Serializable {
 	Date lastUpdated
 
 	
-	static belongsTo = [ picklist : Picklist ]
+	static belongsTo = [ picklist : Picklist, requisitionItem : RequisitionItem ]
 
 	static mapping = {
 		id generator: 'uuid'
@@ -39,7 +39,7 @@ class PicklistItem implements Serializable {
 		
     static constraints = {    	
 		inventoryItem(nullable:true)
-		requestItem(nullable:true)
+        requisitionItem(nullable:true)
 		quantity(nullable:false)
 		status(nullable:true)
 		reasonCode(nullable:true)

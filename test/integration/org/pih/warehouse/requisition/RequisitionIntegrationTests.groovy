@@ -22,6 +22,7 @@ class RequisitionIntegrationTests extends GroovyTestCase {
         assert requisition.status == RequisitionStatus.CREATED
         requisition.status = RequisitionStatus.OPEN
 
+
         requisition.validate()
         requisition.errors.each{ println(it)}
 

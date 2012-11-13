@@ -11,5 +11,6 @@
 	<include file="0.5.x/add-order_index-to-requisition_item.xml"/>
 	<include file="0.5.x/add-product-tag.xml"/>
 	<include file="0.5.x/add-requisition-item-idx.xml"/>
+    <include file="0.5.x/add-picklist_items_idx.xml"/>
 	
 </databaseChangeLog>

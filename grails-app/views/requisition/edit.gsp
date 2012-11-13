@@ -28,10 +28,10 @@
                 </g:if>
                 <div class="status fade">${requisition.status.toString()}</div>
                 
-                ${requisition?.requisitionItems?.size() }
+                %{--${requisition?.requisitionItems?.size() }--}%
             </div>
 
-            <g:form name="requisitionForm" method="post" action="save">
+            <g:form name="requisitionForm" method="post">
                 <g:hiddenField name="id" value="${requisition?.id}" />
                 <g:hiddenField name="version" value="${requisition?.version}" />
                 <input type="hidden" id="name" name="name" size="80" value="${requisition.name}"/>
@@ -155,31 +155,16 @@
 							    <td colspan="4">
 									<div class="buttons right">
                                         <g:isUserInRole roles="[RoleType.ROLE_ADMIN]">
-                                            <button type="submit">
-                                                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'delete.png')}" class="top"/>
-                                                <g:link action="delete" id="${requisition.id}">
-                                                    <warehouse:message code="default.button.delete.label"/>
-                                                </g:link>
-                                            </button>
+                                            <g:actionSubmit class="delete" onclick="this.form.action='${createLink(action:'delete')}';" value="Delete" />
                                         </g:isUserInRole>
                                         &nbsp;
-					                    <button type="submit">
-											<img src="${createLinkTo(dir: 'images/icons/silk', file: 'accept.png')}" class="top"/>
-                                            <g:link action="save" id="${requisition.id}">
-											    <warehouse:message code="default.button.save.label"/>
-                                            </g:link>
-										</button>
+                                        <g:actionSubmit class="save" onclick="this.form.action='${createLink(action:'save')}';" value="Save" />
 										&nbsp;
 										<g:link action="list">
 											${warehouse.message(code: 'default.button.cancel.label')}
 										</g:link>
                                         &nbsp;
-                                        <g:link action="process" id="${requisition.id}">
-                                            <button type="submit">
-                                                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'next-green.png')}" class="top"/>
-                                                <warehouse:message code="default.button.next.label"/>
-                                            </button>
-                                        </g:link>
+                                        <g:actionSubmit class="process" onclick="this.form.action='${createLink(action:'process')}';" value="Process" />
 									</div>
 								</td>
 							</tr>
