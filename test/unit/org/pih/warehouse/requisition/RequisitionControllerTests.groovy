@@ -48,68 +48,69 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
     }
 
     void testSave() {
+        def requisition = new Requisition(id: "2345")
+        def requisitionItem = new RequisitionItem(id:"3322", orderIndex: 1)
+        mockDomain(Requisition, [requisition])
+        mockDomain(RequisitionItem, [requisitionItem])
+        requisition.addToRequisitionItems(requisitionItem)
 
-        def stubMessager = new Expando()
-        stubMessager.message = { args -> return "saved" }
-        controller.metaClass.warehouse = stubMessager;
-        def requisitionItemsToSave
         def requisitionServiceMock = mockFor(RequisitionService)
-        requisitionServiceMock.demand.saveRequisition { requisition ->
-            requisitionItemsToSave = requisition.requisitionItems?.collect{it}
+        requisitionServiceMock.demand.saveRequisition { data, location ->
+            requisition
         }
         controller.requisitionService = requisitionServiceMock.createMock()
 
-        def location1 = new Location(id:"1234", supportedActivities: [ActivityCode.MANAGE_INVENTORY])
-        def location2 = new Location(id:"1235", supportedActivities: ["supplier"])
-        def myLocation = new Location(id:"001", supportedActivities: [ActivityCode.MANAGE_INVENTORY])
-        mockDomain(Location, [location1, location2, myLocation])
-        mockDomain(Requisition, [])
-
-        def person = new Person(id:"1234adb")
-        mockDomain(Person, [person])
-
-        def requisition = new Requisition(id: "abcd")
-        mockDomain(Requisition, [requisition])
-
-        def requisitionItem1 = new RequisitionItem(orderIndex: 0)
-        def requisitionItem2 = new RequisitionItem(orderIndex: 1, quantity: 500, product: new Product())
-        mockDomain(RequisitionItem, [])
-
-        controller.params.name = "testRequisition"
-        controller.params.id = requisition.id
-        controller.params.origin = location1
-        controller.params.destination = myLocation
-        controller.params.requestedBy = person
-        controller.session.warehouse = myLocation
-        controller.params["requisitionItems[0]"] = requisitionItem1
-        controller.params["requisitionItems[1]"] = requisitionItem2
+        Location userLocation = new Location(id:"boston")
+        mockDomain(Location, [userLocation])
+        controller.session.warehouse = userLocation
+        controller.request.contentType = 'text/json' 
+        controller.request.content ='{"id":"2345"}'
 
         controller.save()
-        def model = renderArgs.model
+        def response = controller.response.contentAsString
+        assert response && response.size() > 0
+        def jsonResponse = JSON.parse(response)
 
-        assert model.requisition.name == "testRequisition"
-        assert model.requisition.origin.id == location1.id
-        assert model.requisition.destination.id == myLocation.id
-        assert model.requisition.requestedBy.id == person.id
-        assert requisitionItem1.orderIndex != null
-        assert model.requisition.requisitionItems.size() == 1
-        assert model.requisitionItems.size() == 2
-        assert model.requisitionItems.any{ it.orderIndex == requisitionItem1.orderIndex}
-        assert model.requisitionItems.any{it.orderIndex == requisitionItem2.orderIndex}
-
-        assert requisitionItemsToSave.size() == 1
-        assert !requisitionItemsToSave.any{ it.orderIndex == requisitionItem1.orderIndex}
-        assert requisitionItemsToSave.any{it.orderIndex == requisitionItem2.orderIndex}
-        assert model.depots.contains(location1)
-        assert !model.depots.contains(location2)
-        assert !model.depots.contains(myLocation)
-
-        assert renderArgs.view == "edit"
-        assert controller.flash.message == "saved"
-
+        assert jsonResponse.success
+        assert jsonResponse.id == requisition.id
+        assert jsonResponse.requisitionItems.size() == 1
+        assert jsonResponse.requisitionItems[0].id == requisitionItem.id
+        assert jsonResponse.requisitionItems[0].orderIndex == requisitionItem.orderIndex
 
         requisitionServiceMock.verify()
     }
+
+     void testSaveWithErrors() {
+        def requisition = new Requisition(id: "2345")
+        def requisitionItem = new RequisitionItem(id:"3322", orderIndex: 1)
+        mockDomain(Requisition, [requisition])
+        mockDomain(RequisitionItem, [requisitionItem])
+        mockForConstraintsTests(Requisition)
+        requisition.addToRequisitionItems(requisitionItem)
+
+        def requisitionServiceMock = mockFor(RequisitionService)
+        requisitionServiceMock.demand.saveRequisition { data, location ->
+            requisition.validate()
+            requisition
+        }
+        controller.requisitionService = requisitionServiceMock.createMock()
+
+        Location userLocation = new Location(id:"boston")
+        mockDomain(Location, [userLocation])
+        controller.session.warehouse = userLocation
+        controller.request.contentType = 'text/json' 
+        controller.request.content ='{"id":"2345"}'
+
+        controller.save()
+        def response = controller.response.contentAsString
+        assert response && response.size() > 0
+        def jsonResponse = JSON.parse(response)
+
+        assert !jsonResponse.success
+        assert jsonResponse.errors
+        requisitionServiceMock.verify()
+    }
+
 
     void testDelete() {
 

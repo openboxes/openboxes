@@ -21,3 +21,4 @@ openboxes.ipr
 /cobertura.ser
 /.link_to_grails_plugins
 out/
+*.swp

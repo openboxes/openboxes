@@ -16,6 +16,7 @@ import org.pih.warehouse.core.Document;
 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import grails.converters.JSON
 
 
 
@@ -68,38 +69,18 @@ class RequisitionController {
     }
 
     def save = {
-        def requisition = Requisition.get(params.id) ?: new Requisition()
-        bindData(requisition, params)
-        requisition.destination = Location.get(session.warehouse.id)
-        def json;
-        if (requisitionService.saveRequisition(requisition)) {
-            json = [success: true, id: requisition.id, version: requisition.version, updated: requisition.lastUpdated]
+        def jsonRequest = request.JSON
+        def jsonResponse = []
+        def requisition = requisitionService.saveRequisition(jsonRequest, Location.get(session.warehouse.id))
+        if (!requisition.hasErrors()) {
+            jsonResponse = [success: true, id: requisition.id, version: requisition.version, updated: requisition.lastUpdated]
+            jsonResponse["requisitionItems"] = requisition.requisitionItems?.collect{i -> [id: i.id, orderIndex: i.orderIndex]} 
         }
         else {
-            json = [success: false, errors: requisition.errors]
+            jsonResponse = [success: false, errors: requisition.errors]
         }
-        render(contentType: "text/json") {json}
+        render jsonResponse as JSON
     }
-//        Requisition requisition = Requisition.get(params.id) ?: new Requisition()
-//
-//        bindData(requisition, params)
-//
-//        def emptyRequisitionItems = requisition.requisitionItems?.findAll{ it.checkIsEmpty()} ?: []
-//        emptyRequisitionItems?.each{requisition.removeFromRequisitionItems(it)}
-//
-//        requisition.requisitionItems?.each{println "item to save: ${it}"}
-//        requisition.destination = Location.get(session.warehouse.id)
-//
-//        if (requisitionService.saveRequisition(requisition)) {
-//            flash.message = "${warehouse.message(code: 'default.saved.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), requisition.id])}"
-//        }else{
-//            requisition?.requisitionItems?.each { it.validate()}
-//        }
-//        def depots = getDepots()
-//        def requisitionItems = requisition.requisitionItems?.collect{it} ?: []
-//        requisitionItems.addAll(emptyRequisitionItems)
-//        requisitionItems.each{println "item to render: ${it}"}
-//        render(view: "edit", model: [requisition: requisition, depots:depots, requisitionItems: requisitionItems.sort{ it.orderIndex}])
 
     def process = {
         def requisition = Requisition.get(params?.id)

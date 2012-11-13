@@ -56,12 +56,12 @@
                              class="text"
                              label="${requisition?.recipientProgram}"/>
     </div>
-    <div id="items" data-bind="foreach: allItems">
+    <div id="items" data-bind="foreach: requisition.requisitionItems">
       <div class="requisition-item">
         <input type="hidden" data-bind="value: id"/>
         <label>Product</label>
         <input type="hidden" data-bind="value: productId"/>
-        <input type="text" data-bind="search_product: {source: '${request.contextPath }/json/searchProduct'}, attr: {'data-value': productId}"/>
+        <input type="text" data-bind="search_product: {source: '${request.contextPath }/json/searchProduct'}"/>
         <label>Quantity</label>
         <input type="text" data-bind="value: quantity"/>
         <label>Substitutable</label>
@@ -72,7 +72,7 @@
       </div>
     </div>
     <input type="hidden" data-bind="value: requisition.id"/>
-    <input type="submit"  data-bind='enable: validate()' id="save-requisition" value="Save"/>
+    <input type="submit" id="save-requisition" value="Save"/>
     <button data-bind='click: addItem'>Add New Item</button>
 </g:form>
 
@@ -85,8 +85,8 @@
 </div>
 <script type="text/javascript">
   $(function(){
-    var today = $.datepicker.formatDate("dd/M/yy", new Date());
-    var tomorrow = $.datepicker.formatDate("dd/M/yy", new Date(new Date().getTime() + 24*60*60*1000));
+    var today = $.datepicker.formatDate("mm/dd/yy", new Date());
+    var tomorrow = $.datepicker.formatDate("mm/dd/yy", new Date(new Date().getTime() + 24*60*60*1000));
     var requisition = new warehouse.Requisition("", 0, today, tomorrow, "", "");
     var viewModel = new warehouse.ViewModel(requisition);
     ko.applyBindings(viewModel); // This makes Knockout get to work

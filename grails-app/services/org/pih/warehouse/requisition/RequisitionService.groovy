@@ -292,10 +292,34 @@ class RequisitionService {
 	}
 
 
-    boolean saveRequisition(Requisition requisition) {
+    Requisition saveRequisition(Map data, Location userLocation) {
+      
+      def itemsData = data.requisitionItems ?: []
+      data.remove("requisitionItems")
 
+      def requisition = Requisition.get(data.id) ?: new Requisition()
+      requisition.properties = data
 
-        requisition.save()
+      def requisitionItems = itemsData.collect{ 
+        itemData -> 
+           def requisitionItem = requisition.requisitionItems?.find{i -> itemData.id  && i.id == itemData.id }
+           if(requisitionItem){
+             requisitionItem.properties = itemData
+           }else{
+             requisitionItem = new RequisitionItem(itemData)
+             requisition.addToRequisitionItems(requisitionItem)
+           }
+           requisitionItem
+      }
+
+      def itemsToDelete = requisition.requisitionItems.findAll {
+        dbItem ->!requisitionItems.any{ clientItem-> clientItem.id == dbItem.id} 
+      }
+      itemsToDelete.each{requisition.removeFromRequisitionItems(it)}
+      requisition.destination = userLocation
+      requisition.save(flush:true)
+      requisition.requisitionItems?.each{it.save(flush:true)}
+      requisition        
     }
 
     boolean deleteRequisition(Requisition requisition) {

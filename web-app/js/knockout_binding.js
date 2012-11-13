@@ -3,7 +3,8 @@
         var item =  $(element);
         var minDate= item.attr("min-date");
         var maxDate = item.attr("max-date");
-        item.val(item.prev().val());
+        var date =  $.datepicker.parseDate('mm/dd/yy', item.prev().val())
+        item.val($.datepicker.formatDate('dd/M/yy', date));
         item.datepicker({
           minDate: minDate && new Date(minDate),
           maxDate: maxDate && new Date(maxDate), 
@@ -56,7 +57,6 @@
 									$(this).prev().val(ui.item.value);
 									$(this).val(ui.item.label);
 								}
-								$("#${id}-suggest").trigger("selected");
 							  $(this).prev().trigger("change");
                 return false;
 							}
