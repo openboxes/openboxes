@@ -164,7 +164,7 @@
 							
 
 							<div class="linkButton">
-								<g:link controller="requisition" action="edit" class="create">
+								<g:link controller="requisition" action="create" class="create">
 									<warehouse:message code="requisition.create.label" />
 								</g:link>
 							</div>

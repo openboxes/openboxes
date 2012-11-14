@@ -1,3 +1,4 @@
+<%@ page import="org.pih.warehouse.core.RoleType" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
@@ -139,10 +140,18 @@
     </table>
     <input type="hidden" data-bind="value: requisition.id"/>
     <div class="center">
-      <input type="submit" id="save-requisition" value="${warehouse.message(code: 'default.button.save.label')}
-"/>
+      <g:isUserInRole roles="[RoleType.ROLE_ADMIN]">
+        <g:actionSubmit class="delete" onclick="this.form.action='${createLink(action:'delete')}';" value="Delete" />
+      </g:isUserInRole>
+
+      <input type="submit" id="save-requisition" value="${warehouse.message(code: 'default.button.save.label')}"/>
+      <g:link action="list">
+											${warehouse.message(code: 'default.button.cancel.label')}
+			</g:link>
+      &nbsp;
+      <g:actionSubmit class="process" onclick="this.form.action='${createLink(action:'process')}';" value="Process" />
     </div>
-    </g:form>
+  </g:form>
 
 <script type="text/javascript">
   $(function(){
