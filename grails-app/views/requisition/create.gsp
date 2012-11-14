@@ -11,16 +11,16 @@
 
 </head>
 <body>
-<g:form name="requisitionForm" method="post" action="save" data-bind='submit: save'>
+<g:form name="requisitionForm" method="post" action="save">
     <div>
     <label for="origin.id">requesting depot:</label>
-    <g:select name="origin.id" from="${depots}"   data-bind="value: requisition.origin_id"
-              optionKey="id" optionValue="name" value="${requisition?.origin?.id}" noSelection="['null':'']" />
+    <g:select name="origin.id" from="${depots}"   data-bind="value: requisition.originId"
+              optionKey="id" optionValue="name" class='required' value="${requisition?.origin?.id}" noSelection="['':'']"/>
     </div>
     <div>
        <label><warehouse:message code="requisition.dateRequested.label"/></label>
        <input data-bind="value: requisition.dateRequested" type="hidden"/>
-       <input type="text" class="date-picker" max-date="${new Date()}"
+       <input type="text" class="required" max-date="${new Date()}"
           id="dateRequested"
           data-bind="date_picker:{}"/>
 
@@ -30,7 +30,7 @@
         <label><warehouse:message code="requisition.requestedDeliveryDate.label"/></label>
 
         <input data-bind="value: requisition.requestedDeliveryDate" type="hidden"/>
-        <input class="date-picker" min-date="${new Date().plus(1)}" type="text"
+        <input class="required" min-date="${new Date().plus(1)}" type="text"
            id="requestedDeliveryDate"
            data-bind="date_picker:{}"/>
 
@@ -38,13 +38,13 @@
     <div>
         <label>requested by:</label>
         <g:autoSuggest id="requestedBy" name="requestedBy"
-                       dataBind="value: requisition.requestedBy_id"
+                       dataBind="value: requisition.requestedById"
                        jsonUrl="${request.contextPath }/json/findPersonByName"
-                       styleClass="text"
+                       styleClass="text required"
                        placeholder="Requested by"
                        valueId="${requisition?.requestedBy?.id}"
                        valueName="${requisition?.requestedBy?.name}"
-                       postSelected="updateDescription();"/>
+                       />
     </div>
     <div>
         <label>program:</label>
@@ -61,9 +61,9 @@
         <input type="hidden" data-bind="value: id"/>
         <label>Product</label>
         <input type="hidden" data-bind="value: productId"/>
-        <input type="text" data-bind="search_product: {source: '${request.contextPath }/json/searchProduct'}"/>
+        <input type="text" class="required" data-bind="search_product: {source: '${request.contextPath }/json/searchProduct'}, uniqueName: true"/>
         <label>Quantity</label>
-        <input type="text" data-bind="value: quantity"/>
+        <input type="text" class="required number" data-bind="value: quantity,uniqueName: true"/>
         <label>Substitutable</label>
         <input type="checkbox" data-bind="checked: substitutable"/>
         <label>Recipient</label>
@@ -90,6 +90,7 @@
     var requisition = new warehouse.Requisition("", 0, today, tomorrow, "", "");
     var viewModel = new warehouse.ViewModel(requisition);
     ko.applyBindings(viewModel); // This makes Knockout get to work
+    $("#requisitionForm").validate({ submitHandler: viewModel.save });
 });
 </script>
 </body>
