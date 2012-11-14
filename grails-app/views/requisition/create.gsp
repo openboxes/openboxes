@@ -11,7 +11,7 @@
 </head>
 <body>
 <g:form name="requisitionForm" method="post" action="save">
-  <div class="dialog box">
+  <div class="dialog box  ui-validation">
     <div id="requisition-header">
                 <div class="title" data-bind="html:requisition.name"></div>
                 <div class="time-stamp fade" data-bind="html:requisition.lastUpdated"></div>
@@ -81,7 +81,9 @@
         </td>
       </tr>
     </table>
-    <table id="requisition-items" data-bind="visible: requisition.requisitionItems().length">
+    <table id="requisition-items"  
+      class="ui-validation-items"
+      data-bind="visible: requisition.requisitionItems().length">
       <thead >
         <tr class="prop">
            <th class="list-header">

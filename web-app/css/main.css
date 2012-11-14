@@ -604,7 +604,30 @@ th.desc a {
 }
 
 .ui_datepicker{
-  background-image: url('/openboxes/images/icons/silk/calendar.png');
+  background-image: url(../images/icons/silk/calendar.png);
   background-repeat: no-repeat;
   background-position: center right;
 }
+
+/*fix ui-validation error message styling issue*/
+.ui-validation label.error{
+  display: inline;
+  color: #EA5200;
+  border: 0px;
+  background: url(../images/icons/silk/exclamation.png) no-repeat center left;
+  padding-left: 16px;
+  padding-bottom: 2px;
+  padding-top: 2px;
+  font-weight: bold;
+}
+
+.ui-validation-items label.error{
+  display: block;
+ }
+
+.ui-validation input.error, .ui-validation  select.error{
+  padding: 2px;
+  background-color: white;
+  border: 2px solid #EA5200;
+}
+  
