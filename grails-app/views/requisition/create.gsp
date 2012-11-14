@@ -11,6 +11,7 @@
 </head>
 <body>
 <g:form name="requisitionForm" method="post" action="save">
+  <div class="dialog box">
     <div id="requisition-header">
                 <div class="title" data-bind="html:requisition.name"></div>
                 <div class="time-stamp fade" data-bind="html:requisition.lastUpdated"></div>
@@ -34,7 +35,10 @@
           <label><warehouse:message code="requisition.program.label"/></label>
         </td>
         <td class="value">
-           <input id="recipientProgram" name="recipientProgram" data-bind="autocomplete: {source: '${request.contextPath }/json/findPrograms'}, value: requisition.recipientProgram"/>
+           <input id="recipientProgram" name="recipientProgram" 
+              class="autocomplete"
+              placeholder="${warehouse.message(code:'requisition.program.label')}"
+              data-bind="autocomplete: {source: '${request.contextPath }/json/findPrograms'}, value: requisition.recipientProgram"/>
  
         </td>
       </tr>
@@ -59,7 +63,7 @@
         </td>
         <td class="value">
            <input data-bind="value: requisition.dateRequested" type="hidden"/>
-            <input type="text" class="required" max-date="${new Date()}"
+            <input type="text" class="required ui_datepicker" max-date="${new Date()}"
               id="dateRequested"
               data-bind="date_picker:{}"/>
         </td>
@@ -70,7 +74,7 @@
         </td>
         <td class="value">
           <input data-bind="value: requisition.requestedDeliveryDate" type="hidden"/>
-          <input class="required" min-date="${new Date().plus(1)}" type="text"
+          <input class="required ui_datepicker" min-date="${new Date().plus(1)}" type="text"
            id="requestedDeliveryDate"
            data-bind="date_picker:{}"/>
 
@@ -95,7 +99,7 @@
             <th class="list-header">
                 ${warehouse.message(code: 'requisitionItem.comment.label')}
             </th>
-            <th class="list-header">
+            <th class="center">
                 ${warehouse.message(code: 'requisitionItem.delete.label')}
             </th>
          </tr>
@@ -104,7 +108,10 @@
         <tr>
           <td class="list-header">
             <input type="hidden" data-bind="value: productId"/>
-            <input type="text" class="required" data-bind="search_product: {source: '${request.contextPath }/json/searchProduct'}, uniqueName: true" size="50"/>
+            <input type="text"
+              placeholder="${warehouse.message(code:'requisition.addItem.label')}"
+              class="required autocomplete" 
+              data-bind="search_product: {source: '${request.contextPath }/json/searchProduct'}, uniqueName: true" size="50"/>
           </td>
           <td  class="list-header">
             <input type="text" class="required number" size="6" 
@@ -119,8 +126,10 @@
           <td  class="list-header">
             <input type="text" data-bind="value: comment" size="50"/>
           </td>
-          <td class="list-header">
-            <a href='#' data-bind='click: $root.removeItem'>Delete</a>
+          <td class="center">
+            <a href='#' data-bind='click: $root.removeItem'>
+               <img src="/openboxes/images/icons/silk/delete.png" alt="Delete item" style="vertical-align: middle">
+            </a>
           </td>
         </tr>
       </tbody>
@@ -132,6 +141,7 @@
         ></tr>
       </tfoot>
     </table>
+   </div>
     <input type="hidden" data-bind="value: requisition.id"/>
     <div class="center">
       <g:isUserInRole roles="[RoleType.ROLE_ADMIN]">

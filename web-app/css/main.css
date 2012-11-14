@@ -603,3 +603,8 @@ th.desc a {
     height: 16px;
 }
 
+.ui_datepicker{
+  background-image: url('/openboxes/images/icons/silk/calendar.png');
+  background-repeat: no-repeat;
+  background-position: center right;
+}
