@@ -97,6 +97,7 @@ class AutoSuggestTagLib {
 								if (!ui.item) { 
 									\$(this).prev().val("null").trigger("change");
 									\$(this).val("");				// set the value in the textbox to empty string
+                  \$("#${id}-suggest").trigger("selected");
 								}
 								return false;
 							},

@@ -39,10 +39,16 @@ describe('requisition view model', function(){
     comment:"my comment1", substitutable:true, recipient: "peter",orderIndex: 2});
     var requisitionItem2 = new warehouse.RequisitionItem({productId:"prod2", quantity:400, 
     comment:"my comment2", substitutable:false, recipient: "tim",orderIndex: 1});
-    var requisition = new warehouse.Requisition({originId: originId,
-    dateRequested: dateRequested, requestedDeliveryDate: requestedDeliveryDate, 
-    requestedById: requestedById, recipientProgram:recipientProgram,
-    items: [requisitionItem1, requisitionItem2]});
+    var requisition = new warehouse.Requisition({
+      originId: originId,
+      version: 3,
+      lastUpdated: "11/25/2012",
+      status: "Created",
+      dateRequested: dateRequested, 
+      requestedDeliveryDate: requestedDeliveryDate, 
+      requestedById: requestedById,
+      recipientProgram:recipientProgram,
+      items: [requisitionItem1, requisitionItem2]});
     var viewModel = new warehouse.ViewModel(requisition);
     var formElement ={
       action:"testAction"
@@ -51,6 +57,9 @@ describe('requisition view model', function(){
     var jsonSent = JSON.parse(ajaxOptions.data);
     expect(jsonSent['requestedBy.id']).toEqual(requestedById);
     expect(jsonSent['origin.id']).toEqual(originId);
+    expect(jsonSent.version).not.toBeDefined();
+    expect(jsonSent.status).not.toBeDefined();
+    expect(jsonSent.lastUpdated).not.toBeDefined();
     expect(jsonSent.recipientProgram).toEqual(recipientProgram);
     expect(jsonSent.dateRequested).toEqual(dateRequested);
     expect(jsonSent.requestedDeliveryDate).toEqual(requestedDeliveryDate);

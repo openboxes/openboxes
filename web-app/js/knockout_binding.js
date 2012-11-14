@@ -26,52 +26,77 @@
     };
 
 
-    ko.bindingHandlers.search_product = {
-      init: function (element, params) {
+ko.bindingHandlers.search_product = {
+  init: function (element, params) {
+      $(element).autocomplete({
+          delay: 300,
+          minLength: 3,
+          dataType: 'json',
+          source: function(req, add){
+            $.getJSON(params().source, { term: req.term}, function(data) {
+              var items = [];
+              $.each(data, function(i, item) {
+                items.push(item);
+              });
+              add(items);
+            });
+          },
+          focus: function(event, ui) {
+            return false;
+          },
+          change: function(event, ui) {
+            if (!ui.item) {
+              $(this).prev().val("");  
+              $(this).val("");			
+            }
+            $(this).prev().trigger("change");
+            return false;
+          },
+          select: function(event, ui) {
+            if (ui.item) {
+              $(this).prev().val(ui.item.value);
+              $(this).val(ui.item.label);
+            }
+            $(this).prev().trigger("change");
+            return false;
+          }
+      })
+      .data("autocomplete" )._renderItem = function( ul, item ) {
+            var li = $("<li>").data("item.autocomplete", item );
+            if(item.type == 'Product'){
+                var text = item.quantity == null ? item.label : item.label + " QTY: " + item.quantity;
+                li.append("<a>" + text + "</a>" );
+            }else{
+                li.append("<span class='product-group'>" + item.label + "</span>" );
+            }
+            li.appendTo(ul);
+            return li;
+      };
+  }
+};
+
+ko.bindingHandlers.autocomplete = {
+  init: function (element, params) {
           $(element).autocomplete({
-           	  delay: 300,
-							minLength: 3,
-							dataType: 'json',
-							source: function(req, add){
-								$.getJSON(params().source, { term: req.term}, function(data) {
-									var items = [];
-									$.each(data, function(i, item) {
-										items.push(item);
-									});
-									add(items);
-								});
-							},
-							focus: function(event, ui) {
-								return false;
-							},
-							change: function(event, ui) {
-								if (!ui.item) {
-									$(this).prev().val("");  
-									$(this).val("");			
-								}
-								$(this).prev().trigger("change");
-                return false;
-							},
-							select: function(event, ui) {
-								if (ui.item) {
-									$(this).prev().val(ui.item.value);
-									$(this).val(ui.item.label);
-								}
-							  $(this).prev().trigger("change");
-                return false;
-							}
-          })
-          .data("autocomplete" )._renderItem = function( ul, item ) {
-						    var li = $("<li>").data("item.autocomplete", item );
-                if(item.type == 'Product'){
-                    var text = item.quantity == null ? item.label : item.label + " QTY: " + item.quantity;
-                    li.append("<a>" + text + "</a>" );
-                }else{
-                    li.append("<span class='product-group'>" + item.label + "</span>" );
-                }
-                li.appendTo(ul);
-                return li;
-          };
-      }
-    };
+            delay: 300,
+            dataType: 'json',
+            source: function(req, add){
+              $.getJSON(params().source, { term: req.term}, function(data) {
+                var items = [];
+                $.each(data, function(i, item) {
+                  items.push(item);
+                });
+                add(items);
+              });
+            },
+            select: function(event, ui){
+              $(this).val(ui.item.value);
+              $(this).trigger("selected");
+              return false;
+            }
+          });
+
+        }
+};
+
 

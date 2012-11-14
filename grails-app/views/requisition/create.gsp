@@ -34,13 +34,7 @@
           <label><warehouse:message code="requisition.program.label"/></label>
         </td>
         <td class="value">
-          <g:autoSuggestString id="recipientProgram"
-                   daVtaBind = 'value: requisition.recipientProgram'
-                   name="recipientProgram"
-                   placeholder="Program"
-                   jsonUrl="${request.contextPath }/json/findPrograms"
-                   class="text"
-                   label="${requisition?.recipientProgram}"/>
+           <input id="recipientProgram" name="recipientProgram" data-bind="autocomplete: {source: '${request.contextPath }/json/findPrograms'}, value: requisition.recipientProgram"/>
  
         </td>
       </tr>
@@ -167,7 +161,7 @@
 
     var updateDescription = function() {
                     var depot = $("#depot select option:selected").text() || "";
-                    var program = $("#autosuggest-recipientProgram").val() || "";
+                    var program = $("#recipientProgram").val() || "";
                     var requestedBy = $("#requestedBy-suggest").val() || "";
                     var dateRequested = $("#dateRequested").val() || "";
                     var deliveryDate = $("#requestedDeliveryDate").val() || "";
@@ -175,6 +169,16 @@
                     requisition.name(description);
                 };
   $(".value").change(updateDescription);
+
+  //Todo: very ugly code below because server give us a "does not exist option" which can be selected. should remove it.
+  $("#requestedBy-suggest").bind("selected",function(){
+    if($("#requestedBy-value").val() == "null"){
+      $("#requestedBy-value").val("");
+      $("#requestedBy-suggest").val("");
+    }
+    updateDescription();
+  });
+  $("#recipientProgram").bind("selected", updateDescription);
 
 });
 </script>

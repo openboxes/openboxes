@@ -54,6 +54,9 @@ warehouse.ViewModel = function(requisition) {
         var data = ko.toJS(self.requisition);
         data["origin.id"] = data.originId;
         data["requestedBy.id"] = data.requestedById;
+        delete data.version;
+        delete data.status;
+        delete data.lastUpdated;
         $.each(data.requisitionItems, function(index, item){
           item["product.id"] = item.productId;
         });
