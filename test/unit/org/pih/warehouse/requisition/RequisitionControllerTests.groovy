@@ -20,10 +20,11 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
     }
 
     void testEdit(){
-        def location1 = new Location(id:"1234", supportedActivities: [ActivityCode.MANAGE_INVENTORY])
+        def location1 = new Location(id:"1234", name: "zoom", supportedActivities: [ActivityCode.MANAGE_INVENTORY])
+        def location3 = new Location(id:"1236", name: "hoom", supportedActivities: [ActivityCode.MANAGE_INVENTORY])
         def location2 = new Location(id:"1235", supportedActivities: ["supplier"])
         def myLocation = new Location(id:"001", supportedActivities: [ActivityCode.MANAGE_INVENTORY])
-        mockDomain(Location, [location1, location2, myLocation])
+        mockDomain(Location, [location1, location2, myLocation, location3])
         mockDomain(Requisition, [])
         controller.params.name = "peter"
         controller.session.warehouse = myLocation
@@ -31,7 +32,8 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         def model = controller.edit()
 
         assert model.requisition.name == "peter"
-        assert model.depots.contains(location1)
+        assert model.depots[0] == location3
+        assert model.depots[1] == location1
         assert !model.depots.contains(location2)
         assert !model.depots.contains(myLocation)
     }

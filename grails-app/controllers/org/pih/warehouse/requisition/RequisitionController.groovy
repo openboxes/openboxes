@@ -65,7 +65,7 @@ class RequisitionController {
     }
 
     private List<Location> getDepots() {
-        Location.list().findAll {location -> location.id != session.warehouse.id && location.isWarehouse()}
+        Location.list().findAll {location -> location.id != session.warehouse.id && location.isWarehouse()}.sort{ it.name }
     }
 
     def save = {
