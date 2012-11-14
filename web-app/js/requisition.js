@@ -1,53 +1,55 @@
 if(typeof warehouse === "undefined") warehouse = {};
-warehouse.Requisition = function(id,originId,dateRequested, requestedDeliveryDate, requestedById, recipientProgram, items) {
+warehouse.Requisition = function(attrs) {
     var self = this;
-    self.id = ko.observable(id);
-    self.originId= ko.observable(originId);
-    self.dateRequested = ko.observable(dateRequested);
-    self.requestedDeliveryDate = ko.observable(requestedDeliveryDate);
-    self.requestedById = ko.observable(requestedById);
-    self.recipientProgram = ko.observable(recipientProgram);
-    self.requisitionItems = ko.observableArray(items || []);
+    self.id = ko.observable(attrs.id);
+    self.originId= ko.observable(attrs.originId);
+    self.originName = ko.observable(attrs.originName);
+    self.dateRequested = ko.observable(attrs.dateRequested);
+    self.requestedDeliveryDate = ko.observable(attrs.requestedDeliveryDate);
+    self.requestedById = ko.observable(attrs.requestedById);
+    self.requestedByName = ko.observable(attrs.requestedByName);
+    self.recipientProgram = ko.observable(attrs.recipientProgram);
+    self.lastUpdated = ko.observable(attrs.lastUpdated);
+    self.status = ko.observable(attrs.status);
+    self.version = ko.observable(attrs.version);
+    self.requisitionItems = ko.observableArray(attrs.items || []);
     self.findRequisitionItemByOrderIndex = function(orderIndex){
       for(var idx in self.requisitionItems()){
         if(self.requisitionItems()[idx].orderIndex() == orderIndex) 
           return self.requisitionItems()[idx];
       }
     };
-    self.validateItems = function(){
-      for(var idx in self.requisitionItems()){
-        if(!self.requisitionItems()[idx].validate())
-          return false;
-      }
-      return true;
-    };
-}
+    self.name = ko.observable(attrs.name);
+ }
 
-warehouse.RequisitionItem = function(id, productId, quantity, comment, substitutable, recipient, orderIndex) {
+warehouse.RequisitionItem = function(attrs) {
     var self = this;
-    self.id = ko.observable(id);
-    self.productId = ko.observable(productId);
-    self.quantity =  ko.observable(quantity);
-    self.comment = ko.observable( comment);
-    self.substitutable =  ko.observable(substitutable);
-    self.recipient = ko.observable(recipient);
-    self.orderIndex = ko.observable(orderIndex);
-    self.validate = function(){
-      if(self.productId() && self.quantity())
-        return true;
-      else
-        return false;
-    }
+    self.id = ko.observable(attrs.id);
+    self.productId = ko.observable(attrs.productId);
+    self.quantity =  ko.observable(attrs.quantity);
+    self.comment = ko.observable(attrs.comment);
+    self.substitutable =  ko.observable(attrs.substitutable);
+    self.recipient = ko.observable(attrs.recipient);
+    self.orderIndex = ko.observable(attrs.orderIndex);
 }
 
 warehouse.ViewModel = function(requisition) {
     var self = this;
     self.requisition = requisition;
     self.maxOrderIndex = 0;
+
     self.addItem = function () {
-       self.requisition.requisitionItems.push(new warehouse.RequisitionItem(null, null, null, null, null, null, self.maxOrderIndex));
+       self.requisition.requisitionItems.push(new warehouse.RequisitionItem({orderIndex:self.maxOrderIndex}));
        self.maxOrderIndex += 1;
     };
+
+    self.removeItem = function(item){
+       self.requisition.requisitionItems.remove(item);
+       if(self.requisition.requisitionItems().length == 0)
+         self.addItem();
+
+    };
+
     self.save = function(formElement) {
         var data = ko.toJS(self.requisition);
         data["origin.id"] = data.originId;
@@ -68,6 +70,9 @@ warehouse.ViewModel = function(requisition) {
                 console.log("result:" + JSON.stringify(result));
                 if(result.success){
                     self.requisition.id(result.id);
+                    self.requisition.status(result.status);
+                    self.requisition.lastUpdated(result.lastUpdated);
+                    self.requisition.version(result.version);
                     if(result.requisitionItems){
                       for(var idx in result.requisitionItems){
                         var localItem = self.requisition.findRequisitionItemByOrderIndex(result.requisitionItems[idx].orderIndex);
@@ -77,17 +82,14 @@ warehouse.ViewModel = function(requisition) {
                 }
             }
         });
-    }
+    };
 
-    self.validate = function(){
-      if(self.requisition.originId() 
-        && self.requisition.requestedById() 
-        && self.requisition.dateRequested()
-        && self.requisition.validateItems())
-        return true;
-      else
-        return false;
-    }
+   
+    self.requisition.id.subscribe(function(newValue) {
+        if(newValue){
+          self.addItem();
+        }
+    });
 }
 
 

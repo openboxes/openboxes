@@ -48,7 +48,7 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
     }
 
     void testSave() {
-        def requisition = new Requisition(id: "2345")
+        def requisition = new Requisition(id: "2345", lastUpdated: new Date(), status: RequisitionStatus.CREATED, version: 3)
         def requisitionItem = new RequisitionItem(id:"3322", orderIndex: 1)
         mockDomain(Requisition, [requisition])
         mockDomain(RequisitionItem, [requisitionItem])
@@ -73,6 +73,9 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
 
         assert jsonResponse.success
         assert jsonResponse.id == requisition.id
+        assert jsonResponse.lastUpdated
+        assert jsonResponse.status == requisition.status.toString()
+        assert jsonResponse.version == requisition.version
         assert jsonResponse.requisitionItems.size() == 1
         assert jsonResponse.requisitionItems[0].id == requisitionItem.id
         assert jsonResponse.requisitionItems[0].orderIndex == requisitionItem.orderIndex
