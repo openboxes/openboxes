@@ -11,7 +11,7 @@
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
 	
 	<!-- Include Main CSS -->
-	<!-- TODO Apparently there's a slight distinction between these two ... need to figure out what that distinction is -->
+	<!-- TODO Apparently there is a slight distinction between these two ... need to figure out what that distinction is -->
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'menu.css')}" type="text/css" media="screen, projection" />
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'form.css')}" type="text/css" media="screen, projection" />
@@ -45,7 +45,7 @@
 	<script src="${createLinkTo(dir:'js/jquery.hoverIntent/', file:'jquery.hoverIntent.minified.js')}" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.tableScroll/', file:'jquery.tablescroll.js')}" type="text/javascript" ></script>
 
-    <g:if test="${System.getenv().get('headless') != 'false'}" env="test"> <!--headless drive throw error when using watermark-->
+    <g:if test="${System.getenv().get('headless') != 'false'}" env="test"> <!--headless driver throw error when using watermark-->
 	</g:if>
     <g:else>
         <script src="${createLinkTo(dir:'js/jquery.watermark/', file:'jquery.watermark.min.js')}" type="text/javascript" ></script>
@@ -65,9 +65,7 @@
 	<script src="http://jquery-option-tree.googlecode.com/files/jquery.optionTree.js" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.mcdropdown/', file:'jquery.mcdropdown.js')}" type="text/javascript" ></script>
 
-
-
-		
+  		
  	<!-- Include Jquery Validation and Jquery Validation UI plugins -->
  	<jqval:resources />       
     <jqvalui:resources />
@@ -83,6 +81,10 @@
 	--%>
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'custom.css')}" type="text/css" media="screen, projection" />
 	
+  <!-- jquery validation messages -->
+  <script src="${createLinkTo(dir:'js/jquery.validation/', file:'messages_'+ session?.user?.locale + '.js')}"  type="text/javascript" ></script>
+
+
 	<!-- Custom styles to be applied to all pages -->
 	<style type="text/css" media="screen"></style>
 	
