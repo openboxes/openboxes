@@ -69,9 +69,9 @@ class Requisition implements Serializable {
 	static mapping = {
 		id generator: 'uuid'
 		requisitionItems cascade: "all-delete-orphan", sort: "id"
-		comments cascade: "all-delete-orphan"
-		documents cascade: "all-delete-orphan"
-		events cascade: "all-delete-orphan"
+//		comments cascade: "all-delete-orphan"
+//		documents cascade: "all-delete-orphan"
+//		events cascade: "all-delete-orphan"
 	}
 	
 	static constraints = { 

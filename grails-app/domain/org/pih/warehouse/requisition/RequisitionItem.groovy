@@ -41,7 +41,7 @@ class RequisitionItem implements Serializable {
 	Date dateCreated
 	Date lastUpdated
 
-	static transients = [ "type", "status", "quantityPicked", "quantityRemaining", "existingInventoryItems" ]
+	static transients = [ "type", "status", "quantityPicked", "quantityRemaining" ]
 	
 	static belongsTo = [ requisition: Requisition ]
 
@@ -82,8 +82,8 @@ class RequisitionItem implements Serializable {
         return (quantity ?: 0) - quantityPicked
     }
 
-    InventoryItem[] getExistingInventoryItems() {
-        return InventoryItem.findAll { it.product == product }
+    List<InventoryItem> findExistingInventoryItems() {
+        return []//InventoryItem.findAll { it.product == product }
     }
 
 //
