@@ -45,6 +45,19 @@ class PicklistItem implements Serializable {
 		reasonCode(nullable:true)
 		comment(nullable:true)
 		
-	}			
+	}
+
+    Map toJson(){
+        [
+            "id": id,
+            "requisitionItemId": requisitionItem?.id,
+            "inventoryItemId": inventoryItem?.id,
+            "inventoryItemLotNumber": inventoryItem?.lotNumber,
+            "quantity":quantity,
+            "status": status,
+            "reasonCode" : reasonCode,
+            "comment": comment,
+        ]
+    }
 		
 }

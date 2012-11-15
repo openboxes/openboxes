@@ -35,52 +35,50 @@
             <table>
                 <tbody>
                 <tr>
-                    <td><span data-bind="text: id"></span>
-                        <table>
-                            <tbody data-bind="foreach : requisitionItems">
-                                <div class="requisition-item">
-                                        %{--class="requisitionItem ${i%2?'even':'odd' } accordion"--}%
-                                    <tr  style="border-top-width: 1px; border-top-style: solid; border-bottom-width: 1px; border-bottom-style: solid">
-                                        <td valign='top' class='value' style="border-left-width: 1px; border-left-style: solid; border-left-color: black">
-                                            %{--<label>${i+1}. ${requisitionItem.product?.name}</label>--}%
-                                            <span data-bind="text: id"></span>%{--<span data-bind="text: product.name"></span>--}%
-                                        </td>
-                                        <td valign='top' class='value'>
-                                            %{--Requested:<span data-bind="text: quantity"></span>--}%
-                                        </td>
-                                        <td valign='top' class='value'>
-                                            %{--Picked: <span data-bind="text: quantityPicked"></span>--}%
-                                        </td>
-                                        <td valign='top' class='value'>
-                                            %{--Remaining: <span data-bind="text: quantityRemaining"></span>--}%
-                                        </td>
-                                        <td style="border-right-width: 1px; border-right-style: solid; border-right-color: black">
-                                            %{--<div data-bind="class: status"></div>--}%
-                                        </td>
-                                    </tr>
-                                    %{--<g:each var="inventoryItem" in="${requisition?.findExistingInventoryItems()}" status="i">--}%
-                                    %{--<tr>--}%
-                                    %{--<td>${inventoryItem?.product?.name}</td>--}%
-                                    %{--</tr>--}%
-                                    %{--</g:each>--}%
+                    <td>
+                        <table border="1" data-bind="foreach : requisitionItems">
+                            <tbody class="research">
+                                <tr class="accordion">
+                                    <td>
+                                        <span data-bind="text: rowIndex"></span>. <span data-bind="text: productName"></span>
+                                        <span data-bind="text: quantity"></span>
+                                        Picked: <span data-bind="text: quantityPicked"></span>
+                                        Remaining: <span data-bind="text: quantityRemaining"></span>
+                                        <div data-bind="css: status"></div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5">
+                                        <table>
+                                            <tr data-bind="foreach : requisitionItems">
 
-                                    %{--<input type="hidden" data-bind="value: id"/>--}%
-                                    %{--<label>Product</label>--}%
-                                    %{--<input type="hidden" data-bind="value: productId"/>--}%
-                                    %{--<input type="text" class="required" data-bind="search_product: {source: '${request.contextPath }/json/searchProduct'}, uniqueName: true"/>--}%
-                                    %{--<label>Quantity</label>--}%
-                                    %{--<input type="text" class="required number" data-bind="value: quantity,uniqueName: true"/>--}%
-                                    %{--<label>Substitutable</label>--}%
-                                    %{--<input type="checkbox" data-bind="checked: substitutable"/>--}%
-                                    %{--<label>Recipient</label>--}%
-                                    %{--<input type="text" data-bind="value: recipient"/>--}%
-                                    %{--<span>product:</span><span data-bind="text: productId"/>--}%
-                                </div>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+
                             </tbody>
+
                         </table>
                     </td>
-                    <td>
-                        %{--key--}%
+                    <td width="250">
+                        <table border="1">
+                            <tr>
+                                <td>
+                                    <table>
+                                        <tr>
+                                            <td><div class="Incomplete"></div>Incomplete</td>
+                                        </tr>
+                                        <tr>
+                                            <td><div class="PartiallyComplete"></div>Partially Complete</td>
+                                        </tr>
+                                        <tr>
+                                            <td><div class="Complete"></div>Complete</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
                     </td>
                 </tr>
 
@@ -117,15 +115,47 @@
 
 
 <script type="text/javascript">
-
-
     $(function(){
-        %{--var requisition = new process_requisition.Requisition("${requisition?.id}", ${requisitionItems});--}%
-        %{--console.log("We got some data from the server. " + JSON.stringify(requisition.requisitionItems))--}%
-        %{--console.log("Processing requisition " + requisition.id());--}%
-        %{--var viewModel = new process_requisition.ViewModel(requisition);--}%
-        var viewModel = ko.mapping.fromJS(${serverData});
+
+        var mapping = {
+            'requisitionItems': {
+                create: function(options) {
+                    return new RequisitionItem(options.data);
+                }
+            }
+        };
+
+        var RequisitionItem = function(data) {
+            ko.mapping.fromJS(data, {}, this);
+
+            this.quantityPicked = ko.computed(function() {
+                return 0;
+            }, this);
+            this.quantityRemaining = ko.computed(function() {
+                return this.quantity() - this.quantityPicked();
+            }, this);
+            this.status = ko.computed(function() {
+                if(this.quantityPicked() == 0) return "Incomplete";
+                if(this.quantityPicked() >= this.quantity()) return "Complete";
+                return "PartiallyComplete";
+            }, this);
+            this.rowIndex = ko.computed(function() {
+                return this.orderIndex() + 1;
+            }, this);
+        };
+
+        var viewModel = ko.mapping.fromJS(${serverData}, mapping);
         ko.applyBindings(viewModel);
+
+        var $research = $('.research');
+        //$research.find("tr").not('.accordion').hide();
+        //$research.find("tr").eq(0).show();
+
+        $research.find(".accordion").click(function(){
+            $research.find('.accordion').not(this).siblings().fadeOut(200);
+            $(this).siblings().fadeToggle(200);
+        }).eq(0).trigger('click');
+
     });
 </script>
 

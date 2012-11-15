@@ -583,30 +583,45 @@ th.desc a {
 }
 
 .Complete {
-    background: url(../images/icons/silk/bullet_green.png) right no-repeat;
+    background: url(../images/icons/silk/bullet_green.png) no-repeat;
+    float: right;
     width: 16px;
-    text-align: right;
     height: 16px;
 }
 
 .Incomplete {
-    background: url(../images/icons/silk/asterisk_red.png) right no-repeat;
+    background: url(../images/icons/silk/asterisk_red.png) no-repeat;
+    float: right;
     width: 16px;
-    text-align: right;
     height: 16px;
 }
 
 .PartiallyComplete {
-    background: url(../images/icons/silk/asterisk_yellow.png) right no-repeat;
+    background: url(../images/icons/silk/asterisk_yellow.png) no-repeat;
+    float: right;
     width: 16px;
-    text-align: right;
     height: 16px;
 }
 
 .ui_datepicker{
-  background-image: url(../images/icons/silk/calendar.png);
-  background-repeat: no-repeat;
-  background-position: center right;
+    background-image: url(../images/icons/silk/calendar.png);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.border_left {
+    border-left-width: 1px;
+    border-left-style: solid;
+    border-top-width: 1px;
+    border-top-style: solid;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+}
+
+.border_right {
+  border-right-width: 1px;
+  border-right-style: solid;
+  border-right-color: black
 }
 
 /*fix ui-validation error message styling issue*/

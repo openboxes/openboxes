@@ -11,7 +11,6 @@ package org.pih.warehouse.requisition
 
 import org.pih.warehouse.core.Comment;
 import org.pih.warehouse.core.Document;
-import org.hibernate.FetchMode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import grails.converters.JSON
@@ -88,20 +87,11 @@ class RequisitionController {
 
     def process = {
 
-        JSON.use('deep');
         def requisition = Requisition.get(params?.id)
-        requisition.getRequisitionItems();
-        def serverData = requisition as JSON
+        def serverData = requisition.toJson() as JSON
         println serverData;
 
         return [requisition: requisition, serverData: serverData];
-    }
-
-    def process2 = {
-        def requisition = Requisition.get(params?.id)
-        def requisitionItems = requisition.requisitionItems as JSON
-        println requisitionItems
-        return [requisition: requisition, requisitionItems: requisitionItems];
     }
 
     def show = {

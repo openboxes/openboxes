@@ -149,7 +149,8 @@ class RequisitionItem implements Serializable {
         "quantity":quantity,
         "comment": comment,
         "recipient": recipient,
-        "substitutable": substitutable
+        "substitutable": substitutable,
+        "orderIndex": orderIndex
       ]
     }
 
