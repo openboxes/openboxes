@@ -14,6 +14,12 @@ describe('requisition view model', function(){
     expect(requisition.requisitionItems()[1].orderIndex()).toEqual(1);
   });
 
+  it("should add one item if there is no item in existing requisition", function(){
+    var requisition = new warehouse.Requisition({id:"abc"});
+    var viewModel = new warehouse.ViewModel(requisition);
+    expect(requisition.requisitionItems().length).toBe(1);
+  });
+
   it('be able to remove items but alway add one when items are empty', function() {
     var requisition = new warehouse.Requisition({});
     var viewModel = new warehouse.ViewModel(requisition);
@@ -28,6 +34,19 @@ describe('requisition view model', function(){
     expect(requisition.requisitionItems().length).toEqual(1); //should add new one when items is empty
   });
 
+  it("should build requisition item models when build requisition model", function(){
+    var data = {
+      id: "abc",
+      requisitionItems: [
+        {id: "item1"},
+        {id: "item2"}
+      ]
+    };
+    var requisition = new warehouse.Requisition(data);
+    expect(requisition.requisitionItems()[0].id()).toBe("item1");
+    expect(requisition.requisitionItems()[1].id()).toBe("item2");
+  });
+
   
   it('should save data to server', function(){
     var originId = "2";
@@ -35,10 +54,10 @@ describe('requisition view model', function(){
     var requestedDeliveryDate = "11/13/2012";
     var requestedById = "23";
     var recipientProgram = "test";
-    var requisitionItem1 = new warehouse.RequisitionItem({productId:"prod1", quantity:300, 
-    comment:"my comment1", substitutable:true, recipient: "peter",orderIndex: 2});
-    var requisitionItem2 = new warehouse.RequisitionItem({productId:"prod2", quantity:400, 
-    comment:"my comment2", substitutable:false, recipient: "tim",orderIndex: 1});
+    var requisitionItem1 = {productId:"prod1", quantity:300, 
+    comment:"my comment1", substitutable:true, recipient: "peter",orderIndex: 2};
+    var requisitionItem2 = {productId:"prod2", quantity:400, 
+    comment:"my comment2", substitutable:false, recipient: "tim",orderIndex: 1};
     var requisition = new warehouse.Requisition({
       originId: originId,
       version: 3,
@@ -90,8 +109,8 @@ describe('requisition view model', function(){
     expect(requisition.status()).toBe(responseData.status);
     expect(requisition.lastUpdated()).toBe(responseData.lastUpdated);
     expect(requisition.version()).toBe(responseData.version);
-    expect(requisitionItem1.id()).toBe("item1");
-    expect(requisitionItem2.id()).toBe("item2");
+    expect(requisition.requisitionItems()[0].id()).toBe("item1");
+    expect(requisition.requisitionItems()[1].id()).toBe("item2");
      
   });
 });

@@ -12,7 +12,11 @@ warehouse.Requisition = function(attrs) {
     self.lastUpdated = ko.observable(attrs.lastUpdated);
     self.status = ko.observable(attrs.status);
     self.version = ko.observable(attrs.version);
-    self.requisitionItems = ko.observableArray(attrs.requisitionItems || []);
+    self.requisitionItems = ko.observableArray([]);
+    for(var idx in attrs.requisitionItems){
+      var item = new warehouse.RequisitionItem(attrs.requisitionItems[idx]);
+      self.requisitionItems.push(item);
+    }
     self.findRequisitionItemByOrderIndex = function(orderIndex){
       for(var idx in self.requisitionItems()){
         if(self.requisitionItems()[idx].orderIndex() == orderIndex) 
@@ -86,7 +90,12 @@ warehouse.ViewModel = function(requisition) {
                 }
             }
         });
+
     };
+
+    if(self.requisition.requisitionItems().length == 0 && self.requisition.id()){
+            self.addItem();
+    }
 
    
     self.requisition.id.subscribe(function(newValue) {

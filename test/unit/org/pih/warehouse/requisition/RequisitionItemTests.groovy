@@ -97,7 +97,7 @@ class RequisitionItemTests extends GrailsUnitTestCase {
         comment: "good",
         recipient: "peter",
         substitutable: true,
-        orderIndex: 0
+        orderIndex: 3
       )
       Map json = item.toJson()
       assert json.id == item.id
