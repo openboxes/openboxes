@@ -26,6 +26,7 @@ warehouse.RequisitionItem = function(attrs) {
     var self = this;
     self.id = ko.observable(attrs.id);
     self.productId = ko.observable(attrs.productId);
+    self.productName = ko.observable(attrs.productName);
     self.quantity =  ko.observable(attrs.quantity);
     self.comment = ko.observable(attrs.comment);
     self.substitutable =  ko.observable(attrs.substitutable);

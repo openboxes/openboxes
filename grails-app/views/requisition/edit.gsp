@@ -114,7 +114,7 @@
             <input type="text"
               placeholder="${warehouse.message(code:'requisition.addItem.label')}"
               class="required autocomplete" 
-              data-bind="search_product: {source: '${request.contextPath }/json/searchProduct'}, uniqueName: true" size="50"/>
+              data-bind="search_product: {source: '${request.contextPath }/json/searchProduct'}, uniqueName: true, value: productName" size="50"/>
           </td>
           <td  class="list-header">
             <input type="text" class="required number" size="6" 
