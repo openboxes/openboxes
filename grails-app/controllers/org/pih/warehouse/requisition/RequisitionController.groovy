@@ -57,10 +57,15 @@ class RequisitionController {
     }
 
     def edit = {
-        def requisition = Requisition.get(params.id) ?: new Requisition()
-        bindData(requisition, params)
-        def depots = getDepots()
-        return [requisition: requisition, depots: depots];
+        def requisition = Requisition.get(params.id)
+        if(requisition) {
+           def depots = getDepots()
+           String jsonString = requisition.toJson() as JSON
+           return [requisition: jsonString, depots: depots];  
+        }else
+        {
+          response.sendError(404)
+        }
     }
 
     private List<Location> getDepots() {

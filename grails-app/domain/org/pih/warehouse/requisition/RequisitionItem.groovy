@@ -141,5 +141,16 @@ class RequisitionItem implements Serializable {
         "id:${id} product:${product} quantity:${quantity} substitutable:${substitutable} comment:${comment} recipient:${recipient}"
     }
 
+    Map toJson(){
+      [
+        "id": id,
+        "productId": product?.id,
+        "productName": product?.name,
+        "quantity":quantity,
+        "comment": comment,
+        "recipient": recipient
+      ]
+    }
+
 
 }

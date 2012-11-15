@@ -136,5 +136,23 @@ class Requisition implements Serializable {
 	}
 	
 	
-	
+  Map toJson(){
+    [
+      "id": id,
+      "requestedById": requestedBy?.id,
+      "requestedByName": requestedBy?.name,
+      "dateRequested": dateRequested,
+      "requestedDeliveryDate": requestedDeliveryDate,
+      "name": name,
+      "version": version,
+      "lastUpdated": lastUpdated,
+      "status": status.name(),
+      "originId": origin?.id,
+      "originName": origin?.name,
+      "destinationId": destination?.id,
+      "destinationName": destination?.name,
+      "recipientProgram": recipientProgram,
+      "requisitionItems": requisitionItems?.collect{ it.toJson()}
+    ]
+  }
 }

@@ -88,5 +88,23 @@ class RequisitionItemTests extends GrailsUnitTestCase {
         assertEquals "Complete", requisitionItem.getStatus()
     }
 
+    void testToJsonData(){
+      def product = new Product(id: "prod1", name:"aspin")
+      def item = new RequisitionItem(
+        id: "1234",
+        product: product,
+        quantity: 3000,
+        comment: "good",
+        recipient: "peter"
+      )
+      Map json = item.toJson()
+      assert json.id == item.id
+      assert json.productId == item.product.id
+      assert json.productName == item.product.name
+      assert json.quantity == item.quantity
+      assert json.comment == item.comment
+      assert json.recipient == item.recipient
+    }
+
 
 }

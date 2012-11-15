@@ -19,35 +19,46 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         mockBindData()
     }
 
-    void testEdit(){
+    void testEditShouldRenderDepots(){
         def location1 = new Location(id:"1234", name: "zoom", supportedActivities: [ActivityCode.MANAGE_INVENTORY])
         def location3 = new Location(id:"1236", name: "hoom", supportedActivities: [ActivityCode.MANAGE_INVENTORY])
         def location2 = new Location(id:"1235", supportedActivities: ["supplier"])
         def myLocation = new Location(id:"001", supportedActivities: [ActivityCode.MANAGE_INVENTORY])
         mockDomain(Location, [location1, location2, myLocation, location3])
-        mockDomain(Requisition, [])
-        controller.params.name = "peter"
+         def requisition = new Requisition(id: "1234", name: "jim", recipientProgram:"abc")
+        mockDomain(Requisition, [requisition])
+        controller.params.id = requisition.id
         controller.session.warehouse = myLocation
 
         def model = controller.edit()
 
-        assert model.requisition.name == "peter"
         assert model.depots[0] == location3
         assert model.depots[1] == location1
         assert !model.depots.contains(location2)
         assert !model.depots.contains(myLocation)
     }
+
     void testEditExistingRequisition(){
         def requisition = new Requisition(id: "1234", name: "jim", recipientProgram:"abc")
         mockDomain(Requisition, [requisition])
         mockDomain(Location, [])
-        controller.params.name = "peter"
         controller.params.id = "1234"
         def model =  controller.edit()
-        assert model.requisition.id == "1234"
-        assert model.requisition.name == "peter"
-        assert model.requisition.recipientProgram == "abc"
+        assert model.requisition.class == String
+        def json = JSON.parse(model.requisition)
+        assert json.id == requisition.toJson().id
+        assert json.name == requisition.toJson().name
     }
+
+     void testEditRequisitionWhichCannotBeFound(){
+        def requisition = new Requisition(id: "1234", name: "jim", recipientProgram:"abc")
+        mockDomain(Requisition, [requisition])
+        mockDomain(Location, [])
+        controller.params.name = "something cannot be found"
+        controller.edit()
+        assert controller.response.status == 404
+    }
+
 
     void testSave() {
         def requisition = new Requisition(id: "2345", lastUpdated: new Date(), status: RequisitionStatus.CREATED, version: 3)

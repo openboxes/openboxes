@@ -22,3 +22,4 @@ openboxes.ipr
 /.link_to_grails_plugins
 out/
 *.swp
+tags
