@@ -48,12 +48,13 @@
         </td>
         <td class="value">
            <g:autoSuggest id="requestedBy" name="requestedBy"
-                     dataBind="value: requisition.requestedById"
+                     valueDataBind="value: requisition.requestedById"
+                     textDataBind="value: requisition.requestedByName"
                      jsonUrl="${request.contextPath }/json/findPersonByName"
                      styleClass="text required"
                      placeholder="Requested by"
-                     valueId="${requisition?.requestedBy?.id}"
-                     valueName="${requisition?.requestedBy?.name}"
+                     valueId=""
+                     valueName=""
                      />
         </td>
       </tr>
@@ -162,8 +163,9 @@
 <script type="text/javascript">
   $(function(){
     var today = $.datepicker.formatDate("mm/dd/yy", new Date());
+    var requisitionData = ${requisition};
     var tomorrow = $.datepicker.formatDate("mm/dd/yy", new Date(new Date().getTime() + 24*60*60*1000));
-    var requisition = new warehouse.Requisition({ dateRequested: today, requestedDeliveryDate:tomorrow});
+    var requisition = new warehouse.Requisition(requisitionData || { dateRequested: today, requestedDeliveryDate:tomorrow});
     var viewModel = new warehouse.ViewModel(requisition);
     ko.applyBindings(viewModel);
     $("#requisitionForm").validate({ submitHandler: viewModel.save });

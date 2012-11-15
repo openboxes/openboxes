@@ -86,8 +86,8 @@ class RequisitionTests extends GrailsUnitTestCase {
       assert json.id == requisition.id
       assert json.requestedById == peter.id
       assert json.requestedByName == peter.getName()
-      assert json.dateRequested == today
-      assert json.requestedDeliveryDate == tomorrow
+      assert json.dateRequested == today.format("MM/dd/yy")
+      assert json.requestedDeliveryDate == tomorrow.format("MM/dd/yy")
       assert json.name == requisition.name
       assert json.version == requisition.version
       assert json.lastUpdated == requisition.lastUpdated

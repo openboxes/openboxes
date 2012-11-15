@@ -166,6 +166,7 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
       assert renderArgs.view == "edit"
       assert renderArgs.model
       assert renderArgs.model.depots == []
+      assert renderArgs.model.requisition == "null"
     }
 
 

@@ -48,7 +48,7 @@ describe('requisition view model', function(){
       requestedDeliveryDate: requestedDeliveryDate, 
       requestedById: requestedById,
       recipientProgram:recipientProgram,
-      items: [requisitionItem1, requisitionItem2]});
+      requisitionItems: [requisitionItem1, requisitionItem2]});
     var viewModel = new warehouse.ViewModel(requisition);
     var formElement ={
       action:"testAction"

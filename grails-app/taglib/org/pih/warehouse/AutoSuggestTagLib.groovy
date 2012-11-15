@@ -52,12 +52,13 @@ class AutoSuggestTagLib {
 		//def suggestDisplay = (showValue) ? "none" : "inline";
 		def spanDisplay = "none";
 		def suggestDisplay = "inline";
-        def dataBind = attrs.dataBind ? "data-bind='${attrs.dataBind}'" : ""
+    def valueDataBind = attrs.valueDataBind ? "data-bind='${attrs.valueDataBind}'" : ""
+    def textDataBind = attrs.valueDataBind ? "data-bind='${attrs.textDataBind}'" : ""
 		
 		def html = """
 				<span id="${id}-span" class="span" style="text-align: left; display: ${spanDisplay};">${valueName}</span>
-				<input id="${id}-value" class="value" type="hidden" name="${name}.id" value="${valueId}" ${dataBind }/>
-				<input id="${id}-suggest" type="text"
+				<input id="${id}-value" class="value" type="hidden" name="${name}.id" value="${valueId}" ${valueDataBind }/>
+				<input id="${id}-suggest" type="text" ${textDataBind} 
 					class="autocomplete ${styleClass}" name="${name}.name" placeholder="${placeholder}" value="${valueName}" 
 					style="width: ${width}px; display: ${suggestDisplay};">
 				

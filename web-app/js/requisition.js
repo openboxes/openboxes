@@ -12,7 +12,7 @@ warehouse.Requisition = function(attrs) {
     self.lastUpdated = ko.observable(attrs.lastUpdated);
     self.status = ko.observable(attrs.status);
     self.version = ko.observable(attrs.version);
-    self.requisitionItems = ko.observableArray(attrs.items || []);
+    self.requisitionItems = ko.observableArray(attrs.requisitionItems || []);
     self.findRequisitionItemByOrderIndex = function(orderIndex){
       for(var idx in self.requisitionItems()){
         if(self.requisitionItems()[idx].orderIndex() == orderIndex) 
