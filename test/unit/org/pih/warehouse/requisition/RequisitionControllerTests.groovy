@@ -44,7 +44,6 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         mockDomain(Location, [])
         controller.params.id = "1234"
         def model =  controller.edit()
-        assert model.requisition.class == String
         def json = JSON.parse(model.requisition)
         assert json.id == requisition.toJson().id
         assert json.name == requisition.toJson().name
@@ -159,6 +158,14 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         //This is a bad test because hibernate remembers the object even though it has been deleted. The domain does not refresh.
         //assertEquals oldSize - 1, Requisition.count()
 
+    }
+
+    def testCreate(){
+      mockDomain(Location, [])
+      controller.create()
+      assert renderArgs.view == "edit"
+      assert renderArgs.model
+      assert renderArgs.model.depots == []
     }
 
 

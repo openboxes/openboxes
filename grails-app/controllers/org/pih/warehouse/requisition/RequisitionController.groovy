@@ -53,7 +53,7 @@ class RequisitionController {
     }
 
     def create = {
-        return [depots: getDepots()]
+        render(view:"edit", model:[depots: getDepots()])
     }
 
     def edit = {

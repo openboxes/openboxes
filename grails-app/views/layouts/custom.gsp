@@ -82,7 +82,9 @@
 	<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'custom.css')}" type="text/css" media="screen, projection" />
 	
   <!-- jquery validation messages -->
-  <script src="${createLinkTo(dir:'js/jquery.validation/', file:'messages_'+ session?.user?.locale + '.js')}"  type="text/javascript" ></script>
+  <g:if test="${ session?.user?.locale && session?.user?.locale != 'en'}">
+    <script src="${createLinkTo(dir:'js/jquery.validation/', file:'messages_'+ session?.user?.locale + '.js')}"  type="text/javascript" ></script>
+  </g:if>
 
 
 	<!-- Custom styles to be applied to all pages -->
