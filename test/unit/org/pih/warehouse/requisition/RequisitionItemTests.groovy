@@ -14,7 +14,6 @@ class RequisitionItemTests extends GrailsUnitTestCase {
         assertEquals "nullable", requisitionItem.errors["quantity"]
     }
 
-
     void testQuantityConstraint() {
         mockForConstraintsTests(RequisitionItem)
         def requisitionItem = new RequisitionItem(quantity: 0)
