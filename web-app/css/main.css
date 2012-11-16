@@ -606,7 +606,7 @@ th.desc a {
 .ui_datepicker{
     background-image: url(../images/icons/silk/calendar.png);
     background-repeat: no-repeat;
-    background-position: center;
+    background-position: right;
 }
 
 .border_left {
