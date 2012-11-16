@@ -45,18 +45,14 @@
       <tr class="prop">
         <td class="name">
           <label><warehouse:message code="requisition.requestedBy.label"/></label>
-        </td>
+        </td>        
         <td class="value">
-           <g:autoSuggest id="requestedBy" name="requestedBy"
-                     valueDataBind="value: requisition.requestedById"
-                     textDataBind="value: requisition.requestedByName"
-                     jsonUrl="${request.contextPath }/json/findPersonByName"
-                     styleClass="text required"
-                     placeholder="Requested by"
-                     valueId=""
-                     valueName=""
-                     />
-        </td>
+          <input data-bind="value: requisition.requestedById" type="hidden"/>
+          <input id="requestedBy" name="requestedBy"
+            class="autocomplete"
+            placeholder="${warehouse.message(code:'requisition.requestedBy.label')}"
+            data-bind="autocompleteWithId: {source: '${request.contextPath }/json/searchPersonByName'}, value: requisition.requestedByName"/>
+         </td>
       </tr>
       <tr class="prop">
         <td class="name">
@@ -180,23 +176,13 @@
     var updateDescription = function() {
                     var depot = $("#depot select option:selected").text() || "";
                     var program = $("#recipientProgram").val() || "";
-                    var requestedBy = $("#requestedBy-suggest").val() || "";
+                    var requestedBy = $("#requestedBy").val() || "";
                     var dateRequested = $("#dateRequested").val() || "";
                     var deliveryDate = $("#requestedDeliveryDate").val() || "";
                     var description = "${warehouse.message(code: 'requisition.label', default: 'Requisition')}: " + depot + " - " + program + ", " + requestedBy + " - " + dateRequested + ", " + deliveryDate;
                     requisition.name(description);
                 };
   $(".value").change(updateDescription);
-
-  //Todo: very ugly code below because server give us a "does not exist option" which can be selected. should remove it.
-  $("#requestedBy-suggest").bind("selected",function(){
-    if($("#requestedBy-value").val() == "null"){
-      $("#requestedBy-value").val("");
-      $("#requestedBy-suggest").val("");
-    }
-    updateDescription();
-  });
-  $("#recipientProgram").bind("selected", updateDescription);
   setInterval(function(){warehouse.saveRequisitionToLocal(requisition);}, 3000);
 });
 </script>

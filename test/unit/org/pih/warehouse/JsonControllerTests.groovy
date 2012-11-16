@@ -6,7 +6,7 @@ import org.pih.warehouse.product.Product
 import grails.converters.JSON
 import org.pih.warehouse.requisition.RequisitionService
 import org.pih.warehouse.inventory.InventoryService
-import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.*
 
 
 
@@ -81,7 +81,7 @@ class JsonControllerTests extends ControllerUnitTestCase {
         assert jsonResult[5].quantity == 1100
 
         //result should contain group
-        assert jsonResult[0].group == ""
+
         assert jsonResult[1].group == ""
         assert jsonResult[2].group == group2.description
         assert jsonResult[3].group == ""
@@ -89,4 +89,26 @@ class JsonControllerTests extends ControllerUnitTestCase {
         assert jsonResult[5].group == group1.description
 
     }
+
+//Todo: it seems test does not like withCriteria, waiting for solution; by Peter
+//   void testSearchPersonByName(){
+//      def john = new Person(id:"1",firstName:"john", lastName:"Hoo", email:"jhoo@abc.com")
+//      def tom = new Person(id:"2",firstName:"tom", lastName:"Hoo", email:"thoo@abc.com")
+//      def kyle = new Person(id:"3",firstName:"kyle", lastName:"Foo", email:"kfoo@abc.com")
+//      def stev = new Person(id:"4",firstName:"stev", lastName:"Foo", email:"sfhoo@abc.com")
+//      def magan = new Person(id:"5",firstName:"magan", lastName:"Jsonson", email:"mjsonson@abc.com")
+//      mockDomain(Person, [john, tom, kyle, stev, magan])
+//
+//      controller.params.term = "tom hoo"
+//      controller.searchPersonByName()
+//
+//      def jsonResponse = controller.response.contentAsString
+//      def json = JSON.parse(jsonResponse)
+//      assert json.size() == 2
+//      assert json[0].id == john.id
+//      assert json[0].value == john.name
+//      assert json[0].label == john.name + " " + john.email
+//      assert json[1].id == tom.id
+//
+//   }
 }

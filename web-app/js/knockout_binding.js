@@ -30,7 +30,7 @@ ko.bindingHandlers.search_product = {
   init: function (element, params) {
       $(element).autocomplete({
           delay: 300,
-          minLength: 3,
+          minLength: 2,
           dataType: 'json',
           source: function(req, add){
             $.getJSON(params().source, { term: req.term}, function(data) {
@@ -78,6 +78,7 @@ ko.bindingHandlers.autocomplete = {
   init: function (element, params) {
           $(element).autocomplete({
             delay: 300,
+            minLength: 2,
             dataType: 'json',
             source: function(req, add){
               $.getJSON(params().source, { term: req.term}, function(data) {
@@ -90,12 +91,47 @@ ko.bindingHandlers.autocomplete = {
             },
             select: function(event, ui){
               $(this).val(ui.item.value);
-              $(this).trigger("selected");
-              return false;
+              $(this).trigger("change");
             }
           });
 
         }
 };
+ko.bindingHandlers.autocompleteWithId = {
+  init: function (element, params) {
+          $(element).autocomplete({
+            delay: 300,
+            minLength: 2,
+            dataType: 'json',
+            source: function(req, add){
+              $.getJSON(params().source, { term: req.term}, function(data) {
+                var items = [];
+                $.each(data, function(i, item) {
+                  items.push(item);
+                });
+                add(items);
+              });
+            },
+            change: function(event, ui) {
+              if (!ui.item) {
+                $(this).prev().val(""); 
+                $(this).val("");			
+              }
+              $(this).prev().trigger("change");
+            },
+            select: function(event, ui) {
+              if (ui.item) {
+                $(this).prev().val(ui.item.id);
+                $(this).val(ui.item.value);
+              }
+              $(this).prev().trigger("change");
+              $(this).trigger("change");
+            }
+          });
+
+        }
+};
+
+
 
 

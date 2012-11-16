@@ -1,4 +1,3 @@
-
 /**
 * Copyright (c) 2012 Partners In Health.  All rights reserved.
 * The use and distribution terms for this software are covered by the
@@ -433,7 +432,8 @@ class JsonController {
 		render shipmentItem as JSON
 	}
 
-    def searchProduct = {
+  
+  def searchProduct = {
         log.debug "Search products and product groups contains:" + params.term
         def location = Location.get(session.warehouse.id);
         def groupsWithNameMatched = ProductGroup.findAllByDescriptionIlike ("%" + params.term + "%")
@@ -486,4 +486,26 @@ class JsonController {
                 groupsFromProductNameMatched.addAll(product.productGroups)
         }
     }
+
+
+  def searchPersonByName = {
+		def items = []
+    def terms = params.term?.split(" ")
+    terms?.each{ term ->
+      def result = Person.withCriteria {
+						or {
+						  	ilike("firstName", term + "%")
+						  	ilike("lastName", term + "%")
+						  	ilike("email", term + "%")
+              }
+						}
+      items.addAll(result)
+    }
+    items.unique{ it.id }
+    def json = items.collect{
+      [id: it.id, value: it.name, label: it.name+ " " + it.email]
+    }			
+		render json as JSON
+	}
+
 }
