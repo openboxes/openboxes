@@ -69,8 +69,7 @@ class RequisitionController {
         def jsonResponse = []
         def requisition = requisitionService.saveRequisition(jsonRequest, Location.get(session.warehouse.id))
         if (!requisition.hasErrors()) {
-            jsonResponse = [success: true, id: requisition.id, version: requisition.version, lastUpdated: requisition.lastUpdated.format('dd/MMM/yyyy hh:mm a'), status: requisition.status.toString()]
-            jsonResponse["requisitionItems"] = requisition.requisitionItems?.collect{i -> [id: i.id, orderIndex: i.orderIndex]} 
+            jsonResponse = [success: true, data: requisition.toJson()]
         }
         else {
             jsonResponse = [success: false, errors: requisition.errors]

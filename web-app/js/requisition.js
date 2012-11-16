@@ -92,14 +92,15 @@ warehouse.ViewModel = function(requisition) {
             success: function(result) {
                 console.log("result:" + JSON.stringify(result));
                 if(result.success){
-                    self.requisition.id(result.id);
-                    self.requisition.status(result.status);
-                    self.requisition.lastUpdated(result.lastUpdated);
-                    self.requisition.version(result.version);
-                    if(result.requisitionItems){
-                      for(var idx in result.requisitionItems){
-                        var localItem = self.requisition.findRequisitionItemByOrderIndex(result.requisitionItems[idx].orderIndex);
-                        localItem.id(result.requisitionItems[idx].id);
+                    self.requisition.id(result.data.id);
+                    self.requisition.status(result.data.status);
+                    self.requisition.lastUpdated(result.data.lastUpdated);
+                    self.requisition.version(result.data.version);
+                    if(result.data.requisitionItems){
+                      for(var idx in result.data.requisitionItems){
+                        var localItem = self.requisition.findRequisitionItemByOrderIndex(result.data.requisitionItems[idx].orderIndex);
+                        localItem.id(result.data.requisitionItems[idx].id);
+                        localItem.version(result.data.requisitionItems[idx].version);
                       }
                     }
                 }
@@ -144,6 +145,28 @@ warehouse.getFromLocal = function(name){
   if(typeof(Storage) !== "undefined" && localStorage[name])
     return JSON.parse(localStorage[name]);
   return null;
+};
+
+warehouse.Requisition.getNewer = function(serverData, localData){
+  if(!localData) return serverData;
+  if(serverData.version > localData.version) return serverData;
+  if(serverData.version < localData.version) return localData;
+  if(!serverData.requisitionItems) serverData.requisitionItems = [];
+  if(!localData.requisitionItems) localData.requisitionItems = [];
+  var serverItemIdVersionMap ={}
+  for(var idx in serverData.requisitionItems){
+    var serverItem = serverData.requisitionItems[idx];
+    serverItemIdVersionMap[serverItem.id] = serverItem.version;
+  }
+  for(var idx in localData.requisitionItems){
+    var localItem = localData.requisitionItems[idx];
+    if(localItem.version!=null && localItem.id !=null && serverItemIdVersionMap[localItem.id]!=null ){
+      if(localItem.version < serverItemIdVersionMap[localItem.id]){
+       return serverData;
+      }
+    }
+  }
+  return localData;
 };
 
 

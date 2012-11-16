@@ -160,11 +160,9 @@
   $(function(){
     var today = $.datepicker.formatDate("mm/dd/yy", new Date());
     var tomorrow = $.datepicker.formatDate("mm/dd/yy", new Date(new Date().getTime() + 24*60*60*1000));
-    var requisitionFromServer = ${requisition};
-    var requisitionData = requisitionFromServer ||  { dateRequested: today, requestedDeliveryDate:tomorrow, version: -1};    
-    var requisitionFromLocal = warehouse.getRequisitionFromLocal(requisitionData.id);
-    if(requisitionFromLocal && requisitionFromLocal.version >= requisitionData.version)
-      requisitionData = requisitionFromLocal;
+    var requisitionFromServer = ${requisition}  ||  { dateRequested: today, requestedDeliveryDate:tomorrow, version: -1};
+    var requisitionFromLocal = warehouse.getRequisitionFromLocal(requisitionFromServer.id);
+    var requisitionData = warehouse.Requisition.getNewer(requisitionFromServer, requisitionFromLocal);
     var requisition = new warehouse.Requisition(requisitionData);
     var viewModel = new warehouse.ViewModel(requisition);
     ko.applyBindings(viewModel);

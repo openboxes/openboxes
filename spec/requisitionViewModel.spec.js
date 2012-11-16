@@ -35,28 +35,7 @@ describe("requisition view model", function(){
     expect(requisition.requisitionItems().length).toEqual(1); //should add new one when items is empty
   });
 
-   it("should get new orderIndex of requisitionItem", function(){
-    var requisition = new warehouse.Requisition();
-    expect(requisition.newOrderIndex()).toEqual(0);
-  });
-
-
-  it("should build requisition item models when build requisition model", function(){
-    var data = {
-      id: "abc",
-      requisitionItems: [
-        {id: "item1", orderIndex: 3},
-        {id: "item2", orderIndex: 2}
-      ]
-    };
-    var requisition = new warehouse.Requisition(data);
-    expect(requisition.requisitionItems()[0].id()).toBe("item1");
-    expect(requisition.requisitionItems()[0].orderIndex()).toBe(3);
-    expect(requisition.requisitionItems()[1].id()).toBe("item2");
-    expect(requisition.requisitionItems()[1].orderIndex()).toBe(2);
-    expect(requisition.newOrderIndex()).toBe(4);
-  });
-
+   
   
   it("should save data to server", function(){
     var originId = "2";
@@ -108,21 +87,27 @@ describe("requisition view model", function(){
 
    
     var responseData = {success: true, 
-        id: "requisition1",
-        status: "CREATED",
-        lastUpdated: "14/Nov/2012 12:12 PM",
-        version: 0, 
-        requisitionItems:[
-         {id: "item2", orderIndex: 1},
-         {id: "item1", orderIndex: 2}
-        ]};
+          data:{
+            id: "requisition1",
+            status: "CREATED",
+            lastUpdated: "14/Nov/2012 12:12 PM",
+            version: 0, 
+            requisitionItems:[
+             {id: "item2", orderIndex: 1, version: 1},
+             {id: "item1", orderIndex: 2, version: 2}
+            ]
+          }
+        };
     ajaxOptions.success(responseData); //mimic server call back 
-    expect(requisition.id()).toBe(responseData.id);
-    expect(requisition.status()).toBe(responseData.status);
-    expect(requisition.lastUpdated()).toBe(responseData.lastUpdated);
-    expect(requisition.version()).toBe(responseData.version);
+    expect(requisition.id()).toBe(responseData.data.id);
+    expect(requisition.status()).toBe(responseData.data.status);
+    expect(requisition.lastUpdated()).toBe(responseData.data.lastUpdated);
+    expect(requisition.version()).toBe(responseData.data.version);
     expect(requisition.requisitionItems()[0].id()).toBe("item1");
     expect(requisition.requisitionItems()[1].id()).toBe("item2");
+    expect(requisition.requisitionItems()[0].version()).toBe(2);
+    expect(requisition.requisitionItems()[1].version()).toBe(1);
+
      
   });
 
