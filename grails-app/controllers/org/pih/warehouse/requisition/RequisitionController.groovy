@@ -81,7 +81,7 @@ class RequisitionController {
     def process = {
 
         def requisition = Requisition.get(params?.id)
-        def serverData = requisition.toJson() as JSON
+        def serverData = requisition.toJsonIncludeInventoryItems() as JSON
         println serverData;
 
         return [requisition: requisition, serverData: serverData];

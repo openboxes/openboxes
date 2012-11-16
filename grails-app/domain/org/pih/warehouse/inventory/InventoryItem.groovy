@@ -55,7 +55,20 @@ class InventoryItem implements Serializable {
 		expirationDate(nullable:true)	
     }
 		
-	
+
 	String toString() { return "${id}:${product}:${lotNumber}"; }
+
+    Map toJson() {
+        [
+            "id": id,
+            "productId": product?.id,
+            "productName": product?.name,
+            "lotNumber":lotNumber,
+            "expirationDate": expirationDate,
+            "quantityOnHand": quantityOnHand?: 0,
+            "quantityATP": quantityAvailableToPromise?: 0,
+            "quantityPicked": 0
+        ]
+    }
 	
 }

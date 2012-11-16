@@ -36,6 +36,7 @@ class RequisitionItem implements Serializable {
     Integer orderIndex
 
     List picklistItems = []
+
 	
 	// Audit fields
 	Date dateCreated
@@ -97,6 +98,13 @@ class RequisitionItem implements Serializable {
 
     String toString(){
         "id:${id} product:${product} quantity:${quantity} substitutable:${substitutable} comment:${comment} recipient:${recipient}"
+    }
+
+    Map toJsonIncludeInventoryItems() {
+        def outputValue = toJson()
+        // {outputValue.productId}.collect { it.toJson() }
+        outputValue["inventoryItems"] = InventoryItem.findByProduct(product).collect { it.toJson() }
+        outputValue
     }
 
     Map toJson(){

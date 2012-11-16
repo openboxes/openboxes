@@ -1,6 +1,7 @@
 package org.pih.warehouse.requisition
 
 import grails.test.GrailsUnitTestCase
+import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 
@@ -59,5 +60,33 @@ class RequisitionItemTests extends GrailsUnitTestCase {
       assert json.substitutable
       assert json.orderIndex == item.orderIndex
       assert json.version == 5
+    }
+
+    void testToJsonWithInventoryItemsData() {
+        def product = new Product(id: "prod1", name:"asprin")
+        def inventoryItem = new InventoryItem(id: "inventoryItem1", product: product, lotNumber: "abcd")
+        mockDomain(Product, [product])
+        mockDomain(InventoryItem, [inventoryItem]);
+        def item = new RequisitionItem(
+                id: "1234",
+                product: product,
+                quantity: 3000,
+                comment: "good",
+                recipient: "peter",
+                substitutable: true,
+                orderIndex: 3
+        )
+        mockDomain(RequisitionItem, [item])
+
+        def result = item.toJsonIncludeInventoryItems();
+        assert result.getClass() == LinkedHashMap
+        assert result.inventoryItems
+
+        assert result.inventoryItems.getClass() == ArrayList
+        assert result.inventoryItems[0].id == inventoryItem.id
+        assert result.inventoryItems[0].productId == inventoryItem.product.id
+        assert result.inventoryItems[0].productName == inventoryItem.product.name
+
+
     }
 }

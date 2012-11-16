@@ -42,7 +42,7 @@
                                     <td>
                                         <table>
                                             <tr>
-                                                <td style="width:650px"><span data-bind="text: rowIndex"></span>. <span data-bind="text: productName"></span>  this is what a really wide one will look like it has a product name that is really wide isnt that nice i like it thanks they wanted it more stretched out</td>
+                                                <td style="width:650px"><span data-bind="text: rowIndex"></span>. <span data-bind="text: productName"></span></td>
                                                 <td style="width:80px"><label>Quantity:</label><span data-bind="text: quantity"></span></td>
                                                 <td style="width:60px"><label>Picked:</label> <span data-bind="text: quantityPicked"></span></td>
                                                 <td style="width:100px"><label>Remaining:</label> <span data-bind="text: quantityRemaining"></span></td>
@@ -53,9 +53,34 @@
                                 </tr>
                                 <tr>
                                     <td colspan="5">
-                                        <table>
+                                        <table data-bind="foreach : inventoryItems">
+                                            <tr class="prop">
+                                                <th class="list-header">
+                                                    ${warehouse.message(code: 'inventoryItem.item.label')}
+                                                </th>
+                                                <th class="list-header">
+                                                    ${warehouse.message(code: 'inventoryItem.lotNumber.label')}
+                                                </th>
+                                                <th class="list-header">
+                                                    ${warehouse.message(code: 'inventoryItem.expirationDate.label')}
+                                                </th>
+                                                <th class="list-header">
+                                                    ${warehouse.message(code: 'inventoryItem.onHandQuantity.label')}
+                                                </th>
+                                                <th class="list-header">
+                                                    ${warehouse.message(code: 'inventoryItem.quantityAvailableToPromise.label')}
+                                                </th>
+                                                <th class="list-header">
+                                                    ${warehouse.message(code: 'inventoryItem.quantityPicked.label')}
+                                                </th>
+                                            </tr>
                                             <tr>
-
+                                                <td><span data-bind="text: productName"></span></td>
+                                                <td><span data-bind="text: lotNumber"></span></td>
+                                                <td><span data-bind="text: expirationDate"></span></td>
+                                                <td><span data-bind="text: quantityOnHand"></span></td>
+                                                <td><span data-bind="text: quantityATP"></span></td>
+                                                <td><input data-bind="value: quantityPicked"/></td>
                                             </tr>
                                         </table>
                                     </td>
@@ -120,7 +145,7 @@
 
 <script type="text/javascript">
     $(function(){
-
+        console.log(JSON.stringify(${serverData}));
         var viewModel = ko.mapping.fromJS(${serverData}, RequisitionProcessor.mapping);
         ko.applyBindings(viewModel);
 
