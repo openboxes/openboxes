@@ -1,10 +1,11 @@
 var ajaxOptions;
 jQuery.ajax = function(options){
     ajaxOptions = options;
-  }
+};
 
-describe('requisition view model', function(){
-  it('be able to add items', function() {
+describe("requisition view model", function(){
+ 
+  it("be able to add items", function() {
     var requisition = new warehouse.Requisition({});
     var viewModel = new warehouse.ViewModel(requisition);
     viewModel.addItem();
@@ -21,7 +22,7 @@ describe('requisition view model', function(){
   });
 
   it('be able to remove items but alway add one when items are empty', function() {
-    var requisition = new warehouse.Requisition({});
+    var requisition = new warehouse.Requisition();
     var viewModel = new warehouse.ViewModel(requisition);
     viewModel.addItem();
     viewModel.addItem();
@@ -34,21 +35,30 @@ describe('requisition view model', function(){
     expect(requisition.requisitionItems().length).toEqual(1); //should add new one when items is empty
   });
 
+   it("should get new orderIndex of requisitionItem", function(){
+    var requisition = new warehouse.Requisition();
+    expect(requisition.newOrderIndex()).toEqual(0);
+  });
+
+
   it("should build requisition item models when build requisition model", function(){
     var data = {
       id: "abc",
       requisitionItems: [
-        {id: "item1"},
-        {id: "item2"}
+        {id: "item1", orderIndex: 3},
+        {id: "item2", orderIndex: 2}
       ]
     };
     var requisition = new warehouse.Requisition(data);
     expect(requisition.requisitionItems()[0].id()).toBe("item1");
+    expect(requisition.requisitionItems()[0].orderIndex()).toBe(3);
     expect(requisition.requisitionItems()[1].id()).toBe("item2");
+    expect(requisition.requisitionItems()[1].orderIndex()).toBe(2);
+    expect(requisition.newOrderIndex()).toBe(4);
   });
 
   
-  it('should save data to server', function(){
+  it("should save data to server", function(){
     var originId = "2";
     var dateRequested = "11/12/2012";
     var requestedDeliveryDate = "11/13/2012";
@@ -112,5 +122,13 @@ describe('requisition view model', function(){
     expect(requisition.requisitionItems()[0].id()).toBe("item1");
     expect(requisition.requisitionItems()[1].id()).toBe("item2");
      
+  });
+
+  it("should save and get from local storage", function(){
+    var model = {id:"1234",name:"test"};
+    warehouse.saveToLocal("test", model);
+    var retrievedModel = warehouse.getFromLocal("test");
+    expect(retrievedModel.id).toEqual(model.id);
+    expect(retrievedModel.name).toEqual(model.name);
   });
 });

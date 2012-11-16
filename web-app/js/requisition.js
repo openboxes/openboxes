@@ -1,6 +1,7 @@
 if(typeof warehouse === "undefined") warehouse = {};
 warehouse.Requisition = function(attrs) {
     var self = this;
+    if(!attrs) attrs = {};
     self.id = ko.observable(attrs.id);
     self.originId= ko.observable(attrs.originId);
     self.originName = ko.observable(attrs.originName);
@@ -13,21 +14,33 @@ warehouse.Requisition = function(attrs) {
     self.status = ko.observable(attrs.status);
     self.version = ko.observable(attrs.version);
     self.requisitionItems = ko.observableArray([]);
+    self.name = ko.observable(attrs.name);
+
     for(var idx in attrs.requisitionItems){
       var item = new warehouse.RequisitionItem(attrs.requisitionItems[idx]);
       self.requisitionItems.push(item);
     }
+
     self.findRequisitionItemByOrderIndex = function(orderIndex){
       for(var idx in self.requisitionItems()){
         if(self.requisitionItems()[idx].orderIndex() == orderIndex) 
           return self.requisitionItems()[idx];
       }
     };
-    self.name = ko.observable(attrs.name);
- }
+
+    self.newOrderIndex = function(){
+      var orderIndex = -1;
+      for(var idx in self.requisitionItems()){
+        if(self.requisitionItems()[idx].orderIndex() > orderIndex) 
+          orderIndex = self.requisitionItems()[idx].orderIndex();
+      }
+      return orderIndex + 1;
+    }
+ };
 
 warehouse.RequisitionItem = function(attrs) {
     var self = this;
+    if(!attrs) attrs = {};
     self.id = ko.observable(attrs.id);
     self.productId = ko.observable(attrs.productId);
     self.productName = ko.observable(attrs.productName);
@@ -36,16 +49,16 @@ warehouse.RequisitionItem = function(attrs) {
     self.substitutable =  ko.observable(attrs.substitutable);
     self.recipient = ko.observable(attrs.recipient);
     self.orderIndex = ko.observable(attrs.orderIndex);
-}
+};
 
 warehouse.ViewModel = function(requisition) {
     var self = this;
     self.requisition = requisition;
-    self.maxOrderIndex = 0;
 
     self.addItem = function () {
-       self.requisition.requisitionItems.push(new warehouse.RequisitionItem({orderIndex:self.maxOrderIndex}));
-       self.maxOrderIndex += 1;
+       self.requisition.requisitionItems.push(
+        new warehouse.RequisitionItem({orderIndex:self.requisition.newOrderIndex()})
+       );
     };
 
     self.removeItem = function(item){
@@ -103,7 +116,19 @@ warehouse.ViewModel = function(requisition) {
           self.addItem();
         }
     });
-}
+
+};
+
+warehouse.saveToLocal = function(name, model){
+  if(typeof(Storage) === "undefined") return;
+  localStorage[name] = JSON.stringify(model);
+};
+
+warehouse.getFromLocal = function(name){
+  if(typeof(Storage) !== "undefined" && localStorage[name])
+    return JSON.parse(localStorage[name]);
+  return null;
+};
 
 
 
