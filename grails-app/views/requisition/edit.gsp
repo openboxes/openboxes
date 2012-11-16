@@ -158,32 +158,48 @@
   </g:form>
 
 <script type="text/javascript">
-  $(function(){
-    var today = $.datepicker.formatDate("mm/dd/yy", new Date());
-    var tomorrow = $.datepicker.formatDate("mm/dd/yy", new Date(new Date().getTime() + 24*60*60*1000));
-    var requisitionFromServer = ${requisition}  ||  { dateRequested: today, requestedDeliveryDate:tomorrow, version: -1};
-    var requisitionFromLocal = warehouse.getRequisitionFromLocal(requisitionFromServer.id);
-    var requisitionData = warehouse.Requisition.getNewer(requisitionFromServer, requisitionFromLocal);
-    var requisition = new warehouse.Requisition(requisitionData);
-    var viewModel = new warehouse.ViewModel(requisition);
-    ko.applyBindings(viewModel);
-    $("#requisitionForm").validate({ submitHandler: viewModel.save });
-    
-    if(!requisition.name())
-      requisition.name("${warehouse.message(code: 'requisition.label')}");
+    $(function () {
+        var today = $.datepicker.formatDate("mm/dd/yy", new Date());
+        var tomorrow = $.datepicker.formatDate("mm/dd/yy", new Date(new Date().getTime() + 24 * 60 * 60 * 1000));
+        var requisitionFromServer =
+        ${requisition}  ||
+        {
+            dateRequested: today, requestedDeliveryDate
+        :
+            tomorrow, version
+        :
+            -1
+        }
+        ;
+        var requisitionFromLocal = warehouse.getRequisitionFromLocal(requisitionFromServer.id);
+        var requisitionData = warehouse.Requisition.getNewer(requisitionFromServer, requisitionFromLocal);
+        var requisition = new warehouse.Requisition(requisitionData);
+        var viewModel = new warehouse.ViewModel(requisition);
+        viewModel.processItem = function () {
+            window.location = '../process/' + viewModel.requisition.id();
+        };
+        ko.applyBindings(viewModel);
 
-    var updateDescription = function() {
-                    var depot = $("#depot select option:selected").text() || "";
-                    var program = $("#recipientProgram").val() || "";
-                    var requestedBy = $("#requestedBy").val() || "";
-                    var dateRequested = $("#dateRequested").val() || "";
-                    var deliveryDate = $("#requestedDeliveryDate").val() || "";
-                    var description = "${warehouse.message(code: 'requisition.label', default: 'Requisition')}: " + depot + " - " + program + ", " + requestedBy + " - " + dateRequested + ", " + deliveryDate;
-                    requisition.name(description);
-                };
-  $(".value").change(updateDescription);
-  setInterval(function(){warehouse.saveRequisitionToLocal(requisition);}, 3000);
-});
+
+        $("#requisitionForm").validate({ submitHandler: viewModel.save });
+
+        if (!requisition.name())
+            requisition.name("${warehouse.message(code: 'requisition.label')}");
+
+        var updateDescription = function () {
+            var depot = $("#depot select option:selected").text() || "";
+            var program = $("#recipientProgram").val() || "";
+            var requestedBy = $("#requestedBy").val() || "";
+            var dateRequested = $("#dateRequested").val() || "";
+            var deliveryDate = $("#requestedDeliveryDate").val() || "";
+            var description = "${warehouse.message(code: 'requisition.label', default: 'Requisition')}: " + depot + " - " + program + ", " + requestedBy + " - " + dateRequested + ", " + deliveryDate;
+            requisition.name(description);
+        };
+        $(".value").change(updateDescription);
+        setInterval(function () {
+            warehouse.saveRequisitionToLocal(requisition);
+        }, 3000);
+    });
 </script>
 </body>
 </html>

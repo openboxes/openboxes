@@ -54,7 +54,13 @@ describe("requisition model", function(){
       });
 
     });
-
+//    describe('viewmodel'), function() {
+//        it("should be able to redirect users to the process page for a requisition", function() {
+//            var vm = warehouse.ViewModel( new warehouse.Requisition("abcd1234" ));
+//            var mock = window
+//            expect
+//        })
+//    };
     describe("same version at requisition level then check version at item level", function(){
      
       it("no items for both then local win", function(){
