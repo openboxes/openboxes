@@ -4,8 +4,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="layout" content="custom" />
     <script src="${createLinkTo(dir:'js/knockout/', file:'knockout-2.2.0.js')}" type="text/javascript" ></script>
-    <script src="${createLinkTo(dir:'js/', file:'knockout.mapping-latest.js')}" type="text/javascript" ></script>
-    <script src="${createLinkTo(dir:'js/', file:'processRequisition.js')}" type="text/javascript" ></script>
+    <script src="${createLinkTo(dir:'js/knockout/', file:'knockout.mapping-latest.js')}" type="text/javascript" ></script>
+    <script src="${createLinkTo(dir:'js/', file:'RequisitionProcessor.js')}" type="text/javascript" ></script>
     <g:set var="entityName" value="${warehouse.message(code: 'requisition.label', default: 'Requisition')}" />
     <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
     <!-- Specify content to overload like global navigation links, page titles, etc. -->
@@ -40,17 +40,21 @@
                             <tbody class="research">
                                 <tr class="accordion">
                                     <td>
-                                        <span data-bind="text: rowIndex"></span>. <span data-bind="text: productName"></span>
-                                        <span data-bind="text: quantity"></span>
-                                        Picked: <span data-bind="text: quantityPicked"></span>
-                                        Remaining: <span data-bind="text: quantityRemaining"></span>
-                                        <div data-bind="css: status"></div>
+                                        <table>
+                                            <tr>
+                                                <td style="width:650px"><span data-bind="text: rowIndex"></span>. <span data-bind="text: productName"></span>  this is what a really wide one will look like it has a product name that is really wide isnt that nice i like it thanks they wanted it more stretched out</td>
+                                                <td style="width:80px"><label>Quantity:</label><span data-bind="text: quantity"></span></td>
+                                                <td style="width:60px"><label>Picked:</label> <span data-bind="text: quantityPicked"></span></td>
+                                                <td style="width:100px"><label>Remaining:</label> <span data-bind="text: quantityRemaining"></span></td>
+                                                <td><div data-bind="css: status"></div></td>
+                                            </tr>
+                                        </table>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td colspan="5">
                                         <table>
-                                            <tr data-bind="foreach : requisitionItems">
+                                            <tr>
 
                                             </tr>
                                         </table>
@@ -117,44 +121,17 @@
 <script type="text/javascript">
     $(function(){
 
-        var mapping = {
-            'requisitionItems': {
-                create: function(options) {
-                    return new RequisitionItem(options.data);
-                }
-            }
-        };
-
-        var RequisitionItem = function(data) {
-            ko.mapping.fromJS(data, {}, this);
-
-            this.quantityPicked = ko.computed(function() {
-                return 0;
-            }, this);
-            this.quantityRemaining = ko.computed(function() {
-                return this.quantity() - this.quantityPicked();
-            }, this);
-            this.status = ko.computed(function() {
-                if(this.quantityPicked() == 0) return "Incomplete";
-                if(this.quantityPicked() >= this.quantity()) return "Complete";
-                return "PartiallyComplete";
-            }, this);
-            this.rowIndex = ko.computed(function() {
-                return this.orderIndex() + 1;
-            }, this);
-        };
-
-        var viewModel = ko.mapping.fromJS(${serverData}, mapping);
+        var viewModel = ko.mapping.fromJS(${serverData}, RequisitionProcessor.mapping);
         ko.applyBindings(viewModel);
 
-        var $research = $('.research');
-        //$research.find("tr").not('.accordion').hide();
-        //$research.find("tr").eq(0).show();
-
-        $research.find(".accordion").click(function(){
-            $research.find('.accordion').not(this).siblings().fadeOut(200);
-            $(this).siblings().fadeToggle(200);
-        }).eq(0).trigger('click');
+//        var $research = $('.research');
+//        //$research.find("tr").not('.accordion').hide();
+//        //$research.find("tr").eq(0).show();
+//
+//        $research.find(".accordion").click(function(){
+//            $research.find('.accordion').not(this).siblings().fadeOut(200);
+//            $(this).siblings().fadeToggle(200);
+//        }).eq(0).trigger('click');
 
     });
 </script>

@@ -44,13 +44,6 @@ class RequisitionController {
         [incomingRequests: incomingRequests, outgoingRequests: outgoingRequests]
     }
 
-    def listRequestItems = {
-        //def requestItems = requisitionService.getRequestItems()
-        def requestItems = RequisitionItem.getAll().findAll { !it.isComplete() };
-
-        return [requestItems: requestItems]
-    }
-
     def create = {
         render(view:"edit", model:[requisition:"null", depots: getDepots()])
     }

@@ -41,7 +41,7 @@ class RequisitionItem implements Serializable {
 	Date dateCreated
 	Date lastUpdated
 
-	static transients = [ "type", "status", "quantityPicked", "quantityRemaining" ]
+	static transients = [ "type" ]
 	
 	static belongsTo = [ requisition: Requisition ]
 
@@ -67,30 +67,6 @@ class RequisitionItem implements Serializable {
         orderIndex(nullable: true)
 	}
 
-	String getStatus() { 
-		def quantityPicked = getQuantityPicked()
-		if (quantityPicked >= quantity) return "Complete"
-        if (quantityPicked > 0) return "PartiallyComplete"
-        return "Incomplete"
-	}
-
-    Integer getQuantityPicked() {
-        return picklistItems.sum(0) { it.quantity }
-    }
-
-    Integer getQuantityRemaining() {
-        return (quantity ?: 0) - quantityPicked
-    }
-
-    List<InventoryItem> findExistingInventoryItems() {
-        return []//InventoryItem.findAll { it.product == product }
-    }
-
-//
-//	List getPicklistItems() {
-//		return PicklistItem.findAllByRequestItem(this)
-//	}
-//
 	String getType() { 
 		return (product)?"Product":(productGroup)?"ProductGroup":(category)?"Category":""
 	}
@@ -108,24 +84,6 @@ class RequisitionItem implements Serializable {
 		else {
 			return description;
 		}
-	}
-
-	Integer quantityFulfilled() { 
-		def fulfillmentItems = requisition?.fulfillment?.fulfillmentItems.findAll { it.requestItem == this }
-		return (fulfillmentItems) ? fulfillmentItems.sum { it.quantity } : 0;
-	}
-	
-	Integer quantityRemaining() { 
-		return quantity - quantityFulfilled();
-	}
-	
-	
-	Boolean isComplete() { 
-		return !isPending();
-	}
-	
-	Boolean isPending() { 
-		return quantityRemaining() > 0;
 	}
 	
 	def totalPrice() {
@@ -150,7 +108,7 @@ class RequisitionItem implements Serializable {
         "comment": comment,
         "recipient": recipient,
         "substitutable": substitutable,
-        //"orderIndex": orderIndex
+        "orderIndex": orderIndex,
       ]
     }
 
