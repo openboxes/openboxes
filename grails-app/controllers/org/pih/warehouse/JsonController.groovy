@@ -460,15 +460,15 @@ class JsonController {
 
        result.addAll(productWithoutAnyGroups.collect { product -> getProductItem(product, null, quantities)})
        println result
-       render result.sort{"${it.group}${it.label}"} as JSON
+       render result.sort{"${it.group}${it.value}"} as JSON
     }
 
     private def getProductGroupItem(ProductGroup group) {
-        [value: group.id, label: group.description, type: "ProductGroup", group: ""]
+        [id: group.id, value: group.description, type: "ProductGroup", group: ""]
     }
 
     private def getProductItem(Product product, ProductGroup group,Map<Product, Integer> quantities) {
-        [value: product.id, label: product.name, type: "Product", group: group?.description ?: "", quantity: quantities[product]]
+        [id: product.id, value: product.name, type: "Product", group: group?.description ?: "", quantity: quantities[product]]
     }
 
 

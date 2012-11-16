@@ -49,20 +49,20 @@ class JsonControllerTests extends ControllerUnitTestCase {
         def jsonResult = JSON.parse(jsonResponse)
 
         //result should be sorted by group name and then product name
-        assert jsonResult[0].value == product3.id
-        assert jsonResult[1].value == group2.id
-        assert jsonResult[2].value == product21.id
-        assert jsonResult[3].value == group1.id
-        assert jsonResult[4].value == product12.id
-        assert jsonResult[5].value == product11.id
+        assert jsonResult[0].id == product3.id
+        assert jsonResult[1].id == group2.id
+        assert jsonResult[2].id == product21.id
+        assert jsonResult[3].id == group1.id
+        assert jsonResult[4].id == product12.id
+        assert jsonResult[5].id == product11.id
 
         //result should contain label
-        assert jsonResult[0].label == product3.name
-        assert jsonResult[1].label == group2.description
-        assert jsonResult[2].label == product21.name
-        assert jsonResult[3].label == group1.description
-        assert jsonResult[4].label == product12.name
-        assert jsonResult[5].label == product11.name
+        assert jsonResult[0].value == product3.name
+        assert jsonResult[1].value == group2.description
+        assert jsonResult[2].value == product21.name
+        assert jsonResult[3].value == group1.description
+        assert jsonResult[4].value == product12.name
+        assert jsonResult[5].value == product11.name
         
         //result should contain type
         assert jsonResult[0].type == "Product"

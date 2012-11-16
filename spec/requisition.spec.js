@@ -131,4 +131,20 @@ describe("requisition view model", function(){
     expect(retrievedModel.id).toEqual(model.id);
     expect(retrievedModel.name).toEqual(model.name);
   });
+
+  it("should save requistion to local", function(){
+    var model = {id:"1234",name:"test"};
+    var key = warehouse.saveRequisitionToLocal(model);
+    expect(key).toEqual("warehouseRequisition1234");
+    var retrievedModel = warehouse.getFromLocal(key);
+    expect(retrievedModel).toEqual(model);
+    expect(warehouse.getRequisitionFromLocal(model.id)).toEqual(model);
+  });
+
+   it("should not save requistion to local if it has no id", function(){
+    var model = {name:"test"};
+    var key = warehouse.saveRequisitionToLocal(model);
+    expect(key).toBeNull();
+   });
+
 });

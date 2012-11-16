@@ -46,28 +46,27 @@ ko.bindingHandlers.search_product = {
           },
           change: function(event, ui) {
             if (!ui.item) {
-              $(this).prev().val("");  
+              $(this).prev().val(""); 
               $(this).val("");			
             }
             $(this).prev().trigger("change");
-            return false;
           },
           select: function(event, ui) {
             if (ui.item) {
-              $(this).prev().val(ui.item.value);
-              $(this).val(ui.item.label);
+              $(this).prev().val(ui.item.id);
+              $(this).val(ui.item.value);
             }
             $(this).prev().trigger("change");
-            return false;
+            $(this).trigger("change");
           }
       })
       .data("autocomplete" )._renderItem = function( ul, item ) {
             var li = $("<li>").data("item.autocomplete", item );
             if(item.type == 'Product'){
-                var text = item.quantity == null ? item.label : item.label + " QTY: " + item.quantity;
+                var text = item.quantity == null ? item.value : item.value + " QTY: " + item.quantity;
                 li.append("<a>" + text + "</a>" );
             }else{
-                li.append("<span class='product-group'>" + item.label + "</span>" );
+                li.append("<span class='product-group'>" + item.value + "</span>" );
             }
             li.appendTo(ul);
             return li;

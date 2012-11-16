@@ -119,6 +119,20 @@ warehouse.ViewModel = function(requisition) {
 
 };
 
+warehouse.saveRequisitionToLocal = function(model){
+  var data = ko.toJS(model);
+  if(!data.id) return null;
+  var key = "warehouseRequisition" + data.id;
+  warehouse.saveToLocal(key, data);
+  return key;
+}
+
+warehouse.getRequisitionFromLocal = function(id){
+  if(!id) return null;
+  var key = "warehouseRequisition" + id;
+  return warehouse.getFromLocal(key);
+}
+
 warehouse.saveToLocal = function(name, model){
   if(typeof(Storage) === "undefined") return;
   localStorage[name] = JSON.stringify(model);

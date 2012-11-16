@@ -110,7 +110,7 @@
       <tbody data-bind="foreach: requisition.requisitionItems">
         <tr>
           <td class="list-header">
-            <input type="hidden" data-bind="value: productId"/>
+            <input type="hidden" data-bind="value: productId, uniqueName: true"/>
             <input type="text"
               placeholder="${warehouse.message(code:'requisition.addItem.label')}"
               class="required autocomplete" 
@@ -121,13 +121,13 @@
             data-bind="value: quantity,uniqueName: true"/>
           </td>
           <td  class="center">
-            <input type="checkbox" data-bind="checked: substitutable">
+            <input type="checkbox" data-bind="checked: substitutable, uniqueName: true">
           </td>
           <td  class="list-header">
-            <input type="text" data-bind="value: recipient"/>
+            <input type="text" data-bind="value: recipient, uniqueName: true"/>
           </td>
           <td  class="list-header">
-            <input type="text" data-bind="value: comment" size="50"/>
+            <input type="text" data-bind="value: comment, uniqueName: true" size="50"/>
           </td>
           <td class="center">
             <a href='#' data-bind='click: $root.removeItem'>
@@ -163,9 +163,13 @@
 <script type="text/javascript">
   $(function(){
     var today = $.datepicker.formatDate("mm/dd/yy", new Date());
-    var requisitionData = ${requisition};
     var tomorrow = $.datepicker.formatDate("mm/dd/yy", new Date(new Date().getTime() + 24*60*60*1000));
-    var requisition = new warehouse.Requisition(requisitionData || { dateRequested: today, requestedDeliveryDate:tomorrow});
+    var requisitionFromServer = ${requisition};
+    var requisitionData = requisitionFromServer ||  { dateRequested: today, requestedDeliveryDate:tomorrow, version: -1};    
+    var requisitionFromLocal = warehouse.getRequisitionFromLocal(requisitionData.id);
+    if(requisitionFromLocal && requisitionFromLocal.version >= requisitionData.version)
+      requisitionData = requisitionFromLocal;
+    var requisition = new warehouse.Requisition(requisitionData);
     var viewModel = new warehouse.ViewModel(requisition);
     ko.applyBindings(viewModel);
     $("#requisitionForm").validate({ submitHandler: viewModel.save });
@@ -193,7 +197,7 @@
     updateDescription();
   });
   $("#recipientProgram").bind("selected", updateDescription);
-
+  setInterval(function(){warehouse.saveRequisitionToLocal(requisition);}, 3000);
 });
 </script>
 </body>
