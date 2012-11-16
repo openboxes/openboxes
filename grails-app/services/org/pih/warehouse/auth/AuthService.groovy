@@ -9,13 +9,14 @@
 **/ 
 package org.pih.warehouse.auth
 
+import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.User;
 
 class AuthService {
 	
 	boolean transactional = true
 	static ThreadLocal<User> currentUser = new ThreadLocal<User>();
-	
+	static ThreadLocal<Location> currentLocation = new ThreadLocal<Location>();
 	
 	/**
 	 * Determine whether user is authenticated.  

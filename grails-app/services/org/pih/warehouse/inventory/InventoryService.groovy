@@ -33,11 +33,13 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.validation.Errors;
 
 import org.pih.warehouse.reporting.Consumption;
+import org.pih.warehouse.auth.AuthService
 
 class InventoryService implements ApplicationContextAware {
 
     def sessionFactory
     def productService
+	//def authService
 
     ApplicationContext applicationContext
 
@@ -1088,10 +1090,21 @@ class InventoryService implements ApplicationContextAware {
      * @return
      */
     Integer getQuantity(Inventory inventory, InventoryItem inventoryItem) {
-        log.debug "inventory = " + inventory + ", inventory item = " + inventoryItem
+		
+		if (!inventory) {
+			println AuthService.currentLocation
+			def currentLocation = AuthService?.currentLocation?.get()
+			println currentLocation
+			if (!currentLocation?.inventory)
+				throw new Exception("Inventory not found")
+				
+			inventory = currentLocation.inventory
+		}
         def transactionEntries = getTransactionEntriesByInventoryItemAndInventory(inventoryItem, inventory)
         def quantityMap = getQuantityByInventoryItemMap(transactionEntries)
 
+		
+		
         // inventoryItem -> org.pih.warehouse.inventory.InventoryItem_$$_javassist_10
         //log.debug "inventoryItem -> " + inventoryItem.class
 

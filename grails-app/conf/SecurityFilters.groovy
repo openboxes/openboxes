@@ -10,6 +10,7 @@
 
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.Location
 
 
 class SecurityFilters {
@@ -21,6 +22,7 @@ class SecurityFilters {
 			afterView = {
 				// Clear out current user after rendering the view 
 				AuthService.currentUser.set(null)
+				AuthService.currentLocation.set(null)
 			}
 			before = {	
 				
@@ -31,6 +33,17 @@ class SecurityFilters {
 					}
 					AuthService.currentUser.set(User.get(session.user.id))
 				}
+				
+				if (session.warehouse) { 
+					if (!AuthService.currentLocation) { 
+						AuthService.currentLocation = new ThreadLocal<Location>()
+					}
+					
+					//println "Setting currentLocation " + session.warehouse.id
+					AuthService.currentLocation.set(Location.get(session.warehouse.id))
+					//println "Getting currentLocation " + AuthService.currentLocation.get()
+				}
+				
 				// Need to bypass security filter when generating a PDF report, otherwise the 
 				// generated PDF contains the login screen
 				//if (controllerName.equals("report") && (actionName.equals("showTransactionReport") || actionName.equals("showChecklistReport"))) { 
@@ -39,8 +52,8 @@ class SecurityFilters {
 				//	return true;
 				//}
 				
-				// This allows the left-nav menu to be 'included' in the page (allowing for dynamic content to be added) 
-				if(controllerName.equals("dashboard") && (actionName.equals("menu") || actionName.equals("megamenu"))) { 
+				// This allows the megamenu to be g:include'd in the page (allowing for dynamic content to be added) 
+				if(controllerName.equals("dashboard") && actionName.equals("megamenu")) { 
 					return true
 				}
 								
@@ -65,7 +78,7 @@ class SecurityFilters {
 					if (request.queryString) 
 						targetUri += "?" + request.queryString
 						
-					// Prevent user from being redirected to invalid pages
+					// Prevent user from being redirected to invalid pages after re-authenticating
 					if (!targetUri.contains("/dashboard/status") && !targetUri.contains("logout")) { 					
 						log.info "Request requires authentication, saving targetUri = " + targetUri
 						session.targetUri = targetUri

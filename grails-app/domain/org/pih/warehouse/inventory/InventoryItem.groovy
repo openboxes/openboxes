@@ -10,6 +10,7 @@
 package org.pih.warehouse.inventory
 
 import java.util.Date;
+import java.util.Map;
 
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.inventory.Transaction;
@@ -29,6 +30,8 @@ import org.pih.warehouse.inventory.Transaction;
  */
 class InventoryItem implements Serializable {
 	
+	def inventoryService
+	
 	String id
 	
 	Product product;		    			// Product that we're tracking
@@ -42,7 +45,7 @@ class InventoryItem implements Serializable {
 	Date dateCreated;
 	Date lastUpdated;
 	
-	static transients = ['quantityOnHand', 'quantityAvailableToPromise', 'grailsApplication']
+	static transients = ['quantity', 'quantityOnHand', 'quantityAvailableToPromise', 'grailsApplication']
 
 	static mapping = {
 		id generator: 'uuid'
@@ -54,9 +57,6 @@ class InventoryItem implements Serializable {
 		lotNumber(nullable:true, unique:['product'], maxSize:255)
 		expirationDate(nullable:true)	
     }
-		
-
-	String toString() { return "${id}:${product}:${lotNumber}"; }
 
     Map toJson() {
         [
@@ -65,10 +65,18 @@ class InventoryItem implements Serializable {
             "productName": product?.name,
             "lotNumber":lotNumber,
             "expirationDate": expirationDate,
-            "quantityOnHand": quantityOnHand?: 0,
-            "quantityATP": quantityAvailableToPromise?: 0,
+            "quantityOnHand": quantity?: 0,
+            "quantityATP": quantity?: 0,
             "quantityPicked": 0
         ]
     }
+	
+	Integer getQuantity() { 
+		return inventoryService.getQuantity(null, this)
+	}
+	
+		
+	
+	String toString() { return "${lotNumber}:${expirationDate}"; }
 	
 }

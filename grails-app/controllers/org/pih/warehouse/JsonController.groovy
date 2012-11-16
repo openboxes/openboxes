@@ -27,7 +27,7 @@ import org.pih.warehouse.shipping.ShipmentItem;
 class JsonController {
 	def inventoryService
 	def productService
-	def localizationService
+	def localizationService	
 	
 	def findTags = { 
 		println "find tags " + params
@@ -111,11 +111,7 @@ class JsonController {
 	
 	
 	def getInventoryItem = { 
-		log.info(params)
-		
-		def inventoryItem = InventoryItem.get(params.id)
-		
-		render inventoryItem as JSON;
+		render InventoryItem.get(params.id).toJson() as JSON;
 	}
 	
 	def getQuantity = {
@@ -145,7 +141,21 @@ class JsonController {
 				
 		render(text: "", contentType: "text/plain")
 	}
+	
+	/**
+	 * Ajax method for the Record Inventory page.
+	 */
+	def getInventoryItems = {
+		log.info params
+		def productInstance = Product.get(params?.product?.id);
+		def inventoryItemList = inventoryService.getInventoryItemsByProduct(productInstance)
+		render inventoryItemList as JSON;
+	}
 
+	
+	/**
+	 * Returns inventory items for the given location, lot number, and product.
+	 */
 	def findInventoryItems = {
 		log.info params
 		def inventoryItems = []
