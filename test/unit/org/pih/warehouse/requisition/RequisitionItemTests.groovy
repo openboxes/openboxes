@@ -41,6 +41,7 @@ class RequisitionItemTests extends GrailsUnitTestCase {
       def product = new Product(id: "prod1", name:"aspin")
       def item = new RequisitionItem(
         id: "1234",
+        version: 5,
         product: product,
         quantity: 3000,
         comment: "good",
@@ -57,5 +58,6 @@ class RequisitionItemTests extends GrailsUnitTestCase {
       assert json.recipient == item.recipient
       assert json.substitutable
       assert json.orderIndex == item.orderIndex
+      assert json.version == 5
     }
 }

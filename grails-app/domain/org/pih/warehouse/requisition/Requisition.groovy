@@ -138,21 +138,21 @@ class Requisition implements Serializable {
 	
   Map toJson(){
     [
-      "id": id,
-      "requestedById": requestedBy?.id,
-      "requestedByName": requestedBy?.name,
-      "dateRequested": dateRequested.format("MM/dd/yyyy"),
-      "requestedDeliveryDate": requestedDeliveryDate.format("MM/dd/yyyy"),
-      "name": name,
-      "version": version,
-      "lastUpdated": lastUpdated?.format("dd/MMM/yyyy hh:mm a"),
-      "status": status.name(),
-      "originId": origin?.id,
-      "originName": origin?.name,
-      "destinationId": destination?.id,
-      "destinationName": destination?.name,
-      "recipientProgram": recipientProgram,
-      "requisitionItems": requisitionItems?.collect{ it.toJson()}
+      id: id,
+      requestedById: requestedBy?.id,
+      requestedByName: requestedBy?.name,
+      dateRequested: dateRequested.format("MM/dd/yyyy"),
+      requestedDeliveryDate: requestedDeliveryDate.format("MM/dd/yyyy"),
+      name: name,
+      version: version,
+      lastUpdated: lastUpdated?.format("dd/MMM/yyyy hh:mm a"),
+      status: status.name(),
+      originId: origin?.id,
+      originName: origin?.name,
+      destinationId: destination?.id,
+      destinationName: destination?.name,
+      recipientProgram: recipientProgram,
+      requisitionItems: requisitionItems?.collect{ it.toJson()}
     ]
   }
 }

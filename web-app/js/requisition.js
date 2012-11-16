@@ -42,6 +42,7 @@ warehouse.RequisitionItem = function(attrs) {
     var self = this;
     if(!attrs) attrs = {};
     self.id = ko.observable(attrs.id);
+    self.version = ko.observable(attrs.version);
     self.productId = ko.observable(attrs.productId);
     self.productName = ko.observable(attrs.productName);
     self.quantity =  ko.observable(attrs.quantity);
@@ -77,6 +78,7 @@ warehouse.ViewModel = function(requisition) {
         delete data.lastUpdated;
         $.each(data.requisitionItems, function(index, item){
           item["product.id"] = item.productId;
+          delete item.version;
         });
         var jsonString = JSON.stringify( data);
         console.log("here is the req: "  + jsonString);
