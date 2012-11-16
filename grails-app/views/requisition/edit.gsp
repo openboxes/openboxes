@@ -149,10 +149,11 @@
 
       <input type="submit" id="save-requisition" value="${warehouse.message(code: 'default.button.save.label')}"/>
       <g:link action="list">
-											${warehouse.message(code: 'default.button.cancel.label')}
-			</g:link>
+		${warehouse.message(code: 'default.button.cancel.label')}
+	  </g:link>
       &nbsp;
-      <g:actionSubmit class="process" onclick="this.form.action='${createLink(action:'process')}';" value="Process" />
+      %{--<g:actionSubmit class="process" onclick="this.form.action='${createLink(action:'process', id: requisition)}';" value="Process" />--}%
+        <input type="button" data-bind='click: processItem' value="${warehouse.message(code:'requisition.process.label')}" />
     </div>
   </g:form>
 

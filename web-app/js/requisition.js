@@ -62,6 +62,10 @@ warehouse.ViewModel = function(requisition) {
        );
     };
 
+    self.processItem = function () {
+        window.location = '../process/' + self.requisition.id();
+    };
+
     self.removeItem = function(item){
        self.requisition.requisitionItems.remove(item);
        if(self.requisition.requisitionItems().length == 0)
