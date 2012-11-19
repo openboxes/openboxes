@@ -1,8 +1,12 @@
 package org.pih.warehouse.requisition
 
 import grails.test.GrailsUnitTestCase
+
+import org.pih.warehouse.inventory.Inventory;
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryService;
 import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 
 class RequisitionItemTests extends GrailsUnitTestCase {
@@ -40,9 +44,8 @@ class RequisitionItemTests extends GrailsUnitTestCase {
 
     void testToJsonData(){
       def product = new Product(id: "prod1", name:"aspin")
-      def item = new RequisitionItem(
+      def requisitionItem = new RequisitionItem(
         id: "1234",
-        version: 5,
         product: product,
         quantity: 3000,
         comment: "good",
@@ -50,22 +53,34 @@ class RequisitionItemTests extends GrailsUnitTestCase {
         substitutable: true,
         orderIndex: 3
       )
-      Map json = item.toJson()
-      assert json.id == item.id
-      assert json.productId == item.product.id
-      assert json.productName == item.product.name
-      assert json.quantity == item.quantity
-      assert json.comment == item.comment
-      assert json.recipient == item.recipient
+	  
+	  mockDomain(Product, [product])
+	  mockDomain(RequisitionItem, [requisitionItem])
+	  
+      Map json = requisitionItem.toJson()	 
+	  
+	  println json 
+      assert json.id == requisitionItem.id
+      assert json.productId == requisitionItem.product.id
+      assert json.productName == requisitionItem.product.name
+      assert json.quantity == requisitionItem.quantity
+      assert json.comment == requisitionItem.comment
+      assert json.recipient == requisitionItem.recipient
       assert json.substitutable
-      assert json.orderIndex == item.orderIndex
-      assert json.version == 5
+      assert json.orderIndex == requisitionItem.orderIndex
     }
 
     void testToJsonWithInventoryItemsData() {
-        def product = new Product(id: "prod1", name:"asprin")
+		
+		def category = new Category(id: "cat1", name: "category")
+        def product = new Product(id: "prod1", name:"asprin", category: category)
         def inventoryItem = new InventoryItem(id: "inventoryItem1", product: product, lotNumber: "abcd")
-        mockDomain(Product, [product])
+		
+		def mockControl = mockFor(InventoryService)
+		mockControl.demand.getQuantity(1..2) { Inventory inventory, InventoryItem item -> 1 }
+		inventoryItem.inventoryService = mockControl.createMock()
+        
+		mockDomain(Product, [product])
         mockDomain(InventoryItem, [inventoryItem]);
         def item = new RequisitionItem(
                 id: "1234",
@@ -79,9 +94,11 @@ class RequisitionItemTests extends GrailsUnitTestCase {
         mockDomain(RequisitionItem, [item])
 
         def result = item.toJsonIncludeInventoryItems();
-        assert result.getClass() == LinkedHashMap
-        assert result.inventoryItems
-
+        
+		println result
+		assert result.getClass() == LinkedHashMap
+        
+		assert result.inventoryItems
         assert result.inventoryItems.getClass() == ArrayList
         assert result.inventoryItems[0].id == inventoryItem.id
         assert result.inventoryItems[0].productId == inventoryItem.product.id
