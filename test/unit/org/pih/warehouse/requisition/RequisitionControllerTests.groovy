@@ -3,6 +3,9 @@
 package org.pih.warehouse.requisition
 
 import grails.test.ControllerUnitTestCase
+import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryService
 import org.springframework.mock.web.MockHttpServletResponse
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -53,7 +56,7 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         def requisition = new Requisition(id: "1234", name: "jim", recipientProgram:"abc")
         mockDomain(Requisition, [requisition])
         mockDomain(Location, [])
-        controller.params.name = "something cannot be found"
+        controller.params.id = "something cannot be found"
         controller.edit()
         assert controller.response.status == 404
     }
@@ -170,6 +173,38 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
       assert renderArgs.model.requisition == "null"
     }
 
+    def testProcess() {
+        def requisition = new Requisition(id: "req1")
+        mockDomain(Requisition, [requisition])
+        mockDomain(RequisitionItem, [])
+        def inventory = new Inventory(id: "inventory1")
+        def myLocation = new Location(id: "1234", inventory: inventory)
+        def inventoryItem = new InventoryItem(id: "inventoryItem1")
+        mockDomain(Location, [myLocation])
+        mockDomain(Inventory, [inventory])
 
+        def inventoryServiceMock = mockFor(InventoryService)
+        inventoryServiceMock.demand.getInventoryItemsWithQuantity(2..2) { products, userInventory ->
+            return [inventoryItem]
+        }
+        controller.inventoryService = inventoryServiceMock.createMock()
+        controller.params.id = requisition.id
+        controller.session.warehouse = myLocation
+        def model = controller.process()
+        def returnRequisition = JSON.parse(model.data)
+
+        assert returnRequisition.requisition.id == requisition.id
+        assert returnRequisition.inventoryItems[0].id == inventoryItem.id
+
+    }
+
+    void testProcessRequisitionWhichCannotBeFound(){
+        def requisition = new Requisition(id: "1234", name: "jim", recipientProgram:"abc")
+        mockDomain(Requisition, [requisition])
+        mockDomain(Location, [])
+        controller.params.id = "something cannot be found"
+        controller.process()
+        assert controller.response.status == 404
+    }
 
 }

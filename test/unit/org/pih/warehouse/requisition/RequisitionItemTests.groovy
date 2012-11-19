@@ -69,41 +69,4 @@ class RequisitionItemTests extends GrailsUnitTestCase {
       assert json.substitutable
       assert json.orderIndex == requisitionItem.orderIndex
     }
-
-    void testToJsonWithInventoryItemsData() {
-		
-		def category = new Category(id: "cat1", name: "category")
-        def product = new Product(id: "prod1", name:"asprin", category: category)
-        def inventoryItem = new InventoryItem(id: "inventoryItem1", product: product, lotNumber: "abcd")
-		
-		def mockControl = mockFor(InventoryService)
-		mockControl.demand.getQuantity(1..2) { Inventory inventory, InventoryItem item -> 1 }
-		inventoryItem.inventoryService = mockControl.createMock()
-        
-		mockDomain(Product, [product])
-        mockDomain(InventoryItem, [inventoryItem]);
-        def item = new RequisitionItem(
-                id: "1234",
-                product: product,
-                quantity: 3000,
-                comment: "good",
-                recipient: "peter",
-                substitutable: true,
-                orderIndex: 3
-        )
-        mockDomain(RequisitionItem, [item])
-
-        def result = item.toJsonIncludeInventoryItems();
-        
-		println result
-		assert result.getClass() == LinkedHashMap
-        
-		assert result.inventoryItems
-        assert result.inventoryItems.getClass() == ArrayList
-        assert result.inventoryItems[0].id == inventoryItem.id
-        assert result.inventoryItems[0].productId == inventoryItem.product.id
-        assert result.inventoryItems[0].productName == inventoryItem.product.name
-
-
-    }
 }

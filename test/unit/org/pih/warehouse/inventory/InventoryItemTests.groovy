@@ -22,19 +22,19 @@ class InventoryItemTests extends GrailsUnitTestCase {
 	}
 	
     void testToJsonData(){
+        def expirationDate = new Date()
 		def category = new Category(id: "cat1", name: "new category")
         def product = new Product(id: "prod1", name:"aspin", category: category)
         def item = new InventoryItem(
                 id: "1234",
                 product: product,
                 lotNumber: "ABCD", 
-				expirationDate: new Date()				
+				expirationDate: expirationDate,
+                quantity: 1
         )
-		
-		def mockControl = mockFor(InventoryService)
-		mockControl.demand.getQuantity(1..2) { Inventory inventory, InventoryItem inventoryItem -> 1 }
-		item.inventoryService = mockControl.createMock()
-		
+
+        mockDomain(InventoryItem, [item])
+
         Map json = item.toJson()
 		
         assert json.id == item.id
@@ -43,7 +43,8 @@ class InventoryItemTests extends GrailsUnitTestCase {
         assert json.lotNumber == item.lotNumber
 		assert json.quantityOnHand == 1
 		assert json.quantityATP == 1
-		assert json.quantityPicked == 0
+        assert json.expirationDate == expirationDate.format("MM/dd/yyyy")
+
 		
     }
 }

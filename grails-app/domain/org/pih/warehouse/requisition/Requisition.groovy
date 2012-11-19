@@ -134,12 +134,6 @@ class Requisition implements Serializable {
 		//return (id) ? "R" + String.valueOf(id).padLeft(6, "0")  : "";
 		return id
 	}
-
-  Map toJsonIncludeInventoryItems() {
-      def outputData = toJson()
-      outputData["requisitionItems"] = requisitionItems?.collect { it.toJsonIncludeInventoryItems() }
-      outputData
-  }
 	
   Map toJson(){
     [

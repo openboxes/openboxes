@@ -239,4 +239,66 @@ class InventoryServiceUnitTests extends BaseUnitTest {
 		assert newTransaction.destination == Location.findByName("Haiti Location")
 	}
 	*/
+
+//    Unit test hates createCriteria() T_T
+//
+//    void test_getInventoryItemsWithQuantity() {
+//
+//        def product = new Product(id: "prod")
+//        def product2 = new Product(id: "prod2")
+//
+//        def inventoryItem1 = new InventoryItem(id: "inventItem1", product:product, lotNumber: "abcd")
+//        def inventoryItem2 = new InventoryItem(id: "inventItem2", product:product2, lotNumber: "efgh")
+//
+//        def inventory = new Inventory(id: "inventory")
+//        def transaction1 = new Transaction(id: "transaction1")
+//        def transaction2 = new Transaction(id: "transaction2")
+//        def transaction3 = new Transaction(id: "transaction3")
+//
+//        def transactionType1 = new TransactionType(id: "transType1", transactionCode: TransactionCode.CREDIT)
+//        def transactionType2 = new TransactionType(id: "transType2", transactionCode: TransactionCode.DEBIT)
+//        def transactionType3 = new TransactionType(id: "transType3", transactionCode: TransactionCode.INVENTORY)
+//
+//        transaction1.inventory = inventory
+//        transaction1.transactionType = transactionType1
+//        transaction2.inventory = inventory
+//        transaction2.transactionType = transactionType2
+//        transaction3.inventory = inventory
+//        transaction3.transactionType = transactionType3
+//
+//        def transactionEntry1 = new TransactionEntry(id: "transactionEntry1", quantity: 200, inventoryItem: inventoryItem1)
+//        def transactionEntry2 = new TransactionEntry(id: "transactionEntry2", quantity: 400, inventoryItem: inventoryItem1)
+//        def transactionEntry3 = new TransactionEntry(id: "transactionEntry3", quantity: 500, inventoryItem: inventoryItem1)
+//        def transactionEntry4 = new TransactionEntry(id: "transactionEntry4", quantity: 100, inventoryItem: inventoryItem2)
+//        def transactionEntry5 = new TransactionEntry(id: "transactionEntry5", quantity: 50, inventoryItem: inventoryItem2)
+//        def transactionEntry6 = new TransactionEntry(id: "transactionEntry6", quantity: 300, inventoryItem: inventoryItem2)
+//
+//        transaction1.addToTransactionEntries(transactionEntry1)
+//        transaction1.addToTransactionEntries(transactionEntry2)
+//        transaction2.addToTransactionEntries(transactionEntry3)
+//        transaction2.addToTransactionEntries(transactionEntry4)
+//        transaction3.addToTransactionEntries(transactionEntry5)
+//        transaction3.addToTransactionEntries(transactionEntry6)
+//
+//        mockDomain(Product, [product, product2])
+//        mockDomain(InventoryItem, [inventoryItem1, inventoryItem2])
+//        mockDomain(Inventory, [inventory])
+//        mockDomain(Transaction, [transaction1, transaction2, transaction3])
+//        mockDomain(TransactionType, [transactionType1, transactionType2, transactionType3])
+//        mockDomain(TransactionEntry, [transactionEntry1, transactionEntry2, transactionEntry3, transactionEntry4, transactionEntry5, transactionEntry6])
+//
+//        def service = new InventoryService()
+//        def inventoryItems = service.getInventoryItemsWithQuantity([product, product2], inventory)
+//
+//        assert inventoryItems.size() == 2
+//        assert inventoryItems[0].lotNumber == inventoryItem1.lotNumber
+//        assert inventoryItems[1].lotNumber == inventoryItem2.lotNumber
+//
+//        assert inventoryItems[0].quantity == inventoryItem1.quantity
+//        assert inventoryItems[0].quantity == 100
+//        assert inventoryItems[1].quantity == inventoryItem2.quantity
+//        assert inventoryItems[1].quantity == 300
+//
+//    }
+
 }

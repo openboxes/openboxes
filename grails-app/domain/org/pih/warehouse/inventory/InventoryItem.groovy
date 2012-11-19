@@ -29,15 +29,14 @@ import org.pih.warehouse.inventory.Transaction;
  * be a clearer name
  */
 class InventoryItem implements Serializable {
-	
-	def inventoryService
-	
+
 	String id
 	
 	Product product;		    			// Product that we're tracking
 	String lotNumber;						// Lot information for a product  
 	Date expirationDate;
-	
+
+    Integer quantity
 	Integer quantityOnHand
 	Integer quantityAvailableToPromise
 	
@@ -64,18 +63,12 @@ class InventoryItem implements Serializable {
             "productId": product?.id,
             "productName": product?.name,
             "lotNumber":lotNumber,
-            "expirationDate": expirationDate,
+            "expirationDate": expirationDate?.format("MM/dd/yyyy"),
             "quantityOnHand": quantity?: 0,
-            "quantityATP": quantity?: 0,
-            "quantityPicked": 0
+            "quantityATP": quantity?: 0       //todo: quantity available to promise will coming soon
         ]
     }
-	
-	Integer getQuantity() { 
-		return inventoryService.getQuantity(null, this)
-	}
-	
-		
+
 	
 	String toString() { return "${lotNumber}:${expirationDate}"; }
 	

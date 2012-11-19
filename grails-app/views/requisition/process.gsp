@@ -37,14 +37,14 @@
                 <tr>
                     <td>
                         <table border="1" data-bind="foreach : requisitionItems">
-                            <tbody class="research">
+                            <tbody class="requisitionItem">
                                 <tr class="accordion">
                                     <td>
                                         <table>
                                             <tr>
                                                 <td style="width:650px"><span data-bind="text: rowIndex"></span>. <span data-bind="text: productName"></span></td>
                                                 <td style="width:80px"><label>Quantity:</label><span data-bind="text: quantity"></span></td>
-                                                <td style="width:60px"><label>Picked:</label> <span data-bind="text: quantityPicked"></span></td>
+                                                <td style="width:80px"><label>Picked:</label> <span data-bind="text: quantityPicked"></span></td>
                                                 <td style="width:100px"><label>Remaining:</label> <span data-bind="text: quantityRemaining"></span></td>
                                                 <td><div data-bind="css: status"></div></td>
                                             </tr>
@@ -80,7 +80,7 @@
                                                 <td><span data-bind="text: expirationDate"></span></td>
                                                 <td><span data-bind="text: quantityOnHand"></span></td>
                                                 <td><span data-bind="text: quantityATP"></span></td>
-                                                <td><input data-bind="value: quantityPicked"/></td>
+                                                <td data-bind="css: id"><input data-bind="value: quantityPicked"/></td>
                                             </tr>
                                         </table>
                                     </td>
@@ -111,27 +111,15 @@
                     </td>
                 </tr>
 
-                <tr>
-                    <td valign="top">
-                    </td>
-                    <td colspan="5">
-                        <div class="buttons right">
-                            <button type="submit">
-                                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'accept.png')}" class="top"/>
-                                <g:link action="save" id="${requisition.id}">
-                                    <warehouse:message code="default.button.save.label"/>
-                                </g:link>
-                            </button>
-                            &nbsp;
-                            <g:link action="list">
-                                ${warehouse.message(code: 'default.button.cancel.label')}
-                            </g:link>
-                        </div>
-                    </td>
-                </tr>
-
                 </tbody>
             </table>
+        </div>
+        <div class="center">
+            <input type="submit" id="save-requisition" value="${warehouse.message(code: 'default.button.save.label')}"/>
+            <g:link action="list">
+                ${warehouse.message(code: 'default.button.cancel.label')}
+            </g:link>
+            &nbsp;
         </div>
 
 
@@ -149,14 +137,12 @@
         var viewModel = ko.mapping.fromJS(${serverData}, RequisitionProcessor.mapping);
         ko.applyBindings(viewModel);
 
-//        var $research = $('.research');
-//        //$research.find("tr").not('.accordion').hide();
-//        //$research.find("tr").eq(0).show();
-//
-//        $research.find(".accordion").click(function(){
-//            $research.find('.accordion').not(this).siblings().fadeOut(200);
-//            $(this).siblings().fadeToggle(200);
-//        }).eq(0).trigger('click');
+        var $research = $('.requisitionItem');
+
+        $research.find(".accordion").click(function(){
+            $research.find('.accordion').not(this).siblings().fadeOut(200);
+            $(this).siblings().fadeToggle(200);
+        }).eq(0).trigger('click');
 
     });
 </script>

@@ -78,13 +78,20 @@ class RequisitionController {
     }
 
     def process = {
-
         def requisition = Requisition.get(params?.id)
-        def serverData = requisition.toJsonIncludeInventoryItems() as JSON
-        println serverData;
+        if (requisition) {
+            def currentInventory = Location.get(session.warehouse.id).inventory
+            def inventoryItems = inventoryService.getInventoryItemsWithQuantity(requisition.requisitionItems?.collect{ it.product}, currentInventory).collect { it.toJson() }
+            String jsonString = [requisition: requisition.toJson(), inventoryItems: inventoryItems] as JSON
+            println jsonString
+            return [data: jsonString]
+        } else{
+            response.sendError(404)
+        }
 
-        return [requisition: requisition, serverData: serverData];
+
     }
+
 
     def show = {
         def requestInstance = Requisition.get(params.id)

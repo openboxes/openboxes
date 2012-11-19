@@ -1,5 +1,9 @@
 package org.pih.warehouse.requisition
 import org.pih.warehouse.core.*
+import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryService
+import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.product.*
 import grails.test.GrailsUnitTestCase
 
@@ -91,8 +95,8 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
     }
 
     void testDeleteRequisitionItems(){
-        Product product1 = new Product(id:"prod1")
-        Product product2 = new Product(id:"prod2")
+        Product product1 = new Product(id:"prod1", name: "prodName1")
+        Product product2 = new Product(id:"prod2", name: "prodName2")
         mockDomain(Product, [product1,product2])
         Location boston = new Location(name:"boston", id:"2")
         Location miami = new Location(name: "miami", id: "3")
@@ -135,7 +139,5 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
         assert requisition.requisitionItems.size() == 1
         assert requisition.requisitionItems.any{ item -> item.product == product2 && item.quantity == 400 && item.orderIndex == 1}
     }
-
-
 }
 

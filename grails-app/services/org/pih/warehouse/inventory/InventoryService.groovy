@@ -499,7 +499,7 @@ class InventoryService implements ApplicationContextAware {
         Map quantityByProduct = [:]
         Map quantityShippedByProduct = getShipmentService().getOutgoingQuantityByProduct(location);
         Map quantityOrderedByProduct = getOrderService().getOutgoingQuantityByProduct(location)
-        //Map quantityRequestedByProduct = getRequisitionService().getOutgoingQuantityByProduct(location)
+        //Map quantityRequestedByProduct = getRequisitionService().getOutgoingQuantityBgetInventoryItemsJsonByProductyProduct(location)
         quantityShippedByProduct.each { product, quantity ->
             def productQuantity = quantityByProduct[product];
             if (!productQuantity) productQuantity = 0;
@@ -2754,6 +2754,24 @@ class InventoryService implements ApplicationContextAware {
             }
         }
         getQuantityByProductMap(transactionEntries)
+    }
+
+    public List<InventoryItem> getInventoryItemsWithQuantity(List<Product> products, Inventory inventory) {
+        def transactionEntries = TransactionEntry.createCriteria().list() {
+            transaction {
+                eq("inventory", inventory)
+            }
+            inventoryItem {
+                'in'("product", products)
+            }
+        }
+
+        def map = getQuantityByInventoryItemMap(transactionEntries)
+        map.keySet().collect{ key ->
+           def inventoryItem = key
+           inventoryItem.quantity = map[key]
+           inventoryItem
+        }
     }
 
 }

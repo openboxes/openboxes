@@ -176,7 +176,12 @@
         var requisition = new warehouse.Requisition(requisitionData);
         var viewModel = new warehouse.ViewModel(requisition);
         viewModel.processItem = function () {
-            window.location = '../process/' + viewModel.requisition.id();
+            if(window.location.href.indexOf("edit") > -1) {
+                window.location = '../process/' + viewModel.requisition.id();
+            } else {
+                window.location = 'process/' + viewModel.requisition.id();
+            }
+
         };
         ko.applyBindings(viewModel);
 

@@ -61,6 +61,7 @@ class RequisitionTests extends GrailsUnitTestCase {
         requisition.validate()
         assert requisition.errors["requestedDeliveryDate"]
     }
+
     void testToJson(){
       def peter = new Person(id:"person1", firstName:"peter", lastName:"zhao")
       def boston = new Location(id: "l1", name:"boston")

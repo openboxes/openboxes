@@ -206,8 +206,21 @@ class InventoryServiceTests extends GroovyTestCase {
 
     }
 
+    void test_getInventoryItemsWithQuantity() {
 
+        transactionEntryTestFixture()
 
+        def products = [aspirinProduct, tylenolProduct]
+
+        def inventoryService = new InventoryService()
+        def inventoryItems = inventoryService.getInventoryItemsWithQuantity(products, bostonInventory)
+        println inventoryItems.class
+        assert inventoryItems.size() == 3
+        assert inventoryItems.find { it.id == aspirinItem1.id }.quantity == 94
+        assert inventoryItems.find { it.id == aspirinItem2.id }.quantity == 3
+        assert inventoryItems.find { it.id == tylenolItem.id }.quantity == 25
+
+    }
 
     void test_isValidForLocalTransfer_shouldCheckIfTransactionSupportsLocalTransfer() {
         localTransferTestFixture()

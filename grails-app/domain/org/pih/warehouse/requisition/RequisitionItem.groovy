@@ -100,13 +100,6 @@ class RequisitionItem implements Serializable {
         "id:${id} product:${product} quantity:${quantity} substitutable:${substitutable} comment:${comment} recipient:${recipient}"
     }
 
-    Map toJsonIncludeInventoryItems() {
-        def outputValue = toJson()
-        // {outputValue.productId}.collect { it.toJson() }
-        outputValue["inventoryItems"] = InventoryItem.findByProduct(product).collect { it.toJson() }
-        outputValue
-    }
-
     Map toJson(){
       [
         id: id,
@@ -117,7 +110,8 @@ class RequisitionItem implements Serializable {
         comment: comment,
         recipient: recipient,
         substitutable: substitutable,
-        orderIndex: orderIndex
+        orderIndex: orderIndex,
+        picklistItems: picklistItems.collect { it.toJson() }
       ]
     }
 
