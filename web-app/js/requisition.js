@@ -72,18 +72,50 @@ openboxes.requisition.RequisitionItem = function(attrs) {
     self.recipient = ko.observable(attrs.recipient);
     self.orderIndex = ko.observable(attrs.orderIndex);
     self.picklistItems = ko.observableArray([]);
+
+    self.quantityPicked = ko.computed(function() {
+        var sum = 0;
+        for(var i in self.picklistItems()) {
+            sum += self.picklistItems()[i].quantityPicked();
+        }
+        return sum;
+    }, this);
+
+    self.quantityRemaining = ko.computed(function() {
+        return this.quantity() - this.quantityPicked();
+    }, this);
+
+    self.status = ko.computed(function() {
+        if(this.quantityPicked() == 0) return "Incomplete";
+        if(this.quantityPicked() >= this.quantity()) return "Complete";
+        return "PartiallyComplete";
+    }, this);
 };
 
 openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData, inventoryItemsData) {
     var self = this;
     self.requisition = new openboxes.requisition.Requisition(requisitionData);
+    self.picklistId = picklistData.id;
+    var getPicklistItem = function(inventoryItem, requisitionItemId){
+      var picklistItem = new openboxes.requisition.PicklistItem(inventoryItem);
+      picklistItem.requisitionItemId(requisitionItemId);
+      for(var k in picklistData.picklistItems){
+        var picklistItemData = picklistData.picklistItems[k];
+        if(picklistItemData.inventoryItemId == inventoryItem.inventoryItemId && 
+          picklistItemData.requisitionItemId == requisitionItemId){
+          picklistItem.quantityPicked(picklistItemData.quantity);
+          break;
+        }
+      }
+      return picklistItem;
+    }
 
     for(var i in self.requisition.requisitionItems()) {
-        var inventoryItems = inventoryItemsData[self.requisition.requisitionItems()[i].productId()];
+        var requisitionItem = self.requisition.requisitionItems()[i];
+        var inventoryItems = inventoryItemsData[requisitionItem.productId()];
         for(var j in inventoryItems) {
-          var picklistItem = new openboxes.requisition.PicklistItem(inventoryItems[j]);
-          picklistItem.requisitionItemId(self.requisition.requisitionItems()[i].id());
-          self.requisition.requisitionItems()[i].picklistItems.push(picklistItem);
+          var picklistItem = getPicklistItem(inventoryItems[j], requisitionItem.id());
+          requisitionItem.picklistItems.push(picklistItem);
         };
     };
 };
