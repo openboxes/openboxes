@@ -59,7 +59,7 @@ class InventoryItem implements Serializable {
 
     Map toJson() {
         [
-            "id": id,
+            "inventoryItemId": id,
             "productId": product?.id,
             "productName": product?.name,
             "lotNumber":lotNumber,

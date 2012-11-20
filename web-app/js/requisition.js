@@ -39,6 +39,26 @@ openboxes.requisition.Requisition = function(attrs) {
     }
  };
 
+openboxes.requisition.Picklist = function(attrs) {
+    var self = this;
+    if(!attrs) attrs = {};
+    self.id = ko.observable(attrs.id);
+    self.requisitionId = ko.observable(attrs.requisitionId);
+};
+
+openboxes.requisition.PicklistItem = function(attrs){
+    var self = this;
+    if(!attrs) attrs = {};
+    self.id = ko.observable(attrs.id);
+    self.requisitionItemId = ko.observable(attrs.requisitionItemId);
+    self.inventoryItemId = ko.observable(attrs.inventoryItemId);
+    self.lotNumber = ko.observable(attrs.lotNumber);
+    self.expirationDate = ko.observable(attrs.expirationDate);
+    self.quantityOnHand = ko.observable(attrs.quantityOnHand);
+    self.quantityATP = ko.observable(attrs.quantityATP);
+    self.quantityPicked = ko.observable(attrs.quantityPicked);
+};
+
 openboxes.requisition.RequisitionItem = function(attrs) {
     var self = this;
     if(!attrs) attrs = {};
@@ -51,6 +71,21 @@ openboxes.requisition.RequisitionItem = function(attrs) {
     self.substitutable =  ko.observable(attrs.substitutable);
     self.recipient = ko.observable(attrs.recipient);
     self.orderIndex = ko.observable(attrs.orderIndex);
+    self.picklistItems = ko.observableArray([]);
+};
+
+openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData, inventoryItemsData) {
+    var self = this;
+    self.requisition = new openboxes.requisition.Requisition(requisitionData);
+
+    for(var i in self.requisition.requisitionItems()) {
+        var inventoryItems = inventoryItemsData[self.requisition.requisitionItems()[i].productId()];
+        for(var j in inventoryItems) {
+          var picklistItem = new openboxes.requisition.PicklistItem(inventoryItems[j]);
+          picklistItem.requisitionItemId(self.requisition.requisitionItems()[i].id());
+          self.requisition.requisitionItems()[i].picklistItems.push(picklistItem);
+        };
+    };
 };
 
 openboxes.requisition.ViewModel = function(requisition) {

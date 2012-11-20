@@ -37,7 +37,7 @@ class InventoryItemTests extends GrailsUnitTestCase {
 
         Map json = item.toJson()
 		
-        assert json.id == item.id
+        assert json.inventoryItemId == item.id
         assert json.productId == item.product.id
         assert json.productName == item.product.name
         assert json.lotNumber == item.lotNumber

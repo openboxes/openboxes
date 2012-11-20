@@ -209,7 +209,7 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         assert returnRequisition.productInventoryItemsMap
         assert returnRequisition.productInventoryItemsMap[product.id]
         assert returnRequisition.productInventoryItemsMap[product.id].size() == 1
-        assert returnRequisition.productInventoryItemsMap[product.id].first().id == inventoryItem.id
+        assert returnRequisition.productInventoryItemsMap[product.id].first().inventoryItemId == inventoryItem.id
 
 
     }

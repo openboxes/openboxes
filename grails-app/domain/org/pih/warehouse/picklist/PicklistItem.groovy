@@ -49,14 +49,14 @@ class PicklistItem implements Serializable {
 
     Map toJson(){
         [
-            "id": id,
-            "requisitionItemId": requisitionItem?.id,
-            "inventoryItemId": inventoryItem?.id,
-            "inventoryItemLotNumber": inventoryItem?.lotNumber,
-            "quantity":quantity,
-            "status": status,
-            "reasonCode" : reasonCode,
-            "comment": comment,
+            id: id,
+            requisitionItemId: requisitionItem?.id,
+            inventoryItemId: inventoryItem?.id,
+            inventoryItemLotNumber: inventoryItem?.lotNumber,
+            quantity:quantity,
+            status: status,
+            reasonCode : reasonCode,
+            comment: comment,
         ]
     }
 		

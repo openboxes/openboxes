@@ -144,7 +144,7 @@
     <input type="hidden" data-bind="value: requisition.id"/>
     <div class="center">
       <g:isUserInRole roles="[RoleType.ROLE_ADMIN]">
-        <g:actionSubmit class="delete" onclick="this.form.action='${createLink(action:'delete')}';" value="Delete" />
+        <g:actionSubmit class="delete" onclick="this.form.action='${createLink(action:'delete')}';" value="Delete" data-bind='visible: requisition.id'/>
       </g:isUserInRole>
 
       <input type="submit" id="save-requisition" value="${warehouse.message(code: 'default.button.save.label')}"/>
@@ -152,8 +152,7 @@
 		${warehouse.message(code: 'default.button.cancel.label')}
 	  </g:link>
       &nbsp;
-      %{--<g:actionSubmit class="process" onclick="this.form.action='${createLink(action:'process', id: requisition)}';" value="Process" />--}%
-        <input type="button" data-bind='click: processItem' value="${warehouse.message(code:'requisition.process.label')}" />
+        <input type="button" data-bind='click: processItem, visible: requisition.id' value="${warehouse.message(code:'requisition.process.label')}" />
     </div>
   </g:form>
 
