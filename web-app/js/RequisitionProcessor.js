@@ -1,14 +1,14 @@
-if(typeof RequisitionProcessor === "undefined") RequisitionProcessor = {};
+if(typeof openboxes === "undefined") openboxes = {};
 
-RequisitionProcessor.mapping = {
+openboxes.mapping = {
     'requisitionItems': {
         create: function(options) {
-            return new RequisitionProcessor.RequisitionItem(options.data);
+            return new openboxes.RequisitionItem(options.data);
         }
     }
 };
 
-RequisitionProcessor.RequisitionItem = function(data) {
+openboxes.RequisitionItem = function(data) {
     ko.mapping.fromJS(data, {}, this);
 
     this.quantityPicked = ko.computed(function() {

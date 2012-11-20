@@ -159,22 +159,11 @@
 
 <script type="text/javascript">
     $(function () {
-        var today = $.datepicker.formatDate("mm/dd/yy", new Date());
-        var tomorrow = $.datepicker.formatDate("mm/dd/yy", new Date(new Date().getTime() + 24 * 60 * 60 * 1000));
-        var requisitionFromServer =
-        ${requisition}  ||
-        {
-            dateRequested: today, requestedDeliveryDate
-        :
-            tomorrow, version
-        :
-            -1
-        }
-        ;
-        var requisitionFromLocal = warehouse.getRequisitionFromLocal(requisitionFromServer.id);
-        var requisitionData = warehouse.Requisition.getNewer(requisitionFromServer, requisitionFromLocal);
-        var requisition = new warehouse.Requisition(requisitionData);
-        var viewModel = new warehouse.ViewModel(requisition);
+        var requisitionFromServer = ${requisition};
+        var requisitionFromLocal = openboxes.requisition.getRequisitionFromLocal(requisitionFromServer.id);
+        var requisitionData = openboxes.requisition.Requisition.getNewer(requisitionFromServer, requisitionFromLocal);
+        var requisition = new openboxes.requisition.Requisition(requisitionData);
+        var viewModel = new openboxes.requisition.ViewModel(requisition);
         viewModel.processItem = function () {
             if(window.location.href.indexOf("edit") > -1) {
                 window.location = '../process/' + viewModel.requisition.id();
@@ -202,7 +191,7 @@
         };
         $(".value").change(updateDescription);
         setInterval(function () {
-            warehouse.saveRequisitionToLocal(requisition);
+            openboxes.requisition.saveRequisitionToLocal(requisition);
         }, 3000);
     });
 </script>

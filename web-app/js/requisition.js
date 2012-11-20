@@ -1,5 +1,6 @@
-if(typeof warehouse === "undefined") warehouse = {};
-warehouse.Requisition = function(attrs) {
+if(typeof openboxes === "undefined") openboxes = {};
+if(typeof openboxes.requisition === "undefined") openboxes.requisition = {};
+openboxes.requisition.Requisition = function(attrs) {
     var self = this;
     if(!attrs) attrs = {};
     self.id = ko.observable(attrs.id);
@@ -17,7 +18,7 @@ warehouse.Requisition = function(attrs) {
     self.name = ko.observable(attrs.name);
 
     for(var idx in attrs.requisitionItems){
-      var item = new warehouse.RequisitionItem(attrs.requisitionItems[idx]);
+      var item = new openboxes.requisition.RequisitionItem(attrs.requisitionItems[idx]);
       self.requisitionItems.push(item);
     }
 
@@ -38,7 +39,7 @@ warehouse.Requisition = function(attrs) {
     }
  };
 
-warehouse.RequisitionItem = function(attrs) {
+openboxes.requisition.RequisitionItem = function(attrs) {
     var self = this;
     if(!attrs) attrs = {};
     self.id = ko.observable(attrs.id);
@@ -52,13 +53,13 @@ warehouse.RequisitionItem = function(attrs) {
     self.orderIndex = ko.observable(attrs.orderIndex);
 };
 
-warehouse.ViewModel = function(requisition) {
+openboxes.requisition.ViewModel = function(requisition) {
     var self = this;
     self.requisition = requisition;
 
     self.addItem = function () {
        self.requisition.requisitionItems.push(
-        new warehouse.RequisitionItem({orderIndex:self.requisition.newOrderIndex()})
+        new openboxes.requisition.RequisitionItem({orderIndex:self.requisition.newOrderIndex()})
        );
     };
 
@@ -122,32 +123,32 @@ warehouse.ViewModel = function(requisition) {
 
 };
 
-warehouse.saveRequisitionToLocal = function(model){
+openboxes.requisition.saveRequisitionToLocal = function(model){
   var data = ko.toJS(model);
   if(!data.id) return null;
-  var key = "warehouseRequisition" + data.id;
-  warehouse.saveToLocal(key, data);
+  var key = "openboxesRequisition" + data.id;
+  openboxes.saveToLocal(key, data);
   return key;
 }
 
-warehouse.getRequisitionFromLocal = function(id){
+openboxes.requisition.getRequisitionFromLocal = function(id){
   if(!id) return null;
-  var key = "warehouseRequisition" + id;
-  return warehouse.getFromLocal(key);
+  var key = "openboxesRequisition" + id;
+  return openboxes.getFromLocal(key);
 }
 
-warehouse.saveToLocal = function(name, model){
+openboxes.saveToLocal = function(name, model){
   if(typeof(Storage) === "undefined") return;
   localStorage[name] = JSON.stringify(model);
 };
 
-warehouse.getFromLocal = function(name){
+openboxes.getFromLocal = function(name){
   if(typeof(Storage) !== "undefined" && localStorage[name])
     return JSON.parse(localStorage[name]);
   return null;
 };
 
-warehouse.Requisition.getNewer = function(serverData, localData){
+openboxes.requisition.Requisition.getNewer = function(serverData, localData){
   if(!localData) return serverData;
   if(serverData.version > localData.version) return serverData;
   if(serverData.version < localData.version) return localData;

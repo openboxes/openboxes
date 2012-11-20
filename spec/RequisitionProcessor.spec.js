@@ -3,7 +3,7 @@ describe('Requisition Processor View Model', function(){
     it('has requisitionItems', function() {
 
         // creating the view model
-        var viewModel = ko.mapping.fromJS(mocks.mockRequisitionProcessorServerData, RequisitionProcessor.mapping);
+        var viewModel = ko.mapping.fromJS(mocks.mockRequisitionProcessorServerData, openboxes.mapping);
 
         // testing the view model properties that we create, not the ones that the ko.mapping plugin does
 

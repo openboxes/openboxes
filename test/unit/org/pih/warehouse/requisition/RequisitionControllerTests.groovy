@@ -166,11 +166,18 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
 
     def testCreate(){
       mockDomain(Location, [])
+      def today = new Date().format("MM/dd/yyyy")
+      def tomorrow = new Date().plus(1).format("MM/dd/yyyy")
       controller.create()
       assert renderArgs.view == "edit"
       assert renderArgs.model
       assert renderArgs.model.depots == []
-      assert renderArgs.model.requisition == "null"
+      assert renderArgs.model.requisition
+      String requisitionString = renderArgs.model.requisition
+      def requisitionJson = JSON.parse(requisitionString)
+      assert requisitionJson.dateRequested == today
+      assert requisitionJson.requestedDeliveryDate == tomorrow 
+
     }
 
     def testProcess() {

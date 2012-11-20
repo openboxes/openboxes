@@ -45,7 +45,8 @@ class RequisitionController {
     }
 
     def create = {
-        render(view:"edit", model:[requisition:"null", depots: getDepots()])
+        def requisition = new Requisition()
+        render(view:"edit", model:[requisition:requisition.toJson() as JSON, depots: getDepots()])
     }
 
     def edit = {

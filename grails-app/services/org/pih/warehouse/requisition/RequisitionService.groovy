@@ -297,7 +297,7 @@ class RequisitionService {
       def itemsData = data.requisitionItems ?: []
       data.remove("requisitionItems")
 
-      def requisition = Requisition.get(data.id) ?: new Requisition()
+      def requisition = Requisition.get(data.id?.toString()) ?: new Requisition()
       requisition.properties = data
 
       def requisitionItems = itemsData.collect{ 

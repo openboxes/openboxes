@@ -6,8 +6,8 @@ jQuery.ajax = function(options){
 describe("requisition view model", function(){
  
   it("be able to add items", function() {
-    var requisition = new warehouse.Requisition({});
-    var viewModel = new warehouse.ViewModel(requisition);
+    var requisition = new openboxes.requisition.Requisition({});
+    var viewModel = new openboxes.requisition.ViewModel(requisition);
     viewModel.addItem();
     expect(requisition.requisitionItems().length).toBe(1);
     expect(requisition.requisitionItems()[0].orderIndex()).toEqual(0);
@@ -16,14 +16,14 @@ describe("requisition view model", function(){
   });
 
   it("should add one item if there is no item in existing requisition", function(){
-    var requisition = new warehouse.Requisition({id:"abc"});
-    var viewModel = new warehouse.ViewModel(requisition);
+    var requisition = new openboxes.requisition.Requisition({id:"abc"});
+    var viewModel = new openboxes.requisition.ViewModel(requisition);
     expect(requisition.requisitionItems().length).toBe(1);
   });
 
   it('be able to remove items but alway add one when items are empty', function() {
-    var requisition = new warehouse.Requisition();
-    var viewModel = new warehouse.ViewModel(requisition);
+    var requisition = new openboxes.requisition.Requisition();
+    var viewModel = new openboxes.requisition.ViewModel(requisition);
     viewModel.addItem();
     viewModel.addItem();
    
@@ -47,7 +47,7 @@ describe("requisition view model", function(){
     comment:"my comment1", substitutable:true, recipient: "peter",orderIndex: 2};
     var requisitionItem2 = {productId:"prod2", quantity:400, version:2,
     comment:"my comment2", substitutable:false, recipient: "tim",orderIndex: 1};
-    var requisition = new warehouse.Requisition({
+    var requisition = new openboxes.requisition.Requisition({
       originId: originId,
       version: 3,
       lastUpdated: "11/25/2012",
@@ -57,7 +57,7 @@ describe("requisition view model", function(){
       requestedById: requestedById,
       recipientProgram:recipientProgram,
       requisitionItems: [requisitionItem1, requisitionItem2]});
-    var viewModel = new warehouse.ViewModel(requisition);
+    var viewModel = new openboxes.requisition.ViewModel(requisition);
     var formElement ={
       action:"testAction"
     }
@@ -113,24 +113,24 @@ describe("requisition view model", function(){
 
   it("should save and get from local storage", function(){
     var model = {id:"1234",name:"test"};
-    warehouse.saveToLocal("test", model);
-    var retrievedModel = warehouse.getFromLocal("test");
+    openboxes.saveToLocal("test", model);
+    var retrievedModel = openboxes.getFromLocal("test");
     expect(retrievedModel.id).toEqual(model.id);
     expect(retrievedModel.name).toEqual(model.name);
   });
 
   it("should save requistion to local", function(){
     var model = {id:"1234",name:"test"};
-    var key = warehouse.saveRequisitionToLocal(model);
-    expect(key).toEqual("warehouseRequisition1234");
-    var retrievedModel = warehouse.getFromLocal(key);
+    var key = openboxes.requisition.saveRequisitionToLocal(model);
+    expect(key).toEqual("openboxesRequisition1234");
+    var retrievedModel = openboxes.getFromLocal(key);
     expect(retrievedModel).toEqual(model);
-    expect(warehouse.getRequisitionFromLocal(model.id)).toEqual(model);
+    expect(openboxes.requisition.getRequisitionFromLocal(model.id)).toEqual(model);
   });
 
    it("should not save requistion to local if it has no id", function(){
     var model = {name:"test"};
-    var key = warehouse.saveRequisitionToLocal(model);
+    var key = openboxes.requisition.saveRequisitionToLocal(model);
     expect(key).toBeNull();
    });
 

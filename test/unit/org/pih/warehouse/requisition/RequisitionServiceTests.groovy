@@ -25,7 +25,8 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
         def items = [
           ["product.id":product1.id, quantity: 300, orderIndex: 0],
           ["product.id":product2.id, quantity: 400, orderIndex: 1]]
-        Map data = ["origin.id": miami.id, "requestedBy.id": john.id, 
+        def jsonNull = new org.codehaus.groovy.grails.web.json.JSONObject.Null() 
+        Map data = [id: jsonNull, "origin.id": miami.id, "requestedBy.id": john.id, 
         dateRequested: today, requestedDeliveryDate: tomorrow,
         name: "testRequisition", 
         requisitionItems: items]
