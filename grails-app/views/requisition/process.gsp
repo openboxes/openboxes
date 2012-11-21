@@ -18,17 +18,21 @@
     </g:if>
 
     <div id="requisition-header">
-        <div class="title" id="description" data-bind="html: name"></div>
-        <div class="time-stamp fade" data-bind="text: lastUpdated"></div>
-        <div class="status fade"><span data-bind="text: status"></span></div>
+        <div class="title" id="description" data-bind="html: requisition.name"></div>
+        <div class="time-stamp fade" data-bind="text: requisition.lastUpdated"></div>
+        <div class="status fade"><span data-bind="text: requisition.status"></span></div>
     </div>
 
     <g:form name="requisitionForm" method="post" action="saveProcess">
         <div class="dialog">
-          <ul id="accordion" data-bind="foreach: requisitionItems">
+          <ul id="accordion" data-bind="foreach: requisition.requisitionItems">
             <li>
               <div class="accordion-header">
                 <span data-bind="text: productName" class="product-name"></span>
+                ${warehouse.message(code: 'requisitionItem.quantityRequested.label')}: <span data-bind="text:quantity" class="quantity"></span>
+                ${warehouse.message(code: 'requisitionItem.quantityPicked.label')}: <span data-bind="text:quantityPicked" class="quantityPicked"></span>
+                ${warehouse.message(code: 'requisitionItem.quantityRemaining.label')}: <span data-bind="text:quantityRemaining" class="quantityRemaining"></span>
+                <div data-bind="css:status"></div>
               </div>
               <div class="accordion-content">
                 <span>hi</span>
@@ -55,7 +59,7 @@
 <script type="text/javascript">
     $(function(){
         var data = ${data};
-        var viewModel = new openboxes.requisition.Requisition(data.requisition);
+        var viewModel = new openboxes.requisition.ProcessViewModel(data.requisition, data.picklist, data.productInventoryItemsMap);
         ko.applyBindings(viewModel);
         $("#accordion").accordion({header:".accordion-header", active:false, collapsible:true});
     });

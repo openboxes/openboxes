@@ -82,6 +82,7 @@ class RequisitionController {
         def requisition = Requisition.get(params?.id)
         if (requisition) {
             def currentInventory = Location.get(session.warehouse.id).inventory
+            def picklist = [picklistItems:[]]
             def productInventoryItemsMap = [:]
             def productInventoryItems = inventoryService.getInventoryItemsWithQuantity(requisition.requisitionItems?.collect{ it.product}, currentInventory)
 
@@ -89,7 +90,7 @@ class RequisitionController {
                 productInventoryItemsMap[product.id] = productInventoryItems[product].collect{it.toJson()}
             }
 
-            String jsonString = [requisition: requisition.toJson(), productInventoryItemsMap: productInventoryItemsMap] as JSON
+            String jsonString = [requisition: requisition.toJson(), productInventoryItemsMap: productInventoryItemsMap, picklist: picklist] as JSON
             return [data: jsonString]
         } else{
             response.sendError(404)
