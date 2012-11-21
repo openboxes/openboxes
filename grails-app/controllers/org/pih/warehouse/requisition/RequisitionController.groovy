@@ -99,6 +99,20 @@ class RequisitionController {
 
     }
 
+    def savePicklist = {
+
+        def jsonRequest = request.JSON
+        def jsonResponse = []
+        def requisition = requisitionService.savePicklist(jsonRequest)
+        if (!requisition.hasErrors()) {
+            jsonResponse = [success: true, data: requisition.toJson()]
+        }
+        else {
+            jsonResponse = [success: false, errors: requisition.errors]
+        }
+        render jsonResponse as JSON
+
+    }
 
     def show = {
         def requestInstance = Requisition.get(params.id)

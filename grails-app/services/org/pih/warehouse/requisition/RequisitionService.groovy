@@ -322,6 +322,10 @@ class RequisitionService {
       requisition        
     }
 
+    void savePicklist(Map data) {
+
+    }
+
     boolean deleteRequisition(Requisition requisition) {
         requisition.delete(flush: true)
     }

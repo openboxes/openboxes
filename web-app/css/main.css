@@ -671,6 +671,8 @@ div.clear {
  }
 
 .accordion-content {
+    text-align: center;
+    width: 100%;
 }
 
 .accordion-content .product-name{
@@ -697,23 +699,18 @@ div.clear {
     float: left;
 }
 
+.accordion-content .quantity-picked input{
+    width: 50;
+    text-align: center;
+    float: center;
+}
+
 #picklist{
     width: 80%;
 }
-
-
 
 #requisition-status-key{
     width: 15%;
     margin-top: 2em;
 }
-
-
-
-
-
-
-
-
-
 

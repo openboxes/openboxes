@@ -39,8 +39,8 @@
                   <div class="accordion-content">
                     <div class="picklist-header">
                         <div class="product-name"><warehouse:message code="inventoryItem.item.label"/></div>
-                        <div class="lot"><warehouse:message code="inventoryItem.lotNumber.label"/></div>
-                        <div class="expiration-date"><warehouse:message code="inventoryItem.expirationDate.label"/></div>
+                        <div class="lot"><warehouse:message code="inventoryItem.lot.label"/></div>
+                        <div class="expiration-date"><warehouse:message code="inventoryItem.exp.label"/></div>
                         <div class="quantity-onhand"><warehouse:message code="inventoryItem.onHandQuantity.label"/></div>
                         <div class="quantity-picked"><warehouse:message code="inventoryItem.quantityPicked.label"/></div>
                         <div class="clear"></div>
@@ -94,7 +94,10 @@
         var data = ${data};
         var viewModel = new openboxes.requisition.ProcessViewModel(data.requisition, data.picklist, data.productInventoryItemsMap);
         ko.applyBindings(viewModel);
-        $("#accordion").accordion({header:".accordion-header", heightStyle:"content", icons:false, active:false, collapsible:true});
+
+        $("#requisitionForm").validate({ submitHandler: viewModel.save });
+
+        $("#accordion").accordion({header:".accordion-header", icons:false, active:false, collapsible:true});
     });
 </script>
 

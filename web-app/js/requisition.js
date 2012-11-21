@@ -76,13 +76,14 @@ openboxes.requisition.RequisitionItem = function(attrs) {
     self.quantityPicked = ko.computed(function() {
         var sum = 0;
         for(var i in self.picklistItems()) {
-            sum += self.picklistItems()[i].quantityPicked();
+            sum += parseInt(self.picklistItems()[i].quantityPicked());
         }
         return sum;
     }, this);
 
     self.quantityRemaining = ko.computed(function() {
-        return this.quantity() - this.quantityPicked();
+        var num = this.quantity() - this.quantityPicked();
+        return (num > 0) ? num : 0
     }, this);
 
     self.status = ko.computed(function() {
@@ -118,6 +119,38 @@ openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData,
           requisitionItem.picklistItems.push(picklistItem);
         };
     };
+
+    self.save = function(formElement) {
+        var data = ko.toJS(self.requisition);
+        delete data.version;
+        delete data.lastUpdated;
+        $.each(data.requisitionItems, function(index, item){
+            $.each(item.picklistItems, function(ind, pl) {
+                pl["picklist.id"] = self.picklistId;
+                pl["inventoryItem.id"] = pl.inventoryItemId;
+                pl["requisitionItem.id"] = pl.requisitionItemId;
+                pl["quantity"] = pl.quantityPicked;
+            });
+            delete item.version;
+        });
+        var jsonString = JSON.stringify(data);
+        console.log("here is the req: "  + jsonString);
+        console.log("endpoint is " + formElement.action);
+        
+        jQuery.ajax({
+            url: formElement.action,
+            contentType: 'text/json',
+            type: "POST",
+            data: jsonString,
+            dataType: "json",
+            success: function(result) {
+                console.log("result:" + JSON.stringify(result));
+                if(result.success){
+                }
+            }
+        });
+    };
+
 };
 
 openboxes.requisition.ViewModel = function(requisition) {
