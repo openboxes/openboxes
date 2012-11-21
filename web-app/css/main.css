@@ -552,6 +552,19 @@ th.desc a {
     background: url(../images/icons/silk/bin.png) center left no-repeat;
 }
 
+/*generic float*/
+div.left{
+    float: left;
+}
+div.right{
+    float: right;
+}
+div.clear {
+    clear: both;
+}
+
+/*requisition */
+
 #requisition-header{
     padding: 0.5em;
     margin-left: 0.5em;
@@ -582,26 +595,6 @@ th.desc a {
 
 }
 
-.Complete {
-    background: url(../images/icons/silk/bullet_green.png) no-repeat;
-    float: right;
-    width: 16px;
-    height: 16px;
-}
-
-.Incomplete {
-    background: url(../images/icons/silk/asterisk_red.png) no-repeat;
-    float: right;
-    width: 16px;
-    height: 16px;
-}
-
-.PartiallyComplete {
-    background: url(../images/icons/silk/asterisk_yellow.png) no-repeat;
-    float: right;
-    width: 16px;
-    height: 16px;
-}
 
 .ui_datepicker{
     background-image: url(../images/icons/silk/calendar.png);
@@ -609,20 +602,7 @@ th.desc a {
     background-position: right;
 }
 
-.border_left {
-    border-left-width: 1px;
-    border-left-style: solid;
-    border-top-width: 1px;
-    border-top-style: solid;
-    border-bottom-width: 1px;
-    border-bottom-style: solid;
-}
 
-.border_right {
-  border-right-width: 1px;
-  border-right-style: solid;
-  border-right-color: black
-}
 
 /*fix ui-validation error message styling issue*/
 .ui-validation label.error{
@@ -645,4 +625,95 @@ th.desc a {
   background-color: white;
   border: 2px solid #EA5200;
 }
-  
+
+/*process requisition item */
+.accordion-header .product-name {
+    width: 30%;
+    float: left;
+}
+
+.accordion-header .status {
+    width: 40%;
+    float: right;
+}
+
+.accordion-header .quantity {
+    width: 10%;
+    float: left;
+}
+
+.accordion-header .quantityPicked {
+    width: 10%;
+    float: left;
+}
+
+.accordion-header .quantityRemaining {
+    width: 10%;
+    float: left;
+}
+
+
+.requisition-status {
+    width: 16px;
+    height: 16px;
+}
+
+.requisition-status.Complete {
+    background: url(../images/icons/silk/bullet_green.png) no-repeat;
+}
+
+.requisition-status.Incomplete {
+    background: url(../images/icons/silk/asterisk_red.png) no-repeat;
+  }
+
+.requisition-status.PartiallyComplete {
+    background: url(../images/icons/silk/asterisk_yellow.png) no-repeat;
+ }
+
+.accordion-content {
+}
+
+.accordion-content .product-name{
+    width: 18%;
+    float: left;
+}
+.accordion-content .lot{
+    width: 9%;
+    float: left;
+}
+
+.accordion-content .expiration-date{
+    width: 9%;
+    float: left;
+}
+
+.accordion-content .quantity-onhand{
+    width: 9%;
+    float: left;
+}
+
+.accordion-content .quantity-picked{
+    width: 12%;
+    float: left;
+}
+
+#picklist{
+    width: 80%;
+}
+
+
+
+#requisition-status-key{
+    width: 15%;
+    margin-top: 2em;
+}
+
+
+
+
+
+
+
+
+
+
