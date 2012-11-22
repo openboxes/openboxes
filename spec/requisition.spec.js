@@ -1,9 +1,31 @@
 describe("requisition model", function(){
- 
- it("should get new orderIndex of requisitionItem", function(){
-    var requisition = new openboxes.requisition.Requisition();
-    expect(requisition.newOrderIndex()).toEqual(0);
+  it("be able to add items", function() {
+    var requisition = new openboxes.requisition.Requisition({});
+    requisition.addItem();
+    expect(requisition.requisitionItems().length).toBe(1);
+    expect(requisition.requisitionItems()[0].orderIndex()).toEqual(0);
+    requisition.addItem();
+    expect(requisition.requisitionItems()[1].orderIndex()).toEqual(1);
   });
+
+  it("should add one item if there is no item in existing requisition", function(){
+    var requisition = new openboxes.requisition.Requisition({id:"abc"});
+    expect(requisition.requisitionItems().length).toBe(1);
+  });
+
+  it('be able to remove items but alway add one when items are empty', function() {
+    var requisition = new openboxes.requisition.Requisition();
+    requisition.addItem();
+    requisition.addItem();
+   
+    var item1 = requisition.requisitionItems()[0];
+    var item2 = requisition.requisitionItems()[1];
+    requisition.removeItem(item1);
+    expect(requisition.requisitionItems().length).toEqual(1);
+    requisition.removeItem(item2);
+    expect(requisition.requisitionItems().length).toEqual(1); //should add new one when items is empty
+  });
+ 
 
 
   it("should build requisition item models when build requisition model", function(){
@@ -19,7 +41,6 @@ describe("requisition model", function(){
     expect(requisition.requisitionItems()[0].orderIndex()).toBe(3);
     expect(requisition.requisitionItems()[1].id()).toBe("item2");
     expect(requisition.requisitionItems()[1].orderIndex()).toBe(2);
-    expect(requisition.newOrderIndex()).toBe(4);
   });
 
   describe("should find newer version between two requisition json objects", function(){
@@ -54,13 +75,6 @@ describe("requisition model", function(){
       });
 
     });
-//    describe('viewmodel'), function() {
-//        it("should be able to redirect users to the process page for a requisition", function() {
-//            var vm = openboxes.requisition.ViewModel( new openboxes.requisition.Requisition("abcd1234" ));
-//            var mock = window
-//            expect
-//        })
-//    };
     describe("same version at requisition level then check version at item level", function(){
      
       it("no items for both then local win", function(){

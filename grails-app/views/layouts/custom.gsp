@@ -64,6 +64,7 @@
 	-->
 	<script src="http://jquery-option-tree.googlecode.com/files/jquery.optionTree.js" type="text/javascript" ></script>
 	<script src="${createLinkTo(dir:'js/jquery.mcdropdown/', file:'jquery.mcdropdown.js')}" type="text/javascript" ></script>
+	<script src="${createLinkTo(dir:'js/', file:'underscore-min.js')}" type="text/javascript" ></script>
 
   		
  	<!-- Include Jquery Validation and Jquery Validation UI plugins -->

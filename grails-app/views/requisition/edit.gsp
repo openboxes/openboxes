@@ -126,7 +126,7 @@
             <input type="text" data-bind="value: comment, uniqueName: true" size="50"/>
           </td>
           <td class="center">
-            <a href='#' data-bind='click: $root.removeItem'>
+            <a href='#' data-bind='click: $root.requisition.removeItem'>
                <img src="/openboxes/images/icons/silk/delete.png" alt="Delete item" style="vertical-align: middle">
             </a>
           </td>
@@ -135,7 +135,7 @@
       <tfoot>
         <tr>
           <td colSpan="6">
-            <input type="button" data-bind='click: addItem' value="${warehouse.message(code:'requisition.addNewItem.label')}"/>
+            <input type="button" data-bind='click: requisition.addItem' value="${warehouse.message(code:'requisition.addNewItem.label')}"/>
           </td
         ></tr>
       </tfoot>

@@ -1,7 +1,20 @@
+var ajaxOptions;
+jQuery.ajax = function(options){
+    ajaxOptions = options;
+};
 describe('Requisition Processor View Model', function(){
-    it('should build picklist items from inventory items when there is no picklist items given', function() {
-     
-     var requisitionData = {
+     var requisitionData;
+     var plItem1;
+     var plItem2;
+     var plItem3;
+     var picklistData;
+     var inventoryItem1;
+     var inventoryItem2;
+     var inventoryItem3;
+     var inventoryItemsData;
+   
+    beforeEach(function(){
+      requisitionData = {
         id:"r1",
         requisitionItems:[
           {id:"requisitionItem1", productId: "prod1"},
@@ -9,23 +22,27 @@ describe('Requisition Processor View Model', function(){
         ],
      };
 
-     var plItem1 = {id:"picklistItem1", requisitionItemId:"requisitionItem1", inventoryItemId:"inventoryItem1", quantity:300};
-     var plItem2 = {id:"picklistItem2", requisitionItemId:"requisitionItem1", inventoryItemId:"inventoryItem2", quantity:100};
-     var plItem3 = {id:"picklistItem3", requisitionItemId:"requisitionItem2", inventoryItemId:"inventoryItem3", quantity:50};
-     var picklistData = {
-       id: "picklist1",
-       picklistItems:[plItem1, plItem2, plItem3],
-     };
+       plItem1 = {id:"picklistItem1", requisitionItemId:"requisitionItem1", inventoryItemId:"inventoryItem1", quantity:300};
+       plItem2 = {id:"picklistItem2", requisitionItemId:"requisitionItem1", inventoryItemId:"inventoryItem2", quantity:100};
+       plItem3 = {id:"picklistItem3", requisitionItemId:"requisitionItem2", inventoryItemId:"inventoryItem3", quantity:50};
+       picklistData = {
+         id: "picklist1",
+         picklistItems:[plItem1, plItem2, plItem3],
+       };
 
-     var inventoryItem1 =  {inventoryItemId:"inventoryItem1", lotNumber:"batch1", expirationDate: "12/20/2012", quantityOnHand: 300};
-     var inventoryItem2 =  {inventoryItemId:"inventoryItem2", lotNumber:"batch2", expirationDate: "12/21/2012", quantityOnHand: 400};
-     var inventoryItem3 =  {inventoryItemId:"inventoryItem3", lotNumber:"batch3", expirationDate: "12/23/2012", quantityOnHand:00};
-     var inventoryItemsData = {
-      "prod1": [ inventoryItem1, inventoryItem2],
-      "prod2": [ inventoryItem3 ]
-     }
+       inventoryItem1 =  {inventoryItemId:"inventoryItem1", lotNumber:"batch1", expirationDate: "12/20/2012", quantityOnHand: 300};
+       inventoryItem2 =  {inventoryItemId:"inventoryItem2", lotNumber:"batch2", expirationDate: "12/21/2012", quantityOnHand: 400};
+       inventoryItem3 =  {inventoryItemId:"inventoryItem3", lotNumber:"batch3", expirationDate: "12/23/2012", quantityOnHand:00};
+       inventoryItemsData = {
+        "prod1": [ inventoryItem1, inventoryItem2],
+        "prod2": [ inventoryItem3 ]
+       }
+       
+    });
 
-     var viewModel = new openboxes.requisition.ProcessViewModel(requisitionData, picklistData, inventoryItemsData);
+    it('should build picklist items from inventory items when there is no picklist items given', function() {  
+    
+     var  viewModel = new openboxes.requisition.ProcessViewModel(requisitionData, picklistData, inventoryItemsData);
 
      var requisition = viewModel.requisition;
 
@@ -81,8 +98,11 @@ describe('Requisition Processor View Model', function(){
       expect(requisitionItem.quantityPicked()).toBe(5000);
       expect(requisitionItem.quantityRemaining()).toBe(0);
       expect(requisitionItem.status()).toBe("Complete");
+    });
 
-
+    describe("should save picklist", function(){
+      it("should get picklist items from requisition", function(){});
+         //var viewModel = new openboxes.requisition.ProcessViewModel(requisitionData, picklistData, inventoryItemsData);
 
     });
 });

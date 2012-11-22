@@ -5,36 +5,7 @@ jQuery.ajax = function(options){
 
 describe("requisition view model", function(){
  
-  it("be able to add items", function() {
-    var requisition = new openboxes.requisition.Requisition({});
-    var viewModel = new openboxes.requisition.ViewModel(requisition);
-    viewModel.addItem();
-    expect(requisition.requisitionItems().length).toBe(1);
-    expect(requisition.requisitionItems()[0].orderIndex()).toEqual(0);
-    viewModel.addItem();
-    expect(requisition.requisitionItems()[1].orderIndex()).toEqual(1);
-  });
-
-  it("should add one item if there is no item in existing requisition", function(){
-    var requisition = new openboxes.requisition.Requisition({id:"abc"});
-    var viewModel = new openboxes.requisition.ViewModel(requisition);
-    expect(requisition.requisitionItems().length).toBe(1);
-  });
-
-  it('be able to remove items but alway add one when items are empty', function() {
-    var requisition = new openboxes.requisition.Requisition();
-    var viewModel = new openboxes.requisition.ViewModel(requisition);
-    viewModel.addItem();
-    viewModel.addItem();
-   
-    var item1 = requisition.requisitionItems()[0];
-    var item2 = requisition.requisitionItems()[1];
-    viewModel.removeItem(item1);
-    expect(requisition.requisitionItems().length).toEqual(1);
-    viewModel.removeItem(item2);
-    expect(requisition.requisitionItems().length).toEqual(1); //should add new one when items is empty
-  });
-
+ 
    
   
   it("should save data to server", function(){

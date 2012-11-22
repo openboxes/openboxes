@@ -16,27 +16,54 @@ openboxes.requisition.Requisition = function(attrs) {
     self.version = ko.observable(attrs.version);
     self.requisitionItems = ko.observableArray([]);
     self.name = ko.observable(attrs.name);
+    
+    _.each(attrs.requisitionItems, function(requisitionItemData){
+      self.requisitionItems.push(new openboxes.requisition.RequisitionItem(requisitionItemData));
 
-    for(var idx in attrs.requisitionItems){
-      var item = new openboxes.requisition.RequisitionItem(attrs.requisitionItems[idx]);
-      self.requisitionItems.push(item);
-    }
+    });
 
     self.findRequisitionItemByOrderIndex = function(orderIndex){
-      for(var idx in self.requisitionItems()){
-        if(self.requisitionItems()[idx].orderIndex() == orderIndex) 
-          return self.requisitionItems()[idx];
-      }
+      return _.find(self.requisitionItems(), function(requisitionItem){
+        return requisitionItem.orderIndex() == orderIndex;
+      });
     };
 
-    self.newOrderIndex = function(){
+   
+    self.addItem = function () {
+       self.requisitionItems.push(
+        new openboxes.requisition.RequisitionItem({orderIndex: newOrderIndex()})
+       );
+    };
+
+    self.removeItem = function(item){
+       self.requisitionItems.remove(item);
+       if(self.requisitionItems().length == 0)
+         self.addItem();
+
+    };
+
+    if(self.requisitionItems().length == 0 && self.id()){
+            self.addItem();
+    } 
+
+    self.id.subscribe(function(newValue) {
+        if(newValue){
+          self.addItem();
+        }
+    });
+
+    //private functions
+    function newOrderIndex(){
       var orderIndex = -1;
       for(var idx in self.requisitionItems()){
         if(self.requisitionItems()[idx].orderIndex() > orderIndex) 
           orderIndex = self.requisitionItems()[idx].orderIndex();
       }
       return orderIndex + 1;
-    }
+    };
+
+
+    
  };
 
 openboxes.requisition.Picklist = function(attrs) {
@@ -72,6 +99,10 @@ openboxes.requisition.RequisitionItem = function(attrs) {
     self.recipient = ko.observable(attrs.recipient);
     self.orderIndex = ko.observable(attrs.orderIndex);
     self.picklistItems = ko.observableArray([]);
+    
+    _.each(attrs.picklistItems, function(picklistItem){
+      self.picklistItems.push(new openboxes.requisition.PicklistItem(picklistItem));
+    });
 
     self.quantityPicked = ko.computed(function() {
         var sum = 0;
@@ -95,31 +126,16 @@ openboxes.requisition.RequisitionItem = function(attrs) {
 
 openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData, inventoryItemsData) {
     var self = this;
+    _.each(requisitionData.requisitionItems, function(requisitionItem){
+      requisitionItem.picklistItems = getPicklistItems(requisitionItem);
+    });
+
+    console.log(requisitionData);
+
     self.requisition = new openboxes.requisition.Requisition(requisitionData);
     self.picklistId = picklistData.id;
-    var getPicklistItem = function(inventoryItem, requisitionItemId){
-      var picklistItem = new openboxes.requisition.PicklistItem(inventoryItem);
-      picklistItem.requisitionItemId(requisitionItemId);
-      for(var k in picklistData.picklistItems){
-        var picklistItemData = picklistData.picklistItems[k];
-        if(picklistItemData.inventoryItemId == inventoryItem.inventoryItemId && 
-          picklistItemData.requisitionItemId == requisitionItemId){
-          picklistItem.quantityPicked(picklistItemData.quantity);
-          break;
-        }
-      }
-      return picklistItem;
-    }
 
-    for(var i in self.requisition.requisitionItems()) {
-        var requisitionItem = self.requisition.requisitionItems()[i];
-        var inventoryItems = inventoryItemsData[requisitionItem.productId()];
-        for(var j in inventoryItems) {
-          var picklistItem = getPicklistItem(inventoryItems[j], requisitionItem.id());
-          requisitionItem.picklistItems.push(picklistItem);
-        };
-    };
-
+   
     self.save = function(formElement) {
         var data = ko.toJS(self.requisition);
         delete data.version;
@@ -151,24 +167,25 @@ openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData,
         });
     };
 
+  //private functions
+   function getPicklistItems(requisitionItem){
+       var inventoryItems = inventoryItemsData[requisitionItem.productId];
+       return  _.map(inventoryItems, function(picklistItemData){
+        picklistItemData.requisitionItemId = requisitionItem.id;
+        var matchedPicklistItem = _.find(picklistData.picklistItems, function(picklistItem){
+          return picklistItem.requisitionItemId == requisitionItem.id && picklistItem.inventoryItemId == picklistItemData.inventoryItemId;
+        });
+        if(matchedPicklistItem)
+          picklistItemData.quantityPicked = matchedPicklistItem.quantity;
+        return picklistItemData;
+      });
+    }
 };
 
 openboxes.requisition.ViewModel = function(requisition) {
     var self = this;
     self.requisition = requisition;
 
-    self.addItem = function () {
-       self.requisition.requisitionItems.push(
-        new openboxes.requisition.RequisitionItem({orderIndex:self.requisition.newOrderIndex()})
-       );
-    };
-
-    self.removeItem = function(item){
-       self.requisition.requisitionItems.remove(item);
-       if(self.requisition.requisitionItems().length == 0)
-         self.addItem();
-
-    };
 
     self.save = function(formElement) {
         var data = ko.toJS(self.requisition);
@@ -208,19 +225,7 @@ openboxes.requisition.ViewModel = function(requisition) {
             }
         });
 
-    };
-
-    if(self.requisition.requisitionItems().length == 0 && self.requisition.id()){
-            self.addItem();
-    }
-
-   
-    self.requisition.id.subscribe(function(newValue) {
-        if(newValue){
-          self.addItem();
-        }
-    });
-
+    };   
 };
 
 openboxes.requisition.saveRequisitionToLocal = function(model){
