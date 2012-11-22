@@ -39,9 +39,7 @@ class PicklistItemTests extends GrailsUnitTestCase
         assert json.id == picklistItem.id
         assert json.requisitionItemId == picklistItem.requisitionItem.id
         assert json.inventoryItemId == picklistItem.inventoryItem.id
-        assert json.inventoryItemLotNumber == picklistItem.inventoryItem.lotNumber
         assert json.quantity == picklistItem.quantity
-        assert json.inventoryItemId == picklistItem.inventoryItem.id
     }
 
 }

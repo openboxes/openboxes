@@ -152,7 +152,11 @@ openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData,
 
    
     self.save = function(formElement) {
-        var result = {id: self.picklist.id() || "", picklistItems:[]};
+        var result = {
+          id: self.picklist.id() || "",
+          "requisition.id": self.requisition.id(),
+          picklistItems:[]
+          };
         _.each(ko.toJS(self.requisition).requisitionItems, function(item){
             _.each(item.picklistItems, function(pl) {
               if(pl.quantityPicked != 0) {
@@ -160,6 +164,7 @@ openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData,
                 pl["inventoryItem.id"] = pl.inventoryItemId;
                 pl["requisitionItem.id"] = pl.requisitionItemId;
                 pl["quantity"] = pl.quantityPicked;
+                delete pl.version;
                 result.picklistItems.push(pl);
               }
             });

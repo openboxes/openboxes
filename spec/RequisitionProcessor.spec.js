@@ -95,6 +95,7 @@ describe('Requisition Processor View Model', function(){
          viewModel.save(form);
          var dataSent = JSON.parse(ajaxOptions.data);
          expect(dataSent["id"]).toEqual("");
+         expect(dataSent["requisition.id"]).toEqual(requisitionData.id);
          expect(dataSent["picklistItems"].length).toEqual(2);
          expect(dataSent["picklistItems"][0].id).toEqual("");
          expect(dataSent["picklistItems"][0]["requisitionItem.id"]).toEqual("requisitionItem1");
@@ -132,11 +133,14 @@ describe('Requisition Processor View Model', function(){
          viewModel.requisition.requisitionItems()[0].picklistItems()[0].quantityPicked(100);
          viewModel.requisition.requisitionItems()[0].picklistItems()[1].quantityPicked(0);
          viewModel.requisition.requisitionItems()[1].picklistItems()[0].quantityPicked(500);
+         viewModel.requisition.requisitionItems()[0].picklistItems()[0].version(5);
+
          viewModel.save(form);
          var dataSent = JSON.parse(ajaxOptions.data);
          expect(dataSent["id"]).toEqual(picklistData.id);
          expect(dataSent["picklistItems"].length).toEqual(2);
          expect(dataSent["picklistItems"][0].id).toEqual(plItem1.id);
+         expect(dataSent["picklistItems"][0].version).toEqual(undefined);
          expect(dataSent["picklistItems"][0]["requisitionItem.id"]).toEqual(plItem1.requisitionItemId);
          expect(dataSent["picklistItems"][0]["inventoryItem.id"]).toEqual(inventoryItem1.inventoryItemId);
          expect(dataSent["picklistItems"][0]["quantity"]).toEqual(100);

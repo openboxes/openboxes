@@ -63,4 +63,13 @@ class Picklist implements Serializable {
   String toString(){
     "id: ${id}, name:${name}"
   }
+
+  Map toJson(){
+      [
+        id: id,
+        version: version,
+        picklistItems: picklistItems?.collect { it.toJson() }
+      ]
+    }
+
 }
