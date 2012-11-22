@@ -214,9 +214,20 @@ openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData,
 openboxes.requisition.ViewModel = function(requisition) {
     var self = this;
     self.requisition = requisition;
-
+    
+    self.processRequisition = function () {
+        window.location = '../process/' + self.requisition.id();
+    };
+    
+    self.deleteRequisition = function () {
+        window.location = '../delete/' + self.requisition.id();
+    };
 
     self.save = function(formElement) {
+        var redirect = true;
+        if(self.requisition.id()) {
+            redirect = false;
+        }
         var data = ko.toJS(self.requisition);
         data["origin.id"] = data.originId;
         data["requestedBy.id"] = data.requestedById;
@@ -249,6 +260,9 @@ openboxes.requisition.ViewModel = function(requisition) {
                         localItem.id(result.data.requisitionItems[idx].id);
                         localItem.version(result.data.requisitionItems[idx].version);
                       }
+                    }
+                    if(redirect){
+                        window.location = "./edit/" + self.requisition.id();
                     }
                 }
             }

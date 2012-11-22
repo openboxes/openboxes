@@ -143,16 +143,17 @@
    </div>
     <input type="hidden" data-bind="value: requisition.id"/>
     <div class="center">
-      <g:isUserInRole roles="[RoleType.ROLE_ADMIN]">
-        <g:actionSubmit class="delete" onclick="this.form.action='${createLink(action:'delete')}';" value="Delete" data-bind='visible: requisition.id'/>
-      </g:isUserInRole>
-
+        <g:isUserInRole roles="[RoleType.ROLE_ADMIN]">
+            <input type="button" data-bind='click: deleteRequisition, visible: requisition.id' value="${warehouse.message(code: 'default.button.delete.label')}"/>
+        </g:isUserInRole>
       <input type="submit" id="save-requisition" value="${warehouse.message(code: 'default.button.save.label')}"/>
+            &nbsp;
+        <input type="button" data-bind='click: processRequisition, visible: requisition.id' value="${warehouse.message(code:'requisition.process.label')}" />
+        &nbsp;
       <g:link action="list">
-		${warehouse.message(code: 'default.button.cancel.label')}
+		<input type="button" value="${warehouse.message(code: 'default.button.cancel.label')}"/>
 	  </g:link>
-      &nbsp;
-        <input type="button" data-bind='click: processItem, visible: requisition.id' value="${warehouse.message(code:'requisition.process.label')}" />
+
     </div>
   </g:form>
 
@@ -163,16 +164,7 @@
         var requisitionData = openboxes.requisition.Requisition.getNewer(requisitionFromServer, requisitionFromLocal);
         var requisition = new openboxes.requisition.Requisition(requisitionData);
         var viewModel = new openboxes.requisition.ViewModel(requisition);
-        viewModel.processItem = function () {
-            if(window.location.href.indexOf("edit") > -1) {
-                window.location = '../process/' + viewModel.requisition.id();
-            } else {
-                window.location = 'process/' + viewModel.requisition.id();
-            }
-
-        };
         ko.applyBindings(viewModel);
-
 
         $("#requisitionForm").validate({ submitHandler: viewModel.save });
 
