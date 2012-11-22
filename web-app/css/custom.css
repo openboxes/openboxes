@@ -1130,3 +1130,124 @@ img.photo_tiny {
 
 span.tag { border: 1px solid #a5d24a; -moz-border-radius:2px; -webkit-border-radius:2px; display: block; float: left; padding: 5px; text-decoration:none; background: #cde69c; color: #638421; margin-right: 5px; margin-bottom:5px;font-family: helvetica;  font-size:13px;}
 span.tag a { font-weight: none; color: #82ad2b; text-decoration:none; font-size: 11px;  } 
+
+
+/*process requisition item */
+
+.accordion-header {
+    padding: 8px;
+    background: #FCFCFC;
+    color: #1C94C4;
+}
+
+.accordion-header.ui-state-active {
+  background: #0099FF;
+  color: white;
+}
+
+.accordion-header .product-name {
+    width: 30%;
+    float: left;
+}
+
+.accordion-header .status {
+    width: 25%;
+    float: right;
+}
+
+.accordion-header .quantity {
+    width: 15%;
+    float: left;
+}
+
+.accordion-header .quantityPicked {
+    width: 15%;
+    float: left;
+}
+
+.accordion-header .quantityRemaining {
+    width: 15%;
+    float: left;
+}
+
+.requisition-status {
+    width: 16px;
+    height: 16px;
+}
+
+.requisition-status.Complete {
+    background: url(../images/icons/silk/bullet_green.png) no-repeat;
+}
+
+.requisition-status.Incomplete {
+    background: url(../images/icons/silk/asterisk_red.png) no-repeat;
+  }
+
+.requisition-status.PartiallyComplete {
+    background: url(../images/icons/silk/asterisk_yellow.png) no-repeat;
+ }
+
+.accordion-content {
+    text-align: center;
+}
+
+.accordion-content .requisitionItemPicklist {
+  width: 80%;
+  padding: 5px;
+  border: 1px solid #eeeeee;
+  margin: 5px;
+}
+
+.accordion-content  .picklist-field{
+  margin-top: 5px;
+}
+
+.accordion-content .picklist-header {
+    background-color: #eeeeee;
+    padding: 5px;
+    font-weight: bold;
+}
+
+.accordion-content .product-name{
+    width: 30%;
+    float: left;
+}
+.accordion-content .lot{
+    width: 15%;
+    float: left;
+}
+
+.accordion-content .expiration-date{
+    width: 15%;
+    float: left;
+}
+
+.accordion-content .quantity-onhand{
+    width: 15%;
+    float: left;
+}
+
+.accordion-content .quantity-picked{
+    width: 25%;
+    float: left;
+}
+
+.accordion-content .quantity-picked input{
+    width: 50;
+    text-align: center;
+    float: center;
+}
+
+#picklist{
+    width: 80%;
+}
+
+#requisition-status-key{
+    width: 15%;
+    margin-top: 2em;
+}
+
+#requisitionForm .footer{
+  margin: 10px;
+}
+

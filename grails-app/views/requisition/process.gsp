@@ -22,7 +22,7 @@
             <div class="status fade"><span data-bind="text: requisition.status"></span></div>
         </div>
 
-        <g:form name="requisitionForm" method="post" action="saveProcess">
+        <g:form name="requisitionForm" method="post" action="save" controller="picklist">
             <div class="dialog">
               <ul id="accordion" data-bind="foreach: requisition.requisitionItems">
                 <li>
@@ -37,33 +37,35 @@
                     <div class="clear"></div>
                   </div>
                   <div class="accordion-content">
-                    <div class="picklist-header">
-                        <div class="product-name"><warehouse:message code="inventoryItem.item.label"/></div>
-                        <div class="lot"><warehouse:message code="inventoryItem.lot.label"/></div>
-                        <div class="expiration-date"><warehouse:message code="inventoryItem.exp.label"/></div>
-                        <div class="quantity-onhand"><warehouse:message code="inventoryItem.onHandQuantity.label"/></div>
-                        <div class="quantity-picked"><warehouse:message code="inventoryItem.quantityPicked.label"/></div>
-                        <div class="clear"></div>
-                    </div>
-                    <div class="picklist-items" data-bind="foreach: picklistItems">
-                        <div class="product-name" data-bind="text: $parent.productName"></div>
-                        <div class="lot" data-bind="text: lotNumber"></div>
-                        <div class="expiration-date" data-bind="text: expirationDate"></div>
-                        <div class="quantity-onhand" data-bind="text: quantityOnHand"></div>
-                        <div class="quantity-picked"><input data-bind="value: quantityPicked"></input></div>
-                        <div class="clear"></div>
+                    <div class="requisitionItemPicklist">
+                      <div class="picklist-header">
+                          <div class="product-name"><warehouse:message code="inventoryItem.item.label"/></div>
+                          <div class="lot"><warehouse:message code="inventoryItem.lot.label"/></div>
+                          <div class="expiration-date"><warehouse:message code="inventoryItem.exp.label"/></div>
+                          <div class="quantity-onhand"><warehouse:message code="inventoryItem.onHandQuantity.label"/></div>
+                          <div class="quantity-picked"><warehouse:message code="inventoryItem.quantityPicked.label"/></div>
+                          <div class="clear"></div>
+                      </div>
+                      <div class="picklist-items" data-bind="foreach: picklistItems">
+                          <div class="product-name picklist-field" data-bind="text: $parent.productName"></div>
+                          <div class="lot picklist-field" data-bind="text: lotNumber"></div>
+                          <div class="expiration-date picklist-field" data-bind="text: expirationDate"></div>
+                          <div class="quantity-onhand picklist-field" data-bind="text: quantityOnHand"></div>
+                          <div class="quantity-picked"><input data-bind="value: quantityPicked"></input></div>
+                          <div class="clear"></div>
+                      </div>
                     </div>
                   </div>
                 </li>   
               </ul>
             
             </div>
-            <div class="center">
+            <div class="center footer">
                 <input type="submit" id="save-requisition" value="${warehouse.message(code: 'default.button.save.label')}"/>
-                <g:link action="list">
-                    ${warehouse.message(code: 'default.button.cancel.label')}
-                </g:link>
                 &nbsp;
+                <g:link action="list">
+                    <input type="button" value="${warehouse.message(code: 'default.button.cancel.label')}"/>
+                </g:link>
             </div>
 
 

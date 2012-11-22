@@ -7,6 +7,7 @@ import org.pih.warehouse.inventory.InventoryService
 import org.springframework.mock.web.MockHttpServletResponse
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.picklist.*
 import org.pih.warehouse.product.Product
 import grails.converters.JSON
 import org.pih.warehouse.core.ActivityCode
@@ -186,10 +187,12 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         def myLocation = new Location(id: "1234", inventory: inventory)
         def product = new Product(id: "prod1", name:"peter's product")
         def inventoryItem = new InventoryItem(id: "inventoryItem1", lotNumber: "inventLot1")
+        def picklist = new Picklist(id:"picklist1", requisition: requisition)
         mockDomain(Location, [myLocation])
         mockDomain(Inventory, [inventory])
         mockDomain(Product, [product])
         mockDomain(InventoryItem, [inventoryItem])
+        mockDomain(Picklist, [picklist])
 
         def inventoryServiceMock = mockFor(InventoryService)
         inventoryServiceMock.demand.getInventoryItemsWithQuantity(2..2) { products, userInventory ->
@@ -201,13 +204,15 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         controller.params.id = requisition.id
         controller.session.warehouse = myLocation
         def model = controller.process()
-        def returnRequisition = JSON.parse(model.data)
+        def json = JSON.parse(model.data)
 
-        assert returnRequisition.requisition.id == requisition.id
-        assert returnRequisition.productInventoryItemsMap
-        assert returnRequisition.productInventoryItemsMap[product.id]
-        assert returnRequisition.productInventoryItemsMap[product.id].size() == 1
-        assert returnRequisition.productInventoryItemsMap[product.id].first().inventoryItemId == inventoryItem.id
+        assert json.requisition.id == requisition.id
+        assert json.productInventoryItemsMap
+        assert json.productInventoryItemsMap[product.id]
+        assert json.productInventoryItemsMap[product.id].size() == 1
+        assert json.productInventoryItemsMap[product.id].first().inventoryItemId == inventoryItem.id
+        assert json.picklist
+        assert json.picklist.id == picklist.id
 
 
     }

@@ -31,7 +31,7 @@ class PicklistItem implements Serializable {
 	Date lastUpdated
 
 	
-	static belongsTo = [ picklist : Picklist, requisitionItem : RequisitionItem ]
+	static belongsTo = [ picklist : Picklist ]
 
 	static mapping = {
 		id generator: 'uuid'

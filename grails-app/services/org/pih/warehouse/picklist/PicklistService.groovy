@@ -33,7 +33,7 @@ class PicklistService{
         dbItem ->!picklistItems.any{ clientItem-> clientItem.id == dbItem.id} 
       }
       itemsToDelete.each{picklist.removeFromPicklistItems(it)}
-      picklist.save(flush:true, failOnError:true)
+      picklist.save(flush:true)
       picklist.picklistItems?.each{it.save(flush:true)}
       picklist           
     

@@ -35,8 +35,6 @@ class RequisitionItem implements Serializable {
     String comment
     Integer orderIndex
 
-    List picklistItems = []
-
 	
 	// Audit fields
 	Date dateCreated
@@ -45,8 +43,6 @@ class RequisitionItem implements Serializable {
 	static transients = [ "type" ]
 	
 	static belongsTo = [ requisition: Requisition ]
-
-    static hasMany = [ picklistItems: PicklistItem ]
 
 	static mapping = {
 		id generator: 'uuid'

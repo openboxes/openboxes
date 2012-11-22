@@ -23,7 +23,6 @@ class Picklist implements Serializable {
 	
 	def beforeInsert = {
 		createdBy = AuthService.currentUser.get()
-		picker = picker ?: AuthService.currentUser.get()
 	}
 	def beforeUpdate ={
 		updatedBy = AuthService.currentUser.get()
@@ -34,7 +33,8 @@ class Picklist implements Serializable {
 	String description 		// a user-defined, searchable name for the order 
 	
 	Requisition requisition
-	Person picker
+	Person picker = AuthService.currentUser.get()
+
 	Date datePicked
 	
 	// Audit fields

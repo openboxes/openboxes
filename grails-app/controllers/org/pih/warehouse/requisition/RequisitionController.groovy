@@ -15,6 +15,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import grails.converters.JSON
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.picklist.Picklist
 
 
 
@@ -82,7 +83,7 @@ class RequisitionController {
         def requisition = Requisition.get(params?.id)
         if (requisition) {
             def currentInventory = Location.get(session.warehouse.id).inventory
-            def picklist = [picklistItems:[]]
+            def picklist = Picklist.findByRequisition(requisition)?: new Picklist()
             def productInventoryItemsMap = [:]
             def productInventoryItems = inventoryService.getInventoryItemsWithQuantity(requisition.requisitionItems?.collect{ it.product}, currentInventory)
 
@@ -90,7 +91,7 @@ class RequisitionController {
                 productInventoryItemsMap[product.id] = productInventoryItems[product].collect{it.toJson()}
             }
 
-            String jsonString = [requisition: requisition.toJson(), productInventoryItemsMap: productInventoryItemsMap, picklist: picklist] as JSON
+            String jsonString = [requisition: requisition.toJson(), productInventoryItemsMap: productInventoryItemsMap, picklist: picklist.toJson()] as JSON
             return [data: jsonString]
         } else{
             response.sendError(404)
