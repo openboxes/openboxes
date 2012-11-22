@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+<changeSet author="Thoughtworks (generated)" id="1353605196066-1">
+<addColumn tableName="picklist">
+<column name="requisition_id" type="CHAR(38)"/>
+</addColumn>
+</changeSet>
+<changeSet author="Thoughtworks (generated)" id="1353605196066-2">
+<dropColumn columnName="request_id" tableName="picklist"/>
+</changeSet>
+</databaseChangeLog>

@@ -13,5 +13,5 @@
 	<include file="0.5.x/add-requisition-item-idx.xml"/>
     <include file="0.5.x/add-picklist_items_idx.xml"/>
     <include file="0.5.x/rename-picklist_item_idx-to-picklist_items_idx.xml"/>
-	
+    <include file="0.5.x/rename-request_id-to-requisition_id-in-picklist.xml"/>	
 </databaseChangeLog>

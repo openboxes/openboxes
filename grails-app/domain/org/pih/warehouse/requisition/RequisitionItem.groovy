@@ -110,8 +110,7 @@ class RequisitionItem implements Serializable {
         comment: comment,
         recipient: recipient,
         substitutable: substitutable,
-        orderIndex: orderIndex,
-        picklistItems: picklistItems.collect { it.toJson() }
+        orderIndex: orderIndex
       ]
     }
 
