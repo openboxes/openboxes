@@ -22,11 +22,12 @@ describe('Requisition Processor View Model', function(){
         ],
      };
 
-       plItem1 = {id:"picklistItem1", requisitionItemId:"requisitionItem1", inventoryItemId:"inventoryItem1", quantity:300};
-       plItem2 = {id:"picklistItem2", requisitionItemId:"requisitionItem1", inventoryItemId:"inventoryItem2", quantity:100};
-       plItem3 = {id:"picklistItem3", requisitionItemId:"requisitionItem2", inventoryItemId:"inventoryItem3", quantity:50};
+       plItem1 = {id:"picklistItem1", requisitionItemId:"requisitionItem1", inventoryItemId:"inventoryItem1", quantity:300, version:2};
+       plItem2 = {id:"picklistItem2", requisitionItemId:"requisitionItem1", inventoryItemId:"inventoryItem2", quantity:100, version:3};
+       plItem3 = {id:"picklistItem3", requisitionItemId:"requisitionItem2", inventoryItemId:"inventoryItem3", quantity:50, version:4};
        picklistData = {
          id: "picklist1",
+         version: 1,
          picklistItems:[plItem1, plItem2, plItem3],
        };
 
@@ -40,7 +41,7 @@ describe('Requisition Processor View Model', function(){
        
     });
 
-    it('should build picklist items from inventory items when there is no picklist items given', function() {  
+    it('should build picklist items under requisition items from given inventory items and picklist items', function() {  
     
      var  viewModel = new openboxes.requisition.ProcessViewModel(requisitionData, picklistData, inventoryItemsData);
 
@@ -53,6 +54,8 @@ describe('Requisition Processor View Model', function(){
      var picklistItem3 = requisition.requisitionItems()[1].picklistItems()[0];
      expect(picklistItem1.inventoryItemId()).toEqual(inventoryItem1.inventoryItemId);
      expect(picklistItem1.requisitionItemId()).toEqual("requisitionItem1");
+     expect(picklistItem1.id()).toEqual(plItem1.id);
+     expect(picklistItem1.version()).toEqual(plItem1.version);
      expect(picklistItem1.lotNumber()).toEqual(inventoryItem1.lotNumber);
      expect(picklistItem1.expirationDate()).toEqual(inventoryItem1.expirationDate);
      expect(picklistItem1.quantityOnHand()).toEqual(inventoryItem1.quantityOnHand);
@@ -61,6 +64,8 @@ describe('Requisition Processor View Model', function(){
 
      expect(picklistItem2.inventoryItemId()).toEqual(inventoryItem2.inventoryItemId);
      expect(picklistItem2.requisitionItemId()).toEqual("requisitionItem1");
+     expect(picklistItem2.id()).toEqual(plItem2.id);
+     expect(picklistItem2.version()).toEqual(plItem2.version);
      expect(picklistItem2.lotNumber()).toEqual(inventoryItem2.lotNumber);
      expect(picklistItem2.expirationDate()).toEqual(inventoryItem2.expirationDate);
      expect(picklistItem2.quantityOnHand()).toEqual(inventoryItem2.quantityOnHand);
@@ -68,19 +73,78 @@ describe('Requisition Processor View Model', function(){
 
      expect(picklistItem3.inventoryItemId()).toEqual(inventoryItem3.inventoryItemId);
      expect(picklistItem3.requisitionItemId()).toEqual("requisitionItem2");
+     expect(picklistItem3.id()).toEqual(plItem3.id);
+     expect(picklistItem3.version()).toEqual(plItem3.version);
      expect(picklistItem3.lotNumber()).toEqual(inventoryItem3.lotNumber);
      expect(picklistItem3.expirationDate()).toEqual(inventoryItem3.expirationDate);
      expect(picklistItem3.quantityOnHand()).toEqual(inventoryItem3.quantityOnHand);
      expect(picklistItem3.quantityPicked()).toEqual(plItem3.quantity);
 
-     expect(viewModel.picklistId).toEqual(picklistData.id);
+     expect(viewModel.picklist.id()).toEqual(picklistData.id);
+     expect(viewModel.picklist.version()).toEqual(picklistData.version);
 
     });
 
-  
     describe("should save picklist", function(){
-      it("should get picklist items from requisition", function(){});
-         //var viewModel = new openboxes.requisition.ProcessViewModel(requisitionData, picklistData, inventoryItemsData);
+       it("should save new pick list", function(){
+         var viewModel = new openboxes.requisition.ProcessViewModel(requisitionData, {}, inventoryItemsData);
+         var form = {action:"url"};
+         viewModel.requisition.requisitionItems()[0].picklistItems()[0].quantityPicked(100);
+         viewModel.requisition.requisitionItems()[0].picklistItems()[1].quantityPicked(0);
+         viewModel.requisition.requisitionItems()[1].picklistItems()[0].quantityPicked(500);
+         viewModel.save(form);
+         var dataSent = JSON.parse(ajaxOptions.data);
+         expect(dataSent["id"]).toEqual("");
+         expect(dataSent["picklistItems"].length).toEqual(2);
+         expect(dataSent["picklistItems"][0].id).toEqual("");
+         expect(dataSent["picklistItems"][0]["requisitionItem.id"]).toEqual("requisitionItem1");
+         expect(dataSent["picklistItems"][0]["inventoryItem.id"]).toEqual(inventoryItem1.inventoryItemId);
+         expect(dataSent["picklistItems"][0]["quantity"]).toEqual(100);
+
+         expect(dataSent["picklistItems"][1].id).toEqual("");
+         expect(dataSent["picklistItems"][1]["requisitionItem.id"]).toEqual("requisitionItem2");
+         expect(dataSent["picklistItems"][1]["inventoryItem.id"]).toEqual(inventoryItem3.inventoryItemId);
+         expect(dataSent["picklistItems"][1]["quantity"]).toEqual(500);
+
+         var response = {success: true, data: {id: "picklist1", version:10,
+           picklistItems:[
+             {id: "pi1", version: 3, requisitionItemId: "requisitionItem1", inventoryItemId:"inventoryItem1" },
+             {id: "pi2", version:5, requisitionItemId: "requisitionItem2", inventoryItemId:"inventoryItem3" }
+             ]
+         }};
+         ajaxOptions.success(response);
+
+         expect(viewModel.picklist.id()).toEqual("picklist1");
+         expect(viewModel.picklist.version()).toEqual(10);
+         expect( viewModel.requisition.requisitionItems()[0].picklistItems()[0].id()).toEqual("pi1");
+         expect( viewModel.requisition.requisitionItems()[1].picklistItems()[0].id()).toEqual("pi2");
+         expect( viewModel.requisition.requisitionItems()[0].picklistItems()[0].version()).toEqual(3);
+         expect( viewModel.requisition.requisitionItems()[1].picklistItems()[0].version()).toEqual(5);
+
+
+
 
     });
+
+      it("should update pick list", function(){
+         var viewModel = new openboxes.requisition.ProcessViewModel(requisitionData, picklistData, inventoryItemsData);
+         var form = {action:"url"};
+         viewModel.requisition.requisitionItems()[0].picklistItems()[0].quantityPicked(100);
+         viewModel.requisition.requisitionItems()[0].picklistItems()[1].quantityPicked(0);
+         viewModel.requisition.requisitionItems()[1].picklistItems()[0].quantityPicked(500);
+         viewModel.save(form);
+         var dataSent = JSON.parse(ajaxOptions.data);
+         expect(dataSent["id"]).toEqual(picklistData.id);
+         expect(dataSent["picklistItems"].length).toEqual(2);
+         expect(dataSent["picklistItems"][0].id).toEqual(plItem1.id);
+         expect(dataSent["picklistItems"][0]["requisitionItem.id"]).toEqual(plItem1.requisitionItemId);
+         expect(dataSent["picklistItems"][0]["inventoryItem.id"]).toEqual(inventoryItem1.inventoryItemId);
+         expect(dataSent["picklistItems"][0]["quantity"]).toEqual(100);
+
+         expect(dataSent["picklistItems"][1].id).toEqual(plItem3.id);
+         expect(dataSent["picklistItems"][1]["requisitionItem.id"]).toEqual(plItem3.requisitionItemId);
+         expect(dataSent["picklistItems"][1]["inventoryItem.id"]).toEqual(inventoryItem3.inventoryItemId);
+         expect(dataSent["picklistItems"][1]["quantity"]).toEqual(500);
+    });
+  });
 });

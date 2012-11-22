@@ -28,6 +28,12 @@ openboxes.requisition.Requisition = function(attrs) {
       });
     };
 
+    self.findRequisitionItemById = function(id){
+      return _.find(self.requisitionItems(), function(requisitionItem){
+        return requisitionItem.id() == id;
+      });
+    };
+
    
     self.addItem = function () {
        self.requisitionItems.push(
@@ -70,6 +76,7 @@ openboxes.requisition.Picklist = function(attrs) {
     var self = this;
     if(!attrs) attrs = {};
     self.id = ko.observable(attrs.id);
+    self.version = ko.observable(attrs.version);
     self.requisitionId = ko.observable(attrs.requisitionId);
 };
 
@@ -77,6 +84,7 @@ openboxes.requisition.PicklistItem = function(attrs){
     var self = this;
     if(!attrs) attrs = {};
     self.id = ko.observable(attrs.id);
+    self.version = ko.observable(attrs.version);
     self.requisitionItemId = ko.observable(attrs.requisitionItemId);
     self.inventoryItemId = ko.observable(attrs.inventoryItemId);
     self.lotNumber = ko.observable(attrs.lotNumber);
@@ -84,6 +92,7 @@ openboxes.requisition.PicklistItem = function(attrs){
     self.quantityOnHand = ko.observable(attrs.quantityOnHand);
     self.quantityATP = ko.observable(attrs.quantityATP);
     self.quantityPicked = ko.observable(attrs.quantityPicked || 0);
+
 };
 
 openboxes.requisition.RequisitionItem = function(attrs) {
@@ -103,6 +112,12 @@ openboxes.requisition.RequisitionItem = function(attrs) {
     _.each(attrs.picklistItems, function(picklistItem){
       self.picklistItems.push(new openboxes.requisition.PicklistItem(picklistItem));
     });
+
+    self.findPicklistItemByInventoryItemId = function(inventoryItemId){
+      return _.find(self.picklistItems(), function(picklistItem){
+        return picklistItem.inventoryItemId() == inventoryItemId;
+      });
+    };
 
     self.quantityPicked = ko.computed(function() {
         var sum = 0;
@@ -133,24 +148,24 @@ openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData,
     console.log(requisitionData);
 
     self.requisition = new openboxes.requisition.Requisition(requisitionData);
-    self.picklistId = picklistData.id;
+    self.picklist = new openboxes.requisition.Picklist(picklistData);
 
    
     self.save = function(formElement) {
-        var data = ko.toJS(self.requisition);
-        delete data.version;
-        delete data.lastUpdated;
-        $.each(data.requisitionItems, function(index, item){
-            $.each(item.picklistItems, function(ind, pl) {
-                pl["picklist.id"] = self.picklistId;
+        var result = {id: self.picklist.id() || "", picklistItems:[]};
+        _.each(ko.toJS(self.requisition).requisitionItems, function(item){
+            _.each(item.picklistItems, function(pl) {
+              if(pl.quantityPicked != 0) {
+                pl["id"] = pl.id || "";
                 pl["inventoryItem.id"] = pl.inventoryItemId;
                 pl["requisitionItem.id"] = pl.requisitionItemId;
                 pl["quantity"] = pl.quantityPicked;
+                result.picklistItems.push(pl);
+              }
             });
-            delete item.version;
         });
-        var jsonString = JSON.stringify(data);
-        console.log("here is the req: "  + jsonString);
+        var jsonString = JSON.stringify(result);
+        console.log("here are the picklistItems: "  + jsonString);
         console.log("endpoint is " + formElement.action);
         
         jQuery.ajax({
@@ -162,6 +177,17 @@ openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData,
             success: function(result) {
                 console.log("result:" + JSON.stringify(result));
                 if(result.success){
+                  self.picklist.id(result.data.id);
+                  self.picklist.version(result.data.version);
+                  if(result.data.picklistItems) {
+                      _.each(result.data.picklistItems, function(picklistItem){
+                        var localRequisitionItem = self.requisition.findRequisitionItemById(picklistItem.requisitionItemId);
+                        console.log("********" + localRequisitionItem);
+                        var localItem = localRequisitionItem.findPicklistItemByInventoryItemId(picklistItem.inventoryItemId);
+                        localItem.id(picklistItem.id);
+                        localItem.version(picklistItem.version);
+                      });
+                   }
                 }
             }
         });
@@ -175,8 +201,11 @@ openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData,
         var matchedPicklistItem = _.find(picklistData.picklistItems, function(picklistItem){
           return picklistItem.requisitionItemId == requisitionItem.id && picklistItem.inventoryItemId == picklistItemData.inventoryItemId;
         });
-        if(matchedPicklistItem)
+        if(matchedPicklistItem){
           picklistItemData.quantityPicked = matchedPicklistItem.quantity;
+          picklistItemData.id = matchedPicklistItem.id;
+          picklistItemData.version = matchedPicklistItem.version;
+        }
         return picklistItemData;
       });
     }
@@ -194,7 +223,7 @@ openboxes.requisition.ViewModel = function(requisition) {
         delete data.version;
         delete data.status;
         delete data.lastUpdated;
-        $.each(data.requisitionItems, function(index, item){
+        _.each(data.requisitionItems, function(item){
           item["product.id"] = item.productId;
           delete item.version;
         });
