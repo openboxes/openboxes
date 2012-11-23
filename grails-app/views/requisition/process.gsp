@@ -99,7 +99,13 @@
 
         $("#requisitionForm").validate({ submitHandler: viewModel.save });
 
-        $("#accordion").accordion({header:".accordion-header", icons:false, active:false, collapsible:true});
+        $("#accordion").accordion({
+          header: ".accordion-header", 
+          icons: false, 
+          active:false,
+          collapsible: true,
+          heightStyle: "content"
+          });
     });
 </script>
 

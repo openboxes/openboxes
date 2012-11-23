@@ -145,22 +145,30 @@
     <input type="hidden" data-bind="value: requisition.id"/>
     <div class="center">
         <g:isUserInRole roles="[RoleType.ROLE_ADMIN]">
-            <input type="button" data-bind='click: deleteRequisition, visible: requisition.id' value="${warehouse.message(code: 'default.button.delete.label')}"/>
+            <input type="button" id="deleteRequisition" data-bind='visible: requisition.id' value="${warehouse.message(code: 'default.button.delete.label')}"/>
         </g:isUserInRole>
       <input type="submit" id="save-requisition" value="${warehouse.message(code: 'default.button.save.label')}"/>
             &nbsp;
-        <input type="button" data-bind='click: processRequisition, visible: requisition.id' value="${warehouse.message(code:'requisition.process.label')}" />
+       <g:link class="list" action="process" id="${requisitionId}">
+         <input type="button" value="${warehouse.message(code:'requisition.process.label')}"/>
+         </g:link>
         &nbsp;
       <g:link action="list">
-		<input type="button" value="${warehouse.message(code: 'default.button.cancel.label')}"/>
-	  </g:link>
+		    <input type="button" value="${warehouse.message(code: 'default.button.cancel.label')}"/>
+	    </g:link>
 
     </div>
   </g:form>
+  <g:form name="deleteRequisitionForm" method="post" action="delete">
+    <input type="hidden" name="id" value="${requisitionId}"></input>
+  </g:form>
+
+
 
 <script type="text/javascript">
     $(function () {
         $("#flash").hide();
+        $("#deleteRequisition").click(function(){$("#deleteRequisitionForm").submit();});
         var requisitionFromServer = ${requisition};
         var requisitionFromLocal = openboxes.requisition.getRequisitionFromLocal(requisitionFromServer.id);
         var requisitionData = openboxes.requisition.Requisition.getNewer(requisitionFromServer, requisitionFromLocal);

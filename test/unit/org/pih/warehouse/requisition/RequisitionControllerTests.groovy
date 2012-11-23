@@ -47,6 +47,7 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         controller.params.id = "1234"
         def model =  controller.edit()
         def json = JSON.parse(model.requisition)
+        assert model.requisitionId == requisition.id
         assert json.id == requisition.toJson().id
         assert json.name == requisition.toJson().name
     }

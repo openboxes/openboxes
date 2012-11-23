@@ -221,14 +221,6 @@ openboxes.requisition.ViewModel = function(requisition, savedCallback) {
     self.requisition = requisition;
     self.savedCallback = savedCallback;
     
-    self.processRequisition = function () {
-        window.location = '../process/' + self.requisition.id();
-    };
-    
-    self.deleteRequisition = function () {
-        window.location = '../delete/' + self.requisition.id();
-    };
-
     self.save = function(formElement) {
         var data = ko.toJS(self.requisition);
         data["origin.id"] = data.originId;

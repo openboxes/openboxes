@@ -25,7 +25,7 @@ class RequisitionController {
     def requisitionService
     def inventoryService
 
-    static allowedMethods = [save: "POST", update: "POST"]
+    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def index = {
         redirect(action: "list", params: params)
@@ -55,7 +55,7 @@ class RequisitionController {
         if(requisition) {
            def depots = getDepots()
            String jsonString = requisition.toJson() as JSON
-           return [requisition: jsonString, depots: depots];  
+           return [requisition: jsonString, depots: depots, requisitionId: requisition.id];  
         }else
         {
           response.sendError(404)
