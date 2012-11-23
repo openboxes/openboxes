@@ -11,11 +11,12 @@
     <content tag="pageTitle"><warehouse:message code="default.edit.label" args="[entityName]" /></content>
 </head>
 <body>
+<div class="message" id="flash"></div>
 <div class="body">
     <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
     </g:if>
-    <div id="picklist" class="left">
+    <div id="picklist" class="left ui-validation">
         <div id="requisition-header">
             <div class="title" id="description" data-bind="html: requisition.name"></div>
             <div class="time-stamp fade" data-bind="text: requisition.lastUpdated"></div>
@@ -46,12 +47,14 @@
                           <div class="quantity-picked"><warehouse:message code="inventoryItem.quantityPicked.label"/></div>
                           <div class="clear"></div>
                       </div>
-                      <div class="picklist-items" data-bind="foreach: picklistItems">
+                      <div class="picklist-items ui-validation-items" data-bind="foreach: picklistItems">
                           <div class="product-name picklist-field" data-bind="text: $parent.productName"></div>
                           <div class="lot picklist-field" data-bind="text: lotNumber"></div>
                           <div class="expiration-date picklist-field" data-bind="text: expirationDate"></div>
                           <div class="quantity-onhand picklist-field" data-bind="text: quantityOnHand"></div>
-                          <div class="quantity-picked"><input data-bind="value: quantityPicked" type="text"></input></div>
+                          <div class="quantity-picked">
+                            <input data-bind="value: quantityPicked" type="text" class="number"></input>
+                          </div>
                           <div class="clear"></div>
                       </div>
                     </div>
@@ -94,6 +97,7 @@
 <script type="text/javascript">
     $(function(){
         var viewModel;
+        $("#flash").hide();
         var data = ${data};
         var picklistFromServer = data.picklist;
         var requisitionFromlocal =  openboxes.requisition.getRequisitionFromLocal(data.requisition.id);
@@ -104,9 +108,14 @@
         else
           viewModel = new openboxes.requisition.ProcessViewModel(data.requisition, data.picklist, data.productInventoryItemsMap);
 
-        ko.applyBindings(viewModel);
+        viewModel.savedCallback = function(){
+           $("#flash").text("${warehouse.message(code:'requisition.saved.message')}").show().delay(3000).fadeOut("slow");
+        };
 
+        ko.applyBindings(viewModel);
         $("#requisitionForm").validate({ submitHandler: viewModel.save });
+
+
 
         $("#accordion").accordion({
           header: ".accordion-header", 
@@ -126,8 +135,10 @@
           if(input.val() == "") input.val("0");
         });
         $(".quantity-picked input").keyup(function(){
-           this.value=this.value.replace(/[^\d]/,'')        
+           this.value=this.value.replace(/[^\d]/,'');      
         });
+
+      
     });
 </script>
 

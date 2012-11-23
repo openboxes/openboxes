@@ -16,7 +16,6 @@ describe("requisition view model", function(){
     var requisitionItem2 = {productId:"prod2", quantity:400, version:2,
     comment:"my comment2", substitutable:false, recipient: "tim",orderIndex: 1};
 
-    var savedCallbackCalled = false;
     var requisition = new openboxes.requisition.Requisition({
       originId: originId,
       version: 3,
@@ -27,7 +26,7 @@ describe("requisition view model", function(){
       requestedById: requestedById,
       recipientProgram:recipientProgram,
       requisitionItems: [requisitionItem1, requisitionItem2]});
-    var viewModel = new openboxes.requisition.ViewModel(requisition, function(){savedCallbackCalled = true;});
+    var viewModel = new openboxes.requisition.ViewModel(requisition);
     var formElement ={
       action:"testAction"
     }
@@ -77,7 +76,6 @@ describe("requisition view model", function(){
     expect(requisition.requisitionItems()[1].id()).toBe("item2");
     expect(requisition.requisitionItems()[0].version()).toBe(2);
     expect(requisition.requisitionItems()[1].version()).toBe(1);
-    expect(savedCallbackCalled).toBe(true);
      
   });
 

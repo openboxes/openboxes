@@ -114,7 +114,7 @@
               data-bind="search_product: {source: '${request.contextPath }/json/searchProduct'}, uniqueName: true, value: productName" size="50"/>
           </td>
           <td  class="list-header">
-            <input type="text" class="required number" size="6" 
+            <input type="text" class="required number quantity" size="6" 
             data-bind="value: quantity,uniqueName: true"/>
           </td>
           <td  class="center">
@@ -172,10 +172,11 @@
         var requisitionData = openboxes.requisition.Requisition.getNewer(requisitionFromServer, requisitionFromLocal);
         var requisition = new openboxes.requisition.Requisition(requisitionData);
         var requisitionId = requisition.id();
-        var viewModel = new openboxes.requisition.ViewModel(requisition, function(){
+        var viewModel = new openboxes.requisition.ViewModel(requisition);
+        viewModel.savedCallback = function(){
             if(!requisitionId) window.location = "${request.contextPath}/requisition/edit/" + requisition.id();
-            $("#flash").text("Requistion saved").show().delay(3000).fadeOut("slow");
-          });
+            $("#flash").text("${warehouse.message(code:'requisition.saved.message')}").show().delay(3000).fadeOut("slow");
+        };
         ko.applyBindings(viewModel);
 
         $("#requisitionForm").validate({ submitHandler: viewModel.save });
@@ -196,6 +197,11 @@
         setInterval(function () {
             openboxes.requisition.saveRequisitionToLocal(requisition);
         }, 3000);
+
+        $("input.quantity").keyup(function(){
+           this.value=this.value.replace(/[^\d]/,'');      
+        });
+
     });
 </script>
 </body>

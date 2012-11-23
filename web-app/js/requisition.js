@@ -153,6 +153,7 @@ openboxes.requisition.RequisitionItem = function(attrs) {
 
 openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData, inventoryItemsData) {
     var self = this;
+
     if(picklistData && inventoryItemsData){
       requisitionData.picklist = picklistData;
       _.each(requisitionData.requisitionItems, function(requisitionItem){
@@ -198,6 +199,7 @@ openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData,
                         localItem.version(picklistItem.version);
                       });
                    }
+                   if(self.savedCallback) self.savedCallback();
                 }
             }
         });
@@ -222,10 +224,9 @@ openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData,
     }
 };
 
-openboxes.requisition.ViewModel = function(requisition, savedCallback) {
+openboxes.requisition.ViewModel = function(requisition) {
     var self = this;
     self.requisition = requisition;
-    self.savedCallback = savedCallback;
     
     self.save = function(formElement) {
         var data = ko.toJS(self.requisition);

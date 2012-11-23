@@ -131,7 +131,17 @@ ko.bindingHandlers.autocompleteWithId = {
 
         }
 };
-
+//ko.bindingHandlers.numberOnly = {
+//  init: function (element, params) {
+//     $(element).change(function(){
+//        if(this.value == "") this.value = "0";
+//     });
+//     $(element).keyup(function(){
+//       this.value=this.value.replace(/[^\d]/,'');      
+//     });
+//  }
+//};
+         
 
 
 

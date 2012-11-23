@@ -1131,6 +1131,80 @@ img.photo_tiny {
 span.tag { border: 1px solid #a5d24a; -moz-border-radius:2px; -webkit-border-radius:2px; display: block; float: left; padding: 5px; text-decoration:none; background: #cde69c; color: #638421; margin-right: 5px; margin-bottom:5px;font-family: helvetica;  font-size:13px;}
 span.tag a { font-weight: none; color: #82ad2b; text-decoration:none; font-size: 11px;  } 
 
+/*generic float*/
+div.left{
+    float: left;
+}
+div.right{
+    float: right;
+}
+div.clear {
+    clear: both;
+}
+
+/*requisition */
+
+#requisition-header{
+    padding: 0.5em;
+    margin-left: 0.5em;
+    margin-bottom: 2.0em
+}
+
+#requisition-header .title {
+    font-size: 1.5em;
+    font-weight: bold;
+    line-height: 1em;
+    float: left;
+}
+
+#requisition-header .status, #requisition-header .time-stamp{
+    float: right;
+    font-size: 1.0em;
+    margin-left: 1.5em;
+}
+
+
+/*requisition item search auto complete*/
+.ui-autocomplete span.product-group{
+    font-style: italic;
+}
+
+.list-header {
+    padding-left: 10px;
+
+}
+
+
+.ui_datepicker{
+    background-image: url(../images/icons/silk/calendar.png);
+    background-repeat: no-repeat;
+    background-position: right;
+}
+
+
+
+/*fix ui-validation error message styling issue*/
+.ui-validation label.error{
+  display: inline;
+  color: #EA5200;
+  border: 0px;
+  background: url(../images/icons/silk/exclamation.png) no-repeat center left;
+  padding-left: 16px;
+  padding-bottom: 2px;
+  padding-top: 2px;
+  font-weight: bold;
+}
+
+.ui-validation-items label.error{
+  display: block;
+ }
+
+.ui-validation input.error, .ui-validation  select.error{
+  padding: 2px;
+  background-color: white;
+  border: 2px solid #EA5200;
+}
+
 
 /*process requisition item */
 
