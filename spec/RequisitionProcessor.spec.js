@@ -94,8 +94,8 @@ describe('Requisition Processor View Model', function(){
      expect(picklistItem4.quantityPicked()).toEqual(0);
 
 
-     expect(viewModel.picklist.id()).toEqual(picklistData.id);
-     expect(viewModel.picklist.version()).toEqual(picklistData.version);
+     expect(viewModel.requisition.picklist.id()).toEqual(picklistData.id);
+     expect(viewModel.requisition.picklist.version()).toEqual(picklistData.version);
 
     });
 
@@ -129,8 +129,8 @@ describe('Requisition Processor View Model', function(){
          }};
          ajaxOptions.success(response);
 
-         expect(viewModel.picklist.id()).toEqual("picklist1");
-         expect(viewModel.picklist.version()).toEqual(10);
+         expect(viewModel.requisition.picklist.id()).toEqual("picklist1");
+         expect(viewModel.requisition.picklist.version()).toEqual(10);
          expect( viewModel.requisition.requisitionItems()[0].picklistItems()[0].id()).toEqual("pi1");
          expect( viewModel.requisition.requisitionItems()[1].picklistItems()[0].id()).toEqual("pi2");
          expect( viewModel.requisition.requisitionItems()[0].picklistItems()[0].version()).toEqual(3);

@@ -1,5 +1,30 @@
 if(typeof openboxes === "undefined") openboxes = {};
 if(typeof openboxes.requisition === "undefined") openboxes.requisition = {};
+openboxes.requisition.Picklist = function(attrs) {
+    var self = this;
+    if(!attrs) attrs = {};
+    self.id = ko.observable(attrs.id);
+    self.version = ko.observable(attrs.version);
+    self.requisitionId = ko.observable(attrs.requisitionId);
+    var getPickedItems = attrs.getPickedItems;
+    self.picklistItems = [];
+    self.updatePickedItems = function(){ self.picklistItems = getPickedItems();};
+};
+
+openboxes.requisition.PicklistItem = function(attrs){
+    var self = this;
+    if(!attrs) attrs = {};
+    self.id = ko.observable(attrs.id);
+    self.version = ko.observable(attrs.version);
+    self.requisitionItemId = ko.observable(attrs.requisitionItemId);
+    self.inventoryItemId = ko.observable(attrs.inventoryItemId);
+    self.lotNumber = ko.observable(attrs.lotNumber);
+    self.expirationDate = ko.observable(attrs.expirationDate);
+    self.quantityOnHand = ko.observable(attrs.quantityOnHand);
+    self.quantityATP = ko.observable(attrs.quantityATP);
+    self.quantityPicked = ko.observable(attrs.quantityPicked || 0);
+
+};
 openboxes.requisition.Requisition = function(attrs) {
     var self = this;
     if(!attrs) attrs = {};
@@ -16,12 +41,16 @@ openboxes.requisition.Requisition = function(attrs) {
     self.version = ko.observable(attrs.version);
     self.requisitionItems = ko.observableArray([]);
     self.name = ko.observable(attrs.name);
-    
+    self.getPickedItems = getPickedItems; 
     _.each(attrs.requisitionItems, function(requisitionItemData){
       self.requisitionItems.push(new openboxes.requisition.RequisitionItem(requisitionItemData));
-
     });
 
+    var picklist = attrs.picklist || {}
+    picklist.requisitionId = attrs.id;
+    picklist.getPickedItems = self.getPickedItems;
+    self.picklist = new openboxes.requisition.Picklist(picklist);
+ 
     self.findRequisitionItemByOrderIndex = function(orderIndex){
       return _.find(self.requisitionItems(), function(requisitionItem){
         return requisitionItem.orderIndex() == orderIndex;
@@ -52,11 +81,6 @@ openboxes.requisition.Requisition = function(attrs) {
             self.addItem();
     } 
 
-    self.id.subscribe(function(newValue) {
-        if(newValue){
-          self.addItem();
-        }
-    });
 
     //private functions
     function newOrderIndex(){
@@ -68,32 +92,20 @@ openboxes.requisition.Requisition = function(attrs) {
       return orderIndex + 1;
     };
 
-
-    
+    function getPickedItems(){
+      var picklistItems = [];
+      _.each(self.requisitionItems(), function(requisitionItem){
+        var pickedItems = _.filter(requisitionItem.picklistItems(), function(picklistItem){
+          return picklistItem.quantityPicked() > 0;
+        });
+        _.each(pickedItems, function(picklistItem){
+          picklistItems.push(picklistItem);
+        });
+      });
+      return picklistItems;
+    }
  };
 
-openboxes.requisition.Picklist = function(attrs) {
-    var self = this;
-    if(!attrs) attrs = {};
-    self.id = ko.observable(attrs.id);
-    self.version = ko.observable(attrs.version);
-    self.requisitionId = ko.observable(attrs.requisitionId);
-};
-
-openboxes.requisition.PicklistItem = function(attrs){
-    var self = this;
-    if(!attrs) attrs = {};
-    self.id = ko.observable(attrs.id);
-    self.version = ko.observable(attrs.version);
-    self.requisitionItemId = ko.observable(attrs.requisitionItemId);
-    self.inventoryItemId = ko.observable(attrs.inventoryItemId);
-    self.lotNumber = ko.observable(attrs.lotNumber);
-    self.expirationDate = ko.observable(attrs.expirationDate);
-    self.quantityOnHand = ko.observable(attrs.quantityOnHand);
-    self.quantityATP = ko.observable(attrs.quantityATP);
-    self.quantityPicked = ko.observable(attrs.quantityPicked || 0);
-
-};
 
 openboxes.requisition.RequisitionItem = function(attrs) {
     var self = this;
@@ -141,35 +153,29 @@ openboxes.requisition.RequisitionItem = function(attrs) {
 
 openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData, inventoryItemsData) {
     var self = this;
-    _.each(requisitionData.requisitionItems, function(requisitionItem){
-      requisitionItem.picklistItems = getPicklistItems(requisitionItem);
-    });
-
-    console.log(requisitionData);
-
-    self.requisition = new openboxes.requisition.Requisition(requisitionData);
-    self.picklist = new openboxes.requisition.Picklist(picklistData);
-
+    if(picklistData && inventoryItemsData){
+      requisitionData.picklist = picklistData;
+      _.each(requisitionData.requisitionItems, function(requisitionItem){
+        requisitionItem.picklistItems = createPicklistItems(requisitionItem);
+      });
+      self.requisition = new openboxes.requisition.Requisition(requisitionData);
+    }else{
+      self.requisition = new openboxes.requisition.Requisition(requisitionData);
+   }
    
     self.save = function(formElement) {
-        var result = {
-          id: self.picklist.id() || "",
-          "requisition.id": self.requisition.id(),
-          picklistItems:[]
-          };
-        _.each(ko.toJS(self.requisition).requisitionItems, function(item){
-            _.each(item.picklistItems, function(pl) {
-              if(pl.quantityPicked != 0) {
-                pl["id"] = pl.id || "";
-                pl["inventoryItem.id"] = pl.inventoryItemId;
-                pl["requisitionItem.id"] = pl.requisitionItemId;
-                pl["quantity"] = pl.quantityPicked;
-                delete pl.version;
-                result.picklistItems.push(pl);
-              }
-            });
+        self.requisition.picklist.updatePickedItems();
+        var picklist = ko.toJS(self.requisition.picklist);
+        picklist["id"] = picklist.id || "";
+        picklist["requisition.id"] = picklist.requisitionId;
+        _.each(picklist.picklistItems, function(pickedItem){
+              pickedItem["id"] = pickedItem.id || "";
+              pickedItem["inventoryItem.id"] = pickedItem.inventoryItemId;
+              pickedItem["requisitionItem.id"] = pickedItem.requisitionItemId;
+              pickedItem["quantity"] = pickedItem.quantityPicked;
+              delete pickedItem.version;
         });
-        var jsonString = JSON.stringify(result);
+        var jsonString = JSON.stringify(picklist);
         console.log("here are the picklistItems: "  + jsonString);
         console.log("endpoint is " + formElement.action);
         
@@ -182,8 +188,8 @@ openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData,
             success: function(result) {
                 console.log("result:" + JSON.stringify(result));
                 if(result.success){
-                  self.picklist.id(result.data.id);
-                  self.picklist.version(result.data.version);
+                  self.requisition.picklist.id(result.data.id);
+                  self.requisition.picklist.version(result.data.version);
                   if(result.data.picklistItems) {
                       _.each(result.data.picklistItems, function(picklistItem){
                         var localRequisitionItem = self.requisition.findRequisitionItemById(picklistItem.requisitionItemId);
@@ -198,7 +204,7 @@ openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData,
     };
 
   //private functions
-   function getPicklistItems(requisitionItem){
+   function createPicklistItems(requisitionItem){
        var inventoryItems = inventoryItemsData[requisitionItem.productId];
        return  _.map(inventoryItems, function(picklistItemData){
         picklistItemData.version = null;

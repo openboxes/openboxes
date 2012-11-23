@@ -28,19 +28,33 @@ describe("requisition model", function(){
  
 
 
-  it("should build requisition item models when build requisition model", function(){
+  it("should build requisition items and picklist items when build requisition", function(){
+    var pickItem1 ={quantityPicked: 15, inventoryItemId: "ii1", requisitionItemIs:"item1"};
+    var pickItem2 ={quantityPicked: 0, inventoryItemId: "ii2", requisitionItemIs:"item1"};
+    var pickItem3 ={quantityPicked: 0, inventoryItemId: "ii3", requisitionItemIs:"item2"};
+    var pickItem4 ={quantityPicked: 30, inventoryItemId: "ii4", requisitionItemIs:"item2"};
     var data = {
       id: "abc",
+      picklist: {id:"picklist1"},
       requisitionItems: [
-        {id: "item1", orderIndex: 3},
-        {id: "item2", orderIndex: 2}
+        {id: "item1", orderIndex: 3, picklistItems: [pickItem1, pickItem2], quantity: 5000},
+        {id: "item2", orderIndex: 2, picklistItems: [pickItem3, pickItem4], quantity: 4500}
       ]
     };
     var requisition = new openboxes.requisition.Requisition(data);
     expect(requisition.requisitionItems()[0].id()).toBe("item1");
+    expect(requisition.requisitionItems()[0].picklistItems()[0].quantityPicked()).toBe(15);
+    expect(requisition.requisitionItems()[0].picklistItems()[0].inventoryItemId()).toBe("ii1");
     expect(requisition.requisitionItems()[0].orderIndex()).toBe(3);
     expect(requisition.requisitionItems()[1].id()).toBe("item2");
     expect(requisition.requisitionItems()[1].orderIndex()).toBe(2);
+    expect(requisition.picklist.id()).toEqual("picklist1");
+    requisition.picklist.updatePickedItems();
+    var pickedItems = requisition.picklist.picklistItems;
+    expect(pickedItems.length).toBe(2);
+    expect(pickedItems[0].inventoryItemId()).toEqual("ii1");
+    expect(pickedItems[0].quantityPicked()).toEqual(15);
+    expect(pickedItems[1].inventoryItemId()).toEqual("ii4");
   });
 
   describe("should find newer version between two requisition json objects", function(){
