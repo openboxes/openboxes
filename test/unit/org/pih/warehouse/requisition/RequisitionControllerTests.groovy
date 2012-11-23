@@ -240,11 +240,20 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         def requisition = new Requisition(id: "1234", name: "jim", recipientProgram:"abc")
         mockDomain(Requisition, [requisition])
         mockDomain(Location, [])
-        controller.params.id = "1234"
-        controller.cancel()
 
-        assert controller.redirectArgs.action == "list"
-        assert requisition.status == RequisitionStatus.CANCELED
+        def stubMessager = new Expando()
+        stubMessager.message = { args -> return "cancelled" }
+        controller.metaClass.warehouse = stubMessager;
+        
+        def requisitionServiceMock = mockFor(RequisitionService)
+        requisitionServiceMock.demand.deleteRequisition { true }
+        controller.requisitionService = requisitionServiceMock.createMock()
+        controller.params.id = "1234"
+        controller.delete()
+
+        requisitionServiceMock.verify()
+        assert redirectArgs.action == "list"
+        assert controller.flash.message == "cancelled"
     }
 
 }

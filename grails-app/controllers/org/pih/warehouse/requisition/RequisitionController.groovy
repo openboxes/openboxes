@@ -103,7 +103,8 @@ class RequisitionController {
     def cancel = {
         def requisition = Requisition.get(params?.id)
         if (requisition) {
-            requisition.status = RequisitionStatus.CANCELED
+            requisitionService.cancelRequisition(requisition)
+            flash.message = "${warehouse.message(code: 'default.cancelled.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
         }
         redirect(action: "list")
     }
@@ -178,17 +179,15 @@ class RequisitionController {
             try {
                 requisitionService.deleteRequisition(requisition)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
-                redirect(action: "list")
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
-                redirect(action: "list", id: params.id)
             }
         }
         else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
-            redirect(action: "list")
         }
+        redirect(action: "list", id:params.id)
     }
 
     def addComment = {

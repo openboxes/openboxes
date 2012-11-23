@@ -155,7 +155,7 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
         mockDomain(RequisitionItem, [requisitionItem1, requisitionItem2])
 
         def service = new RequisitionService()
-        def success = service.deleteRequisition(requisition)
+        service.deleteRequisition(requisition)
         def requisitionFromDb = Requisition.get(requisition.id)
         assert !requisitionFromDb
 
@@ -173,7 +173,8 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
         mockDomain(Requisition, [requisition])
 
         def service = new RequisitionService()
-        def requisitionFromDb = service.cancelRequisition(requisition)
+        service.cancelRequisition(requisition)
+        def requisitionFromDb = Requisition.get(requisition.id)
 
         assert requisitionFromDb.status == RequisitionStatus.CANCELED 
     }
