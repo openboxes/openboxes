@@ -93,8 +93,17 @@
 
 <script type="text/javascript">
     $(function(){
+        var viewModel;
         var data = ${data};
-        var viewModel = new openboxes.requisition.ProcessViewModel(data.requisition, data.picklist, data.productInventoryItemsMap);
+        var picklistFromServer = data.picklist;
+        var requisitionFromlocal =  openboxes.requisition.getRequisitionFromLocal(data.requisition.id);
+        var picklistFromLocal = requisitionFromlocal == null? null : requisitionFromlocal.picklist;
+        var newerPicklist = openboxes.requisition.Picklist.getNewer(picklistFromServer, picklistFromLocal);
+        if(newerPicklist == picklistFromLocal && requisitionFromlocal.requisitionItems[0].picklistItems.length > 0)
+          viewModel =  new openboxes.requisition.ProcessViewModel(requisitionFromlocal);
+        else
+          viewModel = new openboxes.requisition.ProcessViewModel(data.requisition, data.picklist, data.productInventoryItemsMap);
+
         ko.applyBindings(viewModel);
 
         $("#requisitionForm").validate({ submitHandler: viewModel.save });
@@ -106,6 +115,11 @@
           collapsible: true,
           heightStyle: "content"
           });
+
+        setInterval(function () {
+            viewModel.requisition.picklist.updatePickedItems();
+            openboxes.requisition.saveRequisitionToLocal(viewModel.requisition);
+        }, 3000);
     });
 </script>
 

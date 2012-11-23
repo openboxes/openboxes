@@ -89,17 +89,17 @@ describe("requisition view model", function(){
     expect(retrievedModel.name).toEqual(model.name);
   });
 
-  it("should save requistion to local", function(){
-    var model = {id:"1234",name:"test"};
+  it("should save requisition to local", function(){
+    var model = new openboxes.requisition.Requisition({id:"1234",name:"test"});
     var key = openboxes.requisition.saveRequisitionToLocal(model);
     expect(key).toEqual("openboxesRequisition1234");
     var retrievedModel = openboxes.getFromLocal(key);
-    expect(retrievedModel).toEqual(model);
-    expect(openboxes.requisition.getRequisitionFromLocal(model.id)).toEqual(model);
+    expect(retrievedModel.name).toEqual(model.name());
+    expect(openboxes.requisition.getRequisitionFromLocal(model.id()).id).toEqual(model.id());
   });
 
    it("should not save requistion to local if it has no id", function(){
-    var model = {name:"test"};
+    var model =  new openboxes.requisition.Requisition({name:"test"});
     var key = openboxes.requisition.saveRequisitionToLocal(model);
     expect(key).toBeNull();
    });

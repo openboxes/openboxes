@@ -316,5 +316,28 @@ openboxes.requisition.Requisition.getNewer = function(serverData, localData){
   return localData;
 };
 
+openboxes.requisition.Picklist.getNewer = function(serverData, localData){
+  if(!localData) return serverData;
+  if(serverData.version > localData.version) return serverData;
+  if(serverData.version < localData.version) return localData;
+  if(!serverData.picklistItems) serverData.picklistItems = [];
+  if(!localData.picklistItems) localData.picklistItems = [];
+  var serverItemIdVersionMap ={}
+  for(var idx in serverData.picklistItems){
+    var serverItem = serverData.picklistItems[idx];
+    serverItemIdVersionMap[serverItem.id] = serverItem.version;
+  }
+  for(var idx in localData.picklistItems){
+    var localItem = localData.picklistItems[idx];
+    if(localItem.version!=null && localItem.id !=null && serverItemIdVersionMap[localItem.id]!=null ){
+      if(localItem.version < serverItemIdVersionMap[localItem.id]){
+       return serverData;
+      }
+    }
+  }
+  return localData;
+};
+
+
 
 
