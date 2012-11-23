@@ -10,6 +10,7 @@
 
 </head>
 <body>
+<div class="message" id="flash"></div>
 <g:form name="requisitionForm" method="post" action="save">
   <div class="dialog box  ui-validation">
     <div id="requisition-header">
@@ -49,7 +50,7 @@
         <td class="value">
           <input data-bind="value: requisition.requestedById" type="hidden"/>
           <input id="requestedBy" name="requestedBy"
-            class="autocomplete"
+            class="autocomplete required"
             placeholder="${warehouse.message(code:'requisition.requestedBy.label')}"
             data-bind="autocompleteWithId: {source: '${request.contextPath }/json/searchPersonByName'}, value: requisition.requestedByName"/>
          </td>
@@ -159,11 +160,16 @@
 
 <script type="text/javascript">
     $(function () {
+        $("#flash").hide();
         var requisitionFromServer = ${requisition};
         var requisitionFromLocal = openboxes.requisition.getRequisitionFromLocal(requisitionFromServer.id);
         var requisitionData = openboxes.requisition.Requisition.getNewer(requisitionFromServer, requisitionFromLocal);
         var requisition = new openboxes.requisition.Requisition(requisitionData);
-        var viewModel = new openboxes.requisition.ViewModel(requisition);
+        var requisitionId = requisition.id();
+        var viewModel = new openboxes.requisition.ViewModel(requisition, function(){
+            if(!requisitionId) window.location = "${request.contextPath}/requisition/edit/" + requisition.id();
+            $("#flash").text("Requistion saved").show().delay(3000).fadeOut("slow");
+          });
         ko.applyBindings(viewModel);
 
         $("#requisitionForm").validate({ submitHandler: viewModel.save });

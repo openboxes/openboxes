@@ -11,6 +11,8 @@ describe('Requisition Processor View Model', function(){
      var inventoryItem1;
      var inventoryItem2;
      var inventoryItem3;
+     var inventoryItem4;
+
      var inventoryItemsData;
    
     beforeEach(function(){
@@ -31,12 +33,13 @@ describe('Requisition Processor View Model', function(){
          picklistItems:[plItem1, plItem2, plItem3],
        };
 
-       inventoryItem1 =  {inventoryItemId:"inventoryItem1", lotNumber:"batch1", expirationDate: "12/20/2012", quantityOnHand: 300};
-       inventoryItem2 =  {inventoryItemId:"inventoryItem2", lotNumber:"batch2", expirationDate: "12/21/2012", quantityOnHand: 400};
-       inventoryItem3 =  {inventoryItemId:"inventoryItem3", lotNumber:"batch3", expirationDate: "12/23/2012", quantityOnHand:00};
+       inventoryItem1 =  {inventoryItemId:"inventoryItem1", lotNumber:"batch1", expirationDate: "12/20/2012", quantityOnHand: 300, version: 33};
+       inventoryItem2 =  {inventoryItemId:"inventoryItem2", lotNumber:"batch2", expirationDate: "12/21/2012", quantityOnHand: 400, version: 44};
+       inventoryItem3 =  {inventoryItemId:"inventoryItem3", lotNumber:"batch3", expirationDate: "12/23/2012", quantityOnHand:00, version: 55};
+       inventoryItem4 =  {inventoryItemId:"inventoryItem4", lotNumber:"batch4", expirationDate: "12/25/2012", quantityOnHand:00, version: 66};
        inventoryItemsData = {
         "prod1": [ inventoryItem1, inventoryItem2],
-        "prod2": [ inventoryItem3 ]
+        "prod2": [ inventoryItem3, inventoryItem4]
        }
        
     });
@@ -52,6 +55,7 @@ describe('Requisition Processor View Model', function(){
      var picklistItem1 = requisition.requisitionItems()[0].picklistItems()[0];
      var picklistItem2 = requisition.requisitionItems()[0].picklistItems()[1];
      var picklistItem3 = requisition.requisitionItems()[1].picklistItems()[0];
+     var picklistItem4 = requisition.requisitionItems()[1].picklistItems()[1];
      expect(picklistItem1.inventoryItemId()).toEqual(inventoryItem1.inventoryItemId);
      expect(picklistItem1.requisitionItemId()).toEqual("requisitionItem1");
      expect(picklistItem1.id()).toEqual(plItem1.id);
@@ -79,6 +83,16 @@ describe('Requisition Processor View Model', function(){
      expect(picklistItem3.expirationDate()).toEqual(inventoryItem3.expirationDate);
      expect(picklistItem3.quantityOnHand()).toEqual(inventoryItem3.quantityOnHand);
      expect(picklistItem3.quantityPicked()).toEqual(plItem3.quantity);
+
+     expect(picklistItem4.inventoryItemId()).toEqual(inventoryItem4.inventoryItemId);
+     expect(picklistItem4.requisitionItemId()).toEqual("requisitionItem2");
+     expect(picklistItem4.id()).toBeUndefined();
+     expect(picklistItem4.version()).toBeNull();
+     expect(picklistItem4.lotNumber()).toEqual(inventoryItem4.lotNumber);
+     expect(picklistItem4.expirationDate()).toEqual(inventoryItem4.expirationDate);
+     expect(picklistItem4.quantityOnHand()).toEqual(inventoryItem4.quantityOnHand);
+     expect(picklistItem4.quantityPicked()).toEqual(0);
+
 
      expect(viewModel.picklist.id()).toEqual(picklistData.id);
      expect(viewModel.picklist.version()).toEqual(picklistData.version);

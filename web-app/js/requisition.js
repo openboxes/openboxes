@@ -187,7 +187,6 @@ openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData,
                   if(result.data.picklistItems) {
                       _.each(result.data.picklistItems, function(picklistItem){
                         var localRequisitionItem = self.requisition.findRequisitionItemById(picklistItem.requisitionItemId);
-                        console.log("********" + localRequisitionItem);
                         var localItem = localRequisitionItem.findPicklistItemByInventoryItemId(picklistItem.inventoryItemId);
                         localItem.id(picklistItem.id);
                         localItem.version(picklistItem.version);
@@ -202,6 +201,7 @@ openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData,
    function getPicklistItems(requisitionItem){
        var inventoryItems = inventoryItemsData[requisitionItem.productId];
        return  _.map(inventoryItems, function(picklistItemData){
+        picklistItemData.version = null;
         picklistItemData.requisitionItemId = requisitionItem.id;
         var matchedPicklistItem = _.find(picklistData.picklistItems, function(picklistItem){
           return picklistItem.requisitionItemId == requisitionItem.id && picklistItem.inventoryItemId == picklistItemData.inventoryItemId;
@@ -216,9 +216,10 @@ openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData,
     }
 };
 
-openboxes.requisition.ViewModel = function(requisition) {
+openboxes.requisition.ViewModel = function(requisition, savedCallback) {
     var self = this;
     self.requisition = requisition;
+    self.savedCallback = savedCallback;
     
     self.processRequisition = function () {
         window.location = '../process/' + self.requisition.id();
@@ -229,10 +230,6 @@ openboxes.requisition.ViewModel = function(requisition) {
     };
 
     self.save = function(formElement) {
-        var redirect = true;
-        if(self.requisition.id()) {
-            redirect = false;
-        }
         var data = ko.toJS(self.requisition);
         data["origin.id"] = data.originId;
         data["requestedBy.id"] = data.requestedById;
@@ -266,9 +263,7 @@ openboxes.requisition.ViewModel = function(requisition) {
                         localItem.version(result.data.requisitionItems[idx].version);
                       }
                     }
-                    if(redirect){
-                        window.location = "./edit/" + self.requisition.id();
-                    }
+                    if(self.savedCallback) self.savedCallback();
                 }
             }
         });
