@@ -131,5 +131,10 @@ class PicklistServiceTests extends GrailsUnitTestCase {
         assert item1
         assert !item2
      }
+
+
+     void testCancelPicklist() {
+
+     }
 }
 

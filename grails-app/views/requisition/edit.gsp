@@ -148,12 +148,10 @@
             <input type="button" id="deleteRequisition" data-bind='visible: requisition.id' value="${warehouse.message(code: 'default.button.delete.label')}"/>
         </g:isUserInRole>
       <input type="submit" id="save-requisition" value="${warehouse.message(code: 'default.button.save.label')}"/>
-            &nbsp;
-       <g:link class="list" action="process" id="${requisitionId}">
+       <g:link class="list" action="process" data-bind="visible: requisition.id" id="${requisitionId}">
          <input type="button" value="${warehouse.message(code:'requisition.process.label')}"/>
-         </g:link>
-        &nbsp;
-      <g:link action="list">
+       </g:link>
+      <g:link action="cancel" id="${requisitionId}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
 		    <input type="button" value="${warehouse.message(code: 'default.button.cancel.label')}"/>
 	    </g:link>
 

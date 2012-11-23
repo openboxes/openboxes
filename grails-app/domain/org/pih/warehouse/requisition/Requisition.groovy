@@ -103,11 +103,11 @@ class Requisition implements Serializable {
 	}	
 	
 	Boolean isPending() { 
-		return isNew() || isRequested();
+		return isCreated() || isOpen();
 	}
 	
-	Boolean isNew() { 
-		return (status == null || status == RequisitionStatus.CREATED)
+	Boolean isCreated() { 
+		return (status in [RequisitionStatus.CREATED])
 	}
 	
 	Boolean isOpen() { 

@@ -322,14 +322,13 @@ class RequisitionService {
       requisition        
     }
 
-    boolean deleteRequisition(Requisition requisition) {
+    void deleteRequisition(Requisition requisition) {
         requisition.delete(flush: true)
     }
 
-    Requisition cancelRequisition(Requisition requisition) {
+    void cancelRequisition(Requisition requisition) {
         requisition.status = RequisitionStatus.CANCELED
         requisition.save(flush: true)
-        requisition
     }
 
 }

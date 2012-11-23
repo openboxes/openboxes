@@ -8,7 +8,7 @@
 		<g:if test="${requestInstance?.isOpen() }">
 			<g:render template="actionsRequested" model="[requestInstance:requestInstance]"/>
 		</g:if>
-		<g:elseif test="${requestInstance?.isNew() }">
+		<g:elseif test="${requestInstance?.isCreated() }">
 			<g:render template="actionsNotYetRequested" model="[requestInstance:requestInstance]"/>
 		</g:elseif>
 		<g:elseif test="${requestInstance.isPending() }">
