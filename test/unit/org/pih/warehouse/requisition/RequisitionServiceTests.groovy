@@ -140,5 +140,42 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
         assert requisition.requisitionItems.size() == 1
         assert requisition.requisitionItems.any{ item -> item.product == product2 && item.quantity == 400 && item.orderIndex == 1}
     }
+
+    void testDeleteRequisitionByAdmin() {
+        Location toronto = new Location(name: "toronto", id: "4")
+        mockDomain(Location, [toronto])
+        
+        def requisitionItem1 = new RequisitionItem(id:"item1", quantity: 30)
+        def requisitionItem2 = new RequisitionItem(id:"item2", quantity: 40)
+        def requisition = new Requisition(id:"requisition1", 
+          origin: toronto, name:"oldRequisition",
+          description: "oldDescription",
+          requisitionItems: [requisitionItem1, requisitionItem2])
+        mockDomain(Requisition, [requisition])
+        mockDomain(RequisitionItem, [requisitionItem1, requisitionItem2])
+
+        def service = new RequisitionService()
+        def success = service.deleteRequisition(requisition)
+        def requisitionFromDb = Requisition.get(requisition.id)
+        assert !requisitionFromDb
+
+        def requisitionItemsFromDb = RequisitionItem.findAllByRequisition(requisition)
+        assert requisitionItemsFromDb.size() == 0
+    }
+
+    void testCancelExistingRequisitionDuringEdit() {
+        Location toronto = new Location(name: "toronto", id: "4")
+        mockDomain(Location, [toronto])
+        
+        def requisition = new Requisition(id:"requisition1", 
+          origin: toronto, name:"oldRequisition",
+          description: "oldDescription")
+        mockDomain(Requisition, [requisition])
+
+        def service = new RequisitionService()
+        def requisitionFromDb = service.cancelRequisition(requisition)
+
+        assert requisitionFromDb.status == RequisitionStatus.CANCELED 
+    }
 }
 

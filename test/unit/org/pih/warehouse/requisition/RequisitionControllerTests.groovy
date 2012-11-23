@@ -227,4 +227,24 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         assert controller.response.status == 404
     }
 
+    void testCancelRequisitionWhichCannotBeFound() {
+        def requisition = new Requisition(id: "1234", name: "jim", recipientProgram:"abc")
+        mockDomain(Requisition, [requisition])
+        mockDomain(Location, [])
+        controller.params.id = "something cannot be found"
+        controller.cancel()
+        assert controller.redirectArgs.action == "list"
+    }
+
+    void testCancelExistingRequisitionDuringEdit() {
+        def requisition = new Requisition(id: "1234", name: "jim", recipientProgram:"abc")
+        mockDomain(Requisition, [requisition])
+        mockDomain(Location, [])
+        controller.params.id = "1234"
+        controller.cancel()
+
+        assert controller.redirectArgs.action == "list"
+        assert requisition.status == RequisitionStatus.CANCELED
+    }
+
 }

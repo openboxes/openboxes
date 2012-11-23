@@ -100,6 +100,14 @@ class RequisitionController {
 
     }
 
+    def cancel = {
+        def requisition = Requisition.get(params?.id)
+        if (requisition) {
+            requisition.status = RequisitionStatus.CANCELED
+        }
+        redirect(action: "list")
+    }
+
     def show = {
         def requestInstance = Requisition.get(params.id)
         if (!requestInstance) {
@@ -136,9 +144,6 @@ class RequisitionController {
 
         }
     }
-
-
-
 
     def update = {
         def requestInstance = Requisition.get(params.id)

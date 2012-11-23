@@ -326,4 +326,10 @@ class RequisitionService {
         requisition.delete(flush: true)
     }
 
+    Requisition cancelRequisition(Requisition requisition) {
+        requisition.status = RequisitionStatus.CANCELED
+        requisition.save(flush: true)
+        requisition
+    }
+
 }
