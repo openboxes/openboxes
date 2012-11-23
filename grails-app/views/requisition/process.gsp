@@ -51,7 +51,7 @@
                           <div class="lot picklist-field" data-bind="text: lotNumber"></div>
                           <div class="expiration-date picklist-field" data-bind="text: expirationDate"></div>
                           <div class="quantity-onhand picklist-field" data-bind="text: quantityOnHand"></div>
-                          <div class="quantity-picked"><input data-bind="value: quantityPicked"></input></div>
+                          <div class="quantity-picked"><input data-bind="value: quantityPicked" type="text"></input></div>
                           <div class="clear"></div>
                       </div>
                     </div>
@@ -120,6 +120,14 @@
             viewModel.requisition.picklist.updatePickedItems();
             openboxes.requisition.saveRequisitionToLocal(viewModel.requisition);
         }, 3000);
+
+        $(".quantity-picked input").change(function(){
+          var input = $(this);
+          if(input.val() == "") input.val("0");
+        });
+        $(".quantity-picked input").keyup(function(){
+           this.value=this.value.replace(/[^\d]/,'')        
+        });
     });
 </script>
 

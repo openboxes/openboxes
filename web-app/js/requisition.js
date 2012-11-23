@@ -134,7 +134,7 @@ openboxes.requisition.RequisitionItem = function(attrs) {
     self.quantityPicked = ko.computed(function() {
         var sum = 0;
         for(var i in self.picklistItems()) {
-            sum += parseInt(self.picklistItems()[i].quantityPicked());
+            sum += parseInt(self.picklistItems()[i].quantityPicked() || 0);
         }
         return sum;
     }, this);
