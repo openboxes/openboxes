@@ -224,28 +224,11 @@ openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData,
     }
 };
 
-openboxes.requisition.ViewModel = function(requisition) {
+openboxes.requisition.EditRequisitionViewModel = function(requisitionData) {
     var self = this;
-    self.requisition = requisition;
-    
+    self.requisition = new openboxes.requisition.Requisition(requisitionData);
     self.save = function(formElement) {
-        var data = ko.toJS(self.requisition);
-        data["origin.id"] = data.originId;
-        data["requestedBy.id"] = data.requestedById;
-        delete data.version;
-        delete data.status;
-        delete data.lastUpdated;
-        for(var attr in data){
-          if(data[attr] == null) delete data[attr];
-        }
-        _.each(data.requisitionItems, function(item){
-          item["product.id"] = item.productId;
-          for(var attr in item){
-            if(item[attr] == null) delete item[attr];
-          }
-          delete item.version;
-        });
-        var jsonString = JSON.stringify( data);
+        var jsonString = getJsonDataFromRequisition();
         console.log("here is the req: "  + jsonString);
         console.log("endpoint is " + formElement.action);
         jQuery.ajax({
@@ -273,7 +256,28 @@ openboxes.requisition.ViewModel = function(requisition) {
             }
         });
 
-    };   
+    };  
+
+    //private functions
+    function getJsonDataFromRequisition(){
+       var data = ko.toJS(self.requisition);
+        data["origin.id"] = data.originId;
+        data["requestedBy.id"] = data.requestedById;
+        delete data.version;
+        delete data.status;
+        delete data.lastUpdated;
+        for(var attr in data){
+          if(data[attr] == null) delete data[attr];
+        }
+        _.each(data.requisitionItems, function(item){
+          item["product.id"] = item.productId;
+          for(var attr in item){
+            if(item[attr] == null) delete item[attr];
+          }
+          delete item.version;
+        });
+        return JSON.stringify( data);
+    }
 };
 
 openboxes.requisition.saveRequisitionToLocal = function(model){

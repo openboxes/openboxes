@@ -170,19 +170,18 @@
         var requisitionFromServer = ${requisition};
         var requisitionFromLocal = openboxes.requisition.getRequisitionFromLocal(requisitionFromServer.id);
         var requisitionData = openboxes.requisition.Requisition.getNewer(requisitionFromServer, requisitionFromLocal);
-        var requisition = new openboxes.requisition.Requisition(requisitionData);
-        var requisitionId = requisition.id();
-        var viewModel = new openboxes.requisition.ViewModel(requisition);
+        var viewModel = new openboxes.requisition.EditRequisitionViewModel(requisitionData);
+        var requisitionId = viewModel.requisition.id();
         viewModel.savedCallback = function(){
-            if(!requisitionId) window.location = "${request.contextPath}/requisition/edit/" + requisition.id();
+            if(!requisitionId) window.location = "${request.contextPath}/requisition/edit/" + viewModel.requisition.id();
             $("#flash").text("${warehouse.message(code:'requisition.saved.message')}").show().delay(3000).fadeOut("slow");
         };
         ko.applyBindings(viewModel);
 
         $("#requisitionForm").validate({ submitHandler: viewModel.save });
 
-        if (!requisition.name())
-            requisition.name("${warehouse.message(code: 'requisition.label')}");
+        if (!viewModel.requisition.name())
+            viewModel.requisition.name("${warehouse.message(code: 'requisition.label')}");
 
         var updateDescription = function () {
             var depot = $("#depot select option:selected").text() || "";
@@ -191,11 +190,11 @@
             var dateRequested = $("#dateRequested").val() || "";
             var deliveryDate = $("#requestedDeliveryDate").val() || "";
             var description = "${warehouse.message(code: 'requisition.label', default: 'Requisition')}: " + depot + " - " + program + ", " + requestedBy + " - " + dateRequested + ", " + deliveryDate;
-            requisition.name(description);
+            viewModel.requisition.name(description);
         };
         $(".value").change(updateDescription);
         setInterval(function () {
-            openboxes.requisition.saveRequisitionToLocal(requisition);
+            openboxes.requisition.saveRequisitionToLocal(viewModel.requisition);
         }, 3000);
 
         $("input.quantity").keyup(function(){

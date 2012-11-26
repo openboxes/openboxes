@@ -16,7 +16,7 @@ describe("requisition view model", function(){
     var requisitionItem2 = {productId:"prod2", quantity:400, version:2,
     comment:"my comment2", substitutable:false, recipient: "tim",orderIndex: 1};
 
-    var requisition = new openboxes.requisition.Requisition({
+    var requisition = {
       originId: originId,
       version: 3,
       lastUpdated: "11/25/2012",
@@ -25,8 +25,8 @@ describe("requisition view model", function(){
       requestedDeliveryDate: requestedDeliveryDate, 
       requestedById: requestedById,
       recipientProgram:recipientProgram,
-      requisitionItems: [requisitionItem1, requisitionItem2]});
-    var viewModel = new openboxes.requisition.ViewModel(requisition);
+      requisitionItems: [requisitionItem1, requisitionItem2]};
+    var viewModel = new openboxes.requisition.EditRequisitionViewModel(requisition);
     var formElement ={
       action:"testAction"
     }
@@ -68,14 +68,14 @@ describe("requisition view model", function(){
           }
         };
     ajaxOptions.success(responseData); //mimic server call back 
-    expect(requisition.id()).toBe(responseData.data.id);
-    expect(requisition.status()).toBe(responseData.data.status);
-    expect(requisition.lastUpdated()).toBe(responseData.data.lastUpdated);
-    expect(requisition.version()).toBe(responseData.data.version);
-    expect(requisition.requisitionItems()[0].id()).toBe("item1");
-    expect(requisition.requisitionItems()[1].id()).toBe("item2");
-    expect(requisition.requisitionItems()[0].version()).toBe(2);
-    expect(requisition.requisitionItems()[1].version()).toBe(1);
+    expect(viewModel.requisition.id()).toBe(responseData.data.id);
+    expect(viewModel.requisition.status()).toBe(responseData.data.status);
+    expect(viewModel.requisition.lastUpdated()).toBe(responseData.data.lastUpdated);
+    expect(viewModel.requisition.version()).toBe(responseData.data.version);
+    expect(viewModel.requisition.requisitionItems()[0].id()).toBe("item1");
+    expect(viewModel.requisition.requisitionItems()[1].id()).toBe("item2");
+    expect(viewModel.requisition.requisitionItems()[0].version()).toBe(2);
+    expect(viewModel.requisition.requisitionItems()[1].version()).toBe(1);
      
   });
 
@@ -83,7 +83,7 @@ describe("requisition view model", function(){
     var requisitionItem = {productId:"prod1", quantity:300, version:1,
     id:null, comment:null, substitutable:true, 
     recipient: null,orderIndex: 2};
-    var requisition = new openboxes.requisition.Requisition({
+    var requisition = {
       id: null,
       originId: 2,
       version: 3,
@@ -93,8 +93,8 @@ describe("requisition view model", function(){
       requestedDeliveryDate: "11/13/2012", 
       requestedById: 23,
       recipientProgram: null,
-      requisitionItems: [requisitionItem]});
-    var viewModel = new openboxes.requisition.ViewModel(requisition);
+      requisitionItems: [requisitionItem]};
+    var viewModel = new openboxes.requisition.EditRequisitionViewModel(requisition);
     var formElement ={
       action:"testAction"
     }
