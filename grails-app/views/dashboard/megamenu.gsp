@@ -130,45 +130,19 @@
 				<warehouse:message code="requests.label"/>
 			</g:link>
 			<div>
-							<div class="buttonsBar">
-								<div class="linkButton">
-									<g:link controller="requisition" action="list" params="[requestType:'INCOMING']" class="list">
-										<warehouse:message code="requisition.listIncoming.label" /> (${incomingRequests?.values()?.flatten()?.size()?:0 })
-									</g:link>
-								</div>
-								%{--<g:each in="${org.pih.warehouse.requisition.RequisitionStatus.list() }" var="status">--}%
-									%{--<div class="linkButton">							--}%
-										%{--<g:set var="statusName" value="${warehouse.message(code:'enum.RequisitionStatus.' + status)}"/>--}%
-										%{--<g:link controller="requisition" action="list" class="request-status-${status }" params="[requestType:'INCOMING',status:status]" fragment="${statusName}">--}%
-											%{--<format:metadata obj="${status}"/> (${incomingRequests[status]?.size()?:0})--}%
-										%{--</g:link>--}%
-									%{--</div>--}%
-								%{--</g:each>--}%
-							</div>
-						
-							
-							<div class="linkButton">
-								<g:link controller="requisition" action="list" params="[requestType:'OUTGOING']" class="list">
-									<warehouse:message code="requisition.listOutgoing.label" /> (${outgoingRequests?.values()?.flatten()?.size()?:0 })
-								</g:link>
-							</div>
-							
-							%{--<g:each in="${org.pih.warehouse.requisition.RequisitionStatus.list() }" var="status">--}%
-								%{--<g:set var="statusName" value="${warehouse.message(code:'enum.RequisitionStatus.' + status)}"/>--}%
-								%{--<div class="linkButton">							--}%
-									%{--<g:link controller="requisition" action="list" class="request-status-${status }" params="[requestType:'OUTGOING',status:status]" fragment="${statusName }>--}%
-										%{--<format:metadata obj="${status}"/> (${outgoingRequests[status]?.size()?:0 })--}%
-									%{--</g:link>--}%
-								%{--</div>--}%
-							%{--</g:each>							--}%
-							
+                <div class="buttonsBar">
+                    <div class="linkButton">
+                        <g:link controller="requisition" action="list" class="list">
+                            <warehouse:message code="requisition.list.label" /> (${incomingRequests?.values()?.flatten()?.size()?:0 })
+                        </g:link>
+                    </div>
+                </div>
 
-							<div class="linkButton">
-								<g:link controller="requisition" action="create" class="create">
-									<warehouse:message code="requisition.create.label" />
-								</g:link>
-							</div>
-
+                <div class="linkButton">
+                    <g:link controller="requisition" action="create" class="create">
+                        <warehouse:message code="requisition.create.label" />
+                    </g:link>
+                </div>
 			</div>
 		</li>
 	</g:authorize>		

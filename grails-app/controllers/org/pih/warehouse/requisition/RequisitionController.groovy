@@ -31,18 +31,9 @@ class RequisitionController {
         redirect(action: "list", params: params)
     }
 
-
     def list = {
-        //params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        //[requestInstanceList: Request.list(params), requestInstanceTotal: Request.count()]
-
-        def location = Location.get(session.warehouse.id)
-        def incomingRequests = params.status ? Requisition.findAllByDestinationAndStatus(location, params.status) :
-            Requisition.findAllByDestination(location)
-        def outgoingRequests = params.status ? Requisition.findAllByOriginAndStatus(location, params.status) :
-            Requisition.findAllByOrigin(location)
-
-        [incomingRequests: incomingRequests, outgoingRequests: outgoingRequests]
+        def requisitions = Requisition.findAll()//Requisition.findAllByStatus(RequisitionStatus.CREATED)
+        render(view:"list", model:[requisitions: requisitions])
     }
 
     def create = {

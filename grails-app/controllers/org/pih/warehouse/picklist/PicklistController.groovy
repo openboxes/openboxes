@@ -31,4 +31,7 @@ class PicklistController {
     }
     render jsonResponse as JSON
   }
+
+  def cancel = {
+  }
 }

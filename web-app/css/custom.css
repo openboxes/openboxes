@@ -1321,7 +1321,11 @@ div.clear {
     margin-top: 2em;
 }
 
+#requisition-status-key div {
+    margin: 10px;
+}
+
 #requisitionForm .footer{
-  margin: 10px;
+    margin: 10px;
 }
 

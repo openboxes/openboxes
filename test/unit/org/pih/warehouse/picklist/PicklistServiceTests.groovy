@@ -134,6 +134,29 @@ class PicklistServiceTests extends GrailsUnitTestCase {
 
 
      void testCancelPicklist() {
+        def requisition = new Requisition(id:"requisition1", name:"myTestRequisition")
+        def picklistInDb = new Picklist(id:"picklist1", requisition: requisition)
+        def plItem1 = new PicklistItem(id:"pli1", quantity:10, comment:"good")
+        def plItem2 = new PicklistItem(id:"pli2", quantity:20, comment: "better")
+        mockDomain(Picklist, [picklistInDb])
+        mockDomain(PicklistItem, [plItem1, plItem2])
+        picklistInDb.addToPicklistItems(plItem1)
+        picklistInDb.addToPicklistItems(plItem2)
+
+        mockDomain(RequisitionItem, [])
+        mockDomain(InventoryItem, [])
+        
+        def service = new PicklistService()
+        
+        def picklistPersisted = Picklist.findByName(requisition.name)
+
+        assert picklist == picklistPersisted
+        def items = picklist.picklistItems.toList()
+        assert items.size() == 1
+        def item1 = items.find{it.id == plItem1.id}
+        def item2 = items.find{it.id == plItem2.id}
+        assert item1
+        assert !item2
 
      }
 }

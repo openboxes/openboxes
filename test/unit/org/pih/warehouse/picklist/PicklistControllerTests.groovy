@@ -78,5 +78,19 @@ class PicklistControllerTests extends ControllerUnitTestCase{
         assert jsonResponse.errors
         picklistServiceMock.verify()
     }
+
+    void testCancel() {
+        def picklist = new Picklist(id: "2345", version: 3)
+        def requisitionItem = new RequisitionItem(id:"ri1")
+        def inventoryItem = new InventoryItem(id: "ii1")
+        def picklistItem = new PicklistItem(id:"3322", version: 3, requisitionItem: requisitionItem, inventoryItem: inventoryItem)
+        mockDomain(Picklist, [picklist])
+        mockDomain(PicklistItem, [picklistItem])
+        picklist.addToPicklistItems(picklistItem)
+        mockDomain(InventoryItem, [inventoryItem])
+        mockDomain(RequisitionItem, [requisitionItem])
+    
+        controller.cancel()
+    }
 }
 

@@ -256,4 +256,22 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         assert controller.flash.message == "cancelled"
     }
 
+    void testListRequisitions() {
+
+        def requisition = new Requisition(id: "req1", name: "req1", recipientProgram:"abc")
+        def requisition2 = new Requisition(id: "req2", name: "req2", recipientProgram:"abcde")
+        def requisition3 = new Requisition(id: "1234", name: "jim", recipientProgram:"abc")
+        mockDomain(Requisition, [requisition, requisition2, requisition3])
+
+        controller.list()
+
+        assert renderArgs.view == "list"
+        assert renderArgs.model
+        assert renderArgs.model.requisitions
+        assert renderArgs.model.requisitions.size() == 3
+        assert renderArgs.model.requisitions.any { it.id = requisition.id}
+        assert renderArgs.model.requisitions.any { it.id = requisition2.id}
+        assert renderArgs.model.requisitions.any { it.id = requisition3.id}
+
+    }
 }
