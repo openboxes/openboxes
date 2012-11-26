@@ -65,8 +65,8 @@
             </div>
             <div class="center footer">
                 <input type="submit" id="save-requisition" value="${warehouse.message(code: 'default.button.save.label')}"/>
-                &nbsp;
-                <g:link action="list">
+
+                <g:link action="cancel" id="${requisitionId}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                     <input type="button" value="${warehouse.message(code: 'default.button.cancel.label')}"/>
                 </g:link>
             </div>
@@ -108,6 +108,7 @@
         else
           viewModel = new openboxes.requisition.ProcessViewModel(data.requisition, data.picklist, data.productInventoryItemsMap);
 
+        var requisitionId = viewModel.requisition.id();
         viewModel.savedCallback = function(){
            $("#flash").text("${warehouse.message(code:'requisition.saved.message')}").show().delay(3000).fadeOut("slow");
         };

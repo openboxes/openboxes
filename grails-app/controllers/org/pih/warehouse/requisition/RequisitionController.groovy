@@ -83,16 +83,15 @@ class RequisitionController {
             }
 
             String jsonString = [requisition: requisition.toJson(), productInventoryItemsMap: productInventoryItemsMap, picklist: picklist.toJson()] as JSON
-            return [data: jsonString]
+            return [data: jsonString, requisitionId: requisition.id]
         } else{
             response.sendError(404)
         }
-
-
     }
 
     def cancel = {
         def requisition = Requisition.get(params?.id)
+        println requisition
         if (requisition) {
             requisitionService.cancelRequisition(requisition)
             flash.message = "${warehouse.message(code: 'default.cancelled.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"

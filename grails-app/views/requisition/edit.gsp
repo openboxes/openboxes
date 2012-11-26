@@ -153,12 +153,12 @@
        </g:link>
       <g:link action="cancel" id="${requisitionId}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
 		    <input type="button" value="${warehouse.message(code: 'default.button.cancel.label')}"/>
-	    </g:link>
+	   </g:link>
 
     </div>
   </g:form>
   <g:form name="deleteRequisitionForm" method="post" action="delete">
-    <input type="hidden" name="id" value="${requisitionId}"></input>
+    <input type="hidden" name="id" value="${requisitionId}" />
   </g:form>
 
 
