@@ -235,8 +235,14 @@ openboxes.requisition.ViewModel = function(requisition) {
         delete data.version;
         delete data.status;
         delete data.lastUpdated;
+        for(var attr in data){
+          if(data[attr] == null) delete data[attr];
+        }
         _.each(data.requisitionItems, function(item){
           item["product.id"] = item.productId;
+          for(var attr in item){
+            if(item[attr] == null) delete item[attr];
+          }
           delete item.version;
         });
         var jsonString = JSON.stringify( data);

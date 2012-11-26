@@ -79,6 +79,38 @@ describe("requisition view model", function(){
      
   });
 
+  it("should convert null to empty string when saving data to server", function(){
+    var requisitionItem = {productId:"prod1", quantity:300, version:1,
+    id:null, comment:null, substitutable:true, 
+    recipient: null,orderIndex: 2};
+    var requisition = new openboxes.requisition.Requisition({
+      id: null,
+      originId: 2,
+      version: 3,
+      lastUpdated: "11/25/2012",
+      status: "Created",
+      dateRequested: "11/12/2012", 
+      requestedDeliveryDate: "11/13/2012", 
+      requestedById: 23,
+      recipientProgram: null,
+      requisitionItems: [requisitionItem]});
+    var viewModel = new openboxes.requisition.ViewModel(requisition);
+    var formElement ={
+      action:"testAction"
+    }
+    viewModel.save(formElement);
+    var jsonSent = JSON.parse(ajaxOptions.data);
+    expect(jsonSent['id']).toBeUndefined();
+    expect(jsonSent['recipientProgram']).toBeUndefined();
+    expect(jsonSent.requisitionItems[0].recipient).toBeUndefined();
+    expect(jsonSent.requisitionItems[0].comment).toBeUndefined();
+    expect(jsonSent.requisitionItems[0].id).toBeUndefined();
+   
+
+     
+  });
+
+
   it("should save and get from local storage", function(){
     var model = {id:"1234",name:"test"};
     openboxes.saveToLocal("test", model);
