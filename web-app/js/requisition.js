@@ -22,7 +22,7 @@ openboxes.requisition.PicklistItem = function(attrs){
     self.expirationDate = ko.observable(attrs.expirationDate);
     self.quantityOnHand = ko.observable(attrs.quantityOnHand);
     self.quantityATP = ko.observable(attrs.quantityATP);
-    self.quantityPicked = ko.observable(attrs.quantityPicked || 0);
+    self.quantityPicked = ko.observable(attrs.quantityPicked || "");
 
 };
 openboxes.requisition.Requisition = function(attrs) {

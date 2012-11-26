@@ -130,12 +130,9 @@
             openboxes.requisition.saveRequisitionToLocal(viewModel.requisition);
         }, 3000);
 
-        $(".quantity-picked input").change(function(){
-          var input = $(this);
-          if(input.val() == "") input.val("0");
-        });
         $(".quantity-picked input").keyup(function(){
            this.value=this.value.replace(/[^\d]/,'');      
+           $(this).trigger("change");//Safari and IE do not fire change event for us!
         });
 
       

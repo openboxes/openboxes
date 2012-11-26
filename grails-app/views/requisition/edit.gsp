@@ -200,6 +200,7 @@
 
         $("input.quantity").keyup(function(){
            this.value=this.value.replace(/[^\d]/,'');      
+           $(this).trigger("change");//Safari and IE do not fire change event for us!
         });
 
     });

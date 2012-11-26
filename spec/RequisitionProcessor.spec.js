@@ -91,7 +91,7 @@ describe('Requisition Processor View Model', function(){
      expect(picklistItem4.lotNumber()).toEqual(inventoryItem4.lotNumber);
      expect(picklistItem4.expirationDate()).toEqual(inventoryItem4.expirationDate);
      expect(picklistItem4.quantityOnHand()).toEqual(inventoryItem4.quantityOnHand);
-     expect(picklistItem4.quantityPicked()).toEqual(0);
+     expect(picklistItem4.quantityPicked()).toEqual("");
 
 
      expect(viewModel.requisition.picklist.id()).toEqual(picklistData.id);
