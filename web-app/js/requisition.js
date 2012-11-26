@@ -154,15 +154,11 @@ openboxes.requisition.RequisitionItem = function(attrs) {
 openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData, inventoryItemsData) {
     var self = this;
 
-    if(picklistData && inventoryItemsData){
-      requisitionData.picklist = picklistData;
-      _.each(requisitionData.requisitionItems, function(requisitionItem){
-        requisitionItem.picklistItems = createPicklistItems(requisitionItem);
-      });
-      self.requisition = new openboxes.requisition.Requisition(requisitionData);
-    }else{
-      self.requisition = new openboxes.requisition.Requisition(requisitionData);
-   }
+    requisitionData.picklist = picklistData;
+    _.each(requisitionData.requisitionItems, function(requisitionItem){
+      requisitionItem.picklistItems = createPicklistItems(requisitionItem);
+    });
+    self.requisition = new openboxes.requisition.Requisition(requisitionData);
    
     self.save = function(formElement) {
         self.requisition.picklist.updatePickedItems();
@@ -293,6 +289,22 @@ openboxes.requisition.getRequisitionFromLocal = function(id){
   var key = "openboxesRequisition" + id;
   return openboxes.getFromLocal(key);
 }
+
+openboxes.requisition.savePicklistToLocal = function(model){
+  var data = ko.toJS(model);
+  if(!data.requisitionId) return null;
+  var key = "openboxesPicklist" + data.requisitionId;
+  openboxes.saveToLocal(key, data);
+  return key;
+}
+
+openboxes.requisition.getPicklistFromLocal = function(id){
+  if(!id) return null;
+  var key = "openboxesPicklist" + id;
+  return openboxes.getFromLocal(key);
+}
+
+
 
 openboxes.saveToLocal = function(name, model){
   if(typeof(Storage) === "undefined") return;

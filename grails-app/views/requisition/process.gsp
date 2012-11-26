@@ -100,13 +100,9 @@
         $("#flash").hide();
         var data = ${data};
         var picklistFromServer = data.picklist;
-        var requisitionFromlocal =  openboxes.requisition.getRequisitionFromLocal(data.requisition.id);
-        var picklistFromLocal = requisitionFromlocal == null? null : requisitionFromlocal.picklist;
+        var picklistFromLocal = openboxes.requisition.getPicklistFromLocal(data.requisition.id); 
         var newerPicklist = openboxes.requisition.Picklist.getNewer(picklistFromServer, picklistFromLocal);
-        if(newerPicklist == picklistFromLocal && requisitionFromlocal.requisitionItems[0].picklistItems.length > 0)
-          viewModel =  new openboxes.requisition.ProcessViewModel(requisitionFromlocal);
-        else
-          viewModel = new openboxes.requisition.ProcessViewModel(data.requisition, data.picklist, data.productInventoryItemsMap);
+        viewModel = new openboxes.requisition.ProcessViewModel(data.requisition, newerPicklist, data.productInventoryItemsMap);
 
         var requisitionId = viewModel.requisition.id();
         viewModel.savedCallback = function(){
@@ -114,9 +110,8 @@
         };
 
         ko.applyBindings(viewModel);
+
         $("#requisitionForm").validate({ submitHandler: viewModel.save });
-
-
 
         $("#accordion").accordion({
           header: ".accordion-header", 
@@ -128,7 +123,7 @@
 
         setInterval(function () {
             viewModel.requisition.picklist.updatePickedItems();
-            openboxes.requisition.saveRequisitionToLocal(viewModel.requisition);
+            openboxes.requisition.savePicklistToLocal(viewModel.requisition.picklist);
         }, 3000);
 
         $(".quantity-picked input").keyup(function(){
