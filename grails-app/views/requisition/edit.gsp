@@ -145,7 +145,10 @@
     <input type="hidden" data-bind="value: requisition.id"/>
     <div class="center">
         <input type="submit" id="save-requisition" value="${warehouse.message(code: 'default.button.submit.label')}"/>
-        <input type="button" id="cancelRequisition" name="cancelRequisition" value="${warehouse.message(code: 'default.button.cancel.label')}"/>
+        <g:link action="${requisitionId ? 'show': 'list'}" id="${requisitionId}">
+            <input type="button" id="cancelRequisition" name="cancelRequisition" value="${warehouse.message(code: 'default.button.cancel.label')}"/>
+        </g:link>
+
     </div>
   </g:form>
   <g:form name="deleteRequisitionForm" method="post" action="delete">
@@ -195,11 +198,7 @@
         $("#cancelRequisition").click(function() {
             if(confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}')) {
                 openboxes.requisition.deleteRequisitionFromLocal(requisitionFromServer.id);
-                if(!requisitionId) {
-                    window.location = "${request.contextPath}/requisition/list";
-                } else {
-                    window.location = "${request.contextPath}/requisition/show/" + viewModel.requisition.id();
-                }
+                return true;
             }
         });
 
