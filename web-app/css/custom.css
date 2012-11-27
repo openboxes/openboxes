@@ -1219,10 +1219,18 @@ div.clear {
   color: white;
 }
 
-.accordion-header .product-name {
-    width: 30%;
+
+.accordion-header .row-index {
+    width: 5%;
     float: left;
 }
+
+.accordion-header .product-name {
+    width: 25%;
+    float: left;
+}
+
+
 
 .accordion-header .status {
     width: 25%;
@@ -1282,11 +1290,11 @@ div.clear {
 }
 
 .accordion-content  .picklist-field{
-  margin-top: 5px;
+  margin-top: 3px;
 }
 
 .accordion-content .picklist-header {
-    background-color: #eeeeee;
+    background-color: #BEE7F7;
     padding: 5px;
     font-weight: bold;
 }
@@ -1343,5 +1351,14 @@ div.clear {
 }
 fieldset legend{
   padding: 5px;
+}
+
+.picking-item.odd{
+  background: #eeeeee;
+}
+
+.picking-item{
+  margin: 5px;
+  vertical-align: middle;
 }
 

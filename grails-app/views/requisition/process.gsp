@@ -28,6 +28,7 @@
               <ul id="accordion" data-bind="foreach: requisition.requisitionItems">
                 <li>
                   <div class="accordion-header">
+                    <div data-bind="text: $index()+1" class="row-index"></div>
                     <div data-bind="text: productName" class="product-name"></div>
                     <div class="quantity">${warehouse.message(code: 'requisitionItem.quantityRequested.label')}: <span data-bind="text:quantity"></span></div>
                     <div class="quantityPicked">
@@ -52,6 +53,7 @@
                           <div class="clear"></div>
                       </div>
                       <div class="picklist-items ui-validation-items" data-bind="foreach: picklistItems">
+                         <div data-bind="css: { 'odd': ($index() % 2 == 1) }" class="picking-item">
                           <div class="product-name picklist-field" data-bind="text: $parent.productName"></div>
                           <div class="lot picklist-field" data-bind="text: lotNumber"></div>
                           <div class="expiration-date picklist-field" data-bind="text: expirationDate"></div>
@@ -60,6 +62,7 @@
                             <input data-bind="value: quantity" type="text" class="number"></input>
                           </div>
                           <div class="clear"></div>
+                        </div>
                       </div>
                     </div>
                   </div>

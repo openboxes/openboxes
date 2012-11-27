@@ -23,6 +23,10 @@ openboxes.requisition.PicklistItem = function(attrs){
     self.quantityOnHand = ko.observable(attrs.quantityOnHand);
     self.quantityATP = ko.observable(attrs.quantityATP);
     self.quantity = ko.observable(attrs.quantity || "");
+    self.quantity.subscribe(function(newValue){
+      if(newValue > self.quantityATP())
+        self.quantity(self.quantityATP());
+    });
 
     function formatDate(dateString){
       if(!dateString) return "";
