@@ -91,15 +91,15 @@ class InventoryItemController {
 			}
 		}
 		
-		def requestItems = 
-			requisitionService.getPendingRequestItemsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance)
-		def requestMap = requestItems.groupBy { it.requisition }
-		if (requestMap) {
-			requestMap.keySet().each {
-				def quantity = requestMap[it].sum() { it.quantity }
-				requestMap.put(it, quantity)
-			}
-		}
+		//def requestItems =
+		//	requisitionService.getPendingRequisitionItemsWithProduct(commandInstance.warehouseInstance, commandInstance?.productInstance)
+		def requestMap = [:]//requestItems.groupBy { it.requisition }
+//		if (requestMap) {
+//			requestMap.keySet().each {
+//				def quantity = requestMap[it].sum() { it.quantity }
+//				requestMap.put(it, quantity)
+//			}
+//		}
 	
 		session.lastProduct = commandInstance.productInstance
 			
