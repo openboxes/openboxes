@@ -48,7 +48,7 @@
           <label><warehouse:message code="requisition.requestedBy.label"/></label>
         </td>        
         <td class="value">
-          <input data-bind="value: requisition.requestedById" type="hidden"/>
+          <input name="requestedById" data-bind="value: requisition.requestedById" type="hidden"/>
           <input id="requestedBy" name="requestedBy"
             class="autocomplete required"
             placeholder="${warehouse.message(code:'requisition.requestedBy.label')}"
@@ -152,7 +152,7 @@
          <input type="button" value="${warehouse.message(code:'requisition.process.label')}"/>
        </g:link>
       <g:link action="cancel" id="${requisitionId}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-		    <input type="button" value="${warehouse.message(code: 'default.button.cancel.label')}"/>
+		    <input type="button" name="cancelRequisition" value="${warehouse.message(code: 'default.button.cancel.label')}"/>
 	   </g:link>
 
     </div>

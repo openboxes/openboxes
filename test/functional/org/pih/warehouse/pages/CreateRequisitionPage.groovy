@@ -1,0 +1,16 @@
+package org.pih.warehouse.pages
+
+import geb.Page
+import testutils.TestFixture
+
+class CreateRequisitionPage extends Page {
+    static url = TestFixture.baseUrl + "/requisition/create"
+    static at = { title == "create requisition"}
+    static content = {
+        selectRequestingDepot { $("select[name='origin.id']") }
+        autocompleteRequestedBy { $("input[name='requestedBy']") }
+        firstSuggestion(wait: true){$("ul.ui-autocomplete li.ui-menu-item a").first()}
+        createRequisitionButton(to: EditRequisitionPage) { $("#save-requisition")}
+        cancelRequisitionButton(to: ListRequisitionPage) { ${"input[name='cancelRequisition']"}}
+    }
+}
