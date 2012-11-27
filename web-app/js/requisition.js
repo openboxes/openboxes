@@ -19,10 +19,16 @@ openboxes.requisition.PicklistItem = function(attrs){
     self.requisitionItemId = ko.observable(attrs.requisitionItemId);
     self.inventoryItemId = ko.observable(attrs.inventoryItemId);
     self.lotNumber = ko.observable(attrs.lotNumber);
-    self.expirationDate = ko.observable(attrs.expirationDate);
+    self.expirationDate = ko.observable(formatDate(attrs.expirationDate));
     self.quantityOnHand = ko.observable(attrs.quantityOnHand);
     self.quantityATP = ko.observable(attrs.quantityATP);
     self.quantity = ko.observable(attrs.quantity || "");
+
+    function formatDate(dateString){
+      if(!dateString) return "";
+      var date = $.datepicker.parseDate('mm/dd/yy', dateString);
+      return $.datepicker.formatDate('dd/M/yy', date);
+    }
 
 };
 openboxes.requisition.Requisition = function(attrs) {
