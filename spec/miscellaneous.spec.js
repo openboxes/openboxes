@@ -9,6 +9,14 @@ describe("miscellaneous", function(){
     expect(retrievedModel.name).toEqual(model.name);
   });
 
+  it("should delete from local", function() {
+    var model = {id:"1234",name:"test"}
+    openboxes.saveToLocal("test", model);
+    openboxes.deleteFromLocal("test");
+    var retrievedModel = openboxes.getFromLocal("test");
+    expect(retrievedModel).toBeNull();
+  });
+
   it("should save requisition to local", function(){
     var model = new openboxes.requisition.Requisition({id:"1234",name:"test"});
     var key = openboxes.requisition.saveRequisitionToLocal(model);
@@ -18,7 +26,14 @@ describe("miscellaneous", function(){
     expect(openboxes.requisition.getRequisitionFromLocal(model.id()).id).toEqual(model.id());
   });
 
-  
+  it("should delete requisition from local", function(){
+    var model = new openboxes.requisition.Requisition({id:"1234",name:"test"});
+    var key = openboxes.requisition.saveRequisitionToLocal(model);
+    expect(key).toEqual("openboxesRequisition1234");
+    openboxes.requisition.deleteRequisitionFromLocal(model.id());
+    var retrievedModel = openboxes.getFromLocal(key);
+    expect(retrievedModel).toBeNull();
+  });
 
   it("should not save requistion to local if it has no Id", function(){
     var model =  new openboxes.requisition.Requisition({name:"test"});
@@ -40,6 +55,15 @@ describe("miscellaneous", function(){
     var key = openboxes.requisition.savePicklistToLocal(model);
     expect(key).toBeNull();
    });
+
+  it("should delete requisition from local", function(){
+    var model = new openboxes.requisition.Picklist({id:"1234",requisitionId:"5678"});
+    var key = openboxes.requisition.savePicklistToLocal(model);
+    expect(key).toEqual("openboxesPicklist5678");
+    openboxes.requisition.deletePicklistFromLocal(model.requisitionId());
+    var retrievedModel = openboxes.getFromLocal(key);
+    expect(retrievedModel).toBeNull();
+  });
 
 
  

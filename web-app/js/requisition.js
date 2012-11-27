@@ -292,13 +292,19 @@ openboxes.requisition.saveRequisitionToLocal = function(model){
   var key = "openboxesRequisition" + data.id;
   openboxes.saveToLocal(key, data);
   return key;
-}
+};
 
 openboxes.requisition.getRequisitionFromLocal = function(id){
   if(!id) return null;
   var key = "openboxesRequisition" + id;
   return openboxes.getFromLocal(key);
-}
+};
+
+openboxes.requisition.deleteRequisitionFromLocal = function(id){
+  if(!id) return null;
+  var key = "openboxesRequisition" + id;
+  return openboxes.deleteFromLocal(key);
+};
 
 openboxes.requisition.savePicklistToLocal = function(model){
   var data = ko.toJS(model);
@@ -306,15 +312,19 @@ openboxes.requisition.savePicklistToLocal = function(model){
   var key = "openboxesPicklist" + data.requisitionId;
   openboxes.saveToLocal(key, data);
   return key;
-}
+};
 
 openboxes.requisition.getPicklistFromLocal = function(id){
   if(!id) return null;
   var key = "openboxesPicklist" + id;
   return openboxes.getFromLocal(key);
-}
+};
 
-
+openboxes.requisition.deletePicklistFromLocal = function(id){
+  if(!id) return null;
+  var key = "openboxesPicklist" + id;
+  return openboxes.deleteFromLocal(key);
+};
 
 openboxes.saveToLocal = function(name, model){
   if(typeof(Storage) === "undefined") return;
@@ -324,6 +334,12 @@ openboxes.saveToLocal = function(name, model){
 openboxes.getFromLocal = function(name){
   if(typeof(Storage) !== "undefined" && localStorage[name])
     return JSON.parse(localStorage[name]);
+  return null;
+};
+
+openboxes.deleteFromLocal = function(name){
+  if(typeof(Storage) !== "undefined" && localStorage[name])
+    delete localStorage[name];
   return null;
 };
 

@@ -10,7 +10,7 @@
 
 </head>
 <body>
-<div class="message" id="flash"></div>
+
 <g:form name="requisitionForm" method="post" action="save">
   <div class="dialog box  ui-validation">
     <div id="requisition-header">
@@ -144,22 +144,8 @@
    </div>
     <input type="hidden" data-bind="value: requisition.id"/>
     <div class="center">
-        <g:isUserInRole roles="[RoleType.ROLE_ADMIN]">
-            <input type="button" id="deleteRequisition" data-bind='visible: requisition.id' value="${warehouse.message(code: 'default.button.delete.label')}"/>
-        </g:isUserInRole>
         <input type="submit" id="save-requisition" value="${warehouse.message(code: 'default.button.submit.label')}"/>
-        <g:if test="${requisitionId}">
-            <g:link action="show" id="${requisitionId}">
-                <input type="button" name="cancelRequisition" value="${warehouse.message(code: 'default.button.cancel.label')}"/>
-            </g:link>
-        </g:if>
-        <g:else>
-            <g:link action="list" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-                <input type="button" name="cancelRequisition" value="${warehouse.message(code: 'default.button.cancel.label')}"/>
-            </g:link>
-        </g:else>
-
-
+        <input type="button" id="cancelRequisition" name="cancelRequisition" value="${warehouse.message(code: 'default.button.cancel.label')}"/>
     </div>
   </g:form>
   <g:form name="deleteRequisitionForm" method="post" action="delete">
@@ -181,9 +167,9 @@
             if(!requisitionId) {
                 window.location = "${request.contextPath}/requisition/edit/" + viewModel.requisition.id();
             } else {
+                openboxes.requisition.deleteRequisitionFromLocal(requisitionId);
                 window.location = "${request.contextPath}/requisition/show/" + viewModel.requisition.id();
             }
-            //$("#flash").text("${warehouse.message(code:'requisition.saved.message')}").show().delay(3000).fadeOut("slow");
         };
         ko.applyBindings(viewModel);
 
@@ -205,6 +191,17 @@
         setInterval(function () {
             openboxes.requisition.saveRequisitionToLocal(viewModel.requisition);
         }, 3000);
+
+        $("#cancelRequisition").click(function() {
+            if(confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}')) {
+                openboxes.requisition.deleteRequisitionFromLocal(requisitionFromServer.id);
+                if(!requisitionId) {
+                    window.location = "${request.contextPath}/requisition/list";
+                } else {
+                    window.location = "${request.contextPath}/requisition/show/" + viewModel.requisition.id();
+                }
+            }
+        });
 
         $("input.quantity").keyup(function(){
            this.value=this.value.replace(/[^\d]/,'');      

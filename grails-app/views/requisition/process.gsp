@@ -73,7 +73,7 @@
             <div class="center footer">
                 <input type="submit" id="save-requisition" value="${warehouse.message(code: 'default.button.save.label')}"/>
 
-                <g:link action="cancel" id="${requisitionId}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                <g:link action="show" id="${requisitionId}">
                     <input type="button" value="${warehouse.message(code: 'default.button.cancel.label')}"/>
                 </g:link>
             </div>

@@ -10,7 +10,7 @@
 			<g:sortableColumn property="description"
 				title="${warehouse.message(code: 'default.description.label', default: 'Description')}" />
 			<th>
-				<warehouse:message code="requisition.requisitionItems"/>
+				<warehouse:message code="requisition.requisitionItem.label"/>
 			</th>
 			<g:sortableColumn property="createdBy"
 				title="${warehouse.message(code: 'default.createdBy.label', default: 'Created by')}" />
