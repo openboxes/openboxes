@@ -21,7 +21,6 @@ import org.pih.warehouse.picklist.Picklist
 
 class RequisitionController {
 
-
     def requisitionService
     def inventoryService
 
@@ -99,16 +98,15 @@ class RequisitionController {
     }
 
     def show = {
-        def requestInstance = Requisition.get(params.id)
-        if (!requestInstance) {
+        def requisition = Requisition.get(params.id)
+        if (!requisition) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
             redirect(action: "list")
         }
         else {
-            [requestInstance: requestInstance]
+            return [requisition: requisition]
         }
     }
-
 
     def delete = {
         def requisition = Requisition.get(params.id)
@@ -126,8 +124,4 @@ class RequisitionController {
         }
         redirect(action: "list", id:params.id)
     }
-
-
-
-
 }

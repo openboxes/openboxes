@@ -276,4 +276,31 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         assert renderArgs.model.requisitions.any { it.id = requisition3.id}
 
     }
+
+    void testShowRequisition() {
+
+        def requisition = new Requisition(id: "req1", name: "req1", recipientProgram:"abc")
+        mockDomain(Requisition, [requisition])
+
+        controller.params.id = "req1"
+        def result = controller.show()
+
+        assert result.requisition == requisition
+    }
+
+    void testShowRequisitionThatDoesNotExist() {
+
+        def requisition = new Requisition(id: "req1", name: "req1", recipientProgram:"abc")
+        mockDomain(Requisition, [requisition])
+
+        def stubMessager = new Expando()
+        stubMessager.message = { args -> return "do not exist" }
+        controller.metaClass.warehouse = stubMessager;
+
+        controller.params.id = "do not exist"
+        def result = controller.show()
+
+        assert redirectArgs.action == "list"
+        assert controller.flash.message == "do not exist"
+    }
 }

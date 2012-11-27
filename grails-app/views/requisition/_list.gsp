@@ -9,15 +9,6 @@
 				
 			<g:sortableColumn property="description"
 				title="${warehouse.message(code: 'default.description.label', default: 'Description')}" />
-				
-			<g:if test="${requestType == 'INCOMING' }">
-				<g:sortableColumn property="origin"
-					title="${warehouse.message(code: 'default.origin.label', default: 'Origin')}" />
-			</g:if>
-			<g:if test="${requestType == 'OUTGOING' }">
-				<g:sortableColumn property="destination"
-					title="${warehouse.message(code: 'default.destination.label', default: 'Destination')}" />
-			</g:if>
 			<th>
 				<warehouse:message code="requisition.requisitionItems"/>
 			</th>
@@ -30,44 +21,30 @@
 		</tr>
 	</thead>
 	<tbody>
-	
-	
-        <g:unless test="${requests}">
+        <g:unless test="${requisitions}">
            	<tr class="prop odd">
            		<td colspan="6" class="center">
            			<warehouse:message code="requisition.noRequisitionsMatchingCriteria.message"/>
 	           	</td>
 			</tr>     
 		</g:unless>	
-		<g:each in="${requests}" status="i" var="requestInstance">
+		<g:each in="${requisitions}" status="i" var="requisition">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 				<td>			
-					<g:render template="/requisition/actions" model="[requestInstance:requestInstance]"/>
+					<g:render template="/requisition/actions" model="[requisition:requisition]"/>
 				</td>
 				<td>
-					<format:metadata obj="${requestInstance?.status}"/>
+					<format:metadata obj="${requisition?.status}"/>
 				</td>
 				<td>
-					<g:link action="edit" id="${requestInstance.id}">
-						${fieldValue(bean: requestInstance, field: "name")}
+					<g:link action="edit" id="${requisition.id}">
+						${fieldValue(bean: requisition, field: "name")}
 					</g:link>
 				</td>
-				<g:if test="${requestType == 'INCOMING' }">
-					<td>
-						${fieldValue(bean: requestInstance, field: "origin.name")}
-					</td>
-				</g:if>
-				<g:if test="${requestType == 'OUTGOING' }">
-					<td>
-						${fieldValue(bean: requestInstance, field: "destination.name")}
-					</td>
-				</g:if>
+				<td>${requisition?.requisitionItems?.size() }</td>
+				<td>${requisition.requestedBy}</td>
 
-				<td>${requestInstance?.requisitionItems?.size() }</td>
-				<td>${requestInstance.requestedBy}</td>
-
-				<td><format:datetime obj="${requestInstance.lastUpdated}" /></td>
-
+				<td><format:datetime obj="${requisition.lastUpdated}" /></td>
 
 			</tr>
 		</g:each>
