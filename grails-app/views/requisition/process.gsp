@@ -53,7 +53,7 @@
                           <div class="expiration-date picklist-field" data-bind="text: expirationDate"></div>
                           <div class="quantity-onhand picklist-field" data-bind="text: quantityOnHand"></div>
                           <div class="quantity-picked">
-                            <input data-bind="value: quantityPicked" type="text" class="number"></input>
+                            <input data-bind="value: quantity" type="text" class="number"></input>
                           </div>
                           <div class="clear"></div>
                       </div>

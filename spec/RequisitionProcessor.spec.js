@@ -63,7 +63,7 @@ describe('Requisition Processor View Model', function(){
      expect(picklistItem1.lotNumber()).toEqual(inventoryItem1.lotNumber);
      expect(picklistItem1.expirationDate()).toEqual(inventoryItem1.expirationDate);
      expect(picklistItem1.quantityOnHand()).toEqual(inventoryItem1.quantityOnHand);
-     expect(picklistItem1.quantityPicked()).toEqual(plItem1.quantity);
+     expect(picklistItem1.quantity()).toEqual(plItem1.quantity);
 
 
      expect(picklistItem2.inventoryItemId()).toEqual(inventoryItem2.inventoryItemId);
@@ -73,7 +73,7 @@ describe('Requisition Processor View Model', function(){
      expect(picklistItem2.lotNumber()).toEqual(inventoryItem2.lotNumber);
      expect(picklistItem2.expirationDate()).toEqual(inventoryItem2.expirationDate);
      expect(picklistItem2.quantityOnHand()).toEqual(inventoryItem2.quantityOnHand);
-     expect(picklistItem2.quantityPicked()).toEqual(plItem2.quantity);
+     expect(picklistItem2.quantity()).toEqual(plItem2.quantity);
 
      expect(picklistItem3.inventoryItemId()).toEqual(inventoryItem3.inventoryItemId);
      expect(picklistItem3.requisitionItemId()).toEqual("requisitionItem2");
@@ -82,7 +82,7 @@ describe('Requisition Processor View Model', function(){
      expect(picklistItem3.lotNumber()).toEqual(inventoryItem3.lotNumber);
      expect(picklistItem3.expirationDate()).toEqual(inventoryItem3.expirationDate);
      expect(picklistItem3.quantityOnHand()).toEqual(inventoryItem3.quantityOnHand);
-     expect(picklistItem3.quantityPicked()).toEqual(plItem3.quantity);
+     expect(picklistItem3.quantity()).toEqual(plItem3.quantity);
 
      expect(picklistItem4.inventoryItemId()).toEqual(inventoryItem4.inventoryItemId);
      expect(picklistItem4.requisitionItemId()).toEqual("requisitionItem2");
@@ -91,7 +91,7 @@ describe('Requisition Processor View Model', function(){
      expect(picklistItem4.lotNumber()).toEqual(inventoryItem4.lotNumber);
      expect(picklistItem4.expirationDate()).toEqual(inventoryItem4.expirationDate);
      expect(picklistItem4.quantityOnHand()).toEqual(inventoryItem4.quantityOnHand);
-     expect(picklistItem4.quantityPicked()).toEqual("");
+     expect(picklistItem4.quantity()).toEqual("");
 
 
      expect(viewModel.requisition.picklist.id()).toEqual(picklistData.id);
@@ -103,9 +103,9 @@ describe('Requisition Processor View Model', function(){
        it("should save new pick list", function(){
          var viewModel = new openboxes.requisition.ProcessViewModel(requisitionData, {}, inventoryItemsData);
          var form = {action:"url"};
-         viewModel.requisition.requisitionItems()[0].picklistItems()[0].quantityPicked(100);
-         viewModel.requisition.requisitionItems()[0].picklistItems()[1].quantityPicked(0);
-         viewModel.requisition.requisitionItems()[1].picklistItems()[0].quantityPicked(500);
+         viewModel.requisition.requisitionItems()[0].picklistItems()[0].quantity(100);
+         viewModel.requisition.requisitionItems()[0].picklistItems()[1].quantity(0);
+         viewModel.requisition.requisitionItems()[1].picklistItems()[0].quantity(500);
          viewModel.save(form);
          var dataSent = JSON.parse(ajaxOptions.data);
          expect(dataSent["id"]).toEqual("");
@@ -144,9 +144,9 @@ describe('Requisition Processor View Model', function(){
       it("should update pick list", function(){
          var viewModel = new openboxes.requisition.ProcessViewModel(requisitionData, picklistData, inventoryItemsData);
          var form = {action:"url"};
-         viewModel.requisition.requisitionItems()[0].picklistItems()[0].quantityPicked(100);
-         viewModel.requisition.requisitionItems()[0].picklistItems()[1].quantityPicked(0);
-         viewModel.requisition.requisitionItems()[1].picklistItems()[0].quantityPicked(500);
+         viewModel.requisition.requisitionItems()[0].picklistItems()[0].quantity(100);
+         viewModel.requisition.requisitionItems()[0].picklistItems()[1].quantity(0);
+         viewModel.requisition.requisitionItems()[1].picklistItems()[0].quantity(500);
          viewModel.requisition.requisitionItems()[0].picklistItems()[0].version(5);
 
          viewModel.save(form);

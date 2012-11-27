@@ -29,10 +29,10 @@ describe("requisition model", function(){
 
 
   it("should build requisition items and picklist items when build requisition", function(){
-    var pickItem1 ={quantityPicked: 15, inventoryItemId: "ii1", requisitionItemIs:"item1"};
-    var pickItem2 ={quantityPicked: 0, inventoryItemId: "ii2", requisitionItemIs:"item1"};
-    var pickItem3 ={quantityPicked: 0, inventoryItemId: "ii3", requisitionItemIs:"item2"};
-    var pickItem4 ={quantityPicked: 30, inventoryItemId: "ii4", requisitionItemIs:"item2"};
+    var pickItem1 ={quantity: 15, inventoryItemId: "ii1", requisitionItemIs:"item1"};
+    var pickItem2 ={quantity: 0, inventoryItemId: "ii2", requisitionItemIs:"item1"};
+    var pickItem3 ={quantity: 0, inventoryItemId: "ii3", requisitionItemIs:"item2"};
+    var pickItem4 ={quantity: 30, inventoryItemId: "ii4", requisitionItemIs:"item2"};
     var data = {
       id: "abc",
       picklist: {id:"picklist1"},
@@ -43,7 +43,7 @@ describe("requisition model", function(){
     };
     var requisition = new openboxes.requisition.Requisition(data);
     expect(requisition.requisitionItems()[0].id()).toBe("item1");
-    expect(requisition.requisitionItems()[0].picklistItems()[0].quantityPicked()).toBe(15);
+    expect(requisition.requisitionItems()[0].picklistItems()[0].quantity()).toBe(15);
     expect(requisition.requisitionItems()[0].picklistItems()[0].inventoryItemId()).toBe("ii1");
     expect(requisition.requisitionItems()[0].orderIndex()).toBe(3);
     expect(requisition.requisitionItems()[1].id()).toBe("item2");
@@ -53,7 +53,7 @@ describe("requisition model", function(){
     var pickedItems = requisition.picklist.picklistItems;
     expect(pickedItems.length).toBe(2);
     expect(pickedItems[0].inventoryItemId()).toEqual("ii1");
-    expect(pickedItems[0].quantityPicked()).toEqual(15);
+    expect(pickedItems[0].quantity()).toEqual(15);
     expect(pickedItems[1].inventoryItemId()).toEqual("ii4");
   });
 

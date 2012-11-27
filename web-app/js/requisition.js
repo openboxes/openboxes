@@ -22,7 +22,7 @@ openboxes.requisition.PicklistItem = function(attrs){
     self.expirationDate = ko.observable(attrs.expirationDate);
     self.quantityOnHand = ko.observable(attrs.quantityOnHand);
     self.quantityATP = ko.observable(attrs.quantityATP);
-    self.quantityPicked = ko.observable(attrs.quantityPicked || "");
+    self.quantity = ko.observable(attrs.quantity || "");
 
 };
 openboxes.requisition.Requisition = function(attrs) {
@@ -96,7 +96,7 @@ openboxes.requisition.Requisition = function(attrs) {
       var picklistItems = [];
       _.each(self.requisitionItems(), function(requisitionItem){
         var pickedItems = _.filter(requisitionItem.picklistItems(), function(picklistItem){
-          return picklistItem.quantityPicked() > 0;
+          return picklistItem.quantity() > 0;
         });
         _.each(pickedItems, function(picklistItem){
           picklistItems.push(picklistItem);
@@ -134,7 +134,7 @@ openboxes.requisition.RequisitionItem = function(attrs) {
     self.quantityPicked = ko.computed(function() {
         var sum = 0;
         for(var i in self.picklistItems()) {
-            sum += parseInt(self.picklistItems()[i].quantityPicked() || 0);
+            sum += parseInt(self.picklistItems()[i].quantity() || 0);
         }
         return sum;
     }, this);
@@ -169,7 +169,7 @@ openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData,
               pickedItem["id"] = pickedItem.id || "";
               pickedItem["inventoryItem.id"] = pickedItem.inventoryItemId;
               pickedItem["requisitionItem.id"] = pickedItem.requisitionItemId;
-              pickedItem["quantity"] = pickedItem.quantityPicked;
+              pickedItem["quantity"] = pickedItem.quantity;
               delete pickedItem.version;
         });
         var jsonString = JSON.stringify(picklist);
@@ -211,7 +211,7 @@ openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData,
           return picklistItem.requisitionItemId == requisitionItem.id && picklistItem.inventoryItemId == picklistItemData.inventoryItemId;
         });
         if(matchedPicklistItem){
-          picklistItemData.quantityPicked = matchedPicklistItem.quantity;
+          picklistItemData.quantity = matchedPicklistItem.quantity;
           picklistItemData.id = matchedPicklistItem.id;
           picklistItemData.version = matchedPicklistItem.version;
         }

@@ -3,7 +3,7 @@ describe("requisitionItem",function(){
       var requisitionItem = new openboxes.requisition.RequisitionItem({id: "1234", quantity:5000});
       expect(requisitionItem.status()).toBe("Incomplete");
       var picklistItem1 = new openboxes.requisition.PicklistItem({
-        quantityPicked: 1000,
+        quantity: 1000,
         quantityOnHand: 2000
       });
       requisitionItem.picklistItems.push(picklistItem1);
@@ -13,7 +13,7 @@ describe("requisitionItem",function(){
       expect(requisitionItem.status()).toBe("PartiallyComplete");
 
       var picklistItem2 = new openboxes.requisition.PicklistItem({
-        quantityPicked: 4000,
+        quantity: 4000,
         quantityOnHand: 4000
       });
       requisitionItem.picklistItems.push(picklistItem2);
