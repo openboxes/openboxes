@@ -105,7 +105,7 @@
                                                     </g:else>
                                                 </td>
                                                 <td>
-                                                    %{--<format:metadata obj="${requisitionItem.displayName()}"/>--}%
+                                                    <format:metadata obj="${requisitionItem?.product?.name}"/>
                                                 </td>
                                                 <td>
                                                     ${requisitionItem?.quantity}
