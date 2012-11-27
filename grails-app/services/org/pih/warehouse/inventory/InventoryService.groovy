@@ -910,8 +910,6 @@ class InventoryService implements ApplicationContextAware {
             def item = it.inventoryItem
             def transaction = it.transaction
 
-			println "======================>> [" + transaction.transactionDate + "] " + 
-				transaction.transactionType.transactionCode + " " + it.inventoryItem.product + " " + it.inventoryItem.lotNumber + " " + it.quantity
 			
             // first see if this is an entry we can skip (because we've already reach a product inventory transaction
             // for this product, or a inventory transaction for this inventory item)
@@ -2774,6 +2772,7 @@ class InventoryService implements ApplicationContextAware {
                 item.quantity = valueMap[item]
                 item
             }
+            inventoryItems.sort{ it.expirationDate}
             result[product]  = inventoryItems
         }
         result

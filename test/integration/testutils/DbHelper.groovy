@@ -44,13 +44,13 @@ class DbHelper {
         newOne
     }
 
-    static InventoryItem createInventoryItem(Product product, String lotNumber) {
+    static InventoryItem createInventoryItem(Product product, String lotNumber, expirationDate = new Date().plus(30) ) {
         def existingOne = InventoryItem.findByProductAndLotNumber(product, lotNumber)
         if(existingOne) return existingOne
         InventoryItem item = new InventoryItem()
         item.product = product
         item.lotNumber = lotNumber
-        item.expirationDate =  new Date().plus(30)
+        item.expirationDate =  expirationDate
         item.save(flush:true)
         item
     }

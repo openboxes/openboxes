@@ -71,8 +71,8 @@ class InventoryServiceTests extends GroovyTestCase {
         tylenolProduct = DbHelper.creatProductIfNotExist("Tylenol" + UUID.randomUUID().toString()[0..5])
 
         // create some inventory items
-        aspirinItem1 = DbHelper.createInventoryItem(aspirinProduct, "1")
-        aspirinItem2 = DbHelper.createInventoryItem(aspirinProduct, "2")
+        aspirinItem1 = DbHelper.createInventoryItem(aspirinProduct, "1", new Date().plus(100))
+        aspirinItem2 = DbHelper.createInventoryItem(aspirinProduct, "2", new Date().plus(10))
         tylenolItem = DbHelper.createInventoryItem(tylenolProduct, "1")
     }
 
@@ -222,6 +222,8 @@ class InventoryServiceTests extends GroovyTestCase {
         assert inventoryItems[aspirinProduct].find{ it.id == aspirinItem1.id }.quantity == 94
         assert inventoryItems[aspirinProduct].find{ it.id == aspirinItem2.id }.quantity == 3
         assert inventoryItems[tylenolProduct].find{ it.id == tylenolItem.id }.quantity == 25
+        assert inventoryItems[aspirinProduct][0].id == aspirinItem2.id //sorted by expirationDate
+        assert inventoryItems[aspirinProduct][1].id == aspirinItem1.id
 
 
     }

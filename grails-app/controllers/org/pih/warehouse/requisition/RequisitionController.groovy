@@ -78,7 +78,6 @@ class RequisitionController {
             def picklist = Picklist.findByRequisition(requisition)?: new Picklist()
             def productInventoryItemsMap = [:]
             def productInventoryItems = inventoryService.getInventoryItemsWithQuantity(requisition.requisitionItems?.collect{ it.product}, currentInventory)
-            //todo: move to service
             productInventoryItems.keySet().each { product ->
                 productInventoryItemsMap[product.id] = productInventoryItems[product].collect{it.toJson()}
             }
