@@ -24,16 +24,16 @@ class RequisitionItem implements Serializable {
 	String id
 	String description	
 	InventoryItem inventoryItem
-  Product product
-  Category category
-  ProductGroup productGroup
+    Product product
+    Category category
+    ProductGroup productGroup
 	Integer quantity 
 	Float unitPrice	
 	Person requestedBy	// the person who actually requested the item
 	Boolean substitutable = false
-  String recipient
-  String comment
-  Integer orderIndex
+    String recipient
+    String comment
+    Integer orderIndex
 
 	
 	// Audit fields
@@ -46,7 +46,7 @@ class RequisitionItem implements Serializable {
 
 	static mapping = {
 		id generator: 'uuid'
-    picklistItems cascade: "all-delete-orphan", sort: "id"
+        picklistItems cascade: "all-delete-orphan", sort: "id"
 	}
 		
     static constraints = {

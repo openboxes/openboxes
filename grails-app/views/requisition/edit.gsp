@@ -147,13 +147,18 @@
         <g:isUserInRole roles="[RoleType.ROLE_ADMIN]">
             <input type="button" id="deleteRequisition" data-bind='visible: requisition.id' value="${warehouse.message(code: 'default.button.delete.label')}"/>
         </g:isUserInRole>
-      <input type="submit" id="save-requisition" value="${warehouse.message(code: 'default.button.save.label')}"/>
-       <g:link class="list" action="process" data-bind="visible: requisition.id" id="${requisitionId}">
-         <input type="button" value="${warehouse.message(code:'requisition.processButton.label')}"/>
-       </g:link>
-      <g:link action="cancel" id="${requisitionId}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-		    <input type="button" name="cancelRequisition" value="${warehouse.message(code: 'default.button.cancel.label')}"/>
-	   </g:link>
+        <input type="submit" id="save-requisition" value="${warehouse.message(code: 'default.button.submit.label')}"/>
+        <g:if test="${requisitionId}">
+            <g:link action="show" id="${requisitionId}">
+                <input type="button" name="cancelRequisition" value="${warehouse.message(code: 'default.button.cancel.label')}"/>
+            </g:link>
+        </g:if>
+        <g:else>
+            <g:link action="list" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                <input type="button" name="cancelRequisition" value="${warehouse.message(code: 'default.button.cancel.label')}"/>
+            </g:link>
+        </g:else>
+
 
     </div>
   </g:form>
@@ -173,8 +178,12 @@
         var viewModel = new openboxes.requisition.EditRequisitionViewModel(requisitionData);
         var requisitionId = viewModel.requisition.id();
         viewModel.savedCallback = function(){
-            if(!requisitionId) window.location = "${request.contextPath}/requisition/edit/" + viewModel.requisition.id();
-            $("#flash").text("${warehouse.message(code:'requisition.saved.message')}").show().delay(3000).fadeOut("slow");
+            if(!requisitionId) {
+                window.location = "${request.contextPath}/requisition/edit/" + viewModel.requisition.id();
+            } else {
+                window.location = "${request.contextPath}/requisition/show/" + viewModel.requisition.id();
+            }
+            //$("#flash").text("${warehouse.message(code:'requisition.saved.message')}").show().delay(3000).fadeOut("slow");
         };
         ko.applyBindings(viewModel);
 

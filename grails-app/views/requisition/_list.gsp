@@ -37,7 +37,7 @@
 					<format:metadata obj="${requisition?.status}"/>
 				</td>
 				<td>
-					<g:link action="edit" id="${requisition.id}">
+					<g:link action="show" id="${requisition.id}">
 						${fieldValue(bean: requisition, field: "name")}
 					</g:link>
 				</td>
