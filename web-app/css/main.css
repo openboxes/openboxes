@@ -551,6 +551,9 @@ th.desc a {
 .linkButton a.trash {
     background: url(../images/icons/silk/bin.png) center left no-repeat;
 }
+.linkButton a.export {
+    background: url(../images/icons/silk/arrow_down.png) center left no-repeat;
+}
 
 
 

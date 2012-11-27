@@ -115,7 +115,7 @@
 	    <g:render template="/common/header"/>		    
 	</div>
 	<g:if test="${session?.user && session?.warehouse}">
-		<div id="megamenu" class="left">    
+		<div id="megamenu">    
 			<g:include controller="dashboard" action="megamenu"/>		    
 		</div>
 	</g:if>	    
@@ -210,15 +210,6 @@
 					<g:layoutBody />
 				</div>
 	      	</div>
-	      		      	
-	      	<!-- YUI nav block that includes the local navigation menu -->
-	      	<%-- 
-	      	<div id="menu" class="yui-b">
-		  		<g:if test="${session?.user && session?.warehouse}">
-					<g:include controller="dashboard" action="menu"/>
-				</g:if>
-			</div>
-			--%>			 
 		</div>
 	</div>
 
