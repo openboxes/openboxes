@@ -37,7 +37,7 @@ class RequisitionController {
     }
 
     def create = {
-        def requisition = new Requisition()
+        def requisition = new Requisition(status: RequisitionStatus.NEW)
         render(view:"edit", model:[requisition:requisition.toJson() as JSON, depots: getDepots()])
     }
 
@@ -73,11 +73,12 @@ class RequisitionController {
     def process = {
         def requisition = Requisition.get(params?.id)
         if (requisition) {
+            requisition.status = RequisitionStatus.OPEN
             def currentInventory = Location.get(session.warehouse.id).inventory
             def picklist = Picklist.findByRequisition(requisition)?: new Picklist()
             def productInventoryItemsMap = [:]
             def productInventoryItems = inventoryService.getInventoryItemsWithQuantity(requisition.requisitionItems?.collect{ it.product}, currentInventory)
-
+            //todo: move to service
             productInventoryItems.keySet().each { product ->
                 productInventoryItemsMap[product.id] = productInventoryItems[product].collect{it.toJson()}
             }
@@ -128,16 +129,6 @@ class RequisitionController {
         redirect(action: "list", id:params.id)
     }
 
-    def addComment = {
-        def requestInstance = Requisition.get(params?.id)
-        if (!requestInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
-            redirect(action: "list")
-        }
-        else {
-            return [requestInstance: requestInstance, commentInstance: new Comment()]
-        }
-    }
 
 
 

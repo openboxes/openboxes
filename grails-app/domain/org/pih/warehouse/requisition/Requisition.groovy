@@ -39,7 +39,7 @@ class Requisition implements Serializable {
 	
 	
 
-	RequisitionStatus status = RequisitionStatus.CREATED;
+	RequisitionStatus status;
 
 	Location origin			// the vendor
 	Location destination 	// the customer location 
@@ -145,7 +145,7 @@ class Requisition implements Serializable {
       name: name,
       version: version,
       lastUpdated: lastUpdated?.format("dd/MMM/yyyy hh:mm a"),
-      status: status.name(),
+      status: status?.name(),
       originId: origin?.id,
       originName: origin?.name,
       destinationId: destination?.id,

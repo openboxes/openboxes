@@ -19,10 +19,6 @@ class RequisitionIntegrationTests extends GroovyTestCase {
         requisition.addToRequisitionItems(item1)
         requisition.addToRequisitionItems(item2)
 
-        assert requisition.status == RequisitionStatus.CREATED
-        requisition.status = RequisitionStatus.OPEN
-
-
         requisition.validate()
         requisition.errors.each{ println(it)}
 
@@ -45,11 +41,6 @@ class RequisitionIntegrationTests extends GroovyTestCase {
 		assert requisition.save(flush:true)
 		assertEquals 1, requisition.requisitionItems.size()
 				
-        //def item = new RequisitionItem(product: product, quantity: 10, requisition: requisition)
-        //assert item.substitutable == false
-        //item.validate()
-        //item.errors.each{ println(it)}
-        //assert item.save(flush:true)
 
     }
 

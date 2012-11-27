@@ -13,7 +13,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.shipping.ShipmentStatusCode;
 
 public enum RequisitionStatus {
-
+  NEW(0),
 	CREATED(1),
 	OPEN(2),
 	PICKED(3),

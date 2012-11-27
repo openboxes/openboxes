@@ -40,6 +40,7 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
         assert requisition == requisitionPersisted
         assert requisition.requestedBy == john
         assert requisition.origin == miami
+        assert requisition.status == RequisitionStatus.CREATED
         assert requisition.destination == boston
         assert requisition.dateRequested == today
         assert requisition.requestedDeliveryDate == tomorrow
@@ -63,6 +64,7 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
         def oldItem2 = new RequisitionItem(id:"item2", quantity: 40)
         def oldRequisition = new Requisition(id:"requisition1", 
           origin: toronto, name:"oldRequisition",
+          status: RequisitionStatus.OPEN,
           description: "oldDescription",
           requisitionItems: [oldItem1, oldItem2])
         mockDomain(Requisition, [oldRequisition])
@@ -84,6 +86,7 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
         assert requisitionPersisted
         assert requisition == requisitionPersisted
         assert requisition.id == oldRequisition.id
+        assert requisition.status == oldRequisition.status
         assert requisition.description == oldRequisition.description
         assert requisition.requestedBy == john
         assert requisition.origin == miami

@@ -176,6 +176,7 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
       String requisitionString = renderArgs.model.requisition
       def requisitionJson = JSON.parse(requisitionString)
       assert requisitionJson.dateRequested == today
+      assert requisitionJson.status == RequisitionStatus.NEW.name()
       assert requisitionJson.requestedDeliveryDate == tomorrow 
 
     }
@@ -208,6 +209,7 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         def json = JSON.parse(model.data)
 
         assert json.requisition.id == requisition.id
+        assert json.requisition.status == RequisitionStatus.OPEN.name()
         assert json.productInventoryItemsMap
         assert json.productInventoryItemsMap[product.id]
         assert json.productInventoryItemsMap[product.id].size() == 1
