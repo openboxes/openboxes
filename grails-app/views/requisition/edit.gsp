@@ -91,7 +91,7 @@
                 ${warehouse.message(code: 'requisitionItem.quantity.label')}
             </th>
             <th class="center">
-                ${warehouse.message(code: 'requisitionItem.substitutable.label')}
+                ${warehouse.message(code: 'requisitionItem.substitutable.label')}?
             </th>
             <th class="list-header">
                 ${warehouse.message(code: 'requisitionItem.recipient.label')}

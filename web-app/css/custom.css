@@ -1249,16 +1249,25 @@ div.clear {
     height: 16px;
 }
 
+.substitution {
+    width: 16px;
+    height: 16px;
+}
+.substitution.ok {
+    background: url(../images/icons/silk/arrow_switch.png) no-repeat;
+}
+
+
 .requisition-status.Complete {
-    background: url(../images/icons/silk/bullet_green.png) no-repeat;
+    background: url(../images/icons/silk/flag_green.png) no-repeat;
 }
 
 .requisition-status.Incomplete {
-    background: url(../images/icons/silk/asterisk_red.png) no-repeat;
+    background: url(../images/icons/silk/flag_red.png) no-repeat;
   }
 
 .requisition-status.PartiallyComplete {
-    background: url(../images/icons/silk/asterisk_yellow.png) no-repeat;
+    background: url(../images/icons/silk/flag_yellow.png) no-repeat;
  }
 
 .accordion-content {
@@ -1331,5 +1340,8 @@ div.clear {
 
 .wide {
     width: 100%;
+}
+fieldset legend{
+  padding: 5px;
 }
 

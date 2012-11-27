@@ -34,7 +34,11 @@
                     ${warehouse.message(code: 'requisitionItem.quantityPicked.label')}: <span data-bind="text:quantityPicked"></span></div>
                     <div class="quantityRemaining">
                     ${warehouse.message(code: 'requisitionItem.quantityRemaining.label')}: <span data-bind="text:quantityRemaining"></span></div>
-                    <div class="status"><div data-bind="css:status" class="right requisition-status"></div></div>
+                    
+                    <div class="status right">
+                      <div data-bind="css:status" class="requisition-status right"></div>
+                      <div data-bind="css: { ok: substitutable() }" class="substitution right"></div>
+                    </div>
                     <div class="clear"></div>
                   </div>
                   <div class="accordion-content">
@@ -85,6 +89,9 @@
                 <div class="clear"></div>                
                 <div class="Incomplete left requisition-status"></div>
                 <div class="left"><warehouse:message code="requisitionItem.incomplete.label"/></div>
+                <div class="clear"></div>
+                <div class="substitution ok left"></div>
+                <div class="left"><warehouse:message code="requisitionItem.substitutable.label"/></div>
                 <div class="clear"></div>
         </fieldset>
     </div>
