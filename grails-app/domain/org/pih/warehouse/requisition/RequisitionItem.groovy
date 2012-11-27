@@ -23,17 +23,17 @@ class RequisitionItem implements Serializable {
 	
 	String id
 	String description	
-	Category category
-	Product product
-	ProductGroup productGroup
 	InventoryItem inventoryItem
-	Integer quantity = 1
+  Product product
+  Category category
+  ProductGroup productGroup
+	Integer quantity 
 	Float unitPrice	
 	Person requestedBy	// the person who actually requested the item
 	Boolean substitutable = false
-    String recipient
-    String comment
-    Integer orderIndex
+  String recipient
+  String comment
+  Integer orderIndex
 
 	
 	// Audit fields
@@ -46,55 +46,25 @@ class RequisitionItem implements Serializable {
 
 	static mapping = {
 		id generator: 'uuid'
-        picklistItems cascade: "all-delete-orphan", sort: "id"
+    picklistItems cascade: "all-delete-orphan", sort: "id"
 	}
 		
     static constraints = {
     	description(nullable:true)
-		category(nullable:true)
-		product(nullable:false)
-		productGroup(nullable:true)
-		inventoryItem(nullable:true)
-		requestedBy(nullable:true)
-		quantity(nullable:false, min:1)
-		unitPrice(nullable:true)
-        substitutable(nullable:false)
-        comment(nullable:true)
-        recipient(nullable:true)
-        orderIndex(nullable: true)
-	}
-
-	String getType() { 
-		return (product)?"Product":(productGroup)?"ProductGroup":(category)?"Category":""
-	}
-	
-	String displayName() {
-		if (product) {
-			return product.name;
-		}
-		else if (productGroup) { 
-			return productGroup.description
-		}
-		else if (category) {
-			return category.name
-		}
-		else {
-			return description;
-		}
-	}
-	
-	def totalPrice() {
-		return ( quantity ? quantity : 0.0 ) * ( unitPrice ? unitPrice : 0.0 );
+      category(nullable:true)
+      product(nullable:false)
+      productGroup(nullable:true)
+      inventoryItem(nullable:true)
+      requestedBy(nullable:true)
+      quantity(nullable:false, min:1)
+      unitPrice(nullable:true)
+      substitutable(nullable:false)
+      comment(nullable:true)
+      recipient(nullable:true)
+      orderIndex(nullable: true)
 	}
 
 
-    boolean checkIsEmpty() {
-     (id == null || id == "") && quantity == 1 && product == null && substitutable == false && (comment == null || comment == "") && (recipient == null || recipient == "")
-    }
-
-    String toString(){
-        "id:${id} product:${product} quantity:${quantity} substitutable:${substitutable} comment:${comment} recipient:${recipient}"
-    }
 
     Map toJson(){
       [
