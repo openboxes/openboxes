@@ -38,7 +38,9 @@ class RequisitionSpec extends GebReportingSpec {
             at ShowRequisitionPage
             firstProductName == productName
             firstProductQuantity == "2000"
+            firstProductQuantityPicked == "0"
             secondProductName == productName2
             secondProductQuantity == "4000"
+            secondProductQuantityPicked == "0"
     }
 }

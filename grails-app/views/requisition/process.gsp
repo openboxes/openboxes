@@ -11,7 +11,6 @@
     <content tag="pageTitle"><warehouse:message code="default.edit.label" args="[entityName]" /></content>
 </head>
 <body>
-<div class="message" id="flash"></div>
 <div class="body">
     <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
@@ -71,10 +70,9 @@
             
             </div>
             <div class="center footer">
-                <input type="submit" id="save-requisition" value="${warehouse.message(code: 'default.button.save.label')}"/>
-
+                <input type="submit" id="save-requisition" value="${warehouse.message(code: 'default.button.submit.label')}"/>
                 <g:link action="show" id="${requisitionId}">
-                    <input type="button" value="${warehouse.message(code: 'default.button.cancel.label')}"/>
+                    <input type="button" id="cancelRequisition" value="${warehouse.message(code: 'default.button.cancel.label')}"/>
                 </g:link>
             </div>
 
@@ -101,13 +99,9 @@
     <div class="clear"></div>
 </div>
 
-
-
-
 <script type="text/javascript">
     $(function(){
         var viewModel;
-        $("#flash").hide();
         var data = ${data};
         var picklistFromServer = data.picklist;
         var picklistFromLocal = openboxes.requisition.getPicklistFromLocal(data.requisition.id); 
@@ -116,7 +110,7 @@
 
         var requisitionId = viewModel.requisition.id();
         viewModel.savedCallback = function(){
-           $("#flash").text("${warehouse.message(code:'requisition.saved.message')}").show().delay(3000).fadeOut("slow");
+            window.location = "${request.contextPath}/requisition/show/" + viewModel.requisition.id();
         };
 
         ko.applyBindings(viewModel);
@@ -136,12 +130,18 @@
             openboxes.requisition.savePicklistToLocal(viewModel.requisition.picklist);
         }, 3000);
 
+        $("#cancelRequisition").click(function() {
+            if(confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}')) {
+                openboxes.requisition.deletePicklistFromLocal(picklistFromServer.id);
+                return true;
+            }
+        });
+
         $(".quantity-picked input").keyup(function(){
            this.value=this.value.replace(/[^\d]/,'');      
            $(this).trigger("change");//Safari and IE do not fire change event for us!
         });
 
-      
     });
 </script>
 

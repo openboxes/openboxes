@@ -51,20 +51,23 @@ class RequisitionItem implements Serializable {
 		
     static constraints = {
     	description(nullable:true)
-      category(nullable:true)
-      product(nullable:false)
-      productGroup(nullable:true)
-      inventoryItem(nullable:true)
-      requestedBy(nullable:true)
-      quantity(nullable:false, min:1)
-      unitPrice(nullable:true)
-      substitutable(nullable:false)
-      comment(nullable:true)
-      recipient(nullable:true)
-      orderIndex(nullable: true)
+        category(nullable:true)
+        product(nullable:false)
+        productGroup(nullable:true)
+        inventoryItem(nullable:true)
+        requestedBy(nullable:true)
+        quantity(nullable:false, min:1)
+        unitPrice(nullable:true)
+        substitutable(nullable:false)
+        comment(nullable:true)
+        recipient(nullable:true)
+        orderIndex(nullable: true)
 	}
 
-
+    def calculateQuantityPicked() {
+        def totalPicked = PicklistItem.findAllByRequisitionItem(this).sum{it.quantity}
+        totalPicked
+    }
 
     Map toJson(){
       [

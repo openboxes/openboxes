@@ -110,9 +110,8 @@
                                                 <td class="quantity">
                                                     ${requisitionItem?.quantity}
                                                 </td>
-                                                <td>
-                                                    %{--<g:set var="quantityPicked" value="${requisitionItem?.picklistItems?.sum { it.quantity }?:0 }"/>--}%
-                                                    %{--${ quantityPicked }--}%
+                                                <td class="quantityPicked">
+                                                    ${requisitionItem?.calculateQuantityPicked()?:0}
                                                 </td>
                                             </tr>
                                         </g:each>
