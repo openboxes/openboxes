@@ -104,10 +104,10 @@
                                                         <warehouse:message code="default.unclassified.label"/>
                                                     </g:else>
                                                 </td>
-                                                <td>
+                                                <td class="product">
                                                     <format:metadata obj="${requisitionItem?.product?.name}"/>
                                                 </td>
-                                                <td>
+                                                <td class="quantity">
                                                     ${requisitionItem?.quantity}
                                                 </td>
                                                 <td>

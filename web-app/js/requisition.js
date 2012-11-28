@@ -340,7 +340,6 @@ openboxes.getFromLocal = function(name){
 openboxes.deleteFromLocal = function(name){
   if(typeof(Storage) !== "undefined" && localStorage[name])
     delete localStorage[name];
-  return null;
 };
 
 openboxes.requisition.Requisition.getNewer = function(serverData, localData){

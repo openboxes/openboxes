@@ -61,6 +61,7 @@ ko.bindingHandlers.search_product = {
           }
       })
       .data("autocomplete" )._renderItem = function( ul, item ) {
+            if(params().id) ul.attr("id", params().id);
             var li = $("<li>").data("item.autocomplete", item );
             if(item.type == 'Product'){
                 var text = item.quantity == null ? item.value : item.value + " QTY: " + item.quantity;

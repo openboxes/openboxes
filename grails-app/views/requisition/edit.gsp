@@ -111,7 +111,7 @@
             <input type="text"
               placeholder="${warehouse.message(code:'requisition.addItem.label')}"
               class="required autocomplete" 
-              data-bind="search_product: {source: '${request.contextPath }/json/searchProduct'}, uniqueName: true, value: productName" size="50"/>
+              data-bind="search_product: {source: '${request.contextPath }/json/searchProduct', id:'searchProduct'+$index()}, uniqueName: true, value: productName" size="50"/>
           </td>
           <td  class="list-header">
             <input type="text" class="required number quantity" size="6" 
@@ -136,7 +136,7 @@
       <tfoot>
         <tr>
           <td colSpan="6">
-            <input type="button" data-bind='click: requisition.addItem' value="${warehouse.message(code:'requisition.addNewItem.label')}"/>
+            <input type="button" name="addRequisitionItemRow" data-bind='click: requisition.addItem' value="${warehouse.message(code:'requisition.addNewItem.label')}"/>
           </td
         ></tr>
       </tfoot>
@@ -151,16 +151,10 @@
 
     </div>
   </g:form>
-  <g:form name="deleteRequisitionForm" method="post" action="delete">
-    <input type="hidden" name="id" value="${requisitionId}" />
-  </g:form>
-
 
 
 <script type="text/javascript">
     $(function () {
-        $("#flash").hide();
-        $("#deleteRequisition").click(function(){$("#deleteRequisitionForm").submit();});
         var requisitionFromServer = ${requisition};
         var requisitionFromLocal = openboxes.requisition.getRequisitionFromLocal(requisitionFromServer.id);
         var requisitionData = openboxes.requisition.Requisition.getNewer(requisitionFromServer, requisitionFromLocal);
@@ -190,6 +184,7 @@
             var description = "${warehouse.message(code: 'requisition.label', default: 'Requisition')}: " + depot + " - " + program + ", " + requestedBy + " - " + dateRequested + ", " + deliveryDate;
             viewModel.requisition.name(description);
         };
+
         $(".value").change(updateDescription);
         setInterval(function () {
             openboxes.requisition.saveRequisitionToLocal(viewModel.requisition);
