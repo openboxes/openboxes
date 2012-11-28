@@ -185,9 +185,9 @@ class InventoryServiceTests extends GroovyTestCase {
     void test_getProductsQuantityForInventory(){
         transactionEntryTestFixture()
         def inventoryService = new InventoryService()
-        def results = inventoryService.getProductsQuantityForInventory(bostonInventory)
-        assert results[aspirinProduct] == 97
-        assert results[tylenolProduct] == 25
+        def results = inventoryService.getQuantityForProducts(bostonInventory, [tylenolProduct.id])
+        assert results[tylenolProduct.id] == 25
+        assert results.keySet().size() == 1
     }
 
 

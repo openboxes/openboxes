@@ -1,11 +1,10 @@
 package org.pih.warehouse
 
 import grails.test.ControllerUnitTestCase
-import org.pih.warehouse.product.ProductGroup
-import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.*
 import grails.converters.JSON
 import org.pih.warehouse.requisition.RequisitionService
-import org.pih.warehouse.inventory.InventoryService
+import org.pih.warehouse.inventory.*
 import org.pih.warehouse.core.*
 
 
@@ -13,7 +12,8 @@ import org.pih.warehouse.core.*
 class JsonControllerTests extends ControllerUnitTestCase {
 
     void testSearchProductByName() {
-        def location = new Location(name: "boston", id: "1234")
+        def bostonInventory = new Inventory(id: "bostonInventory")        
+        def location = new Location(name: "boston", id: "1234", inventory: bostonInventory)
         mockDomain(Location, [location])
         def group1 = new ProductGroup(id: "group1", description: "painkiller")
         def group2 = new ProductGroup(id: "group2", description: "painLight")
@@ -22,32 +22,35 @@ class JsonControllerTests extends ControllerUnitTestCase {
         def product21 = new Product(id: "product21", name: "foo killer")
         def product22 = new Product(id: "product22", name: "moo")
         def product3 = new Product(id: "product3", name: "gookiller")
-        mockDomain(ProductGroup, [group1, group2])
-        mockDomain(Product, [product11, product12, product21, product22, product3])
-        group1.addToProducts(product11)
-        group1.addToProducts(product12)
-        group2.addToProducts(product21)
-        group2.addToProducts(product22)
-        product11.addToProductGroups(group1)
-        product12.addToProductGroups(group1)
-        product21.addToProductGroups(group2)
-        product22.addToProductGroups(group2)
+
+        def productsSearchResult = [
+          [product11.id, product11.name, group1.description, group1.id],
+          [product12.id, product12.name, group1.description, group1.id],
+          [product21.id, product21.name, group2.description, group2.id],
+          [product3.id, product3.name, null, null],
+        ]
+
+        def productServiceMock = mockFor(ProductService)
+        productServiceMock.demand.searchProductAndProductGroup(1..1){ term -> productsSearchResult}
 
         def inventoryServiceMock = mockFor(InventoryService)
         def quantities = [:]
-        quantities[product11] = 1100
-        quantities[product12] = 1200
-        quantities[product21] = 2100
-        quantities[product22] = 2200
-        quantities[product3] = 3000
-        inventoryServiceMock.demand.getProductsQuantityForInventory{inventory -> quantities}
+        quantities[product11.id] = 1100
+        quantities[product12.id] = 1200
+        quantities[product21.id] = 2100
+        quantities[product22.id] = 2200
+        quantities[product3.id] = 3000
+
+        inventoryServiceMock.demand.getQuantityForProducts{inventory, prodcutIds -> quantities}
         controller.inventoryService =  inventoryServiceMock.createMock()
+        controller.productService = productServiceMock.createMock()
         controller.session.warehouse = location
         controller.params.term = "killer"
         controller.searchProduct()
         def jsonResponse = controller.response.contentAsString
         def jsonResult = JSON.parse(jsonResponse)
 
+        
         //result should be sorted by group name and then product name
         assert jsonResult[0].id == product3.id
         assert jsonResult[1].id == group2.id
@@ -90,25 +93,4 @@ class JsonControllerTests extends ControllerUnitTestCase {
 
     }
 
-//Todo: it seems test does not like withCriteria, waiting for solution; by Peter
-//   void testSearchPersonByName(){
-//      def john = new Person(id:"1",firstName:"john", lastName:"Hoo", email:"jhoo@abc.com")
-//      def tom = new Person(id:"2",firstName:"tom", lastName:"Hoo", email:"thoo@abc.com")
-//      def kyle = new Person(id:"3",firstName:"kyle", lastName:"Foo", email:"kfoo@abc.com")
-//      def stev = new Person(id:"4",firstName:"stev", lastName:"Foo", email:"sfhoo@abc.com")
-//      def magan = new Person(id:"5",firstName:"magan", lastName:"Jsonson", email:"mjsonson@abc.com")
-//      mockDomain(Person, [john, tom, kyle, stev, magan])
-//
-//      controller.params.term = "tom hoo"
-//      controller.searchPersonByName()
-//
-//      def jsonResponse = controller.response.contentAsString
-//      def json = JSON.parse(jsonResponse)
-//      assert json.size() == 2
-//      assert json[0].id == john.id
-//      assert json[0].value == john.name
-//      assert json[0].label == john.name + " " + john.email
-//      assert json[1].id == tom.id
-//
-//   }
 }

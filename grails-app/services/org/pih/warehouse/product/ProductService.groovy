@@ -382,5 +382,13 @@ class ProductService {
 		}
 
 	}
+
+
+  public def searchProductAndProductGroup(String term){
+    def text = "%${term.toLowerCase()}%"
+    def products = Product.executeQuery("select p.id, p.name, g.description, g.id as gid from Product as p left join  p.productGroups as g where lower(p.name) like ? or lower(g.description) like ?", [text, text])
+    // products.each{ println it}
+    products
+  }
 	
 }

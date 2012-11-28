@@ -444,57 +444,19 @@ class JsonController {
 
   
   def searchProduct = {
-        log.debug "Search products and product groups contains:" + params.term
-        def location = Location.get(session.warehouse.id);
-        def groupsWithNameMatched = ProductGroup.findAllByDescriptionIlike ("%" + params.term + "%")
-
-        def groupsFromProductNameMatched = []
-        def productWithoutAnyGroups = []
-        def result = []
-        def quantities = inventoryService.getProductsQuantityForInventory(location.inventory)
-        groupsWithNameMatched.each { group ->
-            result.add(getProductGroupItem(group))
-            result.addAll(group.products.collect { product -> getProductItem(product, group, quantities)})
-        }
-        def productsWithNameMatched = Product.findAllByNameIlike ("%" + params.term + "%")
-        buildGroupsFromProductNameMatched(productsWithNameMatched, productWithoutAnyGroups,
-                groupsWithNameMatched, groupsFromProductNameMatched)
-
-
-
-        groupsFromProductNameMatched.each{ group ->
-            result.add(getProductGroupItem(group))
-            result.addAll(group.products.findAll{p ->productsWithNameMatched.contains(p)}
-                        .collect { product -> getProductItem(product, group, quantities)})
-        }
-
-       result.addAll(productWithoutAnyGroups.collect { product -> getProductItem(product, null, quantities)})
-       println result
-       render result.sort{"${it.group}${it.value}"} as JSON
-    }
-
-    private def getProductGroupItem(ProductGroup group) {
-        [id: group.id, value: group.description, type: "ProductGroup", group: ""]
-    }
-
-    private def getProductItem(Product product, ProductGroup group,Map<Product, Integer> quantities) {
-        [id: product.id, value: product.name, type: "Product", group: group?.description ?: "", quantity: quantities[product]]
-    }
-
-
-
-    private def buildGroupsFromProductNameMatched(List<Product> productsWithNameMatched,
-                                                  List<Product> productWithoutAnyGroups,
-                                                  List<ProductGroup> groupsWithNameMatched,
-                                                  List<ProductGroup> groupsFromProductNameMatched) {
-        productsWithNameMatched.each { product ->
-            if (product.productGroups.any {myGroup -> groupsWithNameMatched.contains(myGroup) || groupsFromProductNameMatched.contains(myGroup)})
-                return
-            if (!product.productGroups || product.productGroups.size() == 0)
-                productWithoutAnyGroups.add(product)
-            else
-                groupsFromProductNameMatched.addAll(product.productGroups)
-        }
+      def location = Location.get(session.warehouse.id);
+      def products = productService.searchProductAndProductGroup(params.term)
+      def productIds = products.collect{ it[0]}
+      def quantities = inventoryService.getQuantityForProducts(location.inventory, productIds)
+      def result = []  
+      
+      products.each{ productData ->
+        if(productData[3] && !result.any{it.id == productData[3] && it.type == "ProductGroup"})
+          result.add([id: productData[3], value: productData[2], type:"ProductGroup", group: ""])
+        result.add([id: productData[0], value: productData[1], type:"Product", quantity: quantities[productData[0]], group: productData[2] ?: ""])
+      }
+      //println result
+      render result.sort{"${it.group}${it.value}"} as JSON
     }
 
 

@@ -4,8 +4,7 @@ import grails.validation.ValidationException;
 
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.TransactionType
-import org.pih.warehouse.product.Product
-import org.pih.warehouse.product.Category
+import org.pih.warehouse.product.*
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.core.Location
 
@@ -43,6 +42,28 @@ class DbHelper {
         newOne.save(flush:true)
         newOne
     }
+
+  static Product createProductWithGroups(def name, def groupNames){
+      Product product = Product.findByName(name)
+      if(!product){
+         product = new Product(name: name, category: createCategoryIfNotExists("Integration"))
+         product.save(failOnError:true,flush:true)
+      }
+      groupNames.each{ groupName ->
+      def productGroup = ProductGroup.findByDescription(groupName)
+        if(!productGroup){
+            productGroup = new ProductGroup(description: groupName)
+            productGroup.category = createCategoryIfNotExists("Integration")
+            productGroup.save(failOnError:true,flush:true)
+        }
+        productGroup.addToProducts(product)
+        productGroup.save(failOnError:true,flush:true)
+        product.addToProductGroups(productGroup)
+        product.save(failOnError:true,flush:true)
+      }
+
+      product
+  }
 
     static InventoryItem createInventoryItem(Product product, String lotNumber, expirationDate = new Date().plus(30) ) {
         def existingOne = InventoryItem.findByProductAndLotNumber(product, lotNumber)
