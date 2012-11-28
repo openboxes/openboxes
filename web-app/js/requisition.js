@@ -329,6 +329,9 @@ openboxes.requisition.deletePicklistFromLocal = function(id){
 openboxes.saveToLocal = function(name, model){
   if(typeof(Storage) === "undefined") return;
   localStorage[name] = JSON.stringify(model);
+  var manager = JSON.parse(localStorage.openboxesManager || "{}" );
+  manager[name] = new Date();
+  localStorage.openboxesManager = JSON.stringify(manager);
 };
 
 openboxes.getFromLocal = function(name){
@@ -340,6 +343,19 @@ openboxes.getFromLocal = function(name){
 openboxes.deleteFromLocal = function(name){
   if(typeof(Storage) !== "undefined" && localStorage[name])
     delete localStorage[name];
+};
+
+openboxes.expireFromLocal = function() {
+  if(localStorage.openboxesManager) {
+    var manager = JSON.parse(localStorage.openboxesManager);
+    for(var prop in manager) {
+        var currentDate = new Date();
+        var lastAccessDate = new Date(manager[prop]);
+        if(currentDate > lastAccessDate.setDate(lastAccessDate.getDate() + 7)) {
+            openboxes.deleteFromLocal(prop);
+        }
+    }
+  }
 };
 
 openboxes.requisition.Requisition.getNewer = function(serverData, localData){

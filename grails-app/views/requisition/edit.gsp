@@ -164,7 +164,6 @@
             if(!requisitionId) {
                 window.location = "${request.contextPath}/requisition/edit/" + viewModel.requisition.id();
             } else {
-                openboxes.requisition.deleteRequisitionFromLocal(requisitionId);
                 window.location = "${request.contextPath}/requisition/show/" + viewModel.requisition.id();
             }
         };

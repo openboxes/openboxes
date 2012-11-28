@@ -1,10 +1,26 @@
 describe("miscellaneous", function(){
-  
- 
+
+  it("should expire requisitions after 7 days", function(){
+    var model = {id:"1234",name:"test"};
+    openboxes.saveToLocal("test", model);
+    expect(localStorage.openboxesManager).not.toBeNull();
+    var d = new Date();
+    var manager = JSON.parse(localStorage.openboxesManager);
+    d.setDate(d.getDate()-10);
+    manager["test"] = d;
+    localStorage.openboxesManager = JSON.stringify(manager);
+    openboxes.expireFromLocal();
+    var retrievedModel = openboxes.getFromLocal("test");
+    expect(retrievedModel).toBeNull();
+  });
+
   it("should save and get from local storage", function(){
     var model = {id:"1234",name:"test"};
     openboxes.saveToLocal("test", model);
     var retrievedModel = openboxes.getFromLocal("test");
+    expect(localStorage.openboxesManager).not.toBeNull();
+    expect(localStorage.openboxesManager["test"]).not.toBeNull();
+    console.log(localStorage.openboxesManager["test"]);
     expect(retrievedModel.id).toEqual(model.id);
     expect(retrievedModel.name).toEqual(model.name);
   });
@@ -64,7 +80,4 @@ describe("miscellaneous", function(){
     var retrievedModel = openboxes.getFromLocal(key);
     expect(retrievedModel).toBeNull();
   });
-
-
- 
 });

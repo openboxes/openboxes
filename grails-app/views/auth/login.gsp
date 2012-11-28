@@ -5,6 +5,7 @@
 	<title><warehouse:message code="auth.title"/></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<script src="${createLinkTo(dir:'js/', file:'detect_timezone.js')}" type="text/javascript" ></script>
+    <script src="${createLinkTo(dir:'js/', file:'requisition.js')}" type="text/javascript" ></script>
 </head>
 <body>
 	<style>
@@ -97,6 +98,7 @@
 		    $("#password").watermark("${warehouse.message(code:'login.password.label')}");
 			$("#username").focus();
 
+            openboxes.expireFromLocal();
 		});
 	</script>	
 </body>
