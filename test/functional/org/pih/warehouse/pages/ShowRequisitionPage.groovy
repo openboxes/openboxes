@@ -7,15 +7,17 @@ class ShowRequisitionPage extends Page {
     static url = TestFixture.baseUrl + "/requisition/show"
     static at = { title == "View requisition"}
     static content = {
-        details { $("#tabs-details table").last() }
-        detailsBody { $(details.find("tbody")) }
-        firstProduct { $(detailsBody.find("tr").first()) }
-        firstProductName { $(firstProduct.find("td.product")).text().trim() }
-        firstProductQuantity { $(firstProduct.find("td.quantity")).text().trim() }
-        firstProductQuantityPicked { $(firstProduct.find("td.quantityPicked")).text().trim() }
-        secondProduct { $(firstProduct.next()) }
-        secondProductName { $(secondProduct.find("td.product")).text().trim() }
-        secondProductQuantity { $(secondProduct.find("td.quantity")).text().trim() }
-        secondProductQuantityPicked { $(secondProduct.find("td.quantityPicked")).text().trim() }
+        details(wait:true) { $("#tabs-details table").last() }
+        detailsBody(wait:true) { $(details.find("tbody")) }
+        requisitionActionButton(wait:true) { $("button", class:"action-btn") }
+        processRequisitionActionButton(wait:true) { $("[name='processRequisition']")}
+        firstProduct(wait:true) { $(detailsBody.find("tr").first()) }
+        firstProductName(wait:true) { $(firstProduct.find("td.product")).text().trim() }
+        firstProductQuantity(wait:true) { $(firstProduct.find("td.quantity")).text().trim() }
+        firstProductQuantityPicked(wait:true) { $(firstProduct.find("td.quantityPicked")).text().trim() }
+        secondProduct(wait:true) { $(firstProduct.next()) }
+        secondProductName(wait:true) { $(secondProduct.find("td.product")).text().trim() }
+        secondProductQuantity(wait:true) { $(secondProduct.find("td.quantity")).text().trim() }
+        secondProductQuantityPicked(wait:true) { $(secondProduct.find("td.quantityPicked")).text().trim() }
     }
 }

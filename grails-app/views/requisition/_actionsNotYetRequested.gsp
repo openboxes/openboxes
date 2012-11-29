@@ -36,9 +36,8 @@
 			</g:link>				
 		</div>				
 		<g:if test="${session?.warehouse?.id == requisition?.destination?.id }">
-		
 			<div class="action-menu-item">
-				<g:link controller="requisition" action="process" id="${requisition?.id}">
+				<g:link controller="requisition" name="processRequisition" action="process" id="${requisition?.id}">
 					<img src="${resource(dir: 'images/icons/silk', file: 'cart_go.png')}" />
 					&nbsp;${warehouse.message(code: 'requisition.process.label', default: 'Process requisition')}
 				</g:link>				

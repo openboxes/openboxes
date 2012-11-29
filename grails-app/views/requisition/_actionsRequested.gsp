@@ -14,13 +14,13 @@
 		<div class="action-menu-item">
 			<g:link controller="requisition" action="show" id="${requisition?.id}">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" />
-				&nbsp;${warehouse.message(code: 'request.show.label', default: 'Show requisition details')}
+				&nbsp;${warehouse.message(code: 'requisition.show.label', default: 'Show requisition details')}
 			</g:link>		
 		</div>
 		<div class="action-menu-item">
-			<g:link controller="createRequestWorkflow" action="createRequest" event="pickRequestItems" id="${requisition?.id}">
+			<g:link controller="requisition" action="edit" id="${requisition?.id}">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />
-				&nbsp;${warehouse.message(code: 'request.edit.label', default: 'Edit requisition details')}
+				&nbsp;${warehouse.message(code: 'requisition.edit.label', default: 'Edit requisition details')}
 			</g:link>		
 		</div>		
 		<div class="action-menu-item">
@@ -38,7 +38,6 @@
 		<div class="action-menu-item">
 			<hr/>
 		</div>
-		
 		<g:if test="${session?.warehouse?.id == requisition?.origin?.id }">
 			<div class="action-menu-item">
 				<g:link controller="fulfillRequestWorkflow" action="fulfillRequest" id="${requisition?.id}">

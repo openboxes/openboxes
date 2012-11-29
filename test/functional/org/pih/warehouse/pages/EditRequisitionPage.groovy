@@ -10,8 +10,8 @@ class EditRequisitionPage extends Page {
         selectRequestingDepot { $("select[name='origin.id']") }
         autocompleteRequestedBy { $("input[name='requestedBy']") }
         submitRequisitionButton(to: EditRequisitionPage) { $("#save-requisition")}
-        firstRequisitionItemProduct { $("input[name='ko_unique_2']")}
-        firstRequisitionItemQuantity { $("input[name='ko_unique_3']")}
+        firstRequisitionItemProduct(wait: true) { $("input[name='ko_unique_2']")}
+        firstRequisitionItemQuantity(wait: true) { $("input[name='ko_unique_3']")}
         secondRequisitionItemProduct(wait: true) { $("input[name='ko_unique_8']")}
         secondRequisitionItemQuantity(wait: true) { $("input[name='ko_unique_9']")}
         firstProductSuggestion(wait: true){$("#searchProduct0 li.ui-menu-item a").first()}

@@ -3,6 +3,7 @@ package org.pih.warehouse
 import geb.spock.GebReportingSpec
 import org.pih.warehouse.pages.CreateRequisitionPage
 import org.pih.warehouse.pages.EditRequisitionPage
+import org.pih.warehouse.pages.ProcessRequisitionPage
 import org.pih.warehouse.pages.ShowRequisitionPage
 import testutils.TestFixture
 
@@ -17,7 +18,7 @@ class RequisitionSpec extends GebReportingSpec {
             TestFixture.CreateProductInInventory(productName2, 6000)
         and:
             to CreateRequisitionPage
-        and:
+        when:
             selectRequestingDepot.value(2) // Miama Depot
             autocompleteRequestedBy.value("Justin")
             firstSuggestion.click()
@@ -34,7 +35,7 @@ class RequisitionSpec extends GebReportingSpec {
             secondRequisitionItemQuantity.value("4000")
         and:
             submitRequisitionButton.click()
-        and:
+        then:
             at ShowRequisitionPage
             firstProductName == productName
             firstProductQuantity == "2000"
@@ -42,5 +43,17 @@ class RequisitionSpec extends GebReportingSpec {
             secondProductName == productName2
             secondProductQuantity == "4000"
             secondProductQuantityPicked == "0"
+//        and:
+//            requisitionActionButton.click()
+//            processRequisitionActionButton.click()
+//        and:
+//            at ProcessRequisitionPage
+//            firstAccordionRow.click()
+//            firstRowContentPicked.value("1000")
+//            processRequisitionButton.click()
+//        then:
+//            at ShowRequisitionPage
+//            firstProductQuantityPicked == "1000"
+//            secondProductQuantityPicked == "0"
     }
 }
