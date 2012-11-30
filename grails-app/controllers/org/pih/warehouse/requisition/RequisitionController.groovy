@@ -124,4 +124,11 @@ class RequisitionController {
         }
         redirect(action: "list", id:params.id)
     }
+
+    def print = {
+        def requisition = Requisition.get(params.id)
+        if(requisition) {
+
+        }
+    }
 }

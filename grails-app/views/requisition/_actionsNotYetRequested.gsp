@@ -24,17 +24,11 @@
 			</g:link>		
 		</div>
 		<div class="action-menu-item">
-			<g:link controller="requisition" action="addComment" id="${requisition?.id}">
+			<g:link controller="picklist" action="print" id="${requisition?.id}">
 				<img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />
-				&nbsp;${warehouse.message(code: 'requisition.addComment.label', default: 'Add comment')}
+				&nbsp;${warehouse.message(code: 'picklist.print.label', default: 'Print picklist')}
 			</g:link>				
-		</div>		
-		<div class="action-menu-item">
-			<g:link controller="requisition" action="addDocument" id="${requisition?.id}">
-				<img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />
-				&nbsp;${warehouse.message(code: 'requisition.addDocument.label', default: 'Add document')}
-			</g:link>				
-		</div>				
+		</div>
 		<g:if test="${session?.warehouse?.id == requisition?.destination?.id }">
 			<div class="action-menu-item">
 				<g:link controller="requisition" name="processRequisition" action="process" id="${requisition?.id}">
