@@ -32,7 +32,12 @@ class ProductGroupController {
 
     def save = {
         def productGroupInstance = new ProductGroup(params)
-		productGroupInstance.products = productService.getProducts(params['product.id'])
+		//productGroupInstance.products = productService.getProducts(params['product.id'])
+		def products = productService.getProducts(params['product.id'])
+		println "Products: " + products
+		products.each { product ->
+			productGroupInstance.addToProducts(product)
+        }
 		
 		if (productGroupInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), productGroupInstance.id])}"
@@ -89,7 +94,10 @@ class ProductGroupController {
 			log.info("Products before " + productGroupInstance.products)
 			
 			def products = productService.getProducts(params['product.id'])
-			productGroupInstance.products += products
+			println "Products: " + products
+			products.each { product ->
+				productGroupInstance.addToProducts(product)
+			}
 
 			log.info("Products after " + productGroupInstance.products)
 			
@@ -133,8 +141,13 @@ class ProductGroupController {
 				return
 			}
 			
-			productGroupInstance.products = productService.getProducts(params['product.id'])
+			//productGroupInstance.products = productService.getProducts(params['product.id'])
 			
+			def products = productService.getProducts(params['product.id'])
+			println "Products: " + products
+			products.each { product ->
+				productGroupInstance.addToProducts(product)
+			}
             if (!productGroupInstance.hasErrors() && productGroupInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), productGroupInstance.id])}"
                 redirect(action: "edit", id: productGroupInstance.id)
