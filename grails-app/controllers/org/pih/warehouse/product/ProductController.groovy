@@ -17,12 +17,14 @@ import javax.swing.ImageIcon;
 import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.list.LazyList;
 import org.groovydev.SimpleImageBuilder;
+import org.hsqldb.util.CSVWriter;
 import org.junit.runner.Request;
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product;
 import org.pih.warehouse.product.DocumentCommand;
 import org.pih.warehouse.inventory.InventoryItem;
 import org.pih.warehouse.inventory.InventoryLevel;
+import org.pih.warehouse.core.ApiException;
 import org.pih.warehouse.core.Document;
 import org.pih.warehouse.core.DocumentType;
 import org.pih.warehouse.core.Location;
@@ -40,6 +42,8 @@ import com.google.zxing.BarcodeFormat;
 import java.net.URLEncoder;
 
 import grails.converters.JSON;
+import grails.converters.XML;
+import org.grails.plugins.csv.CSVWriter
 
 class ProductController {
 
@@ -157,8 +161,19 @@ class ProductController {
 		def productInstance = new Product();
 		productInstance.properties = params
 
-		log.info("Categories " + productInstance?.categories);
+		// Add tags 
+		try {
+			if (params.tagsToBeAdded) {
+				productInstance.tags.clear()
+				params.tagsToBeAdded.split(",").each { tagText ->
+					productInstance.addToTags(new Tag(tag:tagText))
+				}
+			}
+		} catch (Exception e) {
+			log.error("Error occurred: " + e.message)
+		}
 		
+		// Add attributes  
 		Attribute.list().each() {
 			String attVal = params["productAttributes." + it.id + ".value"];
 			if (attVal == "_other" || attVal == null || attVal == '') {
@@ -217,9 +232,9 @@ class ProductController {
 			if (!inventoryLevelInstance) {
 				inventoryLevelInstance = new InventoryLevel();
 			}
-	
 			
-			return [productInstance: productInstance, rootCategory: productService.getRootCategory(), inventoryInstance: location.inventory, inventoryLevelInstance:inventoryLevelInstance]
+			[productInstance: productInstance, rootCategory: productService.getRootCategory(), 
+					inventoryInstance: location.inventory, inventoryLevelInstance:inventoryLevelInstance]
 		}
 	}
 
@@ -617,7 +632,7 @@ class ProductController {
 	   }
    }
 
-   /**
+   /*
    static scale = { out, 
 	   def b = new SimpleImageBuilder()
 	   def result = b.render(width:'100px',height:'100px') {
@@ -637,10 +652,81 @@ class ProductController {
 	   
    }   
    */
+
+
+   def export = {
+	   def products = Product.list()
+	   
+	   println "products: " + products
+	   println "params: " + params
+	   if ( products ) {
+		  withFormat {
+			 /*
+			 json {
+				 
+				 println "json"
+				if ( params.callback ) {
+				   render(contentType: 'application/json',
+					  text: "${params.callback}(${products as JSON})")
+				} else {
+				   render products as JSON
+				}
+			 }
+			 xml {
+				 println "xml"
+				render products as XML
+			 }
+			 */
+			 csv {
+				 println "csv"
+				response.setHeader("Content-disposition",
+				   "attachment; filename=products.csv")
+				response.contentType = "text/csv"
+				
+				def sw = new StringWriter()
+				def csvWriter = new CSVWriter(sw, {
+				  "Name" { it.name }
+				  "Category" { it.category }
+				  "Description" { it.description }
+				  "Product Code" { it.productCode }
+				  "Unit of Measure" { it.unitOfMeasure }
+				  "Manufacturer" { it.manufacturer }
+				  "Manufacturer Code" { it.manufacturerCode }
+				  "Cold Chain" { it.coldChain }
+				  "UPC" { it.upc }
+				  "NDC" { it.ndc }
+				  "Date Created" { it.dateCreated }
+				  "Date Updated" { it.lastUpdated }
+				})
+				
+   
+				products.each { product ->
+					csvWriter << [
+						name: product.name,
+						category: product?.category?.name,
+						description: product?.description?:'',
+						productCode: product.productCode?:'',
+						unitOfMeasure: product.unitOfMeasure?:'',
+						manufacturer: product.manufacturer?:'',
+						manufacturerCode: product.manufacturerCode?:'',
+						coldChain: product.coldChain?:Boolean.FALSE,
+						upc: product.upc?:'',
+						ndc: product.ndc?:'',
+						dateCreated: product.dateCreated?:'',
+						lastUpdated: product.lastUpdated?:'',
+					]
+				}
+				render sw.toString()
+			 }
+		  }
+	   }
+	   else {
+		  render(text: 'No products found', status: 404)
+	   }
+	}
+   	
 	
-   
-   
-   
+
    static resize = { bytes, out, maxW, maxH ->
 	   AWTImage ai = new ImageIcon(bytes).image
 	   int width = ai.getWidth( null )
