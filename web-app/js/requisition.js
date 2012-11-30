@@ -192,6 +192,7 @@ openboxes.requisition.ProcessViewModel = function(requisitionData, picklistData,
             type: "POST",
             data: jsonString,
             dataType: "json",
+            async: false,
             success: function(result) {
                 console.log("result:" + JSON.stringify(result));
                 if(result.success){
@@ -242,6 +243,7 @@ openboxes.requisition.EditRequisitionViewModel = function(requisitionData) {
             contentType: 'text/json',
             type: "POST",
             data: jsonString,
+            async: false,
             dataType: "json",
             success: function(result) {
                 console.log("result:" + JSON.stringify(result));

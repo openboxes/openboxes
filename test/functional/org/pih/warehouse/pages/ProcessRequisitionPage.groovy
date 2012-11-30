@@ -5,7 +5,7 @@ import testutils.TestFixture
 
 class ProcessRequisitionPage extends Page {
     static url = TestFixture.baseUrl + "/requisition/process"
-    static at = { title == "Edit Requisition"}
+    static at = { title == "Process requisition"}
     static content = {
         firstLi(wait:true) { $(".ui-accordion-li-fix").first() }
         firstAccordionRow(wait: true) { $(firstLi.find(".accordion-header")) }
@@ -15,6 +15,6 @@ class ProcessRequisitionPage extends Page {
         secondAccordionRow(wait: true) { $(secondLi.find(".accordion-header")) }
         secondRowContent(wait: true) { $(secondLi.find(".accordion-content")) }
         secondRowContentPicked(wait: true) { $(secondRowContent.find(".number")) }
-        processRequisitionButton(wait:true) { $("#save-requisition") }
+        processRequisitionButton(to: ShowRequisitionPage) { $("#save-requisition") }
     }
 }

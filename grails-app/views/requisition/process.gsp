@@ -6,9 +6,8 @@
     <script src="${createLinkTo(dir:'js/knockout/', file:'knockout-2.2.0.js')}" type="text/javascript" ></script>
     <script src="${createLinkTo(dir:'js/', file:'requisition.js')}" type="text/javascript" ></script>
     <g:set var="entityName" value="${warehouse.message(code: 'requisition.label', default: 'Requisition')}" />
-    <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
-    <!-- Specify content to overload like global navigation links, page titles, etc. -->
-    <content tag="pageTitle"><warehouse:message code="default.edit.label" args="[entityName]" /></content>
+    <title><warehouse:message code="requisition.process.label" /></title>
+    <content tag="pageTitle"><warehouse:message code="requisition.process.label" /></content>
 </head>
 <body>
 <div class="body">

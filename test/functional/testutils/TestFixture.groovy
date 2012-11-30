@@ -148,7 +148,6 @@ class TestFixture{
             actualShippingDate.click()
             datePicker.today.click()
             nextButton.click()
-
             at ViewShipmentPage
             assert shipmentName == shipment_name && status == "Shipped"
         }

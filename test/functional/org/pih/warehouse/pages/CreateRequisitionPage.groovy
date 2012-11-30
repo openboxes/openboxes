@@ -5,7 +5,7 @@ import testutils.TestFixture
 
 class CreateRequisitionPage extends Page {
     static url = TestFixture.baseUrl + "/requisition/create"
-    static at = { title == "create requisition"}
+    static at = { title == "Create Requisition"}
     static content = {
         selectRequestingDepot { $("select[name='origin.id']") }
         autocompleteRequestedBy { $("input[name='requestedBy']") }

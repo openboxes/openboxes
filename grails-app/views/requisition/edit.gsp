@@ -2,15 +2,16 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
-<title>create requisition</title>
     <meta name="layout" content="custom" />
+    <g:set var="entityName" value="${warehouse.message(code: 'requisition.label', default: 'Requisition')}" />
+    <title><warehouse:message code="${requisitionId ? 'default.edit.label' : 'default.create.label'}" args="[entityName]" /></title>
+		<content tag="pageTitle"><warehouse:message code="${requisitionId ? 'default.edit.label' : 'default.create.label'}" args="[entityName]" /></content>
     <script src="${createLinkTo(dir:'js/knockout/', file:'knockout-2.2.0.js')}" type="text/javascript" ></script>
     <script src="${createLinkTo(dir:'js/', file:'knockout_binding.js')}" type="text/javascript" ></script>
     <script src="${createLinkTo(dir:'js/', file:'requisition.js')}" type="text/javascript" ></script>
 
 </head>
 <body>
-
 <g:form name="requisitionForm" method="post" action="save">
   <div class="dialog box  ui-validation">
     <div id="requisition-header">
