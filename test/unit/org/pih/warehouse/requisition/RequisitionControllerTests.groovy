@@ -303,4 +303,22 @@ class RequisitionControllerTests extends ControllerUnitTestCase{
         assert redirectArgs.action == "list"
         assert controller.flash.message == "do not exist"
     }
+
+    void testPrintRequisition() {
+
+        def requisition = new Requisition(id: "req1", name: "req1", recipientProgram:"abc")
+        mockDomain(Requisition, [requisition])
+
+        def location = new Location(id: "loc1")
+        mockDomain(Location, [location])
+
+        controller.params.id = "req1"
+        controller.session.warehouse = location
+        controller.printDraft()
+
+        assert renderArgs.view == "printDraft"
+        assert renderArgs.model.location == location
+        assert renderArgs.model.requisition == requisition
+
+    }
 }

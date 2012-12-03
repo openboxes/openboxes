@@ -35,6 +35,7 @@
 			.report { page-break-after: always; }
 		</g:if>		
 	</style>
+
 </head>
 <body >
     <div class="${params.orientation?:'landscape'}" >

@@ -26,8 +26,6 @@ class RequisitionItemTests extends GrailsUnitTestCase {
         println requisitionItem.errors["quantity"]
     }
 
-
-
     void testToJsonData(){
       def product = new Product(id: "prod1", name:"aspin")
       def requisitionItem = new RequisitionItem(
@@ -54,5 +52,45 @@ class RequisitionItemTests extends GrailsUnitTestCase {
       assert json.recipient == requisitionItem.recipient
       assert json.substitutable
       assert json.orderIndex == requisitionItem.orderIndex
+    }
+
+    void testcalculateQuantityPicked() {
+
+        def requisitionItem = new RequisitionItem(id: "reqItem1")
+        mockDomain(RequisitionItem, [requisitionItem])
+
+        def picklistItem1 = new PicklistItem(id: "pickItem1", quantity: 30)
+        def picklistItem2 = new PicklistItem(id: "pickItem2", quantity: 100)
+        def picklistItem3 = new PicklistItem(id: "pickItem3", quantity: 205)
+        mockDomain(PicklistItem, [picklistItem1, picklistItem2, picklistItem3])
+
+        picklistItem1.requisitionItem = requisitionItem
+        picklistItem2.requisitionItem = requisitionItem
+        picklistItem3.requisitionItem = requisitionItem
+
+        assert requisitionItem.calculateQuantityPicked() == (30 + 100 + 205)
+
+    }
+
+    void testcalcuateNumInventoryItem()
+    {
+        def inventoryItem1 = new InventoryItem(id: "invent1")
+        def inventoryItem2 = new InventoryItem(id: "invent2")
+        def inventoryItem3 = new InventoryItem(id: "invent3")
+        mockDomain(InventoryItem, [inventoryItem1, inventoryItem2, inventoryItem3])
+
+        def product = new Product(id: "prod1")
+        mockDomain(Product, [product])
+
+        inventoryItem1.product = product
+        inventoryItem2.product = product
+        inventoryItem3.product = product
+
+        def requisitionItem = new RequisitionItem(id: "reqItem1")
+        mockDomain(RequisitionItem, [requisitionItem])
+
+        requisitionItem.product = product
+
+        assert requisitionItem.calculateNumInventoryItem() == 3
     }
 }

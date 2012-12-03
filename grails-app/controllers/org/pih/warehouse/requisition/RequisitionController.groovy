@@ -9,12 +9,8 @@
  * */
 package org.pih.warehouse.requisition
 
-import org.pih.warehouse.core.Comment;
-import org.pih.warehouse.core.Document;
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.Person
 import grails.converters.JSON
-import org.pih.warehouse.product.Product
 import org.pih.warehouse.picklist.Picklist
 
 
@@ -125,10 +121,9 @@ class RequisitionController {
         redirect(action: "list", id:params.id)
     }
 
-    def print = {
+    def printDraft = {
         def requisition = Requisition.get(params.id)
-        if(requisition) {
-
-        }
+        def location = Location.get(session.warehouse.id)
+        render(view:"printDraft", model:[requisition:requisition, location:location])
     }
 }

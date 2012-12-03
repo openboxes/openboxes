@@ -1,0 +1,50 @@
+body{
+    margin: 15px;
+}
+
+td{
+    border: 1px black solid;
+    height: 30px;
+}
+
+.header{
+    float:right;
+    margin: 10px;
+}
+
+.title{
+    clear: both;
+    text-align: center;
+    margin: 10px;
+}
+
+.theader td {
+    font-weight: bold;
+}
+
+#logo {
+    width: 20px;
+    height: 20px;
+}
+
+#signature-table{
+    width: 60%;
+    margin: auto;
+    border: 1px black solid;
+    margin-bottom: 20px;
+}
+
+#requisition-items{
+    border: 1px black solid;
+    margin-bottom: 10px;
+}
+
+#comment-box{
+    border: 1px black solid;
+    height: 100px;
+    margin-top:10px;
+}
+
+@media print {
+ #print-button { display:none; }
+}

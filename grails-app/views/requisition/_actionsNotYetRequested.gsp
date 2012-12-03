@@ -24,8 +24,8 @@
 			</g:link>		
 		</div>
 		<div class="action-menu-item">
-			<g:link controller="picklist" action="print" id="${requisition?.id}">
-				<img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />
+			<g:link controller="requisition" action="printDraft" id="${requisition?.id}" target="_blank">
+				<img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />
 				&nbsp;${warehouse.message(code: 'picklist.print.label', default: 'Print picklist')}
 			</g:link>				
 		</div>
